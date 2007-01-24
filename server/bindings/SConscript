@@ -1,0 +1,4 @@
+dirs = Split('python')
+
+for subdir in dirs :
+  SConscript('%s/SConscript' % subdir)

@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+
+<gazebo:world 
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
+  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
+  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#params" 
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui">
+
+
+  <!--  <model:xml name="sphere1_model">
+    <xyz>0 1 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:sphere name="sphere1_body">
+      <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <geom:sphere name="sphere1_geom">
+        <mesh>sphere.mesh</mesh>
+        <size>0.5</size>
+        <density>1.0</density>
+        <material>Gazebo/Rocky</material>
+      </geom:sphere>
+    </body:sphere>
+  </model:xml>
+
+  <model:xml name="box1_model">
+    <xyz>2 1 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:box name="box1_body">
+      <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <geom:box name="box1_geom">
+        <mesh>box.mesh</mesh>
+        <size>0.5 0.5 0.5</size>
+        <density>1.0</density>
+        <material>Gazebo/BumpyMetal</material>
+      </geom:box>
+    </body:box>
+  </model:xml>
+
+  <model:xml name="cylinder1_model">
+    <xyz>-2 1 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:cylinder name="cylinder1_body">
+      <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <geom:cylinder name="cylinder1_geom">
+        <mesh>cylinder.mesh</mesh>
+        <size>0.5 0.5 0.5</size>
+        <density>1.0</density>
+        <material>Gazebo/RustyBarrel</material>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:xml>
+  -->
+
+  <model:xml name="plane1_model">
+    <xyz>0 0 0</xyz>
+    <rpy>0 0 0</rpy>
+    <static>true</static>
+
+    <body:plane name="plane1_body">
+
+      <geom:plane name="plane1_geom">
+        <normal>0 1 0</normal>
+        <altitude>0</altitude>
+        <material>Gazebo/GrassFloor</material>
+      </geom:plane>
+    </body:plane>
+  </model:xml>
+
+  <model:LightSource>
+    <name>light1</name>
+    <xyz>0.000 10.000 -10.000</xyz>
+    <type>point</type>
+    <diffuseColor>1.0 1.0 1.0</diffuseColor>
+    <specularColor>0.5 0.5 0.5</specularColor>
+    <attenuation>100 1.0 0.00 0.00</attenuation>
+  </model:LightSource>
+
+  <model:ObserverCam>
+    <name>userCam0</name>
+    <xyz>0 10 0</xyz>
+    <rpy>-0 45 -39</rpy>
+    <imageSize>640 480</imageSize>
+    <updateRate>10</updateRate>
+  </model:ObserverCam>
+
+
+
+
+  <model:xml name="pioneer1_model">
+    <xyz>0 1 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <python>pioneer2dx</python>
+
+    <body:box name="chassis_body">
+      <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <geom:box name="box1_geom">
+        <mesh>box.mesh</mesh>
+        <size>0.277 0.17 0.445</size>
+        <density>1.0</density>
+        <material>Gazebo/PioneerBody</material>
+      </geom:box>
+    </body:box>
+
+    <body:cylinder name="left_wheel">
+      <xyz>-0.16 -0.0725 0.02</xyz>
+      <rpy>0 90 0</rpy>
+      <geom:cylinder name="cylinder1_geom">
+        <mesh>cylinder.mesh</mesh>
+        <size>0.075 0.05</size>
+        <density>0.1</density>
+        <material>Gazebo/Black</material>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:cylinder name="right_wheel">
+      <xyz>0.16 -0.0725 0.02</xyz>
+      <rpy>0 90 0</rpy>
+      <geom:cylinder name="cylinder1_geom">
+        <mesh>cylinder.mesh</mesh>
+        <size>0.075 0.05</size>
+        <density>0.1</density>
+        <material>Gazebo/Black</material>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:sphere name="castor_body">
+      <xyz>0 -0.11 -0.200</xyz>
+      <rpy>0 0 0</rpy>
+      <geom:sphere name="castor_geom">
+        <mesh>sphere.mesh</mesh>
+        <size>0.04</size>
+        <density>0.1</density>
+        <material>Gazebo/Black</material>
+      </geom:sphere>
+    </body:sphere>
+ 
+    <joint:hinge>
+      <body1>left_wheel</body1>
+      <body2>chassis_body</body2>
+      <anchor>left_wheel</anchor>
+      <axis>1 0 0</axis>
+      <erp>0.4</erp>
+      <cfm>0.8</cfm>
+    </joint:hinge>
+
+    <joint:hinge>
+      <body1>right_wheel</body1>
+      <body2>chassis_body</body2>
+      <anchor>right_wheel</anchor>
+      <axis>1 0 0</axis>
+      <erp>0.4</erp>
+      <cfm>0.8</cfm>
+    </joint:hinge>
+
+    <joint:ball>
+      <body1>castor_body</body1>
+      <body2>chassis_body</body2>
+      <anchor>castor_body</anchor>
+    </joint:ball>
+
+    <interface:position2d name="position_iface"/>
+
+    <!--<interface:power name="power_iface"/>
+    <interface:sonar name="sonar_iface"/>
+    -->
+
+  </model:xml>
+
+</gazebo:world>

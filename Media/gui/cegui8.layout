@@ -1,0 +1,130 @@
+<?xml version="1.0" ?>
+<!-- Layout file from CEGUI Demo8 -->
+<GUILayout>
+<Window Type="DefaultGUISheet" Name="demo_root">
+
+	<Window Type="DefaultGUISheet" Name="Demo8">
+
+		<Property Name="RelativeMaxSize" Value="w:1 h:2" />
+		<Property Name="Size" Value="w:1 h:2" />
+
+		<Window Type="TaharezLook/VerticalScrollbar" Name="Demo8/ViewScroll">
+			<Property Name="Position" Value="x:0.0 y:0.0" />
+			<Property Name="Size" Value="w:0.03 h:0.75" />
+			<Property Name="DocumentSize" Value="2" />
+			<Property Name="PageSize" Value="1" />
+			<Property Name="StepSize" Value="0.01" />
+			<Property Name="OverlapSize" Value="0.5" />
+		</Window>
+
+        <Window Type="TaharezLook/FrameWindow" Name="Demo8/Window1">
+			<Property Name="Position" Value="x:0.05 y:0.1" />
+			<Property Name="RelativeMaxSize" Value="w:0.5 h:1" />
+			<Property Name="AbsoluteMinSize" Value="w:128 h:128" />
+			<Property Name="Size" Value="w:0.4 h:0.35" />
+			<Property Name="Text" Value="Demo 8 - Listbox Demo" />
+
+			<Window Type="TaharezLook/Listbox" Name="Demo8/Window1/Listbox">
+				<Property Name="Position" Value="x:0.05 y:0.1" />
+				<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+				<Property Name="Size" Value="w:0.9 h:0.33" />
+			</Window>
+
+			<Window Type="TaharezLook/StaticText" Name="Demo8/Window1/Controls">
+				<Property Name="Position" Value="x:0.05 y:0.45" />
+				<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+				<Property Name="Size" Value="w:0.9 h:0.5" />
+
+                <Window Type="TaharezLook/HorizontalScrollbar" Name="Demo8/Window1/Controls/Red">
+					<Property Name="Position" Value="x:0.05 y:0.05" />
+					<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+					<Property Name="Size" Value="w:0.9 h:0.06" />
+					<Property Name="DocumentSize" Value="255" />
+					<Property Name="PageSize" Value="16" />
+					<Property Name="StepSize" Value="1" />
+					<Property Name="OverlapSize" Value="1" />
+				</Window>
+
+                <Window Type="TaharezLook/HorizontalScrollbar" Name="Demo8/Window1/Controls/Green">
+					<Property Name="Position" Value="x:0.05 y:0.12" />
+					<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+					<Property Name="Size" Value="w:0.9 h:0.06" />
+					<Property Name="DocumentSize" Value="256" />
+					<Property Name="PageSize" Value="16" />
+					<Property Name="StepSize" Value="1" />
+					<Property Name="OverlapSize" Value="1" />
+				</Window>
+
+                <Window Type="TaharezLook/HorizontalScrollbar" Name="Demo8/Window1/Controls/Blue">
+					<Property Name="Position" Value="x:0.05 y:0.19" />
+					<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+					<Property Name="Size" Value="w:0.9 h:0.06" />
+					<Property Name="DocumentSize" Value="255" />
+					<Property Name="PageSize" Value="16" />
+					<Property Name="StepSize" Value="1" />
+					<Property Name="OverlapSize" Value="1" />
+				</Window>
+
+				<Window Type="TaharezLook/StaticImage" Name="Demo8/Window1/Controls/ColourSample">
+					<Property Name="Position" Value="x:0.05 y:0.26" />
+					<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+					<Property Name="Size" Value="w:0.9 h:0.1" />
+					<Property Name="Image" Value="set:TaharezLook image:ListboxSelectionBrush" />
+					<Property Name="ImageColours" Value="tl:0 tr:0 bl:0 br:0" />
+				</Window>
+
+				<Window Type="TaharezLook/Editbox" Name="Demo8/Window1/Controls/Editbox">
+					<Property Name="Position" Value="x:0.05 y:0.38" />
+					<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+					<Property Name="Size" Value="w:0.6 h:0.15" />
+				</Window>
+
+                <Window Type="TaharezLook/Button" Name="Demo8/Window1/Controls/Add">
+					<Property Name="Position" Value="x:0.68 y:0.38" />
+					<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+					<Property Name="Size" Value="w:0.3 h:0.15" />
+					<Property Name="Text" Value="Add" />
+				</Window>
+
+                <Window Type="TaharezLook/StaticText" Name="Demo8/Window1/Controls/ins1">
+					<Property Name="Position" Value="x:0.05 y:0.55" />
+					<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+					<Property Name="Size" Value="w:0.9 h:0.4" />
+					<Property Name="HorzFormatting" Value="WordWrapCentred" />
+					<Property Name="Text" Value="Use this panel to add items.  The scrollbars change the selection colour." />
+				</Window>
+
+			</Window>
+			
+		</Window>
+
+        <Window Type="TaharezLook/FrameWindow" Name="Demo8/Window2">
+			<Property Name="Position" Value="x:0.55 y:0.1" />
+			<Property Name="RelativeMaxSize" Value="w:0.5 h:1" />
+			<Property Name="AbsoluteMinSize" Value="w:128 h:128" />
+			<Property Name="Size" Value="w:0.4 h:0.3" />
+			<Property Name="Text" Value="Demo 8 - Information Window" />
+
+            <Window Type="TaharezLook/StaticText" Name="Demo8/Window2/Info">
+				<Property Name="Position" Value="x:0.05 y:0.1" />
+				<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+				<Property Name="Size" Value="w:0.9 h:0.3" />
+				<Property Name="HorzFormatting" Value="WordWrapCentred" />
+				<Property Name="Text" Value="The panel below gives some information about the item under the mouse." />
+			</Window>
+	
+            <Window Type="TaharezLook/StaticText" Name="Demo8/Window2/Tips">
+				<Property Name="Position" Value="x:0.05 y:0.5" />
+				<Property Name="RelativeMaxSize" Value="w:1 h:1" />
+				<Property Name="Size" Value="w:0.9 h:0.4" />
+				<Property Name="HorzFormatting" Value="WordWrapCentred" />
+			</Window>
+
+		</Window>
+
+
+	</Window>
+
+</Window>
+
+</GUILayout>

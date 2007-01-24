@@ -1,0 +1,95 @@
+
+/** @page standards Coding Standards and Conventions
+
+This appendix sets out the basic coding standards and conventions used
+in Gazebo and libgazebo.  Developers are urged to pay attention to
+these standards, if for no other reason than to avoid annoying other
+developers.
+
+
+@section standards_gazebo Gazebo
+
+Gazebo is written in a subset of C++ ("C with classes" as Brian put it
+recently).  This means that use of more advanced C++ "features"
+(templates, STL, run-time typing, multiple inheritance, etc.) is
+<b>strongly</b> discouraged.
+
+
+@par Naming Conventions
+
+- Source files are camel-capped; e.g., <tt>Pioneer2AT.cc</tt>.
+
+- C++ header files are suffixed with <tt>.hh</tt>, C++ source files are
+  suffixed with <tt>.cc</tt>; e.g., <tt>Model.hh, Model.cc</tt>.
+
+- Directory names are lower case, with the exception of model
+  directories, which are camel-capped.
+
+
+@par Coding Conventions
+
+
+- Class and function names are camel-capped with a leading
+  upper-case character; e.g. <tt>BoxGeom</tt>, <tt>SetGravity()</tt>.
+
+- Variable names are camel-capped with a leading lower-case character,
+  and do not include any type encoding (no Hungarian);
+  e.g. <tt>myVariable</tt>.
+
+- Class variables and methods are always accessed explicitly:
+  e.g. <tt>this->MyMethod()</tt> and <tt>this->myVariable</tt>.
+
+- Standard indentation is two spaces (no tab characters).
+
+- Matching braces are aligned, e.g.:
+  @verbatim
+  if (condition)
+  {
+    do_something();
+    do_something_else();
+  }
+  @endverbatim
+
+
+
+@section standards_libgazebo libgazebo
+
+For maximum compatibility and portability, libgazebo is written in C.
+
+
+@par File Naming Conventions
+
+- Source files are lower-case with underscores; e.g., <tt>gz_laser.c</tt>.
+
+- Header files are suffixed with <tt>.h</tt>, C source files are
+  suffixed with <tt>.c</tt>; e.g., <tt>gazebo.h, libgazebo.c</tt>.
+
+- Source files for interfaces are prefixed by <tt>gz_</tt>; e.g.,
+  <tt>gz_position.c</tt>.
+
+
+
+@par Coding Conventions
+
+- Public functions (i.e., those included in <tt>gazebo.h</tt> are prefixed
+  by <tt>gz_</tt>; e.g., <tt>gz_laser_alloc()</tt>.
+
+- Function names are lower-case with underscores; e.g., <tt>my_function()</tt>.
+
+- Variable names are lower-case with underscores, and do not include
+  any type encoding (i.e., no Hungarian); e.g., <tt>my_variable</tt>.
+
+- Standard indentation is two spaces (no tab characters).
+
+- Matching braces are aligned, e.g.:
+  @verbatim
+  if (condition)
+  {
+    do_something();
+    do_something_else();
+  }
+  @endverbatim
+
+
+
+*/

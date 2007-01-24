@@ -1,0 +1,44 @@
+Gazebo - A dynamic multi-robot simulator
+---------------------------------------- 
+
+This is the Gazebo simulator.  Gazebo simulates multiple robots in a
+3D environment, with extensive dynamic interaction between objects.
+Gazebo was developed at the USC Robotics Research Lab as part of the
+Player/Stage project, and is fully compatible at with the Player robot
+device server.  Gazebo is available under the GNU General Public License (GPL)
+and can be downloaded from the Player/Stage homepage:
+
+  http://playerstage.sourceforge.net
+
+
+Installation
+------------
+Read INSTALL for generic instructions.  For most people, the following
+sequence will suffice:
+
+  $ scons install
+
+
+3rd Party Libraries
+------------------
+Gazebo uses the following libraries:
+
+  Geospatial Data Abstraction Library (GDAL) http://www.remotesensing.org/gdal
+  OpenDynamicsEngine (ODE) http://opende.sourceforge.net
+
+ODE is mandatory. GDAL is required only for specific features
+such as the MapExtruder and Terrain models, but is highly recommended.
+
+
+On-line installation instructions
+---------------------------------
+
+The latest installation instructions can be found on-line, at
+
+  http://playerstage.sourceforge.net/doc/
+
+
+
+
+  - Andrew Howard (ahoward@usc.edu), Nate Koenig (nkoenig@usc.edu)
+

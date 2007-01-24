@@ -1,0 +1,16 @@
+- GPS quantization bug (Player?)
+- WiFi LOS model
+
+
+Open:
+- Real time user interaction
+- Multilevel map extruder
+- Graphical Scene builder. Exports an XML configuration file.
+- Player image interface
+- libgazebo image interface
+- Player gazebo imaging driver
+- Check laser sampling rate
+- Standardize internal API
+- Fix any memory leaks
+- Data Logger
+- Render to offscreen buffers. This will make it possible to run without any X11 windows, and still get camera data back.

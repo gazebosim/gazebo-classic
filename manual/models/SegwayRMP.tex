@@ -1,0 +1,50 @@
+
+\subsection{Overview}
+
+The {\tt \modelName} model simulates RMP modification of the Segway HT.
+
+Those of you that already have one of these will know what this is;
+for everyone else: the Segway RMP (Robotic Mobility Platform) is a
+two-wheeled, dynamically stabilized robot made from a modified Segway
+HT (Human Transporter).  This is an interesting beast: it is large,
+fast and heavy, and will fall down alarmingly if you turn the power
+off.
+
+The {\tt \modelName} model includes a PID inverted pendulum controller
+written by \mkobilar.  The dynamics are roughly similar to those of
+the real robot, but users should not expect a close correlation.
+
+
+
+
+\subsection{\libgazebo Interfaces}
+
+{\tt \modelName} supports the \libgazebo {\tt position} interface.  
+IMU data is not yet available.
+
+
+\subsection{Player Drivers}
+
+Basic motor control and odometry information is available through the
+{\tt gz\_position} driver.  IMU data is not yet available.
+
+\subsection{World File Attributes}
+
+{\tt \modelName} models can be instantiated using the
+\verb+<model:SegwayRMP>+ tag.  The following attributes are
+supported.
+
+\begin{xmlattrtable}{model}{\modelName}
+\modeldefaults
+\end{xmlattrtable}
+
+\subsection{Body Attributes}
+
+The following bodies are used by this model.
+
+\begin{bodyattrtable}
+\bodydefaults
+\bodyattr{topPlate}{Top plate}
+\end{bodyattrtable}
+
+

@@ -1,0 +1,42 @@
+
+/** @page libgazebo_py Python bindings (libgazebo_py)
+
+Python bindings for libgazebo are generated automatically using <a
+href="http://swig.com">SWIG</a>.  The bindings are object-oriented,
+using standard Python classes (for those familiar with SWIG, these are
+standard SWIG shadow classes).  Refer to the @ref libgazebo_usage "libgazebo instructions" 
+for general information on how to use this library.
+
+
+@section libgazebo_py_usage General usage
+
+Programs using the libgazebo Python bindings will generally have the
+following structure:
+
+@include sinusoid.py
+
+The steps in this program mirror those described for <a
+href="index.html">standard C program</a>.  The key syntactical
+difference between the C-version and the Python version is the use of
+Python's object-oriented features.
+
+This example can be demonstrated using the follow world file:
+
+@include sinusoid.world
+
+
+@section libgazebo_py_ref Proxy reference
+
+Generally speaking, the Python bindings are one-to-one mappings to the
+libgazebo API.  Thus, the C documentation can be used as a guide, so
+long as one makes some minor mental translations; e.g.:
+
+@verbatim
+pos = gz_position_alloc(...);    ->   pos = gz_position(...)
+gz_position_open(pos, ...);      ->   pos.open(...)
+@endverbatim
+
+Detailed information for each C proxy can be found in the <a
+href="modules.html">Reference</a> section.
+
+*/

@@ -1,0 +1,296 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Player
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Working with Player}
+\label{sec.player}
+
+The Player device server treats Gazebo in exactly the same way that it
+treats real robot hardware: as a device that is a source of data and a
+sink for commands.  A key advantage of this approach is that users may
+mix Player {\em abstract} drivers with simulation drivers.  Thus, for
+example, drivers such as VFH (Vector Field Histogram) and AMCL
+(adapative Monte-Carlo localization), will work equally well with
+simulated and real robots.  In the following sections, we describe
+some basic scenarios that demonstate this interaction.
+
+\section{Setting up the Simulation}
+
+The basic steps for setting up and running a combined Player/Gazebo
+simulation are as follows.
+\begin{enumerate}
+\item Write the Gazebo world file.
+\item Start Gazebo.
+\item Write the corresponding Player configuration file(s).
+\item Start Player(s).
+\item Start client program(s).
+\end{enumerate}
+Note that Gazebo must be started {\em before} the Player server, and
+that the Player server must {\em re-started} whenever Gazebo is
+re-started.
+
+
+\section{Example: Using a Single Robot}
+
+Consider the case of a single robot with a scanning laser
+range-finder.  The following Gazebo world file snippet will create a
+Pioneer2DX robot with SICK~LMS200 laser.
+\begin{verbatim}
+  <model:Pioneer2DX>
+    <id>robot1_position</id>
+    <xyz>0 0 0.40</xyz>
+    <rpy>0 0 45</rpy>
+    <model:SickLMS200>
+      <id>robot1_laser</id>
+      <xyz>0.15 0 0.20</xyz>
+      <rpy>0 0 0</rpy>
+    </model:SickLMS200>
+  </model:Pioneer2DX>
+\end{verbatim}
+The corresponding snippet of the Player configuration file should look
+like this:
+\begin{verbatim}
+  position:0
+  (
+    driver "gz_position"
+    gz_id "robot1_position"
+  )
+
+  laser:1
+  (
+    driver "gz_laser"
+    gz_id "robot1_laser"
+  )
+\end{verbatim}
+
+To run this simulation, start Gazebo with:
+\begin{verbatim}
+  $ gazebo <myworld>
+\end{verbatim} %$
+where \verb+<myworld>+ is the name of the Gazebo world file,
+and start Player with
+\begin{verbatim}
+  $ player -g default <myconfig>
+\end{verbatim} %$
+where \verb+<myconfig>+ is the name of the Player configuration file.
+%
+Client programs can connect to the simulated devices devices on the
+default Player port 6665.
+
+
+\section{Example: Using a Single Robot with the VFH driver}
+
+Abstract devices can be mixed freely with simulated devices in the
+Player server.  Thus, for example, it is possible to use the VFH
+(Vector Field Histogram) driver with a simulated robot.  The following
+Gazebo world file snippet will create a Pioneer2DX robot with
+SICK~LMS200 laser.
+\begin{verbatim}
+  <model:Pioneer2DX>
+    <id>robot1_position</id>
+    <xyz>0 0 0.40</xyz>
+    <rpy>0 0 45</rpy>
+    <model:SickLMS200>
+      <id>robot1_laser</id>
+      <xyz>0.15 0 0.20</xyz>
+      <rpy>0 0 0</rpy>
+    </model:SickLMS200>
+  </model:Pioneer2DX>
+\end{verbatim}
+The corresponding snippet of the Player configuration file should look
+like this:
+\begin{verbatim}
+  position:0
+  (
+    driver "gz_position"
+    gz_id "robot1_position"
+  )
+
+  laser:0
+  (
+    driver "gz_laser"
+    gz_id "robot1_laser"
+  )
+
+  position:1
+  (
+    driver "vfh"
+    <vfh driver settings>
+  )
+\end{verbatim}
+Note that the configuration file is exactly as per the first example;
+we have simply added another device to the Player server.  The VFH
+driver will use the simulated robot chassis and laser exactly as it
+would a real robot chassis and laser.
+
+To run this simulation, start Gazebo with:
+\begin{verbatim}
+  $ gazebo <myworld>
+\end{verbatim} %$
+where \verb+<myworld>+ is the name of the Gazebo world file,
+and start Player with
+\begin{verbatim}
+  $ player -g default <myconfig>
+\end{verbatim} %$
+where \verb+<myconfig>+ is the name of the Player configuration file.
+%
+Client programs can connect to the server on the default Player port
+6665.
+
+
+\section{Example: Using Multiple Robots}
+
+There are a number of ways to work with multiple robots.  The simplest
+way is to use multiple instances of the Player server (one for each
+robot being simulated).
+%
+The following Gazebo world file snippet will create a pair of
+Pioneer2DX robots with SICK~LMS200 lasers.
+\begin{verbatim}
+  <model:Pioneer2DX>
+    <id>robot1_position</id>
+    <xyz>0 0 0.40</xyz>
+    <rpy>0 0 45</rpy>
+    <model:SickLMS200>
+      <id>robot1_laser</id>
+      <xyz>0.15 0 0.20</xyz>
+      <rpy>0 0 0</rpy>
+    </model:SickLMS200>
+  </model:Pioneer2DX>
+
+  <model:Pioneer2DX>
+    <id>robot2_position</id>
+    <xyz>0 0 0.40</xyz>
+    <rpy>0 0 45</rpy>
+    <model:SickLMS200>
+      <id>robot2_laser</id>
+      <xyz>0.15 0 0.20</xyz>
+      <rpy>0 0 0</rpy>
+    </model:SickLMS200>
+  </model:Pioneer2DX>
+\end{verbatim}
+Since there will be two instances of the Player server, two different
+configuration files are required.   For the first robot:
+\begin{verbatim}
+  position:0
+  (
+    driver "gz_position"
+    gz_id "robot1_position"
+  )
+
+  laser:1
+  (
+    driver "gz_laser"
+    gz_id "robot1_laser"
+  )
+\end{verbatim}
+and for the second robot:
+\begin{verbatim}
+  position:0
+  (
+    driver "gz_position"
+    gz_id "robot2_position"
+  )
+
+  laser:1
+  (
+    driver "gz_laser"
+    gz_id "robot2_laser"
+  )
+\end{verbatim}
+Note that these files are identical apart from the \verb+gz_id+
+property.  In general, however, the simulated robots may be
+heterogeneous, in which case the Player configuration files will
+differ substantially.
+
+To run this simulation, start Gazebo with:
+\begin{verbatim}
+  $ gazebo <myworld>
+\end{verbatim} %$
+where \verb+<myworld>+ is the name of the Gazebo world file,
+and start two instances of Player with
+\begin{verbatim}
+  $ player -p 7000 -g default <myconfig1>
+\end{verbatim} %$
+and
+\begin{verbatim}
+  $ player -p 7001 -g default <myconfig2>
+\end{verbatim} %$
+where \verb+<myconfig1>+ and \verb+<myconfig2>+ are the two Player
+configuration files.
+%
+Client programs can connect to the robots \verb+robot1+ and
+\verb+robot2+ through ports 7000 and 7001, respectively.
+
+
+
+\section{Example: Using Multiple Robots with {\tt --gazebo-prefix}}
+
+When the simulated robots are homogeneous, one may simplify the
+process somewhat by employing the \verb+--gazebo-prefix+ flag with
+Player.
+%
+The following Gazebo world file snippet will create a pair of
+Pioneer2DX robots with SICK~LMS200 lasers.
+\begin{verbatim}
+  <model:Pioneer2DX>
+    <id>robot1_position</id>
+    <xyz>0 0 0.40</xyz>
+    <rpy>0 0 45</rpy>
+    <model:SickLMS200>
+      <id>robot1_laser</id>
+      <xyz>0.15 0 0.20</xyz>
+      <rpy>0 0 0</rpy>
+    </model:SickLMS200>
+  </model:Pioneer2DX>
+
+  <model:Pioneer2DX>
+    <id>robot2_position</id>
+    <xyz>0 0 0.40</xyz>
+    <rpy>0 0 45</rpy>
+    <model:SickLMS200>
+      <id>robot2_laser</id>
+      <xyz>0.15 0 0.20</xyz>
+      <rpy>0 0 0</rpy>
+    </model:SickLMS200>
+  </model:Pioneer2DX>
+\end{verbatim}
+Since the robots are identical, we can write one Player configuration
+file for both:
+\begin{verbatim}
+  position:0
+  (
+    driver "gz_position"
+    gz_id "_position"
+  )
+
+  laser:1
+  (
+    driver "gz_laser"
+    gz_id "_laser"
+  )
+\end{verbatim}
+Note that the \verb+gz_id+ values are incomplete; we will add {\em
+prefix} to these values when the Player server is started.
+
+To run this simulation, start Gazebo with:
+\begin{verbatim}
+  $ gazebo <myworld>
+\end{verbatim} %$
+where \verb+<myworld>+ is the name of the Gazebo world file,
+and start two instances of Player with
+\begin{verbatim}
+  $ player -p 7000 -g default --gazebo-prefix robot1 <myconfig>
+\end{verbatim} %$
+and
+\begin{verbatim}
+  $ player -p 7001 -g default --gazebo-prefix robot 2 <myconfig>
+\end{verbatim} %$
+where \verb+<myconfig>+ is the common Player configuration file.
+%
+Client programs can connect to the robots \verb+robot1+ and
+\verb+robot2+ through ports 7000 and 7001, respectively.
+
+

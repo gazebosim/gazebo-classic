@@ -1,0 +1,40 @@
+\subsection{Overview}
+
+The {\tt \modelName} model generates a triangle mesh from a 2D image or other
+data file, such as a DEM. The generated mesh has a variable triangle density
+corresponding to a user defined error bound. A high error bound allows for more error in the terrain representation, resulting in fewer triangles.
+
+\subsection{\libgazebo Interfaces}
+
+{\tt \modelName} has no \libgazebo interface.
+
+\subsection{Player Drivers}
+
+There are no player drivers.
+
+\subsection{World File Attributes}
+
+{\tt \modelName} models can be instantiated using the
+\verb+<model:Terrain>+ tag.  The following attributes are
+supported.
+
+\begin{xmlattrtable}{model}{\modelName}
+\modeldefaults
+\xmlattr{vertexSpacing}{double}{1.0}{Meters between the vertices of the mesh.}
+\xmlattr{elevationScale}{double}{1.0}{Elevation scale factor in meters.}
+\xmlattr{color}{3-vector}{(0,0,0)}{RGB color}
+\xmlattr{texture2D}{string}{NULL}{Texture image filename}
+\xmlattr{textureRepeat}{tuple}{(1.0 1.0)}{Texture repetition in X and Y directions.}
+\xmlattr{cfm}{double}{0.01}{Constraint Force Mixing parameter}
+\xmlattr{errorBound}{double}{1.0}{Allowable error in triangle mesh.}
+\end{xmlattrtable}
+
+
+\subsection{Body Attributes}
+
+The following bodies are used by this model.
+
+\begin{bodyattrtable}
+\bodydefaults
+\end{bodyattrtable}
+

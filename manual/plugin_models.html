@@ -1,0 +1,264 @@
+
+/** @page plugin_models HOWTO: Creating a Plugin Model
+
+The are two distinct type of models in Gazebo:
+
+- <i>Static</i> models have their code in the main Gazebo
+distribution, and are statically linked into the server.  Generally
+speaking, such models will be added by the lead developers.
+
+- <i>Plugin</i> models are shared objects that are loaded at runtime
+(like loadable modules in the Linux kernel). They are the recommended
+method for all new, experimental or third party models.
+
+Plugin models have serveral advantanges over their static
+counterparts:
+
+- They are easier to build (no mucking about with autotools, or
+digging about in the server internals).
+
+- The allow for quicker debugging through a much faster
+code/compile/test cycle.  Unlike static models, one does not need to
+rebuild the Gazebo server, only the model itself.
+
+- Code can be maintained in a separate source repository.  This is
+particularly useful for third-party developers, and those users with
+funky one-off models that belong with the rest of their code, data,
+papers, etc.
+
+Developers are advised to read @ref standards before creating new
+models.
+
+
+
+@section plugin_models_example Plugin Model Example
+
+Sample code for a very basic plugin model in provided in the
+<tt>examples</tt> directory; for a default install, this will be:
+
+@verbatim
+/usr/local/src/gazebo/examples/plugins/ExampleModel/
+@endverbatim
+
+Copy the files from this directory and rename
+<tt>Makefile.example</tt> to <tt>Makefile</tt>.  Try building the
+example:
+
+@verbatim
+$ make 
+@endverbatim
+
+This produces a plugin model names <tt>ExampleModel.so</tt>.
+You can test the model using the included world file:
+
+@verbatim
+$ gazebo ./example.world
+@endverbatim
+
+The world file <tt>model</tt> tag has an additional attribute
+specifying the path to the plugin, i.e.,:
+
+@verbatim
+  <model:ExampleModel>
+    <plugin>ExampleModel.so</plugin>
+    ...
+  </model:ExampleModel>
+@endverbatim
+
+Note that the same plugin can be specified by more than one model.
+
+Note that the server will search for plugin models according to the
+following algorithm.  Given a request to load the plugin &lt;foo&gt;:
+<ol>
+<li> If &lt;foo&gt; is an absolute path, then try to load it, and exit with an
+     error if that fails.  If &lt;foo&gt; is a relative path, go to (2).
+<li> If the environment variable GAZEBOPATH is set, it is interpreted as a
+     colon-separated list of directores; try to load &lt;foo&gt; from each
+     directory in turn. If &lt;foo&gt; is found, great.  If not (or if GAZEBOPATH
+     is not set), go to (3).
+<li> Try to load &lt;foo&gt; by interpreting it as relative to the directory in
+     which the config file resides.  If that doesn't work, go to (4).
+<li> Try to load &lt;foo&gt; from &lt;prefix&gt;/lib/gazebo/plugins, where &lt;prefix&gt;
+     is the installation prefix determined at configure time.  The default
+     prefix is /usr/local.
+</ol>
+If a plugin cannot be loaded, Gazebo quits with an error.
+
+
+@section plugin_models_code Writing a simple driver
+
+To make a model, create a new class that inherits the Gazebo Model
+class.  This base class defines the standard API that all models must
+support.  The basic elements of the new model class are as follows.
+
+@par Load(...)
+
+The Load() method is responsible for creating the physical, visual and
+sensing elements of the model.  For a very simple robot model, at least
+two elements must be created:
+
+- One or more @e bodies: every model must have at least one instance
+of class Body to manage physical interactions (position, velocity,
+forces and torques).
+
+- One or more @e geoms: geoms are basic geometric objects that have both
+physical and visual properties (mass, size, shape, color, texture,
+etc).  Geoms come in many flavours, but all are derived from the Geom
+class.  Geoms are attached to bodies.
+
+- One or more @e joints: if the model has more than one body, these
+bodies are attached to each other via joints.  Thus, for example,
+a simple robot may consist of five bodies connected by four joints:
+  - One body for the robot chassis.
+  - Four bodies representing the robot's four wheels.
+  - Four joints attaching the wheels to the chassis.
+Joints come in several varieties, representing axles, linear
+actuators, etc., but most joints have @c motors that can be used to
+articulate the model.  The various flavours of joints are derived all
+from the Joint class.
+
+The Load() method has two arguments:
+
+- file : a pointer to the worldfile object.
+- node : a pointer to the worldfile node for this model.
+
+The @c node argument is used to access the worldfile settings for this
+particular model; one can read user-defined model dimensions, motor
+settings, update rates and so on using the methods provided in the
+WorldFileNode class.
+
+@par Init(...)
+
+The Init() method is called after all models have been loaded, and
+provides models the opportunity to perform additional initialization.
+By convention, any libgazebo interfaces supported by the model are
+allocated at this stage.  For example, if the model supports the
+position interface, the Init() method will create the interface as
+follows:
+
+@verbatim
+this->position = gz_position_alloc();
+if (gz_position_create(this->position, this->world->gz_server, this->GetId(),
+                       "ExampleModel", (int) this, (int) this->parent) != 0)
+  return -1;
+@endverbatim
+
+Models may support more than one interface at the same time.
+
+
+@par Fini(...)
+
+The Fini() method is called when the server exits, an provides
+models an opportunity to clean up after themselves.  By convention,
+libgazebo interface are deallocated at this time; e.g.:
+
+@verbatim
+gz_position_destroy( this->position );
+gz_position_free( this->position );
+this->position = NULL;
+@endverbatim
+
+
+@par Update(...)
+
+The Update() method is the heart of any model: this function is called
+periodically by the main simulation loop to update the model state.
+Note that the @b physics of the model are handled automatically by the
+server; the Update() method is generally used to update the libgazebo
+interface (get new commands and write new data).  Since the simulator
+update rate is a user-settable parameter, models should always check
+the current simulator time before taking any action.  The following 
+idiom is recommended:
+
+@verbatim
+if (this->world->GetSimTime() - this->updateTime > this->updatePeriod)
+{
+  this->updateTime = this->world->GetSimTime();
+
+  // Get commands from the external interface
+  this->GetPositionCmd();
+
+  // Set joint motor speeds and/or torques
+  ...
+
+  // Update the interface
+  this->PutPositionData();
+}
+@endverbatim
+
+Thus, for example, if the device being simulated has a communication
+frequency of 10Hz, we should only check for new commands (and update
+outgoing data) once every 100ms.  Failure to limit the update rate in
+this manner will result in a very slow simulation, and/or a poor
+fidelity simulation.  Note also the use of the World::GetSimTime() function;
+this is the elapsed @e simulation time, which may be very different
+from the elapsed @e real time.  Always use the simulation time when
+updating models.
+
+
+@par Other Examples
+
+The following built-in models provide good examples to work from:
+
+- Pioneer2AT : this model simulates an ActivMedia P2AT robot with
+  skid-steering, odometry and sonar sensors.
+
+- SonyVID30 : this model simulates a Sony pan-tilt-zoom unit; the
+  model permits control of the pan, tilt, and zoom values, and
+  provides image data from the camera sensor.
+
+Gazebo also makes heavy use of both OpenGL and the ODE (Open Dynamics
+Engine); the documentation for these projects provides valuable insight
+into the many important concepts:
+
+- OpenGL <a href="http://www.opengl.org/documentation/red_book_1.0/">
+Programming Guide</a> and <a
+href="http://www.opengl.org/documentation/blue_book_1.0/">Reference
+Manual</a>.
+
+- Open Dynamics Engine <a
+href="http://ode.org/ode-docs.html">Documentation</a>.
+
+
+@section plugin_models_registration Registration and instantiation
+
+In order to use a plugin model, the Gazebo server needs to know
+two things:
+
+- The model name (as it will appear in the world file).
+- The model %factory function (used to create an instance of the model class).
+
+The ModelFactory.hh header provides a macro that will automatically
+handle model registration and instantiation.  Use this macro at the
+top of the model file:
+
+@verbatim
+GZ_REGISTER_PLUGIN("ExampleModel", ExampleModel)
+@endverbatim
+
+The first argument gives the model name as it appears in the world
+file; the second argument gives the class name.
+
+@section plugin_models_building Building the shared library
+
+The example model includes a Makefile for building shared objects.  To
+manually build a shared object, try:
+
+@verbatim
+$ g++ -Wall -g3 -c ExampleModel.cc
+$ g++ -shared -nostartfiles -o ExampleModel.so ExampleModel.o
+@endverbatim
+
+While the above method will probably work, it is recommended that you
+use pkg-config to get the compile flags; i.e.,
+
+@verbatim
+$ g++ -Wall -g3 `pkg-config --cflags gazebo` -c ExampleModel.cc
+$ g++ -shared -nostartfiles -o ExampleModel.so ExampleModel.o
+@endverbatim
+
+
+@todo
+- Add example of building plugin using libtool.
+
+*/

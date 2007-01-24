@@ -1,0 +1,48 @@
+
+
+\subsection{Overview}
+
+The {\tt MapExtruder} model extrudes a 2D image into 3D geometry. This
+is useful for generating simple maps.  The bottom left point in the
+image is mapped to the position specified by the {\tt pos} tag.
+
+\subsection{\libgazebo Interfaces}
+
+{\tt MapExtruder} currently has no \libgazebo interface.
+
+
+\subsection{Player Drivers}
+
+There are no player drivers.
+
+\subsection{World File Attributes}
+
+{\tt MapExtruder} models can be instantiated using the
+\verb+<model:MapExtruder>+ tag.  The following attributes are
+supported.
+
+\begin{xmlattrtable}{model}{MapExtruder}
+\modeldefaults
+\xmlattr{imageFile}{string}{NULL}{PPM image file to extrude}
+\xmlattr{negative}{true/false}{false}{Use the inverse color values}
+\xmlattr{threshold}{integer}{200}{Value over which a pixel is considered filled space}
+\xmlattr{width}{float}{0.1}{Width of the geometries}
+\xmlattr{height}{float}{1}{Height of the geometries, along z-axis}
+\xmlattr{scale}{float}{0.1}{Scale the map up or down}
+\xmlattr{color}{3-vector}{(0,0,0)}{RGB color}
+\xmlattr{errBound}{float}{5}{Allowable error in the geometries}
+\xmlattr{halign}{left/center}{left}{Horizontal alignment}
+\xmlattr{valign}{bottom/center}{bottom}{Vertical alignment}
+
+\end{xmlattrtable}
+
+
+\subsection{Body Attributes}
+
+The following bodies are used by this model.
+
+\begin{bodyattrtable}
+\bodydefaults
+\end{bodyattrtable}
+
+

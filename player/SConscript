@@ -1,0 +1,7 @@
+Import('env')
+
+sources = Split('GazeboDriver.cc GazeboClient.cc GazeboInterface.cc GazeboTime.cc SimulationInterface.cc Position2dInterface.cc')
+
+# Position3dInterface.cc PowerInterface.cc LaserInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc FiducialInterface.cc GripperInterface.cc CameraInterface.cc TruthInterface.cc GpsInterface.cc ')
+
+env.SharedLibrary('gazeboplugin',sources)

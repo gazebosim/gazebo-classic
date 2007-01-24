@@ -1,0 +1,60 @@
+
+
+\subsection{Overview}
+
+The {\tt \modelName} model simulates the ubiquitous SICK scanning
+laser range-finder.
+
+
+\subsection{\libgazebo Interfaces}
+
+{\tt \modelName} supports the \libgazebo {\tt laser} and {\tt
+fiducial} interfaces.
+
+
+\subsection{Player Drivers}
+
+Range and intensity data is available through the {\tt gz\_laser}
+driver.  Fiducial information (ID, range, bearing and orientation) is
+available through the {\tt gz\_fiducial} driver.  Note that, at
+present, only {\tt SimpleSolid} models can be fiducials.
+
+
+\subsection{World File Attributes}
+
+{\tt SickLMS200} models can be instantiated using the
+\verb+<model:SickLMS200>+ tag.  The following attributes are
+supported.
+
+\begin{xmlattrtable}{model}{SickLMS200}
+\modeldefaults
+\xmlattr{rangeCount}{int}{361}{The number of range readings to generate.}
+\xmlattr{rayCount}{int}{91}{The number of actual rays to generate.}
+\xmlattr{maxRange}{float}{8.192}{Maximum laser range (m).}
+\xmlattr{minRange}{float}{0.20}{Minimum laser range (m).}
+\xmlattr{scanPeriod}{float}{0.200}{The interval between successive scans (s).}
+\end{xmlattrtable}
+
+\indent Note that when the number of rays is less than the number of range
+readings, the ``missing'' range readings will be interpolated.
+Reducing the number of rays is a good way to save CPU cycles (at the
+expense of simulation fidelity).
+
+
+
+\subsection{Body Attributes}
+
+The following bodies are used by this model.
+
+\begin{bodyattrtable}
+\bodydefaults
+\end{bodyattrtable}
+
+
+
+
+
+
+
+
+

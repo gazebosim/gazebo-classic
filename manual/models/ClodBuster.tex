@@ -1,0 +1,37 @@
+
+\subsection{Overview}
+
+The {\tt ClodBuster} model simulates the UPenn ClodBuster robot (4 wheel
+drive robot with Ackerman steering).
+
+\subsection{\libgazebo Interfaces}
+
+{\tt ClodBuster} supports the \libgazebo {\tt position} interface.
+
+
+\subsection{Player Drivers}
+
+Basic motor control and odometry information is available through the
+{\tt gz\_position} driver.
+
+
+\subsection{World File Attributes}
+
+{\tt ClodBuster} models can be instantiated using the
+\verb+<model:ClodBuster>+ tag.  The following attributes are
+supported.
+
+\begin{xmlattrtable}{model}{ClodBuster}
+\modeldefaults
+\xmlattr{raw\_encoder\_position}{true/false}{false}{Flag indicating return of raw wheel encoder values.}
+\end{xmlattrtable}
+
+\subsection{Body Attributes}
+
+The following bodies are used by this model.
+
+\begin{bodyattrtable}
+\bodydefaults
+%\bodyattr{tires}{The four tires}
+%\bodyattr{stubs}{Blocks attaching the tires to the main body}
+\end{bodyattrtable}

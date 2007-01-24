@@ -1,0 +1,160 @@
+
+/**
+@page worldfile_syntax World File Syntax
+
+The world file contains a description of the world to be simulated by
+Gazebo.  It describes the layout of robots, sensors, light sources,
+user interface components, and so on.  The world file can also be used
+to control some aspects of the simulation engine, such as the force of
+gravity or simulation time step.
+
+Gazebo world files are written in XML, and can thus be created and
+modified using a text editor.  Sample world files can be found in the
+<tt>worlds</tt> directory of the source distribution, or in the
+installed version (default install) under:
+@verbatim
+/usr/local/share/gazebo/worlds/
+@endverbatim
+
+
+@section worldfile_concepts Key Concepts and Basic Syntax
+
+The world consists mainly of <i>model</i> declarations.  A model can be
+a robot (e.g. a Pioneer2AT or SegwayRMP), a sensor (e.g. SICK LMS200),
+a static feature of the world (e.g. MapExtruder) or some manipulable
+object.  For example, the following declaration will create a Pioneer2AT named
+<tt>robot1</tt>:
+
+@verbatim
+<model:Pioneer2AT>
+  <id>robot1</id>
+  <xyz>0 0 0.40</xyz>
+  <rpy>0 0 45</rpy>
+</model:Pioneer2AT>
+@endverbatim
+
+Associated with each model is a set of <i>attributes</i> such as the
+model's position <tt>&lt;xyz;&gt;</tt> and orientation <tt>&lt;rpy;&gt;</tt>; see
+@ref models for a complete list of models and their attributes.
+
+Models can also be composed.  One can, for example, attach a scanning
+laser range-finder to a robot:
+
+@verbatim
+<model:Pioneer2AT>
+  <id>robot1</id>
+  <xyz>0 0 0.40</xyz>
+  <rpy>0 0 45</rpy>
+  <model:SickLMS200>
+    <id>laser1</id>
+    <parentBody>chassis</parentBody>
+    <xyz>0.15 0 0.20</xyz>
+    <rpy>0 0 0</rpy>
+  </model:SickLMS200>
+</model:Pioneer2AT>
+@endverbatim
+
+The <tt>&lt;parentbody&gt;</tt> tag indicates which part of the robot the
+laser should be attached to (in this case, the chassis rather than the
+wheels).  The <tt>&lt;xyz;&gt;</tt> and <tt>&lt;rpy;&gt;</tt> tags describe the
+laser's position and orientation with respect to this body @ref worldfile_units
+for a discussion of coordinate systems).  Once attached, robot and the
+laser form a single rigid body.
+
+
+@section worldfile_gui Graphical User Interface
+
+While Gazebo can operate without a GUI, it is often useful to have a
+viewport through which the user can inspect the world.  In Gazebo,
+such user interface components are provided through special models
+(such as the <tt>ObserverCam</tt>) that can be declared and configured
+in the world file.  See the documentation on the <tt>ObserverCam</tt>
+model for details.
+
+
+@section worldfile_layout Canonical World File Layout
+
+The standard layout for the world file is can be seen from the
+examples included in the <tt>worlds</tt> directory.  The basic
+components are as follows:
+
+- XML meta-data, start of world block, more XML meta-data:
+@verbatim
+  <?xml version="1.0"?>
+  <gz:world 
+    xmlns:gz='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz'
+    ...
+@endverbatim
+- Global parameters:
+@verbatim
+    <param:Global>
+      <gravity>0.0 0.0 -9.8</gravity>
+    </param:Global>
+@endverbatim
+- GUI components:
+@verbatim
+    <model:ObserverCam>
+      <id>userCam0</id>
+      <xyz>0.504 -0.735 0.548</xyz>
+      <rpy>-0 19 119</rpy>
+      <window>
+        <title>Observer</title>
+        <size>640 480</size>
+        <pos>0 0</pos>
+      </window>
+    </model:ObserverCam>
+@endverbatim
+- Light sources (without lights, the scene will be very dark):
+@verbatim
+    <model:LightSource>
+      <id>light0</id>
+      <xyz>0.0 0.0 10.0</xyz>
+    </model:LightSource>
+@endverbatim
+- Ground planes and/or terrains:
+@verbatim
+    <model:GroundPlane>
+      <id>ground1</id>
+    </model:GroundPlane>
+@endverbatim
+- Robots, objects, etc.:
+@verbatim
+    <model:Pioneer2AT>
+      <id>robot1</id>
+      <xyz>0 0.0 0.5</xyz>
+      <model:SickLMS200>
+        <id>laser1</id>
+        <xyz>0.15 0 0.20</xyz>
+      </model:SickLMS200>
+    </model:Pioneer2AT>
+@endverbatim
+- End of world block:
+@verbatim
+  </gz:world>
+@endverbatim
+
+A detailed list of models and their attributes can be found in @ref models.
+
+
+@section worldfile_units Coordinate Systems and Units
+
+By convention, Gazebo uses a right-handed coordinate system, with x
+and y in the plane, and z increasing with altitude.  Most models are
+designed such that the are upright (with respect to the z axis) and
+pointing along the positive x axis.  The tag <tt>&lt;xyz;&gt;</tt> is used to
+indicate an object's position (x, y and z coordinates); the tag
+<tt>&lt;rpy;&gt;</tt> is used to indicate an objects orientation (Euler
+angles; i.e., roll, pitch and yaw).  For example, <tt>&lt;xyz;&gt;1 2
+3&lt;/xyz;&gt;</tt> indicates a translation of 1~m along the x-axis, 2~m
+along the y-axis and 3~m along the z-axis; <tt> &lt;rpy;&gt;10 20
+30&lt;/rpy;&gt;</tt> indicates a rotation of 30~degrees about the z-axis
+(yaw), followed by a rotation of 20~degrees about the y-axis (pitch)
+and a rotation of 10~degrees about the x-axis (roll).
+
+Unless otherwise specified, the world file uses SI units (meters,
+seconds, kilograms, etc).  One exception is angles and angular
+velocities, which are measured in degrees and degrees/sec,
+respectively.
+
+
+*/

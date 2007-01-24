@@ -1,0 +1,105 @@
+
+/** @page libgazebo_usage Using libgazebo
+
+External programs can use libgazebo to interact with the Gazebo
+simulator.  libgazebo is a simple C library that allows other programs
+to peek and poke into a running simulation; through this library,
+programs may read sensor data from and send commands to simulated
+devices.  The Player device server, for example, uses libgazebo in
+this way.
+
+Normal users will interact with Gazebo via player and need not be
+aware of this library.  This chapter is included primarily to aid
+those who either wish to add a new type of interface to the simulator,
+or who wish to write their own custom control programs (by-passing
+player entirely).  
+
+Python bindings for libgazebo are also @ref libgazebo_py "available".
+
+
+@section libgazebo_arch Architecture
+
+libgazebo uses interprocess communication (IPC) to allow a program to
+exchange data with a running simulator.  Hereafter, we shall refer to
+the simulator as the <i>server</i> and the program as the
+<i>client</i>.  Thus, for example, when using player to interact with
+Gazebo, Gazebo is the server and player is the client.
+
+The details of the underlying IPC are entirely hidden by libgazebo,
+which should be treated as a black box for passing data back and forth
+to the server.  Currently, the only limitation users need be aware of
+is that both server and client must reside on the same machine; they
+cannot be run in separate locations across a network.
+
+
+@section libgazebo_devices Devices and Interfaces
+
+libgazebo makes the familiar distinction between <i>devices</i> and
+<i>interfaces</i>.  In Gazebo, a <i>device</i> is a fully
+parameterized model, representing a particular real-world object such
+as a Pioneer2AT robot or a SICK LMS200 laser.  An interface, on the
+other hand, is a general specification for an entire class of devices,
+such as <i>position</i> or <i>laser</i>.  Thus, a Pioneer2AT device
+will present a <i>position</i> interface, while the SICK LMS200 will
+present a <i>laser</i> interface.
+
+The complete set of interfaces supported by libgazebo is described
+@ref libgazebo "here".  Note that these interfaces should not be
+confused with the interfaces defined by Player.  Currently, these two
+sets of interfaces are fairly similar, but there is no guarantee that
+they will remain so in future.
+
+
+@section libgazebo_using Using libgazebo
+
+Client programs must connect both to a specific server and a specific
+set of devices within that server.  The following code snippet
+illustrates the general behavior:
+
+@include simple.c
+
+There are several points to note:
+
+  - The value of <tt>server_id</tt> variable must correspond to the
+  server ID specified on the Gazebo command line.  By default, the ID
+  is <tt>0</tt>, but other values may be specified if the user is
+  running multiple instances of Gazebo simultaneously.
+
+  - The value of <tt>client_id</tt> variable must be unique for each
+  client, and bounded in the range GZ_CLIENT_ID_FIRST to
+  GZ_CLIENT_ID_LAST.  
+
+  - The <tt>device_id</tt> variable specifies a unique device ID; the
+  value of this variable must correspond to the device ID specified in
+  the Gazebo world file.
+
+  - Any attempt to connect to a device using an unsupported interface
+  will result in the <tt>open</tt> function returning an error.  For
+  example, if the device specified by <tt>device_id</tt> is actually
+  a laser, attempting to open it using <tt>gz_position_open()</tt>
+  will result in an error.
+
+  - Do not use the <tt>create</tt> and <tt>destroy</tt> functions
+  associated with each interface; these are reserved for use by Gazebo
+  only.  Use <tt>open</tt> and <tt>close</tt> instead.
+
+This example can be demonstrated using the follow world file:
+
+@include simple.world
+
+
+@section libgazebo_building Compiling and Linking Programs With libgazebo
+
+All public functions are declared in <tt>gazebo.h</tt> and defined in
+<tt>libgazebo.a</tt>.  The default install scripts put these in sensible
+places, so your compiler should pick them up automatically.  Nevertheless,
+the @b recommended way to build applications is using the @c pkg-config 
+mechanism; the compile and link lines should look something like this:
+
+@verbatim
+gcc -Wall -g3 `pkg-config --cflags gazebo` -c -o simple.o simple.c
+gcc simple.o -o simple `pkg-config --libs gazebo` 
+@endverbatim
+
+
+*/

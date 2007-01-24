@@ -1,0 +1,7 @@
+#Import variable
+Import('env staticObjs sharedObjs')
+
+sources = Split('ODEPhysics.cc')
+
+staticObjs.append(env.StaticObject('ODEPhysics.cc'))
+sharedObjs.append(env.SharedObject('ODEPhysics.cc'))

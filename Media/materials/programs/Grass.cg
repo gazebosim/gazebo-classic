@@ -1,0 +1,30 @@
+// Vertex program to wave some grass about
+// Simplistic, assumes base of the grass at 0
+void grass_vp(float4 position : POSITION,
+			  float3 normal   : NORMAL,
+			  float2 uv		  : TEXCOORD0,
+			  out float4 oPosition : POSITION,
+			  out float2 oUv	   : TEXCOORD0,
+			  out float4 colour    : COLOR,
+
+			  uniform float4x4 worldViewProj,
+			  uniform float4 ambient,
+			  uniform float4 objSpaceLight,
+			  uniform float4 lightColour,
+			  uniform float4 offset)
+{
+	float4 mypos = position;
+	//offset = float4(0.5, 0, 0, 0);
+	mypos = mypos + offset * mypos.yyyy;
+	oPosition = mul(worldViewProj, mypos);
+
+	oUv = uv;
+	// get vertex light direction (support directional and point)
+	float3 light = normalize(
+		objSpaceLight.xyz -  (position.xyz * objSpaceLight.w));
+	float diffuseFactor = max(dot(normal, light), 0);
+	
+	
+	colour = ambient + diffuseFactor * lightColour;
+}
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:element name="GUIScheme" type="SchemeType" />
+	<xsd:complexType name="SchemeType">
+		<xsd:sequence>
+			<xsd:element name="Imageset" type="NamedDataType" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="Font" type="NamedDataType" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="WindowSet" type="WindowSetType" minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="WindowAlias" type="WindowAliasType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="Name" type="xsd:string" use="required" />
+	</xsd:complexType>
+	<xsd:complexType name="WindowSetType">
+		<xsd:sequence>
+			<xsd:element name="WindowFactory" type="WindowFactoryType" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="Filename" type="xsd:string" use="required" />
+	</xsd:complexType>
+	<xsd:complexType name="NamedDataType">
+		<xsd:attribute name="Name" type="xsd:string" use="required" />
+		<xsd:attribute name="Filename" type="xsd:string" use="required" />
+		<xsd:attribute name="ResourceGroup" type="xsd:string" use="optional"  default="" />
+	</xsd:complexType>
+	<xsd:complexType name="WindowFactoryType">
+		<xsd:attribute name="Name" type="xsd:string" use="required" />
+	</xsd:complexType>
+	<xsd:complexType name="WindowAliasType">
+		<xsd:attribute name="Alias" type="xsd:string" use="required" />
+		<xsd:attribute name="Target" type="xsd:string" use="required" />
+	</xsd:complexType>
+</xsd:schema>

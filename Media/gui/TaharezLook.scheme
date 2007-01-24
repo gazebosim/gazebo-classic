@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<GUIScheme Name="TaharezLook">
+	<Imageset Name="TaharezLook" Filename="TaharezLook.imageset" />
+	<Font Name="Tahoma-12" Filename="tahoma-12.font" />
+	<WindowSet Filename="CEGUITaharezLook">
+		<WindowFactory Name="TaharezLook/AlternateProgressBar" />
+		<WindowFactory Name="TaharezLook/Button" />
+		<WindowFactory Name="TaharezLook/Checkbox" />
+		<WindowFactory Name="TaharezLook/CloseButton" />
+		<WindowFactory Name="TaharezLook/Combobox" />
+		<WindowFactory Name="TaharezLook/ComboDropList" />
+		<WindowFactory Name="TaharezLook/ComboEditbox" />
+		<WindowFactory Name="TaharezLook/Editbox" />
+		<WindowFactory Name="TaharezLook/FrameWindow" />
+		<WindowFactory Name="TaharezLook/LargeVerticalScrollbar" />
+		<WindowFactory Name="TaharezLook/LargeVerticalScrollbarThumb" />
+		<WindowFactory Name="TaharezLook/Listbox" />
+		<WindowFactory Name="TaharezLook/ListHeader" />
+		<WindowFactory Name="TaharezLook/ListHeaderSegment" />
+		<WindowFactory Name="TaharezLook/HorizontalScrollbar" />
+		<WindowFactory Name="TaharezLook/HorizontalScrollbarThumb" />
+		<WindowFactory Name="TaharezLook/MultiColumnList" />
+		<WindowFactory Name="TaharezLook/MultiLineEditbox" />
+		<WindowFactory Name="TaharezLook/ProgressBar" />
+		<WindowFactory Name="TaharezLook/RadioButton" />
+		<WindowFactory Name="TaharezLook/Slider" />
+		<WindowFactory Name="TaharezLook/SliderThumb" />
+		<WindowFactory Name="TaharezLook/StaticImage" />
+		<WindowFactory Name="TaharezLook/StaticText" />
+		<WindowFactory Name="TaharezLook/TabButton" />
+		<WindowFactory Name="TaharezLook/TabControl" />
+		<WindowFactory Name="TaharezLook/TabPane" />
+		<WindowFactory Name="TaharezLook/Titlebar" />
+		<WindowFactory Name="TaharezLook/VerticalScrollbar" />
+		<WindowFactory Name="TaharezLook/VerticalScrollbarThumb" />
+		<WindowFactory Name="TaharezLook/VUMeter" />
+	</WindowSet>
+</GUIScheme>

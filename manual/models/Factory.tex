@@ -1,0 +1,33 @@
+
+\subsection{Overview}
+
+The {\tt Factory} model maintains no physical characteristics, but instead
+allows the user to dynamically create models at runtime. A model is
+instantiated by passing an XML character string to a {\tt Factory} model.
+The character string use the same model format as the .world files. Note
+that the string should {\em only} contain the model description, and no
+other tags. The XML string is passed into Gazebo through the gz\_factory
+interface which has the same interface as the Player speech device.  
+
+\subsection{\libgazebo Interfaces}
+
+{\tt Factory} supports the \libgazebo {\tt factory} interface.
+
+
+\subsection{Player Drivers}
+
+A new model is created using the {\tt gz\_factory} driver.
+
+\subsection{World File Attributes}
+
+{\tt Factory} models can be instantiated using the \verb+<model:Factory>+
+tag. The following attributes are supported.
+
+\begin{xmlattrtable}{model}{Factory}
+\xmlattr{id}{string}{NULL}{Model ID string}
+\end{xmlattrtable}
+
+
+\subsection{Body Attributes}
+
+This model does not have a physical representation.

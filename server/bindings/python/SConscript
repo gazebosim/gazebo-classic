@@ -1,0 +1,29 @@
+#Import variable
+Import('env prefix staticObjs sharedObjs')
+
+#env = Environment (
+#  CC = 'g++',
+#  CCFLAGS = Split ('-pthread -pipe -O2'),
+#  LINKFLAGS=Split(''),
+#
+#  CPPPATH = [
+#    '#.', 
+#    '#server',
+#    '#models',
+#    '#libgazebo', 
+#    '#rendering',
+#    '#sensors', 
+#    '#sensors/camera',
+#    '#physics',
+#    '#physics/ode',
+#    '/usr/include/python2.4'
+#    ],
+#)
+sources = Split('mygazebo.cc')
+
+objs = sharedObjs
+objs.append(env.SharedObject(sources))
+
+lib = env.SharedLibrary('mygazebo', objs, LIBS=['gazebo', 'boost_python'], LIBPATH=['#/libgazebo'])
+
+env.Install(prefix+'lib/python2.4/site-packages',lib)

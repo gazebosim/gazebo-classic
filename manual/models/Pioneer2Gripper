@@ -1,0 +1,37 @@
+
+\subsection{Overview}
+
+The {\tt \modelName} model simulates the ActivMedia Pioneer2 Gripper. Every object in the world that can be picked up by a gripper must set the {\bf $<$canBeGrip$>$} to true.
+
+\subsection{\libgazebo Interfaces}
+
+{\tt \modelName} supports the \libgazebo {\tt gripper} interface.
+
+
+\subsection{Player Drivers}
+
+Control of the gripper position is available through the
+{\tt gz\_gripper} driver.
+
+
+\subsection{World File Attributes}
+
+{\tt \modelName} models can be instantiated using the
+\verb+<model:Pioneer2Gripper>+ tag.  The following attributes are
+supported.
+
+\begin{xmlattrtable}{model}{\modelName}
+\modeldefaults
+\end{xmlattrtable}
+
+\subsection{Body Attributes}
+
+The following bodies are used by this model.
+
+\begin{bodyattrtable}
+\bodydefaults
+\bodyattr{baseBarBody}{single}{Stationary support bar}
+\bodyattr{leftGripperBody}{single}{Left gripper}
+\bodyattr{rightGripperBody}{single}{Right gripper}
+\end{bodyattrtable}
+
