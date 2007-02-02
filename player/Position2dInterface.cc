@@ -83,9 +83,9 @@ int Position2dInterface::ProcessMessage(MessageQueue *respQueue,
 
     cmd = (player_position2d_cmd_vel_t*) data;
 
-    this->iface->cmdVelocity.x = cmd->vel.px;
-    this->iface->cmdVelocity.y = cmd->vel.py;
-    this->iface->cmdVelocity.yaw = cmd->vel.pa;
+    this->iface->data->cmdVelocity.x = cmd->vel.px;
+    this->iface->data->cmdVelocity.y = cmd->vel.py;
+    this->iface->data->cmdVelocity.yaw = cmd->vel.pa;
 
     return 0;
   }
@@ -102,9 +102,9 @@ int Position2dInterface::ProcessMessage(MessageQueue *respQueue,
 
     player_position2d_set_odom_req_t *odom = (player_position2d_set_odom_req_t*)data;
 
-    this->iface->pose.x = odom->pose.px;
-    this->iface->pose.y = odom->pose.py;
-    this->iface->pose.yaw = odom->pose.pa;
+    this->iface->data->pose.x = odom->pose.px;
+    this->iface->data->pose.y = odom->pose.py;
+    this->iface->data->pose.yaw = odom->pose.pa;
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_SET_ODOM);
@@ -134,7 +134,7 @@ int Position2dInterface::ProcessMessage(MessageQueue *respQueue,
 
     power = (player_position2d_power_config_t*) data;
 
-    this->iface->cmd_enable_motors = power->state;
+    this->iface->data->cmd_enable_motors = power->state;
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
@@ -204,22 +204,22 @@ void Position2dInterface::Update()
   this->iface->Lock(1);
 
   // Only Update when new data is present
-  if (this->iface->time > this->datatime)
+  if (this->iface->data->time > this->datatime)
   {
-    this->datatime = this->iface->time;
+    this->datatime = this->iface->data->time;
 
-    ts.tv_sec = (int) (this->iface->time);
-    ts.tv_usec = (int) (fmod(this->iface->time, 1) * 1e6);
+    ts.tv_sec = (int) (this->iface->data->time);
+    ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
-    data.pos.px = this->iface->pose.x;
-    data.pos.py = this->iface->pose.y;
-    data.pos.pa = this->iface->pose.yaw;
+    data.pos.px = this->iface->data->pose.x;
+    data.pos.py = this->iface->data->pose.y;
+    data.pos.pa = this->iface->data->pose.yaw;
 
-    data.vel.px = this->iface->velocity.x;
-    data.vel.py = this->iface->velocity.y;
-    data.vel.pa = this->iface->velocity.yaw;
+    data.vel.px = this->iface->data->velocity.x;
+    data.vel.py = this->iface->data->velocity.y;
+    data.vel.pa = this->iface->data->velocity.yaw;
 
-    data.stall = (uint8_t) this->iface->stall;
+    data.stall = (uint8_t) this->iface->data->stall;
 
     this->driver->Publish( this->device_addr, NULL,
       PLAYER_MSGTYPE_DATA,

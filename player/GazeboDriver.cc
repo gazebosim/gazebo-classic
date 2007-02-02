@@ -38,6 +38,7 @@ devices.
 #include "GazeboInterface.hh"
 #include "SimulationInterface.hh"
 #include "Position2dInterface.hh"
+#include "Graphics3dInterface.hh"
 /*#include "Position3dInterface.hh"
 #include "PowerInterface.hh"
 #include "LaserInterface.hh"
@@ -257,6 +258,12 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new Position2dInterface( playerAddr, this,  cf, section );
         break;
 
+      case PLAYER_GRAPHICS3D_CODE:	  
+        if (!player_quiet_startup) printf(" a graphics3d interface.\n");
+        ifsrc = new Graphics3dInterface( playerAddr, this,  cf, section );
+        break;
+
+
 /*      case PLAYER_POSITION3D_CODE:	  
         if (!player_quiet_startup) printf(" a position3d interface.\n");
         ifsrc = new Position3dInterface( playerAddr, this,  cf, section );
@@ -314,7 +321,7 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         break;
 */
       default:
-        printf( "nerror: Gazebo driver doesn't support interface type %d\n",
+        printf( "error: Gazebo driver doesn't support interface type %d\n",
             playerAddr.interf );
         this->SetError(-1);
         return -1; 

@@ -42,9 +42,15 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 
-#include "replace.h"
 #include "gz_error.h"
 #include "gazebo.h"
+
+union semun
+{
+  int val;
+  struct semid_ds *buf;
+  unsigned short *array;
+};
 
 // Create a server object
 Server::Server()
@@ -176,6 +182,7 @@ int Server::SemInit(int force)
   for (i = 0; i < 16; i++)
     values[i] = 0;
   arg.array = values;
+
   if (semctl(this->semId, 0, SETALL, arg) < 0)
   {
     GZ_ERROR1("failed to initialize semaphore [%s]", strerror(errno));

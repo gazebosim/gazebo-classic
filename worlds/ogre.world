@@ -10,8 +10,38 @@
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
-  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui">
+  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" >
 
+  <rendering:ogre>
+    <plugins path="/usr/local/lib/OGRE">
+      <plugin>RenderSystem_GL.so</plugin>
+      <plugin>Plugin_ParticleFX.so</plugin>
+      <plugin>Plugin_BSPSceneManager.so</plugin>
+      <plugin>Plugin_OctreeSceneManager.so</plugin>
+    </plugins>
+
+    <resources path="/home/nate/local/share/gazebo">
+      <bootstrap>
+        <zip>Media/packs/OgreCore.zip</zip>
+      </bootstrap>
+
+      <general>
+        <filesystem>Media</filesystem>
+        <filesystem>Media/fonts</filesystem>
+        <filesystem>Media/materials/programs</filesystem>
+        <filesystem>Media/materials/scripts</filesystem>
+        <filesystem>Media/materials/textures</filesystem>
+        <filesystem>Media/models</filesystem>
+        <filesystem>Media/overlays</filesystem>
+        <filesystem>Media/particle</filesystem>
+        <filesystem>Media/gui</filesystem>
+        <zip>Media/packs/cubemap.zip</zip>
+        <zip>Media/packs/cubemapsJS.zip</zip>
+        <zip>Media/packs/skybox.zip</zip>
+      </general>
+    </resources>
+  </rendering:ogre>
 
   <!--  <model:xml name="sphere1_model">
     <xyz>0 1 0</xyz>
@@ -150,7 +180,7 @@
       </geom:sphere>
     </body:sphere>
  
-    <joint:hinge>
+    <joint:hinge name="left_wheel_hinge">
       <body1>left_wheel</body1>
       <body2>chassis_body</body2>
       <anchor>left_wheel</anchor>
@@ -159,7 +189,7 @@
       <cfm>0.8</cfm>
     </joint:hinge>
 
-    <joint:hinge>
+    <joint:hinge name="right_wheel_hinge">
       <body1>right_wheel</body1>
       <body2>chassis_body</body2>
       <anchor>right_wheel</anchor>
@@ -174,7 +204,16 @@
       <anchor>castor_body</anchor>
     </joint:ball>
 
-    <interface:position2d name="position_iface"/>
+    <interface:position2d name="position_iface" controller="pioneer2dx">
+      <left>
+        <joint>left_wheel_hinge</joint>
+        <body>left_wheel</body>
+      </left>
+      <right>
+        <joint>right_wheel_hinge</joint>
+        <body>right_wheel</body>
+      </right>
+    </interface:position2d>
 
     <!--<interface:power name="power_iface"/>
     <interface:sonar name="sonar_iface"/>

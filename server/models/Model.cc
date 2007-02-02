@@ -36,14 +36,14 @@ Model::~Model()
 // Load the model
 int Model::Load(XMLConfigNode *node)
 {
+  XMLConfigNode *bodyNode = NULL;
+  XMLConfigNode *jointNode = NULL;
+  XMLConfigNode *ifaceNode = NULL;
+  Body *body;
+
 
   if (node->GetName() == "xml")
   {
-    XMLConfigNode *bodyNode = NULL;
-    XMLConfigNode *jointNode = NULL;
-    XMLConfigNode *ifaceNode = NULL;
-    Body *body;
-
     this->SetName(node->GetString("name","",1));
     this->SetStatic(node->GetBool("static",false,0));
 
@@ -68,13 +68,15 @@ int Model::Load(XMLConfigNode *node)
       jointNode = jointNode->GetNextByNSPrefix("joint");
     }
 
-    ifaceNode = node->GetChildByNSPrefix("interface");
-    while (ifaceNode)
-    {
-      if (this->LoadIface(ifaceNode) != 0)
-        std::cerr << "Error Loading Interface[" << ifaceNode->GetName() << "]\n";
-      ifaceNode = ifaceNode->GetNextByNSPrefix("interface");
-    }
+  }
+
+  // Load interfaces
+  ifaceNode = node->GetChildByNSPrefix("interface");
+  while (ifaceNode)
+  {
+    if (this->LoadIface(ifaceNode) != 0)
+      std::cerr << "Error Loading Interface[" << ifaceNode->GetName() << "]\n";
+    ifaceNode = ifaceNode->GetNextByNSPrefix("interface");
   }
 
   // Get the name of the python module
@@ -84,7 +86,6 @@ int Model::Load(XMLConfigNode *node)
   // Import the python module
   if (this->pName)
   {
-    printf("Load pModule\n");
     this->pModule = PyImport_Import(this->pName);
     Py_DECREF(this->pName);
   }
@@ -92,7 +93,6 @@ int Model::Load(XMLConfigNode *node)
   // Get the Update function from the module
   if (this->pModule != NULL) 
   {
-    printf("Load pFuncUpdate\n");
     this->pFuncUpdate = PyObject_GetAttrString(this->pModule, "Update");
     if (this->pFuncUpdate && !PyCallable_Check(this->pFuncUpdate))
       this->pFuncUpdate = NULL;
@@ -122,7 +122,6 @@ int Model::Update()
   // Call the model's python update function, if one exists
   if (this->pFuncUpdate)
   {
-    printf("Python Update\n");
     boost::python::call<void>(this->pFuncUpdate, this);
   }
 
@@ -345,6 +344,10 @@ int Model::LoadJoint(XMLConfigNode *node)
   joint->SetParam(dParamSuspensionERP, node->GetDouble("erp",0.0,0));
   joint->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.0,0));
 
+  // Name the joint
+  joint->SetName(node->GetString("name","",1));
+
+
   this->joints.push_back(joint);
 
   return 0;
@@ -359,25 +362,39 @@ int Model::LoadIface(XMLConfigNode *node)
     return -1;
 
   Iface *iface = NULL;
+  std::string ifaceName = node->GetName();
 
-  if (node->GetName() == "position2d")
+  if (ifaceName == "position2d")
   {
-    /*iface = new PositionIface();
-     if (iface->Create(World::Instance()->GetGzServer(),
-           this->GetName().c_str(), "Pioneer2DX", this->GetId(), 
-           this->GetParentId()) != 0)
-       return -1;
-       */
+    iface = new PositionIface();
   }
-  else if (node->GetName() == "power")
+  else if (ifaceName == "power")
   {
+    //TODO: Implement this in libgazebo
+    //iface = new PowerIface();
   }
-  else if (node->GetName() == "sonar")
+  else if (ifaceName == "sonar")
   {
+    //TODO: Implement this in libgazebo
+    //iface = new SonarIface();
+  }
+  else if (ifaceName == "graphics3d")
+  {
+    iface = new Graphics3dIface();
+
   }
 
+  if (iface->Create(World::Instance()->GetGzServer(),
+        this->GetName().c_str()) != 0)
+  {
+    std::cerr << "Error creating " << ifaceName << "interface\n";
+    return -1;
+  }
+
+  // TODO: Problem with this if multiple interfaces of the same type are
+  // used in the same model
   if (iface)
-    this->ifaces.push_back(iface);
+    this->ifaces[ifaceName] = iface;
 
   return 0;
 }

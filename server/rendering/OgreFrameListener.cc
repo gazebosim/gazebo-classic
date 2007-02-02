@@ -148,10 +148,9 @@ void OgreFrameListener::mouseDragged(Ogre::MouseEvent* e)
 void OgreFrameListener::mouseMoved(Ogre::MouseEvent *e)
 {
    // Update CEGUI with the mouse motion
-/*   CEGUI::System::getSingleton().injectMouseMove(
+   CEGUI::System::getSingleton().injectMouseMove(
        e->getRelX() * this->ogreAdaptor->guiRenderer->getWidth(), 
        e->getRelY() * this->ogreAdaptor->guiRenderer->getHeight());
-       */
 }
 
 void OgreFrameListener::mousePressed(Ogre::MouseEvent* e)

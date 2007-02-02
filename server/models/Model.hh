@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <map>
 #include "Pose3d.hh"
 #include "Joint.hh"
 #include "Entity.hh"
@@ -133,7 +134,7 @@ class Model : public Entity
   //! Map of the bodies. std::string == body_name
   protected: std::map<std::string, Body*> bodies;
   protected: std::vector<Joint*> joints;
-  protected: std::vector<Iface*> ifaces;
+  protected: std::map<std::string, Iface*> ifaces;
 
   private: PyObject *pName;
   private: PyObject *pModule;

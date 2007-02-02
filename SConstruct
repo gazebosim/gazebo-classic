@@ -49,5 +49,6 @@ libgazeboServerStatic = env.StaticLibrary('gazeboServer',staticObjs)
 libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
 
 env.Install(prefix+'/bin',gazebo)
+env.Install(prefix+'/share/gazebo','Media')
 
 env.Alias('install', prefix)

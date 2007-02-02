@@ -2,9 +2,11 @@
 Import('env prefix')
 
 sources = Split('Server.cc Client.cc Iface.cc gz_error.c')
+headers = Split('gazebo.h')
 
 sharedLib = env.SharedLibrary('gazebo', sources)
 staticLib = env.StaticLibrary('gazebo', sources)
 
 env.Install(prefix+'/lib', sharedLib)
 env.Install(prefix+'/lib', staticLib)
+env.Install(prefix+'/include/gazebo', headers)

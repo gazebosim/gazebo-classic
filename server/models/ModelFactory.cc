@@ -33,7 +33,7 @@
 void RegisterGroundPlane();
 void RegisterLightSource();
 void RegisterObserverCam();
-//void RegisterPioneer2DX();
+void RegisterGraphics3d();
 
 std::map<std::string, ModelFactoryFn> ModelFactory::models;
 
@@ -45,7 +45,7 @@ void ModelFactory::RegisterAll()
   RegisterGroundPlane();
   RegisterLightSource();
   RegisterObserverCam();
-  //RegisterPioneer2DX();
+  RegisterGraphics3d();
 }
 
 

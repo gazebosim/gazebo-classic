@@ -151,28 +151,22 @@ int Init()
     return -1;
   }
 
-  printf("A\n");
   // Register static models
   ModelFactory::RegisterAll();
   
-  printf("B\n");
   // Load the world file
   XMLConfig *xmlFile = new XMLConfig();
   if (xmlFile->Load(worldFileName) != 0)
     return -1;
 
-  printf("C\n");
-
   // Load the world
   if (World::Instance()->Load(xmlFile, optServerId) != 0)
     return -1;
 
-  printf("D\n");
   // Initialize
   if (World::Instance()->Init() != 0)
     return -1;
 
-  printf("E\n");
   // Check for unused attributes
   //xmlFile->WarnUnused();
 
@@ -213,18 +207,15 @@ bool MainIdle()
 
 int main(int argc, char **argv)
 {
-  printf("1\n");
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
-  printf("2\n");
   if (Init() != 0)
   {
     fprintf(stderr,"Initialization failed\n");
     return -1;
   }
 
-  printf("3\n");
   userQuit = false;
 
   // Run the sim

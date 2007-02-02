@@ -45,8 +45,8 @@ GazeboTime::~GazeboTime()
 // Get the simulator time
 int GazeboTime::GetTime(struct timeval* time)
 {
-  time->tv_sec = (int) floor(GazeboClient::sim->sim_time);
-  time->tv_usec = (int) floor(fmod(GazeboClient::sim->sim_time, 1.0) * 1e6);
+  time->tv_sec = (int) floor(GazeboClient::sim->data->sim_time);
+  time->tv_usec = (int) floor(fmod(GazeboClient::sim->data->sim_time, 1.0) * 1e6);
 
   return 0;
 }
@@ -57,8 +57,8 @@ int GazeboTime::GetTimeDouble(double* time)
 {
   struct timeval ts;
 
-  ts.tv_sec = (int) floor(GazeboClient::sim->sim_time);
-  ts.tv_usec = (int) floor(fmod(GazeboClient::sim->sim_time, 1.0) * 1e6);
+  ts.tv_sec = (int) floor(GazeboClient::sim->data->sim_time);
+  ts.tv_usec = (int) floor(fmod(GazeboClient::sim->data->sim_time, 1.0) * 1e6);
 
   *time = ts.tv_sec + ts.tv_usec/1e6;
 

@@ -44,6 +44,7 @@
 // Create a client object
 Client::Client()
 {
+  this->filename = NULL;
 }
 
 // Destroy a client
@@ -70,7 +71,7 @@ int Client::ConnectWait(int serverId, int clientId)
 {
   char *tmpdir;
   char *user;
-  char filename[128];
+  char tmpfilename[128];
 
   // Check client id
   if (clientId >= 0 && clientId >= 16)
@@ -98,10 +99,11 @@ int Client::ConnectWait(int serverId, int clientId)
     user = "nobody";
 
   // Figure out the directory name
-  snprintf(filename, sizeof(filename), "%s/gazebo-%s-%d",
+  snprintf(tmpfilename, sizeof(tmpfilename), "%s/gazebo-%s-%d",
            tmpdir, user, this->serverId);
+
   assert(this->filename == NULL);
-  this->filename = strdup(filename);
+  this->filename = strdup(tmpfilename);
   
   GZ_MSG1(1, "opening %s", this->filename);
   

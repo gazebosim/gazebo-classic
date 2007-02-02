@@ -65,6 +65,21 @@ class Pose
   public: double roll, pitch, yaw; 
 };
 
+//! Vector 3 class
+class Vec3
+{
+  //! Position information
+  public: double x, y, z;
+};
+
+//! Color class
+class Color
+{
+  //! Color information
+  public: float r, g, b, a;
+};
+
+
 /***************************************************************************/
 //! \addtogroup libgazebo 
 //! \{
@@ -232,13 +247,13 @@ All interfaces share this common structure.
 class Iface
 {
   //! \brief Create an interface
-  public: Iface(const std::string &type);
+  public: Iface(const std::string &type, size_t size);
 
   //! \brief Destroy an interface
   public: virtual ~Iface();
 
   //! \brief Create the interface (used by Gazebo server)
-  public: int Create(Server *server, const char *id);
+  public: virtual int Create(Server *server, const char *id);
 
   //! \brief Create the interface (used by Gazebo server)
   public: int Create(Server *server, const char *id,
@@ -249,7 +264,7 @@ class Iface
   public: int Destroy();
 
   //! Open an existing interface
-  public: int Open(Client *client, const char *id);
+  public: virtual int Open(Client *client, const char *id);
 
   //! Close the interface
   public: int Close();
@@ -317,15 +332,9 @@ of the server, such as the current simulation time-step.
 \{
 */
 
-//! Common simulator data
-class SimIface : public Iface
+/// Simulation interface data
+class SimData
 {
-  //! Create an interface
-  public: SimIface():Iface("sim") {}
-
-  //! Destroy an interface
-  public: virtual ~SimIface() {}
-
   //! Elapsed simulator time
   public: double sim_time;
 
@@ -346,6 +355,30 @@ class SimIface : public Iface
   public: int save;
 
 };
+
+//! Common simulator interface
+class SimIface : public Iface
+{
+  //! Create an interface
+  public: SimIface():Iface("sim",sizeof(SimIface)) {}
+
+  //! Destroy an interface
+  public: virtual ~SimIface() {this->data = NULL;}
+
+  public: virtual int Create(Server *server, const char *id)
+          {int result = Iface::Create(server,id); 
+           this->data = (SimData*)this->mMap; 
+           return result;}
+
+  public: virtual int Open(Client *client, const char *id)
+          {int result = Iface::Open(client,id); 
+           this->data = (SimData*)this->mMap; 
+           return result;}
+
+  public: SimData *data;
+};
+
+
 
 /** \} */
 //! \}
@@ -368,12 +401,9 @@ Images are in packed RGB888 format.
 //! Maximum image pixels (width x height)
 #define GAZEBO_CAMERA_MAX_IMAGE_SIZE 640 * 480 * 3
 
-//! The camera interface
-class CameraIface : public Iface
+/// Camera interface data
+class CameraData
 {
-  public: CameraIface():Iface("camera") {}
-  public: virtual ~CameraIface() {}
-
   //! Data timestamp
   public: double time;
 
@@ -385,6 +415,27 @@ class CameraIface : public Iface
   public: unsigned char image[GAZEBO_CAMERA_MAX_IMAGE_SIZE];
   
 };
+
+//! The camera interface
+class CameraIface : public Iface
+{
+  public: CameraIface():Iface("camera", sizeof(CameraIface)) {}
+  public: virtual ~CameraIface() {this->data = NULL;}
+
+  public: virtual int Create(Server *server, const char *id)
+          {int result = Iface::Create(server,id); 
+           this->data = (CameraData*)this->mMap; 
+           return result;}
+
+  public: virtual int Open(Client *client, const char *id)
+          {int result = Iface::Open(client,id); 
+           this->data = (CameraData*)this->mMap; 
+           return result;}
+
+  public: CameraData *data;
+};
+
+
 /** \} */
 //! \}
 
@@ -401,15 +452,9 @@ Pioneer2AT or ATRV Jr.  This interface handles both 2D and 3D data.
 @{
 */
 
-/// Position interface
-class PositionIface : public Iface
+/// Position interface data
+class PositionData
 {
-  //! Constructor
-  public: PositionIface():Iface("position") {}
-
-  //! Destructor
-  public: virtual ~PositionIface() {}
-
   //! Data timestamp
   public: double time;
 
@@ -429,8 +474,90 @@ class PositionIface : public Iface
   public: Pose cmdVelocity;
 };
 
+/// Position interface
+class PositionIface : public Iface
+{
+  //! Constructor
+  public: PositionIface():Iface("position", sizeof(PositionIface)) {}
+
+  //! Destructor
+  public: virtual ~PositionIface() {this->data = NULL;}
+
+  public: virtual int Create(Server *server, const char *id)
+          {int result = Iface::Create(server,id); 
+           this->data = (PositionData*)this->mMap; 
+           return result;}
+
+  public: virtual int Open(Client *client, const char *id)
+          {int result = Iface::Open(client,id); 
+           this->data = (PositionData*)this->mMap; 
+           return result;}
+
+  public: PositionData *data;
+};
+
 /** @} */
 /// @}
+
+/***************************************************************************/
+/// @addtogroup libgazebo
+/// @{
+/** @defgroup graphics3d graphics3d
+
+The graphics3d interface allows clients to send drawing commands, similar to
+opengl funcitons.
+
+@{
+*/
+
+//! Maximum number of points that can be drawn
+#define GAZEBO_GRAPHICS3D_MAX_POINTS 1024
+
+/// Graphics3d interface data
+class Graphics3dData
+{
+  enum DrawMode {POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON};
+
+  //! Drawing mode
+  public: DrawMode drawmode;
+
+  //! Number of vertices
+  public: unsigned int point_count; 
+
+  //! Vertices 
+  public: Vec3 points[GAZEBO_GRAPHICS3D_MAX_POINTS];
+
+  //! Drawing color
+  public: Color color;
+};
+
+/// Graphics3d interface
+class Graphics3dIface : public Iface
+{
+
+  //! Constructor
+  public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dData)) {}
+
+  //! Destructor
+  public: virtual ~Graphics3dIface() {this->data = NULL;}
+
+  public: virtual int Create(Server *server, const char *id)
+          {int result = Iface::Create(server,id); 
+           this->data = (Graphics3dData*)this->mMap; 
+           return result;}
+
+  public: virtual int Open(Client *client, const char *id)
+          {int result = Iface::Open(client,id); 
+           this->data = (Graphics3dData*)this->mMap; 
+           return result;}
+
+  public: Graphics3dData *data;
+};
+
+
+/** @} */
+/// @}
+
 
 
 #endif

@@ -16,13 +16,10 @@ World *World::myself = NULL;
 // Private constructor
 World::World()
 {
-  printf("1\n");
-  OgreAdaptor::Instance()->Init();
+  //OgreAdaptor::Instance()->Init();
 
-  printf("2\n");
   this->physicsEngine = new ODEPhysics();
 
-  printf("3\n");
   this->server = NULL;
   this->simIface = NULL;
 
@@ -49,26 +46,28 @@ World *World::Instance()
 // Load the world
 int World::Load(XMLConfig *config, int serverId)
 {
-  printf("i\n");
   assert(serverId >= 0);
+  XMLConfigNode *rootNode = config->GetRootNode();
 
+  if (OgreAdaptor::Instance()->Init(rootNode->GetChildByNSPrefix("rendering")) != 0)
+  {
+    std::cerr << "Failed to Initialize the OGRE Rendering system\n";
+    return -1;
+  }
+  
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
   if (this->server->Init(serverId, true ) != 0)
     return -1;
-  printf("ii\n");
 
    // Create the simulator interface
   this->simIface = new SimIface();
   if (this->simIface->Create(this->server, "default" ) != 0)
     return -1;
 
-  printf("iii\n");
-  this->LoadModel(config->GetRootNode(), NULL);
+  this->LoadModel(rootNode, NULL);
 
-  printf("iv\n");
   this->physicsEngine->Load();
-  printf("v\n");
 
   return 0;
 }
@@ -85,7 +84,7 @@ int World::Init()
 
   // Set initial simulator state
   this->simIface->Lock(1);
-  this->simIface->pause = this->pause;
+  this->simIface->data->pause = this->pause;
   this->simIface->Unlock();
 
   this->physicsEngine->Init();

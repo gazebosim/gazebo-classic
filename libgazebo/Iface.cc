@@ -25,6 +25,8 @@
  * CVS: $Id: Iface.cc,v 1.1.2.1 2006/12/16 22:41:14 natepak Exp $
  */
 
+#include <iostream>
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -43,10 +45,11 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface
-Iface::Iface(const std::string &type)
+Iface::Iface(const std::string &type, size_t size)
 {
   this->type = type;
   this->filename = NULL;
+  this->size = size;
 }
 
 
@@ -118,24 +121,24 @@ int Iface::Create(Server *server, const char *id)
   }
 
   // Set the file to the correct size
-  if (ftruncate(this->mmapFd, sizeof(*this)) < 0)
+  if (ftruncate(this->mmapFd, size) < 0)
   {
     GZ_ERROR1("error setting size of mmap file: %s", strerror(errno));
     return -1;
   }
 
   // Map the file into memory
-  this->mMap = mmap(0, sizeof(*this), PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
+  this->mMap = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
 
   if (this->mMap == MAP_FAILED)
   {
     GZ_ERROR1("error mapping mmap file: %s", strerror(errno));
     return -1;
   }
-  memset(this->mMap, 0, sizeof(*this));
+  memset(this->mMap, 0, size);
 
   ((Iface*) this->mMap)->version = LIBGAZEBO_VERSION;
-  ((Iface*) this->mMap)->size = sizeof(*this);
+  ((Iface*) this->mMap)->size = size;
 
   // Print the name, version info
   GZ_MSG3(5, "creating %s %03X %d", this->filename,
@@ -167,7 +170,7 @@ int Iface::Create(Server *server, const char *id,
 int Iface::Destroy()
 {
   // Unmap the file
-  munmap(this->mMap, sizeof(Iface));
+  munmap(this->mMap, this->size);
   this->mMap = NULL;
 
   // Close the file
@@ -202,7 +205,7 @@ int Iface::Open(Client *client, const char *id)
   }
 
   // Map the mmap file
-  this->mMap = mmap(0, sizeof(*this), PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
+  this->mMap = mmap(0, this->size, PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
   if (this->mMap == MAP_FAILED)
   {
     GZ_ERROR1("error mapping device file: %s", strerror(errno));
@@ -210,12 +213,13 @@ int Iface::Open(Client *client, const char *id)
   }    
 
   // Make sure everything is consistent
-  if (((Iface*) this->mMap)->size < sizeof(*this))
+  if (((Iface*) this->mMap)->size < this->size)
   {
-    GZ_ERROR2("expected file size: %d < %d", ((Iface*) this->mMap)->size, sizeof(*this));
+    GZ_ERROR2("expected file size: %d < %d", ((Iface*) this->mMap)->size, this->size);
     return -1;
   }
 
+  
   // Print the name, version info
   GZ_MSG3(5, "opening %s %03X %d", this->filename,
           ((Iface*) this->mMap)->version,
@@ -230,7 +234,7 @@ int Iface::Open(Client *client, const char *id)
 int Iface::Close()
 {
   // Unmap the file
-  munmap(this->mMap, sizeof(Iface));
+  munmap(this->mMap, this->size);
   this->mMap = NULL;
 
   // Close the file
