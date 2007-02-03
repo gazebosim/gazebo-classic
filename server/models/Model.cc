@@ -1,3 +1,29 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: Base class for all models.
+ * Author: Nathan Koenig and Andrew Howard
+ * Date: 8 May 2003
+ * SVN: $Id$
+ */
+
 #include <boost/python.hpp>
 #include <Ogre.h>
 #include "OgreAdaptor.hh"
@@ -41,7 +67,6 @@ int Model::Load(XMLConfigNode *node)
   XMLConfigNode *ifaceNode = NULL;
   Body *body;
 
-
   if (node->GetName() == "xml")
   {
     this->SetName(node->GetString("name","",1));
@@ -58,8 +83,10 @@ int Model::Load(XMLConfigNode *node)
       bodyNode = bodyNode->GetNextByNSPrefix("body");
     }
 
+
     // Load the joints
     jointNode = node->GetChildByNSPrefix("joint");
+
     while (jointNode)
     {
       if (this->LoadJoint(jointNode) != 0)
@@ -346,7 +373,6 @@ int Model::LoadJoint(XMLConfigNode *node)
 
   // Name the joint
   joint->SetName(node->GetString("name","",1));
-
 
   this->joints.push_back(joint);
 

@@ -198,13 +198,13 @@
       <cfm>0.8</cfm>
     </joint:hinge>
 
-    <joint:ball>
+    <joint:ball name="ball_joint">
       <body1>castor_body</body1>
       <body2>chassis_body</body2>
       <anchor>castor_body</anchor>
     </joint:ball>
 
-    <interface:position2d name="position_iface" controller="pioneer2dx">
+    <!--<interface:position2d name="position_iface" controller="pioneer2dx">
       <left>
         <joint>left_wheel_hinge</joint>
         <body>left_wheel</body>
@@ -214,6 +214,7 @@
         <body>right_wheel</body>
       </right>
     </interface:position2d>
+    -->
 
     <!--<interface:power name="power_iface"/>
     <interface:sonar name="sonar_iface"/>

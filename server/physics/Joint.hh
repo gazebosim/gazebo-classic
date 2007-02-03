@@ -76,6 +76,12 @@ class Joint
   // Set the _parameter to _value
   public: virtual void SetParam( int parameter, double value );
 
+  /// Set the name of this joint
+  public: std::string GetName() const;
+
+  /// Get the name of this joint
+  public: void SetName(const std::string &name);
+
   // This is our id
   protected: dJointID jointId;
 
@@ -88,6 +94,8 @@ class Joint
   // The second body this joint connects to
   private: Body* body2;
 
+  /// Name of this joint
+  private: std::string name;
 };
 
 #endif

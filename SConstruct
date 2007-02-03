@@ -24,6 +24,9 @@ env = Environment (
     '#server/sensors/camera',
     '#server/physics',
     '#server/physics/ode',
+    '#server/controllers',
+    '#server/controllers/position2d',
+    '#server/controllers/position2d/pioneer2dx',
     '/usr/include/python2.4'
     ],
 

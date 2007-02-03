@@ -34,7 +34,6 @@ Joint::Joint()
 {
   this->body1 = NULL;
   this->body2 = NULL;
-  return;
 }
 
 
@@ -139,4 +138,19 @@ void Joint::Detach()
 void Joint::SetParam(int /*parameter*/, double /*value*/)
 {
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the name of this joint
+std::string Joint::GetName() const
+{
+  return this->name;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the name of this joint
+void Joint::SetName(const std::string &newName)
+{
+  this->name = newName;
+}
+
 
