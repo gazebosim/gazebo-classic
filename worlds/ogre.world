@@ -204,7 +204,7 @@
       <anchor>castor_body</anchor>
     </joint:ball>
 
-    <!--<interface:position2d name="position_iface" controller="pioneer2dx">
+    <interface:position2d name="position_iface" controller="pioneer2dx">
       <left>
         <joint>left_wheel_hinge</joint>
         <body>left_wheel</body>
@@ -214,7 +214,6 @@
         <body>right_wheel</body>
       </right>
     </interface:position2d>
-    -->
 
     <!--<interface:power name="power_iface"/>
     <interface:sonar name="sonar_iface"/>
