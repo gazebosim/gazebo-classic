@@ -1,6 +1,6 @@
 #include <stdio.h>
+
 #include "Global.hh"
-#include "OgreAdaptor.hh"
 #include "ModelFactory.hh"
 #include "XMLConfig.hh"
 #include "CameraManager.hh"

@@ -6,7 +6,7 @@
 class Body;
 class Geom;
 class XMLConfigNode;
-class Graphics3dIface;
+//class Graphics3dIface;
 
 class Graphics3d : public Model
 { 
@@ -26,6 +26,6 @@ class Graphics3d : public Model
   // Finilaize thie child model
   protected: virtual int FiniChild();
 
-  private: Graphics3dIface *iface;
+ // private: Graphics3dIface *iface;
 };
 #endif

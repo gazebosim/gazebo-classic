@@ -29,10 +29,19 @@
 #endif
 
 #include <Ogre.h>
+#include <CEGUISystem.h>
 #include <OgreImageCodec.h>
+#include <CEGUISchemeManager.h>
+#include <OgreCEGUIRenderer.h>
+#include <OgreLogManager.h>
+#include <OgreWindowEventUtilities.h>
+#include <OgreCEGUIRenderer.h>
 
 #include "OgreAdaptor.hh"
 #include "OgreFrameListener.hh"
+
+
+
 #include "Camera.hh"
 
 //////////////////////////////////////////////////////////////////////////////

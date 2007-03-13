@@ -24,7 +24,8 @@
  * SVN: $Id$
  */
 
-#include <boost/python.hpp>
+//#include <boost/python.hpp>
+
 #include <Ogre.h>
 #include "OgreAdaptor.hh"
 #include "XMLConfig.hh"
@@ -46,9 +47,10 @@ Model::Model()
   this->name = "";
   this->type = "";
 
-  this->pName = NULL;
+ /* this->pName = NULL;
   this->pModule = NULL;
   this->pFuncUpdate = NULL;
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +109,7 @@ int Model::Load(XMLConfigNode *node)
   }
 
   // Get the name of the python module
-  this->pName = PyString_FromString(node->GetString("python","",0).c_str());
+  /*this->pName = PyString_FromString(node->GetString("python","",0).c_str());
   //this->pName = PyString_FromString("pioneer2dx");
 
   // Import the python module
@@ -124,6 +126,7 @@ int Model::Load(XMLConfigNode *node)
     if (this->pFuncUpdate && !PyCallable_Check(this->pFuncUpdate))
       this->pFuncUpdate = NULL;
   }
+  */
 
   return this->LoadChild(node);
 }
@@ -147,10 +150,10 @@ int Model::Update()
   }
 
   // Call the model's python update function, if one exists
-  if (this->pFuncUpdate)
+  /*if (this->pFuncUpdate)
   {
     boost::python::call<void>(this->pFuncUpdate, this);
-  }
+  }*/
 
   return this->UpdateChild();
 }

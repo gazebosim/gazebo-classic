@@ -1,4 +1,4 @@
-#include <python2.4/Python.h>
+//#include <python2.4/Python.h>
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
@@ -133,7 +133,7 @@ void SignalHandler( int /*dummy*/ )
 // Initialize the sim
 int Init()
 {
-  Py_Initialize();
+  //Py_Initialize();
 
   //struct tms cpu;
 
@@ -186,7 +186,7 @@ int Fini()
 {
   World::Instance()->Fini();
 
-  Py_Finalize();
+  //Py_Finalize();
 
   return 0;
 }

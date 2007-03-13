@@ -27,7 +27,7 @@
 #ifndef MODEL_HH
 #define MODEL_HH
 
-#include <python2.4/Python.h>
+//#include <python2.4/Python.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -162,9 +162,10 @@ class Model : public Entity
   protected: std::vector<Joint*> joints;
   protected: std::map<std::string, Iface*> ifaces;
 
-  private: PyObject *pName;
+  /*private: PyObject *pName;
   private: PyObject *pModule;
   private: PyObject *pFuncUpdate;
+  */
 };
 
 #endif

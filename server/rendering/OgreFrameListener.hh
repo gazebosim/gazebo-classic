@@ -2,8 +2,9 @@
 #define OGREFRAMELISTENER_HH
 
 #include <OgreFrameListener.h>
-#include <OgreEventListeners.h>
+//#include <OgreEventListeners.h>
 #include <Ogre.h>
+#include <OIS/OIS.h>
 
 
 namespace Ogre
@@ -15,7 +16,7 @@ namespace Ogre
 
 class OgreAdaptor;
 
-class OgreFrameListener : public Ogre::FrameListener, public Ogre::KeyListener, public Ogre::MouseListener, public Ogre::MouseMotionListener
+class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener
 {
   public: OgreFrameListener( OgreAdaptor *ogreAdaptor );
   public: virtual ~OgreFrameListener();
@@ -23,20 +24,16 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::KeyListener, 
   public: virtual bool frameStarted( const Ogre::FrameEvent &evt);
   public: virtual bool frameEnded( const Ogre::FrameEvent &evt);
 
-  public: virtual void keyClicked( Ogre::KeyEvent *e );
-  public: virtual void keyPressed( Ogre::KeyEvent *e );
-  public: virtual void keyReleased( Ogre::KeyEvent *e );
+  public: virtual bool keyPressed( const OIS::KeyEvent &e );
+  public: virtual bool keyReleased( const OIS::KeyEvent &e );
 
   // MouseDragged
-  public: void mouseMoved(Ogre::MouseEvent *e);
-  public: void mouseDragged(Ogre::MouseEvent* e);
+  public: bool mouseMoved(const OIS::MouseEvent &e);
+  public: bool mouseDragged(const OIS::MouseEvent &e);
 
   // MouseListener
-  public: void mouseClicked(Ogre::MouseEvent* /*e*/){}
-  public: void mouseEntered(Ogre::MouseEvent* /*e*/) {}
-  public: void mouseExited(Ogre::MouseEvent* /*e*/) {}
-  public: void mouseReleased(Ogre::MouseEvent* e);
-  public: void mousePressed(Ogre::MouseEvent* e);
+  public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+  public: bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
   private: Ogre::Vector3 directionVec;
 
@@ -45,7 +42,10 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::KeyListener, 
   private: float rotateAmount;
 
   private: Ogre::EventProcessor *eventProcessor;
-  private: Ogre::InputReader *inputDevice;
+
+  private: OIS::InputManager *inputManager;
+  private: OIS::Mouse *mMouse;
+  private: OIS::Keyboard *mKeyboard;
 };
 
 #endif

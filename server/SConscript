@@ -1,7 +1,7 @@
 #Import variables
 Import('env staticObjs sharedObjs')
 
-dirs = Split('physics rendering sensors models bindings controllers')
+dirs = Split('physics rendering sensors models controllers') #bindings
 
 for subdir in dirs:
   SConscript('%s/SConscript' % subdir)

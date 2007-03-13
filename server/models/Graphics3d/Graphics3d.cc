@@ -1,5 +1,4 @@
 #include <Ogre.h>
-#include "OgreAdaptor.hh"
 #include "ModelFactory.hh"
 #include "XMLConfig.hh"
 #include "Graphics3d.hh"
@@ -29,11 +28,12 @@ int Graphics3d::InitChild()
 // Update the child model
 int Graphics3d::UpdateChild()
 {
-  Graphics3dIface *gIface = (Graphics3dIface*)(this->ifaces["graphics3d"]);
+/*  Graphics3dIface *gIface = (Graphics3dIface*)(this->ifaces["graphics3d"]);
 
   gIface->Lock(1);
   std::cout << "Point Count[" << gIface->data->point_count << "]\n";
   gIface->Unlock();
+  */
 
   return 0;
 }

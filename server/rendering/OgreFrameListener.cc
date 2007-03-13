@@ -1,7 +1,12 @@
 #include <CEGUISystem.h>
 #include <OgreCEGUIRenderer.h>
-#include <OgreKeyEvent.h>
-#include <OgreMouseEvent.h>
+#include <OgreWindowEventUtilities.h>
+
+#include <OIS.h>
+#include <OISEvents.h>
+#include <OISInputManager.h>
+#include <OISMouse.h>
+#include <OISKeyboard.h>
 
 #include "Camera.hh"
 #include "CameraManager.hh"
@@ -16,7 +21,27 @@ OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )
   this->moveAmount = 5;
   this->rotateAmount = 72;
 
-  this->eventProcessor = new Ogre::EventProcessor();
+  OIS::ParamList pl;
+  size_t windowHnd = 0;
+  std::ostringstream windowHndStr;
+
+  this->ogreAdaptor->window->getCustomAttribute("WINDOW",&windowHnd);
+  windowHndStr << windowHnd;
+  pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+
+  // Create the input manager
+  this->inputManager = OIS::InputManager::createInputSystem(pl);
+
+  bool bufferedKeys = false;
+  bool bufferedMouse = false;
+
+  // Create the devices
+  this->mKeyboard = static_cast<OIS::Keyboard*>(this->inputManager->createInputObject( OIS::OISKeyboard, bufferedKeys));
+  this->mMouse = static_cast<OIS::Mouse*>(this->inputManager->createInputObject( OIS::OISMouse, bufferedMouse));
+
+  Ogre::WindowEventUtilities::addWindowEventListener(this->ogreAdaptor->window, this);
+
+  /*this->eventProcessor = new Ogre::EventProcessor();
   this->eventProcessor->initialise(this->ogreAdaptor->window);
   this->eventProcessor->startProcessingEvents();
   this->eventProcessor->addKeyListener(this);
@@ -25,6 +50,7 @@ OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )
   this->eventProcessor->addMouseMotionListener( this );
 
   this->inputDevice = this->eventProcessor->getInputReader();
+  */
 
   this->directionVec[0] = 0;
   this->directionVec[1] = 0;
@@ -52,89 +78,88 @@ bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/)
   return true;
 }
 
-void OgreFrameListener::keyClicked( Ogre::KeyEvent * /*e*/ )
+bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
 {
-}
-
-void OgreFrameListener::keyPressed( Ogre::KeyEvent *e )
-{
-  switch (e->getKey())
+  switch (e.key)
   {
-    case Ogre::KC_ESCAPE:
+    case OIS::KC_ESCAPE:
       userQuit = true;
       break;
 
-    case Ogre::KC_UP:
-    case Ogre::KC_W:
+    case OIS::KC_UP:
+    case OIS::KC_W:
       this->directionVec.z -= this->moveAmount;
       break;
 
-    case Ogre::KC_DOWN:
-    case Ogre::KC_S:
+    case OIS::KC_DOWN:
+    case OIS::KC_S:
       this->directionVec.z += this->moveAmount;
       break;
 
-    case Ogre::KC_LEFT:
-    case Ogre::KC_A:
+    case OIS::KC_LEFT:
+    case OIS::KC_A:
      this->directionVec.x -= this->moveAmount;
       break;
 
-    case Ogre::KC_RIGHT:
-    case Ogre::KC_D:
+    case OIS::KC_RIGHT:
+    case OIS::KC_D:
       this->directionVec.x += this->moveAmount;
       break;
 
-    case Ogre::KC_PGDOWN:
-    case Ogre::KC_E:
+    case OIS::KC_PGDOWN:
+    case OIS::KC_E:
       this->directionVec.y -= this->moveAmount;
       break;
 
-    case Ogre::KC_PGUP:
-    case Ogre::KC_Q:
+    case OIS::KC_PGUP:
+    case OIS::KC_Q:
       this->directionVec.y += this->moveAmount;
       break;
   }
 
+  return true;
 }
 
-void OgreFrameListener::keyReleased( Ogre::KeyEvent *e )
+bool OgreFrameListener::keyReleased( const OIS::KeyEvent &e )
 {
-  switch (e->getKey())
+  switch (e.key)
   {
-    case Ogre::KC_UP:
-    case Ogre::KC_W:
+    case OIS::KC_UP:
+    case OIS::KC_W:
       this->directionVec.z += this->moveAmount;
       break;
 
-    case Ogre::KC_DOWN:
-    case Ogre::KC_S:
+    case OIS::KC_DOWN:
+    case OIS::KC_S:
       this->directionVec.z -= this->moveAmount;
       break;
 
-    case Ogre::KC_LEFT:
-    case Ogre::KC_A:
+    case OIS::KC_LEFT:
+    case OIS::KC_A:
       this->directionVec.x += this->moveAmount;
       break;
 
-    case Ogre::KC_RIGHT:
-    case Ogre::KC_D:
+    case OIS::KC_RIGHT:
+    case OIS::KC_D:
       this->directionVec.x -= this->moveAmount;
       break;
 
-    case Ogre::KC_PGDOWN:
-    case Ogre::KC_E:
+    case OIS::KC_PGDOWN:
+    case OIS::KC_E:
       this->directionVec.y += this->moveAmount;
       break;
 
-    case Ogre::KC_PGUP:
-    case Ogre::KC_Q:
+    case OIS::KC_PGUP:
+    case OIS::KC_Q:
       this->directionVec.y -= this->moveAmount;
       break;
   }
+
+  return true;
 }
 
 
-void OgreFrameListener::mouseDragged(Ogre::MouseEvent* e)
+/*void OgreFrameListener::mouseDragged(Ogre::MouseEvent* e)
 {
   Camera *camera;
 
@@ -143,22 +168,28 @@ void OgreFrameListener::mouseDragged(Ogre::MouseEvent* e)
     camera->RotateYaw(-e->getRelX( ) * this->rotateAmount);
     camera->RotatePitch(-e->getRelY() * this->rotateAmount);
   }
-}
+}*/
 
-void OgreFrameListener::mouseMoved(Ogre::MouseEvent *e)
+bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
 {
    // Update CEGUI with the mouse motion
    CEGUI::System::getSingleton().injectMouseMove(
-       e->getRelX() * this->ogreAdaptor->guiRenderer->getWidth(), 
-       e->getRelY() * this->ogreAdaptor->guiRenderer->getHeight());
+       e.state.X.rel * this->ogreAdaptor->guiRenderer->getWidth(), 
+       e.state.Y.rel * this->ogreAdaptor->guiRenderer->getHeight());
+
+   return true;
 }
 
-void OgreFrameListener::mousePressed(Ogre::MouseEvent* e)
+bool OgreFrameListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
   CEGUI::MouseCursor::getSingleton().hide();
+
+  return true;
 }
 
-void OgreFrameListener::mouseReleased(Ogre::MouseEvent* e)
+bool OgreFrameListener::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
   CEGUI::MouseCursor::getSingleton().show();
+
+  return true;
 }

@@ -27,7 +27,7 @@
 #ifndef CAMERA_HH
 #define CAMERA_HH
 
-#include <OGRE/Ogre.h>
+#include <Ogre.h>
 
 // Forward Declarations
 namespace Ogre

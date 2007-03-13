@@ -2,11 +2,16 @@ version = '0.8'
 
 prefix = ARGUMENTS.get('prefix','/usr/local')
 
+# 3rd party packages
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'pkg-config --cflags --libs CEGUI-OGRE',
               'xml2-config --cflags --libs', 
               'pkg-config --cflags --libs CEGUI',
-              'pkg-config --cflags --libs playercore']
+              'pkg-config --cflags --libs playercore',
+              'pkg-config --cflags --libs playerxdr',
+	      'ode-config --cflags --libs',
+	      'pkg-config --cflags --libs OIS']
+	      #'python-config',
 
 env = Environment (
   CC = 'g++',
@@ -27,16 +32,31 @@ env = Environment (
     '#server/controllers',
     '#server/controllers/position2d',
     '#server/controllers/position2d/pioneer2dx',
-    '/usr/include/python2.4'
     ],
 
     LIBPATH=Split('#libgazebo'),
     
-    LIBS=Split('boost_python python2.4 ode gazebo'),
+    LIBS=Split('gazebo'),#boost_python
 )
 
+conf = Configure(env)
+
+# Check for the necessary headers
+#if not conf.CheckHeader('boost/python.hpp'):
+#  print 'Did not find boost/python.hpp exiting'
+#  Exit(1)
+
+env = conf.Finish()
+
+
+# Parse all the pacakge configurations
 for cfg in parseConfigs:
-  env.ParseConfig(cfg)
+  try:
+    env.ParseConfig(cfg)
+  except OSError:
+    print "Unable to parse config ["+cfg+"]\n"
+    Exit(1)
+   
 
 staticObjs = []
 sharedObjs = []

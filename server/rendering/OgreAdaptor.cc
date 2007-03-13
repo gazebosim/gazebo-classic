@@ -1,8 +1,10 @@
+#include <Ogre.h>
 #include <CEGUISystem.h>
 #include <CEGUISchemeManager.h>
 #include <OgreCEGUIRenderer.h>
 #include <OgreLogManager.h>
-#include <Ogre.h>
+#include <OgreWindowEventUtilities.h>
+
 #include "XMLConfig.hh"
 #include "OgreFrameListener.hh"
 #include "OgreAdaptor.hh"
@@ -297,7 +299,7 @@ void OgreAdaptor::CreateWindow(int width, int height)
 
 int OgreAdaptor::Render()
 {
-  Ogre::PlatformManager::getSingleton().messagePump(window);
+  Ogre::WindowEventUtilities::messagePump();
 
   root->renderOneFrame();
 
