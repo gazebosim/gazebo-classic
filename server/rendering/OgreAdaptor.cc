@@ -89,8 +89,8 @@ int OgreAdaptor::Init(XMLConfigNode *node)
   this->guiSystem = new CEGUI::System(this->guiRenderer);
 
   // Mouse
-  CEGUI::SchemeManager::getSingleton().loadScheme((CEGUI::utf8*)"TaharezLook.scheme");
-  CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
+  //CEGUI::SchemeManager::getSingleton().loadScheme((CEGUI::utf8*)"TaharezLookSkin.scheme");
+  //CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
 
   return 0;
 }
