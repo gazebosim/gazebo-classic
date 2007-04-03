@@ -2,6 +2,7 @@ version = '0.8'
 
 prefix = ARGUMENTS.get('prefix','/usr/local')
 
+
 # 3rd party packages
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'pkg-config --cflags --libs CEGUI-OGRE',
@@ -54,7 +55,15 @@ for cfg in parseConfigs:
   try:
     env.ParseConfig(cfg)
   except OSError:
-    print "Unable to parse config ["+cfg+"]\n"
+    print "Unable to parse config ["+cfg+"]"
+    if cfg.find("OIS") >= 0:
+      print "Install Open Input System (http://sourceforge.net/projects/wgois)\n"
+    elif cfg.find("OGRE") >= 0:
+      print "Install Ogre3d (http://www.ogre3d.org/)\n"
+    elif cfg.find("player") >=0:
+      print "Install Player (http://playerstage.sourceforge.net)\n"
+    elif cfg.find("CEGUI") >=0:
+      print "Install CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
     Exit(1)
    
 

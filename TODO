@@ -3,6 +3,7 @@
 
 
 Open:
+- Check version of 3rd party packages
 - Real time user interaction
 - Multilevel map extruder
 - Graphical Scene builder. Exports an XML configuration file.
@@ -13,4 +14,3 @@ Open:
 - Standardize internal API
 - Fix any memory leaks
 - Data Logger
-- Render to offscreen buffers. This will make it possible to run without any X11 windows, and still get camera data back.

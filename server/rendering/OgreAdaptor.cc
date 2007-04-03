@@ -78,8 +78,10 @@ int OgreAdaptor::Init(XMLConfigNode *node)
   // Add a sky dome to our scene
   this->sceneMgr->setSkyDome(true,"Gazebo/CloudySky",5,8);
 
+
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener(this);
+
   this->root->addFrameListener(this->frameListener);
 
   // CEGUI setup
@@ -87,10 +89,6 @@ int OgreAdaptor::Init(XMLConfigNode *node)
       Ogre::RENDER_QUEUE_OVERLAY, false, 0, this->sceneMgr);
 
   this->guiSystem = new CEGUI::System(this->guiRenderer);
-
-  // Mouse
-  //CEGUI::SchemeManager::getSingleton().loadScheme((CEGUI::utf8*)"TaharezLookSkin.scheme");
-  //CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
 
   return 0;
 }

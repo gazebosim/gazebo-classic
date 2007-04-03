@@ -18,8 +18,8 @@ extern bool userQuit;
 OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )
 {
   this->ogreAdaptor = ogreAdaptor;
-  this->moveAmount = 5;
-  this->rotateAmount = 72;
+  this->moveAmount = 1;
+  this->rotateAmount = 1;
 
   OIS::ParamList pl;
   size_t windowHnd = 0;
@@ -29,32 +29,44 @@ OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )
   windowHndStr << windowHnd;
   pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
+  // Allow the cursor to be showen, and prevent Gazebo from hogging the
+  // cursor.
+  pl.insert(std::make_pair(std::string("x11_mouse_grab"), 
+                           std::string("false")));
+  pl.insert(std::make_pair(std::string("x11_mouse_hide"), 
+                           std::string("false")));
+  pl.insert(std::make_pair(std::string("x11_keyboard_grab"), 
+                           std::string("false")));
+  pl.insert(std::make_pair(std::string("XAutoRepeatOn"), 
+                           std::string("true")));
+
   // Create the input manager
   this->inputManager = OIS::InputManager::createInputSystem(pl);
 
-  bool bufferedKeys = false;
-  bool bufferedMouse = false;
+  bool bufferedKeys = true;
+  bool bufferedMouse = true;
 
   // Create the devices
   this->mKeyboard = static_cast<OIS::Keyboard*>(this->inputManager->createInputObject( OIS::OISKeyboard, bufferedKeys));
+  this->mKeyboard->setEventCallback(this);
+
   this->mMouse = static_cast<OIS::Mouse*>(this->inputManager->createInputObject( OIS::OISMouse, bufferedMouse));
+  this->mMouse->setEventCallback(this);
 
-  Ogre::WindowEventUtilities::addWindowEventListener(this->ogreAdaptor->window, this);
-
-  /*this->eventProcessor = new Ogre::EventProcessor();
-  this->eventProcessor->initialise(this->ogreAdaptor->window);
-  this->eventProcessor->startProcessingEvents();
-  this->eventProcessor->addKeyListener(this);
-
-  this->eventProcessor->addMouseListener( this );
-  this->eventProcessor->addMouseMotionListener( this );
-
-  this->inputDevice = this->eventProcessor->getInputReader();
-  */
+  unsigned int width, height, depth;
+  int top, left;
+  this->ogreAdaptor->window->getMetrics(width, height, depth, left, top);
+  const OIS::MouseState &mouseState = this->mMouse->getMouseState();
+  mouseState.width = width;
+  mouseState.height = height;
 
   this->directionVec[0] = 0;
   this->directionVec[1] = 0;
   this->directionVec[2] = 0;
+
+  this->leftPressed = false;
+  this->rightPressed = false;
+  this->middlePressed = false;
 }
 
 OgreFrameListener::~OgreFrameListener()
@@ -69,6 +81,9 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
   {
     camera->Translate(this->directionVec * evt.timeSinceLastFrame );
   }
+
+  this->mKeyboard->capture();
+  this->mMouse->capture();
 
   return true;
 }
@@ -158,38 +173,64 @@ bool OgreFrameListener::keyReleased( const OIS::KeyEvent &e )
   return true;
 }
 
-
-/*void OgreFrameListener::mouseDragged(Ogre::MouseEvent* e)
+bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
 {
+   // Update CEGUI with the mouse motion
+   /*CEGUI::System::getSingleton().injectMouseMove(
+       e.state.X.rel * this->ogreAdaptor->guiRenderer->getWidth(), 
+       e.state.Y.rel * this->ogreAdaptor->guiRenderer->getHeight());
+       */
+
   Camera *camera;
 
   if ((camera = CameraManager::Instance()->GetActiveCamera()))
   {
-    camera->RotateYaw(-e->getRelX( ) * this->rotateAmount);
-    camera->RotatePitch(-e->getRelY() * this->rotateAmount);
+    if (this->leftPressed)
+    {
+      camera->RotateYaw(-e.state.X.rel * this->rotateAmount);
+      camera->RotatePitch(-e.state.Y.rel * this->rotateAmount);
+    }
   }
-}*/
-
-bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
-{
-   // Update CEGUI with the mouse motion
-   CEGUI::System::getSingleton().injectMouseMove(
-       e.state.X.rel * this->ogreAdaptor->guiRenderer->getWidth(), 
-       e.state.Y.rel * this->ogreAdaptor->guiRenderer->getHeight());
 
    return true;
 }
 
 bool OgreFrameListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-  CEGUI::MouseCursor::getSingleton().hide();
+  //CEGUI::MouseCursor::getSingleton().hide();
+
+  switch (id)
+  {
+    case OIS::MB_Left:
+      this->leftPressed = true;
+      break;
+    case OIS::MB_Right:
+      this->rightPressed = true;
+      break;
+    case OIS::MB_Middle:
+      this->middlePressed = true;
+      break;
+  }
 
   return true;
 }
 
 bool OgreFrameListener::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-  CEGUI::MouseCursor::getSingleton().show();
+//  CEGUI::MouseCursor::getSingleton().show();
+
+  switch (id)
+  {
+    case OIS::MB_Left:
+      this->leftPressed = false;
+      break;
+    case OIS::MB_Right:
+      this->rightPressed = false;
+      break;
+    case OIS::MB_Middle:
+      this->middlePressed = false;
+      break;
+  }
 
   return true;
 }

@@ -27,9 +27,9 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   public: virtual bool keyPressed( const OIS::KeyEvent &e );
   public: virtual bool keyReleased( const OIS::KeyEvent &e );
 
-  // MouseDragged
+
+  // Mouse Events
   public: bool mouseMoved(const OIS::MouseEvent &e);
-  public: bool mouseDragged(const OIS::MouseEvent &e);
 
   // MouseListener
   public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
@@ -46,6 +46,10 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   private: OIS::InputManager *inputManager;
   private: OIS::Mouse *mMouse;
   private: OIS::Keyboard *mKeyboard;
+
+  private: bool leftPressed;
+  private: bool rightPressed;
+  private: bool middlePressed;
 };
 
 #endif
