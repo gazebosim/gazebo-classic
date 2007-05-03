@@ -146,7 +146,8 @@ int Model::Update()
 
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
-    iter->second->Update();
+    if (iter->second)
+      iter->second->Update();
   }
 
   // Call the model's python update function, if one exists
@@ -237,6 +238,9 @@ void Model::SetPose(const Pose3d &pose)
 
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
+    if (!iter->second)
+      continue;
+
     body = iter->second;
 
     bodyPose = body->GetPose();
@@ -350,9 +354,14 @@ int Model::LoadJoint(XMLConfigNode *node)
 
   // Set the anchor vector
   if (anchorBody)
+  {
     joint->SetAnchor(anchorBody->GetPosition());
+  }
   else
+  {
     joint->SetAnchor(anchorVec);
+    this->bodies.erase(node->GetString("anchor","",1));
+  }
 
   // Set the axis of the hing joint
   if (node->GetName() == "hinge")
