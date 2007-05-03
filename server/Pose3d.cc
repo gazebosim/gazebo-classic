@@ -1,27 +1,59 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: External interfaces for Gazebo
+ * Author: Nate Koenig
+ * Date: 03 Apr 2007
+ * SVN: $Id$
+ */
 #include "Pose3d.hh"
 
-// Constructors
+////////////////////////////////////////////////////////////////////////////////
+/// Default constructors
 Pose3d::Pose3d()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Constructor
 Pose3d::Pose3d( const Vector3 &pos, const Quatern &rot)
 {
   this->pos = pos;
   this->rot = rot;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Copy constructor
 Pose3d::Pose3d( const Pose3d &pose )
 {
   this->pos = pose.pos;
   this->rot = pose.rot;
 }
 
-// Destructors
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 Pose3d::~Pose3d()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // See if a pose is finite (e.g., not nan)
 bool Pose3d::IsFinite()
 {
@@ -29,6 +61,7 @@ bool Pose3d::IsFinite()
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this + obj 
 Pose3d Pose3d::operator+(const Pose3d &obj)
 {
@@ -40,6 +73,8 @@ Pose3d Pose3d::operator+(const Pose3d &obj)
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Add-Equals operator
 const Pose3d &Pose3d::operator+=(const Pose3d &obj)
 {
   this->pos = this->CoordPositionAdd(obj);
@@ -48,6 +83,7 @@ const Pose3d &Pose3d::operator+=(const Pose3d &obj)
   return *this;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this - obj 
 Pose3d Pose3d::operator-(const Pose3d &obj)
 {
@@ -59,6 +95,7 @@ Pose3d Pose3d::operator-(const Pose3d &obj)
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this - obj 
 const Pose3d &Pose3d::operator-=(const Pose3d &obj)
 {
@@ -68,6 +105,7 @@ const Pose3d &Pose3d::operator-=(const Pose3d &obj)
   return *this;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Add one point to another: result = this + pose
 Vector3 Pose3d::CoordPositionAdd(const Pose3d &pose)
 {
@@ -88,6 +126,7 @@ Vector3 Pose3d::CoordPositionAdd(const Pose3d &pose)
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Subtract one position from another: result = this - pose
 Vector3 Pose3d::CoordPositionSub(const Pose3d &pose)
 {
@@ -109,12 +148,14 @@ Vector3 Pose3d::CoordPositionSub(const Pose3d &pose)
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Add one rotation to another: result =  this->rot + rot
 Quatern Pose3d::CoordRotationAdd(const Quatern &rot)
 {
   return  Quatern(rot * this->rot);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Subtract one rotation from another: result = this->rot - rot
 Quatern Pose3d::CoordRotationSub(const Quatern &rot)
 {
@@ -130,6 +171,8 @@ std::ostream &operator<<( std::ostream &out, const Pose3d &pose )
   return out;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+  /// Reset the pose
 void Pose3d::Reset()
 {
   // set the position to zero

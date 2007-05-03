@@ -1,3 +1,29 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: The world; all models are collected here
+ * Author: Andrew Howard and Nate Koenig
+ * Date: 3 Apr 2007
+ * SVN: $Id$
+ */
+
 #include <assert.h>
 
 #include "OgreAdaptor.hh"
@@ -13,6 +39,7 @@
 // static pointer to myself
 World *World::myself = NULL;
 
+////////////////////////////////////////////////////////////////////////////////
 // Private constructor
 World::World()
 {
@@ -26,12 +53,14 @@ World::World()
   this->pause = false;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Private destructor
 World::~World()
 {
   delete this->physicsEngine;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 //Get an instance of this World
 World *World::Instance()
 {
@@ -43,6 +72,7 @@ World *World::Instance()
   return myself;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Load the world
 int World::Load(XMLConfig *config, int serverId)
 {
@@ -72,6 +102,7 @@ int World::Load(XMLConfig *config, int serverId)
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the world
 int World::Init()
 {
@@ -90,6 +121,7 @@ int World::Init()
   this->physicsEngine->Init();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Update the world
 int World::Update()
 {
@@ -105,6 +137,7 @@ int World::Update()
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Finilize the world
 int World::Fini()
 {
@@ -128,6 +161,7 @@ int World::Fini()
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Retun the libgazebo server
 Server *World::GetGzServer() const
 {
@@ -135,6 +169,7 @@ Server *World::GetGzServer() const
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Return the physics engine
 PhysicsEngine *World::GetPhysicsEngine() const
 {
@@ -142,6 +177,8 @@ PhysicsEngine *World::GetPhysicsEngine() const
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Load a model
 int World::LoadModel(XMLConfigNode *node, Model *parent)
 {
   XMLConfigNode *cnode;
