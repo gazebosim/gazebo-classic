@@ -14,14 +14,14 @@
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" >
 
   <rendering:ogre>
-    <plugins path="/usr/local/lib/OGRE">
+    <plugins path="/home/nate/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
       <plugin>Plugin_BSPSceneManager.so</plugin>
       <plugin>Plugin_OctreeSceneManager.so</plugin>
     </plugins>
 
-    <resources path="/usr/local/share/gazebo">
+    <resources path="/home/nate/local/share/gazebo">
       <bootstrap>
         <zip>Media/packs/OgreCore.zip</zip>
       </bootstrap>
