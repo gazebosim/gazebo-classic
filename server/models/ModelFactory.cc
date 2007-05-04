@@ -28,6 +28,7 @@
 #include "Model.hh"
 #include "ModelFactory.hh"
 
+using namespace gazebo;
 
 //void RegisterSimpleSolid();
 void RegisterGroundPlane();

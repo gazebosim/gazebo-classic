@@ -3,6 +3,9 @@
 
 #include <deque>
 
+namespace gazebo
+{
+
 class Camera;
 
 class CameraManager
@@ -24,5 +27,5 @@ class CameraManager
   private: Camera *activeCamera;
 };
 
-
+}
 #endif

@@ -30,9 +30,6 @@
 #include <iostream>
 #include "Vector3.hh"
 
-class Quatern;
-std::ostream &operator<<(std::ostream &out, const Quatern &);
-
 namespace gazebo
 {
 
@@ -116,7 +113,14 @@ class Quatern
   /// Ostream operator
   /// \param out Ostream
   /// \param q Quatern to output
-  public: friend std::ostream &operator<< (std::ostream &out, const Quatern &q);
+  /// \return The ostream
+  public: friend  std::ostream &operator<<( std::ostream &out, const gazebo::Quatern &q )
+  {
+    out << q.u << " " << q.x << " " << q.y << " " << q.z;
+
+    return out;
+  }
+
 };
 
 /// @}

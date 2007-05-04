@@ -6,15 +6,16 @@
 
 #include "PhysicsEngine.hh"
 
-class SphereGeom;
-class PlaneGeom;
-class BoxGeom;
-class CylinderGeom;
-class Body;
-class Entity;
+using namespace gazebo;
 
 namespace gazebo
 {
+  class SphereGeom;
+  class PlaneGeom;
+  class BoxGeom;
+  class CylinderGeom;
+  //class Body;
+  class Entity;
 
 class ODEPhysics : public PhysicsEngine
 {
@@ -60,9 +61,9 @@ class ODEPhysics : public PhysicsEngine
   // Simulation step time
   private: double stepTime;
 
-
   protected: std::map<int, Entity*> entities;
 };
 
 }
+
 #endif

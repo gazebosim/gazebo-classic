@@ -13,6 +13,8 @@
 #include "OgreAdaptor.hh"
 #include "OgreFrameListener.hh"
 
+using namespace gazebo;
+
 extern bool userQuit;
 
 OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )

@@ -35,6 +35,7 @@
 #include "gazebo.h"
 #include "World.hh"
 
+using namespace gazebo;
 
 // static pointer to myself
 World *World::myself = NULL;

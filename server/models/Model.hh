@@ -43,6 +43,9 @@ namespace Ogre
   class SceneNode;
 }
 
+namespace gazebo
+{
+
 class XMLConfigNode;
 class Body;
 
@@ -167,5 +170,7 @@ class Model : public Entity
   private: PyObject *pFuncUpdate;
   */
 };
+
+}
 
 #endif

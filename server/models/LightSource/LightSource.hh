@@ -3,6 +3,8 @@
 
 #include "Model.hh"
 
+namespace gazebo
+{
 class Body;
 class Geom;
 class XMLConfigNode;
@@ -26,4 +28,5 @@ class LightSource : public Model
   protected: virtual int FiniChild();
 
 };
+}
 #endif

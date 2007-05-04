@@ -32,11 +32,10 @@
 #include "Vector3.hh"
 #include "Quatern.hh"
 
-class Pose3d;
-std::ostream &operator<<(std::ostream &out, const Pose3d &);
 
 namespace gazebo
 {
+
 /// @addtogroup gazebocore
 /// @{
 
@@ -105,21 +104,27 @@ class Pose3d
   /// Reset the pose
   public: void Reset();
 
-  /// Ostream operator
-  /// \param out Ostream
-  /// \param pose Pose to output
-  /// \return the Ostream
-  public: friend std::ostream &operator<< (std::ostream &out, const Pose3d &pose);
-
   /// The position
   public: Vector3 pos;
 
   /// The rotation
   public: Quatern rot;
+
+  /// Ostream operator
+  /// \param out Ostream
+  /// \param pose Pose to output
+  /// \return the Ostream
+  public: friend std::ostream &operator<<(std::ostream &out, const gazebo::Pose3d &pose)
+          {
+            out << "Pos[" << pose.pos << "] Rot[" << pose.rot << "]";
+            return out;
+
+          }
 };
 
 /// @}
 
 }
+
 #endif
 

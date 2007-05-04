@@ -1,6 +1,8 @@
 #include "Camera.hh"
 #include "CameraManager.hh"
 
+using namespace gazebo;
+
 CameraManager *CameraManager::myself = NULL;
 
 CameraManager::CameraManager()

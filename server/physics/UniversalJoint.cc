@@ -24,9 +24,10 @@
  * CVS: $Id$
  */
 
-
 #include "World.hh"
 #include "UniversalJoint.hh"
+
+using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor

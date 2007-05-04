@@ -40,9 +40,9 @@
 #include "OgreAdaptor.hh"
 #include "OgreFrameListener.hh"
 
-
-
 #include "Camera.hh"
+
+using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor 

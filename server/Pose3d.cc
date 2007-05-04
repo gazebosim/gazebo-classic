@@ -23,7 +23,10 @@
  * Date: 03 Apr 2007
  * SVN: $Id$
  */
+
 #include "Pose3d.hh"
+
+using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Default constructors
@@ -160,15 +163,6 @@ Quatern Pose3d::CoordRotationAdd(const Quatern &rot)
 Quatern Pose3d::CoordRotationSub(const Quatern &rot)
 {
   return rot.GetInverse() * this->rot;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Ostream operator
-std::ostream &operator<<( std::ostream &out, const Pose3d &pose )
-{
-  out << "Pos[" << pose.pos << "] Rot[" << pose.rot << "]";
-
-  return out;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

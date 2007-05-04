@@ -31,6 +31,9 @@
 #include <string>
 #include <map>
 
+namespace gazebo
+{
+
 // Forward declarations
 class Model;
 
@@ -91,6 +94,8 @@ extern "C" \
     ModelFactory::RegisterModel("plugin", name, New##classname); \
     return 0;\
   }\
+}
+
 }
 
 #endif

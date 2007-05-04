@@ -27,6 +27,8 @@
 #include <ode/ode.h>
 #include "ContactParams.hh"
 
+using namespace gazebo;
+
 //////////////////////////////////////////////////////////////////////////////
 // Default constructor
 ContactParams::ContactParams()

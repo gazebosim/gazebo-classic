@@ -13,11 +13,12 @@ namespace Ogre
   class MaterialPtr;
 }
 
-class Body;
-class ContactParams;
-
 namespace gazebo
 {
+
+  class Body;
+  class ContactParams;
+
 
 class Geom : public Entity
 {

@@ -30,13 +30,8 @@
 #include <iostream>
 #include <fstream>
 
-class Vector3;
-
-std::ostream &operator<<(std::ostream &out, const Vector3 &);
-
 namespace gazebo
 {
-
 /// @addtogroup gazebocore
 /// @{
 
@@ -89,11 +84,20 @@ class Vector3
   /// See if a point is finite (e.g., not nan)
   public: bool IsFinite() const;
 
-  /// Ostream operator
-  public: friend std::ostream &operator<< (std::ostream &out, const Vector3 &pt);
-
   // The location
   public: double x, y, z;
+
+  /// Ostream operator
+  /// \param out Ostream
+  /// \param pt Vector3 to output
+  /// \return The Ostream
+  public: friend std::ostream &operator<<( std::ostream &out, const gazebo::Vector3 &pt )
+  {
+    out << pt.x << " " << pt.y << " " << pt.z;
+
+    return out;
+  }
+
 };
 
 /// @}

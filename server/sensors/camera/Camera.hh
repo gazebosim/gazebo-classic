@@ -38,6 +38,9 @@ namespace Ogre
   class Viewport;
 }
 
+namespace gazebo
+{
+
 /// @brief Basic camera sensor
 ///
 /// This sensor is used for simulating standard monocular cameras; is
@@ -160,5 +163,6 @@ class Camera
 
 };
 
+}
 #endif
 

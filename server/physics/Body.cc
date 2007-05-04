@@ -7,6 +7,8 @@
 #include "Geom.hh"
 #include "Body.hh"
 
+using namespace gazebo;
+
 Body::Body(Entity *parent, dWorldID worldId)
   : Entity(parent)
 {

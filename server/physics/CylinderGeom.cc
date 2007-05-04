@@ -30,6 +30,7 @@
 #include "CylinderGeom.hh"
 #include "dCylinder.h" // For declarations missing from ODE
 
+using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor

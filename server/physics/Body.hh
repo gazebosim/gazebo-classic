@@ -10,7 +10,6 @@
 #include "Entity.hh"
 #include "Pose3d.hh"
 
-class Geom;
 namespace Ogre
 {
   class SceneNode;
@@ -18,6 +17,7 @@ namespace Ogre
 
 namespace gazebo
 {
+  class Geom;
 
 class Body : public Entity
 {

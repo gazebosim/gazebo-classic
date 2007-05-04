@@ -29,7 +29,6 @@
 
 #include "Joint.hh"
 
-class World;
 
 namespace gazebo
 {

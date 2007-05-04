@@ -1,5 +1,7 @@
 #include "PhysicsEngine.hh"
 
+using namespace gazebo;
+
 PhysicsEngine::PhysicsEngine()
 {
 }

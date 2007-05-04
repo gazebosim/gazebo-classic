@@ -29,10 +29,10 @@
 
 #include <string>
 
-class XMLConfigNode;
 
 namespace gazebo
 {
+class XMLConfigNode;
 
 /// @addtogroup controllers
 /// @{

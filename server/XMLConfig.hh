@@ -34,11 +34,11 @@
 #include "Quatern.hh"
 #include "Time.hh"
 
+namespace gazebo
+{
 // Forward declarations
 class XMLConfigNode;
 
-namespace gazebo
-{
 /// @addtogroup gazebocore
 /// @{
 

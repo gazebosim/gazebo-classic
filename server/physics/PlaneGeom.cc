@@ -33,6 +33,8 @@
 #include "Body.hh"
 #include "PlaneGeom.hh"
 
+using namespace gazebo;
+
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 PlaneGeom::PlaneGeom(Body *body, double altitude, Vector3 normal)

@@ -4,6 +4,8 @@
 #include "XMLConfig.hh"
 #include "LightSource.hh"
 
+using namespace gazebo;
+
 GZ_REGISTER_STATIC("LightSource", LightSource);
 
 LightSource::LightSource()

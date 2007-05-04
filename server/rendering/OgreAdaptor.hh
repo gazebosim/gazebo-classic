@@ -49,6 +49,9 @@ namespace CEGUI
   class System;
 }
 
+namespace gazebo
+{
+
 class XMLConfigNode;
 class OgreFrameListener;
 
@@ -116,4 +119,5 @@ class OgreGLXWindowInterface
   public: virtual void resized(size_t width, size_t height) = 0;
 };
 
+}
 #endif

@@ -28,6 +28,8 @@
 #include "XMLConfig.hh"
 #include "Controller.hh"
 
+using namespace gazebo;
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Controller::Controller()

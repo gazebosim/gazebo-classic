@@ -5,6 +5,8 @@
 #include "XMLConfig.hh"
 #include "GroundPlane.hh"
 
+using namespace gazebo;
+
 GZ_REGISTER_STATIC("GroundPlane", GroundPlane);
 
 GroundPlane::GroundPlane()

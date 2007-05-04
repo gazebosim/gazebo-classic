@@ -26,6 +26,8 @@
 #include <math.h>
 #include "Quatern.hh"
 
+using namespace gazebo;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Default Constructor
 Quatern::Quatern()
@@ -222,11 +224,3 @@ bool Quatern::IsFinite()
   return finite(this->u) && finite(this->x) && finite(this->y) && finite(this->z);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Ostream operator
-std::ostream &operator<<( std::ostream &out, const Quatern &q )
-{
-  out << q.u << " " << q.x << " " << q.y << " " << q.z;
-
-  return out;
-}

@@ -27,6 +27,8 @@
 #include "World.hh"
 #include "BallJoint.hh"
 
+using namespace gazebo;
+
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 BallJoint::BallJoint(dWorldID worldId)

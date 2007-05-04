@@ -27,6 +27,8 @@
 
 #include "Pioneer2dx_Position2d.hh"
 
+using namespace gazebo;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Pioneer2dx_Position2d::Pioneer2dx_Position2d()

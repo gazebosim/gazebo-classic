@@ -26,6 +26,8 @@
 
 #include "SliderJoint.hh"
 
+using namespace gazebo;
+
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 SliderJoint::SliderJoint( dWorldID worldId )

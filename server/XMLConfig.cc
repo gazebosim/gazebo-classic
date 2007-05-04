@@ -22,6 +22,8 @@
 #include "XMLConfig.hh"
 #include "Global.hh"
 
+using namespace gazebo;
+
 ////////////////////////////////////////////////////////////////////////////
 // Standard constructor
 XMLConfig::XMLConfig()

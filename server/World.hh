@@ -24,24 +24,22 @@
  * SVN: $Id$
  */
 
-
-
-
 #ifndef WORLD_HH
 #define WORLD_HH
 
 #include <vector>
 
 // Forward declarations
-class PhysicsEngine;
-class Model;
-class XMLConfigNode;
-class XMLConfig;
 class Server;
 class SimIface;
 
 namespace gazebo
 {
+  class Model;
+  class PhysicsEngine;
+  class XMLConfigNode;
+  class XMLConfig;
+
 
 /// @addtogroup gazebocore
 /// @{

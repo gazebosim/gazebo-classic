@@ -3,6 +3,8 @@
 
 #include "Model.hh"
 
+namespace gazebo
+{
 class Body;
 class Geom;
 class XMLConfigNode;
@@ -29,4 +31,7 @@ class GroundPlane : public Model
   private: Geom *geom;
 
 };
+
+}
+
 #endif

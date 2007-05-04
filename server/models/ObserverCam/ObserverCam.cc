@@ -7,6 +7,8 @@
 #include "Camera.hh"
 #include "ObserverCam.hh"
 
+using namespace gazebo;
+
 GZ_REGISTER_STATIC("ObserverCam", ObserverCam);
 
 ObserverCam::ObserverCam()

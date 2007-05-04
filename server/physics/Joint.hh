@@ -30,10 +30,10 @@
 #include <ode/ode.h>
 #include "Vector3.hh"
 
-class Body;
 
 namespace gazebo
 {
+  class Body;
 
 class Joint
 {

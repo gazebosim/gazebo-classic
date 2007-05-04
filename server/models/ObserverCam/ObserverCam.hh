@@ -3,6 +3,8 @@
 
 #include "Model.hh"
 
+namespace gazebo
+{
 class Camera;
 class XMLConfigNode;
 
@@ -26,4 +28,5 @@ class ObserverCam : public Model
 
   private: Camera *camera;
 };
+}
 #endif

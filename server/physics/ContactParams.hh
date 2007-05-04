@@ -27,6 +27,9 @@
 #ifndef CONTACTPARAMS_HH
 #define CONTACTPARAMS_HH
 
+namespace gazebo
+{
+
 class ContactParams
 {
   // Constructor
@@ -48,4 +51,5 @@ class ContactParams
   public: double slip1,slip2;   
 };
 
+}
 #endif

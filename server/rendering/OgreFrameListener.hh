@@ -14,6 +14,9 @@ namespace Ogre
   class MouseEvent;
 }
 
+namespace gazebo
+{
+
 class OgreAdaptor;
 
 class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener
@@ -51,5 +54,7 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   private: bool rightPressed;
   private: bool middlePressed;
 };
+
+}
 
 #endif

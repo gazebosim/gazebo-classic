@@ -252,19 +252,19 @@ int Init()
   }
 
   // Register static models
-  ModelFactory::RegisterAll();
+  gazebo::ModelFactory::RegisterAll();
   
   // Load the world file
-  XMLConfig *xmlFile = new XMLConfig();
+  gazebo::XMLConfig *xmlFile = new gazebo::XMLConfig();
   if (xmlFile->Load(worldFileName) != 0)
     return -1;
 
   // Load the world
-  if (World::Instance()->Load(xmlFile, optServerId) != 0)
+  if (gazebo::World::Instance()->Load(xmlFile, optServerId) != 0)
     return -1;
 
   // Initialize
-  if (World::Instance()->Init() != 0)
+  if (gazebo::World::Instance()->Init() != 0)
     return -1;
 
   // Check for unused attributes
@@ -284,7 +284,7 @@ int Init()
 // Finalize the sim
 int Fini()
 {
-  World::Instance()->Fini();
+  gazebo::World::Instance()->Fini();
 
   //Py_Finalize();
 
@@ -295,7 +295,7 @@ int Fini()
 bool MainIdle()
 {
   // Advance the world 
-  World::Instance()->Update();
+  gazebo::World::Instance()->Update();
 
   // Exit if the user has decided to end the simulation
   if (userQuit)

@@ -27,6 +27,8 @@
 #include "World.hh"
 #include "HingeJoint.hh"
 
+using namespace gazebo;
+
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 HingeJoint::HingeJoint( dWorldID worldId )

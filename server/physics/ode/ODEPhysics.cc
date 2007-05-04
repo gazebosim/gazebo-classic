@@ -1,4 +1,5 @@
 #include <assert.h>
+
 #include "Global.hh"
 #include "Geom.hh"
 #include "Body.hh"
@@ -209,7 +210,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       dJointAttach(joint, body1, body2);
     }
   }
-  return;
 }
                                   
                                   

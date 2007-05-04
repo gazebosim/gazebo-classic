@@ -4,6 +4,8 @@
 #include "Body.hh"
 #include "Geom.hh"
 
+using namespace gazebo;
+
 int Geom::geomIdCounter = 0;
 
 Geom::Geom(Body *body)

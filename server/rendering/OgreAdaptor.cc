@@ -9,6 +9,7 @@
 #include "OgreFrameListener.hh"
 #include "OgreAdaptor.hh"
 
+using namespace gazebo;
 
 OgreAdaptor *OgreAdaptor::myself = NULL;
 
