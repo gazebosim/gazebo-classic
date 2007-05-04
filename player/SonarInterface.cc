@@ -21,7 +21,7 @@
 /* Desc: Sonar Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id: SonarInterface.cc,v 1.3.2.1 2006/12/16 22:43:23 natepak Exp $
+ * CVS: $Id$
  */
 
 /**

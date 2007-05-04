@@ -32,6 +32,8 @@
 
 class Body;
 
+namespace gazebo
+{
 
 class Joint
 {
@@ -66,11 +68,11 @@ class Joint
   public: void Detach();
 
   // Set the anchor point
-  public: virtual void SetAnchor( const Vector3 & /*anchor*/ ) {}
+  public: virtual void SetAnchor( const gazebo::Vector3 & /*anchor*/ ) {}
 
   // Set the anchor point
-  public: virtual Vector3 GetAnchor() const
-          {return Vector3(0,0,0);}
+  public: virtual gazebo::Vector3 GetAnchor() const
+          {return gazebo::Vector3(0,0,0);}
 
 
   // Set the _parameter to _value
@@ -98,5 +100,6 @@ class Joint
   private: std::string name;
 };
 
+}
 #endif
 

@@ -21,7 +21,7 @@
 /* Desc: Parameters for contact joints
  * Author: Nate Koenig
  * Date: 30 July 2003
- * CVS: $Id: ContactParams.cc,v 1.1.2.1 2006/12/16 22:41:15 natepak Exp $
+ * CVS: $Id$
  */
 
 #include <ode/ode.h>

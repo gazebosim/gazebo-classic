@@ -29,6 +29,9 @@
 
 #include "Geom.hh"
 
+namespace gazebo
+{
+
 class BoxGeom : public Geom
 {
   // Constructor
@@ -38,4 +41,5 @@ class BoxGeom : public Geom
   public: virtual ~BoxGeom();
 };
 
+}
 #endif

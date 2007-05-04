@@ -23,8 +23,6 @@
  * Date: 03 Apr 2007
  * SVN: $Id$
  */
-/// @addtogroup gazebocore
-/// @{
 
 #ifndef POSE3D_HH
 #define POSE3D_HH
@@ -39,6 +37,9 @@ std::ostream &operator<<(std::ostream &out, const Pose3d &);
 
 namespace gazebo
 {
+/// @addtogroup gazebocore
+/// @{
+
 
 /// Pose3d encapsulates a position and rotation in three space
 class Pose3d
@@ -117,7 +118,8 @@ class Pose3d
   public: Quatern rot;
 };
 
+/// @}
+
 }
 #endif
 
-/// @}

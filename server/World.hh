@@ -24,6 +24,25 @@
  * SVN: $Id$
  */
 
+
+
+
+#ifndef WORLD_HH
+#define WORLD_HH
+
+#include <vector>
+
+// Forward declarations
+class PhysicsEngine;
+class Model;
+class XMLConfigNode;
+class XMLConfig;
+class Server;
+class SimIface;
+
+namespace gazebo
+{
+
 /// @addtogroup gazebocore
 /// @{
 
@@ -85,22 +104,6 @@ The parameters are as follows:
   - Default 0.25
 
 */
-
-/// @}
-
-
-#ifndef WORLD_HH
-#define WORLD_HH
-
-#include <vector>
-
-// Forward declarations
-class PhysicsEngine;
-class Model;
-class XMLConfigNode;
-class XMLConfig;
-class Server;
-class SimIface;
 
 /// The World
 /*
@@ -168,5 +171,9 @@ class World
   /// Flag set if simulation is paused
   private: bool pause;
 };
+
+/// @}
+
+}
 
 #endif

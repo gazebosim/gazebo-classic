@@ -23,9 +23,6 @@
  * Date: 03 Apr 2007
  * SVN: $Id$
  */
-/// @addtogroup gazebocore
-/// @{
-
 #ifndef TIME_HH
 #define TIME_HH
 
@@ -34,6 +31,10 @@
 
 namespace gazebo
 {
+/// @addtogroup gazebocore
+/// @{
+
+
 
 /// A Time class
 /// TODO: replace this with Boost
@@ -130,8 +131,8 @@ class Time
   /// Correct the time
   private: void Correct();
 };
+/// @}
 
 }
 #endif
 
-/// @}

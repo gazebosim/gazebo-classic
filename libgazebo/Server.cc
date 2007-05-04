@@ -23,7 +23,7 @@
  * Desc: Server object
  * Author: Andrew Howard
  * Date: 7 May 2003
- * CVS: $Id: Server.cc,v 1.1.2.1 2006/12/16 22:43:22 natepak Exp $
+ * CVS: $Id$
  */
 
 #if HAVE_CONFIG_H

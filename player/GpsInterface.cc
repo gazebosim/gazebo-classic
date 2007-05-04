@@ -21,7 +21,7 @@
 /* Desc: Gps Interface for Player
  * Author: Glenn Laguna
  * Date: 20 June 2006
- * CVS: $Id: GpsInterface.cc,v 1.3.2.1 2006/12/16 22:43:22 natepak Exp $
+ * CVS: $Id$
  */
 
 /**

@@ -29,6 +29,8 @@
 
 #include "Geom.hh"
 
+namespace gazebo
+{
 
 class CylinderGeom : public Geom
 {
@@ -39,4 +41,5 @@ class CylinderGeom : public Geom
   public: virtual ~CylinderGeom();
 };
 
+}
 #endif

@@ -30,6 +30,9 @@
 #include "Vector3.hh"
 #include "Joint.hh"
 
+namespace gazebo
+{
+
 class HingeJoint : public Joint
 {
   //!  Constructor
@@ -66,5 +69,6 @@ class HingeJoint : public Joint
   public: void SetTorque(double torque);
 };
 
+}
 #endif
 

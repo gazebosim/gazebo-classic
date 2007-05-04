@@ -21,7 +21,7 @@
 /* Desc: Sphere geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: SphereGeom.cc,v 1.1.2.1 2006/12/16 22:41:16 natepak Exp $
+ * CVS: $Id$
  */
 
 #include <ode/ode.h>

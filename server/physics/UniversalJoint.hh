@@ -29,6 +29,9 @@
 
 #include "Joint.hh"
 
+namespace gazebo
+{
+
 class UniversalJoint : public Joint
 {
   /// @brief Constructor
@@ -74,5 +77,6 @@ class UniversalJoint : public Joint
   public: virtual void SetTorque(double torque1, double torque2);
 };
 
+}
 #endif
 

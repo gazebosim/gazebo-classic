@@ -1,3 +1,29 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: XML config file
+ * Author: Andrew Howard and Nate Koenig
+ * Date: 3 Apr 2007
+ * SVN: $Id$
+ */
+
 #ifndef XMLCONFIG_HH
 #define XMLCONFIG_HH
 
@@ -11,153 +37,162 @@
 // Forward declarations
 class XMLConfigNode;
 
+namespace gazebo
+{
+/// @addtogroup gazebocore
+/// @{
+
+/// XML parser
 class XMLConfig
 {
-  // Constructor
+  /// Constructor
   public: XMLConfig();
 
-  // Destructor
+  /// Destructor
   public: ~XMLConfig();
 
-  // Load config from an XML file
+  /// Load config from an XML file
   public: int Load( std::string filename );
 
-  // Load config from an XML string
+  /// Load config from an XML string
   public: int LoadString( std::string str );
 
-  // Save config back into file
-  // Set filename to NULL to save back into the original file
+  /// Save config back into file
+  /// Set filename to NULL to save back into the original file
   public: int Save( std::string filename );
 
-  // Get the root node
+  /// Get the root node
   public: XMLConfigNode *GetRootNode() const;
 
-  // Create wrappers
+  /// Create wrappers
   private: XMLConfigNode *CreateNodes( XMLConfigNode *parent, 
                                        xmlNodePtr xmlNode );
-  // File name
+  /// File name
   public: std::string filename;
   
-  // XML data
+  /// XML data
   private: xmlDocPtr xmlDoc;
 
-  // The root of the tree
+  /// The root of the tree
   private: XMLConfigNode *root;
 };
 
 
-// Class encapsulating a single xml node
+/// Class encapsulating a single xml node
 class XMLConfigNode
 {
-  // Constructor
+  /// Constructor
   public: XMLConfigNode( XMLConfig *cfg, XMLConfigNode *parent, 
                         xmlNodePtr xmlNode, xmlDocPtr xmlDoc );
 
-  // Destructors
+  /// Destructors
   public: ~XMLConfigNode();
 
-  // Get the node name
+  /// Get the node name
   public: std::string GetName();
 
-  // Get the name space prefix
+  /// Get the name space prefix
   public: std::string GetNSPrefix();
 
-  // Get the next sibling of this node
+  /// Get the next sibling of this node
   public: XMLConfigNode *GetNext();
   public: XMLConfigNode *GetNext(std::string name);
   public: XMLConfigNode *GetNextByNSPrefix(std::string name);
 
-  // Get the first child of this node
+  /// Get the first child of this node
   public: XMLConfigNode *GetChild();
 
-  // Get a child based on a name. Returns null if not found
+  /// Get a child based on a name. Returns null if not found
   public: XMLConfigNode *GetChild( std::string name );
 
-  // Get the first child with the specified namespace prefix
+  /// Get the first child with the specified namespace prefix
   public: XMLConfigNode *GetChildByNSPrefix( std::string prefix );
 
-  // Move child pointer back to beginning
+  /// Move child pointer back to beginning
   public: XMLConfigNode *Rewind();
 
-  // Print (for debugging purposes)
+  /// Print (for debugging purposes)
   public: void Print();
 
-  // Return the value of the current node
+  /// Return the value of the current node
   public: std::string GetValue();
 
-  // Get an attribute string value
+  /// Get an attribute string value
   public: std::string GetString( std::string key, std::string def, 
                                  int require = 0 );
 
-  // Get a attribute character value
+  /// Get a attribute character value
   public: unsigned char GetChar( std::string key, char def, int require = 0 );
 
-  // Get a file name.  Always returns an absolute path.  If the filename
-  // is entered as a relative path, we prepend the world file path.
+  /// Get a file name.  Always returns an absolute path.  If the filename
+  /// is entered as a relative path, we prepend the world file path.
   public: std::string GetFilename( std::string key, std::string def, 
                                    int require = 0);
 
-  // Get an integer
+  /// Get an integer
   public: int GetInt( std::string key, int def, int require = 0 );
 
-  // Get a double
+  /// Get a double
   public: double GetDouble( std::string key, double def, int require = 0 );
 
-  // Get a float
+  /// Get a float
   public: float GetFloat( std::string key, float def, int require = 0 );
 
-  // Get a boolean
+  /// Get a boolean
   public: bool GetBool( std::string key, bool def, int require = 0 );
 
-  // Get an attribute length value (return value in meters)
+  /// Get an attribute length value (return value in meters)
   public: double GetLength( std::string key, double def, int require = 0 );
 
-  // Get an attribute time value (return value in seconds)
+  /// Get an attribute time value (return value in seconds)
   public: gazebo::Time GetTime( std::string key, double def, int require = 0 );
 
-  // Get a position
+  /// Get a position
   public: Vector3 GetVector3( std::string key, Vector3 def );
 
-  // Get a rotation
+  /// Get a rotation
   public: Quatern GetRotation( std::string key, Quatern def );
 
-  // Get an attribute tuple value
+  /// Get an attribute tuple value
   public: std::string GetTupleString( std::string key, int index, 
                                       std::string def );
 
-  // Get an attribute tuple int value
+  /// Get an attribute tuple int value
   public: int GetTupleInt( std::string key, int index, int def );
 
-  // Get an attribute tuple double value
+  /// Get an attribute tuple double value
   public: double GetTupleDouble( std::string key, int index, double def );
 
-  // Get an attribute tuple length value (return value in meters)
+  /// Get an attribute tuple length value (return value in meters)
   public: double GetTupleLength( std::string key, int index, double def );
 
-  // Get an attribute tuple angle value (return value in radians)
+  /// Get an attribute tuple angle value (return value in radians)
   public: double GetTupleAngle( std::string key, int index, double def );
 
-  // Get a node's value, which is either a attribute or child node value.
+  /// Get a node's value, which is either a attribute or child node value.
   protected: xmlChar* GetNodeValue( std::string key );
 
-  // Our document
+  /// Our document
   private: XMLConfig *config;
   
-  // Our parent
+  /// Our parent
   private: XMLConfigNode *parent;
   
-  // Our siblings
+  /// Our siblings
   private: XMLConfigNode *next, *prev;
   
-  // Our children
+  /// Our children
   private: XMLConfigNode *childFirst, *childLast;
 
-  // XML data
+  /// XML data
   private: xmlNodePtr xmlNode;
 
-  // XML data
+  /// XML data
   private: xmlDocPtr xmlDoc;
 };
+
+/// @}
+}
 
 #endif
 

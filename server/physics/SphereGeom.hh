@@ -29,6 +29,9 @@
 
 #include "Geom.hh"
 
+namespace gazebo
+{
+
 class SphereGeom : public Geom
 {
   // Constructor
@@ -38,4 +41,5 @@ class SphereGeom : public Geom
   public: virtual ~SphereGeom();
 };
 
+}
 #endif

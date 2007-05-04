@@ -21,7 +21,7 @@
 /* Desc: A hinge joint with 2 degrees of freedom
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: Hinge2Joint.cc,v 1.1.2.1 2006/12/16 22:41:15 natepak Exp $
+ * CVS: $Id$
  */
 
 #include "Hinge2Joint.hh"

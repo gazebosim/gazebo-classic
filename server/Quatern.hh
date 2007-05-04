@@ -23,8 +23,6 @@
  * Date: 03 Apr 2007
  * SVN: $Id$
  */
-/// @addtogroup gazebocore
-/// @{
 
 #ifndef QUATERN_HH
 #define QUATERN_HH
@@ -34,6 +32,12 @@
 
 class Quatern;
 std::ostream &operator<<(std::ostream &out, const Quatern &);
+
+namespace gazebo
+{
+
+/// @addtogroup gazebocore
+/// @{
 
 /// A quaternion class
 class Quatern
@@ -115,5 +119,7 @@ class Quatern
   public: friend std::ostream &operator<< (std::ostream &out, const Quatern &q);
 };
 
-#endif
 /// @}
+}
+
+#endif

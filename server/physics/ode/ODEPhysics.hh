@@ -13,6 +13,9 @@ class CylinderGeom;
 class Body;
 class Entity;
 
+namespace gazebo
+{
+
 class ODEPhysics : public PhysicsEngine
 {
   // Constructor
@@ -61,4 +64,5 @@ class ODEPhysics : public PhysicsEngine
   protected: std::map<int, Entity*> entities;
 };
 
+}
 #endif

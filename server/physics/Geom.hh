@@ -13,10 +13,11 @@ namespace Ogre
   class MaterialPtr;
 }
 
-
 class Body;
 class ContactParams;
 
+namespace gazebo
+{
 
 class Geom : public Entity
 {
@@ -104,4 +105,5 @@ class Geom : public Entity
   protected: dMass mass;
 };
 
+}
 #endif

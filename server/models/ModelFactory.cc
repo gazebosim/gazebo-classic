@@ -22,7 +22,7 @@
  * Desc: Factory for creating models
  * Author: Andrew Howard
  * Date: 18 May 2003
- * CVS info: $Id: ModelFactory.cc,v 1.1.2.1 2006/12/16 22:41:15 natepak Exp $
+ * CVS info: $Id$
  */
 
 #include "Model.hh"

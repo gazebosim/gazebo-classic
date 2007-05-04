@@ -16,6 +16,9 @@ namespace Ogre
   class SceneNode;
 }
 
+namespace gazebo
+{
+
 class Body : public Entity
 {
   // Constructor
@@ -115,4 +118,5 @@ class Body : public Entity
   private: bool isStatic;
 };
 
+}
 #endif

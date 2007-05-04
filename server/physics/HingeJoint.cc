@@ -21,7 +21,7 @@
 /* Desc: A HingeJoint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: HingeJoint.cc,v 1.1.2.1 2006/12/16 22:41:15 natepak Exp $
+ * CVS: $Id$
  */
 
 #include "World.hh"

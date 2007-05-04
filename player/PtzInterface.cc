@@ -21,7 +21,7 @@
 /* Desc: Ptz Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id: PtzInterface.cc,v 1.4.2.1 2006/12/16 22:43:22 natepak Exp $
+ * CVS: $Id$
  */
 
 /**

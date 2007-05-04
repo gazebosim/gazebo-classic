@@ -23,7 +23,7 @@
  * Desc: Client object
  * Author: Andrew Howard
  * Date: 7 May 2003
- * CVS: $Id: Client.cc,v 1.1.2.1 2006/12/16 22:41:14 natepak Exp $
+ * CVS: $Id$
  */
 
 

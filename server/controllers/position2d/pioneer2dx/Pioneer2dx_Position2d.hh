@@ -22,22 +22,51 @@
  * Desc: Position2d controller for a Pioneer2dx.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN info: $Id$
+ * SVN: $Id$
  */
+
+#ifndef PIONEER2DX_POSITION2D_HH
+#define PIONEER2DX_POSITION2D_HH
 
 #include "Controller.hh"
 
+namespace gazebo
+{
+
+/// @addtogroup controllers
+/// @{
+
+/// Pioneer 2 DX Position2D controller.
+/// This is a controller that simulates a Pioneer 2DX motion
 class Pioneer2dx_Position2d : public Controller
 {
+  /// Constructor
   public: Pioneer2dx_Position2d();
+
+  /// Destructor
   public: virtual ~Pioneer2dx_Position2d();
 
+  /// Load the controller
+  /// \param node XML config node
+  /// \return 0 on success
   public: virtual int LoadChild(XMLConfigNode *node);
 
+  /// Init the controller
+  /// \return 0 on success
   public: virtual int InitChild();
 
+  /// Update the controller
+  /// \return 0 on success
   public: virtual int UpdateChild();
 
+  /// Finalize the controller
+  /// \return 0 on success
   public: virtual int FiniChild();
 
 };
+
+/// @}
+
+}
+
+#endif

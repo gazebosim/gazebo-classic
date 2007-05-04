@@ -31,6 +31,9 @@
 
 class World;
 
+namespace gazebo
+{
+
 class BallJoint : public Joint
 {
   // Constructor
@@ -46,5 +49,7 @@ class BallJoint : public Joint
   public: void SetAnchor( const Vector3 &anchor );
 
 };
+
+}
 
 #endif

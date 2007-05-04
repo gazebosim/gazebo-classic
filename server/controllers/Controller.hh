@@ -22,13 +22,22 @@
  * Desc: Controller base class.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN info: $Id$
+ * SVN: $Id$
  */
+#ifndef CONTROLLER_HH
+#define CONTROLER_HH
 
 #include <string>
 
 class XMLConfigNode;
 
+namespace gazebo
+{
+
+/// @addtogroup controllers
+/// @{
+
+/// Base class for all controllers
 class Controller
 {
   /// Constructor
@@ -66,3 +75,10 @@ class Controller
 
   protected: std::string name;
 };
+
+/// @}
+
+}
+
+#endif
+

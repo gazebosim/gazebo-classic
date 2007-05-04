@@ -29,7 +29,8 @@
 
 #include "Geom.hh"
 
-
+namespace gazebo
+{
 
 /// @brief Geom for an infinite plane.
 ///
@@ -49,4 +50,5 @@ class PlaneGeom : public Geom
 
 };
 
+}
 #endif

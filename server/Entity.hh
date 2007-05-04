@@ -22,12 +22,8 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
-
-/// @addtogroup gazebocore
-/// @{
-
 #ifndef ENTITY_HH
 #define ENTITY_HH
 
@@ -39,6 +35,13 @@ namespace Ogre
 {
   class SceneNode;
 }
+
+namespace gazebo
+{
+
+/// @addtogroup gazebocore
+/// @{
+
 
 /// Base class for all objects in Gazebo
 /*
@@ -125,5 +128,7 @@ class Entity
   private: bool isStatic;
 };
 
-#endif
 /// @}
+}
+
+#endif

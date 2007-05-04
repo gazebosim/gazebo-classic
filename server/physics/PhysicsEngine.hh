@@ -6,6 +6,8 @@
 class Entity;
 class Body;
 
+namespace gazebo
+{
 
 class PhysicsEngine
 {
@@ -35,4 +37,5 @@ class PhysicsEngine
 
 };
 
+}
 #endif

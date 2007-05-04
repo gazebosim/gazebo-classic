@@ -3,3 +3,9 @@
 @brief This is the heart of Gazebo.
 
 */
+
+/**
+@defgroup controllers controllers
+@brief Controllers for interfaces
+
+*/

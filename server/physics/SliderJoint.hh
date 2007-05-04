@@ -31,6 +31,9 @@
 
 class JointGroup;
 
+namespace gazebo
+{
+
 class SliderJoint : public Joint
 {
   // Constructor
@@ -62,4 +65,5 @@ class SliderJoint : public Joint
   public: void SetSliderForce(double force);
 };
 
+}
 #endif

@@ -22,7 +22,7 @@
  * Desc: Generic interface support
  * Author: Andrew Howard
  * Date: 21 Apr 2003
- * CVS: $Id: Iface.cc,v 1.1.2.1 2006/12/16 22:41:14 natepak Exp $
+ * CVS: $Id$
  */
 
 #include <iostream>
