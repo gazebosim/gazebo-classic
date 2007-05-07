@@ -32,7 +32,7 @@
 #include "GazeboClient.hh"
 
 Client *GazeboClient::client = NULL;
-SimIface *GazeboClient::sim = NULL;
+SimulationIface *GazeboClient::sim = NULL;
 const char *GazeboClient::prefixId = "";
 
 extern PlayerTime* GlobalTime;
@@ -51,7 +51,7 @@ int GazeboClient::Init(int serverid, const char *prefixid)
   if (GazeboClient::client->ConnectWait(serverid, GZ_CLIENT_ID_PLAYER) != 0)
     return -1;
 
-  GazeboClient::sim = new SimIface();
+  GazeboClient::sim = new SimulationIface();
   assert(GazeboClient::sim);
 
   if (GazeboClient::sim->Open(GazeboClient::client, "default") != 0)

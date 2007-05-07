@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "IfaceFactory.hh"
 
 /** \defgroup libgazebo libgazebo
 
@@ -332,8 +333,9 @@ of the server, such as the current simulation time-step.
 \{
 */
 
+
 /// Simulation interface data
-class SimData
+class SimulationData
 {
   //! Elapsed simulator time
   public: double sim_time;
@@ -357,25 +359,25 @@ class SimData
 };
 
 //! Common simulator interface
-class SimIface : public Iface
+class SimulationIface : public Iface
 {
   //! Create an interface
-  public: SimIface():Iface("sim",sizeof(SimIface)) {}
+  public: SimulationIface(): Iface("simulation",sizeof(SimulationIface)) {}
 
   //! Destroy an interface
-  public: virtual ~SimIface() {this->data = NULL;}
+  public: virtual ~SimulationIface() {this->data = NULL;}
 
   public: virtual int Create(Server *server, const char *id)
           {int result = Iface::Create(server,id); 
-           this->data = (SimData*)this->mMap; 
+           this->data = (SimulationData*)this->mMap; 
            return result;}
 
   public: virtual int Open(Client *client, const char *id)
           {int result = Iface::Open(client,id); 
-           this->data = (SimData*)this->mMap; 
+           this->data = (SimulationData*)this->mMap; 
            return result;}
 
-  public: SimData *data;
+  public: SimulationData *data;
 };
 
 
@@ -397,6 +399,7 @@ Images are in packed RGB888 format.
 
 \{
 */
+
 
 //! Maximum image pixels (width x height)
 #define GAZEBO_CAMERA_MAX_IMAGE_SIZE 640 * 480 * 3
@@ -451,6 +454,7 @@ Pioneer2AT or ATRV Jr.  This interface handles both 2D and 3D data.
 
 @{
 */
+
 
 /// Position interface data
 class PositionData
@@ -509,6 +513,7 @@ opengl funcitons.
 
 @{
 */
+
 
 //! Maximum number of points that can be drawn
 #define GAZEBO_GRAPHICS3D_MAX_POINTS 1024

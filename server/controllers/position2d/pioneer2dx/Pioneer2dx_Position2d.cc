@@ -25,9 +25,12 @@
  * SVN info: $Id$
  */
 
+#include "ControllerFactory.hh"
 #include "Pioneer2dx_Position2d.hh"
 
 using namespace gazebo;
+
+GZ_REGISTER_STATIC_CONTROLLER("pioneer2dx_position2d", Pioneer2dx_Position2d);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -46,6 +49,18 @@ Pioneer2dx_Position2d::~Pioneer2dx_Position2d()
 int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 {
   printf ("Loading\n");
+
+/*  this->wheelSep = 0.35;
+  this->wheelDiam = 0.19;
+
+  this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
+
+  this->batteryLevel = node->GetDouble("batteryLevel", 12.4);
+
+  this->batteryCurve[0] = node->GetTupleDouble("batteryCurve",0, 2 / 3600.0);
+  this->batteryCurve[1] = node->GetTupleDoulbe("batteryCurve",1, 2 / 1e4);
+  */
+
   return 0;
 }
 
@@ -53,6 +68,7 @@ int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 // Initialize the controller
 int Pioneer2dx_Position2d::InitChild()
 {
+
   return 0;
 }
 

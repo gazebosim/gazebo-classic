@@ -25,7 +25,7 @@
  * SVN: $Id$
  */
 #ifndef CONTROLLER_HH
-#define CONTROLER_HH
+#define CONTROLLER_HH
 
 #include <string>
 

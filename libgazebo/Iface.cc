@@ -20,9 +20,9 @@
  */
 /*
  * Desc: Generic interface support
- * Author: Andrew Howard
- * Date: 21 Apr 2003
- * CVS: $Id$
+ * Author: Andrew Howard, Nate Koenig
+ * Date: 06 May 2007
+ * SVN: $Id$
  */
 
 #include <iostream>
@@ -42,6 +42,10 @@
 #include "gazebo.h"
 #include "gz_error.h"
 
+GZ_REGISTER_IFACE("simulation", SimulationIface);
+GZ_REGISTER_IFACE("position", PositionIface);
+GZ_REGISTER_IFACE("camera", CameraIface);
+GZ_REGISTER_IFACE("graphics3d", Graphics3dIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface

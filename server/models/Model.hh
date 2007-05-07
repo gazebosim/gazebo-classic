@@ -163,7 +163,6 @@ class Model : public Entity
   //! Map of the bodies. std::string == body_name
   protected: std::map<std::string, Body*> bodies;
   protected: std::vector<Joint*> joints;
-  protected: std::map<std::string, Iface*> ifaces;
 
   /*private: PyObject *pName;
   private: PyObject *pModule;

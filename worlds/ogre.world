@@ -128,8 +128,6 @@
   </model:ObserverCam>
 
 
-
-
   <model:xml name="pioneer1_model">
     <xyz>0 1 0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
@@ -204,7 +202,7 @@
       <anchor>castor_body</anchor>
     </joint:ball>
 
-    <interface:position2d name="position_iface" controller="pioneer2dx">
+    <interface:position name="position1" controller="pioneer2dx_position2d">
       <left>
         <joint>left_wheel_hinge</joint>
         <body>left_wheel</body>
@@ -213,7 +211,7 @@
         <joint>right_wheel_hinge</joint>
         <body>right_wheel</body>
       </right>
-    </interface:position2d>
+    </interface:position>
 
     <!--<interface:power name="power_iface"/>
     <interface:sonar name="sonar_iface"/>

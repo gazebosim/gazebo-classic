@@ -104,6 +104,8 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include "XMLConfig.hh"
 #include "ModelFactory.hh"
+#include "IfaceFactory.hh"
+#include "ControllerFactory.hh"
 #include "World.hh"
 
 // Command line options
@@ -253,6 +255,8 @@ int Init()
 
   // Register static models
   gazebo::ModelFactory::RegisterAll();
+  IfaceFactory::RegisterAll();
+  gazebo::ControllerFactory::RegisterAll();
   
   // Load the world file
   gazebo::XMLConfig *xmlFile = new gazebo::XMLConfig();

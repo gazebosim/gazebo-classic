@@ -31,7 +31,7 @@
 
 // Forward declarations
 class Server;
-class SimIface;
+class SimulationIface;
 
 namespace gazebo
 {
@@ -164,7 +164,7 @@ class World
   private: Server *server;
 
   /// Simulation interface
-  private: SimIface *simIface;
+  private: SimulationIface *simIface;
 
   /// Flag set if simulation is paused
   private: bool pause;

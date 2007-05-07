@@ -36,6 +36,9 @@
 #include "BallJoint.hh"
 #include "UniversalJoint.hh"
 #include "PhysicsEngine.hh"
+#include "Controller.hh"
+#include "ControllerFactory.hh"
+#include "IfaceFactory.hh"
 #include "Model.hh"
 
 using namespace gazebo;
@@ -401,27 +404,13 @@ int Model::LoadIface(XMLConfigNode *node)
     return -1;
 
   Iface *iface = NULL;
+  Controller *controller = NULL;
+
   std::string ifaceName = node->GetName();
+  std::string controllerName = node->GetString("controller","",1);
 
-  if (ifaceName == "position2d")
-  {
-    iface = new PositionIface();
-  }
-  else if (ifaceName == "power")
-  {
-    //TODO: Implement this in libgazebo
-    //iface = new PowerIface();
-  }
-  else if (ifaceName == "sonar")
-  {
-    //TODO: Implement this in libgazebo
-    //iface = new SonarIface();
-  }
-  else if (ifaceName == "graphics3d")
-  {
-    iface = new Graphics3dIface();
-
-  }
+  controller = ControllerFactory::NewController(controllerName);
+  iface = IfaceFactory::NewIface(ifaceName);
 
   if (iface->Create(World::Instance()->GetGzServer(),
         this->GetName().c_str()) != 0)
@@ -429,11 +418,6 @@ int Model::LoadIface(XMLConfigNode *node)
     std::cerr << "Error creating " << ifaceName << "interface\n";
     return -1;
   }
-
-  // TODO: Problem with this if multiple interfaces of the same type are
-  // used in the same model
-  if (iface)
-    this->ifaces[ifaceName] = iface;
 
   return 0;
 }

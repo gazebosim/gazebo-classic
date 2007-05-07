@@ -92,7 +92,7 @@ int World::Load(XMLConfig *config, int serverId)
     return -1;
 
    // Create the simulator interface
-  this->simIface = new SimIface();
+  this->simIface = new SimulationIface();
   if (this->simIface->Create(this->server, "default" ) != 0)
     return -1;
 

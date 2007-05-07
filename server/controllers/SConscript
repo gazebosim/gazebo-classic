@@ -6,7 +6,7 @@ dirs = Split('position2d')
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)
 
-sources = Split('Controller.cc')
+sources = Split('Controller.cc ControllerFactory.cc')
 
 staticObjs.append(env.StaticObject(sources))
 sharedObjs.append(env.SharedObject(sources))

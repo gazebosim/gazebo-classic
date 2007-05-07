@@ -48,7 +48,7 @@ class GazeboClient
   /// The one and only gazebo client
   public: static Client *client;
 
-  public: static SimIface *sim;
+  public: static SimulationIface *sim;
 };
 
 #endif
