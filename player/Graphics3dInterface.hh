@@ -29,6 +29,9 @@
 
 #include "GazeboInterface.hh"
 
+namespace gazebo
+{
+
 // Forward declarations
 class Graphics3dIface;
 
@@ -63,4 +66,7 @@ class Graphics3dInterface : public GazeboInterface
   private: char *gz_id;
 
 };
+
+}
+
 #endif

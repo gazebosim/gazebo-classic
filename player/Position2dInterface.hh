@@ -29,6 +29,9 @@
 
 #include "GazeboInterface.hh"
 
+namespace gazebo
+{
+
 // Forward declarations
 class PositionIface;
 
@@ -65,4 +68,7 @@ class Position2dInterface : public GazeboInterface
   /// @brief Timestamp on last data update
   private: double datatime;
 };
+
+}
+
 #endif

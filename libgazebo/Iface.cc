@@ -42,6 +42,8 @@
 #include "gazebo.h"
 #include "gz_error.h"
 
+using namespace gazebo;
+
 GZ_REGISTER_IFACE("simulation", SimulationIface);
 GZ_REGISTER_IFACE("position", PositionIface);
 GZ_REGISTER_IFACE("camera", CameraIface);

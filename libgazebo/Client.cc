@@ -41,6 +41,8 @@
 #include "gazebo.h"
 
 
+using namespace gazebo;
+
 // Create a client object
 Client::Client()
 {

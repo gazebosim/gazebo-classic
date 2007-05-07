@@ -35,6 +35,9 @@
 
 #include "IfaceFactory.hh"
 
+namespace gazebo
+{
+
 /** \defgroup libgazebo libgazebo
 
 See \ref libgazebo_usage for information on using libgazebo.
@@ -563,6 +566,6 @@ class Graphics3dIface : public Iface
 /** @} */
 /// @}
 
-
+}
 
 #endif

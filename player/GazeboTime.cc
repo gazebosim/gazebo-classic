@@ -29,6 +29,8 @@
 #include "GazeboClient.hh"
 #include "GazeboTime.hh"
 
+using namespace gazebo;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 GazeboTime::GazeboTime()

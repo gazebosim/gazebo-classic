@@ -255,7 +255,7 @@ int Init()
 
   // Register static models
   gazebo::ModelFactory::RegisterAll();
-  IfaceFactory::RegisterAll();
+  gazebo::IfaceFactory::RegisterAll();
   gazebo::ControllerFactory::RegisterAll();
   
   // Load the world file

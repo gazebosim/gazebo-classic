@@ -412,7 +412,7 @@ int Model::LoadIface(XMLConfigNode *node)
   controller = ControllerFactory::NewController(controllerName);
   iface = IfaceFactory::NewIface(ifaceName);
 
-  if (iface->Create(World::Instance()->GetGzServer(),
+  if (iface->Create(gazebo::World::Instance()->GetGzServer(),
         this->GetName().c_str()) != 0)
   {
     std::cerr << "Error creating " << ifaceName << "interface\n";

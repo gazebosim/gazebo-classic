@@ -29,6 +29,9 @@
 
 #include "GazeboInterface.hh"
 
+namespace gazebo
+{
+
 class SimulationInterface : public GazeboInterface
 {
 
@@ -54,4 +57,5 @@ class SimulationInterface : public GazeboInterface
   public: virtual void Unsubscribe();
 };
 
+}
 #endif

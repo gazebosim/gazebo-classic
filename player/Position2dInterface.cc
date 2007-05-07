@@ -42,6 +42,7 @@
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
 
+using namespace gazebo;
  
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor

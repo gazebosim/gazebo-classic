@@ -35,6 +35,8 @@
 #include "GazeboDriver.hh"
 #include "Graphics3dInterface.hh"
 
+using namespace gazebo;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
 Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr, 

@@ -54,6 +54,8 @@ devices.
 
 #include "GazeboDriver.hh"
 
+using namespace gazebo;
+
 // A factory creation function, declared outside of the class so that it
 // can be invoked without any object context (alternatively, you can
 // declare it static in the class).  In this function, we create and return

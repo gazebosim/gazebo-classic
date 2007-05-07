@@ -27,16 +27,15 @@
 #ifndef GAZEBODRIVER_HH
 #define GAZEBODRIVER_HH
 
-#if HAVE_CONFIG_H
-  #include <config.h>
-#endif
-
 #include <unistd.h>
 #include <string.h>
 
 #include <libplayercore/playercore.h>
 
 #include "GazeboClient.hh"
+
+namespace gazebo
+{
 
 // Forward declarations
 class GazeboInterface;
@@ -80,4 +79,5 @@ class GazeboDriver : public Driver
   protected: int deviceMaxCount;
 };
 
+}
 #endif

@@ -45,6 +45,8 @@
 #include "gz_error.h"
 #include "gazebo.h"
 
+using namespace gazebo;
+
 union semun
 {
   int val;

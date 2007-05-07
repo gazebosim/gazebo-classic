@@ -27,11 +27,10 @@
 #ifndef GAZEBOINTERFACE_HH
 #define GAZEBOINTERFACE_HH
 
-#if HAVE_CONFIG_H
-  #include <config.h>
-#endif
-
 #include <libplayercore/playercore.h>
+
+namespace gazebo
+{
 
 // Forward declarations
 class GazeboDriver;
@@ -67,4 +66,5 @@ class GazeboInterface
   public: GazeboDriver *driver;
 };
 
+}
 #endif

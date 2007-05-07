@@ -31,6 +31,8 @@
 #include "GazeboTime.hh"
 #include "GazeboClient.hh"
 
+using namespace gazebo;
+
 Client *GazeboClient::client = NULL;
 SimulationIface *GazeboClient::sim = NULL;
 const char *GazeboClient::prefixId = "";

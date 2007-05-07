@@ -28,6 +28,8 @@
 #include "GazeboDriver.hh"
 #include "SimulationInterface.hh"
 
+using namespace gazebo;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
 SimulationInterface::SimulationInterface(player_devaddr_t addr, GazeboDriver *driver, ConfigFile *cf, int section)

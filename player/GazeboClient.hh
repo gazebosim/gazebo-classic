@@ -29,6 +29,9 @@
 
 #include "gazebo.h"
 
+namespace gazebo
+{
+
 /// @brief Gazebo client handler
 ///
 /// This class handles the Gazebo client object, and acts as a shared
@@ -51,4 +54,5 @@ class GazeboClient
   public: static SimulationIface *sim;
 };
 
+}
 #endif

@@ -29,6 +29,9 @@
 
 #include <libplayercore/playercore.h>
 
+namespace gazebo
+{
+
 class GazeboTime : public PlayerTime
 {
   public: GazeboTime();
@@ -39,4 +42,6 @@ class GazeboTime : public PlayerTime
   public: int GetTimeDouble(double* time);
 
 };
+
+}
 #endif
