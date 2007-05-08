@@ -19,8 +19,9 @@
 #include <float.h>
 #include <math.h>
 
-#include "XMLConfig.hh"
+#include "GazeboError.hh"
 #include "Global.hh"
+#include "XMLConfig.hh"
 
 using namespace gazebo;
 
@@ -382,6 +383,7 @@ std::string XMLConfigNode::GetString( std::string key, std::string def,
 
   if (!value && require)
   {
+    throw GazeboError("XMLConfigNode::GetString", "unable to find required string attribute");
     return "";
   }
   else if( !value )

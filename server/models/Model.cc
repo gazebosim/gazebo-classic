@@ -27,6 +27,7 @@
 //#include <boost/python.hpp>
 
 #include <Ogre.h>
+#include "GazeboError.hh"
 #include "OgreAdaptor.hh"
 #include "XMLConfig.hh"
 #include "World.hh"
@@ -288,6 +289,18 @@ Joint *Model::CreateJoint(Joint::Type type)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+Joint *Model::GetJoint(std::string name)
+{
+  if (!this->joints[name])
+  {
+    this->joints.erase(name);
+    return NULL;
+  }
+  else
+    return this->joints[name];
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Load a new body helper function
 int Model::LoadBody(XMLConfigNode *node)
 {
@@ -390,7 +403,10 @@ int Model::LoadJoint(XMLConfigNode *node)
   // Name the joint
   joint->SetName(node->GetString("name","",1));
 
-  this->joints.push_back(joint);
+  if (this->joints[joint->GetName()] != NULL)
+    throw GazeboError("Model::LoadJoint", "can't have two joint with the same name");
+
+  this->joints[joint->GetName()] = joint;
 
   return 0;
 }
@@ -418,6 +434,9 @@ int Model::LoadIface(XMLConfigNode *node)
     std::cerr << "Error creating " << ifaceName << "interface\n";
     return -1;
   }
+
+  controller->SetIface(iface);
+  controller->SetModel(this);
 
   return 0;
 }

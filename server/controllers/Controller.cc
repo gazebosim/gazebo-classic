@@ -25,8 +25,10 @@
  * SVN info: $Id$
  */
 
+#include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "Controller.hh"
+#include "Model.hh"
 
 using namespace gazebo;
 
@@ -46,6 +48,11 @@ Controller::~Controller()
 /// Load the controller. Called once on startup
 int Controller::Load(XMLConfigNode *node)
 {
+  if (!this->model)
+    throw GazeboError("Controller::Load","model has not been set");
+
+  this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
+
   return this->LoadChild(node);
 }
 
@@ -68,4 +75,11 @@ int Controller::Update()
 int Controller::Fini()
 {
   return this->FiniChild();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the model for the controller
+void Controller::SetModel(Model *model)
+{
+  this->model = model;
 }

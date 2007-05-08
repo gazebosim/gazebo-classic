@@ -24,6 +24,13 @@
  * SVN: $Id$
  */
 
+#ifndef WORLD_HH
+#define WORLD_HH
+
+#include <vector>
+
+namespace gazebo
+{
 /// @addtogroup gazebocore
 /// @{
 
@@ -86,14 +93,6 @@ The parameters are as follows:
 
 */
 
-
-#ifndef WORLD_HH
-#define WORLD_HH
-
-#include <vector>
-
-namespace gazebo
-{
   // Forward declarations
   class Server;
   class SimulationIface;
@@ -144,6 +143,30 @@ class World
   /// \return Pointer to the physics engine
   public: PhysicsEngine *GetPhysicsEngine() const;
 
+  /// Get the gravity vector
+  /// \return The gravity vector
+  public: Vector3 GetGravity() const;
+
+  /// Get the simulation time
+  /// \return The simulation time
+  public: double GetSimTime() const;
+
+  /// Get the pause time
+  /// \return The pause time
+  public: double GetPauseTime() const;
+
+  /// Get the start time
+  /// \return The start time
+  public: double GetStartTime() const;
+
+  /// Get the real time (elapsed time)
+  /// \return The real time
+  public: double GetRealTime() const;
+
+  /// Get the wall clock time
+  /// \return The wall clock time
+  public: double GetWallTime() const;
+
   /// Load all models
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
@@ -167,10 +190,13 @@ class World
 
   /// Flag set if simulation is paused
   private: bool pause;
+
+  /// Current simulation time
+  private: double simTime, pauseTime, startTime;
 };
 
-/// @}
 
+/// @}
 }
 
 #endif

@@ -43,6 +43,11 @@
     </resources>
   </rendering:ogre>
 
+  <params:global>
+    <stepTime>0.02</stepTime>
+    <gravity>0 -9.8 0</gravity>
+  </params:global>
+
   <!--  <model:xml name="sphere1_model">
     <xyz>0 1 0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
@@ -202,7 +207,13 @@
       <anchor>castor_body</anchor>
     </joint:ball>
 
-    <interface:position name="position1" controller="pioneer2dx_position2d">
+    <controller:pioneer2dx_position2d name="controller1">
+      <iface>positionIface_1</iface>
+      <leftJoint>left_wheel_hinge</leftJoint>
+      <rightJoint>right_wheel_hinge</rightJoint>
+    </controller:pioneer2dx_position2d>
+
+    <interface:position name="positionIface_1">
       <left>
         <joint>left_wheel_hinge</joint>
         <body>left_wheel</body>

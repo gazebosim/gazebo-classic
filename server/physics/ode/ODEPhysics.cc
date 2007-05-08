@@ -1,6 +1,8 @@
 #include <assert.h>
 
 #include "Global.hh"
+#include "World.hh"
+#include "Vector3.hh"
 #include "Geom.hh"
 #include "Body.hh"
 #include "ContactParams.hh"
@@ -38,6 +40,9 @@ ODEPhysics::~ODEPhysics()
 // Load the ODE engine
 int ODEPhysics::Load()
 {
+  Vector3 gravity = World::Instance()->GetGravity();
+
+  dWorldSetGravity(this->worldId, gravity.x, gravity.y. gravity.z);
   return 0;
 }
 

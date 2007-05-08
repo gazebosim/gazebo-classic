@@ -59,6 +59,7 @@ Position2dInterface::Position2dInterface(player_devaddr_t addr,
   this->iface = new PositionIface();
 
   this->datatime = -1;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -135,7 +136,7 @@ int Position2dInterface::ProcessMessage(MessageQueue *respQueue,
 
     power = (player_position2d_power_config_t*) data;
 
-    this->iface->data->cmd_enable_motors = power->state;
+    this->iface->data->cmdEnableMotors = power->state;
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);

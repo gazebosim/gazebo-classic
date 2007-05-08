@@ -24,7 +24,6 @@
  * Date: 01 Feb 2007
  * SVN: $Id$
  */
-
 #ifndef PIONEER2DX_POSITION2D_HH
 #define PIONEER2DX_POSITION2D_HH
 
@@ -32,6 +31,8 @@
 
 namespace gazebo
 {
+  class HingeJoint;
+  class PositionIface;
 
 /// @addtogroup controllers
 /// @{
@@ -63,6 +64,35 @@ class Pioneer2dx_Position2d : public Controller
   /// \return 0 on success
   public: virtual int FiniChild();
 
+  /// The interface for the controller
+  public: virtual void SetIface(Iface *iface);
+
+  /// Update the data in the interface
+  private: void PutPositionData();
+
+  /// Get the position command from libgazebo
+  private: void GetPositionCmd();
+
+  /// The Position interface
+  private: PositionIface *iface;
+
+  /// Separation between the wheels
+  private: float wheelSep;
+
+  /// Diameter of the wheels
+  private: float wheelDiam;
+
+  /// Speeds of the wheels
+  private: float wheelSpeed[2];
+
+  /// True = enable motors
+  private: bool enableMotors;
+
+  private: float odomPose[3];
+  private: float odomVel[3];
+
+  private: HingeJoint *leftJoint;
+  private: HingeJoint *rightJoint;
 };
 
 /// @}
@@ -70,3 +100,4 @@ class Pioneer2dx_Position2d : public Controller
 }
 
 #endif
+

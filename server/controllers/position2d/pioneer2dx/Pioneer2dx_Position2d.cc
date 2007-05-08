@@ -25,6 +25,12 @@
  * SVN info: $Id$
  */
 
+#include "Global.hh"
+#include "XMLConfig.hh"
+#include "Model.hh"
+#include "HingeJoint.hh"
+#include "gazebo.h"
+#include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Pioneer2dx_Position2d.hh"
 
@@ -36,6 +42,12 @@ GZ_REGISTER_STATIC_CONTROLLER("pioneer2dx_position2d", Pioneer2dx_Position2d);
 // Constructor
 Pioneer2dx_Position2d::Pioneer2dx_Position2d()
 {
+  this->leftJoint = NULL;
+  this->rightJoint = NULL;
+  this->enableMotors = false;
+
+  this->wheelSpeed[0] = 0;
+  this->wheelSpeed[1] = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,18 +60,20 @@ Pioneer2dx_Position2d::~Pioneer2dx_Position2d()
 // Load the controller
 int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 {
-  printf ("Loading\n");
-
-/*  this->wheelSep = 0.35;
+  this->wheelSep = 0.35;
   this->wheelDiam = 0.19;
 
-  this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
+  std::string leftJointName = node->GetString("leftJoint", "", 1);
+  std::string rightJointName = node->GetString("rightJoint", "", 1);
 
-  this->batteryLevel = node->GetDouble("batteryLevel", 12.4);
+  this->leftJoint = dynamic_cast<HingeJoint*>(this->model->GetJoint(leftJointName));
+  this->rightJoint = dynamic_cast<HingeJoint*>(this->model->GetJoint(rightJointName));
 
-  this->batteryCurve[0] = node->GetTupleDouble("batteryCurve",0, 2 / 3600.0);
-  this->batteryCurve[1] = node->GetTupleDoulbe("batteryCurve",1, 2 / 1e4);
-  */
+  if (!this->leftJoint)
+    throw GazeboError("Pioneer2dx_Position2d::LoadChild","couldn't get left hinge joint");
+
+  if (!this->rightJoint)
+    throw GazeboError("Pioneer2dx_Position2d::LoadChild","couldn't get right hinge joint");
 
   return 0;
 }
@@ -68,6 +82,14 @@ int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 // Initialize the controller
 int Pioneer2dx_Position2d::InitChild()
 {
+  // Reset odometric pose
+  this->odomPose[0] = 0.0;
+  this->odomPose[1] = 0.0;
+  this->odomPose[2] = 0.0;
+
+  this->odomVel[0] = 0.0;
+  this->odomVel[1] = 0.0;
+  this->odomVel[2] = 0.0;
 
   return 0;
 }
@@ -76,7 +98,33 @@ int Pioneer2dx_Position2d::InitChild()
 // Update the controller
 int Pioneer2dx_Position2d::UpdateChild()
 {
-  return 0;
+  // TODO: Step should be in a parameter of this function
+  double step;
+  double wd, ws;
+  double d1, d2;
+  double dr, da;
+
+  wd = this->wheelDiam;
+  ws = this->wheelSep;
+
+  // Distance travelled by front wheels
+  d1 = step * wd / 2 * this->leftJoint->GetAngleRate();
+  d2 = step * wd / 2 * this->rightJoint->GetAngleRate();
+
+  dr = (d1 + d2) / 2;
+  da = (d2 - d1) / ws;
+  
+  // Compute odometric pose
+  this->odomPose[0] += dr * cos( this->odomPose[2] );
+  this->odomPose[1] += dr * sin( this->odomPose[2] );
+  this->odomPose[2] += da;
+
+  // Compute odometric instantaneous velocity
+  this->odomVel[0] = dr / step;
+  this->odomVel[1] = 0.0;
+  this->odomVel[2] = da / step;
+
+  this->GetPositionCmd();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,4 +132,51 @@ int Pioneer2dx_Position2d::UpdateChild()
 int Pioneer2dx_Position2d::FiniChild()
 {
   return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// The interface for the controller
+void Pioneer2dx_Position2d::SetIface(Iface *iface)
+{
+  this->iface = dynamic_cast<PositionIface*>(iface);
+
+  if (!this->iface)
+    throw GazeboError("Pioneer2dx_Position2d::SetIface","iface is not of type PositionIface");
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Get commands from the external interface
+void Pioneer2dx_Position2d::GetPositionCmd()
+{
+  double vr, va;
+
+  vr = this->iface->data->cmdVelocity.x;
+  va = this->iface->data->cmdVelocity.yaw;
+
+  this->enableMotors = this->iface->data->cmdEnableMotors > 0;
+
+  this->wheelSpeed[0] = vr + va * this->wheelSep / 2;
+  this->wheelSpeed[1] = vr - va * this->wheelSep / 2;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Update the data in the interface
+void Pioneer2dx_Position2d::PutPositionData()
+{
+  this->iface->Lock(1);
+  
+  // TODO: Data timestamp
+  //this->iface->data->time = World::Instance()->GetSimTime();
+
+  this->iface->data->pose.x = this->odomPose[0];
+  this->iface->data->pose.y = this->odomPose[1];
+  this->iface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
+
+  this->iface->data->velocity.x = this->odomVel[0];
+  this->iface->data->velocity.yaw = this->odomVel[2];
+
+  // TODO
+  this->iface->data->stall = 0;
+
+  this->iface->Unlock();
 }

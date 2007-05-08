@@ -52,6 +52,15 @@ World::World()
   this->simIface = NULL;
 
   this->pause = false;
+
+  this->simTime = 0.0;
+  this->pauseTime = 0.0;
+  this->startTime = 0.0;
+  this->stepTime = 0.020;
+
+  this->gravity.x = 0;
+  this->gravity.y = -9.8;
+  this->gravity.z = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,12 +138,19 @@ int World::Update()
   std::vector<Model*>::iterator iter;
   this->physicsEngine->Update();
 
+  this->simTime += this->stepTime;
+
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
-    (*iter)->Update();
+    (*iter)->Update(this->stepTime);
   }
 
   OgreAdaptor::Instance()->Render();
+
+  this->simIface->Lock(1);
+  this->simIface->simTime = this->GetSimTime();
+  this->simIface->pauseTime = this->GetPauseTime();
+  this->simIface->realTime = this->GetRealTime();
   return 0;
 }
 
@@ -177,8 +193,51 @@ PhysicsEngine *World::GetPhysicsEngine() const
   return this->physicsEngine;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the gravity vector
+Vector3 World::GetGravity() const
+{
+  return this->gravity;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get the simulation time
+double World::GetSimTime() const
+{
+  return this->simTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the pause time
+double World::GetPauseTime() const
+{
+  return this->pauseTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the start time
+double World::GetStartTime() const
+{
+  return this->startTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the real time (elapsed time)
+double World::GetRealTime() const
+{
+  return this->GetWallTime() - this->startTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the wall clock time
+double World::GetWallTime() const
+{
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return tv.tv_sec + tv.tv_usec * 1e-6;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Load a model
 int World::LoadModel(XMLConfigNode *node, Model *parent)
 {
@@ -243,6 +302,14 @@ int World::LoadModel(XMLConfigNode *node, Model *parent)
 
         // Add the model to our list
         this->models.push_back(model);
+      }
+    }
+    else if (node->GetNSPrefix() == "params")
+    {
+      if (node->GetName() == "global")
+      {
+        this->stepTime = node->GetDouble("stepTime",this->stepTime);
+        this->gravity = node->GetVector3("gravity",this->gravity);
       }
     }
   }

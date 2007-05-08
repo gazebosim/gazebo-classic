@@ -6,7 +6,7 @@ dirs = Split('physics rendering sensors models controllers') #bindings
 for subdir in dirs:
   SConscript('%s/SConscript' % subdir)
 
-sources = Split('main.cc Vector3.cc Quatern.cc Pose3d.cc World.cc XMLConfig.cc Time.cc Entity.cc')
+sources = Split('main.cc Vector3.cc Quatern.cc Pose3d.cc World.cc XMLConfig.cc Time.cc Entity.cc GazeboError.cc')
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

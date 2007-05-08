@@ -340,23 +340,23 @@ of the server, such as the current simulation time-step.
 /// Simulation interface data
 class SimulationData
 {
-  //! Elapsed simulator time
-  public: double sim_time;
+  /// Elapsed simulator time
+  public: double simTime;
 
-  //! Accumpated pause time (this interface may be updated with the
-  //! server is paused).
-  public: double pause_time;
+  /// Accumpated pause time (this interface may be updated with the
+  /// server is paused).
+  public: double pauseTime;
 
-  // Elapsed real time since start of simulation (from system clock). 
-  public: double real_time;
+  /// Elapsed real time since start of simulation (from system clock). 
+  public: double realTime;
 
-  //! Pause simulation (set by client)
+  /// Pause simulation (set by client)
   public: int pause;
 
-  //! Reset simulation (set by client)
+  /// Reset simulation (set by client)
   public: int reset;
 
-  //! Save current poses to world file (set by client)
+  /// Save current poses to world file (set by client)
   public: int save;
 
 };
@@ -462,22 +462,22 @@ Pioneer2AT or ATRV Jr.  This interface handles both 2D and 3D data.
 /// Position interface data
 class PositionData
 {
-  //! Data timestamp
+  /// Data timestamp
   public: double time;
 
-  //! Pose (usually global cs)
+  /// Pose (usually global cs)
   public: Pose pose;
 
-  //! Velocity
+  /// Velocity
   public: Pose velocity;
 
-  //! Motor stall flag
+  /// Motor stall flag
   public: int stall;
 
-  //! Enable the motors
-  public:  int cmd_enable_motors;
+  /// Enable the motors
+  public: int cmdEnableMotors;
   
-  //! Commanded robot velocities (robot cs)
+  /// Commanded robot velocities (robot cs)
   public: Pose cmdVelocity;
 };
 

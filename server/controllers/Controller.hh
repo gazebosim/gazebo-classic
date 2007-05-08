@@ -32,7 +32,9 @@
 
 namespace gazebo
 {
-class XMLConfigNode;
+  class XMLConfigNode;
+  class Iface;
+  class Model;
 
 /// @addtogroup controllers
 /// @{
@@ -73,7 +75,20 @@ class Controller
   /// Return the name of this controller
   public: std::string GetName() const;
 
+  /// The interface for the controller
+  public: virtual void SetIface(Iface *iface) {return;}
+
+  /// Set the model for the controller
+  public: void SetModel(Model *model); 
+
+  /// The controller's name
   protected: std::string name;
+
+  /// The model for the controller
+  protected: Model *model;
+
+  /// Update period 
+  protected: double updatePeriod;
 };
 
 /// @}
