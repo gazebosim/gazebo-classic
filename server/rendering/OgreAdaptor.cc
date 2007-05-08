@@ -5,6 +5,7 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "OgreFrameListener.hh"
 #include "OgreAdaptor.hh"
@@ -214,11 +215,12 @@ void OgreAdaptor::SetupRenderSystem(bool create)
       if (c == (int)rsList->size())
         break;
       selectedRenderSystem = rsList->at(c);
+      std::cout << "RenderSystem[" << selectedRenderSystem->getName() << "]\n";
       c++;
     } while (selectedRenderSystem->getName().compare("OpenGL Rendering Subsystem")!= 0);
 
     if (selectedRenderSystem == NULL)
-      printf("ERROR!!!\n");
+      throw GazeboError("OgreAdaptor::SetupRenderSystem", "unable to find rendering system");
 
     selectedRenderSystem->setConfigOption("Full Screen","No");
     selectedRenderSystem->setConfigOption("FSAA","2");

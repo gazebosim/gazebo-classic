@@ -28,6 +28,7 @@
 #define WORLD_HH
 
 #include <vector>
+#include "Vector3.hh"
 
 namespace gazebo
 {
@@ -193,6 +194,12 @@ class World
 
   /// Current simulation time
   private: double simTime, pauseTime, startTime;
+
+  /// Time between each update cycle
+  private: double stepTime;
+
+  /// The gravity vector
+  private: Vector3 gravity;
 };
 
 

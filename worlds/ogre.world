@@ -5,13 +5,14 @@
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
   xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
-  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#params" 
+  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
   xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
-  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" >
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" >
 
   <rendering:ogre>
     <plugins path="/home/nate/local/lib/OGRE">
@@ -43,10 +44,10 @@
     </resources>
   </rendering:ogre>
 
-  <params:global>
+  <param:global>
     <stepTime>0.02</stepTime>
     <gravity>0 -9.8 0</gravity>
-  </params:global>
+  </param:global>
 
   <!--  <model:xml name="sphere1_model">
     <xyz>0 1 0</xyz>

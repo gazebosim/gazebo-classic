@@ -145,7 +145,7 @@ int Model::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the model
-int Model::Update()
+int Model::Update(UpdateParams &params)
 {
   std::map<std::string, Body*>::iterator iter;
 

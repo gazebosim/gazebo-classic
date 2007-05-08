@@ -25,6 +25,7 @@
  */
 
 #include <assert.h>
+#include <sys/time.h>
 
 #include "OgreAdaptor.hh"
 #include "PhysicsEngine.hh"
@@ -33,6 +34,7 @@
 #include "Model.hh"
 #include "ModelFactory.hh"
 #include "gazebo.h"
+#include "UpdateParams.hh"
 #include "World.hh"
 
 using namespace gazebo;
@@ -135,22 +137,24 @@ int World::Init()
 // Update the world
 int World::Update()
 {
+  UpdateParams params;
   std::vector<Model*>::iterator iter;
   this->physicsEngine->Update();
 
   this->simTime += this->stepTime;
+  params.stepTime = this->stepTime;
 
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
-    (*iter)->Update(this->stepTime);
+    (*iter)->Update(params);
   }
 
   OgreAdaptor::Instance()->Render();
 
   this->simIface->Lock(1);
-  this->simIface->simTime = this->GetSimTime();
-  this->simIface->pauseTime = this->GetPauseTime();
-  this->simIface->realTime = this->GetRealTime();
+  this->simIface->data->simTime = this->GetSimTime();
+  this->simIface->data->pauseTime = this->GetPauseTime();
+  this->simIface->data->realTime = this->GetRealTime();
   return 0;
 }
 
@@ -304,7 +308,7 @@ int World::LoadModel(XMLConfigNode *node, Model *parent)
         this->models.push_back(model);
       }
     }
-    else if (node->GetNSPrefix() == "params")
+    else if (node->GetNSPrefix() == "param")
     {
       if (node->GetName() == "global")
       {

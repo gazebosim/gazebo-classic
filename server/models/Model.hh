@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "UpdateParams.hh"
 #include "Pose3d.hh"
 #include "Joint.hh"
 #include "Entity.hh"
@@ -65,7 +66,8 @@ class Model : public Entity
   public: int Init();
 
   /// Update the model
-  public: int Update();
+  /// \param params Update parameters
+  public: int Update(UpdateParams &params);
 
   /// Finalize the model
   public: int Fini();

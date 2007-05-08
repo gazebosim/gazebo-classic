@@ -6,7 +6,6 @@
 
 #include "PhysicsEngine.hh"
 
-using namespace gazebo;
 
 namespace gazebo
 {

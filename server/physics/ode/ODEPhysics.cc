@@ -14,6 +14,9 @@
 #include "UniversalJoint.hh"
 #include "ODEPhysics.hh"
 
+using namespace gazebo;
+
+////////////////////////////////////////////////////////////////////////////////
 // Constructor
 ODEPhysics::ODEPhysics()
   : PhysicsEngine()
@@ -27,6 +30,7 @@ ODEPhysics::ODEPhysics()
   this->stepTime = 0.02;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Destructor
 ODEPhysics::~ODEPhysics()
 {
@@ -37,15 +41,17 @@ ODEPhysics::~ODEPhysics()
   this->worldId = NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Load the ODE engine
 int ODEPhysics::Load()
 {
   Vector3 gravity = World::Instance()->GetGravity();
 
-  dWorldSetGravity(this->worldId, gravity.x, gravity.y. gravity.z);
+  dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the ODE engine
 int ODEPhysics::Init()
 {
@@ -54,7 +60,8 @@ int ODEPhysics::Init()
   return 0;
 }
 
-//Update the ODE engine
+////////////////////////////////////////////////////////////////////////////////
+// Update the ODE engine
 int ODEPhysics::Update()
 {
   // Do collision detection; this will add contacts to the contact group
@@ -70,12 +77,14 @@ int ODEPhysics::Update()
   return 0;
 }
 
-//Finilize the ODE engine
+////////////////////////////////////////////////////////////////////////////////
+// Finilize the ODE engine
 int ODEPhysics::Fini()
 {
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Add an entity
 int ODEPhysics::AddEntity(Entity *entity)
 {
@@ -92,12 +101,14 @@ int ODEPhysics::AddEntity(Entity *entity)
   this->entities[entity->GetId()] = entity;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Create a new body
 Body *ODEPhysics::CreateBody(Entity *parent)
 {
   return new Body(parent, this->worldId);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Create a new joint
 Joint *ODEPhysics::CreateJoint(Joint::Type type)
 {
@@ -117,6 +128,7 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
   int i,n;
@@ -215,6 +227,5 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       dJointAttach(joint, body1, body2);
     }
   }
-}
-                                  
+} 
                                   

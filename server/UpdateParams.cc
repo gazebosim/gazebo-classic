@@ -18,51 +18,25 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Gazebo Time functions 
- * Author: Nate Koenig, Andrew Howard
- * Date: 2 March 2006
- * CVS: $Id$
+/* Desc: Parameters for each update cycle
+ * Author: Nate Koenig
+ * Date: 8 May 2007
+ * SVN: $Id$
  */
 
-#include <math.h>
-
-#include "GazeboClient.hh"
-#include "GazeboTime.hh"
+#include "UpdateParams.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Constructor
-GazeboTime::GazeboTime()
+/// Constructor
+UpdateParams::UpdateParams()
 {
+  this->stepTime = 0.02;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Destructor
-GazeboTime::~GazeboTime()
+/// Destructor
+UpdateParams::~UpdateParams()
 {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the simulator time
-int GazeboTime::GetTime(struct timeval* time)
-{
-  time->tv_sec = (int) floor(GazeboClient::sim->data->simTime);
-  time->tv_usec = (int) floor(fmod(GazeboClient::sim->data->simTime, 1.0) * 1e6);
-
-  return 0;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the simulator time
-int GazeboTime::GetTimeDouble(double* time)
-{
-  struct timeval ts;
-
-  ts.tv_sec = (int) floor(GazeboClient::sim->data->simTime);
-  ts.tv_usec = (int) floor(fmod(GazeboClient::sim->data->simTime, 1.0) * 1e6);
-
-  *time = ts.tv_sec + ts.tv_usec/1e6;
-
-  return 0;
 }
