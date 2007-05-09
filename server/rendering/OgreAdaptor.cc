@@ -39,13 +39,11 @@ OgreAdaptor *OgreAdaptor::Instance()
 }
 
 
-
-int OgreAdaptor::Init(XMLConfigNode *node)
+void OgreAdaptor::Init(XMLConfigNode *node)
 {
   if (!node)
   {
-    std::cerr << "Missing OGRE Rendernig information\n";
-    return -1;
+    throw GazeboError("OgreAdaptor::Init", "missing OGRE Rendernig information");
   }
 
   // Load all the plugins
@@ -57,15 +55,13 @@ int OgreAdaptor::Init(XMLConfigNode *node)
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
 
+  std::cout << "Initialize window\n";
   // Initialize the root node, and create a window
   this->window = this->root->initialise(true); 
 
+  std::cout << "Create Scene Manager\n";
   // Get the SceneManager, in this case a generic one
   this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
-
-  this->CreateCameras();
-
-  this->CreateViewports();
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
@@ -73,29 +69,32 @@ int OgreAdaptor::Init(XMLConfigNode *node)
   // Load Resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
+  std::cout << "Setup lighting\n";
+  // Get the SceneManager, in this case a generic one
   // Default lighting
   this->sceneMgr->setAmbientLight(Ogre::ColourValue(0.0f, 0.0f, 0.0f, 1.0f)); 
   this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
 
+  std::cout << "Create sky dome\n";
   // Add a sky dome to our scene
   this->sceneMgr->setSkyDome(true,"Gazebo/CloudySky",5,8);
 
-
+  std::cout << "Create frame listener\n";
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener(this);
 
   this->root->addFrameListener(this->frameListener);
 
+  std::cout << "Create gui renderer\n";
   // CEGUI setup
   this->guiRenderer = new CEGUI::OgreCEGUIRenderer(this->window, 
       Ogre::RENDER_QUEUE_OVERLAY, false, 0, this->sceneMgr);
 
+  std::cout << "Create gui system\n";
   this->guiSystem = new CEGUI::System(this->guiRenderer);
-
-  return 0;
 }
 
-int OgreAdaptor::Init(Display *display, XVisualInfo *visual, 
+void OgreAdaptor::Init(Display *display, XVisualInfo *visual, 
     Window windowId, int width, int height)
 {
   Ogre::NameValuePairList params;
@@ -120,10 +119,6 @@ int OgreAdaptor::Init(Display *display, XVisualInfo *visual,
   // Get the SceneManager, in this case a generic one
   this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
 
-  this->CreateCameras();
-
-  this->CreateViewports();
-
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 2 );
 
@@ -144,12 +139,9 @@ int OgreAdaptor::Init(Display *display, XVisualInfo *visual,
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener(this);
   this->root->addFrameListener(this->frameListener);
-
-
-  return 0;
 }
 
-int OgreAdaptor::SetupResources(XMLConfigNode *node)
+void OgreAdaptor::SetupResources(XMLConfigNode *node)
 {
   XMLConfigNode *sectionNode;
   XMLConfigNode *childNode;
@@ -157,16 +149,14 @@ int OgreAdaptor::SetupResources(XMLConfigNode *node)
 
   if (!node)
   {
-    std::cerr << "OGRE Resources missing\n";
-    return -1;
+    throw GazeboError("OgreAdaptor::SetupResource","ogre resources xml nodemissing");
   }
 
   path = node->GetString("path","",1);
 
   if (path.empty())
   {
-    std::cerr << "OgreAdaptor::SetupResource Empty Resource Path\n";
-    return -1;
+    throw GazeboError("OgreAdaptor::SetupResource","empty resource path");
   }
 
   sectionNode = node->GetChild();
@@ -198,7 +188,6 @@ int OgreAdaptor::SetupResources(XMLConfigNode *node)
 
     sectionNode = sectionNode->GetNext();
   }
-
 }
 
 void OgreAdaptor::SetupRenderSystem(bool create)
@@ -210,18 +199,34 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     int c = 0;
     Ogre::RenderSystem *selectedRenderSystem = NULL;
 
+    // Test code
+    {
+      Ogre::RenderSystemList::iterator iter;
+
+      std::cout << "Available rendering systems:\n";
+      for (iter=rsList->begin(); iter != rsList->end(); iter++)
+      {
+        std::cout << "\t" << (*iter)->getName() << "\n";
+      }
+    }
+
     do 
     {
       if (c == (int)rsList->size())
         break;
       selectedRenderSystem = rsList->at(c);
-      std::cout << "RenderSystem[" << selectedRenderSystem->getName() << "]\n";
       c++;
     } while (selectedRenderSystem->getName().compare("OpenGL Rendering Subsystem")!= 0);
 
     if (selectedRenderSystem == NULL)
-      throw GazeboError("OgreAdaptor::SetupRenderSystem", "unable to find rendering system");
+    {
+      throw GazeboError("OgreAdaptor::SetupRenderSystem", 
+                        "unable to find rendering system");
+    }
 
+    std::cout << "Selected Rendering System[" 
+              << selectedRenderSystem->getName() << "]\n";
+    
     selectedRenderSystem->setConfigOption("Full Screen","No");
     selectedRenderSystem->setConfigOption("FSAA","2");
 
@@ -234,53 +239,6 @@ void OgreAdaptor::SetupRenderSystem(bool create)
   }
 }
 
-void OgreAdaptor::CreateCameras()
-{
-  // Create the camera
-  /*this->camera = this->sceneMgr->createCamera( "PlayerCam" );
-  this->camera->setNearClipDistance(2);
-
-  this->cameraNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("CameraNode", Ogre::Vector3(0,5,5));
-  this->cameraNode->yaw( Ogre::Degree(45) );
-  this->cameraPitchNode = this->cameraNode->createChildSceneNode("CameraPitchNode");
-  this->cameraPitchNode->attachObject(this->camera);
-  */
-}
-
-void OgreAdaptor::CreateViewports()
-{
-  // Create one viewport, entire window
-  /*Ogre::Viewport* vp = this->window->addViewport(this->camera);
-  vp->setBackgroundColour( Ogre::ColourValue(0,0,0) );
-
-  // Alter the camera aspect ratio to match the viewport
-  this->camera->setAspectRatio( Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight()));
-  */
-}
-
-void OgreAdaptor::CreateScene()
-{
-  // Create the scene
-  Ogre::Entity *ent = this->sceneMgr->createEntity( "Ninja", "ninja.mesh" );
-  ent->setCastShadows(true);
-  this->sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
-
-  Ogre::Plane plane(Ogre::Vector3::UNIT_Y,0);
-  Ogre::MeshManager::getSingleton().createPlane("ground",
-      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,plane,
-      1500,1500,20,20,true,1,5,5,Ogre::Vector3::UNIT_Z);
-
-  ent = this->sceneMgr->createEntity( "GroundEntity", "ground");
-  this->sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
-  ent->setMaterialName("Examples/Rockwall");
-  ent->setCastShadows(false);
-
-  Ogre::Light *light = this->sceneMgr->createLight( "Light1" );
-  light->setType( Ogre::Light::LT_POINT );
-  light->setPosition( Ogre::Vector3(0,200,-50) );
-  light->setDiffuseColour( 1.0, 0.0, 0.0 );
-  light->setSpecularColour( 1.0, 0.0, 0.0 );
-}
 
 void OgreAdaptor::CreateWindow(int width, int height)
 {
@@ -308,7 +266,7 @@ int OgreAdaptor::Render()
 }
 
 // Load plugins
-int OgreAdaptor::LoadPlugins(XMLConfigNode *node)
+void OgreAdaptor::LoadPlugins(XMLConfigNode *node)
 {
   std::string pathStr;
   std::string pluginStr;
@@ -316,8 +274,7 @@ int OgreAdaptor::LoadPlugins(XMLConfigNode *node)
 
   if (!node)
   {
-    std::cerr << "OGRE Plugins missing\n";
-    return -1;
+    throw GazeboError("OgreAdaptor::LoadPlugins","missing plugins xml node");
   }
 
   // Get the path prefix
@@ -326,8 +283,7 @@ int OgreAdaptor::LoadPlugins(XMLConfigNode *node)
   // Make sure a path has been specified
   if (pathStr.empty())
   {
-    std::cerr << "!!OgreAdaptor::Init No Plugin Path Set!!\n";
-    return -1;
+    throw GazeboError("OgreAdaptor::LoadPlugins","no Plugin Path Set");
   }
 
   // The first plugin
@@ -343,6 +299,4 @@ int OgreAdaptor::LoadPlugins(XMLConfigNode *node)
     this->root->loadPlugin(pluginStr);
     pluginNode = pluginNode->GetNext();
   }
-
-  return 0;
 }

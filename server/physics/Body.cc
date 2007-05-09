@@ -214,7 +214,7 @@ int Body::LoadGeom(XMLConfigNode *node)
   Geom *geom;
 
   // The mesh used for visualization
-  std::string mesh = node->GetString("mesh","",1);
+  std::string mesh = node->GetString("mesh","",0);
 
   if (node->GetName() == "sphere")
   {

@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <sys/time.h>
 
+#include "GazeboError.hh"
 #include "OgreAdaptor.hh"
 #include "PhysicsEngine.hh"
 #include "ODEPhysics.hh"
@@ -91,9 +92,14 @@ int World::Load(XMLConfig *config, int serverId)
   assert(serverId >= 0);
   XMLConfigNode *rootNode = config->GetRootNode();
 
-  if (OgreAdaptor::Instance()->Init(rootNode->GetChildByNSPrefix("rendering")) != 0)
+  try
   {
-    std::cerr << "Failed to Initialize the OGRE Rendering system\n";
+    OgreAdaptor::Instance()->Init(rootNode->GetChildByNSPrefix("rendering"));
+  }
+  catch (GazeboError e)
+  {
+    std::cerr << "Failed to Initialize the OGRE Rendering system\n" 
+              << e << "\n";
     return -1;
   }
   

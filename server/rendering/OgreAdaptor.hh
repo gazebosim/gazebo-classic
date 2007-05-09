@@ -65,21 +65,18 @@ class OgreAdaptor
 
   public: static OgreAdaptor *Instance();
 
-  // Default initialization. Let OGRE create the window and rendering context
-  public: int Init(XMLConfigNode *node);
+  /// Default initialization. Let OGRE create the window and rendering context
+  public: void Init(XMLConfigNode *node);
 
   /// Initialize Ogre Rendering engine
-  public: int Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height);
+  public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height);
 
   /// Render a single frame
   public: int Render();
 
-  private: int LoadPlugins(XMLConfigNode *node);
-  private: int SetupResources(XMLConfigNode *node);
+  private: void LoadPlugins(XMLConfigNode *node);
+  private: void SetupResources(XMLConfigNode *node);
   private: void SetupRenderSystem(bool create);
-  private: void CreateCameras();
-  private: void CreateViewports();
-  public: void CreateScene();
   private: void CreateWindow(int width, int height);
 
   public: Ogre::Root *root;

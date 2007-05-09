@@ -47,8 +47,10 @@ namespace Ogre
 namespace gazebo
 {
 
-class XMLConfigNode;
-class Body;
+  class XMLConfigNode;
+  class Body;
+  class Iface;
+  class Controller;
 
 /// A model
 class Model : public Entity
@@ -140,8 +142,11 @@ class Model : public Entity
 
   /// Load a interface helper function
   /// \param node XML Configuration node
-  /// \return Non-zero on error
-  private: int LoadIface(XMLConfigNode *node);
+  private: void LoadIface(XMLConfigNode *node);
+
+  /// Load a controller helper function
+  /// \param node XML Configuration node
+  private: void LoadController(XMLConfigNode *node);
 
   /// Type of the model (such as Pioneer2DX, or SimpleSolid)
   private: std::string type;
@@ -163,6 +168,12 @@ class Model : public Entity
 
   /// Map of the joints
   protected: std::map<std::string, Joint*> joints;
+
+  /// Map of the interfaces
+  protected: std::map<std::string, Iface*> ifaces;
+
+  /// Map of the controllers
+  protected: std::map<std::string, Controller*> controllers;
 
   /*private: PyObject *pName;
   private: PyObject *pModule;

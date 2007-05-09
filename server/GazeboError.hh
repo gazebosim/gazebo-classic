@@ -67,14 +67,17 @@ class GazeboError
 
   /// The error code
   private: int code;
+
+  /// Ostream operator for Gazebo Error
+  public: friend std::ostream &operator<<(std::ostream& out, const gazebo::GazeboError &err)
+          {
+            return out << err.GetErrorFunc()
+              << "(" << err.GetErrorCode() << ")"
+              << " : "
+              << err.GetErrorStr();
+          }
 };
 
-}
-
-namespace std
-{
-  /// Ostream operator for Gazebo Error
-  std::ostream &operator<<(std::ostream &out, const gazebo::GazeboError &err);
 }
 
 #endif

@@ -18,6 +18,9 @@
 #include <string.h>
 #include <float.h>
 #include <math.h>
+#include <sstream>
+#include <string>
+#include <iostream>
 
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -383,8 +386,9 @@ std::string XMLConfigNode::GetString( std::string key, std::string def,
 
   if (!value && require)
   {
-    throw GazeboError("XMLConfigNode::GetString", "unable to find required string attribute");
-    return "";
+    std::ostringstream stream;
+    stream << "unable to find required string attribute[" << key << "]";
+    throw GazeboError("XMLConfigNode::GetString", stream.str());
   }
   else if( !value )
     return def;

@@ -28,6 +28,7 @@
 #include "GazeboError.hh"
 
 using namespace gazebo;
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Default constructor
@@ -65,14 +66,4 @@ std::string GazeboError::GetErrorStr() const
 int GazeboError::GetErrorCode() const
 {
   return this->code;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Ostream operator for Gazebo Error
-std::ostream &operator<<(std::ostream &out, const gazebo::GazeboError &err)
-{
-  return out << err.GetErrorFunc()
-            << "(" << err.GetErrorCode() << ")"
-            << " : "
-            << err.GetErrorStr();
 }

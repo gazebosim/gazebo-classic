@@ -102,11 +102,14 @@ home directory, or to the log file specified with the -l command line option.
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
+#include <iostream>
+
 #include "XMLConfig.hh"
 #include "ModelFactory.hh"
 #include "IfaceFactory.hh"
 #include "ControllerFactory.hh"
 #include "World.hh"
+#include "GazeboError.hh"
 
 // Command line options
 const char *worldFileName;
@@ -314,16 +317,33 @@ int main(int argc, char **argv)
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
-  if (Init() != 0)
+  try
   {
-    fprintf(stderr,"Initialization failed\n");
+    if (Init() != 0)
+    {
+      fprintf(stderr,"Initialization failed\n");
+      return -1;
+    }
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::cerr << e << std::endl;
     return -1;
   }
 
+
   userQuit = false;
 
-  // Run the sim
-  while (MainIdle());
+  try
+  {
+    // Run the sim
+    while (MainIdle());
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::cerr << e << std::endl;
+    return -1;
+  }
 
   // Finalize
   Fini();

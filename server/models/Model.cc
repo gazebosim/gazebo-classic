@@ -26,6 +26,8 @@
 
 //#include <boost/python.hpp>
 
+#include <sstream>
+#include <iostream>
 #include <Ogre.h>
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
@@ -72,6 +74,7 @@ int Model::Load(XMLConfigNode *node)
   XMLConfigNode *bodyNode = NULL;
   XMLConfigNode *jointNode = NULL;
   XMLConfigNode *ifaceNode = NULL;
+  XMLConfigNode *controllerNode = NULL;
   Body *body;
 
   if (node->GetName() == "xml")
@@ -108,10 +111,33 @@ int Model::Load(XMLConfigNode *node)
   ifaceNode = node->GetChildByNSPrefix("interface");
   while (ifaceNode)
   {
-    if (this->LoadIface(ifaceNode) != 0)
-      std::cerr << "Error Loading Interface[" << ifaceNode->GetName() << "]\n";
+    try
+    {
+      this->LoadIface(ifaceNode);
+    }
+    catch (gazebo::GazeboError e)
+    {
+      std::cerr << "Error Loading Interface[" << ifaceNode->GetName() << "]\n" 
+                << e << std::endl;
+    }
     ifaceNode = ifaceNode->GetNextByNSPrefix("interface");
   }
+
+  // Load controller
+  controllerNode = node->GetChildByNSPrefix("controller");
+  while (controllerNode)
+  {
+    try{
+      this->LoadController(controllerNode);
+    }
+    catch (GazeboError e)
+    {
+      std::cerr << "Error Loading Controller[" << controllerNode->GetName() 
+                << "]\n" << e << std::endl;
+    }
+    controllerNode = controllerNode->GetNextByNSPrefix("controller");
+  }
+
 
   // Get the name of the python module
   /*this->pName = PyString_FromString(node->GetString("python","",0).c_str());
@@ -414,29 +440,54 @@ int Model::LoadJoint(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new interface helper function
-int Model::LoadIface(XMLConfigNode *node)
+void Model::LoadIface(XMLConfigNode *node)
 {
   if (!node)
-    return -1;
+    throw GazeboError("Model::LoadIface","node parameter is NULL");
 
   Iface *iface = NULL;
-  Controller *controller = NULL;
 
-  std::string ifaceName = node->GetName();
-  std::string controllerName = node->GetString("controller","",1);
+  std::string ifaceType = node->GetName();
+  std::string ifaceName = node->GetString("name","",1);
 
-  controller = ControllerFactory::NewController(controllerName);
-  iface = IfaceFactory::NewIface(ifaceName);
+  iface = IfaceFactory::NewIface(ifaceType);
 
   if (iface->Create(gazebo::World::Instance()->GetGzServer(),
         this->GetName().c_str()) != 0)
   {
-    std::cerr << "Error creating " << ifaceName << "interface\n";
-    return -1;
+    std::ostringstream stream;
+    stream << "Error creating " << ifaceName << "interface\n";
+
+    throw GazeboError("Model::LoadIface",stream.str());
+  }
+
+  this->ifaces[ifaceName] = iface;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load a controller helper function
+void Model::LoadController(XMLConfigNode *node)
+{
+  Controller *controller = NULL;
+  Iface *iface = NULL;
+
+  std::string controllerType = node->GetName();
+  std::string controllerName = node->GetString("name","",1);
+  std::string ifaceName = node->GetString("iface","",1);
+
+  controller = ControllerFactory::NewController(controllerType);
+
+  iface = this->ifaces[ifaceName];
+
+  if (!iface)
+  {
+    std::ostringstream stream;
+    stream << "couldn't find interface[" << ifaceName << "] for controller[" <<controllerName << "]";
+    throw GazeboError("Model::LoadController", stream.str());
   }
 
   controller->SetIface(iface);
   controller->SetModel(this);
 
-  return 0;
+  this->controllers[controllerName] = controller;
 }
