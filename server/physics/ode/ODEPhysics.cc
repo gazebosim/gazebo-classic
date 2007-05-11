@@ -26,8 +26,6 @@ ODEPhysics::ODEPhysics()
   this->spaceId = dSimpleSpaceCreate(0);
 
   this->contactGroup = dJointGroupCreate(0);
-
-  this->stepTime = 0.02;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +66,7 @@ int ODEPhysics::Update()
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
   // Update the dynamical model
-  dWorldStep( this->worldId, this->stepTime );
+  dWorldStep( this->worldId, World::Instance()->GetStepTime() );
   //dWorldStepFast1( this->worldId, step, 10 );
 
   // Very important to clear out the contact group 
@@ -200,7 +198,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       // Compute the CFM and ERP by assuming the two bodies form a
       // spring-damper system.
       double h, kp, kd;
-      h = self->stepTime;
+      h = World::Instance()->GetStepTime();
       kp = 1 / (1 / geom1->contact->kp + 1 / geom2->contact->kp);
       kd = geom1->contact->kd + geom2->contact->kd;
       contactInfo.surface.mode |= dContactSoftERP | dContactSoftCFM;

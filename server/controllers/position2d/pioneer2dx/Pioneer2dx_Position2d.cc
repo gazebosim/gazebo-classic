@@ -38,13 +38,15 @@ using namespace gazebo;
 
 GZ_REGISTER_STATIC_CONTROLLER("pioneer2dx_position2d", Pioneer2dx_Position2d);
 
+enum {LEFT, RIGHT};
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Pioneer2dx_Position2d::Pioneer2dx_Position2d()
 {
-  this->leftJoint = NULL;
-  this->rightJoint = NULL;
-  this->enableMotors = false;
+  this->joints[0] = NULL;
+  this->joints[1] = NULL;
+  this->enableMotors = true;
 
   this->wheelSpeed[0] = 0;
   this->wheelSpeed[1] = 0;
@@ -66,13 +68,13 @@ int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
   std::string leftJointName = node->GetString("leftJoint", "", 1);
   std::string rightJointName = node->GetString("rightJoint", "", 1);
 
-  this->leftJoint = dynamic_cast<HingeJoint*>(this->model->GetJoint(leftJointName));
-  this->rightJoint = dynamic_cast<HingeJoint*>(this->model->GetJoint(rightJointName));
+  this->joints[LEFT] = dynamic_cast<HingeJoint*>(this->model->GetJoint(leftJointName));
+  this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->model->GetJoint(rightJointName));
 
-  if (!this->leftJoint)
+  if (!this->joints[LEFT])
     throw GazeboError("Pioneer2dx_Position2d::LoadChild","couldn't get left hinge joint");
 
-  if (!this->rightJoint)
+  if (!this->joints[RIGHT])
     throw GazeboError("Pioneer2dx_Position2d::LoadChild","couldn't get right hinge joint");
 
   return 0;
@@ -96,7 +98,7 @@ int Pioneer2dx_Position2d::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-int Pioneer2dx_Position2d::UpdateChild()
+int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 {
   // TODO: Step should be in a parameter of this function
   double step;
@@ -108,8 +110,8 @@ int Pioneer2dx_Position2d::UpdateChild()
   ws = this->wheelSep;
 
   // Distance travelled by front wheels
-  d1 = step * wd / 2 * this->leftJoint->GetAngleRate();
-  d2 = step * wd / 2 * this->rightJoint->GetAngleRate();
+  d1 = step * wd / 2 * this->joints[LEFT]->GetAngleRate();
+  d2 = step * wd / 2 * this->joints[RIGHT]->GetAngleRate();
 
   dr = (d1 + d2) / 2;
   da = (d2 - d1) / ws;
@@ -125,6 +127,23 @@ int Pioneer2dx_Position2d::UpdateChild()
   this->odomVel[2] = da / step;
 
   this->GetPositionCmd();
+
+  if (this->enableMotors)
+  {
+    this->joints[LEFT]->SetParam( dParamVel, 
+        this->wheelSpeed[LEFT] / this->wheelDiam * 2 );
+
+    this->joints[RIGHT]->SetParam( dParamVel, 
+        this->wheelSpeed[RIGHT] / this->wheelDiam * 2 );
+    
+    this->joints[LEFT]->SetParam( dParamFMax, 1.1 );
+    this->joints[RIGHT]->SetParam( dParamFMax, 1.1 );
+  }
+  else
+  {
+    this->joints[LEFT]->SetParam( dParamVel, 0.0 ); 
+    this->joints[RIGHT]->SetParam( dParamVel, 0.0 );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,8 +174,8 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 
   this->enableMotors = this->iface->data->cmdEnableMotors > 0;
 
-  this->wheelSpeed[0] = vr + va * this->wheelSep / 2;
-  this->wheelSpeed[1] = vr - va * this->wheelSep / 2;
+  this->wheelSpeed[LEFT] = vr - va * this->wheelSep / 2;
+  this->wheelSpeed[RIGHT] = vr + va * this->wheelSep / 2;
 }
 
 //////////////////////////////////////////////////////////////////////////////

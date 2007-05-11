@@ -57,9 +57,6 @@ class ODEPhysics : public PhysicsEngine
   // Collision attributes
   private: dJointGroupID contactGroup;
            
-  // Simulation step time
-  private: double stepTime;
-
   protected: std::map<int, Entity*> entities;
 };
 

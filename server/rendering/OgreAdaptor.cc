@@ -56,6 +56,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->SetupRenderSystem(true);
 
   std::cout << "Initialize window\n";
+
   // Initialize the root node, and create a window
   this->window = this->root->initialise(true); 
 

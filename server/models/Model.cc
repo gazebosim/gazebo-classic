@@ -173,13 +173,22 @@ int Model::Init()
 // Update the model
 int Model::Update(UpdateParams &params)
 {
-  std::map<std::string, Body*>::iterator iter;
+  std::map<std::string, Body*>::iterator bodyIter;
+  std::map<std::string, Controller*>::iterator contIter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
-    if (iter->second)
-      iter->second->Update();
+    if (bodyIter->second)
+      bodyIter->second->Update();
   }
+
+  for (contIter=this->controllers.begin(); 
+       contIter!=this->controllers.end(); contIter++)
+  {
+    if (contIter->second)
+      contIter->second->Update(params);
+  }
+
 
   // Call the model's python update function, if one exists
   /*if (this->pFuncUpdate)
@@ -276,8 +285,10 @@ void Model::SetPose(const Pose3d &pose)
 
     bodyPose = body->GetPose();
 
+
     // Compute the pose relative to the model
-    bodyPose = bodyPose - origPose;
+    //bodyPose = bodyPose - origPose;
+    //std::cout << "Body Pose[" << bodyPose << "]\n";
 
     // Compute the new pose
     bodyPose += newPose;
@@ -447,11 +458,14 @@ void Model::LoadIface(XMLConfigNode *node)
 
   Iface *iface = NULL;
 
+  // Type and unique name of the iface
   std::string ifaceType = node->GetName();
   std::string ifaceName = node->GetString("name","",1);
 
+  // Use the factory to get a new iface based on the type
   iface = IfaceFactory::NewIface(ifaceType);
 
+  // Create the iface
   if (iface->Create(gazebo::World::Instance()->GetGzServer(),
         this->GetName().c_str()) != 0)
   {
@@ -461,6 +475,7 @@ void Model::LoadIface(XMLConfigNode *node)
     throw GazeboError("Model::LoadIface",stream.str());
   }
 
+  // Store the iface
   this->ifaces[ifaceName] = iface;
 }
 
@@ -468,15 +483,25 @@ void Model::LoadIface(XMLConfigNode *node)
 /// Load a controller helper function
 void Model::LoadController(XMLConfigNode *node)
 {
+  if (!node)
+    throw GazeboError("Model::LoadController","node parameter is NULL");
+
   Controller *controller = NULL;
   Iface *iface = NULL;
 
+  // Get the controller's type
   std::string controllerType = node->GetName();
+
+  // Get the unique name of the controller
   std::string controllerName = node->GetString("name","",1);
+
+  // Get the name of the iface the controller uses
   std::string ifaceName = node->GetString("iface","",1);
 
+  // Create the controller based on it's type
   controller = ControllerFactory::NewController(controllerType);
 
+  // Get the iface the controller uses
   iface = this->ifaces[ifaceName];
 
   if (!iface)
@@ -486,8 +511,13 @@ void Model::LoadController(XMLConfigNode *node)
     throw GazeboError("Model::LoadController", stream.str());
   }
 
+  // Attach the iface to the controller
   controller->SetIface(iface);
   controller->SetModel(this);
 
+  // Load the controller
+  controller->Load(node);
+
+  // Store the controller
   this->controllers[controllerName] = controller;
 }

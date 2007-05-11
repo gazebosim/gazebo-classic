@@ -161,6 +161,8 @@ int World::Update()
   this->simIface->data->simTime = this->GetSimTime();
   this->simIface->data->pauseTime = this->GetPauseTime();
   this->simIface->data->realTime = this->GetRealTime();
+  this->simIface->Unlock();
+
   return 0;
 }
 
@@ -237,6 +239,14 @@ double World::GetRealTime() const
 {
   return this->GetWallTime() - this->startTime;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the step time 
+double World::GetStepTime() const
+{
+  return this->stepTime;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the wall clock time

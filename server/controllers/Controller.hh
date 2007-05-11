@@ -29,6 +29,7 @@
 
 #include <string>
 
+#include "UpdateParams.hh"
 
 namespace gazebo
 {
@@ -55,22 +56,22 @@ class Controller
   public: int Init();
 
   /// Update the controller. Called every cycle.
-  public: int Update();
+  public: int Update(UpdateParams &params);
 
   /// Finialize the controller. Called once on completion.
   public: int Fini();
 
   /// Load function for the child class
-  public: virtual int LoadChild(XMLConfigNode *node) {return 0;}
+  protected: virtual int LoadChild(XMLConfigNode *node) {return 0;}
 
   /// Init function for the child class
-  public: virtual int InitChild() {return 0;}
+  protected: virtual int InitChild() {return 0;}
 
   /// Update function for the child class
-  public: virtual int UpdateChild() {return 0;}
+  protected: virtual int UpdateChild(UpdateParams &params) {return 0;}
 
   /// Fini function for the child class
-  public: virtual int FiniChild() {return 0;}
+  protected: virtual int FiniChild() {return 0;}
 
   /// Return the name of this controller
   public: std::string GetName() const;

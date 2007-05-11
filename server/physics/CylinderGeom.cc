@@ -40,7 +40,7 @@ CylinderGeom::CylinderGeom(Body *body, double radius, double length, const std::
   // Initialize mass matrix
   dMassSetCylinder(&this->mass, 1.0, 2, radius, length);
   
-  this->SetGeom( dCreateCylinder( this->body->spaceId, radius, length ), true );
+  this->SetGeom( dCreateCCylinder( this->body->spaceId, radius, length ), true );
 
   // ODE cylinders are oriented along the y-axis; fix this
   // so the are along the z-axis

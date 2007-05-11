@@ -50,19 +50,19 @@ class Pioneer2dx_Position2d : public Controller
   /// Load the controller
   /// \param node XML config node
   /// \return 0 on success
-  public: virtual int LoadChild(XMLConfigNode *node);
+  protected: virtual int LoadChild(XMLConfigNode *node);
 
   /// Init the controller
   /// \return 0 on success
-  public: virtual int InitChild();
+  protected: virtual int InitChild();
 
   /// Update the controller
   /// \return 0 on success
-  public: virtual int UpdateChild();
+  protected: virtual int UpdateChild(UpdateParams &params);
 
   /// Finalize the controller
   /// \return 0 on success
-  public: virtual int FiniChild();
+  protected: virtual int FiniChild();
 
   /// The interface for the controller
   public: virtual void SetIface(Iface *iface);
@@ -91,8 +91,7 @@ class Pioneer2dx_Position2d : public Controller
   private: float odomPose[3];
   private: float odomVel[3];
 
-  private: HingeJoint *leftJoint;
-  private: HingeJoint *rightJoint;
+  private: HingeJoint *joints[2];
 };
 
 /// @}

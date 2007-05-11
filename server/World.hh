@@ -164,6 +164,9 @@ class World
   /// \return The real time
   public: double GetRealTime() const;
 
+  /// Get the length of each simulation step
+  public: double GetStepTime() const;
+
   /// Get the wall clock time
   /// \return The wall clock time
   public: double GetWallTime() const;
