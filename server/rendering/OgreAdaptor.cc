@@ -32,8 +32,8 @@ OgreAdaptor::~OgreAdaptor()
 
 OgreAdaptor *OgreAdaptor::Instance()
 {
-  if (myself == NULL)
-    myself = new OgreAdaptor();
+  if (!myself)
+    myself = new OgreAdaptor;
 
   return myself;
 }
@@ -55,12 +55,9 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
 
-  std::cout << "Initialize window\n";
-
   // Initialize the root node, and create a window
   this->window = this->root->initialise(true); 
 
-  std::cout << "Create Scene Manager\n";
   // Get the SceneManager, in this case a generic one
   this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
 
@@ -70,33 +67,29 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   // Load Resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  std::cout << "Setup lighting\n";
   // Get the SceneManager, in this case a generic one
   // Default lighting
   this->sceneMgr->setAmbientLight(Ogre::ColourValue(0.0f, 0.0f, 0.0f, 1.0f)); 
   this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
 
-  std::cout << "Create sky dome\n";
   // Add a sky dome to our scene
   this->sceneMgr->setSkyDome(true,"Gazebo/CloudySky",5,8);
 
-  std::cout << "Create frame listener\n";
   // Create our frame listener and register it
-  this->frameListener = new OgreFrameListener(this);
+  this->frameListener = new OgreFrameListener();
 
   this->root->addFrameListener(this->frameListener);
 
-  std::cout << "Create gui renderer\n";
   // CEGUI setup
   this->guiRenderer = new CEGUI::OgreCEGUIRenderer(this->window, 
       Ogre::RENDER_QUEUE_OVERLAY, false, 0, this->sceneMgr);
 
-  std::cout << "Create gui system\n";
   this->guiSystem = new CEGUI::System(this->guiRenderer);
 }
 
-void OgreAdaptor::Init(Display *display, XVisualInfo *visual, 
-    Window windowId, int width, int height)
+void OgreAdaptor::Init(Display *display, 
+                       XVisualInfo *visual, 
+                       Window windowId, int width, int height)
 {
   Ogre::NameValuePairList params;
   Ogre::StringVector paramsVector;
@@ -138,7 +131,7 @@ void OgreAdaptor::Init(Display *display, XVisualInfo *visual,
 
 
   // Create our frame listener and register it
-  this->frameListener = new OgreFrameListener(this);
+  this->frameListener = new OgreFrameListener();
   this->root->addFrameListener(this->frameListener);
 }
 
@@ -180,8 +173,6 @@ void OgreAdaptor::SetupResources(XMLConfigNode *node)
       if (typeName == "Filesystem")
         typeName = "FileSystem";
 
-      //std::cout << "OGRE: Load Resource[" << archName << ", " <<typeName << "," << sectionName << "]\n";
-
       Ogre::ResourceGroupManager::getSingleton().addResourceLocation( archName, typeName, sectionName); 
 
       childNode = childNode->GetNext();
@@ -200,17 +191,6 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     int c = 0;
     Ogre::RenderSystem *selectedRenderSystem = NULL;
 
-    // Test code
-    {
-      Ogre::RenderSystemList::iterator iter;
-
-      std::cout << "Available rendering systems:\n";
-      for (iter=rsList->begin(); iter != rsList->end(); iter++)
-      {
-        std::cout << "\t" << (*iter)->getName() << "\n";
-      }
-    }
-
     do 
     {
       if (c == (int)rsList->size())
@@ -225,9 +205,6 @@ void OgreAdaptor::SetupRenderSystem(bool create)
                         "unable to find rendering system");
     }
 
-    std::cout << "Selected Rendering System[" 
-              << selectedRenderSystem->getName() << "]\n";
-    
     selectedRenderSystem->setConfigOption("Full Screen","No");
     selectedRenderSystem->setConfigOption("FSAA","2");
 
@@ -246,11 +223,11 @@ void OgreAdaptor::CreateWindow(int width, int height)
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
 
-  paramsVector.push_back( Ogre::StringConverter::toString( (int)this->display ) );
+  paramsVector.push_back( Ogre::StringConverter::toString( (int)(this->display) ) );
   paramsVector.push_back( Ogre::StringConverter::toString((int)this->visual->screen));
 
   paramsVector.push_back( Ogre::StringConverter::toString((int)this->windowId));
-  paramsVector.push_back( Ogre::StringConverter::toString((int)this->visual));
+  paramsVector.push_back( Ogre::StringConverter::toString((int)(this->visual)));
 
   params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
 

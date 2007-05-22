@@ -1,4 +1,6 @@
 #include <Ogre.h>
+#include <sstream>
+
 #include "ContactParams.hh"
 #include "OgreAdaptor.hh"
 #include "Body.hh"
@@ -8,12 +10,10 @@ using namespace gazebo;
 
 int Geom::geomIdCounter = 0;
 
-Geom::Geom(Body *body)
+Geom::Geom( Body *body)
   : Entity(body)
 {
   this->body = body;
-
-  this->entityName = new char[256];
 
   // Create the contact parameters
   this->contact = new ContactParams();
@@ -26,8 +26,6 @@ Geom::Geom(Body *body)
 
 Geom::~Geom()
 {
-  delete [] this->entityName;
-
   dGeomDestroy(this->geomId);
 }
 
@@ -47,11 +45,10 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
     dGeomSetData(this->geomId, this);
   }
 
-  if (this->body)
-    this->body->AttachGeom( (Geom*) this );
-
   // Create a new name of the geom's mesh entity
-  sprintf(this->entityName,"Entity[%d]",(int)this->geomId); 
+  std::ostringstream stream;
+  stream << "Entity[" << (int)this->geomId << "]";
+  this->SetName(stream.str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +126,7 @@ void Geom::SetRotation(const Quatern &rot)
 /// Attach a mesh to the geom
 void Geom::AttachMesh(const std::string &meshName)
 {
-  this->meshEntity = this->sceneNode->getCreator()->createEntity(this->entityName, meshName);
+  this->meshEntity = this->sceneNode->getCreator()->createEntity(this->GetName().c_str(), meshName);
 
   this->sceneNode->attachObject(this->meshEntity);
 }

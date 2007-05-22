@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sstream>
 
 #include "gazebo.h"
 #include "gz_error.h"
@@ -54,8 +55,10 @@ GZ_REGISTER_IFACE("graphics3d", Graphics3dIface);
 Iface::Iface(const std::string &type, size_t size)
 {
   this->type = type;
-  this->filename = NULL;
   this->size = size;
+
+  this->server = NULL;
+  this->client = NULL;
 }
 
 
@@ -63,33 +66,27 @@ Iface::Iface(const std::string &type, size_t size)
 // Destroy an interface
 Iface::~Iface()
 {
-  delete this->filename;
+  if (this->mmapFd)
+    this->Destroy();
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Work out the filename
-const char *Iface::Filename(const char *id)
+std::string Iface::Filename(std::string id)
 {
-  char filename[128];
+  std::ostringstream stream;
 
-  if (this->server != NULL)
+  if (this->server)
   {
-    snprintf(filename, sizeof(filename), "%s/%s.%s",
-             this->server->filename, this->type.c_str(), id);
+    stream  << this->server->filename << "/" << this->type << "." << id;
   }
-  else if (this->client != NULL)
+  else if (this->client)
   {
-    snprintf(filename, sizeof(filename), "%s/%s.%s",
-             this->client->filename, this->type.c_str(), id);
+    stream  << this->client->filename << "/" << this->type << "." << id;
   }
-  else
-    assert(0);
 
-  if (this->filename)
-    free(this->filename);
-
-  this->filename = strdup(filename);  
+  this->filename = stream.str();  
 
   return this->filename;
 }
@@ -97,21 +94,21 @@ const char *Iface::Filename(const char *id)
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface (server)
-int Iface::Create(Server *server, const char *id)
+int Iface::Create(Server *server, std::string id)
 {
   this->server = server;
 
   // Went cant have null id's
-  if (id == NULL)
+  if (id.empty())
   {
     GZ_ERROR1("interface [%s] id is NULL", this->type.c_str());
     return -1;
   }
 
   // We cannot have id with '.'
-  if (strchr(id, '.'))
+  if (strchr(id.c_str(), '.'))
   {
-    GZ_ERROR1("invalid id [%s] (must not contain '.')", id);
+    GZ_ERROR1("invalid id [%s] (must not contain '.')", id.c_str());
     return -1;
   }
   
@@ -119,7 +116,8 @@ int Iface::Create(Server *server, const char *id)
   this->Filename(id);
   
   // Create and open the file
-  this->mmapFd = open(this->filename, O_RDWR | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
+  this->mmapFd = open(this->filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
+
   if (this->mmapFd < 0)
   {
     GZ_ERROR1("error creating mmap file: %s", strerror(errno));
@@ -127,36 +125,35 @@ int Iface::Create(Server *server, const char *id)
   }
 
   // Set the file to the correct size
-  if (ftruncate(this->mmapFd, size) < 0)
+  if (ftruncate(this->mmapFd, this->size) < 0)
   {
     GZ_ERROR1("error setting size of mmap file: %s", strerror(errno));
     return -1;
   }
 
   // Map the file into memory
-  this->mMap = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
+  this->mMap = mmap(0, this->size, PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
 
   if (this->mMap == MAP_FAILED)
   {
     GZ_ERROR1("error mapping mmap file: %s", strerror(errno));
     return -1;
   }
-  memset(this->mMap, 0, size);
+  memset(this->mMap, 0, this->size);
 
   ((Iface*) this->mMap)->version = LIBGAZEBO_VERSION;
-  ((Iface*) this->mMap)->size = size;
+  ((Iface*) this->mMap)->size = this->size;
 
   // Print the name, version info
-  GZ_MSG3(5, "creating %s %03X %d", this->filename,
+  GZ_MSG3(5, "creating %s %03X %d", this->filename.c_str(),
           ((Iface*) this->mMap)->version,
           ((Iface*) this->mMap)->size);
-  
   return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Create the interface
-int Iface::Create(Server *server, const char *id,
+int Iface::Create(Server *server, std::string id,
                   const std::string &modelType, int modelId, 
                   int parentModelId)
 {
@@ -175,27 +172,32 @@ int Iface::Create(Server *server, const char *id,
 // Destroy the interface (server)
 int Iface::Destroy()
 {
+  if (!this->mMap && !this->mmapFd)
+    return 0;
+
   // Unmap the file
   munmap(this->mMap, this->size);
   this->mMap = NULL;
 
   // Close the file
   close(this->mmapFd);
+  this->mmapFd = 0;
 
   // Delete the file
-  GZ_MSG1(5, "deleting %s", this->filename);  
-  if (unlink(this->filename))
+  GZ_MSG1(5, "deleting %s", this->filename.c_str());  
+  if (unlink(this->filename.c_str()))
   {
     GZ_ERROR1("error deleting mmap file: %s", strerror(errno));
     return -1;
   }
+
   return 0;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Open an existing interface (client)
-int Iface::Open(Client *client, const char *id)
+int Iface::Open(Client *client, std::string id)
 {
   this->client = client;
   
@@ -203,15 +205,16 @@ int Iface::Open(Client *client, const char *id)
   this->Filename(id);
 
   // Open the mmap file
-  this->mmapFd = open(this->filename, O_RDWR);
+  this->mmapFd = open(this->filename.c_str(), O_RDWR);
   if (this->mmapFd <= 0)
   {
-    GZ_ERROR2("error opening device file %s : %s", this->filename, strerror(errno));
+    GZ_ERROR2("error opening device file %s : %s", this->filename.c_str(), strerror(errno));
     return -1;
   }
 
   // Map the mmap file
   this->mMap = mmap(0, this->size, PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
+
   if (this->mMap == MAP_FAILED)
   {
     GZ_ERROR1("error mapping device file: %s", strerror(errno));
@@ -227,7 +230,7 @@ int Iface::Open(Client *client, const char *id)
 
   
   // Print the name, version info
-  GZ_MSG3(5, "opening %s %03X %d", this->filename,
+  GZ_MSG3(5, "opening %s %03X %d", this->filename.c_str(),
           ((Iface*) this->mMap)->version,
           ((Iface*) this->mMap)->size);
   
@@ -244,7 +247,7 @@ int Iface::Close()
   this->mMap = NULL;
 
   // Close the file
-  GZ_MSG1(5, "closing %s", this->filename);  
+  GZ_MSG1(5, "closing %s", this->filename.c_str());
   close(this->mmapFd);
 
   return 0;
@@ -262,7 +265,7 @@ int Iface::Lock(int blocking)
   // Lock the file
   if (flock(this->mmapFd, LOCK_EX) != 0)
   {
-    GZ_ERROR2("flock %s error: %s", this->filename, strerror(errno));
+    GZ_ERROR2("flock %s error: %s", this->filename.c_str(), strerror(errno));
     return -1;
   }
   return 0;

@@ -34,63 +34,48 @@ class Geom : public Entity
   // Return whether this geom is placeable
   public: bool IsPlaceable() const;
 
-  //! Set the pose
-  /*!
-   * \param pose New pose
-   */
+  /// Set the pose
+  /// \param pose New pose
   public: void SetPose(const Pose3d &pose);
 
-  // Return the pose of the geom
+  /// Return the pose of the geom
   public: Pose3d GetPose() const;
 
-  //! Set the position
-  /*!
-   * \param pos Vector3 position
-   */
+  /// Set the position
+  /// \param pos Vector3 position
   public: void SetPosition(const Vector3 &pos);
 
-  //! Set the rotation
-  /*!
-   * \param rot Quaternion rotation
-   */
+  /// Set the rotation
+  /// \param rot Quaternion rotation
   public: void SetRotation(const Quatern &rot);
 
-  //! Attach a mesh to the geom
-  /*!
-   * \param meshName Name of the mesh
-   */
+  /// Attach a mesh to the geom
+  /// \param meshName Name of the mesh
   public: void AttachMesh(const std::string &meshName);
 
-  //! Set the scale of the mesh
-  /*!
-   * \param scale New scale of the mesh
-   */
+  /// Set the scale of the mesh
+  /// \param scale New scale of the mesh
   public: void ScaleMesh(const Vector3 &scale);
 
-  //! Set the mesh pose
-  /*!
-   * \param pose Pose of the mesh.
-   */
+  /// Set the mesh pose
+  /// \param pose Pose of the mesh.
   public: void SetMeshPose(const Pose3d &pose);
 
-  //! Set the mesh position
-  /*!
-   * \param pos Position of the mesh
-   */
+  /// Set the mesh position
+  /// \param pos Position of the mesh
   public: void SetMeshPosition(const Vector3 &pos);
 
-  //! Set whether the mesh casts shadows
-  /*!
-   * \param enable True=cast shadows
-   */
+  /// Set whether the mesh casts shadows
+  /// \param enable True=cast shadows
   public: void SetCastShadows(bool enable);
 
   /// Set the material to apply to the mesh
   public: void SetMeshMaterial(const std::string &materialName);
 
-  public: ContactParams *contact;
+  /// Contact parameters
+  public: ContactParams *contact; 
 
-  // The body this geom belongs to
+  /// The body this geom belongs to
   protected: Body *body;
 
   private: bool placeable;
@@ -98,7 +83,6 @@ class Geom : public Entity
   private: Ogre::Entity *meshEntity;
 
   private: dGeomID geomId;
-  private: char *entityName;
 
   private: static int geomIdCounter;
 

@@ -1,4 +1,5 @@
 #include <Ogre.h>
+
 #include "OgreAdaptor.hh"
 #include "ModelFactory.hh"
 #include "XMLConfig.hh"
@@ -17,7 +18,7 @@ LightSource::~LightSource()
 }
 
 // Load the child model
-int LightSource::LoadChild(XMLConfigNode *node)
+int LightSource::LoadChild( XMLConfigNode *node)
 {
   Vector3 vec;
   double range,constant,linear,quad;
@@ -25,7 +26,8 @@ int LightSource::LoadChild(XMLConfigNode *node)
   sprintf(lightname,"light%d",this->GetId());
 
   // Create the light
-  Ogre::Light *light = OgreAdaptor::Instance()->sceneMgr->createLight(lightname);
+  Ogre::Light *light(OgreAdaptor::Instance()->sceneMgr->createLight(lightname));
+
  // light->setType( Ogre::Light::LT_POINT);
   //light->setPosition(Ogre::Vector3(0,10.5,-10));
   light->setDiffuseColour(1.0, 1.0, 1.0);

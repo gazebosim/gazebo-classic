@@ -51,9 +51,6 @@ World::World()
 
   this->physicsEngine = new ODEPhysics();
 
-  this->server = NULL;
-  this->simIface = NULL;
-
   this->pause = false;
 
   this->simTime = 0.0;
@@ -70,7 +67,6 @@ World::World()
 // Private destructor
 World::~World()
 {
-  delete this->physicsEngine;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +86,7 @@ World *World::Instance()
 int World::Load(XMLConfig *config, int serverId)
 {
   assert(serverId >= 0);
-  XMLConfigNode *rootNode = config->GetRootNode();
+  XMLConfigNode *rootNode(config->GetRootNode());
 
   try
   {
@@ -102,11 +98,12 @@ int World::Load(XMLConfig *config, int serverId)
               << e << "\n";
     return -1;
   }
-  
+
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
   if (this->server->Init(serverId, true ) != 0)
     return -1;
+
 
    // Create the simulator interface
   this->simIface = new SimulationIface();
@@ -124,7 +121,7 @@ int World::Load(XMLConfig *config, int serverId)
 // Initialize the world
 int World::Init()
 {
-  std::vector<Model*>::iterator iter;
+  std::vector< Model* >::iterator iter;
 
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
@@ -137,6 +134,8 @@ int World::Init()
   this->simIface->Unlock();
 
   this->physicsEngine->Init();
+
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +143,7 @@ int World::Init()
 int World::Update()
 {
   UpdateParams params;
-  std::vector<Model*>::iterator iter;
+  std::vector< Model* >::iterator iter;
   this->physicsEngine->Update();
 
   this->simTime += this->stepTime;
@@ -170,7 +169,7 @@ int World::Update()
 // Finilize the world
 int World::Fini()
 {
-  std::vector<Model*>::iterator iter;
+  std::vector< Model* >::iterator iter;
 
   // Finalize the models
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
@@ -182,10 +181,8 @@ int World::Fini()
 
   // Done with the external interface
   this->simIface->Destroy();
-  delete this->simIface;
 
   this->server->Fini();
-  delete this->server;
 
   return 0;
 }
@@ -259,10 +256,10 @@ double World::GetWallTime() const
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-int World::LoadModel(XMLConfigNode *node, Model *parent)
+int World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
 {
   XMLConfigNode *cnode;
-  Model *model = NULL;
+  Model *model;
   Pose3d pose;
 
   if (node->GetNSPrefix() != "")
@@ -277,12 +274,10 @@ int World::LoadModel(XMLConfigNode *node, Model *parent)
       }
       else
       {
-        std::cout << "Model[" << node->GetName() << "]\n";
-
         // Instantiate the model
         model = ModelFactory::NewModel( node->GetName() );
 
-        if (model == NULL)
+        if (!model)
         {
           std::cout << "unknown model class or class disabled [" << node->GetName() << "]\n";
           return 0;

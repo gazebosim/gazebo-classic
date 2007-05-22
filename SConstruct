@@ -11,14 +11,14 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
               'pkg-config --cflags --libs playercore',
               'pkg-config --cflags --libs playerxdr',
 	      'ode-config --cflags --libs',
-	      'pkg-config --cflags --libs OIS']
-	      #'python-config',
+	      'pkg-config --cflags --libs OIS',
+	      'python-config']
 
 env = Environment (
   CC = 'g++',
 
-  #CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
-  CCFLAGS = Split ('-pthread -pipe -O2'),
+  CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+  #CCFLAGS = Split ('-pthread -pipe'),
 
   CPPPATH = [
     '#.', 
@@ -33,21 +33,13 @@ env = Environment (
     '#server/controllers',
     '#server/controllers/position2d',
     '#server/controllers/position2d/pioneer2dx',
+    '/usr/include/python2.4',
     ],
 
     LIBPATH=Split('#libgazebo'),
     
-    LIBS=Split('gazebo'),#boost_python
+    LIBS=Split('gazebo boost_python')
 )
-
-conf = Configure(env)
-
-# Check for the necessary headers
-#if not conf.CheckHeader('boost/python.hpp'):
-#  print 'Did not find boost/python.hpp exiting'
-#  Exit(1)
-
-env = conf.Finish()
 
 
 # Parse all the pacakge configurations
@@ -65,7 +57,17 @@ for cfg in parseConfigs:
     elif cfg.find("CEGUI") >=0:
       print "Install CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
     Exit(1)
-   
+
+conf = Configure(env)
+
+# Check for the necessary headers
+#if not conf.CheckHeader('boost/python.hpp'):
+#  print 'Did not find boost/python.hpp exiting'
+#  Exit(1)
+
+env = conf.Finish()
+
+  
 
 staticObjs = []
 sharedObjs = []

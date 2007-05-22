@@ -149,7 +149,7 @@ class Server
   public: int serverId;
 
   //! The directory containing mmap files
-  public: char *filename;
+  public: std::string filename;
 
   //! The semphore key and id
   public: int semKey, semId;
@@ -226,7 +226,7 @@ class Client
   public: int clientId;
 
   //! The directory containing mmap files
-  public: char *filename;
+  public: std::string filename;
 
   //! The semphore key and id
   public: int semKey, semId;
@@ -257,10 +257,10 @@ class Iface
   public: virtual ~Iface();
 
   //! \brief Create the interface (used by Gazebo server)
-  public: virtual int Create(Server *server, const char *id);
+  public: virtual int Create(Server *server, std::string id);
 
   //! \brief Create the interface (used by Gazebo server)
-  public: int Create(Server *server, const char *id,
+  public: int Create(Server *server, std::string id,
                      const std::string &modelType, int modelId, 
                      int parentModelId);
 
@@ -268,52 +268,51 @@ class Iface
   public: int Destroy();
 
   //! Open an existing interface
-  public: virtual int Open(Client *client, const char *id);
+  public: virtual int Open(Client *client, std::string id);
 
   //! Close the interface
   public: int Close();
 
-  //! Lock the interface.  Set blocking to 1 if the caller should block
-  //! until the lock is acquired.  Returns 0 if the lock is acquired.
+  /// Lock the interface.  Set blocking to 1 if the caller should block
+  /// until the lock is acquired.  Returns 0 if the lock is acquired.
   public: int Lock(int blocking);
 
-  //! Unlock the interface
+  /// Unlock the interface
   public:  void Unlock();
 
-  //! Tell clients that new data is available
+  /// Tell clients that new data is available
   public: int Post();
 
-  private: const char *Filename(const char *id);
+  private: std::string Filename(std::string id);
 
-  //! The server we are associated with
+  /// The server we are associated with
   public: Server *server;
   
-  //! The client we are associated with
+  /// The client we are associated with
   public: Client *client;
   
-  //! File descriptor for the mmap file
+  /// File descriptor for the mmap file
   public: int mmapFd;
 
-  //! Pointer to the mmap'ed mem
+  /// Pointer to the mmap'ed mem
   public: void *mMap;
 
-  //! The name of the file we created/opened
-  public: char *filename;
+  /// The name of the file we created/opened
+  public: std::string filename;
 
-  //! Interface version number
+  /// Interface version number
   public: int version;
 
-  //! Allocation size
+  /// Allocation size
   public: size_t size;
 
-  //! Type of model that owns this interface
-  //public: char modelType[GAZEBO_MAX_MODEL_TYPE];
+  /// Type of model that owns this interface
   public: std::string modelType;
 
-  //! ID of the model that owns this interface
+  /// ID of the model that owns this interface
   public: int modelId;
 
-  //! ID of the parent model
+  /// ID of the parent model
   public: int parentModelId;
 
   protected: std::string type;
@@ -365,17 +364,17 @@ class SimulationData
 class SimulationIface : public Iface
 {
   //! Create an interface
-  public: SimulationIface(): Iface("simulation",sizeof(SimulationIface)) {}
+  public: SimulationIface(): Iface("simulation",sizeof(SimulationIface)+sizeof(SimulationData)) {}
 
   //! Destroy an interface
   public: virtual ~SimulationIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, const char *id)
+  public: virtual int Create(Server *server, std::string id)
           {int result = Iface::Create(server,id); 
            this->data = (SimulationData*)this->mMap; 
            return result;}
 
-  public: virtual int Open(Client *client, const char *id)
+  public: virtual int Open(Client *client, std::string id)
           {int result = Iface::Open(client,id); 
            this->data = (SimulationData*)this->mMap; 
            return result;}
@@ -425,15 +424,15 @@ class CameraData
 //! The camera interface
 class CameraIface : public Iface
 {
-  public: CameraIface():Iface("camera", sizeof(CameraIface)) {}
+  public: CameraIface():Iface("camera", sizeof(CameraIface)+sizeof(CameraData)) {}
   public: virtual ~CameraIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, const char *id)
+  public: virtual int Create(Server *server, std::string id)
           {int result = Iface::Create(server,id); 
            this->data = (CameraData*)this->mMap; 
            return result;}
 
-  public: virtual int Open(Client *client, const char *id)
+  public: virtual int Open(Client *client, std::string id)
           {int result = Iface::Open(client,id); 
            this->data = (CameraData*)this->mMap; 
            return result;}
@@ -485,17 +484,17 @@ class PositionData
 class PositionIface : public Iface
 {
   //! Constructor
-  public: PositionIface():Iface("position", sizeof(PositionIface)) {}
+  public: PositionIface():Iface("position", sizeof(PositionIface)+sizeof(PositionData)) {}
 
   //! Destructor
   public: virtual ~PositionIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, const char *id)
+  public: virtual int Create(Server *server, std::string id)
           {int result = Iface::Create(server,id); 
            this->data = (PositionData*)this->mMap; 
            return result;}
 
-  public: virtual int Open(Client *client, const char *id)
+  public: virtual int Open(Client *client, std::string id)
           {int result = Iface::Open(client,id); 
            this->data = (PositionData*)this->mMap; 
            return result;}
@@ -544,17 +543,17 @@ class Graphics3dIface : public Iface
 {
 
   //! Constructor
-  public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dData)) {}
+  public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dData)+sizeof(Graphics3dData)) {}
 
   //! Destructor
   public: virtual ~Graphics3dIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, const char *id)
+  public: virtual int Create(Server *server, std::string id)
           {int result = Iface::Create(server,id); 
            this->data = (Graphics3dData*)this->mMap; 
            return result;}
 
-  public: virtual int Open(Client *client, const char *id)
+  public: virtual int Open(Client *client, std::string id)
           {int result = Iface::Open(client,id); 
            this->data = (Graphics3dData*)this->mMap; 
            return result;}

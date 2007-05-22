@@ -1,4 +1,5 @@
 #include <Ogre.h>
+
 #include "OgreAdaptor.hh"
 #include "SphereGeom.hh"
 #include "BoxGeom.hh"
@@ -9,6 +10,8 @@
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 Body::Body(Entity *parent, dWorldID worldId)
   : Entity(parent)
 {
@@ -25,6 +28,8 @@ Body::Body(Entity *parent, dWorldID worldId)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 Body::~Body()
 {
   this->geoms.clear();
@@ -47,7 +52,7 @@ int Body::Load(XMLConfigNode *node)
     this->LoadGeom(geomNode);
     geomNode = geomNode->GetNext();
   }
- 
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +115,7 @@ void Body::SetPosition(const Vector3 &pos)
   }
   else
   {
-    std::vector<Geom*>::iterator iter;
+    std::vector< Geom* >::iterator iter;
     for (iter=this->geoms.begin(); iter!=this->geoms.end(); iter++)
     {
       (*iter)->SetPosition(pos);
@@ -138,7 +143,7 @@ void Body::SetRotation(const Quatern &rot)
   }
   else
   {
-    std::vector<Geom*>::iterator iter;
+    std::vector< Geom* >::iterator iter;
     for (iter=this->geoms.begin(); iter!=this->geoms.end(); iter++)
     {
       //(*iter)->SetRotation(rot);
@@ -220,8 +225,7 @@ int Body::LoadGeom(XMLConfigNode *node)
   {
     double radius = node->GetDouble("size",0.0,0);
     geom = new SphereGeom(this, radius, mesh);
-
-    }
+  }
   else if (node->GetName() == "cylinder")
   {
     double radius = node->GetTupleDouble("size",0,1.0);
@@ -232,8 +236,7 @@ int Body::LoadGeom(XMLConfigNode *node)
   {
     Vector3 size = node->GetVector3("size",Vector3(1,1,1));
     geom = new BoxGeom(this, size, mesh);
-
-    }
+  }
   else if (node->GetName() == "plane")
   {
     Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
@@ -248,6 +251,8 @@ int Body::LoadGeom(XMLConfigNode *node)
 
   geom->SetName(node->GetString("name","",1));
   geom->SetMeshMaterial(node->GetString("material","",0));
+
+  this->AttachGeom(geom);
 
   return 0;
 }

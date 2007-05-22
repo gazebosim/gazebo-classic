@@ -61,7 +61,7 @@ class OgreAdaptor
   private: OgreAdaptor();
 
   /// Destructor
-  private: virtual ~OgreAdaptor();
+  public: virtual ~OgreAdaptor();
 
   public: static OgreAdaptor *Instance();
 

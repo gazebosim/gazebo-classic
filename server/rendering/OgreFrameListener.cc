@@ -17,9 +17,8 @@ using namespace gazebo;
 
 extern bool userQuit;
 
-OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )
+OgreFrameListener::OgreFrameListener()
 {
-  this->ogreAdaptor = ogreAdaptor;
   this->moveAmount = 1;
   this->rotateAmount = 1;
 
@@ -27,7 +26,7 @@ OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )
   size_t windowHnd = 0;
   std::ostringstream windowHndStr;
 
-  this->ogreAdaptor->window->getCustomAttribute("WINDOW",&windowHnd);
+  OgreAdaptor::Instance()->window->getCustomAttribute("WINDOW",&windowHnd);
   windowHndStr << windowHnd;
   pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
@@ -57,7 +56,7 @@ OgreFrameListener::OgreFrameListener( OgreAdaptor *ogreAdaptor )
 
   unsigned int width, height, depth;
   int top, left;
-  this->ogreAdaptor->window->getMetrics(width, height, depth, left, top);
+  OgreAdaptor::Instance()->window->getMetrics(width, height, depth, left, top);
   const OIS::MouseState &mouseState = this->mMouse->getMouseState();
   mouseState.width = width;
   mouseState.height = height;

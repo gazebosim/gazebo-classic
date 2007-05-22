@@ -98,7 +98,7 @@ messages are appended by default to a file called @c .gazebo located in your
 home directory, or to the log file specified with the -l command line option.
 */
 
-//#include <python2.4/Python.h>
+#include <python2.4/Python.h>
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
@@ -238,7 +238,7 @@ void SignalHandler( int /*dummy*/ )
 // Initialize the sim
 int Init()
 {
-  //Py_Initialize();
+  Py_Initialize();
 
   //struct tms cpu;
 
@@ -262,7 +262,8 @@ int Init()
   gazebo::ControllerFactory::RegisterAll();
   
   // Load the world file
-  gazebo::XMLConfig *xmlFile = new gazebo::XMLConfig();
+  gazebo::XMLConfig *xmlFile(new gazebo::XMLConfig());
+
   if (xmlFile->Load(worldFileName) != 0)
     return -1;
 
@@ -293,7 +294,7 @@ int Fini()
 {
   gazebo::World::Instance()->Fini();
 
-  //Py_Finalize();
+  Py_Finalize();
 
   return 0;
 }

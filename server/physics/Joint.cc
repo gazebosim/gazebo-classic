@@ -33,8 +33,6 @@ using namespace gazebo;
 // Constructor
 Joint::Joint()
 {
-  this->body1 = NULL;
-  this->body2 = NULL;
 }
 
 
@@ -59,7 +57,7 @@ Joint::Type Joint::GetType() const
 // Get the body to which the joint is attached according the _index
 Body *Joint::GetJointBody( int index ) const
 {
-  Body *result = NULL;
+  Body *result;
 
   if( index==0 || index==1 )
   {
@@ -105,14 +103,12 @@ void Joint::Attach( Body *one, Body *two )
   if (!one && two)
   {
     dJointAttach( this->jointId, 0, two->GetId() );
-    this->body1 = NULL;
     this->body2 = two;
   }
   else if (one && !two)
   {
     dJointAttach( this->jointId, one->GetId(), 0 );
     this->body1 = one;
-    this->body2 = NULL;
   }
   else if (one && two)
   {
@@ -120,7 +116,6 @@ void Joint::Attach( Body *one, Body *two )
     this->body1 = one;
     this->body2 = two;
   }
-  return;
 }
 
 

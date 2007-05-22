@@ -25,6 +25,7 @@
  * SVN info: $Id$
  */
 
+#include "gazebo.h"
 #include "IfaceFactory.hh"
 
 using namespace gazebo;

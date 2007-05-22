@@ -47,16 +47,14 @@ int GazeboClient::Init(int serverid, const char *prefixid)
     GazeboClient::prefixId = prefixid;
 
   GazeboClient::client = new Client();
-  assert(GazeboClient::client);
 
   // Use version 0.5.0
   if (GazeboClient::client->ConnectWait(serverid, GZ_CLIENT_ID_PLAYER) != 0)
     return -1;
 
   GazeboClient::sim = new SimulationIface();
-  assert(GazeboClient::sim);
 
-  if (GazeboClient::sim->Open(GazeboClient::client, "default") != 0)
+  if (GazeboClient::sim->Open( GazeboClient::client, "default") != 0)
   {
     printf("Gazeob Error: Unable to connect to the Gazebo Sim Interface\n");
     return -1;
@@ -76,14 +74,9 @@ int GazeboClient::Init(int serverid, const char *prefixid)
 int GazeboClient::Fini()
 {
   GazeboClient::sim->Close();
-  delete GazeboClient::sim;
-  GazeboClient::sim = NULL;
 
   if (GazeboClient::client->Disconnect() != 0)
     return -1;
-
-  delete GazeboClient::client;
-  GazeboClient::client = NULL;
 
   return 0;
 }

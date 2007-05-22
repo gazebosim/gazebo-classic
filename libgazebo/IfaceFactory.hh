@@ -33,10 +33,7 @@
 
 namespace gazebo
 {
-
-// Forward declarations
-class Iface;
-
+  class Iface;
 
 // Prototype for iface factory functions
 typedef Iface* (*IfaceFactoryFn) ();

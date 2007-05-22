@@ -73,7 +73,7 @@ int Entity::GetParentId() const
 
 
 // Set the parent
-void Entity::SetParent(Entity* parent)
+void Entity::SetParent(Entity *parent)
 {
   this->parent = parent;
 }
@@ -90,8 +90,10 @@ void Entity::AddChild(Entity *child)
   // Set the child's parent
   child->SetParent(this);
 
+  Ogre::SceneNode *newNode(this->sceneNode->createChildSceneNode());
+
   // The the child's scene node
-  child->SetSceneNode(this->sceneNode->createChildSceneNode());
+  child->SetSceneNode(newNode);
 
   child->SetStatic(this->IsStatic());
 
@@ -100,7 +102,7 @@ void Entity::AddChild(Entity *child)
 }
 
 // Get all children
-std::vector<Entity*> Entity::GetChildren()
+std::vector< Entity* > Entity::GetChildren()
 {
   return this->children;
 }

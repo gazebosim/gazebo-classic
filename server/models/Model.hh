@@ -27,11 +27,12 @@
 #ifndef MODEL_HH
 #define MODEL_HH
 
-//#include <python2.4/Python.h>
+#include <python2.4/Python.h>
 #include <map>
 #include <string>
 #include <vector>
 #include <map>
+
 #include "UpdateParams.hh"
 #include "Pose3d.hh"
 #include "Joint.hh"
@@ -164,20 +165,20 @@ class Model : public Entity
   private: Pose3d pose;
 
   /// Map of the bodies. std::string == body_name
-  protected: std::map<std::string, Body*> bodies;
+  protected: std::map<std::string, Body* > bodies;
 
   /// Map of the joints
-  protected: std::map<std::string, Joint*> joints;
+  protected: std::map<std::string, Joint* > joints;
 
   /// Map of the interfaces
-  protected: std::map<std::string, Iface*> ifaces;
+  protected: std::map<std::string, Iface* > ifaces;
 
   /// Map of the controllers
-  protected: std::map<std::string, Controller*> controllers;
+  protected: std::map<std::string, Controller* > controllers;
 
-  /*private: PyObject *pName;
-  private: PyObject *pModule;
-  private: PyObject *pFuncUpdate;
+/*  private: PyObject *pName;
+    private: PyObject *pModule;
+    private: PyObject *pFuncUpdate;
   */
 };
 

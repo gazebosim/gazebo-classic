@@ -41,6 +41,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sstream>
 
 #include "gz_error.h"
 #include "gazebo.h"
@@ -57,7 +58,6 @@ union semun
 // Create a server object
 Server::Server()
 {
-  this->filename = NULL;
 }
 
 // Destroy a server
@@ -90,26 +90,25 @@ int Server::Init(int serverId, int force)
   if (!user)
     user = "nobody";
 
-  // Figure out the directory name
-  snprintf(filename, sizeof(filename), "%s/gazebo-%s-%d",
-           tmpdir, user, this->serverId);
-  assert(this->filename == NULL);
-  this->filename = strdup(filename);  
+  std::ostringstream stream;
 
-  GZ_MSG1(5, "creating %s", this->filename);
+  stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
+  this->filename = stream.str();
+
+  GZ_MSG1(5, "creating %s", this->filename.c_str());
   
   // Create the directory
-  if (mkdir(this->filename, S_IRUSR | S_IWUSR | S_IXUSR) != 0)
+  if (mkdir(this->filename.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
   {
     if (errno == EEXIST)
     {
-      GZ_ERROR1("directory [%s] already exists (previous crash?)", this->filename);
+      GZ_ERROR1("directory [%s] already exists (previous crash?)", this->filename.c_str());
       GZ_ERROR("remove the directory and re-run gazebo");
       return -1;
     }
     else
     {    
-      GZ_ERROR2("failed to create [%s] : [%s]", this->filename, strerror(errno));
+      GZ_ERROR2("failed to create [%s] : [%s]", this->filename.c_str(), strerror(errno));
       return -1;
     }
   }
@@ -123,18 +122,15 @@ int Server::Fini()
 {
   char cmd[1024];
   
-  GZ_MSG1(5, "deleting %s", this->filename);
+  GZ_MSG1(5, "deleting %s", this->filename.c_str());
   
   // Delete the server dir
-  if (rmdir(this->filename) != 0)
+  if (rmdir(this->filename.c_str()) != 0)
   {
-    GZ_MSG2(0, "failed to cleanly remove [%s] : [%s]", this->filename, strerror(errno));
-    snprintf(cmd, sizeof(cmd), "rm -rf %s", this->filename);
+    GZ_MSG2(0, "failed to cleanly remove [%s] : [%s]", this->filename.c_str(), strerror(errno));
+    snprintf(cmd, sizeof(cmd), "rm -rf %s", this->filename.c_str());
     system(cmd);
   }
-  
-  assert(this->filename != NULL);
-  free(this->filename);
 
   // Finalize semaphores
   if (this->SemFini() < 0)

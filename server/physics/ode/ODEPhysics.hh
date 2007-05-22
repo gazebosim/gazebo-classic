@@ -57,7 +57,7 @@ class ODEPhysics : public PhysicsEngine
   // Collision attributes
   private: dJointGroupID contactGroup;
            
-  protected: std::map<int, Entity*> entities;
+  protected: std::map<int, Entity* > entities;
 };
 
 }

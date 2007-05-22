@@ -27,6 +27,7 @@
 #ifndef PIONEER2DX_POSITION2D_HH
 #define PIONEER2DX_POSITION2D_HH
 
+
 #include "Controller.hh"
 
 namespace gazebo

@@ -28,6 +28,7 @@
 #define JOINT_HH
 
 #include <ode/ode.h>
+
 #include "Vector3.hh"
 
 
@@ -91,10 +92,10 @@ class Joint
   protected: Type type;
 
   // The first body this joint connects to
-  private: Body* body1;
+  private: Body *body1;
 
   // The second body this joint connects to
-  private: Body* body2;
+  private: Body *body2;
 
   /// Name of this joint
   private: std::string name;

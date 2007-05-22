@@ -21,7 +21,7 @@
 /* Desc: The world; all models are collected here
  * Author: Andrew Howard and Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id$
+ * SVN: $Id:$
  */
 
 #ifndef WORLD_HH
@@ -113,7 +113,7 @@ class World
   private: World();
 
   /// Private destructor
-  private: ~World();
+  public: ~World();
 
   /// Get an instance of this World
   /// \return Instance of the World
@@ -175,7 +175,8 @@ class World
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
   /// \return 0 on success
-  private: int LoadModel(XMLConfigNode *node, Model *parent);
+  private: int LoadModel(XMLConfigNode *node, 
+                         Model *parent);
 
   /// Pointer to myself
   private: static World *myself;
@@ -184,7 +185,7 @@ class World
   private: PhysicsEngine *physicsEngine;
 
   /// List of all the models
-  private: std::vector<Model*> models;
+  private: std::vector< Model* > models;
 
   /// Simulator control interface
   private: Server *server;

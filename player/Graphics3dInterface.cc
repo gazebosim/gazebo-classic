@@ -62,7 +62,7 @@ Graphics3dInterface::~Graphics3dInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int Graphics3dInterface::ProcessMessage(MessageQueue *respQueue,
+int Graphics3dInterface::ProcessMessage(MessageQueue * /*respQueue*/,
                    player_msghdr_t *hdr, void *data)
 {
   int result = -1;
@@ -97,7 +97,7 @@ int Graphics3dInterface::ProcessMessage(MessageQueue *respQueue,
     this->iface->data->color.b = cmd->color.blue/255.0;
     this->iface->data->color.a = cmd->color.alpha/255.0;
 
-    for (int i=0; i<this->iface->data->point_count; i++)
+    for (unsigned int i=0; i<this->iface->data->point_count; i++)
     {
       this->iface->data->points[i].x = cmd->points[i].px;
       this->iface->data->points[i].y = cmd->points[i].py;

@@ -21,7 +21,7 @@ class OgreAdaptor;
 
 class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener
 {
-  public: OgreFrameListener( OgreAdaptor *ogreAdaptor );
+  public: OgreFrameListener();
   public: virtual ~OgreFrameListener();
 
   public: virtual bool frameStarted( const Ogre::FrameEvent &evt);
@@ -40,7 +40,6 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
 
   private: Ogre::Vector3 directionVec;
 
-  private: OgreAdaptor *ogreAdaptor;
   private: float moveAmount;
   private: float rotateAmount;
 

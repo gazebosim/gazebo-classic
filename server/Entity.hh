@@ -24,6 +24,7 @@
  * Date: 03 Apr 2007
  * SVN: $Id$
  */
+
 #ifndef ENTITY_HH
 #define ENTITY_HH
 
@@ -51,7 +52,7 @@ class Entity
 {
   /// Constructor
   /// \param parent Parent of the entity.
-  public: Entity(Entity *parent=NULL);
+  public: Entity(Entity *parent = NULL);
 
    /// Destructor
   public: virtual ~Entity();
@@ -66,7 +67,7 @@ class Entity
 
   /// Set the parent
   /// \param parent Parent entity
-  public: void SetParent(Entity* parent);
+  public: void SetParent(Entity *parent);
 
   /// Get the parent
   /// \return Pointer to the parent entity
@@ -78,7 +79,7 @@ class Entity
 
   /// Get all children
   /// \return Vector of children entities
-  public: std::vector<Entity*> GetChildren();
+  public: std::vector< Entity* > GetChildren();
 
   /// Return this entity's sceneNode
   /// \return Ogre scene node
@@ -108,7 +109,7 @@ class Entity
   private: Entity *parent;
 
   /// Children of this entity
-  private: std::vector<Entity*> children;
+  private: std::vector< Entity* > children;
 
   /// This entities ID
   private: unsigned int id;

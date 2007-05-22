@@ -36,6 +36,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sstream>
 
 #include "gz_error.h"
 #include "gazebo.h"
@@ -46,7 +47,6 @@ using namespace gazebo;
 // Create a client object
 Client::Client()
 {
-  this->filename = NULL;
 }
 
 // Destroy a client
@@ -73,7 +73,7 @@ int Client::ConnectWait(int serverId, int clientId)
 {
   char *tmpdir;
   char *user;
-  char tmpfilename[128];
+  //char tmpfilename[128];
 
   // Check client id
   if (clientId >= 0 && clientId >= 16)
@@ -100,14 +100,18 @@ int Client::ConnectWait(int serverId, int clientId)
   if (!user)
     user = "nobody";
 
+  std::ostringstream stream;
+  stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
+
   // Figure out the directory name
-  snprintf(tmpfilename, sizeof(tmpfilename), "%s/gazebo-%s-%d",
+  /*snprintf(tmpfilename, sizeof(tmpfilename), "%s/gazebo-%s-%d",
            tmpdir, user, this->serverId);
 
   assert(this->filename == NULL);
-  this->filename = strdup(tmpfilename);
+  */
+  this->filename = stream.str();//tmpfilename;
   
-  GZ_MSG1(1, "opening %s", this->filename);
+  GZ_MSG1(1, "opening %s", this->filename.c_str());
   
   return 0;
 }
@@ -116,10 +120,11 @@ int Client::ConnectWait(int serverId, int clientId)
 // Disconnect from the server
 int Client::Disconnect()
 {
-  GZ_MSG1(1, "closing %s", this->filename);
+  GZ_MSG1(1, "closing %s", this->filename.c_str());
 
-  assert(this->filename != NULL);
+/*  assert(this->filename != NULL);
   free(this->filename);
+  */
 
   // Finalize semaphores
   if (this->clientId >= 0)

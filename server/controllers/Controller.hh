@@ -62,13 +62,13 @@ class Controller
   public: int Fini();
 
   /// Load function for the child class
-  protected: virtual int LoadChild(XMLConfigNode *node) {return 0;}
+  protected: virtual int LoadChild(XMLConfigNode * /*node*/) {return 0;}
 
   /// Init function for the child class
   protected: virtual int InitChild() {return 0;}
 
   /// Update function for the child class
-  protected: virtual int UpdateChild(UpdateParams &params) {return 0;}
+  protected: virtual int UpdateChild(UpdateParams &/*params*/) {return 0;}
 
   /// Fini function for the child class
   protected: virtual int FiniChild() {return 0;}
@@ -77,7 +77,7 @@ class Controller
   public: std::string GetName() const;
 
   /// The interface for the controller
-  public: virtual void SetIface(Iface *iface) {return;}
+  public: virtual void SetIface(Iface * /*iface*/) {return;}
 
   /// Set the model for the controller
   public: void SetModel(Model *model); 

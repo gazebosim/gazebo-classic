@@ -29,6 +29,7 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "HingeJoint.hh"
+#include "World.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
@@ -44,8 +45,6 @@ enum {LEFT, RIGHT};
 // Constructor
 Pioneer2dx_Position2d::Pioneer2dx_Position2d()
 {
-  this->joints[0] = NULL;
-  this->joints[1] = NULL;
   this->enableMotors = true;
 
   this->wheelSpeed[0] = 0;
@@ -101,7 +100,6 @@ int Pioneer2dx_Position2d::InitChild()
 int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 {
   // TODO: Step should be in a parameter of this function
-  double step;
   double wd, ws;
   double d1, d2;
   double dr, da;
@@ -110,8 +108,8 @@ int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
   ws = this->wheelSep;
 
   // Distance travelled by front wheels
-  d1 = step * wd / 2 * this->joints[LEFT]->GetAngleRate();
-  d2 = step * wd / 2 * this->joints[RIGHT]->GetAngleRate();
+  d1 = params.stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
+  d2 = params.stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
 
   dr = (d1 + d2) / 2;
   da = (d2 - d1) / ws;
@@ -122,9 +120,9 @@ int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
   this->odomPose[2] += da;
 
   // Compute odometric instantaneous velocity
-  this->odomVel[0] = dr / step;
+  this->odomVel[0] = dr / params.stepTime;
   this->odomVel[1] = 0.0;
-  this->odomVel[2] = da / step;
+  this->odomVel[2] = da / params.stepTime;
 
   this->GetPositionCmd();
 
@@ -144,12 +142,15 @@ int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
     this->joints[LEFT]->SetParam( dParamVel, 0.0 ); 
     this->joints[RIGHT]->SetParam( dParamVel, 0.0 );
   }
+
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the controller
 int Pioneer2dx_Position2d::FiniChild()
 {
+  this->iface->Destroy();
   return 0;
 }
 
@@ -185,7 +186,7 @@ void Pioneer2dx_Position2d::PutPositionData()
   this->iface->Lock(1);
   
   // TODO: Data timestamp
-  //this->iface->data->time = World::Instance()->GetSimTime();
+  this->iface->data->time = World::Instance()->GetSimTime();
 
   this->iface->data->pose.x = this->odomPose[0];
   this->iface->data->pose.y = this->odomPose[1];

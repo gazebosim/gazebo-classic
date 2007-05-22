@@ -53,11 +53,6 @@ Model::Model()
 {
   this->name = "";
   this->type = "";
-
- /* this->pName = NULL;
-  this->pModule = NULL;
-  this->pFuncUpdate = NULL;
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,16 +60,16 @@ Model::Model()
 Model::~Model()
 {
   this->bodies.clear();
+  this->joints.clear();
+  this->ifaces.clear();
+  this->controllers.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the model
 int Model::Load(XMLConfigNode *node)
 {
-  XMLConfigNode *bodyNode = NULL;
-  XMLConfigNode *jointNode = NULL;
-  XMLConfigNode *ifaceNode = NULL;
-  XMLConfigNode *controllerNode = NULL;
+  XMLConfigNode *childNode;
   Body *body;
 
   if (node->GetName() == "xml")
@@ -83,77 +78,78 @@ int Model::Load(XMLConfigNode *node)
     this->SetStatic(node->GetBool("static",false,0));
 
     // Load the bodies
-    bodyNode = node->GetChildByNSPrefix("body");
+    childNode = node->GetChildByNSPrefix("body");
 
-    while (bodyNode)
+    while (childNode)
     {
-      if (this->LoadBody(bodyNode) != 0)
-        std::cerr << "Error Loading body[" << bodyNode->GetName() << "]\n";
+      if (this->LoadBody(childNode) != 0)
+        std::cerr << "Error Loading body[" << childNode->GetName() << "]\n";
 
-      bodyNode = bodyNode->GetNextByNSPrefix("body");
+      childNode = childNode->GetNextByNSPrefix("body");
     }
-
 
     // Load the joints
-    jointNode = node->GetChildByNSPrefix("joint");
+    childNode = node->GetChildByNSPrefix("joint");
 
-    while (jointNode)
+    while (childNode)
     {
-      if (this->LoadJoint(jointNode) != 0)
-        std::cerr << "Error Loading Joint[" << jointNode->GetName() << "]\n";
+      if (this->LoadJoint(childNode) != 0)
+        std::cerr << "Error Loading Joint[" << childNode->GetName() << "]\n";
 
-      jointNode = jointNode->GetNextByNSPrefix("joint");
+      childNode = childNode->GetNextByNSPrefix("joint");
     }
 
-  }
+    // Load interfaces
+    childNode = node->GetChildByNSPrefix("interface");
 
-  // Load interfaces
-  ifaceNode = node->GetChildByNSPrefix("interface");
-  while (ifaceNode)
-  {
-    try
+    while (childNode)
     {
-      this->LoadIface(ifaceNode);
-    }
-    catch (gazebo::GazeboError e)
-    {
-      std::cerr << "Error Loading Interface[" << ifaceNode->GetName() << "]\n" 
-                << e << std::endl;
-    }
-    ifaceNode = ifaceNode->GetNextByNSPrefix("interface");
-  }
+      try
+      {
+        this->LoadIface(childNode);
+      }
+      catch (gazebo::GazeboError e)
+      {
+        std::cerr << "Error Loading Interface[" << childNode->GetName() << "]\n" 
+          << e << std::endl;
+      }
 
-  // Load controller
-  controllerNode = node->GetChildByNSPrefix("controller");
-  while (controllerNode)
-  {
-    try{
-      this->LoadController(controllerNode);
+      childNode = childNode->GetNextByNSPrefix("interface");
     }
-    catch (GazeboError e)
+
+    // Load controller
+    childNode = node->GetChildByNSPrefix("controller");
+    while (childNode)
     {
-      std::cerr << "Error Loading Controller[" << controllerNode->GetName() 
-                << "]\n" << e << std::endl;
+      try
+      {
+        this->LoadController(childNode);
+      }
+      catch (GazeboError e)
+      {
+        std::cerr << "Error Loading Controller[" << childNode->GetName() 
+          << "]\n" << e << std::endl;
+      }
+      childNode = childNode->GetNextByNSPrefix("controller");
     }
-    controllerNode = controllerNode->GetNextByNSPrefix("controller");
   }
 
 
   // Get the name of the python module
-  /*this->pName = PyString_FromString(node->GetString("python","",0).c_str());
-  //this->pName = PyString_FromString("pioneer2dx");
+  /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
+  //this->pName.reset(PyString_FromString("pioneer2dx"));
 
   // Import the python module
   if (this->pName)
   {
-    this->pModule = PyImport_Import(this->pName);
+    this->pModule.reset(PyImport_Import(this->pName));
     Py_DECREF(this->pName);
   }
 
   // Get the Update function from the module
-  if (this->pModule != NULL) 
+  if (this->pModule) 
   {
-    this->pFuncUpdate = PyObject_GetAttrString(this->pModule, "Update");
+    this->pFuncUpdate.reset(PyObject_GetAttrString(this->pModule, "Update"));
     if (this->pFuncUpdate && !PyCallable_Check(this->pFuncUpdate))
       this->pFuncUpdate = NULL;
   }
@@ -173,8 +169,8 @@ int Model::Init()
 // Update the model
 int Model::Update(UpdateParams &params)
 {
-  std::map<std::string, Body*>::iterator bodyIter;
-  std::map<std::string, Controller*>::iterator contIter;
+  std::map<std::string, Body* >::iterator bodyIter;
+  std::map<std::string, Controller* >::iterator contIter;
 
   for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
@@ -203,6 +199,22 @@ int Model::Update(UpdateParams &params)
 // Finalize the model
 int Model::Fini()
 {
+  std::map<std::string, Body* >::iterator bodyIter;
+  std::map<std::string, Iface* >::iterator ifaceIter;
+  std::map<std::string, Controller* >::iterator contIter;
+
+  for (ifaceIter = this->ifaces.begin(); 
+       ifaceIter != this->ifaces.end(); ifaceIter++)
+  {
+    ifaceIter->second->Destroy();
+  }
+
+  for (contIter = this->controllers.begin(); 
+       contIter != this->controllers.end(); contIter++)
+  {
+    contIter->second->Fini();
+  }
+
   return this->FiniChild();
 }
 
@@ -267,7 +279,7 @@ const Pose3d &Model::GetInitPose() const
 void Model::SetPose(const Pose3d &pose)
 {
   Body *body;
-  std::map<std::string, Body*>::iterator iter;
+  std::map<std::string, Body* >::iterator iter;
 
   Pose3d origPose, newPose, bodyPose;
 
@@ -284,7 +296,6 @@ void Model::SetPose(const Pose3d &pose)
     body = iter->second;
 
     bodyPose = body->GetPose();
-
 
     // Compute the pose relative to the model
     //bodyPose = bodyPose - origPose;
@@ -313,9 +324,8 @@ const Pose3d &Model::GetPose() const
 Body *Model::CreateBody()
 {
   // Create a new body
-  Body *newBody = World::Instance()->GetPhysicsEngine()->CreateBody(this);
+  return  World::Instance()->GetPhysicsEngine()->CreateBody(this);
 
-  return newBody;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -328,13 +338,13 @@ Joint *Model::CreateJoint(Joint::Type type)
 ////////////////////////////////////////////////////////////////////////////////
 Joint *Model::GetJoint(std::string name)
 {
-  if (!this->joints[name])
-  {
-    this->joints.erase(name);
-    return NULL;
-  }
+  std::map<std::string, Joint* >::const_iterator iter;
+  iter = this->joints.find(name);
+
+  if (iter != this->joints.end())
+    return iter->second;
   else
-    return this->joints[name];
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -346,10 +356,11 @@ int Model::LoadBody(XMLConfigNode *node)
 
   // Create a new body
   Body *body = this->CreateBody();
- 
+
   // Load the body using the config node. This also loads all of the 
   // bodies geometries
   body->Load(node);
+
 
   // Store this body
   if (this->bodies[body->GetName()])
@@ -368,11 +379,11 @@ int Model::LoadJoint(XMLConfigNode *node)
   if (!node)
     return -1;
 
-  Joint *joint = NULL;
+  Joint *joint;
 
-  Body *body1 = this->bodies[node->GetString("body1","",1)];
-  Body *body2 = this->bodies[node->GetString("body2","",1)];
-  Body *anchorBody = this->bodies[node->GetString("anchor","",1)];
+  Body *body1(this->bodies[node->GetString("body1","",1)]);
+  Body *body2(this->bodies[node->GetString("body2","",1)]);
+  Body *anchorBody(this->bodies[node->GetString("anchor","",1)]);
   Vector3 anchorVec = node->GetVector3("anchor",Vector3(0,0,0));
 
   if (!body1)
@@ -420,17 +431,22 @@ int Model::LoadJoint(XMLConfigNode *node)
   // Set the axis of the hing joint
   if (node->GetName() == "hinge")
   {
-    ((HingeJoint*)joint)->SetAxis(node->GetVector3("axis",Vector3(0,0,1)));
+    HingeJoint *hinge = (HingeJoint*)(joint);
+    hinge->SetAxis(node->GetVector3("axis",Vector3(0,0,1)));
   }
   else if (node->GetName() == "hinge2")
   {
-    ((Hinge2Joint*)joint)->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
-    ((Hinge2Joint*)joint)->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
+    Hinge2Joint *hinge = (Hinge2Joint*)(joint);
+
+    hinge->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
+    hinge->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
   }
   else if (node->GetName() == "universal")
   {
-    ((UniversalJoint*)joint)->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
-    ((UniversalJoint*)joint)->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
+    UniversalJoint *uni = (UniversalJoint*)(joint);
+
+    uni->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
+    uni->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
   }
 
   // Set joint parameters
@@ -456,7 +472,7 @@ void Model::LoadIface(XMLConfigNode *node)
   if (!node)
     throw GazeboError("Model::LoadIface","node parameter is NULL");
 
-  Iface *iface = NULL;
+  Iface *iface;
 
   // Type and unique name of the iface
   std::string ifaceType = node->GetName();
@@ -467,7 +483,7 @@ void Model::LoadIface(XMLConfigNode *node)
 
   // Create the iface
   if (iface->Create(gazebo::World::Instance()->GetGzServer(),
-        this->GetName().c_str()) != 0)
+                    this->GetName().c_str()) != 0)
   {
     std::ostringstream stream;
     stream << "Error creating " << ifaceName << "interface\n";
@@ -486,8 +502,8 @@ void Model::LoadController(XMLConfigNode *node)
   if (!node)
     throw GazeboError("Model::LoadController","node parameter is NULL");
 
-  Controller *controller = NULL;
-  Iface *iface = NULL;
+  Controller *controller;
+  Iface *iface;
 
   // Get the controller's type
   std::string controllerType = node->GetName();
