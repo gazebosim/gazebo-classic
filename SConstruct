@@ -28,6 +28,7 @@ env = Environment (
     '#server/rendering',
     '#server/sensors', 
     '#server/sensors/camera',
+    '#server/sensors/ray',
     '#server/physics',
     '#server/physics/ode',
     '#server/controllers',

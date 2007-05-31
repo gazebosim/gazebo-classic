@@ -50,8 +50,8 @@ SimulationInterface::~SimulationInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int SimulationInterface::ProcessMessage(MessageQueue *respQueue,
-                   player_msghdr_t *hdr, void *data)
+int SimulationInterface::ProcessMessage(MessageQueue * /*respQueue*/,
+                   player_msghdr_t *hdr, void * /*data*/)
 {
   if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
         PLAYER_SIMULATION_REQ_SET_POSE2D, this->device_addr))

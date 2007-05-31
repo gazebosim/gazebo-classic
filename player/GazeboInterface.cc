@@ -31,7 +31,7 @@
 using namespace gazebo;
 
 GazeboInterface::GazeboInterface(player_devaddr_t addr, GazeboDriver *driver,
-          ConfigFile *cf, int section)
+          ConfigFile * /*cf*/, int /*section*/)
 {
   this->device_addr = addr;
   this->driver = driver;
