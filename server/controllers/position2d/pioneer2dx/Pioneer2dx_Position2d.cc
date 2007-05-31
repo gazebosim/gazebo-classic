@@ -71,10 +71,10 @@ int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
   this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->model->GetJoint(rightJointName));
 
   if (!this->joints[LEFT])
-    throw GazeboError("Pioneer2dx_Position2d::LoadChild","couldn't get left hinge joint");
+    gzthrow("couldn't get left hinge joint");
 
   if (!this->joints[RIGHT])
-    throw GazeboError("Pioneer2dx_Position2d::LoadChild","couldn't get right hinge joint");
+    gzthrow("couldn't get right hinge joint");
 
   return 0;
 }
@@ -161,7 +161,7 @@ void Pioneer2dx_Position2d::SetIface(Iface *iface)
   this->iface = dynamic_cast<PositionIface*>(iface);
 
   if (!this->iface)
-    throw GazeboError("Pioneer2dx_Position2d::SetIface","iface is not of type PositionIface");
+    gzthrow("iface is not of type PositionIface");
 }
 
 //////////////////////////////////////////////////////////////////////////////

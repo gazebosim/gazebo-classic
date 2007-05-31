@@ -29,6 +29,8 @@
 
 #include <Ogre.h>
 
+#include "Sensor.hh"
+
 // Forward Declarations
 namespace Ogre
 {
@@ -46,7 +48,7 @@ namespace gazebo
 /// This sensor is used for simulating standard monocular cameras; is
 /// is used by both camera models (e.g., SonyVID30) and user interface
 /// models (e.g., ObserverCam).
-class Camera
+class Camera : public Sensor
 {
   // Constructor
   public: Camera();

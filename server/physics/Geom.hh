@@ -82,7 +82,7 @@ class Geom : public Entity
 
   private: Ogre::Entity *meshEntity;
 
-  private: dGeomID geomId;
+  protected: dGeomID geomId;
 
   private: static int geomIdCounter;
 

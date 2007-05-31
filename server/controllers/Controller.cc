@@ -49,7 +49,7 @@ Controller::~Controller()
 int Controller::Load(XMLConfigNode *node)
 {
   if (!this->model)
-    throw GazeboError("Controller::Load","model has not been set");
+    gzthrow("model has not been set");
 
   this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
 

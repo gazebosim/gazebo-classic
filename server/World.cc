@@ -25,8 +25,11 @@
  */
 
 #include <assert.h>
+#include <sstream>
 #include <sys/time.h>
 
+#include "Sensor.hh"
+#include "SensorFactory.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
 #include "PhysicsEngine.hh"
@@ -110,7 +113,7 @@ int World::Load(XMLConfig *config, int serverId)
   if (this->simIface->Create(this->server, "default" ) != 0)
     return -1;
 
-  this->LoadModel(rootNode, NULL);
+  this->LoadEntities(rootNode, NULL);
 
   this->physicsEngine->Load();
 
@@ -122,11 +125,19 @@ int World::Load(XMLConfig *config, int serverId)
 int World::Init()
 {
   std::vector< Model* >::iterator iter;
+  std::vector< Sensor* >::iterator sensorIter;
 
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
     (*iter)->Init();
   }
+
+  for (sensorIter=this->sensors.begin(); 
+       sensorIter!=this->sensors.end(); sensorIter++)
+  {
+    (*sensorIter)->Init();
+  }
+
 
   // Set initial simulator state
   this->simIface->Lock(1);
@@ -144,6 +155,7 @@ int World::Update()
 {
   UpdateParams params;
   std::vector< Model* >::iterator iter;
+  std::vector< Sensor* >::iterator sensorIter;
   this->physicsEngine->Update();
 
   this->simTime += this->stepTime;
@@ -153,6 +165,13 @@ int World::Update()
   {
     (*iter)->Update(params);
   }
+
+  for (sensorIter=this->sensors.begin(); 
+       sensorIter!=this->sensors.end(); sensorIter++)
+  {
+    (*sensorIter)->Update(params);
+  }
+
 
   OgreAdaptor::Instance()->Render();
 
@@ -170,12 +189,21 @@ int World::Update()
 int World::Fini()
 {
   std::vector< Model* >::iterator iter;
+  std::vector< Sensor* >::iterator sensorIter;
 
   // Finalize the models
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
     (*iter)->Fini();
   }
+
+  // Finalize the sensors
+  for (sensorIter=this->sensors.begin(); 
+       sensorIter!=this->sensors.end(); sensorIter++)
+  {
+    (*sensorIter)->Fini();
+  }
+
 
   this->physicsEngine->Fini();
 
@@ -256,68 +284,21 @@ double World::GetWallTime() const
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-int World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
+int World::LoadEntities(XMLConfigNode *node, Model *parent)
 {
   XMLConfigNode *cnode;
-  Model *model;
-  Pose3d pose;
+  Model *model = NULL;
 
   if (node->GetNSPrefix() != "")
   {
     // Check for model nodes
     if (node->GetNSPrefix() == "model")
     {
-
-      if (node->GetName() == "xml")
-      {
-        model = new Model();
-      }
-      else
-      {
-        // Instantiate the model
-        model = ModelFactory::NewModel( node->GetName() );
-
-        if (!model)
-        {
-          std::cout << "unknown model class or class disabled [" << node->GetName() << "]\n";
-          return 0;
-        }
-      }
-
-      if (model)
-      {
-        model->SetType(node->GetName());
-
-        // Recall the node this model is attached to, so we can save
-        // back the data later.
-        model->SetXMLConfigNode(node);
-
-        // Set the id of the model
-        model->SetName( node->GetString( "name", "", 0 ) );
-
-        if (model->GetName() == "")
-        {
-          model->SetName( node->GetName() );
-        }
-
-        // Load the model
-        if (model->Load( node ) != 0)
-          return -1;
-
-        // Get the position and orientation of the model (relative to parent)
-        pose.Reset();
-        pose.pos = node->GetVector3( "xyz", pose.pos );
-        pose.rot = node->GetRotation( "rpy", pose.rot );
-
-        // Set the model's pose (relative to parent)
-        model->SetPose(pose);
-
-        // Record the model's initial pose (for reseting)
-        model->SetInitPose(pose);
-
-        // Add the model to our list
-        this->models.push_back(model);
-      }
+      model = this->LoadModel(node, parent);
+    }
+    else if (node->GetNSPrefix() == "sensor")
+    {
+      this->LoadSensor(node, parent);
     }
     else if (node->GetNSPrefix() == "param")
     {
@@ -332,10 +313,94 @@ int World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
   // Load children
   for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
   {
-    if (this->LoadModel( cnode, model ) != 0)
+    if (this->LoadEntities( cnode, model ) != 0)
       return -1;
   }
 
   return 0;
 }
 
+Model *World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
+{
+  Model *model = NULL;
+  Pose3d pose;
+
+
+  if (node->GetName() == "xml")
+  {
+    model = new Model();
+  }
+  else
+  {
+    // Instantiate the model
+    model = ModelFactory::NewModel( node->GetName() );
+
+    if (!model)
+    {
+      std::cout << "unknown model class or class disabled [" << node->GetName() << "]\n";
+      return 0;
+    }
+  }
+
+  if (model)
+  {
+    model->SetType(node->GetName());
+
+    // Recall the node this model is attached to, so we can save
+    // back the data later.
+    model->SetXMLConfigNode(node);
+
+    // Set the id of the model
+    model->SetName( node->GetString( "name", "", 0 ) );
+
+    if (model->GetName() == "")
+    {
+      model->SetName( node->GetName() );
+    }
+
+    // Load the model
+    if (model->Load( node ) != 0)
+      return NULL;
+
+    // Get the position and orientation of the model (relative to parent)
+    pose.Reset();
+    pose.pos = node->GetVector3( "xyz", pose.pos );
+    pose.rot = node->GetRotation( "rpy", pose.rot );
+
+    // Set the model's pose (relative to parent)
+    model->SetPose(pose);
+
+    // Record the model's initial pose (for reseting)
+    model->SetInitPose(pose);
+
+    // Add the model to our list
+    this->models.push_back(model);
+  }
+
+  return model;
+}
+
+void World::LoadSensor(XMLConfigNode *node, Model * /*parent*/)
+{
+  Sensor *sensor = NULL;
+
+  if (node==NULL)
+  {
+    std::ostringstream stream;
+    stream << "Null node pointer. Invalid sensor in the world file.";
+    gzthrow(stream.str());
+  }
+
+  sensor = SensorFactory::NewSensor(node->GetName());
+  if (sensor)
+  {
+    sensor->Load(node);
+    this->sensors.push_back(sensor);
+  }
+  else
+  {
+    std::ostringstream stream;
+    stream << "Null sensor. Invalid sensor name[" << node->GetName() << "]";
+    gzthrow(stream.str());
+  }
+}

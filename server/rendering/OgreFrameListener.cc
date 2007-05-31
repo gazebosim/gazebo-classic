@@ -131,6 +131,8 @@ bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
     case OIS::KC_Q:
       this->directionVec.y += this->moveAmount;
       break;
+    default:
+      break;
   }
 
   return true;
@@ -169,6 +171,8 @@ bool OgreFrameListener::keyReleased( const OIS::KeyEvent &e )
     case OIS::KC_Q:
       this->directionVec.y -= this->moveAmount;
       break;
+    default:
+      break;
   }
 
   return true;
@@ -196,7 +200,7 @@ bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
    return true;
 }
 
-bool OgreFrameListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
+bool OgreFrameListener::mousePressed(const OIS::MouseEvent & /*e*/, OIS::MouseButtonID id)
 {
   //CEGUI::MouseCursor::getSingleton().hide();
 
@@ -211,12 +215,14 @@ bool OgreFrameListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonI
     case OIS::MB_Middle:
       this->middlePressed = true;
       break;
+    default:
+      break;
   }
 
   return true;
 }
 
-bool OgreFrameListener::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id)
+bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & /*e*/, OIS::MouseButtonID id)
 {
 //  CEGUI::MouseCursor::getSingleton().show();
 
@@ -230,6 +236,8 @@ bool OgreFrameListener::mouseReleased(const OIS::MouseEvent &e, OIS::MouseButton
       break;
     case OIS::MB_Middle:
       this->middlePressed = false;
+      break;
+    default:
       break;
   }
 

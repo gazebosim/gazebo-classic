@@ -106,6 +106,7 @@ home directory, or to the log file specified with the -l command line option.
 
 #include "XMLConfig.hh"
 #include "ModelFactory.hh"
+#include "SensorFactory.hh"
 #include "IfaceFactory.hh"
 #include "ControllerFactory.hh"
 #include "World.hh"
@@ -258,6 +259,7 @@ int Init()
 
   // Register static models
   gazebo::ModelFactory::RegisterAll();
+  gazebo::SensorFactory::RegisterAll();
   gazebo::IfaceFactory::RegisterAll();
   gazebo::ControllerFactory::RegisterAll();
   

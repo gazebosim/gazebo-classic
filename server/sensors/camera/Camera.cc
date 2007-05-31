@@ -47,6 +47,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor 
 Camera::Camera()
+  : Sensor()
 {
   //this->cameraPose = GzPoseSet(GzVectorZero(), GzQuaternIdent());
 
@@ -71,7 +72,7 @@ Camera::~Camera()
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the sensor
 int Camera::Init(int width, int height, double hfov, double minDepth, 
-    double maxDepth, int zBufferDepth)
+    double maxDepth, int /*zBufferDepth*/)
 {
   this->imageWidth = width;
   this->imageHeight = height;
@@ -212,7 +213,7 @@ const unsigned char *Camera::GetImageData()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the Z-buffer value at the given image coordinate
-double Camera::GetZValue(int x, int y)
+double Camera::GetZValue(int /*x*/, int /*y*/)
 {
   //GLfloat iz;
 
@@ -392,7 +393,7 @@ void Camera::GetImageSize(int *w, int *h)
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the base filename for saved frames
-void Camera::SetSavePath(const char *pathname)
+void Camera::SetSavePath(const char * /*pathname*/)
 {
 /*  char tmp[1024];
     
@@ -409,7 +410,7 @@ void Camera::SetSavePath(const char *pathname)
 
 //////////////////////////////////////////////////////////////////////////////
 // Enable or disable saving
-void Camera::EnableSaveFrame(bool enable)
+void Camera::EnableSaveFrame(bool /*enable*/)
 {
   //this->saveEnable = enable;
   return;

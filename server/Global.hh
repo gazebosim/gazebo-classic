@@ -93,6 +93,5 @@ typedef int (*gz_plugin_init_fn_t) (void);
 
 #define ROUND(x) ( (int)( floor((x)+0.5) ) )
 
-
 #endif
 

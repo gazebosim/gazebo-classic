@@ -109,6 +109,27 @@ const Pose3d &Pose3d::operator-=(const Pose3d &obj)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Add one point to a vector: result = this + pos
+Vector3 Pose3d::CoordPositionAdd(const Vector3 &pos)
+{
+  Quatern tmp;
+  Vector3 result;
+
+  // result = pose.rot + pose.rot * this->pos * pose.rot!
+  tmp.u = 0.0;
+  tmp.x = pos.x;
+  tmp.y = pos.y;
+  tmp.z = pos.z;
+
+  tmp = this->rot * (tmp * this->rot.GetInverse());
+  result.x = this->pos.x + tmp.x;
+  result.y = this->pos.y + tmp.y;
+  result.z = this->pos.z + tmp.z;
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Add one point to another: result = this + pose
 Vector3 Pose3d::CoordPositionAdd(const Pose3d &pose)
 {

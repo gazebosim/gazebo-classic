@@ -29,6 +29,7 @@
 #include <sstream>
 #include <iostream>
 #include <Ogre.h>
+#include "Global.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
 #include "XMLConfig.hh"
@@ -70,7 +71,6 @@ Model::~Model()
 int Model::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
-  Body *body;
 
   if (node->GetName() == "xml")
   {
@@ -457,7 +457,7 @@ int Model::LoadJoint(XMLConfigNode *node)
   joint->SetName(node->GetString("name","",1));
 
   if (this->joints[joint->GetName()] != NULL)
-    throw GazeboError("Model::LoadJoint", "can't have two joint with the same name");
+    gzthrow( "can't have two joint with the same name");
 
   this->joints[joint->GetName()] = joint;
 
@@ -470,7 +470,7 @@ int Model::LoadJoint(XMLConfigNode *node)
 void Model::LoadIface(XMLConfigNode *node)
 {
   if (!node)
-    throw GazeboError("Model::LoadIface","node parameter is NULL");
+    gzthrow( "node parameter is NULL" );
 
   Iface *iface;
 
@@ -487,8 +487,7 @@ void Model::LoadIface(XMLConfigNode *node)
   {
     std::ostringstream stream;
     stream << "Error creating " << ifaceName << "interface\n";
-
-    throw GazeboError("Model::LoadIface",stream.str());
+    gzthrow(stream.str()); 
   }
 
   // Store the iface
@@ -500,7 +499,7 @@ void Model::LoadIface(XMLConfigNode *node)
 void Model::LoadController(XMLConfigNode *node)
 {
   if (!node)
-    throw GazeboError("Model::LoadController","node parameter is NULL");
+    gzthrow( "node parameter is NULL" );
 
   Controller *controller;
   Iface *iface;
@@ -523,8 +522,8 @@ void Model::LoadController(XMLConfigNode *node)
   if (!iface)
   {
     std::ostringstream stream;
-    stream << "couldn't find interface[" << ifaceName << "] for controller[" <<controllerName << "]";
-    throw GazeboError("Model::LoadController", stream.str());
+    stream <<  "couldn't find interface[" << ifaceName << "] for controller[" <<controllerName << "]";
+    gzthrow(stream.str());
   }
 
   // Attach the iface to the controller

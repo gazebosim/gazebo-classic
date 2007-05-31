@@ -18,43 +18,46 @@ namespace gazebo
 
 class ODEPhysics : public PhysicsEngine
 {
-  // Constructor
+  /// Constructor
   public: ODEPhysics();
 
-  // Destructor
+  /// Destructor
   public: virtual ~ODEPhysics();
 
-  // Load the ODE engine
+  /// Load the ODE engine
   public: virtual int Load();
 
-  // Initialize the ODE engine
+  /// Initialize the ODE engine
   public: virtual int Init();
 
-  //Update the ODE engine
+  /// Update the ODE engine
   public: virtual int Update();
 
-  //Finilize the ODE engine
+  /// Finilize the ODE engine
   public: virtual int Fini();
 
-  // Add an entity
+  /// Add an entity
   public: virtual int AddEntity(Entity *entity);
 
-  // Create a new body
+  /// Create a new body
   public: virtual Body *CreateBody(Entity *parent);
 
-  // Create a new joint
+  /// Create a new joint
   public: virtual Joint *CreateJoint(Joint::Type type);
 
-  // Do collision detection
+  /// Return the space id 
+  public: dSpaceID GetSpaceId() const;
+
+  /// Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
 
-  // Top-level world for all bodies
+  /// Top-level world for all bodies
   private: dWorldID worldId;
 
-  // Top-level space for all sub-spaces/geoms
+  /// Top-level space for all sub-spaces/geoms
   private: dSpaceID spaceId;
 
-  // Collision attributes
+  /// Collision attributes
   private: dJointGroupID contactGroup;
            
   protected: std::map<int, Entity* > entities;

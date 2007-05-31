@@ -388,7 +388,7 @@ std::string XMLConfigNode::GetString( std::string key, std::string def,
   {
     std::ostringstream stream;
     stream << "unable to find required string attribute[" << key << "]";
-    throw GazeboError("XMLConfigNode::GetString", stream.str());
+    gzthrow(stream.str());
   }
   else if( !value )
     return def;

@@ -29,52 +29,58 @@
 #define GAZEBOERROR_HH
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 namespace gazebo
 {
 
+#define gzthrow(msg) throw GazeboError(__FILE__,__LINE__,msg)
+
 class GazeboError
 {
+  public: GazeboError();
+
   /// Default constructor
-  /// \param func Function name
+  /// \param func File name
+  /// \param line Line number where the error occurred
   /// \param str Error string
   /// \param code Error code
-  public: GazeboError(const std::string func="", 
-                      const std::string str="", 
-                      const int code =-1);
+  public: GazeboError(const char *file, 
+                      int line, 
+                      std::string msg);
 
   /// Destructor
   public: virtual ~GazeboError();
 
   /// Return the error function
   /// \return The error function name
-  public: std::string GetErrorFunc() const;
+  public: std::string GetErrorFile() const;
+
+  /// Return the error line
+  /// \return The error line
+  public: int GetErrorLine() const;
+
 
   /// Return the error string
   /// \return The error string
   public: std::string GetErrorStr() const; 
 
-  /// Return the error code
-  /// \return The error code
-  public: int GetErrorCode() const;
+  /// The error function
+  private: std::string file;
+
+  /// Line the error occured on
+  private: int line;
 
   /// The error string
   private: std::string str;
 
-  /// The error function
-  private: std::string func;
-
-  /// The error code
-  private: int code;
-
   /// Ostream operator for Gazebo Error
   public: friend std::ostream &operator<<(std::ostream& out, const gazebo::GazeboError &err)
           {
-            return out << err.GetErrorFunc()
-              << "(" << err.GetErrorCode() << ")"
-              << " : "
-              << err.GetErrorStr();
+            return out << err.GetErrorFile()
+              << ":" << err.GetErrorLine() 
+              << " : " << err.GetErrorStr();
           }
 };
 

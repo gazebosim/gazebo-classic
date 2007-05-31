@@ -30,16 +30,15 @@
 using namespace gazebo;
 using namespace std;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Default constructor
-GazeboError::GazeboError(const std::string func, const std::string str, 
-                         const int code)
+GazeboError::GazeboError(const char *file, int line, std::string msg)
 {
-  this->func = func;
-  this->str = str;
-  this->code = code;
+  this->file = file;
+  this->line = line;
+  this->str = msg;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
@@ -48,10 +47,10 @@ GazeboError::~GazeboError()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Return the error function
-std::string GazeboError::GetErrorFunc() const
+/// Return the error file
+std::string GazeboError::GetErrorFile() const
 {
-  return this->func;
+  return this->file;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +62,8 @@ std::string GazeboError::GetErrorStr() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the error code
-int GazeboError::GetErrorCode() const
+int GazeboError::GetErrorLine() const
 {
-  return this->code;
+  return this->line;
 }
+

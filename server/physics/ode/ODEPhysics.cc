@@ -125,6 +125,12 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Return the space id 
+dSpaceID ODEPhysics::GetSpaceId() const
+{
+  return this->spaceId;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)

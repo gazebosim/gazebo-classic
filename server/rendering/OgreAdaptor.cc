@@ -5,6 +5,7 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include "Global.hh"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "OgreFrameListener.hh"
@@ -43,7 +44,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 {
   if (!node)
   {
-    throw GazeboError("OgreAdaptor::Init", "missing OGRE Rendernig information");
+    gzthrow( "missing OGRE Rendernig information" );
   }
 
   // Load all the plugins
@@ -143,14 +144,14 @@ void OgreAdaptor::SetupResources(XMLConfigNode *node)
 
   if (!node)
   {
-    throw GazeboError("OgreAdaptor::SetupResource","ogre resources xml nodemissing");
+    gzthrow( "ogre resources xml nodemissing" );
   }
 
   path = node->GetString("path","",1);
 
   if (path.empty())
   {
-    throw GazeboError("OgreAdaptor::SetupResource","empty resource path");
+    gzthrow( "empty resource path" );
   }
 
   sectionNode = node->GetChild();
@@ -201,8 +202,7 @@ void OgreAdaptor::SetupRenderSystem(bool create)
 
     if (selectedRenderSystem == NULL)
     {
-      throw GazeboError("OgreAdaptor::SetupRenderSystem", 
-                        "unable to find rendering system");
+      gzthrow( "unable to find rendering system" );
     }
 
     selectedRenderSystem->setConfigOption("Full Screen","No");
@@ -252,7 +252,7 @@ void OgreAdaptor::LoadPlugins(XMLConfigNode *node)
 
   if (!node)
   {
-    throw GazeboError("OgreAdaptor::LoadPlugins","missing plugins xml node");
+    gzthrow( "missing plugins xml node" );
   }
 
   // Get the path prefix
@@ -261,7 +261,7 @@ void OgreAdaptor::LoadPlugins(XMLConfigNode *node)
   // Make sure a path has been specified
   if (pathStr.empty())
   {
-    throw GazeboError("OgreAdaptor::LoadPlugins","no Plugin Path Set");
+    gzthrow( "no Plugin Path Set" );
   }
 
   // The first plugin

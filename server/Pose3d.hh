@@ -80,6 +80,11 @@ class Pose3d
   /// \param pose Pose to subtract from this one
   /// \return The resulting pose
   public: const Pose3d &operator-=(const Pose3d &pose);
+          
+  /// Add one point to a vector: result = this + pos
+  /// \param pos Position to add to this pose
+  /// \return The resulting position
+  public: Vector3 CoordPositionAdd(const Vector3 &pos);
 
   /// Add one point to another: result = this + pose
   /// \param pose The Pose to add
