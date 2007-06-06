@@ -59,22 +59,24 @@ Ray::Ray()
 // Destructor
 Ray::~Ray()
 {
-  std::vector<RayGeom*>::iterator iter;
-  for (iter=this->rays.begin(); iter!=this->rays.end(); iter++)
-  {
-    delete *iter;
-  }
-  this->rays.clear();
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the ray using parameter from an XMLConfig node
 void Ray::LoadChild(XMLConfigNode *node)
 {
+  double angle;
+  Vector3 start, end, axis;
+  RayGeom *ray;
   int rayCount;
 
   rayCount = node->GetInt("rayCount",0,1);
+  this->minAngle = node->GetDouble("minAngle",-90,1);
+  this->maxAngle = node->GetDouble("maxAngle",90,1);
+  this->minRange = node->GetDouble("minRange",0,1);
+  this->maxRange = node->GetDouble("maxRange",8,1);
+
+  this->origin = node->GetVector3("origin", Vector3(0,0,0));
 
   this->body = World::Instance()->GetPhysicsEngine()->CreateBody(this);
   
@@ -83,6 +85,7 @@ void Ray::LoadChild(XMLConfigNode *node)
     
   // Create a space to contain all the rays
   this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
+
   
   // Set collision bits
   //TODO: dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
@@ -93,7 +96,18 @@ void Ray::LoadChild(XMLConfigNode *node)
   // Create and array of ray geoms
   for (int i = 0; i < rayCount; i++)
   {
-    this->rays.push_back(new RayGeom(this->body));
+    angle = i * (this->maxAngle - this->minAngle) / (rayCount - 1) + this->minAngle;
+
+    axis.Set(cos(angle), 0, sin(angle));
+
+    start = (axis * this->minRange) + this->origin;
+    end = (axis * this->maxRange) + this->origin;
+
+    ray = new RayGeom(this->body);
+
+    ray->SetPoints(start, end);
+
+    this->rays.push_back(ray);
   }
 
 }
@@ -108,6 +122,12 @@ void Ray::InitChild()
 // Init the ray
 void Ray::FiniChild()
 {
+  std::vector<RayGeom*>::iterator iter;
+  for (iter=this->rays.begin(); iter!=this->rays.end(); iter++)
+  {
+    delete *iter;
+  }
+  this->rays.clear();
 }
 
 
@@ -132,9 +152,7 @@ void Ray::SetRay(int index, const Vector3 &a, const Vector3 &b)
   ray->SetCollideBits( ~GZ_LASER_COLLIDE );
   */
 
-  ray->SetLength(a.Distance(b));
-  ray->pos[0] = a;
-  ray->pos[1] = b;
+  ray->SetPoints(a,b);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -202,7 +220,7 @@ int Ray::GetFiducial(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void Ray::UpdateChild(UpdateParams &params)
+void Ray::UpdateChild(UpdateParams &/*params*/)
 {
   std::vector<RayGeom*>::iterator iter;
   Pose3d pose;
@@ -219,16 +237,16 @@ void Ray::UpdateChild(UpdateParams &params)
     (*iter)->contactRetro = 0.0;
     (*iter)->contactFiducial = -1;
 
+    (*iter)->GetPoints(a,b);
+
     // Update the ray endpoints (global cs)
-    a = pose.CoordPositionAdd((*iter)->pos[0]);
+    a = pose.CoordPositionAdd(a);
     //a = GzCoordPositionAdd((*iter)->pos[0], pose.pos, pose.rot);
 
-    b = pose.CoordPositionAdd((*iter)->pos[1]);
+    b = pose.CoordPositionAdd(b);
     //b = GzCoordPositionAdd((*iter)->pos[1], pose.pos, pose.rot);    
 
-    b -= a;
-    b.Normalize();
-    (*iter)->Set(a, b);
+    (*iter)->SetPoints(a, b);
   }
 
   ODEPhysics *ode = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());

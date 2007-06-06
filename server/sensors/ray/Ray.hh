@@ -69,28 +69,28 @@ class Ray: public Sensor
   protected: virtual void FiniChild();
 
 
-  /// @brief Set ray parameters
-  /// @param index Ray index (from 0 to rayCount - 1).
-  /// @param a, b Ray endpoints (initial and final points).  These are
+  /// \brief Set ray parameters
+  /// \param index Ray index (from 0 to rayCount - 1).
+  /// \param a, b Ray endpoints (initial and final points).  These are
   /// in body-relative coordiantes.
   public: void SetRay(int index, const Vector3 &a, const Vector3 &b);
 
-  /// @breif Get ray parameters
-  /// @param index Ray index (from 0 to rayCount -1).
-  /// @param pos, dir Ray position and direction.
+  /// Get ray parameters
+  /// \param index Ray index (from 0 to rayCount -1).
+  /// \param pos, dir Ray position and direction.
   public: void GetRay(int index, Vector3 &pos, Vector3 &dir);
 
-  /// @brief Get detected range for a ray.
-  /// @returns Returns DBL_MAX for no detection.
+  /// \brief Get detected range for a ray.
+  /// \returns Returns DBL_MAX for no detection.
   public: double GetRange(int index);   
 
-  /// @brief Get detected retro (intensity) value for a ray.
+  /// \brief Get detected retro (intensity) value for a ray.
   public: double GetRetro(int index);   
 
-  /// @brief Get detected fiducial value for a ray.
+  /// \brief Get detected fiducial value for a ray.
   public: int GetFiducial(int index);   
 
-  /// @brief Ray-intersection callback
+  /// \brief Ray-intersection callback
   private: static void UpdateCallback( void *data, dGeomID o1, dGeomID o2 );
   
   /// The body we are attached to
@@ -102,6 +102,10 @@ class Ray: public Sensor
 
   /// Ray data
   private: std::vector<RayGeom*> rays;
+
+  private: double minAngle, maxAngle;
+  private: double minRange, maxRange;
+  private: Vector3 origin;
 };
 
 }

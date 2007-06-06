@@ -11,13 +11,6 @@ namespace gazebo
 
 class OgreDynamicLines : public OgreDynamicRenderable
 {
-  /*typedef Ogre::Vector3 Vector3;
-  typedef Ogre::Quaternion Quaternion;
-  typedef Ogre::Camera Camera;
-  typedef Ogre::Real Real;
-  typedef Ogre::RenderOperation::OperationType OperationType;
-  */
-
   /// Constructor
   public: OgreDynamicLines(Ogre::RenderOperation::OperationType opType=Ogre::RenderOperation::OT_LINE_STRIP);
 

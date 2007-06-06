@@ -11,6 +11,7 @@ namespace Ogre
 {
   class Entity;
   class MaterialPtr;
+  class MovableObject;
 }
 
 namespace gazebo
@@ -53,6 +54,10 @@ class Geom : public Entity
   /// \param meshName Name of the mesh
   public: void AttachMesh(const std::string &meshName);
 
+  /// Attach a moveable object to the node
+  /// \param obj The moveable object
+  public: void AttachObject( Ogre::MovableObject *obj );
+
   /// Set the scale of the mesh
   /// \param scale New scale of the mesh
   public: void ScaleMesh(const Vector3 &scale);
@@ -80,7 +85,7 @@ class Geom : public Entity
 
   private: bool placeable;
 
-  private: Ogre::Entity *meshEntity;
+  private: Ogre::MovableObject *ogreObj;
 
   protected: dGeomID geomId;
 

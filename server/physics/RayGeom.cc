@@ -29,6 +29,7 @@
 #include <Ogre.h>
 #include <ode/ode.h>
 
+#include "OgreDynamicLines.hh"
 #include "Body.hh"
 #include "RayGeom.hh"
 
@@ -39,8 +40,18 @@ using namespace gazebo;
 RayGeom::RayGeom( Body *body )
   : Geom( body )
 {
+  body->SetEnabled(false);
+
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
+ 
+  this->line = new OgreDynamicLines(Ogre::RenderOperation::OT_LINE_LIST);
+
+  // Add two points
+  this->line->AddPoint(Vector3(0,0,0));
+  this->line->AddPoint(Vector3(0,0,0));
+
+  this->AttachObject(line);
 
   this->contactDepth = DBL_MAX;
   this->contactRetro = 0.0;
@@ -52,33 +63,85 @@ RayGeom::RayGeom( Body *body )
 // Destructor
 RayGeom::~RayGeom()
 {
+  delete this->line;
+  this->line = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the starting point and direction
-void RayGeom::Set(const Vector3 &pos, const Vector3 &dir)
+void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
 {
-  dGeomRaySet(this->geomId, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z);
+
+  this->pos= posStart;
+  this->dir = posEnd - this->pos;
+  this->dir.Normalize();
+
+  dGeomRaySet(this->geomId, this->pos.x, this->pos.y, this->pos.z, 
+              this->dir.x, this->dir.y, this->dir.z);
+
+  this->SetLength(posEnd.Distance(this->pos));
+
+  this->line->SetPoint(0, this->pos);
+  this->line->SetPoint(1, posEnd);
+  this->line->Update();
 }
 
+void RayGeom::Set(const Vector3 &posStart, const Vector3 &dir, double length)
+{
+  Vector3 end;
+  this->dir = dir;
+  this->pos = posStart;
+
+  dGeomRaySet(this->geomId, this->pos.x, this->pos.y, this->pos.z, 
+              this->dir.x, this->dir.y, this->dir.z);
+
+  this->SetLength(length);
+
+  end = this->pos + this->dir*length;
+
+  this->line->SetPoint(0, this->pos);
+  this->line->SetPoint(1, end);
+
+  this->line->Update();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Get the starting and ending point
+void RayGeom::GetPoints(Vector3 &posA, Vector3 &posB)
+{
+  dVector3 p, d;  
+  Vector3 dir;
+  dGeomRayGet(this->geomId, p, d);
+  
+  this->pos.Set(p[0], p[1], p[2]);
+  this->dir.Set(d[0], d[1], d[2]);
+
+  posA = this->pos;
+  posB = this->pos+(this->dir*this->GetLength());
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the starting point and direction
-void RayGeom::Get(Vector3 &pos, Vector3 &dir)
+void RayGeom::Get(Vector3 &position, Vector3 &direction)
 {
   dVector3 p, d;  
+  Vector3 dir;
   dGeomRayGet(this->geomId, p, d);
+  
+  this->pos.Set(p[0], p[1], p[2]);
+  this->dir.Set(d[0], d[1], d[2]);
 
-  pos.Set(p[0], p[1], p[2]);
-  dir.Set(d[0], d[1], d[2]);
+  position = this->pos;
+  direction = this->dir;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the length of the ray
 void RayGeom::SetLength( const double len )
 {
   dGeomRaySetLength( this->geomId, len );
+
+  this->line->SetPoint(1,  this->dir*this->GetLength()+this->pos);
 }
 
 

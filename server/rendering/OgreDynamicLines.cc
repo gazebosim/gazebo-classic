@@ -1,6 +1,7 @@
 #include <Ogre.h>
 #include <cassert>
 #include <cmath>
+#include <sstream>
 
 #include "GazeboError.hh"
 #include "OgreDynamicLines.hh"
@@ -12,7 +13,7 @@ enum { POSITION_BINDING, TEXCOORD_BINDING };
 OgreDynamicLines::OgreDynamicLines(Ogre::RenderOperation::OperationType opType)
 {
   this->Init(opType, false);
-  this->setMaterial("BaseWhiteNoLighting");
+  this->setMaterial("Gazebo/Blue");
   this->dirty = true;
 }
 
@@ -28,9 +29,11 @@ void OgreDynamicLines::AddPoint(const Vector3 &pt)
 
 void OgreDynamicLines::SetPoint(unsigned int index, const Vector3 &value)
 {
-  if (index < this->points.size())
+  if (index >= this->points.size())
   {
-    gzthrow("Point index is out of bounds");
+    std::ostringstream stream;
+    stream << "Point index[" << index << "] is out of bounds[0-" << this->points.size()-1 << "]";
+    gzthrow(stream.str());
   }
 
   this->points[index] = value;

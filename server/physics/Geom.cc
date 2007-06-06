@@ -10,6 +10,8 @@ using namespace gazebo;
 
 int Geom::geomIdCounter = 0;
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 Geom::Geom( Body *body)
   : Entity(body)
 {
@@ -20,10 +22,14 @@ Geom::Geom( Body *body)
 
   this->geomId = NULL;
 
+  this->ogreObj = NULL;
+
   // Zero out the mass
   dMassSetZero(&this->mass);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 Geom::~Geom()
 {
   dGeomDestroy(this->geomId);
@@ -123,14 +129,24 @@ void Geom::SetRotation(const Quatern &rot)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 /// Attach a mesh to the geom
 void Geom::AttachMesh(const std::string &meshName)
 {
-  this->meshEntity = this->sceneNode->getCreator()->createEntity(this->GetName().c_str(), meshName);
+  this->ogreObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName().c_str(), meshName));
 
-  this->sceneNode->attachObject(this->meshEntity);
+  this->sceneNode->attachObject((Ogre::Entity*)this->ogreObj);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Attach a moveable object to the node
+void Geom::AttachObject( Ogre::MovableObject *obj )
+{
+  this->ogreObj = obj;
+  this->sceneNode->attachObject(this->ogreObj);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set the scale of the mesh
 void Geom::ScaleMesh(const Vector3 &scale)
 {
@@ -138,6 +154,7 @@ void Geom::ScaleMesh(const Vector3 &scale)
   this->sceneNode->setScale(scale.x, scale.y, scale.z);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 /// Set the mesh pose
 void Geom::SetMeshPose(const Pose3d &pose)
 {
@@ -145,22 +162,28 @@ void Geom::SetMeshPose(const Pose3d &pose)
   this->sceneNode->setOrientation(pose.rot.u, pose.rot.x, pose.rot.y, pose.rot.z);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 /// Set the mesh position
 void Geom::SetMeshPosition(const Vector3 &pos)
 {
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 /// Set whether the mesh casts shadows
 void Geom::SetCastShadows(bool enable)
 {
-  this->meshEntity->setCastShadows(enable);
+  if (this->ogreObj)
+    this->ogreObj->setCastShadows(enable);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 /// Set the material to apply to the mesh
 void Geom::SetMeshMaterial(const std::string &materialName)
 {
-  if (materialName != "")
-    this->meshEntity->setMaterialName(materialName);
+  Ogre::Entity *ent = dynamic_cast<Ogre::Entity*>(this->ogreObj);
+
+  if (materialName != "" && ent)
+    ent->setMaterialName(materialName);
 }
 
