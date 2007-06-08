@@ -162,6 +162,11 @@ int Model::Load(XMLConfigNode *node)
 // Initialize the model
 int Model::Init()
 {
+  std::map<std::string, Body* >::iterator biter;
+
+  for (biter = this->bodies.begin(); biter!=this->bodies.end(); biter++)
+    biter->second->Init();
+
   return this->InitChild();
 }
 
@@ -175,7 +180,7 @@ int Model::Update(UpdateParams &params)
   for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
     if (bodyIter->second)
-      bodyIter->second->Update();
+      bodyIter->second->Update(params);
   }
 
   for (contIter=this->controllers.begin(); 
@@ -360,7 +365,6 @@ int Model::LoadBody(XMLConfigNode *node)
   // Load the body using the config node. This also loads all of the 
   // bodies geometries
   body->Load(node);
-
 
   // Store this body
   if (this->bodies[body->GetName()])
