@@ -28,8 +28,6 @@
 #include <sstream>
 #include <sys/time.h>
 
-#include "Sensor.hh"
-#include "SensorFactory.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
 #include "PhysicsEngine.hh"
@@ -125,19 +123,11 @@ int World::Load(XMLConfig *config, int serverId)
 int World::Init()
 {
   std::vector< Model* >::iterator iter;
-  std::vector< Sensor* >::iterator sensorIter;
 
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
     (*iter)->Init();
   }
-
-  for (sensorIter=this->sensors.begin(); 
-       sensorIter!=this->sensors.end(); sensorIter++)
-  {
-    (*sensorIter)->Init();
-  }
-
 
   // Set initial simulator state
   this->simIface->Lock(1);
@@ -155,8 +145,7 @@ int World::Update()
 {
   UpdateParams params;
   std::vector< Model* >::iterator iter;
-  std::vector< Sensor* >::iterator sensorIter;
-  this->physicsEngine->Update();
+
 
   this->simTime += this->stepTime;
   params.stepTime = this->stepTime;
@@ -166,12 +155,7 @@ int World::Update()
     (*iter)->Update(params);
   }
 
-  for (sensorIter=this->sensors.begin(); 
-       sensorIter!=this->sensors.end(); sensorIter++)
-  {
-    (*sensorIter)->Update(params);
-  }
-
+  //this->physicsEngine->Update();
 
   OgreAdaptor::Instance()->Render();
 
@@ -189,21 +173,12 @@ int World::Update()
 int World::Fini()
 {
   std::vector< Model* >::iterator iter;
-  std::vector< Sensor* >::iterator sensorIter;
 
   // Finalize the models
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
     (*iter)->Fini();
   }
-
-  // Finalize the sensors
-  for (sensorIter=this->sensors.begin(); 
-       sensorIter!=this->sensors.end(); sensorIter++)
-  {
-    (*sensorIter)->Fini();
-  }
-
 
   this->physicsEngine->Fini();
 
@@ -296,10 +271,6 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
     {
       model = this->LoadModel(node, parent);
     }
-    else if (node->GetNSPrefix() == "sensor")
-    {
-      this->LoadSensor(node, parent);
-    }
     else if (node->GetNSPrefix() == "param")
     {
       if (node->GetName() == "global")
@@ -380,27 +351,4 @@ Model *World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
   return model;
 }
 
-void World::LoadSensor(XMLConfigNode *node, Model * /*parent*/)
-{
-  Sensor *sensor = NULL;
 
-  if (node==NULL)
-  {
-    std::ostringstream stream;
-    stream << "Null node pointer. Invalid sensor in the world file.";
-    gzthrow(stream.str());
-  }
-
-  sensor = SensorFactory::NewSensor(node->GetName());
-  if (sensor)
-  {
-    sensor->Load(node);
-    this->sensors.push_back(sensor);
-  }
-  else
-  {
-    std::ostringstream stream;
-    stream << "Null sensor. Invalid sensor name[" << node->GetName() << "]";
-    gzthrow(stream.str());
-  }
-}
