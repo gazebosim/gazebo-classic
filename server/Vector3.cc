@@ -104,6 +104,7 @@ const Vector3 &Vector3::operator=( const Vector3 &pt )
 }
 
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Addition operator
 Vector3 Vector3::operator+( const Vector3 &pt ) const
