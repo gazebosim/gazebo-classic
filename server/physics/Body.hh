@@ -6,6 +6,7 @@
 #include <list>
 #include <vector>
 
+#include "UpdateParams.hh"
 #include "XMLConfig.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
@@ -18,6 +19,7 @@ namespace Ogre
 namespace gazebo
 {
   class Geom;
+  class Sensor;
 
 /// Body class
 class Body : public Entity
@@ -39,7 +41,7 @@ class Body : public Entity
 
   /// Update the body
   /// \return Non-zero on error
-  public: virtual int Update();
+  public: virtual int Update(UpdateParams &params);
 
   /// Attach a geom to this body
   /// \param geom Geometery to attach to this body
@@ -81,8 +83,15 @@ class Body : public Entity
   /// \return Non-zero on error
   private: int LoadGeom(XMLConfigNode *node);
 
+  /// Load a new sensor
+  /// \param node XMLConfigNode used to load the geom
+  private: void LoadSensor(XMLConfigNode *node);
+
   /// List of geometries attached to this body
   private: std::vector< Geom* > geoms;
+
+  /// List of attached sensors
+  private: std::vector< Sensor* > sensors;
 
   /// ODE body handle
   private: dBodyID bodyId;
