@@ -43,7 +43,7 @@ void OgreDynamicLines::SetPoint(unsigned int index, const Vector3 &value)
 
 const Vector3& OgreDynamicLines::GetPoint(unsigned int index) const
 {
-  if (index < this->points.size())
+  if (index >= this->points.size())
   {
     gzthrow("Point index is out of bounds");
   }
