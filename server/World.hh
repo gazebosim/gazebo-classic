@@ -98,7 +98,6 @@ The parameters are as follows:
   class Server;
   class SimulationIface;
   class Model;
-  class Sensor;
   class PhysicsEngine;
   class XMLConfigNode;
   class XMLConfig;
@@ -184,11 +183,6 @@ class World
   /// \return The model that was created
   private: Model *LoadModel(XMLConfigNode *node, Model *parent);
 
-  /// Load a sensor
-  /// \param node Pointer to the XMLConfig node
-  /// \param paren The parent model
-  private: void LoadSensor(XMLConfigNode *node, Model *parent);
-
   /// Pointer to myself
   private: static World *myself;
 
@@ -197,9 +191,6 @@ class World
 
   /// List of all the models
   private: std::vector< Model* > models;
-
-   /// List of all the sensors
-  private: std::vector< Sensor* > sensors;
 
   /// Simulator control interface
   private: Server *server;
