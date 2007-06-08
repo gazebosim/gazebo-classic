@@ -65,16 +65,17 @@ class RayGeom : public Geom
 
   /// Set the length of the ray
   /// \param len Length of the array
-  public: void SetLength( const double len );
+  public: void SetLength( double len );
 
   /// Get the length of the ray
   public: double GetLength() const;
 
   /// Contact information; this is filled out during collision
   /// detection.  
-  public: double contactDepth;
   public: double contactRetro;
   public: int contactFiducial;
+
+  private: double contactLen;
 
   private: OgreDynamicLines *line;
   private: Vector3 pos;

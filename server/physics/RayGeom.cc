@@ -53,7 +53,7 @@ RayGeom::RayGeom( Body *body )
 
   this->AttachObject(line);
 
-  this->contactDepth = DBL_MAX;
+  this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 }
@@ -68,7 +68,7 @@ RayGeom::~RayGeom()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Set the starting point and direction
+// Set the starting point and direction, in global cs
 void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
 {
 
@@ -79,11 +79,22 @@ void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   dGeomRaySet(this->geomId, this->pos.x, this->pos.y, this->pos.z, 
               this->dir.x, this->dir.y, this->dir.z);
 
-  this->SetLength(posEnd.Distance(this->pos));
+  dGeomRaySetLength( this->geomId, posEnd.Distance(this->pos) );
 
-  this->line->SetPoint(0, this->pos);
-  this->line->SetPoint(1, posEnd);
+  // Get the gobal position of the scene node
+  /*Ogre::Vector3 olinePos = this->sceneNode->_getDerivedPosition();
+  Vector3 linePos;
+
+  linePos.x = olinePos.x;
+  linePos.y = olinePos.y;
+  linePos.z = olinePos.z;
+
+  // Set the line's position relative to it's parent scene node
+  this->line->SetPoint(0, this->pos-linePos);
+  this->line->SetPoint(1, posEnd-linePos);
   this->line->Update();
+  */
+  
 }
 
 void RayGeom::Set(const Vector3 &posStart, const Vector3 &dir, double length)
@@ -95,18 +106,27 @@ void RayGeom::Set(const Vector3 &posStart, const Vector3 &dir, double length)
   dGeomRaySet(this->geomId, this->pos.x, this->pos.y, this->pos.z, 
               this->dir.x, this->dir.y, this->dir.z);
 
-  this->SetLength(length);
+  dGeomRaySetLength( this->geomId, length );
 
   end = this->pos + this->dir*length;
 
-  this->line->SetPoint(0, this->pos);
-  this->line->SetPoint(1, end);
+  // Get the gobal position of the scene node
+  /*Ogre::Vector3 olinePos = this->sceneNode->_getDerivedPosition();
+  Vector3 linePos;
 
+  linePos.x = olinePos.x;
+  linePos.y = olinePos.y;
+  linePos.z = olinePos.z;
+
+  // Set the line's position relative to it's parent scene node
+  this->line->SetPoint(0, this->pos - linePos);
+  this->line->SetPoint(1, end - linePos);
   this->line->Update();
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get the starting and ending point
+// Get the starting and ending point, in global cs
 void RayGeom::GetPoints(Vector3 &posA, Vector3 &posB)
 {
   dVector3 p, d;  
@@ -141,7 +161,10 @@ void RayGeom::SetLength( const double len )
 {
   dGeomRaySetLength( this->geomId, len );
 
-  this->line->SetPoint(1,  this->dir*this->GetLength()+this->pos);
+  Vector3 startPt = this->line->GetPoint(0);
+
+  this->line->SetPoint(1,  this->dir*len+startPt);
+  this->line->Update();
 }
 
 
