@@ -10,18 +10,18 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
               'pkg-config --cflags --libs CEGUI',
               'pkg-config --cflags --libs playercore',
               'pkg-config --cflags --libs playerxdr',
-	      'ode-config --cflags --libs',
-	      'pkg-config --cflags --libs OIS',
-	      'python-config']
+      	      'ode-config --cflags --libs',
+	            'pkg-config --cflags --libs OIS',
+	            'python-config']
 
 env = Environment (
   CC = 'g++',
 
-  CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
-  #CCFLAGS = Split ('-pthread -pipe'),
+  #CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+  CCFLAGS = Split ('-pthread -pipe'),
 
   CPPPATH = [
-    '#.', 
+   '#.', 
     '#server',
     '#server/models',
     '#libgazebo', 
