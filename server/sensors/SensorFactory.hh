@@ -36,10 +36,11 @@ namespace gazebo
 
 // Forward declarations
 class Sensor;
+class Body;
 
 
 // Prototype for sensor factory functions
-typedef Sensor* (*SensorFactoryFn) ();
+typedef Sensor* (*SensorFactoryFn) (Body*);
 
 
 /// @brief The sensor factory; the class is just for namespacing purposes.
@@ -54,7 +55,7 @@ class SensorFactory
 
   /// @brief Create a new instance of a sensor.  Used by the world when
   /// reading the world file.
-  public: static Sensor *NewSensor(const std::string &classname);
+  public: static Sensor *NewSensor(const std::string &classname, Body *body);
 
   // A list of registered sensor classes
   private: static std::map<std::string, SensorFactoryFn> sensors;
@@ -67,9 +68,9 @@ class SensorFactory
 /// @param name Sensor type name, as it appears in the world file.
 /// @param classname C++ class name for the sensor.
 #define GZ_REGISTER_STATIC_SENSOR(name, classname) \
-Sensor *New##classname() \
+Sensor *New##classname(Body *body) \
 { \
-  return new classname(); \
+  return new classname(body); \
 } \
 void Register##classname() \
 {\
