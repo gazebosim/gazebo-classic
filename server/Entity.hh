@@ -89,12 +89,12 @@ class Entity
   /// \param sceneNode Ogre scene node
   public: void SetSceneNode(Ogre::SceneNode *sceneNode);
 
-  /// Set the name of the body
+  /// Set the name of the entity
   /// \param name Body name
   public: void SetName(const std::string &name);
 
-  /// Return the name of the body
-  /// \return Name of the body
+  /// Return the name of the entity
+  /// \return Name of the entity
   public: std::string GetName() const;
 
   /// Set whether this entity is static: immovable
