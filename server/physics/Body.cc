@@ -1,5 +1,9 @@
 #include <Ogre.h>
+#include <sstream>
 
+#include "GazeboError.hh"
+#include "SensorFactory.hh"
+#include "Sensor.hh"
 #include "OgreAdaptor.hh"
 #include "SphereGeom.hh"
 #include "BoxGeom.hh"
@@ -32,26 +36,52 @@ Body::Body(Entity *parent, dWorldID worldId)
 // Destructor
 Body::~Body()
 {
+  std::vector< Geom* >::iterator giter;
+  std::vector< Sensor* >::iterator siter;
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    delete (*giter);
+  }
   this->geoms.clear();
+
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  {
+    delete (*siter);
+  }
+  this->sensors.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the body based on an XMLConfig node
 int Body::Load(XMLConfigNode *node)
 {
-  XMLConfigNode *geomNode = node->GetChildByNSPrefix("geom");
+  XMLConfigNode *childNode;
 
   this->SetName(node->GetString("name","",1));
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern(1,0,0,0)));
 
+  childNode = node->GetChildByNSPrefix("geom");
+
   // Load the geometries
-  while (geomNode)
+  while (childNode)
   {
     // Create and Load a geom, which will belong to this body.
-    this->LoadGeom(geomNode);
-    geomNode = geomNode->GetNext();
+    this->LoadGeom(childNode);
+    childNode = childNode->GetNextByNSPrefix("geom");
   }
+
+  childNode = node->GetChildByNSPrefix("sensor");
+
+  // Load the sensors
+  while (childNode)
+  {
+    // Create and Load a sensor, which will belong to this body.
+    this->LoadSensor(childNode);
+    childNode = childNode->GetNextByNSPrefix("sensor");
+  }
+
 
 }
 
@@ -59,15 +89,30 @@ int Body::Load(XMLConfigNode *node)
 // Initialize the body
 int Body::Init()
 {
+  std::vector< Sensor* >::iterator siter;
+
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  {
+    (*siter)->Init();
+  }
+
   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the body
-int Body::Update()
+int Body::Update(UpdateParams &params)
 {
+  std::vector< Sensor* >::iterator sensorIter;
+
   if (!this->IsStatic())
     this->SetPose(this->GetPose());
+
+  for (sensorIter=this->sensors.begin(); 
+       sensorIter!=this->sensors.end(); sensorIter++)
+  {
+    (*sensorIter)->Update(params);
+  }
 
   return 0;
 }
@@ -255,4 +300,32 @@ int Body::LoadGeom(XMLConfigNode *node)
   this->AttachGeom(geom);
 
   return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a sensor
+void Body::LoadSensor(XMLConfigNode *node)
+{
+  Sensor *sensor = NULL;
+
+  if (node==NULL)
+  {
+    std::ostringstream stream;
+    stream << "Null node pointer. Invalid sensor in the world file.";
+    gzthrow(stream.str());
+  }
+
+  sensor = SensorFactory::NewSensor(node->GetName(), this);
+
+  if (sensor)
+  {
+    sensor->Load(node);
+    this->sensors.push_back(sensor);
+  }
+  else
+  {
+    std::ostringstream stream;
+    stream << "Null sensor. Invalid sensor name[" << node->GetName() << "]";
+    gzthrow(stream.str());
+  }
 }
