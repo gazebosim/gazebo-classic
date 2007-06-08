@@ -31,7 +31,6 @@
 #include "SensorFactory.hh"
 #include "XMLConfig.hh"
 #include "Global.hh"
-#include "GazeboError.hh"
 #include "RayGeom.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
@@ -49,8 +48,8 @@ GZ_REGISTER_STATIC_SENSOR("Ray", Ray);
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-Ray::Ray()
-    : Sensor()
+Ray::Ray(Body *body)
+    : Sensor(body)
 {
 }
 
@@ -65,12 +64,14 @@ Ray::~Ray()
 /// Load the ray using parameter from an XMLConfig node
 void Ray::LoadChild(XMLConfigNode *node)
 {
-  double angle;
-  Vector3 start, end, axis;
-  RayGeom *ray;
-  int rayCount;
+  if (this->body == NULL)
+  {
+    std::ostringstream stream;
+    stream << "Body is NULL";
+    gzthrow(stream.str());
+  }
 
-  rayCount = node->GetInt("rayCount",0,1);
+  this->rayCount = node->GetInt("rayCount",0,1);
   this->minAngle = node->GetDouble("minAngle",-90,1);
   this->maxAngle = node->GetDouble("maxAngle",90,1);
   this->minRange = node->GetDouble("minRange",0,1);
@@ -78,8 +79,6 @@ void Ray::LoadChild(XMLConfigNode *node)
 
   this->origin = node->GetVector3("origin", Vector3(0,0,0));
 
-  this->body = World::Instance()->GetPhysicsEngine()->CreateBody(this);
-  
   // Create a space to contain the ray space
   this->superSpaceId = dSimpleSpaceCreate( 0 );
     
@@ -91,10 +90,25 @@ void Ray::LoadChild(XMLConfigNode *node)
   //TODO: dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
   //TODO: dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
 
-  //this->body->spaceId = this->raySpaceId;
+  this->body->spaceId = this->raySpaceId;
+
+  
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Init the ray
+void Ray::InitChild()
+{
+  Pose3d bodyPose;
+  double angle;
+  Vector3 start, end, axis;
+  RayGeom *ray;
+
+  bodyPose = this->body->GetPose();
+  this->prevPose = bodyPose;
 
   // Create and array of ray geoms
-  for (int i = 0; i < rayCount; i++)
+  for (int i = 0; i < this->rayCount; i++)
   {
     angle = i * (this->maxAngle - this->minAngle) / (rayCount - 1) + this->minAngle;
 
@@ -103,6 +117,9 @@ void Ray::LoadChild(XMLConfigNode *node)
     start = (axis * this->minRange) + this->origin;
     end = (axis * this->maxRange) + this->origin;
 
+    start = bodyPose.CoordPositionAdd(start);
+    end = bodyPose.CoordPositionAdd(end);
+
     ray = new RayGeom(this->body);
 
     ray->SetPoints(start, end);
@@ -110,12 +127,6 @@ void Ray::LoadChild(XMLConfigNode *node)
     this->rays.push_back(ray);
   }
 
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Init the ray
-void Ray::InitChild()
-{
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -183,7 +194,7 @@ double Ray::GetRange(int index)
     gzthrow(stream.str());
   }
  
-  return this->rays[index]->contactDepth;
+  return this->rays[index]->GetLength();
 }
 
 
@@ -223,29 +234,29 @@ int Ray::GetFiducial(int index)
 void Ray::UpdateChild(UpdateParams &/*params*/)
 {
   std::vector<RayGeom*>::iterator iter;
-  Pose3d pose;
+  Pose3d poseDelta;
   Vector3 a, b;
 
   // Get the pose of the sensor body (global cs)
-  pose = this->body->GetPose();
-  
+  poseDelta = this->body->GetPose() - this->prevPose;
+  this->prevPose = this->body->GetPose();
+
   // Reset the ray lengths and mark the geoms as dirty (so they get
   // redrawn)
   for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
   {
-    (*iter)->contactDepth = DBL_MAX;
+    (*iter)->SetLength( 8.0 );
     (*iter)->contactRetro = 0.0;
     (*iter)->contactFiducial = -1;
 
+    // Get the global points of the line
     (*iter)->GetPoints(a,b);
 
     // Update the ray endpoints (global cs)
-    a = pose.CoordPositionAdd(a);
-    //a = GzCoordPositionAdd((*iter)->pos[0], pose.pos, pose.rot);
+    a = poseDelta.CoordPositionAdd(a);
+    b = poseDelta.CoordPositionAdd(b);
 
-    b = pose.CoordPositionAdd(b);
-    //b = GzCoordPositionAdd((*iter)->pos[1], pose.pos, pose.rot);    
-
+    // Set the global points of the line
     (*iter)->SetPoints(a, b);
   }
 
@@ -277,7 +288,6 @@ void Ray::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 
   self = (Ray*) data;
  
-
   // Check space
   if ( dGeomIsSpace( o1 ) || dGeomIsSpace( o2 ) )
   {
@@ -317,8 +327,9 @@ void Ray::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
     {
       rayGeom = (RayGeom*) geom1;
       hitGeom = (Geom*) geom2;
-      dGeomRaySetParams(o1, 0, 0);
+      /*dGeomRaySetParams(o1, 0, 0);
       dGeomRaySetClosestHit(o1, 1);
+      */
     }    
 
     if (dGeomGetClass(o2) == dRayClass)
@@ -326,8 +337,9 @@ void Ray::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
       assert(rayGeom == NULL);
       rayGeom = (RayGeom*) geom2;
       hitGeom = (Geom* )geom1;
-      dGeomRaySetParams(o2, 0, 0);
+      /*dGeomRaySetParams(o2, 0, 0);
       dGeomRaySetClosestHit(o2, 1);
+      */
     }
         
     // Check for ray/geom intersections
@@ -337,12 +349,9 @@ void Ray::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 
       if ( n > 0 )
       {       
-        if (contact.depth < rayGeom->contactDepth)
+        if (contact.depth < rayGeom->GetLength())
         {
-          Vector3 start;
-          Vector3 dir;
-          rayGeom->Get(start, dir);
-          rayGeom->contactDepth = contact.depth;
+          rayGeom->SetLength( contact.depth );
           //TODO: rayGeom->contactRetro = hitGeom->GetRetro();
           //TODO: rayGeom->contactFiducial = hitGeom->GetFiducial();
         }

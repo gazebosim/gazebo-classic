@@ -33,11 +33,12 @@
 namespace gazebo
 {
   class XMLConfigNode;
+  class Body;
 
 class Sensor : public Entity
 {
   /// Constructor
-  public: Sensor();
+  public: Sensor(Body *body);
 
   /// Destructor
   public: virtual ~Sensor();
@@ -66,6 +67,9 @@ class Sensor : public Entity
 
   /// Finalize the child
   protected: virtual void FiniChild() {};
+
+  /// The body this sensor is attached to
+  protected: Body *body;
 };
 
 }

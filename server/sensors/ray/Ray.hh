@@ -50,7 +50,7 @@ class Ray: public Sensor
   /// @param body The underlying collision test uses an ODE geom, so
   /// ray sensors must be attached to a body.
   /// @param rayCount Maximum number of rays in sensor.
-  public: Ray(/*Body *body, int rayCount*/);
+  public: Ray(Body *body);
 
   /// @brief Destructor
   public: virtual ~Ray();
@@ -93,9 +93,6 @@ class Ray: public Sensor
   /// \brief Ray-intersection callback
   private: static void UpdateCallback( void *data, dGeomID o1, dGeomID o2 );
   
-  /// The body we are attached to
-  private: Body *body;
-  
   /// Ray space for collision detector
   private: dSpaceID superSpaceId;
   private: dSpaceID raySpaceId; 
@@ -106,6 +103,9 @@ class Ray: public Sensor
   private: double minAngle, maxAngle;
   private: double minRange, maxRange;
   private: Vector3 origin;
+
+  private: Pose3d prevPose;
+  private: int rayCount;
 };
 
 }

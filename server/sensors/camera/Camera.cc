@@ -46,8 +46,8 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor 
-Camera::Camera()
-  : Sensor()
+Camera::Camera(Body *body)
+  : Sensor(body)
 {
   //this->cameraPose = GzPoseSet(GzVectorZero(), GzQuaternIdent());
 

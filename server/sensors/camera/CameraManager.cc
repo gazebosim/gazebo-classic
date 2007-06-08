@@ -21,7 +21,7 @@
 /* Desc: Class to manage all cameras
  * Author: Andrew Howard and Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include "Camera.hh"
@@ -58,7 +58,7 @@ CameraManager *CameraManager::Instance()
 /// Create a new camera
 Camera *CameraManager::CreateCamera()
 {
-  Camera *newCamera = new Camera();
+  Camera *newCamera = new Camera(NULL);
 
   this->cameras.push_back(newCamera);
 

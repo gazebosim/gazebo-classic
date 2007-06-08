@@ -51,7 +51,7 @@ namespace gazebo
 class Camera : public Sensor
 {
   // Constructor
-  public: Camera();
+  public: Camera(Body *body);
 
   // Destructor
   public: virtual ~Camera();

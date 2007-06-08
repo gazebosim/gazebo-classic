@@ -24,6 +24,7 @@
  * SVN: $Id$
  */
 
+#include "Body.hh"
 #include "XMLConfig.hh"
 #include "Sensor.hh"
 
@@ -31,9 +32,10 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Sensor::Sensor()
+Sensor::Sensor(Body *body)
   : Entity()
 {
+  this->body = body;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
