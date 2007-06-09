@@ -19,72 +19,100 @@
  *
  */
 /*
- * Desc: Controller base class.
+ * Desc: Gazebo Message
  * Author: Nathan Koenig
- * Date: 01 Feb 2007
+ * Date: 09 June 2007
  * SVN info: $Id$
  */
-#include "Model.hh"
-#include "Sensor.hh"
-#include "gazebo.h"
-#include "GazeboError.hh"
+
+#include <time.h>
 #include "XMLConfig.hh"
-#include "Controller.hh"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 
 using namespace gazebo;
 
+GazeboMessage *GazeboMessage::myself = NULL;
+
 ////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-Controller::Controller( Iface *interface, Entity *entity )
+/// Default constructor
+GazeboMessage::GazeboMessage()
 {
-  if (!interface)
-    gzthrow("iface is NULL");
-
-  if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
-  {
-    gzthrow("The parent of a controller must be a Model or a Sensor");
-  }
-
-  this->iface = interface;
-  this->parent = entity;
+  this->msgStream = &std::cout;
+  this->level = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
-Controller::~Controller()
+GazeboMessage::~GazeboMessage()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the controller. Called once on startup
-int Controller::Load(XMLConfigNode *node)
+/// Return an instance to this class
+GazeboMessage *GazeboMessage::Instance()
 {
-  if (!this->parent)
-    gzthrow("Parent entity has not been set");
+  if (myself == NULL)
+    myself = new GazeboMessage();
 
-  this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
+  return myself;
+}
 
-  return this->LoadChild(node);
+void GazeboMessage::Load(XMLConfigNode *node)
+{
+  bool logData;
+  char logFilename[50];
+
+  if (!node)
+  {
+    gzthrow("Null XMLConfig node");
+  }
+
+  this->SetVerbose(node->GetInt("verbosity",0,0));
+  logData = node->GetBool("logData",false);
+
+  if (logData)
+  {
+    time_t t;
+    struct tm *localTime;
+    char baseFilename[50];
+
+    time(&t);
+    localTime = localtime(&t); 
+
+    strftime(baseFilename, sizeof(baseFilename),
+        "gazebo-%Y_%m_%d_%H_%M", localTime);
+
+    snprintf(logFilename, sizeof(logFilename), "%s.log", baseFilename);
+  }
+  else
+  {
+    strcpy(logFilename,"/dev/null");
+  }
+
+  this->logStream.open(logFilename, std::ios::out);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Initialize the controller. Called once on startup.
-int Controller::Init()
+/// Set the verbosity
+void GazeboMessage::SetVerbose( int level )
 {
-  return this->InitChild();
+  this->level = level;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Update the controller. Called every cycle.
-int Controller::Update(UpdateParams &params)
+/// Get the message stream
+std::ostream &GazeboMessage::Msg( int msglevel )
 {
-  return this->UpdateChild(params);
+  if (msglevel <= this->level)
+    return *this->msgStream;
+  else
+    return this->nullStream;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Finialize the controller. Called once on completion.
-int Controller::Fini()
+// Log a message
+std::ofstream &GazeboMessage::Log()
 {
-  this->iface->Destroy();
-  return this->FiniChild();
+  return this->logStream;
 }

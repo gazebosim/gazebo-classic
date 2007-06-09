@@ -26,6 +26,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 
 #include <assert.h>
 #include <string.h>
@@ -41,7 +42,8 @@
 #include <sstream>
 
 #include "gazebo.h"
-#include "gz_error.h"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 
 using namespace gazebo;
 
@@ -49,6 +51,7 @@ GZ_REGISTER_IFACE("simulation", SimulationIface);
 GZ_REGISTER_IFACE("position", PositionIface);
 GZ_REGISTER_IFACE("camera", CameraIface);
 GZ_REGISTER_IFACE("graphics3d", Graphics3dIface);
+GZ_REGISTER_IFACE("laser", LaserIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface
@@ -94,22 +97,24 @@ std::string Iface::Filename(std::string id)
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface (server)
-int Iface::Create(Server *server, std::string id)
+void Iface::Create(Server *server, std::string id)
 {
+  std::ostringstream stream;
+
   this->server = server;
 
   // Went cant have null id's
   if (id.empty())
   {
-    GZ_ERROR1("interface [%s] id is NULL", this->type.c_str());
-    return -1;
+    stream << "interface [" << this->type << "] id is NULL";
+    gzthrow(stream.str());
   }
 
   // We cannot have id with '.'
   if (strchr(id.c_str(), '.'))
   {
-    GZ_ERROR1("invalid id [%s] (must not contain '.')", id.c_str());
-    return -1;
+    stream << "invalid id [" << id << "] (must not contain '.')";
+    gzthrow(stream.str());
   }
   
   // Work out the filename
@@ -120,15 +125,15 @@ int Iface::Create(Server *server, std::string id)
 
   if (this->mmapFd < 0)
   {
-    GZ_ERROR1("error creating mmap file: %s", strerror(errno));
-    return -1;
+    stream << "error creating mmap file: " << strerror(errno);
+    gzthrow(stream.str());
   }
 
   // Set the file to the correct size
   if (ftruncate(this->mmapFd, this->size) < 0)
   {
-    GZ_ERROR1("error setting size of mmap file: %s", strerror(errno));
-    return -1;
+    stream << "error setting size of mmap file: " << strerror(errno);
+    gzthrow(stream.str());
   }
 
   // Map the file into memory
@@ -136,44 +141,53 @@ int Iface::Create(Server *server, std::string id)
 
   if (this->mMap == MAP_FAILED)
   {
-    GZ_ERROR1("error mapping mmap file: %s", strerror(errno));
-    return -1;
+    stream << "error mapping mmap file: " <<  strerror(errno);
+    gzthrow(stream.str());
   }
+
   memset(this->mMap, 0, this->size);
 
   ((Iface*) this->mMap)->version = LIBGAZEBO_VERSION;
   ((Iface*) this->mMap)->size = this->size;
 
+  std::ios_base::fmtflags origFlags = std::cout.flags();
+
   // Print the name, version info
-  GZ_MSG3(5, "creating %s %03X %d", this->filename.c_str(),
-          ((Iface*) this->mMap)->version,
-          ((Iface*) this->mMap)->size);
-  return 0;
+  gzmsg(5) << "creating " << this->filename.c_str() << " " 
+
+           << setiosflags(std::ios::hex | std::ios::showbase) 
+           << std::setw(3) << ((Iface*) this->mMap)->version << " " 
+
+           << std::setiosflags(std::ios::dec | ~std::ios::showbase) 
+           << ((Iface*) this->mMap)->size << "\n";
+
+  std::cout.flags(origFlags);
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Create the interface
-int Iface::Create(Server *server, std::string id,
+void Iface::Create(Server *server, std::string id,
                   const std::string &modelType, int modelId, 
                   int parentModelId)
 {
-  if (this->Create(server,id) != 0)
-    return -1;
+
+  this->Create(server,id);
 
   this->modelType = modelType;
 
   this->modelId = modelId;
   this->parentModelId = parentModelId;
-
-  return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Destroy the interface (server)
-int Iface::Destroy()
+void Iface::Destroy()
 {
   if (!this->mMap && !this->mmapFd)
-    return 0;
+  {
+    gzthrow("mMap or mmapFd are null");
+  }
 
   // Unmap the file
   munmap(this->mMap, this->size);
@@ -184,21 +198,23 @@ int Iface::Destroy()
   this->mmapFd = 0;
 
   // Delete the file
-  GZ_MSG1(5, "deleting %s", this->filename.c_str());  
+  gzmsg(5) <<  "deleting "<< this->filename << "\n";
+
   if (unlink(this->filename.c_str()))
   {
-    GZ_ERROR1("error deleting mmap file: %s", strerror(errno));
-    return -1;
+    std::ostringstream stream;
+    stream << "error deleting mmap file: " << strerror(errno);
+    gzthrow(stream.str());
   }
-
-  return 0;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Open an existing interface (client)
-int Iface::Open(Client *client, std::string id)
+void Iface::Open(Client *client, std::string id)
 {
+  std::ostringstream stream;
+
   this->client = client;
   
   // Work out the filename
@@ -208,8 +224,9 @@ int Iface::Open(Client *client, std::string id)
   this->mmapFd = open(this->filename.c_str(), O_RDWR);
   if (this->mmapFd <= 0)
   {
-    GZ_ERROR2("error opening device file %s : %s", this->filename.c_str(), strerror(errno));
-    return -1;
+    stream << "error opening device file " <<  this->filename.c_str() << " : " 
+           << strerror(errno);
+    gzthrow(stream.str());
   }
 
   // Map the mmap file
@@ -217,46 +234,51 @@ int Iface::Open(Client *client, std::string id)
 
   if (this->mMap == MAP_FAILED)
   {
-    GZ_ERROR1("error mapping device file: %s", strerror(errno));
-    return -1;
+    stream << "error mapping device file: " << strerror(errno);
+    gzthrow(stream.str());
   }    
 
   // Make sure everything is consistent
   if (((Iface*) this->mMap)->size < this->size)
   {
-    GZ_ERROR2("expected file size: %d < %d", ((Iface*) this->mMap)->size, this->size);
-    return -1;
-  }
+    stream << "expected file size: " << ((Iface*) this->mMap)->size 
+           << " < " <<  this->size;
 
-  
+    gzthrow(stream.str());
+  }
+ 
+  std::ios_base::fmtflags origFlags = std::cout.flags();
+
   // Print the name, version info
-  GZ_MSG3(5, "opening %s %03X %d", this->filename.c_str(),
-          ((Iface*) this->mMap)->version,
-          ((Iface*) this->mMap)->size);
-  
-  return 0;
+  gzmsg(5) << "opening " << this->filename.c_str() << " "
+
+           << std::setiosflags(std::ios::hex | std::ios::showbase) 
+           << std::setw(3) << ((Iface*) this->mMap)->version << " "
+
+           << std::setiosflags(std::ios::dec | ~std::ios::showbase) 
+           << ((Iface*) this->mMap)->size << "\n";
+
+  std::cout.setf(origFlags);
 }  
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Close the interface (client)
-int Iface::Close()
+void Iface::Close()
 {
   // Unmap the file
   munmap(this->mMap, this->size);
   this->mMap = NULL;
 
   // Close the file
-  GZ_MSG1(5, "closing %s", this->filename.c_str());
+  gzmsg(5) <<  "closing " <<  this->filename << "\n";
   close(this->mmapFd);
-
-  return 0;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Lock the interface.
-int Iface::Lock(int blocking)
+void Iface::Lock(int blocking)
 {
   // Some 2.4 kernels seem to screw up the lock count somehow; keep an eye out
   
@@ -265,10 +287,10 @@ int Iface::Lock(int blocking)
   // Lock the file
   if (flock(this->mmapFd, LOCK_EX) != 0)
   {
-    GZ_ERROR2("flock %s error: %s", this->filename.c_str(), strerror(errno));
-    return -1;
+    std::ostringstream stream;
+    stream << "flock " <<  this->filename.c_str() << "error: " <<  strerror(errno);
+    gzthrow(stream.str());
   }
-  return 0;
 }
 
 
@@ -276,22 +298,21 @@ int Iface::Lock(int blocking)
 // Unlock the interface
 void Iface::Unlock()
 {
-  //printf("unlock %p %s\n", this, this->filename);
   
   // Unlock the file
   if (flock(this->mmapFd, LOCK_UN) != 0)
   {
-    GZ_ERROR1("flock error: %s", strerror(errno));
-    return;
+    std::ostringstream stream;
+    stream << "flock error: " <<  strerror(errno);
+    gzthrow(stream.str());
   }
-  return;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Tell clients that new data is available
-int Iface::Post()
+void Iface::Post()
 {
   assert(this->server);
-  return this->server->Post();
+  this->server->Post();
 }

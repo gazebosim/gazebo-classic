@@ -1,7 +1,7 @@
 #Import variable
 Import('env prefix')
 
-sources = Split('Server.cc Client.cc Iface.cc gz_error.c IfaceFactory.cc')
+sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc')
 headers = Split('gazebo.h IfaceFactory.hh')
 
 sharedLib = env.SharedLibrary('gazebo', sources)

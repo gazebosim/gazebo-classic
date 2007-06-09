@@ -29,6 +29,7 @@
 #include <sys/time.h>
 
 #include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "OgreAdaptor.hh"
 #include "PhysicsEngine.hh"
 #include "ODEPhysics.hh"
@@ -84,7 +85,7 @@ World *World::Instance()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
-int World::Load(XMLConfig *config, int serverId)
+void World::Load(XMLConfig *config, int serverId)
 {
   assert(serverId >= 0);
   XMLConfigNode *rootNode(config->GetRootNode());
@@ -95,27 +96,23 @@ int World::Load(XMLConfig *config, int serverId)
   }
   catch (GazeboError e)
   {
-    std::cerr << "Failed to Initialize the OGRE Rendering system\n" 
+    std::ostringstream stream;
+    stream << "Failed to Initialize the OGRE Rendering system\n" 
               << e << "\n";
-    return -1;
+    gzthrow(stream.str());
   }
 
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
-  if (this->server->Init(serverId, true ) != 0)
-    return -1;
-
+  this->server->Init(serverId, true );
 
    // Create the simulator interface
   this->simIface = new SimulationIface();
-  if (this->simIface->Create(this->server, "default" ) != 0)
-    return -1;
+  this->simIface->Create(this->server, "default" );
 
   this->LoadEntities(rootNode, NULL);
 
   this->physicsEngine->Load();
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

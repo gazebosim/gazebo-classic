@@ -486,13 +486,7 @@ void Model::LoadIface(XMLConfigNode *node)
   iface = IfaceFactory::NewIface(ifaceType);
 
   // Create the iface
-  if (iface->Create(gazebo::World::Instance()->GetGzServer(),
-                    this->GetName().c_str()) != 0)
-  {
-    std::ostringstream stream;
-    stream << "Error creating " << ifaceName << "interface\n";
-    gzthrow(stream.str()); 
-  }
+  iface->Create(gazebo::World::Instance()->GetGzServer(), ifaceName);
 
   // Store the iface
   this->ifaces[ifaceName] = iface;
@@ -517,9 +511,6 @@ void Model::LoadController(XMLConfigNode *node)
   // Get the name of the iface the controller uses
   std::string ifaceName = node->GetString("iface","",1);
 
-  // Create the controller based on it's type
-  controller = ControllerFactory::NewController(controllerType);
-
   // Get the iface the controller uses
   iface = this->ifaces[ifaceName];
 
@@ -530,9 +521,8 @@ void Model::LoadController(XMLConfigNode *node)
     gzthrow(stream.str());
   }
 
-  // Attach the iface to the controller
-  controller->SetIface(iface);
-  controller->SetModel(this);
+  // Create the controller based on it's type
+  controller = ControllerFactory::NewController(controllerType, iface, this);
 
   // Load the controller
   controller->Load(node);

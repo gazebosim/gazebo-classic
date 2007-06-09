@@ -26,6 +26,7 @@
  */
 
 #include "gazebo.h"
+#include "GazeboError.hh"
 #include "IfaceFactory.hh"
 
 using namespace gazebo;
@@ -34,6 +35,7 @@ void RegisterSimulationIface();
 void RegisterPositionIface();
 void RegisterCameraIface();
 void RegisterGraphics3dIface();
+void RegisterLaserIface();
 
 std::map<std::string, IfaceFactoryFn> IfaceFactory::ifaces;
 
@@ -45,6 +47,7 @@ void IfaceFactory::RegisterAll()
   RegisterPositionIface();
   RegisterCameraIface();
   RegisterGraphics3dIface();
+  RegisterLaserIface();
 }
 
 
@@ -64,6 +67,13 @@ Iface *IfaceFactory::NewIface(const std::string &classname)
   {
     return (ifaces[classname]) ();
   }
+  else
+  {
+    std::ostringstream stream;
+    stream << "Unable to make interface of type " << classname;
+    gzthrow(stream.str());
+  }
+
 
   return NULL;
 }

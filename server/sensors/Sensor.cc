@@ -16,7 +16,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
  */
 /* Desc: Base class for all sensors
  * Author: Nathan Koenig
@@ -24,8 +23,13 @@
  * SVN: $Id$
  */
 
+#include "Controller.hh"
+#include "gazebo.h"
+#include "GazeboError.hh"
 #include "Body.hh"
 #include "XMLConfig.hh"
+#include "World.hh"
+#include "ControllerFactory.hh"
 #include "Sensor.hh"
 
 using namespace gazebo;
@@ -72,3 +76,47 @@ void Sensor::Fini()
   this->FiniChild();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Load a controller helper function
+void Sensor::LoadController(XMLConfigNode *node)
+{
+  if (!node)
+    gzthrow( "node parameter is NULL" );
+
+  Iface *iface;
+  XMLConfigNode *childNode;
+  std::ostringstream stream;
+
+  // Get the controller's type
+  std::string controllerType = node->GetName();
+
+  // Get the unique name of the controller
+  std::string controllerName = node->GetString("name","",1);
+
+  // Create the interface
+  if ( (childNode = node->GetChildByNSPrefix("interface")) )
+  {
+    // Get the type of the interface (eg: laser)
+    std::string ifaceType = childNode->GetName();
+
+    // Get the name of the iface 
+    std::string ifaceName = childNode->GetString("name","",1);
+
+    // Use the factory to get a new iface based on the type
+    iface = IfaceFactory::NewIface(ifaceType);
+
+    // Create the iface
+    iface->Create(World::Instance()->GetGzServer(), ifaceName);
+  }
+  else
+  {
+    stream << "No interface defined for " << controllerName << "controller";
+    gzthrow(stream.str()); 
+  }
+
+  // Create the controller based on it's type
+  this->controller = ControllerFactory::NewController(controllerType, iface, this);
+
+  // Load the controller
+  this->controller->Load(node);
+}

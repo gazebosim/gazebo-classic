@@ -37,9 +37,12 @@ PLAYER_LASER_REQ_GET_GEOM
 
 #include <math.h>
 
+#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"
+
+using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -53,7 +56,7 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
   strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
 
   // Allocate a Position Interface
-  this->iface = gz_laser_alloc();
+  this->iface = new LaserIface();
 
   this->scanId = 0;
 
@@ -65,7 +68,7 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
 LaserInterface::~LaserInterface()
 {
   // Release this interface
-  gz_laser_free(this->iface); 
+  delete this->iface; 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -162,7 +165,7 @@ void LaserInterface::Update()
   player_laser_data_t data;
   struct timeval ts;
 
-  gz_laser_lock(this->iface, 1);
+  this->iface->Lock(1);
 
   // Only Update when new data is present
   if (this->iface->data->time > this->datatime)
@@ -209,7 +212,7 @@ void LaserInterface::Update()
                    (void*)&data, sizeof(data), &this->datatime );
   }
 
-  gz_laser_unlock(this->iface);
+  this->iface->Unlock();
 }
 
 
@@ -219,9 +222,16 @@ void LaserInterface::Update()
 void LaserInterface::Subscribe()
 {
   // Open the interface
-  if (gz_laser_open(this->iface, GazeboClient::client, this->gz_id) != 0)
+  try
   {
-    printf("Error Subscribing to Gazebo Position Interface\n");
+    this->iface->Open(GazeboClient::client, this->gz_id);
+  }
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "Error Subscribing to Gazebo Position Interface\n"
+           << e << "\n";
+    gzthrow(stream.str());
   }
 }
 
@@ -229,5 +239,5 @@ void LaserInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void LaserInterface::Unsubscribe()
 {
-  gz_laser_close(this->iface);
+  this->iface->Close();
 }

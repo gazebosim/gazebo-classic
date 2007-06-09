@@ -32,6 +32,7 @@
 */
 
 #include "gazebo.h"
+#include "GazeboError.hh"
 #include "GazeboDriver.hh"
 #include "Graphics3dInterface.hh"
 
@@ -126,9 +127,16 @@ void Graphics3dInterface::Update()
 void Graphics3dInterface::Subscribe()
 {
   // Open the interface
-  if (this->iface->Open(GazeboClient::client, this->gz_id) != 0)
+  try
   {
-    printf("Error Subscribing to Gazebo Graphics3d Interface\n");
+    this->iface->Open(GazeboClient::client, this->gz_id);
+  } 
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "Error Subscribing to Gazebo Graphics3d Interface\n"
+           << e << "\n";
+    gzthrow(stream.str());
   }
 }
 

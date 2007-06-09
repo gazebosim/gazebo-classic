@@ -36,10 +36,12 @@ namespace gazebo
 
 // Forward declarations
 class Controller;
+class Entity;
+class Iface;
 
 
 // Prototype for controller factory functions
-typedef Controller* (*ControllerFactoryFn) ();
+typedef Controller* (*ControllerFactoryFn) (Iface *iface, Entity *parent);
 
 
 /// @brief The controller factory; the class is just for namespacing purposes.
@@ -54,7 +56,7 @@ class ControllerFactory
 
   /// @brief Create a new instance of a controller.  Used by the world when
   /// reading the world file.
-  public: static Controller *NewController(const std::string &classname);
+  public: static Controller *NewController(const std::string &classname, Iface *iface, Entity *parent);
 
   // A list of registered controller classes
   private: static std::map<std::string, ControllerFactoryFn> controllers;
@@ -68,34 +70,15 @@ class ControllerFactory
 /// @param name Controller type name, as it appears in the world file.
 /// @param classname C++ class name for the controller.
 #define GZ_REGISTER_STATIC_CONTROLLER(name, classname) \
-Controller *New##classname() \
+Controller *New##classname(Iface *iface, Entity *entity) \
 { \
-  return new classname(); \
+  return new classname(iface, entity); \
 } \
 void Register##classname() \
 {\
   ControllerFactory::RegisterController("static", name, New##classname);\
 }
 
-
-/// @brief Plugin controller registration macro
-///
-/// Use this macro to register plugin controllers with the server.
-/// @param name Controller type name, as it appears in the world file.
-/// @param classname C++ class name for the controller.
-#define GZ_REGISTER_PLUGIN_CONTROLLER(name, classname) \
-Controller *New##classname() \
-{ \
-  return new classname(); \
-} \
-extern "C" \
-{ \
-  int gazebo_plugin_init(void) \
-  { \
-    ControllerFactory::RegisterController("plugin", name, New##classname); \
-    return 0;\
-  }\
-}
 
 }
 

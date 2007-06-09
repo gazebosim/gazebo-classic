@@ -40,10 +40,10 @@ namespace gazebo
 class GazeboClient
 {
   /// Initialize 
-  public: static int Init(int serverid, const char *prefixid);
+  public: static void Init(int serverid, const char *prefixid);
 
   /// Finalize
-  public: static int Fini();
+  public: static void Fini();
 
   /// The prefix used for all gazebo ID's
   public: static const char *prefixId;

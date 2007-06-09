@@ -19,72 +19,71 @@
  *
  */
 /*
- * Desc: Controller base class.
+ * Desc: SickLMS200 Laser controller.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN info: $Id$
+ * SVN info: $Id: SickLMS200_Laser.cc 28 2007-05-31 00:53:17Z natepak $
  */
-#include "Model.hh"
+
 #include "Sensor.hh"
+#include "Global.hh"
+#include "XMLConfig.hh"
+#include "HingeJoint.hh"
+#include "World.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
-#include "XMLConfig.hh"
-#include "Controller.hh"
+#include "ControllerFactory.hh"
+#include "SickLMS200_Laser.hh"
 
 using namespace gazebo;
 
+GZ_REGISTER_STATIC_CONTROLLER("sicklms200_laser", SickLMS200_Laser);
+
 ////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-Controller::Controller( Iface *interface, Entity *entity )
+// Constructor
+SickLMS200_Laser::SickLMS200_Laser(Iface *iface, Entity *parent)
+  : Controller(iface, parent)
 {
-  if (!interface)
-    gzthrow("iface is NULL");
+  this->myIface = dynamic_cast<LaserIface*>(this->iface);
+  this->myParent = dynamic_cast<Sensor*>(this->parent);
 
-  if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
-  {
-    gzthrow("The parent of a controller must be a Model or a Sensor");
-  }
+  if (!this->myIface)
+    gzthrow("SickLMS200_Laser controller requires a LaserIface");
 
-  this->iface = interface;
-  this->parent = entity;
+  if (!this->myParent)
+    gzthrow("SickLMS200_Laser controller requires a Sensor as its parent");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Destructor
-Controller::~Controller()
+// Destructor
+SickLMS200_Laser::~SickLMS200_Laser()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the controller. Called once on startup
-int Controller::Load(XMLConfigNode *node)
+// Load the controller
+int SickLMS200_Laser::LoadChild(XMLConfigNode *node)
 {
-  if (!this->parent)
-    gzthrow("Parent entity has not been set");
-
-  this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
-
-  return this->LoadChild(node);
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Initialize the controller. Called once on startup.
-int Controller::Init()
+// Initialize the controller
+int SickLMS200_Laser::InitChild()
 {
-  return this->InitChild();
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Update the controller. Called every cycle.
-int Controller::Update(UpdateParams &params)
+// Update the controller
+int SickLMS200_Laser::UpdateChild(UpdateParams &params)
 {
-  return this->UpdateChild(params);
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Finialize the controller. Called once on completion.
-int Controller::Fini()
+// Finalize the controller
+int SickLMS200_Laser::FiniChild()
 {
-  this->iface->Destroy();
-  return this->FiniChild();
+  return 0;
 }

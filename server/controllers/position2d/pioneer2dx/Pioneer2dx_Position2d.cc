@@ -43,8 +43,18 @@ enum {LEFT, RIGHT};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Pioneer2dx_Position2d::Pioneer2dx_Position2d()
+Pioneer2dx_Position2d::Pioneer2dx_Position2d( Iface *iface, Entity *parent )
+  : Controller(iface, parent)
 {
+  this->myIface = dynamic_cast<PositionIface*>(this->iface);
+  this->myParent = dynamic_cast<Model*>(this->parent);
+
+  if (!this->myIface)
+    gzthrow("Pioneer2dx_Position2d controller requires a PositionIface");
+
+  if (!this->myParent)
+    gzthrow("Pioneer2dx_Position2d controller requires a Model as its parent");
+
   this->enableMotors = true;
 
   this->wheelSpeed[0] = 0;
@@ -67,8 +77,8 @@ int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
   std::string leftJointName = node->GetString("leftJoint", "", 1);
   std::string rightJointName = node->GetString("rightJoint", "", 1);
 
-  this->joints[LEFT] = dynamic_cast<HingeJoint*>(this->model->GetJoint(leftJointName));
-  this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->model->GetJoint(rightJointName));
+  this->joints[LEFT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(leftJointName));
+  this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightJointName));
 
   if (!this->joints[LEFT])
     gzthrow("couldn't get left hinge joint");
@@ -150,19 +160,9 @@ int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 // Finalize the controller
 int Pioneer2dx_Position2d::FiniChild()
 {
-  this->iface->Destroy();
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// The interface for the controller
-void Pioneer2dx_Position2d::SetIface(Iface *iface)
-{
-  this->iface = dynamic_cast<PositionIface*>(iface);
-
-  if (!this->iface)
-    gzthrow("iface is not of type PositionIface");
-}
 
 //////////////////////////////////////////////////////////////////////////////
 // Get commands from the external interface
@@ -170,10 +170,10 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 {
   double vr, va;
 
-  vr = this->iface->data->cmdVelocity.x;
-  va = this->iface->data->cmdVelocity.yaw;
+  vr = this->myIface->data->cmdVelocity.x;
+  va = this->myIface->data->cmdVelocity.yaw;
 
-  this->enableMotors = this->iface->data->cmdEnableMotors > 0;
+  this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
 
   this->wheelSpeed[LEFT] = vr - va * this->wheelSep / 2;
   this->wheelSpeed[RIGHT] = vr + va * this->wheelSep / 2;
@@ -183,20 +183,20 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 // Update the data in the interface
 void Pioneer2dx_Position2d::PutPositionData()
 {
-  this->iface->Lock(1);
+  this->myIface->Lock(1);
   
   // TODO: Data timestamp
-  this->iface->data->time = World::Instance()->GetSimTime();
+  this->myIface->data->time = World::Instance()->GetSimTime();
 
-  this->iface->data->pose.x = this->odomPose[0];
-  this->iface->data->pose.y = this->odomPose[1];
-  this->iface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
+  this->myIface->data->pose.x = this->odomPose[0];
+  this->myIface->data->pose.y = this->odomPose[1];
+  this->myIface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
 
-  this->iface->data->velocity.x = this->odomVel[0];
-  this->iface->data->velocity.yaw = this->odomVel[2];
+  this->myIface->data->velocity.x = this->odomVel[0];
+  this->myIface->data->velocity.yaw = this->odomVel[2];
 
   // TODO
-  this->iface->data->stall = 0;
+  this->myIface->data->stall = 0;
 
-  this->iface->Unlock();
+  this->myIface->Unlock();
 }

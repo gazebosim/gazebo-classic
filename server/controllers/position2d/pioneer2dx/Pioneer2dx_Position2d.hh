@@ -29,21 +29,26 @@
 
 
 #include "Controller.hh"
+#include "Entity.hh"
+#include "gazebo.h"
 
 namespace gazebo
 {
   class HingeJoint;
   class PositionIface;
 
-/// @addtogroup controllers
-/// @{
+/// \addtogroup controllers
+/// \{
+/** \defgroup pioneer2dx_position2d pioneer2dx_position2d
+\{
+*/
 
 /// Pioneer 2 DX Position2D controller.
 /// This is a controller that simulates a Pioneer 2DX motion
 class Pioneer2dx_Position2d : public Controller
 {
   /// Constructor
-  public: Pioneer2dx_Position2d();
+  public: Pioneer2dx_Position2d( Iface *iface, Entity *parent );
 
   /// Destructor
   public: virtual ~Pioneer2dx_Position2d();
@@ -65,9 +70,6 @@ class Pioneer2dx_Position2d : public Controller
   /// \return 0 on success
   protected: virtual int FiniChild();
 
-  /// The interface for the controller
-  public: virtual void SetIface(Iface *iface);
-
   /// Update the data in the interface
   private: void PutPositionData();
 
@@ -75,7 +77,10 @@ class Pioneer2dx_Position2d : public Controller
   private: void GetPositionCmd();
 
   /// The Position interface
-  private: PositionIface *iface;
+  private: PositionIface *myIface;
+
+  /// The parent Model
+  private: Model *myParent;
 
   /// Separation between the wheels
   private: float wheelSep;
@@ -93,9 +98,11 @@ class Pioneer2dx_Position2d : public Controller
   private: float odomVel[3];
 
   private: HingeJoint *joints[2];
+
 };
 
-/// @}
+/** \} */
+/// \}
 
 }
 

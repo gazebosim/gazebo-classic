@@ -5,6 +5,7 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include "GazeboMessage.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
@@ -271,7 +272,7 @@ void OgreAdaptor::LoadPlugins(XMLConfigNode *node)
   while (pluginNode)
   {
     pluginStr = pathStr + "/" + pluginNode->GetValue();
-    std::cout << "OGRE: Load Plugin[" << pluginStr << "]\n";
+    gzmsg(5) << "OGRE: Load Plugin[" << pluginStr << "]\n";
 
     // Load the plugin into OGRE
     this->root->loadPlugin(pluginStr);

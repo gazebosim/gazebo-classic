@@ -42,10 +42,9 @@ class GazeboError
   public: GazeboError();
 
   /// Default constructor
-  /// \param func File name
+  /// \param file File name
   /// \param line Line number where the error occurred
-  /// \param str Error string
-  /// \param code Error code
+  /// \param msg Error message
   public: GazeboError(const char *file, 
                       int line, 
                       std::string msg);

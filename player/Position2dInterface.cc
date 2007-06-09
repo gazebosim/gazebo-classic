@@ -38,6 +38,7 @@
 */
 #include <math.h>
 
+#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
@@ -240,9 +241,16 @@ void Position2dInterface::Update()
 void Position2dInterface::Subscribe()
 {
   // Open the interface
-  if (this->iface->Open(GazeboClient::client, this->gz_id) != 0)
+  try
   {
-    printf("Error Subscribing to Gazebo Position Interface\n");
+    this->iface->Open(GazeboClient::client, this->gz_id);
+  }
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream <<"Error Subscribing to Gazebo Position Interface\n"
+           << e << "\n";
+    gzthrow(stream.str());
   }
 }
 

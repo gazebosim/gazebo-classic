@@ -83,30 +83,6 @@ class Color
   public: float r, g, b, a;
 };
 
-
-/***************************************************************************/
-//! \addtogroup libgazebo 
-//! \{
-/** \defgroup utility Error-handling
-\{
-*/
-/***************************************************************************/
-
-/** \brief \internal Initialize error logging
-    \param print Set to 0 to stop messages being printed to stderr.
-    \param level Debug level: 0 = important messages, 1 = useful
-    messages, 2+ = all messages.
-*/
-void gz_error_init(int print, int level);
-  
-/** Retrieve the last error (as a descriptive string).  Most functions
-    in will return 0 on success and non-zero value on error; a
-    descriptive error message can be obtained by calling this
-    function. */
-const char *gz_error_str(void);
-
-/** \}*/
-//! \}
 /***************************************************************************/
 
 
@@ -123,35 +99,35 @@ maintain connections with clients.
 \{
 */
 
-//! \brief Server class
+/// \brief Server class
 class Server
 {
-  //! \brief Constructor
+  /// \brief Constructor
   public: Server();
 
-  //! \brief Destructor
+  /// \brief Destructor
   public: virtual ~Server();
 
-  //! \brief Initialize the server
-  public: int Init(int serverId, int force);
+  /// \brief Initialize the server
+  public: void Init(int serverId, int force);
 
-  //! \brief Finalize the server
-  public: int Fini();
+  /// \brief Finalize the server
+  public: void Fini();
 
-  //! \brief Tell clients that new data is available
-  public: int Post();
+  /// \brief Tell clients that new data is available
+  public: void Post();
 
-  private: int SemInit(int force);
-  private: int SemFini();
-  private: int SemPost();
+  private: void SemInit(int force);
+  private: void SemFini();
+  private: void SemPost();
 
-  //! The server id
+  /// The server id
   public: int serverId;
 
-  //! The directory containing mmap files
+  /// The directory containing mmap files
   public: std::string filename;
 
-  //! The semphore key and id
+  /// The semphore key and id
   public: int semKey, semId;
 };
 
@@ -188,36 +164,34 @@ with a running server.  See the \ref libgazebo_usage for an overview.
 //! Client class
 class Client 
 {
-  //! Create a new client
+  /// \brief Create a new client
   public: Client();
 
-  //! Destroy a client
+  /// \brief Destroy a client
   public: virtual ~Client();
 
-  //! Test for the presence of the server.
-  //! \returns The return value is 0 if the server is present; +1 if
-  //! the server is not present; -1 if there is an error.
-  public: int Query(int server_id);
+  /// \brief Test for the presence of the server.
+  public: void Query(int server_id);
 
-  //! Connect to the server (non-blocking mode).
-  public: int Connect(int server_id);
+  /// \brief Connect to the server (non-blocking mode).
+  public: void Connect(int server_id);
 
-  //! \brief Connect to the server (blocking mode).
-  //! \param server_id Server ID; each server must have a unique id.
-  //! \param client_id Client ID; in blocking mode, each client must have a unique id.
-  public: int ConnectWait(int server_id, int client_id);
+  /// \brief Connect to the server (blocking mode).
+  /// \param server_id Server ID; each server must have a unique id.
+  /// \param client_id Client ID; in blocking mode, each client must have a unique id.
+  public: void ConnectWait(int server_id, int client_id);
 
-  //! Disconnect from the server
-  public: int Disconnect();
+  /// \brief Disconnect from the server
+  public: void Disconnect();
 
   //! \brief Wait for new data to be posted (blocking mode).
   //! \returns Returns 0 on success, -1 on error.
-  public: int Wait();
+  public: void Wait();
 
-  private: int SemQuery(int server_id);
-  private: int SemInit();
-  private: int SemFini();
-  private: int SemWait();
+  private: void SemQuery(int server_id);
+  private: void SemInit();
+  private: void SemFini();
+  private: void SemWait();
 
   //! The server id
   public: int serverId;
@@ -257,31 +231,31 @@ class Iface
   public: virtual ~Iface();
 
   //! \brief Create the interface (used by Gazebo server)
-  public: virtual int Create(Server *server, std::string id);
+  public: virtual void Create(Server *server, std::string id);
 
   //! \brief Create the interface (used by Gazebo server)
-  public: int Create(Server *server, std::string id,
+  public: void Create(Server *server, std::string id,
                      const std::string &modelType, int modelId, 
                      int parentModelId);
 
   //! \brief Destroy the interface (server)
-  public: int Destroy();
+  public: void Destroy();
 
   //! Open an existing interface
-  public: virtual int Open(Client *client, std::string id);
+  public: virtual void Open(Client *client, std::string id);
 
   //! Close the interface
-  public: int Close();
+  public: void Close();
 
   /// Lock the interface.  Set blocking to 1 if the caller should block
   /// until the lock is acquired.  Returns 0 if the lock is acquired.
-  public: int Lock(int blocking);
+  public: void Lock(int blocking);
 
   /// Unlock the interface
-  public:  void Unlock();
+  public: void Unlock();
 
   /// Tell clients that new data is available
-  public: int Post();
+  public: void Post();
 
   private: std::string Filename(std::string id);
 
@@ -369,15 +343,17 @@ class SimulationIface : public Iface
   //! Destroy an interface
   public: virtual ~SimulationIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, std::string id)
-          {int result = Iface::Create(server,id); 
-           this->data = (SimulationData*)this->mMap; 
-           return result;}
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (SimulationData*)this->mMap; 
+          }
 
-  public: virtual int Open(Client *client, std::string id)
-          {int result = Iface::Open(client,id); 
-           this->data = (SimulationData*)this->mMap; 
-           return result;}
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (SimulationData*)this->mMap; 
+          }
 
   public: SimulationData *data;
 };
@@ -427,15 +403,17 @@ class CameraIface : public Iface
   public: CameraIface():Iface("camera", sizeof(CameraIface)+sizeof(CameraData)) {}
   public: virtual ~CameraIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, std::string id)
-          {int result = Iface::Create(server,id); 
-           this->data = (CameraData*)this->mMap; 
-           return result;}
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (CameraData*)this->mMap; 
+          }
 
-  public: virtual int Open(Client *client, std::string id)
-          {int result = Iface::Open(client,id); 
-           this->data = (CameraData*)this->mMap; 
-           return result;}
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (CameraData*)this->mMap; 
+          }
 
   public: CameraData *data;
 };
@@ -489,15 +467,17 @@ class PositionIface : public Iface
   //! Destructor
   public: virtual ~PositionIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, std::string id)
-          {int result = Iface::Create(server,id); 
-           this->data = (PositionData*)this->mMap; 
-           return result;}
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (PositionData*)this->mMap; 
+          }
 
-  public: virtual int Open(Client *client, std::string id)
-          {int result = Iface::Open(client,id); 
-           this->data = (PositionData*)this->mMap; 
-           return result;}
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (PositionData*)this->mMap; 
+          }
 
   public: PositionData *data;
 };
@@ -548,15 +528,17 @@ class Graphics3dIface : public Iface
   //! Destructor
   public: virtual ~Graphics3dIface() {this->data = NULL;}
 
-  public: virtual int Create(Server *server, std::string id)
-          {int result = Iface::Create(server,id); 
-           this->data = (Graphics3dData*)this->mMap; 
-           return result;}
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (Graphics3dData*)this->mMap; 
+          }
 
-  public: virtual int Open(Client *client, std::string id)
-          {int result = Iface::Open(client,id); 
-           this->data = (Graphics3dData*)this->mMap; 
-           return result;}
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (Graphics3dData*)this->mMap; 
+          }
 
   public: Graphics3dData *data;
 };
@@ -564,6 +546,80 @@ class Graphics3dIface : public Iface
 
 /** @} */
 /// @}
+
+
+  
+/***************************************************************************/
+/// @addtogroup libgazebo
+/// @{
+/** @defgroup laser laser
+
+@{
+*/
+
+#define GZ_LASER_MAX_RANGES 401
+
+/// Laser interface data
+class LaserData
+{
+  /// Data timestamp
+  public: double time;
+  
+  /// Range scan angles
+  public: double min_angle, max_angle;
+
+  /// Angular resolution
+  public: double res_angle;
+
+  /// Max range value
+  public: double max_range;
+
+  /// Number of range readings
+  public: int range_count;
+  
+  /// Range readings
+  public: double ranges[GZ_LASER_MAX_RANGES];
+
+  /// Intensity readings
+  public: int intensity[GZ_LASER_MAX_RANGES];
+  
+  /// New command ( 0 or 1 )
+  public: int cmd_new_angle;
+  public: int cmd_new_length;
+
+  /// Commanded range value
+  public: double cmd_max_range;
+  public: double cmd_min_angle, cmd_max_angle;
+  public: int cmd_range_count;
+};
+
+/// Laser interface
+class LaserIface : public Iface
+{
+  //! Constructor
+  public: LaserIface():Iface("laser", sizeof(LaserIface)+sizeof(LaserData)) {}
+
+  //! Destructor
+  public: virtual ~LaserIface() {this->data = NULL;}
+
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (LaserData*)this->mMap; 
+          }
+
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (LaserData*)this->mMap; 
+          }
+
+  public: LaserData *data;
+};
+
+/** @} */
+/// @}
+
 
 }
 

@@ -35,64 +35,77 @@ namespace gazebo
 {
   class XMLConfigNode;
   class Iface;
-  class Model;
+  class Entity;
 
-/// @addtogroup controllers
-/// @{
+/// \addtogroup controllers
+/// \{
+/** \defgroup controller controller
+\{ 
+*/
 
-/// Base class for all controllers
+/// \brief Base class for all controllers
 class Controller
 {
-  /// Constructor
-  public: Controller();
+  /// \brief Constructor
+  /// \param iface The libgazebo interface for the controller
+  /// \param parent The parent entity, must be a Model or a Sensor
+  public: Controller( Iface *iface, Entity *parent );
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~Controller();
 
-  /// Load the controller. Called once on startup
+  /// \brief Load the controller. Called once on startup
+  /// \param node The XMLConfig node pointer
+  /// \return 0 on success
   public: int Load(XMLConfigNode *node);
 
-  /// Initialize the controller. Called once on startup.
+  /// \brief Initialize the controller. Called once on startup.
+  /// \return 0 on success
   public: int Init();
 
-  /// Update the controller. Called every cycle.
+  /// \brief Update the controller. Called every cycle.
+  /// \param params Parameters to the update cycle
+  /// \return 0 on success
   public: int Update(UpdateParams &params);
 
-  /// Finialize the controller. Called once on completion.
+  /// \brief Finialize the controller. Called once on completion.
+  /// \return 0 on success
   public: int Fini();
 
-  /// Load function for the child class
+  /// \brief Load function for the child class
+  /// \return 0 on success
   protected: virtual int LoadChild(XMLConfigNode * /*node*/) {return 0;}
 
-  /// Init function for the child class
+  /// \brief Init function for the child class
+  /// \return 0 on success
   protected: virtual int InitChild() {return 0;}
 
-  /// Update function for the child class
+  /// \brief Update function for the child class
+  /// \return 0 on success
   protected: virtual int UpdateChild(UpdateParams &/*params*/) {return 0;}
 
-  /// Fini function for the child class
+  /// \brief Fini function for the child class
+  /// \return 0 on success
   protected: virtual int FiniChild() {return 0;}
 
-  /// Return the name of this controller
+  /// \brief Return the name of this controller
+  /// \return The name of the controller
   public: std::string GetName() const;
 
-  /// The interface for the controller
-  public: virtual void SetIface(Iface * /*iface*/) {return;}
-
-  /// Set the model for the controller
-  public: void SetModel(Model *model); 
-
-  /// The controller's name
+  /// \brief The controller's name
   protected: std::string name;
 
-  /// The model for the controller
-  protected: Model *model;
+  /// \brief The entity that owns this controller
+  protected: Entity *parent;
 
-  /// Update period 
+  protected: Iface *iface;
+
+  /// \brief Update period 
   protected: double updatePeriod;
 };
 
-/// @}
+/** \} */
+/// \}
 
 }
 

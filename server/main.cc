@@ -111,6 +111,7 @@ home directory, or to the log file specified with the -l command line option.
 #include "ControllerFactory.hh"
 #include "World.hh"
 #include "GazeboError.hh"
+#include "GazeboMessage.hh"
 
 // Command line options
 const char *worldFileName;
@@ -256,6 +257,14 @@ int Init()
     printf("signal(2) failed while setting up for SIGINT\n");
     return -1;
   }
+  // Load the world file
+  gazebo::XMLConfig *xmlFile(new gazebo::XMLConfig());
+
+  if (xmlFile->Load(worldFileName) != 0)
+    return -1;
+
+  // Load the messaging system
+  gazebo::GazeboMessage::Instance()->Load(xmlFile->GetRootNode());
 
   // Register static models
   gazebo::ModelFactory::RegisterAll();
@@ -263,15 +272,8 @@ int Init()
   gazebo::IfaceFactory::RegisterAll();
   gazebo::ControllerFactory::RegisterAll();
   
-  // Load the world file
-  gazebo::XMLConfig *xmlFile(new gazebo::XMLConfig());
-
-  if (xmlFile->Load(worldFileName) != 0)
-    return -1;
-
   // Load the world
-  if (gazebo::World::Instance()->Load(xmlFile, optServerId) != 0)
-    return -1;
+  gazebo::World::Instance()->Load(xmlFile, optServerId);
 
   // Initialize
   if (gazebo::World::Instance()->Init() != 0)

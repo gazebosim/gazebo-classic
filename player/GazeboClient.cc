@@ -41,7 +41,7 @@ extern PlayerTime* GlobalTime;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize 
-int GazeboClient::Init(int serverid, const char *prefixid)
+void GazeboClient::Init(int serverid, const char *prefixid)
 {
   if (prefixid != NULL)
     GazeboClient::prefixId = prefixid;
@@ -49,35 +49,26 @@ int GazeboClient::Init(int serverid, const char *prefixid)
   GazeboClient::client = new Client();
 
   // Use version 0.5.0
-  if (GazeboClient::client->ConnectWait(serverid, GZ_CLIENT_ID_PLAYER) != 0)
-    return -1;
+  GazeboClient::client->ConnectWait(serverid, GZ_CLIENT_ID_PLAYER);
 
   GazeboClient::sim = new SimulationIface();
 
-  if (GazeboClient::sim->Open( GazeboClient::client, "default") != 0)
-  {
-    printf("Gazeob Error: Unable to connect to the Gazebo Sim Interface\n");
-    return -1;
-  }
+  GazeboClient::sim->Open( GazeboClient::client, "default");
 
   // steal the global clock - a bit aggressive, but a simple approach
   if (GlobalTime)
     delete GlobalTime;
   assert((GlobalTime = new GazeboTime()));
 
-  return 0;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize
-int GazeboClient::Fini()
+void GazeboClient::Fini()
 {
   GazeboClient::sim->Close();
 
-  if (GazeboClient::client->Disconnect() != 0)
-    return -1;
-
-  return 0;
+  GazeboClient::client->Disconnect();
 }
 

@@ -1,12 +1,20 @@
-- GPS quantization bug (Player?)
-- WiFi LOS model
-
-
 Open:
-- Check version of 3rd party packages
+- Write a tutorial for creating custom models
+- Write a tutorial for creating new controllers
+- Write a tutorial for creating new sensors
+- Write a tutorial for creating a new world
+- Dynamic textures
+- Hand of god
+- Display camera position
+- Selectable models
+- Scripting interface for models and sensors
+- Screen capture
+- BSP loader
+- Google Earth API interface
+- GPS 
+- WiFi
 - Real time user interaction
 - Multilevel map extruder
-- Graphical Scene builder. Exports an XML configuration file.
 - Player image interface
 - libgazebo image interface
 - Player gazebo imaging driver
@@ -14,3 +22,4 @@ Open:
 - Standardize internal API
 - Fix any memory leaks
 - Data Logger
+- Replace all return int, with throws

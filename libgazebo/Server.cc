@@ -26,11 +26,6 @@
  * CVS: $Id$
  */
 
-#if HAVE_CONFIG_H
-  #include <config.h>
-#endif
-
-
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -43,7 +38,8 @@
 #include <sys/sem.h>
 #include <sstream>
 
-#include "gz_error.h"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "gazebo.h"
 
 using namespace gazebo;
@@ -55,30 +51,33 @@ union semun
   unsigned short *array;
 };
 
+////////////////////////////////////////////////////////////////////////////////
 // Create a server object
 Server::Server()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Destroy a server
 Server::~Server()
 {
-  return;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the server
-int Server::Init(int serverId, int force)
+void Server::Init(int serverId, int force)
 {
   char *tmpdir;
   char *user;
   char filename[128];
+  std::ostringstream stream;
+  std::ostringstream errStream;
 
   this->serverId = serverId;
 
   // Initialize semaphores.  Do this first to make sure we dont have
   // another server running with the same id.
-  if (this->SemInit(force) < 0)
-    return -1;
+  this->SemInit(force);
 
   // Get the tmp dir
   tmpdir = getenv("TMP");
@@ -90,69 +89,70 @@ int Server::Init(int serverId, int force)
   if (!user)
     user = "nobody";
 
-  std::ostringstream stream;
-
   stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
   this->filename = stream.str();
 
-  GZ_MSG1(5, "creating %s", this->filename.c_str());
+  gzmsg(5) << "creating " << this->filename << "\n";
   
   // Create the directory
   if (mkdir(this->filename.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
   {
     if (errno == EEXIST)
     {
-      GZ_ERROR1("directory [%s] already exists (previous crash?)", this->filename.c_str());
-      GZ_ERROR("remove the directory and re-run gazebo");
-      return -1;
+      errStream << "directory [" <<  this->filename
+                <<  "] already exists (previous crash?)"
+                << "remove the directory and re-run gazebo";
+      gzthrow(errStream.str());
     }
     else
     {    
-      GZ_ERROR2("failed to create [%s] : [%s]", this->filename.c_str(), strerror(errno));
-      return -1;
+      errStream << "failed to create [" << this->filename << "] : [" 
+                <<  strerror(errno) << "]";
+      gzthrow(errStream.str());
     }
   }
-
-  return 0;
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Finialize the server
-int Server::Fini()
+void Server::Fini()
 {
   char cmd[1024];
   
-  GZ_MSG1(5, "deleting %s", this->filename.c_str());
+  gzmsg(5) << "deleting " << this->filename << "\n";
   
   // Delete the server dir
   if (rmdir(this->filename.c_str()) != 0)
   {
-    GZ_MSG2(0, "failed to cleanly remove [%s] : [%s]", this->filename.c_str(), strerror(errno));
+    gzmsg(0) << "failed to cleanly remove [" << this->filename 
+             << "] : [" << strerror(errno) << "]\n";
+
     snprintf(cmd, sizeof(cmd), "rm -rf %s", this->filename.c_str());
     system(cmd);
   }
 
   // Finalize semaphores
-  if (this->SemFini() < 0)
-    return -1;
-
-  return 0;
+  this->SemFini();
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Tell clients that new data is available
-int Server::Post()
+void Server::Post()
 {
-  return this->SemPost();
+  this->SemPost();
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Initialize semaphores
-int Server::SemInit(int force)
+void Server::SemInit(int force)
 {
   int i;
   union semun arg;
   unsigned short values[16];
+  std::ostringstream stream;
 
   this->semKey = GZ_SEM_KEY + this->serverId;
 
@@ -166,14 +166,16 @@ int Server::SemInit(int force)
   // Create semaphores for clients
   if (this->semId < 0)
   {
-    GZ_ERROR1("Failed to allocate semaphore [%s]", strerror(errno));
+    stream << "Failed to allocate semaphore [" << strerror(errno) << "]";
+
     if (errno == EEXIST)
     {
-      GZ_ERROR("There appears to be another server running.");
-      GZ_ERROR("Use the -s flag to try a different server id,");
-      GZ_ERROR("or use the -f flag if you definitely want to use this id.");
+      stream << "There appears to be another server running."
+             << "Use the -s flag to try a different server id,"
+             << "or use the -f flag if you definitely want to use this id.";
     }
-    return -1;
+
+    gzthrow(stream.str());
   }
 
   // Set initial semaphore values
@@ -183,30 +185,30 @@ int Server::SemInit(int force)
 
   if (semctl(this->semId, 0, SETALL, arg) < 0)
   {
-    GZ_ERROR1("failed to initialize semaphore [%s]", strerror(errno));
-    return -1;
+    stream << "failed to initialize semaphore [" <<  strerror(errno) << "]";
+    gzthrow(stream.str());
   }
-  
-  return 0;
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Finalize semaphores
-int Server::SemFini()
+void Server::SemFini()
 {  
   union semun arg;
 
   if (semctl(this->semId, 0, IPC_RMID, arg) < 0)
   {
-    GZ_ERROR1("failed to deallocate semaphore [%s]", strerror(errno));
-    return -1;
+    std::ostringstream stream;
+    stream << "failed to deallocate semaphore [" << strerror(errno) << "]";
+    gzthrow(stream.str());
   }
-  return 0;
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Release waiting clients
-int Server::SemPost()
+void Server::SemPost()
 {
   int i;
   union semun arg;
@@ -219,9 +221,8 @@ int Server::SemPost()
 
   if (semctl(this->semId, 0, SETALL, arg) < 0)
   {
-    GZ_ERROR1("failed to initialize semaphore [%s]", strerror(errno));
-    return -1;
+    std::ostringstream stream;
+    stream << "failed to initialize semaphore [" << strerror(errno) << "]";
+    gzthrow(stream.str());
   }
-
-  return 0;
 }

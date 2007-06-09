@@ -14,6 +14,8 @@
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
   xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" >
 
+  <verbosity>5</verbosity>
+
   <rendering:ogre>
     <plugins path="/usr/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>

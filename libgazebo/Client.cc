@@ -38,48 +38,53 @@
 #include <sys/sem.h>
 #include <sstream>
 
-#include "gz_error.h"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "gazebo.h"
 
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
 // Create a client object
 Client::Client()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Destroy a client
 Client::~Client()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Test for the presence of the server
-int Client::Query(int serverId)
+void Client::Query(int serverId)
 {
-  return this->SemQuery(serverId);
+  this->SemQuery(serverId);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Connect to the server
+void Client::Connect(int serverId)
+{
+  this->ConnectWait(serverId, -1);
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 // Connect to the server
-int Client::Connect(int serverId)
+void Client::ConnectWait(int serverId, int clientId)
 {
-  return this->ConnectWait(serverId, -1);
-}
-
-
-// Connect to the server
-int Client::ConnectWait(int serverId, int clientId)
-{
+  std::ostringstream stream;
   char *tmpdir;
   char *user;
-  //char tmpfilename[128];
 
   // Check client id
   if (clientId >= 0 && clientId >= 16)
   {
-    GZ_ERROR1("invalid client ID [%d]", clientId);
-    return -1;
+    stream << "invalid client ID [" << clientId << "]";
+    gzthrow(stream.str());
   }
   
   this->serverId = serverId;
@@ -87,8 +92,9 @@ int Client::ConnectWait(int serverId, int clientId)
   
   // Initialize semaphores
   if (this->clientId >= 0)
-    if (this->SemInit() < 0)
-      return -1;
+  {
+    this->SemInit();
+  }
 
   // Get the tmp dir
   tmpdir = getenv("TMP");
@@ -100,53 +106,38 @@ int Client::ConnectWait(int serverId, int clientId)
   if (!user)
     user = "nobody";
 
-  std::ostringstream stream;
+  // Figure out the directory name
   stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
 
-  // Figure out the directory name
-  /*snprintf(tmpfilename, sizeof(tmpfilename), "%s/gazebo-%s-%d",
-           tmpdir, user, this->serverId);
-
-  assert(this->filename == NULL);
-  */
-  this->filename = stream.str();//tmpfilename;
+  this->filename = stream.str();
   
-  GZ_MSG1(1, "opening %s", this->filename.c_str());
-  
-  return 0;
+  gzmsg(1) << "opening " << this->filename << "\n";
 }
 
 
 // Disconnect from the server
-int Client::Disconnect()
+void Client::Disconnect()
 {
-  GZ_MSG1(1, "closing %s", this->filename.c_str());
-
-/*  assert(this->filename != NULL);
-  free(this->filename);
-  */
+  gzmsg(1) << "closing " << this->filename << "\n";
 
   // Finalize semaphores
   if (this->clientId >= 0)
-    if (this->SemFini() < 0)
-      return -1;
-
-  return 0;
+    this->SemFini();
 }
 
 
 // Wait for new data to be posted (blocking)
-int Client::Wait()
+void Client::Wait()
 {
   if (this->clientId >= 0)
-    return this->SemWait();
-  return 0;
+    this->SemWait();
 }
 
 
 // Initialize semaphores
-int Client::SemQuery(int serverId)
+void Client::SemQuery(int serverId)
 {
+  std::ostringstream stream;
   int semKey;
   
   semKey = GZ_SEM_KEY + serverId;
@@ -156,45 +147,42 @@ int Client::SemQuery(int serverId)
   {
     // No semaphore, so no server
     if (errno == ENOENT)
-      return 1;
-  
+    {
+      gzthrow("No semphaore, so no server");
+    }
+
     // Ooops, some kind of error
-    GZ_ERROR1("failed to query semaphore [%s]", strerror(errno));
-    return -1;
+    stream << "failed to query semaphore [" << strerror(errno) << "]";
+    gzthrow(stream.str());
   }
 
-  // We have a server
-  return 0;
 }
 
 
 // Initialize semaphores
-int Client::SemInit()
+void Client::SemInit()
 {
   this->semKey = GZ_SEM_KEY + this->serverId;
   
   // Get the client semaphore group
   this->semId = semget(this->semKey, 0, S_IRWXU);
+
   if (this->semId < 0)
   {
-    GZ_ERROR1("Failed to allocate semaphore [%s]", strerror(errno));
-    GZ_ERROR("The server does not appear to be running");
-    return -1;
+    std::ostringstream stream;
+    stream << "Failed to allocate semaphore [" << strerror(errno) << "]\n"
+           << "The server does not appear to be running";
+    gzthrow(stream.str());
   }
-  
-  return 0;
 }
-
 
 // Finalize semaphores
-int Client::SemFini()
+void Client::SemFini()
 {
-  return 0;
 }
 
-
 // Wait for new data to be posted (blocking)
-int Client::SemWait()
+void Client::SemWait()
 {
   struct sembuf operations[1];
 
@@ -204,10 +192,10 @@ int Client::SemWait()
 
   if (semop(this->semId, operations, 1) < 0)
   {
-    GZ_ERROR1("error on semaphore wait [%s]", strerror(errno));
-    return -1;
+    std::ostringstream stream;
+    stream << "error on semaphore wait [" << strerror(errno) << "]";
+    gzthrow(stream.str());
   }
-  return 0;
 }
 
 

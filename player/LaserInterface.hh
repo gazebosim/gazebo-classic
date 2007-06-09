@@ -21,7 +21,7 @@
 /* Desc: Laser Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id: LaserInterface.hh,v 1.1.2.1 2006/12/16 22:43:22 natepak Exp $
+ * SVN: $Id: LaserInterface.hh,v 1.1.2.1 2006/12/16 22:43:22 natepak Exp $
  */
 
 #ifndef LASERINTERFACE_HH
@@ -29,41 +29,55 @@
 
 #include "GazeboInterface.hh"
 
-// Forward declarations
-typedef struct gz_laser gz_laser_t;
+namespace gazebo
+{
 
+// Forward declarations
+class LaserIface;
+
+/// \brief Plugin Player interface for a Gazebo laser
 class LaserInterface : public GazeboInterface
 {
-  /// @brief Constructor
+  /// \brief Constructor
+  /// \param addr Plaer device address
+  /// \param driver The Gazebo driver
+  /// \param cf Player config file
+  /// \param section Section of the config
   public: LaserInterface(player_devaddr_t addr, GazeboDriver *driver,
                               ConfigFile *cf, int section);
 
-  /// @brief Destructor
+  /// \brief Destructor
   public: virtual ~LaserInterface();
 
-  /// @brief Handle all messages. This is called from GazeboDriver
+  /// \brief Handle all messages. This is called from GazeboDriver
+  /// \param respQueue Response queue
+  /// \param hdr Message header
+  /// \param data Pointer to the message data
   public: virtual int ProcessMessage(MessageQueue *respQueue,
                                      player_msghdr_t *hdr, void *data);
 
-  /// @brief Update this interface, publish new info.
+  /// \brief Update this interface, publish new info.
   public: virtual void Update();
 
-  /// @brief Open a SHM interface when a subscription is received. \
+  /// \brief Open a SHM interface when a subscription is received. \
   ///        This is called fromGazeboDriver::Subscribe
   public: virtual void Subscribe();
 
-  /// @brief Close a SHM interface. This is called from \
+  /// \brief Close a SHM interface. This is called from \
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
-  private: gz_laser_t *iface;
+  /// \brief The gazebo laser interface
+  private: LaserIface *iface;
 
-  /// @brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+  /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: char *gz_id;
 
-  /// @brief Timestamp on last data update
+  /// \brief Timestamp on last data update
   private: double datatime;
 
   private: int scanId;
 };
+
+}
 #endif

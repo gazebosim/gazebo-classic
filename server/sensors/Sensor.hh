@@ -34,42 +34,50 @@ namespace gazebo
 {
   class XMLConfigNode;
   class Body;
+  class Controller;
 
+/// \brief Base class for sensors
 class Sensor : public Entity
 {
-  /// Constructor
+  /// \brief  Constructor
   public: Sensor(Body *body);
 
-  /// Destructor
+  /// \brief  Destructor
   public: virtual ~Sensor();
 
-  /// Load the sensor
+  ///  \brief Load the sensor
   /// \param node XMLConfigNode pointer
   public: virtual void Load(XMLConfigNode *node);
 
-  /// Initialize the sensor
+  /// \brief  Initialize the sensor
   public: void Init();
 
-  /// Update the sensor
+  /// \brief  Update the sensor
   public: void Update(UpdateParams &params);
 
-  /// Finalize the sensor
+  /// \brief  Finalize the sensor
   public: void Fini();
 
-  /// Load the child sensor
+  /// \brief  Load the child sensor
   protected: virtual void LoadChild(XMLConfigNode * /*node*/) {};
 
-  /// Initialize the child
+  /// \brief  Initialize the child
   protected: virtual void InitChild() {};
 
-  /// Update the child
+  /// \brief  Update the child
   protected: virtual void UpdateChild(UpdateParams & /*param*/) {};
 
-  /// Finalize the child
+  /// \brief Finalize the child
   protected: virtual void FiniChild() {};
+
+  /// \brief Load a controller for this sensor
+  /// \param node XML configure parameter node
+  private: void LoadController(XMLConfigNode *node);
 
   /// The body this sensor is attached to
   protected: Body *body;
+
+  protected: Controller *controller;
 };
 
 }

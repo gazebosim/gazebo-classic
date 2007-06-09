@@ -122,7 +122,7 @@ class World
   /// Load the world
   /// \param node XMLConfig node point
   /// \param serverId Id of the gazebo server
-  public: int Load(XMLConfig *node, int serverId);
+  public: void Load(XMLConfig *node, int serverId);
 
   /// Initialize the world
   /// \return 0 on success
