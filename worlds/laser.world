@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+
+<gazebo:world 
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
+  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
+  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" >
+
+  <verbosity>5</verbosity>
+
+  <rendering:ogre>
+    <plugins path="/usr/local/lib/OGRE">
+      <plugin>RenderSystem_GL.so</plugin>
+      <plugin>Plugin_ParticleFX.so</plugin>
+      <plugin>Plugin_BSPSceneManager.so</plugin>
+      <plugin>Plugin_OctreeSceneManager.so</plugin>
+    </plugins>
+
+    <resources path="/usr/local/share/gazebo">
+      <bootstrap>
+        <zip>Media/packs/OgreCore.zip</zip>
+      </bootstrap>
+
+      <general>
+        <filesystem>Media</filesystem>
+        <filesystem>Media/fonts</filesystem>
+        <filesystem>Media/materials/programs</filesystem>
+        <filesystem>Media/materials/scripts</filesystem>
+        <filesystem>Media/materials/textures</filesystem>
+        <filesystem>Media/models</filesystem>
+        <filesystem>Media/overlays</filesystem>
+        <filesystem>Media/particle</filesystem>
+        <filesystem>Media/gui</filesystem>
+        <zip>Media/packs/cubemap.zip</zip>
+        <zip>Media/packs/cubemapsJS.zip</zip>
+        <zip>Media/packs/skybox.zip</zip>
+      </general>
+    </resources>
+  </rendering:ogre>
+
+  <param:global>
+    <stepTime>0.1</stepTime>
+    <gravity>0 -9.8 0</gravity>
+  </param:global>
+
+  <model:xml name="box1_model">
+    <xyz>2 0.0 2</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:box name="box1_body">
+      <xyz>0.0 0.25 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <geom:box name="box1_geom">
+        <mesh>box.mesh</mesh>
+        <size>0.5 0.5 0.5</size>
+        <density>1.0</density>
+        <material>Gazebo/BumpyMetal</material>
+      </geom:box>
+    </body:box>
+  </model:xml>
+
+
+  <model:xml name="laser1_model">
+    <xyz>0 10 0</xyz>
+    <rpy>0.0 0 0.0</rpy>
+
+    <body:box name="laser1_body">
+      <xyz>0.0 0.25 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <geom:box name="laser1_geom">
+        <mesh>box.mesh</mesh>
+        <size>0.5 0.5 0.5</size>
+        <density>1.0</density>
+        <material>Gazebo/Black</material>
+      </geom:box>
+
+      <sensor:Ray name="laser_1">
+        <rayCount>180</rayCount>
+        <origin>0 0.07 0</origin>
+
+        <minAngle>-1.57</minAngle>
+        <maxAngle>1.57</maxAngle>
+
+        <minRange>0.5</minRange>
+        <maxRange>8</maxRange>
+
+        <controller:sicklms200_laser name="laser_controller_1">
+          <interface:laser name="sicklms_iface_1"/>
+        </controller:sicklms200_laser>
+
+      </sensor:Ray>
+
+    </body:box>
+  </model:xml>
+
+
+  <model:xml name="plane1_model">
+    <xyz>0 0 0</xyz>
+    <rpy>0 0 0</rpy>
+    <static>true</static>
+
+    <body:plane name="plane1_body">
+
+      <geom:plane name="plane1_geom">
+        <normal>0 1 0</normal>
+        <altitude>0</altitude>
+        <material>Gazebo/GrassFloor</material>
+      </geom:plane>
+    </body:plane>
+  </model:xml>
+
+  <model:LightSource>
+    <name>light1</name>
+    <xyz>0.000 10.000 -10.000</xyz>
+    <type>point</type>
+    <diffuseColor>1.0 1.0 1.0</diffuseColor>
+    <specularColor>0.5 0.5 0.5</specularColor>
+    <attenuation>100 1.0 0.00 0.00</attenuation>
+  </model:LightSource>
+
+  <model:ObserverCam>
+    <name>userCam0</name>
+    <xyz>0 10 0</xyz>
+    <rpy>-0 45 -39</rpy>
+    <imageSize>640 480</imageSize>
+    <updateRate>10</updateRate>
+  </model:ObserverCam>
+
+</gazebo:world>
