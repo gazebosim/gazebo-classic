@@ -187,3 +187,16 @@ void Geom::SetMeshMaterial(const std::string &materialName)
     ent->setMaterialName(materialName);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set the category bits, used during collision detection
+void Geom::SetCategoryBits(unsigned int bits)
+{
+  dGeomSetCategoryBits(this->geomId, bits);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the collide bits, used during collision detection
+void Geom::SetCollideBits(unsigned int bits)
+{
+  dGeomSetCollideBits(this->geomId, bits);
+}

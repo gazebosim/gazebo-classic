@@ -155,7 +155,7 @@ int World::Update()
     (*iter)->Update(params);
   }
 
-  //this->physicsEngine->Update();
+  this->physicsEngine->Update();
 
   OgreAdaptor::Instance()->Render();
 

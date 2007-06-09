@@ -87,12 +87,10 @@ void Ray::LoadChild(XMLConfigNode *node)
 
   
   // Set collision bits
-  //TODO: dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
-  //TODO: dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
+  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
+  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
 
-  this->body->spaceId = this->raySpaceId;
-
-  
+  this->body->spaceId = this->superSpaceId;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -123,6 +121,8 @@ void Ray::InitChild()
     ray = new RayGeom(this->body);
 
     ray->SetPoints(start, end);
+    ray->SetCategoryBits( GZ_LASER_COLLIDE );
+    ray->SetCollideBits( ~GZ_LASER_COLLIDE );
 
     this->rays.push_back(ray);
   }
@@ -158,10 +158,9 @@ void Ray::SetRay(int index, const Vector3 &a, const Vector3 &b)
 
   ray = this->rays[index];
   
-  /*ray->SetColor( GzColor(0, 0, 1) );
+  //ray->SetColor( GzColor(0, 0, 1) );
   ray->SetCategoryBits( GZ_LASER_COLLIDE );
   ray->SetCollideBits( ~GZ_LASER_COLLIDE );
-  */
 
   ray->SetPoints(a,b);
 }

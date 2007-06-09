@@ -40,7 +40,6 @@ using namespace gazebo;
 RayGeom::RayGeom( Body *body )
   : Geom( body )
 {
-  body->SetEnabled(false);
 
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
@@ -82,7 +81,7 @@ void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   dGeomRaySetLength( this->geomId, posEnd.Distance(this->pos) );
 
   // Get the gobal position of the scene node
-  /*Ogre::Vector3 olinePos = this->sceneNode->_getDerivedPosition();
+  Ogre::Vector3 olinePos = this->sceneNode->_getDerivedPosition();
   Vector3 linePos;
 
   linePos.x = olinePos.x;
@@ -93,7 +92,6 @@ void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   this->line->SetPoint(0, this->pos-linePos);
   this->line->SetPoint(1, posEnd-linePos);
   this->line->Update();
-  */
   
 }
 
