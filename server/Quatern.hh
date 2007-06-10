@@ -105,7 +105,7 @@ class Quatern
 
   /// See if a quatern is finite (e.g., not nan)
   /// \return True if quatern is finite
-  public: bool IsFinite();
+  public: bool IsFinite() const;
 
   /// Attributes of the quaternion 
   public: double u, x, y, z;

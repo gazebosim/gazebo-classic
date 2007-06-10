@@ -52,8 +52,9 @@ using namespace gazebo;
 Model::Model()
   : Entity()
 {
-  this->name = "";
   this->type = "";
+  this->joint = NULL;
+  this->parentModel = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +77,8 @@ int Model::Load(XMLConfigNode *node)
   {
     this->SetName(node->GetString("name","",1));
     this->SetStatic(node->GetBool("static",false,0));
+
+    std::cout << "Loading Model[" << this->GetName() << "]\n";
 
     // Load the bodies
     childNode = node->GetChildByNSPrefix("body");
@@ -132,6 +135,14 @@ int Model::Load(XMLConfigNode *node)
       }
       childNode = childNode->GetNextByNSPrefix("controller");
     }
+
+    this->canonicalBodyName = node->GetString("canonicalBody","",0);
+
+    if (this->canonicalBodyName.empty())
+    {
+      this->canonicalBodyName = this->bodies.begin()->first;
+    }
+
   }
 
 
@@ -190,12 +201,14 @@ int Model::Update(UpdateParams &params)
       contIter->second->Update(params);
   }
 
-
   // Call the model's python update function, if one exists
   /*if (this->pFuncUpdate)
   {
     boost::python::call<void>(this->pFuncUpdate, this);
   }*/
+ 
+  if (!this->canonicalBodyName.empty())
+    this->pose = this->bodies[this->canonicalBodyName]->GetPose();
 
   return this->UpdateChild();
 }
@@ -252,20 +265,6 @@ XMLConfigNode *Model::GetXMLConfigNode() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the Name.
-void Model::SetName(const std::string &name)
-{
-  this->name = name;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the Name
-const std::string &Model::GetName() const
-{
-  return this->name;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Set the initial pose
 void Model::SetInitPose(const Pose3d &pose)
 {
@@ -281,14 +280,17 @@ const Pose3d &Model::GetInitPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the current pose
-void Model::SetPose(const Pose3d &pose)
+void Model::SetPose(const Pose3d &setPose)
 {
   Body *body;
   std::map<std::string, Body* >::iterator iter;
 
-  Pose3d bodyPose;
+  Pose3d bodyPose, origPose;
 
-  this->pose = pose;
+  origPose = this->pose;
+  this->pose = setPose;
+
+  std::cout << "Model[" << this->GetName() << "] Rot[" << this->pose.rot.GetAsEuler() << "]\n";
 
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
@@ -297,19 +299,13 @@ void Model::SetPose(const Pose3d &pose)
 
     body = iter->second;
 
-    bodyPose = body->GetPose();
-
     // Compute the pose relative to the model
-    //bodyPose = bodyPose - origPose;
-    //std::cout << "Body Pose[" << bodyPose << "]\n";
+    bodyPose = body->GetPose() - origPose;
 
     // Compute the new pose
     bodyPose += this->pose;
 
     body->SetPose(bodyPose);
-
-    //body->SetLinearVel(Vector3(0,0,0));
-    //body->SetAngularVel(Vector3(0,0,0));
   }
 
 }
@@ -326,8 +322,7 @@ const Pose3d &Model::GetPose() const
 Body *Model::CreateBody()
 {
   // Create a new body
-  return  World::Instance()->GetPhysicsEngine()->CreateBody(this);
-
+  return World::Instance()->GetPhysicsEngine()->CreateBody(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -526,4 +521,48 @@ void Model::LoadController(XMLConfigNode *node)
 
   // Store the controller
   this->controllers[controllerName] = controller;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the default body
+Body *Model::GetBody()
+{
+  return this->bodies.begin()->second;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Attach this model to its parent
+void Model::Attach()
+{
+  this->parentModel = dynamic_cast<Model*>(this->parent);
+
+  if (this->parentModel == NULL)
+    gzthrow("Parent cannot be NULL when attaching two models");
+
+  this->joint = (HingeJoint*)this->CreateJoint(Joint::HINGE);
+
+  Body *myBody = this->bodies[canonicalBodyName];
+  Body *pBody = this->parentModel->GetCanonicalBody();
+
+  if (myBody == NULL)
+    printf("I have no bodies");
+  if (pBody == NULL)
+    printf("Parent has no bodies");
+
+  std::cout << "Parent[" << this->parentModel->GetName() << "] Child[" << this->GetName() << "]\n";
+
+  std::cout << "Parent Body[" << pBody->GetName() << "] Child Body[" << myBody->GetName() << "]\n";
+
+  this->joint->Attach(myBody, pBody);
+  this->joint->SetAnchor( myBody->GetPosition() );
+  this->joint->SetAxis( Vector3(0,1,0) );
+  this->joint->SetParam( dParamHiStop, 0);
+  this->joint->SetParam( dParamLoStop, 0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the canonical body. Used for connected Model heirarchies
+Body *Model::GetCanonicalBody()
+{
+  return this->bodies[this->canonicalBodyName];
 }

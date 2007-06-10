@@ -128,8 +128,6 @@ void Body::AttachGeom( Geom *geom )
   {
     if (geom->IsPlaceable())
       dGeomSetBody(geom->GetTransId(), this->bodyId);
-    else
-      dGeomSetBody(geom->GetGeomId(), this->bodyId);
   }
 
   this->geoms.push_back(geom);
@@ -202,7 +200,7 @@ void Body::SetRotation(const Quatern &rot)
     std::vector< Geom* >::iterator iter;
     for (iter=this->geoms.begin(); iter!=this->geoms.end(); iter++)
     {
-      //(*iter)->SetRotation(rot);
+      (*iter)->SetRotation(rot);
     }
   }
 
@@ -211,7 +209,7 @@ void Body::SetRotation(const Quatern &rot)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Return the position of the body
+// Return the position of the body. in global CS
 Vector3 Body::GetPosition() const
 {
   Vector3 pos;

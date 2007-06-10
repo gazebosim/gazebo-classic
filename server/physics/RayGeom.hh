@@ -42,26 +42,20 @@ class RayGeom : public Geom
   /// Destructor
   public: virtual ~RayGeom();
 
-  /// Set the ray based on a starting and ending point
-  /// \param posStart Start position
-  /// \param posEnd End position
+  /// Set the ray based on starting and ending points relative to the body
+  /// \param posStart Start position, relative the body
+  /// \param posEnd End position, relative to the body
   public: void SetPoints(const Vector3 &posStart, const Vector3 &posEnd);
 
-  /// Set the starting point and direction (relative coordinates)
-  /// \param pos Starting position
-  /// \param dir Unit length direction of the ray
-  /// \param length Length of the ray
-  public: void Set(const Vector3 &pos, const Vector3 &dir, double length);
-
-  /// Get the starting and ending points
+  /// Get the relative starting and ending points
   /// \param posA Returns the starting point
   /// \param posB Returns the ending point
-  public: void GetPoints(Vector3 &posA, Vector3 &posB);
+  public: void GetRelativePoints(Vector3 &posA, Vector3 &posB);
 
-  /// Get the starting point and direction (relative coordinates)
-  /// \param pos Returns the starting point
-  /// \param dir Returns the direction
-  public: void Get(Vector3 &pos, Vector3 &dir);
+  /// Get the global starting and ending points
+  /// \param posA Returns the starting point
+  /// \param posB Returns the ending point
+  public: void GetGlobalPoints(Vector3 &posA, Vector3 &posB);
 
   /// Set the length of the ray
   /// \param len Length of the array
@@ -69,6 +63,8 @@ class RayGeom : public Geom
 
   /// Get the length of the ray
   public: double GetLength() const;
+
+  public: void Update();
 
   /// Contact information; this is filled out during collision
   /// detection.  
@@ -78,8 +74,15 @@ class RayGeom : public Geom
   private: double contactLen;
 
   private: OgreDynamicLines *line;
-  private: Vector3 pos;
-  private: Vector3 dir;
+
+  /// Start and end positions of the ray, relative to the body
+  private: Vector3 relativeStartPos;
+  private: Vector3 relativeEndPos;
+
+  /// Start and end positions of the ray in global cs
+  private: Vector3 globalStartPos;
+  private: Vector3 globalEndPos;
+
 };
 
 }

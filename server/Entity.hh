@@ -79,7 +79,7 @@ class Entity
 
   /// Get all children
   /// \return Vector of children entities
-  public: std::vector< Entity* > GetChildren();
+  public: std::vector< Entity* > &GetChildren();
 
   /// Return this entity's sceneNode
   /// \return Ogre scene node
@@ -106,10 +106,10 @@ class Entity
   public: bool IsStatic() const;
 
   /// Parent of this entity
-  private: Entity *parent;
+  protected: Entity *parent;
 
   /// Children of this entity
-  private: std::vector< Entity* > children;
+  public: std::vector< Entity* > children;
 
   /// This entities ID
   private: unsigned int id;

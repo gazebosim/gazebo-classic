@@ -219,7 +219,7 @@ Quatern Quatern::operator*( const Quatern &qt ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // See if a quatern is finite (e.g., not nan)
-bool Quatern::IsFinite()
+bool Quatern::IsFinite() const
 {
   return finite(this->u) && finite(this->x) && finite(this->y) && finite(this->z);
 }

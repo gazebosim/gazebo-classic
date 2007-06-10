@@ -115,8 +115,8 @@ void Ray::InitChild()
     start = (axis * this->minRange) + this->origin;
     end = (axis * this->maxRange) + this->origin;
 
-    start = bodyPose.CoordPositionAdd(start);
-    end = bodyPose.CoordPositionAdd(end);
+  //  start = bodyPose.CoordPositionAdd(start);
+  //  end = bodyPose.CoordPositionAdd(end);
 
     ray = new RayGeom(this->body);
 
@@ -125,6 +125,8 @@ void Ray::InitChild()
     ray->SetCollideBits( ~GZ_LASER_COLLIDE );
 
     this->rays.push_back(ray);
+
+    //this->body->AttachGeom(ray);
   }
 
 }
@@ -140,46 +142,6 @@ void Ray::FiniChild()
   }
   this->rays.clear();
 }
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Set ray endpoints
-void Ray::SetRay(int index, const Vector3 &a, const Vector3 &b)
-{
-  RayGeom *ray;
-
-  if (index >= 0 && index < (int)this->rays.size())
-  {
-    std::ostringstream stream;
-    stream << "index[" << index << "] out of range[0-" 
-           << this->rays.size() << "]";
-    gzthrow(stream.str());
-  }
-
-  ray = this->rays[index];
-  
-  //ray->SetColor( GzColor(0, 0, 1) );
-  ray->SetCategoryBits( GZ_LASER_COLLIDE );
-  ray->SetCollideBits( ~GZ_LASER_COLLIDE );
-
-  ray->SetPoints(a,b);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Return a pointer to the ray geom
-void Ray::GetRay(int index, Vector3 &pos, Vector3 &dir)
-{
-  if (index >= 0 && index < (int)this->rays.size())
-  {
-    std::ostringstream stream;
-    stream << "index[" << index << "] out of range[0-" 
-           << this->rays.size() << "]";
-    gzthrow(stream.str());
-  }
-  
-  this->rays[index]->Get(pos, dir);
-}
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Get detected range for a ray
@@ -244,19 +206,19 @@ void Ray::UpdateChild(UpdateParams &/*params*/)
   // redrawn)
   for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
   {
-    (*iter)->SetLength( 8.0 );
+    //(*iter)->SetLength( 8.0 );
     (*iter)->contactRetro = 0.0;
     (*iter)->contactFiducial = -1;
 
     // Get the global points of the line
-    (*iter)->GetPoints(a,b);
+    (*iter)->Update();
 
     // Update the ray endpoints (global cs)
-    a = poseDelta.CoordPositionAdd(a);
-    b = poseDelta.CoordPositionAdd(b);
+   // a = poseDelta.CoordPositionAdd(a);
+  //  b = poseDelta.CoordPositionAdd(b);
 
     // Set the global points of the line
-    (*iter)->SetPoints(a, b);
+ //   (*iter)->SetPoints(a, b);
   }
 
   ODEPhysics *ode = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());
@@ -326,9 +288,8 @@ void Ray::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
     {
       rayGeom = (RayGeom*) geom1;
       hitGeom = (Geom*) geom2;
-      /*dGeomRaySetParams(o1, 0, 0);
+      dGeomRaySetParams(o1, 0, 0);
       dGeomRaySetClosestHit(o1, 1);
-      */
     }    
 
     if (dGeomGetClass(o2) == dRayClass)
@@ -336,9 +297,8 @@ void Ray::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
       assert(rayGeom == NULL);
       rayGeom = (RayGeom*) geom2;
       hitGeom = (Geom* )geom1;
-      /*dGeomRaySetParams(o2, 0, 0);
+      dGeomRaySetParams(o2, 0, 0);
       dGeomRaySetClosestHit(o2, 1);
-      */
     }
         
     // Check for ray/geom intersections

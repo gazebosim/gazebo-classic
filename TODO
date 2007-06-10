@@ -23,3 +23,4 @@ Open:
 - Fix any memory leaks
 - Data Logger
 - Replace all return int, with throws
+- The bodies set their scenenode based on a global pose. They should set their scenenodes based a pose relative to the model. The model currently doesn't move it's scene node, so it's always at (0,0,0). Basically should make all Body Pose stuff relative to the parent.

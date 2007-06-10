@@ -346,10 +346,20 @@ int main(int argc, char **argv)
   }
   catch (gazebo::GazeboError e)
   {
-    std::cerr << e << std::endl;
+    std::cerr << "MainIdle Failed[" << e << "]\n";
     return -1;
   }
 
-  // Finalize
-  Fini();
+  try
+  {
+    // Finalize
+    Fini();
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::cerr << "Finalized Failed[" << e << "]\n";
+    return -1;
+  }
+
+  return 0;
 }

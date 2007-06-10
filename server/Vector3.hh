@@ -73,6 +73,9 @@ class Vector3
   public: const Vector3 operator/( const Vector3 &pt ) const;
   public: const Vector3 &operator/=( const Vector3 &pt );
 
+  public: const Vector3 operator/( double v ) const;
+  public: const Vector3 &operator/=( double v );
+
   /// Multiplication operators
   public: const Vector3 operator*( const Vector3 &pt ) const;
   public: const Vector3 &operator*=( const Vector3 &pt );

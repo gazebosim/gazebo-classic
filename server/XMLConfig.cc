@@ -564,9 +564,14 @@ Quatern XMLConfigNode::GetRotation( std::string key, Quatern def )
   if (this->GetTupleString(key, 0, "") == "")
     return def;
 
-  p.x = this->GetTupleAngle(key, 0, 0.0);
-  p.y = this->GetTupleAngle(key, 1, 0.0);
-  p.z = this->GetTupleAngle(key, 2, 0.0);
+  // Roll is around the z-axis
+  p.z = this->GetTupleAngle(key, 0, 0.0);
+
+  // Pitch is around the x-axis
+  p.x = this->GetTupleAngle(key, 1, 0.0);
+
+  // Yaw is around the y-axis
+  p.y = this->GetTupleAngle(key, 2, 0.0);
 
   q.SetFromEuler(p);
 

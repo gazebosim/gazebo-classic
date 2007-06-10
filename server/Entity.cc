@@ -25,6 +25,7 @@
  * SVN: $Id$
  */
 #include <Ogre.h>
+#include "GazeboError.hh"
 #include "Global.hh"
 #include "OgreAdaptor.hh"
 #include "World.hh"
@@ -50,7 +51,6 @@ Entity::Entity(Entity *parent)
   {
     this->sceneNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode();
   }
-
 
   // Add this to the phyic's engine
   World::Instance()->GetPhysicsEngine()->AddEntity(this);
@@ -87,6 +87,9 @@ Entity *Entity::GetParent() const
 // Add a child to this entity
 void Entity::AddChild(Entity *child)
 {
+  if (child == NULL)
+    gzthrow("Cannot add a null child to an entity");
+
   // Set the child's parent
   child->SetParent(this);
 
@@ -102,7 +105,7 @@ void Entity::AddChild(Entity *child)
 }
 
 // Get all children
-std::vector< Entity* > Entity::GetChildren()
+std::vector< Entity* > &Entity::GetChildren()
 {
   return this->children;
 }

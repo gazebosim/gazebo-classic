@@ -29,6 +29,7 @@
 
 #include <vector>
 #include "Vector3.hh"
+#include "Pose3d.hh"
 
 namespace gazebo
 {
@@ -167,21 +168,26 @@ class World
   /// Get the length of each simulation step
   public: double GetStepTime() const;
 
-  /// Get the wall clock time
+  /// \brief Get the wall clock time
   /// \return The wall clock time
   public: double GetWallTime() const;
 
-  /// Load all entities
+  /// \brief Load all entities
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
   /// \return 0 on success
   private: int LoadEntities(XMLConfigNode *node, Model *parent);
 
-  /// Load a model
+  /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
   /// \param paren The parent model
   /// \return The model that was created
   private: Model *LoadModel(XMLConfigNode *node, Model *parent);
+
+  /// \brief Set the model pose and the pose of it's attached children 
+  /// \param model The model to set
+  /// \param pose The pose to set the model to
+  private: void SetModelPose(Model *model , Pose3d pose);
 
   /// Pointer to myself
   private: static World *myself;

@@ -1,6 +1,7 @@
 #ifndef OBSERVERCAM_HH
 #define OBSERVERCAM_HH
 
+#include "Quatern.hh"
 #include "Vector3.hh"
 #include "Model.hh"
 

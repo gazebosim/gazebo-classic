@@ -16,6 +16,7 @@ Geom::Geom( Body *body)
   : Entity(body)
 {
   this->body = body;
+  this->spaceId = this->body->spaceId;
 
   // Create the contact parameters
   this->contact = new ContactParams();
@@ -188,7 +189,6 @@ void Geom::AttachObject( Ogre::MovableObject *obj )
 /// Set the scale of the mesh
 void Geom::ScaleMesh(const Vector3 &scale)
 {
-  //this->body->GetSceneNode()->setScale(scale.x, scale.y, scale.z);
   this->sceneNode->setScale(scale.x, scale.y, scale.z);
 }
 

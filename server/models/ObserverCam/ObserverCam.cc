@@ -56,6 +56,7 @@ int ObserverCam::LoadChild(XMLConfigNode *node)
 int ObserverCam::InitChild()
 {
   this->camera->Translate(this->defaultPos);
+
   this->camera->RotatePitch(this->defaultRot.y);
   this->camera->RotateYaw(this->defaultRot.z);
   return 0;

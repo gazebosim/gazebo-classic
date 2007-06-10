@@ -52,6 +52,7 @@ namespace gazebo
   class Body;
   class Iface;
   class Controller;
+  class HingeJoint;
 
 /// A model
 class Model : public Entity
@@ -99,12 +100,6 @@ class Model : public Entity
   /// Get the XML Conig node this model was loaded from
   public: XMLConfigNode *GetXMLConfigNode() const;
 
-  /// Set the name
-  public: void SetName(const std::string &name);
-
-  /// Get the name
-  public: const std::string &GetName() const;
-
   /// Set the initial pose
   public: void SetInitPose(const Pose3d &pose);
 
@@ -126,34 +121,42 @@ class Model : public Entity
   /// \return Pointer to a new joint.
   public: Joint *CreateJoint(Joint::Type type);
 
-  /// Get a joint
+  /// \brief Get a joint
   /// \param name The name of the joint, specified in the world file
   /// \return Pointer to the joint
   public: Joint *GetJoint(std::string name);
 
-  /// Load a body helper function
+  /// \brief Get the default body
+  /// \return The default body
+  public: Body *GetBody();
+
+  /// \brief Attach this model to its parent
+  public: void Attach();
+
+  /// \brief Get the canonical body. Used for connected Model heirarchies
+  /// \return Pointer to the body
+  public: Body *GetCanonicalBody();
+
+  /// \brief Load a body helper function
   /// \param node XML Configuration node
   /// \return Non-zero on error
   private: int LoadBody(XMLConfigNode *node);
 
-  /// Load a joint helper function
+  /// \brief Load a joint helper function
   /// \param node XML Configuration node
   /// \return Non-zero on error
   private: int LoadJoint(XMLConfigNode *node);
 
-  /// Load a interface helper function
+  /// \brief Load a interface helper function
   /// \param node XML Configuration node
   private: void LoadIface(XMLConfigNode *node);
 
-  /// Load a controller helper function
+  /// \brief Load a controller helper function
   /// \param node XML Configuration node
   private: void LoadController(XMLConfigNode *node);
 
   /// Type of the model (such as Pioneer2DX, or SimpleSolid)
   private: std::string type;
-
-  /// Name for this model
-  private: std::string name;
 
   /// The node this model was loaded from
   private: XMLConfigNode *node;
@@ -175,6 +178,12 @@ class Model : public Entity
 
   /// Map of the controllers
   protected: std::map<std::string, Controller* > controllers;
+
+  private: std::string canonicalBodyName;
+
+  private: HingeJoint *joint;
+
+  private: Model *parentModel;
 
 /*  private: PyObject *pName;
     private: PyObject *pModule;

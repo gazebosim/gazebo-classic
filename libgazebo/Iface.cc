@@ -186,7 +186,7 @@ void Iface::Destroy()
 {
   if (!this->mMap && !this->mmapFd)
   {
-    gzthrow("mMap or mmapFd are null");
+    return;
   }
 
   // Unmap the file

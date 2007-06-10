@@ -66,91 +66,67 @@ RayGeom::~RayGeom()
   this->line = NULL;
 }
 
+void RayGeom::Update()
+{
+  Vector3 dir;
+
+  this->globalStartPos = this->body->GetPose().CoordPositionAdd(this->relativeStartPos);
+  this->globalEndPos = this->body->GetPose().CoordPositionAdd(this->relativeEndPos);
+
+  dir = this->globalEndPos - this->globalStartPos;
+  dir.Normalize();
+
+  dGeomRaySet(this->geomId, this->globalStartPos.x, 
+      this->globalStartPos.y, this->globalStartPos.z, 
+      dir.x, dir.y, dir.z);
+
+  dGeomRaySetLength( this->geomId, 
+      this->globalStartPos.Distance(this->globalEndPos) );
+}
+
 //////////////////////////////////////////////////////////////////////////////
-// Set the starting point and direction, in global cs
+// Set the starting point and direction 
 void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
 {
+  Vector3 dir;
 
-  this->pos= posStart;
-  this->dir = posEnd - this->pos;
-  this->dir.Normalize();
+  this->relativeStartPos = posStart;
+  this->relativeEndPos = posEnd;
 
-  dGeomRaySet(this->geomId, this->pos.x, this->pos.y, this->pos.z, 
-              this->dir.x, this->dir.y, this->dir.z);
+  this->globalStartPos = this->body->GetPose().CoordPositionAdd(this->relativeStartPos);
+  this->globalEndPos = this->body->GetPose().CoordPositionAdd(this->relativeEndPos);
 
-  dGeomRaySetLength( this->geomId, posEnd.Distance(this->pos) );
+  // Compute the direction of the ray
+  dir = this->globalEndPos - this->globalStartPos;
+  dir.Normalize();
 
-  // Get the gobal position of the scene node
-  Ogre::Vector3 olinePos = this->sceneNode->_getDerivedPosition();
-  Vector3 linePos;
+  dGeomRaySet(this->geomId, this->globalStartPos.x, 
+              this->globalStartPos.y, this->globalStartPos.z, 
+              dir.x, dir.y, dir.z);
 
-  linePos.x = olinePos.x;
-  linePos.y = olinePos.y;
-  linePos.z = olinePos.z;
-
-  // Set the line's position relative to it's parent scene node
-  this->line->SetPoint(0, this->pos-linePos);
-  this->line->SetPoint(1, posEnd-linePos);
-  this->line->Update();
-  
-}
-
-void RayGeom::Set(const Vector3 &posStart, const Vector3 &dir, double length)
-{
-  Vector3 end;
-  this->dir = dir;
-  this->pos = posStart;
-
-  dGeomRaySet(this->geomId, this->pos.x, this->pos.y, this->pos.z, 
-              this->dir.x, this->dir.y, this->dir.z);
-
-  dGeomRaySetLength( this->geomId, length );
-
-  end = this->pos + this->dir*length;
-
-  // Get the gobal position of the scene node
-  /*Ogre::Vector3 olinePos = this->sceneNode->_getDerivedPosition();
-  Vector3 linePos;
-
-  linePos.x = olinePos.x;
-  linePos.y = olinePos.y;
-  linePos.z = olinePos.z;
+  dGeomRaySetLength( this->geomId, 
+      this->globalStartPos.Distance(this->globalEndPos) );
 
   // Set the line's position relative to it's parent scene node
-  this->line->SetPoint(0, this->pos - linePos);
-  this->line->SetPoint(1, end - linePos);
+  this->line->SetPoint(0, this->relativeStartPos);
+  this->line->SetPoint(1, this->relativeEndPos);
   this->line->Update();
-  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get the starting and ending point, in global cs
-void RayGeom::GetPoints(Vector3 &posA, Vector3 &posB)
+// Get the relative starting and ending points
+void RayGeom::GetRelativePoints(Vector3 &posA, Vector3 &posB)
 {
-  dVector3 p, d;  
-  Vector3 dir;
-  dGeomRayGet(this->geomId, p, d);
-  
-  this->pos.Set(p[0], p[1], p[2]);
-  this->dir.Set(d[0], d[1], d[2]);
-
-  posA = this->pos;
-  posB = this->pos+(this->dir*this->GetLength());
+  posA = this->relativeStartPos;
+  posB = this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get the starting point and direction
-void RayGeom::Get(Vector3 &position, Vector3 &direction)
+// Get the global starting and ending points
+void RayGeom::GetGlobalPoints(Vector3 &posA, Vector3 &posB)
 {
-  dVector3 p, d;  
-  Vector3 dir;
-  dGeomRayGet(this->geomId, p, d);
-  
-  this->pos.Set(p[0], p[1], p[2]);
-  this->dir.Set(d[0], d[1], d[2]);
-
-  position = this->pos;
-  direction = this->dir;
+  posA = this->globalStartPos;
+  posB = this->globalEndPos;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -159,9 +135,10 @@ void RayGeom::SetLength( const double len )
 {
   dGeomRaySetLength( this->geomId, len );
 
-  Vector3 startPt = this->line->GetPoint(0);
+  Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  dir.Normalize();
 
-  this->line->SetPoint(1,  this->dir*len+startPt);
+  this->line->SetPoint(1,  dir * len + this->relativeStartPos);
   this->line->Update();
 }
 

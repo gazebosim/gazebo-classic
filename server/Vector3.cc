@@ -155,6 +155,21 @@ const Vector3 &Vector3::operator/=( const Vector3 &pt )
   return *this;
 }
 
+const Vector3 Vector3::operator/( double v ) const
+{
+  return Vector3(this->x / v, this->y / v, this->z / v);
+}
+
+const Vector3 &Vector3::operator/=( double v )
+{
+  this->x /= v;
+  this->y /= v;
+  this->z /= v;
+
+  return *this;
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mulitplication operators

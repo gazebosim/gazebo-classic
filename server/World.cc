@@ -143,7 +143,6 @@ int World::Update()
   UpdateParams params;
   std::vector< Model* >::iterator iter;
 
-
   this->simTime += this->stepTime;
   params.stepTime = this->stepTime;
 
@@ -288,11 +287,10 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
   return 0;
 }
 
-Model *World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
+Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 {
   Model *model = NULL;
   Pose3d pose;
-
 
   if (node->GetName() == "xml")
   {
@@ -326,6 +324,22 @@ Model *World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
       model->SetName( node->GetName() );
     }
 
+    if (parent)
+    {
+      /*std::string bodyName = node->GetString("parentBody", "canonical");
+      body = parent->GetBody(bodyName);
+
+      if (!body)
+      {
+        std::ostringstream stream;
+        stream << "body[" << bodyName << "] is not defined for parent model";
+        gzthrow(stream);
+      }
+      */
+
+      model->SetParent(parent);
+    }
+
     // Load the model
     if (model->Load( node ) != 0)
       return NULL;
@@ -336,16 +350,59 @@ Model *World::LoadModel(XMLConfigNode *node, Model * /*parent*/)
     pose.rot = node->GetRotation( "rpy", pose.rot );
 
     // Set the model's pose (relative to parent)
-    model->SetPose(pose);
+    this->SetModelPose(model, pose);
 
     // Record the model's initial pose (for reseting)
     model->SetInitPose(pose);
 
     // Add the model to our list
     this->models.push_back(model);
+
+    if (parent != NULL)
+      model->Attach();
   }
 
   return model;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Set the model pose and the pose of it's attached children 
+void World::SetModelPose(Model *model , Pose3d pose)
+{
+  std::vector<Entity*>::iterator iter;
+  Pose3d origPose, newPose, childPose;
+  Model *parent = dynamic_cast<Model*>(model->GetParent());
+  Model *child = NULL;
 
+  // Get current pose
+  origPose = model->GetPose();
+
+  // Compute new global pose of the model
+  if (parent)
+    newPose = pose + parent->GetPose();
+  else
+    newPose = pose;
+
+  // Recursively move children
+  for (iter=model->GetChildren().begin(); 
+       iter!=model->GetChildren().end(); iter++)
+  {
+    child = dynamic_cast<Model*>(*iter);
+
+    if (child && child->GetParent() == model)
+    {
+      // Computer the current relative pose of the child
+      childPose = child->GetPose() - origPose;
+
+      // Compute the new global pose of the child
+      childPose = childPose + newPose;
+
+      // Compute the new child pose relative to the current model's pose
+      childPose = childPose - origPose;
+
+      this->SetModelPose( child, childPose );
+    }
+  }
+
+  model->SetPose(newPose);
+}
