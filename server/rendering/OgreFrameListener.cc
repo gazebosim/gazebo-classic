@@ -80,7 +80,8 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
 
   if ((camera = CameraManager::Instance()->GetActiveCamera()))
   {
-    camera->Translate(this->directionVec * evt.timeSinceLastFrame );
+    Ogre::Vector3 tmp =this->directionVec * evt.timeSinceLastFrame;
+    camera->Translate(Vector3(tmp.x, tmp.y, tmp.z));
   }
 
   this->mKeyboard->capture();

@@ -21,6 +21,7 @@ Geom::Geom( Body *body)
   this->contact = new ContactParams();
 
   this->geomId = NULL;
+  this->transId = NULL;
 
   this->ogreObj = NULL;
 
@@ -32,7 +33,11 @@ Geom::Geom( Body *body)
 // Destructor
 Geom::~Geom()
 {
-  dGeomDestroy(this->geomId);
+  if (this->geomId)
+    dGeomDestroy(this->geomId);
+
+  if (this->transId)
+    dGeomDestroy(this->transId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,12 +49,22 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   this->placeable = placeable;
 
   this->geomId = geomId;
+  this->transId = NULL;
 
-  if (this->geomId)
+  if (this->placeable)
   {
-    assert(dGeomGetSpace(this->geomId) != 0);
-    dGeomSetData(this->geomId, this);
+    this->transId = dCreateGeomTransform( this->spaceId );
+    dGeomTransformSetGeom( this->transId, this->geomId );
+    dGeomTransformSetInfo( this->transId, 1 );
+
+    assert(dGeomGetSpace(this->geomId) == 0);
   }
+  else
+    assert(dGeomGetSpace(this->geomId) != 0);
+
+  //TODO: Mass...
+
+  dGeomSetData(this->geomId, this);
 
   // Create a new name of the geom's mesh entity
   std::ostringstream stream;
@@ -65,6 +80,13 @@ dGeomID Geom::GetGeomId() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Return the transform id
+dGeomID Geom::GetTransId() const
+{
+  return this->transId;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Return whether this is a placeable geom.
 bool Geom::IsPlaceable() const
 {
@@ -72,31 +94,52 @@ bool Geom::IsPlaceable() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the pose
+// Set the pose relative to the body
 void Geom::SetPose(const Pose3d &pose)
 {
-  this->SetPosition(pose.pos);
-  this->SetRotation(pose.rot);
+  if (this->placeable)
+  {
+    dQuaternion q;
+    q[0] = pose.rot.u;
+    q[1] = pose.rot.x;
+    q[2] = pose.rot.y;
+    q[3] = pose.rot.z;
+
+    dGeomSetPosition(this->geomId, pose.pos.x, pose.pos.y, pose.pos.z);
+    dMassTranslate(&this->mass, pose.pos.x, pose.pos.y, pose.pos.z);
+
+    dGeomSetQuaternion(this->geomId, q); 
+    dMassRotate(&this->mass, dGeomGetRotation(this->geomId));
+
+    this->sceneNode->setPosition(pose.pos.x, pose.pos.y, pose.pos.z);
+    this->sceneNode->setOrientation(pose.rot.u, pose.rot.x, pose.rot.y, pose.rot.z);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Return the pose of the geom
+// Return the pose of the geom relative to the body
 Pose3d Geom::GetPose() const
 {
-  const dReal *p;
-  dQuaternion r;
   Pose3d pose;
 
-  p = dGeomGetPosition(this->geomId);
-  dGeomGetQuaternion(this->geomId, r);
-  pose.pos.x = p[0];
-  pose.pos.y = p[1];
-  pose.pos.z = p[2];
-  
-  pose.rot.u = r[0];
-  pose.rot.x = r[1];
-  pose.rot.y = r[2];
-  pose.rot.z = r[3];
+  if (this->geomId && this->placeable)
+  {
+    const dReal *p;
+    dQuaternion r;
+
+    p = dGeomGetPosition(this->geomId);
+    dGeomGetQuaternion(this->geomId, r);
+    pose.pos.x = p[0];
+    pose.pos.y = p[1];
+    pose.pos.z = p[2];
+
+    pose.rot.u = r[0];
+    pose.rot.x = r[1];
+    pose.rot.y = r[2];
+    pose.rot.z = r[3];
+  }
+  else
+    pose = this->body->GetPose();
 
   return pose;
 }
@@ -105,27 +148,22 @@ Pose3d Geom::GetPose() const
 // Set the position
 void Geom::SetPosition(const Vector3 &pos)
 {
-  if (this->geomId && this->placeable)
-  {
-    dGeomSetPosition(this->geomId, pos.x, pos.y, pos.z);
-  }
+  Pose3d pose;
+
+  pose = this->GetPose();
+  pose.pos = pos;
+  this->SetPose(pose);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation
 void Geom::SetRotation(const Quatern &rot)
 {
-  if (this->geomId && this->placeable)
-  {
-    dQuaternion q;
-    q[0] = rot.u;
-    q[1] = rot.x;
-    q[2] = rot.y;
-    q[3] = rot.z;
+  Pose3d pose;
 
-    // Set the rotation of the ODE body
-    dGeomSetQuaternion(this->geomId, q);
-  }
+  pose = this->GetPose();
+  pose.rot = rot;
+  this->SetPose(pose);
 }
 
 
@@ -152,21 +190,6 @@ void Geom::ScaleMesh(const Vector3 &scale)
 {
   //this->body->GetSceneNode()->setScale(scale.x, scale.y, scale.z);
   this->sceneNode->setScale(scale.x, scale.y, scale.z);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the mesh pose
-void Geom::SetMeshPose(const Pose3d &pose)
-{
-  this->sceneNode->setPosition(pose.pos.x, pose.pos.y, pose.pos.z);
-  this->sceneNode->setOrientation(pose.rot.u, pose.rot.x, pose.rot.y, pose.rot.z);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the mesh position
-void Geom::SetMeshPosition(const Vector3 &pos)
-{
-  this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

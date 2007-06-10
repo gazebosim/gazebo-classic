@@ -1,6 +1,7 @@
 #ifndef OBSERVERCAM_HH
 #define OBSERVERCAM_HH
 
+#include "Vector3.hh"
 #include "Model.hh"
 
 namespace gazebo
@@ -27,6 +28,9 @@ class ObserverCam : public Model
   protected: virtual int FiniChild();
 
   private: Camera *camera;
+
+  private: Vector3 defaultPos;
+  private: Vector3 defaultRot;
 };
 }
 #endif

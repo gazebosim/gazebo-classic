@@ -41,7 +41,7 @@ SphereGeom::SphereGeom(Body *body, double radius, const std::string &meshName )
   dMassSetSphere(&this->mass, 1, radius);
 
   // Create the sphere geometry
-  this->SetGeom(dCreateSphere( this->body->spaceId, radius ), true);
+  this->SetGeom(dCreateSphere( 0, radius ), true);
 
   // Get the sphere mesh
   this->AttachMesh(meshName);

@@ -34,7 +34,12 @@ class Geom : public Entity
   public: void SetGeom(dGeomID geomId, bool placeable);
 
   /// \brief Return the geom id
+  /// \return The geom id
   public: dGeomID GetGeomId() const;
+
+  /// \brief Return the transform id
+  /// \return The transform id
+  public: dGeomID GetTransId() const;
 
   /// \brief Return whether this geom is placeable
   public: bool IsPlaceable() const;
@@ -66,14 +71,6 @@ class Geom : public Entity
   /// \param scale New scale of the mesh
   public: void ScaleMesh(const Vector3 &scale);
 
-  /// \brief Set the mesh pose
-  /// \param pose Pose of the mesh.
-  public: void SetMeshPose(const Pose3d &pose);
-
-  /// \brief Set the mesh position
-  /// \param pos Position of the mesh
-  public: void SetMeshPosition(const Vector3 &pos);
-
   /// \brief Set whether the mesh casts shadows
   /// \param enable True=cast shadows
   public: void SetCastShadows(bool enable);
@@ -99,7 +96,8 @@ class Geom : public Entity
 
   private: Ogre::MovableObject *ogreObj;
 
-  protected: dGeomID geomId;
+  /// ID for the transform geom and sub-geom
+  protected: dGeomID transId, geomId;
 
   private: static int geomIdCounter;
 

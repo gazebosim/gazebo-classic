@@ -150,13 +150,13 @@ void Quatern::SetFromAxis(double ax, double ay, double az, double aa)
        
 ////////////////////////////////////////////////////////////////////////////////
 // Set the quaternion from Euler angles
-void Quatern::SetFromEuler(double roll, double pitch, double yaw)
+void Quatern::SetFromEuler(const Vector3 &vec)
 {
   double phi, the, psi;
 
-  phi = roll / 2;
-  the = pitch / 2;
-  psi = yaw / 2;
+  phi = vec.x / 2;
+  the = vec.y / 2;
+  psi = vec.z / 2;
 
   this->u = cos(phi) * cos(the) * cos(psi) + sin(phi) * sin(the) * sin(psi);
   this->x = sin(phi) * cos(the) * cos(psi) - cos(phi) * sin(the) * sin(psi);

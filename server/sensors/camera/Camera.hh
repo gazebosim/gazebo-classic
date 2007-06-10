@@ -29,6 +29,7 @@
 
 #include <Ogre.h>
 
+#include "Vector3.hh"
 #include "Sensor.hh"
 
 // Forward Declarations
@@ -76,7 +77,7 @@ class Camera : public Sensor
   public: void Update();
 
   /// @brief Translate the camera
-  public: void Translate( const Ogre::Vector3 &direction );
+  public: void Translate( const Vector3 &direction );
 
   /// @brief Rotate the camera around the yaw axis
   public: void RotateYaw( float angle );

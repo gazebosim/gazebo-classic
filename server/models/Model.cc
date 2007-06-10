@@ -286,12 +286,9 @@ void Model::SetPose(const Pose3d &pose)
   Body *body;
   std::map<std::string, Body* >::iterator iter;
 
-  Pose3d origPose, newPose, bodyPose;
+  Pose3d bodyPose;
 
   this->pose = pose;
-
-  origPose = this->GetPose();
-  newPose = pose;
 
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
@@ -307,7 +304,7 @@ void Model::SetPose(const Pose3d &pose)
     //std::cout << "Body Pose[" << bodyPose << "]\n";
 
     // Compute the new pose
-    bodyPose += newPose;
+    bodyPose += this->pose;
 
     body->SetPose(bodyPose);
 

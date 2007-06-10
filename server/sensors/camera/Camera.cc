@@ -49,8 +49,6 @@ using namespace gazebo;
 Camera::Camera(Body *body)
   : Sensor(body)
 {
-  //this->cameraPose = GzPoseSet(GzVectorZero(), GzQuaternIdent());
-
   this->imageWidth = this->imageHeight = 0;
 
   this->saveEnable = false;
@@ -108,14 +106,17 @@ int Camera::Init(int width, int height, double hfov, double minDepth,
   */
 
   // Create the camera
-  this->camera = OgreAdaptor::Instance()->sceneMgr->createCamera("Camera1");
+  this->camera = OgreAdaptor::Instance()->sceneMgr->createCamera(this->GetName());
   this->camera->setNearClipDistance(minDepth);
   //this->camera->setFarClipDistance(maxDepth);
 
-  this->translateYawNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode("Camera1_TranslateYawSceneNode", Ogre::Vector3(0,2,2));
-  this->pitchNode = this->translateYawNode->createChildSceneNode("Camera1_PitchNode");
+  this->translateYawNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(this->GetName() + "_TranslateYawSceneNode", Ogre::Vector3(0,0,0));
+
+  this->pitchNode = this->translateYawNode->createChildSceneNode(this->GetName() + "PitchNode");
+
   this->pitchNode->attachObject(this->camera);
-  this->pitchNode->pitch(Ogre::Degree(-30));
+
+  this->pitchNode->pitch(Ogre::Degree(0));
 
   // Setup the viewport
   this->viewport = OgreAdaptor::Instance()->window->addViewport(this->camera);
@@ -328,9 +329,11 @@ double Camera::GetZValue(int /*x*/, int /*y*/)
   return n;
 }*/
 
-void Camera::Translate( const Ogre::Vector3 &direction )
+void Camera::Translate( const Vector3 &direction )
 {
-  this->translateYawNode->translate(this->translateYawNode->getOrientation() * this->pitchNode->getOrientation() * direction);
+  Ogre::Vector3 vec(direction.x, direction.y, direction.z);
+
+  this->translateYawNode->translate(this->translateYawNode->getOrientation() * this->pitchNode->getOrientation() * vec);
 }
 
 //////////////////////////////////////////////////////////////////////////////

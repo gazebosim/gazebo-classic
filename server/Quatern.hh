@@ -84,7 +84,7 @@ class Quatern
   /// \param roll Roll in radians
   /// \param pitch Pitch in radians
   /// \param yaw Yaw in radians
-  public: void SetFromEuler(double roll, double pitch, double yaw);
+  public: void SetFromEuler(const Vector3 &vec);
 
   /// Return the rotation in Euler angles
   /// \return This quaternion as an Euler vector

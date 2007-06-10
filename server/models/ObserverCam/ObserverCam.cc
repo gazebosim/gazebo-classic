@@ -24,12 +24,16 @@ int ObserverCam::LoadChild(XMLConfigNode *node)
 {
   int imageSizeX, imageSizeY;
   double nearClip, farClip, hfov;
+  Vector3 pos;
 
   // Create a new camera
   this->camera = CameraManager::Instance()->CreateCamera();
 
   // TODO: Fix so the camera sets whether it's active
   CameraManager::Instance()->SetActiveCamera(this->camera);
+
+  this->defaultPos = node->GetVector3("xyz",Vector3(0,0,0));
+  this->defaultRot = node->GetVector3("rpy",Vector3(0,0,0));
 
   // Get the image size
   imageSizeX = node->GetTupleInt("imageSize",0,640);
@@ -51,6 +55,9 @@ int ObserverCam::LoadChild(XMLConfigNode *node)
 // Initialize the child model
 int ObserverCam::InitChild()
 {
+  this->camera->Translate(this->defaultPos);
+  this->camera->RotatePitch(this->defaultRot.y);
+  this->camera->RotateYaw(this->defaultRot.z);
   return 0;
 }
 

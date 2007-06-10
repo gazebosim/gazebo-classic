@@ -41,7 +41,7 @@ BoxGeom::BoxGeom(Body *body,  Vector3 size, const std::string &meshName )
   dMassSetBox(&this->mass, 1, size.x, size.y, size.z);
 
   // Create a box geometry with box mass matrix
-  this->SetGeom(dCreateBox( this->spaceId, size.x, size.y, size.z),true );
+  this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
 
   // Get the box mesh
   this->AttachMesh(meshName);
@@ -59,8 +59,6 @@ BoxGeom::BoxGeom(Body *body,  Vector3 size, const std::string &meshName )
   mat->setSpecular(0.5, 0.5, 0.5, 1.0);
   ent->setMaterialName("red");
   */
-
-  return;
 }
 
 

@@ -559,16 +559,16 @@ Vector3 XMLConfigNode::GetVector3( std::string key, Vector3 def )
 Quatern XMLConfigNode::GetRotation( std::string key, Quatern def )
 {
   Quatern q;
-  double px, py, pz;
+  Vector3 p;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;
 
-  px = this->GetTupleAngle(key, 0, 0.0);
-  py = this->GetTupleAngle(key, 1, 0.0);
-  pz = this->GetTupleAngle(key, 2, 0.0);
+  p.x = this->GetTupleAngle(key, 0, 0.0);
+  p.y = this->GetTupleAngle(key, 1, 0.0);
+  p.z = this->GetTupleAngle(key, 2, 0.0);
 
-  q.SetFromEuler(px, py, pz);
+  q.SetFromEuler(p);
 
   return q;
 }

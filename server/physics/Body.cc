@@ -1,6 +1,7 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "Quatern.hh"
 #include "GazeboError.hh"
 #include "SensorFactory.hh"
 #include "Sensor.hh"
@@ -106,7 +107,9 @@ int Body::Update(UpdateParams &params)
   std::vector< Sensor* >::iterator sensorIter;
 
   if (!this->IsStatic())
+  {
     this->SetPose(this->GetPose());
+  }
 
   for (sensorIter=this->sensors.begin(); 
        sensorIter!=this->sensors.end(); sensorIter++)
@@ -123,7 +126,10 @@ void Body::AttachGeom( Geom *geom )
 {
   if (this->bodyId)
   {
-    dGeomSetBody(geom->GetGeomId(), this->bodyId);
+    if (geom->IsPlaceable())
+      dGeomSetBody(geom->GetTransId(), this->bodyId);
+    else
+      dGeomSetBody(geom->GetGeomId(), this->bodyId);
   }
 
   this->geoms.push_back(geom);
@@ -161,9 +167,14 @@ void Body::SetPosition(const Vector3 &pos)
   else
   {
     std::vector< Geom* >::iterator iter;
+    Vector3 geomPos;
+
     for (iter=this->geoms.begin(); iter!=this->geoms.end(); iter++)
     {
-      (*iter)->SetPosition(pos);
+      geomPos= (*iter)->GetPose().pos;
+      geomPos += pos;
+
+      (*iter)->SetPosition(geomPos);
     }
   }
 
@@ -266,6 +277,7 @@ int Body::LoadGeom(XMLConfigNode *node)
   // The mesh used for visualization
   std::string mesh = node->GetString("mesh","",0);
 
+
   if (node->GetName() == "sphere")
   {
     double radius = node->GetDouble("size",0.0,0);
@@ -294,10 +306,12 @@ int Body::LoadGeom(XMLConfigNode *node)
     return -1;
   }
 
+  this->AttachGeom(geom);
+
+  geom->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
+  geom->SetRotation(node->GetRotation("rpy",Quatern()));
   geom->SetName(node->GetString("name","",1));
   geom->SetMeshMaterial(node->GetString("material","",0));
-
-  this->AttachGeom(geom);
 
   return 0;
 }
