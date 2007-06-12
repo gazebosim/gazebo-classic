@@ -33,39 +33,21 @@
 
 namespace gazebo
 {
-/// @addtogroup gazebocore
-/// @{
+/// \addtogroup gazebocore
+/// \{
 
-/** @defgroup models_global Global Attributes
+/** \defgroup models_global Global Attributes
 
-The @c param:Global tag is used to specify certain global parameters
+The \c param:Global tag is used to specify certain global parameters
 for the server. Set these parameters as needed in the world file E.g.:
 
-@verbatim
+\verbatim
 <param:Global>
-  <gravity>0.0 0.0 -9.8 </gravity>
-  <stepTime>0.020</stepTime>
+  <pause>true</pause>
 </param:Global>
-@endverbatim
+\endverbatim
 
 The parameters are as follows:
-
-- speed (float)
-  - Target simulation speed (e.g. speed 2 yields twice real time).
-  - Default 1.0
-
-- gravity (float vector)
-  - The gravity vector (m/sec/sec); the default corresponds to Earth gravity.
-  - Default 0 0 -9.8
-
-- stepTime (float)
-  - The minimum step time for the simulator.  Reducing the step time
-    will increase the fidelity of the physical simulation, but consume
-    more CPU time.  If you have particulary complex system that appears to
-    be diverging (i.e., objects "explode" when they come into collision), consider
-    reducing the step time.
-  - Default 0.020
-
 - pause (bool)
   - Set to true to start the simulator in paused mode.
   - Default: false
@@ -145,10 +127,6 @@ class World
   /// \return Pointer to the physics engine
   public: PhysicsEngine *GetPhysicsEngine() const;
 
-  /// Get the gravity vector
-  /// \return The gravity vector
-  public: Vector3 GetGravity() const;
-
   /// Get the simulation time
   /// \return The simulation time
   public: double GetSimTime() const;
@@ -164,9 +142,6 @@ class World
   /// Get the real time (elapsed time)
   /// \return The real time
   public: double GetRealTime() const;
-
-  /// Get the length of each simulation step
-  public: double GetStepTime() const;
 
   /// \brief Get the wall clock time
   /// \return The wall clock time
@@ -210,15 +185,10 @@ class World
   /// Current simulation time
   private: double simTime, pauseTime, startTime;
 
-  /// Time between each update cycle
-  private: double stepTime;
-
-  /// The gravity vector
-  private: Vector3 gravity;
 };
 
 
-/// @}
+/// \}
 }
 
 #endif

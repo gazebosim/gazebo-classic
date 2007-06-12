@@ -1,6 +1,34 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: The ODE physics engine wrapper
+ * Author: Nate Koenig
+ * Date: 11 June 2007
+ * SVN: $Id:$
+ */
+
 #include <assert.h>
 
 #include "Global.hh"
+#include "GazeboMessage.hh"
+#include "GazeboError.hh"
 #include "World.hh"
 #include "Vector3.hh"
 #include "Geom.hh"
@@ -12,6 +40,7 @@
 #include "Hinge2Joint.hh"
 #include "BallJoint.hh"
 #include "UniversalJoint.hh"
+#include "XMLConfig.hh"
 #include "ODEPhysics.hh"
 
 using namespace gazebo;
@@ -26,6 +55,13 @@ ODEPhysics::ODEPhysics()
   this->spaceId = dSimpleSpaceCreate(0);
 
   this->contactGroup = dJointGroupCreate(0);
+
+  this->gravity.x = 0;
+  this->gravity.y = -9.8;
+  this->gravity.z = 0;
+
+  this->globalCFM = 10e-10;
+  this->globalERP = 0.2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,50 +77,54 @@ ODEPhysics::~ODEPhysics()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the ODE engine
-int ODEPhysics::Load()
+void ODEPhysics::Load(XMLConfigNode *node)
 {
-  Vector3 gravity = World::Instance()->GetGravity();
+  node = node->GetChild("ode");
 
-  dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
-  return 0;
+  if (node == NULL)
+    gzthrow("Must define a <physics:ode> node in the XML file");
+
+  this->gravity = node->GetVector3("gravity",this->gravity);
+  this->stepTime = node->GetDouble("stepTime",this->stepTime);
+  this->globalCFM = node->GetDouble("cfm",10e-10,0);
+  this->globalERP = node->GetDouble("erp",0.2,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the ODE engine
-int ODEPhysics::Init()
+void ODEPhysics::Init()
 {
-  dWorldSetGravity(this->worldId, 0.0, -9.8, 0.0);
+  dWorldSetGravity(this->worldId, this->gravity.x, this->gravity.y, this->gravity.z);
+  dWorldSetCFM(this->worldId, this->globalCFM);
+  dWorldSetERP(this->worldId, this->globalERP);
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the ODE engine
-int ODEPhysics::Update()
+void ODEPhysics::Update()
 {
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
   // Update the dynamical model
-  dWorldStep( this->worldId, World::Instance()->GetStepTime() );
+  dWorldStep( this->worldId, this->stepTime );
   //dWorldStepFast1( this->worldId, step, 10 );
 
   // Very important to clear out the contact group 
   dJointGroupEmpty( this->contactGroup );
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the ODE engine
-int ODEPhysics::Fini()
+void ODEPhysics::Fini()
 {
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add an entity
-int ODEPhysics::AddEntity(Entity *entity)
+void ODEPhysics::AddEntity(Entity *entity)
 {
   // Only the top level parent should have a new space
   if (entity->GetParent() == NULL)
@@ -204,7 +244,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       // Compute the CFM and ERP by assuming the two bodies form a
       // spring-damper system.
       double h, kp, kd;
-      h = World::Instance()->GetStepTime();
+      h = self->stepTime;
       kp = 1 / (1 / geom1->contact->kp + 1 / geom2->contact->kp);
       kd = geom1->contact->kd + geom2->contact->kd;
       contactInfo.surface.mode |= dContactSoftERP | dContactSoftCFM;

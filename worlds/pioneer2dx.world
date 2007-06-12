@@ -12,9 +12,17 @@
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
   xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
-  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" >
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
 
   <verbosity>5</verbosity>
+
+  <physics:ode>
+    <stepTime>0.01</stepTime>
+    <gravity>0 -9.8 0</gravity>
+    <cfm>10e-10</cfm>
+    <erp>0.3</erp>
+  </physics:ode>
 
   <rendering:ogre>
     <plugins path="/home/nate/local/lib/OGRE">
@@ -45,11 +53,6 @@
       </general>
     </resources>
   </rendering:ogre>
-
-  <param:global>
-    <stepTime>0.1</stepTime>
-    <gravity>0 -9.8 0</gravity>
-  </param:global>
 
   <model:xml name="box1_model">
     <xyz>2 10.0 2</xyz>

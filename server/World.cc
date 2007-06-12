@@ -58,11 +58,6 @@ World::World()
   this->simTime = 0.0;
   this->pauseTime = 0.0;
   this->startTime = 0.0;
-  this->stepTime = 0.020;
-
-  this->gravity.x = 0;
-  this->gravity.y = -9.8;
-  this->gravity.z = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +107,7 @@ void World::Load(XMLConfig *config, int serverId)
 
   this->LoadEntities(rootNode, NULL);
 
-  this->physicsEngine->Load();
+  this->physicsEngine->Load(rootNode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,8 +138,8 @@ int World::Update()
   UpdateParams params;
   std::vector< Model* >::iterator iter;
 
-  this->simTime += this->stepTime;
-  params.stepTime = this->stepTime;
+  this->simTime += this->physicsEngine->GetStepTime();
+  params.stepTime =this->physicsEngine->GetStepTime();
 
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
@@ -202,13 +197,6 @@ PhysicsEngine *World::GetPhysicsEngine() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the gravity vector
-Vector3 World::GetGravity() const
-{
-  return this->gravity;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Get the simulation time
 double World::GetSimTime() const
 {
@@ -237,14 +225,6 @@ double World::GetRealTime() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the step time 
-double World::GetStepTime() const
-{
-  return this->stepTime;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the wall clock time
 double World::GetWallTime() const
 {
@@ -266,14 +246,6 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
     if (node->GetNSPrefix() == "model")
     {
       model = this->LoadModel(node, parent);
-    }
-    else if (node->GetNSPrefix() == "param")
-    {
-      if (node->GetName() == "global")
-      {
-        this->stepTime = node->GetDouble("stepTime",this->stepTime);
-        this->gravity = node->GetVector3("gravity",this->gravity);
-      }
     }
   }
 
@@ -303,7 +275,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 
     if (!model)
     {
-      std::cout << "unknown model class or class disabled [" << node->GetName() << "]\n";
+      gzmsg(0) << "unknown model class or class disabled [" << node->GetName() << "]\n";
       return 0;
     }
   }
@@ -391,7 +363,7 @@ void World::SetModelPose(Model *model , Pose3d pose)
 
     if (child && child->GetParent() == model)
     {
-      // Computer the current relative pose of the child
+      // Compute the current relative pose of the child
       childPose = child->GetPose() - origPose;
 
       // Compute the new global pose of the child

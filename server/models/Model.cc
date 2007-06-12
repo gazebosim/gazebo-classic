@@ -78,7 +78,6 @@ int Model::Load(XMLConfigNode *node)
     this->SetName(node->GetString("name","",1));
     this->SetStatic(node->GetBool("static",false,0));
 
-    std::cout << "Loading Model[" << this->GetName() << "]\n";
 
     // Load the bodies
     childNode = node->GetChildByNSPrefix("body");
@@ -289,8 +288,6 @@ void Model::SetPose(const Pose3d &setPose)
 
   origPose = this->pose;
   this->pose = setPose;
-
-  std::cout << "Model[" << this->GetName() << "] Rot[" << this->pose.rot.GetAsEuler() << "]\n";
 
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
@@ -545,13 +542,11 @@ void Model::Attach()
   Body *pBody = this->parentModel->GetCanonicalBody();
 
   if (myBody == NULL)
-    printf("I have no bodies");
+    gzthrow("No canonical body set.");
+
   if (pBody == NULL)
-    printf("Parent has no bodies");
+    gzthrow("Parent has no canonical body");
 
-  std::cout << "Parent[" << this->parentModel->GetName() << "] Child[" << this->GetName() << "]\n";
-
-  std::cout << "Parent Body[" << pBody->GetName() << "] Child Body[" << myBody->GetName() << "]\n";
 
   this->joint->Attach(myBody, pBody);
   this->joint->SetAnchor( myBody->GetPosition() );
