@@ -1,8 +1,10 @@
 Open:
+- Pick a formatting standard for XML file
 - Write a tutorial for creating custom models
 - Write a tutorial for creating new controllers
 - Write a tutorial for creating new sensors
 - Write a tutorial for creating a new world
+- Laser retro and fiducial detection
 - Dynamic textures
 - Hand of god
 - Display camera position

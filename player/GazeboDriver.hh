@@ -44,6 +44,7 @@ class GazeboDriver : public Driver
 {
   /// @brief Constructor 
   public: GazeboDriver(ConfigFile* cf, int section);
+
   /// @brief Destructor 
   public: virtual ~GazeboDriver();
 

@@ -43,6 +43,7 @@ extern PlayerTime* GlobalTime;
 // Initialize 
 void GazeboClient::Init(int serverid, const char *prefixid)
 {
+  printf("1\n");
   if (prefixid != NULL)
     GazeboClient::prefixId = prefixid;
 

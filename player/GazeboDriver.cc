@@ -35,13 +35,15 @@ devices.
 
 #include <stdlib.h>
 
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "GazeboInterface.hh"
 #include "SimulationInterface.hh"
 #include "Position2dInterface.hh"
 #include "Graphics3dInterface.hh"
+#include "LaserInterface.hh"
 /*#include "Position3dInterface.hh"
 #include "PowerInterface.hh"
-#include "LaserInterface.hh"
 #include "SonarInterface.hh"
 #include "PtzInterface.hh"
 #include "FiducialInterface.hh"
@@ -90,8 +92,14 @@ extern "C"
 {
   int player_driver_init(DriverTable* table)
   {
-
-    GazeboDriver_Register(table);
+    try
+    {
+      GazeboDriver_Register(table);
+    }
+    catch (GazeboError e)
+    {
+      gzmsg(-1) << "Error: " << e << "\n";
+    }
     return(0);
   }
 }
@@ -108,7 +116,15 @@ GazeboDriver::GazeboDriver(ConfigFile* cf, int section)
   this->deviceCount = 0;
   this->deviceMaxCount = 0;
 
-  this->LoadDevices(cf,section);
+  try
+  {
+    this->LoadDevices(cf,section);
+  }
+  catch (GazeboError e)
+  {
+    gzmsg(-1) << "Error: " << e << "\n";
+  }
+
 }
 
 GazeboDriver::~GazeboDriver()
@@ -265,6 +281,11 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new Graphics3dInterface( playerAddr, this,  cf, section );
         break;
 
+      case PLAYER_LASER_CODE:	  
+        if (!player_quiet_startup) printf(" a laser interface.\n");
+        ifsrc = new LaserInterface( playerAddr,  this, cf, section );
+        break;
+
 
 /*      case PLAYER_POSITION3D_CODE:	  
         if (!player_quiet_startup) printf(" a position3d interface.\n");
@@ -274,11 +295,6 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
       case PLAYER_POWER_CODE:	  
         if (!player_quiet_startup) printf(" a power interface.\n");
         ifsrc = new PowerInterface( playerAddr,  this, cf, section );
-        break;
-
-      case PLAYER_LASER_CODE:	  
-        if (!player_quiet_startup) printf(" a laser interface.\n");
-        ifsrc = new LaserInterface( playerAddr,  this, cf, section );
         break;
 
       case PLAYER_SONAR_CODE:

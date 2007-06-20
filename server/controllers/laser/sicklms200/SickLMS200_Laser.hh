@@ -32,7 +32,7 @@
 
 namespace gazebo
 {
-  class Sensor;
+  class RaySensor;
   class LaserIface;
 
 /// @addtogroup controllers
@@ -58,25 +58,28 @@ class SickLMS200_Laser : public Controller
   /// \brief Load the controller
   /// \param node XML config node
   /// \return 0 on success
-  protected: virtual int LoadChild(XMLConfigNode *node);
+  protected: virtual void LoadChild(XMLConfigNode *node);
 
   /// \brief Init the controller
   /// \return 0 on success
-  protected: virtual int InitChild();
+  protected: virtual void InitChild();
 
   /// \brief Update the controller
   /// \return 0 on success
-  protected: virtual int UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild(UpdateParams &params);
 
   /// \brief Finalize the controller
   /// \return 0 on success
-  protected: virtual int FiniChild();
+  protected: virtual void FiniChild();
+
+  /// \brief Put laser data to the iface
+  private: void PutLaserData();
 
   /// The laser interface
-  private: LaserIface *myIface;
+  private: LaserIface *laserIface;
 
   /// The parent sensor
-  private: Sensor *myParent;
+  private: RaySensor *myParent;
 
 };
 

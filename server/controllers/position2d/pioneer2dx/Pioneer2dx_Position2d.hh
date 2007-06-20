@@ -56,19 +56,19 @@ class Pioneer2dx_Position2d : public Controller
   /// Load the controller
   /// \param node XML config node
   /// \return 0 on success
-  protected: virtual int LoadChild(XMLConfigNode *node);
+  protected: virtual void LoadChild(XMLConfigNode *node);
 
   /// Init the controller
   /// \return 0 on success
-  protected: virtual int InitChild();
+  protected: virtual void InitChild();
 
   /// Update the controller
   /// \return 0 on success
-  protected: virtual int UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild(UpdateParams &params);
 
   /// Finalize the controller
   /// \return 0 on success
-  protected: virtual int FiniChild();
+  protected: virtual void FiniChild();
 
   /// Update the data in the interface
   private: void PutPositionData();

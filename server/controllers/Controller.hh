@@ -57,36 +57,36 @@ class Controller
   /// \brief Load the controller. Called once on startup
   /// \param node The XMLConfig node pointer
   /// \return 0 on success
-  public: int Load(XMLConfigNode *node);
+  public: void Load(XMLConfigNode *node);
 
   /// \brief Initialize the controller. Called once on startup.
   /// \return 0 on success
-  public: int Init();
+  public: void Init();
 
   /// \brief Update the controller. Called every cycle.
   /// \param params Parameters to the update cycle
   /// \return 0 on success
-  public: int Update(UpdateParams &params);
+  public: void Update(UpdateParams &params);
 
   /// \brief Finialize the controller. Called once on completion.
   /// \return 0 on success
-  public: int Fini();
+  public: void Fini();
 
   /// \brief Load function for the child class
   /// \return 0 on success
-  protected: virtual int LoadChild(XMLConfigNode * /*node*/) {return 0;}
+  protected: virtual void LoadChild(XMLConfigNode * /*node*/) {return;}
 
   /// \brief Init function for the child class
   /// \return 0 on success
-  protected: virtual int InitChild() {return 0;}
+  protected: virtual void InitChild() {return;}
 
   /// \brief Update function for the child class
   /// \return 0 on success
-  protected: virtual int UpdateChild(UpdateParams &/*params*/) {return 0;}
+  protected: virtual void UpdateChild(UpdateParams &/*params*/) {return;}
 
   /// \brief Fini function for the child class
   /// \return 0 on success
-  protected: virtual int FiniChild() {return 0;}
+  protected: virtual void FiniChild() {return;}
 
   /// \brief Return the name of this controller
   /// \return The name of the controller

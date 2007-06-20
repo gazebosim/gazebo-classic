@@ -20,8 +20,8 @@
   <physics:ode>
     <stepTime>0.10</stepTime>
     <gravity>0 -9.8 0</gravity>
-    <cfm>10e-10</cfm>
-    <erp>0.3</erp>
+    <cfm>10e-9</cfm>
+    <erp>0.2</erp>
   </physics:ode>
 
   <rendering:ogre>
@@ -120,6 +120,7 @@
 
       <sensor:Ray name="laser_1">
         <rayCount>180</rayCount>
+        <rangeCount>361</rangeCount>
         <origin>0 0.07 0</origin>
 
         <minAngle>-1.57</minAngle>
@@ -131,7 +132,6 @@
         <controller:sicklms200_laser name="laser_controller_1">
           <interface:laser name="sicklms_iface_1"/>
         </controller:sicklms200_laser>
-
       </sensor:Ray>
 
     </body:box>

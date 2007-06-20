@@ -69,7 +69,7 @@ Pioneer2dx_Position2d::~Pioneer2dx_Position2d()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the controller
-int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
+void Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 {
   this->wheelSep = 0.35;
   this->wheelDiam = 0.19;
@@ -86,12 +86,11 @@ int Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
   if (!this->joints[RIGHT])
     gzthrow("couldn't get right hinge joint");
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the controller
-int Pioneer2dx_Position2d::InitChild()
+void Pioneer2dx_Position2d::InitChild()
 {
   // Reset odometric pose
   this->odomPose[0] = 0.0;
@@ -102,12 +101,11 @@ int Pioneer2dx_Position2d::InitChild()
   this->odomVel[1] = 0.0;
   this->odomVel[2] = 0.0;
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
+void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 {
   // TODO: Step should be in a parameter of this function
   double wd, ws;
@@ -153,14 +151,12 @@ int Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
     this->joints[RIGHT]->SetParam( dParamVel, 0.0 );
   }
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the controller
-int Pioneer2dx_Position2d::FiniChild()
+void Pioneer2dx_Position2d::FiniChild()
 {
-  return 0;
 }
 
 

@@ -1,9 +1,19 @@
-Import('env prefix')
+import os
+
+Import('env prefix staticObjs sharedObjs')
 
 sources = Split('GazeboDriver.cc GazeboClient.cc GazeboInterface.cc GazeboTime.cc SimulationInterface.cc Position2dInterface.cc Graphics3dInterface.cc LaserInterface.cc')
 
 # Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc FiducialInterface.cc GripperInterface.cc CameraInterface.cc TruthInterface.cc GpsInterface.cc ')
 
-sharedLib = env.SharedLibrary('gazeboplugin',sources)
+staticPlayerObjs = env.StaticObject(sources)
+sharedPlayerObjs = env.SharedObject(sources)
+
+staticPlayerObjs.append(staticObjs);
+sharedPlayerObjs.append(sharedObjs);
+
+sharedLib = env.SharedLibrary('gazeboplugin', sharedPlayerObjs)
+staticLib = env.StaticLibrary('gazeboplugin', staticPlayerObjs)
 
 env.Install(prefix+'/lib', sharedLib)
+env.Install(prefix+'/lib', staticLib)

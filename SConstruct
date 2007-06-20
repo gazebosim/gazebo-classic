@@ -3,6 +3,7 @@ version = '0.8'
 prefix = ARGUMENTS.get('prefix','/usr/local')
 
 
+
 # 3rd party packages
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'pkg-config --cflags --libs CEGUI-OGRE',
@@ -68,8 +69,6 @@ conf = Configure(env)
 
 env = conf.Finish()
 
-  
-
 staticObjs = []
 sharedObjs = []
 
@@ -83,7 +82,11 @@ gazebo = env.Program('gazebo',staticObjs)
 libgazeboServerStatic = env.StaticLibrary('gazeboServer',staticObjs)
 libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
 
+
 env.Install(prefix+'/bin',gazebo)
 env.Install(prefix+'/share/gazebo','Media')
 
 env.Alias('install', prefix)
+
+env.Install(prefix+'/lib',libgazeboServerStatic )
+env.Install(prefix+'/lib',libgazeboServerShared )

@@ -57,34 +57,34 @@ Controller::~Controller()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the controller. Called once on startup
-int Controller::Load(XMLConfigNode *node)
+void Controller::Load(XMLConfigNode *node)
 {
   if (!this->parent)
     gzthrow("Parent entity has not been set");
 
   this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
 
-  return this->LoadChild(node);
+  this->LoadChild(node);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the controller. Called once on startup.
-int Controller::Init()
+void Controller::Init()
 {
-  return this->InitChild();
+  this->InitChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the controller. Called every cycle.
-int Controller::Update(UpdateParams &params)
+void Controller::Update(UpdateParams &params)
 {
-  return this->UpdateChild(params);
+  this->UpdateChild(params);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Finialize the controller. Called once on completion.
-int Controller::Fini()
+void Controller::Fini()
 {
   this->iface->Destroy();
-  return this->FiniChild();
+  this->FiniChild();
 }

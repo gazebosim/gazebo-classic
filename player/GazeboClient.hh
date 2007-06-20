@@ -31,6 +31,9 @@
 
 namespace gazebo
 {
+  class SimulationIface;
+  class Client;
+}
 
 /// @brief Gazebo client handler
 ///
@@ -49,10 +52,9 @@ class GazeboClient
   public: static const char *prefixId;
 
   /// The one and only gazebo client
-  public: static Client *client;
+  public: static gazebo::Client *client;
 
-  public: static SimulationIface *sim;
+  public: static gazebo::SimulationIface *sim;
 };
 
-}
 #endif

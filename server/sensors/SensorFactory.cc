@@ -31,14 +31,14 @@
 
 using namespace gazebo;
 
-void RegisterRay();
+void RegisterRaySensor();
 
 std::map<std::string, SensorFactoryFn> SensorFactory::sensors;
 
 // Register all known sensor.
 void SensorFactory::RegisterAll()
 {
-  RegisterRay();
+  RegisterRaySensor();
 }
 
 
