@@ -38,17 +38,17 @@
 #include "ODEPhysics.hh"
 #include "XMLConfig.hh"
 
-#include "Ray.hh"
+#include "RaySensor.hh"
 
 #include "Vector3.hh"
 
 using namespace gazebo;
 
-GZ_REGISTER_STATIC_SENSOR("Ray", Ray);
+GZ_REGISTER_STATIC_SENSOR("Ray", RaySensor);
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-Ray::Ray(Body *body)
+RaySensor::RaySensor(Body *body)
     : Sensor(body)
 {
 }
@@ -56,13 +56,13 @@ Ray::Ray(Body *body)
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-Ray::~Ray()
+RaySensor::~RaySensor()
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the ray using parameter from an XMLConfig node
-void Ray::LoadChild(XMLConfigNode *node)
+void RaySensor::LoadChild(XMLConfigNode *node)
 {
   if (this->body == NULL)
   {
@@ -72,6 +72,7 @@ void Ray::LoadChild(XMLConfigNode *node)
   }
 
   this->rayCount = node->GetInt("rayCount",0,1);
+  this->rangeCount = node->GetInt("rangeCount",0,1);
   this->minAngle = node->GetDouble("minAngle",-90,1);
   this->maxAngle = node->GetDouble("maxAngle",90,1);
   this->minRange = node->GetDouble("minRange",0,1);
@@ -95,7 +96,7 @@ void Ray::LoadChild(XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the ray
-void Ray::InitChild()
+void RaySensor::InitChild()
 {
   Pose3d bodyPose;
   double angle;
@@ -133,7 +134,7 @@ void Ray::InitChild()
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the ray
-void Ray::FiniChild()
+void RaySensor::FiniChild()
 {
   std::vector<RayGeom*>::iterator iter;
   for (iter=this->rays.begin(); iter!=this->rays.end(); iter++)
@@ -144,10 +145,52 @@ void Ray::FiniChild()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get detected range for a ray
-double Ray::GetRange(int index)
+/// Get the minimum angle
+double RaySensor::GetMinAngle() const
 {
-  if (index >= 0 && index < (int)this->rays.size())
+  return this->minAngle;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the maximum angle
+double RaySensor::GetMaxAngle() const
+{
+  return this->maxAngle;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the minimum range
+double RaySensor::GetMinRange() const
+{
+  return this->minRange;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+///  Get the maximum range
+double RaySensor::GetMaxRange() const
+{
+  return this->maxRange;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the ray count
+int RaySensor::GetRayCount() const
+{
+  return this->rayCount;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the range count
+int RaySensor::GetRangeCount() const
+{
+  return this->rangeCount;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Get detected range for a ray
+double RaySensor::GetRange(int index)
+{
+  if (index < 0 || index >= (int)this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << index << "] out of range[0-" 
@@ -161,9 +204,9 @@ double Ray::GetRange(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get detected retro (intensity) value for a ray.
-double Ray::GetRetro(int index)
+double RaySensor::GetRetro(int index)
 {
-  if (index >= 0 && index < (int)this->rays.size())
+  if (index < 0 || index >= (int)this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << index << "] out of range[0-" 
@@ -177,9 +220,9 @@ double Ray::GetRetro(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get detected fiducial value for a ray.
-int Ray::GetFiducial(int index)
+int RaySensor::GetFiducial(int index)
 {
-  if (index >= 0 && index < (int)this->rays.size())
+  if (index < 0 || index >= (int)this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << index << "] out of range[0-" 
@@ -192,7 +235,7 @@ int Ray::GetFiducial(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void Ray::UpdateChild(UpdateParams &/*params*/)
+void RaySensor::UpdateChild(UpdateParams &/*params*/)
 {
   std::vector<RayGeom*>::iterator iter;
   Pose3d poseDelta;
@@ -238,16 +281,16 @@ void Ray::UpdateChild(UpdateParams &/*params*/)
 
 /////////////////////////////////////////////////////////////////////////////
 // Callback for ray intersection test
-void Ray::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
+void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 {
   int n;
   dContactGeom contact;
   dxGeom *geom1, *geom2;
   RayGeom *rayGeom;
   Geom *hitGeom;
-  Ray *self;
+  RaySensor *self;
 
-  self = (Ray*) data;
+  self = (RaySensor*) data;
  
   // Check space
   if ( dGeomIsSpace( o1 ) || dGeomIsSpace( o2 ) )

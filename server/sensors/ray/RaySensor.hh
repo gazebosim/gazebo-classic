@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Ray proximity sensor
+/* Desc: RaySensor proximity sensor
  * Author: Carle Cote
  * Date: 23 february 2004
  * SVN: $Id:$
@@ -43,17 +43,17 @@ namespace gazebo
 /// This sensor cast rays into the world, tests for intersections, and
 /// reports the range to the nearest object.  It is used by ranging
 /// sensor models (e.g., sonars and scanning laser range finders).
-class Ray: public Sensor
+class RaySensor: public Sensor
 {
   /// @brief Constructor
   /// @param world The world in which to place the sensor
   /// @param body The underlying collision test uses an ODE geom, so
   /// ray sensors must be attached to a body.
   /// @param rayCount Maximum number of rays in sensor.
-  public: Ray(Body *body);
+  public: RaySensor(Body *body);
 
   /// @brief Destructor
-  public: virtual ~Ray();
+  public: virtual ~RaySensor();
 
   /// Load the ray using parameter from an XMLConfig node
   /// \param node The XMLConfig node
@@ -68,9 +68,32 @@ class Ray: public Sensor
   /// Finalize the ray
   protected: virtual void FiniChild();
 
+  /// \brief Get the minimum angle
+  /// \return The minimum angle
+  public: double GetMinAngle() const;
+
+  /// \brief Get the maximum angle
+  /// \return the maximum angle
+  public: double GetMaxAngle() const;
+
+  /// \brief Get the minimum range
+  /// \return The minimum range
+  public: double GetMinRange() const;
+
+  /// \brief Get the maximum range
+  /// \return The maximum range
+  public: double GetMaxRange() const;
+
+  /// \brief Get the ray count
+  /// \return The number of rays
+  public: int GetRayCount() const;
+
+  /// \brief Get the range count
+  /// \return The number of ranges
+  public: int GetRangeCount() const;
 
   /// \brief Set ray parameters
-  /// \param index Ray index (from 0 to rayCount - 1).
+  /// \param index Rayindex (from 0 to rayCount - 1).
   /// \param a, b Ray endpoints (initial and final points).  These are
   /// in body-relative coordiantes.
   public: void SetRay(int index, const Vector3 &a, const Vector3 &b);
@@ -106,6 +129,8 @@ class Ray: public Sensor
 
   private: Pose3d prevPose;
   private: int rayCount;
+  private: int rangeCount;
+
 };
 
 }
