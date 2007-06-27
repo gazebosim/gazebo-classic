@@ -63,7 +63,6 @@ Model::~Model()
 {
   this->bodies.clear();
   this->joints.clear();
-  this->ifaces.clear();
   this->controllers.clear();
 }
 
@@ -102,7 +101,7 @@ int Model::Load(XMLConfigNode *node)
     }
 
     // Load interfaces
-    childNode = node->GetChildByNSPrefix("interface");
+    /*childNode = node->GetChildByNSPrefix("interface");
 
     while (childNode)
     {
@@ -117,7 +116,7 @@ int Model::Load(XMLConfigNode *node)
       }
 
       childNode = childNode->GetNextByNSPrefix("interface");
-    }
+    }*/
 
     // Load controller
     childNode = node->GetChildByNSPrefix("controller");
@@ -219,12 +218,6 @@ int Model::Fini()
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Iface* >::iterator ifaceIter;
   std::map<std::string, Controller* >::iterator contIter;
-
-  for (ifaceIter = this->ifaces.begin(); 
-       ifaceIter != this->ifaces.end(); ifaceIter++)
-  {
-    ifaceIter->second->Destroy();
-  }
 
   for (contIter = this->controllers.begin(); 
        contIter != this->controllers.end(); contIter++)
@@ -374,6 +367,8 @@ int Model::LoadJoint(XMLConfigNode *node)
 
   Joint *joint;
 
+  printf("Creating a joint\n");
+
   Body *body1(this->bodies[node->GetString("body1","",1)]);
   Body *body2(this->bodies[node->GetString("body2","",1)]);
   Body *anchorBody(this->bodies[node->GetString("anchor","",1)]);
@@ -389,6 +384,9 @@ int Model::LoadJoint(XMLConfigNode *node)
     std::cerr << "Couldn't Find Body[" << node->GetString("body2","",1);
     return -1;
   }
+
+  std::cout << "Body1[" << body1->GetName() << "] Body2[" 
+              << body2->GetName() << "]\n";
 
   // Create a Hinge Joint
   if (node->GetName() == "hinge")
@@ -414,10 +412,12 @@ int Model::LoadJoint(XMLConfigNode *node)
   if (anchorBody)
   {
     joint->SetAnchor(anchorBody->GetPosition());
+    std::cout << "Anchor[" << anchorBody->GetPosition() << "]\n";
   }
   else
   {
     joint->SetAnchor(anchorVec);
+    std::cout << "Anchor[" << anchorVec << "]\n";
     this->bodies.erase(node->GetString("anchor","",1));
   }
 
@@ -426,6 +426,7 @@ int Model::LoadJoint(XMLConfigNode *node)
   {
     HingeJoint *hinge = (HingeJoint*)(joint);
     hinge->SetAxis(node->GetVector3("axis",Vector3(0,0,1)));
+    std::cout << "Axis[" << node->GetVector3("axis",Vector3(0,0,1)) << "]\n";
   }
   else if (node->GetName() == "hinge2")
   {
@@ -459,37 +460,16 @@ int Model::LoadJoint(XMLConfigNode *node)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load a new interface helper function
-void Model::LoadIface(XMLConfigNode *node)
-{
-  if (!node)
-    gzthrow( "node parameter is NULL" );
-
-  Iface *iface;
-
-  // Type and unique name of the iface
-  std::string ifaceType = node->GetName();
-  std::string ifaceName = node->GetString("name","",1);
-
-  // Use the factory to get a new iface based on the type
-  iface = IfaceFactory::NewIface(ifaceType);
-
-  // Create the iface
-  iface->Create(gazebo::World::Instance()->GetGzServer(), ifaceName);
-
-  // Store the iface
-  this->ifaces[ifaceName] = iface;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Load a controller helper function
 void Model::LoadController(XMLConfigNode *node)
 {
   if (!node)
     gzthrow( "node parameter is NULL" );
 
-  Controller *controller;
   Iface *iface;
+  XMLConfigNode *childNode;
+  Controller *controller;
+  std::ostringstream stream;
 
   // Get the controller's type
   std::string controllerType = node->GetName();
@@ -497,17 +477,25 @@ void Model::LoadController(XMLConfigNode *node)
   // Get the unique name of the controller
   std::string controllerName = node->GetString("name","",1);
 
-  // Get the name of the iface the controller uses
-  std::string ifaceName = node->GetString("iface","",1);
-
-  // Get the iface the controller uses
-  iface = this->ifaces[ifaceName];
-
-  if (!iface)
+  // Create the interface
+  if ( (childNode = node->GetChildByNSPrefix("interface")) )
   {
-    std::ostringstream stream;
-    stream <<  "couldn't find interface[" << ifaceName << "] for controller[" <<controllerName << "]";
-    gzthrow(stream.str());
+    // Get the type of the interface (eg: laser)
+    std::string ifaceType = childNode->GetName();
+
+    // Get the name of the iface 
+    std::string ifaceName = childNode->GetString("name","",1);
+
+    // Use the factory to get a new iface based on the type
+    iface = IfaceFactory::NewIface(ifaceType);
+
+    // Create the iface
+    iface->Create(World::Instance()->GetGzServer(), ifaceName);
+  }
+  else
+  {
+    stream << "No interface defined for " << controllerName << "controller";
+    gzthrow(stream.str()); 
   }
 
   // Create the controller based on it's type

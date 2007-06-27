@@ -112,6 +112,13 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
   double d1, d2;
   double dr, da;
 
+  /*double speed1 = this->joints[LEFT]->GetParam(dParamVel);
+  double speed2 = this->joints[RIGHT]->GetParam(dParamVel);
+  printf("ODE Speed[%f %f]\n",speed1, speed2);
+  */
+
+  this->GetPositionCmd();
+
   wd = this->wheelDiam;
   ws = this->wheelSep;
 
@@ -132,16 +139,14 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
   this->odomVel[1] = 0.0;
   this->odomVel[2] = da / params.stepTime;
 
-  this->GetPositionCmd();
-
   if (this->enableMotors)
   {
     this->joints[LEFT]->SetParam( dParamVel, 
-        this->wheelSpeed[LEFT] / this->wheelDiam * 2 );
+        this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
 
     this->joints[RIGHT]->SetParam( dParamVel, 
-        this->wheelSpeed[RIGHT] / this->wheelDiam * 2 );
-    
+        this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
+
     this->joints[LEFT]->SetParam( dParamFMax, 1.1 );
     this->joints[RIGHT]->SetParam( dParamFMax, 1.1 );
   }
@@ -151,6 +156,7 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
     this->joints[RIGHT]->SetParam( dParamVel, 0.0 );
   }
 
+  this->PutPositionData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,6 +172,8 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 {
   double vr, va;
 
+  this->myIface->Lock(1);
+
   vr = this->myIface->data->cmdVelocity.x;
   va = this->myIface->data->cmdVelocity.yaw;
 
@@ -173,6 +181,8 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 
   this->wheelSpeed[LEFT] = vr - va * this->wheelSep / 2;
   this->wheelSpeed[RIGHT] = vr + va * this->wheelSep / 2;
+
+  this->myIface->Unlock();
 }
 
 //////////////////////////////////////////////////////////////////////////////

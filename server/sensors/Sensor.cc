@@ -95,20 +95,14 @@ void Sensor::LoadController(XMLConfigNode *node)
   // Get the unique name of the controller
   std::string controllerName = node->GetString("name","",1);
 
-  std::cout << "Sensor Controller Name[" << controllerName << "]\n";
-
   // Create the interface
   if ( (childNode = node->GetChildByNSPrefix("interface")) )
   {
     // Get the type of the interface (eg: laser)
     std::string ifaceType = childNode->GetName();
 
-    std::cout << "Interface Type[" << ifaceType << "]\n";
-
     // Get the name of the iface 
     std::string ifaceName = childNode->GetString("name","",1);
-
-    std::cout << "Iface Name[" << ifaceName << "]\n";
 
     // Use the factory to get a new iface based on the type
     iface = IfaceFactory::NewIface(ifaceType);

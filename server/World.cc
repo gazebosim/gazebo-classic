@@ -141,13 +141,16 @@ int World::Update()
   this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime =this->physicsEngine->GetStepTime();
 
+  // Update all the models
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
   {
     (*iter)->Update(params);
   }
 
+  // Update the physics engine
   this->physicsEngine->Update();
 
+  // Update the rendering engine
   OgreAdaptor::Instance()->Render();
 
   this->simIface->Lock(1);

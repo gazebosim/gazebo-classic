@@ -90,6 +90,9 @@ int Body::Load(XMLConfigNode *node)
 // Initialize the body
 int Body::Init()
 {
+  // Set the intial pose. Must do this to handle static models
+  this->SetPose(this->GetPose());
+
   std::vector< Sensor* >::iterator siter;
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
@@ -274,7 +277,6 @@ int Body::LoadGeom(XMLConfigNode *node)
 
   // The mesh used for visualization
   std::string mesh = node->GetString("mesh","",0);
-
 
   if (node->GetName() == "sphere")
   {

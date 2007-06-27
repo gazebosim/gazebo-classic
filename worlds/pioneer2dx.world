@@ -18,10 +18,10 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.01</stepTime>
+    <stepTime>0.1</stepTime>
     <gravity>0 -9.8 0</gravity>
-    <cfm>10e-10</cfm>
-    <erp>0.3</erp>
+    <cfm>10e-8</cfm>
+    <erp>0.2</erp>
   </physics:ode>
 
   <rendering:ogre>
@@ -55,7 +55,7 @@
   </rendering:ogre>
 
   <model:xml name="box1_model">
-    <xyz>2 10.0 2</xyz>
+    <xyz>2 0 2</xyz>
     <rpy>0.0 0.0 0.0</rpy>
     <canonicalBody>box1_body</canonicalBody>
 
@@ -193,21 +193,10 @@
     </joint:ball>
 
     <controller:pioneer2dx_position2d name="controller1">
-      <iface>positionIface_1</iface>
       <leftJoint>left_wheel_hinge</leftJoint>
       <rightJoint>right_wheel_hinge</rightJoint>
+      <interface:position name="position_iface_1"/>
     </controller:pioneer2dx_position2d>
-
-    <interface:position name="positionIface_1">
-      <left>
-        <joint>left_wheel_hinge</joint>
-        <body>left_wheel</body>
-      </left>
-      <right>
-        <joint>right_wheel_hinge</joint>
-        <body>right_wheel</body>
-      </right>
-    </interface:position>
 
     <model:xml name="sicklms200_model">
       <xyz>0 0.1 0</xyz>
@@ -251,8 +240,9 @@
           <material>Gazebo/Black</material>
         </geom:box>
 
-        <sensor:Ray name="ray">
+        <sensor:Ray name="laser_1">
           <rayCount>180</rayCount>
+          <rangeCount>361</rangeCount>
           <origin>0 0.07 0</origin>
 
           <minAngle>-1.57</minAngle>

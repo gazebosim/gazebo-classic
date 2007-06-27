@@ -50,7 +50,6 @@ namespace gazebo
 
   class XMLConfigNode;
   class Body;
-  class Iface;
   class Controller;
   class HingeJoint;
 
@@ -147,10 +146,6 @@ class Model : public Entity
   /// \return Non-zero on error
   private: int LoadJoint(XMLConfigNode *node);
 
-  /// \brief Load a interface helper function
-  /// \param node XML Configuration node
-  private: void LoadIface(XMLConfigNode *node);
-
   /// \brief Load a controller helper function
   /// \param node XML Configuration node
   private: void LoadController(XMLConfigNode *node);
@@ -172,9 +167,6 @@ class Model : public Entity
 
   /// Map of the joints
   protected: std::map<std::string, Joint* > joints;
-
-  /// Map of the interfaces
-  protected: std::map<std::string, Iface* > ifaces;
 
   /// Map of the controllers
   protected: std::map<std::string, Controller* > controllers;

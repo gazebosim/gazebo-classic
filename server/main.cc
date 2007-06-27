@@ -306,8 +306,16 @@ int Fini()
 // Idle-time processing
 bool MainIdle()
 {
+  double realTime, simTime, pauseTime;
+
   // Advance the world 
   gazebo::World::Instance()->Update();
+
+  realTime = gazebo::World::Instance()->GetRealTime();
+  simTime = gazebo::World::Instance()->GetSimTime();
+  pauseTime = gazebo::World::Instance()->GetPauseTime();
+
+  //printf("Sim Time[%f]\n",simTime);
 
   // Exit if the user has decided to end the simulation
   if (userQuit)

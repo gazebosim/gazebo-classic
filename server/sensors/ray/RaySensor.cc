@@ -249,19 +249,12 @@ void RaySensor::UpdateChild(UpdateParams &/*params*/)
   // redrawn)
   for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
   {
-    //(*iter)->SetLength( 8.0 );
+    (*iter)->SetLength( 8.0 );
     (*iter)->contactRetro = 0.0;
     (*iter)->contactFiducial = -1;
 
     // Get the global points of the line
     (*iter)->Update();
-
-    // Update the ray endpoints (global cs)
-   // a = poseDelta.CoordPositionAdd(a);
-  //  b = poseDelta.CoordPositionAdd(b);
-
-    // Set the global points of the line
- //   (*iter)->SetPoints(a, b);
   }
 
   ODEPhysics *ode = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());
