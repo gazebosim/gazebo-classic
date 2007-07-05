@@ -21,7 +21,7 @@
     <stepTime>0.03</stepTime>
     <gravity>0 -9.8 0</gravity>
     <cfm>0.008</cfm>
-    <erp>0.4</erp>
+    <erp>0.2</erp>
   </physics:ode>
 
   <rendering:ogre>
@@ -105,13 +105,21 @@
     <attenuation>100 1.0 0.00 0.00</attenuation>
   </model:LightSource>
 
-  <model:ObserverCam>
-    <name>userCam0</name>
+  <model:xml name="cam1_model">
     <xyz>0 4.0 0</xyz>
     <rpy>0 -90 0</rpy>
-    <imageSize>640 480</imageSize>
-    <updateRate>10</updateRate>
-  </model:ObserverCam>
+    <static>true</static>
+
+    <body:empty name="cam1_body">
+      <sensor:camera name="cam1_sensor">
+        <imageSize>640 480</imageSize>
+        <hfov>60</hfov>
+        <nearClip>0.1</nearClip>
+        <farClip>100</farClip>
+      </sensor:camera>
+    </body:empty>
+  </model:xml>
+
 
   <model:xml name="pioneer1_model">
     <xyz>0 0.25 0</xyz>

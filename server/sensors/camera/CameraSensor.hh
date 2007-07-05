@@ -24,8 +24,8 @@
  * CVS: $Id: Camera.hh,v 1.1.2.1 2006/12/16 22:41:17 natepak Exp $
  */
 
-#ifndef CAMERA_HH
-#define CAMERA_HH
+#ifndef CAMERASENSOR_HH
+#define CAMERASENSOR_HH
 
 #include <Ogre.h>
 
@@ -49,68 +49,69 @@ namespace gazebo
 /// This sensor is used for simulating standard monocular cameras; is
 /// is used by both camera models (e.g., SonyVID30) and user interface
 /// models (e.g., ObserverCam).
-class Camera : public Sensor
+class CameraSensor : public Sensor
 {
-  // Constructor
-  public: Camera(Body *body);
+  /// \brief Constructor
+  public: CameraSensor(Body *body);
 
-  // Destructor
-  public: virtual ~Camera();
+  /// \brief Destructor
+  public: virtual ~CameraSensor();
 
-  /// @brief Initialize the sensor.
-  /// @param width, height image width and height (pixels)
-  /// @param hfov horizontal field of view (radians)
-  /// @param minDepth, maxDepth near and far depth clipping planes
+  /// \brief Load the camera using parameter from an XMLConfig node
+  /// \param node The XMLConfig node
+  protected: virtual void LoadChild( XMLConfigNode *node );
+
+  /// \brief Initialize the camera
+  protected: virtual void InitChild();
+
+  /// \brief Update the sensor information
+  protected: virtual void UpdateChild();
+
+  /// Finalize the camera
+  protected: virtual void FiniChild();
+
+  /// \brief Initialize the sensor.
+  /// \param width, height image width and height (pixels)
+  /// \param hfov horizontal field of view (radians)
+  /// \param minDepth, maxDepth near and far depth clipping planes
   ///   (m); minDepth must be greater than zero; maxDepth must be
   ///   greater than minDepth.
-  /// @param method Prefered rendering method: SGIX, GLX or XLIB.
-  ///  @param zBufferDepth Z buffer depth (in bits) used for rendering (useful
+  /// \param method Prefered rendering method: SGIX, GLX or XLIB.
+  /// \param zBufferDepth Z buffer depth (in bits) used for rendering (useful
   ///  for some  nvidia cards that do not support other depths than 24 bits)
-  /// @returns Zero on success.
-  public: int Init(int width, int height, double hfov,
+  /// \returns Zero on success.
+  private: int Init(int width, int height, double hfov,
                    double minDepth, double maxDepth, int zBufferDepth);
 
-  /// @brief Finalize the sensor
-  public: int Fini();
-
-  /// @brief Update the sensor information
-  public: void Update();
-
-  /// @brief Translate the camera
+  /// \brief Translate the camera
   public: void Translate( const Vector3 &direction );
 
-  /// @brief Rotate the camera around the yaw axis
+  /// \brief Rotate the camera around the yaw axis
   public: void RotateYaw( float angle );
 
-  /// @brief Rotate the camera around the pitch axis
+  /// \brief Rotate the camera around the pitch axis
   public: void RotatePitch( float angle );
 
-  /// @brief Set the pose of the camera (global cs)
-  //public: void SetPose(GzPose pose);
-
-  /// @brief Get the camera pose (global cs)
-  //public: GzPose GetPose();
-
-  /// @brief Set the camera FOV (horizontal)
+  /// \brief Set the camera FOV (horizontal)
   public: void SetFOV(double fov);
 
-  /// @brief Get the camera FOV (horizontal)  
+  /// \brief Get the camera FOV (horizontal)  
   public: double GetFOV() const;
 
-  /// @brief Get the image dimensions
+  /// \brief Get the image dimensions
   public: void GetImageSize(int *w, int *h);
 
-  /// @brief Get a pointer to the image data
+  /// \brief Get a pointer to the image data
   public: const unsigned char *GetImageData();
 
-  /// @brief Get the Z-buffer value at the given image coordinate.
+  /// \brief Get the Z-buffer value at the given image coordinate.
   ///
-  /// @param x, y Image coordinate; (0, 0) specifies the top-left corner.
-  /// @returns Image z value; note that this is abitrarily scaled and
+  /// \param x, y Image coordinate; (0, 0) specifies the top-left corner.
+  /// \returns Image z value; note that this is abitrarily scaled and
   /// is @e not the same as the depth value.
   public: double GetZValue(int x, int y);
 
-  /// @brief Compute the change in pose based on two image points.
+  /// \brief Compute the change in pose based on two image points.
   ///
   /// This function provides natural feedback when using a mouse to
   /// control the camera pose.  The function computes a change in
@@ -125,27 +126,27 @@ class Camera : public Sensor
   /// should be affected; the supported modes are translating, zooming
   /// and rotating.
   ///
-  /// @param mode Solution method: 0 = translate; 1 = zoom; 2 = rotate.
-  /// @param a, b Initial and final image points; the z value on a must be
+  /// \param mode Solution method: 0 = translate; 1 = zoom; 2 = rotate.
+  /// \param a, b Initial and final image points; the z value on a must be
   /// specified (use GetZValue() for this).
-  /// @returns Change in pose (camera frame; post-multiply with
+  /// \returns Change in pose (camera frame; post-multiply with
   /// current global pose).
 //  public: GzPose CalcCameraDelta(int mode, GzVector a, GzVector b);
   
-  // Render the scene from the camera perspective
+  /// \brief Render the scene from the camera perspective
   private: void Render();
 
-  /// @brief Set the path for saved frames
+  /// \brief Set the path for saved frames
   public: void SetSavePath(const char *pathname);
 
   /// @brief Enable or disable saving
   public: void EnableSaveFrame(bool enable);
 
-  // Camera pose
-  //private: GzPose cameraPose;
-
   // Save the camera frame
   private: void SaveFrame();
+
+  /// \brief Update the GUI text
+  private: void UpdateText();
 
   // Info for saving images
   private: bool saveEnable;

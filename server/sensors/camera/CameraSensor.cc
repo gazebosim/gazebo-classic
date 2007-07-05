@@ -21,12 +21,10 @@
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id$
+ * CVS: $Id: Camera.cc 46 2007-06-10 00:12:44Z natepak $
  */
 
-#if HAVE_CONFIG_H
-  #include <config.h>
-#endif
+#include <sstream>
 
 #include <Ogre.h>
 #include <CEGUISystem.h>
@@ -37,16 +35,24 @@
 #include <OgreWindowEventUtilities.h>
 #include <OgreCEGUIRenderer.h>
 
+#include "Global.hh"
+#include "GazeboError.hh"
+#include "Body.hh"
+#include "OgreTextRenderer.hh"
 #include "OgreAdaptor.hh"
 #include "OgreFrameListener.hh"
 
-#include "Camera.hh"
+#include "SensorFactory.hh"
+#include "CameraManager.hh"
+#include "CameraSensor.hh"
 
 using namespace gazebo;
 
+GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor);
+
 //////////////////////////////////////////////////////////////////////////////
 // Constructor 
-Camera::Camera(Body *body)
+CameraSensor::CameraSensor(Body *body)
   : Sensor(body)
 {
   this->imageWidth = this->imageHeight = 0;
@@ -55,48 +61,48 @@ Camera::Camera(Body *body)
   this->saveCount = 0;
   this->savePathname = NULL;
 
-  return;
+  CameraManager::Instance()->AddCamera(this);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-Camera::~Camera()
+CameraSensor::~CameraSensor()
 {
-  return;
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
-// Initialize the sensor
-int Camera::Init(int width, int height, double hfov, double minDepth, 
-    double maxDepth, int /*zBufferDepth*/)
+// Load the camera
+void CameraSensor::LoadChild( XMLConfigNode *node )
 {
-  this->imageWidth = width;
-  this->imageHeight = height;
+  this->nearClip = node->GetDouble("nearClip",0.1,0);
+  this->farClip = node->GetDouble("farClip",100,0);
 
-  this->nearClip = minDepth;
-  this->farClip = maxDepth;
+  this->imageWidth = node->GetTupleInt("imageSize",0,640);
+  this->imageHeight = node->GetTupleInt("imageSize",1,480);
 
-  this->hfov = hfov;
+  this->hfov = DTOR(node->GetDouble("hfov",60,0));
 
   // Do some sanity checks
   if (this->imageWidth == 0 || this->imageHeight == 0)
   {
-    printf("image has zero size\n");
-    return -1;
+    gzthrow("image has zero size");
   }
   if (this->hfov < 0.01 || this->hfov > M_PI)
   {
-    printf("bad field of view\n");
-    return -1;
+    gzthrow("Camera horizontal field of veiw invalid.");
   }
   if (this->nearClip < 0.01)
   {
-    printf("near clipping plane (min depth) is zero\n");
-    return -1;
+    gzthrow("near clipping plane (min depth) is zero");
   }
 
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Initialize the camera
+void CameraSensor::InitChild()
+{
   // Create the render texture
   /*this->renderTexture = Ogre::TextureManager::getSingleton().createManual("Camera1",Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D, this->imageWidth, this->imageHeight, 0,  Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET);
 
@@ -107,12 +113,13 @@ int Camera::Init(int width, int height, double hfov, double minDepth,
 
   // Create the camera
   this->camera = OgreAdaptor::Instance()->sceneMgr->createCamera(this->GetName());
-  this->camera->setNearClipDistance(minDepth);
-  //this->camera->setFarClipDistance(maxDepth);
+  this->camera->setNearClipDistance(this->nearClip);
+  this->camera->setFarClipDistance(this->farClip);
 
-  this->translateYawNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(this->GetName() + "_TranslateYawSceneNode", Ogre::Vector3(0,0,0));
-
-  this->pitchNode = this->translateYawNode->createChildSceneNode(this->GetName() + "PitchNode");
+  //this->translateYawNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(this->GetName() + "_TranslateYawSceneNode", Ogre::Vector3(0,0,0));
+  //this->pitchNode = this->translateYawNode->createChildSceneNode(this->GetName() + "PitchNode");
+ 
+  this->pitchNode = this->sceneNode->createChildSceneNode(this->GetName() + "PitchNode");
 
   this->pitchNode->attachObject(this->camera);
 
@@ -124,20 +131,19 @@ int Camera::Init(int width, int height, double hfov, double minDepth,
 
   this->camera->setAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()));
 
-  return 0;
+  OgreTextRenderer::Instance()->AddTextBox(this->GetName(), "", 10, 10, 100, 20, Ogre::ColourValue::White);
+  this->UpdateText();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Finalize the camera
-int Camera::Fini()
+void CameraSensor::FiniChild()
 {
-  return 0;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void Camera::Update()
+void CameraSensor::UpdateChild()
 {  
   /*
   //this->renderTexture->writeContentsToTimestampedFile("test",".jpg");
@@ -199,194 +205,38 @@ void Camera::Update()
   return;
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-// Render the scene from the camera perspective
-void Camera::Render()
-{
-  return;
-}
-
-const unsigned char *Camera::GetImageData()
-{
-  return NULL;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Get the Z-buffer value at the given image coordinate
-double Camera::GetZValue(int /*x*/, int /*y*/)
-{
-  //GLfloat iz;
-
-  // Flip y axis
-  //y = this->imageHeight - 1 - y;
-
-  // Get image z value of first spot
-//  glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &iz);
-
-  return 0.0;// iz;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Determine change in camera pose based on two image points
-/*GzPose Camera::CalcCameraDelta(int mode, GzVector a, GzVector b)
-{
-  GzPose n;
-  GLfloat ix, iy, iz;
-
-  // Image coordates of the first spot
-  ix = a.x;
-  iy = this->imageHeight - 1 - a.y;
-  iz = a.z;
-
-  double dx, dy, dz;
-  
-  // Convert to division coordinates
-  dx = 2 * ix / this->imageWidth - 1;
-  dy = 2 * iy / this->imageHeight - 1;
-  dz = (2 * iz  - 1);
-
-  double px, py, pz, pw;
-
-  // Compute perspective divisor; assumes well-formed projection matrix
-  pw = this->cameraProjectionMatrix[14] / (dz + this->cameraProjectionMatrix[10]);
-
-  // Convert to projected coordinate
-  px = dx * pw;
-  py = dy * pw;
-  pz = dz * pw;
-
-  double cx, cy, cz, cw;
-  
-  // Convert to camera frame (inverse projection)
-  cx = 1 / this->cameraProjectionMatrix[0] * px;
-  cy = 1 / this->cameraProjectionMatrix[5] * py;
-  cz = -pw;
-  cw = 1 / this->cameraProjectionMatrix[14] * pz + 1 / this->cameraProjectionMatrix[10] * pw;
-
-  double ix_, iy_;
-  double dx_, dy_;
-  
-  // Image coordates of the second spot
-  ix_ = b.x;
-  iy_ = this->imageHeight - 1 - b.y;
-
-  // Convert to division coordinates
-  dx_ = 2 * ix_ / this->imageWidth - 1;
-  dy_ = 2 * iy_ / this->imageHeight - 1;
-
-  GzPose n;
-  n.pos = GzVectorZero();
-  n.rot = GzQuaternIdent();
-  
-  double nx, ny, nz;
-
-  // Translate along x, y
-  if (mode == 0)
-  {
-    nz = 0.0;
-    nx = - (cz + nz) / this->cameraProjectionMatrix[0] * dx_ - cx;
-    ny = - (cz + nz) / this->cameraProjectionMatrix[5] * dy_ - cy;
-  }
-
-  // Translate (zoom) along z
-  else if (mode == 1)
-  {
-    ny = 0.0;
-    nz = - this->cameraProjectionMatrix[5] / (fabs(dy_) + 1e-16) * fabs(cy) - cz;    
-    nx = 0;
-
-    // Bound so we dont go too close
-    if (nz > -cz - 2 * this->nearClip)
-      nz = -cz - 2 * this->nearClip;
-
-    // Bound so we dont go too far away
-    else if (nz < -0.5 * this->farClip - cz)
-      nz = -0.5 * this->farClip - cz;
-  }
-  else
-  {
-    nx = 0;
-    ny = 0;
-    nz = 0;
-  }
-  
-  // Convert to Gazebo coordinate system (camera axis along +x)
-  n.pos.x = +nz;
-  n.pos.y = +nx;
-  n.pos.z = -ny;
-
-  // Rotate (pitch and yaw)
-  if (mode == 2)
-  {
-    double rx, ry;
-    rx = atan((dx_ - dx)  / this->cameraProjectionMatrix[0]);
-    ry = atan((dy_ - dy)  / this->cameraProjectionMatrix[5]);
-    n.rot = GzQuaternFromEuler(0, ry, rx);
-  }
-  
-  return n;
-}*/
-
-void Camera::Translate( const Vector3 &direction )
+////////////////////////////////////////////////////////////////////////////////
+// Translate the camera
+void CameraSensor::Translate( const Vector3 &direction )
 {
   Ogre::Vector3 vec(direction.x, direction.y, direction.z);
 
-  this->translateYawNode->translate(this->translateYawNode->getOrientation() * this->pitchNode->getOrientation() * vec);
+  //this->translateYawNode->translate(this->translateYawNode->getOrientation() * this->pitchNode->getOrientation() * vec);
+  this->sceneNode->translate(this->sceneNode->getOrientation() * this->pitchNode->getOrientation() * vec);
+
+  this->UpdateText();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Rotate the camera around the yaw axis
-void Camera::RotateYaw( float angle )
+void CameraSensor::RotateYaw( float angle )
 {
-  this->translateYawNode->yaw(Ogre::Degree(angle));
+  //this->translateYawNode->yaw(Ogre::Degree(angle));
+  this->sceneNode->yaw(Ogre::Degree(angle), Ogre::Node::TS_WORLD);
+  this->UpdateText();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Rotate the camera around the pitch axis
-void Camera::RotatePitch( float angle )
+void CameraSensor::RotatePitch( float angle )
 {
   this->pitchNode->pitch(Ogre::Degree(angle));
+  this->UpdateText();
 }
-
-//////////////////////////////////////////////////////////////////////////////
-// Set the pose of the camera
-/*void Camera::SetPose(GzPose pose)
-{
-  this->cameraPose = pose;
-  return;
-}*/
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Get the pose of the camera
-/*GzPose Camera::GetPose()
-{
-  return //this->cameraPose;
-}*/
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Set the camera FOV (horizontal)
-void Camera::SetFOV(double fov)
-{
-  this->hfov = fov;
-  return;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Get the camera FOV (horizontal)
-double Camera::GetFOV() const
-{
-  return this->hfov;
-}
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the image dimensions
-void Camera::GetImageSize(int *w, int *h)
+void CameraSensor::GetImageSize(int *w, int *h)
 {
   *w = this->imageWidth;
   *h = this->imageHeight;
@@ -396,7 +246,7 @@ void Camera::GetImageSize(int *w, int *h)
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the base filename for saved frames
-void Camera::SetSavePath(const char * /*pathname*/)
+void CameraSensor::SetSavePath(const char * /*pathname*/)
 {
 /*  char tmp[1024];
     
@@ -413,7 +263,7 @@ void Camera::SetSavePath(const char * /*pathname*/)
 
 //////////////////////////////////////////////////////////////////////////////
 // Enable or disable saving
-void Camera::EnableSaveFrame(bool /*enable*/)
+void CameraSensor::EnableSaveFrame(bool /*enable*/)
 {
   //this->saveEnable = enable;
   return;
@@ -422,7 +272,7 @@ void Camera::EnableSaveFrame(bool /*enable*/)
 
 //////////////////////////////////////////////////////////////////////////////
 // Save the current frame to disk
-void Camera::SaveFrame()
+void CameraSensor::SaveFrame()
 {
   /*char tmp[1024];
   FILE *fp;
@@ -446,4 +296,28 @@ void Camera::SaveFrame()
   */
 
   return;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Update the GUI text
+void CameraSensor::UpdateText()
+{
+  std::ostringstream stream;
+
+  stream.precision(2);
+  stream.flags(std::ios::showpoint | std::ios::fixed);
+  stream.fill('0');
+
+  stream << this->GetName() << "\n";
+  stream << "\tXYZ [" 
+    << this->sceneNode->getWorldPosition().x  << " "
+    << this->sceneNode->getWorldPosition().y << " "
+    << this->sceneNode->getWorldPosition().z << "]\n";
+
+  stream << "\tRPY [" 
+    << this->sceneNode->getWorldOrientation().getRoll().valueDegrees() << " " 
+    << this->pitchNode->getWorldOrientation().getPitch().valueDegrees() << " "
+    << this->sceneNode->getWorldOrientation().getYaw().valueDegrees() << "]";
+
+  OgreTextRenderer::Instance()->SetText(this->GetName(), stream.str());
 }
