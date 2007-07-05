@@ -1,6 +1,7 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "Global.hh"
 #include "ContactParams.hh"
 #include "OgreAdaptor.hh"
 #include "Body.hh"
@@ -20,7 +21,6 @@ Geom::Geom( Body *body)
 
   // Create the contact parameters
   this->contact = new ContactParams();
-
   this->geomId = NULL;
   this->transId = NULL;
 
@@ -63,9 +63,13 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   else
     assert(dGeomGetSpace(this->geomId) != 0);
 
-  //TODO: Mass...
-
   dGeomSetData(this->geomId, this);
+
+  if (this->IsStatic())
+  {
+    this->SetCategoryBits(GZ_FIXED_COLLIDE);
+    this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
 
   // Create a new name of the geom's mesh entity
   std::ostringstream stream;
@@ -96,24 +100,34 @@ bool Geom::IsPlaceable() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose relative to the body
-void Geom::SetPose(const Pose3d &pose)
+void Geom::SetPose(const Pose3d &pose, bool updateCoM)
 {
   if (this->placeable)
   {
+    Pose3d localPose;
     dQuaternion q;
-    q[0] = pose.rot.u;
-    q[1] = pose.rot.x;
-    q[2] = pose.rot.y;
-    q[3] = pose.rot.z;
 
-    dGeomSetPosition(this->geomId, pose.pos.x, pose.pos.y, pose.pos.z);
-    dMassTranslate(&this->mass, pose.pos.x, pose.pos.y, pose.pos.z);
+    // Transform into CoM relative Pose
+    localPose = pose - this->body->GetCoMPose();
 
+    q[0] = localPose.rot.u;
+    q[1] = localPose.rot.x;
+    q[2] = localPose.rot.y;
+    q[3] = localPose.rot.z;
+
+    // Set the pose of the encapsulated geom; this is always relative
+    // to the CoM
+    dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
     dGeomSetQuaternion(this->geomId, q); 
-    dMassRotate(&this->mass, dGeomGetRotation(this->geomId));
 
-    this->sceneNode->setPosition(pose.pos.x, pose.pos.y, pose.pos.z);
-    this->sceneNode->setOrientation(pose.rot.u, pose.rot.x, pose.rot.y, pose.rot.z);
+    //dMassTranslate(&this->mass, pose.pos.x, pose.pos.y, pose.pos.z);
+    //dMassRotate(&this->mass, dGeomGetRotation(this->geomId));
+
+    this->sceneNode->setPosition(localPose.pos.x, localPose.pos.y, localPose.pos.z);
+    this->sceneNode->setOrientation(localPose.rot.u, localPose.rot.x, localPose.rot.y, localPose.rot.z);
+
+    if (updateCoM)
+      this->body->UpdateCoM();
   }
 }
 
@@ -128,8 +142,11 @@ Pose3d Geom::GetPose() const
     const dReal *p;
     dQuaternion r;
 
+    // Get the pose of the encapsulated geom; this is always relative to
+    // the CoM
     p = dGeomGetPosition(this->geomId);
     dGeomGetQuaternion(this->geomId, r);
+
     pose.pos.x = p[0];
     pose.pos.y = p[1];
     pose.pos.z = p[2];
@@ -138,6 +155,9 @@ Pose3d Geom::GetPose() const
     pose.rot.x = r[1];
     pose.rot.y = r[2];
     pose.rot.z = r[3];
+
+    // Transform into body relative pose
+    pose += this->body->GetCoMPose();
   }
   else
     pose = this->body->GetPose();
@@ -174,6 +194,16 @@ void Geom::AttachMesh(const std::string &meshName)
 {
   this->ogreObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName().c_str(), meshName));
 
+  /*Ogre::EdgeData *edgeData = this->ogreObj->getEdgeData();
+  std::vector<Ogre::Triangle>::iterator tIter;
+
+  for (tIter = edgeData->triangles.begin(); tIter != edgeData->triangle.end();
+      tIter++)
+  {
+
+  }
+  */
+
   this->sceneNode->attachObject((Ogre::Entity*)this->ogreObj);
 }
 
@@ -204,10 +234,19 @@ void Geom::SetCastShadows(bool enable)
 /// Set the material to apply to the mesh
 void Geom::SetMeshMaterial(const std::string &materialName)
 {
-  Ogre::Entity *ent = dynamic_cast<Ogre::Entity*>(this->ogreObj);
+  Ogre::Entity *ent = NULL;
+  Ogre::SimpleRenderable *simple = NULL;
 
-  if (materialName != "" && ent)
+  if (materialName.empty())
+    return;
+
+  ent = dynamic_cast<Ogre::Entity*>(this->ogreObj);
+  simple = dynamic_cast<Ogre::SimpleRenderable*>(this->ogreObj);
+
+  if (ent)
     ent->setMaterialName(materialName);
+  else if (simple)
+    simple->setMaterial(materialName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,6 +254,7 @@ void Geom::SetMeshMaterial(const std::string &materialName)
 void Geom::SetCategoryBits(unsigned int bits)
 {
   dGeomSetCategoryBits(this->geomId, bits);
+  dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,4 +262,34 @@ void Geom::SetCategoryBits(unsigned int bits)
 void Geom::SetCollideBits(unsigned int bits)
 {
   dGeomSetCollideBits(this->geomId, bits);
+  dGeomSetCollideBits((dGeomID)this->spaceId, bits);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the mass of the geom
+const dMass *Geom::GetBodyMassMatrix()
+{
+  Pose3d pose;
+  dQuaternion q;
+  dMatrix3 r;
+  dMass bodyMass;
+
+  if (!this->placeable)
+    return NULL;
+
+  pose = this->GetPose();
+
+  q[0] = pose.rot.u;
+  q[1] = pose.rot.x;
+  q[2] = pose.rot.y;
+  q[3] = pose.rot.z;
+
+  dQtoR(q,r);
+
+  this->bodyMass = this->mass;
+  dMassRotate(&bodyMass, r);
+  dMassTranslate( &this->bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
+
+  return &this->bodyMass;
+}
+

@@ -4,21 +4,18 @@
   xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
-  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
-  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
-  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
-  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
   xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
 
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.01</stepTime>
+    <stepTime>0.03</stepTime>
     <gravity>0 -9.8 0</gravity>
     <cfm>0.008</cfm>
     <erp>0.4</erp>
@@ -54,91 +51,58 @@
     </resources>
   </rendering:ogre>
 
-  <param:global>
-    <stepTime>0.1</stepTime>
-    <gravity>0 -9.8 0</gravity>
-  </param:global>
+  <model:xml name="sphere1_model">
+    <xyz>0 0.5 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:sphere name="sphere1_body">
+      <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <geom:sphere name="sphere1_geom">
+        <mesh>default</mesh>
+        <size>0.5</size>
+        <density>1.0</density>
+        <material>Gazebo/Rocky</material>
+      </geom:sphere>
+    </body:sphere>
+  </model:xml>
 
   <model:xml name="box1_model">
-    <xyz>2 0.5 0</xyz>
-    <rpy>0.0 0.0 30.0</rpy>
+    <xyz>1.5 0.5 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <canonicalBody>box1_body</canonicalBody>
+    <static>false</static>
 
     <body:box name="box1_body">
-      <xyz>0.0 0.25 0.0</xyz>
+      <xyz>0.0 0.0 0.0</xyz>
       <rpy>0.0 0.0 0.0</rpy>
 
       <geom:box name="box1_geom">
         <mesh>default</mesh>
-        <size>0.5 0.5 0.5</size>
+        <size>1 1 1</size>
         <density>1.0</density>
         <material>Gazebo/BumpyMetal</material>
       </geom:box>
     </body:box>
   </model:xml>
 
-  <model:xml name="sicklms200_model">
-    <xyz>0 0.1 0</xyz>
-    <rpy>0 0 0</rpy>
+  <model:xml name="cylinder1_model">
+    <xyz>-1.5 0.5 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
 
-    <body:box name="laser1_body">
+    <body:cylinder name="cylinder1_body">
       <xyz>0.0 0.0 0.0</xyz>
       <rpy>0.0 0.0 0.0</rpy>
 
-      <geom:box name="laser1_geom1">
+      <geom:cylinder name="cylinder1_geom">
         <mesh>default</mesh>
-        <size>0.10 0.2 0.10</size>
-        <xyz>0.0 0.0 0.0</xyz>
-        <density>0.1</density>
-        <!--<material>Gazebo/Blue</material>-->
-      </geom:box>
-
-
-      <!--
-      <geom:box name="laser1_geom2">
-        <mesh>default</mesh>
-        <size>0.075 0.09 0.155</size>
-        <xyz>-0.0375 0.065 0</xyz>
-        <density>1</density>
-        <material>Gazebo/Blue</material>
-      </geom:box>
-
-      <geom:box name="laser1_geom3">
-        <mesh>default</mesh>
-        <size>0.156 0.08 0.155</size>
-        <xyz>0 .15 0</xyz>
-        <density>0.1</density>
-        <material>Gazebo/Blue</material>
-      </geom:box>
-
-      <geom:box name="laser1_geom4">
-        <mesh>default</mesh>
-        <size>0.06 0.06 0.06</size>
-        <xyz>0 .065 0</xyz>
-        <rpy>-90 0 0</rpy>
-        <density>0.1</density>
-        <material>Gazebo/Black</material>
-      </geom:box>
-      -->
-
-      <sensor:ray name="laser_1">
-        <rayCount>180</rayCount>
-        <rangeCount>361</rangeCount>
-        <origin>0 0.07 0</origin>
-
-        <minAngle>-1.57</minAngle>
-        <maxAngle>1.57</maxAngle>
-
-        <minRange>0.1</minRange>
-        <maxRange>8</maxRange>
-
-        <controller:sicklms200_laser name="laser_controller_1">
-          <interface:laser name="sicklms_iface_1"/>
-        </controller:sicklms200_laser>
-      </sensor:ray>
-
-    </body:box>
+        <size>0.5 1</size>
+        <density>1.0</density>
+        <material>Gazebo/RustyBarrel</material>
+      </geom:cylinder>
+    </body:cylinder>
   </model:xml>
-
 
   <model:xml name="plane1_model">
     <xyz>0 0 0</xyz>
@@ -157,7 +121,7 @@
 
   <model:LightSource>
     <name>light1</name>
-    <xyz>0.000 10.000 10.000</xyz>
+    <xyz>10.000 10.000 10.000</xyz>
     <type>point</type>
     <diffuseColor>1.0 1.0 1.0</diffuseColor>
     <specularColor>0.5 0.5 0.5</specularColor>
@@ -173,13 +137,13 @@
     <attenuation>100 1.0 0.00 0.00</attenuation>
   </model:LightSource>
 
-
   <model:ObserverCam>
     <name>userCam0</name>
-    <xyz>0 2.1 0</xyz>
-    <rpy>0 -90 0</rpy>
+    <xyz>0 3 4</xyz>
+    <rpy>0 -30 0</rpy>
     <imageSize>640 480</imageSize>
     <updateRate>10</updateRate>
   </model:ObserverCam>
+
 
 </gazebo:world>

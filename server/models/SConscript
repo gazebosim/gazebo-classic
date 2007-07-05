@@ -2,7 +2,7 @@
 Import('env staticObjs sharedObjs')
 
 #dirs = Split('GroundPlane LightSource ObserverCam Graphics3d')
-dirs = Split('LightSource ObserverCam')
+dirs = Split('LightSource')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)

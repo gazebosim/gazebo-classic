@@ -29,17 +29,17 @@
 
 #include "Geom.hh"
 
+
 namespace gazebo
 {
+  class SphereGeom : public Geom
+  {
+    // Constructor
+    public: SphereGeom(Body *body, double radius, double density, const std::string &meshName = "default" );
 
-class SphereGeom : public Geom
-{
-  // Constructor
-  public: SphereGeom(Body *body, double radius, const std::string &meshName );
-
-  // Destructor
-  public: virtual ~SphereGeom();
-};
-
+            // Destructor
+    public: virtual ~SphereGeom();
+  };
 }
+
 #endif

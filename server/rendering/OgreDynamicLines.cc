@@ -1,3 +1,29 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: Dynamic line generator
+ * Author: Nate Koenig
+ * Date: 28 June 2007
+ * CVS: $Id: OgreAdaptor.hh,v 1.1.2.1 2006/12/16 22:41:17 natepak Exp $
+ */
+
 #include <Ogre.h>
 #include <cassert>
 #include <cmath>
@@ -68,28 +94,18 @@ void OgreDynamicLines::Update()
     this->FillHardwareBuffers();
 }
 
-void OgreDynamicLines::SetOperationType(Ogre::RenderOperation::OperationType opType)
-{
-  this->mRenderOp.operationType = opType;
-}
-
-Ogre::RenderOperation::OperationType OgreDynamicLines::GetOperationType() const
-{
-  return this->mRenderOp.operationType;
-}
-
 
 void OgreDynamicLines::CreateVertexDeclaration()
 {
   Ogre::VertexDeclaration *decl = this->mRenderOp.vertexData->vertexDeclaration;
 
   decl->addElement(POSITION_BINDING, 0, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+
 }
 
 void OgreDynamicLines::FillHardwareBuffers()
 {
   int size = this->points.size();
-
   this->PrepareHardwareBuffers(size,0);
 
   if (!size) 
@@ -128,6 +144,15 @@ void OgreDynamicLines::FillHardwareBuffers()
     }
   }
   vbuf->unlock();
+
+  if ((float)vaabMin.x >= (float)vaabMax.x)
+    vaabMin.x = vaabMax.x - 10;
+
+  if ((float)vaabMin.y >= (float)vaabMax.y)
+    vaabMin.y = vaabMax.y - 10;
+
+  if ((float)vaabMin.z >= (float)vaabMax.z)
+    vaabMin.z = vaabMax.z - 10;
 
   this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z), 
                         Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );

@@ -34,27 +34,23 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-CylinderGeom::CylinderGeom(Body *body, double radius, double length, const std::string &meshName )
+CylinderGeom::CylinderGeom(Body *body, double radius, double length, double density, const std::string &meshName )
     : Geom(body)
 {
   // Initialize mass matrix
-  dMassSetCylinder(&this->mass, 1.0, 2, radius, length);
+  dMassSetCylinder(&this->mass, density, 2, radius, length);
   
-  this->SetGeom( dCreateCCylinder( 0, radius, length ), true );
+  //this->SetGeom( dCreateCCylinder( 0, radius, length ), true );
+  this->SetGeom( dCreateCylinder( 0, radius, length ), true );
 
-  // ODE cylinders are oriented along the y-axis; fix this
-  // so the are along the z-axis
-  //this->SetExtraRotation(GzQuaternFromAxis(1, 0, 0, M_PI / 2));
-  //this->SetRelativeRotation(GzQuaternIdent());
- 
   // Get the mesh
-  this->AttachMesh(meshName);
+  if (meshName.empty() || meshName == "default")
+    this->AttachMesh("unit_cylinder");
+  else
+    this->AttachMesh(meshName);
 
   // Set the size of the cylinder
-  this->ScaleMesh(Vector3(radius,radius,length));
-
-  // Set the default position of the cylinder
-  //this->SetMeshPosition(GzVectorSet(0,length,0));
+  this->ScaleMesh(Vector3(radius,length,radius));
 
   // Allow it to cast shadows
   this->SetCastShadows(true);

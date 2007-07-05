@@ -109,7 +109,8 @@ void ODEPhysics::Update()
 
   // Update the dynamical model
   dWorldStep( this->worldId, this->stepTime );
-  //dWorldStepFast1( this->worldId, step, 10 );
+  //dWorldStepFast1( this->worldId, this->stepTime, 20 );
+  //dWorldQuickStep(this->worldId, this->stepTime);
 
   // Very important to clear out the contact group 
   dJointGroupEmpty( this->contactGroup );
@@ -222,6 +223,13 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       geom2 = (Geom*) dGeomGetData(o2);
 
     assert(geom1 && geom2);
+
+//    std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
+
+    /*
+    if (geom1->IsStatic() && geom2->IsStatic())
+      printf("Geoms are static\n");
+      */
     
     // Detect collisions betweed geoms
     n = dCollide(o1, o2, num, contactGeoms, sizeof(contactGeoms[0]));
@@ -251,16 +259,19 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       contactInfo.surface.soft_erp = h * kp / (h * kp + kd);
       contactInfo.surface.soft_cfm = 1 / (h * kp + kd);
 
-      /*
-      printf("%f %f %f %f \n",
-             kp, kd,
-             contactInfo.surface.soft_erp,
-             contactInfo.surface.soft_cfm);
-      */
-
       // Compute friction effects; this is standard Coulomb friction
       contactInfo.surface.mode |= dContactApprox1;
       contactInfo.surface.mu = MIN(geom1->contact->mu1, geom2->contact->mu1);
+      
+
+     /* contactInfo.surface.mode = dContactSlip1 | dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+      contactInfo.surface.soft_erp = 0.8;
+      contactInfo.surface.soft_cfm = 0.01;
+      contactInfo.surface.slip1 = 0.0;
+      contactInfo.surface.slip2 = 0.0;
+      contactInfo.surface.mu = 1;
+      */
 
       // Compute slipping effects
       //contactInfo.surface.slip1 = (geom1->contact->slip1 + geom2->contact->slip1)/2.0;

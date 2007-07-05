@@ -9,13 +9,13 @@ namespace gazebo
 /// Abstract base class providing mechanisms for dynamically growing hardware buffers.
 class OgreDynamicRenderable : public Ogre::SimpleRenderable
 {
-  /// Constructor
+  /// \brief Constructor
   public: OgreDynamicRenderable();
 
-  /// Virtual destructor
+  /// \brief Virtual destructor
   public: virtual ~OgreDynamicRenderable();
 
-  /// Initializes the dynamic renderable.
+  /// \brief Initializes the dynamic renderable.
   /// \remarks This function should only be called once. It initializes the
   /// render operation, and calls the abstract function
   /// CreateVertexDeclaration(). 
@@ -24,18 +24,25 @@ class OgreDynamicRenderable : public Ogre::SimpleRenderable
   /// vertices to use as input.
   public: void Init(Ogre::RenderOperation::OperationType operationType, bool useIndices);
 
-  /// Implementation of Ogre::SimpleRenderable
+  /// \brief Set the render operation type
+  public: void SetOperationType(Ogre::RenderOperation::OperationType opType);
+
+  /// \brief Get the render operation type
+  public: Ogre::RenderOperation::OperationType GetOperationType() const;
+
+  /// \brief Implementation of Ogre::SimpleRenderable
   public: virtual Ogre::Real getBoundingRadius(void) const;
 
-  /// Implementation of Ogre::SimpleRenderable
+  /// \brief Implementation of Ogre::SimpleRenderable
   public: virtual Ogre::Real getSquaredViewDepth(const Ogre::Camera* cam) const;
 
-  /// Creates the vertex declaration.  @remarks Override and set
+  /// \brief Creates the vertex declaration.  @remarks Override and set
   /// mRenderOp.vertexData->vertexDeclaration here.  mRenderOp.vertexData
   /// will be created for you before this method is called.
   protected: virtual void CreateVertexDeclaration() = 0;
 
-   /// Prepares the hardware buffers for the requested vertex and index counts.
+   /// \brief Prepares the hardware buffers for the requested vertex and 
+   ///        index counts.
    /// \remarks 
    ///    This function must be called before locking the buffers in
    ///    fillHardwareBuffers().  It guarantees that the hardware buffers are
@@ -49,7 +56,7 @@ class OgreDynamicRenderable : public Ogre::SimpleRenderable
    ///        This parameter is ignored if not using indices.
   protected: void PrepareHardwareBuffers(size_t vertexCount, size_t indexCount);
 
-   /// Fills the hardware vertex and index buffers with data.
+   /// \brief Fills the hardware vertex and index buffers with data.
    /// @remarks 
    ///   This function must call prepareHardwareBuffers() before locking the 
    ///   buffers to ensure the they are large enough for the data to be 
@@ -57,10 +64,10 @@ class OgreDynamicRenderable : public Ogre::SimpleRenderable
    ///   can be locked, and data can be written to them. 
   protected: virtual void FillHardwareBuffers() = 0;
 
-  /// Maximum capacity of the currently allocated vertex buffer.
+  /// \brief Maximum capacity of the currently allocated vertex buffer.
   protected: size_t vertexBufferCapacity;
 
-  /// Maximum capacity of the currently allocated index buffer.
+  /// \brief Maximum capacity of the currently allocated index buffer.
   protected: size_t indexBufferCapacity;
 
 };

@@ -18,12 +18,11 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.01</stepTime>
+    <stepTime>0.02</stepTime>
     <gravity>0 -9.8 0</gravity>
     <cfm>10e-10</cfm>
     <erp>0.3</erp>
   </physics:ode>
-
 
   <rendering:ogre>
     <plugins path="/usr/local/lib/OGRE">
@@ -54,11 +53,6 @@
       </general>
     </resources>
   </rendering:ogre>
-
-  <param:global>
-    <stepTime>0.02</stepTime>
-    <gravity>0 -9.8 0</gravity>
-  </param:global>
 
   <!--  <model:xml name="sphere1_model">
     <xyz>0 1 0</xyz>

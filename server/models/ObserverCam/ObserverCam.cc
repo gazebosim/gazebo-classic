@@ -28,6 +28,7 @@ int ObserverCam::LoadChild(XMLConfigNode *node)
 
   // Create a new camera
   this->camera = CameraManager::Instance()->CreateCamera();
+  this->camera->SetName(this->GetName());
 
   // TODO: Fix so the camera sets whether it's active
   CameraManager::Instance()->SetActiveCamera(this->camera);
@@ -47,7 +48,7 @@ int ObserverCam::LoadChild(XMLConfigNode *node)
   hfov = node->GetDouble("hfov",60.0);
 
   //camera->Init(imageSizeX, imageSizeY, DTOR(hfov), nearClip, farClip, 16);
-  camera->Init(640, 480, 60*M_PI/180.0, 1, 100, 16);
+  camera->Init(640, 480, 60*M_PI/180.0, 0.1, 100, 16);
 
   return 0;
 }
@@ -65,6 +66,7 @@ int ObserverCam::InitChild()
 // Update the child model
 int ObserverCam::UpdateChild()
 {
+  this->camera->Update();
   return 0;
 }
 

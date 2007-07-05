@@ -34,31 +34,26 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BoxGeom::BoxGeom(Body *body,  Vector3 size, const std::string &meshName )
+BoxGeom::BoxGeom(Body *body,  Vector3 size, double density, const std::string &meshName )
     : Geom(body)
 {
   // Initialize box mass matrix
-  dMassSetBox(&this->mass, 1, size.x, size.y, size.z);
+  dMassSetBox(&this->mass, density, size.x, size.y, size.z);
 
   // Create a box geometry with box mass matrix
   this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
 
   // Get the box mesh
-  this->AttachMesh(meshName);
+  if (meshName.empty() || meshName == "default")
+    this->AttachMesh("unit_box");
+  else
+    this->AttachMesh(meshName);
 
   // Set the size of the box
   this->ScaleMesh(size);
 
   // Allow the box to cast shadows
   this->SetCastShadows(true);
-
-  /* TESTING Ogre::MaterialPtr mat= Ogre::MaterialManager::getSingleton().create("red",
-      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-  mat->setAmbient(1.0, 0.0, 0.0);
-  mat->setDiffuse(1.0, 0.0, 0.0, 1.0);
-  mat->setSpecular(0.5, 0.5, 0.5, 1.0);
-  ent->setMaterialName("red");
-  */
 }
 
 

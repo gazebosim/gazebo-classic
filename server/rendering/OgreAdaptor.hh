@@ -47,6 +47,7 @@ namespace CEGUI
 {
   class OgreCEGUIRenderer;
   class System;
+  class Window;
 }
 
 namespace gazebo
@@ -101,8 +102,10 @@ class OgreAdaptor
   private: static OgreAdaptor *myself;
 
   // CE GUI stuff
-  public: CEGUI::OgreCEGUIRenderer *guiRenderer;
+/*  public: CEGUI::OgreCEGUIRenderer *guiRenderer;
+  public: CEGUI::Window *guiEditorSheet;
   public: CEGUI::System *guiSystem;
+  */
 };
 
 class OgreGLXWindowInterface

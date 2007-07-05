@@ -25,6 +25,7 @@
 
 #include "Controller.hh"
 #include "gazebo.h"
+#include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
 #include "XMLConfig.hh"
@@ -37,9 +38,10 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Sensor::Sensor(Body *body)
-  : Entity()
+  : Entity(body)
 {
   this->body = body;
+  this->controller = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +54,7 @@ Sensor::~Sensor()
 // Load the sensor
 void Sensor::Load(XMLConfigNode *node)
 {
+  this->SetName(node->GetString("name","",1));
   this->LoadController( node->GetChildByNSPrefix("controller") );
   this->LoadChild(node);
 }
@@ -68,7 +71,8 @@ void Sensor::Init()
 void Sensor::Update(UpdateParams &params)
 {
   this->UpdateChild(params);
-  this->controller->Update(params);
+  if (this->controller)
+    this->controller->Update(params);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +87,11 @@ void Sensor::Fini()
 void Sensor::LoadController(XMLConfigNode *node)
 {
   if (!node)
-    gzthrow( "node parameter is NULL" );
+  {
+    gzmsg(0) << this->GetName() << " sensor has no controller.";
+    return;
+  }
+
 
   Iface *iface;
   XMLConfigNode *childNode;

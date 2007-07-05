@@ -35,7 +35,7 @@ namespace gazebo
 class CylinderGeom : public Geom
 {
   // Constructor
-  public: CylinderGeom(Body *body, double radius, double length, const std::string &meshName);
+  public: CylinderGeom(Body *body, double radius, double length, double density, const std::string &meshName);
 
   // Destructor
   public: virtual ~CylinderGeom();

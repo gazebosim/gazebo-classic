@@ -40,7 +40,6 @@ using namespace gazebo;
 RayGeom::RayGeom( Body *body )
   : Geom( body )
 {
-
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
  
@@ -50,7 +49,7 @@ RayGeom::RayGeom( Body *body )
   this->line->AddPoint(Vector3(0,0,0));
   this->line->AddPoint(Vector3(0,0,0));
 
-  this->AttachObject(line);
+  this->AttachObject(this->line);
 
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;

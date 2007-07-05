@@ -5,8 +5,7 @@ prefix = ARGUMENTS.get('prefix','/usr/local')
 
 
 # 3rd party packages
-parseConfigs=['pkg-config --cflags --libs OGRE',
-              'pkg-config --cflags --libs CEGUI-OGRE',
+parseConfigs=['pkg-config --cflags --libs CEGUI-OGRE',
               'xml2-config --cflags --libs', 
               'pkg-config --cflags --libs CEGUI',
               'pkg-config --cflags --libs playercore',

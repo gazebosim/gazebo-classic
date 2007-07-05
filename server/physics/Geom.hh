@@ -46,7 +46,8 @@ class Geom : public Entity
 
   /// \brief Set the pose
   /// \param pose New pose
-  public: void SetPose(const Pose3d &pose);
+  /// \param updateCom True to update the bodies Center of Mass
+  public: void SetPose(const Pose3d &pose, bool updateCoM=true);
 
   /// \brief Return the pose of the geom
   public: Pose3d GetPose() const;
@@ -86,6 +87,9 @@ class Geom : public Entity
   /// \param bits The bits
   public: void SetCollideBits(unsigned int bits);
 
+  /// \brief Get the mass of the geom
+  public: const dMass *GetBodyMassMatrix();
+
   /// \brief Contact parameters
   public: ContactParams *contact; 
 
@@ -103,6 +107,7 @@ class Geom : public Entity
 
   // Mass of this geometry
   protected: dMass mass;
+  protected: dMass bodyMass;
 };
 
 }

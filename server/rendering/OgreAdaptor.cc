@@ -1,10 +1,42 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: Middleman between OGRE and Gazebo
+ * Author: Nate Koenig
+ * Date: 13 Feb 2006
+ * CVS: $Id$
+ */
+
 #include <Ogre.h>
 #include <CEGUISystem.h>
 #include <CEGUISchemeManager.h>
 #include <OgreCEGUIRenderer.h>
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
+#include <CEGUI/CEGUILogger.h>
+#include <CEGUI/CEGUIWindowManager.h>
+#include <CEGUI/CEGUIWindow.h>
+#include <CEGUI/elements/CEGUIPushButton.h>
+#include <CEGUI/CEGUIFontManager.h>
 
+#include "OgreTextRenderer.hh"
 #include "GazeboMessage.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
@@ -81,12 +113,21 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->frameListener = new OgreFrameListener();
 
   this->root->addFrameListener(this->frameListener);
-
+ 
   // CEGUI setup
-  this->guiRenderer = new CEGUI::OgreCEGUIRenderer(this->window, 
+ /* this->guiRenderer = new CEGUI::OgreCEGUIRenderer(this->window, 
       Ogre::RENDER_QUEUE_OVERLAY, false, 0, this->sceneMgr);
 
   this->guiSystem = new CEGUI::System(this->guiRenderer);
+  CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
+
+  this->guiEditorSheet= CEGUI::WindowManager::getSingleton().createWindow((CEGUI::utf8*)"DefaultWindow", (CEGUI::utf8*)"Sheet");  
+  this->guiSystem->setGUISheet(this->guiEditorSheet);
+
+  this->guiEditorSheet->setVisible(true);
+  this->guiEditorSheet->setText("HELLO");
+  */
+  
 }
 
 void OgreAdaptor::Init(Display *display, 

@@ -38,59 +38,85 @@ namespace gazebo
 /// Generic x,y,z vector 
 class Vector3
 {
-  /// Constructors
+  /// \brief Constructor
   public: Vector3();
+
+  /// \brief Constructor
   public: Vector3( const double &x, const double &y, const double &z );
+
+  /// \brief Constructor
   public: Vector3( const Vector3 &pt );
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~Vector3();
 
-  /// Calc distance to the given point
+  /// \brief Calc distance to the given point
   public: double Distance( const Vector3 &pt ) const;
 
-  /// Normalize the vector length
+  /// \brief  Normalize the vector length
   public: void Normalize();
 
-  /// Set the contents of the vector
+  /// \brief Set the contents of the vector
   public: void Set(double x = 0, double y =0 , double z = 0);
 
-  /// Return the cross product of this vector and pt
+  /// \brief Return the cross product of this vector and pt
   public: Vector3 GetCrossProd(const Vector3 &pt) const;
 
-  /// Equal operator
+  /// \brief Equal operator
   public: const Vector3 &operator=( const Vector3 &pt );
 
-  /// Addition operators
+  /// \brief Equal operator
+  public: const Vector3 &operator=( double value );
+
+  /// \brief Addition operator
   public: Vector3 operator+( const Vector3 &pt ) const;
+
+  /// \brief Addition operator
   public: const Vector3 &operator+=( const Vector3 &pt );
 
-  /// Subtraction operators 
+  /// \brief Subtraction operators 
   public: Vector3 operator-( const Vector3 &pt ) const;
+
+  /// \brief Subtraction operators 
   public: const Vector3 &operator-=( const Vector3 &pt );
 
-  /// Division operators
+  /// \brief Division operators
   public: const Vector3 operator/( const Vector3 &pt ) const;
+
+  /// \brief Division operators
   public: const Vector3 &operator/=( const Vector3 &pt );
 
+  /// \brief Division operators
   public: const Vector3 operator/( double v ) const;
+
+  /// \brief Division operators
   public: const Vector3 &operator/=( double v );
 
-  /// Multiplication operators
+  /// \brief Multiplication operators
   public: const Vector3 operator*( const Vector3 &pt ) const;
+
+  /// \brief Multiplication operators
   public: const Vector3 &operator*=( const Vector3 &pt );
 
+  /// \brief Multiplication operators
   public: const Vector3 operator*( double v ) const;
+
+  /// \brief Multiplication operators
   public: const Vector3 &operator*=( double v );
 
-  /// Equality operators
+  /// \brief Equality operators
   public: bool operator==( const Vector3 &pt ) const;
+
+  /// \brief Equality operators
   public: bool operator!=( const Vector3 &pt ) const;
 
-  /// See if a point is finite (e.g., not nan)
+  /// \brief See if a point is finite (e.g., not nan)
   public: bool IsFinite() const;
 
-  // The location
+  /// \brief [] operator
+  public: double operator[](unsigned int index) const;
+
+  // \brief The location
   public: double x, y, z;
 
   /// Ostream operator

@@ -1,7 +1,7 @@
 #Import variable
 Import('env staticObjs sharedObjs')
 
-sources = Split('OgreAdaptor.cc OgreFrameListener.cc OgreDynamicRenderable.cc OgreDynamicLines.cc')
+sources = Split('OgreAdaptor.cc OgreFrameListener.cc OgreDynamicRenderable.cc OgreDynamicLines.cc OgreSimpleShape.cc OgreTextRenderer.cc')
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

@@ -78,6 +78,12 @@ class Body : public Entity
   // Set whether this body is enabled
   public: void SetEnabled(bool enable) const;
 
+  /// \brief Update the center of mass
+  public: void UpdateCoM();
+
+  /// \brief Get the Center of Mass pose
+  public: const Pose3d &GetCoMPose() const;
+
   /// Load a new geom helper function
   /// \param node XMLConfigNode used to load the geom
   /// \return Non-zero on error
@@ -102,6 +108,9 @@ class Body : public Entity
   private: std::string name;
 
   private: bool isStatic;
+
+  private: Pose3d comPose;
+  private: Pose3d staticPose;
 };
 
 }

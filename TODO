@@ -1,21 +1,34 @@
 Open:
-- Pick a formatting standard for XML file
+- Get camera's working
+  -Save frames
+  -Player interface
+  -Camera size doesn't work
+  -Offscreen rendering
+  -Mulitple cameras
+- Proper lights
+  - Attach to objects
+- FLTK interface
+- Pause simulation
+- Step simulation
+- Hand of god
+  - Select models and get info
+  - Move models
+- Better camera movement. Translate is too slow over long distances
+- BSP loader
+- Laser retro and fiducial detection
+- XML include
+
 - Write a tutorial for creating custom models
 - Write a tutorial for creating new controllers
 - Write a tutorial for creating new sensors
 - Write a tutorial for creating a new world
-- Laser retro and fiducial detection
+- Pick a formatting standard for XML file
 - Dynamic textures
-- Hand of god
-- Display camera position
 - Selectable models
 - Scripting interface for models and sensors
-- Screen capture
-- BSP loader
 - Google Earth API interface
 - GPS 
 - WiFi
-- Real time user interaction
 - Multilevel map extruder
 - Player image interface
 - libgazebo image interface
@@ -27,3 +40,4 @@ Open:
 - Replace all return int, with throws
 - The bodies set their scenenode based on a global pose. They should set their scenenodes based a pose relative to the model. The model currently doesn't move it's scene node, so it's always at (0,0,0). Basically should make all Body Pose stuff relative to the parent.
 -Allow person to display and change XML parameters through the GUI.
+-Look into COLLADA, OPAL, Bullet Physics & Collisioin detection engine

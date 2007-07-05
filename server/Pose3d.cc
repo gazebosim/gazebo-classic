@@ -194,3 +194,20 @@ void Pose3d::Reset()
   this->pos.Set();
   this->rot.SetToIdentity();
 }
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Find the inverse of a pose; i.e., if b = this + a, given b and this,
+// find a
+Pose3d Pose3d::CoordPoseSolve(const Pose3d &b) const
+{
+  Quatern q;
+  Pose3d a;
+
+  a.rot = this->rot.GetInverse() * b.rot;                       
+  q = a.rot * Quatern(0, this->pos.x, this->pos.y, this->pos.z);
+  q = q * a.rot.GetInverse();
+  a.pos = b.pos - Vector3(q.x, q.y, q.z);
+
+  return a;
+}

@@ -77,7 +77,6 @@ int Model::Load(XMLConfigNode *node)
     this->SetName(node->GetString("name","",1));
     this->SetStatic(node->GetBool("static",false,0));
 
-
     // Load the bodies
     childNode = node->GetChildByNSPrefix("body");
 
@@ -186,10 +185,14 @@ int Model::Update(UpdateParams &params)
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
 
+  Pose3d bodyPose, newPose, oldPose;
+
   for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
     if (bodyIter->second)
+    {
       bodyIter->second->Update(params);
+    }
   }
 
   for (contIter=this->controllers.begin(); 
@@ -205,8 +208,17 @@ int Model::Update(UpdateParams &params)
     boost::python::call<void>(this->pFuncUpdate, this);
   }*/
  
+  Body *b = NULL;
   if (!this->canonicalBodyName.empty())
+  {
     this->pose = this->bodies[this->canonicalBodyName]->GetPose();
+    b = this->bodies[this->canonicalBodyName];
+  }
+
+  if (this->GetName() == "pioneer1_model")
+  {
+    //std::cout << "Pose[" << this->pose << "]\n";
+  }
 
   return this->UpdateChild();
 }
@@ -367,8 +379,6 @@ int Model::LoadJoint(XMLConfigNode *node)
 
   Joint *joint;
 
-  printf("Creating a joint\n");
-
   Body *body1(this->bodies[node->GetString("body1","",1)]);
   Body *body2(this->bodies[node->GetString("body2","",1)]);
   Body *anchorBody(this->bodies[node->GetString("anchor","",1)]);
@@ -384,9 +394,6 @@ int Model::LoadJoint(XMLConfigNode *node)
     std::cerr << "Couldn't Find Body[" << node->GetString("body2","",1);
     return -1;
   }
-
-  std::cout << "Body1[" << body1->GetName() << "] Body2[" 
-              << body2->GetName() << "]\n";
 
   // Create a Hinge Joint
   if (node->GetName() == "hinge")
@@ -412,12 +419,10 @@ int Model::LoadJoint(XMLConfigNode *node)
   if (anchorBody)
   {
     joint->SetAnchor(anchorBody->GetPosition());
-    std::cout << "Anchor[" << anchorBody->GetPosition() << "]\n";
   }
   else
   {
     joint->SetAnchor(anchorVec);
-    std::cout << "Anchor[" << anchorVec << "]\n";
     this->bodies.erase(node->GetString("anchor","",1));
   }
 
@@ -426,7 +431,6 @@ int Model::LoadJoint(XMLConfigNode *node)
   {
     HingeJoint *hinge = (HingeJoint*)(joint);
     hinge->SetAxis(node->GetVector3("axis",Vector3(0,0,1)));
-    std::cout << "Axis[" << node->GetVector3("axis",Vector3(0,0,1)) << "]\n";
   }
   else if (node->GetName() == "hinge2")
   {
@@ -444,8 +448,8 @@ int Model::LoadJoint(XMLConfigNode *node)
   }
 
   // Set joint parameters
-  joint->SetParam(dParamSuspensionERP, node->GetDouble("erp",0.0,0));
-  joint->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.0,0));
+  joint->SetParam(dParamSuspensionERP, node->GetDouble("erp",0.4,0));
+  joint->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.8,0));
 
   // Name the joint
   joint->SetName(node->GetString("name","",1));

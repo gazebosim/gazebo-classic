@@ -44,7 +44,7 @@
 
 using namespace gazebo;
 
-GZ_REGISTER_STATIC_SENSOR("Ray", RaySensor);
+GZ_REGISTER_STATIC_SENSOR("ray", RaySensor);
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -85,13 +85,14 @@ void RaySensor::LoadChild(XMLConfigNode *node)
     
   // Create a space to contain all the rays
   this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
-
   
   // Set collision bits
-  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
+ /* dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
+  */
 
   this->body->spaceId = this->superSpaceId;
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -116,14 +117,12 @@ void RaySensor::InitChild()
     start = (axis * this->minRange) + this->origin;
     end = (axis * this->maxRange) + this->origin;
 
-  //  start = bodyPose.CoordPositionAdd(start);
-  //  end = bodyPose.CoordPositionAdd(end);
-
     ray = new RayGeom(this->body);
 
     ray->SetPoints(start, end);
-    ray->SetCategoryBits( GZ_LASER_COLLIDE );
+/*    ray->SetCategoryBits( GZ_LASER_COLLIDE );
     ray->SetCollideBits( ~GZ_LASER_COLLIDE );
+    */
 
     this->rays.push_back(ray);
 
@@ -266,8 +265,8 @@ void RaySensor::UpdateChild(UpdateParams &/*params*/)
 
   // Do collision detection
   dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
-                  ( dGeomID ) ( ode->GetSpaceId() ),
-                  this, &UpdateCallback );
+                 ( dGeomID ) ( ode->GetSpaceId() ),
+                 this, &UpdateCallback );
 }
 
 
@@ -276,12 +275,12 @@ void RaySensor::UpdateChild(UpdateParams &/*params*/)
 // Callback for ray intersection test
 void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 {
-  int n;
+  int n = 0;
   dContactGeom contact;
-  dxGeom *geom1, *geom2;
-  RayGeom *rayGeom;
-  Geom *hitGeom;
-  RaySensor *self;
+  dxGeom *geom1, *geom2 = NULL;
+  RayGeom *rayGeom = NULL;
+  Geom *hitGeom = NULL;
+  RaySensor *self = NULL;
 
   self = (RaySensor*) data;
  
@@ -340,6 +339,7 @@ void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
     // Check for ray/geom intersections
     if ( rayGeom && hitGeom )
     {
+
       n = dCollide(o1, o2, 1, &contact, sizeof(contact));       
 
       if ( n > 0 )

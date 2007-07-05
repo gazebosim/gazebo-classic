@@ -41,6 +41,20 @@ void OgreDynamicRenderable::Init(Ogre::RenderOperation::OperationType operationT
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Set the render operation type
+void OgreDynamicRenderable::SetOperationType(Ogre::RenderOperation::OperationType opType)
+{
+  this->mRenderOp.operationType = opType;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the render operation type
+Ogre::RenderOperation::OperationType OgreDynamicRenderable::GetOperationType() const
+{
+  return this->mRenderOp.operationType;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Prepares the hardware buffers for the requested vertex and index counts.
 void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexCount)
 {
@@ -67,7 +81,6 @@ void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t in
     while (vertexCount < newVertCapacity>>1)
       newVertCapacity >>= 1;
   }
-
 
   if (newVertCapacity != this->vertexBufferCapacity) 
   {

@@ -103,6 +103,17 @@ const Vector3 &Vector3::operator=( const Vector3 &pt )
   return *this;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Equal operator
+const Vector3 &Vector3::operator=( double value )
+{
+  this->x = value;
+  this->y = value; 
+  this->z = value;
+
+  return *this;
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,10 +226,26 @@ bool Vector3::operator!=( const Vector3 &pt ) const
   return !(*this == pt);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // See if a point is finite (e.g., not nan)
 bool Vector3::IsFinite() const
 {
   return finite(this->x) && finite(this->y) && finite(this->z);
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+/// [] operator
+double Vector3::operator[](unsigned int index) const
+{
+  switch (index)
+  {
+    case 0:
+      return this->x;
+    case 1:
+      return this->y;
+    case 2:
+      return this->z;
+    default:
+      return 0;
+  }
+}

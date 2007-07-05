@@ -31,6 +31,7 @@
 #include <Ogre.h>
 
 #include "Body.hh"
+#include "ContactParams.hh"
 #include "PlaneGeom.hh"
 
 using namespace gazebo;
@@ -63,14 +64,18 @@ PlaneGeom::PlaneGeom(Body *body, double altitude, Vector3 normal)
 
   Ogre::Plane plane(Ogre::Vector3(0, 1, 0), 0);
 
-  Ogre::MeshManager::getSingleton().createPlane("plane",
+  Ogre::MeshManager::getSingleton().createPlane(this->GetName(),
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-      1500,1500,20,20,true,1,5,5, Ogre::Vector3(0,0,1));
+      1500,1500,200,200,true,10,500,500, Ogre::Vector3(0,0,1));
 
-  this->AttachMesh("plane");
+  this->AttachMesh(this->GetName());
   this->SetCastShadows(false);
 
-  return;
+  this->contact->kp = dInfinity;
+  this->contact->kd = 0;
+  this->contact->mu1 = dInfinity;
+  this->contact->mu2 = dInfinity;
+ 
 }
 
 
@@ -78,5 +83,4 @@ PlaneGeom::PlaneGeom(Body *body, double altitude, Vector3 normal)
 // Destructor
 PlaneGeom::~PlaneGeom()
 {
-  return;
 }

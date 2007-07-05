@@ -35,7 +35,7 @@ namespace gazebo
 class BoxGeom : public Geom
 {
   // Constructor
-  public: BoxGeom(Body *body, Vector3 size, const std::string &meshName);
+  public: BoxGeom(Body *body, Vector3 size, double density, const std::string &meshName="default");
 
   // Destructor
   public: virtual ~BoxGeom();

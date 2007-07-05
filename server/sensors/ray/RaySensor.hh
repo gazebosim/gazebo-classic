@@ -63,7 +63,7 @@ class RaySensor: public Sensor
   protected: virtual void InitChild();
 
   ///  Update sensed values
-  public: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild(UpdateParams &params);
   
   /// Finalize the ray
   protected: virtual void FiniChild();

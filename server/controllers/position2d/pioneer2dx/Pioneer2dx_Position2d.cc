@@ -39,7 +39,7 @@ using namespace gazebo;
 
 GZ_REGISTER_STATIC_CONTROLLER("pioneer2dx_position2d", Pioneer2dx_Position2d);
 
-enum {LEFT, RIGHT};
+enum {RIGHT, LEFT};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -57,8 +57,8 @@ Pioneer2dx_Position2d::Pioneer2dx_Position2d( Iface *iface, Entity *parent )
 
   this->enableMotors = true;
 
-  this->wheelSpeed[0] = 0;
-  this->wheelSpeed[1] = 0;
+  this->wheelSpeed[RIGHT] = 0;
+  this->wheelSpeed[LEFT] = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,8 +71,8 @@ Pioneer2dx_Position2d::~Pioneer2dx_Position2d()
 // Load the controller
 void Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 {
-  this->wheelSep = 0.35;
-  this->wheelDiam = 0.19;
+  this->wheelSep = 0.34;
+  this->wheelDiam = 0.15;
 
   std::string leftJointName = node->GetString("leftJoint", "", 1);
   std::string rightJointName = node->GetString("rightJoint", "", 1);
@@ -111,11 +111,6 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
   double wd, ws;
   double d1, d2;
   double dr, da;
-
-  /*double speed1 = this->joints[LEFT]->GetParam(dParamVel);
-  double speed2 = this->joints[RIGHT]->GetParam(dParamVel);
-  printf("ODE Speed[%f %f]\n",speed1, speed2);
-  */
 
   this->GetPositionCmd();
 
@@ -179,8 +174,8 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 
   this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
 
-  this->wheelSpeed[LEFT] = vr - va * this->wheelSep / 2;
-  this->wheelSpeed[RIGHT] = vr + va * this->wheelSep / 2;
+  this->wheelSpeed[LEFT] = vr + va * this->wheelSep / 2;
+  this->wheelSpeed[RIGHT] = vr - va * this->wheelSep / 2;
 
   this->myIface->Unlock();
 }

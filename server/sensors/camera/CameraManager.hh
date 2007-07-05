@@ -32,45 +32,46 @@
 namespace gazebo
 {
 
-class Camera;
+class CameraSensor;
 
-/// Class to manage all the cameras in the world
+/// \brief Class to manage all the cameras in the world
 class CameraManager
 {
-  /// Constructor
+  /// \brief Constructor
   private: CameraManager();
 
-  /// Destructor
+  /// \brief Destructor
   public: ~CameraManager();
 
-  /// Get instance of the camera manager
+  /// \brief Get instance of the camera manager
   public: static CameraManager *Instance();
 
-  /// Create a new camera
-  /// \return Pointer to the new camera
-  public: Camera *CreateCamera();
+  /// \brief Add camera to the manager
+  public: void AddCamera( CameraSensor *camera );
 
-  /// Get a camera
+  /// \brief Return the number of cameras
+  public: unsigned int GetNumCameras() const;
+
+  /// \brief Get a camera
   /// \param index Index of the camera to get
   /// \return Pointer to the camera
-  public: Camera *GetCamera(int index);
+  public: CameraSensor *GetCamera(int index);
 
-  /// Set a camera to be active.
-  /// \param Pointer to the camera to activate
-  public: void SetActiveCamera( Camera *camera);
+  /// \brief Set a camera to be active.
+  public: void SetActiveCamera( unsigned int index );
 
-  /// Return the active camera
+  /// \brief Return the active camera
   /// \return Pointer to the active camera
-  public: Camera *GetActiveCamera();
+  public: CameraSensor *GetActiveCamera();
 
   /// Static self pointer
   private: static CameraManager *myself;
 
   /// List of all the cameras
-  private: std::deque< Camera* > cameras;
+  private: std::deque< CameraSensor* > cameras;
 
   /// The active camera
-  private: Camera *activeCamera;
+  private: unsigned int activeCamera;
 };
 
 }

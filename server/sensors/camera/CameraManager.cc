@@ -19,12 +19,12 @@
  *
  */
 /* Desc: Class to manage all cameras
- * Author: Andrew Howard and Nate Koenig
+ * Author: Nate Koenig
  * Date: 3 Apr 2007
  * SVN: $Id$
  */
 
-#include "Camera.hh"
+#include "CameraSensor.hh"
 #include "CameraManager.hh"
 
 using namespace gazebo;
@@ -35,6 +35,7 @@ CameraManager *CameraManager::myself;
 // Constructor
 CameraManager::CameraManager()
 {
+  this->activeCamera = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,33 +56,38 @@ CameraManager *CameraManager::Instance()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Create a new camera
-Camera *CameraManager::CreateCamera()
+/// Add new camera
+void CameraManager::AddCamera( CameraSensor *camera )
 {
-  Camera *newCamera = new Camera(NULL);
+  this->cameras.push_back(camera);
+}
 
-  this->cameras.push_back(newCamera);
-
-  return newCamera;
+////////////////////////////////////////////////////////////////////////////////
+// Return the number of cameras
+unsigned int CameraManager::GetNumCameras() const
+{
+  return this->cameras.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a camera
-Camera *CameraManager::GetCamera(int index)
+CameraSensor *CameraManager::GetCamera(int index)
 {
   return this->cameras[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a camera to be active.
-void CameraManager::SetActiveCamera( Camera *camera)
+void CameraManager::SetActiveCamera(unsigned int index)
 {
-  this->activeCamera = camera;
+  assert( index < this->cameras.size() );
+
+  this->activeCamera = index;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the active camera
-Camera *CameraManager::GetActiveCamera()
+CameraSensor *CameraManager::GetActiveCamera()
 {
-  return this->activeCamera;
+  return this->cameras[this->activeCamera];
 }

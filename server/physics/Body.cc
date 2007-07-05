@@ -82,8 +82,6 @@ int Body::Load(XMLConfigNode *node)
     this->LoadSensor(childNode);
     childNode = childNode->GetNextByNSPrefix("sensor");
   }
-
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +109,13 @@ int Body::Update(UpdateParams &params)
 
   if (!this->IsStatic())
   {
-    this->SetPose(this->GetPose());
+    Pose3d pose = this->GetPose();
+
+    // Set the position of the scene node
+    this->sceneNode->setPosition(pose.pos.x, pose.pos.y, pose.pos.z);
+
+    // Set the rotation of the scene node
+    this->sceneNode->setOrientation(pose.rot.u, pose.rot.x, pose.rot.y, pose.rot.z);
   }
 
   for (sensorIter=this->sensors.begin(); 
@@ -140,20 +144,42 @@ void Body::AttachGeom( Geom *geom )
 // Set the pose of the body
 void Body::SetPose(const Pose3d &pose)
 {
-  this->SetPosition(pose.pos);
-  this->SetRotation(pose.rot);
+  if (this->IsStatic())
+  {
+    this->staticPose = pose;
+
+    this->SetPosition(this->staticPose.pos);
+    this->SetRotation(this->staticPose.rot);
+  }
+  else
+  {
+    Pose3d localPose;
+
+    // Compute pose of CoM
+    localPose =this->comPose + pose;
+
+    this->SetPosition(localPose.pos);
+    this->SetRotation(localPose.rot);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the pose of the body
 Pose3d Body::GetPose() const
 {
-  Pose3d pose;
+  if (this->IsStatic())
+    return this->staticPose;
+  else
+  {
+    Pose3d pose;
 
-  pose.pos = this->GetPosition();
-  pose.rot = this->GetRotation();
+    pose.pos = this->GetPosition();
+    pose.rot = this->GetRotation();
 
-  return pose;
+    pose = this->comPose.CoordPoseSolve(pose);
+
+    return pose;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -215,9 +241,10 @@ void Body::SetRotation(const Quatern &rot)
 // Return the position of the body. in global CS
 Vector3 Body::GetPosition() const
 {
-  Vector3 pos;
+
   if (!this->IsStatic())
   {
+    Vector3 pos;
     const dReal *p;
 
     p = dBodyGetPosition(this->bodyId);
@@ -225,9 +252,11 @@ Vector3 Body::GetPosition() const
     pos.x = p[0];
     pos.y = p[1];
     pos.z = p[2];
-  }
 
-  return pos;
+    return pos;
+  }
+  else
+    return this->staticPose.pos;
 }
 
 
@@ -235,9 +264,9 @@ Vector3 Body::GetPosition() const
 // Return the rotation
 Quatern Body::GetRotation() const
 {
-  Quatern rot;
   if (!this->IsStatic())
   {
+    Quatern rot;
     const dReal *r;
 
     r = dBodyGetQuaternion(this->bodyId);
@@ -246,9 +275,12 @@ Quatern Body::GetRotation() const
     rot.x = r[1];
     rot.y = r[2];
     rot.z = r[3];
-  }
 
-  return rot;
+    return rot;
+  }
+  else
+    return this->staticPose.rot;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,22 +309,23 @@ int Body::LoadGeom(XMLConfigNode *node)
 
   // The mesh used for visualization
   std::string mesh = node->GetString("mesh","",0);
+  double density = node->GetDouble("density",0.0,0);
 
   if (node->GetName() == "sphere")
   {
     double radius = node->GetDouble("size",0.0,0);
-    geom = new SphereGeom(this, radius, mesh);
+    geom = new SphereGeom(this, radius, density, mesh);
   }
   else if (node->GetName() == "cylinder")
   {
     double radius = node->GetTupleDouble("size",0,1.0);
     double length = node->GetTupleDouble("size",1,1.0);
-    geom = new CylinderGeom(this, radius, length, mesh);
+    geom = new CylinderGeom(this, radius, length, density, mesh);
   }
   else if (node->GetName() == "box")
   {
     Vector3 size = node->GetVector3("size",Vector3(1,1,1));
-    geom = new BoxGeom(this, size, mesh);
+    geom = new BoxGeom(this, size, density, mesh);
   }
   else if (node->GetName() == "plane")
   {
@@ -343,3 +376,88 @@ void Body::LoadSensor(XMLConfigNode *node)
     gzthrow(stream.str());
   }
 }
+
+/////////////////////////////////////////////////////////////////////
+// Update the CoM and mass matrix
+/*
+  What's going on here?  In ODE the CoM of a body corresponds to the
+  origin of the body-fixed coordinate system.  In Gazebo, however, we
+  want to have arbitrary body coordinate systems (i.e., CoM may be
+  displaced from the body-fixed cs).  To get around this limitation in
+  ODE, we have an extra fudge-factor (comPose), describing the pose of
+  the CoM relative to Gazebo's body-fixed cs.  When using low-level
+  ODE functions, one must use apply this factor appropriately.
+
+  The UpdateCoM() function is used to compute this offset, based on
+  the mass distribution of attached geoms.  This function also shifts
+  the ODE-pose of the geoms, to keep everything in the same place in the
+  Gazebo cs.  Simple, neh?
+
+  TODO: messes up if you call it twice; should fix.
+*/
+void Body::UpdateCoM()
+{
+  int i;
+  const dMass *mass;
+  Pose3d oldPose, newPose, pose;
+  std::vector< Geom* >::iterator giter;
+
+  // Dummy bodies dont have mass
+  if (!this->bodyId)
+    return;
+  
+  // Construct the mass matrix by combining all the geoms
+  dMassSetZero( &this->mass );
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    mass = (*giter)->GetBodyMassMatrix();
+    if ((*giter)->IsPlaceable())
+      dMassAdd( &this->mass, mass );
+  }
+
+  // Old pose for the CoM
+  oldPose = this->comPose;
+
+  // New pose for the CoM
+  newPose.pos.x = this->mass.c[0];
+  newPose.pos.y = this->mass.c[1];
+  newPose.pos.z = this->mass.c[2];
+
+  // Fixup the poses of the geoms (they are attached to the CoM)
+  //for (i = 0; i < this->geomCount; i++)
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    if ((*giter)->IsPlaceable())
+    {
+      this->comPose = oldPose;
+      pose = (*giter)->GetPose();
+      this->comPose = newPose;
+      (*giter)->SetPose(pose, false);
+    }
+  }
+
+  // Fixup the pose of the CoM (ODE body)
+  this->comPose = oldPose;
+  pose = this->GetPose();
+  this->comPose = newPose;
+  this->SetPose(pose);
+  
+  // Settle on the new CoM pose
+  this->comPose = newPose;
+  
+
+  // TODO: remove offsets from mass matrix?
+
+  // Set the mass matrix
+  dBodySetMass( this->bodyId, &this->mass );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the Center of Mass pose
+const Pose3d &Body::GetCoMPose() const
+{
+  return this->comPose;
+}
+
+

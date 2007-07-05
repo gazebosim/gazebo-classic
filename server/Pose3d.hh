@@ -106,6 +106,10 @@ class Pose3d
   /// \return The resulting rotation
   public: Quatern CoordRotationSub(const Quatern &rot) const;
 
+  /// \brief Find the inverse of a pose; i.e., if b = this + a, given b and 
+  ///        this, find a
+  public: Pose3d CoordPoseSolve(const Pose3d &b) const;
+
   /// Reset the pose
   public: void Reset();
 
