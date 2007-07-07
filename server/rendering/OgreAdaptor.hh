@@ -82,8 +82,6 @@ class OgreAdaptor
   public: Ogre::Viewport *viewport;
   public: Ogre::InputReader *inputDevice;
 
-  public: Ogre::SceneNode *cameraNode;
-  public: Ogre::SceneNode *cameraPitchNode;
   private: Ogre::LogManager *logManager;
 
   // Our custom frame listener
@@ -95,9 +93,6 @@ class OgreAdaptor
   private: Window windowId;
 
   private: static OgreAdaptor *myself;
-
-  private: Ogre::Overlay *sceneOverlay;
-  public: Ogre::OverlayContainer *panel;
 };
 
 class OgreGLXWindowInterface

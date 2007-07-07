@@ -32,6 +32,9 @@
 #include <OISMouse.h>
 #include <OISKeyboard.h>
 
+#include "Global.hh"
+#include "Pose3d.hh"
+#include "OgreHUD.hh"
 #include "CameraSensor.hh"
 #include "CameraManager.hh"
 #include "OgreAdaptor.hh"
@@ -106,6 +109,8 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
   {
     Ogre::Vector3 tmp =this->directionVec * evt.timeSinceLastFrame;
     camera->Translate(Vector3(tmp.x, tmp.y, tmp.z));
+
+    OgreHUD::Instance()->SetCamera(camera);
   }
 
   this->mKeyboard->capture();
@@ -156,6 +161,15 @@ bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
     case OIS::KC_Q:
       this->directionVec.y += this->moveAmount;
       break;
+
+    case OIS::KC_LBRACKET:
+      CameraManager::Instance()->IncActiveCamera();
+      break;
+
+    case OIS::KC_RBRACKET:
+      CameraManager::Instance()->DecActiveCamera();
+      break;
+
     default:
       break;
   }

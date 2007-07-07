@@ -105,14 +105,6 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->frameListener = new OgreFrameListener();
 
   this->root->addFrameListener(this->frameListener);
- 
-  Ogre::OverlayManager *overlayMgr = Ogre::OverlayManager::getSingletonPtr();
-  this->sceneOverlay = overlayMgr->create("__GAZEBO_CAMERA_OVERLAY__");
-  this->panel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_OVERLAY_PANEL__"));
-  this->panel->setDimensions(1, 1);
-  this->panel->setPosition(0, 0);
-  this->sceneOverlay->add2D(this->panel);
-  this->sceneOverlay->show();
 
   // Create the default camera. This camera is only used to view the output
   // of cameras created using the XML world file
@@ -123,6 +115,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
+
 }
 
 void OgreAdaptor::Init(Display *display, 
