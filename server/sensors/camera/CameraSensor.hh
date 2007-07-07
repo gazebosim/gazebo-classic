@@ -93,8 +93,14 @@ class CameraSensor : public Sensor
   /// \brief Get the width of the image
   public: unsigned int GetImageWidth() const;
 
+  /// \brief Get the width of the texture 
+  public: unsigned int GetTextureWidth() const;
+
   /// \brief Get the height of the image
   public: unsigned int GetImageHeight() const;
+
+  /// \brief Get the height of the texture 
+  public: unsigned int GetTextureHeight() const;
 
   /// \brief Get a pointer to the image data
   public: const unsigned char *GetImageData();

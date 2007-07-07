@@ -102,8 +102,10 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
   // Display the proper camera
   this->cameraPanel->setMaterialName(camera->GetMaterialName());
 
-  float width = (float)camera->GetImageWidth() / this->ogreAdaptor->viewport->getActualWidth();
-  float height = (float)camera->GetImageHeight() / this->ogreAdaptor->viewport->getActualHeight();
+  // TODO: Fix this. It current displays the whole render texture, which is
+  // not the actual size of the camera image
+  float width = (float)camera->GetTextureWidth() / this->ogreAdaptor->viewport->getActualWidth();
+  float height = (float)camera->GetTextureHeight() /this->ogreAdaptor->viewport->getActualHeight();
 
   float left = (1.0 - width) / 2.0;
   float top = (1.0 - height) / 2.0;
@@ -118,7 +120,8 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
   stream.flags(std::ios::showpoint | std::ios::fixed);
   stream.fill('0');
 
-  stream << camera->GetName() << "\n";
+  stream << camera->GetName() << " [" << camera->GetImageWidth() << "x" << camera->GetImageHeight() << "]\n";
+  
   stream << "\tXYZ [" 
     << pose.pos.x  << " "
     << pose.pos.y << " "

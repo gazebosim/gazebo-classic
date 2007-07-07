@@ -222,10 +222,34 @@ unsigned int CameraSensor::GetImageWidth() const
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Get the width of the texture 
+unsigned int CameraSensor::GetTextureWidth() const
+{
+  Ogre::HardwarePixelBufferSharedPtr mBuffer;
+
+  // Get access to the buffer and make an image and write it to file
+  mBuffer = this->renderTexture->getBuffer(0, 0);
+
+  return mBuffer->getWidth();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int CameraSensor::GetImageHeight() const
 {
   return this->imageHeight;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Get the height of the texture 
+unsigned int CameraSensor::GetTextureHeight() const
+{
+  Ogre::HardwarePixelBufferSharedPtr mBuffer;
+
+  // Get access to the buffer and make an image and write it to file
+  mBuffer = this->renderTexture->getBuffer(0, 0);
+
+  return mBuffer->getHeight();
 }
 
 //////////////////////////////////////////////////////////////////////////////
