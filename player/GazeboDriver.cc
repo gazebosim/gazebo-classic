@@ -42,13 +42,14 @@ devices.
 #include "Position2dInterface.hh"
 #include "Graphics3dInterface.hh"
 #include "LaserInterface.hh"
+#include "CameraInterface.hh"
+
 /*#include "Position3dInterface.hh"
 #include "PowerInterface.hh"
 #include "SonarInterface.hh"
 #include "PtzInterface.hh"
 #include "FiducialInterface.hh"
 #include "GripperInterface.hh"
-#include "CameraInterface.hh"
 #include "TruthInterface.hh"
 #include "GpsInterface.hh"
 #include "ActarrayInterface.hh"
@@ -286,6 +287,12 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new LaserInterface( playerAddr,  this, cf, section );
         break;
 
+      case PLAYER_CAMERA_CODE:
+        if (!player_quiet_startup) printf(" a camera interface.\n");
+        ifsrc = new CameraInterface( playerAddr,  this, cf, section );
+        break;
+
+
 
 /*      case PLAYER_POSITION3D_CODE:	  
         if (!player_quiet_startup) printf(" a position3d interface.\n");
@@ -315,11 +322,6 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
       case PLAYER_GRIPPER_CODE:
         if (!player_quiet_startup) printf(" a gripper interface.\n");
         ifsrc = new GripperInterface( playerAddr,  this, cf, section );
-        break;
-
-      case PLAYER_CAMERA_CODE:
-        if (!player_quiet_startup) printf(" a camera interface.\n");
-        ifsrc = new CameraInterface( playerAddr,  this, cf, section );
         break;
 
       case PLAYER_TRUTH_CODE:

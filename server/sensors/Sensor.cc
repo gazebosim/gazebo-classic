@@ -117,6 +117,7 @@ void Sensor::LoadController(XMLConfigNode *node)
 
     // Create the iface
     iface->Create(World::Instance()->GetGzServer(), ifaceName);
+
   }
   else
   {

@@ -2,9 +2,17 @@ import os
 
 Import('env prefix staticObjs sharedObjs')
 
-sources = Split('GazeboDriver.cc GazeboClient.cc GazeboInterface.cc GazeboTime.cc SimulationInterface.cc Position2dInterface.cc Graphics3dInterface.cc LaserInterface.cc')
+sources = ['GazeboDriver.cc',
+           'GazeboClient.cc',
+           'GazeboInterface.cc',
+           'GazeboTime.cc',
+           'SimulationInterface.cc',
+           'Position2dInterface.cc',
+           'LaserInterface.cc',
+           'CameraInterface.cc'
+           ]
 
-# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc FiducialInterface.cc GripperInterface.cc CameraInterface.cc TruthInterface.cc GpsInterface.cc ')
+# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc FiducialInterface.cc GripperInterface.cc TruthInterface.cc GpsInterface.cc ')
 
 staticPlayerObjs = env.StaticObject(sources)
 sharedPlayerObjs = env.SharedObject(sources)

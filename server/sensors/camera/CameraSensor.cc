@@ -218,16 +218,75 @@ void CameraSensor::RotatePitch( float angle )
 /// \brief Get the width of the image
 unsigned int CameraSensor::GetImageWidth() const
 {
-  return this->imageWidth;
+//  return this->imageWidth;
+  Ogre::HardwarePixelBufferSharedPtr mBuffer;
+
+  // Get access to the buffer and make an image and write it to file
+  mBuffer = this->renderTexture->getBuffer(0, 0);
+
+        return mBuffer->getWidth(); 
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int CameraSensor::GetImageHeight() const
 {
-  return this->imageHeight;
+  Ogre::HardwarePixelBufferSharedPtr mBuffer;
+
+  // Get access to the buffer and make an image and write it to file
+  mBuffer = this->renderTexture->getBuffer(0, 0);
+return        mBuffer->getHeight(); 
+ 
+  //return this->imageHeight;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Get the image size in bytes
+size_t CameraSensor::GetImageByteSize() const
+{
+  Ogre::HardwarePixelBufferSharedPtr mBuffer;
+
+  // Get access to the buffer and make an image and write it to file
+  mBuffer = this->renderTexture->getBuffer(0, 0);
+
+  return mBuffer->getSizeInBytes();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get a pointer to the image data
+const unsigned char *CameraSensor::GetImageData()
+{
+  Ogre::HardwarePixelBufferSharedPtr mBuffer;
+  size_t size;
+
+  // Get access to the buffer and make an image and write it to file
+  mBuffer = this->renderTexture->getBuffer(0, 0);
+
+  size = mBuffer->getSizeInBytes();
+
+  printf("Size[%d]\n",size);
+ 
+  // Allocate buffer
+  if (!this->saveFrameBuffer)
+    this->saveFrameBuffer = new unsigned char[size];
+
+  mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
+
+  // Read pixels
+  mBuffer->blitToMemory( 
+      Ogre::PixelBox(
+        mBuffer->getWidth(), 
+        mBuffer->getHeight(), 
+        mBuffer->getDepth(), 
+        mBuffer->getFormat(), 
+        this->saveFrameBuffer)
+      );
+
+  std::cout << "Format[" << mBuffer->getFormat() << "]\n";
+  mBuffer->unlock();
+
+  return this->saveFrameBuffer;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Enable or disable saving
@@ -247,6 +306,8 @@ void CameraSensor::SaveFrame()
   Ogre::Codec * pCodec;
   size_t size, pos;
 
+  this->GetImageData();
+    
   // Get access to the buffer and make an image and write it to file
   mBuffer = this->renderTexture->getBuffer(0, 0);
  
@@ -259,6 +320,7 @@ void CameraSensor::SaveFrame()
   imgData->format = mBuffer->getFormat();
   size = mBuffer->getSizeInBytes();
 
+  /*
   // Allocate buffer
   if (!this->saveFrameBuffer)
     this->saveFrameBuffer = new unsigned char[size];
@@ -276,6 +338,7 @@ void CameraSensor::SaveFrame()
       );
 
   mBuffer->unlock();
+  */
 
   // Wrap buffer in a chunk 
   Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));

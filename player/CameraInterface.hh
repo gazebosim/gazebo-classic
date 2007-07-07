@@ -29,50 +29,55 @@
 
 #include "GazeboInterface.hh"
 
-// Forward declarations
-typedef struct gz_camera gz_camera_t;
 
-class CameraInterface : public GazeboInterface
+namespace gazebo
 {
-  /// @brief Constructor
-  public: CameraInterface(player_devaddr_t addr, GazeboDriver *driver,
-                              ConfigFile *cf, int section);
+  class CameraIface;
 
-  /// @brief Destructor
-  public: virtual ~CameraInterface();
+  class CameraInterface : public GazeboInterface
+  {
+    /// \brief Constructor
+    public: CameraInterface(player_devaddr_t addr, GazeboDriver *driver,
+                ConfigFile *cf, int section);
 
-  /// @brief Handle all messages. This is called from GazeboDriver
-  public: virtual int ProcessMessage(MessageQueue *respQueue,
-                                     player_msghdr_t *hdr, void *data);
+    /// \brief Destructor
+    public: virtual ~CameraInterface();
 
-  /// @brief Update this interface, publish new info.
-  public: virtual void Update();
+    /// \brief Handle all messages. This is called from GazeboDriver
+    public: virtual int ProcessMessage(MessageQueue *respQueue,
+                player_msghdr_t *hdr, void *data);
 
-  /// @brief Open a SHM interface when a subscription is received. \
-  ///        This is called fromGazeboDriver::Subscribe
-  public: virtual void Subscribe();
+    /// \brief Update this interface, publish new info.
+    public: virtual void Update();
 
-  /// @brief Close a SHM interface. This is called from \
-  ///        GazeboDriver::Unsubscribe
-  public: virtual void Unsubscribe();
+    /// \brief Open a SHM interface when a subscription is received. \
+    ///        This is called fromGazeboDriver::Subscribe
+    public: virtual void Subscribe();
 
-  /// Save a camera frame
-  private: void SaveFrame(const char *filename);
+    /// \brief Close a SHM interface. This is called from \
+    ///        GazeboDriver::Unsubscribe
+    public: virtual void Unsubscribe();
 
-  private: gz_camera_t *iface;
+    /// Save a camera frame
+    private: void SaveFrame(const char *filename);
 
-  /// @brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-  private: char *gz_id;
+    private: CameraIface *iface;
 
-  /// @brief Timestamp on last data update
-  private: double datatime;
+    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+    private: char *gz_id;
 
-  /// Most recent data
-  private: player_camera_data_t data;
+    /// \brief Timestamp on last data update
+    private: double datatime;
 
-  // Save image frames?
-  private: int save;
-  private: int frameno;
- 
-};
+    /// Most recent data
+    private: player_camera_data_t data;
+
+    // Save image frames?
+    private: int save;
+    private: int frameno;
+
+  };
+
+}
+
 #endif

@@ -99,6 +99,9 @@ class CameraSensor : public Sensor
   /// \brief Get a pointer to the image data
   public: const unsigned char *GetImageData();
 
+  /// \brief Get the image size in bytes
+  public: size_t GetImageByteSize() const;
+
   /// \brief Get the Z-buffer value at the given image coordinate.
   ///
   /// \param x, y Image coordinate; (0, 0) specifies the top-left corner.
