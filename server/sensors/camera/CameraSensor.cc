@@ -218,38 +218,21 @@ void CameraSensor::RotatePitch( float angle )
 /// \brief Get the width of the image
 unsigned int CameraSensor::GetImageWidth() const
 {
-//  return this->imageWidth;
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-        return mBuffer->getWidth(); 
+  return this->imageWidth;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int CameraSensor::GetImageHeight() const
 {
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-return        mBuffer->getHeight(); 
- 
-  //return this->imageHeight;
+  return this->imageHeight;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the image size in bytes
 size_t CameraSensor::GetImageByteSize() const
 {
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  return mBuffer->getSizeInBytes();
+  this->imageHeight * this->imageWidth * 3;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -262,27 +245,31 @@ const unsigned char *CameraSensor::GetImageData()
   // Get access to the buffer and make an image and write it to file
   mBuffer = this->renderTexture->getBuffer(0, 0);
 
-  size = mBuffer->getSizeInBytes();
+  size = this->imageWidth * this->imageHeight * 3;
 
-  printf("Size[%d]\n",size);
- 
   // Allocate buffer
   if (!this->saveFrameBuffer)
     this->saveFrameBuffer = new unsigned char[size];
 
   mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
 
-  // Read pixels
+  int top = (int)((mBuffer->getHeight() - this->imageHeight) / 2.0);
+  int left = (int)((mBuffer->getWidth() - this->imageWidth) / 2.0);
+  int right = left + this->imageWidth;
+  int bottom = top + this->imageHeight;
+
+  // Get the center of the texture in RGB 24 bit format
   mBuffer->blitToMemory( 
+      Ogre::Box(left, top, right, bottom),
+
       Ogre::PixelBox(
-        mBuffer->getWidth(), 
-        mBuffer->getHeight(), 
-        mBuffer->getDepth(), 
-        mBuffer->getFormat(), 
+        this->imageWidth, 
+        this->imageHeight, 
+        1, 
+        Ogre::PF_B8G8R8, 
         this->saveFrameBuffer)
       );
 
-  std::cout << "Format[" << mBuffer->getFormat() << "]\n";
   mBuffer->unlock();
 
   return this->saveFrameBuffer;
@@ -314,31 +301,11 @@ void CameraSensor::SaveFrame()
   // Create image data structure
   imgData  = new Ogre::ImageCodec::ImageData();
 
-  imgData->width = mBuffer->getWidth();
-  imgData->height = mBuffer->getHeight();
-  imgData->depth = mBuffer->getDepth();
-  imgData->format = mBuffer->getFormat();
-  size = mBuffer->getSizeInBytes();
-
-  /*
-  // Allocate buffer
-  if (!this->saveFrameBuffer)
-    this->saveFrameBuffer = new unsigned char[size];
-
-  mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
-
-  // Read pixels
-  mBuffer->blitToMemory( 
-      Ogre::PixelBox(
-        mBuffer->getWidth(), 
-        mBuffer->getHeight(), 
-        mBuffer->getDepth(), 
-        mBuffer->getFormat(), 
-        this->saveFrameBuffer)
-      );
-
-  mBuffer->unlock();
-  */
+  imgData->width = this->imageWidth;
+  imgData->height = this->imageHeight;
+  imgData->depth = 1;
+  imgData->format = Ogre::PF_B8G8R8;
+  size = this->GetImageByteSize();
 
   // Wrap buffer in a chunk 
   Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));

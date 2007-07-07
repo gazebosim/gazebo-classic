@@ -113,13 +113,17 @@ void Generic_Camera::PutCameraData()
   src = this->myParent->GetImageData();
   dst = data->image;
 
+  memcpy(dst, src, data->image_size);
+
+
   // OGRE image data is A8 B8 G8 R8. Must convert to R8 G8 B8
-  for (i=0; i<data->height; i++)
+/*  for (i=0; i<data->height; i++)
     for (j=0; j<data->width; j++)
       for (k=2; k>=0; k--)
         memcpy(dst + i*data->width*3 + j*3 + 2-k, 
                src + i*data->width*4 + j*4 + k, 
                1);
+               */
 
   this->cameraIface->Unlock();
 

@@ -140,7 +140,6 @@
  <model:xml name="cam1_model">
     <xyz>0 3 4</xyz>
     <rpy>0 -30 0</rpy>
-
     <static>true</static>
 
     <body:empty name="cam1_body">
