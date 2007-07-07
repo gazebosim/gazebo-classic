@@ -22,7 +22,7 @@
   </physics:ode>
 
   <rendering:ogre>
-    <plugins path="/home/nate/local/lib/OGRE">
+    <plugins path="/usr/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
       <plugin>Plugin_BSPSceneManager.so</plugin>
