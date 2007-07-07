@@ -65,7 +65,7 @@ class CameraSensor : public Sensor
   protected: virtual void InitChild();
 
   /// \brief Update the sensor information
-  protected: virtual void UpdateChild();
+  protected: virtual void UpdateChild(UpdateParams &params);
 
   /// Finalize the camera
   protected: virtual void FiniChild();
@@ -136,10 +136,7 @@ class CameraSensor : public Sensor
   /// \brief Render the scene from the camera perspective
   private: void Render();
 
-  /// \brief Set the path for saved frames
-  public: void SetSavePath(const char *pathname);
-
-  /// @brief Enable or disable saving
+  /// \brief Enable or disable saving
   public: void EnableSaveFrame(bool enable);
 
   // Save the camera frame
@@ -147,11 +144,6 @@ class CameraSensor : public Sensor
 
   /// \brief Update the GUI text
   private: void UpdateText();
-
-  // Info for saving images
-  private: bool saveEnable;
-  private: const char *savePathname;
-  private: unsigned int saveCount;
 
   private: double hfov;
   private: double nearClip, farClip;
@@ -165,6 +157,14 @@ class CameraSensor : public Sensor
   private: Ogre::SceneNode *translateYawNode;
   private: Ogre::SceneNode *pitchNode;
 
+  private: std::string ogreTextureName;
+  private: std::string ogreMaterialName;
+
+  // Info for saving images
+  private: unsigned char *saveFrameBuffer;
+  private: unsigned int saveCount;
+  private: bool saveFrames;
+  private: std::string savePathname;
 };
 
 }

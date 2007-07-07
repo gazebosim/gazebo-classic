@@ -41,13 +41,8 @@ namespace Ogre
   class Camera;
   class SceneNode;
   class LogManager;
-}
-
-namespace CEGUI
-{
-  class OgreCEGUIRenderer;
-  class System;
-  class Window;
+  class Overlay;
+  class OverlayContainer;
 }
 
 namespace gazebo
@@ -101,11 +96,8 @@ class OgreAdaptor
 
   private: static OgreAdaptor *myself;
 
-  // CE GUI stuff
-/*  public: CEGUI::OgreCEGUIRenderer *guiRenderer;
-  public: CEGUI::Window *guiEditorSheet;
-  public: CEGUI::System *guiSystem;
-  */
+  private: Ogre::Overlay *sceneOverlay;
+  public: Ogre::OverlayContainer *panel;
 };
 
 class OgreGLXWindowInterface

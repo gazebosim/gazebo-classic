@@ -1,10 +1,9 @@
 Open:
 - Get camera's working
-  -Save frames
   -Player interface
-  -Camera size doesn't work
-  -Offscreen rendering
+  -Black border around camera image when sizes don't match
   -Mulitple cameras
+    -Handle overlay's properly
 - Proper lights
   - Attach to objects
 - FLTK interface

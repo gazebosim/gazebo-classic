@@ -245,7 +245,9 @@ void Geom::SetMeshMaterial(const std::string &materialName)
 
   if (ent)
     ent->setMaterialName(materialName);
+  //  ent->setMaterialName("cam1_sensor");
   else if (simple)
+    //simple->setMaterial("cam1_sensor");
     simple->setMaterial(materialName);
 }
 

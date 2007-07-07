@@ -24,8 +24,6 @@
  * CVS: $Id$
  */
 
-#include <CEGUISystem.h>
-#include <OgreCEGUIRenderer.h>
 #include <OgreWindowEventUtilities.h>
 
 #include <OIS.h>
@@ -207,12 +205,6 @@ bool OgreFrameListener::keyReleased( const OIS::KeyEvent &e )
 
 bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
 {
-   // Update CEGUI with the mouse motion
-   /*CEGUI::System::getSingleton().injectMouseMove(
-       e.state.X.rel * this->ogreAdaptor->guiRenderer->getWidth(), 
-       e.state.Y.rel * this->ogreAdaptor->guiRenderer->getHeight());
-       */
-
   CameraSensor *camera;
 
   if ((camera = CameraManager::Instance()->GetActiveCamera()))
@@ -229,8 +221,6 @@ bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
 
 bool OgreFrameListener::mousePressed(const OIS::MouseEvent & /*e*/, OIS::MouseButtonID id)
 {
-  //CEGUI::MouseCursor::getSingleton().hide();
-
   switch (id)
   {
     case OIS::MB_Left:
@@ -251,7 +241,6 @@ bool OgreFrameListener::mousePressed(const OIS::MouseEvent & /*e*/, OIS::MouseBu
 
 bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & /*e*/, OIS::MouseButtonID id)
 {
-//  CEGUI::MouseCursor::getSingleton().show();
 
   switch (id)
   {

@@ -2,12 +2,12 @@ version = '0.8'
 
 prefix = ARGUMENTS.get('prefix','/usr/local')
 
-
+#'pkg-config --cflags --libs CEGUI-OGRE',
+#'pkg-config --cflags --libs CEGUI',
 
 # 3rd party packages
-parseConfigs=['pkg-config --cflags --libs CEGUI-OGRE',
+parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
-              'pkg-config --cflags --libs CEGUI',
               'pkg-config --cflags --libs playercore',
               'pkg-config --cflags --libs playerxdr',
       	      'ode-config --cflags --libs',

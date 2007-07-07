@@ -25,16 +25,8 @@
  */
 
 #include <Ogre.h>
-#include <CEGUISystem.h>
-#include <CEGUISchemeManager.h>
-#include <OgreCEGUIRenderer.h>
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
-#include <CEGUI/CEGUILogger.h>
-#include <CEGUI/CEGUIWindowManager.h>
-#include <CEGUI/CEGUIWindow.h>
-#include <CEGUI/elements/CEGUIPushButton.h>
-#include <CEGUI/CEGUIFontManager.h>
 
 #include "OgreTextRenderer.hh"
 #include "GazeboMessage.hh"
@@ -114,20 +106,23 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   this->root->addFrameListener(this->frameListener);
  
-  // CEGUI setup
- /* this->guiRenderer = new CEGUI::OgreCEGUIRenderer(this->window, 
-      Ogre::RENDER_QUEUE_OVERLAY, false, 0, this->sceneMgr);
+  Ogre::OverlayManager *overlayMgr = Ogre::OverlayManager::getSingletonPtr();
+  this->sceneOverlay = overlayMgr->create("__GAZEBO_CAMERA_OVERLAY__");
+  this->panel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_OVERLAY_PANEL__"));
+  this->panel->setDimensions(1, 1);
+  this->panel->setPosition(0, 0);
+  this->sceneOverlay->add2D(this->panel);
+  this->sceneOverlay->show();
 
-  this->guiSystem = new CEGUI::System(this->guiRenderer);
-  CEGUI::Logger::getSingleton().setLoggingLevel(CEGUI::Informative);
+  // Create the default camera. This camera is only used to view the output
+  // of cameras created using the XML world file
+  this->camera = this->sceneMgr->createCamera("__GAZEBO_CAMERA__");
+  this->camera->setNearClipDistance(1);
+  this->camera->setFarClipDistance(1);
+  this->viewport = this->window->addViewport(this->camera);
+  this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
 
-  this->guiEditorSheet= CEGUI::WindowManager::getSingleton().createWindow((CEGUI::utf8*)"DefaultWindow", (CEGUI::utf8*)"Sheet");  
-  this->guiSystem->setGUISheet(this->guiEditorSheet);
-
-  this->guiEditorSheet->setVisible(true);
-  this->guiEditorSheet->setText("HELLO");
-  */
-  
+  this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 }
 
 void OgreAdaptor::Init(Display *display, 
