@@ -28,7 +28,6 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
-#include "OgreTextRenderer.hh"
 #include "GazeboMessage.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
