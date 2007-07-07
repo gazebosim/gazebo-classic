@@ -1,3 +1,21 @@
+material Gazebo/FlatBlack
+{
+	receive_shadows off
+
+	technique
+	{
+		pass
+		{
+			ambient 0.000000 0.000000 0.000000 1.000000
+      lighting off
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0 0 0
+      }
+		}
+	}
+}
+
 material Gazebo/Black
 {
 	receive_shadows on
