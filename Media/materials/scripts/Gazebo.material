@@ -17,7 +17,7 @@ material Gazebo/Black
 
 material Gazebo/Blue
 {
-	receive_shadows on
+	receive_shadows off
 
 	technique
 	{
@@ -27,7 +27,7 @@ material Gazebo/Blue
 			diffuse 0.000000 0.000000 1.000000 1.000000
 			specular 0.000000 0.000000 0.200000 1.000000
 			emissive 0.000000 0.000000 0.000000 1.000000
-      lighting on
+      lighting off
 		}
 	}
 }

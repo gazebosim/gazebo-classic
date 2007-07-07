@@ -88,7 +88,7 @@ void Sensor::LoadController(XMLConfigNode *node)
 {
   if (!node)
   {
-    gzmsg(0) << this->GetName() << " sensor has no controller.";
+    gzmsg(0) << this->GetName() << " sensor has no controller.\n";
     return;
   }
 

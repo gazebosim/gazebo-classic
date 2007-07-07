@@ -184,6 +184,27 @@ Vector3 Quatern::GetAsEuler()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the Euler roll angle in radians
+double Quatern::GetRoll()
+{
+  return this->GetAsEuler().x;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the Euler pitch angle in radians
+double Quatern::GetPitch()
+{
+  return this->GetAsEuler().y;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the Euler yaw angle in radians
+double Quatern::GetYaw()
+{
+  return this->GetAsEuler().z;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Return rotation as axis and angle (x, y, y, rotation)
 Quatern Quatern::GetAsAxis()
 {

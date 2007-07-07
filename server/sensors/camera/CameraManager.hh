@@ -64,6 +64,12 @@ class CameraManager
   /// \return Pointer to the active camera
   public: CameraSensor *GetActiveCamera();
 
+  /// \brief Set the next camera in the queue to be active
+  public: void IncActiveCamera();
+
+  /// \brief Set the prev camera in the queue to be active
+  public: void DecActiveCamera();
+
   /// Static self pointer
   private: static CameraManager *myself;
 

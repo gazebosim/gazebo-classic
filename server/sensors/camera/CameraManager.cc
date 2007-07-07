@@ -91,3 +91,17 @@ CameraSensor *CameraManager::GetActiveCamera()
 {
   return this->cameras[this->activeCamera];
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the next camera in the queue to be active
+void CameraManager::IncActiveCamera()
+{
+  this->activeCamera = (this->activeCamera+1)  % this->cameras.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the prev camera in the queue to be active
+void CameraManager::DecActiveCamera()
+{
+  this->activeCamera = (this->activeCamera-1)  % this->cameras.size();
+}

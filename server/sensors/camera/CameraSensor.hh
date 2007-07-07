@@ -28,8 +28,7 @@
 #define CAMERASENSOR_HH
 
 #include <Ogre.h>
-
-#include "Vector3.hh"
+#include "Pose3d.hh"
 #include "Sensor.hh"
 
 // Forward Declarations
@@ -70,18 +69,11 @@ class CameraSensor : public Sensor
   /// Finalize the camera
   protected: virtual void FiniChild();
 
-  /// \brief Initialize the sensor.
-  /// \param width, height image width and height (pixels)
-  /// \param hfov horizontal field of view (radians)
-  /// \param minDepth, maxDepth near and far depth clipping planes
-  ///   (m); minDepth must be greater than zero; maxDepth must be
-  ///   greater than minDepth.
-  /// \param method Prefered rendering method: SGIX, GLX or XLIB.
-  /// \param zBufferDepth Z buffer depth (in bits) used for rendering (useful
-  ///  for some  nvidia cards that do not support other depths than 24 bits)
-  /// \returns Zero on success.
-  private: int Init(int width, int height, double hfov,
-                   double minDepth, double maxDepth, int zBufferDepth);
+  /// \brief Get the global pose of the camera
+  public: Pose3d GetWorldPose() const;
+
+  /// \brief Return the material the camera renders to
+  public: std::string GetMaterialName() const;
 
   /// \brief Translate the camera
   public: void Translate( const Vector3 &direction );
@@ -98,8 +90,11 @@ class CameraSensor : public Sensor
   /// \brief Get the camera FOV (horizontal)  
   public: double GetFOV() const;
 
-  /// \brief Get the image dimensions
-  public: void GetImageSize(int *w, int *h);
+  /// \brief Get the width of the image
+  public: unsigned int GetImageWidth() const;
+
+  /// \brief Get the height of the image
+  public: unsigned int GetImageHeight() const;
 
   /// \brief Get a pointer to the image data
   public: const unsigned char *GetImageData();
@@ -111,43 +106,15 @@ class CameraSensor : public Sensor
   /// is @e not the same as the depth value.
   public: double GetZValue(int x, int y);
 
-  /// \brief Compute the change in pose based on two image points.
-  ///
-  /// This function provides natural feedback when using a mouse to
-  /// control the camera pose.  The function computes a change in
-  /// camera pose, such that the initial image coordinate a and final
-  /// coordinate b map both to the same @e global coordinate.  Thus,
-  /// it is possible to "grab" a piece of the terrain and "drag" it to
-  /// a new location.
-  ///
-  /// Naturally, with only two image coordinates the solution is
-  /// under-determined (4 constraints and 6 DOF).  We therefore
-  /// provide a mode argument specify what kind of transformation
-  /// should be affected; the supported modes are translating, zooming
-  /// and rotating.
-  ///
-  /// \param mode Solution method: 0 = translate; 1 = zoom; 2 = rotate.
-  /// \param a, b Initial and final image points; the z value on a must be
-  /// specified (use GetZValue() for this).
-  /// \returns Change in pose (camera frame; post-multiply with
-  /// current global pose).
-//  public: GzPose CalcCameraDelta(int mode, GzVector a, GzVector b);
-  
-  /// \brief Render the scene from the camera perspective
-  private: void Render();
-
   /// \brief Enable or disable saving
   public: void EnableSaveFrame(bool enable);
 
   // Save the camera frame
   private: void SaveFrame();
 
-  /// \brief Update the GUI text
-  private: void UpdateText();
-
   private: double hfov;
   private: double nearClip, farClip;
-  private: int imageWidth, imageHeight;
+  private: unsigned int imageWidth, imageHeight;
 
   private: Ogre::TexturePtr renderTexture;
   private: Ogre::RenderTarget *renderTarget;
@@ -159,6 +126,8 @@ class CameraSensor : public Sensor
 
   private: std::string ogreTextureName;
   private: std::string ogreMaterialName;
+
+  private: Pose3d pose;
 
   // Info for saving images
   private: unsigned char *saveFrameBuffer;

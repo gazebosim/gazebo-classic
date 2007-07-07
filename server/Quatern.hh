@@ -90,6 +90,15 @@ class Quatern
   /// \return This quaternion as an Euler vector
   public: Vector3 GetAsEuler();
 
+  /// \brief Get the Euler roll angle in radians
+  public: double GetRoll();
+
+  /// \brief Get the Euler pitch angle in radians
+  public: double GetPitch();
+
+  /// \brief Get the Euler yaw angle in radians
+  public: double GetYaw();
+
   /// Return rotation as axis and angle (x, y, y, rotation)
   /// \return This quaternion as an axis-angle
   public: Quatern GetAsAxis();

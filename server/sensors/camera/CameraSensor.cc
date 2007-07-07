@@ -31,7 +31,6 @@
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
-#include "OgreTextRenderer.hh"
 #include "OgreAdaptor.hh"
 #include "OgreFrameListener.hh"
 
@@ -152,11 +151,6 @@ void CameraSensor::InitChild()
   this->pitchNode->attachObject(this->camera);
   this->pitchNode->pitch(Ogre::Degree(0));
 
-  OgreTextRenderer::Instance()->AddTextBox(this->GetName(), "", 10, 10, 100, 20, Ogre::ColourValue::White);
-  this->UpdateText();
-
-  OgreAdaptor::Instance()->panel->setMaterialName(this->ogreMaterialName);
-
   this->saveCount = 0;
 }
 
@@ -170,8 +164,30 @@ void CameraSensor::FiniChild()
 // Update the drawing
 void CameraSensor::UpdateChild(UpdateParams &params)
 {  
+  this->pose.pos.x = this->sceneNode->getWorldPosition().x;
+  this->pose.pos.y = this->sceneNode->getWorldPosition().y;
+  this->pose.pos.z = this->sceneNode->getWorldPosition().z;
+  this->pose.rot.u = this->sceneNode->getWorldOrientation().w;
+  this->pose.rot.x = this->sceneNode->getWorldOrientation().x;
+  this->pose.rot.y = this->sceneNode->getWorldOrientation().y;
+  this->pose.rot.z = this->sceneNode->getWorldOrientation().z;
+
   if (this->saveFrames)
     this->SaveFrame();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the global pose of the camera
+Pose3d CameraSensor::GetWorldPose() const
+{
+  return this->pose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the material the camera renders to
+std::string CameraSensor::GetMaterialName() const
+{
+  return this->ogreMaterialName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,16 +198,13 @@ void CameraSensor::Translate( const Vector3 &direction )
 
   this->sceneNode->translate(this->sceneNode->getOrientation() * this->pitchNode->getOrientation() * vec);
 
-  this->UpdateText();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Rotate the camera around the yaw axis
 void CameraSensor::RotateYaw( float angle )
 {
-  //this->translateYawNode->yaw(Ogre::Degree(angle));
   this->sceneNode->yaw(Ogre::Degree(angle), Ogre::Node::TS_WORLD);
-  this->UpdateText();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -199,16 +212,20 @@ void CameraSensor::RotateYaw( float angle )
 void CameraSensor::RotatePitch( float angle )
 {
   this->pitchNode->pitch(Ogre::Degree(angle));
-  this->UpdateText();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get the image dimensions
-void CameraSensor::GetImageSize(int *w, int *h)
+/// \brief Get the width of the image
+unsigned int CameraSensor::GetImageWidth() const
 {
-  *w = this->imageWidth;
-  *h = this->imageHeight;
-  return;
+  return this->imageWidth;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// \brief Get the height of the image
+unsigned int CameraSensor::GetImageHeight() const
+{
+  return this->imageHeight;
 }
 
 
@@ -217,7 +234,6 @@ void CameraSensor::GetImageSize(int *w, int *h)
 void CameraSensor::EnableSaveFrame(bool enable)
 {
   this->saveFrames = enable;
-  return;
 }
 
 
@@ -284,28 +300,4 @@ void CameraSensor::SaveFrame()
   pCodec->codeToFile(stream, filename, codecDataPtr);
 
   this->saveCount++;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Update the GUI text
-void CameraSensor::UpdateText()
-{
-  std::ostringstream stream;
-
-  stream.precision(2);
-  stream.flags(std::ios::showpoint | std::ios::fixed);
-  stream.fill('0');
-
-  stream << this->GetName() << "\n";
-  stream << "\tXYZ [" 
-    << this->sceneNode->getWorldPosition().x  << " "
-    << this->sceneNode->getWorldPosition().y << " "
-    << this->sceneNode->getWorldPosition().z << "]\n";
-
-  stream << "\tRPY [" 
-    << this->sceneNode->getWorldOrientation().getRoll().valueDegrees() << " " 
-    << this->pitchNode->getWorldOrientation().getPitch().valueDegrees() << " "
-    << this->sceneNode->getWorldOrientation().getYaw().valueDegrees() << "]";
-
-  OgreTextRenderer::Instance()->SetText(this->GetName(), stream.str());
 }

@@ -1,26 +1,34 @@
 Open:
 - Get camera's working
   -Player interface
-  -Black border around camera image when sizes don't match
-  -Mulitple cameras
-    -Handle overlay's properly
-- Proper lights
-  - Attach to objects
-- FLTK interface
+- XML include
+- Help overlay
 - Pause simulation
 - Step simulation
+- Better camera movement. Translate is too slow over long distances
+- Proper lights
+  - Attach to objects
+
+- FLTK interface
 - Hand of god
   - Select models and get info
   - Move models
-- Better camera movement. Translate is too slow over long distances
 - BSP loader
 - Laser retro and fiducial detection
-- XML include
 
+- Write install instructions
+- Write keyboard mappings
+- Quick HOWTO
 - Write a tutorial for creating custom models
 - Write a tutorial for creating new controllers
 - Write a tutorial for creating new sensors
 - Write a tutorial for creating a new world
+- FOG
+- Anti Aliasing
+- Threading. Make use of dual-core machines.
+- Implement triggers with callbacks.
+
+
 - Pick a formatting standard for XML file
 - Dynamic textures
 - Selectable models
@@ -40,3 +48,5 @@ Open:
 - The bodies set their scenenode based on a global pose. They should set their scenenodes based a pose relative to the model. The model currently doesn't move it's scene node, so it's always at (0,0,0). Basically should make all Body Pose stuff relative to the parent.
 -Allow person to display and change XML parameters through the GUI.
 -Look into COLLADA, OPAL, Bullet Physics & Collisioin detection engine
+-Add "Angle" class, will handle ROTD and DTOR.
+-Templatize Vector, Quaternion, Pose
