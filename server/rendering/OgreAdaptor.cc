@@ -28,6 +28,7 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
@@ -203,7 +204,14 @@ void OgreAdaptor::SetupResources(XMLConfigNode *node)
       if (typeName == "Filesystem")
         typeName = "FileSystem";
 
-      Ogre::ResourceGroupManager::getSingleton().addResourceLocation( archName, typeName, sectionName); 
+      try
+      {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation( archName, typeName, sectionName); 
+      }
+      catch (Ogre::Exception)
+      {
+        gzthrow("Unable to load Ogre Resources.\nMake sure the resources path in the world file is set correctly.");
+      }
 
       childNode = childNode->GetNext();
     }
@@ -302,8 +310,15 @@ void OgreAdaptor::LoadPlugins(XMLConfigNode *node)
     pluginStr = pathStr + "/" + pluginNode->GetValue();
     gzmsg(5) << "OGRE: Load Plugin[" << pluginStr << "]\n";
 
-    // Load the plugin into OGRE
-    this->root->loadPlugin(pluginStr);
+    try
+    {
+      // Load the plugin into OGRE
+      this->root->loadPlugin(pluginStr);
+    }
+    catch (Ogre::Exception e)
+    {
+      gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
+    }
     pluginNode = pluginNode->GetNext();
   }
 }

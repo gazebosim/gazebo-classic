@@ -29,7 +29,7 @@
       <plugin>Plugin_OctreeSceneManager.so</plugin>
     </plugins>
 
-    <resources path="/home/nate/local/share/gazebo">
+    <resources path="/usr/local/share/gazebo">
       <bootstrap>
         <zip>Media/packs/OgreCore.zip</zip>
       </bootstrap>

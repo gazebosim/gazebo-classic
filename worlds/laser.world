@@ -18,21 +18,21 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.01</stepTime>
+    <stepTime>0.03</stepTime>
     <gravity>0 -9.8 0</gravity>
     <cfm>0.008</cfm>
     <erp>0.4</erp>
   </physics:ode>
 
   <rendering:ogre>
-    <plugins path="/home/nate/local/lib/OGRE">
+    <plugins path="/usr/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
       <plugin>Plugin_BSPSceneManager.so</plugin>
       <plugin>Plugin_OctreeSceneManager.so</plugin>
     </plugins>
 
-    <resources path="/home/nate/local/share/gazebo">
+    <resources path="/usr/local/share/gazebo">
       <bootstrap>
         <zip>Media/packs/OgreCore.zip</zip>
       </bootstrap>
@@ -89,36 +89,8 @@
         <size>0.10 0.2 0.10</size>
         <xyz>0.0 0.0 0.0</xyz>
         <density>0.1</density>
-        <!--<material>Gazebo/Blue</material>-->
+        <material>Gazebo/BlueLaser</material>
       </geom:box>
-
-
-      <!--
-      <geom:box name="laser1_geom2">
-        <mesh>default</mesh>
-        <size>0.075 0.09 0.155</size>
-        <xyz>-0.0375 0.065 0</xyz>
-        <density>1</density>
-        <material>Gazebo/Blue</material>
-      </geom:box>
-
-      <geom:box name="laser1_geom3">
-        <mesh>default</mesh>
-        <size>0.156 0.08 0.155</size>
-        <xyz>0 .15 0</xyz>
-        <density>0.1</density>
-        <material>Gazebo/Blue</material>
-      </geom:box>
-
-      <geom:box name="laser1_geom4">
-        <mesh>default</mesh>
-        <size>0.06 0.06 0.06</size>
-        <xyz>0 .065 0</xyz>
-        <rpy>-90 0 0</rpy>
-        <density>0.1</density>
-        <material>Gazebo/Black</material>
-      </geom:box>
-      -->
 
       <sensor:ray name="laser_1">
         <rayCount>180</rayCount>
@@ -173,13 +145,22 @@
     <attenuation>100 1.0 0.00 0.00</attenuation>
   </model:LightSource>
 
+ <model:xml name="cam1_model">
+    <xyz>0 3 4</xyz>
+    <rpy>0 -30 0</rpy>
+    <static>true</static>
 
-  <model:ObserverCam>
-    <name>userCam0</name>
-    <xyz>0 2.1 0</xyz>
-    <rpy>0 -90 0</rpy>
-    <imageSize>640 480</imageSize>
-    <updateRate>10</updateRate>
-  </model:ObserverCam>
+    <body:empty name="cam1_body">
+      <sensor:camera name="cam1_sensor">
+        <imageSize>640 480</imageSize>
+        <hfov>60</hfov>
+        <nearClip>0.1</nearClip>
+        <farClip>100</farClip>
+        <saveFrames>false</saveFrames>
+        <saveFramePath>frames</saveFramePath>
+      </sensor:camera>
+    </body:empty>
+  </model:xml>
+
 
 </gazebo:world>
