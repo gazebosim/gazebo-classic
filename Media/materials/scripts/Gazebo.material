@@ -1,3 +1,191 @@
+////////////////////////////////////////////////////////////////////////////////
+// Shader Programs 
+vertex_program Gazebo/AmbientOneTextureVS glsl
+{
+  source AmbientOneTexture.vert
+}
+
+fragment_program Gazebo/AmbientOneTextureFS glsl
+{
+  source AmbientOneTexture.frag
+}
+
+vertex_program Gazebo/DirectionalLightVS glsl
+{
+  source DirectionalLight.vert
+}
+
+fragment_program Gazebo/DirectionalLightFS glsl
+{
+  source DirectionalLight.frag
+}
+
+vertex_program Gazebo/PointLightVS glsl
+{
+  source PointLight.vert
+  default_params
+  {
+    param_named_auto lightDiffuse light_diffuse_colour 0 
+  }
+}
+
+fragment_program Gazebo/PointLightFS glsl
+{
+  source PointLight.frag
+  default_params
+  {
+    param_named_auto lightAttenuation light_attenuation 0      
+    param_named_auto lightPositionOS light_position_object_space 0
+    param_named_auto cameraPositionOS camera_position_object_space
+  }
+} 
+
+vertex_program Gazebo/SpotLightVS glsl
+{
+  source SpotLight.vert
+  default_params
+  {
+    param_named_auto lightDiffuse light_diffuse_colour 0
+    param_named_auto lightSpecular light_specular_colour 0
+  }
+}
+
+fragment_program Gazebo/SpotLightFS glsl
+{
+  source SpotLight.frag
+  default_params
+  {
+    param_named_auto lightAttenuation light_attenuation 0      
+    param_named_auto lightPositionOS light_position_object_space 0
+    param_named_auto cameraPositionOS camera_position_object_space
+    param_name_auto spotExponent light_exponent 0
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Base material for per-pixel shading
+material PerPixelShaded
+{
+	technique
+	{
+		pass Ambient
+		{
+			ambient 1 1 1 1
+			diffuse 0 0 0 
+			specular 0 0 0 0
+			
+			vertex_program_ref Gazebo/AmbientOneTextureVS
+			{
+			}
+			
+			fragment_program_ref Gazebo/AmbientOneTextureFS
+			{
+			}
+		}
+		
+		pass DirectionalLight
+		{
+			iteration once_per_light directional
+
+			ambient 0 0 0
+			diffuse 1 1 1 1
+	 		specular 0.5 0.5 0.5 0.5 16
+
+			scene_blend add
+
+			//vertex_program_ref Gazebo/DirectionalLightVS
+			//{}
+		
+			//fragment_program_ref Gazebo/DirectionalLightFS
+			//{ }
+    }
+		pass PointLight
+		{
+			iteration once_per_light point
+
+			ambient 0 0 0
+			diffuse 1 1 1 1
+	 		specular 0.5 0.5 0.5 0.5 16
+
+			scene_blend add
+
+			vertex_program_ref Gazebo/PointLightVS
+			{
+			}
+		
+			fragment_program_ref Gazebo/PointLightFS
+			{
+			}
+		}
+
+		pass SpotLight
+		{
+			iteration once_per_light spot
+
+			ambient 0 0 0
+			diffuse 1 1 1 1
+	 		specular 0.5 0.5 0.5 0.5 16
+
+			scene_blend add
+
+			vertex_program_ref Gazebo/SpotLightVS
+			{
+			}
+		
+			fragment_program_ref Gazebo/SpotLightFS
+			{
+			}
+		}
+	}
+}
+
+
+material Gazebo/test
+{
+  technique
+  {
+    pass Ambient
+    {
+      ambient 1.0 0 0 1
+      diffuse 0 0 0 1.0
+      specular 0 0 0 1.0
+    }
+    pass DirectionalLight
+    {
+			diffuse 1 1 1 1
+	 		specular 0.5 0.5 0.5 0.0 16
+    }
+    pass PointLight
+    {
+			diffuse 1 1 1 1
+	 		specular 0.5 0.5 0.5 0.0 16
+    }
+  }
+}
+
+material Gazebo/White
+{
+	receive_shadows on
+
+	technique
+	{
+		pass Ambient
+		{
+			ambient 1.000000 1.000000 1.000000 1.000000
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.8 0.8 0.8 1 20
+		}
+		pass PointLight
+		{
+			ambient 1.000000 1.000000 1.000000 1.000000
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.8 0.8 0.8 1 20
+		}
+
+	}
+}
+
 material Gazebo/FlatBlack
 {
 	receive_shadows off
@@ -33,7 +221,7 @@ material Gazebo/Black
 	}
 }
 
-material Gazebo/Blue
+material Gazebo/BlueLaser
 {
 	receive_shadows off
 
@@ -44,24 +232,70 @@ material Gazebo/Blue
 		  ambient 0.000000 0.000000 1.000000 1.000000
 			diffuse 0.000000 0.000000 1.000000 1.000000
 			specular 0.000000 0.000000 0.200000 1.000000
-			emissive 0.000000 0.000000 0.000000 1.000000
-      lighting off
+			emissive 0.000000 0.000000 1.000000 1.000000
+      lighting on
 		}
 	}
 }
+
+
+material Gazebo/Blue
+{
+	receive_shadows on
+
+	technique
+	{
+		pass
+		{
+		  ambient 0.000000 0.000000 1.000000 1.000000
+			diffuse 0.000000 0.000000 1.000000 1.000000
+			specular 0.000000 0.000000 0.200000 1.000000
+			emissive 0.000000 0.000000 0.000000 1.000000
+      lighting on
+		}
+	}
+}
+
 material Gazebo/PioneerBody
 {
 	receive_shadows on
 	technique
 	{
-		pass
-		{
+    pass Ambient
+    {
+      ambient 0.5 0 0 
+
 			texture_unit
 			{
 				texture pioneerBody.jpg
 				filtering trilinear
 			}
-		}
+    }
+    pass DirectionalLight
+    {
+      ambient 0 0 0 
+      diffuse 1 0 0 1
+      specular 0.5 0 0 1 10
+
+			texture_unit
+			{
+				texture pioneerBody.jpg
+				filtering trilinear
+			}
+    }
+    pass PointLight
+    {
+      ambient 0 0 0 
+      diffuse 1 0 0 1
+      specular 0.5 0 0 1 10
+
+			texture_unit
+			{
+				texture pioneerBody.jpg
+				filtering trilinear
+			}
+    }
+
 	}
 }
 
@@ -103,57 +337,6 @@ material Gazebo/StormySkyBox
 }
 
 
-fragment_program Gazebo/MorningSkyBoxHDRfp cg
-{
-	source hdr.cg
-	entry_point morningskybox_fp
-	profiles ps_2_0 arbfp1
-}
-
-material Gazebo/MorningSkyBox
-{
-	technique
-	{
-		pass
-		{
-			lighting off
-			depth_write off
-
-			texture_unit
-			{
-				cubic_texture morning.jpg separateUV
-				tex_address_mode clamp
-			}
-		}
-	}
-
-	// HDR technique (fake)
-	technique
-	{
-		scheme HDR
-
-		pass
-		{
-			lighting off
-			depth_write off
-
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
-			{
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named ambient float4 1 1 1 1
-			}
-			fragment_program_ref Gazebo/MorningSkyBoxHDRfp
-			{
-			}
-
-			texture_unit
-			{
-				cubic_texture morning.jpg separateUV
-				tex_address_mode clamp
-			}
-		}
-	}
-}
 
 material Gazebo/EveningSkyBox
 {
@@ -258,68 +441,55 @@ material Gazebo/Rocky
 }
 
 
-material Gazebo/GrassFloor
+material Gazebo/GrassFloor : PerPixelShaded
 {
+  receive_shadows on
 	technique
 	{
-		pass
-		{
+		pass Ambient
+    {
+      //ambient 0 1 0 1
+      //diffuse 0 1 0 1
+      //specular 0 0 0
 			texture_unit
 			{
 				texture grass_1024.jpg
 			}
 		}
-	}
-}
-
-vertex_program Gazebo/GrassWaverVp cg
-{
-	source Grass.cg
-	entry_point grass_vp
-	profiles vs_1_1 arbvp1
-}
-
-material Gazebo/GrassBlades
-{
-	// Vertex program waving grass
-    technique
+		pass DirectionalLight
     {
-        pass
-        {
-			vertex_program_ref Examples/GrassWaverVp
+      //ambient 0 1 0 1
+      //diffuse 0 1 0 1
+      //specular 0 0 0
+			texture_unit
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named_auto ambient ambient_light_colour
-				param_named_auto objSpaceLight light_position_object_space 0
-				param_named_auto lightColour light_diffuse_colour 0
-				param_named_auto offset custom 999
+				texture grass_1024.jpg
 			}
-			alpha_rejection greater 150 
-			scene_blend alpha_blend
-		    cull_hardware none
-            cull_software none
-            texture_unit
-            {
-                texture gras_02.png 
-            }
-        }
-    }
+		}
 
-	// Non-vertex program technique (no waving)
-	technique
+		pass PointLight
     {
-        pass
-        {
-			alpha_rejection greater 150 
-			scene_blend alpha_blend
-		    cull_hardware none
-            cull_software none
-            texture_unit
-            {
-                texture gras_02.png 
-            }
-        }
-    }
+      //ambient 0 1 0
+      //diffuse 0 1 0
+      //specular 0 0 0
+			texture_unit
+			{
+				texture grass_1024.jpg
+			}
+		}
+		pass SpotLight
+    {
+      //ambient 0 1 0
+      //diffuse 0 1 0
+      //specular 0 0 0
+
+			texture_unit
+			{
+				texture grass_1024.jpg
+			}
+		}
+
+	}
 }
 
 material Gazebo/Rockwall
@@ -374,3 +544,5 @@ material Gazebo/WoodPallet
 		}
 	}
 }
+
+
