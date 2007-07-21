@@ -84,6 +84,9 @@ class Body : public Entity
   /// \brief Get the Center of Mass pose
   public: const Pose3d &GetCoMPose() const;
 
+  /// \brief Set whether gravity affects this body
+  public: void SetGravityMode(bool mode);
+
   /// Load a new geom helper function
   /// \param node XMLConfigNode used to load the geom
   /// \return Non-zero on error

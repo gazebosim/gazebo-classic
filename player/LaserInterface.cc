@@ -139,11 +139,13 @@ int LaserInterface::ProcessMessage(MessageQueue *respQueue,
     player_laser_geom_t rep;
 
     // TODO: get geometry from somewhere
-    rep.pose.px = 0.0;
-    rep.pose.py = 0.0;
-    rep.pose.pa = 0.0;
-    rep.size.sw = 0.0;
-    rep.size.sl = 0.0;
+    memset(&rep.pose, 0, sizeof(rep.pose));
+    memset(&rep.size, 0, sizeof(rep.size));
+//     rep.pose.px = 0.0;
+//     rep.pose.py = 0.0;
+//     rep.pose.pyaw = 0.0;
+//     rep.size.sw = 0.0;
+//     rep.size.sl = 0.0;
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, 

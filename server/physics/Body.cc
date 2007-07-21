@@ -1,6 +1,7 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "Vector2.hh"
 #include "Quatern.hh"
 #include "GazeboError.hh"
 #include "SensorFactory.hh"
@@ -20,6 +21,7 @@ using namespace gazebo;
 Body::Body(Entity *parent, dWorldID worldId)
   : Entity(parent)
 {
+
   if (!this->IsStatic())
   {
     this->bodyId = dBodyCreate(worldId);
@@ -85,6 +87,14 @@ int Body::Load(XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Set whether gravity affects this body
+void Body::SetGravityMode(bool mode)
+{
+  if (this->bodyId)
+    dBodySetGravityMode(this->bodyId, mode);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the body
 int Body::Init()
 {
@@ -111,11 +121,8 @@ int Body::Update(UpdateParams &params)
   {
     Pose3d pose = this->GetPose();
 
-    // Set the position of the scene node
-    this->sceneNode->setPosition(pose.pos.x, pose.pos.y, pose.pos.z);
-
-    // Set the rotation of the scene node
-    this->sceneNode->setOrientation(pose.rot.u, pose.rot.x, pose.rot.y, pose.rot.z);
+    // Set the pose of the scene node
+    OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, pose);
   }
 
   for (sensorIter=this->sensors.begin(); 
@@ -146,7 +153,19 @@ void Body::SetPose(const Pose3d &pose)
 {
   if (this->IsStatic())
   {
+    std::vector< Geom* >::iterator giter;
+    PlaneGeom *plane = NULL;
     this->staticPose = pose;
+
+    // Hack to fix the altitude of the ODE plane
+    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+    {
+      if ((*giter)->GetGeomClass() == dPlaneClass)
+      {
+        plane = dynamic_cast<PlaneGeom*>(*giter);
+        plane->SetAltitude(pose.pos.z);
+      }
+    }
 
     this->SetPosition(this->staticPose.pos);
     this->SetRotation(this->staticPose.rot);
@@ -206,7 +225,7 @@ void Body::SetPosition(const Vector3 &pos)
   }
 
   // Set the position of the scene node
-  this->sceneNode->setPosition(pos.x, pos.y, pos.z);
+  OgreAdaptor::Instance()->SetSceneNodePosition(this->sceneNode, pos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +253,7 @@ void Body::SetRotation(const Quatern &rot)
   }
 
   // Set the orientation of the scene node
-  this->sceneNode->setOrientation(rot.u, rot.x, rot.y, rot.z);
+  OgreAdaptor::Instance()->SetSceneNodeRotation(this->sceneNode, rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,8 +349,11 @@ int Body::LoadGeom(XMLConfigNode *node)
   else if (node->GetName() == "plane")
   {
     Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
-    double altitude = node->GetDouble("altitude",0,0);
-    geom = new PlaneGeom(this,altitude,normal);
+    Vector2 size = node->GetVector2("size",Vector2(1000, 1000));
+    Vector2 segments = node->GetVector2("segments",Vector2(10, 10));
+    Vector2 uvTile = node->GetVector2("uvTile",Vector2(1, 1));
+
+    geom = new PlaneGeom(this,normal,size,segments, uvTile);
   }
   else
   {

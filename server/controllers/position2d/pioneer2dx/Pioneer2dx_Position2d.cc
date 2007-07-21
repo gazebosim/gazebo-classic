@@ -144,11 +144,15 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 
     this->joints[LEFT]->SetParam( dParamFMax, 1.1 );
     this->joints[RIGHT]->SetParam( dParamFMax, 1.1 );
+
   }
   else
   {
-    this->joints[LEFT]->SetParam( dParamVel, 0.0 ); 
-    this->joints[RIGHT]->SetParam( dParamVel, 0.0 );
+    this->joints[LEFT]->SetParam( dParamVel, 0 ); 
+    this->joints[RIGHT]->SetParam( dParamVel, 0 );
+
+    this->joints[LEFT]->SetParam( dParamFMax, 0 );
+    this->joints[RIGHT]->SetParam( dParamFMax, 0 );
   }
 
   this->PutPositionData();

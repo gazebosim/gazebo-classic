@@ -38,35 +38,28 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-PlaneGeom::PlaneGeom(Body *body, double altitude, Vector3 normal)
+PlaneGeom::PlaneGeom(Body *body, Vector3 normal, const Vector2 &size, 
+    const Vector2 &segments, const Vector2 &uvTile, double altitude)
     : Geom(body)
 {
-  Vector3 planeNx, planeNy, planeNz;
-  double patchSize;
+  Vector3 perp;
 
-  // Set the z unit vector (plane normal)
-  planeNy = normal;
-  planeNy.Normalize();
-
-  // Compute x unit vector (orthogonal to Nz and y)
-  planeNx = planeNy.GetCrossProd(Vector3(0.0, 0.0, 1.0));
-  planeNx.Normalize();
-
-  // Compute y unit vector (orthogonal to other two vectors)
-  planeNz = planeNx.GetCrossProd(planeNy);
-
-  // Size of each renderable planar patch
-  patchSize = 2.0;
+  normal.Normalize();
+  perp = normal.GetPerpendicular();
 
   // Create an ODE plane geom
   // This geom is not placable
-  this->SetGeom(dCreatePlane(this->body->spaceId, 0, 1, 0, 0),false);
+  this->SetGeom(dCreatePlane(this->body->spaceId, normal.x, normal.y, normal.z, altitude),false);
 
-  Ogre::Plane plane(Ogre::Vector3(0, 1, 0), 0);
+  Ogre::Plane plane(Ogre::Vector3(normal.y, normal.z, normal.x), 0);
 
   Ogre::MeshManager::getSingleton().createPlane(this->GetName(),
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-      1500,1500,200,200,true,10,500,500, Ogre::Vector3(0,0,1));
+      size.x, size.y, 
+      (int)segments.x, (int)segments.y,
+      true,1,
+      uvTile.x, uvTile.y, 
+      Ogre::Vector3(perp.y, perp.z, perp.x));
 
   this->AttachMesh(this->GetName());
   this->SetCastShadows(false);
@@ -75,7 +68,6 @@ PlaneGeom::PlaneGeom(Body *body, double altitude, Vector3 normal)
   this->contact->kd = 0;
   this->contact->mu1 = dInfinity;
   this->contact->mu2 = dInfinity;
- 
 }
 
 
@@ -84,3 +76,16 @@ PlaneGeom::PlaneGeom(Body *body, double altitude, Vector3 normal)
 PlaneGeom::~PlaneGeom()
 {
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the altitude of the plane
+void PlaneGeom::SetAltitude(double altitude)
+{
+  dVector4 vec4;
+  dGeomPlaneGetParams(this->geomId, vec4);
+
+  vec4[3] = altitude;
+  dGeomPlaneSetParams(this->geomId, vec4[0], vec4[1], vec4[2], vec4[3]);
+}
+
+

@@ -11,14 +11,14 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
               'pkg-config --cflags --libs playercore',
               'pkg-config --cflags --libs playerxdr',
       	      'ode-config --cflags --libs',
-	            'pkg-config --cflags --libs OIS',
-	            'python-config']
+	            'pkg-config --cflags --libs OIS']
+	            #'python-config --cflags --libs']
 
 env = Environment (
   CC = 'g++',
 
   #CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
-  CCFLAGS = Split ('-pthread -pipe'),
+  CCFLAGS = Split ('-O2 -pthread -pipe'),
 
   CPPPATH = [
    '#.', 
@@ -39,7 +39,8 @@ env = Environment (
 
     LIBPATH=Split('#libgazebo'),
     
-    LIBS=Split('gazebo boost_python')
+    #LIBS=Split('gazebo boost_python')
+    LIBS=Split('gazebo')
 )
 
 
@@ -61,10 +62,12 @@ for cfg in parseConfigs:
 
 conf = Configure(env)
 
-# Check for the necessary headers
-#if not conf.CheckHeader('boost/python.hpp'):
-#  print 'Did not find boost/python.hpp exiting'
+# Check for boost_python
+#if not conf.CheckLibWithHeader('boost_python', 'boost/python.hpp', 'C'):
+#  print 'Did not find libboost_python exiting'
 #  Exit(1)
+#else:
+#  conf.env.Append(LIBS="boost_python")
 
 env = conf.Finish()
 

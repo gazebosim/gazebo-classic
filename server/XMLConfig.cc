@@ -1,18 +1,28 @@
-/* ==================================================================
- *                            XMLConfig - Source
- * 
- * Description:
- *    See header
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
  *
- * -------------------------------------------------------------------
- *  Revisions:
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- *  CVS: $Id$
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *  12/22/03  NPK  Creation
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * ==================================================================
-*/
+ */
+/* Desc: XML file parser
+ * Author: Andrew Howard and Nate Koenig
+ * Date: 3 Apr 2007
+ * SVN: $Id:$
+ */
 
 #include <assert.h>
 #include <string.h>
@@ -21,6 +31,8 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+
+#include <libxml/xinclude.h>
 
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -64,6 +76,13 @@ int XMLConfig::Load( std::string filename )
   {
     std::cerr << "Unable to parse xml file: " << this->filename << std::endl;
     return -1;
+  }
+
+
+  //Apply the XInclude process.
+  if (xmlXIncludeProcess(this->xmlDoc) <= 0)
+  {
+    printf("XInclude process failed\n");
   }
 
   // Create wrappers for all the nodes (recursive)
@@ -547,9 +566,24 @@ Vector3 XMLConfigNode::GetVector3( std::string key, Vector3 def )
   if (this->GetTupleString(key, 0, "") == "")
     return def;
 
-  v.x = this->GetTupleLength(key, 0, 0.0);
-  v.y = this->GetTupleLength(key, 1, 0.0);
-  v.z = this->GetTupleLength(key, 2, 0.0);
+  v.x = this->GetTupleDouble(key, 0, 0.0);
+  v.y = this->GetTupleDouble(key, 1, 0.0);
+  v.z = this->GetTupleDouble(key, 2, 0.0);
+
+  return v;
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Get a two dimensional vector
+Vector2 XMLConfigNode::GetVector2( std::string key, Vector2 def )
+{
+  Vector2 v;
+
+  if (this->GetTupleString(key, 0, "") == "")
+    return def;
+
+  v.x = this->GetTupleDouble(key, 0, 0.0);
+  v.y = this->GetTupleDouble(key, 1, 0.0);
 
   return v;
 }
@@ -564,14 +598,14 @@ Quatern XMLConfigNode::GetRotation( std::string key, Quatern def )
   if (this->GetTupleString(key, 0, "") == "")
     return def;
 
-  // Roll is around the z-axis
-  p.z = this->GetTupleAngle(key, 0, 0.0);
+  // Roll is around the x-axis
+  p.x = this->GetTupleAngle(key, 0, 0.0);
 
   // Pitch is around the x-axis
-  p.x = this->GetTupleAngle(key, 1, 0.0);
+  p.y = this->GetTupleAngle(key, 1, 0.0);
 
   // Yaw is around the y-axis
-  p.y = this->GetTupleAngle(key, 2, 0.0);
+  p.z = this->GetTupleAngle(key, 2, 0.0);
 
   q.SetFromEuler(p);
 
@@ -708,5 +742,5 @@ double XMLConfigNode::GetTupleAngle( std::string key, int index, double def )
   if (svalue.empty())
     return def;
 
-  return atof(svalue.c_str()) * M_PI / 180;
+  return DTOR(atof(svalue.c_str()));
 }

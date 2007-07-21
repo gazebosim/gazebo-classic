@@ -43,6 +43,7 @@
 using namespace gazebo;
 
 extern bool userQuit;
+extern bool userPause;
 
 OgreFrameListener::OgreFrameListener()
 {
@@ -128,6 +129,10 @@ bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
 {
   switch (e.key)
   {
+    case OIS::KC_SPACE:
+      userPause = !userPause;
+      break;
+
     case OIS::KC_ESCAPE:
       userQuit = true;
       break;

@@ -120,7 +120,7 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
   stream.flags(std::ios::showpoint | std::ios::fixed);
   stream.fill('0');
 
-  stream << camera->GetName() << " [" << camera->GetImageWidth() << "x" << camera->GetImageHeight() << "]\n";
+  stream << camera->GetName() << " [" << camera->GetImageWidth() << " x " << camera->GetImageHeight() << "]\n";
   
   stream << "\tXYZ [" 
     << pose.pos.x  << " "

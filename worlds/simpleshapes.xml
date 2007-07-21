@@ -16,20 +16,25 @@
 
   <physics:ode>
     <stepTime>0.03</stepTime>
-    <gravity>0 -9.8 0</gravity>
+    <gravity>0 0 -9.8</gravity>
     <cfm>0.008</cfm>
-    <erp>0.4</erp>
+    <erp>0.2</erp>
   </physics:ode>
 
   <rendering:ogre>
-    <plugins path="/usr/local/lib/OGRE">
+    <ambient>1.0 1.0 1.0 1.0</ambient>
+    <sky>
+      <material>Gazebo/CloudySky</material>
+    </sky>
+
+    <plugins path="/home/nate/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
       <plugin>Plugin_BSPSceneManager.so</plugin>
       <plugin>Plugin_OctreeSceneManager.so</plugin>
     </plugins>
 
-    <resources path="/usr/local/share/gazebo">
+    <resources path="/home/nate/local/share/gazebo">
       <bootstrap>
         <zip>Media/packs/OgreCore.zip</zip>
       </bootstrap>
@@ -51,8 +56,8 @@
     </resources>
   </rendering:ogre>
 
-  <model:xml name="sphere1_model">
-    <xyz>0 0.5 0</xyz>
+  <model:physical name="sphere1_model">
+    <xyz>0 0 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
     <body:sphere name="sphere1_body">
@@ -66,10 +71,10 @@
         <material>Gazebo/Rocky</material>
       </geom:sphere>
     </body:sphere>
-  </model:xml>
+  </model:physical>
 
-  <model:xml name="box1_model">
-    <xyz>1.5 0.5 0</xyz>
+  <model:physical name="box1_model">
+    <xyz>0 1.5 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
     <canonicalBody>box1_body</canonicalBody>
     <static>false</static>
@@ -85,10 +90,10 @@
         <material>Gazebo/BumpyMetal</material>
       </geom:box>
     </body:box>
-  </model:xml>
+  </model:physical>
 
-  <model:xml name="cylinder1_model">
-    <xyz>-1.5 0.5 0</xyz>
+  <model:physical name="cylinder1_model">
+    <xyz>0 -1.5 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
     <body:cylinder name="cylinder1_body">
@@ -102,44 +107,28 @@
         <material>Gazebo/RustyBarrel</material>
       </geom:cylinder>
     </body:cylinder>
-  </model:xml>
+  </model:physical>
 
-  <model:xml name="plane1_model">
+   <!-- Ground Plane -->
+  <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
     <static>true</static>
 
     <body:plane name="plane1_body">
-
       <geom:plane name="plane1_geom">
-        <normal>0 1 0</normal>
-        <altitude>0</altitude>
+        <normal>0 0 1</normal>
+        <size>2000 2000</size>
+        <segments>10 10</segments>
+        <uvTile>100 100</uvTile>
         <material>Gazebo/GrassFloor</material>
       </geom:plane>
     </body:plane>
-  </model:xml>
+  </model:physical>
 
-  <model:LightSource>
-    <name>light1</name>
-    <xyz>10.000 10.000 10.000</xyz>
-    <type>point</type>
-    <diffuseColor>1.0 1.0 1.0</diffuseColor>
-    <specularColor>0.5 0.5 0.5</specularColor>
-    <attenuation>100 1.0 0.00 0.00</attenuation>
-  </model:LightSource>
-
-  <model:LightSource>
-    <name>light2</name>
-    <xyz>0.000 10.000 -10.000</xyz>
-    <type>point</type>
-    <diffuseColor>1.0 1.0 1.0</diffuseColor>
-    <specularColor>0.5 0.5 0.5</specularColor>
-    <attenuation>100 1.0 0.00 0.00</attenuation>
-  </model:LightSource>
-
- <model:xml name="cam1_model">
-    <xyz>0 3 4</xyz>
-    <rpy>0 -30 0</rpy>
+ <model:physical name="cam1_model">
+    <xyz>5 0 4</xyz>
+    <rpy>0 -40 0</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">
@@ -152,7 +141,7 @@
         <saveFramePath>frames</saveFramePath>
       </sensor:camera>
     </body:empty>
-  </model:xml>
+  </model:physical>
 
 
 

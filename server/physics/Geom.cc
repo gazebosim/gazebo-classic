@@ -26,6 +26,9 @@ Geom::Geom( Body *body)
 
   this->ogreObj = NULL;
 
+  // Most geoms don't need extra rotation. Cylinders do.
+  this->extraRotation.SetToIdentity();
+
   // Zero out the mass
   dMassSetZero(&this->mass);
 }
@@ -92,6 +95,13 @@ dGeomID Geom::GetTransId() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the ODE geom class
+int Geom::GetGeomClass() const
+{
+  return dGeomGetClass(this->geomId);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Return whether this is a placeable geom.
 bool Geom::IsPlaceable() const
 {
@@ -110,6 +120,10 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     // Transform into CoM relative Pose
     localPose = pose - this->body->GetCoMPose();
 
+    OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, localPose);
+
+    localPose.rot = localPose.rot * this->extraRotation;
+
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
     q[2] = localPose.rot.y;
@@ -123,8 +137,6 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     //dMassTranslate(&this->mass, pose.pos.x, pose.pos.y, pose.pos.z);
     //dMassRotate(&this->mass, dGeomGetRotation(this->geomId));
 
-    this->sceneNode->setPosition(localPose.pos.x, localPose.pos.y, localPose.pos.z);
-    this->sceneNode->setOrientation(localPose.rot.u, localPose.rot.x, localPose.rot.y, localPose.rot.z);
 
     if (updateCoM)
       this->body->UpdateCoM();
@@ -156,8 +168,11 @@ Pose3d Geom::GetPose() const
     pose.rot.y = r[2];
     pose.rot.z = r[3];
 
+    pose.rot = pose.rot * this->extraRotation.GetInverse();
+
     // Transform into body relative pose
     pose += this->body->GetCoMPose();
+
   }
   else
     pose = this->body->GetPose();
@@ -219,7 +234,8 @@ void Geom::AttachObject( Ogre::MovableObject *obj )
 /// Set the scale of the mesh
 void Geom::ScaleMesh(const Vector3 &scale)
 {
-  this->sceneNode->setScale(scale.x, scale.y, scale.z);
+  // The ordering of the vector is converted to OGRE's coordinate system
+  this->sceneNode->setScale(scale.y, scale.z, scale.x);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -57,12 +57,28 @@ Vector3::~Vector3()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Calc distance to the given point
 double Vector3::Distance(const Vector3 &pt ) const
 {
   return sqrt((this->x-pt.x)*(this->x-pt.x) + (this->y-pt.y)*(this->y-pt.y) + (this->z-pt.z)*(this->z-pt.z));
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Returns the length (magnitude) of the vector
+double Vector3::GetLength() const
+{
+  return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the square of the length (magnitude) of the vector
+double Vector3::GetSquaredLength() const
+{
+  return this->x * this->x + this->y * this->y + this->z * this->z;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Normalize the vector length
 void Vector3::Normalize()
 {
@@ -73,6 +89,7 @@ void Vector3::Normalize()
   this->z /= d;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Set the contents of the vector
 void Vector3::Set(double x, double y, double z)
 {
@@ -81,6 +98,7 @@ void Vector3::Set(double x, double y, double z)
   this->z = z;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 Vector3 Vector3::GetCrossProd(const Vector3 &pt) const
 {
   Vector3 c;
@@ -91,6 +109,24 @@ Vector3 Vector3::GetCrossProd(const Vector3 &pt) const
 
   return c;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return a vector that is perpendicular to this one.
+Vector3 Vector3::GetPerpendicular() const
+{
+  static const double sqrZero = 1e-06 * 1e-06;
+
+  Vector3 perp = this->GetCrossProd( Vector3(1,0,0) );
+
+  // Check the length of the vector
+  if (perp.GetSquaredLength() < sqrZero)
+  {
+    perp = this->GetCrossProd( Vector3(0,1,0) );
+  }
+
+  return perp;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equals operator

@@ -98,7 +98,7 @@ messages are appended by default to a file called @c .gazebo located in your
 home directory, or to the log file specified with the -l command line option.
 */
 
-#include <python2.4/Python.h>
+//#include <python2.4/Python.h>
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
@@ -123,7 +123,8 @@ int optMsgLevel = 1;
 int optTimeControl = 1;
 
 // Set to true when the user wants to leave the application
-bool userQuit;
+bool userQuit = false;
+bool userPause = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -240,7 +241,7 @@ void SignalHandler( int /*dummy*/ )
 // Initialize the sim
 int Init()
 {
-  Py_Initialize();
+  //Py_Initialize();
 
   //struct tms cpu;
 
@@ -298,7 +299,7 @@ int Fini()
 {
   gazebo::World::Instance()->Fini();
 
-  Py_Finalize();
+  //Py_Finalize();
 
   return 0;
 }
@@ -343,9 +344,6 @@ int main(int argc, char **argv)
     std::cerr << e << std::endl;
     return -1;
   }
-
-
-  userQuit = false;
 
   try
   {

@@ -28,6 +28,8 @@
 #include <sstream>
 #include <sys/time.h>
 
+#include "OgreDynamicLines.hh"
+#include "Global.hh"
 #include "OgreSimpleShape.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -45,6 +47,8 @@ using namespace gazebo;
 
 // static pointer to myself
 World *World::myself = NULL;
+
+extern bool userPause;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Private constructor
@@ -154,8 +158,8 @@ int World::Update()
   }
 
   // Update the physics engine
-  this->physicsEngine->Update();
-
+  //if (!userPause)
+    this->physicsEngine->Update();
 
   // Update the rendering engine
   OgreAdaptor::Instance()->Render();
@@ -257,6 +261,10 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
     {
       model = this->LoadModel(node, parent);
     }
+    else if (node->GetNSPrefix() == "sensor")
+    {
+      //sensor = this->LoadSensor(node,parent);
+    }
   }
 
   // Load children
@@ -271,78 +279,59 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
 
 Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 {
-  Model *model = NULL;
   Pose3d pose;
+  Model *model = new Model();
 
-  if (node->GetName() == "xml")
+  model->SetType(node->GetName());
+
+  // Recall the node this model is attached to, so we can save
+  // back the data later.
+  model->SetXMLConfigNode(node);
+
+  // Set the id of the model
+  model->SetName( node->GetString( "name", "", 0 ) );
+
+  if (model->GetName() == "")
   {
-    model = new Model();
+    model->SetName( node->GetName() );
   }
-  else
+
+  if (parent)
   {
-    // Instantiate the model
-    model = ModelFactory::NewModel( node->GetName() );
-
-    if (!model)
-    {
-      gzmsg(0) << "unknown model class or class disabled [" << node->GetName() << "]\n";
-      return 0;
-    }
-  }
-
-  if (model)
-  {
-    model->SetType(node->GetName());
-
-    // Recall the node this model is attached to, so we can save
-    // back the data later.
-    model->SetXMLConfigNode(node);
-
-    // Set the id of the model
-    model->SetName( node->GetString( "name", "", 0 ) );
-
-    if (model->GetName() == "")
-    {
-      model->SetName( node->GetName() );
-    }
-
-    if (parent)
-    {
-      /*std::string bodyName = node->GetString("parentBody", "canonical");
+    /*std::string bodyName = node->GetString("parentBody", "canonical");
       body = parent->GetBody(bodyName);
 
       if (!body)
       {
-        std::ostringstream stream;
-        stream << "body[" << bodyName << "] is not defined for parent model";
-        gzthrow(stream);
+      std::ostringstream stream;
+      stream << "body[" << bodyName << "] is not defined for parent model";
+      gzthrow(stream);
       }
       */
 
-      model->SetParent(parent);
-    }
-
-    // Load the model
-    if (model->Load( node ) != 0)
-      return NULL;
-
-    // Get the position and orientation of the model (relative to parent)
-    pose.Reset();
-    pose.pos = node->GetVector3( "xyz", pose.pos );
-    pose.rot = node->GetRotation( "rpy", pose.rot );
-
-    // Set the model's pose (relative to parent)
-    this->SetModelPose(model, pose);
-
-    // Record the model's initial pose (for reseting)
-    model->SetInitPose(pose);
-
-    // Add the model to our list
-    this->models.push_back(model);
-
-    if (parent != NULL)
-      model->Attach();
+    model->SetParent(parent);
   }
+
+  // Load the model
+  if (model->Load( node ) != 0)
+    return NULL;
+
+  // Get the position and orientation of the model (relative to parent)
+  pose.Reset();
+  pose.pos = node->GetVector3( "xyz", pose.pos );
+  pose.rot = node->GetRotation( "rpy", pose.rot );
+
+  // Set the model's pose (relative to parent)
+  this->SetModelPose(model, pose);
+
+  // Record the model's initial pose (for reseting)
+  model->SetInitPose(pose);
+
+  // Add the model to our list
+  this->models.push_back(model);
+
+  if (parent != NULL)
+    model->Attach();
 
   return model;
 }

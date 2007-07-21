@@ -49,7 +49,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor);
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 RaySensor::RaySensor(Body *body)
-    : Sensor(body)
+  : Sensor(body)
 {
 }
 
@@ -112,7 +112,7 @@ void RaySensor::InitChild()
   {
     angle = i * (this->maxAngle - this->minAngle) / (rayCount - 1) + this->minAngle;
 
-    axis.Set(cos(angle), 0, sin(angle));
+    axis.Set(sin(angle), cos(angle),0);
 
     start = (axis * this->minRange) + this->origin;
     end = (axis * this->maxRange) + this->origin;

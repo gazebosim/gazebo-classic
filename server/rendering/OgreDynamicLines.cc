@@ -39,7 +39,7 @@ enum { POSITION_BINDING, TEXCOORD_BINDING };
 OgreDynamicLines::OgreDynamicLines(Ogre::RenderOperation::OperationType opType)
 {
   this->Init(opType, false);
-  this->setMaterial("Gazebo/Blue");
+  this->setCastShadows(false);
   this->dirty = true;
 }
 
@@ -105,6 +105,7 @@ void OgreDynamicLines::CreateVertexDeclaration()
 
 void OgreDynamicLines::FillHardwareBuffers()
 {
+  Vector3 vaabMin, vaabMax;
   int size = this->points.size();
   this->PrepareHardwareBuffers(size,0);
 
@@ -114,8 +115,8 @@ void OgreDynamicLines::FillHardwareBuffers()
     this->dirty=false;
   }
 
-  Vector3 vaabMin = this->points[0];
-  Vector3 vaabMax = this->points[0];
+  vaabMin = this->points[0];
+  vaabMax = this->points[0];
 
   Ogre::HardwareVertexBufferSharedPtr vbuf =
     this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(0);
@@ -124,9 +125,14 @@ void OgreDynamicLines::FillHardwareBuffers()
   {
     for(int i = 0; i < size; i++)
     {
+      /*
       *prPos++ = this->points[i].x;
       *prPos++ = this->points[i].y;
       *prPos++ = this->points[i].z;
+      */
+      *prPos++ = this->points[i].y;
+      *prPos++ = this->points[i].z;
+      *prPos++ = this->points[i].x;
 
       if(this->points[i].x < vaabMin.x)
         vaabMin.x = this->points[i].x;
@@ -154,8 +160,8 @@ void OgreDynamicLines::FillHardwareBuffers()
   if ((float)vaabMin.z >= (float)vaabMax.z)
     vaabMin.z = vaabMax.z - 10;
 
-  this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z), 
-                        Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );
+  this->mBox.setExtents(Ogre::Vector3(vaabMin.y, vaabMin.z, vaabMin.x), 
+                        Ogre::Vector3(vaabMax.y, vaabMax.z, vaabMax.x) );
 
   this->dirty = false;
 }

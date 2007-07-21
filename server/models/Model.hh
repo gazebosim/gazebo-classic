@@ -27,7 +27,7 @@
 #ifndef MODEL_HH
 #define MODEL_HH
 
-#include <python2.4/Python.h>
+//#include <python2.4/Python.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -149,6 +149,12 @@ class Model : public Entity
   /// \brief Load a controller helper function
   /// \param node XML Configuration node
   private: void LoadController(XMLConfigNode *node);
+
+  /// \brief Load a physical model
+  private: void LoadPhysical(XMLConfigNode *node);
+
+  /// \brief Load a renderable model (like a light source).
+  private: void LoadRenderable(XMLConfigNode *node);
 
   /// Type of the model (such as Pioneer2DX, or SimpleSolid)
   private: std::string type;

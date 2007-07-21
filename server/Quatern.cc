@@ -154,15 +154,15 @@ void Quatern::SetFromEuler(const Vector3 &vec)
 {
   double phi, the, psi;
 
-  phi = vec.x / 2;
-  the = vec.y / 2;
-  psi = vec.z / 2;
+  phi = vec.x / 2.0;
+  the = vec.y / 2.0;
+  psi = vec.z / 2.0;
 
   this->u = cos(phi) * cos(the) * cos(psi) + sin(phi) * sin(the) * sin(psi);
   this->x = sin(phi) * cos(the) * cos(psi) - cos(phi) * sin(the) * sin(psi);
   this->y = cos(phi) * sin(the) * cos(psi) + sin(phi) * cos(the) * sin(psi);
   this->z = cos(phi) * cos(the) * sin(psi) - sin(phi) * sin(the) * cos(psi);
-
+  
   this->Normalize();
 }
 
@@ -170,17 +170,32 @@ void Quatern::SetFromEuler(const Vector3 &vec)
 // Return the rotation in Euler angles
 Vector3 Quatern::GetAsEuler()
 {
-  double phi, the, psi;
+  Vector3 vec;
+
+  double squ;
+  double sqx;
+  double sqy;
+  double sqz;
 
   this->Normalize();
 
-  phi = atan2(2 * (this->y*this->z + this->u*this->x), 
-      (this->u*this->u - this->x*this->x - this->y*this->y + this->z*this->z));
-  the = asin(-2 * (this->x*this->z - this->u * this->y));
-  psi = atan2(2 * (this->x*this->y + this->u*this->z), 
-      (this->u*this->u + this->x*this->x - this->y*this->y - this->z*this->z));
+  squ = this->u * this->u;
+  sqx = this->x * this->x;
+  sqy = this->y * this->y;
+  sqz = this->z * this->z;
 
-  return Vector3(phi, the, psi);
+  this->Normalize();
+
+  // Roll
+  vec.x = atan2(2 * (this->y*this->z + this->u*this->x), squ - sqx - sqy + sqz);
+
+  // Pitch
+  vec.y = asin(-2 * (this->x*this->z - this->u * this->y));
+
+  // Yaw
+  vec.z = atan2(2 * (this->x*this->y + this->u*this->z), squ + sqx - sqy - sqz);
+
+  return vec;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

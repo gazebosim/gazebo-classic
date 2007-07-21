@@ -19,12 +19,27 @@
 
   <physics:ode>
     <stepTime>0.03</stepTime>
-    <gravity>0 -9.8 0</gravity>
+    <gravity>0 0 -9.8</gravity>
     <cfm>0.008</cfm>
     <erp>0.2</erp>
   </physics:ode>
 
   <rendering:ogre>
+    <ambient>1.0 1.0 1.0 1.0</ambient>
+    <sky>
+      <material>Gazebo/CloudySky</material>
+    </sky>
+
+    <!--
+    <fog>
+      <color>0.8 0.8 0.8</color>
+      <type>linear</type>
+      <density>0.0</density>
+      <linearStart>50.0</linearStart>
+      <linearEnd>515.0</linearEnd>
+    </fog>
+    -->
+
     <plugins path="/usr/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
@@ -53,60 +68,27 @@
       </general>
     </resources>
   </rendering:ogre>
-  
-  <model:xml name="sphere1_model">
-    <xyz>2 1 0</xyz>
-    <rpy>0.0 0.0 0.0</rpy>
 
-    <body:sphere name="sphere1_body">
-      <xyz>0.0 0.0 0.0</xyz>
-      <rpy>0.0 0.0 0.0</rpy>
-
-      <geom:sphere name="sphere1_geom">
-        <mesh>default</mesh>
-        <size>0.2</size>
-        <density>0.1</density>
-        <material>Gazebo/Rocky</material>
-      </geom:sphere>
-    </body:sphere>
-  </model:xml>
- 
-
-  <model:xml name="plane1_model">
+   <!-- Ground Plane -->
+  <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
     <static>true</static>
 
     <body:plane name="plane1_body">
-
       <geom:plane name="plane1_geom">
-        <normal>0 1 0</normal>
-        <altitude>0</altitude>
+        <normal>0 0 1</normal>
+        <size>2000 2000</size>
+        <segments>10 10</segments>
+        <uvTile>100 100</uvTile>
         <material>Gazebo/GrassFloor</material>
       </geom:plane>
     </body:plane>
-  </model:xml>
+  </model:physical>
 
-  <model:LightSource>
-    <name>light1</name>
-    <xyz>10.000 10.000 10.000</xyz>
-    <type>point</type>
-    <diffuseColor>1.0 1.0 1.0</diffuseColor>
-    <specularColor>0.5 0.5 0.5</specularColor>
-    <attenuation>100 1.0 0.00 0.00</attenuation>
-  </model:LightSource>
-
-  <model:LightSource>
-    <name>light2</name>
-    <xyz>0.000 10.000 -10.000</xyz>
-    <type>point</type>
-    <diffuseColor>1.0 1.0 1.0</diffuseColor>
-    <specularColor>0.5 0.5 0.5</specularColor>
-    <attenuation>100 1.0 0.00 0.00</attenuation>
-  </model:LightSource>
-
-  <model:xml name="cam1_model">
-    <xyz>0 4.0 0</xyz>
+  <!-- The camera -->
+  <model:physical name="cam1_model">
+    <xyz>0 0 4.0</xyz>
     <rpy>0 -90 0</rpy>
     <static>true</static>
 
@@ -118,11 +100,11 @@
         <farClip>100</farClip>
       </sensor:camera>
     </body:empty>
-  </model:xml>
+  </model:physical>
 
-
-  <model:xml name="pioneer1_model">
-    <xyz>0 0.25 0</xyz>
+  <!-- Pioneer Model -->
+  <model:physical name="pioneer1_model">
+    <xyz>0 0 0.25</xyz>
     <rpy>0.0 0.0 0.0</rpy>
     <python>pioneer2dx</python>
 
@@ -135,14 +117,14 @@
       <geom:box name="chassis_geom">
         <xyz>0 0 0.0</xyz>
         <mesh>default</mesh>
-        <size>0.277 0.17 0.445</size>
+        <size>0.445 0.277 0.17</size>
         <density>5</density>
         <material>Gazebo/PioneerBody</material>
       </geom:box>
     </body:box>
 
     <body:cylinder name="left_wheel">
-      <xyz>-0.17 -0.0725 0.1</xyz>
+      <xyz>0.1 -0.17 -0.0725</xyz>
       <rpy>0 90 90</rpy>
       <geom:cylinder name="left_wheel_geom">
         <mesh>default</mesh>
@@ -152,7 +134,7 @@
       </geom:cylinder>
       <geom:box name="left_wheel_box">
         <mesh>default</mesh>
-        <xyz>0.0 -0.010 0.0</xyz>
+        <xyz>0.0 0.0 -0.010</xyz>
         <size>0.05 0.05 0.05</size>
         <density>0</density>
         <material>Gazebo/White</material>
@@ -160,7 +142,7 @@
     </body:cylinder>
 
     <body:cylinder name="right_wheel">
-      <xyz>0.17 -0.0725 0.1</xyz>
+      <xyz>0.1 0.17 -0.0725</xyz>
       <rpy>0 90 90</rpy>
       <geom:cylinder name="right_wheel_geom">
         <mesh>default</mesh>
@@ -171,7 +153,7 @@
 
       <geom:box name="right_wheel_box">
         <mesh>default</mesh>
-        <xyz>0.0 0.010 0.0</xyz>
+        <xyz>0.0 0.0 0.010</xyz>
         <size>0.05 0.05 0.05</size>
         <density>0</density>
         <material>Gazebo/White</material>
@@ -179,7 +161,7 @@
     </body:cylinder>
 
      <body:sphere name="castor_body">
-      <xyz>0 -0.11 -0.200</xyz>
+      <xyz>-0.200 0 -0.11</xyz>
       <rpy>0 0 0</rpy>
       <geom:sphere name="castor_geom">
         <mesh>default</mesh>
@@ -193,7 +175,7 @@
       <body1>left_wheel</body1>
       <body2>chassis_body</body2>
       <anchor>left_wheel</anchor>
-      <axis>1 0 0</axis>
+      <axis>0 1 0</axis>
       <erp>0.4</erp>
       <cfm>0.8</cfm>
     </joint:hinge>
@@ -202,7 +184,7 @@
       <body1>right_wheel</body1>
       <body2>chassis_body</body2>
       <anchor>right_wheel</anchor>
-      <axis>1 0 0</axis>
+      <axis>0 1 0</axis>
       <erp>0.4</erp>
       <cfm>0.8</cfm>
     </joint:hinge>
@@ -220,8 +202,6 @@
       <rightJoint>right_wheel_hinge</rightJoint>
       <interface:position name="position_iface_1"/>
     </controller:pioneer2dx_position2d>
-
-  </model:xml>
-
+  </model:physical>
 
 </gazebo:world>

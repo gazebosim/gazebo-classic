@@ -28,6 +28,8 @@
 #define PLANEGEOM_HH
 
 #include "Geom.hh"
+#include "Vector3.hh"
+#include "Vector2.hh"
 
 namespace gazebo
 {
@@ -38,15 +40,19 @@ namespace gazebo
 /// the plane in infinite, only the part near the camera is drawn.
 class PlaneGeom : public Geom
 {
-  /// @brief Constructor
-  /// @param body Body to which we are attached.
-  /// @param spaceId Collision space to which we belong.
-  /// @param altitude Plane altiude (z value above global 0).
-  /// @param normal Normal vector to plane (global cs).
-  public: PlaneGeom(Body *body, double altitude, Vector3 normal);
+  /// \brief Constructor
+  /// \param body Body to which we are attached.
+  /// \param spaceId Collision space to which we belong.
+  /// \param normal Normal vector to plane (global cs).
+  public: PlaneGeom(Body *body, Vector3 normal,
+              const Vector2 &size, const Vector2 &segments, 
+              const Vector2 &uvTile, double altitude = 0);
 
-  /// @brief Destructor
+  /// \brief Destructor
   public: virtual ~PlaneGeom();
+
+  /// \brief Set the altitude of the plane
+  public: void SetAltitude(double altitude);
 
 };
 

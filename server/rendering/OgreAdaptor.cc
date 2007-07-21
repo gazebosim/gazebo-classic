@@ -28,6 +28,7 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include "Entity.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "Global.hh"
@@ -67,10 +68,21 @@ OgreAdaptor *OgreAdaptor::Instance()
 
 void OgreAdaptor::Init(XMLConfigNode *node)
 {
+  XMLConfigNode *cnode;
+  Ogre::ColourValue ambient;
+
   if (!node)
   {
     gzthrow( "missing OGRE Rendernig information" );
   }
+
+  ambient.r = node->GetTupleDouble("ambient",0,0);
+  ambient.g = node->GetTupleDouble("ambient",1,0);
+  ambient.b = node->GetTupleDouble("ambient",2,0);
+  ambient.a = node->GetTupleDouble("ambient",3,0);
+
+  // Default background color
+  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::Black);
 
   // Load all the plugins
   this->LoadPlugins(node->GetChild("plugins"));
@@ -86,6 +98,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   // Get the SceneManager, in this case a generic one
   this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
+  //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
@@ -95,11 +108,42 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   // Get the SceneManager, in this case a generic one
   // Default lighting
-  this->sceneMgr->setAmbientLight(Ogre::ColourValue(0.0f, 0.0f, 0.0f, 1.0f)); 
+  this->sceneMgr->setAmbientLight(ambient); 
   this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
 
   // Add a sky dome to our scene
-  this->sceneMgr->setSkyDome(true,"Gazebo/CloudySky",5,8);
+  if ((cnode = node->GetChild("sky")))
+  {
+    this->sceneMgr->setSkyDome(true,cnode->GetString("material","",0),5,8);
+  }
+
+  // Add fog. This changes the background color
+  if ((cnode = node->GetChild("fog")))
+  {
+    Ogre::FogMode fogType = Ogre::FOG_NONE; 
+    std::string type;
+    double density, linearStart, linearEnd;
+
+    this->backgroundColor->r = cnode->GetTupleDouble("color",0,0);
+    this->backgroundColor->g = cnode->GetTupleDouble("color",1,0);
+    this->backgroundColor->b = cnode->GetTupleDouble("color",2,0);
+
+    type = cnode->GetString("type","linear",0);
+    density = cnode->GetDouble("density",0,0);
+    linearStart = cnode->GetDouble("linearStart",0,0);
+    linearEnd = cnode->GetDouble("linearEnd",1.0,0);
+
+    if (type == "linear")
+      fogType = Ogre::FOG_LINEAR;
+    else if (type == "exp")
+      fogType = Ogre::FOG_EXP;
+    else if (type == "exp2")
+      fogType = Ogre::FOG_EXP2;
+
+    //this->sceneMgr->setFog(fogType, *this->backgroundColor, density, linearStart, linearEnd);
+    this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, 0, 100);
+  }
+
 
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener();
@@ -115,6 +159,29 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
+
+
+
+  Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
+  Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node"); 
+
+  Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material","debugger"); 
+  myManualObjectMaterial->setReceiveShadows(false); 
+  myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
+  myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0,0,1,0); 
+  myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0,0,1); 
+  myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0,0,1); 
+
+  myManualObject->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
+  myManualObject->position(0, 0, 0); 
+  myManualObject->position(0, 1, 0); 
+  myManualObject->position(0, 0, 0); 
+  myManualObject->position(0, 0, 1); 
+  myManualObject->position(0, 0, 0); 
+  myManualObject->position(1, 0, 0); 
+  // etc 
+  myManualObject->end(); 
+  myManualObjectNode->attachObject(myManualObject);
 
 }
 
@@ -271,6 +338,64 @@ void OgreAdaptor::CreateWindow(int width, int height)
   this->window = this->root->createRenderWindow( "WindowName", width, height, false, &params);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Create a light source and attach it to the entity
+void OgreAdaptor::CreateLight(XMLConfigNode *node, Entity *entity)
+{
+  Vector3 vec;
+  double range,constant,linear,quad;
+
+  // Create the light
+  Ogre::Light *light(this->sceneMgr->createLight(entity->GetName()));
+
+  // Set the light type
+  std::string lightType = node->GetString("type","point",0);
+  if (lightType == "point")
+  {
+    light->setType(Ogre::Light::LT_POINT);
+  }
+  else if (lightType == "directional")
+  {
+    light->setType(Ogre::Light::LT_DIRECTIONAL);
+  }
+  else if (lightType == "spot")
+  {
+    light->setType(Ogre::Light::LT_SPOTLIGHT);
+  }
+
+  // Set the diffuse color
+  vec = node->GetVector3("diffuseColor",Vector3(1.0, 1.0, 1.0)); 
+  light->setDiffuseColour(vec.x, vec.y, vec.z);
+
+  // Sets the specular color
+  vec = node->GetVector3("specularColor",Vector3(1.0, 1.0, 1.0)); 
+  light->setSpecularColour(vec.x, vec.y, vec.z);
+
+  // Set the direction which the light points
+  vec = node->GetVector3("direction", Vector3(0.0, -1.0, 0.0));
+  light->setDirection(vec.x, vec.y, vec.z);
+
+  // Absolute range of light in world coordinates
+  range = node->GetTupleDouble("attenuation",0,1000);
+
+  // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
+  constant = node->GetTupleDouble("attenuation",1,1.0);
+
+  // Linear factor. 1 means attenuate evenly over the distance
+  linear = node->GetTupleDouble("attenuation",2,0);
+
+  // Quadartic factor.adds a curvature to the attenuation formula
+  quad = node->GetTupleDouble("attenuation",3,0);
+
+  // Set attenuation
+  light->setAttenuation(range, constant, linear, quad);
+
+  // TODO: More options for Spot lights, etc.
+
+  entity->GetSceneNode()->attachObject(light);
+}
+ 
+
 int OgreAdaptor::Render()
 {
   Ogre::WindowEventUtilities::messagePump();
@@ -321,4 +446,49 @@ void OgreAdaptor::LoadPlugins(XMLConfigNode *node)
     }
     pluginNode = pluginNode->GetNext();
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Use this function to set the pose of a scene node
+void OgreAdaptor::SetSceneNodePose( Ogre::SceneNode *node, const Pose3d &pose )
+{
+  this->SetSceneNodePosition(node, pose.pos);
+  this->SetSceneNodeRotation(node, pose.rot);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Use this function to set the position of a scene node
+void OgreAdaptor::SetSceneNodePosition( Ogre::SceneNode *node, const Vector3 &pos )
+{
+  node->setPosition(pos.y, pos.z, pos.x);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Use this function to set the rotation of a scene node
+void OgreAdaptor::SetSceneNodeRotation( Ogre::SceneNode *node, const Quatern &rot )
+{
+  node->setOrientation(rot.u, rot.y, rot.z, rot.x);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Helper function to create a camera
+Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip, double farClip, Ogre::RenderTarget *renderTarget)
+{
+  Ogre::Camera *camera;
+  Ogre::Viewport *cviewport;
+  
+  camera = this->sceneMgr->createCamera(name);
+
+  camera->setNearClipDistance(nearClip);
+  camera->setFarClipDistance(farClip);
+
+  // Setup the viewport to use the texture
+  cviewport = renderTarget->addViewport(camera);
+  cviewport->setClearEveryFrame(true);
+  cviewport->setBackgroundColour( *this->backgroundColor );
+  cviewport->setOverlaysEnabled(false);
+  
+  camera->setAspectRatio(
+      Ogre::Real(cviewport->getActualWidth()) / 
+      Ogre::Real(cviewport->getActualHeight()) );
 }

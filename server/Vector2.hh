@@ -18,14 +18,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: The world; all models are collected here
+/* Desc: Two dimensional vector
  * Author: Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id$
+ * SVN: $Id:$
  */
 
-#ifndef VECTOR3_HH
-#define VECTOR3_HH
+#ifndef VECTOR2_HH
+#define VECTOR2_HH
 
 #include <iostream>
 #include <fstream>
@@ -35,89 +35,80 @@ namespace gazebo
 /// @addtogroup gazebocore
 /// @{
 
-/// Generic x,y,z vector 
-class Vector3
+/// Generic x,y vector 
+class Vector2
 {
   /// \brief Constructor
-  public: Vector3();
+  public: Vector2();
 
   /// \brief Constructor
-  public: Vector3( const double &x, const double &y, const double &z );
+  public: Vector2( const double &x, const double &y );
 
   /// \brief Constructor
-  public: Vector3( const Vector3 &pt );
+  public: Vector2( const Vector2 &pt );
 
   /// \brief Destructor
-  public: virtual ~Vector3();
+  public: virtual ~Vector2();
 
   /// \brief Calc distance to the given point
-  public: double Distance( const Vector3 &pt ) const;
+  public: double Distance( const Vector2 &pt ) const;
 
-  /// \brief Returns the length (magnitude) of the vector
-  public: double GetLength() const;
-
-  /// \brief Return the square of the length (magnitude) of the vector
-  public: double GetSquaredLength() const;
-
-  /// \brief Normalize the vector length
+  /// \brief  Normalize the vector length
   public: void Normalize();
 
   /// \brief Set the contents of the vector
-  public: void Set(double x = 0, double y =0 , double z = 0);
+  public: void Set(double x = 0, double y =0);
 
   /// \brief Return the cross product of this vector and pt
-  public: Vector3 GetCrossProd(const Vector3 &pt) const;
-
-  /// \brief Return a vector that is perpendicular to this one.
-  public: Vector3 GetPerpendicular() const;
+  public: Vector2 GetCrossProd(const Vector2 &pt) const;
 
   /// \brief Equal operator
-  public: const Vector3 &operator=( const Vector3 &pt );
+  public: const Vector2 &operator=( const Vector2 &pt );
 
   /// \brief Equal operator
-  public: const Vector3 &operator=( double value );
+  public: const Vector2 &operator=( double value );
 
   /// \brief Addition operator
-  public: Vector3 operator+( const Vector3 &pt ) const;
+  public: Vector2 operator+( const Vector2 &pt ) const;
 
   /// \brief Addition operator
-  public: const Vector3 &operator+=( const Vector3 &pt );
+  public: const Vector2 &operator+=( const Vector2 &pt );
 
   /// \brief Subtraction operators 
-  public: Vector3 operator-( const Vector3 &pt ) const;
+  public: Vector2 operator-( const Vector2 &pt ) const;
 
   /// \brief Subtraction operators 
-  public: const Vector3 &operator-=( const Vector3 &pt );
+  public: const Vector2 &operator-=( const Vector2 &pt );
 
   /// \brief Division operators
-  public: const Vector3 operator/( const Vector3 &pt ) const;
+  public: const Vector2 operator/( const Vector2 &pt ) const;
 
   /// \brief Division operators
-  public: const Vector3 &operator/=( const Vector3 &pt );
+  public: const Vector2 &operator/=( const Vector2 &pt );
 
   /// \brief Division operators
-  public: const Vector3 operator/( double v ) const;
+  public: const Vector2 operator/( double v ) const;
 
   /// \brief Division operators
-  public: const Vector3 &operator/=( double v );
+  public: const Vector2 &operator/=( double v );
 
   /// \brief Multiplication operators
-  public: const Vector3 operator*( const Vector3 &pt ) const;
+  public: const Vector2 operator*( const Vector2 &pt ) const;
 
   /// \brief Multiplication operators
-  public: const Vector3 &operator*=( const Vector3 &pt );
+  public: const Vector2 &operator*=( const Vector2 &pt );
 
   /// \brief Multiplication operators
-  public: const Vector3 operator*( double v ) const;
+  public: const Vector2 operator*( double v ) const;
 
   /// \brief Multiplication operators
-  public: const Vector3 &operator*=( double v );
+  public: const Vector2 &operator*=( double v );
 
   /// \brief Equality operators
-  public: bool operator==( const Vector3 &pt ) const;
+  public: bool operator==( const Vector2 &pt ) const;
 
   /// \brief Equality operators
-  public: bool operator!=( const Vector3 &pt ) const;
+  public: bool operator!=( const Vector2 &pt ) const;
 
   /// \brief See if a point is finite (e.g., not nan)
   public: bool IsFinite() const;
@@ -126,15 +117,15 @@ class Vector3
   public: double operator[](unsigned int index) const;
 
   // \brief The location
-  public: double x, y, z;
+  public: double x, y;
 
   /// Ostream operator
   /// \param out Ostream
-  /// \param pt Vector3 to output
+  /// \param pt Vector2 to output
   /// \return The Ostream
-  public: friend std::ostream &operator<<( std::ostream &out, const gazebo::Vector3 &pt )
+  public: friend std::ostream &operator<<( std::ostream &out, const gazebo::Vector2 &pt )
   {
-    out << pt.x << " " << pt.y << " " << pt.z;
+    out << pt.x << " " << pt.y;
 
     return out;
   }

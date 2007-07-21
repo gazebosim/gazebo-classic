@@ -1,11 +1,14 @@
 Open:
+-Fog
 - XML include
 - Help overlay
 - Pause simulation
 - Step simulation
 - Better camera movement. Translate is too slow over long distances
-- Proper lights
-  - Attach to objects
+-reorganize the Media
+-Fix Quatern Euler angle functions
+
+-run gprof, and valgrind
 
 - FLTK interface
 - Hand of god
@@ -25,6 +28,9 @@ Open:
 - Anti Aliasing
 - Threading. Make use of dual-core machines.
 - Implement triggers with callbacks.
+
+- Better lights
+  - GLSL per pixel lighting. Make this user selectable.
 
 
 - Pick a formatting standard for XML file
@@ -48,3 +54,9 @@ Open:
 -Look into COLLADA, OPAL, Bullet Physics & Collisioin detection engine
 -Add "Angle" class, will handle ROTD and DTOR.
 -Templatize Vector, Quaternion, Pose
+
+Completed:
+-Laser and Camera Interfaces
+-Pose3d Interface. Thanks Toby
+-Lights, and global ambient
+-Enable/disable sky box, and set material

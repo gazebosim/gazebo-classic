@@ -161,9 +161,13 @@ int Position2dInterface::ProcessMessage(MessageQueue *respQueue,
 
     geom.pose.px = 0;
     geom.pose.py = 0;
-    geom.pose.pa = 0;
+    geom.pose.pz = 0;
+    geom.pose.pyaw = 0;
+    geom.pose.ppitch = 0;
+    geom.pose.proll = 0;
     geom.size.sw= 0.53;
     geom.size.sl = 0.38;
+    geom.size.sh = 0.31;
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, 

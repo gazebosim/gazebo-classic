@@ -57,8 +57,8 @@ ODEPhysics::ODEPhysics()
   this->contactGroup = dJointGroupCreate(0);
 
   this->gravity.x = 0;
-  this->gravity.y = -9.8;
-  this->gravity.z = 0;
+  this->gravity.y = 0;
+  this->gravity.z = -9.8;
 
   this->globalCFM = 10e-10;
   this->globalERP = 0.2;
@@ -224,7 +224,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     assert(geom1 && geom2);
 
-//    std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
+      //std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
 
     /*
     if (geom1->IsStatic() && geom2->IsStatic())

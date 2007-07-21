@@ -29,6 +29,7 @@
 #include <sstream>
 #include <iostream>
 #include <Ogre.h>
+
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
@@ -72,76 +73,28 @@ int Model::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
 
-  if (node->GetName() == "xml")
+  this->SetName(node->GetString("name","",1));
+  this->SetStatic(node->GetBool("static",false,0));
+
+  if (this->GetType() == "physical")
   {
-    this->SetName(node->GetString("name","",1));
-    this->SetStatic(node->GetBool("static",false,0));
-
-    // Load the bodies
-    childNode = node->GetChildByNSPrefix("body");
-
-    while (childNode)
-    {
-      if (this->LoadBody(childNode) != 0)
-        std::cerr << "Error Loading body[" << childNode->GetName() << "]\n";
-
-      childNode = childNode->GetNextByNSPrefix("body");
-    }
-
-    // Load the joints
-    childNode = node->GetChildByNSPrefix("joint");
-
-    while (childNode)
-    {
-      if (this->LoadJoint(childNode) != 0)
-        std::cerr << "Error Loading Joint[" << childNode->GetName() << "]\n";
-
-      childNode = childNode->GetNextByNSPrefix("joint");
-    }
-
-    // Load interfaces
-    /*childNode = node->GetChildByNSPrefix("interface");
-
-    while (childNode)
-    {
-      try
-      {
-        this->LoadIface(childNode);
-      }
-      catch (gazebo::GazeboError e)
-      {
-        std::cerr << "Error Loading Interface[" << childNode->GetName() << "]\n" 
-          << e << std::endl;
-      }
-
-      childNode = childNode->GetNextByNSPrefix("interface");
-    }*/
-
-    // Load controller
-    childNode = node->GetChildByNSPrefix("controller");
-    while (childNode)
-    {
-      try
-      {
-        this->LoadController(childNode);
-      }
-      catch (GazeboError e)
-      {
-        std::cerr << "Error Loading Controller[" << childNode->GetName() 
-          << "]\n" << e << std::endl;
-      }
-      childNode = childNode->GetNextByNSPrefix("controller");
-    }
-
-    this->canonicalBodyName = node->GetString("canonicalBody","",0);
-
-    if (this->canonicalBodyName.empty())
-    {
-      this->canonicalBodyName = this->bodies.begin()->first;
-    }
-
+    this->LoadPhysical(node);
+  }
+  else if (this->GetType() == "renderable")
+  {
+    this->LoadRenderable(node);
+  }
+  else
+  {
+    std::ostringstream stream;
+    stream << "Invalid model type[" << this->GetType() << "]\n";
+    gzthrow(stream.str());
   }
 
+  if (this->canonicalBodyName.empty())
+  {
+    this->canonicalBodyName = this->bodies.begin()->first;
+  }
 
   // Get the name of the python module
   /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
@@ -187,6 +140,8 @@ int Model::Update(UpdateParams &params)
 
   Pose3d bodyPose, newPose, oldPose;
 
+
+
   for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
     if (bodyIter->second)
@@ -215,10 +170,13 @@ int Model::Update(UpdateParams &params)
     b = this->bodies[this->canonicalBodyName];
   }
 
-  if (this->GetName() == "pioneer1_model")
+  /*if (this->GetName() == "light2")
   {
-    //std::cout << "Pose[" << this->pose << "]\n";
-  }
+    Ogre::Vector3 ppos = this->sceneNode->getPosition();
+    ppos.z += 0.1;
+    ppos.y = 1.0;
+    this->sceneNode->setPosition(ppos);
+  }*/
 
   return this->UpdateChild();
 }
@@ -552,4 +510,92 @@ void Model::Attach()
 Body *Model::GetCanonicalBody()
 {
   return this->bodies[this->canonicalBodyName];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a renderable model (like a light source).
+void Model::LoadRenderable(XMLConfigNode *node)
+{
+  XMLConfigNode *childNode = NULL;
+
+  // We still need a canonical body so that this model can be attached to
+  // others
+  Body *body = this->CreateBody();
+  body->SetName(this->GetName() + "_RenderableBody");
+  body->SetGravityMode(false);
+  body->SetPose(Pose3d());
+  this->bodies[body->GetName()] = body;
+
+  if ((childNode = node->GetChild("light")))
+  {
+    OgreAdaptor::Instance()->CreateLight(childNode, body);
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a physical model
+void Model::LoadPhysical(XMLConfigNode *node)
+{
+  XMLConfigNode *childNode = NULL;
+
+
+  // Load the bodies
+  childNode = node->GetChildByNSPrefix("body");
+
+  while (childNode)
+  {
+    if (this->LoadBody(childNode) != 0)
+      std::cerr << "Error Loading body[" << childNode->GetName() << "]\n";
+
+    childNode = childNode->GetNextByNSPrefix("body");
+  }
+
+  // Load the joints
+  childNode = node->GetChildByNSPrefix("joint");
+
+  while (childNode)
+  {
+    if (this->LoadJoint(childNode) != 0)
+      std::cerr << "Error Loading Joint[" << childNode->GetName() << "]\n";
+
+    childNode = childNode->GetNextByNSPrefix("joint");
+  }
+
+  // Load interfaces
+  /*childNode = node->GetChildByNSPrefix("interface");
+
+    while (childNode)
+    {
+    try
+    {
+    this->LoadIface(childNode);
+    }
+    catch (gazebo::GazeboError e)
+    {
+    std::cerr << "Error Loading Interface[" << childNode->GetName() << "]\n" 
+    << e << std::endl;
+    }
+
+    childNode = childNode->GetNextByNSPrefix("interface");
+    }*/
+
+  // Load controller
+  childNode = node->GetChildByNSPrefix("controller");
+  while (childNode)
+  {
+    try
+    {
+      this->LoadController(childNode);
+    }
+    catch (GazeboError e)
+    {
+      std::cerr << "Error Loading Controller[" << childNode->GetName() 
+        << "]\n" << e << std::endl;
+    }
+    childNode = childNode->GetNextByNSPrefix("controller");
+  }
+
+  this->canonicalBodyName = node->GetString("canonicalBody","",0);
+
 }

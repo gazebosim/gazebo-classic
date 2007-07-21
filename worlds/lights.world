@@ -4,15 +4,13 @@
   xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
-  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
-  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
-  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
-  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+  xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
   xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
 
   <verbosity>5</verbosity>
@@ -25,19 +23,16 @@
   </physics:ode>
 
   <rendering:ogre>
-    <ambient>1.0 1.0 1.0 1.0</ambient>
-    <sky>
-      <material>Gazebo/CloudySky</material>
-    </sky>
+    <ambient>0.0 0.0 0.0 0.0</ambient>
 
-    <plugins path="/usr/local/lib/OGRE">
+    <plugins path="/home/nate/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
       <plugin>Plugin_BSPSceneManager.so</plugin>
       <plugin>Plugin_OctreeSceneManager.so</plugin>
     </plugins>
 
-    <resources path="/usr/local/share/gazebo">
+    <resources path="/home/nate/local/share/gazebo">
       <bootstrap>
         <zip>Media/packs/OgreCore.zip</zip>
       </bootstrap>
@@ -59,59 +54,7 @@
     </resources>
   </rendering:ogre>
 
-  <model:physical name="box1_model">
-    <xyz>2 0.0 0.5</xyz>
-    <rpy>0.0 0.0 30.0</rpy>
-
-    <body:box name="box1_body">
-      <xyz>0.0 0.0 0.25</xyz>
-      <rpy>0.0 0.0 0.0</rpy>
-
-      <geom:box name="box1_geom">
-        <mesh>default</mesh>
-        <size>0.5 0.5 0.5</size>
-        <density>1.0</density>
-        <material>Gazebo/BumpyMetal</material>
-      </geom:box>
-    </body:box>
-  </model:physical>
-
-  <model:physical name="sicklms200_model">
-    <xyz>0 0.0 0.1</xyz>
-    <rpy>0 0 0</rpy>
-
-    <body:box name="laser1_body">
-      <xyz>0.0 0.0 0.0</xyz>
-      <rpy>0.0 0.0 0.0</rpy>
-
-      <geom:box name="laser1_geom1">
-        <mesh>default</mesh>
-        <size>0.10 0.1 0.2</size>
-        <xyz>0.0 0.0 0.0</xyz>
-        <density>0.1</density>
-        <material>Gazebo/BlueLaser</material>
-      </geom:box>
-
-      <sensor:ray name="laser_1">
-        <rayCount>180</rayCount>
-        <rangeCount>361</rangeCount>
-        <origin>0 0.07 0</origin>
-
-        <minAngle>-1.57</minAngle>
-        <maxAngle>1.57</maxAngle>
-
-        <minRange>0.1</minRange>
-        <maxRange>8</maxRange>
-
-        <controller:sicklms200_laser name="laser_controller_1">
-          <interface:laser name="sicklms_iface_1"/>
-        </controller:sicklms200_laser>
-      </sensor:ray>
-
-    </body:box>
-  </model:physical>
-
-   <!-- Ground Plane -->
+  <!-- Ground Plane -->
   <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
@@ -120,30 +63,96 @@
     <body:plane name="plane1_body">
       <geom:plane name="plane1_geom">
         <normal>0 0 1</normal>
-        <size>2000 2000</size>
+        <size>20 20</size>
         <segments>10 10</segments>
-        <uvTile>100 100</uvTile>
+        <uvTile>1 1</uvTile>
         <material>Gazebo/GrassFloor</material>
       </geom:plane>
     </body:plane>
   </model:physical>
 
- <model:physical name="cam1_model">
-    <xyz>0 3 4</xyz>
-    <rpy>0 -30 0</rpy>
+  <!-- The Camera -->
+  <model:physical name="cam2_model">
+    <xyz>0 3.5 0.9</xyz>
+    <rpy>0 -15 90</rpy>
     <static>true</static>
 
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>640 480</imageSize>
+    <body:empty name="cam2_body">
+      <sensor:camera name="cam2_sensor">
+        <imageSize>800 600</imageSize>
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
         <farClip>100</farClip>
+
         <saveFrames>false</saveFrames>
         <saveFramePath>frames</saveFramePath>
       </sensor:camera>
     </body:empty>
   </model:physical>
 
+
+  <!-- Red Spot light -->
+  <model:renderable name="spot_red">
+    <xyz>0.0 0.0 2.0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <light>
+      <type>spot</type>
+      <direction>0 -1 0</direction>
+      <diffuseColor>0.1 0.0 0.0</diffuseColor>
+      <specularColor>0.2 0.0 0.0</specularColor>
+      <attenuation>10 0.2 0.1 0.00</attenuation>
+    </light>
+  </model:renderable>
+
+  <!-- Green Spot light -->
+  <model:renderable name="spot_green">
+    <xyz>0.0 0.5 2.0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <light>
+      <type>spot</type>
+      <direction>0 -1 0</direction>
+      <diffuseColor>0.0 0.1 0.0</diffuseColor>
+      <specularColor>0.0 0.2 0.0</specularColor>
+      <attenuation>10 0.2 0.1 0.00</attenuation>
+    </light>
+  </model:renderable>
+
+  <!-- Blue Spot light -->
+  <model:renderable name="spot_blue">
+    <xyz>0.0 1.0 2.0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <light>
+      <type>spot</type>
+      <direction>0 -1 0</direction>
+      <diffuseColor>0.0 0.0 0.1</diffuseColor>
+      <specularColor>0.0 0.0 0.2</specularColor>
+      <attenuation>10 0.2 0.1 0.00</attenuation>
+    </light>
+  </model:renderable>
+
+  <!-- Yellow Point light -->
+  <model:renderable name="point_yellow">
+    <xyz>5 5 5</xyz>
+    <light>
+      <type>point</type>
+      <diffuseColor>1.0 1.0 0.0</diffuseColor>
+      <specularColor>0.3 0.3 0.3</specularColor>
+      <attenuation>10 0.4 0.1 0.0</attenuation>
+    </light>
+  </model:renderable>
+
+  <!-- White Directional light -->
+  <model:renderable name="directional_white">
+    <light>
+      <type>directional</type>
+      <direction>0 -1 0</direction>
+      <diffuseColor>0.4 0.4 0.4</diffuseColor>
+      <specularColor>0.0 0.0 0.0</specularColor>
+      <attenuation>100 0.0 1.0 0.4</attenuation>
+    </light>
+  </model:renderable>
 
 </gazebo:world>

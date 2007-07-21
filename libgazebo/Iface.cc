@@ -186,6 +186,7 @@ void Iface::Destroy()
 {
   if (!this->mMap && !this->mmapFd)
   {
+    std::cout << "No mMap or mmapFD for " << this->filename << "\n";
     return;
   }
 

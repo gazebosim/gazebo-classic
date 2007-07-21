@@ -51,6 +51,8 @@ RayGeom::RayGeom( Body *body )
 
   this->AttachObject(this->line);
 
+  this->line->setMaterial("Gazebo/BlueLaser");
+
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;

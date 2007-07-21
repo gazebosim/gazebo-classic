@@ -41,6 +41,9 @@ class Geom : public Entity
   /// \return The transform id
   public: dGeomID GetTransId() const;
 
+  /// \brief Get the ODE geom class
+  public: int GetGeomClass() const;
+
   /// \brief Return whether this geom is placeable
   public: bool IsPlaceable() const;
 
@@ -108,6 +111,8 @@ class Geom : public Entity
   // Mass of this geometry
   protected: dMass mass;
   protected: dMass bodyMass;
+
+  protected: Quatern extraRotation;
 };
 
 }

@@ -30,6 +30,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include "Pose3d.hh"
+
 namespace Ogre
 {
   class Root;
@@ -43,6 +45,9 @@ namespace Ogre
   class LogManager;
   class Overlay;
   class OverlayContainer;
+  class SceneNode;
+  class RenderTarget;
+  class ColourValue;
 }
 
 namespace gazebo
@@ -50,25 +55,42 @@ namespace gazebo
 
 class XMLConfigNode;
 class OgreFrameListener;
+class Entity;
 
 class OgreAdaptor
 {
-  /// Constructor
+  /// \brief Constructor
   private: OgreAdaptor();
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~OgreAdaptor();
 
   public: static OgreAdaptor *Instance();
 
-  /// Default initialization. Let OGRE create the window and rendering context
+  /// \brief Default initialization. Let OGRE create the window and rendering context
   public: void Init(XMLConfigNode *node);
 
-  /// Initialize Ogre Rendering engine
+  /// \brief Initialize Ogre Rendering engine
   public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height);
 
-  /// Render a single frame
+  /// \brief Render a single frame
   public: int Render();
+
+  /// \brief Create a light source and attach it to the entity
+  public: void CreateLight(XMLConfigNode *node, Entity *entity);
+
+  /// \brief Use this function to set the pose of a scene node
+  public: void SetSceneNodePose( Ogre::SceneNode *node, const Pose3d &pose );
+
+  /// \brief Use this function to set the position of a scene node
+  public: void SetSceneNodePosition(Ogre::SceneNode *node, const Vector3 &pos);
+
+  /// \brief Use this function to set the rotation of a scene node
+  public: void SetSceneNodeRotation(Ogre::SceneNode *node, const Quatern &rot);
+
+  /// \brief Helper function to create a camera
+  public: Ogre::Camera *CreateCamera(const std::string &name, double nearClip, 
+              double farClip, Ogre::RenderTarget *renderTarget);
 
   private: void LoadPlugins(XMLConfigNode *node);
   private: void SetupResources(XMLConfigNode *node);
@@ -93,6 +115,8 @@ class OgreAdaptor
   private: Window windowId;
 
   private: static OgreAdaptor *myself;
+
+  private: Ogre::ColourValue *backgroundColor;
 };
 
 class OgreGLXWindowInterface

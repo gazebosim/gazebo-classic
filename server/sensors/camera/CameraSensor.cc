@@ -122,13 +122,15 @@ void CameraSensor::InitChild()
   this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
 
   // Create the camera
-  this->camera = OgreAdaptor::Instance()->sceneMgr->createCamera(this->GetName());
-  this->camera->setNearClipDistance(this->nearClip);
-  this->camera->setFarClipDistance(this->farClip);
+  this->camera = OgreAdaptor::Instance()->CreateCamera(this->GetName(),
+      this->nearClip, this->farClip, this->renderTarget);
+  //this->camera = OgreAdaptor::Instance()->sceneMgr->createCamera(this->GetName());
+//  this->camera->setNearClipDistance(this->nearClip);
+  //this->camera->setFarClipDistance(this->farClip);
 
 
   // Setup the viewport to use the texture
-  this->viewport = this->renderTarget->addViewport(this->camera);
+  /*this->viewport = this->renderTarget->addViewport(this->camera);
   this->viewport->setClearEveryFrame(true);
   this->viewport->setBackgroundColour( Ogre::ColourValue::Black );
   this->viewport->setOverlaysEnabled(false);
@@ -137,6 +139,11 @@ void CameraSensor::InitChild()
   this->camera->setAspectRatio(
       Ogre::Real(this->viewport->getActualWidth()) / 
       Ogre::Real(this->viewport->getActualHeight()) );
+  */
+
+  // TEST CODE
+  //this->camera->setPosition(5, 5, 0);
+  //this->camera->lookAt(0, 0, 0);
 
 
   Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
@@ -150,6 +157,7 @@ void CameraSensor::InitChild()
   this->pitchNode = this->sceneNode->createChildSceneNode(this->GetName() + "PitchNode");
   this->pitchNode->attachObject(this->camera);
   this->pitchNode->pitch(Ogre::Degree(0));
+  
 
   this->saveCount = 0;
 }
@@ -164,13 +172,32 @@ void CameraSensor::FiniChild()
 // Update the drawing
 void CameraSensor::UpdateChild(UpdateParams &params)
 {  
-  this->pose.pos.x = this->sceneNode->getWorldPosition().x;
-  this->pose.pos.y = this->sceneNode->getWorldPosition().y;
-  this->pose.pos.z = this->sceneNode->getWorldPosition().z;
-  this->pose.rot.u = this->sceneNode->getWorldOrientation().w;
-  this->pose.rot.x = this->sceneNode->getWorldOrientation().x;
-  this->pose.rot.y = this->sceneNode->getWorldOrientation().y;
-  this->pose.rot.z = this->sceneNode->getWorldOrientation().z;
+
+  this->pose.pos.x = this->sceneNode->getWorldPosition().z;
+  this->pose.pos.y = this->sceneNode->getWorldPosition().x;
+  this->pose.pos.z = this->sceneNode->getWorldPosition().y;
+
+  this->pose.rot.u = this->pitchNode->getWorldOrientation().w;
+  this->pose.rot.x = this->pitchNode->getWorldOrientation().z;
+  this->pose.rot.y = this->pitchNode->getWorldOrientation().x;
+  this->pose.rot.z = this->pitchNode->getWorldOrientation().y;
+
+  /*
+  this->pose.rot.u = this->pitchNode->getWorldOrientation().w;
+  this->pose.rot.x = this->pitchNode->getWorldOrientation().z;
+  this->pose.rot.y = this->pitchNode->getWorldOrientation().x;
+  this->pose.rot.z = this->pitchNode->getWorldOrientation().y;
+  */
+
+  /*printf("RPY[%4.2f %4.2f %4.2f][%4.2f %4.2f %4.2f]\n",
+      this->pitchNode->getWorldOrientation().getRoll().valueDegrees(),
+      this->pitchNode->getWorldOrientation().getPitch().valueDegrees(),
+      this->pitchNode->getWorldOrientation().getYaw().valueDegrees(),
+      RTOD(this->pose.rot.GetRoll()),
+      RTOD(this->pose.rot.GetPitch()),
+      RTOD(this->pose.rot.GetYaw())
+      );
+      */
 
   if (this->saveFrames)
     this->SaveFrame();

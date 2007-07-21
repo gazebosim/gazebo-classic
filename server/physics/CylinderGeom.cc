@@ -38,7 +38,7 @@ CylinderGeom::CylinderGeom(Body *body, double radius, double length, double dens
     : Geom(body)
 {
   // Initialize mass matrix
-  dMassSetCylinder(&this->mass, density, 2, radius, length);
+  dMassSetCylinder(&this->mass, density, 3, radius, length);
   
   //this->SetGeom( dCreateCCylinder( 0, radius, length ), true );
   this->SetGeom( dCreateCylinder( 0, radius, length ), true );
@@ -50,12 +50,15 @@ CylinderGeom::CylinderGeom(Body *body, double radius, double length, double dens
     this->AttachMesh(meshName);
 
   // Set the size of the cylinder
-  this->ScaleMesh(Vector3(radius,length,radius));
+  //this->ScaleMesh(Vector3(radius,length,radius));
+  this->ScaleMesh(Vector3(radius,radius,length));
 
   // Allow it to cast shadows
   this->SetCastShadows(true);
 
-  return;
+  // ODE Cylinders are aligned along the y-axis. So rotate them to be
+  // aligned along the Z.
+  this->extraRotation.SetFromAxis(1, 0, 0, M_PI/2);
 }
 
 //////////////////////////////////////////////////////////////////////////////
