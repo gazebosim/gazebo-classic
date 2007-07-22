@@ -28,6 +28,7 @@
 #define XMLCONFIG_HH
 
 #include <libxml/parser.h>
+#include <libxml/xpath.h>
 #include <string>
 
 #include "Vector3.hh"
@@ -77,6 +78,8 @@ class XMLConfig
 
   /// \brief The root of the tree
   private: XMLConfigNode *root;
+
+  private: xmlXPathContextPtr xpathContex;
 };
 
 

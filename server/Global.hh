@@ -31,12 +31,6 @@
 // Typedefs
 /////////////////////////////////////////////////////////////////////////////
 
-typedef unsigned char uchar;
-typedef unsigned short ushort;
-typedef unsigned int uint;
-typedef unsigned long ulong;
-typedef int (*gz_plugin_init_fn_t) (void);
-
 #include <stdint.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,13 +57,6 @@ typedef int (*gz_plugin_init_fn_t) (void);
 
 #endif
 
-// Rendering has to happen in a certain order
-#define GZ_RENDER_MAX_PASSES 3
-#define GZ_RENDER_LIGHT 0
-#define GZ_RENDER_OPAQUE 1
-#define GZ_RENDER_TRANSPARENT 2
-
-
 /////////////////////////////////////////////////////////////////////////////
 // Macros
 /////////////////////////////////////////////////////////////////////////////
@@ -95,3 +82,24 @@ typedef int (*gz_plugin_init_fn_t) (void);
 
 #endif
 
+class Global
+{
+  /// \brief Set to true when the user wants to leave the application
+  public: static bool userQuit;
+
+  /// \brief Set to true to pause the simulation
+  public: static bool userPause;
+
+  /// \brief Set to true to step through the simulation
+  public: static bool userStep;
+
+  /// \brief Set to true to increment the simulation once. This is only
+  ///        valid when userStep is true.
+  public: static bool userStepInc;
+
+  /// \brief Count of the number of iterations
+  public: static unsigned long iterations;
+
+  private: Global();
+  private: ~Global();
+};

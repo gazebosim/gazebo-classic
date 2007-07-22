@@ -30,7 +30,6 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   public: virtual bool keyPressed( const OIS::KeyEvent &e );
   public: virtual bool keyReleased( const OIS::KeyEvent &e );
 
-
   // Mouse Events
   public: bool mouseMoved(const OIS::MouseEvent &e);
 
@@ -41,6 +40,7 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   private: Ogre::Vector3 directionVec;
 
   private: float moveAmount;
+  private: float moveScale;
   private: float rotateAmount;
 
   private: Ogre::EventProcessor *eventProcessor;
@@ -52,6 +52,7 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   private: bool leftPressed;
   private: bool rightPressed;
   private: bool middlePressed;
+
 };
 
 }

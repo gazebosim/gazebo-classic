@@ -24,6 +24,14 @@
 
   <rendering:ogre>
     <ambient>0.0 0.0 0.0 0.0</ambient>
+    <sky>
+      <material>Gazebo/CloudySky</material>
+    </sky>
+
+    <video>
+      <depth>16</depth>
+      <size>640 480</size>
+    </video>
 
     <plugins path="/home/nate/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>

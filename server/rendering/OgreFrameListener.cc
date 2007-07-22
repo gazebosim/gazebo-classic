@@ -42,12 +42,10 @@
 
 using namespace gazebo;
 
-extern bool userQuit;
-extern bool userPause;
-
 OgreFrameListener::OgreFrameListener()
 {
   this->moveAmount = 1;
+  this->moveScale = 1;
   this->rotateAmount = 1;
 
   OIS::ParamList pl;
@@ -122,6 +120,10 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
 
 bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/) 
 {
+
+  this->mKeyboard->capture();
+  this->mMouse->capture();
+
   return true;
 }
 
@@ -129,12 +131,21 @@ bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
 {
   switch (e.key)
   {
+    case OIS::KC_H:
+      OgreHUD::Instance()->ToggleHelp();
+      break;
+
     case OIS::KC_SPACE:
-      userPause = !userPause;
+      if (Global::userStep)
+      {
+        Global::userStepInc = true;
+      }
+      else
+        Global::userPause = !Global::userPause;
       break;
 
     case OIS::KC_ESCAPE:
-      userQuit = true;
+      Global::userQuit = true;
       break;
 
     case OIS::KC_UP:
@@ -173,6 +184,10 @@ bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
 
     case OIS::KC_RBRACKET:
       CameraManager::Instance()->DecActiveCamera();
+      break;
+
+    case OIS::KC_TAB:
+      OgreHUD::Instance()->ToggleVisible();
       break;
 
     default:
@@ -215,6 +230,14 @@ bool OgreFrameListener::keyReleased( const OIS::KeyEvent &e )
     case OIS::KC_Q:
       this->directionVec.y -= this->moveAmount;
       break;
+
+    case OIS::KC_T:
+      if (Global::userPause)
+        Global::userPause = false;
+      Global::userStep = !Global::userStep;
+      Global::userStepInc = false;
+      break;
+
     default:
       break;
   }

@@ -48,14 +48,10 @@ using namespace gazebo;
 // static pointer to myself
 World *World::myself = NULL;
 
-extern bool userPause;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Private constructor
 World::World()
 {
-  //OgreAdaptor::Instance()->Init();
-
   this->physicsEngine = new ODEPhysics();
 
   this->pause = false;
@@ -63,6 +59,7 @@ World::World()
   this->simTime = 0.0;
   this->pauseTime = 0.0;
   this->startTime = 0.0;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +135,7 @@ int World::Init()
 
   this->physicsEngine->Init();
 
+  this->startTime = this->GetWallTime();
   return 0;
 }
 
@@ -149,7 +147,7 @@ int World::Update()
   std::vector< Model* >::iterator iter;
 
   this->simTime += this->physicsEngine->GetStepTime();
-  params.stepTime =this->physicsEngine->GetStepTime();
+  params.stepTime = this->physicsEngine->GetStepTime();
 
   // Update all the models
   for (iter=this->models.begin(); iter!=this->models.end(); iter++)
@@ -158,8 +156,18 @@ int World::Update()
   }
 
   // Update the physics engine
-  //if (!userPause)
+  if (!Global::userPause && !Global::userStep ||
+      (Global::userStep && Global::userStepInc))
+  {
     this->physicsEngine->Update();
+    Global::iterations++;
+
+    Global::userStepInc = !Global::userStepInc;
+  }
+  else
+  {
+    this->pauseTime += this->physicsEngine->GetStepTime();
+  }
 
   // Update the rendering engine
   OgreAdaptor::Instance()->Render();

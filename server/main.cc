@@ -104,6 +104,7 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include <iostream>
 
+#include "Global.hh"
 #include "XMLConfig.hh"
 #include "ModelFactory.hh"
 #include "SensorFactory.hh"
@@ -121,10 +122,6 @@ bool optServerForce = true;
 double optTimeout = -1;
 int optMsgLevel = 1;
 int optTimeControl = 1;
-
-// Set to true when the user wants to leave the application
-bool userQuit = false;
-bool userPause = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -233,7 +230,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ ) 
 {
-  userQuit = true;
+  Global::userQuit = true;
   return;
 }
 
@@ -319,7 +316,7 @@ bool MainIdle()
   //printf("Sim Time[%f]\n",simTime);
 
   // Exit if the user has decided to end the simulation
-  if (userQuit)
+  if (Global::userQuit)
     return false;
 
   return true;

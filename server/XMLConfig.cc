@@ -21,7 +21,7 @@
 /* Desc: XML file parser
  * Author: Andrew Howard and Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <assert.h>
@@ -33,6 +33,7 @@
 #include <iostream>
 
 #include <libxml/xinclude.h>
+#include <libxml/xpointer.h>
 
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -65,6 +66,7 @@ XMLConfig::~XMLConfig()
 // Load world from file
 int XMLConfig::Load( std::string filename )
 {
+
   this->filename = filename;
 
   // Enable line numbering
@@ -78,6 +80,13 @@ int XMLConfig::Load( std::string filename )
     return -1;
   }
 
+  // Create xpath evaluation context
+  this->xpathContex = xmlXPathNewContext(this->xmlDoc);
+  if (this->xpathContex == NULL)
+  {
+    std::cerr << "Unable to create new XPath context\n";
+    return -1;
+  }
 
   //Apply the XInclude process.
   if (xmlXIncludeProcess(this->xmlDoc) <= 0)
@@ -138,7 +147,8 @@ XMLConfigNode *XMLConfig::CreateNodes( XMLConfigNode *parent,
   XMLConfigNode *self = NULL;
 
   // No need to create wrappers around text and blank nodes
-  if( !xmlNodeIsText( xmlNode ) && !xmlIsBlankNode( xmlNode ) )
+  if( !xmlNodeIsText( xmlNode ) && !xmlIsBlankNode( xmlNode ) &&
+      strcmp((const char*)(xmlNode->name),"comment") )
   {
 
     // Create a new node
@@ -146,8 +156,61 @@ XMLConfigNode *XMLConfig::CreateNodes( XMLConfigNode *parent,
 
     // Create our children
     for ( xmlNode = xmlNode->xmlChildrenNode; xmlNode != NULL; 
-         xmlNode = xmlNode->next)
-      this->CreateNodes( self, xmlNode );
+        xmlNode = xmlNode->next)
+    {
+
+      // If the node is xi:include, then only process the children of
+      // the included XML files' root node
+      if (!xmlNode->ns && 
+          !strcmp((const char*)(xmlNode->name),"include"))
+      {
+        xmlNodePtr xmlNode2 = NULL;
+        xmlChar *value = NULL;
+
+        // Check to see if this model is meant to be embedded.
+        // When embedded == true, then the root node of the included XML
+        // file should be skipped.
+        if (xmlHasProp( xmlNode, (xmlChar*)"embedded" ))
+        {
+          value = xmlGetProp( xmlNode, (xmlChar*)"embedded"  );
+        }
+
+        if (value && !strcmp((const char*)value,"true"))
+        {
+          // Get point to the first node of the included file
+          xmlNode2 = xmlNode->xmlChildrenNode->next;
+
+          // Skip over garbage
+          while (xmlNodeIsText( xmlNode2 ) ||
+                 !strcmp((const char*)xmlNode2->name,"comment") ||
+                 !strcmp((const char*)xmlNode2->name,"include"))
+            xmlNode2 = xmlNode2->next;
+
+          // Get pointer to the first child of the included file
+          xmlNode2 = xmlNode2->xmlChildrenNode;
+          xmlFree(value);
+        }
+        else if (value)
+        {
+          // Get pointer to the first node in the included file.
+          xmlNode2 = xmlNode->xmlChildrenNode->next;
+          xmlFree(value);
+        }
+
+        // Process all children of the included file's root node
+        for (; xmlNode2 != NULL; xmlNode2 = xmlNode2->next)
+        {
+          this->CreateNodes(self, xmlNode2);
+        }
+
+        // Now skip of the root node that was just processed
+        xmlNode = xmlNode->next;
+      }
+      else
+      {
+        this->CreateNodes( self, xmlNode );
+      }
+    }
   }
 
   return self;
@@ -184,8 +247,6 @@ XMLConfigNode::XMLConfigNode( XMLConfig *cfg, XMLConfigNode *parent,
 
   this->xmlNode = xmlNode;
   this->xmlDoc = xmlDoc;
-
-  return;
 }
 
 
@@ -521,19 +582,29 @@ float XMLConfigNode::GetFloat( std::string key, float def, int require )
 // Get a boolean
 bool XMLConfigNode::GetBool( std::string key, bool def, int require )
 {
+  bool result = false;
   xmlChar *value = this->GetNodeValue( key );
 
   if (!value && require)
   {
+    xmlFree(value);
     return -1;
   }
   else if( !value )
+  {
+    xmlFree(value);
     return def;
+  }
 
   if (strcmp((const char*) value, "true") == 0)
-    return 1;
-  
-  return atoi((const char*) value);
+    result = true;
+  else if (strcmp((const char*) value, "false") == 0)
+    result = false;
+  else
+    result = atoi((const char*) value);
+
+  xmlFree(value);
+  return result;
 }
 
 

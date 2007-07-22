@@ -117,6 +117,8 @@ class OgreAdaptor
   private: static OgreAdaptor *myself;
 
   private: Ogre::ColourValue *backgroundColor;
+
+  private: std::string videoMode;
 };
 
 class OgreGLXWindowInterface

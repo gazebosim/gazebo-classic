@@ -28,6 +28,7 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include "OgreHUD.hh"
 #include "Entity.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -80,6 +81,23 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   ambient.g = node->GetTupleDouble("ambient",1,0);
   ambient.b = node->GetTupleDouble("ambient",2,0);
   ambient.a = node->GetTupleDouble("ambient",3,0);
+
+  if ((cnode=node->GetChild("video")))
+  {
+    std::ostringstream stream;
+    int width, height, depth;
+
+    width = cnode->GetTupleInt("size",0,640);
+    height = cnode->GetTupleInt("size",1,480);
+    depth = cnode->GetInt("depth",16,0);
+
+    stream << width << " x " << height << " @ " << depth << "-bit colour";
+    this->videoMode = stream.str();
+  }
+  else
+  {
+    this->videoMode = "640 x 480 @ 16-bit colour";
+  }
 
   // Default background color
   this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::Black);
@@ -314,7 +332,8 @@ void OgreAdaptor::SetupRenderSystem(bool create)
 
     if (create)
     {
-      selectedRenderSystem->setConfigOption("Video Mode","800 x 600 @ 16-bit colour");
+      //selectedRenderSystem->setConfigOption("Video Mode","640 x 480 @ 16-bit colour");
+      selectedRenderSystem->setConfigOption("Video Mode",this->videoMode);
     }
 
     this->root->setRenderSystem(selectedRenderSystem);
@@ -400,6 +419,8 @@ int OgreAdaptor::Render()
 {
   Ogre::WindowEventUtilities::messagePump();
 
+  OgreHUD::Instance()->Update();
+
   root->renderOneFrame();
 
   return 0;
@@ -476,7 +497,8 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
 {
   Ogre::Camera *camera;
   Ogre::Viewport *cviewport;
-  
+ 
+
   camera = this->sceneMgr->createCamera(name);
 
   camera->setNearClipDistance(nearClip);

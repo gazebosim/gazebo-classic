@@ -45,11 +45,15 @@ namespace gazebo
     /// \brief Get a pointer to the text renderer
     public: static OgreHUD *Instance();
 
+    /// \brief Update the HUD.
+    public: void Update();
+
     /// \brief Set the camera to display
     public: void SetCamera(const CameraSensor *camera);
 
     /// \brief Add a text box
     public: void AddTextBox( const std::string& id,
+                const std::string &panelId,
                 const std::string& text,
                 Ogre::Real x, 
                 Ogre::Real y,
@@ -57,6 +61,12 @@ namespace gazebo
                 Ogre::Real height,
                 const Ogre::ColourValue& color = 
                 Ogre::ColourValue(1.0, 1.0, 1.0, 1.0));
+
+    /// \brief Toggle the visibility of the HUD
+    public: void ToggleVisible();
+
+    /// \brief Toggle display of the help menu
+    public: void ToggleHelp();
 
     /// \brief Hide a text box from being displayed
     public: void HideTextBox(const std::string &id);
@@ -70,9 +80,16 @@ namespace gazebo
     /// \brief Set text 
     public: void SetText(const std::string& id, const std::string& Text);
 
+    /// \brief Helper function to create the HUD text boxes
+    private: void CreateTextBoxes();
+
+    /// \brief Create help text boxes
+    private: void CreateHelp();
+
     private: Ogre::OverlayManager *overlayMgr;
     private: Ogre::OverlayContainer *hudPanel;
     private: Ogre::OverlayContainer *cameraPanel;
+    private: Ogre::OverlayContainer *helpPanel;
     private: Ogre::OverlayContainer *backgroundPanel;
 
     private: static OgreHUD *myself;
