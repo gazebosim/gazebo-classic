@@ -1,4 +1,0 @@
-#Import variable
-Import('env', 'prefix', 'version', 'modelObjs')
-
-modelObjs.append(env.Object('Pioneer2DX.cc'))

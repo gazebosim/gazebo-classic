@@ -84,6 +84,7 @@ The parameters are as follows:
   class PhysicsEngine;
   class XMLConfigNode;
   class XMLConfig;
+  class Sensor;
 
 /// The World
 /*
@@ -155,9 +156,15 @@ class World
 
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
-  /// \param paren The parent model
+  /// \param parent The parent model
   /// \return The model that was created
   private: Model *LoadModel(XMLConfigNode *node, Model *parent);
+
+  /// \brief Load a sensor
+  /// \param node Pointer to the XMLConfig node
+  /// \param parent The parent model
+  /// \return The sensor that was created
+  private: Sensor *LoadSensor(XMLConfigNode *node, Model *parent);
 
   /// \brief Set the model pose and the pose of it's attached children 
   /// \param model The model to set
@@ -172,6 +179,9 @@ class World
 
   /// List of all the models
   private: std::vector< Model* > models;
+
+  /// List of all the sensors
+  private: std::vector< Sensor* > sensors;
 
   /// Simulator control interface
   private: Server *server;

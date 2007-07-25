@@ -40,7 +40,7 @@ Body::Body(Entity *parent, dWorldID worldId)
 Body::~Body()
 {
   std::vector< Geom* >::iterator giter;
-  std::vector< Sensor* >::iterator siter;
+  //std::vector< Sensor* >::iterator siter;
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
@@ -48,11 +48,11 @@ Body::~Body()
   }
   this->geoms.clear();
 
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  /*for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
   {
     delete (*siter);
-  }
-  this->sensors.clear();
+  }*/
+  //this->sensors.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,12 +78,12 @@ int Body::Load(XMLConfigNode *node)
   childNode = node->GetChildByNSPrefix("sensor");
 
   // Load the sensors
-  while (childNode)
+  /*while (childNode)
   {
     // Create and Load a sensor, which will belong to this body.
     this->LoadSensor(childNode);
     childNode = childNode->GetNextByNSPrefix("sensor");
-  }
+  }*/
 
 }
 
@@ -102,12 +102,12 @@ int Body::Init()
   // Set the intial pose. Must do this to handle static models
   this->SetPose(this->GetPose());
 
-  std::vector< Sensor* >::iterator siter;
+  /*std::vector< Sensor* >::iterator siter;
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
   {
     (*siter)->Init();
-  }
+  }*/
 
   return 0;
 }
@@ -116,7 +116,7 @@ int Body::Init()
 // Update the body
 int Body::Update(UpdateParams &params)
 {
-  std::vector< Sensor* >::iterator sensorIter;
+  //std::vector< Sensor* >::iterator sensorIter;
   std::vector< Geom* >::iterator geomIter;
 
   if (!this->IsStatic())
@@ -133,11 +133,12 @@ int Body::Update(UpdateParams &params)
     (*geomIter)->Update();
   }
 
-  for (sensorIter=this->sensors.begin(); 
+/*  for (sensorIter=this->sensors.begin(); 
        sensorIter!=this->sensors.end(); sensorIter++)
   {
     (*sensorIter)->Update(params);
   }
+  */
 
   return 0;
 }
@@ -391,7 +392,7 @@ int Body::LoadGeom(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a sensor
-void Body::LoadSensor(XMLConfigNode *node)
+/*void Body::LoadSensor(XMLConfigNode *node)
 {
   Sensor *sensor = NULL;
 
@@ -415,7 +416,7 @@ void Body::LoadSensor(XMLConfigNode *node)
     stream << "Null sensor. Invalid sensor name[" << node->GetName() << "]";
     gzthrow(stream.str());
   }
-}
+}*/
 
 /////////////////////////////////////////////////////////////////////
 // Update the CoM and mass matrix

@@ -1,7 +1,7 @@
 #Import variables
 Import('env staticObjs sharedObjs')
 
-dirs = Split('physics rendering sensors models controllers')# bindings')
+dirs = Split('physics rendering sensors controllers')# bindings')
 
 for subdir in dirs:
   SConscript('%s/SConscript' % subdir)
@@ -18,7 +18,8 @@ sources = ['main.cc',
            'GazeboError.cc',
            'UpdateParams.cc',
            'GazeboMessage.cc',
-           'Vector2.cc']
+           'Vector2.cc',
+           'Model.cc']
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

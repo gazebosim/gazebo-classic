@@ -265,7 +265,6 @@ int Init()
   gazebo::GazeboMessage::Instance()->Load(xmlFile->GetRootNode());
 
   // Register static models
-  gazebo::ModelFactory::RegisterAll();
   gazebo::SensorFactory::RegisterAll();
   gazebo::IfaceFactory::RegisterAll();
   gazebo::ControllerFactory::RegisterAll();

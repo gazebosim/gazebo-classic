@@ -1,7 +1,0 @@
-#Import variable
-Import('env staticObjs sharedObjs')
-
-sources = Split('LightSource.cc')
-
-staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))
