@@ -1,15 +1,19 @@
+import os
+import sys
+import time
+
 version = '0.8'
 
 prefix = ARGUMENTS.get('prefix','/usr/local')
 
-#'pkg-config --cflags --libs CEGUI-OGRE',
-#'pkg-config --cflags --libs CEGUI',
+# TESTING:
+#odeTestBuild = Builder(action="echo g++ -o $TARGET $_CPPINCFLAGS $SOURCE $_LIBDIRFLAGS $_LIBFLAGS >> /tmp/natedogg")
 
 # 3rd party packages
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
-              'pkg-config --cflags --libs playercore',
-              'pkg-config --cflags --libs playerxdr',
+              'pkg-config --cflags --libs playerc++',
+              #'pkg-config --cflags --libs playerxdr',
       	      'ode-config --cflags --libs',
 	            'pkg-config --cflags --libs OIS']
 	            #'python-config --cflags --libs']
@@ -18,7 +22,7 @@ env = Environment (
   CC = 'g++',
 
   #CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
-  CCFLAGS = Split ('-O2 -pthread -pipe'),
+  CCFLAGS = Split ('-ggdb'),
 
   CPPPATH = [
    '#.', 
@@ -34,7 +38,6 @@ env = Environment (
     '#server/controllers',
     '#server/controllers/position2d',
     '#server/controllers/position2d/pioneer2dx',
-    '/usr/include/python2.4',
     ],
 
     LIBPATH=Split('#libgazebo'),
@@ -43,48 +46,113 @@ env = Environment (
     LIBS=Split('gazebo')
 )
 
+# TESTING:
+#env.Append(BUILDERS = {'odeTestBuild' : odeTestBuild})
 
+# DEFAULT list of subdirectories to build
+subdirs = ['server','libgazebo', 'player']
+
+#
+# Function used to test for ODE library, and TriMesh suppor
+#
+ode_test_source_file = """
+#include <ode/ode.h>
+int main()
+{
+  dGeomTriMeshDataCreate();
+  return 0;
+}
+"""
+
+def CheckODELib(context):
+  context.Message('Checking for ODE...')
+  oldLibs = context.env['LIBS']
+  context.env.Replace(LIBS='ode')
+  result = context.TryLink(ode_test_source_file, '.cpp')
+  context.Result(result)
+  context.env.Replace(LIBS=oldLibs)
+  return result
+
+
+#
 # Parse all the pacakge configurations
-for cfg in parseConfigs:
-  try:
-    env.ParseConfig(cfg)
-  except OSError:
-    print "Unable to parse config ["+cfg+"]"
-    if cfg.find("OIS") >= 0:
-      print "Install Open Input System (http://sourceforge.net/projects/wgois)\n"
-    elif cfg.find("OGRE") >= 0:
-      print "Install Ogre3d (http://www.ogre3d.org/)\n"
-    elif cfg.find("player") >=0:
-      print "Install Player (http://playerstage.sourceforge.net)\n"
-    elif cfg.find("CEGUI") >=0:
-      print "Install CEGUI (http://www.cegui.org.uk/wiki/index.php/Main_Page)\n"
+#
+if not env.GetOption('clean'):
+  for cfg in parseConfigs:
+    print "Checking for ["+cfg+"]"
+    try:
+      env.ParseConfig(cfg)
+      print "  Success"
+    except OSError,e:
+      print "Unable to parse config ["+cfg+"]"
+      if cfg.find("OIS") >= 0:
+        print "OIS is required, but not found."
+        print "  http://sourceforge.net/projects/wgois"
+        Exit(1)
+      elif cfg.find("OGRE") >= 0:
+        print "Ogre3d is required, but not found."
+        print "  http://www.ogre3d.org/"
+        Exit(1)
+      elif cfg.find("ode") >= 0:
+        print "ODE is required, but not found."
+        print "  http://www.ode.org"
+        Exit(1)
+      elif cfg.find("player") >=0:
+        print "\n================================================================"
+        print "Player not found, bindings will not be built."
+        print "  To install player visit(http://playerstage.sourceforge.net)"
+        subdirs.remove('player')
+        print "================================================================"
+        #time.sleep(3)
+  conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib})
+   
+  #Check for the ODE library and header
+  if not conf.CheckCHeader('ode/ode.h'):
+    print "  Error: Install ODE (http://www.ode.org)"
     Exit(1)
+   
+  # Check for trimesh support in ODE
+  if not conf.CheckODELib():
+    print '  Error: ODE not compiled with trimesh support.'
+    Exit(1)
+  env = conf.Finish()
+  
+  # # Check for boost_python
+  #if not conf.CheckLibWithHeader('boost_python', 'boost/python.hpp', 'C'):
+  #  print 'Did not find libboost_python exiting'
+  #  Exit(1)
+  #else:
+  #  conf.env.Append(LIBS="boost_python")
 
-conf = Configure(env)
-
-# Check for boost_python
-#if not conf.CheckLibWithHeader('boost_python', 'boost/python.hpp', 'C'):
-#  print 'Did not find libboost_python exiting'
-#  Exit(1)
-#else:
-#  conf.env.Append(LIBS="boost_python")
-
-env = conf.Finish()
 
 staticObjs = []
 sharedObjs = []
 
+#
+# Export the environment
+#
 Export('env prefix version staticObjs sharedObjs')
 
-for subdir in ['server', 'libgazebo', 'player']:
+#
+# Process subdirectories
+#
+for subdir in subdirs:
   SConscript('%s/SConscript' % subdir)
 
+#
+# Create the gazebo executable
+#
 gazebo = env.Program('gazebo',staticObjs)
 
+#
+# Create static and shared libraries
+#
 libgazeboServerStatic = env.StaticLibrary('gazeboServer',staticObjs)
 libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
 
-
+#
+# Install gazebo
+#
 env.Install(prefix+'/bin',gazebo)
 env.Install(prefix+'/share/gazebo','Media')
 

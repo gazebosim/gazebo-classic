@@ -8,6 +8,7 @@
 #include "Sensor.hh"
 #include "OgreAdaptor.hh"
 #include "SphereGeom.hh"
+#include "TrimeshGeom.hh"
 #include "BoxGeom.hh"
 #include "CylinderGeom.hh"
 #include "PlaneGeom.hh"
@@ -21,7 +22,6 @@ using namespace gazebo;
 Body::Body(Entity *parent, dWorldID worldId)
   : Entity(parent)
 {
-
   if (!this->IsStatic())
   {
     this->bodyId = dBodyCreate(worldId);
@@ -84,6 +84,7 @@ int Body::Load(XMLConfigNode *node)
     this->LoadSensor(childNode);
     childNode = childNode->GetNextByNSPrefix("sensor");
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +117,7 @@ int Body::Init()
 int Body::Update(UpdateParams &params)
 {
   std::vector< Sensor* >::iterator sensorIter;
+  std::vector< Geom* >::iterator geomIter;
 
   if (!this->IsStatic())
   {
@@ -123,6 +125,12 @@ int Body::Update(UpdateParams &params)
 
     // Set the pose of the scene node
     OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, pose);
+  }
+
+  for (geomIter=this->geoms.begin(); 
+       geomIter!=this->geoms.end(); geomIter++)
+  {
+    (*geomIter)->Update();
   }
 
   for (sensorIter=this->sensors.begin(); 
@@ -141,7 +149,12 @@ void Body::AttachGeom( Geom *geom )
   if (this->bodyId)
   {
     if (geom->IsPlaceable())
-      dGeomSetBody(geom->GetTransId(), this->bodyId);
+    {
+      if (geom->GetTransId())
+        dGeomSetBody(geom->GetTransId(), this->bodyId);
+      else
+        dGeomSetBody(geom->GetGeomId(), this->bodyId);
+    }
   }
 
   this->geoms.push_back(geom);
@@ -328,7 +341,7 @@ int Body::LoadGeom(XMLConfigNode *node)
 
   // The mesh used for visualization
   std::string mesh = node->GetString("mesh","",0);
-  double density = node->GetDouble("density",0.0,0);
+  double density = node->GetDouble("density",1.0,0);
 
   if (node->GetName() == "sphere")
   {
@@ -354,6 +367,11 @@ int Body::LoadGeom(XMLConfigNode *node)
     Vector2 uvTile = node->GetVector2("uvTile",Vector2(1, 1));
 
     geom = new PlaneGeom(this,normal,size,segments, uvTile);
+  }
+  else if (node->GetName() == "trimesh")
+  {
+    Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
+    geom = new TrimeshGeom(this, 1.0, mesh, scale);
   }
   else
   {
@@ -427,7 +445,7 @@ void Body::UpdateCoM()
   // Dummy bodies dont have mass
   if (!this->bodyId)
     return;
-  
+
   // Construct the mass matrix by combining all the geoms
   dMassSetZero( &this->mass );
 
@@ -464,12 +482,14 @@ void Body::UpdateCoM()
   pose = this->GetPose();
   this->comPose = newPose;
   this->SetPose(pose);
-  
+
   // Settle on the new CoM pose
   this->comPose = newPose;
-  
+
 
   // TODO: remove offsets from mass matrix?
+
+  //dMassSetZero(&this->mass);
 
   // Set the mass matrix
   dBodySetMass( this->bodyId, &this->mass );

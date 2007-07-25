@@ -18,29 +18,35 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Parameters for contact joints
- * Author: Nate Koenig
- * Date: 30 July 2003
- * CVS: $Id$
+/* Desc: Trimesh geometry
+ * Author: Nate Keonig, Andrew Howard
+ * Date: 8 May 2003
+ * CVS: $Id: TrimeshGeom.hh,v 1.1.2.1 2006/12/16 22:41:16 natepak Exp $
  */
 
-#include <ode/ode.h>
-#include "ContactParams.hh"
+#ifndef TRIMESHGEOM_HH
+#define TRIMESHGEOM_HH
 
-using namespace gazebo;
+#include "Geom.hh"
 
-//////////////////////////////////////////////////////////////////////////////
-// Default constructor
-ContactParams::ContactParams()
+namespace gazebo
 {
-  kp = 10000.0; //dInfinity;
-  kd = 0;
-  bounce = 0.1;
-  bounceVel = 0.1;
-  softCfm = 0.01;
-  
-  mu1 = dInfinity;
-  mu2 = 0.0;
-  slip1 = 0.01;
-  slip2 = 0.01;
+  class TrimeshGeom : public Geom
+  {
+    /// \brief Constructor
+    public: TrimeshGeom(Body *body, double density, const std::string &meshName, const Vector3 &scale);
+
+    /// \brief Destructor
+    public: virtual ~TrimeshGeom();
+
+    /// \brief Update function 
+    public: void Update();
+
+    private: dTriMeshDataID odeData;
+
+    private: dReal matrix_dblbuff[16*2];
+    private: int last_matrix_index;
+  };
 }
+
+#endif

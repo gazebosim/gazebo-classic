@@ -44,6 +44,9 @@ OgreHUD::OgreHUD()
 {
   this->ogreAdaptor = OgreAdaptor::Instance();
 
+  if (!this->ogreAdaptor->window)
+    return;
+
   Ogre::Overlay *hudOverlay;
 
   this->overlayMgr = Ogre::OverlayManager::getSingletonPtr();

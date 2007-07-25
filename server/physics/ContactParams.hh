@@ -49,6 +49,10 @@ class ContactParams
 
   // Force-dependent-slip direction 1 and 2
   public: double slip1,slip2;   
+
+  public: double bounceVel;
+
+  public: double softCfm;
 };
 
 }

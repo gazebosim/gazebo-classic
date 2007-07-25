@@ -285,6 +285,8 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Load a model
 Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 {
   Pose3d pose;

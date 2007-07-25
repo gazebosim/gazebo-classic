@@ -91,6 +91,7 @@ int Model::Load(XMLConfigNode *node)
     gzthrow(stream.str());
   }
 
+
   if (this->canonicalBodyName.empty())
   {
     this->canonicalBodyName = this->bodies.begin()->first;
@@ -282,7 +283,7 @@ const Pose3d &Model::GetPose() const
 Body *Model::CreateBody()
 {
   // Create a new body
-  return World::Instance()->GetPhysicsEngine()->CreateBody(this);
+  return World::Instance()->GetPhysicsEngine()->CreateBody(this); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -538,7 +539,6 @@ void Model::LoadRenderable(XMLConfigNode *node)
 void Model::LoadPhysical(XMLConfigNode *node)
 {
   XMLConfigNode *childNode = NULL;
-
 
   // Load the bodies
   childNode = node->GetChildByNSPrefix("body");

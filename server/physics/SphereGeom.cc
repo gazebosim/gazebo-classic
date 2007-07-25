@@ -42,7 +42,7 @@ SphereGeom::SphereGeom(Body *body, double radius, double density, const std::str
   dMassSetSphere(&this->mass, density, radius);
 
   // Create the sphere geometry
-  this->SetGeom(dCreateSphere( 0, radius ), true);
+  this->SetGeom(dCreateSphere(0, radius ), true);
 
   // Get the sphere mesh
   if (meshName.empty() || meshName == "default")
@@ -55,8 +55,6 @@ SphereGeom::SphereGeom(Body *body, double radius, double density, const std::str
 
   // Allow the sphere to cast shadows
   this->SetCastShadows(true);
-   
-  return;
 }
 
 

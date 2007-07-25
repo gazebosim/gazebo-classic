@@ -49,7 +49,7 @@ PlaneGeom::PlaneGeom(Body *body, Vector3 normal, const Vector2 &size,
 
   // Create an ODE plane geom
   // This geom is not placable
-  this->SetGeom(dCreatePlane(this->body->spaceId, normal.x, normal.y, normal.z, altitude),false);
+  this->SetGeom(dCreatePlane(this->spaceId, normal.x, normal.y, normal.z, altitude),false);
 
   Ogre::Plane plane(Ogre::Vector3(normal.y, normal.z, normal.x), 0);
 

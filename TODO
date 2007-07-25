@@ -1,16 +1,12 @@
 Open:
+- Move Sensors out of Body
 - Pioneer2DX
-- BSP loader
-
 - Laser retro and fiducial detection
 - Truth
 - Factory
-
 - FLTK interface
 - GPS 
 - WiFi
-- Multilevel map extruder
-- Move Sensors out of Body
 
 - Write install instructions
 - Write keyboard mappings
@@ -19,6 +15,12 @@ Open:
 - Write a tutorial for creating new controllers
 - Write a tutorial for creating new sensors
 - Write a tutorial for creating a new world
+
+- BSP loader
+- Multilevel map extruder
+
+- Use dCylinder and dCapsule ODE objects
+- Add spring force between bodies of a model to keep the together. See ODE example test_joints.cpp
 
 -run gprof, and valgrind
 
@@ -53,14 +55,16 @@ Open:
 
 
 Completed:
--Laser and Camera Interfaces
--Pose3d Interface. Thanks Toby
--Lights, and global ambient
--Enable/disable sky box, and set material
--New Coordinate system
+- Laser and Camera Interfaces
+- Pose3d Interface. Thanks Toby
+- Lights, and global ambient
+- Enable/disable sky box, and set material
+- New Coordinate system
 - Pause and step simulation
 - Set the screen size
 - Toggle HUD display using tab
 - Help overlay
 - Show simTime, realTime, pauseTime
 - XML include
+- Check for player.
+- Trimesh 

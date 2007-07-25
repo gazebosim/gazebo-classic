@@ -48,7 +48,7 @@ Geom::~Geom()
 // Set the encapsulated geometry object
 void Geom::SetGeom(dGeomID geomId, bool placeable)
 {
-  assert(!this->geomId);
+  //assert(!this->geomId);
 
   this->placeable = placeable;
 
@@ -57,11 +57,13 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 
   if (this->placeable)
   {
-    this->transId = dCreateGeomTransform( this->spaceId );
-    dGeomTransformSetGeom( this->transId, this->geomId );
-    dGeomTransformSetInfo( this->transId, 1 );
-
-    assert(dGeomGetSpace(this->geomId) == 0);
+    if (dGeomGetClass(geomId) != dTriMeshClass)
+    {
+      this->transId = dCreateGeomTransform( this->spaceId );
+      dGeomTransformSetGeom( this->transId, this->geomId );
+      dGeomTransformSetInfo( this->transId, 1 );
+      assert(dGeomGetSpace(this->geomId) == 0);
+    }
   }
   else
     assert(dGeomGetSpace(this->geomId) != 0);
@@ -140,6 +142,7 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
 
     if (updateCoM)
       this->body->UpdateCoM();
+
   }
 }
 
@@ -208,16 +211,6 @@ void Geom::SetRotation(const Quatern &rot)
 void Geom::AttachMesh(const std::string &meshName)
 {
   this->ogreObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName().c_str(), meshName));
-
-  /*Ogre::EdgeData *edgeData = this->ogreObj->getEdgeData();
-  std::vector<Ogre::Triangle>::iterator tIter;
-
-  for (tIter = edgeData->triangles.begin(); tIter != edgeData->triangle.end();
-      tIter++)
-  {
-
-  }
-  */
 
   this->sceneNode->attachObject((Ogre::Entity*)this->ogreObj);
 }
@@ -305,7 +298,7 @@ const dMass *Geom::GetBodyMassMatrix()
   dQtoR(q,r);
 
   this->bodyMass = this->mass;
-  dMassRotate(&bodyMass, r);
+  dMassRotate(&this->bodyMass, r);
   dMassTranslate( &this->bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
 
   return &this->bodyMass;

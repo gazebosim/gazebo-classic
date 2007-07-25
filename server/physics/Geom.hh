@@ -27,11 +27,14 @@ class Geom : public Entity
   /// \brief Constructor
   public: Geom(Body *body);
 
-   /// \brief Destructor
+  /// \brief Destructor
   public: virtual ~Geom();
 
-  // \brief Set the encapsulated geometry object
+  /// \brief Set the encapsulated geometry object
   public: void SetGeom(dGeomID geomId, bool placeable);
+
+  /// \brief Update function for geoms
+  public: virtual void Update() {}
 
   /// \brief Return the geom id
   /// \return The geom id

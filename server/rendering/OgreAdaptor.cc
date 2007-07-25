@@ -77,6 +77,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
     gzthrow( "missing OGRE Rendernig information" );
   }
 
+
   ambient.r = node->GetTupleDouble("ambient",0,0);
   ambient.g = node->GetTupleDouble("ambient",1,0);
   ambient.b = node->GetTupleDouble("ambient",2,0);
@@ -102,6 +103,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   // Default background color
   this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::Black);
 
+
   // Load all the plugins
   this->LoadPlugins(node->GetChild("plugins"));
 
@@ -115,8 +117,8 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->window = this->root->initialise(true); 
 
   // Get the SceneManager, in this case a generic one
-  this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
-  //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+  //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
+  this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
@@ -165,7 +167,6 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener();
-
   this->root->addFrameListener(this->frameListener);
 
   // Create the default camera. This camera is only used to view the output
@@ -178,9 +179,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 
-
-
-  Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
+  /*Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
   Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node"); 
 
   Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material","debugger"); 
@@ -200,14 +199,16 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   // etc 
   myManualObject->end(); 
   myManualObjectNode->attachObject(myManualObject);
+  */
 
+  //this->sceneMgr->setWorldGeometry("terrain.cfg");
 }
 
 void OgreAdaptor::Init(Display *display, 
                        XVisualInfo *visual, 
                        Window windowId, int width, int height)
 {
-  Ogre::NameValuePairList params;
+/*  Ogre::NameValuePairList params;
   Ogre::StringVector paramsVector;
 
   this->display = display;
@@ -249,6 +250,7 @@ void OgreAdaptor::Init(Display *display,
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener();
   this->root->addFrameListener(this->frameListener);
+  */
 }
 
 void OgreAdaptor::SetupResources(XMLConfigNode *node)
@@ -330,13 +332,12 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     selectedRenderSystem->setConfigOption("Full Screen","No");
     selectedRenderSystem->setConfigOption("FSAA","2");
 
-    if (create)
+    if (create && this->videoMode != "None")
     {
-      //selectedRenderSystem->setConfigOption("Video Mode","640 x 480 @ 16-bit colour");
       selectedRenderSystem->setConfigOption("Video Mode",this->videoMode);
+      this->root->setRenderSystem(selectedRenderSystem);
     }
 
-    this->root->setRenderSystem(selectedRenderSystem);
   }
 }
 
@@ -497,7 +498,7 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
 {
   Ogre::Camera *camera;
   Ogre::Viewport *cviewport;
- 
+
 
   camera = this->sceneMgr->createCamera(name);
 
@@ -513,4 +514,5 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
   camera->setAspectRatio(
       Ogre::Real(cviewport->getActualWidth()) / 
       Ogre::Real(cviewport->getActualHeight()) );
+
 }

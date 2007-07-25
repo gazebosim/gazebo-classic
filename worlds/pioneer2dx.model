@@ -81,7 +81,7 @@
   <anchor>left_wheel</anchor>
   <axis>0 1 0</axis>
   <erp>0.4</erp>
-  <cfm>0.8</cfm>
+  <cfm>0.008</cfm>
 </joint:hinge>
 
 <joint:hinge name="right_wheel_hinge">
@@ -90,7 +90,7 @@
   <anchor>right_wheel</anchor>
   <axis>0 1 0</axis>
   <erp>0.4</erp>
-  <cfm>0.8</cfm>
+  <cfm>0.008</cfm>
 </joint:hinge>
 
 <joint:ball name="ball_joint">
@@ -98,7 +98,7 @@
   <body2>chassis_body</body2>
   <anchor>castor_body</anchor>
   <erp>0.4</erp>
-  <cfm>0.8</cfm>
+  <cfm>0.008</cfm>
 </joint:ball>
 
 </model:physical>
