@@ -283,7 +283,7 @@ unsigned int CameraSensor::GetTextureHeight() const
 // Get the image size in bytes
 size_t CameraSensor::GetImageByteSize() const
 {
-  this->imageHeight * this->imageWidth * 3;
+  return this->imageHeight * this->imageWidth * 3;
 }
 
 //////////////////////////////////////////////////////////////////////////////
