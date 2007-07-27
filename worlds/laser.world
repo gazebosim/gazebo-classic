@@ -37,14 +37,14 @@
     </video>
 
 
-    <plugins path="/usr/local/lib/OGRE">
+    <plugins path="/home/nate/local/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
       <plugin>Plugin_BSPSceneManager.so</plugin>
       <plugin>Plugin_OctreeSceneManager.so</plugin>
     </plugins>
 
-    <resources path="/usr/local/share/gazebo">
+    <resources path="/home/nate/local/share/gazebo">
       <bootstrap>
         <zip>Media/packs/OgreCore.zip</zip>
       </bootstrap>
@@ -105,7 +105,7 @@
     </body:plane>
   </model:physical>
 
- <model:physical name="cam1_model">
+  <model:physical name="cam1_model">
     <xyz>0 3 4</xyz>
     <rpy>0 -30 0</rpy>
     <static>true</static>

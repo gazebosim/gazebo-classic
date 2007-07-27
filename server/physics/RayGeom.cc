@@ -134,7 +134,8 @@ void RayGeom::GetGlobalPoints(Vector3 &posA, Vector3 &posB)
 // Set the length of the ray
 void RayGeom::SetLength( const double len )
 {
-  dGeomRaySetLength( this->geomId, len );
+  //dGeomRaySetLength( this->geomId, len );
+  this->contactLen=len;
 
   Vector3 dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
@@ -148,5 +149,6 @@ void RayGeom::SetLength( const double len )
 // Get the length of the ray
 double RayGeom::GetLength() const
 {
-  return dGeomRayGetLength( this->geomId );
+  return this->contactLen;
+  //return dGeomRayGetLength( this->geomId );
 }

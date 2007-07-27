@@ -106,7 +106,6 @@ home directory, or to the log file specified with the -l command line option.
 
 #include "Global.hh"
 #include "XMLConfig.hh"
-#include "ModelFactory.hh"
 #include "SensorFactory.hh"
 #include "IfaceFactory.hh"
 #include "ControllerFactory.hh"

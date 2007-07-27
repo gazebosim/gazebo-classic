@@ -26,6 +26,7 @@
 
 #include <assert.h>
 
+#include "RayGeom.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
@@ -137,7 +138,8 @@ void ODEPhysics::AddEntity(Entity *entity)
   // Only the top level parent should have a new space
   if (entity->GetParent() == NULL)
   {
-    entity->spaceId = this->spaceId;//dSimpleSpaceCreate(this->spaceId);
+    //entity->spaceId = this->spaceId;
+    entity->spaceId = dSimpleSpaceCreate(this->spaceId);
   }
   else
   {
@@ -193,24 +195,37 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   dBodyID b2 = dGeomGetBody(o2);
   if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact)) return;
 
-  dContact contact[64];   // up to MAX_CONTACTS contacts per box-box
-  for (i=0; i<64; i++) {
-    contact[i].surface.mode = dContactBounce | dContactSoftCFM;
-    contact[i].surface.mu = dInfinity;
-    contact[i].surface.mu2 = 0;
-    contact[i].surface.bounce = 0.1;
-    contact[i].surface.bounce_vel = 0.1;
-    contact[i].surface.soft_cfm = 0.01;
-  }
-
-  if (int numc = dCollide (o1,o2,64,&contact[0].geom, sizeof(dContact)))
+  // Check if either are spaces
+  if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
   {
-    for (i=0; i<numc; i++)
+    dSpaceCollide2(o1, o2, self, &CollisionCallback);
+  }
+  else
+  {
+    // up to MAX_CONTACTS contacts per box-box
+    dContact contacts[64];
+    int numc = 0;
+
+    for (i=0; i<64; i++) 
     {
-      dJointID c = dJointCreateContact (self->worldId,self->contactGroup,contact+i);
-      dJointAttach (c,b1,b2);
+      contacts[i].surface.mode = dContactBounce | dContactSoftCFM;
+      contacts[i].surface.mu = dInfinity;
+      contacts[i].surface.mu2 = 0;
+      contacts[i].surface.bounce = 0.1;
+      contacts[i].surface.bounce_vel = 0.1;
+      contacts[i].surface.soft_cfm = 0.01;
     }
 
+    if (numc = dCollide (o1,o2,64,&contacts[0].geom, sizeof(dContact)))
+    {
+      for (i=0; i<numc; i++)
+      {
+        dJointID c = dJointCreateContact (self->worldId,
+            self->contactGroup, contacts+i);
+        dJointAttach (c,b1,b2);
+      }
+
+    }
   }
 }
       

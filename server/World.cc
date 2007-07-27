@@ -28,7 +28,6 @@
 #include <sstream>
 #include <sys/time.h>
 
-#include "SensorFactory.hh"
 #include "OgreDynamicLines.hh"
 #include "Global.hh"
 #include "OgreSimpleShape.hh"
@@ -39,8 +38,6 @@
 #include "ODEPhysics.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
-#include "Sensor.hh"
-#include "ModelFactory.hh"
 #include "gazebo.h"
 #include "UpdateParams.hh"
 #include "World.hh"
@@ -68,7 +65,6 @@ World::World()
 // Private destructor
 World::~World()
 {
-  std::vector< Sensor* >::iterator siter;
   std::vector< Model* >::iterator miter;
 
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
@@ -76,13 +72,6 @@ World::~World()
     delete (*miter);
   }
   this->models.clear();
-
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-  {
-    delete (*siter);
-  }
-  this->sensors.clear();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,18 +128,11 @@ void World::Load(XMLConfig *config, int serverId)
 int World::Init()
 {
   std::vector< Model* >::iterator miter;
-  std::vector< Sensor* >::iterator siter;
 
   // Init all models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     (*miter)->Init();
-  }
-
-  // Init all sensors
-  for (siter=this->sensors.begin(); siter!=this->sensors.end(); siter++)
-  {
-    (*siter)->Init();
   }
 
   // Set initial simulator state
@@ -170,7 +152,6 @@ int World::Update()
 {
   UpdateParams params;
   std::vector< Model* >::iterator miter;
-  std::vector< Sensor* >::iterator siter;
 
   this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime = this->physicsEngine->GetStepTime();
@@ -179,12 +160,6 @@ int World::Update()
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     (*miter)->Update(params);
-  }
-
-  // Update all the sensors
-  for (siter=this->sensors.begin(); siter!=this->sensors.end(); siter++)
-  {
-    (*siter)->Update(params);
   }
 
   // Update the physics engine
@@ -200,6 +175,7 @@ int World::Update()
   {
     this->pauseTime += this->physicsEngine->GetStepTime();
   }
+
 
   // Update the rendering engine
   OgreAdaptor::Instance()->Render();
@@ -218,18 +194,11 @@ int World::Update()
 int World::Fini()
 {
   std::vector< Model* >::iterator miter;
-  std::vector< Sensor* >::iterator siter;
 
   // Finalize the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     (*miter)->Fini();
-  }
-
-  // Finalize the models
-  for (siter=this->sensors.begin(); siter!=this->sensors.end(); siter++)
-  {
-    (*siter)->Fini();
   }
 
   this->physicsEngine->Fini();
@@ -308,10 +277,6 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
     {
       model = this->LoadModel(node, parent);
     }
-    else if (node->GetNSPrefix() == "sensor")
-    {
-      this->LoadSensor(node, parent);
-    }
   }
 
   // Load children
@@ -385,39 +350,6 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   return model;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Load a sensor
-Sensor *World::LoadSensor(XMLConfigNode *node, Model *parent)
-{
-  std::ostringstream stream;
-  Sensor *sensor = NULL;
-
-  if (parent == NULL)
-  {
-    stream << "Null Parent Model. A Sensor must exist within a Model.\n";
-    gzthrow(stream.str());
-  }
-
-  if (node==NULL)
-  {
-    stream << "Null node pointer. Invalid sensor in the world file.";
-    gzthrow(stream.str());
-  }
-
-  sensor = SensorFactory::NewSensor(node->GetName(), parent->GetCanonicalBody());
-
-  if (sensor)
-  {
-    sensor->Load(node);
-    this->sensors.push_back(sensor);
-  }
-  else
-  {
-    std::ostringstream stream;
-    stream << "Null sensor. Invalid sensor name[" << node->GetName() << "]";
-    gzthrow(stream.str());
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the model pose and the pose of it's attached children 

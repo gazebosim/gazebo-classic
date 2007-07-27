@@ -2,6 +2,8 @@
 
 <model:physical name="default_sicklms200_model"
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
@@ -9,6 +11,7 @@
   >
   <xyz>0 0.0 0.1</xyz>
   <rpy>0 0 0</rpy>
+  <canonicalBody>laser_body</canonicalBody>
 
   <body:box name="laser_body">
     <xyz>0.0 0.0 0.0</xyz>
@@ -39,6 +42,7 @@
     </sensor:ray>
 
   </body:box>
+
 </model:physical>
 
 

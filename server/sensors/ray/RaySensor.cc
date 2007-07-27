@@ -84,12 +84,11 @@ void RaySensor::LoadChild(XMLConfigNode *node)
   this->superSpaceId = dSimpleSpaceCreate( 0 );
     
   // Create a space to contain all the rays
-  this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
+  //this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
   
   // Set collision bits
- /* dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
-  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
-  */
+  //dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
+  //dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
 
   this->body->spaceId = this->superSpaceId;
 
@@ -120,9 +119,8 @@ void RaySensor::InitChild()
     ray = new RayGeom(this->body);
 
     ray->SetPoints(start, end);
-/*    ray->SetCategoryBits( GZ_LASER_COLLIDE );
-    ray->SetCollideBits( ~GZ_LASER_COLLIDE );
-    */
+//    ray->SetCategoryBits( GZ_LASER_COLLIDE );
+    //ray->SetCollideBits( ~GZ_LASER_COLLIDE );
 
     this->rays.push_back(ray);
 
@@ -196,7 +194,7 @@ double RaySensor::GetRange(int index)
            << this->rays.size() << "]";
     gzthrow(stream.str());
   }
- 
+
   return this->rays[index]->GetLength();
 }
 

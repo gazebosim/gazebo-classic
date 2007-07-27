@@ -19,7 +19,7 @@ namespace Ogre
 namespace gazebo
 {
   class Geom;
-  //class Sensor;
+  class Sensor;
 
 /// Body class
 class Body : public Entity
@@ -94,13 +94,13 @@ class Body : public Entity
 
   /// Load a new sensor
   /// \param node XMLConfigNode used to load the geom
-  //private: void LoadSensor(XMLConfigNode *node);
+  private: void LoadSensor(XMLConfigNode *node);
 
   /// List of geometries attached to this body
   private: std::vector< Geom* > geoms;
 
   /// List of attached sensors
-  //private: std::vector< Sensor* > sensors;
+  private: std::vector< Sensor* > sensors;
 
   /// ODE body handle
   private: dBodyID bodyId;
