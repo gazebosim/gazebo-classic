@@ -1,6 +1,7 @@
 import os
 
 Import('env prefix staticObjs sharedObjs')
+install_prefix = env['DESTDIR'] + '/' + prefix
 
 sources = ['GazeboDriver.cc',
            'GazeboClient.cc',
@@ -23,5 +24,5 @@ sharedPlayerObjs.append(sharedObjs);
 sharedLib = env.SharedLibrary('gazeboplugin', sharedPlayerObjs)
 staticLib = env.StaticLibrary('gazeboplugin', staticPlayerObjs)
 
-env.Install(prefix+'/lib', sharedLib)
-env.Install(prefix+'/lib', staticLib)
+env.Install(install_prefix+'/lib', sharedLib)
+env.Install(install_prefix+'/lib', staticLib)

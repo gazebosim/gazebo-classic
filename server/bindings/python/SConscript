@@ -1,5 +1,6 @@
 #Import variable
 Import('env prefix staticObjs sharedObjs')
+install_prefix = env['DESTDIR'] + '/' + prefix
 
 #env = Environment (
 #  CC = 'g++',
@@ -26,4 +27,4 @@ objs.append(env.SharedObject(sources))
 
 lib = env.SharedLibrary('mygazebo', objs, LIBS=['gazebo', 'boost_python'], LIBPATH=['#/libgazebo'])
 
-env.Install(prefix+'lib/python2.4/site-packages',lib)
+env.Install(install_prefix+'lib/python2.4/site-packages',lib)

@@ -1,5 +1,7 @@
 #Import variable
 Import('env prefix')
+install_prefix = env['DESTDIR'] + '/' + prefix
+
 
 sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc')
 headers = Split('gazebo.h IfaceFactory.hh')
@@ -7,6 +9,6 @@ headers = Split('gazebo.h IfaceFactory.hh')
 sharedLib = env.SharedLibrary('gazebo', sources)
 staticLib = env.StaticLibrary('gazebo', sources)
 
-env.Install(prefix+'/lib', sharedLib)
-env.Install(prefix+'/lib', staticLib)
-env.Install(prefix+'/include/gazebo', headers)
+env.Install(install_prefix+'/lib', sharedLib)
+env.Install(install_prefix+'/lib', staticLib)
+env.Install(install_prefix+'/include/gazebo', headers)

@@ -4,8 +4,6 @@ import time
 
 version = '0.8'
 
-prefix = ARGUMENTS.get('prefix','/usr/local')
-
 # TESTING:
 #odeTestBuild = Builder(action="echo g++ -o $TARGET $_CPPINCFLAGS $SOURCE $_LIBDIRFLAGS $_LIBFLAGS >> /tmp/natedogg")
 
@@ -17,6 +15,10 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
       	      'ode-config --cflags --libs',
 	            'pkg-config --cflags --libs OIS']
 	            #'python-config --cflags --libs']
+
+opts = Options()
+#opts.Add('PREFIX', 'The install path "prefix"', '/usr/local')
+opts.Add('DESTDIR', 'The root directory to install into. Useful mainly for binary package building', '/')
 
 env = Environment (
   CC = 'g++',
@@ -43,9 +45,12 @@ env = Environment (
     LIBPATH=Split('#libgazebo'),
     
     #LIBS=Split('gazebo boost_python')
-    LIBS=Split('gazebo')
+    LIBS=Split('gazebo'),
+	options=opts
 )
 
+prefix = ARGUMENTS.get('prefix','/usr/local')
+install_prefix = env['DESTDIR'] + '/' + prefix
 # TESTING:
 #env.Append(BUILDERS = {'odeTestBuild' : odeTestBuild})
 
@@ -153,10 +158,8 @@ libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
 #
 # Install gazebo
 #
-env.Install(prefix+'/bin',gazebo)
-env.Install(prefix+'/share/gazebo','Media')
-
-env.Alias('install', prefix)
-
-env.Install(prefix+'/lib',libgazeboServerStatic )
-env.Install(prefix+'/lib',libgazeboServerShared )
+env.Alias('install', install_prefix)
+env.Install(install_prefix+'/bin',gazebo)
+env.Install(install_prefix+'/share/gazebo','Media')
+env.Install(install_prefix+'/lib',libgazeboServerStatic )
+env.Install(install_prefix+'/lib',libgazeboServerShared )
