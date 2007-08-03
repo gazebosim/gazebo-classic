@@ -37,9 +37,8 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sstream>
+#include <iostream>
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
 #include "gazebo.h"
 
 using namespace gazebo;
@@ -69,7 +68,6 @@ void Server::Init(int serverId, int force)
 {
   char *tmpdir;
   char *user;
-  char filename[128];
   std::ostringstream stream;
   std::ostringstream errStream;
 
@@ -92,7 +90,7 @@ void Server::Init(int serverId, int force)
   stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
   this->filename = stream.str();
 
-  gzmsg(5) << "creating " << this->filename << "\n";
+  std::cout << "creating " << this->filename << "\n";
   
   // Create the directory
   if (mkdir(this->filename.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
@@ -102,13 +100,13 @@ void Server::Init(int serverId, int force)
       errStream << "directory [" <<  this->filename
                 <<  "] already exists (previous crash?)"
                 << "remove the directory and re-run gazebo";
-      gzthrow(errStream.str());
+      throw(errStream.str());
     }
     else
     {    
       errStream << "failed to create [" << this->filename << "] : [" 
                 <<  strerror(errno) << "]";
-      gzthrow(errStream.str());
+      throw(errStream.str());
     }
   }
 }
@@ -120,12 +118,12 @@ void Server::Fini()
 {
   char cmd[1024];
   
-  gzmsg(5) << "deleting " << this->filename << "\n";
+  std::cout << "deleting " << this->filename << "\n";
   
   // Delete the server dir
   if (rmdir(this->filename.c_str()) != 0)
   {
-    gzmsg(0) << "failed to cleanly remove [" << this->filename 
+    std::cout << "failed to cleanly remove [" << this->filename 
              << "] : [" << strerror(errno) << "]\n";
 
     snprintf(cmd, sizeof(cmd), "rm -rf %s", this->filename.c_str());
@@ -175,7 +173,7 @@ void Server::SemInit(int force)
              << "or use the -f flag if you definitely want to use this id.";
     }
 
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
   // Set initial semaphore values
@@ -186,7 +184,7 @@ void Server::SemInit(int force)
   if (semctl(this->semId, 0, SETALL, arg) < 0)
   {
     stream << "failed to initialize semaphore [" <<  strerror(errno) << "]";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }
 
@@ -201,7 +199,7 @@ void Server::SemFini()
   {
     std::ostringstream stream;
     stream << "failed to deallocate semaphore [" << strerror(errno) << "]";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }
 
@@ -223,6 +221,6 @@ void Server::SemPost()
   {
     std::ostringstream stream;
     stream << "failed to initialize semaphore [" << strerror(errno) << "]";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }

@@ -1,5 +1,33 @@
 #Import variable
-Import('env install_prefix')
+Import('install_prefix version')
+
+#
+# Create the pkg-config file
+#
+def createPkgConfig(target,source, env):
+  f = open(str(target[0]), 'wb')
+  prefix = source[0].get_contents()
+  f.write('prefix=' + prefix + '\n')
+  f.write('Name: gazebo\n')
+  f.write('Description: Simplified interface to Player\n')
+  f.write('Version:' + version + '\n')
+  f.write('Requires:\n')
+  f.write('Libs: -L' + prefix + '/lib -lgazebo\n')
+  f.write('Cflags: -I' + prefix + '/include\n')
+
+
+#
+# setup a special build environment for libgazebo. Do this so we can control
+# what libgazebo depends upon
+#
+env = Environment (
+  CC = 'g++',
+  CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+)
+
+env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
+pkgconfig = env.PkgConfig(target='libgazebo.pc', source=Value(install_prefix))
+env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
 
 sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc')
 headers = Split('gazebo.h IfaceFactory.hh')

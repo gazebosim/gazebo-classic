@@ -37,9 +37,8 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sstream>
+#include <iostream>
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
 #include "gazebo.h"
 
 
@@ -84,7 +83,7 @@ void Client::ConnectWait(int serverId, int clientId)
   if (clientId >= 0 && clientId >= 16)
   {
     stream << "invalid client ID [" << clientId << "]";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
   
   this->serverId = serverId;
@@ -111,14 +110,14 @@ void Client::ConnectWait(int serverId, int clientId)
 
   this->filename = stream.str();
   
-  gzmsg(1) << "opening " << this->filename << "\n";
+  std::cout << "opening " << this->filename << "\n";
 }
 
 
 // Disconnect from the server
 void Client::Disconnect()
 {
-  gzmsg(1) << "closing " << this->filename << "\n";
+  std::cout << "closing " << this->filename << "\n";
 
   // Finalize semaphores
   if (this->clientId >= 0)
@@ -148,12 +147,12 @@ void Client::SemQuery(int serverId)
     // No semaphore, so no server
     if (errno == ENOENT)
     {
-      gzthrow("No semphaore, so no server");
+      throw("No semphaore, so no server");
     }
 
     // Ooops, some kind of error
     stream << "failed to query semaphore [" << strerror(errno) << "]";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
 }
@@ -172,7 +171,7 @@ void Client::SemInit()
     std::ostringstream stream;
     stream << "Failed to allocate semaphore [" << strerror(errno) << "]\n"
            << "The server does not appear to be running";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }
 
@@ -194,7 +193,7 @@ void Client::SemWait()
   {
     std::ostringstream stream;
     stream << "error on semaphore wait [" << strerror(errno) << "]";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }
 

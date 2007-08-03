@@ -11,6 +11,8 @@ Open:
 - Write a tutorial for creating new sensors
 - Write a tutorial for creating a new world
 
+- Create libraries so that it's easy to include the core of gazebo without linking in Ogre, fltk, etc, etc. 
+
 - Heightmaps
 - BSP loader
 

@@ -42,8 +42,6 @@
 #include <sstream>
 
 #include "gazebo.h"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
 
 using namespace gazebo;
 
@@ -109,14 +107,14 @@ void Iface::Create(Server *server, std::string id)
   if (id.empty())
   {
     stream << "interface [" << this->type << "] id is NULL";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
   // We cannot have id with '.'
   if (strchr(id.c_str(), '.'))
   {
     stream << "invalid id [" << id << "] (must not contain '.')";
-    gzthrow(stream.str());
+    throw(stream.str());
   }
   
   // Work out the filename
@@ -128,14 +126,14 @@ void Iface::Create(Server *server, std::string id)
   if (this->mmapFd < 0)
   {
     stream << "error creating mmap file: " << strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
   // Set the file to the correct size
   if (ftruncate(this->mmapFd, this->size) < 0)
   {
     stream << "error setting size of mmap file: " << strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
   // Map the file into memory
@@ -144,7 +142,7 @@ void Iface::Create(Server *server, std::string id)
   if (this->mMap == MAP_FAILED)
   {
     stream << "error mapping mmap file: " <<  strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
   memset(this->mMap, 0, this->size);
@@ -155,7 +153,7 @@ void Iface::Create(Server *server, std::string id)
   std::ios_base::fmtflags origFlags = std::cout.flags();
 
   // Print the name, version info
-  gzmsg(5) << "creating " << this->filename.c_str() << " " 
+  std::cout << "creating " << this->filename.c_str() << " " 
 
            << setiosflags(std::ios::hex | std::ios::showbase) 
            << std::setw(3) << ((Iface*) this->mMap)->version << " " 
@@ -201,13 +199,13 @@ void Iface::Destroy()
   this->mmapFd = 0;
 
   // Delete the file
-  gzmsg(5) <<  "deleting "<< this->filename << "\n";
+  std::cout <<  "deleting "<< this->filename << "\n";
 
   if (unlink(this->filename.c_str()))
   {
     std::ostringstream stream;
     stream << "error deleting mmap file: " << strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }
 
@@ -229,7 +227,7 @@ void Iface::Open(Client *client, std::string id)
   {
     stream << "error opening device file " <<  this->filename.c_str() << " : " 
            << strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
   // Map the mmap file
@@ -238,7 +236,7 @@ void Iface::Open(Client *client, std::string id)
   if (this->mMap == MAP_FAILED)
   {
     stream << "error mapping device file: " << strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }    
 
   // Make sure everything is consistent
@@ -247,13 +245,13 @@ void Iface::Open(Client *client, std::string id)
     stream << "expected file size: " << ((Iface*) this->mMap)->size 
            << " < " <<  this->size;
 
-    gzthrow(stream.str());
+    throw(stream.str());
   }
  
   std::ios_base::fmtflags origFlags = std::cout.flags();
 
   // Print the name, version info
-  gzmsg(5) << "opening " << this->filename.c_str() << " "
+  std::cout << "opening " << this->filename.c_str() << " "
 
            << std::setiosflags(std::ios::hex | std::ios::showbase) 
            << std::setw(3) << ((Iface*) this->mMap)->version << " "
@@ -274,14 +272,14 @@ void Iface::Close()
   this->mMap = NULL;
 
   // Close the file
-  gzmsg(5) <<  "closing " <<  this->filename << "\n";
+  std::cout <<  "closing " <<  this->filename << "\n";
   close(this->mmapFd);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Lock the interface.
-void Iface::Lock(int blocking)
+void Iface::Lock(int /*blocking*/)
 {
   // Some 2.4 kernels seem to screw up the lock count somehow; keep an eye out
   
@@ -292,7 +290,7 @@ void Iface::Lock(int blocking)
   {
     std::ostringstream stream;
     stream << "flock " <<  this->filename.c_str() << "error: " <<  strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }
 
@@ -307,7 +305,7 @@ void Iface::Unlock()
   {
     std::ostringstream stream;
     stream << "flock error: " <<  strerror(errno);
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 }
 

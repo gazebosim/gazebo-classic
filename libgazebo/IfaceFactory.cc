@@ -25,8 +25,9 @@
  * SVN info: $Id$
  */
 
+#include <sstream>
+
 #include "gazebo.h"
-#include "GazeboError.hh"
 #include "IfaceFactory.hh"
 
 using namespace gazebo;
@@ -73,7 +74,7 @@ Iface *IfaceFactory::NewIface(const std::string &classname)
   {
     std::ostringstream stream;
     stream << "Unable to make interface of type " << classname;
-    gzthrow(stream.str());
+    throw(stream.str());
   }
 
 

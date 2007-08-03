@@ -34,7 +34,7 @@ def CheckODELib(context):
 #
 # Create the pkg-config file
 #
-def createPkgConfig(target, source, env):
+def createPkgConfig(target,source, env):
   f = open(str(target[0]), 'wb')
   prefix = source[0].get_contents()
   f.write('prefix=' + prefix + '\n')
@@ -42,10 +42,9 @@ def createPkgConfig(target, source, env):
   f.write('Description: Simplified interface to Player\n')
   f.write('Version:' + version + '\n')
   f.write('Requires:\n')
-  f.write('Libs: -L' + prefix + '/lib -lgazebo -lgazeboServer\n')
+  f.write('Libs: -L' + prefix + '/lib -lgazeboServer\n')
   f.write('Cflags: -I' + prefix + '/include\n')
-
-  
+ 
 #
 # 3rd party packages
 #
@@ -69,6 +68,7 @@ env = Environment (
    '#.', 
    '#server',
    '#server/models',
+   '#server/gui',
    '#server/gui/fltk',
    '#libgazebo', 
    '#server/rendering',
@@ -95,8 +95,9 @@ Help(opts.GenerateHelpText(env))
 install_prefix = env['destdir'] + '/' + env['prefix']
 
 env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
-pkgconfig = env.PkgConfig(target='gazebo.pc', source=Value(env['prefix']))
+pkgconfig = env.PkgConfig(target='libgazeboServer.pc', source=Value(install_prefix))
 env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
+
 
 
 # DEFAULT list of subdirectories to build
@@ -167,10 +168,10 @@ for subdir in subdirs:
 gazebo = env.Program('gazebo',staticObjs)
 
 #
-# Create static and shared libraries
+# Create static and shared libraries for the server
 #
-libgazeboServerStatic = env.StaticLibrary('gazeboServer',staticObjs)
-libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
+libgazeboServerStatic = env.StaticLibrary('gazeboServer', staticObjs)
+libgazeboServerShared = env.SharedLibrary('gazeboServer', sharedObjs)
 
 #
 # Install gazebo
@@ -178,6 +179,8 @@ libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
 env.Alias('install', install_prefix)
 env.Install(install_prefix+'/bin',gazebo)
 env.Install(install_prefix+'/share/gazebo','Media')
+env.Install(install_prefix+'/include/gazebo',headers)
 env.Install(install_prefix+'/lib',libgazeboServerStatic )
 env.Install(install_prefix+'/lib',libgazeboServerShared )
-env.Install(install_prefix+'/include/gazebo',headers)
+
+
