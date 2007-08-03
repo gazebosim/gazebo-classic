@@ -1,7 +1,7 @@
 #Import variable
 Import('env staticObjs sharedObjs')
 
-sources = Split('FLTKWindow.cc')
+sources = Split('FLTKGui.cc')
 
 staticObjs.append(env.StaticObject(sources))
 sharedObjs.append(env.SharedObject(sources))

@@ -2,29 +2,62 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
+#include "GuiFactory.hh"
 #include "OgreAdaptor.hh"
-#include "FLTKWindow.hh"
+#include "FLTKGui.hh"
 
 using namespace gazebo;
 
-FLTKWindow::FLTKWindow(int x, int y, int w, int h, const char* label) 
-  : Fl_Window( x, y, w, h, label )
+GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
+
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
+FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label) 
+  : Gui(), Fl_Window( x, y, w, h, label.c_str() )
 {
 }
 
 
-FLTKWindow::~FLTKWindow()
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
+FLTKGui::~FLTKGui()
 {
 }
 
-
-void FLTKWindow::show()
+////////////////////////////////////////////////////////////////////////////////
+// Init
+void FLTKGui::Init()
 {
   this->OpenDisplay();
+
   Fl_Window::show();
 }
 
-void FLTKWindow::OpenDisplay()
+////////////////////////////////////////////////////////////////////////////////
+// Update
+void FLTKGui::Update()
+{
+  this->draw();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the width of the gui's rendering window
+unsigned int FLTKGui::GetWidth() const
+{
+  return this->w();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the height of the gui's rendering window
+unsigned int FLTKGui::GetHeight() const
+{
+  return this->h();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Open the display
+void FLTKGui::OpenDisplay()
 {
   XSetWindowAttributes swa;
   int attrCount;
@@ -65,17 +98,21 @@ void FLTKWindow::OpenDisplay()
   Fl_X::set_xid((Fl_Window*)(this), this->windowId);
 }
 
-void FLTKWindow::draw()
+////////////////////////////////////////////////////////////////////////////////
+// Render the scene
+void FLTKGui::draw()
 {
   OgreAdaptor::Instance()->Render();
 }
 
-void FLTKWindow::flush()
+////////////////////////////////////////////////////////////////////////////////
+// Flush by drawing
+void FLTKGui::flush()
 {
   this->draw();
 }
 
-/*int FLTKWindow::handle(int event)
+/*int FLTKGui::handle(int event)
 {
   switch (event)
   {
@@ -93,17 +130,17 @@ void FLTKWindow::flush()
   }
 }
 
-int FLTKWindow::HandlePush()
+int FLTKGui::HandlePush()
 {
   return 1;
 }
 
-int FLTKWindow::HandleDrag()
+int FLTKGui::HandleDrag()
 {
   return 1;
 }
 
-int FLTKWindow::HandleKeyboard()
+int FLTKGui::HandleKeyboard()
 {
   int key = Fl::event_key();
   return 1;
