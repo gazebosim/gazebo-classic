@@ -144,7 +144,9 @@ int World::Init()
 
   this->startTime = this->GetWallTime();
 
-  this->tmpModels.clear();
+  this->toAddModels.clear();
+  this->toDeleteModels.clear();
+
   return 0;
 }
 
@@ -182,7 +184,7 @@ int World::Update()
 
 
   // Update the rendering engine
-  //if (this->models.size() > 0)
+  if (this->models.size() > 0)
   {
     OgreAdaptor::Instance()->Render();
   }
@@ -193,36 +195,19 @@ int World::Update()
   this->simIface->data->realTime = this->GetRealTime();
   this->simIface->Unlock();
 
-  //std::copy(this->models.begin(), this->tmpModels.begin(), this->tmpModels.end());
-  for (miter=this->tmpModels.begin(); miter!=this->tmpModels.end(); miter++)
-  {
-    this->models.push_back((*miter));
-  }
-  this->tmpModels.clear();
 
+  // Copy the newly created models into the main model vector
+  std::copy(this->toAddModels.begin(), this->toAddModels.end(), 
+      std::back_inserter(this->models));
+  this->toAddModels.clear();
+
+
+  // Remove and delete all models that are marked for deletion
   for (miter=this->toDeleteModels.begin(); 
        miter!=this->toDeleteModels.end(); miter++)
   {
-    //std::remove(this->models.begin(), this->models.end(), *miter);
-
-    bool found = false;
-
-    for (miter2=this->models.begin();
-         miter2!=this->models.end();
-         miter2++)
-    {
-      if (*miter == *miter2)
-      {
-        found = true;
-        break;
-      }
-    }
-
-    if (found)
-    {
-      this->models.erase(miter2);
-    }
-   
+    this->models.erase(
+        std::remove(this->models.begin(), this->models.end(), *miter) );
     delete *miter;
   }
   this->toDeleteModels.clear();
@@ -405,7 +390,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   else
   {
     model->Init();
-    this->tmpModels.push_back(model);
+    this->toAddModels.push_back(model);
   }
 
   if (parent != NULL)

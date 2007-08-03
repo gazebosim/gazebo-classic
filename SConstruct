@@ -10,7 +10,6 @@ opts = Options()
 #opts.Add('PREFIX', 'The install path "prefix"', '/usr/local')
 opts.Add('DESTDIR', 'The root directory to install into. Useful mainly for binary package building', '/')
 prefix = ARGUMENTS.get('prefix','/usr/local')
-install_prefix = env['DESTDIR'] + '/' + prefix
 
 
 #
@@ -94,6 +93,7 @@ env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
 pkgconfig = env.PkgConfig(target='gazebo.pc', source=Value(prefix))
 env.Install(dir=prefix+'/lib/pkgconfig', source=pkgconfig)
 
+install_prefix = env['DESTDIR'] + '/' + prefix
 
 # DEFAULT list of subdirectories to build
 subdirs = ['server','libgazebo', 'player']

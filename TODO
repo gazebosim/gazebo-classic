@@ -1,6 +1,4 @@
 Open:
-- Fix World::Update delete models. It's not very pretty
-- Fix std::copy
 - Fix Player include so that libgazebo doesn't link in player
 - GPS 
 - Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.

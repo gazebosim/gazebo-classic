@@ -176,7 +176,11 @@ class World
 
   /// List of all the models
   private: std::vector< Model* > models;
-  private: std::vector< Model* > tmpModels;
+
+  /// List of models to add into the world
+  private: std::vector< Model* > toAddModels;
+
+  /// List of models to delete from the world
   private: std::vector< Model* > toDeleteModels;
 
   /// Simulator control interface
