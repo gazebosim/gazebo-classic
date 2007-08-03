@@ -1,7 +1,5 @@
 import os
-
-Import('env prefix staticObjs sharedObjs')
-install_prefix = env['DESTDIR'] + '/' + prefix
+Import('env install_prefix staticObjs sharedObjs')
 
 parseConfigs = ['pkg-config --cflags --libs playerc++']
 
@@ -16,11 +14,15 @@ sources = ['GazeboDriver.cc',
            'CameraInterface.cc',
            'FiducialInterface.cc'
            ]
-           
+
+# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc  GripperInterface.cc TruthInterface.cc GpsInterface.cc ')
+
+playerEnv = env.Copy()
+
 for cfg in parseConfigs:
   print "Checking for ["+cfg+"]"
   try:
-    env.ParseConfig(cfg)
+    playerEnv.ParseConfig(cfg)
     print "  Success"
   except OSError,e:
     print "Unable to parse config ["+cfg+"]"
@@ -33,16 +35,15 @@ for cfg in parseConfigs:
       Return
       #time.sleep(3)
 
-# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc  GripperInterface.cc TruthInterface.cc GpsInterface.cc ')
 
-staticPlayerObjs = env.StaticObject(sources)
-sharedPlayerObjs = env.SharedObject(sources)
+staticPlayerObjs = playerEnv.StaticObject(sources)
+sharedPlayerObjs = playerEnv.SharedObject(sources)
 
 staticPlayerObjs.append(staticObjs);
 sharedPlayerObjs.append(sharedObjs);
 
-sharedLib = env.SharedLibrary('gazeboplugin', sharedPlayerObjs)
-staticLib = env.StaticLibrary('gazeboplugin', staticPlayerObjs)
+sharedLib = playerEnv.SharedLibrary('gazeboplugin', sharedPlayerObjs)
+staticLib = playerEnv.StaticLibrary('gazeboplugin', staticPlayerObjs)
 
 env.Install(install_prefix+'/lib', sharedLib)
 env.Install(install_prefix+'/lib', staticLib)

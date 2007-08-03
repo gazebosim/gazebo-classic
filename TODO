@@ -1,10 +1,8 @@
 Open:
 - Fix Player include so that libgazebo doesn't link in player
-- GPS 
+- FLTK interface
 - Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
 - Pioneer2DX
-- FLTK interface
-- WiFi
 
 - Write install instructions
 - Write keyboard mappings
@@ -14,7 +12,12 @@ Open:
 - Write a tutorial for creating new sensors
 - Write a tutorial for creating a new world
 
+- Heightmaps
 - BSP loader
+
+- GPS 
+- WiFi
+
 - Multilevel map extruder
 
 - Use dCylinder and dCapsule ODE objects

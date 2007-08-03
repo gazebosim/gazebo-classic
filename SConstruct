@@ -7,10 +7,8 @@ version = '0.8'
 # Setup the Options
 #
 opts = Options()
-#opts.Add('PREFIX', 'The install path "prefix"', '/usr/local')
-opts.Add('DESTDIR', 'The root directory to install into. Useful mainly for binary package building', '/')
-prefix = ARGUMENTS.get('prefix','/usr/local')
-
+opts.Add('prefix', 'The install path "prefix"', '/usr/local')
+opts.Add('destdir', 'The root directory to install into. Useful mainly for binary package building', '/')
 
 #
 # Function used to test for ODE library, and TriMesh suppor
@@ -53,7 +51,6 @@ def createPkgConfig(target, source, env):
 #
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
-#              'pkg-config --cflags --libs playerc++',
       	      'ode-config --cflags --libs',
 	            'pkg-config --cflags --libs OIS']
 
@@ -82,18 +79,22 @@ env = Environment (
     '#server/controllers/position2d/pioneer2dx',
     ],
 
-    LIBPATH=Split('#libgazebo'),
+  LIBPATH=Split('#libgazebo'),
     
-    #LIBS=Split('gazebo boost_python')
-    LIBS=Split('gazebo'),
-	options=opts
+  #LIBS=Split('gazebo boost_python')
+  LIBS=Split('gazebo'),
+
+  options=opts
 )
 
-env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
-pkgconfig = env.PkgConfig(target='gazebo.pc', source=Value(prefix))
-env.Install(dir=prefix+'/lib/pkgconfig', source=pkgconfig)
+Help(opts.GenerateHelpText(env))
 
-install_prefix = env['DESTDIR'] + '/' + prefix
+install_prefix = env['destdir'] + '/' + env['prefix']
+
+env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
+pkgconfig = env.PkgConfig(target='gazebo.pc', source=Value(env['prefix']))
+env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
+
 
 # DEFAULT list of subdirectories to build
 subdirs = ['server','libgazebo', 'player']
@@ -121,13 +122,6 @@ if not env.GetOption('clean'):
         print "ODE is required, but not found."
         print "  http://www.ode.org"
         Exit(1)
-#      elif cfg.find("player") >=0:
-#        print "\n================================================================"
-#        print "Player not found, bindings will not be built."
-#        print "  To install player visit(http://playerstage.sourceforge.net)"
-#        subdirs.remove('player')
-#        print "================================================================"
-#        #time.sleep(3)
   conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib})
    
   #Check for the ODE library and header
@@ -156,7 +150,7 @@ headers = []
 #
 # Export the environment
 #
-Export('env prefix version staticObjs sharedObjs headers')
+Export('env install_prefix version staticObjs sharedObjs headers')
 
 #
 # Process subdirectories
@@ -178,13 +172,6 @@ libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
 #
 # Install gazebo
 #
-#env.Install(prefix+'/bin',gazebo)
-#env.Install(prefix+'/share/gazebo','Media')
-#env.Alias('install', prefix)
-#env.Install(prefix+'/lib',libgazeboServerStatic )
-#env.Install(prefix+'/lib',libgazeboServerShared )
-#env.Install(prefix+'/include/gazebo',headers)
-
 env.Alias('install', install_prefix)
 env.Install(install_prefix+'/bin',gazebo)
 env.Install(install_prefix+'/share/gazebo','Media')

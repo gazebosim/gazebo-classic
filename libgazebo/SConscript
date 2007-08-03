@@ -1,7 +1,5 @@
 #Import variable
-Import('env prefix')
-install_prefix = env['DESTDIR'] + '/' + prefix
-
+Import('env install_prefix')
 
 sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc')
 headers = Split('gazebo.h IfaceFactory.hh')
