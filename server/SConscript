@@ -1,5 +1,5 @@
 #Import variables
-Import('env staticObjs sharedObjs headers')
+Import('env install_prefix staticObjs sharedObjs headers')
 
 dirs = Split('physics rendering sensors controllers gui')# bindings')
 

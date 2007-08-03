@@ -35,9 +35,9 @@
 namespace gazebo
 {
 
-#define gzmsg(level) (GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
+#define gzmsg(level) (gazebo::GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
 
-#define gzlog() (GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
+#define gzlog() (gazebo::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
 
   class XMLConfigNode;
 

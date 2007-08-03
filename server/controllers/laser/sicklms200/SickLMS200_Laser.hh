@@ -32,8 +32,9 @@
 
 namespace gazebo
 {
-  class RaySensor;
   class LaserIface;
+  class FiducialIface;
+  class RaySensor;
 
 /// @addtogroup controllers
 /// @{

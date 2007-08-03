@@ -34,8 +34,8 @@
 
 namespace gazebo
 {
-  class XMLConfigNode;
   class Iface;
+  class XMLConfigNode;
   class Entity;
 
 /// \addtogroup controllers

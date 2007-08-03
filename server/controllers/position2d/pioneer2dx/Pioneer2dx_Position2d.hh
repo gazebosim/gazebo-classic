@@ -30,7 +30,6 @@
 
 #include "Controller.hh"
 #include "Entity.hh"
-#include "gazebo.h"
 
 namespace gazebo
 {

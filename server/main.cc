@@ -105,12 +105,13 @@ home directory, or to the log file specified with the -l command line option.
 #include <iostream>
 
 #include "Global.hh"
+#include "Gui.hh"
 #include "XMLConfig.hh"
 #include "SensorFactory.hh"
 #include "IfaceFactory.hh"
 #include "ControllerFactory.hh"
+#include "GuiFactory.hh"
 #include "World.hh"
-#include "FLTKWindow.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "OgreAdaptor.hh"
@@ -123,8 +124,6 @@ bool optServerForce = true;
 double optTimeout = -1;
 int optMsgLevel = 1;
 int optTimeControl = 1;
-
-gazebo::FLTKWindow *fltkWindow = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -233,7 +232,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ ) 
 {
-  Global::userQuit = true;
+  gazebo::Global::userQuit = true;
   return;
 }
 
@@ -241,6 +240,8 @@ void SignalHandler( int /*dummy*/ )
 // Initialize the sim
 int Init()
 {
+  gazebo::XMLConfigNode *childNode = NULL;
+
   //Py_Initialize();
 
   //struct tms cpu;
@@ -268,22 +269,39 @@ int Init()
   // Load the messaging system
   gazebo::GazeboMessage::Instance()->Load(xmlFile->GetRootNode());
 
-  // Register static models
+  // Register all the factories
   gazebo::SensorFactory::RegisterAll();
   gazebo::IfaceFactory::RegisterAll();
   gazebo::ControllerFactory::RegisterAll();
+  gazebo::GuiFactory::RegisterAll();
 
-  bool ogreWindow = false;
+  childNode = xmlFile->GetRootNode()->GetChild("gui");
 
-  if (!ogreWindow)
+  if (childNode)
   {
-    fltkWindow = new gazebo::FLTKWindow(100, 290, 640, 480, "OGRE#FLTK Window");
-    fltkWindow->show();
+    int width = childNode->GetTupleInt("size",0,640);
+    int height = childNode->GetTupleInt("size",1,480);
+    int x = childNode->GetTupleInt("pos",0,0);
+    int y = childNode->GetTupleInt("pos",1,0);
+    std::string type = childNode->GetString("type","fltk",1);
+
+    gzmsg(1) << "Creating GUI:\n\tType[" << type << "] Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
+
+    // Create the GUI
+    gazebo::Global::gui = gazebo::GuiFactory::NewGui(type, x, y, width, height, type+"::Gazebo");
+
+    // Initialize the GUI
+    gazebo::Global::gui->Init();
+  }
+  else
+  {
+    gzthrow("XML file must contain a <rendering:gui> section\n");
   }
 
+  // Initialize Ogre
   try
   {
-    gazebo::OgreAdaptor::Instance()->Init(xmlFile->GetRootNode()->GetChildByNSPrefix("rendering"), ogreWindow, fltkWindow->display, fltkWindow->visual, fltkWindow->windowId);
+    gazebo::OgreAdaptor::Instance()->Init(xmlFile->GetRootNode()->GetChild("ogre"));
   }
   catch (gazebo::GazeboError e)
   {
@@ -296,20 +314,10 @@ int Init()
   // Load the world
   gazebo::World::Instance()->Load(xmlFile, optServerId);
 
+  // Initialize the world
   if (gazebo::World::Instance()->Init() != 0)
     return -1;
 
-  // Check for unused attributes
-  //xmlFile->WarnUnused();
-
-  // Our server id
-  //printf("server id [%d]\n", world->server_id);
-
-  // Record the start times for accurate CPU loads
-  /*times(&cpu);
-  cpuStartTime = (double) (cpu.tms_utime + cpu.tms_stime) / sysconf(_SC_CLK_TCK);    
-  */
-    
   return 0;
 }
 
@@ -337,9 +345,12 @@ bool MainIdle()
 
   //printf("Sim Time[%f]\n",simTime);
 
+  gazebo::Global::gui->Update();
+
   // Exit if the user has decided to end the simulation
-  if (Global::userQuit)
+  if (gazebo::Global::userQuit)
     return false;
+
 
   return true;
 }

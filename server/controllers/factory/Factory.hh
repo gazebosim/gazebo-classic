@@ -31,6 +31,7 @@
 #include "Entity.hh"
 #include "gazebo.h"
 
+
 namespace gazebo
 {
   class FactoryIface;

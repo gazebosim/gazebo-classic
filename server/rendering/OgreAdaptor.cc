@@ -35,6 +35,7 @@
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
+#include "Gui.hh"
 #include "OgreFrameListener.hh"
 #include "OgreAdaptor.hh"
 
@@ -69,8 +70,7 @@ OgreAdaptor *OgreAdaptor::Instance()
 }
 
 
-void OgreAdaptor::Init(XMLConfigNode *node, bool window,
-    Display *display, XVisualInfo *visual, Window windowId)
+void OgreAdaptor::Init(XMLConfigNode *node)
 {
   XMLConfigNode *cnode;
   Ogre::ColourValue ambient;
@@ -79,12 +79,6 @@ void OgreAdaptor::Init(XMLConfigNode *node, bool window,
   {
     gzthrow( "missing OGRE Rendernig information" );
   }
-
-  this->display = display;
-  this->visual = visual;
-  this->windowId = windowId;
-
-  this->ogreWindow = window;
 
   ambient.r = node->GetTupleDouble("ambient",0,0);
   ambient.g = node->GetTupleDouble("ambient",1,0);
@@ -121,12 +115,11 @@ void OgreAdaptor::Init(XMLConfigNode *node, bool window,
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
 
-  // Initialize the root node, and create a window
-  this->window = this->root->initialise(this->ogreWindow); 
+  // Initialize the root node, and don't create a window
+  this->window = this->root->initialise(false); 
 
-  if (!this->ogreWindow)
-    this->CreateWindow(640, 480);
-
+  // Create a window for Ogre
+  this->CreateWindow();
 
   // Get the SceneManager, in this case a generic one
   //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
@@ -358,20 +351,22 @@ void OgreAdaptor::SetupRenderSystem(bool create)
 }
 
 
-void OgreAdaptor::CreateWindow(int width, int height)
+////////////////////////////////////////////////////////////////////////////////
+// Create a window for Ogre
+void OgreAdaptor::CreateWindow()
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
 
-  paramsVector.push_back( Ogre::StringConverter::toString( (int)(this->display) ) );
-  paramsVector.push_back( Ogre::StringConverter::toString((int)this->visual->screen));
+  paramsVector.push_back( Ogre::StringConverter::toString( (int)(Global::gui->GetDisplay()) ) );
+  paramsVector.push_back( Ogre::StringConverter::toString((int)Global::gui->GetVisualInfo()->screen));
 
-  paramsVector.push_back( Ogre::StringConverter::toString((int)this->windowId));
-  paramsVector.push_back( Ogre::StringConverter::toString((int)(this->visual)));
+  paramsVector.push_back( Ogre::StringConverter::toString((int)Global::gui->GetWindowId()));
+  paramsVector.push_back( Ogre::StringConverter::toString((int)(Global::gui->GetVisualInfo())));
 
   params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
 
-  this->window = this->root->createRenderWindow( "WindowName", width, height, false, &params);
+  this->window = this->root->createRenderWindow( "WindowName", Global::gui->GetWidth(), Global::gui->GetHeight(), false, &params);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

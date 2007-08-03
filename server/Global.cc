@@ -25,12 +25,16 @@
  */
 
 #include "Global.hh"
+#include "Gui.hh"
+
+using namespace gazebo;
 
 bool Global::userQuit = false;
 bool Global::userPause = false;
 bool Global::userStep = false;
 bool Global::userStepInc = false;
 unsigned long Global::iterations = 0;
+Gui *Global::gui = NULL;
 
 Global::Global()
 {

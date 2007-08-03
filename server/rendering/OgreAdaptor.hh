@@ -68,8 +68,7 @@ class OgreAdaptor
   public: static OgreAdaptor *Instance();
 
   /// \brief Default initialization. Let OGRE create the window and rendering context
-  public: void Init(XMLConfigNode *node, bool window, Display *display=NULL,
-              XVisualInfo *visual=NULL, Window windowId = 0);
+  public: void Init(XMLConfigNode *node);
 
   /// \brief Initialize Ogre Rendering engine
   public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height);
@@ -96,7 +95,7 @@ class OgreAdaptor
   private: void LoadPlugins(XMLConfigNode *node);
   private: void SetupResources(XMLConfigNode *node);
   private: void SetupRenderSystem(bool create);
-  private: void CreateWindow(int width, int height);
+  private: void CreateWindow();
 
   public: Ogre::Root *root;
   public: Ogre::SceneManager *sceneMgr;
@@ -109,11 +108,6 @@ class OgreAdaptor
 
   // Our custom frame listener
   private: OgreFrameListener *frameListener;
-
-  /// Render context info
-  private: Display *display;
-  private: XVisualInfo *visual;
-  private: Window windowId;
 
   private: static OgreAdaptor *myself;
 

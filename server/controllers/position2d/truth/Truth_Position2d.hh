@@ -32,10 +32,11 @@
 #include "Entity.hh"
 #include "gazebo.h"
 
+
 namespace gazebo
 {
-  class HingeJoint;
   class PositionIface;
+  class HingeJoint;
 
 /// \addtogroup controllers
 /// \{

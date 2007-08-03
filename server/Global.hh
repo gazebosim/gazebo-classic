@@ -82,24 +82,32 @@
 
 #endif
 
-class Global
+namespace gazebo
 {
-  /// \brief Set to true when the user wants to leave the application
-  public: static bool userQuit;
+  class Gui;
 
-  /// \brief Set to true to pause the simulation
-  public: static bool userPause;
+  class Global
+  {
+    /// \brief Set to true when the user wants to leave the application
+    public: static bool userQuit;
 
-  /// \brief Set to true to step through the simulation
-  public: static bool userStep;
+    /// \brief Set to true to pause the simulation
+    public: static bool userPause;
 
-  /// \brief Set to true to increment the simulation once. This is only
-  ///        valid when userStep is true.
-  public: static bool userStepInc;
+    /// \brief Set to true to step through the simulation
+    public: static bool userStep;
 
-  /// \brief Count of the number of iterations
-  public: static unsigned long iterations;
+    /// \brief Set to true to increment the simulation once. This is only
+    ///        valid when userStep is true.
+    public: static bool userStepInc;
 
-  private: Global();
-  private: ~Global();
-};
+    /// \brief Count of the number of iterations
+    public: static unsigned long iterations;
+
+    /// \brief Pointer to the selected Gui 
+    public: static Gui *gui;
+
+    private: Global();
+    private: ~Global();
+  };
+}

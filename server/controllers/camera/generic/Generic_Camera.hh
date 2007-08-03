@@ -30,10 +30,11 @@
 
 #include "Controller.hh"
 
+
 namespace gazebo
 {
+  class CameraIface;
   class CameraSensor;
-  class Cameraface;
 
 /// @addtogroup controllers
 /// @{

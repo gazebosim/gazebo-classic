@@ -77,7 +77,7 @@ The parameters are as follows:
 
 */
 
-  // Forward declarations
+// Forward declarations
   class Server;
   class SimulationIface;
   class Model;
