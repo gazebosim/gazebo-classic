@@ -43,14 +43,10 @@ enum {RIGHT, LEFT};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Pioneer2dx_Position2d::Pioneer2dx_Position2d( Iface *iface, Entity *parent )
-  : Controller(iface, parent)
+Pioneer2dx_Position2d::Pioneer2dx_Position2d(Entity *parent )
+  : Controller(parent)
 {
-  this->myIface = dynamic_cast<PositionIface*>(this->iface);
   this->myParent = dynamic_cast<Model*>(this->parent);
-
-  if (!this->myIface)
-    gzthrow("Pioneer2dx_Position2d controller requires a PositionIface");
 
   if (!this->myParent)
     gzthrow("Pioneer2dx_Position2d controller requires a Model as its parent");
@@ -71,6 +67,11 @@ Pioneer2dx_Position2d::~Pioneer2dx_Position2d()
 // Load the controller
 void Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 {
+  this->myIface = dynamic_cast<PositionIface*>(this->ifaces[0]);
+
+  if (!this->myIface)
+    gzthrow("Pioneer2dx_Position2d controller requires a PositionIface");
+
   this->wheelSep = 0.34;
   this->wheelDiam = 0.15;
 

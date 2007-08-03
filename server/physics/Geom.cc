@@ -26,6 +26,9 @@ Geom::Geom( Body *body)
 
   this->ogreObj = NULL;
 
+  this->laserFiducialId = -1;
+  this->laserRetro = 0.0;
+
   // Most geoms don't need extra rotation. Cylinders do.
   this->extraRotation.SetToIdentity();
 
@@ -304,3 +307,30 @@ const dMass *Geom::GetBodyMassMatrix()
   return &this->bodyMass;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Set the laser fiducial integer id
+void Geom::SetLaserFiducialId(int id)
+{
+  this->laserFiducialId = id;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the laser fiducial integer id
+int Geom::GetLaserFiducialId() const
+{
+  return this->laserFiducialId;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Set the laser retro reflectiveness 
+void Geom::SetLaserRetro(float retro)
+{
+  this->laserRetro = retro;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the laser retro reflectiveness 
+float Geom::GetLaserRetro() const
+{
+  return this->laserRetro;
+}

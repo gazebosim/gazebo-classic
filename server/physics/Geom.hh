@@ -96,6 +96,18 @@ class Geom : public Entity
   /// \brief Get the mass of the geom
   public: const dMass *GetBodyMassMatrix();
 
+  /// \brief Set the laser fiducial integer id
+  public: void SetLaserFiducialId(int id);
+
+  /// \brief Get the laser fiducial integer id
+  public: int GetLaserFiducialId() const;
+
+  /// \brief Set the laser retro reflectiveness 
+  public: void SetLaserRetro(float retro);
+
+  /// \brief Get the laser retro reflectiveness 
+  public: float GetLaserRetro() const;
+
   /// \brief Contact parameters
   public: ContactParams *contact; 
 
@@ -116,6 +128,9 @@ class Geom : public Entity
   protected: dMass bodyMass;
 
   protected: Quatern extraRotation;
+
+  private: int laserFiducialId;
+  private: float laserRetro;
 };
 
 }

@@ -93,8 +93,8 @@ void Sensor::LoadController(XMLConfigNode *node)
   }
 
 
-  Iface *iface;
-  XMLConfigNode *childNode;
+  //Iface *iface;
+  //XMLConfigNode *childNode;
   std::ostringstream stream;
 
   // Get the controller's type
@@ -104,7 +104,7 @@ void Sensor::LoadController(XMLConfigNode *node)
   std::string controllerName = node->GetString("name","",1);
 
   // Create the interface
-  if ( (childNode = node->GetChildByNSPrefix("interface")) )
+  /*if ( (childNode = node->GetChildByNSPrefix("interface")) )
   {
     // Get the type of the interface (eg: laser)
     std::string ifaceType = childNode->GetName();
@@ -123,10 +123,10 @@ void Sensor::LoadController(XMLConfigNode *node)
   {
     stream << "No interface defined for " << controllerName << "controller";
     gzthrow(stream.str()); 
-  }
+  }*/
 
   // Create the controller based on it's type
-  this->controller = ControllerFactory::NewController(controllerType, iface, this);
+  this->controller = ControllerFactory::NewController(controllerType, this);
 
   // Load the controller
   this->controller->Load(node);

@@ -1,11 +1,11 @@
 Open:
+- Fix World::Update delete models. It's not very pretty
+- Fix std::copy
+- Fix Player include so that libgazebo doesn't link in player
+- GPS 
 - Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
 - Pioneer2DX
-- Laser retro and fiducial detection
-- Truth
-- Factory
 - FLTK interface
-- GPS 
 - WiFi
 
 - Write install instructions
@@ -69,3 +69,6 @@ Completed:
 - Check for player.
 - Trimesh 
 - Move Sensors out of Body
+- Laser retro and fiducial detection
+- Truth
+- Factory

@@ -41,10 +41,10 @@ class Joint
   public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL};
 
   // Constructor
-  protected: Joint();
+  public: Joint();
 
   // Destructor
-  protected: virtual ~Joint();
+  public: virtual ~Joint();
 
   // Get the type of the joint
   public: Joint::Type GetType() const;

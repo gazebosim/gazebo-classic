@@ -43,12 +43,13 @@ devices.
 #include "Graphics3dInterface.hh"
 #include "LaserInterface.hh"
 #include "CameraInterface.hh"
+#include "FiducialInterface.hh"
+#include "Position3dInterface.hh"
 
-/*#include "Position3dInterface.hh"
+/*
 #include "PowerInterface.hh"
 #include "SonarInterface.hh"
 #include "PtzInterface.hh"
-#include "FiducialInterface.hh"
 #include "GripperInterface.hh"
 #include "TruthInterface.hh"
 #include "GpsInterface.hh"
@@ -292,14 +293,18 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new CameraInterface( playerAddr,  this, cf, section );
         break;
 
+      case PLAYER_FIDUCIAL_CODE:
+        if (!player_quiet_startup) printf(" a fiducial interface.\n");
+        ifsrc = new FiducialInterface( playerAddr,  this, cf, section );
+        break;	  
 
-
-/*      case PLAYER_POSITION3D_CODE:	  
+      case PLAYER_POSITION3D_CODE:	  
         if (!player_quiet_startup) printf(" a position3d interface.\n");
         ifsrc = new Position3dInterface( playerAddr, this,  cf, section );
         break;
 
-      case PLAYER_POWER_CODE:	  
+
+/*      case PLAYER_POWER_CODE:	  
         if (!player_quiet_startup) printf(" a power interface.\n");
         ifsrc = new PowerInterface( playerAddr,  this, cf, section );
         break;
@@ -313,11 +318,6 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         if (!player_quiet_startup) printf(" a ptz interface.\n");
         ifsrc = new PtzInterface( playerAddr,  this, cf, section );
         break;
-
-      case PLAYER_FIDUCIAL_CODE:
-        if (!player_quiet_startup) printf(" a fiducial interface.\n");
-        ifsrc = new FiducialInterface( playerAddr,  this, cf, section );
-        break;	  
 
       case PLAYER_GRIPPER_CODE:
         if (!player_quiet_startup) printf(" a gripper interface.\n");

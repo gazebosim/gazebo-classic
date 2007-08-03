@@ -151,7 +151,11 @@ class World
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
   /// \return 0 on success
-  private: int LoadEntities(XMLConfigNode *node, Model *parent);
+  public: int LoadEntities(XMLConfigNode *node, Model *parent);
+
+  /// \brief Delete an entity by name
+  /// \param name The name of the entity to delete
+  public: void DeleteEntity(const char *name);
 
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
@@ -172,6 +176,8 @@ class World
 
   /// List of all the models
   private: std::vector< Model* > models;
+  private: std::vector< Model* > tmpModels;
+  private: std::vector< Model* > toDeleteModels;
 
   /// Simulator control interface
   private: Server *server;

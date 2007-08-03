@@ -143,6 +143,8 @@ int World::Init()
   this->physicsEngine->Init();
 
   this->startTime = this->GetWallTime();
+
+  this->tmpModels.clear();
   return 0;
 }
 
@@ -152,6 +154,7 @@ int World::Update()
 {
   UpdateParams params;
   std::vector< Model* >::iterator miter;
+  std::vector< Model* >::iterator miter2;
 
   this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime = this->physicsEngine->GetStepTime();
@@ -159,7 +162,8 @@ int World::Update()
   // Update all the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
-    (*miter)->Update(params);
+    if (*miter)
+      (*miter)->Update(params);
   }
 
   // Update the physics engine
@@ -178,13 +182,50 @@ int World::Update()
 
 
   // Update the rendering engine
-  OgreAdaptor::Instance()->Render();
+  //if (this->models.size() > 0)
+  {
+    OgreAdaptor::Instance()->Render();
+  }
 
   this->simIface->Lock(1);
   this->simIface->data->simTime = this->GetSimTime();
   this->simIface->data->pauseTime = this->GetPauseTime();
   this->simIface->data->realTime = this->GetRealTime();
   this->simIface->Unlock();
+
+  //std::copy(this->models.begin(), this->tmpModels.begin(), this->tmpModels.end());
+  for (miter=this->tmpModels.begin(); miter!=this->tmpModels.end(); miter++)
+  {
+    this->models.push_back((*miter));
+  }
+  this->tmpModels.clear();
+
+  for (miter=this->toDeleteModels.begin(); 
+       miter!=this->toDeleteModels.end(); miter++)
+  {
+    //std::remove(this->models.begin(), this->models.end(), *miter);
+
+    bool found = false;
+
+    for (miter2=this->models.begin();
+         miter2!=this->models.end();
+         miter2++)
+    {
+      if (*miter == *miter2)
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if (found)
+    {
+      this->models.erase(miter2);
+    }
+   
+    delete *miter;
+  }
+  this->toDeleteModels.clear();
 
   return 0;
 }
@@ -290,6 +331,21 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Delete an entity by name
+void World::DeleteEntity(const char *name)
+{
+  std::vector< Model* >::iterator miter;
+
+  // Update all the models
+  for (miter=this->models.begin(); miter!=this->models.end(); miter++)
+  {
+    if ((*miter)->GetName() == name)
+      this->toDeleteModels.push_back(*miter);
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Load a model
 Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 {
@@ -305,10 +361,12 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   // Set the id of the model
   model->SetName( node->GetString( "name", "", 0 ) );
 
+
   if (model->GetName() == "")
   {
     model->SetName( node->GetName() );
   }
+
 
   if (parent)
   {
@@ -342,7 +400,13 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   model->SetInitPose(pose);
 
   // Add the model to our list
-  this->models.push_back(model);
+  if (Global::iterations == 0)
+    this->models.push_back(model);
+  else
+  {
+    model->Init();
+    this->tmpModels.push_back(model);
+  }
 
   if (parent != NULL)
     model->Attach();

@@ -111,7 +111,7 @@ void RaySensor::InitChild()
   {
     angle = i * (this->maxAngle - this->minAngle) / (rayCount - 1) + this->minAngle;
 
-    axis.Set(sin(angle), cos(angle),0);
+    axis.Set(cos(angle), sin(angle),0);
 
     start = (axis * this->minRange) + this->origin;
     end = (axis * this->maxRange) + this->origin;
@@ -211,7 +211,7 @@ double RaySensor::GetRetro(int index)
     gzthrow(stream.str());
   }
  
-  return this->rays[index]->contactRetro;
+  return this->rays[index]->GetRetro();
 }
 
 
@@ -227,7 +227,7 @@ int RaySensor::GetFiducial(int index)
     gzthrow(stream.str());
   }
  
-  return this->rays[index]->contactFiducial;
+  return this->rays[index]->GetFiducial();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -247,8 +247,8 @@ void RaySensor::UpdateChild(UpdateParams &/*params*/)
   for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
   {
     (*iter)->SetLength( 8.0 );
-    (*iter)->contactRetro = 0.0;
-    (*iter)->contactFiducial = -1;
+    (*iter)->SetRetro( 0.0 );
+    (*iter)->SetFiducial( -1 );
 
     // Get the global points of the line
     (*iter)->Update();
@@ -345,8 +345,8 @@ void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
         if (contact.depth < rayGeom->GetLength())
         {
           rayGeom->SetLength( contact.depth );
-          //TODO: rayGeom->contactRetro = hitGeom->GetRetro();
-          //TODO: rayGeom->contactFiducial = hitGeom->GetFiducial();
+          rayGeom->SetRetro( hitGeom->GetLaserRetro() );
+          rayGeom->SetFiducial( hitGeom->GetLaserFiducialId() );
         }
       }
     }

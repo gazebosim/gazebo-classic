@@ -48,38 +48,38 @@ See \ref libgazebo_usage for information on using libgazebo.
  * Constants, etc
  **************************************************************************/
 
-//! \addtogroup libgazebo 
-//! \{ 
+/// \addtogroup libgazebo 
+/// \{ 
 
-//! Interface version number
+/// Interface version number
 #define LIBGAZEBO_VERSION 0x070
 
-//! \}
+/// \}
 
-//! \addtogroup libgazebo
-//! \{
+/// \addtogroup libgazebo
+/// \{
 
-//! Pose class
+/// Pose class
 class Pose
 {
-  //! Position information
+  /// Position information
   public: double x, y, z;
 
-  //! Rotation information. Euler angles
+  /// Rotation information. Euler angles
   public: double roll, pitch, yaw; 
 };
 
-//! Vector 3 class
+/// Vector 3 class
 class Vec3
 {
-  //! Position information
+  /// Position information
   public: double x, y, z;
 };
 
-//! Color class
+/// Color class
 class Color
 {
-  //! Color information
+  /// Color information
   public: float r, g, b, a;
 };
 
@@ -87,8 +87,8 @@ class Color
 
 
 /***************************************************************************/
-//! \addtogroup libgazebo
-//! \{
+/// \addtogroup libgazebo
+/// \{
 /** \defgroup server Server object
 
 The server object is used by the Gazebo server to establish and
@@ -132,13 +132,13 @@ class Server
 };
 
 /** \}*/
-//! \}
+/// \}
 /***************************************************************************/
 
   
 /***************************************************************************/
-//! \addtogroup libgazebo 
-//! \{ 
+/// \addtogroup libgazebo 
+/// \{ 
 /** \defgroup client Client object
 
 The client object is used by Gazebo clients to establish a connection
@@ -147,21 +147,21 @@ with a running server.  See the \ref libgazebo_usage for an overview.
 \{
 */
 
-//! \brief Semaphore key used by Gazebo
+/// \brief Semaphore key used by Gazebo
 #define GZ_SEM_KEY 0x135135FA
   
-//! \brief Reserved client IDs.
-//!
-//! User programs may use numbers in the range GZ_SEM_NUM_USER to
-//! GZ_SEM_NUM_USER_LAST, inclusive.  All other semaphore numbers are
-//! reserved.
+/// \brief Reserved client IDs.
+///
+/// User programs may use numbers in the range GZ_SEM_NUM_USER to
+/// GZ_SEM_NUM_USER_LAST, inclusive.  All other semaphore numbers are
+/// reserved.
 #define GZ_CLIENT_ID_USER_FIRST 0x00
 #define GZ_CLIENT_ID_USER_LAST  0x07
 #define GZ_CLIENT_ID_WXGAZEBO   0x08
 #define GZ_CLIENT_ID_PLAYER     0x09
 
   
-//! Client class
+/// Client class
 class Client 
 {
   /// \brief Create a new client
@@ -184,8 +184,8 @@ class Client
   /// \brief Disconnect from the server
   public: void Disconnect();
 
-  //! \brief Wait for new data to be posted (blocking mode).
-  //! \returns Returns 0 on success, -1 on error.
+  /// \brief Wait for new data to be posted (blocking mode).
+  /// \returns Returns 0 on success, -1 on error.
   public: void Wait();
 
   private: void SemQuery(int server_id);
@@ -193,25 +193,25 @@ class Client
   private: void SemFini();
   private: void SemWait();
 
-  //! The server id
+  /// The server id
   public: int serverId;
 
-  //! The client id
+  /// The client id
   public: int clientId;
 
-  //! The directory containing mmap files
+  /// The directory containing mmap files
   public: std::string filename;
 
-  //! The semphore key and id
+  /// The semphore key and id
   public: int semKey, semId;
 };
 
 /** \} */
-//! \}
+/// \}
 
 /***************************************************************************/
-//! \addtogroup libgazebo 
-//! \{
+/// \addtogroup libgazebo 
+/// \{
 /** \internal \defgroup iface Common interface structures
 
 All interfaces share this common structure.
@@ -219,43 +219,46 @@ All interfaces share this common structure.
 \{
 */
 
-//! Max length of model type string 
+/// Max length of model type string 
 #define GAZEBO_MAX_MODEL_TYPE 128
 
 class Iface
 {
-  //! \brief Create an interface
+  /// \brief Create an interface
   public: Iface(const std::string &type, size_t size);
 
-  //! \brief Destroy an interface
+  /// \brief Destroy an interface
   public: virtual ~Iface();
 
-  //! \brief Create the interface (used by Gazebo server)
+  /// \brief Create the interface (used by Gazebo server)
   public: virtual void Create(Server *server, std::string id);
 
-  //! \brief Create the interface (used by Gazebo server)
+  /// \brief Create the interface (used by Gazebo server)
   public: void Create(Server *server, std::string id,
                      const std::string &modelType, int modelId, 
                      int parentModelId);
 
-  //! \brief Destroy the interface (server)
+  /// \brief Destroy the interface (server)
   public: void Destroy();
 
-  //! Open an existing interface
+  /// \brief Open an existing interface
   public: virtual void Open(Client *client, std::string id);
 
-  //! Close the interface
+  /// \brief Close the interface
   public: void Close();
 
-  /// Lock the interface.  Set blocking to 1 if the caller should block
+  /// \brief Lock the interface.  Set blocking to 1 if the caller should block
   /// until the lock is acquired.  Returns 0 if the lock is acquired.
   public: void Lock(int blocking);
 
-  /// Unlock the interface
+  /// \brief Unlock the interface
   public: void Unlock();
 
-  /// Tell clients that new data is available
+  /// \brief Tell clients that new data is available
   public: void Post();
+
+  /// \brief Get the iface type
+  public: std::string GetType() const;
 
   private: std::string Filename(std::string id);
 
@@ -295,12 +298,12 @@ class Iface
 
 
 /** \} */
-//! \}
+/// \}
 
 
 /***************************************************************************/
-//! \addtogroup libgazebo 
-//! \{
+/// \addtogroup libgazebo 
+/// \{
 /** \defgroup simulator simulator 
 
 The simulator interface provides access to certain global properties
@@ -334,13 +337,13 @@ class SimulationData
 
 };
 
-//! Common simulator interface
+/// Common simulator interface
 class SimulationIface : public Iface
 {
-  //! Create an interface
+  /// Create an interface
   public: SimulationIface(): Iface("simulation",sizeof(SimulationIface)+sizeof(SimulationData)) {}
 
-  //! Destroy an interface
+  /// Destroy an interface
   public: virtual ~SimulationIface() {this->data = NULL;}
 
   public: virtual void Create(Server *server, std::string id)
@@ -361,12 +364,12 @@ class SimulationIface : public Iface
 
 
 /** \} */
-//! \}
+/// \}
 
 
 /***************************************************************************/
-//! \addtogroup libgazebo 
-//! \{
+/// \addtogroup libgazebo 
+/// \{
 /** \defgroup camera camera 
 
 The camera interface allows clients to read images from a simulated
@@ -379,25 +382,25 @@ Images are in packed RGB888 format.
 */
 
 
-//! Maximum image pixels (width x height)
+/// Maximum image pixels (width x height)
 #define GAZEBO_CAMERA_MAX_IMAGE_SIZE 640 * 480 * 3
 
 /// Camera interface data
 class CameraData
 {
-  //! Data timestamp
+  /// Data timestamp
   public: double time;
 
-  //! Image dimensions (in pixels)
+  /// Image dimensions (in pixels)
   public: unsigned int width, height;
 
-  //! Image pixel data
+  /// Image pixel data
   public: unsigned int image_size;
   public: unsigned char image[GAZEBO_CAMERA_MAX_IMAGE_SIZE];
   
 };
 
-//! The camera interface
+/// The camera interface
 class CameraIface : public Iface
 {
   public: CameraIface():Iface("camera", sizeof(CameraIface)+sizeof(CameraData)) {}
@@ -420,7 +423,7 @@ class CameraIface : public Iface
 
 
 /** \} */
-//! \}
+/// \}
 
 
 /***************************************************************************/
@@ -461,10 +464,10 @@ class PositionData
 /// Position interface
 class PositionIface : public Iface
 {
-  //! Constructor
+  /// Constructor
   public: PositionIface():Iface("position", sizeof(PositionIface)+sizeof(PositionData)) {}
 
-  //! Destructor
+  /// Destructor
   public: virtual ~PositionIface() {this->data = NULL;}
 
   public: virtual void Create(Server *server, std::string id)
@@ -497,7 +500,7 @@ opengl funcitons.
 */
 
 
-//! Maximum number of points that can be drawn
+/// Maximum number of points that can be drawn
 #define GAZEBO_GRAPHICS3D_MAX_POINTS 1024
 
 /// Graphics3d interface data
@@ -505,16 +508,16 @@ class Graphics3dData
 {
   enum DrawMode {POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON};
 
-  //! Drawing mode
+  /// Drawing mode
   public: DrawMode drawmode;
 
-  //! Number of vertices
+  /// Number of vertices
   public: unsigned int point_count; 
 
-  //! Vertices 
+  /// Vertices 
   public: Vec3 points[GAZEBO_GRAPHICS3D_MAX_POINTS];
 
-  //! Drawing color
+  /// Drawing color
   public: Color color;
 };
 
@@ -522,10 +525,10 @@ class Graphics3dData
 class Graphics3dIface : public Iface
 {
 
-  //! Constructor
+  /// Constructor
   public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dData)+sizeof(Graphics3dData)) {}
 
-  //! Destructor
+  /// Destructor
   public: virtual ~Graphics3dIface() {this->data = NULL;}
 
   public: virtual void Create(Server *server, std::string id)
@@ -596,10 +599,10 @@ class LaserData
 /// Laser interface
 class LaserIface : public Iface
 {
-  //! Constructor
+  /// Constructor
   public: LaserIface():Iface("laser", sizeof(LaserIface)+sizeof(LaserData)) {}
 
-  //! Destructor
+  /// Destructor
   public: virtual ~LaserIface() {this->data = NULL;}
 
   public: virtual void Create(Server *server, std::string id)
@@ -619,6 +622,130 @@ class LaserIface : public Iface
 
 /** @} */
 /// @}
+
+
+/***************************************************************************/
+/// @addtogroup libgazebo
+/// @{
+/** @defgroup fiducial fiducial
+
+The fiducial interface allows clients to determine the identity,
+range, bearing and orientation (relative to some sensor) of objects in
+the world.  For example, this interface is used by the SickLMS200
+model to return data from simulated retro-reflective barcodes.
+
+@{
+*/
+
+#define GZ_FIDUCIAL_MAX_FIDS 401
+
+/// \brief Fudicial interface data
+class FiducialFid
+{
+  /// \brief Fiducial id
+  public: int id;
+
+  /// \brief Fiducial position relative to sensor (x, y, z).
+  public: double pos[3];
+
+  /// \brief Fiducial orientation relative to sensor (roll, pitch, yaw).
+  public: double rot[3];
+};
+
+class FiducialData
+{
+   /// \brief Data timestamp
+  public: double time;
+
+  /// Observed fiducials
+  public: int count;
+  public: FiducialFid fids[GZ_FIDUCIAL_MAX_FIDS];
+};
+
+/// Fiducial interface
+class FiducialIface : public Iface
+{
+  /// \brief Constructor
+  public: FiducialIface():Iface("fiducial", sizeof(FiducialIface)+sizeof(FiducialData)) {}
+
+  /// \brief Destructor
+  public: virtual ~FiducialIface() {this->data = NULL;}
+
+  /// \brief Create the server
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (FiducialData*)this->mMap; 
+          }
+
+  /// \brief Open the iface 
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (FiducialData*)this->mMap; 
+          }
+
+  /// \brief Pointer to the fiducial data
+  public: FiducialData *data;
+};
+
+/** @} */
+/// @}
+
+/***************************************************************************/
+/// @addtogroup libgazebo
+/// @{
+/** @defgroup factory factory
+
+The factory interface allows clients to send XML strings to a factory
+in order to dynamically create models.
+
+@{
+*/
+
+/// \brief Fudicial interface data
+class FactoryData
+{
+   /// \brief Data timestamp
+  public: double time;
+
+  /// \brief String describing the model to be initiated
+  public: uint8_t newModel[4096];
+
+  /// \brief Delete a model by name
+  public: uint8_t deleteModel[512];
+};
+
+/// \brief Factory interface
+class FactoryIface : public Iface
+{
+  /// \brief Constructor
+  public: FactoryIface():Iface("factory", sizeof(FactoryIface)+sizeof(FactoryData)) {}
+
+  /// \brief Destructor
+  public: virtual ~FactoryIface() {this->data = NULL;}
+
+  /// \brief Create the server
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (FactoryData*)this->mMap; 
+          }
+
+  /// \brief Open the iface 
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (FactoryData*)this->mMap; 
+          }
+
+  /// \brief Pointer to the factory data
+  public: FactoryData *data;
+};
+
+/** @} */
+/// @}
+
 
 
 }

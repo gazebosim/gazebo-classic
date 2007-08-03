@@ -32,6 +32,7 @@
 
 #include "Global.hh"
 #include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "OgreAdaptor.hh"
 #include "XMLConfig.hh"
 #include "World.hh"
@@ -62,8 +63,27 @@ Model::Model()
 // Destructor
 Model::~Model()
 {
+  std::map< std::string, Body* >::iterator biter;
+  std::map< std::string, Joint* >::iterator jiter;
+  std::map< std::string, Controller* >::iterator citer;
+
+  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  {
+    delete biter->second;
+  }
   this->bodies.clear();
+
+  for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
+  {
+    delete jiter->second;
+  }
   this->joints.clear();
+
+  for (citer = this->controllers.begin(); 
+       citer != this->controllers.end(); citer++)
+  {
+    delete citer->second;
+  }
   this->controllers.clear();
 }
 
@@ -84,11 +104,27 @@ int Model::Load(XMLConfigNode *node)
   {
     this->LoadRenderable(node);
   }
-  else
+  else if (this->GetType() != "empty")
   {
     std::ostringstream stream;
     stream << "Invalid model type[" << this->GetType() << "]\n";
     gzthrow(stream.str());
+  }
+
+  // Load controllers
+  childNode = node->GetChildByNSPrefix("controller");
+  while (childNode)
+  {
+    try
+    {
+      this->LoadController(childNode);
+    }
+    catch (GazeboError e)
+    {
+      std::cerr << "Error Loading Controller[" << childNode->GetName() 
+        << "]\n" << e << std::endl;
+    }
+    childNode = childNode->GetNextByNSPrefix("controller");
   }
 
   // Create a default body if one does not exist in the XML file
@@ -157,8 +193,6 @@ int Model::Update(UpdateParams &params)
   std::map<std::string, Controller* >::iterator contIter;
 
   Pose3d bodyPose, newPose, oldPose;
-
-
 
   for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
@@ -446,8 +480,6 @@ void Model::LoadController(XMLConfigNode *node)
   if (!node)
     gzthrow( "node parameter is NULL" );
 
-  Iface *iface;
-  XMLConfigNode *childNode;
   Controller *controller;
   std::ostringstream stream;
 
@@ -457,35 +489,21 @@ void Model::LoadController(XMLConfigNode *node)
   // Get the unique name of the controller
   std::string controllerName = node->GetString("name","",1);
 
-  // Create the interface
-  if ( (childNode = node->GetChildByNSPrefix("interface")) )
+  // Create the controller based on it's type
+  controller = ControllerFactory::NewController(controllerType, this);
+
+  if (controller)
   {
-    // Get the type of the interface (eg: laser)
-    std::string ifaceType = childNode->GetName();
+    // Load the controller
+    controller->Load(node);
 
-    // Get the name of the iface 
-    std::string ifaceName = childNode->GetString("name","",1);
-
-    // Use the factory to get a new iface based on the type
-    iface = IfaceFactory::NewIface(ifaceType);
-
-    // Create the iface
-    iface->Create(World::Instance()->GetGzServer(), ifaceName);
+    // Store the controller
+    this->controllers[controllerName] = controller;
   }
   else
   {
-    stream << "No interface defined for " << controllerName << "controller";
-    gzthrow(stream.str()); 
+    gzmsg(0) << "Unknown controller[" << controllerType << "]\n";
   }
-
-  // Create the controller based on it's type
-  controller = ControllerFactory::NewController(controllerType, iface, this);
-
-  // Load the controller
-  controller->Load(node);
-
-  // Store the controller
-  this->controllers[controllerName] = controller;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -579,40 +597,5 @@ void Model::LoadPhysical(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("joint");
   }
 
-  // Load interfaces
-  /*childNode = node->GetChildByNSPrefix("interface");
-
-    while (childNode)
-    {
-    try
-    {
-    this->LoadIface(childNode);
-    }
-    catch (gazebo::GazeboError e)
-    {
-    std::cerr << "Error Loading Interface[" << childNode->GetName() << "]\n" 
-    << e << std::endl;
-    }
-
-    childNode = childNode->GetNextByNSPrefix("interface");
-    }*/
-
-  // Load controller
-  childNode = node->GetChildByNSPrefix("controller");
-  while (childNode)
-  {
-    try
-    {
-      this->LoadController(childNode);
-    }
-    catch (GazeboError e)
-    {
-      std::cerr << "Error Loading Controller[" << childNode->GetName() 
-        << "]\n" << e << std::endl;
-    }
-    childNode = childNode->GetNextByNSPrefix("controller");
-  }
-
   this->canonicalBodyName = node->GetString("canonicalBody","",0);
-
 }

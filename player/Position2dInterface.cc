@@ -252,7 +252,7 @@ void Position2dInterface::Subscribe()
   catch (GazeboError e)
   {
     std::ostringstream stream;
-    stream <<"Error Subscribing to Gazebo Position Interface\n"
+    stream <<"Error Subscribing to Gazebo Position2d Interface\n"
            << e << "\n";
     gzthrow(stream.str());
   }

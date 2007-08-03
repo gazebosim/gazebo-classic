@@ -94,6 +94,9 @@ class PhysicsEngine
   /// \brief Add an entity
   public: virtual void AddEntity(Entity *entity) = 0;
 
+  /// \brief Remove an entity from the physics engine
+  public: virtual void RemoveEntity(Entity *entity) = 0;
+
   /// \brief Create a new body
   public: virtual Body *CreateBody(Entity *parent) = 0;
 

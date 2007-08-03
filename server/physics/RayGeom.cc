@@ -152,3 +152,32 @@ double RayGeom::GetLength() const
   return this->contactLen;
   //return dGeomRayGetLength( this->geomId );
 }
+
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the retro-reflectivness detected by this ray
+void RayGeom::SetRetro( float retro )
+{
+  this->contactRetro = retro;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the retro-reflectivness detected by this ray
+float RayGeom::GetRetro() const
+{
+  return this->contactRetro;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the fiducial id detected by this ray
+void RayGeom::SetFiducial( int fid )
+{
+  this->contactFiducial = fid;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the fiducial id detected by this ray
+int RayGeom::GetFiducial() const
+{
+  return this->contactFiducial;
+}

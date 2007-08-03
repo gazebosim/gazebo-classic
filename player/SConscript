@@ -3,17 +3,37 @@ import os
 Import('env prefix staticObjs sharedObjs')
 install_prefix = env['DESTDIR'] + '/' + prefix
 
+parseConfigs = ['pkg-config --cflags --libs playerc++']
+
 sources = ['GazeboDriver.cc',
            'GazeboClient.cc',
            'GazeboInterface.cc',
            'GazeboTime.cc',
            'SimulationInterface.cc',
            'Position2dInterface.cc',
+           'Position3dInterface.cc',
            'LaserInterface.cc',
-           'CameraInterface.cc'
+           'CameraInterface.cc',
+           'FiducialInterface.cc'
            ]
+           
+for cfg in parseConfigs:
+  print "Checking for ["+cfg+"]"
+  try:
+    env.ParseConfig(cfg)
+    print "  Success"
+  except OSError,e:
+    print "Unable to parse config ["+cfg+"]"
+    if cfg.find("player") >=0:
+      print "\n================================================================"
+      print "Player not found, bindings will not be built."
+      print "  To install player visit(http://playerstage.sourceforge.net)"
+      subdirs.remove('player')
+      print "================================================================"
+      Return
+      #time.sleep(3)
 
-# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc FiducialInterface.cc GripperInterface.cc TruthInterface.cc GpsInterface.cc ')
+# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc  GripperInterface.cc TruthInterface.cc GpsInterface.cc ')
 
 staticPlayerObjs = env.StaticObject(sources)
 sharedPlayerObjs = env.SharedObject(sources)

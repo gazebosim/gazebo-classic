@@ -44,14 +44,10 @@ GZ_REGISTER_STATIC_CONTROLLER("generic_camera", Generic_Camera);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Generic_Camera::Generic_Camera(Iface *cameraIface, Entity *parent)
-  : Controller(cameraIface, parent)
+Generic_Camera::Generic_Camera(Entity *parent)
+  : Controller(parent)
 {
-  this->cameraIface = dynamic_cast<CameraIface*>(this->iface);
   this->myParent = dynamic_cast<CameraSensor*>(this->parent);
-
-  if (!this->cameraIface)
-    gzthrow("Generic_Camera controller requires a CameraIface");
 
   if (!this->myParent)
     gzthrow("Generic_Camera controller requires a Camera Sensor as its parent");
@@ -67,6 +63,10 @@ Generic_Camera::~Generic_Camera()
 // Load the controller
 void Generic_Camera::LoadChild(XMLConfigNode *node)
 {
+  this->cameraIface = dynamic_cast<CameraIface*>(this->ifaces[0]);
+
+  if (!this->cameraIface)
+    gzthrow("Generic_Camera controller requires a CameraIface");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

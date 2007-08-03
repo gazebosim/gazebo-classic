@@ -28,6 +28,7 @@
 #define CONTROLLER_HH
 
 #include <string>
+#include <vector>
 
 #include "UpdateParams.hh"
 
@@ -47,9 +48,8 @@ namespace gazebo
 class Controller
 {
   /// \brief Constructor
-  /// \param iface The libgazebo interface for the controller
   /// \param parent The parent entity, must be a Model or a Sensor
-  public: Controller( Iface *iface, Entity *parent );
+  public: Controller( Entity *parent );
 
   /// \brief Destructor
   public: virtual ~Controller();
@@ -98,10 +98,11 @@ class Controller
   /// \brief The entity that owns this controller
   protected: Entity *parent;
 
-  protected: Iface *iface;
-
   /// \brief Update period 
   protected: double updatePeriod;
+
+  /// \brief Array of all the iface for this controller
+  protected: std::vector<Iface*> ifaces;
 };
 
 /** \} */

@@ -52,6 +52,8 @@ GZ_REGISTER_IFACE("position", PositionIface);
 GZ_REGISTER_IFACE("camera", CameraIface);
 GZ_REGISTER_IFACE("graphics3d", Graphics3dIface);
 GZ_REGISTER_IFACE("laser", LaserIface);
+GZ_REGISTER_IFACE("fiducial", FiducialIface);
+GZ_REGISTER_IFACE("factory", FactoryIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface
@@ -316,4 +318,11 @@ void Iface::Post()
 {
   assert(this->server);
   this->server->Post();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the iface type
+std::string Iface::GetType() const
+{
+  return this->type;
 }

@@ -48,9 +48,8 @@ namespace gazebo
 class Generic_Camera : public Controller
 {
   /// \brief Constructor
-  /// \param iface The libgazebo interface for the controller
   /// \param parent The parent entity, must be a Model or a Sensor
-  public: Generic_Camera(Iface *iface, Entity *parent);
+  public: Generic_Camera(Entity *parent);
 
   /// \brief Destructor
   public: virtual ~Generic_Camera();

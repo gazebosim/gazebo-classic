@@ -9,6 +9,7 @@
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   >
+  >
   <xyz>0 0.0 0.1</xyz>
   <rpy>0 0 0</rpy>
   <canonicalBody>laser_body</canonicalBody>
@@ -28,7 +29,7 @@
     <sensor:ray name="laser_1">
       <rayCount>180</rayCount>
       <rangeCount>361</rangeCount>
-      <origin>0 0.07 0</origin>
+      <origin>0.07 0.0 0</origin>
 
       <minAngle>-1.57</minAngle>
       <maxAngle>1.57</maxAngle>
@@ -37,7 +38,8 @@
       <maxRange>8</maxRange>
 
       <controller:sicklms200_laser name="laser_controller_1">
-        <interface:laser name="sicklms_iface_1"/>
+        <interface:laser name="sicklms_laser_iface_1"/>
+        <interface:fiducial name="sicklms_fid_iface_1"/>
       </controller:sicklms200_laser>
     </sensor:ray>
 

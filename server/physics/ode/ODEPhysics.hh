@@ -93,6 +93,9 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Add an entity
   public: virtual void AddEntity(Entity *entity);
 
+  /// \brief Remove an entity from the physics engine
+  public: virtual void RemoveEntity(Entity *entity);
+
   /// \brief Create a new body
   public: virtual Body *CreateBody(Entity *parent);
 

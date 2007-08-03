@@ -39,9 +39,12 @@
 
 #include <math.h>
 
+#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "FiducialInterface.hh"
+
+using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -55,7 +58,7 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
   strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
 
   // Allocate a Position Interface
-  this->iface = gz_fiducial_alloc();
+  this->iface = new FiducialIface();
 
   this->datatime = -1;
 }
@@ -65,7 +68,7 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
 FiducialInterface::~FiducialInterface()
 {
   // Release this interface
-  gz_fiducial_free(this->iface); 
+  delete this->iface; 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +76,7 @@ FiducialInterface::~FiducialInterface()
 int FiducialInterface::ProcessMessage(MessageQueue *respQueue,
                    player_msghdr_t *hdr, void *data)
 {
-  // Is it a request to get the geometry?
+  // Request the pose and size of the fiducial device
   if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
         PLAYER_FIDUCIAL_REQ_GET_GEOM, this->device_addr))
   {
@@ -81,9 +84,16 @@ int FiducialInterface::ProcessMessage(MessageQueue *respQueue,
 
     rep.pose.px = 0.0;
     rep.pose.py = 0.0;
-    rep.pose.pa = 0.0;
+    rep.pose.pz = 0.0;
+
+    rep.pose.proll = 0.0;
+    rep.pose.ppitch = 0.0;
+    rep.pose.pyaw = 0.0;
+
     rep.size.sw = 0.0;
     rep.size.sl = 0.0;
+    rep.size.sh = 0.0;
+
     rep.fiducial_size.sw = 0.05;
     rep.fiducial_size.sl = 0.50;
 
@@ -151,13 +161,13 @@ void FiducialInterface::Update()
   player_fiducial_data_t data;
   struct timeval ts;
 
-  gz_fiducial_lock(this->iface, 1);
+  this->iface->Lock(1);
 
   // Only Update when new data is present
   if (this->iface->data->time > this->datatime)
   {
     int i;
-    gz_fiducial_fid_t *fid;
+    FiducialFid *fid;
 
     this->datatime = this->iface->data->time;
 
@@ -166,7 +176,7 @@ void FiducialInterface::Update()
 
     memset(&data, 0, sizeof(data));
 
-    for (i = 0; i < this->iface->data->fid_count; i++)
+    for (i = 0; i < this->iface->data->count; i++)
     {
       fid = this->iface->data->fids + i;
       if (i >= PLAYER_FIDUCIAL_MAX_SAMPLES)
@@ -180,6 +190,12 @@ void FiducialInterface::Update()
       data.fiducials[i].pose.proll = fid->rot[0];
       data.fiducials[i].pose.ppitch = fid->rot[1];
       data.fiducials[i].pose.pyaw = fid->rot[2];
+
+    /*printf("fiducial %d %.2f %.2f %.2f\n",
+        fid->id, data.fiducials[i].pose.px, data.fiducials[i].pose.py,
+        data.fiducials[i].pose.pyaw);
+        */
+
     }
     data.fiducials_count = i;
 
@@ -189,7 +205,7 @@ void FiducialInterface::Update()
                    (void*)&data, sizeof(data), &this->datatime );
   }
 
-  gz_fiducial_unlock(this->iface);
+  this->iface->Unlock();
 }
 
 
@@ -199,15 +215,23 @@ void FiducialInterface::Update()
 void FiducialInterface::Subscribe()
 {
   // Open the interface
-  if (gz_fiducial_open(this->iface, GazeboClient::client, this->gz_id) != 0)
+  try
   {
-    printf("Error Subscribing to Gazebo Position Interface\n");
+    this->iface->Open(GazeboClient::client, this->gz_id);
   }
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "Error Subscribing to Gazebo Fiducial Interface\n"
+           << e << "\n";
+    gzthrow(stream.str());
+  }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void FiducialInterface::Unsubscribe()
 {
-  gz_fiducial_close(this->iface);
+  this->iface->Close();
 }

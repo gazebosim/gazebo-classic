@@ -21,7 +21,7 @@
 /* Desc: Fiducial Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id: FiducialInterface.hh,v 1.1.2.1 2006/12/16 22:43:22 natepak Exp $
+ * CVS: $SVN;$
  */
 
 #ifndef FIDUCIALINTERFACE_HH
@@ -29,40 +29,53 @@
 
 #include "GazeboInterface.hh"
 
-// Forward declarations
-typedef struct gz_fiducial gz_fiducial_t;
-
-class FiducialInterface : public GazeboInterface
+namespace gazebo
 {
-  /// @brief Constructor
-  public: FiducialInterface(player_devaddr_t addr, GazeboDriver *driver,
-                              ConfigFile *cf, int section);
 
-  /// @brief Destructor
-  public: virtual ~FiducialInterface();
+  // Forward declarations
+  class FiducialIface;
 
-  /// @brief Handle all messages. This is called from GazeboDriver
-  public: virtual int ProcessMessage(MessageQueue *respQueue,
-                                     player_msghdr_t *hdr, void *data);
+  /// \brief Plugin Player interface for Gazebo fiducials
+  class FiducialInterface : public GazeboInterface
+  {
+    /// \brief Constructor
+    /// \param addr Plaer device address
+    /// \param driver The Gazebo driver
+    /// \param cf Player config file
+    /// \param section Section of the config
+    public: FiducialInterface(player_devaddr_t addr, GazeboDriver *driver,
+                ConfigFile *cf, int section);
 
-  /// @brief Update this interface, publish new info.
-  public: virtual void Update();
+    /// \brief Destructor
+    public: virtual ~FiducialInterface();
 
-  /// @brief Open a SHM interface when a subscription is received. \
-  ///        This is called fromGazeboDriver::Subscribe
-  public: virtual void Subscribe();
+    /// \brief Handle all messages. This is called from GazeboDriver
+    /// \param respQueue Response queue
+    /// \param hdr Message header
+    /// \param data Pointer to the message data
+    public: virtual int ProcessMessage(MessageQueue *respQueue,
+                player_msghdr_t *hdr, void *data);
 
-  /// @brief Close a SHM interface. This is called from \
-  ///        GazeboDriver::Unsubscribe
-  public: virtual void Unsubscribe();
+    /// \brief Update this interface, publish new info.
+    public: virtual void Update();
 
-  private: gz_fiducial_t *iface;
+    /// \brief Open a SHM interface when a subscription is received. \
+    ///        This is called fromGazeboDriver::Subscribe
+    public: virtual void Subscribe();
 
-  /// @brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-  private: char *gz_id;
+    /// \brief Close a SHM interface. This is called from \
+    ///        GazeboDriver::Unsubscribe
+    public: virtual void Unsubscribe();
 
-  /// @brief Timestamp on last data update
-  private: double datatime;
+    /// \brief The gazebo fiducial interface
+    private: FiducialIface *iface;
 
-};
+    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+    private: char *gz_id;
+
+    /// \brief Timestamp on last data update
+    private: double datatime;
+
+  };
+}
 #endif

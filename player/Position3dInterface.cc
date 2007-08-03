@@ -38,9 +38,12 @@ PLAYER_POSITION3D_RESET_ODOM
 
 #include <math.h>
 
+#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "Position3dInterface.hh"
+
+using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -54,7 +57,7 @@ Position3dInterface::Position3dInterface(player_devaddr_t addr,
   strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
 
   // Allocate a Position Interface
-  this->iface = gz_position_alloc();
+  this->iface = new PositionIface();
 
   this->datatime = -1;
 }
@@ -64,7 +67,7 @@ Position3dInterface::Position3dInterface(player_devaddr_t addr,
 Position3dInterface::~Position3dInterface()
 {
   // Release this interface
-  gz_position_free(this->iface); 
+  delete this->iface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,7 +75,7 @@ Position3dInterface::~Position3dInterface()
 int Position3dInterface::ProcessMessage(MessageQueue *respQueue,
                    player_msghdr_t *hdr, void *data)
 {
-  gz_position_lock(this->iface, 1);
+  this->iface->Lock(1);
 
   // COMMAND VELOCITY:
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
@@ -82,12 +85,13 @@ int Position3dInterface::ProcessMessage(MessageQueue *respQueue,
 
     cmd = (player_position3d_cmd_vel_t*) data;
 
-    this->iface->data->cmd_vel_pos[0] = cmd->vel.px;
-    this->iface->data->cmd_vel_pos[1] = cmd->vel.py;
-    this->iface->data->cmd_vel_pos[2] = cmd->vel.pz;
-    this->iface->data->cmd_vel_rot[0] = cmd->vel.proll;
-    this->iface->data->cmd_vel_rot[1] = cmd->vel.ppitch;
-    this->iface->data->cmd_vel_rot[2] = cmd->vel.pyaw;
+    this->iface->data->cmdVelocity.x = cmd->vel.px;
+    this->iface->data->cmdVelocity.y = cmd->vel.py;
+    this->iface->data->cmdVelocity.z = cmd->vel.pz;
+
+    this->iface->data->cmdVelocity.roll = cmd->vel.proll;
+    this->iface->data->cmdVelocity.pitch = cmd->vel.ppitch;
+    this->iface->data->cmdVelocity.yaw = cmd->vel.pyaw;
 
     return 0;
   }
@@ -104,13 +108,13 @@ int Position3dInterface::ProcessMessage(MessageQueue *respQueue,
 
     player_position3d_set_odom_req_t *odom = (player_position3d_set_odom_req_t*)data;
 
-    this->iface->data->pos[0] = odom->pos.px;
-    this->iface->data->pos[1] = odom->pos.py;
-    this->iface->data->pos[2] = odom->pos.pz;
+    this->iface->data->pose.x = odom->pos.px;
+    this->iface->data->pose.y = odom->pos.py;
+    this->iface->data->pose.z = odom->pos.pz;
 
-    this->iface->data->rot[0] = odom->pos.proll;
-    this->iface->data->rot[1] = odom->pos.ppitch;
-    this->iface->data->rot[2] = odom->pos.pyaw;
+    this->iface->data->pose.roll = odom->pos.proll;
+    this->iface->data->pose.pitch = odom->pos.ppitch;
+    this->iface->data->pose.yaw = odom->pos.pyaw;
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_SET_ODOM);
@@ -132,7 +136,7 @@ int Position3dInterface::ProcessMessage(MessageQueue *respQueue,
 
     power = (player_position3d_power_config_t*) data;
 
-    this->iface->data->cmd_enable_motors = power->state;
+    this->iface->data->cmdEnableMotors = power->state;
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_MOTOR_POWER);
@@ -188,7 +192,7 @@ int Position3dInterface::ProcessMessage(MessageQueue *respQueue,
     return 0;
   }
 
-  gz_position_unlock(this->iface);
+  this->iface->Unlock();
 
   return -1;
 }
@@ -201,7 +205,7 @@ void Position3dInterface::Update()
   player_position3d_data_t data;
   struct timeval ts;
 
-  gz_position_lock(this->iface, 1);
+  this->iface->Lock(1);
 
   // Only Update when new data is present
   if (this->iface->data->time > this->datatime)
@@ -211,21 +215,21 @@ void Position3dInterface::Update()
     ts.tv_sec = (int) (this->iface->data->time);
     ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
-    data.pos.px = this->iface->data->pos[0];
-    data.pos.py = this->iface->data->pos[1];
-    data.pos.pz = this->iface->data->pos[2];
+    data.pos.px = this->iface->data->pose.x;
+    data.pos.py = this->iface->data->pose.y;
+    data.pos.pz = this->iface->data->pose.z;
 
-    data.pos.proll = this->iface->data->rot[0];
-    data.pos.ppitch = this->iface->data->rot[1];
-    data.pos.pyaw = this->iface->data->rot[2];
+    data.pos.proll = this->iface->data->pose.roll;
+    data.pos.ppitch = this->iface->data->pose.pitch;
+    data.pos.pyaw = this->iface->data->pose.yaw;
 
-    data.vel.px = this->iface->data->vel_pos[0];
-    data.vel.py = this->iface->data->vel_pos[1];
-    data.vel.pz = this->iface->data->vel_pos[2];
+    data.vel.px = this->iface->data->velocity.x;
+    data.vel.py = this->iface->data->velocity.y;
+    data.vel.pz = this->iface->data->velocity.z;
 
-    data.vel.proll = this->iface->data->vel_rot[0];
-    data.vel.ppitch = this->iface->data->vel_rot[1];
-    data.vel.pyaw = this->iface->data->vel_rot[2];
+    data.vel.proll = this->iface->data->velocity.roll;
+    data.vel.ppitch = this->iface->data->velocity.pitch;
+    data.vel.pyaw = this->iface->data->velocity.yaw;
 
     data.stall = (uint8_t) this->iface->data->stall;
 
@@ -235,7 +239,7 @@ void Position3dInterface::Update()
  
   }
 
-  gz_position_unlock(this->iface);
+  this->iface->Unlock();
 }
 
 
@@ -245,9 +249,16 @@ void Position3dInterface::Update()
 void Position3dInterface::Subscribe()
 {
   // Open the interface
-  if (gz_position_open(this->iface, GazeboClient::client, this->gz_id) != 0)
+  try
   {
-    printf("Error Subscribing to Gazebo Position Interface\n");
+    this->iface->Open(GazeboClient::client, this->gz_id);
+  }
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream <<"Error Subscribing to Gazebo Position3d Interface\n"
+           << e << "\n";
+    gzthrow(stream.str());
   }
 }
 
@@ -255,5 +266,5 @@ void Position3dInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void Position3dInterface::Unsubscribe()
 {
-  gz_position_close(this->iface);
+  this->iface->Close();
 }

@@ -1,25 +1,66 @@
 import os
 import sys
-import time
-
+import time 
 version = '0.8'
 
-# TESTING:
-#odeTestBuild = Builder(action="echo g++ -o $TARGET $_CPPINCFLAGS $SOURCE $_LIBDIRFLAGS $_LIBFLAGS >> /tmp/natedogg")
-
-# 3rd party packages
-parseConfigs=['pkg-config --cflags --libs OGRE',
-              'xml2-config --cflags --libs', 
-              'pkg-config --cflags --libs playerc++',
-              #'pkg-config --cflags --libs playerxdr',
-      	      'ode-config --cflags --libs',
-	            'pkg-config --cflags --libs OIS']
-	            #'python-config --cflags --libs']
-
+#
+# Setup the Options
+#
 opts = Options()
 #opts.Add('PREFIX', 'The install path "prefix"', '/usr/local')
 opts.Add('DESTDIR', 'The root directory to install into. Useful mainly for binary package building', '/')
+prefix = ARGUMENTS.get('prefix','/usr/local')
+install_prefix = env['DESTDIR'] + '/' + prefix
 
+
+#
+# Function used to test for ODE library, and TriMesh suppor
+#
+ode_test_source_file = """
+#include <ode/ode.h>
+int main()
+{
+  dGeomTriMeshDataCreate();
+  return 0;
+}
+"""
+
+def CheckODELib(context):
+  context.Message('Checking for ODE...')
+  oldLibs = context.env['LIBS']
+  context.env.Replace(LIBS='ode')
+  result = context.TryLink(ode_test_source_file, '.cpp')
+  context.Result(result)
+  context.env.Replace(LIBS=oldLibs)
+  return result
+
+#
+# Create the pkg-config file
+#
+def createPkgConfig(target, source, env):
+  f = open(str(target[0]), 'wb')
+  prefix = source[0].get_contents()
+  f.write('prefix=' + prefix + '\n')
+  f.write('Name: gazebo\n')
+  f.write('Description: Simplified interface to Player\n')
+  f.write('Version:' + version + '\n')
+  f.write('Requires:\n')
+  f.write('Libs: -L' + prefix + '/lib -lgazebo -lgazeboServer\n')
+  f.write('Cflags: -I' + prefix + '/include\n')
+
+  
+#
+# 3rd party packages
+#
+parseConfigs=['pkg-config --cflags --libs OGRE',
+              'xml2-config --cflags --libs', 
+#              'pkg-config --cflags --libs playerc++',
+      	      'ode-config --cflags --libs',
+	            'pkg-config --cflags --libs OIS']
+
+#
+# setup the build environment
+#
 env = Environment (
   CC = 'g++',
 
@@ -49,35 +90,13 @@ env = Environment (
 	options=opts
 )
 
-prefix = ARGUMENTS.get('prefix','/usr/local')
-install_prefix = env['DESTDIR'] + '/' + prefix
-# TESTING:
-#env.Append(BUILDERS = {'odeTestBuild' : odeTestBuild})
+env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
+pkgconfig = env.PkgConfig(target='gazebo.pc', source=Value(prefix))
+env.Install(dir=prefix+'/lib/pkgconfig', source=pkgconfig)
+
 
 # DEFAULT list of subdirectories to build
 subdirs = ['server','libgazebo', 'player']
-
-#
-# Function used to test for ODE library, and TriMesh suppor
-#
-ode_test_source_file = """
-#include <ode/ode.h>
-int main()
-{
-  dGeomTriMeshDataCreate();
-  return 0;
-}
-"""
-
-def CheckODELib(context):
-  context.Message('Checking for ODE...')
-  oldLibs = context.env['LIBS']
-  context.env.Replace(LIBS='ode')
-  result = context.TryLink(ode_test_source_file, '.cpp')
-  context.Result(result)
-  context.env.Replace(LIBS=oldLibs)
-  return result
-
 
 #
 # Parse all the pacakge configurations
@@ -102,13 +121,13 @@ if not env.GetOption('clean'):
         print "ODE is required, but not found."
         print "  http://www.ode.org"
         Exit(1)
-      elif cfg.find("player") >=0:
-        print "\n================================================================"
-        print "Player not found, bindings will not be built."
-        print "  To install player visit(http://playerstage.sourceforge.net)"
-        subdirs.remove('player')
-        print "================================================================"
-        #time.sleep(3)
+#      elif cfg.find("player") >=0:
+#        print "\n================================================================"
+#        print "Player not found, bindings will not be built."
+#        print "  To install player visit(http://playerstage.sourceforge.net)"
+#        subdirs.remove('player')
+#        print "================================================================"
+#        #time.sleep(3)
   conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib})
    
   #Check for the ODE library and header
@@ -132,11 +151,12 @@ if not env.GetOption('clean'):
 
 staticObjs = []
 sharedObjs = []
+headers = []
 
 #
 # Export the environment
 #
-Export('env prefix version staticObjs sharedObjs')
+Export('env prefix version staticObjs sharedObjs headers')
 
 #
 # Process subdirectories
@@ -158,8 +178,16 @@ libgazeboServerShared = env.SharedLibrary('gazeboServer',sharedObjs)
 #
 # Install gazebo
 #
+#env.Install(prefix+'/bin',gazebo)
+#env.Install(prefix+'/share/gazebo','Media')
+#env.Alias('install', prefix)
+#env.Install(prefix+'/lib',libgazeboServerStatic )
+#env.Install(prefix+'/lib',libgazeboServerShared )
+#env.Install(prefix+'/include/gazebo',headers)
+
 env.Alias('install', install_prefix)
 env.Install(install_prefix+'/bin',gazebo)
 env.Install(install_prefix+'/share/gazebo','Media')
 env.Install(install_prefix+'/lib',libgazeboServerStatic )
 env.Install(install_prefix+'/lib',libgazeboServerShared )
+env.Install(install_prefix+'/include/gazebo',headers)

@@ -231,7 +231,7 @@ void LaserInterface::Subscribe()
   catch (GazeboError e)
   {
     std::ostringstream stream;
-    stream << "Error Subscribing to Gazebo Position Interface\n"
+    stream << "Error Subscribing to Gazebo Laser Interface\n"
            << e << "\n";
     gzthrow(stream.str());
   }

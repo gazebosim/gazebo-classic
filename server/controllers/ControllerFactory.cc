@@ -36,6 +36,8 @@ using namespace gazebo;
 void RegisterPioneer2dx_Position2d();
 void RegisterSickLMS200_Laser();
 void RegisterGeneric_Camera();
+void RegisterTruth_Position2d();
+void RegisterFactory();
 
 std::map<std::string, ControllerFactoryFn> ControllerFactory::controllers;
 
@@ -46,6 +48,8 @@ void ControllerFactory::RegisterAll()
   RegisterPioneer2dx_Position2d();
   RegisterSickLMS200_Laser();
   RegisterGeneric_Camera();
+  RegisterTruth_Position2d();
+  RegisterFactory();
 }
 
 
@@ -59,11 +63,11 @@ void ControllerFactory::RegisterController(std::string type, std::string classna
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new instance of a controller.  Used by the world when reading
 // the world file.
-Controller *ControllerFactory::NewController(const std::string &classname, Iface *iface, Entity *parent)
+Controller *ControllerFactory::NewController(const std::string &classname, Entity *parent)
 {  
   if (controllers[classname])
   {
-    return (controllers[classname]) (iface, parent);
+    return (controllers[classname]) (parent);
   }
   else
   {

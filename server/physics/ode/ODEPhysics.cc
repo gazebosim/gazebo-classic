@@ -150,6 +150,13 @@ void ODEPhysics::AddEntity(Entity *entity)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Remove an entity from the physics engine
+void ODEPhysics::RemoveEntity(Entity *entity)
+{
+  this->entities.erase(entity->GetId());
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Create a new body
 Body *ODEPhysics::CreateBody(Entity *parent)
 {

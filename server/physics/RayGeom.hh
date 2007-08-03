@@ -35,43 +35,55 @@ namespace gazebo
 
 class RayGeom : public Geom
 {
-  /// Constructor
+  /// \brief Constructor
   /// \param body Body the ray is attached to
   public: RayGeom( Body *body );
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~RayGeom();
 
-  /// Set the ray based on starting and ending points relative to the body
+  /// \brief Set the ray based on starting and ending points relative to the body
   /// \param posStart Start position, relative the body
   /// \param posEnd End position, relative to the body
   public: void SetPoints(const Vector3 &posStart, const Vector3 &posEnd);
 
-  /// Get the relative starting and ending points
+  /// \brief Get the relative starting and ending points
   /// \param posA Returns the starting point
   /// \param posB Returns the ending point
   public: void GetRelativePoints(Vector3 &posA, Vector3 &posB);
 
-  /// Get the global starting and ending points
+  /// \brief Get the global starting and ending points
   /// \param posA Returns the starting point
   /// \param posB Returns the ending point
   public: void GetGlobalPoints(Vector3 &posA, Vector3 &posB);
 
-  /// Set the length of the ray
+  /// \brief Set the length of the ray
   /// \param len Length of the array
   public: void SetLength( double len );
 
-  /// Get the length of the ray
+  /// \brief Get the length of the ray
   public: double GetLength() const;
 
+  /// \brief Update the tay geom
   public: void Update();
+
+  /// \brief Set the retro-reflectivness detected by this ray
+  public: void SetRetro( float retro );
+
+  /// \brief Get the retro-reflectivness detected by this ray
+  public: float GetRetro() const;
+
+  /// \brief Set the fiducial id detected by this ray
+  public: void SetFiducial( int fid );
+
+  /// \brief Get the fiducial id detected by this ray
+  public: int GetFiducial() const;
 
   /// Contact information; this is filled out during collision
   /// detection.  
-  public: double contactRetro;
-  public: int contactFiducial;
-
   private: double contactLen;
+  private: double contactRetro;
+  private: int contactFiducial;
 
   private: OgreDynamicLines *line;
 
@@ -82,6 +94,7 @@ class RayGeom : public Geom
   /// Start and end positions of the ray in global cs
   private: Vector3 globalStartPos;
   private: Vector3 globalEndPos;
+
 
 };
 

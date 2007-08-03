@@ -30,40 +30,42 @@
 #include "GazeboInterface.hh"
 
 // Forward declarations
-typedef struct gz_position gz_position_t;
-
-
-class Position3dInterface : public GazeboInterface
+namespace gazebo
 {
-  /// @brief Constructor
-  public: Position3dInterface(player_devaddr_t addr, GazeboDriver *driver,
-                              ConfigFile *cf, int section);
+  class PositionIface;
 
-  /// @brief Destructor
-  public: virtual ~Position3dInterface();
+  class Position3dInterface : public GazeboInterface
+  {
+    /// \brief Constructor
+    public: Position3dInterface(player_devaddr_t addr, GazeboDriver *driver,
+                ConfigFile *cf, int section);
 
-  /// @brief Handle all messages. This is called from GazeboDriver
-  public: virtual int ProcessMessage(MessageQueue *respQueue,
-                                     player_msghdr_t *hdr, void *data);
+    /// \brief Destructor
+    public: virtual ~Position3dInterface();
 
-  /// @brief Update this interface, publish new info.
-  public: virtual void Update();
+    /// \brief Handle all messages. This is called from GazeboDriver
+    public: virtual int ProcessMessage(MessageQueue *respQueue,
+                player_msghdr_t *hdr, void *data);
 
-  /// @brief Open a SHM interface when a subscription is received. \
-  ///        This is called fromGazeboDriver::Subscribe
-  public: virtual void Subscribe();
+    /// \brief Update this interface, publish new info.
+    public: virtual void Update();
 
-  /// @brief Close a SHM interface. This is called from \
-  ///        GazeboDriver::Unsubscribe
-  public: virtual void Unsubscribe();
+    /// \brief Open a SHM interface when a subscription is received. \
+    ///        This is called fromGazeboDriver::Subscribe
+    public: virtual void Subscribe();
 
-  private: gz_position_t *iface;
+    /// \brief Close a SHM interface. This is called from \
+    ///        GazeboDriver::Unsubscribe
+    public: virtual void Unsubscribe();
 
-  /// @brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-  private: char *gz_id;
+    private: PositionIface *iface;
 
-  /// @brief Timestamp on last data update
-  private: double datatime;
-};
+    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+    private: char *gz_id;
+
+    /// \brief Timestamp on last data update
+    private: double datatime;
+  };
+}
 
 #endif

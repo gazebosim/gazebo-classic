@@ -58,6 +58,16 @@ Entity::Entity(Entity *parent)
 
 Entity::~Entity()
 {
+  if (this->parent)
+  {
+    this->parent->sceneNode->removeAndDestroyChild(this->sceneNode->getName());
+  }
+  else
+  {
+    OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->removeAndDestroyChild(this->sceneNode->getName());
+  }
+
+  World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 }
 
 int Entity::GetId() const
@@ -150,4 +160,13 @@ bool Entity::IsStatic() const
 {
   return this->isStatic;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Returns true if the entities are the same. Checks only the name
+bool Entity::operator==(const Entity &ent)
+{
+  printf("HERE\n");
+  return ent.GetName() == this->GetName();
+}
+
 

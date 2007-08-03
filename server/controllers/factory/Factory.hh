@@ -19,14 +19,13 @@
  *
  */
 /*
- * Desc: Position2d controller for a Pioneer2dx.
+ * Desc: Factory controller.
  * Author: Nathan Koenig
- * Date: 01 Feb 2007
- * SVN: $Id$
+ * Date: 29 July 2007
+ * SVN: $Id:$
  */
-#ifndef PIONEER2DX_POSITION2D_HH
-#define PIONEER2DX_POSITION2D_HH
-
+#ifndef FACTORY_POSITION2D_HH
+#define FACTORY_POSITION2D_HH
 
 #include "Controller.hh"
 #include "Entity.hh"
@@ -34,24 +33,22 @@
 
 namespace gazebo
 {
-  class HingeJoint;
-  class PositionIface;
+  class FactoryIface;
 
 /// \addtogroup controllers
 /// \{
-/** \defgroup pioneer2dx_position2d pioneer2dx_position2d
+/** \defgroup factory factory
 \{
 */
 
-/// Pioneer 2 DX Position2D controller.
-/// This is a controller that simulates a Pioneer 2DX motion
-class Pioneer2dx_Position2d : public Controller
+/// \brief Factory used for dynamic construction of models
+class Factory : public Controller
 {
   /// Constructor
-  public: Pioneer2dx_Position2d(Entity *parent );
+  public: Factory(Entity *parent );
 
   /// Destructor
-  public: virtual ~Pioneer2dx_Position2d();
+  public: virtual ~Factory();
 
   /// Load the controller
   /// \param node XML config node
@@ -70,35 +67,14 @@ class Pioneer2dx_Position2d : public Controller
   /// \return 0 on success
   protected: virtual void FiniChild();
 
-  /// Update the data in the interface
-  private: void PutPositionData();
-
-  /// Get the position command from libgazebo
-  private: void GetPositionCmd();
-
   /// The Position interface
-  private: PositionIface *myIface;
+  private: FactoryIface *factoryIface;
 
   /// The parent Model
   private: Model *myParent;
 
-  /// Separation between the wheels
-  private: float wheelSep;
-
-  /// Diameter of the wheels
-  private: float wheelDiam;
-
-  /// Speeds of the wheels
-  private: float wheelSpeed[2];
-
-  /// True = enable motors
-  private: bool enableMotors;
-
-  private: float odomPose[3];
-  private: float odomVel[3];
-
-  private: HingeJoint *joints[2];
-
+  private: std::string xmlPrefix;
+  private: std::string xmlSuffix;
 };
 
 /** \} */

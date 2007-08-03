@@ -24,28 +24,26 @@
  * Date: 01 Feb 2007
  * SVN info: $Id$
  */
+
 #include "Model.hh"
 #include "Sensor.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
+#include "World.hh"
 #include "Controller.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Controller::Controller( Iface *interface, Entity *entity )
+Controller::Controller(Entity *entity )
 {
-  if (!interface)
-    gzthrow("iface is NULL");
-
   if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
   {
     gzthrow("The parent of a controller must be a Model or a Sensor");
   }
 
-  this->iface = interface;
   this->parent = entity;
 }
 
@@ -59,10 +57,42 @@ Controller::~Controller()
 /// Load the controller. Called once on startup
 void Controller::Load(XMLConfigNode *node)
 {
+  XMLConfigNode *childNode;
+
   if (!this->parent)
     gzthrow("Parent entity has not been set");
 
   this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
+
+  childNode = node->GetChildByNSPrefix("interface");
+
+  // Create the interfaces
+  while (childNode)
+  {
+  
+    // Get the type of the interface (eg: laser)
+    std::string ifaceType = childNode->GetName();
+
+    // Get the name of the iface 
+    std::string ifaceName = childNode->GetString("name","",1);
+
+    // Use the factory to get a new iface based on the type
+    Iface *iface = IfaceFactory::NewIface(ifaceType);
+
+    // Create the iface
+    iface->Create(World::Instance()->GetGzServer(), ifaceName);
+
+    this->ifaces.push_back(iface);
+
+    childNode = childNode->GetNextByNSPrefix("interface");
+  }
+
+  if (this->ifaces.size() <= 0)
+  {
+    std::ostringstream stream;
+    stream << "No interface defined for " << this->name << "controller";
+    gzthrow(stream.str()); 
+  }
 
   this->LoadChild(node);
 }
@@ -85,6 +115,5 @@ void Controller::Update(UpdateParams &params)
 /// Finialize the controller. Called once on completion.
 void Controller::Fini()
 {
-  this->iface->Destroy();
   this->FiniChild();
 }

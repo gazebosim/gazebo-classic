@@ -37,11 +37,10 @@ namespace gazebo
 // Forward declarations
 class Controller;
 class Entity;
-class Iface;
 
 
 // Prototype for controller factory functions
-typedef Controller* (*ControllerFactoryFn) (Iface *iface, Entity *parent);
+typedef Controller* (*ControllerFactoryFn) (Entity *parent);
 
 
 /// @brief The controller factory; the class is just for namespacing purposes.
@@ -56,7 +55,7 @@ class ControllerFactory
 
   /// @brief Create a new instance of a controller.  Used by the world when
   /// reading the world file.
-  public: static Controller *NewController(const std::string &classname, Iface *iface, Entity *parent);
+  public: static Controller *NewController(const std::string &classname, Entity *parent);
 
   // A list of registered controller classes
   private: static std::map<std::string, ControllerFactoryFn> controllers;
@@ -70,9 +69,9 @@ class ControllerFactory
 /// @param name Controller type name, as it appears in the world file.
 /// @param classname C++ class name for the controller.
 #define GZ_REGISTER_STATIC_CONTROLLER(name, classname) \
-Controller *New##classname(Iface *iface, Entity *entity) \
+Controller *New##classname(Entity *entity) \
 { \
-  return new classname(iface, entity); \
+  return new classname(entity); \
 } \
 void Register##classname() \
 {\

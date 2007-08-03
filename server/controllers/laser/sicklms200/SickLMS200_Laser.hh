@@ -48,9 +48,8 @@ namespace gazebo
 class SickLMS200_Laser : public Controller
 {
   /// \brief Constructor
-  /// \param iface The libgazebo interface for the controller
   /// \param parent The parent entity, must be a Model or a Sensor
-  public: SickLMS200_Laser(Iface *iface, Entity *parent);
+  public: SickLMS200_Laser(Entity *parent);
 
   /// \brief Destructor
   public: virtual ~SickLMS200_Laser();
@@ -75,8 +74,13 @@ class SickLMS200_Laser : public Controller
   /// \brief Put laser data to the iface
   private: void PutLaserData();
 
+  /// \brief Put fiducial data to the iface
+  private: void PutFiducialData();
+
   /// The laser interface
   private: LaserIface *laserIface;
+
+  private: FiducialIface *fiducialIface;
 
   /// The parent sensor
   private: RaySensor *myParent;

@@ -105,6 +105,9 @@ class Entity
   /// \return bool True = static
   public: bool IsStatic() const;
 
+  /// \bried Returns true if the entities are the same. Checks only the name
+  public: bool operator==(const Entity &ent);
+
   /// Parent of this entity
   protected: Entity *parent;
 

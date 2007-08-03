@@ -1,5 +1,5 @@
 #Import variables
-Import('env staticObjs sharedObjs')
+Import('env staticObjs sharedObjs headers')
 
 dirs = Split('physics rendering sensors controllers')# bindings')
 
@@ -20,6 +20,21 @@ sources = ['main.cc',
            'GazeboMessage.cc',
            'Vector2.cc',
            'Model.cc']
+
+headers.append( 
+          ['#/server/Global.hh',
+           '#/server/Vector3.hh', 
+           '#/server/Quatern.hh',
+           '#/server/Pose3d.hh',
+           '#/server/World.hh',
+           '#/server/XMLConfig.hh',
+           '#/server/Time.hh',
+           '#/server/Entity.hh',
+           '#/server/GazeboError.hh',
+           '#/server/UpdateParams.hh',
+           '#/server/GazeboMessage.hh',
+           '#/server/Vector2.hh',
+           '#/server/Model.hh'] )
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

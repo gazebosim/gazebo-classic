@@ -385,6 +385,8 @@ int Body::LoadGeom(XMLConfigNode *node)
   geom->SetRotation(node->GetRotation("rpy",Quatern()));
   geom->SetName(node->GetString("name","",1));
   geom->SetMeshMaterial(node->GetString("material","",0));
+  geom->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
+  geom->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
 
   return 0;
 }
