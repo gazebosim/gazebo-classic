@@ -1,5 +1,4 @@
 Open:
-- Fix Player include so that libgazebo doesn't link in player
 - FLTK interface
 - Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
 - Pioneer2DX
@@ -73,3 +72,4 @@ Completed:
 - Laser retro and fiducial detection
 - Truth
 - Factory
+- Fix Player include so that libgazebo doesn't link in player

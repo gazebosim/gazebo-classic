@@ -52,7 +52,9 @@ def createPkgConfig(target, source, env):
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
       	      'ode-config --cflags --libs',
-	            'pkg-config --cflags --libs OIS']
+	            'pkg-config --cflags --libs OIS',
+              'fltk-config --cflags --libs --use-gl --use-images',
+              'xft-config --cflags --libs']
 
 #
 # setup the build environment
@@ -65,19 +67,20 @@ env = Environment (
 
   CPPPATH = [
    '#.', 
-    '#server',
-    '#server/models',
-    '#libgazebo', 
-    '#server/rendering',
-    '#server/sensors', 
-    '#server/sensors/camera',
-    '#server/sensors/ray',
-    '#server/physics',
-    '#server/physics/ode',
-    '#server/controllers',
-    '#server/controllers/position2d',
-    '#server/controllers/position2d/pioneer2dx',
-    ],
+   '#server',
+   '#server/models',
+   '#server/gui/fltk',
+   '#libgazebo', 
+   '#server/rendering',
+   '#server/sensors', 
+   '#server/sensors/camera',
+   '#server/sensors/ray',
+   '#server/physics',
+   '#server/physics/ode',
+   '#server/controllers',
+   '#server/controllers/position2d',
+   '#server/controllers/position2d/pioneer2dx',
+   ],
 
   LIBPATH=Split('#libgazebo'),
     
