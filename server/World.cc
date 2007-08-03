@@ -93,7 +93,7 @@ void World::Load(XMLConfig *config, int serverId)
   assert(serverId >= 0);
   XMLConfigNode *rootNode(config->GetRootNode());
 
-  try
+  /*try
   {
     OgreAdaptor::Instance()->Init(rootNode->GetChildByNSPrefix("rendering"));
   }
@@ -103,7 +103,7 @@ void World::Load(XMLConfig *config, int serverId)
     stream << "Failed to Initialize the OGRE Rendering system\n" 
               << e << "\n";
     gzthrow(stream.str());
-  }
+  }*/
 
   // Create some basic shapes
   OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);

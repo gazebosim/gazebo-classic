@@ -35,7 +35,7 @@
 namespace gazebo
 {
 
-#define gzthrow(msg) throw GazeboError(__FILE__,__LINE__,msg)
+#define gzthrow(msg) throw gazebo::GazeboError(__FILE__,__LINE__,msg)
 
 class GazeboError
 {

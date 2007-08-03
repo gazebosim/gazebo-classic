@@ -68,7 +68,8 @@ class OgreAdaptor
   public: static OgreAdaptor *Instance();
 
   /// \brief Default initialization. Let OGRE create the window and rendering context
-  public: void Init(XMLConfigNode *node);
+  public: void Init(XMLConfigNode *node, bool window, Display *display=NULL,
+              XVisualInfo *visual=NULL, Window windowId = 0);
 
   /// \brief Initialize Ogre Rendering engine
   public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height);
@@ -119,6 +120,8 @@ class OgreAdaptor
   private: Ogre::ColourValue *backgroundColor;
 
   private: std::string videoMode;
+
+  private: bool ogreWindow;
 };
 
 class OgreGLXWindowInterface

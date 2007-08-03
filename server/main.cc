@@ -110,8 +110,10 @@ home directory, or to the log file specified with the -l command line option.
 #include "IfaceFactory.hh"
 #include "ControllerFactory.hh"
 #include "World.hh"
+#include "FLTKWindow.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
+#include "OgreAdaptor.hh"
 
 // Command line options
 const char *worldFileName;
@@ -121,6 +123,8 @@ bool optServerForce = true;
 double optTimeout = -1;
 int optMsgLevel = 1;
 int optTimeControl = 1;
+
+gazebo::FLTKWindow *fltkWindow = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -254,6 +258,7 @@ int Init()
     printf("signal(2) failed while setting up for SIGINT\n");
     return -1;
   }
+
   // Load the world file
   gazebo::XMLConfig *xmlFile(new gazebo::XMLConfig());
 
@@ -267,11 +272,30 @@ int Init()
   gazebo::SensorFactory::RegisterAll();
   gazebo::IfaceFactory::RegisterAll();
   gazebo::ControllerFactory::RegisterAll();
-  
+
+  bool ogreWindow = false;
+
+  if (!ogreWindow)
+  {
+    fltkWindow = new gazebo::FLTKWindow(100, 290, 640, 480, "OGRE#FLTK Window");
+    fltkWindow->show();
+  }
+
+  try
+  {
+    gazebo::OgreAdaptor::Instance()->Init(xmlFile->GetRootNode()->GetChildByNSPrefix("rendering"), ogreWindow, fltkWindow->display, fltkWindow->visual, fltkWindow->windowId);
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "Failed to Initialize the OGRE Rendering system\n" 
+              << e << "\n";
+    gzthrow(stream.str());
+  }
+
   // Load the world
   gazebo::World::Instance()->Load(xmlFile, optServerId);
 
-  // Initialize
   if (gazebo::World::Instance()->Init() != 0)
     return -1;
 

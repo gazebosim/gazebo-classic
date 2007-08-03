@@ -51,6 +51,8 @@ OgreAdaptor::OgreAdaptor()
 
   // Make the root 
   this->root = new Ogre::Root(); 
+
+  this->ogreWindow = true;
 }
 
 /// Destructor
@@ -67,7 +69,8 @@ OgreAdaptor *OgreAdaptor::Instance()
 }
 
 
-void OgreAdaptor::Init(XMLConfigNode *node)
+void OgreAdaptor::Init(XMLConfigNode *node, bool window,
+    Display *display, XVisualInfo *visual, Window windowId)
 {
   XMLConfigNode *cnode;
   Ogre::ColourValue ambient;
@@ -77,6 +80,11 @@ void OgreAdaptor::Init(XMLConfigNode *node)
     gzthrow( "missing OGRE Rendernig information" );
   }
 
+  this->display = display;
+  this->visual = visual;
+  this->windowId = windowId;
+
+  this->ogreWindow = window;
 
   ambient.r = node->GetTupleDouble("ambient",0,0);
   ambient.g = node->GetTupleDouble("ambient",1,0);
@@ -114,7 +122,11 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->SetupRenderSystem(true);
 
   // Initialize the root node, and create a window
-  this->window = this->root->initialise(true); 
+  this->window = this->root->initialise(this->ogreWindow); 
+
+  if (!this->ogreWindow)
+    this->CreateWindow(640, 480);
+
 
   // Get the SceneManager, in this case a generic one
   //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
@@ -336,6 +348,10 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     {
       selectedRenderSystem->setConfigOption("Video Mode",this->videoMode);
       this->root->setRenderSystem(selectedRenderSystem);
+    }
+    else
+    {
+      std::cerr << "No render system selected\n";
     }
 
   }

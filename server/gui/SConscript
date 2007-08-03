@@ -1,0 +1,5 @@
+#Import variable
+dirs = Split('fltk')
+
+for subdir in dirs :
+  SConscript('%s/SConscript' % subdir)
