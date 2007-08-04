@@ -33,60 +33,61 @@
 namespace gazebo
 {
 
-/// @addtogroup gazebocore
-/// @{
+/// \addtogroup gazebo_server
+/// \brief A quaternion class
+/// \{
 
-/// A quaternion class
+/// \brief A quaternion class
 class Quatern
 {
-  /// Default Constructor
+  /// \brief Default Constructor
   public: Quatern();
 
-  /// Constructor
+  /// \brief Constructor
   /// \param u U param
   /// \param x X param
   /// \param y Y param
   /// \param z Z param
   public: Quatern( const double &u, const double &x, const double &y, const double &z);
 
-  /// Copy constructor
+  /// \brief Copy constructor
   /// \param qt Quatern to copy
   public: Quatern( const Quatern &qt );
 
-  /// Destructor
+  /// \brief Destructor
   public: ~Quatern();
 
-  /// Equal operator
+  /// \brief Equal operator
   /// \param qt Quatern to copy
   public: const Quatern &operator=(const Quatern &qt);
 
-  /// Invert the quaternion
+  /// \brief Invert the quaternion
   public: void Invert();
 
-  /// Get the inverse of this quaternion
+  /// \brief Get the inverse of this quaternion
   /// \return Inverse quarenion
   public: Quatern GetInverse() const;
 
-  /// Set the quatern to the identity
+  /// \brief Set the quatern to the identity
   public: void SetToIdentity();
 
-  /// Normalize the quaternion
+  /// \brief Normalize the quaternion
   public: void Normalize();
 
-  /// Set the quaternion from an axis and angle
+  /// \brief Set the quaternion from an axis and angle
   /// \param x X axis 
   /// \param y Y axis
   /// \param z Z axis
   /// \param a Angle in radians
   public: void SetFromAxis(double x, double y, double z, double a);
          
-  /// Set the quaternion from Euler angles
+  /// \brief Set the quaternion from Euler angles
   /// \param roll Roll in radians
   /// \param pitch Pitch in radians
   /// \param yaw Yaw in radians
   public: void SetFromEuler(const Vector3 &vec);
 
-  /// Return the rotation in Euler angles
+  /// \brief Return the rotation in Euler angles
   /// \return This quaternion as an Euler vector
   public: Vector3 GetAsEuler();
 
@@ -99,27 +100,27 @@ class Quatern
   /// \brief Get the Euler yaw angle in radians
   public: double GetYaw();
 
-  /// Return rotation as axis and angle (x, y, y, rotation)
+  /// \brief Return rotation as axis and angle (x, y, y, rotation)
   /// \return This quaternion as an axis-angle
   public: Quatern GetAsAxis();
 
-  /// Scale a Quaternion
+  /// \brief Scale a Quaternion
   /// \param scale Amount to scale this rotation
   public: void Scale(double scale);
 
-  /// Multiplication operator
+  /// \brief Multiplication operator
   /// \param qt Quatern for multiplication
   /// \return This quatern multiplied by the parameter
   public: Quatern operator*( const Quatern &qt ) const;
 
-  /// See if a quatern is finite (e.g., not nan)
+  /// \brief See if a quatern is finite (e.g., not nan)
   /// \return True if quatern is finite
   public: bool IsFinite() const;
 
-  /// Attributes of the quaternion 
+  /// \brief Attributes of the quaternion 
   public: double u, x, y, z;
 
-  /// Ostream operator
+  /// \brief Ostream operator
   /// \param out Ostream
   /// \param q Quatern to output
   /// \return The ostream
@@ -132,7 +133,7 @@ class Quatern
 
 };
 
-/// @}
+/// \}
 }
 
 #endif

@@ -38,11 +38,9 @@ namespace gazebo
   class XMLConfigNode;
   class Entity;
 
-/// \addtogroup controllers
+/// \addtogroup gazebo_controller
+/// \brief Base class for all controllers
 /// \{
-/** \defgroup controller controller
-\{ 
-*/
 
 /// \brief Base class for all controllers
 class Controller
@@ -105,7 +103,6 @@ class Controller
   protected: std::vector<Iface*> ifaces;
 };
 
-/** \} */
 /// \}
 
 }

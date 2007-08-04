@@ -31,9 +31,13 @@
 
 namespace gazebo
 {
+/// \addtogroup gazebo_rendering
+/// \{
+
   class CameraSensor;
   class OgreAdaptor;
 
+  /// \brief The Heads Up Display
   class OgreHUD
   {
     /// \brief Constructor
@@ -97,5 +101,6 @@ namespace gazebo
     private: OgreAdaptor *ogreAdaptor;
   };
 
+/// \}
 }
 #endif

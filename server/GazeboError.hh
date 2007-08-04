@@ -34,55 +34,76 @@
 
 namespace gazebo
 {
+  
+  /// \addtogroup gazebo_server
+  /// \brief Gazebo error class
+  /// \{
+ 
+  #define gzthrow(msg) throw gazebo::GazeboError(__FILE__,__LINE__,msg)
+  
+  /// \brief Class to handle errors
+  ///
+  /**
+   Use <tt>gzthrow(std::string)</tt> to throw errors.
 
-#define gzthrow(msg) throw gazebo::GazeboError(__FILE__,__LINE__,msg)
+   Example:
+   
+   \verbatim
+   std::ostringstreaom stream;
+   stream << "This is an error message of type[" << type << "]\n";
+   gzthrow(stream.str());
+   \endverbatim
 
-class GazeboError
-{
-  public: GazeboError();
-
-  /// Default constructor
-  /// \param file File name
-  /// \param line Line number where the error occurred
-  /// \param msg Error message
-  public: GazeboError(const char *file, 
-                      int line, 
-                      std::string msg);
-
-  /// Destructor
-  public: virtual ~GazeboError();
-
-  /// Return the error function
-  /// \return The error function name
-  public: std::string GetErrorFile() const;
-
-  /// Return the error line
-  /// \return The error line
-  public: int GetErrorLine() const;
-
-
-  /// Return the error string
-  /// \return The error string
-  public: std::string GetErrorStr() const; 
-
-  /// The error function
-  private: std::string file;
-
-  /// Line the error occured on
-  private: int line;
-
-  /// The error string
-  private: std::string str;
-
-  /// Ostream operator for Gazebo Error
-  public: friend std::ostream &operator<<(std::ostream& out, const gazebo::GazeboError &err)
-          {
-            return out << err.GetErrorFile()
-              << ":" << err.GetErrorLine() 
-              << " : " << err.GetErrorStr();
-          }
-};
-
+  */
+  class GazeboError
+  {
+    /// \brief Constructor
+    public: GazeboError();
+  
+    /// \brief Default constructor
+    /// \param file File name
+    /// \param line Line number where the error occurred
+    /// \param msg Error message
+    public: GazeboError(const char *file, 
+                        int line, 
+                        std::string msg);
+  
+    /// \brief Destructor
+    public: virtual ~GazeboError();
+  
+    /// \brief Return the error function
+    /// \return The error function name
+    public: std::string GetErrorFile() const;
+  
+    /// \brief Return the error line
+    /// \return The error line
+    public: int GetErrorLine() const;
+  
+  
+    /// \brief Return the error string
+    /// \return The error string
+    public: std::string GetErrorStr() const; 
+  
+    /// \brief The error function
+    private: std::string file;
+  
+    /// \brief Line the error occured on
+    private: int line;
+  
+    /// \brief The error string
+    private: std::string str;
+  
+    /// \brief Ostream operator for Gazebo Error
+    public: friend std::ostream &operator<<(std::ostream& out, const gazebo::GazeboError &err)
+            {
+              return out << err.GetErrorFile()
+                << ":" << err.GetErrorLine() 
+                << " : " << err.GetErrorStr();
+            }
+  };
+  
+/** \} */
+/// \}
 }
 
 #endif

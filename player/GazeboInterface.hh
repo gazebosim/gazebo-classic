@@ -32,39 +32,47 @@
 namespace gazebo
 {
 
+/// \addtogroup player
+/// \brief Base class for all the player interfaces
+/// \{
+
 // Forward declarations
 class GazeboDriver;
 
+/// \brief Base class for all the player interfaces
 class GazeboInterface
 {
-  /// @brief Constructor
+  /// \brief Constructor
   public: GazeboInterface(player_devaddr_t addr, GazeboDriver *driver,
                     ConfigFile *cf, int section);
 
-  /// @brief Destructor
+  /// \brief Destructor
   public: virtual ~GazeboInterface();
 
-  /// @brief Handle all messages. This is called from GazeboDriver
+  /// \brief Handle all messages. This is called from GazeboDriver
   public: virtual int ProcessMessage(MessageQueue *respQueue,
                                      player_msghdr_t *hdr, void *data) = 0;
 
-  /// @brief Update this interface, publish new info.
+  /// \brief Update this interface, publish new info.
   public: virtual void Update() = 0;
 
-  /// @brief Open a SHM interface when a subscription is received.
+  /// \brief Open a SHM interface when a subscription is received.
   ///        This is called fromGazeboDriver::Subscribe
   public: virtual void Subscribe() = 0;
 
-  /// @brief Close a SHM interface. This is called from
+  /// \brief Close a SHM interface. This is called from
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe() = 0;
 
-  /// @brief Address of the Player Device
+  /// \brief Address of the Player Device
   public: player_devaddr_t device_addr;
 
-  /// @brief Driver instance that created this device
+  /// \brief Driver instance that created this device
   public: GazeboDriver *driver;
 };
+
+/// \}
+
 
 }
 #endif

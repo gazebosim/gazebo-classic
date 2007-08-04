@@ -32,10 +32,16 @@
 namespace gazebo
 {
 
+/// \addtogroup player_iface 
+/// \{
+/// \defgroup position2d_player Position2d Interface
+/// \brief Position2d Player interface
+/// \{
+
 // Forward declarations
 class PositionIface;
 
-
+/// \brief Position2d Player interface
 class Position2dInterface : public GazeboInterface
 {
   /// @brief Constructor
@@ -68,6 +74,10 @@ class Position2dInterface : public GazeboInterface
   /// @brief Timestamp on last data update
   private: double datatime;
 };
+
+/// \} 
+/// \} 
+
 
 }
 

@@ -36,10 +36,8 @@ class Entity;
 class Body;
 class XMLConfigNode;
 
-/// @addtogroup physics
-/// @{
-
-/** @defgroup physicsengine Base Physics Engine
+/// \addtogroup gazebo_physics_engine
+/** \{
 
 \verbatim
 <physics:<engine_type>>
@@ -66,7 +64,6 @@ The parameters are as follows:
     reducing the step time.
   - Default 0.020
 
-\{
 */
 
 /// \brief Base class for a physics engine
@@ -119,6 +116,5 @@ class PhysicsEngine
 };
 
 /** \}*/
-/// \}
 }
 #endif

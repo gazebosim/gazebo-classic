@@ -37,8 +37,14 @@ namespace gazebo
 
   class XMLConfigNode;
   class RayGeom;
+/// \addtogroup gazebo_sensor
+/// \brief Sensor with one or more rays.
+/// \{
+/// \defgroup gazebo_ray Ray
+/// \brief Sensor with one or more rays.
+// \{
 
-/// @brief  sensor with one or more rays.
+/// \brief Sensor with one or more rays.
 ///
 /// This sensor cast rays into the world, tests for intersections, and
 /// reports the range to the nearest object.  It is used by ranging
@@ -132,7 +138,8 @@ class RaySensor: public Sensor
   private: int rangeCount;
 
 };
-
+/// \}
+/// \}
 }
 
 #endif

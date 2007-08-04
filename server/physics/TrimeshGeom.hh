@@ -31,6 +31,15 @@
 
 namespace gazebo
 {
+  /// \addtogroup gazebo_physics_geom
+  /// \brief Trimesh geom
+  /// \{
+  /// \defgroup gazebo_trimesh_geom Triangle Mesh geom
+  /// \brief Trimesh geom
+  /// \{
+
+
+  /// \brief Triangle mesh geom
   class TrimeshGeom : public Geom
   {
     /// \brief Constructor
@@ -47,6 +56,9 @@ namespace gazebo
     private: dReal matrix_dblbuff[16*2];
     private: int last_matrix_index;
   };
+
+  /// \}
+  /// \}
 }
 
 #endif

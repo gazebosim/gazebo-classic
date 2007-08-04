@@ -29,23 +29,24 @@
 
 namespace gazebo
 {
-/// @addtogroup gazebocore
-/// @{
+/// \addtogroup gazebo_server
+/// \brief Parameters used during update cycle
+/// \{
 
-/// Parameters used during update cycle
+/// \brief Parameters used during update cycle
 class UpdateParams
 {
-  /// Constructor
+  /// \brief Constructor
   public: UpdateParams();
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~UpdateParams();
 
-  /// Elapsed time since last update
+  /// \brief Elapsed time since last update
   public: double stepTime;
 };
 
-/// @}
+/// \}
 }
 
 #endif

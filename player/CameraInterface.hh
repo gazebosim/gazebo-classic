@@ -32,8 +32,15 @@
 
 namespace gazebo
 {
+/// \addtogroup player_iface
+/// \{
+/// \defgroup camera_player Camera interface 
+/// \brief Camera interface
+/// \{
+
   class CameraIface;
 
+  /// \brief Camera interface
   class CameraInterface : public GazeboInterface
   {
     /// \brief Constructor
@@ -77,6 +84,9 @@ namespace gazebo
     private: int frameno;
 
   };
+
+/// \}
+/// \}
 
 }
 

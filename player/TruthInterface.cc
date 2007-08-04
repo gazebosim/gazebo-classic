@@ -24,13 +24,6 @@
  * CVS: $Id$
  */
 
-/**
-@addtogroup player
-@par Truth Interface
-- PLAYER_TRUTH_REQ_SET_POSE
-*/
-
-
 #include <math.h>
 
 #include "gazebo.h"

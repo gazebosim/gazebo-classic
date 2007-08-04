@@ -34,73 +34,80 @@
 
 namespace gazebo
 {
+  /// \addtogroup gazebo_physics
+  /// \brief Base class for all joints
+  /// \{
+  
   class Body;
 
-class Joint
-{
-  public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL};
+  /// \brief Base class for all joints
+  class Joint
+  {
+    public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL};
 
-  // Constructor
-  public: Joint();
+    /// \brief Constructor
+    public: Joint();
 
-  // Destructor
-  public: virtual ~Joint();
+    /// \brief Destructor
+    public: virtual ~Joint();
 
-  // Get the type of the joint
-  public: Joint::Type GetType() const;
+    /// \brief Get the type of the joint
+    public: Joint::Type GetType() const;
 
-  // Get the body to which the joint is attached according the _index
-  public: Body *GetJointBody( int index ) const;
+    /// \brief Get the body to which the joint is attached according the _index
+    public: Body *GetJointBody( int index ) const;
 
-  // Determines of the two bodies are connected by a joint
-  public: bool AreConnected( Body *one, Body *two ) const;
+    /// \brief Determines of the two bodies are connected by a joint
+    public: bool AreConnected( Body *one, Body *two ) const;
 
-  // Get the _parameter
-  public: virtual double GetParam(int parameter) const;
+    /// \brief Get the _parameter
+    public: virtual double GetParam(int parameter) const;
 
-  // Make this joint a fixed joint
-  // Use this only when absolutely necessary
-  public: void SetFixed();
+    /// \brief Make this joint a fixed joint
+    /// Use this only when absolutely necessary
+    public: void SetFixed();
 
-  // Attach the two bodies with this joint
-  public: void Attach( Body *one, Body *two );
+    /// \brief Attach the two bodies with this joint
+    public: void Attach( Body *one, Body *two );
 
-  // Detach this joint from all bodies
-  public: void Detach();
+    /// \brief Detach this joint from all bodies
+    public: void Detach();
 
-  // Set the anchor point
-  public: virtual void SetAnchor( const gazebo::Vector3 & /*anchor*/ ) {}
+    /// \brief Set the anchor point
+    public: virtual void SetAnchor( const gazebo::Vector3 & /*anchor*/ ) {}
 
-  // Set the anchor point
-  public: virtual gazebo::Vector3 GetAnchor() const
-          {return gazebo::Vector3(0,0,0);}
+    /// \brief Set the anchor point
+    public: virtual gazebo::Vector3 GetAnchor() const
+            {return gazebo::Vector3(0,0,0);}
 
 
-  // Set the _parameter to _value
-  public: virtual void SetParam( int parameter, double value );
+    /// \brief Set the _parameter to _value
+    public: virtual void SetParam( int parameter, double value );
 
-  /// Set the name of this joint
-  public: std::string GetName() const;
+    /// \brief Set the name of this joint
+    public: std::string GetName() const;
 
-  /// Get the name of this joint
-  public: void SetName(const std::string &name);
+    /// \brief Get the name of this joint
+    public: void SetName(const std::string &name);
 
-  // This is our id
-  protected: dJointID jointId;
+    /// \brief This is our id
+    protected: dJointID jointId;
 
-  // Type of Joint
-  protected: Type type;
+    /// \brief Type of Joint
+    protected: Type type;
 
-  // The first body this joint connects to
-  private: Body *body1;
+    /// \brief The first body this joint connects to
+    private: Body *body1;
 
-  // The second body this joint connects to
-  private: Body *body2;
+    /// \brief The second body this joint connects to
+    private: Body *body2;
 
-  /// Name of this joint
-  private: std::string name;
-};
+    /// \brief Name of this joint
+    private: std::string name;
 
+  };
+
+  /// \}
 }
 #endif
 

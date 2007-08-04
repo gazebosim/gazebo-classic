@@ -38,7 +38,7 @@ namespace gazebo
   class PositionIface;
   class HingeJoint;
 
-/// \addtogroup controllers
+/// \addtogroup gazebo_controller
 /// \{
 /** \defgroup truth_position2d truth_position2d
 \{

@@ -32,6 +32,12 @@
 namespace gazebo
 {
 
+/// \addtogroup player_iface Interfaces
+/// \{
+/// \defgroup laser_player Laser Interface
+/// \brief Plugin Player interface for a Gazebo laser
+/// \{
+
 // Forward declarations
 class LaserIface;
 
@@ -78,6 +84,10 @@ class LaserInterface : public GazeboInterface
 
   private: int scanId;
 };
+
+/// \} 
+/// \} 
+
 
 }
 #endif

@@ -24,12 +24,6 @@
  * CVS: $Id$
  */
 
-/**
-@addtogroup player
-@par Fiducial Interface
-- PLAYER_FIDUCIAL_REQ_GET_GEOM
-*/
-
 /* TODO
 - PLAYER_FIDUCIAL_REQ_GET_GEOM
 - PLAYER_FIDUCIAL_REQ_SET_ID

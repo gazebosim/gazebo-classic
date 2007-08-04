@@ -24,8 +24,8 @@
  * CVS: $Id: Global.hh,v 1.3.2.2 2006/12/16 22:41:14 natepak Exp $
  */
 
-#ifndef GZGLOBAL_H_
-#define GZGLOBAL_H_
+#ifndef GZGLOBAL_HH
+#define GZGLOBAL_HH
 
 /////////////////////////////////////////////////////////////////////////////
 // Typedefs
@@ -86,6 +86,26 @@ namespace gazebo
 {
   class Gui;
 
+  /// \addtogroup gazebo_server
+  /// \brief Global attributes.
+  /// \{
+
+  /// \brief Class to hold global attributes
+  /**
+  The \c param:Global tag is used to specify certain global parameters
+  for the server. Set these parameters as needed in the world file E.g.:
+
+  \verbatim
+  <param:Global>
+    <pause>true</pause>
+  </param:Global>
+  \endverbatim
+  
+  The parameters are as follows:
+  - pause (bool)
+    - Set to true to start the simulator in paused mode.
+    - Default: false
+  */  
   class Global
   {
     /// \brief Set to true when the user wants to leave the application
@@ -110,4 +130,6 @@ namespace gazebo
     private: Global();
     private: ~Global();
   };
+
+  /// \}
 }

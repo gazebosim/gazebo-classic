@@ -42,10 +42,10 @@ namespace gazebo
   class Entity;
   class XMLConfigNode;
 
-/// @addtogroup physics
-/// @{
+/// \addtogroup gazebo_physics_engine
+/// \{
 
-/** @defgroup odephysicsengine ODE Physics Engine
+/** \defgroup odephysicsengine ODE Physics Engine
 
 The \c param:physics tag is used to specify certain parameters for the ODE phyics engine. The following parameters are in addition to those provided by the PhysicsEngine base class.
 

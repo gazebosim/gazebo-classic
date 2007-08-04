@@ -31,36 +31,36 @@
 
 namespace gazebo
 {
-/// @addtogroup gazebocore
-/// @{
+/// \addtogroup gazebo_server
+/// \brief A Time class
+/// \{
 
 
-
-/// A Time class
-/// TODO: replace this with Boost
+/// \brief A Time class
+/// \todo: replace this with Boost
 class Time
 {
-  /// Constructors
+  /// \brief Constructors
   public: Time();
 
-  /// Copy constructor
+  /// \brief Copy constructor
   /// \param time Time to copy
   public: Time( const Time &time );
 
-  /// Constructor
+  /// \brief Constructor
   /// \param tv Time to initialize to
   public: Time( const struct timeval &tv );
 
-  /// Constructor
+  /// \brief Constructor
   /// \param sec Seconds
   /// \param usec Microseconds
   public: Time( int sec,  int usec );
 
-  /// Constuctor
+  /// \brief Constuctor
   /// \param time Time in double format sec.usec
   public: Time( double time );
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~Time();
 
   public: static Time GetWallTime();
@@ -131,7 +131,7 @@ class Time
   /// Correct the time
   private: void Correct();
 };
-/// @}
+/// \}
 
 }
 #endif

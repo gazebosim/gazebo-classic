@@ -33,6 +33,15 @@
 namespace gazebo
 {
 
+/// \addtogroup gazebo_physics_joints
+/// \brief A two-axis hinge joint. See the ODE documentation
+/// \{
+/// \defgroup gazebo_hinge2_joint Hinge 2 Joint
+/// \brief A two-axis hinge joint. See the ODE documentation
+/// \{
+
+
+/// \brief A two axis hinge joint
 class Hinge2Joint : public Joint
 {
   /// @brief Constructor
@@ -80,6 +89,8 @@ class Hinge2Joint : public Joint
   public: void SetTorque(double torque1, double torque2);
 };
 
+/// \}
+/// \}
 }
 #endif
 

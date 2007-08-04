@@ -33,6 +33,14 @@
 namespace gazebo
 {
 
+/// \addtogroup gazebo_physics_joints
+/// \brief A single axis hinge joint
+/// \{
+/// \defgroup gazebo_hinge_joint Hinge Joint
+/// \brief A single axis hinge joint
+/// \{
+
+/// \brief A single axis hinge joint
 class HingeJoint : public Joint
 {
   //!  Constructor
@@ -68,6 +76,9 @@ class HingeJoint : public Joint
   //! Set the torque of a joint.
   public: void SetTorque(double torque);
 };
+
+/// \}
+/// \}
 
 }
 #endif

@@ -34,51 +34,68 @@
 
 namespace gazebo
 {
+  
+  /// \addtogroup gazebo_server
+  /// \brief Gazebo message class
+  /// \{
+ 
+  #define gzmsg(level) (gazebo::GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
+  
+  #define gzlog() (gazebo::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
+  
+    class XMLConfigNode;
+  
+  /// \brief Gazebo class for outputings messages
+  ///
+  /**
+   Use <tt>gzmsg(level)</tt> as an ostream to output messages, where level is 
+   an integer priority level.
 
-#define gzmsg(level) (gazebo::GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
+   Example:
+   
+   \verbatim
+   gzmsg(0) << "This is an important message";
+   gzmsg(2) << "This is a less important message";
+   \endverbatim
+  */
+  class GazeboMessage
+  {
+    /// \brief Default constructor
+    public: GazeboMessage();
+  
+    /// \brief Destructor
+    public: virtual ~GazeboMessage();
+  
+    /// \brief Return an instance to this class
+    public: static GazeboMessage *Instance();
+  
+    /// \brief Load the message parameters
+    public: void Load(XMLConfigNode *node);
+  
+    /// \brief Set the verbosity
+    /// \param int Level of the verbosity
+    public: void SetVerbose( int level );
+  
+    /// \brief Use this to output a message to the terminal
+    /// \param Level of the message
+    public: std::ostream &Msg( int level = 0 );
+  
+    /// \brief Use this to output a message to a log file
+    /// \param Level of the message
+    public: std::ofstream &Log();
+  
+    /// \brief Level of the message
+    private: int level;
+  
+    private: std::ostringstream nullStream;
+    private: std::ostream *msgStream;
+    private: std::ofstream logStream;
+  
+    /// Pointer to myself
+    private: static GazeboMessage *myself;
+  };
 
-#define gzlog() (gazebo::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
-
-  class XMLConfigNode;
-
-/// \brief Gazebo class for outputings messages
-class GazeboMessage
-{
-  /// \brief Default constructor
-  public: GazeboMessage();
-
-  /// \brief Destructor
-  public: virtual ~GazeboMessage();
-
-  /// \brief Return an instance to this class
-  public: static GazeboMessage *Instance();
-
-  /// \brief Load the message parameters
-  public: void Load(XMLConfigNode *node);
-
-  /// \brief Set the verbosity
-  /// \param int Level of the verbosity
-  public: void SetVerbose( int level );
-
-  /// \brief Use this to output a message to the terminal
-  /// \param Level of the message
-  public: std::ostream &Msg( int level = 0 );
-
-  /// \brief Use this to output a message to a log file
-  /// \param Level of the message
-  public: std::ofstream &Log();
-
-  /// \brief Level of the message
-  private: int level;
-
-  private: std::ostringstream nullStream;
-  private: std::ostream *msgStream;
-  private: std::ofstream logStream;
-
-  /// Pointer to myself
-  private: static GazeboMessage *myself;
-};
-
+  /// \}
 }
 
 #endif

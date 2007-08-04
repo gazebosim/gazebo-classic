@@ -35,6 +35,10 @@
 namespace gazebo
 {
 
+/// \addtogroup gazebo_rendering
+/// \{
+
+/// \brief Class for drawing lines
 class OgreDynamicLines : public OgreDynamicRenderable
 {
   /// Constructor
@@ -92,5 +96,6 @@ class OgreDynamicLines : public OgreDynamicRenderable
   private: bool dirty;
 };
 
+/// \}
 }
 #endif

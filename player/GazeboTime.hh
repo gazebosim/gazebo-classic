@@ -32,16 +32,29 @@
 namespace gazebo
 {
 
+/// \addtogroup player
+/// \brief Gazebo player driver
+/// \{
+
+
+  /// \brief Gazebo access to PlayerTime
 class GazeboTime : public PlayerTime
 {
+  /// \brief Constructor
   public: GazeboTime();
+
+  /// \brief Destructor
   public: virtual ~GazeboTime();
 
-  // Get the simulator time
+  /// \brief Get the simulator time
   public: int GetTime(struct timeval* time);
+
+  /// \brief Get the simulator time
   public: int GetTimeDouble(double* time);
 
 };
+
+/// \}
 
 }
 #endif

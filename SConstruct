@@ -182,5 +182,6 @@ env.Install(install_prefix+'/share/gazebo','Media')
 env.Install(install_prefix+'/include/gazebo',headers)
 env.Install(install_prefix+'/lib',libgazeboServerStatic )
 env.Install(install_prefix+'/lib',libgazeboServerShared )
+env.Install(install_prefix+'/share/gazebo','worlds')
 
 

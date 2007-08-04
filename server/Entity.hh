@@ -40,8 +40,8 @@ namespace Ogre
 namespace gazebo
 {
 
-/// @addtogroup gazebocore
-/// @{
+/// \addtogroup gazebo_server
+/// \{
 
 
 /// Base class for all objects in Gazebo
@@ -50,89 +50,89 @@ namespace gazebo
  */
 class Entity
 {
-  /// Constructor
+  /// \brief Constructor
   /// \param parent Parent of the entity.
   public: Entity(Entity *parent = NULL);
 
-   /// Destructor
+  /// \brief Destructor
   public: virtual ~Entity();
 
-  /// Return the ID of this entity. This id is unique
+  /// \brief Return the ID of this entity. This id is unique
   /// \return Integer ID
   public: int GetId() const;
 
-  /// Return the ID of the parent
+  /// \brief Return the ID of the parent
   /// \return Integer ID
   public: int GetParentId() const;
 
-  /// Set the parent
+  /// \brief Set the parent
   /// \param parent Parent entity
   public: void SetParent(Entity *parent);
 
-  /// Get the parent
+  /// \brief Get the parent
   /// \return Pointer to the parent entity
   public: Entity *GetParent() const;
 
-  /// Add a child to this entity
+  /// \brief Add a child to this entity
   /// \param child Child entity
   public: void AddChild(Entity *child);
 
-  /// Get all children
+  /// \brief Get all children
   /// \return Vector of children entities
   public: std::vector< Entity* > &GetChildren();
 
-  /// Return this entity's sceneNode
+  /// \brief Return this entity's sceneNode
   /// \return Ogre scene node
   public: Ogre::SceneNode *GetSceneNode() const;
 
-  /// Set the scene node
+  /// \brief Set the scene node
   /// \param sceneNode Ogre scene node
   public: void SetSceneNode(Ogre::SceneNode *sceneNode);
 
-  /// Set the name of the entity
+  /// \brief Set the name of the entity
   /// \param name Body name
   public: void SetName(const std::string &name);
 
-  /// Return the name of the entity
+  /// \brief Return the name of the entity
   /// \return Name of the entity
   public: std::string GetName() const;
 
-  /// Set whether this entity is static: immovable
+  /// \brief Set whether this entity is static: immovable
   /// \param s Bool, true = static
   public: void SetStatic(bool s);
 
-  /// Return whether this entity is static
+  /// \brief Return whether this entity is static
   /// \return bool True = static
   public: bool IsStatic() const;
 
-  /// \bried Returns true if the entities are the same. Checks only the name
+  /// \brief Returns true if the entities are the same. Checks only the name
   public: bool operator==(const Entity &ent);
 
-  /// Parent of this entity
+  /// \brief Parent of this entity
   protected: Entity *parent;
 
-  /// Children of this entity
+  /// \brief Children of this entity
   public: std::vector< Entity* > children;
 
-  /// This entities ID
+  /// \brief This entities ID
   private: unsigned int id;
 
-  /// Used to automaticaly chose a unique ID on creation
+  /// \brief Used to automaticaly chose a unique ID on creation
   private: static unsigned int idCounter;
 
-  /// OGRE stuff
+  /// \brief OGRE stuff
   protected: Ogre::SceneNode *sceneNode;
 
-  /// ODE Stuff
+  /// \brief ODE Stuff
   public: dSpaceID spaceId;
 
-  /// Name of the entity
+  /// \brief Name of the entity
   private: std::string name;
 
   private: bool isStatic;
 };
 
-/// @}
+/// \}
 }
 
 #endif

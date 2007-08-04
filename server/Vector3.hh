@@ -32,10 +32,11 @@
 
 namespace gazebo
 {
-/// @addtogroup gazebocore
-/// @{
+/// \addtogroup gazebo_server
+/// \brief Generic x,y,z vector 
+/// \{
 
-/// Generic x,y,z vector 
+/// \brief Generic x,y,z vector 
 class Vector3
 {
   /// \brief Constructor
@@ -128,7 +129,7 @@ class Vector3
   // \brief The location
   public: double x, y, z;
 
-  /// Ostream operator
+  /// \brief Ostream operator
   /// \param out Ostream
   /// \param pt Vector3 to output
   /// \return The Ostream
@@ -141,7 +142,7 @@ class Vector3
 
 };
 
-/// @}
+/// \}
 }
 
 #endif

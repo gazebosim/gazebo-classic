@@ -42,27 +42,30 @@ class Body;
 // Prototype for sensor factory functions
 typedef Sensor* (*SensorFactoryFn) (Body*);
 
+/// \addtogroup gazebo_sensor
+/// \brief The sensor factory; the class is just for namespacing purposes.
+/// \{
 
-/// @brief The sensor factory; the class is just for namespacing purposes.
+/// \brief The sensor factory; the class is just for namespacing purposes.
 class SensorFactory
 {
-  /// @brief Register all known sensors.
+  /// \brief Register all known sensors.
   public: static void RegisterAll();
   
-  /// @brief Register a sensor class (called by sensor registration function).
+  /// \brief Register a sensor class (called by sensor registration function).
   public: static void RegisterSensor(std::string type, std::string  classname,
                                     SensorFactoryFn factoryfn);
 
-  /// @brief Create a new instance of a sensor.  Used by the world when
+  /// \brief Create a new instance of a sensor.  Used by the world when
   /// reading the world file.
   public: static Sensor *NewSensor(const std::string &classname, Body *body);
 
-  // A list of registered sensor classes
+  /// \brief A list of registered sensor classes
   private: static std::map<std::string, SensorFactoryFn> sensors;
 };
 
 
-/// @brief Static sensor registration macro
+/// \brief Static sensor registration macro
 ///
 /// Use this macro to register sensors with the server.
 /// @param name Sensor type name, as it appears in the world file.
@@ -77,6 +80,7 @@ void Register##classname() \
   SensorFactory::RegisterSensor("static", name, New##classname);\
 }
 
+/// \}
 }
 
 #endif

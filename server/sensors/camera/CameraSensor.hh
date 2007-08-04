@@ -42,8 +42,15 @@ namespace Ogre
 
 namespace gazebo
 {
+/// \addtogroup gazebo_sensor
+/// \brief Basic camera sensor
+/// \{
+/// \defgroup gazebo_camera Camera
+/// \brief Basic camera sensor
+// \{
 
-/// @brief Basic camera sensor
+
+/// \brief Basic camera sensor
 ///
 /// This sensor is used for simulating standard monocular cameras; is
 /// is used by both camera models (e.g., SonyVID30) and user interface
@@ -145,6 +152,8 @@ class CameraSensor : public Sensor
   private: std::string savePathname;
 };
 
+/// \}
+/// \}
 }
 #endif
 

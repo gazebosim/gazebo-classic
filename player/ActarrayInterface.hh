@@ -30,37 +30,50 @@
 
 // Forward declarations
 typedef struct gz_actarray gz_actarray_t;
+namespace gazebo
+{
+/// \addtogroup player_iface Interfaces
+/// \{
+/// \defgroup actarray_player Actarray Interface
+/// \brief Interface for controller an actuator array
+/// \{
 
 class ActarrayInterface : public GazeboInterface
 {
-  /// @brief Constructor
+  /// \brief Constructor
   public: ActarrayInterface(player_devaddr_t addr, GazeboDriver *driver,
                               ConfigFile *cf, int section);
 
-  /// @brief Destructor
+  /// \brief Destructor
   public: virtual ~ActarrayInterface();
 
-  /// @brief Handle all messages. This is called from GazeboDriver
+  /// \brief Handle all messages. This is called from GazeboDriver
   public: virtual int ProcessMessage(MessageQueue *respQueue,
                                      player_msghdr_t *hdr, void *data);
 
-  /// @brief Update this interface, publish new info.
+  /// \brief Update this interface, publish new info.
   public: virtual void Update();
 
-  /// @brief Open a SHM interface when a subscription is received. \
+  /// \brief Open a SHM interface when a subscription is received. \
   ///        This is called fromGazeboDriver::Subscribe
   public: virtual void Subscribe();
 
-  /// @brief Close a SHM interface. This is called from \
+  /// \brief Close a SHM interface. This is called from \
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
   private: gz_actarray_t *iface;
 
-  /// @brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+  /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: char *gz_id;
 
-  /// @brief Timestamp on last data update
+  /// \brief Timestamp on last data update
   private: double datatime;
 };
+
+/// \} 
+/// \}
+
+
+}
 #endif

@@ -23,12 +23,6 @@
  * Date: 19 September 2006
  */
 
-/**
-@addtogroup player
-@par Actarray Interface
-- PLAYER_ACTARRAY_DATA_STATE
-*/
-
 
 #include <math.h>
 

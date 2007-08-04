@@ -34,27 +34,35 @@
 namespace gazebo
 {
 
-/// @brief Geom for an infinite plane.
-///
-/// This geom is used primarily for ground planes.  Note that while
-/// the plane in infinite, only the part near the camera is drawn.
-class PlaneGeom : public Geom
-{
-  /// \brief Constructor
-  /// \param body Body to which we are attached.
-  /// \param spaceId Collision space to which we belong.
-  /// \param normal Normal vector to plane (global cs).
-  public: PlaneGeom(Body *body, Vector3 normal,
-              const Vector2 &size, const Vector2 &segments, 
-              const Vector2 &uvTile, double altitude = 0);
-
-  /// \brief Destructor
-  public: virtual ~PlaneGeom();
-
-  /// \brief Set the altitude of the plane
-  public: void SetAltitude(double altitude);
-
-};
-
+  /// \addtogroup gazebo_physics_geom
+  /// \brief Geom for an infinite plane.
+  /// \{
+  /// \defgroup gazebo_plane_geom Plane Geom
+  /// \brief Geom for an infinite plane.
+  /// \{
+ 
+  /// \brief Geom for an infinite plane.
+  /// 
+  /// This geom is used primarily for ground planes.  Note that while
+  /// the plane in infinite, only the part near the camera is drawn.
+  class PlaneGeom : public Geom
+  {
+    /// \brief Constructor
+    /// \param body Body to which we are attached.
+    /// \param spaceId Collision space to which we belong.
+    /// \param normal Normal vector to plane (global cs).
+    public: PlaneGeom(Body *body, Vector3 normal,
+                const Vector2 &size, const Vector2 &segments, 
+                const Vector2 &uvTile, double altitude = 0);
+  
+    /// \brief Destructor
+    public: virtual ~PlaneGeom();
+  
+    /// \brief Set the altitude of the plane
+    public: void SetAltitude(double altitude);
+  
+  };
+  
+  /// \}
 }
 #endif

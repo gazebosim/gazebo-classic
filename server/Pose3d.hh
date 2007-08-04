@@ -36,72 +36,73 @@
 namespace gazebo
 {
 
-/// @addtogroup gazebocore
-/// @{
+/// \addtogroup gazebo_server
+/// \brief Pose3d encapsulates a position and rotation in three space
+/// \{
 
 
-/// Pose3d encapsulates a position and rotation in three space
+/// \brief Pose3d encapsulates a position and rotation in three space
 class Pose3d
 {
-  /// Default constructors
+  /// \brief Default constructors
   public: Pose3d();
 
-  /// Constructor
+  /// \brief Constructor
   /// \param pos A position
   /// \param rot A rotation
   public: Pose3d( const Vector3 &pos, const Quatern &rot);
 
-  /// Copy constructor
+  /// \brief Copy constructor
   /// \param pose Pose3d to copy
   public: Pose3d( const Pose3d &pose );
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~Pose3d();
 
-  /// See if a pose is finite (e.g., not nan)
+  /// \brief See if a pose is finite (e.g., not nan)
   public: bool IsFinite() const;
 
-  /// Addition operator
+  /// \brief Addition operator
   /// \param pose Pose to add to this pose
   /// \return The resulting pose
   public: Pose3d operator+(const Pose3d &pose) const;
 
-  /// Add-Equals operator
+  /// \brief Add-Equals operator
   /// \param pose Pose to add to this pose
   /// \return The resulting pose
   public: const Pose3d &operator+=(const Pose3d &pose);
 
-  /// Subtraction operator
+  /// \brief Subtraction operator
   /// \param pose Pose to subtract from this one
   /// \return The resulting pose
   public: Pose3d operator-(const Pose3d &pose) const;
 
-  /// Subtraction operator
+  /// \brief Subtraction operator
   /// \param pose Pose to subtract from this one
   /// \return The resulting pose
   public: const Pose3d &operator-=(const Pose3d &pose);
           
-  /// Add one point to a vector: result = this + pos
+  /// \brief Add one point to a vector: result = this + pos
   /// \param pos Position to add to this pose
   /// \return The resulting position
   public: Vector3 CoordPositionAdd(const Vector3 &pos) const;
 
-  /// Add one point to another: result = this + pose
+  /// \brief Add one point to another: result = this + pose
   /// \param pose The Pose to add
   /// \return The resulting position
   public: Vector3 CoordPositionAdd(const Pose3d &pose) const;
 
-  /// Subtract one position from another: result = this - pose
+  /// \brief Subtract one position from another: result = this - pose
   /// \param pose Pose to subtract
   /// \return The resulting position
   public: Vector3 CoordPositionSub(const Pose3d &pose) const;
 
-  /// Add one rotation to another: result =  this->rot + rot
+  /// \brief Add one rotation to another: result =  this->rot + rot
   /// \param rot Rotation to add
   /// \return The resulting rotation
   public: Quatern CoordRotationAdd(const Quatern &rot) const;
 
-  /// Subtract one rotation from another: result = this->rot - rot
+  /// \brief Subtract one rotation from another: result = this->rot - rot
   /// \param rot The rotation to subtract
   /// \return The resulting rotation
   public: Quatern CoordRotationSub(const Quatern &rot) const;
@@ -110,16 +111,16 @@ class Pose3d
   ///        this, find a
   public: Pose3d CoordPoseSolve(const Pose3d &b) const;
 
-  /// Reset the pose
+  /// \brief Reset the pose
   public: void Reset();
 
-  /// The position
+  /// \brief The position
   public: Vector3 pos;
 
-  /// The rotation
+  /// \brief The rotation
   public: Quatern rot;
 
-  /// Ostream operator
+  /// \brief Ostream operator
   /// \param out Ostream
   /// \param pose Pose to output
   /// \return the Ostream
@@ -131,7 +132,7 @@ class Pose3d
           }
 };
 
-/// @}
+/// \}
 
 }
 

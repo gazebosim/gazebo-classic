@@ -21,6 +21,10 @@ namespace gazebo
   class Geom;
   class Sensor;
 
+/// \addtogroup gazebo_physics
+/// \brief The body class
+/// \{
+
 /// Body class
 class Body : public Entity
 {
@@ -116,5 +120,6 @@ class Body : public Entity
   private: Pose3d staticPose;
 };
 
+/// \}
 }
 #endif

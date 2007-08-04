@@ -36,7 +36,7 @@ namespace gazebo
 {
   class FactoryIface;
 
-/// \addtogroup controllers
+/// \addtogroup gazebo_controller
 /// \{
 /** \defgroup factory factory
 \{

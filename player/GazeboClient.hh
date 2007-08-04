@@ -35,26 +35,36 @@ namespace gazebo
   class Client;
 }
 
-/// @brief Gazebo client handler
+/// \addtogroup player
+/// \brief Gazebo client handler
+/// \{
+
+
+/// \brief Gazebo client handler
 ///
 /// This class handles the Gazebo client object, and acts as a shared
 /// data-structure for all Gazebo related drivers.  Note that there
 /// can only be one instance of this class (it is entirely static).
 class GazeboClient
 {
-  /// Initialize 
+  /// \brief Initialize 
   public: static void Init(int serverid, const char *prefixid);
 
-  /// Finalize
+  /// \brief Finalize
   public: static void Fini();
 
-  /// The prefix used for all gazebo ID's
+  /// \brief The prefix used for all gazebo ID's
   public: static const char *prefixId;
 
-  /// The one and only gazebo client
+  /// \brief The one and only gazebo client
   public: static gazebo::Client *client;
 
+  /// \brief The simulation interface
   public: static gazebo::SimulationIface *sim;
 };
+
+/// \}
+
+
 
 #endif

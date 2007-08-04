@@ -31,31 +31,41 @@
 
 namespace gazebo
 {
+/// \addtogroup player_iface 
+/// \{
+/// \defgroup simulation_player Simulation Interface
+/// \brief The Simulation interface
+/// \{
 
+
+/// \brief The Simulation interface
 class SimulationInterface : public GazeboInterface
 {
-
-  /// @brief Constructor
+  /// \brief Constructor
   public: SimulationInterface(player_devaddr_t addr, GazeboDriver *driver,
                               ConfigFile *cf, int section);
-  /// @brief Destructor
+  /// \brief Destructor
   public: virtual ~SimulationInterface();
 
-  /// @brief Handle all messages. This is called from GazeboDriver
+  /// \brief Handle all messages. This is called from GazeboDriver
   public: virtual int ProcessMessage(MessageQueue *respQueue,
                                      player_msghdr_t *hdr, void *data);
 
-  /// @brief Update this interface, publish new info.
+  /// \brief Update this interface, publish new info.
   public: virtual void Update();
 
-  /// @brief Open a SHM interface when a subscription is received.
+  /// \brief Open a SHM interface when a subscription is received.
   ///        This is called fromGazeboDriver::Subscribe
   public: virtual void Subscribe();
 
-  /// @brief Close a SHM interface. This is called from
+  /// \brief Close a SHM interface. This is called from
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
+
 };
+
+  /// \} 
+  /// \} 
 
 }
 #endif

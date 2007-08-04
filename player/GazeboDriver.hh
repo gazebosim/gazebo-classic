@@ -34,51 +34,60 @@
 
 #include "GazeboClient.hh"
 
+
 namespace gazebo
 {
+
+/// \addtogroup player
+/// \brief Gazebo player driver
+/// \{
 
 // Forward declarations
 class GazeboInterface;
 
+/// \brief Gazebo player driver
 class GazeboDriver : public Driver
 {
-  /// @brief Constructor 
+  /// \brief Constructor 
   public: GazeboDriver(ConfigFile* cf, int section);
 
-  /// @brief Destructor 
+  /// \brief Destructor 
   public: virtual ~GazeboDriver();
 
-  /// @brief Set up the device.  Return 0 if things go well, and -1 otherwise.
+  /// \brief Set up the device.  Return 0 if things go well, and -1 otherwise.
   public: virtual int Setup();
 
-  /// @brief Shutdown the device
+  /// \brief Shutdown the device
   public: virtual int Shutdown();
 
-  /// @brief Process all messages for this driver. 
+  /// \brief Process all messages for this driver. 
   public: virtual int ProcessMessage(MessageQueue * respQueue, 
                                      player_msghdr * hdr, 
                                      void * data);
 
-  /// @brief Subscribe an device to this driver
+  /// \brief Subscribe an device to this driver
   public: virtual int Subscribe(player_devaddr_t addr);
 
-  /// @brief Remove a device from this driver
+  /// \brief Remove a device from this driver
   public: virtual int Unsubscribe(player_devaddr_t addr);
 
-  // @brief The server thread calls this method frequently. We use it to check  for new commands and configs
+  /// \brief The server thread calls this method frequently. We use it to check  for new commands and configs
   private: virtual void Update();
 
-  /// @brief Helper function to load all devices on startup
+  /// \brief Helper function to load all devices on startup
   private: int LoadDevices(ConfigFile* cf, int section);
 
-  /// @brief Find a device according to a player_devaddr
+  /// \brief Find a device according to a player_devaddr
   private: GazeboInterface *LookupDevice(player_devaddr_t addr);
 
-  // Array of interfaces associated with this driver
+  /// Array of interfaces associated with this driver
   protected: GazeboInterface **devices;
   protected: int deviceCount;
   protected: int deviceMaxCount;
 };
+
+/// \}
+
 
 }
 #endif

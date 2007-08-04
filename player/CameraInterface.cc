@@ -24,11 +24,6 @@
  * CVS: $Id$
  */
 
-/**
-@addtogroup player
-@par Camera Interface
-*/
-
 #include <math.h>
 
 #include "gazebo.h"

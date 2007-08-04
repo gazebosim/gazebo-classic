@@ -24,13 +24,6 @@
  * CVS: $Id$
  */
 
-/**
-@addtogroup player
-@par Laser Interface
-- PLAYER_LASER_REQ_SET_CONFIG
-- PLAYER_LASER_REQ_GET_CONFIG
-*/
-
 /* TODO
 PLAYER_LASER_REQ_GET_GEOM
 */

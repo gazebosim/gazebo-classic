@@ -32,8 +32,17 @@
 // Forward declarations
 namespace gazebo
 {
+
+/// \addtogroup player_iface Interfaces
+/// \{
+/// \defgroup position3d_player Position3d Interface
+/// \brief Position3d interface
+/// \{
+
+
   class PositionIface;
 
+  /// \brief Position3d interface
   class Position3dInterface : public GazeboInterface
   {
     /// \brief Constructor
@@ -67,5 +76,8 @@ namespace gazebo
     private: double datatime;
   };
 }
+
+/// \} 
+/// \}
 
 #endif

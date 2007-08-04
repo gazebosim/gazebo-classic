@@ -1,5 +1,4 @@
 Open:
-- FLTK interface
 - Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
 - Pioneer2DX
 
@@ -11,10 +10,15 @@ Open:
 - Write a tutorial for creating new sensors
 - Write a tutorial for creating a new world
 
+- Graphics3d interface
+- Improve build system. Put all the platform checks in on place. 
 - Create libraries so that it's easy to include the core of gazebo without linking in Ogre, fltk, etc, etc. 
 
+- Handle GUI resizing
 - Heightmaps
 - BSP loader
+
+- Replace our Time class with boost
 
 - GPS 
 - WiFi
@@ -75,3 +79,4 @@ Completed:
 - Truth
 - Factory
 - Fix Player include so that libgazebo doesn't link in player
+- FLTK interface

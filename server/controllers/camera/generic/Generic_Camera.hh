@@ -36,7 +36,7 @@ namespace gazebo
   class CameraIface;
   class CameraSensor;
 
-/// @addtogroup controllers
+/// @addtogroup gazebo_controller
 /// @{
 /** \defgroup genericcamera generic camera
 

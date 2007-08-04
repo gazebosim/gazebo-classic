@@ -21,7 +21,7 @@
 /* Desc: Fiducial Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $SVN;$
+ * SVN: $SVN:$
  */
 
 #ifndef FIDUCIALINTERFACE_HH
@@ -31,6 +31,11 @@
 
 namespace gazebo
 {
+/// \addtogroup player_iface
+/// \{
+/// \defgroup fiduacial_player Fiducial Interface
+/// \brief Plugin Player interface for Gazebo fiducials
+/// \{
 
   // Forward declarations
   class FiducialIface;
@@ -77,5 +82,10 @@ namespace gazebo
     private: double datatime;
 
   };
+/// \}
+/// \}
+
+
+
 }
 #endif

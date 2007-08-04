@@ -24,15 +24,6 @@
  * CVS: $Id$
  */
 
-/** 
-@defgroup player libgazeboplugin 
- 
-<b>libgazeboplugin</b> is a plugin for Player that allows Player 
-client to access simulated robots as if there were normal Player
-devices.
-*/
-
-
 #include <stdlib.h>
 
 #include "GazeboError.hh"
@@ -60,20 +51,20 @@ devices.
 
 using namespace gazebo;
 
-// A factory creation function, declared outside of the class so that it
-// can be invoked without any object context (alternatively, you can
-// declare it static in the class).  In this function, we create and return
-// (as a generic Driver*) a pointer to a new instance of this driver.
+/// \brief A factory creation function, declared outside of the class so that it
+/// can be invoked without any object context (alternatively, you can
+/// declare it static in the class).  In this function, we create and return
+/// (as a generic Driver*) a pointer to a new instance of this driver.
 Driver* GazeboDriver_Init(ConfigFile* cf, int section)
 {
   // Create and return a new instance of this driver
   return ((Driver*) (new GazeboDriver(cf, section)));
 }
 
-// A driver registration function, again declared outside of the class so
-// that it can be invoked without object context.  In this function, we add
-// the driver into the given driver table, indicating which interface the
-// driver can support and how to create a driver instance.
+/// \brief A driver registration function, again declared outside of the class so
+/// that it can be invoked without object context.  In this function, we add
+/// the driver into the given driver table, indicating which interface the
+/// driver can support and how to create a driver instance.
 void GazeboDriver_Register(DriverTable* table)
 {
   //! TODO: Fix the PACKAGE_VERSION

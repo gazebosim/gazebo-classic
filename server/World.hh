@@ -33,49 +33,9 @@
 
 namespace gazebo
 {
-/// \addtogroup gazebocore
+/// \addtogroup gazebo_server
+/// \brief The World
 /// \{
-
-/** \defgroup models_global Global Attributes
-
-The \c param:Global tag is used to specify certain global parameters
-for the server. Set these parameters as needed in the world file E.g.:
-
-\verbatim
-<param:Global>
-  <pause>true</pause>
-</param:Global>
-\endverbatim
-
-The parameters are as follows:
-- pause (bool)
-  - Set to true to start the simulator in paused mode.
-  - Default: false
-
-- dayTime (float)
-  - Real time seconds since 12am. Negative number for local time
-  - Default: -1.0
-
-- utmZone (integer)
-  - UTM (Universal Transverse Mercator) zone for calculating latitudes
-    and longitudes from UTM easting and northings.
-  - Default 0
-
-- utmOffset (float vector)
-  - UTM value (easting and northings) of world origin (used for
-    calculating object UTM coordinates).  The z-value can also be used
-    to specify an altitude offset.
-  - Default 0
-
-- skyColor (float vector) 
-  - The color of the "sky", i.e., the default background color.
-  - Default 0.7 0.7 0.9
-
-- fogDensity (float)
-  - Density of the ambient fog (see OpenGL docs for details).
-  - Default 0.25
-
-*/
 
 // Forward declarations
   class Server;
@@ -85,7 +45,7 @@ The parameters are as follows:
   class XMLConfigNode;
   class XMLConfig;
 
-/// The World
+/// \brief The World
 /*
  * The world class keps a list of all models, handles loading and saving,
  * object dynamics and collision detection for contact joints

@@ -32,14 +32,25 @@
 
 namespace gazebo
 {
+  /// \addtogroup gazebo_physics_geom
+  /// \brief Sphere geom
+  /// \{
+  /// \defgroup gazebo_sphere_geom Sphere geom
+  /// \brief Sphere geom
+  /// \{
+
+  /// \brief Sphere geom
   class SphereGeom : public Geom
   {
-    // Constructor
+    /// \brief Constructor
     public: SphereGeom(Body *body, double radius, double density, const std::string &meshName = "default" );
 
-            // Destructor
+    /// \brief Destructor
     public: virtual ~SphereGeom();
   };
+
+  /// \}
+  /// \}
 }
 
 #endif

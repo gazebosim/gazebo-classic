@@ -34,6 +34,14 @@ class JointGroup;
 namespace gazebo
 {
 
+/// \addtogroup gazebo_physics_joints
+/// \brief A slider joint
+/// \{
+/// \defgroup gazebo_slider_joint Slider Joint
+/// \brief A slider joint
+/// \{
+
+/// \brief A slider joint
 class SliderJoint : public Joint
 {
   // Constructor
@@ -65,5 +73,7 @@ class SliderJoint : public Joint
   public: void SetSliderForce(double force);
 };
 
+/// \}
+/// \}
 }
 #endif

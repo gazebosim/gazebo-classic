@@ -33,22 +33,32 @@
 namespace gazebo
 {
 
+/// \addtogroup gazebo_physics_joints
+/// \brief A ball joint
+/// \{
+/// \defgroup gazebo_ball_joint Ball Joint
+/// \brief A ball joint
+/// \{
+
+/// \brief A ball joint
 class BallJoint : public Joint
 {
-  // Constructor
+  /// \brief Constructor
   public: BallJoint( dWorldID worldId );
 
-  // Destructor
+  /// \brief Destructor
   public: virtual ~BallJoint();
 
-  // Get joint's anchor point
+  /// \brief Get joint's anchor point
   public: Vector3 GetAnchor() const;
 
-  // Set joint's anchor point
+  /// \brief Set joint's anchor point
   public: void SetAnchor( const Vector3 &anchor );
 
 };
 
+/// \}
+/// \}
 }
 
 #endif

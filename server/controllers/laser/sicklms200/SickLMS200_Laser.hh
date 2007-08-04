@@ -36,7 +36,7 @@ namespace gazebo
   class FiducialIface;
   class RaySensor;
 
-/// @addtogroup controllers
+/// @addtogroup gazebo_controller
 /// @{
 /** \defgroup sicklms200 sicklms200
 

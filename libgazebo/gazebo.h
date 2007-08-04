@@ -38,11 +38,6 @@
 namespace gazebo
 {
 
-/** \defgroup libgazebo libgazebo
-
-See \ref libgazebo_usage for information on using libgazebo.
-
-*/
 
 /***************************************************************************
  * Constants, etc
@@ -88,8 +83,8 @@ class Color
 
 /***************************************************************************/
 /// \addtogroup libgazebo
-/// \{
-/** \defgroup server Server object
+/**
+  \brief Shared memory server
 
 The server object is used by the Gazebo server to establish and
 maintain connections with clients.
@@ -132,14 +127,13 @@ class Server
 };
 
 /** \}*/
-/// \}
 /***************************************************************************/
 
   
 /***************************************************************************/
 /// \addtogroup libgazebo 
-/// \{ 
-/** \defgroup client Client object
+/**
+  \brief Shared memory client
 
 The client object is used by Gazebo clients to establish a connection
 with a running server.  See the \ref libgazebo_usage for an overview.
@@ -207,14 +201,14 @@ class Client
 };
 
 /** \} */
-/// \}
 
 /***************************************************************************/
 /// \addtogroup libgazebo 
-/// \{
-/** \internal \defgroup iface Common interface structures
+/**
 
-All interfaces share this common structure.
+  \brief Base class for all interfaces
+
+\internal
 
 \{
 */
@@ -222,6 +216,7 @@ All interfaces share this common structure.
 /// Max length of model type string 
 #define GAZEBO_MAX_MODEL_TYPE 128
 
+/// \brief Base class for all interfaces
 class Iface
 {
   /// \brief Create an interface
@@ -295,16 +290,15 @@ class Iface
   protected: std::string type;
 };
 
-
-
 /** \} */
-/// \}
 
 
 /***************************************************************************/
-/// \addtogroup libgazebo 
+/// \addtogroup libgazebo_iface 
 /// \{
-/** \defgroup simulator simulator 
+/** \defgroup simulator_iface simulator
+
+  \brief The simulation interface
 
 The simulator interface provides access to certain global properties
 of the server, such as the current simulation time-step. 
@@ -313,37 +307,37 @@ of the server, such as the current simulation time-step.
 */
 
 
-/// Simulation interface data
+/// \bref Simulation interface data
 class SimulationData
 {
-  /// Elapsed simulator time
+  /// \brief Elapsed simulator time
   public: double simTime;
 
-  /// Accumpated pause time (this interface may be updated with the
+  /// \brief Accumpated pause time (this interface may be updated with the
   /// server is paused).
   public: double pauseTime;
 
-  /// Elapsed real time since start of simulation (from system clock). 
+  /// \brief Elapsed real time since start of simulation (from system clock). 
   public: double realTime;
 
-  /// Pause simulation (set by client)
+  /// \brief Pause simulation (set by client)
   public: int pause;
 
-  /// Reset simulation (set by client)
+  ///\brief  Reset simulation (set by client)
   public: int reset;
 
-  /// Save current poses to world file (set by client)
+  ///\brief  Save current poses to world file (set by client)
   public: int save;
 
 };
 
-/// Common simulator interface
+/// \brief Common simulator interface
 class SimulationIface : public Iface
 {
-  /// Create an interface
+  /// \brief Create an interface
   public: SimulationIface(): Iface("simulation",sizeof(SimulationIface)+sizeof(SimulationData)) {}
 
-  /// Destroy an interface
+  /// \brief Destroy an interface
   public: virtual ~SimulationIface() {this->data = NULL;}
 
   public: virtual void Create(Server *server, std::string id)
@@ -368,9 +362,11 @@ class SimulationIface : public Iface
 
 
 /***************************************************************************/
-/// \addtogroup libgazebo 
+/// \addtogroup libgazebo_iface 
 /// \{
-/** \defgroup camera camera 
+/** \defgroup camera_iface camera 
+
+  \brief Camera interface
 
 The camera interface allows clients to read images from a simulated
 camera.  This interface gives the view of the world as the camera
@@ -427,9 +423,11 @@ class CameraIface : public Iface
 
 
 /***************************************************************************/
-/// @addtogroup libgazebo
+/// @addtogroup libgazebo_iface
 /// @{
-/** @defgroup position position
+/** @defgroup position_iface position
+
+  \brief Position interface
 
 The position interface allows clients to send commands to and read
 odometric data from simulated mobile robot bases, such as the
@@ -489,9 +487,11 @@ class PositionIface : public Iface
 /// @}
 
 /***************************************************************************/
-/// @addtogroup libgazebo
+/// @addtogroup libgazebo_iface
 /// @{
-/** @defgroup graphics3d graphics3d
+/** @defgroup graphics3d_iface graphics3d
+
+  \brief 3D graphics interface
 
 The graphics3d interface allows clients to send drawing commands, similar to
 opengl funcitons.
@@ -553,56 +553,65 @@ class Graphics3dIface : public Iface
 
   
 /***************************************************************************/
-/// @addtogroup libgazebo
+/// @addtogroup libgazebo_iface
 /// @{
-/** @defgroup laser laser
+/** @defgroup laser_iface laser
+
+  \brief Laser interface
+
+The laser interface allows clients to read data from a simulated laser
+range finder (such as the SICK LMS200).  Some configuration of this
+device is also allowed.
+
 
 @{
 */
 
 #define GZ_LASER_MAX_RANGES 401
 
-/// Laser interface data
+/// \brief Laser interface data
 class LaserData
 {
-  /// Data timestamp
+  /// \brief Data timestamp
   public: double time;
   
-  /// Range scan angles
+  /// \brief Range scan angles
   public: double min_angle, max_angle;
 
-  /// Angular resolution
+  /// \brief Angular resolution
   public: double res_angle;
 
-  /// Max range value
+  /// \brief Max range value
   public: double max_range;
 
-  /// Number of range readings
+  /// \brief Number of range readings
   public: int range_count;
   
-  /// Range readings
+  /// \brief Range readings
   public: double ranges[GZ_LASER_MAX_RANGES];
 
-  /// Intensity readings
+  /// \brief Intensity readings
   public: int intensity[GZ_LASER_MAX_RANGES];
   
-  /// New command ( 0 or 1 )
+  /// \brief New command ( 0 or 1 )
   public: int cmd_new_angle;
+
+  /// \brief New command ( 0 or 1 )
   public: int cmd_new_length;
 
-  /// Commanded range value
+  /// \brief Commanded range value
   public: double cmd_max_range;
   public: double cmd_min_angle, cmd_max_angle;
   public: int cmd_range_count;
 };
 
-/// Laser interface
+/// \brief Laser interface
 class LaserIface : public Iface
 {
-  /// Constructor
+  /// \brief Constructor
   public: LaserIface():Iface("laser", sizeof(LaserIface)+sizeof(LaserData)) {}
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~LaserIface() {this->data = NULL;}
 
   public: virtual void Create(Server *server, std::string id)
@@ -625,9 +634,11 @@ class LaserIface : public Iface
 
 
 /***************************************************************************/
-/// @addtogroup libgazebo
+/// @addtogroup libgazebo_iface
 /// @{
-/** @defgroup fiducial fiducial
+/** @defgroup fiducial_iface fiducial
+
+  \brief Fiducial inteface
 
 The fiducial interface allows clients to determine the identity,
 range, bearing and orientation (relative to some sensor) of objects in
@@ -693,14 +704,16 @@ class FiducialIface : public Iface
 /// @}
 
 /***************************************************************************/
-/// @addtogroup libgazebo
-/// @{
-/** @defgroup factory factory
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup factory_iface factory
+
+  \brief Factory interface, create and delete objects at runtime.
 
 The factory interface allows clients to send XML strings to a factory
 in order to dynamically create models.
 
-@{
+\{
 */
 
 /// \brief Fudicial interface data
@@ -743,8 +756,8 @@ class FactoryIface : public Iface
   public: FactoryData *data;
 };
 
-/** @} */
-/// @}
+/** \} */
+/// \}
 
 
 

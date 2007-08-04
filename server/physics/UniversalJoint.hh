@@ -31,7 +31,14 @@
 
 namespace gazebo
 {
+/// \addtogroup gazebo_physics_joints
+/// \brief A universal joint
+/// \{
+/// \defgroup gazebo_universal_joint Universal Joint
+/// \{
 
+
+/// \brief A universal joint
 class UniversalJoint : public Joint
 {
   /// @brief Constructor
@@ -77,6 +84,8 @@ class UniversalJoint : public Joint
   public: virtual void SetTorque(double torque1, double torque2);
 };
 
+/// \}
+/// \}
 }
 #endif
 

@@ -32,14 +32,25 @@
 namespace gazebo
 {
 
-class BoxGeom : public Geom
-{
-  // Constructor
-  public: BoxGeom(Body *body, Vector3 size, double density, const std::string &meshName="default");
+  /// \addtogroup gazebo_physics_geom
+  /// \brief Box geom
+  /// \{
+  /// \defgroup gazebo_box_geom Box Geom
+  /// \brief Box geom
+  /// \{
 
-  // Destructor
-  public: virtual ~BoxGeom();
-};
+  /// \brief Box geom
+  class BoxGeom : public Geom
+  {
+    /// \brief Constructor
+    public: BoxGeom(Body *body, Vector3 size, double density, const std::string &meshName="default");
+
+    /// \brief Destructor
+    public: virtual ~BoxGeom();
+  };
+
+  /// \}
+  /// \}
 
 }
 #endif

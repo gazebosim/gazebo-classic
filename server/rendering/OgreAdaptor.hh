@@ -52,11 +52,15 @@ namespace Ogre
 
 namespace gazebo
 {
+/// \addtogroup gazebo_rendering
+/// \{
+
 
 class XMLConfigNode;
 class OgreFrameListener;
 class Entity;
 
+/// \brief Adptor to Ogre3d
 class OgreAdaptor
 {
   /// \brief Constructor
@@ -118,6 +122,7 @@ class OgreAdaptor
   private: bool ogreWindow;
 };
 
+/*/// \brief 
 class OgreGLXWindowInterface
 {
   public: virtual ~OgreGLXWindowInterface() = 0;
@@ -128,6 +133,9 @@ class OgreGLXWindowInterface
   // Call this to notify the window was resized
   public: virtual void resized(size_t width, size_t height) = 0;
 };
+*/
+
+/// \}
 
 }
 #endif

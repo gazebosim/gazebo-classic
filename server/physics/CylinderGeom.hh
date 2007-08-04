@@ -31,15 +31,25 @@
 
 namespace gazebo
 {
+  /// \addtogroup gazebo_physics_geom
+  /// \brief Cylinder geom
+  /// \{
+  /// \defgroup gazebo_cylinder_geom Cylinder geom
+  /// \brief Cylinder geom
+  /// \{
 
-class CylinderGeom : public Geom
-{
-  // Constructor
-  public: CylinderGeom(Body *body, double radius, double length, double density, const std::string &meshName);
 
-  // Destructor
-  public: virtual ~CylinderGeom();
-};
+  /// \brief Cylinder geom
+  class CylinderGeom : public Geom
+  {
+    /// \brief Constructor
+    public: CylinderGeom(Body *body, double radius, double length, double density, const std::string &meshName);
 
+    /// \brief Destructor
+    public: virtual ~CylinderGeom();
+  };
+
+  /// \}
+  /// \}
 }
 #endif

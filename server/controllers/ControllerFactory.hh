@@ -34,6 +34,10 @@
 namespace gazebo
 {
 
+/// \addtogroup gazebo_controller
+/// \brief Factory for creating controllers
+/// \{
+
 // Forward declarations
 class Controller;
 class Entity;
@@ -79,6 +83,7 @@ void Register##classname() \
 }
 
 
+/// \}
 }
 
 #endif
