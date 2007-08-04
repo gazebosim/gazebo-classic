@@ -1,0 +1,135 @@
+
+/**
+@page install Installation (Linux)
+
+Gazebo relies on a number of third-party libraries that make
+installation a little bit tricky.  If things go wrong, please check
+the archives of the Gazebo <a
+href="http://sourceforge.net/mailarchive/forum.php?forum_id=33909">mailing
+list</a>.  Please read the instructions below @b carefully before
+reporting posting to the mailing list.
+
+<b> These are the Linux installation instructions, OS X users should
+go @ref install_osx "here". </b>
+
+
+@section install_required Required 3rd Party Libraries
+
+The the GUI component of Gazebo is designed to allow users to integrate their favorite GUI libraries with Gazebo. FLTK is the default GUI, which can be found at:
+- <a href="http://www.fltk.org">FLTK</a> (Fast Light Toolkit).
+
+Visual display of Gazebo is accomplished using the OGRE rendering engine. This software library can be installed from:
+- <a href="http://www.ogre3d.org">OGRE</a> (Object-Oriented Graphics Rendering Engine).
+
+To simulate rigid body physics, Gazebo utilizes ODE. Gazebo requires that ODE support trimeshes. A default install of ODE should enable trimesh suppport, if in doubt check the help files found in the ODE sources.
+- <a href="http://www.ode.org">ODE</a> (Open Dynamics Engine)
+
+User input is gathered using OIS:
+- <a href="http://sourceforge.net/projects/wgois">OIS</a> (Object Oriented Input System)
+
+Gazebo requires an xml configuration file to be specified at runtime. We use libxml2 to handle parsing this configuration file:
+- <a href="http://xmlsoft.org">libxml2</a>(XML C parser)
+
+\section install_optional Optional 3rd party libraries
+
+Player provides a convient mechanism to control the various models and sensors withing Gazebo. If Player is installed, then Gazebo will build a plugin for Player.
+- <a href="http://playerstage.sourceforge.net">Player</a>
+
+\section install_prepare Preparing your system
+
+The default install path for many source packages (Gazebo included) is:
+@verbatim
+/usr/local
+/usr/local/bin
+/usr/local/include
+/usr/local/lib
+@endverbatim
+
+In some Linux distributions, however, these paths are not searched by
+default, leading to problems when compiling and linking some packages.
+We therefore recommend that you configure your system with some
+additional paths (added to your .bashrc script, for example):
+
+@verbatim
+export PATH=/usr/local/bin:$PATH
+export CPATH=/usr/local/include:$CPATH
+export LIBRARY_PATH=/usr/local/lib:$LIBRARY_PATH
+@endverbatim
+
+The first line sets the executable path; the second sets the path for
+C and C++ header files; the third line sets the library search path.
+You will also need to set two more paths:
+
+@verbatim
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+@endverbatim 
+
+This line sets the pkg-config path (a neat utility for mananging
+source dependencies).
+
+
+@section install_ Global Installation (requires root access)
+
+@verbatim
+$ tar xvzf gazebo-<version>.tar.gz
+$ cd gazebo-<version>
+$ scons
+@endverbatim
+Note that scons will fail if any of the required packages are missing.
+Once Gazebo has been built, it can be installed: 
+@verbatim
+$ su
+$ scons install
+$ exit
+@endverbatim
+
+Gazebo is now ready to run; try:
+@verbatim
+$ gazebo /usr/local/share/gazebo/worlds/pioneer.world
+@endverbatim
+
+@section install_local Local installation (does not require root access)
+
+Some developers prefer to install Gazebo in our home directory (e.g.,
+/home/[username]/local) rather than in a system directory.  This is
+useful if you are working on shared machines and/or lack root access.
+Naturally, local installs can make it a bit tricky for Gazebo (and
+other packages) to find the right headers, libs and so on.  Here,
+then, is the recommended way to do it:
+ 
+- Pick a spot for "local" installs; for me it is
+ "/home/[username]/local".  The install scripts will create relevant
+ subdirs under this, such as:
+@verbatim
+/home/[username]/local/bin
+/home/[username]/local/include
+/home/[username]/local/lib
+@endverbatim
+ 
+- Set up the necessary compiler paths in your .bashrc (or whatever)
+  script; e.g.:
+@verbatim
+export PATH=~/local/bin:$PATH
+export CPATH=~/local/include:$CPATH
+export LIBRARY_PATH=~/local/lib:$LIBRARY_PATH
+@endverbatim
+The first line sets the executable path; the second sets the path for C
+and C++ header files; the third line sets the library search path.
+ 
+- Set up some additional paths in your .bashrc (or whatever):
+@verbatim
+export PKG_CONFIG_PATH=~/local/lib/pkgconfig:$PKG_CONFIG_PATH
+@endverbatim 
+This line sets the pkg-config path (for applications using
+pkg-config, which will be everything in the Player/Stage/Gazebo
+project pretty soon)
+
+- Build and install Gazebo using the "prefix" argument:
+@verbatim
+$ scons prefix=/home/[username]/local install
+@endverbatim
+
+Everything should now work seamlessly, and your locally installed
+packages will be used in preference to any system-wide defaults.
+
+*/
