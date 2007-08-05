@@ -1,0 +1,277 @@
+
+/**
+@page config_syntax World File Syntax
+
+The world file contains a description of the world to be simulated by
+Gazebo.  It describes the layout of robots, sensors, light sources,
+user interface components, and so on.  The world file can also be used
+to control some aspects of the simulation engine, such as the force of
+gravity or simulation time step.
+
+Gazebo world files are written in XML, and can thus be created and
+modified using a text editor.  Sample world files can be found in the
+<tt>worlds</tt> directory of the source distribution, or in the
+installed version (default install) under:
+@verbatim
+/usr/local/share/gazebo/worlds/
+@endverbatim
+
+
+@section worldfile_concepts Key Concepts and Basic Syntax
+
+The world consists mainly of <i>model</i> declarations.  A model can be
+a robot (e.g. a Pioneer2AT or SegwayRMP), a sensor (e.g. SICK LMS200),
+a static feature of the world (e.g. Terrain) or some manipulable
+object.  
+
+Other elements within a world file indicate how to render a scene via the 
+<i>ogre</i> declaration, attributes of the GUI via the <i>gui</i> declaration, and properties of the physics engine via the <i>ode</i> declaration. These declarations are required by Gazebo.
+
+Each world file is encapsulated by:
+
+\verbatim
+<gazebo:world>
+...
+</gazebo:world>
+\endverbatim
+
+The contents describe a single simulation configuration. Each top level declaration is preprended by a namespace prefix that describes the declaration type. For example, the <i>ogre</i> declaration is prepended by <i>rendering</i>:
+
+\verbatim
+<rendering:ogre>
+...
+</rendering:ogre>
+\endverbatim
+
+\subsection worldfile_units Coordinate Systems and Units
+
+By convention, Gazebo uses a right-handed coordinate system, with x
+and y in the plane, and z increasing with altitude.  Most models are
+designed such that the are upright (with respect to the z axis) and
+pointing along the positive x axis.  The tag <tt>&lt;xyz;&gt;</tt> is used to
+indicate an object's position (x, y and z coordinates); the tag
+<tt>&lt;rpy;&gt;</tt> is used to indicate an objects orientation (Euler
+angles; i.e., roll, pitch and yaw).  For example, <tt>&lt;xyz;&gt;1 2
+3&lt;/xyz;&gt;</tt> indicates a translation of 1~m along the x-axis, 2~m
+along the y-axis and 3~m along the z-axis; <tt> &lt;rpy;&gt;10 20
+30&lt;/rpy;&gt;</tt> indicates a rotation of 30~degrees about the z-axis
+(yaw), followed by a rotation of 20~degrees about the y-axis (pitch)
+and a rotation of 10~degrees about the x-axis (roll).
+
+Unless otherwise specified, the world file uses SI units (meters,
+seconds, kilograms, etc).  One exception is angles and angular
+velocities, which are measured in degrees and degrees/sec,
+respectively.
+
+
+\section worldfile_models Model Syntax
+
+A model is a phyiscal entity within the world. It consists of one or more bodies, each of which contains one or more geometries or sensors. For example, a model of a box would be:
+
+\verbatim
+<model:physical name="box_model">
+  <body:box name="box_body">
+    <geom:box name="box_geom"/>
+  </body:box>
+</model:physical>
+\endverbatim
+
+Note that each <i>model</i>, <i>body</i>, and <i>geom</i> must have a name. Unique names are highly suggested but not enforced.
+
+The above example is simplified. Attributes that indicate the size, shape, mass, position, and texture of the model have been left out. The following is a complete box model:
+
+\verbatim
+<model:physical name="box_model">
+  <xyz>0 1.5 0.5</xyz>
+  <rpy>0.0 0.0 0.0</rpy>
+  <canonicalBody>box1_body</canonicalBody>
+  <static>false</static>
+
+  <body:box name="box_body">
+    <xyz>0.0 0.0 0.0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <geom:box name="box_geom">
+      <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+      <mesh>default</mesh>
+      <size>1 1 1</size>
+      <density>1.0</density>
+      <material>Gazebo/BumpyMetal</material>
+    </geom:box>
+  </body:box>
+</model:physical>
+\endverbatim
+
+- xyz : Position relative to parent
+- rpy : Orientation relative to parent
+- canonicalBody : Body used to attached child and parent models
+- static : Set to true to make the model immovable
+- mesh : The "skin" of the geom, this is not used for collision detection
+- size : Size of the geometry.
+- density : Density of the geometry
+- material : Material used to color and texture the geometry
+
+The entire physical characteristics of a model is encapsulated within the xml. Joints are attached bettween two bodies with the same modele using:
+
+\verbatim
+<joint:hinge name="left_wheel_hinge">
+  <body1>body1_name</body1>
+  <body2>body2_name</body2>
+  <anchor>body2_name</anchor>
+  <axis>0 1 0</axis>
+  <erp>0.4</erp>
+  <cfm>0.008</cfm>
+</joint:hinge>
+\endverbatim
+
+- body1 : First body used by the joint. The parameter is the name of the body.
+- body2 : Second body used by the joint. The parameter is the name of the body.
+- anchor : The body to use ad the joint achor.The parameter is the name of the body.
+- axis : Axis of rotation for the joint.
+- erp : Error reduction parameter, see <a href='www.ode.org'>ODE</a>
+- cfm : Constraint force mixing parameter, see <a href='www.ode.org'>ODE</a>
+
+The above exmple creates a hinge joint between body1_name and body2_name, both of which must exist within the model. 
+
+Complex models can become quite long and cumbersome to use, especially when the same model is required numerous times in the same world. To alleviate this issue, model's can be written in separate files and included within a world.
+
+The above model can be saved as <i>box.model</i> and used within the world:
+\verbatim
+<include embedded="false">
+  <xi:include href="box.model"/>
+</include>
+\endverbatim
+- embedded : False if the included file does not need parameters overwritten.
+- href : The location of the model file
+
+Sometimes it is useful to include the same model with slightly different paramters. This can be accomplished by creating a new model, with a nested include:
+
+\verbatim 
+<model:physical name="box_model1">
+  <xyz> 1 1 0 </xyz>
+  <include embedded="true">
+    <xi:include href="box.model"/>
+  </include>
+</model:physical>
+\endverbatim
+
+Note that the <i>include</i> should be last within the model declaration.
+
+See pioneer2dx.world and pioneer2dx.model for a more elaborate examples.
+
+\subsection worldfile_controller Controllers and Interfaces
+
+A model can contain one ore more controllers. A controller is used to either read data from a sensor or manipulate bodies, and is designed to emulate a specific device. For example, in <i>pioneer2dx.world</i> the <i>pioneer2dx_position2d</i> controller is used to simulate the drive train of a Pioneer 2 dx.
+
+Each controller makes use of one or more interfaces. An interface defines
+what data is exposed via libgazebo. For example, the <i>pioneer2dx_position2d</i> controller can utilize the <i>position</i> interface.
+
+The following example creates a <i>pioneer2d_position2d</i> controller called "controller1", that controller the left and right joints with names "left_wheel_hinge" and "right_wheel_hinge". The interface is a <i>position</i> interface named "position_iface_1".
+
+\verbatim
+<controller:pioneer2dx_position2d name="controller1">
+  <leftJoint>left_wheel_hinge</leftJoint>
+  <rightJoint>right_wheel_hinge</rightJoint>
+  <interface:position name="position_iface_1"/>
+</controller:pioneer2dx_position2d>
+\endverbatim
+
+\section worldfile_physics Physics Syntax
+
+The ODE physics simulator makes use of a few global parameters, which can be defined with the world file.
+
+\verbatim
+<physics:ode>
+  <stepTime>0.03</stepTime>
+  <gravity>0 0 -9.8</gravity>
+  <cfm>0.008</cfm>
+  <erp>0.2</erp>
+</physics:ode>
+\endverbatim
+- stepTime : Number of seconds the physics simulation should progress during each update.
+- gravity : Vector that describes the direction and magnitude of gravity.
+- cfm : The global constraint force mixing.
+- erp : The global error reduction parameter.
+
+\section worldfile_gui GUI Syntax
+
+This declaration indicates what GUI to use, and some basic parameters such as size and position of the GUI.
+
+\verbatim
+<rendering:gui>
+  <type>fltk</type>
+  <size>640 480</size>
+  <pos>0 0</pos>
+</rendering:gui>
+\endverbatim
+- type : Type of GUI. Currently only fltk is supported.
+- size : Size of the rendering window.
+- pos : Position of the rendering window.
+
+\section worldfile_rendering Rendering Syntax
+
+Gazebo makes use of the OGRE rendering engine. OGRE can be configured to include sky boxes, fog, ambient light, and various resources. All of these parameters are defined within the <i>rendering:ogre</i> declaration.
+
+Ambient light is specified using:
+
+\verbatim
+<ambient>1.0 1.0 1.0 1.0</ambient>
+\verbatim
+
+The material used for the sky box is specified using:
+\verbatim
+  <sky>
+    <material>Gazebo/CloudySky</material>
+  </sky>
+\endverbatim
+
+Fog is specified usin:
+
+\verbatim
+<fog>
+  <color>0.8 0.8 0.8</color>
+  <type>linear</type>
+  <density>0.0</density>
+  <linearStart>50.0</linearStart>
+  <linearEnd>515.0</linearEnd>
+</fog>
+\endverbatim
+- color : Color of the fog
+- type : Type of fog (linear, exp, exp2)
+- density : Density of the fog
+- linearStart : Distance from the camera to begin rendering fog
+- linearEnd : Distance from the camera to stop rendering fog
+
+OGRE resources are specified using the following (most people should only change the path information to match where they installed Gazebo):
+\verbatim
+<plugins path="/usr/local/lib/OGRE">
+  <plugin>RenderSystem_GL.so</plugin>
+  <plugin>Plugin_ParticleFX.so</plugin>
+  <plugin>Plugin_BSPSceneManager.so</plugin>
+  <plugin>Plugin_OctreeSceneManager.so</plugin>
+</plugins>
+
+<resources path="/usr/local/share/gazebo">
+  <bootstrap>
+    <zip>Media/packs/OgreCore.zip</zip>
+  </bootstrap>
+
+  <general>
+    <filesystem>Media</filesystem>
+    <filesystem>Media/fonts</filesystem>
+    <filesystem>Media/materials/programs</filesystem>
+    <filesystem>Media/materials/scripts</filesystem>
+    <filesystem>Media/materials/textures</filesystem>
+    <filesystem>Media/models</filesystem>
+    <filesystem>Media/overlays</filesystem>
+    <filesystem>Media/particle</filesystem>
+    <filesystem>Media/gui</filesystem>
+    <zip>Media/packs/cubemap.zip</zip>
+    <zip>Media/packs/cubemapsJS.zip</zip>
+    <zip>Media/packs/skybox.zip</zip>
+  </general>
+</resources>
+\endverbatim
+
+*/
