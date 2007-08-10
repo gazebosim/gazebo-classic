@@ -9,7 +9,7 @@
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   >
-  >
+
   <xyz>0 0.0 0.1</xyz>
   <rpy>0 0 0</rpy>
   <canonicalBody>laser_body</canonicalBody>

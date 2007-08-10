@@ -5,23 +5,21 @@
   xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
-  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
-  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
-  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
-  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" 
+  xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
   xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
 
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.03</stepTime>
-    <gravity>0 0 -9.8</gravity>
-    <cfm>0.008</cfm>
+    <stepTime>0.02</stepTime>
+    <gravity>0 0 -9.80665</gravity>
+    <cfm>1e-2</cfm>
     <erp>0.2</erp>
   </physics:ode>
 
@@ -31,27 +29,30 @@
     <pos>0 0</pos>
   </rendering:gui>
 
-
   <rendering:ogre>
     <ambient>1.0 1.0 1.0 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
 
-    <video>
-      <depth>16</depth>
-      <size>640 480</size>
-    </video>
+    <!--
+    <fog>
+      <color>0.8 0.8 0.8</color>
+      <type>linear</type>
+      <density>0.0</density>
+      <linearStart>50.0</linearStart>
+      <linearEnd>515.0</linearEnd>
+    </fog>
+    -->
 
-
-    <plugins path="/home/nate/local/lib/OGRE">
+    <plugins path="/usrlocal/lib/OGRE">
       <plugin>RenderSystem_GL.so</plugin>
       <plugin>Plugin_ParticleFX.so</plugin>
       <plugin>Plugin_BSPSceneManager.so</plugin>
       <plugin>Plugin_OctreeSceneManager.so</plugin>
     </plugins>
 
-    <resources path="/home/nate/local/share/gazebo">
+    <resources path="/usr/local/share/gazebo">
       <bootstrap>
         <zip>Media/packs/OgreCore.zip</zip>
       </bootstrap>
@@ -73,34 +74,33 @@
     </resources>
   </rendering:ogre>
 
-  <model:physical name="box1_model">
-    <xyz>2 0.0 0.5</xyz>
-    <rpy>0.0 0.0 0.0</rpy>
-
-    <body:box name="box1_body">
-      <xyz>0.0 0.0 0.25</xyz>
-      <rpy>0.0 0.0 0.0</rpy>
-
-      <geom:box name="box1_geom">
+  <model:physical name="sphere1_model">
+    <xyz>197 130 4.0</xyz>
+    <static>false</static>
+    <body:sphere name="sphere1_body">
+      <geom:sphere name="sphere1_geom">
+        <xyz>0 0 0.0</xyz>
         <mesh>default</mesh>
-        <size>0.5 0.5 0.5</size>
+        <size>0.2</size>
         <density>1.0</density>
-        <material>Gazebo/BumpyMetal</material>
-        <laserFiducialId>1</laserFiducialId>
-        <laserRetro>1.0</laserRetro>
-      </geom:box>
-    </body:box>
+        <material>Gazebo/Rocky</material>
+      </geom:sphere>
+    </body:sphere>
   </model:physical>
 
-  <!-- Embedded laser model -->
-  <include embedded="false">
-    <xi:include href="laser.model" />
-  </include>
+  <model:physical name="terrain_model">
+    <body:heightmap name ="terrain_body">
+      <geom:heightmap name="terrain_geom">
+        <image>terrain.png</image>
+        <worldTexture>terrain_texture.jpg</worldTexture>
+        <detailTexture>terrain_detail.jpg</detailTexture>
+        <size>1000 1000 10.0</size>
+      </geom:heightmap>
+    </body:heightmap>
+  </model:physical>
 
-   <!-- Ground Plane -->
   <model:physical name="plane1_model">
-    <xyz>0 0 0</xyz>
-    <rpy>0 0 0</rpy>
+    <xyz>0 0 3</xyz>
     <static>true</static>
 
     <body:plane name="plane1_body">
@@ -114,22 +114,44 @@
     </body:plane>
   </model:physical>
 
-  <model:physical name="cam1_model">
-    <xyz>0 3 4</xyz>
-    <rpy>0 -30 0</rpy>
+  <model:physical name="cam2_model">
+    <xyz>197 147 4.8</xyz>
+    <rpy>0 -6 101</rpy>
     <static>true</static>
 
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>640 480</imageSize>
+    <body:empty name="cam2_body">
+      <sensor:camera name="cam2_sensor">
+        <imageSize>800 600</imageSize>
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
         <farClip>100</farClip>
+
         <saveFrames>false</saveFrames>
         <saveFramePath>frames</saveFramePath>
       </sensor:camera>
     </body:empty>
   </model:physical>
 
+  <model:physical name="pioneer2dx_model2">
+    <xyz>200 140 3.2</xyz>
+    <rpy>0 0 -130</rpy>
+
+    <controller:pioneer2dx_position2d name="controller1">
+      <leftJoint>left_wheel_hinge</leftJoint>
+      <rightJoint>right_wheel_hinge</rightJoint>
+      <interface:position name="position_iface_1"/>
+    </controller:pioneer2dx_position2d>
+
+    <model:physical name="laser_model">
+      <xyz>0 0 0.2</xyz>
+      <include embedded="true">
+        <xi:include href="laser.model" />
+      </include>
+    </model:physical>
+
+    <include embedded="true">
+      <xi:include href="pioneer2dx.model" />
+    </include>
+  </model:physical>
 
 </gazebo:world>

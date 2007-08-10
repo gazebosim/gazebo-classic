@@ -28,7 +28,6 @@
 
 #include "Body.hh"
 #include "CylinderGeom.hh"
-#include "dCylinder.h" // For declarations missing from ODE
 
 using namespace gazebo;
 
@@ -40,7 +39,6 @@ CylinderGeom::CylinderGeom(Body *body, double radius, double length, double dens
   // Initialize mass matrix
   dMassSetCylinder(&this->mass, density, 3, radius, length);
   
-  //this->SetGeom( dCreateCCylinder( 0, radius, length ), true );
   this->SetGeom( dCreateCylinder( 0, radius, length ), true );
 
   // Get the mesh
@@ -58,7 +56,7 @@ CylinderGeom::CylinderGeom(Body *body, double radius, double length, double dens
 
   // ODE Cylinders are aligned along the y-axis. So rotate them to be
   // aligned along the Z.
-  this->extraRotation.SetFromAxis(1, 0, 0, M_PI/2);
+  //this->extraRotation.SetFromAxis(1, 0, 0, M_PI/2);
 }
 
 //////////////////////////////////////////////////////////////////////////////

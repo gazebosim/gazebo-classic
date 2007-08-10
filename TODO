@@ -1,21 +1,23 @@
 Open:
+- Handle GUI resizing
+- Implement SimulationProxy
+- Paging heightmaps. 
+  - Positioning the current heightmap is a big hack
+
+- BSP worlds
+
 - Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
 - Pioneer2DX
 
-- Write install instructions
-- Write keyboard mappings
-- Quick HOWTO
-- Write a tutorial for creating custom models
-- Write a tutorial for creating new controllers
-- Write a tutorial for creating new sensors
-- Write a tutorial for creating a new world
+- Create libraries so that it's easy to include the core of gazebo without linking in Ogre, fltk, etc, etc. 
+
+- Write a tutorial for creating new meshes
+- Install for OSX
+
 
 - Graphics3d interface
 - Improve build system. Put all the platform checks in on place. 
-- Create libraries so that it's easy to include the core of gazebo without linking in Ogre, fltk, etc, etc. 
 
-- Handle GUI resizing
-- Heightmaps
 - BSP loader
 
 - Replace our Time class with boost
@@ -25,7 +27,6 @@ Open:
 
 - Multilevel map extruder
 
-- Use dCylinder and dCapsule ODE objects
 - Add spring force between bodies of a model to keep the together. See ODE example test_joints.cpp
 
 -run gprof, and valgrind
@@ -80,3 +81,10 @@ Completed:
 - Factory
 - Fix Player include so that libgazebo doesn't link in player
 - FLTK interface
+- Write install instructions
+- Write keyboard mappings
+- Write a tutorial for creating custom models
+- Write a tutorial for creating new controllers
+- Write a tutorial for creating new sensors
+- Write a tutorial for using player
+- Heightmaps

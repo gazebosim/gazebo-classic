@@ -40,6 +40,24 @@ namespace gazebo
 /// @{
 /** \defgroup sicklms200 sicklms200
 
+  \brief Sick LMS 200 laser controller.
+   
+   This is a controller that collects data from a ray sensor, and populates a libgazebo laser interface. 
+
+  \verbatim
+  <model:physical name="laser_model">
+    <body:box name="laser_body">
+
+      <sensor:ray name="laser">
+        <controller:sicklms200_laser name="controller-name">
+          <interface:laser name="iface-name"/>
+        </controller:sicklms200_laser>
+      </sensor:ray>
+
+    </body:box>
+  </model:physical>
+  \endverbatim
+ 
 \{
 */
 

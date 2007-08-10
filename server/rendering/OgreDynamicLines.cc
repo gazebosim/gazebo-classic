@@ -162,7 +162,7 @@ void OgreDynamicLines::FillHardwareBuffers()
 
   this->mBox.setExtents(Ogre::Vector3(vaabMin.y, vaabMin.z, vaabMin.x), 
                         Ogre::Vector3(vaabMax.y, vaabMax.z, vaabMax.x) );
-
+  
   this->dirty = false;
 }
 

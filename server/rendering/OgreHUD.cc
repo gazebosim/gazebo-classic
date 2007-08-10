@@ -169,9 +169,11 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
   stream.fill('0');
 
   stream << camera->GetName() << " [" << camera->GetImageWidth() << " x " << camera->GetImageHeight() << "]\n";
-  
+ 
+  pose -= Global::poseOffset;
+
   stream << "  XYZ [" 
-    << pose.pos.x  << " "
+    << pose.pos.x   << " "
     << pose.pos.y << " "
     << pose.pos.z << "]\n";
 
@@ -347,6 +349,7 @@ void OgreHUD::CreateHelp()
   text += "\t D     : Translate camera right\n";
   text += "\t Q     : Translate camera up\n";
   text += "\t E     : Translate camera down\n";
+  text += "\t H     : Display this help menu\n";
 
   left = 0.25;
   top = 0.25;

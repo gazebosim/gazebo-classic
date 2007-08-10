@@ -25,6 +25,7 @@
  */
 
 #include <Ogre.h>
+#include <OgreDataStream.h>
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
@@ -184,7 +185,8 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 
-  /*Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
+  /*
+  Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
   Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node"); 
 
   Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material","debugger"); 
@@ -205,8 +207,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   myManualObject->end(); 
   myManualObjectNode->attachObject(myManualObject);
   */
-
-  //this->sceneMgr->setWorldGeometry("terrain.cfg");
+  //delete [] mstr;
 }
 
 void OgreAdaptor::Init(Display *display, 

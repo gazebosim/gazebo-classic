@@ -19,48 +19,37 @@
  *
  */
 /*
- * Desc: Factory controller.
+ * Desc: Stubbed out controller
  * Author: Nathan Koenig
- * Date: 29 July 2007
- * SVN: $Id:$
+ * Date: 01 Feb 2007
+ * SVN: $Id$
  */
-#ifndef FACTORY_POSITION2D_HH
-#define FACTORY_POSITION2D_HH
+#ifndef CONSTROLLER_STUB_HH
+#define CONSTROLLER_STUB_HH
 
 #include "Controller.hh"
 #include "Entity.hh"
-#include "gazebo.h"
-
 
 namespace gazebo
 {
-  class FactoryIface;
-
 /// \addtogroup gazebo_controller
 /// \{
-/** \defgroup factory factory
-  \brief Factory used for dynamic construction of models
+/** \defgroup controller_stub controller_stub
 
-  The factory controller allows dynamic addition and deletion of models using libgazebo's \ref factory_iface interface.
+  \brief A stubbed out controller.
 
-  \verbatim
-  <model:empty name="factory-model-name">
-    <controller:factory name="factory-controller-name">
-      <interface:factory name="factory-iface-name"/>
-    </controller:factory>
-  </model:empty>
-  \endverbatim
-\{
+  Copy this example code when creating a new controller
+  \{
 */
 
-/// \brief Factory used for dynamic construction of models
-class Factory : public Controller
+/// \brief A stubbed out controller.
+class ControllerStub : public Controller
 {
   /// Constructor
-  public: Factory(Entity *parent );
+  public: ControllerStub(Entity *parent );
 
   /// Destructor
-  public: virtual ~Factory();
+  public: virtual ~ControllerStub();
 
   /// Load the controller
   /// \param node XML config node
@@ -79,14 +68,8 @@ class Factory : public Controller
   /// \return 0 on success
   protected: virtual void FiniChild();
 
-  /// The Position interface
-  private: FactoryIface *factoryIface;
-
   /// The parent Model
   private: Model *myParent;
-
-  private: std::string xmlPrefix;
-  private: std::string xmlSuffix;
 };
 
 /** \} */

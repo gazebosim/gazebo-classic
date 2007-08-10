@@ -41,7 +41,18 @@ namespace gazebo
 /// \addtogroup gazebo_controller
 /// \{
 /** \defgroup truth_position2d truth_position2d
-\{
+
+  \brief Ground truth Position2D controller.
+
+  This is a controller that reports the absolute position. This controller does not accept commands.
+
+  \verbatim
+  <controller:truth_position2d name="controller-name">
+    <interface:position name="iface-name"/>
+  </controller:truth>
+  \endverbatim
+ 
+  \{
 */
 
 /// \brief Ground truth Position2D controller.

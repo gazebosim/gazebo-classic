@@ -120,6 +120,12 @@ void World::Load(XMLConfig *config, int serverId)
 
   this->LoadEntities(rootNode, NULL);
 
+  /*std::vector<Model*>::iterator miter;
+  for (miter = this->models.begin(); miter != this->models.end(); miter++)
+  {
+    this->SetModelPose(*miter, (*miter)->GetPose() + Global::poseOffset);
+  }*/
+
   this->physicsEngine->Load(rootNode);
 }
 

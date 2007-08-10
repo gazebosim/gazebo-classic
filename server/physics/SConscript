@@ -6,7 +6,7 @@ dirs = Split('ode')
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)
 
-sources = Split('BallJoint.cc Body.cc BoxGeom.cc ContactParams.cc CylinderGeom.cc Geom.cc Hinge2Joint.cc HingeJoint.cc Joint.cc PhysicsEngine.cc PlaneGeom.cc SliderJoint.cc SphereGeom.cc UniversalJoint.cc dCylinder.cc RayGeom.cc TrimeshGeom.cc')
+sources = Split('BallJoint.cc Body.cc BoxGeom.cc ContactParams.cc CylinderGeom.cc Geom.cc Hinge2Joint.cc HingeJoint.cc Joint.cc PhysicsEngine.cc PlaneGeom.cc SliderJoint.cc SphereGeom.cc UniversalJoint.cc RayGeom.cc TrimeshGeom.cc HeightmapGeom.cc')
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

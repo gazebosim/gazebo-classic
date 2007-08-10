@@ -1,0 +1,76 @@
+/**
+
+\page tutorial_controller Controller Creation Tutorial
+
+This tutorial describes how to make a new controller. The contents of this page include:
+
+- \ref tutorial_controller_create
+- \ref tutorial_controller_iface 
+- \ref tutorial_controller_init 
+- \ref tutorial_controller_update  
+
+\section tutorial_crontroller_overview Overview
+
+Controller are used to bridge the gap between a libgazebo interface and the
+phyiscal attributes of a model. Essentially, controllers are meant to move
+joints, read commands from libgazebo, and write data to libgazebo.
+
+When creating a new robot or sensor, first check the available controllers.
+Sometimes a pre-existing controller will suit your needs. For example, a new
+type of camera could potentially use the <tt>generic_camera</tt> controller.
+Or if a new robot has a drive train similar to a Pioneer2dx, then use the
+<tt>pioneer2dx_position2d</tt> controller.
+
+\section tutorial_controller_create Initial Construction 
+
+The first step it to decide where in the code base to place your new
+controller. Camera controllers should go in the camera directory,
+<tt>gazebo/server/controllers/camera</tt>, and 2d position controllers
+should go in <tt>gazebo/server/controller/position2d</tt>. Create a new
+directory as appropriate.
+
+Copy the example controller,
+<tt>gazebo/server/controler/ControllerStub.*</tt> to your new controller
+directory. Replace the names as appropriate.
+
+\section tutorial_controller_iface Load the Controller
+
+This section deals with the <tt>LoadChild</tt> function, which is called after initial creationg of the controller.
+
+A controller should have one or more interfaces. Make sure to get a valid pointer to the controllers inteface.
+
+If we are creating a position2d controller, this code would be:
+
+\verbatim
+this->myIface = dynamic_cast<PositionIface*>(this->ifaces[0]);
+
+if (!this->myIface)
+  gzthrow("NAME controller requires a PositionIface");
+\endverbatim
+
+Use the XMLConfigNode pointer to load in any other necessary parameters. For example, the Pioneer2d_Position controller need two hinge joints:
+
+\verbatim
+std::string leftJointName = node->GetString("leftJoint", "", 1);
+std::string rightJointName = node->GetString("rightJoint", "", 1);
+
+this->joints[LEFT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(leftJointName));
+this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightJointName));
+
+if (!this->joints[LEFT])
+  gzthrow("couldn't get left hinge joint");
+
+if (!this->joints[RIGHT])
+  gzthrow("couldn't get right hinge joint");
+\endverbatim
+
+\section tutorial_controller_init Intialize the Controller
+
+After the controller is loaded, the <tt>InitChild</tt> function is called. Use this function to initialize any variables.
+
+\section tutorial_controller_update The Update Function
+
+Once every interation the <tt>UpdateChild</tt> function is called. Use this function to get command from the libgazebo interface, manipulate any physical objects, and publish new data.
+
+For a good example of manipulating joints, look at the Pioneer2dx_Position2d controller. For a a good example of publishing data, look at the SickLMS200_Laser controller.
+*/

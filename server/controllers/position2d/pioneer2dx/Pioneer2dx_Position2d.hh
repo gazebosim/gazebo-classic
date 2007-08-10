@@ -39,10 +39,23 @@ namespace gazebo
 /// \addtogroup gazebo_controller
 /// \{
 /** \defgroup pioneer2dx_position2d pioneer2dx_position2d
-\{
+
+  \brief Pioneer 2 DX Position2D controller.
+
+  This is a controller that simulates a Pioneer 2DX motion
+
+  \verbatim
+  <controller:pioneer2dx_position2d name="controller-name">
+    <leftJoint>left-joint-name</leftJoint>
+    <rightJoint>right-join-name</rightJoint>
+    <interface:position name="iface-name"/>
+  </controller:pioneer2dx_position2d>
+  \endverbatim
+  
+  \{
 */
 
-/// Pioneer 2 DX Position2D controller.
+/// \brief Pioneer 2 DX Position2D controller.
 /// This is a controller that simulates a Pioneer 2DX motion
 class Pioneer2dx_Position2d : public Controller
 {

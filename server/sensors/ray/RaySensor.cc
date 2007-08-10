@@ -107,7 +107,8 @@ void RaySensor::InitChild()
   this->prevPose = bodyPose;
 
   // Create and array of ray geoms
-  for (int i = 0; i < this->rayCount; i++)
+  //for (int i = 0; i < this->rayCount; i++)
+  for (int i = this->rayCount-1; i >= 0; i--)
   {
     angle = i * (this->maxAngle - this->minAngle) / (rayCount - 1) + this->minAngle;
 

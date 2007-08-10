@@ -35,6 +35,7 @@ bool Global::userStep = false;
 bool Global::userStepInc = false;
 unsigned long Global::iterations = 0;
 Gui *Global::gui = NULL;
+Pose3d Global::poseOffset;
 
 Global::Global()
 {

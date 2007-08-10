@@ -40,6 +40,24 @@ namespace gazebo
 /// @{
 /** \defgroup genericcamera generic camera
 
+  \brief Generic camera controller.
+  
+  This is a controller that collects data from a Camera Sensor and populates a libgazebo camera interfaace. This controller should only be used as a child of a camera sensor 
+
+  \verbatim
+  <model:physical name="camera_model">
+    <body:empty name="camera_body">
+      <sensor:camera name="camera_sensor">
+
+        <controller:generic_camera name="controller-name">
+          <interface:camera name="iface-name"/>
+        </controller:generic_camera>
+
+      </sensor:camera>
+    </body:empty>
+  </model:phyiscal>
+  \endverbatim
+ 
 \{
 */
 

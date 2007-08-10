@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include <FL/Fl.h>
+#include <FL/Fl.H>
 #include <FL/x.H>
-#include <FL/Enumerations.h>
+#include <FL/Enumerations.H>
 #include <FL/Fl_Window.H>
 
 #include "Gui.hh"
@@ -33,12 +33,11 @@ namespace gazebo
     public: virtual void draw();
     public: virtual void flush();
 
-/*  public: int handle(int event);
+    public: int handle(int event);
 
     private: int HandlePush();
     private: int HandleDrag();
     private: int HandleKeyboard();
-                */
 
     private: void OpenDisplay();
 

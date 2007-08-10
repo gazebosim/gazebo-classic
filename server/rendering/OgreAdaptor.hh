@@ -120,6 +120,10 @@ class OgreAdaptor
   private: std::string videoMode;
 
   private: bool ogreWindow;
+
+  private: Vector3 terrainSize;
+  private: unsigned int terrainVertSize;
+  private: std::string terrainImage;
 };
 
 /*/// \brief 

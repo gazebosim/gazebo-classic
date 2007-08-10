@@ -12,6 +12,7 @@
 #include "BoxGeom.hh"
 #include "CylinderGeom.hh"
 #include "PlaneGeom.hh"
+#include "HeightmapGeom.hh"
 #include "Geom.hh"
 #include "Body.hh"
 
@@ -225,7 +226,7 @@ void Body::SetPosition(const Vector3 &pos)
   }
   else
   {
-    std::vector< Geom* >::iterator iter;
+    /*std::vector< Geom* >::iterator iter;
     Vector3 geomPos;
 
     for (iter=this->geoms.begin(); iter!=this->geoms.end(); iter++)
@@ -234,7 +235,7 @@ void Body::SetPosition(const Vector3 &pos)
       geomPos += pos;
 
       (*iter)->SetPosition(geomPos);
-    }
+    }*/
   }
 
   // Set the position of the scene node
@@ -372,6 +373,16 @@ int Body::LoadGeom(XMLConfigNode *node)
   {
     Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
     geom = new TrimeshGeom(this, 1.0, mesh, scale);
+  }
+  else if (node->GetName() == "heightmap")
+  {
+    this->SetStatic(true);
+    std::string imageFile = node->GetString("image","",1);
+    std::string worldTex = node->GetString("worldTexture","",0);
+    std::string detailTex = node->GetString("detailTexture","",0);
+    Vector3 size = node->GetVector3("size",Vector3(10,10,10));
+    Vector3 offset = node->GetVector3("offset",Vector3(0,0,0));
+    geom = new HeightmapGeom(this, imageFile, worldTex, detailTex, size, offset);
   }
   else
   {

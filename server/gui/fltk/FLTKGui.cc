@@ -112,8 +112,9 @@ void FLTKGui::flush()
   this->draw();
 }
 
-/*int FLTKGui::handle(int event)
+int FLTKGui::handle(int event)
 {
+  printf("HERE\n");
   switch (event)
   {
     case FL_PUSH:
@@ -145,4 +146,3 @@ int FLTKGui::HandleKeyboard()
   int key = Fl::event_key();
   return 1;
 }
-*/

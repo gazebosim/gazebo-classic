@@ -1,6 +1,11 @@
-doxBld = Builder(action='doxygen $SOURCE')
+opts = Options()
+opts.Add('sfuser', 'The Source Forge Username', 'natepak')
 
-env = Environment()
+stuff = 'natepak'
+
+env = Environment(options=opts)
+
+doxBld = Builder(action='doxygen $SOURCE')
 env.Append( BUILDERS={'dox' : doxBld} )
 
 env.dox('gazebo.dox')

@@ -65,7 +65,7 @@ ODEPhysics::ODEPhysics()
   dWorldSetContactMaxCorrectingVel(this->worldId, 1.0);
 
   // This helps prevent jittering problems.
-  dWorldSetContactSurfaceLayer(this->worldId, 0.01);
+  dWorldSetContactSurfaceLayer(this->worldId, 0.001);
 
   this->gravity.x = 0;
   this->gravity.y = 0;

@@ -1,0 +1,36 @@
+/**
+
+\page tutorial_sensor Sensor Creation Tutorial
+
+This tutorial describes how to make a new sensor. The contents of this page include:
+- \ref tutorial_sensor_create
+- \ref tutorial_sensor_load
+
+\section tutorial_sensor_overview Overview
+
+Sensors in Gazebo are designed to simulate the data returned from real-world devices. One simple example is a camera sensor, which captures an image of the environment.
+
+Data is output from a sensor via a controller and interface pair. Just as a physical model may use a controller and interface to receive controll commands, a sensor can use the controller and interface to process sensor data nd publish it to libgazebo.
+
+\section tutorial_sensor_create Sensor Creation
+
+Sensors do not have a phyiscal representation. Instead they define how data is captured from the Gazebo environment. To create a sensor, copy the stubbed out sensor class from <tt>gazebo/server/sensors/SensorStub.*</tt> to your new directory. Change the name of the sensor appropriatly.
+
+\section tutorial_sensor_load Load the Sensor
+
+Use the <tt>LoadChild</tt> function to read any parameters from the XML
+configuration file. For example, the camera sensor reads the size of the
+image, horizontal field of view, clipping planes, and a few other
+miscellaneous parameters.
+
+\section tutorial_sensor_update Update the Sensor
+
+Once every iteration the <tt>UpdateChild</tt> function is called. Use this
+function to collect, process, and store all data relvant to the sensor.
+A controller will use this information to fill in a libgazebo interface.
+
+Both the RaySensor and CameraSensor provide good examples of how to gather
+different kinds of data from the Gazebo world, and make it accessible to
+a controller.
+
+*/

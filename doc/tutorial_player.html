@@ -1,0 +1,101 @@
+/**
+ 
+\page tutorial_player Using Player
+
+This tutorial describes how to use Gazebo with Player. The contents of this page include:
+
+- \ref tutorial_player_worldfile 
+- \ref tutorial_player_config 
+- \ref tutorial_player_running 
+- \ref tutorial_player_examples 
+
+\section tutorial_player_overview Overview
+
+Gazebo is designed to mesh nicely with Player through libgazebo. Each libgazebo interface is exposed to player through Gazebo's Player plugin. The code for this plugin is found in  <tt>gazebo/player</tt>.
+
+This tutorial describes how to controll models in a Gazebo simulation using player.
+
+\section tutorial_player_worldfile Create the Gazebo World File
+
+The first step is creation of the Gazebo world. Player can only hook into Gazebo when one or more controller and interfaces are present in the world. Each controller must contain at least one interface. The interface defines what commands the controller can receive, and what data the controller can publish.
+
+For example, create a <tt>pioneer2dx_position2d</tt> controller for any Pioneer2dx robot that you wish to move around. Note that the name of a controller indicates what type of device it attempts to simulate. However, a controller's can be assigned to any type of robot. This flexibility allows models to be quickly created in XML, and utilize prebuilt controllers.
+
+Here we have a Pioneer2dx model with a position controller and interface:
+
+\verbatim
+<model:physical name="pioneer2dx_model1">
+  <xyz>1 0 0.25</xyz>
+  <rpy>0.0 0.0 0.0</rpy>
+  <python>pioneer2dx</python>
+
+  <controller:pioneer2dx_position2d name="controller1">
+    <leftJoint>left_wheel_hinge</leftJoint>
+    <rightJoint>right_wheel_hinge</rightJoint>
+    <interface:position name="position_iface_1"/>
+  </controller:pioneer2dx_position2d>
+
+  <include embedded="true">
+    <xi:include href="pioneer2dx.model" />
+  </include>
+</model:physical>
+\endverbatim
+
+The most important attribute to notice is the name of the interface. In this example the name is "position_iface_1". This name will be used in a Player config file to indicate what interface Player should use when access Gazebo's position device.
+
+\section tutorial_player_config Player's Config
+
+Once the Gazebo world is built, we need to tell Player how to communicate with Gazebo's controllers. Continuing with the Pioneer2dx example, the Player config file would contain:
+
+\verbatim
+driver
+(
+  name "gazebo"
+  provides ["simulation:0"]
+  plugin "libgazeboplugin"
+  server_id "default"
+)
+
+driver
+(
+  name "gazebo"
+  provides ["position2d:0"]
+  gz_id "position_iface_1"
+)
+\endverbatim
+
+The first driver tells Player to load the libgazeboplugin, and that it provides a simulation interface. This section should always be present in the Player config file.
+
+The second drive tells Player that Gazebo has a Position2d interface called "position_iface_1". This name must match an interface name in the Gazebo world file.
+
+\section tutorial_player_running Running the Simulation and Player
+
+At this point you have a Gazebo world file, and a Player configuration file. Now it's time to run everything.
+
+First start the simulator:
+\verbatim
+$ gazebo worlds/pioneer2dx.world
+\endverbatim
+
+Now start player:
+\verbatim
+$ cd gazebo/player
+$ player gazebo.cfg
+\endverbatim
+
+Now test the connection using playerv:
+\verbatim
+$ playerv -h localhost
+\endverbatim
+
+Playerv will allow you to connect to the position interface and move the robot around.
+
+\section tutorial_player_examples More Examples
+
+Player can communicate with a wide range of devices, such as lasers, cameras, sonar, etc.
+
+The <tt>gazebo/player</tt> contains an example Player configuration file called <tt>gazebo.cfg</tt> that provides examples to many of the playe devices.
+
+The <tt>gazebo/worlds</tt> contains numberous example worlds which can be used with the <tt>gazebo/plaer/gazebo.cfg</tt> Player configuration file.
+
+*/

@@ -1,0 +1,267 @@
+/**
+
+\page tutorial_model Model Creation Tutorial
+
+This tutorial will describe how to create your own custom model. The contents of this page include:
+
+- \ref tutorial_model_create : Basics of creating a model
+- \ref tutorial_model_create_mesh : Change a model's skin
+- \ref tutorial_model_create_material : Change a model's material
+- \ref tutorial_model_joints : Add joints to a model
+- \ref tutorial_model_geoms : Add multiple geometries to a body
+- \ref tutorial_model_controller : Add controllers to a model
+- \ref tutorial_model_include : Separating models into separate files. Allows for easy inclusion of models into a world.
+- \ref tutorial_model_nesting : Connect models in a parent-child relationship
+
+\section tutorial_model_overview Overview
+
+Models form the core of the Gazebo simulation. They encompass all physical entities and sensors. Since models are so important, they should be easily created and modified. Gazebo utilizes XML to define all the physical aspects of a model.
+
+This tutorial will first describe how to create a new model using Gazebo's xml language, and then how to controll the model using interfaces and controllers.
+
+\section tutorial_model_create Physical Construction
+
+All physical aspects of a model are defined within an XML file. This includes position, orientation, density, joints, etc. There are a few basic rules to follow when constructing a  model:
+
+- Name everything : All models, bodies, and geoms must have names. These names hshould be unique, but this is not strictly enforced.
+- A model must contain a body.
+- A body can contain only senors and/or geometries.
+
+\subsection tutorial_model_create_simple Simple Shape
+
+We'll start with a simple example by create a model a box. A box model consists of one body that contains one geometry.
+
+\verbatim
+<model:physical name="box_model">
+  <xyz>0 1.5 0.5</xyz>
+  <rpy>0.0 0.0 0.0</rpy>
+  <canonicalBody>box1_body</canonicalBody>
+  <static>false</static>
+
+  <body:box name="box_body">
+    <xyz>0.0 0.0 0.0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <geom:box name="box_geom">
+      <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+      <mesh>default</mesh>
+      <size>1 1 1</size>
+      <density>1.0</density>
+      <material>Gazebo/BumpyMetal</material>
+    </geom:box>
+  </body:box>
+</model:physical>
+\endverbatim
+
+In this example the starting position of the model is 1.5 meters up (Z-axes), and 0.5 meters along the Y axis. The model has no rotation.
+
+The <tt>canonicalBody</tt> tag defines which body within a model should be used when nesting models. Nesting occurs when a model is defined withing another model. This creates a parent-child relationship, and a joint attached the two models together by connecting their respective canonical bodies. If this tag is left out, the first body in the model is automatically used as the canonical body.
+
+The <tt>static</tt> flags indicates whether this model is affected by physics. If set to false, then the model will never move, but will still collide with other moving objects. If set to true, then the physics engine will update the model according to it mass, position, collisions, etc.
+
+This model contains one body that is not offset from the model's position. Contained within this model is one geometry that is not offset from the body's position. The <tt>mesh</tt> tag is used to attach a 3D mesh to the geometry. This is mesh is used for visualization only. By setting <tt>mesh</tt> to default the internal mesh is used for the geometry.
+
+The <tt>size</tt> tag indicates how big the geometry should be. The <tt>density</tt> tag is used to calculate the mass of the geometry. Finally, the <tt>material</tt> tag indicates what texture should be applied to the geometry.
+
+\subsection tutorial_model_create_mesh Changing the Mesh
+
+By changing the <tt>mesh</tt> tag a new "skin" can be applied to a geometry. The value of the <tt>mesh</tt> tag should match one of the OGRE models. Contained within the Gazebo sources at <tt>gazebo/Media/models</tt> is a set of predefined meshes. 
+
+If you would like to use a different mesh, say the <tt>fish</tt> mesh, then modify the <tt>mesh</tt> tag:
+
+\verbatim
+<mesh>fish</mesh>
+\endverbatim
+
+\subsection tutorial_model_create_material Changing the Material
+
+The material applied to a geometry can also be changed through OGRE. The list of available materials are contained withing <tt>gazebo/Media/materials/scripts/Gazebo.material</tt>
+
+If you want to use a different material, say <tt>FlatBlack</tt>, then change the <tt>material</tt> tag accordingly:
+
+\verbatim
+<material>Gazebo/FlatBlack</material>
+\endverbatim
+
+\section tutorial_model_joints Creating Joints
+
+Joints connect two bodies together. These are useful for attaching wheels to a car body, or creating an articulated arm. The types of joints available are:
+
+- \ref gazebo_ball_joint 
+- \ref gazebo_hinge_joint 
+- \ref gazebo_hinge2_joint 
+- \ref gazebo_universal_joint 
+- \ref gazebo_slider_joint 
+
+If a model is being created to simulate a Pioneer2DX robot, two hinge joints should be attached between two wheel bodies and on chassis body. Additionally, a rear castor wheel must be connected to the chassis using a ball joint. Read the ODE manual for a description of the various joints. 
+
+Suppose this pioneer2dx model has the following named bodies:
+- left_wheel_body
+- right_wheel_body
+- castor_body
+- chassis_body
+
+The left hinge joint would be:
+\verbatim
+<joint:hinge name="left_wheel_hinge">
+  <body1>left_wheel</body1>
+  <body2>chassis_body</body2>
+  <anchor>left_wheel</anchor>
+  <axis>0 1 0</axis>
+  <erp>0.4</erp>
+  <cfm>0.008</cfm>
+</joint:hinge>
+\endverbatim
+
+The right hinge joint would be:
+\verbatim
+<joint:hinge name="right_wheel_hinge">
+  <body1>right_wheel</body1>
+  <body2>chassis_body</body2>
+  <anchor>right_wheel</anchor>
+  <axis>0 1 0</axis>
+  <erp>0.4</erp>
+  <cfm>0.008</cfm>
+</joint:hinge>
+\endverbatim
+
+The <tt>axis</tt> tag in the above two joints indicates the axis of motion. In this case the two wheels will rotate around the Y-axis. The <tt>erp</tt> and <tt>cfm</tt> tags indicate the error reduction parameter and constrain force mixing parameter. See the ODE manual for more insight into these parameters. 
+
+And the castor joint would be:
+\verbatim
+<joint:ball name="castor_joint">
+  <body1>castor_body</body1>
+  <body2>chassis_body</body2>
+  <anchor>castor_body</anchor>
+  <erp>0.4</erp>
+  <cfm>0.008</cfm>
+</joint:ball>
+\endverbatim
+
+Since a ball joint rotates in all directions, no <tt>axis</tt> tag is used.
+
+\section tutorial_model_geoms Bodies with Multiple Geometries
+
+A body can contain one or more geometries, thereby allowing for complex shapes. Each geometry within a body can have a unique position on rotation relative to the parent body.
+
+In this example we will create a cylindrical wheel that contains a box at the hub.
+
+\verbatim
+<body:cylinder name="left_wheel">
+  <xyz>0.1 -0.17 -0.0725</xyz>
+  <rpy>0 90 90</rpy>
+  <geom:cylinder name="left_wheel_geom">
+    <mesh>default</mesh>
+    <size>0.075 0.05</size>
+    <density>0.5</density>
+    <material>Gazebo/Black</material>
+  </geom:cylinder>
+  <geom:box name="left_wheel_box">
+    <mesh>default</mesh>
+    <xyz>0.0 0.0 -0.010</xyz>
+    <size>0.05 0.05 0.05</size>
+    <density>0</density>
+    <material>Gazebo/White</material>
+  </geom:box>
+</body:cylinder>
+\endverbatim
+
+Note that the cylinder geom has no position and orientation offset from the parent body, while the box geom is translate -0.01 meters along the Z-axis.
+
+\section tutorial_model_controller Controllers
+
+Many models will require movement and/or the ability to publish sensor data.
+Controllers make this functionality possible by simulating a physical
+device.  For example, a Pioneer2DX model should have a controller that
+allows it move around, and a SickLMS-200 model should have a controller that
+publishes laser data.
+
+Controllers are compiled into gazebo, and are linked to model using XML:
+\verbatim
+<controller:pioneer2dx_position2d name="controller1">
+  <leftJoint>left_wheel_hinge</leftJoint>
+  <rightJoint>right_wheel_hinge</rightJoint>
+  <interface:position name="position_iface_1"/>
+</controller:pioneer2dx_position2d>
+\endverbatim
+
+The above example creates a position controller for a pioneer2dx. The first
+two children, <tt>leftjoint</tt> and <tt>rightJoint</tt>, tell this
+controller which two joints make up the drive train. The last child
+parameter, defines what libgazebo interface the controller will read
+commands from and write data to.
+
+Each controller requires it's own unique set of parameters, depending on
+it's functionality. The interface parameter is required to link a controller
+to a libgazebo interface. Without this link the controller cannot receive
+command and publish data. 
+
+\section tutorial_model_include XML Include
+
+A model can be defined in a seperate file, and included within another world
+file. This mechanism creates the possiblity of including the same model many
+times within one world without duplicating code.
+
+The seperate model file should only contain the definition of the model. See <tt>gazebo/worlds/pioneer2dx.model</tt> for an example.
+
+
+A model can be included within a world using two different methods. The first assumes that the included model does not require any modifications.
+
+\verbatim
+<include embedded="false">
+  <xi:include href="pioneer2dx.model" />
+</include>
+\endverbatim
+
+If an included model should have some slight modfications, such as a name or position change, then use this method:
+\verbatim
+<model:physical name="pioneer2dx_model1">
+  <xyz>1 0 0.25</xyz>
+  <rpy>0.0 0.0 0.0</rpy>
+
+  <controller:pioneer2dx_position2d name="controller1">
+    <leftJoint>left_wheel_hinge</leftJoint>
+    <rightJoint>right_wheel_hinge</rightJoint>
+    <interface:position name="position_iface_1"/>
+  </controller:pioneer2dx_position2d>
+
+  <!-- 
+  The include should be last within a model. All previous statements
+  will override those in the included file 
+  -->
+  <include embedded="true">
+    <xi:include href="pioneer2dx.model" />
+  </include>
+</model:physical>
+\endverbatim
+
+In the above example the pioneer2dx model has had a controller added to it, and it's position changed. Note that the included model file should be last within the <tt>model</tt> declaration.
+
+\section tutorial_model_nesting Nesting Models
+
+Models can be nested together, allowing for arbitrarily complex models. This
+is most useful when attaching sensors to a robot. In this example we will
+connect a SickLMS laser to a Pioneer2dx robot.
+
+If we have use the <tt>pioner2dx.model</tt> and the <tt>sicklms200.model</tt> provided in the Gazebo sources (<tt>gazebo/worlds</tt>), out nested model would look like:
+
+\verbatim
+<model:physical name="pioneer2dx_model2">
+  <xyz>0 0 0.5</xyz>
+
+  <model:physical name="laser_model">
+    <xyz>0 0 0.2</xyz>
+    <include embedded="true">
+      <xi:include href="laser.model" />
+    </include>
+  </model:physical>
+
+  <include embedded="true">
+    <xi:include href="pioneer2dx.model" />
+  </include>
+</model:physical>
+\endverbatim
+
+*/
+

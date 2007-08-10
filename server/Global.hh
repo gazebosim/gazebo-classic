@@ -32,6 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
+#include "Pose3d.hh"
 
 /////////////////////////////////////////////////////////////////////////////
 // Defines
@@ -126,6 +127,9 @@ namespace gazebo
 
     /// \brief Pointer to the selected Gui 
     public: static Gui *gui;
+
+    /// \brief Global pose offset
+    public: static Pose3d poseOffset;
 
     private: Global();
     private: ~Global();
