@@ -93,18 +93,6 @@ void World::Load(XMLConfig *config, int serverId)
   assert(serverId >= 0);
   XMLConfigNode *rootNode(config->GetRootNode());
 
-  /*try
-  {
-    OgreAdaptor::Instance()->Init(rootNode->GetChildByNSPrefix("rendering"));
-  }
-  catch (GazeboError e)
-  {
-    std::ostringstream stream;
-    stream << "Failed to Initialize the OGRE Rendering system\n" 
-              << e << "\n";
-    gzthrow(stream.str());
-  }*/
-
   // Create some basic shapes
   OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
   OgreSimpleShape::CreateBox("unit_box", Vector3(1,1,1));
@@ -112,7 +100,15 @@ void World::Load(XMLConfig *config, int serverId)
 
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
-  this->server->Init(serverId, true );
+
+  try
+  {
+    this->server->Init(serverId, true );
+  }
+  catch ( std::string err)
+  {
+    gzthrow (err);
+  }
 
    // Create the simulator interface
   this->simIface = new SimulationIface();

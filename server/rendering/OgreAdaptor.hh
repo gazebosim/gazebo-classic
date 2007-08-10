@@ -96,8 +96,8 @@ class OgreAdaptor
   public: Ogre::Camera *CreateCamera(const std::string &name, double nearClip, 
               double farClip, Ogre::RenderTarget *renderTarget);
 
-  private: void LoadPlugins(XMLConfigNode *node);
-  private: void SetupResources(XMLConfigNode *node);
+  private: void LoadPlugins(const std::string &path);
+  private: void SetupResources(const std::string &path);
   private: void SetupRenderSystem(bool create);
   private: void CreateWindow();
 

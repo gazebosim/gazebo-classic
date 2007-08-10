@@ -23,6 +23,12 @@
     <erp>0.8</erp>
   </physics:ode>
 
+  <rendering:gui>
+    <type>fltk</type>
+    <size>640 480</size>
+    <pos>0 0</pos>
+  </rendering:gui>
+
   <rendering:ogre>
     <ambient>1.0 1.0 1.0 1.0</ambient>
     <sky>
@@ -39,38 +45,8 @@
     </fog>
     -->
 
-    <video>
-      <depth>16</depth>
-      <size>640 480</size>
-    </video>
-
-    <plugins path="/home/nate/local/lib/OGRE">
-      <plugin>RenderSystem_GL.so</plugin>
-      <plugin>Plugin_ParticleFX.so</plugin>
-      <plugin>Plugin_BSPSceneManager.so</plugin>
-      <plugin>Plugin_OctreeSceneManager.so</plugin>
-    </plugins>
-
-    <resources path="/home/nate/local/share/gazebo">
-      <bootstrap>
-        <zip>Media/packs/OgreCore.zip</zip>
-      </bootstrap>
-
-      <general>
-        <filesystem>Media</filesystem>
-        <filesystem>Media/fonts</filesystem>
-        <filesystem>Media/materials/programs</filesystem>
-        <filesystem>Media/materials/scripts</filesystem>
-        <filesystem>Media/materials/textures</filesystem>
-        <filesystem>Media/models</filesystem>
-        <filesystem>Media/overlays</filesystem>
-        <filesystem>Media/particle</filesystem>
-        <filesystem>Media/gui</filesystem>
-        <zip>Media/packs/cubemap.zip</zip>
-        <zip>Media/packs/cubemapsJS.zip</zip>
-        <zip>Media/packs/skybox.zip</zip>
-      </general>
-    </resources>
+    <gazeboPath>/home/nate/local/share/gazebo</gazeboPath>
+    <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
   </rendering:ogre>
 
   <!--<model:physical name="sphere1_model">

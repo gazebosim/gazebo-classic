@@ -318,6 +318,7 @@ int Init()
   if (gazebo::World::Instance()->Init() != 0)
     return -1;
 
+  printf("C\n");
   return 0;
 }
 

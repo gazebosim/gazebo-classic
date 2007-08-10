@@ -12,6 +12,8 @@ This tutorial will describe how to create and use terrains via heightmaps. The c
 Gazebo makes use of heightmaps for terrains. Heightmaps are extruded
 vertically from a 2D image. Therefore no overhangs or tunnels can be formed.
 
+IMPORTANT: ODE version 0.8 or less in incompatible with terrains, due to problems with Ray and Heightmap collision detection. If the highest numbered version of ODE is 0.8, then install from their SVN sources.
+
 \section tutorial_terrain_image Heightmap Image
 
 A heightmap is based on a greyscale image. The image must be square with

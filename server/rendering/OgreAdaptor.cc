@@ -108,10 +108,10 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
 
   // Load all the plugins
-  this->LoadPlugins(node->GetChild("plugins"));
+  this->LoadPlugins(node->GetString("ogrePath","/usr/local/lib/OGRE",1));
 
   // Setup the available resources 
-  this->SetupResources(node->GetChild("resources"));
+  this->SetupResources(node->GetString("gazeboPath","/usr/local/share/gazebo",1));
 
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
@@ -140,7 +140,19 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   // Add a sky dome to our scene
   if ((cnode = node->GetChild("sky")))
   {
-    this->sceneMgr->setSkyDome(true,cnode->GetString("material","",0),5,8);
+    std::string material = cnode->GetString("material","",1);
+    if (!material.empty())
+    {
+      try
+      {
+        this->sceneMgr->setSkyDome(true,material,5,8);
+      }
+      catch (int)
+      {
+        gzmsg(0) << "Unable to set sky dome to material[" << material << "]\n";
+      }
+
+    }
   }
 
   // Add fog. This changes the background color
@@ -210,108 +222,67 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   //delete [] mstr;
 }
 
-void OgreAdaptor::Init(Display *display, 
-                       XVisualInfo *visual, 
-                       Window windowId, int width, int height)
+// Load plugins
+void OgreAdaptor::LoadPlugins(const std::string &path)
 {
-/*  Ogre::NameValuePairList params;
-  Ogre::StringVector paramsVector;
+  std::string pathStr;
+  std::string pluginStr;
+  XMLConfigNode *pluginNode;
 
-  this->display = display;
-  this->visual = visual;
-  this->windowId = windowId;
-
-  // Setup the available resources 
-  this->SetupResources(NULL);
-
-  // Setup the rendering system, and don't create the context
-  this->SetupRenderSystem(false);
-
-  // Initialize the root node, and don't create a window
-  this->window = this->root->initialise(false); 
-
-  // Create the window
-  this->CreateWindow(width,height);
-
-  // Get the SceneManager, in this case a generic one
-  this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
-
-  // Set default mipmap level (NB some APIs ignore this)
-  Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 2 );
-
-  // Load Resources
-  Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
-  // Default lighting
-  this->sceneMgr->setAmbientLight(Ogre::ColourValue(0.8f, 0.8f, 0.8f, 1.0f)); 
-  this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
-
-  OgreGLXWindowInterface* pWindowInterface = NULL;
-
-  this->window->getCustomAttribute("GLXWINDOWINTERFACE", &pWindowInterface);
-
-  //pWindowInterface->exposed(true);
-
-
-  // Create our frame listener and register it
-  this->frameListener = new OgreFrameListener();
-  this->root->addFrameListener(this->frameListener);
-  */
-}
-
-void OgreAdaptor::SetupResources(XMLConfigNode *node)
-{
-  XMLConfigNode *sectionNode;
-  XMLConfigNode *childNode;
-  std::string path, sectionName, typeName, archName;
-
-  if (!node)
-  {
-    gzthrow( "ogre resources xml nodemissing" );
-  }
-
-  path = node->GetString("path","",1);
-
+  // Make sure a path has been specified
   if (path.empty())
   {
-    gzthrow( "empty resource path" );
+    gzthrow( "no Plugin Path Set" );
   }
 
-  sectionNode = node->GetChild();
+  std::vector<std::string> plugins;
+  std::vector<std::string>::iterator iter;
 
-  while(sectionNode)
+  plugins.push_back(path+"/RenderSystem_GL.so");
+  plugins.push_back(path+"/Plugin_ParticleFX.so");
+  plugins.push_back(path+"/Plugin_BSPSceneManager.so");
+  plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+
+  for (iter=plugins.begin(); iter!=plugins.end(); iter++)
   {
-    sectionName = sectionNode->GetName();
-    sectionName[0] = std::toupper(sectionName[0]);
-
-    childNode = sectionNode->GetChild();
-
-    while (childNode)
+    try
     {
-      typeName = childNode->GetName();
-      archName = path+"/"+childNode->GetValue();
-
-      typeName[0] = std::toupper(typeName[0]);
-
-      // Hack to make OGRE happy
-      if (typeName == "Filesystem")
-        typeName = "FileSystem";
-
-      try
-      {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation( archName, typeName, sectionName); 
-      }
-      catch (Ogre::Exception)
-      {
-        gzthrow("Unable to load Ogre Resources.\nMake sure the resources path in the world file is set correctly.");
-      }
-
-      childNode = childNode->GetNext();
+      // Load the plugin into OGRE
+      this->root->loadPlugin(*iter);
     }
+    catch (Ogre::Exception e)
+    {
+      gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
+    }
+  }
 
-    sectionNode = sectionNode->GetNext();
+}
+
+void OgreAdaptor::SetupResources(const std::string &path)
+{
+  std::vector<std::string> archNames;
+  std::vector<std::string>::iterator aiter;
+
+  archNames.push_back(path+"/Media");
+  archNames.push_back(path+"/Media/fonts");
+  archNames.push_back(path+"/Media/materials/programs");
+  archNames.push_back(path+"/Media/materials/scripts");
+  archNames.push_back(path+"/Media/materials/textures");
+  archNames.push_back(path+"/Media/models");
+
+  for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
+  {
+    try
+    {
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation( *aiter, "FileSystem", "General"); 
+    }
+    catch (Ogre::Exception)
+    {
+      gzthrow("Unable to load Ogre Resources.\nMake sure the resources path in the world file is set correctly.");
+    }
   }
 }
+
 
 void OgreAdaptor::SetupRenderSystem(bool create)
 {
@@ -371,7 +342,7 @@ void OgreAdaptor::CreateWindow()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Create a light source and attach it to the entity
+/// Create a light source and attach it to the entity
 void OgreAdaptor::CreateLight(XMLConfigNode *node, Entity *entity)
 {
   Vector3 vec;
@@ -428,6 +399,8 @@ void OgreAdaptor::CreateLight(XMLConfigNode *node, Entity *entity)
 }
  
 
+////////////////////////////////////////////////////////////////////////////////
+// Render
 int OgreAdaptor::Render()
 {
   Ogre::WindowEventUtilities::messagePump();
@@ -437,49 +410,6 @@ int OgreAdaptor::Render()
   root->renderOneFrame();
 
   return 0;
-}
-
-// Load plugins
-void OgreAdaptor::LoadPlugins(XMLConfigNode *node)
-{
-  std::string pathStr;
-  std::string pluginStr;
-  XMLConfigNode *pluginNode;
-
-  if (!node)
-  {
-    gzthrow( "missing plugins xml node" );
-  }
-
-  // Get the path prefix
-  pathStr = node->GetString("path","/usr/local/lib/OGRE",1);
-
-  // Make sure a path has been specified
-  if (pathStr.empty())
-  {
-    gzthrow( "no Plugin Path Set" );
-  }
-
-  // The first plugin
-  pluginNode = node->GetChild();
-
-  // Read all the plugins
-  while (pluginNode)
-  {
-    pluginStr = pathStr + "/" + pluginNode->GetValue();
-    gzmsg(5) << "OGRE: Load Plugin[" << pluginStr << "]\n";
-
-    try
-    {
-      // Load the plugin into OGRE
-      this->root->loadPlugin(pluginStr);
-    }
-    catch (Ogre::Exception e)
-    {
-      gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
-    }
-    pluginNode = pluginNode->GetNext();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -52,7 +52,7 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
       	      'ode-config --cflags --libs',
 	            'pkg-config --cflags --libs OIS',
-              'fltk-config --cflags --ldflags --use-gl --use-images',
+              'fltk-config --cflags --libs --use-gl --use-images',
               'xft-config --cflags --libs']
 
 #
