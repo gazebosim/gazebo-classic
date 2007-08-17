@@ -33,8 +33,8 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-CylinderGeom::CylinderGeom(Body *body, double radius, double length, double density, const std::string &meshName )
-    : Geom(body)
+CylinderGeom::CylinderGeom(Body *body,const std::string &name,  double radius, double length, double density, const std::string &meshName )
+    : Geom(body, name)
 {
   // Initialize mass matrix
   dMassSetCylinder(&this->mass, density, 3, radius, length);

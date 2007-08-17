@@ -63,7 +63,7 @@ OgreHUD::OgreHUD()
   // This overlay element is used to display the ouptut from one of the 
   // cameras in the  Gazebo world. It renders the texture output from a 
   // camera to a 2D overlay.
-  this->cameraPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_CAMERA_PANEL_1__"));
+  this->cameraPanel = static_cast<Ogre::PanelOverlayElement*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_CAMERA_PANEL_1__"));
   this->cameraPanel->setDimensions(1, 1);
   this->cameraPanel->setPosition(0, 0);
   hudOverlay->add2D(this->cameraPanel);
@@ -157,9 +157,36 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
 
   float left = (1.0 - width) / 2.0;
   float top = (1.0 - height) / 2.0;
-
   this->cameraPanel->setDimensions(width, height);
-  this->cameraPanel->setPosition(left, top);
+  this->cameraPanel->setPosition(left,top);
+
+  /*float guiWidth = this->ogreAdaptor->viewport->getActualWidth();
+  float guiHeight = this->ogreAdaptor->viewport->getActualHeight();
+
+  float width = (float)camera->GetImageWidth() / camera->GetTextureWidth();
+  float height = (float)camera->GetImageHeight() / camera->GetTextureHeight();
+
+  float guiXScale = guiWidth / camera->GetImageWidth();
+  float guiYScale = guiHeight / camera->GetImageHeight();
+
+  printf("Viewport Size[%d %d]\n",this->ogreAdaptor->viewport->getActualWidth(), this->ogreAdaptor->viewport->getActualHeight());
+
+  printf("Texture Size[%d %d] [%4.4f %4.4f]\n",camera->GetTextureWidth(), camera->GetTextureHeight(), width, height);
+
+  printf("Image Size[%d %d]\n",camera->GetImageWidth(), camera->GetImageHeight());
+
+  printf("Gui Size[%f %f] Scale[%f %f]\n",guiWidth, guiHeight, guiXScale, guiYScale);
+
+  printf("GUI Ratio[%f] Texture Ratio[%f]\n", guiWidth/guiHeight, width/height);
+  printf("\n");
+
+  this->cameraPanel->setUV((1.0-width)/2.0,(1.0-height)/2.0,width, height);
+  float left = (1.0 - guiXScale) / 2.0;
+  float top = (1.0 - guiYScale) / 2.0;
+
+  //this->cameraPanel->setDimensions(1.0, height*(1.0/width));
+  //this->cameraPanel->setPosition(0,(1-height*(1.0/width)) / 2.0);
+  */
 
   std::ostringstream stream;
   Pose3d pose = camera->GetWorldPose();

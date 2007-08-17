@@ -16,10 +16,10 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.03</stepTime>
+    <stepTime>0.02</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>0.008</cfm>
-    <erp>0.2</erp>
+    <cfm>10e-5</cfm>
+    <erp>0.8</erp>
   </physics:ode>
 
   <rendering:gui>
@@ -29,13 +29,13 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.0 0.0 0.0 0.0</ambient>
+    <ambient>0.8 0.8 0.8 0.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
 
-    <gazeboPath>/usr/local/share/gazebo</gazeboPath>
-    <ogrePath>/usr/local/lib/OGRE</ogrePath>
+    <gazeboPath>/home/nate/local/share/gazebo</gazeboPath>
+    <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
   </rendering:ogre>
 
   <!-- Ground Plane -->
@@ -47,9 +47,9 @@
     <body:plane name="plane1_body">
       <geom:plane name="plane1_geom">
         <normal>0 0 1</normal>
-        <size>20 20</size>
-        <segments>10 10</segments>
-        <uvTile>1 1</uvTile>
+        <size>2000 2000</size>
+        <segments>1 1</segments>
+        <uvTile>100 100</uvTile>
         <material>Gazebo/GrassFloor</material>
       </geom:plane>
     </body:plane>
@@ -57,7 +57,7 @@
 
   <!-- The Camera -->
   <model:physical name="cam2_model">
-    <xyz>0 3.5 0.9</xyz>
+    <xyz>0 8.94 2.21</xyz>
     <rpy>0 -15 90</rpy>
     <static>true</static>
 
@@ -76,7 +76,7 @@
 
 
   <!-- Red Spot light -->
-  <model:renderable name="spot_red">
+  <!--<model:renderable name="spot_red">
     <xyz>0.0 0.0 2.0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
@@ -85,13 +85,14 @@
       <direction>0 -1 0</direction>
       <diffuseColor>0.1 0.0 0.0</diffuseColor>
       <specularColor>0.2 0.0 0.0</specularColor>
-      <attenuation>10 0.2 0.1 0.00</attenuation>
+      <attenuation>5 0.2 0.2 0.00</attenuation>
     </light>
   </model:renderable>
+  -->
 
   <!-- Green Spot light -->
-  <model:renderable name="spot_green">
-    <xyz>0.0 0.5 2.0</xyz>
+  <!--<model:renderable name="spot_green">
+    <xyz>0.0 1.0 2.0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
     <light>
@@ -102,34 +103,53 @@
       <attenuation>10 0.2 0.1 0.00</attenuation>
     </light>
   </model:renderable>
+  -->
 
-  <!-- Blue Spot light -->
-  <model:renderable name="spot_blue">
-    <xyz>0.0 1.0 2.0</xyz>
+  <model:physical name="sphere1_model">
+    <xyz>0 2 5.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
+    <static>false</static>
 
-    <light>
-      <type>spot</type>
-      <direction>0 -1 0</direction>
-      <diffuseColor>0.0 0.0 0.1</diffuseColor>
-      <specularColor>0.0 0.0 0.2</specularColor>
-      <attenuation>10 0.2 0.1 0.00</attenuation>
-    </light>
-  </model:renderable>
+    <body:sphere name="sphere1_body">
+      <geom:sphere name="sphere1_geom">
+        <mesh>default</mesh>
+        <size>0.5</size>
+        <density>1.0</density>
+        <material>Gazebo/Rocky</material>
+      </geom:sphere>
+    </body:sphere>
+
+    <!-- Blue Spot light -->
+    <model:renderable name="spot_blue">
+      <xyz>0.0 0 0</xyz>
+      <rpy>0.0 0.0 0.0</rpy>
+
+      <light>
+        <type>spot</type>
+        <direction>0 -1 0</direction>
+        <diffuseColor>0.0 0.0 0.1</diffuseColor>
+        <specularColor>0.0 0.0 0.2</specularColor>
+        <attenuation>100 0.2 0.1 0.00</attenuation>
+      </light>
+    </model:renderable>
+
+  </model:physical>
+
 
   <!-- Yellow Point light -->
-  <model:renderable name="point_yellow">
+  <!--<model:renderable name="point_yellow">
     <xyz>5 5 5</xyz>
     <light>
       <type>point</type>
-      <diffuseColor>1.0 1.0 0.0</diffuseColor>
+      <diffuseColor>0.1 0.1 0.0</diffuseColor>
       <specularColor>0.3 0.3 0.3</specularColor>
       <attenuation>10 0.4 0.1 0.0</attenuation>
     </light>
   </model:renderable>
+  -->
 
   <!-- White Directional light -->
-  <model:renderable name="directional_white">
+  <!--  <model:renderable name="directional_white">
     <light>
       <type>directional</type>
       <direction>0 -1 0</direction>
@@ -138,5 +158,6 @@
       <attenuation>100 0.0 1.0 0.4</attenuation>
     </light>
   </model:renderable>
+  -->
 
 </gazebo:world>

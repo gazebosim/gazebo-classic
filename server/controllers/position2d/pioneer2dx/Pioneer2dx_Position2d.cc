@@ -108,55 +108,86 @@ void Pioneer2dx_Position2d::InitChild()
 // Update the controller
 void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 {
-  // TODO: Step should be in a parameter of this function
-  double wd, ws;
-  double d1, d2;
-  double dr, da;
+  bool opened = false;
 
-  this->GetPositionCmd();
 
-  wd = this->wheelDiam;
-  ws = this->wheelSep;
-
-  // Distance travelled by front wheels
-  d1 = params.stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
-  d2 = params.stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
-
-  dr = (d1 + d2) / 2;
-  da = (d2 - d1) / ws;
-  
-  // Compute odometric pose
-  this->odomPose[0] += dr * cos( this->odomPose[2] );
-  this->odomPose[1] += dr * sin( this->odomPose[2] );
-  this->odomPose[2] += da;
-
-  // Compute odometric instantaneous velocity
-  this->odomVel[0] = dr / params.stepTime;
-  this->odomVel[1] = 0.0;
-  this->odomVel[2] = da / params.stepTime;
-
-  if (this->enableMotors)
+  if (this->myIface->Lock(1))
   {
-    this->joints[LEFT]->SetParam( dParamVel, 
+    opened = this->myIface->data->opened;
+    this->myIface->Unlock();
+  }
+
+  if (opened)
+  {
+    // TODO: Step should be in a parameter of this function
+    double wd, ws;
+    double d1, d2;
+    double dr, da;
+
+    this->GetPositionCmd();
+
+    wd = this->wheelDiam;
+    ws = this->wheelSep;
+
+    // Distance travelled by front wheels
+    d1 = params.stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
+    d2 = params.stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
+
+    dr = (d1 + d2) / 2;
+    da = (d2 - d1) / ws;
+
+    // Compute odometric pose
+    this->odomPose[0] += dr * cos( this->odomPose[2] );
+    this->odomPose[1] += dr * sin( this->odomPose[2] );
+    this->odomPose[2] += da;
+
+    // Compute odometric instantaneous velocity
+    this->odomVel[0] = dr / params.stepTime;
+    this->odomVel[1] = 0.0;
+    this->odomVel[2] = da / params.stepTime;
+
+    if (this->enableMotors)
+    {
+      /*this->joints[LEFT]->SetParam( dParamVel, 
         this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
 
-    this->joints[RIGHT]->SetParam( dParamVel, 
+        this->joints[RIGHT]->SetParam( dParamVel, 
         this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
+        */
+      this->joints[LEFT]->SetParam( dParamVel, 
+          this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
 
-    this->joints[LEFT]->SetParam( dParamFMax, 1.1 );
-    this->joints[RIGHT]->SetParam( dParamFMax, 1.1 );
+      this->joints[RIGHT]->SetParam( dParamVel, 
+          this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
 
+      this->joints[LEFT]->SetParam( dParamFMax, 1.1 );
+      this->joints[RIGHT]->SetParam( dParamFMax, 1.1 );
+
+    }
+    else
+    {
+      this->joints[LEFT]->SetParam( dParamVel, 0 ); 
+      this->joints[RIGHT]->SetParam( dParamVel, 0 );
+
+      this->joints[LEFT]->SetParam( dParamFMax, 0 );
+      this->joints[RIGHT]->SetParam( dParamFMax, 0 );
+    }
+
+    this->PutPositionData();
   }
   else
   {
-    this->joints[LEFT]->SetParam( dParamVel, 0 ); 
-    this->joints[RIGHT]->SetParam( dParamVel, 0 );
+    this->myParent->Reset();
 
-    this->joints[LEFT]->SetParam( dParamFMax, 0 );
-    this->joints[RIGHT]->SetParam( dParamFMax, 0 );
+    // Reset odometric pose
+    this->odomPose[0] = 0.0;
+    this->odomPose[1] = 0.0;
+    this->odomPose[2] = 0.0;
+
+    this->odomVel[0] = 0.0;
+    this->odomVel[1] = 0.0;
+    this->odomVel[2] = 0.0;
   }
-
-  this->PutPositionData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,37 +203,40 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 {
   double vr, va;
 
-  this->myIface->Lock(1);
+  if (this->myIface->Lock(1))
+  {
 
-  vr = this->myIface->data->cmdVelocity.x;
-  va = this->myIface->data->cmdVelocity.yaw;
+    vr = this->myIface->data->cmdVelocity.x;
+    va = this->myIface->data->cmdVelocity.yaw;
 
-  this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
+    this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
 
-  this->wheelSpeed[LEFT] = vr + va * this->wheelSep / 2;
-  this->wheelSpeed[RIGHT] = vr - va * this->wheelSep / 2;
+    this->wheelSpeed[LEFT] = vr + va * this->wheelSep / 2;
+    this->wheelSpeed[RIGHT] = vr - va * this->wheelSep / 2;
 
-  this->myIface->Unlock();
+    this->myIface->Unlock();
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the data in the interface
 void Pioneer2dx_Position2d::PutPositionData()
 {
-  this->myIface->Lock(1);
-  
-  // TODO: Data timestamp
-  this->myIface->data->time = World::Instance()->GetSimTime();
+  if (this->myIface->Lock(1))
+  {
+    // TODO: Data timestamp
+    this->myIface->data->time = World::Instance()->GetSimTime();
 
-  this->myIface->data->pose.x = this->odomPose[0];
-  this->myIface->data->pose.y = this->odomPose[1];
-  this->myIface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
+    this->myIface->data->pose.x = this->odomPose[0];
+    this->myIface->data->pose.y = this->odomPose[1];
+    this->myIface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
 
-  this->myIface->data->velocity.x = this->odomVel[0];
-  this->myIface->data->velocity.yaw = this->odomVel[2];
+    this->myIface->data->velocity.x = this->odomVel[0];
+    this->myIface->data->velocity.yaw = this->odomVel[2];
 
-  // TODO
-  this->myIface->data->stall = 0;
+    // TODO
+    this->myIface->data->stall = 0;
 
-  this->myIface->Unlock();
+    this->myIface->Unlock();
+  }
 }

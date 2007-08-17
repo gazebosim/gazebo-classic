@@ -37,8 +37,8 @@
       <material>Gazebo/CloudySky</material>
     </sky>
 
-    <gazeboPath>/usr/local/share/gazebo</gazeboPath>
-    <ogrePath>/usr/local/lib/OGRE</ogrePath>
+    <gazeboPath>/home/nate/local/share/gazebo</gazeboPath>
+    <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
   </rendering:ogre>
 
   <model:physical name="box1_model">
@@ -83,8 +83,8 @@
   </model:physical>
 
   <model:physical name="cam1_model">
-    <xyz>0 3 4</xyz>
-    <rpy>0 -30 0</rpy>
+    <xyz>-0.5 2.14 1.05</xyz>
+    <rpy>0 8 106</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">

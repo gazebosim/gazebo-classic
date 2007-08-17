@@ -9,7 +9,7 @@
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   >
 
-<xyz>0 0 0.25</xyz>
+<xyz>0 0 0.0</xyz>
 <rpy>0.0 0.0 0.0</rpy>
 
 <canonicalBody>chassis_body</canonicalBody>
@@ -25,11 +25,20 @@
     <density>5</density>
     <material>Gazebo/PioneerBody</material>
   </geom:box>
+
+  <geom:box name="chassis_top_geom">
+    <xyz>0 0 0.085</xyz>
+    <mesh>default</mesh>
+    <size> 0.45 0.38 0.005</size>
+    <density>0</density>
+    <material>Gazebo/Black</material>
+  </geom:box>
 </body:box>
 
 <body:cylinder name="left_wheel">
   <xyz>0.1 -0.17 -0.0725</xyz>
   <rpy>0 90 90</rpy>
+
   <geom:cylinder name="left_wheel_geom">
     <mesh>default</mesh>
     <size>0.075 0.05</size>

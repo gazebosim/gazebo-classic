@@ -38,6 +38,7 @@ void RegisterSickLMS200_Laser();
 void RegisterGeneric_Camera();
 void RegisterTruth_Position2d();
 void RegisterFactory();
+void RegisterPioneer2_Gripper();
 
 std::map<std::string, ControllerFactoryFn> ControllerFactory::controllers;
 
@@ -50,6 +51,7 @@ void ControllerFactory::RegisterAll()
   RegisterGeneric_Camera();
   RegisterTruth_Position2d();
   RegisterFactory();
+  RegisterPioneer2_Gripper();
 }
 
 

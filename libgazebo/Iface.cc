@@ -52,6 +52,7 @@ GZ_REGISTER_IFACE("graphics3d", Graphics3dIface);
 GZ_REGISTER_IFACE("laser", LaserIface);
 GZ_REGISTER_IFACE("fiducial", FiducialIface);
 GZ_REGISTER_IFACE("factory", FactoryIface);
+GZ_REGISTER_IFACE("gripper", GripperIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface
@@ -62,6 +63,8 @@ Iface::Iface(const std::string &type, size_t size)
 
   this->server = NULL;
   this->client = NULL;
+
+  this->opened = false;
 }
 
 
@@ -260,6 +263,8 @@ void Iface::Open(Client *client, std::string id)
            << ((Iface*) this->mMap)->size << "\n";
 
   std::cout.setf(origFlags);
+
+  this->opened = true;
 }  
 
 
@@ -267,6 +272,8 @@ void Iface::Open(Client *client, std::string id)
 // Close the interface (client)
 void Iface::Close()
 {
+  this->opened = false;
+
   // Unmap the file
   munmap(this->mMap, this->size);
   this->mMap = NULL;
@@ -279,7 +286,7 @@ void Iface::Close()
 
 //////////////////////////////////////////////////////////////////////////////
 // Lock the interface.
-void Iface::Lock(int /*blocking*/)
+int Iface::Lock(int /*blocking*/)
 {
   // Some 2.4 kernels seem to screw up the lock count somehow; keep an eye out
   
@@ -290,14 +297,18 @@ void Iface::Lock(int /*blocking*/)
   {
     std::ostringstream stream;
     stream << "flock " <<  this->filename.c_str() << "error: " <<  strerror(errno);
-    throw(stream.str());
+    std::cout << "ERROR[" << stream.str() << "]\n";
+    return 0;
+    //throw(stream.str().c_str());
   }
+
+  return 1;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Unlock the interface
-void Iface::Unlock()
+int Iface::Unlock()
 {
   
   // Unlock the file
@@ -305,8 +316,12 @@ void Iface::Unlock()
   {
     std::ostringstream stream;
     stream << "flock error: " <<  strerror(errno);
-    throw(stream.str());
+    std::cout << "ERROR[" << stream.str() << "]\n";
+    //throw(stream.str().c_str());
+    return 0;
   }
+
+  return 1;
 }
 
 

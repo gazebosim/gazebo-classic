@@ -382,3 +382,12 @@ void CameraSensor::SaveFrame()
 
   this->saveCount++;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a pointer to the ogre camera
+Ogre::Camera *CameraSensor::GetOgreCamera() const
+{
+  return this->camera;
+}
+
+

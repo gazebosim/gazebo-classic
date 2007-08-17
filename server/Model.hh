@@ -33,6 +33,7 @@
 #include <vector>
 #include <map>
 
+#include "MovableText.hh"
 #include "UpdateParams.hh"
 #include "Pose3d.hh"
 #include "Joint.hh"
@@ -78,6 +79,9 @@ namespace gazebo
   
     /// \brief Finalize the model
     public: int Fini();
+
+    /// \brief Reset the model
+    public: void Reset();
   
     /// \brief Load the child model
     protected: virtual int LoadChild(XMLConfigNode * /*node*/) {return 0;}
@@ -189,7 +193,9 @@ namespace gazebo
   
     /// \brief The parent of this model
     private: Model *parentModel;
-  
+
+    //private: MovableText *mtext;
+
   /*  private: PyObject *pName;
       private: PyObject *pModule;
       private: PyObject *pFuncUpdate;

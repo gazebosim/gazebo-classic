@@ -39,6 +39,7 @@ void RegisterGraphics3dIface();
 void RegisterLaserIface();
 void RegisterFiducialIface();
 void RegisterFactoryIface();
+void RegisterGripperIface();
 
 std::map<std::string, IfaceFactoryFn> IfaceFactory::ifaces;
 
@@ -53,6 +54,7 @@ void IfaceFactory::RegisterAll()
   RegisterLaserIface();
   RegisterFiducialIface();
   RegisterFactoryIface();
+  RegisterGripperIface();
 }
 
 

@@ -42,6 +42,7 @@ Sensor::Sensor(Body *body)
 {
   this->body = body;
   this->controller = NULL;
+  this->active = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,3 +132,12 @@ void Sensor::LoadController(XMLConfigNode *node)
   // Load the controller
   this->controller->Load(node);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Set whether the sensor is active or not
+void Sensor::SetActive(bool value)
+{
+  this->active = value;
+}
+
+

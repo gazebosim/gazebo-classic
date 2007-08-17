@@ -33,6 +33,7 @@ namespace gazebo
     public: virtual void draw();
     public: virtual void flush();
 
+    public: void resize(int x, int y, int w, int h);
     public: int handle(int event);
 
     private: int HandlePush();

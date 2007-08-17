@@ -91,8 +91,25 @@ void SickLMS200_Laser::InitChild()
 // Update the controller
 void SickLMS200_Laser::UpdateChild(UpdateParams &params)
 {
-  this->PutLaserData();
-  this->PutFiducialData();
+  bool opened = false;
+
+  if (this->laserIface->Lock(1))
+  {
+    opened = this->laserIface->data->opened;
+    this->laserIface->Unlock();
+  }
+  
+  if (opened)
+  {
+    this->myParent->SetActive(true);
+
+    this->PutLaserData();
+    //this->PutFiducialData();
+  }
+  else
+  {
+    this->myParent->SetActive(false);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,51 +133,54 @@ void SickLMS200_Laser::PutLaserData()
   double minRange = this->myParent->GetMinRange();
   int rayCount = this->myParent->GetRayCount();
   int rangeCount = this->myParent->GetRangeCount();
- 
-  this->laserIface->Lock(1);
 
-  // Data timestamp
-  this->laserIface->data->time = World::Instance()->GetSimTime();
-    
-  // Read out the laser range data
-  this->laserIface->data->min_angle = minAngle;
-  this->laserIface->data->max_angle = maxAngle;
-  this->laserIface->data->res_angle = (maxAngle - minAngle) / (rangeCount - 1);
-  this->laserIface->data->max_range = maxRange;
-  this->laserIface->data->range_count = rangeCount;
-
-  assert(this->laserIface->data->range_count < GZ_LASER_MAX_RANGES );
-
-  // Interpolate the range readings from the rays
-  for (i = 0; i<rangeCount; i++)
+  
+  if (this->laserIface->Lock(1))
   {
-    b = (double) i * (rayCount - 1) / (rangeCount - 1);
-    ja = (int) floor(b);
-    jb = std::min(ja + 1, rayCount - 1);    
-    b = b - floor(b);
 
-    assert(ja >= 0 && ja < rayCount);
-    assert(jb >= 0 && jb < rayCount);
+    // Data timestamp
+    this->laserIface->data->time = World::Instance()->GetSimTime();
 
-    ra = std::min(this->myParent->GetRange(ja) , maxRange);
-    rb = std::min(this->myParent->GetRange(jb) , maxRange);
+    // Read out the laser range data
+    this->laserIface->data->min_angle = minAngle;
+    this->laserIface->data->max_angle = maxAngle;
+    this->laserIface->data->res_angle = (maxAngle - minAngle) / (rangeCount - 1);
+    this->laserIface->data->max_range = maxRange;
+    this->laserIface->data->range_count = rangeCount;
 
-    // Range is linear interpolation if values are close,
-    // and min if they are very different
-    if (fabs(ra - rb) < 0.10)
-      r = (1 - b) * ra + b * rb;
-    else r = std::min(ra, rb);
+    assert(this->laserIface->data->range_count < GZ_LASER_MAX_RANGES );
 
-    // Intensity is either-or
-    v = (int) this->myParent->GetRetro(ja) || (int) this->myParent->GetRetro(jb);
+    // Interpolate the range readings from the rays
+    for (i = 0; i<rangeCount; i++)
+    {
+      b = (double) i * (rayCount - 1) / (rangeCount - 1);
+      ja = (int) floor(b);
+      jb = std::min(ja + 1, rayCount - 1);    
+      b = b - floor(b);
 
-    this->laserIface->data->ranges[rangeCount-i-1] =  r + minRange;
-    this->laserIface->data->intensity[i] = v;
+      assert(ja >= 0 && ja < rayCount);
+      assert(jb >= 0 && jb < rayCount);
+
+      ra = std::min(this->myParent->GetRange(ja) , maxRange);
+      rb = std::min(this->myParent->GetRange(jb) , maxRange);
+
+      // Range is linear interpolation if values are close,
+      // and min if they are very different
+      if (fabs(ra - rb) < 0.10)
+        r = (1 - b) * ra + b * rb;
+      else r = std::min(ra, rb);
+
+      // Intensity is either-or
+      v = (int) this->myParent->GetRetro(ja) || (int) this->myParent->GetRetro(jb);
+
+      this->laserIface->data->ranges[rangeCount-i-1] =  r + minRange;
+      this->laserIface->data->intensity[i] = v;
+    }
+    this->laserIface->Unlock();
+
+    // New data is available
+    this->laserIface->Post();
   }
-  this->laserIface->Unlock();
-
-  // New data is available
-  this->laserIface->Post();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -180,85 +200,87 @@ void SickLMS200_Laser::PutFiducialData()
   int rayCount = this->myParent->GetRayCount();
   int rangeCount = this->myParent->GetRangeCount();
  
-  this->fiducialIface->Lock(1);
-
-  // Data timestamp
-  this->fiducialIface->data->time = World::Instance()->GetSimTime();
-  this->fiducialIface->data->count = 0;
-
-  // TODO: clean this up
-  count = 0;
-  for (i = 0; i < rayCount; i++)
+  if (this->fiducialIface->Lock(1))
   {
-    if (this->myParent->GetFiducial(i) < 0)
-      continue;
 
-    // Find the end of the fiducial
-    for (j = i + 1; j < rayCount; j++)
+    // Data timestamp
+    this->fiducialIface->data->time = World::Instance()->GetSimTime();
+    this->fiducialIface->data->count = 0;
+
+    // TODO: clean this up
+    count = 0;
+    for (i = 0; i < rayCount; i++)
     {
-      if (this->myParent->GetFiducial(j) != this->myParent->GetFiducial(i))
-        break;
+      if (this->myParent->GetFiducial(i) < 0)
+        continue;
+
+      // Find the end of the fiducial
+      for (j = i + 1; j < rayCount; j++)
+      {
+        if (this->myParent->GetFiducial(j) != this->myParent->GetFiducial(i))
+          break;
+      }
+      j--;
+
+      // Need at least three points to get orientation
+      if (j - i + 1 >= 3)
+      {
+        r = minRange + this->myParent->GetRange(i);
+        b = minAngle + i * ((maxAngle-minAngle) / (rayCount - 1));
+        ax = r * cos(b);
+        ay = r * sin(b);
+
+        r = minRange + this->myParent->GetRange(j);
+        b = minAngle + j * ((maxAngle-minAngle) / (rayCount - 1));
+        bx = r * cos(b);
+        by = r * sin(b);
+
+        cx = (ax + bx) / 2;
+        cy = (ay + by) / 2;
+
+        assert(count < GZ_FIDUCIAL_MAX_FIDS);
+        fid = this->fiducialIface->data->fids + count++;
+
+        fid->id = this->myParent->GetFiducial(j);
+        fid->pos[0] = cx;
+        fid->pos[1] = cy;
+        fid->rot[2] = atan2(by - ay, bx - ax) + M_PI / 2;
+      }
+
+      // Fewer points get no orientation
+      else
+      {
+        r = minRange + this->myParent->GetRange(i);
+        b = minAngle + i * ((maxAngle-minAngle) / (rayCount - 1));
+        ax = r * cos(b);
+        ay = r * sin(b);
+
+        r = minRange + this->myParent->GetRange(j);
+        b = minAngle + j * ((maxAngle-minAngle) / (rayCount - 1));
+        bx = r * cos(b);
+        by = r * sin(b);
+
+        cx = (ax + bx) / 2;
+        cy = (ay + by) / 2;
+
+        assert(count < GZ_FIDUCIAL_MAX_FIDS);
+        fid = this->fiducialIface->data->fids + count++;
+
+        fid->id = this->myParent->GetFiducial(j);
+        fid->pos[0] = cx;
+        fid->pos[1] = cy;
+        fid->rot[2] = atan2(cy, cx) + M_PI;
+      }
+
+      /*printf("fiducial %d i[%d] j[%d] %.2f %.2f %.2f\n",
+        fid->id, i,j,fid->pos[0], fid->pos[1], fid->rot[2]);
+        */
+      i = j;
     }
-    j--;
 
-    // Need at least three points to get orientation
-    if (j - i + 1 >= 3)
-    {
-      r = minRange + this->myParent->GetRange(i);
-      b = minAngle + i * ((maxAngle-minAngle) / (rayCount - 1));
-      ax = r * cos(b);
-      ay = r * sin(b);
+    this->fiducialIface->data->count = count;
 
-      r = minRange + this->myParent->GetRange(j);
-      b = minAngle + j * ((maxAngle-minAngle) / (rayCount - 1));
-      bx = r * cos(b);
-      by = r * sin(b);
-
-      cx = (ax + bx) / 2;
-      cy = (ay + by) / 2;
-      
-      assert(count < GZ_FIDUCIAL_MAX_FIDS);
-      fid = this->fiducialIface->data->fids + count++;
-
-      fid->id = this->myParent->GetFiducial(j);
-      fid->pos[0] = cx;
-      fid->pos[1] = cy;
-      fid->rot[2] = atan2(by - ay, bx - ax) + M_PI / 2;
-    }
-
-    // Fewer points get no orientation
-    else
-    {
-      r = minRange + this->myParent->GetRange(i);
-      b = minAngle + i * ((maxAngle-minAngle) / (rayCount - 1));
-      ax = r * cos(b);
-      ay = r * sin(b);
-
-      r = minRange + this->myParent->GetRange(j);
-      b = minAngle + j * ((maxAngle-minAngle) / (rayCount - 1));
-      bx = r * cos(b);
-      by = r * sin(b);
-
-      cx = (ax + bx) / 2;
-      cy = (ay + by) / 2;
-      
-      assert(count < GZ_FIDUCIAL_MAX_FIDS);
-      fid = this->fiducialIface->data->fids + count++;
-
-      fid->id = this->myParent->GetFiducial(j);
-      fid->pos[0] = cx;
-      fid->pos[1] = cy;
-      fid->rot[2] = atan2(cy, cx) + M_PI;
-    }
-
-    /*printf("fiducial %d i[%d] j[%d] %.2f %.2f %.2f\n",
-           fid->id, i,j,fid->pos[0], fid->pos[1], fid->rot[2]);
-           */
-    i = j;
+    this->fiducialIface->Unlock();
+    this->fiducialIface->Post();
   }
-
-  this->fiducialIface->data->count = count;
-  
-  this->fiducialIface->Unlock();
-  this->fiducialIface->Post();
 }

@@ -41,6 +41,7 @@
 #include "Hinge2Joint.hh"
 #include "BallJoint.hh"
 #include "UniversalJoint.hh"
+#include "SliderJoint.hh"
 #include "PhysicsEngine.hh"
 #include "Controller.hh"
 #include "ControllerFactory.hh"
@@ -182,6 +183,12 @@ int Model::Init()
   for (biter = this->bodies.begin(); biter!=this->bodies.end(); biter++)
     biter->second->Init();
 
+  /*this->mtext = new MovableText(this->GetName(), "this is the caption");
+  this->mtext->setTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
+  this->mtext->setAdditionalHeight(0.5);
+  this->sceneNode->attachObject(this->mtext);
+  */
+
   return this->InitChild();
 }
 
@@ -251,6 +258,16 @@ int Model::Fini()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Reset the model
+void Model::Reset()
+{
+  if (this->initPose.pos != this->pose.pos)
+  {
+    this->SetPose(this->initPose);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Set the name of the model
 void Model::SetType(const std::string &type)
 {
@@ -282,14 +299,14 @@ XMLConfigNode *Model::GetXMLConfigNode() const
 // Set the initial pose
 void Model::SetInitPose(const Pose3d &pose)
 {
-  this->pose = pose;
+  this->initPose = pose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the initial pose
 const Pose3d &Model::GetInitPose() const
 {
-  return this->pose;
+  return this->initPose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -391,7 +408,7 @@ int Model::LoadJoint(XMLConfigNode *node)
 
   Body *body1(this->bodies[node->GetString("body1","",1)]);
   Body *body2(this->bodies[node->GetString("body2","",1)]);
-  Body *anchorBody(this->bodies[node->GetString("anchor","",1)]);
+  Body *anchorBody(this->bodies[node->GetString("anchor","",0)]);
   Vector3 anchorVec = node->GetVector3("anchor",Vector3(0,0,0));
 
   if (!body1)
@@ -433,7 +450,7 @@ int Model::LoadJoint(XMLConfigNode *node)
   else
   {
     joint->SetAnchor(anchorVec);
-    this->bodies.erase(node->GetString("anchor","",1));
+    this->bodies.erase(node->GetString("anchor","",0));
   }
 
   // Set the axis of the hing joint
@@ -455,6 +472,16 @@ int Model::LoadJoint(XMLConfigNode *node)
 
     uni->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
     uni->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
+  }
+  else if (node->GetName() == "slider")
+  {
+    SliderJoint *slider = (SliderJoint*)(joint);
+
+    double lowStop = node->GetDouble("lowStop",0,0);
+    double hiStop = node->GetDouble("hiStop",0,0);
+
+    slider->SetParam(dParamLoStop, lowStop);
+    slider->SetParam(dParamHiStop, hiStop);
   }
 
   // Set joint parameters

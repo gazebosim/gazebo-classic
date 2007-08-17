@@ -327,8 +327,8 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   subMesh->useSharedVertices = true;
 
   mesh->_setBounds( Ogre::AxisAlignedBox( 
-        Ogre::Vector3(-sides.x, -sides.y, -sides.z), 
-        Ogre::Vector3(sides.x, sides.y, sides.z)), false);
+        Ogre::Vector3(-sides.x/2.0, -sides.y/2.0, -sides.z/2.0), 
+        Ogre::Vector3(sides.x/2.0, sides.y/2.0, sides.z/2.0)), false);
 
   // this line makes clear the mesh is loaded (avoids memory leaks)
   mesh->load();
@@ -536,8 +536,8 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
   subMesh->useSharedVertices = true;
 
   mesh->_setBounds( Ogre::AxisAlignedBox( 
-        Ogre::Vector3(-radius, -radius, -radius), 
-        Ogre::Vector3(radius, radius, radius)), false);
+        Ogre::Vector3(-radius, -height/2, -radius), 
+        Ogre::Vector3(radius, height/2, radius)), false);
 
   // this line makes clear the mesh is loaded (avoids memory leaks)
   mesh->load();

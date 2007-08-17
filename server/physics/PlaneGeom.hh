@@ -51,7 +51,7 @@ namespace gazebo
     /// \param body Body to which we are attached.
     /// \param spaceId Collision space to which we belong.
     /// \param normal Normal vector to plane (global cs).
-    public: PlaneGeom(Body *body, Vector3 normal,
+    public: PlaneGeom(Body *body, const std::string &name, Vector3 normal,
                 const Vector2 &size, const Vector2 &segments, 
                 const Vector2 &uvTile, double altitude = 0);
   

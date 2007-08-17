@@ -125,6 +125,9 @@ class CameraSensor : public Sensor
   /// \brief Enable or disable saving
   public: void EnableSaveFrame(bool enable);
 
+  /// \brief Get a pointer to the ogre camera
+  public: Ogre::Camera *GetOgreCamera() const;
+
   // Save the camera frame
   private: void SaveFrame();
 

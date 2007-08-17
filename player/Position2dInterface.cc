@@ -76,128 +76,133 @@ Position2dInterface::~Position2dInterface()
 int Position2dInterface::ProcessMessage(MessageQueue *respQueue,
                    player_msghdr_t *hdr, void *data)
 {
-  this->iface->Lock(1);
-
-  // COMMAND VELOCITY:
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_POSITION2D_CMD_VEL, this->device_addr))
+  if (this->iface->Lock(1))
   {
-    player_position2d_cmd_vel_t *cmd;
 
-    cmd = (player_position2d_cmd_vel_t*) data;
-
-    this->iface->data->cmdVelocity.x = cmd->vel.px;
-    this->iface->data->cmdVelocity.y = cmd->vel.py;
-    this->iface->data->cmdVelocity.yaw = cmd->vel.pa;
-
-    return 0;
-  }
-
-  // REQUEST SET ODOMETRY
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_POSITION2D_REQ_SET_ODOM, this->device_addr))
-  {
-    if (hdr->size != sizeof(player_position2d_set_odom_req_t))
+    // COMMAND VELOCITY:
+    if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
+          PLAYER_POSITION2D_CMD_VEL, this->device_addr))
     {
-      PLAYER_WARN("Arg to odometry set requestes wrong size; ignoring");
-      return -1;
+      player_position2d_cmd_vel_t *cmd;
+
+      cmd = (player_position2d_cmd_vel_t*) data;
+
+      this->iface->data->cmdVelocity.x = cmd->vel.px;
+      this->iface->data->cmdVelocity.y = cmd->vel.py;
+      this->iface->data->cmdVelocity.yaw = cmd->vel.pa;
+
+      return 0;
     }
 
-    player_position2d_set_odom_req_t *odom = (player_position2d_set_odom_req_t*)data;
-
-    this->iface->data->pose.x = odom->pose.px;
-    this->iface->data->pose.y = odom->pose.py;
-    this->iface->data->pose.yaw = odom->pose.pa;
-
-    this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_SET_ODOM);
-
-    return 0;
-  }
-
-  // CMD Set Motor Power
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
-  {
-    // TODO
-    return 0;
-  }
-
-  // REQUEST SET MOTOR POWER
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
-  {
-    if (hdr->size != sizeof(player_position2d_power_config_t))
+    // REQUEST SET ODOMETRY
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
+          PLAYER_POSITION2D_REQ_SET_ODOM, this->device_addr))
     {
-      PLAYER_WARN("Arg to motor set requestes wrong size; ignoring");
-      return -1;
+      if (hdr->size != sizeof(player_position2d_set_odom_req_t))
+      {
+        PLAYER_WARN("Arg to odometry set requestes wrong size; ignoring");
+        return -1;
+      }
+
+      player_position2d_set_odom_req_t *odom = (player_position2d_set_odom_req_t*)data;
+
+      this->iface->data->pose.x = odom->pose.px;
+      this->iface->data->pose.y = odom->pose.py;
+      this->iface->data->pose.yaw = odom->pose.pa;
+
+      this->driver->Publish(this->device_addr, respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_SET_ODOM);
+
+      return 0;
     }
 
-    player_position2d_power_config_t *power;
-
-    power = (player_position2d_power_config_t*) data;
-
-    this->iface->data->cmdEnableMotors = power->state;
-
-    this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
-
-    return 0;
-  }
-
-  // REQUEST GET GEOMETRY
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_POSITION2D_REQ_GET_GEOM, this->device_addr))
-  {
-    if (hdr->size != 0)
+    // CMD Set Motor Power
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
+          PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
     {
-      PLAYER_WARN("Arg get robot geom is wrong size; ignoring");
-      return -1;
+      // TODO
+      return 0;
     }
 
-    player_position2d_geom_t geom;
-
-    // TODO: get correct dimensions; there are for the P2AT
-
-    geom.pose.px = 0;
-    geom.pose.py = 0;
-    geom.pose.pz = 0;
-    geom.pose.pyaw = 0;
-    geom.pose.ppitch = 0;
-    geom.pose.proll = 0;
-    geom.size.sw= 0.53;
-    geom.size.sl = 0.38;
-    geom.size.sh = 0.31;
-
-    this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, 
-        PLAYER_POSITION2D_REQ_GET_GEOM, 
-        &geom, sizeof(geom), NULL);
-
-    return 0;
-  }
-
-  // REQUEST RESET ODOMETRY
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_POSITION2D_REQ_RESET_ODOM, this->device_addr))
-  {
-    if (hdr->size != 0)
+    // REQUEST SET MOTOR POWER
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
+          PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
     {
-      PLAYER_WARN("Arg reset position request is wrong size; ignoring");
-      return -1;
+      if (hdr->size != sizeof(player_position2d_power_config_t))
+      {
+        PLAYER_WARN("Arg to motor set requestes wrong size; ignoring");
+        return -1;
+      }
+
+      player_position2d_power_config_t *power;
+
+      power = (player_position2d_power_config_t*) data;
+
+      this->iface->data->cmdEnableMotors = power->state;
+
+      this->driver->Publish(this->device_addr, respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
+
+      return 0;
     }
 
-    // TODO: Make this work!!
-    //
-    this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_RESET_ODOM);
+    // REQUEST GET GEOMETRY
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
+          PLAYER_POSITION2D_REQ_GET_GEOM, this->device_addr))
+    {
+      if (hdr->size != 0)
+      {
+        PLAYER_WARN("Arg get robot geom is wrong size; ignoring");
+        return -1;
+      }
 
-    return 0;
+      player_position2d_geom_t geom;
+
+      // TODO: get correct dimensions; there are for the P2AT
+
+      geom.pose.px = 0;
+      geom.pose.py = 0;
+      geom.pose.pz = 0;
+      geom.pose.pyaw = 0;
+      geom.pose.ppitch = 0;
+      geom.pose.proll = 0;
+      geom.size.sw= 0.53;
+      geom.size.sl = 0.38;
+      geom.size.sh = 0.31;
+
+      this->driver->Publish(this->device_addr, respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, 
+          PLAYER_POSITION2D_REQ_GET_GEOM, 
+          &geom, sizeof(geom), NULL);
+
+      return 0;
+    }
+
+    // REQUEST RESET ODOMETRY
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
+          PLAYER_POSITION2D_REQ_RESET_ODOM, this->device_addr))
+    {
+      if (hdr->size != 0)
+      {
+        PLAYER_WARN("Arg reset position request is wrong size; ignoring");
+        return -1;
+      }
+
+      // TODO: Make this work!!
+      //
+      this->driver->Publish(this->device_addr, respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_RESET_ODOM);
+
+      return 0;
+    }
+
+    this->iface->Unlock();
   }
-
-  this->iface->Unlock();
+  else 
+    this->Unsubscribe();
 
   return -1;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -208,34 +213,37 @@ void Position2dInterface::Update()
   player_position2d_data_t data;
   struct timeval ts;
 
-  this->iface->Lock(1);
-
-  // Only Update when new data is present
-  if (this->iface->data->time > this->datatime)
+  if (this->iface->Lock(1))
   {
-    this->datatime = this->iface->data->time;
+    // Only Update when new data is present
+    if (this->iface->data->time > this->datatime)
+    {
+      this->datatime = this->iface->data->time;
 
-    ts.tv_sec = (int) (this->iface->data->time);
-    ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
+      ts.tv_sec = (int) (this->iface->data->time);
+      ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
-    data.pos.px = this->iface->data->pose.x;
-    data.pos.py = this->iface->data->pose.y;
-    data.pos.pa = this->iface->data->pose.yaw;
+      data.pos.px = this->iface->data->pose.x;
+      data.pos.py = this->iface->data->pose.y;
+      data.pos.pa = this->iface->data->pose.yaw;
 
-    data.vel.px = this->iface->data->velocity.x;
-    data.vel.py = this->iface->data->velocity.y;
-    data.vel.pa = this->iface->data->velocity.yaw;
+      data.vel.px = this->iface->data->velocity.x;
+      data.vel.py = this->iface->data->velocity.y;
+      data.vel.pa = this->iface->data->velocity.yaw;
 
-    data.stall = (uint8_t) this->iface->data->stall;
+      data.stall = (uint8_t) this->iface->data->stall;
 
-    this->driver->Publish( this->device_addr, NULL,
-      PLAYER_MSGTYPE_DATA,
-      PLAYER_POSITION2D_DATA_STATE, 
-      (void*)&data, sizeof(data), &this->datatime );
-      
+      this->driver->Publish( this->device_addr, NULL,
+          PLAYER_MSGTYPE_DATA,
+          PLAYER_POSITION2D_DATA_STATE, 
+          (void*)&data, sizeof(data), &this->datatime );
+
+    }
+
+    this->iface->Unlock();
   }
-
-  this->iface->Unlock();
+  else
+    this->Unsubscribe();
 }
 
 

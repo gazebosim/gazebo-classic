@@ -37,7 +37,12 @@ void FLTKGui::Init()
 // Update
 void FLTKGui::Update()
 {
+  /// \todo Fix the wait: not sure this is the most efficient method
   this->draw();
+
+  Fl::wait(0.05);
+  
+  //printf("WH[%d %d]\n",this->w(), this->h());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,16 +117,32 @@ void FLTKGui::flush()
   this->draw();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// resize the window
+void FLTKGui::resize(int x, int y, int w, int h)
+{
+  OgreAdaptor::Instance()->ResizeWindow(w, h);
+}
+
 int FLTKGui::handle(int event)
 {
-  printf("HERE\n");
   switch (event)
   {
+    case FL_CLOSE:
+      printf("CLOSE\n");
+      return 0;
+
     case FL_PUSH:
+      printf("PUSH\n");
       return this->HandlePush();
 
     case FL_DRAG:
+      printf("Drag\n");
       return this->HandleDrag();
+
+    case FL_RELEASE:
+      printf("Release\n");
+      return 0;
 
     case FL_KEYBOARD:
       return this->HandleKeyboard();
@@ -138,6 +159,8 @@ int FLTKGui::HandlePush()
 
 int FLTKGui::HandleDrag()
 {
+  printf("dragging\n");
+  //OgreAdaptor::Instance()->ResizeWindow(this->w(), this->h());
   return 1;
 }
 

@@ -43,7 +43,7 @@ namespace gazebo
   class TrimeshGeom : public Geom
   {
     /// \brief Constructor
-    public: TrimeshGeom(Body *body, double density, const std::string &meshName, const Vector3 &scale);
+    public: TrimeshGeom(Body *body, const std::string &name, double density, const std::string &meshName, const Vector3 &scale);
 
     /// \brief Destructor
     public: virtual ~TrimeshGeom();

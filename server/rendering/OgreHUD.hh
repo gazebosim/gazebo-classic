@@ -28,6 +28,7 @@
 #define OGREHUD_HH
 
 #include <Ogre.h>
+#include <OgrePanelOverlayElement.h>
 
 namespace gazebo
 {
@@ -92,7 +93,8 @@ namespace gazebo
 
     private: Ogre::OverlayManager *overlayMgr;
     private: Ogre::OverlayContainer *hudPanel;
-    private: Ogre::OverlayContainer *cameraPanel;
+//    private: Ogre::OverlayContainer *cameraPanel;
+    private: Ogre::PanelOverlayElement *cameraPanel;
     private: Ogre::OverlayContainer *helpPanel;
     private: Ogre::OverlayContainer *backgroundPanel;
 

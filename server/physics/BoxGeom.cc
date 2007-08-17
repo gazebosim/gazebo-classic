@@ -34,8 +34,8 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BoxGeom::BoxGeom(Body *body,  Vector3 size, double density, const std::string &meshName )
-    : Geom(body)
+BoxGeom::BoxGeom(Body *body, const std::string &name, Vector3 size, double density, const std::string &meshName )
+    : Geom(body,name)
 {
   // Initialize box mass matrix
   dMassSetBox(&this->mass, density, size.x, size.y, size.z);

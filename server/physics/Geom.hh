@@ -29,7 +29,7 @@ namespace gazebo
   {
   
     /// \brief Constructor
-    public: Geom(Body *body);
+    public: Geom(Body *body, const std::string &name);
   
     /// \brief Destructor
     public: virtual ~Geom();

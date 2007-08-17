@@ -224,19 +224,6 @@ void Body::SetPosition(const Vector3 &pos)
     // Set the position of the ODE body
     dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
   }
-  else
-  {
-    /*std::vector< Geom* >::iterator iter;
-    Vector3 geomPos;
-
-    for (iter=this->geoms.begin(); iter!=this->geoms.end(); iter++)
-    {
-      geomPos= (*iter)->GetPose().pos;
-      geomPos += pos;
-
-      (*iter)->SetPosition(geomPos);
-    }*/
-  }
 
   // Set the position of the scene node
   OgreAdaptor::Instance()->SetSceneNodePosition(this->sceneNode, pos);
@@ -256,14 +243,7 @@ void Body::SetRotation(const Quatern &rot)
 
     // Set the rotation of the ODE body
     dBodySetQuaternion(this->bodyId, q);
-  }
-  else
-  {
-    std::vector< Geom* >::iterator iter;
-    for (iter=this->geoms.begin(); iter!=this->geoms.end(); iter++)
-    {
-      (*iter)->SetRotation(rot);
-    }
+
   }
 
   // Set the orientation of the scene node
@@ -342,23 +322,25 @@ int Body::LoadGeom(XMLConfigNode *node)
 
   // The mesh used for visualization
   std::string mesh = node->GetString("mesh","",0);
+  std::string name = node->GetString("name","",1);
   double density = node->GetDouble("density",1.0,0);
 
   if (node->GetName() == "sphere")
   {
     double radius = node->GetDouble("size",0.0,0);
-    geom = new SphereGeom(this, radius, density, mesh);
+    geom = new SphereGeom(this, name, radius, density, mesh);
   }
   else if (node->GetName() == "cylinder")
   {
     double radius = node->GetTupleDouble("size",0,1.0);
     double length = node->GetTupleDouble("size",1,1.0);
-    geom = new CylinderGeom(this, radius, length, density, mesh);
+    geom = new CylinderGeom(this, name, radius, length, density, mesh);
   }
   else if (node->GetName() == "box")
   {
     Vector3 size = node->GetVector3("size",Vector3(1,1,1));
-    geom = new BoxGeom(this, size, density, mesh);
+    geom = new BoxGeom(this, name, size, density, mesh);
+
   }
   else if (node->GetName() == "plane")
   {
@@ -367,12 +349,12 @@ int Body::LoadGeom(XMLConfigNode *node)
     Vector2 segments = node->GetVector2("segments",Vector2(10, 10));
     Vector2 uvTile = node->GetVector2("uvTile",Vector2(1, 1));
 
-    geom = new PlaneGeom(this,normal,size,segments, uvTile);
+    geom = new PlaneGeom(this, name, normal,size,segments, uvTile);
   }
   else if (node->GetName() == "trimesh")
   {
     Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
-    geom = new TrimeshGeom(this, 1.0, mesh, scale);
+    geom = new TrimeshGeom(this, name, 1.0, mesh, scale);
   }
   else if (node->GetName() == "heightmap")
   {
@@ -382,7 +364,7 @@ int Body::LoadGeom(XMLConfigNode *node)
     std::string detailTex = node->GetString("detailTexture","",0);
     Vector3 size = node->GetVector3("size",Vector3(10,10,10));
     Vector3 offset = node->GetVector3("offset",Vector3(0,0,0));
-    geom = new HeightmapGeom(this, imageFile, worldTex, detailTex, size, offset);
+    geom = new HeightmapGeom(this, name, imageFile, worldTex, detailTex, size, offset);
   }
   else
   {
@@ -391,10 +373,12 @@ int Body::LoadGeom(XMLConfigNode *node)
   }
 
   this->AttachGeom(geom);
+  
+  if (node->GetChild("meshScale"))
+    geom->ScaleMesh(node->GetVector3("meshScale",Vector3(0,0,0)));
 
   geom->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   geom->SetRotation(node->GetRotation("rpy",Quatern()));
-  geom->SetName(node->GetString("name","",1));
   geom->SetMeshMaterial(node->GetString("material","",0));
   geom->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
   geom->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
@@ -498,7 +482,6 @@ void Body::UpdateCoM()
 
   // Settle on the new CoM pose
   this->comPose = newPose;
-
 
   // TODO: remove offsets from mass matrix?
 

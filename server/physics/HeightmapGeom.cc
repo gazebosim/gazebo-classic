@@ -37,7 +37,7 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-HeightmapGeom::HeightmapGeom(Body *body, const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size,  const Vector3 &offset ) : Geom(body)
+HeightmapGeom::HeightmapGeom(Body *body,const std::string &name,  const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size,  const Vector3 &offset ) : Geom(body, name)
 {
   Ogre::Image tmpImage;
   int tileSize;
@@ -75,11 +75,13 @@ HeightmapGeom::HeightmapGeom(Body *body, const std::string &imageFilename, const
 
   this->terrainScale = this->terrainSize / this->terrainVertSize;
 
-  this->odeVertSize = terrainVertSize * 5;
+  this->odeVertSize = terrainVertSize * 1;
   this->odeScale = this->terrainSize / this->odeVertSize;
 
   std::ostringstream stream;
-  
+ 
+  std::cout << "Terrain Image[" << this->terrainImage << "] Size[" << this->terrainSize << "]\n";
+
   stream << "WorldTexture=" << worldTexture << "\n";
   //The detail texture 
   stream << "DetailTexture=" << detailTexture << "\n";
@@ -99,13 +101,13 @@ HeightmapGeom::HeightmapGeom(Body *body, const std::string &imageFilename, const
   stream << "PageWorldX=" << this->terrainSize.x << "\n";
   stream << "PageWorldZ=" << this->terrainSize.y << "\n";
   // Maximum height of the terrain 
-  stream << "MaxHeight=" << this->terrainSize.z << "\n";
+  stream << "MaxHeight="<< this->terrainSize.z << "\n";
   // Upper LOD limit
   stream << "MaxMipMapLevel=5\n";
 
   // Create a data stream for loading the terrain into Ogre
-  char *mstr = new char[stream.str().size()];
-  sprintf(mstr,stream.str().c_str());
+  char *mstr = new char[1024];//stream.str().size()];
+  sprintf(mstr, stream.str().c_str());
   Ogre::DataStreamPtr dataStream(
       new Ogre::MemoryDataStream(mstr,strlen(mstr)) ); 
 
@@ -163,7 +165,7 @@ HeightmapGeom::HeightmapGeom(Body *body, const std::string &imageFilename, const
   */
 
   // Construct the heightmap lookup table
-  //this->FillHeightMap();
+  this->FillHeightMap();
 
   delete [] mstr;
 }
@@ -210,7 +212,7 @@ void HeightmapGeom::FillHeightMap()
     for (x=0; x<this->odeVertSize; x++)
     {
       // Find the height at a vertex
-      h = this->GetHeightAt(Vector2(x*this->odeScale.x, y*this->odeScale.y));
+      h = this->GetHeightAt(Vector2(x*this->odeScale.x, (this->odeVertSize-y)*this->odeScale.y));
       // Store the hieght for future use
       this->heights[y*this->odeVertSize+x] = h;
     }
@@ -221,16 +223,15 @@ void HeightmapGeom::FillHeightMap()
 // Called by ODE to get the height at a vertex
 dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
 {
-  dReal height = 0;
+//  dReal height = 0;
   HeightmapGeom *geom = (HeightmapGeom*)(data);
 
 //  height = geom->GetHeightAt(Vector2(x*geom->odeScale.x, (geom->odeVertSize-y)*geom->odeScale.y));
-  height = geom->GetHeightAt(Vector2(x*geom->odeScale.x, (geom->odeVertSize-y)*geom->odeScale.y));
 
-  return height;
+ // return height;
 
   // Return the height at a specific vertex
-  //return geom->heights[y*geom->terrainVertSize+x];
+  return geom->heights[y*geom->odeVertSize+x];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

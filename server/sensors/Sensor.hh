@@ -61,7 +61,10 @@ namespace gazebo
   
     /// \brief  Finalize the sensor
     public: void Fini();
-  
+
+    /// \brief Set whether the sensor is active or not
+    public: void SetActive(bool value);
+
     /// \brief  Load the child sensor
     protected: virtual void LoadChild(XMLConfigNode * /*node*/) {};
   
@@ -82,6 +85,8 @@ namespace gazebo
     protected: Body *body;
   
     protected: Controller *controller;
+
+    protected: bool active;
   };
   
   /// \}

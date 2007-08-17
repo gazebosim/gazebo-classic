@@ -38,7 +38,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 RayGeom::RayGeom( Body *body )
-  : Geom( body )
+  : Geom( body,"Ray" )
 {
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );

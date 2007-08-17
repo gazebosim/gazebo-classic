@@ -160,54 +160,58 @@ void LaserInterface::Update()
   player_laser_data_t data;
   struct timeval ts;
 
-  this->iface->Lock(1);
-
-  // Only Update when new data is present
-  if (this->iface->data->time > this->datatime)
+  if (this->iface->Lock(1))
   {
-    int i;
-    float rangeRes;
-    float angleRes;
 
-    this->datatime = this->iface->data->time;
-
-    ts.tv_sec = (int) (this->iface->data->time);
-    ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
-
-    memset(&data, 0, sizeof(data));
-
-    // Pick the rage resolution to use (1, 10, 100)
-    if (this->iface->data->max_range <= 8.192)
-      rangeRes = 1.0;
-    else if (this->iface->data->max_range <= 81.92)
-      rangeRes = 10.0;
-    else
-      rangeRes = 100.0;
-
-    angleRes = this->iface->data->res_angle;
-
-    //printf("range res = %f %f\n", rangeRes, this->iface->data->max_range);
-  
-    data.min_angle = this->iface->data->min_angle;
-    data.max_angle = this->iface->data->max_angle;
-    data.max_range = this->iface->data->max_range;
-    data.resolution = angleRes;
-    data.ranges_count = data.ranges_count = this->iface->data->range_count; 
-    data.id = this->scanId++;
-
-    for (i = 0; i < this->iface->data->range_count; i++)
+    // Only Update when new data is present
+    if (this->iface->data->time > this->datatime)
     {
-      data.ranges[i] = this->iface->data->ranges[i] / rangeRes;
-      data.intensity[i] = (uint8_t) (int) this->iface->data->intensity[i];
+      int i;
+      float rangeRes;
+      float angleRes;
+
+      this->datatime = this->iface->data->time;
+
+      ts.tv_sec = (int) (this->iface->data->time);
+      ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
+
+      memset(&data, 0, sizeof(data));
+
+      // Pick the rage resolution to use (1, 10, 100)
+      if (this->iface->data->max_range <= 8.192)
+        rangeRes = 1.0;
+      else if (this->iface->data->max_range <= 81.92)
+        rangeRes = 10.0;
+      else
+        rangeRes = 100.0;
+
+      angleRes = this->iface->data->res_angle;
+
+      //printf("range res = %f %f\n", rangeRes, this->iface->data->max_range);
+
+      data.min_angle = this->iface->data->min_angle;
+      data.max_angle = this->iface->data->max_angle;
+      data.max_range = this->iface->data->max_range;
+      data.resolution = angleRes;
+      data.ranges_count = data.ranges_count = this->iface->data->range_count; 
+      data.id = this->scanId++;
+
+      for (i = 0; i < this->iface->data->range_count; i++)
+      {
+        data.ranges[i] = this->iface->data->ranges[i] / rangeRes;
+        data.intensity[i] = (uint8_t) (int) this->iface->data->intensity[i];
+      }
+
+      this->driver->Publish( this->device_addr, NULL,
+          PLAYER_MSGTYPE_DATA,
+          PLAYER_LASER_DATA_SCAN,        
+          (void*)&data, sizeof(data), &this->datatime );
     }
 
-    this->driver->Publish( this->device_addr, NULL,
-                   PLAYER_MSGTYPE_DATA,
-                   PLAYER_LASER_DATA_SCAN,        
-                   (void*)&data, sizeof(data), &this->datatime );
+    this->iface->Unlock();
   }
-
-  this->iface->Unlock();
+  else
+    this->Unsubscribe();
 }
 
 

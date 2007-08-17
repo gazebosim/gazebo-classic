@@ -240,14 +240,14 @@ class Iface
   public: virtual void Open(Client *client, std::string id);
 
   /// \brief Close the interface
-  public: void Close();
+  public: virtual void Close();
 
   /// \brief Lock the interface.  Set blocking to 1 if the caller should block
   /// until the lock is acquired.  Returns 0 if the lock is acquired.
-  public: void Lock(int blocking);
+  public: int Lock(int blocking);
 
   /// \brief Unlock the interface
-  public: void Unlock();
+  public: int Unlock();
 
   /// \brief Tell clients that new data is available
   public: void Post();
@@ -288,6 +288,7 @@ class Iface
   public: int parentModelId;
 
   protected: std::string type;
+  public: bool opened;
 };
 
 /** \} */
@@ -457,6 +458,8 @@ class PositionData
   
   /// Commanded robot velocities (robot cs)
   public: Pose cmdVelocity;
+
+  public: bool opened;
 };
 
 /// Position interface
@@ -472,13 +475,22 @@ class PositionIface : public Iface
           {
             Iface::Create(server,id); 
             this->data = (PositionData*)this->mMap; 
+            this->data->opened = false;
           }
 
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
             this->data = (PositionData*)this->mMap; 
+            this->data->opened = true;
           }
+
+  public: virtual void Close()
+          {
+            this->data->opened = false;
+            Iface::Close();
+          }
+
 
   public: PositionData *data;
 };
@@ -567,11 +579,13 @@ device is also allowed.
 @{
 */
 
-#define GZ_LASER_MAX_RANGES 401
+#define GZ_LASER_MAX_RANGES 1024
 
 /// \brief Laser interface data
 class LaserData
 {
+  public: bool opened;
+
   /// \brief Data timestamp
   public: double time;
   
@@ -618,12 +632,20 @@ class LaserIface : public Iface
           {
             Iface::Create(server,id); 
             this->data = (LaserData*)this->mMap; 
+            this->data->opened=false;
           }
 
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
             this->data = (LaserData*)this->mMap; 
+            this->data->opened = true;
+          }
+
+  public: virtual void Close()
+          {
+            this->data->opened = false;
+            Iface::Close();
           }
 
   public: LaserData *data;
@@ -754,6 +776,94 @@ class FactoryIface : public Iface
 
   /// \brief Pointer to the factory data
   public: FactoryData *data;
+};
+
+/** \} */
+/// \}
+
+/***************************************************************************/
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup gripper_iface gripper
+
+  \brief Gripper interface
+
+The gripper interface allows control of a simple 2-DOF gripper, such as
+that found on the Pioneer series robots.
+
+
+\{
+*/
+
+/** Gripper state: open */
+#define GAZEBO_GRIPPER_STATE_OPEN 1
+/** Gripper state: closed */
+#define GAZEBO_GRIPPER_STATE_CLOSED 2
+/** Gripper state: moving */
+#define GAZEBO_GRIPPER_STATE_MOVING 3
+/** Gripper state: error */
+#define GAZEBO_GRIPPER_STATE_ERROR 4
+
+/** Gripper command: open */
+#define GAZEBO_GRIPPER_CMD_OPEN 1
+/** Gripper command: close */
+#define GAZEBO_GRIPPER_CMD_CLOSE 2
+/** Gripper command: stop */
+#define GAZEBO_GRIPPER_CMD_STOP 3
+/** Gripper command: store */
+#define GAZEBO_GRIPPER_CMD_STORE 4
+/** Gripper command: retrieve */
+#define GAZEBO_GRIPPER_CMD_RETRIEVE 5
+
+
+/// \brief Fudicial interface data
+class GripperData
+{
+   /// \brief Data timestamp
+  public: double time;
+
+  /// Current command for the gripper
+  int cmd;
+
+  /// Current state of the gripper
+  int state;
+
+  int grip_limit_reach;
+  int lift_limit_reach;
+  int outer_beam_obstruct;
+  int inner_beam_obstruct;
+  int left_paddle_open;
+  int right_paddle_open;
+
+  int lift_up;
+  int lift_down;
+};
+
+/// \brief Factory interface
+class GripperIface : public Iface
+{
+  /// \brief Constructor
+  public: GripperIface():Iface("gripper", sizeof(GripperIface)+sizeof(GripperData)) {}
+
+  /// \brief Destructor
+  public: virtual ~GripperIface() {this->data = NULL;}
+
+  /// \brief Create the server
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (GripperData*)this->mMap; 
+          }
+
+  /// \brief Open the iface 
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (GripperData*)this->mMap; 
+          }
+
+  /// \brief Pointer to the factory data
+  public: GripperData *data;
 };
 
 /** \} */

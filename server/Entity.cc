@@ -165,7 +165,6 @@ bool Entity::IsStatic() const
 /// Returns true if the entities are the same. Checks only the name
 bool Entity::operator==(const Entity &ent)
 {
-  printf("HERE\n");
   return ent.GetName() == this->GetName();
 }
 

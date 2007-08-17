@@ -318,7 +318,6 @@ int Init()
   if (gazebo::World::Instance()->Init() != 0)
     return -1;
 
-  printf("C\n");
   return 0;
 }
 
@@ -345,6 +344,9 @@ bool MainIdle()
   pauseTime = gazebo::World::Instance()->GetPauseTime();
 
   //printf("Sim Time[%f]\n",simTime);
+
+  if (!gazebo::Global::gui)
+    printf("NULL\n");
 
   gazebo::Global::gui->Update();
 

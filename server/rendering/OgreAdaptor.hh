@@ -96,6 +96,9 @@ class OgreAdaptor
   public: Ogre::Camera *CreateCamera(const std::string &name, double nearClip, 
               double farClip, Ogre::RenderTarget *renderTarget);
 
+  /// \brief Resize the rendering window
+  public: void ResizeWindow(unsigned int w, unsigned int h);
+
   private: void LoadPlugins(const std::string &path);
   private: void SetupResources(const std::string &path);
   private: void SetupRenderSystem(bool create);

@@ -45,8 +45,8 @@
     </fog>
     -->
 
-    <gazeboPath>/usr/local/share/gazebo</gazeboPath>
-    <ogrePath>/usr/local/lib/OGRE</ogrePath>
+    <gazeboPath>/home/nate/local/share/gazebo</gazeboPath>
+    <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">

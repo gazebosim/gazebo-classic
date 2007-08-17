@@ -10,7 +10,7 @@
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   >
 
-  <xyz>0 0.0 0.1</xyz>
+  <xyz>0 0.0 0.0</xyz>
   <rpy>0 0 0</rpy>
   <canonicalBody>laser_body</canonicalBody>
 
@@ -19,20 +19,30 @@
     <rpy>0.0 0.0 0.0</rpy>
 
     <geom:box name="laser_geom1">
-      <mesh>default</mesh>
-      <size>0.10 0.1 0.2</size>
       <xyz>0.0 0.0 0.0</xyz>
+      <rpy>0 -90 0</rpy>
+      <mesh>sicklms200.mesh</mesh>
+      <size>0.15 0.15 0.2</size>
+      <meshScale>0.08 0.08 0.08</meshScale>
       <density>0.1</density>
-      <material>Gazebo/BlueLaser</material>
+      <material>Gazebo/Blue</material>
     </geom:box>
 
-    <sensor:ray name="laser_1">
-      <rayCount>180</rayCount>
-      <rangeCount>361</rangeCount>
-      <origin>0.07 0.0 0</origin>
+    <geom:cylinder name="laser_geom2">
+      <xyz>0.0 0.0 0.0</xyz>
+      <mesh>default</mesh>
+      <size>0.08 0.12</size>
+      <density>0.0</density>
+      <material>Gazebo/Black</material>
+    </geom:cylinder>
 
-      <minAngle>-1.57</minAngle>
-      <maxAngle>1.57</maxAngle>
+    <sensor:ray name="laser_1">
+      <rayCount>90</rayCount>
+      <rangeCount>361</rangeCount>
+      <origin>0.05 0.0 0</origin>
+
+      <minAngle>-90</minAngle>
+      <maxAngle>90</maxAngle>
 
       <minRange>0.1</minRange>
       <maxRange>8</maxRange>
@@ -46,5 +56,3 @@
   </body:box>
 
 </model:physical>
-
-

@@ -12,6 +12,7 @@ namespace Ogre
   class EventProcessor;
   class InputReader;
   class MouseEvent;
+  class RaySceneQuery;
 }
 
 namespace gazebo
@@ -37,6 +38,10 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
   public: bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
+  public: void Resize(unsigned int w, unsigned int h);
+
+  private: void LeftMousePressed(const OIS::MouseEvent &e);
+
   private: Ogre::Vector3 directionVec;
 
   private: float moveAmount;
@@ -53,6 +58,9 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   private: bool rightPressed;
   private: bool middlePressed;
 
+  private: Ogre::RaySceneQuery *raySceneQuery;
+
+  private: Ogre::SceneNode *selectedObject;
 };
 
 }

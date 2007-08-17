@@ -34,7 +34,7 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-TrimeshGeom::TrimeshGeom(Body *body, double density, const std::string &meshName, const Vector3 &scale ) : Geom(body)
+TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double density, const std::string &meshName, const Vector3 &scale ) : Geom(body,name)
 {
   Ogre::SubMesh* subMesh;
   Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().load(meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -118,6 +118,7 @@ TrimeshGeom::TrimeshGeom(Body *body, double density, const std::string &meshName
     }
   }
 
+  printf("Trimesh attaching\n");
   this->AttachMesh(meshName);
   this->ScaleMesh(Vector3(scale.x, scale.y, scale.z));
 

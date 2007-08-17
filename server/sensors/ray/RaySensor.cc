@@ -51,6 +51,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor);
 RaySensor::RaySensor(Body *body)
   : Sensor(body)
 {
+  this->active = false;
 }
 
 
@@ -73,8 +74,8 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 
   this->rayCount = node->GetInt("rayCount",0,1);
   this->rangeCount = node->GetInt("rangeCount",0,1);
-  this->minAngle = node->GetDouble("minAngle",-90,1);
-  this->maxAngle = node->GetDouble("maxAngle",90,1);
+  this->minAngle = DTOR(node->GetDouble("minAngle",-90,1));
+  this->maxAngle = DTOR(node->GetDouble("maxAngle",90,1));
   this->minRange = node->GetDouble("minRange",0,1);
   this->maxRange = node->GetDouble("maxRange",8,1);
 
@@ -235,37 +236,40 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild(UpdateParams &/*params*/)
 {
-  std::vector<RayGeom*>::iterator iter;
-  Pose3d poseDelta;
-  Vector3 a, b;
-
-  // Get the pose of the sensor body (global cs)
-  poseDelta = this->body->GetPose() - this->prevPose;
-  this->prevPose = this->body->GetPose();
-
-  // Reset the ray lengths and mark the geoms as dirty (so they get
-  // redrawn)
-  for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
+  if (this->active)
   {
-    (*iter)->SetLength( 8.0 );
-    (*iter)->SetRetro( 0.0 );
-    (*iter)->SetFiducial( -1 );
+    std::vector<RayGeom*>::iterator iter;
+    Pose3d poseDelta;
+    Vector3 a, b;
 
-    // Get the global points of the line
-    (*iter)->Update();
+    // Get the pose of the sensor body (global cs)
+    poseDelta = this->body->GetPose() - this->prevPose;
+    this->prevPose = this->body->GetPose();
+
+    // Reset the ray lengths and mark the geoms as dirty (so they get
+    // redrawn)
+    for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
+    {
+      (*iter)->SetLength( this->maxRange );
+      (*iter)->SetRetro( 0.0 );
+      (*iter)->SetFiducial( -1 );
+
+      // Get the global points of the line
+      (*iter)->Update();
+    }
+
+    ODEPhysics *ode = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());
+
+    if (ode == NULL)
+    {
+      gzthrow( "Invalid physics engine. Must use ODE." );
+    }
+
+    // Do collision detection
+    dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
+        ( dGeomID ) ( ode->GetSpaceId() ),
+        this, &UpdateCallback );
   }
-
-  ODEPhysics *ode = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());
-
-  if (ode == NULL)
-  {
-    gzthrow( "Invalid physics engine. Must use ODE." );
-  }
-
-  // Do collision detection
-  dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
-                 ( dGeomID ) ( ode->GetSpaceId() ),
-                 this, &UpdateCallback );
 }
 
 

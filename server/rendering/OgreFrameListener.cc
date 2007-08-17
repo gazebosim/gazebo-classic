@@ -44,9 +44,11 @@ using namespace gazebo;
 
 OgreFrameListener::OgreFrameListener()
 {
-  this->moveAmount = 1;
+  this->moveAmount = 5;
   this->moveScale = 1;
   this->rotateAmount = 1;
+
+  this->selectedObject = NULL;
 
   OIS::ParamList pl;
   size_t windowHnd = 0;
@@ -94,6 +96,9 @@ OgreFrameListener::OgreFrameListener()
   this->leftPressed = false;
   this->rightPressed = false;
   this->middlePressed = false;
+
+  // Create ray scene query to handle mouse picking
+  this->raySceneQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(Ogre::Ray());
 }
 
 OgreFrameListener::~OgreFrameListener()
@@ -114,6 +119,7 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
 
   this->mKeyboard->capture();
   this->mMouse->capture();
+
 
   return true;
 }
@@ -261,12 +267,12 @@ bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
    return true;
 }
 
-bool OgreFrameListener::mousePressed(const OIS::MouseEvent & /*e*/, OIS::MouseButtonID id)
+bool OgreFrameListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
   switch (id)
   {
     case OIS::MB_Left:
-      this->leftPressed = true;
+      this->LeftMousePressed(e);
       break;
     case OIS::MB_Right:
       this->rightPressed = true;
@@ -279,6 +285,58 @@ bool OgreFrameListener::mousePressed(const OIS::MouseEvent & /*e*/, OIS::MouseBu
   }
 
   return true;
+}
+
+void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
+{
+  /*CameraSensor *camera;
+
+  if ((camera = CameraManager::Instance()->GetActiveCamera()))
+  {
+    float xscale = (float)camera->GetImageWidth() / e.state.width;
+    float yscale =  (float)camera->GetImageHeight() / e.state.height;
+
+    //int xoffset = (camera->GetImageWidth() - e.state.width)/2 + 5;
+    //int yoffset = (camera->GetImageHeight() - e.state.height)/2 + 5;
+
+    int xoffset = 5;
+    int yoffset = 5;
+
+    xscale = yscale = 1;
+    float x = (xscale * (e.state.X.abs+xoffset)) / (float)camera->GetImageWidth();
+    float y = (yscale * (e.state.Y.abs+yoffset)) / (float)camera->GetImageHeight();
+
+    printf("OFfset[%d %d]\n",xoffset, yoffset);
+
+    printf("Base[%d %d] XY[%4.2f %4.2f] Mouse[%d %d] Camera[%d %d] Scale[%4.2f %4.2f]\n",e.state.X.abs+xoffset, e.state.Y.abs+yoffset, x,y, e.state.width, e.state.height, camera->GetImageWidth(), camera->GetImageHeight(), xscale, yscale);
+    Ogre::Ray mouseRay = camera->GetOgreCamera()->getCameraToViewportRay(x, y);
+    this->raySceneQuery->setRay(mouseRay);
+    this->raySceneQuery->setSortByDistance(true);
+
+    // Execute query
+    Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+    Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+    // Get results, create a node/entity on the position
+    for ( iter = result.begin(); iter != result.end(); iter++ )
+    {
+      if (iter->movable && iter->movable->getName().substr(0,5) == "Geom_")
+      {
+        std::cout << "Name[" << iter->movable->getName() << "]\n";
+
+        if (this->selectedObject)
+          this->selectedObject->showBoundingBox(false);
+
+        this->selectedObject = iter->movable->getParentSceneNode();
+        this->selectedObject->showBoundingBox(true);
+
+        break;
+      }
+    }
+    
+  }*/
+ 
+  this->leftPressed = true;
 }
 
 bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & /*e*/, OIS::MouseButtonID id)
@@ -300,4 +358,11 @@ bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & /*e*/, OIS::MouseB
   }
 
   return true;
+}
+
+void OgreFrameListener::Resize(unsigned int w, unsigned int h)
+{
+  const OIS::MouseState &mouseState = this->mMouse->getMouseState();
+  mouseState.width = w;
+  mouseState.height = h;
 }

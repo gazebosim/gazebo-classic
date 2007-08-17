@@ -23,7 +23,7 @@
 
   <rendering:gui>
     <type>fltk</type>
-    <size>640 480</size>
+    <size>800 600</size>
     <pos>0 0</pos>
   </rendering:gui>
 
@@ -33,18 +33,16 @@
       <material>Gazebo/CloudySky</material>
     </sky>
 
-    <gazeboPath>/usr/local/share/gazebo</gazeboPath>
-    <ogrePath>/usr/local/lib/OGRE</ogrePath>
+    <gazeboPath>/home/nate/local/share/gazebo</gazeboPath>
+    <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
-    <xyz>0 0 0.5</xyz>
+    <xyz>0 0 1.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
+    <static>false</static>
 
     <body:sphere name="sphere1_body">
-      <xyz>0.0 0.0 0.0</xyz>
-      <rpy>0.0 0.0 0.0</rpy>
-
       <geom:sphere name="sphere1_geom">
         <mesh>default</mesh>
         <size>0.5</size>
@@ -78,9 +76,6 @@
     <rpy>0.0 0.0 0.0</rpy>
 
     <body:cylinder name="cylinder1_body">
-      <xyz>0.0 0.0 0.0</xyz>
-      <rpy>0.0 0.0 0.0</rpy>
-
       <geom:cylinder name="cylinder1_geom">
         <mesh>default</mesh>
         <size>0.5 1</size>
@@ -114,7 +109,7 @@
 
     <body:empty name="cam1_body">
       <sensor:camera name="cam1_sensor">
-        <imageSize>640 480</imageSize>
+        <imageSize>800 600</imageSize>
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
         <farClip>100</farClip>

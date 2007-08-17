@@ -91,8 +91,8 @@ void OgreAdaptor::Init(XMLConfigNode *node)
     std::ostringstream stream;
     int width, height, depth;
 
-    width = cnode->GetTupleInt("size",0,640);
-    height = cnode->GetTupleInt("size",1,480);
+    width = cnode->GetTupleInt("size",0,800);
+    height = cnode->GetTupleInt("size",1,600);
     depth = cnode->GetInt("depth",16,0);
 
     stream << width << " x " << height << " @ " << depth << "-bit colour";
@@ -100,7 +100,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   }
   else
   {
-    this->videoMode = "640 x 480 @ 16-bit colour";
+    this->videoMode = "800 x 600 @ 16-bit colour";
   }
 
   // Default background color
@@ -135,7 +135,12 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   // Get the SceneManager, in this case a generic one
   // Default lighting
   this->sceneMgr->setAmbientLight(ambient); 
+
+  // Settings for shadow mapping
+  //this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
+  //this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
   this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
+  this->sceneMgr->setShadowTextureSelfShadow(true);
 
   // Add a sky dome to our scene
   if ((cnode = node->GetChild("sky")))
@@ -340,6 +345,20 @@ void OgreAdaptor::CreateWindow()
 
   this->window = this->root->createRenderWindow( "WindowName", Global::gui->GetWidth(), Global::gui->GetHeight(), false, &params);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Resize the render window
+void OgreAdaptor::ResizeWindow(unsigned int w, unsigned int h)
+{
+  this->window->resize(w, h);
+  this->window->update();
+
+  this->viewport->setDimensions(0,0,1,1);
+
+  this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
+  this->frameListener->Resize(w,h);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a light source and attach it to the entity

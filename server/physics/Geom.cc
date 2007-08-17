@@ -13,9 +13,10 @@ int Geom::geomIdCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( Body *body)
+Geom::Geom( Body *body, const std::string &name)
   : Entity(body)
 {
+  this->SetName(name);
   this->body = body;
   this->spaceId = this->body->spaceId;
 
@@ -80,9 +81,9 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   }
 
   // Create a new name of the geom's mesh entity
-  std::ostringstream stream;
-  stream << "Entity[" << (int)this->geomId << "]";
-  this->SetName(stream.str());
+  //std::ostringstream stream;
+  //stream << "Entity[" << (int)this->geomId << "]";
+  //this->SetName(stream.str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +128,7 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
 
     OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, localPose);
 
-    localPose.rot = localPose.rot * this->extraRotation;
+//    localPose.rot = localPose.rot * this->extraRotation;
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -142,11 +143,10 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     //dMassTranslate(&this->mass, pose.pos.x, pose.pos.y, pose.pos.z);
     //dMassRotate(&this->mass, dGeomGetRotation(this->geomId));
 
-
     if (updateCoM)
       this->body->UpdateCoM();
-
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ Pose3d Geom::GetPose() const
     pose.rot.y = r[2];
     pose.rot.z = r[3];
 
-    pose.rot = pose.rot * this->extraRotation.GetInverse();
+    //pose.rot = pose.rot * this->extraRotation.GetInverse();
 
     // Transform into body relative pose
     pose += this->body->GetCoMPose();
@@ -213,9 +213,13 @@ void Geom::SetRotation(const Quatern &rot)
 /// Attach a mesh to the geom
 void Geom::AttachMesh(const std::string &meshName)
 {
-  this->ogreObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName().c_str(), meshName));
+  std::ostringstream stream;
+  stream << "Geom_" << this->GetName() << ":" << (int)this->geomId;
+
+  this->ogreObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
 
   this->sceneNode->attachObject((Ogre::Entity*)this->ogreObj);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

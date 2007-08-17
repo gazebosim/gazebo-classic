@@ -38,9 +38,9 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-PlaneGeom::PlaneGeom(Body *body, Vector3 normal, const Vector2 &size, 
+PlaneGeom::PlaneGeom(Body *body,const std::string &name,  Vector3 normal, const Vector2 &size, 
     const Vector2 &segments, const Vector2 &uvTile, double altitude)
-    : Geom(body)
+    : Geom(body, name)
 {
   Vector3 perp;
 
