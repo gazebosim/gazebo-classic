@@ -62,7 +62,7 @@ PowerInterface::~PowerInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int PowerInterface::ProcessMessage(MessageQueue *respQueue,
+int PowerInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   return 0;

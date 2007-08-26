@@ -67,7 +67,7 @@ PtzInterface::~PtzInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int PtzInterface::ProcessMessage(MessageQueue *respQueue,
+int PtzInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
 

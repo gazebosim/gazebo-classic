@@ -77,7 +77,7 @@ void GazeboDriver_Register(DriverTable* table)
         " * and contributors. Released under the GNU General Public License v2.");
   }
 
-  table->AddDriver("gazebo", GazeboDriver_Init);
+  table->AddDriver((char*)"gazebo", GazeboDriver_Init);
 }
 
 // need the extern to avoid C++ name-mangling
@@ -141,7 +141,7 @@ int GazeboDriver::Shutdown()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Process all messages for this driver. 
-int GazeboDriver::ProcessMessage(MessageQueue * respQueue, 
+int GazeboDriver::ProcessMessage(QueuePointer &respQueue, 
                                 player_msghdr * hdr, 
                                 void * data)
 {

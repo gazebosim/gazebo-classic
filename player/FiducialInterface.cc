@@ -67,7 +67,7 @@ FiducialInterface::~FiducialInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int FiducialInterface::ProcessMessage(MessageQueue *respQueue,
+int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   // Request the pose and size of the fiducial device
@@ -193,7 +193,7 @@ void FiducialInterface::Update()
     }
     data.fiducials_count = i;
 
-    this->driver->Publish( this->device_addr, NULL,
+    this->driver->Publish( this->device_addr,
                    PLAYER_MSGTYPE_DATA,
                    PLAYER_FIDUCIAL_DATA_SCAN, 
                    (void*)&data, sizeof(data), &this->datatime );

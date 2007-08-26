@@ -67,7 +67,7 @@ ActarrayInterface::~ActarrayInterface() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int ActarrayInterface::ProcessMessage(MessageQueue *respQueue,
+int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
                                       player_msghdr_t *hdr, void *data) {
 
 	//printf("ProcessMessage.\n");

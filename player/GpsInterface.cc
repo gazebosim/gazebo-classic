@@ -64,7 +64,7 @@ GpsInterface::~GpsInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages.  This is called from GazeboDriver
-int GpsInterface::ProcessMessage(MessageQueue *respQueue, player_msghdr_t *hdr,
+int GpsInterface::ProcessMessage(QueuePointer &respQueue, player_msghdr_t *hdr,
                              void *data)
 {
   return 0;

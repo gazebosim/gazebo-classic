@@ -61,7 +61,7 @@ class GazeboDriver : public Driver
   public: virtual int Shutdown();
 
   /// \brief Process all messages for this driver. 
-  public: virtual int ProcessMessage(MessageQueue * respQueue, 
+  public: virtual int ProcessMessage(QueuePointer &respQueue, 
                                      player_msghdr * hdr, 
                                      void * data);
 

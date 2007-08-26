@@ -68,7 +68,7 @@ GripperInterface::~GripperInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int GripperInterface::ProcessMessage(MessageQueue *respQueue,
+int GripperInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   

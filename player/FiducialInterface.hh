@@ -58,7 +58,7 @@ namespace gazebo
     /// \param respQueue Response queue
     /// \param hdr Message header
     /// \param data Pointer to the message data
-    public: virtual int ProcessMessage(MessageQueue *respQueue,
+    public: virtual int ProcessMessage(QueuePointer &respQueue,
                 player_msghdr_t *hdr, void *data);
 
     /// \brief Update this interface, publish new info.

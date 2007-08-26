@@ -51,7 +51,7 @@ namespace gazebo
     public: virtual ~CameraInterface();
 
     /// \brief Handle all messages. This is called from GazeboDriver
-    public: virtual int ProcessMessage(MessageQueue *respQueue,
+    public: virtual int ProcessMessage(QueuePointer &respQueue,
                 player_msghdr_t *hdr, void *data);
 
     /// \brief Update this interface, publish new info.

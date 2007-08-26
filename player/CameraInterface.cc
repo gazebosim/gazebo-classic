@@ -64,7 +64,7 @@ CameraInterface::~CameraInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int CameraInterface::ProcessMessage(MessageQueue *respQueue,
+int CameraInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   return -1;
@@ -109,7 +109,7 @@ void CameraInterface::Update()
       this->iface->data->image_size;
 
     // Send data to server
-    this->driver->Publish(this->device_addr, NULL, 
+    this->driver->Publish(this->device_addr,
                   PLAYER_MSGTYPE_DATA,
                   PLAYER_CAMERA_DATA_STATE,
                   (void*)&this->data, size, &this->datatime);

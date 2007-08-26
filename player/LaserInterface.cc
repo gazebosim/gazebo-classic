@@ -66,7 +66,7 @@ LaserInterface::~LaserInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int LaserInterface::ProcessMessage(MessageQueue *respQueue,
+int LaserInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   // Is it a request to set the laser's config?
@@ -202,7 +202,7 @@ void LaserInterface::Update()
         data.intensity[i] = (uint8_t) (int) this->iface->data->intensity[i];
       }
 
-      this->driver->Publish( this->device_addr, NULL,
+      this->driver->Publish( this->device_addr,
           PLAYER_MSGTYPE_DATA,
           PLAYER_LASER_DATA_SCAN,        
           (void*)&data, sizeof(data), &this->datatime );

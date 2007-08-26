@@ -57,7 +57,7 @@ TruthInterface::~TruthInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int TruthInterface::ProcessMessage(MessageQueue *respQueue,
+int TruthInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 

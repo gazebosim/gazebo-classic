@@ -63,7 +63,7 @@ Graphics3dInterface::~Graphics3dInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int Graphics3dInterface::ProcessMessage(MessageQueue * /*respQueue*/,
+int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
                    player_msghdr_t *hdr, void *data)
 {
   int result = -1;

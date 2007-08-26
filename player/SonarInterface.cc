@@ -67,7 +67,7 @@ SonarInterface::~SonarInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int SonarInterface::ProcessMessage(MessageQueue *respQueue,
+int SonarInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 

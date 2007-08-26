@@ -73,7 +73,7 @@ Position2dInterface::~Position2dInterface()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int Position2dInterface::ProcessMessage(MessageQueue *respQueue,
+int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
   if (this->iface->Lock(1))
@@ -233,7 +233,7 @@ void Position2dInterface::Update()
 
       data.stall = (uint8_t) this->iface->data->stall;
 
-      this->driver->Publish( this->device_addr, NULL,
+      this->driver->Publish( this->device_addr, 
           PLAYER_MSGTYPE_DATA,
           PLAYER_POSITION2D_DATA_STATE, 
           (void*)&data, sizeof(data), &this->datatime );
