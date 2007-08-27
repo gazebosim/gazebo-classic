@@ -1,0 +1,4 @@
+dirs = Split('position factory')
+
+for subdir in dirs:
+  SConscript('%s/SConscript' % subdir)

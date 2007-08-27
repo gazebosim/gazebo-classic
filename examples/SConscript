@@ -1,0 +1,4 @@
+dirs = Split('libgazebo')
+
+for subdir in dirs:
+  SConscript('%s/SConscript' % subdir)
