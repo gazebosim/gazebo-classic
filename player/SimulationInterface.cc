@@ -99,7 +99,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     this->iface->data->model_pose.x = req->pose.px;
     this->iface->data->model_pose.y = req->pose.py;
-    this->iface->data->model_pose.yaw = req->pose.pyaw;
+    this->iface->data->model_pose.yaw = req->pose.pa;
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
