@@ -24,7 +24,7 @@
       <mesh>sicklms200.mesh</mesh>
       <size>0.15 0.15 0.2</size>
       <meshScale>0.08 0.08 0.08</meshScale>
-      <density>0.1</density>
+      <mass>0.1</mass>
       <material>Gazebo/Blue</material>
     </geom:box>
 
@@ -32,7 +32,7 @@
       <xyz>0.0 0.0 0.0</xyz>
       <mesh>default</mesh>
       <size>0.08 0.12</size>
-      <density>0.0</density>
+      <mass>0.0</mass>
       <material>Gazebo/Black</material>
     </geom:cylinder>
 

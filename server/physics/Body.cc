@@ -323,23 +323,26 @@ int Body::LoadGeom(XMLConfigNode *node)
   // The mesh used for visualization
   std::string mesh = node->GetString("mesh","",0);
   std::string name = node->GetString("name","",1);
-  double density = node->GetDouble("density",1.0,0);
+  double mass = node->GetDouble("mass",1.0,1e-5);
+
+  if (mass <= 0)
+    mass = 1e-5;
 
   if (node->GetName() == "sphere")
   {
     double radius = node->GetDouble("size",0.0,0);
-    geom = new SphereGeom(this, name, radius, density, mesh);
+    geom = new SphereGeom(this, name, radius, mass, mesh);
   }
   else if (node->GetName() == "cylinder")
   {
     double radius = node->GetTupleDouble("size",0,1.0);
     double length = node->GetTupleDouble("size",1,1.0);
-    geom = new CylinderGeom(this, name, radius, length, density, mesh);
+    geom = new CylinderGeom(this, name, radius, length, mass, mesh);
   }
   else if (node->GetName() == "box")
   {
     Vector3 size = node->GetVector3("size",Vector3(1,1,1));
-    geom = new BoxGeom(this, name, size, density, mesh);
+    geom = new BoxGeom(this, name, size, mass, mesh);
 
   }
   else if (node->GetName() == "plane")
@@ -354,7 +357,7 @@ int Body::LoadGeom(XMLConfigNode *node)
   else if (node->GetName() == "trimesh")
   {
     Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
-    geom = new TrimeshGeom(this, name, 1.0, mesh, scale);
+    geom = new TrimeshGeom(this, name, mass, mesh, scale);
   }
   else if (node->GetName() == "heightmap")
   {
@@ -483,9 +486,8 @@ void Body::UpdateCoM()
   // Settle on the new CoM pose
   this->comPose = newPose;
 
-  // TODO: remove offsets from mass matrix?
-
-  //dMassSetZero(&this->mass);
+  // My Cheap Hack
+  this->mass.c[0] = this->mass.c[1] = this->mass.c[2] = 0;
 
   // Set the mass matrix
   dBodySetMass( this->bodyId, &this->mass );

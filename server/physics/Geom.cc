@@ -144,7 +144,9 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     //dMassRotate(&this->mass, dGeomGetRotation(this->geomId));
 
     if (updateCoM)
+    {
       this->body->UpdateCoM();
+    }
   }
 
 }
@@ -155,7 +157,8 @@ Pose3d Geom::GetPose() const
 {
   Pose3d pose;
 
-  if (this->geomId && this->placeable)
+  //if (this->geomId && this->placeable)
+  if (this->placeable)
   {
     const dReal *p;
     dQuaternion r;
@@ -164,6 +167,7 @@ Pose3d Geom::GetPose() const
     // the CoM
     p = dGeomGetPosition(this->geomId);
     dGeomGetQuaternion(this->geomId, r);
+
 
     pose.pos.x = p[0];
     pose.pos.y = p[1];
@@ -178,7 +182,6 @@ Pose3d Geom::GetPose() const
 
     // Transform into body relative pose
     pose += this->body->GetCoMPose();
-
   }
   else
     pose = this->body->GetPose();

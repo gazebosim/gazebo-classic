@@ -160,7 +160,7 @@ int ParseArgs(int argc, char **argv)
 {
   FILE *tmpFile;
   int ch;
-  char *flags = "l:hd:s:fg:xt:nq";
+  char *flags = (char*)("l:hd:s:fg:xt:nq");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)

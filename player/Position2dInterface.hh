@@ -44,34 +44,34 @@ class PositionIface;
 /// \brief Position2d Player interface
 class Position2dInterface : public GazeboInterface
 {
-  /// @brief Constructor
+  /// \brief Constructor
   public: Position2dInterface(player_devaddr_t addr, GazeboDriver *driver,
                               ConfigFile *cf, int section);
 
-  /// @brief Destructor
+  /// \brief Destructor
   public: virtual ~Position2dInterface();
 
-  /// @brief Handle all messages. This is called from GazeboDriver
+  /// \brief Handle all messages. This is called from GazeboDriver
   public: virtual int ProcessMessage(QueuePointer &respQueue,
                                      player_msghdr_t *hdr, void *data);
 
-  /// @brief Update this interface, publish new info.
+  /// \brief Update this interface, publish new info.
   public: virtual void Update();
 
-  /// @brief Open a SHM interface when a subscription is received.
+  /// \brief Open a SHM interface when a subscription is received.
   ///        This is called fromGazeboDriver::Subscribe
   public: virtual void Subscribe();
 
-  /// @brief Close a SHM interface. This is called from
+  /// \brief Close a SHM interface. This is called from
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
   private: PositionIface *iface;
 
-  /// @brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+  /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: char *gz_id;
 
-  /// @brief Timestamp on last data update
+  /// \brief Timestamp on last data update
   private: double datatime;
 };
 

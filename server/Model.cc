@@ -116,15 +116,7 @@ int Model::Load(XMLConfigNode *node)
   childNode = node->GetChildByNSPrefix("controller");
   while (childNode)
   {
-    try
-    {
-      this->LoadController(childNode);
-    }
-    catch (GazeboError e)
-    {
-      std::cerr << "Error Loading Controller[" << childNode->GetName() 
-        << "]\n" << e << std::endl;
-    }
+    this->LoadController(childNode);
     childNode = childNode->GetNextByNSPrefix("controller");
   }
 
@@ -522,7 +514,17 @@ void Model::LoadController(XMLConfigNode *node)
   if (controller)
   {
     // Load the controller
-    controller->Load(node);
+    try
+    {
+      controller->Load(node);
+    }
+    catch (GazeboError e)
+    {
+      std::cerr << "Error Loading Controller[" <<  controllerName
+        << "]\n" << e << std::endl;
+      delete controller;
+      return;
+    }
 
     // Store the controller
     this->controllers[controllerName] = controller;

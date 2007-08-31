@@ -83,6 +83,7 @@ World *World::Instance()
     myself = new World();
   }
 
+  //printf("Instance\n");
   return myself;
 }
 
@@ -191,11 +192,7 @@ int World::Update()
     OgreAdaptor::Instance()->Render();
   }
 
-  this->simIface->Lock(1);
-  this->simIface->data->simTime = this->GetSimTime();
-  this->simIface->data->pauseTime = this->GetPauseTime();
-  this->simIface->data->realTime = this->GetRealTime();
-  this->simIface->Unlock();
+  this->UpdateSimulationIface();
 
 
   // Copy the newly created models into the main model vector
@@ -442,4 +439,82 @@ void World::SetModelPose(Model *model , Pose3d pose)
   }
 
   model->SetPose(newPose);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get a pointer to a model based on a name
+Model *World::GetModelByName(std::string modelName)
+{
+  std::vector< Model *>::iterator iter;
+
+  for (iter = models.begin(); iter != models.end(); iter++)
+  {
+    std::cout << "Name[" << (*iter)->GetName() << "] Modelname[" << modelName << "]\n";
+    if ((*iter)->GetName() == modelName)
+      return (*iter);
+  }
+
+  return NULL;
+}
+
+void World::UpdateSimulationIface()
+{
+  this->simIface->Lock(1);
+
+  this->simIface->data->simTime = this->GetSimTime();
+  this->simIface->data->pauseTime = this->GetPauseTime();
+  this->simIface->data->realTime = this->GetRealTime();
+
+  // If the model_name is set, then a request has been received
+  if (strcmp((char*)this->simIface->data->model_name,"")!=0)
+  {
+    /// Get the model requested
+    Model *model = this->GetModelByName((char*)this->simIface->data->model_name);
+    if (model)
+    {
+      std::string req = (char*)this->simIface->data->model_req;
+      if (req == "get_pose")
+      {
+        Pose3d pose = model->GetPose();
+        Vector3 rot = pose.rot.GetAsEuler();
+
+        this->simIface->data->model_pose.x = pose.pos.x;
+        this->simIface->data->model_pose.y = pose.pos.y;
+        this->simIface->data->model_pose.z = pose.pos.z;
+
+
+        this->simIface->data->model_pose.roll = rot.x;
+        this->simIface->data->model_pose.pitch = rot.y;
+        this->simIface->data->model_pose.yaw = rot.z;
+      }
+      else if (req == "set_pose3d")
+      {
+        Pose3d pose;
+        
+        pose.pos.x = this->simIface->data->model_pose.x;
+        pose.pos.y = this->simIface->data->model_pose.y;
+        pose.pos.z = this->simIface->data->model_pose.z;
+        pose.rot.SetFromEuler(Vector3(this->simIface->data->model_pose.roll,
+            this->simIface->data->model_pose.pitch,
+            this->simIface->data->model_pose.yaw));
+        model->SetPose(pose);
+      }
+      else if (req == "set_pose2d")
+      {
+        Pose3d pose = model->GetPose();
+        Vector3 rot = pose.rot.GetAsEuler();
+        
+        pose.pos.x = this->simIface->data->model_pose.x;
+        pose.pos.y = this->simIface->data->model_pose.y;
+
+        pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
+            this->simIface->data->model_pose.yaw));
+        model->SetPose(pose);
+      }
+
+    }
+
+    strcpy((char*)this->simIface->data->model_name, "");
+  }
+  this->simIface->Unlock();
 }

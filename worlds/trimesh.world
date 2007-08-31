@@ -51,7 +51,7 @@
         <xyz>0 0 0.0</xyz>
         <mesh>default</mesh>
         <size>0.2</size>
-        <density>1.0</density>
+        <mass>1.0</mass>
         <material>Gazebo/Rocky</material>
       </geom:sphere>
     </body:sphere>

@@ -502,7 +502,7 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
   }
 
   // Fix all the normals
-  for (i=0; i<subMesh->indexData->indexCount; i+=3)
+  for (i=0; i+3<subMesh->indexData->indexCount; i+=3)
   {
     norm.Set();
 
@@ -526,7 +526,6 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
       }
     }
   }
-
 
   // Unlock
   vBuf->unlock();

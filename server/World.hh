@@ -117,6 +117,9 @@ class World
   /// \param name The name of the entity to delete
   public: void DeleteEntity(const char *name);
 
+  /// \brief Get a pointer to a model based on a name
+  public: Model *GetModelByName(std::string modelName);
+
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
   /// \param parent The parent model
@@ -127,6 +130,9 @@ class World
   /// \param model The model to set
   /// \param pose The pose to set the model to
   private: void SetModelPose(Model *model , Pose3d pose);
+
+  /// \brief Update the simulation iface
+  private: void UpdateSimulationIface();
 
   /// Pointer to myself
   private: static World *myself;

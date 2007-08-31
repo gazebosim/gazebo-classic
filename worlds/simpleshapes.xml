@@ -46,7 +46,7 @@
       <geom:sphere name="sphere1_geom">
         <mesh>default</mesh>
         <size>0.5</size>
-        <density>1.0</density>
+        <mass>1.0</mass>
         <material>Gazebo/Rocky</material>
       </geom:sphere>
     </body:sphere>
@@ -65,7 +65,7 @@
       <geom:box name="box1_geom">
         <mesh>default</mesh>
         <size>1 1 1</size>
-        <density>1.0</density>
+        <mass>1.0</mass>
         <material>Gazebo/BumpyMetal</material>
       </geom:box>
     </body:box>
@@ -79,7 +79,7 @@
       <geom:cylinder name="cylinder1_geom">
         <mesh>default</mesh>
         <size>0.5 1</size>
-        <density>1.0</density>
+        <mass>1.0</mass>
         <material>Gazebo/RustyBarrel</material>
       </geom:cylinder>
     </body:cylinder>

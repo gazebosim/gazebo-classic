@@ -22,7 +22,7 @@
     <xyz>0 0 0.0</xyz>
     <mesh>default</mesh>
     <size>0.445 0.277 0.17</size>
-    <density>5</density>
+    <mass>2.0</mass>
     <material>Gazebo/PioneerBody</material>
   </geom:box>
 
@@ -30,7 +30,7 @@
     <xyz>0 0 0.085</xyz>
     <mesh>default</mesh>
     <size> 0.45 0.38 0.005</size>
-    <density>0</density>
+    <mass>0</mass>
     <material>Gazebo/Black</material>
   </geom:box>
 </body:box>
@@ -42,14 +42,14 @@
   <geom:cylinder name="left_wheel_geom">
     <mesh>default</mesh>
     <size>0.075 0.05</size>
-    <density>0.5</density>
+    <mass>0.1</mass>
     <material>Gazebo/Black</material>
   </geom:cylinder>
   <geom:box name="left_wheel_box">
     <mesh>default</mesh>
     <xyz>0.0 0.0 -0.010</xyz>
     <size>0.05 0.05 0.05</size>
-    <density>0</density>
+    <mass>0</mass>
     <material>Gazebo/White</material>
   </geom:box>
 </body:cylinder>
@@ -60,7 +60,7 @@
   <geom:cylinder name="right_wheel_geom">
     <mesh>default</mesh>
     <size>0.075 0.05</size>
-    <density>0.5</density>
+    <mass>0.1</mass>
     <material>Gazebo/Black</material>
   </geom:cylinder>
 
@@ -68,7 +68,7 @@
     <mesh>default</mesh>
     <xyz>0.0 0.0 0.010</xyz>
     <size>0.05 0.05 0.05</size>
-    <density>0</density>
+    <mass>0</mass>
     <material>Gazebo/White</material>
   </geom:box>
 </body:cylinder>
@@ -79,7 +79,7 @@
   <geom:sphere name="castor_geom">
     <mesh>default</mesh>
     <size>0.04</size>
-    <density>5</density>
+    <mass>0.1</mass>
     <material>Gazebo/Black</material>
   </geom:sphere>
 </body:sphere>
@@ -89,8 +89,8 @@
   <body2>chassis_body</body2>
   <anchor>left_wheel</anchor>
   <axis>0 1 0</axis>
-  <erp>0.4</erp>
-  <cfm>0.008</cfm>
+  <erp>0.8</erp>
+  <cfm>10e-5</cfm>
 </joint:hinge>
 
 <joint:hinge name="right_wheel_hinge">
@@ -98,16 +98,16 @@
   <body2>chassis_body</body2>
   <anchor>right_wheel</anchor>
   <axis>0 1 0</axis>
-  <erp>0.4</erp>
-  <cfm>0.008</cfm>
+  <erp>0.8</erp>
+  <cfm>10e-5</cfm>
 </joint:hinge>
 
 <joint:ball name="ball_joint">
   <body1>castor_body</body1>
   <body2>chassis_body</body2>
   <anchor>castor_body</anchor>
-  <erp>0.4</erp>
-  <cfm>0.008</cfm>
+  <erp>0.8</erp>
+  <cfm>10e-5</cfm>
 </joint:ball>
 
 </model:physical>

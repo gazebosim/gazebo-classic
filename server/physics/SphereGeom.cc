@@ -35,11 +35,11 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-SphereGeom::SphereGeom(Body *body, const std::string &name,  double radius, double density, const std::string &meshName )
+SphereGeom::SphereGeom(Body *body, const std::string &name,  double radius, double mass, const std::string &meshName )
     : Geom(body, name)
 {
   // Initialize box mass matrix
-  dMassSetSphere(&this->mass, density, radius);
+  dMassSetSphereTotal(&this->mass, mass, radius);
 
   // Create the sphere geometry
   this->SetGeom(dCreateSphere(0, radius ), true);

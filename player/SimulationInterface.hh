@@ -37,6 +37,7 @@ namespace gazebo
 /// \brief The Simulation interface
 /// \{
 
+  class SimulationIface;
 
 /// \brief The Simulation interface
 class SimulationInterface : public GazeboInterface
@@ -62,6 +63,10 @@ class SimulationInterface : public GazeboInterface
   ///        GazeboDriver::Unsubscribe
   public: virtual void Unsubscribe();
 
+  /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+  private: char *gz_id;
+
+  public: SimulationIface *iface;
 };
 
   /// \} 

@@ -1,9 +1,6 @@
 Open:
 - Python scripts to models, allow dynamic (movable) meshes
-- Fix the MEdia directory
 - Force sensors
-- Must make clear they need SCONS, and not to try configure & make
-- Get the latest version of ogre
 - Return the sim time from Gazebo in the simulation proxy
 - When nesting a camera in a pioneer model it cause the pioneer to flip over.
 - Slider has to be the first in the XML file, when loading a bunch of joints in a model.

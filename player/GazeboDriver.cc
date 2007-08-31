@@ -166,10 +166,6 @@ int GazeboDriver::ProcessMessage(QueuePointer &respQueue,
 // Subscribe an device to this driver
 int GazeboDriver::Subscribe(player_devaddr_t addr)
 {
-
-  if (addr.interf == PLAYER_SIMULATION_CODE)
-    return 0;
-
   GazeboInterface *device = this->LookupDevice(addr);
 
   if (device)
@@ -188,9 +184,6 @@ int GazeboDriver::Subscribe(player_devaddr_t addr)
 // Remove a device from this driver
 int GazeboDriver::Unsubscribe(player_devaddr_t addr)
 {
-  if( addr.interf == PLAYER_SIMULATION_CODE )
-    return 0; 
-
   GazeboInterface *device = this->LookupDevice(addr);
 
   if (device)

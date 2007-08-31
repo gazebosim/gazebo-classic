@@ -62,7 +62,7 @@ ODEPhysics::ODEPhysics()
   this->contactGroup = dJointGroupCreate(0);
 
   // Help prevent "popping of deeply embedded object
-  dWorldSetContactMaxCorrectingVel(this->worldId, 1.0);
+  dWorldSetContactMaxCorrectingVel(this->worldId, 10.0);
 
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId, 0.01);

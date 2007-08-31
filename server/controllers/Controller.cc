@@ -51,6 +51,7 @@ Controller::Controller(Entity *entity )
 /// Destructor
 Controller::~Controller()
 {
+  this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,5 +116,13 @@ void Controller::Update(UpdateParams &params)
 /// Finialize the controller. Called once on completion.
 void Controller::Fini()
 {
+  std::vector<Iface*>::iterator iter;
+
+  for (iter=this->ifaces.begin(); iter!=this->ifaces.end(); iter++)
+  {
+    delete *iter;
+  }
+  this->ifaces.clear();
+
   this->FiniChild();
 }

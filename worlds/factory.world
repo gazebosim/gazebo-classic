@@ -39,7 +39,7 @@
     <fog>
       <color>0.8 0.8 0.8</color>
       <type>linear</type>
-      <density>0.0</density>
+      <mass>0.1</mass>
       <linearStart>50.0</linearStart>
       <linearEnd>515.0</linearEnd>
     </fog>
@@ -61,7 +61,7 @@
         <xyz>0 0 0.0</xyz>
         <mesh>default</mesh>
         <size>0.2</size>
-        <density>5.0</density>
+        <mass>5.0</mass>
         <material>Gazebo/Rocky</material>
       </geom:sphere>
     </body:sphere>

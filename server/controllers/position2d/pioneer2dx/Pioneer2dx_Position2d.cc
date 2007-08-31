@@ -110,84 +110,54 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 {
   bool opened = false;
 
+  // TODO: Step should be in a parameter of this function
+  double wd, ws;
+  double d1, d2;
+  double dr, da;
 
-  if (this->myIface->Lock(1))
+  this->GetPositionCmd();
+
+  wd = this->wheelDiam;
+  ws = this->wheelSep;
+
+  // Distance travelled by front wheels
+  d1 = params.stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
+  d2 = params.stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
+
+  dr = (d1 + d2) / 2;
+  da = (d2 - d1) / ws;
+
+  // Compute odometric pose
+  this->odomPose[0] += dr * cos( this->odomPose[2] );
+  this->odomPose[1] += dr * sin( this->odomPose[2] );
+  this->odomPose[2] += da;
+
+  // Compute odometric instantaneous velocity
+  this->odomVel[0] = dr / params.stepTime;
+  this->odomVel[1] = 0.0;
+  this->odomVel[2] = da / params.stepTime;
+
+  if (this->enableMotors)
   {
-    opened = this->myIface->data->opened;
-    this->myIface->Unlock();
-  }
-
-  if (opened)
-  {
-    // TODO: Step should be in a parameter of this function
-    double wd, ws;
-    double d1, d2;
-    double dr, da;
-
-    this->GetPositionCmd();
-
-    wd = this->wheelDiam;
-    ws = this->wheelSep;
-
-    // Distance travelled by front wheels
-    d1 = params.stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
-    d2 = params.stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
-
-    dr = (d1 + d2) / 2;
-    da = (d2 - d1) / ws;
-
-    // Compute odometric pose
-    this->odomPose[0] += dr * cos( this->odomPose[2] );
-    this->odomPose[1] += dr * sin( this->odomPose[2] );
-    this->odomPose[2] += da;
-
-    // Compute odometric instantaneous velocity
-    this->odomVel[0] = dr / params.stepTime;
-    this->odomVel[1] = 0.0;
-    this->odomVel[2] = da / params.stepTime;
-
-    if (this->enableMotors)
-    {
-      /*this->joints[LEFT]->SetParam( dParamVel, 
+    this->joints[LEFT]->SetParam( dParamVel, 
         this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
 
-        this->joints[RIGHT]->SetParam( dParamVel, 
+    this->joints[RIGHT]->SetParam( dParamVel, 
         this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
-        */
-      this->joints[LEFT]->SetParam( dParamVel, 
-          this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
+    this->joints[LEFT]->SetParam( dParamFMax, 10.1 );
+    this->joints[RIGHT]->SetParam( dParamFMax, 10.1 );
 
-      this->joints[RIGHT]->SetParam( dParamVel, 
-          this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
-
-      this->joints[LEFT]->SetParam( dParamFMax, 1.1 );
-      this->joints[RIGHT]->SetParam( dParamFMax, 1.1 );
-
-    }
-    else
-    {
-      this->joints[LEFT]->SetParam( dParamVel, 0 ); 
-      this->joints[RIGHT]->SetParam( dParamVel, 0 );
-
-      this->joints[LEFT]->SetParam( dParamFMax, 0 );
-      this->joints[RIGHT]->SetParam( dParamFMax, 0 );
-    }
-
-    this->PutPositionData();
   }
   else
   {
-    this->myParent->Reset();
+    this->joints[LEFT]->SetParam( dParamVel, 0 ); 
+    this->joints[RIGHT]->SetParam( dParamVel, 0 );
 
-    // Reset odometric pose
-    this->odomPose[0] = 0.0;
-    this->odomPose[1] = 0.0;
-    this->odomPose[2] = 0.0;
-
-    this->odomVel[0] = 0.0;
-    this->odomVel[1] = 0.0;
-    this->odomVel[2] = 0.0;
+    this->joints[LEFT]->SetParam( dParamFMax, 0 );
+    this->joints[RIGHT]->SetParam( dParamFMax, 0 );
   }
+
+  this->PutPositionData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

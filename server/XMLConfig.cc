@@ -88,8 +88,8 @@ int XMLConfig::Load( std::string filename )
     return -1;
   }
 
-  //Apply the XInclude process.
-  if (xmlXIncludeProcess(this->xmlDoc) <= 0)
+  // Apply the XInclude process.
+  if (xmlXIncludeProcess(this->xmlDoc) < 0)
   {
     printf("XInclude process failed\n");
   }

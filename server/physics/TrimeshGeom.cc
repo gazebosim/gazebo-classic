@@ -34,7 +34,7 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double density, const std::string &meshName, const Vector3 &scale ) : Geom(body,name)
+TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const std::string &meshName, const Vector3 &scale ) : Geom(body,name)
 {
   Ogre::SubMesh* subMesh;
   Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().load(meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -135,7 +135,7 @@ TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double density, co
   
   this->geomId = dCreateTriMesh( this->spaceId, this->odeData,0,0,0 );
 
-  dMassSetTrimesh(&this->mass, 1.0, this->geomId);
+  dMassSetTrimesh(&this->mass, mass, this->geomId);
 
   // Create the sphere geometry
   this->SetGeom(this->geomId, true);

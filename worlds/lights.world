@@ -114,7 +114,7 @@
       <geom:sphere name="sphere1_geom">
         <mesh>default</mesh>
         <size>0.5</size>
-        <density>1.0</density>
+        <mass>1.0</mass>
         <material>Gazebo/Rocky</material>
       </geom:sphere>
     </body:sphere>
