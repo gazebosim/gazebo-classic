@@ -204,12 +204,13 @@ void Iface::Destroy()
   // Delete the file
   std::cout <<  "deleting "<< this->filename << "\n";
 
-  if (unlink(this->filename.c_str()))
+  if (unlink(this->filename.c_str()) < 0)
   {
     std::ostringstream stream;
     stream << "error deleting mmap file: " << strerror(errno);
     throw(stream.str());
   }
+  sleep(10);
 }
 
 

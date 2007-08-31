@@ -330,6 +330,9 @@ class SimulationData
   ///\brief  Save current poses to world file (set by client)
   public: int save;
 
+  public: uint8_t model_name[512];
+  public: uint8_t model_req[32];
+  public: Pose model_pose;
 };
 
 /// \brief Common simulator interface
@@ -538,7 +541,7 @@ class Graphics3dIface : public Iface
 {
 
   /// Constructor
-  public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dData)+sizeof(Graphics3dData)) {}
+  public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dIface)+sizeof(Graphics3dData)) {}
 
   /// Destructor
   public: virtual ~Graphics3dIface() {this->data = NULL;}
