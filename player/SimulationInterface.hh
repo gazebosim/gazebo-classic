@@ -34,9 +34,18 @@ namespace gazebo
 /// \addtogroup player_iface 
 /// \{
 /// \defgroup simulation_player Simulation Interface
+/// Provides:
+///  - PLAYER_SIMULATION_REQ_SET_POSE3D
+///  - PLAYER_SIMULATION_REQ_SET_POSE2D
+///  - PLAYER_SIMULATION_REQ_GET_POSE3D
+///  - PLAYER_SIMULATION_REQ_GET_POSE2D
+///  - PLAYER_SIMULATION_REQ_GET_PROPERTY
+///    - "sim_time" returns double
+///    - "real_time" returns double
+///    - "pause_time" returns double
 /// \brief The Simulation interface
 /// \{
-
+///
   class SimulationIface;
 
 /// \brief The Simulation interface

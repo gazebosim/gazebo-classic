@@ -62,6 +62,8 @@ SimulationInterface::~SimulationInterface()
 int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
+
+  /// Set a 3D pose
   if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
         PLAYER_SIMULATION_REQ_SET_POSE3D, this->device_addr))
   {
@@ -86,7 +88,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE3D);
 
   }
-  if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
+
+  /// Set a 2D pose
+  else if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
         PLAYER_SIMULATION_REQ_SET_POSE2D, this->device_addr))
   {
     player_simulation_pose2d_req_t *req = 
@@ -106,8 +110,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE2D);
   }
 
-
-
+  /// Get a 3d pose
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
         PLAYER_SIMULATION_REQ_GET_POSE3D, this->device_addr))
   {
@@ -146,6 +149,81 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
         req, sizeof(*req), NULL);
   }
 
+  /// Get a 2D pose
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+        PLAYER_SIMULATION_REQ_GET_POSE2D, this->device_addr))
+  {
+    bool response = false;
+    player_simulation_pose2d_req_t *req = 
+      (player_simulation_pose2d_req_t*)(data);
+
+    this->iface->Lock(1);
+
+    strcpy((char*)this->iface->data->model_name, req->name);
+    strcpy((char*)this->iface->data->model_req,"get_pose");
+
+    this->iface->Unlock();
+   
+    // Wait for response from gazebo
+    while (!response)
+    {
+      this->iface->Lock(1);
+      response = strcmp((char*)this->iface->data->model_name,"") == 0;
+      this->iface->Unlock();
+      usleep(100000);
+    }
+
+    this->iface->Lock(1);
+    req->pose.px = this->iface->data->model_pose.x;
+    req->pose.py = this->iface->data->model_pose.y;
+    req->pose.pa = this->iface->data->model_pose.yaw;
+    this->iface->Unlock();
+
+    this->driver->Publish(this->device_addr, respQueue,
+        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
+        req, sizeof(*req), NULL);
+  }
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+        PLAYER_SIMULATION_REQ_GET_PROPERTY, this->device_addr))
+  {
+    player_simulation_property_req_t *req = 
+      (player_simulation_property_req_t*)(data);
+
+    std::string name = req->name;
+    std::string prop = req->prop;
+
+    this->iface->Lock(1);
+    if (name == "world")
+    {
+      if (prop == "sim_time")
+      {
+        if (req->value_count >= sizeof(double))
+        {
+          *((double*)req->value) = this->iface->data->simTime;
+        }
+      }
+      else if (prop == "pause_time")
+      {
+        if (req->value_count >= sizeof(double))
+        {
+          *((double*)req->value) = this->iface->data->pauseTime;
+        }
+      }
+      else if (prop == "real_time")
+      {
+        if (req->value_count >= sizeof(double))
+        {
+          *((double*)req->value) = this->iface->data->realTime;
+        }
+      }
+    }
+    this->iface->Unlock();
+
+    this->driver->Publish(this->device_addr, respQueue,
+        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY,
+        req, sizeof(*req), NULL);
+  }
+ 
   return 0;
 }
 

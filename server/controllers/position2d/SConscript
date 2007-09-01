@@ -1,7 +1,7 @@
 #Import variable
 Import('env staticObjs sharedObjs')
 
-dirs = Split('pioneer2dx truth')
+dirs = Split('pioneer2dx')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)

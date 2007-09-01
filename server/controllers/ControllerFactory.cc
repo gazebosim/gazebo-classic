@@ -36,7 +36,6 @@ using namespace gazebo;
 void RegisterPioneer2dx_Position2d();
 void RegisterSickLMS200_Laser();
 void RegisterGeneric_Camera();
-void RegisterTruth_Position2d();
 void RegisterFactory();
 void RegisterPioneer2_Gripper();
 
@@ -49,7 +48,6 @@ void ControllerFactory::RegisterAll()
   RegisterPioneer2dx_Position2d();
   RegisterSickLMS200_Laser();
   RegisterGeneric_Camera();
-  RegisterTruth_Position2d();
   RegisterFactory();
   RegisterPioneer2_Gripper();
 }
