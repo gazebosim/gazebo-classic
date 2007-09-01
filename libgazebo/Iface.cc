@@ -210,7 +210,6 @@ void Iface::Destroy()
     stream << "error deleting mmap file: " << strerror(errno);
     throw(stream.str());
   }
-  sleep(10);
 }
 
 
