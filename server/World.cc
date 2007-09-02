@@ -44,9 +44,6 @@
 
 using namespace gazebo;
 
-// static pointer to myself
-World *World::myself = NULL;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Private constructor
 World::World()
@@ -72,20 +69,17 @@ World::~World()
     delete (*miter);
   }
   this->models.clear();
+
+  if (this->physicsEngine)
+    delete this->physicsEngine;
+
+  if (this->server)
+    delete this->server;
+
+  if (this->simIface)
+    delete this->simIface;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//Get an instance of this World
-World *World::Instance()
-{
-  if (!myself)
-  {
-    myself = new World();
-  }
-
-  //printf("Instance\n");
-  return myself;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world

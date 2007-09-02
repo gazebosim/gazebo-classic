@@ -86,6 +86,12 @@ int Body::Load(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("sensor");
   }
 
+  // If no geoms are attached, then don't let gravity affect the body.
+  if (this->geoms.size()==0)
+  {
+    this->SetGravityMode(false);
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,7 +332,9 @@ int Body::LoadGeom(XMLConfigNode *node)
   double mass = node->GetDouble("mass",1.0,1e-5);
 
   if (mass <= 0)
+  {
     mass = 1e-5;
+  }
 
   if (node->GetName() == "sphere")
   {

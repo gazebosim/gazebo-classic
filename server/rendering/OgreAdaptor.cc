@@ -42,8 +42,6 @@
 
 using namespace gazebo;
 
-OgreAdaptor *OgreAdaptor::myself = NULL;
-
 /// Constructor
 OgreAdaptor::OgreAdaptor()
 {
@@ -60,16 +58,15 @@ OgreAdaptor::OgreAdaptor()
 /// Destructor
 OgreAdaptor::~OgreAdaptor()
 {
+  if (this->window)
+    delete this->window;
+
+  if (this->backgroundColor)
+    delete this->backgroundColor;
+
+  if (this->frameListener)
+    delete this->frameListener;
 }
-
-OgreAdaptor *OgreAdaptor::Instance()
-{
-  if (!myself)
-    myself = new OgreAdaptor;
-
-  return myself;
-}
-
 
 void OgreAdaptor::Init(XMLConfigNode *node)
 {

@@ -354,7 +354,6 @@ bool MainIdle()
   if (gazebo::Global::userQuit)
     return false;
 
-
   return true;
 }
 

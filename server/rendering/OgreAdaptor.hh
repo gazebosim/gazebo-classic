@@ -30,6 +30,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include "SingletonT.hh"
 #include "Pose3d.hh"
 
 namespace Ogre
@@ -61,22 +62,20 @@ class OgreFrameListener;
 class Entity;
 
 /// \brief Adptor to Ogre3d
-class OgreAdaptor
+class OgreAdaptor : public SingletonT<OgreAdaptor>
 {
   /// \brief Constructor
   private: OgreAdaptor();
 
   /// \brief Destructor
-  public: virtual ~OgreAdaptor();
+  private: virtual ~OgreAdaptor();
 
-  public: static OgreAdaptor *Instance();
-
-  /// \brief Default initialization. Let OGRE create the window and rendering context
+  /// \brief Default initialization. 
+  ///        Let OGRE create the window and rendering context
   public: void Init(XMLConfigNode *node);
 
   /// \brief Initialize Ogre Rendering engine
-  public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height);
-
+  public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height); 
   /// \brief Render a single frame
   public: int Render();
 
@@ -116,8 +115,6 @@ class OgreAdaptor
   // Our custom frame listener
   private: OgreFrameListener *frameListener;
 
-  private: static OgreAdaptor *myself;
-
   private: Ogre::ColourValue *backgroundColor;
 
   private: std::string videoMode;
@@ -127,6 +124,9 @@ class OgreAdaptor
   private: Vector3 terrainSize;
   private: unsigned int terrainVertSize;
   private: std::string terrainImage;
+
+  private: friend class DestroyerT<OgreAdaptor>;
+  private: friend class SingletonT<OgreAdaptor>;
 };
 
 /*/// \brief 

@@ -28,6 +28,7 @@
 #define WORLD_HH
 
 #include <vector>
+#include "SingletonT.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
 
@@ -50,17 +51,13 @@ namespace gazebo
  * The world class keps a list of all models, handles loading and saving,
  * object dynamics and collision detection for contact joints
  */
-class World
+class World : public SingletonT<World>
 {
   /// Private constructor
   private: World();
 
   /// Private destructor
-  public: ~World();
-
-  /// Get an instance of this World
-  /// \return Instance of the World
-  public: static World *Instance();
+  private: ~World();
 
   /// Load the world
   /// \param node XMLConfig node point
@@ -134,9 +131,6 @@ class World
   /// \brief Update the simulation iface
   private: void UpdateSimulationIface();
 
-  /// Pointer to myself
-  private: static World *myself;
-
   /// Pointer the physics engine
   private: PhysicsEngine *physicsEngine;
 
@@ -161,6 +155,8 @@ class World
   /// Current simulation time
   private: double simTime, pauseTime, startTime;
 
+  private: friend class DestroyerT<World>;
+  private: friend class SingletonT<World>;
 };
 
 

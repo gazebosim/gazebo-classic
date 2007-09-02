@@ -133,6 +133,7 @@ namespace gazebo
 
     private: Global();
     private: ~Global();
+
   };
 
   /// \}
