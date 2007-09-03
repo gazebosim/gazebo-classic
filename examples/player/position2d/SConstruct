@@ -13,4 +13,4 @@ env = Environment (
 for cfg in parseConfigs:
   env.ParseConfig(cfg)
 
-env.Program('simulation','simulation.cc')
+env.Program('position2d','position2d.cc')

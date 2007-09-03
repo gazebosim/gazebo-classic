@@ -1,0 +1,1597 @@
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:410 warning : other error on client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:410 warning : other error on client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/simulation/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+server.cc:169 error   : failed to load config file position2d.cc
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:268 accepted TCP client 1 on port 6665, fd 9
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocaplugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:268 accepted TCP client 1 on port 6665, fd 9
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 byplugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local//lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:587 warning : allocating maximum 33554432 bytes to outgoing message buffer
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local/lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
+plugins.cc:161 trying to load /home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin...
+plugins.cc:165 failed (/home/nate/work/psg/new_gazebo/gazebo/examples/player/position2d/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+plugins.cc:175 trying to load /home/nate/local/lib/libgazeboplugin...
+plugins.cc:178 success
+plugins.cc:218 invoking player_driver_init()...
+plugins.cc:234 success
+playertcp.cc:268 accepted TCP client 0 on port 6665, fd 7
+playertcp.cc:268 accepted TCP client 1 on port 6665, fd 9
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 1
+playertcp.cc:349 closing TCP connection to client 1 on port 6665
+playertcp.cc:773 read() read zero bytes
+playertcp.cc:418 failed to read from client 0
+playertcp.cc:349 closing TCP connection to client 0 on port 6665
