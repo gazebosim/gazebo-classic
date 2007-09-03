@@ -65,6 +65,8 @@ Iface::Iface(const std::string &type, size_t size)
   this->client = NULL;
 
   this->opened = false;
+
+  this->openCount = 0;
 }
 
 
@@ -166,6 +168,7 @@ void Iface::Create(Server *server, std::string id)
 
   std::cout.flags(origFlags);
 
+  this->openCount = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -181,6 +184,8 @@ void Iface::Create(Server *server, std::string id,
 
   this->modelId = modelId;
   this->parentModelId = parentModelId;
+
+  this->openCount = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -217,6 +222,7 @@ void Iface::Destroy()
 // Open an existing interface (client)
 void Iface::Open(Client *client, std::string id)
 {
+
   std::ostringstream stream;
 
   this->client = client;
@@ -264,6 +270,7 @@ void Iface::Open(Client *client, std::string id)
 
   std::cout.setf(origFlags);
 
+  this->openCount++;
   this->opened = true;
 }  
 
@@ -272,15 +279,20 @@ void Iface::Open(Client *client, std::string id)
 // Close the interface (client)
 void Iface::Close()
 {
-  this->opened = false;
+  this->openCount--;
 
-  // Unmap the file
-  munmap(this->mMap, this->size);
-  this->mMap = NULL;
+  if (this->openCount <=0)
+  {
+    this->opened = false;
 
-  // Close the file
-  std::cout <<  "closing " <<  this->filename << "\n";
-  close(this->mmapFd);
+    // Unmap the file
+    munmap(this->mMap, this->size);
+    this->mMap = NULL;
+
+    // Close the file
+    std::cout <<  "closing " <<  this->filename << "\n";
+    close(this->mmapFd);
+  }
 }
 
 

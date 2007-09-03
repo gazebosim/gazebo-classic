@@ -288,6 +288,9 @@ class Iface
   public: int parentModelId;
 
   protected: std::string type;
+
+  private: int openCount;
+
   public: bool opened;
 };
 

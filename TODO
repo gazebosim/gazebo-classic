@@ -1,4 +1,5 @@
 Open:
+- Libagazebo/Player INterfaces crash when a client and playerv connects, and then one of them disconnects
 - Memory Leak in libgazebo
 - A static geom which is offset does not actually move the geom, so collision
   detection does not work
@@ -7,7 +8,6 @@ Open:
 - Force sensors
 - Slider has to be the first in the XML file, when loading a bunch of joints in a model.
 - Add note in Controller tutorial about the Controller Factory
-- Libagazebo/Player INterfaces crash when a client and playerv connects, and then one of them disconnects
 - Overlays in Gazebo with Mac doesn't work
 - Implement Speech interface
 - Implement Act array

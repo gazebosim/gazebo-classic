@@ -213,6 +213,8 @@ void Position2dInterface::Update()
   player_position2d_data_t data;
   struct timeval ts;
 
+  memset(&data, 0, sizeof(data));
+
   if (this->iface->Lock(1))
   {
     // Only Update when new data is present
