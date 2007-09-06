@@ -126,7 +126,6 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
 
 bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/) 
 {
-
   this->mKeyboard->capture();
   this->mMouse->capture();
 

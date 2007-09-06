@@ -171,9 +171,16 @@ int Model::Load(XMLConfigNode *node)
 int Model::Init()
 {
   std::map<std::string, Body* >::iterator biter;
+  std::map<std::string, Controller* >::iterator contIter;
 
   for (biter = this->bodies.begin(); biter!=this->bodies.end(); biter++)
     biter->second->Init();
+
+  for (contIter=this->controllers.begin(); 
+       contIter!=this->controllers.end(); contIter++)
+  {
+      contIter->second->Init();
+  }
 
   /*this->mtext = new MovableText(this->GetName(), "this is the caption");
   this->mtext->setTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);

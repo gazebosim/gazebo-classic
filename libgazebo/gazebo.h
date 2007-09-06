@@ -311,7 +311,7 @@ of the server, such as the current simulation time-step.
 */
 
 
-/// \bref Simulation interface data
+/// \brief Simulation interface data
 class SimulationData
 {
   /// \brief Elapsed simulator time
@@ -361,8 +361,6 @@ class SimulationIface : public Iface
 
   public: SimulationData *data;
 };
-
-
 
 /** \} */
 /// \}
@@ -654,6 +652,7 @@ class LaserIface : public Iface
             Iface::Close();
           }
 
+  /// Pointer to the laser data
   public: LaserData *data;
 };
 
@@ -834,14 +833,28 @@ class GripperData
   /// Current state of the gripper
   int state;
 
+  /// Gripped limit reached flag
   int grip_limit_reach;
+
+  /// Lift limit reached flag
   int lift_limit_reach;
+
+  /// Outer beam obstruct flag
   int outer_beam_obstruct;
+
+  /// Inner beam obstructed flag
   int inner_beam_obstruct;
+
+  /// Left paddle open flag
   int left_paddle_open;
+
+  /// Right paddle open flag
   int right_paddle_open;
 
+  /// Lift up flag
   int lift_up;
+
+  /// Lift down flag
   int lift_down;
 };
 
@@ -876,6 +889,149 @@ class GripperIface : public Iface
 /// \}
 
 
+/***************************************************************************/
+/// \addtogroup libgazebo_iface 
+/// \{
+/** \defgroup actarray_iface actarray
+
+  \brief Actuator Array
+
+The actuator array interface allows a user to control a set of actuators.
+
+\{
+*/
+
+/// maximum number of actuators 
+#define GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS 16
+
+//Actuator states
+/// Idle state
+#define GAZEBO_ACTARRAY_ACTSTATE_IDLE     1
+
+/// Moving state 
+#define GAZEBO_ACTARRAY_ACTSTATE_MOVING   2
+
+/// Braked state 
+#define GAZEBO_ACTARRAY_ACTSTATE_BRAKED   3
+
+/// Stalled state 
+#define GAZEBO_ACTARRAY_ACTSTATE_STALLED  4
+
+/// Linear type 
+#define GAZEBO_ACTARRAY_TYPE_LINEAR       1
+/// Rotary type
+#define GAZEBO_ACTARRAY_TYPE_ROTARY       2
+
+/// Request subtype: power 
+#define GAZEBO_ACTARRAY_POWER_REQ         1
+/// Request subtype: brakes 
+#define GAZEBO_ACTARRAY_BRAKES_REQ        2
+/// Request subtype: get geometry 
+#define GAZEBO_ACTARRAY_GET_GEOM_REQ      3
+/// Request subtype: speed
+#define GAZEBO_ACTARRAY_SPEED_REQ         4
+
+/// Command subtype: position 
+#define GAZEBO_ACTARRAY_POS_CMD           1
+/// Command subtype: speed 
+#define GAZEBO_ACTARRAY_SPEED_CMD         2
+/// Command subtype: home 
+#define GAZEBO_ACTARRAY_HOME_CMD          3
+
+
+/// \brief Actuator geometry 
+class ActarrayActuatorGeom
+{
+/// Data subtype: state
+#define GAZEBO_ACTARRAY_DATA_STATE        1
+
+
+  ///The type of the actuator - linear or rotary.
+  public: uint8_t type;
+  /// The range of motion of the actuator, in m or rad depending on the type. 
+  public: float min;
+  /// The range of motion of the actuator, in m or rad depending on the type. 
+  public: float centre;
+  /// The range of motion of the actuator, in m or rad depending on the type. 
+  public: float max;
+  /// The range of motion of the actuator, in m or rad depending on the type. 
+  public: float home;
+  /// The configured speed setting of the actuator - different from current speed. 
+  public: float config_speed;
+  /// The maximum achievable speed of the actuator.
+  public: float max_speed;
+  /// If the actuator has brakes or not. 
+  public: uint8_t hasbrakes;
+};
+
+/// \brief Structure containing a single actuator's information 
+class ActarrayActuator
+{
+  /// The position of the actuator in m or rad depending on the type.
+  public: float position;
+  /// The speed of the actuator in m/s or rad/s depending on the type. 
+  public: float speed;
+  /// The current state of the actuator. 
+  public: uint8_t state;
+
+}; 
+
+/// \brief The actuator array data packet. 
+class ActarrayData
+{
+  /// The number of actuators in the array. 
+  public: unsigned int actuators_count;
+  
+  /// timestamp
+  public: double time;
+  
+  /// The actuator data. 
+  public: ActarrayActuator actuators[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
+  
+  /// The actuators geoms 
+  public: ActarrayActuatorGeom actuator_geoms[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
+  
+  /// position commands
+  public: float cmd_pos[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
+  
+  /// speed commands
+  public: float cmd_speed[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
+  
+  /// bad command flag - (speed to high set for the actuators or position not reachable)
+  public: int bad_cmd;
+  
+  /// position / speed comand
+  public: unsigned int joint_mode[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
+  
+};
+
+/// \brief The Actarray interface
+class ActarrayIface : public Iface
+{
+  /// \brief Create an interface
+  public: ActarrayIface():Iface("actarray", sizeof(ActarrayIface)+sizeof(ActarrayData)) {}
+
+  /// \brief Destroy and Interface
+  public: virtual ~ActarrayIface() {this->data = NULL;}
+
+  public: virtual void Create(Server *server, std::string id)
+          {
+           Iface::Create(server,id); 
+           this->data = (ActarrayData*)this->mMap; 
+          }
+
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (ActarrayData*)this->mMap; 
+          }
+
+  /// Pointer to the act array data
+  public: ActarrayData *data;
+};
+
+/** \} */
+/// \} */
 
 }
 

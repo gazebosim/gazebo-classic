@@ -53,6 +53,7 @@ GZ_REGISTER_IFACE("laser", LaserIface);
 GZ_REGISTER_IFACE("fiducial", FiducialIface);
 GZ_REGISTER_IFACE("factory", FactoryIface);
 GZ_REGISTER_IFACE("gripper", GripperIface);
+GZ_REGISTER_IFACE("actarray", ActarrayIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface

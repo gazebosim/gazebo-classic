@@ -124,6 +124,8 @@ void FLTKGui::resize(int x, int y, int w, int h)
   OgreAdaptor::Instance()->ResizeWindow(w, h);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Handle events
 int FLTKGui::handle(int event)
 {
   switch (event)
