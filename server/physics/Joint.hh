@@ -39,6 +39,7 @@ namespace gazebo
   /// \{
   
   class Body;
+  class XMLConfigNode;
 
   /// \brief Base class for all joints
   class Joint
@@ -50,6 +51,9 @@ namespace gazebo
 
     /// \brief Destructor
     public: virtual ~Joint();
+
+    /// \brief Load a joint
+    public: virtual void Load(XMLConfigNode *node);
 
     /// \brief Get the type of the joint
     public: Joint::Type GetType() const;

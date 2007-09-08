@@ -339,7 +339,6 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   // Set the id of the model
   model->SetName( node->GetString( "name", "", 0 ) );
 
-
   if (model->GetName() == "")
   {
     model->SetName( node->GetName() );

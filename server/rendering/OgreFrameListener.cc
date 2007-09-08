@@ -44,7 +44,7 @@ using namespace gazebo;
 
 OgreFrameListener::OgreFrameListener()
 {
-  this->moveAmount = 5;
+  this->moveAmount = 1;
   this->moveScale = 1;
   this->rotateAmount = 1;
 
@@ -288,7 +288,7 @@ bool OgreFrameListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonI
 
 void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
 {
-  /*CameraSensor *camera;
+  CameraSensor *camera;
 
   if ((camera = CameraManager::Instance()->GetActiveCamera()))
   {
@@ -305,9 +305,9 @@ void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
     float x = (xscale * (e.state.X.abs+xoffset)) / (float)camera->GetImageWidth();
     float y = (yscale * (e.state.Y.abs+yoffset)) / (float)camera->GetImageHeight();
 
-    printf("OFfset[%d %d]\n",xoffset, yoffset);
+ //   printf("OFfset[%d %d]\n",xoffset, yoffset);
 
-    printf("Base[%d %d] XY[%4.2f %4.2f] Mouse[%d %d] Camera[%d %d] Scale[%4.2f %4.2f]\n",e.state.X.abs+xoffset, e.state.Y.abs+yoffset, x,y, e.state.width, e.state.height, camera->GetImageWidth(), camera->GetImageHeight(), xscale, yscale);
+//    printf("Base[%d %d] XY[%4.2f %4.2f] Mouse[%d %d] Camera[%d %d] Scale[%4.2f %4.2f]\n",e.state.X.abs+xoffset, e.state.Y.abs+yoffset, x,y, e.state.width, e.state.height, camera->GetImageWidth(), camera->GetImageHeight(), xscale, yscale);
     Ogre::Ray mouseRay = camera->GetOgreCamera()->getCameraToViewportRay(x, y);
     this->raySceneQuery->setRay(mouseRay);
     this->raySceneQuery->setSortByDistance(true);
@@ -333,7 +333,7 @@ void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
       }
     }
     
-  }*/
+  }
  
   this->leftPressed = true;
 }

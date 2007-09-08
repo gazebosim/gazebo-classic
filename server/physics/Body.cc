@@ -66,6 +66,7 @@ int Body::Load(XMLConfigNode *node)
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern(1,0,0,0)));
 
+
   childNode = node->GetChildByNSPrefix("geom");
 
   // Load the geometries
@@ -225,10 +226,15 @@ Pose3d Body::GetPose() const
 // Set the position of the body
 void Body::SetPosition(const Vector3 &pos)
 {
+
   if (!this->IsStatic())
   {
     // Set the position of the ODE body
     dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
+  }
+  else
+  {
+    this->staticPose.pos = pos;
   }
 
   // Set the position of the scene node
@@ -250,6 +256,10 @@ void Body::SetRotation(const Quatern &rot)
     // Set the rotation of the ODE body
     dBodySetQuaternion(this->bodyId, q);
 
+  }
+  else
+  {
+    this->staticPose.rot = rot;
   }
 
   // Set the orientation of the scene node
@@ -330,6 +340,7 @@ int Body::LoadGeom(XMLConfigNode *node)
   std::string mesh = node->GetString("mesh","",0);
   std::string name = node->GetString("name","",1);
   double mass = node->GetDouble("mass",1.0,1e-5);
+
 
   if (mass <= 0)
   {

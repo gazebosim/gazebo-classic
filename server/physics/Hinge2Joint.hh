@@ -44,46 +44,49 @@ namespace gazebo
 /// \brief A two axis hinge joint
 class Hinge2Joint : public Joint
 {
-  /// @brief Constructor
+  /// \brief Constructor
   public: Hinge2Joint(dWorldID worldId);
 
-  // Destructor
+  /// \brief Destructor
   public: virtual ~Hinge2Joint(); 
+
+  /// \brief Load the joint
+  public: virtual void Load(XMLConfigNode *node);
  
-  /// @brief Set the anchor point
+  /// \brief Set the anchor point
   public: virtual void SetAnchor( const Vector3 &anchor );
 
-  /// @brief Set the first axis of rotation
+  /// \brief Set the first axis of rotation
   public: void SetAxis1( const Vector3 &axis );
 
-  /// @brief Set the second axis of rotation
+  /// \brief Set the second axis of rotation
   public: void SetAxis2( const Vector3 &axis );
 
-  /// @brief Get the specified parameter
+  /// \brief Get the specified parameter
   public: virtual double GetParam( int parameter ) const;
 
-  /// @brief Set _parameter with _value
+  /// \brief Set _parameter with _value
   public: virtual void SetParam( int parameter, double value );
 
-  /// @brief Get anchor point
+  /// \brief Get anchor point
   public: virtual Vector3 GetAnchor() const;
 
-  /// @brief Get anchor point 2
+  /// \brief Get anchor point 2
   public: Vector3 GetAnchor2() const;
 
-  /// @brief Get first axis of rotation
+  /// \brief Get first axis of rotation
   public: Vector3 GetAxis1() const;
 
-  /// @brief Get second axis of rotation
+  /// \brief Get second axis of rotation
   public: Vector3 GetAxis2() const;
 
-  /// @brief Get angle of rotation about first axis
+  /// \brief Get angle of rotation about first axis
   public: double GetAngle1() const;
 
-  /// @brief Get rate of rotation about first axis
+  /// \brief Get rate of rotation about first axis
   public: double GetAngle1Rate() const;
 
-  /// @brief Get rate of rotation about second axis
+  /// \brief Get rate of rotation about second axis
   public: double GetAngle2Rate() const;
 
   public: void SetTorque(double torque1, double torque2);

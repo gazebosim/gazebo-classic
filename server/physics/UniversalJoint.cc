@@ -132,7 +132,7 @@ void UniversalJoint::SetAxis2( const Vector3 &axis )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the parameter to value
-void UniversalJoint::SetParam( int parameter, double value )
+void UniversalJoint::SetParam( int parameter, double value)
 {
   dJointSetUniversalParam( this->jointId, parameter, value );
 }

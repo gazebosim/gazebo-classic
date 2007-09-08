@@ -456,14 +456,12 @@ int Model::LoadJoint(XMLConfigNode *node)
   if (node->GetName() == "hinge")
   {
     HingeJoint *hinge = (HingeJoint*)(joint);
-    hinge->SetAxis(node->GetVector3("axis",Vector3(0,0,1)));
+    hinge->Load(node);
   }
   else if (node->GetName() == "hinge2")
   {
     Hinge2Joint *hinge = (Hinge2Joint*)(joint);
-
-    hinge->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
-    hinge->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
+    hinge->Load(node);
   }
   else if (node->GetName() == "universal")
   {
@@ -490,7 +488,7 @@ int Model::LoadJoint(XMLConfigNode *node)
   // Name the joint
   joint->SetName(node->GetString("name","",1));
 
-  if (this->joints[joint->GetName()] != NULL)
+  if (this->joints.find(joint->GetName()) == this->joints.end())
     gzthrow( "can't have two joint with the same name");
 
   this->joints[joint->GetName()] = joint;

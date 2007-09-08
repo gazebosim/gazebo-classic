@@ -25,7 +25,10 @@
  */
 
 #include "World.hh"
+#include "XMLConfig.hh"
+#include "Global.hh"
 #include "HingeJoint.hh"
+
 
 using namespace gazebo;
 
@@ -35,7 +38,6 @@ HingeJoint::HingeJoint( dWorldID worldId )
   : Joint()
 {
   this->jointId = dJointCreateHinge( worldId, NULL );
-  return;
 }
 
 
@@ -45,6 +47,28 @@ HingeJoint::~HingeJoint()
 {
 }
 
+/// Load a hinge joint
+void HingeJoint::Load(XMLConfigNode *node)
+{
+  Vector3 axis = node->GetVector3("axis",Vector3(0,0,1));
+
+  double loStop = node->GetDouble("lowStop",-DBL_MAX,0);
+  double hiStop = node->GetDouble("highStop",DBL_MAX,0);
+
+  if (loStop != -DBL_MAX)
+  {
+    loStop = DTOR(loStop);
+    this->SetParam(dParamLoStop, loStop);
+  }
+
+  if (hiStop != DBL_MAX)
+  {
+    hiStop = DTOR(hiStop);
+    this->SetParam(dParamHiStop, hiStop);
+  }
+
+  this->SetAxis(axis);
+}
 
 // Get the anchor point 
 //////////////////////////////////////////////////////////////////////////////
@@ -111,7 +135,7 @@ void HingeJoint::SetAxis( const Vector3 &axis )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the _parameter to _value
-void HingeJoint::SetParam( int parameter, double value )
+void HingeJoint::SetParam( int parameter, double value)
 {
   dJointSetHingeParam( this->jointId, parameter, value );
 }

@@ -23,9 +23,9 @@
  * Date: 21 May 2003
  * CVS: $Id$
  */
-
-#include "Joint.hh"
+#include "Global.hh"
 #include "Body.hh"
+#include "Joint.hh"
 
 using namespace gazebo;
 
@@ -51,6 +51,9 @@ Joint::Type Joint::GetType() const
   return this->type;
 }
 
+void Joint::Load(XMLConfigNode *node)
+{
+}
 
 
 //////////////////////////////////////////////////////////////////////////////

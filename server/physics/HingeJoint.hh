@@ -43,37 +43,40 @@ namespace gazebo
 /// \brief A single axis hinge joint
 class HingeJoint : public Joint
 {
-  //!  Constructor
+  ///  Constructor
   public: HingeJoint(dWorldID worldId);
 
-  //! Destructor
+  /// Destructor
   public: virtual ~HingeJoint();
 
-  //! Get the angle of rotation
+  /// Load a hinge joint
+  public: virtual void Load(XMLConfigNode *node);
+
+  /// Get the angle of rotation
   public: double GetAngle() const;
 
-  //! Get the rotation rate
+  /// Get the rotation rate
   public: double GetAngleRate() const;
 
-  //! Get the specified parameter
+  /// Get the specified parameter
   public: virtual double GetParam( int parameter ) const;
 
-  //! Set the anchor point
+  /// Set the anchor point
   public: virtual void SetAnchor(const Vector3 &anchor);
 
-  //! Set the axis of rotation
+  /// Set the axis of rotation
   public: void SetAxis(const Vector3 &axis);
 
-  //! Get the anchor point
+  /// Get the anchor point
   public: virtual Vector3 GetAnchor() const;
 
-  //! Get the axis of rotation
+  /// Get the axis of rotation
   public: Vector3 GetAxis() const;
 
-  //! Set the parameter to value
-  public: virtual void SetParam( int parameter, double value );
+  /// Set the parameter to value
+  public: virtual void SetParam( int parameter, double value);
 
-  //! Set the torque of a joint.
+  /// Set the torque of a joint.
   public: void SetTorque(double torque);
 };
 

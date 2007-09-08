@@ -236,7 +236,7 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild(UpdateParams &/*params*/)
 {
-  if (this->active)
+  //if (this->active)
   {
     std::vector<RayGeom*>::iterator iter;
     Pose3d poseDelta;
