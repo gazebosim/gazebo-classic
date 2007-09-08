@@ -442,7 +442,6 @@ Model *World::GetModelByName(std::string modelName)
 
   for (iter = models.begin(); iter != models.end(); iter++)
   {
-    std::cout << "Name[" << (*iter)->GetName() << "] Modelname[" << modelName << "]\n";
     if ((*iter)->GetName() == modelName)
       return (*iter);
   }
