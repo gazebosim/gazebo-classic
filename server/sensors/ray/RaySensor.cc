@@ -85,13 +85,14 @@ void RaySensor::LoadChild(XMLConfigNode *node)
   this->superSpaceId = dSimpleSpaceCreate( 0 );
     
   // Create a space to contain all the rays
-  //this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
+  this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
   
   // Set collision bits
-  //dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
-  //dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
+  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
+  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
 
-  this->body->spaceId = this->superSpaceId;
+  //this->body->spaceId = this->superSpaceId;
+  this->body->spaceId = this->raySpaceId;
 
 }
 
@@ -236,7 +237,7 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild(UpdateParams &/*params*/)
 {
-  //if (this->active)
+  if (this->active)
   {
     std::vector<RayGeom*>::iterator iter;
     Pose3d poseDelta;
@@ -266,7 +267,8 @@ void RaySensor::UpdateChild(UpdateParams &/*params*/)
     }
 
     // Do collision detection
-    dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
+    //dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
+    dSpaceCollide2( ( dGeomID ) ( this->raySpaceId ),
         ( dGeomID ) ( ode->GetSpaceId() ),
         this, &UpdateCallback );
   }
