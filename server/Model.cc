@@ -243,8 +243,7 @@ int Model::Update(UpdateParams &params)
 // Finalize the model
 int Model::Fini()
 {
-  std::map<std::string, Body* >::iterator bodyIter;
-  std::map<std::string, Iface* >::iterator ifaceIter;
+  std::map<std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
 
   for (contIter = this->controllers.begin(); 
@@ -252,7 +251,12 @@ int Model::Fini()
   {
     contIter->second->Fini();
   }
-
+  
+  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  {
+    biter->second->Fini();
+  }
+ 
   return this->FiniChild();
 }
 
@@ -488,7 +492,7 @@ int Model::LoadJoint(XMLConfigNode *node)
   // Name the joint
   joint->SetName(node->GetString("name","",1));
 
-  if (this->joints.find(joint->GetName()) == this->joints.end())
+  if (this->joints.find(joint->GetName()) != this->joints.end())
     gzthrow( "can't have two joint with the same name");
 
   this->joints[joint->GetName()] = joint;

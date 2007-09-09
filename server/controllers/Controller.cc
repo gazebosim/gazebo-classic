@@ -63,6 +63,8 @@ void Controller::Load(XMLConfigNode *node)
   if (!this->parent)
     gzthrow("Parent entity has not been set");
 
+  this->name = node->GetString("name","",1);
+
   this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
 
   childNode = node->GetChildByNSPrefix("interface");
@@ -122,7 +124,15 @@ void Controller::Fini()
   {
     delete *iter;
   }
+
   this->ifaces.clear();
 
   this->FiniChild();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the name of the controller
+std::string Controller::GetName() const
+{
+  return this->name;
 }

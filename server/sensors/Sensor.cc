@@ -80,6 +80,8 @@ void Sensor::Update(UpdateParams &params)
 /// Finalize the sensor
 void Sensor::Fini()
 {
+  if (this->controller)
+    this->controller->Fini();
   this->FiniChild();
 }
 

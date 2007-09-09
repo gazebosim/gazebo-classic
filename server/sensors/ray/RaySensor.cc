@@ -237,7 +237,7 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild(UpdateParams &/*params*/)
 {
-  if (this->active)
+//  if (this->active)
   {
     std::vector<RayGeom*>::iterator iter;
     Pose3d poseDelta;
@@ -267,8 +267,7 @@ void RaySensor::UpdateChild(UpdateParams &/*params*/)
     }
 
     // Do collision detection
-    //dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
-    dSpaceCollide2( ( dGeomID ) ( this->raySpaceId ),
+    dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
         ( dGeomID ) ( ode->GetSpaceId() ),
         this, &UpdateCallback );
   }

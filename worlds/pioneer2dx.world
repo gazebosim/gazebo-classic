@@ -94,6 +94,15 @@
       <interface:position name="position_iface_0"/>
     </controller:pioneer2dx_position2d>
 
+  <model:physical name="laser">
+    <xyz>0 0 1.0</xyz>
+    <!-- Embedded laser model -->
+    <include embedded="true">
+      <xi:include href="laser.model" />
+    </include>
+  </model:physical>
+
+
     <!-- 
     The include should be last within a model. All previous statements
     will override those in the included file 

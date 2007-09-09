@@ -28,58 +28,61 @@ namespace gazebo
 /// Body class
 class Body : public Entity
 {
-  /// Constructor
+  /// \brief Constructor
   public: Body(Entity *parent, dWorldID worldId);
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~Body();
 
-  /// Load the body based on an XMLConfig node
+  /// \brief Load the body based on an XMLConfig node
   /// \param node XMLConfigNode pointer
   /// \return Nonzero on error
   public: virtual int Load(XMLConfigNode *node);
 
-  /// Initialize the body
+  /// \brief Initialize the body
   /// \return Non-zero on error
   public: virtual int Init();
 
-  /// Update the body
+  /// \brief Finalize the body
+  public: void Fini();
+
+  /// \brief Update the body
   /// \return Non-zero on error
   public: virtual int Update(UpdateParams &params);
 
-  /// Attach a geom to this body
+  /// \brief Attach a geom to this body
   /// \param geom Geometery to attach to this body
   public: void AttachGeom( Geom *geom );
 
-  /// Set the pose of the body
+  /// \brief Set the pose of the body
   /// \param pose New pose of the body
   public: void SetPose(const Pose3d &pose);
 
-  /// Return the pose of the body
+  /// \brief Return the pose of the body
   /// \return Pose of the body
   public: Pose3d GetPose() const;
 
-  /// Set the position of the body
+  /// \brief Set the position of the body
   /// \param pos Vector position
   public: void SetPosition(const Vector3 &pos);
 
-  /// Set the rotation of the body
+  /// \brief Set the rotation of the body
   /// \param rot Quaternion rotation
   public: void SetRotation(const Quatern &rot);
 
-  /// Return the position of the body
+  /// \brief Return the position of the body
   /// \return Position vector
   public: Vector3 GetPosition() const;
 
-  /// Return the rotation
+  /// \brief Return the rotation
   /// \return Rotation quaternion
   public: Quatern GetRotation() const;
 
-  /// Return the ID of this body
+  /// \brief Return the ID of this body
   /// \return ODE body id
   public: dBodyID GetId() const;
 
-  // Set whether this body is enabled
+  /// \brief Set whether this body is enabled
   public: void SetEnabled(bool enable) const;
 
   /// \brief Update the center of mass

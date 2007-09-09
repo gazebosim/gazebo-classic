@@ -648,6 +648,7 @@ class LaserIface : public Iface
 
   public: virtual void Close()
           {
+            printf("Laser Close\n\n");
             this->data->opened = false;
             Iface::Close();
           }

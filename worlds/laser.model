@@ -48,8 +48,8 @@
       <maxRange>8</maxRange>
 
       <controller:sicklms200_laser name="laser_controller_1">
-        <interface:laser name="sicklms_laser_iface_1"/>
-        <interface:fiducial name="sicklms_fid_iface_1"/>
+        <interface:laser name="laser_iface_0"/>
+        <!--        <interface:fiducial name="sicklms_fid_iface_1"/>-->
       </controller:sicklms200_laser>
     </sensor:ray>
 

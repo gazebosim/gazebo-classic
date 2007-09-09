@@ -96,6 +96,18 @@ int Body::Load(XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Finalize the body
+void Body::Fini()
+{
+  std::vector< Sensor* >::iterator siter;
+
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  {
+    (*siter)->Fini();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Set whether gravity affects this body
 void Body::SetGravityMode(bool mode)
 {
@@ -160,7 +172,7 @@ void Body::AttachGeom( Geom *geom )
     {
       if (geom->GetTransId())
         dGeomSetBody(geom->GetTransId(), this->bodyId);
-      else
+      else if (geom->GetGeomId())
         dGeomSetBody(geom->GetGeomId(), this->bodyId);
     }
   }
@@ -178,6 +190,9 @@ void Body::SetPose(const Pose3d &pose)
     PlaneGeom *plane = NULL;
     this->staticPose = pose;
 
+    this->SetPosition(this->staticPose.pos);
+    this->SetRotation(this->staticPose.rot);
+
     // Hack to fix the altitude of the ODE plane
     for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
     {
@@ -186,10 +201,9 @@ void Body::SetPose(const Pose3d &pose)
         plane = dynamic_cast<PlaneGeom*>(*giter);
         plane->SetAltitude(pose.pos.z);
       }
+      else
+        (*giter)->SetPose(this->staticPose);
     }
-
-    this->SetPosition(this->staticPose.pos);
-    this->SetRotation(this->staticPose.rot);
   }
   else
   {
@@ -471,12 +485,21 @@ void Body::UpdateCoM()
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
     mass = (*giter)->GetBodyMassMatrix();
-    if ((*giter)->IsPlaceable())
+    if ((*giter)->IsPlaceable() && (*giter)->GetGeomId())
       dMassAdd( &this->mass, mass );
   }
 
   // Old pose for the CoM
   oldPose = this->comPose;
+
+  if (isnan(this->mass.c[0]))
+    this->mass.c[0] = 0;
+
+  if (isnan(this->mass.c[1]))
+    this->mass.c[1] = 0;
+
+  if (isnan(this->mass.c[2]))
+    this->mass.c[2] = 0;
 
   // New pose for the CoM
   newPose.pos.x = this->mass.c[0];
@@ -484,7 +507,6 @@ void Body::UpdateCoM()
   newPose.pos.z = this->mass.c[2];
 
   // Fixup the poses of the geoms (they are attached to the CoM)
-  //for (i = 0; i < this->geomCount; i++)
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
     if ((*giter)->IsPlaceable())
@@ -507,9 +529,10 @@ void Body::UpdateCoM()
 
   // My Cheap Hack
   this->mass.c[0] = this->mass.c[1] = this->mass.c[2] = 0;
-
+  
   // Set the mass matrix
-  dBodySetMass( this->bodyId, &this->mass );
+  if (this->mass.mass > 0)
+    dBodySetMass( this->bodyId, &this->mass );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

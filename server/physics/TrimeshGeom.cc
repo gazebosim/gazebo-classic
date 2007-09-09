@@ -36,6 +36,7 @@ using namespace gazebo;
 // Constructor
 TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const std::string &meshName, const Vector3 &scale ) : Geom(body,name)
 {
+
   Ogre::SubMesh* subMesh;
   Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().load(meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
@@ -55,7 +56,8 @@ TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const
   int iindex = 0;
 
   // Count the number of vertices and indices
-  for (i=0; i<mesh->getNumSubMeshes(); i++)
+ // for (i=0; i<mesh->getNumSubMeshes(); i++)
+  for (i=0; i<1; i++)
   {
     subMesh = mesh->getSubMesh(i);
     numVertices += subMesh->vertexData->vertexCount;   
@@ -68,7 +70,8 @@ TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const
 
  
   // Copy the vertex and index data from OGRE
-  for (i = 0; i < mesh->getNumSubMeshes(); i++)
+  //for (i = 0; i < mesh->getNumSubMeshes(); i++)
+  for (i = 0; i < 1; i++)
   {
     subMesh = mesh->getSubMesh(i);
 
@@ -118,13 +121,13 @@ TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const
     }
   }
 
-  printf("Trimesh attaching\n");
   this->AttachMesh(meshName);
+
   this->ScaleMesh(Vector3(scale.x, scale.y, scale.z));
 
   // Allow the sphere to cast shadows
   this->SetCastShadows(true);
-
+  
   /// This will hold the vertex data of the triangle mesh
   this->odeData = dGeomTriMeshDataCreate();
 

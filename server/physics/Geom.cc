@@ -52,8 +52,6 @@ Geom::~Geom()
 // Set the encapsulated geometry object
 void Geom::SetGeom(dGeomID geomId, bool placeable)
 {
-  //assert(!this->geomId);
-
   this->placeable = placeable;
 
   this->geomId = geomId;
@@ -104,7 +102,10 @@ dGeomID Geom::GetTransId() const
 /// Get the ODE geom class
 int Geom::GetGeomClass() const
 {
-  return dGeomGetClass(this->geomId);
+  if (this->geomId)
+    return dGeomGetClass(this->geomId);
+  else
+    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +119,8 @@ bool Geom::IsPlaceable() const
 // Set the pose relative to the body
 void Geom::SetPose(const Pose3d &pose, bool updateCoM)
 {
-  if (this->placeable)
+
+  if (this->placeable && this->geomId)
   {
     Pose3d localPose;
     dQuaternion q;
@@ -126,28 +128,26 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     // Transform into CoM relative Pose
     localPose = pose - this->body->GetCoMPose();
 
-    OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, localPose);
-
-//    localPose.rot = localPose.rot * this->extraRotation;
-
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
+
+    if (!this->IsStatic())
+      OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, localPose);
 
     // Set the pose of the encapsulated geom; this is always relative
     // to the CoM
     dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
     dGeomSetQuaternion(this->geomId, q); 
 
-    //dMassTranslate(&this->mass, pose.pos.x, pose.pos.y, pose.pos.z);
-    //dMassRotate(&this->mass, dGeomGetRotation(this->geomId));
-
     if (updateCoM)
     {
       this->body->UpdateCoM();
     }
+
   }
+  
 
 }
 
@@ -157,8 +157,7 @@ Pose3d Geom::GetPose() const
 {
   Pose3d pose;
 
-  //if (this->geomId && this->placeable)
-  if (this->placeable)
+  if (this->placeable && this->geomId)
   {
     const dReal *p;
     dQuaternion r;
@@ -315,28 +314,28 @@ const dMass *Geom::GetBodyMassMatrix()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Set the laser fiducial integer id
+/// Set the laser fiducial integer id
 void Geom::SetLaserFiducialId(int id)
 {
   this->laserFiducialId = id;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Get the laser fiducial integer id
+/// Get the laser fiducial integer id
 int Geom::GetLaserFiducialId() const
 {
   return this->laserFiducialId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Set the laser retro reflectiveness 
+/// Set the laser retro reflectiveness 
 void Geom::SetLaserRetro(float retro)
 {
   this->laserRetro = retro;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Get the laser retro reflectiveness 
+/// Get the laser retro reflectiveness 
 float Geom::GetLaserRetro() const
 {
   return this->laserRetro;

@@ -60,7 +60,9 @@ Entity::~Entity()
 {
   if (this->parent)
   {
-    this->parent->sceneNode->removeAndDestroyChild(this->sceneNode->getName());
+/*    this->parent->sceneNode->removeAndDestroyChild(this->sceneNode->getName());
+    this->parent = NULL;
+    */
   }
   else
   {
@@ -68,6 +70,7 @@ Entity::~Entity()
   }
 
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
+
 }
 
 int Entity::GetId() const

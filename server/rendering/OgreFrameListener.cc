@@ -321,8 +321,6 @@ void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
     {
       if (iter->movable && iter->movable->getName().substr(0,5) == "Geom_")
       {
-        std::cout << "Name[" << iter->movable->getName() << "]\n";
-
         if (this->selectedObject)
           this->selectedObject->showBoundingBox(false);
 
