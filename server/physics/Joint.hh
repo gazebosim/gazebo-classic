@@ -53,7 +53,10 @@ namespace gazebo
     public: virtual ~Joint();
 
     /// \brief Load a joint
-    public: virtual void Load(XMLConfigNode *node);
+    public: void Load(XMLConfigNode *node);
+
+    /// \brief Load child joint
+    protected: virtual void LoadChild(XMLConfigNode *node) {};
 
     /// \brief Get the type of the joint
     public: Joint::Type GetType() const;

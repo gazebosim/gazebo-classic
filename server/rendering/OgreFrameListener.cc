@@ -85,9 +85,7 @@ OgreFrameListener::OgreFrameListener()
   unsigned int width, height, depth;
   int top, left;
   OgreAdaptor::Instance()->window->getMetrics(width, height, depth, left, top);
-  const OIS::MouseState &mouseState = this->mMouse->getMouseState();
-  mouseState.width = width;
-  mouseState.height = height;
+  this->SetWindowExtents(width, height);
 
   this->directionVec[0] = 0;
   this->directionVec[1] = 0;
@@ -120,7 +118,6 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
   this->mKeyboard->capture();
   this->mMouse->capture();
 
-
   return true;
 }
 
@@ -134,6 +131,7 @@ bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/)
 
 bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
 {
+  printf("Key Pressed\n");
   switch (e.key)
   {
     case OIS::KC_H:
@@ -204,6 +202,8 @@ bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
 
 bool OgreFrameListener::keyReleased( const OIS::KeyEvent &e )
 {
+  printf("Key released\n");
+
   switch (e.key)
   {
     case OIS::KC_UP:
@@ -357,7 +357,7 @@ bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & /*e*/, OIS::MouseB
   return true;
 }
 
-void OgreFrameListener::Resize(unsigned int w, unsigned int h)
+void OgreFrameListener::SetWindowExtents(unsigned int w, unsigned int h)
 {
   const OIS::MouseState &mouseState = this->mMouse->getMouseState();
   mouseState.width = w;

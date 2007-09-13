@@ -47,8 +47,9 @@ HingeJoint::~HingeJoint()
 {
 }
 
+//////////////////////////////////////////////////////////////////////////////
 /// Load a hinge joint
-void HingeJoint::Load(XMLConfigNode *node)
+void HingeJoint::LoadChild(XMLConfigNode *node)
 {
   Vector3 axis = node->GetVector3("axis",Vector3(0,0,1));
 

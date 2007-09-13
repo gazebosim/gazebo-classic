@@ -34,10 +34,30 @@ namespace gazebo
 {
 
 /// \addtogroup gazebo_physics_joints
-/// \brief A ball joint
 /// \{
-/// \defgroup gazebo_ball_joint Ball Joint
-/// \brief A ball joint
+/** \defgroup gazebo_ball_joint Ball Joint
+
+  \brief A ball joint
+
+  \par Attributes
+  - body1 (string)
+    - Name of the first body to attach to the joint
+  - body2 (string)
+    - Name of the second body to attach to the joint
+  - anchor (string)
+    - Name of the body which will act as the anchor to the joint
+
+  \par Example
+  \verbatim
+  <joint:ball name="ball_joint>
+    <body1>body1_name</body1>
+    <body2>body2_name</body2>
+    <anchor>anchor_body</anchor>
+  </joint:ball>
+  \endverbatim
+*/
+/// \}
+/// \addtogroup gazebo_ball_joint
 /// \{
 
 /// \brief A ball joint
@@ -49,6 +69,9 @@ class BallJoint : public Joint
   /// \brief Destructor
   public: virtual ~BallJoint();
 
+  /// \brief Load the joint
+  protected: void LoadChild(XMLConfigNode *node);
+
   /// \brief Get joint's anchor point
   public: Vector3 GetAnchor() const;
 
@@ -57,7 +80,6 @@ class BallJoint : public Joint
 
 };
 
-/// \}
 /// \}
 }
 

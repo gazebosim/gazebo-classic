@@ -24,6 +24,7 @@
  * CVS: $Id$
  */
 
+#include "XMLConfig.hh"
 #include "SliderJoint.hh"
 
 using namespace gazebo;
@@ -43,6 +44,16 @@ SliderJoint::~SliderJoint()
 {
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/// Load the joint
+void SliderJoint::LoadChild(XMLConfigNode *node)
+{
+  double lowStop = node->GetDouble("lowStop",0,0);
+  double hiStop = node->GetDouble("hiStop",0,0);
+
+  this->SetParam(dParamLoStop, lowStop);
+  this->SetParam(dParamHiStop, hiStop);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation

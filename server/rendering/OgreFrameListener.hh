@@ -38,7 +38,7 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
   public: bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
-  public: void Resize(unsigned int w, unsigned int h);
+  public: void SetWindowExtents(unsigned int w, unsigned int h);
 
   private: void LeftMousePressed(const OIS::MouseEvent &e);
 

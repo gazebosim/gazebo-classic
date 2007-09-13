@@ -32,59 +32,106 @@
 namespace gazebo
 {
 /// \addtogroup gazebo_physics_joints
-/// \brief A universal joint
 /// \{
+/** \defgroup gazebo_universal_joint Universal Joint
+ 
+  \brief A universal joint
+
+  \par Attributes
+  - body1 (string)
+    - Name of the first body to attach to the joint
+  - body2 (string)
+    - Name of the second body to attach to the joint
+  - anchor (string)
+    - Name of the body which will act as the anchor to the joint
+  - axis1 (float, tuple)
+    - Defines the axis of rotation for the first degree of freedom
+    - Default: 0 0 1
+  - axis2 (float, tuple)
+    - Defines the axis of rotation for the second degree of freedom
+    - Default: 0 0 1
+  - lowStop1 (float, degrees)
+    - The low stop angle for the first degree of freedom
+    - Default: infinity
+  - highStop1 (float, degrees)
+    - The high stop angle for the first degree of freedom
+    - Default: infinity
+  - lowStop2 (float, degrees)
+    - The low stop angle for the second degree of freedom
+    - Default: infinity
+  - highStop2 (float, degrees)
+    - The high stop angle for the second degree of freedom
+    - Default: infinity
+
+  \par Example
+  \verbatim
+  <joint:universal name="universal_joint>
+    <body1>body1_name</body1>
+    <body2>body2_name</body2>
+    <anchor>anchor_body</anchor>
+    <axis1>0 0 1</axis1>
+    <axis2>0 1 0</axis2>
+    <lowStop1>0</lowStop1>
+    <highStop1>30</highStop1>
+    <lowStop2>0</lowStop2>
+    <highStop2>30</highStop2>
+  </joint:universal>
+  \endverbatim
+*/
+/// \}
+
 /// \defgroup gazebo_universal_joint Universal Joint
 /// \{
-
 
 /// \brief A universal joint
 class UniversalJoint : public Joint
 {
-  /// @brief Constructor
+  /// \brief Constructor
   public: UniversalJoint(dWorldID worldId);
 
-  // Destuctor
+  /// \brief Destuctor
   public: virtual ~UniversalJoint();
 
-  // Get the anchor point
+  /// \brief Load the joint
+  protected: virtual void LoadChild(XMLConfigNode *node);
+
+  /// \brief Get the anchor point
   public: virtual Vector3 GetAnchor() const;
 
-  // Get the first axis of rotation
+  /// \brief Get the first axis of rotation
   public: Vector3 GetAxis1() const;
 
-  // Get the second axis of rotation
+  /// \brief Get the second axis of rotation
   public: Vector3 GetAxis2() const;
 
-  // Get the angle of axis 1
+  /// \brief Get the angle of axis 1
   public: double GetAngle1() const;
 
-  // Get the angle of axis 2
+  /// \brief Get the angle of axis 2
   public: double GetAngle2() const;
 
-  // Get the angular rate of axis 1
+  /// \brief Get the angular rate of axis 1
   public: double GetAngleRate1() const;
 
-  // Get the angular rate of axis 2
+  /// \brief Get the angular rate of axis 2
   public: double GetAngleRate2() const;
 
-  // Set the anchor point
+  /// \brief Set the anchor point
   public: virtual void SetAnchor( const Vector3 &anchor );
 
-  // Set the first axis of rotation
+  /// \brief Set the first axis of rotation
   public: void SetAxis1( const Vector3 &axis );
 
-  // Set the second axis of rotation
+  /// \brief Set the second axis of rotation
   public: void SetAxis2( const Vector3 &axis );
 
-  // Set the parameter to value
+  /// \brief Set the parameter to value
   public: virtual void SetParam( int parameter, double value );
 
-  // Set the torque of a joint.
+  /// \brief Set the torque of a joint.
   public: virtual void SetTorque(double torque1, double torque2);
 };
 
-/// \}
 /// \}
 }
 #endif

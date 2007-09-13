@@ -51,8 +51,18 @@ Joint::Type Joint::GetType() const
   return this->type;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Load a joint
 void Joint::Load(XMLConfigNode *node)
 {
+  // Name the joint
+  this->SetName(node->GetString("name","",1));
+
+  this->LoadChild(node);
+
+  // Set joint parameters
+  this->SetParam(dParamSuspensionERP, node->GetDouble("erp",0.4,0));
+  this->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.8,0));
 }
 
 

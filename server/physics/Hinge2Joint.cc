@@ -47,13 +47,13 @@ Hinge2Joint::~Hinge2Joint()
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Load the joint
-void Hinge2Joint::Load(XMLConfigNode *node)
+void Hinge2Joint::LoadChild(XMLConfigNode *node)
 {
   this->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
   this->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
 
-  double loStop1 = node->GetDouble("lowStop",-DBL_MAX,0);
-  double hiStop1 = node->GetDouble("highStop",DBL_MAX,0);
+  double loStop1 = node->GetDouble("lowStop1",-DBL_MAX,0);
+  double hiStop1 = node->GetDouble("highStop1",DBL_MAX,0);
 
   double loStop2 = node->GetDouble("lowStop2",-DBL_MAX,0);
   double hiStop2 = node->GetDouble("highStop2",DBL_MAX,0);
@@ -81,7 +81,6 @@ void Hinge2Joint::Load(XMLConfigNode *node)
     hiStop2 = DTOR(hiStop2);
     this->SetParam(dParamHiStop2, hiStop2);
   }
-
 
 }
  

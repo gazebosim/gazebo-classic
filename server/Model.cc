@@ -456,41 +456,8 @@ int Model::LoadJoint(XMLConfigNode *node)
     this->bodies.erase(node->GetString("anchor","",0));
   }
 
-  // Set the axis of the hing joint
-  if (node->GetName() == "hinge")
-  {
-    HingeJoint *hinge = (HingeJoint*)(joint);
-    hinge->Load(node);
-  }
-  else if (node->GetName() == "hinge2")
-  {
-    Hinge2Joint *hinge = (Hinge2Joint*)(joint);
-    hinge->Load(node);
-  }
-  else if (node->GetName() == "universal")
-  {
-    UniversalJoint *uni = (UniversalJoint*)(joint);
-
-    uni->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
-    uni->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
-  }
-  else if (node->GetName() == "slider")
-  {
-    SliderJoint *slider = (SliderJoint*)(joint);
-
-    double lowStop = node->GetDouble("lowStop",0,0);
-    double hiStop = node->GetDouble("hiStop",0,0);
-
-    slider->SetParam(dParamLoStop, lowStop);
-    slider->SetParam(dParamHiStop, hiStop);
-  }
-
-  // Set joint parameters
-  joint->SetParam(dParamSuspensionERP, node->GetDouble("erp",0.4,0));
-  joint->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.8,0));
-
-  // Name the joint
-  joint->SetName(node->GetString("name","",1));
+  // Load each joint
+  joint->Load(node);
 
   if (this->joints.find(joint->GetName()) != this->joints.end())
     gzthrow( "can't have two joint with the same name");

@@ -4,6 +4,7 @@
 
 #include "GuiFactory.hh"
 #include "OgreAdaptor.hh"
+#include "GazeboMessage.hh"
 #include "FLTKGui.hh"
 
 using namespace gazebo;
@@ -83,7 +84,7 @@ void FLTKGui::OpenDisplay()
 
   this->visual = glXChooseVisual(this->display, DefaultScreen(this->display), attrList);
   if (!this->visual)
-    printf("Error choosing visual\n");
+    gzmsg(0) << "Error choosing visual\n";
 
   this->colormap = XCreateColormap(this->display, RootWindow(this->display, this->visual->screen),
       this->visual->visual, AllocNone);

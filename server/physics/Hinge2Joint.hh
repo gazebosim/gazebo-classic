@@ -34,12 +34,55 @@ namespace gazebo
 {
 
 /// \addtogroup gazebo_physics_joints
-/// \brief A two-axis hinge joint. See the ODE documentation
 /// \{
-/// \defgroup gazebo_hinge2_joint Hinge 2 Joint
-/// \brief A two-axis hinge joint. See the ODE documentation
-/// \{
+/** \defgroup gazebo_hinge2_joint Hinge 2 Joint
+ 
+  \brief A two-axis hinge joint.
 
+  \par Attributes
+  - body1 (string)
+    - Name of the first body to attach to the joint
+  - body2 (string)
+    - Name of the second body to attach to the joint
+  - anchor (string)
+    - Name of the body which will act as the anchor to the joint
+  - axis1 (float, tuple)
+    - Defines the axis of rotation for the first degree of freedom
+    - Default: 0 0 1
+  - axis2 (float, tuple)
+    - Defines the axis of rotation for the second degree of freedom
+    - Default: 0 0 1
+  - lowStop1 (float, degrees)
+    - The low stop angle for the first degree of freedom
+    - Default: infinity
+  - highStop1 (float, degrees)
+    - The high stop angle for the first degree of freedom
+    - Default: infinity
+  - lowStop2 (float, degrees)
+    - The low stop angle for the second degree of freedom
+    - Default: infinity
+  - highStop2 (float, degrees)
+    - The high stop angle for the second degree of freedom
+    - Default: infinity
+
+  \par Example
+  \verbatim
+  <joint:hinge2 name="hinge2_joint>
+    <body1>body1_name</body1>
+    <body2>body2_name</body2>
+    <anchor>anchor_body</anchor>
+    <axis1>0 0 1</axis1>
+    <axis2>0 1 0</axis2>
+    <lowStop1>0</lowStop1>
+    <highStop1>30</highStop1>
+    <lowStop2>0</lowStop2>
+    <highStop2>30</highStop2>
+  </joint:hinge2>
+  \endverbatim
+*/
+/// \}
+/// \addtogroup gazebo_hinge2_joint
+/// \{
 
 /// \brief A two axis hinge joint
 class Hinge2Joint : public Joint
@@ -51,7 +94,7 @@ class Hinge2Joint : public Joint
   public: virtual ~Hinge2Joint(); 
 
   /// \brief Load the joint
-  public: virtual void Load(XMLConfigNode *node);
+  protected: virtual void LoadChild(XMLConfigNode *node);
  
   /// \brief Set the anchor point
   public: virtual void SetAnchor( const Vector3 &anchor );
@@ -92,7 +135,6 @@ class Hinge2Joint : public Joint
   public: void SetTorque(double torque1, double torque2);
 };
 
-/// \}
 /// \}
 }
 #endif
