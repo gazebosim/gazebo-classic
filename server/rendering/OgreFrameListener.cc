@@ -65,7 +65,7 @@ OgreFrameListener::OgreFrameListener()
   pl.insert(std::make_pair(std::string("x11_mouse_hide"), 
                            std::string("false")));
   pl.insert(std::make_pair(std::string("x11_keyboard_grab"), 
-                           std::string("false")));
+                           std::string("true")));
   pl.insert(std::make_pair(std::string("XAutoRepeatOn"), 
                            std::string("true")));
 
@@ -150,7 +150,6 @@ bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
       break;
 
     case OIS::KC_ESCAPE:
-      printf("ESCAPE\n");
       Global::userQuit = true;
       break;
 
