@@ -44,25 +44,25 @@ void FLTKGui::Init()
   Fl_Window::show();
 }
 
-void UpdateCallback(void *data)
+/*void UpdateCallback(void *data)
 {
   FLTKGui *gui = (FLTKGui*)(data);
 
   gui->draw();
   MainCallback();
 
-  Fl::repeat_timeout(0.03, UpdateCallback, gui);
-}
-
-
+  Fl::repeat_timeout(0.05, UpdateCallback, gui);
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update
-void FLTKGui::Run()
+void FLTKGui::Update()
 {
-  Fl::add_timeout(0.03, UpdateCallback, this);
-  Fl::run();
-  Global::userQuit = true;
+  //Fl::add_timeout(0.05, UpdateCallback, this);
+  //Fl::run();
+  //Global::userQuit = true;
+  
+  this->draw();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ void FLTKGui::resize(int x, int y, int w, int h)
 // Handle events
 int FLTKGui::handle(int event)
 {
-  InputEvent gzevent;
+  /*InputEvent gzevent;
 
   // Get the mouse position
   gzevent.SetMousePos( Vector2<int>( Fl::event_x(), Fl::event_y() ) );
@@ -166,6 +166,7 @@ int FLTKGui::handle(int event)
 
   InputHandler::Instance()->HandleEvent(&gzevent);
 
+  */
   return 0;
 }
 

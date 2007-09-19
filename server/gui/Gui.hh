@@ -21,7 +21,7 @@
 /* Desc: GUI base class
  * Author: Nate Koenig
  * Date: 17 Sep 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef GUI_HH
@@ -47,8 +47,8 @@ namespace gazebo
     /// \brief Initalize the gui
     public: virtual void Init() = 0;
 
-    /// \brief Run the gui
-    public: virtual void Run() = 0;
+    /// \brief Update the gui
+    public: virtual void Update() = 0;
 
     /// \brief Get the width of the gui's rendering window
     public: virtual unsigned int GetWidth() const = 0;

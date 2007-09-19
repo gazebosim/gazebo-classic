@@ -343,7 +343,9 @@ void MainCallback()
   simTime = gazebo::World::Instance()->GetSimTime();
   pauseTime = gazebo::World::Instance()->GetPauseTime();
 
-
+  // Run the sim
+  if (gazebo::Global::gui)
+    gazebo::Global::gui->Update();
 }
 
 
@@ -368,12 +370,8 @@ int main(int argc, char **argv)
 
   try
   {
-    // Run the sim
-    if (gazebo::Global::gui)
-        gazebo::Global::gui->Run();
-    else
-      while (!gazebo::Global::userQuit)
-        MainCallback();
+    while (!gazebo::Global::userQuit)
+      MainCallback();
   }
   catch (gazebo::GazeboError e)
   {
