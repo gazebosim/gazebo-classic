@@ -21,7 +21,7 @@
 /* Desc: A slider or primastic joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: SliderJoint.hh,v 1.1.2.1 2006/12/16 22:41:16 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef SLIDERJOINT_HH

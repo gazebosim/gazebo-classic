@@ -6,14 +6,15 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 #include <FL/Enumerations.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Gl_Window.H>
 
 #include "Gui.hh"
+#include "InputEvent.hh"
 #include "Vector3.hh"
 
 namespace gazebo
 {
-  class FLTKGui : public Gui, public Fl_Window
+  class FLTKGui : public Gui, public Fl_Gl_Window
   {
     public: FLTKGui( int x, int y, int w, int h, const std::string &label );
     public: virtual ~FLTKGui();
@@ -22,7 +23,9 @@ namespace gazebo
     public: virtual void Init();
 
     /// \brief Update the gui
-    public: virtual void Update();
+    public: virtual void Run();
+
+    private: void Update();
 
     /// \brief Get the width of the gui's rendering window
     public: virtual unsigned int GetWidth() const;
@@ -35,12 +38,6 @@ namespace gazebo
 
     public: void resize(int x, int y, int w, int h);
     public: int handle(int event);
-
-    private: int HandlePush();
-    private: int HandleDrag();
-    private: int HandleKeyboard();
-
-    private: void OpenDisplay();
 
     private: Vector3 translateVec;
     private: float translateScale;

@@ -157,8 +157,11 @@ namespace gazebo
     /// \brief Get a position
     public: Vector3 GetVector3( std::string key, Vector3 def );
   
-    /// \brief Get a two dimensional vector
-    public: Vector2 GetVector2( std::string key, Vector2 def );
+    /// \brief Get a two dimensional double vector
+    public: Vector2<double> GetVector2d( std::string key, Vector2<double> def );
+
+    /// \brief Get a two dimensional int vector
+    public: Vector2<int> GetVector2i( std::string key, Vector2<int> def );
   
     /// \brief Get a rotation
     public: Quatern GetRotation( std::string key, Quatern def );

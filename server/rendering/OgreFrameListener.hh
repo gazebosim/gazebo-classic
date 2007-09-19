@@ -4,7 +4,6 @@
 #include <OgreFrameListener.h>
 //#include <OgreEventListeners.h>
 #include <Ogre.h>
-#include <OIS/OIS.h>
 
 
 namespace Ogre
@@ -20,7 +19,7 @@ namespace gazebo
 
 class OgreAdaptor;
 
-class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener
+class OgreFrameListener : public Ogre::FrameListener 
 {
   public: OgreFrameListener();
   public: virtual ~OgreFrameListener();
@@ -28,21 +27,7 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   public: virtual bool frameStarted( const Ogre::FrameEvent &evt);
   public: virtual bool frameEnded( const Ogre::FrameEvent &evt);
 
-  public: virtual bool keyPressed( const OIS::KeyEvent &e );
-  public: virtual bool keyReleased( const OIS::KeyEvent &e );
-
-  // Mouse Events
-  public: bool mouseMoved(const OIS::MouseEvent &e);
-
-  // MouseListener
-  public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-  public: bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-
-  public: void SetWindowExtents(unsigned int w, unsigned int h);
-
-  private: void LeftMousePressed(const OIS::MouseEvent &e);
-
-  private: Ogre::Vector3 directionVec;
+  /*private: Ogre::Vector3 directionVec;
 
   private: float moveAmount;
   private: float moveScale;
@@ -61,6 +46,7 @@ class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventLi
   private: Ogre::RaySceneQuery *raySceneQuery;
 
   private: Ogre::SceneNode *selectedObject;
+  */
 };
 
 }

@@ -21,7 +21,7 @@
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id: Camera.cc 46 2007-06-10 00:12:44Z natepak $
+ * CVS: $Id$
  */
 
 #include <sstream>

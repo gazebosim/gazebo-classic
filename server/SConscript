@@ -18,8 +18,9 @@ sources = ['main.cc',
            'GazeboError.cc',
            'UpdateParams.cc',
            'GazeboMessage.cc',
-           'Vector2.cc',
-           'Model.cc']
+           'Model.cc',
+           'InputEvent.cc',
+           'InputHandler.cc']
 
 headers.append( 
           ['#/server/Global.hh',
@@ -33,8 +34,9 @@ headers.append(
            '#/server/GazeboError.hh',
            '#/server/UpdateParams.hh',
            '#/server/GazeboMessage.hh',
-           '#/server/Vector2.hh',
-           '#/server/Model.hh'] )
+           '#/server/Model.hh',
+           '#/server/InputEvent.hh',
+           '#/server/InputHandler.hh'] )
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

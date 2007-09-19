@@ -21,7 +21,7 @@
 /* Desc: Dynamic line generator
  * Author: Nate Koenig
  * Date: 28 June 2007
- * CVS: $Id: OgreAdaptor.hh,v 1.1.2.1 2006/12/16 22:41:17 natepak Exp $
+ * CVS: $Id$
  */
 
 #include <Ogre.h>

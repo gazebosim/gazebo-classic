@@ -21,7 +21,7 @@
 /* Desc: Plane geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: PlaneGeom.hh,v 1.1.2.1 2006/12/16 22:41:16 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef PLANEGEOM_HH
@@ -52,8 +52,8 @@ namespace gazebo
     /// \param spaceId Collision space to which we belong.
     /// \param normal Normal vector to plane (global cs).
     public: PlaneGeom(Body *body, const std::string &name, Vector3 normal,
-                const Vector2 &size, const Vector2 &segments, 
-                const Vector2 &uvTile, double altitude = 0);
+                const Vector2<double> &size, const Vector2<double> &segments, 
+                const Vector2<double> &uvTile, double altitude = 0);
   
     /// \brief Destructor
     public: virtual ~PlaneGeom();

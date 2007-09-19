@@ -645,10 +645,10 @@ Vector3 XMLConfigNode::GetVector3( std::string key, Vector3 def )
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Get a two dimensional vector
-Vector2 XMLConfigNode::GetVector2( std::string key, Vector2 def )
+// Get a two dimensional double vector
+Vector2<double> XMLConfigNode::GetVector2d( std::string key, Vector2<double> def )
 {
-  Vector2 v;
+  Vector2<double> v;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;
@@ -658,6 +658,22 @@ Vector2 XMLConfigNode::GetVector2( std::string key, Vector2 def )
 
   return v;
 }
+
+////////////////////////////////////////////////////////////////////////////
+// Get a two dimensional int vector
+Vector2<int> XMLConfigNode::GetVector2i( std::string key, Vector2<int> def )
+{
+  Vector2<int> v;
+
+  if (this->GetTupleString(key, 0, "") == "")
+    return def;
+
+  v.x = this->GetTupleInt(key, 0, 0.0);
+  v.y = this->GetTupleInt(key, 1, 0.0);
+
+  return v;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a rotation

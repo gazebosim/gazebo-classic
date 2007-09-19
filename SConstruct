@@ -51,7 +51,6 @@ def createPkgConfig(target,source, env):
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
       	      'ode-config --cflags --libs',
-	            'pkg-config --cflags --libs OIS',
               'fltk-config --cflags --libs --ldflags --use-gl --use-images',
               'xft-config --cflags --libs']
 
@@ -114,11 +113,7 @@ if not env.GetOption('clean'):
       print "  Success"
     except OSError,e:
       print "Unable to parse config ["+cfg+"]"
-      if cfg.find("OIS") >= 0:
-        print "OIS is required, but not found."
-        print "  http://sourceforge.net/projects/wgois"
-        Exit(1)
-      elif cfg.find("OGRE") >= 0:
+      if cfg.find("OGRE") >= 0:
         print "Ogre3d is required, but not found."
         print "  http://www.ogre3d.org/"
         Exit(1)

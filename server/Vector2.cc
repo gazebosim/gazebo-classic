@@ -32,43 +32,49 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Vector2::Vector2()
+template<typename T>
+Vector2<T>::Vector2()
   : x(0), y(0)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Vector2::Vector2( const double &x, const double &y )
+template<typename T>
+Vector2<T>::Vector2( const T &x, const T &y )
   : x(x), y(y)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Copy Constructor
-Vector2::Vector2( const Vector2 &pt )
+template<typename T>
+Vector2<T>::Vector2( const Vector2 &pt )
   : x(pt.x), y(pt.y)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Vector2::~Vector2()
+template<typename T>
+Vector2<T>::~Vector2()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Calc distance to the given point
-double Vector2::Distance(const Vector2 &pt ) const
+template<typename T>
+T Vector2<T>::Distance(const Vector2<T> &pt ) const
 {
-  return sqrt((this->x-pt.x)*(this->x-pt.x) + (this->y-pt.y)*(this->y-pt.y));
+  return (T)sqrt((this->x-pt.x)*(this->x-pt.x) + (this->y-pt.y)*(this->y-pt.y));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Normalize the vector length
-void Vector2::Normalize()
+template<typename T>
+void Vector2<T>::Normalize()
 {
-  double d = sqrt(this->x * this->x + this->y * this->y);
+  T d = (T)sqrt(this->x * this->x + this->y * this->y);
 
   this->x /= d;
   this->y /= d;
@@ -76,7 +82,8 @@ void Vector2::Normalize()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the contents of the vector
-void Vector2::Set(double x, double y)
+template<typename T>
+void Vector2<T>::Set(T x, T y)
 {
   this->x = x;
   this->y = y;
@@ -85,7 +92,8 @@ void Vector2::Set(double x, double y)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equals operator
-const Vector2 &Vector2::operator=( const Vector2 &pt )
+template<typename T>
+const Vector2<T> &Vector2<T>::operator=( const Vector2<T> &pt )
 {
   this->x = pt.x;
   this->y = pt.y;
@@ -95,7 +103,8 @@ const Vector2 &Vector2::operator=( const Vector2 &pt )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Equal operator
-const Vector2 &Vector2::operator=( double value )
+template<typename T>
+const Vector2<T> &Vector2<T>::operator=( T value )
 {
   this->x = value;
   this->y = value; 
@@ -107,12 +116,14 @@ const Vector2 &Vector2::operator=( double value )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Addition operator
-Vector2 Vector2::operator+( const Vector2 &pt ) const
+template<typename T>
+Vector2<T> Vector2<T>::operator+( const Vector2<T> &pt ) const
 {
-  return Vector2(this->x + pt.x, this->y + pt.y);
+  return Vector2<T>(this->x + pt.x, this->y + pt.y);
 }
 
-const Vector2 &Vector2::operator+=( const Vector2 &pt )
+template<typename T>
+const Vector2<T> &Vector2<T>::operator+=( const Vector2<T> &pt )
 {
   this->x += pt.x;
   this->y += pt.y;
@@ -122,12 +133,14 @@ const Vector2 &Vector2::operator+=( const Vector2 &pt )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Subtraction operators
-Vector2 Vector2::operator-( const Vector2 &pt ) const
+template<typename T>
+Vector2<T> Vector2<T>::operator-( const Vector2<T> &pt ) const
 {
-  return Vector2(this->x - pt.x, this->y - pt.y);
+  return Vector2<T>(this->x - pt.x, this->y - pt.y);
 }
 
-const Vector2 &Vector2::operator-=( const Vector2 &pt )
+template<typename T>
+const Vector2<T> &Vector2<T>::operator-=( const Vector2<T> &pt )
 {
   this->x -= pt.x;
   this->y -= pt.y;
@@ -139,12 +152,14 @@ const Vector2 &Vector2::operator-=( const Vector2 &pt )
 ////////////////////////////////////////////////////////////////////////////////
 // Division operators
 
-const Vector2 Vector2::operator/( const Vector2 &pt ) const
+template<typename T>
+const Vector2<T> Vector2<T>::operator/( const Vector2<T> &pt ) const
 {
-  return Vector2(this->x / pt.x, this->y / pt.y);
+  return Vector2<T>(this->x / pt.x, this->y / pt.y);
 }
 
-const Vector2 &Vector2::operator/=( const Vector2 &pt )
+template<typename T>
+const Vector2<T> &Vector2<T>::operator/=( const Vector2<T> &pt )
 {
   this->x /= pt.x;
   this->y /= pt.y;
@@ -152,12 +167,14 @@ const Vector2 &Vector2::operator/=( const Vector2 &pt )
   return *this;
 }
 
-const Vector2 Vector2::operator/( double v ) const
+template<typename T>
+const Vector2<T> Vector2<T>::operator/( T v ) const
 {
-  return Vector2(this->x / v, this->y / v);
+  return Vector2<T>(this->x / v, this->y / v);
 }
 
-const Vector2 &Vector2::operator/=( double v )
+template<typename T>
+const Vector2<T> &Vector2<T>::operator/=( T v )
 {
   this->x /= v;
   this->y /= v;
@@ -169,12 +186,14 @@ const Vector2 &Vector2::operator/=( double v )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mulitplication operators
-const Vector2 Vector2::operator*( const Vector2 &pt ) const
+template<typename T>
+const Vector2<T> Vector2<T>::operator*( const Vector2<T> &pt ) const
 {
-  return Vector2(this->x * pt.x, this->y * pt.y);
+  return Vector2<T>(this->x * pt.x, this->y * pt.y);
 }
 
-const Vector2 &Vector2::operator*=( const Vector2 &pt )
+template<typename T>
+const Vector2<T> &Vector2<T>::operator*=( const Vector2<T> &pt )
 {
   this->x *= pt.x;
   this->y *= pt.y;
@@ -182,12 +201,14 @@ const Vector2 &Vector2::operator*=( const Vector2 &pt )
   return *this;
 }
 
-const Vector2 Vector2::operator*( double v ) const
+template<typename T>
+const Vector2<T> Vector2<T>::operator*( T v ) const
 {
-  return Vector2(this->x * v, this->y * v);
+  return Vector2<T>(this->x * v, this->y * v);
 }
 
-const Vector2 &Vector2::operator*=( double v)
+template<typename T>
+const Vector2<T> &Vector2<T>::operator*=( T v)
 {
   this->x *= v;
   this->y *= v;
@@ -197,28 +218,32 @@ const Vector2 &Vector2::operator*=( double v)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equality operator
-bool Vector2::operator==( const Vector2 &pt ) const
+template<typename T>
+bool Vector2<T>::operator==( const Vector2<T> &pt ) const
 {
   return this->x == pt.x && this->y == pt.y;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Inequality operator
-bool Vector2::operator!=( const Vector2 &pt ) const
+template<typename T>
+bool Vector2<T>::operator!=( const Vector2<T> &pt ) const
 {
   return !(*this == pt);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // See if a point is finite (e.g., not nan)
-bool Vector2::IsFinite() const
+template<typename T>
+bool Vector2<T>::IsFinite() const
 {
   return finite(this->x) && finite(this->y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// [] operator
-double Vector2::operator[](unsigned int index) const
+template<typename T>
+T Vector2<T>::operator[](unsigned int index) const
 {
   switch (index)
   {

@@ -21,7 +21,7 @@
 /* Desc: Gazebo Time functions 
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
- * CVS: $Id: GazeboTime.hh,v 1.1.2.1 2006/12/16 22:43:22 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef GAZEBOTIME_HH

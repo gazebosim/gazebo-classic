@@ -22,7 +22,7 @@
  * Desc: Position2d controller for a Pioneer2dx.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN info: $Id: Pioneer2_Gripper.cc 83 2007-08-03 13:59:34Z natepak $
+ * SVN info: $Id$
  */
 
 #include "Global.hh"

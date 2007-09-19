@@ -98,12 +98,12 @@ void Client::ConnectWait(int serverId, int clientId)
   // Get the tmp dir
   tmpdir = getenv("TMP");
   if (!tmpdir)
-    tmpdir = "/tmp";
+    tmpdir = (char*)"/tmp";
 
   // Get the user
   user = getenv("USER");
   if (!user)
-    user = "nobody";
+    user = (char*)"nobody";
 
   // Figure out the directory name
   stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;

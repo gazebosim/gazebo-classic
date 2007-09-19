@@ -22,7 +22,7 @@
 /* Desc: External interfaces for Gazebo
  * Author: Andrew Howard
  * Date: 6 Apr 2003
- * SVN: $Id: gazebo.h,v 1.84.2.3 2006/12/16 22:43:22 natepak Exp $
+ * SVN: $Id$
  */
 
 #ifndef GAZEBO_H

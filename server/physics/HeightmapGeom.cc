@@ -21,7 +21,7 @@
 /* Desc: Heightmap geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: HeightmapGeom.cc 52 2007-07-05 23:17:46Z natepak $
+ * CVS: $Id$
  */
 
 #include <ode/ode.h>
@@ -184,7 +184,7 @@ void HeightmapGeom::Update()
 {
 }
 
-double HeightmapGeom::GetHeightAt(const Vector2 &pos)
+double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
 {
   Ogre::Vector3 pos3(pos.y, this->terrainSize.z, pos.x);
 
@@ -212,7 +212,7 @@ void HeightmapGeom::FillHeightMap()
     for (x=0; x<this->odeVertSize; x++)
     {
       // Find the height at a vertex
-      h = this->GetHeightAt(Vector2(x*this->odeScale.x, (this->odeVertSize-y)*this->odeScale.y));
+      h = this->GetHeightAt(Vector2<double>(x*this->odeScale.x, (this->odeVertSize-y)*this->odeScale.y));
       // Store the hieght for future use
       this->heights[y*this->odeVertSize+x] = h;
     }
@@ -226,7 +226,7 @@ dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
 //  dReal height = 0;
   HeightmapGeom *geom = (HeightmapGeom*)(data);
 
-//  height = geom->GetHeightAt(Vector2(x*geom->odeScale.x, (geom->odeVertSize-y)*geom->odeScale.y));
+//  height = geom->GetHeightAt(Vector2<double>(x*geom->odeScale.x, (geom->odeVertSize-y)*geom->odeScale.y));
 
  // return height;
 

@@ -21,7 +21,7 @@
 /* Desc: A ray
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: RayGeom.hh,v 1.17 2004/12/07 00:15:06 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef RAYGEOM_HH

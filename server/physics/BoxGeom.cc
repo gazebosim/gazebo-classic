@@ -45,12 +45,14 @@ BoxGeom::BoxGeom(Body *body, const std::string &name, Vector3 size, double mass,
 
   // Get the box mesh
   if (meshName.empty() || meshName == "default")
+  {
     this->AttachMesh("unit_box");
+
+    // Set the size of the box
+    this->ScaleMesh(size);
+  }
   else
     this->AttachMesh(meshName);
-
-  // Set the size of the box
-//  this->ScaleMesh(size);
 
   // Allow the box to cast shadows
   this->SetCastShadows(true);

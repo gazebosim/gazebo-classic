@@ -40,6 +40,7 @@
 #include "Model.hh"
 #include "gazebo.h"
 #include "UpdateParams.hh"
+#include "InputHandler.hh"
 #include "World.hh"
 
 using namespace gazebo;
@@ -154,6 +155,8 @@ int World::Update()
   UpdateParams params;
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
+
+  InputHandler::Instance()->Update();
 
   this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime = this->physicsEngine->GetStepTime();

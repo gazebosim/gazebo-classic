@@ -22,7 +22,7 @@
  * Desc: SickLMS200 Laser controller.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN info: $Id: Generic_Camera.cc 28 2007-05-31 00:53:17Z natepak $
+ * SVN info: $Id$
  */
 
 #include <algorithm>

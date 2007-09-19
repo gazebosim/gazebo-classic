@@ -21,7 +21,7 @@
 /* Desc: Base class for all models.
  * Author: Nathan Koenig and Andrew Howard
  * Date: 8 May 2003
- * SVN: $Id: Model.cc 75 2007-07-25 15:47:11Z natepak $
+ * SVN: $Id$
  */
 
 //#include <boost/python.hpp>

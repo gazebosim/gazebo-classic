@@ -21,7 +21,7 @@
 /* Desc: Trimesh geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: TrimeshGeom.hh,v 1.1.2.1 2006/12/16 22:41:16 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef HEIGHTMAPGEOM_HH
@@ -53,7 +53,7 @@ namespace gazebo
     public: void Update();
 
     /// \brief Get the height of the heightmap as a specific coordinate
-    public: double GetHeightAt(const Vector2 &pos);
+    public: double GetHeightAt(const Vector2<double> &pos);
 
     /// \brief Overloaded Ogre function for Ray Scene Queries
     public: virtual bool queryResult(Ogre::MovableObject *obj, Ogre::Real dist);

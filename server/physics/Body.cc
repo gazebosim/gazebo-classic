@@ -381,9 +381,9 @@ int Body::LoadGeom(XMLConfigNode *node)
   else if (node->GetName() == "plane")
   {
     Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
-    Vector2 size = node->GetVector2("size",Vector2(1000, 1000));
-    Vector2 segments = node->GetVector2("segments",Vector2(10, 10));
-    Vector2 uvTile = node->GetVector2("uvTile",Vector2(1, 1));
+    Vector2<double> size = node->GetVector2d("size",Vector2<double>(1000, 1000));
+    Vector2<double> segments = node->GetVector2d("segments",Vector2<double>(10, 10));
+    Vector2<double> uvTile = node->GetVector2d("uvTile",Vector2<double>(1, 1));
 
     geom = new PlaneGeom(this, name, normal,size,segments, uvTile);
   }

@@ -21,7 +21,7 @@
 /* Desc: A ray
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: RayGeom.cc,v 1.26 2006/02/03 02:53:03 natepak Exp $
+ * CVS: $Id$
  */
 
 #include <assert.h>

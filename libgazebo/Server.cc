@@ -80,12 +80,12 @@ void Server::Init(int serverId, int force)
   // Get the tmp dir
   tmpdir = getenv("TMP");
   if (!tmpdir)
-    tmpdir = "/tmp";
+    tmpdir = (char*)"/tmp";
 
   // Get the user
   user = getenv("USER");
   if (!user)
-    user = "nobody";
+    user = (char*)"nobody";
 
   stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
   this->filename = stream.str();

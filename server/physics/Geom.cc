@@ -145,7 +145,6 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     {
       this->body->UpdateCoM();
     }
-
   }
   
 

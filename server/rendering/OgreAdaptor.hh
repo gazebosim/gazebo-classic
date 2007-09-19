@@ -21,7 +21,7 @@
 /* Desc: Middleman between OGRE and Gazebo
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * CVS: $Id: OgreAdaptor.hh,v 1.1.2.1 2006/12/16 22:41:17 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef OGREADAPTOR

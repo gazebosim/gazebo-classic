@@ -21,7 +21,7 @@
 /* Desc: A body that has a box shape
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: HingeJoint.hh,v 1.1.2.1 2006/12/16 22:41:15 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef HINGEJOINT_HH

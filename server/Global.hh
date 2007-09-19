@@ -21,7 +21,7 @@
 /* Desc: Generic Typedefs, macros, functions, etc
  * Author: Nate Koenig
  * Date: 16 June 2003
- * CVS: $Id: Global.hh,v 1.3.2.2 2006/12/16 22:41:14 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef GZGLOBAL_HH

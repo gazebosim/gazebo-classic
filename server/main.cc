@@ -332,7 +332,7 @@ int Fini()
 }
 
 // Idle-time processing
-bool MainIdle()
+void MainCallback()
 {
   double realTime, simTime, pauseTime;
 
@@ -343,18 +343,7 @@ bool MainIdle()
   simTime = gazebo::World::Instance()->GetSimTime();
   pauseTime = gazebo::World::Instance()->GetPauseTime();
 
-  //printf("Sim Time[%f]\n",simTime);
 
-  if (!gazebo::Global::gui)
-    printf("NULL\n");
-
-  gazebo::Global::gui->Update();
-
-  // Exit if the user has decided to end the simulation
-  if (gazebo::Global::userQuit)
-    return false;
-
-  return true;
 }
 
 
@@ -380,7 +369,11 @@ int main(int argc, char **argv)
   try
   {
     // Run the sim
-    while (MainIdle());
+    if (gazebo::Global::gui)
+        gazebo::Global::gui->Run();
+    else
+      while (!gazebo::Global::userQuit)
+        MainCallback();
   }
   catch (gazebo::GazeboError e)
   {

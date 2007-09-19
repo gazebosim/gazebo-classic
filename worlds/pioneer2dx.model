@@ -26,13 +26,14 @@
     <material>Gazebo/PioneerBody</material>
   </geom:box>
 
-  <geom:box name="chassis_top_geom">
+  <!--<geom:box name="chassis_top_geom">
     <xyz>0 0 0.085</xyz>
     <mesh>default</mesh>
     <size> 0.45 0.38 0.005</size>
     <mass>0</mass>
     <material>Gazebo/Black</material>
   </geom:box>
+  -->
 </body:box>
 
 <body:cylinder name="left_wheel">

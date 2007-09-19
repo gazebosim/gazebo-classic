@@ -21,7 +21,7 @@
 /* Desc: Power Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id: PowerInterface.hh,v 1.1.2.1 2006/12/16 22:43:22 natepak Exp $
+ * CVS: $Id$
  */
 
 #ifndef POWERINTERFACE_HH

@@ -29,6 +29,7 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include "InputEvent.hh"
 #include "OgreHUD.hh"
 #include "Entity.hh"
 #include "GazeboError.hh"
@@ -42,6 +43,7 @@
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 OgreAdaptor::OgreAdaptor()
 {
@@ -55,6 +57,7 @@ OgreAdaptor::OgreAdaptor()
   this->ogreWindow = true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 OgreAdaptor::~OgreAdaptor()
 {
@@ -68,6 +71,8 @@ OgreAdaptor::~OgreAdaptor()
     delete this->frameListener;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Init
 void OgreAdaptor::Init(XMLConfigNode *node)
 {
   XMLConfigNode *cnode;
@@ -224,6 +229,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   //delete [] mstr;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Load plugins
 void OgreAdaptor::LoadPlugins(const std::string &path)
 {
@@ -260,6 +266,8 @@ void OgreAdaptor::LoadPlugins(const std::string &path)
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Setup resources
 void OgreAdaptor::SetupResources(const std::string &path)
 {
   std::vector<std::string> archNames;
@@ -286,6 +294,8 @@ void OgreAdaptor::SetupResources(const std::string &path)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Setup render system
 void OgreAdaptor::SetupRenderSystem(bool create)
 {
   // Set parameters of render system (window size, etc.)
@@ -341,6 +351,8 @@ void OgreAdaptor::CreateWindow()
   params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
 
   this->window = this->root->createRenderWindow( "WindowName", Global::gui->GetWidth(), Global::gui->GetHeight(), false, &params);
+  this->window->setActive(true);
+  this->window->setAutoUpdated(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,7 +365,7 @@ void OgreAdaptor::ResizeWindow(unsigned int w, unsigned int h)
   this->viewport->setDimensions(0,0,1,1);
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
-  this->frameListener->SetWindowExtents(w,h);
+  //this->frameListener->SetWindowExtents(w,h);
 }
 
 
@@ -474,3 +486,5 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
       Ogre::Real(cviewport->getActualHeight()) );
 
 }
+
+

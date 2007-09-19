@@ -21,7 +21,7 @@
 /* Desc: Trimesh geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id: TrimeshGeom.cc 52 2007-07-05 23:17:46Z natepak $
+ * CVS: $Id$
  */
 
 #include <ode/ode.h>
