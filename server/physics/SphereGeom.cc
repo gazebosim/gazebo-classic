@@ -35,26 +35,10 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-SphereGeom::SphereGeom(Body *body, const std::string &name,  double radius, double mass, const std::string &meshName )
-    : Geom(body, name)
+//SphereGeom::SphereGeom(Body *body, const std::string &name,  double radius, double mass, const std::string &meshName )
+SphereGeom::SphereGeom(Body *body)
+    : Geom(body)
 {
-  // Initialize box mass matrix
-  dMassSetSphereTotal(&this->mass, mass, radius);
-
-  // Create the sphere geometry
-  this->SetGeom(dCreateSphere(0, radius ), true);
-
-  // Get the sphere mesh
-  if (meshName.empty() || meshName == "default")
-    this->AttachMesh("unit_sphere");
-  else
-    this->AttachMesh(meshName);
-
-  // Set the size of the sphere
-  this->ScaleMesh(Vector3(radius,radius,radius));
-
-  // Allow the sphere to cast shadows
-  this->SetCastShadows(true);
 }
 
 
@@ -62,4 +46,29 @@ SphereGeom::SphereGeom(Body *body, const std::string &name,  double radius, doub
 // Destructor
 SphereGeom::~SphereGeom()
 {
+}
+
+//////////////////////////////////////////////////////////////////////////////
+///  Load the sphere
+void SphereGeom::LoadChild(XMLConfigNode *node)
+{
+  double radius = node->GetDouble("size",0.0,0);
+
+  // Initialize box mass matrix
+  dMassSetSphereTotal(&this->mass, this->dblMass, radius);
+
+  // Create the sphere geometry
+  this->SetGeom(dCreateSphere(0, radius ), true);
+
+  // Get the sphere mesh
+  if (this->meshName.empty() || this->meshName == "default")
+    this->AttachMesh("unit_sphere");
+  else
+    this->AttachMesh(this->meshName);
+
+  // Set the size of the sphere
+  this->ScaleMesh(Vector3(radius,radius,radius));
+
+  // Allow the sphere to cast shadows
+  this->SetCastShadows(true);
 }

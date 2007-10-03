@@ -34,11 +34,63 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const std::string &meshName, const Vector3 &scale ) : Geom(body,name)
+//TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const std::string &meshName, const Vector3 &scale ) : Geom(body,name)
+TrimeshGeom::TrimeshGeom(Body *body) : Geom(body)
 {
+}
 
+
+//////////////////////////////////////////////////////////////////////////////
+// Destructor
+TrimeshGeom::~TrimeshGeom()
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Update function.
+void TrimeshGeom::Update() 
+{
+  
+  // tell the tri-tri collider the current transform of the trimesh --
+  // this is fairly important for good results.
+
+  // Fill in the (4x4) matrix.
+  dReal* p_matrix = this->matrix_dblbuff + ( this->last_matrix_index * 16 );
+  const dReal *Pos = dGeomGetPosition(this->geomId);
+  const dReal *Rot = dGeomGetRotation(this->geomId);
+
+  p_matrix[ 0 ] = Rot[ 0 ];
+  p_matrix[ 1 ] = Rot[ 1 ];
+  p_matrix[ 2 ] = Rot[ 2 ];
+  p_matrix[ 3 ] = 0;
+  p_matrix[ 4 ] = Rot[ 4 ];
+  p_matrix[ 5 ] = Rot[ 5 ];
+  p_matrix[ 6 ] = Rot[ 6 ];
+  p_matrix[ 7 ] = 0;
+  p_matrix[ 8 ] = Rot[ 8 ];
+  p_matrix[ 9 ] = Rot[ 9 ];
+  p_matrix[10 ] = Rot[10 ];
+  p_matrix[11 ] = 0; 
+  p_matrix[12 ] = Pos[ 0 ];
+  p_matrix[13 ] = Pos[ 1 ];
+  p_matrix[14 ] = Pos[ 2 ];
+  p_matrix[15 ] = 1; 
+
+  // Flip to other matrix.
+  this->last_matrix_index = !this->last_matrix_index;
+
+  dGeomTriMeshSetLastTransform( this->geomId, 
+      *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Load the trimesh
+void TrimeshGeom::LoadChild(XMLConfigNode *node)
+{
   Ogre::SubMesh* subMesh;
   Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().load(meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+  Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
 
   int i,j,k;
   unsigned int numVertices = 0;
@@ -138,57 +190,12 @@ TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const
   
   this->geomId = dCreateTriMesh( this->spaceId, this->odeData,0,0,0 );
 
-  dMassSetTrimesh(&this->mass, mass, this->geomId);
+  dMassSetTrimesh(&this->mass, this->dblMass, this->geomId);
 
   // Create the sphere geometry
   this->SetGeom(this->geomId, true);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;
+
 }
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
-TrimeshGeom::~TrimeshGeom()
-{
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Update function.
-void TrimeshGeom::Update() 
-{
-  
-  // tell the tri-tri collider the current transform of the trimesh --
-  // this is fairly important for good results.
-
-  // Fill in the (4x4) matrix.
-  dReal* p_matrix = this->matrix_dblbuff + ( this->last_matrix_index * 16 );
-  const dReal *Pos = dGeomGetPosition(this->geomId);
-  const dReal *Rot = dGeomGetRotation(this->geomId);
-
-  p_matrix[ 0 ] = Rot[ 0 ];
-  p_matrix[ 1 ] = Rot[ 1 ];
-  p_matrix[ 2 ] = Rot[ 2 ];
-  p_matrix[ 3 ] = 0;
-  p_matrix[ 4 ] = Rot[ 4 ];
-  p_matrix[ 5 ] = Rot[ 5 ];
-  p_matrix[ 6 ] = Rot[ 6 ];
-  p_matrix[ 7 ] = 0;
-  p_matrix[ 8 ] = Rot[ 8 ];
-  p_matrix[ 9 ] = Rot[ 9 ];
-  p_matrix[10 ] = Rot[10 ];
-  p_matrix[11 ] = 0; 
-  p_matrix[12 ] = Pos[ 0 ];
-  p_matrix[13 ] = Pos[ 1 ];
-  p_matrix[14 ] = Pos[ 2 ];
-  p_matrix[15 ] = 1; 
-
-  // Flip to other matrix.
-  this->last_matrix_index = !this->last_matrix_index;
-
-  dGeomTriMeshSetLastTransform( this->geomId, 
-      *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
-}
-
-

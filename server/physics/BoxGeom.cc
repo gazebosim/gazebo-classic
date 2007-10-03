@@ -34,28 +34,12 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BoxGeom::BoxGeom(Body *body, const std::string &name, Vector3 size, double mass, const std::string &meshName )
+/*BoxGeom::BoxGeom(Body *body, const std::string &name, Vector3 size, double mass, const std::string &meshName )
     : Geom(body,name)
+    */
+BoxGeom::BoxGeom(Body *body)
+    : Geom(body)
 {
-  // Initialize box mass matrix
-  dMassSetBoxTotal(&this->mass, mass, size.x, size.y, size.z);
-
-  // Create a box geometry with box mass matrix
-  this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
-
-  // Get the box mesh
-  if (meshName.empty() || meshName == "default")
-  {
-    this->AttachMesh("unit_box");
-
-    // Set the size of the box
-    this->ScaleMesh(size);
-  }
-  else
-    this->AttachMesh(meshName);
-
-  // Allow the box to cast shadows
-  this->SetCastShadows(true);
 }
 
 
@@ -63,5 +47,30 @@ BoxGeom::BoxGeom(Body *body, const std::string &name, Vector3 size, double mass,
 // Destructor
 BoxGeom::~BoxGeom()
 {
-  return;
+}
+//////////////////////////////////////////////////////////////////////////////
+/// Load the box
+void BoxGeom::LoadChild(XMLConfigNode *node)
+{
+  Vector3 size = node->GetVector3("size",Vector3(1,1,1));
+
+  // Initialize box mass matrix
+  dMassSetBoxTotal(&this->mass, this->dblMass, size.x, size.y, size.z);
+
+  // Create a box geometry with box mass matrix
+  this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
+
+  // Get the box mesh
+  if (this->meshName.empty() || this->meshName == "default")
+  {
+    this->AttachMesh("unit_box");
+
+    // Set the size of the box
+    this->ScaleMesh(size);
+  }
+  else
+    this->AttachMesh(this->meshName);
+
+  // Allow the box to cast shadows
+  this->SetCastShadows(true);
 }

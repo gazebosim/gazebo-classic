@@ -33,19 +33,36 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-CylinderGeom::CylinderGeom(Body *body,const std::string &name,  double radius, double length, double mass, const std::string &meshName )
-    : Geom(body, name)
+//CylinderGeom::CylinderGeom(Body *body,const std::string &name,  double radius, double length, double mass, const std::string &meshName )
+//: Geom(body, name)
+CylinderGeom::CylinderGeom(Body *body)
+  : Geom(body)
 {
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Destructor
+CylinderGeom::~CylinderGeom()
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Load the cylinder
+void CylinderGeom::LoadChild(XMLConfigNode *node)
+{
+  double radius = node->GetTupleDouble("size",0,1.0);
+  double length = node->GetTupleDouble("size",1,1.0);
+
   // Initialize mass matrix
-  dMassSetCylinderTotal(&this->mass, mass, 3, radius, length);
+  dMassSetCylinderTotal(&this->mass, this->dblMass, 3, radius, length);
   
   this->SetGeom( dCreateCylinder( 0, radius, length ), true );
 
   // Get the mesh
-  if (meshName.empty() || meshName == "default")
+  if (this->meshName.empty() || this->meshName == "default")
     this->AttachMesh("unit_cylinder");
   else
-    this->AttachMesh(meshName);
+    this->AttachMesh(this->meshName);
 
   // Set the size of the cylinder
   //this->ScaleMesh(Vector3(radius,length,radius));
@@ -57,11 +74,5 @@ CylinderGeom::CylinderGeom(Body *body,const std::string &name,  double radius, d
   // ODE Cylinders are aligned along the y-axis. So rotate them to be
   // aligned along the Z.
   //this->extraRotation.SetFromAxis(1, 0, 0, M_PI/2);
-}
 
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
-CylinderGeom::~CylinderGeom()
-{
-  return;
 }

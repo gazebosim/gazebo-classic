@@ -38,8 +38,10 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 RayGeom::RayGeom( Body *body )
-  : Geom( body,"Ray" )
+  : Geom( body)
 {
+  this->SetName("Ray");
+
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
  
@@ -181,3 +183,11 @@ int RayGeom::GetFiducial() const
 {
   return this->contactFiducial;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// \brief Load thte ray
+void RayGeom::LoadChild(XMLConfigNode * /*node*/)
+{
+}
+
+

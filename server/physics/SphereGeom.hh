@@ -43,10 +43,15 @@ namespace gazebo
   class SphereGeom : public Geom
   {
     /// \brief Constructor
-    public: SphereGeom(Body *body,const std::string &name,  double radius, double mass, const std::string &meshName = "default" );
+//    public: SphereGeom(Body *body,const std::string &name,  double radius, double mass, const std::string &meshName = "default" );
+    public: SphereGeom(Body *body);
 
     /// \brief Destructor
     public: virtual ~SphereGeom();
+
+    /// \brief Load the sphere
+    protected: void LoadChild(XMLConfigNode *node);
+
   };
 
   /// \}

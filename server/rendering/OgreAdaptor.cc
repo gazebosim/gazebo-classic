@@ -485,6 +485,7 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
       Ogre::Real(cviewport->getActualWidth()) / 
       Ogre::Real(cviewport->getActualHeight()) );
 
+  return camera;
 }
 
 

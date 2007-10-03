@@ -13,10 +13,10 @@ int Geom::geomIdCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( Body *body, const std::string &name)
+Geom::Geom( Body *body)//, const std::string &name)
   : Entity(body)
 {
-  this->SetName(name);
+  //this->SetName(name);
   this->body = body;
   this->spaceId = this->body->spaceId;
 
@@ -48,6 +48,80 @@ Geom::~Geom()
     dGeomDestroy(this->transId);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Load the geom
+void Geom::Load(XMLConfigNode *node)
+{
+  this->SetName(node->GetString("name","",1));
+
+  // The mesh used for visualization
+  this->meshName = node->GetString("mesh","",0);
+  this->dblMass = node->GetDouble("mass",1.0,1e-5);
+
+  if (this->dblMass <= 0)
+  {
+    this->dblMass = 1e-5;
+  }
+
+  this->LoadChild(node);
+
+  this->body->AttachGeom(this);
+  
+  if (node->GetChild("meshScale"))
+    this->ScaleMesh(node->GetVector3("meshScale",Vector3(0,0,0)));
+
+  this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
+  this->SetRotation(node->GetRotation("rpy",Quatern()));
+  this->SetMeshMaterial(node->GetString("material","",0));
+  this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
+  this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
+
+  /*dReal aabb[6];
+  dGeomGetAABB(this->geomId, aabb);
+
+  std::cout << "Geom Name[" << this->GetName() << "]\n";
+  std::cout << "  AABB[";
+  for (int i=0; i<6; i++)
+  {
+    std::cout << aabb[i] << " "; 
+  }
+
+  Ogre::ManualObject* myManualObject =  OgreAdaptor::Instance()->sceneMgr->createManualObject(this->GetName()+"_AABB"); 
+
+  Ogre::SceneNode* myManualObjectNode = this->sceneNode->createChildSceneNode(this->GetName()+"_AABB_NODE"); 
+
+  Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create(this->GetName() + "manual1Material","debugger"); 
+  myManualObjectMaterial->setReceiveShadows(false); 
+  myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
+  myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0,0,1,0); 
+  myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0,0,1); 
+  myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0,0,1); 
+
+  myManualObject->begin(this->GetName() + "manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
+
+  Vector3 min(aabb[0], aabb[2], aabb[4]);
+  Vector3 max(aabb[1], aabb[3], aabb[5]);
+
+  myManualObject->position(min.x, min.y, min.z); 
+  myManualObject->position(max.x, max.y, max.z); 
+  //myManualObject->position(min.x, min.y, max.z); 
+
+  //myManualObject->position(min.x, max.y, max.z); 
+  //myManualObject->position(min.x, max.y, max.z); 
+
+  //myManualObject->position(0, 1, 0); 
+  //myManualObject->position(0, 0, 0); 
+  //myManualObject->position(0, 0, 1); 
+  //myManualObject->position(0, 0, 0); 
+  //myManualObject->position(1, 0, 0); 
+  
+  // etc 
+  myManualObject->end(); 
+  myManualObjectNode->attachObject(myManualObject);
+  */
+
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the encapsulated geometry object
 void Geom::SetGeom(dGeomID geomId, bool placeable)
@@ -215,7 +289,7 @@ void Geom::SetRotation(const Quatern &rot)
 void Geom::AttachMesh(const std::string &meshName)
 {
   std::ostringstream stream;
-  stream << "Geom_" << this->GetName() << ":" << (int)this->geomId;
+  stream << "Geom_" << this->GetName() << ":" << (long)this->geomId;
 
   this->ogreObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
 

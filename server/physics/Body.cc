@@ -350,57 +350,20 @@ int Body::LoadGeom(XMLConfigNode *node)
 {
   Geom *geom;
 
-  // The mesh used for visualization
-  std::string mesh = node->GetString("mesh","",0);
-  std::string name = node->GetString("name","",1);
-  double mass = node->GetDouble("mass",1.0,1e-5);
-
-
-  if (mass <= 0)
-  {
-    mass = 1e-5;
-  }
-
   if (node->GetName() == "sphere")
-  {
-    double radius = node->GetDouble("size",0.0,0);
-    geom = new SphereGeom(this, name, radius, mass, mesh);
-  }
+    geom = new SphereGeom(this);
   else if (node->GetName() == "cylinder")
-  {
-    double radius = node->GetTupleDouble("size",0,1.0);
-    double length = node->GetTupleDouble("size",1,1.0);
-    geom = new CylinderGeom(this, name, radius, length, mass, mesh);
-  }
+    geom = new CylinderGeom(this);
   else if (node->GetName() == "box")
-  {
-    Vector3 size = node->GetVector3("size",Vector3(1,1,1));
-    geom = new BoxGeom(this, name, size, mass, mesh);
-
-  }
+    geom = new BoxGeom(this);
   else if (node->GetName() == "plane")
-  {
-    Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
-    Vector2<double> size = node->GetVector2d("size",Vector2<double>(1000, 1000));
-    Vector2<double> segments = node->GetVector2d("segments",Vector2<double>(10, 10));
-    Vector2<double> uvTile = node->GetVector2d("uvTile",Vector2<double>(1, 1));
-
-    geom = new PlaneGeom(this, name, normal,size,segments, uvTile);
-  }
+    geom = new PlaneGeom(this);
   else if (node->GetName() == "trimesh")
-  {
-    Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
-    geom = new TrimeshGeom(this, name, mass, mesh, scale);
-  }
+    geom = new TrimeshGeom(this);
   else if (node->GetName() == "heightmap")
   {
     this->SetStatic(true);
-    std::string imageFile = node->GetString("image","",1);
-    std::string worldTex = node->GetString("worldTexture","",0);
-    std::string detailTex = node->GetString("detailTexture","",0);
-    Vector3 size = node->GetVector3("size",Vector3(10,10,10));
-    Vector3 offset = node->GetVector3("offset",Vector3(0,0,0));
-    geom = new HeightmapGeom(this, name, imageFile, worldTex, detailTex, size, offset);
+    geom = new HeightmapGeom(this);
   }
   else
   {
@@ -408,16 +371,7 @@ int Body::LoadGeom(XMLConfigNode *node)
     return -1;
   }
 
-  this->AttachGeom(geom);
-  
-  if (node->GetChild("meshScale"))
-    geom->ScaleMesh(node->GetVector3("meshScale",Vector3(0,0,0)));
-
-  geom->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
-  geom->SetRotation(node->GetRotation("rpy",Quatern()));
-  geom->SetMeshMaterial(node->GetString("material","",0));
-  geom->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
-  geom->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
+  geom->Load(node);
 
   return 0;
 }

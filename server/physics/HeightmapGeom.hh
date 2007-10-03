@@ -44,7 +44,8 @@ namespace gazebo
   class HeightmapGeom : public Geom, public Ogre::RaySceneQueryListener
   {
     /// \brief Constructor
-    public: HeightmapGeom(Body *body, const std::string &name, const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size, const Vector3 &offset);
+    //public: HeightmapGeom(Body *body, const std::string &name, const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size, const Vector3 &offset);
+    public: HeightmapGeom(Body *body);
 
     /// \brief Destructor
     public: virtual ~HeightmapGeom();
@@ -60,6 +61,9 @@ namespace gazebo
 
     /// \brief Overloaded Ogre function for Ray Scene Queries
     public: virtual bool queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist);
+
+    /// \brief Load the heightmap
+    protected: virtual void LoadChild(XMLConfigNode *node);
 
     /// Create a lookup table of the terrain's height
     private: void FillHeightMap();

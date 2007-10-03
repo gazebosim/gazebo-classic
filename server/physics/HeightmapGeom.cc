@@ -37,10 +37,103 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-HeightmapGeom::HeightmapGeom(Body *body,const std::string &name,  const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size,  const Vector3 &offset ) : Geom(body, name)
+//HeightmapGeom::HeightmapGeom(Body *body,const std::string &name,  const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size,  const Vector3 &offset ) : Geom(body, name)
+HeightmapGeom::HeightmapGeom(Body *body) 
+  : Geom(body)
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Destructor
+HeightmapGeom::~HeightmapGeom()
+{
+  OgreAdaptor::Instance()->sceneMgr->destroyQuery(this->rayQuery);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Update function.
+void HeightmapGeom::Update() 
+{
+}
+
+double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
+{
+  Ogre::Vector3 pos3(pos.y, this->terrainSize.z, pos.x);
+
+  this->ray.setOrigin(pos3);
+  this->rayQuery->setRay(this->ray);
+  this->distToTerrain = 0;
+  this->rayQuery->execute(this);
+
+  return this->terrainSize.z - this->distToTerrain;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a lookup table of the terrain's height
+void HeightmapGeom::FillHeightMap()
+{
+  int x,y;
+  double h;
+
+  // Resize the vector to match the size of the vertices
+  this->heights.resize(this->odeVertSize*this->odeVertSize);
+
+  // Iterate over all the verices
+  for (y=0; y<this->odeVertSize; y++)
+  {
+    for (x=0; x<this->odeVertSize; x++)
+    {
+      // Find the height at a vertex
+      h = this->GetHeightAt(Vector2<double>(x*this->odeScale.x, (this->odeVertSize-y)*this->odeScale.y));
+      // Store the hieght for future use
+      this->heights[y*this->odeVertSize+x] = h;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Called by ODE to get the height at a vertex
+dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
+{
+//  dReal height = 0;
+  HeightmapGeom *geom = (HeightmapGeom*)(data);
+
+//  height = geom->GetHeightAt(Vector2<double>(x*geom->odeScale.x, (geom->odeVertSize-y)*geom->odeScale.y));
+
+ // return height;
+
+  // Return the height at a specific vertex
+  return geom->heights[y*geom->odeVertSize+x];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Overloaded Ogre function for Ray Scene Queries
+bool HeightmapGeom::queryResult(Ogre::MovableObject *obj, Ogre::Real dist)
+{
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Overloaded Ogre function for Ray Scene Queries
+bool HeightmapGeom::queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist)
+{
+  this->distToTerrain = dist;
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load the heightmap
+void HeightmapGeom::LoadChild(XMLConfigNode *node)
 {
   Ogre::Image tmpImage;
   int tileSize;
+
+  std::string imageFilename = node->GetString("image","",1);
+  std::string worldTexture = node->GetString("worldTexture","",0);
+  std::string detailTexture = node->GetString("detailTexture","",0);
+  Vector3 size = node->GetVector3("size",Vector3(10,10,10));
+  Vector3 offset = node->GetVector3("offset",Vector3(0,0,0));
 
   this->terrainImage = imageFilename;
 
@@ -168,85 +261,5 @@ HeightmapGeom::HeightmapGeom(Body *body,const std::string &name,  const std::str
   this->FillHeightMap();
 
   delete [] mstr;
+
 }
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
-HeightmapGeom::~HeightmapGeom()
-{
-  OgreAdaptor::Instance()->sceneMgr->destroyQuery(this->rayQuery);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Update function.
-void HeightmapGeom::Update() 
-{
-}
-
-double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
-{
-  Ogre::Vector3 pos3(pos.y, this->terrainSize.z, pos.x);
-
-  this->ray.setOrigin(pos3);
-  this->rayQuery->setRay(this->ray);
-  this->distToTerrain = 0;
-  this->rayQuery->execute(this);
-
-  return this->terrainSize.z - this->distToTerrain;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Create a lookup table of the terrain's height
-void HeightmapGeom::FillHeightMap()
-{
-  int x,y;
-  double h;
-
-  // Resize the vector to match the size of the vertices
-  this->heights.resize(this->odeVertSize*this->odeVertSize);
-
-  // Iterate over all the verices
-  for (y=0; y<this->odeVertSize; y++)
-  {
-    for (x=0; x<this->odeVertSize; x++)
-    {
-      // Find the height at a vertex
-      h = this->GetHeightAt(Vector2<double>(x*this->odeScale.x, (this->odeVertSize-y)*this->odeScale.y));
-      // Store the hieght for future use
-      this->heights[y*this->odeVertSize+x] = h;
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Called by ODE to get the height at a vertex
-dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
-{
-//  dReal height = 0;
-  HeightmapGeom *geom = (HeightmapGeom*)(data);
-
-//  height = geom->GetHeightAt(Vector2<double>(x*geom->odeScale.x, (geom->odeVertSize-y)*geom->odeScale.y));
-
- // return height;
-
-  // Return the height at a specific vertex
-  return geom->heights[y*geom->odeVertSize+x];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Overloaded Ogre function for Ray Scene Queries
-bool HeightmapGeom::queryResult(Ogre::MovableObject *obj, Ogre::Real dist)
-{
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Overloaded Ogre function for Ray Scene Queries
-bool HeightmapGeom::queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist)
-{
-  this->distToTerrain = dist;
-  return false;
-}
-
-

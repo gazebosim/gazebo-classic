@@ -86,7 +86,10 @@ namespace gazebo
   
     /// \brief Get the fiducial id detected by this ray
     public: int GetFiducial() const;
-  
+
+    /// \brief Load thte ray
+    protected: virtual void LoadChild(XMLConfigNode *node);
+
     /// Contact information; this is filled out during collision
     /// detection.  
     private: double contactLen;

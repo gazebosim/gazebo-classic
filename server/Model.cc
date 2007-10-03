@@ -412,7 +412,7 @@ int Model::LoadJoint(XMLConfigNode *node)
   Body *body1(this->bodies[node->GetString("body1","",1)]);
   Body *body2(this->bodies[node->GetString("body2","",1)]);
   Body *anchorBody(this->bodies[node->GetString("anchor","",0)]);
-  Vector3 anchorVec = node->GetVector3("anchor",Vector3(0,0,0));
+  Vector3 anchorOffset = node->GetVector3("anchorOffset",Vector3(0,0,0));
 
   if (!body1)
   {
@@ -441,20 +441,27 @@ int Model::LoadJoint(XMLConfigNode *node)
     std::cerr << "Uknown joint[" << node->GetName() << "]\n";
     return -1;
   }
- 
+
+  std::cout << "Body1[" << body1->GetName() << "] Body2[" << body2->GetName() << "]\n";
+
   // Attach two bodies 
   joint->Attach(body1,body2);
+
 
   // Set the anchor vector
   if (anchorBody)
   {
-    joint->SetAnchor(anchorBody->GetPosition());
+    Vector3 anchorVec = anchorBody->GetPosition() + anchorOffset;
+
+    std::cout << "AnchorBody["<<anchorBody->GetPosition()<< "] Vec[" << anchorVec << "]\n";
+    joint->SetAnchor(anchorVec);
+    //joint->SetAnchor(anchorBody->GetPosition());
   }
-  else
+  /*else
   {
     joint->SetAnchor(anchorVec);
     this->bodies.erase(node->GetString("anchor","",0));
-  }
+  }*/
 
   // Load each joint
   joint->Load(node);

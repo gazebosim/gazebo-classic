@@ -65,7 +65,7 @@ OgreFrameListener::OgreFrameListener()
   pl.insert(std::make_pair(std::string("x11_mouse_hide"), 
                            std::string("false")));
   pl.insert(std::make_pair(std::string("x11_keyboard_grab"), 
-                           std::string("true")));
+                           std::string("false")));
   pl.insert(std::make_pair(std::string("XAutoRepeatOn"), 
                            std::string("true")));
 

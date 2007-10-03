@@ -43,10 +43,14 @@ namespace gazebo
   class BoxGeom : public Geom
   {
     /// \brief Constructor
-    public: BoxGeom(Body *body, const std::string &name, Vector3 size, double mass, const std::string &meshName="default");
+//    public: BoxGeom(Body *body, const std::string &name, Vector3 size, double mass, const std::string &meshName="default");
+    public: BoxGeom(Body *body);
 
     /// \brief Destructor
     public: virtual ~BoxGeom();
+
+    /// \brief Load the box
+    protected: void LoadChild(XMLConfigNode *node);
   };
 
   /// \}

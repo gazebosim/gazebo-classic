@@ -19,6 +19,7 @@ namespace gazebo
 
   class Body;
   class ContactParams;
+  class XMLConfigNode;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
@@ -29,10 +30,15 @@ namespace gazebo
   {
   
     /// \brief Constructor
-    public: Geom(Body *body, const std::string &name);
+    //public: Geom(Body *body, const std::string &name);
+    public: Geom(Body *body);
   
     /// \brief Destructor
     public: virtual ~Geom();
+
+    /// \brief Load the geom
+    public: virtual void Load(XMLConfigNode *node);
+    protected: virtual void LoadChild(XMLConfigNode *node) = 0;
   
     /// \brief Set the encapsulated geometry object
     public: void SetGeom(dGeomID geomId, bool placeable);
@@ -135,6 +141,9 @@ namespace gazebo
   
     private: int laserFiducialId;
     private: float laserRetro;
+
+    protected: std::string meshName;
+    protected: double dblMass;
   };
 
   /// \}

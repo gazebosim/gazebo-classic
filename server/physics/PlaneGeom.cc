@@ -38,11 +38,43 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-PlaneGeom::PlaneGeom(Body *body,const std::string &name,  Vector3 normal, const Vector2<double> &size, 
+/*PlaneGeom::PlaneGeom(Body *body,const std::string &name,  Vector3 normal, const Vector2<double> &size, 
     const Vector2<double> &segments, const Vector2<double> &uvTile, double altitude)
     : Geom(body, name)
+    */
+PlaneGeom::PlaneGeom(Body *body)
+    : Geom(body)
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Destructor
+PlaneGeom::~PlaneGeom()
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the altitude of the plane
+void PlaneGeom::SetAltitude(double altitude)
+{
+  dVector4 vec4;
+  dGeomPlaneGetParams(this->geomId, vec4);
+
+  vec4[3] = altitude;
+  dGeomPlaneSetParams(this->geomId, vec4[0], vec4[1], vec4[2], vec4[3]);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Load the plane
+void PlaneGeom::LoadChild(XMLConfigNode *node)
 {
   Vector3 perp;
+
+  double altitude = 0;
+  Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
+  Vector2<double> size = node->GetVector2d("size",Vector2<double>(1000, 1000));
+  Vector2<double> segments = node->GetVector2d("segments",Vector2<double>(10, 10));
+  Vector2<double> uvTile = node->GetVector2d("uvTile",Vector2<double>(1, 1));
 
   normal.Normalize();
   perp = normal.GetPerpendicular();
@@ -68,24 +100,5 @@ PlaneGeom::PlaneGeom(Body *body,const std::string &name,  Vector3 normal, const 
   this->contact->kd = 0;
   this->contact->mu1 = dInfinity;
   this->contact->mu2 = dInfinity;
+
 }
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Destructor
-PlaneGeom::~PlaneGeom()
-{
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Set the altitude of the plane
-void PlaneGeom::SetAltitude(double altitude)
-{
-  dVector4 vec4;
-  dGeomPlaneGetParams(this->geomId, vec4);
-
-  vec4[3] = altitude;
-  dGeomPlaneSetParams(this->geomId, vec4[0], vec4[1], vec4[2], vec4[3]);
-}
-
-
