@@ -1,0 +1,7 @@
+#Import variable
+Import('env staticObjs sharedObjs')
+
+dirs = Split('bandit')
+
+for subdir in dirs :
+  SConscript('%s/SConscript' % subdir)
