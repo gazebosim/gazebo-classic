@@ -24,7 +24,6 @@
  * SVN: $Id:$
  */
 
-#include <fltk/run.h>
 #include <X11/keysym.h>
 
 #include "CameraSensor.hh"
