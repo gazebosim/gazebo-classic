@@ -11,23 +11,16 @@
 
 using namespace gazebo;
 
-extern void MainCallback();
+//extern void MainCallback();
 
-GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label) 
-  : Gui(), Fl_Gl_Window( x, y, w, h, label.c_str() )
+  : Fl_Gl_Window( x, y, w, h, label.c_str() )
 {
-this->end();
-this->show();
-
-this->display = fl_display;
-this->visual = fl_visual;
-this->colormap = fl_colormap;
-this->windowId = Fl_X::i(this)->xid;
-
+  this->end();
+//  this->show();
 }
 
 
@@ -41,7 +34,11 @@ FLTKGui::~FLTKGui()
 // Init
 void FLTKGui::Init()
 {
-  Fl_Window::show();
+  this->show();
+  this->display = fl_display;
+  this->visual = fl_visual;
+  this->colormap = fl_colormap;
+  this->windowId = Fl_X::i(this)->xid;
 }
 
 /*void UpdateCallback(void *data)

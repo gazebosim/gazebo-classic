@@ -68,7 +68,7 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
   length /= meshSize.z;
 
   // Set the size of the cylinder
-  this->ScaleMesh(Vector3(radius,radius,length));
+  this->ScaleMesh(Vector3(radius*2,radius*2,length));
 
   // Allow it to cast shadows
   this->SetCastShadows(true);

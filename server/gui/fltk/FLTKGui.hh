@@ -14,7 +14,7 @@
 
 namespace gazebo
 {
-  class FLTKGui : public Gui, public Fl_Gl_Window
+  class FLTKGui : public Fl_Gl_Window
   {
     public: FLTKGui( int x, int y, int w, int h, const std::string &label );
     public: virtual ~FLTKGui();
@@ -39,6 +39,12 @@ namespace gazebo
 
     private: Vector3 translateVec;
     private: float translateScale;
+
+    public: Window windowId;
+    public: XVisualInfo *visual;
+    public: Colormap colormap;
+    public: Display *display;
+
 
   };
 

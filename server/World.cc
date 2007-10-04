@@ -91,7 +91,7 @@ void World::Load(XMLConfig *config, int serverId)
   // Create some basic shapes
   OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
   OgreSimpleShape::CreateBox("unit_box", Vector3(1,1,1));
-  OgreSimpleShape::CreateCylinder("unit_cylinder", 1.0, 1.0, 1, 32);
+  OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
 
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
