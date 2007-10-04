@@ -35,26 +35,57 @@ namespace gazebo
 {
 
   /// \addtogroup gazebo_physics_geom
-  /// \brief Geom for an infinite plane.
   /// \{
-  /// \defgroup gazebo_plane_geom Plane Geom
-  /// \brief Geom for an infinite plane.
-  /// \{
+  /** \defgroup gazebo_plane_geom Plane Geom
+      \brief Geom for an infinite plane.
+
+       \par Attributes
+      The following attributes are supported.
+  
+      \htmlinclude default_geom_attr_include.html
  
+      - normal (float tuple, unit vector)
+        - Set the plane's normal vector
+        - Default: 0 0 1
+
+      - segments (int tuple)
+        - Set the number of segments of the plane. Larger numbers increase the vertex density.
+        - Default: 1 1
+
+      - uvTile (float tuple)
+        - Set the UV tiling, used for texture mapping
+        - Default: 1 1
+
+      - size (float tuple, meters)
+        - Size of the plane
+        - Default: 0 0
+  
+      \par Example
+      \verbatim
+      <geom:plane name="plane1_geom">
+        <normal>0 0 1</normal>
+        <size>2000 2000</size>
+        <segments>10 10</segments>
+        <uvTile>100 100</uvTile>
+        <material>Gazebo/GrassFloor</material>
+      </geom:plane>
+      \endverbatim
+  */
+  /// \}
+  /// \addtogroup gazebo_plane_geom 
+  /// \{
+
+
   /// \brief Geom for an infinite plane.
   /// 
   /// This geom is used primarily for ground planes.  Note that while
-  /// the plane in infinite, only the part near the camera is drawn.
+  /// the plane in infinite, only the part near the camera is drawn.  
   class PlaneGeom : public Geom
   {
     /// \brief Constructor
     /// \param body Body to which we are attached.
     /// \param spaceId Collision space to which we belong.
     /// \param normal Normal vector to plane (global cs).
-/*    public: PlaneGeom(Body *body, const std::string &name, Vector3 normal,
-                const Vector2<double> &size, const Vector2<double> &segments, 
-                const Vector2<double> &uvTile, double altitude = 0);
-                */
     public: PlaneGeom(Body *body);
 
     /// \brief Destructor

@@ -66,9 +66,9 @@ void Geom::Load(XMLConfigNode *node)
   this->LoadChild(node);
 
   this->body->AttachGeom(this);
-  
+
   if (node->GetChild("meshScale"))
-    this->ScaleMesh(node->GetVector3("meshScale",Vector3(0,0,0)));
+    this->ScaleMesh(node->GetVector3("meshScale",Vector3(1,1,1)));
 
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern()));

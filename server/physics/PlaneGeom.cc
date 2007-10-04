@@ -38,10 +38,6 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-/*PlaneGeom::PlaneGeom(Body *body,const std::string &name,  Vector3 normal, const Vector2<double> &size, 
-    const Vector2<double> &segments, const Vector2<double> &uvTile, double altitude)
-    : Geom(body, name)
-    */
 PlaneGeom::PlaneGeom(Body *body)
     : Geom(body)
 {

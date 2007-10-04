@@ -34,7 +34,6 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-//TrimeshGeom::TrimeshGeom(Body *body, const std::string &name, double mass, const std::string &meshName, const Vector3 &scale ) : Geom(body,name)
 TrimeshGeom::TrimeshGeom(Body *body) : Geom(body)
 {
 }

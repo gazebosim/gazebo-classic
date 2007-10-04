@@ -34,10 +34,14 @@ namespace gazebo
   class OgreDynamicLines;
 
   /// \addtogroup gazebo_physics_geom
-  /// \brief Ray geom
   /// \{
-  /// \defgroup gazebo_ray_geom Ray geom
-  /// \brief Ray geom
+  /** \defgroup gazebo_ray_geom Ray geom
+      \brief Ray geom
+
+      This geom is used soley by ray sensors. It should not be directly included in a world file.
+  */
+  /// \}
+  /// \addtogroup gazebo_ray_geom 
   /// \{
 
   /// \brief Ray geom 
@@ -109,7 +113,6 @@ namespace gazebo
   
   };
   
-  /// \}
   /// \}
 }
 

@@ -37,7 +37,6 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-//HeightmapGeom::HeightmapGeom(Body *body,const std::string &name,  const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size,  const Vector3 &offset ) : Geom(body, name)
 HeightmapGeom::HeightmapGeom(Body *body) 
   : Geom(body)
 {
@@ -57,6 +56,8 @@ void HeightmapGeom::Update()
 {
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/// Update function.
 double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
 {
   Ogre::Vector3 pos3(pos.y, this->terrainSize.z, pos.x);

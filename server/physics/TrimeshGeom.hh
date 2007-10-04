@@ -32,10 +32,31 @@
 namespace gazebo
 {
   /// \addtogroup gazebo_physics_geom
-  /// \brief Trimesh geom
   /// \{
-  /// \defgroup gazebo_trimesh_geom Triangle Mesh geom
-  /// \brief Trimesh geom
+  /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
+      \brief Trimesh geom
+
+    \par Attributes
+    The following attributes are supported.
+
+    \htmlinclude default_geom_attr_include.html
+
+    - scale (float tuple, meters)
+      - Scale of the trimesh
+      - Default: 1 1 1
+
+    \par Example
+    \verbatim
+      <geom:trimesh name="pallet_geom">
+        <mesh>kitchen.mesh</mesh>
+        <scale>.2 .2 .2</scale>
+        <material>Gazebo/WoodPallet</material>
+        <mass>1.0</mass>
+      </geom:trimesh>
+    \endverbatim
+  */
+  /// \}
+  /// \addtogroup gazebo_trimesh_geom 
   /// \{
 
 
@@ -43,7 +64,6 @@ namespace gazebo
   class TrimeshGeom : public Geom
   {
     /// \brief Constructor
-//    public: TrimeshGeom(Body *body, const std::string &name, double mass, const std::string &meshName, const Vector3 &scale);
     public: TrimeshGeom(Body *body);
 
     /// \brief Destructor
@@ -61,7 +81,6 @@ namespace gazebo
     private: int last_matrix_index;
   };
 
-  /// \}
   /// \}
 }
 

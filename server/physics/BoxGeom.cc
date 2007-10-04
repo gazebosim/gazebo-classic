@@ -34,9 +34,6 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-/*BoxGeom::BoxGeom(Body *body, const std::string &name, Vector3 size, double mass, const std::string &meshName )
-    : Geom(body,name)
-    */
 BoxGeom::BoxGeom(Body *body)
     : Geom(body)
 {
@@ -62,14 +59,17 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
 
   // Get the box mesh
   if (this->meshName.empty() || this->meshName == "default")
-  {
     this->AttachMesh("unit_box");
-
-    // Set the size of the box
-    this->ScaleMesh(size);
-  }
   else
     this->AttachMesh(this->meshName);
+
+  Ogre::Vector3 meshSize = this->ogreObj->getBoundingBox().getSize();
+
+  size.x /= meshSize.x;
+  size.y /= meshSize.y;
+  size.z /= meshSize.z;
+
+  this->ScaleMesh(size);
 
   // Allow the box to cast shadows
   this->SetCastShadows(true);

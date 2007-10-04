@@ -33,17 +33,42 @@
 namespace gazebo
 {
   /// \addtogroup gazebo_physics_geom
-  /// \brief Sphere geom
   /// \{
-  /// \defgroup gazebo_sphere_geom Sphere geom
-  /// \brief Sphere geom
+  /** \defgroup gazebo_sphere_geom Sphere geom
+      \brief Sphere geom
+
+      \par Attributes
+      The following attributes are supported.
+
+      \htmlinclude default_geom_attr_include.html
+
+      - size (float, meters)
+        - Radius of the sphere
+        - Default: 0
+
+      \par Example
+      \verbatim
+      <geom:sphere name="geom_name">
+        <xyz>1 2 3</xyz>
+        <rpy>0 0 30</rpy>
+        <size>0.1</size>
+        <mesh>default</mesh>
+        <mass>0.5</mass>
+        <material>Gazebo/Red</material>
+        <laserFiducialId>1</laserFiducialId>
+        <laserRetro>0.5</laserRetro>
+      </geom:sphere>
+      \endverbatim
+    */
+  /// \}
+  /// \addtogroup gazebo_sphere_geom 
   /// \{
+
 
   /// \brief Sphere geom
   class SphereGeom : public Geom
   {
     /// \brief Constructor
-//    public: SphereGeom(Body *body,const std::string &name,  double radius, double mass, const std::string &meshName = "default" );
     public: SphereGeom(Body *body);
 
     /// \brief Destructor
@@ -54,7 +79,6 @@ namespace gazebo
 
   };
 
-  /// \}
   /// \}
 }
 

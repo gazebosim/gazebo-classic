@@ -35,7 +35,6 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-//SphereGeom::SphereGeom(Body *body, const std::string &name,  double radius, double mass, const std::string &meshName )
 SphereGeom::SphereGeom(Body *body)
     : Geom(body)
 {
@@ -65,6 +64,10 @@ void SphereGeom::LoadChild(XMLConfigNode *node)
     this->AttachMesh("unit_sphere");
   else
     this->AttachMesh(this->meshName);
+
+  Ogre::Vector3 meshSize = this->ogreObj->getBoundingBox().getSize();
+
+  radius = radius / ((meshSize.x + meshSize.y + meshSize.z)/3.0);
 
   // Set the size of the sphere
   this->ScaleMesh(Vector3(radius,radius,radius));

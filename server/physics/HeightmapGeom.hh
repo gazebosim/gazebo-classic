@@ -34,17 +34,48 @@
 namespace gazebo
 {
   /// \addtogroup gazebo_physics_geom
-  /// \brief Height Map geom
   /// \{
-  /// \defgroup gazebo_heightmap_geom Height map geom
-  /// \brief Height map geom
+  /** \defgroup gazebo_heightmap_geom Height map geom
+      \brief Height map geom
+
+    \par Attributes
+    The following attributes are supported.
+
+    - image (string)
+      - Greyscale image to use as the height map
+      - Default: (empty)
+
+    - worldTexture (string)
+      - Material to use on distant portions of the heightmap, relative to the camera's pose
+      - Default: (empty)
+
+    - detailTexture (string)
+      - Material to use on nearby portions of the heightmap, relative to the camera's pose
+      - Default: (empty)
+
+    - size (float tuple)
+      - Size of the height map
+      - Default: 0 0 0
+
+    \par Example
+    \verbatim
+      <geom:heightmap name="terrain_geom">
+        <image>terrain.png</image>
+        <worldTexture>terrain_texture.jpg</worldTexture>
+        <detailTexture>terrain_detail.jpg</detailTexture>
+        <size>1000 1000 10.0</size>
+      </geom:heightmap>
+    \endverbatim
+    */
+  /// \}
+  /// \addtogroup gazebo_heightmap_geom 
   /// \{
+
 
   /// \brief Height map geom
   class HeightmapGeom : public Geom, public Ogre::RaySceneQueryListener
   {
     /// \brief Constructor
-    //public: HeightmapGeom(Body *body, const std::string &name, const std::string &imageFilename, const std::string &worldTexture, const std::string &detailTexture, const Vector3 &size, const Vector3 &offset);
     public: HeightmapGeom(Body *body);
 
     /// \brief Destructor
@@ -90,7 +121,6 @@ namespace gazebo
     private: std::vector<double> heights;
   };
 
-  /// \}
   /// \}
 }
 

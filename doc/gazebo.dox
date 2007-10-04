@@ -459,7 +459,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  =  mainpage.html install.html modules.html tutorial_model.html tutorial_controller.html tutorial_sensor.html tutorial_player.html tutorial_terrain.html config_syntax.html gazebo.txt gui.html prerequisites.html ../server ../player ../libgazebo
+INPUT                  =  mainpage.html install.html modules.html tutorial_model.html tutorial_controller.html tutorial_sensor.html tutorial_player.html tutorial_terrain.html config_syntax.html gazebo.txt gui.html prerequisites.html  ../server ../player ../libgazebo
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -500,7 +500,7 @@ EXCLUDE_PATTERNS       =
 # directories that contain example code fragments that are included (see 
 # the \include command).
 
-EXAMPLE_PATH           = 
+EXAMPLE_PATH           = .
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the 
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -995,7 +995,7 @@ SEARCH_INCLUDES        = YES
 # contain include files that are not input files but should be processed by 
 # the preprocessor.
 
-INCLUDE_PATH           = 
+INCLUDE_PATH           = .
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard 
 # patterns (like *.h and *.hpp) to filter out the header-files in the 

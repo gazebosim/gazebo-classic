@@ -33,8 +33,6 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-//CylinderGeom::CylinderGeom(Body *body,const std::string &name,  double radius, double length, double mass, const std::string &meshName )
-//: Geom(body, name)
 CylinderGeom::CylinderGeom(Body *body)
   : Geom(body)
 {
@@ -64,15 +62,14 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
   else
     this->AttachMesh(this->meshName);
 
+  Ogre::Vector3 meshSize = this->ogreObj->getBoundingBox().getSize();
+
+  radius /= meshSize.x;
+  length /= meshSize.z;
+
   // Set the size of the cylinder
-  //this->ScaleMesh(Vector3(radius,length,radius));
   this->ScaleMesh(Vector3(radius,radius,length));
 
   // Allow it to cast shadows
   this->SetCastShadows(true);
-
-  // ODE Cylinders are aligned along the y-axis. So rotate them to be
-  // aligned along the Z.
-  //this->extraRotation.SetFromAxis(1, 0, 0, M_PI/2);
-
 }

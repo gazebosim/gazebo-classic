@@ -21,7 +21,7 @@
 /* Desc: Box geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id $
+ * SVN: $Id:$
  */
 
 #ifndef BOXGEOM_HH
@@ -33,17 +33,41 @@ namespace gazebo
 {
 
   /// \addtogroup gazebo_physics_geom
-  /// \brief Box geom
   /// \{
-  /// \defgroup gazebo_box_geom Box Geom
-  /// \brief Box geom
+  /** \defgroup gazebo_box_geom Box Geom
+    \brief Box geom
+
+    \par Attributes
+    The following attributes are supported.
+
+    \htmlinclude default_geom_attr_include.html
+
+    - size (float tuple, meters)
+      - Size of the box
+      - Default: 0 0 0
+
+    \par Example
+    \verbatim
+    <geom:box name="geom_name">
+      <xyz>1 2 3</xyz>
+      <rpy>0 0 30</rpy>
+      <size>0.1 0.2 0.3</size>
+      <mesh>default</mesh>
+      <mass>0.5</mass>
+      <material>Gazebo/Red</material>
+      <laserFiducialId>1</laserFiducialId>
+      <laserRetro>0.5</laserRetro>
+    </geom:box>
+    \endverbatim
+    */
+  /// \}
+  /// \addtogroup gazebo_box_geom 
   /// \{
 
   /// \brief Box geom
   class BoxGeom : public Geom
   {
     /// \brief Constructor
-//    public: BoxGeom(Body *body, const std::string &name, Vector3 size, double mass, const std::string &meshName="default");
     public: BoxGeom(Body *body);
 
     /// \brief Destructor
@@ -53,7 +77,6 @@ namespace gazebo
     protected: void LoadChild(XMLConfigNode *node);
   };
 
-  /// \}
   /// \}
 
 }

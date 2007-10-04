@@ -126,7 +126,7 @@ namespace gazebo
   
     private: bool placeable;
   
-    private: Ogre::MovableObject *ogreObj;
+    protected: Ogre::MovableObject *ogreObj;
   
     /// ID for the transform geom and sub-geom
     protected: dGeomID transId, geomId;

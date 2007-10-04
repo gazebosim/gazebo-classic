@@ -86,7 +86,6 @@
   <model:physical name="pioneer2dx_model1">
     <xyz>1 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
-    <python>pioneer2dx</python>
 
     <controller:pioneer2dx_position2d name="controller1">
       <leftJoint>left_wheel_hinge</leftJoint>
@@ -94,13 +93,13 @@
       <interface:position name="position_iface_0"/>
     </controller:pioneer2dx_position2d>
 
-  <model:physical name="laser">
-    <xyz>0 0 1.0</xyz>
-    <!-- Embedded laser model -->
-    <include embedded="true">
-      <xi:include href="laser.model" />
-    </include>
-  </model:physical>
+    <model:physical name="laser">
+      <xyz>0 0 0.16</xyz>
+      <!-- Embedded laser model -->
+      <include embedded="true">
+        <xi:include href="laser.model" />
+      </include>
+    </model:physical>
 
 
     <!-- 

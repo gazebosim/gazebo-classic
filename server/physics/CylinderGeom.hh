@@ -32,18 +32,41 @@
 namespace gazebo
 {
   /// \addtogroup gazebo_physics_geom
-  /// \brief Cylinder geom
   /// \{
-  /// \defgroup gazebo_cylinder_geom Cylinder geom
-  /// \brief Cylinder geom
-  /// \{
+  /** \defgroup gazebo_cylinder_geom Cylinder geom
+      \brief Cylinder geom
 
+      \par Attributes
+      The following attributes are supported.
+
+      \htmlinclude default_geom_attr_include.html
+
+      - size (float tuple, meters)
+        - Radius and height of the cylinder
+        - Default: 0 0 
+
+    \par Example
+    \verbatim
+    <geom:cylinder name="geom_name">
+      <xyz>1 2 3</xyz>
+      <rpy>0 0 30</rpy>
+      <size>0.1 0.5</size>
+      <mesh>default</mesh>
+      <mass>0.5</mass>
+      <material>Gazebo/Red</material>
+      <laserFiducialId>1</laserFiducialId>
+      <laserRetro>0.5</laserRetro>
+    </geom:box>
+    \endverbatim
+    */
+  /// \}
+  /// \addtogroup gazebo_cylinder_geom
+  /// \{
 
   /// \brief Cylinder geom
   class CylinderGeom : public Geom
   {
     /// \brief Constructor
-  //  public: CylinderGeom(Body *body, const std::string &name, double radius, double length, double mass, const std::string &meshName);
     public: CylinderGeom(Body *body);
 
     /// \brief Destructor
@@ -53,7 +76,6 @@ namespace gazebo
     protected: void LoadChild(XMLConfigNode *node);
   };
 
-  /// \}
   /// \}
 }
 #endif
