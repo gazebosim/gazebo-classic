@@ -33,8 +33,6 @@
       <material>Gazebo/CloudySky</material>
     </sky>
 
-    <gazeboPath>/home/nate/local/share/gazebo</gazeboPath>
-    <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
