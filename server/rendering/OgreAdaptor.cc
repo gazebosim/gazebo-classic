@@ -29,6 +29,9 @@
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
 
+#include <sys/types.h>
+#include <dirent.h>
+
 #include "InputEvent.hh"
 #include "OgreHUD.hh"
 #include "Entity.hh"
@@ -236,31 +239,36 @@ void OgreAdaptor::LoadPlugins()
   std::string pathStr;
   std::string pluginStr;
   XMLConfigNode *pluginNode;
+  std::list<std::string>::iterator iter;
 
-  // Make sure a path has been specified
-  if (Global::ogrePath.empty())
+  for (iter=Global::ogrePaths.begin(); iter!=Global::ogrePaths.end(); iter++)
   {
-    gzthrow( "no Plugin Path Set" );
-  }
-
-  std::vector<std::string> plugins;
-  std::vector<std::string>::iterator iter;
-
-  plugins.push_back(Global::ogrePath+"/RenderSystem_GL.so");
-  plugins.push_back(Global::ogrePath+"/Plugin_ParticleFX.so");
-  plugins.push_back(Global::ogrePath+"/Plugin_BSPSceneManager.so");
-  plugins.push_back(Global::ogrePath+"/Plugin_OctreeSceneManager.so");
-
-  for (iter=plugins.begin(); iter!=plugins.end(); iter++)
-  {
-    try
+    DIR *dir;
+    if ((dir=opendir((*iter).c_str())) == NULL)
     {
-      // Load the plugin into OGRE
-      this->root->loadPlugin(*iter);
+      continue;
     }
-    catch (Ogre::Exception e)
+    closedir(dir);
+
+    std::vector<std::string> plugins;
+    std::vector<std::string>::iterator piter;
+
+    plugins.push_back((*iter)+"/RenderSystem_GL.so");
+    plugins.push_back((*iter)+"/Plugin_ParticleFX.so");
+    plugins.push_back((*iter)+"/Plugin_BSPSceneManager.so");
+    plugins.push_back((*iter)+"/Plugin_OctreeSceneManager.so");
+
+    for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {
-      gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
+      try
+      {
+        // Load the plugin into OGRE
+        this->root->loadPlugin(*piter);
+      }
+      catch (Ogre::Exception e)
+      {
+     //   gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
+      }
     }
   }
 
@@ -272,23 +280,36 @@ void OgreAdaptor::SetupResources()
 {
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
+  std::list<std::string>::iterator iter;
 
-  archNames.push_back(Global::gazeboPath+"/Media");
-  archNames.push_back(Global::gazeboPath+"/Media/fonts");
-  archNames.push_back(Global::gazeboPath+"/Media/materials/programs");
-  archNames.push_back(Global::gazeboPath+"/Media/materials/scripts");
-  archNames.push_back(Global::gazeboPath+"/Media/materials/textures");
-  archNames.push_back(Global::gazeboPath+"/Media/models");
-
-  for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
+  for (iter=Global::gazeboPaths.begin(); 
+       iter!=Global::gazeboPaths.end(); iter++)
   {
-    try
+
+    DIR *dir;
+    if ((dir=opendir((*iter).c_str())) == NULL)
     {
-      Ogre::ResourceGroupManager::getSingleton().addResourceLocation( *aiter, "FileSystem", "General"); 
+      continue;
     }
-    catch (Ogre::Exception)
+    closedir(dir);
+
+    archNames.push_back((*iter)+"/Media");
+    archNames.push_back((*iter)+"/Media/fonts");
+    archNames.push_back((*iter)+"/Media/materials/programs");
+    archNames.push_back((*iter)+"/Media/materials/scripts");
+    archNames.push_back((*iter)+"/Media/materials/textures");
+    archNames.push_back((*iter)+"/Media/models");
+
+    for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
     {
-      gzthrow("Unable to load Ogre Resources.\nMake sure the resources path in the world file is set correctly.");
+      try
+      {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation( *aiter, "FileSystem", "General"); 
+      }
+      catch (Ogre::Exception)
+      {
+        gzthrow("Unable to load Ogre Resources.\nMake sure the resources path in the world file is set correctly.");
+      }
     }
   }
 }

@@ -240,6 +240,48 @@ void SignalHandler( int /*dummy*/ )
   return;
 }
 
+void LoadConfigFile()
+{
+  std::ifstream cfgFile;
+
+  std::string rcFilename = getenv("HOME");
+  rcFilename += "/.gazeborc";
+
+  cfgFile.open(rcFilename.c_str(), std::ios::in);
+
+  if (cfgFile)
+  {
+    gazebo::XMLConfig rc;
+    gazebo::XMLConfigNode *node;
+    rc.Load(rcFilename);
+
+    node = rc.GetRootNode()->GetChild("gazeboPath");
+    while (node)
+    {
+      std::cout << "Gazebo Path[" << node->GetValue() << "]\n";
+      gazebo::Global::gazeboPaths.push_back(node->GetValue());
+      node = node->GetNext("gazeboPath");
+    }
+
+    node = rc.GetRootNode()->GetChild("ogrePath");
+    while (node)
+    {
+      std::cout << "Ogre Path[" << node->GetValue() << "]\n";
+      gazebo::Global::ogrePaths.push_back( node->GetValue() );
+      node = node->GetNext("ogrePath");
+    }
+  }
+  else
+  {
+    std::cout << "Unable to file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
+    gazebo::Global::gazeboPaths.push_back("/usr/local/share/gazebo");
+    gazebo::Global::ogrePaths.push_back("/usr/local/lib/OGRE");
+    gazebo::Global::ogrePaths.push_back("/usr/lib/OGRE");
+  }
+
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the sim
 int Init()
@@ -301,6 +343,8 @@ int Init()
   {
     gzthrow("XML file must contain a <rendering:gui> section\n");
   }
+
+  LoadConfigFile();
 
   // Initialize Ogre
   try

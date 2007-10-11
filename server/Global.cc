@@ -37,8 +37,8 @@ unsigned long Global::iterations = 0;
 Gui *Global::gui = NULL;
 Pose3d Global::poseOffset;
 
-std::string Global::gazeboPath = "/usr/local/share/gazebo";
-std::string Global::ogrePath = "/usr/local/lib/OGRE";
+std::list<std::string> Global::gazeboPaths;
+std::list<std::string> Global::ogrePaths;
 
 Global::Global()
 {

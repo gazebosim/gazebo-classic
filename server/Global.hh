@@ -32,6 +32,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
+#include <list>
 #include "Pose3d.hh"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -128,11 +129,11 @@ namespace gazebo
     /// \brief Pointer to the selected Gui 
     public: static Gui *gui;
 
-    /// \brief Path gazebo install
-    public: static std::string gazeboPath;
+    /// \brief Paths gazebo install
+    public: static std::list<std::string> gazeboPaths;
 
-    /// \brief Path to the ogre install
-    public: static std::string ogrePath;
+    /// \brief Paths to the ogre install
+    public: static std::list<std::string> ogrePaths;
 
     /// \brief Global pose offset
     public: static Pose3d poseOffset;

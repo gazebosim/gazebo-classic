@@ -88,27 +88,12 @@ void World::Load(XMLConfig *config, int serverId)
 {
   assert(serverId >= 0);
 
-  std::ifstream cfgFile;
   XMLConfigNode *rootNode(config->GetRootNode());
 
   // Create some basic shapes
   OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
   OgreSimpleShape::CreateBox("unit_box", Vector3(1,1,1));
   OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
-
-  std::string rcFilename = getenv("HOME");
-  rcFilename += "/.gazeborc";
-  
-  cfgFile.open(rcFilename.c_str(), std::ios::in);
-
-  if (cfgFile)
-  {
-    XMLConfig rc;
-    rc.Load(rcFilename);
-
-    Global::gazeboPath = rc.GetRootNode()->GetString("gazeboPath","/usr/local/share/gazebo",1);
-    Global::ogrePath = rc.GetRootNode()->GetString("ogrePath","/usr/local/lib/OGRE",1);
-  }
 
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
