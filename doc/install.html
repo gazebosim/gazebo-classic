@@ -114,4 +114,17 @@ $ scons prefix=/home/[username]/local install
 Everything should now work seamlessly, and your locally installed
 packages will be used in preference to any system-wide defaults.
 
+\section config_file Configuration File
+
+Gazebo needs some system information in order to load plugins, texture files, models, etc. This information is place in gazeborc file in the user's home directory. The file is called <tt>.gazeborc</tt> and typical contains:
+
+\verbatim
+<?xml version="1.0"?>
+<gazeborc>
+  <gazeboPath>/usr/local/share/gazebo</gazeboPath>
+  <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
+</gazeborc>
+\endverbatim
+
+If this file does not exist, then the builder will automatically create the file with appropriate values. If the file does exist, the builder will not overwrite it.
 */
