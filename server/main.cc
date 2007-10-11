@@ -387,6 +387,7 @@ int main(int argc, char **argv)
     while (!gazebo::Global::userQuit)
     {
       MainCallback();
+      //usleep(100000);
     }
   }
   catch (gazebo::GazeboError e)

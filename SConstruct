@@ -1,6 +1,8 @@
 import os
 import sys
 import time 
+import commands
+
 version = '0.8'
 
 #
@@ -11,7 +13,7 @@ opts.Add('prefix', 'The install path "prefix"', '/usr/local')
 opts.Add('destdir', 'The root directory to install into. Useful mainly for binary package building', '/')
 
 #
-# Function used to test for ODE library, and TriMesh suppor
+# Function used to test for ODE library, and TriMesh support
 #
 ode_test_source_file = """
 #include <ode/ode.h>
@@ -44,7 +46,22 @@ def createPkgConfig(target,source, env):
   f.write('Requires:\n')
   f.write('Libs: -L' + prefix + '/lib -lgazeboServer\n')
   f.write('Cflags: -I' + prefix + '/include\n')
- 
+  f.close()
+
+#
+# Create the .gazeborc file
+#
+def createGazeborc(target, source, env):
+  f = open(str(target[0]),'wb')
+  prefix=source[0].get_contents()
+  ogre=commands.getoutput('pkg-config --variable=plugindir OGRE')
+  f.write('<?xml version="1.0"?>\n')
+  f.write('<gazeborc>\n')
+  f.write('  <gazeboPath>' + prefix + '/share/gazebo</gazeboPath>\n')
+  f.write('  <ogrePath>' + ogre + '</ogrePath>\n')
+  f.write('</gazeborc>\n')
+  f.close()
+
 #
 # 3rd party packages
 #
@@ -92,13 +109,22 @@ env = Environment (
 
 Help(opts.GenerateHelpText(env))
 
-install_prefix = env['destdir'] + '/' + env['prefix']
+if env['destdir'] != '/':
+  install_prefix = env['destdir'] + '/' + env['prefix']
+else:
+  install_prefix = env['prefix']
+
 
 env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
 pkgconfig = env.PkgConfig(target='libgazeboServer.pc', source=Value(install_prefix))
 env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
 
+env['BUILDERS']['RCConfig'] = Builder(action = createGazeborc)
+rcconfig = env.RCConfig(target='gazeborc', source=Value(install_prefix))
 
+# Use a python command because scons won't copy files to a home directory
+if not os.path.exists(os.environ['HOME']+'/.gazeborc'):
+  os.system('cp gazeborc ~/.gazeborc')
 
 # DEFAULT list of subdirectories to build
 subdirs = ['server','libgazebo', 'player']
@@ -179,5 +205,3 @@ env.Install(install_prefix+'/include/gazebo',headers)
 env.Install(install_prefix+'/lib',libgazeboServerStatic )
 env.Install(install_prefix+'/lib',libgazeboServerShared )
 env.Install(install_prefix+'/share/gazebo','worlds')
-
-

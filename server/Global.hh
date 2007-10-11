@@ -128,6 +128,12 @@ namespace gazebo
     /// \brief Pointer to the selected Gui 
     public: static Gui *gui;
 
+    /// \brief Path gazebo install
+    public: static std::string gazeboPath;
+
+    /// \brief Path to the ogre install
+    public: static std::string ogrePath;
+
     /// \brief Global pose offset
     public: static Pose3d poseOffset;
 

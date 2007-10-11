@@ -98,8 +98,8 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   /// \brief Resize the rendering window
   public: void ResizeWindow(unsigned int w, unsigned int h);
 
-  private: void LoadPlugins(const std::string &path);
-  private: void SetupResources(const std::string &path);
+  private: void LoadPlugins();
+  private: void SetupResources();
   private: void SetupRenderSystem(bool create);
   private: void CreateWindow();
 

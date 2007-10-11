@@ -13,26 +13,30 @@ using namespace gazebo;
 
 GZ_REGISTER_STATIC_GUI("fltk", FLTKMainWindow);
 
+/*
+void quit_cb(Fl_Widget*, void*) {Global::userQuit = true;}
+
 Fl_Menu_Item menuitems[] = {
-  { "&File", FL_ALT+'f', 0, 0, FL_SUBMENU },
-  { "&Open", FL_ALT+'o', 0, 0, FL_MENU_INACTIVE },
+  { "File", 0, 0, 0, FL_SUBMENU },
+  { "Quit", 0, quit_cb, 0, FL_MENU_DIVIDER },
   { 0 },
   
   { 0 }
 };
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t)
-  : Gui(), Fl_Window(x, y, w, h+30, t.c_str())
+  : Gui(), Fl_Window(x, y, w, h, t.c_str())
 {
-
   this->begin();
 
-  Fl_Menu_Bar *m = new Fl_Menu_Bar(0, 0, w, 30, "Menu Bar");
+  /*Fl_Menu_Bar *m = new Fl_Menu_Bar(0, 0, w, 30, "Menu Bar");
   m->copy(menuitems);
+  */
 
-  this->glWindow = new FLTKGui(0, 30, w, h, "");
+  this->glWindow = new FLTKGui(0, 0, w, h, "");
 
   printf("GLWindow Size[%d %d]\n", this->glWindow->w(), this->glWindow->h());
 

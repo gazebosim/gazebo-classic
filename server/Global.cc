@@ -21,7 +21,7 @@
 /* Desc: Generic Typedefs, macros, functions, etc
  * Author: Nate Koenig
  * Date: 21 July 2007
- * CVS: $Id:$
+ * CVS: $Id$
  */
 
 #include "Global.hh"
@@ -36,6 +36,9 @@ bool Global::userStepInc = false;
 unsigned long Global::iterations = 0;
 Gui *Global::gui = NULL;
 Pose3d Global::poseOffset;
+
+std::string Global::gazeboPath = "/usr/local/share/gazebo";
+std::string Global::ogrePath = "/usr/local/lib/OGRE";
 
 Global::Global()
 {

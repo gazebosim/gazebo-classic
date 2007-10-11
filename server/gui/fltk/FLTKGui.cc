@@ -12,8 +12,6 @@
 
 using namespace gazebo;
 
-//extern void MainCallback();
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -21,7 +19,6 @@ FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label)
   : Fl_Gl_Window( x, y, w, h, label.c_str() )
 {
   this->end();
-//  this->show();
 }
 
 
@@ -124,8 +121,10 @@ int FLTKGui::handle(int event)
     case FL_MIDDLE_MOUSE:
       gzevent.SetMouseButton(InputEvent::MIDDLE_MOUSE);
       break;
+
     default:
       gzevent.SetMouseButton(InputEvent::NONE);
+      break;
   }
 
   // Set the type of the event
@@ -150,6 +149,8 @@ int FLTKGui::handle(int event)
       break;
 
     case FL_SHORTCUT:
+      return 0;
+
     case FL_KEYDOWN:
       gzevent.SetType(InputEvent::KEY_PRESS);
       break;
@@ -164,7 +165,8 @@ int FLTKGui::handle(int event)
 
   InputHandler::Instance()->HandleEvent(&gzevent);
 
+  this->redraw();
+
   return 1;
-  
 }
 

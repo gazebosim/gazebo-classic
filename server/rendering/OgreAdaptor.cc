@@ -110,10 +110,10 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
 
   // Load all the plugins
-  this->LoadPlugins(node->GetString("ogrePath","/usr/local/lib/OGRE",1));
+  this->LoadPlugins();
 
   // Setup the available resources 
-  this->SetupResources(node->GetString("gazeboPath","/usr/local/share/gazebo",1));
+  this->SetupResources();
 
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
@@ -231,14 +231,14 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load plugins
-void OgreAdaptor::LoadPlugins(const std::string &path)
+void OgreAdaptor::LoadPlugins()
 {
   std::string pathStr;
   std::string pluginStr;
   XMLConfigNode *pluginNode;
 
   // Make sure a path has been specified
-  if (path.empty())
+  if (Global::ogrePath.empty())
   {
     gzthrow( "no Plugin Path Set" );
   }
@@ -246,10 +246,10 @@ void OgreAdaptor::LoadPlugins(const std::string &path)
   std::vector<std::string> plugins;
   std::vector<std::string>::iterator iter;
 
-  plugins.push_back(path+"/RenderSystem_GL.so");
-  plugins.push_back(path+"/Plugin_ParticleFX.so");
-  plugins.push_back(path+"/Plugin_BSPSceneManager.so");
-  plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+  plugins.push_back(Global::ogrePath+"/RenderSystem_GL.so");
+  plugins.push_back(Global::ogrePath+"/Plugin_ParticleFX.so");
+  plugins.push_back(Global::ogrePath+"/Plugin_BSPSceneManager.so");
+  plugins.push_back(Global::ogrePath+"/Plugin_OctreeSceneManager.so");
 
   for (iter=plugins.begin(); iter!=plugins.end(); iter++)
   {
@@ -268,17 +268,17 @@ void OgreAdaptor::LoadPlugins(const std::string &path)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Setup resources
-void OgreAdaptor::SetupResources(const std::string &path)
+void OgreAdaptor::SetupResources()
 {
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
 
-  archNames.push_back(path+"/Media");
-  archNames.push_back(path+"/Media/fonts");
-  archNames.push_back(path+"/Media/materials/programs");
-  archNames.push_back(path+"/Media/materials/scripts");
-  archNames.push_back(path+"/Media/materials/textures");
-  archNames.push_back(path+"/Media/models");
+  archNames.push_back(Global::gazeboPath+"/Media");
+  archNames.push_back(Global::gazeboPath+"/Media/fonts");
+  archNames.push_back(Global::gazeboPath+"/Media/materials/programs");
+  archNames.push_back(Global::gazeboPath+"/Media/materials/scripts");
+  archNames.push_back(Global::gazeboPath+"/Media/materials/textures");
+  archNames.push_back(Global::gazeboPath+"/Media/models");
 
   for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
   {
