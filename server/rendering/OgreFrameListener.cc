@@ -26,12 +26,6 @@
 
 #include <OgreWindowEventUtilities.h>
 
-#include <OIS.h>
-#include <OISEvents.h>
-#include <OISInputManager.h>
-#include <OISMouse.h>
-#include <OISKeyboard.h>
-
 #include "Global.hh"
 #include "Pose3d.hh"
 #include "OgreHUD.hh"
@@ -48,9 +42,9 @@ OgreFrameListener::OgreFrameListener()
   this->moveScale = 1;
   this->rotateAmount = 1;
 
-  this->selectedObject = NULL;
+  //this->selectedObject = NULL;
 
-  OIS::ParamList pl;
+ /* OIS::ParamList pl;
   size_t windowHnd = 0;
   std::ostringstream windowHndStr;
 
@@ -99,6 +93,7 @@ OgreFrameListener::OgreFrameListener()
 
   // Create ray scene query to handle mouse picking
   this->raySceneQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(Ogre::Ray());
+  */
 }
 
 OgreFrameListener::~OgreFrameListener()
@@ -111,28 +106,28 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
 
   if ((camera = CameraManager::Instance()->GetActiveCamera()))
   {
-    Ogre::Vector3 tmp =this->directionVec * evt.timeSinceLastFrame;
-    camera->Translate(Vector3(tmp.x, tmp.y, tmp.z));
+//    Ogre::Vector3 tmp =this->directionVec * evt.timeSinceLastFrame;
+    //camera->Translate(Vector3(tmp.x, tmp.y, tmp.z));
 
     OgreHUD::Instance()->SetCamera(camera);
   }
 
-  this->mKeyboard->capture();
+/*  this->mKeyboard->capture();
   this->mMouse->capture();
-
-
+  */
   return true;
 }
 
 bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/) 
 {
-  this->mKeyboard->capture();
+/*  this->mKeyboard->capture();
   this->mMouse->capture();
+  */
 
   return true;
 }
 
-bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
+/*bool OgreFrameListener::keyPressed( const OIS::KeyEvent &e )
 {
   switch (e.key)
   {
@@ -338,7 +333,7 @@ void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
   this->leftPressed = true;
 }
 
-bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & /*e*/, OIS::MouseButtonID id)
+bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & e, OIS::MouseButtonID id)
 {
 
   switch (id)
@@ -358,10 +353,11 @@ bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & /*e*/, OIS::MouseB
 
   return true;
 }
-
+*/
 void OgreFrameListener::Resize(unsigned int w, unsigned int h)
 {
-  const OIS::MouseState &mouseState = this->mMouse->getMouseState();
-  mouseState.width = w;
-  mouseState.height = h;
+  //const OIS::MouseState &mouseState = this->mMouse->getMouseState();
+  //mouseState.width = w;
+  //mouseState.height = h;
 }
+

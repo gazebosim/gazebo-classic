@@ -85,7 +85,7 @@ env = Environment (
   LIBPATH=Split('#libgazebo'),
     
   #LIBS=Split('gazebo boost_python')
-  LIBS=Split('gazebo'),
+  LIBS=Split('gazebo boost_thread'),
 
   options=opts
 )
@@ -114,11 +114,7 @@ if not env.GetOption('clean'):
       print "  Success"
     except OSError,e:
       print "Unable to parse config ["+cfg+"]"
-      if cfg.find("OIS") >= 0:
-        print "OIS is required, but not found."
-        print "  http://sourceforge.net/projects/wgois"
-        Exit(1)
-      elif cfg.find("OGRE") >= 0:
+      if cfg.find("OGRE") >= 0:
         print "Ogre3d is required, but not found."
         print "  http://www.ogre3d.org/"
         Exit(1)

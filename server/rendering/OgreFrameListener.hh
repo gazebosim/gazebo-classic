@@ -22,7 +22,7 @@ namespace gazebo
   
   class OgreAdaptor;
   
-  class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener
+  class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener//, public OIS::KeyListener, public OIS::MouseListener
   {
     public: OgreFrameListener();
     public: virtual ~OgreFrameListener();
@@ -30,19 +30,19 @@ namespace gazebo
     public: virtual bool frameStarted( const Ogre::FrameEvent &evt);
     public: virtual bool frameEnded( const Ogre::FrameEvent &evt);
   
-    public: virtual bool keyPressed( const OIS::KeyEvent &e );
-    public: virtual bool keyReleased( const OIS::KeyEvent &e );
+    //public: virtual bool keyPressed( const OIS::KeyEvent &e );
+    //public: virtual bool keyReleased( const OIS::KeyEvent &e );
   
     // Mouse Events
-    public: bool mouseMoved(const OIS::MouseEvent &e);
+    //public: bool mouseMoved(const OIS::MouseEvent &e);
   
     // MouseListener
-    public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    public: bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+    //public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+    //public: bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
   
     public: void Resize(unsigned int w, unsigned int h);
   
-    private: void LeftMousePressed(const OIS::MouseEvent &e);
+    //private: void LeftMousePressed(const OIS::MouseEvent &e);
   
     private: Ogre::Vector3 directionVec;
   
@@ -50,7 +50,7 @@ namespace gazebo
     private: float moveScale;
     private: float rotateAmount;
   
-    private: Ogre::EventProcessor *eventProcessor;
+    /*private: Ogre::EventProcessor *eventProcessor;
   
     private: OIS::InputManager *inputManager;
     private: OIS::Mouse *mMouse;
@@ -63,6 +63,7 @@ namespace gazebo
     private: Ogre::RaySceneQuery *raySceneQuery;
   
     private: Ogre::SceneNode *selectedObject;
+    */
   };
 
 }

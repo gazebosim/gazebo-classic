@@ -2,6 +2,7 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
+#include "FLTKMainWindow.hh"
 #include "Global.hh"
 #include "InputHandler.hh"
 #include "GuiFactory.hh"
@@ -101,7 +102,7 @@ void FLTKGui::resize(int x, int y, int w, int h)
 // Handle events
 int FLTKGui::handle(int event)
 {
-  /*InputEvent gzevent;
+  InputEvent gzevent;
 
   // Get the mouse position
   gzevent.SetMousePos( Vector2<int>( Fl::event_x(), Fl::event_y() ) );
@@ -163,7 +164,7 @@ int FLTKGui::handle(int event)
 
   InputHandler::Instance()->HandleEvent(&gzevent);
 
-  */
-  return 0;
+  return 1;
+  
 }
 

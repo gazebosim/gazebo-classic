@@ -103,6 +103,8 @@ home directory, or to the log file specified with the -l command line option.
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
+#include <FL/Fl.h>
+#include <boost/thread/thread.hpp>
 
 #include "Global.hh"
 #include "Gui.hh"
@@ -124,6 +126,8 @@ bool optServerForce = true;
 double optTimeout = -1;
 int optMsgLevel = 1;
 int optTimeControl = 1;
+
+boost::mutex mutex;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -334,6 +338,8 @@ int Fini()
 // Idle-time processing
 void MainCallback()
 {
+  boost::mutex::scoped_lock lock(mutex);
+
   double realTime, simTime, pauseTime;
 
   // Advance the world 
@@ -348,6 +354,11 @@ void MainCallback()
     gazebo::Global::gui->Update();
 }
 
+// Run the FLTK main loop
+void FLTKLoop()
+{
+  Fl::run();
+}
 
 int main(int argc, char **argv)
 {
@@ -368,16 +379,22 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  // Run FLTK main loop in a separate thread
+  boost::thread fltkThread(FLTKLoop);
+
   try
   {
     while (!gazebo::Global::userQuit)
+    {
       MainCallback();
+    }
   }
   catch (gazebo::GazeboError e)
   {
     std::cerr << "MainIdle Failed[" << e << "]\n";
     return -1;
   }
+  
 
   try
   {
@@ -389,6 +406,8 @@ int main(int argc, char **argv)
     std::cerr << "Finalized Failed[" << e << "]\n";
     return -1;
   }
+
+  //fltkThread.join();
 
   return 0;
 }

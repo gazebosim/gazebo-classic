@@ -13,13 +13,13 @@ using namespace gazebo;
 
 GZ_REGISTER_STATIC_GUI("fltk", FLTKMainWindow);
 
-  Fl_Menu_Item menuitems[] = {
-    { "&File", 0, 0, 0, 0 },
-    { 0 },
-    
-    { 0 }
-  };
-
+Fl_Menu_Item menuitems[] = {
+  { "&File", FL_ALT+'f', 0, 0, FL_SUBMENU },
+  { "&Open", FL_ALT+'o', 0, 0, FL_MENU_INACTIVE },
+  { 0 },
+  
+  { 0 }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -28,12 +28,11 @@ FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t
 {
 
   this->begin();
-//  Fl_Choice *c = new Fl_Choice(0,0,20,30,"Label");
 
   Fl_Menu_Bar *m = new Fl_Menu_Bar(0, 0, w, 30, "Menu Bar");
   m->copy(menuitems);
 
-  this->glWindow = new FLTKGui(0, 40, w, h, "");
+  this->glWindow = new FLTKGui(0, 30, w, h, "");
 
   printf("GLWindow Size[%d %d]\n", this->glWindow->w(), this->glWindow->h());
 
@@ -47,7 +46,7 @@ FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t
   this->colormap = this->glWindow->colormap;
   this->windowId = this->glWindow->windowId;
   
-  this->resizable(this->glWindow);
+//  this->resizable(this->glWindow);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +59,8 @@ FLTKMainWindow::~FLTKMainWindow()
 /// Initalize the gui
 void FLTKMainWindow::Init()
 {
+//  Fl_Window::draw();
+
   /*Fl_Window::show();
   this->glWindow->Init();
   */
@@ -69,7 +70,6 @@ void FLTKMainWindow::Init()
 /// Update the gui
 void FLTKMainWindow::Update()
 {
-  Fl::wait();
   this->glWindow->Update();
 }
 
@@ -90,24 +90,27 @@ unsigned int FLTKMainWindow::GetHeight() const
 ////////////////////////////////////////////////////////////////////////////////
 /*void FLTKMainWindow::draw()
 {
-//  this->redraw();
+  printf("draw\n");
+  Fl_Window::draw();
   this->glWindow->draw();
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
-void FLTKMainWindow::flush()
+/*void FLTKMainWindow::flush()
 {
  // this->glWindow->draw();
 }*/
 
 ////////////////////////////////////////////////////////////////////////////////
-void FLTKMainWindow::resize(int x, int y, int w, int h)
+/*void FLTKMainWindow::resize(int x, int y, int w, int h)
 {
-  this->glWindow->resize(x, y, w, h);
-}
+  printf("resize\n");
+//  this->glWindow->resize(x, y, w, h);
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
-int FLTKMainWindow::handle(int event)
+/*int FLTKMainWindow::handle(int event)
 {
-  this->glWindow->handle(event);
-}
+  printf("Handle\n");
+ // this->glWindow->handle(event);
+}*/

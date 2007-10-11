@@ -3,6 +3,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
+#include <string>
 
 #include "Gui.hh"
 
@@ -35,10 +36,11 @@ namespace gazebo
     //public: virtual void draw();
     //public: virtual void flush();
 
-    public: void resize(int x, int y, int w, int h);
-    public: int handle(int event);
+    //public: void resize(int x, int y, int w, int h);
+    //public: int handle(int event);
 
     private: FLTKGui *glWindow;
+
   };
 
 }
