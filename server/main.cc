@@ -270,6 +270,7 @@ void LoadConfigFile()
       gazebo::Global::ogrePaths.push_back( node->GetValue() );
       node = node->GetNext("ogrePath");
     }
+
   }
   else
   {
@@ -392,10 +393,6 @@ void MainCallback()
   realTime = gazebo::World::Instance()->GetRealTime();
   simTime = gazebo::World::Instance()->GetSimTime();
   pauseTime = gazebo::World::Instance()->GetPauseTime();
-
-  // Run the sim
-  if (gazebo::Global::gui)
-    gazebo::Global::gui->Update();
 }
 
 // Run the FLTK main loop

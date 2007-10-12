@@ -13,7 +13,7 @@ using namespace gazebo;
 
 GZ_REGISTER_STATIC_GUI("fltk", FLTKMainWindow);
 
-/*
+
 void quit_cb(Fl_Widget*, void*) {Global::userQuit = true;}
 
 Fl_Menu_Item menuitems[] = {
@@ -23,7 +23,7 @@ Fl_Menu_Item menuitems[] = {
   
   { 0 }
 };
-*/
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -38,7 +38,7 @@ FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t
 
   this->glWindow = new FLTKGui(0, 0, w, h, "");
 
-  printf("GLWindow Size[%d %d]\n", this->glWindow->w(), this->glWindow->h());
+//  printf("GLWindow Size[%d %d]\n", this->glWindow->w(), this->glWindow->h());
 
   this->end();
   this->show();
@@ -63,18 +63,6 @@ FLTKMainWindow::~FLTKMainWindow()
 /// Initalize the gui
 void FLTKMainWindow::Init()
 {
-//  Fl_Window::draw();
-
-  /*Fl_Window::show();
-  this->glWindow->Init();
-  */
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Update the gui
-void FLTKMainWindow::Update()
-{
-  this->glWindow->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,31 +78,3 @@ unsigned int FLTKMainWindow::GetHeight() const
 {
   return this->glWindow->h();
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/*void FLTKMainWindow::draw()
-{
-  printf("draw\n");
-  Fl_Window::draw();
-  this->glWindow->draw();
-}*/
-
-////////////////////////////////////////////////////////////////////////////////
-/*void FLTKMainWindow::flush()
-{
- // this->glWindow->draw();
-}*/
-
-////////////////////////////////////////////////////////////////////////////////
-/*void FLTKMainWindow::resize(int x, int y, int w, int h)
-{
-  printf("resize\n");
-//  this->glWindow->resize(x, y, w, h);
-}*/
-
-////////////////////////////////////////////////////////////////////////////////
-/*int FLTKMainWindow::handle(int event)
-{
-  printf("Handle\n");
- // this->glWindow->handle(event);
-}*/

@@ -209,6 +209,8 @@ int World::Update()
   }
   this->toDeleteModels.clear();
 
+  OgreAdaptor::Instance()->Render();
+
   return 0;
 }
 
