@@ -1,6 +1,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <GL/glx.h>
+#include <boost/thread/thread.hpp>
 
 #include "FLTKMainWindow.hh"
 #include "Global.hh"
@@ -12,6 +13,7 @@
 
 using namespace gazebo;
 
+extern boost::mutex mutex;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -131,9 +133,11 @@ int FLTKGui::handle(int event)
       return 1;
   }
 
+
+//  boost::mutex::scoped_lock lock(mutex);
   InputHandler::Instance()->HandleEvent(&gzevent);
 
-  this->redraw();
+  //this->redraw();
 
   return 1;
 }

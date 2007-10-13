@@ -14,96 +14,123 @@
 #define MOVABLETEXT_HH
 
 #include <Ogre.h>
+#include <string>
 
 class MovableText : public Ogre::MovableObject, public Ogre::Renderable
 {
-  public:
-    enum HorizontalAlignment    {H_LEFT, H_CENTER};
-    enum VerticalAlignment      {V_BELOW, V_ABOVE};
+  public: enum HorizAlign {H_LEFT, H_CENTER};
+  public: enum VertAlign  {V_BELOW, V_ABOVE};
 
-  protected:
-    Ogre::String      mFontName;
-    Ogre::String      mType;
-    Ogre::String      mName;
-    Ogre::UTFString     mCaption;
-    HorizontalAlignment   mHorizontalAlignment;
-    VerticalAlignment   mVerticalAlignment;
-
-    Ogre::ColourValue   mColor;
-    Ogre::RenderOperation mRenderOp;
-    Ogre::AxisAlignedBox  mAABB;
-    Ogre::LightList     mLList;
-
-    float      mCharHeight;
-    unsigned int      mSpaceWidth;
-
-    bool          mNeedUpdate;
-    bool          mUpdateColors;
-    bool          mOnTop;
-
-    float         mTimeUntilNextToggle;
-    float         mRadius;
-    float         mAdditionalHeight;
-
-    Ogre::Camera      * mpCam;
-    Ogre::RenderWindow    * mpWin;
-    Ogre::Font        * mpFont;
-    Ogre::MaterialPtr   mpMaterial;
-    Ogre::MaterialPtr   mpBackgroundMaterial;
-
-  public: MovableText(const Ogre::String & name, 
-                      const Ogre::UTFString & caption, 
-                      const Ogre::String & fontName = "Arial", 
+  /// \brief Constructor
+  public: MovableText(const std::string &name, 
+                      const Ogre::UTFString &text, 
+                      const std::string fontName = "Arial", 
                       float charHeight = 1.0,
-                      const Ogre::ColourValue & color = Ogre::ColourValue::White);
+                      const Ogre::ColourValue &color = Ogre::ColourValue::White);
+  /// \brief Destructor
   public: virtual ~MovableText();
 
-    // Set settings
-  public: void setFontName(const Ogre::String & fontName);
-  public: void setCaption(const Ogre::UTFString & caption);
-  public: void setColor(const Ogre::ColourValue & color);
-  public: void setCharacterHeight(float height);
-  public:void setSpaceWidth(unsigned int width);
+  /// \brief Set the font
+  public: void SetFontName(const std::string &font);
+          
+  /// \brief Get the font
+  public: const std::string &GetFont() const;
 
-  public: void setTextAlignment(const HorizontalAlignment & horizontalAlignment,                                const VerticalAlignment & verticalAlignment);
+  /// \brief Set the text to display
+  public: void SetText(const Ogre::UTFString & caption);
 
-  public: void setAdditionalHeight( float height);
-  public: void showOnTop(bool show = true);
+  /// \brief Get the displayed text
+  public: const Ogre::UTFString & GetText() const;
 
-    // Get settings
-  public: const Ogre::String & getFontName() const {return mFontName;}
-  public: const Ogre::UTFString & getCaption() const {return mCaption;}
-  public: const Ogre::ColourValue & getColor() const {return mColor;}
+  /// \brief Set the text color
+  public: void SetColor(const Ogre::ColourValue & color);
 
-  public: float getCharacterHeight() const {return mCharHeight;}
-  public: unsigned int getSpaceWidth() const {return mSpaceWidth;}
-  public: float getAdditionalHeight() const {return mAdditionalHeight;}
-  public: bool getShowOnTop() const {return mOnTop;}
-  public: Ogre::AxisAlignedBox GetAABB(void) { return mAABB; }
+  /// \brief Get the text color
+  public: const Ogre::ColourValue & GetColor() const; 
 
-  protected: float mViewportAspectCoef;
+  /// \brief Set the height of a character
+  public: void SetCharHeight(float height);
 
-    // from MovableText, create the object
+  /// \brief Set the height of a characters
+  public: float GetCharHeight() const;
+
+  /// \brief Set the width of a space
+  public:void SetSpaceWidth(float width);
+
+  /// \brief Get the width of a space
+  public: float GetSpaceWidth() const;
+
+  /// \brief Set the alignment of the text
+  public: void SetTextAlignment(const HorizAlign &hAlign, 
+                                const VertAlign &vAlign); 
+
+  /// \brief Set the baseline height of the text
+  public: void SetBaseline(float height);
+
+  /// \brief Get the baseline height
+  public: float GetBaseline() const;
+
+  /// \brief True=text always is displayed ontop
+  public: void SetShowOnTop(bool show);
+
+  /// \brief True=text is displayed on top
+  public: bool GetShowOnTop() const;
+
+  /// \brief Get the axis aligned bounding box of the text
+  public: Ogre::AxisAlignedBox GetAABB();
+
+
+  // from MovableText, create the object
   protected: void _setupGeometry();
   protected: void _updateColors();
 
     // from MovableObject
   protected: void getWorldTransforms(Ogre::Matrix4 *xform) const;
-  protected: float getBoundingRadius(void) const {return mRadius;};
-  protected: float getSquaredViewDepth(const Ogre::Camera *cam) const {return 0;};
-  protected: const Ogre::Quaternion & getWorldOrientation(void) const;
-  protected: const Ogre::Vector3 & getWorldPosition(void) const;
-  protected: const Ogre::AxisAlignedBox & getBoundingBox(void) const {return mAABB;};
-  protected: const Ogre::String & getName(void) const {return mName;};
-  protected: const Ogre::String & getMovableType(void) const {static Ogre::String movType = "MovableText"; return movType;};
+  protected: float getBoundingRadius() const;
+  protected: float getSquaredViewDepth(const Ogre::Camera *cam) const;
 
-  protected: void _notifyCurrentCamera(Ogre::Camera *cam);
-  protected: void _updateRenderQueue(Ogre::RenderQueue* queue);
+  private: float viewportAspectCoef;
+
+  private: std::string fontName;
+  private: Ogre::UTFString text;
+
+  private: HorizAlign horizAlign;
+  private: VertAlign vertAlign;
+
+  private: Ogre::ColourValue color;
+  private: Ogre::RenderOperation renderOp;
+  private: Ogre::AxisAlignedBox aabb;
+  private: Ogre::LightList lightList;
+
+  private: float charHeight;
+  private: float spaceWidth;
+
+  private: bool needUpdate;
+  private: bool updateColors;
+  private: bool onTop;
+
+  private: float radius;
+  private: float baseline;
+
+  private: Ogre::Camera *camera;
+  private: Ogre::RenderWindow *renderWindow;
+  private: Ogre::Font *font;
+  private: Ogre::MaterialPtr material;
+  private: Ogre::MaterialPtr backgroundMaterial;
+
+  private: const Ogre::Quaternion &getWorldOrientation(void) const;
+  private: const Ogre::Vector3 &getWorldPosition(void) const;
+  private: const Ogre::AxisAlignedBox &getBoundingBox(void) const;
+
+  private: const Ogre::String &getMovableType() const;
+
+  private: void _notifyCurrentCamera(Ogre::Camera *cam);
+  private: void _updateRenderQueue(Ogre::RenderQueue* queue);
 
     // from renderable
   protected: void getRenderOperation(Ogre::RenderOperation &op);
-  protected: const Ogre::MaterialPtr &getMaterial(void) const {assert(!mpMaterial.isNull());return mpMaterial;};
-  protected: const Ogre::LightList &getLights(void) const {return mLList;}; 
+  protected: const Ogre::MaterialPtr &getMaterial(void) const;
+  protected: const Ogre::LightList &getLights(void) const; //{return mLList;}; 
 
 };
 

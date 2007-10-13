@@ -231,6 +231,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   myManualObject->end(); 
   myManualObjectNode->attachObject(myManualObject);
   */
+  
   //delete [] mstr;
 }
 
@@ -515,15 +516,6 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
 // Draw a grid on the ground
 void OgreAdaptor::DrawGrid()
 {
-  /*MovableText* msg = new MovableText("TXT_001", "0","Arial",0.05);
-  msg->setTextAlignment(MovableText::H_CENTER, MovableText::V_BELOW);
-  // Center horizontally and display above the node msg->setAdditionalHeight( ei.getRadius() )
-  Ogre::SceneNode *textNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("textNode");
- 
-  textNode->attachObject(msg); 
-  std::cout << "TEXT NODE POS[" << textNode->_getDerivedPosition() << "]\n";
-  */
-
   Ogre::ManualObject* gridObject =  this->sceneMgr->createManualObject("grid"); 
   Ogre::SceneNode* gridObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("grid_node"); 
 
@@ -537,27 +529,74 @@ void OgreAdaptor::DrawGrid()
   gridObject->begin("gridMaterial", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
 
   float d = 0.01;
-  for (int x=-1000; x<1000; x++)
-  {
-    gridObject->position(x-d, 0.02, 1000); 
-    gridObject->position(x+d, 0.02, 1000); 
-    gridObject->position(x-d, 0.02, -1000); 
+  float z = 0.1;
 
-    gridObject->position(x+d, 0.02, 1000); 
-    gridObject->position(x+d, 0.02, -1000); 
-    gridObject->position(x-d, 0.02, -1000); 
+  for (int x=-100; x<100; x++)
+  {
+    if (x%10 == 0)
+      d = 0.04;
+    else
+      d = 0.01;
+
+    gridObject->position(x-d, z, 100); 
+    gridObject->position(x+d, z, 100); 
+    gridObject->position(x-d, z, -100); 
+
+    gridObject->position(x+d, z, 100); 
+    gridObject->position(x+d, z, -100); 
+    gridObject->position(x-d, z, -100); 
+
+    char *name=new char[20];
+    char *text=new char[10];
+
+    sprintf(name,"(%d %d)_xaxis",x,0);
+    sprintf(text,"%d",x);
+    MovableText* msg = new MovableText(name, text,"Arial",0.05);
+    msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
+
+    Ogre::SceneNode *textNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
+ 
+    textNode->attachObject(msg); 
+    textNode->translate(x,0.02,0);
+
+    delete name;
+    delete text;
   }
 
-  for (int y=-1000; y<1000; y++)
+  for (int y=-100; y<100; y++)
   {
-    gridObject->position(1000,0.02, y-d); 
-    gridObject->position(-1000,0.02, y-d); 
-    gridObject->position(1000,0.02, y+d); 
+    if (y%10 == 0)
+      d = 0.04;
+    else
+      d = 0.01;
 
-    gridObject->position(1000, 0.02, y+d); 
-    gridObject->position(-1000, 0.02, y-d); 
-    gridObject->position(-1000, 0.02, y+d); 
+
+    gridObject->position(100,z, y-d); 
+    gridObject->position(-100,z, y-d); 
+    gridObject->position(100,z, y+d); 
+
+    gridObject->position(100,z, y+d); 
+    gridObject->position(-100,z, y-d); 
+    gridObject->position(-100,z, y+d); 
+
+    char *name=new char[20];
+    char *text=new char[10];
+
+    sprintf(name,"(%d %d)_yaxis",0,y);
+    sprintf(text,"%d",y);
+    MovableText* msg = new MovableText(name, text,"Arial",0.05);
+    msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
+
+    Ogre::SceneNode *textNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
+ 
+    textNode->attachObject(msg); 
+    textNode->translate(0,0.02,y);
+
+    delete name;
+    delete text;
+
   }
+
 
   // etc 
   gridObject->end(); 
