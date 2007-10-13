@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 
+#include "MovableText.hh"
 #include "InputEvent.hh"
 #include "OgreHUD.hh"
 #include "Entity.hh"
@@ -207,7 +208,8 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 
-  /*
+  this->DrawGrid();
+/*
   Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
   Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node"); 
 
@@ -509,4 +511,55 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
   return camera;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Draw a grid on the ground
+void OgreAdaptor::DrawGrid()
+{
+  /*MovableText* msg = new MovableText("TXT_001", "0","Arial",0.05);
+  msg->setTextAlignment(MovableText::H_CENTER, MovableText::V_BELOW);
+  // Center horizontally and display above the node msg->setAdditionalHeight( ei.getRadius() )
+  Ogre::SceneNode *textNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("textNode");
+ 
+  textNode->attachObject(msg); 
+  std::cout << "TEXT NODE POS[" << textNode->_getDerivedPosition() << "]\n";
+  */
 
+  Ogre::ManualObject* gridObject =  this->sceneMgr->createManualObject("grid"); 
+  Ogre::SceneNode* gridObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("grid_node"); 
+
+  Ogre::MaterialPtr gridObjectMaterial = Ogre::MaterialManager::getSingleton().create("gridMaterial","debugger"); 
+  gridObjectMaterial->setReceiveShadows(false); 
+  gridObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
+  gridObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0.4,0.4,0.4,0); 
+  gridObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0.4,0.4,0.4); 
+  gridObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0.1,0.1,0.1); 
+
+  gridObject->begin("gridMaterial", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
+
+  float d = 0.01;
+  for (int x=-1000; x<1000; x++)
+  {
+    gridObject->position(x-d, 0.02, 1000); 
+    gridObject->position(x+d, 0.02, 1000); 
+    gridObject->position(x-d, 0.02, -1000); 
+
+    gridObject->position(x+d, 0.02, 1000); 
+    gridObject->position(x+d, 0.02, -1000); 
+    gridObject->position(x-d, 0.02, -1000); 
+  }
+
+  for (int y=-1000; y<1000; y++)
+  {
+    gridObject->position(1000,0.02, y-d); 
+    gridObject->position(-1000,0.02, y-d); 
+    gridObject->position(1000,0.02, y+d); 
+
+    gridObject->position(1000, 0.02, y+d); 
+    gridObject->position(-1000, 0.02, y-d); 
+    gridObject->position(-1000, 0.02, y+d); 
+  }
+
+  // etc 
+  gridObject->end(); 
+  gridObjectNode->attachObject(gridObject);
+}

@@ -102,6 +102,7 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   private: void SetupResources();
   private: void SetupRenderSystem(bool create);
   private: void CreateWindow();
+  private: void DrawGrid();
 
   public: Ogre::Root *root;
   public: Ogre::SceneManager *sceneMgr;
