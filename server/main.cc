@@ -103,7 +103,7 @@ home directory, or to the log file specified with the -l command line option.
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
-#include <FL/Fl.h>
+#include <FL/Fl.H>
 #include <boost/thread/thread.hpp>
 
 #include "Global.hh"
