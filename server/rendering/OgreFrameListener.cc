@@ -38,13 +38,13 @@ using namespace gazebo;
 
 OgreFrameListener::OgreFrameListener()
 {
-  this->moveAmount = 1;
+/*  this->moveAmount = 1;
   this->moveScale = 1;
   this->rotateAmount = 1;
 
   //this->selectedObject = NULL;
 
- /* OIS::ParamList pl;
+  OIS::ParamList pl;
   size_t windowHnd = 0;
   std::ostringstream windowHndStr;
 
@@ -106,24 +106,14 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
 
   if ((camera = CameraManager::Instance()->GetActiveCamera()))
   {
-//    Ogre::Vector3 tmp =this->directionVec * evt.timeSinceLastFrame;
-    //camera->Translate(Vector3(tmp.x, tmp.y, tmp.z));
-
     OgreHUD::Instance()->SetCamera(camera);
   }
 
-/*  this->mKeyboard->capture();
-  this->mMouse->capture();
-  */
   return true;
 }
 
 bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/) 
 {
-/*  this->mKeyboard->capture();
-  this->mMouse->capture();
-  */
-
   return true;
 }
 
@@ -199,6 +189,7 @@ bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/)
 
 bool OgreFrameListener::keyReleased( const OIS::KeyEvent &e )
 {
+
   switch (e.key)
   {
     case OIS::KC_UP:
@@ -258,7 +249,7 @@ bool OgreFrameListener::mouseMoved(const OIS::MouseEvent &e)
     }
   }
 
-   return true;
+  return true;
 }
 
 bool OgreFrameListener::mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id)
@@ -335,7 +326,6 @@ void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
 
 bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & e, OIS::MouseButtonID id)
 {
-
   switch (id)
   {
     case OIS::MB_Left:
@@ -353,11 +343,10 @@ bool OgreFrameListener::mouseReleased(const OIS::MouseEvent & e, OIS::MouseButto
 
   return true;
 }
-*/
 void OgreFrameListener::Resize(unsigned int w, unsigned int h)
 {
   //const OIS::MouseState &mouseState = this->mMouse->getMouseState();
   //mouseState.width = w;
   //mouseState.height = h;
 }
-
+*/

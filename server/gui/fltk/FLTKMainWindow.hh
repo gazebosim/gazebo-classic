@@ -24,6 +24,8 @@ namespace gazebo
     /// \brief Initalize the gui
     public: virtual void Init();
 
+    public: virtual void Update();
+
     /// \brief Get the width of the gui's rendering window
     public: virtual unsigned int GetWidth() const;
 

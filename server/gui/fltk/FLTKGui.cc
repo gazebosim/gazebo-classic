@@ -41,16 +41,6 @@ void FLTKGui::Init()
   this->windowId = Fl_X::i(this)->xid;
 }
 
-/*void UpdateCallback(void *data)
-{
-  FLTKGui *gui = (FLTKGui*)(data);
-
-  gui->draw();
-  MainCallback();
-
-  Fl::repeat_timeout(0.05, UpdateCallback, gui);
-}*/
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the width of the gui's rendering window
 unsigned int FLTKGui::GetWidth() const
@@ -65,10 +55,11 @@ unsigned int FLTKGui::GetHeight() const
   return this->h();
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // Handle events
 int FLTKGui::handle(int event)
 {
+  boost::mutex::scoped_lock lock(mutex);
+
   InputEvent gzevent;
 
   // Get the mouse position
@@ -134,10 +125,7 @@ int FLTKGui::handle(int event)
   }
 
 
-//  boost::mutex::scoped_lock lock(mutex);
   InputHandler::Instance()->HandleEvent(&gzevent);
-
-  //this->redraw();
 
   return 1;
 }

@@ -67,7 +67,6 @@ def createGazeborc(target, source, env):
 #
 parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
-	            'pkg-config --cflags --libs OIS',
       	      'ode-config --cflags --libs',
               'fltk-config --cflags --libs --ldflags --use-gl --use-images',
               'xft-config --cflags --libs']

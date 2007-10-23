@@ -390,6 +390,8 @@ void MainCallback()
   // Advance the world 
   gazebo::World::Instance()->Update();
 
+  //gazebo::Global::gui->Update();
+
   realTime = gazebo::World::Instance()->GetRealTime();
   simTime = gazebo::World::Instance()->GetSimTime();
   pauseTime = gazebo::World::Instance()->GetPauseTime();

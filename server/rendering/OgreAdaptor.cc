@@ -156,7 +156,10 @@ void OgreAdaptor::Init(XMLConfigNode *node)
     {
       try
       {
+        printf("one\n");
+        std::cout << "Material[" << material << "]\n";
         this->sceneMgr->setSkyDome(true,material,5,8);
+        printf("two\n");
       }
       catch (int)
       {
@@ -195,8 +198,8 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
 
   // Create our frame listener and register it
-  this->frameListener = new OgreFrameListener();
-  this->root->addFrameListener(this->frameListener);
+  // NATE: this->frameListener = new OgreFrameListener();
+  // NATE: this->root->addFrameListener(this->frameListener);
 
   // Create the default camera. This camera is only used to view the output
   // of cameras created using the XML world file
@@ -375,6 +378,7 @@ void OgreAdaptor::CreateWindow()
   params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
 
   this->window = this->root->createRenderWindow( "WindowName", Global::gui->GetWidth(), Global::gui->GetHeight(), false, &params);
+
   this->window->setActive(true);
   this->window->setAutoUpdated(true);
 }

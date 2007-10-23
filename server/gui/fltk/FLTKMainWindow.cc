@@ -50,7 +50,7 @@ FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t
   this->colormap = this->glWindow->colormap;
   this->windowId = this->glWindow->windowId;
   
-//  this->resizable(this->glWindow);
+  this->resizable(this->glWindow);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +63,13 @@ FLTKMainWindow::~FLTKMainWindow()
 /// Initalize the gui
 void FLTKMainWindow::Init()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void FLTKMainWindow::Update()
+{
+  printf("UPDATE\n");
+  this->glWindow->redraw();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

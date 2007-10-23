@@ -21,7 +21,7 @@
 /* Desc: GUI base class
  * Author: Nate Koenig
  * Date: 17 Sep 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include "OgreAdaptor.hh"
@@ -33,7 +33,7 @@ using namespace gazebo;
 ///Constructor
 Gui::Gui()
 {
-  this->windowId = 0;
+  this->windowId = -1;
   this->visual = NULL;
   this->display = NULL;
 
