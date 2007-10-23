@@ -36,6 +36,14 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+
+    <fog>
+      <color>0.9 0.9 0.9</color>
+      <linearStart>50</linearStart>
+      <linearEnd>100</linearEnd>
+    </fog>
+    
+    
   </rendering:ogre>
 
    <!-- Ground Plane -->

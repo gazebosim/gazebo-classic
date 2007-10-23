@@ -385,16 +385,12 @@ void MainCallback()
 {
   boost::mutex::scoped_lock lock(mutex);
 
-  double realTime, simTime, pauseTime;
-
   // Advance the world 
   gazebo::World::Instance()->Update();
 
-  //gazebo::Global::gui->Update();
-
-  realTime = gazebo::World::Instance()->GetRealTime();
-  simTime = gazebo::World::Instance()->GetSimTime();
-  pauseTime = gazebo::World::Instance()->GetPauseTime();
+  /*if (gazebo::Global::gui)
+    gazebo::Global::gui->Update();
+    */
 }
 
 // Run the FLTK main loop
@@ -430,7 +426,7 @@ int main(int argc, char **argv)
     while (!gazebo::Global::userQuit)
     {
       MainCallback();
-      //usleep(100000);
+      usleep(10000);
     }
   }
   catch (gazebo::GazeboError e)

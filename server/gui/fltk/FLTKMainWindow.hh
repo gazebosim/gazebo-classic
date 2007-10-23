@@ -32,6 +32,10 @@ namespace gazebo
     /// \brief Get the height of the gui's rendering window
     public: virtual unsigned int GetHeight() const;
 
+    public: void draw();
+    public: void flush();
+    public: void resize(int x, int y, int w, int h);
+
     //public: int handle(int event);
 
     private: FLTKGui *glWindow;

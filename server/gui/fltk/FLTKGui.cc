@@ -34,6 +34,7 @@ FLTKGui::~FLTKGui()
 // Init
 void FLTKGui::Init()
 {
+
   this->show();
   this->display = fl_display;
   this->visual = fl_visual;
@@ -53,6 +54,15 @@ unsigned int FLTKGui::GetWidth() const
 unsigned int FLTKGui::GetHeight() const
 {
   return this->h();
+}
+
+void FLTKGui::draw()
+{
+}
+
+void FLTKGui::flush()
+{
+  this->draw();
 }
 
 // Handle events
@@ -130,3 +140,7 @@ int FLTKGui::handle(int event)
   return 1;
 }
 
+void FLTKGui::resize(int x, int y, int w, int h)
+{
+//  OgreAdaptor::Instance()->ResizeWindow(w,h);
+}

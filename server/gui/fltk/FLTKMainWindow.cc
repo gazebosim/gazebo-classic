@@ -50,7 +50,7 @@ FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t
   this->colormap = this->glWindow->colormap;
   this->windowId = this->glWindow->windowId;
   
-  this->resizable(this->glWindow);
+  this->resizable(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,8 +68,7 @@ void FLTKMainWindow::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void FLTKMainWindow::Update()
 {
-  printf("UPDATE\n");
-  this->glWindow->redraw();
+  this->draw();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,4 +83,19 @@ unsigned int FLTKMainWindow::GetWidth() const
 unsigned int FLTKMainWindow::GetHeight() const
 {
   return this->glWindow->h();
+}
+
+void FLTKMainWindow::flush()
+{
+  this->glWindow->flush();
+}
+
+void FLTKMainWindow::draw()
+{
+  this->glWindow->draw();
+}
+
+void FLTKMainWindow::resize(int x, int y, int w, int h)
+{
+  this->glWindow->resize(x,y,w,h);
 }

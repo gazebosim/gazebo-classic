@@ -148,6 +148,41 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
   this->sceneMgr->setShadowTextureSelfShadow(true);
 
+
+
+  // Add fog. This changes the background color
+  if ((cnode = node->GetChild("fog")))
+  {
+    //Ogre::FogMode fogType = Ogre::FOG_NONE; 
+    //std::string type;
+    //double density;
+    double linearStart, linearEnd;
+
+    this->backgroundColor->r = cnode->GetTupleDouble("color",0,0);
+    this->backgroundColor->g = cnode->GetTupleDouble("color",1,0);
+    this->backgroundColor->b = cnode->GetTupleDouble("color",2,0);
+
+    //type = cnode->GetString("type","linear",0);
+    //density = cnode->GetDouble("density",0,0);
+    linearStart = cnode->GetDouble("linearStart",0,0);
+    linearEnd = cnode->GetDouble("linearEnd",1.0,0);
+
+    /*if (type == "linear")
+      fogType = Ogre::FOG_LINEAR;
+    else if (type == "exp")
+      fogType = Ogre::FOG_EXP;
+    else if (type == "exp2")
+      fogType = Ogre::FOG_EXP2;
+      */
+
+    //this->sceneMgr->setFog(fogType, *this->backgroundColor, density, linearStart, linearEnd);
+    this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, linearStart, linearEnd);
+  }
+  else
+  {
+    this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, 0, 0);
+  }
+
   // Add a sky dome to our scene
   if ((cnode = node->GetChild("sky")))
   {
@@ -156,10 +191,18 @@ void OgreAdaptor::Init(XMLConfigNode *node)
     {
       try
       {
-        printf("one\n");
-        std::cout << "Material[" << material << "]\n";
-        this->sceneMgr->setSkyDome(true,material,5,8);
-        printf("two\n");
+        if (node->GetChild("fog"))
+        {
+          Ogre::Plane plane;
+          plane.d = 49;
+          plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Y;
+          this->sceneMgr->setSkyPlane(true, plane, material, 50, 8, true, 0.5, 150, 150);
+        }
+        else
+        {
+          this->sceneMgr->setSkyDome(true,material,5,8);
+        }
+
       }
       catch (int)
       {
@@ -168,38 +211,9 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
     }
   }
-
-  // Add fog. This changes the background color
-  if ((cnode = node->GetChild("fog")))
-  {
-    Ogre::FogMode fogType = Ogre::FOG_NONE; 
-    std::string type;
-    double density, linearStart, linearEnd;
-
-    this->backgroundColor->r = cnode->GetTupleDouble("color",0,0);
-    this->backgroundColor->g = cnode->GetTupleDouble("color",1,0);
-    this->backgroundColor->b = cnode->GetTupleDouble("color",2,0);
-
-    type = cnode->GetString("type","linear",0);
-    density = cnode->GetDouble("density",0,0);
-    linearStart = cnode->GetDouble("linearStart",0,0);
-    linearEnd = cnode->GetDouble("linearEnd",1.0,0);
-
-    if (type == "linear")
-      fogType = Ogre::FOG_LINEAR;
-    else if (type == "exp")
-      fogType = Ogre::FOG_EXP;
-    else if (type == "exp2")
-      fogType = Ogre::FOG_EXP2;
-
-    //this->sceneMgr->setFog(fogType, *this->backgroundColor, density, linearStart, linearEnd);
-    this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, 0, 100);
-  }
-
-
   // Create our frame listener and register it
-  // NATE: this->frameListener = new OgreFrameListener();
-  // NATE: this->root->addFrameListener(this->frameListener);
+  this->frameListener = new OgreFrameListener();
+  this->root->addFrameListener(this->frameListener);
 
   // Create the default camera. This camera is only used to view the output
   // of cameras created using the XML world file
@@ -273,7 +287,7 @@ void OgreAdaptor::LoadPlugins()
       }
       catch (Ogre::Exception e)
       {
-     //   gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
+        gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
       }
     }
   }
@@ -291,6 +305,7 @@ void OgreAdaptor::SetupResources()
   for (iter=Global::gazeboPaths.begin(); 
        iter!=Global::gazeboPaths.end(); iter++)
   {
+
 
     DIR *dir;
     if ((dir=opendir((*iter).c_str())) == NULL)
@@ -520,20 +535,67 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
 // Draw a grid on the ground
 void OgreAdaptor::DrawGrid()
 {
-  Ogre::ManualObject* gridObject =  this->sceneMgr->createManualObject("grid"); 
-  Ogre::SceneNode* gridObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("grid_node"); 
+  Ogre::ManualObject* gridObject =  this->sceneMgr->createManualObject("__OGRE_GRID__"); 
 
-  Ogre::MaterialPtr gridObjectMaterial = Ogre::MaterialManager::getSingleton().create("gridMaterial","debugger"); 
-  gridObjectMaterial->setReceiveShadows(false); 
-  gridObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
-  gridObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0.4,0.4,0.4,0); 
-  gridObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0.4,0.4,0.4); 
-  gridObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0.1,0.1,0.1); 
+  Ogre::SceneNode* gridObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("__OGRE_GRID_NODE__"); 
 
-  gridObject->begin("gridMaterial", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
+  Ogre::MaterialPtr gridObjectMaterialX = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_X__","debugger1"); 
+  gridObjectMaterialX->setReceiveShadows(false); 
+  gridObjectMaterialX->getTechnique(0)->setLightingEnabled(true); 
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.4,0.0,0.0,0); 
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setAmbient(0.4,0.0,0.0); 
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.1,0.0,0.0); 
+
+  Ogre::MaterialPtr gridObjectMaterialY = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_Y__","debugger2"); 
+  gridObjectMaterialY->setReceiveShadows(false); 
+  gridObjectMaterialY->getTechnique(0)->setLightingEnabled(true); 
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.0,0.0,0.4,0); 
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setAmbient(0.0,0.0,0.4); 
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.1); 
+
 
   float d = 0.01;
-  float z = 0.1;
+  float z = 0.01;
+  
+  gridObject->begin("__OGRE_GRID_MATERIAL_Y__", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
+
+  for (int y=-100; y<100; y++)
+  {
+    if (y%10 == 0)
+      d = 0.04;
+    else
+      d = 0.01;
+
+    gridObject->position(100,z, y-d); 
+    gridObject->position(-100,z, y-d); 
+    gridObject->position(100,z, y+d); 
+
+    gridObject->position(100,z, y+d); 
+    gridObject->position(-100,z, y-d); 
+    gridObject->position(-100,z, y+d); 
+
+    char *name=new char[20];
+    char *text=new char[10];
+
+    sprintf(name,"(%d %d)_yaxis",0,y);
+    sprintf(text,"%d",y);
+    MovableText* msg = new MovableText(name, text,"Arial",0.08);
+    msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
+
+    Ogre::SceneNode *textNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
+ 
+    textNode->attachObject(msg); 
+    textNode->translate(0,0.02,y);
+
+    delete name;
+    delete text;
+
+  }
+
+  gridObject->end(); 
+  gridObject->begin("__OGRE_GRID_MATERIAL_X__", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
+
+  z -= 0.001;
 
   for (int x=-100; x<100; x++)
   {
@@ -555,7 +617,7 @@ void OgreAdaptor::DrawGrid()
 
     sprintf(name,"(%d %d)_xaxis",x,0);
     sprintf(text,"%d",x);
-    MovableText* msg = new MovableText(name, text,"Arial",0.05);
+    MovableText* msg = new MovableText(name, text,"Arial",0.08);
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
@@ -567,41 +629,8 @@ void OgreAdaptor::DrawGrid()
     delete text;
   }
 
-  for (int y=-100; y<100; y++)
-  {
-    if (y%10 == 0)
-      d = 0.04;
-    else
-      d = 0.01;
 
-
-    gridObject->position(100,z, y-d); 
-    gridObject->position(-100,z, y-d); 
-    gridObject->position(100,z, y+d); 
-
-    gridObject->position(100,z, y+d); 
-    gridObject->position(-100,z, y-d); 
-    gridObject->position(-100,z, y+d); 
-
-    char *name=new char[20];
-    char *text=new char[10];
-
-    sprintf(name,"(%d %d)_yaxis",0,y);
-    sprintf(text,"%d",y);
-    MovableText* msg = new MovableText(name, text,"Arial",0.05);
-    msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
-
-    Ogre::SceneNode *textNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
- 
-    textNode->attachObject(msg); 
-    textNode->translate(0,0.02,y);
-
-    delete name;
-    delete text;
-
-  }
-
-
+  
   // etc 
   gridObject->end(); 
   gridObjectNode->attachObject(gridObject);
