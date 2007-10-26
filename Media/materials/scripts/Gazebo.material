@@ -385,7 +385,7 @@ material Gazebo/Rocky
 }
 
 
-material Gazebo/GrassFloor : PerPixelShaded
+material Gazebo/GrassFloor
 {
   receive_shadows on
 	technique
