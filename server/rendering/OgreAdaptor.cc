@@ -148,8 +148,6 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
   this->sceneMgr->setShadowTextureSelfShadow(true);
 
-
-
   // Add fog. This changes the background color
   if ((cnode = node->GetChild("fog")))
   {
@@ -180,7 +178,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   }
   else
   {
-    this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, 0, 0);
+    this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, 1000, 1000);
   }
 
   // Add a sky dome to our scene
@@ -540,14 +538,14 @@ void OgreAdaptor::DrawGrid()
   Ogre::SceneNode* gridObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("__OGRE_GRID_NODE__"); 
 
   Ogre::MaterialPtr gridObjectMaterialX = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_X__","debugger1"); 
-  gridObjectMaterialX->setReceiveShadows(false); 
+  gridObjectMaterialX->setReceiveShadows(true); 
   gridObjectMaterialX->getTechnique(0)->setLightingEnabled(true); 
   gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.4,0.0,0.0,0); 
   gridObjectMaterialX->getTechnique(0)->getPass(0)->setAmbient(0.4,0.0,0.0); 
   gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.1,0.0,0.0); 
 
   Ogre::MaterialPtr gridObjectMaterialY = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_Y__","debugger2"); 
-  gridObjectMaterialY->setReceiveShadows(false); 
+  gridObjectMaterialY->setReceiveShadows(true); 
   gridObjectMaterialY->getTechnique(0)->setLightingEnabled(true); 
   gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.0,0.0,0.4,0); 
   gridObjectMaterialY->getTechnique(0)->getPass(0)->setAmbient(0.0,0.0,0.4); 
