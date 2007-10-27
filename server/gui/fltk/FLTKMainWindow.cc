@@ -7,6 +7,7 @@
 #include "FLTKGui.hh"
 #include "Global.hh"
 #include "GuiFactory.hh"
+#include "InputHandler.hh"
 #include "FLTKMainWindow.hh"
 
 using namespace gazebo;
@@ -50,13 +51,16 @@ FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t
   this->colormap = this->glWindow->colormap;
   this->windowId = this->glWindow->windowId;
   
-  this->resizable(this);
+  this->resizable(this->glWindow);
+
+  this->inputHandler = InputHandler::Instance();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 FLTKMainWindow::~FLTKMainWindow()
 {
+  delete this->glWindow;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,5 +101,30 @@ void FLTKMainWindow::draw()
 
 void FLTKMainWindow::resize(int x, int y, int w, int h)
 {
-  this->glWindow->resize(x,y,w,h);
+}
+
+int FLTKMainWindow::handle(int event)
+{
+  printf("Handle[%d][%d]\n",event,FL_HIDE);
+
+  switch (event)
+  {
+    case FL_ENTER:
+    case FL_LEAVE:
+    case FL_DEACTIVATE:
+    case FL_HIDE:
+      this->inputHandler->ClearEvents();
+      break;
+
+    case FL_CLOSE:
+      printf("CLOSE\n");
+      Global::userQuit = true;
+      break;
+
+    default:
+      this->glWindow->handle(event);
+      break;
+  }
+
+  return 0;
 }

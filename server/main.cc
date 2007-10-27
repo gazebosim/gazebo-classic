@@ -383,7 +383,6 @@ int Fini()
 // Idle-time processing
 void MainCallback()
 {
-  boost::mutex::scoped_lock lock(mutex);
 
   // Advance the world 
   gazebo::World::Instance()->Update();
@@ -421,12 +420,15 @@ int main(int argc, char **argv)
   // Run FLTK main loop in a separate thread
   boost::thread fltkThread(FLTKLoop);
 
+  //Fl::add_idle(MainCallback);
+  //Fl::run();
+
   try
   {
     while (!gazebo::Global::userQuit)
     {
       MainCallback();
-      usleep(10000);
+  //    usleep(1000);
     }
   }
   catch (gazebo::GazeboError e)
@@ -447,7 +449,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  //fltkThread.join();
+  fltkThread.join();
 
   return 0;
 }

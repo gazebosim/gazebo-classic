@@ -21,6 +21,7 @@ FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label)
   : Fl_Gl_Window( x, y, w, h, label.c_str() )
 {
   this->end();
+  this->inputHandler = InputHandler::Instance();
 }
 
 
@@ -68,7 +69,6 @@ void FLTKGui::flush()
 // Handle events
 int FLTKGui::handle(int event)
 {
-  boost::mutex::scoped_lock lock(mutex);
 
   InputEvent gzevent;
 
@@ -98,15 +98,10 @@ int FLTKGui::handle(int event)
       break;
   }
 
+
   // Set the type of the event
   switch (event)
   {
-    case FL_HIDE:
-    case FL_DEACTIVATE:
-    case FL_CLOSE:
-      Global::userQuit = true;
-      break;
-
     case FL_PUSH:
       gzevent.SetType(InputEvent::MOUSE_PRESS);
       break;
@@ -119,9 +114,8 @@ int FLTKGui::handle(int event)
       gzevent.SetType(InputEvent::MOUSE_DRAG);
       break;
 
-    case FL_SHORTCUT:
-      return 0;
 
+    case FL_SHORTCUT:
     case FL_KEYDOWN:
       gzevent.SetType(InputEvent::KEY_PRESS);
       break;
@@ -131,16 +125,10 @@ int FLTKGui::handle(int event)
       break;
 
     default:
-      return 1;
+      return 0;
   }
 
+  this->inputHandler->HandleEvent(&gzevent);
 
-  InputHandler::Instance()->HandleEvent(&gzevent);
-
-  return 1;
-}
-
-void FLTKGui::resize(int x, int y, int w, int h)
-{
-//  OgreAdaptor::Instance()->ResizeWindow(w,h);
+  return 0;
 }

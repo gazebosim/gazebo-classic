@@ -28,6 +28,7 @@
 #include <sstream>
 #include <fstream>
 #include <sys/time.h>
+#include <boost/thread/thread.hpp>
 
 #include "OgreDynamicLines.hh"
 #include "Global.hh"
@@ -45,6 +46,8 @@
 #include "World.hh"
 
 using namespace gazebo;
+
+extern boost::mutex mutex;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Private constructor
@@ -157,7 +160,10 @@ int World::Update()
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
 
-  InputHandler::Instance()->Update();
+  {
+    boost::mutex::scoped_lock lock(mutex);
+    InputHandler::Instance()->Update();
+  }
 
   this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime = this->physicsEngine->GetStepTime();
@@ -173,6 +179,7 @@ int World::Update()
   if (!Global::userPause && !Global::userStep ||
       (Global::userStep && Global::userStepInc))
   {
+    boost::mutex::scoped_lock lock(mutex);
     this->physicsEngine->Update();
     Global::iterations++;
 
@@ -187,6 +194,7 @@ int World::Update()
   // Update the rendering engine
   if (this->models.size() > 0)
   {
+    boost::mutex::scoped_lock lock(mutex);
     OgreAdaptor::Instance()->Render();
   }
 
@@ -209,7 +217,10 @@ int World::Update()
   }
   this->toDeleteModels.clear();
 
-  OgreAdaptor::Instance()->Render();
+  {
+    boost::mutex::scoped_lock lock(mutex);
+    OgreAdaptor::Instance()->Render();
+  }
 
   return 0;
 }

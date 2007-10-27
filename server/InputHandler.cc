@@ -104,9 +104,18 @@ void InputHandler::HandleEvent(const InputEvent *event)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Clear all events
+void InputHandler::ClearEvents()
+{
+  this->keys.clear();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Handle key press
 void InputHandler::HandleKeyPress( const InputEvent *event )
 {
+  printf("Key Press\n");
   this->keys[event->GetKey()] = 1;
 }
 
@@ -114,7 +123,7 @@ void InputHandler::HandleKeyPress( const InputEvent *event )
 // Handle key release
 bool InputHandler::HandleKeyRelease( const InputEvent *event )
 {
-  //printf("Release[%d]\n",event->GetKey());
+  printf("Release[%d]\n",event->GetKey());
 
   this->keys[event->GetKey()] = 0;
 
@@ -207,8 +216,11 @@ void InputHandler::Update()
       }
     }
   }
+
   camera->Translate(this->directionVec);
   this->directionVec.Set(0,0,0);
+
+  //this->keys.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

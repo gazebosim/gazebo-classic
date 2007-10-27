@@ -14,6 +14,8 @@
 
 namespace gazebo
 {
+  class InputHandler;
+
   class FLTKGui : public Fl_Gl_Window
   {
     public: FLTKGui( int x, int y, int w, int h, const std::string &label );
@@ -30,7 +32,6 @@ namespace gazebo
 
     public: void draw();
     public: void flush();
-    public: void resize(int x, int y, int w, int h);
 
     public: int handle(int event);
 
@@ -42,7 +43,7 @@ namespace gazebo
     public: Colormap colormap;
     public: Display *display;
 
-
+    private: InputHandler *inputHandler;
   };
 
 }

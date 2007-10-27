@@ -11,6 +11,7 @@ namespace gazebo
 {
 
   class FLTKGui;
+  class InputHandler;
 
   /// \brief FLTK Main Window
   class FLTKMainWindow : public Gui, public Fl_Window
@@ -36,10 +37,10 @@ namespace gazebo
     public: void flush();
     public: void resize(int x, int y, int w, int h);
 
-    //public: int handle(int event);
+    public: int handle(int event);
 
     private: FLTKGui *glWindow;
-
+    private: InputHandler *inputHandler;
   };
 
 }
