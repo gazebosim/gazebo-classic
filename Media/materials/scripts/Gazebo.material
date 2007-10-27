@@ -71,9 +71,10 @@ material PerPixelShaded
 	{
 		pass Ambient
 		{
-			ambient 1 1 1 1
+			/*ambient 1 1 1 1
 			diffuse 0 0 0 
 			specular 0 0 0 0
+      */
 			
 			vertex_program_ref Gazebo/AmbientOneTextureVS
 			{
@@ -141,25 +142,25 @@ material PerPixelShaded
 }
 
 
-material Gazebo/test
+material Gazebo/test : PerPixelShaded
 {
   technique
   {
     pass Ambient
     {
-      ambient 1.0 0 0 1
+      ambient 0 0 0  1
       diffuse 0 0 0 1.0
       specular 0 0 0 1.0
     }
     pass DirectionalLight
     {
-			diffuse 1 1 1 1
-	 		specular 0.5 0.5 0.5 0.0 16
+			diffuse 1.0 1.0 1.0 1
+	 		specular 0.8 0.8 0.8 0.0 16
     }
     pass PointLight
     {
-			diffuse 1 1 1 1
-	 		specular 0.5 0.5 0.5 0.0 16
+			diffuse 0.9 0.9 0.9 1
+	 		specular 0.8 0.8 0.8 0.0 16
     }
   }
 }
@@ -186,10 +187,43 @@ material Gazebo/White
 	}
 }
 
+material Gazebo/Grey
+{
+  receive_shadows on
+
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1.000000
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.8 0.8 0.8
+      }
+		}
+	}
+}
+
+material Gazebo/Eyes
+{
+  receive_shadows on
+
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1.000000
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 0.1 0.1 0.1
+      }
+		}
+	}
+}
+
 material Gazebo/FlatBlack
 {
   receive_shadows off
-  lighting on
 
 	technique
 	{
@@ -299,14 +333,12 @@ material Gazebo/PioneerBody
 	}
 }
 
-
 material Gazebo/CloudySky
 {
 	technique
 	{
 		pass
 		{
-			//lighting off
 			depth_write off
 
 			texture_unit
@@ -384,27 +416,28 @@ material Gazebo/Rocky
 	}
 }
 
-
+//: PerPixelShaded
 material Gazebo/GrassFloor
 {
-  receive_shadows on
+  //receive_shadows on
 	technique
 	{
-		pass Ambient
+		pass 
     {
-      //ambient 0 1 0 1
-      //diffuse 0 1 0 1
-      //specular 0 0 0
+     /* ambient 1 1 1 1
+      diffuse 1 1 1 1
+      specular 0 0 0
+      */
 			texture_unit
 			{
 				texture grass_1024.jpg
 			}
 		}
-		pass DirectionalLight
+		/*pass DirectionalLight
     {
-      //ambient 0 1 0 1
-      //diffuse 0 1 0 1
-      //specular 0 0 0
+      ambient 0 1 0 1
+      diffuse 0 1 0 1
+      specular 0 0 0
 			texture_unit
 			{
 				texture grass_1024.jpg
@@ -413,9 +446,9 @@ material Gazebo/GrassFloor
 
 		pass PointLight
     {
-      //ambient 0 1 0
-      //diffuse 0 1 0
-      //specular 0 0 0
+      ambient 0 1 0
+      diffuse 0 1 0
+      specular 0 0 0
 			texture_unit
 			{
 				texture grass_1024.jpg
@@ -423,15 +456,16 @@ material Gazebo/GrassFloor
 		}
 		pass SpotLight
     {
-      //ambient 0 1 0
-      //diffuse 0 1 0
-      //specular 0 0 0
+      ambient 0 1 0
+      diffuse 0 1 0
+      specular 0 0 0
 
 			texture_unit
 			{
 				texture grass_1024.jpg
 			}
 		}
+    */
 
 	}
 }
@@ -549,6 +583,34 @@ material Gazebo/Fish
       texture_unit
       {
         texture steelhead.png
+      }
+    }
+  }
+}
+
+material Gazebo/WoodTile
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture wood_floor.jpg
+      }
+    }
+  }
+}
+
+material Gazebo/Brick
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture brick_5.gif
       }
     }
   }

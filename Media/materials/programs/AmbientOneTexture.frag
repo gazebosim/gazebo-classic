@@ -4,7 +4,10 @@ uniform sampler2D diffuse_map;
 //uniform sampler2D diffuse_map3;
 //uniform sampler2D diffuse_map4;
 
+varying float fogFactor;
+
 void main()
 {
-	gl_FragColor = texture2D( diffuse_map, gl_TexCoord[ 0 ].st ) * gl_Color;
+  vec4 color = texture2D( diffuse_map, gl_TexCoord[ 0 ].st ) * gl_Color;
+	gl_FragColor = mix(  vec4(gl_Fog.color), color, fogFactor);
 }
