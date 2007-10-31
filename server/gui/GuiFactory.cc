@@ -24,6 +24,8 @@
  * Date: 03 Aug 2007
  * SVN info: $Id$
  */
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Menu_Bar.H>
 
 #include "Gui.hh"
 #include "Body.hh"
@@ -31,7 +33,7 @@
 
 using namespace gazebo;
 
-void RegisterFLTKMainWindow();
+void RegisterFLTKGui();
 
 std::map<std::string, GuiFactoryFn> GuiFactory::guis;
 
@@ -39,7 +41,7 @@ std::map<std::string, GuiFactoryFn> GuiFactory::guis;
 // Register all known guis.
 void GuiFactory::RegisterAll()
 {
-  RegisterFLTKMainWindow();
+  RegisterFLTKGui();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

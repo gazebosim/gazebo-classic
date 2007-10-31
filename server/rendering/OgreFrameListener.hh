@@ -19,7 +19,7 @@ namespace gazebo
   
   class OgreAdaptor;
   
-  class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener
+  class OgreFrameListener : public Ogre::FrameListener//, public Ogre::WindowEventListener
   {
     public: OgreFrameListener();
     public: virtual ~OgreFrameListener();

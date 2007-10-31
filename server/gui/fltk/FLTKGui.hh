@@ -16,7 +16,7 @@ namespace gazebo
 {
   class InputHandler;
 
-  class FLTKGui : public Fl_Gl_Window
+  class FLTKGui : public Fl_Gl_Window, public Gui
   {
     public: FLTKGui( int x, int y, int w, int h, const std::string &label );
     public: virtual ~FLTKGui();
@@ -30,18 +30,11 @@ namespace gazebo
     /// \brief Get the height of the gui's rendering window
     public: virtual unsigned int GetHeight() const;
 
-    public: void draw();
-    public: void flush();
-
+    /// \brief Handle event
     public: int handle(int event);
 
     private: Vector3 translateVec;
     private: float translateScale;
-
-    public: Window windowId;
-    public: XVisualInfo *visual;
-    public: Colormap colormap;
-    public: Display *display;
 
     private: InputHandler *inputHandler;
   };

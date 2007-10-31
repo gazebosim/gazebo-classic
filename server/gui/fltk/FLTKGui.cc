@@ -1,5 +1,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Menu_Bar.H>
+
 #include <GL/glx.h>
 #include <boost/thread/thread.hpp>
 
@@ -9,18 +12,41 @@
 #include "GuiFactory.hh"
 #include "OgreAdaptor.hh"
 #include "GazeboMessage.hh"
+#include "GuiFactory.hh"
 #include "FLTKGui.hh"
 
 using namespace gazebo;
 
+GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
+
 extern boost::mutex mutex;
+
+void quit_cb(Fl_Widget*, void*) {Global::userQuit = true;}
+
+Fl_Menu_Item menuitems[] = {
+  { "File", 0, 0, 0, FL_SUBMENU },
+  { "Quit", 0, quit_cb, 0, FL_MENU_DIVIDER },
+  { 0 },
+  
+  { 0 }
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label) 
-  : Fl_Gl_Window( x, y, w, h, label.c_str() )
+  : Gui(), Fl_Gl_Window( x, y, w, h, label.c_str() )
 {
+//  this->begin();
+
   this->end();
+  this->show();
+
+  this->display = fl_display;
+  this->visual = fl_visual;
+  this->colormap = fl_colormap;
+  this->windowId = Fl_X::i(this)->xid;
+
   this->inputHandler = InputHandler::Instance();
 }
 
@@ -35,18 +61,21 @@ FLTKGui::~FLTKGui()
 // Init
 void FLTKGui::Init()
 {
-
-  this->show();
+  Fl_Window::show();
+  printf("GUI Init\n");
+  /*this->show();
   this->display = fl_display;
   this->visual = fl_visual;
   this->colormap = fl_colormap;
   this->windowId = Fl_X::i(this)->xid;
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the width of the gui's rendering window
 unsigned int FLTKGui::GetWidth() const
 {
+  printf("GUI GetWidth\n");
   return this->w();
 }
 
@@ -54,22 +83,15 @@ unsigned int FLTKGui::GetWidth() const
 /// Get the height of the gui's rendering window
 unsigned int FLTKGui::GetHeight() const
 {
+  printf("GUI GetHeight\n");
   return this->h();
 }
 
-void FLTKGui::draw()
-{
-}
-
-void FLTKGui::flush()
-{
-  this->draw();
-}
-
-// Handle events
+////////////////////////////////////////////////////////////////////////////////
+/// Handle events
 int FLTKGui::handle(int event)
 {
-
+  printf("GUI Handle\n");
   InputEvent gzevent;
 
   // Get the mouse position
@@ -102,6 +124,18 @@ int FLTKGui::handle(int event)
   // Set the type of the event
   switch (event)
   {
+    case FL_ENTER:
+    case FL_LEAVE:
+    case FL_DEACTIVATE:
+    case FL_HIDE:
+      this->inputHandler->ClearEvents();
+      return 0;
+
+    case FL_CLOSE:
+      printf("CLOSE\n");
+      Global::userQuit = true;
+      return 0;
+
     case FL_PUSH:
       gzevent.SetType(InputEvent::MOUSE_PRESS);
       break;
@@ -127,6 +161,8 @@ int FLTKGui::handle(int event)
     default:
       return 0;
   }
+
+  boost::mutex::scoped_lock lock(mutex);
 
   this->inputHandler->HandleEvent(&gzevent);
 

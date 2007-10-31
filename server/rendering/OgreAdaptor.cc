@@ -472,7 +472,7 @@ void OgreAdaptor::CreateLight(XMLConfigNode *node, Entity *entity)
 // Render
 int OgreAdaptor::Render()
 {
-  Ogre::WindowEventUtilities::messagePump();
+  //Ogre::WindowEventUtilities::messagePump();
 
   OgreHUD::Instance()->Update();
 

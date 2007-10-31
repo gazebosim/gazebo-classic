@@ -370,6 +370,7 @@ int Init()
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Finalize the sim
 int Fini()
 {
@@ -380,24 +381,25 @@ int Fini()
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Idle-time processing
 void MainCallback()
 {
+  boost::mutex::scoped_lock lock(mutex);
 
   // Advance the world 
   gazebo::World::Instance()->Update();
-
-  /*if (gazebo::Global::gui)
-    gazebo::Global::gui->Update();
-    */
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Run the FLTK main loop
 void FLTKLoop()
 {
   Fl::run();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Main function
 int main(int argc, char **argv)
 {
   if (ParseArgs(argc, argv) != 0)
@@ -428,7 +430,7 @@ int main(int argc, char **argv)
     while (!gazebo::Global::userQuit)
     {
       MainCallback();
-  //    usleep(1000);
+      usleep(1000);
     }
   }
   catch (gazebo::GazeboError e)
@@ -449,7 +451,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  fltkThread.join();
+  //fltkThread.join();
 
   return 0;
 }
