@@ -52,12 +52,12 @@ HeightmapGeom::~HeightmapGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void HeightmapGeom::Update() 
+void HeightmapGeom::UpdateChild() 
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Update function.
+/// get height at a point
 double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
 {
   Ogre::Vector3 pos3(pos.y, this->terrainSize.z, pos.x);

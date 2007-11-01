@@ -107,11 +107,11 @@ OgreHUD *OgreHUD::Instance()
 void OgreHUD::Update()
 {
   std::ostringstream stream;
-  if (Global::userPause)
+  if (Global::GetUserPause())
   {
     this->SetText("__GAZEBO_HUD_PAUSE__","Paused");
   }
-  else if (Global::userStep)
+  else if (Global::GetUserStep())
   {
     this->SetText("__GAZEBO_HUD_PAUSE__","Step");
   }
@@ -128,7 +128,7 @@ void OgreHUD::Update()
   stream.fill('0');
 
   stream << "FPS        [" << (int)avgFPS << "]\n"
-         << "Iterations [" << Global::iterations << "]\n"
+         << "Iterations [" << Global::GetIterations() << "]\n"
          << "Time       [" << World::Instance()->GetRealTime() << " " 
          << World::Instance()->GetSimTime() << " " 
          << World::Instance()->GetPauseTime() << "]";
@@ -256,11 +256,11 @@ void OgreHUD::ToggleHelp()
   if (this->helpPanel->isVisible())
   {
     this->helpPanel->hide();
-    Global::userPause = false;
+    Global::SetUserPause(false);
   }
   else
   {
-    Global::userPause = true;
+    Global::SetUserPause(true);
     this->helpPanel->show();
   }
 }
@@ -377,6 +377,7 @@ void OgreHUD::CreateHelp()
   text += "\t Q     : Translate camera up\n";
   text += "\t E     : Translate camera down\n";
   text += "\t H     : Display this help menu\n";
+  text += "\t B     : Toggle display of ODE bounding boxes\n";
 
   left = 0.25;
   top = 0.25;

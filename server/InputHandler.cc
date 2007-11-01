@@ -62,6 +62,7 @@ InputHandler::~InputHandler()
 /// Handle an input event
 void InputHandler::HandleEvent(const InputEvent *event)
 {
+
   switch( event->GetType() )
   {
     case InputEvent::MOUSE_PRESS:
@@ -107,6 +108,7 @@ void InputHandler::HandleEvent(const InputEvent *event)
 /// Clear all events
 void InputHandler::ClearEvents()
 {
+
   this->keys.clear();
 }
 
@@ -115,7 +117,14 @@ void InputHandler::ClearEvents()
 // Handle key press
 void InputHandler::HandleKeyPress( const InputEvent *event )
 {
-  printf("Key Press\n");
+
+  switch(event->GetKey())
+  {
+    case XK_Escape:
+      Global::SetUserQuit(true);
+      break;
+  }
+
   this->keys[event->GetKey()] = 1;
 }
 
@@ -123,18 +132,23 @@ void InputHandler::HandleKeyPress( const InputEvent *event )
 // Handle key release
 bool InputHandler::HandleKeyRelease( const InputEvent *event )
 {
-  printf("Release[%d]\n",event->GetKey());
-
   this->keys[event->GetKey()] = 0;
 
   // Handle all toggle keys
   switch (event->GetKey())
   {
     case XK_t:
-      if (Global::userPause)
-        Global::userPause = false;
-      Global::userStep = !Global::userStep;
-      Global::userStepInc = false;
+      if (Global::GetUserPause())
+        Global::SetUserPause(false);
+      Global::SetUserStep( !Global::GetUserStep() );
+      Global::SetUserStepInc( false );
+      break;
+
+    case XK_f:
+      {
+        CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
+        camera->ToggleSaveFrame();
+      }
       break;
 
     case XK_h:
@@ -142,16 +156,20 @@ bool InputHandler::HandleKeyRelease( const InputEvent *event )
       break;
 
     case XK_space:
-      if (Global::userStep)
+      if (Global::GetUserStep())
       {
-        Global::userStepInc = true;
+        Global::SetUserStepInc( true );
       }
       else
-        Global::userPause = !Global::userPause;
+        Global::SetUserPause( !Global::GetUserPause() );
       break;
 
     case XK_Escape:
-      Global::userQuit = true;
+      Global::SetUserQuit( true );
+      break;
+
+    case XK_b:
+      Global::SetShowBoundingBoxes( !Global::GetShowBoundingBoxes() );
       break;
 
     case XK_bracketleft:
@@ -216,6 +234,8 @@ void InputHandler::Update()
       }
     }
   }
+
+  //std::cout << "DirectionVec[" << this->directionVec << "]\n";
 
   camera->Translate(this->directionVec);
   this->directionVec.Set(0,0,0);

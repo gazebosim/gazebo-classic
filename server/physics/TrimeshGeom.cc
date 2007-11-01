@@ -47,7 +47,7 @@ TrimeshGeom::~TrimeshGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void TrimeshGeom::Update() 
+void TrimeshGeom::UpdateChild() 
 {
   
   // tell the tri-tri collider the current transform of the trimesh --

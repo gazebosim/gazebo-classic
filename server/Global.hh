@@ -33,6 +33,9 @@
 
 #include <stdint.h>
 #include <list>
+//#include <boost/thread/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+
 #include "Pose3d.hh"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -110,21 +113,45 @@ namespace gazebo
   */  
   class Global
   {
+    public: static boost::recursive_mutex mutex;
+
     /// \brief Set to true when the user wants to leave the application
-    public: static bool userQuit;
+    private: static bool userQuit;
+
+    public: static bool GetUserQuit();
+    public: static void SetUserQuit(bool quit);
 
     /// \brief Set to true to pause the simulation
-    public: static bool userPause;
+    private: static bool userPause;
+
+    public: static bool GetUserPause();
+    public: static void SetUserPause(bool pause);
 
     /// \brief Set to true to step through the simulation
-    public: static bool userStep;
+    private: static bool userStep;
+
+    public: static bool GetUserStep();
+    public: static void SetUserStep( bool step );
 
     /// \brief Set to true to increment the simulation once. This is only
     ///        valid when userStep is true.
-    public: static bool userStepInc;
+    private: static bool userStepInc;
+
+    public: static bool GetUserStepInc();
+    public: static void SetUserStepInc(bool step);
+
+    /// \brief Set to true to show bounding boxes
+    private: static bool showBoundingBoxes;
+
+    public: static bool GetShowBoundingBoxes();
+    public: static void SetShowBoundingBoxes(bool show);
 
     /// \brief Count of the number of iterations
-    public: static unsigned long iterations;
+    private: static unsigned long iterations;
+
+    public: static unsigned long GetIterations();
+    public: static void SetIterations(unsigned long count);
+    public: static void IncIterations();
 
     /// \brief Pointer to the selected Gui 
     public: static Gui *gui;
@@ -140,7 +167,6 @@ namespace gazebo
 
     private: Global();
     private: ~Global();
-
   };
 
   /// \}

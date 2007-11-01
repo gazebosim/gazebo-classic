@@ -26,12 +26,15 @@ Geom::Geom( Body *body)//, const std::string &name)
   this->transId = NULL;
 
   this->ogreObj = NULL;
+  this->odeObj = NULL;
 
   this->laserFiducialId = -1;
   this->laserRetro = 0.0;
 
   // Most geoms don't need extra rotation. Cylinders do.
   this->extraRotation.SetToIdentity();
+
+  this->boundingBoxNode = NULL;
 
   // Zero out the mass
   dMassSetZero(&this->mass);
@@ -76,50 +79,38 @@ void Geom::Load(XMLConfigNode *node)
   this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
   this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
 
-  /*dReal aabb[6];
-  dGeomGetAABB(this->geomId, aabb);
-
-  std::cout << "Geom Name[" << this->GetName() << "]\n";
-  std::cout << "  AABB[";
-  for (int i=0; i<6; i++)
+  // Create the bounding box
+  if (dGeomGetClass(this->geomId) != dPlaneClass) 
   {
-    std::cout << aabb[i] << " "; 
+    dReal aabb[6];
+    dGeomGetAABB(this->geomId, aabb);
+
+    Vector3 min(aabb[0], aabb[2], aabb[4]);
+    Vector3 max(aabb[1], aabb[3], aabb[5]);
+
+    this->boundingBoxNode = this->sceneNode->createChildSceneNode(this->GetName()+"_AABB_NODE"); 
+    this->boundingBoxNode->setInheritScale(false);
+
+    this->odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName()+"_AABB", "unit_box"));
+
+    this->boundingBoxNode->attachObject(this->odeObj);
+    Vector3 diff = max-min;
+
+    this->boundingBoxNode->setScale(diff.y, diff.z, diff.x);
+
+    Ogre::Entity *ent = NULL;
+    Ogre::SimpleRenderable *simple = NULL;
+
+    ent = dynamic_cast<Ogre::Entity*>(this->odeObj);
+    simple = dynamic_cast<Ogre::SimpleRenderable*>(this->odeObj);
+
+    if (ent)
+      ent->setMaterialName("Gazebo/TransparentTest");
+    else if (simple)
+      simple->setMaterial("Gazebo/TransparentTest");
+
+    this->boundingBoxNode->setVisible(false);
   }
-
-  Ogre::ManualObject* myManualObject =  OgreAdaptor::Instance()->sceneMgr->createManualObject(this->GetName()+"_AABB"); 
-
-  Ogre::SceneNode* myManualObjectNode = this->sceneNode->createChildSceneNode(this->GetName()+"_AABB_NODE"); 
-
-  Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create(this->GetName() + "manual1Material","debugger"); 
-  myManualObjectMaterial->setReceiveShadows(false); 
-  myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
-  myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0,0,1,0); 
-  myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0,0,1); 
-  myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0,0,1); 
-
-  myManualObject->begin(this->GetName() + "manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
-
-  Vector3 min(aabb[0], aabb[2], aabb[4]);
-  Vector3 max(aabb[1], aabb[3], aabb[5]);
-
-  myManualObject->position(min.x, min.y, min.z); 
-  myManualObject->position(max.x, max.y, max.z); 
-  //myManualObject->position(min.x, min.y, max.z); 
-
-  //myManualObject->position(min.x, max.y, max.z); 
-  //myManualObject->position(min.x, max.y, max.z); 
-
-  //myManualObject->position(0, 1, 0); 
-  //myManualObject->position(0, 0, 0); 
-  //myManualObject->position(0, 0, 1); 
-  //myManualObject->position(0, 0, 0); 
-  //myManualObject->position(1, 0, 0); 
-  
-  // etc 
-  myManualObject->end(); 
-  myManualObjectNode->attachObject(myManualObject);
-  */
-
 }
  
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,6 +147,14 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   //std::ostringstream stream;
   //stream << "Entity[" << (int)this->geomId << "]";
   //this->SetName(stream.str());
+}
+
+void Geom::Update()
+{
+  if (this->boundingBoxNode)
+    this->boundingBoxNode->setVisible(Global::GetShowBoundingBoxes());
+
+  this->UpdateChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

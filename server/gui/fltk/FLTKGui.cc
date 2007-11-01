@@ -19,9 +19,7 @@ using namespace gazebo;
 
 GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
 
-extern boost::mutex mutex;
-
-void quit_cb(Fl_Widget*, void*) {Global::userQuit = true;}
+void quit_cb(Fl_Widget*, void*) {Global::SetUserQuit(true);}
 
 Fl_Menu_Item menuitems[] = {
   { "File", 0, 0, 0, FL_SUBMENU },
@@ -75,7 +73,6 @@ void FLTKGui::Init()
 /// Get the width of the gui's rendering window
 unsigned int FLTKGui::GetWidth() const
 {
-  printf("GUI GetWidth\n");
   return this->w();
 }
 
@@ -83,7 +80,6 @@ unsigned int FLTKGui::GetWidth() const
 /// Get the height of the gui's rendering window
 unsigned int FLTKGui::GetHeight() const
 {
-  printf("GUI GetHeight\n");
   return this->h();
 }
 
@@ -91,7 +87,6 @@ unsigned int FLTKGui::GetHeight() const
 /// Handle events
 int FLTKGui::handle(int event)
 {
-  printf("GUI Handle\n");
   InputEvent gzevent;
 
   // Get the mouse position
@@ -133,7 +128,7 @@ int FLTKGui::handle(int event)
 
     case FL_CLOSE:
       printf("CLOSE\n");
-      Global::userQuit = true;
+      Global::SetUserQuit(true);
       return 0;
 
     case FL_PUSH:
@@ -162,7 +157,7 @@ int FLTKGui::handle(int event)
       return 0;
   }
 
-  boost::mutex::scoped_lock lock(mutex);
+  //boost::mutex::scoped_lock lock(Global::mutex);
 
   this->inputHandler->HandleEvent(&gzevent);
 

@@ -333,11 +333,19 @@ void CameraSensor::EnableSaveFrame(bool enable)
   this->saveFrames = enable;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/// Toggle saving of frames
+void CameraSensor::ToggleSaveFrame()
+{
+  this->saveFrames = !this->saveFrames;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Save the current frame to disk
 void CameraSensor::SaveFrame()
 {
+  printf("Saving\n");
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   std::ostringstream sstream;
   Ogre::ImageCodec::ImageData *imgData;
@@ -362,8 +370,15 @@ void CameraSensor::SaveFrame()
   Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
 
   char tmp[1024];
-  sprintf(tmp, "%s/%s-%04d.jpg", this->savePathname.c_str(), 
-      this->GetName().c_str(), this->saveCount);
+  if (!this->savePathname.empty())
+  {
+    sprintf(tmp, "%s/%s-%04d.jpg", this->savePathname.c_str(), 
+        this->GetName().c_str(), this->saveCount);
+  }
+  else
+  {
+    sprintf(tmp, "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
+  }
 
   // Get codec
   Ogre::String filename = tmp; 

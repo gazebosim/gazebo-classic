@@ -17,7 +17,7 @@
   <physics:ode>
     <stepTime>0.03</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>0.008</cfm>
+    <cfm>1e-5</cfm>
     <erp>0.2</erp>
   </physics:ode>
 
@@ -38,12 +38,13 @@
   </rendering:ogre>
 
   <model:physical name="test">
-    <xyz>-0.048 0 -0.042</xyz>
+    <xyz>0 0 0.1</xyz>
     <static>true</static>
     <body:box name="test_body">
       <geom:box name="test_geom">
         <mesh>default</mesh>
-        <size>0.01 1 0.01</size>
+        <size>.2 .2 .25</size>
+        <material>Gazebo/WoodTile</material>
       </geom:box>
     </body:box>
   </model:physical>
@@ -54,10 +55,9 @@
     <static>false</static>
 
     <body:box name="head_body">
-      <!--<xyz>0.02 0 0.03</xyz>-->
+      <xyz>-0.01 0 0.02</xyz>
       <geom:box name="head_geom">
         <mesh>head_1.mesh</mesh>
-        <size>0.158 0.127 0.175 </size>
         <mass>1.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
@@ -68,71 +68,66 @@
       <rpy>183.928 0 -90</rpy>
       <geom:box name="neck_geom">
         <mesh>neck_1.mesh</mesh>
-        <size>0.63 0.63 0.76</size>
         <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
 
     <joint:hinge name="head_neck_hinge">
-      <body1>head_body</body1>
-      <body2>neck_body</body2>
-      <anchor>neck_body</anchor>
-      <anchorOffset>-0.015 0 0.029</anchorOffset>
+      <body1>neck_body</body1>
+      <body2>head_body</body2>
+      <anchor>head_body</anchor>
       <axis>0 1 0</axis>
       <lowStop>-30</lowStop>
-      <highStop>5</highStop>
+      <highStop>15</highStop>
     </joint:hinge>
+   
 
     <joint:hinge name="neck_torso_hinge">
       <body1>neck_body</body1>
       <body2>torso_body</body2>
       <anchor>torso_body</anchor>
       <axis>0 0 1</axis>
-      <lowStop>0</lowStop>
-      <highStop>0</highStop>
+      <lowStop>-90</lowStop>
+      <highStop>90</highStop>
     </joint:hinge>
-
 
     <body:box name="torso_body">
       <xyz>-0.025 0 -0.223</xyz>
       <rpy>0 0 -90</rpy>
       <geom:box name="torso_geom">
         <mesh>body_model_1.mesh</mesh>
-        <size>0.145 0.196 0.299</size>
-        <mass>0.1</mass>
+        <mass>5</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
-
+    
     <body:box name="right_shoulder_mounting_body">
       <xyz>-0.035 0.131 -0.168</xyz>
       <rpy>180 0 0</rpy>
       <geom:box name="right_shoulder_mounting_geom">
         <mesh>shoulder_mounting_1.mesh</mesh>
-        <size>0.81 0.66 0.105</size>
-        <mass>0.1</mass>
+        <mass>0.01</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
 
-    <joint:hinge name="right_torso_shoulder_mountin_hinge">
+    <joint:hinge name="right_torso_shoulder_mounting_hinge">
       <body1>torso_body</body1>
       <body2>right_shoulder_mounting_body</body2>
       <anchor>right_shoulder_mounting_body</anchor>
       <axis>0 1 0</axis>
-      <lowStop>0</lowStop>
-      <highStop>10</highStop>
+      <lowStop>-30</lowStop>
+      <highStop>179</highStop>
     </joint:hinge>
 
-
+    
     <body:box name="right_shoulder_body">
       <xyz>-0.035 0.167 -0.197</xyz>
       <rpy>0 180 0</rpy>
       <geom:box name="right_shoulder_geom">
         <mesh>right_shoulder.mesh</mesh>
-        <size>0.111 0.083 0.078</size>
-        <mass>0.1</mass>
+        <mass>0.01</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
@@ -141,9 +136,10 @@
       <body1>right_shoulder_mounting_body</body1>
       <body2>right_shoulder_body</body2>
       <anchor>right_shoulder_body</anchor>
+      <anchorOffset>0 0 0</anchorOffset>
       <axis>1 0 0</axis>
-      <lowStop>0</lowStop>
-      <highStop>10</highStop>
+      <lowStop>-80</lowStop>
+      <highStop>0</highStop>
     </joint:hinge>
 
 
@@ -152,8 +148,7 @@
       <rpy>0 0 90</rpy>
       <geom:box name="right_bicep_geom">
         <mesh>bicep.mesh</mesh>
-        <size>0.075 0.075 0.075</size>
-        <mass>0.1</mass>
+        <mass>0.01</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
@@ -166,15 +161,14 @@
       <lowStop>0</lowStop>
       <highStop>10</highStop>
     </joint:hinge>
-
+    
 
     <body:box name="right_forearm_body">
       <xyz>-0.028 0.170 -0.372</xyz>
       <rpy>0 180 180</rpy>
-      <geom:box name="right_bicep_geom">
+      <geom:box name="right_forearm_geom">
         <mesh>right_forearm.mesh</mesh>
-        <size>0.065 0.068 0.095</size>
-        <mass>0.1</mass>
+        <mass>0.01</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
@@ -188,14 +182,12 @@
       <highStop>10</highStop>
     </joint:hinge>
 
-
     <body:box name="right_wrist_body">
       <xyz>-0.026 0.170 -0.434</xyz>
       <rpy>0 0 0</rpy>
       <geom:box name="right_wrist_geom">
         <mesh>wrist.mesh</mesh>
-        <size>0.054 0.054 0.025</size>
-        <mass>0.1</mass>
+        <mass>0.01</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
@@ -215,8 +207,7 @@
       <rpy>90 0 90</rpy>
       <geom:box name="right_hand_geom">
         <mesh>right_hand.mesh</mesh>
-        <size>0.098 0.054 0.057</size>
-        <mass>0.1</mass>
+        <mass>0.01</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
@@ -225,7 +216,7 @@
       <body1>right_wrist_body</body1>
       <body2>right_hand_body</body2>
       <anchor>right_hand_body</anchor>
-      <axis>1 0 0</axis>
+      <axis>0 1 0</axis>
       <lowStop>0</lowStop>
       <highStop>10</highStop>
     </joint:hinge>
@@ -236,8 +227,7 @@
       <rpy>90 0 90</rpy>
       <geom:box name="right_thumb_geom">
         <mesh>thumb.mesh</mesh>
-        <size>0.072 0.028 0.038</size>
-        <mass>0.1</mass>
+        <mass>0.01</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
@@ -246,16 +236,10 @@
       <body1>right_hand_body</body1>
       <body2>right_thumb_body</body2>
       <anchor>right_hand_body</anchor>
-      <axis>1 0 0</axis>
+      <axis>0 1 0</axis>
       <lowStop>0</lowStop>
       <highStop>10</highStop>
     </joint:hinge>
-
-    <controller:bandit_actarray name="bandit_controller">
-      <head_neck_joint>head_neck_hinge</head_neck_joint>
-      <interface:actarray name="actarray_iface"/>
-    </controller:bandit_actarray>
-
 
 
     <body:box name="left_shoulder_mounting_body">
@@ -263,63 +247,113 @@
       <rpy>0 0 0</rpy>
       <geom:box name="left_shoulder_mounting_geom">
         <mesh>shoulder_mounting_1.mesh</mesh>
-        <size>0.66 0.81 0.105</size>
         <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
+
+    <joint:hinge name="left_torso_shoulder_mounting_hinge">
+      <body1>torso_body</body1>
+      <body2>left_shoulder_mounting_body</body2>
+      <anchor>left_shoulder_mounting_body</anchor>
+      <axis>0 1 0</axis>
+      <lowStop>0</lowStop>
+      <highStop>10</highStop>
+    </joint:hinge>
+
 
     <body:box name="left_shoulder_body">
       <xyz>-0.035 -0.167 -0.197</xyz>
       <rpy>0 180 0</rpy>
       <geom:box name="left_shoulder_geom">
         <mesh>left_shoulder.mesh</mesh>
-        <size>0.111 0.083 0.078</size>
         <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
+
+    <joint:hinge name="left_shoulder_mounting_shoulder_hinge">
+      <body1>left_shoulder_mounting_body</body1>
+      <body2>left_shoulder_body</body2>
+      <anchor>left_shoulder_body</anchor>
+      <axis>1 0 0</axis>
+      <lowStop>0</lowStop>
+      <highStop>10</highStop>
+    </joint:hinge>
 
     <body:box name="left_bicep_body">
       <xyz>-0.035 -0.170 -0.288</xyz>
       <rpy>0 0 90</rpy>
       <geom:box name="left_bicep_geom">
         <mesh>bicep.mesh</mesh>
-        <size>0.075 0.075 0.075</size>
         <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
 
+    <joint:hinge name="left_shoulder_bicep_hinge">
+      <body1>left_shoulder_body</body1>
+      <body2>left_bicep_body</body2>
+      <anchor>left_bicep_body</anchor>
+      <axis>0 0 1</axis>
+      <lowStop>0</lowStop>
+      <highStop>10</highStop>
+    </joint:hinge>
+
     <body:box name="left_forearm_body">
       <xyz>-0.028 -0.170 -0.372</xyz>
       <rpy>0 180 180</rpy>
-      <geom:box name="left_bicep_geom">
+      <geom:box name="left_forearm_geom">
         <mesh>left_forearm.mesh</mesh>
-        <size>0.065 0.068 0.095</size>
         <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
+
+    <joint:hinge name="left_bicep_forearm_hinge">
+      <body1>left_bicep_body</body1>
+      <body2>left_forearm_body</body2>
+      <anchor>left_forearm_body</anchor>
+      <axis>0 1 0</axis>
+      <lowStop>0</lowStop>
+      <highStop>10</highStop>
+    </joint:hinge>
+
+
+    <joint:hinge name="left_forearm_wrist_hinge">
+      <body1>left_forearm_body</body1>
+      <body2>left_wrist_body</body2>
+      <anchor>left_wrist_body</anchor>
+      <axis>0 0 1</axis>
+      <lowStop>0</lowStop>
+      <highStop>10</highStop>
+    </joint:hinge>
+
 
     <body:box name="left_wrist_body">
       <xyz>-0.026 -0.170 -0.434</xyz>
       <rpy>0 0 0</rpy>
       <geom:box name="left_wrist_geom">
         <mesh>wrist.mesh</mesh>
-        <size>0.054 0.054 0.025</size>
-        <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
 
+    <joint:hinge name="left_wrist_hand_hinge">
+      <body1>left_wrist_body</body1>
+      <body2>left_hand_body</body2>
+      <anchor>left_hand_body</anchor>
+      <axis>1 0 0</axis>
+      <lowStop>0</lowStop>
+      <highStop>10</highStop>
+    </joint:hinge>
+
+
     <body:box name="left_hand_body">
       <xyz>-0.028 -0.170 -0.486</xyz>
       <rpy>90 0 90</rpy>
-      <geom:box name="right_wrist_geom">
+      <geom:box name="left_hand_geom">
         <mesh>left_hand.mesh</mesh>
-        <size>0.098 0.054 0.057</size>
-        <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
@@ -329,13 +363,32 @@
       <rpy>90 0 90</rpy>
       <geom:box name="left_thumb_geom">
         <mesh>thumb.mesh</mesh>
-        <size>0.072 0.028 0.038</size>
-        <mass>0.1</mass>
         <material>Gazebo/test</material>
       </geom:box>
     </body:box>
 
+    <joint:hinge name="left_hand_thumb_hinge">
+      <body1>left_hand_body</body1>
+      <body2>left_thumb_body</body2>
+      <anchor>left_hand_body</anchor>
+      <axis>0 1 0</axis>
+      <lowStop>0</lowStop>
+      <highStop>10</highStop>
+    </joint:hinge>
+
+    <controller:bandit_actarray name="bandit_controller">
+      <head_neck_joint>head_neck_hinge</head_neck_joint>
+      <neck_torso_joint>neck_torso_hinge</neck_torso_joint>
+      <right_torso_shoulder_mounting_joint>right_torso_shoulder_mounting_hinge</right_torso_shoulder_mounting_joint>
+      <right_shoulder_mounting_shoulder_joint>right_shoulder_mounting_shoulder_hinge</right_shoulder_mounting_shoulder_joint>
+
+      <left_torso_shoulder_mounting_joint>left_torso_shoulder_mounting_hinge</left_torso_shoulder_mounting_joint>
+
+      <interface:actarray name="actarray_iface"/>
+    </controller:bandit_actarray>
+
   </model:physical>
+
 
   <!-- Ground Plane -->
   <model:physical name="plane1_model">
@@ -381,7 +434,7 @@
       <attenuation>100 0.0 1.0 0.4</attenuation>
     </light>
   </model:renderable>
-  
+
   <model:renderable name="directional_white2">
     <light>
       <type>directional</type>
@@ -391,6 +444,7 @@
       <attenuation>100 0.0 1.0 0.4</attenuation>
     </light>
   </model:renderable>
+  
 
 
 

@@ -103,8 +103,9 @@ home directory, or to the log file specified with the -l command line option.
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
-#include <FL/Fl.H>
 #include <boost/thread/thread.hpp>
+#include <FL/Fl.H>
+#include <FL/x.H>
 
 #include "Global.hh"
 #include "Gui.hh"
@@ -127,7 +128,6 @@ double optTimeout = -1;
 int optMsgLevel = 1;
 int optTimeControl = 1;
 
-boost::mutex mutex;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -236,7 +236,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ ) 
 {
-  gazebo::Global::userQuit = true;
+  gazebo::Global::SetUserQuit(true);
   return;
 }
 
@@ -385,7 +385,7 @@ int Fini()
 // Idle-time processing
 void MainCallback()
 {
-  boost::mutex::scoped_lock lock(mutex);
+  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
 
   // Advance the world 
   gazebo::World::Instance()->Update();
@@ -395,7 +395,10 @@ void MainCallback()
 // Run the FLTK main loop
 void FLTKLoop()
 {
-  Fl::run();
+  while (!gazebo::Global::GetUserQuit() && Fl_X::first)
+    Fl::wait(0.5);
+
+  //Fl::run();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -422,15 +425,15 @@ int main(int argc, char **argv)
   // Run FLTK main loop in a separate thread
   boost::thread fltkThread(FLTKLoop);
 
-  //Fl::add_idle(MainCallback);
-  //Fl::run();
-
   try
   {
-    while (!gazebo::Global::userQuit)
+    bool done = false;
+    while (!done)
     {
       MainCallback();
       usleep(1000);
+      boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+      done = gazebo::Global::GetUserQuit();
     }
   }
   catch (gazebo::GazeboError e)
@@ -438,7 +441,6 @@ int main(int argc, char **argv)
     std::cerr << "MainIdle Failed[" << e << "]\n";
     return -1;
   }
-  
 
   try
   {
@@ -451,7 +453,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  //fltkThread.join();
+  fltkThread.join();
 
   return 0;
 }

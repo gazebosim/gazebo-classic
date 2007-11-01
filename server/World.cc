@@ -171,13 +171,13 @@ int World::Update()
   }
 
   // Update the physics engine
-  if (!Global::userPause && !Global::userStep ||
-      (Global::userStep && Global::userStepInc))
+  if (!Global::GetUserPause() && !Global::GetUserStep() ||
+      (Global::GetUserStep() && Global::GetUserStepInc()))
   {
     this->physicsEngine->Update();
-    Global::iterations++;
+    Global::IncIterations();
 
-    Global::userStepInc = !Global::userStepInc;
+    Global::SetUserStepInc(!Global::GetUserStepInc());
   }
   else
   {
@@ -212,8 +212,6 @@ int World::Update()
   }
 
   this->toDeleteModels.clear();
-
-  OgreAdaptor::Instance()->Render();
 
   return 0;
 }
@@ -387,7 +385,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   model->SetInitPose(pose);
 
   // Add the model to our list
-  if (Global::iterations == 0)
+  if (Global::GetIterations() == 0)
     this->models.push_back(model);
   else
   {

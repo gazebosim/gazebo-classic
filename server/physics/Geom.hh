@@ -12,6 +12,7 @@ namespace Ogre
   class Entity;
   class MaterialPtr;
   class MovableObject;
+  class SceneNode;
 }
 
 namespace gazebo
@@ -44,7 +45,8 @@ namespace gazebo
     public: void SetGeom(dGeomID geomId, bool placeable);
   
     /// \brief Update function for geoms
-    public: virtual void Update() {}
+    public: void Update();
+    public: virtual void UpdateChild() {};
   
     /// \brief Return the geom id
     /// \return The geom id
@@ -127,6 +129,7 @@ namespace gazebo
     private: bool placeable;
   
     protected: Ogre::MovableObject *ogreObj;
+    protected: Ogre::MovableObject *odeObj;
   
     /// ID for the transform geom and sub-geom
     protected: dGeomID transId, geomId;
@@ -144,6 +147,8 @@ namespace gazebo
 
     protected: std::string meshName;
     protected: double dblMass;
+
+    private: Ogre::SceneNode *boundingBoxNode;
   };
 
   /// \}

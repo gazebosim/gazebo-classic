@@ -70,7 +70,7 @@ namespace gazebo
     public: virtual ~TrimeshGeom();
 
     /// \brief Update function 
-    public: void Update();
+    public: void UpdateChild();
 
     /// \brief Load the trimesh
     protected: virtual void LoadChild(XMLConfigNode *node);

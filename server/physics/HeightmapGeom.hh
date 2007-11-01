@@ -82,7 +82,7 @@ namespace gazebo
     public: virtual ~HeightmapGeom();
 
     /// \brief Update function 
-    public: void Update();
+    public: void UpdateChild();
 
     /// \brief Get the height of the heightmap as a specific coordinate
     public: double GetHeightAt(const Vector2<double> &pos);
