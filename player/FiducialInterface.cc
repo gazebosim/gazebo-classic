@@ -169,12 +169,13 @@ void FiducialInterface::Update()
     ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
     memset(&data, 0, sizeof(data));
+    data.fiducials_count = i;
+    data.fiducials = new player_fiducial_item_t[data.fiducials_count];
+    
 
     for (i = 0; i < this->iface->data->count; i++)
     {
       fid = this->iface->data->fids + i;
-      if (i >= PLAYER_FIDUCIAL_MAX_SAMPLES)
-        break;
 
       data.fiducials[i].id = (int16_t) fid->id;
 
@@ -191,12 +192,12 @@ void FiducialInterface::Update()
         */
 
     }
-    data.fiducials_count = i;
 
     this->driver->Publish( this->device_addr,
                    PLAYER_MSGTYPE_DATA,
                    PLAYER_FIDUCIAL_DATA_SCAN, 
                    (void*)&data, sizeof(data), &this->datatime );
+    delete [] data.fiducials;
   }
 
   this->iface->Unlock();

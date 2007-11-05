@@ -382,11 +382,11 @@ void OgreAdaptor::CreateWindow()
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
 
-  paramsVector.push_back( Ogre::StringConverter::toString( (int)(Global::gui->GetDisplay()) ) );
+  paramsVector.push_back( Ogre::StringConverter::toString( (size_t)(Global::gui->GetDisplay()) ) );
   paramsVector.push_back( Ogre::StringConverter::toString((int)Global::gui->GetVisualInfo()->screen));
 
   paramsVector.push_back( Ogre::StringConverter::toString((int)Global::gui->GetWindowId()));
-  paramsVector.push_back( Ogre::StringConverter::toString((int)(Global::gui->GetVisualInfo())));
+  paramsVector.push_back( Ogre::StringConverter::toString((size_t)(Global::gui->GetVisualInfo())));
 
   params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
 
