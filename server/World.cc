@@ -478,9 +478,9 @@ void World::UpdateSimulationIface()
         Pose3d pose = model->GetPose();
         Vector3 rot = pose.rot.GetAsEuler();
 
-        this->simIface->data->model_pose.x = pose.pos.x;
-        this->simIface->data->model_pose.y = pose.pos.y;
-        this->simIface->data->model_pose.z = pose.pos.z;
+        this->simIface->data->model_pose.pos.x = pose.pos.x;
+        this->simIface->data->model_pose.pos.y = pose.pos.y;
+        this->simIface->data->model_pose.pos.z = pose.pos.z;
 
 
         this->simIface->data->model_pose.roll = rot.x;
@@ -491,9 +491,9 @@ void World::UpdateSimulationIface()
       {
         Pose3d pose;
         
-        pose.pos.x = this->simIface->data->model_pose.x;
-        pose.pos.y = this->simIface->data->model_pose.y;
-        pose.pos.z = this->simIface->data->model_pose.z;
+        pose.pos.x = this->simIface->data->model_pose.pos.x;
+        pose.pos.y = this->simIface->data->model_pose.pos.y;
+        pose.pos.z = this->simIface->data->model_pose.pos.z;
         pose.rot.SetFromEuler(Vector3(this->simIface->data->model_pose.roll,
             this->simIface->data->model_pose.pitch,
             this->simIface->data->model_pose.yaw));
@@ -504,8 +504,8 @@ void World::UpdateSimulationIface()
         Pose3d pose = model->GetPose();
         Vector3 rot = pose.rot.GetAsEuler();
         
-        pose.pos.x = this->simIface->data->model_pose.x;
-        pose.pos.y = this->simIface->data->model_pose.y;
+        pose.pos.x = this->simIface->data->model_pose.pos.x;
+        pose.pos.y = this->simIface->data->model_pose.pos.y;
 
         pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
             this->simIface->data->model_pose.yaw));

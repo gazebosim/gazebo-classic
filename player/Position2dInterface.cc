@@ -87,8 +87,8 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
 
       cmd = (player_position2d_cmd_vel_t*) data;
 
-      this->iface->data->cmdVelocity.x = cmd->vel.px;
-      this->iface->data->cmdVelocity.y = cmd->vel.py;
+      this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
+      this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
       this->iface->data->cmdVelocity.yaw = cmd->vel.pa;
 
       return 0;
@@ -106,8 +106,8 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
 
       player_position2d_set_odom_req_t *odom = (player_position2d_set_odom_req_t*)data;
 
-      this->iface->data->pose.x = odom->pose.px;
-      this->iface->data->pose.y = odom->pose.py;
+      this->iface->data->pose.pos.x = odom->pose.px;
+      this->iface->data->pose.pos.y = odom->pose.py;
       this->iface->data->pose.yaw = odom->pose.pa;
 
       this->driver->Publish(this->device_addr, respQueue,
@@ -225,12 +225,12 @@ void Position2dInterface::Update()
       ts.tv_sec = (int) (this->iface->data->time);
       ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
-      data.pos.px = this->iface->data->pose.x;
-      data.pos.py = this->iface->data->pose.y;
+      data.pos.px = this->iface->data->pose.pos.x;
+      data.pos.py = this->iface->data->pose.pos.y;
       data.pos.pa = this->iface->data->pose.yaw;
 
-      data.vel.px = this->iface->data->velocity.x;
-      data.vel.py = this->iface->data->velocity.y;
+      data.vel.px = this->iface->data->velocity.pos.x;
+      data.vel.py = this->iface->data->velocity.pos.y;
       data.vel.pa = this->iface->data->velocity.yaw;
 
       data.stall = (uint8_t) this->iface->data->stall;

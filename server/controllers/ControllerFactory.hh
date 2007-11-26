@@ -43,21 +43,21 @@ class Controller;
 class Entity;
 
 
-// Prototype for controller factory functions
+/// Prototype for controller factory functions
 typedef Controller* (*ControllerFactoryFn) (Entity *parent);
 
 
-/// @brief The controller factory; the class is just for namespacing purposes.
+/// \brief The controller factory; the class is just for namespacing purposes.
 class ControllerFactory
 {
-  /// @brief Register all known controllers.
+  /// \brief Register all known controllers.
   public: static void RegisterAll();
   
-  /// @brief Register a controller class 
+  /// \brief Register a controller class 
   /// (called by controller registration function).
   public: static void RegisterController(std::string type, std::string classname, ControllerFactoryFn factoryfn);
 
-  /// @brief Create a new instance of a controller.  Used by the world when
+  /// \brief Create a new instance of a controller.  Used by the world when
   /// reading the world file.
   public: static Controller *NewController(const std::string &classname, Entity *parent);
 
@@ -67,11 +67,11 @@ class ControllerFactory
 };
 
 
-/// @brief Static controller registration macro
+/// \brief Static controller registration macro
 ///
 /// Use this macro to register controllers with the server.
-/// @param name Controller type name, as it appears in the world file.
-/// @param classname C++ class name for the controller.
+/// \param name Controller type name, as it appears in the world file.
+/// \param classname C++ class name for the controller.
 #define GZ_REGISTER_STATIC_CONTROLLER(name, classname) \
 Controller *New##classname(Entity *entity) \
 { \

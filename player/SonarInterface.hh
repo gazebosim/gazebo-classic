@@ -21,7 +21,7 @@
 /* Desc: Sonar Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
+ * SVN: $Id$
  */
 
 #ifndef SONARINTERFACE_HH
@@ -32,6 +32,7 @@
 // Forward declarations
 typedef struct gz_sonar gz_sonar_t;
 
+/// \brief Sonar interface
 class SonarInterface : public GazeboInterface
 {
   /// @brief Constructor

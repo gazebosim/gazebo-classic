@@ -82,9 +82,7 @@ class Quatern
   public: void SetFromAxis(double x, double y, double z, double a);
          
   /// \brief Set the quaternion from Euler angles
-  /// \param roll Roll in radians
-  /// \param pitch Pitch in radians
-  /// \param yaw Yaw in radians
+  /// \param vec  Euler angle
   public: void SetFromEuler(const Vector3 &vec);
 
   /// \brief Return the rotation in Euler angles
@@ -118,7 +116,16 @@ class Quatern
   public: bool IsFinite() const;
 
   /// \brief Attributes of the quaternion 
-  public: double u, x, y, z;
+  public: double u;
+
+  /// \brief Attributes of the quaternion 
+  public: double x;
+
+  /// \brief Attributes of the quaternion 
+  public: double y;
+
+  /// \brief Attributes of the quaternion 
+  public: double z;
 
   /// \brief Ostream operator
   /// \param out Ostream

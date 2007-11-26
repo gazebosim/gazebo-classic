@@ -38,7 +38,8 @@ namespace gazebo
   /// \addtogroup gazebo_server
   /// \brief Gazebo error class
   /// \{
- 
+
+  /// Throw an error
   #define gzthrow(msg) throw gazebo::GazeboError(__FILE__,__LINE__,msg)
   
   /// \brief Class to handle errors

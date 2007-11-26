@@ -21,7 +21,7 @@
 /* Desc: Two dimensional vector
  * Author: Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef VECTOR2_HH
@@ -119,8 +119,11 @@ namespace gazebo
     /// \brief [] operator
     public: T operator[](unsigned int index) const;
   
-    /// \brief The data
-    public: T x, y;
+    /// \brief x data
+    public: T x;
+
+    /// \brief y data
+    public: T y;
   
     /// \brief Ostream operator
     /// \param out Ostream

@@ -21,7 +21,7 @@
 /* Desc: Middleman between OGRE and Gazebo
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * CVS: $Id$
+ * SVN: $Id$
  */
 
 #ifndef OGREADAPTOR
@@ -104,11 +104,22 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   private: void CreateWindow();
   private: void DrawGrid();
 
+  /// \brief Pointer to the root scene node
   public: Ogre::Root *root;
+
+  /// \brief Pointer to the scene manager
   public: Ogre::SceneManager *sceneMgr;
+
+  /// \brief Pointer to the render window
   public: Ogre::RenderWindow *window;
+
+  /// \brief Pointer to the camera
   public: Ogre::Camera *camera;
+
+  /// \brief Pointer to the viewport
   public: Ogre::Viewport *viewport;
+
+  /// \brief Pointer to the input reader
   public: Ogre::InputReader *inputDevice;
 
   private: Ogre::LogManager *logManager;

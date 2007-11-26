@@ -54,35 +54,56 @@ namespace gazebo
 /// \addtogroup libgazebo
 /// \{
 
-/// Pose class
-class Pose
-{
-  /// Position information
-  public: double x, y, z;
-
-  /// Rotation information. Euler angles
-  public: double roll, pitch, yaw; 
-};
-
-/// Vector 3 class
+/// \brief Vector 3 class
 class Vec3
 {
-  /// Position information
-  public: double x, y, z;
+  /// X value
+  public: double x;
+
+  /// Y value
+  public: double y;
+
+  /// Z value
+  public: double z;
 };
 
-/// Color class
+
+/// \brief Pose class
+class Pose
+{
+  /// 3d position
+  public: Vec3 pos;
+
+  /// Rotation information. Roll Euler angle
+  public: double roll;
+
+  /// Rotation information. Pitch Euler angle
+  public: double pitch;
+
+  /// Rotation information. Yaw Euler angle
+  public: double yaw; 
+};
+
+/// \brief Color class
 class Color
 {
-  /// Color information
-  public: float r, g, b, a;
+  /// Red color information
+  public: float r;
+
+  /// Green color information
+  public: float g;
+
+  /// Blue color information
+  public: float b;
+
+  /// Alpha color information
+  public: float a;
 };
 
 /***************************************************************************/
 
 
 /***************************************************************************/
-/// \addtogroup libgazebo
 /**
   \brief Shared memory server
 
@@ -122,8 +143,11 @@ class Server
   /// The directory containing mmap files
   public: std::string filename;
 
-  /// The semphore key and id
-  public: int semKey, semId;
+  /// The semphore key
+  public: int semKey;
+
+  /// The semphore id
+  public: int semId;
 };
 
 /** \}*/
@@ -131,12 +155,11 @@ class Server
 
   
 /***************************************************************************/
-/// \addtogroup libgazebo 
 /**
   \brief Shared memory client
 
 The client object is used by Gazebo clients to establish a connection
-with a running server.  See the \ref libgazebo_usage for an overview.
+with a running server.
 
 \{
 */
@@ -155,7 +178,7 @@ with a running server.  See the \ref libgazebo_usage for an overview.
 #define GZ_CLIENT_ID_PLAYER     0x09
 
   
-/// Client class
+/// \brief Client class
 class Client 
 {
   /// \brief Create a new client
@@ -165,9 +188,11 @@ class Client
   public: virtual ~Client();
 
   /// \brief Test for the presence of the server.
+  /// \param server_id Id of the server
   public: void Query(int server_id);
 
   /// \brief Connect to the server (non-blocking mode).
+  /// \param server_id Id of the server
   public: void Connect(int server_id);
 
   /// \brief Connect to the server (blocking mode).
@@ -196,14 +221,16 @@ class Client
   /// The directory containing mmap files
   public: std::string filename;
 
-  /// The semphore key and id
-  public: int semKey, semId;
+  /// The semphore key
+  public: int semKey;
+
+  /// The semphore id
+  public: int semId;
 };
 
 /** \} */
 
 /***************************************************************************/
-/// \addtogroup libgazebo 
 /**
 
   \brief Base class for all interfaces
@@ -220,15 +247,24 @@ class Client
 class Iface
 {
   /// \brief Create an interface
+  /// \param type Type of interface
+  /// \param size Size of the interface in bytes
   public: Iface(const std::string &type, size_t size);
 
   /// \brief Destroy an interface
   public: virtual ~Iface();
 
   /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
   public: virtual void Create(Server *server, std::string id);
 
   /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the server
+  /// \param modelType Type of the model
+  /// \param modelId Id of the model
+  /// \param parentModelId Id of the model's parent
   public: void Create(Server *server, std::string id,
                      const std::string &modelType, int modelId, 
                      int parentModelId);
@@ -237,13 +273,16 @@ class Iface
   public: void Destroy();
 
   /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
   public: virtual void Open(Client *client, std::string id);
 
   /// \brief Close the interface
   public: virtual void Close();
 
-  /// \brief Lock the interface.  Set blocking to 1 if the caller should block
-  /// until the lock is acquired.  Returns 0 if the lock is acquired.
+  /// \brief Lock the interface. 
+  /// \param blocking 1=caller should block, 0=no-block
+  /// \return 0 if the lock is acquired
   public: int Lock(int blocking);
 
   /// \brief Unlock the interface
@@ -253,6 +292,7 @@ class Iface
   public: void Post();
 
   /// \brief Get the iface type
+  /// \return The type of interface
   public: std::string GetType() const;
 
   private: std::string Filename(std::string id);
@@ -287,10 +327,13 @@ class Iface
   /// ID of the parent model
   public: int parentModelId;
 
+  /// type of interface
   protected: std::string type;
 
+  /// Number of times the interface has been opened
   private: int openCount;
 
+  /// True if opened
   public: bool opened;
 };
 
@@ -300,11 +343,11 @@ class Iface
 /***************************************************************************/
 /// \addtogroup libgazebo_iface 
 /// \{
-/** \defgroup simulator_iface simulator
+/** \defgroup simulation_iface simulation
 
   \brief The simulation interface
 
-The simulator interface provides access to certain global properties
+The simulation interface provides access to certain global properties
 of the server, such as the current simulation time-step. 
 
 \{
@@ -314,31 +357,39 @@ of the server, such as the current simulation time-step.
 /// \brief Simulation interface data
 class SimulationData
 {
-  /// \brief Elapsed simulator time
+  /// Elapsed simulation time
   public: double simTime;
 
-  /// \brief Accumpated pause time (this interface may be updated with the
-  /// server is paused).
+  /// Accumpated pause time (this interface may be updated with the server is paused).
   public: double pauseTime;
 
-  /// \brief Elapsed real time since start of simulation (from system clock). 
+  /// Elapsed real time since start of simulation (from system clock)
   public: double realTime;
 
-  /// \brief Pause simulation (set by client)
+  /// Pause simulation (set by client)
   public: int pause;
 
-  ///\brief  Reset simulation (set by client)
+  /// Reset simulation (set by client)
   public: int reset;
 
-  ///\brief  Save current poses to world file (set by client)
+  /// Save current poses to world file (set by client)
   public: int save;
 
+  /// Name of the model to get/set data
   public: uint8_t model_name[512];
+
+  /// Type of request
+  /// - "get_pose" Sets model_pose to the pose of model_name
+  /// - "set_pose3d" Set the model_name to model_pose
+  /// - "set_pose2d" Set the model_name to model_pose
   public: uint8_t model_req[32];
+
+  /// Pose of the model.
+  /// \sa model_req
   public: Pose model_pose;
 };
 
-/// \brief Common simulator interface
+/// \brief Common simulation interface
 class SimulationIface : public Iface
 {
   /// \brief Create an interface
@@ -347,18 +398,25 @@ class SimulationIface : public Iface
   /// \brief Destroy an interface
   public: virtual ~SimulationIface() {this->data = NULL;}
 
+  /// \brief Create a simulation interface
+  /// \brief server Pointer to the server
+  /// \brief id String id
   public: virtual void Create(Server *server, std::string id)
           {
             Iface::Create(server,id); 
             this->data = (SimulationData*)this->mMap; 
           }
 
+  /// \brief Open a simulation interface
+  /// \param client Pointer to the client
+  /// \param id String name of the client
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
             this->data = (SimulationData*)this->mMap; 
           }
 
+  /// Pointer to the simulation data
   public: SimulationData *data;
 };
 
@@ -386,39 +444,54 @@ Images are in packed RGB888 format.
 /// Maximum image pixels (width x height)
 #define GAZEBO_CAMERA_MAX_IMAGE_SIZE 640 * 480 * 3
 
-/// Camera interface data
+/// \brief Camera interface data
 class CameraData
 {
   /// Data timestamp
   public: double time;
 
-  /// Image dimensions (in pixels)
-  public: unsigned int width, height;
+  /// Width of image in pixels
+  public: unsigned int width;
+
+  /// Height of image in pixels
+  public: unsigned int height;
+
+  /// Size of the image in bytes
+  public: unsigned int image_size;
 
   /// Image pixel data
-  public: unsigned int image_size;
   public: unsigned char image[GAZEBO_CAMERA_MAX_IMAGE_SIZE];
   
 };
 
-/// The camera interface
+/// \brief The camera interface
 class CameraIface : public Iface
 {
+  /// \brief Constructor
   public: CameraIface():Iface("camera", sizeof(CameraIface)+sizeof(CameraData)) {}
+
+  /// \brief Destructor
   public: virtual ~CameraIface() {this->data = NULL;}
 
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
   public: virtual void Create(Server *server, std::string id)
           {
             Iface::Create(server,id); 
             this->data = (CameraData*)this->mMap; 
           }
 
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
             this->data = (CameraData*)this->mMap; 
           }
 
+  /// Pointer to the camera data
   public: CameraData *data;
 };
 
@@ -442,7 +515,7 @@ Pioneer2AT or ATRV Jr.  This interface handles both 2D and 3D data.
 */
 
 
-/// Position interface data
+/// \brief Position interface data
 class PositionData
 {
   /// Data timestamp
@@ -463,18 +536,22 @@ class PositionData
   /// Commanded robot velocities (robot cs)
   public: Pose cmdVelocity;
 
+  /// True if opened
   public: bool opened;
 };
 
-/// Position interface
+/// \brief Position interface
 class PositionIface : public Iface
 {
-  /// Constructor
+  /// \brief Constructor
   public: PositionIface():Iface("position", sizeof(PositionIface)+sizeof(PositionData)) {}
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~PositionIface() {this->data = NULL;}
 
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
   public: virtual void Create(Server *server, std::string id)
           {
             Iface::Create(server,id); 
@@ -482,6 +559,9 @@ class PositionIface : public Iface
             this->data->opened = false;
           }
 
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
@@ -489,6 +569,7 @@ class PositionIface : public Iface
             this->data->opened = true;
           }
 
+  /// \brief Close the interface
   public: virtual void Close()
           {
             this->data->opened = false;
@@ -496,6 +577,7 @@ class PositionIface : public Iface
           }
 
 
+  /// Pointer to the position data
   public: PositionData *data;
 };
 
@@ -519,9 +601,10 @@ opengl funcitons.
 /// Maximum number of points that can be drawn
 #define GAZEBO_GRAPHICS3D_MAX_POINTS 1024
 
-/// Graphics3d interface data
+/// \brief Graphics3d interface data
 class Graphics3dData
 {
+  /// Type of drawing to perform
   enum DrawMode {POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON};
 
   /// Drawing mode
@@ -537,28 +620,35 @@ class Graphics3dData
   public: Color color;
 };
 
-/// Graphics3d interface
+/// \brief Graphics3d interface
 class Graphics3dIface : public Iface
 {
 
-  /// Constructor
+  /// \brief Constructor
   public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dIface)+sizeof(Graphics3dData)) {}
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~Graphics3dIface() {this->data = NULL;}
 
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
   public: virtual void Create(Server *server, std::string id)
           {
             Iface::Create(server,id); 
             this->data = (Graphics3dData*)this->mMap; 
           }
 
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
             this->data = (Graphics3dData*)this->mMap; 
           }
 
+  /// Pointer to the graphics3d data
   public: Graphics3dData *data;
 };
 
@@ -583,43 +673,55 @@ device is also allowed.
 @{
 */
 
+/// Max number of laser ranges
 #define GZ_LASER_MAX_RANGES 1024
 
 /// \brief Laser interface data
 class LaserData
 {
+  /// True if the interface is opened
   public: bool opened;
 
-  /// \brief Data timestamp
+  /// Data timestamp
   public: double time;
   
-  /// \brief Range scan angles
-  public: double min_angle, max_angle;
+  /// Range scan min angle
+  public: double min_angle;
 
-  /// \brief Angular resolution
+  /// Range scan max angle
+  public: double max_angle;
+
+  /// Angular resolution
   public: double res_angle;
 
-  /// \brief Max range value
+  /// Max range value
   public: double max_range;
 
-  /// \brief Number of range readings
+  /// Number of range readings
   public: int range_count;
   
-  /// \brief Range readings
+  /// Range readings
   public: double ranges[GZ_LASER_MAX_RANGES];
 
-  /// \brief Intensity readings
+  /// Intensity readings
   public: int intensity[GZ_LASER_MAX_RANGES];
   
-  /// \brief New command ( 0 or 1 )
+  /// New command ( 0 or 1 )
   public: int cmd_new_angle;
 
-  /// \brief New command ( 0 or 1 )
+  /// New command ( 0 or 1 )
   public: int cmd_new_length;
 
-  /// \brief Commanded range value
+  /// Commanded range value
   public: double cmd_max_range;
-  public: double cmd_min_angle, cmd_max_angle;
+
+  /// Commaned min angle
+  public: double cmd_min_angle;
+
+  /// Commaned max angle
+  public: double cmd_max_angle;
+
+  /// Commaned range count
   public: int cmd_range_count;
 };
 
@@ -632,6 +734,9 @@ class LaserIface : public Iface
   /// \brief Destructor
   public: virtual ~LaserIface() {this->data = NULL;}
 
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
   public: virtual void Create(Server *server, std::string id)
           {
             Iface::Create(server,id); 
@@ -639,6 +744,9 @@ class LaserIface : public Iface
             this->data->opened=false;
           }
 
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
@@ -646,9 +754,9 @@ class LaserIface : public Iface
             this->data->opened = true;
           }
 
+  /// \brief Close the interface
   public: virtual void Close()
           {
-            printf("Laser Close\n\n");
             this->data->opened = false;
             Iface::Close();
           }
@@ -676,32 +784,33 @@ model to return data from simulated retro-reflective barcodes.
 @{
 */
 
+/// Max number of fiducials
 #define GZ_FIDUCIAL_MAX_FIDS 401
 
 /// \brief Fudicial interface data
 class FiducialFid
 {
-  /// \brief Fiducial id
+  /// Fiducial id
   public: int id;
 
-  /// \brief Fiducial position relative to sensor (x, y, z).
-  public: double pos[3];
-
-  /// \brief Fiducial orientation relative to sensor (roll, pitch, yaw).
-  public: double rot[3];
+   /// Fiducial pose
+  public: Pose pose;
 };
 
+/// \brief Fiducial data
 class FiducialData
 {
-   /// \brief Data timestamp
+   /// Data timestamp
   public: double time;
 
-  /// Observed fiducials
+  /// Number of fiducials
   public: int count;
+
+  /// Observed fiducials
   public: FiducialFid fids[GZ_FIDUCIAL_MAX_FIDS];
 };
 
-/// Fiducial interface
+/// \brief Fiducial interface
 class FiducialIface : public Iface
 {
   /// \brief Constructor
@@ -724,7 +833,7 @@ class FiducialIface : public Iface
             this->data = (FiducialData*)this->mMap; 
           }
 
-  /// \brief Pointer to the fiducial data
+  /// Pointer to the fiducial data
   public: FiducialData *data;
 };
 
@@ -747,13 +856,13 @@ in order to dynamically create models.
 /// \brief Fudicial interface data
 class FactoryData
 {
-   /// \brief Data timestamp
+   /// Data timestamp
   public: double time;
 
-  /// \brief String describing the model to be initiated
+  /// String describing the model to be initiated
   public: uint8_t newModel[4096];
 
-  /// \brief Delete a model by name
+  /// Delete a model by name
   public: uint8_t deleteModel[512];
 };
 
@@ -780,7 +889,7 @@ class FactoryIface : public Iface
             this->data = (FactoryData*)this->mMap; 
           }
 
-  /// \brief Pointer to the factory data
+  /// Pointer to the factory data
   public: FactoryData *data;
 };
 
@@ -825,38 +934,38 @@ that found on the Pioneer series robots.
 /// \brief Fudicial interface data
 class GripperData
 {
-   /// \brief Data timestamp
+   /// Data timestamp
   public: double time;
 
-  /// Current command for the gripper
-  int cmd;
+  /// \brief Current command for the gripper
+  public: int cmd;
 
   /// Current state of the gripper
-  int state;
+  public: int state;
 
   /// Gripped limit reached flag
-  int grip_limit_reach;
+  public: int grip_limit_reach;
 
   /// Lift limit reached flag
-  int lift_limit_reach;
+  public: int lift_limit_reach;
 
   /// Outer beam obstruct flag
-  int outer_beam_obstruct;
+  public: int outer_beam_obstruct;
 
   /// Inner beam obstructed flag
-  int inner_beam_obstruct;
+  public: int inner_beam_obstruct;
 
   /// Left paddle open flag
-  int left_paddle_open;
+  public: int left_paddle_open;
 
   /// Right paddle open flag
-  int right_paddle_open;
+  public: int right_paddle_open;
 
   /// Lift up flag
-  int lift_up;
+  public: int lift_up;
 
   /// Lift down flag
-  int lift_down;
+  public: int lift_down;
 };
 
 /// \brief Factory interface
@@ -882,7 +991,7 @@ class GripperIface : public Iface
             this->data = (GripperData*)this->mMap; 
           }
 
-  /// \brief Pointer to the factory data
+  /// Pointer to the factory data
   public: GripperData *data;
 };
 
@@ -943,24 +1052,32 @@ The actuator array interface allows a user to control a set of actuators.
 /// \brief Actuator geometry 
 class ActarrayActuatorGeom
 {
+
 /// Data subtype: state
 #define GAZEBO_ACTARRAY_DATA_STATE        1
 
 
-  ///The type of the actuator - linear or rotary.
+  /// The type of the actuator - linear or rotary.
   public: uint8_t type;
-  /// The range of motion of the actuator, in m or rad depending on the type. 
+
+  /// Min range of motion (m or rad depending on the type)
   public: float min;
-  /// The range of motion of the actuator, in m or rad depending on the type. 
-  public: float centre;
-  /// The range of motion of the actuator, in m or rad depending on the type. 
+
+  /// Center position (m or rad)
+  public: float center;
+
+  /// Max range of motion (m or rad depending on the type)
   public: float max;
-  /// The range of motion of the actuator, in m or rad depending on the type. 
+
+  /// Home position (m or rad depending on the type)
   public: float home;
-  /// The configured speed setting of the actuator - different from current speed. 
+
+  /// The configured speed - different from current speed. 
   public: float config_speed;
+
   /// The maximum achievable speed of the actuator.
   public: float max_speed;
+
   /// If the actuator has brakes or not. 
   public: uint8_t hasbrakes;
 };
@@ -1015,12 +1132,18 @@ class ActarrayIface : public Iface
   /// \brief Destroy and Interface
   public: virtual ~ActarrayIface() {this->data = NULL;}
 
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
   public: virtual void Create(Server *server, std::string id)
           {
            Iface::Create(server,id); 
            this->data = (ActarrayData*)this->mMap; 
           }
 
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 

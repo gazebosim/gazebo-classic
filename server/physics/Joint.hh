@@ -44,6 +44,7 @@ namespace gazebo
   /// \brief Base class for all joints
   class Joint
   {
+    /// \brief Type of joint
     public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL};
 
     /// \brief Constructor

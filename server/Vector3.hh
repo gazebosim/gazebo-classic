@@ -126,8 +126,14 @@ class Vector3
   /// \brief [] operator
   public: double operator[](unsigned int index) const;
 
-  // \brief The location
-  public: double x, y, z;
+  /// \brief X location
+  public: double x;
+
+  /// \brief Y location
+  public: double y;
+
+  /// \brief Z location
+  public: double z;
 
   /// \brief Ostream operator
   /// \param out Ostream

@@ -38,9 +38,11 @@ namespace gazebo
   /// \addtogroup gazebo_server
   /// \brief Gazebo message class
   /// \{
- 
+
+  /// Output a message
   #define gzmsg(level) (gazebo::GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
-  
+ 
+  /// Log a message
   #define gzlog() (gazebo::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
   
     class XMLConfigNode;
@@ -73,15 +75,14 @@ namespace gazebo
     public: void Load(XMLConfigNode *node);
   
     /// \brief Set the verbosity
-    /// \param int Level of the verbosity
+    /// \param level Level of the verbosity
     public: void SetVerbose( int level );
   
     /// \brief Use this to output a message to the terminal
-    /// \param Level of the message
+    /// \param level Level of the message
     public: std::ostream &Msg( int level = 0 );
   
     /// \brief Use this to output a message to a log file
-    /// \param Level of the message
     public: std::ofstream &Log();
   
     /// \brief Level of the message

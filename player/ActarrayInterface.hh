@@ -38,6 +38,7 @@ namespace gazebo
 /// \brief Interface for controller an actuator array
 /// \{
 
+/// \brief Actarray interface
 class ActarrayInterface : public GazeboInterface
 {
   /// \brief Constructor

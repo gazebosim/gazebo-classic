@@ -52,6 +52,7 @@ namespace gazebo
     /// \brief Clear all events
     public: void ClearEvents();
 
+    /// \brief Update the input handler
     public: void Update();
 
     private: void HandleKeyPress( const InputEvent *event );

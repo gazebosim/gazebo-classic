@@ -21,7 +21,7 @@
 /* Desc: Singleton base class
  * Author: Nate Koenig
  * Date: 2 Sept 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef SINGLETONT_HH
@@ -30,9 +30,11 @@
 template < class DOOMED >
 class DestroyerT;
 
+/// \brief Singleton class
 template <class T>
 class SingletonT
 {
+  /// \brief Get an instance of the singleton
   public: static T *Instance()
           {
             if (!myself)
@@ -44,7 +46,10 @@ class SingletonT
             return myself;
           }
 
+  /// \brief Constructor
   protected: SingletonT() {}
+
+  /// \brief Destructor
   protected: virtual ~SingletonT() {}
 
   private: static DestroyerT< T > destroyer;
@@ -58,19 +63,26 @@ template <class T>
 T *SingletonT<T>::myself = 0;
 
 
+
+/// \brief Destroyer
 template < class DOOMED >
 class DestroyerT 
 {
 
+  /// \brief Constructor
   public: DestroyerT(DOOMED* = 0);
+
+  /// \brief Destructor
   public: ~DestroyerT();
 
-    // Desc: Sets the class to be cleaned
+  /// \brief Sets the class to be cleaned
   public: void SetDoomed(DOOMED*);
 
-    // Prevent users from making copies of a
-    // Destroyer to avoid double deletion:
+  /// \brief Prevent users from making copies of a
+  ///        Destroyer to avoid double deletion:
   private: DestroyerT(const DestroyerT<DOOMED>&);
+
+  /// \brief Equal operator
   private: DestroyerT<DOOMED>& operator=(const DestroyerT<DOOMED>&);
 
   private: DOOMED* doomed;

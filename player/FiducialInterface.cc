@@ -170,7 +170,7 @@ void FiducialInterface::Update()
 
     memset(&data, 0, sizeof(data));
     data.fiducials_count = i;
-    data.fiducials = new player_fiducial_item_t[data.fiducials_count];
+    //data.fiducials = new player_fiducial_item_t[data.fiducials_count];
     
 
     for (i = 0; i < this->iface->data->count; i++)
@@ -179,12 +179,12 @@ void FiducialInterface::Update()
 
       data.fiducials[i].id = (int16_t) fid->id;
 
-      data.fiducials[i].pose.px = fid->pos[0];
-      data.fiducials[i].pose.py = fid->pos[1];
-      data.fiducials[i].pose.pz = fid->pos[2];      
-      data.fiducials[i].pose.proll = fid->rot[0];
-      data.fiducials[i].pose.ppitch = fid->rot[1];
-      data.fiducials[i].pose.pyaw = fid->rot[2];
+      data.fiducials[i].pose.px = fid->pose.pos.x;
+      data.fiducials[i].pose.py = fid->pose.pos.y;
+      data.fiducials[i].pose.pz = fid->pose.pos.z;      
+      data.fiducials[i].pose.proll = fid->pose.roll;
+      data.fiducials[i].pose.ppitch = fid->pose.pitch;
+      data.fiducials[i].pose.pyaw = fid->pose.yaw;
 
     /*printf("fiducial %d %.2f %.2f %.2f\n",
         fid->id, data.fiducials[i].pose.px, data.fiducials[i].pose.py,

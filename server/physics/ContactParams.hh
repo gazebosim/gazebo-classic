@@ -21,7 +21,7 @@
 /* Desc: Parameters for contact joints
  * Author: Nate Koenig
  * Date: 30 July 2003
- * CVS: $Id$
+ * SVN: $Id:$
  */
 
 #ifndef CONTACTPARAMS_HH
@@ -30,28 +30,37 @@
 namespace gazebo
 {
 
+/// \brief Contact params
 class ContactParams
 {
-  // Constructor
+  /// Constructor
   public: ContactParams();
 
-  // Spring constant
+  /// Spring constant
   public: double kp;   
 
-  // Damping constant
+  /// Damping constant
   public: double kd;
 
-  // 0..1, 0=no bounciness
+  /// 0..1, 0=no bounciness
   public: double bounce;
   
-  // coefficients of friction 
-  public: double mu1,mu2;
+  /// first coefficient of friction 
+  public: double mu1;
 
-  // Force-dependent-slip direction 1 and 2
-  public: double slip1,slip2;   
+  /// second coefficient of friction 
+  public: double mu2;
 
+  /// Force-dependent-slip direction 1
+  public: double slip1;
+
+  /// Force-dependent-slip direction 2
+  public: double slip2;   
+
+  /// \brief bounce vel
   public: double bounceVel;
 
+  /// \brief soft constraint force mixing
   public: double softCfm;
 };
 

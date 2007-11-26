@@ -242,9 +242,9 @@ void SickLMS200_Laser::PutFiducialData()
         fid = this->fiducialIface->data->fids + count++;
 
         fid->id = this->myParent->GetFiducial(j);
-        fid->pos[0] = cx;
-        fid->pos[1] = cy;
-        fid->rot[2] = atan2(by - ay, bx - ax) + M_PI / 2;
+        fid->pose.pos.x = cx;
+        fid->pose.pos.y = cy;
+        fid->pose.yaw = atan2(by - ay, bx - ax) + M_PI / 2;
       }
 
       // Fewer points get no orientation
@@ -267,9 +267,9 @@ void SickLMS200_Laser::PutFiducialData()
         fid = this->fiducialIface->data->fids + count++;
 
         fid->id = this->myParent->GetFiducial(j);
-        fid->pos[0] = cx;
-        fid->pos[1] = cy;
-        fid->rot[2] = atan2(cy, cx) + M_PI;
+        fid->pose.pos.x = cx;
+        fid->pose.pos.y = cy;
+        fid->pose.yaw = atan2(cy, cx) + M_PI;
       }
 
       /*printf("fiducial %d i[%d] j[%d] %.2f %.2f %.2f\n",

@@ -113,44 +113,65 @@ namespace gazebo
   */  
   class Global
   {
+    /// \brief Boost recursive mutex
     public: static boost::recursive_mutex mutex;
 
     /// \brief Set to true when the user wants to leave the application
     private: static bool userQuit;
 
+    /// \brief Return true if the user has quit
     public: static bool GetUserQuit();
+
+    /// \brief Set whether the user has quit
     public: static void SetUserQuit(bool quit);
 
     /// \brief Set to true to pause the simulation
     private: static bool userPause;
 
+    /// \brief Return true if the user has pased
     public: static bool GetUserPause();
+
+    /// \brief Set whether the user has paused
     public: static void SetUserPause(bool pause);
 
     /// \brief Set to true to step through the simulation
     private: static bool userStep;
 
+    /// \brief Return true if the user has stepped the simulation
     public: static bool GetUserStep();
+
+    /// \brief Set whether the user has stepped the simulation
     public: static void SetUserStep( bool step );
 
     /// \brief Set to true to increment the simulation once. This is only
     ///        valid when userStep is true.
     private: static bool userStepInc;
 
+    /// \brief Return true if the step has incremented
     public: static bool GetUserStepInc();
+
+    /// \brief Set whether the step has incremented
     public: static void SetUserStepInc(bool step);
 
     /// \brief Set to true to show bounding boxes
     private: static bool showBoundingBoxes;
 
+    /// \brief Return true if the bounding boxes should be shown
     public: static bool GetShowBoundingBoxes();
+
+    /// \brief Set if the bounding boxes should be shown
     public: static void SetShowBoundingBoxes(bool show);
 
     /// \brief Count of the number of iterations
     private: static unsigned long iterations;
 
+    /// \brief Get the number of iterations
     public: static unsigned long GetIterations();
+
+    /// \brief Set the number of iterations
     public: static void SetIterations(unsigned long count);
+
+    /// \brief Increment the number of iterations
     public: static void IncIterations();
 
     /// \brief Pointer to the selected Gui 

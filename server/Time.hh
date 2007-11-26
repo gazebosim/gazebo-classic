@@ -63,60 +63,114 @@ class Time
   /// \brief Destructor
   public: virtual ~Time();
 
+  /// \brief Get the wall time
   public: static Time GetWallTime();
 
+  /// \brief Set the time to the wall time
   public: void SetToWallTime();
-  public: void Set(  int sec,  int usec );
+
+  /// \brief Set to sec and usec
+  /// \param sec Seconds
+  /// \param usec micro seconds
+  public: void Set( int sec, int usec );
+
+  /// \brief Set to seconds
+  /// \param seconds Number of seconds
   public: void Set(double seconds);
 
+  /// \brief Get the time as a double
+  /// \return Time as a double
   public: double Double() const;
 
-  /// Equal opeators
+  /// \brief Equal opeator
   public: const Time &operator=( const struct timeval &tv );
+
+  /// \brief Equal opeator
   public: const Time &operator=( const Time &time );
 
-  /// Addition operators
+  /// \brief Addition operators
   public: Time operator +( const struct timeval &tv ) const;
+
+  /// \brief Addition operators
   public: const Time &operator +=( const struct timeval &tv );
+
+  /// \brief Addition operators
   public: Time operator +( const Time &time ) const;
+
+  /// \brief Addition operators
   public: const Time &operator +=( const Time &time );
 
-  /// Subtraction operators
+  /// \brief Subtraction operator
   public: Time operator -( const struct timeval &tv ) const;
+
+  /// \brief Subtraction operator
   public: const Time &operator -=( const struct timeval &tv );
+
+  /// \brief Subtraction operator
   public: Time operator -( const Time &time ) const;
+
+  /// \brief Subtraction operator
   public: const Time &operator -=( const Time &time );
 
-  /// Multiplication operators
+  /// \brief Multiplication operators
   public: Time operator *( const struct timeval &tv ) const;
+
+  /// \brief Multiplication operators
   public: const Time &operator *=( const struct timeval &tv );
+
+  /// \brief Multiplication operators
   public: Time operator *( const Time &time ) const;
+
+  /// \brief Multiplication operators
   public: const Time &operator *=( const Time &time );
 
-  /// Division operators
+  /// \brief Division operators
   public: Time operator /( const struct timeval &tv ) const;
+
+  /// \brief Division operators
   public: const Time &operator /=( const struct timeval &tv );
+
+  /// \brief Division operators
   public: Time operator /( const Time &time ) const;
+
+  /// \brief Division operators
   public: const Time &operator /=( const Time &time );
 
-  /// Equality operators
+  /// \brief Equality operators
   public: bool operator==( const struct timeval &tv ) const;
+  /// \brief Equality operators
   public: bool operator==( const Time &time ) const;
+  /// \brief Equality operators
   public: bool operator==( double time ) const;
+  /// \brief Equality operators
   public: bool operator!=( const struct timeval &tv ) const;
+  /// \brief Equality operators
   public: bool operator!=( const Time &time ) const;
+  /// \brief Equality operators
   public: bool operator!=( double time ) const;
+  /// \brief Equality operators
   public: bool operator<( const struct timeval &tv ) const;
+  /// \brief Equality operators
   public: bool operator<( const Time &time ) const;
+  /// \brief Equality operators
   public: bool operator<( double time ) const;
+  /// \brief Equality operators
   public: bool operator<=( const struct timeval &tv ) const;
+  /// \brief Equality operators
   public: bool operator<=( const Time &time ) const;
+  /// \brief Equality operators
   public: bool operator<=( double time ) const;
+  /// \brief Equality operators
   public: bool operator>( const struct timeval &tv ) const;
+  /// \brief Equality operators
   public: bool operator>( const Time &time ) const;
+  /// \brief Equality operators
   public: bool operator>( double time ) const;
+  /// \brief Equality operators
   public: bool operator>=( const struct timeval &tv ) const;
+  /// \brief Equality operators
   public: bool operator>=( const Time &time ) const;
+  /// \brief Equality operators
   public: bool operator>=( double time ) const;
 
   /// Stream operators

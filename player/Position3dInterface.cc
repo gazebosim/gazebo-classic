@@ -78,9 +78,9 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
 
     cmd = (player_position3d_cmd_vel_t*) data;
 
-    this->iface->data->cmdVelocity.x = cmd->vel.px;
-    this->iface->data->cmdVelocity.y = cmd->vel.py;
-    this->iface->data->cmdVelocity.z = cmd->vel.pz;
+    this->iface->data->cmdVelocity.pos.x = cmd->vel.px;
+    this->iface->data->cmdVelocity.pos.y = cmd->vel.py;
+    this->iface->data->cmdVelocity.pos.z = cmd->vel.pz;
 
     this->iface->data->cmdVelocity.roll = cmd->vel.proll;
     this->iface->data->cmdVelocity.pitch = cmd->vel.ppitch;
@@ -101,9 +101,9 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
 
     player_position3d_set_odom_req_t *odom = (player_position3d_set_odom_req_t*)data;
 
-    this->iface->data->pose.x = odom->pos.px;
-    this->iface->data->pose.y = odom->pos.py;
-    this->iface->data->pose.z = odom->pos.pz;
+    this->iface->data->pose.pos.x = odom->pos.px;
+    this->iface->data->pose.pos.y = odom->pos.py;
+    this->iface->data->pose.pos.z = odom->pos.pz;
 
     this->iface->data->pose.roll = odom->pos.proll;
     this->iface->data->pose.pitch = odom->pos.ppitch;
@@ -208,17 +208,17 @@ void Position3dInterface::Update()
     ts.tv_sec = (int) (this->iface->data->time);
     ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
-    data.pos.px = this->iface->data->pose.x;
-    data.pos.py = this->iface->data->pose.y;
-    data.pos.pz = this->iface->data->pose.z;
+    data.pos.px = this->iface->data->pose.pos.x;
+    data.pos.py = this->iface->data->pose.pos.y;
+    data.pos.pz = this->iface->data->pose.pos.z;
 
     data.pos.proll = this->iface->data->pose.roll;
     data.pos.ppitch = this->iface->data->pose.pitch;
     data.pos.pyaw = this->iface->data->pose.yaw;
 
-    data.vel.px = this->iface->data->velocity.x;
-    data.vel.py = this->iface->data->velocity.y;
-    data.vel.pz = this->iface->data->velocity.z;
+    data.vel.px = this->iface->data->velocity.pos.x;
+    data.vel.py = this->iface->data->velocity.pos.y;
+    data.vel.pz = this->iface->data->velocity.pos.z;
 
     data.vel.proll = this->iface->data->velocity.roll;
     data.vel.ppitch = this->iface->data->velocity.pitch;

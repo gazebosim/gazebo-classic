@@ -1,14 +1,29 @@
-/**
- *  * File: MovableText.h
- *   *
- *    * description: This create create a billboarding object that display
- *    a text.
- *     * 
- *      * @author  2003 by cTh see gavocanov@rambler.ru
- *       * @update  2006 by barraq see nospam@barraquand.com
- *        * @update  2007 by independentCreations see
- *        independentCreations@gmail.com
- *         */
+
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: Middleman between OGRE and Gazebo
+ * Author: indepedentCreations@gmail.com
+ * Date: 13 Feb 2006
+ * CVS: $Id$
+ */
 
 #ifndef MOVABLETEXT_HH
 #define MOVABLETEXT_HH
@@ -16,9 +31,13 @@
 #include <Ogre.h>
 #include <string>
 
+/// \brief Movable text
 class MovableText : public Ogre::MovableObject, public Ogre::Renderable
 {
+  /// \brief Horizontal alignment
   public: enum HorizAlign {H_LEFT, H_CENTER};
+
+  /// \brief vertical alignment
   public: enum VertAlign  {V_BELOW, V_ABOVE};
 
   /// \brief Constructor
@@ -79,14 +98,19 @@ class MovableText : public Ogre::MovableObject, public Ogre::Renderable
   /// \brief Get the axis aligned bounding box of the text
   public: Ogre::AxisAlignedBox GetAABB();
 
-
-  // from MovableText, create the object
+  /// \brief setup the geometry (from MovableText)
   protected: void _setupGeometry();
+
+  /// \brief update the color(from MovableText)
   protected: void _updateColors();
 
-    // from MovableObject
+  /// \brief Get the world transform (from MovableObject)
   protected: void getWorldTransforms(Ogre::Matrix4 *xform) const;
+
+  /// \brief Get the bounding radiu (from MovableObject)
   protected: float getBoundingRadius() const;
+
+  /// \brief Get the squared view depth (from MovableObject)
   protected: float getSquaredViewDepth(const Ogre::Camera *cam) const;
 
   private: float viewportAspectCoef;
@@ -127,9 +151,13 @@ class MovableText : public Ogre::MovableObject, public Ogre::Renderable
   private: void _notifyCurrentCamera(Ogre::Camera *cam);
   private: void _updateRenderQueue(Ogre::RenderQueue* queue);
 
-    // from renderable
+  /// \brief Get the render operation
   protected: void getRenderOperation(Ogre::RenderOperation &op);
+
+  /// \brief Get the material
   protected: const Ogre::MaterialPtr &getMaterial(void) const;
+
+  /// \brief Get the lights
   protected: const Ogre::LightList &getLights(void) const; //{return mLList;}; 
 
 };

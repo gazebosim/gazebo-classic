@@ -83,9 +83,11 @@ namespace gazebo
   
     /// The body this sensor is attached to
     protected: Body *body;
-  
+
+    /// \brief Pointer to the controller of the sensor
     protected: Controller *controller;
 
+    /// \brief True if active
     protected: bool active;
   };
   

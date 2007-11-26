@@ -75,9 +75,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     strcpy((char*)this->iface->data->model_name,req->name);
     strcpy((char*)this->iface->data->model_req,"set_pose3d");
 
-    this->iface->data->model_pose.x = req->pose.px;
-    this->iface->data->model_pose.y = req->pose.py;
-    this->iface->data->model_pose.z = req->pose.pz;
+    this->iface->data->model_pose.pos.x = req->pose.px;
+    this->iface->data->model_pose.pos.y = req->pose.py;
+    this->iface->data->model_pose.pos.z = req->pose.pz;
 
     this->iface->data->model_pose.roll = req->pose.proll;
     this->iface->data->model_pose.pitch = req->pose.ppitch;
@@ -101,8 +101,8 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     strcpy((char*)this->iface->data->model_name,req->name);
     strcpy((char*)this->iface->data->model_req,"set_pose2d");
 
-    this->iface->data->model_pose.x = req->pose.px;
-    this->iface->data->model_pose.y = req->pose.py;
+    this->iface->data->model_pose.pos.x = req->pose.px;
+    this->iface->data->model_pose.pos.y = req->pose.py;
     this->iface->data->model_pose.yaw = req->pose.pa;
     this->iface->Unlock();
 
@@ -135,9 +135,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     }
 
     this->iface->Lock(1);
-    req->pose.px = this->iface->data->model_pose.x;
-    req->pose.py = this->iface->data->model_pose.y;
-    req->pose.pz = this->iface->data->model_pose.y;
+    req->pose.px = this->iface->data->model_pose.pos.x;
+    req->pose.py = this->iface->data->model_pose.pos.y;
+    req->pose.pz = this->iface->data->model_pose.pos.z;
 
     req->pose.proll = this->iface->data->model_pose.roll;
     req->pose.ppitch = this->iface->data->model_pose.pitch;
@@ -174,8 +174,8 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     }
 
     this->iface->Lock(1);
-    req->pose.px = this->iface->data->model_pose.x;
-    req->pose.py = this->iface->data->model_pose.y;
+    req->pose.px = this->iface->data->model_pose.pos.x;
+    req->pose.py = this->iface->data->model_pose.pos.y;
     req->pose.pa = this->iface->data->model_pose.yaw;
     this->iface->Unlock();
 

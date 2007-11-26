@@ -21,7 +21,7 @@
 /* Desc: Gripper Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
+ * SVN: $Id:$
  */
 
 #ifndef GRIPPERINTERFACE_HH
@@ -32,6 +32,7 @@
 // Forward declarations
 typedef struct gz_gripper gz_gripper_t;
 
+/// \brief Gripper interface
 class GripperInterface : public GazeboInterface
 {
   /// @brief Constructor

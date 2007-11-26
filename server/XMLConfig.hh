@@ -102,7 +102,11 @@ namespace gazebo
   
     /// \brief Get the next sibling of this node
     public: XMLConfigNode *GetNext();
+
+    /// \brief Get next by name
     public: XMLConfigNode *GetNext(std::string name);
+
+    /// \brief Get next node by namespace prefix
     public: XMLConfigNode *GetNextByNSPrefix(std::string name);
   
     /// \brief Get the first child of this node

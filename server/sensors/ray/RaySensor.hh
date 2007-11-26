@@ -21,7 +21,7 @@
 /* Desc: RaySensor proximity sensor
  * Author: Carle Cote
  * Date: 23 february 2004
- * SVN: $Id:$
+ * SVN: $Id$
 */
 
 #ifndef RAYSENSOR_HH
@@ -51,14 +51,12 @@ namespace gazebo
 /// sensor models (e.g., sonars and scanning laser range finders).
 class RaySensor: public Sensor
 {
-  /// @brief Constructor
-  /// @param world The world in which to place the sensor
-  /// @param body The underlying collision test uses an ODE geom, so
-  /// ray sensors must be attached to a body.
-  /// @param rayCount Maximum number of rays in sensor.
+  /// \brief Constructor
+  /// \param body The underlying collision test uses an ODE geom, so
+  ///             ray sensors must be attached to a body.
   public: RaySensor(Body *body);
 
-  /// @brief Destructor
+  /// \brief Destructor
   public: virtual ~RaySensor();
 
   /// Load the ray using parameter from an XMLConfig node

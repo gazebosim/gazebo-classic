@@ -176,7 +176,7 @@ void Pioneer2dx_Position2d::GetPositionCmd()
   if (this->myIface->Lock(1))
   {
 
-    vr = this->myIface->data->cmdVelocity.x;
+    vr = this->myIface->data->cmdVelocity.pos.x;
     va = this->myIface->data->cmdVelocity.yaw;
 
     this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
@@ -197,11 +197,11 @@ void Pioneer2dx_Position2d::PutPositionData()
     // TODO: Data timestamp
     this->myIface->data->time = World::Instance()->GetSimTime();
 
-    this->myIface->data->pose.x = this->odomPose[0];
-    this->myIface->data->pose.y = this->odomPose[1];
+    this->myIface->data->pose.pos.x = this->odomPose[0];
+    this->myIface->data->pose.pos.y = this->odomPose[1];
     this->myIface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
 
-    this->myIface->data->velocity.x = this->odomVel[0];
+    this->myIface->data->velocity.pos.x = this->odomVel[0];
     this->myIface->data->velocity.yaw = this->odomVel[2];
 
     // TODO

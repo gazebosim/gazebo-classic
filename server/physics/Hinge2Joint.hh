@@ -132,6 +132,7 @@ class Hinge2Joint : public Joint
   /// \brief Get rate of rotation about second axis
   public: double GetAngle2Rate() const;
 
+  /// \brief Set the torque
   public: void SetTorque(double torque1, double torque2);
 };
 

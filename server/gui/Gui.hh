@@ -68,9 +68,16 @@ namespace gazebo
     /// \brief Handle a keyboard event
     protected: void HandleKeyboard(int key);
 
+    /// \brief ID of the window
     protected: Window windowId;
+
+    /// \brief Pointer to the Xvisual
     protected: XVisualInfo *visual;
+
+    /// \brief colormap
     protected: Colormap colormap;
+
+    /// \brief pointer to the display
     protected: Display *display;
 
     private: OgreAdaptor *ogre;

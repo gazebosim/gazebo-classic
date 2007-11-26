@@ -39,6 +39,8 @@ namespace gazebo
 
     /// \brief Load the geom
     public: virtual void Load(XMLConfigNode *node);
+
+    /// \brief Load child class
     protected: virtual void LoadChild(XMLConfigNode *node) = 0;
   
     /// \brief Set the encapsulated geometry object
@@ -46,6 +48,8 @@ namespace gazebo
   
     /// \brief Update function for geoms
     public: void Update();
+
+    /// \brief Update child class
     public: virtual void UpdateChild() {};
   
     /// \brief Return the geom id
@@ -64,7 +68,7 @@ namespace gazebo
   
     /// \brief Set the pose
     /// \param pose New pose
-    /// \param updateCom True to update the bodies Center of Mass
+    /// \param updateCoM True to update the bodies Center of Mass
     public: void SetPose(const Pose3d &pose, bool updateCoM=true);
   
     /// \brief Return the pose of the geom
@@ -127,25 +131,37 @@ namespace gazebo
     protected: Body *body;
   
     private: bool placeable;
-  
+
+    /// \brief Ogre Object
     protected: Ogre::MovableObject *ogreObj;
+
+    /// \brief ODE object
     protected: Ogre::MovableObject *odeObj;
   
-    /// ID for the transform geom and sub-geom
-    protected: dGeomID transId, geomId;
+    /// \brief ID for the transform geom
+    protected: dGeomID transId;
+
+    /// \brief ID for the sub-geom
+    protected: dGeomID geomId;
   
     private: static int geomIdCounter;
   
-    // Mass of this geometry
+    /// \brief Mass of this geometry
     protected: dMass mass;
+
+    /// \brief mass of the body
     protected: dMass bodyMass;
-  
+ 
+    /// \brief Extra rotation, used for cylinders
     protected: Quatern extraRotation;
   
     private: int laserFiducialId;
     private: float laserRetro;
 
+    /// \name name of the mesh
     protected: std::string meshName;
+
+    /// \brief Mass as a double
     protected: double dblMass;
 
     private: Ogre::SceneNode *boundingBoxNode;

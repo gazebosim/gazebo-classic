@@ -84,8 +84,6 @@ namespace gazebo
   {
     /// \brief Constructor
     /// \param body Body to which we are attached.
-    /// \param spaceId Collision space to which we belong.
-    /// \param normal Normal vector to plane (global cs).
     public: PlaneGeom(Body *body);
 
     /// \brief Destructor
