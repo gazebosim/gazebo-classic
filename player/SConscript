@@ -15,7 +15,7 @@ sources = ['GazeboDriver.cc',
            'FiducialInterface.cc'
            ]
 
-# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc  GripperInterface.cc TruthInterface.cc GpsInterface.cc ')
+# Position3dInterface.cc PowerInterface.cc SonarInterface.cc PtzInterface.cc ActarrayInterface.cc  GripperInterface.cc GpsInterface.cc ')
 
 playerEnv = env.Copy()
 

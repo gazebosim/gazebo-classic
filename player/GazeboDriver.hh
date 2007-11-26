@@ -82,7 +82,11 @@ class GazeboDriver : public Driver
 
   /// Array of interfaces associated with this driver
   protected: GazeboInterface **devices;
+
+  /// \brief Number of devices
   protected: int deviceCount;
+
+  /// \brief Max device count
   protected: int deviceMaxCount;
 };
 

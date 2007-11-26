@@ -32,6 +32,7 @@
 // Forward declarations
 typedef struct gz_truth gz_truth_t;
 
+/// \brief Truth interface
 class TruthInterface : public GazeboInterface
 {
   /// @brief Constructor

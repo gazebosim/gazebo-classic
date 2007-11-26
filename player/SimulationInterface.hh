@@ -36,9 +36,13 @@ namespace gazebo
 /// \defgroup simulation_player Simulation Interface
 /// Provides:
 ///  - PLAYER_SIMULATION_REQ_SET_POSE3D
+///    - "set_pose3d"
 ///  - PLAYER_SIMULATION_REQ_SET_POSE2D
+///    - "set_pose2d"
 ///  - PLAYER_SIMULATION_REQ_GET_POSE3D
+///    - "get_pose"
 ///  - PLAYER_SIMULATION_REQ_GET_POSE2D
+///    - "get_pose"
 ///  - PLAYER_SIMULATION_REQ_GET_PROPERTY
 ///    - "sim_time" returns double
 ///    - "real_time" returns double
@@ -75,6 +79,7 @@ class SimulationInterface : public GazeboInterface
   /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: char *gz_id;
 
+  /// \brief Pointer to the Simulation Interface
   public: SimulationIface *iface;
 };
 

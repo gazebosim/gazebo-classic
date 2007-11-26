@@ -32,6 +32,7 @@
 // Forward declarations
 typedef struct gz_ptz gz_ptz_t;
 
+/// \brief PTZ Interface
 class PtzInterface : public GazeboInterface
 {
   /// @brief Constructor

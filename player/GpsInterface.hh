@@ -32,6 +32,7 @@
 // Forward declarations
 typedef struct gz_gps gz_gps_t;
 
+/// \brief GPS interface
 class GpsInterface : public GazeboInterface
 {
   /// @brief Constructor
