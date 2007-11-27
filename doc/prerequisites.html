@@ -1,0 +1,39 @@
+/**
+\page prerequisites Prerequisites
+
+This page describes the necessary 3rd party libraries to use Gazebo
+
+\section install_required Mandatory
+
+Scons is used as a replacement to autotools.
+- Version 0.97 or greater
+- <a href="http://scons.org">Scons</a>
+
+The the GUI component of Gazebo is designed to allow users to integrate their favorite GUI libraries with Gazebo. 
+- Version 1.1.7 or greater
+- <a href="http://www.fltk.org">FLTK</a> (Fast Light Toolkit).
+
+Visual display of Gazebo is accomplished using the OGRE rendering engine. 
+- Version 1.4.4
+- <a href="http://www.ogre3d.org">OGRE</a> (Object-Oriented Graphics Rendering Engine).
+
+To simulate rigid body physics, Gazebo utilizes ODE. Gazebo requires that ODE support trimeshes. A default install of ODE should enable trimesh suppport, if in doubt check the help files found in the ODE sources.
+- Version 0.8
+- <a href="http://www.ode.org">ODE</a> (Open Dynamics Engine)
+
+User input is gathered using OIS:
+- Version 1.0
+- <a href="http://sourceforge.net/projects/wgois">OIS</a> (Object Oriented Input System)
+
+Gazebo requires an xml configuration file to be specified at runtime. We use libxml2 to handle parsing this configuration file:
+- Version 2.6.29 or greater
+- <a href="http://xmlsoft.org">libxml2</a>(XML C parser)
+
+
+\section install_optional Optional
+
+Player provides a convient mechanism to control the various models and sensors withing Gazebo. If Player is installed, then Gazebo will build a plugin for Player.
+- Version CVS HEAD
+- <a href="http://playerstage.sourceforge.net">Player</a>
+
+*/
