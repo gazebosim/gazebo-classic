@@ -968,7 +968,7 @@ class GripperData
   public: int lift_down;
 };
 
-/// \brief Factory interface
+/// \brief Gripper interface
 class GripperIface : public Iface
 {
   /// \brief Constructor
@@ -991,7 +991,7 @@ class GripperIface : public Iface
             this->data = (GripperData*)this->mMap; 
           }
 
-  /// Pointer to the factory data
+  /// Pointer to the gripper data
   public: GripperData *data;
 };
 
@@ -1013,6 +1013,9 @@ The actuator array interface allows a user to control a set of actuators.
 
 /// maximum number of actuators 
 #define GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS 16
+#define GAZEBO_ACTARRAY_JOINT_POSITION_MODE 0
+#define GAZEBO_ACTARRAY_JOINT_SPEED_MODE 1
+#define GAZEBO_ACTARRAY_JOINT_CURRENT_MODE 2
 
 //Actuator states
 /// Idle state
@@ -1117,6 +1120,9 @@ class ActarrayData
   
   /// bad command flag - (speed to high set for the actuators or position not reachable)
   public: int bad_cmd;
+
+  /// True if new command
+  public: bool new_cmd;
   
   /// position / speed comand
   public: unsigned int joint_mode[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
@@ -1157,6 +1163,79 @@ class ActarrayIface : public Iface
 /** \} */
 /// \} */
 
+
+/***************************************************************************/
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup ptz_iface ptz
+
+  \brief PTZ interface
+
+The ptz interface allows control of a pan-tilt-zoom unit
+
+\{
+*/
+
+/// \brief PTZ data
+class PTZData
+{
+  /// Data timestamp
+  public: double time;
+
+  /// Measured pan angle (radians)
+  public: double pan;
+
+  /// Measured tilt angle (radians)
+  public: double tilt;
+
+  /// Measured field of view (radians)
+  public: double zoom;
+
+  /// Commanded pan angle (radians)
+  public: double cmd_pan;
+
+  /// Commanded tilt angle (radians)
+  public: double cmd_tilt;
+
+  /// Commanded field of view (radians)
+  public: double cmd_zoom;
+  
+}; 
+
+
+/// \brief PTZ interface
+class PTZIface : public Iface
+{
+  /// \brief Constructor
+  public: PTZIface():Iface("ptz", sizeof(PTZIface)+sizeof(PTZData)) {}
+
+  /// \brief Destructor
+  public: virtual ~PTZIface() {this->data = NULL;}
+
+  /// \brief Create the server
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (PTZData*)this->mMap; 
+          }
+
+  /// \brief Open the iface 
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (PTZData*)this->mMap; 
+          }
+
+  /// Pointer to the ptz data
+  public: PTZData *data;
+};
+
+/** \} */
+/// \}
+
+
+
 }
+
 
 #endif

@@ -18,35 +18,37 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Actarray Interface for Player
- * Author: Alexis Maldonado
- * Date: 19 September 2006
+/* Desc: PTZ Interface for Player
+ * Author: Nate Koenig
+ * Date: 2 March 2006
+ * CVS: $Id: PTZInterface.hh 154 2007-11-26 19:14:04Z natepak $
  */
 
-#ifndef ACTARRAYINTERFACE_HH
-#define ACTARRAYINTERFACE_HH
+#ifndef PTZINTERFACE_HH
+#define PTZINTERFACE_HH
 
 #include "GazeboInterface.hh"
 
 namespace gazebo
 {
-/// \addtogroup player_iface
-/// \{
-/// \defgroup actarray_player Actarray Interface
-/// \brief Interface for controller an actuator array
-/// \{
+  
+  /// \addtogroup player_iface
+  /// \{
+  /// \defgroup ptz_player PTZ Interface
+  /// \brief Interface for controling a ptz
+  /// \{
+ 
+  class PTZIface;
 
-  class ActArrayIface;
-
-  /// \brief Actarray interface
-  class ActarrayInterface : public GazeboInterface
+  /// \brief PTZ Interface
+  class PTZInterface : public GazeboInterface
   {
     /// \brief Constructor
-    public: ActarrayInterface( player_devaddr_t addr, GazeboDriver *driver,
-                               ConfigFile *cf, int section);
+    public: PTZInterface(player_devaddr_t addr, GazeboDriver *driver,
+                         ConfigFile *cf, int section);
   
     /// \brief Destructor
-    public: virtual ~ActarrayInterface();
+    public: virtual ~PTZInterface();
   
     /// \brief Handle all messages. This is called from GazeboDriver
     public: virtual int ProcessMessage(QueuePointer &respQueue,
@@ -63,7 +65,7 @@ namespace gazebo
     ///        GazeboDriver::Unsubscribe
     public: virtual void Unsubscribe();
   
-    private: ActarrayIface *iface;
+    private: PTZIface *iface;
   
     /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
     private: char *gz_id;
@@ -71,10 +73,6 @@ namespace gazebo
     /// \brief Timestamp on last data update
     private: double datatime;
   };
-  
-  /// \} 
-  /// \}
-  
   
 }
 #endif

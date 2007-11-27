@@ -41,6 +41,7 @@ void RegisterFiducialIface();
 void RegisterFactoryIface();
 void RegisterGripperIface();
 void RegisterActarrayIface();
+void RegisterPTZIface();
 
 std::map<std::string, IfaceFactoryFn> IfaceFactory::ifaces;
 
@@ -57,6 +58,7 @@ void IfaceFactory::RegisterAll()
   RegisterFactoryIface();
   RegisterGripperIface();
   RegisterActarrayIface();
+  RegisterPTZIface();
 }
 
 

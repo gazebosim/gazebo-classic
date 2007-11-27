@@ -54,6 +54,7 @@ GZ_REGISTER_IFACE("fiducial", FiducialIface);
 GZ_REGISTER_IFACE("factory", FactoryIface);
 GZ_REGISTER_IFACE("gripper", GripperIface);
 GZ_REGISTER_IFACE("actarray", ActarrayIface);
+GZ_REGISTER_IFACE("ptz", PTZIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface

@@ -18,15 +18,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Ptz Interface for Player
+/* Desc: PTZ Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id$
+ * CVS: $Id: PTZInterface.cc 123 2007-09-19 20:36:14Z natepak $
  */
 
 /**
 @addtogroup player
-@par Ptz Interface
+@par PTZ Interface
 - PLAYER_PTZ_CMD_STATE
 */
 
@@ -36,13 +36,16 @@ PLAYER_PTZ_REQ_GEOM
 
 #include <math.h>
 
+#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
-#include "PtzInterface.hh"
+#include "PTZInterface.hh"
+
+using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-PtzInterface::PtzInterface(player_devaddr_t addr, 
+PTZInterface::PTZInterface(player_devaddr_t addr, 
     GazeboDriver *driver, ConfigFile *cf, int section)
 : GazeboInterface(addr, driver, cf, section)
 {
@@ -52,22 +55,22 @@ PtzInterface::PtzInterface(player_devaddr_t addr,
   strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
 
   // Allocate a Position Interface
-  this->iface = gz_ptz_alloc();
+  this->iface = new PTZIface();
 
   this->datatime = -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
-PtzInterface::~PtzInterface()
+PTZInterface::~PTZInterface()
 {
   // Release this interface
-  gz_ptz_free(this->iface); 
+  delete this->iface; 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
-int PtzInterface::ProcessMessage(QueuePointer &respQueue,
+int PTZInterface::ProcessMessage(QueuePointer &respQueue,
     player_msghdr_t *hdr, void *data)
 {
 
@@ -80,13 +83,13 @@ int PtzInterface::ProcessMessage(QueuePointer &respQueue,
 
     cmd = (player_ptz_cmd_t*) data;
 
-    gz_ptz_lock(this->iface, 1);
+    this->iface->Lock(1);
 
     this->iface->data->cmd_pan = cmd->pan;
     this->iface->data->cmd_tilt = cmd->tilt;
     this->iface->data->cmd_zoom = cmd->zoom;
 
-    gz_ptz_unlock(this->iface);
+    this->iface->Unlock();
   }
 
   // Is it a request for ptz geometry?
@@ -124,12 +127,12 @@ int PtzInterface::ProcessMessage(QueuePointer &respQueue,
 ///////////////////////////////////////////////////////////////////////////////
 // Update this interface, publish new info. This is
 // called from GazeboDriver::Update
-void PtzInterface::Update()
+void PTZInterface::Update()
 {
   player_ptz_data_t data;
   struct timeval ts;
 
-  gz_ptz_lock(this->iface, 1);
+  this->iface->Lock(1);
 
   // Only Update when new data is present
   if (this->iface->data->time > this->datatime)
@@ -149,7 +152,7 @@ void PtzInterface::Update()
     data.tilt = this->iface->data->tilt;
     data.zoom = this->iface->data->zoom;
 
-    this->driver->Publish( this->device_addr, NULL,
+    this->driver->Publish( this->device_addr,
                    PLAYER_MSGTYPE_DATA,
                    PLAYER_PTZ_DATA_STATE,      
                    (void*)&data, sizeof(data), &this->datatime );
@@ -157,25 +160,30 @@ void PtzInterface::Update()
 
   }
 
-  gz_ptz_unlock(this->iface);
+  this->iface->Unlock();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Open a SHM interface when a subscription is received. This is called from
 // GazeboDriver::Subscribe
-void PtzInterface::Subscribe()
+void PTZInterface::Subscribe()
 {
-  // Open the interface
-  if (gz_ptz_open(this->iface, GazeboClient::client, this->gz_id) != 0)
+  try
   {
-    printf("Error Subscribing to Gazebo Position Interface\n");
+    this->iface->Open(GazeboClient::client, this->gz_id);
+  }
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "Error subscribing to Gazebo PTZ Interface\n" << e << "\n";
+    gzthrow(stream.str());
   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
-void PtzInterface::Unsubscribe()
+void PTZInterface::Unsubscribe()
 {
-  gz_ptz_close(this->iface);
+  this->iface->Close();
 }

@@ -1,7 +1,7 @@
 #Import variable
 Import('env staticObjs sharedObjs')
 
-dirs = Split('position2d laser camera factory gripper actarray')
+dirs = Split('position2d laser camera factory gripper actarray ptz')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)

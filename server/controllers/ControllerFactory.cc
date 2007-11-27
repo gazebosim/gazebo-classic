@@ -39,6 +39,7 @@ void RegisterGeneric_Camera();
 void RegisterFactory();
 void RegisterPioneer2_Gripper();
 void RegisterBandit_Actarray();
+void RegisterGeneric_PTZ();
 
 std::map<std::string, ControllerFactoryFn> ControllerFactory::controllers;
 
@@ -52,6 +53,7 @@ void ControllerFactory::RegisterAll()
   RegisterFactory();
   RegisterPioneer2_Gripper();
   RegisterBandit_Actarray();
+  RegisterGeneric_PTZ();
 }
 
 
