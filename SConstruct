@@ -3,7 +3,11 @@ import sys
 import time 
 import commands
 
-version = '0.8'
+exec(open('build.py'))
+
+if 'release' in COMMAND_LINE_TARGETS:
+  CreateRelease()
+  exit()
 
 #
 # Setup the Options
@@ -11,56 +15,6 @@ version = '0.8'
 opts = Options()
 opts.Add('prefix', 'The install path "prefix"', '/usr/local')
 opts.Add('destdir', 'The root directory to install into. Useful mainly for binary package building', '/')
-
-#
-# Function used to test for ODE library, and TriMesh support
-#
-ode_test_source_file = """
-#include <ode/ode.h>
-int main()
-{
-  dGeomTriMeshDataCreate();
-  return 0;
-}
-"""
-
-def CheckODELib(context):
-  context.Message('Checking for ODE...')
-  oldLibs = context.env['LIBS']
-  context.env.Replace(LIBS='ode')
-  result = context.TryLink(ode_test_source_file, '.cpp')
-  context.Result(result)
-  context.env.Replace(LIBS=oldLibs)
-  return result
-
-#
-# Create the pkg-config file
-#
-def createPkgConfig(target,source, env):
-  f = open(str(target[0]), 'wb')
-  prefix = source[0].get_contents()
-  f.write('prefix=' + prefix + '\n')
-  f.write('Name: gazebo\n')
-  f.write('Description: Simplified interface to Player\n')
-  f.write('Version:' + version + '\n')
-  f.write('Requires:\n')
-  f.write('Libs: -L' + prefix + '/lib -lgazeboServer\n')
-  f.write('Cflags: -I' + prefix + '/include\n')
-  f.close()
-
-#
-# Create the .gazeborc file
-#
-def createGazeborc(target, source, env):
-  f = open(str(target[0]),'wb')
-  prefix=source[0].get_contents()
-  ogre=commands.getoutput('pkg-config --variable=plugindir OGRE')
-  f.write('<?xml version="1.0"?>\n')
-  f.write('<gazeborc>\n')
-  f.write('  <gazeboPath>' + prefix + '/share/gazebo</gazeboPath>\n')
-  f.write('  <ogrePath>' + ogre + '</ogrePath>\n')
-  f.write('</gazeborc>\n')
-  f.close()
 
 #
 # 3rd party packages
@@ -102,6 +56,9 @@ env = Environment (
     
   #LIBS=Split('gazebo boost_python')
   LIBS=Split('gazebo boost_thread'),
+
+  TARFLAGS = '-c -z',
+  TARSUFFIX = '.tar.gz',
 
   options=opts
 )
