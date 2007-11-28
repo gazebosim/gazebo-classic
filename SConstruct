@@ -23,7 +23,8 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
       	      'ode-config --cflags --libs',
               'fltk-config --cflags --libs --ldflags --use-gl --use-images',
-              'xft-config --cflags --libs']
+              'xft-config --cflags --libs',
+              'pkg-config --cflags --libs OIS']
 
 #
 # setup the build environment
@@ -103,6 +104,10 @@ if not env.GetOption('clean'):
       elif cfg.find("ode") >= 0:
         print "ODE is required, but not found."
         print "  http://www.ode.org"
+        Exit(1)
+      elif cfg.find("OIS") >= 0:
+        print "OIS is required, but not found."
+        print "  http://sourceforge.net/projects/wgois"
         Exit(1)
   conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib})
    

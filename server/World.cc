@@ -159,7 +159,7 @@ int World::Update()
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
 
-  InputHandler::Instance()->Update();
+  //InputHandler::Instance()->Update();
 
   this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime = this->physicsEngine->GetStepTime();

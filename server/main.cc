@@ -104,8 +104,6 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include <iostream>
 #include <boost/thread/thread.hpp>
-#include <FL/Fl.H>
-#include <FL/x.H>
 
 #include "Global.hh"
 #include "Gui.hh"
@@ -386,49 +384,12 @@ int Fini()
 void MainCallback()
 {
 
-  try
-  {
-    bool done = false;
-    while (!done)
-    {
-      //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
-
-      //Fl::lock();
-      // Advance the world 
-      gazebo::World::Instance()->Update();
-      //Fl::unlock();
-
-      //usleep(10000);
-
-      done = gazebo::Global::GetUserQuit();
-    }
-  }
-  catch (gazebo::GazeboError e)
-  {
-    std::cerr << "MainIdle Failed[" << e << "]\n";
-    //return -1;
-  }
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Run the FLTK main loop
-void FLTKLoop()
-{
-  while (!gazebo::Global::GetUserQuit() && Fl_X::first)
-  {
-    Fl::lock();
-    Fl::wait(0);
-    Fl::unlock();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main function
 int main(int argc, char **argv)
 {
-  //Fl::lock();
-
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
@@ -446,10 +407,26 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  // Run FLTK main loop in a separate thread
-  boost::thread fltkThread(FLTKLoop);
+  try
+  {
+    bool done = false;
+    while (!done)
+    {
+      boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
 
-  MainCallback();
+      // Advance the world 
+      gazebo::World::Instance()->Update();
+      //usleep(10000);
+
+      done = gazebo::Global::GetUserQuit();
+    }
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::cerr << "MainIdle Failed[" << e << "]\n";
+    //return -1;
+  }
+
 
   try
   {
