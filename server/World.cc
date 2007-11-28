@@ -154,6 +154,7 @@ int World::Init()
 // Update the world
 int World::Update()
 {
+
   UpdateParams params;
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
@@ -167,7 +168,9 @@ int World::Update()
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     if (*miter)
+    {
       (*miter)->Update(params);
+    }
   }
 
   // Update the physics engine

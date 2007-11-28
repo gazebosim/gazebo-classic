@@ -385,10 +385,30 @@ int Fini()
 // Idle-time processing
 void MainCallback()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
 
-  // Advance the world 
-  gazebo::World::Instance()->Update();
+  try
+  {
+    bool done = false;
+    while (!done)
+    {
+      //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+
+      //Fl::lock();
+      // Advance the world 
+      gazebo::World::Instance()->Update();
+      //Fl::unlock();
+
+      //usleep(10000);
+
+      done = gazebo::Global::GetUserQuit();
+    }
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::cerr << "MainIdle Failed[" << e << "]\n";
+    //return -1;
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -407,6 +427,8 @@ void FLTKLoop()
 // Main function
 int main(int argc, char **argv)
 {
+  //Fl::lock();
+
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
@@ -427,22 +449,7 @@ int main(int argc, char **argv)
   // Run FLTK main loop in a separate thread
   boost::thread fltkThread(FLTKLoop);
 
-  try
-  {
-    bool done = false;
-    while (!done)
-    {
-      MainCallback();
-      usleep(1000);
-      //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
-      done = gazebo::Global::GetUserQuit();
-    }
-  }
-  catch (gazebo::GazeboError e)
-  {
-    std::cerr << "MainIdle Failed[" << e << "]\n";
-    return -1;
-  }
+  MainCallback();
 
   try
   {
@@ -455,7 +462,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  fltkThread.join();
+  //fltkThread.join();
 
   return 0;
 }

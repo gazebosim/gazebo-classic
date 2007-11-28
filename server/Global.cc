@@ -53,79 +53,79 @@ Global::~Global()
 
 bool Global::GetUserQuit()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   return userQuit;
 }
 
 void Global::SetUserQuit(bool quit)
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   userQuit = quit;
 }
 
 
 bool Global::GetUserPause()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   return userPause;
 }
 
 void Global::SetUserPause(bool pause)
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   userPause = pause;
 }
 
 bool Global::GetUserStep()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   return userStep;
 }
 
 void Global::SetUserStep( bool step )
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   userStep = step;
 }
 
 bool Global::GetUserStepInc()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   return userStepInc;
 }
 
 void Global::SetUserStepInc(bool step)
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   userStepInc = step;
 }
 
 bool Global::GetShowBoundingBoxes()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   return showBoundingBoxes;
 }
 
 void Global::SetShowBoundingBoxes(bool show)
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   showBoundingBoxes = show;
 }
 
 unsigned long Global::GetIterations()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   return iterations;
 }
 
 void Global::SetIterations(unsigned long count)
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   iterations = count;
 }
 
 void Global::IncIterations()
 {
-  boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+  //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
   iterations++;
 }
