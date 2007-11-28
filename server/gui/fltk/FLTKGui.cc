@@ -60,7 +60,6 @@ FLTKGui::~FLTKGui()
 void FLTKGui::Init()
 {
   Fl_Window::show();
-  printf("GUI Init\n");
   /*this->show();
   this->display = fl_display;
   this->visual = fl_visual;
@@ -87,7 +86,7 @@ unsigned int FLTKGui::GetHeight() const
 /// Handle events
 int FLTKGui::handle(int event)
 {
-  InputEvent gzevent;
+  /*InputEvent gzevent;
 
   // Get the mouse position
   gzevent.SetMousePos( Vector2<int>( Fl::event_x(), Fl::event_y() ) );
@@ -160,6 +159,7 @@ int FLTKGui::handle(int event)
   //boost::mutex::scoped_lock lock(Global::mutex);
 
   this->inputHandler->HandleEvent(&gzevent);
+  */
 
   return 0;
 }
