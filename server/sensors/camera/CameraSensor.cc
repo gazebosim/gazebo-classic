@@ -1,4 +1,4 @@
-adkfa/*
+/*
  *  Gazebo - Outdoor Multi-Robot Simulator
  *  Copyright (C) 2003  
  *     Nate Koenig & Andrew Howard
