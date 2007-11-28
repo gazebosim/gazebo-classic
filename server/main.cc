@@ -396,9 +396,11 @@ void MainCallback()
 void FLTKLoop()
 {
   while (!gazebo::Global::GetUserQuit() && Fl_X::first)
-    Fl::wait(0.5);
-
-  //Fl::run();
+  {
+    Fl::lock();
+    Fl::wait(0);
+    Fl::unlock();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -432,7 +434,7 @@ int main(int argc, char **argv)
     {
       MainCallback();
       usleep(1000);
-      boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
+      //boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
       done = gazebo::Global::GetUserQuit();
     }
   }
