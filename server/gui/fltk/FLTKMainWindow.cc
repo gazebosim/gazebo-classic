@@ -105,6 +105,8 @@ void FLTKMainWindow::resize(int x, int y, int w, int h)
 
 int FLTKMainWindow::handle(int event)
 {
+  printf("Handle[%d][%d]\n",event,FL_HIDE);
+
   switch (event)
   {
     case FL_ENTER:

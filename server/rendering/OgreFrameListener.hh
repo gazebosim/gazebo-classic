@@ -6,9 +6,6 @@
 #include <Ogre.h>
 
 
-#include <OIS/OIS.h>
-
-
 namespace Ogre
 {
   class EventProcessor;
@@ -22,7 +19,7 @@ namespace gazebo
   
   class OgreAdaptor;
   
-  class OgreFrameListener : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener
+  class OgreFrameListener : public Ogre::FrameListener//, public Ogre::WindowEventListener
   {
     public: OgreFrameListener();
     public: virtual ~OgreFrameListener();
@@ -30,39 +27,12 @@ namespace gazebo
     public: virtual bool frameStarted( const Ogre::FrameEvent &evt);
     public: virtual bool frameEnded( const Ogre::FrameEvent &evt);
   
-    public: virtual bool keyPressed( const OIS::KeyEvent &e );
-    public: virtual bool keyReleased( const OIS::KeyEvent &e );
-  
-    // Mouse Events
-    public: bool mouseMoved(const OIS::MouseEvent &e);
-  
-    // MouseListener
-    public: bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-    public: bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
-  
-    public: void Resize(unsigned int w, unsigned int h);
-  
-    private: void LeftMousePressed(const OIS::MouseEvent &e);
-  
     private: Ogre::Vector3 directionVec;
   
     private: float moveAmount;
     private: float moveScale;
     private: float rotateAmount;
   
-    private: Ogre::EventProcessor *eventProcessor;
-  
-    private: OIS::InputManager *inputManager;
-    private: OIS::Mouse *mMouse;
-    private: OIS::Keyboard *mKeyboard;
-  
-    private: bool leftPressed;
-    private: bool rightPressed;
-    private: bool middlePressed;
-  
-    private: Ogre::RaySceneQuery *raySceneQuery;
-  
-    private: Ogre::SceneNode *selectedObject;
   };
 
 }

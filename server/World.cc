@@ -159,7 +159,7 @@ int World::Update()
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
 
-  //InputHandler::Instance()->Update();
+  InputHandler::Instance()->Update();
 
   this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime = this->physicsEngine->GetStepTime();
@@ -187,17 +187,9 @@ int World::Update()
     this->pauseTime += this->physicsEngine->GetStepTime();
   }
 
-
-  // Update the rendering engine
-  /*if (this->models.size() > 0)
-  {
-    OgreAdaptor::Instance()->Render();
-  }*/
-
   OgreAdaptor::Instance()->Render();
   
   this->UpdateSimulationIface();
-
 
   // Copy the newly created models into the main model vector
   std::copy(this->toAddModels.begin(), this->toAddModels.end(), 

@@ -35,10 +35,12 @@ Fl_Menu_Item menuitems[] = {
 FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label) 
   : Gui(), Fl_Gl_Window( x, y, w, h, label.c_str() )
 {
-//  this->begin();
-
   this->end();
   this->show();
+
+  // Must have the next two lines right here!!!!
+  this->make_current();
+  this->valid(1);
 
   this->display = fl_display;
   this->visual = fl_visual;
@@ -60,12 +62,6 @@ FLTKGui::~FLTKGui()
 void FLTKGui::Init()
 {
   Fl_Window::show();
-  /*this->show();
-  this->display = fl_display;
-  this->visual = fl_visual;
-  this->colormap = fl_colormap;
-  this->windowId = Fl_X::i(this)->xid;
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,10 +79,22 @@ unsigned int FLTKGui::GetHeight() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Update function
+void FLTKGui::Update()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Draw function
+void FLTKGui::draw()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Handle events
 int FLTKGui::handle(int event)
 {
-  /*InputEvent gzevent;
+  InputEvent gzevent;
 
   // Get the mouse position
   gzevent.SetMousePos( Vector2<int>( Fl::event_x(), Fl::event_y() ) );
@@ -159,7 +167,6 @@ int FLTKGui::handle(int event)
   //boost::mutex::scoped_lock lock(Global::mutex);
 
   this->inputHandler->HandleEvent(&gzevent);
-  */
 
   return 0;
 }

@@ -406,7 +406,7 @@ void OgreAdaptor::ResizeWindow(unsigned int w, unsigned int h)
   this->viewport->setDimensions(0,0,1,1);
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
-  this->frameListener->Resize(w,h);
+  //this->frameListener->Resize(w,h);
 }
 
 

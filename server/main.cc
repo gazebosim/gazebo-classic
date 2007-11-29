@@ -104,6 +104,8 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include <iostream>
 #include <boost/thread/thread.hpp>
+#include <FL/Fl.H>
+#include <FL/x.H>
 
 #include "Global.hh"
 #include "Gui.hh"
@@ -380,13 +382,6 @@ int Fini()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Idle-time processing
-void MainCallback()
-{
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Main function
 int main(int argc, char **argv)
 {
@@ -409,24 +404,17 @@ int main(int argc, char **argv)
 
   try
   {
-    bool done = false;
-    while (!done)
+    while (!gazebo::Global::GetUserQuit())
     {
-      boost::recursive_mutex::scoped_lock lock(gazebo::Global::mutex);
-
-      // Advance the world 
+      Fl::wait(0);
       gazebo::World::Instance()->Update();
-      //usleep(10000);
-
-      done = gazebo::Global::GetUserQuit();
     }
   }
   catch (gazebo::GazeboError e)
   {
     std::cerr << "MainIdle Failed[" << e << "]\n";
-    //return -1;
+    return -1;
   }
-
 
   try
   {
@@ -438,8 +426,6 @@ int main(int argc, char **argv)
     std::cerr << "Finalized Failed[" << e << "]\n";
     return -1;
   }
-
-  //fltkThread.join();
 
   return 0;
 }
