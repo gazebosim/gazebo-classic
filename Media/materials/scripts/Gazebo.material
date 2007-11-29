@@ -71,11 +71,7 @@ material PerPixelShaded
 	{
 		pass Ambient
 		{
-			/*ambient 1 1 1 1
-			diffuse 0 0 0 
-			specular 0 0 0 0
-      */
-			
+		
 			vertex_program_ref Gazebo/AmbientOneTextureVS
 			{
 			}
@@ -141,26 +137,16 @@ material PerPixelShaded
 	}
 }
 
-
-material Gazebo/test : PerPixelShaded
+ //: PerPixelShaded
+material Gazebo/test
 {
   technique
   {
     pass Ambient
     {
-      ambient 0 0 0  1
-      diffuse 0 0 0 1.0
-      specular 0 0 0 1.0
-    }
-    pass DirectionalLight
-    {
-			diffuse 1.0 1.0 1.0 1
-	 		specular 0.8 0.8 0.8 0.0 16
-    }
-    pass PointLight
-    {
-			diffuse 0.9 0.9 0.9 1
-	 		specular 0.8 0.8 0.8 0.0 16
+      ambient 0.3 0.3 0.3 1
+      diffuse 0.5 0.5 0.5 1
+      specular 0.1 0.1 0.1 1
     }
   }
 }
@@ -424,48 +410,43 @@ material Gazebo/GrassFloor
 	{
 		pass 
     {
-     /* ambient 1 1 1 1
-      diffuse 1 1 1 1
-      specular 0 0 0
-      */
 			texture_unit
 			{
 				texture grass_1024.jpg
 			}
 		}
-		/*pass DirectionalLight
-    {
-      ambient 0 1 0 1
-      diffuse 0 1 0 1
-      specular 0 0 0
-			texture_unit
-			{
-				texture grass_1024.jpg
-			}
-		}
+		//pass DirectionalLight
+    //{
+    //  ambient 0 1 0 1
+    //  diffuse 0 1 0 1
+    //  specular 0 0 0
+		//	texture_unit
+		//	{
+		//		texture grass_1024.jpg
+		//	}
+		//}
 
-		pass PointLight
-    {
-      ambient 0 1 0
-      diffuse 0 1 0
-      specular 0 0 0
-			texture_unit
-			{
-				texture grass_1024.jpg
-			}
-		}
-		pass SpotLight
-    {
-      ambient 0 1 0
-      diffuse 0 1 0
-      specular 0 0 0
+		//pass PointLight
+    //{
+    //  ambient 0 1 0
+    //  diffuse 0 1 0
+    //  specular 0 0 0
+		//	texture_unit
+		//	{
+		//		texture grass_1024.jpg
+		//	}
+		//}
+		//pass SpotLight
+    //{
+    //  ambient 0 1 0
+    //  diffuse 0 1 0
+    //  specular 0 0 0
 
-			texture_unit
-			{
-				texture grass_1024.jpg
-			}
-		}
-    */
+		//	texture_unit
+		//	{
+		//		texture grass_1024.jpg
+		//	}
+		//}
 
 	}
 }
@@ -527,52 +508,52 @@ material Gazebo/WoodPallet
 
 
 
-vertex_program ShadowCasterVP glsl
-{
-  source v-shadow-caster.cg
-    entry_point main
-    profiles arbvp1
+//vertex_program ShadowCasterVP glsl
+//{
+//  source v-shadow-caster.cg
+//    entry_point main
+//    profiles arbvp1
+//
+//    default_params
+//    {
+//      param_named_auto p_ModelViewProjection worldviewproj_matrix
+//        param_named_auto p_AmbientLight ambient_light_colour
+//    }
+//}
 
-    default_params
-    {
-      param_named_auto p_ModelViewProjection worldviewproj_matrix
-        param_named_auto p_AmbientLight ambient_light_colour
-    }
-}
+//fragment_program ShadowCasterFP glsl
+//{
+//  source f-shadow-caster.cg
+//    entry_point main
+//    profiles arbfp1
+//    // Store normalized (usefull to avoid overflowin) or non-normalized depth ?
+//    //compile_arguments -DSTORE_NORMALIZED_DEPTH
+//
+//    default_params
+//    {
+//      // Only used when storing normalized depth values
+//      //param_named_auto p_Near near_clip_distance
+//      //param_named_auto p_Far far_clip_distance
+//      param_named p_DepthOffset float 0.01
+//    }
+//}
 
-fragment_program ShadowCasterFP glsl
-{
-  source f-shadow-caster.cg
-    entry_point main
-    profiles arbfp1
-    // Store normalized (usefull to avoid overflowin) or non-normalized depth ?
-    //compile_arguments -DSTORE_NORMALIZED_DEPTH
-
-    default_params
-    {
-      // Only used when storing normalized depth values
-      //param_named_auto p_Near near_clip_distance
-      //param_named_auto p_Far far_clip_distance
-      param_named p_DepthOffset float 0.01
-    }
-}
-
-material ShadowCaster
-{
-  technique default
-  {
-    // Z-write only pass
-    pass Z-write
-    {
-      vertex_program_ref ShadowCasterVP
-      {
-      }
-      fragment_program_ref ShadowCasterFP
-      {
-      }
-    }
-  }
-}
+//material ShadowCaster
+//{
+//  technique default
+//  {
+//    // Z-write only pass
+//    pass Z-write
+//    {
+//      vertex_program_ref ShadowCasterVP
+//      {
+//      }
+//      fragment_program_ref ShadowCasterFP
+//      {
+//      }
+//    }
+//  }
+//}
 
 material Gazebo/Fish
 {
@@ -614,4 +595,22 @@ material Gazebo/Brick
       }
     }
   }
+}
+
+material Gazebo/TransparentTest
+{
+	technique
+	{
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      texture_unit
+      {
+        colour_op_ex source1 src_manual src_current 1 0 1
+        alpha_op_ex source1 src_manual src_current 0.2
+      }
+    }
+	}
 }
