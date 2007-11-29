@@ -106,7 +106,7 @@ OgreHUD *OgreHUD::Instance()
 /// Update the HUD.
 void OgreHUD::Update()
 {
-  std::ostringstream stream;
+/*  std::ostringstream stream;
   if (Global::GetUserPause())
   {
     this->SetText("__GAZEBO_HUD_PAUSE__","Paused");
@@ -137,6 +137,7 @@ void OgreHUD::Update()
   this->SetText("__GAZEBO_HUD_STATS__",stream.str());
 
   stream.str("");
+  */
 
 }
 

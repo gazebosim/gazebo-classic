@@ -117,7 +117,6 @@ void InputHandler::ClearEvents()
 // Handle key press
 void InputHandler::HandleKeyPress( const InputEvent *event )
 {
-
   switch(event->GetKey())
   {
     case XK_Escape:

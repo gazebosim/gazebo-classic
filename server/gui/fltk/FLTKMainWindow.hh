@@ -38,6 +38,7 @@ namespace gazebo
 
   class FLTKGui;
   class Toolbar;
+  class StatusBar;
 
   /// \brief FLTK Main Window
   class FLTKMainWindow : public Gui, public Fl_Window
@@ -62,6 +63,7 @@ namespace gazebo
     private: FLTKGui *glWindow;
 
     private: Toolbar *toolbar;
+    private: StatusBar *statusbar;
   };
 
 }

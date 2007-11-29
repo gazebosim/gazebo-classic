@@ -408,7 +408,7 @@ int main(int argc, char **argv)
     {
       gazebo::World::Instance()->Update();
       gazebo::Global::gui->Update();
-      Fl::wait(0);
+      Fl::wait(0.03);
     }
   }
   catch (gazebo::GazeboError e)

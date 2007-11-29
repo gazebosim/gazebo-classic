@@ -36,6 +36,7 @@
 #include "InputHandler.hh"
 #include "MainMenu.hh"
 #include "Toolbar.hh"
+#include "StatusBar.hh"
 #include "FLTKMainWindow.hh"
 
 using namespace gazebo;
@@ -46,19 +47,21 @@ GZ_REGISTER_STATIC_GUI("fltk", FLTKMainWindow);
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 FLTKMainWindow::FLTKMainWindow (int x, int y, int width, int height, const std::string &t)
-  : Gui(), Fl_Window(x, y, width+200, height+30, t.c_str())
+  : Gui(), Fl_Window(x, y, width+200, height+60, t.c_str())
 {
 
   Fl::scheme("plastic");
 
   // Create a main menu
-  MainMenu *mainMenu = new MainMenu(0,0,w(),30,"MainMenu");
-
-  // Create the toolbar
-  this->toolbar = new Toolbar(w()-200, 30, 200, h()-30);
+  MainMenu *mainMenu = new MainMenu(0,0,w(),30,(char *)"MainMenu");
 
   // Create the Rendering window
-  this->glWindow = new FLTKGui(0, 30, w()-200, h()-30,"GL Window");
+  this->glWindow = new FLTKGui(0, 30, w()-200, h()-60,"GL Window");
+
+  // Create the toolbar
+  this->toolbar = new Toolbar(w()-200, 30, 200, h()-60);
+
+  this->statusbar = new StatusBar(0, h()-30, w(), 30);
 
   this->end();
   this->show();
@@ -91,6 +94,7 @@ void FLTKMainWindow::Init()
 void FLTKMainWindow::Update()
 {
   this->toolbar->Update();
+  this->statusbar->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

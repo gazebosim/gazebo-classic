@@ -18,46 +18,45 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Toolbar
+/* Desc: StatusBar
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id:$
  */
-#ifndef TOOLBAR_HH
-#define TOOLBAR_HH
+#ifndef STATUSBAR_HH
+#define STATUSBAR_HH
 
 #include <FL/Fl_Group.H>
 
 class Fl_Value_Output;
+class Fl_Output;
 
 namespace gazebo
 {
 
   /// \brief Toolbar
-  class Toolbar : public Fl_Group
+  class StatusBar : public Fl_Group
   {
     /// \brief Constructor
-    public: Toolbar (int x, int y, int w, int h, const char *l=0);
-  
+    public: StatusBar (int x, int y, int w, int h, const char *l=0);
+   
     /// \brief Destructor
-    public: virtual ~Toolbar();
-
+    public: virtual ~StatusBar();
+    
     /// \brief Update the toolbar data
     public: void Update();
+   
+    public: int handle( int event );
 
-    private: Fl_Group *cameraInfoGrp;
-    private: Fl_Value_Output *outputX;
-    private: Fl_Value_Output *outputY;
-    private: Fl_Value_Output *outputZ;
+    private: Fl_Value_Output *iterations;
+    private: Fl_Value_Output *fps;
+    private: Fl_Value_Output *realTime;
+    private: Fl_Value_Output *pauseTime;
+    private: Fl_Value_Output *simTime;
 
-    private: Fl_Value_Output *outputRoll;
-    private: Fl_Value_Output *outputPitch;
-    private: Fl_Value_Output *outputYaw;
-
+    private: Fl_Output *statusString;
   };
   
 }
 
-
 #endif
-

@@ -142,7 +142,6 @@ int FLTKGui::handle(int event)
       handled = true;
       break;
 
-
     case FL_SHORTCUT:
     case FL_KEYDOWN:
       gzevent.SetType(InputEvent::KEY_PRESS);
