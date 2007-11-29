@@ -103,7 +103,6 @@
 
     <model:physical name="laser">
       <xyz>0 0 0.16</xyz>
-      <!-- Embedded laser model -->
       <include embedded="true">
         <xi:include href="laser.model" />
       </include>

@@ -18,52 +18,47 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: FLTK Mainwindow
+/* Desc: Toolbar
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id:$
  */
+#ifndef TOOLBAR_HH
+#define TOOLBAR_HH
 
-#ifndef FLTKMAINWINDOW_HH
-#define FLTKMAINWINDOW_HH
+#include <FL/Fl_Group.H>
 
-#include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <string>
-
-#include "Gui.hh"
+class Fl_Value_Output;
 
 namespace gazebo
 {
 
-  class FLTKGui;
-  class Toolbar;
-
-  /// \brief FLTK Main Window
-  class FLTKMainWindow : public Gui, public Fl_Window
+  /// \brief Toolbar
+  class Toolbar : public Fl_Group
   {
     /// \brief Constructor
-    public: FLTKMainWindow (int x, int y, int w, int h, const std::string &t);
- 
+    public: Toolbar (int x, int y, int w, int h, const char *l=0);
+  
     /// \brief Destructor
-    public: virtual ~FLTKMainWindow();
+    public: virtual ~Toolbar();
 
-    /// \brief Initalize the gui
-    public: virtual void Init();
+    /// \brief Update the toolbar data
+    public: void Update();
 
-    public: virtual void Update();
 
-    /// \brief Get the width of the gui's rendering window
-    public: virtual unsigned int GetWidth() const;
+    private: Fl_Group *cameraInfoGrp;
+    private: Fl_Value_Output *outputX;
+    private: Fl_Value_Output *outputY;
+    private: Fl_Value_Output *outputZ;
 
-    /// \brief Get the height of the gui's rendering window
-    public: virtual unsigned int GetHeight() const;
+    private: Fl_Value_Output *outputRoll;
+    private: Fl_Value_Output *outputPitch;
+    private: Fl_Value_Output *outputYaw;
 
-    private: FLTKGui *glWindow;
-
-    private: Toolbar *toolbar;
   };
-
+  
 }
 
+
 #endif
+

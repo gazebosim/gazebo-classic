@@ -38,7 +38,7 @@ unsigned long Global::iterations = 0;
 Gui *Global::gui = NULL;
 Pose3d Global::poseOffset;
 
-boost::recursive_mutex Global::mutex;
+//boost::recursive_mutex Global::mutex;
 
 std::list<std::string> Global::gazeboPaths;
 std::list<std::string> Global::ogrePaths;

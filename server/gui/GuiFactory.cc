@@ -33,7 +33,7 @@
 
 using namespace gazebo;
 
-void RegisterFLTKGui();
+void RegisterFLTKMainWindow();
 
 std::map<std::string, GuiFactoryFn> GuiFactory::guis;
 
@@ -41,7 +41,7 @@ std::map<std::string, GuiFactoryFn> GuiFactory::guis;
 // Register all known guis.
 void GuiFactory::RegisterAll()
 {
-  RegisterFLTKGui();
+  RegisterFLTKMainWindow();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

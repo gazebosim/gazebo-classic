@@ -13,40 +13,20 @@
 #include "OgreAdaptor.hh"
 #include "GazeboMessage.hh"
 #include "GuiFactory.hh"
+#include "MainMenu.hh"
 #include "FLTKGui.hh"
 
 using namespace gazebo;
 
-GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
-
-void quit_cb(Fl_Widget*, void*) {Global::SetUserQuit(true);}
-
-Fl_Menu_Item menuitems[] = {
-  { "File", 0, 0, 0, FL_SUBMENU },
-  { "Quit", 0, quit_cb, 0, FL_MENU_DIVIDER },
-  { 0 },
-  
-  { 0 }
-};
-
+//GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label) 
-  : Gui(), Fl_Gl_Window( x, y, w, h, label.c_str() )
+  : Fl_Gl_Window( x, y, w, h, label.c_str() )
 {
+
   this->end();
-  this->show();
-
-  // Must have the next two lines right here!!!!
-  this->make_current();
-  this->valid(1);
-
-  this->display = fl_display;
-  this->visual = fl_visual;
-  this->colormap = fl_colormap;
-  this->windowId = Fl_X::i(this)->xid;
-
   this->inputHandler = InputHandler::Instance();
 }
 
@@ -61,7 +41,19 @@ FLTKGui::~FLTKGui()
 // Init
 void FLTKGui::Init()
 {
+  this->show();
+
+  // Must have the next two lines right here!!!!
+  this->make_current();
+  this->valid(1);
+
+  this->display = fl_display;
+  this->visual = fl_visual;
+  this->colormap = fl_colormap;
+  this->windowId = Fl_X::i(this)->xid;
+
   Fl_Window::show();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,15 +77,10 @@ void FLTKGui::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Draw function
-void FLTKGui::draw()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Handle events
 int FLTKGui::handle(int event)
 {
+  bool handled = false;
   InputEvent gzevent;
 
   // Get the mouse position
@@ -107,14 +94,17 @@ int FLTKGui::handle(int event)
   {
     case FL_LEFT_MOUSE:
       gzevent.SetMouseButton(InputEvent::LEFT_MOUSE);
+      handled = true;
       break;
 
     case FL_RIGHT_MOUSE:
       gzevent.SetMouseButton(InputEvent::RIGHT_MOUSE);
+      handled = true;
       break;
 
     case FL_MIDDLE_MOUSE:
       gzevent.SetMouseButton(InputEvent::MIDDLE_MOUSE);
+      handled = true;
       break;
 
     default:
@@ -139,33 +129,36 @@ int FLTKGui::handle(int event)
 
     case FL_PUSH:
       gzevent.SetType(InputEvent::MOUSE_PRESS);
+      handled = true;
       break;
 
     case FL_RELEASE:
       gzevent.SetType(InputEvent::MOUSE_RELEASE);
+      handled = true;
       break;
 
     case FL_DRAG:
       gzevent.SetType(InputEvent::MOUSE_DRAG);
+      handled = true;
       break;
 
 
     case FL_SHORTCUT:
     case FL_KEYDOWN:
       gzevent.SetType(InputEvent::KEY_PRESS);
+      handled = true;
       break;
 
     case FL_KEYUP:
       gzevent.SetType(InputEvent::KEY_RELEASE);
+      handled = true;
       break;
-
-    default:
-      return 0;
   }
-
-  //boost::mutex::scoped_lock lock(Global::mutex);
 
   this->inputHandler->HandleEvent(&gzevent);
 
-  return 0;
+  if (!handled)
+    return Fl_Gl_Window::handle(event);
+  else
+    return 1;
 }

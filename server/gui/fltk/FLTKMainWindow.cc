@@ -1,3 +1,29 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: FLTK Mainwindow
+ * Author: Nate Koenig
+ * Date: 13 Feb 2006
+ * SVN: $Id:$
+ */
+
 #include <string>
 
 #include <FL/Fl_Menu_Item.H>
@@ -8,6 +34,8 @@
 #include "Global.hh"
 #include "GuiFactory.hh"
 #include "InputHandler.hh"
+#include "MainMenu.hh"
+#include "Toolbar.hh"
 #include "FLTKMainWindow.hh"
 
 using namespace gazebo;
@@ -15,31 +43,22 @@ using namespace gazebo;
 GZ_REGISTER_STATIC_GUI("fltk", FLTKMainWindow);
 
 
-void quit_cb(Fl_Widget*, void*) {Global::userQuit = true;}
-
-Fl_Menu_Item menuitems[] = {
-  { "File", 0, 0, 0, FL_SUBMENU },
-  { "Quit", 0, quit_cb, 0, FL_MENU_DIVIDER },
-  { 0 },
-  
-  { 0 }
-};
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t)
-  : Gui(), Fl_Window(x, y, w, h, t.c_str())
+FLTKMainWindow::FLTKMainWindow (int x, int y, int width, int height, const std::string &t)
+  : Gui(), Fl_Window(x, y, width+200, height+30, t.c_str())
 {
-  this->begin();
 
-  /*Fl_Menu_Bar *m = new Fl_Menu_Bar(0, 0, w, 30, "Menu Bar");
-  m->copy(menuitems);
-  */
+  Fl::scheme("plastic");
 
-  this->glWindow = new FLTKGui(0, 0, w, h, "");
+  // Create a main menu
+  MainMenu *mainMenu = new MainMenu(0,0,w(),30,"MainMenu");
 
-//  printf("GLWindow Size[%d %d]\n", this->glWindow->w(), this->glWindow->h());
+  // Create the toolbar
+  this->toolbar = new Toolbar(w()-200, 30, 200, h()-30);
+
+  // Create the Rendering window
+  this->glWindow = new FLTKGui(0, 30, w()-200, h()-30,"GL Window");
 
   this->end();
   this->show();
@@ -52,8 +71,7 @@ FLTKMainWindow::FLTKMainWindow (int x, int y, int w, int h, const std::string &t
   this->windowId = this->glWindow->windowId;
   
   this->resizable(this->glWindow);
-
-  this->inputHandler = InputHandler::Instance();
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +90,7 @@ void FLTKMainWindow::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void FLTKMainWindow::Update()
 {
-  this->draw();
+  this->toolbar->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,42 +107,3 @@ unsigned int FLTKMainWindow::GetHeight() const
   return this->glWindow->h();
 }
 
-void FLTKMainWindow::flush()
-{
-  this->glWindow->flush();
-}
-
-void FLTKMainWindow::draw()
-{
-  this->glWindow->draw();
-}
-
-void FLTKMainWindow::resize(int x, int y, int w, int h)
-{
-}
-
-int FLTKMainWindow::handle(int event)
-{
-  printf("Handle[%d][%d]\n",event,FL_HIDE);
-
-  switch (event)
-  {
-    case FL_ENTER:
-    case FL_LEAVE:
-    case FL_DEACTIVATE:
-    case FL_HIDE:
-      this->inputHandler->ClearEvents();
-      break;
-
-    case FL_CLOSE:
-      printf("CLOSE\n");
-      Global::userQuit = true;
-      break;
-
-    default:
-      this->glWindow->handle(event);
-      break;
-  }
-
-  return 0;
-}

@@ -18,52 +18,25 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: FLTK Mainwindow
+/* Desc: FLTK main menu
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id:$
  */
 
-#ifndef FLTKMAINWINDOW_HH
-#define FLTKMAINWINDOW_HH
+#ifndef MAINMENU_HH
+#define MAINMENU_HH
 
-#include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <string>
-
-#include "Gui.hh"
+#include <FL/Fl_Menu_Bar.H>
 
 namespace gazebo
 {
-
-  class FLTKGui;
-  class Toolbar;
-
-  /// \brief FLTK Main Window
-  class FLTKMainWindow : public Gui, public Fl_Window
+  class MainMenu : public Fl_Menu_Bar
   {
-    /// \brief Constructor
-    public: FLTKMainWindow (int x, int y, int w, int h, const std::string &t);
- 
-    /// \brief Destructor
-    public: virtual ~FLTKMainWindow();
+    public: MainMenu(int x, int y, int w, int h, char *name=0);
 
-    /// \brief Initalize the gui
-    public: virtual void Init();
-
-    public: virtual void Update();
-
-    /// \brief Get the width of the gui's rendering window
-    public: virtual unsigned int GetWidth() const;
-
-    /// \brief Get the height of the gui's rendering window
-    public: virtual unsigned int GetHeight() const;
-
-    private: FLTKGui *glWindow;
-
-    private: Toolbar *toolbar;
+    public: static void QuitCB(Fl_Widget *w, void *data);
   };
-
 }
 
 #endif

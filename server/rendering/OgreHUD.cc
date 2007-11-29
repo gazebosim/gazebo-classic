@@ -188,7 +188,7 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
   //this->cameraPanel->setPosition(0,(1-height*(1.0/width)) / 2.0);
   */
 
-  std::ostringstream stream;
+  /*std::ostringstream stream;
   Pose3d pose = camera->GetWorldPose();
 
   stream.precision(2);
@@ -210,6 +210,7 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
     << RTOD(pose.rot.GetYaw()) << "]";
 
   this->SetText("__GAZEBO_HUD_CAMERA_POSE__", stream.str());
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

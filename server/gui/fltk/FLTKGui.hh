@@ -2,6 +2,8 @@
 #define FLTKGUI_HH
 
 #include <string>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 #include <FL/Fl.H>
 #include <FL/x.H>
@@ -16,7 +18,7 @@ namespace gazebo
 {
   class InputHandler;
 
-  class FLTKGui : public Fl_Gl_Window, public Gui
+  class FLTKGui : public Fl_Gl_Window
   {
     public: FLTKGui( int x, int y, int w, int h, const std::string &label );
     public: virtual ~FLTKGui();
@@ -32,8 +34,6 @@ namespace gazebo
     /// \brief Get the height of the gui's rendering window
     public: virtual unsigned int GetHeight() const;
 
-    public: void draw();
-
     /// \brief Handle event
     public: int handle(int event);
 
@@ -41,6 +41,18 @@ namespace gazebo
     private: float translateScale;
 
     private: InputHandler *inputHandler;
+
+    /// ID of the window
+    public: Window windowId;
+
+    /// Pointer to the Xvisual
+    public: XVisualInfo *visual;
+
+    /// colormap
+    public: Colormap colormap;
+
+    /// pointer to the display
+    public: Display *display;
   };
 
 }

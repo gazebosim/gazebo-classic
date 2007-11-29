@@ -89,7 +89,10 @@ void CameraManager::SetActiveCamera(unsigned int index)
 /// Return the active camera
 CameraSensor *CameraManager::GetActiveCamera()
 {
-  return this->cameras[this->activeCamera];
+  if (this->activeCamera < this->cameras.size())
+    return this->cameras[this->activeCamera];
+  else
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

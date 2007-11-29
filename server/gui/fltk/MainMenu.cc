@@ -18,52 +18,33 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: FLTK Mainwindow
+/* Desc: FLTK main menu
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id:$
  */
 
-#ifndef FLTKMAINWINDOW_HH
-#define FLTKMAINWINDOW_HH
+#include "Global.hh"
+#include "MainMenu.hh"
 
-#include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <string>
+using namespace gazebo;
 
-#include "Gui.hh"
-
-namespace gazebo
+MainMenu::MainMenu(int x, int y, int w, int h, char *name)
+  : Fl_Menu_Bar(x,y,w,h,name)
 {
-
-  class FLTKGui;
-  class Toolbar;
-
-  /// \brief FLTK Main Window
-  class FLTKMainWindow : public Gui, public Fl_Window
-  {
-    /// \brief Constructor
-    public: FLTKMainWindow (int x, int y, int w, int h, const std::string &t);
- 
-    /// \brief Destructor
-    public: virtual ~FLTKMainWindow();
-
-    /// \brief Initalize the gui
-    public: virtual void Init();
-
-    public: virtual void Update();
-
-    /// \brief Get the width of the gui's rendering window
-    public: virtual unsigned int GetWidth() const;
-
-    /// \brief Get the height of the gui's rendering window
-    public: virtual unsigned int GetHeight() const;
-
-    private: FLTKGui *glWindow;
-
-    private: Toolbar *toolbar;
+  const Fl_Menu_Item menuitems[] = {
+    { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },
+    { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { 0 },
+  
+    { 0 }
   };
 
+
+  this->copy(menuitems);
 }
 
-#endif
+void MainMenu::QuitCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  Global::SetUserQuit(true);
+}
