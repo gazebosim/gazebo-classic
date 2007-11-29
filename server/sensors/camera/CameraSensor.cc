@@ -345,7 +345,6 @@ void CameraSensor::ToggleSaveFrame()
 // Save the current frame to disk
 void CameraSensor::SaveFrame()
 {
-  printf("Saving\n");
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   std::ostringstream sstream;
   Ogre::ImageCodec::ImageData *imgData;

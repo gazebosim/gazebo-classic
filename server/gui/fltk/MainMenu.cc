@@ -24,7 +24,11 @@
  * SVN: $Id:$
  */
 
+#include <FL/Fl_File_Chooser.H>
+
 #include "Global.hh"
+#include "CameraManager.hh"
+#include "CameraSensor.hh"
 #include "MainMenu.hh"
 
 using namespace gazebo;
@@ -34,6 +38,8 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
 {
   const Fl_Menu_Item menuitems[] = {
     { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },
+  //  { "Open", 0, &gazebo::MainMenu::OpenCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
     { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
     { 0 },
   
@@ -44,7 +50,27 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
   this->copy(menuitems);
 }
 
+void MainMenu::OpenCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  Fl_File_Chooser *fileChooser = new Fl_File_Chooser(getenv("PWD"),"*.world",Fl_File_Chooser::SINGLE,"Open World File");
+
+  fileChooser->show();
+
+  while (fileChooser->shown())
+    Fl::wait();
+
+
+}
+
+void MainMenu::SaveFramesCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
+  camera->ToggleSaveFrame();
+}
+
 void MainMenu::QuitCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   Global::SetUserQuit(true);
 }
+
+

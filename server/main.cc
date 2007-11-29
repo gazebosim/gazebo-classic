@@ -279,8 +279,6 @@ void LoadConfigFile()
     gazebo::Global::ogrePaths.push_back("/usr/local/lib/OGRE");
     gazebo::Global::ogrePaths.push_back("/usr/lib/OGRE");
   }
-
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

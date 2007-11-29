@@ -35,6 +35,10 @@ namespace gazebo
   {
     public: MainMenu(int x, int y, int w, int h, char *name=0);
 
+    public: static void OpenCB(Fl_Widget * /*w*/, void * /*data*/);
+
+    public: static void SaveFramesCB(Fl_Widget *w, void *data);
+
     public: static void QuitCB(Fl_Widget *w, void *data);
   };
 }

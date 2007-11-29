@@ -143,13 +143,6 @@ bool InputHandler::HandleKeyRelease( const InputEvent *event )
       Global::SetUserStepInc( false );
       break;
 
-    case XK_f:
-      {
-        CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
-        camera->ToggleSaveFrame();
-      }
-      break;
-
     case XK_h:
       OgreHUD::Instance()->ToggleHelp();
       break;
