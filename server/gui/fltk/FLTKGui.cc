@@ -134,7 +134,6 @@ int FLTKGui::handle(int event)
       return 0;
 
     case FL_CLOSE:
-      printf("CLOSE\n");
       Global::SetUserQuit(true);
       return 0;
 

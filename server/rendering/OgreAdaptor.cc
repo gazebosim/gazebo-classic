@@ -533,7 +533,7 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
 // Draw a grid on the ground
 void OgreAdaptor::DrawGrid()
 {
-  Ogre::ManualObject* gridObject =  this->sceneMgr->createManualObject("__OGRE_GRID__"); 
+  /*Ogre::ManualObject* gridObject =  this->sceneMgr->createManualObject("__OGRE_GRID__"); 
 
   Ogre::SceneNode* gridObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("__OGRE_GRID_NODE__"); 
 
@@ -632,4 +632,5 @@ void OgreAdaptor::DrawGrid()
   // etc 
   gridObject->end(); 
   gridObjectNode->attachObject(gridObject);
+  */
 }
