@@ -79,11 +79,11 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
   //std::string leftTorsoShoulderMountingJointName = node->GetString("left_torso_shoulder_mounting_joint", "", 1);
 
   this->joints[0] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(headNeckJointName));
-  this->joints[1] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(neckTorsoJointName));
+  //this->joints[1] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(neckTorsoJointName));
 
-  this->joints[2] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightTorsoShoulderMountingJointName));
+  //this->joints[2] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightTorsoShoulderMountingJointName));
 
-  this->joints[3] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightShoulderMountingShoulderJointName ));
+  //this->joints[3] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightShoulderMountingShoulderJointName ));
 
   /*this->joints[3] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightShoulderMountingShoulderJointName ));
   */
@@ -91,7 +91,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
   if (!this->joints[0])
     gzthrow("couldn't get head->neck hinge joint");
 
-  if (!this->joints[1])
+  /*if (!this->joints[1])
     gzthrow("couldn't get neck->torso hinge joint");
 
   if (!this->joints[2])
@@ -99,6 +99,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
 
   if (!this->joints[3])
     gzthrow("couldn't get right_shoulder_mounting -> right_shoulder joint");
+    */
 
 }
 
@@ -107,7 +108,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
 void Bandit_Actarray::InitChild()
 {
 
-  for (int i=0; i<4; i++)
+  for (int i=0; i<1; i++)
   {
     this->joints[i]->SetParam( dParamVel, 0.0);
     this->joints[i]->SetParam( dParamFMax, 0 );
@@ -119,10 +120,10 @@ void Bandit_Actarray::InitChild()
 void Bandit_Actarray::UpdateChild(UpdateParams &params)
 {
   // Head Joint
-  this->joints[0]->SetParam( dParamVel, 0.0);
-  this->joints[0]->SetParam( dParamFMax, 10 );
+  this->joints[0]->SetParam( dParamVel, 0.1);
+  this->joints[0]->SetParam( dParamFMax, 0.5 );
 
-  this->joints[1]->SetParam( dParamVel, 0.0);
+  /*this->joints[1]->SetParam( dParamVel, 0.0);
   this->joints[1]->SetParam( dParamFMax, 10 );
 
   this->joints[2]->SetParam( dParamVel, 0.0);
@@ -130,6 +131,7 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
 
   this->joints[3]->SetParam( dParamVel, -0.05);
   this->joints[3]->SetParam( dParamFMax, 10 );
+  */
 
 }
 

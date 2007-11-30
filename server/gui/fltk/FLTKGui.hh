@@ -34,6 +34,8 @@ namespace gazebo
     /// \brief Get the height of the gui's rendering window
     public: virtual unsigned int GetHeight() const;
 
+    public: void flush();
+
     /// \brief Handle event
     public: int handle(int event);
 

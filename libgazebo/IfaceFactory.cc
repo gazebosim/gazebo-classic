@@ -72,7 +72,7 @@ void IfaceFactory::RegisterIface(std::string classname, IfaceFactoryFn factoryfn
 // the world file.
 Iface *IfaceFactory::NewIface(const std::string &classname)
 {  
-  if (ifaces[classname])
+  if (ifaces.find(classname) != ifaces.end())
   {
     return (ifaces[classname]) ();
   }

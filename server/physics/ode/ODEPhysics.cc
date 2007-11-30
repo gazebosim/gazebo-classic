@@ -70,6 +70,8 @@ ODEPhysics::ODEPhysics()
   this->gravity.x = 0;
   this->gravity.y = 0;
   this->gravity.z = -9.80665;
+
+  this->stepTime = 0.05;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

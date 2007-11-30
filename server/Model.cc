@@ -324,6 +324,8 @@ void Model::SetPose(const Pose3d &setPose)
   origPose = this->pose;
   this->pose = setPose;
 
+  //OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, this->pose);
+
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
     if (!iter->second)
@@ -337,6 +339,7 @@ void Model::SetPose(const Pose3d &setPose)
     // Compute the new pose
     bodyPose += this->pose;
 
+   
     body->SetPose(bodyPose);
   }
 
@@ -445,12 +448,13 @@ int Model::LoadJoint(XMLConfigNode *node)
   // Attach two bodies 
   joint->Attach(body1,body2);
 
+  std::cout << "Body1 Pose[" << body1->GetPose() << "] Body2 Pose[" << body2->GetPose() << "]\n";
+
+  Vector3 anchorVec = anchorBody->GetPosition() + anchorOffset;
 
   // Set the anchor vector
   if (anchorBody)
   {
-    Vector3 anchorVec = anchorBody->GetPosition() + anchorOffset;
-
     joint->SetAnchor(anchorVec);
     //joint->SetAnchor(anchorBody->GetPosition());
   }
@@ -467,6 +471,18 @@ int Model::LoadJoint(XMLConfigNode *node)
     gzthrow( "can't have two joint with the same name");
 
   this->joints[joint->GetName()] = joint;
+
+  /// Add a renderable for the joint
+  Ogre::SceneNode *mynode = this->sceneNode->createChildSceneNode(joint->GetName()+"_JOINT_NODE");
+
+  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(joint->GetName()+"_JOINT", "unit_sphere"));
+
+  std::cout << "ANCHOR Vec[" <<joint->GetAnchor() << "]\n";
+
+  mynode->attachObject(odeObj);
+  mynode->setScale(0.1,0.1,0.1);
+  OgreAdaptor::Instance()->SetSceneNodePosition(mynode, joint->GetAnchor());
+
 
   return 0;
 }

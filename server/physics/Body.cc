@@ -250,7 +250,7 @@ void Body::SetPosition(const Vector3 &pos)
   {
     this->staticPose.pos = pos;
   }
-
+ 
   // Set the position of the scene node
   OgreAdaptor::Instance()->SetSceneNodePosition(this->sceneNode, pos);
 }

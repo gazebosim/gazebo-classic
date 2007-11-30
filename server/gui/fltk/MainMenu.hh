@@ -40,6 +40,8 @@ namespace gazebo
     public: static void SaveFramesCB(Fl_Widget *w, void *data);
 
     public: static void QuitCB(Fl_Widget *w, void *data);
+
+    public: static void ShowBoundingBoxesCB(Fl_Widget *w, void *data);
   };
 }
 

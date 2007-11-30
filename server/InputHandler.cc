@@ -160,10 +160,6 @@ bool InputHandler::HandleKeyRelease( const InputEvent *event )
       Global::SetUserQuit( true );
       break;
 
-    case XK_b:
-      Global::SetShowBoundingBoxes( !Global::GetShowBoundingBoxes() );
-      break;
-
     case XK_bracketleft:
       CameraManager::Instance()->IncActiveCamera();
       break;

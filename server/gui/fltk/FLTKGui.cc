@@ -76,6 +76,11 @@ void FLTKGui::Update()
 {
 }
 
+void FLTKGui::flush()
+{
+  return;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle events
 int FLTKGui::handle(int event)

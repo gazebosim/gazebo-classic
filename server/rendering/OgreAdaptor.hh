@@ -43,6 +43,7 @@ namespace Ogre
   class Window;
   class Camera;
   class SceneNode;
+  class Node;
   class LogManager;
   class Overlay;
   class OverlayContainer;
@@ -83,13 +84,13 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   public: void CreateLight(XMLConfigNode *node, Entity *entity);
 
   /// \brief Use this function to set the pose of a scene node
-  public: void SetSceneNodePose( Ogre::SceneNode *node, const Pose3d &pose );
+  public: void SetSceneNodePose( Ogre::Node *node, const Pose3d &pose );
 
   /// \brief Use this function to set the position of a scene node
-  public: void SetSceneNodePosition(Ogre::SceneNode *node, const Vector3 &pos);
+  public: void SetSceneNodePosition(Ogre::Node *node, const Vector3 &pos);
 
   /// \brief Use this function to set the rotation of a scene node
-  public: void SetSceneNodeRotation(Ogre::SceneNode *node, const Quatern &rot);
+  public: void SetSceneNodeRotation(Ogre::Node *node, const Quatern &rot);
 
   /// \brief Helper function to create a camera
   public: Ogre::Camera *CreateCamera(const std::string &name, double nearClip, 

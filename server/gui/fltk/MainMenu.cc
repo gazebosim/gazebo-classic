@@ -33,15 +33,21 @@
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 MainMenu::MainMenu(int x, int y, int w, int h, char *name)
   : Fl_Menu_Bar(x,y,w,h,name)
 {
   const Fl_Menu_Item menuitems[] = {
     { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },
   //  { "Open", 0, &gazebo::MainMenu::OpenCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-    { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-    { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-    { 0 },
+      { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+      { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+      { 0 },
+    
+    { "View", 0, 0, 0, FL_SUBMENU, FL_NORMAL_LABEL, 0, 14, 0},
+      { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+      { 0 },
   
     { 0 }
   };
@@ -50,6 +56,8 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
   this->copy(menuitems);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Open Callback
 void MainMenu::OpenCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   Fl_File_Chooser *fileChooser = new Fl_File_Chooser(getenv("PWD"),"*.world",Fl_File_Chooser::SINGLE,"Open World File");
@@ -58,19 +66,26 @@ void MainMenu::OpenCB(Fl_Widget * /*w*/, void * /*data*/)
 
   while (fileChooser->shown())
     Fl::wait();
-
-
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Save Frames Callback
 void MainMenu::SaveFramesCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
   camera->ToggleSaveFrame();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Quit Callback
 void MainMenu::QuitCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   Global::SetUserQuit(true);
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Show Bounding boxes callback
+void MainMenu::ShowBoundingBoxesCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  Global::SetShowBoundingBoxes( !Global::GetShowBoundingBoxes() );
+}
