@@ -31,6 +31,10 @@
 
 #include "Vector3.hh"
 
+namespace Ogre
+{
+  class SceneNode;
+}
 
 namespace gazebo
 {
@@ -113,6 +117,7 @@ namespace gazebo
     /// \brief Name of this joint
     private: std::string name;
 
+    public: Ogre::SceneNode *sceneNode;
   };
 
   /// \}

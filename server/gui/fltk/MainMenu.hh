@@ -42,6 +42,8 @@ namespace gazebo
     public: static void QuitCB(Fl_Widget *w, void *data);
 
     public: static void ShowBoundingBoxesCB(Fl_Widget *w, void *data);
+
+    public: static void ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/);
   };
 }
 

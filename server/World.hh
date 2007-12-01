@@ -21,7 +21,7 @@
 /* Desc: The world; all models are collected here
  * Author: Andrew Howard and Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef WORLD_HH
@@ -116,6 +116,9 @@ class World : public SingletonT<World>
 
   /// \brief Get a pointer to a model based on a name
   public: Model *GetModelByName(std::string modelName);
+
+  /// \brief Get an iterator over the models
+  public: std::vector<Model*> &GetModels();
 
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node

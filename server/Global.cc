@@ -34,6 +34,7 @@ bool Global::userPause = false;
 bool Global::userStep = false;
 bool Global::userStepInc = false;
 bool Global::showBoundingBoxes = false;
+bool Global::showJoints = false;
 unsigned long Global::iterations = 0;
 Gui *Global::gui = NULL;
 Pose3d Global::poseOffset;
@@ -115,3 +116,17 @@ void Global::IncIterations()
 {
   iterations++;
 }
+
+/// Get wheter to show the joints
+bool Global::GetShowJoints()
+{
+  return showJoints;
+}
+
+/// Set whether to show the joints
+void Global::SetShowJoints(bool show)
+{
+  showJoints = show;
+}
+
+

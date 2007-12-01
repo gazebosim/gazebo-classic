@@ -27,19 +27,20 @@
 #ifndef GEOM_HH
 #define GEOM_HH
 
+#include <Ogre.h>
 #include <ode/ode.h>
 
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Vector3.hh"
 
-namespace Ogre
+/*namespace Ogre
 {
+  class Material;
   class Entity;
-  class MaterialPtr;
   class MovableObject;
   class SceneNode;
-}
+}*/
 
 namespace gazebo
 {
@@ -149,48 +150,60 @@ namespace gazebo
   
     /// \brief Get the laser retro reflectiveness 
     public: float GetLaserRetro() const;
+
+    /// \brief Set the transparency
+    public: void SetTransparency( float trans );
+
+    /// \brief Get the value of the transparency
+    public: float GetTransparency() const;
   
-    /// \brief Contact parameters
+    ///  Contact parameters
     public: ContactParams *contact; 
   
-    /// \brief The body this geom belongs to
+    /// The body this geom belongs to
     protected: Body *body;
   
     private: bool placeable;
 
-    /// \brief Ogre Object
+    ///  Ogre Object
     protected: Ogre::MovableObject *ogreObj;
 
-    /// \brief ODE object
+    ///  ODE object
     protected: Ogre::MovableObject *odeObj;
   
-    /// \brief ID for the transform geom
+    /// ID for the transform geom
     protected: dGeomID transId;
 
-    /// \brief ID for the sub-geom
+    ///  ID for the sub-geom
     protected: dGeomID geomId;
   
     private: static int geomIdCounter;
   
-    /// \brief Mass of this geometry
+    ///  Mass of this geometry
     protected: dMass mass;
 
-    /// \brief mass of the body
+    /// mass of the body
     protected: dMass bodyMass;
  
-    /// \brief Extra rotation, used for cylinders
+    ///  Extra rotation, used for cylinders
     protected: Quatern extraRotation;
   
     private: int laserFiducialId;
     private: float laserRetro;
 
-    /// \name name of the mesh
+    ///  name of the mesh
     protected: std::string meshName;
 
-    /// \brief Mass as a double
+    ///  Mass as a double
     protected: double dblMass;
 
     private: Ogre::SceneNode *boundingBoxNode;
+
+    private: Ogre::MaterialPtr origMaterial;
+    private: Ogre::MaterialPtr myMaterial;
+    private: Ogre::SceneBlendType sceneBlendType;
+
+    private: float transparency;
   };
 
   /// \}

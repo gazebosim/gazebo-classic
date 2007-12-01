@@ -23,6 +23,8 @@
  * Date: 21 May 2003
  * CVS: $Id$
  */
+#include <Ogre.h>
+
 #include "Global.hh"
 #include "Body.hh"
 #include "Joint.hh"
@@ -33,6 +35,7 @@ using namespace gazebo;
 // Constructor
 Joint::Joint()
 {
+  this->sceneNode = NULL;
 }
 
 

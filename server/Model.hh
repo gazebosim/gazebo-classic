@@ -143,7 +143,7 @@ namespace gazebo
     /// \brief Get the canonical body. Used for connected Model heirarchies
     /// \return Pointer to the body
     public: Body *GetCanonicalBody();
-  
+
     /// \brief Load a body helper function
     /// \param node XML Configuration node
     /// \return Non-zero on error

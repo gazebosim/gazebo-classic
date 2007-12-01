@@ -28,6 +28,7 @@
 #include <sstream>
 
 #include "Global.hh"
+#include "GazeboMessage.hh"
 #include "ContactParams.hh"
 #include "OgreAdaptor.hh"
 #include "Body.hh"
@@ -64,6 +65,10 @@ Geom::Geom( Body *body)//, const std::string &name)
 
   // Zero out the mass
   dMassSetZero(&this->mass);
+
+  this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
+
+  this->transparency = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,6 +184,12 @@ void Geom::Update()
 {
   if (this->boundingBoxNode)
     this->boundingBoxNode->setVisible(Global::GetShowBoundingBoxes());
+
+  if (Global::GetShowJoints())
+    if (dGeomGetClass(this->geomId) != dPlaneClass) 
+      this->SetTransparency(0.8);
+  else
+    this->SetTransparency(0);
 
   this->UpdateChild();
 }
@@ -356,15 +367,37 @@ void Geom::SetMeshMaterial(const std::string &materialName)
   if (materialName.empty())
     return;
 
+  // Get the original material
+  this->origMaterial= Ogre::MaterialManager::getSingleton ().getByName (materialName);;
+
+  // Create a custom material name
+  std::string myMaterialName = this->GetName() + "_MATERIAL_" + materialName;
+
+  // Clone the material. This will allow us to change the look of each geom
+  // individually.
+  this->myMaterial = origMaterial->clone(myMaterialName);
+
+  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
+
+    while (techniqueIt.hasMoreElements ()) 
+    {
+      Ogre::Technique *t = techniqueIt.getNext ();
+      Ogre::Technique::PassIterator passIt = t->getPassIterator ();
+      while (passIt.hasMoreElements ()) 
+      {
+        passIt.peekNext ()->setDepthWriteEnabled (true);
+        passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
+        passIt.moveNext ();
+      }
+    }
+
   ent = dynamic_cast<Ogre::Entity*>(this->ogreObj);
   simple = dynamic_cast<Ogre::SimpleRenderable*>(this->ogreObj);
 
   if (ent)
-    ent->setMaterialName(materialName);
-  //  ent->setMaterialName("cam1_sensor");
+    ent->setMaterialName(myMaterialName);
   else if (simple)
-    //simple->setMaterial("cam1_sensor");
-    simple->setMaterial(materialName);
+    simple->setMaterial(myMaterialName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -438,3 +471,76 @@ float Geom::GetLaserRetro() const
 {
   return this->laserRetro;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the transparency
+void Geom::SetTransparency( float trans )
+{
+  unsigned short i = 0, j=0;
+  Ogre::ColourValue sc, dc;
+  Ogre::Technique *t;
+
+  this->transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
+
+  if (this->myMaterial.isNull())
+  {
+    gzmsg(0) << "Can't set transparency for a geom without a material\n";
+    return;
+  }
+
+  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
+
+
+  while ( techniqueIt.hasMoreElements() ) 
+  {
+    t = techniqueIt.getNext ();
+    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
+
+    j = 0;
+
+    while (passIt.hasMoreElements ()) 
+    {
+      sc = this->origMaterial->getTechnique (i)->getPass (j)->getDiffuse ();
+
+      passIt.peekNext ()->setDiffuse (0,0,0,1-this->transparency);
+      if (this->transparency >0.0)
+        passIt.peekNext ()->setDepthWriteEnabled (false);
+      else
+        passIt.peekNext ()->setDepthWriteEnabled (true);
+        
+
+      /*switch (this->sceneBlendType) 
+      {
+        case Ogre::SBT_ADD:
+          dc = sc;
+          dc.r -= sc.r * this->transparency;
+          dc.g -= sc.g * this->transparency;
+          dc.b -= sc.b * this->transparency;
+          passIt.peekNext ()->setAmbient (Ogre::ColourValue::Black);
+          break;
+
+        case Ogre::SBT_TRANSPARENT_ALPHA:
+        default:
+          dc = sc;
+          dc.a = sc.a * (1.0f - this->transparency);
+          passIt.peekNext()->setAmbient(this->origMaterial->getTechnique (i)->getPass (j)->getAmbient ());
+          break;
+      }
+      passIt.peekNext ()->setDiffuse (dc);
+      */
+      passIt.moveNext ();
+
+      ++j;
+    }
+
+    ++i;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///  Get the value of the transparency
+float Geom::GetTransparency() const
+{
+  return this->transparency;
+}
+ 

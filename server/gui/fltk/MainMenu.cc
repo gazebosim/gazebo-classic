@@ -47,6 +47,7 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
     
     { "View", 0, 0, 0, FL_SUBMENU, FL_NORMAL_LABEL, 0, 14, 0},
       { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+      { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
       { 0 },
   
     { 0 }
@@ -88,4 +89,20 @@ void MainMenu::QuitCB(Fl_Widget * /*w*/, void * /*data*/)
 void MainMenu::ShowBoundingBoxesCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   Global::SetShowBoundingBoxes( !Global::GetShowBoundingBoxes() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Show Bounding boxes callback
+void MainMenu::ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  Global::SetShowJoints( !Global::GetShowJoints() );
+
+  /*std::vector<Model*>::iterator iter;
+
+  for (iter= World::Instance()->GetModels().begin(); 
+      iter !=World::Instance()->GetModels().end(); iter++)
+  {
+    (*iter)->SetTransparency(0.1);
+  }
+  */
 }

@@ -452,6 +452,14 @@ Model *World::GetModelByName(std::string modelName)
   return NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+///  Get an iterator over the models
+std::vector<Model*> &World::GetModels()
+{
+  return this->models;
+}
+
+
 void World::UpdateSimulationIface()
 {
   this->simIface->Lock(1);

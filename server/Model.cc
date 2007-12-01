@@ -197,6 +197,7 @@ int Model::Update(UpdateParams &params)
 {
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
+  std::map<std::string, Joint* >::iterator jointIter;
 
   Pose3d bodyPose, newPose, oldPose;
 
@@ -213,6 +214,12 @@ int Model::Update(UpdateParams &params)
   {
     if (contIter->second)
       contIter->second->Update(params);
+  }
+
+  for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
+  {
+    jointIter->second->sceneNode->setVisible(Global::GetShowJoints());
+    OgreAdaptor::Instance()->SetSceneNodePosition(jointIter->second->sceneNode, jointIter->second->GetAnchor());
   }
 
   // Call the model's python update function, if one exists
@@ -473,20 +480,16 @@ int Model::LoadJoint(XMLConfigNode *node)
   this->joints[joint->GetName()] = joint;
 
   /// Add a renderable for the joint
-  Ogre::SceneNode *mynode = this->sceneNode->createChildSceneNode(joint->GetName()+"_JOINT_NODE");
+  this->joints[joint->GetName()]->sceneNode = this->sceneNode->createChildSceneNode(joint->GetName()+"_JOINT_NODE");
 
   Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(joint->GetName()+"_JOINT", "unit_sphere"));
 
-  std::cout << "ANCHOR Vec[" <<joint->GetAnchor() << "]\n";
-
-  mynode->attachObject(odeObj);
-  mynode->setScale(0.1,0.1,0.1);
-  OgreAdaptor::Instance()->SetSceneNodePosition(mynode, joint->GetAnchor());
-
+  this->joints[joint->GetName()]->sceneNode->attachObject(odeObj);
+  this->joints[joint->GetName()]->sceneNode->setScale(0.01,0.01,0.01);
+  this->joints[joint->GetName()]->sceneNode->setVisible(false);
 
   return 0;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a controller helper function
