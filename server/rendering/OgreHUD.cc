@@ -68,7 +68,7 @@ OgreHUD::OgreHUD()
   this->cameraPanel->setPosition(0, 0);
   hudOverlay->add2D(this->cameraPanel);
 
-  this->helpPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_HELP_PANEL_1__"));
+/*  this->helpPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_HELP_PANEL_1__"));
   this->helpPanel->setDimensions(1, 1);
   this->helpPanel->setPosition(0, 0);
   this->helpPanel->hide();
@@ -76,12 +76,14 @@ OgreHUD::OgreHUD()
 
   this->CreateHelp();
   this->CreateTextBoxes();
+  */
 
-  this->backgroundPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_BACKGROUND_PANEL__"));
+  /*this->backgroundPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_BACKGROUND_PANEL__"));
   this->backgroundPanel->setDimensions(1, 1);
   this->backgroundPanel->setPosition(0, 0);
   this->backgroundPanel->setMaterialName("Gazebo/FlatBlack");
   hudOverlay->add2D(this->backgroundPanel);
+  */
 
   hudOverlay->show();
 }
@@ -255,7 +257,7 @@ void OgreHUD::ToggleVisible()
 // Toggle display of the help
 void OgreHUD::ToggleHelp()
 {
-  if (this->helpPanel->isVisible())
+  /*if (this->helpPanel->isVisible())
   {
     this->helpPanel->hide();
     Global::SetUserPause(false);
@@ -264,7 +266,7 @@ void OgreHUD::ToggleHelp()
   {
     Global::SetUserPause(true);
     this->helpPanel->show();
-  }
+  }*/
 }
 
 

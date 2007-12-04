@@ -54,6 +54,8 @@ Generic_PTZ::Generic_PTZ(Entity *parent)
 
   this->panJoint = NULL;
   this->tiltJoint = NULL;
+
+  this->motionGain = 2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,8 +133,12 @@ void Generic_PTZ::UpdateChild(UpdateParams &params)
   // a proportional control
   float tilt = this->cmdTilt - this->tiltJoint->GetAngle();
   float pan = this->cmdPan - this->panJoint->GetAngle();
+ 
   this->tiltJoint->SetParam( dParamVel, this->motionGain * tilt);
+  this->tiltJoint->SetParam( dParamFMax, 2 );
+
   this->panJoint->SetParam( dParamVel, this->motionGain * pan);
+  this->panJoint->SetParam( dParamFMax, 10 );
 
   this->PutPTZData();
 }
