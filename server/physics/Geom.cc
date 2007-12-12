@@ -65,6 +65,7 @@ Geom::Geom( Body *body)//, const std::string &name)
 
   // Zero out the mass
   dMassSetZero(&this->mass);
+  dMassSetZero(&this->bodyMass);
 
   this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
 
@@ -367,37 +368,62 @@ void Geom::SetMeshMaterial(const std::string &materialName)
   if (materialName.empty())
     return;
 
-  // Get the original material
-  this->origMaterial= Ogre::MaterialManager::getSingleton ().getByName (materialName);;
+  try
+  {
+    // Get the original material
+    this->origMaterial= Ogre::MaterialManager::getSingleton().getByName (materialName);;
+  }
+  catch (Ogre::Exception e)
+  {
+    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry[" 
+      << this->GetName() << ". Object will appear white.\n";
+    return;
+  }
 
+  if (this->origMaterial.isNull())
+  {
+    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry[" 
+      << this->GetName() << ". Object will appear white\n";
+    return;
+  }
+
+  
   // Create a custom material name
   std::string myMaterialName = this->GetName() + "_MATERIAL_" + materialName;
 
   // Clone the material. This will allow us to change the look of each geom
   // individually.
-  this->myMaterial = origMaterial->clone(myMaterialName);
+  this->myMaterial = this->origMaterial->clone(myMaterialName);
 
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
 
-    while (techniqueIt.hasMoreElements ()) 
+  while (techniqueIt.hasMoreElements ()) 
+  {
+    Ogre::Technique *t = techniqueIt.getNext ();
+    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
+    while (passIt.hasMoreElements ()) 
     {
-      Ogre::Technique *t = techniqueIt.getNext ();
-      Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-      while (passIt.hasMoreElements ()) 
-      {
-        passIt.peekNext ()->setDepthWriteEnabled (true);
-        passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
-        passIt.moveNext ();
-      }
+      passIt.peekNext ()->setDepthWriteEnabled (true);
+      passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
+      passIt.moveNext ();
     }
+  }
 
   ent = dynamic_cast<Ogre::Entity*>(this->ogreObj);
   simple = dynamic_cast<Ogre::SimpleRenderable*>(this->ogreObj);
 
-  if (ent)
-    ent->setMaterialName(myMaterialName);
-  else if (simple)
-    simple->setMaterial(myMaterialName);
+  try
+  {
+    if (ent)
+      ent->setMaterialName(myMaterialName);
+    else if (simple)
+      simple->setMaterial(myMaterialName);
+  } catch (Ogre::Exception e)
+  { 
+    gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry[" 
+             << this->GetName() << ". Object will appear white.\n";
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -437,9 +463,14 @@ const dMass *Geom::GetBodyMassMatrix()
 
   dQtoR(q,r);
 
+
   this->bodyMass = this->mass;
-  dMassRotate(&this->bodyMass, r);
-  dMassTranslate( &this->bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
+  
+  if (dMassCheck(&this->bodyMass))
+  {
+    dMassRotate(&this->bodyMass, r);
+    dMassTranslate( &this->bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
+  }
 
   return &this->bodyMass;
 }

@@ -425,7 +425,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 void Body::UpdateCoM()
 {
   int i;
-  const dMass *mass;
+  const dMass *lmass;
   Pose3d oldPose, newPose, pose;
   std::vector< Geom* >::iterator giter;
 
@@ -438,9 +438,11 @@ void Body::UpdateCoM()
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    mass = (*giter)->GetBodyMassMatrix();
+    lmass = (*giter)->GetBodyMassMatrix();
     if ((*giter)->IsPlaceable() && (*giter)->GetGeomId())
-      dMassAdd( &this->mass, mass );
+    {
+      dMassAdd( &this->mass, lmass );
+    }
   }
 
   // Old pose for the CoM
@@ -481,9 +483,9 @@ void Body::UpdateCoM()
   // Settle on the new CoM pose
   this->comPose = newPose;
 
-  // My Cheap Hack
+  // My Cheap Hack, to put the center of mass at the origin
   this->mass.c[0] = this->mass.c[1] = this->mass.c[2] = 0;
-  
+ 
   // Set the mass matrix
   if (this->mass.mass > 0)
     dBodySetMass( this->bodyId, &this->mass );
