@@ -53,20 +53,14 @@ void HingeJoint::LoadChild(XMLConfigNode *node)
 {
   Vector3 axis = node->GetVector3("axis",Vector3(0,0,1));
 
-  double loStop = node->GetDouble("lowStop",-DBL_MAX,0);
-  double hiStop = node->GetDouble("highStop",DBL_MAX,0);
+  double loStop = DTOR(node->GetDouble("lowStop",RTOD(-M_PI),0));
+  double hiStop = DTOR(node->GetDouble("highStop",RTOD(M_PI),0));
 
-  if (loStop != -DBL_MAX)
-  {
-    loStop = DTOR(loStop);
-    this->SetParam(dParamLoStop, loStop);
-  }
-
-  if (hiStop != DBL_MAX)
-  {
-    hiStop = DTOR(hiStop);
-    this->SetParam(dParamHiStop, hiStop);
-  }
+  // Perform this three step ordering to ensure the parameters are set
+  // properly. This is taken from the ODE wiki.
+  this->SetParam(dParamHiStop, hiStop);
+  this->SetParam(dParamLoStop, loStop);
+  this->SetParam(dParamHiStop, hiStop);
 
   this->SetAxis(axis);
 }

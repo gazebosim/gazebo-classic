@@ -136,9 +136,13 @@ namespace gazebo
     /// \brief Get the default body
     /// \return The default body
     public: Body *GetBody();
+
+    /// \brief Get a body by name
+    /// \return Pointer to the body
+    public: Body *GetBody(const std::string &name);
   
     /// \brief Attach this model to its parent
-    public: void Attach();
+    public: void Attach(XMLConfigNode *node);
   
     /// \brief Get the canonical body. Used for connected Model heirarchies
     /// \return Pointer to the body

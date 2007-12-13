@@ -202,7 +202,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   // exit without doing anything if the two bodies are connected by a joint 
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
-  if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact)) return;
+
+
+  if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact)) 
+    return;
 
   // Check if either are spaces
   if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
@@ -211,6 +214,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   }
   else
   {
+
+    // We should never test two geoms in the same space
+    assert(dGeomGetSpace(o1) != dGeomGetSpace(o2));
+
     // up to MAX_CONTACTS contacts per box-box
     dContact contacts[64];
     int numc = 0;

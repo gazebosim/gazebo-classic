@@ -389,7 +389,8 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   }
 
   if (parent != NULL)
-    model->Attach();
+    model->Attach(node->GetChild("attach"));
+    //model->Attach();
 
   return model;
 }

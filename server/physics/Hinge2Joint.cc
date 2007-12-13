@@ -52,36 +52,23 @@ void Hinge2Joint::LoadChild(XMLConfigNode *node)
   this->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
   this->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
 
-  double loStop1 = node->GetDouble("lowStop1",-DBL_MAX,0);
-  double hiStop1 = node->GetDouble("highStop1",DBL_MAX,0);
+  double loStop1 = DTOR(node->GetDouble("lowStop1",RTOD(-M_PI),0));
+  double hiStop1 = DTOR(node->GetDouble("highStop1",RTOD(M_PI),0));
 
-  double loStop2 = node->GetDouble("lowStop2",-DBL_MAX,0);
-  double hiStop2 = node->GetDouble("highStop2",DBL_MAX,0);
+  double loStop2 = DTOR(node->GetDouble("lowStop2",RTOD(-M_PI),0));
+  double hiStop2 = DTOR(node->GetDouble("highStop2",RTOD(M_PI),0));
 
-  if (loStop1 != -DBL_MAX)
-  {
-    loStop1 = DTOR(loStop1);
-    this->SetParam(dParamLoStop, loStop1);
-  }
+  // Perform this three step ordering to ensure the parameters are set
+  // properly. This is taken from the ODE wiki.
+  this->SetParam(dParamHiStop, hiStop1);
+  this->SetParam(dParamLoStop, loStop1);
+  this->SetParam(dParamHiStop, hiStop1);
 
-  if (hiStop1 != DBL_MAX)
-  {
-    hiStop1 = DTOR(hiStop1);
-    this->SetParam(dParamHiStop, hiStop1);
-  }
-
-  if (loStop2 != -DBL_MAX)
-  {
-    loStop2 = DTOR(loStop2);
-    this->SetParam(dParamLoStop2, loStop1);
-  }
-
-  if (hiStop2 != DBL_MAX)
-  {
-    hiStop2 = DTOR(hiStop2);
-    this->SetParam(dParamHiStop2, hiStop2);
-  }
-
+  // Perform this three step ordering to ensure the parameters are set
+  // properly. This is taken from the ODE wiki.
+  this->SetParam(dParamHiStop2, hiStop2);
+  this->SetParam(dParamLoStop2, loStop1);
+  this->SetParam(dParamHiStop2, hiStop2);
 }
  
 

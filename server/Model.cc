@@ -540,9 +540,33 @@ Body *Model::GetBody()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Attach this model to its parent
-void Model::Attach()
+/// Get a body by name
+Body *Model::GetBody(const std::string &name)
 {
+  if (this->bodies.find(name) != this->bodies.end())
+  {
+    return  this->bodies[name];
+  }
+  else if (name == "canonical")
+  {
+    return this->GetCanonicalBody();
+  }
+  return NULL;
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
+// Attach this model to its parent
+void Model::Attach(XMLConfigNode *node)
+{
+  std::string parentBodyName = "canonical";
+  std::string myBodyName = "canonical";
+
+  if (node)
+  {
+    parentBodyName = node->GetString("parentBody","canonical",1);
+    myBodyName = node->GetString("myBody",canonicalBodyName,1);
+  }
+
   this->parentModel = dynamic_cast<Model*>(this->parent);
 
   if (this->parentModel == NULL)
@@ -550,8 +574,8 @@ void Model::Attach()
 
   this->joint = (HingeJoint*)this->CreateJoint(Joint::HINGE);
 
-  Body *myBody = this->bodies[canonicalBodyName];
-  Body *pBody = this->parentModel->GetCanonicalBody();
+  Body *myBody = this->GetBody(myBodyName);
+  Body *pBody = this->parentModel->GetBody(parentBodyName);
 
   if (myBody == NULL)
     gzthrow("No canonical body set.");
@@ -565,6 +589,12 @@ void Model::Attach()
   this->joint->SetAxis( Vector3(0,1,0) );
   this->joint->SetParam( dParamHiStop, 0);
   this->joint->SetParam( dParamLoStop, 0);
+
+  if (this->spaceId)
+  {
+    dSpaceDestroy(this->spaceId);
+    this->spaceId = this->parentModel->spaceId;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

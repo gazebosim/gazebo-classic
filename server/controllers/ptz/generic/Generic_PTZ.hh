@@ -101,6 +101,7 @@ namespace gazebo
     private: HingeJoint *tiltJoint;
 
     private: float motionGain;
+    private: float force;
     private: float cmdTilt;
     private: float cmdPan;
   };

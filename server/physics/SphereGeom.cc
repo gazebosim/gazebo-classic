@@ -65,9 +65,10 @@ void SphereGeom::LoadChild(XMLConfigNode *node)
   else
     this->AttachMesh(this->meshName);
 
-  Ogre::Vector3 meshSize = this->ogreObj->getBoundingBox().getSize();
+ /* Ogre::Vector3 meshSize = this->ogreObj->getBoundingBox().getSize();
 
   radius = radius / ((meshSize.x + meshSize.y + meshSize.z)/3.0);
+  */
 
   // Set the size of the sphere
   this->ScaleMesh(Vector3(radius,radius,radius));

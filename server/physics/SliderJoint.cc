@@ -48,9 +48,12 @@ SliderJoint::~SliderJoint()
 /// Load the joint
 void SliderJoint::LoadChild(XMLConfigNode *node)
 {
-  double lowStop = node->GetDouble("lowStop",0,0);
-  double hiStop = node->GetDouble("hiStop",0,0);
+  double lowStop = node->GetDouble("lowStop",-DBL_MAX,0);
+  double hiStop = node->GetDouble("hiStop",DBL_MAX,0);
 
+  // Perform this three step ordering to ensure the parameters are set
+  // properly. This is taken from the ODE wiki.
+  this->SetParam(dParamHiStop, hiStop);
   this->SetParam(dParamLoStop, lowStop);
   this->SetParam(dParamHiStop, hiStop);
 }

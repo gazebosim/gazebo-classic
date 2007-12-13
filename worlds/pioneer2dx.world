@@ -103,6 +103,12 @@
 
     <model:physical name="laser">
       <xyz>0 0 0.16</xyz>
+
+      <attach>
+        <parentBody>chassis_body</parentBody>
+        <myBody>laser_body</myBody>
+      </attach>
+
       <include embedded="true">
         <xi:include href="laser.model" />
       </include>

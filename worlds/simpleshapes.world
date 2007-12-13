@@ -50,7 +50,7 @@
     </body:sphere>
   </model:physical>
 
-  <model:physical name="box1_model">
+  <!--<model:physical name="box1_model">
     <xyz>0 1.5 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
     <canonicalBody>box1_body</canonicalBody>
@@ -82,6 +82,7 @@
       </geom:cylinder>
     </body:cylinder>
   </model:physical>
+  -->
 
    <!-- Ground Plane -->
   <model:physical name="plane1_model">

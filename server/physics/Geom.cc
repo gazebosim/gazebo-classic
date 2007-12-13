@@ -120,6 +120,12 @@ void Geom::Load(XMLConfigNode *node)
     Vector3 min(aabb[0], aabb[2], aabb[4]);
     Vector3 max(aabb[1], aabb[3], aabb[5]);
 
+    if (this->GetName() == "pan_geom")
+    {
+      std::cout << "MIN[" << min << "] MAX[" << max<< "]\n";
+    }
+
+
     this->boundingBoxNode = this->sceneNode->createChildSceneNode(this->GetName()+"_AABB_NODE"); 
     this->boundingBoxNode->setInheritScale(false);
 
