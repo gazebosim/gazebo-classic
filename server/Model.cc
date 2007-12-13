@@ -455,8 +455,6 @@ int Model::LoadJoint(XMLConfigNode *node)
   // Attach two bodies 
   joint->Attach(body1,body2);
 
-  std::cout << "Body1 Pose[" << body1->GetPose() << "] Body2 Pose[" << body2->GetPose() << "]\n";
-
   Vector3 anchorVec = anchorBody->GetPosition() + anchorOffset;
 
   // Set the anchor vector

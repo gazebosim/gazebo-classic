@@ -91,6 +91,9 @@ void Generic_PTZ::LoadChild(XMLConfigNode *node)
 
   if (!this->tiltJoint)
     gzthrow("couldn't get tilt hinge joint");
+
+  this->motionGain = node->GetDouble("motionGain",2,0);
+  printf("MOTIONGAIN[%f]\n",this->motionGain);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +138,7 @@ void Generic_PTZ::UpdateChild(UpdateParams &params)
   float pan = this->cmdPan - this->panJoint->GetAngle();
  
   this->tiltJoint->SetParam( dParamVel, this->motionGain * tilt);
-  this->tiltJoint->SetParam( dParamFMax, 2 );
+  this->tiltJoint->SetParam( dParamFMax, 10 );
 
   this->panJoint->SetParam( dParamVel, this->motionGain * pan);
   this->panJoint->SetParam( dParamFMax, 10 );
