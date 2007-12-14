@@ -95,6 +95,7 @@ void FLTKMainWindow::Update()
 {
   this->toolbar->Update();
   this->statusbar->Update();
+  this->glWindow->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

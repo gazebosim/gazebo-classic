@@ -32,13 +32,13 @@
 #include "Sensor.hh"
 
 // Forward Declarations
-namespace Ogre
+/*namespace Ogre
 {
   class TexturePtr;
   class RenderTarget;
   class Camera;
   class Viewport;
-}
+}*/
 
 namespace gazebo
 {

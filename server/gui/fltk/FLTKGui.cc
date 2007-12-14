@@ -1,3 +1,4 @@
+#include "CameraSensor.hh"
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <FL/Fl_Menu_Item.H>
@@ -6,14 +7,17 @@
 #include <GL/glx.h>
 #include <boost/thread/thread.hpp>
 
+#include "World.hh"
 #include "FLTKMainWindow.hh"
 #include "Global.hh"
-#include "InputHandler.hh"
 #include "GuiFactory.hh"
-#include "OgreAdaptor.hh"
 #include "GazeboMessage.hh"
 #include "GuiFactory.hh"
 #include "MainMenu.hh"
+#include "CameraManager.hh"
+
+#include "OgreHUD.hh"
+
 #include "FLTKGui.hh"
 
 using namespace gazebo;
@@ -27,7 +31,17 @@ FLTKGui::FLTKGui(int x, int y, int w, int h, const std::string &label)
 {
 
   this->end();
-  this->inputHandler = InputHandler::Instance();
+
+  this->moveAmount = 1.0;
+  this->moveScale = 1;
+  this->rotateAmount = 0.5;
+
+  this->directionVec.x = 0;
+  this->directionVec.y = 0;
+  this->directionVec.z = 0;
+
+  this->keys.clear();
+
 }
 
 
@@ -74,6 +88,55 @@ unsigned int FLTKGui::GetHeight() const
 // Update function
 void FLTKGui::Update()
 {
+  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
+  std::map<int,int>::iterator iter;
+
+  for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
+  {
+    if (iter->second == 1)
+    {
+      switch (iter->first)
+      {
+        case XK_Up:
+        case XK_w:
+          this->directionVec.z -= this->moveAmount;
+          break;
+
+        case XK_Down:
+        case XK_s:
+          this->directionVec.z += this->moveAmount;
+          break;
+
+        case XK_Left:
+        case XK_a:
+          this->directionVec.x -= this->moveAmount;
+          break;
+
+        case XK_Right:
+        case XK_d:
+          this->directionVec.x += this->moveAmount;
+          break;
+
+        case XK_Page_Down:
+        case XK_e:
+          this->directionVec.y -= this->moveAmount;
+          break;
+
+        case XK_Page_Up:
+        case XK_q:
+          this->directionVec.y += this->moveAmount;
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
+
+  camera->Translate( this->directionVec * (World::Instance()->GetRealTime() - this->lastUpdateTime) );
+  this->directionVec.Set(0,0,0);
+
+  this->lastUpdateTime = World::Instance()->GetRealTime();
 }
 
 void FLTKGui::flush()
@@ -82,41 +145,126 @@ void FLTKGui::flush()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Handle events
-int FLTKGui::handle(int event)
+/// Handle a mouse button push
+void FLTKGui::HandleMousePush()
 {
-  bool handled = false;
-  InputEvent gzevent;
-
-  // Get the mouse position
-  gzevent.SetMousePos( Vector2<int>( Fl::event_x(), Fl::event_y() ) );
-
-  // Get the key that was pressed (if one was pressed) 
-  gzevent.SetKey(Fl::event_key());
-
   // Get the mouse button that was pressed (if one was pressed)
   switch (Fl::event_button())
   {
     case FL_LEFT_MOUSE:
-      gzevent.SetMouseButton(InputEvent::LEFT_MOUSE);
-      handled = true;
+      this->leftMousePressed = true;
       break;
 
     case FL_RIGHT_MOUSE:
-      gzevent.SetMouseButton(InputEvent::RIGHT_MOUSE);
-      handled = true;
+      this->rightMousePressed = true;
       break;
 
     case FL_MIDDLE_MOUSE:
-      gzevent.SetMouseButton(InputEvent::MIDDLE_MOUSE);
-      handled = true;
-      break;
-
-    default:
-      gzevent.SetMouseButton(InputEvent::NONE);
+      this->middleMousePressed = true;
       break;
   }
+}
 
+////////////////////////////////////////////////////////////////////////////////
+/// Handle a mouse button release
+void FLTKGui::HandleMouseRelease()
+{
+  // Get the mouse button that was pressed (if one was pressed)
+  switch (Fl::event_button())
+  {
+    case FL_LEFT_MOUSE:
+      this->leftMousePressed = false;
+      break;
+
+    case FL_RIGHT_MOUSE:
+      this->rightMousePressed = false;
+      break;
+
+    case FL_MIDDLE_MOUSE:
+      this->middleMousePressed = false;
+      break;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Handle a mouse drag
+void FLTKGui::HandleMouseDrag()
+{
+  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
+
+  if (camera)
+  {
+    if (this->leftMousePressed)
+    {
+      Vector2<int> d = this->mousePos - this->prevMousePos;
+      camera->RotateYaw(-d.x * this->rotateAmount);
+      camera->RotatePitch(-d.y * this->rotateAmount);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Handle a key press
+void FLTKGui::HandleKeyPress()
+{
+  this->keys[Fl::event_key()] = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Handle a key release
+void FLTKGui::HandleKeyRelease()
+{
+  this->keys[Fl::event_key()] = 0;
+
+  // Handle all toggle keys
+  switch (Fl::event_key())
+  {
+    case 't':
+      if (Global::GetUserPause())
+        Global::SetUserPause(false);
+      Global::SetUserStep( !Global::GetUserStep() );
+      Global::SetUserStepInc( false );
+      break;
+
+    case 'h':
+      //OgreHUD::Instance()->ToggleHelp();
+      break;
+
+    case ' ':
+      if (Global::GetUserStep())
+      {
+        Global::SetUserStepInc( true );
+      }
+      else
+        Global::SetUserPause( !Global::GetUserPause() );
+      break;
+
+    case FL_Escape:
+      Global::SetUserQuit( true );
+      break;
+
+    case '[':
+      CameraManager::Instance()->IncActiveCamera();
+      break;
+
+    case ']':
+      CameraManager::Instance()->DecActiveCamera();
+      break;
+
+    case FL_Tab:
+      //OgreHUD::Instance()->ToggleVisible();
+      break;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Handle events
+int FLTKGui::handle(int event)
+{
+  bool handled = false;
+
+  // Get the mouse position
+  this->mousePos = Vector2<int>( Fl::event_x(), Fl::event_y() );
 
   // Set the type of the event
   switch (event)
@@ -125,7 +273,7 @@ int FLTKGui::handle(int event)
     case FL_LEAVE:
     case FL_DEACTIVATE:
     case FL_HIDE:
-      this->inputHandler->ClearEvents();
+      //this->inputHandler->ClearEvents();
       return 0;
 
     case FL_CLOSE:
@@ -133,33 +281,33 @@ int FLTKGui::handle(int event)
       return 0;
 
     case FL_PUSH:
-      gzevent.SetType(InputEvent::MOUSE_PRESS);
+      this->HandleMousePush();
       handled = true;
       break;
 
     case FL_RELEASE:
-      gzevent.SetType(InputEvent::MOUSE_RELEASE);
+      this->HandleMouseRelease();
       handled = true;
       break;
 
     case FL_DRAG:
-      gzevent.SetType(InputEvent::MOUSE_DRAG);
+      this->HandleMouseDrag();
       handled = true;
       break;
 
     case FL_SHORTCUT:
     case FL_KEYDOWN:
-      gzevent.SetType(InputEvent::KEY_PRESS);
+      this->HandleKeyPress();
       handled = true;
       break;
 
     case FL_KEYUP:
-      gzevent.SetType(InputEvent::KEY_RELEASE);
+      this->HandleKeyRelease();
       handled = true;
       break;
   }
 
-  this->inputHandler->HandleEvent(&gzevent);
+  this->prevMousePos = this->mousePos;
 
   if (!handled)
     return Fl_Gl_Window::handle(event);
