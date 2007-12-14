@@ -21,7 +21,7 @@
 /* Desc: Actarray Interface for Player-Gazebo
  * Author: Alexis Maldonado
  * Date: 19 September 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 

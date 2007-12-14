@@ -85,7 +85,9 @@ class Bandit_Actarray : public Controller
   /// The parent Model
   private: Model *myParent;
 
-  private: HingeJoint *joints[14];
+  private: HingeJoint *joints[16];
+  private: float forces[16];
+  private: float gains[16];
 
 };
 

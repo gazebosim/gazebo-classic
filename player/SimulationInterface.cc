@@ -240,8 +240,6 @@ void SimulationInterface::Update()
 // GazeboDriver::Subscribe
 void SimulationInterface::Subscribe()
 {
-  printf("Simulation Subscribe\n");
-
   // Open the interface
   try
   {

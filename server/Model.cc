@@ -218,8 +218,7 @@ int Model::Update(UpdateParams &params)
 
   for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
   {
-    jointIter->second->sceneNode->setVisible(Global::GetShowJoints());
-    OgreAdaptor::Instance()->SetSceneNodePosition(jointIter->second->sceneNode, jointIter->second->GetAnchor());
+    jointIter->second->Update();
   }
 
   // Call the model's python update function, if one exists
@@ -234,14 +233,6 @@ int Model::Update(UpdateParams &params)
     this->pose = this->bodies[this->canonicalBodyName]->GetPose();
     b = this->bodies[this->canonicalBodyName];
   }
-
-  /*if (this->GetName() == "light2")
-  {
-    Ogre::Vector3 ppos = this->sceneNode->getPosition();
-    ppos.z += 0.1;
-    ppos.y = 1.0;
-    this->sceneNode->setPosition(ppos);
-  }*/
 
   return this->UpdateChild();
 }
@@ -452,6 +443,8 @@ int Model::LoadJoint(XMLConfigNode *node)
     return -1;
   }
 
+  joint->SetModel(this);
+
   // Attach two bodies 
   joint->Attach(body1,body2);
 
@@ -476,15 +469,6 @@ int Model::LoadJoint(XMLConfigNode *node)
     gzthrow( "can't have two joint with the same name");
 
   this->joints[joint->GetName()] = joint;
-
-  /// Add a renderable for the joint
-  this->joints[joint->GetName()]->sceneNode = this->sceneNode->createChildSceneNode(joint->GetName()+"_JOINT_NODE");
-
-  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(joint->GetName()+"_JOINT", "unit_sphere"));
-
-  this->joints[joint->GetName()]->sceneNode->attachObject(odeObj);
-  this->joints[joint->GetName()]->sceneNode->setScale(0.01,0.01,0.01);
-  this->joints[joint->GetName()]->sceneNode->setVisible(false);
 
   return 0;
 }

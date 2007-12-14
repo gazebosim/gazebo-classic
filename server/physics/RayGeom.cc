@@ -53,7 +53,7 @@ RayGeom::RayGeom( Body *body )
 
   this->AttachObject(this->line);
 
-  this->line->setMaterial("Gazebo/BlueLaser");
+  this->line->setMaterial("Gazebo/RedEmissive");
 
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;

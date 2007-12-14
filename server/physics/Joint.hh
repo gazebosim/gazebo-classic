@@ -44,6 +44,8 @@ namespace gazebo
   
   class Body;
   class XMLConfigNode;
+  class Model;
+  class OgreDynamicLines;
 
   /// \brief Base class for all joints
   class Joint
@@ -62,6 +64,12 @@ namespace gazebo
 
     /// \brief Load child joint
     protected: virtual void LoadChild(XMLConfigNode *node) {};
+
+    /// \brief Update the joint
+    public: void Update();
+
+    /// \brief Set the model this joint belongs too
+    public: void SetModel(Model *model);
 
     /// \brief Get the type of the joint
     public: Joint::Type GetType() const;
@@ -118,6 +126,11 @@ namespace gazebo
     private: std::string name;
 
     public: Ogre::SceneNode *sceneNode;
+
+    private: Model *model;
+
+    private: OgreDynamicLines *line1;
+    private: OgreDynamicLines *line2;
   };
 
   /// \}

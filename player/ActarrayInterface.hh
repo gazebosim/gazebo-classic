@@ -36,7 +36,7 @@ namespace gazebo
 /// \brief Interface for controller an actuator array
 /// \{
 
-  class ActArrayIface;
+  class ActarrayIface;
 
   /// \brief Actarray interface
   class ActarrayInterface : public GazeboInterface

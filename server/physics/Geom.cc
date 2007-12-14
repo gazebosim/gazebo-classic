@@ -192,11 +192,15 @@ void Geom::Update()
   if (this->boundingBoxNode)
     this->boundingBoxNode->setVisible(Global::GetShowBoundingBoxes());
 
-  if (Global::GetShowJoints())
-    if (dGeomGetClass(this->geomId) != dPlaneClass) 
-      this->SetTransparency(0.8);
-  else
+  if (!Global::GetShowJoints())
+  {
     this->SetTransparency(0);
+  }
+  else
+  {
+    if (dGeomGetClass(this->geomId) != dPlaneClass) 
+      this->SetTransparency(0.6);
+  }
 
   this->UpdateChild();
 }
@@ -539,14 +543,13 @@ void Geom::SetTransparency( float trans )
     {
       sc = this->origMaterial->getTechnique (i)->getPass (j)->getDiffuse ();
 
-      passIt.peekNext ()->setDiffuse (0,0,0,1-this->transparency);
       if (this->transparency >0.0)
         passIt.peekNext ()->setDepthWriteEnabled (false);
       else
         passIt.peekNext ()->setDepthWriteEnabled (true);
         
 
-      /*switch (this->sceneBlendType) 
+      switch (this->sceneBlendType) 
       {
         case Ogre::SBT_ADD:
           dc = sc;
@@ -564,7 +567,7 @@ void Geom::SetTransparency( float trans )
           break;
       }
       passIt.peekNext ()->setDiffuse (dc);
-      */
+      
       passIt.moveNext ();
 
       ++j;

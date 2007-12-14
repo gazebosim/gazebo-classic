@@ -26,7 +26,10 @@
 #include <Ogre.h>
 
 #include "Global.hh"
+#include "OgreDynamicLines.hh"
+#include "OgreAdaptor.hh"
 #include "Body.hh"
+#include "Model.hh"
 #include "Joint.hh"
 
 using namespace gazebo;
@@ -36,6 +39,7 @@ using namespace gazebo;
 Joint::Joint()
 {
   this->sceneNode = NULL;
+  this->model = NULL;
 }
 
 
@@ -66,8 +70,63 @@ void Joint::Load(XMLConfigNode *node)
   // Set joint parameters
   this->SetParam(dParamSuspensionERP, node->GetDouble("erp",0.4,0));
   this->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.8,0));
+
+  /// Add a renderable for the joint
+  this->sceneNode = this->model->GetSceneNode()->createChildSceneNode(this->GetName()+"_JOINT_NODE");
+
+  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName()+"_JOINT", "joint_anchor"));
+
+  this->sceneNode->attachObject(odeObj);
+  //this->joints[joint->GetName()]->sceneNode->setScale(0.01, 0.01, 0.01);
+  this->sceneNode->setVisible(false);
+
+  this->line1 = new OgreDynamicLines(Ogre::RenderOperation::OT_LINE_LIST);
+  this->line2 = new OgreDynamicLines(Ogre::RenderOperation::OT_LINE_LIST);
+  this->line1->setMaterial("Gazebo/BlueLaser");
+  this->line2->setMaterial("Gazebo/BlueLaser");
+
+  this->sceneNode->attachObject(this->line1);
+  this->sceneNode->attachObject(this->line2);
+
+  this->line1->AddPoint(Vector3(0,0,0));
+  this->line1->AddPoint(Vector3(0,0,0));
+  this->line2->AddPoint(Vector3(0,0,0));
+  this->line2->AddPoint(Vector3(0,0,0));
+
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Update the joint
+void Joint::Update()
+{
+  Vector3 start,end;
+
+  this->sceneNode->setVisible(Global::GetShowJoints());
+  OgreAdaptor::Instance()->SetSceneNodePosition(
+      this->sceneNode, this->GetAnchor());
+
+  if (this->body1)
+  {
+    start = this->body1->GetPose().pos - this->GetAnchor();
+    this->line1->SetPoint(0, start);
+    this->line1->Update();
+  }
+
+  if (this->body2)
+  {
+    start = this->body2->GetPose().pos - this->GetAnchor();
+    this->line2->SetPoint(0, start);
+    this->line2->Update();
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the model this joint belongs too
+void Joint::SetModel(Model *model)
+{
+  this->model = model;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the body to which the joint is attached according the _index

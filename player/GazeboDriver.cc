@@ -36,6 +36,7 @@
 #include "CameraInterface.hh"
 #include "FiducialInterface.hh"
 #include "Position3dInterface.hh"
+#include "ActarrayInterface.hh"
 
 /*
 #include "PowerInterface.hh"
@@ -44,7 +45,6 @@
 #include "GripperInterface.hh"
 #include "TruthInterface.hh"
 #include "GpsInterface.hh"
-#include "ActarrayInterface.hh"
 */
 
 #include "GazeboDriver.hh"
@@ -287,6 +287,11 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new Position3dInterface( playerAddr, this,  cf, section );
         break;
 
+      case PLAYER_ACTARRAY_CODE:
+        if (!player_quiet_startup) printf(" an actarray interface.\n");
+        ifsrc = new ActarrayInterface( playerAddr,  this, cf, section );
+        break;
+	
 
 /*      case PLAYER_POWER_CODE:	  
         if (!player_quiet_startup) printf(" a power interface.\n");
@@ -313,11 +318,7 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new TruthInterface( playerAddr,  this, cf, section );
         break;
 		
-      case PLAYER_ACTARRAY_CODE:
-        if (!player_quiet_startup) printf(" an actarray interface.\n");
-        ifsrc = new ActarrayInterface( playerAddr,  this, cf, section );
-        break;
-			
+		
 
       case PLAYER_GPS_CODE:
         if (!player_quiet_startup) printf(" a gps interface.\n");
