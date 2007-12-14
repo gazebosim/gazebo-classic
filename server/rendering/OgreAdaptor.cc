@@ -33,7 +33,6 @@
 #include <dirent.h>
 
 #include "MovableText.hh"
-#include "InputEvent.hh"
 #include "OgreHUD.hh"
 #include "Entity.hh"
 #include "GazeboError.hh"

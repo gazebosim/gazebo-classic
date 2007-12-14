@@ -33,7 +33,6 @@
 #include "FLTKGui.hh"
 #include "Global.hh"
 #include "GuiFactory.hh"
-#include "InputHandler.hh"
 #include "MainMenu.hh"
 #include "Toolbar.hh"
 #include "StatusBar.hh"
