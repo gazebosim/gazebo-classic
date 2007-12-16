@@ -27,6 +27,7 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "OgreVisual.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "ContactParams.hh"
@@ -67,7 +68,7 @@ Geom::Geom( Body *body)//, const std::string &name)
   dMassSetZero(&this->mass);
   dMassSetZero(&this->bodyMass);
 
-  this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
+  //this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
 
   this->transparency = 0;
 }
@@ -87,10 +88,11 @@ Geom::~Geom()
 /// Load the geom
 void Geom::Load(XMLConfigNode *node)
 {
+  XMLConfigNode *childNode = NULL;
+
   this->SetName(node->GetString("name","",1));
 
   // The mesh used for visualization
-  this->meshName = node->GetString("mesh","",0);
   this->dblMass = node->GetDouble("mass",1.0,1e-5);
 
   if (this->dblMass <= 0)
@@ -100,16 +102,22 @@ void Geom::Load(XMLConfigNode *node)
 
   this->LoadChild(node);
 
-  this->body->AttachGeom(this);
+  childNode = node->GetChild("visual");
+  while (childNode)
+  {
+    OgreVisual *visual = new OgreVisual(this->sceneNode);
+    visual->Load(childNode);
+    this->visuals.push_back(visual);
+    childNode = childNode->GetNext("visual");
+  }
 
-  if (node->GetChild("meshScale"))
-    this->ScaleMesh(node->GetVector3("meshScale",Vector3(1,1,1)));
+  this->body->AttachGeom(this);
 
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern()));
-  this->SetMeshMaterial(node->GetString("material","",0));
   this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
   this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
+
 
   // Create the bounding box
   if (dGeomGetClass(this->geomId) != dPlaneClass) 
@@ -372,7 +380,7 @@ void Geom::SetCastShadows(bool enable)
 /// Set the material to apply to the mesh
 void Geom::SetMeshMaterial(const std::string &materialName)
 {
-  Ogre::Entity *ent = NULL;
+/*  Ogre::Entity *ent = NULL;
   Ogre::SimpleRenderable *simple = NULL;
 
   if (materialName.empty())
@@ -433,6 +441,7 @@ void Geom::SetMeshMaterial(const std::string &materialName)
     gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry[" 
              << this->GetName() << ". Object will appear white.\n";
   }
+  */
 
 }
 
@@ -517,64 +526,14 @@ float Geom::GetLaserRetro() const
 /// Set the transparency
 void Geom::SetTransparency( float trans )
 {
-  unsigned short i = 0, j=0;
-  Ogre::ColourValue sc, dc;
-  Ogre::Technique *t;
+  std::vector<OgreVisual*>::iterator iter;
 
-  this->transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
-
-  if (this->myMaterial.isNull())
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
-    gzmsg(0) << "Can't set transparency for a geom without a material\n";
-    return;
+    (*iter)->SetTransparency(trans);
   }
 
-  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
-
-
-  while ( techniqueIt.hasMoreElements() ) 
-  {
-    t = techniqueIt.getNext ();
-    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-
-    j = 0;
-
-    while (passIt.hasMoreElements ()) 
-    {
-      sc = this->origMaterial->getTechnique (i)->getPass (j)->getDiffuse ();
-
-      if (this->transparency >0.0)
-        passIt.peekNext ()->setDepthWriteEnabled (false);
-      else
-        passIt.peekNext ()->setDepthWriteEnabled (true);
-        
-
-      switch (this->sceneBlendType) 
-      {
-        case Ogre::SBT_ADD:
-          dc = sc;
-          dc.r -= sc.r * this->transparency;
-          dc.g -= sc.g * this->transparency;
-          dc.b -= sc.b * this->transparency;
-          passIt.peekNext ()->setAmbient (Ogre::ColourValue::Black);
-          break;
-
-        case Ogre::SBT_TRANSPARENT_ALPHA:
-        default:
-          dc = sc;
-          dc.a = sc.a * (1.0f - this->transparency);
-          passIt.peekNext()->setAmbient(this->origMaterial->getTechnique (i)->getPass (j)->getAmbient ());
-          break;
-      }
-      passIt.peekNext ()->setDiffuse (dc);
-      
-      passIt.moveNext ();
-
-      ++j;
-    }
-
-    ++i;
-  }
+  this->transparency = trans;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

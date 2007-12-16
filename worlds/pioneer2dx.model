@@ -20,20 +20,15 @@
 
   <geom:box name="chassis_geom">
     <xyz>0 0 0.0</xyz>
-    <mesh>default</mesh>
     <size>0.445 0.277 0.17</size>
     <mass>2.0</mass>
-    <material>Gazebo/PioneerBody</material>
-  </geom:box>
 
-  <!--<geom:box name="chassis_top_geom">
-    <xyz>0 0 0.085</xyz>
-    <mesh>default</mesh>
-    <size> 0.45 0.38 0.005</size>
-    <mass>0</mass>
-    <material>Gazebo/Black</material>
+    <visual>
+      <rpy>0 90 90</rpy>
+      <mesh>pioneer2dx/chassis.mesh</mesh>
+      <material>Gazebo/Pioneer2Body</material>
+    </visual>
   </geom:box>
-  -->
 </body:box>
 
 <body:cylinder name="left_wheel">
@@ -41,47 +36,43 @@
   <rpy>0 90 90</rpy>
 
   <geom:cylinder name="left_wheel_geom">
-    <mesh>default</mesh>
     <size>0.075 0.05</size>
     <mass>0.1</mass>
-    <material>Gazebo/Black</material>
+
+    <visual>
+      <size> 0.125 0.125 0.05</size>
+      <mesh>pioneer2dx/tire.mesh</mesh>
+      <material>Gazebo/Black</material>
+    </visual>
   </geom:cylinder>
-  <geom:box name="left_wheel_box">
-    <mesh>default</mesh>
-    <xyz>0.0 0.0 -0.010</xyz>
-    <size>0.05 0.05 0.05</size>
-    <mass>0</mass>
-    <material>Gazebo/White</material>
-  </geom:box>
 </body:cylinder>
 
 <body:cylinder name="right_wheel">
   <xyz>0.1 0.17 -0.0725</xyz>
   <rpy>0 90 90</rpy>
   <geom:cylinder name="right_wheel_geom">
-    <mesh>default</mesh>
     <size>0.075 0.05</size>
     <mass>0.1</mass>
-    <material>Gazebo/Black</material>
+
+    <visual>
+      <mesh>pioneer2dx/tire.mesh</mesh>
+      <material>Gazebo/Black</material>
+    </visual>
   </geom:cylinder>
 
-  <geom:box name="right_wheel_box">
-    <mesh>default</mesh>
-    <xyz>0.0 0.0 0.010</xyz>
-    <size>0.05 0.05 0.05</size>
-    <mass>0</mass>
-    <material>Gazebo/White</material>
-  </geom:box>
 </body:cylinder>
 
 <body:sphere name="castor_body">
   <xyz>-0.200 0 -0.11</xyz>
   <rpy>0 0 0</rpy>
   <geom:sphere name="castor_geom">
-    <mesh>default</mesh>
     <size>0.04</size>
     <mass>0.1</mass>
-    <material>Gazebo/Black</material>
+
+    <visual>
+      <mesh>unit_sphere</mesh>
+      <material>Gazebo/Black</material>
+    </visual>
   </geom:sphere>
 </body:sphere>
 

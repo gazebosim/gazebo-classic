@@ -60,16 +60,12 @@ void SphereGeom::LoadChild(XMLConfigNode *node)
   this->SetGeom(dCreateSphere(0, radius ), true);
 
   // Get the sphere mesh
-  if (this->meshName.empty() || this->meshName == "default")
+  /*if (this->meshName.empty() || this->meshName == "default")
     this->AttachMesh("unit_sphere");
   else
     this->AttachMesh(this->meshName);
 
- /* Ogre::Vector3 meshSize = this->ogreObj->getBoundingBox().getSize();
-
-  radius = radius / ((meshSize.x + meshSize.y + meshSize.z)/3.0);
-  */
-
+    */
   // Set the size of the sphere
   this->ScaleMesh(Vector3(radius,radius,radius));
 

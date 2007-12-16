@@ -57,7 +57,7 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
   this->SetGeom( dCreateCylinder( 0, radius, length ), true );
 
   // Get the mesh
-  if (this->meshName.empty() || this->meshName == "default")
+  /*if (this->meshName.empty() || this->meshName == "default")
     this->AttachMesh("unit_cylinder");
   else
     this->AttachMesh(this->meshName);
@@ -67,8 +67,10 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
   radius /= meshSize.x;
   length /= meshSize.z;
 
+  */
   // Set the size of the cylinder
-  this->ScaleMesh(Vector3(radius*2,radius*2,length));
+  //this->ScaleMesh(Vector3(radius*2,radius*2,length));
+  
 
   // Allow it to cast shadows
   this->SetCastShadows(true);

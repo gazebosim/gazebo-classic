@@ -89,7 +89,16 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
       uvTile.x, uvTile.y, 
       Ogre::Vector3(perp.y, perp.z, perp.x));
 
-  this->AttachMesh(this->GetName());
+  //this->AttachMesh(this->GetName());
+  
+  std::ostringstream stream;
+  stream << "Geom_" << this->GetName() << ":" << (long)this->geomId;
+
+  Ogre::Entity *entity = this->sceneNode->getCreator()->createEntity(stream.str(), this->GetName());
+  this->sceneNode->attachObject(entity);
+
+  entity->setMaterialName(node->GetString("material","",1));
+
   this->SetCastShadows(false);
 
   this->contact->kp = dInfinity;

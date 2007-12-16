@@ -103,6 +103,9 @@ class Body : public Entity
   /// \param node XMLConfigNode used to load the geom
   private: void LoadSensor(XMLConfigNode *node);
 
+  /// \brief Load a renderable
+  private: void LoadVisual(XMLConfigNode *node);
+
   /// List of geometries attached to this body
   private: std::vector< Geom* > geoms;
 
@@ -121,6 +124,8 @@ class Body : public Entity
 
   private: Pose3d comPose;
   private: Pose3d staticPose;
+
+  private: std::vector<Ogre::SceneNode*> visuals;
 };
 
 /// \}

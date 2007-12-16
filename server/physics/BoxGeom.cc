@@ -53,7 +53,7 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
   Vector3 size;
   
   // Get the box mesh
-  if (this->meshName.empty() || this->meshName == "default")
+  /*if (this->meshName.empty() || this->meshName == "default")
     this->AttachMesh("unit_box");
   else
     this->AttachMesh(this->meshName);
@@ -67,6 +67,7 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
     size.z = ogreSize.y;
   }
   else
+    */
     size = node->GetVector3("size",Vector3(1,1,1));
 
   // Initialize box mass matrix
@@ -76,7 +77,7 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
   this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
 
 
-  if (node->GetChild("meshScale") == NULL)
+  /*if (node->GetChild("meshScale") == NULL)
   {
 
     meshScale.x = size.x / ogreSize.z;
@@ -87,13 +88,9 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
   {
     meshScale = node->GetVector3("meshScale",Vector3(1,1,1));
   }
-
-  /*size.x /= meshSize.x;
-  size.y /= meshSize.y;
-  size.z /= meshSize.z;
   */
 
-  this->ScaleMesh(meshScale);
+  //this->ScaleMesh(size);
 
   // Allow the box to cast shadows
   this->SetCastShadows(true);

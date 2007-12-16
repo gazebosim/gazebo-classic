@@ -66,7 +66,6 @@ int Body::Load(XMLConfigNode *node)
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern(1,0,0,0)));
 
-
   childNode = node->GetChildByNSPrefix("geom");
 
   // Load the geometries
@@ -85,6 +84,14 @@ int Body::Load(XMLConfigNode *node)
     // Create and Load a sensor, which will belong to this body.
     this->LoadSensor(childNode);
     childNode = childNode->GetNextByNSPrefix("sensor");
+  }
+
+  childNode = node->GetChild("visual");
+
+  while (childNode)
+  {
+    this->LoadVisual(childNode);
+    childNode = childNode->GetNext("visual");
   }
 
   // If no geoms are attached, then don't let gravity affect the body.
@@ -498,4 +505,30 @@ const Pose3d &Body::GetCoMPose() const
   return this->comPose;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Load a renderable
+void Body::LoadVisual(XMLConfigNode *node)
+{
+  std::ostringstream stream;
+  Ogre::SceneNode *snode = NULL;
+  Ogre::Entity *entity;
+  Pose3d pose;
 
+  std::string name = node->GetString("name","",1);
+  std::string meshName = node->GetString("mesh","",1);
+  std::string materialName = node->GetString("material","",0);
+
+  pose.pos = node->GetVector3("xyz", Vector3(0,0,0));
+  pose.rot = node->GetRotation("rpy", Quatern());
+
+  snode = this->sceneNode->createChildSceneNode( name );
+
+  stream << "VISUAL_" << name;
+  entity = snode->getCreator()->createEntity(stream.str(), meshName);
+
+  snode->attachObject(entity);
+
+  OgreAdaptor::Instance()->SetSceneNodePose(snode,pose);
+
+  this->visuals.push_back( snode );
+}

@@ -27,20 +27,20 @@
 #ifndef GEOM_HH
 #define GEOM_HH
 
-#include <Ogre.h>
+//#include <Ogre.h>
 #include <ode/ode.h>
 
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Vector3.hh"
 
-/*namespace Ogre
+namespace Ogre
 {
   class Material;
   class Entity;
   class MovableObject;
   class SceneNode;
-}*/
+}
 
 namespace gazebo
 {
@@ -48,6 +48,7 @@ namespace gazebo
   class Body;
   class ContactParams;
   class XMLConfigNode;
+  class OgreVisual;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
@@ -199,11 +200,9 @@ namespace gazebo
 
     private: Ogre::SceneNode *boundingBoxNode;
 
-    private: Ogre::MaterialPtr origMaterial;
-    private: Ogre::MaterialPtr myMaterial;
-    private: Ogre::SceneBlendType sceneBlendType;
-
     private: float transparency;
+
+    private: std::vector<OgreVisual*> visuals;
   };
 
   /// \}
