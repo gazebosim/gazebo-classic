@@ -1,7 +1,0 @@
-#Import variable
-Import('env staticObjs sharedObjs')
-
-sources = Split('FLTKMainWindow.cc FLTKGui.cc MainMenu.cc Toolbar.cc StatusBar.cc')
-
-staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

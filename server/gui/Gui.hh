@@ -18,43 +18,53 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: GUI base class
+/* Desc: FLTK Mainwindow
  * Author: Nate Koenig
- * Date: 17 Sep 2007
- * SVN: $Id$
+ * Date: 13 Feb 2006
+ * SVN: $Id:$
  */
 
-#ifndef GUI_HH
-#define GUI_HH
+#ifndef FLTKMAINWINDOW_HH
+#define FLTKMAINWINDOW_HH
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <string>
+
+#include "Gui.hh"
+
 namespace gazebo
 {
 
-  class OgreAdaptor;
+  class GLWindow;
+  class Toolbar;
+  class StatusBar;
 
-  /// \brief The base class for all GUIs
-  class Gui
+  /// \brief FLTK Main Window
+  class Gui : public Fl_Window
   {
     /// \brief Constructor
-    public: Gui();
-
+    public: Gui (int x, int y, int w, int h, const std::string &t);
+ 
     /// \brief Destructor
     public: virtual ~Gui();
 
     /// \brief Initalize the gui
-    public: virtual void Init() = 0;
+    public: virtual void Init();
 
-    /// \brief Update the gui
-    public: virtual void Update() {};
+    public: virtual void Update();
 
     /// \brief Get the width of the gui's rendering window
-    public: virtual unsigned int GetWidth() const = 0;
+    public: unsigned int GetWidth() const;
 
     /// \brief Get the height of the gui's rendering window
-    public: virtual unsigned int GetHeight() const = 0;
+    public: unsigned int GetHeight() const;
+
+    /// \brief Handle an event
+    public: int handle(int event);
 
     /// \brief Get the id of the window
     public: Window GetWindowId() const;
@@ -65,22 +75,24 @@ namespace gazebo
     /// \brief Get the display
     public: Display *GetDisplay() const;
 
-    /// \brief Handle a keyboard event
-    protected: void HandleKeyboard(int key);
-
-    /// \brief ID of the window
+    /// ID of the window
     protected: Window windowId;
 
-    /// \brief Pointer to the Xvisual
+    /// Pointer to the Xvisual
     protected: XVisualInfo *visual;
 
-    /// \brief colormap
+    /// colormap
     protected: Colormap colormap;
 
-    /// \brief pointer to the display
+    /// pointer to the display
     protected: Display *display;
 
-    private: OgreAdaptor *ogre;
+    private: GLWindow *glWindow;
+
+    private: Toolbar *toolbar;
+    private: StatusBar *statusbar;
   };
+
 }
+
 #endif

@@ -18,33 +18,111 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: GUI base class
+/* Desc: FLTK Mainwindow
  * Author: Nate Koenig
- * Date: 17 Sep 2007
- * SVN: $Id$
+ * Date: 13 Feb 2006
+ * SVN: $Id:$
  */
 
-#include "OgreAdaptor.hh"
+#include <string>
+
+#include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Choice.H>
+
+#include "GLWindow.hh"
+#include "Global.hh"
+#include "MainMenu.hh"
+#include "Toolbar.hh"
+#include "StatusBar.hh"
 #include "Gui.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
-///Constructor
-Gui::Gui()
+/// Constructor
+Gui::Gui (int x, int y, int width, int height, const std::string &t)
+  : Fl_Window(x, y, width+200, height+60, t.c_str())
 {
   this->windowId = -1;
   this->visual = NULL;
   this->display = NULL;
 
-  this->ogre = OgreAdaptor::Instance();
+  Fl::scheme("plastic");
+
+  // Create a main menu
+  MainMenu *mainMenu = new MainMenu(0,0,w(),30,(char *)"MainMenu");
+
+  // Create the Rendering window
+  this->glWindow = new GLWindow(0, 30, w()-200, h()-60,"GL Window");
+
+  // Create the toolbar
+  this->toolbar = new Toolbar(w()-200, 30, 200, h()-60);
+
+  this->statusbar = new StatusBar(0, h()-30, w(), 30);
+
+  this->end();
+  this->show();
+
+  this->glWindow->Init();
+
+  this->display = this->glWindow->display;
+  this->visual = this->glWindow->visual;
+  this->colormap = this->glWindow->colormap;
+  this->windowId = this->glWindow->windowId;
+  
+  this->resizable(this->glWindow);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Gui::~Gui()
 {
+  delete this->glWindow;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Initalize the gui
+void Gui::Init()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Gui::Update()
+{
+  this->toolbar->Update();
+  this->statusbar->Update();
+  this->glWindow->Update();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the width of the gui's rendering window
+unsigned int Gui::GetWidth() const
+{
+  return this->glWindow->w();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the height of the gui's rendering window
+unsigned int Gui::GetHeight() const
+{
+  return this->glWindow->h();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Handle an event
+int Gui::handle(int event)
+{
+  switch (event)
+  {
+    case FL_HIDE:
+      Global::SetUserQuit(true);
+      return 1;
+  }
+
+  return Fl_Window::handle(event);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the id of the window
 Window Gui::GetWindowId() const
@@ -64,10 +142,4 @@ XVisualInfo *Gui::GetVisualInfo() const
 Display *Gui::GetDisplay() const
 {
   return this->display;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Handle a keyboard event
-void Gui::HandleKeyboard(int key)
-{
 }
