@@ -51,6 +51,8 @@ using namespace gazebo;
 World::World()
 {
   this->physicsEngine = new ODEPhysics();
+  this->server=0;
+  this->simIface=0;
 
   this->pause = false;
 

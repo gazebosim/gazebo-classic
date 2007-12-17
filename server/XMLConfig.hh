@@ -56,14 +56,14 @@ namespace gazebo
     public: ~XMLConfig();
   
     /// \brief Load config from an XML file
-    public: int Load( std::string filename );
+    public: int Load(const std::string &filename );
   
     /// \brief Load config from an XML string
-    public: int LoadString( std::string str );
+    public: int LoadString(const std::string &str );
   
     /// \brief Save config back into file
     ///        Set filename to NULL to save back into the original file
-    public: int Save( std::string filename );
+    public: int Save(const std::string &filename );
   
     /// \brief Get the root node
     public: XMLConfigNode *GetRootNode() const;
@@ -104,19 +104,19 @@ namespace gazebo
     public: XMLConfigNode *GetNext();
 
     /// \brief Get next by name
-    public: XMLConfigNode *GetNext(std::string name);
+    public: XMLConfigNode *GetNext(const std::string &name,const std::string &prefix=std::string());
 
     /// \brief Get next node by namespace prefix
-    public: XMLConfigNode *GetNextByNSPrefix(std::string name);
+    public: XMLConfigNode *GetNextByNSPrefix(const std::string &prefix);
   
     /// \brief Get the first child of this node
     public: XMLConfigNode *GetChild();
   
     /// \brief Get a child based on a name. Returns null if not found
-    public: XMLConfigNode *GetChild( std::string name );
+    public: XMLConfigNode *GetChild(const std::string &name, const std::string &prefix=std::string() );
   
     /// \brief Get the first child with the specified namespace prefix
-    public: XMLConfigNode *GetChildByNSPrefix( std::string prefix );
+    public: XMLConfigNode *GetChildByNSPrefix(const std::string &prefix );
   
     /// \brief Move child pointer back to beginning
     public: XMLConfigNode *Rewind();
@@ -128,66 +128,66 @@ namespace gazebo
     public: std::string GetValue();
   
     /// \brief Get an attribute string value
-    public: std::string GetString( std::string key, std::string def, 
+    public: std::string GetString( const std::string &key, const std::string &def, 
                                    int require = 0 );
   
     /// \brief Get a attribute character value
-    public: unsigned char GetChar( std::string key, char def, int require = 0 );
+    public: unsigned char GetChar( const std::string &key, char def, int require = 0 );
   
     /// \brief Get a file name.  Always returns an absolute path.  
     ///        If the filename is entered as a relative path, we prepend the 
     ///        world file path.
-    public: std::string GetFilename( std::string key, std::string def, 
+    public: std::string GetFilename( const std::string &key, const std::string &def, 
                                      int require = 0);
   
     /// \brief Get an integer
-    public: int GetInt( std::string key, int def, int require = 0 );
+    public: int GetInt( const std::string &key, int def, int require = 0 );
   
     /// \brief Get a double
-    public: double GetDouble( std::string key, double def, int require = 0 );
+    public: double GetDouble( const std::string &key, double def, int require = 0 );
   
     /// \brief Get a float
-    public: float GetFloat( std::string key, float def, int require = 0 );
+    public: float GetFloat( const std::string &key, float def, int require = 0 );
   
     /// \brief Get a boolean
-    public: bool GetBool( std::string key, bool def, int require = 0 );
+    public: bool GetBool( const std::string &key, bool def, int require = 0 );
   
     /// \brief Get an attribute length value (return value in meters)
-    public: double GetLength( std::string key, double def, int require = 0 );
+    public: double GetLength( const std::string &key, double def, int require = 0 );
   
     /// \brief Get an attribute time value (return value in seconds)
-    public: gazebo::Time GetTime( std::string key, double def, int require = 0 );
+    public: gazebo::Time GetTime( const std::string &key, double def, int require = 0 );
   
     /// \brief Get a position
-    public: Vector3 GetVector3( std::string key, Vector3 def );
+    public: Vector3 GetVector3( const std::string &key, Vector3 def );
   
     /// \brief Get a two dimensional double vector
-    public: Vector2<double> GetVector2d( std::string key, Vector2<double> def );
+    public: Vector2<double> GetVector2d( const std::string &key, Vector2<double> def );
 
     /// \brief Get a two dimensional int vector
-    public: Vector2<int> GetVector2i( std::string key, Vector2<int> def );
+    public: Vector2<int> GetVector2i( const std::string &key, Vector2<int> def );
   
     /// \brief Get a rotation
-    public: Quatern GetRotation( std::string key, Quatern def );
+    public: Quatern GetRotation( const std::string &key, Quatern def );
   
     /// \brief Get an attribute tuple value
-    public: std::string GetTupleString( std::string key, int index, 
-                                        std::string def );
+    public: std::string GetTupleString( const std::string &key, int index, 
+                                        const std::string &def );
   
     /// \brief Get an attribute tuple int value
-    public: int GetTupleInt( std::string key, int index, int def );
+    public: int GetTupleInt( const std::string &key, int index, int def );
   
     /// \brief Get an attribute tuple double value
-    public: double GetTupleDouble( std::string key, int index, double def );
+    public: double GetTupleDouble( const std::string &key, int index, double def );
   
     /// \brief Get an attribute tuple length value (return value in meters)
-    public: double GetTupleLength( std::string key, int index, double def );
+    public: double GetTupleLength( const std::string &key, int index, double def );
   
     /// \brief Get an attribute tuple angle value (return value in radians)
-    public: double GetTupleAngle( std::string key, int index, double def );
+    public: double GetTupleAngle( const std::string &key, int index, double def );
   
     /// \brief Get a node's value, which is either a attribute or child node value.
-    protected: xmlChar* GetNodeValue( std::string key );
+    protected: xmlChar* GetNodeValue( const std::string &key );
   
     /// \brief Our document
     private: XMLConfig *config;

@@ -112,7 +112,7 @@ home directory, or to the log file specified with the -l command line option.
 #include "SensorFactory.hh"
 #include "IfaceFactory.hh"
 #include "ControllerFactory.hh"
-#include "GuiFactory.hh"
+#include "Gui.hh"
 #include "World.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -317,7 +317,6 @@ int Init()
   gazebo::SensorFactory::RegisterAll();
   gazebo::IfaceFactory::RegisterAll();
   gazebo::ControllerFactory::RegisterAll();
-  gazebo::GuiFactory::RegisterAll();
 
   childNode = xmlFile->GetRootNode()->GetChild("gui");
 
@@ -332,7 +331,7 @@ int Init()
     gzmsg(1) << "Creating GUI:\n\tType[" << type << "] Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
 
     // Create the GUI
-    gazebo::Global::gui = gazebo::GuiFactory::NewGui(type, x, y, width, height, type+"::Gazebo");
+    gazebo::Global::gui = new gazebo::Gui(x, y, width, height, type+"::Gazebo");
 
     // Initialize the GUI
     gazebo::Global::gui->Init();
