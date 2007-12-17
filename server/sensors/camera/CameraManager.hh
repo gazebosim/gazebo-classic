@@ -21,7 +21,7 @@
 /* Desc: Class to manage all cameras
  * Author: Andrew Howard and Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef CAMERAMANAGER_HH

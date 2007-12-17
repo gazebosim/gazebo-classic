@@ -21,7 +21,7 @@
 /* Desc: Stubbed out sensor
  * Author: Nate Koenig
  * Date: 05 Aug 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef SENSORSTUB_HH

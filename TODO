@@ -1,4 +1,7 @@
 Open:
+- boost signals for GUI input, etc
+- Add check for libxml2
+- Add check for boost
 - Add in Pioneer blender models
 -A highstop of >180 breaks Bandit's shoulder
 - A static geom which is offset does not actually move the geom, so collision

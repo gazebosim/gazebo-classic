@@ -93,7 +93,7 @@ void Geom::Load(XMLConfigNode *node)
   this->SetName(node->GetString("name","",1));
 
   // The mesh used for visualization
-  this->dblMass = node->GetDouble("mass",1.0,1e-5);
+  this->dblMass = node->GetDouble("mass",1e-5,0);
 
   if (this->dblMass <= 0)
   {
@@ -113,8 +113,13 @@ void Geom::Load(XMLConfigNode *node)
 
   this->body->AttachGeom(this);
 
-  this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
-  this->SetRotation(node->GetRotation("rpy",Quatern()));
+  Pose3d pose;
+
+  pose.pos = node->GetVector3("xyz",Vector3(0,0,0));
+  pose.rot = node->GetRotation("rpy",Quatern());
+
+  this->SetPose(pose);
+
   this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
   this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
 
@@ -211,6 +216,8 @@ void Geom::Update()
   }
 
   this->UpdateChild();
+
+  this->SetPose(this->GetPose());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,8 +282,6 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
       this->body->UpdateCoM();
     }
   }
-  
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

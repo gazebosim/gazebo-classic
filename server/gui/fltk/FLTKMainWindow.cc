@@ -111,3 +111,18 @@ unsigned int FLTKMainWindow::GetHeight() const
   return this->glWindow->h();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Handle an event
+int FLTKMainWindow::handle(int event)
+{
+  switch (event)
+  {
+    case FL_HIDE:
+      Global::SetUserQuit(true);
+      return 1;
+  }
+
+  return Fl_Window::handle(event);
+}
+
+

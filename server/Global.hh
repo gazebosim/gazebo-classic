@@ -35,7 +35,7 @@
 #include <list>
 #include <math.h>
 //#include <boost/thread/thread.hpp>
-#include <boost/thread/recursive_mutex.hpp>
+//#include <boost/thread/recursive_mutex.hpp>
 
 #include "Pose3d.hh"
 
@@ -164,9 +164,6 @@ namespace gazebo
 
     /// Pointer to the selected Gui 
     public: static Gui *gui;
-
-    /// Boost recursive mutex
-    public: static boost::recursive_mutex mutex;
 
     /// Set to true when the user wants to leave the application
     private: static bool userQuit;

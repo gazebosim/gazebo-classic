@@ -60,6 +60,9 @@ namespace gazebo
     /// \brief Get the height of the gui's rendering window
     public: virtual unsigned int GetHeight() const;
 
+    /// \brief Handle an event
+    public: int handle(int event);
+
     private: FLTKGui *glWindow;
 
     private: Toolbar *toolbar;

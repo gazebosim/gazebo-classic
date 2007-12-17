@@ -197,6 +197,7 @@ void OgreAdaptor::Init(XMLConfigNode *node)
         }
         else
         {
+          printf("Adding a sky dome\n");
           this->sceneMgr->setSkyDome(true,material,5,8);
         }
 

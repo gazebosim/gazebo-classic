@@ -22,7 +22,7 @@
  * Desc: Factory Position2d controller.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN info: $Id:$
+ * SVN info: $Id$
  */
 
 #include "Global.hh"

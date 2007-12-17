@@ -21,7 +21,7 @@
 /* Desc: Parameters for contact joints
  * Author: Nate Koenig
  * Date: 30 July 2003
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef CONTACTPARAMS_HH

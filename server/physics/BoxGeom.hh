@@ -21,7 +21,7 @@
 /* Desc: Box geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef BOXGEOM_HH

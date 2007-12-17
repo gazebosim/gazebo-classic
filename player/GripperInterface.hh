@@ -21,7 +21,7 @@
 /* Desc: Gripper Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef GRIPPERINTERFACE_HH

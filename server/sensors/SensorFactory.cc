@@ -22,7 +22,7 @@
  * Desc: Factory for creating sensor
  * Author: Andrew Howard
  * Date: 18 May 2003
- * SVN info: $Id:$
+ * SVN info: $Id$
  */
 
 #include "Sensor.hh"

@@ -22,7 +22,7 @@
  * Desc: Factory controller.
  * Author: Nathan Koenig
  * Date: 29 July 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 #ifndef FACTORY_POSITION2D_HH
 #define FACTORY_POSITION2D_HH

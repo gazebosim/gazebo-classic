@@ -70,5 +70,10 @@ def createGazeborc(target, source, env):
   f.write('  <ogrePath>' + ogre + '</ogrePath>\n')
   f.write('</gazeborc>\n')
   f.close()
+  # Use a python command because scons won't copy files to a home directory
+  if not os.path.exists(os.environ['HOME']+'/.gazeborc'):
+    os.system('cp gazeborc ~/.gazeborc')
+
+
 
 

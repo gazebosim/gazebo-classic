@@ -21,7 +21,7 @@
 /* Desc: Ray proximity sensor
  * Author: Carle Cote
  * Date: 23 february 2004
- * SVN: $Id:$
+ * SVN: $Id$
 */
 
 #include <assert.h>

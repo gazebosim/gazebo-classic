@@ -79,10 +79,6 @@ env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
 env['BUILDERS']['RCConfig'] = Builder(action = createGazeborc)
 rcconfig = env.RCConfig(target='gazeborc', source=Value(install_prefix))
 
-# Use a python command because scons won't copy files to a home directory
-if not os.path.exists(os.environ['HOME']+'/.gazeborc'):
-  os.system('cp gazeborc ~/.gazeborc')
-
 # DEFAULT list of subdirectories to build
 subdirs = ['server','libgazebo', 'player']
 
