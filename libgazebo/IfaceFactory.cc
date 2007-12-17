@@ -26,41 +26,14 @@
  */
 
 #include <sstream>
+#include <iostream>
 
 #include "gazebo.h"
 #include "IfaceFactory.hh"
 
 using namespace gazebo;
 
-void RegisterSimulationIface();
-void RegisterPositionIface();
-void RegisterCameraIface();
-void RegisterGraphics3dIface();
-void RegisterLaserIface();
-void RegisterFiducialIface();
-void RegisterFactoryIface();
-void RegisterGripperIface();
-void RegisterActarrayIface();
-void RegisterPTZIface();
-
 std::map<std::string, IfaceFactoryFn> IfaceFactory::ifaces;
-
-// Register all known ifaces.
-void IfaceFactory::RegisterAll()
-{
-  // Register static ifaces
-  RegisterSimulationIface();
-  RegisterPositionIface();
-  RegisterCameraIface();
-  RegisterGraphics3dIface();
-  RegisterLaserIface();
-  RegisterFiducialIface();
-  RegisterFactoryIface();
-  RegisterGripperIface();
-  RegisterActarrayIface();
-  RegisterPTZIface();
-}
-
 
 // Register a iface class.  Use by dynamically loaded modules
 void IfaceFactory::RegisterIface(std::string classname, IfaceFactoryFn factoryfn)

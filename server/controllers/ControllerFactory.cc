@@ -33,29 +33,7 @@
 
 using namespace gazebo;
 
-void RegisterPioneer2dx_Position2d();
-void RegisterSickLMS200_Laser();
-void RegisterGeneric_Camera();
-void RegisterFactory();
-void RegisterPioneer2_Gripper();
-void RegisterBandit_Actarray();
-void RegisterGeneric_PTZ();
-
 std::map<std::string, ControllerFactoryFn> ControllerFactory::controllers;
-
-////////////////////////////////////////////////////////////////////////////////
-// Register all known controllers.
-void ControllerFactory::RegisterAll()
-{
-  RegisterPioneer2dx_Position2d();
-  RegisterSickLMS200_Laser();
-  RegisterGeneric_Camera();
-  RegisterFactory();
-  RegisterPioneer2_Gripper();
-  RegisterBandit_Actarray();
-  RegisterGeneric_PTZ();
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Register a controller class.  Use by dynamically loaded modules
@@ -79,6 +57,6 @@ Controller *ControllerFactory::NewController(const std::string &classname, Entit
     stream << "Unable to make controller of type " << classname;
     gzthrow(stream.str());
   }
-
+  
   return NULL;
 }

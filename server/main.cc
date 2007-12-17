@@ -314,9 +314,9 @@ int Init()
   gazebo::GazeboMessage::Instance()->Load(xmlFile->GetRootNode());
 
   // Register all the factories
-  gazebo::SensorFactory::RegisterAll();
-  gazebo::IfaceFactory::RegisterAll();
-  gazebo::ControllerFactory::RegisterAll();
+  //gazebo::SensorFactory::RegisterAll();
+  //gazebo::IfaceFactory::RegisterAll();
+  //gazebo::ControllerFactory::RegisterAll();
 
   childNode = xmlFile->GetRootNode()->GetChild("gui");
 

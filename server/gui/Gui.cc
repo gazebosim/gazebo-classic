@@ -21,7 +21,7 @@
 /* Desc: FLTK Mainwindow
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <string>

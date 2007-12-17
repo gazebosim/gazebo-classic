@@ -30,6 +30,7 @@
 
 #include <string>
 #include <map>
+#include "StaticPluginRegister.hh"
 
 namespace gazebo
 {
@@ -50,9 +51,6 @@ typedef Controller* (*ControllerFactoryFn) (Entity *parent);
 /// \brief The controller factory; the class is just for namespacing purposes.
 class ControllerFactory
 {
-  /// \brief Register all known controllers.
-  public: static void RegisterAll();
-  
   /// \brief Register a controller class 
   /// (called by controller registration function).
   public: static void RegisterController(std::string type, std::string classname, ControllerFactoryFn factoryfn);
@@ -80,8 +78,8 @@ Controller *New##classname(Entity *entity) \
 void Register##classname() \
 {\
   ControllerFactory::RegisterController("static", name, New##classname);\
-}
-
+}\
+StaticPluginRegister Registered##classname (Register##classname);
 
 /// \}
 }

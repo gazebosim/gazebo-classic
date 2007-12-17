@@ -31,33 +31,41 @@
 #include <string>
 #include <map>
 
+struct LibgazeboPluginRegister
+{
+  LibgazeboPluginRegister(void (*initFunc)())
+  {
+    (*initFunc)();
+  }
+};
+
 namespace gazebo
 {
   class Iface;
 
-// Prototype for iface factory functions
-typedef Iface* (*IfaceFactoryFn) ();
+  // Prototype for iface factory functions
+  typedef Iface* (*IfaceFactoryFn) ();
 
 
-/// @brief The iface factory; the class is just for namespacing purposes.
-class IfaceFactory
-{
-
-  /// @brief Register all known ifaces.
-  public: static void RegisterAll();
+  /// @brief The iface factory; the class is just for namespacing purposes.
+  class IfaceFactory
+  {
   
-  /// @brief Register a iface class 
-  /// (called by iface registration function).
-  public: static void RegisterIface(std::string classname, IfaceFactoryFn factoryfn);
-
-  /// @brief Create a new instance of a iface.  Used by the world when
-  /// reading the world file.
-  public: static Iface *NewIface(const std::string &classname);
-
-  // A list of registered iface classes
-  private: static std::map<std::string, IfaceFactoryFn> ifaces;
-
-};
+    /// @brief Register all known ifaces.
+    //public: static void RegisterAll();
+    
+    /// @brief Register a iface class 
+    /// (called by iface registration function).
+    public: static void RegisterIface(std::string classname, IfaceFactoryFn factoryfn);
+  
+    /// @brief Create a new instance of a iface.  Used by the world when
+    /// reading the world file.
+    public: static Iface *NewIface(const std::string &classname);
+  
+    // A list of registered iface classes
+    private: static std::map<std::string, IfaceFactoryFn> ifaces;
+  
+  };
 
 }
 
@@ -74,7 +82,7 @@ Iface *New##classname() \
 void Register##classname() \
 {\
   IfaceFactory::RegisterIface(name, New##classname);\
-}
-
+}\
+LibgazeboPluginRegister Registered##classname (Register##classname);
 
 #endif

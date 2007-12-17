@@ -30,6 +30,7 @@
 
 #include <string>
 #include <map>
+#include "StaticPluginRegister.hh"
 
 namespace gazebo
 {
@@ -50,7 +51,7 @@ typedef Sensor* (*SensorFactoryFn) (Body*);
 class SensorFactory
 {
   /// \brief Register all known sensors.
-  public: static void RegisterAll();
+  //public: static void RegisterAll();
   
   /// \brief Register a sensor class (called by sensor registration function).
   public: static void RegisterSensor(std::string type, std::string  classname,
@@ -78,7 +79,8 @@ Sensor *New##classname(Body *body) \
 void Register##classname() \
 {\
   SensorFactory::RegisterSensor("static", name, New##classname);\
-}
+}\
+StaticPluginRegister Registered##classname (Register##classname);
 
 /// \}
 }

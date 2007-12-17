@@ -31,17 +31,7 @@
 
 using namespace gazebo;
 
-void RegisterRaySensor();
-void RegisterCameraSensor();
-
 std::map<std::string, SensorFactoryFn> SensorFactory::sensors;
-
-// Register all known sensor.
-void SensorFactory::RegisterAll()
-{
-  RegisterCameraSensor();
-  RegisterRaySensor();
-}
 
 
 // Register a model class.  Use by dynamically loaded modules
