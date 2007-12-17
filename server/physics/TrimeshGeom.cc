@@ -27,6 +27,7 @@
 #include <ode/ode.h>
 #include <Ogre.h>
 
+#include "OgreAdaptor.hh"
 #include "Body.hh"
 #include "TrimeshGeom.hh"
 
@@ -87,7 +88,11 @@ void TrimeshGeom::UpdateChild()
 void TrimeshGeom::LoadChild(XMLConfigNode *node)
 {
   Ogre::SubMesh* subMesh;
-  Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().load(meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  Ogre::MeshPtr mesh;
+ 
+  this->meshName = node->GetString("mesh","",1);
+  
+  mesh = Ogre::MeshManager::getSingleton().load(this->meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
   Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
 
@@ -172,15 +177,17 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
     }
   }
 
-  this->AttachMesh(meshName);
+ /*this->AttachMesh(meshName);
 
   this->ScaleMesh(Vector3(scale.x, scale.y, scale.z));
 
   // Allow the sphere to cast shadows
   this->SetCastShadows(true);
+  */
   
   /// This will hold the vertex data of the triangle mesh
   this->odeData = dGeomTriMeshDataCreate();
+
 
   // Build the ODE triangle mesh
   dGeomTriMeshDataBuildSingle( this->odeData, 
@@ -191,10 +198,9 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 
   dMassSetTrimesh(&this->mass, this->dblMass, this->geomId);
 
-  // Create the sphere geometry
+  // Create the trimesh geometry
   this->SetGeom(this->geomId, true);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;
-
 }

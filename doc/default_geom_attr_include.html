@@ -24,29 +24,51 @@
 </ul>
 
 <ul>
-  <li>mesh (string)
+  <li>visual
   <ul>
-    <li>Name of the mesh model to use
-    <li>Default: default
+    <li>mesh (string)
+      <ul>
+        <li>Name of the mesh model to use
+        <li>Default: default
+      </ul>
+    <li>material (string)
+      <ul>
+        <li>Name of the material to apply to the geom's mesh
+        <li>Default: (empty)
+      </ul>
+    <li>xyz (float tuple, meters)
+      <ul>
+        <li>Visual position relative to the parent geom
+        <li>Default: 0 0 0
+      </ul>
+    <li>rpy (float tuple, degrees)
+      <ul>
+        <li>Visual orientation relative to the parent geom in Euler angles: roll, pitch yaw
+        <li>Default: 0 0 0
+      </ul>
+    <li>size (float tuple, meters)
+      <ul>
+        <li>Desired size of the mesh visual
+        <li>Default: Size of the mesh
+      </ul>
+    <li>scale (float tuple)
+      <ul>
+        <li>Scaling factor applied to the default size of the mesh. This overrides the size option, if set.
+        <li>Default: 1 1 1
+      </ul>
   </ul>
+</ul>
+
+
 </ul>
 
 <ul>
   <li>mass (float, kilograms)
   <ul>
     <li>Mass in kilograms
-    <li>Default: 1e-6
+    <li>Default: 1e-3
   </ul>
 </ul>
-
-<ul>
-  <li>material (string)
-  <ul>
-    <li>Name of the material to apply to the geom's mesh
-    <li>Default: (empty)
-  </ul>
-</ul>
-
 <ul>
   <li>laserFiducialId (int)
   <ul>

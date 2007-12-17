@@ -91,7 +91,7 @@ def optimize_for_cpu(env):
     for line in f_proc:
       if (re.match('flags', line)): 
         for atr in cpuAtr:
-          if (re.search(atr, line)):
+          if (re.search(atr, line) and not re.search(atr, line_atr)):
             line_atr+= "-m" + atr + " "
             
   env['CCFLAGS'] += Split (line_atr)

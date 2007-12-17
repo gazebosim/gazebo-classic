@@ -192,8 +192,6 @@ namespace gazebo
     private: int laserFiducialId;
     private: float laserRetro;
 
-    ///  name of the mesh
-    protected: std::string meshName;
 
     ///  Mass as a double
     protected: double dblMass;

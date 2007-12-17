@@ -79,6 +79,10 @@ namespace gazebo
 
     private: dReal matrix_dblbuff[16*2];
     private: int last_matrix_index;
+
+    ///  name of the mesh
+    private: std::string meshName;
+
   };
 
   /// \}

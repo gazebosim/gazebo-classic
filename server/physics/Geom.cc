@@ -93,14 +93,27 @@ void Geom::Load(XMLConfigNode *node)
   this->SetName(node->GetString("name","",1));
 
   // The mesh used for visualization
-  this->dblMass = node->GetDouble("mass",1e-5,0);
+  this->dblMass = node->GetDouble("mass",0.001,0);
 
   if (this->dblMass <= 0)
   {
-    this->dblMass = 1e-5;
+    this->dblMass = 0.001;
   }
 
   this->LoadChild(node);
+
+  this->body->AttachGeom(this);
+
+  Pose3d pose;
+
+  pose.pos = node->GetVector3("xyz",Vector3(0,0,0));
+  pose.rot = node->GetRotation("rpy",Quatern());
+
+  // TODO: This should probably be true....but "true" breaks trimesh postions.
+  this->SetPose(pose, false);
+
+  this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
+  this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
 
   childNode = node->GetChild("visual");
   while (childNode)
@@ -110,18 +123,6 @@ void Geom::Load(XMLConfigNode *node)
     this->visuals.push_back(visual);
     childNode = childNode->GetNext("visual");
   }
-
-  this->body->AttachGeom(this);
-
-  Pose3d pose;
-
-  pose.pos = node->GetVector3("xyz",Vector3(0,0,0));
-  pose.rot = node->GetRotation("rpy",Quatern());
-
-  this->SetPose(pose);
-
-  this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
-  this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
 
 
   // Create the bounding box
@@ -133,16 +134,22 @@ void Geom::Load(XMLConfigNode *node)
     Vector3 min(aabb[0], aabb[2], aabb[4]);
     Vector3 max(aabb[1], aabb[3], aabb[5]);
 
-    if (this->GetName() == "pan_geom")
+    std::ostringstream nodeName;
+
+    nodeName << this->GetName()<<"_AABB_NODE";
+
+    int i=0;
+    while (this->sceneNode->getCreator()->hasSceneNode(nodeName.str()))
     {
-      std::cout << "MIN[" << min << "] MAX[" << max<< "]\n";
+      nodeName << "_" << i;
+      i++;
     }
 
+    this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str()); 
 
-    this->boundingBoxNode = this->sceneNode->createChildSceneNode(this->GetName()+"_AABB_NODE"); 
     this->boundingBoxNode->setInheritScale(false);
 
-    this->odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName()+"_AABB", "unit_box"));
+    this->odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box"));
 
     this->boundingBoxNode->attachObject(this->odeObj);
     Vector3 diff = max-min;
@@ -217,7 +224,7 @@ void Geom::Update()
 
   this->UpdateChild();
 
-  this->SetPose(this->GetPose());
+  //this->SetPose(this->GetPose());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,8 +268,16 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     Pose3d localPose;
     dQuaternion q;
 
-    // Transform into CoM relative Pose
+        // Transform into CoM relative Pose
     localPose = pose - this->body->GetCoMPose();
+    
+    if (this->GetName() == "pyramid_geom")
+    {
+      std::cout << "Pose to Set[" << pose << "]";
+      std::cout << "Body COM[" << this->body->GetCoMPose() << "]\n";
+      std::cout << "Local Pose[" << localPose << "]\n";
+    }
+
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;

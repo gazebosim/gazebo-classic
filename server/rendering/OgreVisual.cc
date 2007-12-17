@@ -50,38 +50,54 @@ void OgreVisual::Load(XMLConfigNode *node)
   std::ostringstream stream;
   Pose3d pose;
   Vector3 size;
+  Ogre::Vector3 meshSize;
 
   std::string meshName = node->GetString("mesh","",1);
   std::string materialName = node->GetString("material","",0);
 
+  // Read the desired position and rotation of the mesh
   pose.pos = node->GetVector3("xyz", Vector3(0,0,0));
   pose.rot = node->GetRotation("rpy", Quatern());
 
- 
+
+  // Create a unique name for the scene node
   stream << this->parentNode->getName() << "_VISUAL_" << this->parentNode->numChildren();
 
+  // Create the scene node
   this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
 
+  // Create the entity
   stream << "_ENTITY";
   this->entity = this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
 
+  // Attach the entity to the node
   this->sceneNode->attachObject(this->entity);
+  
+  // Get the size of the mesh
+  meshSize = this->entity->getBoundingBox().getSize();
 
-  Ogre::Vector3 meshSize = this->entity->getBoundingBox().getSize();
-
+  // Get the desired size of the mesh
   if (node->GetChild("size") != NULL)
-  {
     size = node->GetVector3("size",Vector3(1,1,1));
+  else
+    size = Vector3(meshSize.z, meshSize.x, meshSize.y);
+
+  // Get and set teh desired scale of the mesh
+  if (node->GetChild("scale") != NULL)
+  {
+    Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
+
+    this->sceneNode->setScale(scale.y, scale.z, scale.x);
   }
   else
   {
-    size = Vector3(meshSize.z, meshSize.x, meshSize.y);
+    this->sceneNode->setScale(size.y/meshSize.x, size.z/meshSize.y, size.x/meshSize.z);
   }
 
-  this->sceneNode->setScale(size.y/meshSize.x, size.z/meshSize.y, size.x/meshSize.z);
-
+  // Set the pose of the scene node
   OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, pose);
 
+  // Set the material of the mesh
   this->SetMaterial(node->GetString("material","",0));
 }
 
