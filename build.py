@@ -2,6 +2,8 @@ import sys
 import SCons.Util
 import SCons.SConf as SConf
 import string
+import os
+import re
 
 version = '0.8-pre1'
 
@@ -76,4 +78,22 @@ def createGazeborc(target, source, env):
 
 
 
+
+#
+# Add optimizations to compiler flags based on the architecture
+#
+#TODO:search architecture
+def optimize_for_cpu(env):
+  cpuAtr = ['mmx', 'sse', 'sse2', 'sse3', '3dnow']
+  line_atr =""
+  if (os.path.isfile("/proc/cpuinfo")):
+    f_proc = open("/proc/cpuinfo")
+    for line in f_proc:
+      if (re.match('flags', line)): 
+        for atr in cpuAtr:
+          if (re.search(atr, line)):
+            line_atr+= "-m" + atr + " "
+            
+  env['CCFLAGS'] += Split (line_atr)
+  print "detected CPU atributes: " +line_atr
 

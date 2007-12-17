@@ -1,5 +1,5 @@
 import os
-Import('env install_prefix staticObjs sharedObjs')
+Import('env install_prefix staticObjs sharedObjs subdirs')
 
 parseConfigs = ['pkg-config --cflags --libs playerc++']
 
@@ -32,20 +32,21 @@ for cfg in parseConfigs:
       print "\n================================================================"
       print "Player not found, bindings will not be built."
       print "  To install player visit(http://playerstage.sourceforge.net)"
-      subdirs.remove('player')
       print "================================================================"
+      subdirs.remove('player')
       Return
       #time.sleep(3)
 
-
-staticPlayerObjs = playerEnv.StaticObject(sources)
-sharedPlayerObjs = playerEnv.SharedObject(sources)
-
-staticPlayerObjs.append(staticObjs);
-sharedPlayerObjs.append(sharedObjs);
-
-sharedLib = playerEnv.SharedLibrary('gazeboplugin', sharedPlayerObjs)
-staticLib = playerEnv.StaticLibrary('gazeboplugin', staticPlayerObjs)
-
-env.Install(install_prefix+'/lib', sharedLib)
-env.Install(install_prefix+'/lib', staticLib)
+if ('player' in subdirs):
+  
+  staticPlayerObjs = playerEnv.StaticObject(sources)
+  sharedPlayerObjs = playerEnv.SharedObject(sources)
+  
+  staticPlayerObjs.append(staticObjs);
+  sharedPlayerObjs.append(sharedObjs);
+  
+  sharedLib = playerEnv.SharedLibrary('gazeboplugin', sharedPlayerObjs)
+  staticLib = playerEnv.StaticLibrary('gazeboplugin', staticPlayerObjs)
+  
+  env.Install(install_prefix+'/lib', sharedLib)
+  env.Install(install_prefix+'/lib', staticLib)
