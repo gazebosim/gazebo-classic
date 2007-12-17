@@ -5,7 +5,6 @@
 #include <FL/Fl_Menu_Bar.H>
 
 #include <GL/glx.h>
-#include <boost/thread/thread.hpp>
 
 #include "World.hh"
 #include "FLTKMainWindow.hh"
