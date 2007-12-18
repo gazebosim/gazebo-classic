@@ -19,13 +19,13 @@
  *
  */
 /*
- * Desc: Position2d controller for a Pioneer2dx.
+ * Desc: Position2d controller for a Differential drive.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN: $Id$
+ * SVN: $Id: Differential_Position2d.hh 198 2007-12-18 00:20:58Z natepak $
  */
-#ifndef PIONEER2DX_POSITION2D_HH
-#define PIONEER2DX_POSITION2D_HH
+#ifndef DIFFERENTIAL_POSITION2D_HH
+#define DIFFERENTIAL_POSITION2D_HH
 
 
 #include "Controller.hh"
@@ -60,13 +60,13 @@ namespace gazebo
 
 /// \brief Pioneer 2 DX Position2D controller.
 /// This is a controller that simulates a Pioneer 2DX motion
-class Pioneer2dx_Position2d : public Controller
+class Differential_Position2d : public Controller
 {
   /// Constructor
-  public: Pioneer2dx_Position2d(Entity *parent );
+  public: Differential_Position2d(Entity *parent );
 
   /// Destructor
-  public: virtual ~Pioneer2dx_Position2d();
+  public: virtual ~Differential_Position2d();
 
   /// Load the controller
   /// \param node XML config node

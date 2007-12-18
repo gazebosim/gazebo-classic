@@ -19,10 +19,10 @@
  *
  */
 /*
- * Desc: Position2d controller for a Pioneer2dx.
+ * Desc: Position2d controller for a Differential drive.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN info: $Id$
+ * SVN info: $Id: Differential_Position2d.cc 198 2007-12-18 00:20:58Z natepak $
  */
 
 #include "Global.hh"
@@ -33,23 +33,23 @@
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
-#include "Pioneer2dx_Position2d.hh"
+#include "Differential_Position2d.hh"
 
 using namespace gazebo;
 
-GZ_REGISTER_STATIC_CONTROLLER("pioneer2dx_position2d", Pioneer2dx_Position2d);
+GZ_REGISTER_STATIC_CONTROLLER("differential_position2d", Differential_Position2d);
 
 enum {RIGHT, LEFT};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Pioneer2dx_Position2d::Pioneer2dx_Position2d(Entity *parent )
+Differential_Position2d::Differential_Position2d(Entity *parent )
   : Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 
   if (!this->myParent)
-    gzthrow("Pioneer2dx_Position2d controller requires a Model as its parent");
+    gzthrow("Differential_Position2d controller requires a Model as its parent");
 
   this->enableMotors = true;
 
@@ -59,18 +59,18 @@ Pioneer2dx_Position2d::Pioneer2dx_Position2d(Entity *parent )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Pioneer2dx_Position2d::~Pioneer2dx_Position2d()
+Differential_Position2d::~Differential_Position2d()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the controller
-void Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
+void Differential_Position2d::LoadChild(XMLConfigNode *node)
 {
   this->myIface = dynamic_cast<PositionIface*>(this->ifaces[0]);
 
   if (!this->myIface)
-    gzthrow("Pioneer2dx_Position2d controller requires a PositionIface");
+    gzthrow("Differential_Position2d controller requires a PositionIface");
 
   // the defaults are from pioneer2dx
   this->wheelSep = node->GetFloat("wheelSeparation", 0.34,1);
@@ -93,7 +93,7 @@ void Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the controller
-void Pioneer2dx_Position2d::InitChild()
+void Differential_Position2d::InitChild()
 {
   // Reset odometric pose
   this->odomPose[0] = 0.0;
@@ -108,7 +108,7 @@ void Pioneer2dx_Position2d::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
+void Differential_Position2d::UpdateChild(UpdateParams &params)
 {
   bool opened = false;
 
@@ -164,14 +164,14 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the controller
-void Pioneer2dx_Position2d::FiniChild()
+void Differential_Position2d::FiniChild()
 {
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Get commands from the external interface
-void Pioneer2dx_Position2d::GetPositionCmd()
+void Differential_Position2d::GetPositionCmd()
 {
   double vr, va;
 
@@ -192,7 +192,7 @@ void Pioneer2dx_Position2d::GetPositionCmd()
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the data in the interface
-void Pioneer2dx_Position2d::PutPositionData()
+void Differential_Position2d::PutPositionData()
 {
   if (this->myIface->Lock(1))
   {
