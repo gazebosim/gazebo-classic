@@ -48,6 +48,9 @@ namespace gazebo
   <controller:pioneer2dx_position2d name="controller-name">
     <leftJoint>left-joint-name</leftJoint>
     <rightJoint>right-join-name</rightJoint>
+    <wheelDiameter>diameter_in_meters</wheelDiameter>
+    <wheelSeparation>separation_in_meters</wheelSeparation>
+    <torque></torque>
     <interface:position name="iface-name"/>
   </controller:pioneer2dx_position2d>
   \endverbatim
@@ -99,6 +102,9 @@ class Pioneer2dx_Position2d : public Controller
 
   /// Diameter of the wheels
   private: float wheelDiam;
+
+  ///Torque applied to the wheels
+  private: float torque;
 
   /// Speeds of the wheels
   private: float wheelSpeed[2];

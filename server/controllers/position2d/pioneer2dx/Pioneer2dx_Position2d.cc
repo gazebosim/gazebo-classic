@@ -72,8 +72,10 @@ void Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
   if (!this->myIface)
     gzthrow("Pioneer2dx_Position2d controller requires a PositionIface");
 
-  this->wheelSep = 0.34;
-  this->wheelDiam = 0.15;
+  // the defaults are from pioneer2dx
+  this->wheelSep = node->GetFloat("wheelSeparation", 0.34,1);
+  this->wheelDiam = node->GetFloat("wheelDiameter", 0.15,1);
+  this->torque = node->GetFloat("torque", 10.0, 1);
 
   std::string leftJointName = node->GetString("leftJoint", "", 1);
   std::string rightJointName = node->GetString("rightJoint", "", 1);
@@ -82,10 +84,10 @@ void Pioneer2dx_Position2d::LoadChild(XMLConfigNode *node)
   this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightJointName));
 
   if (!this->joints[LEFT])
-    gzthrow("couldn't get left hinge joint");
+    gzthrow("The controller couldn't get left hinge joint");
 
   if (!this->joints[RIGHT])
-    gzthrow("couldn't get right hinge joint");
+    gzthrow("The controller couldn't get right hinge joint");
 
 }
 
@@ -144,8 +146,8 @@ void Pioneer2dx_Position2d::UpdateChild(UpdateParams &params)
 
     this->joints[RIGHT]->SetParam( dParamVel, 
         this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
-    this->joints[LEFT]->SetParam( dParamFMax, 10.1 );
-    this->joints[RIGHT]->SetParam( dParamFMax, 10.1 );
+    this->joints[LEFT]->SetParam( dParamFMax, torque );
+    this->joints[RIGHT]->SetParam( dParamFMax, torque );
 
   }
   else

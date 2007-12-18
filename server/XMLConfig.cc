@@ -468,15 +468,14 @@ std::string XMLConfigNode::GetValue()
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a string value.
-std::string XMLConfigNode::GetString( const std::string &key, const std::string &def, 
-                                      int require)
+std::string XMLConfigNode::GetString( const std::string &key, const std::string &def, int require)
 {
   xmlChar *value = this->GetNodeValue( key );
 
   if (!value && require)
   {
     std::ostringstream stream;
-    stream << "unable to find required string attribute[" << key << "]";
+    stream << "unable to find required string attribute[" << key << "] in world file node[" << this->GetName() << "]";
     gzthrow(stream.str());
   }
   else if( !value )
@@ -494,7 +493,9 @@ unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int requ
 
   if (!value && require)
   {
-    return result;
+    std::ostringstream stream;
+    stream << "unable to find required char attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if( !value )
     return def;
@@ -509,8 +510,7 @@ unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int requ
 ///////////////////////////////////////////////////////////////////////////
 // Get a file name.  Always returns an absolute path.  If the filename
 // is entered as a relative path, we prepend the world file path.
-std::string XMLConfigNode::GetFilename( const std::string &key, const std::string &def, 
-                                        int require)
+std::string XMLConfigNode::GetFilename( const std::string &key, const std::string &def, int require)
 {
   std::string filename = this->GetString( key, def, require );
 
@@ -545,7 +545,9 @@ int XMLConfigNode::GetInt( const std::string &key, int def, int require )
 
   if (!value && require)
   {
-    return -1;
+    std::ostringstream stream;
+    stream << "unable to find required int attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if( !value )
     return def;
@@ -562,7 +564,9 @@ double XMLConfigNode::GetDouble( const std::string &key, double def, int require
 
   if (!value && require)
   {
-    return -1;
+    std::ostringstream stream;
+    stream << "unable to find required double attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if( !value )
     return def;
@@ -578,7 +582,9 @@ float XMLConfigNode::GetFloat( const std::string &key, float def, int require )
 
   if (!value && require)
   {
-    return -1;
+    std::ostringstream stream;
+    stream << "unable to find required float attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if( !value )
     return def;
@@ -597,7 +603,9 @@ bool XMLConfigNode::GetBool( const std::string &key, bool def, int require )
   if (!value && require)
   {
     xmlFree(value);
-    return -1;
+    std::ostringstream stream;
+    stream << "unable to find required bool attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if( !value )
   {
@@ -677,8 +685,8 @@ Vector2<int> XMLConfigNode::GetVector2i( const std::string &key, Vector2<int> de
   if (this->GetTupleString(key, 0, "") == "")
     return def;
 
-  v.x = this->GetTupleInt(key, 0, 0.0);
-  v.y = this->GetTupleInt(key, 1, 0.0);
+  v.x = this->GetTupleInt(key, 0, 0);
+  v.y = this->GetTupleInt(key, 1, 0);
 
   return v;
 }
