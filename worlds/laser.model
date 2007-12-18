@@ -21,20 +21,23 @@
     <geom:box name="laser_geom1">
       <xyz>0.0 0.0 0.0</xyz>
       <rpy>0 -90 0</rpy>
-      <mesh>sicklms200.mesh</mesh>
       <size>0.15 0.15 0.2</size>
-      <meshScale>0.08 0.08 0.08</meshScale>
       <mass>0.1</mass>
-      <material>Gazebo/Blue</material>
-    </geom:box>
 
-    <geom:cylinder name="laser_geom2">
-      <xyz>0.0 0.0 0.0</xyz>
-      <mesh>default</mesh>
-      <size>0.08 0.12</size>
-      <mass>0.0</mass>
-      <material>Gazebo/Black</material>
-    </geom:cylinder>
+      <visual>
+        <scale>0.1 0.07 0.07</scale>
+        <mesh>sicklms200.mesh</mesh>
+        <material>Gazebo/Blue</material>
+      </visual>
+
+      <visual>
+        <rpy>0 90 0</rpy>
+        <size>0.12 0.12 0.18</size>
+        <mesh>unit_cylinder</mesh>
+        <material>Gazebo/Black</material>
+      </visual>
+
+    </geom:box>
 
     <sensor:ray name="laser_1">
       <rayCount>180</rayCount>

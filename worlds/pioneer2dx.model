@@ -24,10 +24,36 @@
     <mass>2.0</mass>
 
     <visual>
+      <size>0.17 0.5 0.277</size>
+      <xyz>0 0 0.04</xyz>
       <rpy>0 90 90</rpy>
       <mesh>pioneer2dx/chassis.mesh</mesh>
       <material>Gazebo/Pioneer2Body</material>
     </visual>
+
+    <visual>
+      <xyz>0.015 0 0.09</xyz>
+      <rpy>0 90 -90</rpy>
+      <mesh>pioneer2at/chassis_top.mesh</mesh>
+      <material>Gazebo/Black</material>
+    </visual>
+
+    <visual>
+      <xyz>0.21 0.0 0.068</xyz>
+      <rpy>0 90 -90</rpy>
+      <size>0.034 0.12 0.29</size>
+      <mesh>pioneer2at/sonarbank.mesh</mesh>
+      <material>Gazebo/Gold</material>
+    </visual>
+
+    <visual>
+      <xyz>-0.178 0.0 0.068</xyz>
+      <rpy>0 90 90</rpy>
+      <size>0.034 0.12 0.29</size>
+      <mesh>pioneer2at/sonarbank.mesh</mesh>
+      <material>Gazebo/Gold</material>
+    </visual>
+
   </geom:box>
 </body:box>
 
@@ -44,6 +70,20 @@
       <mesh>pioneer2dx/tire.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
+
+    <visual>
+      <size> 0.073 0.073 0.05</size>
+      <mesh>pioneer2at/wheel.mesh</mesh>
+      <material>Gazebo/Gold</material>
+    </visual>
+
+    <visual>
+      <xyz>0 0 0.015</xyz>
+      <size>0.04 0.04 0.08</size>
+      <mesh>unit_cylinder</mesh>
+      <material>Gazebo/Black</material>
+    </visual>
+
   </geom:cylinder>
 </body:cylinder>
 
@@ -55,9 +95,24 @@
     <mass>0.1</mass>
 
     <visual>
+      <size> 0.125 0.125 0.05</size>
       <mesh>pioneer2dx/tire.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
+    <visual>
+      <size> 0.073 0.073 0.05</size>
+      <mesh>pioneer2at/wheel.mesh</mesh>
+      <material>Gazebo/Gold</material>
+    </visual>
+
+    <visual>
+      <xyz>0 0 -0.015</xyz>
+      <size>0.04 0.04 0.08</size>
+      <mesh>unit_cylinder</mesh>
+      <material>Gazebo/Black</material>
+    </visual>
+
+
   </geom:cylinder>
 
 </body:cylinder>
@@ -80,6 +135,7 @@
   <body1>left_wheel</body1>
   <body2>chassis_body</body2>
   <anchor>left_wheel</anchor>
+  <anchorOffset>0 0.04 0</anchorOffset>
   <axis>0 1 0</axis>
   <erp>0.8</erp>
   <cfm>10e-5</cfm>
@@ -89,6 +145,7 @@
   <body1>right_wheel</body1>
   <body2>chassis_body</body2>
   <anchor>right_wheel</anchor>
+  <anchorOffset>0 -0.04 0</anchorOffset>
   <axis>0 1 0</axis>
   <erp>0.8</erp>
   <cfm>10e-5</cfm>

@@ -32,7 +32,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>1.0 1.0 1.0 1.0</ambient>
+    <ambient>0.5 0.5 0.5 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -105,7 +105,7 @@
     </controller:differential_position2d>
 
     <model:physical name="laser">
-      <xyz>0 0 0.16</xyz>
+      <xyz>0.15 0 0.18</xyz>
 
       <attach>
         <parentBody>chassis_body</parentBody>
@@ -125,5 +125,17 @@
       <xi:include href="pioneer2dx.model" />
     </include>
   </model:physical>
+
+  <!-- White Directional light -->
+  <model:renderable name="directional_white">
+    <light>
+      <type>directional</type>
+      <direction>0 -0.6 0.4</direction>
+      <diffuseColor>1.0 1.0 1.0</diffuseColor>
+      <specularColor>0.2 0.2 0.2</specularColor>
+      <attenuation>1000 1.0 0.0 0</attenuation>
+    </light>
+  </model:renderable>
+
 
 </gazebo:world>
