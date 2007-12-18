@@ -27,7 +27,6 @@
 #ifndef GEOM_HH
 #define GEOM_HH
 
-//#include <Ogre.h>
 #include <ode/ode.h>
 
 #include "Entity.hh"
@@ -110,25 +109,6 @@ namespace gazebo
     /// \param rot Quaternion rotation
     public: void SetRotation(const Quatern &rot);
   
-    /// \brief Attach a mesh to the geom
-    /// \param meshName Name of the mesh
-    public: void AttachMesh(const std::string &meshName);
-  
-    /// \brief Attach a moveable object to the node
-    /// \param obj The moveable object
-    public: void AttachObject( Ogre::MovableObject *obj );
-  
-    /// \brief Set the scale of the mesh
-    /// \param scale New scale of the mesh
-    public: void ScaleMesh(const Vector3 &scale);
-  
-    /// \brief Set whether the mesh casts shadows
-    /// \param enable True=cast shadows
-    public: void SetCastShadows(bool enable);
-  
-    /// \brief Set the material to apply to the mesh
-    public: void SetMeshMaterial(const std::string &materialName);
-  
     /// \brief Set the category bits, used during collision detection
     /// \param bits The bits
     public: void SetCategoryBits(unsigned int bits);
@@ -186,17 +166,14 @@ namespace gazebo
     /// mass of the body
     protected: dMass bodyMass;
  
-    ///  Extra rotation, used for cylinders
-    protected: Quatern extraRotation;
-  
     private: int laserFiducialId;
     private: float laserRetro;
-
 
     ///  Mass as a double
     protected: double dblMass;
 
-    private: Ogre::SceneNode *boundingBoxNode;
+    /// Special bounding box visual
+    private: OgreVisual *bbVisual;
 
     private: float transparency;
 

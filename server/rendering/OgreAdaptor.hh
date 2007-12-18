@@ -65,6 +65,7 @@ class Entity;
 /// \brief Adptor to Ogre3d
 class OgreAdaptor : public SingletonT<OgreAdaptor>
 {
+
   /// \brief Constructor
   private: OgreAdaptor();
 

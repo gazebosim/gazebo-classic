@@ -181,6 +181,8 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
       return new BallJoint(this->worldId);
     case Joint::UNIVERSAL:
       return new UniversalJoint(this->worldId);
+    default:
+      return NULL;
   }
 }
 
@@ -195,7 +197,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
   ODEPhysics *self;
   int i;
-  //if (o1->body && o2->body) return;
+  int numc = 0;
 
   self = (ODEPhysics*) data;
 
@@ -220,7 +222,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     // up to MAX_CONTACTS contacts per box-box
     dContact contacts[64];
-    int numc = 0;
 
     for (i=0; i<64; i++) 
     {

@@ -25,7 +25,6 @@
  */
 
 #include <ode/ode.h>
-#include <Ogre.h>
 
 #include "OgreSimpleShape.hh"
 #include "Body.hh"
@@ -58,17 +57,4 @@ void SphereGeom::LoadChild(XMLConfigNode *node)
 
   // Create the sphere geometry
   this->SetGeom(dCreateSphere(0, radius ), true);
-
-  // Get the sphere mesh
-  /*if (this->meshName.empty() || this->meshName == "default")
-    this->AttachMesh("unit_sphere");
-  else
-    this->AttachMesh(this->meshName);
-
-    */
-  // Set the size of the sphere
-  this->ScaleMesh(Vector3(radius,radius,radius));
-
-  // Allow the sphere to cast shadows
-  this->SetCastShadows(true);
 }

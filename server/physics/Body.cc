@@ -1,18 +1,43 @@
-#include <Ogre.h>
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: Body class
+ * Author: Nate Koenig
+ * Date: 13 Feb 2006
+ * SVN: $Id:$
+ */
+
 #include <sstream>
 
+#include "HeightmapGeom.hh"
+#include "OgreAdaptor.hh"
 #include "Vector2.hh"
 #include "Quatern.hh"
 #include "GazeboError.hh"
 #include "SensorFactory.hh"
 #include "Sensor.hh"
-#include "OgreAdaptor.hh"
 #include "SphereGeom.hh"
 #include "TrimeshGeom.hh"
 #include "BoxGeom.hh"
 #include "CylinderGeom.hh"
 #include "PlaneGeom.hh"
-#include "HeightmapGeom.hh"
 #include "Geom.hh"
 #include "Body.hh"
 
@@ -58,7 +83,7 @@ Body::~Body()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the body based on an XMLConfig node
-int Body::Load(XMLConfigNode *node)
+void Body::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
 
@@ -84,14 +109,6 @@ int Body::Load(XMLConfigNode *node)
     // Create and Load a sensor, which will belong to this body.
     this->LoadSensor(childNode);
     childNode = childNode->GetNextByNSPrefix("sensor");
-  }
-
-  childNode = node->GetChild("visual");
-
-  while (childNode)
-  {
-    this->LoadVisual(childNode);
-    childNode = childNode->GetNext("visual");
   }
 
   // If no geoms are attached, then don't let gravity affect the body.
@@ -124,7 +141,7 @@ void Body::SetGravityMode(bool mode)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the body
-int Body::Init()
+void Body::Init()
 {
   // Set the intial pose. Must do this to handle static models
   this->SetPose(this->GetPose());
@@ -135,13 +152,11 @@ int Body::Init()
   {
     (*siter)->Init();
   }
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the body
-int Body::Update(UpdateParams &params)
+void Body::Update(UpdateParams &params)
 {
   std::vector< Sensor* >::iterator sensorIter;
   std::vector< Geom* >::iterator geomIter;
@@ -165,8 +180,6 @@ int Body::Update(UpdateParams &params)
   {
     (*sensorIter)->Update(params);
   }
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -503,32 +516,4 @@ void Body::UpdateCoM()
 const Pose3d &Body::GetCoMPose() const
 {
   return this->comPose;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Load a renderable
-void Body::LoadVisual(XMLConfigNode *node)
-{
-  std::ostringstream stream;
-  Ogre::SceneNode *snode = NULL;
-  Ogre::Entity *entity;
-  Pose3d pose;
-
-  std::string name = node->GetString("name","",1);
-  std::string meshName = node->GetString("mesh","",1);
-  std::string materialName = node->GetString("material","",0);
-
-  pose.pos = node->GetVector3("xyz", Vector3(0,0,0));
-  pose.rot = node->GetRotation("rpy", Quatern());
-
-  snode = this->sceneNode->createChildSceneNode( name );
-
-  stream << "VISUAL_" << name;
-  entity = snode->getCreator()->createEntity(stream.str(), meshName);
-
-  snode->attachObject(entity);
-
-  OgreAdaptor::Instance()->SetSceneNodePose(snode,pose);
-
-  this->visuals.push_back( snode );
 }

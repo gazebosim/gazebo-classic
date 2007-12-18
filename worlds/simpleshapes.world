@@ -46,6 +46,7 @@
         <mass>1.0</mass>
 
         <visual>
+          <scale>0.5 0.5 0.5</scale>
           <mesh>unit_sphere</mesh>
           <material>Gazebo/Rocky</material>
         </visual>

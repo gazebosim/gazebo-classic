@@ -33,8 +33,6 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
 env = Environment (
   CC = 'g++',
 
-  CCFLAGS = Split ('-O3'),
-
   CPPPATH = [
    '#.', 
    '#server',
@@ -87,6 +85,9 @@ if env['mode'] == 'debug':
   env['CCFLAGS'] += Split('-ggdb -g3')
 elif env['mode'] == 'profile':
   env['CCFLAGS'] += Split('-p -pg') 
+elif env['mode'] == 'optimized':
+  env['CCFLAGS'] += Split('-O3') 
+
 
 optimize_for_cpu(env);
 

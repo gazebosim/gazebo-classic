@@ -96,6 +96,7 @@ void Generic_Camera::PutCameraData()
   const unsigned char *src;
   unsigned char *dst;
   int i, j, k;
+  Pose3d cameraPose;
 
   this->cameraIface->Lock(1);
 
@@ -105,7 +106,19 @@ void Generic_Camera::PutCameraData()
   data->width = this->myParent->GetImageWidth();
   data->height = this->myParent->GetImageHeight();
   data->image_size = data->width * data->height * 3;
-  
+
+   // GetFOV() returns radians
+  data->hfov = this->myParent->GetFOV(); 
+
+  // Set the pose of the camera
+  cameraPose = this->myParent->GetWorldPose();
+  data->camera_pose.pos.x = cameraPose.pos.x;
+  data->camera_pose.pos.y = cameraPose.pos.y;
+  data->camera_pose.pos.z = cameraPose.pos.z;
+  data->camera_pose.roll = cameraPose.rot.GetRoll();
+  data->camera_pose.pitch = cameraPose.rot.GetPitch();
+  data->camera_pose.yaw = cameraPose.rot.GetYaw();
+ 
   // Make sure there is room to store the image
   assert (data->image_size <= sizeof(data->image));
 

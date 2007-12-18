@@ -46,6 +46,7 @@ namespace gazebo
   class XMLConfigNode;
   class Model;
   class OgreDynamicLines;
+  class OgreVisual; 
 
   /// \brief Base class for all joints
   class Joint
@@ -126,6 +127,8 @@ namespace gazebo
     private: std::string name;
 
     public: Ogre::SceneNode *sceneNode;
+
+    private: OgreVisual *visual;
 
     private: Model *model;
 

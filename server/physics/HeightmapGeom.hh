@@ -29,6 +29,7 @@
 
 #include <Ogre.h>
 
+#include "Vector2.hh"
 #include "Geom.hh"
 
 namespace gazebo

@@ -23,11 +23,10 @@
  * Date: 21 May 2003
  * CVS: $Id$
  */
-#include <Ogre.h>
-
-#include "Global.hh"
+#include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
 #include "OgreAdaptor.hh"
+#include "Global.hh"
 #include "Body.hh"
 #include "Model.hh"
 #include "Joint.hh"
@@ -38,7 +37,7 @@ using namespace gazebo;
 // Constructor
 Joint::Joint()
 {
-  this->sceneNode = NULL;
+  this->visual = NULL;
   this->model = NULL;
 }
 
@@ -72,21 +71,18 @@ void Joint::Load(XMLConfigNode *node)
   this->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.8,0));
 
   /// Add a renderable for the joint
-  this->sceneNode = this->model->GetSceneNode()->createChildSceneNode(this->GetName()+"_JOINT_NODE");
+  this->visual = new OgreVisual(this->model->GetSceneNode());
+  this->visual->AttachMesh("joint_anchor");
+  this->visual->SetVisible(false);
 
-  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(this->GetName()+"_JOINT", "joint_anchor"));
 
-  this->sceneNode->attachObject(odeObj);
-  //this->joints[joint->GetName()]->sceneNode->setScale(0.01, 0.01, 0.01);
-  this->sceneNode->setVisible(false);
+  this->line1 = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
+  this->line2 = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
+  this->line1->setMaterial("Gazebo/BlueEmissive");
+  this->line2->setMaterial("Gazebo/BlueEmissive");
 
-  this->line1 = new OgreDynamicLines(Ogre::RenderOperation::OT_LINE_LIST);
-  this->line2 = new OgreDynamicLines(Ogre::RenderOperation::OT_LINE_LIST);
-  this->line1->setMaterial("Gazebo/BlueLaser");
-  this->line2->setMaterial("Gazebo/BlueLaser");
-
-  this->sceneNode->attachObject(this->line1);
-  this->sceneNode->attachObject(this->line2);
+  this->visual->AttachObject(this->line1);
+  this->visual->AttachObject(this->line2);
 
   this->line1->AddPoint(Vector3(0,0,0));
   this->line1->AddPoint(Vector3(0,0,0));
@@ -101,9 +97,11 @@ void Joint::Update()
 {
   Vector3 start,end;
 
-  this->sceneNode->setVisible(Global::GetShowJoints());
-  OgreAdaptor::Instance()->SetSceneNodePosition(
-      this->sceneNode, this->GetAnchor());
+  this->visual->SetVisible(Global::GetShowJoints());
+  this->visual->SetPosition(this->GetAnchor());
+
+  //this->sceneNode->setVisible(Global::GetShowJoints());
+  //OgreAdaptor::Instance()->SetSceneNodePosition( this->sceneNode, this->GetAnchor());
 
   if (this->body1)
   {

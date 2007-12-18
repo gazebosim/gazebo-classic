@@ -12,6 +12,27 @@ namespace gazebo
 /// \brief Abstract base class providing mechanisms for dynamically growing hardware buffers.
 class OgreDynamicRenderable : public Ogre::SimpleRenderable
 {
+  public: enum OperationType 
+  {
+    /// A list of points, 1 vertex per point
+    OT_POINT_LIST = 0,//Ogre::RenderOperation::OT_POINT_LIST,
+
+    /// A list of lines, 2 vertices per line
+    OT_LINE_LIST = 1,//Ogre::RenderOperation::OT_LINE_LIST,
+
+    /// A strip of connected lines, 1 vertex per line plus 1 start vertex
+    OT_LINE_STRIP = 2,//Ogre::RenderOperation::OT_LINE_STRIP,
+
+    /// A list of triangles, 3 vertices per triangle
+    OT_TRIANGLE_LIST = 3,//Ogre::RenderOperation::OT_TRIANGLE_LIST,
+
+    /// A strip of triangles, 3 vertices for the first triangle, and 1 per triangle after that 
+    OT_TRIANGLE_STRIP = 4,//Ogre::RenderOperation::OT_TRIANGLE_STRIP,
+
+    /// A fan of triangles, 3 vertices for the first triangle, and 1 per triangle after that
+    OT_TRIANGLE_FAN = 5,//Ogre::RenderOperation::OT_TRIANGLE_FAN 
+  };
+
   /// \brief Constructor
   public: OgreDynamicRenderable();
 
@@ -25,13 +46,13 @@ class OgreDynamicRenderable : public Ogre::SimpleRenderable
   /// \param operationType The type of render operation to perform.
   /// \param useIndices Specifies whether to use indices to determine the
   /// vertices to use as input.
-  public: void Init(Ogre::RenderOperation::OperationType operationType, bool useIndices);
+  public: void Init(OperationType operationType, bool useIndices);
 
   /// \brief Set the render operation type
-  public: void SetOperationType(Ogre::RenderOperation::OperationType opType);
+  public: void SetOperationType(OperationType opType);
 
   /// \brief Get the render operation type
-  public: Ogre::RenderOperation::OperationType GetOperationType() const;
+  public: OgreDynamicRenderable::OperationType GetOperationType() const;
 
   /// \brief Implementation of Ogre::SimpleRenderable
   public: virtual Ogre::Real getBoundingRadius(void) const;

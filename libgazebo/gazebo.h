@@ -461,6 +461,12 @@ class CameraData
 
   /// Image pixel data
   public: unsigned char image[GAZEBO_CAMERA_MAX_IMAGE_SIZE];
+
+  /// Horizontal field of view of the camera in radians
+  public: double hfov;
+
+  /// Pose of the camera
+  public: Pose camera_pose;
   
 };
 

@@ -24,7 +24,6 @@
  * CVS: $Id$
  */
 
-#include <Ogre.h>
 #include <ode/ode.h>
 
 #include "Body.hh"
@@ -49,49 +48,13 @@ BoxGeom::~BoxGeom()
 /// Load the box
 void BoxGeom::LoadChild(XMLConfigNode *node)
 {
-  Vector3 meshScale;
   Vector3 size;
   
-  // Get the box mesh
-  /*if (this->meshName.empty() || this->meshName == "default")
-    this->AttachMesh("unit_box");
-  else
-    this->AttachMesh(this->meshName);
-
-  Ogre::Vector3 ogreSize = this->ogreObj->getBoundingBox().getSize();
-
-  if (node->GetChild("size") == NULL)
-  {
-    size.x = ogreSize.z;
-    size.y = ogreSize.x;
-    size.z = ogreSize.y;
-  }
-  else
-    */
-    size = node->GetVector3("size",Vector3(1,1,1));
+  size = node->GetVector3("size",Vector3(1,1,1));
 
   // Initialize box mass matrix
   dMassSetBoxTotal(&this->mass, this->dblMass, size.x, size.y, size.z);
 
   // Create a box geometry with box mass matrix
   this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
-
-
-  /*if (node->GetChild("meshScale") == NULL)
-  {
-
-    meshScale.x = size.x / ogreSize.z;
-    meshScale.y = size.y / ogreSize.x;
-    meshScale.z = size.z / ogreSize.y;
-  }
-  else
-  {
-    meshScale = node->GetVector3("meshScale",Vector3(1,1,1));
-  }
-  */
-
-  //this->ScaleMesh(size);
-
-  // Allow the box to cast shadows
-  this->SetCastShadows(true);
 }

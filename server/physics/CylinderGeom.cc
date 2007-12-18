@@ -24,8 +24,6 @@
  * CVS: $Id$
  */
 
-#include <Ogre.h>
-
 #include "Body.hh"
 #include "CylinderGeom.hh"
 
@@ -55,23 +53,4 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
   dMassSetCylinderTotal(&this->mass, this->dblMass, 3, radius, length);
   
   this->SetGeom( dCreateCylinder( 0, radius, length ), true );
-
-  // Get the mesh
-  /*if (this->meshName.empty() || this->meshName == "default")
-    this->AttachMesh("unit_cylinder");
-  else
-    this->AttachMesh(this->meshName);
-
-  Ogre::Vector3 meshSize = this->ogreObj->getBoundingBox().getSize();
-
-  radius /= meshSize.x;
-  length /= meshSize.z;
-
-  */
-  // Set the size of the cylinder
-  //this->ScaleMesh(Vector3(radius*2,radius*2,length));
-  
-
-  // Allow it to cast shadows
-  this->SetCastShadows(true);
 }

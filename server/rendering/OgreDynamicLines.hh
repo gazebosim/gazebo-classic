@@ -42,7 +42,7 @@ namespace gazebo
 class OgreDynamicLines : public OgreDynamicRenderable
 {
   /// Constructor
-  public: OgreDynamicLines(Ogre::RenderOperation::OperationType opType=Ogre::RenderOperation::OT_LINE_STRIP);
+  public: OgreDynamicLines(OperationType opType=OT_LINE_STRIP);
 
   /// Destructor
   public: virtual ~OgreDynamicLines();
@@ -70,21 +70,6 @@ class OgreDynamicLines : public OgreDynamicRenderable
 
   /// Call this to update the hardware buffer after making changes.  
   public: void Update();
-
-  /// Set the type of operation to draw with.
-  /// @param opType Can be one of 
-  ///    - RenderOperation::OT_LINE_STRIP
-  ///    - RenderOperation::OT_LINE_LIST
-  ///    - RenderOperation::OT_POINT_LIST
-  ///    - RenderOperation::OT_TRIANGLE_LIST
-  ///    - RenderOperation::OT_TRIANGLE_STRIP
-  ///   - RenderOperation::OT_TRIANGLE_FAN
-  ///   The default is OT_LINE_STRIP.
-  public: void SetOperationType(Ogre::RenderOperation::OperationType opType);
-
-  /// Get the operation type
-  /// \return The operation type
-  public: Ogre::RenderOperation::OperationType GetOperationType() const;
 
   /// \brief Implementation DynamicRenderable, creates a simple vertex-only decl
   protected: virtual void  CreateVertexDeclaration();

@@ -177,17 +177,9 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
     }
   }
 
- /*this->AttachMesh(meshName);
-
-  this->ScaleMesh(Vector3(scale.x, scale.y, scale.z));
-
-  // Allow the sphere to cast shadows
-  this->SetCastShadows(true);
-  */
-  
+ 
   /// This will hold the vertex data of the triangle mesh
   this->odeData = dGeomTriMeshDataCreate();
-
 
   // Build the ODE triangle mesh
   dGeomTriMeshDataBuildSingle( this->odeData, 

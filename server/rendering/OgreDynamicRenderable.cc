@@ -21,11 +21,11 @@ OgreDynamicRenderable::~OgreDynamicRenderable()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initializes the dynamic renderable.
-void OgreDynamicRenderable::Init(Ogre::RenderOperation::OperationType operationType, bool useIndices)
+void OgreDynamicRenderable::Init(OperationType operationType, bool useIndices)
 {
+  this->SetOperationType(operationType);
 
   // Initialize render operation
-  this->mRenderOp.operationType = operationType;
   this->mRenderOp.useIndexes = useIndices;
   this->mRenderOp.vertexData = new Ogre::VertexData;
 
@@ -42,16 +42,60 @@ void OgreDynamicRenderable::Init(Ogre::RenderOperation::OperationType operationT
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the render operation type
-void OgreDynamicRenderable::SetOperationType(Ogre::RenderOperation::OperationType opType)
+void OgreDynamicRenderable::SetOperationType(OperationType opType)
 {
-  this->mRenderOp.operationType = opType;
+  switch (opType)
+  {
+    case OT_POINT_LIST:
+      this->mRenderOp.operationType = Ogre::RenderOperation::OT_POINT_LIST;
+      break;
+
+    case OT_LINE_LIST:
+      this->mRenderOp.operationType = Ogre::RenderOperation::OT_LINE_LIST;
+      break;
+
+    case OT_LINE_STRIP:
+      this->mRenderOp.operationType = Ogre::RenderOperation::OT_LINE_STRIP;
+      break;
+
+    case OT_TRIANGLE_LIST:
+      this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
+      break;
+
+    case OT_TRIANGLE_STRIP:
+      this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
+      break;
+
+    case OT_TRIANGLE_FAN:
+      this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
+      break;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the render operation type
-Ogre::RenderOperation::OperationType OgreDynamicRenderable::GetOperationType() const
+OgreDynamicRenderable::OperationType OgreDynamicRenderable::GetOperationType() const
 {
-  return this->mRenderOp.operationType;
+  switch (this->mRenderOp.operationType)
+  {
+    case Ogre::RenderOperation::OT_POINT_LIST:
+      return OT_POINT_LIST;
+
+    case Ogre::RenderOperation::OT_LINE_LIST:
+      return OT_LINE_LIST;
+
+    case Ogre::RenderOperation::OT_LINE_STRIP:
+      return OT_LINE_STRIP;
+
+    case Ogre::RenderOperation::OT_TRIANGLE_LIST:
+      return OT_TRIANGLE_LIST;
+
+    case Ogre::RenderOperation::OT_TRIANGLE_STRIP:
+      return OT_TRIANGLE_STRIP;
+
+    case Ogre::RenderOperation::OT_TRIANGLE_FAN:
+      return OT_TRIANGLE_FAN;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

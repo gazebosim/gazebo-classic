@@ -26,9 +26,9 @@
 
 #include <assert.h>
 #include <float.h>
-#include <Ogre.h>
 #include <ode/ode.h>
 
+#include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
 #include "Body.hh"
 #include "RayGeom.hh"
@@ -44,16 +44,18 @@ RayGeom::RayGeom( Body *body )
 
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
+
+  this->visual = new OgreVisual(this->sceneNode);
  
-  this->line = new OgreDynamicLines(Ogre::RenderOperation::OT_LINE_LIST);
+  this->line = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
 
   // Add two points
   this->line->AddPoint(Vector3(0,0,0));
   this->line->AddPoint(Vector3(0,0,0));
 
-  this->AttachObject(this->line);
+  this->visual->AttachObject(this->line);
 
-  this->line->setMaterial("Gazebo/RedEmissive");
+  this->line->setMaterial("Gazebo/BlueEmissive");
 
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;

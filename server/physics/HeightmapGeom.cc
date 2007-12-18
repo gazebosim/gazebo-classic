@@ -74,7 +74,7 @@ double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
 // Create a lookup table of the terrain's height
 void HeightmapGeom::FillHeightMap()
 {
-  int x,y;
+  unsigned int x,y;
   double h;
 
   // Resize the vector to match the size of the vertices

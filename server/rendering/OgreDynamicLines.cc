@@ -36,7 +36,7 @@ using namespace gazebo;
 
 enum { POSITION_BINDING, TEXCOORD_BINDING };
 
-OgreDynamicLines::OgreDynamicLines(Ogre::RenderOperation::OperationType opType)
+OgreDynamicLines::OgreDynamicLines(OperationType opType)
 {
   this->Init(opType, false);
   this->setCastShadows(false);

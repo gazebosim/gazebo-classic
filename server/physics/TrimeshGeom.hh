@@ -31,6 +31,8 @@
 
 namespace gazebo
 {
+  class OgreVisual;
+
   /// \addtogroup gazebo_physics_geom
   /// \{
   /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
@@ -82,7 +84,6 @@ namespace gazebo
 
     ///  name of the mesh
     private: std::string meshName;
-
   };
 
   /// \}

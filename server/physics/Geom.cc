@@ -24,14 +24,13 @@
  * SVN: $Id$
  */
 
-#include <Ogre.h>
 #include <sstream>
 
 #include "OgreVisual.hh"
+#include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "ContactParams.hh"
-#include "OgreAdaptor.hh"
 #include "Body.hh"
 #include "Geom.hh"
 
@@ -53,22 +52,16 @@ Geom::Geom( Body *body)//, const std::string &name)
   this->geomId = NULL;
   this->transId = NULL;
 
-  this->ogreObj = NULL;
   this->odeObj = NULL;
 
   this->laserFiducialId = -1;
   this->laserRetro = 0.0;
 
-  // Most geoms don't need extra rotation. Cylinders do.
-  this->extraRotation.SetToIdentity();
-
-  this->boundingBoxNode = NULL;
+  this->bbVisual = NULL;
 
   // Zero out the mass
   dMassSetZero(&this->mass);
   dMassSetZero(&this->bodyMass);
-
-  //this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
 
   this->transparency = 0;
 }
@@ -134,40 +127,8 @@ void Geom::Load(XMLConfigNode *node)
     Vector3 min(aabb[0], aabb[2], aabb[4]);
     Vector3 max(aabb[1], aabb[3], aabb[5]);
 
-    std::ostringstream nodeName;
-
-    nodeName << this->GetName()<<"_AABB_NODE";
-
-    int i=0;
-    while (this->sceneNode->getCreator()->hasSceneNode(nodeName.str()))
-    {
-      nodeName << "_" << i;
-      i++;
-    }
-
-    this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str()); 
-
-    this->boundingBoxNode->setInheritScale(false);
-
-    this->odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box"));
-
-    this->boundingBoxNode->attachObject(this->odeObj);
-    Vector3 diff = max-min;
-
-    this->boundingBoxNode->setScale(diff.y, diff.z, diff.x);
-
-    Ogre::Entity *ent = NULL;
-    Ogre::SimpleRenderable *simple = NULL;
-
-    ent = dynamic_cast<Ogre::Entity*>(this->odeObj);
-    simple = dynamic_cast<Ogre::SimpleRenderable*>(this->odeObj);
-
-    if (ent)
-      ent->setMaterialName("Gazebo/TransparentTest");
-    else if (simple)
-      simple->setMaterial("Gazebo/TransparentTest");
-
-    this->boundingBoxNode->setVisible(false);
+    this->bbVisual = new OgreVisual(this->sceneNode);
+    this->bbVisual->AttachBoundingBox(min,max);
   }
 }
  
@@ -209,8 +170,8 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 
 void Geom::Update()
 {
-  if (this->boundingBoxNode)
-    this->boundingBoxNode->setVisible(Global::GetShowBoundingBoxes());
+  if (this->bbVisual)
+    this->bbVisual->SetVisible(Global::GetShowBoundingBoxes());
 
   if (!Global::GetShowJoints())
   {
@@ -325,8 +286,6 @@ Pose3d Geom::GetPose() const
     pose.rot.y = r[2];
     pose.rot.z = r[3];
 
-    //pose.rot = pose.rot * this->extraRotation.GetInverse();
-
     // Transform into body relative pose
     pose += this->body->GetCoMPose();
   }
@@ -356,113 +315,6 @@ void Geom::SetRotation(const Quatern &rot)
   pose = this->GetPose();
   pose.rot = rot;
   this->SetPose(pose);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Attach a mesh to the geom
-void Geom::AttachMesh(const std::string &meshName)
-{
-  std::ostringstream stream;
-  stream << "Geom_" << this->GetName() << ":" << (long)this->geomId;
-
-  this->ogreObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
-
-  this->sceneNode->attachObject((Ogre::Entity*)this->ogreObj);
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Attach a moveable object to the node
-void Geom::AttachObject( Ogre::MovableObject *obj )
-{
-  this->ogreObj = obj;
-  this->sceneNode->attachObject(this->ogreObj);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the scale of the mesh
-void Geom::ScaleMesh(const Vector3 &scale)
-{
-  // The ordering of the vector is converted to OGRE's coordinate system
-  this->sceneNode->setScale(scale.y, scale.z, scale.x);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether the mesh casts shadows
-void Geom::SetCastShadows(bool enable)
-{
-  if (this->ogreObj)
-    this->ogreObj->setCastShadows(enable);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the material to apply to the mesh
-void Geom::SetMeshMaterial(const std::string &materialName)
-{
-/*  Ogre::Entity *ent = NULL;
-  Ogre::SimpleRenderable *simple = NULL;
-
-  if (materialName.empty())
-    return;
-
-  try
-  {
-    // Get the original material
-    this->origMaterial= Ogre::MaterialManager::getSingleton().getByName (materialName);;
-  }
-  catch (Ogre::Exception e)
-  {
-    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry[" 
-      << this->GetName() << ". Object will appear white.\n";
-    return;
-  }
-
-  if (this->origMaterial.isNull())
-  {
-    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry[" 
-      << this->GetName() << ". Object will appear white\n";
-    return;
-  }
-
-  
-  // Create a custom material name
-  std::string myMaterialName = this->GetName() + "_MATERIAL_" + materialName;
-
-  // Clone the material. This will allow us to change the look of each geom
-  // individually.
-  this->myMaterial = this->origMaterial->clone(myMaterialName);
-
-  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
-
-  while (techniqueIt.hasMoreElements ()) 
-  {
-    Ogre::Technique *t = techniqueIt.getNext ();
-    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-    while (passIt.hasMoreElements ()) 
-    {
-      passIt.peekNext ()->setDepthWriteEnabled (true);
-      passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
-      passIt.moveNext ();
-    }
-  }
-
-  ent = dynamic_cast<Ogre::Entity*>(this->ogreObj);
-  simple = dynamic_cast<Ogre::SimpleRenderable*>(this->ogreObj);
-
-  try
-  {
-    if (ent)
-      ent->setMaterialName(myMaterialName);
-    else if (simple)
-      simple->setMaterial(myMaterialName);
-  } catch (Ogre::Exception e)
-  { 
-    gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry[" 
-             << this->GetName() << ". Object will appear white.\n";
-  }
-  */
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

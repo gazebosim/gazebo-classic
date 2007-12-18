@@ -258,7 +258,7 @@ material Gazebo/RedEmissive
 	}
 }
 
-material Gazebo/BlueLaser
+material Gazebo/BlueEmissive
 {
 	receive_shadows off
 

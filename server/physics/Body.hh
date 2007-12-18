@@ -1,3 +1,29 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: Body class
+ * Author: Nate Koenig
+ * Date: 13 Feb 2006
+ * SVN: $Id:$
+ */
+
 #ifndef BODY_HH
 #define BODY_HH
 
@@ -10,11 +36,6 @@
 #include "XMLConfig.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
-
-namespace Ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {
@@ -37,18 +58,18 @@ class Body : public Entity
   /// \brief Load the body based on an XMLConfig node
   /// \param node XMLConfigNode pointer
   /// \return Nonzero on error
-  public: virtual int Load(XMLConfigNode *node);
+  public: virtual void Load(XMLConfigNode *node);
 
   /// \brief Initialize the body
   /// \return Non-zero on error
-  public: virtual int Init();
+  public: virtual void Init();
 
   /// \brief Finalize the body
   public: void Fini();
 
   /// \brief Update the body
   /// \return Non-zero on error
-  public: virtual int Update(UpdateParams &params);
+  public: virtual void Update(UpdateParams &params);
 
   /// \brief Attach a geom to this body
   /// \param geom Geometery to attach to this body
@@ -118,14 +139,10 @@ class Body : public Entity
   /// Mass properties of the object
   private: dMass mass;
 
-  private: std::string name;
-
   private: bool isStatic;
 
   private: Pose3d comPose;
   private: Pose3d staticPose;
-
-  private: std::vector<Ogre::SceneNode*> visuals;
 };
 
 /// \}

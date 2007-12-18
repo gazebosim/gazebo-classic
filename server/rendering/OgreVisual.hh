@@ -29,6 +29,10 @@
 
 #include <Ogre.h>
 
+#include "Pose3d.hh"
+#include "Quatern.hh"
+#include "Vector3.hh"
+
 namespace gazebo
 { 
 
@@ -43,14 +47,38 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~OgreVisual();
 
+    /// \brief Attach a renerable object to the visual
+    public: void AttachObject( Ogre::MovableObject *obj);
+
+    /// \brief Attach a mesh to this visual by name
+    public: void AttachMesh( const std::string &meshName );
+
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
 
     /// \brief Set the transparency
     public: void SetTransparency( float trans );
 
+    /// \brief Set whether the visual should cast shadows
+    public: void SetCastShadows(float shadows);
+
     /// \brief Set the material
-    private: void SetMaterial(const std::string &materialName);
+    public: void SetMaterial(const std::string &materialName);
+
+    /// \brief Set whether the visual is visible
+    public: void SetVisible(bool visible);
+
+    /// \brief Set the position of the visual
+    public: void SetPosition( const Vector3 &pos);
+
+    /// \brief Set the rotation of the visual
+    public: void SetRotation( const Quatern &rot);
+
+    /// \brief Set the pose of the visual
+    public: void SetPose( const Pose3d &pose);
+
+    /// \brief Create a bounding box for this visual
+    public: void AttachBoundingBox(const Vector3 &min, const Vector3 &max);
 
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
@@ -58,7 +86,7 @@ namespace gazebo
 
     private: Ogre::SceneNode *parentNode;
     private: Ogre::SceneNode *sceneNode;
-    private: Ogre::Entity *entity;
+    private: Ogre::SceneNode *boundingBoxNode;
 
     private: float transparency;
   };

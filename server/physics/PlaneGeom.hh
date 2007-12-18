@@ -33,6 +33,7 @@
 
 namespace gazebo
 {
+  class OgreVisual;
 
   /// \addtogroup gazebo_physics_geom
   /// \{
@@ -94,7 +95,8 @@ namespace gazebo
 
     /// \brief Load the plane
     public: virtual void LoadChild(XMLConfigNode *node);
-  
+
+    private: OgreVisual *visual;
   };
   
   /// \}

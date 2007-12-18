@@ -30,6 +30,7 @@
 #include <math.h>
 #include <Ogre.h>
 
+#include "OgreVisual.hh"
 #include "Body.hh"
 #include "ContactParams.hh"
 #include "PlaneGeom.hh"
@@ -89,17 +90,9 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
       uvTile.x, uvTile.y, 
       Ogre::Vector3(perp.y, perp.z, perp.x));
 
-  //this->AttachMesh(this->GetName());
-  
-  std::ostringstream stream;
-  stream << "Geom_" << this->GetName() << ":" << (long)this->geomId;
-
-  Ogre::Entity *entity = this->sceneNode->getCreator()->createEntity(stream.str(), this->GetName());
-  this->sceneNode->attachObject(entity);
-
-  entity->setMaterialName(node->GetString("material","",1));
-
-  this->SetCastShadows(false);
+  this->visual = new OgreVisual(this->sceneNode);
+  this->visual->AttachMesh(this->GetName());
+  this->visual->SetMaterial(node->GetString("material","",1));
 
   this->contact->kp = dInfinity;
   this->contact->kd = 0;

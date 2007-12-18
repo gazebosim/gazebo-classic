@@ -313,11 +313,6 @@ int Init()
   // Load the messaging system
   gazebo::GazeboMessage::Instance()->Load(xmlFile->GetRootNode());
 
-  // Register all the factories
-  //gazebo::SensorFactory::RegisterAll();
-  //gazebo::IfaceFactory::RegisterAll();
-  //gazebo::ControllerFactory::RegisterAll();
-
   childNode = xmlFile->GetRootNode()->GetChild("gui");
 
   if (childNode)

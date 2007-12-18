@@ -33,9 +33,19 @@ using namespace gazebo;
 
 OgreVisual::OgreVisual(Ogre::SceneNode *node)
 {
+
+  std::ostringstream stream;
   this->parentNode = node;
 
   this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
+
+  // Create a unique name for the scene node
+  stream << this->parentNode->getName() << "_VISUAL_" << this->parentNode->numChildren();
+
+  // Create the scene node
+  this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
+
+  this->boundingBoxNode = NULL;
 }
 
 /// \brief Destructor
@@ -51,6 +61,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   Pose3d pose;
   Vector3 size;
   Ogre::Vector3 meshSize;
+  Ogre::MovableObject *obj;
 
   std::string meshName = node->GetString("mesh","",1);
   std::string materialName = node->GetString("material","",0);
@@ -60,21 +71,15 @@ void OgreVisual::Load(XMLConfigNode *node)
   pose.rot = node->GetRotation("rpy", Quatern());
 
 
-  // Create a unique name for the scene node
-  stream << this->parentNode->getName() << "_VISUAL_" << this->parentNode->numChildren();
-
-  // Create the scene node
-  this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
-
   // Create the entity
-  stream << "_ENTITY";
-  this->entity = this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
+  stream << this->sceneNode->getName() << "_ENTITY";
+  obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
 
   // Attach the entity to the node
-  this->sceneNode->attachObject(this->entity);
+  this->AttachObject(obj);  
   
   // Get the size of the mesh
-  meshSize = this->entity->getBoundingBox().getSize();
+  meshSize = obj->getBoundingBox().getSize();
 
   // Get the desired size of the mesh
   if (node->GetChild("size") != NULL)
@@ -99,15 +104,36 @@ void OgreVisual::Load(XMLConfigNode *node)
 
   // Set the material of the mesh
   this->SetMaterial(node->GetString("material","",0));
+
+  // Allow the sphere to cast shadows
+  this->SetCastShadows(true);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Attach a renerable object to the visual
+void OgreVisual::AttachObject( Ogre::MovableObject *obj)
+{
+  this->sceneNode->attachObject(obj);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Attach a mesh to this visual by name
+void OgreVisual::AttachMesh( const std::string &meshName )
+{
+  std::ostringstream stream;
+  Ogre::MovableObject *obj;
+  stream << this->sceneNode->getName() << "_ENTITY_" << meshName;
+
+  obj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
+
+  this->sceneNode->attachObject((Ogre::Entity*)obj);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the material
 void OgreVisual::SetMaterial(const std::string &materialName)
 {
-  Ogre::Entity *ent = NULL;
-  Ogre::SimpleRenderable *simple = NULL;
-
   if (materialName.empty())
     return;
 
@@ -154,14 +180,22 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 
   try
   {
-    if (this->entity)
-      this->entity->setMaterialName(myMaterialName);
-  } catch (Ogre::Exception e)
+    for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+    {
+      Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+
+      if (dynamic_cast<Ogre::Entity*>(obj))
+        ((Ogre::Entity*)obj)->setMaterialName(myMaterialName);
+      else
+        ((Ogre::SimpleRenderable*)obj)->setMaterial(myMaterialName);
+    }
+    
+  } 
+  catch (Ogre::Exception e)
   { 
     gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry[" 
              << this->sceneNode->getName() << ". Object will appear white.\n";
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -226,4 +260,82 @@ void OgreVisual::SetTransparency( float trans )
 
     ++i;
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether the visual should cast shadows
+void OgreVisual::SetCastShadows(float shadows)
+{
+  for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+  {
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
+    obj->setCastShadows(shadows);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether the visual is visible
+void OgreVisual::SetVisible(bool visible)
+{
+  this->sceneNode->setVisible( visible );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the position of the visual
+void OgreVisual::SetPosition( const Vector3 &pos)
+{
+  OgreAdaptor::Instance()->SetSceneNodePosition( this->sceneNode, pos);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the rotation of the visual
+void OgreVisual::SetRotation( const Quatern &rot)
+{
+  OgreAdaptor::Instance()->SetSceneNodeRotation( this->sceneNode, rot);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the pose of the visual
+void OgreVisual::SetPose( const Pose3d &pose)
+{
+  OgreAdaptor::Instance()->SetSceneNodePose( this->sceneNode, pose);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///  Create a bounding box for this visual
+void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
+{
+  std::ostringstream nodeName;
+
+  nodeName << this->sceneNode->getName()<<"_AABB_NODE";
+
+  int i=0;
+  while (this->sceneNode->getCreator()->hasSceneNode(nodeName.str()))
+  {
+    nodeName << "_" << i;
+    i++;
+  }
+
+  this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str()); 
+  this->boundingBoxNode->setInheritScale(false);
+
+  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box"));
+
+  this->boundingBoxNode->attachObject(odeObj);
+  Vector3 diff = max-min;
+
+  this->boundingBoxNode->setScale(diff.y, diff.z, diff.x);
+
+  Ogre::Entity *ent = NULL;
+  Ogre::SimpleRenderable *simple = NULL;
+
+  ent = dynamic_cast<Ogre::Entity*>(odeObj);
+  simple = dynamic_cast<Ogre::SimpleRenderable*>(odeObj);
+
+  if (ent)
+    ent->setMaterialName("Gazebo/TransparentTest");
+  else if (simple)
+    simple->setMaterial("Gazebo/TransparentTest");
+
+  this->boundingBoxNode->setVisible(false);
 }
