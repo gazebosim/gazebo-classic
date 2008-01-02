@@ -521,8 +521,8 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
   Ogre::Camera *camera;
   Ogre::Viewport *cviewport;
 
-
   camera = this->sceneMgr->createCamera(name);
+  camera->setDirection(0,0,1);
 
   camera->setNearClipDistance(nearClip);
   camera->setFarClipDistance(farClip);
@@ -536,6 +536,7 @@ Ogre::Camera *OgreAdaptor::CreateCamera(const std::string &name, double nearClip
   camera->setAspectRatio(
       Ogre::Real(cviewport->getActualWidth()) / 
       Ogre::Real(cviewport->getActualHeight()) );
+
 
   return camera;
 }

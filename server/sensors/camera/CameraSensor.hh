@@ -143,7 +143,6 @@ class CameraSensor : public Sensor
   private: Ogre::Viewport *viewport;
 
   private: Ogre::Camera *camera;
-  private: Ogre::SceneNode *translateYawNode;
   private: Ogre::SceneNode *pitchNode;
 
   private: std::string ogreTextureName;

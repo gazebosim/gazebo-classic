@@ -124,27 +124,6 @@ void CameraSensor::InitChild()
   // Create the camera
   this->camera = OgreAdaptor::Instance()->CreateCamera(this->GetName(),
       this->nearClip, this->farClip, this->renderTarget);
-  //this->camera = OgreAdaptor::Instance()->sceneMgr->createCamera(this->GetName());
-//  this->camera->setNearClipDistance(this->nearClip);
-  //this->camera->setFarClipDistance(this->farClip);
-
-
-  // Setup the viewport to use the texture
-  /*this->viewport = this->renderTarget->addViewport(this->camera);
-  this->viewport->setClearEveryFrame(true);
-  this->viewport->setBackgroundColour( Ogre::ColourValue::Black );
-  this->viewport->setOverlaysEnabled(false);
-
-  
-  this->camera->setAspectRatio(
-      Ogre::Real(this->viewport->getActualWidth()) / 
-      Ogre::Real(this->viewport->getActualHeight()) );
-  */
-
-  // TEST CODE
-  //this->camera->setPosition(5, 5, 0);
-  //this->camera->lookAt(0, 0, 0);
-
 
   Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
       this->ogreMaterialName,
@@ -155,9 +134,8 @@ void CameraSensor::InitChild()
 
   // Create a scene node to control pitch motion
   this->pitchNode = this->sceneNode->createChildSceneNode(this->GetName() + "PitchNode");
-  this->pitchNode->attachObject(this->camera);
   this->pitchNode->pitch(Ogre::Degree(0));
-  
+  this->pitchNode->attachObject(this->camera);
 
   this->saveCount = 0;
 }
@@ -186,27 +164,12 @@ void CameraSensor::UpdateChild(UpdateParams &params)
   this->pose.pos.y = this->sceneNode->getWorldPosition().x;
   this->pose.pos.z = this->sceneNode->getWorldPosition().y;
 
-  this->pose.rot.u = this->pitchNode->getWorldOrientation().w;
-  this->pose.rot.x = this->pitchNode->getWorldOrientation().z;
-  this->pose.rot.y = this->pitchNode->getWorldOrientation().x;
-  this->pose.rot.z = this->pitchNode->getWorldOrientation().y;
+  Ogre::Quaternion q = this->pitchNode->getWorldOrientation();// + Ogre::Degree(180);
 
-  /*
-  this->pose.rot.u = this->pitchNode->getWorldOrientation().w;
-  this->pose.rot.x = this->pitchNode->getWorldOrientation().z;
-  this->pose.rot.y = this->pitchNode->getWorldOrientation().x;
-  this->pose.rot.z = this->pitchNode->getWorldOrientation().y;
-  */
-
-  /*printf("RPY[%4.2f %4.2f %4.2f][%4.2f %4.2f %4.2f]\n",
-      this->pitchNode->getWorldOrientation().getRoll().valueDegrees(),
-      this->pitchNode->getWorldOrientation().getPitch().valueDegrees(),
-      this->pitchNode->getWorldOrientation().getYaw().valueDegrees(),
-      RTOD(this->pose.rot.GetRoll()),
-      RTOD(this->pose.rot.GetPitch()),
-      RTOD(this->pose.rot.GetYaw())
-      );
-      */
+  this->pose.rot.u = q.w;
+  this->pose.rot.x = q.z;
+  this->pose.rot.y = q.x;
+  this->pose.rot.z = q.y;
 
   if (this->saveFrames)
     this->SaveFrame();
