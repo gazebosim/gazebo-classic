@@ -10,6 +10,6 @@ Arial
 {
   type truetype
   source arial.ttf
-  size 64
+  size 18
   resolution 96
 }
