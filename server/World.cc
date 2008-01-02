@@ -113,7 +113,6 @@ void World::Load(XMLConfig *config, int serverId)
    // Create the simulator interface
   this->simIface = new SimulationIface();
   this->simIface->Create(this->server, "default" );
-  printf("RESET[%d]\n",this->simIface->data->reset);
 
   this->LoadEntities(rootNode, NULL);
 
@@ -467,11 +466,9 @@ std::vector<Model*> &World::GetModels()
 void World::UpdateSimulationIface()
 {
   this->simIface->Lock(1);
-  printf("R[%d]\n",this->simIface->data->reset);
 
   if (this->simIface->opened)
   {
-    printf("Opened\n");
     this->simIface->data->simTime = this->GetSimTime();
     this->simIface->data->pauseTime = this->GetPauseTime();
     this->simIface->data->realTime = this->GetRealTime();
@@ -543,7 +540,6 @@ void World::Reset()
 {
   std::vector< Model* >::iterator miter;
 
-  printf("WOrld Reset\n");
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
   {
     (*miter)->Reset();
