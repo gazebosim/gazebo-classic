@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <libplayercore/playercore.h>
 
+#include "GazeboError.hh"
 #include "GazeboTime.hh"
 #include "GazeboClient.hh"
 
@@ -43,6 +44,7 @@ extern PlayerTime* GlobalTime;
 // Initialize 
 void GazeboClient::Init(int serverid, const char *prefixid)
 {
+
   if (prefixid != NULL)
     GazeboClient::prefixId = prefixid;
 
@@ -53,7 +55,15 @@ void GazeboClient::Init(int serverid, const char *prefixid)
 
   GazeboClient::sim = new SimulationIface();
 
-  GazeboClient::sim->Open( GazeboClient::client, "default");
+  try
+  {
+    GazeboClient::sim->Open( GazeboClient::client, "default");
+  }
+  catch (std::string e)
+  {
+    std::cout << "Error: " << e << "\n";
+    exit(0);
+  }
 
   // steal the global clock - a bit aggressive, but a simple approach
   if (GlobalTime)

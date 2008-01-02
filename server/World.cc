@@ -113,6 +113,7 @@ void World::Load(XMLConfig *config, int serverId)
    // Create the simulator interface
   this->simIface = new SimulationIface();
   this->simIface->Create(this->server, "default" );
+  printf("RESET[%d]\n",this->simIface->data->reset);
 
   this->LoadEntities(rootNode, NULL);
 
@@ -461,64 +462,90 @@ std::vector<Model*> &World::GetModels()
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Update the simulation interface
 void World::UpdateSimulationIface()
 {
   this->simIface->Lock(1);
+  printf("R[%d]\n",this->simIface->data->reset);
 
-  this->simIface->data->simTime = this->GetSimTime();
-  this->simIface->data->pauseTime = this->GetPauseTime();
-  this->simIface->data->realTime = this->GetRealTime();
-
-  // If the model_name is set, then a request has been received
-  if (strcmp((char*)this->simIface->data->model_name,"")!=0)
+  if (this->simIface->opened)
   {
-    /// Get the model requested
-    Model *model = this->GetModelByName((char*)this->simIface->data->model_name);
-    if (model)
+    printf("Opened\n");
+    this->simIface->data->simTime = this->GetSimTime();
+    this->simIface->data->pauseTime = this->GetPauseTime();
+    this->simIface->data->realTime = this->GetRealTime();
+
+    if (this->simIface->data->reset)
     {
-      std::string req = (char*)this->simIface->data->model_req;
-      if (req == "get_pose")
-      {
-        Pose3d pose = model->GetPose();
-        Vector3 rot = pose.rot.GetAsEuler();
-
-        this->simIface->data->model_pose.pos.x = pose.pos.x;
-        this->simIface->data->model_pose.pos.y = pose.pos.y;
-        this->simIface->data->model_pose.pos.z = pose.pos.z;
-
-
-        this->simIface->data->model_pose.roll = rot.x;
-        this->simIface->data->model_pose.pitch = rot.y;
-        this->simIface->data->model_pose.yaw = rot.z;
-      }
-      else if (req == "set_pose3d")
-      {
-        Pose3d pose;
-        
-        pose.pos.x = this->simIface->data->model_pose.pos.x;
-        pose.pos.y = this->simIface->data->model_pose.pos.y;
-        pose.pos.z = this->simIface->data->model_pose.pos.z;
-        pose.rot.SetFromEuler(Vector3(this->simIface->data->model_pose.roll,
-            this->simIface->data->model_pose.pitch,
-            this->simIface->data->model_pose.yaw));
-        model->SetPose(pose);
-      }
-      else if (req == "set_pose2d")
-      {
-        Pose3d pose = model->GetPose();
-        Vector3 rot = pose.rot.GetAsEuler();
-        
-        pose.pos.x = this->simIface->data->model_pose.pos.x;
-        pose.pos.y = this->simIface->data->model_pose.pos.y;
-
-        pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
-            this->simIface->data->model_pose.yaw));
-        model->SetPose(pose);
-      }
-
+      this->Reset();
+      this->simIface->data->reset = 0;
     }
 
-    strcpy((char*)this->simIface->data->model_name, "");
+    // If the model_name is set, then a request has been received
+    if (strcmp((char*)this->simIface->data->model_name,"")!=0)
+    {
+      /// Get the model requested
+      Model *model = this->GetModelByName((char*)this->simIface->data->model_name);
+      if (model)
+      {
+        std::string req = (char*)this->simIface->data->model_req;
+        if (req == "get_pose")
+        {
+          Pose3d pose = model->GetPose();
+          Vector3 rot = pose.rot.GetAsEuler();
+
+          this->simIface->data->model_pose.pos.x = pose.pos.x;
+          this->simIface->data->model_pose.pos.y = pose.pos.y;
+          this->simIface->data->model_pose.pos.z = pose.pos.z;
+
+
+          this->simIface->data->model_pose.roll = rot.x;
+          this->simIface->data->model_pose.pitch = rot.y;
+          this->simIface->data->model_pose.yaw = rot.z;
+        }
+        else if (req == "set_pose3d")
+        {
+          Pose3d pose;
+
+          pose.pos.x = this->simIface->data->model_pose.pos.x;
+          pose.pos.y = this->simIface->data->model_pose.pos.y;
+          pose.pos.z = this->simIface->data->model_pose.pos.z;
+          pose.rot.SetFromEuler(Vector3(this->simIface->data->model_pose.roll,
+                this->simIface->data->model_pose.pitch,
+                this->simIface->data->model_pose.yaw));
+          model->SetPose(pose);
+        }
+        else if (req == "set_pose2d")
+        {
+          Pose3d pose = model->GetPose();
+          Vector3 rot = pose.rot.GetAsEuler();
+
+          pose.pos.x = this->simIface->data->model_pose.pos.x;
+          pose.pos.y = this->simIface->data->model_pose.pos.y;
+
+          pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
+                this->simIface->data->model_pose.yaw));
+          model->SetPose(pose);
+        }
+
+      }
+
+      strcpy((char*)this->simIface->data->model_name, "");
+    }
   }
   this->simIface->Unlock();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Reset the simulation to the initial settings
+void World::Reset()
+{
+  std::vector< Model* >::iterator miter;
+
+  printf("WOrld Reset\n");
+  for (miter = this->models.begin(); miter != this->models.end(); miter++)
+  {
+    (*miter)->Reset();
+  }
 }

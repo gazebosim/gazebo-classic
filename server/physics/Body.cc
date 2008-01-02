@@ -21,11 +21,12 @@
 /* Desc: Body class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <sstream>
 
+#include "GazeboMessage.hh"
 #include "HeightmapGeom.hh"
 #include "OgreAdaptor.hh"
 #include "Vector2.hh"
@@ -516,4 +517,140 @@ void Body::UpdateCoM()
 const Pose3d &Body::GetCoMPose() const
 {
   return this->comPose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the velocity of the body
+void Body::SetLinearVel(const Vector3 &vel)
+{
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+  }
+  else
+    dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the velocity of the body
+Vector3 Body::GetLinearVel() const
+{
+  Vector3 vel;
+  const dReal *dvel;
+
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+    return vel;
+  }
+
+  dvel = dBodyGetLinearVel(this->bodyId);
+
+  vel.x = dvel[0];
+  vel.y = dvel[1];
+  vel.z = dvel[2];
+
+  return vel;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the velocity of the body
+void Body::SetAngularVel(const Vector3 &vel)
+{
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+  }
+  else
+    dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the velocity of the body
+Vector3 Body::GetAngularVel() const
+{
+  Vector3 vel;
+  const dReal *dvel;
+
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+    return vel;
+  }
+
+  dvel = dBodyGetAngularVel(this->bodyId);
+
+  vel.x = dvel[0];
+  vel.y = dvel[1];
+  vel.z = dvel[2];
+
+  return vel;
+}
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Set the force applied to the body
+void Body::SetForce(const Vector3 &force)
+{
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+  }
+  else
+    dBodySetForce(this->bodyId, force.x, force.y, force.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the force applied to the body
+Vector3 Body::GetForce() const
+{
+  Vector3 force;
+  const dReal *dforce;
+
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+    return force;
+  }
+
+  dforce = dBodyGetForce(this->bodyId);
+
+  force.x = dforce[0];
+  force.y = dforce[1];
+  force.z = dforce[2];
+
+  return force;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Set the torque applied to the body
+void Body::SetTorque(const Vector3 &torque)
+{
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+  }
+  else
+    dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the torque applied to the body
+Vector3 Body::GetTorque() const
+{
+  Vector3 torque;
+  const dReal *dtorque;
+
+  if (!this->bodyId)
+  {
+    gzmsg(0) << "Invalid ODE body\n";
+    return torque;
+  }
+
+
+  dtorque = dBodyGetTorque(this->bodyId);
+
+  torque.x = dtorque[0];
+  torque.y = dtorque[1];
+  torque.z = dtorque[2];
+
+  return torque;
 }

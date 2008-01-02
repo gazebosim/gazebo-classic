@@ -204,7 +204,6 @@ class Client
   public: void Disconnect();
 
   /// \brief Wait for new data to be posted (blocking mode).
-  /// \returns Returns 0 on success, -1 on error.
   public: void Wait();
 
   private: void SemQuery(int server_id);

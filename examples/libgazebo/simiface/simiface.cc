@@ -22,7 +22,9 @@ int main()
   /// Open the Simulation Interface
   try 
   {
+    printf("1\n");
     simIface->Open(client, "default");
+    printf("2\n");
   }
   catch (gazebo::GazeboError e)
   {
@@ -30,14 +32,11 @@ int main()
     return -1;
   }
 
-  while (true)
-  {
-    posIface->Lock(1);
-    printf("Enables[%d]\n", posIface->data->cmdEnableMotors);
-    posIface->Unlock();
+  simIface->Lock(1);
+  simIface->data->reset = 1;
+  simIface->Unlock();
 
-    usleep(100000);
-  }
+  usleep(1000000);
   return 0;
 }
 

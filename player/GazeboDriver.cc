@@ -145,6 +145,7 @@ int GazeboDriver::ProcessMessage(QueuePointer &respQueue,
                                 player_msghdr * hdr, 
                                 void * data)
 {
+
   // find the right interface to handle this config
   GazeboInterface* in = this->LookupDevice( hdr->addr );
 

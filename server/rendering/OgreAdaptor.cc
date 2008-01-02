@@ -129,7 +129,14 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
   // Get the SceneManager, in this case a generic one
   //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
-  this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+  if (node->GetChild("bsp"))
+  {
+    this->sceneMgr = this->root->createSceneManager("BspSceneManager");
+  }
+  else
+  {
+    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+  }
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
@@ -174,10 +181,6 @@ void OgreAdaptor::Init(XMLConfigNode *node)
 
     //this->sceneMgr->setFog(fogType, *this->backgroundColor, density, linearStart, linearEnd);
     this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, linearStart, linearEnd);
-  }
-  else
-  {
-    this->sceneMgr->setFog(Ogre::FOG_LINEAR, *this->backgroundColor, 0, 1000, 1000);
   }
 
   // Add a sky dome to our scene
@@ -224,6 +227,13 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 
   this->DrawGrid();
+
+  // Set up the world geometry link
+  if (node->GetChild("bsp"))
+  {
+    this->sceneMgr->setWorldGeometry(node->GetString("bsp","",1));
+  }
+
 /*
   Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
   Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node"); 
@@ -248,6 +258,8 @@ void OgreAdaptor::Init(XMLConfigNode *node)
   */
   
   //delete [] mstr;
+  //
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -303,8 +315,6 @@ void OgreAdaptor::SetupResources()
   for (iter=Global::gazeboPaths.begin(); 
        iter!=Global::gazeboPaths.end(); iter++)
   {
-
-
     DIR *dir;
     if ((dir=opendir((*iter).c_str())) == NULL)
     {
@@ -318,6 +328,7 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/Media/materials/scripts");
     archNames.push_back((*iter)+"/Media/materials/textures");
     archNames.push_back((*iter)+"/Media/models");
+    archNames.push_back((*iter)+"/Media/maps");
 
     for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
     {

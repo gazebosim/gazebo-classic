@@ -27,6 +27,7 @@
 #include <FL/Fl_File_Chooser.H>
 
 #include "Global.hh"
+#include "World.hh"
 #include "CameraManager.hh"
 #include "CameraSensor.hh"
 #include "MainMenu.hh"
@@ -42,10 +43,12 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
     { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },
   //  { "Open", 0, &gazebo::MainMenu::OpenCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
       { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+      { "Reset", 0, &gazebo::MainMenu::ResetCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
       { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
       { 0 },
     
     { "View", 0, 0, 0, FL_SUBMENU, FL_NORMAL_LABEL, 0, 14, 0},
+      { "Wireframe", 0, &gazebo::MainMenu::WireframeCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
       { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
       { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
       { 0 },
@@ -96,13 +99,18 @@ void MainMenu::ShowBoundingBoxesCB(Fl_Widget * /*w*/, void * /*data*/)
 void MainMenu::ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   Global::SetShowJoints( !Global::GetShowJoints() );
+}
 
-  /*std::vector<Model*>::iterator iter;
+////////////////////////////////////////////////////////////////////////////////
+// Reset the world
+void MainMenu::ResetCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  World::Instance()->Reset();
+}
 
-  for (iter= World::Instance()->GetModels().begin(); 
-      iter !=World::Instance()->GetModels().end(); iter++)
-  {
-    (*iter)->SetTransparency(0.1);
-  }
-  */
+////////////////////////////////////////////////////////////////////////////////
+// View the world as wireframe
+void MainMenu::WireframeCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  Global::SetWireframe( !Global::GetWireframe() );
 }

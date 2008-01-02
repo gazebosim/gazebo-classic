@@ -103,7 +103,7 @@ void Geom::Load(XMLConfigNode *node)
   pose.rot = node->GetRotation("rpy",Quatern());
 
   // TODO: This should probably be true....but "true" breaks trimesh postions.
-  this->SetPose(pose, false);
+  this->SetPose(pose, true);
 
   this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
   this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));

@@ -120,6 +120,9 @@ class World : public SingletonT<World>
   /// \brief Get an iterator over the models
   public: std::vector<Model*> &GetModels();
 
+  /// \brief Reset the simulation to the initial settings
+  public: void Reset();
+
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
   /// \param parent The parent model

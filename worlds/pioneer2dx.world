@@ -100,11 +100,11 @@
       <rightJoint>right_wheel_hinge</rightJoint>
       <wheelSeparation>0.34</wheelSeparation>
       <wheelDiameter>0.15</wheelDiameter>
-      <torque>10</torque>
+      <torque>5</torque>
       <interface:position name="position_iface_0"/>
     </controller:differential_position2d>
 
-    <model:physical name="laser">
+    <!--<model:physical name="laser">
       <xyz>0.15 0 0.18</xyz>
 
       <attach>
@@ -116,6 +116,7 @@
         <xi:include href="laser.model" />
       </include>
     </model:physical>
+    -->
 
     <!-- 
     The include should be last within a model. All previous statements

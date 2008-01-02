@@ -262,10 +262,18 @@ int Model::Fini()
 // Reset the model
 void Model::Reset()
 {
-  if (this->initPose.pos != this->pose.pos)
+  Vector3 v(0,0,0);
+  std::map< std::string, Body* >::iterator biter;
+
+  this->SetPose(this->initPose);
+
+  /*for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
   {
-    this->SetPose(this->initPose);
-  }
+    biter->second->SetLinearVel(v);
+    biter->second->SetAngularVel(v);
+    biter->second->SetForce(v);
+    biter->second->SetTorque(v);
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,7 @@
 /* Desc: Body class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef BODY_HH
@@ -114,6 +114,30 @@ class Body : public Entity
 
   /// \brief Set whether gravity affects this body
   public: void SetGravityMode(bool mode);
+
+  /// \brief Set the linear velocity of the body
+  public: void SetLinearVel(const Vector3 &vel);
+
+  /// \brief Get the linear velocity of the body
+  public: Vector3 GetLinearVel() const;
+
+  /// \brief Set the angular velocity of the body
+  public: void SetAngularVel(const Vector3 &vel);
+
+  /// \brief Get the angular velocity of the body
+  public: Vector3 GetAngularVel() const;
+
+  /// \brief Set the force applied to the body
+  public: void SetForce(const Vector3 &force);
+
+  /// \brief Get the force applied to the body
+  public: Vector3 GetForce() const;
+
+  /// \brief Set the torque applied to the body
+  public: void SetTorque(const Vector3 &force);
+
+  /// \brief Get the torque applied to the body
+  public: Vector3 GetTorque() const;
 
   /// Load a new geom helper function
   /// \param node XMLConfigNode used to load the geom

@@ -224,7 +224,6 @@ void Iface::Destroy()
 // Open an existing interface (client)
 void Iface::Open(Client *client, std::string id)
 {
-
   std::ostringstream stream;
 
   this->client = client;
@@ -243,6 +242,7 @@ void Iface::Open(Client *client, std::string id)
 
   // Map the mmap file
   this->mMap = mmap(0, this->size, PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
+
 
   if (this->mMap == MAP_FAILED)
   {
@@ -272,8 +272,10 @@ void Iface::Open(Client *client, std::string id)
 
   std::cout.setf(origFlags);
 
+  this->Lock(1);
   this->openCount++;
   this->opened = true;
+  this->Unlock();
 }  
 
 

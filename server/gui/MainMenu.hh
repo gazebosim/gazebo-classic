@@ -44,6 +44,11 @@ namespace gazebo
     public: static void ShowBoundingBoxesCB(Fl_Widget *w, void *data);
 
     public: static void ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/);
+
+    public: static void ResetCB(Fl_Widget * /*w*/, void * /*data*/);
+
+    public: static void WireframeCB(Fl_Widget * /*w*/, void * /*data*/);
+
   };
 }
 

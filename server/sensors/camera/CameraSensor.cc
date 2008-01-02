@@ -173,6 +173,15 @@ void CameraSensor::FiniChild()
 void CameraSensor::UpdateChild(UpdateParams &params)
 {  
 
+  if (Global::GetWireframe())
+  {
+    this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
+  }
+  else
+  {
+    this->camera->setPolygonMode(Ogre::PM_SOLID);
+  }
+
   this->pose.pos.x = this->sceneNode->getWorldPosition().z;
   this->pose.pos.y = this->sceneNode->getWorldPosition().x;
   this->pose.pos.z = this->sceneNode->getWorldPosition().y;

@@ -45,6 +45,7 @@ SimulationInterface::SimulationInterface(player_devaddr_t addr, GazeboDriver *dr
   int serverId = atoi((char*)cf->ReadString(section,"server_id","default"));
 
   // Initialize the Client. Creates the SHM connection
+
   GazeboClient::Init(serverId, "");
 
   this->iface = new SimulationIface();

@@ -160,6 +160,12 @@ namespace gazebo
     /// \brief Set whether to show the joints
     public: static void SetShowJoints(bool show);
 
+    /// \brief Set to view as wireframe
+    public: static void SetWireframe( bool wire );
+
+    /// \brief Get whether to view as wireframe
+    public: static bool GetWireframe();
+
     /// Pointer to the selected Gui 
     public: static Gui *gui;
 
@@ -181,6 +187,8 @@ namespace gazebo
 
     /// Set to true to show joints
     private: static bool showJoints;
+
+    private: static bool wireframe;
 
     /// Paths gazebo install
     public: static std::list<std::string> gazeboPaths;
