@@ -11,6 +11,7 @@ sources = ['main.cc',
            'Vector3.cc', 
            'Quatern.cc',
            'Pose3d.cc',
+           'String.cc',
            'World.cc',
            'XMLConfig.cc',
            'Time.cc',
@@ -19,6 +20,7 @@ sources = ['main.cc',
            'UpdateParams.cc',
            'GazeboMessage.cc',
            'Model.cc',
+           'Simulator.cc',
            ]
 
 headers.append( 
@@ -26,6 +28,7 @@ headers.append(
            '#/server/Vector3.hh', 
            '#/server/Quatern.hh',
            '#/server/Pose3d.hh',
+           '#/server/String.hh',
            '#/server/World.hh',
            '#/server/XMLConfig.hh',
            '#/server/Time.hh',
@@ -34,6 +37,7 @@ headers.append(
            '#/server/UpdateParams.hh',
            '#/server/GazeboMessage.hh',
            '#/server/Model.hh',
+           '#/server/Simulator.hh', 
            ] )
 
 staticObjs.append( env.StaticObject(sources) )

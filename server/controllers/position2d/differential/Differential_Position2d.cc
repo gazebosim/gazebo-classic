@@ -25,9 +25,9 @@
  * SVN info: $Id: Differential_Position2d.cc 198 2007-12-18 00:20:58Z natepak $
  */
 
-#include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
+#include "Global.hh"
 #include "HingeJoint.hh"
 #include "World.hh"
 #include "gazebo.h"
@@ -89,6 +89,17 @@ void Differential_Position2d::LoadChild(XMLConfigNode *node)
   if (!this->joints[RIGHT])
     gzthrow("The controller couldn't get right hinge joint");
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load the controller
+void Differential_Position2d::SaveChild(XMLConfigNode *node)
+{
+  node->SetValue("wheelSeparation",this->wheelSep);
+  node->SetValue("wheelDiameter",this->wheelDiam);
+  node->SetValue("torque",this->torque);
+//  node->SetValue("leftJoint",this->XMLData["leftJointName"]);
+//  node->SetValue("rightJoint",this->XMLData["rightJointName"]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

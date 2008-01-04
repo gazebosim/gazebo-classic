@@ -28,7 +28,7 @@
 #define GZGLOBAL_HH
 
 /////////////////////////////////////////////////////////////////////////////
-// Typedefs
+// Includes
 /////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
@@ -36,6 +36,9 @@
 #include <math.h>
 
 #include "Pose3d.hh"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Defines
@@ -43,6 +46,9 @@
 #ifndef NULL
 #define NULL 0
 #endif
+
+// TODO: Fix the version number
+#define GAZEBO_VERSION "0.8-pre1"
 
 #ifndef GZ_COLLIDE_BITS
 
@@ -84,10 +90,11 @@
 
 #define ROUND(x) ( (int)( floor((x)+0.5) ) )
 
-#endif
+#define GZ_DELETE(p){ if(p) { delete (p);  (p)=NULL; } }
 
 namespace gazebo
 {
+
   class Gui;
 
   /// \addtogroup gazebo_server
@@ -112,12 +119,6 @@ namespace gazebo
   */  
   class Global
   {
-    /// \brief Return true if the user has quit
-    public: static bool GetUserQuit();
-
-    /// \brief Set whether the user has quit
-    public: static void SetUserQuit(bool quit);
-
     /// \brief Set to true to pause the simulation
     private: static bool userPause;
 
@@ -169,9 +170,6 @@ namespace gazebo
     /// Pointer to the selected Gui 
     public: static Gui *gui;
 
-    /// Set to true when the user wants to leave the application
-    private: static bool userQuit;
-
     /// Set to true to step through the simulation
     private: static bool userStep;
 
@@ -205,3 +203,5 @@ namespace gazebo
 
   /// \}
 }
+
+#endif

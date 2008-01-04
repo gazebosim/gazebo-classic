@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: GL Windwo
+/* Desc: GL Window
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id:$

@@ -30,7 +30,7 @@
 #include <FL/Fl_Output.H>
 
 #include "Global.hh"
-#include "World.hh"
+#include "Simulator.hh"
 #include "OgreAdaptor.hh"
 #include "StatusBar.hh"
 
@@ -82,9 +82,9 @@ void StatusBar::Update()
   this->iterations->value(Global::GetIterations());
   this->fps->value(avgFPS);
 
-  this->realTime->value(World::Instance()->GetRealTime());
-  this->simTime->value(World::Instance()->GetSimTime());
-  this->pauseTime->value(World::Instance()->GetPauseTime());
+  this->realTime->value(Simulator::Instance()->GetRealTime());
+  this->simTime->value(Simulator::Instance()->GetSimTime());
+  this->pauseTime->value(Simulator::Instance()->GetPauseTime());
 
   if (Global::GetUserPause())
   {

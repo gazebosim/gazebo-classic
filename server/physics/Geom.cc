@@ -170,6 +170,8 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 
 void Geom::Update()
 {
+//FIXME: Calling this FPS * num of geoms each second ...
+
   if (this->bbVisual)
     this->bbVisual->SetVisible(Global::GetShowBoundingBoxes());
 

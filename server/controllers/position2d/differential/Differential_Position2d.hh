@@ -27,13 +27,14 @@
 #ifndef DIFFERENTIAL_POSITION2D_HH
 #define DIFFERENTIAL_POSITION2D_HH
 
+#include <map>
 
 #include "Controller.hh"
-#include "Entity.hh"
 
 namespace gazebo
 {
   class HingeJoint;
+  class Entity;
   class PositionIface;
 
 /// \addtogroup gazebo_controller
@@ -70,19 +71,20 @@ class Differential_Position2d : public Controller
 
   /// Load the controller
   /// \param node XML config node
-  /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode *node);
+
+  /// Load the controller
+  /// \param node XML config writer node
+  protected: virtual void SaveChild(XMLConfigNode *node);
 
   /// Init the controller
   /// \return 0 on success
   protected: virtual void InitChild();
 
   /// Update the controller
-  /// \return 0 on success
   protected: virtual void UpdateChild(UpdateParams &params);
 
   /// Finalize the controller
-  /// \return 0 on success
   protected: virtual void FiniChild();
 
   /// Update the data in the interface

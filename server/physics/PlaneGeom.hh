@@ -28,12 +28,12 @@
 #define PLANEGEOM_HH
 
 #include "Geom.hh"
-#include "Vector3.hh"
-#include "Vector2.hh"
 
 namespace gazebo
 {
   class OgreVisual;
+  class Body;
+  class XMLConfig;
 
   /// \addtogroup gazebo_physics_geom
   /// \{

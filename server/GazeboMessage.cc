@@ -67,11 +67,11 @@ void GazeboMessage::Load(XMLConfigNode *node)
   {
     gzthrow("Null XMLConfig node");
   }
-
+  
   this->SetVerbose(node->GetInt("verbosity",0,0));
-  logData = node->GetBool("logData",false);
+  this->logData = node->GetBool("logData",false);
 
-  if (logData)
+  if (this->logData)
   {
     time_t t;
     struct tm *localTime;
@@ -91,6 +91,23 @@ void GazeboMessage::Load(XMLConfigNode *node)
   }
 
   this->logStream.open(logFilename, std::ios::out);
+}
+
+void GazeboMessage::Save(XMLConfigNode *node)
+{
+  node->SetValue("verbosity", this->level);
+  node->SetValue("logData", this->logData);
+
+/*
+  node->NewElement("verbosity", String(this->level)); //std::ostringstream << this->level);
+ 
+  node->NewElement("logData", gazebo::String(this->logData));
+
+  if (this->logData)
+    node->NewElement("logData", std::ostringstream << "true");
+  else
+    node->NewElement("logData", std::ostringstream << "true");
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

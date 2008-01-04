@@ -32,7 +32,7 @@
 
 #include <GL/glx.h>
 
-#include "World.hh"
+#include "Simulator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "MainMenu.hh"
@@ -153,10 +153,10 @@ void GLWindow::Update()
     }
   }
 
-  camera->Translate( this->directionVec * (World::Instance()->GetRealTime() - this->lastUpdateTime) );
+  camera->Translate( this->directionVec * (Simulator::Instance()->GetRealTime() - this->lastUpdateTime) );
   this->directionVec.Set(0,0,0);
 
-  this->lastUpdateTime = World::Instance()->GetRealTime();
+  this->lastUpdateTime = Simulator::Instance()->GetRealTime();
 }
 
 void GLWindow::flush()
@@ -251,6 +251,7 @@ void GLWindow::HandleKeyRelease()
       break;
 
     case ' ':
+      
       if (Global::GetUserStep())
       {
         Global::SetUserStepInc( true );
@@ -260,7 +261,7 @@ void GLWindow::HandleKeyRelease()
       break;
 
     case FL_Escape:
-      Global::SetUserQuit( true );
+      Simulator::Instance()->SetUserQuit();
       break;
 
     case '[':
@@ -297,7 +298,7 @@ int GLWindow::handle(int event)
       return 0;
 
     case FL_CLOSE:
-      Global::SetUserQuit(true);
+      Simulator::Instance()->SetUserQuit();
       return 0;
 
     case FL_PUSH:

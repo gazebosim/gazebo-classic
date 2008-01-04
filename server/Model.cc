@@ -28,14 +28,13 @@
 
 #include <sstream>
 #include <iostream>
-#include <Ogre.h>
 
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
-#include "OgreAdaptor.hh"
 #include "XMLConfig.hh"
 #include "World.hh"
+#include "OgreCreator.hh"
 #include "Body.hh"
 #include "HingeJoint.hh"
 #include "Hinge2Joint.hh"
@@ -166,6 +165,53 @@ int Model::Load(XMLConfigNode *node)
   return this->LoadChild(node);
 }
 
+void Model::Save()
+{
+  std::map<std::string, Body* >::iterator bodyIter;
+  std::map<std::string, Controller* >::iterator contIter;
+  std::map<std::string, Joint* >::iterator jointIter;
+  
+  this->xmlNode->SetValue("name", this->GetName());
+  this->xmlNode->SetValue("xyz", this->pose.pos); 
+  this->xmlNode->SetValue("rpy", this->pose.rot);
+  this->xmlNode->SetValue("static", this->IsStatic());
+  //TODO: Attach tag
+  if (this->GetType()=="renderable")
+  {
+  // TODO: lights  
+  }  
+  else if (this->GetType()=="physical")
+  {
+    this->xmlNode->SetValue("canonicalBody",this->canonicalBodyName);
+    
+    for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
+    {
+      if (bodyIter->second)
+      {
+        bodyIter->second->Save();
+        
+      }
+    }
+    
+    for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
+    {
+       //TODO:When joints can be changed with the GUI..
+    }
+  
+  }
+  else // empty
+  {
+  }
+  
+  for (contIter=this->controllers.begin(); 
+       contIter!=this->controllers.end(); contIter++)
+  { //TODO: when the controllers can be changed (maybe reload the XML is the best way)
+    if (contIter->second)
+      contIter->second->Save();
+  }
+  
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the model
 int Model::Init()
@@ -212,6 +258,7 @@ int Model::Update(UpdateParams &params)
   for (contIter=this->controllers.begin(); 
        contIter!=this->controllers.end(); contIter++)
   {
+    
     if (contIter->second)
       contIter->second->Update(params);
   }
@@ -294,14 +341,14 @@ const std::string &Model::GetType() const
 // Set the XMLConfig node this model was loaded from
 void Model::SetXMLConfigNode( XMLConfigNode *node )
 {
-  this->node = node;
+  this->xmlNode = node;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the XML Conig node this model was loaded from
 XMLConfigNode *Model::GetXMLConfigNode() const
 {
-  return this->node;
+  return this->xmlNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -612,7 +659,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
 
   if ((childNode = node->GetChild("light")))
   {
-    OgreAdaptor::Instance()->CreateLight(childNode, body);
+    OgreCreator::CreateLight(childNode, body);
   }
 
 }

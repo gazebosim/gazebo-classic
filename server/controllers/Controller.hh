@@ -54,8 +54,11 @@ class Controller
 
   /// \brief Load the controller. Called once on startup
   /// \param node The XMLConfig node pointer
-  /// \return 0 on success
   public: void Load(XMLConfigNode *node);
+
+  /// \brief Save the controller. 
+  /// \param node The XMLConfigWriter node pointer
+  public: void Save();
 
   /// \brief Initialize the controller. Called once on startup.
   /// \return 0 on success
@@ -63,27 +66,24 @@ class Controller
 
   /// \brief Update the controller. Called every cycle.
   /// \param params Parameters to the update cycle
-  /// \return 0 on success
   public: void Update(UpdateParams &params);
 
   /// \brief Finialize the controller. Called once on completion.
-  /// \return 0 on success
   public: void Fini();
 
   /// \brief Load function for the child class
-  /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode * /*node*/) {return;}
 
+  /// \brief Save function for the child class
+  protected: virtual void SaveChild(XMLConfigNode * /*node*/) {return;}
+
   /// \brief Init function for the child class
-  /// \return 0 on success
   protected: virtual void InitChild() {return;}
 
   /// \brief Update function for the child class
-  /// \return 0 on success
   protected: virtual void UpdateChild(UpdateParams &/*params*/) {return;}
 
   /// \brief Fini function for the child class
-  /// \return 0 on success
   protected: virtual void FiniChild() {return;}
 
   /// \brief Return the name of this controller
@@ -101,6 +101,8 @@ class Controller
 
   /// \brief Array of all the iface for this controller
   protected: std::vector<Iface*> ifaces;
+
+  protected: XMLConfigNode *xmlNode;
 };
 
 /// \}

@@ -107,16 +107,9 @@ home directory, or to the log file specified with the -l command line option.
 #include <FL/x.H>
 
 #include "Global.hh"
-#include "Gui.hh"
+#include "Simulator.hh"
 #include "XMLConfig.hh"
-#include "SensorFactory.hh"
-#include "IfaceFactory.hh"
-#include "ControllerFactory.hh"
-#include "Gui.hh"
-#include "World.hh"
 #include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "OgreAdaptor.hh"
 
 // Command line options
 const char *worldFileName;
@@ -148,8 +141,7 @@ void PrintUsage()
 // Print the version/licence string
 void PrintVersion()
 {
-  //TODO: Fix the version number
-  fprintf(stderr, "Gazebo multi-robot simulator, version %s\n\n", "0.8");
+  fprintf(stderr, "Gazebo multi-robot simulator, version %s\n\n", GAZEBO_VERSION);
   fprintf(stderr, "Part of the Player/Stage Project "
           "[http://playerstage.sourceforge.net].\n");
   fprintf(stderr, "Copyright (C) 2003 Nate Koenig, Andrew Howard, and contributors.\n");
@@ -235,7 +227,8 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ ) 
 {
-  gazebo::Global::SetUserQuit(true);
+  //TODO: use a boost::signal
+  gazebo::Simulator::Instance()->SetUserQuit();
   return;
 }
 
@@ -284,18 +277,7 @@ void LoadConfigFile()
 // Initialize the sim
 int Init()
 {
-  gazebo::XMLConfigNode *childNode = NULL;
-
-  //Py_Initialize();
-
-  //struct tms cpu;
-
-  // TODO: Fix the version number
-  // Print banner
-  printf("** Gazebo %s **\n", "0.8");
-  printf("* Part of the Player/Stage Project [http://playerstage.sourceforge.net].\n");
-  printf("* Copyright 2000-2005 Copyright (C) 2003 Nate Koenig, Andrew Howard, and contributors.\n");
-  printf("* Released under the GNU General Public License.\n");
+  PrintVersion(); 
 
   // Establish signal handlers
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
@@ -304,72 +286,23 @@ int Init()
     return -1;
   }
 
-  // Load the world file
-  gazebo::XMLConfig *xmlFile(new gazebo::XMLConfig());
-
-  if (xmlFile->Load(worldFileName) != 0)
-    return -1;
-
-  // Load the messaging system
-  gazebo::GazeboMessage::Instance()->Load(xmlFile->GetRootNode());
-
-  childNode = xmlFile->GetRootNode()->GetChild("gui");
-
-  if (childNode)
-  {
-    int width = childNode->GetTupleInt("size",0,640);
-    int height = childNode->GetTupleInt("size",1,480);
-    int x = childNode->GetTupleInt("pos",0,0);
-    int y = childNode->GetTupleInt("pos",1,0);
-    std::string type = childNode->GetString("type","fltk",1);
-
-    gzmsg(1) << "Creating GUI:\n\tType[" << type << "] Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
-
-    // Create the GUI
-    gazebo::Global::gui = new gazebo::Gui(x, y, width, height, type+"::Gazebo");
-
-    // Initialize the GUI
-    gazebo::Global::gui->Init();
-  }
-  else
-  {
-    gzthrow("XML file must contain a <rendering:gui> section\n");
-  }
-
   LoadConfigFile();
 
-  // Initialize Ogre
-  try
-  {
-    gazebo::OgreAdaptor::Instance()->Init(xmlFile->GetRootNode()->GetChild("ogre"));
-  }
-  catch (gazebo::GazeboError e)
-  {
-    std::ostringstream stream;
-    stream << "Failed to Initialize the OGRE Rendering system\n" 
-              << e << "\n";
-    gzthrow(stream.str());
-  }
-
-  // Load the world
-  gazebo::World::Instance()->Load(xmlFile, optServerId);
-
-  // Initialize the world
-  if (gazebo::World::Instance()->Init() != 0)
+  if (gazebo::Simulator::Instance()->Load(worldFileName, optServerId)!=0)
     return -1;
 
+  gazebo::Simulator::Instance()->Init();
+ 
+
   return 0;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the sim
 int Fini()
 {
-  gazebo::World::Instance()->Fini();
-
-  //Py_Finalize();
-
-  return 0;
+  return gazebo::Simulator::Instance()->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -395,12 +328,7 @@ int main(int argc, char **argv)
 
   try
   {
-    while (!gazebo::Global::GetUserQuit())
-    {
-      gazebo::World::Instance()->Update();
-      gazebo::Global::gui->Update();
-      Fl::wait(0.03);
-    }
+     gazebo::Simulator::Instance()->MainLoop();
   }
   catch (gazebo::GazeboError e)
   {

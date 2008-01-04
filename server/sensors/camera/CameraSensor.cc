@@ -32,6 +32,7 @@
 #include "GazeboError.hh"
 #include "Body.hh"
 #include "OgreAdaptor.hh"
+#include "OgreCreator.hh"
 #include "OgreFrameListener.hh"
 
 #include "SensorFactory.hh"
@@ -122,7 +123,7 @@ void CameraSensor::InitChild()
   this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
 
   // Create the camera
-  this->camera = OgreAdaptor::Instance()->CreateCamera(this->GetName(),
+  this->camera = OgreCreator::CreateCamera(this->GetName(),
       this->nearClip, this->farClip, this->renderTarget);
 
   Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(

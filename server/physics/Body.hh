@@ -57,18 +57,18 @@ class Body : public Entity
 
   /// \brief Load the body based on an XMLConfig node
   /// \param node XMLConfigNode pointer
-  /// \return Nonzero on error
   public: virtual void Load(XMLConfigNode *node);
 
+  /// \brief Save the body based on our XMLConfig node
+  public: virtual void Save();
+  
   /// \brief Initialize the body
-  /// \return Non-zero on error
   public: virtual void Init();
 
   /// \brief Finalize the body
   public: void Fini();
 
   /// \brief Update the body
-  /// \return Non-zero on error
   public: virtual void Update(UpdateParams &params);
 
   /// \brief Attach a geom to this body
@@ -156,7 +156,9 @@ class Body : public Entity
 
   /// List of attached sensors
   private: std::vector< Sensor* > sensors;
-
+  
+  ///our XML DATA
+  private: XMLConfigNode *xmlNode;
   /// ODE body handle
   private: dBodyID bodyId;
 

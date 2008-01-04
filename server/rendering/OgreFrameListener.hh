@@ -2,9 +2,8 @@
 #define OGREFRAMELISTENER_HH
 
 #include <OgreFrameListener.h>
+#include <OgrePrerequisites.h>
 //#include <OgreEventListeners.h>
-#include <Ogre.h>
-
 
 namespace Ogre
 {

@@ -27,18 +27,15 @@
 #include <assert.h>
 #include <sstream>
 #include <fstream>
-#include <sys/time.h>
 
-#include "OgreDynamicLines.hh"
 #include "Global.hh"
-#include "OgreSimpleShape.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
-#include "OgreAdaptor.hh"
 #include "PhysicsEngine.hh"
 #include "ODEPhysics.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
+#include "Simulator.hh"
 #include "gazebo.h"
 #include "UpdateParams.hh"
 #include "World.hh"
@@ -54,11 +51,6 @@ World::World()
   this->server=0;
   this->simIface=0;
 
-  this->pause = false;
-
-  this->simTime = 0.0;
-  this->pauseTime = 0.0;
-  this->startTime = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,17 +78,9 @@ World::~World()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
-void World::Load(XMLConfig *config, int serverId)
+void World::Load(XMLConfigNode *rootNode, int serverId)
 {
   assert(serverId >= 0);
-
-  XMLConfigNode *rootNode(config->GetRootNode());
-
-  // Create some basic shapes
-  OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
-  OgreSimpleShape::CreateSphere("joint_anchor",0.01, 32, 32);
-  OgreSimpleShape::CreateBox("unit_box", Vector3(1,1,1));
-  OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
 
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
@@ -126,6 +110,20 @@ void World::Load(XMLConfig *config, int serverId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Save the world
+void World::Save(XMLConfigNode *node)
+{
+  std::vector< Model* >::iterator miter;
+  // Save all the models
+  for (miter=this->models.begin(); miter!=this->models.end(); miter++)
+  {
+    (*miter)->Save();
+  }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the world
 int World::Init()
 {
@@ -139,12 +137,10 @@ int World::Init()
 
   // Set initial simulator state
   this->simIface->Lock(1);
-  this->simIface->data->pause = this->pause;
+  this->simIface->data->pause = Simulator::Instance()->isPaused();
   this->simIface->Unlock();
 
   this->physicsEngine->Init();
-
-  this->startTime = this->GetWallTime();
 
   this->toAddModels.clear();
   this->toDeleteModels.clear();
@@ -156,12 +152,10 @@ int World::Init()
 // Update the world
 int World::Update()
 {
-
   UpdateParams params;
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
 
-  this->simTime += this->physicsEngine->GetStepTime();
   params.stepTime = this->physicsEngine->GetStepTime();
   
   // Update all the models
@@ -173,22 +167,11 @@ int World::Update()
     }
   }
 
-  // Update the physics engine
-  if (!Global::GetUserPause() && !Global::GetUserStep() ||
-      (Global::GetUserStep() && Global::GetUserStepInc()))
+  if (!Simulator::Instance()->isPaused())
   {
     this->physicsEngine->Update();
-    Global::IncIterations();
-
-    Global::SetUserStepInc(!Global::GetUserStepInc());
-  }
-  else
-  {
-    this->pauseTime += this->physicsEngine->GetStepTime();
   }
 
-  OgreAdaptor::Instance()->Render();
-  
   this->UpdateSimulationIface();
 
   // Copy the newly created models into the main model vector
@@ -249,40 +232,10 @@ PhysicsEngine *World::GetPhysicsEngine() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the simulation time
+// Get the simulation time, this method is replicated in Simulator class
 double World::GetSimTime() const
 {
-  return this->simTime;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the pause time
-double World::GetPauseTime() const
-{
-  return this->pauseTime;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the start time
-double World::GetStartTime() const
-{
-  return this->startTime;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the real time (elapsed time)
-double World::GetRealTime() const
-{
-  return this->GetWallTime() - this->startTime;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the wall clock time
-double World::GetWallTime() const
-{
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  return tv.tv_sec + tv.tv_usec * 1e-6;
+  return Simulator::Instance()->GetSimTime();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -469,9 +422,9 @@ void World::UpdateSimulationIface()
 
   if (this->simIface->opened)
   {
-    this->simIface->data->simTime = this->GetSimTime();
-    this->simIface->data->pauseTime = this->GetPauseTime();
-    this->simIface->data->realTime = this->GetRealTime();
+    this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
+    this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
+    this->simIface->data->realTime = Simulator::Instance()->GetRealTime();
 
     if (this->simIface->data->reset)
     {

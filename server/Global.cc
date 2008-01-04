@@ -25,11 +25,10 @@
  */
 
 #include "Global.hh"
-#include "Gui.hh"
+
 
 using namespace gazebo;
 
-bool Global::userQuit = false;
 bool Global::userPause = false;
 bool Global::userStep = false;
 bool Global::userStepInc = false;
@@ -37,7 +36,7 @@ bool Global::showBoundingBoxes = false;
 bool Global::showJoints = false;
 bool Global::wireframe = false;
 unsigned long Global::iterations = 0;
-Gui *Global::gui = NULL;
+//Gui *Global::gui = NULL;
 Pose3d Global::poseOffset;
 
 
@@ -53,19 +52,6 @@ Global::Global()
 Global::~Global()
 {
 }
-
-////////////////////////////////////////////////////////////////////////////////
-bool Global::GetUserQuit()
-{
-  return userQuit;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Global::SetUserQuit(bool quit)
-{
-  userQuit = quit;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Global::GetUserPause()

@@ -74,15 +74,15 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
 
   /// \brief Default initialization. 
   ///        Let OGRE create the window and rendering context
-  public: void Init(XMLConfigNode *node);
+  public: void Init(XMLConfigNode *rootNode);
+
+  /// \brief Save Ogre settings 
+  public: void Save(XMLConfigNode *node);
 
   /// \brief Initialize Ogre Rendering engine
   public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height); 
   /// \brief Render a single frame
   public: int Render();
-
-  /// \brief Create a light source and attach it to the entity
-  public: void CreateLight(XMLConfigNode *node, Entity *entity);
 
   /// \brief Use this function to set the pose of a scene node
   public: void SetSceneNodePose( Ogre::Node *node, const Pose3d &pose );
@@ -93,10 +93,6 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   /// \brief Use this function to set the rotation of a scene node
   public: void SetSceneNodeRotation(Ogre::Node *node, const Quatern &rot);
 
-  /// \brief Helper function to create a camera
-  public: Ogre::Camera *CreateCamera(const std::string &name, double nearClip, 
-              double farClip, Ogre::RenderTarget *renderTarget);
-
   /// \brief Resize the rendering window
   public: void ResizeWindow(unsigned int w, unsigned int h);
 
@@ -104,7 +100,6 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   private: void SetupResources();
   private: void SetupRenderSystem(bool create);
   private: void CreateWindow();
-  private: void DrawGrid();
 
   /// \brief Pointer to the root scene node
   public: Ogre::Root *root;
@@ -129,16 +124,20 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   // Our custom frame listener
   private: OgreFrameListener *frameListener;
 
-  private: Ogre::ColourValue *backgroundColor;
+  public: Ogre::ColourValue *backgroundColor;
 
   private: std::string videoMode;
 
   private: bool ogreWindow;
+  
+  //bsp attributes saved to write XML file back
+  private: int sceneType;
+  private: std::string worldGeometry;
 
   private: Vector3 terrainSize;
   private: unsigned int terrainVertSize;
   private: std::string terrainImage;
-
+  
   private: friend class DestroyerT<OgreAdaptor>;
   private: friend class SingletonT<OgreAdaptor>;
 };

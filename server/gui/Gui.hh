@@ -33,8 +33,8 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <string>
+#include <iostream>
 
-#include "Gui.hh"
 
 namespace gazebo
 {

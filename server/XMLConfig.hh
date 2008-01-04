@@ -34,6 +34,7 @@
 #include "Vector3.hh"
 #include "Vector2.hh"
 #include "Quatern.hh"
+#include "String.hh"
 #include "Time.hh"
 
 namespace gazebo
@@ -186,9 +187,22 @@ namespace gazebo
     /// \brief Get an attribute tuple angle value (return value in radians)
     public: double GetTupleAngle( const std::string &key, int index, double def );
   
+    /// \brief Set a node's value, either attribute or child node value, maybe create it
+    /// \param key : the name of the element or attribute to write 
+    /// \param value : the name of the element or attribute to write
+    /// \param require : Require=1 means that if not found a new node will be created
+    /// \param type : Only if a new node is created, the type must be specified
+    public: void SetValue(const String& key, const String& value, int require =0, int type=0);
+
     /// \brief Get a node's value, which is either a attribute or child node value.
     protected: xmlChar* GetNodeValue( const std::string &key );
   
+    /// \brief Set a node's value, either attribute or child node value (private)
+    protected: bool SetNodeValue(const char* key, const char* value);
+
+    /// \brief Creates a new node child of this. either attribute or element
+    protected: void NewNode(const char* key, const char* value, int type);
+
     /// \brief Our document
     private: XMLConfig *config;
     
@@ -207,7 +221,8 @@ namespace gazebo
     /// \brief XML data
     private: xmlDocPtr xmlDoc;
   };
-  
+
+
   /// \}
 }
 

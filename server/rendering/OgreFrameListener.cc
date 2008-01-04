@@ -108,7 +108,7 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
   {
     OgreHUD::Instance()->SetCamera(camera);
   }
-
+ 
   return true;
 }
 

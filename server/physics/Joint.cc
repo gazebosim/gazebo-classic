@@ -130,7 +130,7 @@ void Joint::SetModel(Model *model)
 // Get the body to which the joint is attached according the _index
 Body *Joint::GetJointBody( int index ) const
 {
-  Body *result;
+  Body *result=0;
 
   if( index==0 || index==1 )
   {
@@ -220,6 +220,34 @@ std::string Joint::GetName() const
 void Joint::SetName(const std::string &newName)
 {
   this->name = newName;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Set the ERP of this joint
+void Joint::SetERP(double newERP)
+{
+  this->SetParam(dParamSuspensionERP, newERP);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+/// Get the ERP of this joint
+double Joint::GetERP()
+{
+  return this->GetParam(dParamSuspensionERP);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Set the CFM of this joint
+void Joint::SetCFM(double newCFM)
+{
+  this->SetParam(dParamSuspensionCFM, newCFM);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+/// Get the ERP of this joint
+double Joint::GetCFM()
+{
+  return this->GetParam(dParamSuspensionCFM);
 }
 
 

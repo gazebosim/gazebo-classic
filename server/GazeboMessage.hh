@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <sstream>
 
 namespace gazebo
@@ -46,7 +47,7 @@ namespace gazebo
   #define gzlog() (gazebo::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
   
     class XMLConfigNode;
-  
+ 
   /// \brief Gazebo class for outputings messages
   ///
   /**
@@ -74,6 +75,9 @@ namespace gazebo
     /// \brief Load the message parameters
     public: void Load(XMLConfigNode *node);
   
+    /// \brief Saves the message parameters
+    public: void Save(XMLConfigNode *node);
+
     /// \brief Set the verbosity
     /// \param level Level of the verbosity
     public: void SetVerbose( int level );
@@ -87,6 +91,9 @@ namespace gazebo
   
     /// \brief Level of the message
     private: int level;
+   
+    /// \brief True if logging data
+    private: bool logData;
   
     private: std::ostringstream nullStream;
     private: std::ostream *msgStream;

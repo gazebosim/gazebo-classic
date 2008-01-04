@@ -31,7 +31,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "MovableText.hh"
 #include "UpdateParams.hh"
@@ -40,15 +39,11 @@
 #include "Entity.hh"
 #include "gazebo.h"
 
-// Forward declarations
-namespace Ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {
 
+  // Forward declarations
   class XMLConfigNode;
   class Body;
   class Controller;
@@ -70,6 +65,9 @@ namespace gazebo
     /// \brief Load the model
     public: int Load(XMLConfigNode *node);
   
+    /// \brief Save the model
+    public: void Save();
+
     /// \brief Initialize the model
     public: int Init();
   
@@ -172,7 +170,7 @@ namespace gazebo
     private: std::string type;
   
     /// \brief The node this model was loaded from
-    private: XMLConfigNode *node;
+    private: XMLConfigNode *xmlNode;
   
     /// \brief Initial pose of the model
     private: Pose3d initPose;

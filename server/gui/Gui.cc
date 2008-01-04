@@ -32,6 +32,7 @@
 
 #include "GLWindow.hh"
 #include "Global.hh"
+#include "Simulator.hh"
 #include "MainMenu.hh"
 #include "Toolbar.hh"
 #include "StatusBar.hh"
@@ -69,9 +70,11 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   this->display = this->glWindow->display;
   this->visual = this->glWindow->visual;
   this->colormap = this->glWindow->colormap;
-  this->windowId = this->glWindow->windowId;
-  
+  this->windowId = this->glWindow->windowId;  
   this->resizable(this->glWindow);
+  //this->glWindow->UserQuit.connect( &gazebo::Gui::UserQuit);
+  //this->glWindow->Finished.connect( boost::bind(&gazebo::Gui::Finished,this));
+  //MainMenu::Finished.connect( boost::bind(&gazebo::Gui::Finished,this));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,6 +82,9 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 Gui::~Gui()
 {
   delete this->glWindow;
+  delete this->toolbar;
+  //delete this->statusbar;
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,6 +99,7 @@ void Gui::Update()
   this->toolbar->Update();
   this->statusbar->Update();
   this->glWindow->Update();
+  Fl::wait(0.03);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +123,7 @@ int Gui::handle(int event)
   switch (event)
   {
     case FL_HIDE:
-      Global::SetUserQuit(true);
+      Simulator::Instance()->SetUserQuit();
       return 1;
   }
 

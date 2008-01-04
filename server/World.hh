@@ -44,8 +44,7 @@ namespace gazebo
   class Model;
   class PhysicsEngine;
   class XMLConfigNode;
-  class XMLConfig;
-
+   
 /// \brief The World
 /*
  * The world class keps a list of all models, handles loading and saving,
@@ -62,7 +61,11 @@ class World : public SingletonT<World>
   /// Load the world
   /// \param node XMLConfig node point
   /// \param serverId Id of the gazebo server
-  public: void Load(XMLConfig *node, int serverId);
+  public: void Load(XMLConfigNode *rootNode, int serverId);
+
+  /// Save the world
+  /// \param node XMLConfig node writer pointer
+  public: void Save(XMLConfigNode *node);
 
   /// Initialize the world
   /// \return 0 on success
@@ -87,22 +90,6 @@ class World : public SingletonT<World>
   /// Get the simulation time
   /// \return The simulation time
   public: double GetSimTime() const;
-
-  /// Get the pause time
-  /// \return The pause time
-  public: double GetPauseTime() const;
-
-  /// Get the start time
-  /// \return The start time
-  public: double GetStartTime() const;
-
-  /// Get the real time (elapsed time)
-  /// \return The real time
-  public: double GetRealTime() const;
-
-  /// \brief Get the wall clock time
-  /// \return The wall clock time
-  public: double GetWallTime() const;
 
   /// \brief Load all entities
   /// \param node XMLConfg node pointer
@@ -154,12 +141,6 @@ class World : public SingletonT<World>
 
   /// Simulation interface
   private: SimulationIface *simIface;
-
-  /// Flag set if simulation is paused
-  private: bool pause;
-
-  /// Current simulation time
-  private: double simTime, pauseTime, startTime;
 
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;

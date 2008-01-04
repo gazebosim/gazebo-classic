@@ -97,7 +97,7 @@ namespace gazebo
     /// \brief Set the anchor point
     public: virtual void SetAnchor( const gazebo::Vector3 & /*anchor*/ ) {}
 
-    /// \brief Set the anchor point
+    /// \brief Get the anchor point
     public: virtual gazebo::Vector3 GetAnchor() const
             {return gazebo::Vector3(0,0,0);}
 
@@ -105,12 +105,26 @@ namespace gazebo
     /// \brief Set the _parameter to _value
     public: virtual void SetParam( int parameter, double value );
 
-    /// \brief Set the name of this joint
+    /// \brief Get the name of this joint
     public: std::string GetName() const;
 
-    /// \brief Get the name of this joint
+    /// \brief Set the name of this joint
     public: void SetName(const std::string &name);
 
+     /// \brief Set the ERP of this joint
+    public: void SetERP(double newERP);
+
+    /// \brief Get the ERP of this joint
+    public: double GetERP();
+
+     /// \brief Set the CFM  of this joint
+    public: void SetCFM(double newERP);
+
+    /// \brief Get the CFM of this joint
+    public: double GetCFM();
+
+
+   
     /// \brief This is our id
     protected: dJointID jointId;
 

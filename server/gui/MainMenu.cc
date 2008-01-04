@@ -28,6 +28,7 @@
 
 #include "Global.hh"
 #include "World.hh"
+#include "Simulator.hh"
 #include "CameraManager.hh"
 #include "CameraSensor.hh"
 #include "MainMenu.hh"
@@ -84,7 +85,7 @@ void MainMenu::SaveFramesCB(Fl_Widget * /*w*/, void * /*data*/)
 // Quit Callback
 void MainMenu::QuitCB(Fl_Widget * /*w*/, void * /*data*/)
 {
-  Global::SetUserQuit(true);
+  Simulator::Instance()->SetUserQuit();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

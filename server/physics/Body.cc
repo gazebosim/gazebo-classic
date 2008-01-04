@@ -87,11 +87,12 @@ Body::~Body()
 void Body::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
-
+  
   this->SetName(node->GetString("name","",1));
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern(1,0,0,0)));
-
+  this->xmlNode=node;
+   
   childNode = node->GetChildByNSPrefix("geom");
 
   // Load the geometries
@@ -119,6 +120,30 @@ void Body::Load(XMLConfigNode *node)
   }
 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Save the body based on our XMLConfig node
+void Body::Save()
+{
+  std::vector< Geom* >::iterator giter;
+  std::vector< Sensor* >::iterator siter;
+
+  this->xmlNode->SetValue("name", this->GetName());
+  this->xmlNode->SetValue("xyz", this->GetPosition());
+  this->xmlNode->SetValue("rpy", this->GetRotation());
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    //(*giter)->Save();
+  }
+
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  {
+    //(*siter)->Save();
+  }
+  
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the body

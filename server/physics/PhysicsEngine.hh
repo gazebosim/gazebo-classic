@@ -79,6 +79,10 @@ class PhysicsEngine
   /// \param node Pointer to the XML parameters
   public: virtual void Load(XMLConfigNode *node) = 0;
 
+  /// \brief Saves to XMLFile
+  /// \param node Pointer to the XML writer 
+  public: virtual void Save(XMLConfigNode *node) =0;
+
   /// \brief Initialize the physics engine
   public: virtual void Init() = 0;
 

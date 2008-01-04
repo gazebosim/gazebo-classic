@@ -59,8 +59,11 @@ namespace gazebo
     /// \brief Set the transparency
     public: void SetTransparency( float trans );
 
+    /// \brief Set highlighted or no
+    public: void SetHighlight( bool highlight);
+
     /// \brief Set whether the visual should cast shadows
-    public: void SetCastShadows(float shadows);
+    public: void SetCastShadows(bool shadows);
 
     /// \brief Set the material
     public: void SetMaterial(const std::string &materialName);

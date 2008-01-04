@@ -89,15 +89,28 @@ ODEPhysics::~ODEPhysics()
 // Load the ODE engine
 void ODEPhysics::Load(XMLConfigNode *node)
 {
-  node = node->GetChild("ode");
-
-  if (node == NULL)
+  XMLConfigNode *cnode = node->GetChild("ode", "physics");
+  if (cnode == NULL)
     gzthrow("Must define a <physics:ode> node in the XML file");
+  
+  this->gravity = cnode->GetVector3("gravity",this->gravity);
+  this->stepTime = cnode->GetDouble("stepTime",this->stepTime);
+  this->globalCFM = cnode->GetDouble("cfm",1e-5,0);
+  this->globalERP = cnode->GetDouble("erp",0.2,0);
+}
 
-  this->gravity = node->GetVector3("gravity",this->gravity);
-  this->stepTime = node->GetDouble("stepTime",this->stepTime);
-  this->globalCFM = node->GetDouble("cfm",1e-5,0);
-  this->globalERP = node->GetDouble("erp",0.2,0);
+////////////////////////////////////////////////////////////////////////////////
+// Save the ODE engine
+void ODEPhysics::Save(XMLConfigNode *node)
+{
+  XMLConfigNode *cnode = node->GetChild("ode");
+  if (cnode == NULL)
+    gzthrow("No <physics:ode> node in the XML, can't write back the data");
+
+  cnode->SetValue("gravity", this->gravity);
+  cnode->SetValue("stepTime", this->stepTime);
+  cnode->SetValue("cfm", this->globalCFM);
+  cnode->SetValue("erp", this->globalERP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

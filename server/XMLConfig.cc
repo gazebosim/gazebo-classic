@@ -25,7 +25,6 @@
  */
 
 #include <assert.h>
-#include <string.h>
 #include <float.h>
 #include <math.h>
 #include <sstream>
@@ -130,6 +129,20 @@ int XMLConfig::LoadString( const std::string &str )
 
   return 0;
 }
+
+
+////////////////////////////////////////////////////////////////////////////
+//  Save config back into file
+int XMLConfig::Save(const std::string &filename )
+{
+  int result=0;
+  if (filename==std::string())
+    result=xmlSaveFileEnc(this->filename.c_str(), this->xmlDoc, "UTF-8");
+  else
+    result=xmlSaveFileEnc(filename.c_str(), this->xmlDoc, "UTF-8");
+  return result;
+}
+  
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the root node
@@ -399,9 +412,6 @@ void XMLConfigNode::Print()
   XMLConfigNode *node;
 
   std::cout << "name = [" << (const char*) this->xmlNode->name 
-                      << "]\n";
-
-  std::cout << "id = [" << xmlGetProp(this->xmlNode, (xmlChar*) "id")
                       << "]\n";
 
   // Recurse
@@ -848,3 +858,84 @@ double XMLConfigNode::GetTupleAngle( const std::string &key, int index, double d
 
   return DTOR(atof(svalue.c_str()));
 }
+
+
+////////////////////////////////////////////////////////////////////////////
+// Set the value associated with a node. 
+void XMLConfigNode::SetValue(const String& key, const String& value, int require, int type)
+{
+  bool success;
+  success=this->SetNodeValue(key.GetCharStr(), value.GetCharStr());
+
+  if (!success && require)
+  {
+    this->NewNode(key.GetCharStr(), value.GetCharStr(),type);
+  }
+  
+}
+
+
+bool XMLConfigNode::SetNodeValue(const char* key, const char* value)
+{
+  bool success=false;
+
+  // First check if the key is an attribute
+  if (xmlHasProp( this->xmlNode, (xmlChar*) key ))
+  {
+    xmlSetProp( this->xmlNode, (xmlChar*) key, (xmlChar*) value );
+    success=true;
+  } // This very same node
+
+  else if (key == this->GetName())
+  {
+    xmlNodeSetContent(this->xmlNode, (xmlChar*) value );
+    success=true;
+  }// If not, then it should be a child node
+ 
+ else
+  {
+    XMLConfigNode *currNode;
+    currNode = this->childFirst;
+
+    // Loop through children
+    while (currNode)
+    {
+      // If the name matches, then return its value
+      if (key == currNode->GetName())
+      {
+        xmlNodeSetContent(this->xmlNode, (xmlChar*) value);
+        success=true;
+        break;
+      }
+
+      currNode = currNode->next;
+    }
+  }
+  return success;
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+// Create a new node, child of this. May be a attribute or an element
+void XMLConfigNode::NewNode(const char* key, const char* value, int type)
+{
+  if (type ==0) // A new child element 
+  {
+    xmlNodePtr newNode;
+    newNode = xmlNewNode(0, (xmlChar*) key); //I hope we don't need namespaces here
+    if (!newNode)
+    {
+      std::ostringstream stream;
+      stream << "unable to create an element [" << key << "] in world file node[" << this->GetName() << "]";
+      gzthrow(stream.str());
+    }
+    xmlNodeSetContent(newNode, (xmlChar*) value);
+    xmlAddChild(this->xmlNode, newNode);
+  }
+
+  else //a new atribute
+  {
+    xmlNewProp(this->xmlNode, (xmlChar*) key, (xmlChar*) value);
+  }
+}
+

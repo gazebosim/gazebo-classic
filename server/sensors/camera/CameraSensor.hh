@@ -27,18 +27,19 @@
 #ifndef CAMERASENSOR_HH
 #define CAMERASENSOR_HH
 
-#include <Ogre.h>
+#include <OgrePrerequisites.h>
+#include <OgreTexture.h>
 #include "Pose3d.hh"
 #include "Sensor.hh"
 
 // Forward Declarations
-/*namespace Ogre
+namespace Ogre
 {
   class TexturePtr;
   class RenderTarget;
   class Camera;
   class Viewport;
-}*/
+}
 
 namespace gazebo
 {

@@ -27,7 +27,8 @@
 #ifndef OGREHUD_HH
 #define OGREHUD_HH
 
-#include <Ogre.h>
+#include <OgrePrerequisites.h>
+#include <OgreColourValue.h>
 #include <OgrePanelOverlayElement.h>
 
 namespace gazebo

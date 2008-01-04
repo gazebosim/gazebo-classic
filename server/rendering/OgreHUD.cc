@@ -25,6 +25,7 @@
  */
 
 #include <sstream>
+#include <Ogre.h>
 
 #include "World.hh"
 #include "CameraSensor.hh"

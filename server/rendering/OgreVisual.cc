@@ -239,7 +239,7 @@ void OgreVisual::SetTransparency( float trans )
         case Ogre::SBT_ADD:
           dc = sc;
           dc.r -= sc.r * this->transparency;
-          dc.g -= sc.g * this->transparency;
+          dc.g -= sc.g	 * this->transparency;
           dc.b -= sc.b * this->transparency;
           passIt.peekNext ()->setAmbient (Ogre::ColourValue::Black);
           break;
@@ -260,17 +260,58 @@ void OgreVisual::SetTransparency( float trans )
 
     ++i;
   }
+
 }
+
+void OgreVisual::SetHighlight(bool highlight)
+{
+  /*
+#include <OgreParticleSystem.h>
+#include <iostream>
+  Ogre::ParticleSystem *effect =OgreAdaptor::Instance()->sceneMgr->createParticleSystem(this->parentNode->getName(), "Gazebo/Aureola");
+  OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(effect);
+  //this->sceneNode->createChildSceneNode()->attachObject(effect);
+  Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);
+std::cout << this->parentNode->getName() << std::endl;
+*/
+
+//FIXME:  Modifying selfIllumination is invasive to the material definition of the user
+// Choose other effect.
+
+  Ogre::Technique *t;
+  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
+  while ( techniqueIt.hasMoreElements() ) 
+  {
+    t = techniqueIt.getNext ();
+    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
+
+    while (passIt.hasMoreElements ()) 
+    {
+      if (highlight)
+      {
+        passIt.peekNext ()->setSelfIllumination (1,1,1);
+      }
+      else
+      {
+        passIt.peekNext ()->setSelfIllumination (0,0,0);
+      }       
+      passIt.moveNext ();
+    }
+  }
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual should cast shadows
-void OgreVisual::SetCastShadows(float shadows)
+void OgreVisual::SetCastShadows(bool shadows)
 {
   for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
     obj->setCastShadows(shadows);
   }
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,4 +379,5 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
     simple->setMaterial("Gazebo/TransparentTest");
 
   this->boundingBoxNode->setVisible(false);
+  
 }

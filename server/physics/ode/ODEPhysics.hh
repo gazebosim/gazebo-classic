@@ -81,6 +81,9 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Load the ODE engine
   public: virtual void Load(XMLConfigNode *node);
 
+  /// \brief Saves to XMLFile
+  public: void Save(XMLConfigNode *node);
+
   /// \brief Initialize the ODE engine
   public: virtual void Init();
 

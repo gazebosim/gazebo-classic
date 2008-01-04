@@ -98,7 +98,17 @@ void Controller::Load(XMLConfigNode *node)
   }
 
   this->LoadChild(node);
+  this->xmlNode=node;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the controller. 
+void Controller::Save()
+{
+  //So far the controller can not change in any way, not rewrite
+  this->SaveChild(this->xmlNode); 
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the controller. Called once on startup.
