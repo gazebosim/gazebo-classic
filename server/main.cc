@@ -288,11 +288,9 @@ int Init()
 
   LoadConfigFile();
 
-  if (gazebo::Simulator::Instance()->Load(worldFileName, optServerId)!=0)
-    return -1;
+  gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
 
   gazebo::Simulator::Instance()->Init();
- 
 
   return 0;
 
@@ -316,7 +314,7 @@ int main(int argc, char **argv)
   {
     if (Init() != 0)
     {
-      fprintf(stderr,"Initialization failed\n");
+      fprintf(stderr,"Simulator initialization failed\n");
       return -1;
     }
   }
@@ -332,7 +330,7 @@ int main(int argc, char **argv)
   }
   catch (gazebo::GazeboError e)
   {
-    std::cerr << "MainIdle Failed[" << e << "]\n";
+    std::cerr << "Simulator MainIdle loop failed[" << e << "]\n";
     return -1;
   }
 

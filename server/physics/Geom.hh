@@ -67,6 +67,7 @@ namespace gazebo
     /// \brief Load the geom
     public: virtual void Load(XMLConfigNode *node);
 
+
     /// \brief Load child class
     protected: virtual void LoadChild(XMLConfigNode *node) = 0;
   
@@ -177,7 +178,10 @@ namespace gazebo
 
     private: float transparency;
 
+    /// All the visual apparence 
     private: std::vector<OgreVisual*> visuals;
+
+
   };
 
   /// \}

@@ -159,6 +159,7 @@ class Body : public Entity
   
   ///our XML DATA
   private: XMLConfigNode *xmlNode;
+  
   /// ODE body handle
   private: dBodyID bodyId;
 

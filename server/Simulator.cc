@@ -65,7 +65,7 @@ Simulator::~Simulator()
   GZ_DELETE (this->xmlFile)
 }
 
-int Simulator::Load(const std::string &worldFileName, int serverId )
+void Simulator::Load(const std::string &worldFileName, int serverId )
 {
 
   // Load the world file

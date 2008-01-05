@@ -56,7 +56,7 @@ class Simulator : public SingletonT<Simulator>
   /// Private destructor
   private: ~Simulator();
 
-  public: int Load(const std::string &worldFileName, int serverId );
+  public: void Load(const std::string &worldFileName, int serverId );
 
   public: int Init( );
 
