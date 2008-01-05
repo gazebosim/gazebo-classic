@@ -39,6 +39,7 @@ namespace Ogre
   class RenderTarget;
   class Camera;
   class Viewport;
+  class SceneNode;
 }
 
 namespace gazebo
@@ -150,6 +151,9 @@ class CameraSensor : public Sensor
   private: std::string ogreMaterialName;
 
   private: Pose3d pose;
+
+  //access to our visual node (convenience member)
+  private: Ogre::SceneNode *sceneNode;
 
   // Info for saving images
   private: unsigned char *saveFrameBuffer;

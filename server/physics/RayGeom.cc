@@ -45,15 +45,13 @@ RayGeom::RayGeom( Body *body )
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
 
-  this->visual = new OgreVisual(this->sceneNode);
- 
   this->line = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
 
   // Add two points
   this->line->AddPoint(Vector3(0,0,0));
   this->line->AddPoint(Vector3(0,0,0));
 
-  this->visual->AttachObject(this->line);
+  this->visualNode->AttachObject(this->line);
 
   this->line->setMaterial("Gazebo/BlueEmissive");
 

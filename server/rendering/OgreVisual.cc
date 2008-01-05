@@ -31,11 +31,15 @@
 
 using namespace gazebo;
 
-OgreVisual::OgreVisual(Ogre::SceneNode *node)
+OgreVisual::OgreVisual(OgreVisual *node)
 {
 
   std::ostringstream stream;
-  this->parentNode = node;
+
+  if (!node)
+    this->parentNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
+  else
+    this->parentNode = node->GetSceneNode();
 
   this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
 
@@ -51,6 +55,7 @@ OgreVisual::OgreVisual(Ogre::SceneNode *node)
 /// \brief Destructor
 OgreVisual::~OgreVisual()
 {
+ this->parentNode->removeAndDestroyChild(this->sceneNode->getName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +68,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   Ogre::Vector3 meshSize;
   Ogre::MovableObject *obj;
 
+  this->xmlNode=node; 
   std::string meshName = node->GetString("mesh","",1);
   std::string materialName = node->GetString("material","",0);
 
@@ -100,13 +106,20 @@ void OgreVisual::Load(XMLConfigNode *node)
   }
 
   // Set the pose of the scene node
-  OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, pose);
-
+  this->SetPose(pose);
+  
   // Set the material of the mesh
   this->SetMaterial(node->GetString("material","",0));
 
   // Allow the sphere to cast shadows
   this->SetCastShadows(true);
+}
+
+void OgreVisual::Save()
+{
+  this->xmlNode->SetValue("xyz", this->GetPosition());
+  this->xmlNode->SetValue("rpy", this->GetRotation());
+  //TODO: A lot of information!
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -321,26 +334,73 @@ void OgreVisual::SetVisible(bool visible)
   this->sceneNode->setVisible( visible );
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
 void OgreVisual::SetPosition( const Vector3 &pos)
 {
-  OgreAdaptor::Instance()->SetSceneNodePosition( this->sceneNode, pos);
+  this->sceneNode->setPosition(pos.y, pos.z, pos.x);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
 void OgreVisual::SetRotation( const Quatern &rot)
 {
-  OgreAdaptor::Instance()->SetSceneNodeRotation( this->sceneNode, rot);
+  this->sceneNode->setOrientation(rot.u, rot.y, rot.z, rot.x);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the visual
 void OgreVisual::SetPose( const Pose3d &pose)
 {
-  OgreAdaptor::Instance()->SetSceneNodePose( this->sceneNode, pose);
+  this->SetPosition(pose.pos);
+  this->SetRotation( pose.rot);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the position of the visual
+Vector3 OgreVisual::GetPosition()
+{
+  Ogre::Vector3 vpos;
+  Vector3 pos;
+  vpos=this->sceneNode->getPosition();
+  pos.x=vpos.z;
+  pos.y=vpos.x;
+  pos.z=vpos.y;
+  return pos;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the rotation of the visual
+Quatern OgreVisual::GetRotation( )
+{
+  Ogre::Quaternion vquatern;
+  Quatern quatern;
+  vquatern=this->sceneNode->getOrientation();
+  quatern.u =vquatern.w;
+  quatern.x=vquatern.z;
+  quatern.y=vquatern.x;
+  quatern.z=vquatern.y;
+  return quatern;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the pose of the visual
+Pose3d OgreVisual::GetPose()
+{
+  Pose3d pos;
+  pos.pos=this->GetPosition();
+  pos.rot=this->GetRotation();
+  return pos;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get this visual Ogre node 
+Ogre::SceneNode * OgreVisual::GetSceneNode()
+{
+  return this->sceneNode;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Create a bounding box for this visual

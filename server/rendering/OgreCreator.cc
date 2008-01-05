@@ -75,7 +75,7 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
       uvTile.x, uvTile.y, 
       Ogre::Vector3(perp.y, perp.z, perp.x));
 
-  OgreVisual *visual = new OgreVisual(parent->GetSceneNode());
+  OgreVisual *visual = new OgreVisual(parent->GetVisualNode());
   visual->AttachMesh(parent->GetName());
   visual->SetMaterial(material);
 
@@ -138,7 +138,7 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
 
   // TODO: More options for Spot lights, etc.
 
-  entity->GetSceneNode()->attachObject(light);
+  entity->GetVisualNode()->AttachObject(light);
 }
 
 

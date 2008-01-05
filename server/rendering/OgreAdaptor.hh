@@ -84,15 +84,6 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   /// \brief Render a single frame
   public: int Render();
 
-  /// \brief Use this function to set the pose of a scene node
-  public: void SetSceneNodePose( Ogre::Node *node, const Pose3d &pose );
-
-  /// \brief Use this function to set the position of a scene node
-  public: void SetSceneNodePosition(Ogre::Node *node, const Vector3 &pos);
-
-  /// \brief Use this function to set the rotation of a scene node
-  public: void SetSceneNodeRotation(Ogre::Node *node, const Quatern &rot);
-
   /// \brief Resize the rendering window
   public: void ResizeWindow(unsigned int w, unsigned int h);
 

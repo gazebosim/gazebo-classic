@@ -408,25 +408,4 @@ int OgreAdaptor::Render()
   return 0;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Use this function to set the pose of a scene node
-void OgreAdaptor::SetSceneNodePose( Ogre::Node *node, const Pose3d &pose )
-{
-  this->SetSceneNodePosition(node, pose.pos);
-  this->SetSceneNodeRotation(node, pose.rot);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Use this function to set the position of a scene node
-void OgreAdaptor::SetSceneNodePosition( Ogre::Node *node, const Vector3 &pos )
-{
-  node->setPosition(pos.y, pos.z, pos.x);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Use this function to set the rotation of a scene node
-void OgreAdaptor::SetSceneNodeRotation( Ogre::Node *node, const Quatern &rot )
-{
-  node->setOrientation(rot.u, rot.y, rot.z, rot.x);
-}
 

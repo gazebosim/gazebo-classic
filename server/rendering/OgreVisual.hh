@@ -42,7 +42,7 @@ namespace gazebo
   class OgreVisual
   {
     /// \brief Constructor
-    public: OgreVisual (Ogre::SceneNode *node);
+    public: OgreVisual (OgreVisual *node);
 
     /// \brief Destructor
     public: virtual ~OgreVisual();
@@ -55,6 +55,9 @@ namespace gazebo
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
+
+    /// \brief Save the visual
+    public: void Save();
 
     /// \brief Set the transparency
     public: void SetTransparency( float trans );
@@ -80,6 +83,18 @@ namespace gazebo
     /// \brief Set the pose of the visual
     public: void SetPose( const Pose3d &pose);
 
+    /// \brief Get the position of the visual
+    public: Vector3 GetPosition();
+
+    /// \brief Get the rotation of the visual
+    public: Quatern GetRotation();
+
+    /// \brief Get the pose of the visual
+    public: Pose3d GetPose();
+
+    /// \brief Return the scene Node of this visual entity
+    public: Ogre::SceneNode * GetSceneNode();
+
     /// \brief Create a bounding box for this visual
     public: void AttachBoundingBox(const Vector3 &min, const Vector3 &max);
 
@@ -92,6 +107,11 @@ namespace gazebo
     private: Ogre::SceneNode *boundingBoxNode;
 
     private: float transparency;
+
+    ///our XML DATA
+    private: XMLConfigNode *xmlNode;
+
+
   };
 }
 

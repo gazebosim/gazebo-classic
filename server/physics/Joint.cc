@@ -25,7 +25,6 @@
  */
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
-#include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "Body.hh"
 #include "Model.hh"
@@ -71,7 +70,7 @@ void Joint::Load(XMLConfigNode *node)
   this->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.8,0));
 
   /// Add a renderable for the joint
-  this->visual = new OgreVisual(this->model->GetSceneNode());
+  this->visual = new OgreVisual(this->model->GetVisualNode());
   this->visual->AttachMesh("joint_anchor");
   this->visual->SetVisible(false);
 
@@ -99,9 +98,6 @@ void Joint::Update()
 
   this->visual->SetVisible(Global::GetShowJoints());
   this->visual->SetPosition(this->GetAnchor());
-
-  //this->sceneNode->setVisible(Global::GetShowJoints());
-  //OgreAdaptor::Instance()->SetSceneNodePosition( this->sceneNode, this->GetAnchor());
 
   if (this->body1)
   {

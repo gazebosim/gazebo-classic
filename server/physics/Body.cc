@@ -28,7 +28,8 @@
 
 #include "GazeboMessage.hh"
 #include "HeightmapGeom.hh"
-#include "OgreAdaptor.hh"
+#include "OgreVisual.hh"
+#include "Global.hh"
 #include "Vector2.hh"
 #include "Quatern.hh"
 #include "GazeboError.hh"
@@ -71,13 +72,13 @@ Body::~Body()
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    delete (*giter);
+    GZ_DELETE (*giter);
   }
   this->geoms.clear();
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
   {
-    delete (*siter);
+    GZ_DELETE (*siter);
   }
   this->sensors.clear();
 }
@@ -192,7 +193,7 @@ void Body::Update(UpdateParams &params)
     Pose3d pose = this->GetPose();
 
     // Set the pose of the scene node
-    OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, pose);
+    this->visualNode->SetPose(pose);
   }
 
   for (geomIter=this->geoms.begin(); 
@@ -298,7 +299,7 @@ void Body::SetPosition(const Vector3 &pos)
   }
  
   // Set the position of the scene node
-  OgreAdaptor::Instance()->SetSceneNodePosition(this->sceneNode, pos);
+  this->visualNode->SetPosition(pos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -323,7 +324,7 @@ void Body::SetRotation(const Quatern &rot)
   }
 
   // Set the orientation of the scene node
-  OgreAdaptor::Instance()->SetSceneNodeRotation(this->sceneNode, rot);
+  this->visualNode->SetRotation(rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

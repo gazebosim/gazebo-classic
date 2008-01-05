@@ -70,11 +70,19 @@ Geom::Geom( Body *body)//, const std::string &name)
 // Destructor
 Geom::~Geom()
 {
+  std::vector<OgreVisual*>::iterator iter;
+
   if (this->geomId)
     dGeomDestroy(this->geomId);
 
   if (this->transId)
     dGeomDestroy(this->transId);
+
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    GZ_DELETE (*iter)
+  }
+  this->visuals.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +90,8 @@ Geom::~Geom()
 void Geom::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode = NULL;
+
+  this->xmlNode=node;
 
   this->SetName(node->GetString("name","",1));
 
@@ -111,7 +121,7 @@ void Geom::Load(XMLConfigNode *node)
   childNode = node->GetChild("visual");
   while (childNode)
   {
-    OgreVisual *visual = new OgreVisual(this->sceneNode);
+    OgreVisual *visual = new OgreVisual(this->visualNode);
     visual->Load(childNode);
     this->visuals.push_back(visual);
     childNode = childNode->GetNext("visual");
@@ -127,11 +137,35 @@ void Geom::Load(XMLConfigNode *node)
     Vector3 min(aabb[0], aabb[2], aabb[4]);
     Vector3 max(aabb[1], aabb[3], aabb[5]);
 
-    this->bbVisual = new OgreVisual(this->sceneNode);
+    this->bbVisual = new OgreVisual(this->visualNode);
     this->bbVisual->AttachBoundingBox(min,max);
   }
 }
  
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Save the body based on our XMLConfig node
+void Geom::Save()
+{
+  std::vector<OgreVisual*>::iterator iter;
+  Pose3d pose= this->GetPose();
+
+  this->xmlNode->SetValue("name", this->GetName());
+  this->xmlNode->SetValue("xyz", pose.pos);
+  this->xmlNode->SetValue("rpy", pose.rot);
+
+  this->xmlNode->SetValue("mass", this->dblMass);
+  this->xmlNode->SetValue("laserFiducialId",GetLaserFiducialId());
+  this->xmlNode->SetValue("laserRetro",GetLaserRetro());
+
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    (*iter)->Save();
+  }
+
+
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Set the encapsulated geometry object
 void Geom::SetGeom(dGeomID geomId, bool placeable)
@@ -247,8 +281,8 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
 
-    if (!this->IsStatic())
-      OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, localPose);
+    if (!this->IsStatic()) 
+      this->visualNode->SetPose(localPose);
 
     // Set the pose of the encapsulated geom; this is always relative
     // to the CoM

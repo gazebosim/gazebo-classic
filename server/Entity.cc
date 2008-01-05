@@ -24,10 +24,9 @@
  * Date: 03 Apr 2007
  * SVN: $Id$
  */
-#include <Ogre.h>
 #include "GazeboError.hh"
 #include "Global.hh"
-#include "OgreAdaptor.hh"
+#include "OgreVisual.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Entity.hh"
@@ -42,14 +41,17 @@ Entity::Entity(Entity *parent)
   this->parent = parent;
   this->id = idCounter++;
   this->isStatic = false;
-
+  this->visualNode=0;
+  
   if (this->parent)
   {
     this->parent->AddChild(this);
+    this->visualNode=new OgreVisual(this->parent->GetVisualNode());
+    this->SetStatic(parent->IsStatic());
   }
   else
   {
-    this->sceneNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode();
+    this->visualNode = new OgreVisual(NULL);
   }
 
   // Add this to the phyic's engine
@@ -58,17 +60,7 @@ Entity::Entity(Entity *parent)
 
 Entity::~Entity()
 {
-  if (this->parent)
-  {
-/*    this->parent->sceneNode->removeAndDestroyChild(this->sceneNode->getName());
-    this->parent = NULL;
-    */
-  }
-  else
-  {
-    OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->removeAndDestroyChild(this->sceneNode->getName());
-  }
-
+  GZ_DELETE (this->visualNode);
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 
 }
@@ -103,16 +95,6 @@ void Entity::AddChild(Entity *child)
   if (child == NULL)
     gzthrow("Cannot add a null child to an entity");
 
-  // Set the child's parent
-  child->SetParent(this);
-
-  Ogre::SceneNode *newNode(this->sceneNode->createChildSceneNode());
-
-  // The the child's scene node
-  child->SetSceneNode(newNode);
-
-  child->SetStatic(this->IsStatic());
-
   // Add this child to our list
   this->children.push_back(child);
 }
@@ -124,15 +106,15 @@ std::vector< Entity* > &Entity::GetChildren()
 }
 
 // Return this entitie's sceneNode
-Ogre::SceneNode *Entity::GetSceneNode() const
+OgreVisual *Entity::GetVisualNode() const
 {
-  return this->sceneNode;
+  return this->visualNode;
 }
 
 // Set the scene node
-void Entity::SetSceneNode(Ogre::SceneNode *sceneNode)
+void Entity::SetVisualNode(OgreVisual *visualNode)
 {
-  this->sceneNode = sceneNode;
+  this->visualNode = visualNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,5 +152,3 @@ bool Entity::operator==(const Entity &ent)
 {
   return ent.GetName() == this->GetName();
 }
-
-

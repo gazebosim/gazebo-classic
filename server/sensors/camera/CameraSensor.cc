@@ -31,7 +31,7 @@
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
-#include "OgreAdaptor.hh"
+#include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "OgreFrameListener.hh"
 
@@ -132,7 +132,7 @@ void CameraSensor::InitChild()
 
   Ogre::TextureUnitState *t = mat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreTextureName);
 
-
+  this->sceneNode=this->GetVisualNode()->GetSceneNode();
   // Create a scene node to control pitch motion
   this->pitchNode = this->sceneNode->createChildSceneNode(this->GetName() + "PitchNode");
   this->pitchNode->pitch(Ogre::Degree(0));

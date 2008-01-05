@@ -32,14 +32,10 @@
 #include <string>
 #include <ode/ode.h>
 
-namespace Ogre
-{
-  class SceneNode;
-}
-
 namespace gazebo
 {
 
+class OgreVisual;
 /// \addtogroup gazebo_server
 /// \{
 
@@ -83,11 +79,11 @@ class Entity
 
   /// \brief Return this entity's sceneNode
   /// \return Ogre scene node
-  public: Ogre::SceneNode *GetSceneNode() const;
+  public: OgreVisual *GetVisualNode() const;
 
   /// \brief Set the scene node
   /// \param sceneNode Ogre scene node
-  public: void SetSceneNode(Ogre::SceneNode *sceneNode);
+  public: void SetVisualNode(OgreVisual *visualNode);
 
   /// \brief Set the name of the entity
   /// \param name Body name
@@ -121,7 +117,7 @@ class Entity
   private: static unsigned int idCounter;
 
   /// \brief OGRE stuff
-  protected: Ogre::SceneNode *sceneNode;
+  protected: OgreVisual *visualNode;
 
   /// \brief ODE Stuff
   public: dSpaceID spaceId;
