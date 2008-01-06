@@ -865,7 +865,7 @@ double XMLConfigNode::GetTupleAngle( const std::string &key, int index, double d
 void XMLConfigNode::SetValue(const String& key, const String& value, int require, int type)
 {
   bool success;
-  success=this->SetNodeValue(key.GetCharStr(), value.GetCharStr());
+  success=this->SetNodeValue(key.GetStr(), value.GetStr());
 
   if (!success && require)
   {
@@ -875,20 +875,20 @@ void XMLConfigNode::SetValue(const String& key, const String& value, int require
 }
 
 
-bool XMLConfigNode::SetNodeValue(const char* key, const char* value)
+bool XMLConfigNode::SetNodeValue(const std::string& key,const std::string& value)
 {
   bool success=false;
 
   // First check if the key is an attribute
-  if (xmlHasProp( this->xmlNode, (xmlChar*) key ))
+  if (xmlHasProp( this->xmlNode, (xmlChar*) key.c_str() ))
   {
-    xmlSetProp( this->xmlNode, (xmlChar*) key, (xmlChar*) value );
+    xmlSetProp( this->xmlNode, (xmlChar*) key.c_str(), (xmlChar*) value.c_str() );
     success=true;
   } // This very same node
 
   else if (key == this->GetName())
   {
-    xmlNodeSetContent(this->xmlNode, (xmlChar*) value );
+    xmlNodeSetContent(this->xmlNode, (xmlChar*) value.c_str() );
     success=true;
   }// If not, then it should be a child node
  
@@ -903,7 +903,7 @@ bool XMLConfigNode::SetNodeValue(const char* key, const char* value)
       // If the name matches, then return its value
       if (key == currNode->GetName())
       {
-        xmlNodeSetContent(this->xmlNode, (xmlChar*) value);
+        xmlNodeSetContent(currNode->xmlNode, (xmlChar*) value.c_str());
         success=true;
         break;
       }

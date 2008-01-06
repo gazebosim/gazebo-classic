@@ -198,7 +198,7 @@ namespace gazebo
     protected: xmlChar* GetNodeValue( const std::string &key );
   
     /// \brief Set a node's value, either attribute or child node value (private)
-    protected: bool SetNodeValue(const char* key, const char* value);
+    protected: bool SetNodeValue(const std::string& key,const std::string& value);
 
     /// \brief Creates a new node child of this. either attribute or element
     protected: void NewNode(const char* key, const char* value, int type);

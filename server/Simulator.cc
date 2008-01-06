@@ -109,9 +109,7 @@ void Simulator::Save(const std::string& filename)
 {
   // Saving in the preferred order
   XMLConfigNode* root=xmlFile->GetRootNode();
-  root->Print();
   gazebo::GazeboMessage::Instance()->Save(root);
-  root->Print();
   World::Instance()->GetPhysicsEngine()->Save(root);
   this->SaveGui(root);
   gazebo::OgreAdaptor::Instance()->Save(root);
@@ -138,7 +136,6 @@ int Simulator::Init()
 
 int Simulator::Fini( )
 {
-//  this->Save("test.xml");
   gazebo::World::Instance()->Fini();
   return 0;
 }
