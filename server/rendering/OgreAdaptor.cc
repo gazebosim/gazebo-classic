@@ -89,7 +89,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   node = rootNode->GetChild("ogre", "rendering");
   if (!node)
   {
-    gzthrow( "missing OGRE Rendernig information" );
+    gzthrow( "missing OGRE Rendering information" );
   }
   
   ambient.r = node->GetTupleDouble("ambient",0,1.0);

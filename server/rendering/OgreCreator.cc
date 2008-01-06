@@ -200,12 +200,6 @@ void OgreCreator::CreateFog(XMLConfigNode *node)
     //OgreAdaptor::Instance()->sceneMgr->setFog(fogType, backgroundColor, density, linearStart, linearEnd);
     OgreAdaptor::Instance()->sceneMgr->setFog(Ogre::FOG_LINEAR, backgroundColor, 0, linearStart, linearEnd);
   }
-  else
-  {
-    OgreAdaptor::Instance()->sceneMgr->setFog(Ogre::FOG_LINEAR, *OgreAdaptor::Instance()->backgroundColor, 0.001, 900, 1000);
-  }
-
-
 }
 
 void OgreCreator::SaveFog(XMLConfigNode *node)
