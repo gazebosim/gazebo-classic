@@ -50,6 +50,7 @@ OgreVisual::OgreVisual(OgreVisual *node)
   this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
 
   this->boundingBoxNode = NULL;
+  this->sceneNode->setInheritScale(false);
 }
 
 /// \brief Destructor
@@ -142,6 +143,26 @@ void OgreVisual::AttachMesh( const std::string &meshName )
   this->sceneNode->attachObject((Ogre::Entity*)obj);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+///  Set the scale
+void OgreVisual::SetScale( Vector3 scale )
+{
+  Ogre::Vector3 vscale;
+  vscale.x=scale.y;  
+  vscale.y=scale.z;
+  vscale.z=scale.x;
+  this->sceneNode->setScale(vscale);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the scale
+Vector3 OgreVisual::GetScale()
+{
+  Ogre::Vector3 vscale;
+  vscale=this->sceneNode->getScale();
+  return Vector3(vscale.z, vscale.x, vscale.y);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the material
@@ -223,7 +244,7 @@ void OgreVisual::SetTransparency( float trans )
 
   if (this->myMaterial.isNull())
   {
-    gzmsg(0) << "Can't set transparency for a geom without a material\n";
+    gzmsg(0) << "The visual " << this->sceneNode->getName() << " can't set transparency for this geom without a material\n";
     return;
   }
 
@@ -329,9 +350,9 @@ void OgreVisual::SetCastShadows(bool shadows)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual is visible
-void OgreVisual::SetVisible(bool visible)
+void OgreVisual::SetVisible(bool visible, bool cascade)
 {
-  this->sceneNode->setVisible( visible );
+  this->sceneNode->setVisible( visible, cascade );
 }
 
 

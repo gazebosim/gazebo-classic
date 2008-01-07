@@ -28,6 +28,7 @@
 
 #include "Body.hh"
 #include "BoxGeom.hh"
+#include "OgreVisual.hh"
 
 using namespace gazebo;
 
@@ -57,4 +58,7 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
 
   // Create a box geometry with box mass matrix
   this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
+  this->visualNode->AttachMesh("unit_box");
+  this->visualNode->SetScale(size);
+  this->visualNode->SetMaterial("Gazebo/GreenEmissive");
 }

@@ -26,7 +26,7 @@
 
 #include <ode/ode.h>
 
-#include "OgreSimpleShape.hh"
+#include "OgreVisual.hh"
 #include "Body.hh"
 #include "SphereGeom.hh"
 
@@ -50,11 +50,18 @@ SphereGeom::~SphereGeom()
 ///  Load the sphere
 void SphereGeom::LoadChild(XMLConfigNode *node)
 {
-  double radius = node->GetDouble("size",0.0,0);
+  double radius = node->GetDouble("size",1.0,0);
 
   // Initialize box mass matrix
   dMassSetSphereTotal(&this->mass, this->dblMass, radius);
 
   // Create the sphere geometry
   this->SetGeom(dCreateSphere(0, radius ), true);
+
+  //to be able to show physics
+  this->visualNode->AttachMesh("unit_sphere"); // unit_sphere radius=1 diameter=2
+  this->visualNode->SetScale(Vector3(radius/2, radius/2 ,radius/2));
+  this->visualNode->SetMaterial("Gazebo/GreenEmissive");
+
+
 }

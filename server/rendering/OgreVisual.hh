@@ -59,6 +59,15 @@ namespace gazebo
     /// \brief Save the visual
     public: void Save();
 
+    /// \brief Set the scale
+    public: void SetScale( Vector3 scale );
+
+    /// \brief Get the scale
+    public: Vector3 GetScale();
+
+    /// \brief Set the material
+    public: void SetMaterial(const std::string &materialName);
+
     /// \brief Set the transparency
     public: void SetTransparency( float trans );
 
@@ -68,11 +77,10 @@ namespace gazebo
     /// \brief Set whether the visual should cast shadows
     public: void SetCastShadows(bool shadows);
 
-    /// \brief Set the material
-    public: void SetMaterial(const std::string &materialName);
-
     /// \brief Set whether the visual is visible
-    public: void SetVisible(bool visible);
+    /// \param visible set this node visible
+    /// \param cascade setting this parameter in children too
+    public: void SetVisible(bool visible, bool cascade=true);
 
     /// \brief Set the position of the visual
     public: void SetPosition( const Vector3 &pos);

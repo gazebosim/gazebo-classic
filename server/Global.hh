@@ -167,6 +167,12 @@ namespace gazebo
     /// \brief Get whether to view as wireframe
     public: static bool GetWireframe();
 
+    /// \brief Set to view as wireframe
+    public: static void SetShowPhysics( bool show );
+
+    /// \brief Get whether to view as wireframe
+    public: static bool GetShowPhysics();
+
     /// Pointer to the selected Gui 
     public: static Gui *gui;
 
@@ -185,6 +191,8 @@ namespace gazebo
 
     /// Set to true to show joints
     private: static bool showJoints;
+
+    private: static bool showPhysics;
 
     private: static bool wireframe;
 

@@ -27,7 +27,6 @@
 #include <sstream>
 
 #include "OgreVisual.hh"
-#include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "ContactParams.hh"
@@ -206,9 +205,13 @@ void Geom::Update()
 {
 //FIXME: Calling this FPS * num of geoms each second ...
 
+  if (dGeomGetClass(this->geomId) != dPlaneClass && dGeomGetClass(this->geomId) != dHeightfieldClass)
+    this->ShowPhysics(Global::GetShowPhysics());
+
   if (this->bbVisual)
     this->bbVisual->SetVisible(Global::GetShowBoundingBoxes());
-
+    //this->visualNode->GetSceneNode()->setVisible(true, false);
+    
   if (!Global::GetShowJoints())
   {
     this->SetTransparency(0);
@@ -220,7 +223,7 @@ void Geom::Update()
   }
 
   this->UpdateChild();
-
+  
   //this->SetPose(this->GetPose());
 }
 
@@ -451,3 +454,27 @@ float Geom::GetTransparency() const
   return this->transparency;
 }
  
+void Geom::ShowPhysics(bool show)
+{
+std::vector<OgreVisual*>::iterator iter;
+  if (show)
+  {
+    for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+    {
+      (*iter)->SetVisible(false, false);  
+  //    (*iter)->SetTransparency(1.0);
+    }
+    this->visualNode->SetVisible(true, false);
+    this->visualNode->SetTransparency(0.6);
+  }
+  else
+  {
+    for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+    {
+      (*iter)->SetVisible(true, false);  
+    //  (*iter)->SetTransparency(this->transparency);
+    }
+    this->visualNode->SetVisible(false, false);
+    this->visualNode->SetTransparency(1.0);
+  }
+}

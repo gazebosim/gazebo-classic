@@ -50,6 +50,7 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
     
     { "View", 0, 0, 0, FL_SUBMENU, FL_NORMAL_LABEL, 0, 14, 0},
       { "Wireframe", 0, &gazebo::MainMenu::WireframeCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+      { "Show Physics", 0, &gazebo::MainMenu::ShowPhysicsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
       { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
       { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
       { 0 },
@@ -100,6 +101,13 @@ void MainMenu::ShowBoundingBoxesCB(Fl_Widget * /*w*/, void * /*data*/)
 void MainMenu::ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   Global::SetShowJoints( !Global::GetShowJoints() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Show Bounding boxes callback
+void MainMenu::ShowPhysicsCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  Global::SetShowPhysics( !Global::GetShowPhysics() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -141,6 +141,8 @@ namespace gazebo
     /// \brief Get the value of the transparency
     public: float GetTransparency() const;
   
+  void ShowPhysics(bool);
+
     ///  Contact parameters
     public: ContactParams *contact; 
   

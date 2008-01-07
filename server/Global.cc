@@ -35,6 +35,7 @@ bool Global::userStepInc = false;
 bool Global::showBoundingBoxes = false;
 bool Global::showJoints = false;
 bool Global::wireframe = false;
+bool Global::showPhysics = false;
 unsigned long Global::iterations = 0;
 //Gui *Global::gui = NULL;
 Pose3d Global::poseOffset;
@@ -147,4 +148,18 @@ bool Global::GetWireframe()
   return wireframe;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get wheter to show the joints
+bool Global::GetShowPhysics()
+{
+  return showPhysics;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to show the joints
+void Global::SetShowPhysics(bool show)
+{
+  showPhysics = show;
+}
 

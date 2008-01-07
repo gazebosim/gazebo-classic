@@ -27,7 +27,7 @@
 #include <ode/ode.h>
 #include <Ogre.h>
 
-#include "OgreAdaptor.hh"
+#include "OgreVisual.hh"
 #include "Body.hh"
 #include "TrimeshGeom.hh"
 
@@ -93,9 +93,13 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   this->meshName = node->GetString("mesh","",1);
   
   mesh = Ogre::MeshManager::getSingleton().load(this->meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
+  
   Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
 
+  this->visualNode->AttachMesh(this->meshName);
+  this->visualNode->SetScale(scale);
+  this->visualNode->SetMaterial("Gazebo/GreenEmissive");
+  
   int i,j,k;
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
