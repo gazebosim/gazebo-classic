@@ -249,30 +249,47 @@ material Gazebo/RedEmissive
 	{
 		pass
 		{
-		  ambient 1.000000 0.000000 0.000000 1.000000
+	                ambient 1.000000 0.000000 0.000000 1.000000
 			diffuse 1.000000 0.000000 0.000000 1.000000
 			specular 0.200000 0.000000 0.000000 1.000000
 			emissive 1.000000 0.000000 0.000000 1.000000
-      lighting on
+                        lighting on
 		}
 	}
 }
 
+material Gazebo/GreenEmissive
+{
+  receive_shadows off
+
+  technique
+  {
+    pass
+    {
+      ambient 0.000000 1.000000 0.000000 1.000000
+      diffuse 0.000000 1.000000 0.000000 1.000000
+      specular 0.000000 0.200000 0.000000 1.000000
+      emissive 0.000000 0.100000 0.000000 1.000000
+      lighting on
+     }
+  }
+}
+
 material Gazebo/BlueEmissive
 {
-	receive_shadows off
+  receive_shadows off
 
-	technique
-	{
-		pass
-		{
-		  ambient 0.000000 0.000000 1.000000 1.000000
-			diffuse 0.000000 0.000000 1.000000 1.000000
-			specular 0.000000 0.000000 0.200000 1.000000
-			emissive 0.000000 0.000000 1.000000 1.000000
+  technique
+  {
+    pass
+    {
+      ambient 0.000000 0.000000 1.000000 1.000000
+      diffuse 0.000000 0.000000 1.000000 1.000000
+      specular 0.000000 0.000000 0.200000 1.000000
+      emissive 0.000000 0.000000 1.000000 1.000000
       lighting on
-		}
-	}
+    }
+  }
 }
 
 

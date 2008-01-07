@@ -108,11 +108,14 @@
     <xyz>200 140 3.2</xyz>
     <rpy>0 0 -130</rpy>
 
-    <controller:pioneer2dx_position2d name="controller1">
+    <controller:differential_position2d name="controller1">
       <leftJoint>left_wheel_hinge</leftJoint>
       <rightJoint>right_wheel_hinge</rightJoint>
-      <interface:position name="position_iface_1"/>
-    </controller:pioneer2dx_position2d>
+      <wheelSeparation>0.34</wheelSeparation>
+      <wheelDiameter>0.15</wheelDiameter>
+      <torque>5</torque>
+      <interface:position name="position_iface_0"/>
+    </controller:differential_position2d>
 
     <model:physical name="laser_model">
       <xyz>0 0 0.2</xyz>
