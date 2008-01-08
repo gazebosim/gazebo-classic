@@ -28,6 +28,7 @@
 #include "Global.hh"
 #include "Body.hh"
 #include "Model.hh"
+#include "World.hh"
 #include "Joint.hh"
 
 using namespace gazebo;
@@ -95,8 +96,12 @@ void Joint::Load(XMLConfigNode *node)
 void Joint::Update()
 {
   Vector3 start,end;
+//TODO: Evaluate impact of this code on performance
+  this->visual->SetVisible(World::Instance()->GetShowJoints());
 
-  this->visual->SetVisible(Global::GetShowJoints());
+  if (!World::Instance()->GetShowJoints())
+    return; 
+
   this->visual->SetPosition(this->GetAnchor());
 
   if (this->body1)

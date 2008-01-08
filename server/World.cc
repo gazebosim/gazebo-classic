@@ -39,6 +39,7 @@
 #include "gazebo.h"
 #include "UpdateParams.hh"
 #include "World.hh"
+#include "Geom.hh"
 
 using namespace gazebo;
 
@@ -50,6 +51,11 @@ World::World()
   this->physicsEngine = new ODEPhysics();
   this->server=0;
   this->simIface=0;
+
+  this->showBoundingBoxes = false;
+  this->showJoints = false;
+  this->wireframe = false;
+  this->showPhysics = false;
 
 }
 
@@ -65,14 +71,12 @@ World::~World()
   }
   this->models.clear();
 
-  if (this->physicsEngine)
-    delete this->physicsEngine;
+  this->geometries.clear();
 
-  if (this->server)
-    delete this->server;
+  GZ_DELETE (this->physicsEngine)
+  GZ_DELETE (this->server)
+  GZ_DELETE (this->simIface)
 
-  if (this->simIface)
-    delete this->simIface;
 }
 
 
@@ -333,7 +337,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
   model->SetInitPose(pose);
 
   // Add the model to our list
-  if (Global::GetIterations() == 0)
+  if (Simulator::Instance()->GetIterations() == 0)
     this->models.push_back(model);
   else
   {
@@ -413,6 +417,107 @@ std::vector<Model*> &World::GetModels()
   return this->models;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Reset the simulation to the initial settings
+void World::Reset()
+{
+  std::vector< Model* >::iterator miter;
+
+  for (miter = this->models.begin(); miter != this->models.end(); miter++)
+  {
+    (*miter)->Reset();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// The plane and heighweighmap will not be registered
+void World::RegisterGeom(Geom *geom)
+{
+  this->geometries.push_back(geom);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// True if the bounding boxes of the models are being shown 
+bool World::GetShowBoundingBoxes()
+{
+  return this->showBoundingBoxes;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set if the bounding boxes are shown or no
+void World::SetShowBoundingBoxes(bool show)
+{
+  this->showBoundingBoxes = show;
+
+  std::vector< Geom *>::iterator iter;
+
+  for (iter = geometries.begin(); iter != geometries.end(); iter++)
+  {
+    (*iter)->ShowBoundingBox(this->showBoundingBoxes);
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get wheter to show the joints
+bool World::GetShowJoints()
+{
+  return this->showJoints;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to show the joints
+void World::SetShowJoints(bool show)
+{
+  this->showJoints = show;
+
+  std::vector< Geom *>::iterator iter;
+
+  for (iter = geometries.begin(); iter != geometries.end(); iter++)
+  {
+    (*iter)->ShowJoints(this->showJoints);
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set to view as wireframe
+void World::SetWireframe( bool wire )
+{
+  this->wireframe = wire;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether to view as wireframe
+bool World::GetWireframe()
+{
+  return this->wireframe;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get wheter to show the joints
+bool World::GetShowPhysics()
+{
+  return this->showPhysics;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to show the joints
+void World::SetShowPhysics(bool show)
+{
+  this->showPhysics = show;
+
+  std::vector< Geom *>::iterator iter;
+
+  for (iter = geometries.begin(); iter != geometries.end(); iter++)
+  {
+    (*iter)->ShowPhysics(this->showPhysics);
+  }
+
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the simulation interface
@@ -487,14 +592,3 @@ void World::UpdateSimulationIface()
   this->simIface->Unlock();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Reset the simulation to the initial settings
-void World::Reset()
-{
-  std::vector< Model* >::iterator miter;
-
-  for (miter = this->models.begin(); miter != this->models.end(); miter++)
-  {
-    (*miter)->Reset();
-  }
-}

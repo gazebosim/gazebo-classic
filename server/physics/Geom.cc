@@ -30,6 +30,7 @@
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "ContactParams.hh"
+#include "World.hh"
 #include "Body.hh"
 #include "Geom.hh"
 
@@ -63,6 +64,7 @@ Geom::Geom( Body *body)//, const std::string &name)
   dMassSetZero(&this->bodyMass);
 
   this->transparency = 0;
+ 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,6 +141,13 @@ void Geom::Load(XMLConfigNode *node)
     this->bbVisual = new OgreVisual(this->visualNode);
     this->bbVisual->AttachBoundingBox(min,max);
   }
+
+  if (dGeomGetClass(this->geomId) != dPlaneClass && dGeomGetClass(this->geomId) != dHeightfieldClass)
+  {
+    World::Instance()->RegisterGeom(this);
+    this->ShowPhysics(false);
+  }
+
 }
  
 
@@ -203,27 +212,7 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 
 void Geom::Update()
 {
-//FIXME: Calling this FPS * num of geoms each second ...
-
-  if (dGeomGetClass(this->geomId) != dPlaneClass && dGeomGetClass(this->geomId) != dHeightfieldClass)
-    this->ShowPhysics(Global::GetShowPhysics());
-
-  if (this->bbVisual)
-    this->bbVisual->SetVisible(Global::GetShowBoundingBoxes());
-    //this->visualNode->GetSceneNode()->setVisible(true, false);
-    
-  if (!Global::GetShowJoints())
-  {
-    this->SetTransparency(0);
-  }
-  else
-  {
-    if (dGeomGetClass(this->geomId) != dPlaneClass) 
-      this->SetTransparency(0.6);
-  }
-
   this->UpdateChild();
-  
   //this->SetPose(this->GetPose());
 }
 
@@ -453,7 +442,28 @@ float Geom::GetTransparency() const
 {
   return this->transparency;
 }
- 
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the visibility of the Bounding box of this geometry
+void Geom::ShowBoundingBox(bool show)
+{
+   if (this->bbVisual)
+    this->bbVisual->SetVisible(show);
+}
+
+// FIXME: ShowJoints and ShowPhysics will mess with each other and with the user's defined transparency visibility
+////////////////////////////////////////////////////////////////////////////////
+/// Set the visibility of the joints of this geometry
+void Geom::ShowJoints(bool show)
+{
+  if (show)
+    this->SetTransparency(0.6);    
+  else
+    this->SetTransparency(0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the visibility of the physical entity of this geom 
 void Geom::ShowPhysics(bool show)
 {
 std::vector<OgreVisual*>::iterator iter;
@@ -462,7 +472,6 @@ std::vector<OgreVisual*>::iterator iter;
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
       (*iter)->SetVisible(false, false);  
-  //    (*iter)->SetTransparency(1.0);
     }
     this->visualNode->SetVisible(true, false);
     this->visualNode->SetTransparency(0.6);
@@ -472,7 +481,6 @@ std::vector<OgreVisual*>::iterator iter;
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
       (*iter)->SetVisible(true, false);  
-    //  (*iter)->SetTransparency(this->transparency);
     }
     this->visualNode->SetVisible(false, false);
     this->visualNode->SetTransparency(1.0);

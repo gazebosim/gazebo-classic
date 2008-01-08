@@ -29,6 +29,7 @@
 #include <Ogre.h>
 
 #include "Global.hh"
+#include "World.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
 #include "OgreVisual.hh"
@@ -152,7 +153,7 @@ void CameraSensor::FiniChild()
 void CameraSensor::UpdateChild(UpdateParams &params)
 {  
 
-  if (Global::GetWireframe())
+  if (World::Instance()->GetWireframe())
   {
     this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
   }

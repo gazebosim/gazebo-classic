@@ -42,6 +42,7 @@ namespace gazebo
   class Server;
   class SimulationIface;
   class Model;
+  class Geom;
   class PhysicsEngine;
   class XMLConfigNode;
    
@@ -110,6 +111,46 @@ class World : public SingletonT<World>
   /// \brief Reset the simulation to the initial settings
   public: void Reset();
 
+  /// \brief register a geom This method is no more than a manually-done signal system
+  public: void RegisterGeom(Geom *geom);
+
+    // User control of how the world is viewed 
+    // If this section grows it may become a model-view structure ...
+    /// \brief Return true if the bounding boxes should be shown
+    public: bool GetShowBoundingBoxes();
+
+    /// \brief Set if the bounding boxes should be shown
+    public: void SetShowBoundingBoxes(bool show);
+
+    /// \brief Get wheter to show the joints
+    public: bool GetShowJoints();
+
+    /// \brief Set whether to show the joints
+    public: void SetShowJoints(bool show);
+
+    /// \brief Set to view as wireframe
+    public: void SetWireframe( bool wire );
+
+    /// \brief Get whether to view as wireframe
+    public: bool GetWireframe();
+
+    /// \brief Set to view as wireframe
+    public: void SetShowPhysics( bool show );
+
+    /// \brief Get whether to view as wireframe
+    public: bool GetShowPhysics();
+
+    /// Set to true to show bounding boxes
+    private: bool showBoundingBoxes;
+
+    /// Set to true to show joints
+    private: bool showJoints;
+
+    private: bool showPhysics;
+
+    private: bool wireframe;
+
+
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
   /// \param parent The parent model
@@ -129,6 +170,9 @@ class World : public SingletonT<World>
 
   /// List of all the models
   private: std::vector< Model* > models;
+
+  /// List of all the registered geometries
+  private: std::vector< Geom* > geometries;
 
   /// List of models to add into the world
   private: std::vector< Model* > toAddModels;

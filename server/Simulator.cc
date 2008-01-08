@@ -48,13 +48,19 @@ Simulator::Simulator()
 {
   this->gui=NULL;
 
+
   this->pause = false;
 
+  this->iterations = 0;
   this->pauseTime = 0.0;
   this->startTime = 0.0;
   this->simTime = 0.0;
 
   this->userQuit = false;
+  this->userPause = false;
+  this->userStep = false;
+  this->userStepInc = false;
+
 
   this->xmlFile=NULL;
 }
@@ -147,17 +153,17 @@ void Simulator::Update()
   this->simTime += step;
 
   // Update the physics engine
-  if (!Global::GetUserPause() && !Global::GetUserStep() ||
-      (Global::GetUserStep() && Global::GetUserStepInc()))
+  if (!this->GetUserPause() && !this->GetUserStep() ||
+      (this->GetUserStep() && this->GetUserStepInc()))
   {
-    Global::IncIterations();
-    pause=false;
-    Global::SetUserStepInc(!Global::GetUserStepInc());
+    this->iterations++;
+    this->pause=false;
+    this->SetUserStepInc(!this->GetUserStepInc());
   }
   else
   {
     this->pauseTime += step; 
-    pause=true;
+    this->pause=true;
   }
 
 }
@@ -182,6 +188,29 @@ bool Simulator::isPaused() const
 {
   return this->pause;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of iterations of this simulation session
+unsigned long Simulator::GetIterations()
+{
+  return this->iterations;
+}
+
+/*
+These methods are needeD?
+////////////////////////////////////////////////////////////////////////////////
+void Global::SetIterations(unsigned long count)
+{
+  iterations = count;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Global::IncIterations()
+{
+  iterations++;
+}
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the simulation time
@@ -226,6 +255,43 @@ void Simulator::SetUserQuit()
 //  this->Save("test.xml");
   this->userQuit = true;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+bool Simulator::GetUserPause()
+{
+  return userPause;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Simulator::SetUserPause(bool pause)
+{
+  userPause = pause;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Simulator::GetUserStep()
+{
+  return userStep;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Simulator::SetUserStep( bool step )
+{
+  userStep = step;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Simulator::GetUserStepInc()
+{
+  return userStepInc;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Simulator::SetUserStepInc(bool step)
+{
+  userStepInc = step;
+}
+
 
 
 

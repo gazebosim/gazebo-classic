@@ -95,8 +95,6 @@
 namespace gazebo
 {
 
-  class Gui;
-
   /// \addtogroup gazebo_server
   /// \brief Global attributes.
   /// \{
@@ -119,82 +117,6 @@ namespace gazebo
   */  
   class Global
   {
-    /// \brief Set to true to pause the simulation
-    private: static bool userPause;
-
-    /// \brief Return true if the user has pased
-    public: static bool GetUserPause();
-
-    /// \brief Set whether the user has paused
-    public: static void SetUserPause(bool pause);
-
-    /// \brief Return true if the user has stepped the simulation
-    public: static bool GetUserStep();
-
-    /// \brief Set whether the user has stepped the simulation
-    public: static void SetUserStep( bool step );
-
-    /// \brief Return true if the step has incremented
-    public: static bool GetUserStepInc();
-
-    /// \brief Set whether the step has incremented
-    public: static void SetUserStepInc(bool step);
-
-    /// \brief Return true if the bounding boxes should be shown
-    public: static bool GetShowBoundingBoxes();
-
-    /// \brief Set if the bounding boxes should be shown
-    public: static void SetShowBoundingBoxes(bool show);
-
-    /// \brief Get the number of iterations
-    public: static unsigned long GetIterations();
-
-    /// \brief Set the number of iterations
-    public: static void SetIterations(unsigned long count);
-
-    /// \brief Increment the number of iterations
-    public: static void IncIterations();
-
-    /// \brief Get wheter to show the joints
-    public: static bool GetShowJoints();
-
-    /// \brief Set whether to show the joints
-    public: static void SetShowJoints(bool show);
-
-    /// \brief Set to view as wireframe
-    public: static void SetWireframe( bool wire );
-
-    /// \brief Get whether to view as wireframe
-    public: static bool GetWireframe();
-
-    /// \brief Set to view as wireframe
-    public: static void SetShowPhysics( bool show );
-
-    /// \brief Get whether to view as wireframe
-    public: static bool GetShowPhysics();
-
-    /// Pointer to the selected Gui 
-    public: static Gui *gui;
-
-    /// Set to true to step through the simulation
-    private: static bool userStep;
-
-    /// Set to true to increment the simulation once. This is only
-    ///  valid when userStep is true.
-    private: static bool userStepInc;
-
-    /// Set to true to show bounding boxes
-    private: static bool showBoundingBoxes;
-
-    ///  Count of the number of iterations
-    private: static unsigned long iterations;
-
-    /// Set to true to show joints
-    private: static bool showJoints;
-
-    private: static bool showPhysics;
-
-    private: static bool wireframe;
 
     /// Paths gazebo install
     public: static std::list<std::string> gazeboPaths;

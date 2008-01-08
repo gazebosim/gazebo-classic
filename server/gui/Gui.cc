@@ -81,8 +81,8 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 /// Destructor
 Gui::~Gui()
 {
-  delete this->glWindow;
-  delete this->toolbar;
+  GZ_DELETE (this->glWindow)
+  GZ_DELETE (this->toolbar)
   //delete this->statusbar;
   
 }

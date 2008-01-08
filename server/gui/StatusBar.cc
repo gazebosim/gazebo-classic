@@ -29,7 +29,6 @@
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
 
-#include "Global.hh"
 #include "Simulator.hh"
 #include "OgreAdaptor.hh"
 #include "StatusBar.hh"
@@ -79,19 +78,19 @@ void StatusBar::Update()
   float lastFPS, avgFPS, bestFPS, worstFPS;
   OgreAdaptor::Instance()->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
 
-  this->iterations->value(Global::GetIterations());
+  this->iterations->value(Simulator::Instance()->GetIterations());
   this->fps->value(avgFPS);
 
   this->realTime->value(Simulator::Instance()->GetRealTime());
   this->simTime->value(Simulator::Instance()->GetSimTime());
   this->pauseTime->value(Simulator::Instance()->GetPauseTime());
 
-  if (Global::GetUserPause())
+  if (Simulator::Instance()->GetUserPause())
   {
     this->statusString->value("PAUSED");
     this->statusString->color(FL_RED);
   }
-  else if (Global::GetUserStep())
+  else if (Simulator::Instance()->GetUserStep())
   {
     this->statusString->value("STEP");
     this->statusString->color(FL_RED);

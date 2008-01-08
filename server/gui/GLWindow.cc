@@ -236,14 +236,15 @@ void GLWindow::HandleKeyRelease()
 {
   this->keys[Fl::event_key()] = 0;
 
+  Simulator* sim=Simulator::Instance();
   // Handle all toggle keys
   switch (Fl::event_key())
   {
     case 't':
-      if (Global::GetUserPause())
-        Global::SetUserPause(false);
-      Global::SetUserStep( !Global::GetUserStep() );
-      Global::SetUserStepInc( false );
+      if (sim->GetUserPause())
+        sim->SetUserPause(false);
+      sim->SetUserStep( !sim->GetUserStep() );
+      sim->SetUserStepInc( false );
       break;
 
     case 'h':
@@ -252,12 +253,12 @@ void GLWindow::HandleKeyRelease()
 
     case ' ':
       
-      if (Global::GetUserStep())
+      if (sim->GetUserStep())
       {
-        Global::SetUserStepInc( true );
+        sim->SetUserStepInc( true );
       }
       else
-        Global::SetUserPause( !Global::GetUserPause() );
+        sim->SetUserPause( !sim->GetUserPause() );
       break;
 
     case FL_Escape:

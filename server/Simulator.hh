@@ -41,78 +41,133 @@ namespace gazebo
   class Server;
   class SimulationIface;
   class XMLConfig;
-  class XMLConfigWriter;
+  class XMLConfigNode;
 
 /// \brief The World
 /*
  * Top level class: Takes care of World Gui SimulatorIface and Server
  * 
  */
-class Simulator : public SingletonT<Simulator>
-{
-  /// Private constructor
-  private: Simulator();
+  class Simulator : public SingletonT<Simulator>
+  {
+    /// \brief Private constructor
+    private: Simulator();
 
-  /// Private destructor
-  private: ~Simulator();
+    /// \brief Private destructor
+    private: ~Simulator();
 
-  public: void Load(const std::string &worldFileName, int serverId );
+    /// \brief Load the world configuration file 
+    public: void Load(const std::string &worldFileName, int serverId );
 
-  public: int Init( );
+    public: void Save(const std::string& filename);
 
-  public: int Fini( );
+    /// \brief Initialize the simulation
+    public: int Init( );
 
-  public: void Update();
+    /// \brief Finalize the simulation
+    public: int Fini( );
 
-  public: void MainLoop();
+    /// \brief Update the simulation
+    public: void Update();
 
-  public: Gui *GetUI();
+    /// \brief Main simulation loop, when this loop ends the simulation finish
+    public: void MainLoop();
 
-  public: bool isPaused() const;
+   /// \brief Gets our current GUI interface
+    public: Gui *GetUI();
 
-  /// Get the simulation time
-  /// \return The simulation time
-  public: double GetSimTime() const;
+   /// \brief Returns the state of the simulation true if paused
+    public: bool isPaused() const;
 
-  /// Get the pause time
-  /// \return The pause time
-  public: double GetPauseTime() const;
+    /// \brief Get the number of iterations
+    public: unsigned long GetIterations();
+/*
+    /// \brief Set the number of iterations
+    public: static void SetIterations(unsigned long count);
 
-  /// Get the start time
-  /// \return The start time
-  public: double GetStartTime() const;
+    /// \brief Increment the number of iterations
+    public: static void IncIterations();
+*/
+    /// Get the simulation time
+    /// \return The simulation time
+    public: double GetSimTime() const;
 
-  /// Get the real time (elapsed time)
-  /// \return The real time
-  public: double GetRealTime() const;
+    /// Get the pause time
+    /// \return The pause time
+    public: double GetPauseTime() const;
 
-  /// \brief Get the wall clock time
-  /// \return The wall clock time
-  public: double GetWallTime() const;
+    /// Get the start time
+    /// \return The start time
+    public: double GetStartTime() const;
 
-  public: void SetUserQuit();
+    /// Get the real time (elapsed time)
+    /// \return The real time
+    public: double GetRealTime() const;
 
-  public: void Save(const std::string& filename);
+    /// \brief Get the wall clock time
+    /// \return The wall clock time
+    public: double GetWallTime() const;
 
-  public: void LoadGui(XMLConfigNode *rootNode);
-  public: void SaveGui(XMLConfigNode *node);
+    public: void LoadGui(XMLConfigNode *rootNode);
+    public: void SaveGui(XMLConfigNode *node);
+
+
+    //User Iteractions
+    /// \brief Simulator finished by the user
+    public: void SetUserQuit();
+
+    /// \brief Return true if the user has pased
+    public: bool GetUserPause();
+
+    /// \brief Set whether the user has paused
+    public: void SetUserPause(bool pause);
+
+    /// \brief Return true if the user has stepped the simulation
+    public: bool GetUserStep();
+
+    /// \brief Set whether the user has stepped the simulation
+    public: void SetUserStep( bool step );
+
+    /// \brief Return true if the step has incremented
+    public: bool GetUserStepInc();
+
+    /// \brief Set whether the step has incremented
+    public: void SetUserStepInc(bool step);
+
+
   
-  ///pointer to the XML Data
-  private:gazebo::XMLConfig *xmlFile;
+    ///pointer to the XML Data
+    private:gazebo::XMLConfig *xmlFile;
 
-  /// Pointer to the selected Gui 
-  private: Gui *gui;
+    /// Pointer to the selected Gui 
+    private: Gui *gui;
 
-  private: bool userQuit;
 
-  /// Flag set if simulation is paused
-  private: bool pause;
+    /// Flag set if simulation is paused
+    private: bool pause;
 
-  /// Current simulation time
-  private: double simTime, pauseTime, startTime;
+    ///  Count of the number of iterations
+    private: unsigned long iterations;
 
-  private: friend class DestroyerT<Simulator>;
-  private: friend class SingletonT<Simulator>;
+    /// Current simulation time
+    private: double simTime, pauseTime, startTime;
+
+    // UserIteractions 
+    /// \brief Set to true to pause the simulation
+    private: bool userPause;
+
+    /// Set to true to step through the simulation
+    private: bool userStep;
+
+    /// Set to true to increment the simulation once. This is only
+    ///  valid when userStep is true.
+    private: bool userStepInc;
+
+    private: bool userQuit;
+
+
+    private: friend class DestroyerT<Simulator>;
+    private: friend class SingletonT<Simulator>;
 
 };
 

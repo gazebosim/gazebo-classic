@@ -93,21 +93,21 @@ void MainMenu::QuitCB(Fl_Widget * /*w*/, void * /*data*/)
 // Show Bounding boxes callback
 void MainMenu::ShowBoundingBoxesCB(Fl_Widget * /*w*/, void * /*data*/)
 {
-  Global::SetShowBoundingBoxes( !Global::GetShowBoundingBoxes() );
+  World::Instance()->SetShowBoundingBoxes( !World::Instance()->GetShowBoundingBoxes() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Show Bounding boxes callback
 void MainMenu::ShowJointsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
-  Global::SetShowJoints( !Global::GetShowJoints() );
+  World::Instance()->SetShowJoints( !World::Instance()->GetShowJoints() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Show Bounding boxes callback
 void MainMenu::ShowPhysicsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
-  Global::SetShowPhysics( !Global::GetShowPhysics() );
+  World::Instance()->SetShowPhysics( !World::Instance()->GetShowPhysics() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,5 +121,5 @@ void MainMenu::ResetCB(Fl_Widget * /*w*/, void * /*data*/)
 // View the world as wireframe
 void MainMenu::WireframeCB(Fl_Widget * /*w*/, void * /*data*/)
 {
-  Global::SetWireframe( !Global::GetWireframe() );
+  World::Instance()->SetWireframe( !World::Instance()->GetWireframe() );
 }

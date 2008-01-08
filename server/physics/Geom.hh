@@ -141,7 +141,14 @@ namespace gazebo
     /// \brief Get the value of the transparency
     public: float GetTransparency() const;
   
-  void ShowPhysics(bool);
+/// \brief Set the visibility of the bounding box
+    public: void ShowBoundingBox(bool show);
+
+/// \brief Set the visibility of the joints
+    public: void ShowJoints(bool show);
+
+   /// \brief Set the visibility of the physical entity of this geom
+    public: void ShowPhysics(bool);
 
     ///  Contact parameters
     public: ContactParams *contact; 
