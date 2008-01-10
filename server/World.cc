@@ -141,7 +141,7 @@ int World::Init()
 
   // Set initial simulator state
   this->simIface->Lock(1);
-  this->simIface->data->pause = Simulator::Instance()->isPaused();
+  this->simIface->data->pause = Simulator::Instance()->IsPaused();
   this->simIface->Unlock();
 
   this->physicsEngine->Init();
@@ -171,7 +171,7 @@ int World::Update()
     }
   }
 
-  if (!Simulator::Instance()->isPaused())
+  if (!Simulator::Instance()->IsPaused())
   {
     this->physicsEngine->Update();
   }

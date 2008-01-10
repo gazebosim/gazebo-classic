@@ -65,8 +65,7 @@ namespace gazebo
     public: static void CreateLight(XMLConfigNode *node, Entity *entity);
 
     /// \brief Helper function to create a camera
-    public: static Ogre::Camera *CreateCamera(const std::string &name, double nearClip, 
-              double farClip, Ogre::RenderTarget *renderTarget);
+    public: static Ogre::Camera *CreateCamera(const std::string &name, double nearClip, double farClip, Ogre::RenderTarget *renderTarget);
 
     /// \brief Helper function to create fog
     public: static void CreateFog(XMLConfigNode *node);

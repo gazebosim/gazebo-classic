@@ -44,6 +44,8 @@
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 Simulator::Simulator()
 {
   this->gui=NULL;
@@ -65,12 +67,16 @@ Simulator::Simulator()
   this->xmlFile=NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 Simulator::~Simulator()
 {
   GZ_DELETE (this->gui)
-  GZ_DELETE (this->xmlFile)
+    GZ_DELETE (this->xmlFile)
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Load the world configuration file 
 void Simulator::Load(const std::string &worldFileName, int serverId )
 {
 
@@ -81,7 +87,7 @@ void Simulator::Load(const std::string &worldFileName, int serverId )
   {
     gzthrow ("The XML config file can not be loaded, please make sure is a correct file");
   }
-  
+
   XMLConfigNode *rootNode(xmlFile->GetRootNode());
 
   // Load the messaging system
@@ -99,18 +105,19 @@ void Simulator::Load(const std::string &worldFileName, int serverId )
   {
     std::ostringstream stream;
     stream << "Failed to Initialize the OGRE Rendering system\n" 
-              << e << "\n";
+      << e << "\n";
     gzthrow(stream.str());
   }
 
   //Preload basic shapes that can be used anywhere
-  gazebo::OgreCreator::CreateBasicShapes();
+  OgreCreator::CreateBasicShapes();
 
   //Create the world
   gazebo::World::Instance()->Load(rootNode, serverId);
-
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Save the world configuration file
 void Simulator::Save(const std::string& filename)
 {
   // Saving in the preferred order
@@ -130,6 +137,8 @@ void Simulator::Save(const std::string& filename)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the simulation
 int Simulator::Init()
 {
   this->startTime = this->GetWallTime();
@@ -140,12 +149,16 @@ int Simulator::Init()
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Finalize the simulation
 int Simulator::Fini( )
 {
   gazebo::World::Instance()->Fini();
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Update the simulation
 void Simulator::Update()
 {
   double step= World::Instance()->GetPhysicsEngine()->GetStepTime();
@@ -168,6 +181,8 @@ void Simulator::Update()
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
 {
   while (!this->userQuit)
@@ -179,12 +194,16 @@ void Simulator::MainLoop()
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Gets our current GUI interface
 Gui *Simulator::GetUI()
 {
   return this->gui;
 }
 
-bool Simulator::isPaused() const
+////////////////////////////////////////////////////////////////////////////////
+// Return when this simulator is paused
+bool Simulator::IsPaused() const
 {
   return this->pause;
 }
@@ -198,17 +217,17 @@ unsigned long Simulator::GetIterations()
 }
 
 /*
-These methods are needeD?
+   These methods are needeD?
 ////////////////////////////////////////////////////////////////////////////////
 void Global::SetIterations(unsigned long count)
 {
-  iterations = count;
+iterations = count;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Global::IncIterations()
 {
-  iterations++;
+iterations++;
 }
 */
 
@@ -252,7 +271,7 @@ double Simulator::GetWallTime() const
 
 void Simulator::SetUserQuit()
 {
-//  this->Save("test.xml");
+  //  this->Save("test.xml");
   this->userQuit = true;
 }
 
@@ -318,8 +337,8 @@ void Simulator::LoadGui(XMLConfigNode *rootNode)
     // Initialize the GUI
     this->gui->Init();
 
-//    gazebo::GuiFinished.connect( boost::bind(&gazebo::Simulator::SetUserQuit,this));
-   
+    //    gazebo::GuiFinished.connect( boost::bind(&gazebo::Simulator::SetUserQuit,this));
+
   }
   else
   {
@@ -328,10 +347,11 @@ void Simulator::LoadGui(XMLConfigNode *rootNode)
 }
 
 
- void Simulator::SaveGui(XMLConfigNode *node)
- {
+void Simulator::SaveGui(XMLConfigNode *node)
+{
   Vector2<int> size;
   XMLConfigNode* childNode = node->GetChild("gui");
+
   if (childNode)
   {
     size.x = this->gui->GetWidth();
@@ -339,5 +359,5 @@ void Simulator::LoadGui(XMLConfigNode *rootNode)
     childNode->SetValue("size", size);
     //TODO: node->SetValue("pos", Vector2<int>(x,y));
   }
-  
- }
+
+}

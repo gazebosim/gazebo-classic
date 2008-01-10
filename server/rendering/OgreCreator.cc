@@ -40,10 +40,20 @@
 
 using namespace gazebo;
 
-OgreCreator::OgreCreator(){}
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
+OgreCreator::OgreCreator()
+{
+}
 
-OgreCreator::~OgreCreator(){}
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
+OgreCreator::~OgreCreator()
+{
+}
 
+////////////////////////////////////////////////////////////////////////////////
+// Create the basic shapes
 void OgreCreator::CreateBasicShapes()
 {
   // Create some basic shapes
@@ -53,6 +63,8 @@ void OgreCreator::CreateBasicShapes()
   OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Create a plane
 OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
 {
   Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
@@ -60,8 +72,8 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
   Vector2<double> segments = node->GetVector2d("segments",Vector2<double>(10, 10));
   Vector2<double> uvTile = node->GetVector2d("uvTile",Vector2<double>(1, 1));
   std::string material=node->GetString("material","",1);
- 
-  
+
+
   normal.Normalize();
   Vector3 perp = normal.GetPerpendicular();
 
@@ -160,7 +172,7 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
   cviewport->setClearEveryFrame(true);
   cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
   cviewport->setOverlaysEnabled(false);
-  
+
   camera->setAspectRatio(
       Ogre::Real(cviewport->getActualWidth()) / 
       Ogre::Real(cviewport->getActualHeight()) );
@@ -169,11 +181,12 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
 void OgreCreator::CreateFog(XMLConfigNode *node)
 {
   Ogre::ColourValue backgroundColor;
   XMLConfigNode *cnode;
-  
+
   if ((cnode = node->GetChild("fog")))
   {
     //Ogre::FogMode fogType = Ogre::FOG_NONE; 
@@ -191,9 +204,9 @@ void OgreCreator::CreateFog(XMLConfigNode *node)
 
     /*if (type == "linear")
       fogType = Ogre::FOG_LINEAR;
-    else if (type == "exp")
+      else if (type == "exp")
       fogType = Ogre::FOG_EXP;
-    else if (type == "exp2")
+      else if (type == "exp2")
       fogType = Ogre::FOG_EXP2;
       */
 
@@ -202,6 +215,7 @@ void OgreCreator::CreateFog(XMLConfigNode *node)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void OgreCreator::SaveFog(XMLConfigNode *node)
 {
   Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
@@ -219,7 +233,7 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
       fogMode="exp2";
       break;
     case Ogre::FOG_LINEAR:
-    //case default:
+      //case default:
       fogMode="linear";
       break;
   }
@@ -234,7 +248,7 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
 void OgreCreator::CreateSky(XMLConfigNode *node)
 {
   XMLConfigNode *cnode;
-if ((cnode = node->GetChild("sky")))
+  if ((cnode = node->GetChild("sky")))
   {
     std::string material = cnode->GetString("material","",1);
     if (!material.empty())
@@ -290,7 +304,7 @@ void OgreCreator::DrawGrid()
 
   float d = 0.01;
   float z = 0.01;
-  
+
   gridObject->begin("__OGRE_GRID_MATERIAL_Y__", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
 
   for (int y=-100; y<100; y++)
@@ -317,7 +331,7 @@ void OgreCreator::DrawGrid()
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
- 
+
     textNode->attachObject(msg); 
     textNode->translate(0,0.02,y);
 
@@ -355,14 +369,14 @@ void OgreCreator::DrawGrid()
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
- 
+
     textNode->attachObject(msg); 
     textNode->translate(x,0.02,0);
 
     delete name;
     delete text;
   }
-  
+
   // etc 
   gridObject->end(); 
   gridObjectNode->attachObject(gridObject);

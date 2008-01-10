@@ -862,19 +862,21 @@ double XMLConfigNode::GetTupleAngle( const std::string &key, int index, double d
 
 ////////////////////////////////////////////////////////////////////////////
 // Set the value associated with a node. 
-void XMLConfigNode::SetValue(const String& key, const String& value, int require, int type)
+void XMLConfigNode::SetValue(const std::string &key, const StringValue &data, int require, int type)
 {
   bool success;
-  success=this->SetNodeValue(key.GetStr(), value.GetStr());
+
+  success = this->SetNodeValue(key, data.GetStr());
 
   if (!success && require)
   {
-    this->NewNode(key.GetCharStr(), value.GetCharStr(),type);
+    this->NewNode(key.c_str(), data.GetCharStr(), type);
   }
   
 }
 
 
+////////////////////////////////////////////////////////////////////////////
 bool XMLConfigNode::SetNodeValue(const std::string& key,const std::string& value)
 {
   bool success=false;

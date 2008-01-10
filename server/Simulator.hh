@@ -59,6 +59,7 @@ namespace gazebo
     /// \brief Load the world configuration file 
     public: void Load(const std::string &worldFileName, int serverId );
 
+    /// \brief Save the world configuration file
     public: void Save(const std::string& filename);
 
     /// \brief Initialize the simulation
@@ -73,11 +74,11 @@ namespace gazebo
     /// \brief Main simulation loop, when this loop ends the simulation finish
     public: void MainLoop();
 
-   /// \brief Gets our current GUI interface
+    /// \brief Gets our current GUI interface
     public: Gui *GetUI();
 
-   /// \brief Returns the state of the simulation true if paused
-    public: bool isPaused() const;
+    /// \brief Returns the state of the simulation true if paused
+    public: bool IsPaused() const;
 
     /// \brief Get the number of iterations
     public: unsigned long GetIterations();
