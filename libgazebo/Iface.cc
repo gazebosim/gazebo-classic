@@ -66,9 +66,9 @@ Iface::Iface(const std::string &type, size_t size)
   this->server = NULL;
   this->client = NULL;
 
-  this->opened = false;
-
   this->openCount = 0;
+
+  this->creator = false;
 }
 
 
@@ -76,7 +76,7 @@ Iface::Iface(const std::string &type, size_t size)
 // Destroy an interface
 Iface::~Iface()
 {
-  if (this->mmapFd)
+  if (this->mmapFd && this->creator)
     this->Destroy();
 }
 
@@ -107,6 +107,8 @@ std::string Iface::Filename(std::string id)
 void Iface::Create(Server *server, std::string id)
 {
   std::ostringstream stream;
+
+  this->creator = true;
 
   this->server = server;
 
@@ -156,6 +158,7 @@ void Iface::Create(Server *server, std::string id)
 
   ((Iface*) this->mMap)->version = LIBGAZEBO_VERSION;
   ((Iface*) this->mMap)->size = this->size;
+  ((Iface*) this->mMap)->openCount = 0;
 
   std::ios_base::fmtflags origFlags = std::cout.flags();
 
@@ -169,8 +172,6 @@ void Iface::Create(Server *server, std::string id)
            << ((Iface*) this->mMap)->size << "\n";
 
   std::cout.flags(origFlags);
-
-  this->openCount = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -180,20 +181,23 @@ void Iface::Create(Server *server, std::string id,
                   int parentModelId)
 {
 
+  this->creator = true;
+
   this->Create(server,id);
 
   this->modelType = modelType;
 
   this->modelId = modelId;
   this->parentModelId = parentModelId;
-
-  this->openCount = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Destroy the interface (server)
 void Iface::Destroy()
 {
+  if (!this->creator)
+    return;
+
   if (!this->mMap && !this->mmapFd)
   {
     std::cout << "No mMap or mmapFD for " << this->filename << "\n";
@@ -226,6 +230,7 @@ void Iface::Open(Client *client, std::string id)
 {
   std::ostringstream stream;
 
+  this->creator = false;
   this->client = client;
   
   // Work out the filename
@@ -272,10 +277,8 @@ void Iface::Open(Client *client, std::string id)
 
   std::cout.setf(origFlags);
 
-  this->Lock(1);
+  ((Iface*)this->mMap)->openCount++;
   this->openCount++;
-  this->opened = true;
-  this->Unlock();
 }  
 
 
@@ -284,11 +287,10 @@ void Iface::Open(Client *client, std::string id)
 void Iface::Close()
 {
   this->openCount--;
+  ((Iface*)this->mMap)->openCount--;
 
   if (this->openCount <=0)
   {
-    this->opened = false;
-
     // Unmap the file
     munmap(this->mMap, this->size);
     this->mMap = NULL;
@@ -354,4 +356,14 @@ void Iface::Post()
 std::string Iface::GetType() const
 {
   return this->type;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the number of connections
+int Iface::GetOpenCount()
+{
+  if (this->mMap)
+    return ((Iface*)this->mMap)->openCount;
+  else
+    return 0;
 }

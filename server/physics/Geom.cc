@@ -257,16 +257,9 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     Pose3d localPose;
     dQuaternion q;
 
-        // Transform into CoM relative Pose
+    // Transform into CoM relative Pose
     localPose = pose - this->body->GetCoMPose();
     
-    if (this->GetName() == "pyramid_geom")
-    {
-      std::cout << "Pose to Set[" << pose << "]";
-      std::cout << "Body COM[" << this->body->GetCoMPose() << "]\n";
-      std::cout << "Local Pose[" << localPose << "]\n";
-    }
-
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;

@@ -125,14 +125,9 @@ void OgreDynamicLines::FillHardwareBuffers()
   {
     for(int i = 0; i < size; i++)
     {
-      /*
       *prPos++ = this->points[i].x;
       *prPos++ = this->points[i].y;
       *prPos++ = this->points[i].z;
-      */
-      *prPos++ = this->points[i].y;
-      *prPos++ = this->points[i].z;
-      *prPos++ = this->points[i].x;
 
       if(this->points[i].x < vaabMin.x)
         vaabMin.x = this->points[i].x;
@@ -160,9 +155,9 @@ void OgreDynamicLines::FillHardwareBuffers()
   if ((float)vaabMin.z >= (float)vaabMax.z)
     vaabMin.z = vaabMax.z - 10;
 
-  this->mBox.setExtents(Ogre::Vector3(vaabMin.y, vaabMin.z, vaabMin.x), 
-                        Ogre::Vector3(vaabMax.y, vaabMax.z, vaabMax.x) );
-  
+  this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z), 
+                        Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );
+ 
   this->dirty = false;
 }
 

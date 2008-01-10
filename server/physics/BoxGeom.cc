@@ -45,6 +45,7 @@ BoxGeom::BoxGeom(Body *body)
 BoxGeom::~BoxGeom()
 {
 }
+
 //////////////////////////////////////////////////////////////////////////////
 /// Load the box
 void BoxGeom::LoadChild(XMLConfigNode *node)

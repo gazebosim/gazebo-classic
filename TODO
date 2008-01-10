@@ -1,10 +1,9 @@
 Open:
-- boost signals for GUI input, etc
+- Document adding/modifying Materials
+- Document the new Visual XML attribute
 - Apply Linear and Angular Damping, see OGREODE sources.
-- Add check for boost
 - A static geom which is offset does not actually move the geom, so collision
   detection does not work
-- Try out code on AMD64 machine
 - Python scripts to models, allow dynamic (movable) meshes
 - Force sensors
 - Slider has to be the first in the XML file, when loading a bunch of joints in a model.
@@ -18,6 +17,7 @@ Open:
   - Positioning the current heightmap is a big hack
 
 - Intelligent positioning of nested models
+- Added the ability to reset the simulator during runtime
 - BSP worlds
 
 - Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
@@ -114,3 +114,4 @@ Completed:
 - look into using FL::RUN. Using threads now
 - Add in Pioneer blender models
 - Add check for libxml2
+- Added the ability to reset the simulator during runtime

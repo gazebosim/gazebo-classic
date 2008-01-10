@@ -213,7 +213,14 @@ int World::Fini()
   this->physicsEngine->Fini();
 
   // Done with the external interface
-  this->simIface->Destroy();
+  try
+  {
+    this->simIface->Destroy();
+  }
+  catch (std::string e)
+  {
+    gzmsg(-1) << "Problem destroying simIface[" << e << "]\n";
+  }
 
   this->server->Fini();
 
@@ -525,7 +532,7 @@ void World::UpdateSimulationIface()
 {
   this->simIface->Lock(1);
 
-  if (this->simIface->opened)
+  if (this->simIface->GetOpenCount() > 0)
   {
     this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
     this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
@@ -584,6 +591,10 @@ void World::UpdateSimulationIface()
           model->SetPose(pose);
         }
 
+      }
+      else
+      {
+        gzmsg(-1) << "Simulation Iface: Model[" << this->simIface->data->model_name << "] does not exist\n";
       }
 
       strcpy((char*)this->simIface->data->model_name, "");

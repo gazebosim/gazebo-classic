@@ -290,6 +290,9 @@ class Iface
   /// \brief Tell clients that new data is available
   public: void Post();
 
+  /// \brief Get the number of connections
+  public: int GetOpenCount();
+
   /// \brief Get the iface type
   /// \return The type of interface
   public: std::string GetType() const;
@@ -332,8 +335,7 @@ class Iface
   /// Number of times the interface has been opened
   private: int openCount;
 
-  /// True if opened
-  public: bool opened;
+  private: bool creator;
 };
 
 /** \} */
@@ -375,13 +377,13 @@ class SimulationData
   public: int save;
 
   /// Name of the model to get/set data
-  public: uint8_t model_name[512];
+  public: char model_name[512];
 
   /// Type of request
   /// - "get_pose" Sets model_pose to the pose of model_name
   /// - "set_pose3d" Set the model_name to model_pose
   /// - "set_pose2d" Set the model_name to model_pose
-  public: uint8_t model_req[32];
+  public: char model_req[32];
 
   /// Pose of the model.
   /// \sa model_req
@@ -403,7 +405,7 @@ class SimulationIface : public Iface
   public: virtual void Create(Server *server, std::string id)
           {
             Iface::Create(server,id); 
-            this->data = (SimulationData*)this->mMap; 
+            this->data = (SimulationData*)((char*)this->mMap+sizeof(SimulationIface)); 
           }
 
   /// \brief Open a simulation interface
@@ -412,7 +414,7 @@ class SimulationIface : public Iface
   public: virtual void Open(Client *client, std::string id)
           {
             Iface::Open(client,id); 
-            this->data = (SimulationData*)this->mMap; 
+            this->data = (SimulationData*)((char*)this->mMap+sizeof(SimulationIface)); 
           }
 
   /// Pointer to the simulation data
@@ -521,7 +523,7 @@ Pioneer2AT or ATRV Jr.  This interface handles both 2D and 3D data.
 
 
 /// \brief Position interface data
-class PositionData
+class PositionData 
 {
   /// Data timestamp
   public: double time;
@@ -540,9 +542,6 @@ class PositionData
   
   /// Commanded robot velocities (robot cs)
   public: Pose cmdVelocity;
-
-  /// True if opened
-  public: bool opened;
 };
 
 /// \brief Position interface
@@ -561,7 +560,6 @@ class PositionIface : public Iface
           {
             Iface::Create(server,id); 
             this->data = (PositionData*)this->mMap; 
-            this->data->opened = false;
           }
 
   /// \brief Open an existing interface
@@ -571,16 +569,7 @@ class PositionIface : public Iface
           {
             Iface::Open(client,id); 
             this->data = (PositionData*)this->mMap; 
-            this->data->opened = true;
           }
-
-  /// \brief Close the interface
-  public: virtual void Close()
-          {
-            this->data->opened = false;
-            Iface::Close();
-          }
-
 
   /// Pointer to the position data
   public: PositionData *data;
@@ -653,6 +642,7 @@ class Graphics3dIface : public Iface
             this->data = (Graphics3dData*)this->mMap; 
           }
 
+
   /// Pointer to the graphics3d data
   public: Graphics3dData *data;
 };
@@ -684,9 +674,6 @@ device is also allowed.
 /// \brief Laser interface data
 class LaserData
 {
-  /// True if the interface is opened
-  public: bool opened;
-
   /// Data timestamp
   public: double time;
   
@@ -746,7 +733,6 @@ class LaserIface : public Iface
           {
             Iface::Create(server,id); 
             this->data = (LaserData*)this->mMap; 
-            this->data->opened=false;
           }
 
   /// \brief Open an existing interface
@@ -756,14 +742,6 @@ class LaserIface : public Iface
           {
             Iface::Open(client,id); 
             this->data = (LaserData*)this->mMap; 
-            this->data->opened = true;
-          }
-
-  /// \brief Close the interface
-  public: virtual void Close()
-          {
-            this->data->opened = false;
-            Iface::Close();
           }
 
   /// Pointer to the laser data
@@ -859,7 +837,7 @@ in order to dynamically create models.
 */
 
 /// \brief Fudicial interface data
-class FactoryData
+class FactoryData 
 {
    /// Data timestamp
   public: double time;

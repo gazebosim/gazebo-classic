@@ -22,21 +22,41 @@ int main()
   /// Open the Simulation Interface
   try 
   {
-    printf("1\n");
     simIface->Open(client, "default");
-    printf("2\n");
   }
-  catch (gazebo::GazeboError e)
+  catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect to the sim interface\n" << e << "\n";
     return -1;
   }
 
   simIface->Lock(1);
-  simIface->data->reset = 1;
+  //simIface->data->reset = 1;
+
+  // Example of how to move a model (box1_model)
+  uint8_t name[512] = "box1_model";
+  uint8_t cmd[32] = "set_pose3d";
+
+  memcpy(simIface->data->model_name, name, 512);
+  memcpy(simIface->data->model_req,cmd, 32);
+
+  simIface->data->model_pose.pos.x = 2;
+  simIface->data->model_pose.pos.y = 0;
+  simIface->data->model_pose.pos.z = 0;
+
   simIface->Unlock();
 
   usleep(1000000);
+
+  // Example of resetting the simulator
+  simIface->Lock(1);
+//  simIface->data->reset = 1;
+  simIface->Unlock();
+
+  usleep(1000000);
+
+  simIface->Close();
+  delete simIface;
   return 0;
 }
 

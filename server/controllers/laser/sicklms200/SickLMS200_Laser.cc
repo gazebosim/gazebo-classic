@@ -95,7 +95,7 @@ void SickLMS200_Laser::UpdateChild(UpdateParams &params)
 
   if (this->laserIface->Lock(1))
   {
-    opened = this->laserIface->data->opened;
+    opened = this->laserIface->GetOpenCount() > 0;
     this->laserIface->Unlock();
   }
   

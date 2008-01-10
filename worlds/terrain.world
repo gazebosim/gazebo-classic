@@ -35,15 +35,6 @@
       <material>Gazebo/CloudySky</material>
     </sky>
 
-    <!--
-    <fog>
-      <color>0.8 0.8 0.8</color>
-      <type>linear</type>
-      <mass>0.0</mass>
-      <linearStart>50.0</linearStart>
-      <linearEnd>515.0</linearEnd>
-    </fog>
-    -->
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
@@ -51,11 +42,14 @@
     <static>false</static>
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
-        <xyz>0 0 0.0</xyz>
-        <mesh>default</mesh>
         <size>0.2</size>
         <mass>1.0</mass>
-        <material>Gazebo/Rocky</material>
+
+        <visual>
+          <scale>0.2 0.2 0.2</scale>
+          <material>Gazebo/Rocky</material>
+          <mesh>unit_sphere</mesh>
+        </visual>
       </geom:sphere>
     </body:sphere>
   </model:physical>
@@ -66,13 +60,13 @@
         <image>terrain.png</image>
         <worldTexture>terrain_texture.jpg</worldTexture>
         <detailTexture>terrain_detail.jpg</detailTexture>
-        <size>1000 1000 10.0</size>
+        <size>1000 1000 10</size>
       </geom:heightmap>
     </body:heightmap>
   </model:physical>
 
   <model:physical name="plane1_model">
-    <xyz>0 0 3</xyz>
+    <xyz>0 0 0</xyz>
     <static>true</static>
 
     <body:plane name="plane1_body">
@@ -87,8 +81,8 @@
   </model:physical>
 
   <model:physical name="cam2_model">
-    <xyz>197 147 4.8</xyz>
-    <rpy>0 -6 101</rpy>
+    <xyz>197 147 15.8</xyz>
+    <rpy>0 50.5 -26.5</rpy>
     <static>true</static>
 
     <body:empty name="cam2_body">

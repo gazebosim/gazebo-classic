@@ -162,16 +162,18 @@ void CameraSensor::UpdateChild(UpdateParams &params)
     this->camera->setPolygonMode(Ogre::PM_SOLID);
   }
 
-  this->pose.pos.x = this->sceneNode->getWorldPosition().z;
-  this->pose.pos.y = this->sceneNode->getWorldPosition().x;
-  this->pose.pos.z = this->sceneNode->getWorldPosition().y;
+  Ogre::Vector3 v = this->sceneNode->getWorldPosition();
 
-  Ogre::Quaternion q = this->pitchNode->getWorldOrientation();// + Ogre::Degree(180);
+  this->pose.pos.x = v.x;
+  this->pose.pos.y = v.y;
+  this->pose.pos.z = v.z;
+
+  Ogre::Quaternion q = this->pitchNode->getWorldOrientation();
 
   this->pose.rot.u = q.w;
-  this->pose.rot.x = q.z;
-  this->pose.rot.y = q.x;
-  this->pose.rot.z = q.y;
+  this->pose.rot.x = q.x;
+  this->pose.rot.y = q.y;
+  this->pose.rot.z = q.z;
 
   if (this->saveFrames)
     this->SaveFrame();
@@ -205,14 +207,14 @@ void CameraSensor::Translate( const Vector3 &direction )
 // Rotate the camera around the yaw axis
 void CameraSensor::RotateYaw( float angle )
 {
-  this->sceneNode->yaw(Ogre::Degree(angle), Ogre::Node::TS_WORLD);
+  this->sceneNode->roll(Ogre::Degree(angle), Ogre::Node::TS_WORLD);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Rotate the camera around the pitch axis
 void CameraSensor::RotatePitch( float angle )
 {
-  this->pitchNode->pitch(Ogre::Degree(angle));
+  this->pitchNode->yaw(Ogre::Degree(angle));
 }
 
 //////////////////////////////////////////////////////////////////////////////

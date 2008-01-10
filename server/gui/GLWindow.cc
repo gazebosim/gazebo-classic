@@ -117,34 +117,44 @@ void GLWindow::Update()
     {
       switch (iter->first)
       {
+        case '=':
+        case '+':
+          this->moveAmount *= 2;
+          break;
+
+        case '-':
+        case '_':
+          this->moveAmount *= 0.5;
+          break;
+
         case XK_Up:
         case XK_w:
-          this->directionVec.z += this->moveAmount;
+          this->directionVec.x += this->moveAmount;
           break;
 
         case XK_Down:
         case XK_s:
-          this->directionVec.z -= this->moveAmount;
+          this->directionVec.x -= this->moveAmount;
           break;
 
         case XK_Left:
         case XK_a:
-          this->directionVec.x += this->moveAmount;
+          this->directionVec.y += this->moveAmount;
           break;
 
         case XK_Right:
         case XK_d:
-          this->directionVec.x -= this->moveAmount;
+          this->directionVec.y -= this->moveAmount;
           break;
 
         case XK_Page_Down:
         case XK_e:
-          this->directionVec.y += this->moveAmount;
+          this->directionVec.z += this->moveAmount;
           break;
 
         case XK_Page_Up:
         case XK_q:
-          this->directionVec.y -= this->moveAmount;
+          this->directionVec.z -= this->moveAmount;
           break;
 
         default:

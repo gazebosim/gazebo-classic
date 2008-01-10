@@ -715,10 +715,10 @@ Quatern XMLConfigNode::GetRotation( const std::string &key, Quatern def )
   // Roll is around the x-axis
   p.x = this->GetTupleAngle(key, 0, 0.0);
 
-  // Pitch is around the x-axis
+  // Pitch is around the y-axis
   p.y = this->GetTupleAngle(key, 1, 0.0);
 
-  // Yaw is around the y-axis
+  // Yaw is around the z-axis
   p.z = this->GetTupleAngle(key, 2, 0.0);
 
   q.SetFromEuler(p);

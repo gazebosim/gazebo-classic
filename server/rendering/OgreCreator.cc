@@ -77,7 +77,7 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
   normal.Normalize();
   Vector3 perp = normal.GetPerpendicular();
 
-  Ogre::Plane plane(Ogre::Vector3(normal.y, normal.z, normal.x), 0);
+  Ogre::Plane plane(Ogre::Vector3(normal.x, normal.y, normal.z), 0);
 
   Ogre::MeshManager::getSingleton().createPlane(parent->GetName(),
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
@@ -85,7 +85,7 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
       (int)segments.x, (int)segments.y,
       true,1,
       uvTile.x, uvTile.y, 
-      Ogre::Vector3(perp.y, perp.z, perp.x));
+      Ogre::Vector3(perp.x, perp.y, perp.z));
 
   OgreVisual *visual = new OgreVisual(parent->GetVisualNode());
   visual->AttachMesh(parent->GetName());
@@ -163,6 +163,14 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
   Ogre::Viewport *cviewport;
 
   camera = OgreAdaptor::Instance()->sceneMgr->createCamera(name);
+
+  // Use X/Y as horizon, Z up
+  camera->pitch(Ogre::Degree(90));
+
+  // Don't yaw along variable axis, causes leaning
+  camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+
+  camera->setDirection(1,0,0);
 
   camera->setNearClipDistance(nearClip);
   camera->setFarClipDistance(farClip);
@@ -245,6 +253,8 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Create a sky
 void OgreCreator::CreateSky(XMLConfigNode *node)
 {
   XMLConfigNode *cnode;
@@ -259,13 +269,14 @@ void OgreCreator::CreateSky(XMLConfigNode *node)
         {
           Ogre::Plane plane;
           plane.d = 49;
-          plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Y;
+          plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Z;
           OgreAdaptor::Instance()->sceneMgr->setSkyPlane(true, plane, material, 50, 8, true, 0.5, 150, 150);
         }
         else
         {
-          std::cout << "Adding a sky dome" << std::endl; 
-          OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8);
+          Ogre::Quaternion orientation;
+          orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
+          OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
         }
 
       }
@@ -304,7 +315,7 @@ void OgreCreator::DrawGrid()
 
   float d = 0.01;
   float z = 0.01;
-
+  
   gridObject->begin("__OGRE_GRID_MATERIAL_Y__", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
 
   for (int y=-100; y<100; y++)
@@ -314,13 +325,13 @@ void OgreCreator::DrawGrid()
     else
       d = 0.01;
 
-    gridObject->position(100,z, y-d); 
-    gridObject->position(-100,z, y-d); 
-    gridObject->position(100,z, y+d); 
+    gridObject->position(-100, y-d, z); 
+    gridObject->position(100, y-d, z); 
+    gridObject->position(100, y+d, z); 
 
-    gridObject->position(100,z, y+d); 
-    gridObject->position(-100,z, y-d); 
-    gridObject->position(-100,z, y+d); 
+    gridObject->position(-100, y-d, z); 
+    gridObject->position(100, y+d, z); 
+    gridObject->position(-100, y+d, z); 
 
     char *name=new char[20];
     char *text=new char[10];
@@ -331,9 +342,9 @@ void OgreCreator::DrawGrid()
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
-
+ 
     textNode->attachObject(msg); 
-    textNode->translate(0,0.02,y);
+    textNode->translate(0, y, 0.02);
 
     delete name;
     delete text;
@@ -352,13 +363,13 @@ void OgreCreator::DrawGrid()
     else
       d = 0.01;
 
-    gridObject->position(x-d, z, 100); 
-    gridObject->position(x+d, z, 100); 
-    gridObject->position(x-d, z, -100); 
+    gridObject->position(x+d, 100, z); 
+    gridObject->position(x-d, 100, z); 
+    gridObject->position(x-d, -100, z); 
 
-    gridObject->position(x+d, z, 100); 
-    gridObject->position(x+d, z, -100); 
-    gridObject->position(x-d, z, -100); 
+    gridObject->position(x+d, -100, z); 
+    gridObject->position(x+d, 100, z); 
+    gridObject->position(x-d, -100, z); 
 
     char *name=new char[20];
     char *text=new char[10];
@@ -369,14 +380,14 @@ void OgreCreator::DrawGrid()
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
-
+ 
     textNode->attachObject(msg); 
-    textNode->translate(x,0.02,0);
+    textNode->translate(x, 0, 0.02);
 
     delete name;
     delete text;
   }
-
+  
   // etc 
   gridObject->end(); 
   gridObjectNode->attachObject(gridObject);

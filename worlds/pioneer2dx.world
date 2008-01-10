@@ -65,7 +65,7 @@
   <!-- The camera -->
   <model:physical name="cam1_model">
     <xyz>0.07 -1.10 0.5</xyz>
-    <rpy>0 -19 -134</rpy>
+    <rpy>0 12 52.5</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">
@@ -131,7 +131,7 @@
   <model:renderable name="directional_white">
     <light>
       <type>directional</type>
-      <direction>0 -0.6 0.4</direction>
+      <direction>0 -0.6 -0.4</direction>
       <diffuseColor>1.0 1.0 1.0</diffuseColor>
       <specularColor>0.2 0.2 0.2</specularColor>
       <attenuation>1000 1.0 0.0 0</attenuation>

@@ -21,7 +21,7 @@
 /* Desc: Ogre Visual Class
  * Author: Nate Koenig
  * Date: 14 Dec 2007
- * SVN: $Id$
+ * SVN: $Id:$
  */
 #include <Ogre.h>
 #include "GazeboMessage.hh"
@@ -31,6 +31,8 @@
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 OgreVisual::OgreVisual(OgreVisual *node)
 {
 
@@ -53,7 +55,8 @@ OgreVisual::OgreVisual(OgreVisual *node)
   this->sceneNode->setInheritScale(false);
 }
 
-/// \brief Destructor
+////////////////////////////////////////////////////////////////////////////////
+/// Destructor
 OgreVisual::~OgreVisual()
 {
  this->parentNode->removeAndDestroyChild(this->sceneNode->getName());
@@ -92,18 +95,18 @@ void OgreVisual::Load(XMLConfigNode *node)
   if (node->GetChild("size") != NULL)
     size = node->GetVector3("size",Vector3(1,1,1));
   else
-    size = Vector3(meshSize.z, meshSize.x, meshSize.y);
+    size = Vector3(meshSize.x, meshSize.y, meshSize.z);
 
   // Get and set teh desired scale of the mesh
   if (node->GetChild("scale") != NULL)
   {
     Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
 
-    this->sceneNode->setScale(scale.y, scale.z, scale.x);
+    this->sceneNode->setScale(scale.x, scale.y, scale.z);
   }
   else
   {
-    this->sceneNode->setScale(size.y/meshSize.x, size.z/meshSize.y, size.x/meshSize.z);
+    this->sceneNode->setScale(size.x/meshSize.x, size.y/meshSize.y, size.z/meshSize.z);
   }
 
   // Set the pose of the scene node
@@ -360,21 +363,21 @@ void OgreVisual::SetVisible(bool visible, bool cascade)
 // Set the position of the visual
 void OgreVisual::SetPosition( const Vector3 &pos)
 {
-  this->sceneNode->setPosition(pos.y, pos.z, pos.x);
+  this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
 void OgreVisual::SetRotation( const Quatern &rot)
 {
-  this->sceneNode->setOrientation(rot.u, rot.y, rot.z, rot.x);
+  this->sceneNode->setOrientation(rot.u, rot.x, rot.y, rot.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the visual
 void OgreVisual::SetPose( const Pose3d &pose)
 {
-  this->SetPosition(pose.pos);
+  this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
 }
 
@@ -385,9 +388,9 @@ Vector3 OgreVisual::GetPosition()
   Ogre::Vector3 vpos;
   Vector3 pos;
   vpos=this->sceneNode->getPosition();
-  pos.x=vpos.z;
-  pos.y=vpos.x;
-  pos.z=vpos.y;
+  pos.x=vpos.x;
+  pos.y=vpos.y;
+  pos.z=vpos.z;
   return pos;
 }
 
@@ -399,9 +402,9 @@ Quatern OgreVisual::GetRotation( )
   Quatern quatern;
   vquatern=this->sceneNode->getOrientation();
   quatern.u =vquatern.w;
-  quatern.x=vquatern.z;
-  quatern.y=vquatern.x;
-  quatern.z=vquatern.y;
+  quatern.x=vquatern.x;
+  quatern.y=vquatern.y;
+  quatern.z=vquatern.z;
   return quatern;
 }
 
@@ -446,7 +449,7 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
   this->boundingBoxNode->attachObject(odeObj);
   Vector3 diff = max-min;
 
-  this->boundingBoxNode->setScale(diff.y, diff.z, diff.x);
+  this->boundingBoxNode->setScale(diff.x, diff.y, diff.z);
 
   Ogre::Entity *ent = NULL;
   Ogre::SimpleRenderable *simple = NULL;
