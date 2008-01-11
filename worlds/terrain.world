@@ -101,7 +101,7 @@
   <model:physical name="pioneer2dx_model2">
     <xyz>200 140 3.2</xyz>
     <rpy>0 0 -130</rpy>
-
+<!--
     <controller:differential_position2d name="controller1">
       <leftJoint>left_wheel_hinge</leftJoint>
       <rightJoint>right_wheel_hinge</rightJoint>
@@ -110,7 +110,7 @@
       <torque>5</torque>
       <interface:position name="position_iface_0"/>
     </controller:differential_position2d>
-
+-->
     <model:physical name="laser_model">
       <xyz>0 0 0.2</xyz>
       <include embedded="true">

@@ -27,14 +27,14 @@
       <size>0.5 0.277 0.17</size>
       <xyz>0 0 0.04</xyz>
       <rpy>0 180 0</rpy>
-      <mesh>pioneer2dx/chassis.mesh</mesh>
+      <mesh>Pioneer2dx/chassis.mesh</mesh>
       <material>Gazebo/Pioneer2Body</material>
     </visual>
 
     <visual>
       <xyz>0.015 0 0.09</xyz>
       <rpy>0 0 0</rpy>
-      <mesh>pioneer2at/chassis_top.mesh</mesh>
+      <mesh>Pioneer2at/chassis_top.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
 
@@ -42,7 +42,7 @@
       <xyz>0.21 0.0 0.068</xyz>
       <rpy>0 0 0</rpy>
       <size>0.12 0.29 0.034</size>
-      <mesh>pioneer2at/sonarbank.mesh</mesh>
+      <mesh>Pioneer2at/sonarbank.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
 
@@ -50,7 +50,7 @@
       <xyz>-0.178 0.0 0.068</xyz>
       <rpy>0 0 180</rpy>
       <size>0.12 0.29 0.034</size>
-      <mesh>pioneer2at/sonarbank.mesh</mesh>
+      <mesh>Pioneer2at/sonarbank.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
 
@@ -68,14 +68,14 @@
     <visual>
       <rpy>-90 0 0</rpy>
       <size>0.125 0.05 0.125</size>
-      <mesh>pioneer2dx/tire.mesh</mesh>
+      <mesh>Pioneer2dx/tire.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
 
     <visual>
       <rpy>-90 0 0</rpy>
       <size>0.073 0.05 0.073 </size>
-      <mesh>pioneer2at/wheel.mesh</mesh>
+      <mesh>Pioneer2at/wheel.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
 
@@ -100,14 +100,14 @@
     <visual>
       <rpy>-90 0 0</rpy>
       <size>0.125 0.05 0.125 </size>
-      <mesh>pioneer2dx/tire.mesh</mesh>
+      <mesh>Pioneer2dx/tire.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
 
     <visual>
       <rpy>-90 0 0</rpy>
       <size>0.073 0.05 0.073 </size>
-      <mesh>pioneer2at/wheel.mesh</mesh>
+      <mesh>Pioneer2at/wheel.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
 

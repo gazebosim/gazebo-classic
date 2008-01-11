@@ -32,7 +32,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.5 0.5 0.5 1.0</ambient>
+    <ambient>0.4 0.4 0.4 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -65,7 +65,7 @@
   <!-- The camera -->
   <model:physical name="cam1_model">
     <xyz>0.07 -1.10 0.5</xyz>
-    <rpy>0 12 52.5</rpy>
+    <rpy>0 -19 -134</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">
@@ -91,21 +91,59 @@
   </include>
   -->
 
-  <model:physical name="pioneer2dx_model1">
+  <model:physical name="simpleCar_model">
     <xyz>1 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
-    <controller:differential_position2d name="controller1">
-      <leftJoint>left_wheel_hinge</leftJoint>
-      <rightJoint>right_wheel_hinge</rightJoint>
+  <controller:steering_position2d name="a car">
+    <wheel>
+       <joint>left_front_wheel_hinge</joint>
+       <type>steer</type>
+       <torque>1000</torque>
+        <steerTorque>1000</steerTorque>
+    </wheel>
+    <wheel>
+       <joint>right_front_wheel_hinge</joint>
+       <type>steer</type>
+       <torque>1000</torque>
+        <steerTorque>1000</steerTorque>
+    </wheel>
+    <wheel>
+      <joint>left_rear_wheel_hinge</joint>
+       <type>drive</type>
+       <torque>1000</torque>
+    </wheel>
+    <wheel>
+      <joint>right_rear_wheel_hinge</joint>
+       <type>drive</type>
+       <torque>1000</torque>
+    </wheel>
+    <steerPD>10 0</steerPD>
+    <steerMaxAngle>50</steerMaxAngle>
+    <interface:position name="position_iface_0"/>
+  </controller:steering_position2d>
+
+<!--
+    <controller:steer2_position2d name="controller1">
+      <leftJoint>left_front_wheel_hinge</leftJoint>
+      <rightJoint>right_front_wheel_hinge</rightJoint>
       <wheelSeparation>0.34</wheelSeparation>
       <wheelDiameter>0.15</wheelDiameter>
-      <torque>5</torque>
-      <interface:position name="position_iface_0"/>
-    </controller:differential_position2d>
+      <torque>100</torque>
+      <steerMaxAngle>50</steerMaxAngle>
+      <interface:position name="position_iface_0" share="master"/>
+    </controller:steer2_position2d>
+ 
+    <controller:drive2_position2d name="controller2">
+      <leftJoint>left_rear_wheel_hinge</leftJoint>
+      <rightJoint>right_rear_wheel_hinge</rightJoint>
+      <torque>1000</torque>
+      <interface:position name="position_iface_0" share="slave"/>
+    </controller:drive2_position2d>
+    -->
 
     <!--<model:physical name="laser">
-      <xyz>0.15 0 0.18</xyz>
+      <xyz>0 0 0.16</xyz>
 
       <attach>
         <parentBody>chassis_body</parentBody>
@@ -118,12 +156,13 @@
     </model:physical>
     -->
 
+
     <!-- 
     The include should be last within a model. All previous statements
     will override those in the included file 
     -->
     <include embedded="true">
-      <xi:include href="models/pioneer2dx.model" />
+      <xi:include href="simpleCar.model" />
     </include>
   </model:physical>
 
@@ -131,12 +170,11 @@
   <model:renderable name="directional_white">
     <light>
       <type>directional</type>
-      <direction>0 -0.6 -0.4</direction>
-      <diffuseColor>1.0 1.0 1.0</diffuseColor>
-      <specularColor>0.2 0.2 0.2</specularColor>
-      <attenuation>1000 1.0 0.0 0</attenuation>
+      <direction>0 -0.8 -0.3</direction>
+      <diffuseColor>0.9 0.9 0.9</diffuseColor>
+      <specularColor>0.0 0.0 0.0</specularColor>
+      <attenuation>100 0.0 1.0 0.4</attenuation>
     </light>
   </model:renderable>
-
 
 </gazebo:world>

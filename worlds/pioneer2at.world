@@ -95,12 +95,15 @@
     <xyz>1 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
-    <!--    <controller:pioneer2dx_position2d name="controller1">
-      <leftJoint>left_wheel_hinge</leftJoint>
-      <rightJoint>right_wheel_hinge</rightJoint>
+    <controller:differential_position2d name="controller1">
+      <leftJoint>left_front_wheel_hinge</leftJoint>
+      <rightJoint>right_front_wheel_hinge</rightJoint>
+      <wheelSeparation>0.34</wheelSeparation>
+      <wheelDiameter>0.15</wheelDiameter>
+      <torque>10.0</torque>
       <interface:position name="position_iface_0"/>
-    </controller:pioneer2dx_position2d>
-    -->
+    </controller:differential_position2d>
+    
 
     <!--<model:physical name="laser">
       <xyz>0 0 0.16</xyz>
@@ -122,7 +125,7 @@
     will override those in the included file 
     -->
     <include embedded="true">
-      <xi:include href="pioneer2at.model" />
+      <xi:include href="models/pioneer2at.model" />
     </include>
   </model:physical>
 
