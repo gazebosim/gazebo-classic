@@ -31,6 +31,8 @@
 
 #include <sys/types.h>
 #include <dirent.h>
+#include <iostream>
+#include <string.h>
 
 #include "MovableText.hh"
 #include "OgreHUD.hh"
@@ -306,7 +308,27 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/Media/materials/scripts");
     archNames.push_back((*iter)+"/Media/materials/textures");
     archNames.push_back((*iter)+"/Media/models");
-    archNames.push_back((*iter)+"/Media/maps");
+    archNames.push_back((*iter)+"/Media/sets");
+
+  
+//we want to add all the material files of the sets
+
+    if ((dir=opendir(((*iter)+"/Media/sets").c_str()))== NULL)
+    {
+      continue;
+    }
+
+    std::string filename;
+    struct dirent *dir_entry_p;
+    while( (dir_entry_p = readdir(dir))!=NULL )
+    {
+       filename =(*iter)+"/Media/sets/"+ dir_entry_p->d_name;
+       //std::cout << filename << std::endl;
+       archNames.push_back(filename);
+    }
+
+    closedir(dir);
+
 
     for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
     {
