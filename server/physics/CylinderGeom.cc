@@ -56,8 +56,9 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
   this->SetGeom( dCreateCylinder( 0, radius, length ), true );
 
   //to be able to show physics
-  this->visualNode->AttachMesh("unit_cylinder");
+  /*this->visualNode->AttachMesh("unit_cylinder");
   this->visualNode->SetScale(Vector3(radius*2, radius*2 ,length));
   this->visualNode->SetMaterial("Gazebo/GreenEmissive");
+  */
 
 }

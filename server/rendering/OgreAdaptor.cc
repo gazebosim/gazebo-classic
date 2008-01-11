@@ -407,3 +407,4 @@ int OgreAdaptor::Render()
   root->renderOneFrame();
   return 0;
 }
+

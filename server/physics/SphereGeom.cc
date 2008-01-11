@@ -59,9 +59,10 @@ void SphereGeom::LoadChild(XMLConfigNode *node)
   this->SetGeom(dCreateSphere(0, radius ), true);
 
   //to be able to show physics
-  this->visualNode->AttachMesh("unit_sphere"); // unit_sphere radius=1 diameter=2
-  this->visualNode->SetScale(Vector3(radius/2, radius/2 ,radius/2));
+/*  this->visualNode->AttachMesh("unit_sphere"); // unit_sphere radius=1 diameter=2
+  this->visualNode->SetScale(Vector3(radius, radius ,radius));
   this->visualNode->SetMaterial("Gazebo/GreenEmissive");
+  */
 
 
 }

@@ -52,7 +52,7 @@ OgreVisual::OgreVisual(OgreVisual *node)
   this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
 
   this->boundingBoxNode = NULL;
-  this->sceneNode->setInheritScale(false);
+//  this->sceneNode->setInheritScale(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

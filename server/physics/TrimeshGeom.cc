@@ -96,9 +96,10 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   
   Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
 
-  this->visualNode->AttachMesh(this->meshName);
+  /*this->visualNode->AttachMesh(this->meshName);
   this->visualNode->SetScale(scale);
   this->visualNode->SetMaterial("Gazebo/GreenEmissive");
+  */
   
   int i,j,k;
   unsigned int numVertices = 0;
