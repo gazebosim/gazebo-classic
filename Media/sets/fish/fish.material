@@ -1,0 +1,15 @@
+material Gazebo/Fish/body
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture Fish/steelhead.png
+      }
+    }
+  }
+}
+
+

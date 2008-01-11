@@ -1,0 +1,16 @@
+material Gazebo/GeneralStoreShop/GeneralStoreShop
+{
+	technique
+	{
+		pass
+		{
+			diffuse 0.800000 0.800000 0.800000
+			specular 0.500000 0.500000 0.500000 12.500000
+			texture_unit
+			{
+				texture GeneralStoreShop/shop.jpg
+			}
+		}
+	}
+}
+
