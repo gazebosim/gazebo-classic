@@ -1,7 +1,7 @@
 #Import variable
 Import('env staticObjs sharedObjs')
 
-dirs = Split('differential')
+dirs = Split('differential steering')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)
