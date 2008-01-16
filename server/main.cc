@@ -99,13 +99,14 @@ home directory, or to the log file specified with the -l command line option.
 */
 
 //#include <python2.4/Python.h>
+//#include <FL/Fl.H>
+//#include <FL/x.H>
+
+
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
-#include <FL/Fl.H>
-#include <FL/x.H>
-
 #include "Global.hh"
 #include "Simulator.hh"
 #include "XMLConfig.hh"
