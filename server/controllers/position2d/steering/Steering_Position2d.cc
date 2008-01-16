@@ -154,8 +154,20 @@ void Steering_Position2d::InitChild()
   this->odomVel[0] = 0.0;
   this->odomVel[1] = 0.0;
   this->odomVel[2] = 0.0;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+// Reset the controller
+void Steering_Position2d::ResetChild()
+{
+  // Reset odometric pose
+  this->odomPose[0] = 0.0;
+  this->odomPose[1] = 0.0;
+  this->odomPose[2] = 0.0;
 
+  this->odomVel[0] = 0.0;
+  this->odomVel[1] = 0.0;
+  this->odomVel[2] = 0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

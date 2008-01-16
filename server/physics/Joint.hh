@@ -69,6 +69,12 @@ namespace gazebo
     /// \brief Update the joint
     public: void Update();
 
+    /// \brief Reset the joint
+    public: void Reset();
+
+    /// \brief Reset the child joint
+    protected: virtual void ResetChild() {};
+
     /// \brief Set the model this joint belongs too
     public: void SetModel(Model *model);
 

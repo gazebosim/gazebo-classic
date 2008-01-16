@@ -93,19 +93,18 @@ class Steering_Position2d : public Controller
 
   /// Load the controller
   /// \param node XML config node
-  /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode *node);
 
   /// Init the controller
-  /// \return 0 on success
   protected: virtual void InitChild();
 
+  /// \brief Reset the controller
+  protected: virtual void ResetChild();
+
   /// Update the controller
-  /// \return 0 on success
   protected: virtual void UpdateChild(UpdateParams &params);
 
   /// Finalize the controller
-  /// \return 0 on success
   protected: virtual void FiniChild();
 
   /// Update the data in the interface

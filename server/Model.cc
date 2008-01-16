@@ -309,10 +309,22 @@ int Model::Fini()
 // Reset the model
 void Model::Reset()
 {
-  Vector3 v(0,0,0);
+  std::map<std::string, Joint* >::iterator jiter;
   std::map< std::string, Body* >::iterator biter;
+  std::map<std::string, Controller* >::iterator citer;
+  Vector3 v(0,0,0);
 
   this->SetPose(this->initPose);
+
+  for (citer=this->controllers.begin(); citer!=this->controllers.end(); citer++)
+  {
+    citer->second->Reset();
+  }
+
+  for (jiter=this->joints.begin(); jiter!=this->joints.end(); citer++)
+  {
+    jiter->second->Reset();
+  }
 
   /*for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
   {

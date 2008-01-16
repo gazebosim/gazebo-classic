@@ -64,6 +64,9 @@ class Controller
   /// \return 0 on success
   public: void Init();
 
+  /// \brief Reset the controller
+  public: void Reset();
+
   /// \brief Update the controller. Called every cycle.
   /// \param params Parameters to the update cycle
   public: void Update(UpdateParams &params);
@@ -79,6 +82,9 @@ class Controller
 
   /// \brief Init function for the child class
   protected: virtual void InitChild() {return;}
+
+  /// \brief Reset function for the child class
+  protected: virtual void ResetChild() {return;}
 
   /// \brief Update function for the child class
   protected: virtual void UpdateChild(UpdateParams &/*params*/) {return;}

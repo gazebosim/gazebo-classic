@@ -78,8 +78,10 @@ class Differential_Position2d : public Controller
   protected: virtual void SaveChild(XMLConfigNode *node);
 
   /// Init the controller
-  /// \return 0 on success
   protected: virtual void InitChild();
+
+  /// \brief Reset the controller
+  protected: void ResetChild();
 
   /// Update the controller
   protected: virtual void UpdateChild(UpdateParams &params);

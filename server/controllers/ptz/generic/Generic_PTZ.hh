@@ -70,20 +70,19 @@ namespace gazebo
   
     /// \brief Load the controller
     /// \param node XML config node
-    /// \return 0 on success
     protected: virtual void LoadChild(XMLConfigNode *node);
   
     /// \brief Init the controller
-    /// \return 0 on success
     protected: virtual void InitChild();
   
     /// \brief Update the controller
-    /// \return 0 on success
     protected: virtual void UpdateChild(UpdateParams &params);
   
     /// \brief Finalize the controller
-    /// \return 0 on success
     protected: virtual void FiniChild();
+              
+    /// \brief Reset the controller
+    protected: virtual void ResetChild();
   
     /// \brief Put camera data to the iface
     private: void PutPTZData();
