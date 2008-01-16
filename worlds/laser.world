@@ -59,7 +59,7 @@
 
   <!-- Embedded laser model -->
   <include embedded="false">
-    <xi:include href="laser.model" />
+    <xi:include href="models/laser.model" />
   </include>
 
    <!-- Ground Plane -->

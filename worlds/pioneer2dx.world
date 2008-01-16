@@ -36,13 +36,6 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-
-    <!--<fog>
-      <color>0.9 0.9 0.9</color>
-      <linearStart>50</linearStart>
-      <linearEnd>100</linearEnd>
-    </fog>
-    -->
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -82,6 +75,23 @@
     </body:empty>
   </model:physical>
 
+  <model:physical name="cylinder1_model">
+    <xyz>1 -1.5 0.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:cylinder name="cylinder1_body">
+      <geom:cylinder name="cylinder1_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+
+
   <!-- 
   Include the complete model described in the .model file
   This assumes the root node is a <model:...>
@@ -113,7 +123,7 @@
       </attach>
 
       <include embedded="true">
-        <xi:include href="laser.model" />
+        <xi:include href="models/laser.model" />
       </include>
     </model:physical>
 

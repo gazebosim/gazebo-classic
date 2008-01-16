@@ -242,13 +242,6 @@ PhysicsEngine *World::GetPhysicsEngine() const
   return this->physicsEngine;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get the simulation time, this method is replicated in Simulator class
-double World::GetSimTime() const
-{
-  return Simulator::Instance()->GetSimTime();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
 int World::LoadEntities(XMLConfigNode *node, Model *parent)

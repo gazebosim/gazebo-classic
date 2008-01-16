@@ -29,7 +29,7 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "HingeJoint.hh"
-#include "World.hh"
+#include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
@@ -101,7 +101,7 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
   float hiStop, loStop;
 
   this->myIface->Lock(1);
-  this->myIface->data->time = World::Instance()->GetSimTime();
+  this->myIface->data->time = Simulator::Instance()->GetSimTime();
 
   for (int i=0; i<16; i++)
   {

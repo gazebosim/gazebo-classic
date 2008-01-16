@@ -30,6 +30,7 @@
 #include "Global.hh"
 #include "HingeJoint.hh"
 #include "World.hh"
+#include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
@@ -208,7 +209,7 @@ void Differential_Position2d::PutPositionData()
   if (this->myIface->Lock(1))
   {
     // TODO: Data timestamp
-    this->myIface->data->time = World::Instance()->GetSimTime();
+    this->myIface->data->time = Simulator::Instance()->GetSimTime();
 
     this->myIface->data->pose.pos.x = this->odomPose[0];
     this->myIface->data->pose.pos.y = this->odomPose[1];

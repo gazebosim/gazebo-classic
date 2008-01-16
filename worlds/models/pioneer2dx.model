@@ -80,9 +80,9 @@
     </visual>
 
     <visual>
-      <rpy>-90 0 0</rpy>
+      <rpy>0 0 0</rpy>
       <xyz>0 0 0.015</xyz>
-      <size>0.04 0.08 0.04 </size>
+      <size>0.04 0.04 0.08 </size>
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
@@ -112,9 +112,9 @@
     </visual>
 
     <visual>
-      <rpy>-90 0 0</rpy>
+      <rpy>0 0 0</rpy>
       <xyz>0 0 -0.015</xyz>
-      <size>0.04 0.08 0.04</size>
+      <size>0.04 0.04 0.08 </size>
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>

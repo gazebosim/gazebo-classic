@@ -33,6 +33,7 @@
 #include "XMLConfig.hh"
 #include "HingeJoint.hh"
 #include "World.hh"
+#include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
@@ -137,9 +138,8 @@ void SickLMS200_Laser::PutLaserData()
   
   if (this->laserIface->Lock(1))
   {
-
     // Data timestamp
-    this->laserIface->data->time = World::Instance()->GetSimTime();
+    this->laserIface->data->time = Simulator::Instance()->GetSimTime();
 
     // Read out the laser range data
     this->laserIface->data->min_angle = minAngle;
@@ -176,6 +176,7 @@ void SickLMS200_Laser::PutLaserData()
       this->laserIface->data->ranges[rangeCount-i-1] =  r + minRange;
       this->laserIface->data->intensity[i] = v;
     }
+    
     this->laserIface->Unlock();
 
     // New data is available
@@ -204,7 +205,7 @@ void SickLMS200_Laser::PutFiducialData()
   {
 
     // Data timestamp
-    this->fiducialIface->data->time = World::Instance()->GetSimTime();
+    this->fiducialIface->data->time = Simulator::Instance()->GetSimTime();
     this->fiducialIface->data->count = 0;
 
     // TODO: clean this up

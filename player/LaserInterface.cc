@@ -29,6 +29,7 @@ PLAYER_LASER_REQ_GET_GEOM
 */
 
 #include <math.h>
+#include <libplayerxdr/playerxdr.h>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -54,12 +55,16 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
   this->scanId = 0;
 
   this->datatime = -1;
+
+  memset(&this->data, 0, sizeof(this->data));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
 LaserInterface::~LaserInterface()
 {
+  player_laser_data_t_cleanup(&this->data);
+
   // Release this interface
   delete this->iface; 
 }
@@ -157,7 +162,6 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void LaserInterface::Update()
 {
-  player_laser_data_t data;
   struct timeval ts;
 
   if (this->iface->Lock(1))
@@ -175,7 +179,6 @@ void LaserInterface::Update()
       ts.tv_sec = (int) (this->iface->data->time);
       ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
-      memset(&data, 0, sizeof(data));
 
       // Pick the rage resolution to use (1, 10, 100)
       if (this->iface->data->max_range <= 8.192)
@@ -189,23 +192,34 @@ void LaserInterface::Update()
 
       //printf("range res = %f %f\n", rangeRes, this->iface->data->max_range);
 
-      data.min_angle = this->iface->data->min_angle;
-      data.max_angle = this->iface->data->max_angle;
-      data.max_range = this->iface->data->max_range;
-      data.resolution = angleRes;
-      data.ranges_count = data.ranges_count = this->iface->data->range_count; 
-      data.id = this->scanId++;
+      this->data.min_angle = this->iface->data->min_angle;
+      this->data.max_angle = this->iface->data->max_angle;
+      this->data.max_range = this->iface->data->max_range;
+      this->data.resolution = angleRes;
+
+      double oldCount = this->data.ranges_count;
+      this->data.ranges_count = this->data.intensity_count = this->iface->data->range_count; 
+      this->data.id = this->scanId++;
+
+      if (oldCount != this->data.ranges_count)
+      {
+        delete [] this->data.ranges;
+        delete [] this->data.intensity;
+
+        this->data.ranges = new float[data.ranges_count];
+        this->data.intensity = new uint8_t[data.intensity_count];
+      }
 
       for (i = 0; i < this->iface->data->range_count; i++)
       {
-        data.ranges[i] = this->iface->data->ranges[i] / rangeRes;
-        data.intensity[i] = (uint8_t) (int) this->iface->data->intensity[i];
+        this->data.ranges[i] = this->iface->data->ranges[i] / rangeRes;
+        this->data.intensity[i] = (uint8_t) (int) this->iface->data->intensity[i];
       }
 
       this->driver->Publish( this->device_addr,
           PLAYER_MSGTYPE_DATA,
           PLAYER_LASER_DATA_SCAN,        
-          (void*)&data, sizeof(data), &this->datatime );
+          (void*)&this->data, sizeof(this->data), &this->datatime );
     }
 
     this->iface->Unlock();

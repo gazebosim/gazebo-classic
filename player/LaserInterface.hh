@@ -83,6 +83,8 @@ class LaserInterface : public GazeboInterface
   private: double datatime;
 
   private: int scanId;
+
+  private: player_laser_data_t data;
 };
 
 /// \} 

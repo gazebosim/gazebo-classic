@@ -88,10 +88,6 @@ class World : public SingletonT<World>
   /// \return Pointer to the physics engine
   public: PhysicsEngine *GetPhysicsEngine() const;
 
-  /// Get the simulation time
-  /// \return The simulation time
-  public: double GetSimTime() const;
-
   /// \brief Load all entities
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load

@@ -31,7 +31,7 @@
 #include "Model.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
-#include "World.hh"
+#include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
@@ -163,7 +163,7 @@ void Generic_PTZ::PutPTZData()
   this->ptzIface->Lock(1);
 
   // Data timestamp
-  data->time = World::Instance()->GetSimTime();
+  data->time = Simulator::Instance()->GetSimTime();
 
   data->pan = this->panJoint->GetAngle();
   data->tilt = this->tiltJoint->GetAngle();

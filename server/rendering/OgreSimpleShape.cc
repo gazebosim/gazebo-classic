@@ -418,13 +418,14 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++) 
   {
-    vert.y = ring * height/rings - height/2.0;
+    vert.z = ring * height/rings - height/2.0;
 
     // Generate the group of segments for the current ring
     for(seg = 0; seg <= segments; seg++)
     {
-      vert.x = radius * cosf(seg * deltaSegAngle);
-      vert.z = radius * sinf(seg * deltaSegAngle); 
+      vert.y = radius * cosf(seg * deltaSegAngle);
+      vert.x = radius * sinf(seg * deltaSegAngle); 
+
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -460,12 +461,12 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
 
   /// The top cap vertex
   *vertices++ = 0;
-  *vertices++ = height/2.0;
   *vertices++ = 0;
+  *vertices++ = height/2.0;
 
   *vertices++ = 0;
-  *vertices++ = 1;
   *vertices++ = 0;
+  *vertices++ = 1;
 
   *vertices++ = 0;
   *vertices++ = 0;
@@ -473,12 +474,12 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
 
   // The bottom cap vertex
   *vertices++ = 0;
-  *vertices++ = -height/2.0;
   *vertices++ = 0;
+  *vertices++ = -height/2.0;
 
   *vertices++ = 0;
-  *vertices++ = -1;
   *vertices++ = 0;
+  *vertices++ = -1;
 
   *vertices++ = 0;
   *vertices++ = 0;

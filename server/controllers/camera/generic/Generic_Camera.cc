@@ -31,7 +31,7 @@
 #include "Sensor.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
-#include "World.hh"
+#include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
@@ -101,7 +101,7 @@ void Generic_Camera::PutCameraData()
   this->cameraIface->Lock(1);
 
   // Data timestamp
-  data->time = World::Instance()->GetSimTime();
+  data->time = Simulator::Instance()->GetSimTime();
   
   data->width = this->myParent->GetImageWidth();
   data->height = this->myParent->GetImageHeight();

@@ -31,8 +31,8 @@
       </visual>
 
       <visual>
-        <rpy>90 0 0</rpy>
-        <size>0.12 0.18 0.12</size>
+        <rpy>0 0 0</rpy>
+        <size>0.12 0.12 0.18</size>
         <mesh>unit_cylinder</mesh>
         <material>Gazebo/Black</material>
       </visual>

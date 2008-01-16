@@ -74,9 +74,9 @@
     </visual>
 
     <visual>
-      <rpy>-90 0 0</rpy>
+      <rpy>0 0 0</rpy>
       <xyz>0 0 0.015</xyz>
-      <size>0.048 0.09 0.048 </size>
+      <size>0.048 0.048 0.09</size>
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
@@ -104,9 +104,9 @@
     </visual>
 
     <visual>
-      <rpy>-90 0 0</rpy>
+      <rpy>0 0 0</rpy>
       <xyz>0 0 0.015</xyz>
-      <size>0.048 0.09 0.048 </size>
+      <size>0.048 0.048 0.09</size>
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
@@ -141,8 +141,8 @@
 
     <visual>
       <xyz>0 0 -0.015</xyz>
-      <rpy>-90 0 0</rpy>
-      <size>0.048 0.09 0.048 </size>
+      <rpy>0 0 0</rpy>
+      <size>0.048 0.048  0.09</size>
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
@@ -177,8 +177,8 @@
 
     <visual>
       <xyz>0 0 -0.015</xyz>
-      <rpy>-90 0 0</rpy>
-      <size>0.048 0.09 0.048 </size>
+      <rpy>0 0 0</rpy>
+      <size>0.048 0.048 0.09</size>
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
