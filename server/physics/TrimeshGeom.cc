@@ -150,9 +150,9 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
     {
       elem->baseVertexPointerToElement(pData, &pFloat);
 
-      *(vertPtr+1) = (*pFloat++) * scale.x;
-      *(vertPtr+2) = (*pFloat++) * scale.y;
-      *(vertPtr+0) = (*pFloat++) * scale.z;
+      *(vertPtr+0) = (*pFloat++) * scale.x;
+      *(vertPtr+1) = (*pFloat++) * scale.y;
+      *(vertPtr+2) = (*pFloat++) * scale.z;
 
       vertPtr += 3;
 
