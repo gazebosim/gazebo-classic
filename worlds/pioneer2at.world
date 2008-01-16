@@ -64,8 +64,8 @@
 
   <!-- The camera -->
   <model:physical name="cam1_model">
-    <xyz>0.07 -1.10 0.5</xyz>
-    <rpy>0 -19 -134</rpy>
+    <xyz>-0.52 -1.39 0.71</xyz>
+    <rpy>0 26.50 64.00</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">
@@ -92,7 +92,7 @@
   -->
 
   <model:physical name="pioneer2at_model">
-    <xyz>1 0 0.145</xyz>
+    <xyz>0 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
     <controller:differential_position2d name="controller1">

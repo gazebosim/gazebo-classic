@@ -64,5 +64,4 @@ void SphereGeom::LoadChild(XMLConfigNode *node)
   this->visualNode->SetMaterial("Gazebo/GreenEmissive");
   */
 
-
 }

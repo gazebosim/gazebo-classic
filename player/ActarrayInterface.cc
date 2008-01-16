@@ -242,11 +242,12 @@ void ActarrayInterface::Subscribe()
   {
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (GazeboError e)
+  catch (std::string e)
   {
-    std::ostringstream stream;
-    stream << "Error subscribing to Gazebo Actarray Interface\n" << e << "\n";
-    gzthrow(stream.str());
+    //std::ostringstream stream;
+    std::cout << "Error subscribing to Gazebo Actarray Interface\n" << e << "\n";
+    //gzthrow(stream.str());
+    exit(0);
   }
 }
 

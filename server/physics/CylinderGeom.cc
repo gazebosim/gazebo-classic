@@ -60,5 +60,4 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
   this->visualNode->SetScale(Vector3(radius*2, radius*2 ,length));
   this->visualNode->SetMaterial("Gazebo/GreenEmissive");
   */
-
 }

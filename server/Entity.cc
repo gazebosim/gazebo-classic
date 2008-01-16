@@ -60,9 +60,9 @@ Entity::Entity(Entity *parent)
 
 Entity::~Entity()
 {
-  GZ_DELETE (this->visualNode);
-  World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
+  GZ_DELETE(this->visualNode);
 
+  World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 }
 
 int Entity::GetId() const

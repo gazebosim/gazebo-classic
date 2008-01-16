@@ -213,7 +213,9 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 void Geom::Update()
 {
   this->UpdateChild();
-  //this->SetPose(this->GetPose());
+
+  if (this->GetName() == "sphere1_geom")
+    std::cout << "Visual Node Pose[" << this->visualNode->GetPose() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -459,15 +461,17 @@ void Geom::ShowJoints(bool show)
 /// Set the visibility of the physical entity of this geom 
 void Geom::ShowPhysics(bool show)
 {
-std::vector<OgreVisual*>::iterator iter;
+  std::vector<OgreVisual*>::iterator iter;
+
   if (show)
   {
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
       (*iter)->SetVisible(false, false);  
     }
-    this->visualNode->SetVisible(true, false);
+    /*this->visualNode->SetVisible(true, false);
     this->visualNode->SetTransparency(0.6);
+    */
   }
   else
   {
@@ -475,7 +479,8 @@ std::vector<OgreVisual*>::iterator iter;
     {
       (*iter)->SetVisible(true, false);  
     }
-    this->visualNode->SetVisible(false, false);
+    /*this->visualNode->SetVisible(false, false);
     this->visualNode->SetTransparency(1.0);
+    */
   }
 }

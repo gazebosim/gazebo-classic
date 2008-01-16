@@ -259,12 +259,13 @@ void Position2dInterface::Subscribe()
   {
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (GazeboError e)
+  catch (std::string e)
   {
-    std::ostringstream stream;
-    stream <<"Error Subscribing to Gazebo Position2d Interface\n"
+    //std::ostringstream stream;
+    std::cout <<"Error Subscribing to Gazebo Position2d Interface\n"
            << e << "\n";
-    gzthrow(stream.str());
+    //gzthrow(stream.str());
+    exit(0);
   }
 }
 

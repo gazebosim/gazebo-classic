@@ -35,7 +35,6 @@ using namespace gazebo;
 // Constructor
 OgreVisual::OgreVisual(OgreVisual *node)
 {
-
   std::ostringstream stream;
 
   if (!node)
@@ -113,7 +112,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   this->SetPose(pose);
   
   // Set the material of the mesh
-  this->SetMaterial(node->GetString("material","",0));
+  this->SetMaterial(node->GetString("material","",1));
 
   // Allow the sphere to cast shadows
   this->SetCastShadows(true);
@@ -151,9 +150,9 @@ void OgreVisual::AttachMesh( const std::string &meshName )
 void OgreVisual::SetScale( Vector3 scale )
 {
   Ogre::Vector3 vscale;
-  vscale.x=scale.y;  
-  vscale.y=scale.z;
-  vscale.z=scale.x;
+  vscale.x=scale.x;  
+  vscale.y=scale.y;
+  vscale.z=scale.z;
   this->sceneNode->setScale(vscale);
 }
 
@@ -163,7 +162,7 @@ Vector3 OgreVisual::GetScale()
 {
   Ogre::Vector3 vscale;
   vscale=this->sceneNode->getScale();
-  return Vector3(vscale.z, vscale.x, vscale.y);
+  return Vector3(vscale.x, vscale.y, vscale.z);
 }
 
 

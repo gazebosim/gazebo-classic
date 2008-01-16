@@ -214,12 +214,13 @@ void FiducialInterface::Subscribe()
   {
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
-  catch (GazeboError e)
+  catch (std::string e)
   {
-    std::ostringstream stream;
-    stream << "Error Subscribing to Gazebo Fiducial Interface\n"
+    //std::ostringstream stream;
+    std::cout << "Error Subscribing to Gazebo Fiducial Interface\n"
            << e << "\n";
-    gzthrow(stream.str());
+    //gzthrow(stream.str());
+    exit(0);
   }
 
 }

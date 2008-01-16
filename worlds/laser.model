@@ -20,19 +20,19 @@
 
     <geom:box name="laser_geom1">
       <xyz>0.0 0.0 0.0</xyz>
-      <rpy>0 -90 0</rpy>
+      <rpy>0 0 90</rpy>
       <size>0.15 0.15 0.2</size>
       <mass>0.1</mass>
 
       <visual>
-        <scale>0.1 0.07 0.07</scale>
+        <scale>0.07 0.07 0.1</scale>
         <mesh>sicklms200.mesh</mesh>
         <material>Gazebo/Blue</material>
       </visual>
 
       <visual>
-        <rpy>0 90 0</rpy>
-        <size>0.12 0.12 0.18</size>
+        <rpy>90 0 0</rpy>
+        <size>0.12 0.18 0.12</size>
         <mesh>unit_cylinder</mesh>
         <material>Gazebo/Black</material>
       </visual>
@@ -52,7 +52,6 @@
 
       <controller:sicklms200_laser name="laser_controller_1">
         <interface:laser name="laser_iface_0"/>
-        <!--        <interface:fiducial name="sicklms_fid_iface_1"/>-->
       </controller:sicklms200_laser>
     </sensor:ray>
 

@@ -92,7 +92,7 @@
   -->
 
   <model:physical name="pioneer2dx_model1">
-    <xyz>1 0 0.145</xyz>
+    <xyz>0 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
     <controller:differential_position2d name="controller1">
@@ -104,7 +104,7 @@
       <interface:position name="position_iface_0"/>
     </controller:differential_position2d>
 
-    <!--<model:physical name="laser">
+    <model:physical name="laser">
       <xyz>0.15 0 0.18</xyz>
 
       <attach>
@@ -116,7 +116,6 @@
         <xi:include href="laser.model" />
       </include>
     </model:physical>
-    -->
 
     <!-- 
     The include should be last within a model. All previous statements
