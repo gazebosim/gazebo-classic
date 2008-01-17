@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- Cool Athene statue model -->
+<!-- Cool low pol game like plane model -->
 <model:physical name="athene_statue_model"
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
@@ -15,14 +15,14 @@
   <static>false</static>
   <body:trimesh name="pallet_body">
     <geom:trimesh name="pallet_geom">
-      <mesh>athene/athene.mesh</mesh>
-      <scale>0.05 0.05 0.05</scale>
+      <mesh>RZR-002/RZR-002.mesh</mesh>
+      <scale>0.5 0.5 0.5</scale>
       <mass>0.1</mass>
       <visual>
-        <scale>0.05 0.05 0.05</scale>
+        <scale>0.5 0.5 0.5</scale>
         <rpy>0 0 0</rpy>
-        <mesh>athene/athene.mesh</mesh>
-        <material>Gazebo/Athene/AtheneNormalMap</material>
+        <mesh>RZR-002/RZR-002.mesh</mesh>
+        <material>Gazebo/RZR-002/RZR-002Texture</material>
       </visual>
     </geom:trimesh>
   </body:trimesh>
