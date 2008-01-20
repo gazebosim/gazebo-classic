@@ -1,4 +1,5 @@
 Open:
+- Add uninstall
 - boost signals for GUI input, etc
 - Apply Linear and Angular Damping, see OGREODE sources.
 - Add check for boost

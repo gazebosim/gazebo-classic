@@ -189,8 +189,17 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Set up the world geometry link
   if (this->sceneType==SCENE_BSP)
   {
-    this->worldGeometry=node->GetString("bsp","",1);
-    this->sceneMgr->setWorldGeometry(this->worldGeometry);
+    this->worldGeometry = node->GetString("bsp","",1);
+
+    try
+    {
+      this->sceneMgr->setWorldGeometry(this->worldGeometry);
+    }
+    catch (Ogre::Exception e)
+    {
+      gzmsg(0) << "Unable to load BSP geometry." << e.getDescription() << "\n";
+      exit(0);
+    }
   }
 
 /*
@@ -309,6 +318,7 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/Media/materials/textures");
     archNames.push_back((*iter)+"/Media/models");
     archNames.push_back((*iter)+"/Media/sets");
+    archNames.push_back((*iter)+"/Media/maps");
 
   
 //we want to add all the material files of the sets
