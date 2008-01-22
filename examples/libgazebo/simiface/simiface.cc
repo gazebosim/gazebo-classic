@@ -50,7 +50,7 @@ int main()
 
   // Example of resetting the simulator
   simIface->Lock(1);
-//  simIface->data->reset = 1;
+  simIface->data->reset = 1;
   simIface->Unlock();
 
   usleep(1000000);

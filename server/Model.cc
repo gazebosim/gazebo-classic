@@ -321,7 +321,7 @@ void Model::Reset()
     citer->second->Reset();
   }
 
-  for (jiter=this->joints.begin(); jiter!=this->joints.end(); citer++)
+  for (jiter=this->joints.begin(); jiter!=this->joints.end(); jiter++)
   {
     jiter->second->Reset();
   }

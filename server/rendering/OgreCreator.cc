@@ -130,7 +130,7 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
   light->setSpecularColour(vec.x, vec.y, vec.z);
 
   // Set the direction which the light points
-  vec = node->GetVector3("direction", Vector3(0.0, -1.0, 0.0));
+  vec = node->GetVector3("direction", Vector3(0.0, 0.0, -1.0));
   light->setDirection(vec.x, vec.y, vec.z);
 
   // Absolute range of light in world coordinates
