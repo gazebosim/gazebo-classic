@@ -82,10 +82,17 @@ void Simulator::Load(const std::string &worldFileName, int serverId )
 
   // Load the world file
   this->xmlFile=new gazebo::XMLConfig();
-
-  if (xmlFile->Load(worldFileName) != 0)
+  
+  try
   {
-    gzthrow ("The XML config file can not be loaded, please make sure is a correct file");
+    xmlFile->Load(worldFileName);
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "The XML config file can not be loaded, please make sure is a correct file\n" 
+      << e << "\n";
+    gzthrow(stream.str());
   }
 
   XMLConfigNode *rootNode(xmlFile->GetRootNode());

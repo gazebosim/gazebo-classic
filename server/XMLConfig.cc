@@ -63,9 +63,9 @@ XMLConfig::~XMLConfig()
 
 ////////////////////////////////////////////////////////////////////////////
 // Load world from file
-int XMLConfig::Load( const std::string &filename )
+void XMLConfig::Load( const std::string &filename )
 {
-
+  std::ostringstream stream;
   this->filename = filename;
 
   // Enable line numbering
@@ -75,36 +75,33 @@ int XMLConfig::Load( const std::string &filename )
   this->xmlDoc = xmlParseFile( this->filename.c_str() );
   if (xmlDoc == NULL)
   {
-    std::cerr << "Unable to parse xml file: " << this->filename << std::endl;
-    return -1;
+    stream << "Unable to parse xml file: " << this->filename;
+    gzthrow(stream.str());
   }
 
   // Create xpath evaluation context
   this->xpathContex = xmlXPathNewContext(this->xmlDoc);
   if (this->xpathContex == NULL)
   {
-    std::cerr << "Unable to create new XPath context\n";
-    return -1;
+    gzthrow("Unable to create new XPath context");
   }
 
   // Apply the XInclude process.
   if (xmlXIncludeProcess(this->xmlDoc) < 0)
-  {
-    printf("XInclude process failed\n");
+  { //this will fail if the included file is not found, too strict?
+    gzthrow("XInclude process failed\n");
   }
 
   // Create wrappers for all the nodes (recursive)
   this->root = this->CreateNodes( NULL, xmlDocGetRootElement(this->xmlDoc) );
   if (this->root == NULL)
   {
-    std::cerr << "Empty document [" << this->filename << std::endl;
-    return -1;
+    stream << "Empty document [" << this->filename << "]";
+    gzthrow(stream.str());
   }
-
-  return 0;
 }
 
-int XMLConfig::LoadString( const std::string &str )
+void XMLConfig::LoadString( const std::string &str )
 {
   // Enable line numbering
   xmlLineNumbersDefault( 1 );
@@ -113,8 +110,9 @@ int XMLConfig::LoadString( const std::string &str )
   this->xmlDoc = xmlParseDoc( (xmlChar*)(str.c_str()) );
   if (xmlDoc == NULL)
   {
-    std::cerr << "unable to parse [" << str << "]";
-    return -1;
+    std::ostringstream stream;
+    stream << "unable to parse [" << str << "]";
+    gzthrow(stream.str()); 
   }
 
   // Create wrappers for all the nodes (recursive)
@@ -123,11 +121,10 @@ int XMLConfig::LoadString( const std::string &str )
 
   if (this->root == NULL)
   {
-    std::cerr << "Empty document [" << str << "\n";
-    return -1;
+    std::ostringstream stream;
+    stream << "Empty document [" << str << "\n";
+    gzthrow(stream.str()); 
   }
-
-  return 0;
 }
 
 

@@ -57,10 +57,10 @@ namespace gazebo
     public: ~XMLConfig();
   
     /// \brief Load config from an XML file
-    public: int Load(const std::string &filename );
+    public: void Load(const std::string &filename );
   
     /// \brief Load config from an XML string
-    public: int LoadString(const std::string &str );
+    public: void LoadString(const std::string &str );
   
     /// \brief Save config back into file
     ///        Set filename to NULL to save back into the original file

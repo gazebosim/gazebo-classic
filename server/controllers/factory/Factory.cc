@@ -94,7 +94,15 @@ void Factory::UpdateChild(UpdateParams &params)
     XMLConfig *xmlConfig = new XMLConfig();
 
     // Load the XML tree from the given string
-    xmlConfig->LoadString( xmlString );
+    try
+    {
+      xmlConfig->LoadString( xmlString );
+    }
+    catch (gazebo::GazeboError e)
+    {
+      std::cerr << "The controlled factory could not load its XML data [" << e << "]\n";
+      return;
+    }
 
     // Add the new models into the World
     World::Instance()->LoadEntities( xmlConfig->GetRootNode(), NULL );
