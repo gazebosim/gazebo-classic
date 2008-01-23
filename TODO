@@ -1,5 +1,4 @@
 Open:
-- Add uninstall
 - boost signals for GUI input, etc
 - Apply Linear and Angular Damping, see OGREODE sources.
 - Add check for boost
@@ -115,3 +114,4 @@ Completed:
 - look into using FL::RUN. Using threads now
 - Add in Pioneer blender models
 - Add check for libxml2
+- Add uninstall (scons automatically handles this!)

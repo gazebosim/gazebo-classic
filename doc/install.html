@@ -127,4 +127,22 @@ Gazebo needs some system information in order to load plugins, texture files, mo
 \endverbatim
 
 If this file does not exist, then the builder will automatically create the file with appropriate values. If the file does exist, the builder will not overwrite it.
+
+\section uninstall Uninstall 
+
+To uninstall Gazebo, all we have to do is clean the installation of our SVN copy. This is done with the -c switch.
+
+@verbatim
+$ su
+$ scons -c install
+$ exit
+@endverbatim
+
+If you installed a local copy, simply: 
+
+@verbatim
+$ scons -c install
+@endverbatim
+
+
 */
