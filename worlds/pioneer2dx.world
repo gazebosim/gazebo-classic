@@ -123,7 +123,7 @@
       </attach>
 
       <include embedded="true">
-        <xi:include href="models/laser.model" />
+        <xi:include href="models/sicklms200.model" />
       </include>
     </model:physical>
 

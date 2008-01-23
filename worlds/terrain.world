@@ -114,12 +114,12 @@
     <model:physical name="laser_model">
       <xyz>0 0 0.2</xyz>
       <include embedded="true">
-        <xi:include href="laser.model" />
+        <xi:include href="models/sicklms200.model" />
       </include>
     </model:physical>
 
     <include embedded="true">
-      <xi:include href="pioneer2dx.model" />
+      <xi:include href="models/pioneer2dx.model" />
     </include>
   </model:physical>
 
