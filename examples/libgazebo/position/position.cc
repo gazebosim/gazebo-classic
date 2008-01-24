@@ -34,15 +34,16 @@ int main()
   /// Open the Position interface
   try
   {
-    posIface->Open(client, "pioneer1_model");
+    posIface->Open(client, "position_iface_0");
   }
-  catch (gazebo::GazeboError e)
+  catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect to the position interface\n"
       << e << "\n";
     return -1;
   }
 
+  // Enable the motor
   posIface->Lock(1);
   posIface->data->cmdEnableMotors = 1;
   posIface->Unlock();
@@ -50,7 +51,7 @@ int main()
   while (true)
   {
     posIface->Lock(1);
-    printf("Enables[%d]\n", posIface->data->cmdEnableMotors);
+    posIface->data->cmdVelocity.pos.x += 10;
     posIface->Unlock();
 
     usleep(100000);

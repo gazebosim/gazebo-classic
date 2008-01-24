@@ -213,9 +213,6 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 void Geom::Update()
 {
   this->UpdateChild();
-
-  if (this->GetName() == "sphere1_geom")
-    std::cout << "Visual Node Pose[" << this->visualNode->GetPose() << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
