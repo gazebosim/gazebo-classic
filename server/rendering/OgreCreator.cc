@@ -338,7 +338,18 @@ void OgreCreator::DrawGrid()
 
     sprintf(name,"(%d %d)_yaxis",0,y);
     sprintf(text,"%d",y);
-    MovableText* msg = new MovableText(name, text,"Arial",0.08);
+
+    MovableText* msg = new MovableText();
+    try
+    {
+      msg->Load(name, text,"Arial",0.08);
+    }
+    catch (Ogre::Exception e)
+    {
+      std::ostringstream stream;
+      stream <<  "Unable to create the text. " << e.getDescription() <<std::endl;
+      gzthrow(stream.str() );
+    }
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
@@ -376,7 +387,18 @@ void OgreCreator::DrawGrid()
 
     sprintf(name,"(%d %d)_xaxis",x,0);
     sprintf(text,"%d",x);
-    MovableText* msg = new MovableText(name, text,"Arial",0.08);
+
+    MovableText* msg = new MovableText();
+    try
+    {
+      msg->Load(name, text,"Arial",0.08);
+    }
+    catch (Ogre::Exception e)
+    {
+      std::ostringstream stream;
+      stream <<  "Unable to create the text. " << e.getDescription() <<std::endl;
+      gzthrow(stream.str() );
+    }
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");

@@ -19,19 +19,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-MovableText::MovableText(const std::string &name, 
-                         const Ogre::UTFString &text, 
-                         const std::string fontName, 
-                         float charHeight, 
-                         const Ogre::ColourValue &color)
+MovableText::MovableText()
   : camera(NULL), 
     renderWindow(NULL) , 
     font(NULL) , 
-    text(text) , 
-    fontName(fontName) , 
-    charHeight(charHeight) , 
-    color(color) , 
-    spaceWidth(0) , 
+   spaceWidth(0) , 
     updateColors(true) , 
     onTop(false) , 
     horizAlign(H_LEFT) , 
@@ -39,22 +31,7 @@ MovableText::MovableText(const std::string &name,
     baseline(0.0) , 
     viewportAspectCoef (0.75)
 {
-  this->mName = name;
-
-  if (this->mName == "")
-    Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS, 
-                    "Trying to create MovableText without name", 
-                    "MovableText::MovableText");
-
-  if (this->text == "")
-    Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS, 
-                    "Trying to create MovableText without text", 
-                    "MovableText::MovableText");
-
   this->renderOp.vertexData = NULL;
-
-  this->SetFontName(this->fontName);
-  this->_setupGeometry();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,6 +41,37 @@ MovableText::~MovableText()
   if (this->renderOp.vertexData)
     delete this->renderOp.vertexData;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//Loads the text to display and select the font 
+void MovableText::Load(const std::string &name, 
+                         const Ogre::UTFString &text, 
+                         const std::string &fontName, 
+                         float charHeight, 
+                         const Ogre::ColourValue &color)
+{
+  this->text=text;
+  this->color=color;
+  this->fontName=fontName;
+  this->charHeight=charHeight;
+  this->mName = name;
+
+  if (this->mName == "")
+    throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS, 
+                    "Trying to create MovableText without name", 
+                    "MovableText::MovableText");
+
+  if (this->text == "")
+    throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS, 
+                    "Trying to create MovableText without text", 
+                    "MovableText::MovableText");
+  
+
+  this->SetFontName(this->fontName);
+  this->_setupGeometry();
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the font name
@@ -82,7 +90,7 @@ void MovableText::SetFontName(const std::string &newFontName)
 
     if (!this->font)
     {
-      Ogre::Exception(Ogre::Exception::ERR_ITEM_NOT_FOUND, 
+      throw Ogre::Exception(Ogre::Exception::ERR_ITEM_NOT_FOUND, 
                       "Could not find font " + fontName, 
                       "MovableText::setFontName");
     }

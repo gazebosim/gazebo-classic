@@ -41,13 +41,17 @@ class MovableText : public Ogre::MovableObject, public Ogre::Renderable
   public: enum VertAlign  {V_BELOW, V_ABOVE};
 
   /// \brief Constructor
-  public: MovableText(const std::string &name, 
-                      const Ogre::UTFString &text, 
-                      const std::string fontName = "Arial", 
-                      float charHeight = 1.0,
-                      const Ogre::ColourValue &color = Ogre::ColourValue::White);
+  public: MovableText();
+
   /// \brief Destructor
   public: virtual ~MovableText();
+
+  /// \brief Loads text and font info 
+  public: void Load(const std::string &name, 
+                      const Ogre::UTFString &text, 
+                      const std::string &fontName = "Arial", 
+                      float charHeight = 1.0,
+                      const Ogre::ColourValue &color = Ogre::ColourValue::White);
 
   /// \brief Set the font
   public: void SetFontName(const std::string &font);
