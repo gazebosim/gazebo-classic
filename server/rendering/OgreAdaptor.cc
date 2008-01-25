@@ -64,20 +64,37 @@ OgreAdaptor::OgreAdaptor()
   this->root = new Ogre::Root(); 
 
   this->ogreWindow = true;
+  this->window=NULL;
+  this->backgroundColor=NULL;
+  this->logManager=NULL;
+  this->sceneMgr=NULL;
+  this->camera=NULL;
+  this->viewport=NULL;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 OgreAdaptor::~OgreAdaptor()
 {
-  if (this->window)
-    delete this->window;
+  //GZ_DELETE (this->window)
+  //GZ_DELETE (this->backgroundColor)
+  //GZ_DELETE (this->frameListener)
+  //GZ_DELETE (this->logManager)
+//  this->root->detachRenderTarget(this->window);
+//  this->root->shutdown();
+  GZ_DELETE (this->root)
+//  GZ_DELETE (this->sceneMgr) //this objects seems to be destroyed by root
+//  GZ_DELETE (this->camera)
+//  GZ_DELETE (this->viewport)
 
-  if (this->backgroundColor)
-    delete this->backgroundColor;
+}
 
-  if (this->frameListener)
-    delete this->frameListener;
+////////////////////////////////////////////////////////////////////////////////
+// Closes and free
+void OgreAdaptor::Close()
+{
+  GZ_DELETE (this->root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -321,24 +338,19 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/Media/maps");
 
   
-//we want to add all the material files of the sets
-
-    if ((dir=opendir(((*iter)+"/Media/sets").c_str()))== NULL)
+  //we want to add all the material files of the sets
+    if ((dir=opendir(((*iter)+"/Media/sets").c_str()))!= NULL)
     {
-      continue;
+      std::string filename;
+      struct dirent *dir_entry_p;
+      while( (dir_entry_p = readdir(dir))!=NULL )
+      {
+         filename =(*iter)+"/Media/sets/"+ dir_entry_p->d_name;
+         //std::cout << filename << std::endl;
+         archNames.push_back(filename);
+      }
+      closedir(dir);
     }
-
-    std::string filename;
-    struct dirent *dir_entry_p;
-    while( (dir_entry_p = readdir(dir))!=NULL )
-    {
-       filename =(*iter)+"/Media/sets/"+ dir_entry_p->d_name;
-       //std::cout << filename << std::endl;
-       archNames.push_back(filename);
-    }
-
-    closedir(dir);
-
 
     for (aiter=archNames.begin(); aiter!=archNames.end(); aiter++)
     {
