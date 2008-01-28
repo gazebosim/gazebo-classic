@@ -92,7 +92,7 @@
   -->
 
   <model:physical name="simpleCar_model">
-    <xyz>1 0 0.145</xyz>
+    <xyz>0 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
   <controller:steering_position2d name="a car">
@@ -162,7 +162,7 @@
     will override those in the included file 
     -->
     <include embedded="true">
-      <xi:include href="simpleCar.model" />
+      <xi:include href="models/simplecar.model" />
     </include>
   </model:physical>
 
