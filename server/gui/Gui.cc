@@ -99,8 +99,8 @@ void Gui::Update()
   this->toolbar->Update();
   this->statusbar->Update();
   this->glWindow->Update();
-  Fl::check();
-  //Fl::wait(0.3);
+  //Fl::check();
+  Fl::wait(0.03);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
