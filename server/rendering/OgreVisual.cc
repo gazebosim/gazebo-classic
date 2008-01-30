@@ -86,6 +86,9 @@ void OgreVisual::Load(XMLConfigNode *node)
 
   // Attach the entity to the node
   this->AttachObject(obj);  
+
+  // Set the pose of the scene node
+  this->SetPose(pose);
   
   // Get the size of the mesh
   meshSize = obj->getBoundingBox().getSize();
@@ -108,9 +111,7 @@ void OgreVisual::Load(XMLConfigNode *node)
     this->sceneNode->setScale(size.x/meshSize.x, size.y/meshSize.y, size.z/meshSize.z);
   }
 
-  // Set the pose of the scene node
-  this->SetPose(pose);
-  
+ 
   // Set the material of the mesh
   this->SetMaterial(node->GetString("material","",1));
 

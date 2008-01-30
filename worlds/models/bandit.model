@@ -22,12 +22,12 @@
   <body:box name="head_body">
     <xyz>0 0 0</xyz>
     <geom:box name="head_geom">
-      <size>0.127 0.158 0.175</size>
+      <size>0.127 0.158 0.175 </size>
       <mass>0</mass>
 
       <visual>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/head_1.mesh</mesh>
-        <size>0.127 0.158 0.175</size>
         <material>Gazebo/test</material>
       </visual>
     </geom:box>
@@ -66,8 +66,8 @@
       <mass>0</mass>
 
       <visual>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/neck_1.mesh</mesh>
-        <size>0.063 0.063 0.076</size>
         <material>Gazebo/test</material>
       </visual>
     </geom:box>
@@ -93,7 +93,7 @@
       <mass>.1</mass>
 
       <visual>
-        <size>0.196 0.145 0.299</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/body_model_1.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -121,7 +121,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.105 0.066 0.081</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/shoulder_mounting_1.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -147,7 +147,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.078 0.083 0.111</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/right_shoulder.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -172,7 +172,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.075 0.070 0.075</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/bicep.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -197,7 +197,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.068 0.065 0.095</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/right_forearm.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -222,7 +222,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.054 0.054 0.025</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/wrist.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -247,7 +247,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.057 0.098 0.054</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/right_hand.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -272,8 +272,8 @@
       <mass>0</mass>
 
       <visual>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/thumb.mesh</mesh>
-        <size>0.038 0.072 0.028</size>
         <material>Gazebo/test</material>
       </visual>
     </geom:box>
@@ -300,7 +300,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.105 0.066 0.081</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/shoulder_mounting_1.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -326,7 +326,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.078 0.083 0.111</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/left_shoulder.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -351,7 +351,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.075 0.070 0.075</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/bicep.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -376,7 +376,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.068 0.065 0.095</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/left_forearm.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -401,7 +401,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.054 0.054 0.025</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/wrist.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -426,7 +426,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.057 0.098 0.054</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/left_hand.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>
@@ -451,7 +451,7 @@
       <mass>0</mass>
 
       <visual>
-        <size>0.038 0.072 0.028</size>
+        <rpy>90 0 90</rpy>
         <mesh>bandit/thumb.mesh</mesh>
         <material>Gazebo/test</material>
       </visual>

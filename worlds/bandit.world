@@ -60,10 +60,14 @@
       </attach>
       <body:box name="box_body">
         <geom:box name="box_geom">
-          <mesh>default</mesh>
           <size>.1 .2 .25</size>
-          <material>Gazebo/PioneerBody</material>
           <mass>0</mass>
+
+          <visual>
+            <mesh>unit_box</mesh>
+            <size>.1 .2 .25</size>
+            <material>Gazebo/PioneerBody</material>
+          </visual>
         </geom:box>
       </body:box>
 
@@ -104,8 +108,8 @@
 
 
  <model:physical name="cam1_model">
-    <xyz>0.78 0.04 0.56</xyz>
-    <rpy>0 -13 0</rpy>
+    <xyz>2.96 -0.06 1.04</xyz>
+    <rpy>0 16 180</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">
