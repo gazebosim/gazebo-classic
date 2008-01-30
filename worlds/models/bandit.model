@@ -22,7 +22,7 @@
   <body:box name="head_body">
     <xyz>0 0 0</xyz>
     <geom:box name="head_geom">
-      <mesh>head_1.mesh</mesh>
+      <mesh>bandit/head_1.mesh</mesh>
       <size>0.127 0.158 0.175</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -30,7 +30,7 @@
 
     <geom:sphere name="left_eye">
       <xyz> 0.01 -0.035 0</xyz>
-      <mesh>default</mesh>
+      <mesh>unit_sphere</mesh>
       <size>0.020</size>
       <material>Gazebo/Eyes</material>
       <mass>0</mass>
@@ -38,7 +38,7 @@
 
     <geom:sphere name="right_eye">
       <xyz> 0.01 0.035 0</xyz>
-      <mesh>default</mesh>
+      <mesh>unit_sphere</mesh>
       <size>0.020</size>
       <material>Gazebo/Eyes</material>
       <mass>0</mass>
@@ -50,7 +50,7 @@
     <xyz>-0.03 0 -0.071</xyz>
     <rpy>183.928 0 -90</rpy>
     <geom:box name="neck_geom">
-      <mesh>neck_1.mesh</mesh>
+      <mesh>bandit/neck_1.mesh</mesh>
       <size>0.063 0.063 0.076</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -73,7 +73,7 @@
     <xyz>-0.025 0 -0.223</xyz>
     <rpy>0 0 -90</rpy>
     <geom:box name="torso_geom">
-      <mesh>body_model_1.mesh</mesh>
+      <mesh>bandit/body_model_1.mesh</mesh>
       <size>0.196 0.145 0.299</size>
       <mass>.1</mass>
       <material>Gazebo/test</material>
@@ -97,7 +97,7 @@
     <rpy>180 0 0</rpy>
     <geom:box name="right_shoulder_mounting_geom">
       <rpy>0 0 0</rpy>
-      <mesh>shoulder_mounting_1.mesh</mesh>
+      <mesh>bandit/shoulder_mounting_1.mesh</mesh>
       <size>0.105 0.066 0.081</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -119,7 +119,7 @@
     <rpy>0 180 0</rpy>
     <geom:box name="right_shoulder_geom">
       <rpy>0 0 0</rpy>
-      <mesh>right_shoulder.mesh</mesh>
+      <mesh>bandit/right_shoulder.mesh</mesh>
       <size>0.078 0.083 0.111</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -140,7 +140,7 @@
     <xyz>-0.030 0.163 -0.288</xyz>
     <rpy>0 0 90</rpy>
     <geom:box name="right_bicep_geom">
-      <mesh>bicep.mesh</mesh>
+      <mesh>bandit/bicep.mesh</mesh>
       <size>0.075 0.070 0.075</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -161,7 +161,7 @@
     <xyz>-0.028 0.163 -0.372</xyz>
     <rpy>0 180 180</rpy>
     <geom:box name="right_forearm_geom">
-      <mesh>right_forearm.mesh</mesh>
+      <mesh>bandit/right_forearm.mesh</mesh>
       <size>0.068 0.065 0.095</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -182,7 +182,7 @@
     <xyz>-0.026 0.163 -0.434</xyz>
     <rpy>0 0 0</rpy>
     <geom:box name="right_wrist_geom">
-      <mesh>wrist.mesh</mesh>
+      <mesh>bandit/wrist.mesh</mesh>
       <size>0.054 0.054 0.025</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -203,7 +203,7 @@
     <xyz>-0.015 0.163 -0.486</xyz>
     <rpy>57 0 90</rpy>
     <geom:box name="right_hand_geom">
-      <mesh>right_hand.mesh</mesh>
+      <mesh>bandit/right_hand.mesh</mesh>
       <size>0.057 0.098 0.054</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -224,7 +224,7 @@
     <xyz>-0.037 0.163 -0.484</xyz>
     <rpy>90 0 90</rpy>
     <geom:box name="right_thumb_geom">
-      <mesh>thumb.mesh</mesh>
+      <mesh>bandit/thumb.mesh</mesh>
       <size>0.038 0.072 0.028</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -248,7 +248,7 @@
     <rpy>0 0 0</rpy>
     <geom:box name="left_shoulder_mounting_geom">
       <rpy>0 0 0</rpy>
-      <mesh>shoulder_mounting_1.mesh</mesh>
+      <mesh>bandit/shoulder_mounting_1.mesh</mesh>
       <size>0.105 0.066 0.081</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -270,7 +270,7 @@
     <rpy>0 180 0</rpy>
     <geom:box name="left_shoulder_geom">
       <rpy>0 0 0</rpy>
-      <mesh>left_shoulder.mesh</mesh>
+      <mesh>bandit/left_shoulder.mesh</mesh>
       <size>0.078 0.083 0.111</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -291,7 +291,7 @@
     <xyz>-0.030 -0.163 -0.288</xyz>
     <rpy>0 0 90</rpy>
     <geom:box name="left_bicep_geom">
-      <mesh>bicep.mesh</mesh>
+      <mesh>bandit/bicep.mesh</mesh>
       <size>0.075 0.070 0.075</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -312,7 +312,7 @@
     <xyz>-0.028 -0.163 -0.372</xyz>
     <rpy>0 180 180</rpy>
     <geom:box name="left_forearm_geom">
-      <mesh>left_forearm.mesh</mesh>
+      <mesh>bandit/left_forearm.mesh</mesh>
       <size>0.068 0.065 0.095</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -333,7 +333,7 @@
     <xyz>-0.026 -0.163 -0.434</xyz>
     <rpy>0 0 0</rpy>
     <geom:box name="left_wrist_geom">
-      <mesh>wrist.mesh</mesh>
+      <mesh>bandit/wrist.mesh</mesh>
       <size>0.054 0.054 0.025</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -354,7 +354,7 @@
     <xyz>-0.015 -0.163 -0.486</xyz>
     <rpy>57 0 90</rpy>
     <geom:box name="left_hand_geom">
-      <mesh>left_hand.mesh</mesh>
+      <mesh>bandit/left_hand.mesh</mesh>
       <size>0.057 0.098 0.054</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
@@ -375,7 +375,7 @@
     <xyz>-0.037 -0.163 -0.484</xyz>
     <rpy>90 0 90</rpy>
     <geom:box name="left_thumb_geom">
-      <mesh>thumb.mesh</mesh>
+      <mesh>bandit/thumb.mesh</mesh>
       <size>0.038 0.072 0.028</size>
       <mass>0</mass>
       <material>Gazebo/test</material>
