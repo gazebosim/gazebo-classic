@@ -76,7 +76,7 @@
         </attach>
 
         <include embedded="true">
-          <xi:include href="bandit.model" />
+          <xi:include href="models/bandit.model" />
         </include>
       </model:physical>
 
