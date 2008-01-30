@@ -113,13 +113,9 @@ void Geom::Load(XMLConfigNode *node)
   pose.pos = node->GetVector3("xyz",Vector3(0,0,0));
   pose.rot = node->GetRotation("rpy",Quatern());
 
-  std::cout << "Geom[" << this->GetName() << "]\n";
-  std::cout << "Pose[" << pose << "]\n";
 
   // TODO: This should probably be true....but "true" breaks trimesh postions.
   this->SetPose(pose, true);
-
-  std::cout << "Geom New Pose[" << this->GetPose() << "]\n";
 
   this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
   this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));

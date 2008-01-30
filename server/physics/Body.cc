@@ -521,7 +521,6 @@ void Body::UpdateCoM()
     }
   }
 
-  std::cout << "Old Pose[" << oldPose << "]\n";
 
   // Fixup the pose of the CoM (ODE body)
   this->comPose = oldPose;
@@ -529,7 +528,6 @@ void Body::UpdateCoM()
   this->comPose = newPose;
   this->SetPose(pose);
 
-  std::cout << "New Pose[" << this->GetPose() << "]\n";
 
   // Settle on the new CoM pose
   this->comPose = newPose;
