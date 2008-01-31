@@ -51,6 +51,9 @@ namespace gazebo
     /// \brief Get a pointer to the text renderer
     public: static OgreHUD *Instance();
 
+    /// \brief Get a pointer to the text renderer
+    public: static void Close();
+
     /// \brief Update the HUD.
     public: void Update();
 

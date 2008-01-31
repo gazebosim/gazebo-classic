@@ -98,6 +98,8 @@ OgreFrameListener::OgreFrameListener()
 
 OgreFrameListener::~OgreFrameListener()
 {
+  CameraManager::Instance()->Clear();
+  OgreHUD::Close();
 }
 
 bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)

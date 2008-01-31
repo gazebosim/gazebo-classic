@@ -63,6 +63,13 @@ void CameraManager::AddCamera( CameraSensor *camera )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Del all cameras
+void CameraManager::Clear()
+{
+  this->cameras.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Return the number of cameras
 unsigned int CameraManager::GetNumCameras() const
 {

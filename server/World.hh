@@ -59,6 +59,9 @@ class World : public SingletonT<World>
   /// Private destructor
   private: ~World();
 
+  ///Closes the present world, frees the resources and closes the interfaces   
+  public: void Close();
+
   /// Load the world
   /// \param node XMLConfig node point
   /// \param serverId Id of the gazebo server

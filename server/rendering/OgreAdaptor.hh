@@ -72,6 +72,9 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   /// \brief Destructor
   private: virtual ~OgreAdaptor();
 
+  /// \brief Closes the present simulation, frees the resources 
+  public: void Close();
+
   /// \brief Default initialization. 
   ///        Let OGRE create the window and rendering context
   public: void Init(XMLConfigNode *rootNode);

@@ -48,7 +48,6 @@ using namespace gazebo;
 // Private constructor
 World::World()
 {
-  this->physicsEngine = new ODEPhysics();
   this->server=0;
   this->simIface=0;
 
@@ -63,6 +62,13 @@ World::World()
 // Private destructor
 World::~World()
 {
+  this->Close();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Closes the world, free resources and interfaces
+void World::Close()
+{
   std::vector< Model* >::iterator miter;
 
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
@@ -76,9 +82,7 @@ World::~World()
   GZ_DELETE (this->physicsEngine)
   GZ_DELETE (this->server)
   GZ_DELETE (this->simIface)
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
@@ -101,6 +105,8 @@ void World::Load(XMLConfigNode *rootNode, int serverId)
    // Create the simulator interface
   this->simIface = new SimulationIface();
   this->simIface->Create(this->server, "default" );
+
+  this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 
   this->LoadEntities(rootNode, NULL);
 

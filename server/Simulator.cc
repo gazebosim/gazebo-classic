@@ -50,7 +50,7 @@ Simulator::Simulator()
 {
   this->gui=NULL;
 
-
+  this->loaded = false;
   this->pause = false;
 
   this->iterations = 0;
@@ -71,14 +71,32 @@ Simulator::Simulator()
 // Destructor
 Simulator::~Simulator()
 {
-  GZ_DELETE (this->gui)
-    GZ_DELETE (this->xmlFile)
+  this->Close(); 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Closes the Simulator and frees everything
+void Simulator::Close()
+{
+  if (!this->loaded) 
+    return;
+
+  GZ_DELETE (this->gui) // enough? 
+  GZ_DELETE (this->xmlFile) //enough?
+  gazebo::World::Instance()->Close();
+  gazebo::OgreAdaptor::Instance()->Close();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the world configuration file 
 void Simulator::Load(const std::string &worldFileName, int serverId )
 {
+  if (loaded)
+  {
+    this->Close();
+    loaded=false;
+  }
 
   // Load the world file
   this->xmlFile=new gazebo::XMLConfig();
@@ -121,6 +139,8 @@ void Simulator::Load(const std::string &worldFileName, int serverId )
 
   //Create the world
   gazebo::World::Instance()->Load(rootNode, serverId);
+
+  this->loaded=true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,10 +178,9 @@ int Simulator::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Finalize the simulation
-int Simulator::Fini( )
+void Simulator::Fini( )
 {
   gazebo::World::Instance()->Fini();
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -56,6 +56,9 @@ namespace gazebo
     /// \brief Private destructor
     private: ~Simulator();
 
+    /// \brief Closes the present simulation, frees the resources 
+    public: void Close();
+
     /// \brief Load the world configuration file 
     public: void Load(const std::string &worldFileName, int serverId );
 
@@ -66,7 +69,7 @@ namespace gazebo
     public: int Init( );
 
     /// \brief Finalize the simulation
-    public: int Fini( );
+    public: void Fini( );
 
     /// \brief Update the simulation
     public: void Update();
@@ -135,7 +138,6 @@ namespace gazebo
     /// \brief Set whether the step has incremented
     public: void SetUserStepInc(bool step);
 
-
   
     ///pointer to the XML Data
     private:gazebo::XMLConfig *xmlFile;
@@ -143,6 +145,9 @@ namespace gazebo
     /// Pointer to the selected Gui 
     private: Gui *gui;
 
+
+    /// Flag to know if we have a simulation loaded
+    private: bool loaded;
 
     /// Flag set if simulation is paused
     private: bool pause;
@@ -164,12 +169,12 @@ namespace gazebo
     ///  valid when userStep is true.
     private: bool userStepInc;
 
+    //The user has somewhat signaled the end of the program
     private: bool userQuit;
 
-
+    //Singleton implementation
     private: friend class DestroyerT<Simulator>;
     private: friend class SingletonT<Simulator>;
-
 };
 
 /// \}

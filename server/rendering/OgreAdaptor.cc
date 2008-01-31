@@ -60,9 +60,6 @@ OgreAdaptor::OgreAdaptor()
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
 
-  // Make the root 
-  this->root = new Ogre::Root(); 
-
   this->ogreWindow = true;
   this->window=NULL;
   this->backgroundColor=NULL;
@@ -92,10 +89,12 @@ OgreAdaptor::~OgreAdaptor()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Closes and free
-//void OgreAdaptor::Close()
-//{
-  //GZ_DELETE (this->root)
-//}
+void OgreAdaptor::Close()
+{
+  GZ_DELETE (this->frameListener)  
+  GZ_DELETE (this->root) // All Ogre things should be shutdown and freed with this
+  
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Init
@@ -104,6 +103,18 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   XMLConfigNode *cnode;
   XMLConfigNode *node;
   Ogre::ColourValue ambient;
+
+  try
+  {
+    // Make the root 
+    this->root = new Ogre::Root(); 
+  } 
+  catch (Ogre::Exception e)
+  {
+    gzthrow("Unable to create an Ogre rendering environment, no Root ");
+    exit(0);
+  }
+
 
   node = rootNode->GetChild("ogre", "rendering");
   if (!node)

@@ -49,6 +49,9 @@ class CameraManager
   /// \brief Add camera to the manager
   public: void AddCamera( CameraSensor *camera );
 
+  /// \brief Del all the cameras
+  public: void Clear();
+
   /// \brief Return the number of cameras
   public: unsigned int GetNumCameras() const;
 
