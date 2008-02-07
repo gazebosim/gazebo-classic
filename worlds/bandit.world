@@ -111,8 +111,12 @@
 
 
  <model:physical name="cam1_model">
-    <xyz>2.96 -0.06 1.04</xyz>
+   <!--<xyz>2.96 -0.06 1.04</xyz>
     <rpy>0 16 180</rpy>
+    -->
+    <xyz>.94 0.5 0.86</xyz>
+    <rpy>0 18.5 -75</rpy>
+
     <static>true</static>
 
     <body:empty name="cam1_body">

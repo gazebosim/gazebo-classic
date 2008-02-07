@@ -107,11 +107,30 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
 
   for (int i=0; i<16; i++)
   {
+    double cmdAngle = this->myIface->data->cmd_pos[i];
     joint = dynamic_cast<HingeJoint*>(this->joints[i]);
-    angle = this->myIface->data->cmd_pos[i] - joint->GetAngle();
 
-    joint->SetParam( dParamVel, this->gains[i] * angle);
-    joint->SetParam( dParamFMax, this->forces[i] );
+    if (cmdAngle > joint->GetHighStop())
+    {
+      cmdAngle = joint->GetHighStop();
+    }
+    else if (cmdAngle < joint->GetLowStop())
+    {
+      cmdAngle = joint->GetLowStop();
+    }
+
+    angle = cmdAngle - joint->GetAngle();
+
+    if (i == 3)
+    {
+      printf("CMD Angle[%f] Vel[%f]\n",angle, this->gains[i]*angle);
+    }
+
+    if (fabs(angle) > 0.01)
+    {
+      joint->SetParam( dParamVel, this->gains[i] * angle);
+      joint->SetParam( dParamFMax, this->forces[i] );
+    }
 
     this->myIface->data->actuators[i].position = joint->GetAngle();
     this->myIface->data->actuators[i].speed = joint->GetAngleRate(); 

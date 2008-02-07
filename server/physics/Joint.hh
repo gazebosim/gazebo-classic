@@ -129,7 +129,11 @@ namespace gazebo
     /// \brief Get the CFM of this joint
     public: double GetCFM();
 
+    /// \brief Get the high stop of an axis(index).
+    public: double GetHighStop(int index=0);
 
+    /// \brief Get the low stop of an axis(index).
+    public: double GetLowStop(int index=0);
    
     /// \brief This is our id
     protected: dJointID jointId;

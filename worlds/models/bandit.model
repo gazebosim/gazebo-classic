@@ -33,24 +33,24 @@
     </geom:box>
 
     <geom:sphere name="left_eye">
-      <xyz> 0.01 -0.035 0</xyz>
+      <xyz> 0.01 -0.035 0.01</xyz>
       <size>0.020</size>
       <mass>0</mass>
 
       <visual>
-        <size>0.020 0.02 0.02</size>
+        <size>0.04 0.04 0.04</size>
         <mesh>unit_sphere</mesh>
         <material>Gazebo/Eyes</material>
       </visual>
     </geom:sphere>
 
     <geom:sphere name="right_eye">
-      <xyz> 0.01 0.035 0</xyz>
+      <xyz>0.01 0.035 0.01</xyz>
       <size>0.020</size>
       <mass>0</mass>
 
       <visual>
-        <size>0.02 0.02 0.02</size>
+        <size>0.04 0.04 0.04</size>
         <mesh>unit_sphere</mesh>
         <material>Gazebo/Eyes</material>
       </visual>
