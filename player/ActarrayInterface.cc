@@ -59,6 +59,8 @@ ActarrayInterface::ActarrayInterface(player_devaddr_t addr,
 
 	// Allocate a Actarray Interface
 	this->iface = new ActarrayIface();
+  
+	memset(&this->actData, 0, sizeof(this->actData));
 
 	this->datatime = -1;
 }
@@ -67,6 +69,9 @@ ActarrayInterface::ActarrayInterface(player_devaddr_t addr,
 // Destructor
 ActarrayInterface::~ActarrayInterface() 
 {
+
+  delete [] this->actData.actuators;
+
 	// Release this interface
 	delete this->iface;
 }
@@ -194,8 +199,6 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void ActarrayInterface::Update() 
 {
-	player_actarray_data_t data;
-	memset(&data, 0, sizeof(data));
 
 	struct timeval ts;
 
@@ -208,25 +211,37 @@ void ActarrayInterface::Update()
 		//Update the local time so we know when new info comes
 		this->datatime = this->iface->data->time;
 
-		// The number of actuators in the array.
-		data.actuators_count=this->iface->data->actuators_count;
+    unsigned int prevCount = this->actData.actuators_count;
 
-		for (unsigned int i=0; i<data.actuators_count ; ++i ) 
+		// The number of actuators in the array.
+		this->actData.actuators_count = this->iface->data->actuators_count;
+
+    if (prevCount != this->actData.actuators_count)
     {
+      delete [] this->actData.actuators;
+
+      this->actData.actuators = new player_actarray_actuator_t[this->actData.actuators_count];
+    }
+
+		for (unsigned int i=0; i < this->actData.actuators_count ; ++i ) 
+    {
+
 			float pos = this->iface->data->actuators[i].position;
 			float speed = this->iface->data->actuators[i].speed;
+
 			//float current = this->iface->data->actuators_data[i].current;
 			uint8_t report_state = this->iface->data->actuators[i].state;
-			data.actuators[i].position = pos;
-			data.actuators[i].speed = speed;
+			this->actData.actuators[i].position = pos;
+			this->actData.actuators[i].speed = speed;
 			//data.actuators[i].current=current;
-			data.actuators[i].state = report_state;
+			this->actData.actuators[i].state = report_state;
+
 		}
 
 		driver->Publish( this->device_addr, 
 		                 PLAYER_MSGTYPE_DATA,
 		                 PLAYER_ACTARRAY_DATA_STATE,
-		                 (void*)&data, sizeof(data), &this->datatime );
+		                 (void*)&this->actData, sizeof(this->actData), &this->datatime );
 	}
 
 	this->iface->Unlock();

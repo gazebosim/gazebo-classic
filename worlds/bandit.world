@@ -42,6 +42,9 @@
     <controller:differential_position2d name="controller1">
       <leftJoint>left_wheel_hinge</leftJoint>
       <rightJoint>right_wheel_hinge</rightJoint>
+      <wheelSeparation>0.34</wheelSeparation>
+      <wheelDiameter>0.15</wheelDiameter>
+      <torque>5</torque>
       <interface:position name="position_iface_0"/>
     </controller:differential_position2d>
 

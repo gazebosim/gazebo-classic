@@ -60,16 +60,18 @@ namespace gazebo
     public: virtual void Subscribe();
   
     /// \brief Close a SHM interface. This is called from \
-    ///        GazeboDriver::Unsubscribe
+    /// GazeboDriver::Unsubscribe
     public: virtual void Unsubscribe();
   
     private: ActarrayIface *iface;
   
-    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+    /// Gazebo id. This needs to match and ID in a Gazebo WorldFile
     private: char *gz_id;
   
-    /// \brief Timestamp on last data update
+    /// Timestamp on last data update
     private: double datatime;
+
+    private: player_actarray_data_t actData;
   };
   
   /// \} 

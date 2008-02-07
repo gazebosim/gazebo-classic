@@ -25,6 +25,8 @@ int main()
       robot.Read();
 
       ap.MoveTo(3, -M_PI/2.0);
+      player_actarray_actuator_t data = ap.GetActuatorData(3);
+      printf("Pos[%f] Speed[%f]\n",data.position, data.speed);
     }
   }
   catch (PlayerCc::PlayerError e)

@@ -393,6 +393,7 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     {
       if (c == (int)rsList->size())
         break;
+
       selectedRenderSystem = rsList->at(c);
       c++;
     } while (selectedRenderSystem->getName().compare("OpenGL Rendering Subsystem")!= 0);
@@ -402,8 +403,12 @@ void OgreAdaptor::SetupRenderSystem(bool create)
       gzthrow( "unable to find rendering system" );
     }
 
+
     selectedRenderSystem->setConfigOption("Full Screen","No");
     selectedRenderSystem->setConfigOption("FSAA","2");
+
+    // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy"
+    selectedRenderSystem->setConfigOption("RTT Preferred Mode", "PBuffer");
 
     if (create && this->videoMode != "None")
     {
