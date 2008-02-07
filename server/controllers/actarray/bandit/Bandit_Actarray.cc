@@ -121,11 +121,6 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
 
     angle = cmdAngle - joint->GetAngle();
 
-    if (i == 3)
-    {
-      printf("CMD Angle[%f] Vel[%f]\n",angle, this->gains[i]*angle);
-    }
-
     if (fabs(angle) > 0.01)
     {
       joint->SetParam( dParamVel, this->gains[i] * angle);
