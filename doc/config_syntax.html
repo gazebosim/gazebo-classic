@@ -209,6 +209,8 @@ This declaration indicates what GUI to use, and some basic parameters such as si
 - size : Size of the rendering window.
 - pos : Position of the rendering window.
 
+If no rendering:gui section is found in the configuration file, Gazebo will run in no-GUI mode. In this mode, the physical simulation is still being made but it is not displayed on the screen. Useful to save rendering resources if not needed. 
+
 \section worldfile_rendering Rendering Syntax
 
 Gazebo makes use of the OGRE rendering engine. OGRE can be configured to include sky boxes, fog, ambient light, and various resources. All of these parameters are defined within the <i>rendering:ogre</i> declaration.
@@ -226,7 +228,27 @@ The material used for the sky box is specified using:
   </sky>
 \endverbatim
 
-Fog is specified usin:
+The shadowing method is specified using:
+\verbatim
+<shadowTechnique>stencilAdditive</shadowTechnique>
+\endverbatim
+or
+\verbatim
+<shadowTechnique>textureAdditive</shadowTechnique>
+\endverbatim
+By default stencilAdditive will be used.
+
+The texture size of the shadows can be specified by:
+<shadowTextureSize>256</shadowTextureSize>
+By default 512 is used.
+
+
+The grid can be disabled with:
+/verbatim
+<grid>false</grid>
+/endverbatim
+
+Fog is specified using:
 
 \verbatim
 <fog>

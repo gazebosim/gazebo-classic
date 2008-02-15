@@ -33,7 +33,6 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-
   </rendering:ogre>
 
   <!-- Ground Plane -->
@@ -128,6 +127,7 @@
         <diffuseColor>0.0 0.0 0.1</diffuseColor>
         <specularColor>0.0 0.0 0.2</specularColor>
         <attenuation>100 0.2 0.1 0.00</attenuation>
+        <range>8.0, 10.0, 2.0</range> 
       </light>
     </model:renderable>
 
