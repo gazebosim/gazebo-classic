@@ -49,6 +49,8 @@
 
 using namespace gazebo;
 
+uint Model::lightNumber = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Model::Model()
@@ -314,7 +316,7 @@ void Model::Reset()
   std::map<std::string, Controller* >::iterator citer;
   Vector3 v(0,0,0);
 
-  this->SetPose(this->initPose);
+//  this->SetPose(this->initPose);
 
   for (citer=this->controllers.begin(); citer!=this->controllers.end(); citer++)
   {
@@ -664,7 +666,9 @@ void Model::LoadRenderable(XMLConfigNode *node)
   // We still need a canonical body so that this model can be attached to
   // others
   Body *body = this->CreateBody();
-  body->SetName(this->GetName() + "_RenderableBody");
+  char lightNumBuf[8];
+  sprintf(lightNumBuf, "%d", lightNumber++);
+  body->SetName(this->GetName() + "_RenderableBody_" + lightNumBuf);
   body->SetGravityMode(false);
   body->SetPose(Pose3d());
   this->bodies[body->GetName()] = body;

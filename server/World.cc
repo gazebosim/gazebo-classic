@@ -431,6 +431,7 @@ void World::Reset()
 
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
   {
+    this->SetModelPose((*miter), (*miter)->GetInitPose());
     (*miter)->Reset();
   }
 }

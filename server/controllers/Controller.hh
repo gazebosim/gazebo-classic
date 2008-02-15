@@ -105,6 +105,9 @@ class Controller
   /// \brief Update period 
   protected: double updatePeriod;
 
+  /// \brief Last update time
+  protected: double lastUpdate;
+
   /// \brief Array of all the iface for this controller
   protected: std::vector<Iface*> ifaces;
 

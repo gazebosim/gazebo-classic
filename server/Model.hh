@@ -196,6 +196,9 @@ namespace gazebo
     /// \brief The parent of this model
     private: Model *parentModel;
 
+    /// \brief Light numbering variable to give a unique name to all light entities
+    private: static uint lightNumber;
+
     //private: MovableText *mtext;
 
   /*  private: PyObject *pName;

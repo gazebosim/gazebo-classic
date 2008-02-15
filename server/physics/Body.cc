@@ -246,7 +246,7 @@ void Body::SetPose(const Pose3d &pose)
       if ((*giter)->GetGeomClass() == dPlaneClass)
       {
         plane = dynamic_cast<PlaneGeom*>(*giter);
-        plane->SetAltitude(pose.pos.z);
+        plane->SetAltitude(pose.pos);
       }
       else
         (*giter)->SetPose(this->staticPose);

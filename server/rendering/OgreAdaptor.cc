@@ -188,9 +188,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   // Settings for shadow mapping
   //this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
-  //this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
-  this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
+  std::string shadowTechnique = node->GetString("shadowTechnique", "stencilAdditive");
+  if (shadowTechnique == std::string("stencilAdditive"))
+    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
+  else if (shadowTechnique == std::string("textureAdditive"))
+    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
+  else gzthrow(std::string("Unsupported shadow technique: ") + shadowTechnique + "\n");
+
   this->sceneMgr->setShadowTextureSelfShadow(true);
+  this->sceneMgr->setShadowTextureSize(node->GetInt("shadowTextureSize", 512));
 
   // Add fog. This changes the background color
   OgreCreator::CreateFog(node);
@@ -212,7 +218,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 
-  OgreCreator::DrawGrid();
+  if (node->GetBool("grid", true)) OgreCreator::DrawGrid();
 
   // Set up the world geometry link
   if (this->sceneType==SCENE_BSP)

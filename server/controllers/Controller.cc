@@ -32,6 +32,7 @@
 #include "XMLConfig.hh"
 #include "World.hh"
 #include "Controller.hh"
+#include "Simulator.hh"
 
 using namespace gazebo;
 
@@ -66,6 +67,7 @@ void Controller::Load(XMLConfigNode *node)
   this->name = node->GetString("name","",1);
 
   this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
+  this->lastUpdate = -1e6;
 
   childNode = node->GetChildByNSPrefix("interface");
 
@@ -128,7 +130,10 @@ void Controller::Reset()
 /// Update the controller. Called every cycle.
 void Controller::Update(UpdateParams &params)
 {
-  this->UpdateChild(params);
+  if (lastUpdate + updatePeriod <= Simulator::Instance()->GetSimTime()) {
+    this->UpdateChild(params);
+    lastUpdate = Simulator::Instance()->GetSimTime();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

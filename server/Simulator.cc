@@ -31,7 +31,9 @@
 //#include <boost/bind.hpp>
 
 #include "World.hh"
+#include "GuiFactory.hh"
 #include "Gui.hh"
+#include "DummyGui.hh"
 #include "XMLConfig.hh"
 #include "Global.hh"
 #include "gazebo.h"
@@ -356,19 +358,23 @@ void Simulator::LoadGui(XMLConfigNode *rootNode)
     std::string type = childNode->GetString("type","fltk",1);
 
     gzmsg(1) << "Creating GUI:\n\tType[" << type << "] Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
+    if (type != "fltk")
+    {
+      gzthrow("The only GUI available is 'fltk', for no-GUI simulation, delete the 'gui' tag and its children");
+    }
 
     // Create the GUI
-    this->gui = new gazebo::Gui(x, y, width, height, type+"::Gazebo");
+    this->gui = GuiFactory::NewGui(type, x, y, width, height, type+"::Gazebo");
 
     // Initialize the GUI
     this->gui->Init();
 
-    //    gazebo::GuiFinished.connect( boost::bind(&gazebo::Simulator::SetUserQuit,this));
-
   }
   else
   {
-    gzthrow("XML file must contain a <rendering:gui> section\n");
+    // Create a dummy GUI
+    gzmsg(1) << "Creating a dummy GUI\n";
+    this->gui = GuiFactory::NewGui(std::string("dummy"), 0, 0, 0, 0, std::string());
   }
 }
 

@@ -149,6 +149,12 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
   light->setAttenuation(range, constant, linear, quad);
 
   // TODO: More options for Spot lights, etc.
+  //  options for spotlights
+  if (lightType == "spot")
+  {
+    vec = node->GetVector3("range", Vector3(5.0, 10.0, 1.0));
+    light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
+  }
 
   entity->GetVisualNode()->AttachObject(light);
 }

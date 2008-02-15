@@ -50,12 +50,13 @@ PlaneGeom::~PlaneGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the altitude of the plane
-void PlaneGeom::SetAltitude(double altitude)
+void PlaneGeom::SetAltitude(const Vector3 &pos)
 {
   dVector4 vec4;
   dGeomPlaneGetParams(this->geomId, vec4);
 
-  vec4[3] = altitude;
+  // Compute "altitude": scalar product of position and normal
+  vec4[3] = vec4[0] * pos.x + vec4[1] * pos.y + vec4[2] * pos.z;
   dGeomPlaneSetParams(this->geomId, vec4[0], vec4[1], vec4[2], vec4[3]);
 }
 
@@ -78,3 +79,4 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
   this->contact->mu2 = dInfinity;
 
 }
+

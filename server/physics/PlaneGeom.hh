@@ -91,7 +91,7 @@ namespace gazebo
     public: virtual ~PlaneGeom();
   
     /// \brief Set the altitude of the plane
-    public: void SetAltitude(double altitude);
+    public: void SetAltitude(const Vector3 &pos);
 
     /// \brief Load the plane
     public: virtual void LoadChild(XMLConfigNode *node);
