@@ -1,6 +1,5 @@
 Open:
 - Use the Contact information in the Collision Callback. See CVS version of Gazebo.
-- Add uninstall
 - Apply Linear and Angular Damping, see OGREODE sources.
 - Add check for boost
 - A static geom which is offset does not actually move the geom, so collision
@@ -9,6 +8,7 @@ Open:
 - Python scripts to models, allow dynamic (movable) meshes
 - Force sensors
 - Slider has to be the first in the XML file, when loading a bunch of joints in a model.
+- Why order on hinge and hinge2 joints matters? Should we avoid this?
 - Add note in Controller tutorial about the Controller Factory
 - Overlays in Gazebo with Mac doesn't work
 - Implement Speech interface
@@ -115,4 +115,4 @@ Completed:
 - look into using FL::RUN. Using threads now
 - Add in Pioneer blender models
 - Add check for libxml2
-- Add uninstall (scons automatically handles this!)
+- Add uninstall (scons -c automatically handles this!)

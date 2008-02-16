@@ -36,14 +36,7 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-
-    <!--<fog>
-      <color>0.9 0.9 0.9</color>
-      <linearStart>50</linearStart>
-      <linearEnd>100</linearEnd>
-    </fog>
-    -->
-  </rendering:ogre>
+    </rendering:ogre>
 
    <!-- Ground Plane -->
   <model:physical name="plane1_model">
@@ -74,22 +67,9 @@
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
         <farClip>100</farClip>
-
-        <!--<saveFrames>true</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-        -->
       </sensor:camera>
     </body:empty>
   </model:physical>
-
-  <!-- 
-  Include the complete model described in the .model file
-  This assumes the root node is a <model:...>
-  -->
-  <!--  <include embedded="false">
-    <xi:include href="pioneer2dx.model" />
-  </include>
-  -->
 
   <model:physical name="simpleCar_model">
     <xyz>0 0 0.145</xyz>
@@ -122,40 +102,6 @@
     <steerMaxAngle>50</steerMaxAngle>
     <interface:position name="position_iface_0"/>
   </controller:steering_position2d>
-
-<!--
-    <controller:steer2_position2d name="controller1">
-      <leftJoint>left_front_wheel_hinge</leftJoint>
-      <rightJoint>right_front_wheel_hinge</rightJoint>
-      <wheelSeparation>0.34</wheelSeparation>
-      <wheelDiameter>0.15</wheelDiameter>
-      <torque>100</torque>
-      <steerMaxAngle>50</steerMaxAngle>
-      <interface:position name="position_iface_0" share="master"/>
-    </controller:steer2_position2d>
- 
-    <controller:drive2_position2d name="controller2">
-      <leftJoint>left_rear_wheel_hinge</leftJoint>
-      <rightJoint>right_rear_wheel_hinge</rightJoint>
-      <torque>1000</torque>
-      <interface:position name="position_iface_0" share="slave"/>
-    </controller:drive2_position2d>
-    -->
-
-    <!--<model:physical name="laser">
-      <xyz>0 0 0.16</xyz>
-
-      <attach>
-        <parentBody>chassis_body</parentBody>
-        <myBody>laser_body</myBody>
-      </attach>
-
-      <include embedded="true">
-        <xi:include href="laser.model" />
-      </include>
-    </model:physical>
-    -->
-
 
     <!-- 
     The include should be last within a model. All previous statements
