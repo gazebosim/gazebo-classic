@@ -13,10 +13,17 @@ and can be downloaded from the Player/Stage homepage:
 
 Installation
 ------------
-Read INSTALL for generic instructions.  For most people, the following
+Read the installation instructions in the online manual for generic instructions.  For most people, the following
 sequence will suffice:
 
   $ scons install
+
+
+Uninstallation
+--------------
+Read the installation instructions in the online manual for generic instructions.  For most people, the following sequence will suffice:
+
+  $ scons -c install 
 
 
 3rd Party Libraries
@@ -25,8 +32,9 @@ Gazebo uses the following libraries:
 
   Geospatial Data Abstraction Library (GDAL) http://www.remotesensing.org/gdal
   OpenDynamicsEngine (ODE) http://opende.sourceforge.net
+  Ogre3D  http://www.ogre3d.org
 
-ODE is mandatory. GDAL is required only for specific features
+ODE and Ogre3D are mandatory. GDAL is required only for specific features
 such as the MapExtruder and Terrain models, but is highly recommended.
 
 
@@ -38,6 +46,9 @@ The latest installation instructions can be found on-line, at
   http://playerstage.sourceforge.net/doc/
 
 
+General information (changelog, etc) can be found in the wiki pages, at
+
+  http://playerstage.sourceforge.net/wiki/Gazebo
 
 
   - Andrew Howard (ahoward@usc.edu), Nate Koenig (nkoenig@usc.edu)

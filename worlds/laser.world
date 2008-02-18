@@ -39,7 +39,7 @@
   </rendering:ogre>
 
   <model:physical name="box1_model">
-    <xyz>2 0.0 0.5</xyz>
+    <xyz>2 1.0 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
     <body:box name="box1_body">
@@ -58,9 +58,25 @@
   </model:physical>
 
   <!-- Embedded laser model -->
-  <include embedded="false">
-    <xi:include href="models/laser.model" />
+
+ <model:physical name="sick200lms_model">
+    <xyz>0 0 0.145</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+  <include embedded="true">
+    <xi:include href="models/sicklms200.model" />
   </include>
+ </model:physical>
+
+ <model:physical name="hokuyo-urg-04l_model">
+    <xyz>0 3 0.145</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+  <include embedded="true">
+    <xi:include href="models/hokuyo-urg-04l.model" />
+  </include>
+
+</model:physical>
 
    <!-- Ground Plane -->
   <model:physical name="plane1_model">
@@ -80,8 +96,8 @@
   </model:physical>
 
   <model:physical name="cam1_model">
-    <xyz>-0.5 2.14 1.05</xyz>
-    <rpy>0 8 106</rpy>
+    <xyz>-2.5 1.5 2</xyz>
+    <rpy>0 24 0</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">
