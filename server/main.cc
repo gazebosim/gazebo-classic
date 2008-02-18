@@ -260,11 +260,12 @@ void LoadConfigFile()
       gazebo::Global::ogrePaths.push_back( node->GetValue() );
       node = node->GetNext("ogrePath");
     }
-
+    gazebo::Global::RTTMode = rc.GetRootNode()->GetString("RTTMode", "PBuffer");
+    
   }
   else
   {
-    std::cout << "Unable to file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
+    std::cout << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
     gazebo::Global::gazeboPaths.push_back("/usr/local/share/gazebo");
     gazebo::Global::ogrePaths.push_back("/usr/local/lib/OGRE");
     gazebo::Global::ogrePaths.push_back("/usr/lib/OGRE");

@@ -413,8 +413,8 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     selectedRenderSystem->setConfigOption("Full Screen","No");
     selectedRenderSystem->setConfigOption("FSAA","2");
 
-    // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy"
-    selectedRenderSystem->setConfigOption("RTT Preferred Mode", "PBuffer");
+    // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy", can be set in the .gazeborc file
+    selectedRenderSystem->setConfigOption("RTT Preferred Mode", Global::RTTMode);
 
     if (create && this->videoMode != "None")
     {

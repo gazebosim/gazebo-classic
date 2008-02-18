@@ -124,6 +124,8 @@ namespace gazebo
     /// Paths to the ogre install
     public: static std::list<std::string> ogrePaths;
 
+    public: static std::string RTTMode;
+
     /// Global pose offset
     public: static Pose3d poseOffset;
 

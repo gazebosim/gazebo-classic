@@ -57,8 +57,8 @@
 
   <!-- The camera -->
   <model:physical name="cam1_model">
-    <xyz>0.07 -1.10 0.5</xyz>
-    <rpy>0 -19 -134</rpy>
+    <xyz>-3 -4.5 2</xyz>
+    <rpy>0 14 50</rpy>
     <static>true</static>
 
     <body:empty name="cam1_body">

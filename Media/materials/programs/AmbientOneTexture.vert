@@ -15,11 +15,11 @@ void main()
   // Compute the amount of fog to apply
   if ( gl_Fog.end != 0.0)
   {
-    fogFactor = clamp((gl_Fog.end - abs(ecPosition.z)) * gl_Fog.scale,0,1);
+    fogFactor = clamp((gl_Fog.end - fabs(ecPosition.z)) * gl_Fog.scale,0,1);
   }
   else
   {
-    fogFactor = 1;
+    fogFactor = 1.0;
   }
 
 

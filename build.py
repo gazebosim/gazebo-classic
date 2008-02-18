@@ -70,6 +70,7 @@ def createGazeborc(target, source, env):
   f.write('<gazeborc>\n')
   f.write('  <gazeboPath>' + prefix + '/share/gazebo</gazeboPath>\n')
   f.write('  <ogrePath>' + ogre + '</ogrePath>\n')
+  f.write('  <RTTMode>PBuffer</RTTMode>\n')
   f.write('</gazeborc>\n')
   f.close()
   # Use a python command because scons won't copy files to a home directory

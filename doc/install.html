@@ -116,17 +116,19 @@ packages will be used in preference to any system-wide defaults.
 
 \section config_file Configuration File
 
-Gazebo needs some system information in order to load plugins, texture files, models, etc. This information is place in gazeborc file in the user's home directory. The file is called <tt>.gazeborc</tt> and typical contains:
+Gazebo needs some system information in order to load plugins, texture files, models, etc. This information is place in gazeborc file in the user's home directory. This file also will have other properties of this machine, work around for incomplete graphics drivers, etc. The file is called <tt>.gazeborc</tt> and typical contains:
 
 \verbatim
 <?xml version="1.0"?>
 <gazeborc>
   <gazeboPath>/usr/local/share/gazebo</gazeboPath>
   <ogrePath>/home/nate/local/lib/OGRE</ogrePath>
+  <RTTMode>PBuffer</RTTMode>
 </gazeborc>
 \endverbatim
 
 If this file does not exist, then the builder will automatically create the file with appropriate values. If the file does exist, the builder will not overwrite it.
+RTTMode can have three values: "Copy", "PBuffer" and "FBO". "Copy" is the oldest and most basic method, "PBuffer" is newer and "FBO" is the lastest shiny new RTT method. The availability of those methods depends on the graphic card drivers. If the driver are old chances are that only "Copy" work with decent performance and without artifacts. If the driver support them, using the newest method will give better framerates. Gazebo uses PBuffer by default. 
 
 \section uninstall Uninstall 
 
