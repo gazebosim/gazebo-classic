@@ -129,6 +129,7 @@ Gazebo needs some system information in order to load plugins, texture files, mo
 
 If this file does not exist, then the builder will automatically create the file with appropriate values. If the file does exist, the builder will not overwrite it.
 RTTMode can have three values: "Copy", "PBuffer" and "FBO". "Copy" is the oldest and most basic method, "PBuffer" is newer and "FBO" is the lastest shiny new RTT method. The availability of those methods depends on the graphic card drivers. If the driver are old chances are that only "Copy" work with decent performance and without artifacts. If the driver support them, using the newest method will give better framerates. Gazebo uses PBuffer by default. 
+With the current version of fglrx driver there is no performance difference between FBO and Copy modes and Copy has more functionalities.
 
 \section uninstall Uninstall 
 
