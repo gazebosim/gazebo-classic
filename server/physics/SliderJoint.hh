@@ -100,7 +100,7 @@ class SliderJoint : public Joint
   public: virtual double GetParam( int parameter ) const;
 
   /// \brief Set the axis of motion
-  public: void SetAxis( double x, double y, double z );
+  public: void SetAxis( const Vector3 &axis );
 
   /// \brief Set the _parameter
   public: virtual void SetParam( int parameter, double value);

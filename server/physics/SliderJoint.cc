@@ -48,6 +48,8 @@ SliderJoint::~SliderJoint()
 /// Load the joint
 void SliderJoint::LoadChild(XMLConfigNode *node)
 {
+  this->SetAxis(node->GetVector3("axis",Vector3(0,0,1)));
+
   double lowStop = node->GetDouble("lowStop",-DBL_MAX,0);
   double hiStop = node->GetDouble("hiStop",DBL_MAX,0);
 
@@ -92,14 +94,12 @@ double SliderJoint::GetParam( int parameter ) const
   return dJointGetSliderParam( this->jointId, parameter );
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
 // Set the axis of motion
-void SliderJoint::SetAxis( double x, double y, double z)
+void SliderJoint::SetAxis( const Vector3 &axis )
 {
-  dJointSetSliderAxis( this->jointId, x, y, z );
+  dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the _parameter
