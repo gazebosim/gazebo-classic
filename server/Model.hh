@@ -57,7 +57,7 @@ namespace gazebo
   class Model : public Entity
   {
     /// \brief Constructor
-    public: Model();
+    public: Model(Model *parent);
   
     /// \brief Destructor
     public: virtual ~Model();
@@ -92,19 +92,10 @@ namespace gazebo
   
     /// \brief Finilaize thie child model
     protected: virtual int FiniChild() {return 0;}
-  
-    /// \brief Set the type of the model
-    public: void SetType(const std::string &type);
-  
+    
     /// \brief Get the type of the model
     public: const std::string &GetType() const;
-  
-    /// \brief Set the XMLConfig node this model was loaded from
-    public: void SetXMLConfigNode( XMLConfigNode *node );
-  
-    /// \brief Get the XML Conig node this model was loaded from
-    public: XMLConfigNode *GetXMLConfigNode() const;
-  
+
     /// \brief Set the initial pose
     public: void SetInitPose(const Pose3d &pose);
   
@@ -148,13 +139,11 @@ namespace gazebo
 
     /// \brief Load a body helper function
     /// \param node XML Configuration node
-    /// \return Non-zero on error
-    private: int LoadBody(XMLConfigNode *node);
+    private: void LoadBody(XMLConfigNode *node);
   
     /// \brief Load a joint helper function
     /// \param node XML Configuration node
-    /// \return Non-zero on error
-    private: int LoadJoint(XMLConfigNode *node);
+    private: void LoadJoint(XMLConfigNode *node);
   
     /// \brief Load a controller helper function
     /// \param node XML Configuration node
@@ -193,9 +182,6 @@ namespace gazebo
     /// \brief Joint used to connected models (parent->child).
     private: HingeJoint *joint;
   
-    /// \brief The parent of this model
-    private: Model *parentModel;
-
     /// \brief Light numbering variable to give a unique name to all light entities
     private: static uint lightNumber;
 

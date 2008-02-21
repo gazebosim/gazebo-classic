@@ -53,12 +53,11 @@ uint Model::lightNumber = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Model::Model()
-  : Entity()
+Model::Model(Model *parent)
+  : Entity(parent)
 {
   this->type = "";
   this->joint = NULL;
-  this->parentModel = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,23 +93,20 @@ Model::~Model()
 int Model::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
-
+  Pose3d pose;
+    
+  this->xmlNode = node;
+  this->type=node->GetName();
   this->SetName(node->GetString("name","",1));
   this->SetStatic(node->GetBool("static",false,0));
 
-  if (this->GetType() == "physical")
-  {
+  if (this->type == "physical")
     this->LoadPhysical(node);
-  }
-  else if (this->GetType() == "renderable")
-  {
+  else if (this->type == "renderable")
     this->LoadRenderable(node);
-  }
-  else if (this->GetType() != "empty")
+  else if (this->type != "empty")
   {
-    std::ostringstream stream;
-    stream << "Invalid model type[" << this->GetType() << "]\n";
-    gzthrow(stream.str());
+    gzthrow("Invalid model type[" + this->type + "]\n");
   }
 
   // Load controllers
@@ -143,7 +139,18 @@ int Model::Load(XMLConfigNode *node)
   {
     this->canonicalBodyName = this->bodies.begin()->first;
   }
-
+  
+  // Get the position and orientation of the model (relative to parent)
+  pose.Reset();
+  pose.pos = node->GetVector3( "xyz", pose.pos );
+  pose.rot = node->GetRotation( "rpy", pose.rot );
+  
+  // Record the model's initial pose (for reseting)
+  this->SetInitPose(pose);
+  
+  
+  return this->LoadChild(node);
+  
   // Get the name of the python module
   /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
   //this->pName.reset(PyString_FromString("pioneer2dx"));
@@ -164,7 +171,7 @@ int Model::Load(XMLConfigNode *node)
   }
   */
 
-  return this->LoadChild(node);
+  
 }
 
 void Model::Save()
@@ -178,11 +185,11 @@ void Model::Save()
   this->xmlNode->SetValue("rpy", this->pose.rot);
   this->xmlNode->SetValue("static", this->IsStatic());
   //TODO: Attach tag
-  if (this->GetType()=="renderable")
+  if (this->type=="renderable")
   {
   // TODO: lights  
   }  
-  else if (this->GetType()=="physical")
+  else if (this->type=="physical")
   {
     this->xmlNode->SetValue("canonicalBody",this->canonicalBodyName);
     
@@ -337,12 +344,7 @@ void Model::Reset()
   }*/
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Set the name of the model
-void Model::SetType(const std::string &type)
-{
-  this->type = type;
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the name of the model
@@ -350,21 +352,6 @@ const std::string &Model::GetType() const
 {
   return this->type;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the XMLConfig node this model was loaded from
-void Model::SetXMLConfigNode( XMLConfigNode *node )
-{
-  this->xmlNode = node;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the XML Conig node this model was loaded from
-XMLConfigNode *Model::GetXMLConfigNode() const
-{
-  return this->xmlNode;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Set the initial pose
 void Model::SetInitPose(const Pose3d &pose)
@@ -448,10 +435,10 @@ Joint *Model::GetJoint(std::string name)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new body helper function
-int Model::LoadBody(XMLConfigNode *node)
+void Model::LoadBody(XMLConfigNode *node)
 {
   if (!node)
-    return -1;
+    gzthrow("Trying to load a body with NULL XML information");
 
   // Create a new body
   Body *body = this->CreateBody();
@@ -462,20 +449,19 @@ int Model::LoadBody(XMLConfigNode *node)
 
   // Store this body
   if (this->bodies[body->GetName()])
-    std::cerr << "Body with name[" << body->GetName() << "] already exists!!\n";
+    gzmsg(0) << "Body with name[" << body->GetName() << "] already exists!!\n";
 
   // Store the pointer to this body
   this->bodies[body->GetName()] = body;
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new joint helper function
-int Model::LoadJoint(XMLConfigNode *node)
+void Model::LoadJoint(XMLConfigNode *node)
 {
   if (!node)
-    return -1;
+    gzthrow("Trying to load a joint with NULL XML information");
 
   Joint *joint;
 
@@ -486,13 +472,11 @@ int Model::LoadJoint(XMLConfigNode *node)
 
   if (!body1)
   {
-    std::cerr << "Couldn't Find Body[" << node->GetString("body1","",1);
-    return -1;
+    gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
   }
   if (!body2)
   {
-    std::cerr << "Couldn't Find Body[" << node->GetString("body2","",1);
-    return -1;
+    gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
   }
 
   // Create a Hinge Joint
@@ -508,8 +492,7 @@ int Model::LoadJoint(XMLConfigNode *node)
     joint = this->CreateJoint(Joint::UNIVERSAL);
   else
   {
-    std::cerr << "Uknown joint[" << node->GetName() << "]\n";
-    return -1;
+    gzthrow("Uknown joint[" + node->GetName() + "]\n");
   }
 
   joint->SetModel(this);
@@ -538,8 +521,6 @@ int Model::LoadJoint(XMLConfigNode *node)
     gzthrow( "can't have two joint with the same name");
 
   this->joints[joint->GetName()] = joint;
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -613,6 +594,8 @@ void Model::Attach(XMLConfigNode *node)
 {
   std::string parentBodyName = "canonical";
   std::string myBodyName = "canonical";
+  Model *parentModel;
+
 
   if (node)
   {
@@ -620,15 +603,15 @@ void Model::Attach(XMLConfigNode *node)
     myBodyName = node->GetString("myBody",canonicalBodyName,1);
   }
 
-  this->parentModel = dynamic_cast<Model*>(this->parent);
+  parentModel = dynamic_cast<Model*>(this->parent);
 
-  if (this->parentModel == NULL)
+  if (parentModel == NULL)
     gzthrow("Parent cannot be NULL when attaching two models");
 
   this->joint = (HingeJoint*)this->CreateJoint(Joint::HINGE);
 
   Body *myBody = this->GetBody(myBodyName);
-  Body *pBody = this->parentModel->GetBody(parentBodyName);
+  Body *pBody = parentModel->GetBody(parentBodyName);
 
   if (myBody == NULL)
     gzthrow("No canonical body set.");
@@ -646,7 +629,7 @@ void Model::Attach(XMLConfigNode *node)
   if (this->spaceId)
   {
     dSpaceDestroy(this->spaceId);
-    this->spaceId = this->parentModel->spaceId;
+    this->spaceId = parentModel->spaceId;
   }
 }
 
@@ -691,9 +674,14 @@ void Model::LoadPhysical(XMLConfigNode *node)
 
   while (childNode)
   {
-    if (this->LoadBody(childNode) != 0)
+    try 
+    {
+      this->LoadBody(childNode);
+    }
+    catch (GazeboError e)
+    {
       std::cerr << "Error Loading body[" << childNode->GetName() << "]\n";
-
+    }
     childNode = childNode->GetNextByNSPrefix("body");
   }
 
@@ -702,9 +690,14 @@ void Model::LoadPhysical(XMLConfigNode *node)
 
   while (childNode)
   {
-    if (this->LoadJoint(childNode) != 0)
+    try 
+    {
+      this->LoadJoint(childNode);
+    }
+    catch (GazeboError e)
+    {
       std::cerr << "Error Loading Joint[" << childNode->GetName() << "]\n";
-
+    }
     childNode = childNode->GetNextByNSPrefix("joint");
   }
 

@@ -1,14 +1,16 @@
 Open:
+
 - Use the Contact information in the Collision Callback. See CVS version of Gazebo.
 - Apply Linear and Angular Damping, see OGREODE sources.
-- Add check for boost
 - A static geom which is offset does not actually move the geom, so collision
   detection does not work
+- Force sensors
+- Why order on hinge and hinge2 joints matters? Should we avoid this?
+- Add spring force between bodies of a model to keep the together. See ODE example test_joints.cpp
+
 - Try out code on AMD64 machine
 - Python scripts to models, allow dynamic (movable) meshes
-- Force sensors
 - Slider has to be the first in the XML file, when loading a bunch of joints in a model.
-- Why order on hinge and hinge2 joints matters? Should we avoid this?
 - Add note in Controller tutorial about the Controller Factory
 - Overlays in Gazebo with Mac doesn't work
 - Implement Speech interface
@@ -29,7 +31,6 @@ Open:
 - Write a tutorial for creating new meshes
 - Install for OSX
 
-
 - Graphics3d interface
 - Improve build system. Put all the platform checks in on place. 
 
@@ -41,8 +42,6 @@ Open:
 - WiFi
 
 - Multilevel map extruder
-
-- Add spring force between bodies of a model to keep the together. See ODE example test_joints.cpp
 
 -run gprof, and valgrind
 
@@ -68,12 +67,16 @@ Open:
 - Check laser sampling rate
 - Standardize internal API
 - Data Logger
-- Replace all return int, with throws
 - The bodies set their scenenode based on a global pose. They should set their scenenodes based a pose relative to the model. The model currently doesn't move it's scene node, so it's always at (0,0,0). Basically should make all Body Pose stuff relative to the parent.
 -Allow person to display and change XML parameters through the GUI.
 -Look into COLLADA, OPAL, Bullet Physics & Collisioin detection engine
 -Add "Angle" class, will handle ROTD and DTOR.
 -Templatize Vector, Quaternion, Pose
+- Replace all return int, with throws
+- Find something shorter for:
+   std::ostringstreaom stream;
+   stream << "This is an error message of type[" << type << "]\n";
+   gzthrow(stream.str());
 
 
 Completed:

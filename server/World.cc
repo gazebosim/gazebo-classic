@@ -294,53 +294,15 @@ void World::DeleteEntity(const char *name)
 Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 {
   Pose3d pose;
-  Model *model = new Model();
+  Model *model = new Model(parent);
 
-  model->SetType(node->GetName());
-
-  // Recall the node this model is attached to, so we can save
-  // back the data later.
-  model->SetXMLConfigNode(node);
-
-  // Set the id of the model
-  model->SetName( node->GetString( "name", "", 0 ) );
-
-  if (model->GetName() == "")
-  {
-    model->SetName( node->GetName() );
-  }
-
-
-  if (parent)
-  {
-    /*std::string bodyName = node->GetString("parentBody", "canonical");
-      body = parent->GetBody(bodyName);
-
-      if (!body)
-      {
-      std::ostringstream stream;
-      stream << "body[" << bodyName << "] is not defined for parent model";
-      gzthrow(stream);
-      }
-      */
-
-    model->SetParent(parent);
-  }
-
+  //model->SetParent(parent);
   // Load the model
   if (model->Load( node ) != 0)
     return NULL;
 
-  // Get the position and orientation of the model (relative to parent)
-  pose.Reset();
-  pose.pos = node->GetVector3( "xyz", pose.pos );
-  pose.rot = node->GetRotation( "rpy", pose.rot );
-
   // Set the model's pose (relative to parent)
-  this->SetModelPose(model, pose);
-
-  // Record the model's initial pose (for reseting)
-  model->SetInitPose(pose);
+  this->SetModelPose(model, model->GetInitPose());
 
   // Add the model to our list
   if (Simulator::Instance()->GetIterations() == 0)
@@ -353,8 +315,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 
   if (parent != NULL)
     model->Attach(node->GetChild("attach"));
-    //model->Attach();
-
+    
   return model;
 }
 

@@ -111,7 +111,6 @@ void CameraSensor::InitChild()
 {
   this->ogreTextureName = this->GetName() + "_RttTex";
   this->ogreMaterialName = this->GetName() + "_RttMat";
-
   // Create the render texture
   this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
       this->ogreTextureName,

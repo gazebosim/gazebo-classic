@@ -40,7 +40,7 @@ namespace gazebo
   /// \{
 
   /// Throw an error
-  #define gzthrow(msg) throw gazebo::GazeboError(__FILE__,__LINE__,msg)
+  #define gzthrow(msg) throw gazebo::GazeboError(__FILE__,__LINE__,std::string(msg))
   
   /// \brief Class to handle errors
   ///
@@ -50,9 +50,11 @@ namespace gazebo
    Example:
    
    \verbatim
-   std::ostringstreaom stream;
+   std::ostringstream stream;
    stream << "This is an error message of type[" << type << "]\n";
    gzthrow(stream.str());
+   or if type is a string, simply:
+   gzthrow("This is an error message of type[" << type << "]\n");
    \endverbatim
 
   */
