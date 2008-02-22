@@ -58,9 +58,9 @@ void HeightmapGeom::UpdateChild()
 
 //////////////////////////////////////////////////////////////////////////////
 /// get height at a point
-double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
+float HeightmapGeom::GetHeightAt(const Vector2<float> &pos)
 {
-  Ogre::Vector3 pos3(pos.x, pos.y, this->terrainSize.z);
+  Ogre::Vector3 pos3(pos.x,this->terrainSize.z,pos.y);
 
   this->ray.setOrigin(pos3);
   this->rayQuery->setRay(this->ray);
@@ -75,17 +75,10 @@ double HeightmapGeom::GetHeightAt(const Vector2<double> &pos)
 void HeightmapGeom::FillHeightMap()
 {
   unsigned int x,y;
-  double h;
-
+  float h;
 
   // Resize the vector to match the size of the vertices
   this->heights.resize(this->odeVertSize*this->odeVertSize);
-
-  std::cout << "Vert Size[" << this->odeVertSize << "]\n";
-  std::cout << "ODE Scale[" << this->odeScale.x << " " << this->odeScale.y << "]\n";
-
-  h = this->GetHeightAt(Vector2<double>(0,0));
-  std::cout << "Height[0,0] = [" << h << "]\n";
 
   // Iterate over all the verices
   for (y=0; y<this->odeVertSize; y++)
@@ -93,9 +86,7 @@ void HeightmapGeom::FillHeightMap()
     for (x=0; x<this->odeVertSize; x++)
     {
        // Find the height at a vertex
-      h = this->GetHeightAt(Vector2<double>(x*this->odeScale.x, (this->odeVertSize-y)*this->odeScale.y));
-
- //     std::cout << "x[" << x << "] y[" << y << "] z[" << h << "]\n";
+      h = this->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
 
       // Store the height for future use
       this->heights[y*this->odeVertSize + x] = h;
@@ -110,7 +101,7 @@ dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
   HeightmapGeom *geom = (HeightmapGeom*)(data);
 
   // Return the height at a specific vertex
-  return geom->heights[y*geom->odeVertSize+x];
+  return geom->heights[y * geom->odeVertSize + x];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,15 +167,8 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   this->terrainScale = this->terrainSize / this->terrainVertSize;
 
   this->odeVertSize = terrainVertSize * 1;
-
-  std::cout << "Terrain Size [" << this->terrainSize << "]\n";
-  std::cout << "Terrain Scale [" << this->terrainScale << "]\n";
-  std::cout << "Terrain Vert Size[" << this->terrainVertSize << "]\n";
-  std::cout << "Tile Size[" << tileSize << "]\n";
-
-  std::cout << "ODE Vert Size[" << this->odeVertSize << "]\n";
-
   this->odeScale = this->terrainSize / this->odeVertSize;
+
 
   std::ostringstream stream;
  
@@ -204,7 +188,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   // How large is each tile? Must be (2^n)+1 and be smaller than PageSize
   stream << "TileSize=" << tileSize << "\n";
   // The maximum error allowed when determining which LOD to use
-  stream << "MaxPixelError=3\n";
+  stream << "MaxPixelError=4\n";
   // The size of a terrain page, in world units
   stream << "PageWorldX=" << this->terrainSize.x << "\n";
   stream << "PageWorldZ=" << this->terrainSize.y << "\n";
@@ -222,18 +206,17 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   // Set the static terrain in Ogre
   OgreAdaptor::Instance()->sceneMgr->setWorldGeometry(dataStream);
 
-  // Setup the ray scene query, which is used to determine the heights of
-  // the vertices for ODE
-  this->ray = Ogre::Ray(Ogre::Vector3::ZERO, Ogre::Vector3::NEGATIVE_UNIT_Z);
-  this->rayQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(this->ray);
-  this->rayQuery->setQueryTypeMask(Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
-  this->rayQuery->setWorldFragmentType(Ogre::SceneQuery::WFT_SINGLE_INTERSECTION);
-
-
   // HACK to make the terrain oriented properly
   Ogre::SceneNode *tnode = OgreAdaptor::Instance()->sceneMgr->getSceneNode("Terrain");
   tnode->pitch(Ogre::Degree(90));
   tnode->translate(Ogre::Vector3(-this->terrainSize.x*0.5, this->terrainSize.y*0.5, 0));
+ 
+  // Setup the ray scene query, which is used to determine the heights of
+  // the vertices for ODE
+  this->ray = Ogre::Ray(Ogre::Vector3::ZERO, Ogre::Vector3::NEGATIVE_UNIT_Y);
+  this->rayQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(this->ray);
+  this->rayQuery->setQueryTypeMask(Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
+  this->rayQuery->setWorldFragmentType(Ogre::SceneQuery::WFT_SINGLE_INTERSECTION);
 
   // Construct the heightmap lookup table
   this->FillHeightMap();
@@ -271,5 +254,4 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   dGeomSetRotation(this->geomId, R);
 
   delete [] mstr;
-
 }

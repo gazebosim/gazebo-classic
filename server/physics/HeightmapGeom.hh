@@ -86,7 +86,7 @@ namespace gazebo
     public: void UpdateChild();
 
     /// \brief Get the height of the heightmap as a specific coordinate
-    public: double GetHeightAt(const Vector2<double> &pos);
+    public: float GetHeightAt(const Vector2<float> &pos);
 
     /// \brief Overloaded Ogre function for Ray Scene Queries
     public: virtual bool queryResult(Ogre::MovableObject *obj, Ogre::Real dist);

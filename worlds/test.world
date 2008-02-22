@@ -19,7 +19,7 @@
   <physics:ode>
     <stepTime>0.02</stepTime>
     <gravity>0 0 -9.80665</gravity>
-    <cfm>1e-2</cfm>
+    <cfm>10e-5</cfm>
     <erp>0.2</erp>
   </physics:ode>
 
@@ -34,16 +34,16 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-
   </rendering:ogre>
 
-  <!--  <model:physical name="sphere1_model">
-    <xyz>0 0 0.1</xyz>
+  <model:physical name="sphere1_model">
+    <xyz>3 3 0.5</xyz>
     <static>false</static>
+
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
-        <size>0.1</size>
-        <mass>1.0</mass>
+        <size>0.2</size>
+        <mass>0.5</mass>
 
         <visual>
           <scale>0.2 0.2 0.2</scale>
@@ -53,7 +53,6 @@
       </geom:sphere>
     </body:sphere>
   </model:physical>
-  -->
 
   <model:physical name="terrain_model">
     <body:heightmap name ="terrain_body">
@@ -61,12 +60,12 @@
         <image>test.jpg</image>
         <worldTexture>test.jpg</worldTexture>
         <detailTexture>test.jpg</detailTexture>
-        <size>9 9 1</size>
+        <size>9 9 0.2</size>
       </geom:heightmap>
     </body:heightmap>
   </model:physical>
 
-  <!--<model:physical name="plane1_model">
+  <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <static>true</static>
 
@@ -80,11 +79,10 @@
       </geom:plane>
     </body:plane>
   </model:physical>
-  -->
 
   <model:physical name="cam2_model">
-    <xyz>0 0 1</xyz>
-    <rpy>0 50.5 -26.5</rpy>
+    <xyz>0.12 3.41 0.63</xyz>
+    <rpy>0 5.5 -86.5</rpy>
     <static>true</static>
 
     <body:empty name="cam2_body">
