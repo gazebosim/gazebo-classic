@@ -230,6 +230,9 @@ void SignalHandler( int /*dummy*/ )
   return;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Loads the Gazebo configuration file 
 void LoadConfigFile()
 {
   std::ifstream cfgFile;
@@ -272,50 +275,30 @@ void LoadConfigFile()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Initialize the sim
-int Init()
-{
-  PrintVersion(); 
-
-  // Establish signal handlers
-  if (signal(SIGINT, SignalHandler) == SIG_ERR)
-  {
-    printf("signal(2) failed while setting up for SIGINT\n");
-    return -1;
-  }
-
-  LoadConfigFile();
-
-  gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
-
-  gazebo::Simulator::Instance()->Init();
-
-  return 0;
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Finalize the sim
-void Fini()
-{
-  gazebo::Simulator::Instance()->Fini();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main function
 int main(int argc, char **argv)
 {
+
+  //Application Setup 
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
+  PrintVersion(); 
+
+  if (signal(SIGINT, SignalHandler) == SIG_ERR)
+  {
+    printf("signal(2) failed while setting up for SIGINT\n");
+    return -1;
+  } 
+
+
+  //Load the simulator  
   try
   {
-    if (Init() != 0)
-    {
-      fprintf(stderr,"Simulator initialization failed\n");
-      return -1;
-    }
+   LoadConfigFile();
+   gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
   }
   catch (gazebo::GazeboError e)
   {
@@ -323,6 +306,18 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  // Initialize the simulator
+  try
+  {
+    gazebo::Simulator::Instance()->Init();
+  }
+  catch (gazebo::GazeboError e)
+  {
+    std::cerr << e << std::endl;
+    return -1;
+  }
+
+  // Main loop of the simulator
   try
   {
      gazebo::Simulator::Instance()->MainLoop();
@@ -333,10 +328,10 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  // Finalization and clean up
   try
   {
-    // Finalize
-    Fini();
+    gazebo::Simulator::Instance()->Fini();
   }
   catch (gazebo::GazeboError e)
   {
