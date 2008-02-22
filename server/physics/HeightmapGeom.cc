@@ -77,16 +77,25 @@ void HeightmapGeom::FillHeightMap()
   unsigned int x,y;
   double h;
 
+
   // Resize the vector to match the size of the vertices
   this->heights.resize(this->odeVertSize*this->odeVertSize);
+
+  std::cout << "Vert Size[" << this->odeVertSize << "]\n";
+  std::cout << "ODE Scale[" << this->odeScale.x << " " << this->odeScale.y << "]\n";
+
+  h = this->GetHeightAt(Vector2<double>(0,0));
+  std::cout << "Height[0,0] = [" << h << "]\n";
 
   // Iterate over all the verices
   for (y=0; y<this->odeVertSize; y++)
   {
     for (x=0; x<this->odeVertSize; x++)
     {
-      // Find the height at a vertex
+       // Find the height at a vertex
       h = this->GetHeightAt(Vector2<double>(x*this->odeScale.x, (this->odeVertSize-y)*this->odeScale.y));
+
+ //     std::cout << "x[" << x << "] y[" << y << "] z[" << h << "]\n";
 
       // Store the height for future use
       this->heights[y*this->odeVertSize + x] = h;
@@ -145,6 +154,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   this->terrainVertSize = tmpImage.getWidth();
 
+
   // Make sure the heightmap image size is (2^n)+1 in size
   if ( (this->terrainVertSize-1) & (this->terrainVertSize-2) != 0)
   {
@@ -166,6 +176,14 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   this->terrainScale = this->terrainSize / this->terrainVertSize;
 
   this->odeVertSize = terrainVertSize * 1;
+
+  std::cout << "Terrain Size [" << this->terrainSize << "]\n";
+  std::cout << "Terrain Scale [" << this->terrainScale << "]\n";
+  std::cout << "Terrain Vert Size[" << this->terrainVertSize << "]\n";
+  std::cout << "Tile Size[" << tileSize << "]\n";
+
+  std::cout << "ODE Vert Size[" << this->odeVertSize << "]\n";
+
   this->odeScale = this->terrainSize / this->odeVertSize;
 
   std::ostringstream stream;
@@ -193,7 +211,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   // Maximum height of the terrain 
   stream << "MaxHeight="<< this->terrainSize.z << "\n";
   // Upper LOD limit
-  stream << "MaxMipMapLevel=5\n";
+  stream << "MaxMipMapLevel=2\n";
 
   // Create a data stream for loading the terrain into Ogre
   char *mstr = new char[1024];//stream.str().size()];
