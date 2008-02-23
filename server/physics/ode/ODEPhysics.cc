@@ -222,6 +222,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact)) 
     return;
 
+
   // Check if either are spaces
   if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
   {

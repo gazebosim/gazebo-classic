@@ -596,7 +596,6 @@ void Model::Attach(XMLConfigNode *node)
   std::string myBodyName = "canonical";
   Model *parentModel;
 
-
   if (node)
   {
     parentBodyName = node->GetString("parentBody","canonical",1);
@@ -619,18 +618,18 @@ void Model::Attach(XMLConfigNode *node)
   if (pBody == NULL)
     gzthrow("Parent has no canonical body");
 
-
   this->joint->Attach(myBody, pBody);
   this->joint->SetAnchor( myBody->GetPosition() );
   this->joint->SetAxis( Vector3(0,1,0) );
   this->joint->SetParam( dParamHiStop, 0);
   this->joint->SetParam( dParamLoStop, 0);
 
-  if (this->spaceId)
+/*  if (this->spaceId)
   {
     dSpaceDestroy(this->spaceId);
     this->spaceId = parentModel->spaceId;
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
