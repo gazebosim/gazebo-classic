@@ -44,8 +44,6 @@ StringValue::StringValue(const StringValue& data)
 StringValue::StringValue(Vector3 data)
 {
   stream << data;
-  //if (!(stream << data.x << " " << data.y << " " <<data.z))
-  //  gztrow();  
 }
 
 ////////////////////////////////////////////////////////////////////////////////

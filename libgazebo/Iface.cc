@@ -48,6 +48,7 @@ using namespace gazebo;
 GZ_REGISTER_IFACE("simulation", SimulationIface);
 GZ_REGISTER_IFACE("position", PositionIface);
 GZ_REGISTER_IFACE("camera", CameraIface);
+GZ_REGISTER_IFACE("audio", AudioIface);
 GZ_REGISTER_IFACE("graphics3d", Graphics3dIface);
 GZ_REGISTER_IFACE("laser", LaserIface);
 GZ_REGISTER_IFACE("fiducial", FiducialIface);

@@ -16,6 +16,7 @@ opts = Options()
 opts.Add('prefix', 'The install path "prefix"', '/usr/local')
 opts.Add('destdir', 'The root directory to install into. Useful mainly for binary package building', '/')
 opts.Add('mode','Defines how Gazebo will be built, options available: optimized, profile, debug','debug')
+opts.Add('with_audio','Builds support for 3d sound. Options available: no, yes ', 'no')
 
 #
 # 3rd party packages
@@ -24,7 +25,7 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
       	      'ode-config --cflags --libs',
               'fltk-config --cflags --libs --ldflags --use-gl --use-images',
-              'xft-config --cflags --libs'
+              'pkg-config --cflags --libs xft'
               ]
 
 #
@@ -87,6 +88,9 @@ elif env['mode'] == 'profile':
   env['CCFLAGS'] += Split('-p -pg') 
 elif env['mode'] == 'optimized':
   env['CCFLAGS'] += Split('-O3') 
+
+if env['with_audio'] == 'yes':
+  parseConfigs+=['pkg-config --cflags --libs OgreAL']
 
 
 optimize_for_cpu(env);

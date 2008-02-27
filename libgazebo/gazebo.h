@@ -428,6 +428,95 @@ class SimulationIface : public Iface
 /***************************************************************************/
 /// \addtogroup libgazebo_iface 
 /// \{
+/** \defgroup audio_iface audio 
+
+  \brief Audio interface
+
+The audio interface allows clients send and receive audio from the 
+simulated world. 
+It implements the microphones and also the sounds that can be 
+sent to the world.
+
+\{
+*/
+
+#define GAZEBO_MAX_URL_SIZE 256
+
+/// \brief Audio interface data
+class AudioData
+{
+  /// Data timestamp
+  public: double time;
+
+  /// Play in a loop?
+  public: bool loop;
+
+  /// Gain
+  public: float gain;
+
+  ///streaming of the file?
+  public: bool stream;
+
+  ///Play
+  public: int cmd_play;
+
+  ///Pause
+  public: int cmd_pause;
+
+  ///Stop
+  public: int cmd_stop;
+
+  ///state given by the server, 1 for playing.
+  public: int state;
+ 
+  /// location of the file
+  public: char url[GAZEBO_MAX_URL_SIZE];
+
+  /// 3D Pose of the audio, given by the server 
+  public: Pose audio_pose;
+  
+};
+
+/// \brief The audio interface
+class AudioIface : public Iface
+{
+  /// \brief Constructor
+  public: AudioIface():Iface("audio", sizeof(AudioIface)+sizeof(AudioData)) {}
+
+  /// \brief Destructor
+  public: virtual ~AudioIface() {this->data = NULL;}
+
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (AudioData*)this->mMap; 
+          }
+
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (AudioData*)this->mMap; 
+          }
+
+  /// Pointer to the audio data
+  public: AudioData *data;
+};
+
+
+/** \} */
+/// \}
+
+
+
+/***************************************************************************/
+/// \addtogroup libgazebo_iface 
+/// \{
 /** \defgroup camera_iface camera 
 
   \brief Camera interface
