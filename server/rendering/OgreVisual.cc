@@ -115,8 +115,8 @@ void OgreVisual::Load(XMLConfigNode *node)
   // Set the material of the mesh
   this->SetMaterial(node->GetString("material","",1));
 
-  // Allow the sphere to cast shadows
-  this->SetCastShadows(true);
+  // Allow the mesh to cast shadows
+  this->SetCastShadows(node->GetBool("castShadows",true,0));
 }
 
 void OgreVisual::Save()
