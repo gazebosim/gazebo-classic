@@ -217,6 +217,7 @@ void Simulator::MainLoop()
   {
     this->Update();  //global simulation
     World::Instance()->Update(); //physics
+
     gazebo::OgreAdaptor::Instance()->Render(); //rendering
     this->gui->Update(); //GUI
   }

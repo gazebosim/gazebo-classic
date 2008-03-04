@@ -29,10 +29,11 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.8 0.8 0.8 0.8</ambient>
+    <ambient>1.0 1.0 1.0 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+    <shadowTechnique>stencilAdditive</shadowTechnique>
   </rendering:ogre>
 
   <model:physical name="pioneer2dx_model1">

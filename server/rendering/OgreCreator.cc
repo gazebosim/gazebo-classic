@@ -179,7 +179,7 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
   camera->setDirection(1,0,0);
 
   camera->setNearClipDistance(nearClip);
-  camera->setFarClipDistance(farClip);
+  camera->setFarClipDistance(farClip+1000);
 
   // Setup the viewport to use the texture
   cviewport = renderTarget->addViewport(camera);

@@ -147,7 +147,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Default background color
   this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::Black);
 
-
   // Load all the plugins
   this->LoadPlugins();
 
@@ -164,7 +163,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->CreateWindow();
 
   // Get the SceneManager, in this case a generic one
-  //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
   if (node->GetChild("bsp"))
   {
     this->sceneMgr = this->root->createSceneManager("BspSceneManager");
@@ -182,22 +180,24 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Load Resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  // Get the SceneManager, in this case a generic one
-  // Default lighting
+  // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient); 
 
   // Settings for shadow mapping
-  //this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
   std::string shadowTechnique = node->GetString("shadowTechnique", "stencilAdditive");
   if (shadowTechnique == std::string("stencilAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
   else if (shadowTechnique == std::string("textureAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
+  else if (shadowTechnique == std::string("none"))
+    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
   else gzthrow(std::string("Unsupported shadow technique: ") + shadowTechnique + "\n");
 
   this->sceneMgr->setShadowTextureSelfShadow(true);
   this->sceneMgr->setShadowTextureSize(node->GetInt("shadowTextureSize", 512));
+  this->sceneMgr->setShadowIndexBufferSize( node->GetInt("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize()) );
 
+  
   // Add fog. This changes the background color
   OgreCreator::CreateFog(node);
 
@@ -218,7 +218,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 
-  if (node->GetBool("grid", true)) OgreCreator::DrawGrid();
+  if (node->GetBool("grid", true)) 
+    OgreCreator::DrawGrid();
 
   // Set up the world geometry link
   if (this->sceneType==SCENE_BSP)
@@ -470,6 +471,7 @@ void OgreAdaptor::ResizeWindow(unsigned int w, unsigned int h)
 int OgreAdaptor::Render()
 {
   OgreHUD::Instance()->Update();
+
   root->renderOneFrame();
   return 0;
 }
