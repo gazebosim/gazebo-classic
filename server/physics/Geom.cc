@@ -104,6 +104,8 @@ void Geom::Load(XMLConfigNode *node)
     this->dblMass = 0.001;
   }
 
+  this->contact->Load(node);
+
   this->LoadChild(node);
 
   this->body->AttachGeom(this);

@@ -209,8 +209,12 @@ dSpaceID ODEPhysics::GetSpaceId() const
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
   ODEPhysics *self;
+  Geom *geom1 = NULL;
+  Geom *geom2 = NULL;
   int i;
   int numc = 0;
+  dContactGeom contactGeoms[64];
+  dContact contact;
 
   self = (ODEPhysics*) data;
 
@@ -234,28 +238,49 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     // We should never test two geoms in the same space
     assert(dGeomGetSpace(o1) != dGeomGetSpace(o2));
 
-    // up to MAX_CONTACTS contacts per box-box
-    dContact contacts[64];
+    // Get pointers to the underlying geoms
+    if (dGeomGetClass(o1) == dGeomTransformClass)
+      geom1 = (Geom*) dGeomGetData(dGeomTransformGetGeom(o1));
+    else
+      geom1 = (Geom*) dGeomGetData(o1);
 
-    for (i=0; i<64; i++) 
-    {
-      contacts[i].surface.mode = dContactBounce | dContactSoftCFM;
-      contacts[i].surface.mu = dInfinity;
-      contacts[i].surface.mu2 = 0;
-      contacts[i].surface.bounce = 0.1;
-      contacts[i].surface.bounce_vel = 0.1;
-      contacts[i].surface.soft_cfm = 0.01;
-    }
+    if (dGeomGetClass(o2) == dGeomTransformClass)
+      geom2 = (Geom*) dGeomGetData(dGeomTransformGetGeom(o2));
+    else
+      geom2 = (Geom*) dGeomGetData(o2);
 
-    if (numc = dCollide (o1,o2,64,&contacts[0].geom, sizeof(dContact)))
+
+    if (numc = dCollide (o1,o2,64, contactGeoms, sizeof(contactGeoms[0])))
     {
       for (i=0; i<numc; i++)
       {
+        double h, kp, kd;
+
+        contact.geom = contactGeoms[i];
+        contact.surface.mode = 0;
+
+        // Compute the CFM and ERP by assuming the two bodies form a
+        // spring-damper system.
+        h = self->stepTime;
+        kp = 1 / (1 / geom1->contact->kp + 1 / geom2->contact->kp);
+        kd = geom1->contact->kd + geom2->contact->kd;
+        contact.surface.mode |= dContactSoftERP | dContactSoftCFM;
+        contact.surface.soft_erp = h * kp / (h * kp + kd);
+        contact.surface.soft_cfm = 1 / (h * kp + kd);
+
+
+        //contacts[i].surface.mode |= dContactBounce | dContactSoftCFM;
+        contact.surface.mode |= dContactApprox1;
+        contact.surface.mu = MIN(geom1->contact->mu1, geom2->contact->mu1);
+        contact.surface.mu2 = 0;
+        contact.surface.bounce = 0.1;
+        contact.surface.bounce_vel = 0.1;
+        //contacts[i].surface.soft_cfm = 0.01;
+
         dJointID c = dJointCreateContact (self->worldId,
-            self->contactGroup, contacts+i);
+            self->contactGroup, &contact);
         dJointAttach (c,b1,b2);
       }
-
     }
   }
 }

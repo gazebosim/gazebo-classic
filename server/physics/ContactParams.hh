@@ -30,11 +30,16 @@
 namespace gazebo
 {
 
+  class XMLConfigNode;
+
 /// \brief Contact params
 class ContactParams
 {
   /// Constructor
   public: ContactParams();
+
+  /// \brief Load the contact params
+  public: void Load(XMLConfigNode *node);
 
   /// Spring constant
   public: double kp;   

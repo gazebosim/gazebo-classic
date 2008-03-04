@@ -25,6 +25,8 @@
  */
 
 #include <ode/ode.h>
+
+#include "XMLConfig.hh"
 #include "ContactParams.hh"
 
 using namespace gazebo;
@@ -33,14 +35,31 @@ using namespace gazebo;
 // Default constructor
 ContactParams::ContactParams()
 {
-  kp = 10000.0; //dInfinity;
-  kd = 0;
-  bounce = 0.1;
-  bounceVel = 0.1;
-  softCfm = 0.01;
+  this->kp = 10000.0; //dInfinity;
+  this->kd = 0;
+  this->bounce = 0.1;
+  this->bounceVel = 0.1;
+  this->softCfm = 0.01;
   
-  mu1 = dInfinity;
-  mu2 = 0.0;
-  slip1 = 0.01;
-  slip2 = 0.01;
+  this->mu1 = dInfinity;
+  this->mu2 = 0.0;
+  this->slip1 = 0.01;
+  this->slip2 = 0.01;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Load the contact params
+void ContactParams::Load(XMLConfigNode *node)
+{
+  this->kp = node->GetDouble("kp",this->kp);
+  this->kd = node->GetDouble("kd",this->kd);
+  this->bounce = node->GetDouble("bounce",this->bounce);
+  this->bounceVel = node->GetDouble("bounceVel",this->bounceVel);
+
+  this->mu1 = node->GetDouble("mu1",this->mu1);
+  this->mu2 = node->GetDouble("mu2",this->mu2);
+  this->slip1 = node->GetDouble("slip1",this->slip1);
+  this->slip2 = node->GetDouble("slip2",this->slip2);
+
+  this->softCfm = node->GetDouble("softCFM",this->softCfm);
 }
