@@ -141,8 +141,7 @@ class Body : public Entity
 
   /// Load a new geom helper function
   /// \param node XMLConfigNode used to load the geom
-  /// \return Non-zero on error
-  private: int LoadGeom(XMLConfigNode *node);
+  private: void LoadGeom(XMLConfigNode *node);
 
   /// Load a new sensor
   /// \param node XMLConfigNode used to load the geom

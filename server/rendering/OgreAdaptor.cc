@@ -67,6 +67,7 @@ OgreAdaptor::OgreAdaptor()
   this->sceneMgr=NULL;
   this->camera=NULL;
   this->viewport=NULL;
+  this->root=NULL;
 
 }
 

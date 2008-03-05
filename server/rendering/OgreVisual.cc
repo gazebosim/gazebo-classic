@@ -25,6 +25,7 @@
  */
 #include <Ogre.h>
 #include "GazeboMessage.hh"
+#include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "OgreAdaptor.hh"
 #include "OgreVisual.hh"
@@ -79,10 +80,16 @@ void OgreVisual::Load(XMLConfigNode *node)
   pose.pos = node->GetVector3("xyz", Vector3(0,0,0));
   pose.rot = node->GetRotation("rpy", Quatern());
 
-
-  // Create the entity
-  stream << this->sceneNode->getName() << "_ENTITY";
-  obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
+  try
+  {
+    // Create the entity
+    stream << this->sceneNode->getName() << "_ENTITY";
+    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
+  }
+  catch(Ogre::Exception e)
+  {
+    gzthrow("Unable to create a mesh from " + meshName);
+  }
 
   // Attach the entity to the node
   this->AttachObject(obj);  
@@ -113,7 +120,7 @@ void OgreVisual::Load(XMLConfigNode *node)
 
  
   // Set the material of the mesh
-  this->SetMaterial(node->GetString("material","",1));
+  this->SetMaterial(node->GetString("material",std::string(),1));
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(node->GetBool("castShadows",true,0));

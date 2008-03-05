@@ -30,6 +30,7 @@
 #include "OgreVisual.hh"
 #include "Body.hh"
 #include "TrimeshGeom.hh"
+#include "GazeboError.hh"
 
 using namespace gazebo;
 
@@ -90,6 +91,23 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   Ogre::SubMesh* subMesh;
   Ogre::MeshPtr mesh;
  
+  int i,j,k;
+  unsigned int numVertices = 0;
+  unsigned int numIndices = 0;
+  const Ogre::VertexElement* elem;
+  Ogre::VertexData *vertexData;
+  Ogre::HardwareVertexBufferSharedPtr vbuf;
+  Ogre::HardwareIndexBufferSharedPtr ibuf;
+  unsigned short* indTmp = NULL;
+  unsigned char* pData = NULL;
+  float *pFloat = NULL;
+  float *vertPtr = NULL;
+  float *vertices = NULL;
+  int *indices = NULL;
+  int vindex = 0;
+  int iindex = 0;
+  
+  
   this->meshName = node->GetString("mesh","",1);
   
   mesh = Ogre::MeshManager::getSingleton().load(this->meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -101,27 +119,18 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   this->visualNode->SetMaterial("Gazebo/GreenEmissive");
   */
   
-  int i,j,k;
-  unsigned int numVertices = 0;
-  unsigned int numIndices = 0;
-  const Ogre::VertexElement* elem;
-  Ogre::HardwareVertexBufferSharedPtr vbuf;
-  Ogre::HardwareIndexBufferSharedPtr ibuf;
-  unsigned short* indTmp = NULL;
-  unsigned char* pData = NULL;
-  float *pFloat = NULL;
-  float *vertPtr = NULL;
-  float *vertices = NULL;
-  int *indices = NULL;
-  int vindex = 0;
-  int iindex = 0;
-
+  if (mesh.isNull())
+    gzthrow("Failed to load trimesh "+ this->meshName);
+ 
   // Count the number of vertices and indices
  // for (i=0; i<mesh->getNumSubMeshes(); i++)
   for (i=0; i<1; i++)
   {
     subMesh = mesh->getSubMesh(i);
-    numVertices += subMesh->vertexData->vertexCount;   
+    if (subMesh->useSharedVertices)
+      numVertices += mesh->sharedVertexData->vertexCount;
+    else
+      numVertices += subMesh->vertexData->vertexCount;   
     numIndices += subMesh->indexData->indexCount;
   }
 
@@ -135,18 +144,23 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   for (i = 0; i < 1; i++)
   {
     subMesh = mesh->getSubMesh(i);
+    
+    if (subMesh->useSharedVertices)
+      vertexData=mesh->sharedVertexData;
+    else
+      vertexData=subMesh->vertexData;
 
-    elem = subMesh->vertexData->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);             
-    vbuf = subMesh->vertexData->vertexBufferBinding->getBuffer(elem->getSource());
+    elem = vertexData->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);             
+    vbuf = vertexData->vertexBufferBinding->getBuffer(elem->getSource());
 
     // Pointer to vertex array.
     vertPtr = &(vertices[vindex]);
-    vindex += subMesh->vertexData->vertexCount*3;
+    vindex += vertexData->vertexCount*3;
 
     pData = static_cast<unsigned char*>(vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
 
     // Add vertices to the vertex array
-    for (j = 0; j < subMesh->vertexData->vertexCount; j++)
+    for (j = 0; j < vertexData->vertexCount; j++)
     {
       elem->baseVertexPointerToElement(pData, &pFloat);
 

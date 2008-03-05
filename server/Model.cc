@@ -97,7 +97,7 @@ int Model::Load(XMLConfigNode *node)
     
   this->xmlNode = node;
   this->type=node->GetName();
-  this->SetName(node->GetString("name","",1));
+  this->SetName(node->GetString("name",std::string(),1));
   this->SetStatic(node->GetBool("static",false,0));
 
   if (this->type == "physical")
@@ -465,9 +465,9 @@ void Model::LoadJoint(XMLConfigNode *node)
 
   Joint *joint;
 
-  Body *body1(this->bodies[node->GetString("body1","",1)]);
-  Body *body2(this->bodies[node->GetString("body2","",1)]);
-  Body *anchorBody(this->bodies[node->GetString("anchor","",0)]);
+  Body *body1(this->bodies[node->GetString("body1",std::string(),1)]);
+  Body *body2(this->bodies[node->GetString("body2",std::string(),1)]);
+  Body *anchorBody(this->bodies[node->GetString("anchor",std::string(),0)]);
   Vector3 anchorOffset = node->GetVector3("anchorOffset",Vector3(0,0,0));
 
   if (!body1)
@@ -511,7 +511,7 @@ void Model::LoadJoint(XMLConfigNode *node)
   /*else
   {
     joint->SetAnchor(anchorVec);
-    this->bodies.erase(node->GetString("anchor","",0));
+    this->bodies.erase(node->GetString("anchor",std::string(),0));
   }*/
 
   // Load each joint
@@ -537,7 +537,7 @@ void Model::LoadController(XMLConfigNode *node)
   std::string controllerType = node->GetName();
 
   // Get the unique name of the controller
-  std::string controllerName = node->GetString("name","",1);
+  std::string controllerName = node->GetString("name",std::string(),1);
 
   // Create the controller based on it's type
   controller = ControllerFactory::NewController(controllerType, this);
@@ -679,7 +679,10 @@ void Model::LoadPhysical(XMLConfigNode *node)
     }
     catch (GazeboError e)
     {
-      std::cerr << "Error Loading body[" << childNode->GetName() << "]\n";
+      std::cerr << "Error Loading body[" << childNode->GetString("name",std::string(), 0) << "]\n";
+      std::cerr <<  e << std::endl; 
+      childNode = childNode->GetNextByNSPrefix("body");
+      continue;
     }
     childNode = childNode->GetNextByNSPrefix("body");
   }
@@ -695,10 +698,13 @@ void Model::LoadPhysical(XMLConfigNode *node)
     }
     catch (GazeboError e)
     {
-      std::cerr << "Error Loading Joint[" << childNode->GetName() << "]\n";
-    }
+      std::cerr << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
+      std::cerr <<  e << std::endl; 
+      childNode = childNode->GetNextByNSPrefix("joint");
+      continue;
+  }
     childNode = childNode->GetNextByNSPrefix("joint");
   }
 
-  this->canonicalBodyName = node->GetString("canonicalBody","",0);
+  this->canonicalBodyName = node->GetString("canonicalBody",std::string(),0);
 }

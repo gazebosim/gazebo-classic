@@ -89,7 +89,7 @@ void Body::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
   
-  this->SetName(node->GetString("name","",1));
+  this->SetName(node->GetString("name",std::string(),1));
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern(1,0,0,0)));
   this->xmlNode=node;
@@ -393,7 +393,7 @@ void Body::SetEnabled(bool enable) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new geom helper function
-int Body::LoadGeom(XMLConfigNode *node)
+void Body::LoadGeom(XMLConfigNode *node)
 {
   Geom *geom;
 
@@ -414,13 +414,11 @@ int Body::LoadGeom(XMLConfigNode *node)
   }
   else
   {
-    std::cerr << "Unkown Geometry Type[" << node->GetName() << "]\n";
-    return -1;
+    gzthrow("Unknown Geometry Type["+node->GetString("name",std::string(),0)+"]");
   }
 
   geom->Load(node);
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -431,9 +429,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 
   if (node==NULL)
   {
-    std::ostringstream stream;
-    stream << "Null node pointer. Invalid sensor in the world file.";
-    gzthrow(stream.str());
+    gzthrow("Null node pointer. Invalid sensor in the world file.");
   }
 
   sensor = SensorFactory::NewSensor(node->GetName(), this);
@@ -446,7 +442,7 @@ void Body::LoadSensor(XMLConfigNode *node)
   else
   {
     std::ostringstream stream;
-    stream << "Null sensor. Invalid sensor name[" << node->GetName() << "]";
+    stream << "Null sensor. Invalid sensor name[" << node->GetString("name",std::string(), 0) << "]";
     gzthrow(stream.str());
   }
 }

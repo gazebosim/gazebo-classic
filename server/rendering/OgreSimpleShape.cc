@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 
 #include "OgreSimpleShape.hh"
 #include "Vector3.hh"
@@ -354,6 +355,8 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
 
+try
+{
   // Create a new mesh specifically for manual definition.
   mesh = Ogre::MeshManager::getSingleton().createManual(name, 
                        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -541,4 +544,10 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
 
   // this line makes clear the mesh is loaded (avoids memory leaks)
   mesh->load();
+}
+catch (Ogre::Exception e)
+{
+ std::cerr << "Unable to create a basic Unit cylinder object" << std::endl; 
+}
+
 }
