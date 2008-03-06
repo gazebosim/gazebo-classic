@@ -5,7 +5,7 @@ import string
 import os
 import re
 
-version = '0.8-pre1'
+version = '0.8-pre2'
 
 #
 # Function used to test for ODE library, and TriMesh support
