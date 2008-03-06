@@ -112,10 +112,10 @@ home directory, or to the log file specified with the -l command line option.
 // Command line options
 const char *worldFileName;
 const char *optLogFileName = NULL;
-int optServerId = 0;
+unsigned int optServerId = 0;
 bool optServerForce = true;
 double optTimeout = -1;
-int optMsgLevel = 1;
+unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
 
 

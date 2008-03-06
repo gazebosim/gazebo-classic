@@ -84,9 +84,9 @@ void CameraSensor::LoadChild( XMLConfigNode *node )
   // Create the directory to store frames
   if (this->saveFrames)
   {
-    char tmp[1024];
-    sprintf(tmp, "mkdir %s 2>>/dev/null", this->savePathname.c_str());
-    system(tmp);
+    std::string command;
+    command = "mkdir " + this->savePathname + " 2>>/dev/null";
+    system(command.c_str());
   }
 
   // Do some sanity checks

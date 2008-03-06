@@ -60,7 +60,7 @@ namespace gazebo
     public: void Close();
 
     /// \brief Load the world configuration file 
-    public: void Load(const std::string &worldFileName, int serverId );
+    public: void Load(const std::string &worldFileName, unsigned int serverId );
 
     /// \brief Save the world configuration file
     public: void Save(const std::string& filename);

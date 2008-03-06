@@ -33,14 +33,6 @@
 #include "Pose3d.hh"
 #include "Vector3.hh"
 
-namespace Ogre
-{
-  class Material;
-  class Entity;
-  class MovableObject;
-  class SceneNode;
-}
-
 namespace gazebo
 {
 
@@ -158,12 +150,6 @@ namespace gazebo
   
     private: bool placeable;
 
-    ///  Ogre Object
-    protected: Ogre::MovableObject *ogreObj;
-
-    ///  ODE object
-    protected: Ogre::MovableObject *odeObj;
-  
     /// ID for the transform geom
     protected: dGeomID transId;
 

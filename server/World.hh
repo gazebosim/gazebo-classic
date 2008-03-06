@@ -65,7 +65,7 @@ class World : public SingletonT<World>
   /// Load the world
   /// \param node XMLConfig node point
   /// \param serverId Id of the gazebo server
-  public: void Load(XMLConfigNode *rootNode, int serverId);
+  public: void Load(XMLConfigNode *rootNode, unsigned int serverId);
 
   /// Save the world
   /// \param node XMLConfig node writer pointer

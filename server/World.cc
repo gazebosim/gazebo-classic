@@ -86,9 +86,8 @@ void World::Close()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
-void World::Load(XMLConfigNode *rootNode, int serverId)
+void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 {
-  assert(serverId >= 0);
 
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();

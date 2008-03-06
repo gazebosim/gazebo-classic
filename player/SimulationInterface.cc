@@ -24,6 +24,8 @@
  * CVS: $Id$
  */
 
+#include <time.h>
+
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "GazeboDriver.hh"
@@ -64,6 +66,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
 
+  timespec sleepTime = {0, 10000000};
   /// Set a 3D pose
   if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
         PLAYER_SIMULATION_REQ_SET_POSE3D, this->device_addr))
@@ -132,7 +135,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       this->iface->Lock(1);
       response = strcmp((char*)this->iface->data->model_name,"") == 0;
       this->iface->Unlock();
-      usleep(100000);
+      nanosleep(&sleepTime);
     }
 
     this->iface->Lock(1);
@@ -171,7 +174,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       this->iface->Lock(1);
       response = strcmp((char*)this->iface->data->model_name,"") == 0;
       this->iface->Unlock();
-      usleep(100000);
+      nanosleep(&sleepTime);
     }
 
     this->iface->Lock(1);

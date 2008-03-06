@@ -26,7 +26,7 @@
 #include "Global.hh"
 #include "DummyGui.hh"
 #include "GuiFactory.hh"
-
+#include <time.h>
 
 using namespace gazebo;
 
@@ -63,7 +63,8 @@ DummyGui::~DummyGui()
 ////////////////////////////////////////////////////////////////////////////////
 void DummyGui::Update()
 {
-  usleep(1000);
+  timespec sleepTime={0, 1000000};
+  nanosleep(&sleepTime,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

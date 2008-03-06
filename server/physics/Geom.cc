@@ -52,8 +52,6 @@ Geom::Geom( Body *body)//, const std::string &name)
   this->geomId = NULL;
   this->transId = NULL;
 
-  this->odeObj = NULL;
-
   this->laserFiducialId = -1;
   this->laserRetro = 0.0;
 

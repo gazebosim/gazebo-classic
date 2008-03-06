@@ -92,7 +92,7 @@ void Simulator::Close()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the world configuration file 
-void Simulator::Load(const std::string &worldFileName, int serverId )
+void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 {
   if (loaded)
   {
