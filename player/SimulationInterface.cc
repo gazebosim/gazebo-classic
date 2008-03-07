@@ -135,7 +135,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       this->iface->Lock(1);
       response = strcmp((char*)this->iface->data->model_name,"") == 0;
       this->iface->Unlock();
-      nanosleep(&sleepTime);
+      nanosleep(&sleepTime, NULL);
     }
 
     this->iface->Lock(1);
@@ -174,7 +174,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       this->iface->Lock(1);
       response = strcmp((char*)this->iface->data->model_name,"") == 0;
       this->iface->Unlock();
-      nanosleep(&sleepTime);
+      nanosleep(&sleepTime, NULL);
     }
 
     this->iface->Lock(1);

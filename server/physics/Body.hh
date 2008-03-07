@@ -28,7 +28,6 @@
 #define BODY_HH
 
 #include <ode/ode.h>
-#include <boost/any.hpp>
 #include <list>
 #include <vector>
 
