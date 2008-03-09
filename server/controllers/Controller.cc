@@ -29,6 +29,7 @@
 #include "Sensor.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "XMLConfig.hh"
 #include "World.hh"
 #include "Controller.hh"
@@ -74,16 +75,26 @@ void Controller::Load(XMLConfigNode *node)
   // Create the interfaces
   while (childNode)
   {
-  
+    Iface *iface=0;
+    
     // Get the type of the interface (eg: laser)
     std::string ifaceType = childNode->GetName();
 
     // Get the name of the iface 
     std::string ifaceName = childNode->GetString("name","",1);
-
-    // Use the factory to get a new iface based on the type
-    Iface *iface = IfaceFactory::NewIface(ifaceType);
-
+    
+    try 
+    {
+      // Use the factory to get a new iface based on the type
+      iface = IfaceFactory::NewIface(ifaceType);
+    }
+    catch(...) //TODO: Show the exception text here (subclass exception?)
+    {
+      gzmsg(1) << "No manager for the interface " << ifaceType << " found. Disabled.\n";
+      childNode = childNode->GetNextByNSPrefix("interface");
+      continue;
+    }
+    
     // Create the iface
     iface->Create(World::Instance()->GetGzServer(), ifaceName);
 
@@ -95,7 +106,7 @@ void Controller::Load(XMLConfigNode *node)
   if (this->ifaces.size() <= 0)
   {
     std::ostringstream stream;
-    stream << "No interface defined for " << this->name << "controller";
+    stream << "No interface defined for " << this->name << " controller";
     gzthrow(stream.str()); 
   }
 

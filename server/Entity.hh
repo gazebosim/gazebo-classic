@@ -93,6 +93,10 @@ class Entity
   /// \return Name of the entity
   public: std::string GetName() const;
 
+  /// \brief Return an unique name <name>_<id> for the entity
+  /// \return Unique name for the entity
+  public: std::string GetUniqueName() const;
+
   /// \brief Set whether this entity is static: immovable
   /// \param s Bool, true = static
   public: void SetStatic(bool s);

@@ -54,7 +54,7 @@ namespace gazebo
    stream << "This is an error message of type[" << type << "]\n";
    gzthrow(stream.str());
    or if type is a string, simply:
-   gzthrow("This is an error message of type[" << type << "]\n");
+   gzthrow("This is an error message of type[" + type + "]\n");
    \endverbatim
 
   */

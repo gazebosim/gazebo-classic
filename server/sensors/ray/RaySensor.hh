@@ -134,6 +134,9 @@ class RaySensor: public Sensor
   private: Pose3d prevPose;
   private: int rayCount;
   private: int rangeCount;
+  
+  /// Display rays when rendering images
+  private: bool displayRays;
 
 };
 /// \}

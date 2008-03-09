@@ -50,7 +50,8 @@ namespace gazebo
   {
     /// \brief Constructor
     /// \param body Body the ray is attached to
-    public: RayGeom( Body *body );
+    /// \param displayRays Indicates if the rays should be displayed when rendering images
+    public: RayGeom( Body *body, bool displayRays );
   
     /// \brief Destructor
     public: virtual ~RayGeom();

@@ -249,7 +249,7 @@ void Body::SetPose(const Pose3d &pose)
         plane->SetAltitude(pose.pos);
       }
       else
-        (*giter)->SetPose(this->staticPose);
+        (*giter)->SetImmovableBasePose(this->staticPose);
     }
   }
   else

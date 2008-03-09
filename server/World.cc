@@ -101,10 +101,12 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
     gzthrow (err);
   }
 
-   // Create the simulator interface
+  
+  // Create the simulator interface
   this->simIface = new SimulationIface();
   this->simIface->Create(this->server, "default" );
-
+  
+  
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 
   this->LoadEntities(rootNode, NULL);

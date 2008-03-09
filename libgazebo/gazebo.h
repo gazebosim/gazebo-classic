@@ -465,7 +465,10 @@ class AudioData
 
   ///Stop
   public: int cmd_stop;
-
+  
+///Reset to the beginning
+  public: int cmd_reset;
+  
   ///state given by the server, 1 for playing.
   public: int state;
  

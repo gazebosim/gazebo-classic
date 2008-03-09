@@ -94,6 +94,7 @@ class AudioController : public Controller
   private: bool cmdPlay;
   private: bool cmdPause;
   private: bool cmdStop;
+  private: bool cmdReset;
   private: float gain;
   private: std::string url;
   private: OgreAL::SoundManager *soundManager;

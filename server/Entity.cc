@@ -131,6 +131,16 @@ std::string Entity::GetName() const
   return this->name;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Return an unique name for the entity
+std::string Entity::GetUniqueName() const
+{
+  std::ostringstream str;
+  str << this->name;
+  str << "_";
+  str << this->id;
+  return str.str();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this entity is static: immovable

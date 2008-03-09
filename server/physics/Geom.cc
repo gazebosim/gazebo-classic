@@ -247,6 +247,34 @@ bool Geom::IsPlaceable() const
   return this->placeable;
 }
 
+void Geom::PlaceImmovable()
+{
+  assert(IsStatic());
+  if (this->geomId == 0) return;
+
+  dQuaternion q;
+  Pose3d finalPose = immovableRelativePose + immovableBasePose;
+  q[0] = finalPose.rot.u;
+  q[1] = finalPose.rot.x;
+  q[2] = finalPose.rot.y;
+  q[3] = finalPose.rot.z;
+
+  // Set the pose of the encapsulated geom
+  dGeomSetPosition( this->geomId, finalPose.pos.x, finalPose.pos.y, finalPose.pos.z );
+  dGeomSetQuaternion( this->geomId, q);
+  
+  return;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set base pose when body is immovable (static)
+void Geom::SetImmovableBasePose(const Pose3d & pose)
+{
+  immovableBasePose = pose;
+  this->PlaceImmovable();
+  return;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose relative to the body
 void Geom::SetPose(const Pose3d &pose, bool updateCoM)
@@ -266,8 +294,13 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
 
-    if (!this->IsStatic()) 
-      this->visualNode->SetPose(localPose);
+    this->visualNode->SetPose(pose);
+
+    if (this->IsStatic()) {
+      immovableRelativePose = pose;
+      this->PlaceImmovable();
+      return;
+    }
 
     // Set the pose of the encapsulated geom; this is always relative
     // to the CoM

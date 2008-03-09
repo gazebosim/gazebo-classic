@@ -79,7 +79,7 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
 
   Ogre::Plane plane(Ogre::Vector3(normal.x, normal.y, normal.z), 0);
 
-  Ogre::MeshManager::getSingleton().createPlane(parent->GetName(),
+  Ogre::MeshManager::getSingleton().createPlane(parent->GetUniqueName(),
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
       size.x, size.y, 
       (int)segments.x, (int)segments.y,
@@ -88,8 +88,9 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
       Ogre::Vector3(perp.x, perp.y, perp.z));
 
   OgreVisual *visual = new OgreVisual(parent->GetVisualNode());
-  visual->AttachMesh(parent->GetName());
+  visual->AttachMesh(parent->GetUniqueName());
   visual->SetMaterial(material);
+  visual->SetCastShadows(node->GetBool("castShadows",true,0));
 
   return visual;
 }
@@ -104,7 +105,7 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
   double range,constant,linear,quad;
 
   // Create the light
-  Ogre::Light *light(OgreAdaptor::Instance()->sceneMgr->createLight(entity->GetName()));
+  Ogre::Light *light(OgreAdaptor::Instance()->sceneMgr->createLight(entity->GetUniqueName()));
 
   // Set the light type
   std::string lightType = node->GetString("type","point",0);
@@ -163,7 +164,7 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper function to create a camera
-Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip, double farClip, Ogre::RenderTarget *renderTarget)
+Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip, double farClip, double hfov, Ogre::RenderTarget *renderTarget)
 {
   Ogre::Camera *camera;
   Ogre::Viewport *cviewport;
@@ -187,9 +188,10 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
   cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
   cviewport->setOverlaysEnabled(false);
 
-  camera->setAspectRatio(
-      Ogre::Real(cviewport->getActualWidth()) / 
-      Ogre::Real(cviewport->getActualHeight()) );
+  double ratio = (double)cviewport->getActualWidth() / (double)cviewport->getActualHeight();
+  double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+  camera->setAspectRatio(ratio);
+  camera->setFOVy(Ogre::Radian(vfov));
 
   return camera;
 }

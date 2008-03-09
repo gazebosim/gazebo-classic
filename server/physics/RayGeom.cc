@@ -37,23 +37,26 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-RayGeom::RayGeom( Body *body )
-  : Geom( body)
+RayGeom::RayGeom( Body *body, bool displayRays )
+  : Geom( body),
+    line(NULL)
 {
   this->SetName("Ray");
 
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
 
-  this->line = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
+  if (displayRays) {
+    this->line = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
 
-  // Add two points
-  this->line->AddPoint(Vector3(0,0,0));
-  this->line->AddPoint(Vector3(0,0,0));
+    // Add two points
+    this->line->AddPoint(Vector3(0,0,0));
+    this->line->AddPoint(Vector3(0,0,0));
 
-  this->visualNode->AttachObject(this->line);
+    this->visualNode->AttachObject(this->line);
 
-  this->line->setMaterial("Gazebo/BlueEmissive");
+    this->line->setMaterial("Gazebo/BlueEmissive");
+  }
 
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;
@@ -65,8 +68,10 @@ RayGeom::RayGeom( Body *body )
 // Destructor
 RayGeom::~RayGeom()
 {
-  delete this->line;
-  this->line = NULL;
+  if (this->line) {
+    delete this->line;
+    this->line = NULL;
+  }
 }
 
 void RayGeom::Update()
@@ -110,10 +115,12 @@ void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   dGeomRaySetLength( this->geomId, 
       this->globalStartPos.Distance(this->globalEndPos) );
 
-  // Set the line's position relative to it's parent scene node
-  this->line->SetPoint(0, this->relativeStartPos);
-  this->line->SetPoint(1, this->relativeEndPos);
-  this->line->Update();
+  if (this->line) {
+    // Set the line's position relative to it's parent scene node
+    this->line->SetPoint(0, this->relativeStartPos);
+    this->line->SetPoint(1, this->relativeEndPos);
+    this->line->Update();
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -139,11 +146,13 @@ void RayGeom::SetLength( const double len )
   //dGeomRaySetLength( this->geomId, len );
   this->contactLen=len;
 
-  Vector3 dir = this->relativeEndPos - this->relativeStartPos;
-  dir.Normalize();
+  if (this->line) {
+    Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+    dir.Normalize();
 
-  this->line->SetPoint(1,  dir * len + this->relativeStartPos);
-  this->line->Update();
+    this->line->SetPoint(1,  dir * len + this->relativeStartPos);
+    this->line->Update();
+  }
 }
 
 

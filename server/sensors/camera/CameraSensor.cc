@@ -124,7 +124,7 @@ void CameraSensor::InitChild()
 
   // Create the camera
   this->camera = OgreCreator::CreateCamera(this->GetName(),
-      this->nearClip, this->farClip, this->renderTarget);
+      this->nearClip, this->farClip, this->hfov, this->renderTarget);
 
   Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
       this->ogreMaterialName,

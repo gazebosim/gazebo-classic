@@ -1,4 +1,4 @@
-dirs = Split('position factory')
+dirs = Split('audio camera position factory simiface')
 
 for subdir in dirs:
   SConscript('%s/SConscript' % subdir)

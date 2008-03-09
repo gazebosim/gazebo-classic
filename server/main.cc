@@ -289,7 +289,7 @@ int main(int argc, char **argv)
 
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
-    printf("signal(2) failed while setting up for SIGINT\n");
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
   } 
 
@@ -302,6 +302,7 @@ int main(int argc, char **argv)
   }
   catch (gazebo::GazeboError e)
   {
+    std::cerr << "Loading Gazebo" << std::endl;
     std::cerr << e << std::endl;
     return -1;
   }
@@ -313,6 +314,7 @@ int main(int argc, char **argv)
   }
   catch (gazebo::GazeboError e)
   {
+    std::cerr << "Initialization failed" << std::endl;
     std::cerr << e << std::endl;
     return -1;
   }
@@ -324,7 +326,8 @@ int main(int argc, char **argv)
   }
   catch (gazebo::GazeboError e)
   {
-    std::cerr << "Simulator MainIdle loop failed[" << e << "]\n";
+    std::cerr << "Main simulation loop failed" << std::endl;
+    std::cerr << e << std::endl;
     return -1;
   }
 
@@ -335,7 +338,8 @@ int main(int argc, char **argv)
   }
   catch (gazebo::GazeboError e)
   {
-    std::cerr << "Finalized Failed[" << e << "]\n";
+    std::cerr << "Finalization failed" << std::endl;
+    std::cerr << e << std::endl;
     return -1;
   }
 

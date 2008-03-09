@@ -174,6 +174,11 @@ int Model::Load(XMLConfigNode *node)
   
 }
 
+void Model::Test()
+{
+  std::cout << "this is a test\n";
+}
+
 void Model::Save()
 {
   std::map<std::string, Body* >::iterator bodyIter;
@@ -530,7 +535,7 @@ void Model::LoadController(XMLConfigNode *node)
   if (!node)
     gzthrow( "node parameter is NULL" );
 
-  Controller *controller;
+  Controller *controller=0;
   std::ostringstream stream;
 
   // Get the controller's type

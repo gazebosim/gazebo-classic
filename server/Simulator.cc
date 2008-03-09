@@ -65,7 +65,6 @@ Simulator::Simulator()
   this->userStep = false;
   this->userStepInc = false;
 
-
   this->xmlFile=NULL;
 }
 
@@ -92,6 +91,7 @@ void Simulator::Close()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the world configuration file 
+/// Any error that reach this level must make the simulator exit
 void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 {
   if (loaded)
@@ -107,7 +107,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   {
     xmlFile->Load(worldFileName);
   }
-  catch (gazebo::GazeboError e)
+  catch (GazeboError e)
   {
     std::ostringstream stream;
     stream << "The XML config file can not be loaded, please make sure is a correct file\n" 
@@ -120,9 +120,19 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   // Load the messaging system
   gazebo::GazeboMessage::Instance()->Load(rootNode);
 
-  //Create and initialize the Gui
-  this->LoadGui(rootNode);
-
+  try 
+  {
+    //Create and initialize the Gui
+    this->LoadGui(rootNode);
+  }
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "Error loading the GUI\n" 
+        << e << "\n";
+    gzthrow(stream.str());
+  }
+  
   //Initialize RenderingEngine
   try
   {
@@ -138,9 +148,19 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
   //Preload basic shapes that can be used anywhere
   OgreCreator::CreateBasicShapes();
-
-  //Create the world
-  gazebo::World::Instance()->Load(rootNode, serverId);
+  
+  try 
+  {
+    //Create the world
+    gazebo::World::Instance()->Load(rootNode, serverId);
+  }
+  catch (GazeboError e)
+  {
+    std::ostringstream stream;
+    stream << "Error loading the GUI\n" 
+        << e << "\n";
+    gzthrow(stream.str());
+  }
 
   this->loaded=true;
 }

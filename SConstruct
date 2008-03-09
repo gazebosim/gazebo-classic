@@ -122,6 +122,10 @@ if not env.GetOption('clean'):
         print "libfltk & development files are required, but not found."
         print "  http://www.fltk.org"
         Exit(1)
+      elif cfg.find("OgreAL") >= 0:
+        print "You requested to activate the support for 3D audio. But OgreAL is not found."
+        print "http://www.ogre3d.org/phpBB2addons/viewtopic.php?t=3293"
+        Exit(1)
  
   conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib})
    

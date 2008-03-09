@@ -81,6 +81,8 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 
   this->origin = node->GetVector3("origin", Vector3(0,0,0));
 
+  this->displayRays = node->GetBool("displayRays", true);
+
   // Create a space to contain the ray space
   this->superSpaceId = dSimpleSpaceCreate( 0 );
     
@@ -119,7 +121,7 @@ void RaySensor::InitChild()
     start = (axis * this->minRange) + this->origin;
     end = (axis * this->maxRange) + this->origin;
 
-    ray = new RayGeom(this->body);
+    ray = new RayGeom(this->body, displayRays);
 
     ray->SetPoints(start, end);
 //    ray->SetCategoryBits( GZ_LASER_COLLIDE );
