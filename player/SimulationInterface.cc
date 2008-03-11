@@ -199,33 +199,38 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->Lock(1);
     if (name == "world")
     {
+      req->value = new char[ sizeof(double) ];
+      req->value_count = sizeof(double);
+
       if (prop == "sim_time")
       {
-        if (req->value_count >= sizeof(double))
-        {
-          *((double*)req->value) = this->iface->data->simTime;
-        }
+        memcpy(req->value, &this->iface->data->simTime, sizeof(double));
       }
       else if (prop == "pause_time")
       {
-        if (req->value_count >= sizeof(double))
-        {
-          *((double*)req->value) = this->iface->data->pauseTime;
-        }
+        memcpy(req->value, &this->iface->data->pauseTime, sizeof(double));
       }
       else if (prop == "real_time")
       {
-        if (req->value_count >= sizeof(double))
-        {
-          *((double*)req->value) = this->iface->data->realTime;
-        }
+        memcpy(req->value, &this->iface->data->realTime, sizeof(double));
       }
     }
+    else
+    {
+      std::cerr << "Invalid Name[" << name << "]. Must be \"world\".\n";
+    }
+
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY,
         req, sizeof(*req), NULL);
+
+    if (req->value)
+    {
+      delete [] req->value;
+      req->value = NULL;
+    }
   }
  
   return 0;
