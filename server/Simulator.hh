@@ -63,7 +63,7 @@ namespace gazebo
     public: void Load(const std::string &worldFileName, unsigned int serverId );
 
     /// \brief Save the world configuration file
-    public: void Save(const std::string& filename);
+    public: void Save(const std::string& filename=std::string());
 
     /// \brief Initialize the simulation
     public: int Init( );
@@ -125,7 +125,7 @@ namespace gazebo
 
     /// \brief Set whether the user has paused
     public: void SetUserPause(bool pause);
-
+    
     /// \brief Return true if the user has stepped the simulation
     public: bool GetUserStep();
 

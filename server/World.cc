@@ -492,6 +492,7 @@ void World::SetShowPhysics(bool show)
 // Update the simulation interface
 void World::UpdateSimulationIface()
 {
+  //TODO: Move this method to simulator? Hard because of the models
   this->simIface->Lock(1);
 
   if (this->simIface->GetOpenCount() > 0)
@@ -499,13 +500,27 @@ void World::UpdateSimulationIface()
     this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
     this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
     this->simIface->data->realTime = Simulator::Instance()->GetRealTime();
-
+    this->simIface->data->state = !Simulator::Instance()->GetUserPause();
+    
     if (this->simIface->data->reset)
     {
       this->Reset();
       this->simIface->data->reset = 0;
     }
-
+    
+    if (this->simIface->data->pause)
+    {
+      Simulator::Instance()->SetUserPause(!Simulator::Instance()->GetUserPause());
+      this->simIface->data->pause = 0;
+    }
+    
+    //TODO: save as , load
+    if (this->simIface->data->save)
+    {
+      Simulator::Instance()->Save();
+      this->simIface->data->save=0;
+    }
+    
     // If the model_name is set, then a request has been received
     if (strcmp((char*)this->simIface->data->model_name,"")!=0)
     {

@@ -367,8 +367,12 @@ class SimulationData
   /// Elapsed real time since start of simulation (from system clock)
   public: double realTime;
 
-  /// Pause simulation (set by client)
-  public: int pause;
+  /// state of the simulation : 0 paused, 1 running -1 not_started/exiting
+  public: int state;
+  
+  /// Pause simulation (set by client) should check the state
+  /// Changes the state of the simulation from pause to play and viceversa. 
+  public: bool pause;
 
   /// Reset simulation (set by client)
   public: int reset;
