@@ -42,8 +42,8 @@ void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int ri
   size_t currOffset = 0;
 
   // Create a new mesh specifically for manual definition.
-  mesh = Ogre::MeshManager::getSingleton().createManual(name, 
-                       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  mesh = Ogre::MeshManager::getSingleton().createManual(name,
+         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
   subMesh = mesh->createSubMesh();
 
@@ -61,7 +61,7 @@ void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int ri
   currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
 
   // TODO: blending weights
-  
+
   // normals
   vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
   currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
@@ -71,7 +71,7 @@ void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int ri
   // TODO: specular colors
 
   // two dimensional texture coordinates
-  vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2, 
+  vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
                          Ogre::VES_TEXTURE_COORDINATES, 0);
   currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
 
@@ -79,37 +79,37 @@ void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int ri
   // allocate the vertex buffer
   vertexData->vertexCount = (rings + 1) * (segments+1);
   vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-             vertexDecl->getVertexSize(0), 
-             vertexData->vertexCount, 
-             Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-             false);
+           vertexDecl->getVertexSize(0),
+           vertexData->vertexCount,
+           Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+           false);
 
   vertexData->vertexBufferBinding->setBinding(0, vBuf);
   vertices = static_cast<float*>(vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // allocate index buffer
   subMesh->indexData->indexCount = 6 * rings * (segments + 1);
-  subMesh->indexData->indexBuffer = 
-              Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-                  Ogre::HardwareIndexBuffer::IT_16BIT, 
-                  subMesh->indexData->indexCount, 
-                  Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-                  false);
+  subMesh->indexData->indexBuffer =
+    Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+      Ogre::HardwareIndexBuffer::IT_16BIT,
+      subMesh->indexData->indexCount,
+      Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+      false);
 
   iBuf = subMesh->indexData->indexBuffer;
   indices = static_cast<unsigned short*>(iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // Generate the group of rings for the sphere
-  for (ring = 0; ring <= rings; ring++) 
+  for (ring = 0; ring <= rings; ring++)
   {
     r0 = radius * sinf (ring * deltaRingAngle);
     vert.y = radius * cosf (ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
-    for(seg = 0; seg <= segments; seg++)
+    for (seg = 0; seg <= segments; seg++)
     {
       vert.x = r0 * sinf(seg * deltaSegAngle);
-      vert.z = r0 * cosf(seg * deltaSegAngle); 
+      vert.z = r0 * cosf(seg * deltaSegAngle);
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -136,7 +136,7 @@ void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int ri
         *indices++ = verticeIndex + segments;
         *indices++ = verticeIndex + segments + 1;
         *indices++ = verticeIndex + 1;
-        *indices++ = verticeIndex; 
+        *indices++ = verticeIndex;
         verticeIndex++;
       }
     }
@@ -149,9 +149,9 @@ void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int ri
   // Generate face list
   subMesh->useSharedVertices = true;
 
-  mesh->_setBounds( Ogre::AxisAlignedBox( 
-        Ogre::Vector3(-radius, -radius, -radius), 
-        Ogre::Vector3(radius, radius, radius)), false);
+  mesh->_setBounds( Ogre::AxisAlignedBox(
+                      Ogre::Vector3(-radius, -radius, -radius),
+                      Ogre::Vector3(radius, radius, radius)), false);
 
   mesh->_setBoundingSphereRadius(radius);
 
@@ -178,8 +178,8 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   int i,j,k;
 
   // Create a new mesh specifically for manual definition.
-  mesh = Ogre::MeshManager::getSingleton().createManual(name, 
-                       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  mesh = Ogre::MeshManager::getSingleton().createManual(name,
+         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
   subMesh = mesh->createSubMesh();
 
@@ -197,7 +197,7 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
 
   // TODO: blending weights
-  
+
   // normals
   vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
   currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
@@ -207,30 +207,30 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   // TODO: specular colors
 
   // two dimensional texture coordinates
-  vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2, 
+  vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
                          Ogre::VES_TEXTURE_COORDINATES, 0);
   currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
 
 
   // allocate the vertex buffer
-  vertexData->vertexCount = 24; 
+  vertexData->vertexCount = 24;
   vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-             vertexDecl->getVertexSize(0), 
-             vertexData->vertexCount, 
-             Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-             false);
+           vertexDecl->getVertexSize(0),
+           vertexData->vertexCount,
+           Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+           false);
 
   vertexData->vertexBufferBinding->setBinding(0, vBuf);
   vertices = static_cast<float*>(vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // allocate index buffer
   subMesh->indexData->indexCount = 36;
-  subMesh->indexData->indexBuffer = 
-              Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-                  Ogre::HardwareIndexBuffer::IT_16BIT, 
-                  subMesh->indexData->indexCount, 
-                  Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-                  false);
+  subMesh->indexData->indexBuffer =
+    Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+      Ogre::HardwareIndexBuffer::IT_16BIT,
+      subMesh->indexData->indexCount,
+      Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+      false);
 
   iBuf = subMesh->indexData->indexBuffer;
   indices = static_cast<unsigned short*>(iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
@@ -256,7 +256,7 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   };
 
   // Texture coords
-  int t[4][2] = 
+  int t[4][2] =
   {
     {0, 1}, {1,1}, {1, 0}, {0,0}
   };
@@ -270,7 +270,7 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   };
 
   // Indices
-  int ind[36] = 
+  int ind[36] =
   {
     0, 1, 2,
     2, 3, 0,
@@ -327,9 +327,9 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   // Generate face list
   subMesh->useSharedVertices = true;
 
-  mesh->_setBounds( Ogre::AxisAlignedBox( 
-        Ogre::Vector3(-sides.x/2.0, -sides.y/2.0, -sides.z/2.0), 
-        Ogre::Vector3(sides.x/2.0, sides.y/2.0, sides.z/2.0)), false);
+  mesh->_setBounds( Ogre::AxisAlignedBox(
+                      Ogre::Vector3(-sides.x/2.0, -sides.y/2.0, -sides.z/2.0),
+                      Ogre::Vector3(sides.x/2.0, sides.y/2.0, sides.z/2.0)), false);
 
   // this line makes clear the mesh is loaded (avoids memory leaks)
   mesh->load();
@@ -355,199 +355,199 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
 
-try
-{
-  // Create a new mesh specifically for manual definition.
-  mesh = Ogre::MeshManager::getSingleton().createManual(name, 
-                       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  try
+  {
+    // Create a new mesh specifically for manual definition.
+    mesh = Ogre::MeshManager::getSingleton().createManual(name,
+           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-  subMesh = mesh->createSubMesh();
+    subMesh = mesh->createSubMesh();
 
-  mesh->sharedVertexData = new Ogre::VertexData();
-  vertexData = mesh->sharedVertexData;
+    mesh->sharedVertexData = new Ogre::VertexData();
+    vertexData = mesh->sharedVertexData;
 
-  // define the vertex format
-  vertexDecl = vertexData->vertexDeclaration;
+    // define the vertex format
+    vertexDecl = vertexData->vertexDeclaration;
 
-  // The vertexDecl should contain positions, blending weights, normals,
-  // diffiuse colors, specular colors, tex coords. In that order.
+    // The vertexDecl should contain positions, blending weights, normals,
+    // diffiuse colors, specular colors, tex coords. In that order.
 
-  // positions
-  vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
-  currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+    // positions
+    vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+    currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
 
-  // TODO: blending weights
-  
-  // normals
-  vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
-  currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+    // TODO: blending weights
 
-  // TODO: diffuse colors
+    // normals
+    vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
+    currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
 
-  // TODO: specular colors
+    // TODO: diffuse colors
 
-  // two dimensional texture coordinates
-  vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2, 
-                         Ogre::VES_TEXTURE_COORDINATES, 0);
-  currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
+    // TODO: specular colors
+
+    // two dimensional texture coordinates
+    vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
+                           Ogre::VES_TEXTURE_COORDINATES, 0);
+    currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
 
 
-  // allocate the vertex buffer
-  vertexData->vertexCount = (rings + 1) * (segments+1) + 2; 
-  vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-             vertexDecl->getVertexSize(0), 
-             vertexData->vertexCount, 
-             Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+    // allocate the vertex buffer
+    vertexData->vertexCount = (rings + 1) * (segments+1) + 2;
+    vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+             vertexDecl->getVertexSize(0),
+             vertexData->vertexCount,
+             Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
              false);
 
-  vertexData->vertexBufferBinding->setBinding(0, vBuf);
-  vertices = static_cast<float*>(vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+    vertexData->vertexBufferBinding->setBinding(0, vBuf);
+    vertices = static_cast<float*>(vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
-  // allocate index buffer
-  subMesh->indexData->indexCount = 6 * rings * (segments + 1) + (segments*6)+2;
-  subMesh->indexData->indexBuffer = 
-              Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-                  Ogre::HardwareIndexBuffer::IT_16BIT, 
-                  subMesh->indexData->indexCount, 
-                  Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-                  false);
+    // allocate index buffer
+    subMesh->indexData->indexCount = 6 * rings * (segments + 1) + (segments*6)+2;
+    subMesh->indexData->indexBuffer =
+      Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+        Ogre::HardwareIndexBuffer::IT_16BIT,
+        subMesh->indexData->indexCount,
+        Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+        false);
 
-  iBuf = subMesh->indexData->indexBuffer;
-  indices = static_cast<unsigned short*>(iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+    iBuf = subMesh->indexData->indexBuffer;
+    indices = static_cast<unsigned short*>(iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
-  vertStart = vertices;
-  indStart = indices;
+    vertStart = vertices;
+    indStart = indices;
 
-  // Generate the group of rings for the sphere
-  for (ring = 0; ring <= rings; ring++) 
-  {
-    vert.z = ring * height/rings - height/2.0;
-
-    // Generate the group of segments for the current ring
-    for(seg = 0; seg <= segments; seg++)
+    // Generate the group of rings for the sphere
+    for (ring = 0; ring <= rings; ring++)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle); 
+      vert.z = ring * height/rings - height/2.0;
 
-
-      // TODO: Don't think these normals are correct.
-      norm = vert;
-      norm.Normalize();
-
-      // Add one vertex to the strip which makes up the sphere
-      *vertices++ = vert.x;
-      *vertices++ = vert.y;
-      *vertices++ = vert.z;
-
-      *vertices++ = norm.x;
-      *vertices++ = norm.y;
-      *vertices++ = norm.z;
-
-      // Texture coords
-      *vertices++ = (float) seg / (float) segments;
-      *vertices++ = (float) ring / (float) rings;
-
-      if (ring != rings)
+      // Generate the group of segments for the current ring
+      for (seg = 0; seg <= segments; seg++)
       {
-        // each vertex (except the last) has six indices pointing to it
-        *indices++ = verticeIndex + segments + 1;
-        *indices++ = verticeIndex;
-        *indices++ = verticeIndex + segments;
-        *indices++ = verticeIndex + segments + 1;
-        *indices++ = verticeIndex + 1;
-        *indices++ = verticeIndex; 
-
-        verticeIndex++;
-      } 
-    }
-  }
-
-  /// The top cap vertex
-  *vertices++ = 0;
-  *vertices++ = 0;
-  *vertices++ = height/2.0;
-
-  *vertices++ = 0;
-  *vertices++ = 0;
-  *vertices++ = 1;
-
-  *vertices++ = 0;
-  *vertices++ = 0;
+        vert.y = radius * cosf(seg * deltaSegAngle);
+        vert.x = radius * sinf(seg * deltaSegAngle);
 
 
-  // The bottom cap vertex
-  *vertices++ = 0;
-  *vertices++ = 0;
-  *vertices++ = -height/2.0;
+        // TODO: Don't think these normals are correct.
+        norm = vert;
+        norm.Normalize();
 
-  *vertices++ = 0;
-  *vertices++ = 0;
-  *vertices++ = -1;
+        // Add one vertex to the strip which makes up the sphere
+        *vertices++ = vert.x;
+        *vertices++ = vert.y;
+        *vertices++ = vert.z;
 
-  *vertices++ = 0;
-  *vertices++ = 0;
+        *vertices++ = norm.x;
+        *vertices++ = norm.y;
+        *vertices++ = norm.z;
 
-  // Create the top fan
-  verticeIndex += segments + 1;
-  for (seg=0; seg < segments; seg++)
-  {
-    *indices++ = verticeIndex;
-    *indices++ = verticeIndex - segments + seg; 
-    *indices++ = verticeIndex - segments + seg - 1; 
-  }
- 
-  // Create the bottom fan
-  verticeIndex++;
-  for (seg=0; seg < segments; seg++)
-  {
-    *indices++ = verticeIndex;
-    *indices++ = seg; 
-    *indices++ = seg+1; 
-  }
+        // Texture coords
+        *vertices++ = (float) seg / (float) segments;
+        *vertices++ = (float) ring / (float) rings;
 
-  // Fix all the normals
-  for (i=0; i+3<subMesh->indexData->indexCount; i+=3)
-  {
-    norm.Set();
+        if (ring != rings)
+        {
+          // each vertex (except the last) has six indices pointing to it
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex;
+          *indices++ = verticeIndex + segments;
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex + 1;
+          *indices++ = verticeIndex;
 
-    for (j=0; j<3; j++)
-    {
-      int index = indStart[i+j];
-      norm += Vector3(vertStart[index*8+3], 
-                      vertStart[index*8+4], 
-                      vertStart[index*8+5]);
-    }
-
-    norm /= 3;
-    norm.Normalize();
-
-    for (j=0; j<3; j++)
-    {
-      for (int k=0; k<3; k++)
-      {
-        int index = indStart[i+j];
-        vertStart[index*8+3+k] = norm[k];
+          verticeIndex++;
+        }
       }
     }
+
+    /// The top cap vertex
+    *vertices++ = 0;
+    *vertices++ = 0;
+    *vertices++ = height/2.0;
+
+    *vertices++ = 0;
+    *vertices++ = 0;
+    *vertices++ = 1;
+
+    *vertices++ = 0;
+    *vertices++ = 0;
+
+
+    // The bottom cap vertex
+    *vertices++ = 0;
+    *vertices++ = 0;
+    *vertices++ = -height/2.0;
+
+    *vertices++ = 0;
+    *vertices++ = 0;
+    *vertices++ = -1;
+
+    *vertices++ = 0;
+    *vertices++ = 0;
+
+    // Create the top fan
+    verticeIndex += segments + 1;
+    for (seg=0; seg < segments; seg++)
+    {
+      *indices++ = verticeIndex;
+      *indices++ = verticeIndex - segments + seg;
+      *indices++ = verticeIndex - segments + seg - 1;
+    }
+
+    // Create the bottom fan
+    verticeIndex++;
+    for (seg=0; seg < segments; seg++)
+    {
+      *indices++ = verticeIndex;
+      *indices++ = seg;
+      *indices++ = seg+1;
+    }
+
+    // Fix all the normals
+    for (i=0; i+3<subMesh->indexData->indexCount; i+=3)
+    {
+      norm.Set();
+
+      for (j=0; j<3; j++)
+      {
+        int index = indStart[i+j];
+        norm += Vector3(vertStart[index*8+3],
+                        vertStart[index*8+4],
+                        vertStart[index*8+5]);
+      }
+
+      norm /= 3;
+      norm.Normalize();
+
+      for (j=0; j<3; j++)
+      {
+        for (int k=0; k<3; k++)
+        {
+          int index = indStart[i+j];
+          vertStart[index*8+3+k] = norm[k];
+        }
+      }
+    }
+
+    // Unlock
+    vBuf->unlock();
+    iBuf->unlock();
+
+    // Generate face list
+    subMesh->useSharedVertices = true;
+
+    mesh->_setBounds( Ogre::AxisAlignedBox(
+                        Ogre::Vector3(-radius, -height/2, -radius),
+                        Ogre::Vector3(radius, height/2, radius)), false);
+
+    // this line makes clear the mesh is loaded (avoids memory leaks)
+    mesh->load();
   }
-
-  // Unlock
-  vBuf->unlock();
-  iBuf->unlock();
-
-  // Generate face list
-  subMesh->useSharedVertices = true;
-
-  mesh->_setBounds( Ogre::AxisAlignedBox( 
-        Ogre::Vector3(-radius, -height/2, -radius), 
-        Ogre::Vector3(radius, height/2, radius)), false);
-
-  // this line makes clear the mesh is loaded (avoids memory leaks)
-  mesh->load();
-}
-catch (Ogre::Exception e)
-{
- std::cerr << "Unable to create a basic Unit cylinder object" << std::endl; 
-}
+  catch (Ogre::Exception e)
+  {
+    std::cerr << "Unable to create a basic Unit cylinder object" << std::endl;
+  }
 
 }

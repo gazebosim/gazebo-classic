@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Body::Body(Entity *parent, dWorldID worldId)
-  : Entity(parent)
+    : Entity(parent)
 {
   if (!this->IsStatic())
   {
@@ -88,12 +88,12 @@ Body::~Body()
 void Body::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
-  
+
   this->SetName(node->GetString("name",std::string(),1));
   this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
   this->SetRotation(node->GetRotation("rpy",Quatern(1,0,0,0)));
   this->xmlNode=node;
-   
+
   childNode = node->GetChildByNSPrefix("geom");
 
   // Load the geometries
@@ -142,7 +142,7 @@ void Body::Save()
   {
     //(*siter)->Save();
   }
-  
+
 }
 
 
@@ -196,13 +196,13 @@ void Body::Update(UpdateParams &params)
     this->visualNode->SetPose(pose);
   }
 
-  for (geomIter=this->geoms.begin(); 
+  for (geomIter=this->geoms.begin();
        geomIter!=this->geoms.end(); geomIter++)
   {
     (*geomIter)->Update();
   }
 
-  for (sensorIter=this->sensors.begin(); 
+  for (sensorIter=this->sensors.begin();
        sensorIter!=this->sensors.end(); sensorIter++)
   {
     (*sensorIter)->Update(params);
@@ -297,7 +297,7 @@ void Body::SetPosition(const Vector3 &pos)
   {
     this->staticPose.pos = pos;
   }
- 
+
   // Set the position of the scene node
   this->visualNode->SetPosition(pos);
 }
@@ -530,7 +530,7 @@ void Body::UpdateCoM()
 
   // My Cheap Hack, to put the center of mass at the origin
   this->mass.c[0] = this->mass.c[1] = this->mass.c[2] = 0;
- 
+
   // Set the mass matrix
   if (this->mass.mass > 0)
     dBodySetMass( this->bodyId, &this->mass );

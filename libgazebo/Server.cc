@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -91,21 +91,21 @@ void Server::Init(int serverId, int force)
   this->filename = stream.str();
 
   std::cout << "creating " << this->filename << "\n";
-  
+
   // Create the directory
   if (mkdir(this->filename.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
   {
     if (errno == EEXIST)
     {
       errStream << "directory [" <<  this->filename
-                <<  "] already exists (previous crash?)"
-                << "remove the directory and re-run gazebo";
+      <<  "] already exists (previous crash?)"
+      << "remove the directory and re-run gazebo";
       throw(errStream.str());
     }
     else
-    {    
-      errStream << "failed to create [" << this->filename << "] : [" 
-                <<  strerror(errno) << "]";
+    {
+      errStream << "failed to create [" << this->filename << "] : ["
+      <<  strerror(errno) << "]";
       throw(errStream.str());
     }
   }
@@ -117,14 +117,14 @@ void Server::Init(int serverId, int force)
 void Server::Fini()
 {
   char cmd[1024];
-  
+
   std::cout << "deleting " << this->filename << "\n";
-  
+
   // Delete the server dir
   if (rmdir(this->filename.c_str()) != 0)
   {
-    std::cout << "failed to cleanly remove [" << this->filename 
-             << "] : [" << strerror(errno) << "]\n";
+    std::cout << "failed to cleanly remove [" << this->filename
+    << "] : [" << strerror(errno) << "]\n";
 
     snprintf(cmd, sizeof(cmd), "rm -rf %s", this->filename.c_str());
     system(cmd);
@@ -160,7 +160,7 @@ void Server::SemInit(int force)
     this->semId = semget(this->semKey, 16, IPC_CREAT | S_IRWXU);
   else
     this->semId = semget(this->semKey, 16, IPC_CREAT | IPC_EXCL | S_IRWXU);
-  
+
   // Create semaphores for clients
   if (this->semId < 0)
   {
@@ -169,8 +169,8 @@ void Server::SemInit(int force)
     if (errno == EEXIST)
     {
       stream << "There appears to be another server running."
-             << "Use the -s flag to try a different server id,"
-             << "or use the -f flag if you definitely want to use this id.";
+      << "Use the -s flag to try a different server id,"
+      << "or use the -f flag if you definitely want to use this id.";
     }
 
     throw(stream.str());
@@ -192,7 +192,7 @@ void Server::SemInit(int force)
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize semaphores
 void Server::SemFini()
-{  
+{
   union semun arg;
 
   if (semctl(this->semId, 0, IPC_RMID, arg) < 0)

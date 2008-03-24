@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -41,7 +41,7 @@ GZ_REGISTER_STATIC_CONTROLLER("factory", Factory);
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Factory::Factory(Entity *parent)
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 
@@ -87,7 +87,7 @@ void Factory::UpdateChild(UpdateParams &params)
   {
     std::string xmlString;
     std::string xmlMiddle = (const char*)(this->factoryIface->data->newModel);
-    
+
     xmlString = this->xmlPrefix + xmlMiddle + this->xmlSuffix;
 
     // Create the world file

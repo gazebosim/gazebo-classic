@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -61,23 +61,23 @@ OgreHUD::OgreHUD()
   this->hudPanel->setMetricsMode(Ogre::GMM_RELATIVE);
   hudOverlay->add2D(this->hudPanel);
 
-  // This overlay element is used to display the ouptut from one of the 
-  // cameras in the  Gazebo world. It renders the texture output from a 
+  // This overlay element is used to display the ouptut from one of the
+  // cameras in the  Gazebo world. It renders the texture output from a
   // camera to a 2D overlay.
   this->cameraPanel = static_cast<Ogre::PanelOverlayElement*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_CAMERA_PANEL_1__"));
   this->cameraPanel->setDimensions(1, 1);
   this->cameraPanel->setPosition(0, 0);
   hudOverlay->add2D(this->cameraPanel);
 
-/*  this->helpPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_HELP_PANEL_1__"));
-  this->helpPanel->setDimensions(1, 1);
-  this->helpPanel->setPosition(0, 0);
-  this->helpPanel->hide();
-  hudOverlay->add2D(this->helpPanel);
+  /*  this->helpPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_HELP_PANEL_1__"));
+    this->helpPanel->setDimensions(1, 1);
+    this->helpPanel->setPosition(0, 0);
+    this->helpPanel->hide();
+    hudOverlay->add2D(this->helpPanel);
 
-  this->CreateHelp();
-  this->CreateTextBoxes();
-  */
+    this->CreateHelp();
+    this->CreateTextBoxes();
+    */
 
   /*this->backgroundPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_BACKGROUND_PANEL__"));
   this->backgroundPanel->setDimensions(1, 1);
@@ -116,43 +116,43 @@ void OgreHUD::Close()
 /// Update the HUD.
 void OgreHUD::Update()
 {
-/*  std::ostringstream stream;
-  if (Global::GetUserPause())
-  {
-    this->SetText("__GAZEBO_HUD_PAUSE__","Paused");
-  }
-  else if (Global::GetUserStep())
-  {
-    this->SetText("__GAZEBO_HUD_PAUSE__","Step");
-  }
-  else
-  {
-    this->SetText("__GAZEBO_HUD_PAUSE__","");
-  }
+  /*  std::ostringstream stream;
+    if (Global::GetUserPause())
+    {
+      this->SetText("__GAZEBO_HUD_PAUSE__","Paused");
+    }
+    else if (Global::GetUserStep())
+    {
+      this->SetText("__GAZEBO_HUD_PAUSE__","Step");
+    }
+    else
+    {
+      this->SetText("__GAZEBO_HUD_PAUSE__","");
+    }
 
-  float lastFPS, avgFPS, bestFPS, worstFPS;
-  this->ogreAdaptor->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+    float lastFPS, avgFPS, bestFPS, worstFPS;
+    this->ogreAdaptor->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
 
-  stream.precision(2);
-  stream.flags(std::ios::showpoint | std::ios::fixed);
-  stream.fill('0');
+    stream.precision(2);
+    stream.flags(std::ios::showpoint | std::ios::fixed);
+    stream.fill('0');
 
-  stream << "FPS        [" << (int)avgFPS << "]\n"
-         << "Iterations [" << Global::GetIterations() << "]\n"
-         << "Time       [" << World::Instance()->GetRealTime() << " " 
-         << World::Instance()->GetSimTime() << " " 
-         << World::Instance()->GetPauseTime() << "]";
+    stream << "FPS        [" << (int)avgFPS << "]\n"
+           << "Iterations [" << Global::GetIterations() << "]\n"
+           << "Time       [" << World::Instance()->GetRealTime() << " "
+           << World::Instance()->GetSimTime() << " "
+           << World::Instance()->GetPauseTime() << "]";
 
 
-  this->SetText("__GAZEBO_HUD_STATS__",stream.str());
+    this->SetText("__GAZEBO_HUD_STATS__",stream.str());
 
-  stream.str("");
-  */
+    stream.str("");
+    */
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the camera pose text box 
+/// Set the camera pose text box
 void OgreHUD::SetCamera(const CameraSensor *camera)
 {
   if (!camera)
@@ -207,16 +207,16 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
   stream.fill('0');
 
   stream << camera->GetName() << " [" << camera->GetImageWidth() << " x " << camera->GetImageHeight() << "]\n";
- 
+
   pose -= Global::poseOffset;
 
-  stream << "  XYZ [" 
+  stream << "  XYZ ["
     << pose.pos.x   << " "
     << pose.pos.y << " "
     << pose.pos.z << "]\n";
 
-  stream << "  RPY [" 
-    << RTOD(pose.rot.GetRoll()) << " " 
+  stream << "  RPY ["
+    << RTOD(pose.rot.GetRoll()) << " "
     << RTOD(pose.rot.GetPitch()) << " "
     << RTOD(pose.rot.GetYaw()) << "]";
 
@@ -232,7 +232,7 @@ void OgreHUD::AddTextBox( const std::string& id,
                           Ogre::Real x, Ogre::Real y,
                           Ogre::Real width, Ogre::Real height,
                           const Ogre::ColourValue& color
-                          )
+                        )
 {
   Ogre::OverlayElement* textBox = this->overlayMgr->createOverlayElement("TextArea", id);
   textBox->setMetricsMode(Ogre::GMM_RELATIVE);
@@ -301,7 +301,7 @@ void OgreHUD::RemoveTextBox(const std::string& ID)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set text 
+/// Set text
 void OgreHUD::SetText(const std::string& ID, const std::string& Text)
 {
   Ogre::OverlayElement* textBox = this->overlayMgr->getOverlayElement(ID);
@@ -343,25 +343,25 @@ void OgreHUD::CreateTextBoxes()
   width = 0.15;
   height = 0.03;
   this->AddTextBox("__GAZEBO_HUD_STATS__","__GAZEBO_HUD_PANEL_1__","",left,top,width,height,Ogre::ColourValue::White);
-/*
-  //
-  // FPS text box
-  //
-  left = 0.015;
-  top = 0.94;
-  width = 0.15;
-  height = 0.04;
-  this->AddTextBox("__GAZEBO_HUD_FPS__","__GAZEBO_HUD_PANEL_1__","",left,top,width,height,Ogre::ColourValue::White);
+  /*
+    //
+    // FPS text box
+    //
+    left = 0.015;
+    top = 0.94;
+    width = 0.15;
+    height = 0.04;
+    this->AddTextBox("__GAZEBO_HUD_FPS__","__GAZEBO_HUD_PANEL_1__","",left,top,width,height,Ogre::ColourValue::White);
 
-  //
-  // Time text box
-  //
-  left = 0.015;
-  top = 0.94;
-  width = 0.15;
-  height = 0.04;
-  this->AddTextBox("__GAZEBO_HUD_FPS__","__GAZEBO_HUD_PANEL_1__","",left,top,width,height,Ogre::ColourValue::White);
-  */
+    //
+    // Time text box
+    //
+    left = 0.015;
+    top = 0.94;
+    width = 0.15;
+    height = 0.04;
+    this->AddTextBox("__GAZEBO_HUD_FPS__","__GAZEBO_HUD_PANEL_1__","",left,top,width,height,Ogre::ColourValue::White);
+    */
 
 
 }

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 ODEPhysics::ODEPhysics()
-  : PhysicsEngine()
+    : PhysicsEngine()
 {
   // Collision detection init
   dInitODE();
@@ -92,7 +92,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
   XMLConfigNode *cnode = node->GetChild("ode", "physics");
   if (cnode == NULL)
     gzthrow("Must define a <physics:ode> node in the XML file");
-  
+
   this->gravity = cnode->GetVector3("gravity",this->gravity);
   this->stepTime = cnode->GetDouble("stepTime",this->stepTime);
   this->globalCFM = cnode->GetDouble("cfm",1e-5,0);
@@ -135,7 +135,7 @@ void ODEPhysics::Update()
   //dWorldStepFast1( this->worldId, this->stepTime, 8 );
   //dWorldQuickStep(this->worldId, this->stepTime);
 
-  // Very important to clear out the contact group 
+  // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
 
 }
@@ -200,7 +200,7 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Return the space id 
+/// Return the space id
 dSpaceID ODEPhysics::GetSpaceId() const
 {
   return this->spaceId;
@@ -218,12 +218,12 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
   self = (ODEPhysics*) data;
 
-  // exit without doing anything if the two bodies are connected by a joint 
+  // exit without doing anything if the two bodies are connected by a joint
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 
 
-  if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact)) 
+  if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact))
     return;
 
 
@@ -278,13 +278,13 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         //contacts[i].surface.soft_cfm = 0.01;
 
         dJointID c = dJointCreateContact (self->worldId,
-            self->contactGroup, &contact);
+                                          self->contactGroup, &contact);
         dJointAttach (c,b1,b2);
       }
     }
   }
 }
-      
+
 ////////////////////////////////////////////////////////////////////////////////
 /*void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
@@ -297,7 +297,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   int num;
 
   self = (ODEPhysics*) data;
-  
+
   // Maximum number of contacts
   num = sizeof(contactGeoms) / sizeof(contactGeoms[0]);
 
@@ -340,7 +340,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     if (geom1->IsStatic() && geom2->IsStatic())
       printf("Geoms are static\n");
-    
+
     // Detect collisions betweed geoms
     n = dCollide(o1, o2, num, contactGeoms, sizeof(contactGeoms[0]));
 
@@ -357,10 +357,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       if (body1 && body2)
         if (dAreConnectedExcluding(body1, body2, dJointTypeContact))
           continue;
-         
+
       contactInfo.geom = contactGeoms[i];
       contactInfo.surface.mode = 0;
-      
+
       // Compute the CFM and ERP by assuming the two bodies form a
       // spring-damper system.
       double h, kp, kd;
@@ -377,7 +377,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       contactInfo.surface.mu2 = 0;
       contactInfo.surface.bounce = 0.1;
       contactInfo.surface.bounce_vel = 0.1;
-      
+
 
      // contactInfo.surface.mode = dContactSlip1 | dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
 
@@ -390,7 +390,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       // Compute slipping effects
       //contactInfo.surface.slip1 = (geom1->contact->slip1 + geom2->contact->slip1)/2.0;
       //contactInfo.surface.slip2 = (geom1->contact->slip2 + geom2->contact->slip2)/2.0;
-      
+
     std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
       // Construct a contact joint between the two bodies
       joint = dJointCreateContact(self->worldId, self->contactGroup, &contactInfo);
@@ -398,4 +398,4 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     }
   }
 }*/
-                                  
+

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@ std::map<std::string, SensorFactoryFn> SensorFactory::sensors;
 
 // Register a model class.  Use by dynamically loaded modules
 void SensorFactory::RegisterSensor(std::string type, std::string classname,
-                                 SensorFactoryFn factoryfn)
+                                   SensorFactoryFn factoryfn)
 {
   sensors[classname] = factoryfn;
 }
@@ -45,7 +45,7 @@ void SensorFactory::RegisterSensor(std::string type, std::string classname,
 // Create a new instance of a model.  Used by the world when reading
 // the world file.
 Sensor *SensorFactory::NewSensor(const std::string &classname, Body *body)
-{  
+{
   if (sensors[classname])
   {
     return (sensors[classname]) (body);

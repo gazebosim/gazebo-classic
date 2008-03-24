@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ Time::Time()
 }
 
 Time::Time( const Time &time )
-  : sec(time.sec), usec(time.usec)
+    : sec(time.sec), usec(time.usec)
 {
   this->Correct();
 }
@@ -49,7 +49,7 @@ Time::Time( const struct timeval &tv )
 }
 
 Time::Time(  int sec,  int usec )
-  : sec(sec), usec(usec)
+    : sec(sec), usec(usec)
 {
   this->Correct();
 }
@@ -237,8 +237,8 @@ const Time &Time::operator /=( const Time &time )
 // Equality operators
 bool Time::operator==( const struct timeval &tv ) const
 {
-  return this->sec==( int)tv.tv_sec && 
-    this->usec==tv.tv_usec;
+  return this->sec==( int)tv.tv_sec &&
+         this->usec==tv.tv_usec;
 }
 
 bool Time::operator==( const Time &time ) const
@@ -268,14 +268,14 @@ bool Time::operator!=( double time ) const
 
 bool Time::operator<( const struct timeval &tv ) const
 {
-  return this->sec < ( int)tv.tv_sec || 
-    (this->sec==( int)tv.tv_sec && this->usec < tv.tv_usec);
+  return this->sec < ( int)tv.tv_sec ||
+         (this->sec==( int)tv.tv_sec && this->usec < tv.tv_usec);
 }
 
 bool Time::operator<( const Time &time ) const
 {
-  return this->sec < time.sec || 
-    (this->sec==time.sec && this->usec < time.usec);
+  return this->sec < time.sec ||
+         (this->sec==time.sec && this->usec < time.usec);
 }
 
 bool Time::operator<( double time ) const
@@ -285,8 +285,8 @@ bool Time::operator<( double time ) const
 
 bool Time::operator<=( const struct timeval &tv ) const
 {
-  return this->sec <= ( int)tv.tv_sec || 
-    (this->sec==( int)tv.tv_sec && this->usec <= tv.tv_usec);
+  return this->sec <= ( int)tv.tv_sec ||
+         (this->sec==( int)tv.tv_sec && this->usec <= tv.tv_usec);
 }
 
 bool Time::operator<=( const Time &time ) const
@@ -301,8 +301,8 @@ bool Time::operator<=( double time ) const
 
 bool Time::operator>( const struct timeval &tv ) const
 {
-  return this->sec > (int)tv.tv_sec || 
-    (this->sec==( int)tv.tv_sec && this->usec > tv.tv_usec);
+  return this->sec > (int)tv.tv_sec ||
+         (this->sec==( int)tv.tv_sec && this->usec > tv.tv_usec);
 }
 
 bool Time::operator>( const Time &time ) const
@@ -317,8 +317,8 @@ bool Time::operator>( double time ) const
 
 bool Time::operator>=( const struct timeval &tv ) const
 {
-  return this->sec >= ( int)tv.tv_sec || 
-    (this->sec==( int)tv.tv_sec && this->usec >= tv.tv_usec);
+  return this->sec >= ( int)tv.tv_sec ||
+         (this->sec==( int)tv.tv_sec && this->usec >= tv.tv_usec);
 }
 
 bool Time::operator>=( const Time &time ) const
@@ -350,7 +350,9 @@ void Time::Correct()
   {
     this->sec++;
     this->usec = (int)(this->usec - 1e6);
-  } else if (this->usec < 0) {
+  }
+  else if (this->usec < 0)
+  {
     this->sec--;
     this->usec = (int)(this->usec + 1e6);
   }

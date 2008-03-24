@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@ enum {RIGHT, LEFT};
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Pioneer2_Gripper::Pioneer2_Gripper(Entity *parent )
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 

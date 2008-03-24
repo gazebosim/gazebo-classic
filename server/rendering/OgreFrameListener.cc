@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,62 +38,62 @@ using namespace gazebo;
 
 OgreFrameListener::OgreFrameListener()
 {
-/*  this->moveAmount = 1;
-  this->moveScale = 1;
-  this->rotateAmount = 1;
+  /*  this->moveAmount = 1;
+    this->moveScale = 1;
+    this->rotateAmount = 1;
 
-  //this->selectedObject = NULL;
+    //this->selectedObject = NULL;
 
-  OIS::ParamList pl;
-  size_t windowHnd = 0;
-  std::ostringstream windowHndStr;
+    OIS::ParamList pl;
+    size_t windowHnd = 0;
+    std::ostringstream windowHndStr;
 
-  OgreAdaptor::Instance()->window->getCustomAttribute("WINDOW",&windowHnd);
-  windowHndStr << windowHnd;
-  pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+    OgreAdaptor::Instance()->window->getCustomAttribute("WINDOW",&windowHnd);
+    windowHndStr << windowHnd;
+    pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
-  // Allow the cursor to be showen, and prevent Gazebo from hogging the
-  // cursor.
-  pl.insert(std::make_pair(std::string("x11_mouse_grab"), 
-                           std::string("false")));
-  pl.insert(std::make_pair(std::string("x11_mouse_hide"), 
-                           std::string("false")));
-  pl.insert(std::make_pair(std::string("x11_keyboard_grab"), 
-                           std::string("false")));
-  pl.insert(std::make_pair(std::string("XAutoRepeatOn"), 
-                           std::string("true")));
+    // Allow the cursor to be showen, and prevent Gazebo from hogging the
+    // cursor.
+    pl.insert(std::make_pair(std::string("x11_mouse_grab"),
+                             std::string("false")));
+    pl.insert(std::make_pair(std::string("x11_mouse_hide"),
+                             std::string("false")));
+    pl.insert(std::make_pair(std::string("x11_keyboard_grab"),
+                             std::string("false")));
+    pl.insert(std::make_pair(std::string("XAutoRepeatOn"),
+                             std::string("true")));
 
-  // Create the input manager
-  this->inputManager = OIS::InputManager::createInputSystem(pl);
+    // Create the input manager
+    this->inputManager = OIS::InputManager::createInputSystem(pl);
 
-  bool bufferedKeys = true;
-  bool bufferedMouse = true;
+    bool bufferedKeys = true;
+    bool bufferedMouse = true;
 
-  // Create the devices
-  this->mKeyboard = static_cast<OIS::Keyboard*>(this->inputManager->createInputObject( OIS::OISKeyboard, bufferedKeys));
-  this->mKeyboard->setEventCallback(this);
+    // Create the devices
+    this->mKeyboard = static_cast<OIS::Keyboard*>(this->inputManager->createInputObject( OIS::OISKeyboard, bufferedKeys));
+    this->mKeyboard->setEventCallback(this);
 
-  this->mMouse = static_cast<OIS::Mouse*>(this->inputManager->createInputObject( OIS::OISMouse, bufferedMouse));
-  this->mMouse->setEventCallback(this);
+    this->mMouse = static_cast<OIS::Mouse*>(this->inputManager->createInputObject( OIS::OISMouse, bufferedMouse));
+    this->mMouse->setEventCallback(this);
 
-  unsigned int width, height, depth;
-  int top, left;
-  OgreAdaptor::Instance()->window->getMetrics(width, height, depth, left, top);
-  const OIS::MouseState &mouseState = this->mMouse->getMouseState();
-  mouseState.width = width;
-  mouseState.height = height;
+    unsigned int width, height, depth;
+    int top, left;
+    OgreAdaptor::Instance()->window->getMetrics(width, height, depth, left, top);
+    const OIS::MouseState &mouseState = this->mMouse->getMouseState();
+    mouseState.width = width;
+    mouseState.height = height;
 
-  this->directionVec[0] = 0;
-  this->directionVec[1] = 0;
-  this->directionVec[2] = 0;
+    this->directionVec[0] = 0;
+    this->directionVec[1] = 0;
+    this->directionVec[2] = 0;
 
-  this->leftPressed = false;
-  this->rightPressed = false;
-  this->middlePressed = false;
+    this->leftPressed = false;
+    this->rightPressed = false;
+    this->middlePressed = false;
 
-  // Create ray scene query to handle mouse picking
-  this->raySceneQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(Ogre::Ray());
-  */
+    // Create ray scene query to handle mouse picking
+    this->raySceneQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(Ogre::Ray());
+    */
 }
 
 OgreFrameListener::~OgreFrameListener()
@@ -110,11 +110,11 @@ bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
   {
     OgreHUD::Instance()->SetCamera(camera);
   }
- 
+
   return true;
 }
 
-bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/) 
+bool OgreFrameListener::frameEnded( const Ogre::FrameEvent &/*evt*/)
 {
   return true;
 }
@@ -320,9 +320,9 @@ void OgreFrameListener::LeftMousePressed(const OIS::MouseEvent &e)
         break;
       }
     }
-    
+
   }
- 
+
   this->leftPressed = true;
 }
 

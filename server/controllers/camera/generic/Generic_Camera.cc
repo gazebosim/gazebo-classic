@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ GZ_REGISTER_STATIC_CONTROLLER("generic_camera", Generic_Camera);
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Generic_Camera::Generic_Camera(Entity *parent)
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<CameraSensor*>(this->parent);
 
@@ -102,13 +102,13 @@ void Generic_Camera::PutCameraData()
 
   // Data timestamp
   data->time = Simulator::Instance()->GetSimTime();
-  
+
   data->width = this->myParent->GetImageWidth();
   data->height = this->myParent->GetImageHeight();
   data->image_size = data->width * data->height * 3;
 
-   // GetFOV() returns radians
-  data->hfov = this->myParent->GetFOV(); 
+  // GetFOV() returns radians
+  data->hfov = this->myParent->GetFOV();
 
   // Set the pose of the camera
   cameraPose = this->myParent->GetWorldPose();
@@ -118,7 +118,7 @@ void Generic_Camera::PutCameraData()
   data->camera_pose.roll = cameraPose.rot.GetRoll();
   data->camera_pose.pitch = cameraPose.rot.GetPitch();
   data->camera_pose.yaw = cameraPose.rot.GetYaw();
- 
+
   // Make sure there is room to store the image
   assert (data->image_size <= sizeof(data->image));
 
@@ -130,18 +130,18 @@ void Generic_Camera::PutCameraData()
 
 
   // OGRE image data is A8 B8 G8 R8. Must convert to R8 G8 B8
-/*  for (i=0; i<data->height; i++)
-    for (j=0; j<data->width; j++)
-      for (k=2; k>=0; k--)
-        memcpy(dst + i*data->width*3 + j*3 + 2-k, 
-               src + i*data->width*4 + j*4 + k, 
-               1);
-               */
+  /*  for (i=0; i<data->height; i++)
+      for (j=0; j<data->width; j++)
+        for (k=2; k>=0; k--)
+          memcpy(dst + i*data->width*3 + j*3 + 2-k,
+                 src + i*data->width*4 + j*4 + k,
+                 1);
+                 */
 
   this->cameraIface->Unlock();
 
   // New data is available
   this->cameraIface->Post();
-  
+
 }
 

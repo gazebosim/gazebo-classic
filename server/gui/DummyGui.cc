@@ -35,15 +35,16 @@ GZ_REGISTER_STATIC_GUI("dummy", DummyGui);
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor: Creates a dummy window necessary to initialize and use GL rendering system.
 /// This window won't appear on the screen and is not used afterward.
-DummyGui::DummyGui(int x, int y, int width, int height, const std::string &t): 
-Gui (x,y,width,height, t)
+DummyGui::DummyGui(int x, int y, int width, int height, const std::string &t):
+    Gui (x,y,width,height, t)
 {
   this->display = XOpenDisplay(0);
   if (!this->display) gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
   int screen = DefaultScreen(this->display);
   int attribList[8] =
-      {GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
-      GLX_BLUE_SIZE, 8, None};
+    {GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
+     GLX_BLUE_SIZE, 8, None
+    };
   this->visual = glXChooseVisual(this->display, screen, (int *)attribList);
   this->windowId = XCreateSimpleWindow(this->display, RootWindow(this->display, screen), 0, 0, 1, 1, 0, 0, 0);
   this->context = glXCreateContext(this->display, this->visual, NULL, 1);
@@ -88,4 +89,4 @@ Display *DummyGui::GetDisplay() const
   return this->display;
 }
 
-      
+

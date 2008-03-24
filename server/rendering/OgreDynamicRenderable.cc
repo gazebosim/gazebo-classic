@@ -102,7 +102,7 @@ OgreDynamicRenderable::OperationType OgreDynamicRenderable::GetOperationType() c
 /// Prepares the hardware buffers for the requested vertex and index counts.
 void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexCount)
 {
-  // Prepare vertex buffer 
+  // Prepare vertex buffer
   size_t newVertCapacity = this->vertexBufferCapacity;
 
   if ((vertexCount > this->vertexBufferCapacity) || (!this->vertexBufferCapacity))
@@ -111,11 +111,11 @@ void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t in
     // It is necessary to reallocate the buffer.
 
     // Check if this is the first call
-    if (!newVertCapacity) 
+    if (!newVertCapacity)
       newVertCapacity = 1;
 
     // Make capacity the next power of two
-    while (newVertCapacity < vertexCount) 
+    while (newVertCapacity < vertexCount)
       newVertCapacity <<= 1;
 
   }
@@ -126,16 +126,16 @@ void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t in
       newVertCapacity >>= 1;
   }
 
-  if (newVertCapacity != this->vertexBufferCapacity) 
+  if (newVertCapacity != this->vertexBufferCapacity)
   {
     this->vertexBufferCapacity = newVertCapacity;
 
     // Create new vertex buffer
     Ogre::HardwareVertexBufferSharedPtr vbuf =
       Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-          this->mRenderOp.vertexData->vertexDeclaration->getVertexSize(0),
-          this->vertexBufferCapacity,
-          Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        this->mRenderOp.vertexData->vertexDeclaration->getVertexSize(0),
+        this->vertexBufferCapacity,
+        Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
     // TODO: Custom HBU_?
 
@@ -163,14 +163,14 @@ void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t in
         newIndexCapacity = 1;
 
       // Make capacity the next power of two
-      while (newIndexCapacity < indexCount) 
+      while (newIndexCapacity < indexCount)
         newIndexCapacity <<= 1;
 
     }
-    else if (indexCount < newIndexCapacity>>1) 
+    else if (indexCount < newIndexCapacity>>1)
     {
       // Make capacity the previous power of two
-      while (indexCount < newIndexCapacity>>1) 
+      while (indexCount < newIndexCapacity>>1)
         newIndexCapacity >>= 1;
     }
 
@@ -181,9 +181,9 @@ void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t in
       // Create new index buffer
       this->mRenderOp.indexData->indexBuffer =
         Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
-            Ogre::HardwareIndexBuffer::IT_16BIT,
-            this->indexBufferCapacity,
-            Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+          Ogre::HardwareIndexBuffer::IT_16BIT,
+          this->indexBufferCapacity,
+          Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
       // TODO: Custom HBU_?
     }
 
@@ -197,7 +197,7 @@ void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t in
 Ogre::Real OgreDynamicRenderable::getBoundingRadius() const
 {
   return Ogre::Math::Sqrt(std::max(mBox.getMaximum().squaredLength(),
-        mBox.getMinimum().squaredLength()));
+                                   mBox.getMinimum().squaredLength()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -92,9 +92,9 @@ OgreAdaptor::~OgreAdaptor()
 // Closes and free
 void OgreAdaptor::Close()
 {
-  GZ_DELETE (this->frameListener)  
+  GZ_DELETE (this->frameListener)
   GZ_DELETE (this->root) // All Ogre things should be shutdown and freed with this
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,9 +107,9 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   try
   {
-    // Make the root 
-    this->root = new Ogre::Root(); 
-  } 
+    // Make the root
+    this->root = new Ogre::Root();
+  }
   catch (Ogre::Exception e)
   {
     gzthrow("Unable to create an Ogre rendering environment, no Root ");
@@ -122,7 +122,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   {
     gzthrow( "missing OGRE Rendering information" );
   }
-  
+
   ambient.r = node->GetTupleDouble("ambient",0,1.0);
   ambient.g = node->GetTupleDouble("ambient",1,1.0);
   ambient.b = node->GetTupleDouble("ambient",2,1.0);
@@ -151,14 +151,14 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Load all the plugins
   this->LoadPlugins();
 
-  // Setup the available resources 
+  // Setup the available resources
   this->SetupResources();
 
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
 
   // Initialize the root node, and don't create a window
-  this->window = this->root->initialise(false); 
+  this->window = this->root->initialise(false);
 
   // Create a window for Ogre
   this->CreateWindow();
@@ -182,7 +182,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
   // Ambient lighting
-  this->sceneMgr->setAmbientLight(ambient); 
+  this->sceneMgr->setAmbientLight(ambient);
 
   // Settings for shadow mapping
   std::string shadowTechnique = node->GetString("shadowTechnique", "stencilAdditive");
@@ -198,7 +198,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->sceneMgr->setShadowTextureSize(node->GetInt("shadowTextureSize", 512));
   this->sceneMgr->setShadowIndexBufferSize( node->GetInt("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize()) );
 
-  
+
   // Add fog. This changes the background color
   OgreCreator::CreateFog(node);
 
@@ -219,7 +219,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
 
-  if (node->GetBool("grid", true)) 
+  if (node->GetBool("grid", true))
     OgreCreator::DrawGrid();
 
   // Set up the world geometry link
@@ -238,29 +238,29 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     }
   }
 
-/*
-  Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1"); 
-  Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node"); 
+  /*
+    Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1");
+    Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node");
 
-  Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material","debugger"); 
-  myManualObjectMaterial->setReceiveShadows(false); 
-  myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true); 
-  myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0,0,1,0); 
-  myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0,0,1); 
-  myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0,0,1); 
+    Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material","debugger");
+    myManualObjectMaterial->setReceiveShadows(false);
+    myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true);
+    myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0,0,1,0);
+    myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0,0,1);
+    myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0,0,1);
 
-  myManualObject->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST); 
-  myManualObject->position(0, 0, 0); 
-  myManualObject->position(0, 1, 0); 
-  myManualObject->position(0, 0, 0); 
-  myManualObject->position(0, 0, 1); 
-  myManualObject->position(0, 0, 0); 
-  myManualObject->position(1, 0, 0); 
-  // etc 
-  myManualObject->end(); 
-  myManualObjectNode->attachObject(myManualObject);
-  */
-  
+    myManualObject->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST);
+    myManualObject->position(0, 0, 0);
+    myManualObject->position(0, 1, 0);
+    myManualObject->position(0, 0, 0);
+    myManualObject->position(0, 0, 1);
+    myManualObject->position(0, 0, 0);
+    myManualObject->position(1, 0, 0);
+    // etc
+    myManualObject->end();
+    myManualObjectNode->attachObject(myManualObject);
+    */
+
   //delete [] mstr;
   //
 
@@ -277,7 +277,7 @@ void OgreAdaptor::Save(XMLConfigNode *node)
   rnode = node->GetChild("ogre", "rendering");
   if (!rnode)
     gzthrow( "missing OGRE Rendering information, can't write back the data" );
-  
+
   rnode->SetValue("ambient", this->backgroundColor);
   //TODO: BSP (when bsp are definitely integrated)
 
@@ -337,7 +337,7 @@ void OgreAdaptor::SetupResources()
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::iterator iter;
 
-  for (iter=Global::gazeboPaths.begin(); 
+  for (iter=Global::gazeboPaths.begin();
        iter!=Global::gazeboPaths.end(); iter++)
   {
     DIR *dir;
@@ -356,17 +356,17 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/Media/sets");
     archNames.push_back((*iter)+"/Media/maps");
 
-  
-  //we want to add all the material files of the sets
+
+    //we want to add all the material files of the sets
     if ((dir=opendir(((*iter)+"/Media/sets").c_str()))!= NULL)
     {
       std::string filename;
       struct dirent *dir_entry_p;
-      while( (dir_entry_p = readdir(dir))!=NULL )
+      while ( (dir_entry_p = readdir(dir))!=NULL )
       {
-         filename =(*iter)+"/Media/sets/"+ dir_entry_p->d_name;
-         //std::cout << filename << std::endl;
-         archNames.push_back(filename);
+        filename =(*iter)+"/Media/sets/"+ dir_entry_p->d_name;
+        //std::cout << filename << std::endl;
+        archNames.push_back(filename);
       }
       closedir(dir);
     }
@@ -375,7 +375,7 @@ void OgreAdaptor::SetupResources()
     {
       try
       {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation( *aiter, "FileSystem", "General"); 
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation( *aiter, "FileSystem", "General");
       }
       catch (Ogre::Exception)
       {
@@ -397,14 +397,15 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     int c = 0;
     Ogre::RenderSystem *selectedRenderSystem = NULL;
 
-    do 
+    do
     {
       if (c == (int)rsList->size())
         break;
 
       selectedRenderSystem = rsList->at(c);
       c++;
-    } while (selectedRenderSystem->getName().compare("OpenGL Rendering Subsystem")!= 0);
+    }
+    while (selectedRenderSystem->getName().compare("OpenGL Rendering Subsystem")!= 0);
 
     if (selectedRenderSystem == NULL)
     {

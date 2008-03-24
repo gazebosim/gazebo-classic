@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -101,12 +101,12 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
     gzthrow (err);
   }
 
-  
+
   // Create the simulator interface
   this->simIface = new SimulationIface();
   this->simIface->Create(this->server, "default" );
-  
-  
+
+
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 
   this->LoadEntities(rootNode, NULL);
@@ -168,7 +168,7 @@ int World::Update()
   std::vector< Model* >::iterator miter2;
 
   params.stepTime = this->physicsEngine->GetStepTime();
-  
+
   // Update all the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
@@ -186,17 +186,17 @@ int World::Update()
   this->UpdateSimulationIface();
 
   // Copy the newly created models into the main model vector
-  std::copy(this->toAddModels.begin(), this->toAddModels.end(), 
-      std::back_inserter(this->models));
+  std::copy(this->toAddModels.begin(), this->toAddModels.end(),
+            std::back_inserter(this->models));
   this->toAddModels.clear();
 
 
   // Remove and delete all models that are marked for deletion
-  for (miter=this->toDeleteModels.begin(); 
+  for (miter=this->toDeleteModels.begin();
        miter!=this->toDeleteModels.end(); miter++)
   {
     this->models.erase(
-        std::remove(this->models.begin(), this->models.end(), *miter) );
+      std::remove(this->models.begin(), this->models.end(), *miter) );
     delete *miter;
   }
 
@@ -316,13 +316,13 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent)
 
   if (parent != NULL)
     model->Attach(node->GetChild("attach"));
-    
+
   return model;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the model pose and the pose of it's attached children 
+// Set the model pose and the pose of it's attached children
 void World::SetModelPose(Model *model , Pose3d pose)
 {
   std::vector<Entity*>::iterator iter;
@@ -340,7 +340,7 @@ void World::SetModelPose(Model *model , Pose3d pose)
     newPose = pose;
 
   // Recursively move children
-  for (iter=model->GetChildren().begin(); 
+  for (iter=model->GetChildren().begin();
        iter!=model->GetChildren().end(); iter++)
   {
     child = dynamic_cast<Model*>(*iter);
@@ -406,7 +406,7 @@ void World::RegisterGeom(Geom *geom)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// True if the bounding boxes of the models are being shown 
+// True if the bounding boxes of the models are being shown
 bool World::GetShowBoundingBoxes()
 {
   return this->showBoundingBoxes;
@@ -501,26 +501,26 @@ void World::UpdateSimulationIface()
     this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
     this->simIface->data->realTime = Simulator::Instance()->GetRealTime();
     this->simIface->data->state = !Simulator::Instance()->GetUserPause();
-    
+
     if (this->simIface->data->reset)
     {
       this->Reset();
       this->simIface->data->reset = 0;
     }
-    
+
     if (this->simIface->data->pause)
     {
       Simulator::Instance()->SetUserPause(!Simulator::Instance()->GetUserPause());
       this->simIface->data->pause = 0;
     }
-    
+
     //TODO: save as , load
     if (this->simIface->data->save)
     {
       Simulator::Instance()->Save();
       this->simIface->data->save=0;
     }
-    
+
     // If the model_name is set, then a request has been received
     if (strcmp((char*)this->simIface->data->model_name,"")!=0)
     {
@@ -551,8 +551,8 @@ void World::UpdateSimulationIface()
           pose.pos.y = this->simIface->data->model_pose.pos.y;
           pose.pos.z = this->simIface->data->model_pose.pos.z;
           pose.rot.SetFromEuler(Vector3(this->simIface->data->model_pose.roll,
-                this->simIface->data->model_pose.pitch,
-                this->simIface->data->model_pose.yaw));
+                                        this->simIface->data->model_pose.pitch,
+                                        this->simIface->data->model_pose.yaw));
           model->SetPose(pose);
         }
         else if (req == "set_pose2d")
@@ -564,7 +564,7 @@ void World::UpdateSimulationIface()
           pose.pos.y = this->simIface->data->model_pose.pos.y;
 
           pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
-                this->simIface->data->model_pose.yaw));
+                                        this->simIface->data->model_pose.yaw));
           model->SetPose(pose);
         }
 

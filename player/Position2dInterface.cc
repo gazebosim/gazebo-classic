@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,12 +44,12 @@
 #include "Position2dInterface.hh"
 
 using namespace gazebo;
- 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-Position2dInterface::Position2dInterface(player_devaddr_t addr, 
+Position2dInterface::Position2dInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -68,20 +68,20 @@ Position2dInterface::Position2dInterface(player_devaddr_t addr,
 Position2dInterface::~Position2dInterface()
 {
   // Release this interface
-  delete this->iface; 
+  delete this->iface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                        player_msghdr_t *hdr, void *data)
 {
   if (this->iface->Lock(1))
   {
 
     // COMMAND VELOCITY:
-    if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-          PLAYER_POSITION2D_CMD_VEL, this->device_addr))
+    if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                              PLAYER_POSITION2D_CMD_VEL, this->device_addr))
     {
       player_position2d_cmd_vel_t *cmd;
 
@@ -95,8 +95,8 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
     }
 
     // REQUEST SET ODOMETRY
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-          PLAYER_POSITION2D_REQ_SET_ODOM, this->device_addr))
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                   PLAYER_POSITION2D_REQ_SET_ODOM, this->device_addr))
     {
       if (hdr->size != sizeof(player_position2d_set_odom_req_t))
       {
@@ -111,22 +111,22 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
       this->iface->data->pose.yaw = odom->pose.pa;
 
       this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_SET_ODOM);
+                            PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_SET_ODOM);
 
       return 0;
     }
 
     // CMD Set Motor Power
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-          PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                   PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
     {
       // TODO
       return 0;
     }
 
     // REQUEST SET MOTOR POWER
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-          PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                   PLAYER_POSITION2D_REQ_MOTOR_POWER, this->device_addr))
     {
       if (hdr->size != sizeof(player_position2d_power_config_t))
       {
@@ -141,14 +141,14 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
       this->iface->data->cmdEnableMotors = power->state;
 
       this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
+                            PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_MOTOR_POWER);
 
       return 0;
     }
 
     // REQUEST GET GEOMETRY
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-          PLAYER_POSITION2D_REQ_GET_GEOM, this->device_addr))
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                   PLAYER_POSITION2D_REQ_GET_GEOM, this->device_addr))
     {
       if (hdr->size != 0)
       {
@@ -171,16 +171,16 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
       geom.size.sh = 0.31;
 
       this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, 
-          PLAYER_POSITION2D_REQ_GET_GEOM, 
-          &geom, sizeof(geom), NULL);
+                            PLAYER_MSGTYPE_RESP_ACK,
+                            PLAYER_POSITION2D_REQ_GET_GEOM,
+                            &geom, sizeof(geom), NULL);
 
       return 0;
     }
 
     // REQUEST RESET ODOMETRY
-    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-          PLAYER_POSITION2D_REQ_RESET_ODOM, this->device_addr))
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                   PLAYER_POSITION2D_REQ_RESET_ODOM, this->device_addr))
     {
       if (hdr->size != 0)
       {
@@ -191,14 +191,14 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
       // TODO: Make this work!!
       //
       this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_RESET_ODOM);
+                            PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION2D_REQ_RESET_ODOM);
 
       return 0;
     }
 
     this->iface->Unlock();
   }
-  else 
+  else
     this->Unsubscribe();
 
   return -1;
@@ -235,10 +235,10 @@ void Position2dInterface::Update()
 
       data.stall = (uint8_t) this->iface->data->stall;
 
-      this->driver->Publish( this->device_addr, 
-          PLAYER_MSGTYPE_DATA,
-          PLAYER_POSITION2D_DATA_STATE, 
-          (void*)&data, sizeof(data), &this->datatime );
+      this->driver->Publish( this->device_addr,
+                             PLAYER_MSGTYPE_DATA,
+                             PLAYER_POSITION2D_DATA_STATE,
+                             (void*)&data, sizeof(data), &this->datatime );
 
     }
 
@@ -263,7 +263,7 @@ void Position2dInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Position2d Interface\n"
-           << e << "\n";
+    << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Gazebo (simulator) client functions 
+/* Desc: Gazebo (simulator) client functions
  * Author: Nate Koenig, Andrew Howard
  * Date: 2 March 2006
  * CVS: $Id$
@@ -41,7 +41,7 @@ const char *GazeboClient::prefixId = "";
 extern PlayerTime* GlobalTime;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Initialize 
+// Initialize
 void GazeboClient::Init(int serverid, const char *prefixid)
 {
 

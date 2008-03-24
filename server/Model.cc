@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -54,7 +54,7 @@ uint Model::lightNumber = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Model::Model(Model *parent)
-  : Entity(parent)
+    : Entity(parent)
 {
   this->type = "";
   this->joint = NULL;
@@ -80,7 +80,7 @@ Model::~Model()
   }
   this->joints.clear();
 
-  for (citer = this->controllers.begin(); 
+  for (citer = this->controllers.begin();
        citer != this->controllers.end(); citer++)
   {
     delete citer->second;
@@ -94,7 +94,7 @@ int Model::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
   Pose3d pose;
-    
+
   this->xmlNode = node;
   this->type=node->GetName();
   this->SetName(node->GetString("name",std::string(),1));
@@ -139,18 +139,18 @@ int Model::Load(XMLConfigNode *node)
   {
     this->canonicalBodyName = this->bodies.begin()->first;
   }
-  
+
   // Get the position and orientation of the model (relative to parent)
   pose.Reset();
   pose.pos = node->GetVector3( "xyz", pose.pos );
   pose.rot = node->GetRotation( "rpy", pose.rot );
-  
+
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);
-  
-  
+
+
   return this->LoadChild(node);
-  
+
   // Get the name of the python module
   /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
   //this->pName.reset(PyString_FromString("pioneer2dx"));
@@ -163,7 +163,7 @@ int Model::Load(XMLConfigNode *node)
   }
 
   // Get the Update function from the module
-  if (this->pModule) 
+  if (this->pModule)
   {
     this->pFuncUpdate.reset(PyObject_GetAttrString(this->pModule, "Update"));
     if (this->pFuncUpdate && !PyCallable_Check(this->pFuncUpdate))
@@ -171,7 +171,7 @@ int Model::Load(XMLConfigNode *node)
   }
   */
 
-  
+
 }
 
 void Model::Test()
@@ -184,46 +184,47 @@ void Model::Save()
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   std::map<std::string, Joint* >::iterator jointIter;
-  
+
   this->xmlNode->SetValue("name", this->GetName());
-  this->xmlNode->SetValue("xyz", this->pose.pos); 
+  this->xmlNode->SetValue("xyz", this->pose.pos);
   this->xmlNode->SetValue("rpy", this->pose.rot);
   this->xmlNode->SetValue("static", this->IsStatic());
   //TODO: Attach tag
   if (this->type=="renderable")
   {
-  // TODO: lights  
-  }  
+    // TODO: lights
+  }
   else if (this->type=="physical")
   {
     this->xmlNode->SetValue("canonicalBody",this->canonicalBodyName);
-    
+
     for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
     {
       if (bodyIter->second)
       {
         bodyIter->second->Save();
-        
+
       }
     }
-    
+
     for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
     {
-       //TODO:When joints can be changed with the GUI..
+      //TODO:When joints can be changed with the GUI..
     }
-  
+
   }
   else // empty
   {
   }
-  
-  for (contIter=this->controllers.begin(); 
+
+  for (contIter=this->controllers.begin();
        contIter!=this->controllers.end(); contIter++)
-  { //TODO: when the controllers can be changed (maybe reload the XML is the best way)
+  {
+    //TODO: when the controllers can be changed (maybe reload the XML is the best way)
     if (contIter->second)
       contIter->second->Save();
   }
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,10 +237,10 @@ int Model::Init()
   for (biter = this->bodies.begin(); biter!=this->bodies.end(); biter++)
     biter->second->Init();
 
-  for (contIter=this->controllers.begin(); 
+  for (contIter=this->controllers.begin();
        contIter!=this->controllers.end(); contIter++)
   {
-      contIter->second->Init();
+    contIter->second->Init();
   }
 
   /*this->mtext = new MovableText(this->GetName(), "this is the caption");
@@ -269,10 +270,10 @@ int Model::Update(UpdateParams &params)
     }
   }
 
-  for (contIter=this->controllers.begin(); 
+  for (contIter=this->controllers.begin();
        contIter!=this->controllers.end(); contIter++)
   {
-    
+
     if (contIter->second)
       contIter->second->Update(params);
   }
@@ -287,7 +288,7 @@ int Model::Update(UpdateParams &params)
   {
     boost::python::call<void>(this->pFuncUpdate, this);
   }*/
- 
+
   Body *b = NULL;
   if (!this->canonicalBodyName.empty())
   {
@@ -305,17 +306,17 @@ int Model::Fini()
   std::map<std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
 
-  for (contIter = this->controllers.begin(); 
+  for (contIter = this->controllers.begin();
        contIter != this->controllers.end(); contIter++)
   {
     contIter->second->Fini();
   }
-  
+
   for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
   {
     biter->second->Fini();
   }
- 
+
   return this->FiniChild();
 }
 
@@ -398,7 +399,7 @@ void Model::SetPose(const Pose3d &setPose)
     // Compute the new pose
     bodyPose += this->pose;
 
-   
+
     body->SetPose(bodyPose);
   }
 
@@ -416,7 +417,7 @@ const Pose3d &Model::GetPose() const
 Body *Model::CreateBody()
 {
   // Create a new body
-  return World::Instance()->GetPhysicsEngine()->CreateBody(this); 
+  return World::Instance()->GetPhysicsEngine()->CreateBody(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -448,7 +449,7 @@ void Model::LoadBody(XMLConfigNode *node)
   // Create a new body
   Body *body = this->CreateBody();
 
-  // Load the body using the config node. This also loads all of the 
+  // Load the body using the config node. This also loads all of the
   // bodies geometries
   body->Load(node);
 
@@ -502,7 +503,7 @@ void Model::LoadJoint(XMLConfigNode *node)
 
   joint->SetModel(this);
 
-  // Attach two bodies 
+  // Attach two bodies
   joint->Attach(body1,body2);
 
   Vector3 anchorVec = anchorBody->GetPosition() + anchorOffset;
@@ -557,7 +558,7 @@ void Model::LoadController(XMLConfigNode *node)
     catch (GazeboError e)
     {
       std::cerr << "Error Loading Controller[" <<  controllerName
-        << "]\n" << e << std::endl;
+      << "]\n" << e << std::endl;
       delete controller;
       return;
     }
@@ -592,7 +593,7 @@ Body *Model::GetBody(const std::string &name)
   }
   return NULL;
 }
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Attach this model to its parent
 void Model::Attach(XMLConfigNode *node)
@@ -629,12 +630,12 @@ void Model::Attach(XMLConfigNode *node)
   this->joint->SetParam( dParamHiStop, 0);
   this->joint->SetParam( dParamLoStop, 0);
 
-/*  if (this->spaceId)
-  {
-    dSpaceDestroy(this->spaceId);
-    this->spaceId = parentModel->spaceId;
-  }
-  */
+  /*  if (this->spaceId)
+    {
+      dSpaceDestroy(this->spaceId);
+      this->spaceId = parentModel->spaceId;
+    }
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -678,14 +679,14 @@ void Model::LoadPhysical(XMLConfigNode *node)
 
   while (childNode)
   {
-    try 
+    try
     {
       this->LoadBody(childNode);
     }
     catch (GazeboError e)
     {
       std::cerr << "Error Loading body[" << childNode->GetString("name",std::string(), 0) << "]\n";
-      std::cerr <<  e << std::endl; 
+      std::cerr <<  e << std::endl;
       childNode = childNode->GetNextByNSPrefix("body");
       continue;
     }
@@ -697,17 +698,17 @@ void Model::LoadPhysical(XMLConfigNode *node)
 
   while (childNode)
   {
-    try 
+    try
     {
       this->LoadJoint(childNode);
     }
     catch (GazeboError e)
     {
       std::cerr << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
-      std::cerr <<  e << std::endl; 
+      std::cerr <<  e << std::endl;
       childNode = childNode->GetNextByNSPrefix("joint");
       continue;
-  }
+    }
     childNode = childNode->GetNextByNSPrefix("joint");
   }
 

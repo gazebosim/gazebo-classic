@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 Hinge2Joint::Hinge2Joint( dWorldID worldId )
-  : Joint()
+    : Joint()
 {
   this->jointId = dJointCreateHinge2( worldId, NULL );
 }
@@ -70,7 +70,7 @@ void Hinge2Joint::LoadChild(XMLConfigNode *node)
   this->SetParam(dParamLoStop2, loStop2);
   this->SetParam(dParamHiStop2, hiStop2);
 }
- 
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Get anchor point
@@ -85,8 +85,8 @@ Vector3 Hinge2Joint::GetAnchor() const
 //////////////////////////////////////////////////////////////////////////////
 // Get the second anchor point
 Vector3 Hinge2Joint::GetAnchor2() const
-{ 
-  dVector3 result; 
+{
+  dVector3 result;
   dJointGetHinge2Anchor2( this->jointId, result );
   return Vector3(result[0], result[1], result[2]);
 }
@@ -96,7 +96,7 @@ Vector3 Hinge2Joint::GetAnchor2() const
 // Get first axis of rotation
 Vector3 Hinge2Joint::GetAxis1() const
 {
-  dVector3 result; 
+  dVector3 result;
   dJointGetHinge2Axis1( this->jointId, result );
   return Vector3(result[0], result[1], result[2]);
 }
@@ -106,7 +106,7 @@ Vector3 Hinge2Joint::GetAxis1() const
 // Get second axis of rotation
 Vector3 Hinge2Joint::GetAxis2() const
 {
-  dVector3 result; 
+  dVector3 result;
   dJointGetHinge2Axis2( this->jointId, result );
   return Vector3(result[0], result[1], result[2]);
 }

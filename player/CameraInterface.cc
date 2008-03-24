@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -35,9 +35,9 @@ using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-CameraInterface::CameraInterface(player_devaddr_t addr, 
-    GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+CameraInterface::CameraInterface(player_devaddr_t addr,
+                                 GazeboDriver *driver, ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -65,7 +65,7 @@ CameraInterface::~CameraInterface()
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int CameraInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                    player_msghdr_t *hdr, void *data)
 {
   return -1;
 }
@@ -77,7 +77,7 @@ void CameraInterface::Update()
 {
   size_t size;
   char filename[256];
- 
+
   struct timeval ts;
 
   this->iface->Lock(1);
@@ -112,19 +112,19 @@ void CameraInterface::Update()
 
     printf("1\n");
     // Set the image pixels
-    memcpy(this->data.image, this->iface->data->image, 
-        this->iface->data->image_size);
+    memcpy(this->data.image, this->iface->data->image,
+           this->iface->data->image_size);
     printf("2\n");
 
-    size = sizeof(this->data) - sizeof(this->data.image) + 
-      this->iface->data->image_size;
+    size = sizeof(this->data) - sizeof(this->data.image) +
+           this->iface->data->image_size;
     printf("3\n");
 
     // Send data to server
     this->driver->Publish(this->device_addr,
-                  PLAYER_MSGTYPE_DATA,
-                  PLAYER_CAMERA_DATA_STATE,
-                  (void*)&this->data, size, &this->datatime);
+                          PLAYER_MSGTYPE_DATA,
+                          PLAYER_CAMERA_DATA_STATE,
+                          (void*)&this->data, size, &this->datatime);
     printf("4\n");
 
     // Save frames
@@ -154,7 +154,7 @@ void CameraInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Camera Interface\n"
-           << e << "\n";
+    << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }
@@ -186,7 +186,7 @@ void CameraInterface::SaveFrame(const char *filename)
 
   if (this->data.format == PLAYER_CAMERA_FORMAT_RGB888)
   {
-    // Write ppm  
+    // Write ppm
     fprintf(file, "P6\n%d %d\n%d\n", width, height, 255);
     for (i = 0; i < height; i++)
       fwrite(this->data.image + i * rowSize, rowSize, 1, file);

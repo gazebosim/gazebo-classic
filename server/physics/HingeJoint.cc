@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 HingeJoint::HingeJoint( dWorldID worldId )
-  : Joint()
+    : Joint()
 {
   this->jointId = dJointCreateHinge( worldId, NULL );
 }
@@ -65,7 +65,7 @@ void HingeJoint::LoadChild(XMLConfigNode *node)
   this->SetAxis(axis);
 }
 
-// Get the anchor point 
+// Get the anchor point
 //////////////////////////////////////////////////////////////////////////////
 Vector3 HingeJoint::GetAnchor( ) const
 {
@@ -123,7 +123,7 @@ void HingeJoint::SetAnchor( const Vector3 &anchor )
 // Set the axis of rotation
 void HingeJoint::SetAxis( const Vector3 &axis )
 {
- dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
+  dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
 }
 
 

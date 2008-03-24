@@ -21,7 +21,7 @@ int main()
   }
 
   /// Open the Simulation Interface
-  try 
+  try
   {
     simIface->Open(client, "default");
   }
@@ -39,7 +39,7 @@ int main()
   catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect to the position interface\n"
-      << e << "\n";
+    << e << "\n";
     return -1;
   }
 

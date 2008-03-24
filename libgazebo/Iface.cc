@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -97,7 +97,7 @@ std::string Iface::Filename(std::string id)
     stream  << this->client->filename << "/" << this->type << "." << id;
   }
 
-  this->filename = stream.str();  
+  this->filename = stream.str();
 
   return this->filename;
 }
@@ -126,10 +126,10 @@ void Iface::Create(Server *server, std::string id)
     stream << "invalid id [" << id << "] (must not contain '.')";
     throw(stream.str());
   }
-  
+
   // Work out the filename
   this->Filename(id);
-  
+
   // Create and open the file
   this->mmapFd = open(this->filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
 
@@ -164,13 +164,13 @@ void Iface::Create(Server *server, std::string id)
   std::ios_base::fmtflags origFlags = std::cout.flags();
 
   // Print the name, version info
-  std::cout << "creating " << this->filename.c_str() << " " 
+  std::cout << "creating " << this->filename.c_str() << " "
 
-           << setiosflags(std::ios::hex | std::ios::showbase) 
-           << std::setw(3) << ((Iface*) this->mMap)->version << " " 
+  << setiosflags(std::ios::hex | std::ios::showbase)
+  << std::setw(3) << ((Iface*) this->mMap)->version << " "
 
-           << std::setiosflags(std::ios::dec | ~std::ios::showbase) 
-           << ((Iface*) this->mMap)->size << "\n";
+  << std::setiosflags(std::ios::dec | ~std::ios::showbase)
+  << ((Iface*) this->mMap)->size << "\n";
 
   std::cout.flags(origFlags);
 }
@@ -178,8 +178,8 @@ void Iface::Create(Server *server, std::string id)
 //////////////////////////////////////////////////////////////////////////////
 // Create the interface
 void Iface::Create(Server *server, std::string id,
-                  const std::string &modelType, int modelId, 
-                  int parentModelId)
+                   const std::string &modelType, int modelId,
+                   int parentModelId)
 {
 
   this->creator = true;
@@ -233,7 +233,7 @@ void Iface::Open(Client *client, std::string id)
 
   this->creator = false;
   this->client = client;
-  
+
   // Work out the filename
   this->Filename(id);
 
@@ -241,8 +241,8 @@ void Iface::Open(Client *client, std::string id)
   this->mmapFd = open(this->filename.c_str(), O_RDWR);
   if (this->mmapFd <= 0)
   {
-    stream << "error opening device file " <<  this->filename.c_str() << " : " 
-           << strerror(errno);
+    stream << "error opening device file " <<  this->filename.c_str() << " : "
+    << strerror(errno);
     throw(stream.str());
   }
 
@@ -254,33 +254,33 @@ void Iface::Open(Client *client, std::string id)
   {
     stream << "error mapping device file: " << strerror(errno);
     throw(stream.str());
-  }    
+  }
 
   // Make sure everything is consistent
   if (((Iface*) this->mMap)->size < this->size)
   {
-    stream << "expected file size: " << ((Iface*) this->mMap)->size 
-           << " < " <<  this->size;
+    stream << "expected file size: " << ((Iface*) this->mMap)->size
+    << " < " <<  this->size;
 
     throw(stream.str());
   }
- 
+
   std::ios_base::fmtflags origFlags = std::cout.flags();
 
   // Print the name, version info
   std::cout << "opening " << this->filename.c_str() << " "
 
-           << std::setiosflags(std::ios::hex | std::ios::showbase) 
-           << std::setw(3) << ((Iface*) this->mMap)->version << " "
+  << std::setiosflags(std::ios::hex | std::ios::showbase)
+  << std::setw(3) << ((Iface*) this->mMap)->version << " "
 
-           << std::setiosflags(std::ios::dec | ~std::ios::showbase) 
-           << ((Iface*) this->mMap)->size << "\n";
+  << std::setiosflags(std::ios::dec | ~std::ios::showbase)
+  << ((Iface*) this->mMap)->size << "\n";
 
   std::cout.setf(origFlags);
 
   ((Iface*)this->mMap)->openCount++;
   this->openCount++;
-}  
+}
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ void Iface::Close()
 int Iface::Lock(int /*blocking*/)
 {
   // Some 2.4 kernels seem to screw up the lock count somehow; keep an eye out
-  
+
   //printf("  lock %p %s\n", this, this->filename);
 
   // Lock the file
@@ -329,7 +329,7 @@ int Iface::Lock(int /*blocking*/)
 // Unlock the interface
 int Iface::Unlock()
 {
-  
+
   // Unlock the file
   if (flock(this->mmapFd, LOCK_UN) != 0)
   {

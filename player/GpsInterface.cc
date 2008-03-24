@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -39,9 +39,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-GpsInterface::GpsInterface(player_devaddr_t addr, GazeboDriver *driver, 
-                          ConfigFile *cf, int section)
-: GazeboInterface(addr, driver, cf, section)
+GpsInterface::GpsInterface(player_devaddr_t addr, GazeboDriver *driver,
+                           ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -59,13 +59,13 @@ GpsInterface::GpsInterface(player_devaddr_t addr, GazeboDriver *driver,
 GpsInterface::~GpsInterface()
 {
   // Release this interface
-  gz_gps_free(this->iface); 
+  gz_gps_free(this->iface);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages.  This is called from GazeboDriver
 int GpsInterface::ProcessMessage(QueuePointer &respQueue, player_msghdr_t *hdr,
-                             void *data)
+                                 void *data)
 {
   return 0;
 }
@@ -95,16 +95,16 @@ void GpsInterface::Update()
     data.longitude = (int32_t) (1e7 * this->iface->data->longitude);
     data.altitude =  (int32_t) this->iface->data->altitude;
     data.utm_e = this->iface->data->utm_e;
-    data.utm_n = this->iface->data->utm_n;       
-    // data.quality = this->iface->data->quality;     
-    // data.hdop = (uint32_t) this->iface->data->hdop; 
+    data.utm_n = this->iface->data->utm_n;
+    // data.quality = this->iface->data->quality;
+    // data.hdop = (uint32_t) this->iface->data->hdop;
     // data.vdop = (uint32_t) this->iface->data->vdop;
     // data.err_horz = this->iface->data->err_horz;
     // data.err_vert = this->iface->data->err_vert;
 
-    this->driver->Publish( this->device_addr, NULL, PLAYER_MSGTYPE_DATA, 
-        PLAYER_GPS_DATA_STATE, (void*)&data, 
-        sizeof(data), &this->datatime);
+    this->driver->Publish( this->device_addr, NULL, PLAYER_MSGTYPE_DATA,
+                           PLAYER_GPS_DATA_STATE, (void*)&data,
+                           sizeof(data), &this->datatime);
 
   }
 

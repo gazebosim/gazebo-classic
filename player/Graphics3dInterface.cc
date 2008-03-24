@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,9 +40,9 @@ using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr, 
+Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -58,21 +58,21 @@ Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr,
 Graphics3dInterface::~Graphics3dInterface()
 {
   // Release this interface
-  delete this->iface; 
+  delete this->iface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
-                   player_msghdr_t *hdr, void *data)
+                                        player_msghdr_t *hdr, void *data)
 {
   int result = -1;
 
   this->iface->Lock(1);
 
   // COMMAND CLEAR:
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_GRAPHICS3D_CMD_CLEAR, this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                            PLAYER_GRAPHICS3D_CMD_CLEAR, this->device_addr))
   {
     player_graphics3d_cmd_draw_t *cmd;
 
@@ -84,8 +84,8 @@ int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
   }
 
   // COMMAND DRAW:
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_GRAPHICS3D_CMD_DRAW, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_GRAPHICS3D_CMD_DRAW, this->device_addr))
   {
     player_graphics3d_cmd_draw_t *cmd;
 
@@ -130,12 +130,12 @@ void Graphics3dInterface::Subscribe()
   try
   {
     this->iface->Open(GazeboClient::client, this->gz_id);
-  } 
+  }
   catch (std::string e)
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Graphics3d Interface\n"
-           << e << "\n";
+    << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }

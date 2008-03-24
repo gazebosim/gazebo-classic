@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -45,9 +45,9 @@ using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-PTZInterface::PTZInterface(player_devaddr_t addr, 
-    GazeboDriver *driver, ConfigFile *cf, int section)
-: GazeboInterface(addr, driver, cf, section)
+PTZInterface::PTZInterface(player_devaddr_t addr,
+                           GazeboDriver *driver, ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -65,17 +65,17 @@ PTZInterface::PTZInterface(player_devaddr_t addr,
 PTZInterface::~PTZInterface()
 {
   // Release this interface
-  delete this->iface; 
+  delete this->iface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int PTZInterface::ProcessMessage(QueuePointer &respQueue,
-    player_msghdr_t *hdr, void *data)
+                                 player_msghdr_t *hdr, void *data)
 {
 
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_PTZ_CMD_STATE, this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                            PLAYER_PTZ_CMD_STATE, this->device_addr))
   {
     player_ptz_cmd_t *cmd;
 
@@ -93,10 +93,10 @@ int PTZInterface::ProcessMessage(QueuePointer &respQueue,
   }
 
   // Is it a request for ptz geometry?
-  else if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_PTZ_REQ_GEOM, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_PTZ_REQ_GEOM, this->device_addr))
   {
-    if(hdr->size == 0)
+    if (hdr->size == 0)
     {
       // TODO: Implement this
       player_ptz_geom_t pgeom;
@@ -108,14 +108,14 @@ int PTZInterface::ProcessMessage(QueuePointer &respQueue,
       pgeom.pos.ppitch = 0;
       pgeom.pos.pyaw   =0;
 
-      pgeom.size.sl = 0; 
-      pgeom.size.sw = 0; 
-      pgeom.size.sh = 0; // same as sl.  
+      pgeom.size.sl = 0;
+      pgeom.size.sw = 0;
+      pgeom.size.sh = 0; // same as sl.
 
       this->driver->Publish( this->device_addr, respQueue,
-         PLAYER_MSGTYPE_RESP_ACK, 
-         PLAYER_PTZ_REQ_GEOM,
-         (void*)&pgeom, sizeof(pgeom), NULL );
+                             PLAYER_MSGTYPE_RESP_ACK,
+                             PLAYER_PTZ_REQ_GEOM,
+                             (void*)&pgeom, sizeof(pgeom), NULL );
 
       return(0);
     }
@@ -153,10 +153,10 @@ void PTZInterface::Update()
     data.zoom = this->iface->data->zoom;
 
     this->driver->Publish( this->device_addr,
-                   PLAYER_MSGTYPE_DATA,
-                   PLAYER_PTZ_DATA_STATE,      
-                   (void*)&data, sizeof(data), &this->datatime );
- 
+                           PLAYER_MSGTYPE_DATA,
+                           PLAYER_PTZ_DATA_STATE,
+                           (void*)&data, sizeof(data), &this->datatime );
+
 
   }
 

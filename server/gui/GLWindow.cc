@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -46,8 +46,8 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-GLWindow::GLWindow(int x, int y, int w, int h, const std::string &label) 
-  : Fl_Gl_Window( x, y, w, h, label.c_str() )
+GLWindow::GLWindow(int x, int y, int w, int h, const std::string &label)
+    : Fl_Gl_Window( x, y, w, h, label.c_str() )
 {
 
   this->end();
@@ -262,7 +262,7 @@ void GLWindow::HandleKeyRelease()
       break;
 
     case ' ':
-      
+
       if (sim->GetUserStep())
       {
         sim->SetUserStepInc( true );

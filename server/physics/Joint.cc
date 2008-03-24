@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -100,7 +100,7 @@ void Joint::Update()
   this->visual->SetVisible(World::Instance()->GetShowJoints());
 
   if (!World::Instance()->GetShowJoints())
-    return; 
+    return;
 
   this->visual->SetPosition(this->GetAnchor());
 
@@ -140,14 +140,14 @@ Body *Joint::GetJointBody( int index ) const
 {
   Body *result=0;
 
-  if( index==0 || index==1 )
+  if ( index==0 || index==1 )
   {
     if (dJointGetBody( this->jointId, index ) == this->body1->GetId())
       result = this->body1;
     else
-      result = this->body2; 
+      result = this->body2;
   }
-  
+
   return result;
 }
 
@@ -204,13 +204,13 @@ void Joint::Attach( Body *one, Body *two )
 // Detach this joint from all bodies
 void Joint::Detach()
 {
-  dJointAttach( this->jointId, 0, 0 );  
+  dJointAttach( this->jointId, 0, 0 );
   return;
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
-// By default this does nothing. It should be overridden in child classes 
+// By default this does nothing. It should be overridden in child classes
 // where appropriate
 void Joint::SetParam(int /*parameter*/, double /*value*/)
 {
@@ -262,7 +262,7 @@ double Joint::GetCFM()
 /// Get the high stop of an axis(index).
 double Joint::GetHighStop(int index)
 {
-  switch(index)
+  switch (index)
   {
     case 0:
       return this->GetParam(dParamHiStop);
@@ -279,7 +279,7 @@ double Joint::GetHighStop(int index)
 /// Get the low stop of an axis(index).
 double Joint::GetLowStop(int index)
 {
-  switch(index)
+  switch (index)
   {
     case 0:
       return this->GetParam(dParamLoStop);

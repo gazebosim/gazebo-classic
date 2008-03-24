@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -39,8 +39,8 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-HeightmapGeom::HeightmapGeom(Body *body) 
-  : Geom(body)
+HeightmapGeom::HeightmapGeom(Body *body)
+    : Geom(body)
 {
 }
 
@@ -54,7 +54,7 @@ HeightmapGeom::~HeightmapGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void HeightmapGeom::UpdateChild() 
+void HeightmapGeom::UpdateChild()
 {
 }
 
@@ -87,7 +87,7 @@ void HeightmapGeom::FillHeightMap()
   {
     for (x=0; x<this->odeVertSize; x++)
     {
-       // Find the height at a vertex
+      // Find the height at a vertex
       h = this->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
 
       // Store the height for future use
@@ -173,11 +173,11 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
 
   std::ostringstream stream;
- 
+
   std::cout << "Terrain Image[" << this->terrainImage << "] Size[" << this->terrainSize << "]\n";
 
   stream << "WorldTexture=" << worldTexture << "\n";
-  //The detail texture 
+  //The detail texture
   stream << "DetailTexture=" << detailTexture << "\n";
   // number of times the detail texture will tile in a terrain tile
   stream << "DetailTile=3\n";
@@ -194,7 +194,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   // The size of a terrain page, in world units
   stream << "PageWorldX=" << this->terrainSize.x << "\n";
   stream << "PageWorldZ=" << this->terrainSize.y << "\n";
-  // Maximum height of the terrain 
+  // Maximum height of the terrain
   stream << "MaxHeight="<< this->terrainSize.z << "\n";
   // Upper LOD limit
   stream << "MaxMipMapLevel=2\n";
@@ -204,7 +204,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   bzero (mstr, 1024);
   sprintf(mstr, stream.str().c_str());
   Ogre::DataStreamPtr dataStream(
-      new Ogre::MemoryDataStream(mstr,strlen(mstr)) ); 
+    new Ogre::MemoryDataStream(mstr,strlen(mstr)) );
 
   // Set the static terrain in Ogre
   OgreAdaptor::Instance()->sceneMgr->setWorldGeometry(dataStream);
@@ -213,7 +213,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   Ogre::SceneNode *tnode = OgreAdaptor::Instance()->sceneMgr->getSceneNode("Terrain");
   tnode->pitch(Ogre::Degree(90));
   tnode->translate(Ogre::Vector3(-this->terrainSize.x*0.5, this->terrainSize.y*0.5, 0));
- 
+
   // Setup the ray scene query, which is used to determine the heights of
   // the vertices for ODE
   this->ray = Ogre::Ray(Ogre::Vector3::ZERO, Ogre::Vector3::NEGATIVE_UNIT_Y);
@@ -228,19 +228,19 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   this->odeData = dGeomHeightfieldDataCreate();
 
   // Setup a callback method for ODE
-  dGeomHeightfieldDataBuildCallback( 
-      this->odeData, 
-      this,
-      HeightmapGeom::GetHeightCallback,
-      this->terrainSize.x,
-      this->terrainSize.y,
-      this->odeVertSize,
-      this->odeVertSize,
-      1.0, // scale
-      0.0, // vertical offset
-      0.0, // vertical thickness
-      0 // wrap mode
-      );
+  dGeomHeightfieldDataBuildCallback(
+    this->odeData,
+    this,
+    HeightmapGeom::GetHeightCallback,
+    this->terrainSize.x,
+    this->terrainSize.y,
+    this->odeVertSize,
+    this->odeVertSize,
+    1.0, // scale
+    0.0, // vertical offset
+    0.0, // vertical thickness
+    0 // wrap mode
+  );
 
   // Restrict the bounds of the AABB to improve efficiency
   dGeomHeightfieldDataSetBounds( this->odeData, 0, this->terrainSize.z);

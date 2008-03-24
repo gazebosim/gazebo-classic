@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,23 +38,24 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 MainMenu::MainMenu(int x, int y, int w, int h, char *name)
-  : Fl_Menu_Bar(x,y,w,h,name)
+    : Fl_Menu_Bar(x,y,w,h,name)
 {
-  const Fl_Menu_Item menuitems[] = {
+  const Fl_Menu_Item menuitems[] =
+  {
     { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },
-  //  { "Open", 0, &gazebo::MainMenu::OpenCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-      { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-      { "Reset", 0, &gazebo::MainMenu::ResetCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-      { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-      { 0 },
-    
+    //  { "Open", 0, &gazebo::MainMenu::OpenCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Reset", 0, &gazebo::MainMenu::ResetCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { 0 },
+
     { "View", 0, 0, 0, FL_SUBMENU, FL_NORMAL_LABEL, 0, 14, 0},
-      { "Wireframe", 0, &gazebo::MainMenu::WireframeCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+    { "Wireframe", 0, &gazebo::MainMenu::WireframeCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
 //      { "Show Physics", 0, &gazebo::MainMenu::ShowPhysicsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
-      { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
-      { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
-      { 0 },
-  
+    { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+    { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+    { 0 },
+
     { 0 }
   };
 

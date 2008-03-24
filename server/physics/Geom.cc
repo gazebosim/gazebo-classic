@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -41,7 +41,7 @@ int Geom::geomIdCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Geom::Geom( Body *body)//, const std::string &name)
-  : Entity(body)
+    : Entity(body)
 {
   //this->SetName(name);
   this->body = body;
@@ -62,7 +62,7 @@ Geom::Geom( Body *body)//, const std::string &name)
   dMassSetZero(&this->bodyMass);
 
   this->transparency = 0;
- 
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ void Geom::Load(XMLConfigNode *node)
 
 
   // Create the bounding box
-  if (dGeomGetClass(this->geomId) != dPlaneClass) 
+  if (dGeomGetClass(this->geomId) != dPlaneClass)
   {
     dReal aabb[6];
     dGeomGetAABB(this->geomId, aabb);
@@ -150,7 +150,7 @@ void Geom::Load(XMLConfigNode *node)
   }
 
 }
- 
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,7 +262,7 @@ void Geom::PlaceImmovable()
   // Set the pose of the encapsulated geom
   dGeomSetPosition( this->geomId, finalPose.pos.x, finalPose.pos.y, finalPose.pos.z );
   dGeomSetQuaternion( this->geomId, q);
-  
+
   return;
 }
 
@@ -287,7 +287,7 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
 
     // Transform into CoM relative Pose
     localPose = pose - this->body->GetCoMPose();
-    
+
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -296,7 +296,8 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
 
     this->visualNode->SetPose(pose);
 
-    if (this->IsStatic()) {
+    if (this->IsStatic())
+    {
       immovableRelativePose = pose;
       this->PlaceImmovable();
       return;
@@ -305,7 +306,7 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     // Set the pose of the encapsulated geom; this is always relative
     // to the CoM
     dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
-    dGeomSetQuaternion(this->geomId, q); 
+    dGeomSetQuaternion(this->geomId, q);
 
     if (updateCoM)
     {
@@ -410,7 +411,7 @@ const dMass *Geom::GetBodyMassMatrix()
 
 
   this->bodyMass = this->mass;
-  
+
   if (dMassCheck(&this->bodyMass))
   {
     dMassRotate(&this->bodyMass, r);
@@ -435,14 +436,14 @@ int Geom::GetLaserFiducialId() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the laser retro reflectiveness 
+/// Set the laser retro reflectiveness
 void Geom::SetLaserRetro(float retro)
 {
   this->laserRetro = retro;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the laser retro reflectiveness 
+/// Get the laser retro reflectiveness
 float Geom::GetLaserRetro() const
 {
   return this->laserRetro;
@@ -473,7 +474,7 @@ float Geom::GetTransparency() const
 /// Set the visibility of the Bounding box of this geometry
 void Geom::ShowBoundingBox(bool show)
 {
-   if (this->bbVisual)
+  if (this->bbVisual)
     this->bbVisual->SetVisible(show);
 }
 
@@ -483,13 +484,13 @@ void Geom::ShowBoundingBox(bool show)
 void Geom::ShowJoints(bool show)
 {
   if (show)
-    this->SetTransparency(0.6);    
+    this->SetTransparency(0.6);
   else
     this->SetTransparency(0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the visibility of the physical entity of this geom 
+/// Set the visibility of the physical entity of this geom
 void Geom::ShowPhysics(bool show)
 {
   std::vector<OgreVisual*>::iterator iter;
@@ -498,7 +499,7 @@ void Geom::ShowPhysics(bool show)
   {
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
-      (*iter)->SetVisible(false, false);  
+      (*iter)->SetVisible(false, false);
     }
     /*this->visualNode->SetVisible(true, false);
     this->visualNode->SetTransparency(0.6);
@@ -508,7 +509,7 @@ void Geom::ShowPhysics(bool show)
   {
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
-      (*iter)->SetVisible(true, false);  
+      (*iter)->SetVisible(true, false);
     }
     /*this->visualNode->SetVisible(false, false);
     this->visualNode->SetTransparency(1.0);

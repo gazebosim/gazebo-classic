@@ -13,7 +13,7 @@ int main()
     // call to parse_args()
     PlayerClient robot(PlayerCc::PLAYER_HOSTNAME, PlayerCc::PLAYER_PORTNUM);
 
-    // Subscribe to the camera proxy 
+    // Subscribe to the camera proxy
     CameraProxy cp(&robot, 0);
 
   }

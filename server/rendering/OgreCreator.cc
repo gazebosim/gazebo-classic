@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  *
  */
 /* Desc: Some functions that creates Ogre objects together
- * Author: Jordi Polo	
+ * Author: Jordi Polo
  * Date: 27 Dec 2007
  */
 
@@ -81,10 +81,10 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
 
   Ogre::MeshManager::getSingleton().createPlane(parent->GetUniqueName(),
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-      size.x, size.y, 
+      size.x, size.y,
       (int)segments.x, (int)segments.y,
       true,1,
-      uvTile.x, uvTile.y, 
+      uvTile.x, uvTile.y,
       Ogre::Vector3(perp.x, perp.y, perp.z));
 
   OgreVisual *visual = new OgreVisual(parent->GetVisualNode());
@@ -123,11 +123,11 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
   }
 
   // Set the diffuse color
-  vec = node->GetVector3("diffuseColor",Vector3(1.0, 1.0, 1.0)); 
+  vec = node->GetVector3("diffuseColor",Vector3(1.0, 1.0, 1.0));
   light->setDiffuseColour(vec.x, vec.y, vec.z);
 
   // Sets the specular color
-  vec = node->GetVector3("specularColor",Vector3(1.0, 1.0, 1.0)); 
+  vec = node->GetVector3("specularColor",Vector3(1.0, 1.0, 1.0));
   light->setSpecularColour(vec.x, vec.y, vec.z);
 
   // Set the direction which the light points
@@ -205,7 +205,7 @@ void OgreCreator::CreateFog(XMLConfigNode *node)
 
   if ((cnode = node->GetChild("fog")))
   {
-    //Ogre::FogMode fogType = Ogre::FOG_NONE; 
+    //Ogre::FogMode fogType = Ogre::FOG_NONE;
     //std::string type;
     //double density;
     double linearStart, linearEnd;
@@ -302,29 +302,29 @@ void OgreCreator::CreateSky(XMLConfigNode *node)
 // Draw a grid on the ground
 void OgreCreator::DrawGrid()
 {
-  Ogre::ManualObject* gridObject =  OgreAdaptor::Instance()->sceneMgr->createManualObject("__OGRE_GRID__"); 
+  Ogre::ManualObject* gridObject =  OgreAdaptor::Instance()->sceneMgr->createManualObject("__OGRE_GRID__");
 
-  Ogre::SceneNode* gridObjectNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode("__OGRE_GRID_NODE__"); 
+  Ogre::SceneNode* gridObjectNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode("__OGRE_GRID_NODE__");
 
-  Ogre::MaterialPtr gridObjectMaterialX = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_X__","debugger1"); 
-  gridObjectMaterialX->setReceiveShadows(true); 
-  gridObjectMaterialX->getTechnique(0)->setLightingEnabled(true); 
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.4,0.0,0.0,0); 
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setAmbient(0.4,0.0,0.0); 
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.1,0.0,0.0); 
+  Ogre::MaterialPtr gridObjectMaterialX = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_X__","debugger1");
+  gridObjectMaterialX->setReceiveShadows(true);
+  gridObjectMaterialX->getTechnique(0)->setLightingEnabled(true);
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.4,0.0,0.0,0);
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setAmbient(0.4,0.0,0.0);
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.1,0.0,0.0);
 
-  Ogre::MaterialPtr gridObjectMaterialY = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_Y__","debugger2"); 
-  gridObjectMaterialY->setReceiveShadows(true); 
-  gridObjectMaterialY->getTechnique(0)->setLightingEnabled(true); 
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.0,0.0,0.4,0); 
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setAmbient(0.0,0.0,0.4); 
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.1); 
+  Ogre::MaterialPtr gridObjectMaterialY = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_Y__","debugger2");
+  gridObjectMaterialY->setReceiveShadows(true);
+  gridObjectMaterialY->getTechnique(0)->setLightingEnabled(true);
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.0,0.0,0.4,0);
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setAmbient(0.0,0.0,0.4);
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.1);
 
 
   float d = 0.01;
   float z = 0.01;
-  
-  gridObject->begin("__OGRE_GRID_MATERIAL_Y__", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
+
+  gridObject->begin("__OGRE_GRID_MATERIAL_Y__", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
   for (int y=-100; y<100; y++)
   {
@@ -333,13 +333,13 @@ void OgreCreator::DrawGrid()
     else
       d = 0.01;
 
-    gridObject->position(-100, y-d, z); 
-    gridObject->position(100, y-d, z); 
-    gridObject->position(100, y+d, z); 
+    gridObject->position(-100, y-d, z);
+    gridObject->position(100, y-d, z);
+    gridObject->position(100, y+d, z);
 
-    gridObject->position(-100, y-d, z); 
-    gridObject->position(100, y+d, z); 
-    gridObject->position(-100, y+d, z); 
+    gridObject->position(-100, y-d, z);
+    gridObject->position(100, y+d, z);
+    gridObject->position(-100, y+d, z);
 
     char *name=new char[20];
     char *text=new char[10];
@@ -361,8 +361,8 @@ void OgreCreator::DrawGrid()
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
- 
-    textNode->attachObject(msg); 
+
+    textNode->attachObject(msg);
     textNode->translate(0, y, 0.02);
 
     delete name;
@@ -370,8 +370,8 @@ void OgreCreator::DrawGrid()
 
   }
 
-  gridObject->end(); 
-  gridObject->begin("__OGRE_GRID_MATERIAL_X__", Ogre::RenderOperation::OT_TRIANGLE_LIST); 
+  gridObject->end();
+  gridObject->begin("__OGRE_GRID_MATERIAL_X__", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
   z -= 0.001;
 
@@ -382,13 +382,13 @@ void OgreCreator::DrawGrid()
     else
       d = 0.01;
 
-    gridObject->position(x+d, 100, z); 
-    gridObject->position(x-d, 100, z); 
-    gridObject->position(x-d, -100, z); 
+    gridObject->position(x+d, 100, z);
+    gridObject->position(x-d, 100, z);
+    gridObject->position(x-d, -100, z);
 
-    gridObject->position(x+d, -100, z); 
-    gridObject->position(x+d, 100, z); 
-    gridObject->position(x-d, -100, z); 
+    gridObject->position(x+d, -100, z);
+    gridObject->position(x+d, 100, z);
+    gridObject->position(x-d, -100, z);
 
     char *name=new char[20];
     char *text=new char[10];
@@ -410,15 +410,15 @@ void OgreCreator::DrawGrid()
     msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
- 
-    textNode->attachObject(msg); 
+
+    textNode->attachObject(msg);
     textNode->translate(x, 0, 0.02);
 
     delete name;
     delete text;
   }
-  
-  // etc 
-  gridObject->end(); 
+
+  // etc
+  gridObject->end();
   gridObjectNode->attachObject(gridObject);
 }

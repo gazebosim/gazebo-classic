@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,9 +42,9 @@ using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-FiducialInterface::FiducialInterface(player_devaddr_t addr, 
-    GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+FiducialInterface::FiducialInterface(player_devaddr_t addr,
+                                     GazeboDriver *driver, ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -62,17 +62,17 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
 FiducialInterface::~FiducialInterface()
 {
   // Release this interface
-  delete this->iface; 
+  delete this->iface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                      player_msghdr_t *hdr, void *data)
 {
   // Request the pose and size of the fiducial device
-  if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_FIDUCIAL_REQ_GET_GEOM, this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                            PLAYER_FIDUCIAL_REQ_GET_GEOM, this->device_addr))
   {
     player_fiducial_geom_t rep;
 
@@ -92,17 +92,17 @@ int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
     rep.fiducial_size.sl = 0.50;
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, 
-        PLAYER_FIDUCIAL_REQ_GET_GEOM, 
-        &rep, sizeof(rep),NULL);
+                          PLAYER_MSGTYPE_RESP_ACK,
+                          PLAYER_FIDUCIAL_REQ_GET_GEOM,
+                          &rep, sizeof(rep),NULL);
 
     return 0;
   }
-  
-  else if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_FIDUCIAL_REQ_SET_ID, this->device_addr))
-  {  
-    if( hdr->size == sizeof(player_fiducial_id_t) )
+
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_FIDUCIAL_REQ_SET_ID, this->device_addr))
+  {
+    if ( hdr->size == sizeof(player_fiducial_id_t) )
     {
       // TODO: Implement me
 
@@ -111,38 +111,38 @@ int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
 
       // acknowledge, including the new ID
       this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, 
-          PLAYER_FIDUCIAL_REQ_SET_ID,
-          (void*)&pid, sizeof(pid) );
+                            PLAYER_MSGTYPE_RESP_ACK,
+                            PLAYER_FIDUCIAL_REQ_SET_ID,
+                            (void*)&pid, sizeof(pid) );
 
       return 0;
     }
     else
     {
       printf("Incorrect packet size setting fiducial ID (%d/%d)",
-          (int)hdr->size, (int)sizeof(player_fiducial_id_t) );      
+             (int)hdr->size, (int)sizeof(player_fiducial_id_t) );
 
       return -1; // error - NACK is sent automatically
     }
-  }  
-  else if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_FIDUCIAL_REQ_GET_ID, this->device_addr))
+  }
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_FIDUCIAL_REQ_GET_ID, this->device_addr))
   {
 
     // TODO: Implement me
-    
+
     // fill in the data formatted player-like
     player_fiducial_id_t pid;
     pid.id = 0;
 
     // acknowledge, including the new ID
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, 
-        PLAYER_FIDUCIAL_REQ_GET_ID,
-        (void*)&pid, sizeof(pid) );      
+                          PLAYER_MSGTYPE_RESP_ACK,
+                          PLAYER_FIDUCIAL_REQ_GET_ID,
+                          (void*)&pid, sizeof(pid) );
 
     return 0;
-  }      
+  }
 
   return -1;
 }
@@ -171,7 +171,7 @@ void FiducialInterface::Update()
     memset(&data, 0, sizeof(data));
     data.fiducials_count = i;
     //data.fiducials = new player_fiducial_item_t[data.fiducials_count];
-    
+
 
     for (i = 0; i < this->iface->data->count; i++)
     {
@@ -181,22 +181,22 @@ void FiducialInterface::Update()
 
       data.fiducials[i].pose.px = fid->pose.pos.x;
       data.fiducials[i].pose.py = fid->pose.pos.y;
-      data.fiducials[i].pose.pz = fid->pose.pos.z;      
+      data.fiducials[i].pose.pz = fid->pose.pos.z;
       data.fiducials[i].pose.proll = fid->pose.roll;
       data.fiducials[i].pose.ppitch = fid->pose.pitch;
       data.fiducials[i].pose.pyaw = fid->pose.yaw;
 
-    /*printf("fiducial %d %.2f %.2f %.2f\n",
-        fid->id, data.fiducials[i].pose.px, data.fiducials[i].pose.py,
-        data.fiducials[i].pose.pyaw);
-        */
+      /*printf("fiducial %d %.2f %.2f %.2f\n",
+          fid->id, data.fiducials[i].pose.px, data.fiducials[i].pose.py,
+          data.fiducials[i].pose.pyaw);
+          */
 
     }
 
     this->driver->Publish( this->device_addr,
-                   PLAYER_MSGTYPE_DATA,
-                   PLAYER_FIDUCIAL_DATA_SCAN, 
-                   (void*)&data, sizeof(data), &this->datatime );
+                           PLAYER_MSGTYPE_DATA,
+                           PLAYER_FIDUCIAL_DATA_SCAN,
+                           (void*)&data, sizeof(data), &this->datatime );
     delete [] data.fiducials;
   }
 
@@ -218,7 +218,7 @@ void FiducialInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Fiducial Interface\n"
-           << e << "\n";
+    << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }

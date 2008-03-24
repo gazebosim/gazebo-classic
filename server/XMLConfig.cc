@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -88,7 +88,8 @@ void XMLConfig::Load( const std::string &filename )
 
   // Apply the XInclude process.
   if (xmlXIncludeProcess(this->xmlDoc) < 0)
-  { //this will fail if the included file is not found, too strict?
+  {
+    //this will fail if the included file is not found, too strict?
     gzthrow("XInclude process failed\n");
   }
 
@@ -112,18 +113,18 @@ void XMLConfig::LoadString( const std::string &str )
   {
     std::ostringstream stream;
     stream << "unable to parse [" << str << "]";
-    gzthrow(stream.str()); 
+    gzthrow(stream.str());
   }
 
   // Create wrappers for all the nodes (recursive)
   this->root = this->CreateNodes( NULL,
-      xmlDocGetRootElement(this->xmlDoc) );
+                                  xmlDocGetRootElement(this->xmlDoc) );
 
   if (this->root == NULL)
   {
     std::ostringstream stream;
     stream << "Empty document [" << str << "\n";
-    gzthrow(stream.str()); 
+    gzthrow(stream.str());
   }
 }
 
@@ -139,7 +140,7 @@ int XMLConfig::Save(const std::string &filename )
     result=xmlSaveFileEnc(filename.c_str(), this->xmlDoc, "UTF-8");
   return result;
 }
-  
+
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the root node
@@ -151,27 +152,27 @@ XMLConfigNode *XMLConfig::GetRootNode() const
 
 ////////////////////////////////////////////////////////////////////////////
 // Create wrappers
-XMLConfigNode *XMLConfig::CreateNodes( XMLConfigNode *parent, 
+XMLConfigNode *XMLConfig::CreateNodes( XMLConfigNode *parent,
                                        xmlNodePtr xmlNode )
 {
   XMLConfigNode *self = NULL;
 
   // No need to create wrappers around text and blank nodes
-  if( !xmlNodeIsText( xmlNode ) && !xmlIsBlankNode( xmlNode ) &&
-      strcmp((const char*)(xmlNode->name),"comment") )
+  if ( !xmlNodeIsText( xmlNode ) && !xmlIsBlankNode( xmlNode ) &&
+       strcmp((const char*)(xmlNode->name),"comment") )
   {
 
     // Create a new node
     self = new XMLConfigNode(this, parent, xmlNode,xmlDoc);
 
     // Create our children
-    for ( xmlNode = xmlNode->xmlChildrenNode; xmlNode != NULL; 
-        xmlNode = xmlNode->next)
+    for ( xmlNode = xmlNode->xmlChildrenNode; xmlNode != NULL;
+          xmlNode = xmlNode->next)
     {
 
       // If the node is xi:include, then only process the children of
       // the included XML files' root node
-      if (!xmlNode->ns && 
+      if (!xmlNode->ns &&
           !strcmp((const char*)(xmlNode->name),"include"))
       {
         xmlNodePtr xmlNode2 = NULL;
@@ -230,7 +231,7 @@ XMLConfigNode *XMLConfig::CreateNodes( XMLConfigNode *parent,
 
 ////////////////////////////////////////////////////////////////////////////
 // Constructor
-XMLConfigNode::XMLConfigNode( XMLConfig *cfg, XMLConfigNode *parent, 
+XMLConfigNode::XMLConfigNode( XMLConfig *cfg, XMLConfigNode *parent,
                               xmlNodePtr xmlNode, xmlDocPtr xmlDoc )
 {
   this->config = cfg;
@@ -267,7 +268,7 @@ XMLConfigNode::~XMLConfigNode()
   // Delete all our children first
   if (this->childFirst)
     delete this->childFirst;
-    
+
   // Unlink ourself from our siblings
   if (this->prev)
     this->prev->next = this->next;
@@ -300,7 +301,7 @@ std::string XMLConfigNode::GetName()
 // Get the Name Space Prefix
 std::string XMLConfigNode::GetNSPrefix()
 {
-  if( !this->xmlNode->ns )
+  if ( !this->xmlNode->ns )
     return "";
   else
     return (const char*)this->xmlNode->ns->prefix;
@@ -322,11 +323,11 @@ XMLConfigNode *XMLConfigNode::GetNext(const std::string &name, const std::string
   for (tmp = this->next; tmp != NULL; tmp = tmp->GetNext() )
   {
     if (tmp->xmlNode->name && name == (const char*)tmp->xmlNode->name)
-      if (prefix==std::string() || (prefix == (const char*)tmp->xmlNode->ns->prefix))  
+      if (prefix==std::string() || (prefix == (const char*)tmp->xmlNode->ns->prefix))
         break;
   }
 
-  return tmp; 
+  return tmp;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -341,7 +342,7 @@ XMLConfigNode *XMLConfigNode::GetNextByNSPrefix(const std::string &prefix)
       break;
   }
 
-  return tmp; 
+  return tmp;
 
 }
 
@@ -364,7 +365,7 @@ XMLConfigNode *XMLConfigNode::GetChildByNSPrefix(const std::string &prefix )
       break;
   }
 
-  return tmp; 
+  return tmp;
 
 }
 
@@ -390,12 +391,12 @@ XMLConfigNode *XMLConfigNode::GetChild( const std::string &name, const std::stri
   for (tmp = this->childFirst; tmp != NULL; tmp = tmp->GetNext() )
   {
     if (tmp->xmlNode->name && name == (const char*)tmp->xmlNode->name)
-      if (prefix==std::string() || (prefix == (const char*)tmp->xmlNode->ns->prefix))  
-      break;
+      if (prefix==std::string() || (prefix == (const char*)tmp->xmlNode->ns->prefix))
+        break;
   }
 
 
-//  for (tmp = this->childFirst; tmp != NULL && 
+//  for (tmp = this->childFirst; tmp != NULL &&
 //      name != (const char*)tmp->xmlNode->name; tmp = tmp->GetNext() );
 
   return tmp;
@@ -408,8 +409,8 @@ void XMLConfigNode::Print()
 {
   XMLConfigNode *node;
 
-  std::cout << "name = [" << (const char*) this->xmlNode->name 
-                      << "]\n";
+  std::cout << "name = [" << (const char*) this->xmlNode->name
+  << "]\n";
 
   // Recurse
   for (node = this->childFirst; node != NULL; node = node->next)
@@ -437,7 +438,7 @@ xmlChar* XMLConfigNode::GetNodeValue( const std::string &key )
   }
   else if (key == this->GetName())
   {
-    value = xmlNodeListGetString( this->xmlDoc, 
+    value = xmlNodeListGetString( this->xmlDoc,
                                   this->xmlNode->xmlChildrenNode, 1);
   }
   else
@@ -485,7 +486,7 @@ std::string XMLConfigNode::GetString( const std::string &key, const std::string 
     stream << "unable to find required string attribute[" << key << "] in world file node[" << this->GetName() << "]";
     gzthrow(stream.str());
   }
-  else if( !value )
+  else if ( !value )
     return def;
 
   // TODO: cache the value somewhere (currently leaks)
@@ -504,7 +505,7 @@ unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int requ
     stream << "unable to find required char attribute[" << key << "] in world file node[" << this->GetName() << "]";
     gzthrow(stream.str());
   }
-  else if( !value )
+  else if ( !value )
     return def;
 
   result = value[0];
@@ -526,7 +527,7 @@ std::string XMLConfigNode::GetFilename( const std::string &key, const std::strin
 
   if (filename[0] == '/' || filename[0] == '~')
     return filename;
-  else 
+  else
   {
     std::string result;
 
@@ -556,7 +557,7 @@ int XMLConfigNode::GetInt( const std::string &key, int def, int require )
     stream << "unable to find required int attribute[" << key << "] in world file node[" << this->GetName() << "]";
     gzthrow(stream.str());
   }
-  else if( !value )
+  else if ( !value )
     return def;
 
   return atoi((const char*) value);
@@ -575,7 +576,7 @@ double XMLConfigNode::GetDouble( const std::string &key, double def, int require
     stream << "unable to find required double attribute[" << key << "] in world file node[" << this->GetName() << "]";
     gzthrow(stream.str());
   }
-  else if( !value )
+  else if ( !value )
     return def;
 
   return atof((const char*) value);
@@ -593,7 +594,7 @@ float XMLConfigNode::GetFloat( const std::string &key, float def, int require )
     stream << "unable to find required float attribute[" << key << "] in world file node[" << this->GetName() << "]";
     gzthrow(stream.str());
   }
-  else if( !value )
+  else if ( !value )
     return def;
 
   return (float)(atof((const char*) value));
@@ -614,7 +615,7 @@ bool XMLConfigNode::GetBool( const std::string &key, bool def, int require )
     stream << "unable to find required bool attribute[" << key << "] in world file node[" << this->GetName() << "]";
     gzthrow(stream.str());
   }
-  else if( !value )
+  else if ( !value )
   {
     xmlFree(value);
     return def;
@@ -639,7 +640,7 @@ double XMLConfigNode::GetLength( const std::string &key, double def, int require
   double length = this->GetDouble(key, def, require);
 
   // Do unit conversion here
-  
+
   return length;
 }
 
@@ -725,8 +726,8 @@ Quatern XMLConfigNode::GetRotation( const std::string &key, Quatern def )
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a tuple string value.
-std::string XMLConfigNode::GetTupleString( const std::string &key, int index, 
-                                           const std::string &def)
+std::string XMLConfigNode::GetTupleString( const std::string &key, int index,
+    const std::string &def)
 {
   xmlChar *value;
   std::string nvalue;
@@ -793,7 +794,7 @@ std::string XMLConfigNode::GetTupleString( const std::string &key, int index,
 
     nvalue = r;
   }
-  
+
   xmlFree( value );
 
   return nvalue;
@@ -838,7 +839,7 @@ double XMLConfigNode::GetTupleLength( const std::string &key, int index, double 
     return def;
 
   // TODO: unit conversion here
-  
+
   return atof(svalue.c_str());
 }
 
@@ -858,7 +859,7 @@ double XMLConfigNode::GetTupleAngle( const std::string &key, int index, double d
 
 
 ////////////////////////////////////////////////////////////////////////////
-// Set the value associated with a node. 
+// Set the value associated with a node.
 void XMLConfigNode::SetValue(const std::string &key, const StringValue &data, int require, int type)
 {
   bool success;
@@ -869,7 +870,7 @@ void XMLConfigNode::SetValue(const std::string &key, const StringValue &data, in
   {
     this->NewNode(key.c_str(), data.GetCharStr(), type);
   }
-  
+
 }
 
 
@@ -890,8 +891,8 @@ bool XMLConfigNode::SetNodeValue(const std::string& key,const std::string& value
     xmlNodeSetContent(this->xmlNode, (xmlChar*) value.c_str() );
     success=true;
   }// If not, then it should be a child node
- 
- else
+
+  else
   {
     XMLConfigNode *currNode;
     currNode = this->childFirst;
@@ -918,7 +919,7 @@ bool XMLConfigNode::SetNodeValue(const std::string& key,const std::string& value
 // Create a new node, child of this. May be a attribute or an element
 void XMLConfigNode::NewNode(const char* key, const char* value, int type)
 {
-  if (type ==0) // A new child element 
+  if (type ==0) // A new child element
   {
     xmlNodePtr newNode;
     newNode = xmlNewNode(0, (xmlChar*) key); //I hope we don't need namespaces here

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ StringValue::StringValue(const StringValue& data)
 {
   stream << data.GetStr();
 }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert Vector3 to string
 StringValue::StringValue(Vector3 data)
@@ -71,7 +71,7 @@ StringValue::StringValue(Quatern data)
 /// Convert bool to string
 StringValue::StringValue(bool data)
 {
-  if (data) 
+  if (data)
     stream << "true";
   else
     stream << "false";
@@ -134,7 +134,7 @@ bool StringValue::IsNull() const
     null=true;
   return null;
 }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the value as a std string
 std::string StringValue::GetStr() const

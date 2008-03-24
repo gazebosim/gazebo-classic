@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ void ControllerFactory::RegisterController(std::string type, std::string classna
 // Create a new instance of a controller.  Used by the world when reading
 // the world file.
 Controller *ControllerFactory::NewController(const std::string &classname, Entity *parent)
-{  
+{
   if (controllers[classname])
   {
     return (controllers[classname]) (parent);
@@ -57,6 +57,6 @@ Controller *ControllerFactory::NewController(const std::string &classname, Entit
     stream << "Unable to make controller of type " << classname;
     gzthrow(stream.str());
   }
-  
+
   return NULL;
 }

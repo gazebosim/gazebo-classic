@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -57,15 +57,15 @@ FullWheel::~FullWheel( )
 // Connects the wheel to a given Joint
 void FullWheel::Connect(Joint *joint, int type)
 {
-  this->joint= dynamic_cast<Hinge2Joint*>(joint);  
+  this->joint= dynamic_cast<Hinge2Joint*>(joint);
   this->type=type;
   if (!joint)
-    {
-      std::ostringstream stream;
-      stream << "The controller couldn't get the joint " << joint->GetName();
-      gzthrow(stream.str()); 
-    }
- 
+  {
+    std::ostringstream stream;
+    stream << "The controller couldn't get the joint " << joint->GetName();
+    gzthrow(stream.str());
+  }
+
   //avoid an initial impulse to the joints that would make the vehicle flip
   this->joint->SetParam(dParamFudgeFactor, 0.1);
 }
@@ -93,7 +93,7 @@ void FullWheel::SetTorque( float newTorque)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the steering torque 
+// Set the steering torque
 void FullWheel::SetSteerTorque(float newTorque)
 {
   this->steerTorque=newTorque;
@@ -122,8 +122,8 @@ void FullWheel::SetSteerMaxAngle(float maxAngle)
 // Updates
 void FullWheel::Update(float speed, float steer)
 {
-    double v;
-    double kp, kd;
+  double v;
+  double kp, kd;
 
   this->cmdSpeed=speed;
   this->cmdSteer=steer;
@@ -135,8 +135,8 @@ void FullWheel::Update(float speed, float steer)
 
 
   // TODO: proper acceleration model
-    // Normalize the gain factors using the step time (dont what the PD
-    // to depend on sim cycle rate)
+  // Normalize the gain factors using the step time (dont what the PD
+  // to depend on sim cycle rate)
   kp = this->steerKp;
   kd = this->steerKd;
 
@@ -144,7 +144,7 @@ void FullWheel::Update(float speed, float steer)
   v = kp * (this->cmdSteer - this->joint->GetAngle1())
       - kd * this->joint->GetAngle1Rate();
   this->joint->SetParam(dParamVel, v);
- 
+
   this->joint->SetParam(dParamFMax, this->steerTorque);
   if (type==FULL)
   {

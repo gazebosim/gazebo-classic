@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,9 +34,9 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 UniversalJoint::UniversalJoint( dWorldID worldId )
-  : Joint()
+    : Joint()
 {
-    this->jointId = dJointCreateUniversal( worldId, NULL );
+  this->jointId = dJointCreateUniversal( worldId, NULL );
 }
 
 

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,9 +42,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-GripperInterface::GripperInterface(player_devaddr_t addr, 
-    GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+GripperInterface::GripperInterface(player_devaddr_t addr,
+                                   GazeboDriver *driver, ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
 
   // Get the ID of the interface
@@ -63,19 +63,19 @@ GripperInterface::GripperInterface(player_devaddr_t addr,
 GripperInterface::~GripperInterface()
 {
   // Release this interface
-  gz_gripper_free(this->iface); 
+  gz_gripper_free(this->iface);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int GripperInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                     player_msghdr_t *hdr, void *data)
 {
-  
+
 //   This code works with Player CVS
 #ifdef PLAYER_GRIPPER_CMD_OPEN
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_GRIPPER_CMD_OPEN, this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                            PLAYER_GRIPPER_CMD_OPEN, this->device_addr))
   {
     gz_gripper_lock(this->iface, 1);
     this->iface->data->cmd = GAZEBO_GRIPPER_CMD_OPEN;
@@ -83,8 +83,8 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_GRIPPER_CMD_CLOSE, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_GRIPPER_CMD_CLOSE, this->device_addr))
   {
     gz_gripper_lock(this->iface, 1);
     this->iface->data->cmd = GAZEBO_GRIPPER_CMD_CLOSE;
@@ -92,8 +92,8 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_GRIPPER_CMD_STOP, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_GRIPPER_CMD_STOP, this->device_addr))
   {
     gz_gripper_lock(this->iface, 1);
     this->iface->data->cmd = GAZEBO_GRIPPER_CMD_STOP;
@@ -101,8 +101,8 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_GRIPPER_CMD_STORE, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_GRIPPER_CMD_STORE, this->device_addr))
   {
     gz_gripper_lock(this->iface, 1);
     this->iface->data->cmd = GAZEBO_GRIPPER_CMD_STORE;
@@ -110,8 +110,8 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_GRIPPER_CMD_RETRIEVE, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_GRIPPER_CMD_RETRIEVE, this->device_addr))
   {
     gz_gripper_lock(this->iface, 1);
     this->iface->data->cmd = GAZEBO_GRIPPER_CMD_RETRIEVE;
@@ -119,39 +119,39 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
 
     return 0;
   }
-  // is it a geometry request?  
-  else if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-                           PLAYER_GRIPPER_REQ_GET_GEOM,
-                           this->device_addr))
-    {
-      // TODO: implement me
+  // is it a geometry request?
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_GRIPPER_REQ_GET_GEOM,
+                                 this->device_addr))
+  {
+    // TODO: implement me
 
-      player_gripper_geom_t pgeom;
+    player_gripper_geom_t pgeom;
 
-      pgeom.pose.px = 0;
-      pgeom.pose.py = 0;
-      pgeom.pose.pz = 0;
-      pgeom.pose.proll = 0;      
-      pgeom.pose.ppitch = 0;      
-      pgeom.pose.pyaw = 0;      
+    pgeom.pose.px = 0;
+    pgeom.pose.py = 0;
+    pgeom.pose.pz = 0;
+    pgeom.pose.proll = 0;
+    pgeom.pose.ppitch = 0;
+    pgeom.pose.pyaw = 0;
 
-      pgeom.outer_size.sw = 0;
-      pgeom.outer_size.sl = 0;
-      pgeom.outer_size.sh = 0;
+    pgeom.outer_size.sw = 0;
+    pgeom.outer_size.sl = 0;
+    pgeom.outer_size.sh = 0;
 
-      pgeom.inner_size.sw = 0;
-      pgeom.inner_size.sl = 0;
-      pgeom.inner_size.sh = 0;
+    pgeom.inner_size.sw = 0;
+    pgeom.inner_size.sl = 0;
+    pgeom.inner_size.sh = 0;
 
-      pgeom.num_beams = 2;
-     
-      this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, 
-			    PLAYER_GRIPPER_REQ_GET_GEOM,
-			    (void*)&pgeom, sizeof(pgeom), NULL);
+    pgeom.num_beams = 2;
 
-      return 0;
-    }
+    this->driver->Publish(this->device_addr, respQueue,
+                          PLAYER_MSGTYPE_RESP_ACK,
+                          PLAYER_GRIPPER_REQ_GET_GEOM,
+                          (void*)&pgeom, sizeof(pgeom), NULL);
+
+    return 0;
+  }
 #endif
 
   return -1;
@@ -179,13 +179,13 @@ void GripperInterface::Update()
 
     // break beams are now implemented
     data.beams = 0;
-  
+
     data.beams |= this->iface->data->grip_limit_reach ? 0x01 : 0x00;
     data.beams |= this->iface->data->lift_limit_reach ? 0x02 : 0x00;
     data.beams |= this->iface->data->outer_beam_obstruct ? 0x04 : 0x00;
     data.beams |= this->iface->data->inner_beam_obstruct ? 0x08 : 0x00;
     data.beams |= this->iface->data->left_paddle_open ? 0x10 : 0x00;
-    data.beams |= this->iface->data->right_paddle_open ? 0x20 : 0x00;  
+    data.beams |= this->iface->data->right_paddle_open ? 0x20 : 0x00;
 
     // This works with player cvs.
 #ifdef PLAYER_GRIPPER_STATE_OPEN
@@ -201,9 +201,9 @@ void GripperInterface::Update()
 #endif
 
     this->driver->Publish( this->device_addr, NULL,
-                   PLAYER_MSGTYPE_DATA,
-                   PLAYER_GRIPPER_DATA_STATE,
-                   (void*)&data, sizeof(data), &this->datatime );
+                           PLAYER_MSGTYPE_DATA,
+                           PLAYER_GRIPPER_DATA_STATE,
+                           (void*)&data, sizeof(data), &this->datatime );
   }
 
   gz_gripper_unlock(this->iface);

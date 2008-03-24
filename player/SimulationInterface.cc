@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@ using namespace gazebo;
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
 SimulationInterface::SimulationInterface(player_devaddr_t addr, GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -63,15 +63,15 @@ SimulationInterface::~SimulationInterface()
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                        player_msghdr_t *hdr, void *data)
 {
 
   timespec sleepTime = {0, 10000000};
   /// Set a 3D pose
-  if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_SIMULATION_REQ_SET_POSE3D, this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                            PLAYER_SIMULATION_REQ_SET_POSE3D, this->device_addr))
   {
-    player_simulation_pose3d_req_t *req = 
+    player_simulation_pose3d_req_t *req =
       (player_simulation_pose3d_req_t*)(data);
 
     this->iface->Lock(1);
@@ -89,15 +89,15 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE3D);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE3D);
 
   }
 
   /// Set a 2D pose
-  else if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_SIMULATION_REQ_SET_POSE2D, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_SIMULATION_REQ_SET_POSE2D, this->device_addr))
   {
-    player_simulation_pose2d_req_t *req = 
+    player_simulation_pose2d_req_t *req =
       (player_simulation_pose2d_req_t*)(data);
 
     this->iface->Lock(1);
@@ -111,15 +111,15 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE2D);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE2D);
   }
 
   /// Get a 3d pose
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-        PLAYER_SIMULATION_REQ_GET_POSE3D, this->device_addr))
+                                 PLAYER_SIMULATION_REQ_GET_POSE3D, this->device_addr))
   {
     bool response = false;
-    player_simulation_pose3d_req_t *req = 
+    player_simulation_pose3d_req_t *req =
       (player_simulation_pose3d_req_t*)(data);
 
     this->iface->Lock(1);
@@ -128,7 +128,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     strcpy((char*)this->iface->data->model_req,"get_pose");
 
     this->iface->Unlock();
-   
+
     // Wait for response from gazebo
     while (!response)
     {
@@ -149,16 +149,16 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
-        req, sizeof(*req), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
+                          req, sizeof(*req), NULL);
   }
 
   /// Get a 2D pose
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-        PLAYER_SIMULATION_REQ_GET_POSE2D, this->device_addr))
+                                 PLAYER_SIMULATION_REQ_GET_POSE2D, this->device_addr))
   {
     bool response = false;
-    player_simulation_pose2d_req_t *req = 
+    player_simulation_pose2d_req_t *req =
       (player_simulation_pose2d_req_t*)(data);
 
     this->iface->Lock(1);
@@ -167,7 +167,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     strcpy((char*)this->iface->data->model_req,"get_pose");
 
     this->iface->Unlock();
-   
+
     // Wait for response from gazebo
     while (!response)
     {
@@ -184,13 +184,13 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
-        req, sizeof(*req), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
+                          req, sizeof(*req), NULL);
   }
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-        PLAYER_SIMULATION_REQ_GET_PROPERTY, this->device_addr))
+                                 PLAYER_SIMULATION_REQ_GET_PROPERTY, this->device_addr))
   {
-    player_simulation_property_req_t *req = 
+    player_simulation_property_req_t *req =
       (player_simulation_property_req_t*)(data);
 
     std::string name = req->name;
@@ -223,8 +223,8 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY,
-        req, sizeof(*req), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY,
+                          req, sizeof(*req), NULL);
 
     if (req->value)
     {
@@ -232,7 +232,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       req->value = NULL;
     }
   }
- 
+
   return 0;
 }
 
@@ -258,7 +258,7 @@ void SimulationInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Simulation Interface\n"
-           << e << "\n";
+    << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }

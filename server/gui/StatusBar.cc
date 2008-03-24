@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@
 using namespace gazebo;
 
 StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
-  : Fl_Group(x,y,w,h,l)
+    : Fl_Group(x,y,w,h,l)
 {
   x += 30;
   y += 5;
@@ -100,7 +100,7 @@ void StatusBar::Update()
     this->statusString->value("RUNNING");
     this->statusString->color(FL_GREEN);
   }
-  
+
 }
 
 int StatusBar::handle( int event )

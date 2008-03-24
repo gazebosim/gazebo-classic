@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,9 +37,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-PowerInterface::PowerInterface(player_devaddr_t addr, 
-    GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+PowerInterface::PowerInterface(player_devaddr_t addr,
+                               GazeboDriver *driver, ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -57,13 +57,13 @@ PowerInterface::PowerInterface(player_devaddr_t addr,
 PowerInterface::~PowerInterface()
 {
   // Release this interface
-  gz_power_free(this->iface); 
+  gz_power_free(this->iface);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int PowerInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                   player_msghdr_t *hdr, void *data)
 {
   return 0;
 }
@@ -87,7 +87,7 @@ void PowerInterface::Update()
     ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
 
     data.percent = this->iface->data->levels[0];
-    
+
     this->driver->Publish( this->device_addr, NULL,
                            PLAYER_MSGTYPE_DATA,
                            PLAYER_POWER_DATA_STATE,

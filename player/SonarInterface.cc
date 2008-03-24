@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,9 +42,9 @@ PLAYER_SONAR_REQ_POWER
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-SonarInterface::SonarInterface(player_devaddr_t addr, 
-    GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+SonarInterface::SonarInterface(player_devaddr_t addr,
+                               GazeboDriver *driver, ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -62,16 +62,16 @@ SonarInterface::SonarInterface(player_devaddr_t addr,
 SonarInterface::~SonarInterface()
 {
   // Release this interface
-  gz_sonar_free(this->iface); 
+  gz_sonar_free(this->iface);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int SonarInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                   player_msghdr_t *hdr, void *data)
 {
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_SONAR_REQ_GET_GEOM, this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                            PLAYER_SONAR_REQ_GET_GEOM, this->device_addr))
   {
     player_sonar_geom_t geom;
 
@@ -89,15 +89,15 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
     gz_sonar_unlock(this->iface);
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, 
-        PLAYER_SONAR_REQ_GET_GEOM,
-        &geom, sizeof(geom), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK,
+                          PLAYER_SONAR_REQ_GET_GEOM,
+                          &geom, sizeof(geom), NULL);
 
     return 0;
   }
 
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_SONAR_REQ_POWER,this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_SONAR_REQ_POWER,this->device_addr))
   {
     player_sonar_power_config_t *power;
 
@@ -111,9 +111,9 @@ int SonarInterface::ProcessMessage(QueuePointer &respQueue,
     gz_sonar_unlock(this->iface);
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, 
-        PLAYER_SONAR_REQ_POWER,
-        power, sizeof(*power), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK,
+                          PLAYER_SONAR_REQ_POWER,
+                          power, sizeof(*power), NULL);
 
     return 0;
   }
@@ -151,9 +151,9 @@ void SonarInterface::Update()
       data.ranges[i] = this->iface->data->sonar_ranges[i];
 
     this->driver->Publish( this->device_addr, NULL,
-                   PLAYER_MSGTYPE_DATA,
-                   PLAYER_SONAR_DATA_RANGES,     
-                   (void*)&data, sizeof(data), &this->datatime );
+                           PLAYER_MSGTYPE_DATA,
+                           PLAYER_SONAR_DATA_RANGES,
+                           (void*)&data, sizeof(data), &this->datatime );
 
   }
 

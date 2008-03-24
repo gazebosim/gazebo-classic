@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@ BoxGeom::~BoxGeom()
 void BoxGeom::LoadChild(XMLConfigNode *node)
 {
   Vector3 size;
-  
+
   size = node->GetVector3("size",Vector3(1,1,1));
 
   // Initialize box mass matrix
@@ -59,8 +59,8 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
 
   // Create a box geometry with box mass matrix
   this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
-/*  this->visualNode->AttachMesh("unit_box");
-  this->visualNode->SetScale(size);
-  this->visualNode->SetMaterial("Gazebo/GreenEmissive");
-  */
+  /*  this->visualNode->AttachMesh("unit_box");
+    this->visualNode->SetScale(size);
+    this->visualNode->SetMaterial("Gazebo/GreenEmissive");
+    */
 }

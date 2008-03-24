@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Default Constructor
 Quatern::Quatern()
-  : u(1), x(0), y(0), z(0)
+    : u(1), x(0), y(0), z(0)
 {
 
 }
@@ -39,7 +39,7 @@ Quatern::Quatern()
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Quatern::Quatern( const double &u, const double &x, const double &y, const double &z)
-  : u(u), x(x), y(y), z(z)
+    : u(u), x(x), y(y), z(z)
 {
 }
 
@@ -147,7 +147,7 @@ void Quatern::SetFromAxis(double ax, double ay, double az, double aa)
 
   this->Normalize();
 }
-       
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set the quaternion from Euler angles
 void Quatern::SetFromEuler(const Vector3 &vec)
@@ -162,7 +162,7 @@ void Quatern::SetFromEuler(const Vector3 &vec)
   this->x = sin(phi) * cos(the) * cos(psi) - cos(phi) * sin(the) * sin(psi);
   this->y = cos(phi) * sin(the) * cos(psi) + sin(phi) * cos(the) * sin(psi);
   this->z = cos(phi) * cos(the) * sin(psi) - sin(phi) * sin(the) * cos(psi);
-  
+
   this->Normalize();
 }
 

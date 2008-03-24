@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ Entity::Entity(Entity *parent)
   this->id = idCounter++;
   this->isStatic = false;
   this->visualNode=0;
-  
+
   if (this->parent)
   {
     this->parent->AddChild(this);

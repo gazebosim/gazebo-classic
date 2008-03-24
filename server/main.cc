@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@ where [options] is one or more of the following:
 - -f                  : Force usage of the server id (use with caution)
 - -d &lt;level&gt;    : Verbose mode: -1 = none, 0 = critical messages (default), 9 = all messages
 - -t &lt;sec&gt;      : Timeout and quit after &lt;sec&gt; seconds
-- -l &lt;logfile&gt;  : Log messages to &lt;logfile&gt 
+- -l &lt;logfile&gt;  : Log messages to &lt;logfile&gt
 - -n                  : Do not do any time control
 
 The server prints some diagnostic information to the console before
@@ -67,7 +67,7 @@ gz_server.c:111 directory [/tmp/gazebo-ahoward-0] already exists
 
 While the simulation loop is running, basic status information is
 printed on the console:
-  
+
 @verbatim
 Time 1.542 1.560 0.000 [1.000] 0.220 [ 14%]
 @endverbatim
@@ -164,7 +164,7 @@ int ParseArgs(int argc, char **argv)
         // Verbose mode
         optMsgLevel = atoi(optarg);
         break;
- 
+
       case 'f':
         // Force server id
         optServerForce = true;
@@ -179,14 +179,14 @@ int ParseArgs(int argc, char **argv)
         optServerId = atoi(optarg);
         optServerForce = false;
         break;
-       
+
       case 't':
         // Timeout and quit after x seconds
         optTimeout = atof(optarg);
         break;
       case 'n':
         optTimeControl = 0;
-      break;
+        break;
 
       case 'h':
       default:
@@ -217,13 +217,13 @@ int ParseArgs(int argc, char **argv)
     return  -1;
   }
   fclose(tmpFile);
- 
+
   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // sighandler to shut everything down properly
-void SignalHandler( int /*dummy*/ ) 
+void SignalHandler( int /*dummy*/ )
 {
   //TODO: use a boost::signal
   gazebo::Simulator::Instance()->SetUserQuit();
@@ -232,7 +232,7 @@ void SignalHandler( int /*dummy*/ )
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Loads the Gazebo configuration file 
+// Loads the Gazebo configuration file
 void LoadConfigFile()
 {
   std::ifstream cfgFile;
@@ -264,7 +264,7 @@ void LoadConfigFile()
       node = node->GetNext("ogrePath");
     }
     gazebo::Global::RTTMode = rc.GetRootNode()->GetString("RTTMode", "PBuffer");
-    
+
   }
   else
   {
@@ -281,24 +281,24 @@ void LoadConfigFile()
 int main(int argc, char **argv)
 {
 
-  //Application Setup 
+  //Application Setup
   if (ParseArgs(argc, argv) != 0)
     return -1;
 
-  PrintVersion(); 
+  PrintVersion();
 
   if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
-  } 
+  }
 
 
-  //Load the simulator  
+  //Load the simulator
   try
   {
-   LoadConfigFile();
-   gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
+    LoadConfigFile();
+    gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
   }
   catch (gazebo::GazeboError e)
   {
@@ -322,7 +322,7 @@ int main(int argc, char **argv)
   // Main loop of the simulator
   try
   {
-     gazebo::Simulator::Instance()->MainLoop();
+    gazebo::Simulator::Instance()->MainLoop();
   }
   catch (gazebo::GazeboError e)
   {

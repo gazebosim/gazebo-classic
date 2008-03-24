@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor);
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 RaySensor::RaySensor(Body *body)
-  : Sensor(body)
+    : Sensor(body)
 {
   this->active = false;
 }
@@ -85,10 +85,10 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 
   // Create a space to contain the ray space
   this->superSpaceId = dSimpleSpaceCreate( 0 );
-    
+
   // Create a space to contain all the rays
   this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
-  
+
   // Set collision bits
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
@@ -195,8 +195,8 @@ double RaySensor::GetRange(int index)
   if (index < 0 || index >= (int)this->rays.size())
   {
     std::ostringstream stream;
-    stream << "index[" << index << "] out of range[0-" 
-           << this->rays.size() << "]";
+    stream << "index[" << index << "] out of range[0-"
+    << this->rays.size() << "]";
     gzthrow(stream.str());
   }
 
@@ -211,11 +211,11 @@ double RaySensor::GetRetro(int index)
   if (index < 0 || index >= (int)this->rays.size())
   {
     std::ostringstream stream;
-    stream << "index[" << index << "] out of range[0-" 
-           << this->rays.size() << "]";
+    stream << "index[" << index << "] out of range[0-"
+    << this->rays.size() << "]";
     gzthrow(stream.str());
   }
- 
+
   return this->rays[index]->GetRetro();
 }
 
@@ -227,11 +227,11 @@ int RaySensor::GetFiducial(int index)
   if (index < 0 || index >= (int)this->rays.size())
   {
     std::ostringstream stream;
-    stream << "index[" << index << "] out of range[0-" 
-           << this->rays.size() << "]";
+    stream << "index[" << index << "] out of range[0-"
+    << this->rays.size() << "]";
     gzthrow(stream.str());
   }
- 
+
   return this->rays[index]->GetFiducial();
 }
 
@@ -270,8 +270,8 @@ void RaySensor::UpdateChild(UpdateParams &/*params*/)
 
     // Do collision detection
     dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
-        ( dGeomID ) ( ode->GetSpaceId() ),
-        this, &UpdateCallback );
+                    ( dGeomID ) ( ode->GetSpaceId() ),
+                    this, &UpdateCallback );
   }
 }
 
@@ -289,7 +289,7 @@ void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
   RaySensor *self = NULL;
 
   self = (RaySensor*) data;
- 
+
   // Check space
   if ( dGeomIsSpace( o1 ) || dGeomIsSpace( o2 ) )
   {
@@ -306,13 +306,13 @@ void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
   {
     geom1 = NULL;
     geom2 = NULL;
-    
+
     // Get pointers to the underlying geoms
     if (dGeomGetClass(o1) == dGeomTransformClass)
       geom1 = (dxGeom*) dGeomGetData(dGeomTransformGetGeom(o1));
     else
       geom1 = (dxGeom*) dGeomGetData(o1);
-    
+
     if (dGeomGetClass(o2) == dGeomTransformClass)
       geom2 = (dxGeom*) dGeomGetData(dGeomTransformGetGeom(o2));
     else
@@ -324,14 +324,14 @@ void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
     hitGeom = NULL;
 
     // Figure out which one is a ray; note that this assumes
-    // that the ODE dRayClass is used *soley* by the RayGeom.    
+    // that the ODE dRayClass is used *soley* by the RayGeom.
     if (dGeomGetClass(o1) == dRayClass)
     {
       rayGeom = (RayGeom*) geom1;
       hitGeom = (Geom*) geom2;
       dGeomRaySetParams(o1, 0, 0);
       dGeomRaySetClosestHit(o1, 1);
-    }    
+    }
 
     if (dGeomGetClass(o2) == dRayClass)
     {
@@ -341,15 +341,15 @@ void RaySensor::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
       dGeomRaySetParams(o2, 0, 0);
       dGeomRaySetClosestHit(o2, 1);
     }
-        
+
     // Check for ray/geom intersections
     if ( rayGeom && hitGeom )
     {
 
-      n = dCollide(o1, o2, 1, &contact, sizeof(contact));       
+      n = dCollide(o1, o2, 1, &contact, sizeof(contact));
 
       if ( n > 0 )
-      {       
+      {
         if (contact.depth < rayGeom->GetLength())
         {
           rayGeom->SetLength( contact.depth );

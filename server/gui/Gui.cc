@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
-  : Fl_Window(x, y, width+200, height+60, t.c_str()), Gui(x,y,width,height, t)
+    : Fl_Window(x, y, width+200, height+60, t.c_str()), Gui(x,y,width,height, t)
 {
   this->windowId = -1;
   this->visual = NULL;
@@ -75,7 +75,7 @@ FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
   this->display = this->glWindow->display;
   this->visual = this->glWindow->visual;
   this->colormap = this->glWindow->colormap;
-  this->windowId = this->glWindow->windowId;  
+  this->windowId = this->glWindow->windowId;
   this->resizable(this->glWindow);
   //this->glWindow->UserQuit.connect( &gazebo::Gui::UserQuit);
   //this->glWindow->Finished.connect( boost::bind(&gazebo::Gui::Finished,this));
@@ -89,7 +89,7 @@ FLTKGui::~FLTKGui()
   GZ_DELETE (this->glWindow)
   GZ_DELETE (this->toolbar)
   //delete this->statusbar;
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,7 +141,7 @@ int FLTKGui::handle(int event)
 Window FLTKGui::GetWindowId() const
 {
   return this->windowId;
-}       
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the visual info

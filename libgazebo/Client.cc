@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -85,10 +85,10 @@ void Client::ConnectWait(int serverId, int clientId)
     stream << "invalid client ID [" << clientId << "]";
     throw(stream.str());
   }
-  
+
   this->serverId = serverId;
   this->clientId = clientId;
-  
+
   // Initialize semaphores
   if (this->clientId >= 0)
   {
@@ -109,7 +109,7 @@ void Client::ConnectWait(int serverId, int clientId)
   stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
 
   this->filename = stream.str();
-  
+
   std::cout << "opening " << this->filename << "\n";
 }
 
@@ -138,7 +138,7 @@ void Client::SemQuery(int serverId)
 {
   std::ostringstream stream;
   int semKey;
-  
+
   semKey = GZ_SEM_KEY + serverId;
 
   // Try to get the semaphore
@@ -162,7 +162,7 @@ void Client::SemQuery(int serverId)
 void Client::SemInit()
 {
   this->semKey = GZ_SEM_KEY + this->serverId;
-  
+
   // Get the client semaphore group
   this->semId = semget(this->semKey, 0, S_IRWXU);
 
@@ -170,7 +170,7 @@ void Client::SemInit()
   {
     std::ostringstream stream;
     stream << "Failed to allocate semaphore [" << strerror(errno) << "]\n"
-           << "The server does not appear to be running";
+    << "The server does not appear to be running";
     throw(stream.str());
   }
 }

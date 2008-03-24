@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -57,22 +57,22 @@ DriveWheel::~DriveWheel( )
 
 void DriveWheel::Connect(Joint *joint, int type)
 {
-  this->joint= dynamic_cast<HingeJoint*>(joint);  
+  this->joint= dynamic_cast<HingeJoint*>(joint);
   this->type=type;
   if (!joint)
-    {
-      std::ostringstream stream;
-      stream << "The controller couldn't get the joint " << joint->GetName();
-      gzthrow(stream.str()); 
-    }
+  {
+    std::ostringstream stream;
+    stream << "The controller couldn't get the joint " << joint->GetName();
+    gzthrow(stream.str());
+  }
   //avoid an initial impulse to the joints that would make the vehicle flip
   this->joint->SetParam(dParamFudgeFactor, 0.1);
 }
 
 void DriveWheel::Stop()
 {
-    this->joint->SetParam(dParamVel, 0);
-    this->joint->SetParam(dParamFMax, 0);
+  this->joint->SetParam(dParamVel, 0);
+  this->joint->SetParam(dParamFMax, 0);
 }
 
 void DriveWheel::SetTorque( float newTorque)

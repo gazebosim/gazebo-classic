@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 RayGeom::RayGeom( Body *body, bool displayRays )
-  : Geom( body),
+    : Geom( body),
     line(NULL)
 {
   this->SetName("Ray");
@@ -46,7 +46,8 @@ RayGeom::RayGeom( Body *body, bool displayRays )
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
 
-  if (displayRays) {
+  if (displayRays)
+  {
     this->line = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
 
     // Add two points
@@ -68,7 +69,8 @@ RayGeom::RayGeom( Body *body, bool displayRays )
 // Destructor
 RayGeom::~RayGeom()
 {
-  if (this->line) {
+  if (this->line)
+  {
     delete this->line;
     this->line = NULL;
   }
@@ -84,16 +86,16 @@ void RayGeom::Update()
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(this->geomId, this->globalStartPos.x, 
-      this->globalStartPos.y, this->globalStartPos.z, 
-      dir.x, dir.y, dir.z);
+  dGeomRaySet(this->geomId, this->globalStartPos.x,
+              this->globalStartPos.y, this->globalStartPos.z,
+              dir.x, dir.y, dir.z);
 
-  dGeomRaySetLength( this->geomId, 
-      this->globalStartPos.Distance(this->globalEndPos) );
+  dGeomRaySetLength( this->geomId,
+                     this->globalStartPos.Distance(this->globalEndPos) );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Set the starting point and direction 
+// Set the starting point and direction
 void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
 {
   Vector3 dir;
@@ -108,14 +110,15 @@ void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(this->geomId, this->globalStartPos.x, 
-              this->globalStartPos.y, this->globalStartPos.z, 
+  dGeomRaySet(this->geomId, this->globalStartPos.x,
+              this->globalStartPos.y, this->globalStartPos.z,
               dir.x, dir.y, dir.z);
 
-  dGeomRaySetLength( this->geomId, 
-      this->globalStartPos.Distance(this->globalEndPos) );
+  dGeomRaySetLength( this->geomId,
+                     this->globalStartPos.Distance(this->globalEndPos) );
 
-  if (this->line) {
+  if (this->line)
+  {
     // Set the line's position relative to it's parent scene node
     this->line->SetPoint(0, this->relativeStartPos);
     this->line->SetPoint(1, this->relativeEndPos);
@@ -146,7 +149,8 @@ void RayGeom::SetLength( const double len )
   //dGeomRaySetLength( this->geomId, len );
   this->contactLen=len;
 
-  if (this->line) {
+  if (this->line)
+  {
     Vector3 dir = this->relativeEndPos - this->relativeStartPos;
     dir.Normalize();
 

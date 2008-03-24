@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,9 +40,9 @@ using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-Position3dInterface::Position3dInterface(player_devaddr_t addr, 
+Position3dInterface::Position3dInterface(player_devaddr_t addr,
     GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -66,13 +66,13 @@ Position3dInterface::~Position3dInterface()
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                        player_msghdr_t *hdr, void *data)
 {
   this->iface->Lock(1);
 
   // COMMAND VELOCITY:
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_POSITION3D_CMD_SET_VEL, this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                            PLAYER_POSITION3D_CMD_SET_VEL, this->device_addr))
   {
     player_position3d_cmd_vel_t *cmd;
 
@@ -90,8 +90,8 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
   }
 
   // REQUEST SET ODOMETRY
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_POSITION3D_REQ_SET_ODOM, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_POSITION3D_REQ_SET_ODOM, this->device_addr))
   {
     if (hdr->size != sizeof(player_position3d_set_odom_req_t))
     {
@@ -110,14 +110,14 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->data->pose.yaw = odom->pos.pyaw;
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_SET_ODOM);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_SET_ODOM);
 
     return 0;
   }
 
   // REQUEST SET MOTOR POWER
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD, 
-        PLAYER_POSITION3D_REQ_MOTOR_POWER, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_POSITION3D_REQ_MOTOR_POWER, this->device_addr))
   {
     if (hdr->size != sizeof(player_position3d_power_config_t))
     {
@@ -132,14 +132,14 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->data->cmdEnableMotors = power->state;
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_MOTOR_POWER);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_MOTOR_POWER);
 
     return 0;
   }
 
   // REQUEST GET GEOMETRY
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_POSITION3D_REQ_GET_GEOM, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_POSITION3D_REQ_GET_GEOM, this->device_addr))
   {
     if (hdr->size != 0)
     {
@@ -161,15 +161,15 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
     geom.size.sh = 0.2;
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_GET_GEOM, 
-        &geom, sizeof(geom), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_GET_GEOM,
+                          &geom, sizeof(geom), NULL);
 
     return 0;
   }
 
   // REQUEST RESET ODOMETRY
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-        PLAYER_POSITION3D_REQ_RESET_ODOM, this->device_addr))
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_POSITION3D_REQ_RESET_ODOM, this->device_addr))
   {
     if (hdr->size != 0)
     {
@@ -180,7 +180,7 @@ int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
     // TODO: Make this work!!
     //
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_RESET_ODOM);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_POSITION3D_REQ_RESET_ODOM);
 
     return 0;
   }
@@ -227,9 +227,9 @@ void Position3dInterface::Update()
     data.stall = (uint8_t) this->iface->data->stall;
 
     this->driver->Publish( this->device_addr,
-                   PLAYER_MSGTYPE_DATA, PLAYER_POSITION3D_DATA_STATE, 
-                   (void*)&data, sizeof(data), &this->datatime );
- 
+                           PLAYER_MSGTYPE_DATA, PLAYER_POSITION3D_DATA_STATE,
+                           (void*)&data, sizeof(data), &this->datatime );
+
   }
 
   this->iface->Unlock();
@@ -250,7 +250,7 @@ void Position3dInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Position3d Interface\n"
-           << e << "\n";
+    << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }

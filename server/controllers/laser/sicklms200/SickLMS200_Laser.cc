@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ GZ_REGISTER_STATIC_CONTROLLER("sicklms200_laser", SickLMS200_Laser);
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 SickLMS200_Laser::SickLMS200_Laser(Entity *parent)
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<RaySensor*>(this->parent);
 
@@ -78,7 +78,7 @@ void SickLMS200_Laser::LoadChild(XMLConfigNode *node)
       this->fiducialIface = dynamic_cast<FiducialIface*>(*iter);
   }
 
-  if (!this->laserIface) gzthrow("SickLMS200_Laser controller requires a LaserIface"); 
+  if (!this->laserIface) gzthrow("SickLMS200_Laser controller requires a LaserIface");
 
 }
 
@@ -99,7 +99,7 @@ void SickLMS200_Laser::UpdateChild(UpdateParams &params)
     opened = this->laserIface->GetOpenCount() > 0;
     this->laserIface->Unlock();
   }
-  
+
   if (opened)
   {
     this->myParent->SetActive(true);
@@ -135,7 +135,7 @@ void SickLMS200_Laser::PutLaserData()
   int rayCount = this->myParent->GetRayCount();
   int rangeCount = this->myParent->GetRangeCount();
 
-  
+
   if (this->laserIface->Lock(1))
   {
     // Data timestamp
@@ -155,7 +155,7 @@ void SickLMS200_Laser::PutLaserData()
     {
       b = (double) i * (rayCount - 1) / (rangeCount - 1);
       ja = (int) floor(b);
-      jb = std::min(ja + 1, rayCount - 1);    
+      jb = std::min(ja + 1, rayCount - 1);
       b = b - floor(b);
 
       assert(ja >= 0 && ja < rayCount);
@@ -176,7 +176,7 @@ void SickLMS200_Laser::PutLaserData()
       this->laserIface->data->ranges[rangeCount-i-1] =  r + minRange;
       this->laserIface->data->intensity[i] = v;
     }
-    
+
     this->laserIface->Unlock();
 
     // New data is available
@@ -200,7 +200,7 @@ void SickLMS200_Laser::PutFiducialData()
   double minRange = this->myParent->GetMinRange();
   int rayCount = this->myParent->GetRayCount();
   int rangeCount = this->myParent->GetRangeCount();
- 
+
   if (this->fiducialIface->Lock(1))
   {
 

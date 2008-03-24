@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Sensor::Sensor(Body *body)
-  : Entity(body)
+    : Entity(body)
 {
   this->body = body;
   this->controller = NULL;
@@ -112,7 +112,7 @@ void Sensor::LoadController(XMLConfigNode *node)
     // Get the type of the interface (eg: laser)
     std::string ifaceType = childNode->GetName();
 
-    // Get the name of the iface 
+    // Get the name of the iface
     std::string ifaceName = childNode->GetString("name","",1);
 
     // Use the factory to get a new iface based on the type
@@ -125,7 +125,7 @@ void Sensor::LoadController(XMLConfigNode *node)
   else
   {
     stream << "No interface defined for " << controllerName << "controller";
-    gzthrow(stream.str()); 
+    gzthrow(stream.str());
   }*/
 
   // Create the controller based on it's type

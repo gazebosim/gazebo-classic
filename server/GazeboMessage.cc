@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ void GazeboMessage::Load(XMLConfigNode *node)
   {
     gzthrow("Null XMLConfig node");
   }
-  
+
   this->SetVerbose(node->GetInt("verbosity",0,0));
   this->logData = node->GetBool("logData",false);
 
@@ -78,10 +78,10 @@ void GazeboMessage::Load(XMLConfigNode *node)
     char baseFilename[50];
 
     time(&t);
-    localTime = localtime(&t); 
+    localTime = localtime(&t);
 
     strftime(baseFilename, sizeof(baseFilename),
-        "gazebo-%Y_%m_%d_%H_%M", localTime);
+             "gazebo-%Y_%m_%d_%H_%M", localTime);
 
     snprintf(logFilename, sizeof(logFilename), "%s.log", baseFilename);
   }
@@ -98,16 +98,16 @@ void GazeboMessage::Save(XMLConfigNode *node)
   node->SetValue("verbosity", this->level);
   node->SetValue("logData", this->logData);
 
-/*
-  node->NewElement("verbosity", String(this->level)); //std::ostringstream << this->level);
- 
-  node->NewElement("logData", gazebo::String(this->logData));
+  /*
+    node->NewElement("verbosity", String(this->level)); //std::ostringstream << this->level);
 
-  if (this->logData)
-    node->NewElement("logData", std::ostringstream << "true");
-  else
-    node->NewElement("logData", std::ostringstream << "true");
-  */
+    node->NewElement("logData", gazebo::String(this->logData));
+
+    if (this->logData)
+      node->NewElement("logData", std::ostringstream << "true");
+    else
+      node->NewElement("logData", std::ostringstream << "true");
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

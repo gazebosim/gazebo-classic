@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,9 +40,9 @@ using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
-LaserInterface::LaserInterface(player_devaddr_t addr, 
-    GazeboDriver *driver, ConfigFile *cf, int section)
-  : GazeboInterface(addr, driver, cf, section)
+LaserInterface::LaserInterface(player_devaddr_t addr,
+                               GazeboDriver *driver, ConfigFile *cf, int section)
+    : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
   this->gz_id = (char*) calloc(1024, sizeof(char));
@@ -66,34 +66,34 @@ LaserInterface::~LaserInterface()
   player_laser_data_t_cleanup(&this->data);
 
   // Release this interface
-  delete this->iface; 
+  delete this->iface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Handle all messages. This is called from GazeboDriver
 int LaserInterface::ProcessMessage(QueuePointer &respQueue,
-                   player_msghdr_t *hdr, void *data)
+                                   player_msghdr_t *hdr, void *data)
 {
   // Is it a request to set the laser's config?
-  if(Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ, 
-                           PLAYER_LASER_REQ_SET_CONFIG, 
-                           this->device_addr))
+  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                            PLAYER_LASER_REQ_SET_CONFIG,
+                            this->device_addr))
   {
     player_laser_config_t* plc = (player_laser_config_t*)data;
 
-    if( hdr->size == sizeof(player_laser_config_t) )
+    if ( hdr->size == sizeof(player_laser_config_t) )
     {
       // TODO: Complete this
 
-        this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, 
-          PLAYER_LASER_REQ_SET_CONFIG);
+      this->driver->Publish(this->device_addr, respQueue,
+                            PLAYER_MSGTYPE_RESP_ACK,
+                            PLAYER_LASER_REQ_SET_CONFIG);
       return(0);
     }
     else
     {
-      printf("config request len is invalid (%d != %d)", 
-          (int)hdr->size, (int)sizeof(player_laser_config_t));
+      printf("config request len is invalid (%d != %d)",
+             (int)hdr->size, (int)sizeof(player_laser_config_t));
 
       return(-1);
     }
@@ -103,8 +103,8 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_LASER_REQ_GET_CONFIG,
                                  this->device_addr))
-  {   
-    if( hdr->size == 0 )
+  {
+    if ( hdr->size == 0 )
     {
       int intensity = 1; // todo
 
@@ -118,9 +118,9 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
       plc.intensity = intensity;
 
       this->driver->Publish(this->device_addr, respQueue,
-          PLAYER_MSGTYPE_RESP_ACK, 
-			    PLAYER_LASER_REQ_GET_CONFIG,
-			    (void*)&plc, sizeof(plc), NULL);
+                            PLAYER_MSGTYPE_RESP_ACK,
+                            PLAYER_LASER_REQ_GET_CONFIG,
+                            (void*)&plc, sizeof(plc), NULL);
       return(0);
     }
     else
@@ -132,7 +132,7 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
 
 
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-        PLAYER_LASER_REQ_GET_GEOM, this->device_addr))
+                                 PLAYER_LASER_REQ_GET_GEOM, this->device_addr))
   {
     player_laser_geom_t rep;
 
@@ -146,9 +146,9 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
 //     rep.size.sl = 0.0;
 
     this->driver->Publish(this->device_addr, respQueue,
-        PLAYER_MSGTYPE_RESP_ACK, 
-        PLAYER_LASER_REQ_GET_GEOM, 
-        &rep, sizeof(rep), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK,
+                          PLAYER_LASER_REQ_GET_GEOM,
+                          &rep, sizeof(rep), NULL);
 
     return 0;
   }
@@ -198,7 +198,7 @@ void LaserInterface::Update()
       this->data.resolution = angleRes;
 
       double oldCount = this->data.ranges_count;
-      this->data.ranges_count = this->data.intensity_count = this->iface->data->range_count; 
+      this->data.ranges_count = this->data.intensity_count = this->iface->data->range_count;
       this->data.id = this->scanId++;
 
       if (oldCount != this->data.ranges_count)
@@ -217,9 +217,9 @@ void LaserInterface::Update()
       }
 
       this->driver->Publish( this->device_addr,
-          PLAYER_MSGTYPE_DATA,
-          PLAYER_LASER_DATA_SCAN,        
-          (void*)&this->data, sizeof(this->data), &this->datatime );
+                             PLAYER_MSGTYPE_DATA,
+                             PLAYER_LASER_DATA_SCAN,
+                             (void*)&this->data, sizeof(this->data), &this->datatime );
     }
 
     this->iface->Unlock();
@@ -243,7 +243,7 @@ void LaserInterface::Subscribe()
   {
     //std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Laser Interface\n"
-           << e << "\n";
+    << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }

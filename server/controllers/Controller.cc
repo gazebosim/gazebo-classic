@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -76,25 +76,25 @@ void Controller::Load(XMLConfigNode *node)
   while (childNode)
   {
     Iface *iface=0;
-    
+
     // Get the type of the interface (eg: laser)
     std::string ifaceType = childNode->GetName();
 
-    // Get the name of the iface 
+    // Get the name of the iface
     std::string ifaceName = childNode->GetString("name","",1);
-    
-    try 
+
+    try
     {
       // Use the factory to get a new iface based on the type
       iface = IfaceFactory::NewIface(ifaceType);
     }
-    catch(...) //TODO: Show the exception text here (subclass exception?)
+    catch (...) //TODO: Show the exception text here (subclass exception?)
     {
       gzmsg(1) << "No manager for the interface " << ifaceType << " found. Disabled.\n";
       childNode = childNode->GetNextByNSPrefix("interface");
       continue;
     }
-    
+
     // Create the iface
     iface->Create(World::Instance()->GetGzServer(), ifaceName);
 
@@ -107,7 +107,7 @@ void Controller::Load(XMLConfigNode *node)
   {
     std::ostringstream stream;
     stream << "No interface defined for " << this->name << " controller";
-    gzthrow(stream.str()); 
+    gzthrow(stream.str());
   }
 
   this->LoadChild(node);
@@ -115,11 +115,11 @@ void Controller::Load(XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Save the controller. 
+/// Save the controller.
 void Controller::Save()
 {
   //So far the controller can not change in any way, not rewrite
-  this->SaveChild(this->xmlNode); 
+  this->SaveChild(this->xmlNode);
 }
 
 
@@ -141,7 +141,8 @@ void Controller::Reset()
 /// Update the controller. Called every cycle.
 void Controller::Update(UpdateParams &params)
 {
-  if (lastUpdate + updatePeriod <= Simulator::Instance()->GetSimTime()) {
+  if (lastUpdate + updatePeriod <= Simulator::Instance()->GetSimTime())
+  {
     this->UpdateChild(params);
     lastUpdate = Simulator::Instance()->GetSimTime();
   }

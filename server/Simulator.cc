@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -72,17 +72,17 @@ Simulator::Simulator()
 // Destructor
 Simulator::~Simulator()
 {
-  this->Close(); 
+  this->Close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Closes the Simulator and frees everything
 void Simulator::Close()
 {
-  if (!this->loaded) 
+  if (!this->loaded)
     return;
 
-  GZ_DELETE (this->gui) // enough? 
+  GZ_DELETE (this->gui) // enough?
   GZ_DELETE (this->xmlFile) //enough?
   gazebo::World::Instance()->Close();
   gazebo::OgreAdaptor::Instance()->Close();
@@ -90,7 +90,7 @@ void Simulator::Close()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the world configuration file 
+/// Load the world configuration file
 /// Any error that reach this level must make the simulator exit
 void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 {
@@ -102,7 +102,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
   // Load the world file
   this->xmlFile=new gazebo::XMLConfig();
-  
+
   try
   {
     xmlFile->Load(worldFileName);
@@ -110,8 +110,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   catch (GazeboError e)
   {
     std::ostringstream stream;
-    stream << "The XML config file can not be loaded, please make sure is a correct file\n" 
-      << e << "\n";
+    stream << "The XML config file can not be loaded, please make sure is a correct file\n"
+    << e << "\n";
     gzthrow(stream.str());
   }
 
@@ -120,7 +120,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   // Load the messaging system
   gazebo::GazeboMessage::Instance()->Load(rootNode);
 
-  try 
+  try
   {
     //Create and initialize the Gui
     this->LoadGui(rootNode);
@@ -128,11 +128,11 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   catch (GazeboError e)
   {
     std::ostringstream stream;
-    stream << "Error loading the GUI\n" 
-        << e << "\n";
+    stream << "Error loading the GUI\n"
+    << e << "\n";
     gzthrow(stream.str());
   }
-  
+
   //Initialize RenderingEngine
   try
   {
@@ -141,15 +141,15 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   catch (gazebo::GazeboError e)
   {
     std::ostringstream stream;
-    stream << "Failed to Initialize the OGRE Rendering system\n" 
-      << e << "\n";
+    stream << "Failed to Initialize the OGRE Rendering system\n"
+    << e << "\n";
     gzthrow(stream.str());
   }
 
   //Preload basic shapes that can be used anywhere
   OgreCreator::CreateBasicShapes();
-  
-  try 
+
+  try
   {
     //Create the world
     gazebo::World::Instance()->Load(rootNode, serverId);
@@ -157,8 +157,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   catch (GazeboError e)
   {
     std::ostringstream stream;
-    stream << "Error loading the GUI\n" 
-        << e << "\n";
+    stream << "Error loading the GUI\n"
+    << e << "\n";
     gzthrow(stream.str());
   }
 
@@ -223,7 +223,7 @@ void Simulator::Update()
   }
   else
   {
-    this->pauseTime += step; 
+    this->pauseTime += step;
     this->pause=true;
   }
 

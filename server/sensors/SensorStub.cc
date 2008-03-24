@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,9 +37,9 @@ using namespace gazebo;
 GZ_REGISTER_STATIC_SENSOR("stub", SensorStub);
 
 //////////////////////////////////////////////////////////////////////////////
-// Constructor 
+// Constructor
 SensorStub::SensorStub(Body *body)
-  : Sensor(body)
+    : Sensor(body)
 {
 }
 
@@ -71,5 +71,5 @@ void SensorStub::FiniChild()
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
 void SensorStub::UpdateChild(UpdateParams &params)
-{  
+{
 }

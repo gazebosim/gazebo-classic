@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@ void IfaceFactory::RegisterIface(std::string classname, IfaceFactoryFn factoryfn
 // Create a new instance of a iface.  Used by the world when reading
 // the world file.
 Iface *IfaceFactory::NewIface(const std::string &classname)
-{  
+{
   if (ifaces.find(classname) != ifaces.end())
   {
     return (ifaces[classname]) ();

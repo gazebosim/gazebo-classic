@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ GZ_REGISTER_STATIC_CONTROLLER("bandit_actarray", Bandit_Actarray);
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Bandit_Actarray::Bandit_Actarray(Entity *parent )
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 
@@ -68,7 +68,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
   if (!this->myIface)
     gzthrow("Bandit_Actarray controller requires a Actarray Iface");
 
-  
+
   for (i=0, jNode = node->GetChild("joint"); jNode; i++)
   {
     std::string name = jNode->GetString("name","",1);
@@ -128,7 +128,7 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
     }
 
     this->myIface->data->actuators[i].position = joint->GetAngle();
-    this->myIface->data->actuators[i].speed = joint->GetAngleRate(); 
+    this->myIface->data->actuators[i].speed = joint->GetAngleRate();
   }
 
   this->myIface->data->new_cmd = 0;

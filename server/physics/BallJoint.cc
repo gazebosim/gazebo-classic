@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 BallJoint::BallJoint(dWorldID worldId)
-  : Joint()
+    : Joint()
 {
   this->jointId = dJointCreateBall(worldId, NULL);
 }
@@ -62,7 +62,7 @@ Vector3 BallJoint::GetAnchor() const
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joints anchor point
-void BallJoint::SetAnchor(const Vector3 &anchor) 
+void BallJoint::SetAnchor(const Vector3 &anchor)
 {
   dJointSetBallAnchor( jointId, anchor.x, anchor.y, anchor.z );
 }

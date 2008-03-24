@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ ContactParams::ContactParams()
   this->bounce = 0.1;
   this->bounceVel = 0.1;
   this->softCfm = 0.01;
-  
+
   this->mu1 = dInfinity;
   this->mu2 = 0.0;
   this->slip1 = 0.01;

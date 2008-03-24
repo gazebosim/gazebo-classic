@@ -2,7 +2,7 @@
  * File: MovableText.cpp
  *
  * description: This create create a billboarding object that display a text.
- * 
+ *
  * @author  2003 by cTh see gavocanov@rambler.ru
  * @update  2006 by barraq see nospam@barraquand.com
  * @update  2007 by independentCreations see independentCreations@gmail.com
@@ -20,15 +20,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 MovableText::MovableText()
-  : camera(NULL), 
-    renderWindow(NULL) , 
-    font(NULL) , 
-   spaceWidth(0) , 
-    updateColors(true) , 
-    onTop(false) , 
-    horizAlign(H_LEFT) , 
-    vertAlign(V_BELOW) , 
-    baseline(0.0) , 
+    : camera(NULL),
+    renderWindow(NULL) ,
+    font(NULL) ,
+    spaceWidth(0) ,
+    updateColors(true) ,
+    onTop(false) ,
+    horizAlign(H_LEFT) ,
+    vertAlign(V_BELOW) ,
+    baseline(0.0) ,
     viewportAspectCoef (0.75)
 {
   this->renderOp.vertexData = NULL;
@@ -43,12 +43,12 @@ MovableText::~MovableText()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//Loads the text to display and select the font 
-void MovableText::Load(const std::string &name, 
-                         const Ogre::UTFString &text, 
-                         const std::string &fontName, 
-                         float charHeight, 
-                         const Ogre::ColourValue &color)
+//Loads the text to display and select the font
+void MovableText::Load(const std::string &name,
+                       const Ogre::UTFString &text,
+                       const std::string &fontName,
+                       float charHeight,
+                       const Ogre::ColourValue &color)
 {
   this->text=text;
   this->color=color;
@@ -57,15 +57,15 @@ void MovableText::Load(const std::string &name,
   this->mName = name;
 
   if (this->mName == "")
-    throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS, 
-                    "Trying to create MovableText without name", 
-                    "MovableText::MovableText");
+    throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS,
+                          "Trying to create MovableText without name",
+                          "MovableText::MovableText");
 
   if (this->text == "")
-    throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS, 
-                    "Trying to create MovableText without text", 
-                    "MovableText::MovableText");
-  
+    throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS,
+                          "Trying to create MovableText without text",
+                          "MovableText::MovableText");
+
 
   this->SetFontName(this->fontName);
   this->_setupGeometry();
@@ -77,9 +77,9 @@ void MovableText::Load(const std::string &name,
 // Set the font name
 void MovableText::SetFontName(const std::string &newFontName)
 {
-  if ((Ogre::MaterialManager::getSingletonPtr()->resourceExists(this->mName + "Material"))) 
-  { 
-    Ogre::MaterialManager::getSingleton().remove(this->mName + "Material"); 
+  if ((Ogre::MaterialManager::getSingletonPtr()->resourceExists(this->mName + "Material")))
+  {
+    Ogre::MaterialManager::getSingleton().remove(this->mName + "Material");
   }
 
   if (this->fontName != newFontName || this->material.isNull() || !this->font)
@@ -90,9 +90,9 @@ void MovableText::SetFontName(const std::string &newFontName)
 
     if (!this->font)
     {
-      throw Ogre::Exception(Ogre::Exception::ERR_ITEM_NOT_FOUND, 
-                      "Could not find font " + fontName, 
-                      "MovableText::setFontName");
+      throw Ogre::Exception(Ogre::Exception::ERR_ITEM_NOT_FOUND,
+                            "Could not find font " + fontName,
+                            "MovableText::setFontName");
     }
 
     this->font->load();
@@ -165,13 +165,13 @@ void MovableText::SetSpaceWidth(float width)
 // Set alignment of the text
 void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 {
-  if(this->horizAlign != h)
+  if (this->horizAlign != h)
   {
     this->horizAlign = h;
     this->needUpdate = true;
   }
 
-  if(this->vertAlign != v)
+  if (this->vertAlign != v)
   {
     this->vertAlign = v;
     this->needUpdate = true;
@@ -182,7 +182,7 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 // Set additional height
 void MovableText::SetBaseline( float base )
 {
-  if( this->baseline != base )
+  if ( this->baseline != base )
   {
     this->baseline = base;
     this->needUpdate = true;
@@ -213,8 +213,8 @@ bool MovableText::GetShowOnTop() const
 ////////////////////////////////////////////////////////////////////////////////
 // Get the axis aligned bounding box
 Ogre::AxisAlignedBox MovableText::GetAABB(void)
-{ 
-  return this->aabb; 
+{
+  return this->aabb;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ void MovableText::_setupGeometry()
   assert(this->font);
   assert(!this->material.isNull());
 
-  Ogre::VertexDeclaration *decl = NULL; 
+  Ogre::VertexDeclaration *decl = NULL;
   Ogre::VertexBufferBinding *bind = NULL;
   Ogre::HardwareVertexBufferSharedPtr ptbuf;
   Ogre::HardwareVertexBufferSharedPtr cbuf;
@@ -265,27 +265,27 @@ void MovableText::_setupGeometry()
   this->renderOp.indexData = 0;
   this->renderOp.vertexData->vertexStart = 0;
   this->renderOp.vertexData->vertexCount = vertexCount;
-  this->renderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST; 
-  this->renderOp.useIndexes = false; 
+  this->renderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
+  this->renderOp.useIndexes = false;
 
   decl = this->renderOp.vertexData->vertexDeclaration;
   bind = this->renderOp.vertexData->vertexBufferBinding;
 
   // create/bind positions/tex.ccord. buffer
   if (!decl->findElementBySemantic(Ogre::VES_POSITION))
-    decl->addElement(POS_TEX_BINDING, offset, Ogre::VET_FLOAT3, 
+    decl->addElement(POS_TEX_BINDING, offset, Ogre::VET_FLOAT3,
                      Ogre::VES_POSITION);
 
   offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
 
   if (!decl->findElementBySemantic(Ogre::VES_TEXTURE_COORDINATES))
-    decl->addElement(POS_TEX_BINDING, offset, Ogre::VET_FLOAT2, 
+    decl->addElement(POS_TEX_BINDING, offset, Ogre::VET_FLOAT2,
                      Ogre::VES_TEXTURE_COORDINATES, 0);
 
   ptbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-              decl->getVertexSize(POS_TEX_BINDING),
-              this->renderOp.vertexData->vertexCount,
-              Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+            decl->getVertexSize(POS_TEX_BINDING),
+            this->renderOp.vertexData->vertexCount,
+            Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
   bind->setBinding(POS_TEX_BINDING, ptbuf);
 
@@ -294,9 +294,9 @@ void MovableText::_setupGeometry()
     decl->addElement(COLOUR_BINDING, 0, Ogre::VET_COLOUR, Ogre::VES_DIFFUSE);
 
   cbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-             decl->getVertexSize(COLOUR_BINDING),
-             this->renderOp.vertexData->vertexCount,
-             Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+           decl->getVertexSize(COLOUR_BINDING),
+           this->renderOp.vertexData->vertexCount,
+           Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
 
   bind->setBinding(COLOUR_BINDING, cbuf);
 
@@ -306,7 +306,7 @@ void MovableText::_setupGeometry()
   if (this->spaceWidth == 0)
     this->spaceWidth = this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 
-  if(this->vertAlign == MovableText::V_ABOVE)
+  if (this->vertAlign == MovableText::V_ABOVE)
   {
     // Raise the first line of the caption
     top += this->charHeight;
@@ -318,12 +318,12 @@ void MovableText::_setupGeometry()
     }
   }
 
-  for( i = this->text.begin(); i != this->text.end(); ++i )
+  for ( i = this->text.begin(); i != this->text.end(); ++i )
   {
-    if( newLine )
+    if ( newLine )
     {
       len = 0.0;
-      for( Ogre::UTFString::iterator j = i; j != this->text.end(); j++ )
+      for ( Ogre::UTFString::iterator j = i; j != this->text.end(); j++ )
       {
         Ogre::Font::CodePoint character = j.getCharacter();
         if (character == 0x000D // CR
@@ -335,7 +335,7 @@ void MovableText::_setupGeometry()
         {
           len += this->spaceWidth;
         }
-        else 
+        else
         {
           len += this->font->getGlyphAspectRatio(character) * this->charHeight * 2.0 * this->viewportAspectCoef;
         }
@@ -390,7 +390,7 @@ void MovableText::_setupGeometry()
       currPos = Ogre::Vector3(left,top,0);
     else
       currPos = Ogre::Vector3(left - (len/2.0), top, 0);
-    
+
     if (first)
     {
       min = max = currPos;
@@ -451,8 +451,8 @@ void MovableText::_setupGeometry()
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
-      
-   
+
+
     //------------------------------------------------------------------------
 
     //------------------------------------------------------------------------
@@ -473,7 +473,7 @@ void MovableText::_setupGeometry()
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
-     
+
 
     top -= this->charHeight * 2.0;
     left -= horiz_height  * this->charHeight * 2.0;
@@ -493,7 +493,7 @@ void MovableText::_setupGeometry()
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
- 
+
 
     left += horiz_height  * this->charHeight * 2.0;
 
@@ -512,7 +512,7 @@ void MovableText::_setupGeometry()
     min.makeFloor(currPos);
     max.makeFloor(currPos);
     maxSquaredRadius = std::max(maxSquaredRadius, currPos.squaredLength());
- 
+
     //-------------------------------------------------------------------------
 
 
@@ -530,9 +530,9 @@ void MovableText::_setupGeometry()
   ptbuf->unlock();
 
 
-/*  min.x=min.y=min.z=-10000;
-  max.x=max.y=max.z = 10000;
-  */
+  /*  min.x=min.y=min.z=-10000;
+    max.x=max.y=max.z = 10000;
+    */
 
   // update AABB/Sphere radius
   this->aabb = Ogre::AxisAlignedBox(min, max);
@@ -596,12 +596,12 @@ const Ogre::AxisAlignedBox &MovableText::getBoundingBox(void) const
 ////////////////////////////////////////////////////////////////////////////////
 const Ogre::String &MovableText::getMovableType() const
 {
-  static Ogre::String movType = "MovableText"; 
+  static Ogre::String movType = "MovableText";
   return movType;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const 
+void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
 {
   if (this->isVisible() && this->camera)
   {
@@ -621,7 +621,7 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
     scale3x3[1][1] = mParentNode->_getDerivedScale().y / 2;
     scale3x3[2][2] = mParentNode->_getDerivedScale().z / 2;
 
-    // apply all transforms to xform       
+    // apply all transforms to xform
     *xform = (rot3x3 * scale3x3);
     xform->setTrans(ppos);
   }

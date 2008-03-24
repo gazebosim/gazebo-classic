@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -65,22 +65,22 @@ void Wheel::SetSuspension(float spring, float damping, float step)
 
 void Wheel::Connect(Joint *joint, int type)
 {
-  
- } 
+
+}
 
 void Wheel::Stop()
 {
-  
+
 }
 
 
 void Wheel::SetTorque( float newTorque)
 {
- }
+}
 
 void Wheel::Update(float speed, float steer)
 {
- 
+
 }
 
 

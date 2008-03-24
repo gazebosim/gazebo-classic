@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -50,7 +50,7 @@ void GuiFactory::RegisterGui(std::string type, std::string classname,
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new instance of a gui.
 Gui *GuiFactory::NewGui(const std::string &classname, int x, int y, int w, int h, const std::string &label)
-{  
+{
   if (guis[classname])
   {
     return (guis[classname]) (x, y, w, h, label);

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -59,7 +59,7 @@ OgreVisual::OgreVisual(OgreVisual *node)
 /// Destructor
 OgreVisual::~OgreVisual()
 {
- this->parentNode->removeAndDestroyChild(this->sceneNode->getName());
+  this->parentNode->removeAndDestroyChild(this->sceneNode->getName());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   Ogre::Vector3 meshSize;
   Ogre::MovableObject *obj;
 
-  this->xmlNode=node; 
+  this->xmlNode=node;
   std::string meshName = node->GetString("mesh","",1);
   std::string materialName = node->GetString("material","",0);
 
@@ -86,17 +86,17 @@ void OgreVisual::Load(XMLConfigNode *node)
     stream << this->sceneNode->getName() << "_ENTITY";
     obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
   }
-  catch(Ogre::Exception e)
+  catch (Ogre::Exception e)
   {
     gzthrow("Unable to create a mesh from " + meshName);
   }
 
   // Attach the entity to the node
-  this->AttachObject(obj);  
+  this->AttachObject(obj);
 
   // Set the pose of the scene node
   this->SetPose(pose);
-  
+
   // Get the size of the mesh
   meshSize = obj->getBoundingBox().getSize();
 
@@ -118,7 +118,7 @@ void OgreVisual::Load(XMLConfigNode *node)
     this->sceneNode->setScale(size.x/meshSize.x, size.y/meshSize.y, size.z/meshSize.z);
   }
 
- 
+
   // Set the material of the mesh
   this->SetMaterial(node->GetString("material",std::string(),1));
 
@@ -158,7 +158,7 @@ void OgreVisual::AttachMesh( const std::string &meshName )
 void OgreVisual::SetScale( Vector3 scale )
 {
   Ogre::Vector3 vscale;
-  vscale.x=scale.x;  
+  vscale.x=scale.x;
   vscale.y=scale.y;
   vscale.z=scale.z;
   this->sceneNode->setScale(vscale);
@@ -188,19 +188,19 @@ void OgreVisual::SetMaterial(const std::string &materialName)
   }
   catch (Ogre::Exception e)
   {
-    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry[" 
-      << this->sceneNode->getName() << ". Object will appear white.\n";
+    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry["
+    << this->sceneNode->getName() << ". Object will appear white.\n";
     return;
   }
 
   if (this->origMaterial.isNull())
   {
-    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry[" 
-      << this->sceneNode->getName() << ". Object will appear white\n";
+    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry["
+    << this->sceneNode->getName() << ". Object will appear white\n";
     return;
   }
 
-  
+
   // Create a custom material name
   std::string myMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
 
@@ -210,11 +210,11 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
 
-  while (techniqueIt.hasMoreElements ()) 
+  while (techniqueIt.hasMoreElements ())
   {
     Ogre::Technique *t = techniqueIt.getNext ();
     Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-    while (passIt.hasMoreElements ()) 
+    while (passIt.hasMoreElements ())
     {
       passIt.peekNext ()->setDepthWriteEnabled (true);
       passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
@@ -233,12 +233,12 @@ void OgreVisual::SetMaterial(const std::string &materialName)
       else
         ((Ogre::SimpleRenderable*)obj)->setMaterial(myMaterialName);
     }
-    
-  } 
+
+  }
   catch (Ogre::Exception e)
-  { 
-    gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry[" 
-             << this->sceneNode->getName() << ". Object will appear white.\n";
+  {
+    gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry["
+    << this->sceneNode->getName() << ". Object will appear white.\n";
   }
 }
 
@@ -261,14 +261,14 @@ void OgreVisual::SetTransparency( float trans )
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
 
 
-  while ( techniqueIt.hasMoreElements() ) 
+  while ( techniqueIt.hasMoreElements() )
   {
     t = techniqueIt.getNext ();
     Ogre::Technique::PassIterator passIt = t->getPassIterator ();
 
     j = 0;
 
-    while (passIt.hasMoreElements ()) 
+    while (passIt.hasMoreElements ())
     {
       sc = this->origMaterial->getTechnique (i)->getPass (j)->getDiffuse ();
 
@@ -276,14 +276,14 @@ void OgreVisual::SetTransparency( float trans )
         passIt.peekNext ()->setDepthWriteEnabled (false);
       else
         passIt.peekNext ()->setDepthWriteEnabled (true);
-        
 
-      switch (this->sceneBlendType) 
+
+      switch (this->sceneBlendType)
       {
         case Ogre::SBT_ADD:
           dc = sc;
           dc.r -= sc.r * this->transparency;
-          dc.g -= sc.g	 * this->transparency;
+          dc.g -= sc.g  * this->transparency;
           dc.b -= sc.b * this->transparency;
           passIt.peekNext ()->setAmbient (Ogre::ColourValue::Black);
           break;
@@ -296,7 +296,7 @@ void OgreVisual::SetTransparency( float trans )
           break;
       }
       passIt.peekNext ()->setDiffuse (dc);
-      
+
       passIt.moveNext ();
 
       ++j;
@@ -310,26 +310,26 @@ void OgreVisual::SetTransparency( float trans )
 void OgreVisual::SetHighlight(bool highlight)
 {
   /*
-#include <OgreParticleSystem.h>
-#include <iostream>
+  #include <OgreParticleSystem.h>
+  #include <iostream>
   Ogre::ParticleSystem *effect =OgreAdaptor::Instance()->sceneMgr->createParticleSystem(this->parentNode->getName(), "Gazebo/Aureola");
   OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(effect);
   //this->sceneNode->createChildSceneNode()->attachObject(effect);
   Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);
-std::cout << this->parentNode->getName() << std::endl;
-*/
+  std::cout << this->parentNode->getName() << std::endl;
+  */
 
 //FIXME:  Modifying selfIllumination is invasive to the material definition of the user
 // Choose other effect.
 
   Ogre::Technique *t;
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
-  while ( techniqueIt.hasMoreElements() ) 
+  while ( techniqueIt.hasMoreElements() )
   {
     t = techniqueIt.getNext ();
     Ogre::Technique::PassIterator passIt = t->getPassIterator ();
 
-    while (passIt.hasMoreElements ()) 
+    while (passIt.hasMoreElements ())
     {
       if (highlight)
       {
@@ -338,7 +338,7 @@ std::cout << this->parentNode->getName() << std::endl;
       else
       {
         passIt.peekNext ()->setSelfIllumination (0,0,0);
-      }       
+      }
       passIt.moveNext ();
     }
   }
@@ -355,7 +355,7 @@ void OgreVisual::SetCastShadows(bool shadows)
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
     obj->setCastShadows(shadows);
   }
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -426,7 +426,7 @@ Pose3d OgreVisual::GetPose()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get this visual Ogre node 
+// Get this visual Ogre node
 Ogre::SceneNode * OgreVisual::GetSceneNode()
 {
   return this->sceneNode;
@@ -448,7 +448,7 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
     i++;
   }
 
-  this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str()); 
+  this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str());
   this->boundingBoxNode->setInheritScale(false);
 
   Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box"));
@@ -470,5 +470,5 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
     simple->setMaterial("Gazebo/TransparentTest");
 
   this->boundingBoxNode->setVisible(false);
-  
+
 }

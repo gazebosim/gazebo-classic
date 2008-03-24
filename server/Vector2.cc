@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ using namespace gazebo;
 // Constructor
 template<typename T>
 Vector2<T>::Vector2()
-  : x(0), y(0)
+    : x(0), y(0)
 {
 }
 
@@ -42,7 +42,7 @@ Vector2<T>::Vector2()
 // Constructor
 template<typename T>
 Vector2<T>::Vector2( const T &x, const T &y )
-  : x(x), y(y)
+    : x(x), y(y)
 {
 }
 
@@ -50,7 +50,7 @@ Vector2<T>::Vector2( const T &x, const T &y )
 // Copy Constructor
 template<typename T>
 Vector2<T>::Vector2( const Vector2 &pt )
-  : x(pt.x), y(pt.y)
+    : x(pt.x), y(pt.y)
 {
 }
 
@@ -107,7 +107,7 @@ template<typename T>
 const Vector2<T> &Vector2<T>::operator=( T value )
 {
   this->x = value;
-  this->y = value; 
+  this->y = value;
 
   return *this;
 }

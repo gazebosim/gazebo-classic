@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ GZ_REGISTER_STATIC_CONTROLLER("generic_ptz", Generic_PTZ);
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Generic_PTZ::Generic_PTZ(Entity *parent)
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 
@@ -119,7 +119,7 @@ void Generic_PTZ::UpdateChild(UpdateParams &params)
   this->cmdPan = this->ptzIface->data->cmd_pan;
   this->cmdTilt = this->ptzIface->data->cmd_tilt;
   //this->cmdZoom = this->hfov / this->ptzIface->data->cmd_zoom;
-  
+
   this->ptzIface->Unlock();
 
   // Apply joint limits to commanded pan/tilt angles
@@ -144,7 +144,7 @@ void Generic_PTZ::UpdateChild(UpdateParams &params)
   // a proportional control
   float tilt = this->cmdTilt - this->tiltJoint->GetAngle();
   float pan = this->cmdPan - this->panJoint->GetAngle();
- 
+
   this->tiltJoint->SetParam( dParamVel, this->motionGain * tilt);
   this->tiltJoint->SetParam( dParamFMax, this->force );
 
@@ -174,8 +174,8 @@ void Generic_PTZ::PutPTZData()
 
   data->pan = this->panJoint->GetAngle();
   data->tilt = this->tiltJoint->GetAngle();
-  //data->zoom = this->camera->GetFOV();  
- 
+  //data->zoom = this->camera->GetFOV();
+
   this->ptzIface->Unlock();
 
   // New data is available

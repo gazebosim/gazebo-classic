@@ -18,7 +18,7 @@ void SaveFrame(const char *filename, gazebo::CameraData *data)
   int pixelSize = 3;
   int rowSize = width * pixelSize;
 
-  // Write ppm  
+  // Write ppm
   fprintf(file, "P6\n%d %d\n%d\n", width, height, 255);
   for (i = 0; i < height; i++)
     fwrite(data->image + i * rowSize, rowSize, 1, file);
@@ -46,7 +46,7 @@ int main()
   }
 
   /// Open the Simulation Interface
-  try 
+  try
   {
     simIface->Open(client, "default");
   }
@@ -64,7 +64,7 @@ int main()
   catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect to the camera interface\n"
-      << e << "\n";
+    << e << "\n";
     return -1;
   }
 

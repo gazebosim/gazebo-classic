@@ -20,7 +20,7 @@ int main()
   }
 
   /// Open the Simulation Interface
-  try 
+  try
   {
     simIface->Open(client, "default");
   }

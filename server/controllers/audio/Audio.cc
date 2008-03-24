@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -45,11 +45,11 @@ enum {DRIVE, STEER, FULL};
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 AudioController::AudioController(Entity *parent )
-  : Controller(parent)
+    : Controller(parent)
 {
   this->soundManager =0;
- // this->myParent = dynamic_cast<Model*>(this->parent);
-  
+// this->myParent = dynamic_cast<Model*>(this->parent);
+
 //  if (!this->myParent)
 //    gzthrow("AudioController controller requires a Model as its parent");
 
@@ -75,7 +75,7 @@ void AudioController::LoadChild(XMLConfigNode *node)
   this->loopSound= node->GetBool("loop",false,0);
   this->stream=node->GetBool("stream",false,0);
 
- }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the controller
@@ -85,7 +85,7 @@ void AudioController::InitChild()
   {
     this->soundManager = new OgreAL::SoundManager();
   }
-  catch(Ogre::Exception e)
+  catch (Ogre::Exception e)
   {
     gzthrow("The 3d Sound manager can not be initialized, check your OpenAL and OgreAL installation\n");
   }
@@ -106,21 +106,21 @@ void AudioController::UpdateChild(UpdateParams &params)
   OgreAL::Sound *sound;
   std::string uniqueSoundName = this->GetUniqueName() + this->url;
   this->GetAudioCmd();
- 
+
   if (cmdPlay)
   {
-    
+
     if (!soundManager->hasSound(uniqueSoundName)
-      sound = soundManager->createSound(uniqueSoundName, this->url, this->loopSound, this->stream);
-    else
-      sound = soundManager->getSound(uniqueSoundName);
-     //TODO: check what happens if I call this twice
-    this->parent->GetVisualNode()->AttachObject(sound);
-    sound->addSoundFinishedHandler(this, &AudioController::SoundFinished);
-    sound->play();
-    this->state=1;
-  }
-  if (cmdStop)
+        sound = soundManager->createSound(uniqueSoundName, this->url, this->loopSound, this->stream);
+        else
+          sound = soundManager->getSound(uniqueSoundName);
+          //TODO: check what happens if I call this twice
+          this->parent->GetVisualNode()->AttachObject(sound);
+          sound->addSoundFinishedHandler(this, &AudioController::SoundFinished);
+          sound->play();
+          this->state=1;
+        }
+    if (cmdStop)
   {
     sound = soundManager->getSound(uniqueSoundName);
     if (sound)
@@ -137,13 +137,13 @@ void AudioController::UpdateChild(UpdateParams &params)
       sound->pause();
       this->state=2;
     }
-  
+
   }
   if (cmdReset)
   {
-  
+
   }
-  
+
   //more stuff here
 
   this->PutAudioData();
@@ -168,22 +168,22 @@ void AudioController::GetAudioCmd()
 
   if (this->myIface->Lock(1))
   {
-    
+
     this->cmdPlay = this->myIface->data->cmd_play;
     this->cmdPause = this->myIface->data->cmd_pause;
     this->cmdStop = this->myIface->data->cmd_stop;
     this->cmdReset = this->myIface->data->cmd_reset;
     this->gain = this->myIface->data->gain;
-    
+
     if (this->cmdPlay)
       this->url = ((const char *)this->myIface->data->url);
 
     //we got the command, not sure if this is correct
-    this->myIface->data->cmd_reset=0; 
+    this->myIface->data->cmd_reset=0;
     this->myIface->data->cmd_play=0;
     this->myIface->data->cmd_pause=0;
     this->myIface->data->cmd_stop=0;
-    
+
     this->myIface->Unlock();
   }
   std::cout << this->url << std::endl;

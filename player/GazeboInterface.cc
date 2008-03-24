@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 using namespace gazebo;
 
 GazeboInterface::GazeboInterface(player_devaddr_t addr, GazeboDriver *driver,
-          ConfigFile * /*cf*/, int /*section*/)
+                                 ConfigFile * /*cf*/, int /*section*/)
 {
   this->device_addr = addr;
   this->driver = driver;

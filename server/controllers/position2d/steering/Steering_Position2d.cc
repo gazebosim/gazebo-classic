@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ enum {DRIVE, STEER, FULL};
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Steering_Position2d::Steering_Position2d(Entity *parent )
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 
@@ -81,7 +81,7 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
   float steerKp, steerKd;
   float defaultTorque, defaultSteerTorque, defaultKp, defaultKd;
   float defaultMaxAngle;
-   
+
 
   this->myIface = dynamic_cast<PositionIface*>(this->ifaces[0]);
 
@@ -90,8 +90,8 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
 
 
   //general
-  defaultTorque = node->GetFloat("torque", 1000, 0); 
-  
+  defaultTorque = node->GetFloat("torque", 1000, 0);
+
   // Steering controller
   defaultSteerTorque = node->GetFloat("steerTorque", 100, 0);
   defaultKp = node->GetTupleDouble("steerPD", 0, 10.0);
@@ -110,7 +110,7 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
     steerKp = node->GetTupleDouble("steerPD", 0, defaultKp);
     steerKd = node->GetTupleDouble("steerPD", 1, defaultKd);
     maxAngle = node->GetFloat("steerMaxAngle", defaultMaxAngle, 0);
-    
+
     wheel=new Wheel ();
 
     if (typestr=="drive")
@@ -120,11 +120,11 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
       wheel->SetTorque(torque);
       wheels.push_back(wheel);
     }
-    else 
+    else
     {
       if (typestr=="steer")
         type=STEER;
-      else 
+      else
         type=FULL;
 
       FullWheel *wheel=new FullWheel();
@@ -133,7 +133,7 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
       wheel->SetSteerTorque(steerTorque);
       wheel->SetSteerPD(steerKp, steerKd);
       wheel->SetSteerMaxAngle(maxAngle);
-     // wheel->SetSuspension(0.95, 0.9, 0.1); //TODO: we need step here
+      // wheel->SetSuspension(0.95, 0.9, 0.1); //TODO: we need step here
       wheels.push_back(wheel);
     }
 
@@ -181,13 +181,13 @@ void Steering_Position2d::UpdateChild(UpdateParams &params)
   // Constrain the steering angle to lie within the stops
 
   std::vector<Wheel*>::iterator iter;
-  
+
   for (iter=this->wheels.begin(); iter!=this->wheels.end(); iter++)
   {
     if (this->enableMotors)
       (*iter)->Update(this->cmdSpeed, this->cmdSteer);
-    else 
-     (*iter)->Stop();
+    else
+      (*iter)->Stop();
   }
 
 

@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 CylinderGeom::CylinderGeom(Body *body)
-  : Geom(body)
+    : Geom(body)
 {
 }
 
@@ -52,7 +52,7 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
 
   // Initialize mass matrix
   dMassSetCylinderTotal(&this->mass, this->dblMass, 3, radius, length);
-  
+
   this->SetGeom( dCreateCylinder( 0, radius, length ), true );
 
   //to be able to show physics

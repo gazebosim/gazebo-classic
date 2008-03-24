@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -65,7 +65,7 @@ bool Pose3d::IsFinite() const
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add two poses: result = this + obj 
+// Add two poses: result = this + obj
 Pose3d Pose3d::operator+(const Pose3d &obj) const
 {
   Pose3d result;
@@ -87,7 +87,7 @@ const Pose3d &Pose3d::operator+=(const Pose3d &obj)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add two poses: result = this - obj 
+// Add two poses: result = this - obj
 Pose3d Pose3d::operator-(const Pose3d &obj) const
 {
   Pose3d result;
@@ -99,7 +99,7 @@ Pose3d Pose3d::operator-(const Pose3d &obj) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add two poses: result = this - obj 
+// Add two poses: result = this - obj
 const Pose3d &Pose3d::operator-=(const Pose3d &obj)
 {
   this->pos = this->CoordPositionSub(obj);
@@ -187,7 +187,7 @@ Quatern Pose3d::CoordRotationSub(const Quatern &rot) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-  /// Reset the pose
+/// Reset the pose
 void Pose3d::Reset()
 {
   // set the position to zero
@@ -204,7 +204,7 @@ Pose3d Pose3d::CoordPoseSolve(const Pose3d &b) const
   Quatern q;
   Pose3d a;
 
-  a.rot = this->rot.GetInverse() * b.rot;                       
+  a.rot = this->rot.GetInverse() * b.rot;
   q = a.rot * Quatern(0, this->pos.x, this->pos.y, this->pos.z);
   q = q * a.rot.GetInverse();
   a.pos = b.pos - Vector3(q.x, q.y, q.z);

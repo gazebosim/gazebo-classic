@@ -22,7 +22,7 @@ int main()
   }
 
   /// Open the Simulation Interface
-  try 
+  try
   {
     simIface->Open(client, "default");
   }
@@ -33,14 +33,14 @@ int main()
   }
 
   /// Open the Factory interface
-  try 
+  try
   {
     factoryIface->Open(client, "factory_iface");
   }
   catch (gazebo::GazeboError e)
   {
-    std::cout << "Gazebo error: Unable to connect to the factory interface\n" 
-      << e << "\n";
+    std::cout << "Gazebo error: Unable to connect to the factory interface\n"
+    << e << "\n";
     return -1;
   }
 

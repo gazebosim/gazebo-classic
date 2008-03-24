@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -90,7 +90,7 @@ void OgreDynamicLines::Clear()
 
 void OgreDynamicLines::Update()
 {
-  if (this->dirty) 
+  if (this->dirty)
     this->FillHardwareBuffers();
 }
 
@@ -109,8 +109,8 @@ void OgreDynamicLines::FillHardwareBuffers()
   int size = this->points.size();
   this->PrepareHardwareBuffers(size,0);
 
-  if (!size) 
-  { 
+  if (!size)
+  {
     this->mBox.setExtents(Ogre::Vector3::ZERO, Ogre::Vector3::ZERO);
     this->dirty=false;
   }
@@ -123,24 +123,24 @@ void OgreDynamicLines::FillHardwareBuffers()
 
   Ogre::Real *prPos = static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
   {
-    for(int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
       *prPos++ = this->points[i].x;
       *prPos++ = this->points[i].y;
       *prPos++ = this->points[i].z;
 
-      if(this->points[i].x < vaabMin.x)
+      if (this->points[i].x < vaabMin.x)
         vaabMin.x = this->points[i].x;
-      if(this->points[i].y < vaabMin.y)
+      if (this->points[i].y < vaabMin.y)
         vaabMin.y = this->points[i].y;
-      if(this->points[i].z < vaabMin.z)
+      if (this->points[i].z < vaabMin.z)
         vaabMin.z = this->points[i].z;
 
-      if(this->points[i].x > vaabMax.x)
+      if (this->points[i].x > vaabMax.x)
         vaabMax.x = this->points[i].x;
-      if(this->points[i].y > vaabMax.y)
+      if (this->points[i].y > vaabMax.y)
         vaabMax.y = this->points[i].y;
-      if(this->points[i].z > vaabMax.z)
+      if (this->points[i].z > vaabMax.z)
         vaabMax.z = this->points[i].z;
     }
   }
@@ -155,9 +155,9 @@ void OgreDynamicLines::FillHardwareBuffers()
   if ((float)vaabMin.z >= (float)vaabMax.z)
     vaabMin.z = vaabMax.z - 10;
 
-  this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z), 
+  this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z),
                         Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );
- 
+
   this->dirty = false;
 }
 

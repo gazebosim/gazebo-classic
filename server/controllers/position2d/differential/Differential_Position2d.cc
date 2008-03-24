@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ enum {RIGHT, LEFT};
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Differential_Position2d::Differential_Position2d(Entity *parent )
-  : Controller(parent)
+    : Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 
@@ -164,18 +164,18 @@ void Differential_Position2d::UpdateChild(UpdateParams &params)
 
   if (this->enableMotors)
   {
-    this->joints[LEFT]->SetParam( dParamVel, 
-        this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
+    this->joints[LEFT]->SetParam( dParamVel,
+                                  this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
 
-    this->joints[RIGHT]->SetParam( dParamVel, 
-        this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
+    this->joints[RIGHT]->SetParam( dParamVel,
+                                   this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
     this->joints[LEFT]->SetParam( dParamFMax, torque );
     this->joints[RIGHT]->SetParam( dParamFMax, torque );
 
   }
   else
   {
-    this->joints[LEFT]->SetParam( dParamVel, 0 ); 
+    this->joints[LEFT]->SetParam( dParamVel, 0 );
     this->joints[RIGHT]->SetParam( dParamVel, 0 );
 
     this->joints[LEFT]->SetParam( dParamFMax, 0 );

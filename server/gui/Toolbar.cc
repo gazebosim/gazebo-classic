@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 using namespace gazebo;
 
 Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
-  : Fl_Group(x,y,w,h,l)
+    : Fl_Group(x,y,w,h,l)
 {
   char *buffer = new char[256];
 
@@ -97,7 +97,7 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->cameraInfoGrp->end();
 
   this->end();
-  
+
   delete buffer;
 }
 

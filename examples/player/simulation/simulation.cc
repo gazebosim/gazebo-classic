@@ -13,7 +13,7 @@ int main()
     // call to parse_args()
     PlayerClient robot(PlayerCc::PLAYER_HOSTNAME, PlayerCc::PLAYER_PORTNUM);
 
-    // Subscribe to the simulation proxy 
+    // Subscribe to the simulation proxy
     SimulationProxy sp(&robot, 0);
 
     // Print out some stuff
