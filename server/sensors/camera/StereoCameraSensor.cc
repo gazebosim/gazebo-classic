@@ -26,6 +26,7 @@
 
 #include <sstream>
 #include <OgreImageCodec.h>
+#include <GL/gl.h>
 #include <Ogre.h>
 
 #include "Global.hh"
@@ -64,19 +65,22 @@ StereoCameraSensor::~StereoCameraSensor()
 void StereoCameraSensor::LoadChild( XMLConfigNode *node )
 {
   CameraSensor::LoadChild(node);
+
+  this->baseline = node->GetDouble("baseline",0,1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
 void StereoCameraSensor::InitChild()
 {
-  this->leftOgreTextureName = this->GetName() + "_LEFTRttTex";
-  this->rightOgreTextureName = this->GetName() + "_RIGHTRttTex";
+  this->leftOgreTextureName = this->GetName() + "_RttTex_Stereo_Left";
+  this->rightOgreTextureName = this->GetName() + "_RttTex_Stereo_Right";
 
-  this->ogreMaterialName = this->GetName() + "_RttMat";
+  this->leftOgreMaterialName = this->GetName() + "_RttMat_Stereo_Left";
+  this->rightOgreMaterialName = this->GetName() + "_RttMat_Stereo_Right";
 
   // Create the render texture
-  this->leftRenderTexture = Ogre::TextureManager::getSingleton().createManual(
+  this->renderTexture[0] = Ogre::TextureManager::getSingleton().createManual(
                           this->leftOgreTextureName,
                           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                           Ogre::TEX_TYPE_2D,
@@ -84,9 +88,9 @@ void StereoCameraSensor::InitChild()
                           Ogre::PF_R8G8B8,
                           Ogre::TU_RENDERTARGET);
 
-  this->leftRenderTarget = this->leftRenderTexture->getBuffer()->getRenderTarget();
+  this->leftRenderTarget = this->renderTexture[0]->getBuffer()->getRenderTarget();
 
-  this->rightRenderTexture = Ogre::TextureManager::getSingleton().createManual(
+  this->renderTexture[1] = Ogre::TextureManager::getSingleton().createManual(
                           this->rightOgreTextureName,
                           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                           Ogre::TEX_TYPE_2D,
@@ -94,7 +98,7 @@ void StereoCameraSensor::InitChild()
                           Ogre::PF_R8G8B8,
                           Ogre::TU_RENDERTARGET);
 
-  this->rightRenderTarget = this->rightRenderTexture->getBuffer()->getRenderTarget();
+  this->rightRenderTarget = this->renderTexture[1]->getBuffer()->getRenderTarget();
 
   // Create the camera
   this->camera = OgreCreator::CreateCamera(this->GetName(),
@@ -111,20 +115,27 @@ void StereoCameraSensor::InitChild()
     cviewport->setOverlaysEnabled(false);
   }
 
-  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
-                            this->ogreMaterialName,
+  Ogre::MaterialPtr leftmat = Ogre::MaterialManager::getSingleton().create(
+                            this->leftOgreMaterialName,
                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  Ogre::MaterialPtr rightmat = Ogre::MaterialManager::getSingleton().create(
+                            this->rightOgreMaterialName,
+                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+
+  leftmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->leftOgreTextureName);
+  rightmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->rightOgreTextureName);
 
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
 
   // Get access to the buffer and make an image and write it to file
-  mBuffer = this->leftRenderTexture->getBuffer(0, 0);
+  mBuffer = this->renderTexture[0]->getBuffer(0, 0);
 
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
 
-  this->leftCameraListener.Init(this, true);
-  this->rightCameraListener.Init(this, false);
+  this->leftCameraListener.Init(this, this->leftRenderTarget, true);
+  this->rightCameraListener.Init(this, this->rightRenderTarget, false);
 
   this->leftRenderTarget->addListener(&this->leftCameraListener);
   this->rightRenderTarget->addListener(&this->rightCameraListener);
@@ -149,18 +160,24 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
 // Return the material the camera renders to
 std::string StereoCameraSensor::GetMaterialName() const
 {
-  return this->ogreMaterialName;
+  return this->leftOgreMaterialName;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a pointer to the image data
-const unsigned char *StereoCameraSensor::GetImageData()
+const unsigned char *StereoCameraSensor::GetImageData(unsigned int i)
 {
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   size_t size;
 
+  if (i > 1)
+  {
+    gzerr(0) << "Camera index must be 0=Left or 1=Right for stereo camera\n";
+    i = 1;
+  }
+
   // Get access to the buffer and make an image and write it to file
-  mBuffer = this->leftRenderTexture->getBuffer(0, 0);
+  mBuffer = this->renderTexture[i]->getBuffer(0, 0);
 
   size = this->imageWidth * this->imageHeight * 3;
 
@@ -202,94 +219,166 @@ void StereoCameraSensor::SaveFrame()
   Ogre::Codec * pCodec;
   size_t size, pos;
 
-  this->GetImageData();
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->leftRenderTexture->getBuffer(0, 0);
-
-  // Create image data structure
-  imgData  = new Ogre::ImageCodec::ImageData();
-
-  imgData->width = this->imageWidth;
-  imgData->height = this->imageHeight;
-  imgData->depth = 1;
-  imgData->format = Ogre::PF_B8G8R8;
-  size = this->GetImageByteSize();
-
-  // Wrap buffer in a chunk
-  Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
-
-  char tmp[1024];
-  if (!this->savePathname.empty())
+  for (int i=0; i<2; i++)
   {
-    sprintf(tmp, "%s/%s-%04d.jpg", this->savePathname.c_str(),
+    this->GetImageData(i);
+
+    // Get access to the buffer and make an image and write it to file
+    mBuffer = this->renderTexture[i]->getBuffer(0, 0);
+
+    // Create image data structure
+    imgData  = new Ogre::ImageCodec::ImageData();
+
+    imgData->width = this->imageWidth;
+    imgData->height = this->imageHeight;
+    imgData->depth = 1;
+    imgData->format = Ogre::PF_B8G8R8;
+    size = this->GetImageByteSize();
+
+    // Wrap buffer in a chunk
+    Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
+
+    char tmp[1024];
+    if (!this->savePathname.empty())
+    {
+      if (i==0)
+        sprintf(tmp, "%s/%s-%04d-left.png", this->savePathname.c_str(),
             this->GetName().c_str(), this->saveCount);
+      else
+        sprintf(tmp, "%s/%s-%04d-right.png", this->savePathname.c_str(),
+            this->GetName().c_str(), this->saveCount);
+    }
+    else
+    {
+      if (i==0)
+        sprintf(tmp, "%s-%04d-left.png", this->GetName().c_str(), this->saveCount);
+      else
+        sprintf(tmp, "%s-%04d-right.png", this->GetName().c_str(), this->saveCount);
+    }
+
+    // Get codec
+    Ogre::String filename = tmp;
+    pos = filename.find_last_of(".");
+    Ogre::String extension;
+
+    while (pos != filename.length() - 1)
+      extension += filename[++pos];
+
+    // Get the codec
+    pCodec = Ogre::Codec::getCodec(extension);
+
+    // Write out
+    Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
+    pCodec->codeToFile(stream, filename, codecDataPtr);
   }
-  else
-  {
-    sprintf(tmp, "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
-  }
-
-  // Get codec
-  Ogre::String filename = tmp;
-  pos = filename.find_last_of(".");
-  Ogre::String extension;
-
-  while (pos != filename.length() - 1)
-    extension += filename[++pos];
-
-  // Get the codec
-  pCodec = Ogre::Codec::getCodec(extension);
-
-  // Write out
-  Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
-  pCodec->codeToFile(stream, filename, codecDataPtr);
 
   this->saveCount++;
 }
 
+//void StereCameraSensor::UpdateAllDependentRenderTargets()
+//{
+/*  Ogre::RenderTargetList::iterator iter;
+
+  for( iter = mRenderTargetList.begin(); iter != mRenderTargetList.end(); ++iter )
+  {                                                                                 (*iter)->update();
+  }
+  */
+//}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the baselien of the camera
+double StereoCameraSensor::GetBaseline() const
+{
+  return this->baseline;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Read the depth data
+void StereoCameraSensor::ReadDepthImage()
+{
+  float *depthImage = new float[this->imageWidth * this->imageHeight];
+
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  glReadBuffer(GL_BACK);
+  glReadPixels(0, 0, this->imageWidth, this->imageHeight, GL_DEPTH_COMPONENT, GL_FLOAT, depthImage);
+
+  char tmp[1024];
+  FILE *fp;
+
+  // Save depth image
+  sprintf(tmp, "left_depth_%04d.pnm", this->saveCount++);
+  fp = fopen( tmp, "wb" );
+  if (!fp)
+  {
+    printf( "unable to open file %s\n for writing\n", tmp );
+    return;
+  }
+
+  fprintf( fp, "P5\n# Gazebo\n%d %d\n255\n", this->imageWidth, this->imageHeight);
+  unsigned char *dst = new unsigned char[this->imageWidth];
+  float a = (this->nearClip * this->farClip) / (this->farClip - this->nearClip);
+  float b = -this->nearClip / (this->farClip - this->nearClip);
+
+  for (int i = this->imageHeight-1; i >= 0; i--)
+  {
+    float *src = depthImage + i * this->imageWidth;
+    for (int j = 0; j < this->imageWidth; j++)
+    {
+      dst[j] = src[j];
+      printf("%4.2f ",src[j]);
+      /*if (src[j] < 1e-6)
+        dst[j] = 0;
+      else
+        dst[j] = (int) (255 * (a / src[j] + b));
+        */
+    }
+    printf("\n");
+    fwrite( dst, 1, this->imageWidth, fp);
+  }
+  fclose( fp);
+
+}
+
 void StereoCameraSensor::StereoCameraListener::Init(
-    StereoCameraSensor *cam, bool isLeft)
+    StereoCameraSensor *cam, Ogre::RenderTarget *target, bool isLeft)
 {
   this->sensor = cam;
   this->camera = this->sensor->GetOgreCamera();
+  this->renderTarget = target;
   this->isLeftCamera = isLeft;
 }
 
 void StereoCameraSensor::StereoCameraListener::preViewportUpdate(const Ogre::RenderTargetViewportEvent &evt)
 {
-  if (this->isLeftCamera)
-    printf("Left Pre\n");
-  else
-    printf("Rightt Pre\n");
-
-/*	if(evt.source != mViewport)
+	if(evt.source != this->renderTarget->getViewport(0))
+  {
+    printf("Invalid viewport");
 		return;
-	Real offset = mStereoMgr->getEyesSpacing()/2;
-	if(mIsLeftEye)
+  }
+
+	double offset = this->sensor->GetBaseline()/2;
+
+	if(this->isLeftCamera)
 	{
 		offset = -offset;
 	}
-	mCamera->setFrustumOffset(-offset,0);
-	mPos = mCamera->getPosition();
-	Vector3 pos = mPos;
-	pos += offset * mCamera->getRight();
-	mCamera->setPosition(pos);
-	mStereoMgr->updateAllDependentRenderTargets();
-	mStereoMgr->chooseDebugPlaneMaterial(mIsLeftEye);
-  */
 
+	this->camera->setFrustumOffset(-offset,0);
+
+	this->pos = this->camera->getPosition();
+  Ogre::Vector3 pos = this->pos;
+
+	pos += offset * this->camera->getRight();
+	this->camera->setPosition(pos);
+
+	//this->sensor->UpdateAllDependentRenderTargets();
+	//this->sensor->chooseDebugPlaneMaterial(mIsLeftEye);
 }
 
 void StereoCameraSensor::StereoCameraListener::postViewportUpdate(const Ogre::RenderTargetViewportEvent &evt)
 {
-  if (this->isLeftCamera)
-    printf("Left Post\n");
-  else
-    printf("Rightt Post\n");
+  this->sensor->ReadDepthImage();
 
-/*	mCamera->setFrustumOffset(0,0);
-	mCamera->setPosition(mPos);
-  */
-
+	this->camera->setFrustumOffset(0,0);
+	this->camera->setPosition(this->pos);
 }

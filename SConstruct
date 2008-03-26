@@ -85,7 +85,8 @@ subdirs = ['server','libgazebo', 'player']
 if env['mode'] == 'debug':
   env['CCFLAGS'] += Split('-ggdb -g3')
 elif env['mode'] == 'profile':
-  env['CCFLAGS'] += Split('-p -pg') 
+  env['CCFLAGS'] += Split('-pg') 
+  env['LINKFLAGS'] += Split('-pg') 
 elif env['mode'] == 'optimized':
   env['CCFLAGS'] += Split('-O3') 
 

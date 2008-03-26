@@ -93,6 +93,8 @@ void MonoCameraSensor::InitChild()
                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 
+  mat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreTextureName);
+
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
 
   // Get access to the buffer and make an image and write it to file
@@ -128,8 +130,11 @@ std::string MonoCameraSensor::GetMaterialName() const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a pointer to the image data
-const unsigned char *MonoCameraSensor::GetImageData()
+const unsigned char *MonoCameraSensor::GetImageData(unsigned int i)
 {
+  if (i!=0)
+    gzerr(0) << "Camera index must be zero for mono cam";
+
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   size_t size;
 

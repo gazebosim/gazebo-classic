@@ -81,32 +81,43 @@ class StereoCameraSensor : public CameraSensor
   public: virtual std::string GetMaterialName() const;
 
   /// \brief Get a pointer to the image data
-  public: virtual const unsigned char *GetImageData();
+  public: virtual const unsigned char *GetImageData(unsigned int i=0);
+
+  /// \brief Get the baselien of the camera
+  public: double GetBaseline() const;
 
   // Save the camera frame
   protected: virtual void SaveFrame();
 
-  private: Ogre::TexturePtr leftRenderTexture;
+  private: void ReadDepthImage();
+
+  //private: void UpdateAllDependentRenderTargets();
+
+  private: Ogre::TexturePtr renderTexture[2];
   private: Ogre::RenderTarget *leftRenderTarget;
-  private: Ogre::TexturePtr rightRenderTexture;
   private: Ogre::RenderTarget *rightRenderTarget;
 
 
   private: std::string leftOgreTextureName;
   private: std::string rightOgreTextureName;
-  private: std::string ogreMaterialName;
+  private: std::string leftOgreMaterialName;
+  private: std::string rightOgreMaterialName;
+
+  private: double baseline;
 
   private: 
            class StereoCameraListener : public Ogre::RenderTargetListener
            {
              public: StereoCameraListener() : Ogre::RenderTargetListener() {}
-             public: void Init(StereoCameraSensor *sensor, bool isLeft);
+
+             public: void Init(StereoCameraSensor *sensor, Ogre::RenderTarget *target, bool isLeft);
              public: void preViewportUpdate(const Ogre::RenderTargetViewportEvent &evt);
              public: void postViewportUpdate(const Ogre::RenderTargetViewportEvent &evt);
 
              private: Ogre::Vector3 pos;
              private: StereoCameraSensor *sensor;
              private: Ogre::Camera *camera;
+             private: Ogre::RenderTarget *renderTarget;
              private: bool isLeftCamera;
            };
 

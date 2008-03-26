@@ -82,7 +82,7 @@ class MonoCameraSensor : public CameraSensor
   public: virtual std::string GetMaterialName() const;
 
   /// \brief Get a pointer to the image data
-  public: virtual const unsigned char *GetImageData();
+  public: virtual const unsigned char *GetImageData(unsigned int i=0);
 
   // Save the camera frame
   private: void SaveFrame();

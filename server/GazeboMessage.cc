@@ -39,6 +39,8 @@ GazeboMessage *GazeboMessage::myself = NULL;
 GazeboMessage::GazeboMessage()
 {
   this->msgStream = &std::cout;
+  this->errStream = &std::cerr;
+
   this->level = 0;
 }
 
@@ -123,6 +125,16 @@ std::ostream &GazeboMessage::Msg( int msglevel )
 {
   if (msglevel <= this->level)
     return *this->msgStream;
+  else
+    return this->nullStream;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the error stream
+std::ostream &GazeboMessage::Err( int msglevel )
+{
+  if (msglevel <= this->level)
+    return *this->errStream;
   else
     return this->nullStream;
 }

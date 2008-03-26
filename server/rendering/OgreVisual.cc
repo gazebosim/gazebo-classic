@@ -73,7 +73,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   Pose3d pose;
   Vector3 size;
   Ogre::Vector3 meshSize;
-  Ogre::MovableObject *obj;
+  Ogre::MovableObject *obj = NULL;
 
   this->xmlNode=node;
   std::string meshName = node->GetString("mesh","",1);
@@ -91,17 +91,20 @@ void OgreVisual::Load(XMLConfigNode *node)
   }
   catch (Ogre::Exception e)
   {
+    std::cerr << "Ogre Error:" << e.getFullDescription() << "\n";
     gzthrow("Unable to create a mesh from " + meshName);
   }
 
   // Attach the entity to the node
-  this->AttachObject(obj);
+  if (obj)
+    this->AttachObject(obj);
 
   // Set the pose of the scene node
   this->SetPose(pose);
 
   // Get the size of the mesh
-  meshSize = obj->getBoundingBox().getSize();
+  if (obj)
+    meshSize = obj->getBoundingBox().getSize();
 
   // Get the desired size of the mesh
   if (node->GetChild("size") != NULL)

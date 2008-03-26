@@ -109,11 +109,10 @@ class CameraSensor : public Sensor
   /// \brief Get the height of the texture 
   public: unsigned int GetTextureHeight() const;
 
-  /// \brief Get a pointer to the image data
-  public: virtual const unsigned char *GetImageData() = 0;
-
   /// \brief Get the image size in bytes
   public: size_t GetImageByteSize() const;
+
+  public: virtual const unsigned char *GetImageData(unsigned int i=0) = 0;
 
   /// \brief Get the Z-buffer value at the given image coordinate.
   ///

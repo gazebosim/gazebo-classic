@@ -42,6 +42,8 @@ namespace gazebo
 
   /// Output a message
   #define gzmsg(level) (gazebo::GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
+
+  #define gzerr(level) (gazebo::GazeboMessage::Instance()->Err(level) << "Error: [" << __FILE__ << ":" << __LINE__ << "]\n  ")
  
   /// Log a message
   #define gzlog() (gazebo::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
@@ -85,6 +87,10 @@ namespace gazebo
     /// \brief Use this to output a message to the terminal
     /// \param level Level of the message
     public: std::ostream &Msg( int level = 0 );
+
+    /// \brief Use this to output an error to the terminal
+    /// \param level Level of the message
+    public: std::ostream &Err( int level = 0 );
   
     /// \brief Use this to output a message to a log file
     public: std::ofstream &Log();
@@ -97,6 +103,7 @@ namespace gazebo
   
     private: std::ostringstream nullStream;
     private: std::ostream *msgStream;
+    private: std::ostream *errStream;
     private: std::ofstream logStream;
   
     /// Pointer to myself
