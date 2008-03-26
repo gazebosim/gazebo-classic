@@ -183,7 +183,7 @@
     <body1>right_shoulder_body</body1>
     <body2>right_bicep_body</body2>
     <anchor>right_shoulder_body</anchor>
-    <anchorOffset>0 0 -0.052</anchorOffset>
+    <anchorOffset>0 0.0 -0.052</anchorOffset>
     <axis>0 0 1</axis>
     <lowStop>-90</lowStop>
     <highStop>90</highStop>

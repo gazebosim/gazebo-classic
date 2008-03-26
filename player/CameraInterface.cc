@@ -101,31 +101,24 @@ void CameraInterface::Update()
     unsigned int oldCount = this->data.image_count;
     this->data.image_count = this->iface->data->image_size;
 
-    printf("Iface Image Size[%d]\n", this->iface->data->image_size);
-
     if (oldCount != this->data.image_count)
     {
       delete this->data.image;
       this->data.image = new uint8_t[this->data.image_count];
-      printf("Created array of size[%d]\n",this->data.image_count);
     }
 
-    printf("1\n");
     // Set the image pixels
     memcpy(this->data.image, this->iface->data->image,
            this->iface->data->image_size);
-    printf("2\n");
 
     size = sizeof(this->data) - sizeof(this->data.image) +
            this->iface->data->image_size;
-    printf("3\n");
 
     // Send data to server
     this->driver->Publish(this->device_addr,
                           PLAYER_MSGTYPE_DATA,
                           PLAYER_CAMERA_DATA_STATE,
                           (void*)&this->data, size, &this->datatime);
-    printf("4\n");
 
     // Save frames
     if (this->save)
