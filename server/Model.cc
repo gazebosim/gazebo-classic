@@ -70,20 +70,20 @@ Model::~Model()
 
   for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
   {
-    delete biter->second;
+    GZ_DELETE(biter->second);
   }
   this->bodies.clear();
 
   for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
   {
-    delete jiter->second;
+    GZ_DELETE( jiter->second );
   }
   this->joints.clear();
 
   for (citer = this->controllers.begin();
        citer != this->controllers.end(); citer++)
   {
-    delete citer->second;
+    GZ_DELETE( citer->second );
   }
   this->controllers.clear();
 }

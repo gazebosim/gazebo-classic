@@ -166,8 +166,8 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
 // Helper function to create a camera
 Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip, double farClip, double hfov, Ogre::RenderTarget *renderTarget)
 {
-  Ogre::Camera *camera;
   Ogre::Viewport *cviewport;
+  Ogre::Camera *camera;
 
   camera = OgreAdaptor::Instance()->sceneMgr->createCamera(name);
 
@@ -195,7 +195,6 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
 
   return camera;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 void OgreCreator::CreateFog(XMLConfigNode *node)

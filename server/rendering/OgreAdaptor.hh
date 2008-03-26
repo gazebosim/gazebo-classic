@@ -134,6 +134,7 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   
   private: friend class DestroyerT<OgreAdaptor>;
   private: friend class SingletonT<OgreAdaptor>;
+
 };
 
 /*/// \brief 

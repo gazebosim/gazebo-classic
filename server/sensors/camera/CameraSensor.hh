@@ -29,6 +29,7 @@
 
 #include <OgrePrerequisites.h>
 #include <OgreTexture.h>
+
 #include "Pose3d.hh"
 #include "Sensor.hh"
 
@@ -82,7 +83,7 @@ class CameraSensor : public Sensor
   public: Pose3d GetWorldPose() const;
 
   /// \brief Return the material the camera renders to
-  public: std::string GetMaterialName() const;
+  public: virtual std::string GetMaterialName() const = 0;
 
   /// \brief Translate the camera
   public: void Translate( const Vector3 &direction );
@@ -92,9 +93,6 @@ class CameraSensor : public Sensor
 
   /// \brief Rotate the camera around the pitch axis
   public: void RotatePitch( float angle );
-
-  /// \brief Set the camera FOV (horizontal)
-  public: void SetFOV(double fov);
 
   /// \brief Get the camera FOV (horizontal)  
   public: double GetFOV() const;
@@ -112,7 +110,7 @@ class CameraSensor : public Sensor
   public: unsigned int GetTextureHeight() const;
 
   /// \brief Get a pointer to the image data
-  public: const unsigned char *GetImageData();
+  public: virtual const unsigned char *GetImageData() = 0;
 
   /// \brief Get the image size in bytes
   public: size_t GetImageByteSize() const;
@@ -134,32 +132,26 @@ class CameraSensor : public Sensor
   public: Ogre::Camera *GetOgreCamera() const;
 
   // Save the camera frame
-  private: void SaveFrame();
+  protected: virtual void SaveFrame() = 0;
 
-  private: double hfov;
-  private: double nearClip, farClip;
-  private: unsigned int imageWidth, imageHeight;
+  protected: double hfov;
+  protected: double nearClip, farClip;
+  protected: unsigned int imageWidth, imageHeight;
+  protected: unsigned int textureWidth, textureHeight;
 
-  private: Ogre::TexturePtr renderTexture;
-  private: Ogre::RenderTarget *renderTarget;
-  private: Ogre::Viewport *viewport;
+  protected: Ogre::Camera *camera;
+  protected: Ogre::SceneNode *pitchNode;
 
-  private: Ogre::Camera *camera;
-  private: Ogre::SceneNode *pitchNode;
-
-  private: std::string ogreTextureName;
-  private: std::string ogreMaterialName;
-
-  private: Pose3d pose;
+  protected: Pose3d pose;
 
   //access to our visual node (convenience member)
-  private: Ogre::SceneNode *sceneNode;
+  protected: Ogre::SceneNode *sceneNode;
 
   // Info for saving images
-  private: unsigned char *saveFrameBuffer;
-  private: unsigned int saveCount;
-  private: bool saveFrames;
-  private: std::string savePathname;
+  protected: unsigned char *saveFrameBuffer;
+  protected: unsigned int saveCount;
+  protected: bool saveFrames;
+  protected: std::string savePathname;
 };
 
 /// \}

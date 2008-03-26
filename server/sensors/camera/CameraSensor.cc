@@ -42,14 +42,13 @@
 
 using namespace gazebo;
 
-GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor);
-
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 CameraSensor::CameraSensor(Body *body)
     : Sensor(body)
 {
   this->imageWidth = this->imageHeight = 0;
+  this->textureWidth = this->textureHeight = 0;
 
   this->saveFrameBuffer = NULL;
   this->saveCount = 0;
@@ -109,29 +108,6 @@ void CameraSensor::LoadChild( XMLConfigNode *node )
 // Initialize the camera
 void CameraSensor::InitChild()
 {
-  this->ogreTextureName = this->GetName() + "_RttTex";
-  this->ogreMaterialName = this->GetName() + "_RttMat";
-  // Create the render texture
-  this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
-                          this->ogreTextureName,
-                          Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                          Ogre::TEX_TYPE_2D,
-                          this->imageWidth, this->imageHeight, 0,
-                          Ogre::PF_R8G8B8,
-                          Ogre::TU_RENDERTARGET);
-
-  this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
-
-  // Create the camera
-  this->camera = OgreCreator::CreateCamera(this->GetName(),
-                 this->nearClip, this->farClip, this->hfov, this->renderTarget);
-
-  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
-                            this->ogreMaterialName,
-                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-  Ogre::TextureUnitState *t = mat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreTextureName);
-
   this->sceneNode=this->GetVisualNode()->GetSceneNode();
   // Create a scene node to control pitch motion
   this->pitchNode = this->sceneNode->createChildSceneNode(this->GetName() + "PitchNode");
@@ -151,7 +127,6 @@ void CameraSensor::FiniChild()
 // Update the drawing
 void CameraSensor::UpdateChild(UpdateParams &params)
 {
-
   if (World::Instance()->GetWireframe())
   {
     this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
@@ -185,12 +160,6 @@ Pose3d CameraSensor::GetWorldPose() const
   return this->pose;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return the material the camera renders to
-std::string CameraSensor::GetMaterialName() const
-{
-  return this->ogreMaterialName;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Translate the camera
@@ -217,13 +186,6 @@ void CameraSensor::RotatePitch( float angle )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Get the width of the image
-unsigned int CameraSensor::GetImageWidth() const
-{
-  return this->imageWidth;
-}
-
-//////////////////////////////////////////////////////////////////////////////
 /// Get the horizontal field of view of the camera
 double CameraSensor::GetFOV() const
 {
@@ -231,15 +193,10 @@ double CameraSensor::GetFOV() const
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get the width of the texture
-unsigned int CameraSensor::GetTextureWidth() const
+/// Get the width of the image
+unsigned int CameraSensor::GetImageWidth() const
 {
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  return mBuffer->getWidth();
+  return this->imageWidth;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -250,16 +207,19 @@ unsigned int CameraSensor::GetImageHeight() const
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get the height of the texture
+/// Get the width of the texture
+unsigned int CameraSensor::GetTextureWidth() const
+{
+  return this->textureWidth;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// \brief Get the height of the texture
 unsigned int CameraSensor::GetTextureHeight() const
 {
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  return mBuffer->getHeight();
+  return this->textureHeight;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the image size in bytes
@@ -268,45 +228,6 @@ size_t CameraSensor::GetImageByteSize() const
   return this->imageHeight * this->imageWidth * 3;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get a pointer to the image data
-const unsigned char *CameraSensor::GetImageData()
-{
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-  size_t size;
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  size = this->imageWidth * this->imageHeight * 3;
-
-  // Allocate buffer
-  if (!this->saveFrameBuffer)
-    this->saveFrameBuffer = new unsigned char[size];
-
-  mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
-
-  int top = (int)((mBuffer->getHeight() - this->imageHeight) / 2.0);
-  int left = (int)((mBuffer->getWidth() - this->imageWidth) / 2.0);
-  int right = left + this->imageWidth;
-  int bottom = top + this->imageHeight;
-
-  // Get the center of the texture in RGB 24 bit format
-  mBuffer->blitToMemory(
-    Ogre::Box(left, top, right, bottom),
-
-    Ogre::PixelBox(
-      this->imageWidth,
-      this->imageHeight,
-      1,
-      Ogre::PF_B8G8R8,
-      this->saveFrameBuffer)
-  );
-
-  mBuffer->unlock();
-
-  return this->saveFrameBuffer;
-}
 
 //////////////////////////////////////////////////////////////////////////////
 // Enable or disable saving
@@ -320,63 +241,6 @@ void CameraSensor::EnableSaveFrame(bool enable)
 void CameraSensor::ToggleSaveFrame()
 {
   this->saveFrames = !this->saveFrames;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Save the current frame to disk
-void CameraSensor::SaveFrame()
-{
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-  std::ostringstream sstream;
-  Ogre::ImageCodec::ImageData *imgData;
-  Ogre::Codec * pCodec;
-  size_t size, pos;
-
-  this->GetImageData();
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  // Create image data structure
-  imgData  = new Ogre::ImageCodec::ImageData();
-
-  imgData->width = this->imageWidth;
-  imgData->height = this->imageHeight;
-  imgData->depth = 1;
-  imgData->format = Ogre::PF_B8G8R8;
-  size = this->GetImageByteSize();
-
-  // Wrap buffer in a chunk
-  Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
-
-  char tmp[1024];
-  if (!this->savePathname.empty())
-  {
-    sprintf(tmp, "%s/%s-%04d.jpg", this->savePathname.c_str(),
-            this->GetName().c_str(), this->saveCount);
-  }
-  else
-  {
-    sprintf(tmp, "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
-  }
-
-  // Get codec
-  Ogre::String filename = tmp;
-  pos = filename.find_last_of(".");
-  Ogre::String extension;
-
-  while (pos != filename.length() - 1)
-    extension += filename[++pos];
-
-  // Get the codec
-  pCodec = Ogre::Codec::getCodec(extension);
-
-  // Write out
-  Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
-  pCodec->codeToFile(stream, filename, codecDataPtr);
-
-  this->saveCount++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

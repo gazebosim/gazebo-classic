@@ -73,7 +73,11 @@ void World::Close()
 
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
   {
-    delete (*miter);
+    if (*miter)
+    {
+      delete (*miter);
+      (*miter) = NULL;
+    }
   }
   this->models.clear();
 

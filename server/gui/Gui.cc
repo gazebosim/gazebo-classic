@@ -86,6 +86,8 @@ FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
 /// Destructor
 FLTKGui::~FLTKGui()
 {
+  this->hide();
+
   GZ_DELETE (this->glWindow)
   GZ_DELETE (this->toolbar)
   //delete this->statusbar;

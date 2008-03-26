@@ -59,7 +59,10 @@ OgreVisual::OgreVisual(OgreVisual *node)
 /// Destructor
 OgreVisual::~OgreVisual()
 {
-  this->parentNode->removeAndDestroyChild(this->sceneNode->getName());
+  if (this->parentNode && this->sceneNode)
+  {
+    //this->parentNode->removeAndDestroyChild(this->sceneNode->getName());
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

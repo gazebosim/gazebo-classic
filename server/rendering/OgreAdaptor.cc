@@ -81,7 +81,7 @@ OgreAdaptor::~OgreAdaptor()
   //GZ_DELETE (this->logManager)
 //  this->root->detachRenderTarget(this->window);
 //  this->root->shutdown();
-  GZ_DELETE (this->root)
+  //GZ_DELETE (this->root)
 //  GZ_DELETE (this->sceneMgr) //this objects seems to be destroyed by root
 //  GZ_DELETE (this->camera)
 //  GZ_DELETE (this->viewport)
@@ -93,8 +93,9 @@ OgreAdaptor::~OgreAdaptor()
 void OgreAdaptor::Close()
 {
   GZ_DELETE (this->frameListener)
-  GZ_DELETE (this->root) // All Ogre things should be shutdown and freed with this
 
+  // This causes a seg fault. Need to fix
+  //GZ_DELETE (this->root)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -82,11 +82,10 @@ void Simulator::Close()
   if (!this->loaded)
     return;
 
-  GZ_DELETE (this->gui) // enough?
-  GZ_DELETE (this->xmlFile) //enough?
+  GZ_DELETE (this->gui)
+  GZ_DELETE (this->xmlFile)
   gazebo::World::Instance()->Close();
   gazebo::OgreAdaptor::Instance()->Close();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
