@@ -230,7 +230,7 @@ int World::Fini()
   }
   catch (std::string e)
   {
-    gzmsg(-1) << "Problem destroying simIface[" << e << "]\n";
+    gzmsg(-1, "Problem destroying simIface[" << e << "]");
   }
 
   this->server->Fini();
@@ -575,7 +575,7 @@ void World::UpdateSimulationIface()
       }
       else
       {
-        gzmsg(-1) << "Simulation Iface: Model[" << this->simIface->data->model_name << "] does not exist\n";
+        gzmsg(-1, "Simulation Iface: Model[" << this->simIface->data->model_name << "] does not exist");
       }
 
       strcpy((char*)this->simIface->data->model_name, "");

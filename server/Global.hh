@@ -33,6 +33,8 @@
 
 #include <list>
 #include <math.h>
+#include <sstream>
+
 
 #include "Pose3d.hh"
 #include "GazeboError.hh"
@@ -116,7 +118,6 @@ namespace gazebo
   */  
   class Global
   {
-
     /// Paths gazebo install
     public: static std::list<std::string> gazeboPaths;
 

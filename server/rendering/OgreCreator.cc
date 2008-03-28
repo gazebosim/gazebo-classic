@@ -289,7 +289,7 @@ void OgreCreator::CreateSky(XMLConfigNode *node)
       }
       catch (int)
       {
-        gzmsg(0) << "Unable to set sky dome to material[" << material << "]\n";
+        gzmsg(0, "Unable to set sky dome to material[" << material << "]");
       }
 
     }

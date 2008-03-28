@@ -172,7 +172,7 @@ const unsigned char *StereoCameraSensor::GetImageData(unsigned int i)
 
   if (i > 1)
   {
-    gzerr(0) << "Camera index must be 0=Left or 1=Right for stereo camera\n";
+    gzmsg(0, "Camera index must be 0=Left or 1=Right for stereo camera");
     i = 1;
   }
 

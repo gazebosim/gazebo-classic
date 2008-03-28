@@ -100,7 +100,7 @@ void Factory::UpdateChild(UpdateParams &params)
     }
     catch (gazebo::GazeboError e)
     {
-      std::cerr << "The controlled factory could not load its XML data [" << e << "]\n";
+      gzerr("The controlled factory could not load its XML data [" << e << "]");
       return;
     }
 

@@ -133,7 +133,7 @@ std::string MonoCameraSensor::GetMaterialName() const
 const unsigned char *MonoCameraSensor::GetImageData(unsigned int i)
 {
   if (i!=0)
-    gzerr(0) << "Camera index must be zero for mono cam";
+    gzmsg(0, "Camera index must be zero for mono cam");
 
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   size_t size;

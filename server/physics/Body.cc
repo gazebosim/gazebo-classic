@@ -549,7 +549,7 @@ void Body::SetLinearVel(const Vector3 &vel)
 {
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Set velocity to an invalid ODE body");
   }
   else
     dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
@@ -564,7 +564,7 @@ Vector3 Body::GetLinearVel() const
 
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Invalid ODE body");
     return vel;
   }
 
@@ -583,7 +583,7 @@ void Body::SetAngularVel(const Vector3 &vel)
 {
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Invalid ODE body");
   }
   else
     dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
@@ -598,7 +598,7 @@ Vector3 Body::GetAngularVel() const
 
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Invalid ODE body");
     return vel;
   }
 
@@ -616,7 +616,7 @@ void Body::SetForce(const Vector3 &force)
 {
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Invalid ODE body");
   }
   else
     dBodySetForce(this->bodyId, force.x, force.y, force.z);
@@ -631,7 +631,7 @@ Vector3 Body::GetForce() const
 
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Invalid ODE body");
     return force;
   }
 
@@ -650,7 +650,7 @@ void Body::SetTorque(const Vector3 &torque)
 {
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Invalid ODE body");
   }
   else
     dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
@@ -665,7 +665,7 @@ Vector3 Body::GetTorque() const
 
   if (!this->bodyId)
   {
-    gzmsg(0) << "Invalid ODE body\n";
+    gzmsg(0, "Invalid ODE body");
     return torque;
   }
 
