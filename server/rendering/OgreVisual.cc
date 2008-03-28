@@ -194,15 +194,15 @@ void OgreVisual::SetMaterial(const std::string &materialName)
   }
   catch (Ogre::Exception e)
   {
-    gzmsg(0, "Unable to get Material[" << materialName << "] for Geometry[" 
-    << this->sceneNode->getName() << ". Object will appear white.");
+    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry["
+    << this->sceneNode->getName() << ". Object will appear white.\n";
     return;
   }
 
   if (this->origMaterial.isNull())
   {
-    gzmsg(0, "Unable to get Material[" << materialName << "] for Geometry["
-    << this->sceneNode->getName() << ". Object will appear white");
+    gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry["
+    << this->sceneNode->getName() << ". Object will appear white\n";
     return;
   }
 
@@ -243,8 +243,8 @@ void OgreVisual::SetMaterial(const std::string &materialName)
   }
   catch (Ogre::Exception e)
   {
-    gzmsg(0, "Unable to set Material[" << myMaterialName << "] to Geometry["
-    << this->sceneNode->getName() << ". Object will appear white.");
+    gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry["
+    << this->sceneNode->getName() << ". Object will appear white.\n";
   }
 }
 
@@ -260,7 +260,7 @@ void OgreVisual::SetTransparency( float trans )
 
   if (this->myMaterial.isNull())
   {
-    gzmsg(0, "The visual " << this->sceneNode->getName() << " can't set transparency for this geom without a material");
+    gzmsg(0) << "The visual " << this->sceneNode->getName() << " can't set transparency for this geom without a material\n";
     return;
   }
 

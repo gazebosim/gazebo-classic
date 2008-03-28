@@ -38,7 +38,10 @@ GazeboMessage *GazeboMessage::myself = NULL;
 /// Default constructor
 GazeboMessage::GazeboMessage()
 {
-  this->level = 2;
+  this->msgStream = &std::cout;
+  this->errStream = &std::cerr;
+
+  this->level = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +70,7 @@ void GazeboMessage::Load(XMLConfigNode *node)
     gzthrow("Null XMLConfig node");
   }
 
-  this->SetVerbose(node->GetInt("verbosity",2,0));
+  this->SetVerbose(node->GetInt("verbosity",0,0));
   this->logData = node->GetBool("logData",false);
 
   if (this->logData)
@@ -96,6 +99,17 @@ void GazeboMessage::Save(XMLConfigNode *node)
 {
   node->SetValue("verbosity", this->level);
   node->SetValue("logData", this->logData);
+
+  /*
+    node->NewElement("verbosity", String(this->level)); //std::ostringstream << this->level);
+
+    node->NewElement("logData", gazebo::String(this->logData));
+
+    if (this->logData)
+      node->NewElement("logData", std::ostringstream << "true");
+    else
+      node->NewElement("logData", std::ostringstream << "true");
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,21 +121,23 @@ void GazeboMessage::SetVerbose( int level )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the message stream
-void GazeboMessage::Msg( int msglevel, std::string msg )
+std::ostream &GazeboMessage::Msg( int msglevel )
 {
-
-  if (msglevel >= this->level)
-    return;
-
-  if (msglevel <0)
-    std::cerr << msg;
+  if (msglevel <= this->level)
+    return *this->msgStream;
   else
-    std::cout << msg;
-
-  if (this->logData)
-    this->Log() << msg;
+    return this->nullStream;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the error stream
+std::ostream &GazeboMessage::Err( int msglevel )
+{
+  if (msglevel <= this->level)
+    return *this->errStream;
+  else
+    return this->nullStream;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Log a message

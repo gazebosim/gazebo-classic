@@ -65,6 +65,7 @@ XMLConfig::~XMLConfig()
 // Load world from file
 void XMLConfig::Load( const std::string &filename )
 {
+  std::ostringstream stream;
   this->filename = filename;
 
   // Enable line numbering
@@ -74,7 +75,8 @@ void XMLConfig::Load( const std::string &filename )
   this->xmlDoc = xmlParseFile( this->filename.c_str() );
   if (xmlDoc == NULL)
   {
-    gzthrow( "Unable to parse xml file: " << this->filename);
+    stream << "Unable to parse xml file: " << this->filename;
+    gzthrow(stream.str());
   }
 
   // Create xpath evaluation context
@@ -95,7 +97,8 @@ void XMLConfig::Load( const std::string &filename )
   this->root = this->CreateNodes( NULL, xmlDocGetRootElement(this->xmlDoc) );
   if (this->root == NULL)
   {
-    gzthrow( "Empty document [" << this->filename << "]");
+    stream << "Empty document [" << this->filename << "]";
+    gzthrow(stream.str());
   }
 }
 
@@ -108,7 +111,9 @@ void XMLConfig::LoadString( const std::string &str )
   this->xmlDoc = xmlParseDoc( (xmlChar*)(str.c_str()) );
   if (xmlDoc == NULL)
   {
-    gzthrow("unable to parse [" << str << "]");
+    std::ostringstream stream;
+    stream << "unable to parse [" << str << "]";
+    gzthrow(stream.str());
   }
 
   // Create wrappers for all the nodes (recursive)
@@ -117,7 +122,9 @@ void XMLConfig::LoadString( const std::string &str )
 
   if (this->root == NULL)
   {
-    gzthrow( "Empty document [" << str<< "]") ;
+    std::ostringstream stream;
+    stream << "Empty document [" << str << "\n";
+    gzthrow(stream.str());
   }
 }
 
@@ -402,7 +409,8 @@ void XMLConfigNode::Print()
 {
   XMLConfigNode *node;
 
-  gzmsg(2, "name = [" << (const char*) this->xmlNode->name << "]");
+  std::cout << "name = [" << (const char*) this->xmlNode->name
+  << "]\n";
 
   // Recurse
   for (node = this->childFirst; node != NULL; node = node->next)
@@ -474,7 +482,9 @@ std::string XMLConfigNode::GetString( const std::string &key, const std::string 
 
   if (!value && require)
   {
-    gzthrow( "unable to find required string attribute[" << key << "] in world file node[" << this->GetName() << "]");
+    std::ostringstream stream;
+    stream << "unable to find required string attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if ( !value )
     return def;
@@ -491,7 +501,9 @@ unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int requ
 
   if (!value && require)
   {
-    gzthrow("unable to find required char attribute[" << key << "] in world file node[" << this->GetName() << "]");
+    std::ostringstream stream;
+    stream << "unable to find required char attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if ( !value )
     return def;
@@ -541,7 +553,9 @@ int XMLConfigNode::GetInt( const std::string &key, int def, int require )
 
   if (!value && require)
   {
-    gzthrow ("unable to find required int attribute[" << key << "] in world file node[" << this->GetName() << "]");
+    std::ostringstream stream;
+    stream << "unable to find required int attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if ( !value )
     return def;
@@ -558,7 +572,9 @@ double XMLConfigNode::GetDouble( const std::string &key, double def, int require
 
   if (!value && require)
   {
-    gzthrow( "unable to find required double attribute[" << key << "] in world file node[" << this->GetName() << "]");
+    std::ostringstream stream;
+    stream << "unable to find required double attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if ( !value )
     return def;
@@ -574,7 +590,9 @@ float XMLConfigNode::GetFloat( const std::string &key, float def, int require )
 
   if (!value && require)
   {
-    gzthrow( "unable to find required float attribute[" << key << "] in world file node[" << this->GetName() << "]");
+    std::ostringstream stream;
+    stream << "unable to find required float attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if ( !value )
     return def;
@@ -593,7 +611,9 @@ bool XMLConfigNode::GetBool( const std::string &key, bool def, int require )
   if (!value && require)
   {
     xmlFree(value);
-    gzthrow( "unable to find required bool attribute[" << key << "] in world file node[" << this->GetName() << "]");
+    std::ostringstream stream;
+    stream << "unable to find required bool attribute[" << key << "] in world file node[" << this->GetName() << "]";
+    gzthrow(stream.str());
   }
   else if ( !value )
   {
@@ -905,7 +925,9 @@ void XMLConfigNode::NewNode(const char* key, const char* value, int type)
     newNode = xmlNewNode(0, (xmlChar*) key); //I hope we don't need namespaces here
     if (!newNode)
     {
-      gzthrow( "unable to create an element [" << key << "] in world file node[" << this->GetName() << "]");
+      std::ostringstream stream;
+      stream << "unable to create an element [" << key << "] in world file node[" << this->GetName() << "]";
+      gzthrow(stream.str());
     }
     xmlNodeSetContent(newNode, (xmlChar*) value);
     xmlAddChild(this->xmlNode, newNode);

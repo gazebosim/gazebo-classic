@@ -193,8 +193,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
   else if (shadowTechnique == std::string("none"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
-  else 
-    gzthrow("Unsupported shadow technique:\n" << shadowTechnique);
+  else gzthrow(std::string("Unsupported shadow technique: ") + shadowTechnique + "\n");
 
   this->sceneMgr->setShadowTextureSelfShadow(true);
   this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
@@ -236,7 +235,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     }
     catch (Ogre::Exception e)
     {
-      gzmsg(-1, "Unable to load BSP geometry." << e.getDescription()) ;
+      gzmsg(0) << "Unable to load BSP geometry." << e.getDescription() << "\n";
       exit(0);
     }
   }

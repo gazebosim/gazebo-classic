@@ -90,7 +90,7 @@ void Controller::Load(XMLConfigNode *node)
     }
     catch (...) //TODO: Show the exception text here (subclass exception?)
     {
-      gzmsg(0, "No manager for the interface " << ifaceType << " found. Disabled.");
+      gzmsg(1) << "No manager for the interface " << ifaceType << " found. Disabled.\n";
       childNode = childNode->GetNextByNSPrefix("interface");
       continue;
     }
@@ -105,7 +105,9 @@ void Controller::Load(XMLConfigNode *node)
 
   if (this->ifaces.size() <= 0)
   {
-    gzthrow( "No interface defined for " << this->name << " controller");
+    std::ostringstream stream;
+    stream << "No interface defined for " << this->name << " controller";
+    gzthrow(stream.str());
   }
 
   this->LoadChild(node);

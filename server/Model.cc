@@ -455,7 +455,7 @@ void Model::LoadBody(XMLConfigNode *node)
 
   // Store this body
   if (this->bodies[body->GetName()])
-    gzmsg(0, "Body with name[" << body->GetName() << "] already exists!!");
+    gzmsg(0) << "Body with name[" << body->GetName() << "] already exists!!\n";
 
   // Store the pointer to this body
   this->bodies[body->GetName()] = body;
@@ -557,7 +557,8 @@ void Model::LoadController(XMLConfigNode *node)
     }
     catch (GazeboError e)
     {
-      gzerr("Error Loading Controller[" <<  controllerName << "]\n" << e) ;
+      std::cerr << "Error Loading Controller[" <<  controllerName
+      << "]\n" << e << std::endl;
       delete controller;
       return;
     }
@@ -567,7 +568,7 @@ void Model::LoadController(XMLConfigNode *node)
   }
   else
   {
-    gzmsg(0, "Unknown controller[" << controllerType << "]");
+    gzmsg(0) << "Unknown controller[" << controllerType << "]\n";
   }
 }
 
@@ -684,7 +685,8 @@ void Model::LoadPhysical(XMLConfigNode *node)
     }
     catch (GazeboError e)
     {
-      gzmsg(0,"Error Loading body[" << childNode->GetString("name",std::string(), 0) << "]\n" << e );
+      std::cerr << "Error Loading body[" << childNode->GetString("name",std::string(), 0) << "]\n";
+      std::cerr <<  e << std::endl;
       childNode = childNode->GetNextByNSPrefix("body");
       continue;
     }
@@ -702,7 +704,8 @@ void Model::LoadPhysical(XMLConfigNode *node)
     }
     catch (GazeboError e)
     {
-      gzmsg(0,"Error Loading Joint[" << childNode->GetString("name",std::string(), 0) << "]\n" << e );
+      std::cerr << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
+      std::cerr <<  e << std::endl;
       childNode = childNode->GetNextByNSPrefix("joint");
       continue;
     }

@@ -30,7 +30,6 @@
 #include <string.h>
 
 #include "GazeboError.hh"
-#include "GazeboMessage.hh"
 #include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "Body.hh"
@@ -175,7 +174,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   std::ostringstream stream;
 
-  gzmsg(2, "Terrain Image[" << this->terrainImage << "] Size[" << this->terrainSize << "]");
+  std::cout << "Terrain Image[" << this->terrainImage << "] Size[" << this->terrainSize << "]\n";
 
   stream << "WorldTexture=" << worldTexture << "\n";
   //The detail texture
