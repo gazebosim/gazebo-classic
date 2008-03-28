@@ -197,6 +197,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     gzthrow("Unsupported shadow technique:\n" << shadowTechnique);
 
   this->sceneMgr->setShadowTextureSelfShadow(true);
+  this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
   this->sceneMgr->setShadowTextureSize(node->GetInt("shadowTextureSize", 512));
   this->sceneMgr->setShadowIndexBufferSize( node->GetInt("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize()) );
 

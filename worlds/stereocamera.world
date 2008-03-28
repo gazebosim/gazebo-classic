@@ -32,6 +32,7 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+    <!--<shadowTechnique>textureAdditive</shadowTechnique>-->
 
   </rendering:ogre>
 

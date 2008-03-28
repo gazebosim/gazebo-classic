@@ -235,8 +235,8 @@
     <anchor>right_forearm_body</anchor>
     <anchorOffset>0 0 -0.05</anchorOffset>
     <axis>0 0 1</axis>
-    <lowStop>-1</lowStop>
-    <highStop>90</highStop>
+    <lowStop>-90</lowStop>
+    <highStop>1</highStop>
   </joint:hinge>
 
   <body:box name="right_hand_body">

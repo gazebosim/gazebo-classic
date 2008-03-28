@@ -73,58 +73,129 @@ void StereoCameraSensor::LoadChild( XMLConfigNode *node )
 // Initialize the camera
 void StereoCameraSensor::InitChild()
 {
-  this->leftOgreTextureName = this->GetName() + "_RttTex_Stereo_Left";
-  this->rightOgreTextureName = this->GetName() + "_RttTex_Stereo_Right";
+  this->ogreTextureName[0] = this->GetName() + "_RttTex_Stereo_Left";
+  this->ogreTextureName[1] = this->GetName() + "_RttTex_Stereo_Right";
 
-  this->leftOgreMaterialName = this->GetName() + "_RttMat_Stereo_Left";
-  this->rightOgreMaterialName = this->GetName() + "_RttMat_Stereo_Right";
+  this->ogreDepthTextureName[0] = this->GetName() +"_RttTex_Stereo_Left_Depth";
+  this->ogreDepthTextureName[1] = this->GetName() +"_RttTex_Stereo_Right_Depth";
 
-  // Create the render texture
+  this->ogreMaterialName[0] = this->GetName() + "_RttMat_Stereo_Left";
+  this->ogreMaterialName[1] = this->GetName() + "_RttMat_Stereo_Right";
+
+  this->ogreDepthMaterialName[0] = this->GetName()+"_RttMat_Stereo_Left_Depth";
+  this->ogreDepthMaterialName[1] = this->GetName()+"_RttMat_Stereo_Right_Depth";
+
+
+  // Create the left render texture
   this->renderTexture[0] = Ogre::TextureManager::getSingleton().createManual(
-                          this->leftOgreTextureName,
+                          this->ogreTextureName[0],
                           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                           Ogre::TEX_TYPE_2D,
                           this->imageWidth, this->imageHeight, 0,
                           Ogre::PF_R8G8B8,
                           Ogre::TU_RENDERTARGET);
 
-  this->leftRenderTarget = this->renderTexture[0]->getBuffer()->getRenderTarget();
+  this->renderTarget[0] = this->renderTexture[0]->getBuffer()->getRenderTarget();
 
+  // Create the right render texture
   this->renderTexture[1] = Ogre::TextureManager::getSingleton().createManual(
-                          this->rightOgreTextureName,
+                          this->ogreTextureName[1],
                           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                           Ogre::TEX_TYPE_2D,
                           this->imageWidth, this->imageHeight, 0,
                           Ogre::PF_R8G8B8,
                           Ogre::TU_RENDERTARGET);
 
-  this->rightRenderTarget = this->renderTexture[1]->getBuffer()->getRenderTarget();
+  this->renderTarget[1] = this->renderTexture[1]->getBuffer()->getRenderTarget();
+
+  // Create the left depth render texture
+  this->depthRenderTexture[0] = 
+    Ogre::TextureManager::getSingleton().createManual(
+        this->ogreDepthTextureName[0],
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        Ogre::TEX_TYPE_2D,
+        this->imageWidth, this->imageHeight, 0,
+        Ogre::PF_FLOAT32_R,
+        //Ogre::PF_DEPTH,
+        //Ogre::PF_R8G8B8,
+        Ogre::TU_RENDERTARGET);
+
+  this->depthRenderTarget[0] = this->depthRenderTexture[0]->getBuffer()->getRenderTarget();
+
+  // Create the right depth render texture
+  this->depthRenderTexture[1] = 
+    Ogre::TextureManager::getSingleton().createManual(
+        this->ogreDepthTextureName[1],
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        Ogre::TEX_TYPE_2D,
+        this->imageWidth, this->imageHeight, 0,
+        Ogre::PF_FLOAT32_R,
+        //Ogre::PF_DEPTH,
+        //Ogre::PF_R8G8B8,
+        Ogre::TU_RENDERTARGET);
+
+  this->depthRenderTarget[1] = this->depthRenderTexture[1]->getBuffer()->getRenderTarget();
+
+
 
   // Create the camera
   this->camera = OgreCreator::CreateCamera(this->GetName(),
-                 this->nearClip, this->farClip, this->hfov, this->leftRenderTarget);
+                 this->nearClip, this->farClip, this->hfov, this->renderTarget[0]);
 
   // Hack to make the camera use the right render target too
   {
     Ogre::Viewport *cviewport;
 
     // Setup the viewport to use the texture
-    cviewport = this->rightRenderTarget->addViewport(camera);
+    cviewport = this->renderTarget[1]->addViewport(camera);
+    cviewport->setClearEveryFrame(true);
+    cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+    cviewport->setOverlaysEnabled(false);
+
+    cviewport = this->depthRenderTarget[0]->addViewport(camera);
+    cviewport->setClearEveryFrame(true);
+    cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+    cviewport->setOverlaysEnabled(false);
+
+    cviewport = this->depthRenderTarget[1]->addViewport(camera);
     cviewport->setClearEveryFrame(true);
     cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
     cviewport->setOverlaysEnabled(false);
   }
 
   Ogre::MaterialPtr leftmat = Ogre::MaterialManager::getSingleton().create(
-                            this->leftOgreMaterialName,
-                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                      this->ogreMaterialName[0],
+                      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
   Ogre::MaterialPtr rightmat = Ogre::MaterialManager::getSingleton().create(
-                            this->rightOgreMaterialName,
-                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                      this->ogreMaterialName[1],
+                      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+  leftmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreTextureName[0]);
+  rightmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreTextureName[1]);
+
+  Ogre::MaterialPtr leftdepthmat = Ogre::MaterialManager::getSingleton().create(
+                      this->ogreDepthMaterialName[0],
+                      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+  Ogre::MaterialPtr rightdepthmat=Ogre::MaterialManager::getSingleton().create(
+                      this->ogreDepthMaterialName[1],
+                      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+  //leftdepthmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreDepthTextureName[0]);
+  Ogre::TextureUnitState *t = leftdepthmat->getTechnique(0)->getPass(0)->createTextureUnitState(OgreAdaptor::Instance()->sceneMgr->getShadowTexture(0)->getName());
+  leftdepthmat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+  t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+
+  //leftdepthmat->getTechnique(0)->getPass(0)->setDepthWriteEnabled(true);
+  //leftdepthmat->getTechnique(0)->getPass(0)->setColourWriteEnabled(false);
+
+  rightdepthmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreDepthTextureName[1]);
+  rightdepthmat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+  //rightdepthmat->getTechnique(0)->getPass(0)->setDepthWriteEnabled(true);
+  //rightdepthmat->getTechnique(0)->getPass(0)->setColourWriteEnabled(false);
 
 
-  leftmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->leftOgreTextureName);
-  rightmat->getTechnique(0)->getPass(0)->createTextureUnitState(this->rightOgreTextureName);
 
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
 
@@ -134,11 +205,11 @@ void StereoCameraSensor::InitChild()
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
 
-  this->leftCameraListener.Init(this, this->leftRenderTarget, true);
-  this->rightCameraListener.Init(this, this->rightRenderTarget, false);
+  this->leftCameraListener.Init(this, this->renderTarget[0], true);
+  this->rightCameraListener.Init(this, this->renderTarget[1], false);
 
-  this->leftRenderTarget->addListener(&this->leftCameraListener);
-  this->rightRenderTarget->addListener(&this->rightCameraListener);
+  this->renderTarget[0]->addListener(&this->leftCameraListener);
+  this->renderTarget[1]->addListener(&this->rightCameraListener);
 
   CameraSensor::InitChild();
 }
@@ -160,7 +231,7 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
 // Return the material the camera renders to
 std::string StereoCameraSensor::GetMaterialName() const
 {
-  return this->leftOgreMaterialName;
+  return this->ogreDepthMaterialName[0];
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -177,7 +248,7 @@ const unsigned char *StereoCameraSensor::GetImageData(unsigned int i)
   }
 
   // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture[i]->getBuffer(0, 0);
+  mBuffer = this->depthRenderTexture[i]->getBuffer(0, 0);
 
   size = this->imageWidth * this->imageHeight * 3;
 
@@ -324,13 +395,10 @@ void StereoCameraSensor::ReadDepthImage()
     float *src = depthImage + i * this->imageWidth;
     for (int j = 0; j < this->imageWidth; j++)
     {
-      dst[j] = src[j];
-      printf("%4.2f ",src[j]);
-      /*if (src[j] < 1e-6)
+      if (src[j] < 1e-6)
         dst[j] = 0;
       else
         dst[j] = (int) (255 * (a / src[j] + b));
-        */
     }
     printf("\n");
     fwrite( dst, 1, this->imageWidth, fp);
@@ -377,7 +445,7 @@ void StereoCameraSensor::StereoCameraListener::preViewportUpdate(const Ogre::Ren
 
 void StereoCameraSensor::StereoCameraListener::postViewportUpdate(const Ogre::RenderTargetViewportEvent &evt)
 {
-  this->sensor->ReadDepthImage();
+  //this->sensor->ReadDepthImage();
 
 	this->camera->setFrustumOffset(0,0);
 	this->camera->setPosition(this->pos);

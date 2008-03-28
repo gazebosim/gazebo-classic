@@ -94,14 +94,17 @@ class StereoCameraSensor : public CameraSensor
   //private: void UpdateAllDependentRenderTargets();
 
   private: Ogre::TexturePtr renderTexture[2];
-  private: Ogre::RenderTarget *leftRenderTarget;
-  private: Ogre::RenderTarget *rightRenderTarget;
+  private: Ogre::TexturePtr depthRenderTexture[2];
+
+  private: Ogre::RenderTarget *renderTarget[2];
+  private: Ogre::RenderTarget *depthRenderTarget[2];
 
 
-  private: std::string leftOgreTextureName;
-  private: std::string rightOgreTextureName;
-  private: std::string leftOgreMaterialName;
-  private: std::string rightOgreMaterialName;
+  private: std::string ogreTextureName[2];
+  private: std::string ogreMaterialName[2];
+  private: std::string ogreDepthTextureName[2];
+  private: std::string ogreDepthMaterialName[2];
+
 
   private: double baseline;
 
