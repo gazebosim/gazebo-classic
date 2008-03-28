@@ -32,7 +32,6 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-    <!--<shadowTechnique>textureAdditive</shadowTechnique>-->
 
   </rendering:ogre>
 
@@ -97,7 +96,7 @@
 
     <body:empty name="cam1_body">
       <sensor:stereocamera name="cam1_sensor">
-        <imageSize>800 600</imageSize>
+        <imageSize>320 240</imageSize>
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
         <farClip>100</farClip>
