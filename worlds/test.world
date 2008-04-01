@@ -5,24 +5,22 @@
   xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
-  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
-  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
-  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
   xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
+  xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable" 
   xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
   xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
 
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.03</stepTime>
-    <gravity>0 0 -9.8</gravity>
+    <stepTime>0.02</stepTime>
+    <gravity>0 0 -9.80665</gravity>
     <cfm>10e-5</cfm>
-    <erp>0.8</erp>
+    <erp>0.3</erp>
   </physics:ode>
 
   <rendering:gui>
@@ -32,16 +30,43 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.5 0.5 0.5 1.0</ambient>
+    <ambient>1.0 1.0 1.0 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+
   </rendering:ogre>
 
-   <!-- Ground Plane -->
+  <model:physical name="sphere1_model">
+    <xyz>0 0 9.0</xyz>
+    <static>false</static>
+    <body:sphere name="sphere1_body">
+      <geom:sphere name="sphere1_geom">
+        <size>0.2</size>
+        <mass>1.0</mass>
+
+        <visual>
+          <scale>0.2 0.2 0.2</scale>
+          <material>Gazebo/Rocky</material>
+          <mesh>unit_sphere</mesh>
+        </visual>
+      </geom:sphere>
+    </body:sphere>
+  </model:physical>
+
+  <model:physical name="terrain_model">
+    <body:heightmap name ="terrain_body">
+      <geom:heightmap name="terrain_geom">
+        <image>test.jpg</image>
+        <worldTexture>test.jpg</worldTexture>
+        <detailTexture>test.jpg</detailTexture>
+        <size>17 17 1.0</size>
+      </geom:heightmap>
+    </body:heightmap>
+  </model:physical>
+
   <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
-    <rpy>0 0 0</rpy>
     <static>true</static>
 
     <body:plane name="plane1_body">
@@ -55,66 +80,138 @@
     </body:plane>
   </model:physical>
 
-  <!-- The camera -->
-  <model:physical name="cam1_model">
-    <xyz>0.07 -1.10 0.5</xyz>
-    <rpy>0 12 52.5</rpy>
+  <model:physical name="cam2_model">
+    <xyz>-1.62 10.92 0.77</xyz>
+    <rpy>0 16 -79</rpy>
     <static>true</static>
 
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>640 480</imageSize>
+    <body:empty name="cam2_body">
+      <sensor:camera name="cam2_sensor">
+        <imageSize>800 600</imageSize>
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
         <farClip>100</farClip>
 
-        <!--<saveFrames>true</saveFrames>
+        <saveFrames>false</saveFrames>
         <saveFramePath>frames</saveFramePath>
-        -->
       </sensor:camera>
     </body:empty>
   </model:physical>
 
-  <model:physical name="cylinder1_model">
-    <xyz>1 0 0.8</xyz>
+  <model:physical name="pioneer2dx_model1">
+    <xyz>-12 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
-    <body:box name="cylinder1_body">
-      <geom:box name="cylinder1_geom">
-        <size>0.8 0.8 0.8</size>
-        <mass>0.1</mass>
+    <controller:differential_position2d name="controller1">
+      <leftJoint>left_wheel_hinge</leftJoint>
+      <rightJoint>right_wheel_hinge</rightJoint>
+      <wheelSeparation>0.34</wheelSeparation>
+      <wheelDiameter>0.15</wheelDiameter>
+      <torque>5</torque>
+      <interface:position name="position_iface_0"/>
+    </controller:differential_position2d>
 
-        <mu1>0.1</mu1>
+    <model:physical name="laser">
+      <xyz>0.15 0 0.18</xyz>
 
-        <visual>
-          <mesh>unit_box</mesh>
-          <size>0.8 0.8 0.8</size>
-          <material>Gazebo/RustyBarrel</material>
-        </visual>
-      </geom:box>
-    </body:box>
+      <attach>
+        <parentBody>chassis_body</parentBody>
+        <myBody>laser_body</myBody>
+      </attach>
+
+      <include embedded="true">
+        <xi:include href="models/sicklms200.model" />
+      </include>
+    </model:physical>
+
+    <!-- 
+    The include should be last within a model. All previous statements
+    will override those in the included file 
+    -->
+    <include embedded="true">
+      <xi:include href="models/pioneer2dx.model" />
+    </include>
+  </model:physical>
+
+  <model:physical name="pioneer2dx_model2">
+    <xyz>12 0 0.145</xyz>
+    <rpy>0.0 0.0 180.0</rpy>
+
+    <model:physical name="laser2">
+      <xyz>0.15 0 0.18</xyz>
+
+      <attach>
+        <parentBody>chassis_body</parentBody>
+        <myBody>laser_body</myBody>
+      </attach>
+
+      <include embedded="true">
+        <xi:include href="models/sicklms200.model" />
+      </include>
+    </model:physical>
+
+    <!-- 
+    The include should be last within a model. All previous statements
+    will override those in the included file 
+    -->
+    <include embedded="true">
+      <xi:include href="models/pioneer2dx.model" />
+    </include>
   </model:physical>
 
 
-  <!-- 
-  Include the complete model described in the .model file
-  This assumes the root node is a <model:...>
-  -->
-  <!--  <include embedded="false">
-    <xi:include href="pioneer2dx.model" />
-  </include>
-  -->
+  <model:physical name="pioneer2dx_model3">
+    <xyz>0 5 0.145</xyz>
+    <rpy>0.0 0.0 -90.0</rpy>
 
-  <!-- White Directional light -->
-  <model:renderable name="directional_white">
-    <light>
-      <type>directional</type>
-      <direction>0 -0.6 -0.4</direction>
-      <diffuseColor>1.0 1.0 1.0</diffuseColor>
-      <specularColor>0.2 0.2 0.2</specularColor>
-      <attenuation>1000 1.0 0.0 0</attenuation>
-    </light>
-  </model:renderable>
+    <model:physical name="laser3">
+      <xyz>0.15 0 0.18</xyz>
+
+      <attach>
+        <parentBody>chassis_body</parentBody>
+        <myBody>laser_body</myBody>
+      </attach>
+
+      <include embedded="true">
+        <xi:include href="models/sicklms200.model" />
+      </include>
+    </model:physical>
+
+    <!-- 
+    The include should be last within a model. All previous statements
+    will override those in the included file 
+    -->
+    <include embedded="true">
+      <xi:include href="models/pioneer2dx.model" />
+    </include>
+  </model:physical>
+
+  <model:physical name="pioneer2dx_model4">
+    <xyz>0 -5 0.145</xyz>
+    <rpy>0.0 0.0 90.0</rpy>
+
+    <model:physical name="laser4">
+      <xyz>0.15 0 0.18</xyz>
+
+      <attach>
+        <parentBody>chassis_body</parentBody>
+        <myBody>laser_body</myBody>
+      </attach>
+
+      <include embedded="true">
+        <xi:include href="models/sicklms200.model" />
+      </include>
+    </model:physical>
+
+    <!-- 
+    The include should be last within a model. All previous statements
+    will override those in the included file 
+    -->
+    <include embedded="true">
+      <xi:include href="models/pioneer2dx.model" />
+    </include>
+  </model:physical>
+
 
 
 </gazebo:world>

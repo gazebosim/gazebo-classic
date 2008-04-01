@@ -113,7 +113,6 @@ void Geom::Load(XMLConfigNode *node)
   pose.pos = node->GetVector3("xyz",Vector3(0,0,0));
   pose.rot = node->GetRotation("rpy",Quatern());
 
-
   // TODO: This should probably be true....but "true" breaks trimesh postions.
   this->SetPose(pose, true);
 
@@ -279,7 +278,6 @@ void Geom::SetImmovableBasePose(const Pose3d & pose)
 // Set the pose relative to the body
 void Geom::SetPose(const Pose3d &pose, bool updateCoM)
 {
-
   if (this->placeable && this->geomId)
   {
     Pose3d localPose;

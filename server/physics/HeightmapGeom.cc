@@ -28,6 +28,7 @@
 #include <Ogre.h>
 #include <iostream>
 #include <string.h>
+#include <math.h>
 
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
@@ -147,15 +148,18 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   this->terrainVertSize = tmpImage.getWidth();
 
+  float nf = log(this->terrainVertSize-1)/log(2);
+  int ni = log(this->terrainVertSize-1)/log(2);
 
   // Make sure the heightmap image size is (2^n)+1 in size
-  if ( (this->terrainVertSize-1) & (this->terrainVertSize-2) != 0)
+  if ( nf - ni != 0)
   {
     gzthrow("Heightmap image size must be (2^n)+1\n");
   }
 
   // Calculate a good tile size
-  tileSize = (this->terrainVertSize-1)/8;
+  tileSize = pow( 2,  ni/2 );
+
 
   if (tileSize <= 2)
   {
@@ -168,13 +172,18 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   this->terrainScale = this->terrainSize / this->terrainVertSize;
 
-  this->odeVertSize = terrainVertSize * 1;
+  this->odeVertSize = this->terrainVertSize * 4;
   this->odeScale = this->terrainSize / this->odeVertSize;
 
 
   std::ostringstream stream;
-
+ 
+  /*std::cout << "Terrain Scale[" << this->terrainScale << "]\n";
+  std::cout << "ODE Scale[" << this->odeScale << "]\n";
   std::cout << "Terrain Image[" << this->terrainImage << "] Size[" << this->terrainSize << "]\n";
+  printf("Terrain Size[%f %f %f]\n", this->terrainSize.x, this->terrainSize.y, this->terrainSize.z);
+  printf("VertSize[%d] Tile Size[%d]\n", this->terrainVertSize, tileSize);
+  */
 
   stream << "WorldTexture=" << worldTexture << "\n";
   //The detail texture
@@ -249,12 +258,16 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   this->SetGeom(this->geomId, false);
 
-  //Rotate so Z is up, not Y (which is the default orientation)
-  dMatrix3 R;
-  dRSetIdentity(R);
-  dRFromAxisAndAngle(R, 1, 0, 0, DTOR(90));
+  this->SetStatic(true);
 
-  dGeomSetRotation(this->geomId, R);
+  //Rotate so Z is up, not Y (which is the default orientation)
+  Quatern quat;
+  Pose3d pose = this->GetPose();
+
+  quat.SetFromEuler(Vector3(DTOR(90),0,0));
+
+  pose.rot = pose.rot * quat;
+  this->body->SetPose(pose);
 
   delete [] mstr;
 }

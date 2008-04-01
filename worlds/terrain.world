@@ -81,8 +81,8 @@
   </model:physical>
 
   <model:physical name="cam2_model">
-    <xyz>210 -75 1.39</xyz>
-    <rpy>0 2.5 -87</rpy>
+    <xyz>211.42 -78.48 2.57</xyz>
+    <rpy>0 13 0</rpy>
     <static>true</static>
 
     <body:empty name="cam2_body">
@@ -99,8 +99,8 @@
   </model:physical>
 
   <model:physical name="pioneer2dx_model2">
-    <xyz>210 -78.18 1.15</xyz>
-    <rpy>0 0 -130</rpy>
+    <xyz>214.76 -79.34 1.29</xyz>
+    <rpy>0 0 20</rpy>
     <controller:differential_position2d name="controller1">
       <leftJoint>left_wheel_hinge</leftJoint>
       <rightJoint>right_wheel_hinge</rightJoint>
