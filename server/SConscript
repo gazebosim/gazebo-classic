@@ -24,20 +24,23 @@ sources = ['main.cc',
            ]
 
 headers.append( 
-          ['#/server/Global.hh',
-           '#/server/Vector3.hh', 
-           '#/server/Quatern.hh',
-           '#/server/Pose3d.hh',
-           '#/server/World.hh',
-           '#/server/XMLConfig.hh',
-           '#/server/Time.hh',
-           '#/server/Entity.hh',
+          ['#/server/Entity.hh',
            '#/server/GazeboError.hh',
-           '#/server/UpdateParams.hh',
            '#/server/GazeboMessage.hh',
+           '#/server/Global.hh',
            '#/server/Model.hh',
-           '#/server/Simulator.hh', 
-           '#/server/StringValue.hh'
+           '#/server/Pose3d.hh',
+           '#/server/Quatern.hh',
+           '#/server/Simulator.hh',
+           '#/server/SingletonT.hh',
+           '#/server/StaticPluginRegister.hh',
+           '#/server/StringValue.hh',
+           '#/server/Time.hh',
+           '#/server/UpdateParams.hh',
+           '#/server/Vector2.hh', 
+           '#/server/Vector3.hh',
+           '#/server/World.hh',
+           '#/server/XMLConfig.hh'
            ] )
 
 staticObjs.append( env.StaticObject(sources) )

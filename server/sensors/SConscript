@@ -1,5 +1,5 @@
 #Import variable
-Import('env staticObjs sharedObjs')
+Import('env staticObjs sharedObjs headers')
 
 dirs = Split('camera ray')
 
@@ -7,6 +7,12 @@ for subdir in dirs :
   SConscript('%s/SConscript' % subdir)
 
 sources = Split('Sensor.cc SensorFactory.cc')
+
+headers.append( 
+          ['server/sensors/SensorFactory.hh',
+           'server/sensors/SensorStub.hh',
+           'server/sensors/Sensor.hh'
+           ] )
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

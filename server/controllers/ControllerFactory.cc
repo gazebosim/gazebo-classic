@@ -30,6 +30,9 @@
 #include "gazebo.h"
 #include "Controller.hh"
 #include "ControllerFactory.hh"
+#ifdef HAVE_LTDL
+#include <ltdl.h>
+#endif // HAVE_LTDL
 
 using namespace gazebo;
 
@@ -59,4 +62,53 @@ Controller *ControllerFactory::NewController(const std::string &classname, Entit
   }
 
   return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load a controller plugin. Used by Model and Sensor when creating controllers.
+void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string &classname)
+{
+#ifdef HAVE_LTDL
+	
+	static bool init_done = false;
+
+	if (!init_done)
+	{
+		int errors = lt_dlinit();
+		if (errors)
+		{
+			std::ostringstream stream;
+		    stream << "Error(s) initializing dynamic loader (" << errors << ", " << lt_dlerror() << ")";
+		    gzthrow(stream.str());
+		}
+		else
+			init_done = true;
+	}
+	
+	lt_dlhandle handle = lt_dlopenext(plugin.c_str());
+	
+	if (!handle)
+	{
+		std::ostringstream stream;
+		stream << "Failed to load " << plugin << ": " << lt_dlerror();
+		gzthrow(stream.str());
+	}
+	
+	std::string registerName = "RegisterPluginController";
+	void *(*registerFunc)() = (void *(*)())lt_dlsym(handle, registerName.c_str());
+	if(!registerFunc)
+	{
+    	std::ostringstream stream;
+    	stream << "Failed to resolve " << registerName << ": " << lt_dlerror();
+    	gzthrow(stream.str());
+	}
+	
+	// Register the new controller.
+	registerFunc();
+	
+#else // HAVE_LTDL
+	
+    gzthrow("Cannot load plugins as libtool is not installed.");
+	
+#endif // HAVE_LTDL
 }

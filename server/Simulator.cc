@@ -101,17 +101,13 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
   // Load the world file
   this->xmlFile=new gazebo::XMLConfig();
-
   try
   {
     xmlFile->Load(worldFileName);
   }
   catch (GazeboError e)
   {
-    std::ostringstream stream;
-    stream << "The XML config file can not be loaded, please make sure is a correct file\n"
-    << e << "\n";
-    gzthrow(stream.str());
+    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
   }
 
   XMLConfigNode *rootNode(xmlFile->GetRootNode());
@@ -126,10 +122,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
   catch (GazeboError e)
   {
-    std::ostringstream stream;
-    stream << "Error loading the GUI\n"
-    << e << "\n";
-    gzthrow(stream.str());
+    gzthrow( "Error loading the GUI\n" << e);
   }
 
   //Initialize RenderingEngine
@@ -139,11 +132,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
   catch (gazebo::GazeboError e)
   {
-    std::ostringstream stream;
-    stream << "Failed to Initialize the OGRE Rendering system\n"
-    << e << "\n";
-    gzthrow(stream.str());
-  }
+    gzthrow("Failed to Initialize the OGRE Rendering system\n" << e );
+ }
 
   //Preload basic shapes that can be used anywhere
   OgreCreator::CreateBasicShapes();
@@ -155,10 +145,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
   catch (GazeboError e)
   {
-    std::ostringstream stream;
-    stream << "Error loading the GUI\n"
-    << e << "\n";
-    gzthrow(stream.str());
+    gzthrow("Failed to load the GUI\n"  << e);
   }
 
   this->loaded=true;
@@ -178,10 +165,8 @@ void Simulator::Save(const std::string& filename)
 
   if (xmlFile->Save(filename)<0)
   {
-    std::ostringstream stream;
-    stream << "The XML file coult not be written back to " << filename << std::endl;
-    gzthrow(stream.str());
-  }
+   gzthrow("The XML file could not be written back to " << filename );
+   }
 }
 
 
@@ -376,7 +361,7 @@ void Simulator::LoadGui(XMLConfigNode *rootNode)
     int x = childNode->GetTupleInt("pos",0,0);
     int y = childNode->GetTupleInt("pos",1,0);
     std::string type = childNode->GetString("type","fltk",1);
-
+ 
     gzmsg(1) << "Creating GUI:\n\tType[" << type << "] Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
     if (type != "fltk")
     {
@@ -393,7 +378,7 @@ void Simulator::LoadGui(XMLConfigNode *rootNode)
   else
   {
     // Create a dummy GUI
-    gzmsg(1) << "Creating a dummy GUI\n";
+    gzmsg(1) <<"Creating a dummy GUI";
     this->gui = GuiFactory::NewGui(std::string("dummy"), 0, 0, 0, 0, std::string());
   }
 }

@@ -544,6 +544,11 @@ void Model::LoadController(XMLConfigNode *node)
 
   // Get the unique name of the controller
   std::string controllerName = node->GetString("name",std::string(),1);
+  
+  // See if the controller is in a plugin
+  std::string pluginName = node->GetString("plugin","",0);
+  if (pluginName != "")
+	  ControllerFactory::LoadPlugin(pluginName, controllerType);
 
   // Create the controller based on it's type
   controller = ControllerFactory::NewController(controllerType, this);

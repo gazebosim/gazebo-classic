@@ -56,6 +56,7 @@ env = Environment (
     
   #LIBS=Split('gazebo boost_python')
   LIBS=Split('gazebo'),
+  LINKFLAGS=Split('-export-dynamic'),
 
   TARFLAGS = '-c -z',
   TARSUFFIX = '.tar.gz',
@@ -134,6 +135,13 @@ if not env.GetOption('clean'):
   if not conf.CheckCHeader('ode/ode.h'):
     print "  Error: Install ODE (http://www.ode.org)"
     Exit(1)
+    
+  if not conf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
+    print "  Warning: Failed to find ltdl, no plugin support will be included"
+    env["HAVE_LTDL"]=False
+  else:
+    env["HAVE_LTDL"]=True
+    env["CCFLAGS"].append("-DHAVE_LTDL")
    
   # Check for trimesh support in ODE
   if not conf.CheckODELib():

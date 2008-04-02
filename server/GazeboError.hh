@@ -34,27 +34,32 @@
 
 namespace gazebo
 {
-  
   /// \addtogroup gazebo_server
   /// \brief Gazebo error class
   /// \{
 
+  //TODO: global variable, static in the class would be better, if only the linker didn't oppose to it ...
+  static std::ostringstream throwStream;
   /// Throw an error
-  #define gzthrow(msg) throw gazebo::GazeboError(__FILE__,__LINE__,std::string(msg))
+  #define gzthrow(msg) throwStream << "Exception: " << msg << std::endl << std::flush;\
+                       throw gazebo::GazeboError(__FILE__,__LINE__,throwStream.str())
+
   
   /// \brief Class to handle errors
   ///
   /**
-   Use <tt>gzthrow(std::string)</tt> to throw errors.
+   Use <tt>gzthrow(data1 << data2)</tt> to throw errors.
 
    Example:
    
    \verbatim
+   Recommended new way:
+   gzthrow("This is an error message of type[" << type << "]");
+   Old way:
    std::ostringstream stream;
    stream << "This is an error message of type[" << type << "]\n";
    gzthrow(stream.str());
-   or if type is a string, simply:
-   gzthrow("This is an error message of type[" + type + "]\n");
+   The final "\n" is not needed anymore, the code should be changed to the new type.
    \endverbatim
 
   */
@@ -86,7 +91,7 @@ namespace gazebo
     /// \brief Return the error string
     /// \return The error string
     public: std::string GetErrorStr() const; 
-  
+
     /// \brief The error function
     private: std::string file;
   

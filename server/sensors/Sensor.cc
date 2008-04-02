@@ -127,6 +127,11 @@ void Sensor::LoadController(XMLConfigNode *node)
     stream << "No interface defined for " << controllerName << "controller";
     gzthrow(stream.str());
   }*/
+  
+  // See if the controller is in a plugin
+  std::string pluginName = node->GetString("plugin","",0);
+  if (pluginName != "")
+    ControllerFactory::LoadPlugin(pluginName, controllerType);
 
   // Create the controller based on it's type
   this->controller = ControllerFactory::NewController(controllerType, this);

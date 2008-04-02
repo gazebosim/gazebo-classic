@@ -58,6 +58,9 @@ class ControllerFactory
   /// \brief Create a new instance of a controller.  Used by the world when
   /// reading the world file.
   public: static Controller *NewController(const std::string &classname, Entity *parent);
+  
+  /// \brief Load a controller plugin. Used by Model and Sensor when creating controllers.
+  public: static void LoadPlugin(const std::string &plugin, const std::string &classname);
 
   // A list of registered controller classes
   private: static std::map<std::string, ControllerFactoryFn> controllers;
@@ -80,6 +83,22 @@ void Register##classname() \
   ControllerFactory::RegisterController("static", name, New##classname);\
 }\
 StaticPluginRegister Registered##classname (Register##classname);
+
+/// \brief Dynamic controller registration macro
+///
+/// Use this macro to register plugin controllers with the server.
+/// \param name Controller type name, as it appears in the world file.
+/// \param classname C++ class name for the controller.
+#define GZ_REGISTER_DYNAMIC_CONTROLLER(name, classname) \
+Controller *New##classname(Entity *entity) \
+{ \
+  return new classname(entity); \
+} \
+extern "C" void RegisterPluginController(); \
+void RegisterPluginController() \
+{\
+  ControllerFactory::RegisterController("dynamic", name, New##classname);\
+}
 
 /// \}
 }

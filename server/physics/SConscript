@@ -1,5 +1,5 @@
 #Import variable
-Import('env staticObjs sharedObjs')
+Import('env staticObjs sharedObjs headers')
 
 dirs = Split('ode')
 
@@ -7,6 +7,26 @@ for subdir in dirs :
   SConscript('%s/SConscript' % subdir)
 
 sources = Split('BallJoint.cc Body.cc BoxGeom.cc ContactParams.cc CylinderGeom.cc Geom.cc Hinge2Joint.cc HingeJoint.cc Joint.cc PhysicsEngine.cc PlaneGeom.cc SliderJoint.cc SphereGeom.cc UniversalJoint.cc RayGeom.cc TrimeshGeom.cc HeightmapGeom.cc')
+
+headers.append( 
+          ['server/physics/BallJoint.hh',
+           'server/physics/Body.hh',
+           'server/physics/BoxGeom.hh',
+           'server/physics/ContactParams.hh',
+           'server/physics/CylinderGeom.hh',
+           'server/physics/Geom.hh',
+           'server/physics/HeightmapGeom.hh',
+           'server/physics/Hinge2Joint.hh',
+           'server/physics/HingeJoint.hh',
+           'server/physics/Joint.hh',
+           'server/physics/PhysicsEngine.hh',
+           'server/physics/PlaneGeom.hh',
+           'server/physics/RayGeom.hh',
+           'server/physics/SliderJoint.hh',
+           'server/physics/SphereGeom.hh',
+           'server/physics/TrimeshGeom.hh',
+           'server/physics/UniversalJoint.hh'
+           ] )
 
 staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )
