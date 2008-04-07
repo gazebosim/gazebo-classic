@@ -187,13 +187,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   // Settings for shadow mapping
   std::string shadowTechnique = node->GetString("shadowTechnique", "stencilAdditive");
+
   if (shadowTechnique == std::string("stencilAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
   else if (shadowTechnique == std::string("textureAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
   else if (shadowTechnique == std::string("none"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
-  else gzthrow(std::string("Unsupported shadow technique: ") + shadowTechnique + "\n");
+  else 
+    gzthrow(std::string("Unsupported shadow technique: ") + shadowTechnique + "\n");
 
   this->sceneMgr->setShadowTextureSelfShadow(true);
   this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
@@ -476,7 +478,7 @@ int OgreAdaptor::Render()
 {
   OgreHUD::Instance()->Update();
 
-  root->renderOneFrame();
+  this->root->renderOneFrame();
   return 0;
 }
 

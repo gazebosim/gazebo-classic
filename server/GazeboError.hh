@@ -41,8 +41,7 @@ namespace gazebo
   //TODO: global variable, static in the class would be better, if only the linker didn't oppose to it ...
   static std::ostringstream throwStream;
   /// Throw an error
-  #define gzthrow(msg) throwStream << "Exception: " << msg << std::endl << std::flush;\
-                       throw gazebo::GazeboError(__FILE__,__LINE__,throwStream.str())
+  #define gzthrow(msg) {throwStream << "Exception: " << msg << std::endl << std::flush; throw gazebo::GazeboError(__FILE__,__LINE__,throwStream.str()); }
 
   
   /// \brief Class to handle errors

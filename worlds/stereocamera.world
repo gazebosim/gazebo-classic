@@ -29,14 +29,15 @@
 
   <rendering:ogre>
     <ambient>1.0 1.0 1.0 1.0</ambient>
-    <sky>
+    <!--<sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+    -->
 
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
-    <xyz>4 -1 1.5</xyz>
+    <xyz>90 -1 1.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
     <static>false</static>
 
@@ -103,6 +104,10 @@
         <saveFrames>false</saveFrames>
         <saveFramePath>frames</saveFramePath>
         <baseline>0.2</baseline>
+
+        <controller:stereo_camera name="stereo_camera_controller">
+          <interface:stereocamera name="stereo_camera_interface" />
+        </controller:stereo_camera>
       </sensor:stereocamera>
     </body:empty>
   </model:physical>

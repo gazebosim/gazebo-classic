@@ -40,6 +40,7 @@ namespace Ogre
   class Camera;
   class Viewport;
   class SceneNode;
+  class Material;
 }
 
 namespace gazebo
@@ -57,6 +58,8 @@ namespace gazebo
 /// This sensor is used for simulating a stereo camera.
 class StereoCameraSensor : public CameraSensor
 {
+
+  enum Sides {LEFT, RIGHT, D_LEFT, D_RIGHT};
 
   /// \brief Constructor
   public: StereoCameraSensor(Body *body);
@@ -81,7 +84,12 @@ class StereoCameraSensor : public CameraSensor
   public: virtual std::string GetMaterialName() const;
 
   /// \brief Get a pointer to the image data
+  /// \param i 0=left, 1=right
   public: virtual const unsigned char *GetImageData(unsigned int i=0);
+
+  /// \brief Get a point to the disparity data
+  /// \param i 0=left, 1=right
+  public: const float *GetDisparityData(unsigned int i=0);
 
   /// \brief Get the baselien of the camera
   public: double GetBaseline() const;
@@ -89,26 +97,27 @@ class StereoCameraSensor : public CameraSensor
   // Save the camera frame
   protected: virtual void SaveFrame();
 
-  private: void ReadDepthImage();
+  /// \brief Fill all the image buffers
+  private: void FillBuffers();
+
+  private: Ogre::TexturePtr CreateRTT( const std::string &name, bool depth);
 
   //private: void UpdateAllDependentRenderTargets();
 
-  private: Ogre::TexturePtr renderTexture[2];
-  private: Ogre::TexturePtr depthRenderTexture[2];
+  private: Ogre::TexturePtr renderTexture[4];
+  private: Ogre::RenderTarget *renderTarget[4];
+  private: Ogre::Material *depthMaterial;
 
-  private: Ogre::RenderTarget *renderTarget[2];
-  private: Ogre::RenderTarget *depthRenderTarget[2];
+  private: std::string textureName[4];
+  private: std::string materialName[4];
 
-
-  private: std::string ogreTextureName[2];
-  private: std::string ogreMaterialName[2];
-  private: std::string ogreDepthTextureName[2];
-  private: std::string ogreDepthMaterialName[2];
-
-
+  private: unsigned int depthBufferSize;
+  private: unsigned int rgbBufferSize;
+  private: float *depthBuffer[2];
+  private: unsigned char *rgbBuffer[2];
   private: double baseline;
 
-  private: 
+  /*private: 
            class StereoCameraListener : public Ogre::RenderTargetListener
            {
              public: StereoCameraListener() : Ogre::RenderTargetListener() {}
@@ -127,6 +136,7 @@ class StereoCameraSensor : public CameraSensor
 
   private: StereoCameraListener leftCameraListener;
   private: StereoCameraListener rightCameraListener;
+  */
 };
 
 /// \}

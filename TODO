@@ -1,14 +1,11 @@
 Open:
-
-- Use the Contact information in the Collision Callback. See CVS version of Gazebo.
+- Removing the sky results in a black screen
 - Apply Linear and Angular Damping, see OGREODE sources.
 - A static geom which is offset does not actually move the geom, so collision
   detection does not work
 - Force sensors
 - Why order on hinge and hinge2 joints matters? Should we avoid this?
 - Add spring force between bodies of a model to keep the together. See ODE example test_joints.cpp
-
-- Try out code on AMD64 machine
 - Python scripts to models, allow dynamic (movable) meshes
 - Slider has to be the first in the XML file, when loading a bunch of joints in a model.
 - Add note in Controller tutorial about the Controller Factory
@@ -120,3 +117,4 @@ Completed:
 - Add in Pioneer blender models
 - Add check for libxml2
 - Add uninstall (scons -c automatically handles this!)
+- Use the Contact information in the Collision Callback. See CVS version of Gazebo.

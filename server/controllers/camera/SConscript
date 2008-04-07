@@ -1,7 +1,7 @@
 #Import variable
 Import('env staticObjs sharedObjs')
 
-dirs = Split('generic')
+dirs = Split('generic stereo')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)

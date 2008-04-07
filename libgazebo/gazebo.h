@@ -1313,6 +1313,87 @@ class PTZIface : public Iface
 /// \}
 
 
+/***************************************************************************/
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup stereo_iface Stereo
+
+  \brief Stereo vision interface
+
+The stereo interface allows a client to read data from a stereo camera unit
+\{
+*/
+
+#define GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE 640 * 480 * 3
+#define GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE 640 * 480
+
+/// \brief Stereo data
+class StereoCameraData
+{
+  /// Data timestamp
+  public: double time;
+
+  /// Width of image in pixels
+  public: unsigned int width;
+
+  /// Height of image in pixels
+  public: unsigned int height;
+
+  /// Right image size
+  public: unsigned int right_rgb_size;
+
+  /// Right image (R8G8B8)
+  public: unsigned char right_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
+
+  /// Left image size
+  public: unsigned int left_rgb_size;
+
+  /// left image (R8G8B8)
+  public: unsigned char left_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
+
+  /// Left disparity size
+  public: unsigned int left_disparity_size;
+
+  /// Left disparity (float)
+  public: float left_disparity[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
+
+  /// Right Disparity  size
+  public: unsigned int right_disparity_size;
+
+  /// Right disparity (float)
+  public: float right_disparity[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
+}; 
+
+
+/// \brief Stereo interface
+class StereoCameraIface : public Iface
+{
+  /// \brief Constructor
+  public: StereoCameraIface():Iface("stereo", sizeof(StereoCameraIface)+sizeof(StereoCameraData)) {}
+
+  /// \brief Destructor
+  public: virtual ~StereoCameraIface() {this->data = NULL;}
+
+  /// \brief Create the server
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (StereoCameraData*)this->mMap; 
+          }
+
+  /// \brief Open the iface 
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (StereoCameraData*)this->mMap; 
+          }
+
+  /// Pointer to the stereo data
+  public: StereoCameraData *data;
+};
+
+/** \} */
+/// \}
 
 }
 

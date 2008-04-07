@@ -56,6 +56,7 @@ GZ_REGISTER_IFACE("factory", FactoryIface);
 GZ_REGISTER_IFACE("gripper", GripperIface);
 GZ_REGISTER_IFACE("actarray", ActarrayIface);
 GZ_REGISTER_IFACE("ptz", PTZIface);
+GZ_REGISTER_IFACE("stereocamera", StereoCameraIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface
