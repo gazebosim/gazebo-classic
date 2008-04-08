@@ -29,10 +29,10 @@
 
   <rendering:ogre>
     <ambient>1.0 1.0 1.0 1.0</ambient>
-    <!--<sky>
+    <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-    -->
+    <shadowTechnique>stencilAdditive</shadowTechnique>
 
   </rendering:ogre>
 
@@ -105,9 +105,10 @@
         <saveFramePath>frames</saveFramePath>
         <baseline>0.2</baseline>
 
-        <controller:stereo_camera name="stereo_camera_controller">
+        <!--<controller:stereo_camera name="stereo_camera_controller">
           <interface:stereocamera name="stereo_camera_interface" />
         </controller:stereo_camera>
+        -->
       </sensor:stereocamera>
     </body:empty>
   </model:physical>

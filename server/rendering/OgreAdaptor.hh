@@ -50,6 +50,7 @@ namespace Ogre
   class SceneNode;
   class RenderTarget;
   class ColourValue;
+  class RenderSystem;
 }
 
 namespace gazebo
@@ -95,22 +96,25 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   private: void SetupRenderSystem(bool create);
   private: void CreateWindow();
 
-  /// \brief Pointer to the root scene node
+  /// Pointer to the root scene node
   public: Ogre::Root *root;
 
-  /// \brief Pointer to the scene manager
+  /// Pointer to the scene manager
   public: Ogre::SceneManager *sceneMgr;
 
-  /// \brief Pointer to the render window
+  /// Pointer to the rendering system
+  public: Ogre::RenderSystem *renderSys;
+
+  /// Pointer to the render window
   public: Ogre::RenderWindow *window;
 
-  /// \brief Pointer to the camera
+  /// Pointer to the camera
   public: Ogre::Camera *camera;
 
-  /// \brief Pointer to the viewport
+  /// Pointer to the viewport
   public: Ogre::Viewport *viewport;
 
-  /// \brief Pointer to the input reader
+  /// Pointer to the input reader
   public: Ogre::InputReader *inputDevice;
 
   private: Ogre::LogManager *logManager;

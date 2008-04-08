@@ -29,18 +29,17 @@
 
 #include <OgrePrerequisites.h>
 #include <OgreTexture.h>
+#include <OgreMaterial.h>
 
 #include "CameraSensor.hh"
 
 // Forward Declarations
 namespace Ogre
 {
-  class TexturePtr;
   class RenderTarget;
   class Camera;
   class Viewport;
   class SceneNode;
-  class Material;
 }
 
 namespace gazebo
@@ -106,7 +105,7 @@ class StereoCameraSensor : public CameraSensor
 
   private: Ogre::TexturePtr renderTexture[4];
   private: Ogre::RenderTarget *renderTarget[4];
-  private: Ogre::Material *depthMaterial;
+  private: Ogre::MaterialPtr depthMaterial;
 
   private: std::string textureName[4];
   private: std::string materialName[4];

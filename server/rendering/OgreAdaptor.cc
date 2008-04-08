@@ -68,6 +68,7 @@ OgreAdaptor::OgreAdaptor()
   this->camera=NULL;
   this->viewport=NULL;
   this->root=NULL;
+  this->renderSys = NULL;
 
 }
 
@@ -399,34 +400,35 @@ void OgreAdaptor::SetupRenderSystem(bool create)
   {
     Ogre::RenderSystemList *rsList = this->root->getAvailableRenderers();
     int c = 0;
-    Ogre::RenderSystem *selectedRenderSystem = NULL;
+
+    this->renderSys = NULL;
 
     do
     {
       if (c == (int)rsList->size())
         break;
 
-      selectedRenderSystem = rsList->at(c);
+      this->renderSys = rsList->at(c);
       c++;
     }
-    while (selectedRenderSystem->getName().compare("OpenGL Rendering Subsystem")!= 0);
+    while (this->renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
 
-    if (selectedRenderSystem == NULL)
+    if (this->renderSys == NULL)
     {
       gzthrow( "unable to find rendering system" );
     }
 
 
-    selectedRenderSystem->setConfigOption("Full Screen","No");
-    selectedRenderSystem->setConfigOption("FSAA","2");
+    this->renderSys->setConfigOption("Full Screen","No");
+    this->renderSys->setConfigOption("FSAA","2");
 
     // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy", can be set in the .gazeborc file
-    selectedRenderSystem->setConfigOption("RTT Preferred Mode", Global::RTTMode);
+    this->renderSys->setConfigOption("RTT Preferred Mode", Global::RTTMode);
 
     if (create && this->videoMode != "None")
     {
-      selectedRenderSystem->setConfigOption("Video Mode",this->videoMode);
-      this->root->setRenderSystem(selectedRenderSystem);
+      this->renderSys->setConfigOption("Video Mode",this->videoMode);
+      this->root->setRenderSystem(this->renderSys);
     }
     else
     {
@@ -479,6 +481,7 @@ int OgreAdaptor::Render()
   OgreHUD::Instance()->Update();
 
   this->root->renderOneFrame();
+
   return 0;
 }
 
