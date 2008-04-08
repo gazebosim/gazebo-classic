@@ -293,7 +293,6 @@ int main(int argc, char **argv)
     return -1;
   }
 
-
   //Load the simulator
   try
   {
@@ -331,8 +330,6 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  printf("Finalize\n");
-
   // Finalization and clean up
   try
   {
@@ -345,6 +342,5 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  printf("Quit\n");
   return 0;
 }

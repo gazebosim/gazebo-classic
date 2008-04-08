@@ -42,6 +42,8 @@
 #include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
 
+#define PF_FLOAT Ogre::PF_FLOAT16_R
+
 using namespace gazebo;
 
 GZ_REGISTER_STATIC_SENSOR("stereocamera", StereoCameraSensor);
@@ -201,7 +203,7 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
 
   CameraSensor::UpdateChild(params);
 
-  //sceneMgr->_suppressRenderStateChanges(true);
+  sceneMgr->_suppressRenderStateChanges(true);
 
   // Get pointer to the material pass
   pass = this->depthMaterial->getBestTechnique()->getPass(0);
@@ -215,23 +217,18 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
     vp = this->renderTarget[i]->getViewport(0);
 
     // Need this line to render the ground plane. No idea why it's necessary.
-    /*renderSys->_setViewport(vp);
+    renderSys->_setViewport(vp);
     sceneMgr->_setPass(pass, true, false); 
     autoParamDataSource.setCurrentPass(pass);
     autoParamDataSource.setCurrentViewport(vp);
     autoParamDataSource.setCurrentRenderTarget(this->renderTarget[i]);
     autoParamDataSource.setCurrentSceneManager(sceneMgr);
     autoParamDataSource.setCurrentCamera(this->camera);
-    printf("8\n");
-    //pass->_updateAutoParamsNoLights(autoParamDataSource);
-    printf("9\n");
+    pass->_updateAutoParamsNoLights(autoParamDataSource);
 
-    printf("10\n");
     // These two lines don't seem to do anything useful
     renderSys->_setProjectionMatrix(this->camera->getProjectionMatrixRS()); 
-    printf("11\n");
     renderSys->_setViewMatrix(this->camera->getViewMatrix(true));
-    printf("12\n");
 
     // NOTE: We MUST bind parameters AFTER updating the autos
     if (pass->hasVertexProgram())
@@ -248,12 +245,8 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
           pass->getFragmentProgramParameters());
     }   
 
-  */
-
-    printf("i[%d]\n",i);
     // Render the texture
     this->renderTarget[i]->update();
-    printf("13\n");
 
     // OgreSceneManager::_render function automatically sets farClip to 0.
     // Which normally equates to infinite distance. We don't want this. So
@@ -261,9 +254,9 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
     this->camera->setFarClipDistance( this->farClip );
   }
 
-  //sceneMgr->_suppressRenderStateChanges(false); 
+  sceneMgr->_suppressRenderStateChanges(false); 
 
-  //this->FillBuffers();
+  this->FillBuffers();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -298,22 +291,23 @@ const float *StereoCameraSensor::GetDisparityData(unsigned int i)
 void StereoCameraSensor::FillBuffers()
 {
   Ogre::HardwarePixelBufferSharedPtr hardwareBuffer;
-  int top, left, right, bottom, i;
+  int i;
+  Ogre::Box box;
 
-  top = (int)((hardwareBuffer->getHeight() - this->imageHeight) / 2.0);
-  left = (int)((hardwareBuffer->getWidth() - this->imageWidth) / 2.0);
-  right = left + this->imageWidth;
-  bottom = top + this->imageHeight;
-
-  Ogre::Box box(left, top, right, bottom);
-
-  for (i=0; i<4; i++)
+  for (i=2; i<3; i++)
   {
+    printf("1\n");
     // Get access to the buffer and make an image and write it to file
     hardwareBuffer = this->renderTexture[i]->getBuffer(0, 0);
 
-   // hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+    hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_DISCARD);
 
+    box.top = (int)((hardwareBuffer->getHeight() - this->imageHeight) / 2.0);
+    box.left = (int)((hardwareBuffer->getWidth() - this->imageWidth) / 2.0);
+    box.right = box.left + this->imageWidth;
+    box.bottom = box.top + this->imageHeight;
+
+    printf("2\n");
     if (i < 2)
     {
       hardwareBuffer->blitToMemory ( box,
@@ -325,11 +319,21 @@ void StereoCameraSensor::FillBuffers()
     {
       hardwareBuffer->blitToMemory (box,
           Ogre::PixelBox( this->imageWidth, this->imageHeight,
-            1, Ogre::PF_FLOAT32_R, this->depthBuffer[i-2])
+            1, PF_FLOAT, this->depthBuffer[i-2])
           );
     }
 
-    //hardwareBuffer->unlock();
+    printf("3\n");
+    hardwareBuffer->unlock();
+  }
+
+    printf("4\n");
+  for (i=0; i<this->imageHeight; i++)
+  {
+    for (int j = 0; j<this->imageWidth; j++)
+    {
+      printf("%4.2f\n",*(this->depthBuffer[D_LEFT] + i*this->imageWidth+j)); 
+    }
   }
 }
 
@@ -398,7 +402,7 @@ void StereoCameraSensor::SaveFrame()
     if (i<2)
       imgData->format = Ogre::PF_B8G8R8;
     else
-      imgData->format = Ogre::PF_FLOAT32_R;
+      imgData->format = PF_FLOAT;
 
     size = this->GetImageByteSize();
 
@@ -501,7 +505,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
   Ogre::PixelFormat pf;
 
   if (depth)
-    pf = Ogre::PF_FLOAT32_R;
+    pf = PF_FLOAT;
   else
     pf = Ogre::PF_R8G8B8;
 
