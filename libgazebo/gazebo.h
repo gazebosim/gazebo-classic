@@ -1324,8 +1324,8 @@ The stereo interface allows a client to read data from a stereo camera unit
 \{
 */
 
-#define GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE 640 * 480 * 3
-#define GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE 640 * 480
+#define GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE 320 * 240 * 3
+#define GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE 320 * 240
 
 /// \brief Stereo data
 class StereoCameraData

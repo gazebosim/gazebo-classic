@@ -54,8 +54,8 @@ def createPkgConfig(target,source, env):
   f.write('Name: gazebo\n')
   f.write('Description: Simplified interface to Player\n')
   f.write('Version:' + version + '\n')
-  f.write('Requires:\n')
-  f.write('Libs: -L' + prefix + '/lib -lgazeboServer\n')
+  f.write('Requires: OGRE\n')
+  f.write('Libs: -L' + prefix + '/lib -lgazeboServer -lode\n')
   f.write('Cflags: -I' + prefix + '/include\n')
   f.close()
 

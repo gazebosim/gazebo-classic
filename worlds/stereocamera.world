@@ -105,10 +105,9 @@
         <saveFramePath>frames</saveFramePath>
         <baseline>0.2</baseline>
 
-        <!--<controller:stereo_camera name="stereo_camera_controller">
-          <interface:stereocamera name="stereo_camera_interface" />
+        <controller:stereo_camera name="stereo_camera_controller">
+          <interface:stereocamera name="stereo_iface_0" />
         </controller:stereo_camera>
-        -->
       </sensor:stereocamera>
     </body:empty>
   </model:physical>

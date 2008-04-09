@@ -174,6 +174,8 @@ void Iface::Create(Server *server, std::string id)
   << ((Iface*) this->mMap)->size << "\n";
 
   std::cout.flags(origFlags);
+
+  std::cout << "Create: Size[" << this->size << "] Size[" << ((Iface*) this->mMap)->size << "]\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -256,6 +258,8 @@ void Iface::Open(Client *client, std::string id)
     stream << "error mapping device file: " << strerror(errno);
     throw(stream.str());
   }
+
+  std::cout << "Open Size[" <<((Iface*) this->mMap)->size << "]\n";
 
   // Make sure everything is consistent
   if (((Iface*) this->mMap)->size < this->size)

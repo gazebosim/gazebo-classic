@@ -1,12 +1,6 @@
 
 # 3rd party packages
-parseConfigs=['pkg-config --cflags --libs OGRE',
-              'xml2-config --cflags --libs', 
-      	      'ode-config --cflags --libs',
-	            'pkg-config --cflags --libs OIS',
-              'fltk-config --cflags --libs --use-gl --use-images',
-              'xft-config --cflags --libs',
-              'pkg-config --cflags --libs libgazebo',
+parseConfigs=['pkg-config --cflags --libs libgazebo',
               'pkg-config --cflags --libs libgazeboServer']
 
 env = Environment (

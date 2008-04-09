@@ -93,8 +93,11 @@ void Stereo_Camera::FiniChild()
 void Stereo_Camera::PutCameraData()
 {
   StereoCameraData *data = this->cameraIface->data;
-  const unsigned char *rgb_src;
-  unsigned char *rgb_dst;
+  const unsigned char *rgb_src = NULL;
+  unsigned char *rgb_dst = NULL;
+
+  const unsigned char *rgb_src2 = NULL;
+  unsigned char *rgb_dst2 = NULL;
 
   const float *disp_src;
   float *disp_dst;
@@ -138,7 +141,7 @@ void Stereo_Camera::PutCameraData()
   memcpy(disp_dst, disp_src, data->left_disparity_size);
 
   // Copy the right disparity data to the interface
-  disp_src = this->myParent->GetDisparityData(0);
+  disp_src = this->myParent->GetDisparityData(1);
   disp_dst = data->right_disparity;
   memcpy(disp_dst, disp_src, data->right_disparity_size);
 

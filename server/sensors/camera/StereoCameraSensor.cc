@@ -42,7 +42,7 @@
 #include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
 
-#define PF_FLOAT Ogre::PF_FLOAT16_R
+#define PF_FLOAT Ogre::PF_FLOAT32_R
 
 using namespace gazebo;
 
@@ -80,8 +80,6 @@ void StereoCameraSensor::LoadChild( XMLConfigNode *node )
 {
   CameraSensor::LoadChild(node);
 
-  std::cout << "Image Size[" << this->imageWidth << " " << this->imageHeight << "]\n";
-
   this->baseline = node->GetDouble("baseline",0,1);
 }
 
@@ -105,17 +103,15 @@ void StereoCameraSensor::InitChild()
   this->materialName[D_LEFT] = this->GetName()+"_RttMat_Stereo_Left_Depth";
   this->materialName[D_RIGHT] = this->GetName()+"_RttMat_Stereo_Right_Depth";
 
-  i = D_LEFT;
-
   // Create the render textures for the color textures
-  /*for (i = 0; i<2; i++)
+  for (i = 0; i<2; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], false);
     this->renderTarget[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
-  }*/
+  }
 
   // Create the render texture for the depth textures
-  //for (i = 2; i<4; i++)
+  for (i = 2; i<4; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], true);
     this->renderTarget[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
@@ -124,23 +120,23 @@ void StereoCameraSensor::InitChild()
   // Create the camera
   this->camera = OgreCreator::CreateCamera(this->GetName(),
                  this->nearClip, this->farClip, this->hfov, 
-                 this->renderTarget[i]);
+                 this->renderTarget[0]);
 
   //this->camera->setUseRenderingDistance(true);
 
   // Hack to make the camera use the right render target too.
-  //for (i=2; i<3; i++)
+  for (i=0; i<4; i++)
   {
     this->renderTarget[i]->setAutoUpdated(false);
 
-    /*if (i > 0)
+    if (i > 0)
     {
       // Setup the viewport to use the texture
       cviewport = this->renderTarget[i]->addViewport(camera);
       cviewport->setClearEveryFrame(true);
       cviewport->setOverlaysEnabled(false);
       cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
-    }*/
+    }
 
     // Create materials for all the render textures.
     matPtr = Ogre::MaterialManager::getSingleton().create(
@@ -154,13 +150,11 @@ void StereoCameraSensor::InitChild()
   // Get pointer to the depth map material
   this->depthMaterial = Ogre::MaterialManager::getSingleton().load("Gazebo/DepthMap", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture[i]->getBuffer(0, 0);
 
+  mBuffer = this->renderTexture[0]->getBuffer(0,0);
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
 
-  std::cout << "Texture size[" << this->textureWidth << " " << this->textureHeight << "]\n";
 
   //this->leftCameraListener.Init(this, this->renderTarget[0], true);
   //this->rightCameraListener.Init(this, this->renderTarget[1], false);
@@ -172,14 +166,10 @@ void StereoCameraSensor::InitChild()
   this->depthBufferSize = this->imageWidth*this->imageHeight;
 
   // Allocate buffers
-  if (!this->depthBuffer[0])
-    this->depthBuffer[0] = new float[this->depthBufferSize];
-  if (!this->depthBuffer[1])
-    this->depthBuffer[1] = new float[this->depthBufferSize];
-  if (!this->rgbBuffer[0])
-    this->rgbBuffer[0] = new unsigned char[this->rgbBufferSize];
-  if (!this->rgbBuffer[1])
-    this->rgbBuffer[1] = new unsigned char[this->rgbBufferSize];
+  this->depthBuffer[0] = new float[this->depthBufferSize];
+  this->depthBuffer[1] = new float[this->depthBufferSize];
+  this->rgbBuffer[0] = new unsigned char[this->rgbBufferSize];
+  this->rgbBuffer[1] = new unsigned char[this->rgbBufferSize];
 
   CameraSensor::InitChild();
 }
@@ -203,14 +193,20 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
 
   CameraSensor::UpdateChild(params);
 
+  // Render the image texture
+  for (i=0; i<2; i++)
+  {
+    this->renderTarget[i]->update();
+  }
+
   sceneMgr->_suppressRenderStateChanges(true);
 
   // Get pointer to the material pass
   pass = this->depthMaterial->getBestTechnique()->getPass(0);
 
-  i = D_LEFT;
 
-  //for (i=2; i<3; i++)
+  // Render the depth texture
+  for (i=2; i<4; i++)
   {
     Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -245,9 +241,6 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
           pass->getFragmentProgramParameters());
     }   
 
-    // Render the texture
-    this->renderTarget[i]->update();
-
     // OgreSceneManager::_render function automatically sets farClip to 0.
     // Which normally equates to infinite distance. We don't want this. So
     // we have to set the distance every time.
@@ -263,7 +256,7 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
 // Return the material the camera renders to
 std::string StereoCameraSensor::GetMaterialName() const
 {
-  return this->materialName[D_LEFT];
+  return this->materialName[LEFT];
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -283,6 +276,7 @@ const float *StereoCameraSensor::GetDisparityData(unsigned int i)
 {
   if (i > 1)
     gzthrow("Index must be 0 for left, or 1 for right disparity image\n");
+
   return this->depthBuffer[i];
 }
 
@@ -292,48 +286,36 @@ void StereoCameraSensor::FillBuffers()
 {
   Ogre::HardwarePixelBufferSharedPtr hardwareBuffer;
   int i;
-  Ogre::Box box;
+  int top,left,right,bottom;
 
   for (i=2; i<3; i++)
   {
-    printf("1\n");
     // Get access to the buffer and make an image and write it to file
     hardwareBuffer = this->renderTexture[i]->getBuffer(0, 0);
 
-    hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_DISCARD);
+    hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
 
-    box.top = (int)((hardwareBuffer->getHeight() - this->imageHeight) / 2.0);
-    box.left = (int)((hardwareBuffer->getWidth() - this->imageWidth) / 2.0);
-    box.right = box.left + this->imageWidth;
-    box.bottom = box.top + this->imageHeight;
+    top = (int)((hardwareBuffer->getHeight() - this->imageHeight) / 2.0);
+    left = (int)((hardwareBuffer->getWidth() - this->imageWidth) / 2.0);
+    right = left + this->imageWidth;
+    bottom = top + this->imageHeight;
 
-    printf("2\n");
     if (i < 2)
     {
-      hardwareBuffer->blitToMemory ( box,
+      hardwareBuffer->blitToMemory ( Ogre::Box(left,top,right,bottom),
           Ogre::PixelBox( this->imageWidth, this->imageHeight,
             1, Ogre::PF_R8G8B8, this->rgbBuffer[i])
           );
     }
     else
     {
-      hardwareBuffer->blitToMemory (box,
+      hardwareBuffer->blitToMemory (Ogre::Box(left,top,right,bottom),
           Ogre::PixelBox( this->imageWidth, this->imageHeight,
             1, PF_FLOAT, this->depthBuffer[i-2])
           );
     }
 
-    printf("3\n");
     hardwareBuffer->unlock();
-  }
-
-    printf("4\n");
-  for (i=0; i<this->imageHeight; i++)
-  {
-    for (int j = 0; j<this->imageWidth; j++)
-    {
-      printf("%4.2f\n",*(this->depthBuffer[D_LEFT] + i*this->imageWidth+j)); 
-    }
   }
 }
 
@@ -514,7 +496,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
       name, 
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
-      512, 512, 0,
+      this->imageWidth, this->imageHeight, 0,
       pf,
       Ogre::TU_RENDERTARGET);
 }

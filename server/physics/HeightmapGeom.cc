@@ -148,8 +148,8 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   this->terrainVertSize = tmpImage.getWidth();
 
-  float nf = log(this->terrainVertSize-1)/log(2);
-  int ni = log(this->terrainVertSize-1)/log(2);
+  float nf = (float)(log(this->terrainVertSize-1)/log(2));
+  int ni = (int)(log(this->terrainVertSize-1)/log(2));
 
   // Make sure the heightmap image size is (2^n)+1 in size
   if ( nf - ni != 0)
@@ -158,7 +158,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   }
 
   // Calculate a good tile size
-  tileSize = pow( 2,  ni/2 );
+  tileSize = (int)(pow( 2,  ni/2 ));
 
 
   if (tileSize <= 2)
