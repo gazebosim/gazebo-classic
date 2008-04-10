@@ -42,7 +42,7 @@
 #include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
 
-#define PF_FLOAT Ogre::PF_FLOAT32_R
+#define PF_FLOAT Ogre::PF_FLOAT16_R
 
 using namespace gazebo;
 
@@ -108,6 +108,7 @@ void StereoCameraSensor::InitChild()
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], false);
     this->renderTarget[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
+    this->renderTarget[i]->setAutoUpdated(false);
   }
 
   // Create the render texture for the depth textures
@@ -115,24 +116,21 @@ void StereoCameraSensor::InitChild()
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], true);
     this->renderTarget[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
+    this->renderTarget[i]->setAutoUpdated(false);
   }
 
   // Create the camera
   this->camera = OgreCreator::CreateCamera(this->GetName(),
                  this->nearClip, this->farClip, this->hfov, 
-                 this->renderTarget[0]);
-
-  //this->camera->setUseRenderingDistance(true);
+                 this->renderTarget[D_LEFT]);
 
   // Hack to make the camera use the right render target too.
   for (i=0; i<4; i++)
   {
-    this->renderTarget[i]->setAutoUpdated(false);
-
-    if (i > 0)
+    if (i != D_LEFT )
     {
       // Setup the viewport to use the texture
-      cviewport = this->renderTarget[i]->addViewport(camera);
+      cviewport = this->renderTarget[i]->addViewport(this->camera);
       cviewport->setClearEveryFrame(true);
       cviewport->setOverlaysEnabled(false);
       cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
@@ -151,7 +149,7 @@ void StereoCameraSensor::InitChild()
   this->depthMaterial = Ogre::MaterialManager::getSingleton().load("Gazebo/DepthMap", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 
-  mBuffer = this->renderTexture[0]->getBuffer(0,0);
+  mBuffer = this->renderTexture[D_LEFT]->getBuffer(0,0);
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
 
@@ -189,25 +187,32 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
   Ogre::Viewport *vp = NULL;
   Ogre::SceneManager *sceneMgr = adapt->sceneMgr;
   Ogre::Pass *pass;
+  Ogre::Pass *prev_pass;
+  Ogre::SceneNode *gridNode = sceneMgr->getSceneNode("__OGRE_GRID_NODE__");
   int i;
 
   CameraSensor::UpdateChild(params);
 
-  // Render the image texture
-  for (i=0; i<2; i++)
-  {
-    this->renderTarget[i]->update();
-  }
-
   sceneMgr->_suppressRenderStateChanges(true);
+
+  //prev_pass = sceneMgr->getPass();
 
   // Get pointer to the material pass
   pass = this->depthMaterial->getBestTechnique()->getPass(0);
 
+  if (gridNode)
+    gridNode->setVisible(false);
 
   // Render the depth texture
   for (i=2; i<4; i++)
   {
+
+    // OgreSceneManager::_render function automatically sets farClip to 0.
+    // Which normally equates to infinite distance. We don't want this. So
+    // we have to set the distance every time.
+    this->camera->setFarClipDistance( this->farClip );
+
+
     Ogre::AutoParamDataSource autoParamDataSource;
 
     vp = this->renderTarget[i]->getViewport(0);
@@ -240,16 +245,24 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
       renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
           pass->getFragmentProgramParameters());
     }   
-
-    // OgreSceneManager::_render function automatically sets farClip to 0.
-    // Which normally equates to infinite distance. We don't want this. So
-    // we have to set the distance every time.
-    this->camera->setFarClipDistance( this->farClip );
+    this->renderTarget[i]->update();
   }
 
   sceneMgr->_suppressRenderStateChanges(false); 
 
+  // Render the image texture
+  for (i=0; i<2; i++)
+  {
+    this->renderTarget[i]->update();
+  }
+
+  if (gridNode)
+    gridNode->setVisible(true);
+
   this->FillBuffers();
+
+  if (this->saveFrames)
+    this->SaveFrame();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +301,7 @@ void StereoCameraSensor::FillBuffers()
   int i;
   int top,left,right,bottom;
 
-  for (i=2; i<3; i++)
+  for (i=0; i<4; i++)
   {
     // Get access to the buffer and make an image and write it to file
     hardwareBuffer = this->renderTexture[i]->getBuffer(0, 0);
@@ -304,14 +317,14 @@ void StereoCameraSensor::FillBuffers()
     {
       hardwareBuffer->blitToMemory ( Ogre::Box(left,top,right,bottom),
           Ogre::PixelBox( this->imageWidth, this->imageHeight,
-            1, Ogre::PF_R8G8B8, this->rgbBuffer[i])
+            1, Ogre::PF_B8G8R8, this->rgbBuffer[i])
           );
     }
     else
     {
       hardwareBuffer->blitToMemory (Ogre::Box(left,top,right,bottom),
           Ogre::PixelBox( this->imageWidth, this->imageHeight,
-            1, PF_FLOAT, this->depthBuffer[i-2])
+            1, Ogre::PF_FLOAT32_R, this->depthBuffer[i-2])
           );
     }
 
@@ -342,10 +355,9 @@ void StereoCameraSensor::SaveFrame()
   {
     for (int j =0; j<this->imageWidth; j++)
     {
-      int index = i*this->imageWidth + j;
-      //float ptr = (float)(*(this->depthBuffer + i * this->imageWidth + j));
+      float f = this->depthBuffer[0][i*this->imageWidth+j];
 
-      unsigned char value = this->saveFrameBuffer[i*this->imageWidth+j];
+      unsigned char value =  f * 255;
       fwrite( &value, 1, 1, fp );
       fwrite( &value, 1, 1, fp );
       fwrite( &value, 1, 1, fp );
@@ -487,7 +499,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
   Ogre::PixelFormat pf;
 
   if (depth)
-    pf = PF_FLOAT;
+    pf = Ogre::PF_FLOAT16_R;
   else
     pf = Ogre::PF_R8G8B8;
 

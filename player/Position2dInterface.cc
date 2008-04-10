@@ -218,12 +218,12 @@ void Position2dInterface::Update()
   if (this->iface->Lock(1))
   {
     // Only Update when new data is present
-    if (this->iface->data->time > this->datatime)
+    if (this->iface->data->head.time > this->datatime)
     {
-      this->datatime = this->iface->data->time;
+      this->datatime = this->iface->data->head.time;
 
-      ts.tv_sec = (int) (this->iface->data->time);
-      ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
+      ts.tv_sec = (int) (this->iface->data->head.time);
+      ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
       data.pos.px = this->iface->data->pose.pos.x;
       data.pos.py = this->iface->data->pose.pos.y;

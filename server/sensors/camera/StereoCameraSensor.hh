@@ -116,6 +116,8 @@ class StereoCameraSensor : public CameraSensor
   private: unsigned char *rgbBuffer[2];
   private: double baseline;
 
+  private: Ogre::Camera *depthCamera;
+
   /*private: 
            class StereoCameraListener : public Ogre::RenderTargetListener
            {

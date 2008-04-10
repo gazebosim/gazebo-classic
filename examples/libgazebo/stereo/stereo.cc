@@ -1,11 +1,49 @@
 #include <gazebo/gazebo.h>
 #include <gazebo/GazeboError.hh>
 
+gazebo::Client *client = NULL;
+gazebo::SimulationIface *simIface = NULL;
+gazebo::StereoCameraIface *stereoIface = NULL;
+int saveCount = 0;
+
+void SaveFrame()
+{
+  char tmp[1024];
+  FILE *fp;
+  
+  sprintf(tmp, "frame%04d.pgm", saveCount);
+
+  fp = fopen( tmp, "wb" );
+
+  if (!fp)
+  {
+    printf( "unable to open file %s\n for writing", tmp );
+    return;
+  }
+
+  fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", stereoIface->data->width, stereoIface->data->height);
+
+  for (unsigned int i = 0; i<stereoIface->data->height; i++)
+  {
+    for (unsigned int j =0; j<stereoIface->data->width; j++)
+    {
+      unsigned char value = stereoIface->data->left_disparity[i*stereoIface->data->width+j] * 255;
+      fwrite( &value, 1, 1, fp );
+      fwrite( &value, 1, 1, fp );
+      fwrite( &value, 1, 1, fp );
+    }
+  }
+
+  fclose( fp );
+  saveCount++;
+}
+
 int main()
 {
-  gazebo::Client *client = new gazebo::Client();
-  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
-  gazebo::StereoCameraIface *stereoIface = new gazebo::StereoIface();
+  client = new gazebo::Client();
+  simIface = new gazebo::SimulationIface();
+  stereoIface = new gazebo::StereoCameraIface();
+
 
   int serverId = 0;
 
@@ -34,7 +72,7 @@ int main()
   /// Open the Stereo interface
   try
   {
-    posIface->Open(client, "stereo_iface_0");
+    stereoIface->Open(client, "stereo_iface_0");
   }
   catch (std::string e)
   {
@@ -43,18 +81,16 @@ int main()
     return -1;
   }
 
-  // Enable the motor
-  stereoIface->Lock(1);
-  stereoIface->Unlock();
-
-  /*while (true)
+  while (true)
   {
-    posIface->Lock(1);
-    posIface->data->cmdVelocity.pos.x += 10;
-    posIface->Unlock();
+    stereoIface->Lock(1);
+    SaveFrame();
+    stereoIface->Unlock();
 
     usleep(100000);
-  }*/
+  }
+
   return 0;
 }
+
 

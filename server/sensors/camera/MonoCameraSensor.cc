@@ -118,6 +118,9 @@ void MonoCameraSensor::FiniChild()
 void MonoCameraSensor::UpdateChild(UpdateParams &params)
 {
   CameraSensor::UpdateChild(params);
+
+  if (this->saveFrames)
+    this->SaveFrame();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

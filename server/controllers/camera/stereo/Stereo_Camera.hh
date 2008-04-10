@@ -33,6 +33,7 @@
 namespace gazebo
 {
   class CameraIface;
+  class StereoCameraIface;
   class CameraSensor;
 
 /// @addtogroup gazebo_controller
@@ -89,11 +90,15 @@ class Stereo_Camera : public Controller
   /// \return 0 on success
   protected: virtual void FiniChild();
 
+  /// \brief Put stereo data to the iface
+  private: void PutStereoData();
+
   /// \brief Put camera data to the iface
   private: void PutCameraData();
 
   /// The camera interface
-  private: StereoCameraIface *cameraIface;
+  private: StereoCameraIface *stereoIface;
+  private: CameraIface *cameraIface;
 
   /// The parent sensor
   private: StereoCameraSensor *myParent;

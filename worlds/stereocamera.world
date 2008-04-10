@@ -67,7 +67,7 @@
         <mass>1.0</mass>
         <visual>
           <mesh>unit_box</mesh>
-          <material>Gazebo/BumpyMetal</material>
+          <material>Gazebo/Red</material>
         </visual>
       </geom:box>
     </body:box>
@@ -107,6 +107,7 @@
 
         <controller:stereo_camera name="stereo_camera_controller">
           <interface:stereocamera name="stereo_iface_0" />
+          <interface:camera name="camera_iface_0" />
         </controller:stereo_camera>
       </sensor:stereocamera>
     </body:empty>

@@ -80,7 +80,7 @@ env['BUILDERS']['RCConfig'] = Builder(action = createGazeborc)
 rcconfig = env.RCConfig(target='gazeborc', source=Value(install_prefix))
 
 # DEFAULT list of subdirectories to build
-subdirs = ['server','libgazebo', 'player']
+subdirs = ['libgazebo','server', 'player']
 
 # Set the compile mode
 if env['mode'] == 'debug':
@@ -95,7 +95,7 @@ if env['with_audio'] == 'yes':
   parseConfigs+=['pkg-config --cflags --libs OgreAL']
 
 
-optimize_for_cpu(env);
+#optimize_for_cpu(env);
 
 #
 # Parse all the pacakge configurations
@@ -170,6 +170,7 @@ Export('env install_prefix version staticObjs sharedObjs headers subdirs')
 # Process subdirectories
 #
 for subdir in subdirs:
+  print subdir
   SConscript('%s/SConscript' % subdir)
 
 #
@@ -177,6 +178,7 @@ for subdir in subdirs:
 #
 gazebo = env.Program('gazebo',staticObjs)
 
+Depends(gazebo, 'libgazebo/libgazebo.so')
 #
 # Create static and shared libraries for the server
 #

@@ -135,16 +135,16 @@ void PTZInterface::Update()
   this->iface->Lock(1);
 
   // Only Update when new data is present
-  if (this->iface->data->time > this->datatime)
+  if (this->iface->data->head.time > this->datatime)
   {
     int i;
     float rangeRes;
     float angleRes;
 
-    this->datatime = this->iface->data->time;
+    this->datatime = this->iface->data->head.time;
 
-    ts.tv_sec = (int) (this->iface->data->time);
-    ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
+    ts.tv_sec = (int) (this->iface->data->head.time);
+    ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
     memset(&data, 0, sizeof(data));
 

@@ -80,15 +80,17 @@ void CameraInterface::Update()
 
   struct timeval ts;
 
+  printf("Trying to lock\n");
   this->iface->Lock(1);
 
+  printf("Player Update\n");
   // Only Update when new data is present
-  if (this->iface->data->time > this->datatime)
+  /*if (this->iface->data->head.time > this->datatime)
   {
-    this->datatime = this->iface->data->time;
+    this->datatime = this->iface->data->head.time;
 
-    ts.tv_sec = (int) (this->iface->data->time);
-    ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
+    ts.tv_sec = (int) (this->iface->data->head.time);
+    ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
     // Set the image properties
     this->data.width = this->iface->data->width;
@@ -127,7 +129,7 @@ void CameraInterface::Update()
       this->SaveFrame(filename);
     }
 
-  }
+  }*/
 
   this->iface->Unlock();
 }

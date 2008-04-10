@@ -101,7 +101,7 @@ void Generic_Camera::PutCameraData()
   this->cameraIface->Lock(1);
 
   // Data timestamp
-  data->time = Simulator::Instance()->GetSimTime();
+  data->head.time = Simulator::Instance()->GetSimTime();
 
   data->width = this->myParent->GetImageWidth();
   data->height = this->myParent->GetImageHeight();

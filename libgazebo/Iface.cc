@@ -63,12 +63,11 @@ GZ_REGISTER_IFACE("stereocamera", StereoCameraIface);
 Iface::Iface(const std::string &type, size_t size)
 {
   this->type = type;
+
   this->size = size;
 
   this->server = NULL;
   this->client = NULL;
-
-  this->openCount = 0;
 
   this->creator = false;
 }
@@ -140,6 +139,8 @@ void Iface::Create(Server *server, std::string id)
     throw(stream.str());
   }
 
+  this->Lock(1);
+
   // Set the file to the correct size
   if (ftruncate(this->mmapFd, this->size) < 0)
   {
@@ -158,9 +159,9 @@ void Iface::Create(Server *server, std::string id)
 
   memset(this->mMap, 0, this->size);
 
-  ((Iface*) this->mMap)->version = LIBGAZEBO_VERSION;
-  ((Iface*) this->mMap)->size = this->size;
-  ((Iface*) this->mMap)->openCount = 0;
+  ((GazeboData*) this->mMap)->version = LIBGAZEBO_VERSION;
+  ((GazeboData*) this->mMap)->size = this->size;
+  ((GazeboData*) this->mMap)->openCount = 0;
 
   std::ios_base::fmtflags origFlags = std::cout.flags();
 
@@ -168,14 +169,14 @@ void Iface::Create(Server *server, std::string id)
   std::cout << "creating " << this->filename.c_str() << " "
 
   << setiosflags(std::ios::hex | std::ios::showbase)
-  << std::setw(3) << ((Iface*) this->mMap)->version << " "
+  << std::setw(3) << ((GazeboData*) this->mMap)->version << " "
 
   << std::setiosflags(std::ios::dec | ~std::ios::showbase)
-  << ((Iface*) this->mMap)->size << "\n";
+  << ((GazeboData*) this->mMap)->size << "\n";
 
   std::cout.flags(origFlags);
 
-  std::cout << "Create: Size[" << this->size << "] Size[" << ((Iface*) this->mMap)->size << "]\n";
+  this->Unlock();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -189,10 +190,10 @@ void Iface::Create(Server *server, std::string id,
 
   this->Create(server,id);
 
-  this->modelType = modelType;
+  ((GazeboData*)this->mMap)->modelType = modelType;
 
-  this->modelId = modelId;
-  this->parentModelId = parentModelId;
+  ((GazeboData*)this->mMap)->modelId = modelId;
+  ((GazeboData*)this->mMap)->parentModelId = parentModelId;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -259,12 +260,10 @@ void Iface::Open(Client *client, std::string id)
     throw(stream.str());
   }
 
-  std::cout << "Open Size[" <<((Iface*) this->mMap)->size << "]\n";
-
   // Make sure everything is consistent
-  if (((Iface*) this->mMap)->size < this->size)
+  if (((GazeboData*) this->mMap)->size < this->size)
   {
-    stream << "expected file size: " << ((Iface*) this->mMap)->size
+    stream << "expected file size: " << ((GazeboData*) this->mMap)->size
     << " < " <<  this->size;
 
     throw(stream.str());
@@ -276,15 +275,19 @@ void Iface::Open(Client *client, std::string id)
   std::cout << "opening " << this->filename.c_str() << " "
 
   << std::setiosflags(std::ios::hex | std::ios::showbase)
-  << std::setw(3) << ((Iface*) this->mMap)->version << " "
+  << std::setw(3) << ((GazeboData*) this->mMap)->version << " "
 
   << std::setiosflags(std::ios::dec | ~std::ios::showbase)
-  << ((Iface*) this->mMap)->size << "\n";
+  << ((GazeboData*) this->mMap)->size << "\n";
 
   std::cout.setf(origFlags);
 
-  ((Iface*)this->mMap)->openCount++;
-  this->openCount++;
+  this->Lock(1);
+  printf("1 Iface Open[%d]\n",((GazeboData*)this->mMap)->openCount);
+  ((GazeboData*)this->mMap)->openCount++;
+
+  printf("2 Iface Open[%d]\n",((GazeboData*)this->mMap)->openCount);
+  this->Unlock();
 }
 
 
@@ -292,10 +295,9 @@ void Iface::Open(Client *client, std::string id)
 // Close the interface (client)
 void Iface::Close()
 {
-  this->openCount--;
-  ((Iface*)this->mMap)->openCount--;
+  ((GazeboData*)this->mMap)->openCount--;
 
-  if (this->openCount <=0)
+  if (((GazeboData*)this->mMap)->openCount <= 0)
   {
     // Unmap the file
     munmap(this->mMap, this->size);
@@ -368,8 +370,14 @@ std::string Iface::GetType() const
 /// Get the number of connections
 int Iface::GetOpenCount()
 {
+  int result = 0;
+
   if (this->mMap)
-    return ((Iface*)this->mMap)->openCount;
-  else
-    return 0;
+  {
+    this->Lock(1);
+    result = ((GazeboData*)this->mMap)->openCount;
+    this->Unlock();
+  }
+
+  return result;
 }

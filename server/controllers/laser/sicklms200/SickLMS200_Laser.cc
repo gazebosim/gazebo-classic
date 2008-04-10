@@ -139,7 +139,7 @@ void SickLMS200_Laser::PutLaserData()
   if (this->laserIface->Lock(1))
   {
     // Data timestamp
-    this->laserIface->data->time = Simulator::Instance()->GetSimTime();
+    this->laserIface->data->head.time = Simulator::Instance()->GetSimTime();
 
     // Read out the laser range data
     this->laserIface->data->min_angle = minAngle;
@@ -205,7 +205,7 @@ void SickLMS200_Laser::PutFiducialData()
   {
 
     // Data timestamp
-    this->fiducialIface->data->time = Simulator::Instance()->GetSimTime();
+    this->fiducialIface->data->head.time = Simulator::Instance()->GetSimTime();
     this->fiducialIface->data->count = 0;
 
     // TODO: clean this up

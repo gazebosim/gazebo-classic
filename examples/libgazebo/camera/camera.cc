@@ -59,7 +59,7 @@ int main()
   /// Open the Camera interface
   try
   {
-    camIface->Open(client, "camera_iface_1");
+    camIface->Open(client, "camera_iface_0");
   }
   catch (std::string e)
   {

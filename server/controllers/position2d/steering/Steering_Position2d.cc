@@ -227,7 +227,7 @@ void Steering_Position2d::PutPositionData()
   if (this->myIface->Lock(1))
   {
     // TODO: Data timestamp
-    this->myIface->data->time = Simulator::Instance()->GetSimTime();
+    this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
 
     this->myIface->data->pose.pos.x = this->odomPose[0];
     this->myIface->data->pose.pos.y = this->odomPose[1];

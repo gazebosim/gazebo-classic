@@ -101,7 +101,7 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
   float hiStop, loStop;
 
   this->myIface->Lock(1);
-  this->myIface->data->time = Simulator::Instance()->GetSimTime();
+  this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
 
   this->myIface->data->actuators_count = 16;
 

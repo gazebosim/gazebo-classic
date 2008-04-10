@@ -148,9 +148,6 @@ void CameraSensor::UpdateChild(UpdateParams &params)
   this->pose.rot.x = q.x;
   this->pose.rot.y = q.y;
   this->pose.rot.z = q.z;
-
-  if (this->saveFrames)
-    this->SaveFrame();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

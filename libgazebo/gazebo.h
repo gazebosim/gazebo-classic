@@ -265,8 +265,8 @@ class Iface
   /// \param modelId Id of the model
   /// \param parentModelId Id of the model's parent
   public: void Create(Server *server, std::string id,
-                     const std::string &modelType, int modelId, 
-                     int parentModelId);
+              const std::string &modelType, int modelId, 
+              int parentModelId);
 
   /// \brief Destroy the interface (server)
   public: void Destroy();
@@ -301,10 +301,10 @@ class Iface
 
   /// The server we are associated with
   public: Server *server;
-  
+
   /// The client we are associated with
   public: Client *client;
-  
+
   /// File descriptor for the mmap file
   public: int mmapFd;
 
@@ -314,14 +314,24 @@ class Iface
   /// The name of the file we created/opened
   public: std::string filename;
 
-  /// Interface version number
+  /// type of interface
+  protected: std::string type;
+
+  private: bool creator;
+
+  private: size_t size;
+};
+
+class GazeboData
+{
+  /// Number of times the interface has been opened
+  public: int openCount;
+
+  public: double time;
+
   public: int version;
 
-  /// Allocation size
   public: size_t size;
-
-  /// Type of model that owns this interface
-  public: std::string modelType;
 
   /// ID of the model that owns this interface
   public: int modelId;
@@ -329,13 +339,10 @@ class Iface
   /// ID of the parent model
   public: int parentModelId;
 
-  /// type of interface
-  protected: std::string type;
+  /// Type of model that owns this interface
+  public: std::string modelType;
 
-  /// Number of times the interface has been opened
-  private: int openCount;
 
-  private: bool creator;
 };
 
 /** \} */
@@ -358,6 +365,8 @@ of the server, such as the current simulation time-step.
 /// \brief Simulation interface data
 class SimulationData
 {
+  public: GazeboData head;
+
   /// Elapsed simulation time
   public: double simTime;
 
@@ -449,6 +458,8 @@ sent to the world.
 /// \brief Audio interface data
 class AudioData
 {
+  public: GazeboData head;
+
   /// Data timestamp
   public: double time;
 
@@ -544,8 +555,7 @@ Images are in packed RGB888 format.
 /// \brief Camera interface data
 class CameraData
 {
-  /// Data timestamp
-  public: double time;
+  public: GazeboData head;
 
   /// Width of image in pixels
   public: unsigned int width;
@@ -621,8 +631,7 @@ Pioneer2AT or ATRV Jr.  This interface handles both 2D and 3D data.
 /// \brief Position interface data
 class PositionData 
 {
-  /// Data timestamp
-  public: double time;
+  public: GazeboData head;
 
   /// Pose (usually global cs)
   public: Pose pose;
@@ -770,8 +779,7 @@ device is also allowed.
 /// \brief Laser interface data
 class LaserData
 {
-  /// Data timestamp
-  public: double time;
+  public: GazeboData head;
   
   /// Range scan min angle
   public: double min_angle;
@@ -869,6 +877,7 @@ model to return data from simulated retro-reflective barcodes.
 /// \brief Fudicial interface data
 class FiducialFid
 {
+
   /// Fiducial id
   public: int id;
 
@@ -879,8 +888,7 @@ class FiducialFid
 /// \brief Fiducial data
 class FiducialData
 {
-   /// Data timestamp
-  public: double time;
+  public: GazeboData head;
 
   /// Number of fiducials
   public: int count;
@@ -935,8 +943,7 @@ in order to dynamically create models.
 /// \brief Fudicial interface data
 class FactoryData 
 {
-   /// Data timestamp
-  public: double time;
+  public: GazeboData head;
 
   /// String describing the model to be initiated
   public: uint8_t newModel[4096];
@@ -1013,8 +1020,7 @@ that found on the Pioneer series robots.
 /// \brief Fudicial interface data
 class GripperData
 {
-   /// Data timestamp
-  public: double time;
+  public: GazeboData head;
 
   /// \brief Current command for the gripper
   public: int cmd;
@@ -1179,11 +1185,10 @@ class ActarrayActuator
 /// \brief The actuator array data packet. 
 class ActarrayData
 {
+  public: GazeboData head;
+
   /// The number of actuators in the array. 
   public: unsigned int actuators_count;
-  
-  /// timestamp
-  public: double time;
   
   /// The actuator data. 
   public: ActarrayActuator actuators[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
@@ -1258,8 +1263,7 @@ The ptz interface allows control of a pan-tilt-zoom unit
 /// \brief PTZ data
 class PTZData
 {
-  /// Data timestamp
-  public: double time;
+  public: GazeboData head;
 
   /// Measured pan angle (radians)
   public: double pan;
@@ -1324,14 +1328,13 @@ The stereo interface allows a client to read data from a stereo camera unit
 \{
 */
 
-#define GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE 320 * 240 * 3
-#define GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE 320 * 240
+#define GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE 640 * 480 * 3
+#define GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE 640 * 480
 
 /// \brief Stereo data
 class StereoCameraData
 {
-  /// Data timestamp
-  public: double time;
+  public: GazeboData head;
 
   /// Width of image in pixels
   public: unsigned int width;
@@ -1339,17 +1342,17 @@ class StereoCameraData
   /// Height of image in pixels
   public: unsigned int height;
 
-  /// Right image size
-  public: unsigned int right_rgb_size;
-
-  /// Right image (R8G8B8)
-  public: unsigned char right_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
-
   /// Left image size
   public: unsigned int left_rgb_size;
 
   /// left image (R8G8B8)
   public: unsigned char left_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
+
+  /// Right image size
+  public: unsigned int right_rgb_size;
+
+  /// Right image (R8G8B8)
+  public: unsigned char right_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
 
   /// Left disparity size
   public: unsigned int left_disparity_size;

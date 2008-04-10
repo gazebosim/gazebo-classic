@@ -195,7 +195,7 @@ void AudioController::PutAudioData()
 {
   if (this->myIface->Lock(1))
   {
-    this->myIface->data->time = Simulator::Instance()->GetSimTime();
+    this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
     this->myIface->data->state = this->state;
 
     this->myIface->Unlock();

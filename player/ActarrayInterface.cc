@@ -207,11 +207,11 @@ void ActarrayInterface::Update()
   this->iface->Lock(1);
 
   // Only Update when new data is present
-  if (this->iface->data->time > this->datatime)
+  if (this->iface->data->head.time > this->datatime)
   {
 
     //Update the local time so we know when new info comes
-    this->datatime = this->iface->data->time;
+    this->datatime = this->iface->data->head.time;
 
     unsigned int prevCount = this->actData.actuators_count;
 

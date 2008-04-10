@@ -170,7 +170,7 @@ void Generic_PTZ::PutPTZData()
   this->ptzIface->Lock(1);
 
   // Data timestamp
-  data->time = Simulator::Instance()->GetSimTime();
+  data->head.time = Simulator::Instance()->GetSimTime();
 
   data->pan = this->panJoint->GetAngle();
   data->tilt = this->tiltJoint->GetAngle();
