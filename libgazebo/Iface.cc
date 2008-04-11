@@ -283,10 +283,7 @@ void Iface::Open(Client *client, std::string id)
   std::cout.setf(origFlags);
 
   this->Lock(1);
-  printf("1 Iface Open[%d]\n",((GazeboData*)this->mMap)->openCount);
   ((GazeboData*)this->mMap)->openCount++;
-
-  printf("2 Iface Open[%d]\n",((GazeboData*)this->mMap)->openCount);
   this->Unlock();
 }
 
