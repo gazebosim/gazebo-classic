@@ -80,6 +80,13 @@ void CameraSensor::LoadChild( XMLConfigNode *node )
 
   this->hfov = DTOR(node->GetDouble("hfov",60,0));
 
+  this->visibilityMask = GZ_ALL_CAMERA; 
+
+  if (node->GetString("mask","none",0) == "laser")
+  {
+    this->visibilityMask ^= GZ_LASER_CAMERA;
+  }
+
   // Create the directory to store frames
   if (this->saveFrames)
   {
@@ -113,6 +120,8 @@ void CameraSensor::InitChild()
   this->pitchNode = this->sceneNode->createChildSceneNode(this->GetName() + "PitchNode");
   this->pitchNode->pitch(Ogre::Degree(0));
   this->pitchNode->attachObject(this->camera);
+
+  this->camera->getViewport()->setVisibilityMask(this->visibilityMask);
 
   this->saveCount = 0;
 }
@@ -247,4 +256,16 @@ Ogre::Camera *CameraSensor::GetOgreCamera() const
   return this->camera;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the near clip distance
+double CameraSensor::GetNearClip()
+{
+  return this->nearClip;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the far clip distance
+double CameraSensor::GetFarClip()
+{
+  return this->farClip;
+}

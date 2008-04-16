@@ -31,6 +31,7 @@
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
 #include "Body.hh"
+#include "Global.hh"
 #include "RayGeom.hh"
 
 using namespace gazebo;
@@ -57,6 +58,7 @@ RayGeom::RayGeom( Body *body, bool displayRays )
     this->visualNode->AttachObject(this->line);
 
     this->line->setMaterial("Gazebo/BlueEmissive");
+    this->line->setVisibilityFlags(GZ_LASER_CAMERA);
   }
 
   this->contactLen = DBL_MAX;

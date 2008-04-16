@@ -121,6 +121,12 @@ class CameraSensor : public Sensor
   /// is @e not the same as the depth value.
   public: double GetZValue(int x, int y);
 
+  /// \brief Get the near clip distance
+  public: double GetNearClip();
+
+  /// \brief Get the far clip distance
+  public: double GetFarClip();
+
   /// \brief Enable or disable saving
   public: void EnableSaveFrame(bool enable);
 
@@ -151,6 +157,8 @@ class CameraSensor : public Sensor
   protected: unsigned int saveCount;
   protected: bool saveFrames;
   protected: std::string savePathname;
+
+  protected: unsigned int visibilityMask;
 };
 
 /// \}

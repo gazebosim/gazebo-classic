@@ -100,9 +100,15 @@ void Stereo_Camera::UpdateChild(UpdateParams &params)
     this->cameraIface->Post();
   }
 
-  /*if (this->stereoIface && this->stereoIface->GetOpenCount() > 0)
-    this->PutStereoData();
-    */
+  if (this->stereoIface)
+  {
+    this->stereoIface->Lock(1);
+    if (this->stereoIface->data->head.openCount > 0)
+      this->PutStereoData();
+    this->stereoIface->Unlock();
+
+    this->stereoIface->Post();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,13 +128,13 @@ void Stereo_Camera::PutStereoData()
   const float *disp_src;
   float *disp_dst;
 
-  this->stereoIface->Lock(1);
-
   // Data timestamp
   stereo_data->head.time = Simulator::Instance()->GetSimTime();
 
   stereo_data->width = this->myParent->GetImageWidth();
   stereo_data->height = this->myParent->GetImageHeight();
+  stereo_data->farClip = this->myParent->GetFarClip();
+  stereo_data->nearClip = this->myParent->GetNearClip();
 
   //stereo_data->right_rgb_size = stereo_data->width * stereo_data->height * 3;
   //stereo_data->left_rgb_size = stereo_data->width * stereo_data->height * 3;
@@ -164,8 +170,6 @@ void Stereo_Camera::PutStereoData()
   disp_dst = stereo_data->right_disparity;
   memcpy(disp_dst, disp_src, stereo_data->right_disparity_size);
 
-  this->stereoIface->Unlock();
-  this->stereoIface->Post();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

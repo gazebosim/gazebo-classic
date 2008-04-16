@@ -1342,6 +1342,12 @@ class StereoCameraData
   /// Height of image in pixels
   public: unsigned int height;
 
+  /// Far clip distance in meters
+  public: float farClip;
+
+  /// Near clip distance in meters
+  public: float nearClip;
+
   /// Left image size
   public: unsigned int left_rgb_size;
 

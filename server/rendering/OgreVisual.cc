@@ -24,6 +24,7 @@
  * SVN: $Id:$
  */
 #include <Ogre.h>
+#include "Global.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
@@ -98,6 +99,8 @@ void OgreVisual::Load(XMLConfigNode *node)
   // Attach the entity to the node
   if (obj)
     this->AttachObject(obj);
+
+  obj->setVisibilityFlags(GZ_ALL_CAMERA);
 
   // Set the pose of the scene node
   this->SetPose(pose);
