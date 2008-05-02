@@ -81,7 +81,10 @@ void StatusBar::Update()
   this->iterations->value(Simulator::Instance()->GetIterations());
   this->fps->value(avgFPS);
 
-  this->realTime->value(Simulator::Instance()->GetRealTime());
+  if (Simulator::Instance()->GetRealTime() - this->realTime->value() > 0.1)
+  {
+    this->realTime->value(Simulator::Instance()->GetRealTime());
+  }
   this->simTime->value(Simulator::Instance()->GetSimTime());
   this->pauseTime->value(Simulator::Instance()->GetPauseTime());
 

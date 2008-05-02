@@ -71,9 +71,6 @@ namespace gazebo
     /// \brief Finalize the simulation
     public: void Fini( );
 
-    /// \brief Update the simulation
-    public: void Update();
-
     /// \brief Main simulation loop, when this loop ends the simulation finish
     public: void MainLoop();
 
@@ -157,6 +154,7 @@ namespace gazebo
 
     /// Current simulation time
     private: double simTime, pauseTime, startTime;
+    private: double prevPhysicsTime, prevRenderTime;
 
     // UserIteractions 
     /// \brief Set to true to pause the simulation
