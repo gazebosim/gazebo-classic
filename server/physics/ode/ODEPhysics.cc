@@ -78,8 +78,11 @@ ODEPhysics::ODEPhysics()
 // Destructor
 ODEPhysics::~ODEPhysics()
 {
-  dSpaceDestroy(this->spaceId);
-  dWorldDestroy(this->worldId);
+  if (this->spaceId)
+    dSpaceDestroy(this->spaceId);
+
+  if (this->worldId)
+    dWorldDestroy(this->worldId);
 
   this->spaceId = NULL;
   this->worldId = NULL;

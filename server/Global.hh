@@ -88,7 +88,7 @@
 
 #define ROUND(x) ( (int)( floor((x)+0.5) ) )
 
-#define GZ_DELETE(p){ if(p) { delete (p);  (p)=NULL; } }
+#define GZ_DELETE(p) { if(p) { delete (p);  (p)=NULL; } }
 
 namespace gazebo
 {

@@ -55,6 +55,9 @@ World::World()
   this->showJoints = false;
   this->wireframe = false;
   this->showPhysics = false;
+  this->physicsEngine = NULL;
+  this->server = NULL;
+  this->simIface = NULL;
 
 }
 
