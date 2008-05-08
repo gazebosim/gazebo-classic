@@ -68,7 +68,10 @@ namespace gazebo
   
     /// \brief Get the root node
     public: XMLConfigNode *GetRootNode() const;
-  
+
+    /// \brief Fill the document with information
+    private: void FillDocumentNodes();
+ 
     /// \brief Create wrappers
     private: XMLConfigNode *CreateNodes( XMLConfigNode *parent, 
                                          xmlNodePtr xmlNode );
@@ -96,28 +99,28 @@ namespace gazebo
     public: ~XMLConfigNode();
   
     /// \brief Get the node name
-    public: std::string GetName();
+    public: std::string GetName() const;
   
     /// \brief Get the name space prefix
-    public: std::string GetNSPrefix();
+    public: std::string GetNSPrefix() const;
   
     /// \brief Get the next sibling of this node
-    public: XMLConfigNode *GetNext();
+    public: XMLConfigNode *GetNext() const;
 
     /// \brief Get next by name
-    public: XMLConfigNode *GetNext(const std::string &name,const std::string &prefix=std::string());
+    public: XMLConfigNode *GetNext(const std::string &name,const std::string &prefix=std::string()) const;
 
     /// \brief Get next node by namespace prefix
-    public: XMLConfigNode *GetNextByNSPrefix(const std::string &prefix);
+    public: XMLConfigNode *GetNextByNSPrefix(const std::string &prefix) const;
   
     /// \brief Get the first child of this node
-    public: XMLConfigNode *GetChild();
+    public: XMLConfigNode *GetChild() const;
   
     /// \brief Get a child based on a name. Returns null if not found
-    public: XMLConfigNode *GetChild(const std::string &name, const std::string &prefix=std::string() );
+    public: XMLConfigNode *GetChild(const std::string &name, const std::string &prefix=std::string() ) const;
   
     /// \brief Get the first child with the specified namespace prefix
-    public: XMLConfigNode *GetChildByNSPrefix(const std::string &prefix );
+    public: XMLConfigNode *GetChildByNSPrefix(const std::string &prefix ) const;
   
     /// \brief Move child pointer back to beginning
     public: XMLConfigNode *Rewind();
@@ -126,66 +129,66 @@ namespace gazebo
     public: void Print();
   
     /// \brief Return the value of the current node
-    public: std::string GetValue();
+    public: std::string GetValue() const;
   
     /// \brief Get an attribute string value
     public: std::string GetString( const std::string &key, const std::string &def, 
-                                   int require = 0 );
+                                   int require = 0 ) const;
   
     /// \brief Get a attribute character value
-    public: unsigned char GetChar( const std::string &key, char def, int require = 0 );
+    public: unsigned char GetChar( const std::string &key, char def, int require = 0 ) const;
   
     /// \brief Get a file name.  Always returns an absolute path.  
     ///        If the filename is entered as a relative path, we prepend the 
     ///        world file path.
     public: std::string GetFilename( const std::string &key, const std::string &def, 
-                                     int require = 0);
+                                     int require = 0) const;
   
     /// \brief Get an integer
-    public: int GetInt( const std::string &key, int def, int require = 0 );
+    public: int GetInt( const std::string &key, int def, int require = 0 ) const;
   
     /// \brief Get a double
-    public: double GetDouble( const std::string &key, double def, int require = 0 );
+    public: double GetDouble( const std::string &key, double def, int require = 0 ) const;
   
     /// \brief Get a float
-    public: float GetFloat( const std::string &key, float def, int require = 0 );
+    public: float GetFloat( const std::string &key, float def, int require = 0 ) const;
   
     /// \brief Get a boolean
-    public: bool GetBool( const std::string &key, bool def, int require = 0 );
+    public: bool GetBool( const std::string &key, bool def, int require = 0 ) const;
   
     /// \brief Get an attribute length value (return value in meters)
-    public: double GetLength( const std::string &key, double def, int require = 0 );
+    public: double GetLength( const std::string &key, double def, int require = 0 ) const;
   
     /// \brief Get an attribute time value (return value in seconds)
-    public: gazebo::Time GetTime( const std::string &key, double def, int require = 0 );
+    public: gazebo::Time GetTime( const std::string &key, double def, int require = 0 ) const;
   
     /// \brief Get a position
-    public: Vector3 GetVector3( const std::string &key, Vector3 def );
+    public: Vector3 GetVector3( const std::string &key, Vector3 def ) const;
   
     /// \brief Get a two dimensional double vector
-    public: Vector2<double> GetVector2d( const std::string &key, Vector2<double> def );
+    public: Vector2<double> GetVector2d( const std::string &key, Vector2<double> def ) const;
 
     /// \brief Get a two dimensional int vector
-    public: Vector2<int> GetVector2i( const std::string &key, Vector2<int> def );
+    public: Vector2<int> GetVector2i( const std::string &key, Vector2<int> def ) const;
   
     /// \brief Get a rotation
-    public: Quatern GetRotation( const std::string &key, Quatern def );
+    public: Quatern GetRotation( const std::string &key, Quatern def ) const;
   
     /// \brief Get an attribute tuple value
     public: std::string GetTupleString( const std::string &key, int index, 
-                                        const std::string &def );
+                                        const std::string &def ) const;
   
     /// \brief Get an attribute tuple int value
-    public: int GetTupleInt( const std::string &key, int index, int def );
+    public: int GetTupleInt( const std::string &key, int index, int def ) const;
   
     /// \brief Get an attribute tuple double value
-    public: double GetTupleDouble( const std::string &key, int index, double def );
+    public: double GetTupleDouble( const std::string &key, int index, double def ) const;
   
     /// \brief Get an attribute tuple length value (return value in meters)
-    public: double GetTupleLength( const std::string &key, int index, double def );
+    public: double GetTupleLength( const std::string &key, int index, double def ) const;
   
     /// \brief Get an attribute tuple angle value (return value in radians)
-    public: double GetTupleAngle( const std::string &key, int index, double def );
+    public: double GetTupleAngle( const std::string &key, int index, double def ) const;
   
     /// \brief Set a node's value, either attribute or child node value, maybe create it
     /// \param key : the name of the element or attribute to write 
@@ -195,7 +198,7 @@ namespace gazebo
     public: void SetValue(const std::string &key, const StringValue &data, int require =0, int type=0);
 
     /// \brief Get a node's value, which is either a attribute or child node value.
-    protected: xmlChar* GetNodeValue( const std::string &key );
+    protected: xmlChar* GetNodeValue( const std::string &key ) const;
   
     /// \brief Set a node's value, either attribute or child node value (private)
     protected: bool SetNodeValue(const std::string& key,const std::string& value);

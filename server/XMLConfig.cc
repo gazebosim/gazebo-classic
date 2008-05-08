@@ -72,6 +72,46 @@ void XMLConfig::Load( const std::string &filename )
 
   // Load the file
   this->xmlDoc = xmlParseFile( this->filename.c_str() );
+  this->FillDocumentNodes();
+}
+
+void XMLConfig::LoadString( const std::string &str )
+{
+  // Enable line numbering
+  xmlLineNumbersDefault( 1 );
+
+  // Load the file
+  this->xmlDoc = xmlParseDoc( (xmlChar*)(str.c_str()) );
+  this->FillDocumentNodes();
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+//  Save config back into file
+int XMLConfig::Save(const std::string &filename )
+{
+  int result=0;
+  if (filename == std::string())
+    result=xmlSaveFileEnc(this->filename.c_str(), this->xmlDoc, "UTF-8");
+  else
+    result=xmlSaveFileEnc(filename.c_str(), this->xmlDoc, "UTF-8");
+  return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+// Get the root node
+XMLConfigNode *XMLConfig::GetRootNode() const
+{
+  return this->root;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////
+// Fills the document with information 
+void XMLConfig::FillDocumentNodes()
+{
   if (xmlDoc == NULL)
   {
     gzthrow( "Unable to parse xml file: " << this->filename);
@@ -97,49 +137,6 @@ void XMLConfig::Load( const std::string &filename )
   {
     gzthrow( "Empty document [" << this->filename << "]");
   }
-}
-
-void XMLConfig::LoadString( const std::string &str )
-{
-  // Enable line numbering
-  xmlLineNumbersDefault( 1 );
-
-  // Load the file
-  this->xmlDoc = xmlParseDoc( (xmlChar*)(str.c_str()) );
-  if (xmlDoc == NULL)
-  {
-    gzthrow("unable to parse [" << str << "]");
-  }
-
-  // Create wrappers for all the nodes (recursive)
-  this->root = this->CreateNodes( NULL,
-                                  xmlDocGetRootElement(this->xmlDoc) );
-
-  if (this->root == NULL)
-  {
-    gzthrow( "Empty document [" << str<< "]") ;
-  }
-}
-
-
-////////////////////////////////////////////////////////////////////////////
-//  Save config back into file
-int XMLConfig::Save(const std::string &filename )
-{
-  int result=0;
-  if (filename==std::string())
-    result=xmlSaveFileEnc(this->filename.c_str(), this->xmlDoc, "UTF-8");
-  else
-    result=xmlSaveFileEnc(filename.c_str(), this->xmlDoc, "UTF-8");
-  return result;
-}
-
-
-////////////////////////////////////////////////////////////////////////////
-// Get the root node
-XMLConfigNode *XMLConfig::GetRootNode() const
-{
-  return this->root;
 }
 
 
@@ -279,20 +276,19 @@ XMLConfigNode::~XMLConfigNode()
       this->parent->childLast = this->prev;
   }
 
-  return;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the node name
-std::string XMLConfigNode::GetName()
+std::string XMLConfigNode::GetName() const
 {
   return (const char*)(this->xmlNode->name);
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the Name Space Prefix
-std::string XMLConfigNode::GetNSPrefix()
+std::string XMLConfigNode::GetNSPrefix() const
 {
   if ( !this->xmlNode->ns )
     return "";
@@ -302,14 +298,14 @@ std::string XMLConfigNode::GetNSPrefix()
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the next sibling of this node
-XMLConfigNode *XMLConfigNode::GetNext()
+XMLConfigNode *XMLConfigNode::GetNext() const
 {
   return this->next;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the next sibling of this node
-XMLConfigNode *XMLConfigNode::GetNext(const std::string &name, const std::string &prefix)
+XMLConfigNode *XMLConfigNode::GetNext(const std::string &name, const std::string &prefix) const
 {
   XMLConfigNode *tmp;
 
@@ -325,7 +321,7 @@ XMLConfigNode *XMLConfigNode::GetNext(const std::string &name, const std::string
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the next sibling of this node according the namespace prefix
-XMLConfigNode *XMLConfigNode::GetNextByNSPrefix(const std::string &prefix)
+XMLConfigNode *XMLConfigNode::GetNextByNSPrefix(const std::string &prefix) const
 {
   XMLConfigNode *tmp;
 
@@ -341,14 +337,14 @@ XMLConfigNode *XMLConfigNode::GetNextByNSPrefix(const std::string &prefix)
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the first child of this node
-XMLConfigNode *XMLConfigNode::GetChild()
+XMLConfigNode *XMLConfigNode::GetChild() const
 {
   return this->childFirst;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the first child with the appropriate NS prefix
-XMLConfigNode *XMLConfigNode::GetChildByNSPrefix(const std::string &prefix )
+XMLConfigNode *XMLConfigNode::GetChildByNSPrefix(const std::string &prefix ) const
 {
   XMLConfigNode *tmp;
 
@@ -364,7 +360,7 @@ XMLConfigNode *XMLConfigNode::GetChildByNSPrefix(const std::string &prefix )
 
 ////////////////////////////////////////////////////////////////////////////
 // Rewind the node pointer to the first siblind
-XMLConfigNode *XMLConfigNode::Rewind()
+XMLConfigNode *XMLConfigNode::Rewind() 
 {
   XMLConfigNode *result = this;
 
@@ -378,7 +374,7 @@ XMLConfigNode *XMLConfigNode::Rewind()
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a child based on a name. Returns null if not found
-XMLConfigNode *XMLConfigNode::GetChild( const std::string &name, const std::string &prefix )
+XMLConfigNode *XMLConfigNode::GetChild( const std::string &name, const std::string &prefix ) const
 {
   XMLConfigNode *tmp;
   for (tmp = this->childFirst; tmp != NULL; tmp = tmp->GetNext() )
@@ -417,7 +413,7 @@ void XMLConfigNode::Print()
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a value associated with a node.
-xmlChar* XMLConfigNode::GetNodeValue( const std::string &key )
+xmlChar* XMLConfigNode::GetNodeValue( const std::string &key ) const
 {
   xmlChar *value=NULL;
 
@@ -460,7 +456,7 @@ xmlChar* XMLConfigNode::GetNodeValue( const std::string &key )
 
 ////////////////////////////////////////////////////////////////////////////
 // Get the value of this node
-std::string XMLConfigNode::GetValue()
+std::string XMLConfigNode::GetValue() const
 {
   return (const char*)xmlNodeListGetString(this->xmlDoc, this->xmlNode->xmlChildrenNode, 1);
 }
@@ -468,7 +464,7 @@ std::string XMLConfigNode::GetValue()
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a string value.
-std::string XMLConfigNode::GetString( const std::string &key, const std::string &def, int require)
+std::string XMLConfigNode::GetString( const std::string &key, const std::string &def, int require) const 
 {
   xmlChar *value = this->GetNodeValue( key );
 
@@ -483,7 +479,7 @@ std::string XMLConfigNode::GetString( const std::string &key, const std::string 
   return (char *)value;
 }
 
-unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int require )
+unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int require ) const
 {
   unsigned char result = ' ';
 
@@ -506,7 +502,7 @@ unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int requ
 ///////////////////////////////////////////////////////////////////////////
 // Get a file name.  Always returns an absolute path.  If the filename
 // is entered as a relative path, we prepend the world file path.
-std::string XMLConfigNode::GetFilename( const std::string &key, const std::string &def, int require)
+std::string XMLConfigNode::GetFilename( const std::string &key, const std::string &def, int require) const
 {
   std::string filename = this->GetString( key, def, require );
 
@@ -535,7 +531,7 @@ std::string XMLConfigNode::GetFilename( const std::string &key, const std::strin
 
 ////////////////////////////////////////////////////////////////////////////
 // Get an integer
-int XMLConfigNode::GetInt( const std::string &key, int def, int require )
+int XMLConfigNode::GetInt( const std::string &key, int def, int require ) const
 {
   xmlChar *value = this->GetNodeValue( key );
 
@@ -552,7 +548,7 @@ int XMLConfigNode::GetInt( const std::string &key, int def, int require )
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a double
-double XMLConfigNode::GetDouble( const std::string &key, double def, int require )
+double XMLConfigNode::GetDouble( const std::string &key, double def, int require ) const
 {
   xmlChar *value = this->GetNodeValue( key );
 
@@ -568,7 +564,7 @@ double XMLConfigNode::GetDouble( const std::string &key, double def, int require
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a float
-float XMLConfigNode::GetFloat( const std::string &key, float def, int require )
+float XMLConfigNode::GetFloat( const std::string &key, float def, int require ) const
 {
   xmlChar *value = this->GetNodeValue( key );
 
@@ -585,7 +581,7 @@ float XMLConfigNode::GetFloat( const std::string &key, float def, int require )
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a boolean
-bool XMLConfigNode::GetBool( const std::string &key, bool def, int require )
+bool XMLConfigNode::GetBool( const std::string &key, bool def, int require ) const
 {
   bool result = false;
   xmlChar *value = this->GetNodeValue( key );
@@ -615,7 +611,7 @@ bool XMLConfigNode::GetBool( const std::string &key, bool def, int require )
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a length
-double XMLConfigNode::GetLength( const std::string &key, double def, int require )
+double XMLConfigNode::GetLength( const std::string &key, double def, int require ) const
 {
   double length = this->GetDouble(key, def, require);
 
@@ -627,7 +623,7 @@ double XMLConfigNode::GetLength( const std::string &key, double def, int require
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a time
-gazebo::Time XMLConfigNode::GetTime( const std::string &key, double def, int require )
+gazebo::Time XMLConfigNode::GetTime( const std::string &key, double def, int require ) const
 {
   gazebo::Time time(this->GetDouble(key, def, require));
   return time;
@@ -635,7 +631,7 @@ gazebo::Time XMLConfigNode::GetTime( const std::string &key, double def, int req
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a position
-Vector3 XMLConfigNode::GetVector3( const std::string &key, Vector3 def )
+Vector3 XMLConfigNode::GetVector3( const std::string &key, Vector3 def ) const
 {
   Vector3 v;
 
@@ -651,7 +647,7 @@ Vector3 XMLConfigNode::GetVector3( const std::string &key, Vector3 def )
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a two dimensional double vector
-Vector2<double> XMLConfigNode::GetVector2d( const std::string &key, Vector2<double> def )
+Vector2<double> XMLConfigNode::GetVector2d( const std::string &key, Vector2<double> def ) const
 {
   Vector2<double> v;
 
@@ -666,7 +662,7 @@ Vector2<double> XMLConfigNode::GetVector2d( const std::string &key, Vector2<doub
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a two dimensional int vector
-Vector2<int> XMLConfigNode::GetVector2i( const std::string &key, Vector2<int> def )
+Vector2<int> XMLConfigNode::GetVector2i( const std::string &key, Vector2<int> def ) const
 {
   Vector2<int> v;
 
@@ -682,7 +678,7 @@ Vector2<int> XMLConfigNode::GetVector2i( const std::string &key, Vector2<int> de
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a rotation
-Quatern XMLConfigNode::GetRotation( const std::string &key, Quatern def )
+Quatern XMLConfigNode::GetRotation( const std::string &key, Quatern def ) const
 {
   Quatern q;
   Vector3 p;
@@ -707,7 +703,7 @@ Quatern XMLConfigNode::GetRotation( const std::string &key, Quatern def )
 ////////////////////////////////////////////////////////////////////////////
 // Get a tuple string value.
 std::string XMLConfigNode::GetTupleString( const std::string &key, int index,
-    const std::string &def)
+    const std::string &def) const
 {
   xmlChar *value;
   std::string nvalue;
@@ -782,7 +778,7 @@ std::string XMLConfigNode::GetTupleString( const std::string &key, int index,
 
 ////////////////////////////////////////////////////////////////////////////
 // Get an attribute tuple double value
-int XMLConfigNode::GetTupleInt( const std::string &key, int index, int def )
+int XMLConfigNode::GetTupleInt( const std::string &key, int index, int def ) const
 {
   std::string svalue;
 
@@ -796,7 +792,7 @@ int XMLConfigNode::GetTupleInt( const std::string &key, int index, int def )
 
 ////////////////////////////////////////////////////////////////////////////
 // Get an attribute tuple double value
-double XMLConfigNode::GetTupleDouble( const std::string &key, int index, double def )
+double XMLConfigNode::GetTupleDouble( const std::string &key, int index, double def ) const
 {
   std::string svalue;
 
@@ -810,7 +806,7 @@ double XMLConfigNode::GetTupleDouble( const std::string &key, int index, double 
 
 ////////////////////////////////////////////////////////////////////////////
 // Get an tuple length value (return value in meters)
-double XMLConfigNode::GetTupleLength( const std::string &key, int index, double def )
+double XMLConfigNode::GetTupleLength( const std::string &key, int index, double def ) const
 {
   std::string svalue;
 
@@ -826,7 +822,7 @@ double XMLConfigNode::GetTupleLength( const std::string &key, int index, double 
 
 ////////////////////////////////////////////////////////////////////////////
 // Get an tuple angle value (return value in radians)
-double XMLConfigNode::GetTupleAngle( const std::string &key, int index, double def )
+double XMLConfigNode::GetTupleAngle( const std::string &key, int index, double def ) const
 {
   std::string svalue;
 
@@ -840,7 +836,7 @@ double XMLConfigNode::GetTupleAngle( const std::string &key, int index, double d
 
 ////////////////////////////////////////////////////////////////////////////
 // Set the value associated with a node.
-void XMLConfigNode::SetValue(const std::string &key, const StringValue &data, int require, int type)
+void XMLConfigNode::SetValue(const std::string &key, const StringValue &data, int require, int type) 
 {
   bool success;
 
@@ -916,4 +912,6 @@ void XMLConfigNode::NewNode(const char* key, const char* value, int type)
     xmlNewProp(this->xmlNode, (xmlChar*) key, (xmlChar*) value);
   }
 }
+
+
 

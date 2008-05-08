@@ -75,13 +75,13 @@ namespace gazebo
     public: void MainLoop();
 
     /// \brief Gets our current GUI interface
-    public: Gui *GetUI();
+    public: Gui *GetUI() const;
 
     /// \brief Returns the state of the simulation true if paused
     public: bool IsPaused() const;
 
     /// \brief Get the number of iterations
-    public: unsigned long GetIterations();
+    public: unsigned long GetIterations() const;
 /*
     /// \brief Set the number of iterations
     public: static void SetIterations(unsigned long count);
@@ -118,19 +118,19 @@ namespace gazebo
     public: void SetUserQuit();
 
     /// \brief Return true if the user has pased
-    public: bool GetUserPause();
+    public: bool GetUserPause() const;
 
     /// \brief Set whether the user has paused
     public: void SetUserPause(bool pause);
     
     /// \brief Return true if the user has stepped the simulation
-    public: bool GetUserStep();
+    public: bool GetUserStep() const;
 
     /// \brief Set whether the user has stepped the simulation
     public: void SetUserStep( bool step );
 
     /// \brief Return true if the step has incremented
-    public: bool GetUserStepInc();
+    public: bool GetUserStepInc() const;
 
     /// \brief Set whether the step has incremented
     public: void SetUserStepInc(bool step);

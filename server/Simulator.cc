@@ -247,7 +247,7 @@ void Simulator::MainLoop()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Gets our current GUI interface
-Gui *Simulator::GetUI()
+Gui *Simulator::GetUI() const
 {
   return this->gui;
 }
@@ -262,7 +262,7 @@ bool Simulator::IsPaused() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of iterations of this simulation session
-unsigned long Simulator::GetIterations()
+unsigned long Simulator::GetIterations() const
 {
   return this->iterations;
 }
@@ -327,7 +327,7 @@ void Simulator::SetUserQuit()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Simulator::GetUserPause()
+bool Simulator::GetUserPause() const
 {
   return userPause;
 }
@@ -339,7 +339,7 @@ void Simulator::SetUserPause(bool pause)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Simulator::GetUserStep()
+bool Simulator::GetUserStep() const 
 {
   return userStep;
 }
@@ -351,7 +351,7 @@ void Simulator::SetUserStep( bool step )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Simulator::GetUserStepInc()
+bool Simulator::GetUserStepInc() const
 {
   return userStepInc;
 }
