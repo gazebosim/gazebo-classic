@@ -26,14 +26,9 @@
 
 #include "Global.hh"
 
-
 using namespace gazebo;
 
 Pose3d Global::poseOffset;
-
-std::list<std::string> Global::gazeboPaths;
-std::list<std::string> Global::ogrePaths;
-std::string Global::RTTMode;
 
 ////////////////////////////////////////////////////////////////////////////////
 Global::Global()

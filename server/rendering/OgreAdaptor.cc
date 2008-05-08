@@ -39,8 +39,8 @@
 #include "Entity.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
+#include "GazeboConfig.hh"
 #include "Global.hh"
-#include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
 #include "Gui.hh"
@@ -300,8 +300,10 @@ void OgreAdaptor::LoadPlugins()
   std::string pluginStr;
   XMLConfigNode *pluginNode;
   std::list<std::string>::iterator iter;
+ 
 
-  for (iter=Global::ogrePaths.begin(); iter!=Global::ogrePaths.end(); iter++)
+  for (iter=Simulator::Instance()->GetGazeboConfig()->GetOgrePaths().begin(); 
+       iter!=Simulator::Instance()->GetGazeboConfig()->GetOgrePaths().end(); iter++)
   {
     DIR *dir;
     if ((dir=opendir((*iter).c_str())) == NULL)
@@ -342,8 +344,8 @@ void OgreAdaptor::SetupResources()
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::iterator iter;
 
-  for (iter=Global::gazeboPaths.begin();
-       iter!=Global::gazeboPaths.end(); iter++)
+  for (iter=Simulator::Instance()->GetGazeboConfig()->GetGazeboPaths().begin();
+       iter!=Simulator::Instance()->GetGazeboConfig()->GetGazeboPaths().end(); iter++)
   {
     DIR *dir;
     if ((dir=opendir((*iter).c_str())) == NULL)
@@ -423,7 +425,7 @@ void OgreAdaptor::SetupRenderSystem(bool create)
     this->renderSys->setConfigOption("FSAA","2");
 
     // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy", can be set in the .gazeborc file
-    this->renderSys->setConfigOption("RTT Preferred Mode", Global::RTTMode);
+    this->renderSys->setConfigOption("RTT Preferred Mode", Simulator::Instance()->GetGazeboConfig()->GetRTTMode());
 
     if (create && this->videoMode != "None")
     {

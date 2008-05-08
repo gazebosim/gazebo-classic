@@ -104,10 +104,9 @@ home directory, or to the log file specified with the -l command line option.
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
-#include "Global.hh"
 #include "Simulator.hh"
-#include "XMLConfig.hh"
 #include "GazeboError.hh"
+#include "Global.hh"
 
 // Command line options
 const char *worldFileName;
@@ -230,52 +229,6 @@ void SignalHandler( int /*dummy*/ )
   return;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Loads the Gazebo configuration file
-void LoadConfigFile()
-{
-  std::ifstream cfgFile;
-
-  std::string rcFilename = getenv("HOME");
-  rcFilename += "/.gazeborc";
-
-  cfgFile.open(rcFilename.c_str(), std::ios::in);
-
-  if (cfgFile)
-  {
-    gazebo::XMLConfig rc;
-    gazebo::XMLConfigNode *node;
-    rc.Load(rcFilename);
-
-    node = rc.GetRootNode()->GetChild("gazeboPath");
-    while (node)
-    {
-      std::cout << "Gazebo Path[" << node->GetValue() << "]\n";
-      gazebo::Global::gazeboPaths.push_back(node->GetValue());
-      node = node->GetNext("gazeboPath");
-    }
-
-    node = rc.GetRootNode()->GetChild("ogrePath");
-    while (node)
-    {
-      std::cout << "Ogre Path[" << node->GetValue() << "]\n";
-      gazebo::Global::ogrePaths.push_back( node->GetValue() );
-      node = node->GetNext("ogrePath");
-    }
-    gazebo::Global::RTTMode = rc.GetRootNode()->GetString("RTTMode", "PBuffer");
-
-  }
-  else
-  {
-    std::cout << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
-    gazebo::Global::gazeboPaths.push_back("/usr/local/share/gazebo");
-    gazebo::Global::ogrePaths.push_back("/usr/local/lib/OGRE");
-    gazebo::Global::ogrePaths.push_back("/usr/lib/OGRE");
-  }
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Main function
 int main(int argc, char **argv)
@@ -296,7 +249,6 @@ int main(int argc, char **argv)
   //Load the simulator
   try
   {
-    LoadConfigFile();
     gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
   }
   catch (gazebo::GazeboError e)

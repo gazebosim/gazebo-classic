@@ -35,12 +35,13 @@
 #include "Gui.hh"
 #include "DummyGui.hh"
 #include "XMLConfig.hh"
-#include "Global.hh"
+#include "GazeboConfig.hh"
 #include "gazebo.h"
 #include "PhysicsEngine.hh"
 #include "OgreAdaptor.hh"
 #include "OgreCreator.hh"
 #include "GazeboMessage.hh"
+#include "Global.hh"
 
 #include "Simulator.hh"
 
@@ -66,6 +67,7 @@ Simulator::Simulator()
   this->userStepInc = false;
 
   this->xmlFile=NULL;
+  this->gazeboConfig=NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,6 +86,7 @@ void Simulator::Close()
 
   GZ_DELETE (this->gui)
   GZ_DELETE (this->xmlFile)
+  GZ_DELETE (this->gazeboConfig)
   gazebo::World::Instance()->Close();
   gazebo::OgreAdaptor::Instance()->Close();
 }
@@ -99,11 +102,23 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     loaded=false;
   }
 
+  // load the configuration options 
+  this->gazeboConfig=new gazebo::GazeboConfig();
+  try
+  {
+    this->gazeboConfig->Load();
+  }
+  catch (GazeboError e)
+  {
+    gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
+  }
+
+
   // Load the world file
   this->xmlFile=new gazebo::XMLConfig();
   try
   {
-    xmlFile->Load(worldFileName);
+    this->xmlFile->Load(worldFileName);
   }
   catch (GazeboError e)
   {
@@ -251,6 +266,14 @@ Gui *Simulator::GetUI() const
 {
   return this->gui;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Gets local configuration for this computer
+GazeboConfig *Simulator::GetGazeboConfig() const
+{
+  return this->gazeboConfig;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return when this simulator is paused

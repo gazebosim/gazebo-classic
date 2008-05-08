@@ -31,7 +31,6 @@
 // Includes
 /////////////////////////////////////////////////////////////////////////////
 
-#include <list>
 #include <math.h>
 
 #include "Pose3d.hh"
@@ -115,14 +114,6 @@ namespace gazebo
   */  
   class Global
   {
-
-    /// Paths gazebo install
-    public: static std::list<std::string> gazeboPaths;
-
-    /// Paths to the ogre install
-    public: static std::list<std::string> ogrePaths;
-
-    public: static std::string RTTMode;
 
     /// Global pose offset
     public: static Pose3d poseOffset;

@@ -42,6 +42,7 @@ namespace gazebo
   class SimulationIface;
   class XMLConfig;
   class XMLConfigNode;
+  class GazeboConfig;
 
 /// \brief The World
 /*
@@ -76,6 +77,9 @@ namespace gazebo
 
     /// \brief Gets our current GUI interface
     public: Gui *GetUI() const;
+
+    /// \brief Gets the local configuration for this computer
+    public: gazebo::GazeboConfig *GetGazeboConfig() const;
 
     /// \brief Returns the state of the simulation true if paused
     public: bool IsPaused() const;
@@ -137,11 +141,13 @@ namespace gazebo
 
   
     ///pointer to the XML Data
-    private:gazebo::XMLConfig *xmlFile;
+    private: gazebo::XMLConfig *xmlFile;
 
     /// Pointer to the selected Gui 
     private: Gui *gui;
 
+/// Pointer to the selected Gui 
+    private: gazebo::GazeboConfig *gazeboConfig;
 
     /// Flag to know if we have a simulation loaded
     private: bool loaded;
