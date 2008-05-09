@@ -41,7 +41,7 @@ headers.append(
            '#/server/Vector2.hh', 
            '#/server/Vector3.hh',
            '#/server/World.hh',
-           '#/server/XMLConfig.hh'
+           '#/server/XMLConfig.hh',
            '#/server/GazeboConfig.hh'
            ] )
 
