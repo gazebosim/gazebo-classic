@@ -160,7 +160,12 @@ namespace gazebo
 
     /// Current simulation time
     private: double simTime, pauseTime, startTime;
-    private: double prevPhysicsTime, prevRenderTime;
+
+    //upper limits on updating
+    //how many updates we have done in this slot
+    private: int physicsUpdates, renderUpdates;
+    // when the slot started
+    private: double checkpoint;
 
     // UserIteractions 
     /// \brief Set to true to pause the simulation
