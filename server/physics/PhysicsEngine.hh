@@ -109,14 +109,23 @@ class PhysicsEngine
   public: Vector3 GetGravity() const;
 
   /// \brief Get the time between each update cycle
-  /// \return Time in seconds
+  /// \return seconds between updates 
+  public: double GetUpdateRate() const;
+
+  /// \brief Get the physics time steps in the virtual world
+  /// \return step time 
   public: double GetStepTime() const;
 
   /// The gravity vector
   protected: Vector3 gravity;
 
-  /// Time between each update cycle
+  /// time steps the physical engine will take 
+  /// how much time will pass on each update
   protected: double stepTime;
+  
+  /// update rate of the physical engine, how many times
+  /// it is called 
+  protected: double updateRate;
 };
 
 /** \}*/

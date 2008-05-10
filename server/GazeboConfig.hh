@@ -48,12 +48,12 @@ namespace gazebo
     public: void Load();
 
     /// \brief Get paths to Gazebo install 
-    public: std::list<std::string> GetGazeboPaths() const;
+    public: std::list<std::string>& GetGazeboPaths();
 
     /// \brief Get paths to ogre install
-    public: std::list<std::string> GetOgrePaths() const;
+    public: std::list<std::string>& GetOgrePaths();
  
-    public: std::string GetRTTMode() const;
+    public: std::string& GetRTTMode();
 
     /// Paths gazebo install
     private: std::list<std::string> gazeboPaths;

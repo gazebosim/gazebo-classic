@@ -68,6 +68,8 @@ Simulator::Simulator()
 
   this->xmlFile=NULL;
   this->gazeboConfig=NULL;
+  this->prevPhysicsTime=0.0;
+  this->prevRenderTime=0.0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +104,22 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     loaded=false;
   }
 
-  // load the configuration options 
+    // Load the world file
+  this->xmlFile=new gazebo::XMLConfig();
+  try
+  {
+    this->xmlFile->Load(worldFileName);
+  }
+  catch (GazeboError e)
+  {
+    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
+  }
+  XMLConfigNode *rootNode(xmlFile->GetRootNode());
+
+    // Load the messaging system
+  gazebo::GazeboMessage::Instance()->Load(rootNode);
+
+    // load the configuration options 
   this->gazeboConfig=new gazebo::GazeboConfig();
   try
   {
@@ -113,26 +130,9 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-
-  // Load the world file
-  this->xmlFile=new gazebo::XMLConfig();
-  try
-  {
-    this->xmlFile->Load(worldFileName);
-  }
-  catch (GazeboError e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
-
-  XMLConfigNode *rootNode(xmlFile->GetRootNode());
-
-  // Load the messaging system
-  gazebo::GazeboMessage::Instance()->Load(rootNode);
-
-  try
-  {
     //Create and initialize the Gui
+  try
+  {
     this->LoadGui(rootNode);
   }
   catch (GazeboError e)
@@ -140,7 +140,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     gzthrow( "Error loading the GUI\n" << e);
   }
 
-  //Initialize RenderingEngine
+    //Initialize RenderingEngine
   try
   {
     gazebo::OgreAdaptor::Instance()->Init(rootNode);
@@ -150,12 +150,12 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     gzthrow("Failed to Initialize the OGRE Rendering system\n" << e );
  }
 
-  //Preload basic shapes that can be used anywhere
+    //Preload basic shapes that can be used anywhere
   OgreCreator::CreateBasicShapes();
 
+    //Create the world
   try
   {
-    //Create the world
     gazebo::World::Instance()->Load(rootNode, serverId);
   }
   catch (GazeboError e)
@@ -209,22 +209,35 @@ void Simulator::Fini( )
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
 {
-  double step= World::Instance()->GetPhysicsEngine()->GetStepTime();
-  double currTime;
-  double elapsedTime;
+  double maxPhysicsUpdateRate = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
+  double maxRenderUpdateRate = OgreAdaptor::Instance()->GetUpdateRate();
+  double step = World::Instance()->GetPhysicsEngine()->GetStepTime();
+ 
+  if (maxPhysicsUpdateRate == 0)
+    gzmsg(2) << "updating the physics at full speed";
+  else
+    gzmsg(2) << "updating the physics " << 1/maxPhysicsUpdateRate << " times/seconds";  
+
+  if (maxRenderUpdateRate == 0)
+    gzmsg(2) << "updating the visualization at full speed";
+  else
+    gzmsg(2) << "updating the visualization " << 1/maxRenderUpdateRate << " times/seconds";  
+  std::cout.flush();
 
   while (!this->userQuit)
-  {
-    currTime = this->GetRealTime();
-
-    if ((currTime - this->prevPhysicsTime) >= step) 
-    {
-      this->simTime += step;
+  {    
+    bool updated=false;
 
       // Update the physics engine
+    double currentPhysicsTime = this->GetRealTime();
+
+    if ((currentPhysicsTime - this->prevPhysicsTime) >= maxPhysicsUpdateRate) 
+    {
+
       if (!this->GetUserPause() && !this->GetUserStep() ||
           (this->GetUserStep() && this->GetUserStepInc()))
       {
+        this->simTime += step;
         this->iterations++;
         this->pause=false;
         this->SetUserStepInc(!this->GetUserStepInc());
@@ -237,25 +250,31 @@ void Simulator::MainLoop()
 
       World::Instance()->Update(); //physics
 
-      this->prevPhysicsTime = this->GetRealTime();
+      this->prevPhysicsTime = currentPhysicsTime;
+      updated=true;
     }
 
-    // Update the rendering
-    if (currTime - this->prevRenderTime > 0.02)
+    // Update the rendering and gui
+    double currentRenderTime = this->GetRealTime();
+
+    if ((currentRenderTime - this->prevRenderTime) >= maxRenderUpdateRate)
     {
       gazebo::OgreAdaptor::Instance()->Render(); 
-      this->prevRenderTime = this->GetRealTime();
+      this->prevRenderTime = currentRenderTime;
+      this->gui->Update();
+      this->prevRenderTime = currentRenderTime;
+      updated=true;
     }
 
-    // Update the gui
-    this->gui->Update();
-
-    elapsedTime = (this->GetRealTime()-currTime)*2.0;
-
-    // Wait if we're going too fast
-    if ( elapsedTime < 0.02 )
+    if (!updated)
     {
-      usleep( (0.02 - elapsedTime) * 1e6  );
+      double nextUpdate;
+      nextUpdate=MAX(this->prevRenderTime+maxRenderUpdateRate, this->prevPhysicsTime+maxPhysicsUpdateRate);
+      int realStep = static_cast<int>(this->GetRealTime() - nextUpdate);
+      struct timespec waiting;
+      waiting.tv_sec=0;
+      waiting.tv_nsec=realStep *1000000; //TODO: binary
+      nanosleep(&waiting,0);
     }
   }
 }

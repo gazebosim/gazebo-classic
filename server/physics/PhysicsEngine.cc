@@ -49,6 +49,13 @@ Vector3 PhysicsEngine::GetGravity() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
+double PhysicsEngine::GetUpdateRate() const
+{
+  return this->updateRate;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the time between each update cycle
 double PhysicsEngine::GetStepTime() const
 {
   return this->stepTime;

@@ -29,6 +29,7 @@
 
 #include "XMLConfig.hh"
 #include "GazeboConfig.hh"
+#include "GazeboMessage.hh"
 
 using namespace gazebo;
 
@@ -64,7 +65,7 @@ void GazeboConfig::Load()
     node = rc.GetRootNode()->GetChild("gazeboPath");
     while (node)
     {
-      std::cout << "Gazebo Path[" << node->GetValue() << "]\n";
+      gzmsg(1) << "Gazebo Path[" << node->GetValue() << "]\n";
       this->gazeboPaths.push_back(node->GetValue());
       node = node->GetNext("gazeboPath");
     }
@@ -72,7 +73,7 @@ void GazeboConfig::Load()
     node = rc.GetRootNode()->GetChild("ogrePath");
     while (node)
     {
-      std::cout << "Ogre Path[" << node->GetValue() << "]\n";
+      gzmsg(1) << "Ogre Path[" << node->GetValue() << "]\n";
       this->ogrePaths.push_back( node->GetValue() );
       node = node->GetNext("ogrePath");
     }
@@ -81,7 +82,7 @@ void GazeboConfig::Load()
   }
   else
   {
-    std::cout << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
+    gzmsg(0) << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
     this->gazeboPaths.push_back("/usr/local/share/gazebo");
     this->ogrePaths.push_back("/usr/local/lib/OGRE");
     this->ogrePaths.push_back("/usr/lib/OGRE");
@@ -89,17 +90,17 @@ void GazeboConfig::Load()
   }
 }
 
-std::list<std::string> GazeboConfig::GetGazeboPaths() const
+std::list<std::string> &GazeboConfig::GetGazeboPaths() 
 {
   return this->gazeboPaths;
 }
 
-std::list<std::string> GazeboConfig::GetOgrePaths() const
+std::list<std::string> &GazeboConfig::GetOgrePaths()
 {
   return this->ogrePaths;
 }
 
-std::string GazeboConfig::GetRTTMode() const
+std::string &GazeboConfig::GetRTTMode() 
 {
   return this->RTTMode;
 }

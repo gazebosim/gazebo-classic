@@ -88,6 +88,9 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   /// \brief Render a single frame
   public: int Render();
 
+  /// \brief Gets the minimum time between renders, set by in the file to limit Framerate
+  public: double GetUpdateRate() const;
+ 
   /// \brief Resize the rendering window
   public: void ResizeWindow(unsigned int w, unsigned int h);
 
@@ -116,6 +119,8 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
 
   /// Pointer to the input reader
   public: Ogre::InputReader *inputDevice;
+
+  private: double updateRate;
 
   private: Ogre::LogManager *logManager;
 

@@ -124,6 +124,12 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   {
     gzthrow( "missing OGRE Rendering information" );
   }
+ 
+  int maxFPS = node->GetInt("updateRate", 0);
+  if (maxFPS == 0)
+    this->updateRate=0;
+  else
+    this->updateRate = 1.0/maxFPS;
 
   ambient.r = node->GetTupleDouble("ambient",0,1.0);
   ambient.g = node->GetTupleDouble("ambient",1,1.0);
@@ -238,8 +244,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     }
     catch (Ogre::Exception e)
     {
-      gzmsg(0) << "Unable to load BSP geometry." << e.getDescription() << "\n";
-      exit(0);
+      gzmsg(-1) << "Unable to load BSP geometry." << e.getDescription() << "\n";
+      exit(-1);
     }
   }
 
@@ -296,17 +302,15 @@ void OgreAdaptor::Save(XMLConfigNode *node)
 // Load plugins
 void OgreAdaptor::LoadPlugins()
 {
-  std::string pathStr;
-  std::string pluginStr;
-  XMLConfigNode *pluginNode;
   std::list<std::string>::iterator iter;
+  std::list<std::string> ogrePaths=Simulator::Instance()->GetGazeboConfig()->GetOgrePaths();
  
-
-  for (iter=Simulator::Instance()->GetGazeboConfig()->GetOgrePaths().begin(); 
-       iter!=Simulator::Instance()->GetGazeboConfig()->GetOgrePaths().end(); iter++)
+  for (iter=ogrePaths.begin(); 
+       iter!=ogrePaths.end(); ++iter)
   {
-    DIR *dir;
-    if ((dir=opendir((*iter).c_str())) == NULL)
+    std::string path(*iter);
+    DIR *dir=opendir(path.c_str()); 
+    if (dir == NULL)
     {
       continue;
     }
@@ -315,10 +319,10 @@ void OgreAdaptor::LoadPlugins()
     std::vector<std::string> plugins;
     std::vector<std::string>::iterator piter;
 
-    plugins.push_back((*iter)+"/RenderSystem_GL.so");
-    plugins.push_back((*iter)+"/Plugin_ParticleFX.so");
-    plugins.push_back((*iter)+"/Plugin_BSPSceneManager.so");
-    plugins.push_back((*iter)+"/Plugin_OctreeSceneManager.so");
+    plugins.push_back(path+"/RenderSystem_GL.so");
+    plugins.push_back(path+"/Plugin_ParticleFX.so");
+    plugins.push_back(path+"/Plugin_BSPSceneManager.so");
+    plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {
@@ -326,10 +330,14 @@ void OgreAdaptor::LoadPlugins()
       {
         // Load the plugin into OGRE
         this->root->loadPlugin(*piter);
+        //gzmsg(2) << "Loaded plugin:" << (*piter);
       }
       catch (Ogre::Exception e)
       {
-        gzthrow("Unable to load Ogre Plugins.\nMake sure the plugins path in the world file is set correctly");
+        std::string description("Unable to load Ogre Plugins on directory ");
+        description.append(path);
+        description.append("\n Make sure the plugins path in the gazebo configuration file are set correctly.\n");
+        gzthrow( description + e.getDescription() );
       }
     }
   }
@@ -485,5 +493,10 @@ int OgreAdaptor::Render()
   this->root->renderOneFrame();
 
   return 0;
+}
+
+double OgreAdaptor::GetUpdateRate() const
+{
+  return this->updateRate;
 }
 
