@@ -89,7 +89,6 @@ void StereoCameraSensor::InitChild()
 {
   Ogre::Viewport *cviewport;
   Ogre::MaterialPtr matPtr;
-  Ogre::TextureUnitState *texUnit;
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   int i;
 
@@ -187,7 +186,6 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
   Ogre::Viewport *vp = NULL;
   Ogre::SceneManager *sceneMgr = adapt->sceneMgr;
   Ogre::Pass *pass;
-  Ogre::Pass *prev_pass;
   Ogre::SceneNode *gridNode = sceneMgr->getSceneNode("__OGRE_GRID_NODE__");
   int i;
 
@@ -351,13 +349,13 @@ void StereoCameraSensor::SaveFrame()
 
   fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", this->imageWidth, this->imageHeight);
 
-  for (int i = 0; i<this->imageHeight; i++)
+  for (unsigned int i = 0; i<this->imageHeight; i++)
   {
-    for (int j =0; j<this->imageWidth; j++)
+    for (unsigned int j =0; j<this->imageWidth; j++)
     {
       float f = this->depthBuffer[0][i*this->imageWidth+j];
-
-      unsigned char value =  f * 255;
+      
+      unsigned char value =  static_cast<unsigned char>((double)f * 255);
       fwrite( &value, 1, 1, fp );
       fwrite( &value, 1, 1, fp );
       fwrite( &value, 1, 1, fp );

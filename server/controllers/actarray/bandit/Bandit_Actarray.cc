@@ -98,14 +98,13 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
 {
   HingeJoint *joint = NULL;
   float angle;
-  float hiStop, loStop;
 
   this->myIface->Lock(1);
   this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
 
   this->myIface->data->actuators_count = 16;
 
-  for (int i=0; i<16; i++)
+  for (unsigned int i=0; i<16; i++)
   {
     double cmdAngle = this->myIface->data->cmd_pos[i];
     joint = dynamic_cast<HingeJoint*>(this->joints[i]);

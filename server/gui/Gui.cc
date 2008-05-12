@@ -48,8 +48,9 @@ GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
-    : Fl_Window(x, y, width+200, height+60, t.c_str()), Gui(x,y,width,height, t)
-{
+    : Gui(x,y,width,height, t),
+      Fl_Window(x, y, width+200, height+60, t.c_str())
+ {
   this->windowId = -1;
   this->visual = NULL;
   this->display = NULL;
@@ -57,7 +58,7 @@ FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
   Fl::scheme("plastic");
 
   // Create a main menu
-  MainMenu *mainMenu = new MainMenu(0,0,w(),30,(char *)"MainMenu");
+  new MainMenu(0,0,w(),30,(char *)"MainMenu");
 
   // Create the Rendering window
   this->glWindow = new GLWindow(0, 30, w()-200, h()-60,"GL Window");

@@ -236,7 +236,7 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
   Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
   Ogre::Real start = OgreAdaptor::Instance()->sceneMgr->getFogStart();
   Ogre::Real end = OgreAdaptor::Instance()->sceneMgr->getFogEnd();
-  Ogre::Real density = OgreAdaptor::Instance()->sceneMgr->getFogDensity();
+  //Ogre::Real density = OgreAdaptor::Instance()->sceneMgr->getFogDensity();
   std::string fogMode="";
 
   switch (OgreAdaptor::Instance()->sceneMgr->getFogMode())
@@ -250,6 +250,9 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
     case Ogre::FOG_LINEAR:
       //case default:
       fogMode="linear";
+      break;
+    case Ogre::FOG_NONE:
+      fogMode="none";
       break;
   }
   node->SetValue("type", fogMode);

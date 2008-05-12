@@ -22,14 +22,14 @@
 MovableText::MovableText()
     : camera(NULL),
     renderWindow(NULL) ,
+    viewportAspectCoef (0.75),
     font(NULL) ,
     spaceWidth(0) ,
     updateColors(true) ,
-    onTop(false) ,
-    horizAlign(H_LEFT) ,
     vertAlign(V_BELOW) ,
-    baseline(0.0) ,
-    viewportAspectCoef (0.75)
+    horizAlign(H_LEFT) ,
+    onTop(false) ,
+    baseline(0.0) 
 {
   this->renderOp.vertexData = NULL;
 }

@@ -76,26 +76,28 @@ void OgreDynamicRenderable::SetOperationType(OperationType opType)
 // Get the render operation type
 OgreDynamicRenderable::OperationType OgreDynamicRenderable::GetOperationType() const
 {
+  OperationType type = OT_POINT_LIST;
   switch (this->mRenderOp.operationType)
   {
     case Ogre::RenderOperation::OT_POINT_LIST:
-      return OT_POINT_LIST;
+      type = OT_POINT_LIST;
 
     case Ogre::RenderOperation::OT_LINE_LIST:
-      return OT_LINE_LIST;
+      type = OT_LINE_LIST;
 
     case Ogre::RenderOperation::OT_LINE_STRIP:
-      return OT_LINE_STRIP;
+      type = OT_LINE_STRIP;
 
     case Ogre::RenderOperation::OT_TRIANGLE_LIST:
-      return OT_TRIANGLE_LIST;
+      type = OT_TRIANGLE_LIST;
 
     case Ogre::RenderOperation::OT_TRIANGLE_STRIP:
-      return OT_TRIANGLE_STRIP;
+      type = OT_TRIANGLE_STRIP;
 
     case Ogre::RenderOperation::OT_TRIANGLE_FAN:
-      return OT_TRIANGLE_FAN;
+      type = OT_TRIANGLE_FAN;
   }
+  return type;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

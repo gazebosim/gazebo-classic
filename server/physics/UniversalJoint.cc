@@ -68,7 +68,7 @@ void UniversalJoint::LoadChild(XMLConfigNode *node)
   // Perform this three step ordering to ensure the parameters are set
   // properly. This is taken from the ODE wiki.
   this->SetParam(dParamHiStop2, hiStop2);
-  this->SetParam(dParamLoStop2, loStop1);
+  this->SetParam(dParamLoStop2, loStop2);
   this->SetParam(dParamHiStop2, hiStop2);
 }
 

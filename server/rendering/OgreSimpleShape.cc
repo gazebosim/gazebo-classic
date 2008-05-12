@@ -173,7 +173,6 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   float *vertices;
   unsigned short *indices;
   Vector3 vert, norm;
-  unsigned short verticeIndex = 0;
   size_t currOffset = 0;
   int i,j,k;
 
@@ -351,7 +350,7 @@ void OgreSimpleShape::CreateCylinder(const std::string &name, float radius, floa
   Vector3 vert, norm;
   unsigned short verticeIndex = 0;
   size_t currOffset = 0;
-  int i,j;
+  unsigned int i,j;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
 

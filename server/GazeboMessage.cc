@@ -62,7 +62,6 @@ GazeboMessage *GazeboMessage::Instance()
 
 void GazeboMessage::Load(XMLConfigNode *node)
 {
-  bool logData;
   char logFilename[50];
 
   if (!node)

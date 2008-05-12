@@ -91,7 +91,7 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   Ogre::SubMesh* subMesh;
   Ogre::MeshPtr mesh;
 
-  int i,j,k;
+  unsigned int i,j;
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
   const Ogre::VertexElement* elem;

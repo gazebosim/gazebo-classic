@@ -133,8 +133,6 @@ void Differential_Position2d::ResetChild()
 // Update the controller
 void Differential_Position2d::UpdateChild(UpdateParams &params)
 {
-  bool opened = false;
-
   // TODO: Step should be in a parameter of this function
   double wd, ws;
   double d1, d2;

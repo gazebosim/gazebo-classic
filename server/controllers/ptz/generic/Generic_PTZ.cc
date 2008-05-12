@@ -165,7 +165,6 @@ void Generic_PTZ::FiniChild()
 void Generic_PTZ::PutPTZData()
 {
   PTZData *data = this->ptzIface->data;
-  int i, j, k;
 
   this->ptzIface->Lock(1);
 

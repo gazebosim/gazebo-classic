@@ -196,7 +196,7 @@ int Simulator::Init()
   //Initialize the world
   if (gazebo::World::Instance()->Init() != 0)
     return -1;
-
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

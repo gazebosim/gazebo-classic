@@ -467,7 +467,6 @@ void Body::LoadSensor(XMLConfigNode *node)
 */
 void Body::UpdateCoM()
 {
-  int i;
   const dMass *lmass;
   Pose3d oldPose, newPose, pose;
   std::vector< Geom* >::iterator giter;

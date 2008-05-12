@@ -95,7 +95,6 @@ void Generic_Camera::PutCameraData()
   CameraData *data = this->cameraIface->data;
   const unsigned char *src;
   unsigned char *dst;
-  int i, j, k;
   Pose3d cameraPose;
 
   this->cameraIface->Lock(1);
@@ -129,6 +128,7 @@ void Generic_Camera::PutCameraData()
   memcpy(dst, src, data->image_size);
 
 
+  //unsigned int i, j, k;
   // OGRE image data is A8 B8 G8 R8. Must convert to R8 G8 B8
   /*  for (i=0; i<data->height; i++)
       for (j=0; j<data->width; j++)

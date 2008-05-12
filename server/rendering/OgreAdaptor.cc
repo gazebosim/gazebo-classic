@@ -291,8 +291,9 @@ void OgreAdaptor::Save(XMLConfigNode *node)
 
   rnode->SetValue("ambient", this->backgroundColor);
   //TODO: BSP (when bsp are definitely integrated)
-
-  if (cnode=node->GetChild("fog"))
+  //
+  cnode = rnode->GetChild("fog");
+  if (cnode)
     OgreCreator::SaveFog(cnode);
 
 }

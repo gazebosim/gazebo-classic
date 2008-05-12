@@ -257,8 +257,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (Geom*) dGeomGetData(o2);
 
-
-    if (numc = dCollide (o1,o2,64, contactGeoms, sizeof(contactGeoms[0])))
+    numc = dCollide(o1,o2,64, contactGeoms, sizeof(contactGeoms[0]));
+    if (numc == 0)
     {
       for (i=0; i<numc; i++)
       {

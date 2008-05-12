@@ -196,10 +196,11 @@ void SickLMS200_Laser::PutFiducialData()
   double maxAngle = this->myParent->GetMaxAngle();
   double minAngle = this->myParent->GetMinAngle();
 
-  double maxRange = this->myParent->GetMaxRange();
+//TODO: implement max range and rangeCount
+//  double maxRange = this->myParent->GetMaxRange();
   double minRange = this->myParent->GetMinRange();
   int rayCount = this->myParent->GetRayCount();
-  int rangeCount = this->myParent->GetRangeCount();
+//  int rangeCount = this->myParent->GetRangeCount();
 
   if (this->fiducialIface->Lock(1))
   {
