@@ -125,7 +125,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     gzthrow( "missing OGRE Rendering information" );
   }
  
-  int maxFPS = node->GetInt("updateRate", 0);
+  int maxFPS = node->GetInt("updateRate", -3);
   if (maxFPS == 0)
     this->updateRate=0;
   else

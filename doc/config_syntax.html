@@ -183,6 +183,7 @@ The ODE physics simulator makes use of a few global parameters, which can be def
 
 \verbatim
 <physics:ode>
+  <updateRate>0</updateRate>
   <stepTime>0.03</stepTime>
   <gravity>0 0 -9.8</gravity>
   <cfm>0.008</cfm>
@@ -193,6 +194,12 @@ The ODE physics simulator makes use of a few global parameters, which can be def
 - gravity : Vector that describes the direction and magnitude of gravity.
 - cfm : The global constraint force mixing.
 - erp : The global error reduction parameter.
+- updateRate: number of times per second the physics simulation will try to update. This value is interpreted as:
+- 0 : as fast as possible
+- more than 0 : Maximum number of times the simulator will update physics each second (limit speed, save CPU, etc.)
+- less than 0 : How many rendering update cycles we will wait till we update one physic cycle
+The defaults are 0 physics updateRate (as fast as possible) and -3 render updateRate (update 3 times physics prior updating rendering)
+
 
 \section worldfile_gui GUI Syntax
 
@@ -264,6 +271,18 @@ Fog is specified using:
 - density : Density of the fog
 - linearStart : Distance from the camera to begin rendering fog
 - linearEnd : Distance from the camera to stop rendering fog
+
+The update rate (Frames Per Second) is specified using:
+\verbatim
+  <updateRate>0</updateRate>
+\endverbatim
+updateRate: number of times per second the rendering will try to update. This value is interpreted as:
+- 0 : as fast as possible
+- more than 0 : Maximum number of times the simulator will render each second (maximum Framerate)
+- less than 0 : How many physics update cycles we will wait till we update one render cycle
+The defaults are 0 physics updateRate (as fast as possible) and -3 render updateRate (update 3 times physics updates prior updating rendering)
+
+Note that if the limits of physics and rendering updating rates are not related, no lineal behaviour can be seen even when the simulation is lineal.
 
 OGRE resources are specified using the following (most people should only change the path information to match where they installed Gazebo):
 \verbatim

@@ -211,19 +211,23 @@ void Simulator::Fini( )
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
 {
-  double maxPhysicsUpdateRate = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
-  double maxRenderUpdateRate = OgreAdaptor::Instance()->GetUpdateRate();
+  double maxPhysicsUpdateTime = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
+  double maxRenderUpdateTime = OgreAdaptor::Instance()->GetUpdateRate();
   double step = World::Instance()->GetPhysicsEngine()->GetStepTime();
  
-  if (maxPhysicsUpdateRate == 0)
+  if (maxPhysicsUpdateTime == 0)
     gzmsg(2) << "updating the physics at full speed";
+  else if (maxPhysicsUpdateTime > 0)
+    gzmsg(2) << "updating the physics " << 1/maxPhysicsUpdateTime << " times per second";  
   else
-    gzmsg(2) << "updating the physics " << 1/maxPhysicsUpdateRate << " times/seconds";  
+   gzmsg(2) << "updating the physics after " << -1/maxPhysicsUpdateTime << " visualization updates";  
 
-  if (maxRenderUpdateRate == 0)
+  if (maxRenderUpdateTime == 0)
     gzmsg(2) << "updating the visualization at full speed";
+  else if (maxRenderUpdateTime > 0)
+    gzmsg(2) << "updating the visualization " << 1/maxRenderUpdateTime << " times per second";  
   else
-    gzmsg(2) << "updating the visualization " << 1/maxRenderUpdateRate << " times/seconds";  
+   gzmsg(2) << "updating the visualization " << -1/maxRenderUpdateTime << " times per each physics updates";  
   std::cout.flush();
 
   while (!this->userQuit)
@@ -231,7 +235,8 @@ void Simulator::MainLoop()
     bool updated=false;
      
     //During 3 seconds we want to keep balance between how time pass and update limits
-    //this is a time slot
+    //this is a time slot. We don't want to make this too big so we keep changing behaviour
+    // in new circunstances, nor too small so we have a good measure.
     if ((this->checkpoint + 3 )< this->GetRealTime())
     {
       this->checkpoint = this->GetRealTime();
@@ -239,11 +244,15 @@ void Simulator::MainLoop()
       this->renderUpdates = 0; 
     }
 
-      // Update the physics engine
-      // maxPhysicsUpdateRate * physicsUpdates means how much we have _advanced_ in this time slot so far.
-      // getRealTime - ckeckpoint means our +current point_ in the slot, we only update if our current point has 
+    // Update the physics engine
+    // If  maxPhysicsUpdateTime is positive, we will update when our time has come
+      // maxPhysicsUpdateTime * physicsUpdates means how much we have _advanced_ in this time slot so far.
+      // getRealTime - ckeckpoint means our _current point_ in the slot, we only update if our current point has 
       // surpassed what we have already advanced.
-    if ((this->GetRealTime() - this->checkpoint) > (maxPhysicsUpdateRate * this->physicsUpdates)) 
+   // If maxPhysicsUpdateTime is negative, we update if we are below the times rendering was updated * the multiplier of the userPause
+   // note that the multiplier defined in the file is inverted when read so for instance -2 will become -0.5
+    if ((maxPhysicsUpdateTime >= 0) && ((this->GetRealTime() - this->checkpoint) > (maxPhysicsUpdateTime * this->physicsUpdates)) || \
+        ((maxPhysicsUpdateTime < 0) && (this->physicsUpdates < (-maxPhysicsUpdateTime * this->renderUpdates)))) 
     {
 
       if (!this->GetUserPause() && !this->GetUserStep() ||
@@ -265,9 +274,10 @@ void Simulator::MainLoop()
       this->physicsUpdates++;
       updated=true;
     }
-
+      
     // Update the rendering and gui
-    if ((this->GetRealTime() - this->checkpoint) > (maxRenderUpdateRate * this->renderUpdates))
+    if (((maxRenderUpdateTime >= 0) && ((this->GetRealTime() - this->checkpoint) > (maxRenderUpdateTime * this->renderUpdates))) || \
+        ((maxRenderUpdateTime < 0) && (this->renderUpdates < (-maxRenderUpdateTime * this->physicsUpdates))))
     {
       gazebo::OgreAdaptor::Instance()->Render(); 
       this->gui->Update();
@@ -278,12 +288,15 @@ void Simulator::MainLoop()
     if (!updated)
     {
       double nextUpdate;
-      nextUpdate=MIN(this->renderUpdates+maxRenderUpdateRate, this->renderUpdates+maxPhysicsUpdateRate);
-      int realStep = static_cast<int>(nextUpdate - this->GetRealTime());
-      struct timespec waiting;
-      waiting.tv_sec=0;
-      waiting.tv_nsec=realStep *1000000000; //nanoseconds to seconds
-      //nanosleep(&waiting,0);
+      nextUpdate=MIN(this->renderUpdates * maxRenderUpdateTime, this->renderUpdates * maxPhysicsUpdateTime);
+      double realStep = this->checkpoint + nextUpdate - this->GetRealTime();
+      if (realStep > 0)
+      {
+        struct timespec waiting;
+        waiting.tv_sec=0;
+        waiting.tv_nsec=static_cast<long int>(realStep *1000000000); //nanoseconds to seconds
+        nanosleep(&waiting,0);
+      }
     }
   }
 }
