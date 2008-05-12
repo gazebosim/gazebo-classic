@@ -71,7 +71,7 @@ ODEPhysics::ODEPhysics()
   this->gravity.y = 0;
   this->gravity.z = -9.80665;
 
-  this->stepTime = 0.05;
+  this->stepTime = 0.025;
   this->updateRate = 0.0;
 }
 
@@ -141,7 +141,6 @@ void ODEPhysics::Update()
 
   // Update the dynamical model
   dWorldStep( this->worldId, this->stepTime );
-  //dWorldStepFast1( this->worldId, this->stepTime, 8 );
   //dWorldQuickStep(this->worldId, this->stepTime);
 
   // Very important to clear out the contact group
