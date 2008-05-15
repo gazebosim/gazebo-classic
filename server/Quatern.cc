@@ -93,7 +93,7 @@ void Quatern::Invert()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the inverse of this quaternion
-Quatern Quatern::GetInverse() const
+Quatern Quatern::GetInverse() const 
 {
   Quatern q;
 

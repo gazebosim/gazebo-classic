@@ -163,9 +163,13 @@ namespace gazebo
 
     //upper limits on updating
     //how many updates we have done in this slot
-    private: int physicsUpdates, renderUpdates;
+    private: int physicsUpdates;
+
     // when the slot started
     private: double checkpoint;
+
+    // render updates
+    private: int  renderUpdates;
 
     // UserIteractions 
     /// \brief Set to true to pause the simulation

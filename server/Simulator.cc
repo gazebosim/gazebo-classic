@@ -50,28 +50,23 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Simulator::Simulator()
+: xmlFile(NULL),
+  gui(NULL),
+  gazeboConfig(NULL),
+  loaded(false),
+  pause(false),
+  iterations(0),
+  simTime(0.0),
+  pauseTime(0.0),
+  startTime(0.0),
+  physicsUpdates(0),
+  checkpoint(0.0),
+  renderUpdates(0),
+  userPause(false),
+  userStep(false),
+  userStepInc(false),
+  userQuit(false)
 {
-  this->gui=NULL;
-
-  this->loaded = false;
-  this->pause = false;
-
-  this->iterations = 0;
-  this->pauseTime = 0.0;
-  this->startTime = 0.0;
-  this->simTime = 0.0;
-
-  this->userQuit = false;
-  this->userPause = false;
-  this->userStep = false;
-  this->userStepInc = false;
-
-  this->xmlFile=NULL;
-  this->gazeboConfig=NULL;
-  this->checkpoint=0.0;
-  this->physicsUpdates=0;
-  this->renderUpdates=0;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +254,7 @@ void Simulator::MainLoop()
           (this->GetUserStep() && this->GetUserStepInc()))
       {
         this->simTime += step;
-        this->iterations++;
+        ++this->iterations;
         this->pause=false;
         this->SetUserStepInc(!this->GetUserStepInc());
       }
@@ -271,7 +266,7 @@ void Simulator::MainLoop()
 
       World::Instance()->Update(); //physics
 
-      this->physicsUpdates++;
+      ++this->physicsUpdates;
       updated=true;
     }
       
@@ -281,7 +276,7 @@ void Simulator::MainLoop()
     {
       gazebo::OgreAdaptor::Instance()->Render(); 
       this->gui->Update();
-      this->renderUpdates++;
+      ++this->renderUpdates;
       updated=true;
     }
 

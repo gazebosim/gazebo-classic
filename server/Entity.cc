@@ -36,13 +36,12 @@ unsigned int Entity::idCounter = 0;
 
 
 Entity::Entity(Entity *parent)
+: parent(parent),
+  id(++idCounter),
+  isStatic(false),
+  visualNode(0)
 {
-  // Set the parent and the id
-  this->parent = parent;
-  this->id = idCounter++;
-  this->isStatic = false;
-  this->visualNode=0;
-
+ 
   if (this->parent)
   {
     this->parent->AddChild(this);
@@ -61,7 +60,6 @@ Entity::Entity(Entity *parent)
 Entity::~Entity()
 {
   GZ_DELETE(this->visualNode);
-
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 }
 
@@ -100,7 +98,7 @@ void Entity::AddChild(Entity *child)
 }
 
 // Get all children
-std::vector< Entity* > &Entity::GetChildren()
+std::vector< Entity* > &Entity::GetChildren() 
 {
   return this->children;
 }
@@ -151,14 +149,14 @@ void Entity::SetStatic(bool s)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return whether this entity is static
-bool Entity::IsStatic() const
+inline bool Entity::IsStatic() const
 {
   return this->isStatic;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Returns true if the entities are the same. Checks only the name
-bool Entity::operator==(const Entity &ent)
+bool Entity::operator==(const Entity &ent) const 
 {
   return ent.GetName() == this->GetName();
 }

@@ -75,7 +75,7 @@ class Entity
 
   /// \brief Get all children
   /// \return Vector of children entities
-  public: std::vector< Entity* > &GetChildren();
+  public: std::vector< Entity* >  &GetChildren();
 
   /// \brief Return this entity's sceneNode
   /// \return Ogre scene node
@@ -106,13 +106,13 @@ class Entity
   public: bool IsStatic() const;
 
   /// \brief Returns true if the entities are the same. Checks only the name
-  public: bool operator==(const Entity &ent);
+  public: bool operator==(const Entity &ent) const;
 
   /// \brief Parent of this entity
   protected: Entity *parent;
 
   /// \brief Children of this entity
-  public: std::vector< Entity* > children;
+  private: std::vector< Entity* > children;
 
   /// \brief This entities ID
   private: unsigned int id;
@@ -120,16 +120,18 @@ class Entity
   /// \brief Used to automaticaly chose a unique ID on creation
   private: static unsigned int idCounter;
 
-  /// \brief OGRE stuff
+  // is this an static entity
+  private: bool isStatic;
+
+  /// \brief Visual stuff
   protected: OgreVisual *visualNode;
 
-  /// \brief ODE Stuff
+  /// \brief ODE Stuff (should be go somewhere else)
   public: dSpaceID spaceId;
 
   /// \brief Name of the entity
   private: std::string name;
 
-  private: bool isStatic;
 };
 
 /// \}
