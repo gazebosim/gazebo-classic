@@ -149,7 +149,7 @@ void Entity::SetStatic(bool s)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return whether this entity is static
-inline bool Entity::IsStatic() const
+bool Entity::IsStatic() const
 {
   return this->isStatic;
 }
