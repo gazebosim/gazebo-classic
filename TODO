@@ -1,4 +1,6 @@
 Open:
+- Fix the updateRate tags for rendering and phyics to be more intuitive.
+- Shadows draw on multiple surfaces(seem to pass through walls).
 - Removing the sky results in a black screen
 - Apply Linear and Angular Damping, see OGREODE sources.
 - A static geom which is offset does not actually move the geom, so collision

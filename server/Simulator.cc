@@ -201,10 +201,64 @@ void Simulator::Fini( )
   gazebo::World::Instance()->Fini();
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
+{
+  double step= World::Instance()->GetPhysicsEngine()->GetStepTime();
+  double currTime;
+  double elapsedTime;
+
+  while (!this->userQuit)
+  {
+    currTime = this->GetRealTime();
+
+    if ((currTime - this->prevPhysicsTime) >= step) 
+    {
+      this->simTime += step;
+
+      // Update the physics engine
+      if (!this->GetUserPause() && !this->GetUserStep() ||
+          (this->GetUserStep() && this->GetUserStepInc()))
+      {
+        this->iterations++;
+        this->pause=false;
+        this->SetUserStepInc(!this->GetUserStepInc());
+      }
+      else
+      {
+        this->pauseTime += step;
+        this->pause=true;
+      }
+
+      World::Instance()->Update(); //physics
+
+      this->prevPhysicsTime = this->GetRealTime();
+    }
+
+    // Update the rendering
+    if (currTime - this->prevRenderTime > 0.02)
+    {
+      gazebo::OgreAdaptor::Instance()->Render(); 
+      this->prevRenderTime = this->GetRealTime();
+    }
+
+    // Update the gui
+    this->gui->Update();
+
+    elapsedTime = (this->GetRealTime()-currTime)*2.0;
+
+    // Wait if we're going too fast
+    if ( elapsedTime < 0.02 )
+    {
+      usleep( (0.02 - elapsedTime) * 1e6  );
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Main simulation loop, when this loop ends the simulation finish
+/*void Simulator::MainLoop()
 {
   double maxPhysicsUpdateTime = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
   double maxRenderUpdateTime = OgreAdaptor::Instance()->GetUpdateRate();
@@ -294,7 +348,7 @@ void Simulator::MainLoop()
       }
     }
   }
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Gets our current GUI interface

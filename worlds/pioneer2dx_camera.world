@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+
+<gazebo:world 
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
+  xmlns:window="http://playerstage.sourceforge.net/gazebo/xmlschema/#window" 
+  xmlns:param="http://playerstage.sourceforge.net/gazebo/xmlschema/#param" 
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+  xmlns:ui="http://playerstage.sourceforge.net/gazebo/xmlschema/#ui"
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
+
+  <verbosity>5</verbosity>
+
+  <physics:ode>
+    <stepTime>0.03</stepTime>
+    <gravity>0 0 -9.8</gravity>
+    <cfm>10e-5</cfm>
+    <erp>0.8</erp>
+    <updateRate>2</updateRate>
+  </physics:ode>
+
+  <rendering:gui>
+    <type>fltk</type>
+    <size>640 480</size>
+    <updateRate>20</updateRate>
+    <pos>0 0</pos>
+  </rendering:gui>
+
+  <rendering:ogre>
+    <ambient>0.5 0.5 0.5 1.0</ambient>
+    <sky>
+      <material>Gazebo/CloudySky</material>
+    </sky>
+  </rendering:ogre>
+
+   <!-- Ground Plane -->
+  <model:physical name="plane1_model">
+    <xyz>0 0 0</xyz>
+    <rpy>0 0 0</rpy>
+    <static>true</static>
+
+    <body:plane name="plane1_body">
+      <geom:plane name="plane1_geom">
+        <normal>0 0 1</normal>
+        <size>2000 2000</size>
+        <segments>10 10</segments>
+        <uvTile>100 100</uvTile>
+        <material>Gazebo/GrassFloor</material>
+      </geom:plane>
+    </body:plane>
+  </model:physical>
+
+  <!-- The camera -->
+  <model:physical name="cam1_model">
+    <xyz>0.07 -1.10 0.5</xyz>
+    <rpy>0 12 52.5</rpy>
+    <static>true</static>
+
+    <body:empty name="cam1_body">
+      <sensor:camera name="cam1_sensor">
+        <imageSize>640 480</imageSize>
+        <hfov>60</hfov>
+        <nearClip>0.1</nearClip>
+        <farClip>100</farClip>
+
+        <!--<saveFrames>true</saveFrames>
+        <saveFramePath>frames</saveFramePath>
+        -->
+      </sensor:camera>
+    </body:empty>
+  </model:physical>
+
+  <model:physical name="cylinder1_model">
+    <xyz>1 -1.5 0.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:cylinder name="cylinder1_body">
+      <geom:cylinder name="cylinder1_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+
+
+  <!-- 
+  Include the complete model described in the .model file
+  This assumes the root node is a <model:...>
+  -->
+  <!--  <include embedded="false">
+    <xi:include href="pioneer2dx.model" />
+  </include>
+  -->
+
+  <model:physical name="pioneer2dx_model1">
+    <xyz>0 0 0.145</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <controller:differential_position2d name="controller1">
+      <leftJoint>left_wheel_hinge</leftJoint>
+      <rightJoint>right_wheel_hinge</rightJoint>
+      <wheelSeparation>0.34</wheelSeparation>
+      <wheelDiameter>0.15</wheelDiameter>
+      <torque>5</torque>
+      <interface:position name="position_iface_0"/>
+    </controller:differential_position2d>
+
+    <model:physical name="sonyvid30_model">
+      <xyz>0.15 0 0.09</xyz>
+
+      <attach>
+        <parentBody>chassis_body</parentBody>
+        <myBody>sonyvid30_body</myBody>
+      </attach>
+
+      <include embedded="true">
+        <xi:include href="models/sonyvid30.model" />
+      </include>
+    </model:physical>
+
+    <!-- 
+    The include should be last within a model. All previous statements
+    will override those in the included file 
+    -->
+    <include embedded="true">
+      <xi:include href="models/pioneer2dx.model" />
+    </include>
+  </model:physical>
+
+  <!-- White Directional light -->
+  <model:renderable name="directional_white">
+    <light>
+      <type>directional</type>
+      <direction>0 -0.6 -0.4</direction>
+      <diffuseColor>1.0 1.0 1.0</diffuseColor>
+      <specularColor>0.2 0.2 0.2</specularColor>
+      <attenuation>1000 1.0 0.0 0</attenuation>
+    </light>
+  </model:renderable>
+
+
+</gazebo:world>

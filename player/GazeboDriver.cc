@@ -37,6 +37,7 @@
 #include "FiducialInterface.hh"
 #include "Position3dInterface.hh"
 #include "ActarrayInterface.hh"
+#include "PTZInterface.hh"
 
 /*
 #include "PowerInterface.hh"
@@ -293,6 +294,10 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new ActarrayInterface( playerAddr,  this, cf, section );
         break;
 
+      case PLAYER_PTZ_CODE:
+        if (!player_quiet_startup) printf(" a ptz interface.\n");
+        ifsrc = new PTZInterface( playerAddr,  this, cf, section );
+        break;
 
         /*      case PLAYER_POWER_CODE:
                 if (!player_quiet_startup) printf(" a power interface.\n");
@@ -302,11 +307,6 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
               case PLAYER_SONAR_CODE:
                 if (!player_quiet_startup) printf(" a sonar interface.\n");
                 ifsrc = new SonarInterface( playerAddr,  this, cf, section );
-                break;
-
-              case PLAYER_PTZ_CODE:
-                if (!player_quiet_startup) printf(" a ptz interface.\n");
-                ifsrc = new PtzInterface( playerAddr,  this, cf, section );
                 break;
 
               case PLAYER_GRIPPER_CODE:

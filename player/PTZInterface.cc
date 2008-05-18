@@ -90,6 +90,8 @@ int PTZInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->data->cmd_zoom = cmd->zoom;
 
     this->iface->Unlock();
+
+    return 0;
   }
 
   // Is it a request for ptz geometry?
