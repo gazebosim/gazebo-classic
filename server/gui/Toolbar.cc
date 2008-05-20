@@ -27,10 +27,10 @@
 #include <stdio.h>
 #include <FL/Fl_Value_Output.H>
 
-#include "Global.hh"
 #include "CameraManager.hh"
 #include "CameraSensor.hh"
 #include "Toolbar.hh"
+#include "Global.hh"
 
 using namespace gazebo;
 
@@ -122,7 +122,6 @@ void Toolbar::Update()
     }
 
     Pose3d pose = camera->GetWorldPose();
-    pose -= Global::poseOffset;
 
     this->outputX->value(pose.pos.x);
     this->outputY->value(pose.pos.y);

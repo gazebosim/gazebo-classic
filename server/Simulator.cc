@@ -276,7 +276,7 @@ void Simulator::MainLoop()
   else if (maxRenderUpdateTime > 0)
     gzmsg(2) << "updating the visualization " << 1/maxRenderUpdateTime << " times per second";  
   else
-   gzmsg(2) << "updating the visualization " << -1/maxRenderUpdateTime << " times per each physics updates";  
+   gzmsg(2) << "updating the visualization after " << -1/maxRenderUpdateTime << " physics updates" << std::endl;  
   std::cout.flush();
 
   while (!this->userQuit)

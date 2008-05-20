@@ -7,7 +7,6 @@ for subdir in dirs:
   SConscript('%s/SConscript' % subdir)
 
 sources = ['main.cc',
-           'Global.cc',
            'Vector3.cc', 
            'Quatern.cc',
            'Pose3d.cc',

@@ -41,7 +41,6 @@ namespace gazebo
   class CylinderGeom;
   class Entity;
   class XMLConfigNode;
-
 /// \addtogroup gazebo_physics_engine
 /// \{
 
@@ -121,7 +120,7 @@ class ODEPhysics : public PhysicsEngine
   private: dJointGroupID contactGroup;
           
   /// List of all the entities
-  protected: std::map<int, Entity* > entities;
+  private: std::map<int, Entity* > entities;
 
   private: double globalCFM;
   private: double globalERP; 

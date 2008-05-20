@@ -33,7 +33,6 @@
 
 #include <math.h>
 
-#include "Pose3d.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 
@@ -89,40 +88,5 @@
 
 #define GZ_DELETE(p) { if(p) { delete (p);  (p)=NULL; } }
 
-namespace gazebo
-{
-
-  /// \addtogroup gazebo_server
-  /// \brief Global attributes.
-  /// \{
-
-  /// \brief Class to hold global attributes
-  /**
-  The \c param:Global tag is used to specify certain global parameters
-  for the server. Set these parameters as needed in the world file E.g.:
-
-  \verbatim
-  <param:Global>
-    <pause>true</pause>
-  </param:Global>
-  \endverbatim
-  
-  The parameters are as follows:
-  - pause (bool)
-    - Set to true to start the simulator in paused mode.
-    - Default: false
-  */  
-  class Global
-  {
-
-    /// Global pose offset
-    public: static Pose3d poseOffset;
-
-    private: Global();
-    private: ~Global();
-  };
-
-  /// \}
-}
 
 #endif

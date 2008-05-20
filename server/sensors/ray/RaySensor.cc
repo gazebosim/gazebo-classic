@@ -67,9 +67,7 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 {
   if (this->body == NULL)
   {
-    std::ostringstream stream;
-    stream << "Body is NULL";
-    gzthrow(stream.str());
+    gzthrow("Null body in the ray sensor");
   }
 
   this->rayCount = node->GetInt("rayCount",0,1);
