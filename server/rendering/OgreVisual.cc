@@ -78,7 +78,6 @@ void OgreVisual::Load(XMLConfigNode *node)
 
   this->xmlNode=node;
   std::string meshName = node->GetString("mesh","",1);
-  std::string materialName = node->GetString("material","",0);
 
   // Read the desired position and rotation of the mesh
   pose.pos = node->GetVector3("xyz", Vector3(0,0,0));

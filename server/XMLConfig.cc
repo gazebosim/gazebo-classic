@@ -27,9 +27,9 @@
 #include <assert.h>
 #include <float.h>
 #include <math.h>
-#include <sstream>
-#include <string>
+#include <string.h>
 #include <iostream>
+#include <sstream>
 
 #include <libxml/xinclude.h>
 #include <libxml/xpointer.h>

@@ -26,6 +26,7 @@
  */
 
 #include <time.h>
+#include <string.h>
 #include "XMLConfig.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"

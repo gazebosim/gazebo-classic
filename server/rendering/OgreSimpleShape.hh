@@ -13,9 +13,6 @@ namespace gazebo
 /// \brief Class used to render simple shapes
 class OgreSimpleShape
 {
-  /// \brief The type of shape
-  public: typedef enum Shape {CUBE, ROUNDED_CUBE, CYLINDER, SPHERE};
-
   /// \brief Constructor
   private: OgreSimpleShape();
 

@@ -83,7 +83,6 @@ void World::Close()
     }
   }
   this->models.clear();
-
   this->geometries.clear();
 
   GZ_DELETE (this->physicsEngine)

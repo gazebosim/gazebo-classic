@@ -101,6 +101,7 @@ home directory, or to the log file specified with the -l command line option.
 //#include <python2.4/Python.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
