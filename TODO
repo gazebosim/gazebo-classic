@@ -73,10 +73,6 @@ Open:
 -Add "Angle" class, will handle ROTD and DTOR.
 -Templatize Vector, Quaternion, Pose
 - Replace all return int, with throws
-- Find something shorter for:
-   std::ostringstreaom stream;
-   stream << "This is an error message of type[" << type << "]\n";
-   gzthrow(stream.str());
 
 
 Completed:
@@ -119,4 +115,9 @@ Completed:
 - Add in Pioneer blender models
 - Add check for libxml2
 - Add uninstall (scons -c automatically handles this!)
-- Use the Contact information in the Collision Callback. See CVS version of Gazebo.
+-- Find something shorter for:
+   std::ostringstreaom stream;
+   stream << "This is an error message of type[" << type << "]\n";
+   gzthrow(stream.str());
+
+ Use the Contact information in the Collision Callback. See CVS version of Gazebo.

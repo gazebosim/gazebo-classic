@@ -84,9 +84,9 @@ subdirs = ['libgazebo','server', 'player']
 
 # Set the compile mode
 if env['mode'] == 'debug':
-  env['CCFLAGS'] += Split('-ggdb -g3')
+  env['CCFLAGS'] += Split('-ggdb -g2 -Wall -Wno-deprecated')
 elif env['mode'] == 'profile':
-  env['CCFLAGS'] += Split('-pg') 
+  env['CCFLAGS'] += Split('-ggdb -g2 -pg') 
   env['LINKFLAGS'] += Split('-pg') 
 elif env['mode'] == 'optimized':
   env['CCFLAGS'] += Split('-O3') 
