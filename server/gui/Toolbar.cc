@@ -26,6 +26,8 @@
 
 #include <stdio.h>
 #include <FL/Fl_Value_Output.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Button.H>
 
 #include "CameraManager.hh"
 #include "CameraSensor.hh"
@@ -53,14 +55,37 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
     sprintf(buffer,"Camera");
   }
 
-  this->cameraInfoGrp = new Fl_Group(x+10,y+20,w-20,25*3, buffer);
+  this->cameraInfoGrp = new Fl_Group(x+10,y+20,w-20,25*5, "Camera");
 
   // Camera Info Group
   this->cameraInfoGrp->box(FL_BORDER_BOX);
 
-  // Camera X output
+  // Camera name output
   x = this->cameraInfoGrp->x()+20;
   y = this->cameraInfoGrp->y()+2;
+  this->cameraName = new Fl_Output(x,y,this->cameraInfoGrp->w()-44,20);
+
+  // Prev camera button
+  x = this->cameraInfoGrp->x()+2;
+  y = this->cameraInfoGrp->y()+2;
+  this->prevCameraButton = new Fl_Button(x,y,16,20,"<");
+  this->prevCameraButton->callback( &gazebo::Toolbar::PrevCameraButtonCB, this );
+
+  // Next camera button
+  x = this->cameraInfoGrp->x() + this->cameraInfoGrp->w()-22;
+  y = this->cameraInfoGrp->y()+2;
+  this->nextCameraButton = new Fl_Button(x,y,16,20,">");
+  this->nextCameraButton->callback( &gazebo::Toolbar::NextCameraButtonCB, this );
+
+  // Camera dimensions
+  x = this->cameraInfoGrp->x() + 40;
+  y = this->cameraName->y()+this->cameraName->h()+5;
+  this->cameraDimensions = new Fl_Output(x,y,this->cameraName->w()-20,20,"WxH");
+
+
+  // Camera X output
+  x = this->cameraInfoGrp->x() + 20;
+  y = this->cameraDimensions->y() + this->cameraDimensions->h()+5;
   this->outputX = new Fl_Value_Output(x,y,60,20,"X");
   this->outputX->precision(2);
 
@@ -114,12 +139,18 @@ void Toolbar::Update()
 
   if (camera != NULL)
   {
-    sprintf(buffer,"%s [%d x %d]", camera->GetName().c_str(), camera->GetImageWidth(), camera->GetImageHeight());
-
-    if (strcmp(buffer,this->cameraInfoGrp->label()) != 0)
+    sprintf(buffer,"%s", camera->GetName().c_str());
+    if (strcmp(buffer,this->cameraName->value()) != 0)
     {
-      this->cameraInfoGrp->label(buffer);
+      this->cameraName->value(buffer);
     }
+
+    sprintf(buffer,"%d x %d", camera->GetImageWidth(), camera->GetImageHeight());
+    if (strcmp(buffer,this->cameraDimensions->value()) != 0)
+    {
+      this->cameraDimensions->value(buffer);
+    }
+
 
     Pose3d pose = camera->GetWorldPose();
 
@@ -132,3 +163,12 @@ void Toolbar::Update()
   }
 }
 
+void Toolbar::PrevCameraButtonCB(Fl_Widget * /*w*/, void *data)
+{
+  CameraManager::Instance()->DecActiveCamera();
+}
+
+void Toolbar::NextCameraButtonCB(Fl_Widget * /*w*/, void *data)
+{
+  CameraManager::Instance()->IncActiveCamera();
+}

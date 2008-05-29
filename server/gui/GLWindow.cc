@@ -37,6 +37,7 @@
 #include "GazeboMessage.hh"
 #include "MainMenu.hh"
 #include "CameraManager.hh"
+#include "World.hh"
 
 #include "OgreHUD.hh"
 
@@ -85,6 +86,8 @@ void GLWindow::Init()
   this->visual = fl_visual;
   this->colormap = fl_colormap;
   this->windowId = Fl_X::i(this)->xid;
+
+  this->mouseDrag = false;
 
   Fl_Window::show();
 
@@ -214,6 +217,13 @@ void GLWindow::HandleMouseRelease()
       this->middleMousePressed = false;
       break;
   }
+
+  if (!this->mouseDrag)
+  {
+    //Entity *ent = World::Instance()->GetEntityAt(this->mousePos);
+  }
+
+  this->mouseDrag = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,6 +241,8 @@ void GLWindow::HandleMouseDrag()
       camera->RotatePitch(d.y * this->rotateAmount);
     }
   }
+
+  this->mouseDrag = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

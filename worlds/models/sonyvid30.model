@@ -80,6 +80,13 @@
         <material>Gazebo/White</material>
       </visual>
     </geom:cylinder>
+
+    <sensor:camera name="sonyvid30_camera_sensor">
+      <imageSize>320 240</imageSize>
+      <hfov>60</hfov>
+      <nearClip>0.1</nearClip>
+      <farClip>100</farClip>
+    </sensor:camera>
   </body:box>
 
   <joint:hinge name="pan_joint">

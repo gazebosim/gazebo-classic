@@ -105,6 +105,8 @@ namespace gazebo
     private: std::map<int,int> keys;
 
     private: double lastUpdateTime;
+
+    private: bool mouseDrag;
   };
 
 }

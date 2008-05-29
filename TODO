@@ -1,5 +1,6 @@
 Open:
-- Fix the updateRate tags for rendering and phyics to be more intuitive.
+- Mouse picking
+  -Implement in CameraSensor class.
 - Shadows draw on multiple surfaces(seem to pass through walls).
 - Removing the sky results in a black screen
 - Apply Linear and Angular Damping, see OGREODE sources.
@@ -15,7 +16,6 @@ Open:
 - Implement Speech interface
 - Add in user adjustment of simple solids texture units
 - Fix sicklms200 PutFiducialData. Breaks when using large angles
-- Mouse picking
 - Paging heightmaps. 
   - Positioning the current heightmap is a big hack
 

@@ -29,6 +29,8 @@
 #include <FL/Fl_Group.H>
 
 class Fl_Value_Output;
+class Fl_Output;
+class Fl_Button;
 
 namespace gazebo
 {
@@ -45,7 +47,14 @@ namespace gazebo
     /// \brief Update the toolbar data
     public: void Update();
 
+    public: static void PrevCameraButtonCB(Fl_Widget * /*w*/, void *data);
+    public: static void NextCameraButtonCB(Fl_Widget * /*w*/, void *data);
+
     private: Fl_Group *cameraInfoGrp;
+    private: Fl_Button *prevCameraButton;
+    private: Fl_Button *nextCameraButton;
+    private: Fl_Output *cameraName;
+    private: Fl_Output *cameraDimensions;
     private: Fl_Value_Output *outputX;
     private: Fl_Value_Output *outputY;
     private: Fl_Value_Output *outputZ;
