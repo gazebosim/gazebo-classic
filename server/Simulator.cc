@@ -209,6 +209,9 @@ void Simulator::MainLoop()
   double currTime;
   double elapsedTime;
 
+  this->prevPhysicsTime = this->GetRealTime();
+  this->prevRenderTime = this->GetRealTime();
+
   while (!this->userQuit)
   {
     currTime = this->GetRealTime();
