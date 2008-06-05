@@ -31,7 +31,6 @@
 
 namespace gazebo
 {
-  class OgreVisual;
   class Body;
   class XMLConfig;
 
@@ -96,7 +95,6 @@ namespace gazebo
     /// \brief Load the plane
     public: virtual void LoadChild(XMLConfigNode *node);
 
-    private: OgreVisual *visual;
   };
   
   /// \}

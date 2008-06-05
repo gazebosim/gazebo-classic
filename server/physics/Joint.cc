@@ -95,7 +95,6 @@ void Joint::Load(XMLConfigNode *node)
 /// Update the joint
 void Joint::Update()
 {
-  Vector3 start,end;
 //TODO: Evaluate impact of this code on performance
   this->visual->SetVisible(World::Instance()->GetShowJoints());
 
@@ -104,6 +103,7 @@ void Joint::Update()
 
   this->visual->SetPosition(this->GetAnchor());
 
+  Vector3 start;
   if (this->body1)
   {
     start = this->body1->GetPose().pos - this->GetAnchor();
