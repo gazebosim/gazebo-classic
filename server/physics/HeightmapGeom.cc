@@ -32,6 +32,8 @@
 
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
+#include "Simulator.hh"
+#include "RenderEngine.hh"
 #include "Global.hh"
 #include "Body.hh"
 #include "HeightmapGeom.hh"
@@ -50,7 +52,8 @@ HeightmapGeom::HeightmapGeom(Body *body)
 // Destructor
 HeightmapGeom::~HeightmapGeom()
 {
-  OgreAdaptor::Instance()->sceneMgr->destroyQuery(this->rayQuery);
+  OgreAdaptor *ogreAdaptor = (OgreAdaptor *) Simulator::Instance()->GetRenderEngine();
+  ogreAdaptor->sceneMgr->destroyQuery(this->rayQuery);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -128,6 +131,14 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 {
   Ogre::Image tmpImage;
   int tileSize;
+  OgreAdaptor *ogreAdaptor;
+
+  if (Simulator::Instance()->GetRenderEngine()->GetType() != "ogre")
+  {
+    gzthrow("Heighmaps are only supported by the Ogre renderer");
+  }
+  else
+    ogreAdaptor = (OgreAdaptor  *)(Simulator::Instance()->GetRenderEngine());
 
   std::string imageFilename = node->GetString("image","",1);
   std::string worldTexture = node->GetString("worldTexture","",0);
@@ -143,7 +154,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   // Width and height must be the same
   if (tmpImage.getWidth() != tmpImage.getHeight())
   {
-    gzthrow("Hieghtmap image must be square\n");
+    gzthrow("Heightmap image must be square\n");
   }
 
   this->terrainVertSize = tmpImage.getWidth();
@@ -216,17 +227,17 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
     new Ogre::MemoryDataStream(mstr,strlen(mstr)) );
 
   // Set the static terrain in Ogre
-  OgreAdaptor::Instance()->sceneMgr->setWorldGeometry(dataStream);
+  ogreAdaptor->sceneMgr->setWorldGeometry(dataStream);
 
   // HACK to make the terrain oriented properly
-  Ogre::SceneNode *tnode = OgreAdaptor::Instance()->sceneMgr->getSceneNode("Terrain");
+  Ogre::SceneNode *tnode = ogreAdaptor->sceneMgr->getSceneNode("Terrain");
   tnode->pitch(Ogre::Degree(90));
   tnode->translate(Ogre::Vector3(-this->terrainSize.x*0.5, this->terrainSize.y*0.5, 0));
 
   // Setup the ray scene query, which is used to determine the heights of
   // the vertices for ODE
   this->ray = Ogre::Ray(Ogre::Vector3::ZERO, Ogre::Vector3::NEGATIVE_UNIT_Y);
-  this->rayQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(this->ray);
+  this->rayQuery = ogreAdaptor->sceneMgr->createRayQuery(this->ray);
   this->rayQuery->setQueryTypeMask(Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
   this->rayQuery->setWorldFragmentType(Ogre::SceneQuery::WFT_SINGLE_INTERSECTION);
 

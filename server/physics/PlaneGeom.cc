@@ -69,7 +69,7 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
   double altitude = 0;
   Vector3 normal = node->GetVector3("normal",Vector3(0,0,1));
 
-  OgreCreator::CreatePlane(node,this);
+  OgreCreator::CreatePlane(node,this->GetVisualNode());
 
   this->SetGeom(dCreatePlane(this->spaceId, normal.x, normal.y, normal.z, altitude),false);
 

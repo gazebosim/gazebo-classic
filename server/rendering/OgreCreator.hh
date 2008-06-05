@@ -55,14 +55,19 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~OgreCreator();
 
-    /// \brief Create some simple general shapes
-    public: static void CreateBasicShapes();
+    /// \brief Load some simple shapes on the render engine
+      public: static void LoadBasicShapes();
 
-    ///\brief Helper function to create a Plane
-    public: static OgreVisual *CreatePlane(XMLConfigNode *node, Entity *parent);
-
-    /// \brief Create a light source and attach it to the entity
-    public: static void CreateLight(XMLConfigNode *node, Entity *entity);
+    ///\brief Create a Plane
+    ///It adds itself to the Visual node parent, it will those change parent
+    ///properties if needed, to avoid this create a child visual node for the plane
+    public: static void CreatePlane(XMLConfigNode *node, OgreVisual *parent);
+    
+    ///\brief Create a visual entity
+    public: static void CreateVisual(XMLConfigNode *node, OgreVisual *parent);
+        
+    /// \brief Create a light source 
+    public: static void CreateLight(XMLConfigNode *node, OgreVisual *parent);
 
     /// \brief Helper function to create a camera
     public: static Ogre::Camera *CreateCamera(const std::string &name, double nearClip, double farClip, double hfov, Ogre::RenderTarget *renderTarget);
@@ -77,6 +82,7 @@ namespace gazebo
     public: static void CreateSky(XMLConfigNode *node);
     
     public: static void DrawGrid();
+    private: static unsigned int lightCounter;
 
 
 /// \}

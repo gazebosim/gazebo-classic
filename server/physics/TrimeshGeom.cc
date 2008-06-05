@@ -31,6 +31,8 @@
 #include "Body.hh"
 #include "TrimeshGeom.hh"
 #include "GazeboError.hh"
+#include "Simulator.hh"
+#include "RenderEngine.hh"
 
 using namespace gazebo;
 
@@ -107,6 +109,10 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   int vindex = 0;
   int iindex = 0;
 
+  if (Simulator::Instance()->GetRenderEngine()->GetType() != "ogre")
+  {
+    gzthrow("Heighmaps are only supported by the Ogre renderer");
+  }
 
   this->meshName = node->GetString("mesh","",1);
 

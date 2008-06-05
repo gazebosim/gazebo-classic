@@ -27,6 +27,7 @@
 #include <sstream>
 
 #include "OgreVisual.hh"
+#include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "ContactParams.hh"
@@ -123,7 +124,7 @@ void Geom::Load(XMLConfigNode *node)
   while (childNode)
   {
     OgreVisual *visual = new OgreVisual(this->visualNode);
-    visual->Load(childNode);
+    OgreCreator::CreateVisual(childNode,visual);
     this->visuals.push_back(visual);
     childNode = childNode->GetNext("visual");
   }
@@ -448,27 +449,6 @@ float Geom::GetLaserRetro() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the transparency
-void Geom::SetTransparency( float trans )
-{
-  std::vector<OgreVisual*>::iterator iter;
-
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-  {
-    (*iter)->SetTransparency(trans);
-  }
-
-  this->transparency = trans;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-///  Get the value of the transparency
-float Geom::GetTransparency() const
-{
-  return this->transparency;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the visibility of the Bounding box of this geometry
 void Geom::ShowBoundingBox(bool show)
 {
@@ -482,9 +462,9 @@ void Geom::ShowBoundingBox(bool show)
 void Geom::ShowJoints(bool show)
 {
   if (show)
-    this->SetTransparency(0.6);
+    this->visualNode->SetTransparency(0.6);
   else
-    this->SetTransparency(0);
+    this->visualNode->SetTransparency(0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -48,9 +48,8 @@ using namespace gazebo;
 // Private constructor
 World::World()
 {
-  this->server=0;
-  this->simIface=0;
-
+  this->server = NULL;
+  this->simIface = NULL;
   this->showBoundingBoxes = false;
   this->showJoints = false;
   this->wireframe = false;

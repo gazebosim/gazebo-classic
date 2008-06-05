@@ -27,6 +27,7 @@
 #include <Ogre.h>
 #include <iostream>
 
+#include "Global.hh"
 #include "Entity.hh"
 #include "XMLConfig.hh"
 #include "GazeboError.hh"
@@ -37,8 +38,9 @@
 #include "OgreSimpleShape.hh"
 #include "OgreCreator.hh"
 
-
 using namespace gazebo;
+
+unsigned int OgreCreator::lightCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -54,7 +56,7 @@ OgreCreator::~OgreCreator()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create the basic shapes
-void OgreCreator::CreateBasicShapes()
+void OgreCreator::LoadBasicShapes()
 {
   // Create some basic shapes
   OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
@@ -65,7 +67,7 @@ void OgreCreator::CreateBasicShapes()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
-OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
+void OgreCreator::CreatePlane(XMLConfigNode *node, OgreVisual *parent)
 {
   Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
   Vector2<double> size = node->GetVector2d("size",Vector2<double>(1000, 1000));
@@ -78,35 +80,113 @@ OgreVisual *OgreCreator::CreatePlane(XMLConfigNode *node, Entity *parent)
   Vector3 perp = normal.GetPerpendicular();
 
   Ogre::Plane plane(Ogre::Vector3(normal.x, normal.y, normal.z), 0);
-
-  Ogre::MeshManager::getSingleton().createPlane(parent->GetUniqueName(),
+//FIXME: only one plane per parent
+//TODO:names and parents
+  Ogre::MeshManager::getSingleton().createPlane(parent->GetName() + "_PLANE",
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
       size.x, size.y,
       (int)segments.x, (int)segments.y,
       true,1,
       uvTile.x, uvTile.y,
       Ogre::Vector3(perp.x, perp.y, perp.z));
+  
+  //OgreVisual *visual = new OgreVisual(parent);
+  parent->AttachMesh(parent->GetName() + "_PLANE");
+  parent->SetMaterial(material);
+  parent->SetCastShadows(node->GetBool("castShadows",true,0));
 
-  OgreVisual *visual = new OgreVisual(parent->GetVisualNode());
-  visual->AttachMesh(parent->GetUniqueName());
-  visual->SetMaterial(material);
-  visual->SetCastShadows(node->GetBool("castShadows",true,0));
-
-  return visual;
+  //return visual;
 }
 
+void OgreCreator::CreateVisual(XMLConfigNode *node, OgreVisual *parent)
+{
+  std::ostringstream stream;
+  Pose3d pose;
+  Vector3 size;
+  Ogre::Vector3 meshSize;
+  Ogre::MovableObject *obj = NULL;
+
+  std::string meshName = node->GetString("mesh","",1);
+
+  // Read the desired position and rotation of the mesh
+  pose.pos = node->GetVector3("xyz", Vector3(0,0,0));
+  pose.rot = node->GetRotation("rpy", Quatern());
+
+  try
+  {
+    // Create the entity
+    stream << parent->GetName() << "_ENTITY";
+    obj = (Ogre::MovableObject*)parent->GetSceneNode()->getCreator()->createEntity(stream.str(), meshName);
+  }
+  catch (Ogre::Exception e)
+  {
+    std::cerr << "Ogre Error:" << e.getFullDescription() << "\n";
+    gzthrow("Unable to create a mesh from " + meshName);
+  }
+
+  // Set the pose of the scene node
+  parent->SetPose(pose);
+
+  // Attach the entity to the node
+  if (obj)
+  {
+    parent->AttachObject(obj);
+    obj->setVisibilityFlags(GZ_ALL_CAMERA);
+    meshSize = obj->getBoundingBox().getSize();
+  }
+  
+  // Get the desired size of the mesh
+  if (node->GetChild("size") != NULL)
+    size = node->GetVector3("size",Vector3(1,1,1));
+  else
+    size = Vector3(meshSize.x, meshSize.y, meshSize.z);
+
+  // Get and set teh desired scale of the mesh
+  if (node->GetChild("scale") != NULL)
+  {
+    Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
+    parent->SetScale(scale);
+  }
+  else
+  {
+    parent->SetScale(Vector3(size.x/meshSize.x, size.y/meshSize.y, size.z/meshSize.z));
+  }
 
 
+  // Set the material of the mesh
+  parent->SetMaterial(node->GetString("material",std::string(),1));
+
+  // Allow the mesh to cast shadows
+  parent->SetCastShadows(node->GetBool("castShadows",true,0));
+
+  parent->SetXML(node);
+}
+
+  
 ////////////////////////////////////////////////////////////////////////////////
-/// Create a light source and attach it to the entity
-void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
+/// Create a light source and attach it to the visual node
+/// Note that the properties here are not modified afterwards and thus, 
+/// we don't need a Light class. 
+void OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
 {
   Vector3 vec;
   double range,constant,linear,quad;
+  Ogre::Light *light;
 
   // Create the light
-  Ogre::Light *light(OgreAdaptor::Instance()->sceneMgr->createLight(entity->GetUniqueName()));
-
+  std::ostringstream stream;
+  stream << parent->GetName() << "_LIGHT" << lightCounter;
+  lightCounter++;
+  try
+  {
+    light = OgreAdaptor::Instance()->sceneMgr->createLight(stream.str());
+  } 
+  catch (Ogre::Exception e)
+  {
+    gzthrow("Ogre Error:" << e.getFullDescription() << "\n" << \
+             "Unable to create a light on " + parent->GetName());
+  }
+  
   // Set the light type
   std::string lightType = node->GetString("type","point",0);
   if (lightType == "point")
@@ -157,7 +237,7 @@ void OgreCreator::CreateLight(XMLConfigNode *node, Entity *entity)
     light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
   }
 
-  entity->GetVisualNode()->AttachObject(light);
+  parent->AttachObject(light);
 }
 
 

@@ -31,7 +31,7 @@
 #include <X11/Xutil.h>
 
 #include "SingletonT.hh"
-#include "Pose3d.hh"
+#include "RenderEngine.hh"
 
 namespace Ogre
 {
@@ -64,7 +64,7 @@ class OgreFrameListener;
 class Entity;
 
 /// \brief Adptor to Ogre3d
-class OgreAdaptor : public SingletonT<OgreAdaptor>
+class OgreAdaptor : RenderEngine, public SingletonT<OgreAdaptor>
 {
 
   /// \brief Constructor
@@ -86,13 +86,12 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   /// \brief Initialize Ogre Rendering engine
   public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height); 
   /// \brief Render a single frame
-  public: int Render();
+  public: void Render();
 
-  /// \brief Gets the minimum time between renders, set by in the file to limit Framerate
-  public: double GetUpdateRate() const;
- 
   /// \brief Resize the rendering window
   public: void ResizeWindow(unsigned int w, unsigned int h);
+
+  public: float GetAverageFPS() const;
 
   private: void LoadPlugins();
   private: void SetupResources();
@@ -120,8 +119,6 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   /// Pointer to the input reader
   public: Ogre::InputReader *inputDevice;
 
-  private: double updateRate;
-
   private: Ogre::LogManager *logManager;
 
   // Our custom frame listener
@@ -137,9 +134,9 @@ class OgreAdaptor : public SingletonT<OgreAdaptor>
   private: int sceneType;
   private: std::string worldGeometry;
 
-  private: Vector3 terrainSize;
-  private: unsigned int terrainVertSize;
-  private: std::string terrainImage;
+  //private: Vector3 terrainSize;
+  //private: unsigned int terrainVertSize;
+  //private: std::string terrainImage;
   
   private: friend class DestroyerT<OgreAdaptor>;
   private: friend class SingletonT<OgreAdaptor>;

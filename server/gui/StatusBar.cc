@@ -25,12 +25,11 @@
  */
 
 #include <stdio.h>
-#include <Ogre.h>
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
 
 #include "Simulator.hh"
-#include "OgreAdaptor.hh"
+#include "RenderEngine.hh"
 #include "StatusBar.hh"
 
 using namespace gazebo;
@@ -75,9 +74,7 @@ StatusBar::~StatusBar()
 /// Update the toolbar data
 void StatusBar::Update()
 {
-  float lastFPS, avgFPS, bestFPS, worstFPS;
-  OgreAdaptor::Instance()->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-
+  float avgFPS = Simulator::Instance()->GetRenderEngine()->GetAverageFPS();
   this->iterations->value(Simulator::Instance()->GetIterations());
   this->fps->value(avgFPS);
 

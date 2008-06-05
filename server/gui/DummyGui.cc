@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: FLTK Mainwindow
+/* Desc: Dummy Mainwindow
  * Author: Renaud Barate
  * Date: 16 Feb 2008
  */

@@ -47,7 +47,9 @@ OgreVisual::OgreVisual(OgreVisual *node)
   this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
 
   // Create a unique name for the scene node
+  //FIXME: what if we add the capability to delete and add new children?
   stream << this->parentNode->getName() << "_VISUAL_" << this->parentNode->numChildren();
+  
 
   // Create the scene node
   this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
@@ -67,7 +69,17 @@ OgreVisual::~OgreVisual()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Sets the XML we will save the data to
+void OgreVisual::SetXML(XMLConfigNode *node)
+{
+  this->xmlNode=node;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Load the visual
+/*
 void OgreVisual::Load(XMLConfigNode *node)
 {
   std::ostringstream stream;
@@ -133,6 +145,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   // Allow the mesh to cast shadows
   this->SetCastShadows(node->GetBool("castShadows",true,0));
 }
+*/
 
 void OgreVisual::Save()
 {
@@ -140,6 +153,15 @@ void OgreVisual::Save()
   this->xmlNode->SetValue("rpy", this->GetRotation());
   //TODO: A lot of information!
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Return an unique name for the Visual
+std::string OgreVisual::GetName() const
+{
+  return this->sceneNode->getName();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a renerable object to the visual
@@ -163,7 +185,7 @@ void OgreVisual::AttachMesh( const std::string &meshName )
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Set the scale
-void OgreVisual::SetScale( Vector3 scale )
+void OgreVisual::SetScale(const Vector3 &scale )
 {
   Ogre::Vector3 vscale;
   vscale.x=scale.x;

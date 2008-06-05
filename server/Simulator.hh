@@ -43,6 +43,7 @@ namespace gazebo
   class XMLConfig;
   class XMLConfigNode;
   class GazeboConfig;
+  class RenderEngine;
 
 /// \brief The World
 /*
@@ -79,7 +80,10 @@ namespace gazebo
     public: Gui *GetUI() const;
 
     /// \brief Gets the local configuration for this computer
-    public: gazebo::GazeboConfig *GetGazeboConfig() const;
+    public: GazeboConfig *GetGazeboConfig() const;
+
+    /// \brief Gets our current GUI interface
+    public: RenderEngine *GetRenderEngine() const;
 
     /// \brief Returns the state of the simulation true if paused
     public: bool IsPaused() const;
@@ -141,13 +145,14 @@ namespace gazebo
 
   
     ///pointer to the XML Data
-    private: gazebo::XMLConfig *xmlFile;
+    private: XMLConfig *xmlFile;
 
     /// Pointer to the selected Gui 
     private: Gui *gui;
 
+    private: RenderEngine *renderEngine;
 /// Pointer to the selected Gui 
-    private: gazebo::GazeboConfig *gazeboConfig;
+    private: GazeboConfig *gazeboConfig;
 
     /// Flag to know if we have a simulation loaded
     private: bool loaded;

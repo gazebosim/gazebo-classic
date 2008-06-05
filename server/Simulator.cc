@@ -39,7 +39,7 @@
 #include "gazebo.h"
 #include "PhysicsEngine.hh"
 #include "OgreAdaptor.hh"
-#include "OgreCreator.hh"
+#include "RenderEngine.hh"
 #include "GazeboMessage.hh"
 #include "Global.hh"
 
@@ -52,6 +52,7 @@ using namespace gazebo;
 Simulator::Simulator()
 : xmlFile(NULL),
   gui(NULL),
+  renderEngine(NULL),
   gazeboConfig(NULL),
   loaded(false),
   pause(false),
@@ -88,6 +89,8 @@ void Simulator::Close()
   GZ_DELETE (this->gazeboConfig)
   gazebo::World::Instance()->Close();
   gazebo::OgreAdaptor::Instance()->Close();
+
+  //GZ_DELETE(this->renderEngine);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,28 +130,29 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-    //Create and initialize the Gui
+  //Create and initialize the Gui
   try
   {
-    this->LoadGui(rootNode);
+    this->gui=GuiFactory::NewGui(rootNode);
+    this->gui->Init();
   }
   catch (GazeboError e)
   {
     gzthrow( "Error loading the GUI\n" << e);
   }
 
-    //Initialize RenderingEngine
+  //Initialize RenderEngine //create factory
+  //this->renderEngine = new OgreAdaptor();
   try
   {
-    gazebo::OgreAdaptor::Instance()->Init(rootNode);
+    OgreAdaptor::Instance()->Init(rootNode);
+    this->renderEngine = (RenderEngine *) OgreAdaptor::Instance();
+    //this->renderEngine->Init();
   }
   catch (gazebo::GazeboError e)
   {
-    gzthrow("Failed to Initialize the OGRE Rendering system\n" << e );
- }
-
-    //Preload basic shapes that can be used anywhere
-  OgreCreator::CreateBasicShapes();
+    gzthrow("Failed to Initialize the Rendering engine subsystem\n" << e );
+  }
 
     //Create the world
   try
@@ -169,10 +173,10 @@ void Simulator::Save(const std::string& filename)
 {
   // Saving in the preferred order
   XMLConfigNode* root=xmlFile->GetRootNode();
-  gazebo::GazeboMessage::Instance()->Save(root);
+  GazeboMessage::Instance()->Save(root);
   World::Instance()->GetPhysicsEngine()->Save(root);
+  this->GetRenderEngine()->Save(root);
   this->SaveGui(root);
-  gazebo::OgreAdaptor::Instance()->Save(root);
   World::Instance()->Save(root);
 
   if (xmlFile->Save(filename)<0)
@@ -200,7 +204,7 @@ void Simulator::Fini( )
 {
   gazebo::World::Instance()->Fini();
 }
-
+/*
 ////////////////////////////////////////////////////////////////////////////////
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
@@ -242,7 +246,7 @@ void Simulator::MainLoop()
     // Update the rendering
     if (currTime - this->prevRenderTime > 0.02)
     {
-      gazebo::OgreAdaptor::Instance()->Render(); 
+      this->GetRenderEngine()->Render(); 
       this->prevRenderTime = this->GetRealTime();
     }
 
@@ -258,13 +262,13 @@ void Simulator::MainLoop()
     }
   }
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////////////
 /// Main simulation loop, when this loop ends the simulation finish
-/*void Simulator::MainLoop()
+void Simulator::MainLoop()
 {
   double maxPhysicsUpdateTime = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
-  double maxRenderUpdateTime = OgreAdaptor::Instance()->GetUpdateRate();
+  double maxRenderUpdateTime = this->GetRenderEngine()->GetUpdateRate();
   double step = World::Instance()->GetPhysicsEngine()->GetStepTime();
  
   if (maxPhysicsUpdateTime == 0)
@@ -303,11 +307,11 @@ void Simulator::MainLoop()
       // surpassed what we have already advanced.
    // If maxPhysicsUpdateTime is negative, we update if we are below the times rendering was updated * the multiplier of the userPause
    // note that the multiplier defined in the file is inverted when read so for instance -2 will become -0.5
-    if ((maxPhysicsUpdateTime >= 0) && ((this->GetRealTime() - this->checkpoint) > (maxPhysicsUpdateTime * this->physicsUpdates)) || \
+    if (((maxPhysicsUpdateTime >= 0) && ((this->GetRealTime() - this->checkpoint) > (maxPhysicsUpdateTime * this->physicsUpdates))) || \
         ((maxPhysicsUpdateTime < 0) && (this->physicsUpdates < (-maxPhysicsUpdateTime * this->renderUpdates)))) 
     {
 
-      if (!this->GetUserPause() && !this->GetUserStep() ||
+      if ((!this->GetUserPause() && !this->GetUserStep()) ||
           (this->GetUserStep() && this->GetUserStepInc()))
       {
         this->simTime += step;
@@ -331,7 +335,7 @@ void Simulator::MainLoop()
     if (((maxRenderUpdateTime >= 0) && ((this->GetRealTime() - this->checkpoint) > (maxRenderUpdateTime * this->renderUpdates))) || \
         ((maxRenderUpdateTime < 0) && (this->renderUpdates < (-maxRenderUpdateTime * this->physicsUpdates))))
     {
-      gazebo::OgreAdaptor::Instance()->Render(); 
+      this->GetRenderEngine()->Render(); 
       this->gui->Update();
       ++this->renderUpdates;
       updated=true;
@@ -351,7 +355,7 @@ void Simulator::MainLoop()
       }
     }
   }
-}*/
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Gets our current GUI interface
@@ -367,6 +371,10 @@ GazeboConfig *Simulator::GetGazeboConfig() const
   return this->gazeboConfig;
 }
 
+RenderEngine *Simulator::GetRenderEngine() const
+{
+  return this->renderEngine;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return when this simulator is paused
@@ -479,45 +487,7 @@ void Simulator::SetUserStepInc(bool step)
 }
 
 
-
-
-//TODO: Move to Gui or create GuiEngine and move it there
-void Simulator::LoadGui(XMLConfigNode *rootNode)
-{
-  gazebo::XMLConfigNode *childNode;
-
-  childNode = rootNode->GetChild("gui");
-
-  if (childNode)
-  {
-    int width = childNode->GetTupleInt("size",0,640);
-    int height = childNode->GetTupleInt("size",1,480);
-    int x = childNode->GetTupleInt("pos",0,0);
-    int y = childNode->GetTupleInt("pos",1,0);
-    std::string type = childNode->GetString("type","fltk",1);
- 
-    gzmsg(1) << "Creating GUI:\n\tType[" << type << "] Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
-    if (type != "fltk")
-    {
-      gzthrow("The only GUI available is 'fltk', for no-GUI simulation, delete the 'gui' tag and its children");
-    }
-
-    // Create the GUI
-    this->gui = GuiFactory::NewGui(type, x, y, width, height, type+"::Gazebo");
-
-    // Initialize the GUI
-    this->gui->Init();
-
-  }
-  else
-  {
-    // Create a dummy GUI
-    gzmsg(1) <<"Creating a dummy GUI";
-    this->gui = GuiFactory::NewGui(std::string("dummy"), 0, 0, 0, 0, std::string());
-  }
-}
-
-
+// Move to GuiFactory?
 void Simulator::SaveGui(XMLConfigNode *node)
 {
   Vector2<int> size;
@@ -532,3 +502,4 @@ void Simulator::SaveGui(XMLConfigNode *node)
   }
 
 }
+

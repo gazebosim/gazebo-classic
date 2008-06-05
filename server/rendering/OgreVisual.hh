@@ -28,6 +28,7 @@
 #define OGREVISUAL_HH
 
 #include <Ogre.h>
+#include <string>
 
 #include "Pose3d.hh"
 #include "Quatern.hh"
@@ -53,14 +54,18 @@ namespace gazebo
     /// \brief Attach a mesh to this visual by name
     public: void AttachMesh( const std::string &meshName );
 
-    /// \brief Load the visual
-    public: void Load(XMLConfigNode *node);
+    /// \brief Set the node we will save to.
+    public: void SetXML(XMLConfigNode *node);
 
     /// \brief Save the visual
     public: void Save();
+    
+    /// \brief Return an unique name for this object
+    /// \return Unique name for the object
+    public: std::string GetName() const;
 
     /// \brief Set the scale
-    public: void SetScale( Vector3 scale );
+    public: void SetScale( const Vector3 &scale );
 
     /// \brief Get the scale
     public: Vector3 GetScale();

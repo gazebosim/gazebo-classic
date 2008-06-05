@@ -48,10 +48,10 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~Gui() { }
   
-  /// \brief Initalize the gui
+    /// \brief Initalize the gui
     public: virtual void Init()=0;
  
-   /// \brief Updates the gui
+    /// \brief Updates the gui
     public: virtual void Update()=0;
 
     /// \brief Get the width of the gui's rendering window
@@ -71,6 +71,7 @@ namespace gazebo
 
     /// \brief Get the display
     public: virtual Display *GetDisplay() const=0;
+
   };
 
   class GLWindow;

@@ -384,8 +384,6 @@ void Model::SetPose(const Pose3d &setPose)
   origPose = this->pose;
   this->pose = setPose;
 
-  //OgreAdaptor::Instance()->SetSceneNodePose(this->sceneNode, this->pose);
-
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
     if (!iter->second)
@@ -668,7 +666,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
 
   if ((childNode = node->GetChild("light")))
   {
-    OgreCreator::CreateLight(childNode, body);
+    OgreCreator::CreateLight(childNode, body->GetVisualNode());
   }
 
 }

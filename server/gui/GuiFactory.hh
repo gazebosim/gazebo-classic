@@ -50,8 +50,11 @@ namespace gazebo
                 GuiFactoryFn factoryfn);
 
     /// \brief Create a new instance of a gui.  
-    public: static Gui *NewGui(const std::string &classname, int x, int y, int w, int h, const std::string &label);
+    public: static Gui *CreateGui(const std::string &classname, int x, int y, int w, int h, const std::string &label);
 
+    /// \brief Read from XML the correct gui configuration and create it
+    public: static Gui *NewGui(XMLConfigNode *rootNode);
+    
     /// \brief A list of registered  classes
     private: static std::map<std::string, GuiFactoryFn> guis;
   };

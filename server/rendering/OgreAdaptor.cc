@@ -68,7 +68,7 @@ OgreAdaptor::OgreAdaptor()
   this->camera=NULL;
   this->viewport=NULL;
   this->root=NULL;
-  this->renderSys = NULL;
+  this->type = "ogre";
 
 }
 
@@ -249,6 +249,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     }
   }
 
+  //Preload basic shapes that can be used anywhere
+  OgreCreator::LoadBasicShapes();
+
+
   /*
     Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1");
     Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node");
@@ -406,40 +410,43 @@ void OgreAdaptor::SetupResources()
 // Setup render system
 void OgreAdaptor::SetupRenderSystem(bool create)
 {
+
+  Ogre::RenderSystem *renderSys;
+
   // Set parameters of render system (window size, etc.)
   //if (!this->root->restoreConfig())
   {
     Ogre::RenderSystemList *rsList = this->root->getAvailableRenderers();
     int c = 0;
 
-    this->renderSys = NULL;
+    renderSys = NULL;
 
     do
     {
       if (c == (int)rsList->size())
         break;
 
-      this->renderSys = rsList->at(c);
+      renderSys = rsList->at(c);
       c++;
     }
-    while (this->renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
+    while (renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
 
-    if (this->renderSys == NULL)
+    if (renderSys == NULL)
     {
       gzthrow( "unable to find rendering system" );
     }
 
 
-    this->renderSys->setConfigOption("Full Screen","No");
-    this->renderSys->setConfigOption("FSAA","2");
+    renderSys->setConfigOption("Full Screen","No");
+    renderSys->setConfigOption("FSAA","2");
 
     // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy", can be set in the .gazeborc file
-    this->renderSys->setConfigOption("RTT Preferred Mode", Simulator::Instance()->GetGazeboConfig()->GetRTTMode());
+    renderSys->setConfigOption("RTT Preferred Mode", Simulator::Instance()->GetGazeboConfig()->GetRTTMode());
 
     if (create && this->videoMode != "None")
     {
-      this->renderSys->setConfigOption("Video Mode",this->videoMode);
-      this->root->setRenderSystem(this->renderSys);
+      renderSys->setConfigOption("Video Mode",this->videoMode);
+      this->root->setRenderSystem(renderSys);
     }
     else
     {
@@ -487,17 +494,18 @@ void OgreAdaptor::ResizeWindow(unsigned int w, unsigned int h)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Render
-int OgreAdaptor::Render()
+void OgreAdaptor::Render()
 {
   OgreHUD::Instance()->Update();
-
   this->root->renderOneFrame();
-
-  return 0;
 }
 
-double OgreAdaptor::GetUpdateRate() const
+float OgreAdaptor::GetAverageFPS() const
 {
-  return this->updateRate;
+  float lastFPS, avgFPS, bestFPS, worstFPS;
+//  float avgFPS;
+  this->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+  return avgFPS;
+
 }
 
