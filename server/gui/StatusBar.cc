@@ -29,7 +29,7 @@
 #include <FL/Fl_Output.H>
 
 #include "Simulator.hh"
-#include "RenderEngine.hh"
+#include "OgreAdaptor.hh"
 #include "StatusBar.hh"
 
 using namespace gazebo;

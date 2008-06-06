@@ -136,6 +136,8 @@ void Stereo_Camera::PutStereoData()
   stereo_data->farClip = this->myParent->GetFarClip();
   stereo_data->nearClip = this->myParent->GetNearClip();
 
+  stereo_data->hfov = this->myParent->GetFOV();
+
   //stereo_data->right_rgb_size = stereo_data->width * stereo_data->height * 3;
   //stereo_data->left_rgb_size = stereo_data->width * stereo_data->height * 3;
 

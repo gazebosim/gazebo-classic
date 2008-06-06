@@ -99,11 +99,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
 
   this->gravity = cnode->GetVector3("gravity",this->gravity);
   this->stepTime = cnode->GetDouble("stepTime",this->stepTime);
-  int maxUpdatesSecond = cnode->GetInt("updateRate",0);
-  if (maxUpdatesSecond == 0)
-    this->updateRate = 0.0;
-  else 
-    this->updateRate = 1.0/maxUpdatesSecond;
+  this->updateRate = cnode->GetDouble("maxUpdateRate", 0, 0);
   this->globalCFM = cnode->GetDouble("cfm",1e-5,0);
   this->globalERP = cnode->GetDouble("erp",0.2,0);
 }

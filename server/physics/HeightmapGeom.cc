@@ -33,7 +33,7 @@
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
 #include "Simulator.hh"
-#include "RenderEngine.hh"
+#include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "Body.hh"
 #include "HeightmapGeom.hh"
@@ -52,7 +52,7 @@ HeightmapGeom::HeightmapGeom(Body *body)
 // Destructor
 HeightmapGeom::~HeightmapGeom()
 {
-  OgreAdaptor *ogreAdaptor = (OgreAdaptor *) Simulator::Instance()->GetRenderEngine();
+  OgreAdaptor *ogreAdaptor = Simulator::Instance()->GetRenderEngine();
   ogreAdaptor->sceneMgr->destroyQuery(this->rayQuery);
 }
 
@@ -133,12 +133,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   int tileSize;
   OgreAdaptor *ogreAdaptor;
 
-  if (Simulator::Instance()->GetRenderEngine()->GetType() != "ogre")
-  {
-    gzthrow("Heighmaps are only supported by the Ogre renderer");
-  }
-  else
-    ogreAdaptor = (OgreAdaptor  *)(Simulator::Instance()->GetRenderEngine());
+  ogreAdaptor = Simulator::Instance()->GetRenderEngine();
 
   std::string imageFilename = node->GetString("image","",1);
   std::string worldTexture = node->GetString("worldTexture","",0);

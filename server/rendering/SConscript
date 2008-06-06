@@ -1,11 +1,19 @@
 #Import variable
 Import('env staticObjs sharedObjs headers')
 
-sources = Split('RenderEngine.cc OgreCreator.cc OgreAdaptor.cc OgreFrameListener.cc OgreDynamicRenderable.cc OgreDynamicLines.cc OgreSimpleShape.cc OgreHUD.cc MovableText.cc OgreVisual.cc')
+sources = ['OgreCreator.cc',
+           'OgreAdaptor.cc',
+           'OgreFrameListener.cc',
+           'OgreDynamicRenderable.cc',
+           'OgreDynamicLines.cc',
+           'OgreSimpleShape.cc',
+           'OgreHUD.cc',
+           'MovableText.cc',
+           'OgreVisual.cc'
+	  ] 
 
 headers.append( 
           ['#/server/rendering/MovableText.hh',
-           '#/server/rendering/RenderEngine.hh',
            '#/server/rendering/OgreAdaptor.hh',
            '#/server/rendering/OgreCreator.hh',
            '#/server/rendering/OgreDynamicLines.hh',

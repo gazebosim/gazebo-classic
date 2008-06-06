@@ -107,24 +107,35 @@ void Bandit_Actarray::UpdateChild(UpdateParams &params)
   for (unsigned int i=0; i<16; i++)
   {
     double cmdAngle = this->myIface->data->cmd_pos[i];
+    double cmdSpeed = this->myIface->data->cmd_speed[i];
+
     joint = dynamic_cast<HingeJoint*>(this->joints[i]);
 
-    if (cmdAngle > joint->GetHighStop())
+    if (this->myIface->data->joint_mode[i] == GAZEBO_ACTARRAY_JOINT_POSITION_MODE)
     {
-      cmdAngle = joint->GetHighStop();
-    }
-    else if (cmdAngle < joint->GetLowStop())
-    {
-      cmdAngle = joint->GetLowStop();
-    }
+      if (cmdAngle > joint->GetHighStop())
+      {
+        cmdAngle = joint->GetHighStop();
+      }
+      else if (cmdAngle < joint->GetLowStop())
+      {
+        cmdAngle = joint->GetLowStop();
+      }
 
-    angle = cmdAngle - joint->GetAngle();
+      angle = cmdAngle - joint->GetAngle();
 
-    if (fabs(angle) > 0.01)
+      if (fabs(angle) > 0.01)
+      {
+        joint->SetParam( dParamVel, this->gains[i] * angle);
+        joint->SetParam( dParamFMax, this->forces[i] );
+      }
+    }
+    else if (this->myIface->data->joint_mode[i] == GAZEBO_ACTARRAY_JOINT_SPEED_MODE)
     {
-      joint->SetParam( dParamVel, this->gains[i] * angle);
+      joint->SetParam( dParamVel, cmdSpeed );
       joint->SetParam( dParamFMax, this->forces[i] );
     }
+
 
     this->myIface->data->actuators[i].position = joint->GetAngle();
     this->myIface->data->actuators[i].speed = joint->GetAngleRate();

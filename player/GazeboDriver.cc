@@ -38,6 +38,7 @@
 #include "Position3dInterface.hh"
 #include "ActarrayInterface.hh"
 #include "PTZInterface.hh"
+#include "GripperInterface.hh"
 
 /*
 #include "PowerInterface.hh"
@@ -299,6 +300,11 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         ifsrc = new PTZInterface( playerAddr,  this, cf, section );
         break;
 
+      case PLAYER_GRIPPER_CODE:
+        if (!player_quiet_startup) printf(" a gripper interface.\n");
+        ifsrc = new GripperInterface( playerAddr,  this, cf, section );
+        break;
+
         /*      case PLAYER_POWER_CODE:
                 if (!player_quiet_startup) printf(" a power interface.\n");
                 ifsrc = new PowerInterface( playerAddr,  this, cf, section );
@@ -308,12 +314,6 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
                 if (!player_quiet_startup) printf(" a sonar interface.\n");
                 ifsrc = new SonarInterface( playerAddr,  this, cf, section );
                 break;
-
-              case PLAYER_GRIPPER_CODE:
-                if (!player_quiet_startup) printf(" a gripper interface.\n");
-                ifsrc = new GripperInterface( playerAddr,  this, cf, section );
-                break;
-
               case PLAYER_TRUTH_CODE:
                 if (!player_quiet_startup) printf(" a truth interface.\n");
                 ifsrc = new TruthInterface( playerAddr,  this, cf, section );

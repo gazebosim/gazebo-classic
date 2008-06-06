@@ -19,14 +19,15 @@
     <rpy>0.0 0.0 0.0</rpy>
 
     <geom:box name="camera_bottom_geom">
-      <xyz>0.0 0.0 0.00</xyz>
+      <xyz>0.0 0.0 0.02</xyz>
       <rpy>0 0 90</rpy>
       <size>0.15 0.14 0.04</size>
       <mass>0.01</mass>
 
       <visual>
+        <rpy>0 0 -90</rpy>
         <size>0.15 0.14 0.04</size>
-        <mesh>unit_box</mesh>
+        <mesh>sonyvid30_bottom.mesh</mesh>
         <material>Gazebo/Grey</material>
       </visual>
     </geom:box>
@@ -37,15 +38,16 @@
     <rpy>0.0 0.0 0.0</rpy>
 
     <geom:box name="camera_column_geom">
-      <xyz>0.0 0.0 0.00</xyz>
+      <xyz>0.02 0.00 0.0</xyz>
       <rpy>0 0 90</rpy>
-      <size>0.04 0.04</size>
+      <size>0.11 0.11</size>
       <mass>0.01</mass>
 
       <visual>
-        <size>0.04 0.04 0.04</size>
-        <mesh>unit_cylinder</mesh>
-        <material>Gazebo/White</material>
+        <rpy>0 0 -90</rpy>
+        <size>0.11 0.11 0.03</size>
+        <mesh>sonyvid30_mid.mesh</mesh>
+        <material>Gazebo/Black</material>
       </visual>
     </geom:box>
   </body:box>
@@ -56,26 +58,28 @@
     <rpy>0.0 0.0 0.0</rpy>
 
     <geom:box name="camera_top_geom">
-      <xyz>0.0 0.0 0.02</xyz>
       <rpy>0 0 90</rpy>
-      <size>0.12 0.12 0.05</size>
+      <size>0.12 0.119 0.03</size>
       <mass>0.01</mass>
 
       <visual>
-        <size>0.12 0.12 0.05</size>
-        <mesh>unit_box</mesh>
+        <xyz>0.0 0.06 -0.015</xyz>
+        <rpy>0 0 90</rpy>
+        <size>0.12 0.119 0.03</size>
+        <mesh>sonyvid30_top.mesh</mesh>
+        <!--<material>Gazebo/Grey</material>-->
         <material>Gazebo/Grey</material>
       </visual>
     </geom:box>
 
     <geom:cylinder name="camera_lens_geom">
-      <xyz>0.042 0.00 0.02</xyz>
+      <xyz>0.045 -0.002 -0.002</xyz>
       <rpy>0 90 0</rpy>
-      <size>0.04 0.04</size>
+      <size>0.01 0.04</size>
       <mass>0.01</mass>
 
       <visual>
-        <size>0.04 0.04 0.04</size>
+        <size>0.025 0.025 0.04</size>
         <mesh>unit_cylinder</mesh>
         <material>Gazebo/White</material>
       </visual>

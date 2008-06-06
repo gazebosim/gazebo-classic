@@ -23,6 +23,7 @@
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-5</cfm>
     <erp>0.8</erp>
+    <maxUpdateRate>0</maxUpdateRate>
   </physics:ode>
 
   <rendering:gui>
@@ -36,6 +37,7 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+    <maxUpdateRate>0</maxUpdateRate>
   </rendering:ogre>
 
    <!-- Ground Plane -->

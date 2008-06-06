@@ -43,7 +43,7 @@ namespace gazebo
   class XMLConfig;
   class XMLConfigNode;
   class GazeboConfig;
-  class RenderEngine;
+  class OgreAdaptor;
 
 /// \brief The World
 /*
@@ -83,7 +83,7 @@ namespace gazebo
     public: GazeboConfig *GetGazeboConfig() const;
 
     /// \brief Gets our current GUI interface
-    public: RenderEngine *GetRenderEngine() const;
+    public: OgreAdaptor *GetRenderEngine() const;
 
     /// \brief Returns the state of the simulation true if paused
     public: bool IsPaused() const;
@@ -150,7 +150,7 @@ namespace gazebo
     /// Pointer to the selected Gui 
     private: Gui *gui;
 
-    private: RenderEngine *renderEngine;
+    private: OgreAdaptor *renderEngine;
 /// Pointer to the selected Gui 
     private: GazeboConfig *gazeboConfig;
 

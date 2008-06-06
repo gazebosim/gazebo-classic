@@ -29,41 +29,54 @@
 
 #include "GazeboInterface.hh"
 
-// Forward declarations
-typedef struct gz_gripper gz_gripper_t;
-
-/// \brief Gripper interface
-class GripperInterface : public GazeboInterface
+namespace gazebo
 {
-  /// @brief Constructor
-  public: GripperInterface(player_devaddr_t addr, GazeboDriver *driver,
-                              ConfigFile *cf, int section);
+  /// \addtogroup player_iface 
+  /// \{
+  /// \defgroup gripper_player Gripper Interface
+  /// \brief Gripper Player interface
+  /// \{
+  
+  class GripperIface;
+  
+  /// \brief Gripper interface
+  class GripperInterface : public GazeboInterface
+  {
+    /// \brief Constructor
+    public: GripperInterface(player_devaddr_t addr, GazeboDriver *driver,
+                                ConfigFile *cf, int section);
+  
+    /// \brief Destructor
+    public: virtual ~GripperInterface();
+  
+    /// \brief Handle all messages. This is called from GazeboDriver
+    public: virtual int ProcessMessage(QueuePointer &respQueue,
+                                       player_msghdr_t *hdr, void *data);
+  
+    /// \brief Update this interface, publish new info.
+    public: virtual void Update();
+  
+    /// \brief Open a SHM interface when a subscription is received. \
+    ///        This is called fromGazeboDriver::Subscribe
+    public: virtual void Subscribe();
+  
+    /// \brief Close a SHM interface. This is called from \
+    ///        GazeboDriver::Unsubscribe
+    public: virtual void Unsubscribe();
+  
+    private: GripperIface *iface;
+  
+    /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
+    private: char *gz_id;
+  
+    /// \brief Timestamp on last data update
+    private: double datatime;
+  
+  };
+  
+  /// \} 
+  /// \} 
+  
+}
 
-  /// @brief Destructor
-  public: virtual ~GripperInterface();
-
-  /// @brief Handle all messages. This is called from GazeboDriver
-  public: virtual int ProcessMessage(QueuePointer &respQueue,
-                                     player_msghdr_t *hdr, void *data);
-
-  /// @brief Update this interface, publish new info.
-  public: virtual void Update();
-
-  /// @brief Open a SHM interface when a subscription is received. \
-  ///        This is called fromGazeboDriver::Subscribe
-  public: virtual void Subscribe();
-
-  /// @brief Close a SHM interface. This is called from \
-  ///        GazeboDriver::Unsubscribe
-  public: virtual void Unsubscribe();
-
-  private: gz_gripper_t *iface;
-
-  /// @brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
-  private: char *gz_id;
-
-  /// @brief Timestamp on last data update
-  private: double datatime;
-
-};
 #endif

@@ -140,14 +140,17 @@
 
   <!-- White Directional light -->
   <model:renderable name="directional_white">
+    <xyz>2.0 0 2.0</xyz>
     <light>
-      <type>directional</type>
-      <direction>0 -0.6 -0.4</direction>
-      <diffuseColor>1.0 1.0 1.0</diffuseColor>
-      <specularColor>0.2 0.2 0.2</specularColor>
-      <attenuation>1000 1.0 0.0 0</attenuation>
+      <type>spot</type>
+      <range>1000 1000 100</range>
+      <direction>-0.1 0 -0.9</direction>
+      <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      <specularColor>0.1 0.1 0.1</specularColor>
+      <attenuation>10 1.0 0.0 0</attenuation>
     </light>
   </model:renderable>
+ 
 
 
 </gazebo:world>

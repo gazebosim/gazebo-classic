@@ -140,7 +140,7 @@ void OgreVisual::Load(XMLConfigNode *node)
 
 
   // Set the material of the mesh
-  this->SetMaterial(node->GetString("material",std::string(),1));
+  this->SetMaterial(node->GetString("material",std::string(),0));
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(node->GetBool("castShadows",true,0));

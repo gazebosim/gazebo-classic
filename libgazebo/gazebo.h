@@ -1348,6 +1348,9 @@ class StereoCameraData
   /// Near clip distance in meters
   public: float nearClip;
 
+  /// Horizontal field of view of the camera in radians
+  public: double hfov;
+
   /// Left image size
   public: unsigned int left_rgb_size;
 
@@ -1371,6 +1374,7 @@ class StereoCameraData
 
   /// Right disparity (float)
   public: float right_disparity[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
+
 }; 
 
 

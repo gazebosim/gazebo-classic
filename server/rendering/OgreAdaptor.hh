@@ -31,7 +31,6 @@
 #include <X11/Xutil.h>
 
 #include "SingletonT.hh"
-#include "RenderEngine.hh"
 
 namespace Ogre
 {
@@ -64,7 +63,7 @@ class OgreFrameListener;
 class Entity;
 
 /// \brief Adptor to Ogre3d
-class OgreAdaptor : RenderEngine, public SingletonT<OgreAdaptor>
+class OgreAdaptor : public SingletonT<OgreAdaptor>
 {
 
   /// \brief Constructor
@@ -91,7 +90,11 @@ class OgreAdaptor : RenderEngine, public SingletonT<OgreAdaptor>
   /// \brief Resize the rendering window
   public: void ResizeWindow(unsigned int w, unsigned int h);
 
+  /// \brief Get the average frame rate
   public: float GetAverageFPS() const;
+
+  /// \brief Get the desired update rate
+  public: double GetUpdateRate();
 
   private: void LoadPlugins();
   private: void SetupResources();
@@ -137,7 +140,9 @@ class OgreAdaptor : RenderEngine, public SingletonT<OgreAdaptor>
   //private: Vector3 terrainSize;
   //private: unsigned int terrainVertSize;
   //private: std::string terrainImage;
-  
+
+  private: double updateRate;
+
   private: friend class DestroyerT<OgreAdaptor>;
   private: friend class SingletonT<OgreAdaptor>;
 

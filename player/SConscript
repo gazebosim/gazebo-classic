@@ -14,12 +14,13 @@ sources = ['GazeboDriver.cc',
            'CameraInterface.cc',
            'FiducialInterface.cc',
            'PTZInterface.cc',
-           'ActarrayInterface.cc'
+           'ActarrayInterface.cc',
+           'GripperInterface.cc' 
            ]
 
-# Position3dInterface.cc PowerInterface.cc SonarInterface.cc   GripperInterface.cc GpsInterface.cc ')
+# Position3dInterface.cc PowerInterface.cc SonarInterface.ccGpsInterface.cc ')
 
-playerEnv = env.Copy()
+playerEnv = env.Clone()
 
 for cfg in parseConfigs:
   print "Checking for ["+cfg+"]"

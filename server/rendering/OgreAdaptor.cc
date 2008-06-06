@@ -68,8 +68,8 @@ OgreAdaptor::OgreAdaptor()
   this->camera=NULL;
   this->viewport=NULL;
   this->root=NULL;
-  this->type = "ogre";
 
+  this->updateRate = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,12 +124,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   {
     gzthrow( "missing OGRE Rendering information" );
   }
- 
-  int maxFPS = node->GetInt("updateRate", -3);
-  if (maxFPS == 0)
-    this->updateRate=0;
-  else
-    this->updateRate = 1.0/maxFPS;
+
+  this->updateRate = node->GetDouble("maxUpdateRate",0,0);
 
   ambient.r = node->GetTupleDouble("ambient",0,1.0);
   ambient.g = node->GetTupleDouble("ambient",1,1.0);
@@ -500,6 +496,7 @@ void OgreAdaptor::Render()
   this->root->renderOneFrame();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 float OgreAdaptor::GetAverageFPS() const
 {
   float lastFPS, avgFPS, bestFPS, worstFPS;
@@ -509,3 +506,9 @@ float OgreAdaptor::GetAverageFPS() const
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the desired update rate
+double OgreAdaptor::GetUpdateRate()
+{
+  return this->updateRate;
+}

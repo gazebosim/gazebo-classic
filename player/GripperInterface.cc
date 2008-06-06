@@ -34,11 +34,14 @@
 - PLAYER_GRIPPER_REQ_GET_GEOM
 */
 
+#include <iostream>
 #include <math.h>
 
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "GripperInterface.hh"
+
+using namespace gazebo;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -53,7 +56,7 @@ GripperInterface::GripperInterface(player_devaddr_t addr,
   strcat(this->gz_id, cf->ReadString(section, "gz_id", ""));
 
   // Allocate a Position Interface
-  this->iface = gz_gripper_alloc();
+  this->iface = new GripperIface();
 
   this->datatime = -1;
 }
@@ -63,7 +66,7 @@ GripperInterface::GripperInterface(player_devaddr_t addr,
 GripperInterface::~GripperInterface()
 {
   // Release this interface
-  gz_gripper_free(this->iface);
+  delete this->iface;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,87 +75,80 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
                                      player_msghdr_t *hdr, void *data)
 {
 
-//   This code works with Player CVS
+  if (this->iface->Lock(1))
+  {
+
+    //   This code works with Player CVS
 #ifdef PLAYER_GRIPPER_CMD_OPEN
-  if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                            PLAYER_GRIPPER_CMD_OPEN, this->device_addr))
-  {
-    gz_gripper_lock(this->iface, 1);
-    this->iface->data->cmd = GAZEBO_GRIPPER_CMD_OPEN;
-    gz_gripper_unlock(this->iface);
+    if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+          PLAYER_GRIPPER_CMD_OPEN, this->device_addr))
+    {
+      this->iface->data->cmd = GAZEBO_GRIPPER_CMD_OPEN;
+      return 0;
+    }
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+          PLAYER_GRIPPER_CMD_CLOSE, this->device_addr))
+    {
+      this->iface->data->cmd = GAZEBO_GRIPPER_CMD_CLOSE;
+      return 0;
+    }
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+          PLAYER_GRIPPER_CMD_STOP, this->device_addr))
+    {
+      this->iface->data->cmd = GAZEBO_GRIPPER_CMD_STOP;
+      return 0;
+    }
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+          PLAYER_GRIPPER_CMD_STORE, this->device_addr))
+    {
+      this->iface->data->cmd = GAZEBO_GRIPPER_CMD_STORE;
+      return 0;
+    }
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+          PLAYER_GRIPPER_CMD_RETRIEVE, this->device_addr))
+    {
+      this->iface->data->cmd = GAZEBO_GRIPPER_CMD_RETRIEVE;
+      return 0;
+    }
+    // is it a geometry request?
+    else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+          PLAYER_GRIPPER_REQ_GET_GEOM,
+          this->device_addr))
+    {
+      // TODO: implement me
 
-    return 0;
-  }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_GRIPPER_CMD_CLOSE, this->device_addr))
-  {
-    gz_gripper_lock(this->iface, 1);
-    this->iface->data->cmd = GAZEBO_GRIPPER_CMD_CLOSE;
-    gz_gripper_unlock(this->iface);
+      player_gripper_geom_t pgeom;
 
-    return 0;
-  }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_GRIPPER_CMD_STOP, this->device_addr))
-  {
-    gz_gripper_lock(this->iface, 1);
-    this->iface->data->cmd = GAZEBO_GRIPPER_CMD_STOP;
-    gz_gripper_unlock(this->iface);
+      pgeom.pose.px = 0;
+      pgeom.pose.py = 0;
+      pgeom.pose.pz = 0;
+      pgeom.pose.proll = 0;
+      pgeom.pose.ppitch = 0;
+      pgeom.pose.pyaw = 0;
 
-    return 0;
-  }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_GRIPPER_CMD_STORE, this->device_addr))
-  {
-    gz_gripper_lock(this->iface, 1);
-    this->iface->data->cmd = GAZEBO_GRIPPER_CMD_STORE;
-    gz_gripper_unlock(this->iface);
+      pgeom.outer_size.sw = 0;
+      pgeom.outer_size.sl = 0;
+      pgeom.outer_size.sh = 0;
 
-    return 0;
-  }
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
-                                 PLAYER_GRIPPER_CMD_RETRIEVE, this->device_addr))
-  {
-    gz_gripper_lock(this->iface, 1);
-    this->iface->data->cmd = GAZEBO_GRIPPER_CMD_RETRIEVE;
-    gz_gripper_unlock(this->iface);
+      pgeom.inner_size.sw = 0;
+      pgeom.inner_size.sl = 0;
+      pgeom.inner_size.sh = 0;
 
-    return 0;
-  }
-  // is it a geometry request?
-  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_GRIPPER_REQ_GET_GEOM,
-                                 this->device_addr))
-  {
-    // TODO: implement me
+      pgeom.num_beams = 2;
 
-    player_gripper_geom_t pgeom;
+      this->driver->Publish(this->device_addr, respQueue,
+          PLAYER_MSGTYPE_RESP_ACK,
+          PLAYER_GRIPPER_REQ_GET_GEOM,
+          (void*)&pgeom, sizeof(pgeom), NULL);
 
-    pgeom.pose.px = 0;
-    pgeom.pose.py = 0;
-    pgeom.pose.pz = 0;
-    pgeom.pose.proll = 0;
-    pgeom.pose.ppitch = 0;
-    pgeom.pose.pyaw = 0;
-
-    pgeom.outer_size.sw = 0;
-    pgeom.outer_size.sl = 0;
-    pgeom.outer_size.sh = 0;
-
-    pgeom.inner_size.sw = 0;
-    pgeom.inner_size.sl = 0;
-    pgeom.inner_size.sh = 0;
-
-    pgeom.num_beams = 2;
-
-    this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK,
-                          PLAYER_GRIPPER_REQ_GET_GEOM,
-                          (void*)&pgeom, sizeof(pgeom), NULL);
-
-    return 0;
-  }
+      return 0;
+    }
 #endif
+
+    this->iface->Unlock();
+  }
+  else
+    this->Unsubscribe();
 
   return -1;
 }
@@ -165,15 +161,15 @@ void GripperInterface::Update()
   player_gripper_data_t data;
   struct timeval ts;
 
-  gz_gripper_lock(this->iface, 1);
+  this->iface->Lock(1);
 
   // Only Update when new data is present
-  if (this->iface->data->time > this->datatime)
+  if (this->iface->data->head.time > this->datatime)
   {
-    this->datatime = this->iface->data->time;
+    this->datatime = this->iface->data->head.time;
 
-    ts.tv_sec = (int) (this->iface->data->time);
-    ts.tv_usec = (int) (fmod(this->iface->data->time, 1) * 1e6);
+    ts.tv_sec = (int) (this->iface->data->head.time);
+    ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
     memset(&data, 0, sizeof(data));
 
@@ -200,13 +196,13 @@ void GripperInterface::Update()
       data.state = PLAYER_GRIPPER_STATE_ERROR;
 #endif
 
-    this->driver->Publish( this->device_addr, NULL,
+    this->driver->Publish( this->device_addr,
                            PLAYER_MSGTYPE_DATA,
                            PLAYER_GRIPPER_DATA_STATE,
                            (void*)&data, sizeof(data), &this->datatime );
   }
 
-  gz_gripper_unlock(this->iface);
+  this->iface->Unlock();
 }
 
 
@@ -215,10 +211,15 @@ void GripperInterface::Update()
 // GazeboDriver::Subscribe
 void GripperInterface::Subscribe()
 {
-  // Open the interface
-  if (gz_gripper_open(this->iface, GazeboClient::client, this->gz_id) != 0)
+  try
   {
-    printf("Error Subscribing to Gazebo Position Interface\n");
+    this->iface->Open( GazeboClient::client, this->gz_id);
+  }
+  catch (std::string e)
+  {
+    std::cerr << "Error subscribing to Gazebo Gripper Interface\n"
+      << e << "\n";
+    exit(0);
   }
 }
 
@@ -226,5 +227,5 @@ void GripperInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void GripperInterface::Unsubscribe()
 {
-  gz_gripper_close(this->iface);
+  this->iface->Close();
 }

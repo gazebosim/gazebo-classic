@@ -186,8 +186,16 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
   Ogre::Viewport *vp = NULL;
   Ogre::SceneManager *sceneMgr = adapt->sceneMgr;
   Ogre::Pass *pass;
-  Ogre::SceneNode *gridNode = sceneMgr->getSceneNode("__OGRE_GRID_NODE__");
+  Ogre::SceneNode *gridNode = NULL;
   int i;
+
+  try
+  {
+    gridNode = sceneMgr->getSceneNode("__OGRE_GRID_NODE__");
+  }
+  catch (...)
+  {
+  }
 
   CameraSensor::UpdateChild(params);
 

@@ -39,11 +39,12 @@
 #include "gazebo.h"
 #include "PhysicsEngine.hh"
 #include "OgreAdaptor.hh"
-#include "RenderEngine.hh"
 #include "GazeboMessage.hh"
 #include "Global.hh"
 
 #include "Simulator.hh"
+
+#define MAX_FRAME_RATE 35
 
 using namespace gazebo;
 
@@ -146,7 +147,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   try
   {
     OgreAdaptor::Instance()->Init(rootNode);
-    this->renderEngine = (RenderEngine *) OgreAdaptor::Instance();
+    this->renderEngine = OgreAdaptor::Instance();
     //this->renderEngine->Init();
   }
   catch (gazebo::GazeboError e)
@@ -204,23 +205,29 @@ void Simulator::Fini( )
 {
   gazebo::World::Instance()->Fini();
 }
-/*
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
 {
-  double step= World::Instance()->GetPhysicsEngine()->GetStepTime();
+  double step = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  double physicsUpdateRate = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
+  double renderUpdateRate = OgreAdaptor::Instance()->GetUpdateRate();
+
   double currTime;
   double elapsedTime;
 
   this->prevPhysicsTime = this->GetRealTime();
   this->prevRenderTime = this->GetRealTime();
+ 
+ printf("Period Physics[%f] Render[%f]\n",  physicsUpdateRate, renderUpdateRate);
 
   while (!this->userQuit)
   {
     currTime = this->GetRealTime();
 
-    if ((currTime - this->prevPhysicsTime) >= step) 
+    if (physicsUpdateRate == 0 || 
+        currTime - this->prevPhysicsTime >= 1.0/physicsUpdateRate) 
     {
       this->simTime += step;
 
@@ -238,13 +245,14 @@ void Simulator::MainLoop()
         this->pause=true;
       }
 
-      World::Instance()->Update(); //physics
+      World::Instance()->Update();
 
       this->prevPhysicsTime = this->GetRealTime();
     }
 
     // Update the rendering
-    if (currTime - this->prevRenderTime > 0.02)
+    if (renderUpdateRate == 0 || 
+        currTime - this->prevRenderTime >= 1.0/renderUpdateRate)
     {
       this->GetRenderEngine()->Render(); 
       this->prevRenderTime = this->GetRealTime();
@@ -253,106 +261,13 @@ void Simulator::MainLoop()
     // Update the gui
     this->gui->Update();
 
-    elapsedTime = (this->GetRealTime()-currTime)*2.0;
+    elapsedTime = (this->GetRealTime() - currTime);
 
     // Wait if we're going too fast
-    if ( elapsedTime < 0.02 )
+    if ( elapsedTime < 1.0/MAX_FRAME_RATE )
     {
-      usleep( (0.02 - elapsedTime) * 1e6  );
-    }
-  }
-}
-*/
-////////////////////////////////////////////////////////////////////////////////
-/// Main simulation loop, when this loop ends the simulation finish
-void Simulator::MainLoop()
-{
-  double maxPhysicsUpdateTime = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
-  double maxRenderUpdateTime = this->GetRenderEngine()->GetUpdateRate();
-  double step = World::Instance()->GetPhysicsEngine()->GetStepTime();
- 
-  if (maxPhysicsUpdateTime == 0)
-    gzmsg(2) << "updating the physics at full speed";
-  else if (maxPhysicsUpdateTime > 0)
-    gzmsg(2) << "updating the physics " << 1/maxPhysicsUpdateTime << " times per second";  
-  else
-   gzmsg(2) << "updating the physics after " << -1/maxPhysicsUpdateTime << " visualization updates";  
-
-  if (maxRenderUpdateTime == 0)
-    gzmsg(2) << "updating the visualization at full speed";
-  else if (maxRenderUpdateTime > 0)
-    gzmsg(2) << "updating the visualization " << 1/maxRenderUpdateTime << " times per second";  
-  else
-   gzmsg(2) << "updating the visualization after " << -1/maxRenderUpdateTime << " physics updates" << std::endl;  
-  std::cout.flush();
-
-  while (!this->userQuit)
-  {    
-    bool updated=false;
-     
-    //During 3 seconds we want to keep balance between how time pass and update limits
-    //this is a time slot. We don't want to make this too big so we keep changing behaviour
-    // in new circunstances, nor too small so we have a good measure.
-    if ((this->checkpoint + 3 )< this->GetRealTime())
-    {
-      this->checkpoint = this->GetRealTime();
-      this->physicsUpdates = 0;
-      this->renderUpdates = 0; 
-    }
-
-    // Update the physics engine
-    // If  maxPhysicsUpdateTime is positive, we will update when our time has come
-      // maxPhysicsUpdateTime * physicsUpdates means how much we have _advanced_ in this time slot so far.
-      // getRealTime - ckeckpoint means our _current point_ in the slot, we only update if our current point has 
-      // surpassed what we have already advanced.
-   // If maxPhysicsUpdateTime is negative, we update if we are below the times rendering was updated * the multiplier of the userPause
-   // note that the multiplier defined in the file is inverted when read so for instance -2 will become -0.5
-    if (((maxPhysicsUpdateTime >= 0) && ((this->GetRealTime() - this->checkpoint) > (maxPhysicsUpdateTime * this->physicsUpdates))) || \
-        ((maxPhysicsUpdateTime < 0) && (this->physicsUpdates < (-maxPhysicsUpdateTime * this->renderUpdates)))) 
-    {
-
-      if ((!this->GetUserPause() && !this->GetUserStep()) ||
-          (this->GetUserStep() && this->GetUserStepInc()))
-      {
-        this->simTime += step;
-        ++this->iterations;
-        this->pause=false;
-        this->SetUserStepInc(!this->GetUserStepInc());
-      }
-      else
-      {
-        this->pauseTime += step;
-        this->pause=true;
-      }
-
-      World::Instance()->Update(); //physics
-
-      ++this->physicsUpdates;
-      updated=true;
-    }
-      
-    // Update the rendering and gui
-    if (((maxRenderUpdateTime >= 0) && ((this->GetRealTime() - this->checkpoint) > (maxRenderUpdateTime * this->renderUpdates))) || \
-        ((maxRenderUpdateTime < 0) && (this->renderUpdates < (-maxRenderUpdateTime * this->physicsUpdates))))
-    {
-      this->GetRenderEngine()->Render(); 
-      this->gui->Update();
-      ++this->renderUpdates;
-      updated=true;
-    }
-
-    if (!updated)
-    {
-      double nextUpdate;
-      nextUpdate=MIN(this->renderUpdates * maxRenderUpdateTime, this->renderUpdates * maxPhysicsUpdateTime);
-      double realStep = this->checkpoint + nextUpdate - this->GetRealTime();
-      if (realStep > 0)
-      {
-        struct timespec waiting;
-        waiting.tv_sec=0;
-        waiting.tv_nsec=static_cast<long int>(realStep *1000000000); //nanoseconds to seconds
-        nanosleep(&waiting,0);
-      }
+      //printf("Too fast Elapsed Time[%f] [%f]\n",elapsedTime, (int)((1.0/MAX_FRAME_RATE - elapsedTime) * 1e6));
+      usleep( (int)((1.0/MAX_FRAME_RATE - elapsedTime) * 1e6)  );
     }
   }
 }
@@ -371,7 +286,7 @@ GazeboConfig *Simulator::GetGazeboConfig() const
   return this->gazeboConfig;
 }
 
-RenderEngine *Simulator::GetRenderEngine() const
+OgreAdaptor *Simulator::GetRenderEngine() const
 {
   return this->renderEngine;
 }
@@ -390,21 +305,6 @@ unsigned long Simulator::GetIterations() const
 {
   return this->iterations;
 }
-
-/*
-   These methods are needeD?
-////////////////////////////////////////////////////////////////////////////////
-void Global::SetIterations(unsigned long count)
-{
-iterations = count;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Global::IncIterations()
-{
-iterations++;
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the simulation time

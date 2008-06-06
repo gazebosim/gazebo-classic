@@ -160,7 +160,7 @@ void Differential_Position2d::UpdateChild(UpdateParams &params)
   this->odomVel[1] = 0.0;
   this->odomVel[2] = da / params.stepTime;
 
-  if (this->enableMotors)
+  //if (this->enableMotors)
   {
     this->joints[LEFT]->SetParam( dParamVel,
                                   this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
@@ -171,14 +171,14 @@ void Differential_Position2d::UpdateChild(UpdateParams &params)
     this->joints[RIGHT]->SetParam( dParamFMax, torque );
 
   }
-  else
+  /*else
   {
     this->joints[LEFT]->SetParam( dParamVel, 0 );
     this->joints[RIGHT]->SetParam( dParamVel, 0 );
 
     this->joints[LEFT]->SetParam( dParamFMax, 0 );
     this->joints[RIGHT]->SetParam( dParamFMax, 0 );
-  }
+  }*/
 
   this->PutPositionData();
 }
@@ -204,8 +204,8 @@ void Differential_Position2d::GetPositionCmd()
 
     this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
 
-    this->wheelSpeed[LEFT] = vr + va * this->wheelSep / 2;
-    this->wheelSpeed[RIGHT] = vr - va * this->wheelSep / 2;
+    this->wheelSpeed[LEFT] = vr - va * this->wheelSep / 2;
+    this->wheelSpeed[RIGHT] = vr + va * this->wheelSep / 2;
 
     this->myIface->Unlock();
   }
