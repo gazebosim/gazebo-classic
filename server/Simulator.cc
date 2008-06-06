@@ -220,8 +220,6 @@ void Simulator::MainLoop()
   this->prevPhysicsTime = this->GetRealTime();
   this->prevRenderTime = this->GetRealTime();
  
- printf("Period Physics[%f] Render[%f]\n",  physicsUpdateRate, renderUpdateRate);
-
   while (!this->userQuit)
   {
     currTime = this->GetRealTime();
@@ -266,7 +264,6 @@ void Simulator::MainLoop()
     // Wait if we're going too fast
     if ( elapsedTime < 1.0/MAX_FRAME_RATE )
     {
-      //printf("Too fast Elapsed Time[%f] [%f]\n",elapsedTime, (int)((1.0/MAX_FRAME_RATE - elapsedTime) * 1e6));
       usleep( (int)((1.0/MAX_FRAME_RATE - elapsedTime) * 1e6)  );
     }
   }
