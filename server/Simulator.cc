@@ -213,6 +213,8 @@ void Simulator::MainLoop()
   double step = World::Instance()->GetPhysicsEngine()->GetStepTime();
   double physicsUpdateRate = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
   double renderUpdateRate = OgreAdaptor::Instance()->GetUpdateRate();
+  double physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+  double renderUpdatePeriod = 1.0 / renderUpdateRate;
 
   double currTime;
   double elapsedTime;
@@ -225,7 +227,7 @@ void Simulator::MainLoop()
     currTime = this->GetRealTime();
 
     if (physicsUpdateRate == 0 || 
-        currTime - this->prevPhysicsTime >= 1.0/physicsUpdateRate) 
+        currTime - this->prevPhysicsTime >= physicsUpdatePeriod) 
     {
       this->simTime += step;
 
@@ -250,7 +252,7 @@ void Simulator::MainLoop()
 
     // Update the rendering
     if (renderUpdateRate == 0 || 
-        currTime - this->prevRenderTime >= 1.0/renderUpdateRate)
+        currTime - this->prevRenderTime >= renderUpdatePeriod)
     {
       this->GetRenderEngine()->Render(); 
       this->prevRenderTime = this->GetRealTime();
