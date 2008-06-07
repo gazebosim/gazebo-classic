@@ -56,6 +56,33 @@
       </visual>
     </geom:sphere>
 
+    <sensor:camera name="bandit_left_camera_sensor">
+      <imageSize>640 480</imageSize>
+      <hfov>60</hfov>
+      <nearClip>0.1</nearClip>
+      <farClip>100</farClip>
+      <saveFrames>false</saveFrames>
+      <saveFramePath>frames</saveFramePath>
+
+      <controller:generic_camera name="bandit_left_eye_controller">
+        <interface:camera name="bandit_left_eye_iface"/>
+      </controller:generic_camera>
+    </sensor:camera>
+
+    <sensor:camera name="bandit_right_camera_sensor">
+      <imageSize>640 480</imageSize>
+      <hfov>60</hfov>
+      <nearClip>0.1</nearClip>
+      <farClip>100</farClip>
+      <saveFrames>false</saveFrames>
+      <saveFramePath>frames</saveFramePath>
+
+      <controller:generic_camera name="bandit_right_eye_controller">
+        <interface:camera name="bandit_right_eye_iface"/>
+      </controller:generic_camera>
+    </sensor:camera>
+
+
   </body:box>
 
   <body:box name="neck_body">
