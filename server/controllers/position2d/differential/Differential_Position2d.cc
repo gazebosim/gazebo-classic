@@ -204,8 +204,8 @@ void Differential_Position2d::GetPositionCmd()
 
     this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
 
-    this->wheelSpeed[LEFT] = vr - va * this->wheelSep / 2;
-    this->wheelSpeed[RIGHT] = vr + va * this->wheelSep / 2;
+    this->wheelSpeed[LEFT] = vr + va * this->wheelSep / 2;
+    this->wheelSpeed[RIGHT] = vr - va * this->wheelSep / 2;
 
     this->myIface->Unlock();
   }
