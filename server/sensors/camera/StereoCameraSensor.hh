@@ -44,101 +44,101 @@ namespace Ogre
 
 namespace gazebo
 {
-/// \addtogroup gazebo_sensor
-/// \brief Stereo camera sensor
-/// \{
-/// \defgroup gazebo_stereo_camera Stereo Camera
-/// \brief Stereo camera sensor
-// \{
-
-
-/// \brief Stereo camera sensor
-///
-/// This sensor is used for simulating a stereo camera.
-class StereoCameraSensor : public CameraSensor
-{
-
-  enum Sides {LEFT, RIGHT, D_LEFT, D_RIGHT};
-
-  /// \brief Constructor
-  public: StereoCameraSensor(Body *body);
-
-  /// \brief Destructor
-  public: virtual ~StereoCameraSensor();
-
-  /// \brief Load the camera using parameter from an XMLConfig node
-  /// \param node The XMLConfig node
-  protected: virtual void LoadChild( XMLConfigNode *node );
-
-  /// \brief Initialize the camera
-  protected: virtual void InitChild();
-
-  /// \brief Update the sensor information
-  protected: virtual void UpdateChild(UpdateParams &params);
-
-  /// Finalize the camera
-  protected: virtual void FiniChild();
-
-  /// \brief Return the material the camera renders to
-  public: virtual std::string GetMaterialName() const;
-
-  /// \brief Get a pointer to the image data
-  /// \param i 0=left, 1=right
-  public: virtual const unsigned char *GetImageData(unsigned int i=0);
-
-  /// \brief Get a point to the disparity data
-  /// \param i 0=left, 1=right
-  public: const float *GetDisparityData(unsigned int i=0);
-
-  /// \brief Get the baselien of the camera
-  public: double GetBaseline() const;
-
-  // Save the camera frame
-  protected: virtual void SaveFrame();
-
-  /// \brief Fill all the image buffers
-  private: void FillBuffers();
-
-  private: Ogre::TexturePtr CreateRTT( const std::string &name, bool depth);
-
-  //private: void UpdateAllDependentRenderTargets();
-
-  private: Ogre::TexturePtr renderTexture[4];
-  private: Ogre::RenderTarget *renderTarget[4];
-  private: Ogre::MaterialPtr depthMaterial;
-
-  private: std::string textureName[4];
-  private: std::string materialName[4];
-
-  private: unsigned int depthBufferSize;
-  private: unsigned int rgbBufferSize;
-  private: float *depthBuffer[2];
-  private: unsigned char *rgbBuffer[2];
-  private: double baseline;
-
-  private: Ogre::Camera *depthCamera;
-
-  /*private: 
-           class StereoCameraListener : public Ogre::RenderTargetListener
-           {
-             public: StereoCameraListener() : Ogre::RenderTargetListener() {}
-
-             public: void Init(StereoCameraSensor *sensor, Ogre::RenderTarget *target, bool isLeft);
-             public: void preViewportUpdate(const Ogre::RenderTargetViewportEvent &evt);
-             public: void postViewportUpdate(const Ogre::RenderTargetViewportEvent &evt);
-
-             private: Ogre::Vector3 pos;
-             private: StereoCameraSensor *sensor;
-             private: Ogre::Camera *camera;
-             private: Ogre::RenderTarget *renderTarget;
-             private: bool isLeftCamera;
-           };
-
-
-  private: StereoCameraListener leftCameraListener;
-  private: StereoCameraListener rightCameraListener;
-  */
-};
+  /// \addtogroup gazebo_sensor
+  /// \brief Stereo camera sensor
+  /// \{
+  /// \defgroup gazebo_stereo_camera Stereo Camera
+  /// \brief Stereo camera sensor
+  // \{
+  
+  
+  /// \brief Stereo camera sensor
+  ///
+  /// This sensor is used for simulating a stereo camera.
+  class StereoCameraSensor : public CameraSensor
+  {
+  
+    enum Sides {LEFT, RIGHT, D_LEFT, D_RIGHT};
+  
+    /// \brief Constructor
+    public: StereoCameraSensor(Body *body);
+  
+    /// \brief Destructor
+    public: virtual ~StereoCameraSensor();
+  
+    /// \brief Load the camera using parameter from an XMLConfig node
+    /// \param node The XMLConfig node
+    protected: virtual void LoadChild( XMLConfigNode *node );
+  
+    /// \brief Initialize the camera
+    protected: virtual void InitChild();
+  
+    /// \brief Update the sensor information
+    protected: virtual void UpdateChild(UpdateParams &params);
+  
+    /// Finalize the camera
+    protected: virtual void FiniChild();
+  
+    /// \brief Return the material the camera renders to
+    public: virtual std::string GetMaterialName() const;
+  
+    /// \brief Get a pointer to the image data
+    /// \param i 0=left, 1=right
+    public: virtual const unsigned char *GetImageData(unsigned int i=0);
+  
+    /// \brief Get a point to the disparity data
+    /// \param i 0=left, 1=right
+    public: const float *GetDisparityData(unsigned int i=0);
+  
+    /// \brief Get the baselien of the camera
+    public: double GetBaseline() const;
+  
+    // Save the camera frame
+    protected: virtual void SaveFrame();
+  
+    /// \brief Fill all the image buffers
+    private: void FillBuffers();
+  
+    private: Ogre::TexturePtr CreateRTT( const std::string &name, bool depth);
+  
+    //private: void UpdateAllDependentRenderTargets();
+  
+    private: Ogre::TexturePtr renderTexture[4];
+    private: Ogre::RenderTarget *renderTarget[4];
+    private: Ogre::MaterialPtr depthMaterial;
+  
+    private: std::string textureName[4];
+    private: std::string materialName[4];
+  
+    private: unsigned int depthBufferSize;
+    private: unsigned int rgbBufferSize;
+    private: float *depthBuffer[2];
+    private: unsigned char *rgbBuffer[2];
+    private: double baseline;
+  
+    private: Ogre::Camera *depthCamera;
+  
+    /*private: 
+             class StereoCameraListener : public Ogre::RenderTargetListener
+             {
+               public: StereoCameraListener() : Ogre::RenderTargetListener() {}
+  
+               public: void Init(StereoCameraSensor *sensor, Ogre::RenderTarget *target, bool isLeft);
+               public: void preViewportUpdate(const Ogre::RenderTargetViewportEvent &evt);
+               public: void postViewportUpdate(const Ogre::RenderTargetViewportEvent &evt);
+  
+               private: Ogre::Vector3 pos;
+               private: StereoCameraSensor *sensor;
+               private: Ogre::Camera *camera;
+               private: Ogre::RenderTarget *renderTarget;
+               private: bool isLeftCamera;
+             };
+  
+  
+    private: StereoCameraListener leftCameraListener;
+    private: StereoCameraListener rightCameraListener;
+    */
+  };
 
 /// \}
 /// \}

@@ -42,7 +42,7 @@
 #include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
 
-#define PF_FLOAT Ogre::PF_FLOAT16_R
+#define PF_FLOAT Ogre::PF_FLOAT32_R
 
 using namespace gazebo;
 
@@ -195,6 +195,7 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
   }
   catch (...)
   {
+    gridNode = NULL;
   }
 
   CameraSensor::UpdateChild(params);
@@ -330,7 +331,7 @@ void StereoCameraSensor::FillBuffers()
     {
       hardwareBuffer->blitToMemory (Ogre::Box(left,top,right,bottom),
           Ogre::PixelBox( this->imageWidth, this->imageHeight,
-            1, Ogre::PF_FLOAT32_R, this->depthBuffer[i-2])
+            1, PF_FLOAT, this->depthBuffer[i-2])
           );
     }
 
@@ -361,9 +362,9 @@ void StereoCameraSensor::SaveFrame()
   {
     for (unsigned int j =0; j<this->imageWidth; j++)
     {
-      float f = this->depthBuffer[0][i*this->imageWidth+j];
-      
-      unsigned char value =  static_cast<unsigned char>((double)f * 255);
+      double f = this->depthBuffer[0][i*this->imageWidth+j];
+     
+      unsigned char value = static_cast<unsigned char>(f * 255);
       fwrite( &value, 1, 1, fp );
       fwrite( &value, 1, 1, fp );
       fwrite( &value, 1, 1, fp );
@@ -505,7 +506,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
   Ogre::PixelFormat pf;
 
   if (depth)
-    pf = Ogre::PF_FLOAT16_R;
+    pf = PF_FLOAT;
   else
     pf = Ogre::PF_R8G8B8;
 
