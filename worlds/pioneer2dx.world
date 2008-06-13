@@ -26,12 +26,11 @@
     <maxUpdateRate>0</maxUpdateRate>
   </physics:ode>
 
-  <!--<rendering:gui>
+  <rendering:gui>
     <type>fltk</type>
     <size>640 480</size>
     <pos>0 0</pos>
   </rendering:gui>
-  -->
 
   <rendering:ogre>
     <ambient>0.5 0.5 0.5 1.0</ambient>
