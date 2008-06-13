@@ -25,7 +25,7 @@
  */
 
 #include "CameraSensor.hh"
-#include <X11/keysym.h>
+//#include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <FL/Fl_Menu_Item.H>
@@ -64,6 +64,7 @@ GLWindow::GLWindow(int x, int y, int w, int h, const std::string &label)
 
   this->keys.clear();
 
+  this->resizable(this);
 }
 
 
@@ -314,6 +315,12 @@ int GLWindow::handle(int event)
   // Set the type of the event
   switch (event)
   {
+    // Need FL_FOCUS && FL_UNFOCUS to receive all the KEY_DOWN events
+    case FL_FOCUS:
+    case FL_UNFOCUS:
+      handled = true;
+      break;
+
     case FL_ENTER:
     case FL_LEAVE:
     case FL_DEACTIVATE:
@@ -349,6 +356,9 @@ int GLWindow::handle(int event)
     case FL_KEYUP:
       this->HandleKeyRelease();
       handled = true;
+      break;
+
+    default:
       break;
   }
 

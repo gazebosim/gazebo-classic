@@ -33,8 +33,6 @@
 
 #include "Global.hh"
 #include "Simulator.hh"
-#include "GuiFactory.hh"
-
 #include "GLWindow.hh"
 #include "MainMenu.hh"
 #include "Toolbar.hh"
@@ -43,13 +41,10 @@
 
 using namespace gazebo;
 
-GZ_REGISTER_STATIC_GUI("fltk", FLTKGui);
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
-    : Gui(x,y,width,height, t),
-      Fl_Window(x, y, width+200, height+60, t.c_str())
+Gui::Gui (int x, int y, int width, int height, const std::string &t)
+  : Fl_Window(x, y, width+200, height+60, t.c_str())
  {
   this->windowId = -1;
   this->visual = NULL;
@@ -77,7 +72,7 @@ FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
   this->visual = this->glWindow->visual;
   this->colormap = this->glWindow->colormap;
   this->windowId = this->glWindow->windowId;
-  this->resizable(this->glWindow);
+  this->resizable(this);
   //this->glWindow->UserQuit.connect( &gazebo::Gui::UserQuit);
   //this->glWindow->Finished.connect( boost::bind(&gazebo::Gui::Finished,this));
   //MainMenu::Finished.connect( boost::bind(&gazebo::Gui::Finished,this));
@@ -85,7 +80,7 @@ FLTKGui::FLTKGui (int x, int y, int width, int height, const std::string &t)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
-FLTKGui::~FLTKGui()
+Gui::~Gui()
 {
   this->hide();
 
@@ -97,38 +92,39 @@ FLTKGui::~FLTKGui()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initalize the gui
-void FLTKGui::Init()
+void Gui::Init()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FLTKGui::Update()
+void Gui::Update()
 {
   this->toolbar->Update();
   this->statusbar->Update();
   this->glWindow->Update();
   Fl::check();
-  //Fl::wait(0.03);
+  //Fl::wait(0.3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the width of the gui's rendering window
-unsigned int FLTKGui::GetWidth() const
+unsigned int Gui::GetWidth() const
 {
   return this->glWindow->w();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the height of the gui's rendering window
-unsigned int FLTKGui::GetHeight() const
+unsigned int Gui::GetHeight() const
 {
   return this->glWindow->h();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle an event
-int FLTKGui::handle(int event)
+int Gui::handle(int event)
 {
+
   switch (event)
   {
     case FL_HIDE:
@@ -141,21 +137,21 @@ int FLTKGui::handle(int event)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the id of the window
-Window FLTKGui::GetWindowId() const
+Window Gui::GetWindowId() const
 {
   return this->windowId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the visual info
-XVisualInfo *FLTKGui::GetVisualInfo() const
+XVisualInfo *Gui::GetVisualInfo() const
 {
   return this->visual;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the display
-Display *FLTKGui::GetDisplay() const
+Display *Gui::GetDisplay() const
 {
   return this->display;
 }

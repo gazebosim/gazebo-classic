@@ -6,13 +6,18 @@ Import('env staticObjs sharedObjs headers')
 #env = Environment()
 #conf = Configure(env)
 #if conf.CheckCHeader('GL/glx.h'):
-sources = Split('Gui.cc DummyGui.cc GuiFactory.cc GLWindow.cc MainMenu.cc Toolbar.cc StatusBar.cc')
+sources = ['Gui.cc',
+           'GLWindow.cc',
+           'MainMenu.cc',
+           'Toolbar.cc',
+           'StatusBar.cc'
+           ]
+
 #env = conf.Finish()
 
 headers.append( 
-          ['server/gui/DummyGui.hh',
+          [
            'server/gui/GLWindow.hh',
-           'server/gui/GuiFactory.hh',
            'server/gui/Gui.hh',
            'server/gui/MainMenu.hh',
            'server/gui/StatusBar.hh',

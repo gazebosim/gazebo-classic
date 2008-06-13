@@ -25,12 +25,9 @@
 
 #include "Global.hh"
 #include "DummyGui.hh"
-#include "GuiFactory.hh"
 #include <time.h>
 
 using namespace gazebo;
-
-GZ_REGISTER_STATIC_GUI("dummy", DummyGui);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor: Creates a dummy window necessary to initialize and use GL rendering system.

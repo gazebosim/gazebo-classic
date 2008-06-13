@@ -38,54 +38,18 @@
 namespace gazebo
 {
 
-  /// \brief Abstract class describing a generic GUI
-  class Gui
-  {
-
-   /// \brief Constructor
-    public: Gui(int x, int y, int w, int h, const std::string &t) { }
-
-    /// \brief Destructor
-    public: virtual ~Gui() { }
-  
-    /// \brief Initalize the gui
-    public: virtual void Init()=0;
- 
-    /// \brief Updates the gui
-    public: virtual void Update()=0;
-
-    /// \brief Get the width of the gui's rendering window
-    public: virtual unsigned int GetWidth() const=0;
-
-    /// \brief Get the height of the gui's rendering window
-    public: virtual unsigned int GetHeight() const=0;
-
-    /// \brief Handle an event
-    public: virtual int handle(int event)=0;
-
-    /// \brief Get the id of the window
-    public: virtual Window GetWindowId() const=0;
-            
-    /// \brief Get the visual info
-    public: virtual XVisualInfo *GetVisualInfo() const=0;
-
-    /// \brief Get the display
-    public: virtual Display *GetDisplay() const=0;
-
-  };
-
   class GLWindow;
   class Toolbar;
   class StatusBar;
 
   /// \brief FLTK Main Window
-  class FLTKGui : public Gui, public Fl_Window
+  class Gui : public Fl_Window
   {
     /// \brief Constructor
-    public: FLTKGui (int x, int y, int w, int h, const std::string &t);
+    public: Gui (int x, int y, int w, int h, const std::string &t);
  
     /// \brief Destructor
-    public: virtual ~FLTKGui();
+    public: virtual ~Gui();
 
     /// \brief Initalize the gui
     public: virtual void Init();
