@@ -26,17 +26,25 @@
     <maxUpdateRate>0</maxUpdateRate>
   </physics:ode>
 
-  <rendering:gui>
+  <!--<rendering:gui>
     <type>fltk</type>
     <size>640 480</size>
     <pos>0 0</pos>
   </rendering:gui>
+  -->
 
   <rendering:ogre>
     <ambient>0.5 0.5 0.5 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+
+    <fog>
+      <color>1.0 1.0 1.0</color>
+      <linearStart>10</linearStart>
+      <linearEnd>100</linearEnd>
+    </fog>
+
     <maxUpdateRate>0</maxUpdateRate>
   </rendering:ogre>
 
@@ -52,7 +60,7 @@
         <size>2000 2000</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/GrassFloor</material>
+        <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
   </model:physical>

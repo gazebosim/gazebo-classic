@@ -1,4 +1,5 @@
 Open:
+- Make headless
 - Mouse picking
   -Implement in CameraSensor class.
 - Shadows draw on multiple surfaces(seem to pass through walls).

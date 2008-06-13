@@ -360,7 +360,7 @@ void OgreCreator::CreateSky(XMLConfigNode *node)
           Ogre::Plane plane;
           plane.d = 49;
           plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Z;
-          OgreAdaptor::Instance()->sceneMgr->setSkyPlane(true, plane, material, 50, 8, true, 0.5, 150, 150);
+          OgreAdaptor::Instance()->sceneMgr->setSkyPlane(true, plane, material, 500, 100, true, 0.5, 150, 150);
         }
         else
         {
@@ -386,43 +386,86 @@ void OgreCreator::DrawGrid()
 {
   Ogre::ManualObject* gridObject =  OgreAdaptor::Instance()->sceneMgr->createManualObject("__OGRE_GRID__");
 
+  gridObject->setCastShadows(false);
+
   Ogre::SceneNode* gridObjectNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode("__OGRE_GRID_NODE__");
 
   Ogre::MaterialPtr gridObjectMaterialX = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_X__","debugger1");
   gridObjectMaterialX->setReceiveShadows(true);
   gridObjectMaterialX->getTechnique(0)->setLightingEnabled(true);
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.4,0.0,0.0,0);
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setAmbient(0.4,0.0,0.0);
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.1,0.0,0.0);
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.2,0.2,0.2,0);
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setAmbient(0.2,0.2,0.2);
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.0);
+  gridObjectMaterialX->setReceiveShadows(false);
 
   Ogre::MaterialPtr gridObjectMaterialY = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_Y__","debugger2");
   gridObjectMaterialY->setReceiveShadows(true);
   gridObjectMaterialY->getTechnique(0)->setLightingEnabled(true);
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.0,0.0,0.4,0);
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setAmbient(0.0,0.0,0.4);
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.1);
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.2,0.2,0.2,0);
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setAmbient(0.2,0.2,0.2);
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.0);
+  gridObjectMaterialY->setReceiveShadows(false);
 
 
   float d = 0.01;
-  float z = 0.01;
+  float z_bottom = .02;
+  float height = 1.0;
+
+  int dim = 50;
+
+  // Vertex Values for a square box
+  float v[8][3] =
+  {
+    {-1, -1, -1}, {+1, -1, -1}, {+1, +1, -1}, {-1, +1, -1},
+    {-1, -1, +1}, {+1, -1, +1}, {+1, +1, +1}, {-1, +1, +1}
+  };
+
+  // Indices
+  int ind[36] =
+  {
+    // Bottom Face
+    0, 1, 2,
+    2, 3, 0,
+
+    // Top Face
+    4, 5, 7,
+    7, 5, 6,
+
+    // Front Face
+    0, 4, 7,
+    7, 3, 0,
+
+    // Back face
+    5, 1, 6,
+    6, 1, 2,
+
+    // Left face
+    0, 5, 4,
+    0, 1, 5,
+
+    // Right face
+    3, 7, 6,
+    6, 2, 3
+
+
+  };
 
   gridObject->begin("__OGRE_GRID_MATERIAL_Y__", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
-  for (int y=-100; y<100; y++)
+  for (int y=-dim; y<dim; y++)
   {
     if (y%10 == 0)
       d = 0.04;
     else
       d = 0.01;
 
-    gridObject->position(-100, y-d, z);
-    gridObject->position(100, y-d, z);
-    gridObject->position(100, y+d, z);
-
-    gridObject->position(-100, y-d, z);
-    gridObject->position(100, y+d, z);
-    gridObject->position(-100, y+d, z);
-
+    // For each face
+    for (int i = 0; i < 36; i++)
+    {
+      gridObject->position(  v[ind[i]][0] * dim, 
+                           y+v[ind[i]][1] * 0.02, 
+                             v[ind[i]][2] * 0.01 );
+    }
     char *name=new char[20];
     char *text=new char[10];
 
@@ -453,24 +496,23 @@ void OgreCreator::DrawGrid()
   }
 
   gridObject->end();
+
   gridObject->begin("__OGRE_GRID_MATERIAL_X__", Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
-  z -= 0.001;
-
-  for (int x=-100; x<100; x++)
+  for (int x=-dim; x<dim; x++)
   {
     if (x%10 == 0)
       d = 0.04;
     else
       d = 0.01;
 
-    gridObject->position(x+d, 100, z);
-    gridObject->position(x-d, 100, z);
-    gridObject->position(x-d, -100, z);
-
-    gridObject->position(x+d, -100, z);
-    gridObject->position(x+d, 100, z);
-    gridObject->position(x-d, -100, z);
+    // For each face
+    for (int i = 0; i < 36; i++)
+    {
+      gridObject->position(x+v[ind[i]][0] * 0.02, 
+                             v[ind[i]][1] * dim, 
+                             v[ind[i]][2] * 0.01 );
+    }
 
     char *name=new char[20];
     char *text=new char[10];

@@ -167,6 +167,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Create a window for Ogre
   this->CreateWindow();
 
+  // No window...then exit
+  if (!this->window)
+    return;
+
   // Get the SceneManager, in this case a generic one
   if (node->GetChild("bsp"))
   {
@@ -459,20 +463,23 @@ void OgreAdaptor::CreateWindow()
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
-  Gui *gui=Simulator::Instance()->GetUI();
+  Gui *gui = Simulator::Instance()->GetUI();
 
-  paramsVector.push_back( Ogre::StringConverter::toString( (size_t)(gui->GetDisplay()) ) );
-  paramsVector.push_back( Ogre::StringConverter::toString((int)gui->GetVisualInfo()->screen));
+  if (gui)
+  {
+    paramsVector.push_back( Ogre::StringConverter::toString( (size_t)(gui->GetDisplay()) ) );
+    paramsVector.push_back( Ogre::StringConverter::toString((int)gui->GetVisualInfo()->screen));
 
-  paramsVector.push_back( Ogre::StringConverter::toString((int)gui->GetWindowId()));
-  paramsVector.push_back( Ogre::StringConverter::toString((size_t)(gui->GetVisualInfo())));
+    paramsVector.push_back( Ogre::StringConverter::toString((int)gui->GetWindowId()));
+    paramsVector.push_back( Ogre::StringConverter::toString((size_t)(gui->GetVisualInfo())));
 
-  params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
+    params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
 
-  this->window = this->root->createRenderWindow( "WindowName", gui->GetWidth(), gui->GetHeight(), false, &params);
+    this->window = this->root->createRenderWindow( "WindowName", gui->GetWidth(), gui->GetHeight(), false, &params);
 
-  this->window->setActive(true);
-  this->window->setAutoUpdated(true);
+    this->window->setActive(true);
+    this->window->setAutoUpdated(true);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -32,7 +32,6 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
@@ -100,7 +99,7 @@
         <size>2000 2000</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/GrassFloor</material>
+        <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
   </model:physical>

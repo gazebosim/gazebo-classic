@@ -31,10 +31,9 @@
 //#include <boost/bind.hpp>
 
 #include "World.hh"
-#include "GuiFactory.hh"
 #include "Gui.hh"
-#include "DummyGui.hh"
 #include "XMLConfig.hh"
+#include "Gui.hh"
 #include "GazeboConfig.hh"
 #include "gazebo.h"
 #include "PhysicsEngine.hh"
@@ -134,8 +133,24 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   //Create and initialize the Gui
   try
   {
-    this->gui=GuiFactory::NewGui(rootNode);
-    this->gui->Init();
+    XMLConfigNode *childNode = rootNode->GetChild("gui");
+
+    if (childNode)
+    {
+      int width = childNode->GetTupleInt("size",0,640);
+      int height = childNode->GetTupleInt("size",1,480);
+      int x = childNode->GetTupleInt("pos",0,0);
+      int y = childNode->GetTupleInt("pos",1,0);
+      std::string type = childNode->GetString("type","fltk",1);
+
+      gzmsg(1) << "Creating GUI:\n\tType[" << type 
+               << "] Pos[" << x << " " << y 
+               << "] Size[" << width << " " << height << "]\n";
+
+      // Create the GUI
+      this->gui = new Gui(x, y, width, height, type+"::Gazebo");
+      this->gui->Init();
+    }
   }
   catch (GazeboError e)
   {
@@ -259,7 +274,8 @@ void Simulator::MainLoop()
     }
 
     // Update the gui
-    this->gui->Update();
+    if (this->gui)
+      this->gui->Update();
 
     elapsedTime = (this->GetRealTime() - currTime);
 
@@ -386,13 +402,12 @@ void Simulator::SetUserStepInc(bool step)
 }
 
 
-// Move to GuiFactory?
 void Simulator::SaveGui(XMLConfigNode *node)
 {
   Vector2<int> size;
   XMLConfigNode* childNode = node->GetChild("gui");
 
-  if (childNode)
+  if (childNode && this->gui)
   {
     size.x = this->gui->GetWidth();
     size.y = this->gui->GetHeight();
