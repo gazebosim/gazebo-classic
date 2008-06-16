@@ -27,7 +27,6 @@
 #include <sstream>
 
 #include "OgreVisual.hh"
-#include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "ContactParams.hh"
@@ -124,7 +123,7 @@ void Geom::Load(XMLConfigNode *node)
   while (childNode)
   {
     OgreVisual *visual = new OgreVisual(this->visualNode);
-    OgreCreator::CreateVisual(childNode,visual);
+    visual->Load(childNode);
     this->visuals.push_back(visual);
     childNode = childNode->GetNext("visual");
   }
@@ -461,10 +460,22 @@ void Geom::ShowBoundingBox(bool show)
 /// Set the visibility of the joints of this geometry
 void Geom::ShowJoints(bool show)
 {
+  std::vector<OgreVisual*>::iterator iter;
+
   if (show)
-    this->visualNode->SetTransparency(0.6);
+  {
+    for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+    {
+      (*iter)->SetTransparency(0.6);
+    }
+  }
   else
-    this->visualNode->SetTransparency(0);
+  {
+    for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+    {
+      (*iter)->SetTransparency(0.0);
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

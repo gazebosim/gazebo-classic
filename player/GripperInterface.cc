@@ -77,9 +77,6 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
 
   if (this->iface->Lock(1))
   {
-
-    //   This code works with Player CVS
-#ifdef PLAYER_GRIPPER_CMD_OPEN
     if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
           PLAYER_GRIPPER_CMD_OPEN, this->device_addr))
     {
@@ -143,7 +140,6 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
 
       return 0;
     }
-#endif
 
     this->iface->Unlock();
   }

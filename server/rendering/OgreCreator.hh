@@ -63,9 +63,6 @@ namespace gazebo
     ///properties if needed, to avoid this create a child visual node for the plane
     public: static void CreatePlane(XMLConfigNode *node, OgreVisual *parent);
     
-    ///\brief Create a visual entity
-    public: static void CreateVisual(XMLConfigNode *node, OgreVisual *parent);
-        
     /// \brief Create a light source 
     public: static void CreateLight(XMLConfigNode *node, OgreVisual *parent);
 

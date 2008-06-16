@@ -48,6 +48,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~OgreVisual();
 
+    /// \brief Load the visual
+    public: void Load(XMLConfigNode *node);
+
     /// \brief Attach a renerable object to the visual
     public: void AttachObject( Ogre::MovableObject *obj);
 

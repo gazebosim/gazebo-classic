@@ -76,10 +76,8 @@ void OgreVisual::SetXML(XMLConfigNode *node)
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Load the visual
-/*
 void OgreVisual::Load(XMLConfigNode *node)
 {
   std::ostringstream stream;
@@ -130,7 +128,6 @@ void OgreVisual::Load(XMLConfigNode *node)
   if (node->GetChild("scale") != NULL)
   {
     Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
-
     this->sceneNode->setScale(scale.x, scale.y, scale.z);
   }
   else
@@ -144,8 +141,9 @@ void OgreVisual::Load(XMLConfigNode *node)
 
   // Allow the mesh to cast shadows
   this->SetCastShadows(node->GetBool("castShadows",true,0));
+
+  this->SetXML(node);
 }
-*/
 
 void OgreVisual::Save()
 {
@@ -285,6 +283,7 @@ void OgreVisual::SetTransparency( float trans )
   if (this->myMaterial.isNull())
   {
     gzmsg(0) << "The visual " << this->sceneNode->getName() << " can't set transparency for this geom without a material\n";
+
     return;
   }
 
@@ -300,7 +299,7 @@ void OgreVisual::SetTransparency( float trans )
 
     while (passIt.hasMoreElements ())
     {
-      sc = this->origMaterial->getTechnique (i)->getPass (j)->getDiffuse ();
+      sc = this->origMaterial->getTechnique(i)->getPass(j)->getDiffuse();
 
       if (this->transparency >0.0)
         passIt.peekNext ()->setDepthWriteEnabled (false);
@@ -315,14 +314,14 @@ void OgreVisual::SetTransparency( float trans )
           dc.r -= sc.r * this->transparency;
           dc.g -= sc.g  * this->transparency;
           dc.b -= sc.b * this->transparency;
-          passIt.peekNext ()->setAmbient (Ogre::ColourValue::Black);
+          passIt.peekNext()->setAmbient(Ogre::ColourValue::Black);
           break;
 
         case Ogre::SBT_TRANSPARENT_ALPHA:
         default:
           dc = sc;
           dc.a = sc.a * (1.0f - this->transparency);
-          passIt.peekNext()->setAmbient(this->origMaterial->getTechnique (i)->getPass (j)->getAmbient ());
+          passIt.peekNext()->setAmbient(this->origMaterial->getTechnique(i)->getPass(j)->getAmbient());
           break;
       }
       passIt.peekNext ()->setDiffuse (dc);
@@ -351,7 +350,7 @@ void OgreVisual::SetHighlight(bool highlight)
 
 //FIXME:  Modifying selfIllumination is invasive to the material definition of the user
 // Choose other effect.
-
+/*
   Ogre::Technique *t;
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
   while ( techniqueIt.hasMoreElements() )
@@ -372,6 +371,7 @@ void OgreVisual::SetHighlight(bool highlight)
       passIt.moveNext ();
     }
   }
+  */
 
 }
 

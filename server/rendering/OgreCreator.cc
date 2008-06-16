@@ -98,71 +98,7 @@ void OgreCreator::CreatePlane(XMLConfigNode *node, OgreVisual *parent)
   //return visual;
 }
 
-void OgreCreator::CreateVisual(XMLConfigNode *node, OgreVisual *parent)
-{
-  std::ostringstream stream;
-  Pose3d pose;
-  Vector3 size;
-  Ogre::Vector3 meshSize;
-  Ogre::MovableObject *obj = NULL;
 
-  std::string meshName = node->GetString("mesh","",1);
-
-  // Read the desired position and rotation of the mesh
-  pose.pos = node->GetVector3("xyz", Vector3(0,0,0));
-  pose.rot = node->GetRotation("rpy", Quatern());
-
-  try
-  {
-    // Create the entity
-    stream << parent->GetName() << "_ENTITY";
-    obj = (Ogre::MovableObject*)parent->GetSceneNode()->getCreator()->createEntity(stream.str(), meshName);
-  }
-  catch (Ogre::Exception e)
-  {
-    std::cerr << "Ogre Error:" << e.getFullDescription() << "\n";
-    gzthrow("Unable to create a mesh from " + meshName);
-  }
-
-  // Set the pose of the scene node
-  parent->SetPose(pose);
-
-  // Attach the entity to the node
-  if (obj)
-  {
-    parent->AttachObject(obj);
-    obj->setVisibilityFlags(GZ_ALL_CAMERA);
-    meshSize = obj->getBoundingBox().getSize();
-  }
-  
-  // Get the desired size of the mesh
-  if (node->GetChild("size") != NULL)
-    size = node->GetVector3("size",Vector3(1,1,1));
-  else
-    size = Vector3(meshSize.x, meshSize.y, meshSize.z);
-
-  // Get and set teh desired scale of the mesh
-  if (node->GetChild("scale") != NULL)
-  {
-    Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
-    parent->SetScale(scale);
-  }
-  else
-  {
-    parent->SetScale(Vector3(size.x/meshSize.x, size.y/meshSize.y, size.z/meshSize.z));
-  }
-
-
-  // Set the material of the mesh
-  parent->SetMaterial(node->GetString("material",std::string(),1));
-
-  // Allow the mesh to cast shadows
-  parent->SetCastShadows(node->GetBool("castShadows",true,0));
-
-  parent->SetXML(node);
-}
-
-  
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a light source and attach it to the visual node
 /// Note that the properties here are not modified afterwards and thus, 

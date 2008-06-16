@@ -91,6 +91,34 @@ void Pioneer2_Gripper::InitChild()
 // Update the controller
 void Pioneer2_Gripper::UpdateChild(UpdateParams &params)
 {
+  /*double leftPaddleHiStop = this->joints[LEFT]->GetParam(dParamHiStop);
+  double leftPaddleLoStop = this->joints[LEFT]->GetParam(dParamLoStop);
+  double rightPaddleHiStop = this->joints[RIGHT]->GetParam(dParamHiStop);
+  double rightPaddleLoStop = this->joints[RIGHT]->GetParam(dParamLoStop);
+
+  double leftPaddlePos = this->joints[LEFT]->GetPosition();
+  double rightPaddlePos = this->joints[RIGHT]->GetPosition();
+  */
+
+  this->myIface->Lock(1);
+
+  switch( this->myIface->data->cmd)
+  {
+    case GAZEBO_GRIPPER_CMD_OPEN:
+        this->joints[RIGHT]->SetParam(dParamVel,0.1);
+        this->joints[LEFT]->SetParam(dParamVel, -0.1);
+      break;
+
+    case GAZEBO_GRIPPER_CMD_CLOSE:
+      this->joints[RIGHT]->SetParam(dParamVel,-0.1);
+      this->joints[LEFT]->SetParam(dParamVel,0.1);
+      break;
+  }
+
+  this->joints[LEFT]->SetParam(dParamFMax,.01);
+  this->joints[RIGHT]->SetParam(dParamFMax,.01);
+
+  this->myIface->Unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
