@@ -57,11 +57,11 @@ namespace gazebo
     /// \brief Update this interface, publish new info.
     public: virtual void Update();
 
-    /// \brief Open a SHM interface when a subscription is received. \
+    /// \brief Open a SHM interface when a subscription is received.
     ///        This is called fromGazeboDriver::Subscribe
     public: virtual void Subscribe();
 
-    /// \brief Close a SHM interface. This is called from \
+    /// \brief Close a SHM interface. This is called from
     ///        GazeboDriver::Unsubscribe
     public: virtual void Unsubscribe();
 

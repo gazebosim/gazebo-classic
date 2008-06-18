@@ -164,7 +164,7 @@ void CameraInterface::Unsubscribe()
 // Save an image frame
 void CameraInterface::SaveFrame(const char *filename)
 {
-  int i, j,k, width, height;
+  int i, width, height;
   FILE *file;
 
   file = fopen(filename, "w+");

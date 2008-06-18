@@ -32,6 +32,7 @@
 
 
 #include <math.h>
+#include <libplayerxdr/playerxdr.h>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -43,7 +44,8 @@ using namespace gazebo;
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
 FiducialInterface::FiducialInterface(player_devaddr_t addr,
-                                     GazeboDriver *driver, ConfigFile *cf, int section)
+                                     GazeboDriver *driver, ConfigFile *cf, 
+                                     int section)
     : GazeboInterface(addr, driver, cf, section)
 {
   // Get the ID of the interface
@@ -55,12 +57,17 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
   this->iface = new FiducialIface();
 
   this->datatime = -1;
+
+  memset(&this->data, 0, sizeof(this->data));
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Destructor
 FiducialInterface::~FiducialInterface()
 {
+  player_fiducial_data_t_cleanup(&this->data);
+
   // Release this interface
   delete this->iface;
 }
@@ -152,7 +159,6 @@ int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void FiducialInterface::Update()
 {
-  player_fiducial_data_t data;
   struct timeval ts;
 
   this->iface->Lock(1);
@@ -168,36 +174,37 @@ void FiducialInterface::Update()
     ts.tv_sec = (int) (this->iface->data->head.time);
     ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
-    memset(&data, 0, sizeof(data));
-    data.fiducials_count = i;
-    //data.fiducials = new player_fiducial_item_t[data.fiducials_count];
+    unsigned int oldCount = data.fiducials_count;
 
+    data.fiducials_count = i;
+
+    if (oldCount != this->data.fiducials_count)
+    {
+      delete [] this->data.fiducials;
+
+      this->data.fiducials = new player_fiducial_item_t[this->data.fiducials_count];
+    }
 
     for (i = 0; i < this->iface->data->count; i++)
     {
       fid = this->iface->data->fids + i;
 
-      data.fiducials[i].id = (int16_t) fid->id;
+      this->data.fiducials[i].id = (int16_t) fid->id;
 
-      data.fiducials[i].pose.px = fid->pose.pos.x;
-      data.fiducials[i].pose.py = fid->pose.pos.y;
-      data.fiducials[i].pose.pz = fid->pose.pos.z;
-      data.fiducials[i].pose.proll = fid->pose.roll;
-      data.fiducials[i].pose.ppitch = fid->pose.pitch;
-      data.fiducials[i].pose.pyaw = fid->pose.yaw;
-
-      /*printf("fiducial %d %.2f %.2f %.2f\n",
-          fid->id, data.fiducials[i].pose.px, data.fiducials[i].pose.py,
-          data.fiducials[i].pose.pyaw);
-          */
-
+      this->data.fiducials[i].pose.px = fid->pose.pos.x;
+      this->data.fiducials[i].pose.py = fid->pose.pos.y;
+      this->data.fiducials[i].pose.pz = fid->pose.pos.z;
+      this->data.fiducials[i].pose.proll = fid->pose.roll;
+      this->data.fiducials[i].pose.ppitch = fid->pose.pitch;
+      this->data.fiducials[i].pose.pyaw = fid->pose.yaw;
     }
 
     this->driver->Publish( this->device_addr,
                            PLAYER_MSGTYPE_DATA,
                            PLAYER_FIDUCIAL_DATA_SCAN,
-                           (void*)&data, sizeof(data), &this->datatime );
-    delete [] data.fiducials;
+                           reinterpret_cast<void*>(&data), sizeof(this->data), 
+                           &this->datatime );
+                           
   }
 
   this->iface->Unlock();

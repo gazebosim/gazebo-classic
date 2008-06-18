@@ -139,10 +139,6 @@ void PTZInterface::Update()
   // Only Update when new data is present
   if (this->iface->data->head.time > this->datatime)
   {
-    int i;
-    float rangeRes;
-    float angleRes;
-
     this->datatime = this->iface->data->head.time;
 
     ts.tv_sec = (int) (this->iface->data->head.time);
@@ -158,8 +154,6 @@ void PTZInterface::Update()
                            PLAYER_MSGTYPE_DATA,
                            PLAYER_PTZ_DATA_STATE,
                            (void*)&data, sizeof(data), &this->datatime );
-
-
   }
 
   this->iface->Unlock();
