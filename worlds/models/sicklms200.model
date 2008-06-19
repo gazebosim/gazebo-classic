@@ -52,7 +52,7 @@
 
       <controller:sicklms200_laser name="laser_controller_1">
         <interface:laser name="laser_iface_0"/>
-        <interface:laser name="fiducial"/>
+        <interface:fiducial name="fiducial_iface_0"/>
       </controller:sicklms200_laser>
     </sensor:ray>
 
