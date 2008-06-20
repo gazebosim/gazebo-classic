@@ -33,6 +33,8 @@
 #include <map>
 
 #include <FL/Fl.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Group.H>
 #include <FL/x.H>
 #include <FL/Enumerations.H>
 #include <FL/Fl_Gl_Window.H>
@@ -41,16 +43,27 @@
 #include "Vector3.hh"
 #include "Vector2.hh"
 
+
 namespace gazebo
 {
+  class UserCamera;
+  class OgreCamera;
+  class GLFrame;
+  class WindowManager;
+
+  /// \brief OpenGL window to display camera data
   class GLWindow : public Fl_Gl_Window
   {
-    public: GLWindow( int x, int y, int w, int h, const std::string &label );
+    /// \brief Constructor
+    public: GLWindow(int x, int y, int w, int h, const std::string &label="" );
+
+    /// \brief Destructor
     public: virtual ~GLWindow();
 
     /// \brief Initalize the gui
     public: virtual void Init();
 
+    /// \brief Update the window
     public: void Update();
 
     /// \brief Get the width of the gui's rendering window
@@ -63,7 +76,25 @@ namespace gazebo
 
     /// \brief Handle event
     public: int handle(int event);
-           
+   
+    /// \brief Handle resizing
+    public: void resize(int x, int y, int w, int h);
+
+    /// \brief Get the visual info
+    public: XVisualInfo *GetVisualInfo() const;
+
+    /// \brief Get the display
+    public: Display *GetDisplay() const;
+
+    /// \brief Get a pointer to the camera
+    public: UserCamera *GetCamera() const;
+
+    // \brief Get the average FPS for this window
+    public: float GetAvgFPS() const;
+
+    /// \brief Set the active camera
+    public: void SetActiveCamera( OgreCamera *camera );
+
     /// \brief Handle a mouse button push
     private: void HandleMousePush();
 
@@ -74,22 +105,23 @@ namespace gazebo
     private: void HandleMouseDrag();
 
     /// \brief Handle a key press
-    private: void HandleKeyPress();
+    private: void HandleKeyPress(int keyNum);
 
     /// \brief Handle a key release
-    private: void HandleKeyRelease();
+    private: void HandleKeyRelease(int keyNum);
+
 
     /// ID of the window
-    public: Window windowId;
+    private: Window windowId;
 
     /// Pointer to the Xvisual
-    public: XVisualInfo *visual;
+    private: XVisualInfo *visual;
 
     /// colormap
-    public: Colormap colormap;
+    private: Colormap colormap;
 
     /// pointer to the display
-    public: Display *display;
+    private: Display *display;
 
     private: float moveAmount;
     private: float moveScale;
@@ -107,6 +139,12 @@ namespace gazebo
     private: double lastUpdateTime;
 
     private: bool mouseDrag;
+
+    /// Pointer to the camera
+    private: UserCamera *userCamera;
+    private: OgreCamera *activeCamera;
+
+    private: static GLWindow *activeWin;
   };
 
 }

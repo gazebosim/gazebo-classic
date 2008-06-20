@@ -41,6 +41,7 @@ namespace gazebo
   class GLWindow;
   class Toolbar;
   class StatusBar;
+  class GLFrameManager;
 
   /// \brief FLTK Main Window
   class Gui : public Fl_Window
@@ -65,31 +66,12 @@ namespace gazebo
     /// \brief Handle an event
     public: int handle(int event);
 
-    /// \brief Get the id of the window
-    public: Window GetWindowId() const;
-            
-    /// \brief Get the visual info
-    public: XVisualInfo *GetVisualInfo() const;
-
-    /// \brief Get the display
-    public: Display *GetDisplay() const;
-
-    /// ID of the window
-    protected: Window windowId;
-
-    /// Pointer to the Xvisual
-    protected: XVisualInfo *visual;
-
-    /// colormap
-    protected: Colormap colormap;
-
-    /// pointer to the display
-    protected: Display *display;
-
-    private: GLWindow *glWindow;
+    /// \brief Get the average FPS
+    public: float GetAvgFPS() const;
 
     private: Toolbar *toolbar;
     private: StatusBar *statusbar;
+    private: GLFrameManager *frameMgr;
   };
 }
 

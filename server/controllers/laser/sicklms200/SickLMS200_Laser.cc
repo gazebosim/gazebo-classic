@@ -90,7 +90,7 @@ void SickLMS200_Laser::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void SickLMS200_Laser::UpdateChild(UpdateParams &params)
+void SickLMS200_Laser::UpdateChild()
 {
   bool opened = false;
 

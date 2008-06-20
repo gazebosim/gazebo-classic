@@ -47,7 +47,7 @@ GZ_REGISTER_STATIC_SENSOR("camera", MonoCameraSensor);
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 MonoCameraSensor::MonoCameraSensor(Body *body)
-    : CameraSensor(body)
+    : Sensor(body), OgreCamera("Mono")
 {
 }
 
@@ -62,13 +62,15 @@ MonoCameraSensor::~MonoCameraSensor()
 // Load the camera
 void MonoCameraSensor::LoadChild( XMLConfigNode *node )
 {
-  CameraSensor::LoadChild(node);
-}
+  this->LoadCam( node );
 
-//////////////////////////////////////////////////////////////////////////////
-// Initialize the camera
-void MonoCameraSensor::InitChild()
-{
+  // Do some sanity checks
+  if (this->imageWidth == 0 || this->imageHeight == 0)
+  {
+    gzthrow("image has zero size");
+  }
+
+  this->SetCameraSceneNode( this->GetVisualNode()->GetSceneNode() );
 
   this->ogreTextureName = this->GetName() + "_RttTex";
   this->ogreMaterialName = this->GetName() + "_RttMat";
@@ -83,10 +85,13 @@ void MonoCameraSensor::InitChild()
                           Ogre::TU_RENDERTARGET);
 
   this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
+}
 
-  // Create the camera
-  this->camera = OgreCreator::CreateCamera(this->GetName(),
-                 this->nearClip, this->farClip, this->hfov, this->renderTarget);
+//////////////////////////////////////////////////////////////////////////////
+// Initialize the camera
+void MonoCameraSensor::InitChild()
+{
+  this->InitCam();
 
   Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
                             this->ogreMaterialName,
@@ -102,22 +107,22 @@ void MonoCameraSensor::InitChild()
 
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
-
-  CameraSensor::InitChild();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Finalize the camera
 void MonoCameraSensor::FiniChild()
 {
-  CameraSensor::FiniChild();
+  this->FiniCam();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void MonoCameraSensor::UpdateChild(UpdateParams &params)
+void MonoCameraSensor::UpdateChild()
 {
-  CameraSensor::UpdateChild(params);
+  this->UpdateCam();
+
+  this->renderTarget->update();
 
   if (this->saveFrames)
     this->SaveFrame();

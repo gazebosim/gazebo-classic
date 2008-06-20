@@ -27,7 +27,7 @@
 
   <rendering:gui>
     <type>fltk</type>
-    <size>640 480</size>
+    <size>800 600</size>
     <pos>0 0</pos>
   </rendering:gui>
 
@@ -60,26 +60,6 @@
         <material>Gazebo/GrassFloor</material>
       </geom:plane>
     </body:plane>
-  </model:physical>
-
-  <!-- The camera -->
-  <model:physical name="cam1_model">
-    <xyz>-0.52 -1.39 0.71</xyz>
-    <rpy>0 26.50 64.00</rpy>
-    <static>true</static>
-
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>640 480</imageSize>
-        <hfov>60</hfov>
-        <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
-
-        <!--<saveFrames>true</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-        -->
-      </sensor:camera>
-    </body:empty>
   </model:physical>
 
   <!-- 

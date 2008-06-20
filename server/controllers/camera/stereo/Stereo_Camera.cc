@@ -40,7 +40,7 @@
 
 using namespace gazebo;
 
-GZ_REGISTER_STATIC_CONTROLLER("stereo_camera", Stereo_Camera);
+GZ_REGISTER_STATIC_CONTROLLER("stereocamera", Stereo_Camera);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -85,10 +85,8 @@ void Stereo_Camera::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Stereo_Camera::UpdateChild(UpdateParams &params)
+void Stereo_Camera::UpdateChild()
 {
-
-
   if (this->cameraIface)
   {
     this->cameraIface->Lock(1);

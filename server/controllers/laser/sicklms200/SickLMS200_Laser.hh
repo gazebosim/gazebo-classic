@@ -84,7 +84,7 @@ class SickLMS200_Laser : public Controller
 
   /// \brief Update the controller
   /// \return 0 on success
-  protected: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild();
 
   /// \brief Finalize the controller
   /// \return 0 on success

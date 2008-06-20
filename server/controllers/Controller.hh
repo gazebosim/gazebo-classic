@@ -30,7 +30,6 @@
 #include <string>
 #include <vector>
 
-#include "UpdateParams.hh"
 
 namespace gazebo
 {
@@ -69,7 +68,7 @@ class Controller
 
   /// \brief Update the controller. Called every cycle.
   /// \param params Parameters to the update cycle
-  public: void Update(UpdateParams &params);
+  public: void Update();
 
   /// \brief Finialize the controller. Called once on completion.
   public: void Fini();
@@ -87,7 +86,7 @@ class Controller
   protected: virtual void ResetChild() {return;}
 
   /// \brief Update function for the child class
-  protected: virtual void UpdateChild(UpdateParams &/*params*/) {return;}
+  protected: virtual void UpdateChild() {return;}
 
   /// \brief Fini function for the child class
   protected: virtual void FiniChild() {return;}

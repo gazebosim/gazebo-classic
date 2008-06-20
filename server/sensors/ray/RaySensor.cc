@@ -235,7 +235,7 @@ int RaySensor::GetFiducial(int index)
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
-void RaySensor::UpdateChild(UpdateParams &/*params*/)
+void RaySensor::UpdateChild()
 {
 //  if (this->active)
   {

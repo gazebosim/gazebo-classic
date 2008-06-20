@@ -69,11 +69,11 @@ void Sensor::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the sensor
-void Sensor::Update(UpdateParams &params)
+void Sensor::Update()
 {
-  this->UpdateChild(params);
+  this->UpdateChild();
   if (this->controller)
-    this->controller->Update(params);
+    this->controller->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

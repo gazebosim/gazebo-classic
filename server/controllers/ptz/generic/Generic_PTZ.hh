@@ -76,7 +76,7 @@ namespace gazebo
     protected: virtual void InitChild();
   
     /// \brief Update the controller
-    protected: virtual void UpdateChild(UpdateParams &params);
+    protected: virtual void UpdateChild();
   
     /// \brief Finalize the controller
     protected: virtual void FiniChild();

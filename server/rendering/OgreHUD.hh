@@ -36,7 +36,7 @@ namespace gazebo
 /// \addtogroup gazebo_rendering
 /// \{
 
-  class CameraSensor;
+  class OgreCamera;
   class OgreAdaptor;
 
   /// \brief The Heads Up Display
@@ -58,7 +58,7 @@ namespace gazebo
     public: void Update();
 
     /// \brief Set the camera to display
-    public: void SetCamera(const CameraSensor *camera);
+    public: void SetCamera(const OgreCamera *camera);
 
     /// \brief Add a text box
     public: void AddTextBox( const std::string& id,

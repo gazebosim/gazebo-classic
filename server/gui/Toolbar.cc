@@ -30,7 +30,7 @@
 #include <FL/Fl_Button.H>
 
 #include "CameraManager.hh"
-#include "CameraSensor.hh"
+#include "OgreCamera.hh"
 #include "Toolbar.hh"
 #include "Global.hh"
 
@@ -39,11 +39,11 @@ using namespace gazebo;
 Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
-  char *buffer = new char[256];
+/*  char *buffer = new char[256];
 
   this->box(FL_UP_BOX);
 
-  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
+  OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
 
   if (camera)
   {
@@ -123,7 +123,10 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
 
   this->end();
 
+  this->resizable(NULL);
+
   delete buffer;
+  */
 }
 
 Toolbar::~Toolbar()
@@ -134,8 +137,8 @@ Toolbar::~Toolbar()
 /// Update the toolbar data
 void Toolbar::Update()
 {
-  char *buffer = new char[256];
-  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
+  /*char *buffer = new char[256];
+  OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
 
   if (camera != NULL)
   {
@@ -161,14 +164,15 @@ void Toolbar::Update()
     this->outputPitch->value(RTOD(pose.rot.GetPitch()));
     this->outputYaw->value(RTOD(pose.rot.GetYaw()));
   }
+  */
 }
 
 void Toolbar::PrevCameraButtonCB(Fl_Widget * /*w*/, void *data)
 {
-  CameraManager::Instance()->DecActiveCamera();
+  //CameraManager::Instance()->DecActiveCamera();
 }
 
 void Toolbar::NextCameraButtonCB(Fl_Widget * /*w*/, void *data)
 {
-  CameraManager::Instance()->IncActiveCamera();
+  //CameraManager::Instance()->IncActiveCamera();
 }

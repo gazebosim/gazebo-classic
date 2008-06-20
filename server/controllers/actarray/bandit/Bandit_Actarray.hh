@@ -73,7 +73,7 @@ class Bandit_Actarray : public Controller
 
   /// Update the controller
   /// \return 0 on success
-  protected: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild();
 
   /// Finalize the controller
   /// \return 0 on success

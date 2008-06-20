@@ -172,7 +172,7 @@ void Steering_Position2d::ResetChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Steering_Position2d::UpdateChild(UpdateParams &params)
+void Steering_Position2d::UpdateChild()
 {
 
   this->GetPositionCmd();

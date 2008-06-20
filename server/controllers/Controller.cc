@@ -114,20 +114,20 @@ void Controller::Load(XMLConfigNode *node)
   this->xmlNode=node;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Save the controller.
-void Controller::Save()
-{
-  //So far the controller can not change in any way, not rewrite
-  this->SaveChild(this->xmlNode);
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the controller. Called once on startup.
 void Controller::Init()
 {
   this->InitChild();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the controller.
+void Controller::Save()
+{
+  //So far the controller can not change in any way, not rewrite
+  this->SaveChild(this->xmlNode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,11 +139,11 @@ void Controller::Reset()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the controller. Called every cycle.
-void Controller::Update(UpdateParams &params)
+void Controller::Update()
 {
   if (lastUpdate + updatePeriod <= Simulator::Instance()->GetSimTime())
   {
-    this->UpdateChild(params);
+    this->UpdateChild();
     lastUpdate = Simulator::Instance()->GetSimTime();
   }
 }

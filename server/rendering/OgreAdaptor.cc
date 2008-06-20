@@ -34,6 +34,7 @@
 #include <iostream>
 #include <string.h>
 
+#include "UserCamera.hh"
 #include "MovableText.hh"
 #include "OgreHUD.hh"
 #include "Entity.hh"
@@ -43,7 +44,6 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
-#include "Gui.hh"
 #include "OgreFrameListener.hh"
 #include "OgreCreator.hh"
 #include "OgreAdaptor.hh"
@@ -51,6 +51,7 @@
 using namespace gazebo;
 
 enum SceneTypes{SCENE_BSP, SCENE_EXT};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -60,13 +61,9 @@ OgreAdaptor::OgreAdaptor()
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
 
-  this->ogreWindow = true;
-  this->window=NULL;
   this->backgroundColor=NULL;
   this->logManager=NULL;
   this->sceneMgr=NULL;
-  this->camera=NULL;
-  this->viewport=NULL;
   this->root=NULL;
 
   this->updateRate = 0;
@@ -76,15 +73,12 @@ OgreAdaptor::OgreAdaptor()
 /// Destructor
 OgreAdaptor::~OgreAdaptor()
 {
-  //GZ_DELETE (this->window)
   //GZ_DELETE (this->backgroundColor)
   //GZ_DELETE (this->frameListener)
   //GZ_DELETE (this->logManager)
-//  this->root->detachRenderTarget(this->window);
 //  this->root->shutdown();
   //GZ_DELETE (this->root)
 //  GZ_DELETE (this->sceneMgr) //this objects seems to be destroyed by root
-//  GZ_DELETE (this->camera)
 //  GZ_DELETE (this->viewport)
 
 }
@@ -100,39 +94,34 @@ void OgreAdaptor::Close()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Init
-void OgreAdaptor::Init(XMLConfigNode *rootNode)
+/// Load the parameters for Ogre
+void OgreAdaptor::Load(XMLConfigNode *rootNode)
 {
   XMLConfigNode *cnode;
   XMLConfigNode *node;
-  Ogre::ColourValue ambient;
 
+  node = rootNode->GetChild("ogre", "rendering");
+
+  // Make the root
   try
   {
-    // Make the root
     this->root = new Ogre::Root();
   }
   catch (Ogre::Exception e)
   {
     gzthrow("Unable to create an Ogre rendering environment, no Root ");
-    exit(0);
   }
 
+  // Default background color
+  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::Black);
 
-  node = rootNode->GetChild("ogre", "rendering");
-  if (!node)
-  {
-    gzthrow( "missing OGRE Rendering information" );
-  }
+  // Load all the plugins
+  this->LoadPlugins();
 
-  this->updateRate = node->GetDouble("maxUpdateRate",0,0);
+  // Setup the available resources
+  this->SetupResources();
 
-  ambient.r = node->GetTupleDouble("ambient",0,1.0);
-  ambient.g = node->GetTupleDouble("ambient",1,1.0);
-  ambient.b = node->GetTupleDouble("ambient",2,1.0);
-  ambient.a = node->GetTupleDouble("ambient",3,1.0);
-
-  if ((cnode=node->GetChild("video")))
+  if ((cnode = node->GetChild("video")))
   {
     std::ostringstream stream;
     int width, height, depth;
@@ -149,39 +138,23 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->videoMode = "800 x 600 @ 16-bit colour";
   }
 
-  // Default background color
-  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::Black);
-
-  // Load all the plugins
-  this->LoadPlugins();
-
-  // Setup the available resources
-  this->SetupResources();
+  this->videoMode = "800 x 600 @ 16-bit colour";
 
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
 
   // Initialize the root node, and don't create a window
-  this->window = this->root->initialise(false);
+  this->root->initialise(false);
+}
 
-  // Create a window for Ogre
-  this->CreateWindow();
+////////////////////////////////////////////////////////////////////////////////
+// Initialize ogre
+void OgreAdaptor::Init(XMLConfigNode *rootNode)
+{
+  XMLConfigNode *node;
+  Ogre::ColourValue ambient;
 
-  // No window...then exit
-  if (!this->window)
-    return;
-
-  // Get the SceneManager, in this case a generic one
-  if (node->GetChild("bsp"))
-  {
-    this->sceneMgr = this->root->createSceneManager("BspSceneManager");
-    this->sceneType= SCENE_BSP;
-  }
-  else
-  {
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-    this->sceneType= SCENE_EXT;
-  }
+  node = rootNode->GetChild("ogre", "rendering");
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
@@ -189,10 +162,32 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Load Resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
+  // Get the SceneManager, in this case a generic one
+  if (node->GetChild("bsp"))
+  {
+    this->sceneType= SCENE_BSP;
+    this->sceneMgr = this->root->createSceneManager("BspSceneManager");
+  }
+  else
+  {
+    this->sceneType= SCENE_EXT;
+    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+  }
+
+  ambient.r = node->GetTupleDouble("ambient",0,1.0);
+  ambient.g = node->GetTupleDouble("ambient",1,1.0);
+  ambient.b = node->GetTupleDouble("ambient",2,1.0);
+  ambient.a = node->GetTupleDouble("ambient",3,1.0);
+
   // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient);
 
-  // Settings for shadow mapping
+  this->sceneMgr->setShadowTextureSelfShadow(true);
+  this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+  this->sceneMgr->setShadowTextureSize(node->GetInt("shadowTextureSize", 512));
+  this->sceneMgr->setShadowIndexBufferSize( node->GetInt("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize()) );
+
+   // Settings for shadow mapping
   std::string shadowTechnique = node->GetString("shadowTechnique", "stencilAdditive");
 
   if (shadowTechnique == std::string("stencilAdditive"))
@@ -204,33 +199,20 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   else 
     gzthrow(std::string("Unsupported shadow technique: ") + shadowTechnique + "\n");
 
-  this->sceneMgr->setShadowTextureSelfShadow(true);
-  this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-  this->sceneMgr->setShadowTextureSize(node->GetInt("shadowTextureSize", 512));
-  this->sceneMgr->setShadowIndexBufferSize( node->GetInt("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize()) );
+  //Preload basic shapes that can be used anywhere
+  OgreCreator::LoadBasicShapes();
 
-
-  // Add fog. This changes the background color
-  OgreCreator::CreateFog(node);
+  this->fogNode = node->GetChild("fog");
+  this->skyNode = node->GetChild("sky");
+  this->drawGrid = node->GetBool("grid", true);
 
   // Add a sky dome to our scene
-  OgreCreator::CreateSky(node);
+  OgreCreator::CreateSky(this->skyNode);
 
-  // Create our frame listener and register it
-  this->frameListener = new OgreFrameListener();
-  this->root->addFrameListener(this->frameListener);
+  // Add fog. This changes the background color
+  OgreCreator::CreateFog(this->fogNode);
 
-  // Create the default camera. This camera is only used to view the output
-  // of cameras created using the XML world file
-  this->camera = this->sceneMgr->createCamera("__GAZEBO_CAMERA__");
-  this->camera->setNearClipDistance(1);
-  this->camera->setFarClipDistance(1);
-  this->viewport = this->window->addViewport(this->camera);
-  this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
-
-  this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
-
-  if (node->GetBool("grid", true))
+  if (this->drawGrid)
     OgreCreator::DrawGrid();
 
   // Set up the world geometry link
@@ -248,40 +230,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
       exit(-1);
     }
   }
+  // Create our frame listener and register it
+  this->frameListener = new OgreFrameListener();
+  this->root->addFrameListener(this->frameListener);
 
-  //Preload basic shapes that can be used anywhere
-  OgreCreator::LoadBasicShapes();
-
-
-  /*
-    Ogre::ManualObject* myManualObject =  this->sceneMgr->createManualObject("manual1");
-    Ogre::SceneNode* myManualObjectNode = this->sceneMgr->getRootSceneNode()->createChildSceneNode("manual1_node");
-
-    Ogre::MaterialPtr myManualObjectMaterial = Ogre::MaterialManager::getSingleton().create("manual1Material","debugger");
-    myManualObjectMaterial->setReceiveShadows(false);
-    myManualObjectMaterial->getTechnique(0)->setLightingEnabled(true);
-    myManualObjectMaterial->getTechnique(0)->getPass(0)->setDiffuse(0,0,1,0);
-    myManualObjectMaterial->getTechnique(0)->getPass(0)->setAmbient(0,0,1);
-    myManualObjectMaterial->getTechnique(0)->getPass(0)->setSelfIllumination(0,0,1);
-
-    myManualObject->begin("manual1Material", Ogre::RenderOperation::OT_LINE_LIST);
-    myManualObject->position(0, 0, 0);
-    myManualObject->position(0, 1, 0);
-    myManualObject->position(0, 0, 0);
-    myManualObject->position(0, 0, 1);
-    myManualObject->position(0, 0, 0);
-    myManualObject->position(1, 0, 0);
-    // etc
-    myManualObject->end();
-    myManualObjectNode->attachObject(myManualObject);
-    */
-
-  //delete [] mstr;
-  //
-
+  this->updateRate = node->GetDouble("maxUpdateRate",0,0);
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Save
 void OgreAdaptor::Save(XMLConfigNode *node)
 {
   //Video information is not modified so we don't need to rewrite it.
@@ -458,59 +415,14 @@ void OgreAdaptor::SetupRenderSystem(bool create)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Create a window for Ogre
-void OgreAdaptor::CreateWindow()
+// Update a window
+void OgreAdaptor::UpdateWindow(Ogre::RenderWindow *window, OgreCamera *camera)
 {
-  Ogre::StringVector paramsVector;
-  Ogre::NameValuePairList params;
-  Gui *gui = Simulator::Instance()->GetUI();
+  this->root->_fireFrameStarted();
 
-  if (gui)
-  {
-    paramsVector.push_back( Ogre::StringConverter::toString( (size_t)(gui->GetDisplay()) ) );
-    paramsVector.push_back( Ogre::StringConverter::toString((int)gui->GetVisualInfo()->screen));
+  window->update();
 
-    paramsVector.push_back( Ogre::StringConverter::toString((int)gui->GetWindowId()));
-    paramsVector.push_back( Ogre::StringConverter::toString((size_t)(gui->GetVisualInfo())));
-
-    params["parentWindowHandle"] = Ogre::StringConverter::toString(paramsVector);
-
-    this->window = this->root->createRenderWindow( "WindowName", gui->GetWidth(), gui->GetHeight(), false, &params);
-
-    this->window->setActive(true);
-    this->window->setAutoUpdated(true);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Resize the render window
-void OgreAdaptor::ResizeWindow(unsigned int w, unsigned int h)
-{
-  this->window->resize(w, h);
-  this->window->update();
-
-  this->viewport->setDimensions(0,0,1,1);
-  this->camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()) );
-  //this->frameListener->Resize(w,h);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Render
-void OgreAdaptor::Render()
-{
-  OgreHUD::Instance()->Update();
-  this->root->renderOneFrame();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-float OgreAdaptor::GetAverageFPS() const
-{
-  float lastFPS, avgFPS, bestFPS, worstFPS;
-//  float avgFPS;
-  this->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-  return avgFPS;
-
+  this->root->_fireFrameEnded();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

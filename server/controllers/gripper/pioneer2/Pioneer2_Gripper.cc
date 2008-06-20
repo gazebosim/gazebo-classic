@@ -89,7 +89,7 @@ void Pioneer2_Gripper::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Pioneer2_Gripper::UpdateChild(UpdateParams &params)
+void Pioneer2_Gripper::UpdateChild()
 {
   /*double leftPaddleHiStop = this->joints[LEFT]->GetParam(dParamHiStop);
   double leftPaddleLoStop = this->joints[LEFT]->GetParam(dParamLoStop);

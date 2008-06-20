@@ -27,8 +27,6 @@
 #include <iostream>
 #include <fstream>
 #include <sys/time.h>
-//#include <boost/signals.hpp>
-//#include <boost/bind.hpp>
 
 #include "World.hh"
 #include "Gui.hh"
@@ -104,7 +102,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     loaded=false;
   }
 
-    // Load the world file
+  // Load the world file
   this->xmlFile=new gazebo::XMLConfig();
   try
   {
@@ -114,12 +112,13 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   {
     gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
   }
+
   XMLConfigNode *rootNode(xmlFile->GetRootNode());
 
-    // Load the messaging system
+  // Load the messaging system
   gazebo::GazeboMessage::Instance()->Load(rootNode);
 
-    // load the configuration options 
+  // load the configuration options 
   this->gazeboConfig=new gazebo::GazeboConfig();
   try
   {
@@ -130,7 +129,10 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-  //Create and initialize the Gui
+  // Load the Ogre rendering system
+  OgreAdaptor::Instance()->Load(rootNode);
+
+  // Create and initialize the Gui
   try
   {
     XMLConfigNode *childNode = rootNode->GetChild("gui");
@@ -149,7 +151,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
       // Create the GUI
       this->gui = new Gui(x, y, width, height, type+"::Gazebo");
-      this->gui->Init();
     }
   }
   catch (GazeboError e)
@@ -157,20 +158,24 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     gzthrow( "Error loading the GUI\n" << e);
   }
 
-  //Initialize RenderEngine //create factory
-  //this->renderEngine = new OgreAdaptor();
+  //Initialize RenderEngine
   try
   {
     OgreAdaptor::Instance()->Init(rootNode);
     this->renderEngine = OgreAdaptor::Instance();
-    //this->renderEngine->Init();
   }
   catch (gazebo::GazeboError e)
   {
     gzthrow("Failed to Initialize the Rendering engine subsystem\n" << e );
   }
 
-    //Create the world
+  // Initialize the GUI
+  if (this->gui)
+  {
+    this->gui->Init();
+  }
+
+  //Create the world
   try
   {
     gazebo::World::Instance()->Load(rootNode, serverId);
@@ -181,6 +186,19 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   this->loaded=true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the simulation
+int Simulator::Init()
+{
+
+  this->startTime = this->GetWallTime();
+
+  //Initialize the world
+  if (gazebo::World::Instance()->Init() != 0)
+    return -1;
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,19 +217,6 @@ void Simulator::Save(const std::string& filename)
   {
    gzthrow("The XML file could not be written back to " << filename );
    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Initialize the simulation
-int Simulator::Init()
-{
-  this->startTime = this->GetWallTime();
-
-  //Initialize the world
-  if (gazebo::World::Instance()->Init() != 0)
-    return -1;
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -269,13 +274,15 @@ void Simulator::MainLoop()
     if (renderUpdateRate == 0 || 
         currTime - this->prevRenderTime >= renderUpdatePeriod)
     {
-      this->GetRenderEngine()->Render(); 
-      this->prevRenderTime = this->GetRealTime();
+      //this->GetRenderEngine()->Render(); 
+      //this->prevRenderTime = this->GetRealTime();
     }
 
     // Update the gui
     if (this->gui)
+    {
       this->gui->Update();
+    }
 
     elapsedTime = (this->GetRealTime() - currTime);
 

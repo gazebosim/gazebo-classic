@@ -24,8 +24,7 @@
  * SVN: $Id:$
  */
 
-#include "CameraSensor.hh"
-//#include <X11/keysym.h>
+#include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <FL/Fl_Menu_Item.H>
@@ -33,25 +32,31 @@
 
 #include <GL/glx.h>
 
+#include "OgreCamera.hh"
+#include "OgreCreator.hh"
 #include "Simulator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "MainMenu.hh"
 #include "CameraManager.hh"
+#include "UserCamera.hh"
 #include "World.hh"
 
 #include "OgreHUD.hh"
+#include "OgreAdaptor.hh"
 
+#include "GLFrame.hh"
 #include "GLWindow.hh"
 
 using namespace gazebo;
 
+GLWindow *GLWindow::activeWin = NULL;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-GLWindow::GLWindow(int x, int y, int w, int h, const std::string &label)
-    : Fl_Gl_Window( x, y, w, h, label.c_str() )
+GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
+    : Fl_Gl_Window( x, y, w, h, "" )
 {
-
   this->end();
 
   this->moveAmount = 1.0;
@@ -64,7 +69,8 @@ GLWindow::GLWindow(int x, int y, int w, int h, const std::string &label)
 
   this->keys.clear();
 
-  this->resizable(this);
+  if (activeWin == NULL)
+    activeWin = this;
 }
 
 
@@ -79,20 +85,16 @@ GLWindow::~GLWindow()
 void GLWindow::Init()
 {
   this->show();
-
-  // Must have the next two lines right here!!!!
-  this->make_current();
-  this->valid(1);
-
-  this->display = fl_display;
-  this->visual = fl_visual;
-  this->colormap = fl_colormap;
-  this->windowId = Fl_X::i(this)->xid;
-
   this->mouseDrag = false;
 
-  Fl_Window::show();
+  // Create the default camera.
+  this->userCamera = new UserCamera( this );
+  this->userCamera->Load(NULL);
+  this->userCamera->Init();
+  this->userCamera->RotatePitch( DTOR(30) );
+  this->userCamera->Translate( Vector3(-5, 0, 1) );
 
+  this->activeCamera = this->userCamera;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,74 +111,56 @@ unsigned int GLWindow::GetHeight() const
   return this->h();
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+void GLWindow::flush()
+{
+  return;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Update function
 void GLWindow::Update()
 {
-  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
-  std::map<int,int>::iterator iter;
-
-  for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
+  /*if (this->userCamera && this->userCamera->GetUserMovable())
   {
-    if (iter->second == 1)
-    {
-      switch (iter->first)
-      {
-        case '=':
-        case '+':
-          this->moveAmount *= 2;
-          break;
-
-        case '-':
-        case '_':
-          this->moveAmount *= 0.5;
-          break;
-
-        case XK_Up:
-        case XK_w:
-          this->directionVec.x += this->moveAmount;
-          break;
-
-        case XK_Down:
-        case XK_s:
-          this->directionVec.x -= this->moveAmount;
-          break;
-
-        case XK_Left:
-        case XK_a:
-          this->directionVec.y += this->moveAmount;
-          break;
-
-        case XK_Right:
-        case XK_d:
-          this->directionVec.y -= this->moveAmount;
-          break;
-
-        case XK_Page_Down:
-        case XK_e:
-          this->directionVec.z += this->moveAmount;
-          break;
-
-        case XK_Page_Up:
-        case XK_q:
-          this->directionVec.z -= this->moveAmount;
-          break;
-
-        default:
-          break;
-      }
-    }
+    this->userCamera->Translate( 
+        this->directionVec * (Simulator::Instance()->GetRealTime() - this->lastUpdateTime) );
+    this->directionVec.Set(0,0,0);
   }
 
-  camera->Translate( this->directionVec * (Simulator::Instance()->GetRealTime() - this->lastUpdateTime) );
-  this->directionVec.Set(0,0,0);
+  this->lastUpdateTime = Simulator::Instance()->GetRealTime();
+
+  this->userCamera->Update();
+  */
+  if (this->activeCamera && this->activeCamera->GetUserMovable())
+  {
+    this->activeCamera->Translate( 
+        this->directionVec * (Simulator::Instance()->GetRealTime() - this->lastUpdateTime) );
+    this->directionVec.Set(0,0,0);
+  }
 
   this->lastUpdateTime = Simulator::Instance()->GetRealTime();
+
+  if (this->userCamera != this->activeCamera)
+    this->activeCamera->UpdateCam();
+  else
+    this->userCamera->Update();
 }
 
-void GLWindow::flush()
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a pointer to the camera
+UserCamera *GLWindow::GetCamera() const
 {
-  return;
+  return this->userCamera;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the average FPS for this window
+float GLWindow::GetAvgFPS() const
+{
+  return this->activeCamera->GetAvgFPS();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,15 +216,24 @@ void GLWindow::HandleMouseRelease()
 /// Handle a mouse drag
 void GLWindow::HandleMouseDrag()
 {
-  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
-
-  if (camera)
+  /*if (this->userCamera && this->userCamera->GetUserMovable())
   {
     if (this->leftMousePressed)
     {
       Vector2<int> d = this->mousePos - this->prevMousePos;
-      camera->RotateYaw(-d.x * this->rotateAmount);
-      camera->RotatePitch(d.y * this->rotateAmount);
+      this->userCamera->RotateYaw(DTOR(-d.x * this->rotateAmount));
+      this->userCamera->RotatePitch(DTOR(d.y * this->rotateAmount));
+    }
+  }
+  */
+
+  if (this->activeCamera && this->activeCamera->GetUserMovable())
+  {
+    if (this->leftMousePressed)
+    {
+      Vector2<int> d = this->mousePos - this->prevMousePos;
+      this->activeCamera->RotateYaw(DTOR(-d.x * this->rotateAmount));
+      this->activeCamera->RotatePitch(DTOR(d.y * this->rotateAmount));
     }
   }
 
@@ -249,30 +242,80 @@ void GLWindow::HandleMouseDrag()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a key press
-void GLWindow::HandleKeyPress()
+void GLWindow::HandleKeyPress(int keyNum)
 {
-  this->keys[Fl::event_key()] = 1;
+  std::map<int,int>::iterator iter;
+  this->keys[keyNum] = 1;
+
+  for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
+  {
+    if (iter->second == 1)
+    {
+      switch (iter->first)
+      {
+        case '=':
+        case '+':
+          this->moveAmount *= 2;
+          break;
+
+        case '-':
+        case '_':
+          this->moveAmount *= 0.5;
+          break;
+
+        case XK_Up:
+        case XK_w:
+          this->directionVec.x += this->moveAmount;
+          break;
+
+        case XK_Down:
+        case XK_s:
+          this->directionVec.x -= this->moveAmount;
+          break;
+
+        case XK_Left:
+        case XK_a:
+          this->directionVec.y += this->moveAmount;
+          break;
+
+        case XK_Right:
+        case XK_d:
+          this->directionVec.y -= this->moveAmount;
+          break;
+
+        case XK_Page_Down:
+        case XK_e:
+          this->directionVec.z += this->moveAmount;
+          break;
+
+        case XK_Page_Up:
+        case XK_q:
+          this->directionVec.z -= this->moveAmount;
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a key release
-void GLWindow::HandleKeyRelease()
+void GLWindow::HandleKeyRelease(int keyNum)
 {
-  this->keys[Fl::event_key()] = 0;
+  this->keys[keyNum] = 0;
 
-  Simulator* sim=Simulator::Instance();
+  Simulator* sim = Simulator::Instance();
+
   // Handle all toggle keys
-  switch (Fl::event_key())
+  switch (keyNum)
   {
     case 't':
       if (sim->GetUserPause())
         sim->SetUserPause(false);
       sim->SetUserStep( !sim->GetUserStep() );
       sim->SetUserStepInc( false );
-      break;
-
-    case 'h':
-      //OgreHUD::Instance()->ToggleHelp();
       break;
 
     case ' ':
@@ -296,10 +339,6 @@ void GLWindow::HandleKeyRelease()
     case ']':
       CameraManager::Instance()->DecActiveCamera();
       break;
-
-    case FL_Tab:
-      //OgreHUD::Instance()->ToggleVisible();
-      break;
   }
 }
 
@@ -312,25 +351,24 @@ int GLWindow::handle(int event)
   // Get the mouse position
   this->mousePos = Vector2<int>( Fl::event_x(), Fl::event_y() );
 
-  // Set the type of the event
-  switch (event)
+  // Handle Events
+  switch(event)
   {
-    // Need FL_FOCUS && FL_UNFOCUS to receive all the KEY_DOWN events
-    case FL_FOCUS:
     case FL_UNFOCUS:
+    case FL_LEAVE:
       handled = true;
       break;
 
-    case FL_ENTER:
-    case FL_LEAVE:
-    case FL_DEACTIVATE:
-    case FL_HIDE:
-      //this->inputHandler->ClearEvents();
-      return 0;
+    case FL_FOCUS:
+    case FL_ENTER: 
+      activeWin = this;
+      handled = true;
+      break;
 
     case FL_CLOSE:
       Simulator::Instance()->SetUserQuit();
-      return 0;
+      handled = true;
+      break;
 
     case FL_PUSH:
       this->HandleMousePush();
@@ -349,12 +387,18 @@ int GLWindow::handle(int event)
 
     case FL_SHORTCUT:
     case FL_KEYDOWN:
-      this->HandleKeyPress();
+      if (activeWin != this)
+        activeWin->HandleKeyPress(Fl::event_key());
+      else
+        this->HandleKeyPress(Fl::event_key());
       handled = true;
       break;
 
     case FL_KEYUP:
-      this->HandleKeyRelease();
+      if (activeWin != this)
+        activeWin->HandleKeyRelease(Fl::event_key());
+      else
+        this->HandleKeyRelease(Fl::event_key());
       handled = true;
       break;
 
@@ -368,4 +412,36 @@ int GLWindow::handle(int event)
     return Fl_Gl_Window::handle(event);
   else
     return 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Handle resizing the window
+void GLWindow::resize(int x, int y, int w, int h)
+{
+  Fl_Window::resize(x,y,w,h);
+  this->userCamera->Resize(w,h);
+
+  this->redraw();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the visual info
+XVisualInfo *GLWindow::GetVisualInfo() const
+{
+  return this->visual;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the display
+Display *GLWindow::GetDisplay() const
+{
+  return this->display;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the active camera
+void GLWindow::SetActiveCamera( OgreCamera *camera )
+{
+   this->activeCamera = camera;
 }

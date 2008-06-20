@@ -28,6 +28,7 @@
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
 
+#include "Gui.hh"
 #include "Simulator.hh"
 #include "OgreAdaptor.hh"
 #include "StatusBar.hh"
@@ -39,6 +40,8 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
 {
   x += 30;
   y += 5;
+
+  this->box(FL_UP_BOX);
   this->fps = new Fl_Value_Output(x,y,40,20,"FPS");
   this->fps->precision(0);
 
@@ -54,16 +57,19 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->pauseTime = new Fl_Value_Output(x,y,55,20,"Pause Time");
   this->pauseTime->precision(2);
 
-  x = this->pauseTime->x() + this->pauseTime->w() + 80;
-  this->iterations = new Fl_Value_Output(x,y,65,20,"Iterations");
-  this->iterations->precision(0);
+  //x = this->pauseTime->x() + this->pauseTime->w() + 80;
+  //this->iterations = new Fl_Value_Output(x,y,65,20,"Iterations");
+  //this->iterations->precision(0);
 
   x = this->w() - 80;
   this->statusString = new Fl_Output(x,y,80,20,"");
   this->statusString->value("Running");
   this->statusString->color(FL_GREEN);
 
+  this->resizable(NULL);
   this->end();
+  this->show();
+
 }
 
 StatusBar::~StatusBar()
@@ -74,8 +80,11 @@ StatusBar::~StatusBar()
 /// Update the toolbar data
 void StatusBar::Update()
 {
-  float avgFPS = Simulator::Instance()->GetRenderEngine()->GetAverageFPS();
-  this->iterations->value(Simulator::Instance()->GetIterations());
+  float avgFPS = 0;
+
+  avgFPS = this->gui->GetAvgFPS();
+
+  //this->iterations->value(Simulator::Instance()->GetIterations());
   this->fps->value(avgFPS);
 
   if (Simulator::Instance()->GetRealTime() - this->realTime->value() > 0.1)
@@ -101,9 +110,5 @@ void StatusBar::Update()
     this->statusString->color(FL_GREEN);
   }
 
-}
-
-int StatusBar::handle( int event )
-{
-  return 0;
+  //this->redraw();
 }

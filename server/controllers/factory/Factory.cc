@@ -80,7 +80,7 @@ void Factory::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Factory::UpdateChild(UpdateParams &params)
+void Factory::UpdateChild()
 {
   // If there is a string, then add the contents to the world
   if (strcmp((const char*)this->factoryIface->data->newModel,"")!=0)

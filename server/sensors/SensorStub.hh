@@ -48,7 +48,7 @@ class SensorStub : public Sensor
   public: SensorStub(Body *body);
 
   /// \brief Destructor
-  public: virtual ~CameraSensor();
+  public: virtual ~SensorStub();
 
   /// \brief Load the camera using parameter from an XMLConfig node
   /// \param node The XMLConfig node
@@ -58,7 +58,7 @@ class SensorStub : public Sensor
   protected: virtual void InitChild();
 
   /// \brief Update the sensor information
-  protected: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild();
 
   /// Finalize the camera
   protected: virtual void FiniChild();

@@ -28,7 +28,7 @@
 #include <Ogre.h>
 
 #include "World.hh"
-#include "CameraSensor.hh"
+#include "OgreCamera.hh"
 #include "OgreAdaptor.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -45,7 +45,7 @@ OgreHUD::OgreHUD()
 {
   this->ogreAdaptor = OgreAdaptor::Instance();
 
-  if (!this->ogreAdaptor->window)
+  /*if (!this->ogreAdaptor->window)
     return;
 
   Ogre::Overlay *hudOverlay;
@@ -69,24 +69,9 @@ OgreHUD::OgreHUD()
   this->cameraPanel->setPosition(0, 0);
   hudOverlay->add2D(this->cameraPanel);
 
-  /*  this->helpPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_HELP_PANEL_1__"));
-    this->helpPanel->setDimensions(1, 1);
-    this->helpPanel->setPosition(0, 0);
-    this->helpPanel->hide();
-    hudOverlay->add2D(this->helpPanel);
-
-    this->CreateHelp();
-    this->CreateTextBoxes();
-    */
-
-  /*this->backgroundPanel = static_cast<Ogre::OverlayContainer*>(overlayMgr->createOverlayElement("Panel", "__GAZEBO_BACKGROUND_PANEL__"));
-  this->backgroundPanel->setDimensions(1, 1);
-  this->backgroundPanel->setPosition(0, 0);
-  this->backgroundPanel->setMaterialName("Gazebo/FlatBlack");
-  hudOverlay->add2D(this->backgroundPanel);
+//  hudOverlay->show();
+  this->hudPanel->hide();
   */
-
-  hudOverlay->show();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,45 +101,14 @@ void OgreHUD::Close()
 /// Update the HUD.
 void OgreHUD::Update()
 {
-  /*  std::ostringstream stream;
-    if (Global::GetUserPause())
-    {
-      this->SetText("__GAZEBO_HUD_PAUSE__","Paused");
-    }
-    else if (Global::GetUserStep())
-    {
-      this->SetText("__GAZEBO_HUD_PAUSE__","Step");
-    }
-    else
-    {
-      this->SetText("__GAZEBO_HUD_PAUSE__","");
-    }
-
-    float lastFPS, avgFPS, bestFPS, worstFPS;
-    this->ogreAdaptor->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-
-    stream.precision(2);
-    stream.flags(std::ios::showpoint | std::ios::fixed);
-    stream.fill('0');
-
-    stream << "FPS        [" << (int)avgFPS << "]\n"
-           << "Iterations [" << Global::GetIterations() << "]\n"
-           << "Time       [" << World::Instance()->GetRealTime() << " "
-           << World::Instance()->GetSimTime() << " "
-           << World::Instance()->GetPauseTime() << "]";
-
-
-    this->SetText("__GAZEBO_HUD_STATS__",stream.str());
-
-    stream.str("");
-    */
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the camera pose text box
-void OgreHUD::SetCamera(const CameraSensor *camera)
+void OgreHUD::SetCamera(const OgreCamera *camera)
 {
+  /*
   if (!camera)
     gzthrow("Camera is NULL");
 
@@ -163,65 +117,15 @@ void OgreHUD::SetCamera(const CameraSensor *camera)
 
   // TODO: Fix this. It current displays the whole render texture, which is
   // not the actual size of the camera image
-  float width = (float)camera->GetTextureWidth() / this->ogreAdaptor->viewport->getActualWidth();
-  float height = (float)camera->GetTextureHeight() /this->ogreAdaptor->viewport->getActualHeight();
+  float width = (float)camera->GetTextureWidth() / camera->GetViewportWidth();
+  float height = (float)camera->GetTextureHeight() / camera->GetViewportHeight();
 
   float left = (1.0 - width) / 2.0;
   float top = (1.0 - height) / 2.0;
   this->cameraPanel->setDimensions(width, height);
   this->cameraPanel->setPosition(left,top);
-
-  /*float guiWidth = this->ogreAdaptor->viewport->getActualWidth();
-  float guiHeight = this->ogreAdaptor->viewport->getActualHeight();
-
-  float width = (float)camera->GetImageWidth() / camera->GetTextureWidth();
-  float height = (float)camera->GetImageHeight() / camera->GetTextureHeight();
-
-  float guiXScale = guiWidth / camera->GetImageWidth();
-  float guiYScale = guiHeight / camera->GetImageHeight();
-
-  printf("Viewport Size[%d %d]\n",this->ogreAdaptor->viewport->getActualWidth(), this->ogreAdaptor->viewport->getActualHeight());
-
-  printf("Texture Size[%d %d] [%4.4f %4.4f]\n",camera->GetTextureWidth(), camera->GetTextureHeight(), width, height);
-
-  printf("Image Size[%d %d]\n",camera->GetImageWidth(), camera->GetImageHeight());
-
-  printf("Gui Size[%f %f] Scale[%f %f]\n",guiWidth, guiHeight, guiXScale, guiYScale);
-
-  printf("GUI Ratio[%f] Texture Ratio[%f]\n", guiWidth/guiHeight, width/height);
-  printf("\n");
-
-  this->cameraPanel->setUV((1.0-width)/2.0,(1.0-height)/2.0,width, height);
-  float left = (1.0 - guiXScale) / 2.0;
-  float top = (1.0 - guiYScale) / 2.0;
-
-  //this->cameraPanel->setDimensions(1.0, height*(1.0/width));
-  //this->cameraPanel->setPosition(0,(1-height*(1.0/width)) / 2.0);
   */
 
-  /*std::ostringstream stream;
-  Pose3d pose = camera->GetWorldPose();
-
-  stream.precision(2);
-  stream.flags(std::ios::showpoint | std::ios::fixed);
-  stream.fill('0');
-
-  stream << camera->GetName() << " [" << camera->GetImageWidth() << " x " << camera->GetImageHeight() << "]\n";
-
-  pose -= Global::poseOffset;
-
-  stream << "  XYZ ["
-    << pose.pos.x   << " "
-    << pose.pos.y << " "
-    << pose.pos.z << "]\n";
-
-  stream << "  RPY ["
-    << RTOD(pose.rot.GetRoll()) << " "
-    << RTOD(pose.rot.GetPitch()) << " "
-    << RTOD(pose.rot.GetYaw()) << "]";
-
-  this->SetText("__GAZEBO_HUD_CAMERA_POSE__", stream.str());
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

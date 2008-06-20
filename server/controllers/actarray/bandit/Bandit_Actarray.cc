@@ -94,7 +94,7 @@ void Bandit_Actarray::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Bandit_Actarray::UpdateChild(UpdateParams &params)
+void Bandit_Actarray::UpdateChild()
 {
   HingeJoint *joint = NULL;
   float angle;

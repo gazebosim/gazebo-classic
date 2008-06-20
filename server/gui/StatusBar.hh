@@ -46,8 +46,6 @@ namespace gazebo
     /// \brief Update the toolbar data
     public: void Update();
    
-    public: int handle( int event );
-
     private: Fl_Value_Output *iterations;
     private: Fl_Value_Output *fps;
     private: Fl_Value_Output *realTime;
@@ -55,6 +53,8 @@ namespace gazebo
     private: Fl_Value_Output *simTime;
 
     private: Fl_Output *statusString;
+
+    public: Gui *gui;
   };
   
 }

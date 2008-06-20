@@ -30,8 +30,10 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Choice.H>
 
-
 #include "Global.hh"
+#include "GLFrameManager.hh"
+#include "OgreAdaptor.hh"
+#include "OgreCreator.hh"
 #include "Simulator.hh"
 #include "GLWindow.hh"
 #include "MainMenu.hh"
@@ -44,38 +46,39 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Gui::Gui (int x, int y, int width, int height, const std::string &t)
-  : Fl_Window(x, y, width+200, height+60, t.c_str())
- {
-  this->windowId = -1;
-  this->visual = NULL;
-  this->display = NULL;
-
+  : Fl_Window(x, y, width, height, t.c_str())
+{
   Fl::scheme("plastic");
 
-  // Create a main menu
-  new MainMenu(0,0,w(),30,(char *)"MainMenu");
+  // The order of creation matters! Menubar first, followed by FrameManager,
+  // then statusbar
+  {
+    // Create a main menu
+    new MainMenu(0,0,w(),30,(char *)"MainMenu");
 
-  // Create the Rendering window
-  this->glWindow = new GLWindow(0, 30, w()-200, h()-60,"GL Window");
+    // Create the frame mamanger
+    this->frameMgr = new GLFrameManager(0,30, this->w(), this->h()-60, "");
+
+    // Create the status bar
+    this->statusbar = new StatusBar(0, height-30, width, 30);
+    this->statusbar->gui = this;
+  }
+
 
   // Create the toolbar
-  this->toolbar = new Toolbar(w()-200, 30, 200, h()-60);
+  //this->toolbar = new Toolbar(this->w()-200, 30, 200, this->h()-60);
 
-  this->statusbar = new StatusBar(0, h()-30, w(), 30);
+  this->resizable(this->statusbar);
+  //this->resizable(this->toolbar);
+  this->resizable(this->frameMgr);
 
   this->end();
   this->show();
 
-  this->glWindow->Init();
 
-  this->display = this->glWindow->display;
-  this->visual = this->glWindow->visual;
-  this->colormap = this->glWindow->colormap;
-  this->windowId = this->glWindow->windowId;
-  this->resizable(this);
-  //this->glWindow->UserQuit.connect( &gazebo::Gui::UserQuit);
-  //this->glWindow->Finished.connect( boost::bind(&gazebo::Gui::Finished,this));
-  //MainMenu::Finished.connect( boost::bind(&gazebo::Gui::Finished,this));
+  // Create a dummy rendering window. This creates a context, and allows Ogre
+  // to initialize properly
+  OgreCreator::CreateWindow(this, 1, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,24 +87,23 @@ Gui::~Gui()
 {
   this->hide();
 
-  GZ_DELETE (this->glWindow)
-  GZ_DELETE (this->toolbar)
+  //GZ_DELETE (this->toolbar)
   //delete this->statusbar;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initalize the gui
 void Gui::Init()
 {
+  this->frameMgr->Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Gui::Update()
 {
-  this->toolbar->Update();
+  //this->toolbar->Update();
   this->statusbar->Update();
-  this->glWindow->Update();
+  this->frameMgr->Update();
   Fl::check();
   //Fl::wait(0.3);
 }
@@ -110,14 +112,14 @@ void Gui::Update()
 /// Get the width of the gui's rendering window
 unsigned int Gui::GetWidth() const
 {
-  return this->glWindow->w();
+  return this->w();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the height of the gui's rendering window
 unsigned int Gui::GetHeight() const
 {
-  return this->glWindow->h();
+  return this->h();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,23 +138,10 @@ int Gui::handle(int event)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the id of the window
-Window Gui::GetWindowId() const
+/// Get the average FPS
+float Gui::GetAvgFPS() const
 {
-  return this->windowId;
+  return this->frameMgr->GetFPS();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the visual info
-XVisualInfo *Gui::GetVisualInfo() const
-{
-  return this->visual;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the display
-Display *Gui::GetDisplay() const
-{
-  return this->display;
-}
 

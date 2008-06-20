@@ -29,7 +29,6 @@
 #include "Global.hh"
 #include "Pose3d.hh"
 #include "OgreHUD.hh"
-#include "CameraSensor.hh"
 #include "CameraManager.hh"
 #include "OgreAdaptor.hh"
 #include "OgreFrameListener.hh"
@@ -99,17 +98,18 @@ OgreFrameListener::OgreFrameListener()
 OgreFrameListener::~OgreFrameListener()
 {
   CameraManager::Instance()->Clear();
-  OgreHUD::Close();
+//  OgreHUD::Close();
 }
 
 bool OgreFrameListener::frameStarted( const Ogre::FrameEvent &evt)
 {
-  CameraSensor *camera;
+ /* OgreCamera *camera;
 
   if ((camera = CameraManager::Instance()->GetActiveCamera()))
   {
     OgreHUD::Instance()->SetCamera(camera);
   }
+  */
 
   return true;
 }

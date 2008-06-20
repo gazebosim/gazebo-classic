@@ -120,7 +120,6 @@ namespace gazebo
     public: void LoadGui(XMLConfigNode *rootNode);
     public: void SaveGui(XMLConfigNode *node);
 
-
     //User Iteractions
     /// \brief Simulator finished by the user
     public: void SetUserQuit();

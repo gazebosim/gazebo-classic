@@ -25,15 +25,17 @@
 
 #ifndef OGRECREATOR
 #define OGRECREATOR
-#include <string>
 
-//#include <Ogre.h>
+#include <string>
 
 namespace Ogre
 {
   class Camera;
   class RenderTarget;
+  class RenderWindow;
 }
+
+class Fl_Window;
 
 namespace gazebo
 {
@@ -45,7 +47,7 @@ namespace gazebo
 /// \{
 
 
-/// \brief Functions that creates Ogre3d objects
+   /// \brief Functions that creates Ogre3d objects
   class OgreCreator
   {
 
@@ -58,16 +60,19 @@ namespace gazebo
     /// \brief Load some simple shapes on the render engine
       public: static void LoadBasicShapes();
 
-    ///\brief Create a Plane
-    ///It adds itself to the Visual node parent, it will those change parent
-    ///properties if needed, to avoid this create a child visual node for the plane
+    /// \brief Create a Plane
+    /// It adds itself to the Visual node parent, it will those change parent
+    /// properties if needed, to avoid this create a child visual node for the 
+    /// plane
     public: static void CreatePlane(XMLConfigNode *node, OgreVisual *parent);
     
     /// \brief Create a light source 
     public: static void CreateLight(XMLConfigNode *node, OgreVisual *parent);
 
     /// \brief Helper function to create a camera
-    public: static Ogre::Camera *CreateCamera(const std::string &name, double nearClip, double farClip, double hfov, Ogre::RenderTarget *renderTarget);
+    public: static Ogre::Camera *CreateCamera(const std::string &name, 
+                double nearClip, double farClip, double hfov, 
+                Ogre::RenderTarget *renderTarget);
 
     /// \brief Helper function to create fog
     public: static void CreateFog(XMLConfigNode *node);
@@ -77,10 +82,17 @@ namespace gazebo
 
     /// \brief Helper function to create the sky 
     public: static void CreateSky(XMLConfigNode *node);
-    
-    public: static void DrawGrid();
-    private: static unsigned int lightCounter;
 
+    /// \brief Create a new window
+    public: static Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 
+                                                    unsigned int width, 
+                                                    unsigned int height);
+   
+    /// \brief Draw the uniform grid pattern
+    public: static void DrawGrid();
+
+    private: static unsigned int lightCounter;
+    private: static unsigned int windowCounter;
 
 /// \}
 

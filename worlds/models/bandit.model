@@ -61,14 +61,14 @@
       <hfov>60</hfov>
       <nearClip>0.1</nearClip>
       <farClip>100</farClip>
-      <saveFrames>false</saveFrames>
+      <saveFrames>true</saveFrames>
       <saveFramePath>frames</saveFramePath>
       <baseline>0.2</baseline>
 
-      <controller:stereo_camera name="stereo_camera_controller">
+      <controller:stereocamera name="stereo_camera_controller">
         <interface:stereocamera name="bandit_stereo_iface" />
         <interface:camera name="bandit_stereo_camera_iface" />
-      </controller:stereo_camera>
+      </controller:stereocamera>
     </sensor:stereocamera>
   </body:box>
 

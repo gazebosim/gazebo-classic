@@ -57,6 +57,9 @@ Generic_PTZ::Generic_PTZ(Entity *parent)
 
   this->motionGain = 2;
   this->force = 10;
+
+  this->panJoint = NULL;
+  this->tiltJoint = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +115,7 @@ void Generic_PTZ::ResetChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Generic_PTZ::UpdateChild(UpdateParams &params)
+void Generic_PTZ::UpdateChild()
 {
   this->ptzIface->Lock(1);
 

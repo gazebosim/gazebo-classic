@@ -21,10 +21,10 @@
 /* Desc: Class to manage all cameras
  * Author: Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id$
+ * SVN: $Id: CameraManager.cc 4436 2008-03-24 17:42:45Z robotos $
  */
 
-#include "CameraSensor.hh"
+#include "OgreCamera.hh"
 #include "CameraManager.hh"
 
 using namespace gazebo;
@@ -57,9 +57,10 @@ CameraManager *CameraManager::Instance()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add new camera
-void CameraManager::AddCamera( CameraSensor *camera )
+void CameraManager::AddCamera( OgreCamera *camera )
 {
   this->cameras.push_back(camera);
+  this->addSignal(camera);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +79,26 @@ unsigned int CameraManager::GetNumCameras() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a camera
-CameraSensor *CameraManager::GetCamera(int index)
+OgreCamera *CameraManager::GetCamera(int index)
 {
   return this->cameras[index];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get a camera based on the camera's name
+OgreCamera *CameraManager::GetCamera(const std::string &cameraName) const
+{
+  std::deque< OgreCamera* >::const_iterator iter;
+
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  {
+    if ((*iter)->GetCameraName() == cameraName)
+      return (*iter);
+  }
+
+  return NULL;
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a camera to be active.
 void CameraManager::SetActiveCamera(unsigned int index)
@@ -94,7 +110,7 @@ void CameraManager::SetActiveCamera(unsigned int index)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the active camera
-CameraSensor *CameraManager::GetActiveCamera()
+OgreCamera *CameraManager::GetActiveCamera()
 {
   if (this->activeCamera < this->cameras.size())
     return this->cameras[this->activeCamera];

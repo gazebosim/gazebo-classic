@@ -113,41 +113,41 @@ class World : public SingletonT<World>
   /// \brief register a geom This method is no more than a manually-done signal system
   public: void RegisterGeom(Geom *geom);
 
-    // User control of how the world is viewed 
-    // If this section grows it may become a model-view structure ...
-    /// \brief Return true if the bounding boxes should be shown
-    public: bool GetShowBoundingBoxes();
+  // User control of how the world is viewed 
+  // If this section grows it may become a model-view structure ...
+  /// \brief Return true if the bounding boxes should be shown
+  public: bool GetShowBoundingBoxes();
 
-    /// \brief Set if the bounding boxes should be shown
-    public: void SetShowBoundingBoxes(bool show);
+  /// \brief Set if the bounding boxes should be shown
+  public: void SetShowBoundingBoxes(bool show);
 
-    /// \brief Get wheter to show the joints
-    public: bool GetShowJoints();
+  /// \brief Get wheter to show the joints
+  public: bool GetShowJoints();
 
-    /// \brief Set whether to show the joints
-    public: void SetShowJoints(bool show);
+  /// \brief Set whether to show the joints
+  public: void SetShowJoints(bool show);
 
-    /// \brief Set to view as wireframe
-    public: void SetWireframe( bool wire );
+  /// \brief Set to view as wireframe
+  public: void SetWireframe( bool wire );
 
-    /// \brief Get whether to view as wireframe
-    public: bool GetWireframe();
+  /// \brief Get whether to view as wireframe
+  public: bool GetWireframe();
 
-    /// \brief Set to view as wireframe
-    public: void SetShowPhysics( bool show );
+  /// \brief Set to view as wireframe
+  public: void SetShowPhysics( bool show );
 
-    /// \brief Get whether to view as wireframe
-    public: bool GetShowPhysics();
+  /// \brief Get whether to view as wireframe
+  public: bool GetShowPhysics();
 
-    /// Set to true to show bounding boxes
-    private: bool showBoundingBoxes;
+  /// Set to true to show bounding boxes
+  private: bool showBoundingBoxes;
 
-    /// Set to true to show joints
-    private: bool showJoints;
+  /// Set to true to show joints
+  private: bool showJoints;
 
-    private: bool showPhysics;
+  private: bool showPhysics;
 
-    private: bool wireframe;
+  private: bool wireframe;
 
 
   /// \brief Load a model

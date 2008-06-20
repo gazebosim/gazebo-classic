@@ -52,29 +52,9 @@
         <size>2000 2000</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/GrassFloor</material>
+        <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
-  </model:physical>
-
-  <!-- The camera -->
-  <model:physical name="cam1_model">
-    <xyz>0.07 -1.10 0.5</xyz>
-    <rpy>0 12 52.5</rpy>
-    <static>true</static>
-
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>640 480</imageSize>
-        <hfov>60</hfov>
-        <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
-
-        <!--<saveFrames>true</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-        -->
-      </sensor:camera>
-    </body:empty>
   </model:physical>
 
   <model:physical name="cylinder1_model">
@@ -92,16 +72,6 @@
       </geom:cylinder>
     </body:cylinder>
   </model:physical>
-
-
-  <!-- 
-  Include the complete model described in the .model file
-  This assumes the root node is a <model:...>
-  -->
-  <!--  <include embedded="false">
-    <xi:include href="pioneer2dx.model" />
-  </include>
-  -->
 
   <model:physical name="pioneer2dx_model1">
     <xyz>0 0 0.145</xyz>
@@ -150,7 +120,5 @@
       <attenuation>10 1.0 0.0 0</attenuation>
     </light>
   </model:renderable>
- 
-
 
 </gazebo:world>

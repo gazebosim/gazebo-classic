@@ -34,7 +34,7 @@
 namespace gazebo
 {
   class CameraIface;
-  class CameraSensor;
+  class OgreCamera;
 
 /// @addtogroup gazebo_controller
 /// @{
@@ -84,7 +84,7 @@ class Generic_Camera : public Controller
 
   /// \brief Update the controller
   /// \return 0 on success
-  protected: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild();
 
   /// \brief Finalize the controller
   /// \return 0 on success
@@ -97,7 +97,7 @@ class Generic_Camera : public Controller
   private: CameraIface *cameraIface;
 
   /// The parent sensor
-  private: CameraSensor *myParent;
+  private: OgreCamera *myParent;
 
 };
 

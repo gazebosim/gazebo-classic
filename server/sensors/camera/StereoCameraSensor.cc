@@ -51,7 +51,7 @@ GZ_REGISTER_STATIC_SENSOR("stereocamera", StereoCameraSensor);
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 StereoCameraSensor::StereoCameraSensor(Body *body)
-    : CameraSensor(body)
+    : Sensor(body), OgreCamera("Stereo")
 {
   this->depthBuffer[0] = NULL;
   this->depthBuffer[1] = NULL;
@@ -78,7 +78,7 @@ StereoCameraSensor::~StereoCameraSensor()
 // Load the camera
 void StereoCameraSensor::LoadChild( XMLConfigNode *node )
 {
-  CameraSensor::LoadChild(node);
+  this->LoadCam(node);
 
   this->baseline = node->GetDouble("baseline",0,1);
 }
@@ -91,6 +91,8 @@ void StereoCameraSensor::InitChild()
   Ogre::MaterialPtr matPtr;
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   int i;
+
+  this->SetCameraSceneNode( this->GetVisualNode()->GetSceneNode() );
 
   this->textureName[LEFT] = this->GetName() + "_RttTex_Stereo_Left";
   this->textureName[RIGHT] = this->GetName() + "_RttTex_Stereo_Right";
@@ -106,30 +108,33 @@ void StereoCameraSensor::InitChild()
   for (i = 0; i<2; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], false);
-    this->renderTarget[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
-    this->renderTarget[i]->setAutoUpdated(false);
+    this->renderTargets[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
+    this->renderTargets[i]->setAutoUpdated(false);
   }
 
   // Create the render texture for the depth textures
   for (i = 2; i<4; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], true);
-    this->renderTarget[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
-    this->renderTarget[i]->setAutoUpdated(false);
+    this->renderTargets[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
+    this->renderTargets[i]->setAutoUpdated(false);
   }
 
   // Create the camera
-  this->camera = OgreCreator::CreateCamera(this->GetName(),
+  /*this->camera = OgreCreator::CreateCamera(this->GetName(),
                  this->nearClip, this->farClip, this->hfov, 
-                 this->renderTarget[D_LEFT]);
+                 this->renderTargets[D_LEFT]);
+                 */
+  this->renderTarget = this->renderTargets[D_LEFT];
 
+  this->InitCam();
   // Hack to make the camera use the right render target too.
   for (i=0; i<4; i++)
   {
     if (i != D_LEFT )
     {
       // Setup the viewport to use the texture
-      cviewport = this->renderTarget[i]->addViewport(this->camera);
+      cviewport = this->renderTargets[i]->addViewport(this->GetOgreCamera());
       cviewport->setClearEveryFrame(true);
       cviewport->setOverlaysEnabled(false);
       cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
@@ -153,11 +158,11 @@ void StereoCameraSensor::InitChild()
   this->textureHeight = mBuffer->getHeight();
 
 
-  //this->leftCameraListener.Init(this, this->renderTarget[0], true);
-  //this->rightCameraListener.Init(this, this->renderTarget[1], false);
+  //this->leftCameraListener.Init(this, this->renderTargets[0], true);
+  //this->rightCameraListener.Init(this, this->renderTargets[1], false);
 
-  //this->renderTarget[0]->addListener(&this->leftCameraListener);
-  //this->renderTarget[1]->addListener(&this->rightCameraListener);
+  //this->renderTargets[0]->addListener(&this->leftCameraListener);
+  //this->renderTargets[1]->addListener(&this->rightCameraListener);
  
   this->rgbBufferSize = this->imageWidth*this->imageHeight * 3;
   this->depthBufferSize = this->imageWidth*this->imageHeight;
@@ -167,19 +172,18 @@ void StereoCameraSensor::InitChild()
   this->depthBuffer[1] = new float[this->depthBufferSize];
   this->rgbBuffer[0] = new unsigned char[this->rgbBufferSize];
   this->rgbBuffer[1] = new unsigned char[this->rgbBufferSize];
-
-  CameraSensor::InitChild();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Finalize the camera
 void StereoCameraSensor::FiniChild()
 {
+   this->FiniCam();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void StereoCameraSensor::UpdateChild(UpdateParams &params)
+void StereoCameraSensor::UpdateChild()
 {
   OgreAdaptor *adapt = OgreAdaptor::Instance();
   Ogre::RenderSystem *renderSys = adapt->root->getRenderSystem();
@@ -189,6 +193,8 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
   Ogre::SceneNode *gridNode = NULL;
   int i;
 
+  this->UpdateCam();
+
   try
   {
     gridNode = sceneMgr->getSceneNode("__OGRE_GRID_NODE__");
@@ -197,8 +203,6 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
   {
     gridNode = NULL;
   }
-
-  CameraSensor::UpdateChild(params);
 
   sceneMgr->_suppressRenderStateChanges(true);
 
@@ -217,26 +221,26 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
     // OgreSceneManager::_render function automatically sets farClip to 0.
     // Which normally equates to infinite distance. We don't want this. So
     // we have to set the distance every time.
-    this->camera->setFarClipDistance( this->farClip );
+    this->GetOgreCamera()->setFarClipDistance( this->farClip );
 
 
     Ogre::AutoParamDataSource autoParamDataSource;
 
-    vp = this->renderTarget[i]->getViewport(0);
+    vp = this->renderTargets[i]->getViewport(0);
 
     // Need this line to render the ground plane. No idea why it's necessary.
     renderSys->_setViewport(vp);
     sceneMgr->_setPass(pass, true, false); 
     autoParamDataSource.setCurrentPass(pass);
     autoParamDataSource.setCurrentViewport(vp);
-    autoParamDataSource.setCurrentRenderTarget(this->renderTarget[i]);
+    autoParamDataSource.setCurrentRenderTarget(this->renderTargets[i]);
     autoParamDataSource.setCurrentSceneManager(sceneMgr);
-    autoParamDataSource.setCurrentCamera(this->camera);
+    autoParamDataSource.setCurrentCamera(this->GetOgreCamera());
     pass->_updateAutoParamsNoLights(autoParamDataSource);
 
     // These two lines don't seem to do anything useful
-    renderSys->_setProjectionMatrix(this->camera->getProjectionMatrixRS()); 
-    renderSys->_setViewMatrix(this->camera->getViewMatrix(true));
+    renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS()); 
+    renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
 
     // NOTE: We MUST bind parameters AFTER updating the autos
     if (pass->hasVertexProgram())
@@ -252,7 +256,7 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
       renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
           pass->getFragmentProgramParameters());
     }   
-    this->renderTarget[i]->update();
+    this->renderTargets[i]->update();
   }
 
   sceneMgr->_suppressRenderStateChanges(false); 
@@ -260,7 +264,7 @@ void StereoCameraSensor::UpdateChild(UpdateParams &params)
   // Render the image texture
   for (i=0; i<2; i++)
   {
-    this->renderTarget[i]->update();
+    this->renderTargets[i]->update();
   }
 
   if (gridNode)
@@ -461,13 +465,13 @@ double StereoCameraSensor::GetBaseline() const
 {
   this->sensor = cam;
   this->camera = this->sensor->GetOgreCamera();
-  this->renderTarget = target;
+  this->renderTargets = target;
   this->isLeftCamera = isLeft;
 }
 
 void StereoCameraSensor::StereoCameraListener::preViewportUpdate(const Ogre::RenderTargetViewportEvent &evt)
 {
-	if(evt.source != this->renderTarget->getViewport(0))
+	if(evt.source != this->renderTargets->getViewport(0))
   {
     printf("Invalid viewport");
 		return;

@@ -25,7 +25,7 @@
 
   <rendering:gui>
     <type>fltk</type>
-    <size>640 480</size>
+    <size>800 600</size>
     <pos>0 0</pos>
   </rendering:gui>
 
@@ -47,27 +47,9 @@
         <size>2000 2000</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/GrassFloor</material>
+        <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
-  </model:physical>
-
-  <model:physical name="cam2_model">
-    <xyz>1.27 2.84 1.13</xyz>
-    <rpy>0 16.5 -114</rpy>
-    <static>true</static>
-
-    <body:empty name="cam2_body">
-      <sensor:camera name="cam2_sensor">
-        <imageSize>800 600</imageSize>
-        <hfov>60</hfov>
-        <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
-
-        <saveFrames>false</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-      </sensor:camera>
-    </body:empty>
   </model:physical>
 
   <model:physical name="wood_pallet">
@@ -90,4 +72,15 @@
     </body:trimesh>
   </model:physical>
 
+  <!-- White Directional light -->
+  <model:renderable name="directional_white">
+    <light>
+      <type>directional</type>
+      <direction>0 -0.5 -0.5</direction>
+      <diffuseColor>0.4 0.4 0.4</diffuseColor>
+      <specularColor>0.0 0.0 0.0</specularColor>
+      <attenuation>100 0.0 1.0 0.4</attenuation>
+    </light>
+  </model:renderable>
+ 
 </gazebo:world>

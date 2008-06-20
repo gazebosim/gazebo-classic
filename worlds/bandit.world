@@ -105,28 +105,25 @@
         <size>2000 2000</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/GrassFloor</material>
+        <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
   </model:physical>
 
+  <model:physical name="cylinder1_model">
+    <xyz>10 0 0.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
 
- <model:physical name="cam1_model">
-   <xyz>2.96 -0.06 1.04</xyz>
-    <rpy>0 16 180</rpy>
-
-    <static>true</static>
-
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>800 600</imageSize>
-        <hfov>60</hfov>
-        <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
-        <saveFrames>false</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-      </sensor:camera>
-    </body:empty>
+    <body:cylinder name="cylinder1_body">
+      <geom:cylinder name="cylinder1_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
   </model:physical>
 
   <!-- White Directional light -->

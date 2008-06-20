@@ -31,7 +31,6 @@
 #include <list>
 #include <vector>
 
-#include "UpdateParams.hh"
 #include "XMLConfig.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
@@ -68,7 +67,7 @@ class Body : public Entity
   public: void Fini();
 
   /// \brief Update the body
-  public: virtual void Update(UpdateParams &params);
+  public: virtual void Update();
 
   /// \brief Attach a geom to this body
   /// \param geom Geometery to attach to this body

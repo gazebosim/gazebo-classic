@@ -254,7 +254,7 @@ int Model::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the model
-int Model::Update(UpdateParams &params)
+int Model::Update()
 {
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
@@ -266,7 +266,7 @@ int Model::Update(UpdateParams &params)
   {
     if (bodyIter->second)
     {
-      bodyIter->second->Update(params);
+      bodyIter->second->Update();
     }
   }
 
@@ -275,7 +275,7 @@ int Model::Update(UpdateParams &params)
   {
 
     if (contIter->second)
-      contIter->second->Update(params);
+      contIter->second->Update();
   }
 
   for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)

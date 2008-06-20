@@ -24,7 +24,7 @@
 
   <rendering:gui>
     <type>fltk</type>
-    <size>640 480</size>
+    <size>800 600</size>
     <pos>0 0</pos>
   </rendering:gui>
 
@@ -47,33 +47,13 @@
         <size>2000 2000</size>
         <segments>1 1</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/GrassFloor</material>
+        <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
   </model:physical>
 
-  <!-- The Camera -->
-  <model:physical name="cam2_model">
-    <xyz>0 8.94 2.21</xyz>
-    <rpy>0 -15 90</rpy>
-    <static>true</static>
-
-    <body:empty name="cam2_body">
-      <sensor:camera name="cam2_sensor">
-        <imageSize>800 600</imageSize>
-        <hfov>60</hfov>
-        <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
-
-        <saveFrames>false</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-      </sensor:camera>
-    </body:empty>
-  </model:physical>
-
-
   <!-- Red Spot light -->
-  <!--<model:renderable name="spot_red">
+  <model:renderable name="spot_red">
     <xyz>0.0 0.0 2.0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
@@ -85,10 +65,9 @@
       <attenuation>5 0.2 0.2 0.00</attenuation>
     </light>
   </model:renderable>
-  -->
 
   <!-- Green Spot light -->
-  <!--<model:renderable name="spot_green">
+  <model:renderable name="spot_green">
     <xyz>0.0 1.0 2.0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
@@ -100,7 +79,6 @@
       <attenuation>10 0.2 0.1 0.00</attenuation>
     </light>
   </model:renderable>
-  -->
 
   <model:physical name="sphere1_model">
     <xyz>0 2 5.5</xyz>
@@ -135,7 +113,7 @@
 
 
   <!-- Yellow Point light -->
-  <!--<model:renderable name="point_yellow">
+  <model:renderable name="point_yellow">
     <xyz>5 5 5</xyz>
     <light>
       <type>point</type>
@@ -144,10 +122,9 @@
       <attenuation>10 0.4 0.1 0.0</attenuation>
     </light>
   </model:renderable>
-  -->
 
   <!-- White Directional light -->
-  <!--  <model:renderable name="directional_white">
+  <model:renderable name="directional_white">
     <light>
       <type>directional</type>
       <direction>0 -1 0</direction>
@@ -156,6 +133,5 @@
       <attenuation>100 0.0 1.0 0.4</attenuation>
     </light>
   </model:renderable>
-  -->
 
 </gazebo:world>

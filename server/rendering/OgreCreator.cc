@@ -26,6 +26,11 @@
 #include <math.h>
 #include <Ogre.h>
 #include <iostream>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <FL/Fl.H>
+#include <FL/x.H>
+
 
 #include "Global.hh"
 #include "Entity.hh"
@@ -41,6 +46,7 @@
 using namespace gazebo;
 
 unsigned int OgreCreator::lightCounter = 0;
+unsigned int OgreCreator::windowCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -198,28 +204,29 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
   camera->setNearClipDistance(nearClip);
   camera->setFarClipDistance(farClip);
 
-  // Setup the viewport to use the texture
-  cviewport = renderTarget->addViewport(camera);
-  cviewport->setClearEveryFrame(true);
-  cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
-  cviewport->setOverlaysEnabled(false);
+  if (renderTarget)
+  {
+    // Setup the viewport to use the texture
+    cviewport = renderTarget->addViewport(camera);
+    cviewport->setClearEveryFrame(true);
+    cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+    //cviewport->setOverlaysEnabled(false);
 
-  double ratio = (double)cviewport->getActualWidth() / (double)cviewport->getActualHeight();
-  double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-  camera->setAspectRatio(ratio);
-  camera->setFOVy(Ogre::Radian(vfov));
+    double ratio = (double)cviewport->getActualWidth() / (double)cviewport->getActualHeight();
+    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+    camera->setAspectRatio(ratio);
+    camera->setFOVy(Ogre::Radian(vfov));
+  }
 
   return camera;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OgreCreator::CreateFog(XMLConfigNode *node)
+void OgreCreator::CreateFog(XMLConfigNode *cnode)
 {
-  Ogre::ColourValue backgroundColor;
-  XMLConfigNode *cnode;
-
-  if ((cnode = node->GetChild("fog")))
+  if (cnode)
   {
+    Ogre::ColourValue backgroundColor;
     //Ogre::FogMode fogType = Ogre::FOG_NONE;
     //std::string type;
     //double density;
@@ -281,17 +288,16 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a sky
-void OgreCreator::CreateSky(XMLConfigNode *node)
+void OgreCreator::CreateSky(XMLConfigNode *cnode)
 {
-  XMLConfigNode *cnode;
-  if ((cnode = node->GetChild("sky")))
+  if (cnode)
   {
     std::string material = cnode->GetString("material","",1);
     if (!material.empty())
     {
       try
       {
-        if (node->GetChild("fog"))
+        /*if (node->GetChild("fog"))
         {
           Ogre::Plane plane;
           plane.d = 49;
@@ -299,11 +305,11 @@ void OgreCreator::CreateSky(XMLConfigNode *node)
           OgreAdaptor::Instance()->sceneMgr->setSkyPlane(true, plane, material, 500, 100, true, 0.5, 150, 150);
         }
         else
-        {
+        {*/
           Ogre::Quaternion orientation;
           orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
           OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
-        }
+        //}
 
       }
       catch (int)
@@ -344,9 +350,6 @@ void OgreCreator::DrawGrid()
 
 
   float d = 0.01;
-  float z_bottom = .02;
-  float height = 1.0;
-
   int dim = 50;
 
   // Vertex Values for a square box
@@ -481,4 +484,36 @@ void OgreCreator::DrawGrid()
   // etc
   gridObject->end();
   gridObjectNode->attachObject(gridObject);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a window for Ogre
+Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int width, unsigned int height)
+{
+  Ogre::StringVector paramsVector;
+  Ogre::NameValuePairList params;
+  Ogre::RenderWindow *window = NULL;
+
+  if (flWindow)
+  {
+    Display *display;
+    int screen;
+    Window winId;
+
+    display = fl_display;
+    screen = fl_visual->screen;
+    winId = Fl_X::i(flWindow)->xid;
+
+    params["parentWindowHandle"] = Ogre::StringConverter::toString((long)display) + ":" + Ogre::StringConverter::toString(screen) + ":" + Ogre::StringConverter::toString((long)winId);
+
+    std::ostringstream stream;
+    stream << "OgreWindow(" << windowCounter++ << ")";
+
+     window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
+
+    window->setActive(true);
+    window->setAutoUpdated(true);
+  }
+
+  return window;
 }

@@ -55,7 +55,7 @@ env = Environment (
   LIBPATH=Split('#libgazebo'),
     
   #LIBS=Split('gazebo boost_python')
-  LIBS=Split('gazebo'),
+  LIBS=Split('gazebo boost_signals'),
   LINKFLAGS=Split('-export-dynamic'),
 
   TARFLAGS = '-c -z',

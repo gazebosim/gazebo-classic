@@ -33,6 +33,7 @@
 #include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
+#include "PhysicsEngine.hh"
 #include "ControllerFactory.hh"
 #include "Differential_Position2d.hh"
 
@@ -93,17 +94,6 @@ void Differential_Position2d::LoadChild(XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load the controller
-void Differential_Position2d::SaveChild(XMLConfigNode *node)
-{
-  node->SetValue("wheelSeparation",this->wheelSep);
-  node->SetValue("wheelDiameter",this->wheelDiam);
-  node->SetValue("torque",this->torque);
-//  node->SetValue("leftJoint",this->XMLData["leftJointName"]);
-//  node->SetValue("rightJoint",this->XMLData["rightJointName"]);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Initialize the controller
 void Differential_Position2d::InitChild()
 {
@@ -115,7 +105,20 @@ void Differential_Position2d::InitChild()
   this->odomVel[0] = 0.0;
   this->odomVel[1] = 0.0;
   this->odomVel[2] = 0.0;
+
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Load the controller
+void Differential_Position2d::SaveChild(XMLConfigNode *node)
+{
+  node->SetValue("wheelSeparation",this->wheelSep);
+  node->SetValue("wheelDiameter",this->wheelDiam);
+  node->SetValue("torque",this->torque);
+//  node->SetValue("leftJoint",this->XMLData["leftJointName"]);
+//  node->SetValue("rightJoint",this->XMLData["rightJointName"]);
+}
+
 
 void Differential_Position2d::ResetChild()
 {
@@ -131,21 +134,25 @@ void Differential_Position2d::ResetChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void Differential_Position2d::UpdateChild(UpdateParams &params)
+void Differential_Position2d::UpdateChild()
 {
   // TODO: Step should be in a parameter of this function
   double wd, ws;
   double d1, d2;
   double dr, da;
+  double stepTime;
 
   this->GetPositionCmd();
 
   wd = this->wheelDiam;
   ws = this->wheelSep;
 
+
+  stepTime = World::Instance()->GetPhysicsEngine()->GetStepTime();
+
   // Distance travelled by front wheels
-  d1 = params.stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
-  d2 = params.stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
+  d1 = stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
+  d2 = stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
 
   dr = (d1 + d2) / 2;
   da = (d2 - d1) / ws;
@@ -156,9 +163,9 @@ void Differential_Position2d::UpdateChild(UpdateParams &params)
   this->odomPose[2] += da;
 
   // Compute odometric instantaneous velocity
-  this->odomVel[0] = dr / params.stepTime;
+  this->odomVel[0] = dr / stepTime;
   this->odomVel[1] = 0.0;
-  this->odomVel[2] = da / params.stepTime;
+  this->odomVel[2] = da / stepTime;
 
   //if (this->enableMotors)
   {

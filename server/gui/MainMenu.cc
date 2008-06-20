@@ -29,8 +29,10 @@
 #include "Global.hh"
 #include "World.hh"
 #include "Simulator.hh"
+#include "Gui.hh"
 #include "CameraManager.hh"
-#include "CameraSensor.hh"
+#include "OgreCamera.hh"
+#include "OgreAdaptor.hh"
 #include "MainMenu.hh"
 
 using namespace gazebo;
@@ -79,7 +81,7 @@ void MainMenu::OpenCB(Fl_Widget * /*w*/, void * /*data*/)
 // Save Frames Callback
 void MainMenu::SaveFramesCB(Fl_Widget * /*w*/, void * /*data*/)
 {
-  CameraSensor *camera = CameraManager::Instance()->GetActiveCamera();
+  OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
   camera->ToggleSaveFrame();
 }
 
@@ -124,3 +126,4 @@ void MainMenu::WireframeCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   World::Instance()->SetWireframe( !World::Instance()->GetWireframe() );
 }
+

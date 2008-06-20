@@ -84,7 +84,7 @@ class Differential_Position2d : public Controller
   protected: void ResetChild();
 
   /// Update the controller
-  protected: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild();
 
   /// Finalize the controller
   protected: virtual void FiniChild();
@@ -121,6 +121,7 @@ class Differential_Position2d : public Controller
 
   private: HingeJoint *joints[2];
 
+  private: PhysicsEngine  *physicsEngine;
 };
 
 /** \} */

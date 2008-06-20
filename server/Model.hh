@@ -33,7 +33,6 @@
 #include <vector>
 
 #include "MovableText.hh"
-#include "UpdateParams.hh"
 #include "Pose3d.hh"
 #include "Joint.hh"
 #include "Entity.hh"
@@ -74,7 +73,7 @@ namespace gazebo
   
     /// \brief Update the model
     /// \param params Update parameters
-    public: int Update(UpdateParams &params);
+    public: int Update();
   
     /// \brief Finalize the model
     public: int Fini();

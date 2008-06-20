@@ -74,7 +74,7 @@ class AudioController : public Controller
   protected: virtual void ResetChild();
 
   /// Update the controller
-  protected: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild();
 
   /// Finalize the controller
   protected: virtual void FiniChild();

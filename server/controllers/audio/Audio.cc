@@ -100,7 +100,7 @@ void AudioController::ResetChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
-void AudioController::UpdateChild(UpdateParams &params)
+void AudioController::UpdateChild()
 {
 
   OgreAL::Sound *sound;

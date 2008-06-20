@@ -52,116 +52,106 @@ namespace Ogre
   class RenderSystem;
 }
 
+
 namespace gazebo
 {
-/// \addtogroup gazebo_rendering
-/// \{
-
-
-class XMLConfigNode;
-class OgreFrameListener;
-class Entity;
-
-/// \brief Adptor to Ogre3d
-class OgreAdaptor : public SingletonT<OgreAdaptor>
-{
-
-  /// \brief Constructor
-  private: OgreAdaptor();
-
-  /// \brief Destructor
-  private: virtual ~OgreAdaptor();
-
-  /// \brief Closes the present simulation, frees the resources 
-  public: void Close();
-
-  /// \brief Default initialization. 
-  ///        Let OGRE create the window and rendering context
-  public: void Init(XMLConfigNode *rootNode);
-
-  /// \brief Save Ogre settings 
-  public: void Save(XMLConfigNode *node);
-
-  /// \brief Initialize Ogre Rendering engine
-  public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height); 
-  /// \brief Render a single frame
-  public: void Render();
-
-  /// \brief Resize the rendering window
-  public: void ResizeWindow(unsigned int w, unsigned int h);
-
-  /// \brief Get the average frame rate
-  public: float GetAverageFPS() const;
-
-  /// \brief Get the desired update rate
-  public: double GetUpdateRate();
-
-  private: void LoadPlugins();
-  private: void SetupResources();
-  private: void SetupRenderSystem(bool create);
-  private: void CreateWindow();
-
-  /// Pointer to the root scene node
-  public: Ogre::Root *root;
-
-  /// Pointer to the scene manager
-  public: Ogre::SceneManager *sceneMgr;
-
-  /// Pointer to the rendering system
-  public: Ogre::RenderSystem *renderSys;
-
-  /// Pointer to the render window
-  public: Ogre::RenderWindow *window;
-
-  /// Pointer to the camera
-  public: Ogre::Camera *camera;
-
-  /// Pointer to the viewport
-  public: Ogre::Viewport *viewport;
-
-  /// Pointer to the input reader
-  public: Ogre::InputReader *inputDevice;
-
-  private: Ogre::LogManager *logManager;
-
-  // Our custom frame listener
-  private: OgreFrameListener *frameListener;
-
-  public: Ogre::ColourValue *backgroundColor;
-
-  private: std::string videoMode;
-
-  private: bool ogreWindow;
+  /// \addtogroup gazebo_rendering
+  /// \{
   
-  //bsp attributes saved to write XML file back
-  private: int sceneType;
-  private: std::string worldGeometry;
+  
+  class XMLConfigNode;
+  class OgreFrameListener;
+  class Entity;
+  class UserCamera;
+  class OgreCamera;
+  
+  /// \brief Adptor to Ogre3d
+  class OgreAdaptor : public SingletonT<OgreAdaptor>
+  {
+  
+    /// \brief Constructor
+    private: OgreAdaptor();
+  
+    /// \brief Destructor
+    private: virtual ~OgreAdaptor();
+  
+    /// \brief Closes the present simulation, frees the resources 
+    public: void Close();
 
-  //private: Vector3 terrainSize;
-  //private: unsigned int terrainVertSize;
-  //private: std::string terrainImage;
+    /// \brief Load the parameters for Ogre
+    public: void Load(XMLConfigNode *rootNode);
 
-  private: double updateRate;
+    /// \brief Initialize ogre
+    public: void Init(XMLConfigNode *rootNode);
+  
+    /// \brief Save Ogre settings 
+    public: void Save(XMLConfigNode *node);
+  
+    /// \brief Initialize Ogre Rendering engine
+    public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height); 
+  
+    /// \brief Get the desired update rate
+    public: double GetUpdateRate();
+ 
+    /// \brief Update a window
+    public: void UpdateWindow(Ogre::RenderWindow *window, OgreCamera *camera);
 
-  private: friend class DestroyerT<OgreAdaptor>;
-  private: friend class SingletonT<OgreAdaptor>;
+    private: void LoadPlugins();
+    private: void SetupResources();
+    private: void SetupRenderSystem(bool create);
+  
+    /// Pointer to the root scene node
+    public: Ogre::Root *root;
+  
+    /// Pointer to the scene manager
+    public: Ogre::SceneManager *sceneMgr;
+  
+    /// Pointer to the rendering system
+    public: Ogre::RenderSystem *renderSys;
+ 
+    private: Ogre::LogManager *logManager;
+  
+    // Our custom frame listener
+    private: OgreFrameListener *frameListener;
+  
+    public: Ogre::ColourValue *backgroundColor;
+  
+    private: std::string videoMode;
+  
 
-};
+    //bsp attributes saved to write XML file back
+    private: int sceneType;
+    private: std::string worldGeometry;
+  
+    //private: Vector3 terrainSize;
+    //private: unsigned int terrainVertSize;
+    //private: std::string terrainImage;
+  
+    private: double updateRate;
 
-/*/// \brief 
-class OgreGLXWindowInterface
-{
-  public: virtual ~OgreGLXWindowInterface() = 0;
+    private: XMLConfigNode *skyNode;
+    private: XMLConfigNode *fogNode;
+    private: bool drawGrid;
 
-  // Call this with true when the window is mapped/visible, false when the window is unmapped/invisible
-  public: virtual void exposed(bool active) = 0;
-
-  // Call this to notify the window was resized
-  public: virtual void resized(size_t width, size_t height) = 0;
-};
-*/
-
-/// \}
+    private: friend class DestroyerT<OgreAdaptor>;
+    private: friend class SingletonT<OgreAdaptor>;
+  
+  };
+  
+  /*/// \brief 
+  class OgreGLXWindowInterface
+  {
+    public: virtual ~OgreGLXWindowInterface() = 0;
+  
+    // Call this with true when the window is mapped/visible, false when the window is unmapped/invisible
+    public: virtual void exposed(bool active) = 0;
+  
+    // Call this to notify the window was resized
+    public: virtual void resized(size_t width, size_t height) = 0;
+  };
+  */
+  
+  /// \}
 
 }
 #endif

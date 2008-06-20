@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,35 +18,46 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Parameters for each update cycle
+/* Desc: FLTK GL Frame manager
  * Author: Nate Koenig
- * Date: 8 May 2007
- * SVN: $Id$
+ * Date: 18 Jun 2008
+ * SVN: $Id:$
  */
 
-#ifndef UPDATEPARAMS_HH
-#define UPDATEPARAMS_HH
+#ifndef GLFRAMEMANAGER_HH
+#define GLFRAMEMANAGER_HH
+
+#include <FL/Fl_Tile.H>
+#include <vector>
 
 namespace gazebo
 {
-/// \addtogroup gazebo_server
-/// \brief Parameters used during update cycle
-/// \{
+  class GLFrame;
+  class GLWindow;
 
-/// \brief Parameters used during update cycle
-class UpdateParams
-{
-  /// \brief Constructor
-  public: UpdateParams();
+  /// \brief Class to manage all the GL frames
+  class GLFrameManager : public Fl_Tile
+  {
+    /// \brief Constructor
+    public: GLFrameManager(int x, int y, int w, int h, const std::string &name);
 
-  /// \brief Destructor
-  public: virtual ~UpdateParams();
+    /// \brief Destructor
+    public: virtual ~GLFrameManager();
 
-  /// \brief Elapsed time since last update
-  public: double stepTime;
-};
+    /// \brief Initalize the window manager
+    public: void Init();
 
-/// \}
+    /// \brief Update the window manager
+    public: void Update();
+
+    /// \brief Split a frame
+    public: void Split(GLFrame *parent, const std::string &type);
+
+    /// \brief Get the avg FPS
+    public: float GetFPS() const;
+
+    /// Vector of all the frames
+    private: std::vector<GLFrame *> frames;
+  };
 }
-
 #endif

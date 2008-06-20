@@ -37,7 +37,6 @@
 #include "Model.hh"
 #include "Simulator.hh"
 #include "gazebo.h"
-#include "UpdateParams.hh"
 #include "World.hh"
 #include "Geom.hh"
 
@@ -168,18 +167,15 @@ int World::Init()
 // Update the world
 int World::Update()
 {
-  UpdateParams params;
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
-
-  params.stepTime = this->physicsEngine->GetStepTime();
 
   // Update all the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     if (*miter)
     {
-      (*miter)->Update(params);
+      (*miter)->Update();
     }
   }
 
@@ -475,6 +471,7 @@ bool World::GetShowPhysics()
 {
   return this->showPhysics;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether to show the joints

@@ -183,7 +183,7 @@ void Body::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the body
-void Body::Update(UpdateParams &params)
+void Body::Update()
 {
   std::vector< Sensor* >::iterator sensorIter;
   std::vector< Geom* >::iterator geomIter;
@@ -205,7 +205,7 @@ void Body::Update(UpdateParams &params)
   for (sensorIter=this->sensors.begin();
        sensorIter!=this->sensors.end(); sensorIter++)
   {
-    (*sensorIter)->Update(params);
+    (*sensorIter)->Update();
   }
 }
 

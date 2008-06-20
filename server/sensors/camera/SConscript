@@ -1,7 +1,10 @@
 #Import variable
 Import('env staticObjs sharedObjs')
 
-sources = Split('CameraSensor.cc MonoCameraSensor.cc CameraManager.cc StereoCameraSensor.cc')
+sources = [
+           'MonoCameraSensor.cc',
+           'StereoCameraSensor.cc'
+          ]
 
 staticObjs.append(env.StaticObject(sources))
 sharedObjs.append(env.SharedObject(sources))

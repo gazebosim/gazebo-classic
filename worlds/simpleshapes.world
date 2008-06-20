@@ -65,7 +65,7 @@
         <mass>1.0</mass>
         <visual>
           <mesh>unit_box</mesh>
-          <material>Gazebo/BumpyMetal</material>
+          <material>Gazebo/Rocky</material>
         </visual>
       </geom:box>
     </body:box>
@@ -104,21 +104,15 @@
     </body:plane>
   </model:physical>
 
- <model:physical name="cam1_model">
-    <xyz>-6 0 3.5</xyz>
-    <rpy>0 28 0</rpy>
-    <static>true</static>
-
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>800 600</imageSize>
-        <hfov>60</hfov>
-        <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
-        <saveFrames>false</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-      </sensor:camera>
-    </body:empty>
-  </model:physical>
-
+  <!-- White Directional light -->
+  <model:renderable name="directional_white">
+    <light>
+      <type>directional</type>
+      <direction>0 -0.5 -0.5</direction>
+      <diffuseColor>0.4 0.4 0.4</diffuseColor>
+      <specularColor>0.0 0.0 0.0</specularColor>
+      <attenuation>100 0.0 1.0 0.4</attenuation>
+    </light>
+  </model:renderable>
+ 
 </gazebo:world>

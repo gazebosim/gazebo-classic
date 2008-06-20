@@ -28,7 +28,7 @@
 
   <rendering:gui>
     <type>fltk</type>
-    <size>640 480</size>
+    <size>800 600</size>
     <pos>0 0</pos>
   </rendering:gui>
 
@@ -43,8 +43,6 @@
       <linearStart>10</linearStart>
       <linearEnd>100</linearEnd>
     </fog>
-
-    <maxUpdateRate>0</maxUpdateRate>
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -62,26 +60,6 @@
         <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
-  </model:physical>
-
-  <!-- The camera -->
-  <model:physical name="cam1_model">
-    <xyz>0.07 -1.10 0.5</xyz>
-    <rpy>0 12 52.5</rpy>
-    <static>true</static>
-
-    <body:empty name="cam1_body">
-      <sensor:camera name="cam1_sensor">
-        <imageSize>640 480</imageSize>
-        <hfov>60</hfov>
-        <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
-
-        <!--<saveFrames>true</saveFrames>
-        <saveFramePath>frames</saveFramePath>
-        -->
-      </sensor:camera>
-    </body:empty>
   </model:physical>
 
   <model:physical name="cylinder1_model">

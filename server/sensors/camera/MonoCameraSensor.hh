@@ -27,20 +27,8 @@
 #ifndef MONOCAMERASENSOR_HH
 #define MONOCAMERASENSOR_HH
 
-#include <OgrePrerequisites.h>
-#include <OgreTexture.h>
-
-#include "CameraSensor.hh"
-
-// Forward Declarations
-namespace Ogre
-{
-  class TexturePtr;
-  class RenderTarget;
-  class Camera;
-  class Viewport;
-  class SceneNode;
-}
+#include "OgreCamera.hh"
+#include "Sensor.hh"
 
 namespace gazebo
 {
@@ -57,7 +45,7 @@ namespace gazebo
 /// This sensor is used for simulating standard monocular cameras; is
 /// is used by both camera models (e.g., SonyVID30) and user interface
 /// models (e.g., ObserverCam).
-class MonoCameraSensor : public CameraSensor
+class MonoCameraSensor : public Sensor, public OgreCamera
 {
   /// \brief Constructor
   public: MonoCameraSensor(Body *body);
@@ -73,7 +61,7 @@ class MonoCameraSensor : public CameraSensor
   protected: virtual void InitChild();
 
   /// \brief Update the sensor information
-  protected: virtual void UpdateChild(UpdateParams &params);
+  protected: virtual void UpdateChild();
 
   /// Finalize the camera
   protected: virtual void FiniChild();
@@ -84,14 +72,11 @@ class MonoCameraSensor : public CameraSensor
   /// \brief Get a pointer to the image data
   public: virtual const unsigned char *GetImageData(unsigned int i=0);
 
+  public: virtual std::string GetName() const { return Sensor::GetName(); }
+
   // Save the camera frame
   private: void SaveFrame();
 
-  private: Ogre::TexturePtr renderTexture;
-  private: Ogre::RenderTarget *renderTarget;
-
-  private: std::string ogreTextureName;
-  private: std::string ogreMaterialName;
 };
 
 /// \}

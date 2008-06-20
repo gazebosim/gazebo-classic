@@ -28,7 +28,6 @@
 #define SENSOR_HH
 
 #include "Entity.hh"
-#include "UpdateParams.hh"
 
 namespace gazebo
 {
@@ -57,7 +56,7 @@ namespace gazebo
     public: void Init();
   
     /// \brief  Update the sensor
-    public: void Update(UpdateParams &params);
+    public: void Update();
   
     /// \brief  Finalize the sensor
     public: void Fini();
@@ -72,7 +71,7 @@ namespace gazebo
     protected: virtual void InitChild() {};
   
     /// \brief  Update the child
-    protected: virtual void UpdateChild(UpdateParams & /*param*/) {};
+    protected: virtual void UpdateChild() {};
   
     /// \brief Finalize the child
     protected: virtual void FiniChild() {};

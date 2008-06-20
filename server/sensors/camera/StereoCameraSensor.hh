@@ -31,7 +31,8 @@
 #include <OgreTexture.h>
 #include <OgreMaterial.h>
 
-#include "CameraSensor.hh"
+#include "OgreCamera.hh"
+#include "Sensor.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -55,9 +56,8 @@ namespace gazebo
   /// \brief Stereo camera sensor
   ///
   /// This sensor is used for simulating a stereo camera.
-  class StereoCameraSensor : public CameraSensor
+  class StereoCameraSensor : public Sensor, public OgreCamera
   {
-  
     enum Sides {LEFT, RIGHT, D_LEFT, D_RIGHT};
   
     /// \brief Constructor
@@ -74,7 +74,7 @@ namespace gazebo
     protected: virtual void InitChild();
   
     /// \brief Update the sensor information
-    protected: virtual void UpdateChild(UpdateParams &params);
+    protected: virtual void UpdateChild();
   
     /// Finalize the camera
     protected: virtual void FiniChild();
@@ -92,7 +92,7 @@ namespace gazebo
   
     /// \brief Get the baselien of the camera
     public: double GetBaseline() const;
-  
+
     // Save the camera frame
     protected: virtual void SaveFrame();
   
@@ -104,7 +104,7 @@ namespace gazebo
     //private: void UpdateAllDependentRenderTargets();
   
     private: Ogre::TexturePtr renderTexture[4];
-    private: Ogre::RenderTarget *renderTarget[4];
+    private: Ogre::RenderTarget *renderTargets[4];
     private: Ogre::MaterialPtr depthMaterial;
   
     private: std::string textureName[4];
