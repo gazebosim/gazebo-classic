@@ -43,6 +43,7 @@
 #include "StereoCameraSensor.hh"
 
 #define PF_FLOAT Ogre::PF_FLOAT32_R
+#define PF_RGB Ogre::PF_B8G8R8
 
 using namespace gazebo;
 
@@ -328,7 +329,7 @@ void StereoCameraSensor::FillBuffers()
     {
       hardwareBuffer->blitToMemory ( Ogre::Box(left,top,right,bottom),
           Ogre::PixelBox( this->imageWidth, this->imageHeight,
-            1, Ogre::PF_B8G8R8, this->rgbBuffer[i])
+            1, PF_RGB, this->rgbBuffer[i])
           );
     }
     else
@@ -512,7 +513,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
   if (depth)
     pf = PF_FLOAT;
   else
-    pf = Ogre::PF_R8G8B8;
+    pf = PF_RGB;
 
   // Create the left render texture
   return Ogre::TextureManager::getSingleton().createManual(

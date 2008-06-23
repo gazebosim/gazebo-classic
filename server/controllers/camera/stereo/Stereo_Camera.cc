@@ -119,6 +119,8 @@ void Stereo_Camera::FiniChild()
 // Put stereo data to the interface
 void Stereo_Camera::PutStereoData()
 {
+
+  printf("put stereo data\n");
   StereoCameraData *stereo_data = this->stereoIface->data;
   //const unsigned char *rgb_src = NULL;
   //unsigned char *rgb_dst = NULL;

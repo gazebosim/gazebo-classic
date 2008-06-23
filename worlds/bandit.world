@@ -34,6 +34,11 @@
       <material>Gazebo/CloudySky</material>
     </sky>
     <shadowTechnique>stencilAdditive</shadowTechnique>
+    <fog>
+      <color>1.0 1.0 1.0</color>
+      <linearStart>10</linearStart>
+      <linearEnd>100</linearEnd>
+    </fog>
   </rendering:ogre>
 
   <model:physical name="pioneer2dx_model1">
@@ -137,14 +142,4 @@
     </light>
   </model:renderable>
   
-  <model:renderable name="directional_white2">
-    <light>
-      <type>directional</type>
-      <direction>0 -0.5 0.5</direction>
-      <diffuseColor>0.4 0.4 0.4</diffuseColor>
-      <specularColor>0.0 0.0 0.0</specularColor>
-      <attenuation>100 0.0 1.0 0.4</attenuation>
-    </light>
-  </model:renderable>
-
 </gazebo:world>
