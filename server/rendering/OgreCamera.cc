@@ -237,9 +237,16 @@ void OgreCamera::RotatePitch( float angle )
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the horizontal field of view of the camera
-double OgreCamera::GetFOV() const
+double OgreCamera::GetHFOV() const
 {
   return this->hfov;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the vertical field of view of the camera
+double OgreCamera::GetVFOV() const
+{
+  return this->camera->getFOVy().valueRadians();
 }
 
 //////////////////////////////////////////////////////////////////////////////

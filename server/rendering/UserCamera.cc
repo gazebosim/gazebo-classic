@@ -57,7 +57,7 @@ void UserCamera::Load(XMLConfigNode *node)
 {
   OgreCamera::LoadCam(node);
 
-  this->SetClipDist(0.1, 1000);
+  this->SetClipDist(0.1, 100);
   this->SetFOV( DTOR(60) );
 }
 

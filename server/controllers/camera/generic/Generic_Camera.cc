@@ -107,7 +107,8 @@ void Generic_Camera::PutCameraData()
   data->image_size = data->width * data->height * 3;
 
   // GetFOV() returns radians
-  data->hfov = this->myParent->GetFOV();
+  data->hfov = this->myParent->GetHFOV();
+  data->vfov = this->myParent->GetVFOV();
 
   // Set the pose of the camera
   cameraPose = this->myParent->GetWorldPose();

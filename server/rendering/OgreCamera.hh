@@ -100,7 +100,10 @@ namespace gazebo
     public: void SetFOV( float radians );
 
     /// \brief Get the camera FOV (horizontal)  
-    public: double GetFOV() const;
+    public: double GetHFOV() const;
+
+    /// \brief Get the camera FOV (vertical)  
+    public: double GetVFOV() const;
   
     /// \brief Get the width of the image
     public: unsigned int GetImageWidth() const;

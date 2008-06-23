@@ -572,6 +572,9 @@ class CameraData
   /// Horizontal field of view of the camera in radians
   public: double hfov;
 
+  /// Vertical field of view of the camera in radians
+  public: double vfov;
+
   /// Pose of the camera
   public: Pose camera_pose;
   
@@ -1351,7 +1354,10 @@ class StereoCameraData
   /// Horizontal field of view of the camera in radians
   public: double hfov;
 
-  /// Left image size
+  /// Vertical field of view of the camera in radians
+  public: double vfov;
+
+  // Left image size
   public: unsigned int left_rgb_size;
 
   /// left image (R8G8B8)

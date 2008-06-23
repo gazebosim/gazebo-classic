@@ -136,7 +136,8 @@ void Stereo_Camera::PutStereoData()
   stereo_data->farClip = this->myParent->GetFarClip();
   stereo_data->nearClip = this->myParent->GetNearClip();
 
-  stereo_data->hfov = this->myParent->GetFOV();
+  stereo_data->hfov = this->myParent->GetHFOV();
+  stereo_data->vfov = this->myParent->GetVFOV();
 
   //stereo_data->right_rgb_size = stereo_data->width * stereo_data->height * 3;
   //stereo_data->left_rgb_size = stereo_data->width * stereo_data->height * 3;
@@ -190,7 +191,9 @@ void Stereo_Camera::PutCameraData()
   camera_data->image_size = camera_data->width * camera_data->height * 3;
   assert (camera_data->image_size <= sizeof(camera_data->image));
 
-  camera_data->hfov = this->myParent->GetFOV();
+  camera_data->hfov = this->myParent->GetHFOV();
+  camera_data->vfov = this->myParent->GetVFOV();
+
   // Set the pose of the camera
   cameraPose = this->myParent->GetWorldPose();
   camera_data->camera_pose.pos.x = cameraPose.pos.x;
