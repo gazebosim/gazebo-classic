@@ -92,22 +92,29 @@ void SickLMS200_Laser::InitChild()
 // Update the controller
 void SickLMS200_Laser::UpdateChild()
 {
-  bool opened = false;
+  bool laserOpened = false;
+  bool fidOpened = false;
 
   if (this->laserIface->Lock(1))
   {
-    opened = this->laserIface->GetOpenCount() > 0;
+    laserOpened = this->laserIface->GetOpenCount() > 0;
+    fidOpened = this->fiducialIface->GetOpenCount() > 0;
     this->laserIface->Unlock();
   }
 
-  if (opened)
+  if (laserOpened)
   {
     this->myParent->SetActive(true);
-
     this->PutLaserData();
-    //this->PutFiducialData();
   }
-  else
+
+  if (fidOpened)
+  {
+    this->myParent->SetActive(true);
+    this->PutFiducialData();
+  }
+
+  if (!laserOpened && !fidOpened)
   {
     this->myParent->SetActive(false);
   }
@@ -173,7 +180,7 @@ void SickLMS200_Laser::PutLaserData()
       // Intensity is either-or
       v = (int) this->myParent->GetRetro(ja) || (int) this->myParent->GetRetro(jb);
 
-      this->laserIface->data->ranges[rangeCount-i-1] =  r + minRange;
+      this->laserIface->data->ranges[i] =  r + minRange;
       this->laserIface->data->intensity[i] = v;
     }
 
@@ -196,15 +203,13 @@ void SickLMS200_Laser::PutFiducialData()
   double maxAngle = this->myParent->GetMaxAngle();
   double minAngle = this->myParent->GetMinAngle();
 
-//TODO: implement max range and rangeCount
-//  double maxRange = this->myParent->GetMaxRange();
+  double maxRange = this->myParent->GetMaxRange();
   double minRange = this->myParent->GetMinRange();
   int rayCount = this->myParent->GetRayCount();
-//  int rangeCount = this->myParent->GetRangeCount();
+  int rangeCount = this->myParent->GetRangeCount();
 
   if (this->fiducialIface->Lock(1))
   {
-
     // Data timestamp
     this->fiducialIface->data->head.time = Simulator::Instance()->GetSimTime();
     this->fiducialIface->data->count = 0;

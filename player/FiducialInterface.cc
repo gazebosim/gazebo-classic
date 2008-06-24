@@ -174,9 +174,9 @@ void FiducialInterface::Update()
     ts.tv_sec = (int) (this->iface->data->head.time);
     ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
-    unsigned int oldCount = data.fiducials_count;
+    unsigned int oldCount = this->data.fiducials_count;
 
-    data.fiducials_count = i;
+    this->data.fiducials_count = this->iface->data->count;
 
     if (oldCount != this->data.fiducials_count)
     {
