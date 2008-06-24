@@ -70,12 +70,12 @@
       <geom:cylinder name="cylinder1_geom">
         <size>0.5 1</size>
         <mass>1.0</mass>
+        <laserFiducialId>1</laserFiducialId>
+        
         <visual>
           <mesh>unit_cylinder</mesh>
           <material>Gazebo/RustyBarrel</material>
         </visual>
-
-        <laserFiducialId>1</laserFiducialId>
       </geom:cylinder>
     </body:cylinder>
   </model:physical>

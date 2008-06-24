@@ -98,8 +98,13 @@ void SickLMS200_Laser::UpdateChild()
   if (this->laserIface->Lock(1))
   {
     laserOpened = this->laserIface->GetOpenCount() > 0;
-    fidOpened = this->fiducialIface->GetOpenCount() > 0;
     this->laserIface->Unlock();
+  }
+
+  if (this->fiducialIface && this->fiducialIface->Lock(1))
+  {
+    fidOpened = this->fiducialIface->GetOpenCount() > 0;
+    this->fiducialIface->Unlock();
   }
 
   if (laserOpened)
