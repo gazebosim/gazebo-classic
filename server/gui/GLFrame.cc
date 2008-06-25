@@ -176,7 +176,7 @@ void GLFrame::ViewCB(Fl_Widget *widget, void *data)
 /// Get the pose of the camera attached to this frame
 Pose3d GLFrame::GetCameraPose() const
 {
-  this->glWindow->GetCamera()->GetWorldPose();  
+  return this->glWindow->GetCamera()->GetWorldPose();  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
