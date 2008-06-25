@@ -147,7 +147,6 @@ void SickLMS200_Laser::PutLaserData()
   int rayCount = this->myParent->GetRayCount();
   int rangeCount = this->myParent->GetRangeCount();
 
-
   if (this->laserIface->Lock(1))
   {
     // Data timestamp
@@ -157,6 +156,7 @@ void SickLMS200_Laser::PutLaserData()
     this->laserIface->data->min_angle = minAngle;
     this->laserIface->data->max_angle = maxAngle;
     this->laserIface->data->res_angle = (maxAngle - minAngle) / (rangeCount - 1);
+    this->laserIface->data->res_range = 0.1;
     this->laserIface->data->max_range = maxRange;
     this->laserIface->data->range_count = rangeCount;
 

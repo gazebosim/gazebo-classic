@@ -793,6 +793,9 @@ class LaserData
   /// Angular resolution
   public: double res_angle;
 
+  /// Range resolution
+  public: double res_range;
+
   /// Max range value
   public: double max_range;
 

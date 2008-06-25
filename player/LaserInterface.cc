@@ -115,6 +115,7 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
       plc.max_angle = this->iface->data->max_angle;
       plc.max_range = this->iface->data->max_range;
       plc.resolution = this->iface->data->res_angle;
+      plc.range_res = this->iface->data->res_range;
       plc.intensity = intensity;
 
       this->driver->Publish(this->device_addr, respQueue,
@@ -192,12 +193,12 @@ void LaserInterface::Update()
 
       //printf("range res = %f %f\n", rangeRes, this->iface->data->max_range);
 
+      double oldCount = this->data.ranges_count;
+
       this->data.min_angle = this->iface->data->min_angle;
       this->data.max_angle = this->iface->data->max_angle;
-      this->data.max_range = this->iface->data->max_range;
       this->data.resolution = angleRes;
-
-      double oldCount = this->data.ranges_count;
+      this->data.max_range = this->iface->data->max_range;
       this->data.ranges_count = this->data.intensity_count = this->iface->data->range_count;
       this->data.id = this->scanId++;
 
@@ -216,10 +217,13 @@ void LaserInterface::Update()
         this->data.intensity[i] = (uint8_t) (int) this->iface->data->intensity[i];
       }
 
-      this->driver->Publish( this->device_addr,
-                             PLAYER_MSGTYPE_DATA,
-                             PLAYER_LASER_DATA_SCAN,
-                             (void*)&this->data, sizeof(this->data), &this->datatime );
+      if (this->data.ranges_count > 0)
+      {
+        this->driver->Publish( this->device_addr,
+            PLAYER_MSGTYPE_DATA,
+            PLAYER_LASER_DATA_SCAN,
+            (void*)&this->data, sizeof(this->data), &this->datatime );
+      }
     }
 
     this->iface->Unlock();

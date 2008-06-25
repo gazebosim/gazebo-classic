@@ -14,7 +14,7 @@ int main()
     PlayerClient robot(PlayerCc::PLAYER_HOSTNAME, PlayerCc::PLAYER_PORTNUM);
 
     // Subscribe to the simulation proxy
-    Position2dProxy pp(&robot, 0);
+    Position2dProxy pp(&robot, 1);
 
     // Print out some stuff
     std::cout << robot << std::endl;
@@ -26,7 +26,7 @@ int main()
       // This blocks until new data comes
       robot.Read();
 
-      pp.SetSpeed(0.2, 0.05);
+      pp.SetSpeed(0.0, 0.05);
     }
   }
   catch (PlayerCc::PlayerError e)

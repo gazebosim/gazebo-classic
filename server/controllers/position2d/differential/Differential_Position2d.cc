@@ -57,6 +57,8 @@ Differential_Position2d::Differential_Position2d(Entity *parent )
 
   this->wheelSpeed[RIGHT] = 0;
   this->wheelSpeed[LEFT] = 0;
+
+  this->prevUpdateTime = Simulator::Instance()->GetSimTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +92,6 @@ void Differential_Position2d::LoadChild(XMLConfigNode *node)
 
   if (!this->joints[RIGHT])
     gzthrow("The controller couldn't get right hinge joint");
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,14 +149,16 @@ void Differential_Position2d::UpdateChild()
   ws = this->wheelSep;
 
 
-  stepTime = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  //stepTime = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  stepTime = Simulator::Instance()->GetSimTime() - this->prevUpdateTime;
+  this->prevUpdateTime = Simulator::Instance()->GetSimTime();
 
   // Distance travelled by front wheels
   d1 = stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
   d2 = stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
 
   dr = (d1 + d2) / 2;
-  da = (d2 - d1) / ws;
+  da = (d1 - d2) / ws;
 
   // Compute odometric pose
   this->odomPose[0] += dr * cos( this->odomPose[2] );

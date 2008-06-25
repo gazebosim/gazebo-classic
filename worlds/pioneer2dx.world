@@ -62,20 +62,22 @@
     </body:plane>
   </model:physical>
 
-  <model:physical name="cylinder1_model">
-    <xyz>1 -1.5 0.5</xyz>
+  <model:physical name="sphere1_model">
+    <xyz>2.15 -1.68 .7</xyz>
     <rpy>0.0 0.0 0.0</rpy>
+    <static>true</static>
 
-    <body:cylinder name="cylinder1_body">
-      <geom:cylinder name="cylinder1_geom">
-        <size>0.5 1</size>
-        <mass>1.0</mass>
+    <body:sphere name="sphere1_body">
+      <geom:sphere name="sphere1_geom">
+        <size>0.1</size>
+
         <visual>
-          <mesh>unit_cylinder</mesh>
-          <material>Gazebo/RustyBarrel</material>
+          <scale>0.1 0.1 0.1</scale>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Rocky</material>
         </visual>
-      </geom:cylinder>
-    </body:cylinder>
+      </geom:sphere>
+    </body:sphere>
   </model:physical>
 
 
@@ -95,7 +97,7 @@
     <controller:differential_position2d name="controller1">
       <leftJoint>left_wheel_hinge</leftJoint>
       <rightJoint>right_wheel_hinge</rightJoint>
-      <wheelSeparation>0.34</wheelSeparation>
+      <wheelSeparation>0.39</wheelSeparation>
       <wheelDiameter>0.15</wheelDiameter>
       <torque>5</torque>
       <interface:position name="position_iface_0"/>
