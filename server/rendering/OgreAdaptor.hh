@@ -29,6 +29,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <GL/glx.h>
 
 #include "SingletonT.hh"
 
@@ -87,9 +88,6 @@ namespace gazebo
     /// \brief Save Ogre settings 
     public: void Save(XMLConfigNode *node);
   
-    /// \brief Initialize Ogre Rendering engine
-    public: void Init(Display *display, XVisualInfo *visual, Window windowId, int width, int height); 
-  
     /// \brief Get the desired update rate
     public: double GetUpdateRate();
  
@@ -135,22 +133,21 @@ namespace gazebo
 
     private: friend class DestroyerT<OgreAdaptor>;
     private: friend class SingletonT<OgreAdaptor>;
-  
+
+    /// ID for a dummy window. Used for gui-less operation
+    protected: Window dummyWindowId;
+
+    /// Pointer to the dummy Xvisual.Used for gui-less operation
+    protected: XVisualInfo *dummyVisual;
+
+    /// Pointer to the dummy display.Used for gui-less operation
+    protected: Display *dummyDisplay;
+    
+    /// GLX context used to render the scenes.Used for gui-less operation
+    protected: GLXContext dummyContext;
   };
   
-  /*/// \brief 
-  class OgreGLXWindowInterface
-  {
-    public: virtual ~OgreGLXWindowInterface() = 0;
-  
-    // Call this with true when the window is mapped/visible, false when the window is unmapped/invisible
-    public: virtual void exposed(bool active) = 0;
-  
-    // Call this to notify the window was resized
-    public: virtual void resized(size_t width, size_t height) = 0;
-  };
-  */
-  
+ 
   /// \}
 
 }

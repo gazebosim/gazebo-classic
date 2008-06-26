@@ -64,7 +64,8 @@ Simulator::Simulator()
   userPause(false),
   userStep(false),
   userStepInc(false),
-  userQuit(false)
+  userQuit(false),
+  guiEnabled(true)
 {
 }
 
@@ -133,30 +134,35 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   OgreAdaptor::Instance()->Load(rootNode);
 
   // Create and initialize the Gui
-  try
+  if (this->guiEnabled)
   {
-    XMLConfigNode *childNode = rootNode->GetChild("gui");
-
-    if (childNode)
+    try
     {
-      int width = childNode->GetTupleInt("size",0,640);
-      int height = childNode->GetTupleInt("size",1,480);
-      int x = childNode->GetTupleInt("pos",0,0);
-      int y = childNode->GetTupleInt("pos",1,0);
-      std::string type = childNode->GetString("type","fltk",1);
+      XMLConfigNode *childNode = rootNode->GetChild("gui");
 
-      gzmsg(1) << "Creating GUI:\n\tType[" << type 
-               << "] Pos[" << x << " " << y 
-               << "] Size[" << width << " " << height << "]\n";
+      if (childNode)
+      {
+        int width = childNode->GetTupleInt("size",0,640);
+        int height = childNode->GetTupleInt("size",1,480);
+        int x = childNode->GetTupleInt("pos",0,0);
+        int y = childNode->GetTupleInt("pos",1,0);
+        std::string type = childNode->GetString("type","fltk",1);
 
-      // Create the GUI
-      this->gui = new Gui(x, y, width, height, type+"::Gazebo");
+        gzmsg(1) << "Creating GUI:\n\tType[" << type 
+          << "] Pos[" << x << " " << y 
+          << "] Size[" << width << " " << height << "]\n";
+
+        // Create the GUI
+        this->gui = new Gui(x, y, width, height, type+"::Gazebo");
+      }
+    }
+    catch (GazeboError e)
+    {
+      gzthrow( "Error loading the GUI\n" << e);
     }
   }
-  catch (GazeboError e)
-  {
-    gzthrow( "Error loading the GUI\n" << e);
-  }
+  else
+    this->gui = NULL;
 
   //Initialize RenderEngine
   try
@@ -192,7 +198,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 /// Initialize the simulation
 int Simulator::Init()
 {
-
   this->startTime = this->GetWallTime();
 
   //Initialize the world
@@ -423,4 +428,19 @@ void Simulator::SaveGui(XMLConfigNode *node)
   }
 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// True if the gui is to be used
+void Simulator::SetGuiEnabled( bool enabled )
+{
+  this->guiEnabled = enabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the gui is enabled
+bool Simulator::GetGuiEnabled() const
+{
+  return this->guiEnabled;
+}
+
 

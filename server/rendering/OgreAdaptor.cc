@@ -81,6 +81,13 @@ OgreAdaptor::~OgreAdaptor()
 //  GZ_DELETE (this->sceneMgr) //this objects seems to be destroyed by root
 //  GZ_DELETE (this->viewport)
 
+  if (this->dummyDisplay)
+  {
+    glXDestroyContext(this->dummyDisplay, this->dummyContext);
+    XDestroyWindow(this->dummyDisplay, this->dummyWindowId);
+    XCloseDisplay(this->dummyDisplay);
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +162,32 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   Ogre::ColourValue ambient;
 
   node = rootNode->GetChild("ogre", "rendering");
+
+  /// Create a dummy rendering context if the GUI is disabled
+  if (!Simulator::Instance()->GetGuiEnabled())
+  {
+    this->dummyDisplay = XOpenDisplay(0);
+    if (!this->dummyDisplay) 
+      gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
+
+    int screen = DefaultScreen(this->dummyDisplay);
+
+    int attribList[8] = {GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
+                         GLX_BLUE_SIZE, 8,	None};
+
+    this->dummyVisual = glXChooseVisual(this->dummyDisplay, screen, 
+                                        (int *)attribList);
+
+    this->dummyWindowId = XCreateSimpleWindow(this->dummyDisplay, 
+        RootWindow(this->dummyDisplay, screen), 0, 0, 1, 1, 0, 0, 0);
+
+    this->dummyContext = glXCreateContext(this->dummyDisplay, 
+                                          this->dummyVisual, NULL, 1);
+
+    glXMakeCurrent(this->dummyDisplay, this->dummyWindowId, this->dummyContext);
+    OgreCreator::CreateWindow((long)this->dummyDisplay, screen, 
+                              (long)this->dummyWindowId,1,1);
+  }
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );

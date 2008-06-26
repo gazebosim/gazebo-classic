@@ -142,6 +142,12 @@ namespace gazebo
     /// \brief Set whether the step has incremented
     public: void SetUserStepInc(bool step);
 
+    /// \brief True if the gui is to be used
+    public: void SetGuiEnabled( bool enabled );
+
+    /// \brief Return true if the gui is enabled
+    public: bool GetGuiEnabled() const;
+
   
     ///pointer to the XML Data
     private: XMLConfig *xmlFile;
@@ -189,6 +195,9 @@ namespace gazebo
 
     //The user has somewhat signaled the end of the program
     private: bool userQuit;
+
+    /// True if the GUI is enabled
+    private: bool guiEnabled;
 
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;

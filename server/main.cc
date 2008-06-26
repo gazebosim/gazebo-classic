@@ -114,6 +114,7 @@ const char *worldFileName;
 const char *optLogFileName = NULL;
 unsigned int optServerId = 0;
 bool optServerForce = true;
+bool optGuiEnabled = true;
 double optTimeout = -1;
 unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
@@ -129,6 +130,7 @@ void PrintUsage()
   fprintf(stderr, "  -f            : Force usage of the server id (use with caution)\n");
   fprintf(stderr, "  -d <-1:9>      : Verbose mode: -1 = none, 0 = critical (default), 9 = all)\n");
   fprintf(stderr, "  -t <sec>      : Timeout and quit after <sec> seconds\n");
+  fprintf(stderr, "  -g            : Run without a GUI\n");
   fprintf(stderr, "  -l <logfile>  : Log to indicated file.\n");
   fprintf(stderr, "  -n            : Do not do any time control\n");
   fprintf(stderr, "  <worldfile>   : load the the indicated world file\n");
@@ -153,7 +155,7 @@ int ParseArgs(int argc, char **argv)
 {
   FILE *tmpFile;
   int ch;
-  char *flags = (char*)("l:hd:s:fg:xt:nq");
+  char *flags = (char*)("l:hd:s:fgxt:nq");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
@@ -184,8 +186,13 @@ int ParseArgs(int argc, char **argv)
         // Timeout and quit after x seconds
         optTimeout = atof(optarg);
         break;
+
       case 'n':
         optTimeControl = 0;
+        break;
+
+      case 'g':
+        optGuiEnabled = false;
         break;
 
       case 'h':
@@ -246,6 +253,8 @@ int main(int argc, char **argv)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
   }
+
+  gazebo::Simulator::Instance()->SetGuiEnabled( optGuiEnabled );
 
   //Load the simulator
   try

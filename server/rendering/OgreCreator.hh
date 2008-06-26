@@ -26,6 +26,10 @@
 #ifndef OGRECREATOR
 #define OGRECREATOR
 
+
+//#include <X11/Xlib.h>
+//#include <X11/Xutil.h>
+
 #include <string>
 
 namespace Ogre
@@ -85,6 +89,14 @@ namespace gazebo
 
     /// \brief Create a new window
     public: static Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 
+                                                    unsigned int width, 
+                                                    unsigned int height);
+
+
+    /// \brief Create a window for Ogre
+    public: static Ogre::RenderWindow *CreateWindow(long display, 
+                                                    int screen, 
+                                                    long winId, 
                                                     unsigned int width, 
                                                     unsigned int height);
    

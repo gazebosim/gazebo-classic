@@ -23,8 +23,9 @@
  * Date: 27 Dec 2007
  */
 
-#include <math.h>
 #include <Ogre.h>
+
+#include <math.h>
 #include <iostream>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -490,30 +491,32 @@ void OgreCreator::DrawGrid()
 // Create a window for Ogre
 Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int width, unsigned int height)
 {
+  if (flWindow)
+    return OgreCreator::CreateWindow( (long)fl_display, fl_visual->screen, 
+        (long)(Fl_X::i(flWindow)->xid), width, height);
+  else
+    return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a window for Ogre
+Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen, 
+                                              long winId, unsigned int width, 
+                                              unsigned int height)
+{
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
-  if (flWindow)
-  {
-    Display *display;
-    int screen;
-    Window winId;
+  params["parentWindowHandle"] = Ogre::StringConverter::toString(display) + ":" + Ogre::StringConverter::toString(screen) + ":" + Ogre::StringConverter::toString(winId);
 
-    display = fl_display;
-    screen = fl_visual->screen;
-    winId = Fl_X::i(flWindow)->xid;
+  std::ostringstream stream;
+  stream << "OgreWindow(" << windowCounter++ << ")";
 
-    params["parentWindowHandle"] = Ogre::StringConverter::toString((long)display) + ":" + Ogre::StringConverter::toString(screen) + ":" + Ogre::StringConverter::toString((long)winId);
+  window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
 
-    std::ostringstream stream;
-    stream << "OgreWindow(" << windowCounter++ << ")";
-
-     window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
-
-    window->setActive(true);
-    window->setAutoUpdated(true);
-  }
+  window->setActive(true);
+  window->setAutoUpdated(true);
 
   return window;
 }
