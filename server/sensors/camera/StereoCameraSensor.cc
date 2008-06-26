@@ -139,6 +139,7 @@ void StereoCameraSensor::InitChild()
       cviewport->setClearEveryFrame(true);
       cviewport->setOverlaysEnabled(false);
       cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+      cviewport->setVisibilityMask(this->visibilityMask);
     }
 
     // Create materials for all the render textures.

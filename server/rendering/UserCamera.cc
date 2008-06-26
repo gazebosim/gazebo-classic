@@ -74,7 +74,7 @@ void UserCamera::Init()
 
   this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
 
-  //this->viewport->setVisibilityMask(this->visibilityMask);
+  this->viewport->setVisibilityMask(this->visibilityMask);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

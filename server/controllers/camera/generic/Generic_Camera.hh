@@ -34,7 +34,7 @@
 namespace gazebo
 {
   class CameraIface;
-  class OgreCamera;
+  class MonoCameraSensor;
 
 /// @addtogroup gazebo_controller
 /// @{
@@ -97,7 +97,7 @@ class Generic_Camera : public Controller
   private: CameraIface *cameraIface;
 
   /// The parent sensor
-  private: OgreCamera *myParent;
+  private: MonoCameraSensor *myParent;
 
 };
 

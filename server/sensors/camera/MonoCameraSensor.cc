@@ -124,25 +124,6 @@ void MonoCameraSensor::UpdateChild()
 
   this->renderTarget->update();
 
-  if (this->saveFrames)
-    this->SaveFrame();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the material the camera renders to
-std::string MonoCameraSensor::GetMaterialName() const
-{
-  return this->ogreMaterialName;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-/// Get a pointer to the image data
-const unsigned char *MonoCameraSensor::GetImageData(unsigned int i)
-{
-  if (i!=0)
-    gzerr(0) << "Camera index must be zero for mono cam";
-
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
   size_t size;
 
@@ -175,6 +156,26 @@ const unsigned char *MonoCameraSensor::GetImageData(unsigned int i)
   );
 
   mBuffer->unlock();
+
+
+  if (this->saveFrames)
+    this->SaveFrame();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the material the camera renders to
+std::string MonoCameraSensor::GetMaterialName() const
+{
+  return this->ogreMaterialName;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get a pointer to the image data
+const unsigned char *MonoCameraSensor::GetImageData(unsigned int i)
+{
+  if (i!=0)
+    gzerr(0) << "Camera index must be zero for mono cam";
 
   return this->saveFrameBuffer;
 }

@@ -93,19 +93,6 @@
       </include>
     </model:physical>
 
-    <model:physical name="laser">
-      <xyz>0.15 0 0.18</xyz>
-
-      <attach>
-        <parentBody>chassis_body</parentBody>
-        <myBody>laser_body</myBody>
-      </attach>
-
-      <include embedded="true">
-        <xi:include href="models/sicklms200.model" />
-      </include>
-    </model:physical>
-
     <!-- 
     The include should be last within a model. All previous statements
     will override those in the included file 

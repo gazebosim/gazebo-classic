@@ -132,7 +132,6 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
 // Initialize the camera
 void OgreCamera::InitCam()
 {
-
   this->camera = OgreCreator::CreateCamera(this->cameraName, this->nearClip, this->farClip, this->hfov, this->renderTarget );
 
   // Create a scene node to control pitch motion
@@ -142,7 +141,6 @@ void OgreCamera::InitCam()
 
   this->saveCount = 0;
 
-  //this->camera->getViewport()->setVisibilityMask(this->visibilityMask);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -155,6 +153,7 @@ void OgreCamera::FiniCam()
 // Update the drawing
 void OgreCamera::UpdateCam()
 {
+
   if (World::Instance()->GetWireframe())
   {
     this->camera->setPolygonMode(Ogre::PM_WIREFRAME);

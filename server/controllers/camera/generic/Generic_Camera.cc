@@ -35,7 +35,7 @@
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
-#include "OgreCamera.hh"
+#include "MonoCameraSensor.hh"
 #include "Generic_Camera.hh"
 
 using namespace gazebo;
@@ -47,7 +47,7 @@ GZ_REGISTER_STATIC_CONTROLLER("generic_camera", Generic_Camera);
 Generic_Camera::Generic_Camera(Entity *parent)
     : Controller(parent)
 {
-  this->myParent = dynamic_cast<OgreCamera*>(this->parent);
+  this->myParent = dynamic_cast<MonoCameraSensor*>(this->parent);
 
   if (!this->myParent)
     gzthrow("Generic_Camera controller requires a Camera Sensor as its parent");
@@ -123,21 +123,10 @@ void Generic_Camera::PutCameraData()
   assert (data->image_size <= sizeof(data->image));
 
   // Copy the pixel data to the interface
-  //src = this->myParent->GetImageData();
+  src = this->myParent->GetImageData(0);
   dst = data->image;
 
   memcpy(dst, src, data->image_size);
-
-
-  //unsigned int i, j, k;
-  // OGRE image data is A8 B8 G8 R8. Must convert to R8 G8 B8
-  /*  for (i=0; i<data->height; i++)
-      for (j=0; j<data->width; j++)
-        for (k=2; k>=0; k--)
-          memcpy(dst + i*data->width*3 + j*3 + 2-k,
-                 src + i*data->width*4 + j*4 + k,
-                 1);
-                 */
 
   this->cameraIface->Unlock();
 
