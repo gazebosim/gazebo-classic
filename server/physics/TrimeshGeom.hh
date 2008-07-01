@@ -50,10 +50,15 @@ namespace gazebo
     \par Example
     \verbatim
       <geom:trimesh name="pallet_geom">
-        <mesh>kitchen.mesh</mesh>
+        <mesh>WoodPallet.mesh</mesh>
         <scale>.2 .2 .2</scale>
-        <material>Gazebo/WoodPallet</material>
-        <mass>1.0</mass>
+        <mass>0.1</mass>
+
+        <visual>
+          <scale>.2 .2 .2</scale>
+          <material>Gazebo/WoodPallet</material>
+          <mesh>WoodPallet.mesh</mesh>
+        </visual>
       </geom:trimesh>
     \endverbatim
   */

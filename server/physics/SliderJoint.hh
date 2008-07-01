@@ -56,6 +56,13 @@ namespace gazebo
   - highStop (float, meters)
     - The high stop position
     - Default: infinity
+  - erp (double)
+    - Error reduction parameter. 
+    - Default = 0.4
+  - cfm (double)
+    - Constraint force mixing. 
+    - Default = 0.8
+
 
   \par Example
   \verbatim

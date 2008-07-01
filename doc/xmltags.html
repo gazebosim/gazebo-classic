@@ -1,0 +1,100 @@
+/**
+
+\page xmltags Worldfile XML Tags
+
+\section generaltags General Tags
+
+The following XML tags are general attributes that are applicable to all world files. Specific details of geometries, joints, sensors, etc can be found in their documentation. 
+
+\verbatim
+
+  <!-- Parameters for ODE physics engine -->
+  <physics:ode>
+    <stepTime>#</stepTime> <!-- Duration of a step, in seconds. (default=0.03)-->
+    <gravity># # #</gravity> <!-- Gravity vector. (default=0 0 -9.8)-->
+    <cfm>#</cfm> <!-- Constraint force mixing. (default = 10e-5) -->
+    <erp>#</erp> <!-- Error reduction. (default=0.3) -->
+  </physics:ode>
+
+  <!-- Parameters for the GUI -->
+  <rendering:gui>
+    <size># #</size> <!-- Size in pixels of the initial GUI -->
+    <pos># #</pos> <!-- Position on the screen to place the GUI -->
+  </rendering:gui>
+
+  <!-- Parameters for the OGRE rendering engine -->
+  <rendering:ogre>
+    <ambient># # # #</ambient> <!-- Ambient light color -->
+
+    <sky> <!-- Sky material. Optional -->
+      <material>string</material>
+    </sky>
+
+    <fog> <!-- Fog, optional -->
+      <color># # #</color> <!-- Color of the fog -->
+        <linearStart>#</linearStart> <!-- Distance at which the fog starts -->
+        <linearEnd>#</linearEnd> <!-- Distance at which the fog reaches full density-->
+    </fog>
+  </rendering:ogre>
+
+  <!-- A model. There is no limit to the number of models in a world-->
+  <model:physical name="">
+    <xyz># # #</xyz> <!-- Position of the model in the world -->
+    <rpy># # #</rpy> <!-- Roll, pitch, yaw of the model -->
+
+    <static>true|false</static> <!-- True = makes the model immovable -->
+
+    <!-- A body. There is no limit to the number of bodies in a model -->
+    <body:[plane|box|sphere|cylinder|trimesh] name="">
+      <xyz># # #</xyz> <!-- XYZ position of the body relative to the model -->
+      <rpy># # #</rpy> <!-- Roll, Pitch, Yaw of the body relative to the model -->
+
+      <!-- A geometry that is attached to the parent body. There can be 1..n geometries per body -->
+      <geom:[box|sphere|cylinder|trimesh] name="">
+        <xyz># # #</xyz> <!-- XYZ position of the geom, relative to the body -->
+        <rpy># # #</rpy> <!-- Roll, pitch, yaw of the geom, relative to the body -->
+        <mass>#</mass> <!-- Mass in kilograms -->
+        <laserFiducialId>#</laserFiducialId> <!-- Integer laser fiducial ID -->
+        <laserRetro>#</laserRetro> <!-- Retro reflectance value -->
+
+        <size># # #</size> <!-- Size of geom. Sphere uses radius, Cylinder uses radius, height. Box uses xyz lengths -->
+
+        <visual>
+          <xyz># # #</xyz> <!-- Position relative to the geom -->
+          <rpy># # #<rpy> <!-- Roll, pitch, yaw relative to the geom -->
+          <size># # #<size> <!-- Size of the mesh in the x,y,z dimensions -->
+          <mesh>string</mesh> <!-- Name of the mesh -->
+          <material>string</mesh> <!-- Name of the material. This name must match a name in one of the file at install_path/share/gazebo/Media/materials/scripts. -->
+          <castShadows>true|false</castShadows> <!-- True = cast shadows -->
+        </visual>
+
+      </geom:[box|sphere|cylinder|trimesh]>
+
+      <!-- Attach a sensor to the body. Each sensor has a different set of parameters  -->
+      <sensor:type name="">
+
+        <!-- Define a controller to process the sensor information, and expose the data to libgazebo -->
+        <controller:type name="">
+          <!-- Define an type of interface that the controller interacts with -->
+          <interface:type name="" />
+        </controller:type name="">
+      </sensor>
+
+    </body:[box|sphere|cylinder|trimesh]>
+
+    <!-- A joint connects two bodies together -->
+    <joint:type>
+      <body1>string</body1> <!-- Name of the first body -->
+      <body2>string</body2> <!-- Name of the second body -->
+      <anchor>string</anchor> <!-- Name of the model that acts as the anchor -->
+      <anchorOffset># # #</anchorOffset> <!-- Meters to move the anchor, relative to the anchor -->
+      <erp>#</erp> <!-- Error reduction parameter -->
+      <cfm>#</cfm> <!-- Constraint force mixing parameter -->
+    </joint:type>
+
+  </model:physical>
+
+
+\endverbatim
+
+*/

@@ -35,10 +35,12 @@
 #include "Entity.hh"
 #include "Pose3d.hh"
 
+
 namespace gazebo
 {
   class Geom;
   class Sensor;
+
 
 /// \addtogroup gazebo_physics
 /// \brief The body class

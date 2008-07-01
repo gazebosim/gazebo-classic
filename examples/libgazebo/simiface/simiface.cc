@@ -30,28 +30,34 @@ int main()
     return -1;
   }
 
-  simIface->Lock(1);
   //simIface->data->reset = 1;
 
   // Example of how to move a model (box1_model)
-  uint8_t name[512] = "box1_model";
+  uint8_t name[512] = "pioneer2dx_model1";
   uint8_t cmd[32] = "set_pose3d";
 
-  memcpy(simIface->data->model_name, name, 512);
-  memcpy(simIface->data->model_req,cmd, 32);
+  for (int i=0; i< 10; i++)
+  {
+    simIface->Lock(1);
 
-  simIface->data->model_pose.pos.x = 2;
-  simIface->data->model_pose.pos.y = 0;
-  simIface->data->model_pose.pos.z = 0;
+    memcpy(simIface->data->model_name, name, 512);
+    memcpy(simIface->data->model_req,cmd, 32);
 
-  simIface->Unlock();
+    simIface->data->model_pose.pos.x = i+.1;
+    simIface->data->model_pose.pos.y = 0;
+    simIface->data->model_pose.pos.z = 0.2;
 
-  usleep(1000000);
+    simIface->Unlock();
+
+    usleep(100000);
+  }
+
 
   // Example of resetting the simulator
-  simIface->Lock(1);
+  /*simIface->Lock(1);
   simIface->data->reset = 1;
   simIface->Unlock();
+  */
 
   usleep(1000000);
 

@@ -48,22 +48,34 @@ namespace gazebo
 
 The \c param:physics tag is used to specify certain parameters for the ODE phyics engine. The following parameters are in addition to those provided by the PhysicsEngine base class.
 
-\verbatim
-<param:physics>
-  <cfm>10e-9</cfm>
-  <erp>0.2</erp>
-</param:physics>
-\endverbatim
+\par Attributes
 
 - cfm (float)
-  - Global Constraint Force Mixing parameter
+  - Global constraint force mixing
+  - Default: 10e-5
   - Range:  10e-10 to 1.0
-  - Recommended value: 10e-9
-
+  - Recommended value: 10e-5
 - erp (float)
-  - Global Error Reduction parameter
+  - Global error reduction parameter
+  - Default: 0.2
   - Range: 0 to 1.0
   - Recommended Range: 0.1 to 0.8
+- stepTime (float)
+  - Time, in seconds, that elapse for each iteration of the physics engine
+  - Default: 0.025
+-gravity (float float float)
+  - Gravity vector.
+  - Default: 0 0 -9.8
+
+\verbatim
+<physics:ode>
+  <stepTime>0.03</stepTime>
+  <gravity>0 0 -9.8</gravity>
+  <cfm>10e-5</cfm>
+  <erp>0.2</erp>
+</physcis:ode>
+\endverbatim
+
 
 \{
 */

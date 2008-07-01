@@ -46,6 +46,10 @@ namespace gazebo
     - Name of the second body to attach to the joint
   - anchor (string)
     - Name of the body which will act as the anchor to the joint
+  - erp (double)
+    - Error reduction parameter. Default = 0.4
+  - cfm (double)
+    - Constraint force mixing. Default = 0.8
 
   \par Example
   \verbatim

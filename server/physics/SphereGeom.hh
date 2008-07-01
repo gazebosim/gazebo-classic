@@ -52,11 +52,15 @@ namespace gazebo
         <xyz>1 2 3</xyz>
         <rpy>0 0 30</rpy>
         <size>0.1</size>
-        <mesh>default</mesh>
         <mass>0.5</mass>
-        <material>Gazebo/Red</material>
         <laserFiducialId>1</laserFiducialId>
         <laserRetro>0.5</laserRetro>
+
+        <visual>
+          <mesh>default</mesh>
+          <size>0.1 0.1 0.1</size>
+          <material>Gazebo/Red</material>
+        </visual>
       </geom:sphere>
       \endverbatim
     */

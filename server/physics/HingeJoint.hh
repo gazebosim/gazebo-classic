@@ -55,6 +55,12 @@ namespace gazebo
   - highStop (float, degrees)
     - The high stop angle for the first degree of freedom
     - Default: infinity
+  - erp (double)
+    - Error reduction parameter. 
+    - Default = 0.4
+  - cfm (double)
+    - Constraint force mixing. 
+    - Default = 0.8
 
   \par Example
   \verbatim
