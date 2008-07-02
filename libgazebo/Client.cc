@@ -60,7 +60,15 @@ Client::~Client()
 // Test for the presence of the server
 void Client::Query(int serverId)
 {
-  this->SemQuery(serverId);
+  try
+  {
+    this->SemQuery(serverId);
+  }
+  catch (std::string e)
+  {
+    std::cerr << "Error[" << e << "]\n";
+    exit(0);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +100,15 @@ void Client::ConnectWait(int serverId, int clientId)
   // Initialize semaphores
   if (this->clientId >= 0)
   {
-    this->SemInit();
+    try
+    {
+      this->SemInit();
+    }
+    catch (std::string e)
+    {
+      std::cerr << "Error[" << e << "]\n";
+      exit(0);
+    }
   }
 
   // Get the tmp dir
@@ -129,7 +145,17 @@ void Client::Disconnect()
 void Client::Wait()
 {
   if (this->clientId >= 0)
-    this->SemWait();
+  {
+    try
+    {
+      this->SemWait();
+    }
+    catch (std::string e)
+    {
+      std::cerr << "Error[" << e << "]\n";
+      exit(0);
+    }
+  }
 }
 
 

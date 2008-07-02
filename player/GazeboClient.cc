@@ -50,8 +50,15 @@ void GazeboClient::Init(int serverid, const char *prefixid)
 
   GazeboClient::client = new Client();
 
-  // Use version 0.5.0
+  try
+  {
   GazeboClient::client->ConnectWait(serverid, GZ_CLIENT_ID_PLAYER);
+  }
+  catch( std::string e )
+  {
+    std::cerr << "Error[" << e << "]\n";
+    exit(0);
+  }
 
   GazeboClient::sim = new SimulationIface();
 
