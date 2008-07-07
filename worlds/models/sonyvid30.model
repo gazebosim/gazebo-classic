@@ -28,8 +28,7 @@
       <visual>
         <rpy>0 0 -90</rpy>
         <size>0.15 0.14 0.04</size>
-        <!--<mesh>sonyvid30_bottom.mesh</mesh>-->
-        <mesh>unit_box</mesh>
+        <mesh>sonyvid30/sonyvid30_bottom.mesh</mesh>
         <material>Gazebo/Grey</material>
       </visual>
     </geom:box>
@@ -48,8 +47,7 @@
       <visual>
         <rpy>0 0 -90</rpy>
         <size>0.11 0.11 0.03</size>
-        <!--<mesh>sonyvid30_mid.mesh</mesh>-->
-        <mesh>unit_cylinder</mesh>
+        <mesh>sonyvid30/sonyvid30_mid.mesh</mesh>
         <material>Gazebo/Black</material>
       </visual>
     </geom:box>
@@ -69,9 +67,7 @@
         <xyz>0.0 0.06 -0.015</xyz>
         <rpy>0 0 90</rpy>
         <size>0.12 0.119 0.03</size>
-        <!--<mesh>sonyvid30_top.mesh</mesh>-->
-        <mesh>unit_box</mesh>
-        <!--<material>Gazebo/Grey</material>-->
+        <mesh>sonyvid30/sonyvid30_top.mesh</mesh>
         <material>Gazebo/Grey</material>
       </visual>
     </geom:box>
