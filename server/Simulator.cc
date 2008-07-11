@@ -146,14 +146,12 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
         int height = childNode->GetTupleInt("size",1,480);
         int x = childNode->GetTupleInt("pos",0,0);
         int y = childNode->GetTupleInt("pos",1,0);
-        std::string type = childNode->GetString("type","fltk",1);
 
-        gzmsg(1) << "Creating GUI:\n\tType[" << type 
-          << "] Pos[" << x << " " << y 
-          << "] Size[" << width << " " << height << "]\n";
+        //gzmsg(1) << "Creating GUI: Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
 
         // Create the GUI
-        this->gui = new Gui(x, y, width, height, type+"::Gazebo");
+        this->gui = new Gui(x, y, width, height, "Gazebo");
+        this->gui->Load(childNode);
       }
     }
     catch (GazeboError e)

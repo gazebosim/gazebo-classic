@@ -31,6 +31,7 @@
 #include <FL/Fl_Choice.H>
 
 #include "Global.hh"
+#include "XMLConfig.hh"
 #include "GLFrameManager.hh"
 #include "OgreAdaptor.hh"
 #include "OgreCreator.hh"
@@ -64,7 +65,6 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
     this->statusbar->gui = this;
   }
 
-
   // Create the toolbar
   //this->toolbar = new Toolbar(this->w()-200, 30, 200, this->h()-60);
 
@@ -89,6 +89,13 @@ Gui::~Gui()
 
   //GZ_DELETE (this->toolbar)
   //delete this->statusbar;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load the gui
+void Gui::Load( XMLConfigNode *node )
+{
+  this->frameMgr->Load( node->GetChild("frames") );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

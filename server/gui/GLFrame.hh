@@ -39,6 +39,7 @@ namespace gazebo
 {
   class GLWindow;
   class OgreCamera;
+  class XMLConfigNode;
 
   class GLFrame : public Fl_Group
   {
@@ -47,6 +48,9 @@ namespace gazebo
 
     /// \brief Destructor
     public: virtual ~GLFrame();
+
+    /// \brief Load the frame
+    public: void Load( XMLConfigNode *node );
 
     /// \brief Initialize 
     public: void Init();
@@ -89,6 +93,9 @@ namespace gazebo
 
     private: Fl_Output *outputXYZ;
     private: Fl_Output *outputRPY;
+
+    /// Starting pose of the camera
+    private: Pose3d startPose;
   };
 }
 

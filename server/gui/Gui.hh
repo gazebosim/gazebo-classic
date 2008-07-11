@@ -42,6 +42,7 @@ namespace gazebo
   class Toolbar;
   class StatusBar;
   class GLFrameManager;
+  class XMLConfigNode;
 
   /// \brief FLTK Main Window
   class Gui : public Fl_Window
@@ -51,6 +52,9 @@ namespace gazebo
  
     /// \brief Destructor
     public: virtual ~Gui();
+
+    /// \brief Load the gui
+    public: virtual void Load(XMLConfigNode *node);
 
     /// \brief Initalize the gui
     public: virtual void Init();

@@ -34,6 +34,7 @@ namespace gazebo
 {
   class GLFrame;
   class GLWindow;
+  class XMLConfigNode;
 
   /// \brief Class to manage all the GL frames
   class GLFrameManager : public Fl_Tile
@@ -43,6 +44,9 @@ namespace gazebo
 
     /// \brief Destructor
     public: virtual ~GLFrameManager();
+
+    /// \brief Load the frame manager
+    public: void Load( XMLConfigNode *node );
 
     /// \brief Initalize the window manager
     public: void Init();

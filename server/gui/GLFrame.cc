@@ -26,6 +26,7 @@
 
 #include <boost/bind.hpp>
 
+#include "XMLConfig.hh"
 #include "CameraManager.hh"
 #include "Global.hh"
 #include "Pose3d.hh"
@@ -90,6 +91,10 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
 
   this->resizable(NULL);
   this->resizable(this->glWindow);
+
+  // Set default starting pose of the camera
+  this->startPose.pos.Set(-2, 0, 2);
+  this->startPose.rot.SetFromEuler( Vector3(0, DTOR(30), 0) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,10 +104,24 @@ GLFrame::~GLFrame()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Load the frame
+void GLFrame::Load( XMLConfigNode *node )
+{
+
+  if (node)
+  {
+    this->startPose.pos = node->GetVector3("xyz", Vector3(0,0,0));
+    this->startPose.rot = node->GetRotation("rpy", Quatern());
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the frame
 void GLFrame::Init()
 {
   this->glWindow->Init();
+  this->glWindow->GetCamera()->SetWorldPose(this->startPose);
 
   CameraManager::Instance()->ConnectAddCameraSignal( boost::bind(&GLFrame::CameraAddedSlot, this, _1) );
 }
@@ -163,13 +182,12 @@ void GLFrame::SplitCB(Fl_Widget *widget, void *data)
 // Switch view callback
 void GLFrame::ViewCB(Fl_Widget *widget, void *data)
 {
-  /*GLFrame *frame = reinterpret_cast<GLFrame *>(data);
+  GLFrame *frame = reinterpret_cast<GLFrame *>(data);
   Fl_Choice *choice = dynamic_cast<Fl_Choice *>(widget);
   CameraManager *manager = CameraManager::Instance();
   OgreCamera *cam = manager->GetCamera(choice->text());
 
-  frame->glWindow->SetActiveCamera( cam );
-  */
+  frame->glWindow->SetViewStyle(choice->text());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

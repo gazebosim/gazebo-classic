@@ -95,6 +95,9 @@ namespace gazebo
     /// \brief Set the active camera
     public: void SetActiveCamera( OgreCamera *camera );
 
+    /// \brief Set the style of the view = "front, left, top, user"
+    public: void SetViewStyle(std::string view);
+
     /// \brief Handle a mouse button push
     private: void HandleMousePush();
 

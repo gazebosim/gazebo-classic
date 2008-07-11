@@ -445,3 +445,26 @@ void GLWindow::SetActiveCamera( OgreCamera *camera )
 {
    this->activeCamera = camera;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the style of the view = "front, left, top, user"
+void GLWindow::SetViewStyle(std::string view)
+{
+  UserCamera *cam =  this->GetCamera();
+  Pose3d pose = cam->GetWorldPose();
+
+  if (view == "Top")
+  {
+    pose.rot.SetFromEuler( Vector3(0, DTOR(90), 0) );
+  }
+  else if (view == "Left")
+  {
+    pose.rot.SetFromEuler( Vector3(0, 0, DTOR(90) ) );
+  }
+  else if (view == "Front")
+  {
+    pose.rot.SetFromEuler( Vector3(0, 0,0) );
+  }
+
+  cam->SetWorldPose( pose );
+}

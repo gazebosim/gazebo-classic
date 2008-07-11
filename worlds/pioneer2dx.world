@@ -30,6 +30,8 @@
     <type>fltk</type>
     <size>800 600</size>
     <pos>0 0</pos>
+    <xyz>0 0 0</xyz>
+    <rpy>0 0 0</rpy>
   </rendering:gui>
 
   <rendering:ogre>
