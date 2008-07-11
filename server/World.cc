@@ -179,7 +179,8 @@ int World::Update()
     }
   }
 
-  if (!Simulator::Instance()->IsPaused())
+  if (!Simulator::Instance()->IsPaused() &&
+       Simulator::Instance()->GetPhysicsEnabled())
   {
     this->physicsEngine->Update();
   }

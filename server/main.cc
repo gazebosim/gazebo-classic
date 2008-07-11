@@ -118,7 +118,7 @@ bool optGuiEnabled = true;
 double optTimeout = -1;
 unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
-
+bool optPhysicsEnabled  = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -133,6 +133,7 @@ void PrintUsage()
   fprintf(stderr, "  -g            : Run without a GUI\n");
   fprintf(stderr, "  -l <logfile>  : Log to indicated file.\n");
   fprintf(stderr, "  -n            : Do not do any time control\n");
+  fprintf(stderr,"   -p            : Run without physics engine\n");
   fprintf(stderr, "  <worldfile>   : load the the indicated world file\n");
   return;
 }
@@ -155,7 +156,7 @@ int ParseArgs(int argc, char **argv)
 {
   FILE *tmpFile;
   int ch;
-  char *flags = (char*)("l:hd:s:fgxt:nq");
+  char *flags = (char*)("l:hd:s:fgxt:nqp");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
@@ -193,6 +194,10 @@ int ParseArgs(int argc, char **argv)
 
       case 'g':
         optGuiEnabled = false;
+        break;
+
+      case 'p':
+        optPhysicsEnabled = false;
         break;
 
       case 'h':
@@ -260,6 +265,8 @@ int main(int argc, char **argv)
   try
   {
     gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
+    gazebo::Simulator::Instance()->SetTimeout(optTimeout);
+    gazebo::Simulator::Instance()->SetPhysicsEnabled(optPhysicsEnabled);
   }
   catch (gazebo::GazeboError e)
   {

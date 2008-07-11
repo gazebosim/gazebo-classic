@@ -379,7 +379,7 @@ void Model::SetPose(const Pose3d &setPose)
   Body *body;
   std::map<std::string, Body* >::iterator iter;
 
-  Pose3d bodyPose, origPose;
+  Pose3d newPose, origPose;
 
   origPose = this->pose;
   this->pose = setPose;
@@ -392,15 +392,27 @@ void Model::SetPose(const Pose3d &setPose)
     body = iter->second;
 
     // Compute the pose relative to the model
-    bodyPose = body->GetPose() - origPose;
+    newPose = body->GetPose() - origPose;
 
     // Compute the new pose
-    bodyPose += this->pose;
+    newPose += this->pose;
 
-
-    body->SetPose(bodyPose);
+    body->SetPose(newPose);
   }
 
+  // Update the child models as well
+  std::vector<Entity*>::iterator citer;
+  for (citer = this->children.begin(); citer != this->children.end(); citer++)
+  {
+    Model *childModel = dynamic_cast<Model*>(*citer);
+    if (childModel)
+    {
+      newPose = childModel->GetPose() - origPose;
+      newPose += this->pose;
+
+      childModel->SetPose(newPose);
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

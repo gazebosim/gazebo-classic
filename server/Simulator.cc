@@ -65,7 +65,9 @@ Simulator::Simulator()
   userStep(false),
   userStepInc(false),
   userQuit(false),
-  guiEnabled(true)
+  guiEnabled(true),
+  physicsEnabled(true),
+  timeout(-1)
 {
 }
 
@@ -294,6 +296,9 @@ void Simulator::MainLoop()
     {
       usleep( (int)((1.0/MAX_FRAME_RATE - elapsedTime) * 1e6)  );
     }
+
+    if (this->timeout > 0 && this->GetRealTime() > this->timeout)
+      break;
   }
 }
 
@@ -441,4 +446,23 @@ bool Simulator::GetGuiEnabled() const
   return this->guiEnabled;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set the length of time the simulation should run.
+void Simulator::SetTimeout(double time)
+{
+  this->timeout = time;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+// Set the physics enabled/disabled
+void Simulator::SetPhysicsEnabled( bool enabled )
+{
+  this->physicsEnabled = enabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the physics enabled/disabled
+bool Simulator::GetPhysicsEnabled() const
+{
+  return this->physicsEnabled;
+}

@@ -148,7 +148,15 @@ namespace gazebo
     /// \brief Return true if the gui is enabled
     public: bool GetGuiEnabled() const;
 
-  
+    /// \brief Set the length of time the simulation should run.
+    public: void SetTimeout(double time);
+
+    /// \brief Set the physics enabled/disabled
+    public: void SetPhysicsEnabled(bool enabled);
+
+    /// \brief Get the physics enabled/disabled
+    public: bool GetPhysicsEnabled() const;
+
     ///pointer to the XML Data
     private: XMLConfig *xmlFile;
 
@@ -198,6 +206,12 @@ namespace gazebo
 
     /// True if the GUI is enabled
     private: bool guiEnabled;
+
+    /// True if physics is enabled
+    private: bool physicsEnabled;
+
+    /// Length of time the simulation should run
+    private: double timeout;
 
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;

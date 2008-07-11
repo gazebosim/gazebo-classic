@@ -108,7 +108,7 @@ class Entity
   protected: Entity *parent;
 
   /// \brief Children of this entity
-  private: std::vector< Entity* > children;
+  protected: std::vector< Entity* > children;
 
   /// \brief This entities ID
   private: unsigned int id;
