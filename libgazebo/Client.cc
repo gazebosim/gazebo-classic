@@ -107,7 +107,7 @@ void Client::ConnectWait(int serverId, int clientId)
     catch (std::string e)
     {
       std::cerr << "Error[" << e << "]\n";
-      exit(0);
+      throw(e);
     }
   }
 

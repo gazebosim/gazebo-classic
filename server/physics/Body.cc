@@ -28,6 +28,7 @@
 
 #include "GazeboMessage.hh"
 #include "HeightmapGeom.hh"
+#include "OccupancyGridGeom.hh"
 #include "OgreVisual.hh"
 #include "Global.hh"
 #include "Vector2.hh"
@@ -411,6 +412,10 @@ void Body::LoadGeom(XMLConfigNode *node)
   {
     this->SetStatic(true);
     geom = new HeightmapGeom(this);
+  }
+  else if (node->GetName() == "occupancy_grid")
+  {
+    geom = new OccupancyGridGeom(this);
   }
   else
   {
