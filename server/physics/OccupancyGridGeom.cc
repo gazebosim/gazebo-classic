@@ -153,7 +153,7 @@ void OccupancyGridGeom::GenerateLines()
 
       // If the image data is beyond the threshold, then create a new map
       // point
-      if (v >= this->threshold)
+  /*    if (v >= this->threshold)
       {
         // Create the new point
         map[r*this->mapWidth+c] = new MapPoint( c, r );
@@ -214,8 +214,10 @@ void OccupancyGridGeom::GenerateLines()
         map[r*this->mapWidth+c] = NULL;
       }
 
+      */
     }
   }
+  /*
   int i=0;
 
   for (r=0; r<this->mapHeight; r++)
@@ -251,6 +253,7 @@ void OccupancyGridGeom::GenerateLines()
   {
     ReduceLines();
   }
+  */
 
 }
 /*
