@@ -88,10 +88,10 @@
     <static>true</static>
     <body:occupancy_grid name="grid_body">
 
-      <geom:occupancy_grid name="grid_geom">
-        <image>willowMap.png</image>
+      <geom:quadtree  name="grid_geom">
+        <image>map.png</image>
         <negative>true</negative>
-      </geom:occupancy_grid>
+      </geom:quadtree>
 
     </body:occupancy_grid>
   </model:physical>
