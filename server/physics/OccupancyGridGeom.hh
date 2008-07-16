@@ -63,6 +63,7 @@ namespace gazebo
   /// \{
 
 
+  class SpaceTree;
   class Line;
   class MapPoint;
 
@@ -84,9 +85,27 @@ namespace gazebo
     /// \brief Get the 2d lines from an image file
     private: void GenerateLines();
 
+    /// \brief Create a single line starting from point pt in direction dir
+    private: void GenerateLine( MapPoint* pt, int dir );
+
+    /// \brief Reduce the number of lines in the map
+    private: void ReduceLines();
+
+    /// \brief Calculates the shortest distance from a point to a line
+    private: float PointLineDist( const MapPoint &p1, const MapPoint &p2, 
+                                  const MapPoint &p );
+    /// \brief Adds a wall
+    private: void AddWall( Line *line );
+
+    /// \brief Deletes a wall segment
+    private: void EraseWall( int index );
+
+    /// \brief Create the geometry from a list of 2d lines
+    private: void GenerateGeometry();
+
     private: Vector3 mapSize;
 
-    //private: Line **walls;
+    private: Line **walls;
     private: int wallCount;
     private: int wallMaxCount;
 
@@ -112,7 +131,7 @@ namespace gazebo
     private: float wallHeight;
 
     // The color of the walls
-    //private: Vector3 color;
+    private: Vector3 color;
 
     // The amount of acceptable error in the model
     private: float errBound;
@@ -122,8 +141,10 @@ namespace gazebo
     private: unsigned int mapHeight;
 
     private: Ogre::Image mapImage;
+
+    private: SpaceTree *tree;
   };
-/*
+
   class MapPoint
   {
     public: MapPoint() : x(0), y(0), arcCount(0) 
@@ -174,7 +195,6 @@ namespace gazebo
     private: float length;
     private: float angle;
   };
-  */
 
 
   /// \}

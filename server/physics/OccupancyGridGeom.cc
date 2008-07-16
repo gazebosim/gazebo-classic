@@ -36,6 +36,7 @@
 #include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "Body.hh"
+#include "SpaceTree.hh"
 #include "OccupancyGridGeom.hh"
 
 using namespace gazebo;
@@ -45,6 +46,7 @@ using namespace gazebo;
 OccupancyGridGeom::OccupancyGridGeom(Body *body)
     : Geom(body)
 {
+  this->tree = NULL;
 }
 
 
@@ -52,6 +54,8 @@ OccupancyGridGeom::OccupancyGridGeom(Body *body)
 // Destructor
 OccupancyGridGeom::~OccupancyGridGeom()
 {
+  if (this->tree)
+    delete this->tree;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -100,16 +104,16 @@ void OccupancyGridGeom::LoadChild(XMLConfigNode *node)
 
   // Create the 2d lines of the map
   this->GenerateLines();
-  std::cout << "OccupancyGrid: found [%d] walls" << this->wallCount;
-      
+  printf("OccupancyGrid: found [%d] walls\n",this->wallCount);
+     
+
   // Create the quad tree
-  /*this->tree = new SpaceTree();
+  this->tree = new SpaceTree();
   tree->BuildTree( this->walls, this->wallCount, 
                    this->mapWidth, this->mapHeight );
 
   // Create the extruded geometry
   this->GenerateGeometry();
-  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -120,7 +124,6 @@ void OccupancyGridGeom::GenerateLines()
   unsigned char v;
   MapPoint **map;
   MapPoint *pt;
-  const unsigned char *imageData;
   Ogre::ColourValue pixColor;
 
   this->mapWidth = this->mapImage.getWidth();
@@ -148,54 +151,53 @@ void OccupancyGridGeom::GenerateLines()
       if (this->negative)
         v = 255 - v;
  
-      std::cout << "XY[" << x << " " << y << "] Color[" << pixColor[0] << " " << pixColor[1] << " " << pixColor[2] << "]";
-      printf("V[%d]\n",v);
+  //    std::cout << "XY[" << x << " " << y << "] Color[" << pixColor[0] << " " << pixColor[1] << " " << pixColor[2] << "]"; printf("V[%d]\n",v);
 
       // If the image data is beyond the threshold, then create a new map
       // point
-  /*    if (v >= this->threshold)
+      if (v >= this->threshold)
       {
         // Create the new point
-        map[r*this->mapWidth+c] = new MapPoint( c, r );
+        map[y*this->mapWidth+x] = new MapPoint( x, y );
 
         // Point to the North
-        if (r>0 && map[(r-1)*this->mapWidth+c] != NULL)
+        if (y>0 && map[(y-1)*this->mapWidth+x] != NULL)
         {
-          map[r*this->mapWidth+c]->arcs[0] = map[(r-1)*this->mapWidth+c];
-          map[r*this->mapWidth+c]->arcCount++;
+          map[y*this->mapWidth+x]->arcs[0] = map[(y-1)*this->mapWidth+x];
+          map[y*this->mapWidth+x]->arcCount++;
 
-          map[(r-1)*this->mapWidth+c]->arcs[4] = map[r*this->mapWidth+c];
-          map[(r-1)*this->mapWidth+c]->arcCount++;
+          map[(y-1)*this->mapWidth+x]->arcs[4] = map[y*this->mapWidth+x];
+          map[(y-1)*this->mapWidth+x]->arcCount++;
         }
 
         // Point the NorthWest
-        if (c>0 && r>0 && map[(r-1)*this->mapWidth+c-1] != NULL)
+        if (x>0 && y>0 && map[(y-1)*this->mapWidth+x-1] != NULL)
         {
-          map[r*this->mapWidth+c]->arcs[7] = map[(r-1)*this->mapWidth+c-1];
-          map[r*this->mapWidth+c]->arcCount++;
+          map[y*this->mapWidth+x]->arcs[7] = map[(y-1)*this->mapWidth+x-1];
+          map[y*this->mapWidth+x]->arcCount++;
 
-          map[(r-1)*this->mapWidth+c-1]->arcs[3] = map[r*this->mapWidth+c];
-          map[(r-1)*this->mapWidth+c-1]->arcCount++;
+          map[(y-1)*this->mapWidth+x-1]->arcs[3] = map[y*this->mapWidth+x];
+          map[(y-1)*this->mapWidth+x-1]->arcCount++;
         }
  
         // Point to the West
-        if (c>0 && map[r*this->mapWidth+c-1] != NULL)
+        if (x>0 && map[y*this->mapWidth+x-1] != NULL)
         {
-          map[r*this->mapWidth+c]->arcs[6] = map[r*this->mapWidth+c-1]; 
-          map[r*this->mapWidth+c]->arcCount++;
+          map[y*this->mapWidth+x]->arcs[6] = map[y*this->mapWidth+x-1]; 
+          map[y*this->mapWidth+x]->arcCount++;
 
-          map[r*this->mapWidth+c-1]->arcs[2] = map[r*this->mapWidth+c];
-          map[r*this->mapWidth+c-1]->arcCount++;
+          map[y*this->mapWidth+x-1]->arcs[2] = map[y*this->mapWidth+x];
+          map[y*this->mapWidth+x-1]->arcCount++;
         }
 
         // Point to the NorthEast
-        if (c+1<this->mapWidth && r>0 && map[(r-1)*this->mapWidth+c+1] != NULL)
+        if (x+1<this->mapWidth && y>0 && map[(y-1)*this->mapWidth+x+1] != NULL)
         {
-          map[r*this->mapWidth+c]->arcs[1] = map[(r-1)*this->mapWidth+c+1]; 
-          map[r*this->mapWidth+c]->arcCount++;
+          map[y*this->mapWidth+x]->arcs[1] = map[(y-1)*this->mapWidth+x+1]; 
+          map[y*this->mapWidth+x]->arcCount++;
 
-          map[(r-1)*this->mapWidth+c+1]->arcs[5] = map[r*this->mapWidth+c];
-          map[(r-1)*this->mapWidth+c+1]->arcCount++;
+          map[(y-1)*this->mapWidth+x+1]->arcs[5] = map[y*this->mapWidth+x];
+          map[(y-1)*this->mapWidth+x+1]->arcCount++;
         }
        
         // Point to the East
@@ -211,20 +213,16 @@ void OccupancyGridGeom::GenerateLines()
       }
       else
       {
-        map[r*this->mapWidth+c] = NULL;
+        map[y*this->mapWidth+x] = NULL;
       }
-
-      */
     }
   }
-  /*
-  int i=0;
 
-  for (r=0; r<this->mapHeight; r++)
+  for (y=0; y<this->mapHeight; y++)
   {
-    for (c=0; c<this->mapWidth; c++)
+    for (x=0; x<this->mapWidth; x++)
     {
-      pt = map[r*this->mapWidth+c];
+      pt = map[y*this->mapWidth+x];
 
       // If the map point is valid
       if (pt != NULL && pt->arcCount < 8)
@@ -244,19 +242,15 @@ void OccupancyGridGeom::GenerateLines()
   // Free the map data
   delete [] map;
 
-  // Free the image
-  delete dataSet;
-
   // If the user has specified an error bound, then reduce the graph. 
   // This will only reduce curved surefaces
-  if (this->errBound > 0)
+  /*if (this->errBound > 0)
   {
     ReduceLines();
-  }
-  */
+  }*/
 
 }
-/*
+
 //////////////////////////////////////////////////////////////////////////////
 // Create a single line starting from point pt in direction dir
 void OccupancyGridGeom::GenerateLine( MapPoint* pt, int dir )
@@ -348,22 +342,23 @@ void OccupancyGridGeom::ReduceLines()
 
 }
 
+
 //////////////////////////////////////////////////////////////////////////////
 // Create the geometry from a list of 2d lines
 void OccupancyGridGeom::GenerateGeometry()
 {
   // We are a space of fixed objects, and shouldnt collide with ourself
-  dGeomSetCategoryBits( (dGeomID) this->modelSpaceId, GZ_FIXED_COLLIDE );
-  dGeomSetCollideBits( (dGeomID) this->modelSpaceId, ~GZ_FIXED_COLLIDE );
+  //dGeomSetCategoryBits( (dGeomID) this->modelSpaceId, GZ_FIXED_COLLIDE );
+  //dGeomSetCollideBits( (dGeomID) this->modelSpaceId, ~GZ_FIXED_COLLIDE );
   
-  this->tree->GetRoot()->GenerateGeoms( this->modelSpaceId, this->body,
+  this->tree->GetRoot()->GenerateGeoms( this->spaceId, this->body,
       this->wallWidth, this->wallHeight, this->pos,
-      this->scale, this->color, this->shadeModel, this->polygonMode);
+      this->scale, this->color);
 
-  this->AddSpaceGeoms(this->tree->GetRoot());
+  //this->AddSpaceGeoms(this->tree->GetRoot());
 }
 
-void OccupancyGridGeom::AddSpaceGeoms( SpaceNode *node)
+/*void OccupancyGridGeom::AddSpaceGeoms( SpaceNode *node)
 {
   //int i = 0;
   if (node==NULL)
@@ -379,7 +374,7 @@ void OccupancyGridGeom::AddSpaceGeoms( SpaceNode *node)
   //{
   //  this->AddSpaceGeoms(node->children[i]);
   //}
-}
+}*/
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -515,5 +510,3 @@ void Line::Calc()
     this->mid.y = this->start.y - fabs( this->start.y - this->end.y ) / 2.0; 
   }
 }
-
-*/

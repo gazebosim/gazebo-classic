@@ -79,6 +79,10 @@ namespace gazebo
 
     /// \brief Load the box
     protected: void LoadChild(XMLConfigNode *node);
+
+    /// \brief Set the size of the box
+    public: void SetSize( Vector3 size );
+
   };
 
   /// \}

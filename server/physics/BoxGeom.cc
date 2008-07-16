@@ -64,3 +64,14 @@ void BoxGeom::LoadChild(XMLConfigNode *node)
     this->visualNode->SetMaterial("Gazebo/GreenEmissive");
     */
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the size of the box
+void BoxGeom::SetSize( Vector3 size )
+{
+  // Initialize box mass matrix
+  dMassSetBoxTotal(&this->mass, this->dblMass, size.x, size.y, size.z);
+
+  // Create a box geometry with box mass matrix
+  this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
+}

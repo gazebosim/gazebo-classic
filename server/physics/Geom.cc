@@ -130,7 +130,7 @@ void Geom::Load(XMLConfigNode *node)
 
 
   // Create the bounding box
-  if (dGeomGetClass(this->geomId) != dPlaneClass)
+  if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass)
   {
     dReal aabb[6];
     dGeomGetAABB(this->geomId, aabb);
@@ -142,7 +142,8 @@ void Geom::Load(XMLConfigNode *node)
     this->bbVisual->AttachBoundingBox(min,max);
   }
 
-  if (dGeomGetClass(this->geomId) != dPlaneClass && dGeomGetClass(this->geomId) != dHeightfieldClass)
+  if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass && 
+      dGeomGetClass(this->geomId) != dHeightfieldClass)
   {
     World::Instance()->RegisterGeom(this);
     this->ShowPhysics(false);
