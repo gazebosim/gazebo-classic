@@ -28,7 +28,7 @@
 #define QUADTREEGEOM_HH
 
 #include <Ogre.h>
-#include <vector>
+#include <deque>
 
 #include "Vector2.hh"
 #include "Geom.hh"
@@ -93,6 +93,8 @@ namespace gazebo
 
     private: void Merge(QuadNode *nodeA, QuadNode *nodeB);
 
+    private: void CreateBoxes(QuadNode *node);
+
     private: Vector3 mapSize;
 
     // The scale factor to apply to the geoms
@@ -142,29 +144,28 @@ namespace gazebo
 
     public: ~QuadNode() 
             { 
-              std::vector<QuadNode*>::iterator iter;
+              /*std::deque<QuadNode*>::iterator iter;
               for (iter = children.begin(); iter != children.end(); iter++) 
                   delete (*iter); 
+                  */
             }
 
     public: void Print(std::string space)
             {
-              std::vector<QuadNode*>::iterator iter;
+              std::deque<QuadNode*>::iterator iter;
 
               printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",space.c_str(),x,y,width, height, occupied, leaf, valid);
               space += "  ";
               for (iter = children.begin(); iter != children.end(); iter++) 
-                if ((*iter)->valid)
+                if ((*iter)->occupied)
                   (*iter)->Print(space);
             }
 
     public: unsigned int x, y;
     public: unsigned int width, height;
 
-    public: std::vector<Geom*> geoms;
-
     public: QuadNode *parent;
-    public: std::vector<QuadNode*> children;
+    public: std::deque<QuadNode*> children;
     public: bool occupied;
     public: bool leaf;
     public: int leaves;

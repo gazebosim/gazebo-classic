@@ -30,6 +30,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "BoxGeom.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
 #include "Simulator.hh"
@@ -79,6 +80,7 @@ void QuadTreeGeom::LoadChild(XMLConfigNode *node)
   this->threshold = node->GetDouble( "threshold", 200.0);
 
   this->wallHeight = node->GetDouble( "height", 1.0, 0 );
+  this->scale = node->GetDouble("scale",1.0,0);
 
   //this->color = node->GetColor( "color", GzColor(1.0, 1.0, 1.0) );
 
@@ -98,95 +100,158 @@ void QuadTreeGeom::LoadChild(XMLConfigNode *node)
   this->root->height = this->mapImage.getHeight();
 
   this->BuildTree(this->root);
-  this->root->Print(" ");
-
-  printf("\n\n");
 
   this->merged = true;
   while (this->merged)
   {
-    printf("---------------------------\n");
     this->merged =false;
     this->ReduceTree(this->root);
   }
 
-  this->root->Print(" ");
+  this->CreateBoxes(this->root);
+  this->root->Print("");
+}
 
+void QuadTreeGeom::CreateBoxes(QuadNode *node)
+{
+  if (node->leaf)
+  {
+    if (!node->valid || !node->occupied)
+      return;
+
+    std::ostringstream stream;
+
+    // Create the box geometry
+    BoxGeom* newBox = new BoxGeom( body );
+
+    XMLConfig *boxConfig = new XMLConfig();
+
+    stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
+
+    float x = (node->x + node->width / 2.0) * this->scale;
+    float y = (node->y + node->height / 2.0) * this->scale;
+    float w = (node->width) * this->scale;
+    float h = (node->height) * this->scale;
+
+    stream << "<geom:box name='occ_geom'>";
+    stream << "  <mass>0.0</mass>";
+    stream << "  <xyz>" << x << " " << y << " " << 0.25 << "</xyz>";
+    stream << "  <rpy>0 0 0</rpy>";
+    stream << "  <size>" << w << " " << h << " " << 0.5 << "</size>";
+    stream << "  <visual>";
+    stream << "    <mesh>unit_box</mesh>";
+    stream << "    <material>Gazebo/Rocky</material>";
+    stream << "    <size>" << w << " " << h << " " << 0.5 << "</size>";
+    stream << "  </visual>";
+    stream << "</geom:box>";
+    stream << "</gazebo:world>";
+
+    std::cout << stream.str() << "\n\n";
+    boxConfig->LoadString( stream.str() );
+
+    newBox->Load( boxConfig->GetRootNode()->GetChild() );
+    delete boxConfig;
+  }
+  else
+  {
+    std::deque<QuadNode*>::iterator iter;
+    for (iter = node->children.begin(); iter != node->children.end(); iter++)
+    {
+      this->CreateBoxes(*iter);
+    }
+  }
 }
 
 void QuadTreeGeom::ReduceTree(QuadNode *node)
 {
-  std::vector<QuadNode*>::iterator iter;
+  std::deque<QuadNode*>::iterator iter;
 
   if (!node->valid)
     return;
 
   if (!node->leaf)
   {
-    for (iter = node->children.begin(); iter != node->children.end(); iter++)
+    unsigned int count = 0;
+    int size = node->children.size();
+
+    for (int i = 0; i < size; i++)
     {
-      if ((*iter)->valid)
-        this->ReduceTree((*iter));
+      if (node->children[i]->valid)
+      {
+        this->ReduceTree(node->children[i]);
+      }
+      if (node->children[i]->leaf)
+        count++;
     }
+
+    if (node->parent && count == node->children.size())
+    {
+      for (iter = node->children.begin(); iter != node->children.end(); iter++)
+      {
+        node->parent->children.push_back( *iter );
+        (*iter)->parent = node->parent;
+      }
+      node->valid = false;
+    }
+    else
+    {
+      bool done = false;
+      while (!done)
+      {
+        done = true;
+        for (iter = node->children.begin(); 
+             iter != node->children.end();iter++ )
+        {
+          if (!(*iter)->valid)
+          {
+            node->children.erase(iter, iter+1);
+            done = false;
+            break;
+          }
+        }
+      }
+    }
+
   }
   else
   {
-    this->Merge(node, this->root);
-
-/*    for (unsigned int i=0; i<4; i++)
-    {
-      QuadNode *sibling = node->parent->children[i];
-      this->Merge(node, sibling);
-
-      if ( sibling->x == node->x+node->width && 
-           sibling->y == node->y && 
-           sibling->occupied == node->occupied)
-      {
-        node->width += sibling->width;
-        sibling->valid = false;
-        node->valid = true;
-
-        printf("Combine XY[%d %d][%d] XY[%d %d][%d]\n",node->x, node->y, node->occupied, sibling->x, sibling->y, sibling->occupied);
-      }
-    }*/
+    this->Merge(node, node->parent);
   }
 }
 
 void QuadTreeGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
 {
-  std::vector<QuadNode*>::iterator iter;
+  std::deque<QuadNode*>::iterator iter;
 
   if (!nodeB)
     return;
 
   if (nodeB->leaf)
   {
+    if (nodeB->occupied != nodeA->occupied)
+      return;
+
     if ( nodeB->x == nodeA->x + nodeA->width && 
          nodeB->y == nodeA->y && 
-         nodeB->occupied == nodeA->occupied )
+         nodeB->height == nodeA->height )
     {
       nodeA->width += nodeB->width;
       nodeB->valid = false;
       nodeA->valid = true;
 
       this->merged = true;
-
-      printf("Combine XY[%d %d][%d] XY[%d %d][%d]\n",nodeA->x, nodeA->y, nodeA->occupied, nodeB->x, nodeB->y, nodeB->occupied);
     }
 
-    /*if (nodeB->x == nodeA->x && nodeB->width == nodeA->width &&
-        nodeB->y == nodeA->y + nodeA->height &&
-        nodeB->occupied == nodeA->occupied)
+    if (nodeB->x == nodeA->x && 
+        nodeB->width == nodeA->width &&
+        nodeB->y == nodeA->y + nodeA->height )
     {
-      nodeA->height += nodeA->height;
+      nodeA->height += nodeB->height;
       nodeB->valid = false;
       nodeA->valid = true;
 
       this->merged = true;
-
-      printf("Combine XY[%d %d][%d] XY[%d %d][%d]\n",nodeA->x, nodeA->y, nodeA->occupied, nodeB->x, nodeB->y, nodeB->occupied);
-
-    }*/
+    }
   }
   else
   {
@@ -194,7 +259,9 @@ void QuadTreeGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
     for (iter = nodeB->children.begin(); iter != nodeB->children.end(); iter++)
     {
       if ((*iter)->valid)
+      {
         this->Merge(nodeA, (*iter));
+      }
     }
   }
 }
@@ -208,7 +275,9 @@ void QuadTreeGeom::BuildTree(QuadNode *node)
   this->GetPixelCount(node->x, node->y, node->width, node->height, 
                       freePixels, occPixels);
 
-  if (freePixels > 0 && occPixels > 0)
+  int diff = labs(freePixels - occPixels);
+
+  if ( diff > 10)
   {
     float newX, newY;
     float newW, newH;
