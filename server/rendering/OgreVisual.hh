@@ -114,6 +114,9 @@ namespace gazebo
     /// \brief Create a bounding box for this visual
     public: void AttachBoundingBox(const Vector3 &min, const Vector3 &max);
 
+    /// \brief Make the visual objects static renderables
+    public: void MakeStatic();
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: Ogre::SceneBlendType sceneBlendType;
@@ -127,6 +130,9 @@ namespace gazebo
     ///our XML DATA
     private: XMLConfigNode *xmlNode;
 
+    private: Ogre::StaticGeometry *staticGeometry;
+
+    private: static unsigned int visualCounter;
 
   };
 }

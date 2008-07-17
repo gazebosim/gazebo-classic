@@ -120,6 +120,7 @@ void OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
   std::ostringstream stream;
   stream << parent->GetName() << "_LIGHT" << lightCounter;
   lightCounter++;
+
   try
   {
     light = OgreAdaptor::Instance()->sceneMgr->createLight(stream.str());

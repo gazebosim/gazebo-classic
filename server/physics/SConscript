@@ -23,9 +23,7 @@ sources = ['BallJoint.cc',
            'RayGeom.cc',
            'TrimeshGeom.cc',
            'HeightmapGeom.cc',
-           'OccupancyGridGeom.cc',
-           'SpaceTree.cc',
-           'QuadTreeGeom.cc'
+           'MapGeom.cc'
            ]
 
 headers.append( 
@@ -46,8 +44,7 @@ headers.append(
            'server/physics/SphereGeom.hh',
            'server/physics/TrimeshGeom.hh',
            'server/physics/UniversalJoint.hh',
-           'server/physics/OccupancyGridGeom.hh',
-           'server/physics/SpaceTree.hh'
+           'server/physics/MapGeom.hh'
            ] )
 
 staticObjs.append( env.StaticObject(sources) )

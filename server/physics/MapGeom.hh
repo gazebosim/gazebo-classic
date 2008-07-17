@@ -24,8 +24,8 @@
  * CVS: $Id:$
  */
 
-#ifndef QUADTREEGEOM_HH
-#define QUADTREEGEOM_HH
+#ifndef MAPGEOM_HH
+#define MAPGEOM_HH
 
 #include <Ogre.h>
 #include <deque>
@@ -37,8 +37,8 @@ namespace gazebo
 {
   /// \addtogroup gazebo_physics_geom
   /// \{
-  /** \defgroup gazebo_occupancy_geom Occupancy grid geom
-      \brief Occupancy grid geom
+  /** \defgroup gazebo_map_geom Map geom
+      \brief Map geom
 
     \par Attributes
     The following attributes are supported.
@@ -47,34 +47,52 @@ namespace gazebo
       - Binary image that defines an occupancy grid
       - Default: (empty)
 
-    - size (float tuple)
-      - Size of the height map
-      - Default: 0 0 0
+    - scale (float)
+      - Scaling factor
+      - Default: 1
+
+    - granularity (int)
+      - Degree of coarseness when determing if an image area is occupied. Units are pixels
+      - Default: 5
+
+    - threshold (unsigned char)
+      - Grayscale threshold. A pixel value greater than this amount is considered free space
+      - Default: 200
+
+    - negative (bool)
+      - True if the image pixel values should be inverted.
+      - Default: false
+
+    - material (string)
+      - Material to apply to the map
+      - Default: (empty)
+
+
 
     \par Example
     \verbatim
-      <geom:occupancygrid name="occ_geom">
+      <geom:map name="map_geom">
         <image>map.png</image>
-        <size>100 100 1.0</size>
-      </geom:occupancygrid>
+        <scale>0.1</scale>
+      </geom:map>
     \endverbatim
     */
   /// \}
-  /// \addtogroup gazebo_occupancy_geom 
+  /// \addtogroup gazebo_map_geom 
   /// \{
 
 
   class SpaceTree;
   class QuadNode;
 
-  /// \brief Occupancy grid geom
-  class QuadTreeGeom : public Geom
+  /// \brief Map geom
+  class MapGeom : public Geom
   {
     /// \brief Constructor
-    public: QuadTreeGeom(Body *body);
+    public: MapGeom(Body *body);
 
     /// \brief Destructor
-    public: virtual ~QuadTreeGeom();
+    public: virtual ~MapGeom();
 
     /// \brief Update function 
     public: void UpdateChild();
@@ -82,29 +100,26 @@ namespace gazebo
     /// \brief Load the heightmap
     protected: virtual void LoadChild(XMLConfigNode *node);
 
+    /// \brief Build the quadtree
     private: void BuildTree(QuadNode *node);
 
+    /// \brief Get the number of free and occupied pixels in a given area
     private: void GetPixelCount(unsigned int xStart, unsigned int yStart, 
                                 unsigned int width, unsigned int height, 
                                 unsigned int &freePixels, 
                                 unsigned int &occPixels  );
 
+    /// \brief Reduce the number of nodes in the tree. 
     private: void ReduceTree(QuadNode *node);
 
+    /// \brief Try to merge to nodes
     private: void Merge(QuadNode *nodeA, QuadNode *nodeB);
 
+    /// \brief Create the boxes for the map
     private: void CreateBoxes(QuadNode *node);
-
-    private: Vector3 mapSize;
 
     // The scale factor to apply to the geoms
     private: float scale;
-
-    // Alignment
-    private: std::string halign, valign;
-
-    // The position of the map
-    private: Vector3 pos;
 
     // Negative image?
     private: int negative;
@@ -113,20 +128,17 @@ namespace gazebo
     private: float threshold;
 
     // The color of the walls
-    private: Vector3 color;
+    private: std::string material;
 
     // The amount of acceptable error in the model
-    private: float errBound;
+    private: int granularity;
 
     private: float wallHeight;
-
-    // The map dimensions
-    private: unsigned int mapWidth;
-    private: unsigned int mapHeight;
 
     private: Ogre::Image mapImage;
 
     private: QuadNode *root;
+
     private: bool merged;
   };
 
@@ -138,16 +150,14 @@ namespace gazebo
               parent = _parent;
               occupied = false;
               leaf = true;
-              leaves = 0;
               valid = true;
             }
 
     public: ~QuadNode() 
             { 
-              /*std::deque<QuadNode*>::iterator iter;
+              std::deque<QuadNode*>::iterator iter;
               for (iter = children.begin(); iter != children.end(); iter++) 
                   delete (*iter); 
-                  */
             }
 
     public: void Print(std::string space)
@@ -168,7 +178,6 @@ namespace gazebo
     public: std::deque<QuadNode*> children;
     public: bool occupied;
     public: bool leaf;
-    public: int leaves;
 
     public: bool valid;
   };

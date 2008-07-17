@@ -33,6 +33,8 @@
 
 using namespace gazebo;
 
+unsigned int OgreVisual::visualCounter = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 OgreVisual::OgreVisual(OgreVisual *node)
@@ -48,12 +50,14 @@ OgreVisual::OgreVisual(OgreVisual *node)
 
   // Create a unique name for the scene node
   //FIXME: what if we add the capability to delete and add new children?
-  stream << this->parentNode->getName() << "_VISUAL_" << this->parentNode->numChildren();
+  stream << this->parentNode->getName() << "_VISUAL_" << visualCounter++;
   
 
   // Create the scene node
   this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
 
+
+  this->staticGeometry = NULL;
   this->boundingBoxNode = NULL;
 //  this->sceneNode->setInheritScale(false);
 }
@@ -166,6 +170,23 @@ std::string OgreVisual::GetName() const
 void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 {
   this->sceneNode->attachObject(obj);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Attach a static object
+void OgreVisual::MakeStatic()
+{
+  if (!this->staticGeometry)
+    this->staticGeometry = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
+
+  // Detach the scene node from the parent. Prevents double rendering
+  this->sceneNode->getParent()->removeChild(this->sceneNode);
+
+  // Add the scene node to the static geometry
+  this->staticGeometry->addSceneNode(this->sceneNode);
+
+  // Build the static geometry
+  this->staticGeometry->build();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

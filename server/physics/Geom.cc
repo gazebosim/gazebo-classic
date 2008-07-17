@@ -128,6 +128,10 @@ void Geom::Load(XMLConfigNode *node)
     childNode = childNode->GetNext("visual");
   }
 
+  if (this->IsStatic())
+  {
+    this->visualNode->MakeStatic();
+  }
 
   // Create the bounding box
   if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass)
@@ -175,6 +179,7 @@ void Geom::Save()
 
 
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set the encapsulated geometry object
 void Geom::SetGeom(dGeomID geomId, bool placeable)

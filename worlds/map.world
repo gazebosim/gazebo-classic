@@ -62,27 +62,26 @@
   </model:physical>
 
 
-  <model:physical name="grid">
-    <static>true</static>
-    <body:occupancy_grid name="grid_body">
-
-      <geom:quadtree  name="grid_geom">
+  <model:physical name="map">
+    <body:map name="map_body">
+      <geom:map name="map_geom">
         <image>willowMap.png</image>
-        <negative>true</negative>
+        <threshold>200</threshold>
+        <granularity>2</granularity>
+        <negative>false</negative>
         <scale>0.1</scale>
-      </geom:quadtree>
-
-    </body:occupancy_grid>
+        <material>Gazebo/Rocky</material>
+      </geom:map>
+    </body:map>
   </model:physical>
 
-  <!-- White Directional light -->
   <model:renderable name="directional_white">
     <light>
       <type>directional</type>
       <direction>0 -0.6 -0.4</direction>
       <diffuseColor>1.0 1.0 1.0</diffuseColor>
       <specularColor>0.2 0.2 0.2</specularColor>
-      <attenuation>1000 1.0 0.0 0</attenuation>
+      <attenuation>100 1.0 0.0 0</attenuation>
     </light>
   </model:renderable>
 

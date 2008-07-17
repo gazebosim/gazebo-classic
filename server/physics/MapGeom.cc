@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: QuadTree geometry
+/* Desc: Map geometry
  * Author: Nate Koenig
  * Date: 14 July 2008
  * CVS: $Id:$
@@ -37,14 +37,13 @@
 #include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "Body.hh"
-#include "SpaceTree.hh"
-#include "QuadTreeGeom.hh"
+#include "MapGeom.hh"
 
 using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-QuadTreeGeom::QuadTreeGeom(Body *body)
+MapGeom::MapGeom(Body *body)
     : Geom(body)
 {
   this->root = new QuadNode(NULL);
@@ -53,7 +52,7 @@ QuadTreeGeom::QuadTreeGeom(Body *body)
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-QuadTreeGeom::~QuadTreeGeom()
+MapGeom::~MapGeom()
 {
   if (this->root)
     delete this->root;
@@ -61,34 +60,36 @@ QuadTreeGeom::~QuadTreeGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void QuadTreeGeom::UpdateChild()
+void MapGeom::UpdateChild()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void QuadTreeGeom::LoadChild(XMLConfigNode *node)
+void MapGeom::LoadChild(XMLConfigNode *node)
 {
   OgreAdaptor *ogreAdaptor;
 
   ogreAdaptor = Simulator::Instance()->GetRenderEngine();
 
   std::string imageFilename = node->GetString("image","",1);
-  this->mapSize = node->GetVector3("size",Vector3(10,10,10));
 
   this->negative = node->GetBool("negative", 0);
+
   this->threshold = node->GetDouble( "threshold", 200.0);
 
   this->wallHeight = node->GetDouble( "height", 1.0, 0 );
+
   this->scale = node->GetDouble("scale",1.0,0);
 
-  //this->color = node->GetColor( "color", GzColor(1.0, 1.0, 1.0) );
+  this->material = node->GetString("material", "", 0);
+
+  this->granularity = node->GetInt("granularity", 5, 0);
 
   // Make sure they are ok
   if (this->scale <= 0) this->scale = 0.1;
   if (this->threshold <=0) this->threshold = 200;
   if (this->wallHeight <= 0) this->wallHeight = 1.0;
-  if (this->errBound <= 0) this->errBound = 0.0;
 
   // Load the image 
   this->mapImage.load(imageFilename,
@@ -109,10 +110,9 @@ void QuadTreeGeom::LoadChild(XMLConfigNode *node)
   }
 
   this->CreateBoxes(this->root);
-  this->root->Print("");
 }
 
-void QuadTreeGeom::CreateBoxes(QuadNode *node)
+void MapGeom::CreateBoxes(QuadNode *node)
 {
   if (node->leaf)
   {
@@ -130,23 +130,24 @@ void QuadTreeGeom::CreateBoxes(QuadNode *node)
 
     float x = (node->x + node->width / 2.0) * this->scale;
     float y = (node->y + node->height / 2.0) * this->scale;
-    float w = (node->width) * this->scale;
-    float h = (node->height) * this->scale;
+    float z = this->wallHeight / 2.0;
+    float xSize = (node->width) * this->scale;
+    float ySize = (node->height) * this->scale;
+    float zSize = this->wallHeight;
 
-    stream << "<geom:box name='occ_geom'>";
+    stream << "<geom:box name='map_geom'>";
     stream << "  <mass>0.0</mass>";
-    stream << "  <xyz>" << x << " " << y << " " << 0.25 << "</xyz>";
+    stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
     stream << "  <rpy>0 0 0</rpy>";
-    stream << "  <size>" << w << " " << h << " " << 0.5 << "</size>";
+    stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
     stream << "  <visual>";
     stream << "    <mesh>unit_box</mesh>";
-    stream << "    <material>Gazebo/Rocky</material>";
-    stream << "    <size>" << w << " " << h << " " << 0.5 << "</size>";
+    stream << "    <material>" << this->material << "</material>";
+    stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
     stream << "  </visual>";
     stream << "</geom:box>";
     stream << "</gazebo:world>";
 
-    std::cout << stream.str() << "\n\n";
     boxConfig->LoadString( stream.str() );
 
     newBox->Load( boxConfig->GetRootNode()->GetChild() );
@@ -162,7 +163,7 @@ void QuadTreeGeom::CreateBoxes(QuadNode *node)
   }
 }
 
-void QuadTreeGeom::ReduceTree(QuadNode *node)
+void MapGeom::ReduceTree(QuadNode *node)
 {
   std::deque<QuadNode*>::iterator iter;
 
@@ -219,7 +220,7 @@ void QuadTreeGeom::ReduceTree(QuadNode *node)
   }
 }
 
-void QuadTreeGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
+void MapGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
 {
   std::deque<QuadNode*>::iterator iter;
 
@@ -267,7 +268,7 @@ void QuadTreeGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
 }
 
 
-void QuadTreeGeom::BuildTree(QuadNode *node)
+void MapGeom::BuildTree(QuadNode *node)
 {
   QuadNode *newNode = NULL;
   unsigned int freePixels, occPixels;
@@ -277,7 +278,7 @@ void QuadTreeGeom::BuildTree(QuadNode *node)
 
   int diff = labs(freePixels - occPixels);
 
-  if ( diff > 10)
+  if (diff > this->granularity)
   {
     float newX, newY;
     float newW, newH;
@@ -330,18 +331,16 @@ void QuadTreeGeom::BuildTree(QuadNode *node)
   {
     node->occupied = false;
     node->leaf = true;
-    node->parent->leaves++;
   }
   else
   {
     node->occupied = true;
     node->leaf = true;
-    node->parent->leaves++;
   }
 
 }
 
-void QuadTreeGeom::GetPixelCount(unsigned int xStart, unsigned int yStart, 
+void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart, 
                                  unsigned int width, unsigned int height, 
                                  unsigned int &freePixels, 
                                  unsigned int &occPixels )
@@ -361,7 +360,7 @@ void QuadTreeGeom::GetPixelCount(unsigned int xStart, unsigned int yStart,
       if (this->negative)
         v = 255 - v;
 
-      if (v < this->threshold)
+      if (v > this->threshold)
         freePixels++;
       else
         occPixels++;

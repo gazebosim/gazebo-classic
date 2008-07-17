@@ -28,8 +28,7 @@
 
 #include "GazeboMessage.hh"
 #include "HeightmapGeom.hh"
-#include "OccupancyGridGeom.hh"
-#include "QuadTreeGeom.hh"
+#include "MapGeom.hh"
 #include "OgreVisual.hh"
 #include "Global.hh"
 #include "Vector2.hh"
@@ -414,13 +413,10 @@ void Body::LoadGeom(XMLConfigNode *node)
     this->SetStatic(true);
     geom = new HeightmapGeom(this);
   }
-  else if (node->GetName() == "occupancy_grid")
+  else if (node->GetName() == "map")
   {
-    geom = new OccupancyGridGeom(this);
-  }
-  else if (node->GetName() == "quadtree")
-  {
-    geom = new QuadTreeGeom(this);
+    this->SetStatic(true);
+    geom = new MapGeom(this);
   }
   else
   {
