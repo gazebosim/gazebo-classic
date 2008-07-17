@@ -204,7 +204,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   else
   {
     this->sceneType= SCENE_EXT;
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
   }
 
   ambient.r = node->GetTupleDouble("ambient",0,1.0);

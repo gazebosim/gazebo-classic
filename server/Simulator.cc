@@ -41,7 +41,7 @@
 
 #include "Simulator.hh"
 
-#define MAX_FRAME_RATE 35
+#define MAX_FRAME_RATE 60
 
 using namespace gazebo;
 
@@ -292,10 +292,10 @@ void Simulator::MainLoop()
     elapsedTime = (this->GetRealTime() - currTime);
 
     // Wait if we're going too fast
-    if ( elapsedTime < 1.0/MAX_FRAME_RATE )
+    /*if ( elapsedTime < 1.0/MAX_FRAME_RATE )
     {
       usleep( (int)((1.0/MAX_FRAME_RATE - elapsedTime) * 1e6)  );
-    }
+    }*/
 
     if (this->timeout > 0 && this->GetRealTime() > this->timeout)
       break;
