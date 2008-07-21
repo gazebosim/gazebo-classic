@@ -108,7 +108,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
 // Save the ODE engine
 void ODEPhysics::Save(XMLConfigNode *node)
 {
-  XMLConfigNode *cnode = node->GetChild("ode");
+  /*XMLConfigNode *cnode = node->GetChild("ode");
   if (cnode == NULL)
     gzthrow("No <physics:ode> node in the XML, can't write back the data");
 
@@ -116,6 +116,7 @@ void ODEPhysics::Save(XMLConfigNode *node)
   cnode->SetValue("stepTime", this->stepTime);
   cnode->SetValue("cfm", this->globalCFM);
   cnode->SetValue("erp", this->globalERP);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

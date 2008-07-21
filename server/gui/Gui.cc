@@ -79,6 +79,8 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   // Create a dummy rendering window. This creates a context, and allows Ogre
   // to initialize properly
   OgreCreator::CreateWindow(this, 1, 1);
+
+  this->hasFocus = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,12 +135,18 @@ unsigned int Gui::GetHeight() const
 /// Handle an event
 int Gui::handle(int event)
 {
-
-  switch (event)
+  switch(event)
   {
+    case FL_FOCUS:
+      this->hasFocus = true;
+      break;
+    case FL_UNFOCUS:
+      this->hasFocus = false;
+      break;
     case FL_HIDE:
-      Simulator::Instance()->SetUserQuit();
-      return 1;
+      if (this->hasFocus)
+        Simulator::Instance()->SetUserQuit();
+      break;
   }
 
   return Fl_Window::handle(event);

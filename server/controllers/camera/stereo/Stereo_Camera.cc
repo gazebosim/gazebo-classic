@@ -70,8 +70,14 @@ void Stereo_Camera::LoadChild(XMLConfigNode *node)
     if ((*iter)->GetType() == "stereo")
       this->stereoIface = dynamic_cast<StereoCameraIface*>(*iter);
     else if ((*iter)->GetType() == "camera")
-      this->cameraIface = dynamic_cast<CameraIface*>(*iter);
+    {
+      CameraIface *ciface = dynamic_cast<CameraIface*>(*iter);
+      this->cameraIfaces[ciface->GetId()] = ciface;
+    }
   }
+
+  this->leftCameraName = node->GetString("leftcamera","", 1);
+  this->rightCameraName = node->GetString("rightcamera","", 1);
 
   if (!this->stereoIface)
     gzthrow("Stereo_Camera controller requires a StereoCameraIface");
@@ -87,15 +93,23 @@ void Stereo_Camera::InitChild()
 // Update the controller
 void Stereo_Camera::UpdateChild()
 {
-  if (this->cameraIface)
-  {
-    this->cameraIface->Lock(1);
-    if (this->cameraIface->data->head.openCount > 0)
-      this->PutCameraData();
-    this->cameraIface->Unlock();
+  std::map< std::string, CameraIface*>::iterator iter;
 
-    // New data is available
-    this->cameraIface->Post();
+  for (iter = this->cameraIfaces.begin(); 
+       iter != this->cameraIfaces.end(); iter++)
+  {
+    iter->second->Lock(1);
+
+    if (iter->second->data->head.openCount > 0)
+    {
+      if (this->leftCameraName == iter->first)
+        this->PutCameraData( iter->second->data, 0 );
+      else
+        this->PutCameraData( iter->second->data, 1 );
+    }
+
+    iter->second->Unlock();
+    iter->second->Post();
   }
 
   if (this->stereoIface)
@@ -175,9 +189,9 @@ void Stereo_Camera::PutStereoData()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Put camera data to the interface
-void Stereo_Camera::PutCameraData()
+void Stereo_Camera::PutCameraData(CameraData *camera_data, unsigned int camera)
 {
-  CameraData *camera_data = this->cameraIface->data;
+  //CameraData *camera_data = this->cameraIface->data;
   const unsigned char *rgb_src = NULL;
   unsigned char *rgb_dst = NULL;
   Pose3d cameraPose;
@@ -202,10 +216,9 @@ void Stereo_Camera::PutCameraData()
   camera_data->camera_pose.yaw = cameraPose.rot.GetYaw();
 
   // Copy the pixel data to the interface
-  rgb_src = this->myParent->GetImageData(0);
+  rgb_src = this->myParent->GetImageData(camera);
   rgb_dst = camera_data->image;
 
   memcpy(rgb_dst, rgb_src, camera_data->image_size);
-
 }
 

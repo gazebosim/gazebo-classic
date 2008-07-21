@@ -128,10 +128,10 @@ void Geom::Load(XMLConfigNode *node)
     childNode = childNode->GetNext("visual");
   }
 
-  if (this->IsStatic())
+  /*if (this->IsStatic())
   {
     this->visualNode->MakeStatic();
-  }
+  }*/
 
   // Create the bounding box
   if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass)
@@ -161,7 +161,7 @@ void Geom::Load(XMLConfigNode *node)
 // Save the body based on our XMLConfig node
 void Geom::Save()
 {
-  std::vector<OgreVisual*>::iterator iter;
+  /*std::vector<OgreVisual*>::iterator iter;
   Pose3d pose= this->GetPose();
 
   this->xmlNode->SetValue("name", this->GetName());
@@ -176,8 +176,7 @@ void Geom::Save()
   {
     (*iter)->Save();
   }
-
-
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -151,9 +151,10 @@ void OgreVisual::Load(XMLConfigNode *node)
 
 void OgreVisual::Save()
 {
-  this->xmlNode->SetValue("xyz", this->GetPosition());
+  /*this->xmlNode->SetValue("xyz", this->GetPosition());
   this->xmlNode->SetValue("rpy", this->GetRotation());
   //TODO: A lot of information!
+  */
 }
 
 

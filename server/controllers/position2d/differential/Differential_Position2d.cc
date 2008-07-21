@@ -113,11 +113,12 @@ void Differential_Position2d::InitChild()
 // Load the controller
 void Differential_Position2d::SaveChild(XMLConfigNode *node)
 {
-  node->SetValue("wheelSeparation",this->wheelSep);
+  /*node->SetValue("wheelSeparation",this->wheelSep);
   node->SetValue("wheelDiameter",this->wheelDiam);
   node->SetValue("torque",this->torque);
 //  node->SetValue("leftJoint",this->XMLData["leftJointName"]);
 //  node->SetValue("rightJoint",this->XMLData["rightJointName"]);
+*/
 }
 
 

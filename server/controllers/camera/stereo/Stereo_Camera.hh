@@ -28,6 +28,8 @@
 #ifndef STEREO_CAMERA_HH
 #define STEREO_CAMERA_HH
 
+#include <map>
+
 #include "Controller.hh"
 
 namespace gazebo
@@ -93,11 +95,14 @@ class Stereo_Camera : public Controller
   private: void PutStereoData();
 
   /// \brief Put camera data to the iface
-  private: void PutCameraData();
+  private: void PutCameraData(CameraData *camera_data, unsigned int camera);
 
   /// The camera interface
   private: StereoCameraIface *stereoIface;
-  private: CameraIface *cameraIface;
+  private: std::map< std::string, CameraIface*> cameraIfaces;
+
+  private: std::string leftCameraName;
+  private: std::string rightCameraName;
 
   /// The parent sensor
   private: StereoCameraSensor *myParent;

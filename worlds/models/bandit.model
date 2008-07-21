@@ -67,7 +67,11 @@
 
       <controller:stereocamera name="stereo_camera_controller">
         <interface:stereocamera name="bandit_stereo_iface" />
-        <interface:camera name="bandit_stereo_camera_iface" />
+        <interface:camera name="bandit_stereo_camera_left_iface" />
+        <interface:camera name="bandit_stereo_camera_right_iface" />
+
+        <leftcamera>bandit_stereo_camera_left_iface</leftcamera>
+        <rightcamera>bandit_stereo_camera_right_iface</rightcamera>
       </controller:stereocamera>
     </sensor:stereocamera>
   </body:box>

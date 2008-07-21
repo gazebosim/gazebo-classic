@@ -113,22 +113,24 @@ void Iface::Create(Server *server, std::string id)
 
   this->server = server;
 
+  this->id = id;
+
   // Went cant have null id's
-  if (id.empty())
+  if (this->id.empty())
   {
     stream << "interface [" << this->type << "] id is NULL";
     throw(stream.str());
   }
 
   // We cannot have id with '.'
-  if (strchr(id.c_str(), '.'))
+  if (strchr(this->id.c_str(), '.'))
   {
-    stream << "invalid id [" << id << "] (must not contain '.')";
+    stream << "invalid id [" << this->id << "] (must not contain '.')";
     throw(stream.str());
   }
 
   // Work out the filename
-  this->Filename(id);
+  this->Filename(this->id);
 
   // Create and open the file
   this->mmapFd = open(this->filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
@@ -361,6 +363,13 @@ void Iface::Post()
 std::string Iface::GetType() const
 {
   return this->type;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the ID of the inteface
+std::string Iface::GetId() const
+{
+  return this->id;
 }
 
 //////////////////////////////////////////////////////////////////////////////

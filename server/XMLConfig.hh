@@ -35,7 +35,6 @@
 #include "Vector2.hh"
 #include "Quatern.hh"
 #include "Time.hh"
-#include "StringValue.hh"
 
 namespace gazebo
 {
@@ -195,7 +194,7 @@ namespace gazebo
     /// \param value : the name of the element or attribute to write
     /// \param require : Require=1 means that if not found a new node will be created
     /// \param type : Only if a new node is created, the type must be specified
-    public: void SetValue(const std::string &key, const StringValue &data, int require =0, int type=0);
+    //public: void SetValue(const std::string &key, const StringValue &data, int require =0, int type=0);
 
     /// \brief Get a node's value, which is either a attribute or child node value.
     protected: xmlChar* GetNodeValue( const std::string &key ) const;

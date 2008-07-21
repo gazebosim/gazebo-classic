@@ -51,6 +51,7 @@ namespace Ogre
   class RenderTarget;
   class ColourValue;
   class RenderSystem;
+  class RaySceneQuery; 
 }
 
 
@@ -94,6 +95,10 @@ namespace gazebo
     /// \brief Update a window
     public: void UpdateWindow(Ogre::RenderWindow *window, OgreCamera *camera);
 
+    /// \brief Get an entity at a pixel location using a camera. Used for
+    ///        mouse picking. 
+    public: Entity *GetEntityAt(OgreCamera *camera, int x, int y);
+
     private: void LoadPlugins();
     private: void SetupResources();
     private: void SetupRenderSystem(bool create);
@@ -116,6 +121,7 @@ namespace gazebo
   
     private: std::string videoMode;
   
+    private: Ogre::RaySceneQuery *raySceneQuery;
 
     //bsp attributes saved to write XML file back
     private: int sceneType;
@@ -145,6 +151,7 @@ namespace gazebo
     
     /// GLX context used to render the scenes.Used for gui-less operation
     protected: GLXContext dummyContext;
+
   };
   
  

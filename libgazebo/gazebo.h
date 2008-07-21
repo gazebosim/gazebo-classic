@@ -297,6 +297,9 @@ class Iface
   /// \return The type of interface
   public: std::string GetType() const;
 
+  /// \brief Get the ID of the inteface
+  public: std::string GetId() const;
+
   private: std::string Filename(std::string id);
 
   /// The server we are associated with
@@ -316,6 +319,8 @@ class Iface
 
   /// type of interface
   protected: std::string type;
+
+  protected: std::string id;
 
   private: bool creator;
 

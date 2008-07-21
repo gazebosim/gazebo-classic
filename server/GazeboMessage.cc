@@ -97,18 +97,17 @@ void GazeboMessage::Load(XMLConfigNode *node)
 
 void GazeboMessage::Save(XMLConfigNode *node)
 {
-  node->SetValue("verbosity", this->level);
+  /*node->SetValue("verbosity", this->level);
   node->SetValue("logData", this->logData);
 
-  /*
-    node->NewElement("verbosity", String(this->level)); //std::ostringstream << this->level);
+    //node->NewElement("verbosity", String(this->level)); //std::ostringstream << this->level);
 
-    node->NewElement("logData", gazebo::String(this->logData));
+    //node->NewElement("logData", gazebo::String(this->logData));
 
-    if (this->logData)
-      node->NewElement("logData", std::ostringstream << "true");
-    else
-      node->NewElement("logData", std::ostringstream << "true");
+    //if (this->logData)
+    //  node->NewElement("logData", std::ostringstream << "true");
+    //else
+    //  node->NewElement("logData", std::ostringstream << "true");
     */
 }
 

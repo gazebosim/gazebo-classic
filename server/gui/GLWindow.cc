@@ -122,17 +122,6 @@ void GLWindow::flush()
 // Update function
 void GLWindow::Update()
 {
-  /*if (this->userCamera && this->userCamera->GetUserMovable())
-  {
-    this->userCamera->Translate( 
-        this->directionVec * (Simulator::Instance()->GetRealTime() - this->lastUpdateTime) );
-    this->directionVec.Set(0,0,0);
-  }
-
-  this->lastUpdateTime = Simulator::Instance()->GetRealTime();
-
-  this->userCamera->Update();
-  */
   if (this->activeCamera && this->activeCamera->GetUserMovable())
   {
     this->activeCamera->Translate( 
@@ -216,17 +205,6 @@ void GLWindow::HandleMouseRelease()
 /// Handle a mouse drag
 void GLWindow::HandleMouseDrag()
 {
-  /*if (this->userCamera && this->userCamera->GetUserMovable())
-  {
-    if (this->leftMousePressed)
-    {
-      Vector2<int> d = this->mousePos - this->prevMousePos;
-      this->userCamera->RotateYaw(DTOR(-d.x * this->rotateAmount));
-      this->userCamera->RotatePitch(DTOR(d.y * this->rotateAmount));
-    }
-  }
-  */
-
   if (this->activeCamera && this->activeCamera->GetUserMovable())
   {
     if (this->leftMousePressed)

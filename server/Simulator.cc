@@ -419,16 +419,16 @@ void Simulator::SetUserStepInc(bool step)
 
 void Simulator::SaveGui(XMLConfigNode *node)
 {
-  Vector2<int> size;
+  /*Vector2<int> size;
   XMLConfigNode* childNode = node->GetChild("gui");
 
   if (childNode && this->gui)
   {
     size.x = this->gui->GetWidth();
     size.y = this->gui->GetHeight();
-    childNode->SetValue("size", size);
+    //childNode->SetValue("size", size);
     //TODO: node->SetValue("pos", Vector2<int>(x,y));
-  }
+  }*/
 
 }
 

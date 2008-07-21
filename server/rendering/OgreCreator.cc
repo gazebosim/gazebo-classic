@@ -258,7 +258,7 @@ void OgreCreator::CreateFog(XMLConfigNode *cnode)
 ////////////////////////////////////////////////////////////////////////////////
 void OgreCreator::SaveFog(XMLConfigNode *node)
 {
-  Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
+  /*Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
   Ogre::Real start = OgreAdaptor::Instance()->sceneMgr->getFogStart();
   Ogre::Real end = OgreAdaptor::Instance()->sceneMgr->getFogEnd();
   //Ogre::Real density = OgreAdaptor::Instance()->sceneMgr->getFogDensity();
@@ -286,6 +286,7 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
   node->SetValue("linearEnd", end);
   //node->SetValue("density", density);
 
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -181,7 +181,7 @@ void Model::Test()
 
 void Model::Save()
 {
-  std::map<std::string, Body* >::iterator bodyIter;
+  /*std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   std::map<std::string, Joint* >::iterator jointIter;
 
@@ -225,6 +225,7 @@ void Model::Save()
       contIter->second->Save();
   }
 
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

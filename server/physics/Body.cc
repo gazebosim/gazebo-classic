@@ -127,7 +127,7 @@ void Body::Load(XMLConfigNode *node)
 // Save the body based on our XMLConfig node
 void Body::Save()
 {
-  std::vector< Geom* >::iterator giter;
+  /*std::vector< Geom* >::iterator giter;
   std::vector< Sensor* >::iterator siter;
 
   this->xmlNode->SetValue("name", this->GetName());
@@ -143,7 +143,7 @@ void Body::Save()
   {
     //(*siter)->Save();
   }
-
+  */
 }
 
 

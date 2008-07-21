@@ -76,6 +76,8 @@ namespace gazebo
     private: Toolbar *toolbar;
     private: StatusBar *statusbar;
     private: GLFrameManager *frameMgr;
+
+    private: bool hasFocus;
   };
 }
 

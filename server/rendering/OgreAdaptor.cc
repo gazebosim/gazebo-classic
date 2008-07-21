@@ -67,6 +67,8 @@ OgreAdaptor::OgreAdaptor()
   this->root=NULL;
 
   this->updateRate = 0;
+
+  this->dummyDisplay = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -269,12 +271,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->root->addFrameListener(this->frameListener);
 
   this->updateRate = node->GetDouble("maxUpdateRate",0,0);
+
+  this->raySceneQuery = this->sceneMgr->createRayQuery( Ogre::Ray() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save
 void OgreAdaptor::Save(XMLConfigNode *node)
 {
+  /*
   //Video information is not modified so we don't need to rewrite it.
   //Sky is not modified, not rewritten
   XMLConfigNode *rnode;
@@ -290,7 +295,7 @@ void OgreAdaptor::Save(XMLConfigNode *node)
   cnode = rnode->GetChild("fog");
   if (cnode)
     OgreCreator::SaveFog(cnode);
-
+    */
 }
 
 
@@ -457,6 +462,32 @@ void OgreAdaptor::UpdateWindow(Ogre::RenderWindow *window, OgreCamera *camera)
   window->update();
 
   this->root->_fireFrameEnded();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get an entity at a pixel location using a camera. Used for mouse picking. 
+Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, int x, int y)
+{
+  /*
+  Ogre::Vector3 camPos = camera->getPosition();
+
+  Ogre::Ray mouseRay = camera->getCameraToViewportRay(
+      x/camera->GetViewportWidth(), y/camera->GetViewportHeight());
+
+  this->raySceneQuery->setRay( mouseRay );
+
+  // Perform the scene query
+  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult::iterator iter = result.begin();
+   
+  // Get the results, set the camera height
+  if (iter != result.end() && iter->worldFragment)
+  {
+    Ogre::Real terrainHeight = iter->worldFragment->singleIntersection.y;
+    if ((terrainHeight + 10.0f) > camPos.y)
+        camera->setPosition( camPos.x, terrainHeight + 10.0f, camPos.z);
+  }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

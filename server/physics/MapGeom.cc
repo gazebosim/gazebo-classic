@@ -35,6 +35,7 @@
 #include "OgreAdaptor.hh"
 #include "Simulator.hh"
 #include "OgreAdaptor.hh"
+#include "OgreVisual.hh"
 #include "Global.hh"
 #include "Body.hh"
 #include "MapGeom.hh"
@@ -110,6 +111,8 @@ void MapGeom::LoadChild(XMLConfigNode *node)
   }
 
   this->CreateBoxes(this->root);
+
+  this->visualNode->MakeStatic();
 }
 
 void MapGeom::CreateBoxes(QuadNode *node)

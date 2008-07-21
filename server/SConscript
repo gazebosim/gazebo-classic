@@ -19,7 +19,6 @@ sources = ['main.cc',
            'GazeboMessage.cc',
            'Model.cc',
            'Simulator.cc',
-           'StringValue.cc'
            ]
 
 headers.append( 
@@ -33,7 +32,6 @@ headers.append(
            '#/server/Simulator.hh',
            '#/server/SingletonT.hh',
            '#/server/StaticPluginRegister.hh',
-           '#/server/StringValue.hh',
            '#/server/Time.hh',
            '#/server/Vector2.hh', 
            '#/server/Vector3.hh',
