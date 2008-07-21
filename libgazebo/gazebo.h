@@ -406,9 +406,9 @@ class SimulationData
   public: SimulationRequestData requests[GAZEBO_SIMULATION_MAX_REQUESTS];
   public: unsigned int requestCount;
 
-  /// Array of request results from the simulator
-  public: SimulationRequestData results[GAZEBO_SIMULATION_MAX_REQUESTS];
-  public: unsigned int resultCount;
+  /// Array of request responses from the simulator
+  public: SimulationRequestData responses[GAZEBO_SIMULATION_MAX_REQUESTS];
+  public: unsigned int responseCount;
 };
 
 /// \brief Common simulation interface

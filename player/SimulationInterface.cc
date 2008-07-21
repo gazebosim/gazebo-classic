@@ -223,14 +223,14 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void SimulationInterface::Update()
 {
-  gazebo::SimulationRequestData *result = NULL;
+  gazebo::SimulationRequestData *response = NULL;
   this->iface->Lock(1);
 
-  for (unsigned int i=0; i < this->iface->data->resultCount; i++)
+  for (unsigned int i=0; i < this->iface->data->responseCount; i++)
   {
-    result = &(this->iface->data->results[i]);
+    response = &(this->iface->data->responses[i]);
 
-    switch (result->type)
+    switch (response->type)
     {
       case gazebo::SimulationRequestData::PAUSE:
       case gazebo::SimulationRequestData::RESET:
@@ -243,16 +243,16 @@ void SimulationInterface::Update()
         {
           player_simulation_pose3d_req_t req;
 
-          strcpy(req.name, result->modelName);
+          strcpy(req.name, response->modelName);
           req.name_count = strlen(req.name);
 
-          req.pose.px = result->modelPose.pos.x;
-          req.pose.py = result->modelPose.pos.y;
-          req.pose.pz = result->modelPose.pos.z;
+          req.pose.px = response->modelPose.pos.x;
+          req.pose.py = response->modelPose.pos.y;
+          req.pose.pz = response->modelPose.pos.z;
 
-          req.pose.proll = result->modelPose.roll;
-          req.pose.ppitch = result->modelPose.pitch;
-          req.pose.pyaw = result->modelPose.yaw;
+          req.pose.proll = response->modelPose.roll;
+          req.pose.ppitch = response->modelPose.pitch;
+          req.pose.pyaw = response->modelPose.yaw;
 
           this->driver->Publish(this->device_addr, *(this->responseQueue),
               PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
@@ -264,12 +264,12 @@ void SimulationInterface::Update()
         {
           player_simulation_pose2d_req_t req;
 
-          strcpy(req.name, result->modelName);
+          strcpy(req.name, response->modelName);
           req.name_count = strlen(req.name);
 
-          req.pose.px = result->modelPose.pos.x;
-          req.pose.py = result->modelPose.pos.y;
-          req.pose.pa = result->modelPose.yaw;
+          req.pose.px = response->modelPose.pos.x;
+          req.pose.py = response->modelPose.pos.y;
+          req.pose.pa = response->modelPose.yaw;
 
           this->driver->Publish(this->device_addr, *(this->responseQueue),
               PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
@@ -279,6 +279,8 @@ void SimulationInterface::Update()
         }
     }
   }
+
+  this->iface->data->responseCount = 0;
 
   this->iface->Unlock();
 

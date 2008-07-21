@@ -490,7 +490,7 @@ void World::SetShowPhysics(bool show)
 // Update the simulation interface
 void World::UpdateSimulationIface()
 {
-  SimulationRequestData *results = NULL;
+  SimulationRequestData *response = NULL;
 
   //TODO: Move this method to simulator? Hard because of the models
   this->simIface->Lock(1);
@@ -501,8 +501,8 @@ void World::UpdateSimulationIface()
     return;
   }
 
-  results = this->simIface->data->results;
-  this->simIface->data->resultCount = 0;
+  response = this->simIface->data->responses;
+  this->simIface->data->responseCount = 0;
 
   this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
   this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
@@ -571,19 +571,19 @@ void World::UpdateSimulationIface()
             Pose3d pose = model->GetPose();
             Vector3 rot = pose.rot.GetAsEuler();
 
-            results->type = req->type;
+            response->type = req->type;
 
-            strcpy( results->modelName, req->modelName);
-            results->modelPose.pos.x = pose.pos.x;
-            results->modelPose.pos.y = pose.pos.y;
-            results->modelPose.pos.z = pose.pos.z;
+            strcpy( response->modelName, req->modelName);
+            response->modelPose.pos.x = pose.pos.x;
+            response->modelPose.pos.y = pose.pos.y;
+            response->modelPose.pos.z = pose.pos.z;
 
-            results->modelPose.roll = rot.x;
-            results->modelPose.pitch = rot.y;
-            results->modelPose.yaw = rot.z;
+            response->modelPose.roll = rot.x;
+            response->modelPose.pitch = rot.y;
+            response->modelPose.yaw = rot.z;
 
-            results++;
-            this->simIface->data->resultCount++;
+            response++;
+            this->simIface->data->responseCount++;
           }
           else
           {
