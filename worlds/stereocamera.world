@@ -100,7 +100,7 @@
         <imageSize>320 240</imageSize>
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
-        <farClip>100</farClip>
+        <farClip>1000</farClip>
         <saveFrames>false</saveFrames>
         <saveFramePath>frames</saveFramePath>
         <baseline>0.2</baseline>
@@ -108,6 +108,10 @@
         <controller:stereocamera name="stereo_camera_controller">
           <interface:stereocamera name="stereo_iface_0" />
           <interface:camera name="camera_iface_0" />
+          <interface:camera name="camera_iface_1" />
+
+          <leftcamera>camera_iface_0</leftcamera>
+          <rightcamera>camera_iface_1</rightcamera>
         </controller:stereocamera>
       </sensor:stereocamera>
     </body:empty>

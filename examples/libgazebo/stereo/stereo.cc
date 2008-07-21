@@ -21,16 +21,24 @@ void SaveFrame()
     return;
   }
 
-  fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", stereoIface->data->width, stereoIface->data->height);
+  fprintf( fp, "P5\n# Gazebo\n%d %d\n32768\n", stereoIface->data->width, stereoIface->data->height);
 
+  double max = 0;
+  for (unsigned int i=0; i<stereoIface->data->height*stereoIface->data->width; i++)
+  {
+    double v = stereoIface->data->left_disparity[i];
+    if (v > max)
+      max = v;
+  }
+
+  printf("Max[%f]\n",max);
   for (unsigned int i = 0; i<stereoIface->data->height; i++)
   {
     for (unsigned int j =0; j<stereoIface->data->width; j++)
     {
-      unsigned char value = stereoIface->data->left_disparity[i*stereoIface->data->width+j] * 255;
-      fwrite( &value, 1, 1, fp );
-      fwrite( &value, 1, 1, fp );
-      fwrite( &value, 1, 1, fp );
+      double v = stereoIface->data->left_disparity[i*stereoIface->data->width+j];
+      unsigned int value = (unsigned int)((v/max) * 32767);
+      fwrite( &value, 2, 1, fp );
     }
   }
 
