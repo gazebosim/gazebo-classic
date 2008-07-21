@@ -81,6 +81,8 @@ class SimulationInterface : public GazeboInterface
 
   /// \brief Pointer to the Simulation Interface
   public: SimulationIface *iface;
+
+  private: QueuePointer *responseQueue;
 };
 
   /// \} 

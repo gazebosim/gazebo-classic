@@ -65,130 +65,112 @@ SimulationInterface::~SimulationInterface()
 int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                         player_msghdr_t *hdr, void *data)
 {
+  if (this->responseQueue)
+    delete this->responseQueue;
 
-  timespec sleepTime = {0, 10000000};
+  this->responseQueue = new QueuePointer(respQueue);
+
   /// Set a 3D pose
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                             PLAYER_SIMULATION_REQ_SET_POSE3D, this->device_addr))
   {
+    gazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose3d_req_t *req =
       (player_simulation_pose3d_req_t*)(data);
 
     this->iface->Lock(1);
 
-    strcpy((char*)this->iface->data->model_name,req->name);
-    strcpy((char*)this->iface->data->model_req,"set_pose3d");
+    gzReq = &(this->iface->data->requests[ this->iface->data->requestCount++ ]);
 
-    this->iface->data->model_pose.pos.x = req->pose.px;
-    this->iface->data->model_pose.pos.y = req->pose.py;
-    this->iface->data->model_pose.pos.z = req->pose.pz;
+    gzReq->type = gazebo::SimulationRequestData::SET_POSE3D;
+    strcpy((char*)gzReq->modelName, req->name);
 
-    this->iface->data->model_pose.roll = req->pose.proll;
-    this->iface->data->model_pose.pitch = req->pose.ppitch;
-    this->iface->data->model_pose.yaw = req->pose.pyaw;
+    gzReq->modelPose.pos.x = req->pose.px;
+    gzReq->modelPose.pos.y = req->pose.py;
+    gzReq->modelPose.pos.z = req->pose.pz;
+
+    gzReq->modelPose.roll = req->pose.proll;
+    gzReq->modelPose.pitch = req->pose.ppitch;
+    gzReq->modelPose.yaw = req->pose.pyaw;
+
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE3D);
+                          PLAYER_MSGTYPE_RESP_ACK, 
+                          PLAYER_SIMULATION_REQ_SET_POSE3D);
 
   }
 
   /// Set a 2D pose
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SIMULATION_REQ_SET_POSE2D, this->device_addr))
+                                 PLAYER_SIMULATION_REQ_SET_POSE2D, 
+                                 this->device_addr))
   {
+    gazebo::SimulationRequestData *gzReq = NULL;
+
     player_simulation_pose2d_req_t *req =
       (player_simulation_pose2d_req_t*)(data);
 
     this->iface->Lock(1);
 
-    strcpy((char*)this->iface->data->model_name,req->name);
-    strcpy((char*)this->iface->data->model_req,"set_pose2d");
+    gzReq = &(this->iface->data->requests[ this->iface->data->requestCount++]);
 
-    this->iface->data->model_pose.pos.x = req->pose.px;
-    this->iface->data->model_pose.pos.y = req->pose.py;
-    this->iface->data->model_pose.yaw = req->pose.pa;
+    gzReq->type = gazebo::SimulationRequestData::SET_POSE2D;
+
+    strcpy((char*)gzReq->modelName, req->name);
+
+    gzReq->modelPose.pos.x = req->pose.px;
+    gzReq->modelPose.pos.y = req->pose.py;
+    gzReq->modelPose.yaw = req->pose.pa;
+
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_SET_POSE2D);
+                          PLAYER_MSGTYPE_RESP_ACK, 
+                          PLAYER_SIMULATION_REQ_SET_POSE2D);
   }
 
   /// Get a 3d pose
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SIMULATION_REQ_GET_POSE3D, this->device_addr))
+                                 PLAYER_SIMULATION_REQ_GET_POSE3D, 
+                                 this->device_addr))
   {
-    bool response = false;
+    gazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose3d_req_t *req =
       (player_simulation_pose3d_req_t*)(data);
 
     this->iface->Lock(1);
 
-    strcpy((char*)this->iface->data->model_name, req->name);
-    strcpy((char*)this->iface->data->model_req,"get_pose");
+    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
+
+    gzReq->type = gazebo::SimulationRequestData::GET_POSE3D;
+
+    strcpy((char*)gzReq->modelName, req->name);
 
     this->iface->Unlock();
-
-    // Wait for response from gazebo
-    while (!response)
-    {
-      this->iface->Lock(1);
-      response = strcmp((char*)this->iface->data->model_name,"") == 0;
-      this->iface->Unlock();
-      nanosleep(&sleepTime, NULL);
-    }
-
-    this->iface->Lock(1);
-    req->pose.px = this->iface->data->model_pose.pos.x;
-    req->pose.py = this->iface->data->model_pose.pos.y;
-    req->pose.pz = this->iface->data->model_pose.pos.z;
-
-    req->pose.proll = this->iface->data->model_pose.roll;
-    req->pose.ppitch = this->iface->data->model_pose.pitch;
-    req->pose.pyaw = this->iface->data->model_pose.yaw;
-    this->iface->Unlock();
-
-    this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
-                          req, sizeof(*req), NULL);
   }
 
   /// Get a 2D pose
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_SIMULATION_REQ_GET_POSE2D, this->device_addr))
   {
-    bool response = false;
+    gazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose2d_req_t *req =
       (player_simulation_pose2d_req_t*)(data);
 
     this->iface->Lock(1);
 
-    strcpy((char*)this->iface->data->model_name, req->name);
-    strcpy((char*)this->iface->data->model_req,"get_pose");
+    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
+
+    gzReq->type = gazebo::SimulationRequestData::GET_POSE2D;
+
+    strcpy((char*)gzReq->modelName, req->name);
 
     this->iface->Unlock();
-
-    // Wait for response from gazebo
-    while (!response)
-    {
-      this->iface->Lock(1);
-      response = strcmp((char*)this->iface->data->model_name,"") == 0;
-      this->iface->Unlock();
-      nanosleep(&sleepTime, NULL);
-    }
-
-    this->iface->Lock(1);
-    req->pose.px = this->iface->data->model_pose.pos.x;
-    req->pose.py = this->iface->data->model_pose.pos.y;
-    req->pose.pa = this->iface->data->model_pose.yaw;
-    this->iface->Unlock();
-
-    this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
-                          req, sizeof(*req), NULL);
   }
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
-                                 PLAYER_SIMULATION_REQ_GET_PROPERTY, this->device_addr))
+                                 PLAYER_SIMULATION_REQ_GET_PROPERTY, 
+                                 this->device_addr))
   {
     player_simulation_property_req_t *req =
       (player_simulation_property_req_t*)(data);
@@ -241,6 +223,65 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void SimulationInterface::Update()
 {
+  gazebo::SimulationRequestData *result = NULL;
+  this->iface->Lock(1);
+
+  for (unsigned int i=0; i < this->iface->data->resultCount; i++)
+  {
+    result = &(this->iface->data->results[i]);
+
+    switch (result->type)
+    {
+      case gazebo::SimulationRequestData::PAUSE:
+      case gazebo::SimulationRequestData::RESET:
+      case gazebo::SimulationRequestData::SAVE:
+      case gazebo::SimulationRequestData::SET_POSE2D:
+      case gazebo::SimulationRequestData::SET_POSE3D:
+        break;
+
+      case gazebo::SimulationRequestData::GET_POSE3D:
+        {
+          player_simulation_pose3d_req_t req;
+
+          strcpy(req.name, result->modelName);
+          req.name_count = strlen(req.name);
+
+          req.pose.px = result->modelPose.pos.x;
+          req.pose.py = result->modelPose.pos.y;
+          req.pose.pz = result->modelPose.pos.z;
+
+          req.pose.proll = result->modelPose.roll;
+          req.pose.ppitch = result->modelPose.pitch;
+          req.pose.pyaw = result->modelPose.yaw;
+
+          this->driver->Publish(this->device_addr, *(this->responseQueue),
+              PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE3D,
+              &req, sizeof(req), NULL);
+
+          break;
+        }
+      case gazebo::SimulationRequestData::GET_POSE2D:
+        {
+          player_simulation_pose2d_req_t req;
+
+          strcpy(req.name, result->modelName);
+          req.name_count = strlen(req.name);
+
+          req.pose.px = result->modelPose.pos.x;
+          req.pose.py = result->modelPose.pos.y;
+          req.pose.pa = result->modelPose.yaw;
+
+          this->driver->Publish(this->device_addr, *(this->responseQueue),
+              PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
+              &req, sizeof(req), NULL);
+
+          break;
+        }
+    }
+  }
+
+  this->iface->Unlock();
+
   return;
 }
 

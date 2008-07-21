@@ -366,6 +366,24 @@ of the server, such as the current simulation time-step.
 \{
 */
 
+#define GAZEBO_SIMULATION_MAX_REQUESTS 128
+
+class SimulationRequestData
+{
+  public: enum Type { PAUSE,
+                      RESET,
+                      SAVE,
+                      GET_POSE3D,
+                      GET_POSE2D,
+                      SET_POSE3D,
+                      SET_POSE2D,
+                   };
+
+  public: Type type; 
+  public: char modelName[512];
+  public: Pose modelPose;
+
+};
 
 /// \brief Simulation interface data
 class SimulationData
@@ -383,29 +401,14 @@ class SimulationData
 
   /// state of the simulation : 0 paused, 1 running -1 not_started/exiting
   public: int state;
-  
-  /// Pause simulation (set by client) should check the state
-  /// Changes the state of the simulation from pause to play and viceversa. 
-  public: bool pause;
 
-  /// Reset simulation (set by client)
-  public: int reset;
+  /// Array of requests to the simulator
+  public: SimulationRequestData requests[GAZEBO_SIMULATION_MAX_REQUESTS];
+  public: unsigned int requestCount;
 
-  /// Save current poses to world file (set by client)
-  public: int save;
-
-  /// Name of the model to get/set data
-  public: char model_name[512];
-
-  /// Type of request
-  /// - "get_pose" Sets model_pose to the pose of model_name
-  /// - "set_pose3d" Set the model_name to model_pose
-  /// - "set_pose2d" Set the model_name to model_pose
-  public: char model_req[32];
-
-  /// Pose of the model.
-  /// \sa model_req
-  public: Pose model_pose;
+  /// Array of request results from the simulator
+  public: SimulationRequestData results[GAZEBO_SIMULATION_MAX_REQUESTS];
+  public: unsigned int resultCount;
 };
 
 /// \brief Common simulation interface

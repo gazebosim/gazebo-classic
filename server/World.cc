@@ -150,11 +150,6 @@ int World::Init()
     (*miter)->Init();
   }
 
-  // Set initial simulator state
-  this->simIface->Lock(1);
-  this->simIface->data->pause = Simulator::Instance()->IsPaused();
-  this->simIface->Unlock();
-
   this->physicsEngine->Init();
 
   this->toAddModels.clear();
@@ -495,91 +490,139 @@ void World::SetShowPhysics(bool show)
 // Update the simulation interface
 void World::UpdateSimulationIface()
 {
+  SimulationRequestData *results = NULL;
+
   //TODO: Move this method to simulator? Hard because of the models
   this->simIface->Lock(1);
 
-  if (this->simIface->GetOpenCount() > 0)
+  if (this->simIface->GetOpenCount() <= 0)
   {
-    this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
-    this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
-    this->simIface->data->realTime = Simulator::Instance()->GetRealTime();
-    this->simIface->data->state = !Simulator::Instance()->GetUserPause();
+    this->simIface->Unlock();
+    return;
+  }
 
-    if (this->simIface->data->reset)
+  results = this->simIface->data->results;
+  this->simIface->data->resultCount = 0;
+
+  this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
+  this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
+  this->simIface->data->realTime = Simulator::Instance()->GetRealTime();
+  this->simIface->data->state = !Simulator::Instance()->GetUserPause();
+
+  unsigned int requestCount = this->simIface->data->requestCount;
+
+  // Max sure the request count is valid
+  if (this->simIface->data->requestCount > GAZEBO_SIMULATION_MAX_REQUESTS)
+  {
+    gzerr(0) << "Request count[" << this->simIface->data->requestCount << "] greater than max allowable[" << GAZEBO_SIMULATION_MAX_REQUESTS << "]\n";
+
+    requestCount = GAZEBO_SIMULATION_MAX_REQUESTS;
+  }
+
+  // Process all the requests
+  for (unsigned int i=0; i < requestCount; i++)
+  {
+    SimulationRequestData *req = &(this->simIface->data->requests[i]);
+
+    switch (req->type)
     {
-      this->Reset();
-      this->simIface->data->reset = 0;
-    }
+      case SimulationRequestData::PAUSE: 
+        Simulator::Instance()->SetUserPause(
+            !Simulator::Instance()->GetUserPause());
+        break;
 
-    if (this->simIface->data->pause)
-    {
-      Simulator::Instance()->SetUserPause(!Simulator::Instance()->GetUserPause());
-      this->simIface->data->pause = 0;
-    }
+      case SimulationRequestData::RESET:
+        this->Reset();
+        break;
 
-    //TODO: save as , load
-    if (this->simIface->data->save)
-    {
-      Simulator::Instance()->Save();
-      this->simIface->data->save=0;
-    }
+      case SimulationRequestData::SAVE:
+        Simulator::Instance()->Save();
+        break;
 
-    // If the model_name is set, then a request has been received
-    if (strcmp((char*)this->simIface->data->model_name,"")!=0)
-    {
-      /// Get the model requested
-      Model *model = this->GetModelByName((char*)this->simIface->data->model_name);
-      if (model)
-      {
-        std::string req = (char*)this->simIface->data->model_req;
-        if (req == "get_pose")
-        {
-          Pose3d pose = model->GetPose();
-          Vector3 rot = pose.rot.GetAsEuler();
-
-          this->simIface->data->model_pose.pos.x = pose.pos.x;
-          this->simIface->data->model_pose.pos.y = pose.pos.y;
-          this->simIface->data->model_pose.pos.z = pose.pos.z;
-
-
-          this->simIface->data->model_pose.roll = rot.x;
-          this->simIface->data->model_pose.pitch = rot.y;
-          this->simIface->data->model_pose.yaw = rot.z;
-        }
-        else if (req == "set_pose3d")
+      case SimulationRequestData::SET_POSE3D:
         {
           Pose3d pose;
+          Model *model = this->GetModelByName((char*)req->modelName);
+          if (model)
+          {
+            pose.pos.x = req->modelPose.pos.x;
+            pose.pos.y = req->modelPose.pos.y;
+            pose.pos.z = req->modelPose.pos.z;
 
-          pose.pos.x = this->simIface->data->model_pose.pos.x;
-          pose.pos.y = this->simIface->data->model_pose.pos.y;
-          pose.pos.z = this->simIface->data->model_pose.pos.z;
-          pose.rot.SetFromEuler(Vector3(this->simIface->data->model_pose.roll,
-                                        this->simIface->data->model_pose.pitch,
-                                        this->simIface->data->model_pose.yaw));
-          model->SetPose(pose);
+            pose.rot.SetFromEuler(
+                Vector3(req->modelPose.roll, 
+                  req->modelPose.pitch,
+                  req->modelPose.yaw));
+            model->SetPose(pose);
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Set Pose 3d Request.\n";
+          }
+
+          break;
         }
-        else if (req == "set_pose2d")
+
+      case SimulationRequestData::GET_POSE3D:
         {
-          Pose3d pose = model->GetPose();
-          Vector3 rot = pose.rot.GetAsEuler();
+          Model *model = this->GetModelByName((char*)req->modelName);
+          if (model)
+          {
+            Pose3d pose = model->GetPose();
+            Vector3 rot = pose.rot.GetAsEuler();
 
-          pose.pos.x = this->simIface->data->model_pose.pos.x;
-          pose.pos.y = this->simIface->data->model_pose.pos.y;
+            results->type = req->type;
 
-          pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
-                                        this->simIface->data->model_pose.yaw));
-          model->SetPose(pose);
+            strcpy( results->modelName, req->modelName);
+            results->modelPose.pos.x = pose.pos.x;
+            results->modelPose.pos.y = pose.pos.y;
+            results->modelPose.pos.z = pose.pos.z;
+
+            results->modelPose.roll = rot.x;
+            results->modelPose.pitch = rot.y;
+            results->modelPose.yaw = rot.z;
+
+            results++;
+            this->simIface->data->resultCount++;
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Get Pose 3d Request.\n";
+          }
+
+          break;
         }
 
-      }
-      else
-      {
-        gzmsg(-1) << "Simulation Iface: Model[" << this->simIface->data->model_name << "] does not exist\n";
-      }
+      case SimulationRequestData::SET_POSE2D:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+          if (model)
+          {
+            Pose3d pose = model->GetPose();
+            Vector3 rot = pose.rot.GetAsEuler();
 
-      strcpy((char*)this->simIface->data->model_name, "");
+            pose.pos.x = req->modelPose.pos.x;
+            pose.pos.y = req->modelPose.pos.y;
+
+            pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
+                  req->modelPose.yaw));
+            model->SetPose(pose);
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Set Pose 2d Request.\n";
+          }
+          break;
+        }
+
+      default:
+        gzerr(0) << "Unknown simulation iface request[" << req->type << "]\n";
+        break;
     }
+
+    this->simIface->data->requestCount = 0;
   }
+
   this->simIface->Unlock();
 }
 

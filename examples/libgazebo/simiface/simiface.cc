@@ -34,18 +34,18 @@ int main()
 
   // Example of how to move a model (box1_model)
   uint8_t name[512] = "pioneer2dx_model1";
-  uint8_t cmd[32] = "set_pose3d";
 
   for (int i=0; i< 10; i++)
   {
     simIface->Lock(1);
 
-    memcpy(simIface->data->model_name, name, 512);
-    memcpy(simIface->data->model_req,cmd, 32);
+    gazebo::SimulationRequestData *request = &(simIface->data->requests[simIface->data->requestCount++]);
 
-    simIface->data->model_pose.pos.x = i+.1;
-    simIface->data->model_pose.pos.y = 0;
-    simIface->data->model_pose.pos.z = 0.2;
+    request->type = gazebo::SimulationRequestData::SET_POSE2D;
+    memcpy(request->modelName, name, 512);
+
+    request->modelPose.pos.x = i+.1;
+    request->modelPose.pos.y = 0;
 
     simIface->Unlock();
 
