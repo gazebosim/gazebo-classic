@@ -154,15 +154,15 @@ void Stereo_Camera::PutStereoData()
   //stereo_data->right_rgb_size = stereo_data->width * stereo_data->height * 3;
   //stereo_data->left_rgb_size = stereo_data->width * stereo_data->height * 3;
 
-  stereo_data->right_disparity_size = stereo_data->width * stereo_data->height * sizeof(float);
-  stereo_data->left_disparity_size = stereo_data->width * stereo_data->height * sizeof(float);
+  stereo_data->right_depth_size = stereo_data->width * stereo_data->height * sizeof(float);
+  stereo_data->left_depth_size = stereo_data->width * stereo_data->height * sizeof(float);
 
   // Make sure there is room to store the image
   //assert (stereo_data->right_rgb_size <= sizeof(stereo_data->right_rgb));
   //assert (stereo_data->left_rgb_size <= sizeof(stereo_data->left_rgb));
 
-  assert (stereo_data->right_disparity_size <= sizeof(stereo_data->right_disparity));
-  assert (stereo_data->left_disparity_size <= sizeof(stereo_data->left_disparity));
+  assert (stereo_data->right_depth_size <= sizeof(stereo_data->right_depth));
+  assert (stereo_data->left_depth_size <= sizeof(stereo_data->left_depth));
 
   // Copy the left pixel data to the interface
   /*rgb_src = this->myParent->GetImageData(0);
@@ -175,15 +175,15 @@ void Stereo_Camera::PutStereoData()
   memcpy(rgb_dst, rgb_src, stereo_data->right_rgb_size);
   */
 
-  // Copy the left disparity data to the interface
-  disp_src = this->myParent->GetDisparityData(0);
-  disp_dst = stereo_data->left_disparity;
-  memcpy(disp_dst, disp_src, stereo_data->left_disparity_size);
+  // Copy the left depth data to the interface
+  disp_src = this->myParent->GetDepthData(0);
+  disp_dst = stereo_data->left_depth;
+  memcpy(disp_dst, disp_src, stereo_data->left_depth_size);
 
-  // Copy the right disparity data to the interface
-  disp_src = this->myParent->GetDisparityData(1);
-  disp_dst = stereo_data->right_disparity;
-  memcpy(disp_dst, disp_src, stereo_data->right_disparity_size);
+  // Copy the right depth data to the interface
+  disp_src = this->myParent->GetDepthData(1);
+  disp_dst = stereo_data->right_depth;
+  memcpy(disp_dst, disp_src, stereo_data->right_depth_size);
 
 }
 

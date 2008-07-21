@@ -1377,17 +1377,17 @@ class StereoCameraData
   /// Right image (R8G8B8)
   public: unsigned char right_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
 
-  /// Left disparity size
-  public: unsigned int left_disparity_size;
+  /// Left depth map size
+  public: unsigned int left_depth_size;
 
-  /// Left disparity (float)
-  public: float left_disparity[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
+  /// Left depth map (float)
+  public: float left_depth[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
 
-  /// Right Disparity  size
-  public: unsigned int right_disparity_size;
+  /// Right depth map  size
+  public: unsigned int right_depth_size;
 
-  /// Right disparity (float)
-  public: float right_disparity[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
+  /// Right depth map (float)
+  public: float right_depth[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
 
 }; 
 

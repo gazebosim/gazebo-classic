@@ -26,7 +26,7 @@ void SaveFrame()
   double max = 0;
   for (unsigned int i=0; i<stereoIface->data->height*stereoIface->data->width; i++)
   {
-    double v = stereoIface->data->left_disparity[i];
+    double v = stereoIface->data->left_depth[i];
     if (v > max)
       max = v;
   }
@@ -36,7 +36,7 @@ void SaveFrame()
   {
     for (unsigned int j =0; j<stereoIface->data->width; j++)
     {
-      double v = stereoIface->data->left_disparity[i*stereoIface->data->width+j];
+      double v = stereoIface->data->left_depth[i*stereoIface->data->width+j];
       unsigned int value = (unsigned int)((v/max) * 32767);
       fwrite( &value, 2, 1, fp );
     }

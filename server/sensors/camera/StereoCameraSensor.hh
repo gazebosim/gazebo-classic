@@ -86,9 +86,9 @@ namespace gazebo
     /// \param i 0=left, 1=right
     public: virtual const unsigned char *GetImageData(unsigned int i=0);
   
-    /// \brief Get a point to the disparity data
+    /// \brief Get a point to the depth data
     /// \param i 0=left, 1=right
-    public: const float *GetDisparityData(unsigned int i=0);
+    public: const float *GetDepthData(unsigned int i=0);
   
     /// \brief Get the baselien of the camera
     public: double GetBaseline() const;

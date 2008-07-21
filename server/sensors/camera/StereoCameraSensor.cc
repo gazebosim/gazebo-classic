@@ -291,23 +291,23 @@ const unsigned char *StereoCameraSensor::GetImageData(unsigned int i)
 {
 
   if (i > 1)
-    gzthrow("Index must be 0 for left, or 1 for right disparity image\n");
+    gzthrow("Index must be 0 for left, or 1 for right depth image\n");
 
   return this->rgbBuffer[i];
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Get a pointer to the disparity data
-const float *StereoCameraSensor::GetDisparityData(unsigned int i)
+// Get a pointer to the depth data
+const float *StereoCameraSensor::GetDepthData(unsigned int i)
 {
   if (i > 1)
-    gzthrow("Index must be 0 for left, or 1 for right disparity image\n");
+    gzthrow("Index must be 0 for left, or 1 for right depth image\n");
 
   return this->depthBuffer[i];
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Fill all RGB and Disparity buffers
+// Fill all RGB and depth buffers
 void StereoCameraSensor::FillBuffers()
 {
   Ogre::HardwarePixelBufferSharedPtr hardwareBuffer;
