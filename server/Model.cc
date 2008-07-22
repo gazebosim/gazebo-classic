@@ -174,11 +174,6 @@ int Model::Load(XMLConfigNode *node)
 
 }
 
-void Model::Test()
-{
-  std::cout << "this is a test\n";
-}
-
 void Model::Save()
 {
   /*std::map<std::string, Body* >::iterator bodyIter;
@@ -290,11 +285,9 @@ int Model::Update()
     boost::python::call<void>(this->pFuncUpdate, this);
   }*/
 
-  Body *b = NULL;
   if (!this->canonicalBodyName.empty())
   {
     this->pose = this->bodies[this->canonicalBodyName]->GetPose();
-    b = this->bodies[this->canonicalBodyName];
   }
 
   return this->UpdateChild();

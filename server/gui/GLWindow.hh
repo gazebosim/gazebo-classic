@@ -113,6 +113,8 @@ namespace gazebo
     /// \brief Handle a key release
     private: void HandleKeyRelease(int keyNum);
 
+    /// \brief Handle mouse wheel movement
+    private: void HandleMouseWheel(int dx, int dy);
 
     /// ID of the window
     private: Window windowId;

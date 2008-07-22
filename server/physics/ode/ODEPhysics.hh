@@ -28,10 +28,8 @@
 #define ODEPHYSICS_HH
 
 #include <ode/ode.h>
-#include <map>
 
 #include "PhysicsEngine.hh"
-
 
 namespace gazebo
 {
@@ -131,9 +129,6 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Collision attributes
   private: dJointGroupID contactGroup;
           
-  /// List of all the entities
-  private: std::map<int, Entity* > entities;
-
   private: double globalCFM;
   private: double globalERP; 
 };

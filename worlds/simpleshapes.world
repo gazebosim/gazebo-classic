@@ -15,10 +15,10 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.03</stepTime>
+    <stepTime>0.01</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>0.008</cfm>
-    <erp>0.2</erp>
+    <cfm>10e-5</cfm>
+    <erp>0.3</erp>
   </physics:ode>
 
   <rendering:gui>
@@ -32,17 +32,20 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+    <grid>false</grid>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
-    <xyz>1 0 1.5</xyz>
+    <xyz>1 0 0.25</xyz>
     <rpy>0.0 0.0 0.0</rpy>
     <static>false</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
         <size>0.5</size>
-        <mass>1.0</mass>
+        <mass>0.0</mass>
+
+        <mu1>109999.0</mu1>
 
         <visual>
           <scale>0.5 0.5 0.5</scale>
@@ -62,7 +65,7 @@
 
       <geom:box name="box1_geom">
         <size>1 1 1</size>
-        <mass>1.0</mass>
+        <mass>0.1</mass>
         <visual>
           <mesh>unit_box</mesh>
           <material>Gazebo/Rocky</material>
@@ -79,6 +82,8 @@
       <geom:cylinder name="cylinder1_geom">
         <size>0.5 1</size>
         <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
         <visual>
           <mesh>unit_cylinder</mesh>
           <material>Gazebo/RustyBarrel</material>
@@ -100,6 +105,8 @@
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
         <material>Gazebo/Grey</material>
+        <mu1>109999.0</mu1>
+        <mu2>1000.0</mu2>
       </geom:plane>
     </body:plane>
   </model:physical>

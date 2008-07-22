@@ -24,6 +24,7 @@
  * SVN: $Id:$
  */
 
+#include "Model.hh"
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -32,6 +33,7 @@
 
 #include <GL/glx.h>
 
+#include "Entity.hh"
 #include "OgreCamera.hh"
 #include "OgreCreator.hh"
 #include "Simulator.hh"
@@ -195,7 +197,11 @@ void GLWindow::HandleMouseRelease()
 
   if (!this->mouseDrag)
   {
-    //Entity *ent = World::Instance()->GetEntityAt(this->mousePos);
+    Entity *ent = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, this->mousePos);
+    if (ent)
+    {
+      Simulator::Instance()->SetSelectedEntity( ent );
+    }
   }
 
   this->mouseDrag = false;
@@ -207,15 +213,41 @@ void GLWindow::HandleMouseDrag()
 {
   if (this->activeCamera && this->activeCamera->GetUserMovable())
   {
+    Vector2<int> d = this->mousePos - this->prevMousePos;
     if (this->leftMousePressed)
     {
-      Vector2<int> d = this->mousePos - this->prevMousePos;
       this->activeCamera->RotateYaw(DTOR(-d.x * this->rotateAmount));
       this->activeCamera->RotatePitch(DTOR(d.y * this->rotateAmount));
     }
+    else if (this->rightMousePressed)
+    {
+      Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
+      if (model)
+      {
+        Pose3d pose = model->GetPose();
+        pose.pos.y -= d.x * 0.05;
+        pose.pos.x -= d.y * 0.05;
+        model->SetPose(pose);
+      }
+    }
+
   }
 
   this->mouseDrag = true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Handle mouse wheel movement
+void GLWindow::HandleMouseWheel(int dx, int dy)
+{
+  Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
+  if (model)
+  {
+    Pose3d pose = model->GetPose();
+    pose.pos.z += dy * 0.05;
+    model->SetPose(pose);
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -377,6 +409,11 @@ int GLWindow::handle(int event)
         activeWin->HandleKeyRelease(Fl::event_key());
       else
         this->HandleKeyRelease(Fl::event_key());
+      handled = true;
+      break;
+
+    case FL_MOUSEWHEEL:
+      this->HandleMouseWheel(Fl::event_dx(), Fl::event_dy());
       handled = true;
       break;
 

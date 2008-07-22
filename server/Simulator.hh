@@ -44,6 +44,7 @@ namespace gazebo
   class XMLConfigNode;
   class GazeboConfig;
   class OgreAdaptor;
+  class Entity;
 
 /// \brief The World
 /*
@@ -157,6 +158,12 @@ namespace gazebo
     /// \brief Get the physics enabled/disabled
     public: bool GetPhysicsEnabled() const;
 
+    /// \brief Set the selected entity
+    public: void SetSelectedEntity( Entity *ent );
+
+    /// \brief Get the selected entity
+    public: Entity *GetSelectedEntity() const;
+
     ///pointer to the XML Data
     private: XMLConfig *xmlFile;
 
@@ -212,6 +219,9 @@ namespace gazebo
 
     /// Length of time the simulation should run
     private: double timeout;
+
+    /// The entity currently selected by the user
+    private: Entity *selectedEntity;
 
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;

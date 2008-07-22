@@ -122,7 +122,7 @@ void Geom::Load(XMLConfigNode *node)
   childNode = node->GetChild("visual");
   while (childNode)
   {
-    OgreVisual *visual = new OgreVisual(this->visualNode);
+    OgreVisual *visual = new OgreVisual(this->visualNode, this);
     visual->Load(childNode);
     this->visuals.push_back(visual);
     childNode = childNode->GetNext("visual");

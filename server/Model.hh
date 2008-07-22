@@ -66,7 +66,6 @@ namespace gazebo
   
     /// \brief Save the model
     public: void Save();
-    public: void Test();
 
     /// \brief Initialize the model
     public: int Init();

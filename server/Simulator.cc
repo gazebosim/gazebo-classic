@@ -28,6 +28,9 @@
 #include <fstream>
 #include <sys/time.h>
 
+#include "Model.hh"
+#include "Entity.hh"
+#include "OgreVisual.hh"
 #include "World.hh"
 #include "Gui.hh"
 #include "XMLConfig.hh"
@@ -466,3 +469,33 @@ bool Simulator::GetPhysicsEnabled() const
 {
   return this->physicsEnabled;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the selected entity
+void Simulator::SetSelectedEntity( Entity *ent )
+{
+  if (this->selectedEntity)
+  {
+    this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
+    this->selectedEntity->SetStatic(false);
+  }
+
+  if (this->selectedEntity != ent)
+  {
+    this->selectedEntity = ent;
+    this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
+    this->selectedEntity->SetStatic(true);
+  }
+  else
+    this->selectedEntity = NULL;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the selected entity
+Entity *Simulator::GetSelectedEntity() const
+{
+  return this->selectedEntity;
+}
+
+

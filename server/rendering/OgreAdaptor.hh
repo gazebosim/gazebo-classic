@@ -31,6 +31,7 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
+#include "Vector2.hh"
 #include "SingletonT.hh"
 
 namespace Ogre
@@ -97,7 +98,7 @@ namespace gazebo
 
     /// \brief Get an entity at a pixel location using a camera. Used for
     ///        mouse picking. 
-    public: Entity *GetEntityAt(OgreCamera *camera, int x, int y);
+    public: Entity *GetEntityAt(OgreCamera *camera, Vector2<int> mousePos);
 
     private: void LoadPlugins();
     private: void SetupResources();

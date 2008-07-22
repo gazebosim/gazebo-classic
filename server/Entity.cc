@@ -24,6 +24,8 @@
  * Date: 03 Apr 2007
  * SVN: $Id$
  */
+
+#include "Body.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
 #include "OgreVisual.hh"
@@ -134,7 +136,19 @@ std::string Entity::GetName() const
 // Set whether this entity is static: immovable
 void Entity::SetStatic(bool s)
 {
+  std::vector< Entity *>::iterator iter;
+  Body *body = NULL;
+
   this->isStatic = s;
+
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    (*iter)->SetStatic(s);
+    body = dynamic_cast<Body*>(*iter);
+    if (body)
+      body->SetEnabled(!s);
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

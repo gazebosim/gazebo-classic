@@ -24,6 +24,7 @@
  * SVN: $Id:$
  */
 #include <Ogre.h>
+#include "Entity.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
@@ -37,7 +38,7 @@ unsigned int OgreVisual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreVisual::OgreVisual(OgreVisual *node)
+OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
 {
   std::ostringstream stream;
 
@@ -52,10 +53,10 @@ OgreVisual::OgreVisual(OgreVisual *node)
   //FIXME: what if we add the capability to delete and add new children?
   stream << this->parentNode->getName() << "_VISUAL_" << visualCounter++;
   
-
   // Create the scene node
   this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
 
+  this->entity = owner;
 
   this->staticGeometry = NULL;
   this->boundingBoxNode = NULL;
@@ -100,7 +101,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   try
   {
     // Create the entity
-    stream << this->sceneNode->getName() << "_ENTITY";
+    stream << "ENTITY_" << this->sceneNode->getName();
     obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
   }
   catch (Ogre::Exception e)
@@ -171,6 +172,7 @@ std::string OgreVisual::GetName() const
 void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 {
   this->sceneNode->attachObject(obj);
+  obj->setUserObject( this );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -524,3 +526,26 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
   this->boundingBoxNode->setVisible(false);
 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the entity that manages this visual
+Entity *OgreVisual::GetEntity() const
+{
+  return this->entity;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set to true to show a white bounding box, used to indicate user selection
+void OgreVisual::ShowSelectionBox( bool value )
+{
+  Ogre::SceneNode *node = this->sceneNode;
+
+  while (node && node->numAttachedObjects() == 0)
+  {
+    node = dynamic_cast<Ogre::SceneNode*>(node->getChild(0));
+  }
+  if (node)
+    node->showBoundingBox(value);
+}
+
+

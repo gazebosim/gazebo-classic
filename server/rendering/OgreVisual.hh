@@ -38,12 +38,13 @@ namespace gazebo
 { 
 
   class XMLConfigNode;
-  
+  class Entity;
+
   /// \brief Ogre Visual Object
-  class OgreVisual
+  class OgreVisual : public Ogre::UserDefinedObject
   {
     /// \brief Constructor
-    public: OgreVisual (OgreVisual *node);
+    public: OgreVisual (OgreVisual *node, Entity *owner = NULL);
 
     /// \brief Destructor
     public: virtual ~OgreVisual();
@@ -117,6 +118,14 @@ namespace gazebo
     /// \brief Make the visual objects static renderables
     public: void MakeStatic();
 
+    /// \brief Get the entity that manages this visual
+    public: Entity *GetEntity() const;
+
+    /// \brief Set to true to show a white bounding box, used to indicate 
+    //         user selection
+    public: void ShowSelectionBox( bool value );
+
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: Ogre::SceneBlendType sceneBlendType;
@@ -134,6 +143,7 @@ namespace gazebo
 
     private: static unsigned int visualCounter;
 
+    private: Entity *entity;
   };
 }
 

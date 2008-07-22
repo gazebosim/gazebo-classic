@@ -39,7 +39,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 UserCamera::UserCamera(GLWindow *parentWindow)
-  : OgreCamera("User")
+  : OgreCamera("UserCamera")
 {
   this->window = OgreCreator::CreateWindow(parentWindow, 
                      parentWindow->w(), parentWindow->h());

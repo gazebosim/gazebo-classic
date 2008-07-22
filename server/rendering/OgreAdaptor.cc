@@ -34,6 +34,8 @@
 #include <iostream>
 #include <string.h>
 
+#include "Model.hh"
+#include "OgreVisual.hh"
 #include "UserCamera.hh"
 #include "MovableText.hh"
 #include "OgreHUD.hh"
@@ -273,6 +275,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->updateRate = node->GetDouble("maxUpdateRate",0,0);
 
   this->raySceneQuery = this->sceneMgr->createRayQuery( Ogre::Ray() );
+  this->raySceneQuery->setSortByDistance(true);
+  this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -466,29 +470,49 @@ void OgreAdaptor::UpdateWindow(Ogre::RenderWindow *window, OgreCamera *camera)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, int x, int y)
+Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos) 
 {
-  /*
-  Ogre::Vector3 camPos = camera->getPosition();
+  Entity *entity = NULL;
+  Ogre::Camera *ogreCam = camera->GetOgreCamera();
+  Ogre::Vector3 camPos = ogreCam->getPosition();
 
-  Ogre::Ray mouseRay = camera->getCameraToViewportRay(
-      x/camera->GetViewportWidth(), y/camera->GetViewportHeight());
+  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
+      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
+      (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
 
   this->raySceneQuery->setRay( mouseRay );
 
   // Perform the scene query
   Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
   Ogre::RaySceneQueryResult::iterator iter = result.begin();
-   
-  // Get the results, set the camera height
-  if (iter != result.end() && iter->worldFragment)
+
+  for (iter = result.begin(); iter != result.end(); iter++)
   {
-    Ogre::Real terrainHeight = iter->worldFragment->singleIntersection.y;
-    if ((terrainHeight + 10.0f) > camPos.y)
-        camera->setPosition( camPos.x, terrainHeight + 10.0f, camPos.z);
+    if (iter->movable)
+    {
+
+      OgreVisual *vis = dynamic_cast<OgreVisual*>(iter->movable->getUserObject());
+      if (vis && vis->GetEntity())
+      {
+        entity = vis->GetEntity();
+        entity->GetVisualNode()->ShowSelectionBox(true);
+        Model *model = NULL;
+        
+        do 
+        {
+          model = dynamic_cast<Model*>(entity);
+          entity = entity->GetParent();
+        } while (model == NULL);
+
+        return model;
+      }
+    }
+
   }
-  */
+
+  return NULL;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the desired update rate

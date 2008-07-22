@@ -168,7 +168,6 @@ class Body : public Entity
   private: bool isStatic;
 
   private: Pose3d comPose;
-  private: Pose3d staticPose;
 };
 
 /// \}

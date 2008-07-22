@@ -51,16 +51,11 @@ using namespace gazebo;
 Body::Body(Entity *parent, dWorldID worldId)
     : Entity(parent)
 {
-  if (!this->IsStatic())
-  {
-    this->bodyId = dBodyCreate(worldId);
+  this->bodyId = dBodyCreate(worldId);
 
-    dMassSetZero( &this->mass );
-  }
-  else
-  {
-    this->bodyId = NULL;
-  }
+  dMassSetZero( &this->mass );
+
+  this->SetEnabled(!this->IsStatic());
 }
 
 
@@ -163,8 +158,7 @@ void Body::Fini()
 // Set whether gravity affects this body
 void Body::SetGravityMode(bool mode)
 {
-  if (this->bodyId)
-    dBodySetGravityMode(this->bodyId, mode);
+  dBodySetGravityMode(this->bodyId, mode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,10 +185,15 @@ void Body::Update()
 
   if (!this->IsStatic())
   {
+    //this->SetEnabled(true);
     Pose3d pose = this->GetPose();
 
     // Set the pose of the scene node
     this->visualNode->SetPose(pose);
+  }
+  else
+  {
+    this->SetEnabled(false);
   }
 
   for (geomIter=this->geoms.begin();
@@ -214,7 +213,7 @@ void Body::Update()
 // Attach a geom to this body
 void Body::AttachGeom( Geom *geom )
 {
-  if (this->bodyId)
+  //if (this->bodyId)
   {
     if (geom->IsPlaceable())
     {
@@ -232,72 +231,34 @@ void Body::AttachGeom( Geom *geom )
 // Set the pose of the body
 void Body::SetPose(const Pose3d &pose)
 {
-  if (this->IsStatic())
-  {
-    std::vector< Geom* >::iterator giter;
-    PlaneGeom *plane = NULL;
-    this->staticPose = pose;
+  Pose3d localPose;
 
-    this->SetPosition(this->staticPose.pos);
-    this->SetRotation(this->staticPose.rot);
+  // Compute pose of CoM
+  localPose = this->comPose + pose;
 
-    // Hack to fix the altitude of the ODE plane
-    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    {
-      if ((*giter)->GetGeomClass() == dPlaneClass)
-      {
-        plane = dynamic_cast<PlaneGeom*>(*giter);
-        plane->SetAltitude(pose.pos);
-      }
-      else
-        (*giter)->SetImmovableBasePose(this->staticPose);
-    }
-  }
-  else
-  {
-    Pose3d localPose;
-
-    // Compute pose of CoM
-    localPose =this->comPose + pose;
-
-    this->SetPosition(localPose.pos);
-    this->SetRotation(localPose.rot);
-  }
+  this->SetPosition(localPose.pos);
+  this->SetRotation(localPose.rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the pose of the body
 Pose3d Body::GetPose() const
 {
-  if (this->IsStatic())
-    return this->staticPose;
-  else
-  {
-    Pose3d pose;
+  Pose3d pose;
 
-    pose.pos = this->GetPosition();
-    pose.rot = this->GetRotation();
+  pose.pos = this->GetPosition();
+  pose.rot = this->GetRotation();
 
-    pose = this->comPose.CoordPoseSolve(pose);
+  pose = this->comPose.CoordPoseSolve(pose);
 
-    return pose;
-  }
+  return pose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the body
 void Body::SetPosition(const Vector3 &pos)
 {
-
-  if (!this->IsStatic())
-  {
-    // Set the position of the ODE body
-    dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
-  }
-  else
-  {
-    this->staticPose.pos = pos;
-  }
+  dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
 
   // Set the position of the scene node
   this->visualNode->SetPosition(pos);
@@ -307,22 +268,14 @@ void Body::SetPosition(const Vector3 &pos)
 // Set the rotation of the body
 void Body::SetRotation(const Quatern &rot)
 {
-  if (!this->IsStatic())
-  {
-    dQuaternion q;
-    q[0] = rot.u;
-    q[1] = rot.x;
-    q[2] = rot.y;
-    q[3] = rot.z;
+  dQuaternion q;
+  q[0] = rot.u;
+  q[1] = rot.x;
+  q[2] = rot.y;
+  q[3] = rot.z;
 
-    // Set the rotation of the ODE body
-    dBodySetQuaternion(this->bodyId, q);
-
-  }
-  else
-  {
-    this->staticPose.rot = rot;
-  }
+  // Set the rotation of the ODE body
+  dBodySetQuaternion(this->bodyId, q);
 
   // Set the orientation of the scene node
   this->visualNode->SetRotation(rot);
@@ -332,22 +285,16 @@ void Body::SetRotation(const Quatern &rot)
 // Return the position of the body. in global CS
 Vector3 Body::GetPosition() const
 {
+  Vector3 pos;
+  const dReal *p;
 
-  if (!this->IsStatic())
-  {
-    Vector3 pos;
-    const dReal *p;
+  p = dBodyGetPosition(this->bodyId);
 
-    p = dBodyGetPosition(this->bodyId);
+  pos.x = p[0];
+  pos.y = p[1];
+  pos.z = p[2];
 
-    pos.x = p[0];
-    pos.y = p[1];
-    pos.z = p[2];
-
-    return pos;
-  }
-  else
-    return this->staticPose.pos;
+  return pos;
 }
 
 
@@ -355,23 +302,17 @@ Vector3 Body::GetPosition() const
 // Return the rotation
 Quatern Body::GetRotation() const
 {
-  if (!this->IsStatic())
-  {
-    Quatern rot;
-    const dReal *r;
+  Quatern rot;
+  const dReal *r;
 
-    r = dBodyGetQuaternion(this->bodyId);
+  r = dBodyGetQuaternion(this->bodyId);
 
-    rot.u = r[0];
-    rot.x = r[1];
-    rot.y = r[2];
-    rot.z = r[3];
+  rot.u = r[0];
+  rot.x = r[1];
+  rot.y = r[2];
+  rot.z = r[3];
 
-    return rot;
-  }
-  else
-    return this->staticPose.rot;
-
+  return rot;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -477,10 +418,6 @@ void Body::UpdateCoM()
   Pose3d oldPose, newPose, pose;
   std::vector< Geom* >::iterator giter;
 
-  // Dummy bodies dont have mass
-  if (!this->bodyId)
-    return;
-
   // Construct the mass matrix by combining all the geoms
   dMassSetZero( &this->mass );
 
@@ -552,12 +489,7 @@ const Pose3d &Body::GetCoMPose() const
 /// Set the velocity of the body
 void Body::SetLinearVel(const Vector3 &vel)
 {
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-  }
-  else
-    dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
+  dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -566,12 +498,6 @@ Vector3 Body::GetLinearVel() const
 {
   Vector3 vel;
   const dReal *dvel;
-
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-    return vel;
-  }
 
   dvel = dBodyGetLinearVel(this->bodyId);
 
@@ -586,12 +512,7 @@ Vector3 Body::GetLinearVel() const
 /// Set the velocity of the body
 void Body::SetAngularVel(const Vector3 &vel)
 {
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-  }
-  else
-    dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
+  dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -600,12 +521,6 @@ Vector3 Body::GetAngularVel() const
 {
   Vector3 vel;
   const dReal *dvel;
-
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-    return vel;
-  }
 
   dvel = dBodyGetAngularVel(this->bodyId);
 
@@ -619,12 +534,7 @@ Vector3 Body::GetAngularVel() const
 /// \brief Set the force applied to the body
 void Body::SetForce(const Vector3 &force)
 {
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-  }
-  else
-    dBodySetForce(this->bodyId, force.x, force.y, force.z);
+  dBodySetForce(this->bodyId, force.x, force.y, force.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -633,12 +543,6 @@ Vector3 Body::GetForce() const
 {
   Vector3 force;
   const dReal *dforce;
-
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-    return force;
-  }
 
   dforce = dBodyGetForce(this->bodyId);
 
@@ -653,12 +557,7 @@ Vector3 Body::GetForce() const
 /// \brief Set the torque applied to the body
 void Body::SetTorque(const Vector3 &torque)
 {
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-  }
-  else
-    dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
+  dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -667,13 +566,6 @@ Vector3 Body::GetTorque() const
 {
   Vector3 torque;
   const dReal *dtorque;
-
-  if (!this->bodyId)
-  {
-    gzmsg(0) << "Invalid ODE body\n";
-    return torque;
-  }
-
 
   dtorque = dBodyGetTorque(this->bodyId);
 

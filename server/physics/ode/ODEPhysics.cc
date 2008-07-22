@@ -165,15 +165,12 @@ void ODEPhysics::AddEntity(Entity *entity)
   {
     entity->spaceId = entity->GetParent()->spaceId;
   }
-
-  this->entities[entity->GetId()] = entity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove an entity from the physics engine
 void ODEPhysics::RemoveEntity(Entity *entity)
 {
-  this->entities.erase(entity->GetId());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,25 +259,24 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         double h, kp, kd;
 
         contact.geom = contactGeoms[i];
-        contact.surface.mode = 0;
+        contact.surface.mode = dContactSoftERP | dContactSoftCFM | 
+                               dContactBounce | dContactMu2;
+
 
         // Compute the CFM and ERP by assuming the two bodies form a
         // spring-damper system.
         h = self->stepTime;
         kp = 1 / (1 / geom1->contact->kp + 1 / geom2->contact->kp);
         kd = geom1->contact->kd + geom2->contact->kd;
-        contact.surface.mode |= dContactSoftERP | dContactSoftCFM;
         contact.surface.soft_erp = h * kp / (h * kp + kd);
         contact.surface.soft_cfm = 1 / (h * kp + kd);
 
 
-        //contacts[i].surface.mode |= dContactBounce | dContactSoftCFM;
-        contact.surface.mode |= dContactApprox1;
         contact.surface.mu = MIN(geom1->contact->mu1, geom2->contact->mu1);
-        contact.surface.mu2 = 0;
+        contact.surface.mu2 = MIN(geom1->contact->mu2, geom2->contact->mu2);
         contact.surface.bounce = 0.1;
         contact.surface.bounce_vel = 0.1;
-        //contacts[i].surface.soft_cfm = 0.01;
+        contact.surface.soft_cfm = 0.01;
 
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
