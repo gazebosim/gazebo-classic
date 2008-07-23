@@ -58,14 +58,14 @@
     <static>false</static>
     <body:trimesh name="pallet_body">
       <geom:trimesh name="pallet_geom">
-        <mesh>WoodPallet.mesh</mesh>
+        <mesh>Mesh.mesh</mesh>
         <scale>.2 .2 .2</scale>
         <mass>0.1</mass>
 
         <visual>
           <scale>.2 .2 .2</scale>
           <rpy>0 0 0</rpy>
-          <mesh>WoodPallet.mesh</mesh>
+          <mesh>Mesh.mesh</mesh>
           <material>Gazebo/WoodPallet</material>
         </visual>
       </geom:trimesh>

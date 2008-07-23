@@ -22,8 +22,7 @@
     <stepTime>0.03</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-5</cfm>
-    <erp>0.8</erp>
-    <maxUpdateRate>0</maxUpdateRate>
+    <erp>0.3</erp>
   </physics:ode>
 
   <rendering:gui>
@@ -67,7 +66,7 @@
   <model:physical name="sphere1_model">
     <xyz>2.15 -1.68 .7</xyz>
     <rpy>0.0 0.0 0.0</rpy>
-    <static>true</static>
+    <static>false</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">

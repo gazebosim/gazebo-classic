@@ -30,6 +30,7 @@
 #include <FL/Fl_Button.H>
 
 #include "Entity.hh"
+#include "Model.hh"
 #include "Simulator.hh"
 #include "CameraManager.hh"
 #include "OgreCamera.hh"
@@ -45,20 +46,7 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
 
   this->box(FL_UP_BOX);
 
-  //OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
-
-  /*if (camera)
-  {
-    sprintf(buffer,"%s [%d x %d]", camera->GetName().c_str(), camera->GetImageWidth(), camera->GetImageHeight());
-
-  }
-  else
-  {
-    sprintf(buffer,"Camera");
-  }
-  */
-
-  this->entityInfoGrp = new Fl_Group(x+10,y+20,w-20,25*5, "Entity");
+  this->entityInfoGrp = new Fl_Group(x+10,y+20,w-20,25*3, "Entity");
 
   // Camera Info Group
   this->entityInfoGrp->box(FL_BORDER_BOX);
@@ -68,60 +56,11 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   y = this->entityInfoGrp->y()+2;
   this->entityName = new Fl_Output(x,y, this->entityInfoGrp->w()-55,20, "Name: ");
 
-  /*// Prev camera button
-  x = this->cameraInfoGrp->x()+2;
-  y = this->cameraInfoGrp->y()+2;
-  this->prevCameraButton = new Fl_Button(x,y,16,20,"<");
-  this->prevCameraButton->callback( &gazebo::Toolbar::PrevCameraButtonCB, this );
+  y = this->entityName->y() + this->entityName->h() + 5;
+  this->entityPos = new Fl_Output(x,y, this->entityInfoGrp->w()-55,20, "XYZ: ");
 
-  // Next camera button
-  x = this->cameraInfoGrp->x() + this->cameraInfoGrp->w()-22;
-  y = this->cameraInfoGrp->y()+2;
-  this->nextCameraButton = new Fl_Button(x,y,16,20,">");
-  this->nextCameraButton->callback( &gazebo::Toolbar::NextCameraButtonCB, this );
-
-  // Camera dimensions
-  x = this->cameraInfoGrp->x() + 40;
-  y = this->cameraName->y()+this->cameraName->h()+5;
-  this->cameraDimensions = new Fl_Output(x,y,this->cameraName->w()-20,20,"WxH");
-
-
-  // Camera X output
-  x = this->cameraInfoGrp->x() + 20;
-  y = this->cameraDimensions->y() + this->cameraDimensions->h()+5;
-  this->outputX = new Fl_Value_Output(x,y,60,20,"X");
-  this->outputX->precision(2);
-
-  // Camera Y output
-  x = this->outputX->x();
-  y = this->outputX->y() + this->outputX->h()+5;
-  this->outputY = new Fl_Value_Output(x,y,60,20,"Y");
-  this->outputY->precision(2);
-
-  // Camera Z output
-  x = this->outputY->x();
-  y = this->outputY->y() + this->outputX->h()+5;
-  this->outputZ = new Fl_Value_Output(x,y,60,20,"Z");
-  this->outputZ->precision(2);
-
-  // Camera ROLL output
-  x = this->outputX->x() + this->outputX->w()+20;
-  y = this->outputX->y();
-  this->outputRoll = new Fl_Value_Output(x,y,60,20,"R");
-  this->outputRoll->precision(2);
-
-  // Camera Pitch output
-  x = this->outputRoll->x();
-  y = this->outputRoll->y() + this->outputRoll->h() + 5;
-  this->outputPitch = new Fl_Value_Output(x,y,60,20,"P");
-  this->outputPitch->precision(2);
-
-  // Camera Yaw output
-  x = this->outputPitch->x();
-  y = this->outputPitch->y() + this->outputPitch->h() + 5;
-  this->outputYaw = new Fl_Value_Output(x,y,60,20,"Y");
-  this->outputYaw->precision(2);
-  */
+  y = this->entityPos->y() + this->entityPos->h() + 5;
+  this->entityRot = new Fl_Output(x,y, this->entityInfoGrp->w()-55,20, "RPY: ");
 
   this->entityInfoGrp->end();
 
@@ -145,49 +84,31 @@ void Toolbar::Update()
 
   if (entity)
   {
+    Model *model = dynamic_cast<Model *>(entity);
+
     sprintf(buffer,"%s", entity->GetName().c_str());
     if (strcmp(buffer, this->entityName->value()) != 0)
-    {
       this->entityName->value(buffer);
+
+    if (model)
+    {
+      Pose3d pose = model->GetPose();
+      Vector3 rpy = pose.rot.GetAsEuler();
+
+      sprintf(buffer,"%4.2f,  %4.2f,  %4.2f",pose.pos.x, pose.pos.y, pose.pos.z);
+      if (strcmp( buffer, this->entityPos->value()) != 0)
+        this->entityPos->value(buffer);
+
+      sprintf(buffer,"%4.2f,  %4.2f,  %4.2f",rpy.x, rpy.y, rpy.z);
+      if (strcmp( buffer, this->entityRot->value()) != 0)
+        this->entityRot->value(buffer);
+
     }
   }
-
-  /*char *buffer = new char[256];
-  OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
-
-  if (camera != NULL)
+  else
   {
-    sprintf(buffer,"%s", camera->GetName().c_str());
-    if (strcmp(buffer,this->cameraName->value()) != 0)
-    {
-      this->cameraName->value(buffer);
-    }
-
-    sprintf(buffer,"%d x %d", camera->GetImageWidth(), camera->GetImageHeight());
-    if (strcmp(buffer,this->cameraDimensions->value()) != 0)
-    {
-      this->cameraDimensions->value(buffer);
-    }
-
-
-    Pose3d pose = camera->GetWorldPose();
-
-    this->outputX->value(pose.pos.x);
-    this->outputY->value(pose.pos.y);
-    this->outputZ->value(pose.pos.z);
-    this->outputRoll->value(RTOD(pose.rot.GetRoll()));
-    this->outputPitch->value(RTOD(pose.rot.GetPitch()));
-    this->outputYaw->value(RTOD(pose.rot.GetYaw()));
+    this->entityName->value("");
+    this->entityPos->value("");
+    this->entityRot->value("");
   }
-  */
 }
-
-//void Toolbar::PrevCameraButtonCB(Fl_Widget * /*w*/, void *data)
-//{
-  //CameraManager::Instance()->DecActiveCamera();
-//}
-
-//void Toolbar::NextCameraButtonCB(Fl_Widget * /*w*/, void *data)
-//{
-  //CameraManager::Instance()->IncActiveCamera();
-//}

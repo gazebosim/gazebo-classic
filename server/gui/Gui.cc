@@ -68,7 +68,7 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 
     // Create the status bar
     this->statusbar = new StatusBar(0, height-30, 
-                         width-toolbarWidth, 30);
+                         width, 30);
 
     this->statusbar->gui = this;
   }

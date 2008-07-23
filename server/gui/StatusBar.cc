@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Button.H>
 
 #include "Gui.hh"
 #include "Simulator.hh"
@@ -57,14 +58,14 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->pauseTime = new Fl_Value_Output(x,y,55,20,"Pause Time");
   this->pauseTime->precision(2);
 
-  //x = this->pauseTime->x() + this->pauseTime->w() + 80;
-  //this->iterations = new Fl_Value_Output(x,y,65,20,"Iterations");
-  //this->iterations->precision(0);
+  x = this->pauseTime->x() + this->pauseTime->w() + 30;
+  this->playButton = new Fl_Button(x, y, 30, 20, "@||");
+  this->playButton->callback( &gazebo::StatusBar::PlayPauseButtonCB, this );
 
-  x = this->w() - 80;
-  this->statusString = new Fl_Output(x,y,80,20,"");
-  this->statusString->value("Running");
-  this->statusString->color(FL_GREEN);
+  x = this->playButton->x() + this->playButton->w() + 15;
+  this->stepButton = new Fl_Button(x, y, 30, 20, "@>|");
+  this->stepButton->callback( &gazebo::StatusBar::StepButtonCB, this );
+  this->stepButton->deactivate();
 
   this->resizable(NULL);
   this->end();
@@ -91,24 +92,37 @@ void StatusBar::Update()
   {
     this->realTime->value(Simulator::Instance()->GetRealTime());
   }
+
   this->simTime->value(Simulator::Instance()->GetSimTime());
   this->pauseTime->value(Simulator::Instance()->GetPauseTime());
+}
 
-  if (Simulator::Instance()->GetUserPause())
+////////////////////////////////////////////////////////////////////////////////
+// Play pause button callback
+void StatusBar::PlayPauseButtonCB( Fl_Widget *w, void *data )
+{
+  StatusBar *sb = (StatusBar*)(data);
+
+  if (strcmp(w->label(), "@||") == 0)
   {
-    this->statusString->value("PAUSED");
-    this->statusString->color(FL_RED);
-  }
-  else if (Simulator::Instance()->GetUserStep())
-  {
-    this->statusString->value("STEP");
-    this->statusString->color(FL_RED);
+    Simulator::Instance()->SetUserPause(true);
+
+    sb->stepButton->activate();
+    w->label("@>");
   }
   else
   {
-    this->statusString->value("RUNNING");
-    this->statusString->color(FL_GREEN);
+    Simulator::Instance()->SetUserPause(false);
+    sb->stepButton->deactivate();
+    w->label("@||");
   }
 
-  //this->redraw();
+  w->clear_visible_focus();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set button callback
+void StatusBar::StepButtonCB( Fl_Widget * /*w*/, void * /*data*/ )
+{
+  Simulator::Instance()->SetUserStepInc( true );
 }

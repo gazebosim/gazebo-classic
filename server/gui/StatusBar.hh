@@ -30,6 +30,7 @@
 
 class Fl_Value_Output;
 class Fl_Output;
+class Fl_Button;
 
 namespace gazebo
 {
@@ -45,14 +46,21 @@ namespace gazebo
     
     /// \brief Update the toolbar data
     public: void Update();
-   
+  
+    /// \brief Play Pause button callback
+    public: static void PlayPauseButtonCB( Fl_Widget *w, void *data );
+
+    /// \brief Set button callback
+    public: static void StepButtonCB( Fl_Widget *w, void *data );
+
     private: Fl_Value_Output *iterations;
     private: Fl_Value_Output *fps;
     private: Fl_Value_Output *realTime;
     private: Fl_Value_Output *pauseTime;
     private: Fl_Value_Output *simTime;
 
-    private: Fl_Output *statusString;
+    private: Fl_Button *playButton;
+    private: Fl_Button *stepButton;
 
     public: Gui *gui;
   };

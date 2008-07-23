@@ -65,7 +65,6 @@ Simulator::Simulator()
   checkpoint(0.0),
   renderUpdates(0),
   userPause(false),
-  userStep(false),
   userStepInc(false),
   userQuit(false),
   guiEnabled(true),
@@ -260,8 +259,8 @@ void Simulator::MainLoop()
       this->simTime += step;
 
       // Update the physics engine
-      if (!this->GetUserPause() && !this->GetUserStep() ||
-          (this->GetUserStep() && this->GetUserStepInc()))
+      if (!this->GetUserPause() ||
+          (this->GetUserPause() && this->GetUserStepInc()))
       {
         this->iterations++;
         this->pause=false;
@@ -386,37 +385,25 @@ void Simulator::SetUserQuit()
 ////////////////////////////////////////////////////////////////////////////////
 bool Simulator::GetUserPause() const
 {
-  return userPause;
+  return this->userPause;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Simulator::SetUserPause(bool pause)
 {
-  userPause = pause;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Simulator::GetUserStep() const 
-{
-  return userStep;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Simulator::SetUserStep( bool step )
-{
-  userStep = step;
+  this->userPause = pause;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Simulator::GetUserStepInc() const
 {
-  return userStepInc;
+  return this->userStepInc;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Simulator::SetUserStepInc(bool step)
 {
-  userStepInc = step;
+  this->userStepInc = step;
 }
 
 

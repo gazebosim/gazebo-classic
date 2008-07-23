@@ -131,12 +131,6 @@ namespace gazebo
     /// \brief Set whether the user has paused
     public: void SetUserPause(bool pause);
     
-    /// \brief Return true if the user has stepped the simulation
-    public: bool GetUserStep() const;
-
-    /// \brief Set whether the user has stepped the simulation
-    public: void SetUserStep( bool step );
-
     /// \brief Return true if the step has incremented
     public: bool GetUserStepInc() const;
 
@@ -201,11 +195,8 @@ namespace gazebo
     /// \brief Set to true to pause the simulation
     private: bool userPause;
 
-    /// Set to true to step through the simulation
-    private: bool userStep;
-
     /// Set to true to increment the simulation once. This is only
-    ///  valid when userStep is true.
+    ///  valid when paused.
     private: bool userStepInc;
 
     //The user has somewhat signaled the end of the program

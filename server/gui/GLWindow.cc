@@ -321,23 +321,6 @@ void GLWindow::HandleKeyRelease(int keyNum)
   // Handle all toggle keys
   switch (keyNum)
   {
-    case 't':
-      if (sim->GetUserPause())
-        sim->SetUserPause(false);
-      sim->SetUserStep( !sim->GetUserStep() );
-      sim->SetUserStepInc( false );
-      break;
-
-    case ' ':
-
-      if (sim->GetUserStep())
-      {
-        sim->SetUserStepInc( true );
-      }
-      else
-        sim->SetUserPause( !sim->GetUserPause() );
-      break;
-
     case FL_Escape:
       Simulator::Instance()->SetUserQuit();
       break;

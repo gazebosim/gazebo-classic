@@ -48,23 +48,11 @@ namespace gazebo
     /// \brief Update the toolbar data
     public: void Update();
 
-//    public: static void PrevCameraButtonCB(Fl_Widget * /*w*/, void *data);
-    //public: static void NextCameraButtonCB(Fl_Widget * /*w*/, void *data);
-
     private: Fl_Group *entityInfoGrp;
-    /*private: Fl_Button *prevCameraButton;
-    private: Fl_Button *nextCameraButton;
-    */
-    private: Fl_Output *entityName;
-    /*private: Fl_Output *cameraDimensions;
-    private: Fl_Value_Output *outputX;
-    private: Fl_Value_Output *outputY;
-    private: Fl_Value_Output *outputZ;
 
-    private: Fl_Value_Output *outputRoll;
-    private: Fl_Value_Output *outputPitch;
-    private: Fl_Value_Output *outputYaw;
-    */
+    private: Fl_Output *entityName;
+    private: Fl_Output *entityPos;
+    private: Fl_Output *entityRot;
 
   };
   
