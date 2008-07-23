@@ -29,6 +29,8 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
 
+#include "Entity.hh"
+#include "Simulator.hh"
 #include "CameraManager.hh"
 #include "OgreCamera.hh"
 #include "Toolbar.hh"
@@ -39,13 +41,13 @@ using namespace gazebo;
 Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
-/*  char *buffer = new char[256];
+  char *buffer = new char[256];
 
   this->box(FL_UP_BOX);
 
-  OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
+  //OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
 
-  if (camera)
+  /*if (camera)
   {
     sprintf(buffer,"%s [%d x %d]", camera->GetName().c_str(), camera->GetImageWidth(), camera->GetImageHeight());
 
@@ -54,18 +56,19 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   {
     sprintf(buffer,"Camera");
   }
+  */
 
-  this->cameraInfoGrp = new Fl_Group(x+10,y+20,w-20,25*5, "Camera");
+  this->entityInfoGrp = new Fl_Group(x+10,y+20,w-20,25*5, "Entity");
 
   // Camera Info Group
-  this->cameraInfoGrp->box(FL_BORDER_BOX);
+  this->entityInfoGrp->box(FL_BORDER_BOX);
 
-  // Camera name output
-  x = this->cameraInfoGrp->x()+20;
-  y = this->cameraInfoGrp->y()+2;
-  this->cameraName = new Fl_Output(x,y,this->cameraInfoGrp->w()-44,20);
+  // Entity name output
+  x = this->entityInfoGrp->x()+50;
+  y = this->entityInfoGrp->y()+2;
+  this->entityName = new Fl_Output(x,y, this->entityInfoGrp->w()-55,20, "Name: ");
 
-  // Prev camera button
+  /*// Prev camera button
   x = this->cameraInfoGrp->x()+2;
   y = this->cameraInfoGrp->y()+2;
   this->prevCameraButton = new Fl_Button(x,y,16,20,"<");
@@ -118,15 +121,15 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   y = this->outputPitch->y() + this->outputPitch->h() + 5;
   this->outputYaw = new Fl_Value_Output(x,y,60,20,"Y");
   this->outputYaw->precision(2);
+  */
 
-  this->cameraInfoGrp->end();
+  this->entityInfoGrp->end();
 
   this->end();
 
   this->resizable(NULL);
 
   delete buffer;
-  */
 }
 
 Toolbar::~Toolbar()
@@ -137,6 +140,18 @@ Toolbar::~Toolbar()
 /// Update the toolbar data
 void Toolbar::Update()
 {
+  char *buffer = new char[256];
+  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+
+  if (entity)
+  {
+    sprintf(buffer,"%s", entity->GetName().c_str());
+    if (strcmp(buffer, this->entityName->value()) != 0)
+    {
+      this->entityName->value(buffer);
+    }
+  }
+
   /*char *buffer = new char[256];
   OgreCamera *camera = CameraManager::Instance()->GetActiveCamera();
 
@@ -167,12 +182,12 @@ void Toolbar::Update()
   */
 }
 
-void Toolbar::PrevCameraButtonCB(Fl_Widget * /*w*/, void *data)
-{
+//void Toolbar::PrevCameraButtonCB(Fl_Widget * /*w*/, void *data)
+//{
   //CameraManager::Instance()->DecActiveCamera();
-}
+//}
 
-void Toolbar::NextCameraButtonCB(Fl_Widget * /*w*/, void *data)
-{
+//void Toolbar::NextCameraButtonCB(Fl_Widget * /*w*/, void *data)
+//{
   //CameraManager::Instance()->IncActiveCamera();
-}
+//}

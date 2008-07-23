@@ -54,14 +54,22 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   // The order of creation matters! Menubar first, followed by FrameManager,
   // then statusbar
   {
+    int toolbarWidth = 200;
+
     // Create a main menu
     new MainMenu(0,0,w(),30,(char *)"MainMenu");
 
     // Create the frame mamanger
-    this->frameMgr = new GLFrameManager(0,30, this->w(), this->h()-60, "");
+    this->frameMgr = new GLFrameManager(0, 30, 
+                         this->w()-toolbarWidth, this->h()-60, "");
+
+    this->toolbar = new Toolbar(this->w() - toolbarWidth, 30,
+                                toolbarWidth, this->h() - 60);
 
     // Create the status bar
-    this->statusbar = new StatusBar(0, height-30, width, 30);
+    this->statusbar = new StatusBar(0, height-30, 
+                         width-toolbarWidth, 30);
+
     this->statusbar->gui = this;
   }
 
@@ -110,7 +118,7 @@ void Gui::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void Gui::Update()
 {
-  //this->toolbar->Update();
+  this->toolbar->Update();
   this->statusbar->Update();
   this->frameMgr->Update();
   Fl::check();

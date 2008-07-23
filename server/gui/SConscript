@@ -18,7 +18,7 @@ headers.append(
            'server/gui/StatusBar.hh',
            'server/gui/Toolbar.hh',
            'server/gui/GLFrameManager.hh',
-           'server/gui/GLFrame.hh'
+           'server/gui/GLFrame.hh',
            ] )
 
 staticObjs.append(env.StaticObject(sources))

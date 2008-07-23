@@ -23,6 +23,7 @@
  * Date: 13 Feb 2006
  * SVN: $Id:$
  */
+
 #ifndef TOOLBAR_HH
 #define TOOLBAR_HH
 
@@ -47,14 +48,15 @@ namespace gazebo
     /// \brief Update the toolbar data
     public: void Update();
 
-    public: static void PrevCameraButtonCB(Fl_Widget * /*w*/, void *data);
-    public: static void NextCameraButtonCB(Fl_Widget * /*w*/, void *data);
+//    public: static void PrevCameraButtonCB(Fl_Widget * /*w*/, void *data);
+    //public: static void NextCameraButtonCB(Fl_Widget * /*w*/, void *data);
 
-    private: Fl_Group *cameraInfoGrp;
-    private: Fl_Button *prevCameraButton;
+    private: Fl_Group *entityInfoGrp;
+    /*private: Fl_Button *prevCameraButton;
     private: Fl_Button *nextCameraButton;
-    private: Fl_Output *cameraName;
-    private: Fl_Output *cameraDimensions;
+    */
+    private: Fl_Output *entityName;
+    /*private: Fl_Output *cameraDimensions;
     private: Fl_Value_Output *outputX;
     private: Fl_Value_Output *outputY;
     private: Fl_Value_Output *outputZ;
@@ -62,6 +64,7 @@ namespace gazebo
     private: Fl_Value_Output *outputRoll;
     private: Fl_Value_Output *outputPitch;
     private: Fl_Value_Output *outputYaw;
+    */
 
   };
   
