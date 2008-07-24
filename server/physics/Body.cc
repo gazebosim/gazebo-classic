@@ -202,10 +202,6 @@ void Body::Update()
        geomIter!=this->geoms.end(); geomIter++)
   {
     (*geomIter)->Update();
-    if ((*geomIter)->GetName() == "sphere1_geom")
-    {
-      std::cout << "Geom pose[" << (*geomIter)->GetPose() << "]\n";
-    }
   }
 
   for (sensorIter=this->sensors.begin();
@@ -250,12 +246,6 @@ void Body::SetPose(const Pose3d &pose)
     //this->SetPosition(this->staticPose.pos);
     //this->SetRotation(this->staticPose.rot);
    
-    if (this->GetName() == "map_body")
-    {
-      std::cout << "Set new pose[" << pose << "]\n";
-      std::cout << "Old Pose[ " << oldPose << "]\n";
-    }
-
     for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
     {
       newPose = (*iter)->GetPose() - oldPose;

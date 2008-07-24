@@ -188,7 +188,7 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   this->geomId = geomId;
   this->transId = NULL;
 
-  if (this->placeable)
+  if (this->placeable && !this->IsStatic())
   {
     if (dGeomGetClass(geomId) != dTriMeshClass)
     {
@@ -198,8 +198,11 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
       assert(dGeomGetSpace(this->geomId) == 0);
     }
   }
-  else
+  else if ( dGeomGetSpace(this->geomId) == 0 )
+  {
+    dSpaceAdd(this->spaceId, this->geomId);
     assert(dGeomGetSpace(this->geomId) != 0);
+  }
 
   dGeomSetData(this->geomId, this);
 
@@ -271,17 +274,13 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
 
-    this->visualNode->SetPose(pose);
 
     // Set the pose of the encapsulated geom; this is always relative
     // to the CoM
     dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
     dGeomSetQuaternion(this->geomId, q);
 
-    if (this->GetName() == "sphere1_geom")
-    {
-      std::cout << "Geom set pose[" << this->GetPose() << "]\n";
-    }
+    this->visualNode->SetPose(localPose);
 
     if (updateCoM)
     {

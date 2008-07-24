@@ -110,50 +110,14 @@ void MapGeom::LoadChild(XMLConfigNode *node)
     this->ReduceTree(this->root);
   }
 
-  //this->CreateBoxes(this->root);
-  this->CreateBox();
+  this->CreateBoxes(this->root);
 
   this->visualNode->MakeStatic();
 }
 
-void MapGeom::CreateBox()
-{
-  std::ostringstream stream;
 
-  // Create the box geometry
-  BoxGeom* newBox = new BoxGeom( this->body );
-
-  XMLConfig *boxConfig = new XMLConfig();
-
-  stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
-
-  float x = 2;
-  float y = 2;
-  float z = 0.5;
-  float xSize = 1.0;
-  float ySize = 1.0;
-  float zSize = 1.0;
-
-  stream << "<geom:box name='map_geom_box'>";
-  stream << "  <mass>0.0</mass>";
-  stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
-  stream << "  <rpy>0 0 0</rpy>";
-  stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
-  stream << "  <mass>0.01</mass>";
-  stream << "  <visual>";
-  stream << "    <mesh>unit_box</mesh>";
-  stream << "    <material>" << this->material << "</material>";
-  stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
-  stream << "  </visual>";
-  stream << "</geom:box>";
-  stream << "</gazebo:world>";
-
-  boxConfig->LoadString( stream.str() );
-
-  newBox->Load( boxConfig->GetRootNode()->GetChild() );
-  delete boxConfig;
-}
-
+//////////////////////////////////////////////////////////////////////////////
+// Create the ODE boxes
 void MapGeom::CreateBoxes(QuadNode *node)
 {
   if (node->leaf)
@@ -205,6 +169,8 @@ void MapGeom::CreateBoxes(QuadNode *node)
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Reduce the size of the quad tree
 void MapGeom::ReduceTree(QuadNode *node)
 {
   std::deque<QuadNode*>::iterator iter;
@@ -262,6 +228,8 @@ void MapGeom::ReduceTree(QuadNode *node)
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Merege quad tree cells
 void MapGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
 {
   std::deque<QuadNode*>::iterator iter;
@@ -310,6 +278,8 @@ void MapGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
 }
 
 
+//////////////////////////////////////////////////////////////////////////////
+// Construct the quad tree
 void MapGeom::BuildTree(QuadNode *node)
 {
   QuadNode *newNode = NULL;
@@ -382,6 +352,8 @@ void MapGeom::BuildTree(QuadNode *node)
 
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Get a count of pixels within a given area
 void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart, 
                                  unsigned int width, unsigned int height, 
                                  unsigned int &freePixels, 

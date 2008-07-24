@@ -56,7 +56,7 @@ void SphereGeom::LoadChild(XMLConfigNode *node)
   dMassSetSphereTotal(&this->mass, this->dblMass, radius);
 
   // Create the sphere geometry
-  this->SetGeom(dCreateSphere(0, radius ), true);
+  this->SetGeom( dCreateSphere(0, radius ), true);
 
   //to be able to show physics
   /*  this->visualNode->AttachMesh("unit_sphere"); // unit_sphere radius=1 diameter=2
