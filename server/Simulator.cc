@@ -464,14 +464,14 @@ void Simulator::SetSelectedEntity( Entity *ent )
   if (this->selectedEntity)
   {
     this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
-    this->selectedEntity->SetStatic(false);
+    this->selectedEntity->SetSelected(false);
   }
 
   if (this->selectedEntity != ent)
   {
     this->selectedEntity = ent;
     this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
-    this->selectedEntity->SetStatic(true);
+    this->selectedEntity->SetSelected(true);
   }
   else
     this->selectedEntity = NULL;

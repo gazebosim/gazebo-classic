@@ -51,11 +51,17 @@ using namespace gazebo;
 Body::Body(Entity *parent, dWorldID worldId)
     : Entity(parent)
 {
-  this->bodyId = dBodyCreate(worldId);
 
-  dMassSetZero( &this->mass );
+  if ( !this->IsStatic() )
+  {
+    this->bodyId = dBodyCreate(worldId);
 
-  this->SetEnabled(!this->IsStatic());
+    dMassSetZero( &this->mass );
+  }
+  else
+  {
+    this->bodyId = NULL;
+  }
 }
 
 
@@ -158,7 +164,8 @@ void Body::Fini()
 // Set whether gravity affects this body
 void Body::SetGravityMode(bool mode)
 {
-  dBodySetGravityMode(this->bodyId, mode);
+  if (this->bodyId)
+    dBodySetGravityMode(this->bodyId, mode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,21 +192,20 @@ void Body::Update()
 
   if (!this->IsStatic())
   {
-    //this->SetEnabled(true);
     Pose3d pose = this->GetPose();
 
     // Set the pose of the scene node
     this->visualNode->SetPose(pose);
-  }
-  else
-  {
-    this->SetEnabled(false);
   }
 
   for (geomIter=this->geoms.begin();
        geomIter!=this->geoms.end(); geomIter++)
   {
     (*geomIter)->Update();
+    if ((*geomIter)->GetName() == "sphere1_geom")
+    {
+      std::cout << "Geom pose[" << (*geomIter)->GetPose() << "]\n";
+    }
   }
 
   for (sensorIter=this->sensors.begin();
@@ -213,7 +219,7 @@ void Body::Update()
 // Attach a geom to this body
 void Body::AttachGeom( Geom *geom )
 {
-  //if (this->bodyId)
+  if ( this->bodyId )
   {
     if (geom->IsPlaceable())
     {
@@ -233,11 +239,38 @@ void Body::SetPose(const Pose3d &pose)
 {
   Pose3d localPose;
 
-  // Compute pose of CoM
-  localPose = this->comPose + pose;
+  if (this->IsStatic())
+  {
+    Pose3d oldPose = this->staticPose;
+    Pose3d newPose;
+    this->staticPose = pose;
 
-  this->SetPosition(localPose.pos);
-  this->SetRotation(localPose.rot);
+    std::vector<Geom*>::iterator iter;
+
+    //this->SetPosition(this->staticPose.pos);
+    //this->SetRotation(this->staticPose.rot);
+   
+    if (this->GetName() == "map_body")
+    {
+      std::cout << "Set new pose[" << pose << "]\n";
+      std::cout << "Old Pose[ " << oldPose << "]\n";
+    }
+
+    for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+    {
+      newPose = (*iter)->GetPose() - oldPose;
+      newPose += this->staticPose;
+      (*iter)->SetPose(newPose);
+    }
+  }
+  else
+  {
+    // Compute pose of CoM
+    localPose = this->comPose + pose;
+
+    this->SetPosition(localPose.pos);
+    this->SetRotation(localPose.rot);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -246,10 +279,17 @@ Pose3d Body::GetPose() const
 {
   Pose3d pose;
 
-  pose.pos = this->GetPosition();
-  pose.rot = this->GetRotation();
+  if (this->IsStatic())
+  {
+    pose = this->staticPose;
+  }
+  else
+  {
+    pose.pos = this->GetPosition();
+    pose.rot = this->GetRotation();
 
-  pose = this->comPose.CoordPoseSolve(pose);
+    pose = this->comPose.CoordPoseSolve(pose);
+  }
 
   return pose;
 }
@@ -258,7 +298,8 @@ Pose3d Body::GetPose() const
 // Set the position of the body
 void Body::SetPosition(const Vector3 &pos)
 {
-  dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
+  if (this->bodyId)
+    dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
 
   // Set the position of the scene node
   this->visualNode->SetPosition(pos);
@@ -268,14 +309,18 @@ void Body::SetPosition(const Vector3 &pos)
 // Set the rotation of the body
 void Body::SetRotation(const Quatern &rot)
 {
-  dQuaternion q;
-  q[0] = rot.u;
-  q[1] = rot.x;
-  q[2] = rot.y;
-  q[3] = rot.z;
 
-  // Set the rotation of the ODE body
-  dBodySetQuaternion(this->bodyId, q);
+  if (this->bodyId)
+  {
+    dQuaternion q;
+    q[0] = rot.u;
+    q[1] = rot.x;
+    q[2] = rot.y;
+    q[3] = rot.z;
+
+    // Set the rotation of the ODE body
+    dBodySetQuaternion(this->bodyId, q);
+  }
 
   // Set the orientation of the scene node
   this->visualNode->SetRotation(rot);
@@ -286,13 +331,21 @@ void Body::SetRotation(const Quatern &rot)
 Vector3 Body::GetPosition() const
 {
   Vector3 pos;
-  const dReal *p;
 
-  p = dBodyGetPosition(this->bodyId);
+  if (this->bodyId)
+  {
+    const dReal *p;
 
-  pos.x = p[0];
-  pos.y = p[1];
-  pos.z = p[2];
+    p = dBodyGetPosition(this->bodyId);
+
+    pos.x = p[0];
+    pos.y = p[1];
+    pos.z = p[2];
+  }
+  else
+  {
+    pos = this->staticPose.pos;
+  }
 
   return pos;
 }
@@ -303,14 +356,22 @@ Vector3 Body::GetPosition() const
 Quatern Body::GetRotation() const
 {
   Quatern rot;
-  const dReal *r;
 
-  r = dBodyGetQuaternion(this->bodyId);
+  if (this->bodyId)
+  {
+    const dReal *r;
 
-  rot.u = r[0];
-  rot.x = r[1];
-  rot.y = r[2];
-  rot.z = r[3];
+    r = dBodyGetQuaternion(this->bodyId);
+
+    rot.u = r[0];
+    rot.x = r[1];
+    rot.y = r[2];
+    rot.z = r[3];
+  }
+  else
+  {
+    rot = this->staticPose.rot;
+  }
 
   return rot;
 }
@@ -327,6 +388,9 @@ dBodyID Body::GetId() const
 // Set whether this body is enabled
 void Body::SetEnabled(bool enable) const
 {
+  if (!this->bodyId)
+    return;
+
   if (enable)
     dBodyEnable(this->bodyId);
   else
@@ -356,7 +420,7 @@ void Body::LoadGeom(XMLConfigNode *node)
   }
   else if (node->GetName() == "map")
   {
-    this->SetStatic(true);
+    //this->SetStatic(true);
     geom = new MapGeom(this);
   }
   else
@@ -417,6 +481,9 @@ void Body::UpdateCoM()
   const dMass *lmass;
   Pose3d oldPose, newPose, pose;
   std::vector< Geom* >::iterator giter;
+
+  if (!this->bodyId)
+    return;
 
   // Construct the mass matrix by combining all the geoms
   dMassSetZero( &this->mass );
@@ -489,7 +556,8 @@ const Pose3d &Body::GetCoMPose() const
 /// Set the velocity of the body
 void Body::SetLinearVel(const Vector3 &vel)
 {
-  dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
+  if (this->bodyId)
+    dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -497,13 +565,17 @@ void Body::SetLinearVel(const Vector3 &vel)
 Vector3 Body::GetLinearVel() const
 {
   Vector3 vel;
-  const dReal *dvel;
 
-  dvel = dBodyGetLinearVel(this->bodyId);
+  if (this->bodyId)
+  {
+    const dReal *dvel;
 
-  vel.x = dvel[0];
-  vel.y = dvel[1];
-  vel.z = dvel[2];
+    dvel = dBodyGetLinearVel(this->bodyId);
+
+    vel.x = dvel[0];
+    vel.y = dvel[1];
+    vel.z = dvel[2];
+  }
 
   return vel;
 }
@@ -512,7 +584,8 @@ Vector3 Body::GetLinearVel() const
 /// Set the velocity of the body
 void Body::SetAngularVel(const Vector3 &vel)
 {
-  dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
+  if (this->bodyId)
+    dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -520,13 +593,17 @@ void Body::SetAngularVel(const Vector3 &vel)
 Vector3 Body::GetAngularVel() const
 {
   Vector3 vel;
-  const dReal *dvel;
 
-  dvel = dBodyGetAngularVel(this->bodyId);
+  if (this->bodyId)
+  {
+    const dReal *dvel;
 
-  vel.x = dvel[0];
-  vel.y = dvel[1];
-  vel.z = dvel[2];
+    dvel = dBodyGetAngularVel(this->bodyId);
+
+    vel.x = dvel[0];
+    vel.y = dvel[1];
+    vel.z = dvel[2];
+  }
 
   return vel;
 }
@@ -534,7 +611,8 @@ Vector3 Body::GetAngularVel() const
 /// \brief Set the force applied to the body
 void Body::SetForce(const Vector3 &force)
 {
-  dBodySetForce(this->bodyId, force.x, force.y, force.z);
+  if (this->bodyId)
+    dBodySetForce(this->bodyId, force.x, force.y, force.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -542,13 +620,17 @@ void Body::SetForce(const Vector3 &force)
 Vector3 Body::GetForce() const
 {
   Vector3 force;
-  const dReal *dforce;
 
-  dforce = dBodyGetForce(this->bodyId);
+  if (this->bodyId)
+  {
+    const dReal *dforce;
 
-  force.x = dforce[0];
-  force.y = dforce[1];
-  force.z = dforce[2];
+    dforce = dBodyGetForce(this->bodyId);
+
+    force.x = dforce[0];
+    force.y = dforce[1];
+    force.z = dforce[2];
+  }
 
   return force;
 }
@@ -557,7 +639,8 @@ Vector3 Body::GetForce() const
 /// \brief Set the torque applied to the body
 void Body::SetTorque(const Vector3 &torque)
 {
-  dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
+  if (this->bodyId)
+    dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -565,13 +648,16 @@ void Body::SetTorque(const Vector3 &torque)
 Vector3 Body::GetTorque() const
 {
   Vector3 torque;
-  const dReal *dtorque;
+  if (this->bodyId)
+  {
+    const dReal *dtorque;
 
-  dtorque = dBodyGetTorque(this->bodyId);
+    dtorque = dBodyGetTorque(this->bodyId);
 
-  torque.x = dtorque[0];
-  torque.y = dtorque[1];
-  torque.z = dtorque[2];
+    torque.x = dtorque[0];
+    torque.y = dtorque[1];
+    torque.z = dtorque[2];
+  }
 
   return torque;
 }

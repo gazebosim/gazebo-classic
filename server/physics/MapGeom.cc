@@ -110,9 +110,48 @@ void MapGeom::LoadChild(XMLConfigNode *node)
     this->ReduceTree(this->root);
   }
 
-  this->CreateBoxes(this->root);
+  //this->CreateBoxes(this->root);
+  this->CreateBox();
 
   this->visualNode->MakeStatic();
+}
+
+void MapGeom::CreateBox()
+{
+  std::ostringstream stream;
+
+  // Create the box geometry
+  BoxGeom* newBox = new BoxGeom( this->body );
+
+  XMLConfig *boxConfig = new XMLConfig();
+
+  stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
+
+  float x = 2;
+  float y = 2;
+  float z = 0.5;
+  float xSize = 1.0;
+  float ySize = 1.0;
+  float zSize = 1.0;
+
+  stream << "<geom:box name='map_geom_box'>";
+  stream << "  <mass>0.0</mass>";
+  stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
+  stream << "  <rpy>0 0 0</rpy>";
+  stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
+  stream << "  <mass>0.01</mass>";
+  stream << "  <visual>";
+  stream << "    <mesh>unit_box</mesh>";
+  stream << "    <material>" << this->material << "</material>";
+  stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
+  stream << "  </visual>";
+  stream << "</geom:box>";
+  stream << "</gazebo:world>";
+
+  boxConfig->LoadString( stream.str() );
+
+  newBox->Load( boxConfig->GetRootNode()->GetChild() );
+  delete boxConfig;
 }
 
 void MapGeom::CreateBoxes(QuadNode *node)
@@ -125,7 +164,7 @@ void MapGeom::CreateBoxes(QuadNode *node)
     std::ostringstream stream;
 
     // Create the box geometry
-    BoxGeom* newBox = new BoxGeom( body );
+    BoxGeom* newBox = new BoxGeom( this->body );
 
     XMLConfig *boxConfig = new XMLConfig();
 

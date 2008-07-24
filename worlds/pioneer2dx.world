@@ -64,9 +64,9 @@
   </model:physical>
 
   <model:physical name="sphere1_model">
-    <xyz>2.15 -1.68 .7</xyz>
+    <xyz>2.15 -1.68 .3</xyz>
     <rpy>0.0 0.0 0.0</rpy>
-    <static>false</static>
+    <static>true</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
@@ -117,10 +117,6 @@
       </include>
     </model:physical>
 
-    <!-- 
-    The include should be last within a model. All previous statements
-    will override those in the included file 
-    -->
     <include embedded="true">
       <xi:include href="models/pioneer2dx.model" />
     </include>

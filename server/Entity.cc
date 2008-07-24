@@ -44,6 +44,8 @@ Entity::Entity(Entity *parent)
   visualNode(0)
 {
  
+  this->selected = false;
+
   if (this->parent)
   {
     this->parent->AddChild(this);
@@ -156,6 +158,31 @@ void Entity::SetStatic(bool s)
 bool Entity::IsStatic() const
 {
   return this->isStatic;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether this entity has been selected by the user through the gui
+bool Entity::SetSelected( bool s )
+{
+  std::vector< Entity *>::iterator iter;
+  Body *body = NULL;
+
+  this->selected = s;
+
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    (*iter)->SetSelected(s);
+    body = dynamic_cast<Body*>(*iter);
+    if (body)
+      body->SetEnabled(!s);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// True if the entity is selected by the user
+bool Entity::IsSelected() const
+{
+  return this->selected;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

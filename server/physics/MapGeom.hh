@@ -115,6 +115,8 @@ namespace gazebo
     /// \brief Try to merge to nodes
     private: void Merge(QuadNode *nodeA, QuadNode *nodeB);
 
+    private: void CreateBox();
+
     /// \brief Create the boxes for the map
     private: void CreateBoxes(QuadNode *node);
 

@@ -101,6 +101,13 @@ class Entity
   /// \return bool True = static
   public: bool IsStatic() const;
 
+  /// \brief Set whether this entity has been selected by the user through 
+  //         the gui
+  public: bool SetSelected( bool s );
+
+  /// \brief True if the entity is selected by the user
+  public: bool IsSelected() const;
+
   /// \brief Returns true if the entities are the same. Checks only the name
   public: bool operator==(const Entity &ent) const;
 
@@ -127,6 +134,8 @@ class Entity
 
   /// \brief Name of the entity
   private: std::string name;
+
+  private: bool selected;
 
 };
 

@@ -42,7 +42,7 @@ ContactParams::ContactParams()
   this->softCfm = 0.01;
 
   this->mu1 = dInfinity;
-  this->mu2 = 0.0;
+  this->mu2 = dInfinity;
   this->slip1 = 0.01;
   this->slip2 = 0.01;
 }

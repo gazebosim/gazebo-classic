@@ -136,12 +136,6 @@ namespace gazebo
    /// \brief Set the visibility of the physical entity of this geom
     public: void ShowPhysics(bool);
 
-    /// @brief Place Geom when body is immovable (static)
-    private: void PlaceImmovable( );
-
-    /// @brief Set base pose when body is immovable (static)
-    public: virtual void SetImmovableBasePose( const Pose3d & pose );
-
     ///  Contact parameters
     public: ContactParams *contact; 
   
@@ -180,9 +174,6 @@ namespace gazebo
 
     ///our XML DATA
     private: XMLConfigNode *xmlNode;
-
-    private: Pose3d immovableBasePose;
-    private: Pose3d immovableRelativePose;
 
   };
 

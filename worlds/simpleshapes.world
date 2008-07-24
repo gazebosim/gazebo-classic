@@ -38,7 +38,7 @@
   <model:physical name="sphere1_model">
     <xyz>1 0 0.25</xyz>
     <rpy>0.0 0.0 0.0</rpy>
-    <static>false</static>
+    <static>true</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">

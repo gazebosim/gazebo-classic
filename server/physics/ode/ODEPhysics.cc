@@ -259,8 +259,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         double h, kp, kd;
 
         contact.geom = contactGeoms[i];
-        contact.surface.mode = dContactSoftERP | dContactSoftCFM | 
-                               dContactBounce | dContactMu2;
+        contact.surface.mode = dContactSoftERP |  dContactBounce | dContactMu2;
 
 
         // Compute the CFM and ERP by assuming the two bodies form a
@@ -276,7 +275,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         contact.surface.mu2 = MIN(geom1->contact->mu2, geom2->contact->mu2);
         contact.surface.bounce = 0.1;
         contact.surface.bounce_vel = 0.1;
-        contact.surface.soft_cfm = 0.01;
+        //contact.surface.soft_cfm = 0.01;
 
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
