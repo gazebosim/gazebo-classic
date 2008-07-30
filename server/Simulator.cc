@@ -69,7 +69,8 @@ Simulator::Simulator()
   userQuit(false),
   guiEnabled(true),
   physicsEnabled(true),
-  timeout(-1)
+  timeout(-1),
+  selectedEntity(NULL)
 {
 }
 
