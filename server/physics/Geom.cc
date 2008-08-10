@@ -268,19 +268,17 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     // Transform into CoM relative Pose
     localPose = pose - this->body->GetCoMPose();
 
-
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
-
 
     // Set the pose of the encapsulated geom; this is always relative
     // to the CoM
     dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
     dGeomSetQuaternion(this->geomId, q);
 
-    this->visualNode->SetPose(localPose);
+    this->visualNode->SetPose(pose);
 
     if (updateCoM)
     {
