@@ -51,6 +51,8 @@ SimulationInterface::SimulationInterface(player_devaddr_t addr, GazeboDriver *dr
   GazeboClient::Init(serverId, "");
 
   this->iface = new SimulationIface();
+
+  this->responseQueue = NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,6 +60,12 @@ SimulationInterface::SimulationInterface(player_devaddr_t addr, GazeboDriver *dr
 SimulationInterface::~SimulationInterface()
 {
   delete this->iface;
+
+  if (this->responseQueue)
+  {
+    delete this->responseQueue;
+    this->responseQueue = NULL;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -205,8 +213,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->Unlock();
 
     this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY,
-                          req, sizeof(*req), NULL);
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY, req, sizeof(*req), NULL);
 
     if (req->value)
     {

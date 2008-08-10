@@ -1368,18 +1368,6 @@ class StereoCameraData
   /// Vertical field of view of the camera in radians
   public: double vfov;
 
-  // Left image size
-  public: unsigned int left_rgb_size;
-
-  /// left image (R8G8B8)
-  public: unsigned char left_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
-
-  /// Right image size
-  public: unsigned int right_rgb_size;
-
-  /// Right image (R8G8B8)
-  public: unsigned char right_rgb[GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE];
-
   /// Left depth map size
   public: unsigned int left_depth_size;
 

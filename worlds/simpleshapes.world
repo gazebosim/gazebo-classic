@@ -36,9 +36,9 @@
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
-    <xyz>1 0 0.25</xyz>
+    <xyz>1 0 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
-    <static>true</static>
+    <static>false</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">

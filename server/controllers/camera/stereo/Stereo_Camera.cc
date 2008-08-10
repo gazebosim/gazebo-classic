@@ -151,29 +151,11 @@ void Stereo_Camera::PutStereoData()
   stereo_data->hfov = this->myParent->GetHFOV();
   stereo_data->vfov = this->myParent->GetVFOV();
 
-  //stereo_data->right_rgb_size = stereo_data->width * stereo_data->height * 3;
-  //stereo_data->left_rgb_size = stereo_data->width * stereo_data->height * 3;
-
   stereo_data->right_depth_size = stereo_data->width * stereo_data->height * sizeof(float);
   stereo_data->left_depth_size = stereo_data->width * stereo_data->height * sizeof(float);
 
-  // Make sure there is room to store the image
-  //assert (stereo_data->right_rgb_size <= sizeof(stereo_data->right_rgb));
-  //assert (stereo_data->left_rgb_size <= sizeof(stereo_data->left_rgb));
-
   assert (stereo_data->right_depth_size <= sizeof(stereo_data->right_depth));
   assert (stereo_data->left_depth_size <= sizeof(stereo_data->left_depth));
-
-  // Copy the left pixel data to the interface
-  /*rgb_src = this->myParent->GetImageData(0);
-  rgb_dst = stereo_data->left_rgb;
-  memcpy(rgb_dst, rgb_src, stereo_data->left_rgb_size);
-
-  // Copy the right pixel data to the interface
-  rgb_src = this->myParent->GetImageData(1);
-  rgb_dst = stereo_data->right_rgb;
-  memcpy(rgb_dst, rgb_src, stereo_data->right_rgb_size);
-  */
 
   // Copy the left depth data to the interface
   disp_src = this->myParent->GetDepthData(0);

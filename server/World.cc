@@ -502,7 +502,6 @@ void World::UpdateSimulationIface()
   }
 
   response = this->simIface->data->responses;
-  this->simIface->data->responseCount = 0;
 
   this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
   this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
@@ -583,7 +582,7 @@ void World::UpdateSimulationIface()
             response->modelPose.yaw = rot.z;
 
             response++;
-            this->simIface->data->responseCount++;
+            this->simIface->data->responseCount += 1;
           }
           else
           {
