@@ -688,17 +688,7 @@ void Model::LoadPhysical(XMLConfigNode *node)
 
   while (childNode)
   {
-    try
-    {
-      this->LoadBody(childNode);
-    }
-    catch (GazeboError e)
-    {
-      std::cerr << "Error Loading body[" << childNode->GetString("name",std::string(), 0) << "]\n";
-      std::cerr <<  e << std::endl;
-      childNode = childNode->GetNextByNSPrefix("body");
-      continue;
-    }
+    this->LoadBody(childNode);
     childNode = childNode->GetNextByNSPrefix("body");
   }
 

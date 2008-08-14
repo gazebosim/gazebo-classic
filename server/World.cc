@@ -85,7 +85,15 @@ void World::Close()
 
   GZ_DELETE (this->physicsEngine)
   GZ_DELETE (this->server)
-  GZ_DELETE (this->simIface)
+
+  try
+  {
+    GZ_DELETE (this->simIface)
+  }
+  catch (std::string e)
+  {
+    gzthrow(e);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,8 +115,15 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
 
   // Create the simulator interface
-  this->simIface = new SimulationIface();
-  this->simIface->Create(this->server, "default" );
+  try
+  {
+    this->simIface = new SimulationIface();
+    this->simIface->Create(this->server, "default" );
+  }
+  catch (std::string err)
+  {
+    gzthrow(err);
+  }
 
 
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
@@ -226,7 +241,14 @@ int World::Fini()
     gzmsg(-1) << "Problem destroying simIface[" << e << "]\n";
   }
 
-  this->server->Fini();
+  try
+  {
+    this->server->Fini();
+  }
+  catch (std::string e)
+  {
+    gzthrow(e);
+  }
 
   return 0;
 }

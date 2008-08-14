@@ -78,7 +78,16 @@ Iface::Iface(const std::string &type, size_t size)
 Iface::~Iface()
 {
   if (this->mmapFd && this->creator)
-    this->Destroy();
+  {
+    try
+    {
+      this->Destroy();
+    }
+    catch (std::string e)
+    {
+      std::cerr << "Error: " << e << "\n";
+    }
+  }
 }
 
 
@@ -131,6 +140,13 @@ void Iface::Create(Server *server, std::string id)
 
   // Work out the filename
   this->Filename(this->id);
+
+  int testFD = open(this->filename.c_str(), O_RDONLY);
+  if (testFD >= 0)
+  {
+    stream << "error: interface[" << this->filename << " already exists.";
+    throw(stream.str());
+  }
 
   // Create and open the file
   this->mmapFd = open(this->filename.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);

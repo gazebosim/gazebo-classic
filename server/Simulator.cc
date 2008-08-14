@@ -191,7 +191,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
   catch (GazeboError e)
   {
-    gzthrow("Failed to load the GUI\n"  << e);
+    gzthrow("Failed to load the World\n"  << e);
   }
 
   this->loaded=true;
