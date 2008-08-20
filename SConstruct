@@ -128,22 +128,28 @@ if not env.GetOption('clean'):
         print "You requested to activate the support for 3D audio. But OgreAL is not found."
         print "http://www.ogre3d.org/phpBB2addons/viewtopic.php?t=3293"
         Exit(1)
- 
+
+   #FIXME: if this check fails, it makes it fail the check for ODE  
+  # This test should be done outside of the configure context below, because
+  # otherwise it tries to link against the not-yet-built libgazebo, causing
+  # the test to always fail.
+  simpleenv = Environment()
+  simpleconf = Configure(env)
+  if not simpleconf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
+    print "  Warning: Failed to find ltdl, no plugin support will be included"
+    env["HAVE_LTDL"]=False
+  else:
+    env["HAVE_LTDL"]=True
+    env["CCFLAGS"].append("-DHAVE_LTDL")
+  simpleconf.Finish()
+
   conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib})
    
   #Check for the ODE library and header
   if not conf.CheckCHeader('ode/ode.h'):
     print "  Error: Install ODE (http://www.ode.org)"
     Exit(1)
-  
-  #FIXME: if this check fails, it makes it fail the check for ODE  
-  if not conf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
-    print "  Warning: Failed to find ltdl, no plugin support will be included"
-    env["HAVE_LTDL"]=False
-  else:
-    env["HAVE_LTDL"]=True
-    env["CCFLAGS"].append("-DHAVE_LTDL")
-   
+    
   # Check for trimesh support in ODE
   if not conf.CheckODELib():
     print '  Error: ODE not compiled with trimesh support.'
