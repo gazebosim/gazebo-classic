@@ -56,6 +56,22 @@ void GazeboConfig::Load()
 
   cfgFile.open(rcFilename.c_str(), std::ios::in);
 
+  char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
+  if(ogre_resource_path) 
+  {
+    this->ogrePaths.push_back(ogre_resource_path);
+  }
+  char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
+  if(gazebo_resource_path) 
+  {
+    this->gazeboPaths.push_back(gazebo_resource_path);
+  }
+
+  // if both paths are set, don't check the config file or use the defaults.
+  if(ogre_resource_path && gazebo_resource_path) 
+    return;
+
+
   if (cfgFile)
   {
     XMLConfig rc;
