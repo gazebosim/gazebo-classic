@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <math.h> 
+#include <cmath> 
 
 #include "Angle.hh"
 #include "Vector3.hh"
@@ -141,11 +142,11 @@ class Quatern
     v.y = v.y * 180.0 / M_PI;
     v.z = v.z * 180.0 / M_PI;
 
-    if (isnan(v.x))
+    if (std::isnan(v.x))
       v.x = 90.0;
-    if (isnan(v.y))
+    if (std::isnan(v.y))
       v.y = 90.0;
-    if (isnan(v.z))
+    if (std::isnan(v.z))
       v.z = 90.0;
 
     out << v.x << " " << v.y << " " << v.z;

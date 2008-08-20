@@ -510,13 +510,13 @@ void Body::UpdateCoM()
   // Old pose for the CoM
   oldPose = this->comPose;
 
-  if (isnan(this->mass.c[0]))
+  if (std::isnan(this->mass.c[0]))
     this->mass.c[0] = 0;
 
-  if (isnan(this->mass.c[1]))
+  if (std::isnan(this->mass.c[1]))
     this->mass.c[1] = 0;
 
-  if (isnan(this->mass.c[2]))
+  if (std::isnan(this->mass.c[2]))
     this->mass.c[2] = 0;
 
   // New pose for the CoM
