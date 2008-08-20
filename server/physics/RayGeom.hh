@@ -96,6 +96,9 @@ namespace gazebo
     /// \brief Load thte ray
     protected: virtual void LoadChild(XMLConfigNode *node);
 
+    /// \brief Save child parameters
+    protected: virtual void SaveChild(std::string &, std::ostream &) {}
+ 
     /// Contact information; this is filled out during collision
     /// detection.  
     private: double contactLen;

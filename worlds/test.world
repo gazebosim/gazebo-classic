@@ -66,7 +66,6 @@
     </fog>
   </rendering:ogre>
 
-   <!-- Ground Plane -->
   <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
@@ -100,7 +99,6 @@
       </geom:sphere>
     </body:sphere>
   </model:physical>
-
 
   <!-- 
   Include the complete model described in the .model file
@@ -137,25 +135,6 @@
       </include>
     </model:physical>
 
-    <model:physical name="laser">
-      <xyz>-0.15 0 0.18</xyz>
-      <rpy>0 0 -180</rpy>
-
-      <attach>
-        <parentBody>chassis_body</parentBody>
-        <myBody>laser_body</myBody>
-      </attach>
-
-      <include embedded="true">
-        <xi:include href="models/sicklms200.model" />
-      </include>
-    </model:physical>
-
-
-    <!-- 
-    The include should be last within a model. All previous statements
-    will override those in the included file 
-    -->
     <include embedded="true">
       <xi:include href="models/pioneer2dx.model" />
     </include>
@@ -171,6 +150,5 @@
       <attenuation>1000 1.0 0.0 0</attenuation>
     </light>
   </model:renderable>
-
 
 </gazebo:world>

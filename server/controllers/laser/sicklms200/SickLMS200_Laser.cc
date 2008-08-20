@@ -139,8 +139,8 @@ void SickLMS200_Laser::PutLaserData()
   double ra, rb, r, b;
   int v;
 
-  double maxAngle = this->myParent->GetMaxAngle();
-  double minAngle = this->myParent->GetMinAngle();
+  Angle maxAngle = this->myParent->GetMaxAngle();
+  Angle minAngle = this->myParent->GetMinAngle();
 
   double maxRange = this->myParent->GetMaxRange();
   double minRange = this->myParent->GetMinRange();
@@ -153,9 +153,9 @@ void SickLMS200_Laser::PutLaserData()
     this->laserIface->data->head.time = Simulator::Instance()->GetSimTime();
 
     // Read out the laser range data
-    this->laserIface->data->min_angle = minAngle;
-    this->laserIface->data->max_angle = maxAngle;
-    this->laserIface->data->res_angle = (maxAngle - minAngle) / (rangeCount - 1);
+    this->laserIface->data->min_angle = minAngle.GetAsRadian();
+    this->laserIface->data->max_angle = maxAngle.GetAsRadian();
+    this->laserIface->data->res_angle = (maxAngle.GetAsRadian() - minAngle.GetAsRadian()) / (rangeCount - 1);
     this->laserIface->data->res_range = 0.1;
     this->laserIface->data->max_range = maxRange;
     this->laserIface->data->range_count = rangeCount;
@@ -205,13 +205,11 @@ void SickLMS200_Laser::PutFiducialData()
   double r, b;
   double ax, ay, bx, by, cx, cy;
 
-  double maxAngle = this->myParent->GetMaxAngle();
-  double minAngle = this->myParent->GetMinAngle();
+  Angle maxAngle = this->myParent->GetMaxAngle();
+  Angle minAngle = this->myParent->GetMinAngle();
 
-  double maxRange = this->myParent->GetMaxRange();
   double minRange = this->myParent->GetMinRange();
   int rayCount = this->myParent->GetRayCount();
-  int rangeCount = this->myParent->GetRangeCount();
 
   if (this->fiducialIface->Lock(1))
   {
@@ -238,12 +236,12 @@ void SickLMS200_Laser::PutFiducialData()
       if (j - i + 1 >= 3)
       {
         r = minRange + this->myParent->GetRange(i);
-        b = minAngle + i * ((maxAngle-minAngle) / (rayCount - 1));
+        b = minAngle.GetAsRadian() + i * ((maxAngle-minAngle).GetAsRadian() / (rayCount - 1));
         ax = r * cos(b);
         ay = r * sin(b);
 
         r = minRange + this->myParent->GetRange(j);
-        b = minAngle + j * ((maxAngle-minAngle) / (rayCount - 1));
+        b = minAngle.GetAsRadian() + j * ((maxAngle-minAngle).GetAsRadian() / (rayCount - 1));
         bx = r * cos(b);
         by = r * sin(b);
 
@@ -263,12 +261,12 @@ void SickLMS200_Laser::PutFiducialData()
       else
       {
         r = minRange + this->myParent->GetRange(i);
-        b = minAngle + i * ((maxAngle-minAngle) / (rayCount - 1));
+        b = minAngle.GetAsRadian() + i * ((maxAngle-minAngle).GetAsRadian() / (rayCount - 1));
         ax = r * cos(b);
         ay = r * sin(b);
 
         r = minRange + this->myParent->GetRange(j);
-        b = minAngle + j * ((maxAngle-minAngle) / (rayCount - 1));
+        b = minAngle.GetAsRadian() + j * ((maxAngle-minAngle).GetAsRadian() / (rayCount - 1));
         bx = r * cos(b);
         by = r * sin(b);
 

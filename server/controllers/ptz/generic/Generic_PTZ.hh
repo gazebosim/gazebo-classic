@@ -28,6 +28,7 @@
 #ifndef GENERIC_PTZ_HH
 #define GENERIC_PTZ_HH
 
+#include "Param.hh"
 #include "Controller.hh"
 
 namespace gazebo
@@ -71,7 +72,11 @@ namespace gazebo
     /// \brief Load the controller
     /// \param node XML config node
     protected: virtual void LoadChild(XMLConfigNode *node);
-  
+
+    /// \brief Save the controller.
+    /// \stream Output stream
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
     /// \brief Init the controller
     protected: virtual void InitChild();
   
@@ -99,10 +104,14 @@ namespace gazebo
     /// Tilt joint
     private: HingeJoint *tiltJoint;
 
-    private: float motionGain;
-    private: float force;
     private: float cmdTilt;
     private: float cmdPan;
+
+    private: Param<double> *motionGainP;
+    private: Param<double> *forceP;
+
+    private: Param<std::string> *panJointNameP;
+    private: Param<std::string> *tiltJointNameP;
   };
   
   /** /} */

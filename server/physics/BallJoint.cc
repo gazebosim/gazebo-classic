@@ -34,6 +34,7 @@ using namespace gazebo;
 BallJoint::BallJoint(dWorldID worldId)
     : Joint()
 {
+  this->type = BALL;
   this->jointId = dJointCreateBall(worldId, NULL);
 }
 
@@ -47,6 +48,12 @@ BallJoint::~BallJoint()
 //////////////////////////////////////////////////////////////////////////////
 /// Load the joint
 void BallJoint::LoadChild(XMLConfigNode * /*node*/)
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Save a joint to a stream in XML format
+void BallJoint::SaveChild(std::string &prefix, std::ostream &stream)
 {
 }
 

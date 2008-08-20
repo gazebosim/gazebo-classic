@@ -55,6 +55,12 @@ Bandit_Actarray::Bandit_Actarray(Entity *parent )
 // Destructor
 Bandit_Actarray::~Bandit_Actarray()
 {
+  for (int i=0; i<16; i++)
+  {
+    GZ_DELETE(this->jointNamesP[i]);
+    GZ_DELETE(this->forcesP[i]);
+    GZ_DELETE(this->gainsP[i]);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,13 +77,31 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
 
   for (i=0, jNode = node->GetChild("joint"); jNode; i++)
   {
-    std::string name = jNode->GetString("name","",1);
+    this->jointNamesP[i] = new Param<std::string>("name","",1);
+    this->jointNamesP[i]->Load(jNode);
 
-    this->joints[i] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(name));
-    this->forces[i] = jNode->GetDouble("force",0.0,1);
-    this->gains[i] = jNode->GetDouble("gain",0.0,1);
+    this->forcesP[i] = new Param<float>("force",0.0,1);
+    this->forcesP[i]->Load(jNode);
+
+    this->gainsP[i] = new Param<float>("gain",0.0,1);
+    this->gainsP[i]->Load(jNode);
+   
+    this->joints[i] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->jointNamesP[i]->GetValue()));
 
     jNode = jNode->GetNext("joint");
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the controller.
+void Bandit_Actarray::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  for (int i=0; i<16; i++)
+  {
+    stream << prefix << "<joint name=\"" << this->jointNamesP[i]->GetValue() << "\">\n";
+    stream << prefix << "  " << *(this->forcesP[i]) << "\n";
+    stream << prefix << "  " << *(this->gainsP[i]) << "\n";
+    stream << prefix << "</joint>\n";
   }
 }
 
@@ -88,7 +112,7 @@ void Bandit_Actarray::InitChild()
   for (int i=0; i<16; i++)
   {
     this->joints[i]->SetParam( dParamVel, 0.0);
-    this->joints[i]->SetParam( dParamFMax, this->forces[i] );
+    this->joints[i]->SetParam( dParamFMax, **(this->forcesP[i]) );
   }
 }
 
@@ -126,14 +150,14 @@ void Bandit_Actarray::UpdateChild()
 
       if (fabs(angle) > 0.01)
       {
-        joint->SetParam( dParamVel, this->gains[i] * angle);
-        joint->SetParam( dParamFMax, this->forces[i] );
+        joint->SetParam( dParamVel, **(this->gainsP[i]) * angle);
+        joint->SetParam( dParamFMax, **(this->forcesP[i]) );
       }
     }
     else if (this->myIface->data->joint_mode[i] == GAZEBO_ACTARRAY_JOINT_SPEED_MODE)
     {
       joint->SetParam( dParamVel, cmdSpeed );
-      joint->SetParam( dParamFMax, this->forces[i] );
+      joint->SetParam( dParamFMax, **(this->forcesP[i]) );
     }
 
 

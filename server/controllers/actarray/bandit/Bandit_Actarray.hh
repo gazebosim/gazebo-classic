@@ -27,6 +27,7 @@
 #ifndef BANDIT_ACTARRAY_HH
 #define BANDIT_ACTARRAY_HH
 
+#include "Param.hh"
 #include "Controller.hh"
 #include "Entity.hh"
 
@@ -67,6 +68,10 @@ class Bandit_Actarray : public Controller
   /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode *node);
 
+  /// \brief Save the controller.
+  /// \stream Output stream
+  protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
   /// Init the controller
   /// \return 0 on success
   protected: virtual void InitChild();
@@ -85,9 +90,10 @@ class Bandit_Actarray : public Controller
   /// The parent Model
   private: Model *myParent;
 
+  private: Param<std::string> *jointNamesP[16];
   private: HingeJoint *joints[16];
-  private: float forces[16];
-  private: float gains[16];
+  private: Param<float> *forcesP[16];
+  private: Param<float> *gainsP[16];
 
 };
 

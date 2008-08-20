@@ -67,12 +67,8 @@ ODEPhysics::ODEPhysics()
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId, 0.01);
 
-  this->gravity.x = 0;
-  this->gravity.y = 0;
-  this->gravity.z = -9.80665;
-
-  this->stepTime = 0.025;
-  this->updateRate = 0.0;
+  this->globalCFMP = new Param<double>("cfm", 10e-5, 0);
+  this->globalERPP = new Param<double>("erp", 0.2, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +83,9 @@ ODEPhysics::~ODEPhysics()
 
   this->spaceId = NULL;
   this->worldId = NULL;
+
+  delete this->globalCFMP;
+  delete this->globalERPP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,35 +96,34 @@ void ODEPhysics::Load(XMLConfigNode *node)
   if (cnode == NULL)
     gzthrow("Must define a <physics:ode> node in the XML file");
 
-  this->gravity = cnode->GetVector3("gravity",this->gravity);
-  this->stepTime = cnode->GetDouble("stepTime",this->stepTime);
-  this->updateRate = cnode->GetDouble("maxUpdateRate", 0, 0);
-  this->globalCFM = cnode->GetDouble("cfm",10e-5,0);
-  this->globalERP = cnode->GetDouble("erp",0.2,0);
+  this->gravityP->Load(cnode);
+  this->stepTimeP->Load(cnode);
+  this->updateRateP->Load(cnode);
+  this->globalCFMP->Load(cnode);
+  this->globalERPP->Load(cnode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the ODE engine
-void ODEPhysics::Save(XMLConfigNode *node)
+void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
 {
-  /*XMLConfigNode *cnode = node->GetChild("ode");
-  if (cnode == NULL)
-    gzthrow("No <physics:ode> node in the XML, can't write back the data");
-
-  cnode->SetValue("gravity", this->gravity);
-  cnode->SetValue("stepTime", this->stepTime);
-  cnode->SetValue("cfm", this->globalCFM);
-  cnode->SetValue("erp", this->globalERP);
-  */
+  stream << prefix << "<physics:ode>\n";
+  stream << prefix << "  " << *(this->gravityP) << "\n";
+  stream << prefix << "  " << *(this->stepTimeP) << "\n";
+  stream << prefix << "  " << *(this->updateRateP) << "\n";
+  stream << prefix << "  " << *(this->globalCFMP) << "\n";
+  stream << prefix << "  " << *(this->globalERPP) << "\n";
+  stream << prefix << "</physics:ode>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the ODE engine
 void ODEPhysics::Init()
 {
-  dWorldSetGravity(this->worldId, this->gravity.x, this->gravity.y, this->gravity.z);
-  dWorldSetCFM(this->worldId, this->globalCFM);
-  dWorldSetERP(this->worldId, this->globalERP);
+  Vector3 g = this->gravityP->GetValue();
+  dWorldSetGravity(this->worldId, g.x, g.y, g.z);
+  dWorldSetCFM(this->worldId, this->globalCFMP->GetValue());
+  dWorldSetERP(this->worldId, this->globalERPP->GetValue());
 
 }
 
@@ -137,7 +135,7 @@ void ODEPhysics::Update()
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
   // Update the dynamical model
-  dWorldStep( this->worldId, this->stepTime );
+  dWorldStep( this->worldId, this->stepTimeP->GetValue() );
   //dWorldQuickStep(this->worldId, this->stepTime);
 
   // Very important to clear out the contact group
@@ -264,7 +262,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
         // Compute the CFM and ERP by assuming the two bodies form a
         // spring-damper system.
-        h = self->stepTime;
+        h = self->stepTimeP->GetValue();
         kp = 1 / (1 / geom1->contact->kp + 1 / geom2->contact->kp);
         kd = geom1->contact->kd + geom2->contact->kd;
         contact.surface.soft_erp = h * kp / (h * kp + kd);

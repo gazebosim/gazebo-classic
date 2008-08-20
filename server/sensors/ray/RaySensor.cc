@@ -37,7 +37,7 @@
 #include "GazeboError.hh"
 #include "ODEPhysics.hh"
 #include "XMLConfig.hh"
-
+#include "Controller.hh"
 #include "RaySensor.hh"
 
 #include "Vector3.hh"
@@ -52,6 +52,15 @@ RaySensor::RaySensor(Body *body)
     : Sensor(body)
 {
   this->active = false;
+
+  this->rayCountP = new Param<int>("rayCount",0,1);
+  this->rangeCountP = new Param<int>("rangeCount",0,1);
+  this->minAngleP = new Param<Angle>("minAngle",DTOR(-90),1);
+  this->maxAngleP = new Param<Angle>("maxAngle",DTOR(-90),1);
+  this->minRangeP = new Param<double>("minRange",0,1);
+  this->maxRangeP = new Param<double>("maxRange",0,1);
+  this->originP = new Param<Vector3>("origin", Vector3(0,0,0), 0);
+  this->displayRaysP = new Param<bool>("displayRays", true, 0);
 }
 
 
@@ -59,6 +68,14 @@ RaySensor::RaySensor(Body *body)
 // Destructor
 RaySensor::~RaySensor()
 {
+  delete this->rayCountP;
+  delete this->rangeCountP;
+  delete this->minAngleP;
+  delete this->maxAngleP;
+  delete this->minRangeP;
+  delete this->maxRangeP;
+  delete this->originP;
+  delete this->displayRaysP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -70,16 +87,15 @@ void RaySensor::LoadChild(XMLConfigNode *node)
     gzthrow("Null body in the ray sensor");
   }
 
-  this->rayCount = node->GetInt("rayCount",0,1);
-  this->rangeCount = node->GetInt("rangeCount",0,1);
-  this->minAngle = DTOR(node->GetDouble("minAngle",-90,1));
-  this->maxAngle = DTOR(node->GetDouble("maxAngle",90,1));
-  this->minRange = node->GetDouble("minRange",0,1);
-  this->maxRange = node->GetDouble("maxRange",8,1);
+  this->rayCountP->Load(node);
+  this->rangeCountP->Load(node);
+  this->minAngleP->Load(node);
+  this->maxAngleP->Load(node);
+  this->minRangeP->Load(node);
+  this->maxRangeP->Load(node);
+  this->originP->Load(node);
+  this->displayRaysP->Load(node);
 
-  this->origin = node->GetVector3("origin", Vector3(0,0,0));
-
-  this->displayRays = node->GetBool("displayRays", true);
 
   // Create a space to contain the ray space
   this->superSpaceId = dSimpleSpaceCreate( 0 );
@@ -97,6 +113,27 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// Save the sensor info in XML format
+void RaySensor::Save(std::string &prefix, std::ostream &stream)
+{
+  std::string p = prefix + "  ";
+  stream << prefix << "<sensor:ray name=\"" << this->nameP->GetValue() << "\">\n";
+  stream << prefix << "  " << *(this->minAngleP) << "\n";
+  stream << prefix << "  " << *(this->maxAngleP) << "\n";
+  stream << prefix << "  " << *(this->minRangeP) << "\n";
+  stream << prefix << "  " << *(this->maxRangeP) << "\n";
+  stream << prefix << "  " << *(this->originP) << "\n";
+  stream << prefix << "  " << *(this->rayCountP) << "\n";
+  stream << prefix << "  " << *(this->rangeCountP) << "\n";
+  stream << prefix << "  " << *(this->displayRaysP) << "\n";
+
+  if (this->controller)
+    this->controller->Save(p, stream);
+
+  stream << prefix << "</sensor:ray>\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Init the ray
 void RaySensor::InitChild()
 {
@@ -109,17 +146,19 @@ void RaySensor::InitChild()
   this->prevPose = bodyPose;
 
   // Create and array of ray geoms
-  for (int i = 0; i < this->rayCount; i++)
+  for (int i = 0; i < this->rayCountP->GetValue(); i++)
   //for (int i = this->rayCount-1; i >= 0; i--)
   {
-    angle = i * (this->maxAngle - this->minAngle) / (rayCount - 1) + this->minAngle;
+    double diff = (**(this->maxAngleP) - **(this->minAngleP)).GetAsRadian();
+
+    angle = i * diff / (rayCountP->GetValue() - 1) + (**(this->minAngleP)).GetAsRadian();
 
     axis.Set(cos(angle), sin(angle),0);
 
-    start = (axis * this->minRange) + this->origin;
-    end = (axis * this->maxRange) + this->origin;
+    start = (axis * this->minRangeP->GetValue()) + this->originP->GetValue();
+    end = (axis * this->maxRangeP->GetValue()) + this->originP->GetValue();
 
-    ray = new RayGeom(this->body, displayRays);
+    ray = new RayGeom(this->body, displayRaysP->GetValue());
 
     ray->SetPoints(start, end);
 //    ray->SetCategoryBits( GZ_LASER_COLLIDE );
@@ -146,44 +185,44 @@ void RaySensor::FiniChild()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum angle
-double RaySensor::GetMinAngle() const
+Angle RaySensor::GetMinAngle() const
 {
-  return this->minAngle;
+  return **(this->minAngleP);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the maximum angle
-double RaySensor::GetMaxAngle() const
+Angle RaySensor::GetMaxAngle() const
 {
-  return this->maxAngle;
+  return **(this->maxAngleP);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum range
 double RaySensor::GetMinRange() const
 {
-  return this->minRange;
+  return this->minRangeP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Get the maximum range
 double RaySensor::GetMaxRange() const
 {
-  return this->maxRange;
+  return this->maxRangeP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the ray count
 int RaySensor::GetRayCount() const
 {
-  return this->rayCount;
+  return this->rayCountP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the range count
 int RaySensor::GetRangeCount() const
 {
-  return this->rangeCount;
+  return this->rangeCountP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -251,7 +290,7 @@ void RaySensor::UpdateChild()
     // redrawn)
     for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
     {
-      (*iter)->SetLength( this->maxRange );
+      (*iter)->SetLength( this->maxRangeP->GetValue() );
       (*iter)->SetRetro( 0.0 );
       (*iter)->SetFiducial( -1 );
 

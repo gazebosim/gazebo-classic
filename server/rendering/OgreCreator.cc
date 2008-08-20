@@ -74,19 +74,15 @@ void OgreCreator::LoadBasicShapes()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
-void OgreCreator::CreatePlane(XMLConfigNode *node, OgreVisual *parent)
+void OgreCreator::CreatePlane(const Vector3 &normal, const Vector2<double> &size, const Vector2<double> &segments, const Vector2<double> &uvTile, const std::string &material, bool castShadows, OgreVisual *parent)
 {
-  Vector3 normal = node->GetVector3("normal",Vector3(0,1,0));
-  Vector2<double> size = node->GetVector2d("size",Vector2<double>(1000, 1000));
-  Vector2<double> segments = node->GetVector2d("segments",Vector2<double>(10, 10));
-  Vector2<double> uvTile = node->GetVector2d("uvTile",Vector2<double>(1, 1));
-  std::string material=node->GetString("material","",1);
+  Vector3 n = normal;
 
+  n.Normalize();
+  Vector3 perp = n.GetPerpendicular();
 
-  normal.Normalize();
-  Vector3 perp = normal.GetPerpendicular();
+  Ogre::Plane plane(Ogre::Vector3(n.x, n.y, n.z), 0);
 
-  Ogre::Plane plane(Ogre::Vector3(normal.x, normal.y, normal.z), 0);
 //FIXME: only one plane per parent
 //TODO:names and parents
   Ogre::MeshManager::getSingleton().createPlane(parent->GetName() + "_PLANE",
@@ -97,12 +93,10 @@ void OgreCreator::CreatePlane(XMLConfigNode *node, OgreVisual *parent)
       uvTile.x, uvTile.y,
       Ogre::Vector3(perp.x, perp.y, perp.z));
   
-  //OgreVisual *visual = new OgreVisual(parent);
   parent->AttachMesh(parent->GetName() + "_PLANE");
   parent->SetMaterial(material);
-  parent->SetCastShadows(node->GetBool("castShadows",true,0));
 
-  //return visual;
+  parent->SetCastShadows(castShadows);
 }
 
 
@@ -110,7 +104,7 @@ void OgreCreator::CreatePlane(XMLConfigNode *node, OgreVisual *parent)
 /// Create a light source and attach it to the visual node
 /// Note that the properties here are not modified afterwards and thus, 
 /// we don't need a Light class. 
-void OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
+std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
 {
   Vector3 vec;
   double range,constant,linear,quad;
@@ -178,12 +172,64 @@ void OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
   if (lightType == "spot")
   {
     vec = node->GetVector3("range", Vector3(5.0, 10.0, 1.0));
-    light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
+    light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), 
+        Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
   }
 
   parent->AttachObject(light);
+
+  return stream.str();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Save a light's information in xml format
+void OgreCreator::SaveLight(const std::string &prefix, 
+                           const std::string lightName, std::ostream &stream)
+{
+  Ogre::Light *light = NULL;
+  std::string type;
+
+  if (!OgreAdaptor::Instance()->sceneMgr->hasLight(lightName))
+  {
+    gzerr(0) << "Unknown light[" << lightName << "]\n";
+    return;
+  }
+
+  light = OgreAdaptor::Instance()->sceneMgr->getLight(lightName);
+
+  if (light->getType() == Ogre::Light::LT_POINT)
+    type = "point";
+  else if (light->getType() == Ogre::Light::LT_DIRECTIONAL)
+    type = "directional";
+  else 
+    type = "spot";
+
+  Ogre::ColourValue diffuseColor = light->getDiffuseColour();
+  Ogre::ColourValue specularColor = light->getDiffuseColour();
+  Ogre::Vector3 dir = light->getDirection();
+  Ogre::Real attRange = light->getAttenuationRange();
+  Ogre::Real attConst = light->getAttenuationConstant();
+  Ogre::Real attLinear = light->getAttenuationLinear();
+  Ogre::Real attQuadric = light->getAttenuationQuadric();
+
+  stream << prefix << "<light>\n";
+  stream << prefix << "  <type>" << type << "</type>\n";
+
+  stream << prefix << "  <direction>" << dir.x << " " << dir.y << " " 
+         << dir.z << "</direction>\n";
+
+  stream << prefix << "  <diffuseColor>" << diffuseColor.r << " " 
+         << diffuseColor.g << " " << diffuseColor.b << " " << diffuseColor.a 
+         << "</diffuseColor>\n";
+
+  stream << prefix << "  <specularColor>" << specularColor.r << " " 
+         << specularColor.g << " " << specularColor.b << " "
+         << specularColor.a << "</specularColor>\n";
+
+  stream << prefix << "  <attenuation>" << attRange << " " << attConst 
+         << " " << attLinear << " " << attQuadric << "</attenuation>\n";
+  stream << prefix << "</light>\n";
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -256,12 +302,12 @@ void OgreCreator::CreateFog(XMLConfigNode *cnode)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OgreCreator::SaveFog(XMLConfigNode *node)
+void OgreCreator::SaveFog(std::string &prefix, std::ostream &stream)
 {
-  /*Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
+  Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
   Ogre::Real start = OgreAdaptor::Instance()->sceneMgr->getFogStart();
   Ogre::Real end = OgreAdaptor::Instance()->sceneMgr->getFogEnd();
-  //Ogre::Real density = OgreAdaptor::Instance()->sceneMgr->getFogDensity();
+  Ogre::Real density = OgreAdaptor::Instance()->sceneMgr->getFogDensity();
   std::string fogMode="";
 
   switch (OgreAdaptor::Instance()->sceneMgr->getFogMode())
@@ -280,47 +326,44 @@ void OgreCreator::SaveFog(XMLConfigNode *node)
       fogMode="none";
       break;
   }
-  node->SetValue("type", fogMode);
-  node->SetValue("color", &color);
-  node->SetValue("linearStart", start);
-  node->SetValue("linearEnd", end);
-  //node->SetValue("density", density);
 
-  */
+  stream << prefix << "  <fog>\n";
+  stream << prefix << "    <type>" << fogMode << "</type>\n";
+  stream << prefix << "    <color>" << color.r << " " << color.g << " " << color.b << " " << color.a << "</color>\n";
+  stream << prefix << "    <linearStart>" << start << "</linearStart>\n";
+  stream << prefix << "    <linearEnd>" << end << "</linearEnd>\n";
+  stream << prefix << "    <density>" << density << "</density>\n";
+  stream << prefix << "  </fog>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a sky
-void OgreCreator::CreateSky(XMLConfigNode *cnode)
+void OgreCreator::CreateSky(std::string material)
 {
-  if (cnode)
+  if (!material.empty())
   {
-    std::string material = cnode->GetString("material","",1);
-    if (!material.empty())
+    try
     {
-      try
-      {
-        /*if (node->GetChild("fog"))
+      /*if (node->GetChild("fog"))
         {
-          Ogre::Plane plane;
-          plane.d = 49;
-          plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Z;
-          OgreAdaptor::Instance()->sceneMgr->setSkyPlane(true, plane, material, 500, 100, true, 0.5, 150, 150);
+        Ogre::Plane plane;
+        plane.d = 49;
+        plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Z;
+        OgreAdaptor::Instance()->sceneMgr->setSkyPlane(true, plane, material, 500, 100, true, 0.5, 150, 150);
         }
         else
         {*/
-          Ogre::Quaternion orientation;
-          orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
-          OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
-        //}
-
-      }
-      catch (int)
-      {
-        gzmsg(0) << "Unable to set sky dome to material[" << material << "]\n";
-      }
+      Ogre::Quaternion orientation;
+      orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
+      OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
+      //}
 
     }
+    catch (int)
+    {
+      gzmsg(0) << "Unable to set sky dome to material[" << material << "]\n";
+    }
+
   }
 }
 

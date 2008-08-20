@@ -40,12 +40,28 @@ using namespace gazebo;
 PlaneGeom::PlaneGeom(Body *body)
     : Geom(body)
 {
+  this->normalP = new Param<Vector3>("normal",Vector3(0,0,1),0);
+  this->sizeP = new Param<Vector2<double> >("size",
+      Vector2<double>(1000, 1000), 0);
+  this->segmentsP = new Param<Vector2<double> >("segments",
+      Vector2<double>(10, 10), 0);
+  this->uvTileP = new Param<Vector2<double> >("uvTile",
+      Vector2<double>(1, 1), 0);
+  this->materialP = new Param<std::string>("material","",1);
+  this->castShadowsP = new Param<bool>("castShadows", false, 0);
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
 PlaneGeom::~PlaneGeom()
 {
+  delete this->normalP;
+  delete this->sizeP;
+  delete this->segmentsP;
+  delete this->uvTileP;
+  delete this->materialP;
+  delete this->castShadowsP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -67,16 +83,35 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
   Vector3 perp;
 
   double altitude = 0;
-  Vector3 normal = node->GetVector3("normal",Vector3(0,0,1));
 
-  OgreCreator::CreatePlane(node,this->GetVisualNode());
+  this->normalP->Load(node);
+  this->sizeP->Load(node);
+  this->segmentsP->Load(node);
+  this->uvTileP->Load(node);
+  this->materialP->Load(node);
+  this->castShadowsP->Load(node);
 
-  this->SetGeom(dCreatePlane(this->spaceId, normal.x, normal.y, normal.z, altitude),false);
+  OgreCreator::CreatePlane(**(this->normalP), **(this->sizeP), 
+      **(this->segmentsP), **(this->uvTileP), **(this->materialP),
+      **(this->castShadowsP), this->GetVisualNode());
+
+  this->SetGeom(dCreatePlane(this->spaceId, this->normalP->GetValue().x, 
+        this->normalP->GetValue().y, this->normalP->GetValue().z, altitude),false);
 
   this->contact->kp = dInfinity;
   this->contact->kd = 0;
   this->contact->mu1 = dInfinity;
   this->contact->mu2 = dInfinity;
-
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/// Save child parameters
+void PlaneGeom::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->normalP) << "\n";
+  stream << prefix << *(this->sizeP) << "\n";
+  stream << prefix << *(this->segmentsP) << "\n";
+  stream << prefix << *(this->uvTileP) << "\n";
+  stream << prefix << *(this->materialP) << "\n";
+  stream << prefix << *(this->castShadowsP) << "\n";
+}

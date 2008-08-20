@@ -34,7 +34,12 @@ using namespace gazebo;
 SliderJoint::SliderJoint( dWorldID worldId )
     : Joint()
 {
+  this->type = SLIDER;
   this->jointId = dJointCreateSlider( worldId, NULL );
+
+  this->axisP = new Param<Vector3>("axis",Vector3(0,0,1), 0);
+  this->loStopP = new Param<double>("lowStop",-DBL_MAX,0);
+  this->hiStopP = new Param<double>("highStop",DBL_MAX,0);
 }
 
 
@@ -42,22 +47,35 @@ SliderJoint::SliderJoint( dWorldID worldId )
 // Destructor
 SliderJoint::~SliderJoint()
 {
+  delete this->axisP;
+  delete this->loStopP;
+  delete this->hiStopP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the joint
 void SliderJoint::LoadChild(XMLConfigNode *node)
 {
-  this->SetAxis(node->GetVector3("axis",Vector3(0,0,1)));
+  this->axisP->Load(node);
+  this->loStopP->Load(node);
+  this->hiStopP->Load(node);
 
-  double lowStop = node->GetDouble("lowStop",-DBL_MAX,0);
-  double hiStop = node->GetDouble("highStop",DBL_MAX,0);
+  this->SetAxis(**(this->axisP));
 
   // Perform this three step ordering to ensure the parameters are set
   // properly. This is taken from the ODE wiki.
-  this->SetParam(dParamHiStop, hiStop);
-  this->SetParam(dParamLoStop, lowStop);
-  this->SetParam(dParamHiStop, hiStop);
+  this->SetParam(dParamHiStop, **(this->hiStopP));
+  this->SetParam(dParamLoStop, **(this->loStopP));
+  this->SetParam(dParamHiStop, **(this->hiStopP));
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Save a joint to a stream in XML format
+void SliderJoint::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->axisP) << "\n";
+  stream << prefix << *(this->loStopP) << "\n";
+  stream << prefix << *(this->hiStopP) << "\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -35,29 +35,35 @@ using namespace gazebo;
 CylinderGeom::CylinderGeom(Body *body)
     : Geom(body)
 {
+  this->sizeP = new Param<Vector2<double> >("size", Vector2<double>(1.0,1.0), 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
 CylinderGeom::~CylinderGeom()
 {
+  delete this->sizeP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the cylinder
 void CylinderGeom::LoadChild(XMLConfigNode *node)
 {
-  double radius = node->GetTupleDouble("size",0,1.0);
-  double length = node->GetTupleDouble("size",1,1.0);
+  this->sizeP->Load(node);
 
   // Initialize mass matrix
-  dMassSetCylinderTotal(&this->mass, this->dblMass, 3, radius, length);
+  dMassSetCylinderTotal(&this->mass, this->massP->GetValue(), 3, 
+      this->sizeP->GetValue().x, this->sizeP->GetValue().y);
 
-  this->SetGeom( dCreateCylinder( 0, radius, length ), true );
+  this->SetGeom( dCreateCylinder( 0, this->sizeP->GetValue().x, 
+        this->sizeP->GetValue().y ), true );
 
-  //to be able to show physics
-  /*this->visualNode->AttachMesh("unit_cylinder");
-  this->visualNode->SetScale(Vector3(radius*2, radius*2 ,length));
-  this->visualNode->SetMaterial("Gazebo/GreenEmissive");
-  */
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Save child parameters
+void CylinderGeom::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->sizeP) << "\n";
+}
+

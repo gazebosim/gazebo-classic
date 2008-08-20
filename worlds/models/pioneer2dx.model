@@ -76,7 +76,7 @@
 
     <visual>
       <rpy>-90 0 0</rpy>
-      <size>0.073 0.05 0.073 </size>
+      <size>0.073 0.05 0.073</size>
       <mesh>Pioneer2at/wheel.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
@@ -88,6 +88,7 @@
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
+    
 
   </geom:cylinder>
 </body:cylinder>
@@ -95,6 +96,7 @@
 <body:cylinder name="right_wheel">
   <xyz>0.1 0.17 -0.0725</xyz>
   <rpy>0 90 90</rpy>
+
   <geom:cylinder name="right_wheel_geom">
     <size>0.075 0.05</size>
     <mass>0.1</mass>
@@ -102,14 +104,14 @@
 
     <visual>
       <rpy>-90 0 0</rpy>
-      <size>0.125 0.05 0.125 </size>
+      <size>0.125 0.05 0.125</size>
       <mesh>Pioneer2dx/tire.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
 
     <visual>
       <rpy>-90 0 0</rpy>
-      <size>0.073 0.05 0.073 </size>
+      <size>0.073 0.05 0.073</size>
       <mesh>Pioneer2at/wheel.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
@@ -117,7 +119,7 @@
     <visual>
       <rpy>0 0 0</rpy>
       <xyz>0 0 -0.015</xyz>
-      <size>0.04 0.04 0.08 </size>
+      <size>0.04 0.04 0.08</size>
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>

@@ -37,6 +37,7 @@ using namespace gazebo;
 BoxGeom::BoxGeom(Body *body)
     : Geom(body)
 {
+  this->sizeP = new Param<Vector3>("size",Vector3(1,1,1),1);
 }
 
 
@@ -44,34 +45,49 @@ BoxGeom::BoxGeom(Body *body)
 // Destructor
 BoxGeom::~BoxGeom()
 {
+  delete this->sizeP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the box
 void BoxGeom::LoadChild(XMLConfigNode *node)
 {
-  Vector3 size;
-
-  size = node->GetVector3("size",Vector3(1,1,1));
+  this->sizeP->Load(node);
 
   // Initialize box mass matrix
-  dMassSetBoxTotal(&this->mass, this->dblMass, size.x, size.y, size.z);
+  dMassSetBoxTotal(&this->mass, this->massP->GetValue(),
+      this->sizeP->GetValue().x,
+      this->sizeP->GetValue().y,
+      this->sizeP->GetValue().z);
 
   // Create a box geometry with box mass matrix
-  this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
-  /*  this->visualNode->AttachMesh("unit_box");
-    this->visualNode->SetScale(size);
-    this->visualNode->SetMaterial("Gazebo/GreenEmissive");
-    */
+  this->SetGeom(dCreateBox( 0, this->sizeP->GetValue().x, 
+                            this->sizeP->GetValue().y,
+                            this->sizeP->GetValue().z), true );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the size of the box
 void BoxGeom::SetSize( Vector3 size )
 {
+
+  this->sizeP->SetValue( size );
+
   // Initialize box mass matrix
-  dMassSetBoxTotal(&this->mass, this->dblMass, size.x, size.y, size.z);
+  dMassSetBoxTotal(&this->mass, this->massP->GetValue(), 
+      this->sizeP->GetValue().x, this->sizeP->GetValue().y, 
+      this->sizeP->GetValue().z);
+
 
   // Create a box geometry with box mass matrix
-  this->SetGeom(dCreateBox( 0, size.x, size.y, size.z), true );
+  this->SetGeom(dCreateBox( 0, this->sizeP->GetValue().x, 
+                            this->sizeP->GetValue().y,
+                            this->sizeP->GetValue().z), true );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Save the box parameters
+void BoxGeom::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->sizeP) << "\n";
 }

@@ -206,6 +206,7 @@ int Simulator::Init()
   //Initialize the world
   if (gazebo::World::Instance()->Init() != 0)
     return -1;
+
   return 0;
 }
 
@@ -213,18 +214,54 @@ int Simulator::Init()
 /// Save the world configuration file
 void Simulator::Save(const std::string& filename)
 {
-  // Saving in the preferred order
-  XMLConfigNode* root=xmlFile->GetRootNode();
-  GazeboMessage::Instance()->Save(root);
-  World::Instance()->GetPhysicsEngine()->Save(root);
-  this->GetRenderEngine()->Save(root);
-  this->SaveGui(root);
-  World::Instance()->Save(root);
+  std::fstream output;
 
-  if (xmlFile->Save(filename)<0)
+  output.open(filename.c_str(), std::ios::out);
+
+  // Write out the xml header
+  output << "<?xml version=\"1.0\"?>\n";
+  output << "<gazebo:world\n\
+    xmlns:xi=\"http://www.w3.org/2001/XInclude\"\n\
+    xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\"\n\
+    xmlns:model=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#model\"\n\
+    xmlns:sensor=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor\"\n\
+    xmlns:window=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#window\"\n\
+    xmlns:param=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#param\"\n\
+    xmlns:body=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#body\"\n\
+    xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\"\n\
+    xmlns:joint=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#joint\"\n\
+    xmlns:interface=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#interface\"\n\
+    xmlns:ui=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#ui\"\n\
+    xmlns:rendering=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering\"\n\
+    xmlns:controller=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#controller\"\n\
+    xmlns:physics=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#physics\">\n\n";
+
+  std::string prefix = "  ";
+
+  if (output.is_open())
   {
-   gzthrow("The XML file could not be written back to " << filename );
-   }
+    GazeboMessage::Instance()->Save(prefix, output);
+    output << "\n";
+
+    World::Instance()->GetPhysicsEngine()->Save(prefix, output);
+    output << "\n";
+
+    this->GetRenderEngine()->Save(prefix, output);
+    output << "\n";
+
+    this->gui->Save(prefix, output);
+    output << "\n";
+
+    World::Instance()->Save(prefix, output);
+    output << "\n";
+
+    output << "</gazebo:world>\n";
+    output.close();
+  }
+  else
+  {
+    gzerr(0) << "Unable to save XML file to file[" << filename << "]\n";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -405,22 +442,6 @@ bool Simulator::GetUserStepInc() const
 void Simulator::SetUserStepInc(bool step)
 {
   this->userStepInc = step;
-}
-
-
-void Simulator::SaveGui(XMLConfigNode *node)
-{
-  /*Vector2<int> size;
-  XMLConfigNode* childNode = node->GetChild("gui");
-
-  if (childNode && this->gui)
-  {
-    size.x = this->gui->GetWidth();
-    size.y = this->gui->GetHeight();
-    //childNode->SetValue("size", size);
-    //TODO: node->SetValue("pos", Vector2<int>(x,y));
-  }*/
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

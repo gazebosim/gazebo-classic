@@ -32,32 +32,38 @@ using namespace gazebo;
 // Constructor
 PhysicsEngine::PhysicsEngine()
 {
+  this->gravityP = new Param<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
+  this->updateRateP = new Param<double>("maxUpdateRate", 0.0, 0);
+  this->stepTimeP = new Param<double>("stepTime",0.025,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
+  delete this->gravityP;
+  delete this->updateRateP;
+  delete this->stepTimeP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
 Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->gravity;
+  return this->gravityP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
 double PhysicsEngine::GetUpdateRate() const
 {
-  return this->updateRate;
+  return this->updateRateP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
 double PhysicsEngine::GetStepTime() const
 {
-  return this->stepTime;
+  return this->stepTimeP->GetValue();
 }
 

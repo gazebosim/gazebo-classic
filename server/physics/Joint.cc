@@ -39,6 +39,14 @@ Joint::Joint()
 {
   this->visual = NULL;
   this->model = NULL;
+
+  this->nameP = new Param<std::string>("name","",1);
+  this->erpP = new Param<double>("erp",0.4,0);
+  this->cfmP = new Param<double>("cfm",0.8,0);
+  this->body1NameP = new Param<std::string>("body1",std::string(),1);
+  this->body2NameP = new Param<std::string>("body2",std::string(),1);
+  this->anchorBodyNameP = new Param<std::string>("anchor",std::string(),0);
+  this->anchorOffsetP = new Param<Vector3>("anchorOffset",Vector3(0,0,0), 0);
 }
 
 
@@ -47,6 +55,13 @@ Joint::Joint()
 Joint::~Joint()
 {
   dJointDestroy( this->jointId );
+  delete this->nameP;
+  delete this->erpP;
+  delete this->cfmP;
+  delete this->body1NameP;
+  delete this->body2NameP;
+  delete this->anchorBodyNameP;
+  delete this->anchorOffsetP;
 }
 
 
@@ -62,22 +77,53 @@ Joint::Type Joint::GetType() const
 void Joint::Load(XMLConfigNode *node)
 {
   // Name the joint
-  this->SetName(node->GetString("name","",1));
-
+  this->nameP->Load(node);
   this->LoadChild(node);
 
+  this->body1NameP->Load(node);
+  this->body2NameP->Load(node);
+  this->anchorBodyNameP->Load(node);
+  this->anchorOffsetP->Load(node);
+
+  Body *body1 = this->model->GetBody( **(this->body1NameP));
+  Body *body2 = this->model->GetBody(**(this->body2NameP));
+  Body *anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
+
+  if (!body1)
+    gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
+
+  if (!body2)
+    gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
+
+  Vector3 anchorVec = anchorBody->GetPosition() + **(this->anchorOffsetP);
+
+  this->Attach(body1,body2);
+
+  // Set the anchor vector
+  if (anchorBody)
+  {
+    this->SetAnchor(anchorVec);
+    //joint->SetAnchor(anchorBody->GetPosition());
+  }
+  /*else
+  {
+    joint->SetAnchor(anchorVec);
+    this->bodies.erase(node->GetString("anchor",std::string(),0));
+  }*/
+
+
   // Set joint parameters
-  this->SetParam(dParamSuspensionERP, node->GetDouble("erp",0.4,0));
-  this->SetParam(dParamSuspensionCFM, node->GetDouble("cfm",0.8,0));
+  this->SetParam(dParamSuspensionERP, **(this->erpP));
+  this->SetParam(dParamSuspensionCFM, **(this->erpP));
 
   /// Add a renderable for the joint
   this->visual = new OgreVisual(this->model->GetVisualNode());
   this->visual->AttachMesh("joint_anchor");
   this->visual->SetVisible(false);
 
-
   this->line1 = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
   this->line2 = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
+
   this->line1->setMaterial("Gazebo/BlueEmissive");
   this->line2->setMaterial("Gazebo/BlueEmissive");
 
@@ -89,6 +135,36 @@ void Joint::Load(XMLConfigNode *node)
   this->line2->AddPoint(Vector3(0,0,0));
   this->line2->AddPoint(Vector3(0,0,0));
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save a joint to a stream in XML format
+void Joint::Save(std::string &prefix, std::ostream &stream)
+{
+  std::string typeName;
+
+  switch (this->type)
+  {
+    case SLIDER: typeName="slider"; break;
+    case HINGE: typeName = "hinge"; break;
+    case HINGE2: typeName = "hinge2"; break;
+    case BALL: typeName = "ball"; break;
+    case UNIVERSAL: typeName = "universal"; break;
+  }
+
+  stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
+  stream << prefix << "  " << *(this->body1NameP) << "\n";
+  stream << prefix << "  " << *(this->body2NameP) << "\n";
+  stream << prefix << "  " << *(this->anchorBodyNameP) << "\n";
+  stream << prefix << "  " << *(this->anchorOffsetP) << "\n";
+
+  stream << prefix << "  " << *(this->erpP) << "\n";
+  stream << prefix << "  " << *(this->cfmP) << "\n";
+
+  std::string p = prefix + "  ";
+  this->SaveChild(p,stream);
+
+  stream << prefix << "</joint:" << typeName << ">\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,14 +296,14 @@ void Joint::SetParam(int /*parameter*/, double /*value*/)
 /// Get the name of this joint
 std::string Joint::GetName() const
 {
-  return this->name;
+  return this->nameP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the name of this joint
 void Joint::SetName(const std::string &newName)
 {
-  this->name = newName;
+  this->nameP->SetValue(newName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

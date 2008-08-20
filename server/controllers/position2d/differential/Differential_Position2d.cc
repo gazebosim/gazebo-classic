@@ -59,12 +59,23 @@ Differential_Position2d::Differential_Position2d(Entity *parent )
   this->wheelSpeed[LEFT] = 0;
 
   this->prevUpdateTime = Simulator::Instance()->GetSimTime();
+
+  this->leftJointNameP = new Param<std::string>("leftJoint", "", 1);
+  this->rightJointNameP = new Param<std::string>("rightJoint", "", 1);
+  this->wheelSepP = new Param<float>("wheelSeparation", 0.34,1);
+  this->wheelDiamP = new Param<float>("wheelDiameter", 0.15,1);
+  this->torqueP = new Param<float>("torque", 10.0, 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Differential_Position2d::~Differential_Position2d()
 {
+  delete this->leftJointNameP;
+  delete this->rightJointNameP;
+  delete this->wheelSepP;
+  delete this->wheelDiamP;
+  delete this->torqueP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,15 +88,15 @@ void Differential_Position2d::LoadChild(XMLConfigNode *node)
     gzthrow("Differential_Position2d controller requires a PositionIface");
 
   // the defaults are from pioneer2dx
-  this->wheelSep = node->GetFloat("wheelSeparation", 0.34,1);
-  this->wheelDiam = node->GetFloat("wheelDiameter", 0.15,1);
-  this->torque = node->GetFloat("torque", 10.0, 1);
+  this->wheelSepP->Load(node);
+  this->wheelDiamP->Load(node);
+  this->torqueP->Load(node);
 
-  std::string leftJointName = node->GetString("leftJoint", "", 1);
-  std::string rightJointName = node->GetString("rightJoint", "", 1);
+  this->leftJointNameP->Load(node);
+  this->rightJointNameP->Load(node);
 
-  this->joints[LEFT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(leftJointName));
-  this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(rightJointName));
+  this->joints[LEFT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->leftJointNameP->GetValue()));
+  this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->rightJointNameP->GetValue()));
 
   if (!this->joints[LEFT])
     gzthrow("The controller couldn't get left hinge joint");
@@ -111,17 +122,18 @@ void Differential_Position2d::InitChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the controller
-void Differential_Position2d::SaveChild(XMLConfigNode *node)
+void Differential_Position2d::SaveChild(std::string &prefix, std::ostream &stream)
 {
-  /*node->SetValue("wheelSeparation",this->wheelSep);
-  node->SetValue("wheelDiameter",this->wheelDiam);
-  node->SetValue("torque",this->torque);
-//  node->SetValue("leftJoint",this->XMLData["leftJointName"]);
-//  node->SetValue("rightJoint",this->XMLData["rightJointName"]);
-*/
+  stream << prefix << *(this->leftJointNameP) << "\n";
+  stream << prefix << *(this->rightJointNameP) << "\n";
+  stream << prefix << *(this->torqueP) << "\n";
+  stream << prefix << *(this->wheelDiamP) << "\n";
+  stream << prefix << *(this->wheelSepP) << "\n";
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Reset
 void Differential_Position2d::ResetChild()
 {
   // Reset odometric pose
@@ -146,8 +158,8 @@ void Differential_Position2d::UpdateChild()
 
   this->GetPositionCmd();
 
-  wd = this->wheelDiam;
-  ws = this->wheelSep;
+  wd = **(this->wheelDiamP);
+  ws = **(this->wheelSepP);
 
 
   //stepTime = World::Instance()->GetPhysicsEngine()->GetStepTime();
@@ -174,12 +186,12 @@ void Differential_Position2d::UpdateChild()
   //if (this->enableMotors)
   {
     this->joints[LEFT]->SetParam( dParamVel,
-                                  this->wheelSpeed[LEFT] / this->wheelDiam * 2.0 );
+                                  this->wheelSpeed[LEFT] / **(this->wheelDiamP) * 2.0 );
 
     this->joints[RIGHT]->SetParam( dParamVel,
-                                   this->wheelSpeed[RIGHT] / this->wheelDiam * 2.0 );
-    this->joints[LEFT]->SetParam( dParamFMax, torque );
-    this->joints[RIGHT]->SetParam( dParamFMax, torque );
+                                   this->wheelSpeed[RIGHT] / **(this->wheelDiamP) * 2.0 );
+    this->joints[LEFT]->SetParam( dParamFMax, **(this->torqueP) );
+    this->joints[RIGHT]->SetParam( dParamFMax, **(this->torqueP) );
 
   }
   /*else
@@ -215,8 +227,8 @@ void Differential_Position2d::GetPositionCmd()
 
     this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
 
-    this->wheelSpeed[LEFT] = vr + va * this->wheelSep / 2;
-    this->wheelSpeed[RIGHT] = vr - va * this->wheelSep / 2;
+    this->wheelSpeed[LEFT] = vr + va * **(this->wheelSepP) / 2;
+    this->wheelSpeed[RIGHT] = vr - va * **(this->wheelSepP) / 2;
 
     this->myIface->Unlock();
   }

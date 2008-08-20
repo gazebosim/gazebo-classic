@@ -28,6 +28,7 @@
 #include <OgreImageCodec.h>
 #include <Ogre.h>
 
+#include "Controller.hh"
 #include "Global.hh"
 #include "World.hh"
 #include "GazeboError.hh"
@@ -65,7 +66,7 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
   this->LoadCam( node );
 
   // Do some sanity checks
-  if (this->imageWidth == 0 || this->imageHeight == 0)
+  if (this->imageWidthP->GetValue() == 0 || this->imageHeightP->GetValue() == 0)
   {
     gzthrow("image has zero size");
   }
@@ -80,11 +81,27 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
                           this->ogreTextureName,
                           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                           Ogre::TEX_TYPE_2D,
-                          this->imageWidth, this->imageHeight, 0,
+                          this->imageWidthP->GetValue(), 
+                          this->imageHeightP->GetValue(), 0,
                           Ogre::PF_R8G8B8,
                           Ogre::TU_RENDERTARGET);
 
   this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Save the sensor info in XML format
+void MonoCameraSensor::Save(std::string &prefix, std::ostream &stream)
+{
+  std::string p = prefix + "  ";
+  stream << prefix << "<sensor:monocamera name=\"" << this->nameP->GetValue() << "\">\n";
+
+  this->SaveCam(p, stream);
+
+  if (this->controller)
+    this->controller->Save(p, stream);
+
+  stream << prefix << "</sensor:monocamera>\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -130,7 +147,7 @@ void MonoCameraSensor::UpdateChild()
   // Get access to the buffer and make an image and write it to file
   mBuffer = this->renderTexture->getBuffer(0, 0);
 
-  size = this->imageWidth * this->imageHeight * 3;
+  size = this->imageWidthP->GetValue() * this->imageHeightP->GetValue() * 3;
 
   // Allocate buffer
   if (!this->saveFrameBuffer)
@@ -138,18 +155,18 @@ void MonoCameraSensor::UpdateChild()
 
   mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
 
-  int top = (int)((mBuffer->getHeight() - this->imageHeight) / 2.0);
-  int left = (int)((mBuffer->getWidth() - this->imageWidth) / 2.0);
-  int right = left + this->imageWidth;
-  int bottom = top + this->imageHeight;
+  int top = (int)((mBuffer->getHeight() - this->imageHeightP->GetValue()) / 2.0);
+  int left = (int)((mBuffer->getWidth() - this->imageWidthP->GetValue()) / 2.0);
+  int right = left + this->imageWidthP->GetValue();
+  int bottom = top + this->imageHeightP->GetValue();
 
   // Get the center of the texture in RGB 24 bit format
   mBuffer->blitToMemory(
     Ogre::Box(left, top, right, bottom),
 
     Ogre::PixelBox(
-      this->imageWidth,
-      this->imageHeight,
+      this->imageWidthP->GetValue(),
+      this->imageHeightP->GetValue(),
       1,
       Ogre::PF_B8G8R8,
       this->saveFrameBuffer)
@@ -158,7 +175,7 @@ void MonoCameraSensor::UpdateChild()
   mBuffer->unlock();
 
 
-  if (this->saveFrames)
+  if (this->saveFramesP->GetValue())
     this->SaveFrame();
 }
 
@@ -198,8 +215,8 @@ void MonoCameraSensor::SaveFrame()
   // Create image data structure
   imgData  = new Ogre::ImageCodec::ImageData();
 
-  imgData->width = this->imageWidth;
-  imgData->height = this->imageHeight;
+  imgData->width = this->imageWidthP->GetValue();
+  imgData->height = this->imageHeightP->GetValue();
   imgData->depth = 1;
   imgData->format = Ogre::PF_B8G8R8;
   size = this->GetImageByteSize();
@@ -208,9 +225,9 @@ void MonoCameraSensor::SaveFrame()
   Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
 
   char tmp[1024];
-  if (!this->savePathname.empty())
+  if (!this->savePathnameP->GetValue().empty())
   {
-    sprintf(tmp, "%s/%s-%04d.jpg", this->savePathname.c_str(),
+    sprintf(tmp, "%s/%s-%04d.jpg", this->savePathnameP->GetValue().c_str(),
             this->GetName().c_str(), this->saveCount);
   }
   else

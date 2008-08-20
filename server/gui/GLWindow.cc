@@ -68,6 +68,10 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
   this->directionVec.x = 0;
   this->directionVec.y = 0;
   this->directionVec.z = 0;
+  this->leftMousePressed = false;
+  this->rightMousePressed = false;
+  this->middleMousePressed = false;
+
 
   this->keys.clear();
 
@@ -202,6 +206,8 @@ void GLWindow::HandleMouseRelease()
     {
       Simulator::Instance()->SetSelectedEntity( ent );
     }
+
+
   }
 
   this->mouseDrag = false;
@@ -229,8 +235,21 @@ void GLWindow::HandleMouseDrag()
         pose.pos.x -= d.y * 0.05;
         model->SetPose(pose);
       }
+      else
+      {
+        Vector2<int> d = this->mousePos - this->prevMousePos;
+        this->directionVec.x = 0;
+        this->directionVec.y =  d.x * this->moveAmount;
+        this->directionVec.z =  d.y * this->moveAmount;
+      }
     }
-
+    else if (this->middleMousePressed)
+    {
+      Vector2<int> d = this->mousePos - this->prevMousePos;
+      this->directionVec.x =  d.y * this->moveAmount;
+      this->directionVec.y =  0;
+      this->directionVec.z =  0;
+    }
   }
 
   this->mouseDrag = true;
@@ -256,6 +275,22 @@ void GLWindow::HandleKeyPress(int keyNum)
 {
   std::map<int,int>::iterator iter;
   this->keys[keyNum] = 1;
+
+  // loop through the keys to find the modifiers -- swh
+  float moveAmount = this->moveAmount;
+  for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
+  {
+    if (iter->second == 1)
+    {
+      switch (iter->first)
+      {
+        case FL_Control_L:
+        case FL_Control_R:
+          moveAmount = this->moveAmount * 10;
+          break;
+      }
+    }
+  }
 
   for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
   {

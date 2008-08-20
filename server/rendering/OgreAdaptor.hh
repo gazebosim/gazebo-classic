@@ -31,6 +31,8 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
+#include "Vector4.hh"
+#include "Param.hh"
 #include "Vector2.hh"
 #include "SingletonT.hh"
 
@@ -88,7 +90,7 @@ namespace gazebo
     public: void Init(XMLConfigNode *rootNode);
   
     /// \brief Save Ogre settings 
-    public: void Save(XMLConfigNode *node);
+    public: void Save(std::string &prefix, std::ostream &stream);
   
     /// \brief Get the desired update rate
     public: double GetUpdateRate();
@@ -132,12 +134,6 @@ namespace gazebo
     //private: unsigned int terrainVertSize;
     //private: std::string terrainImage;
   
-    private: double updateRate;
-
-    private: XMLConfigNode *skyNode;
-    private: XMLConfigNode *fogNode;
-    private: bool drawGrid;
-
     private: friend class DestroyerT<OgreAdaptor>;
     private: friend class SingletonT<OgreAdaptor>;
 
@@ -153,6 +149,13 @@ namespace gazebo
     /// GLX context used to render the scenes.Used for gui-less operation
     protected: GLXContext dummyContext;
 
+    private: Param<Vector4> *ambientP;
+    private: Param<std::string> *shadowTechniqueP;
+    private: Param<int> *shadowTextureSizeP;
+    private: Param<int> *shadowIndexSizeP;
+    private: Param<double> *updateRateP;
+    private: Param<bool> *drawGridP;
+    private: Param<std::string> *skyMaterialP;
   };
   
  

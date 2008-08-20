@@ -146,6 +146,19 @@ class Vector3
     return out;
   }
 
+  /// \brief Istream operator
+  /// \param in Ostream
+  /// \param pt Vector3 to read values into
+  /// \return The istream
+  public: friend std::istream &operator>>( std::istream &in, gazebo::Vector3 &pt )
+  {
+    // Skip white spaces
+    in.setf( std::ios_base::skipws );
+    in >> pt.x >> pt.y >> pt.z;
+    return in;
+  }
+
+
 };
 
 /// \}

@@ -118,9 +118,6 @@ namespace gazebo
     /// \return The wall clock time
     public: double GetWallTime() const;
 
-    public: void LoadGui(XMLConfigNode *rootNode);
-    public: void SaveGui(XMLConfigNode *node);
-
     //User Iteractions
     /// \brief Simulator finished by the user
     public: void SetUserQuit();

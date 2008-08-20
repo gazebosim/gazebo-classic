@@ -27,107 +27,111 @@
 #ifndef PHYSICSENGINE_HH
 #define PHYSICSENGINE_HH
 
+#include <iostream>
+
 #include "Joint.hh"
+#include "Param.hh"
 
 namespace gazebo
 {
-
-class Entity;
-class Body;
-class XMLConfigNode;
-
-/// \addtogroup gazebo_physics_engine
-/** \{
-
-\verbatim
-<physics:<engine_type>>
-  <gravity>0.0 0.0 -9.8 </gravity>
-  <stepTime>0.020</stepTime>
-</physics:<engine_type>>
-\endverbatim
-
-The parameters are as follows:
-
-- speed (float)
-  - Target simulation speed (e.g. speed 2 yields twice real time).
-  - Default 1.0
-
-- gravity (float vector)
-  - The gravity vector (m/sec/sec); the default corresponds to Earth gravity.
-  - Default 0 0 -9.8
-
-- stepTime (float)
-  - The minimum step time for the simulator.  Reducing the step time
-    will increase the fidelity of the physical simulation, but consume
-    more CPU time.  If you have particulary complex system that appears to
-    be diverging (i.e., objects "explode" when they come into collision), consider
-    reducing the step time.
-  - Default 0.020
-
-*/
-
-/// \brief Base class for a physics engine
-class PhysicsEngine
-{
-  /// \brief Default constructor
-  public: PhysicsEngine();
-
-  /// \brief Destructor
-  public: virtual ~PhysicsEngine();
-
-  /// \brief Load the physics engine
-  /// \param node Pointer to the XML parameters
-  public: virtual void Load(XMLConfigNode *node) = 0;
-
-  /// \brief Saves to XMLFile
-  /// \param node Pointer to the XML writer 
-  public: virtual void Save(XMLConfigNode *node) =0;
-
-  /// \brief Initialize the physics engine
-  public: virtual void Init() = 0;
-
-  /// \brief Update the physics engine
-  public: virtual void Update() = 0;
-
-  /// \brief Finilize the physics engine
-  public: virtual void Fini() = 0;
-
-  /// \brief Add an entity
-  public: virtual void AddEntity(Entity *entity) = 0;
-
-  /// \brief Remove an entity from the physics engine
-  public: virtual void RemoveEntity(Entity *entity) = 0;
-
-  /// \brief Create a new body
-  public: virtual Body *CreateBody(Entity *parent) = 0;
-
-  /// \brief Create a new joint
-  public: virtual Joint *CreateJoint(Joint::Type type) = 0;
-
-  /// \brief Return the gavity vector
-  /// \return The gavity vector
-  public: Vector3 GetGravity() const;
-
-  /// \brief Get the time between each update cycle
-  /// \return seconds between updates 
-  public: double GetUpdateRate() const;
-
-  /// \brief Get the physics time steps in the virtual world
-  /// \return step time 
-  public: double GetStepTime() const;
-
-  /// The gravity vector
-  protected: Vector3 gravity;
-
-  /// time steps the physical engine will take 
-  /// how much time will pass on each update
-  protected: double stepTime;
   
-  /// update rate of the physical engine, how many times
-  /// it is called 
-  protected: double updateRate;
-};
-
-/** \}*/
+  class Entity;
+  class Body;
+  class XMLConfigNode;
+  
+  /// \addtogroup gazebo_physics_engine
+  /** \{
+  
+  \verbatim
+  <physics:<engine_type>>
+    <gravity>0.0 0.0 -9.8 </gravity>
+    <stepTime>0.020</stepTime>
+  </physics:<engine_type>>
+  \endverbatim
+  
+  The parameters are as follows:
+  
+  - speed (float)
+    - Target simulation speed (e.g. speed 2 yields twice real time).
+    - Default 1.0
+  
+  - gravity (float vector)
+    - The gravity vector (m/sec/sec); the default corresponds to Earth gravity.
+    - Default 0 0 -9.8
+  
+  - stepTime (float)
+    - The minimum step time for the simulator.  Reducing the step time
+      will increase the fidelity of the physical simulation, but consume
+      more CPU time.  If you have particulary complex system that appears to
+      be diverging (i.e., objects "explode" when they come into collision), consider
+      reducing the step time.
+    - Default 0.020
+  
+  */
+  
+  /// \brief Base class for a physics engine
+  class PhysicsEngine
+  {
+    /// \brief Default constructor
+    public: PhysicsEngine();
+  
+    /// \brief Destructor
+    public: virtual ~PhysicsEngine();
+  
+    /// \brief Load the physics engine
+    /// \param node Pointer to the XML parameters
+    public: virtual void Load(XMLConfigNode *node) = 0;
+  
+    /// \brief Saves to XMLFile
+    /// \param stread Output stream
+    public: virtual void Save(std::string &prefix, std::ostream &stream) =0;
+  
+    /// \brief Initialize the physics engine
+    public: virtual void Init() = 0;
+  
+    /// \brief Update the physics engine
+    public: virtual void Update() = 0;
+  
+    /// \brief Finilize the physics engine
+    public: virtual void Fini() = 0;
+  
+    /// \brief Add an entity
+    public: virtual void AddEntity(Entity *entity) = 0;
+  
+    /// \brief Remove an entity from the physics engine
+    public: virtual void RemoveEntity(Entity *entity) = 0;
+  
+    /// \brief Create a new body
+    public: virtual Body *CreateBody(Entity *parent) = 0;
+  
+    /// \brief Create a new joint
+    public: virtual Joint *CreateJoint(Joint::Type type) = 0;
+  
+    /// \brief Return the gavity vector
+    /// \return The gavity vector
+    public: Vector3 GetGravity() const;
+  
+    /// \brief Get the time between each update cycle
+    /// \return seconds between updates 
+    public: double GetUpdateRate() const;
+  
+    /// \brief Get the physics time steps in the virtual world
+    /// \return step time 
+    public: double GetStepTime() const;
+  
+    /// The gravity vector
+    protected: Param<Vector3> *gravityP;
+  
+    /// time steps the physical engine will take 
+    /// how much time will pass on each update
+    protected: Param<double> *stepTimeP;
+    
+    /// update rate of the physical engine, how many times
+    /// it is called 
+    protected: Param<double> *updateRateP;
+  };
+  
+  /** \}*/
 }
+
 #endif

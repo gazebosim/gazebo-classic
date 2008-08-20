@@ -55,11 +55,18 @@ Sensor::~Sensor()
 // Load the sensor
 void Sensor::Load(XMLConfigNode *node)
 {
-  this->SetName(node->GetString("name","",1));
+  this->nameP->Load(node);
   this->LoadController( node->GetChildByNSPrefix("controller") );
   this->LoadChild(node);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Save the sensor info in XML format
+void Sensor::Save(std::string &prefix, std::ostream &stream)
+{
+  
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the sensor
 void Sensor::Init()

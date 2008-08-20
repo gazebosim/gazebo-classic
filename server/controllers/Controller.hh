@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 
+#include "Param.hh"
 
 namespace gazebo
 {
@@ -55,9 +56,9 @@ class Controller
   /// \param node The XMLConfig node pointer
   public: void Load(XMLConfigNode *node);
 
-  /// \brief Save the controller. 
-  /// \param node The XMLConfigWriter node pointer
-  public: void Save();
+  /// \brief Save the controller in XML format.
+  /// \param stream The output stream
+  public: void Save(std::string &prefix, std::ostream &stream);
 
   /// \brief Initialize the controller. Called once on startup.
   /// \return 0 on success
@@ -77,7 +78,7 @@ class Controller
   protected: virtual void LoadChild(XMLConfigNode * /*node*/) {return;}
 
   /// \brief Save function for the child class
-  protected: virtual void SaveChild(XMLConfigNode * /*node*/) {return;}
+  protected: virtual void SaveChild(std::string &prefix, std::ostream &stream) {return;}
 
   /// \brief Init function for the child class
   protected: virtual void InitChild() {return;}
@@ -96,13 +97,16 @@ class Controller
   public: std::string GetName() const;
 
   /// \brief The controller's name
-  protected: std::string name;
+  protected: Param<std::string> *nameP;
 
   /// \brief The entity that owns this controller
   protected: Entity *parent;
 
   /// \brief Update period 
   protected: double updatePeriod;
+  protected: Param<double> *updatePeriodP;
+
+  private: std::string typeName;
 
   /// \brief Last update time
   protected: double lastUpdate;
@@ -110,7 +114,8 @@ class Controller
   /// \brief Array of all the iface for this controller
   protected: std::vector<Iface*> ifaces;
 
-  protected: XMLConfigNode *xmlNode;
+  private: std::vector< std::string > ifaceTypes; 
+  private: std::vector< std::string > ifaceNames; 
 };
 
 /// \}

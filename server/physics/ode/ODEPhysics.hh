@@ -29,6 +29,7 @@
 
 #include <ode/ode.h>
 
+#include "Param.hh"
 #include "PhysicsEngine.hh"
 
 namespace gazebo
@@ -39,6 +40,7 @@ namespace gazebo
   class CylinderGeom;
   class Entity;
   class XMLConfigNode;
+
 /// \addtogroup gazebo_physics_engine
 /// \{
 
@@ -91,7 +93,7 @@ class ODEPhysics : public PhysicsEngine
   public: virtual void Load(XMLConfigNode *node);
 
   /// \brief Saves to XMLFile
-  public: void Save(XMLConfigNode *node);
+  public: void Save(std::string &prefix, std::ostream &stream);
 
   /// \brief Initialize the ODE engine
   public: virtual void Init();
@@ -128,9 +130,9 @@ class ODEPhysics : public PhysicsEngine
 
   /// \brief Collision attributes
   private: dJointGroupID contactGroup;
-          
-  private: double globalCFM;
-  private: double globalERP; 
+
+  private: Param<double> *globalCFMP; 
+  private: Param<double> *globalERPP; 
 };
 
 /** \}*/

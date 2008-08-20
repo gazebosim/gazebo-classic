@@ -49,6 +49,9 @@ Stereo_Camera::Stereo_Camera(Entity *parent)
 {
   this->myParent = dynamic_cast<StereoCameraSensor*>(this->parent);
 
+  this->leftCameraNameP = new Param<std::string>("leftcamera","", 1);
+  this->rightCameraNameP = new Param<std::string>("rightcamera","", 1);
+
   if (!this->myParent)
     gzthrow("Stereo_Camera controller requires a Stereo Camera Sensor as its parent");
 }
@@ -57,6 +60,8 @@ Stereo_Camera::Stereo_Camera(Entity *parent)
 // Destructor
 Stereo_Camera::~Stereo_Camera()
 {
+  delete this->leftCameraNameP;
+  delete this->rightCameraNameP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,11 +81,19 @@ void Stereo_Camera::LoadChild(XMLConfigNode *node)
     }
   }
 
-  this->leftCameraName = node->GetString("leftcamera","", 1);
-  this->rightCameraName = node->GetString("rightcamera","", 1);
+  this->leftCameraNameP->Load(node);
+  this->rightCameraNameP->Load(node);
 
   if (!this->stereoIface)
     gzthrow("Stereo_Camera controller requires a StereoCameraIface");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the controller.
+void Stereo_Camera::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->leftCameraNameP) << "\n";
+  stream << prefix << *(this->rightCameraNameP) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +115,7 @@ void Stereo_Camera::UpdateChild()
 
     if (iter->second->data->head.openCount > 0)
     {
-      if (this->leftCameraName == iter->first)
+      if (**(this->leftCameraNameP) == iter->first)
         this->PutCameraData( iter->second->data, 0 );
       else
         this->PutCameraData( iter->second->data, 1 );
@@ -148,8 +161,8 @@ void Stereo_Camera::PutStereoData()
   stereo_data->farClip = this->myParent->GetFarClip();
   stereo_data->nearClip = this->myParent->GetNearClip();
 
-  stereo_data->hfov = this->myParent->GetHFOV();
-  stereo_data->vfov = this->myParent->GetVFOV();
+  stereo_data->hfov = *(this->myParent->GetHFOV());
+  stereo_data->vfov = *(this->myParent->GetVFOV());
 
   stereo_data->right_depth_size = stereo_data->width * stereo_data->height * sizeof(float);
   stereo_data->left_depth_size = stereo_data->width * stereo_data->height * sizeof(float);
@@ -185,8 +198,8 @@ void Stereo_Camera::PutCameraData(CameraData *camera_data, unsigned int camera)
   camera_data->image_size = camera_data->width * camera_data->height * 3;
   assert (camera_data->image_size <= sizeof(camera_data->image));
 
-  camera_data->hfov = this->myParent->GetHFOV();
-  camera_data->vfov = this->myParent->GetVFOV();
+  camera_data->hfov = *(this->myParent->GetHFOV());
+  camera_data->vfov = *(this->myParent->GetVFOV());
 
   // Set the pose of the camera
   cameraPose = this->myParent->GetWorldPose();

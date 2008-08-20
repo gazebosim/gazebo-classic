@@ -78,6 +78,10 @@ class Generic_Camera : public Controller
   /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode *node);
 
+  /// \brief Save the controller.
+  /// \stream Output stream
+  protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
   /// \brief Init the controller
   /// \return 0 on success
   protected: virtual void InitChild();

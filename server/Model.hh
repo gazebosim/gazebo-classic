@@ -28,11 +28,12 @@
 #define MODEL_HH
 
 //#include <python2.4/Python.h>
+#include <boost/any.hpp>
 #include <map>
 #include <string>
 #include <vector>
 
-#include "MovableText.hh"
+#include "Param.hh"
 #include "Pose3d.hh"
 #include "Joint.hh"
 #include "Entity.hh"
@@ -65,7 +66,7 @@ namespace gazebo
     public: int Load(XMLConfigNode *node);
   
     /// \brief Save the model
-    public: void Save();
+    public: void Save(std::string &prefix, std::ostream &stream);
 
     /// \brief Initialize the model
     public: int Init();
@@ -79,9 +80,6 @@ namespace gazebo
 
     /// \brief Reset the model
     public: void Reset();
-  
-    /// \brief Load the child model
-    protected: virtual int LoadChild(XMLConfigNode * /*node*/) {return 0;}
   
     /// \brief Initialize the child model
     protected: virtual int InitChild() {return 0;}
@@ -175,16 +173,21 @@ namespace gazebo
     /// \brief Map of the controllers
     protected: std::map<std::string, Controller* > controllers;
   
-    /// \brief Name of the canonical body
-    private: std::string canonicalBodyName;
-  
     /// \brief Joint used to connected models (parent->child).
     private: HingeJoint *joint;
   
     /// \brief Light numbering variable to give a unique name to all light entities
     private: static uint lightNumber;
 
-    //private: MovableText *mtext;
+    private: std::vector<boost::any> parameters;
+    private: Param<std::string> *canonicalBodyNameP;
+    private: Param<Vector3> *xyzP;
+    private: Param<Quatern> *rpyP;
+    private: Param<std::string> *parentBodyNameP;
+    private: Param<std::string> *myBodyNameP;
+
+    // Name of a light (if the model is renderable:light)
+    private: std::string lightName;
 
   /*  private: PyObject *pName;
       private: PyObject *pModule;

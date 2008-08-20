@@ -27,99 +27,108 @@
 #ifndef HINGEJOINT_HH
 #define HINGEJOINT_HH
 
+#include "Angle.hh"
 #include "Vector3.hh"
+#include "Param.hh"
 #include "Joint.hh"
 
 namespace gazebo
 {
 
-/// \addtogroup gazebo_physics_joints
-/// \{
-/** \defgroup gazebo_hinge_joint Hinge Joint
+  /// \addtogroup gazebo_physics_joints
+  /// \{
+  /** \defgroup gazebo_hinge_joint Hinge Joint
+    
+    \brief A two-axis hinge joint.
   
-  \brief A two-axis hinge joint.
+    \par Attributes
+    - body1 (string)
+      - Name of the first body to attach to the joint
+    - body2 (string)
+      - Name of the second body to attach to the joint
+    - anchor (string)
+      - Name of the body which will act as the anchor to the joint
+    - axis (float, tuple)
+      - Defines the axis of rotation for the first degree of freedom
+      - Default: 0 0 1
+    - lowStop (float, degrees)
+      - The low stop angle for the first degree of freedom
+      - Default: infinity
+    - highStop (float, degrees)
+      - The high stop angle for the first degree of freedom
+      - Default: infinity
+    - erp (double)
+      - Error reduction parameter. 
+      - Default = 0.4
+    - cfm (double)
+      - Constraint force mixing. 
+      - Default = 0.8
+  
+    \par Example
+    \verbatim
+    <joint:hinge name="hinge_joint>
+      <body1>body1_name</body1>
+      <body2>body2_name</body2>
+      <anchor>anchor_body</anchor>
+      <axis>0 0 1</axis>
+      <lowStop>0</lowStop>
+      <highStop>30</highStop>
+    </joint:hinge>
+    \endverbatim
+  */
+  /// \}
+  
+  /// \addtogroup gazebo_hinge_joint
+  /// \{
+  
+  ///\brief A single axis hinge joint
+  class HingeJoint : public Joint
+  {
+    ///  Constructor
+    public: HingeJoint(dWorldID worldId);
+  
+    /// Destructor
+    public: virtual ~HingeJoint();
+  
+    /// \brief Load joint
+    protected: virtual void LoadChild(XMLConfigNode *node);
 
-  \par Attributes
-  - body1 (string)
-    - Name of the first body to attach to the joint
-  - body2 (string)
-    - Name of the second body to attach to the joint
-  - anchor (string)
-    - Name of the body which will act as the anchor to the joint
-  - axis (float, tuple)
-    - Defines the axis of rotation for the first degree of freedom
-    - Default: 0 0 1
-  - lowStop (float, degrees)
-    - The low stop angle for the first degree of freedom
-    - Default: infinity
-  - highStop (float, degrees)
-    - The high stop angle for the first degree of freedom
-    - Default: infinity
-  - erp (double)
-    - Error reduction parameter. 
-    - Default = 0.4
-  - cfm (double)
-    - Constraint force mixing. 
-    - Default = 0.8
+    /// \brief Save a joint to a stream in XML format
+    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
 
-  \par Example
-  \verbatim
-  <joint:hinge name="hinge_joint>
-    <body1>body1_name</body1>
-    <body2>body2_name</body2>
-    <anchor>anchor_body</anchor>
-    <axis>0 0 1</axis>
-    <lowStop>0</lowStop>
-    <highStop>30</highStop>
-  </joint:hinge>
-  \endverbatim
-*/
-/// \}
-
-/// \addtogroup gazebo_hinge_joint
-/// \{
-
-///\brief A single axis hinge joint
-class HingeJoint : public Joint
-{
-  ///  Constructor
-  public: HingeJoint(dWorldID worldId);
-
-  /// Destructor
-  public: virtual ~HingeJoint();
-
-  /// \brief Load joint
-  protected: virtual void LoadChild(XMLConfigNode *node);
-
-  /// Get the angle of rotation
-  public: double GetAngle() const;
-
-  /// Get the rotation rate
-  public: double GetAngleRate() const;
-
-  /// Get the specified parameter
-  public: virtual double GetParam( int parameter ) const;
-
-  /// Set the anchor point
-  public: virtual void SetAnchor(const Vector3 &anchor);
-
-  /// Set the axis of rotation
-  public: void SetAxis(const Vector3 &axis);
-
-  /// Get the anchor point
-  public: virtual Vector3 GetAnchor() const;
-
-  /// Get the axis of rotation
-  public: Vector3 GetAxis() const;
-
-  /// Set the parameter to value
-  public: virtual void SetParam( int parameter, double value);
-
-  /// Set the torque of a joint.
-  public: void SetTorque(double torque);
-};
-/// \}
-
+    /// Get the angle of rotation
+    public: double GetAngle() const;
+  
+    /// Get the rotation rate
+    public: double GetAngleRate() const;
+  
+    /// Get the specified parameter
+    public: virtual double GetParam( int parameter ) const;
+  
+    /// Set the anchor point
+    public: virtual void SetAnchor(const Vector3 &anchor);
+  
+    /// Set the axis of rotation
+    public: void SetAxis(const Vector3 &axis);
+  
+    /// Get the anchor point
+    public: virtual Vector3 GetAnchor() const;
+  
+    /// Get the axis of rotation
+    public: Vector3 GetAxis() const;
+  
+    /// Set the parameter to value
+    public: virtual void SetParam( int parameter, double value);
+  
+    /// Set the torque of a joint.
+    public: void SetTorque(double torque);
+  
+    private: Param<Vector3> *axisP;
+    private: Param<Angle> *loStopP;
+    private: Param<Angle> *hiStopP; 
+  };
+  /// \}
+  
 }
 #endif
 

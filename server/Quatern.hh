@@ -28,6 +28,9 @@
 #define QUATERN_HH
 
 #include <iostream>
+#include <math.h> 
+
+#include "Angle.hh"
 #include "Vector3.hh"
 
 namespace gazebo
@@ -133,10 +136,40 @@ class Quatern
   /// \return The ostream
   public: friend  std::ostream &operator<<( std::ostream &out, const gazebo::Quatern &q )
   {
-    out << q.u << " " << q.x << " " << q.y << " " << q.z;
+    Vector3 v = const_cast<Quatern*>(&q)->GetAsEuler();
+    v.x = v.x * 180.0 / M_PI;
+    v.y = v.y * 180.0 / M_PI;
+    v.z = v.z * 180.0 / M_PI;
+
+    if (isnan(v.x))
+      v.x = 90.0;
+    if (isnan(v.y))
+      v.y = 90.0;
+    if (isnan(v.z))
+      v.z = 90.0;
+
+    out << v.x << " " << v.y << " " << v.z;
 
     return out;
   }
+
+  /// \brief Istream operator
+  /// \param in Ostream
+  /// \param q Quatern to read values into
+  /// \return The istream
+  public: friend std::istream &operator>>( std::istream &in, gazebo::Quatern &q )
+  {
+    Angle r, p, y;
+
+    // Skip white spaces
+    in.setf( std::ios_base::skipws );
+    in >> r >> p >> y;
+
+    q.SetFromEuler(Vector3(*r,*p,*y));
+
+    return in;
+  }
+
 
 };
 

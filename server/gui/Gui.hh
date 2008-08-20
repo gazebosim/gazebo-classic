@@ -35,6 +35,9 @@
 #include <string>
 #include <iostream>
 
+#include "Param.hh"
+#include "Vector2.hh"
+
 namespace gazebo
 {
 
@@ -55,6 +58,9 @@ namespace gazebo
 
     /// \brief Load the gui
     public: virtual void Load(XMLConfigNode *node);
+
+    /// \brief Save the gui params in xml format
+    public: virtual void Save(std::string &prefix, std::ostream &stream);
 
     /// \brief Initalize the gui
     public: virtual void Init();
@@ -78,6 +84,9 @@ namespace gazebo
     private: GLFrameManager *frameMgr;
 
     private: bool hasFocus;
+
+    private: Param<Vector2<int> > *sizeP;
+    private: Param<Vector2<int> > *posP;
   };
 }
 

@@ -37,7 +37,12 @@ using namespace gazebo;
 HingeJoint::HingeJoint( dWorldID worldId )
     : Joint()
 {
+  this->type = HINGE;
   this->jointId = dJointCreateHinge( worldId, NULL );
+
+  this->axisP = new Param<Vector3>("axis",Vector3(0,0,1), 0);
+  this->loStopP = new Param<Angle>("lowStop",-M_PI,0);
+  this->hiStopP = new Param<Angle>("highStop",M_PI,0);
 }
 
 
@@ -45,28 +50,39 @@ HingeJoint::HingeJoint( dWorldID worldId )
 // Destructor
 HingeJoint::~HingeJoint()
 {
+  delete this->axisP;
+  delete this->loStopP;
+  delete this->hiStopP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load a hinge joint
 void HingeJoint::LoadChild(XMLConfigNode *node)
 {
-  Vector3 axis = node->GetVector3("axis",Vector3(0,0,1));
-
-  double loStop = DTOR(node->GetDouble("lowStop",RTOD(-M_PI),0));
-  double hiStop = DTOR(node->GetDouble("highStop",RTOD(M_PI),0));
+  this->axisP->Load(node);
+  this->loStopP->Load(node);
+  this->hiStopP->Load(node);
 
   // Perform this three step ordering to ensure the parameters are set
   // properly. This is taken from the ODE wiki.
-  this->SetParam(dParamHiStop, hiStop);
-  this->SetParam(dParamLoStop, loStop);
-  this->SetParam(dParamHiStop, hiStop);
+  this->SetParam(dParamHiStop, this->hiStopP->GetValue().GetAsRadian());
+  this->SetParam(dParamLoStop, this->loStopP->GetValue().GetAsRadian());
+  this->SetParam(dParamHiStop, this->hiStopP->GetValue().GetAsRadian());
 
-  this->SetAxis(axis);
+  this->SetAxis(**(this->axisP));
 }
 
-// Get the anchor point
+////////////////////////////////////////////////////////////////////////////////
+/// Save a joint to a stream in XML format
+void HingeJoint::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->axisP) << "\n";
+  stream << prefix << *(this->loStopP) << "\n";
+  stream << prefix << *(this->hiStopP) << "\n";
+}
+
 //////////////////////////////////////////////////////////////////////////////
+// Get the anchor point
 Vector3 HingeJoint::GetAnchor( ) const
 {
   dVector3 result;

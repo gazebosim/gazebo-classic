@@ -51,6 +51,9 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 {
   Fl::scheme("plastic");
 
+  this->sizeP = new Param<Vector2<int> >("size", Vector2<int>(800, 600), 0);
+  this->posP = new Param<Vector2<int> >("pos",Vector2<int>(0,0),0);
+
   // The order of creation matters! Menubar first, followed by FrameManager,
   // then statusbar
   {
@@ -97,6 +100,9 @@ Gui::~Gui()
 {
   this->hide();
 
+  delete this->sizeP;
+  delete this->posP;
+
   //GZ_DELETE (this->toolbar)
   //delete this->statusbar;
 }
@@ -105,7 +111,23 @@ Gui::~Gui()
 /// Load the gui
 void Gui::Load( XMLConfigNode *node )
 {
+  this->sizeP->Load(node);
+  this->posP->Load(node);
+
   this->frameMgr->Load( node->GetChild("frames") );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Save the gui params in xml format
+void Gui::Save(std::string &prefix, std::ostream &stream)
+{
+  std::string p = prefix + "  ";
+
+  stream << prefix <<  "<rendering:gui>\n";
+  stream << prefix <<  "  " << *(this->sizeP) << "\n";
+  stream << prefix <<  "  " << *(this->posP) << "\n";
+  this->frameMgr->Save(p, stream);
+  stream << prefix << "</rendering:gui>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

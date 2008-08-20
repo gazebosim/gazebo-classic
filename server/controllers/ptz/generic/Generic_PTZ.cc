@@ -55,11 +55,13 @@ Generic_PTZ::Generic_PTZ(Entity *parent)
   this->panJoint = NULL;
   this->tiltJoint = NULL;
 
-  this->motionGain = 2;
-  this->force = 10;
-
   this->panJoint = NULL;
   this->tiltJoint = NULL;
+
+  this->panJointNameP = new Param<std::string>("panJoint", "", 1);
+  this->tiltJointNameP = new Param<std::string>("tiltJoint", "", 1);
+  this->motionGainP = new Param<double>("motionGain",2,0);
+  this->forceP = new Param<double>("force",10,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,6 +75,11 @@ Generic_PTZ::~Generic_PTZ()
 
   this->panJoint = NULL;
   this->tiltJoint = NULL;
+
+  delete this->panJointNameP;
+  delete this->tiltJointNameP;
+  delete this->motionGainP;
+  delete this->forceP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,11 +91,13 @@ void Generic_PTZ::LoadChild(XMLConfigNode *node)
   if (!this->ptzIface)
     gzthrow("Generic_PTZ controller requires a PTZIface");
 
-  std::string panJointName = node->GetString("panJoint", "", 1);
-  std::string tiltJointName = node->GetString("tiltJoint", "", 1);
+  this->panJointNameP->Load(node);
+  this->tiltJointNameP->Load(node);
+  this->motionGainP->Load(node);
+  this->forceP->Load(node);
 
-  this->panJoint = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(panJointName));
-  this->tiltJoint = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(tiltJointName));
+  this->panJoint = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->panJointNameP->GetValue()));
+  this->tiltJoint = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->tiltJointNameP->GetValue()));
 
   if (!this->panJoint)
     gzthrow("couldn't get pan hinge joint");
@@ -96,8 +105,16 @@ void Generic_PTZ::LoadChild(XMLConfigNode *node)
   if (!this->tiltJoint)
     gzthrow("couldn't get tilt hinge joint");
 
-  this->motionGain = node->GetDouble("motionGain",2,0);
-  this->force = node->GetDouble("force",10,0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the controller.
+void Generic_PTZ::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->panJointNameP) << "\n";
+  stream << prefix << *(this->tiltJointNameP) << "\n";
+  stream << prefix << *(this->motionGainP) << "\n";
+  stream << prefix << *(this->forceP) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,11 +165,11 @@ void Generic_PTZ::UpdateChild()
   float tilt = this->cmdTilt - this->tiltJoint->GetAngle();
   float pan = this->cmdPan - this->panJoint->GetAngle();
 
-  this->tiltJoint->SetParam( dParamVel, this->motionGain * tilt);
-  this->tiltJoint->SetParam( dParamFMax, this->force );
+  this->tiltJoint->SetParam( dParamVel, **(this->motionGainP) * tilt);
+  this->tiltJoint->SetParam( dParamFMax, **(this->forceP) );
 
-  this->panJoint->SetParam( dParamVel, this->motionGain * pan);
-  this->panJoint->SetParam( dParamFMax, this->force );
+  this->panJoint->SetParam( dParamVel, **(this->motionGainP) * pan);
+  this->panJoint->SetParam( dParamFMax, **(this->forceP) );
 
   this->PutPTZData();
 }

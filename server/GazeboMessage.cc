@@ -27,6 +27,7 @@
 
 #include <time.h>
 #include <string.h>
+
 #include "XMLConfig.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -43,12 +44,17 @@ GazeboMessage::GazeboMessage()
   this->errStream = &std::cerr;
 
   this->level = 0;
+
+  this->verbosityP = new Param<int>("verbosity",0,0);
+  this->logDataP = new Param<bool>("logData",false,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 GazeboMessage::~GazeboMessage()
 {
+  delete this->verbosityP;
+  delete this->logDataP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +67,8 @@ GazeboMessage *GazeboMessage::Instance()
   return myself;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Load the Message parameters
 void GazeboMessage::Load(XMLConfigNode *node)
 {
   char logFilename[50];
@@ -70,10 +78,12 @@ void GazeboMessage::Load(XMLConfigNode *node)
     gzthrow("Null XMLConfig node");
   }
 
-  this->SetVerbose(node->GetInt("verbosity",0,0));
-  this->logData = node->GetBool("logData",false);
+  this->verbosityP->Load(node);
+  this->logDataP->Load(node);
 
-  if (this->logData)
+  this->SetVerbose(**(this->verbosityP));
+
+  if (**(this->logDataP))
   {
     time_t t;
     struct tm *localTime;
@@ -95,20 +105,12 @@ void GazeboMessage::Load(XMLConfigNode *node)
   this->logStream.open(logFilename, std::ios::out);
 }
 
-void GazeboMessage::Save(XMLConfigNode *node)
+////////////////////////////////////////////////////////////////////////////////
+// Save in xml format
+void GazeboMessage::Save(std::string &prefix, std::ostream &stream)
 {
-  /*node->SetValue("verbosity", this->level);
-  node->SetValue("logData", this->logData);
-
-    //node->NewElement("verbosity", String(this->level)); //std::ostringstream << this->level);
-
-    //node->NewElement("logData", gazebo::String(this->logData));
-
-    //if (this->logData)
-    //  node->NewElement("logData", std::ostringstream << "true");
-    //else
-    //  node->NewElement("logData", std::ostringstream << "true");
-    */
+  stream << prefix << *(this->verbosityP) << "\n";
+  stream << prefix << *(this->logDataP) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

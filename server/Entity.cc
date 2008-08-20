@@ -40,9 +40,10 @@ unsigned int Entity::idCounter = 0;
 Entity::Entity(Entity *parent)
 : parent(parent),
   id(++idCounter),
-  isStatic(false),
   visualNode(0)
 {
+  this->nameP = new Param<std::string>("name","",1);
+  this->staticP = new Param<bool>("static",false,0);
  
   this->selected = false;
 
@@ -63,6 +64,9 @@ Entity::Entity(Entity *parent)
 
 Entity::~Entity()
 {
+  delete this->nameP;
+  delete this->staticP;
+
   GZ_DELETE(this->visualNode);
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 }
@@ -123,14 +127,14 @@ void Entity::SetVisualNode(OgreVisual *visualNode)
 // Set the name of the body
 void Entity::SetName(const std::string &name)
 {
-  this->name = name;
+  this->nameP->SetValue( name );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the name of the body
 std::string Entity::GetName() const
 {
-  return this->name;
+  return this->nameP->GetValue();
 }
 
 
@@ -141,7 +145,7 @@ void Entity::SetStatic(bool s)
   std::vector< Entity *>::iterator iter;
   Body *body = NULL;
 
-  this->isStatic = s;
+  this->staticP->SetValue( s );
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
@@ -157,7 +161,7 @@ void Entity::SetStatic(bool s)
 // Return whether this entity is static
 bool Entity::IsStatic() const
 {
-  return this->isStatic;
+  return this->staticP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

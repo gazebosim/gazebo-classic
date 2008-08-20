@@ -58,6 +58,16 @@ Model::Model(Model *parent)
 {
   this->type = "";
   this->joint = NULL;
+
+  this->canonicalBodyNameP = new Param<std::string>("canonicalBody",
+                                                   std::string(),0);
+  this->xyzP = new Param<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->rpyP = new Param<Quatern>("rpy", Quatern(1,0,0,0), 0);
+
+  this->parameters.push_back( this->canonicalBodyNameP );
+
+  this->parentBodyNameP = NULL;
+  this->myBodyNameP = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,6 +96,9 @@ Model::~Model()
     GZ_DELETE( citer->second );
   }
   this->controllers.clear();
+
+  GZ_DELETE(this->parentBodyNameP);
+  GZ_DELETE(this->myBodyNameP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,10 +108,17 @@ int Model::Load(XMLConfigNode *node)
   XMLConfigNode *childNode;
   Pose3d pose;
 
+  this->nameP->Load(node);
+  this->staticP->Load(node);
+
+  this->canonicalBodyNameP->Load(node);
+  this->xyzP->Load(node);
+  this->rpyP->Load(node);
+
   this->xmlNode = node;
   this->type=node->GetName();
-  this->SetName(node->GetString("name",std::string(),1));
-  this->SetStatic(node->GetBool("static",false,0));
+
+  this->SetStatic(this->staticP->GetValue());
 
   if (this->type == "physical")
     this->LoadPhysical(node);
@@ -131,25 +151,24 @@ int Model::Load(XMLConfigNode *node)
     // Store the pointer to this body
     this->bodies[body->GetName()] = body;
 
-    this->canonicalBodyName = bodyName.str();
+    this->canonicalBodyNameP->SetValue( bodyName.str() );
   }
 
 
-  if (this->canonicalBodyName.empty())
+  if (this->canonicalBodyNameP->GetValue().empty())
   {
-    this->canonicalBodyName = this->bodies.begin()->first;
+    this->canonicalBodyNameP->SetValue( this->bodies.begin()->first );
   }
 
   // Get the position and orientation of the model (relative to parent)
   pose.Reset();
-  pose.pos = node->GetVector3( "xyz", pose.pos );
-  pose.rot = node->GetRotation( "rpy", pose.rot );
+  pose.pos = this->xyzP->GetValue();
+  pose.rot = this->rpyP->GetValue();
 
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);
 
-
-  return this->LoadChild(node);
+  return 0;
 
   // Get the name of the python module
   /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
@@ -170,57 +189,92 @@ int Model::Load(XMLConfigNode *node)
       this->pFuncUpdate = NULL;
   }
   */
-
-
 }
 
-void Model::Save()
+////////////////////////////////////////////////////////////////////////////////
+// Save the model in XML format
+void Model::Save(std::string &prefix, std::ostream &stream)
 {
-  /*std::map<std::string, Body* >::iterator bodyIter;
+  std::string p = prefix + "  ";
+  std::string typeName;
+  std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   std::map<std::string, Joint* >::iterator jointIter;
+  Vector3 pos = this->pose.pos;
 
-  this->xmlNode->SetValue("name", this->GetName());
-  this->xmlNode->SetValue("xyz", this->pose.pos);
-  this->xmlNode->SetValue("rpy", this->pose.rot);
-  this->xmlNode->SetValue("static", this->IsStatic());
-  //TODO: Attach tag
-  if (this->type=="renderable")
+  if (this->parent)
   {
-    // TODO: lights
+    Model *pmodel = dynamic_cast<Model*>(this->parent);
+    pos = this->pose.pos - pmodel->GetPose().pos;
   }
-  else if (this->type=="physical")
-  {
-    this->xmlNode->SetValue("canonicalBody",this->canonicalBodyName);
 
+  this->xyzP->SetValue( pos );
+  this->rpyP->SetValue( this->pose.rot );
+
+  if (this->type=="renderable")
+    typeName = "renderable";
+  else if (this->type=="physical")
+    typeName = "physical";
+
+  stream << prefix << "<model:" << typeName;
+  stream << " name=\"" << this->nameP->GetValue() << "\">\n"; 
+  stream << prefix << "  " << *(this->xyzP) << "\n";
+  stream << prefix << "  " << *(this->rpyP) << "\n";
+
+  if (this->type == "physical")
+  {
+    stream << prefix << "  " << *(this->staticP) << "\n";
+
+    // Save all the bodies
     for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
     {
+      stream << "\n";
       if (bodyIter->second)
-      {
-        bodyIter->second->Save();
-
-      }
+        bodyIter->second->Save(p, stream);
     }
 
-    for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
+    // Save all the joints
+    for (jointIter = this->joints.begin(); jointIter != this->joints.end(); 
+        jointIter++)
     {
-      //TODO:When joints can be changed with the GUI..
+      if (jointIter->second)
+        jointIter->second->Save(p, stream);
     }
 
+    // Save all the controllers
+    for (contIter=this->controllers.begin();
+        contIter!=this->controllers.end(); contIter++)
+    {
+      if (contIter->second)
+        contIter->second->Save(p, stream);
+    }
   }
-  else // empty
+  else
   {
+    if (!this->lightName.empty())
+    {
+      OgreCreator::SaveLight(p, this->lightName, stream);
+    }
   }
 
-  for (contIter=this->controllers.begin();
-       contIter!=this->controllers.end(); contIter++)
+  if (this->parentBodyNameP && this->myBodyNameP)
   {
-    //TODO: when the controllers can be changed (maybe reload the XML is the best way)
-    if (contIter->second)
-      contIter->second->Save();
+    stream << prefix << "  <attach>\n";
+    stream << prefix << "    " << *(this->parentBodyNameP) << "\n";
+    stream << prefix << "    " << *(this->myBodyNameP) << "\n";
+    stream << prefix << "  </attach>\n";
   }
 
-  */
+  // Save all child models
+  std::vector< Entity* >::iterator eiter;
+  for (eiter = this->children.begin(); eiter != this->children.end(); eiter++)
+  {
+    Model *cmodel = dynamic_cast<Model*>(*eiter);
+    if (cmodel)
+      cmodel->Save(p, stream);
+  }
+
+  stream << prefix << "</model:" << typeName << ">\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -285,9 +339,9 @@ int Model::Update()
     boost::python::call<void>(this->pFuncUpdate, this);
   }*/
 
-  if (!this->canonicalBodyName.empty())
+  if (!this->canonicalBodyNameP->GetValue().empty())
   {
-    this->pose = this->bodies[this->canonicalBodyName]->GetPose();
+    this->pose = this->bodies[this->canonicalBodyNameP->GetValue()]->GetPose();
   }
 
   return this->UpdateChild();
@@ -475,20 +529,6 @@ void Model::LoadJoint(XMLConfigNode *node)
 
   Joint *joint;
 
-  Body *body1(this->bodies[node->GetString("body1",std::string(),1)]);
-  Body *body2(this->bodies[node->GetString("body2",std::string(),1)]);
-  Body *anchorBody(this->bodies[node->GetString("anchor",std::string(),0)]);
-  Vector3 anchorOffset = node->GetVector3("anchorOffset",Vector3(0,0,0));
-
-  if (!body1)
-  {
-    gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
-  }
-  if (!body2)
-  {
-    gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
-  }
-
   // Create a Hinge Joint
   if (node->GetName() == "hinge")
     joint = this->CreateJoint(Joint::HINGE);
@@ -506,23 +546,6 @@ void Model::LoadJoint(XMLConfigNode *node)
   }
 
   joint->SetModel(this);
-
-  // Attach two bodies
-  joint->Attach(body1,body2);
-
-  Vector3 anchorVec = anchorBody->GetPosition() + anchorOffset;
-
-  // Set the anchor vector
-  if (anchorBody)
-  {
-    joint->SetAnchor(anchorVec);
-    //joint->SetAnchor(anchorBody->GetPosition());
-  }
-  /*else
-  {
-    joint->SetAnchor(anchorVec);
-    this->bodies.erase(node->GetString("anchor",std::string(),0));
-  }*/
 
   // Load each joint
   joint->Load(node);
@@ -594,7 +617,7 @@ Body *Model::GetBody(const std::string &name)
 {
   if (this->bodies.find(name) != this->bodies.end())
   {
-    return  this->bodies[name];
+    return this->bodies[name];
   }
   else if (name == "canonical")
   {
@@ -607,14 +630,15 @@ Body *Model::GetBody(const std::string &name)
 // Attach this model to its parent
 void Model::Attach(XMLConfigNode *node)
 {
-  std::string parentBodyName = "canonical";
-  std::string myBodyName = "canonical";
-  Model *parentModel;
+  Model *parentModel = NULL;
+
+  this->parentBodyNameP = new Param<std::string>("parentBody","canonical",1);
+  this->myBodyNameP = new Param<std::string>("myBody",this->canonicalBodyNameP->GetValue(),1);
 
   if (node)
   {
-    parentBodyName = node->GetString("parentBody","canonical",1);
-    myBodyName = node->GetString("myBody",canonicalBodyName,1);
+    this->parentBodyNameP->Load(node);
+    this->myBodyNameP->Load(node);
   }
 
   parentModel = dynamic_cast<Model*>(this->parent);
@@ -624,8 +648,8 @@ void Model::Attach(XMLConfigNode *node)
 
   this->joint = (HingeJoint*)this->CreateJoint(Joint::HINGE);
 
-  Body *myBody = this->GetBody(myBodyName);
-  Body *pBody = parentModel->GetBody(parentBodyName);
+  Body *myBody = this->GetBody(**(this->myBodyNameP));
+  Body *pBody = parentModel->GetBody(**(this->parentBodyNameP));
 
   if (myBody == NULL)
     gzthrow("No canonical body set.");
@@ -651,7 +675,7 @@ void Model::Attach(XMLConfigNode *node)
 /// Get the canonical body. Used for connected Model heirarchies
 Body *Model::GetCanonicalBody()
 {
-  return this->bodies[this->canonicalBodyName];
+  return this->bodies[this->canonicalBodyNameP->GetValue()];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -672,7 +696,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
 
   if ((childNode = node->GetChild("light")))
   {
-    OgreCreator::CreateLight(childNode, body->GetVisualNode());
+    this->lightName = OgreCreator::CreateLight(childNode, body->GetVisualNode());
   }
 
 }
@@ -684,12 +708,19 @@ void Model::LoadPhysical(XMLConfigNode *node)
   XMLConfigNode *childNode = NULL;
 
   // Load the bodies
-  childNode = node->GetChildByNSPrefix("body");
+  if (node->GetChildByNSPrefix("body"))
+    childNode = node->GetChildByNSPrefix("body");
+  else
+    childNode = node->GetChild("body");
 
   while (childNode)
   {
     this->LoadBody(childNode);
-    childNode = childNode->GetNextByNSPrefix("body");
+
+    if (childNode->GetNextByNSPrefix("body"))
+      childNode = childNode->GetNextByNSPrefix("body");
+    else
+      childNode = childNode->GetNext("body");
   }
 
   // Load the joints
@@ -711,5 +742,4 @@ void Model::LoadPhysical(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("joint");
   }
 
-  this->canonicalBodyName = node->GetString("canonicalBody",std::string(),0);
 }

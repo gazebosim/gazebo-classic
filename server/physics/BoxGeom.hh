@@ -28,6 +28,7 @@
 #define BOXGEOM_HH
 
 #include "Geom.hh"
+#include "Param.hh"
 
 namespace gazebo
 {
@@ -80,9 +81,13 @@ namespace gazebo
     /// \brief Load the box
     protected: void LoadChild(XMLConfigNode *node);
 
+    /// \brief Save child parameters
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
     /// \brief Set the size of the box
     public: void SetSize( Vector3 size );
 
+    private: Param<Vector3> *sizeP;
   };
 
   /// \}

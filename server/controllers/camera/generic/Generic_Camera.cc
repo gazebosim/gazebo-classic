@@ -70,6 +70,13 @@ void Generic_Camera::LoadChild(XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Save the controller.
+void Generic_Camera::SaveChild(std::string &prefix, std::ostream &stream)
+{
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the controller
 void Generic_Camera::InitChild()
 {
@@ -107,8 +114,8 @@ void Generic_Camera::PutCameraData()
   data->image_size = data->width * data->height * 3;
 
   // GetFOV() returns radians
-  data->hfov = this->myParent->GetHFOV();
-  data->vfov = this->myParent->GetVFOV();
+  data->hfov = *(this->myParent->GetHFOV());
+  data->vfov = *(this->myParent->GetVFOV());
 
   // Set the pose of the camera
   cameraPose = this->myParent->GetWorldPose();

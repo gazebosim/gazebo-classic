@@ -8,6 +8,7 @@ for subdir in dirs:
 
 sources = ['main.cc',
            'Vector3.cc', 
+           'Vector4.cc', 
            'Quatern.cc',
            'Pose3d.cc',
            'World.cc',
@@ -19,6 +20,7 @@ sources = ['main.cc',
            'GazeboMessage.cc',
            'Model.cc',
            'Simulator.cc',
+           'Angle.cc',
            ]
 
 headers.append( 
@@ -35,9 +37,11 @@ headers.append(
            '#/server/Time.hh',
            '#/server/Vector2.hh', 
            '#/server/Vector3.hh',
+           '#/server/Vector4.hh',
            '#/server/World.hh',
            '#/server/XMLConfig.hh',
-           '#/server/GazeboConfig.hh'
+           '#/server/GazeboConfig.hh',
+           '#/server/Angle.hh'
            ] )
 
 staticObjs.append( env.StaticObject(sources) )

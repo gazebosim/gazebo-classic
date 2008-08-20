@@ -48,6 +48,13 @@ MapGeom::MapGeom(Body *body)
     : Geom(body)
 {
   this->root = new QuadNode(NULL);
+
+  this->negativeP = new Param<int>("negative", 0, 0);
+  this->thresholdP = new Param<double>( "threshold", 200.0, 0);
+  this->wallHeightP = new Param<double>( "height", 1.0, 0 );
+  this->scaleP = new Param<double>("scale",1.0,0);
+  this->materialP = new Param<std::string>("material", "", 0);
+  this->granularityP = new Param<int>("granularity", 5, 0);
 }
 
 
@@ -57,6 +64,13 @@ MapGeom::~MapGeom()
 {
   if (this->root)
     delete this->root;
+
+  delete this->negativeP;
+  delete this->thresholdP;
+  delete this->wallHeightP;
+  delete this->scaleP;
+  delete this->materialP;
+  delete this->granularityP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -75,22 +89,17 @@ void MapGeom::LoadChild(XMLConfigNode *node)
 
   std::string imageFilename = node->GetString("image","",1);
 
-  this->negative = node->GetBool("negative", 0);
-
-  this->threshold = node->GetDouble( "threshold", 200.0);
-
-  this->wallHeight = node->GetDouble( "height", 1.0, 0 );
-
-  this->scale = node->GetDouble("scale",1.0,0);
-
-  this->material = node->GetString("material", "", 0);
-
-  this->granularity = node->GetInt("granularity", 5, 0);
+  this->negativeP->Load(node);
+  this->thresholdP->Load(node);
+  this->wallHeightP->Load(node);
+  this->scaleP->Load(node);
+  this->materialP->Load(node);
+  this->granularityP->Load(node);
 
   // Make sure they are ok
-  if (this->scale <= 0) this->scale = 0.1;
-  if (this->threshold <=0) this->threshold = 200;
-  if (this->wallHeight <= 0) this->wallHeight = 1.0;
+  if (this->scaleP->GetValue() <= 0) this->scaleP->SetValue( 0.1 );
+  if (this->thresholdP->GetValue() <=0) this->thresholdP->SetValue(200);
+  if (this->wallHeightP->GetValue() <= 0) this->wallHeightP->SetValue( 1.0 );
 
   // Load the image 
   this->mapImage.load(imageFilename,
@@ -134,12 +143,12 @@ void MapGeom::CreateBoxes(QuadNode *node)
 
     stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
 
-    float x = (node->x + node->width / 2.0) * this->scale;
-    float y = (node->y + node->height / 2.0) * this->scale;
-    float z = this->wallHeight / 2.0;
-    float xSize = (node->width) * this->scale;
-    float ySize = (node->height) * this->scale;
-    float zSize = this->wallHeight;
+    float x = (node->x + node->width / 2.0) * this->scaleP->GetValue();
+    float y = (node->y + node->height / 2.0) * this->scaleP->GetValue();
+    float z = this->wallHeightP->GetValue() / 2.0;
+    float xSize = (node->width) * this->scaleP->GetValue();
+    float ySize = (node->height) * this->scaleP->GetValue();
+    float zSize = this->wallHeightP->GetValue();
 
     stream << "<geom:box name='map_geom'>";
     stream << "  <mass>0.0</mass>";
@@ -148,7 +157,7 @@ void MapGeom::CreateBoxes(QuadNode *node)
     stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
     stream << "  <visual>";
     stream << "    <mesh>unit_box</mesh>";
-    stream << "    <material>" << this->material << "</material>";
+    stream << "    <material>" << this->materialP->GetValue() << "</material>";
     stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
     stream << "  </visual>";
     stream << "</geom:box>";
@@ -290,7 +299,7 @@ void MapGeom::BuildTree(QuadNode *node)
 
   int diff = labs(freePixels - occPixels);
 
-  if (diff > this->granularity)
+  if (diff > this->granularityP->GetValue())
   {
     float newX, newY;
     float newW, newH;
@@ -371,10 +380,10 @@ void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart,
     {
       pixColor = this->mapImage.getColourAt(x, y, 0);
       v = (unsigned char)(255 * ((pixColor[0] + pixColor[1] + pixColor[2]) / 3.0));
-      if (this->negative)
+      if (this->negativeP->GetValue())
         v = 255 - v;
 
-      if (v > this->threshold)
+      if (v > this->thresholdP->GetValue())
         freePixels++;
       else
         occPixels++;
@@ -382,3 +391,14 @@ void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart,
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/// Save child parameters
+void MapGeom::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->negativeP) << "\n";
+  stream << prefix << *(this->thresholdP) << "\n";
+  stream << prefix << *(this->wallHeightP) << "\n";
+  stream << prefix << *(this->scaleP) << "\n";
+  stream << prefix << *(this->materialP) << "\n";
+  stream << prefix << *(this->granularityP) << "\n";
+}

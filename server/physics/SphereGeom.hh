@@ -27,8 +27,8 @@
 #ifndef SPHEREGEOM_HH
 #define SPHEREGEOM_HH
 
+#include "Param.hh"
 #include "Geom.hh"
-
 
 namespace gazebo
 {
@@ -81,6 +81,10 @@ namespace gazebo
     /// \brief Load the sphere
     protected: void LoadChild(XMLConfigNode *node);
 
+    /// \brief Save child parameters
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
+    private: Param<double> *radiusP;
   };
 
   /// \}

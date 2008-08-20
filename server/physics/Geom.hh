@@ -29,6 +29,7 @@
 
 #include <ode/ode.h>
 
+#include "Param.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Vector3.hh"
@@ -60,7 +61,10 @@ namespace gazebo
     public: virtual void Load(XMLConfigNode *node);
 
     /// \brief Load the geom
-    public: virtual void Save();
+    public: virtual void Save(std::string &prefix, std::ostream &stream);
+
+    /// \brief Save child parameters
+    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream) = 0;
 
     /// \brief Load child class
     protected: virtual void LoadChild(XMLConfigNode *node) = 0;
@@ -158,11 +162,14 @@ namespace gazebo
     /// mass of the body
     protected: dMass bodyMass;
  
-    private: int laserFiducialId;
-    private: float laserRetro;
+    private: Param<int> *laserFiducialIdP;
+    private: Param<float> *laserRetroP;
 
     ///  Mass as a double
-    protected: double dblMass;
+    protected: Param<double> *massP;
+
+    private: Param<Vector3> *xyzP;
+    private: Param<Quatern> *rpyP;
 
     /// Special bounding box visual
     private: OgreVisual *bbVisual;
@@ -175,6 +182,7 @@ namespace gazebo
     ///our XML DATA
     private: XMLConfigNode *xmlNode;
 
+    private: std::string typeName;
   };
 
   /// \}

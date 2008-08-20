@@ -36,7 +36,16 @@ using namespace gazebo;
 UniversalJoint::UniversalJoint( dWorldID worldId )
     : Joint()
 {
+  this->type = UNIVERSAL;
   this->jointId = dJointCreateUniversal( worldId, NULL );
+
+  this->axis1P = new Param<Vector3>("axis1",Vector3(0,0,1),0);
+  this->axis2P = new Param<Vector3>("axis2",Vector3(0,0,1),0);
+
+  this->loStop1P = new Param<Angle>("lowStop1",-M_PI,0);
+  this->hiStop1P = new Param<Angle>("highStop1",M_PI,0);
+  this->loStop2P = new Param<Angle>("lowStop2",-M_PI,0);
+  this->hiStop2P = new Param<Angle>("highStop2",M_PI,0);
 }
 
 
@@ -44,32 +53,53 @@ UniversalJoint::UniversalJoint( dWorldID worldId )
 // Destructor
 UniversalJoint::~UniversalJoint()
 {
+  delete this->axis1P;
+  delete this->axis2P;
+  delete this->loStop1P;
+  delete this->hiStop1P;
+  delete this->loStop2P;
+  delete this->hiStop2P;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the joint
 void UniversalJoint::LoadChild(XMLConfigNode *node)
 {
-  this->SetAxis1(node->GetVector3("axis1",Vector3(0,0,1)));
-  this->SetAxis2(node->GetVector3("axis2",Vector3(0,0,1)));
+  this->axis1P->Load(node);
+  this->axis2P->Load(node);
 
-  double loStop1 = DTOR(node->GetDouble("lowStop1",RTOD(-M_PI),0));
-  double hiStop1 = DTOR(node->GetDouble("highStop1",RTOD(M_PI),0));
+  this->loStop1P->Load(node);
+  this->hiStop1P->Load(node);
+  this->loStop2P->Load(node);
+  this->hiStop2P->Load(node);
 
-  double loStop2 = DTOR(node->GetDouble("lowStop2",RTOD(-M_PI),0));
-  double hiStop2 = DTOR(node->GetDouble("highStop2",RTOD(M_PI),0));
-
-  // Perform this three step ordering to ensure the parameters are set
-  // properly. This is taken from the ODE wiki.
-  this->SetParam(dParamHiStop, hiStop1);
-  this->SetParam(dParamLoStop, loStop1);
-  this->SetParam(dParamHiStop, hiStop1);
+  this->SetAxis1(**(this->axis1P));
+  this->SetAxis2(**(this->axis1P));
 
   // Perform this three step ordering to ensure the parameters are set
   // properly. This is taken from the ODE wiki.
-  this->SetParam(dParamHiStop2, hiStop2);
-  this->SetParam(dParamLoStop2, loStop2);
-  this->SetParam(dParamHiStop2, hiStop2);
+  this->SetParam(dParamHiStop, this->hiStop1P->GetValue().GetAsRadian());
+  this->SetParam(dParamLoStop, this->loStop1P->GetValue().GetAsRadian());
+  this->SetParam(dParamHiStop, this->hiStop1P->GetValue().GetAsRadian());
+
+  // Perform this three step ordering to ensure the parameters are set
+  // properly. This is taken from the ODE wiki.
+  this->SetParam(dParamHiStop2, this->hiStop2P->GetValue().GetAsRadian());
+  this->SetParam(dParamLoStop2, this->loStop2P->GetValue().GetAsRadian());
+  this->SetParam(dParamHiStop2, this->hiStop2P->GetValue().GetAsRadian());
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Save a joint to a stream in XML format
+void UniversalJoint::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->axis1P) << "\n";
+  stream << prefix << *(this->loStop1P) << "\n";
+  stream << prefix << *(this->hiStop1P) << "\n";
+
+  stream << prefix << *(this->axis2P) << "\n";
+  stream << prefix << *(this->loStop2P) << "\n";
+  stream << prefix << *(this->hiStop2P) << "\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

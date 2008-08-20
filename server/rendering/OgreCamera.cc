@@ -47,13 +47,10 @@ unsigned int OgreCamera::cameraCounter = 0;
 // Constructor
 OgreCamera::OgreCamera(const std::string &namePrefix)
 {
-  this->imageWidth = this->imageHeight = 0;
   this->textureWidth = this->textureHeight = 0;
 
   this->saveFrameBuffer = NULL;
   this->saveCount = 0;
-  this->saveFrames = false;
-
 
   this->myCount = cameraCounter++;
 
@@ -63,6 +60,15 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   this->renderTarget = NULL;
   this->userMovable = true;
+
+  this->nearClipP = new Param<double>("nearClip",0.1,0);
+  this->farClipP = new Param<double>("farClip",100,0);
+  this->saveFramesP = new Param<bool>("saveFrames",false,0);
+  this->savePathnameP = new Param<std::string>("saveFramePath","",0);
+  this->imageWidthP = new Param<unsigned int>("imageSize",640,0);
+  this->imageHeightP = new Param<unsigned int>("imageSize",480,0);
+  this->visMaskP = new Param<std::string>("mask","none",0);
+  this->hfovP = new Param<Angle>("hfov", Angle(DTOR(60)),0);
 
   // This should be last in the constructor
   CameraManager::Instance()->AddCamera(this);
@@ -75,6 +81,15 @@ OgreCamera::~OgreCamera()
 {
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
+
+  delete this->nearClipP;
+  delete this->farClipP;
+  delete this->saveFramesP;
+  delete this->savePathnameP;
+  delete this->imageWidthP;
+  delete this->imageHeightP;
+  delete this->visMaskP;
+  delete this->hfovP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -86,42 +101,35 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
 
   if (node)
   {
-    this->nearClip = node->GetDouble("nearClip",0.1,0);
-    this->farClip = node->GetDouble("farClip",100,0);
-    this->saveFrames = node->GetBool("saveFrames",false,0);
-    this->savePathname = node->GetString("saveFramePath","",0);
+    this->nearClipP->Load(node);
+    this->farClipP->Load(node);
+    this->saveFramesP->Load(node);
+    this->savePathnameP->Load(node);
+    this->imageWidthP->Load(node);
+    this->imageHeightP->Load(node);
+    this->visMaskP->Load(node);
+    this->hfovP->Load(node);
 
-    this->imageWidth = node->GetTupleInt("imageSize",0,640);
-    this->imageHeight = node->GetTupleInt("imageSize",1,480);
-
-    this->hfov = DTOR(node->GetDouble("hfov",60,0));
-
-    if (node->GetString("mask","none",0) == "laser")
+    if (this->visMaskP->GetValue() == "laser")
     {
       this->visibilityMask ^= GZ_LASER_CAMERA;
     }
   }
-  else
-  {
-    this->nearClip = 0.1;
-    this->farClip = 100;
-    this->hfov = DTOR(60);
-    this->saveFrames = false;
-  }
 
   // Create the directory to store frames
-  if (this->saveFrames)
+  if (this->saveFramesP->GetValue())
   {
     std::string command;
-    command = "mkdir " + this->savePathname + " 2>>/dev/null";
+    command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
     system(command.c_str());
   }
 
-  if (this->hfov < 0.01 || this->hfov > M_PI)
+  if (this->hfovP->GetValue() < Angle(0.01) || 
+      this->hfovP->GetValue() > Angle(M_PI))
   {
     gzthrow("Camera horizontal field of veiw invalid.");
   }
-  if (this->nearClip <= 0)
+  if (this->nearClipP->GetValue() <= 0)
   {
     gzthrow("near clipping plane (min depth) <= zero");
   }
@@ -129,10 +137,24 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// Save camera info in xml format
+void OgreCamera::SaveCam(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << (*this->nearClipP) << "\n";
+  stream << prefix << (*this->farClipP) << "\n";
+  stream << prefix << (*this->saveFramesP) << "\n";
+  stream << prefix << (*this->savePathnameP) << "\n";
+  stream << prefix << (*this->imageWidthP) << "\n";
+  stream << prefix << (*this->imageHeightP) << "\n";
+  stream << prefix << (*this->visMaskP) << "\n";
+  stream << prefix << (*this->hfovP) << "\n";
+}
+ 
+//////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
 void OgreCamera::InitCam()
 {
-  this->camera = OgreCreator::CreateCamera(this->cameraName, this->nearClip, this->farClip, this->hfov, this->renderTarget );
+  this->camera = OgreCreator::CreateCamera(this->cameraName, this->nearClipP->GetValue(), this->farClipP->GetValue(), *(this->hfovP->GetValue()), this->renderTarget );
 
   // Create a scene node to control pitch motion
   this->pitchNode = this->sceneNode->createChildSceneNode( this->cameraName + "PitchNode");
@@ -197,16 +219,15 @@ void OgreCamera::SetWorldPose(const Pose3d &pose)
 /// Set the clip distances
 void OgreCamera::SetClipDist(float near, float far)
 {
-  this->nearClip = near;
-  this->farClip = far;
+  this->nearClipP->SetValue(near);
+  this->farClipP->SetValue(far);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the camera FOV (horizontal)  
 void OgreCamera::SetFOV( float radians )
 {
-  this->hfov = radians;
-
+  this->hfovP->SetValue(radians);
 }
 
 
@@ -236,30 +257,30 @@ void OgreCamera::RotatePitch( float angle )
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the horizontal field of view of the camera
-double OgreCamera::GetHFOV() const
+Angle OgreCamera::GetHFOV() const
 {
-  return this->hfov;
+  return this->hfovP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical field of view of the camera
-double OgreCamera::GetVFOV() const
+Angle OgreCamera::GetVFOV() const
 {
-  return this->camera->getFOVy().valueRadians();
+  return Angle(this->camera->getFOVy().valueRadians());
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the width of the image
 unsigned int OgreCamera::GetImageWidth() const
 {
-  return this->imageWidth;
+  return this->imageWidthP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int OgreCamera::GetImageHeight() const
 {
-  return this->imageHeight;
+  return this->imageHeightP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -281,7 +302,7 @@ unsigned int OgreCamera::GetTextureHeight() const
 // Get the image size in bytes
 size_t OgreCamera::GetImageByteSize() const
 {
-  return this->imageHeight * this->imageWidth * 3;
+  return this->imageHeightP->GetValue() * this->imageWidthP->GetValue() * 3;
 }
 
 
@@ -289,14 +310,14 @@ size_t OgreCamera::GetImageByteSize() const
 // Enable or disable saving
 void OgreCamera::EnableSaveFrame(bool enable)
 {
-  this->saveFrames = enable;
+  this->saveFramesP->SetValue( enable );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Toggle saving of frames
 void OgreCamera::ToggleSaveFrame()
 {
-  this->saveFrames = !this->saveFrames;
+  this->saveFramesP->SetValue(!this->saveFramesP->GetValue());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -310,14 +331,14 @@ Ogre::Camera *OgreCamera::GetOgreCamera() const
 /// Get the near clip distance
 double OgreCamera::GetNearClip()
 {
-  return this->nearClip;
+  return this->nearClipP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the far clip distance
 double OgreCamera::GetFarClip()
 {
-  return this->farClip;
+  return this->farClipP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -62,6 +62,8 @@ GLFrameManager::~GLFrameManager()
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Load from xml
 void GLFrameManager::Load( XMLConfigNode *node )
 {
   GLFrame *frame = NULL;
@@ -127,6 +129,41 @@ void GLFrameManager::Load( XMLConfigNode *node )
     this->insert(*frame, windowCount);
   }
   
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the gui params in xml format
+void GLFrameManager::Save(std::string &prefix, std::ostream &stream)
+{
+  std::vector<GLFrame *>::iterator iter;
+  std::vector<int> rows;
+
+  stream << prefix << "<frames>\n";
+
+  int cy = -1;
+  for (iter = this->frames.begin(); iter != this->frames.end(); iter++)
+  {
+    int height = (int)( ((float)(*iter)->h() / this->h()) * 100 );
+    int width = (int)( ((float)(*iter)->w() / this->w()) * 100 );
+    Pose3d pose = (*iter)->GetCameraPose();
+
+    if ((*iter)->y() != cy)
+    {
+      if (cy != -1)
+        stream << prefix << "  </row>\n";
+
+      cy = (*iter)->y();
+      stream << prefix << "  <row height=\"" << height << "%\">\n";
+    }
+
+    stream << prefix << "    <camera width=\"" << width << "%\">\n";
+    stream << prefix << "      <xyz>" << pose.pos << "</xyz>\n";
+    stream << prefix << "      <rpy>" << pose.rot << "</rpy>\n";
+    stream << prefix << "    </camera>\n";
+  }
+
+  stream << prefix << "  </row>\n";
+  stream << prefix << "</frames>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,8 @@
 #ifndef HINGE2JOINT_HH
 #define HINGE2JOINT_HH
 
+#include "Param.hh"
+#include "Angle.hh"
 #include "Vector3.hh"
 #include "Joint.hh"
 
@@ -102,6 +104,9 @@ class Hinge2Joint : public Joint
 
   /// \brief Load the joint
   protected: virtual void LoadChild(XMLConfigNode *node);
+
+  /// \brief Save a joint to a stream in XML format
+  protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
  
   /// \brief Set the anchor point
   public: virtual void SetAnchor( const Vector3 &anchor );
@@ -141,6 +146,14 @@ class Hinge2Joint : public Joint
 
   /// \brief Set the torque
   public: void SetTorque(double torque1, double torque2);
+
+  private: Param<Vector3> *axis1P;
+  private: Param<Angle> *loStop1P;
+  private: Param<Angle> *hiStop1P; 
+
+  private: Param<Vector3> *axis2P;
+  private: Param<Angle> *loStop2P;
+  private: Param<Angle> *hiStop2P; 
 };
 
 /// \}

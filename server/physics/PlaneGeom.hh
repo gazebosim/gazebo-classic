@@ -28,6 +28,7 @@
 #define PLANEGEOM_HH
 
 #include "Geom.hh"
+#include "Param.hh"
 
 namespace gazebo
 {
@@ -95,6 +96,15 @@ namespace gazebo
     /// \brief Load the plane
     public: virtual void LoadChild(XMLConfigNode *node);
 
+    /// \brief Save child parameters
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
+    private: Param<Vector3> *normalP;
+    private: Param<Vector2<double> > *sizeP;
+    private: Param<Vector2<double> > *segmentsP;
+    private: Param<Vector2<double> > *uvTileP;
+    private: Param<std::string> *materialP;
+    private: Param<bool> *castShadowsP;
   };
   
   /// \}

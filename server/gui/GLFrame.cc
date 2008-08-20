@@ -184,8 +184,6 @@ void GLFrame::ViewCB(Fl_Widget *widget, void *data)
 {
   GLFrame *frame = reinterpret_cast<GLFrame *>(data);
   Fl_Choice *choice = dynamic_cast<Fl_Choice *>(widget);
-  CameraManager *manager = CameraManager::Instance();
-  OgreCamera *cam = manager->GetCamera(choice->text());
 
   frame->glWindow->SetViewStyle(choice->text());
 }

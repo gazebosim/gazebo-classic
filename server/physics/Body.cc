@@ -26,6 +26,7 @@
 
 #include <sstream>
 
+#include "Model.hh"
 #include "GazeboMessage.hh"
 #include "HeightmapGeom.hh"
 #include "MapGeom.hh"
@@ -62,6 +63,9 @@ Body::Body(Entity *parent, dWorldID worldId)
   {
     this->bodyId = NULL;
   }
+
+  this->xyzP = new Param<Vector3>("xyz", Vector3(), 0);
+  this->rpyP = new Param<Quatern>("rpy", Quatern(), 0);
 }
 
 
@@ -83,6 +87,10 @@ Body::~Body()
     GZ_DELETE (*siter);
   }
   this->sensors.clear();
+
+  delete this->xyzP;
+  delete this->rpyP;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,10 +99,12 @@ void Body::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode;
 
-  this->SetName(node->GetString("name",std::string(),1));
-  this->SetPosition(node->GetVector3("xyz",Vector3(0,0,0)));
-  this->SetRotation(node->GetRotation("rpy",Quatern(1,0,0,0)));
-  this->xmlNode=node;
+  this->nameP->Load(node);
+  this->xyzP->Load(node);
+  this->rpyP->Load(node);
+
+  this->SetPosition(this->xyzP->GetValue());
+  this->SetRotation(this->rpyP->GetValue());
 
   childNode = node->GetChildByNSPrefix("geom");
 
@@ -126,25 +136,35 @@ void Body::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the body based on our XMLConfig node
-void Body::Save()
+void Body::Save(std::string &prefix, std::ostream &stream)
 {
-  /*std::vector< Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
   std::vector< Sensor* >::iterator siter;
+  Model *model = dynamic_cast<Model*>(this->parent);
+  //Vector3 pose = model->GetPose() - this->GetPose();
 
-  this->xmlNode->SetValue("name", this->GetName());
-  this->xmlNode->SetValue("xyz", this->GetPosition());
-  this->xmlNode->SetValue("rpy", this->GetRotation());
+  this->xyzP->SetValue( this->GetPose().pos - model->GetPose().pos );
+  this->rpyP->SetValue( this->GetRotation() );
+
+  stream << prefix << "<body name=\"" << this->nameP->GetValue() << "\">\n";
+  stream << prefix << "  " << *(this->xyzP) << "\n";
+  stream << prefix << "  " << *(this->rpyP) << "\n";
+
+  std::string p = prefix + "  ";
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    //(*giter)->Save();
+    stream << "\n";
+    (*giter)->Save(p, stream);
   }
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
   {
-    //(*siter)->Save();
+    stream << "\n";
+    (*siter)->Save(p, stream);
   }
-  */
+
+  stream << prefix << "</body>\n";
 }
 
 

@@ -38,7 +38,7 @@
   <model:physical name="sphere1_model">
     <xyz>1 0 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
-    <static>false</static>
+    <static>true</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
@@ -48,7 +48,6 @@
         <mu1>109999.0</mu1>
 
         <visual>
-          <scale>0.5 0.5 0.5</scale>
           <mesh>unit_sphere</mesh>
           <material>Gazebo/Rocky</material>
         </visual>
@@ -67,6 +66,7 @@
         <size>1 1 1</size>
         <mass>0.1</mass>
         <visual>
+          <size>1 1 1</size>
           <mesh>unit_box</mesh>
           <material>Gazebo/Rocky</material>
         </visual>
@@ -74,6 +74,7 @@
     </body:box>
   </model:physical>
 
+  <!--
   <model:physical name="cylinder1_model">
     <xyz>1 -1.5 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
@@ -91,6 +92,7 @@
       </geom:cylinder>
     </body:cylinder>
   </model:physical>
+  -->
 
    <!-- Ground Plane -->
    <model:physical name="plane1_model">

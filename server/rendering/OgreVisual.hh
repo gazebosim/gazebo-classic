@@ -33,6 +33,7 @@
 #include "Pose3d.hh"
 #include "Quatern.hh"
 #include "Vector3.hh"
+#include "Param.hh"
 
 namespace gazebo
 { 
@@ -58,11 +59,8 @@ namespace gazebo
     /// \brief Attach a mesh to this visual by name
     public: void AttachMesh( const std::string &meshName );
 
-    /// \brief Set the node we will save to.
-    public: void SetXML(XMLConfigNode *node);
-
     /// \brief Save the visual
-    public: void Save();
+    public: void Save(std::string &prefix, std::ostream &stream);
     
     /// \brief Return an unique name for this object
     /// \return Unique name for the object
@@ -136,14 +134,19 @@ namespace gazebo
 
     private: float transparency;
 
-    ///our XML DATA
-    private: XMLConfigNode *xmlNode;
-
     private: Ogre::StaticGeometry *staticGeometry;
 
     private: static unsigned int visualCounter;
 
     private: Entity *entity;
+
+    private: Param<Vector3> *xyzP;
+    private: Param<Quatern> *rpyP;
+    private: Param<std::string> *meshNameP;
+    private: Param<std::string> *materialNameP;
+    private: Param<bool> *castShadowsP;
+    private: Param<Vector3> *sizeP;
+    private: Param<Vector3> *scaleP;
   };
 }
 

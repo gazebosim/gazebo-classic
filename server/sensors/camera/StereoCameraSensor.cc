@@ -29,6 +29,7 @@
 #include <GL/gl.h>
 #include <Ogre.h>
 
+#include "Controller.hh"
 #include "Global.hh"
 #include "World.hh"
 #include "GazeboError.hh"
@@ -82,6 +83,22 @@ void StereoCameraSensor::LoadChild( XMLConfigNode *node )
   this->LoadCam(node);
 
   this->baseline = node->GetDouble("baseline",0,1);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Save the sensor info in XML format
+void StereoCameraSensor::Save(std::string &prefix, std::ostream &stream)
+{
+  std::string p = prefix + "  ";
+
+  stream << prefix << "<sensor:stereocamera name=\"" << this->nameP->GetValue() << "\">\n";
+
+  this->SaveCam(p, stream);
+
+  if (this->controller)
+    this->controller->Save(p, stream);
+
+  stream << prefix << "</sensor:stereocamera>\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -166,8 +183,8 @@ void StereoCameraSensor::InitChild()
   //this->renderTargets[0]->addListener(&this->leftCameraListener);
   //this->renderTargets[1]->addListener(&this->rightCameraListener);
  
-  this->rgbBufferSize = this->imageWidth*this->imageHeight * 3;
-  this->depthBufferSize = this->imageWidth*this->imageHeight;
+  this->rgbBufferSize = this->imageWidthP->GetValue()*this->imageHeightP->GetValue() * 3;
+  this->depthBufferSize = this->imageWidthP->GetValue()*this->imageHeightP->GetValue();
 
   // Allocate buffers
   this->depthBuffer[0] = new float[this->depthBufferSize];
@@ -223,7 +240,7 @@ void StereoCameraSensor::UpdateChild()
     // OgreSceneManager::_render function automatically sets farClip to 0.
     // Which normally equates to infinite distance. We don't want this. So
     // we have to set the distance every time.
-    this->GetOgreCamera()->setFarClipDistance( this->farClip );
+    this->GetOgreCamera()->setFarClipDistance( this->farClipP->GetValue() );
 
 
     Ogre::AutoParamDataSource autoParamDataSource;
@@ -274,7 +291,7 @@ void StereoCameraSensor::UpdateChild()
 
   this->FillBuffers();
 
-  if (this->saveFrames)
+  if (this->saveFramesP->GetValue())
     this->SaveFrame();
 }
 
@@ -321,22 +338,22 @@ void StereoCameraSensor::FillBuffers()
 
     hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
 
-    top = (int)((hardwareBuffer->getHeight() - this->imageHeight) / 2.0);
-    left = (int)((hardwareBuffer->getWidth() - this->imageWidth) / 2.0);
-    right = left + this->imageWidth;
-    bottom = top + this->imageHeight;
+    top = (int)((hardwareBuffer->getHeight() - this->imageHeightP->GetValue()) / 2.0);
+    left = (int)((hardwareBuffer->getWidth() - this->imageWidthP->GetValue()) / 2.0);
+    right = left + this->imageWidthP->GetValue();
+    bottom = top + this->imageHeightP->GetValue();
 
     if (i < 2)
     {
       hardwareBuffer->blitToMemory ( Ogre::Box(left,top,right,bottom),
-          Ogre::PixelBox( this->imageWidth, this->imageHeight,
+          Ogre::PixelBox( this->imageWidthP->GetValue(), this->imageHeightP->GetValue(),
             1, PF_RGB, this->rgbBuffer[i])
           );
     }
     else
     {
       hardwareBuffer->blitToMemory (Ogre::Box(left,top,right,bottom),
-          Ogre::PixelBox( this->imageWidth, this->imageHeight,
+          Ogre::PixelBox( this->imageWidthP->GetValue(), this->imageHeightP->GetValue(),
             1, PF_FLOAT, this->depthBuffer[i-2])
           );
     }
@@ -362,13 +379,13 @@ void StereoCameraSensor::SaveFrame()
     return;
   }
 
-  fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", this->imageWidth, this->imageHeight);
+  fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", this->imageWidthP->GetValue(), this->imageHeightP->GetValue());
 
-  for (unsigned int i = 0; i<this->imageHeight; i++)
+  for (unsigned int i = 0; i<this->imageHeightP->GetValue(); i++)
   {
-    for (unsigned int j =0; j<this->imageWidth; j++)
+    for (unsigned int j =0; j<this->imageWidthP->GetValue(); j++)
     {
-      double f = this->depthBuffer[0][i*this->imageWidth+j];
+      double f = this->depthBuffer[0][i*this->imageWidthP->GetValue()+j];
      
       unsigned char value = static_cast<unsigned char>(f * 255);
       fwrite( &value, 1, 1, fp );
@@ -403,8 +420,8 @@ void StereoCameraSensor::SaveFrame()
     // Create image data structure
     imgData  = new Ogre::ImageCodec::ImageData();
 
-    imgData->width = this->imageWidth;
-    imgData->height = this->imageHeight;
+    imgData->width = this->imageWidthP->GetValue();
+    imgData->height = this->imageHeightP->GetValue();
     imgData->depth = 1;
     if (i<2)
       imgData->format = Ogre::PF_B8G8R8;
@@ -521,7 +538,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
       name, 
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
-      this->imageWidth, this->imageHeight, 0,
+      this->imageWidthP->GetValue(), this->imageHeightP->GetValue(), 0,
       pf,
       Ogre::TU_RENDERTARGET);
 }

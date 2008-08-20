@@ -97,6 +97,9 @@ namespace gazebo
     /// \brief Load the heightmap
     protected: virtual void LoadChild(XMLConfigNode *node);
 
+    /// \brief Save child parameters
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
     /// Create a lookup table of the terrain's height
     private: void FillHeightMap();
 
@@ -120,6 +123,13 @@ namespace gazebo
     private: double distToTerrain;
 
     private: std::vector<double> heights;
+
+    private: Param<std::string> *imageFilenameP;
+    private: Param<std::string> *worldTextureP;
+    private: Param<std::string> *detailTextureP;
+    private: Param<Vector3> *sizeP;
+    private: Param<Vector3> *offsetP;
+
   };
 
   /// \}

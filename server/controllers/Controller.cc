@@ -41,6 +41,9 @@ using namespace gazebo;
 /// Constructor
 Controller::Controller(Entity *entity )
 {
+  this->nameP = new Param<std::string>("name","",1);
+  this->updatePeriodP = new Param<double>("updateRate", 10, 0);
+
   if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
   {
     gzthrow("The parent of a controller must be a Model or a Sensor");
@@ -54,6 +57,8 @@ Controller::Controller(Entity *entity )
 Controller::~Controller()
 {
   this->Fini();
+  delete this->nameP;
+  delete this->updatePeriodP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,9 +70,12 @@ void Controller::Load(XMLConfigNode *node)
   if (!this->parent)
     gzthrow("Parent entity has not been set");
 
-  this->name = node->GetString("name","",1);
+  this->typeName = node->GetName();
 
-  this->updatePeriod = 1.0 / (node->GetDouble("updateRate", 10) + 1e-6);
+  this->nameP->Load(node);
+  this->updatePeriodP->Load(node);
+  this->updatePeriod = 1.0 / (this->updatePeriodP->GetValue() + 1e-6);
+
   this->lastUpdate = -1e6;
 
   childNode = node->GetChildByNSPrefix("interface");
@@ -82,6 +90,9 @@ void Controller::Load(XMLConfigNode *node)
 
     // Get the name of the iface
     std::string ifaceName = childNode->GetString("name","",1);
+
+    this->ifaceTypes.push_back(ifaceType);
+    this->ifaceNames.push_back(ifaceName);
 
     try
     {
@@ -113,12 +124,11 @@ void Controller::Load(XMLConfigNode *node)
   if (this->ifaces.size() <= 0)
   {
     std::ostringstream stream;
-    stream << "No interface defined for " << this->name << " controller";
+    stream << "No interface defined for " << this->GetName() << " controller";
     gzthrow(stream.str());
   }
 
   this->LoadChild(node);
-  this->xmlNode=node;
 }
 
 
@@ -131,10 +141,28 @@ void Controller::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save the controller.
-void Controller::Save()
+void Controller::Save(std::string &prefix, std::ostream &stream)
 {
-  //So far the controller can not change in any way, not rewrite
-  this->SaveChild(this->xmlNode);
+  std::vector<std::string>::iterator iter1;
+  std::vector<std::string>::iterator iter2;
+
+  stream << prefix << "<controller:" << this->typeName << " name=\"" << this->nameP->GetValue() << "\">\n";
+
+  stream << prefix << "  " << *(this->updatePeriodP) << "\n";
+
+  // Ouptut the interfaces
+  for (iter1 = this->ifaceTypes.begin(), iter2=this->ifaceNames.begin(); 
+       iter1 != this->ifaceTypes.end() && iter2 != this->ifaceNames.end(); 
+       iter1++, iter2++)
+  {
+    stream << prefix << "  <interface:" << *(iter1) << " name=\"" << *(iter2) << "\"/>\n";
+  }
+
+  std::string p = prefix + "  ";
+
+  this->SaveChild(p, stream);
+
+  stream << prefix << "</controller:" << this->typeName << ">\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,5 +203,5 @@ void Controller::Fini()
 // Get the name of the controller
 std::string Controller::GetName() const
 {
-  return this->name;
+  return this->nameP->GetValue();
 }

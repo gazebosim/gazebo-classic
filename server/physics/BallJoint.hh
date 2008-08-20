@@ -76,6 +76,9 @@ class BallJoint : public Joint
   /// \brief Load the joint
   protected: void LoadChild(XMLConfigNode *node);
 
+  /// \brief Save a joint to a stream in XML format
+  protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
   /// \brief Get joint's anchor point
   public: Vector3 GetAnchor() const;
 

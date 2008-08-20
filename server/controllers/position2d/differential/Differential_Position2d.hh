@@ -29,6 +29,7 @@
 
 #include <map>
 
+#include "Param.hh"
 #include "Controller.hh"
 
 namespace gazebo
@@ -73,9 +74,9 @@ class Differential_Position2d : public Controller
   /// \param node XML config node
   protected: virtual void LoadChild(XMLConfigNode *node);
 
-  /// Load the controller
-  /// \param node XML config writer node
-  protected: virtual void SaveChild(XMLConfigNode *node);
+  /// \brief Save the controller.
+  /// \stream Output stream
+  protected: void SaveChild(std::string &prefix, std::ostream &stream);
 
   /// Init the controller
   protected: virtual void InitChild();
@@ -102,13 +103,13 @@ class Differential_Position2d : public Controller
   private: Model *myParent;
 
   /// Separation between the wheels
-  private: float wheelSep;
+  private: Param<float> *wheelSepP;
 
   /// Diameter of the wheels
-  private: float wheelDiam;
+  private: Param<float> *wheelDiamP;
 
   ///Torque applied to the wheels
-  private: float torque;
+  private: Param<float> *torqueP;
 
   /// Speeds of the wheels
   private: float wheelSpeed[2];
@@ -125,6 +126,9 @@ class Differential_Position2d : public Controller
   private: HingeJoint *joints[2];
 
   private: PhysicsEngine  *physicsEngine;
+
+  private: Param<std::string> *leftJointNameP;
+  private: Param<std::string> *rightJointNameP;
 };
 
 /** \} */

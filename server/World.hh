@@ -27,6 +27,7 @@
 #ifndef WORLD_HH
 #define WORLD_HH
 
+#include <iostream>
 #include <vector>
 #include "SingletonT.hh"
 #include "Vector3.hh"
@@ -68,8 +69,8 @@ class World : public SingletonT<World>
   public: void Load(XMLConfigNode *rootNode, unsigned int serverId);
 
   /// Save the world
-  /// \param node XMLConfig node writer pointer
-  public: void Save(XMLConfigNode *node);
+  /// \param stream Output stream
+  public: void Save(std::string &prefix, std::ostream &stream);
 
   /// Initialize the world
   /// \return 0 on success

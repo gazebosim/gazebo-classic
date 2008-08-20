@@ -25,11 +25,11 @@
  */
 #include <Ogre.h>
 #include "Entity.hh"
-#include "Global.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "OgreAdaptor.hh"
+#include "Global.hh"
 #include "OgreVisual.hh"
 
 using namespace gazebo;
@@ -58,28 +58,28 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
 
   this->entity = owner;
 
+  this->xyzP = new Param<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->rpyP = new Param<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  this->meshNameP = new Param<std::string>("mesh","",1);
+  this->materialNameP = new Param<std::string>("material",std::string(),0);
+  this->castShadowsP = new Param<bool>("castShadows",true,0);
+  this->scaleP = new Param<Vector3>("scale", Vector3(1,1,1), 0);
+  this->sizeP = new Param<Vector3>("size", Vector3(1,1,1), 0);
+
   this->staticGeometry = NULL;
   this->boundingBoxNode = NULL;
-//  this->sceneNode->setInheritScale(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 OgreVisual::~OgreVisual()
 {
-  if (this->parentNode && this->sceneNode)
-  {
-    //this->parentNode->removeAndDestroyChild(this->sceneNode->getName());
-  }
+  delete this->xyzP;
+  delete this->rpyP;
+  delete this->meshNameP;
+  delete this->materialNameP;
+  delete this->castShadowsP;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Sets the XML we will save the data to
-void OgreVisual::SetXML(XMLConfigNode *node)
-{
-  this->xmlNode=node;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the visual
@@ -91,23 +91,26 @@ void OgreVisual::Load(XMLConfigNode *node)
   Ogre::Vector3 meshSize;
   Ogre::MovableObject *obj = NULL;
 
-  this->xmlNode=node;
-  std::string meshName = node->GetString("mesh","",1);
+  this->xyzP->Load(node);
+  this->rpyP->Load(node);
+  this->meshNameP->Load(node);
+  this->materialNameP->Load(node);
+  this->castShadowsP->Load(node);
 
   // Read the desired position and rotation of the mesh
-  pose.pos = node->GetVector3("xyz", Vector3(0,0,0));
-  pose.rot = node->GetRotation("rpy", Quatern());
+  pose.pos = this->xyzP->GetValue();
+  pose.rot = this->rpyP->GetValue();
 
   try
   {
     // Create the entity
     stream << "ENTITY_" << this->sceneNode->getName();
-    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
+    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), this->meshNameP->GetValue());
   }
   catch (Ogre::Exception e)
   {
     std::cerr << "Ogre Error:" << e.getFullDescription() << "\n";
-    gzthrow("Unable to create a mesh from " + meshName);
+    gzthrow("Unable to create a mesh from " + this->meshNameP->GetValue());
   }
 
   // Attach the entity to the node
@@ -125,37 +128,51 @@ void OgreVisual::Load(XMLConfigNode *node)
 
   // Get the desired size of the mesh
   if (node->GetChild("size") != NULL)
-    size = node->GetVector3("size",Vector3(1,1,1));
+  {
+    this->sizeP->Load(node);
+  }
   else
-    size = Vector3(meshSize.x, meshSize.y, meshSize.z);
+    this->sizeP->SetValue( Vector3(meshSize.x, meshSize.y, meshSize.z) );
 
   // Get and set teh desired scale of the mesh
   if (node->GetChild("scale") != NULL)
   {
-    Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
+    this->scaleP->Load(node);
+    Vector3 scale = this->scaleP->GetValue();
     this->sceneNode->setScale(scale.x, scale.y, scale.z);
   }
   else
   {
-    this->sceneNode->setScale(size.x/meshSize.x, size.y/meshSize.y, size.z/meshSize.z);
+    Vector3 scale = this->sizeP->GetValue();
+    scale.x /= meshSize.x;
+    scale.y /= meshSize.y;
+    scale.z /= meshSize.z;
+
+    this->scaleP->SetValue( scale );
+    this->sceneNode->setScale(scale.x, scale.y, scale.z);
   }
 
-
   // Set the material of the mesh
-  this->SetMaterial(node->GetString("material",std::string(),0));
+  this->SetMaterial(this->materialNameP->GetValue());
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(node->GetBool("castShadows",true,0));
+  this->SetCastShadows(this->castShadowsP->GetValue());
 
-  this->SetXML(node);
 }
 
-void OgreVisual::Save()
+
+////////////////////////////////////////////////////////////////////////////////
+// Save the visual in XML format
+void OgreVisual::Save(std::string &prefix, std::ostream &stream)
 {
-  /*this->xmlNode->SetValue("xyz", this->GetPosition());
-  this->xmlNode->SetValue("rpy", this->GetRotation());
-  //TODO: A lot of information!
-  */
+  stream << prefix << "<visual>\n";
+  stream << prefix << "  " << *(this->xyzP) << "\n";
+  stream << prefix << "  " << *(this->rpyP) << "\n";
+  stream << prefix << "  " << *(this->meshNameP) << "\n";
+  stream << prefix << "  " << *(this->materialNameP) << "\n";
+  stream << prefix << "  " << *(this->castShadowsP) << "\n";
+  stream << prefix << "  " << *(this->scaleP) << "\n";
+  stream << prefix << "</visual>\n";
 }
 
 

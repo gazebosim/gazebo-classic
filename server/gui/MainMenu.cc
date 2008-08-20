@@ -46,6 +46,7 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
   {
     { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },
     //  { "Open", 0, &gazebo::MainMenu::OpenCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Save World", 0, &gazebo::MainMenu::SaveWorldCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
     { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
     { "Reset", 0, &gazebo::MainMenu::ResetCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
     { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
@@ -75,6 +76,23 @@ void MainMenu::OpenCB(Fl_Widget * /*w*/, void * /*data*/)
 
   while (fileChooser->shown())
     Fl::wait();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Save world Callback
+void MainMenu::SaveWorldCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  Fl_File_Chooser *fileChooser = new Fl_File_Chooser(getenv("PWD"),"*.world",Fl_File_Chooser::CREATE,"Save World File");
+
+  fileChooser->show();
+
+  while (fileChooser->shown())
+    Fl::wait();
+
+  if (fileChooser->count() == 1)
+  {
+    Simulator::Instance()->Save( fileChooser->value(1) );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

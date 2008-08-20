@@ -30,6 +30,7 @@
 
 #include <map>
 
+#include "Param.hh"
 #include "Controller.hh"
 
 namespace gazebo
@@ -79,6 +80,10 @@ class Stereo_Camera : public Controller
   /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode *node);
 
+  /// \brief Save the controller.
+  /// \stream Output stream
+  protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
   /// \brief Init the controller
   /// \return 0 on success
   protected: virtual void InitChild();
@@ -101,8 +106,8 @@ class Stereo_Camera : public Controller
   private: StereoCameraIface *stereoIface;
   private: std::map< std::string, CameraIface*> cameraIfaces;
 
-  private: std::string leftCameraName;
-  private: std::string rightCameraName;
+  private: Param<std::string> *leftCameraNameP;
+  private: Param<std::string> *rightCameraNameP;
 
   /// The parent sensor
   private: StereoCameraSensor *myParent;

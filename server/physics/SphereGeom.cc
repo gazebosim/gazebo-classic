@@ -37,6 +37,7 @@ using namespace gazebo;
 SphereGeom::SphereGeom(Body *body)
     : Geom(body)
 {
+  this->radiusP = new Param<double>("size",1.0,0);
 }
 
 
@@ -44,24 +45,25 @@ SphereGeom::SphereGeom(Body *body)
 // Destructor
 SphereGeom::~SphereGeom()
 {
+  delete this->radiusP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Load the sphere
 void SphereGeom::LoadChild(XMLConfigNode *node)
 {
-  double radius = node->GetDouble("size",1.0,0);
+  this->radiusP->Load(node);
 
   // Initialize box mass matrix
-  dMassSetSphereTotal(&this->mass, this->dblMass, radius);
+  dMassSetSphereTotal(&this->mass, this->massP->GetValue(), this->radiusP->GetValue());
 
   // Create the sphere geometry
-  this->SetGeom( dCreateSphere(0, radius ), true);
+  this->SetGeom( dCreateSphere(0, this->radiusP->GetValue()), true);
+}
 
-  //to be able to show physics
-  /*  this->visualNode->AttachMesh("unit_sphere"); // unit_sphere radius=1 diameter=2
-    this->visualNode->SetScale(Vector3(radius, radius ,radius));
-    this->visualNode->SetMaterial("Gazebo/GreenEmissive");
-    */
-
+//////////////////////////////////////////////////////////////////////////////
+// Save sphere parameters
+void SphereGeom::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->radiusP) << "\n";
 }

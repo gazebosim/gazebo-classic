@@ -416,6 +416,7 @@ void XMLConfigNode::Print()
 xmlChar* XMLConfigNode::GetNodeValue( const std::string &key ) const
 {
   xmlChar *value=NULL;
+  xmlChar *result=NULL;
 
   // First check if the key is an attribute
   if (xmlHasProp( this->xmlNode, (xmlChar*) key.c_str() ))
@@ -450,7 +451,17 @@ xmlChar* XMLConfigNode::GetNodeValue( const std::string &key ) const
     }
   }
 
-  return value;
+  if (value)
+  {
+    int j = xmlStrlen(value)-1;
+    int i = 0;
+    while (value[i] == ' ') i++;
+    while (value[j] == ' ') j--;
+    result = xmlStrndup(value+i, j-i+1);
+    delete value;
+  }
+
+  return result;
 }
 
 

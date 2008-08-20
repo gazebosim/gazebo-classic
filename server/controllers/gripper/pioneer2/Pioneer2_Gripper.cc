@@ -67,11 +67,11 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   if (!this->myIface)
     gzthrow("Pioneer2_Gripper controller requires a GripperIface");
 
-  std::string leftJointName = node->GetString("leftJoint", "", 1);
-  std::string rightJointName = node->GetString("rightJoint", "", 1);
+  this->leftJointNameP = new Param<std::string>("leftJoint", "", 1);
+  this->rightJointNameP = new Param<std::string>("rightJoint", "", 1);
 
-  this->joints[LEFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(leftJointName));
-  this->joints[RIGHT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(rightJointName));
+  this->joints[LEFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->leftJointNameP->GetValue()));
+  this->joints[RIGHT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->rightJointNameP->GetValue()));
 
   if (!this->joints[LEFT])
     gzthrow("couldn't get left slider joint");
@@ -79,6 +79,14 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   if (!this->joints[RIGHT])
     gzthrow("couldn't get right slider joint");
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the controller
+void Pioneer2_Gripper::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->leftJointNameP) << "\n";
+  stream << prefix << *(this->rightJointNameP) << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

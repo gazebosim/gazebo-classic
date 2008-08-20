@@ -40,10 +40,11 @@ int Geom::geomIdCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( Body *body)//, const std::string &name)
+Geom::Geom( Body *body)
     : Entity(body)
 {
-  //this->SetName(name);
+  this->typeName = "unknown";
+
   this->body = body;
   this->spaceId = this->body->spaceId;
 
@@ -51,9 +52,6 @@ Geom::Geom( Body *body)//, const std::string &name)
   this->contact = new ContactParams();
   this->geomId = NULL;
   this->transId = NULL;
-
-  this->laserFiducialId = -1;
-  this->laserRetro = 0.0;
 
   this->bbVisual = NULL;
 
@@ -63,6 +61,11 @@ Geom::Geom( Body *body)//, const std::string &name)
 
   this->transparency = 0;
 
+  this->massP = new Param<double>("mass",0.001,0);
+  this->xyzP = new Param<Vector3>("xyz", Vector3(), 0);
+  this->rpyP = new Param<Quatern>("rpy", Quatern(), 0);
+  this->laserFiducialIdP = new Param<int>("laserFiducialId",-1,0);
+  this->laserRetroP = new Param<float>("laserRetro",-1,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +85,12 @@ Geom::~Geom()
     GZ_DELETE (*iter)
   }
   this->visuals.clear();
+
+  delete this->massP;
+  delete this->xyzP;
+  delete this->rpyP;
+  delete this->laserFiducialIdP;
+  delete this->laserRetroP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,14 +101,18 @@ void Geom::Load(XMLConfigNode *node)
 
   this->xmlNode=node;
 
-  this->SetName(node->GetString("name","",1));
+  this->typeName = node->GetName();
 
-  // The mesh used for visualization
-  this->dblMass = node->GetDouble("mass",0.001,0);
+  this->nameP->Load(node);
+  this->massP->Load(node);
+  this->xyzP->Load(node);
+  this->rpyP->Load(node);
+  this->laserFiducialIdP->Load(node);
+  this->laserRetroP->Load(node);
 
-  if (this->dblMass <= 0)
+  if (this->massP->GetValue() <= 0)
   {
-    this->dblMass = 0.001;
+    this->massP->SetValue( 0.001 );
   }
 
   this->contact->Load(node);
@@ -110,15 +123,11 @@ void Geom::Load(XMLConfigNode *node)
 
   Pose3d pose;
 
-  pose.pos = node->GetVector3("xyz",Vector3(0,0,0));
-  pose.rot = node->GetRotation("rpy",Quatern());
+  pose.pos = this->xyzP->GetValue();
+  pose.rot = this->rpyP->GetValue();
 
   // TODO: This should probably be true....but "true" breaks trimesh postions.
   this->SetPose(pose, true);
-
-  this->SetLaserFiducialId(node->GetInt("laserFiducialId",-1,0));
-  this->SetLaserRetro(node->GetDouble("laserRetro",0.0,0));
-
   childNode = node->GetChild("visual");
   while (childNode)
   {
@@ -159,24 +168,36 @@ void Geom::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the body based on our XMLConfig node
-void Geom::Save()
+void Geom::Save(std::string &prefix, std::ostream &stream)
 {
-  /*std::vector<OgreVisual*>::iterator iter;
-  Pose3d pose= this->GetPose();
+  if (this->GetGeomClass() == dRayClass)
+    return;
 
-  this->xmlNode->SetValue("name", this->GetName());
-  this->xmlNode->SetValue("xyz", pose.pos);
-  this->xmlNode->SetValue("rpy", pose.rot);
+  std::string p = prefix + "  ";
+  std::vector<OgreVisual*>::iterator iter;
 
-  this->xmlNode->SetValue("mass", this->dblMass);
-  this->xmlNode->SetValue("laserFiducialId",GetLaserFiducialId());
-  this->xmlNode->SetValue("laserRetro",GetLaserRetro());
+  this->xyzP->SetValue( this->GetPose().pos );
+  this->rpyP->SetValue( this->GetPose().rot );
+
+  stream << prefix << "<geom:" << this->typeName << " name=\"" 
+         << this->nameP->GetValue() << "\">\n";
+
+  stream << prefix << "  " << *(this->xyzP) << "\n";
+  stream << prefix << "  " << *(this->rpyP) << "\n";
+
+  this->SaveChild(p, stream);
+
+  stream << prefix << "  " << *(this->massP) << "\n";
+
+  stream << prefix << "  " << *(this->laserFiducialIdP) << "\n";
+  stream << prefix << "  " << *(this->laserRetroP) << "\n";
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
-    (*iter)->Save();
+    (*iter)->Save(p, stream);
   }
-  */
+
+  stream << prefix << "</geom:" << this->typeName << ">\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -397,28 +418,28 @@ const dMass *Geom::GetBodyMassMatrix()
 /// Set the laser fiducial integer id
 void Geom::SetLaserFiducialId(int id)
 {
-  this->laserFiducialId = id;
+  this->laserFiducialIdP->SetValue( id );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the laser fiducial integer id
 int Geom::GetLaserFiducialId() const
 {
-  return this->laserFiducialId;
+  return this->laserFiducialIdP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the laser retro reflectiveness
 void Geom::SetLaserRetro(float retro)
 {
-  this->laserRetro = retro;
+  this->laserRetroP->SetValue(retro);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the laser retro reflectiveness
 float Geom::GetLaserRetro() const
 {
-  return this->laserRetro;
+  return this->laserRetroP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

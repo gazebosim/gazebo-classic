@@ -27,6 +27,7 @@
 #ifndef SLIDERJOINT_HH
 #define SLIDERJOINT_HH
 
+#include "Param.hh"
 #include "Joint.hh"
 
 class JointGroup;
@@ -82,43 +83,50 @@ namespace gazebo
 /// \addtogroup gazebo_slider_joint Slider Joint
 /// \{
 
-/// \brief A slider joint
-class SliderJoint : public Joint
-{
-  /// \brief Constructor
-  public: SliderJoint( dWorldID worldId );
-
-  /// \brief Destructor
-  public: virtual ~SliderJoint();
-
-  /// \brief Load the joint
-  protected: virtual void LoadChild(XMLConfigNode *node);
-
-  /// \brief Get the axis of rotation
-  public: Vector3 GetAxis() const;
-
-  /// \brief Get the position of the joint
-  public: double GetPosition() const;
-
-  /// \brief Get the rate of change
-  public: double GetPositionRate() const;
-
-  /// \brief Get the _parameter
-  public: virtual double GetParam( int parameter ) const;
-
-  /// \brief Set the axis of motion
-  public: void SetAxis( const Vector3 &axis );
-
-  /// \brief Set the _parameter
-  public: virtual void SetParam( int parameter, double value);
-
-  /// \brief Set the anchor
-  public: virtual void SetAnchor( const Vector3 &anchor) {}
-
-  /// \brief Set the slider force
-  public: void SetSliderForce(double force);
-};
-
+  /// \brief A slider joint
+  class SliderJoint : public Joint
+  {
+    /// \brief Constructor
+    public: SliderJoint( dWorldID worldId );
+  
+    /// \brief Destructor
+    public: virtual ~SliderJoint();
+  
+    /// \brief Load the joint
+    protected: virtual void LoadChild(XMLConfigNode *node);
+  
+    /// \brief Save a joint to a stream in XML format
+    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
+  
+    /// \brief Get the axis of rotation
+    public: Vector3 GetAxis() const;
+  
+    /// \brief Get the position of the joint
+    public: double GetPosition() const;
+  
+    /// \brief Get the rate of change
+    public: double GetPositionRate() const;
+  
+    /// \brief Get the _parameter
+    public: virtual double GetParam( int parameter ) const;
+  
+    /// \brief Set the axis of motion
+    public: void SetAxis( const Vector3 &axis );
+  
+    /// \brief Set the _parameter
+    public: virtual void SetParam( int parameter, double value);
+  
+    /// \brief Set the anchor
+    public: virtual void SetAnchor( const Vector3 &anchor) {}
+  
+    /// \brief Set the slider force
+    public: void SetSliderForce(double force);
+  
+    private: Param<Vector3> *axisP;
+    private: Param<double> *loStopP;
+    private: Param<double> *hiStopP; 
+  };
+  
 /// \}
 }
 #endif

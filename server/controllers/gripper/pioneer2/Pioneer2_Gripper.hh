@@ -28,6 +28,7 @@
 #define PIONEER2_GRIPPER_HH
 
 
+#include "Param.hh"
 #include "Controller.hh"
 #include "Entity.hh"
 
@@ -70,6 +71,10 @@ class Pioneer2_Gripper : public Controller
   /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode *node);
 
+  /// \brief Save the controller.
+  /// \stream Output stream
+  protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
   /// Init the controller
   /// \return 0 on success
   protected: virtual void InitChild();
@@ -90,6 +95,8 @@ class Pioneer2_Gripper : public Controller
 
   private: SliderJoint *joints[2];
 
+  private: Param<std::string> *leftJointNameP;
+  private: Param<std::string> *rightJointNameP;
 };
 
 /** \} */

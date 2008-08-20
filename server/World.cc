@@ -141,13 +141,18 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the world
-void World::Save(XMLConfigNode *node)
+void World::Save(std::string &prefix, std::ostream &stream)
 {
   std::vector< Model* >::iterator miter;
+
   // Save all the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
-    (*miter)->Save();
+    if ( (*miter)->GetParent() == NULL)
+    {
+      (*miter)->Save(prefix, stream);
+      stream << "\n";
+    }
   }
 
 }

@@ -31,6 +31,8 @@
 //#include <X11/Xutil.h>
 
 #include <string>
+#include "Vector3.hh"
+#include "Vector2.hh"
 
 namespace Ogre
 {
@@ -68,10 +70,18 @@ namespace gazebo
     /// It adds itself to the Visual node parent, it will those change parent
     /// properties if needed, to avoid this create a child visual node for the 
     /// plane
-    public: static void CreatePlane(XMLConfigNode *node, OgreVisual *parent);
+    public: static void CreatePlane(const Vector3 &normal, 
+                const Vector2<double> &size, const Vector2<double> &segments, 
+                const Vector2<double> &uvTile, const std::string &material, 
+                bool castShadows, OgreVisual *parent);
     
     /// \brief Create a light source 
-    public: static void CreateLight(XMLConfigNode *node, OgreVisual *parent);
+    /// \return The name of the light source
+    public: static std::string CreateLight(XMLConfigNode *node, OgreVisual *parent);
+
+    /// \brief Save a light source info in xml format
+    public: static void SaveLight(const std::string &prefix, 
+                           const std::string lightName, std::ostream &stream);
 
     /// \brief Helper function to create a camera
     public: static Ogre::Camera *CreateCamera(const std::string &name, 
@@ -82,10 +92,10 @@ namespace gazebo
     public: static void CreateFog(XMLConfigNode *node);
 
     /// \brief Helper function to save the fog settings
-    public: static void SaveFog(XMLConfigNode *node);
+    public: static void SaveFog(std::string &prefix, std::ostream &stream);
 
     /// \brief Helper function to create the sky 
-    public: static void CreateSky(XMLConfigNode *node);
+    public: static void CreateSky(std::string material);
 
     /// \brief Create a new window
     public: static Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 

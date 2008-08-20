@@ -29,6 +29,7 @@
 
 #include <ode/ode.h>
 
+#include "Param.hh"
 #include "Vector3.hh"
 
 namespace gazebo
@@ -58,8 +59,14 @@ namespace gazebo
     /// \brief Load a joint
     public: void Load(XMLConfigNode *node);
 
+    /// \brief Save a joint to a stream in XML format
+    public: void Save(std::string &prefix, std::ostream &stream);
+
+    /// \brief Save a joint to a stream in XML format
+    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream) {}
+
     /// \brief Load child joint
-    protected: virtual void LoadChild(XMLConfigNode *node) {};
+    protected: virtual void LoadChild(XMLConfigNode *node) {}
 
     /// \brief Update the joint
     public: void Update();
@@ -130,20 +137,26 @@ namespace gazebo
     /// \brief Get the low stop of an axis(index).
     public: double GetLowStop(int index=0);
    
-    /// \brief This is our id
+    /// This is our id
     protected: dJointID jointId;
 
-    /// \brief Type of Joint
+    /// Type of Joint
     protected: Type type;
 
-    /// \brief The first body this joint connects to
+    /// The first body this joint connects to
     private: Body *body1;
 
-    /// \brief The second body this joint connects to
+    /// The second body this joint connects to
     private: Body *body2;
 
-    /// \brief Name of this joint
-    private: std::string name;
+    /// Name of this joint
+    private: Param<std::string> *nameP;
+    private: Param<double> *erpP;
+    private: Param<double> *cfmP;
+    private: Param<std::string> *body1NameP;
+    private: Param<std::string> *body2NameP;
+    private: Param<std::string> *anchorBodyNameP;
+    private: Param<Vector3> *anchorOffsetP;
 
     private: OgreVisual *visual;
 

@@ -30,6 +30,8 @@
 #include <OgrePrerequisites.h>
 #include <OgreTexture.h>
 
+#include "Param.hh"
+#include "Angle.hh"
 #include "Pose3d.hh"
 
 // Forward Declarations
@@ -68,6 +70,10 @@ namespace gazebo
     /// \brief Load the camera using parameter from an XMLConfig node
     /// \param node The XMLConfig node
     public: void LoadCam( XMLConfigNode *node );
+
+    /// \brief Save camera info in xml format
+    /// \param stream Output stream
+    public: void SaveCam(std::string &prefix, std::ostream &stream);
   
     /// \brief Initialize the camera
     public: void InitCam();
@@ -100,10 +106,10 @@ namespace gazebo
     public: void SetFOV( float radians );
 
     /// \brief Get the camera FOV (horizontal)  
-    public: double GetHFOV() const;
+    public: Angle GetHFOV() const;
 
     /// \brief Get the camera FOV (vertical)  
-    public: double GetVFOV() const;
+    public: Angle GetVFOV() const;
   
     /// \brief Get the width of the image
     public: unsigned int GetImageWidth() const;
@@ -166,9 +172,9 @@ namespace gazebo
     /// \brief Set the camera's scene node
     public: void SetCameraSceneNode( Ogre::SceneNode *node );
 
-    protected: double hfov;
-    protected: double nearClip, farClip;
-    protected: unsigned int imageWidth, imageHeight;
+    protected: Param<Angle> *hfovP;
+    protected: Param<double> *nearClipP, *farClipP;
+    protected: Param<unsigned int> *imageWidthP, *imageHeightP;
     protected: unsigned int textureWidth, textureHeight;
   
     private: Ogre::Camera *camera;
@@ -180,9 +186,10 @@ namespace gazebo
     // Info for saving images
     protected: unsigned char *saveFrameBuffer;
     protected: unsigned int saveCount;
-    protected: bool saveFrames;
-    protected: std::string savePathname;
-  
+    protected: Param<bool> *saveFramesP;
+    protected: Param<std::string> *savePathnameP;
+ 
+    protected: Param<std::string> *visMaskP;
     protected: unsigned int visibilityMask;
 
     protected: Ogre::RenderTarget *renderTarget;

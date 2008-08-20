@@ -33,9 +33,11 @@
 #include <string>
 #include <sstream>
 
+#include "Param.hh"
+
 namespace gazebo
 {
-  
+
   /// \addtogroup gazebo_server
   /// \brief Gazebo message class
   /// \{
@@ -78,7 +80,7 @@ namespace gazebo
     public: void Load(XMLConfigNode *node);
   
     /// \brief Saves the message parameters
-    public: void Save(XMLConfigNode *node);
+    public: void Save(std::string &prefix, std::ostream &stream);
 
     /// \brief Set the verbosity
     /// \param level Level of the verbosity
@@ -105,7 +107,10 @@ namespace gazebo
     private: std::ostream *msgStream;
     private: std::ostream *errStream;
     private: std::ofstream logStream;
-  
+
+    private: Param<int> *verbosityP;
+    private: Param<bool> *logDataP;
+
     /// Pointer to myself
     private: static GazeboMessage *myself;
   };

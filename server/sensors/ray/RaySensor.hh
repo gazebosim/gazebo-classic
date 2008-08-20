@@ -29,6 +29,7 @@
 
 #include <vector>
 
+#include "Angle.hh"
 #include "Sensor.hh"
 #include "Body.hh"
 
@@ -63,6 +64,9 @@ class RaySensor: public Sensor
   /// \param node The XMLConfig node
   protected: virtual void LoadChild(XMLConfigNode *node);
 
+  /// \brief Save the sensor info in XML format
+  public: void Save(std::string &prefix, std::ostream &stream);
+
   /// Initialize the ray
   protected: virtual void InitChild();
 
@@ -74,11 +78,11 @@ class RaySensor: public Sensor
 
   /// \brief Get the minimum angle
   /// \return The minimum angle
-  public: double GetMinAngle() const;
+  public: Angle GetMinAngle() const;
 
   /// \brief Get the maximum angle
   /// \return the maximum angle
-  public: double GetMaxAngle() const;
+  public: Angle GetMaxAngle() const;
 
   /// \brief Get the minimum range
   /// \return The minimum range
@@ -127,16 +131,16 @@ class RaySensor: public Sensor
   /// Ray data
   private: std::vector<RayGeom*> rays;
 
-  private: double minAngle, maxAngle;
-  private: double minRange, maxRange;
-  private: Vector3 origin;
+  private: Param<Angle> *minAngleP, *maxAngleP;
+  private: Param<double> *minRangeP, *maxRangeP;
+  private: Param<Vector3> *originP;
 
   private: Pose3d prevPose;
-  private: int rayCount;
-  private: int rangeCount;
+  private: Param<int> *rayCountP;
+  private: Param<int> *rangeCountP;
   
   /// Display rays when rendering images
-  private: bool displayRays;
+  private: Param<bool> *displayRaysP;
 
 };
 /// \}

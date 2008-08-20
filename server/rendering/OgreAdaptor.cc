@@ -68,9 +68,14 @@ OgreAdaptor::OgreAdaptor()
   this->sceneMgr=NULL;
   this->root=NULL;
 
-  this->updateRate = 0;
-
   this->dummyDisplay = false;
+
+  this->ambientP = new Param<Vector4>("ambient",Vector4(1,1,1,1),0);
+  this->shadowTextureSizeP = new Param<int>("shadowTextureSize", 512,0);
+  this->shadowTechniqueP = new Param<std::string>("shadowTechnique", "stencilAdditive", 0);
+  this->drawGridP = new Param<bool>("grid", true, 0);
+  this->updateRateP = new Param<double>("maxUpdateRate",0,0);
+  this->skyMaterialP = new Param<std::string>("material","",1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +97,14 @@ OgreAdaptor::~OgreAdaptor()
     XCloseDisplay(this->dummyDisplay);
   }
 
+  delete this->ambientP;
+  delete this->shadowTextureSizeP;
+  delete this->shadowIndexSizeP;
+  delete this->shadowTechniqueP;
+  delete this->drawGridP;
+  delete this->updateRateP;
+  delete this->skyMaterialP;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +121,6 @@ void OgreAdaptor::Close()
 /// Load the parameters for Ogre
 void OgreAdaptor::Load(XMLConfigNode *rootNode)
 {
-  XMLConfigNode *cnode;
   XMLConfigNode *node;
 
   node = rootNode->GetChild("ogre", "rendering");
@@ -131,23 +143,6 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
 
   // Setup the available resources
   this->SetupResources();
-
-  if ((cnode = node->GetChild("video")))
-  {
-    std::ostringstream stream;
-    int width, height, depth;
-
-    width = cnode->GetTupleInt("size",0,800);
-    height = cnode->GetTupleInt("size",1,600);
-    depth = cnode->GetInt("depth",16,0);
-
-    stream << width << " x " << height << " @ " << depth << "-bit colour";
-    this->videoMode = stream.str();
-  }
-  else
-  {
-    this->videoMode = "800 x 600 @ 16-bit colour";
-  }
 
   this->videoMode = "800 x 600 @ 16-bit colour";
 
@@ -212,45 +207,54 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
   }
 
-  ambient.r = node->GetTupleDouble("ambient",0,1.0);
-  ambient.g = node->GetTupleDouble("ambient",1,1.0);
-  ambient.b = node->GetTupleDouble("ambient",2,1.0);
-  ambient.a = node->GetTupleDouble("ambient",3,1.0);
+  this->shadowIndexSizeP = new Param<int>("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize(), 0);
+
+  this->ambientP->Load(node);
+  this->shadowTextureSizeP->Load(node);
+  this->shadowIndexSizeP->Load(node);
+  this->shadowTechniqueP->Load(node);
+  this->drawGridP->Load(node);
+  this->updateRateP->Load(node);
+
+
+  ambient.r = (**(this->ambientP)).x;
+  ambient.g = (**(this->ambientP)).y;
+  ambient.b = (**(this->ambientP)).z;
+  ambient.a = (**(this->ambientP)).w;
 
   // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient);
 
   this->sceneMgr->setShadowTextureSelfShadow(true);
   this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
-  this->sceneMgr->setShadowTextureSize(node->GetInt("shadowTextureSize", 512));
-  this->sceneMgr->setShadowIndexBufferSize( node->GetInt("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize()) );
+  this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
+  this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
 
-   // Settings for shadow mapping
-  std::string shadowTechnique = node->GetString("shadowTechnique", "stencilAdditive");
 
-  if (shadowTechnique == std::string("stencilAdditive"))
+  // Settings for shadow mapping
+  if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
-  else if (shadowTechnique == std::string("textureAdditive"))
+  else if (**(this->shadowTechniqueP) == std::string("textureAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
-  else if (shadowTechnique == std::string("none"))
+  else if (**(this->shadowTechniqueP) == std::string("none"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
   else 
-    gzthrow(std::string("Unsupported shadow technique: ") + shadowTechnique + "\n");
+    gzthrow(std::string("Unsupported shadow technique: ") + **(this->shadowTechniqueP) + "\n");
 
   //Preload basic shapes that can be used anywhere
   OgreCreator::LoadBasicShapes();
 
-  this->fogNode = node->GetChild("fog");
-  this->skyNode = node->GetChild("sky");
-  this->drawGrid = node->GetBool("grid", true);
-
   // Add a sky dome to our scene
-  OgreCreator::CreateSky(this->skyNode);
+  if (node->GetChild("sky"))
+  {
+    this->skyMaterialP->Load(node->GetChild("sky"));
+    OgreCreator::CreateSky(**(this->skyMaterialP));
+  }
 
   // Add fog. This changes the background color
-  OgreCreator::CreateFog(this->fogNode);
+  OgreCreator::CreateFog(node->GetChild("fog"));
 
-  if (this->drawGrid)
+  if (**(this->drawGridP))
     OgreCreator::DrawGrid();
 
   // Set up the world geometry link
@@ -268,11 +272,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
       exit(-1);
     }
   }
+
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener();
   this->root->addFrameListener(this->frameListener);
-
-  this->updateRate = node->GetDouble("maxUpdateRate",0,0);
 
   this->raySceneQuery = this->sceneMgr->createRayQuery( Ogre::Ray() );
   this->raySceneQuery->setSortByDistance(true);
@@ -281,25 +284,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save
-void OgreAdaptor::Save(XMLConfigNode *node)
+void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
 {
-  /*
-  //Video information is not modified so we don't need to rewrite it.
-  //Sky is not modified, not rewritten
-  XMLConfigNode *rnode;
-  XMLConfigNode *cnode;
-
-  rnode = node->GetChild("ogre", "rendering");
-  if (!rnode)
-    gzthrow( "missing OGRE Rendering information, can't write back the data" );
-
-  rnode->SetValue("ambient", this->backgroundColor);
-  //TODO: BSP (when bsp are definitely integrated)
-  //
-  cnode = rnode->GetChild("fog");
-  if (cnode)
-    OgreCreator::SaveFog(cnode);
-    */
+  stream << prefix << "<rendering:ogre>\n";
+  stream << prefix << "  " << *(this->ambientP) << "\n";
+  stream << prefix << "  <sky>\n";
+  stream << prefix << "    " << *(this->skyMaterialP) << "\n";
+  stream << prefix << "  </sky>\n";
+  OgreCreator::SaveFog(prefix, stream);
+  stream << prefix << "</rendering:ogre>\n";
 }
 
 
@@ -518,5 +511,5 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos)
 /// Get the desired update rate
 double OgreAdaptor::GetUpdateRate()
 {
-  return this->updateRate;
+  return **(this->updateRateP);
 }

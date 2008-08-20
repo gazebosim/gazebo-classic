@@ -82,13 +82,18 @@ namespace gazebo
     /// \brief Load the trimesh
     protected: virtual void LoadChild(XMLConfigNode *node);
 
+    /// \brief Save child parameters
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+ 
     private: dTriMeshDataID odeData;
 
     private: dReal matrix_dblbuff[16*2];
     private: int last_matrix_index;
 
     ///  name of the mesh
-    private: std::string meshName;
+    private: Param<std::string> *meshNameP;
+
+    private: Param<Vector3> *scaleP;
   };
 
   /// \}

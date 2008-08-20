@@ -28,6 +28,7 @@
 #define CYLINDERGEOM_HH
 
 #include "Geom.hh"
+#include "Param.hh"
 
 namespace gazebo
 {
@@ -78,6 +79,11 @@ namespace gazebo
 
     /// \brief Load the cylinder
     protected: void LoadChild(XMLConfigNode *node);
+
+    /// \brief Save child parameters
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+
+    private: Param<Vector2<double> > *sizeP;
   };
 
   /// \}

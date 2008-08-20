@@ -31,6 +31,7 @@
 #include <deque>
 
 #include "Vector2.hh"
+#include "Param.hh"
 #include "Geom.hh"
 
 namespace gazebo
@@ -100,6 +101,9 @@ namespace gazebo
     /// \brief Load the heightmap
     protected: virtual void LoadChild(XMLConfigNode *node);
 
+    /// \brief Save child parameters
+    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+ 
     /// \brief Build the quadtree
     private: void BuildTree(QuadNode *node);
 
@@ -121,21 +125,21 @@ namespace gazebo
     private: void CreateBoxes(QuadNode *node);
 
     // The scale factor to apply to the geoms
-    private: float scale;
+    private: Param<double> *scaleP;
 
     // Negative image?
-    private: int negative;
+    private: Param<int> *negativeP;
 
     // Image color threshold used for extrusion
-    private: float threshold;
+    private: Param<double> *thresholdP;
 
     // The color of the walls
-    private: std::string material;
+    private: Param<std::string> *materialP;
 
     // The amount of acceptable error in the model
-    private: int granularity;
+    private: Param<int> *granularityP;
 
-    private: float wallHeight;
+    private: Param<double> *wallHeightP;
 
     private: Ogre::Image mapImage;
 

@@ -48,6 +48,9 @@ namespace gazebo
     /// \brief Load the frame manager
     public: void Load( XMLConfigNode *node );
 
+    /// \brief Save the gui params in xml format
+    public: virtual void Save(std::string &prefix, std::ostream &stream);
+
     /// \brief Initalize the window manager
     public: void Init();
 

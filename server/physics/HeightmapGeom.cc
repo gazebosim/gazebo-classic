@@ -45,6 +45,11 @@ using namespace gazebo;
 HeightmapGeom::HeightmapGeom(Body *body)
     : Geom(body)
 {
+  this->imageFilenameP = new Param<std::string>("image","",1);
+  this->worldTextureP = new Param<std::string>("worldTexture","",0);
+  this->detailTextureP = new Param<std::string>("detailTexture","",0);
+  this->sizeP = new Param<Vector3>("size",Vector3(10,10,10), 0);
+  this->offsetP = new Param<Vector3>("offset",Vector3(0,0,0), 0);
 }
 
 
@@ -54,6 +59,12 @@ HeightmapGeom::~HeightmapGeom()
 {
   OgreAdaptor *ogreAdaptor = Simulator::Instance()->GetRenderEngine();
   ogreAdaptor->sceneMgr->destroyQuery(this->rayQuery);
+
+  delete this->imageFilenameP;
+  delete this->worldTextureP;
+  delete this->detailTextureP;
+  delete this->sizeP;
+  delete this->offsetP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -135,16 +146,15 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   ogreAdaptor = Simulator::Instance()->GetRenderEngine();
 
-  std::string imageFilename = node->GetString("image","",1);
-  std::string worldTexture = node->GetString("worldTexture","",0);
-  std::string detailTexture = node->GetString("detailTexture","",0);
-  Vector3 size = node->GetVector3("size",Vector3(10,10,10));
-  Vector3 offset = node->GetVector3("offset",Vector3(0,0,0));
+  this->imageFilenameP->Load(node);
+  this->worldTextureP->Load(node);
+  this->detailTextureP->Load(node);
+  this->sizeP->Load(node);
+  this->offsetP->Load(node);
 
-  this->terrainImage = imageFilename;
 
   // Use the image to get the size of the heightmap
-  tmpImage.load(this->terrainImage,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  tmpImage.load(this->imageFilenameP->GetValue(),Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
   // Width and height must be the same
   if (tmpImage.getWidth() != tmpImage.getHeight())
@@ -174,7 +184,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   tileSize++;
 
-  this->terrainSize = size;
+  this->terrainSize = this->sizeP->GetValue();
 
   this->terrainScale = this->terrainSize / this->terrainVertSize;
 
@@ -186,20 +196,20 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
  
   /*std::cout << "Terrain Scale[" << this->terrainScale << "]\n";
   std::cout << "ODE Scale[" << this->odeScale << "]\n";
-  std::cout << "Terrain Image[" << this->terrainImage << "] Size[" << this->terrainSize << "]\n";
+  std::cout << "Terrain Image[" << this->imageFilenameP->GetValue() << "] Size[" << this->terrainSize << "]\n";
   printf("Terrain Size[%f %f %f]\n", this->terrainSize.x, this->terrainSize.y, this->terrainSize.z);
   printf("VertSize[%d] Tile Size[%d]\n", this->terrainVertSize, tileSize);
   */
 
-  stream << "WorldTexture=" << worldTexture << "\n";
+  stream << "WorldTexture=" << worldTextureP->GetValue() << "\n";
   //The detail texture
-  stream << "DetailTexture=" << detailTexture << "\n";
+  stream << "DetailTexture=" << detailTextureP->GetValue() << "\n";
   // number of times the detail texture will tile in a terrain tile
   stream << "DetailTile=3\n";
   // Heightmap source
   stream << "PageSource=Heightmap\n";
   // Heightmap-source specific settings
-  stream << "Heightmap.image=" << this->terrainImage << "\n";
+  stream << "Heightmap.image=" << this->imageFilenameP->GetValue() << "\n";
   // How large is a page of tiles (in vertices)? Must be (2^n)+1
   stream << "PageSize=" << this->terrainVertSize << "\n";
   // How large is each tile? Must be (2^n)+1 and be smaller than PageSize
@@ -277,3 +287,16 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   delete [] mstr;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save child parameters
+void HeightmapGeom::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->imageFilenameP) << "\n";
+  stream << prefix << *(this->worldTextureP) << "\n";
+  stream << prefix << *(this->detailTextureP) << "\n";
+  stream << prefix << *(this->sizeP) << "\n";
+  stream << prefix << *(this->offsetP) << "\n";
+}
+
+

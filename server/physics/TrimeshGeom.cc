@@ -40,6 +40,8 @@ using namespace gazebo;
 // Constructor
 TrimeshGeom::TrimeshGeom(Body *body) : Geom(body)
 {
+  this->meshNameP = new Param<std::string>("mesh","",1);
+  this->scaleP = new Param<Vector3>("scale",Vector3(1,1,1),0);
 }
 
 
@@ -47,6 +49,8 @@ TrimeshGeom::TrimeshGeom(Body *body) : Geom(body)
 // Destructor
 TrimeshGeom::~TrimeshGeom()
 {
+  delete this->meshNameP;
+  delete this->scaleP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -109,22 +113,16 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   int vindex = 0;
   int iindex = 0;
 
-  this->meshName = node->GetString("mesh","",1);
+  this->meshNameP->Load(node);
+  this->scaleP->Load(node);
 
-  mesh = Ogre::MeshManager::getSingleton().load(this->meshName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-  Vector3 scale = node->GetVector3("scale",Vector3(1,1,1));
-
-  /*this->visualNode->AttachMesh(this->meshName);
-  this->visualNode->SetScale(scale);
-  this->visualNode->SetMaterial("Gazebo/GreenEmissive");
-  */
+  mesh = Ogre::MeshManager::getSingleton().load(this->meshNameP->GetValue(),Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
   if (mesh.isNull())
-    gzthrow("Failed to load trimesh "+ this->meshName);
+    gzthrow("Failed to load trimesh "+ this->meshNameP->GetValue());
 
   // Count the number of vertices and indices
-// for (i=0; i<mesh->getNumSubMeshes(); i++)
+  // for (i=0; i<mesh->getNumSubMeshes(); i++)
   for (i=0; i<1; i++)
   {
     subMesh = mesh->getSubMesh(i);
@@ -165,9 +163,9 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
     {
       elem->baseVertexPointerToElement(pData, &pFloat);
 
-      *(vertPtr+0) = (*pFloat++) * scale.x;
-      *(vertPtr+1) = (*pFloat++) * scale.y;
-      *(vertPtr+2) = (*pFloat++) * scale.z;
+      *(vertPtr+0) = (*pFloat++) * this->scaleP->GetValue().x;
+      *(vertPtr+1) = (*pFloat++) * this->scaleP->GetValue().y;
+      *(vertPtr+2) = (*pFloat++) * this->scaleP->GetValue().z;
 
       vertPtr += 3;
 
@@ -208,7 +206,7 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 
   this->geomId = dCreateTriMesh( this->spaceId, this->odeData,0,0,0 );
 
-  dMassSetTrimesh(&this->mass, this->dblMass, this->geomId);
+  dMassSetTrimesh(&this->mass, this->massP->GetValue(), this->geomId);
 
   // Create the trimesh geometry
   this->SetGeom(this->geomId, true);
@@ -216,3 +214,12 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Save child parameters
+void TrimeshGeom::SaveChild(std::string &prefix, std::ostream &stream)
+{
+  stream << prefix << *(this->meshNameP) << "\n";
+  stream << prefix << *(this->scaleP) << "\n";
+}
+ 
