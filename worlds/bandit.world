@@ -16,7 +16,7 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.03</stepTime>
+    <stepTime>0.3</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-5</cfm>
     <erp>0.3</erp>

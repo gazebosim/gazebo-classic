@@ -100,7 +100,6 @@
     <lowStop>-15</lowStop>
     <highStop>15</highStop>
     <erp>0.1</erp>
-    <cfm>10e-5</cfm>
   </joint:hinge>
 
   <body:box name="torso_body">
@@ -127,7 +126,6 @@
     <lowStop>-90</lowStop>
     <highStop>90</highStop>
     <erp>0.1</erp>
-    <cfm>10e-5</cfm>
   </joint:hinge>
 
   <body:box name="right_shoulder_mounting_body">
