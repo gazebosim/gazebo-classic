@@ -153,6 +153,7 @@ namespace gazebo
     private: Param<std::string> *nameP;
     private: Param<double> *erpP;
     private: Param<double> *cfmP;
+    private: Param<double> *suspensionCfmP;
     private: Param<std::string> *body1NameP;
     private: Param<std::string> *body2NameP;
     private: Param<std::string> *anchorBodyNameP;
