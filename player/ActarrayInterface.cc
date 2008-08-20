@@ -192,6 +192,38 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
                     PLAYER_MSGTYPE_RESP_ACK, PLAYER_ACTARRAY_REQ_POWER);
     return(0);
   }
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+          PLAYER_ACTARRAY_REQ_GET_GEOM, this->device_addr))
+  {
+	  player_actarray_geom response;
+	  this->iface->Lock(1);
+	  response.actuators_count = this->iface->data->actuators_count;
+	  
+	  player_actarray_actuatorgeom_t geoms[GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS];
+	  for (unsigned int i = 0; i < GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS; ++i)
+	  {
+		  ActarrayActuatorGeom& gazeboGeom = this->iface->data->actuator_geoms[i];
+		  geoms[i].type = gazeboGeom.type;
+		  geoms[i].length = 0; // unused
+		  memset(&(geoms[i].orientation), 0, sizeof(geoms[i].orientation)); // unused
+		  memset(&(geoms[i].axis), 0, sizeof(geoms[i].axis)); // unused
+		  geoms[i].min = gazeboGeom.min;
+		  geoms[i].centre = gazeboGeom.center;
+		  geoms[i].max = gazeboGeom.max;
+		  geoms[i].home = gazeboGeom.home;
+		  geoms[i].config_speed = gazeboGeom.config_speed;
+		  geoms[i].hasbrakes = gazeboGeom.hasbrakes;
+	  }
+	  response.actuators = geoms;
+	  
+	  memset(&response.base_pos, 0, sizeof(response.base_pos)); // unused
+	  memset(&response.base_orientation, 0, sizeof(response.base_orientation)); // unused
+	  this->iface->Unlock();
+	  
+	  driver->Publish(this->device_addr, respQueue,
+			  PLAYER_MSGTYPE_RESP_ACK, PLAYER_ACTARRAY_REQ_GET_GEOM, &response);
+	  return(0);
+  }
 
   return -1;
 }
