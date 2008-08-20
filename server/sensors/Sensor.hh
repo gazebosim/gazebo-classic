@@ -27,6 +27,7 @@
 #ifndef SENSOR_HH
 #define SENSOR_HH
 
+#include "Param.hh"
 #include "Entity.hh"
 
 namespace gazebo
@@ -53,7 +54,10 @@ namespace gazebo
     public: virtual void Load(XMLConfigNode *node);
 
     /// \brief Save the sensor info in XML format
-    public: virtual void Save(std::string &prefix, std::ostream &stream);
+    public: void Save(std::string &prefix, std::ostream &stream);
+
+    /// \brief Child save function
+    protected: virtual void SaveChild(std::string &prefix,std::ostream &stream) {}
   
     /// \brief  Initialize the sensor
     public: void Init();
@@ -91,6 +95,11 @@ namespace gazebo
 
     /// \brief True if active
     protected: bool active;
+
+    protected: Param<double> *updateRateP;
+    protected: double updatePeriod;
+    protected: double lastUpdate;
+    protected: std::string typeName;
   };
   
   /// \}

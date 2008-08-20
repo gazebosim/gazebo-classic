@@ -36,7 +36,7 @@ using namespace gazebo;
 UniversalJoint::UniversalJoint( dWorldID worldId )
     : Joint()
 {
-  this->type = UNIVERSAL;
+  this->type = Joint::UNIVERSAL;
   this->jointId = dJointCreateUniversal( worldId, NULL );
 
   this->axis1P = new Param<Vector3>("axis1",Vector3(0,0,1),0);

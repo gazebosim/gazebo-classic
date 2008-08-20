@@ -35,7 +35,7 @@ using namespace gazebo;
 Hinge2Joint::Hinge2Joint( dWorldID worldId )
     : Joint()
 {
-  this->type = HINGE2;
+  this->type = Joint::HINGE2;
   this->jointId = dJointCreateHinge2( worldId, NULL );
 
   this->axis1P = new Param<Vector3>("axis1",Vector3(0,0,1), 0);

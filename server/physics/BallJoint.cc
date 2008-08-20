@@ -34,7 +34,7 @@ using namespace gazebo;
 BallJoint::BallJoint(dWorldID worldId)
     : Joint()
 {
-  this->type = BALL;
+  this->type = Joint::BALL;
   this->jointId = dJointCreateBall(worldId, NULL);
 }
 

@@ -31,6 +31,7 @@
 #include "XMLConfig.hh"
 #include "World.hh"
 #include "ControllerFactory.hh"
+#include "Simulator.hh"
 #include "Sensor.hh"
 
 using namespace gazebo;
@@ -43,12 +44,15 @@ Sensor::Sensor(Body *body)
   this->body = body;
   this->controller = NULL;
   this->active = true;
+
+  this->updateRateP = new Param<double>("updateRate", 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Sensor::~Sensor()
 {
+  delete this->updateRateP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +60,13 @@ Sensor::~Sensor()
 void Sensor::Load(XMLConfigNode *node)
 {
   this->nameP->Load(node);
+  this->updateRateP->Load(node);
+
+  if (**(this->updateRateP) == 0)
+    this->updatePeriod = 0.0;
+  else
+    this->updatePeriod = 1.0 / **(updateRateP);
+
   this->LoadController( node->GetChildByNSPrefix("controller") );
   this->LoadChild(node);
 }
@@ -64,13 +75,26 @@ void Sensor::Load(XMLConfigNode *node)
 /// Save the sensor info in XML format
 void Sensor::Save(std::string &prefix, std::ostream &stream)
 {
-  
+  std::string p = prefix + "  ";
+
+  stream << prefix << "<sensor:" << this->typeName << " name=\"" << this->nameP->GetValue() << "\">\n";
+
+  stream << prefix << *(this->updateRateP) << "\n";
+
+  this->SaveChild(prefix, stream);
+
+  if (this->controller)
+    this->controller->Save(p, stream);
+
+  stream << prefix << "</sensor:" << this->typeName << ">\n";
 }
  
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the sensor
 void Sensor::Init()
 {
+  this->lastUpdate = Simulator::Instance()->GetSimTime();
+
   this->InitChild();
 }
 
@@ -78,7 +102,12 @@ void Sensor::Init()
 /// Update the sensor
 void Sensor::Update()
 {
-  this->UpdateChild();
+  if (this->lastUpdate + this->updatePeriod <= Simulator::Instance()->GetSimTime())
+  {
+    this->UpdateChild();
+    this->lastUpdate = Simulator::Instance()->GetSimTime();
+  }
+
   if (this->controller)
     this->controller->Update();
 }

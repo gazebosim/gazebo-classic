@@ -50,6 +50,7 @@ GZ_REGISTER_STATIC_SENSOR("camera", MonoCameraSensor);
 MonoCameraSensor::MonoCameraSensor(Body *body)
     : Sensor(body), OgreCamera("Mono")
 {
+  this->typeName = "monocamera";
 }
 
 
@@ -91,17 +92,10 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save the sensor info in XML format
-void MonoCameraSensor::Save(std::string &prefix, std::ostream &stream)
+void MonoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
-  stream << prefix << "<sensor:monocamera name=\"" << this->nameP->GetValue() << "\">\n";
-
   this->SaveCam(p, stream);
-
-  if (this->controller)
-    this->controller->Save(p, stream);
-
-  stream << prefix << "</sensor:monocamera>\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

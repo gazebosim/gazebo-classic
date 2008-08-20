@@ -53,6 +53,8 @@ RaySensor::RaySensor(Body *body)
 {
   this->active = false;
 
+  this->typeName = "ray";
+
   this->rayCountP = new Param<int>("rayCount",0,1);
   this->rangeCountP = new Param<int>("rangeCount",0,1);
   this->minAngleP = new Param<Angle>("minAngle",DTOR(-90),1);
@@ -114,10 +116,8 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save the sensor info in XML format
-void RaySensor::Save(std::string &prefix, std::ostream &stream)
+void RaySensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
-  std::string p = prefix + "  ";
-  stream << prefix << "<sensor:ray name=\"" << this->nameP->GetValue() << "\">\n";
   stream << prefix << "  " << *(this->minAngleP) << "\n";
   stream << prefix << "  " << *(this->maxAngleP) << "\n";
   stream << prefix << "  " << *(this->minRangeP) << "\n";
@@ -126,11 +126,6 @@ void RaySensor::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->rayCountP) << "\n";
   stream << prefix << "  " << *(this->rangeCountP) << "\n";
   stream << prefix << "  " << *(this->displayRaysP) << "\n";
-
-  if (this->controller)
-    this->controller->Save(p, stream);
-
-  stream << prefix << "</sensor:ray>\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

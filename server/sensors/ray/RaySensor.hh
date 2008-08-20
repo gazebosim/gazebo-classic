@@ -65,7 +65,7 @@ class RaySensor: public Sensor
   protected: virtual void LoadChild(XMLConfigNode *node);
 
   /// \brief Save the sensor info in XML format
-  public: void Save(std::string &prefix, std::ostream &stream);
+  protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
 
   /// Initialize the ray
   protected: virtual void InitChild();

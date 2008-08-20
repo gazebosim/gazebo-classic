@@ -59,6 +59,8 @@ StereoCameraSensor::StereoCameraSensor(Body *body)
   this->depthBuffer[1] = NULL;
   this->rgbBuffer[0] = NULL;
   this->rgbBuffer[1] = NULL;
+
+  this->typeName = "stereocamera";
 }
 
 
@@ -87,18 +89,10 @@ void StereoCameraSensor::LoadChild( XMLConfigNode *node )
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save the sensor info in XML format
-void StereoCameraSensor::Save(std::string &prefix, std::ostream &stream)
+void StereoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
-
-  stream << prefix << "<sensor:stereocamera name=\"" << this->nameP->GetValue() << "\">\n";
-
   this->SaveCam(p, stream);
-
-  if (this->controller)
-    this->controller->Save(p, stream);
-
-  stream << prefix << "</sensor:stereocamera>\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

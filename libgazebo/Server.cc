@@ -95,36 +95,41 @@ void Server::Init(int serverId, int force)
 
   // check to see if there is already a directory created.
   struct stat astat;
-  if (stat(this->filename.c_str(), &astat) == 0) {
+  if (stat(this->filename.c_str(), &astat) == 0) 
+  {
     // directory already exists, check gazebo.pid to see if 
     // another gazebo is already running.
 
     std::string pidfn = this->filename + "/gazebo.pid";
-    
+
     FILE *fp = fopen(pidfn.c_str(), "r");
-    if(fp) {
+    if(fp) 
+    {
       int pid;
       fscanf(fp, "%d", &pid);
       fclose(fp);
       std::cout << "found a pid file: pid=" << pid << "\n";
 
-      if(kill(pid, 0) == 0) {
-	// a gazebo process is still alive.
-	errStream << "directory [" <<  this->filename
-		  <<  "] already exists (previous crash?)\n"
-		  << "gazebo (pid=" << pid << ") is still running.";
-	throw(errStream.str());
-      } else {
-	// the gazebo process is not alive.
-	// remove directory.
-	std::cout << "The gazebo process is not alive.\n";
+      if(kill(pid, 0) == 0) 
+      {
+        // a gazebo process is still alive.
+        errStream << "directory [" <<  this->filename
+          <<  "] already exists (previous crash?)\n"
+          << "gazebo (pid=" << pid << ") is still running.";
+        throw(errStream.str());
+      } 
+      else 
+      {
+        // the gazebo process is not alive.
+        // remove directory.
+        std::cout << "The gazebo process is not alive.\n";
 
-	// remove the existing directory.
-	std::string cmd = "rm -rf '" + this->filename + "'";
-	if(system(cmd.c_str()) != 0) {
-	  errStream << "couldn't remove directory [" <<  this->filename << "]";
-	  throw(errStream.str());
-	}
+        // remove the existing directory.
+        std::string cmd = "rm -rf '" + this->filename + "'";
+        if(system(cmd.c_str()) != 0) {
+          errStream << "couldn't remove directory [" <<  this->filename << "]";
+          throw(errStream.str());
+        }
       }
     }
   }

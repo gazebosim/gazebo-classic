@@ -34,7 +34,7 @@ using namespace gazebo;
 SliderJoint::SliderJoint( dWorldID worldId )
     : Joint()
 {
-  this->type = SLIDER;
+  this->type = Joint::SLIDER;
   this->jointId = dJointCreateSlider( worldId, NULL );
 
   this->axisP = new Param<Vector3>("axis",Vector3(0,0,1), 0);
