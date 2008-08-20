@@ -257,7 +257,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         double h, kp, kd;
 
         contact.geom = contactGeoms[i];
-        contact.surface.mode = dContactSoftERP |  dContactBounce | dContactMu2;
+        contact.surface.mode = dContactSoftERP |  dContactBounce | dContactMu2 | dContactApprox1;
 
 
         // Compute the CFM and ERP by assuming the two bodies form a
