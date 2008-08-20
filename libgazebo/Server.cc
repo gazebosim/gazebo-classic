@@ -38,6 +38,7 @@
 #include <sys/sem.h>
 #include <sstream>
 #include <iostream>
+#include <signal.h>
 
 #include "gazebo.h"
 
@@ -92,6 +93,42 @@ void Server::Init(int serverId, int force)
 
   std::cout << "creating " << this->filename << "\n";
 
+  // check to see if there is already a directory created.
+  struct stat astat;
+  if (stat(this->filename.c_str(), &astat) == 0) {
+    // directory already exists, check gazebo.pid to see if 
+    // another gazebo is already running.
+
+    std::string pidfn = this->filename + "/gazebo.pid";
+    
+    FILE *fp = fopen(pidfn.c_str(), "r");
+    if(fp) {
+      int pid;
+      fscanf(fp, "%d", &pid);
+      fclose(fp);
+      std::cout << "found a pid file: pid=" << pid << "\n";
+
+      if(kill(pid, 0) == 0) {
+	// a gazebo process is still alive.
+	errStream << "directory [" <<  this->filename
+		  <<  "] already exists (previous crash?)\n"
+		  << "gazebo (pid=" << pid << ") is still running.";
+	throw(errStream.str());
+      } else {
+	// the gazebo process is not alive.
+	// remove directory.
+	std::cout << "The gazebo process is not alive.\n";
+
+	// remove the existing directory.
+	std::string cmd = "rm -rf '" + this->filename + "'";
+	if(system(cmd.c_str()) != 0) {
+	  errStream << "couldn't remove directory [" <<  this->filename << "]";
+	  throw(errStream.str());
+	}
+      }
+    }
+  }
+
   // Create the directory
   if (mkdir(this->filename.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
   {
@@ -108,6 +145,16 @@ void Server::Init(int serverId, int force)
       <<  strerror(errno) << "]";
       throw(errStream.str());
     }
+
+  }
+
+  // write the PID to a file
+  std::string pidfn = this->filename + "/gazebo.pid";
+    
+  FILE *fp = fopen(pidfn.c_str(), "w");
+  if(fp) {
+    fprintf(fp, "%d\n", getpid());
+    fclose(fp);
   }
 }
 
@@ -119,6 +166,15 @@ void Server::Fini()
   char cmd[1024];
 
   std::cout << "deleting " << this->filename << "\n";
+
+  // unlink the pid file
+  std::string pidfn = this->filename + "/gazebo.pid";
+  if (unlink(pidfn.c_str()) < 0)
+  {
+    std::ostringstream stream;
+    stream << "error deleting pid file: " << strerror(errno);
+    throw(stream.str());
+  }
 
   // Delete the server dir
   if (rmdir(this->filename.c_str()) != 0)
