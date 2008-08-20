@@ -95,7 +95,7 @@ if env['with_audio'] == 'yes':
   parseConfigs+=['pkg-config --cflags --libs OgreAL']
 
 
-#optimize_for_cpu(env);
+optimize_for_cpu(env);
 
 #
 # Parse all the pacakge configurations
