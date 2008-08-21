@@ -43,8 +43,8 @@ ContactParams::ContactParams()
 
   this->mu1 = dInfinity;
   this->mu2 = dInfinity;
-  this->slip1 = 0.01;
-  this->slip2 = 0.01;
+  this->slip1 = 0.1;
+  this->slip2 = 0.1;
 }
 
 //////////////////////////////////////////////////////////////////////////////

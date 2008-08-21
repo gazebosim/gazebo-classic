@@ -45,7 +45,7 @@
 #endif
 
 // TODO: Fix the version number
-#define GAZEBO_VERSION "0.8-pre2"
+#define GAZEBO_VERSION "0.8-pre3"
 
 #ifndef GZ_COLLIDE_BITS
 
