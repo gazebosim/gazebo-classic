@@ -80,7 +80,6 @@ void Joint::Load(XMLConfigNode *node)
 {
   // Name the joint
   this->nameP->Load(node);
-  this->LoadChild(node);
 
   this->body1NameP->Load(node);
   this->body2NameP->Load(node);
@@ -138,6 +137,7 @@ void Joint::Load(XMLConfigNode *node)
   this->line2->AddPoint(Vector3(0,0,0));
   this->line2->AddPoint(Vector3(0,0,0));
 
+  this->LoadChild(node);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

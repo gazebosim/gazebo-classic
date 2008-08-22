@@ -102,9 +102,11 @@ void Body::Load(XMLConfigNode *node)
   this->nameP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
+  Pose3d initPose;
 
-  this->SetPosition(this->xyzP->GetValue());
-  this->SetRotation(this->rpyP->GetValue());
+  initPose.pos = **(this->xyzP);
+  initPose.rot = **(this->rpyP);
+
 
   childNode = node->GetChildByNSPrefix("geom");
 
@@ -132,6 +134,7 @@ void Body::Load(XMLConfigNode *node)
     this->SetGravityMode(false);
   }
 
+  this->SetPose(initPose);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -268,6 +271,7 @@ void Body::SetPose(const Pose3d &pose)
    
     for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
     {
+      //newPose = (*iter)->GetPose() - this->staticPose;
       newPose = (*iter)->GetPose() - oldPose;
       newPose += this->staticPose;
       (*iter)->SetPose(newPose);
