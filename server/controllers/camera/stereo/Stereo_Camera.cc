@@ -103,6 +103,16 @@ void Stereo_Camera::InitChild()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// True if a stereo iface is connected
+bool Stereo_Camera::StereoIfaceConnected() const
+{
+  if (this->stereoIface)
+    return this->stereoIface->GetOpenCount() > 0;
+  else
+    return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Update the controller
 void Stereo_Camera::UpdateChild()
 {

@@ -150,7 +150,10 @@ namespace gazebo
   
     /// \brief Load a renderable
     private: void LoadVisual(XMLConfigNode *node);
-  
+
+    /// \brief Update the pose of the body
+    private: void UpdatePose();
+ 
     /// List of geometries attached to this body
     private: std::vector< Geom* > geoms;
   
@@ -167,6 +170,7 @@ namespace gazebo
   
     private: Pose3d comPose;
     private: Pose3d staticPose;
+    private: Pose3d pose;
   
     private: Param<Vector3> *xyzP;
     private: Param<Quatern> *rpyP;

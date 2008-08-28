@@ -42,7 +42,7 @@ Joint::Joint()
 
   this->nameP = new Param<std::string>("name","",1);
   this->erpP = new Param<double>("erp",0.4,0);
-  this->cfmP = new Param<double>("cfm",0.8,0);
+  this->cfmP = new Param<double>("cfm",10e-3,0);
   this->suspensionCfmP = new Param<double>("suspensionCfm",0.0,0);
   this->body1NameP = new Param<std::string>("body1",std::string(),1);
   this->body2NameP = new Param<std::string>("body2",std::string(),1);

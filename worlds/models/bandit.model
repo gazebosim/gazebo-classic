@@ -484,9 +484,117 @@
     <highStop>20</highStop>
   </joint:hinge>
 
+  <body name="left_eyebrow_body">
+    <xyz>0.035 0.041 0.034</xyz>
+    <rpy>85 0 -70</rpy>
+
+    <geom:box name="left_eyebrow_geom">
+      <size>0.045 0.02 0.002</size>
+      <mass>0</mass>
+
+      <visual>
+        <size>0.045 0.02 0.002</size>
+        <mesh>bandit/right_eyebrow.mesh</mesh>
+        <material>Gazebo/Black</material>
+      </visual>
+    </geom:box>
+  </body>
+
+  <joint:hinge name="left_eyebrow_hinge">
+    <body1>head_body</body1>
+    <body2>left_eyebrow_body</body2>
+    <anchor>left_eyebrow_body</anchor>
+    <anchorOffset>-0.01 0.01 0</anchorOffset>
+    <axis>1 0 0</axis>
+    <lowStop>-70</lowStop>
+    <highStop>70</highStop>
+  </joint:hinge>
+
+  <body name="right_eyebrow_body">
+    <xyz>0.035 -0.041 0.034</xyz>
+    <rpy>95 16 -110</rpy>
+
+    <geom:box name="right_eyebrow_geom">
+      <size>0.045 0.02 0.002</size>
+      <mass>0</mass>
+      <visual>
+        <size>0.045 0.02 0.002</size>
+        <mesh>bandit/right_eyebrow.mesh</mesh>
+        <material>Gazebo/Black</material>
+      </visual>
+    </geom:box>
+  </body>
+
+  <joint:hinge name="right_eyebrow_hinge">
+    <body1>head_body</body1>
+    <body2>right_eyebrow_body</body2>
+    <anchor>right_eyebrow_body</anchor>
+    <anchorOffset>-0.01 -0.01 0</anchorOffset>
+    <axis>1 0 0</axis>
+    <lowStop>-70</lowStop>
+    <highStop>70</highStop>
+  </joint:hinge>
+
+  <body name="upperlip_body">
+    <xyz>0.044 -0.001 -0.05</xyz>
+    <rpy>0 0 0</rpy>
+
+    <geom:box name="upperlip_geom">
+      <size>0.02 0.08 0.014</size>
+      <mass>0</mass>
+      <visual>
+        <rpy>0 0 -91</rpy>
+        <xyz>0.006 -0.0015 0</xyz>
+        <scale>0.05 0.05 0.05</scale>
+        <mesh>bandit/upperlip.mesh</mesh>
+        <material>Gazebo/Red</material>
+      </visual>
+    </geom:box>
+  </body>
+
+  <joint:hinge name="upperlip_hinge">
+    <body1>head_body</body1>
+    <body2>upperlip_body</body2>
+    <anchor>upperlip_body</anchor>
+    <anchorOffset>0 -0.042 0.0</anchorOffset>
+    <axis>0 1 0</axis>
+    <lowStop>-20</lowStop>
+    <highStop>20</highStop>
+  </joint:hinge>
+
+  <body name="lowerlip_body">
+    <xyz>0.044 0.0 -0.06</xyz>
+    <rpy>0 0 0</rpy>
+
+    <geom:box name="lowerlip_geom">
+      <size>0.02 0.08 0.014</size>
+      <mass>0</mass>
+
+      <visual>
+        <rpy>90 0 90</rpy>
+        <xyz>0.01 0 -0.015</xyz>
+        <scale>0.09 0.1 0.1</scale>
+        <mesh>bandit/lowerlip.mesh</mesh>
+        <material>Gazebo/Red</material>
+      </visual>
+    </geom:box>
+  </body>
+
+  <joint:hinge name="lowerlip_hinge">
+    <body1>head_body</body1>
+    <body2>lowerlip_body</body2>
+    <anchor>lowerlip_body</anchor>
+    <anchorOffset>0.0 -0.042 0</anchorOffset>
+    <axis>0 1 0</axis>
+    <lowStop>-20</lowStop>
+    <highStop>20</highStop>
+  </joint:hinge>
+
+
+
   <controller:bandit_actarray name="bandit_controller">
     <joint name="head_neck_hinge">
-      <force>2</force>
+      <force>1</force>
       <gain>2</gain>
     </joint>
 
@@ -561,6 +669,26 @@
     </joint>
 
     <joint name="left_hand_thumb_hinge">
+      <force>1</force>
+      <gain>2</gain>
+    </joint>
+
+    <joint name="left_eyebrow_hinge">
+      <force>1</force>
+      <gain>2</gain>
+    </joint>
+
+    <joint name="right_eyebrow_hinge">
+      <force>1</force>
+      <gain>2</gain>
+    </joint>
+
+    <joint name="lowerlip_hinge">
+      <force>1</force>
+      <gain>2</gain>
+    </joint>
+
+    <joint name="upperlip_hinge">
       <force>1</force>
       <gain>2</gain>
     </joint>

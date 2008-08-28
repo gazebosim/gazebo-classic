@@ -176,10 +176,13 @@ void Controller::Reset()
 /// Update the controller. Called every cycle.
 void Controller::Update()
 {
-  if (lastUpdate + updatePeriod <= Simulator::Instance()->GetSimTime())
+  if (this->IsConnected())
   {
-    this->UpdateChild();
-    lastUpdate = Simulator::Instance()->GetSimTime();
+    if (lastUpdate + updatePeriod <= Simulator::Instance()->GetSimTime())
+    {
+      this->UpdateChild();
+      lastUpdate = Simulator::Instance()->GetSimTime();
+    }
   }
 }
 
@@ -197,6 +200,21 @@ void Controller::Fini()
   this->ifaces.clear();
 
   this->FiniChild();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if an interface is open 
+bool Controller::IsConnected() const
+{
+  std::vector<Iface*>::const_iterator iter;
+
+  for (iter=this->ifaces.begin(); iter!=this->ifaces.end(); iter++)
+  {
+    if ((*iter)->GetOpenCount() > 0)
+      return true;
+  }
+
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

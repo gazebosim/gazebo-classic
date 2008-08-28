@@ -30,6 +30,7 @@
 
 #include <map>
 
+#include "Stereo_Camera.hh"
 #include "Param.hh"
 #include "Controller.hh"
 
@@ -74,6 +75,9 @@ class Stereo_Camera : public Controller
 
   /// \brief Destructor
   public: virtual ~Stereo_Camera();
+
+  /// \brief True if a stereo iface is connected
+  public: bool StereoIfaceConnected() const;
 
   /// \brief Load the controller
   /// \param node XML config node

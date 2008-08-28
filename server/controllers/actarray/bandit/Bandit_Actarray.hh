@@ -31,6 +31,8 @@
 #include "Controller.hh"
 #include "Entity.hh"
 
+#define JOINTCNT 20
+
 namespace gazebo
 {
   class HingeJoint;
@@ -90,10 +92,10 @@ class Bandit_Actarray : public Controller
   /// The parent Model
   private: Model *myParent;
 
-  private: Param<std::string> *jointNamesP[16];
-  private: HingeJoint *joints[16];
-  private: Param<float> *forcesP[16];
-  private: Param<float> *gainsP[16];
+  private: Param<std::string> *jointNamesP[JOINTCNT];
+  private: HingeJoint *joints[JOINTCNT];
+  private: Param<float> *forcesP[JOINTCNT];
+  private: Param<float> *gainsP[JOINTCNT];
 
 };
 

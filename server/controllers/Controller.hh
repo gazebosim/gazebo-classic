@@ -74,6 +74,9 @@ class Controller
   /// \brief Finialize the controller. Called once on completion.
   public: void Fini();
 
+  /// \brief Return true if an interface is open 
+  public: bool IsConnected() const;
+
   /// \brief Load function for the child class
   protected: virtual void LoadChild(XMLConfigNode * /*node*/) {return;}
 

@@ -140,6 +140,7 @@ void StereoCameraSensor::InitChild()
   this->renderTarget = this->renderTargets[D_LEFT];
 
   this->InitCam();
+
   // Hack to make the camera use the right render target too.
   for (i=0; i<4; i++)
   {
@@ -206,6 +207,12 @@ void StereoCameraSensor::UpdateChild()
   Ogre::SceneNode *gridNode = NULL;
   int i;
 
+  // Only continue if the controller has an active interface. Or frames need
+  // to be saved
+  if ( (this->controller && !this->controller->IsConnected()) &&
+       !this->saveFramesP->GetValue())
+    return;
+
   this->UpdateCam();
 
   try
@@ -235,7 +242,6 @@ void StereoCameraSensor::UpdateChild()
     // Which normally equates to infinite distance. We don't want this. So
     // we have to set the distance every time.
     this->GetOgreCamera()->setFarClipDistance( this->farClipP->GetValue() );
-
 
     Ogre::AutoParamDataSource autoParamDataSource;
 

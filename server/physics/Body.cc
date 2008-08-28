@@ -213,12 +213,12 @@ void Body::Update()
   std::vector< Sensor* >::iterator sensorIter;
   std::vector< Geom* >::iterator geomIter;
 
+  this->UpdatePose();
+
   if (!this->IsStatic())
   {
-    Pose3d pose = this->GetPose();
-
     // Set the pose of the scene node
-    this->visualNode->SetPose(pose);
+    this->visualNode->SetPose(this->pose);
   }
 
   for (geomIter=this->geoms.begin();
@@ -256,7 +256,8 @@ void Body::AttachGeom( Geom *geom )
 // Set the pose of the body
 void Body::SetPose(const Pose3d &pose)
 {
-  Pose3d localPose;
+
+  this->pose = pose;
 
   if (this->IsStatic())
   {
@@ -279,8 +280,10 @@ void Body::SetPose(const Pose3d &pose)
   }
   else
   {
+    Pose3d localPose;
+
     // Compute pose of CoM
-    localPose = this->comPose + pose;
+    localPose = this->comPose + this->pose;
 
     this->SetPosition(localPose.pos);
     this->SetRotation(localPose.rot);
@@ -291,21 +294,20 @@ void Body::SetPose(const Pose3d &pose)
 // Return the pose of the body
 Pose3d Body::GetPose() const
 {
-  Pose3d pose;
-
   if (this->IsStatic())
-  {
-    pose = this->staticPose;
-  }
+    return this->staticPose;
   else
-  {
-    pose.pos = this->GetPosition();
-    pose.rot = this->GetRotation();
+    return this->pose;
+}
 
-    pose = this->comPose.CoordPoseSolve(pose);
-  }
+////////////////////////////////////////////////////////////////////////////////
+// Update the pose of the body
+void Body::UpdatePose()
+{
+  this->pose.pos = this->GetPosition();
+  this->pose.rot = this->GetRotation();
 
-  return pose;
+  this->pose = this->comPose.CoordPoseSolve(pose);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

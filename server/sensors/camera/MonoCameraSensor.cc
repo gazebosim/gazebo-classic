@@ -131,6 +131,12 @@ void MonoCameraSensor::FiniChild()
 // Update the drawing
 void MonoCameraSensor::UpdateChild()
 {
+  // Only continue if the controller has an active interface. Or frames need
+  // to be saved
+  if ( (this->controller && !this->controller->IsConnected()) &&
+       !this->saveFramesP->GetValue())
+    return;
+
   this->UpdateCam();
 
   this->renderTarget->update();

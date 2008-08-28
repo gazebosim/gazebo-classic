@@ -120,7 +120,7 @@ namespace gazebo
     private: double baseline;
   
     private: Ogre::Camera *depthCamera;
-  
+
     /*private: 
              class StereoCameraListener : public Ogre::RenderTargetListener
              {

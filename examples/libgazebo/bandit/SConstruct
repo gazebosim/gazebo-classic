@@ -1,0 +1,16 @@
+
+# 3rd party packages
+parseConfigs=['pkg-config --cflags --libs libgazebo',
+              'pkg-config --cflags --libs libgazeboServer']
+
+
+env = Environment (
+  CC = 'g++',
+  CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+)
+
+# Parse all the package configurations
+for cfg in parseConfigs:
+  env.ParseConfig(cfg)
+
+env.Program('bandit','bandit.cc')

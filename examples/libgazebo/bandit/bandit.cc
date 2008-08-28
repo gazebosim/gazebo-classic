@@ -5,7 +5,7 @@ int main()
 {
   gazebo::Client *client = new gazebo::Client();
   gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
-  gazebo::PositionIface *posIface = new gazebo::PositionIface();
+  gazebo::ActarrayIface *actarrayIface = new gazebo::ActarrayIface();
 
   int serverId = 0;
 
@@ -31,28 +31,26 @@ int main()
     return -1;
   }
 
-  /// Open the Position interface
+  /// Open the Actuator Array interface
   try
   {
-    posIface->Open(client, "position_iface_0");
+    actarrayIface->Open(client, "bandit_actarray_iface");
   }
   catch (std::string e)
   {
-    std::cout << "Gazebo error: Unable to connect to the position interface\n"
+    std::cout << "Gazebo error: Unable to connect to the actarray interface\n"
     << e << "\n";
     return -1;
   }
 
-  // Enable the motor
-  posIface->Lock(1);
-  posIface->data->cmdEnableMotors = 1;
-  posIface->Unlock();
-
   while (true)
   {
-    posIface->Lock(1);
-    posIface->data->cmdVelocity.pos.x = 0.2;
-    posIface->Unlock();
+    actarrayIface->Lock(1);
+    actarrayIface->data->cmd_pos[16] = 0.3;
+    actarrayIface->data->cmd_pos[17] = -0.3;
+    actarrayIface->data->cmd_pos[18] = 0.3;
+    actarrayIface->data->cmd_pos[19] = -0.3;
+    actarrayIface->Unlock();
 
     usleep(100000);
   }

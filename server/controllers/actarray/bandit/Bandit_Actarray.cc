@@ -55,7 +55,7 @@ Bandit_Actarray::Bandit_Actarray(Entity *parent )
 // Destructor
 Bandit_Actarray::~Bandit_Actarray()
 {
-  for (int i=0; i<16; i++)
+  for (int i=0; i<JOINTCNT; i++)
   {
     GZ_DELETE(this->jointNamesP[i]);
     GZ_DELETE(this->forcesP[i]);
@@ -96,7 +96,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
 /// Save the controller.
 void Bandit_Actarray::SaveChild(std::string &prefix, std::ostream &stream)
 {
-  for (int i=0; i<16; i++)
+  for (int i=0; i<JOINTCNT; i++)
   {
     stream << prefix << "<joint name=\"" << this->jointNamesP[i]->GetValue() << "\">\n";
     stream << prefix << "  " << *(this->forcesP[i]) << "\n";
@@ -109,7 +109,7 @@ void Bandit_Actarray::SaveChild(std::string &prefix, std::ostream &stream)
 // Initialize the controller
 void Bandit_Actarray::InitChild()
 {
-  for (int i=0; i<16; i++)
+  for (int i=0; i<JOINTCNT; i++)
   {
     this->joints[i]->SetParam( dParamVel, 0.0);
     this->joints[i]->SetParam( dParamFMax, **(this->forcesP[i]) );
@@ -126,9 +126,9 @@ void Bandit_Actarray::UpdateChild()
   this->myIface->Lock(1);
   this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
 
-  this->myIface->data->actuators_count = 16;
+  this->myIface->data->actuators_count = JOINTCNT;
 
-  for (unsigned int i=0; i<16; i++)
+  for (unsigned int i=0; i<JOINTCNT; i++)
   {
     double cmdAngle = this->myIface->data->cmd_pos[i];
     double cmdSpeed = this->myIface->data->cmd_speed[i];
@@ -153,6 +153,7 @@ void Bandit_Actarray::UpdateChild()
         joint->SetParam( dParamVel, **(this->gainsP[i]) * angle);
         joint->SetParam( dParamFMax, **(this->forcesP[i]) );
       }
+
     }
     else if (this->myIface->data->joint_mode[i] == GAZEBO_ACTARRAY_JOINT_SPEED_MODE)
     {
