@@ -67,8 +67,10 @@ ODEPhysics::ODEPhysics()
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId, 0.01);
 
-  this->globalCFMP = new Param<double>("cfm", 10e-5, 0);
-  this->globalERPP = new Param<double>("erp", 0.2, 0);
+  Param::Begin(&this->parameters);
+  this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
+  this->globalERPP = new ParamT<double>("erp", 0.2, 0);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

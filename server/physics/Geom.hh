@@ -162,14 +162,14 @@ namespace gazebo
     /// mass of the body
     protected: dMass bodyMass;
  
-    private: Param<int> *laserFiducialIdP;
-    private: Param<float> *laserRetroP;
+    private: ParamT<int> *laserFiducialIdP;
+    private: ParamT<float> *laserRetroP;
 
     ///  Mass as a double
-    protected: Param<double> *massP;
+    protected: ParamT<double> *massP;
 
-    private: Param<Vector3> *xyzP;
-    private: Param<Quatern> *rpyP;
+    private: ParamT<Vector3> *xyzP;
+    private: ParamT<Quatern> *rpyP;
 
     /// Special bounding box visual
     private: OgreVisual *bbVisual;

@@ -131,8 +131,8 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Collision attributes
   private: dJointGroupID contactGroup;
 
-  private: Param<double> *globalCFMP; 
-  private: Param<double> *globalERPP; 
+  private: ParamT<double> *globalCFMP; 
+  private: ParamT<double> *globalERPP; 
 };
 
 /** \}*/

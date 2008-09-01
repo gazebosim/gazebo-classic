@@ -85,8 +85,9 @@ namespace gazebo
 
     private: bool hasFocus;
 
-    private: Param<Vector2<int> > *sizeP;
-    private: Param<Vector2<int> > *posP;
+    private: ParamT<Vector2<int> > *sizeP;
+    private: ParamT<Vector2<int> > *posP;
+    private: std::vector<Param*> parameters;
   };
 }
 

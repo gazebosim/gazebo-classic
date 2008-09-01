@@ -45,11 +45,13 @@ using namespace gazebo;
 HeightmapGeom::HeightmapGeom(Body *body)
     : Geom(body)
 {
-  this->imageFilenameP = new Param<std::string>("image","",1);
-  this->worldTextureP = new Param<std::string>("worldTexture","",0);
-  this->detailTextureP = new Param<std::string>("detailTexture","",0);
-  this->sizeP = new Param<Vector3>("size",Vector3(10,10,10), 0);
-  this->offsetP = new Param<Vector3>("offset",Vector3(0,0,0), 0);
+  Param::Begin(&this->parameters);
+  this->imageFilenameP = new ParamT<std::string>("image","",1);
+  this->worldTextureP = new ParamT<std::string>("worldTexture","",0);
+  this->detailTextureP = new ParamT<std::string>("detailTexture","",0);
+  this->sizeP = new ParamT<Vector3>("size",Vector3(10,10,10), 0);
+  this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
+  Param::End();
 }
 
 

@@ -120,15 +120,17 @@ namespace gazebo
     public: double GetStepTime() const;
   
     /// The gravity vector
-    protected: Param<Vector3> *gravityP;
+    protected: ParamT<Vector3> *gravityP;
   
     /// time steps the physical engine will take 
     /// how much time will pass on each update
-    protected: Param<double> *stepTimeP;
+    protected: ParamT<double> *stepTimeP;
     
     /// update rate of the physical engine, how many times
     /// it is called 
-    protected: Param<double> *updateRateP;
+    protected: ParamT<double> *updateRateP;
+
+    protected: std::vector<Param*> parameters;
   };
   
   /** \}*/

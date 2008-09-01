@@ -99,12 +99,12 @@ namespace gazebo
     /// \brief Save child parameters
     protected: void SaveChild(std::string &prefix, std::ostream &stream);
 
-    private: Param<Vector3> *normalP;
-    private: Param<Vector2<double> > *sizeP;
-    private: Param<Vector2<double> > *segmentsP;
-    private: Param<Vector2<double> > *uvTileP;
-    private: Param<std::string> *materialP;
-    private: Param<bool> *castShadowsP;
+    private: ParamT<Vector3> *normalP;
+    private: ParamT<Vector2<double> > *sizeP;
+    private: ParamT<Vector2<double> > *segmentsP;
+    private: ParamT<Vector2<double> > *uvTileP;
+    private: ParamT<std::string> *materialP;
+    private: ParamT<bool> *castShadowsP;
   };
   
   /// \}

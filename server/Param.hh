@@ -28,24 +28,60 @@
 #define PARAM_HH
 
 #include <iostream>
+#include <vector>
 #include <boost/lexical_cast.hpp>
+#include <boost/any.hpp>
+#include <typeinfo>
 #include <string>
 
 #include "XMLConfig.hh"
 
 namespace gazebo
 {
-  template< typename T >
   class Param
   {
     /// \brief Constructor
-    public: Param(std::string key, T defValue, int required);
+    public: Param(Param *newParam);
+
+    /// \brief Destructor
+    public: virtual  ~Param();
+
+    /// \brief Begin a block of "new Param<*>"
+    public: static void Begin(std::vector<Param*> *_params);
+
+    /// \brief End a block of "new Param<*>"
+    public: static void End();
+
+    /// \brief The name of the key
+    public: std::string GetKey() const;
+
+    /// \brief Get the name of the param's data type
+    public: std::string GetTypename() const;
+           
+    /// \brief Get the type
+    public: virtual std::string GetAsString() const {return std::string();}
+
+    /// List of created parameters
+    private: static std::vector<Param*> *params;
+
+    protected: std::string key;
+    protected: std::string typeName;
+  };
+
+
+  template< typename T>
+  class ParamT : public Param
+  {
+    /// \brief Constructor
+    public: ParamT(std::string key, T defValue, int required);
   
     /// \brief Destructor
-    public: virtual ~Param();
+    public: virtual ~ParamT();
   
     /// \brief Load the param from an XML config file
     public: void Load(XMLConfigNode *node);
+
+    public: virtual std::string GetAsString() const;
 
     /// \brief Get the value
     public: T GetValue() const;
@@ -55,7 +91,7 @@ namespace gazebo
 
     public: inline T operator*() const {return value;}
 
-    public: friend std::ostream &operator<<( std::ostream &out, const Param<T> &p)
+    public: friend std::ostream &operator<<( std::ostream &out, const ParamT<T> &p)
             {
               out << "<" << p.key << ">" << p.value << "</" << p.key << ">";
 
@@ -64,7 +100,6 @@ namespace gazebo
   
     private: T value;
   
-    private: std::string key;
     private: T defaultValue;
     private: int required;
   
@@ -74,25 +109,28 @@ namespace gazebo
   //////////////////////////////////////////////////////////////////////////////
   // Constructor
   template< typename T>
-  Param<T>::Param(std::string key, T defValue, int required)
+  ParamT<T>::ParamT(std::string key, T defValue, int required)
+    : Param(this)
   {
     this->key = key;
     this->defaultValue = defValue;
     this->required = required;
     this->value = this->defaultValue;
+
+    this->typeName = typeid(T).name();
   }
   
   //////////////////////////////////////////////////////////////////////////////
   // Destructor
   template<typename T>
-  Param<T>::~Param()
+  ParamT<T>::~ParamT()
   {
   }
  
   //////////////////////////////////////////////////////////////////////////////
   /// Load the param from an XML config file
   template<typename T>
-  void Param<T>::Load(XMLConfigNode *node)
+  void ParamT<T>::Load(XMLConfigNode *node)
   {
     std::ostringstream stream;
     stream << this->defaultValue;
@@ -117,9 +155,17 @@ namespace gazebo
   }
 
   //////////////////////////////////////////////////////////////////////////////
+  // Get value as boost
+  template<typename T>
+  std::string ParamT<T>::GetAsString() const
+  {
+    return boost::lexical_cast<std::string>(this->value);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
   ///Get the value
   template<typename T>
-  T Param<T>::GetValue() const
+  T ParamT<T>::GetValue() const
   {
     return this->value;
   }
@@ -127,7 +173,7 @@ namespace gazebo
   //////////////////////////////////////////////////////////////////////////////
   /// Set the value of the parameter
   template<typename T>
-  void Param<T>::SetValue(const T &v)
+  void ParamT<T>::SetValue(const T &v)
   {
     this->value = v;
   }

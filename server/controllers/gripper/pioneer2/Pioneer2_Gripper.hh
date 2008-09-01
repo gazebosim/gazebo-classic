@@ -95,8 +95,8 @@ class Pioneer2_Gripper : public Controller
 
   private: SliderJoint *joints[2];
 
-  private: Param<std::string> *leftJointNameP;
-  private: Param<std::string> *rightJointNameP;
+  private: ParamT<std::string> *leftJointNameP;
+  private: ParamT<std::string> *rightJointNameP;
 };
 
 /** \} */

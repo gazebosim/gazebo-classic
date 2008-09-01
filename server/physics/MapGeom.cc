@@ -49,12 +49,14 @@ MapGeom::MapGeom(Body *body)
 {
   this->root = new QuadNode(NULL);
 
-  this->negativeP = new Param<int>("negative", 0, 0);
-  this->thresholdP = new Param<double>( "threshold", 200.0, 0);
-  this->wallHeightP = new Param<double>( "height", 1.0, 0 );
-  this->scaleP = new Param<double>("scale",1.0,0);
-  this->materialP = new Param<std::string>("material", "", 0);
-  this->granularityP = new Param<int>("granularity", 5, 0);
+  Param::Begin(&this->parameters);
+  this->negativeP = new ParamT<int>("negative", 0, 0);
+  this->thresholdP = new ParamT<double>( "threshold", 200.0, 0);
+  this->wallHeightP = new ParamT<double>( "height", 1.0, 0 );
+  this->scaleP = new ParamT<double>("scale",1.0,0);
+  this->materialP = new ParamT<std::string>("material", "", 0);
+  this->granularityP = new ParamT<int>("granularity", 5, 0);
+  Param::End();
 }
 
 

@@ -42,33 +42,21 @@ using namespace gazebo;
 Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
-  char *buffer = new char[256];
-
   this->box(FL_UP_BOX);
 
-  this->entityInfoGrp = new Fl_Group(x+10,y+20,w-20,25*3, "Entity");
+  this->columnWidths[0] = 80;
+  this->columnWidths[1] = 120;
+  this->columnWidths[2] = 0;
 
-  // Camera Info Group
-  this->entityInfoGrp->box(FL_BORDER_BOX);
-
-  // Entity name output
-  x = this->entityInfoGrp->x()+50;
-  y = this->entityInfoGrp->y()+2;
-  this->entityName = new Fl_Output(x,y, this->entityInfoGrp->w()-55,20, "Name: ");
-
-  y = this->entityName->y() + this->entityName->h() + 5;
-  this->entityPos = new Fl_Output(x,y, this->entityInfoGrp->w()-55,20, "XYZ: ");
-
-  y = this->entityPos->y() + this->entityPos->h() + 5;
-  this->entityRot = new Fl_Output(x,y, this->entityInfoGrp->w()-55,20, "RPY: ");
-
-  this->entityInfoGrp->end();
+  this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*5, "Attributes");
+  this->entityBrowser->align(FL_ALIGN_TOP);
+  this->entityBrowser->column_char('~');
+  this->entityBrowser->column_widths( columnWidths );
+  this->entityBrowser->callback(&Toolbar::AttributeBrowserCB, this);
 
   this->end();
 
   this->resizable(NULL);
-
-  delete buffer;
 }
 
 Toolbar::~Toolbar()
@@ -79,36 +67,84 @@ Toolbar::~Toolbar()
 /// Update the toolbar data
 void Toolbar::Update()
 {
-  char *buffer = new char[256];
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  std::vector<Param*> *parameters;
+  std::vector<Param*>::iterator iter;
 
   if (entity)
   {
-    Model *model = dynamic_cast<Model *>(entity);
+    //Model *model = dynamic_cast<Model *>(entity);
 
-    sprintf(buffer,"%s", entity->GetName().c_str());
-    if (strcmp(buffer, this->entityName->value()) != 0)
-      this->entityName->value(buffer);
+    parameters = entity->GetParameters();
 
-    if (model)
+    int i=0;
+    for (iter = parameters->begin(); iter != parameters->end(); iter++, i++)
     {
-      Pose3d pose = model->GetPose();
-      Vector3 rpy = pose.rot.GetAsEuler();
+      std::string value;
+      //boost::any anyValue = (*iter)->Get();
+      //std::string typeName = (*iter)->GetTypename();
+      std::string colorStr = "";
 
-      sprintf(buffer,"%4.2f,  %4.2f,  %4.2f",pose.pos.x, pose.pos.y, pose.pos.z);
-      if (strcmp( buffer, this->entityPos->value()) != 0)
-        this->entityPos->value(buffer);
+      /*if ( i%2 == 0)
+        colorStr = "@B50";
+        */
 
-      sprintf(buffer,"%4.2f,  %4.2f,  %4.2f",rpy.x, rpy.y, rpy.z);
-      if (strcmp( buffer, this->entityRot->value()) != 0)
-        this->entityRot->value(buffer);
+      value = colorStr + "@b@s" + (*iter)->GetKey() + ":~" + colorStr + "@s";
+      value += (*iter)->GetAsString();
 
+
+      // Convert the variable value to a string
+      /*if (typeName == typeid(float).name())
+        value += boost::lexical_cast<std::string>(
+            boost::any_cast<float>( anyValue ));
+      else if (typeName == typeid(double).name())
+        value += boost::lexical_cast<std::string>(
+            boost::any_cast<double>( anyValue )); 
+      else if (typeName == typeid(int).name())
+        value += boost::lexical_cast<std::string>(
+            boost::any_cast<int>( anyValue ));
+      else if (typeName == typeid(bool).name())
+        value += boost::lexical_cast<std::string>( 
+            boost::any_cast<bool>(anyValue) );
+      else if (typeName == typeid(long).name())
+        value += boost::lexical_cast<std::string>( 
+            boost::any_cast<long>(anyValue) );
+      else if (typeName == typeid(Quatern).name())
+        value += boost::lexical_cast<std::string>(
+            boost::any_cast<Quatern>( anyValue ));
+      else if (typeName == typeid(Vector3).name())
+        value += boost::lexical_cast<std::string>(
+            boost::any_cast<Vector3>( anyValue ));
+      else if (typeName == typeid(std::string).name())
+        value += boost::any_cast<std::string>( anyValue );
+      else
+        gzerr(0) << "Unknown typename[" << typeName << "]\n";
+        */
+
+      if (!this->entityBrowser->text(i+1))
+      {
+        this->entityBrowser->add( value.c_str() );
+      }
+      else if (strcmp(this->entityBrowser->text(i+1), value.c_str()) != 0)
+      {
+        this->entityBrowser->text( i+1, value.c_str() );
+      }
     }
+
+    // Clear the remaining lines
+    while ( this->entityBrowser->text(i+1) != NULL )
+    {
+      this->entityBrowser->text( i+1, "" );
+      i++;
+    }
+
   }
-  else
-  {
-    this->entityName->value("");
-    this->entityPos->value("");
-    this->entityRot->value("");
-  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Attribute browser callback
+void Toolbar::AttributeBrowserCB( Fl_Widget * w, void *data)
+{
+  printf("Callback\n");
 }

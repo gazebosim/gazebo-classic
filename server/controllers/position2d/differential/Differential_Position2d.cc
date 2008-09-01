@@ -60,11 +60,13 @@ Differential_Position2d::Differential_Position2d(Entity *parent )
 
   this->prevUpdateTime = Simulator::Instance()->GetSimTime();
 
-  this->leftJointNameP = new Param<std::string>("leftJoint", "", 1);
-  this->rightJointNameP = new Param<std::string>("rightJoint", "", 1);
-  this->wheelSepP = new Param<float>("wheelSeparation", 0.34,1);
-  this->wheelDiamP = new Param<float>("wheelDiameter", 0.15,1);
-  this->torqueP = new Param<float>("torque", 10.0, 1);
+  Param::Begin(&this->parameters);
+  this->leftJointNameP = new ParamT<std::string>("leftJoint", "", 1);
+  this->rightJointNameP = new ParamT<std::string>("rightJoint", "", 1);
+  this->wheelSepP = new ParamT<float>("wheelSeparation", 0.34,1);
+  this->wheelDiamP = new ParamT<float>("wheelDiameter", 0.15,1);
+  this->torqueP = new ParamT<float>("torque", 10.0, 1);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -96,7 +96,7 @@ namespace gazebo
     /// \brief True if active
     protected: bool active;
 
-    protected: Param<double> *updateRateP;
+    protected: ParamT<double> *updateRateP;
     protected: double updatePeriod;
     protected: double lastUpdate;
     protected: std::string typeName;

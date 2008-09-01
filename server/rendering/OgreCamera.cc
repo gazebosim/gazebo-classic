@@ -61,14 +61,16 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->renderTarget = NULL;
   this->userMovable = true;
 
-  this->nearClipP = new Param<double>("nearClip",0.1,0);
-  this->farClipP = new Param<double>("farClip",100,0);
-  this->saveFramesP = new Param<bool>("saveFrames",false,0);
-  this->savePathnameP = new Param<std::string>("saveFramePath","",0);
-  this->imageWidthP = new Param<unsigned int>("imageSize",640,0);
-  this->imageHeightP = new Param<unsigned int>("imageSize",480,0);
-  this->visMaskP = new Param<std::string>("mask","none",0);
-  this->hfovP = new Param<Angle>("hfov", Angle(DTOR(60)),0);
+  Param::Begin(&this->camParameters);
+  this->nearClipP = new ParamT<double>("nearClip",0.1,0);
+  this->farClipP = new ParamT<double>("farClip",100,0);
+  this->saveFramesP = new ParamT<bool>("saveFrames",false,0);
+  this->savePathnameP = new ParamT<std::string>("saveFramePath","",0);
+  this->imageWidthP = new ParamT<unsigned int>("imageSize",640,0);
+  this->imageHeightP = new ParamT<unsigned int>("imageSize",480,0);
+  this->visMaskP = new ParamT<std::string>("mask","none",0);
+  this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
+  Param::End();
 
   // This should be last in the constructor
   CameraManager::Instance()->AddCamera(this);

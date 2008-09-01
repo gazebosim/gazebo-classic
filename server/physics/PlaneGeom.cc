@@ -40,16 +40,17 @@ using namespace gazebo;
 PlaneGeom::PlaneGeom(Body *body)
     : Geom(body)
 {
-  this->normalP = new Param<Vector3>("normal",Vector3(0,0,1),0);
-  this->sizeP = new Param<Vector2<double> >("size",
+  Param::Begin(&this->parameters);
+  this->normalP = new ParamT<Vector3>("normal",Vector3(0,0,1),0);
+  this->sizeP = new ParamT<Vector2<double> >("size",
       Vector2<double>(1000, 1000), 0);
-  this->segmentsP = new Param<Vector2<double> >("segments",
+  this->segmentsP = new ParamT<Vector2<double> >("segments",
       Vector2<double>(10, 10), 0);
-  this->uvTileP = new Param<Vector2<double> >("uvTile",
+  this->uvTileP = new ParamT<Vector2<double> >("uvTile",
       Vector2<double>(1, 1), 0);
-  this->materialP = new Param<std::string>("material","",1);
-  this->castShadowsP = new Param<bool>("castShadows", false, 0);
-
+  this->materialP = new ParamT<std::string>("material","",1);
+  this->castShadowsP = new ParamT<bool>("castShadows", false, 0);
+  Param::End();
 }
 
 //////////////////////////////////////////////////////////////////////////////

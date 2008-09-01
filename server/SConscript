@@ -21,6 +21,7 @@ sources = ['main.cc',
            'Model.cc',
            'Simulator.cc',
            'Angle.cc',
+           'Param.cc'
            ]
 
 headers.append( 

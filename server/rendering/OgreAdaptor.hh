@@ -149,13 +149,14 @@ namespace gazebo
     /// GLX context used to render the scenes.Used for gui-less operation
     protected: GLXContext dummyContext;
 
-    private: Param<Vector4> *ambientP;
-    private: Param<std::string> *shadowTechniqueP;
-    private: Param<int> *shadowTextureSizeP;
-    private: Param<int> *shadowIndexSizeP;
-    private: Param<double> *updateRateP;
-    private: Param<bool> *drawGridP;
-    private: Param<std::string> *skyMaterialP;
+    private: ParamT<Vector4> *ambientP;
+    private: ParamT<std::string> *shadowTechniqueP;
+    private: ParamT<int> *shadowTextureSizeP;
+    private: ParamT<int> *shadowIndexSizeP;
+    private: ParamT<double> *updateRateP;
+    private: ParamT<bool> *drawGridP;
+    private: ParamT<std::string> *skyMaterialP;
+    private: std::vector<Param*> parameters;
   };
   
  

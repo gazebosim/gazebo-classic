@@ -32,9 +32,11 @@ using namespace gazebo;
 // Constructor
 PhysicsEngine::PhysicsEngine()
 {
-  this->gravityP = new Param<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
-  this->updateRateP = new Param<double>("maxUpdateRate", 0.0, 0);
-  this->stepTimeP = new Param<double>("stepTime",0.025,0);
+  Param::Begin(&this->parameters);
+  this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
+  this->updateRateP = new ParamT<double>("maxUpdateRate", 0.0, 0);
+  this->stepTimeP = new ParamT<double>("stepTime",0.025,0);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

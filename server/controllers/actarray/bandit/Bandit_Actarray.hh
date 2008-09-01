@@ -92,10 +92,10 @@ class Bandit_Actarray : public Controller
   /// The parent Model
   private: Model *myParent;
 
-  private: Param<std::string> *jointNamesP[JOINTCNT];
+  private: ParamT<std::string> *jointNamesP[JOINTCNT];
   private: HingeJoint *joints[JOINTCNT];
-  private: Param<float> *forcesP[JOINTCNT];
-  private: Param<float> *gainsP[JOINTCNT];
+  private: ParamT<float> *forcesP[JOINTCNT];
+  private: ParamT<float> *gainsP[JOINTCNT];
 
 };
 

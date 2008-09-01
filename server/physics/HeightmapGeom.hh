@@ -124,11 +124,11 @@ namespace gazebo
 
     private: std::vector<double> heights;
 
-    private: Param<std::string> *imageFilenameP;
-    private: Param<std::string> *worldTextureP;
-    private: Param<std::string> *detailTextureP;
-    private: Param<Vector3> *sizeP;
-    private: Param<Vector3> *offsetP;
+    private: ParamT<std::string> *imageFilenameP;
+    private: ParamT<std::string> *worldTextureP;
+    private: ParamT<std::string> *detailTextureP;
+    private: ParamT<Vector3> *sizeP;
+    private: ParamT<Vector3> *offsetP;
 
   };
 

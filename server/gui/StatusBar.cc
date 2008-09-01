@@ -28,6 +28,7 @@
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
+#include <string.h>
 
 #include "Gui.hh"
 #include "Simulator.hh"

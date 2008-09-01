@@ -58,10 +58,12 @@ Generic_PTZ::Generic_PTZ(Entity *parent)
   this->panJoint = NULL;
   this->tiltJoint = NULL;
 
-  this->panJointNameP = new Param<std::string>("panJoint", "", 1);
-  this->tiltJointNameP = new Param<std::string>("tiltJoint", "", 1);
-  this->motionGainP = new Param<double>("motionGain",2,0);
-  this->forceP = new Param<double>("force",10,0);
+  Param::Begin(&this->parameters);
+  this->panJointNameP = new ParamT<std::string>("panJoint", "", 1);
+  this->tiltJointNameP = new ParamT<std::string>("tiltJoint", "", 1);
+  this->motionGainP = new ParamT<double>("motionGain",2,0);
+  this->forceP = new ParamT<double>("force",10,0);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

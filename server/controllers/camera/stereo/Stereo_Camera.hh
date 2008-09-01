@@ -110,8 +110,8 @@ class Stereo_Camera : public Controller
   private: StereoCameraIface *stereoIface;
   private: std::map< std::string, CameraIface*> cameraIfaces;
 
-  private: Param<std::string> *leftCameraNameP;
-  private: Param<std::string> *rightCameraNameP;
+  private: ParamT<std::string> *leftCameraNameP;
+  private: ParamT<std::string> *rightCameraNameP;
 
   /// The parent sensor
   private: StereoCameraSensor *myParent;

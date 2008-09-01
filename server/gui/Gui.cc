@@ -51,8 +51,10 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 {
   Fl::scheme("plastic");
 
-  this->sizeP = new Param<Vector2<int> >("size", Vector2<int>(800, 600), 0);
-  this->posP = new Param<Vector2<int> >("pos",Vector2<int>(0,0),0);
+  Param::Begin(&this->parameters);
+  this->sizeP = new ParamT<Vector2<int> >("size", Vector2<int>(800, 600), 0);
+  this->posP = new ParamT<Vector2<int> >("pos",Vector2<int>(0,0),0);
+  Param::End();
 
   // The order of creation matters! Menubar first, followed by FrameManager,
   // then statusbar

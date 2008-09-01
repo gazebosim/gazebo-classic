@@ -41,8 +41,10 @@ using namespace gazebo;
 /// Constructor
 Controller::Controller(Entity *entity )
 {
-  this->nameP = new Param<std::string>("name","",1);
-  this->updatePeriodP = new Param<double>("updateRate", 10, 0);
+  Param::Begin(&this->parameters);
+  this->nameP = new ParamT<std::string>("name","",1);
+  this->updatePeriodP = new ParamT<double>("updateRate", 10, 0);
+  Param::End();
 
   if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
   {

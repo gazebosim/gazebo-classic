@@ -83,6 +83,10 @@ class SimulationInterface : public GazeboInterface
   public: SimulationIface *iface;
 
   private: QueuePointer *responseQueue;
+
+  private: player_simulation_pose3d_req_t pose3dReq;
+
+  private: player_simulation_pose2d_req_t pose2dReq;
 };
 
   /// \} 

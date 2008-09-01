@@ -108,8 +108,9 @@ namespace gazebo
     private: std::ostream *errStream;
     private: std::ofstream logStream;
 
-    private: Param<int> *verbosityP;
-    private: Param<bool> *logDataP;
+    private: ParamT<int> *verbosityP;
+    private: ParamT<bool> *logDataP;
+    private: std::vector<Param*> parameters;
 
     /// Pointer to myself
     private: static GazeboMessage *myself;

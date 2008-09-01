@@ -33,6 +33,7 @@
 
 #include <GL/glx.h>
 
+#include "Param.hh"
 #include "Entity.hh"
 #include "OgreCamera.hh"
 #include "OgreCreator.hh"
@@ -202,12 +203,11 @@ void GLWindow::HandleMouseRelease()
   if (!this->mouseDrag)
   {
     Entity *ent = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, this->mousePos);
+
     if (ent)
     {
       Simulator::Instance()->SetSelectedEntity( ent );
     }
-
-
   }
 
   this->mouseDrag = false;

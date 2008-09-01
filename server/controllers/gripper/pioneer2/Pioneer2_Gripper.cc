@@ -67,8 +67,10 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   if (!this->myIface)
     gzthrow("Pioneer2_Gripper controller requires a GripperIface");
 
-  this->leftJointNameP = new Param<std::string>("leftJoint", "", 1);
-  this->rightJointNameP = new Param<std::string>("rightJoint", "", 1);
+  Param::Begin(&this->parameters);
+  this->leftJointNameP = new ParamT<std::string>("leftJoint", "", 1);
+  this->rightJointNameP = new ParamT<std::string>("rightJoint", "", 1);
+  Param::End();
 
   this->joints[LEFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->leftJointNameP->GetValue()));
   this->joints[RIGHT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->rightJointNameP->GetValue()));

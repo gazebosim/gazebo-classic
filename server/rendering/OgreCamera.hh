@@ -172,9 +172,9 @@ namespace gazebo
     /// \brief Set the camera's scene node
     public: void SetCameraSceneNode( Ogre::SceneNode *node );
 
-    protected: Param<Angle> *hfovP;
-    protected: Param<double> *nearClipP, *farClipP;
-    protected: Param<unsigned int> *imageWidthP, *imageHeightP;
+    protected: ParamT<Angle> *hfovP;
+    protected: ParamT<double> *nearClipP, *farClipP;
+    protected: ParamT<unsigned int> *imageWidthP, *imageHeightP;
     protected: unsigned int textureWidth, textureHeight;
   
     private: Ogre::Camera *camera;
@@ -186,10 +186,10 @@ namespace gazebo
     // Info for saving images
     protected: unsigned char *saveFrameBuffer;
     protected: unsigned int saveCount;
-    protected: Param<bool> *saveFramesP;
-    protected: Param<std::string> *savePathnameP;
+    protected: ParamT<bool> *saveFramesP;
+    protected: ParamT<std::string> *savePathnameP;
  
-    protected: Param<std::string> *visMaskP;
+    protected: ParamT<std::string> *visMaskP;
     protected: unsigned int visibilityMask;
 
     protected: Ogre::RenderTarget *renderTarget;
@@ -205,6 +205,7 @@ namespace gazebo
     private: std::string cameraName;
 
     private: bool userMovable;
+    protected: std::vector<Param*> camParameters;
   };
   
   /// \}

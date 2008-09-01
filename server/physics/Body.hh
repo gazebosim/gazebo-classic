@@ -172,8 +172,8 @@ namespace gazebo
     private: Pose3d staticPose;
     private: Pose3d pose;
   
-    private: Param<Vector3> *xyzP;
-    private: Param<Quatern> *rpyP;
+    private: ParamT<Vector3> *xyzP;
+    private: ParamT<Quatern> *rpyP;
   };
   
   /// \}

@@ -125,21 +125,21 @@ namespace gazebo
     private: void CreateBoxes(QuadNode *node);
 
     // The scale factor to apply to the geoms
-    private: Param<double> *scaleP;
+    private: ParamT<double> *scaleP;
 
     // Negative image?
-    private: Param<int> *negativeP;
+    private: ParamT<int> *negativeP;
 
     // Image color threshold used for extrusion
-    private: Param<double> *thresholdP;
+    private: ParamT<double> *thresholdP;
 
     // The color of the walls
-    private: Param<std::string> *materialP;
+    private: ParamT<std::string> *materialP;
 
     // The amount of acceptable error in the model
-    private: Param<int> *granularityP;
+    private: ParamT<int> *granularityP;
 
-    private: Param<double> *wallHeightP;
+    private: ParamT<double> *wallHeightP;
 
     private: Ogre::Image mapImage;
 

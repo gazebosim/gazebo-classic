@@ -64,8 +64,10 @@ Body::Body(Entity *parent, dWorldID worldId)
     this->bodyId = NULL;
   }
 
-  this->xyzP = new Param<Vector3>("xyz", Vector3(), 0);
-  this->rpyP = new Param<Quatern>("rpy", Quatern(), 0);
+  Param::Begin(&this->parameters);
+  this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
+  this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
+  Param::End();
 }
 
 

@@ -123,9 +123,9 @@ namespace gazebo
     /// Set the torque of a joint.
     public: void SetTorque(double torque);
   
-    private: Param<Vector3> *axisP;
-    private: Param<Angle> *loStopP;
-    private: Param<Angle> *hiStopP; 
+    private: ParamT<Vector3> *axisP;
+    private: ParamT<Angle> *loStopP;
+    private: ParamT<Angle> *hiStopP; 
   };
   /// \}
   

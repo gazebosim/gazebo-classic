@@ -42,8 +42,10 @@ Entity::Entity(Entity *parent)
   id(++idCounter),
   visualNode(0)
 {
-  this->nameP = new Param<std::string>("name","",1);
-  this->staticP = new Param<bool>("static",false,0);
+  Param::Begin(&this->parameters);
+  this->nameP = new ParamT<std::string>("name","",1);
+  this->staticP = new ParamT<bool>("static",false,0);
+  Param::End();
  
   this->selected = false;
 
@@ -195,3 +197,12 @@ bool Entity::operator==(const Entity &ent) const
 {
   return ent.GetName() == this->GetName();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the parameters 
+std::vector<Param*> *Entity::GetParameters()
+{
+  return &this->parameters;
+}
+
+

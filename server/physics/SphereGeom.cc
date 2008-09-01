@@ -37,7 +37,9 @@ using namespace gazebo;
 SphereGeom::SphereGeom(Body *body)
     : Geom(body)
 {
-  this->radiusP = new Param<double>("size",1.0,0);
+  Param::Begin(&this->parameters);
+  this->radiusP = new ParamT<double>("size",1.0,0);
+  Param::End();
 }
 
 

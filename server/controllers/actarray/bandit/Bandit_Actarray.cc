@@ -75,21 +75,23 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
     gzthrow("Bandit_Actarray controller requires a Actarray Iface");
 
 
+  Param::Begin(&this->parameters);
   for (i=0, jNode = node->GetChild("joint"); jNode; i++)
   {
-    this->jointNamesP[i] = new Param<std::string>("name","",1);
+    this->jointNamesP[i] = new ParamT<std::string>("name","",1);
     this->jointNamesP[i]->Load(jNode);
 
-    this->forcesP[i] = new Param<float>("force",0.0,1);
+    this->forcesP[i] = new ParamT<float>("force",0.0,1);
     this->forcesP[i]->Load(jNode);
 
-    this->gainsP[i] = new Param<float>("gain",0.0,1);
+    this->gainsP[i] = new ParamT<float>("gain",0.0,1);
     this->gainsP[i]->Load(jNode);
    
     this->joints[i] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->jointNamesP[i]->GetValue()));
 
     jNode = jNode->GetNext("joint");
   }
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -87,7 +87,7 @@ namespace gazebo
     /// \brief Set the size of the box
     public: void SetSize( Vector3 size );
 
-    private: Param<Vector3> *sizeP;
+    private: ParamT<Vector3> *sizeP;
   };
 
   /// \}

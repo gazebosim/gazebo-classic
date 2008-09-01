@@ -589,6 +589,7 @@ void World::UpdateSimulationIface()
           break;
         }
 
+      case SimulationRequestData::GET_POSE2D:
       case SimulationRequestData::GET_POSE3D:
         {
           Model *model = this->GetModelByName((char*)req->modelName);
@@ -619,7 +620,7 @@ void World::UpdateSimulationIface()
           break;
         }
 
-      case SimulationRequestData::SET_POSE2D:
+     case SimulationRequestData::SET_POSE2D:
         {
           Model *model = this->GetModelByName((char*)req->modelName);
           if (model)

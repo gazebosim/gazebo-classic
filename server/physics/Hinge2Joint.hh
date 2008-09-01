@@ -147,13 +147,13 @@ class Hinge2Joint : public Joint
   /// \brief Set the torque
   public: void SetTorque(double torque1, double torque2);
 
-  private: Param<Vector3> *axis1P;
-  private: Param<Angle> *loStop1P;
-  private: Param<Angle> *hiStop1P; 
+  private: ParamT<Vector3> *axis1P;
+  private: ParamT<Angle> *loStop1P;
+  private: ParamT<Angle> *hiStop1P; 
 
-  private: Param<Vector3> *axis2P;
-  private: Param<Angle> *loStop2P;
-  private: Param<Angle> *hiStop2P; 
+  private: ParamT<Vector3> *axis2P;
+  private: ParamT<Angle> *loStop2P;
+  private: ParamT<Angle> *hiStop2P; 
 };
 
 /// \}

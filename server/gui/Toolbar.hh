@@ -28,6 +28,7 @@
 #define TOOLBAR_HH
 
 #include <FL/Fl_Group.H>
+#include <FL/Fl_Hold_Browser.H>
 
 class Fl_Value_Output;
 class Fl_Output;
@@ -48,12 +49,11 @@ namespace gazebo
     /// \brief Update the toolbar data
     public: void Update();
 
-    private: Fl_Group *entityInfoGrp;
+    public: static void AttributeBrowserCB( Fl_Widget * w, void *data);
 
-    private: Fl_Output *entityName;
-    private: Fl_Output *entityPos;
-    private: Fl_Output *entityRot;
+    private: Fl_Hold_Browser *entityBrowser;
 
+    private: int columnWidths[3];
   };
   
 }

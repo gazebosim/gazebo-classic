@@ -45,7 +45,9 @@ Sensor::Sensor(Body *body)
   this->controller = NULL;
   this->active = true;
 
-  this->updateRateP = new Param<double>("updateRate", 0, 0);
+  Param::Begin(&this->parameters);
+  this->updateRateP = new ParamT<double>("updateRate", 0, 0);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

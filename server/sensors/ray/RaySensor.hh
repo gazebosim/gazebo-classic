@@ -131,16 +131,16 @@ class RaySensor: public Sensor
   /// Ray data
   private: std::vector<RayGeom*> rays;
 
-  private: Param<Angle> *minAngleP, *maxAngleP;
-  private: Param<double> *minRangeP, *maxRangeP;
-  private: Param<Vector3> *originP;
+  private: ParamT<Angle> *minAngleP, *maxAngleP;
+  private: ParamT<double> *minRangeP, *maxRangeP;
+  private: ParamT<Vector3> *originP;
 
   private: Pose3d prevPose;
-  private: Param<int> *rayCountP;
-  private: Param<int> *rangeCountP;
+  private: ParamT<int> *rayCountP;
+  private: ParamT<int> *rangeCountP;
   
   /// Display rays when rendering images
-  private: Param<bool> *displayRaysP;
+  private: ParamT<bool> *displayRaysP;
 
 };
 /// \}

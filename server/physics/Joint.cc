@@ -40,14 +40,16 @@ Joint::Joint()
   this->visual = NULL;
   this->model = NULL;
 
-  this->nameP = new Param<std::string>("name","",1);
-  this->erpP = new Param<double>("erp",0.4,0);
-  this->cfmP = new Param<double>("cfm",10e-3,0);
-  this->suspensionCfmP = new Param<double>("suspensionCfm",0.0,0);
-  this->body1NameP = new Param<std::string>("body1",std::string(),1);
-  this->body2NameP = new Param<std::string>("body2",std::string(),1);
-  this->anchorBodyNameP = new Param<std::string>("anchor",std::string(),0);
-  this->anchorOffsetP = new Param<Vector3>("anchorOffset",Vector3(0,0,0), 0);
+  Param::Begin(&this->parameters);
+  this->nameP = new ParamT<std::string>("name","",1);
+  this->erpP = new ParamT<double>("erp",0.4,0);
+  this->cfmP = new ParamT<double>("cfm",10e-3,0);
+  this->suspensionCfmP = new ParamT<double>("suspensionCfm",0.0,0);
+  this->body1NameP = new ParamT<std::string>("body1",std::string(),1);
+  this->body2NameP = new ParamT<std::string>("body2",std::string(),1);
+  this->anchorBodyNameP = new ParamT<std::string>("anchor",std::string(),0);
+  this->anchorOffsetP = new ParamT<Vector3>("anchorOffset",Vector3(0,0,0), 0);
+  Param::End();
 }
 
 

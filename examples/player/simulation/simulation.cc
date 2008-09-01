@@ -23,10 +23,13 @@ int main()
 
     // Get the robot pose
     sp.GetPose3d((char*)"pioneer2dx_model1", x, y, z, roll, pitch, yaw, time);
+    printf("Robot Pose3d: XYZ[%f %f %f] RPY[%f %f %f]\n",x, y, z, roll, pitch, yaw); 
+
+    sp.GetPose2d((char*)"pioneer2dx_model1", x, y, roll );
+    printf("Robot Pose2d: XY[%f %f] Yaw[%f]\n", x, y, roll );
 
     // Set the robot pose
     //sp.SetPose3d((char*)"pioneer2dx_model1", 2.0, 0.0, 5.0, 0, 0, 0);
-
 
     printf("Get Sim Time\n");
     /// Get the simulation time
@@ -40,6 +43,7 @@ int main()
     /// Get the realtime
     sp.GetProperty((char*)"world",(char*)"real_time", &time, sizeof(time));
     printf("Real Time[%f]\n",time);
+
   }
   catch (PlayerCc::PlayerError e)
   {

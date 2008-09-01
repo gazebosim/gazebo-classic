@@ -44,9 +44,10 @@ GazeboMessage::GazeboMessage()
   this->errStream = &std::cerr;
 
   this->level = 0;
-
-  this->verbosityP = new Param<int>("verbosity",0,0);
-  this->logDataP = new Param<bool>("logData",false,0);
+  Param::Begin(&this->parameters);
+  this->verbosityP = new ParamT<int>("verbosity",0,0);
+  this->logDataP = new ParamT<bool>("logData",false,0);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

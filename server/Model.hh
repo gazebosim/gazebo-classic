@@ -179,12 +179,11 @@ namespace gazebo
     /// \brief Light numbering variable to give a unique name to all light entities
     private: static uint lightNumber;
 
-    private: std::vector<boost::any> parameters;
-    private: Param<std::string> *canonicalBodyNameP;
-    private: Param<Vector3> *xyzP;
-    private: Param<Quatern> *rpyP;
-    private: Param<std::string> *parentBodyNameP;
-    private: Param<std::string> *myBodyNameP;
+    private: ParamT<std::string> *canonicalBodyNameP;
+    private: ParamT<Vector3> *xyzP;
+    private: ParamT<Quatern> *rpyP;
+    private: ParamT<std::string> *parentBodyNameP;
+    private: ParamT<std::string> *myBodyNameP;
 
     // Name of a light (if the model is renderable:light)
     private: std::string lightName;

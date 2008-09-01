@@ -40,9 +40,11 @@ HingeJoint::HingeJoint( dWorldID worldId )
   this->type = Joint::HINGE;
   this->jointId = dJointCreateHinge( worldId, NULL );
 
-  this->axisP = new Param<Vector3>("axis",Vector3(0,1,0), 1);
-  this->loStopP = new Param<Angle>("lowStop",-M_PI,0);
-  this->hiStopP = new Param<Angle>("highStop",M_PI,0);
+  Param::Begin(&this->parameters);
+  this->axisP = new ParamT<Vector3>("axis",Vector3(0,1,0), 1);
+  this->loStopP = new ParamT<Angle>("lowStop",-M_PI,0);
+  this->hiStopP = new ParamT<Angle>("highStop",M_PI,0);
+  Param::End();
 }
 
 

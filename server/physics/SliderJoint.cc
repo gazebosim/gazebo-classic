@@ -37,9 +37,11 @@ SliderJoint::SliderJoint( dWorldID worldId )
   this->type = Joint::SLIDER;
   this->jointId = dJointCreateSlider( worldId, NULL );
 
-  this->axisP = new Param<Vector3>("axis",Vector3(0,0,1), 0);
-  this->loStopP = new Param<double>("lowStop",-DBL_MAX,0);
-  this->hiStopP = new Param<double>("highStop",DBL_MAX,0);
+  Param::Begin(&this->parameters);
+  this->axisP = new ParamT<Vector3>("axis",Vector3(0,0,1), 0);
+  this->loStopP = new ParamT<double>("lowStop",-DBL_MAX,0);
+  this->hiStopP = new ParamT<double>("highStop",DBL_MAX,0);
+  Param::End();
 }
 
 

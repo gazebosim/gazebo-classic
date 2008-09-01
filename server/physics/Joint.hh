@@ -150,14 +150,16 @@ namespace gazebo
     private: Body *body2;
 
     /// Name of this joint
-    private: Param<std::string> *nameP;
-    private: Param<double> *erpP;
-    private: Param<double> *cfmP;
-    private: Param<double> *suspensionCfmP;
-    private: Param<std::string> *body1NameP;
-    private: Param<std::string> *body2NameP;
-    private: Param<std::string> *anchorBodyNameP;
-    private: Param<Vector3> *anchorOffsetP;
+    private: ParamT<std::string> *nameP;
+    private: ParamT<double> *erpP;
+    private: ParamT<double> *cfmP;
+    private: ParamT<double> *suspensionCfmP;
+    private: ParamT<std::string> *body1NameP;
+    private: ParamT<std::string> *body2NameP;
+    private: ParamT<std::string> *anchorBodyNameP;
+    private: ParamT<Vector3> *anchorOffsetP;
+
+    protected: std::vector<Param*> parameters;
 
     private: OgreVisual *visual;
 

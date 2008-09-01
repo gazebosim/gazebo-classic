@@ -35,7 +35,9 @@ using namespace gazebo;
 CylinderGeom::CylinderGeom(Body *body)
     : Geom(body)
 {
-  this->sizeP = new Param<Vector2<double> >("size", Vector2<double>(1.0,1.0), 1);
+  Param::Begin(&this->parameters);
+  this->sizeP = new ParamT<Vector2<double> >("size", Vector2<double>(1.0,1.0), 1);
+  Param::End();
 }
 
 //////////////////////////////////////////////////////////////////////////////

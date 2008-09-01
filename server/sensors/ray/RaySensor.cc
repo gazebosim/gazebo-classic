@@ -55,14 +55,16 @@ RaySensor::RaySensor(Body *body)
 
   this->typeName = "ray";
 
-  this->rayCountP = new Param<int>("rayCount",0,1);
-  this->rangeCountP = new Param<int>("rangeCount",0,1);
-  this->minAngleP = new Param<Angle>("minAngle",DTOR(-90),1);
-  this->maxAngleP = new Param<Angle>("maxAngle",DTOR(-90),1);
-  this->minRangeP = new Param<double>("minRange",0,1);
-  this->maxRangeP = new Param<double>("maxRange",0,1);
-  this->originP = new Param<Vector3>("origin", Vector3(0,0,0), 0);
-  this->displayRaysP = new Param<bool>("displayRays", true, 0);
+  Param::Begin(&this->parameters);
+  this->rayCountP = new ParamT<int>("rayCount",0,1);
+  this->rangeCountP = new ParamT<int>("rangeCount",0,1);
+  this->minAngleP = new ParamT<Angle>("minAngle",DTOR(-90),1);
+  this->maxAngleP = new ParamT<Angle>("maxAngle",DTOR(-90),1);
+  this->minRangeP = new ParamT<double>("minRange",0,1);
+  this->maxRangeP = new ParamT<double>("maxRange",0,1);
+  this->originP = new ParamT<Vector3>("origin", Vector3(0,0,0), 0);
+  this->displayRaysP = new ParamT<bool>("displayRays", true, 0);
+  Param::End();
 }
 
 

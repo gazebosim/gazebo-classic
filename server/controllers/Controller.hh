@@ -100,14 +100,14 @@ class Controller
   public: std::string GetName() const;
 
   /// \brief The controller's name
-  protected: Param<std::string> *nameP;
+  protected: ParamT<std::string> *nameP;
 
   /// \brief The entity that owns this controller
   protected: Entity *parent;
 
   /// \brief Update period 
   protected: double updatePeriod;
-  protected: Param<double> *updatePeriodP;
+  protected: ParamT<double> *updatePeriodP;
 
   private: std::string typeName;
 
@@ -119,6 +119,8 @@ class Controller
 
   private: std::vector< std::string > ifaceTypes; 
   private: std::vector< std::string > ifaceNames; 
+
+  protected: std::vector<Param*> parameters;
 };
 
 /// \}

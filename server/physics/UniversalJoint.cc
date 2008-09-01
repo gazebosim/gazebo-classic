@@ -39,13 +39,15 @@ UniversalJoint::UniversalJoint( dWorldID worldId )
   this->type = Joint::UNIVERSAL;
   this->jointId = dJointCreateUniversal( worldId, NULL );
 
-  this->axis1P = new Param<Vector3>("axis1",Vector3(0,0,1),0);
-  this->axis2P = new Param<Vector3>("axis2",Vector3(0,0,1),0);
+  Param::Begin(&this->parameters);
+  this->axis1P = new ParamT<Vector3>("axis1",Vector3(0,0,1),0);
+  this->axis2P = new ParamT<Vector3>("axis2",Vector3(0,0,1),0);
 
-  this->loStop1P = new Param<Angle>("lowStop1",-M_PI,0);
-  this->hiStop1P = new Param<Angle>("highStop1",M_PI,0);
-  this->loStop2P = new Param<Angle>("lowStop2",-M_PI,0);
-  this->hiStop2P = new Param<Angle>("highStop2",M_PI,0);
+  this->loStop1P = new ParamT<Angle>("lowStop1",-M_PI,0);
+  this->hiStop1P = new ParamT<Angle>("highStop1",M_PI,0);
+  this->loStop2P = new ParamT<Angle>("lowStop2",-M_PI,0);
+  this->hiStop2P = new ParamT<Angle>("highStop2",M_PI,0);
+  Param::End();
 }
 
 

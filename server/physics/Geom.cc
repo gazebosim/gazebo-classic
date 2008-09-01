@@ -61,11 +61,13 @@ Geom::Geom( Body *body)
 
   this->transparency = 0;
 
-  this->massP = new Param<double>("mass",0.001,0);
-  this->xyzP = new Param<Vector3>("xyz", Vector3(), 0);
-  this->rpyP = new Param<Quatern>("rpy", Quatern(), 0);
-  this->laserFiducialIdP = new Param<int>("laserFiducialId",-1,0);
-  this->laserRetroP = new Param<float>("laserRetro",-1,0);
+  Param::Begin(&this->parameters);
+  this->massP = new ParamT<double>("mass",0.001,0);
+  this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
+  this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
+  this->laserFiducialIdP = new ParamT<int>("laserFiducialId",-1,0);
+  this->laserRetroP = new ParamT<float>("laserRetro",-1,0);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

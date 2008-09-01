@@ -91,9 +91,9 @@ namespace gazebo
     private: int last_matrix_index;
 
     ///  name of the mesh
-    private: Param<std::string> *meshNameP;
+    private: ParamT<std::string> *meshNameP;
 
-    private: Param<Vector3> *scaleP;
+    private: ParamT<Vector3> *scaleP;
   };
 
   /// \}

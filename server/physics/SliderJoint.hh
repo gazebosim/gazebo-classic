@@ -122,9 +122,9 @@ namespace gazebo
     /// \brief Set the slider force
     public: void SetSliderForce(double force);
   
-    private: Param<Vector3> *axisP;
-    private: Param<double> *loStopP;
-    private: Param<double> *hiStopP; 
+    private: ParamT<Vector3> *axisP;
+    private: ParamT<double> *loStopP;
+    private: ParamT<double> *hiStopP; 
   };
   
 /// \}

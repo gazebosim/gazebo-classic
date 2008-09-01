@@ -70,12 +70,14 @@ OgreAdaptor::OgreAdaptor()
 
   this->dummyDisplay = false;
 
-  this->ambientP = new Param<Vector4>("ambient",Vector4(1,1,1,1),0);
-  this->shadowTextureSizeP = new Param<int>("shadowTextureSize", 512,0);
-  this->shadowTechniqueP = new Param<std::string>("shadowTechnique", "stencilAdditive", 0);
-  this->drawGridP = new Param<bool>("grid", true, 0);
-  this->updateRateP = new Param<double>("maxUpdateRate",0,0);
-  this->skyMaterialP = new Param<std::string>("material","",1);
+  Param::Begin(&this->parameters);
+  this->ambientP = new ParamT<Vector4>("ambient",Vector4(1,1,1,1),0);
+  this->shadowTextureSizeP = new ParamT<int>("shadowTextureSize", 512,0);
+  this->shadowTechniqueP = new ParamT<std::string>("shadowTechnique", "stencilAdditive", 0);
+  this->drawGridP = new ParamT<bool>("grid", true, 0);
+  this->updateRateP = new ParamT<double>("maxUpdateRate",0,0);
+  this->skyMaterialP = new ParamT<std::string>("material","",1);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +209,9 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
   }
 
-  this->shadowIndexSizeP = new Param<int>("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize(), 0);
+  Param::Begin(&this->parameters);
+  this->shadowIndexSizeP = new ParamT<int>("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize(), 0);
+  Param::End();
 
   this->ambientP->Load(node);
   this->shadowTextureSizeP->Load(node);

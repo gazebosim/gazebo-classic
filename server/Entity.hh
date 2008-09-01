@@ -112,7 +112,10 @@ namespace gazebo
   
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;
-  
+
+    /// \brief Get the parameters 
+    public: std::vector<Param*> *GetParameters();
+ 
     /// \brief Parent of this entity
     protected: Entity *parent;
   
@@ -126,7 +129,7 @@ namespace gazebo
     private: static unsigned int idCounter;
   
     // is this an static entity
-    protected: Param<bool> *staticP;
+    protected: ParamT<bool> *staticP;
   
     /// \brief Visual stuff
     protected: OgreVisual *visualNode;
@@ -135,7 +138,10 @@ namespace gazebo
     public: dSpaceID spaceId;
   
     /// \brief Name of the entity
-    protected: Param<std::string> *nameP;
+    protected: ParamT<std::string> *nameP;
+
+    /// List of all the parameters
+    protected: std::vector<Param*> parameters;
   
     private: bool selected;
   

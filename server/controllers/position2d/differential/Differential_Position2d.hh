@@ -103,13 +103,13 @@ class Differential_Position2d : public Controller
   private: Model *myParent;
 
   /// Separation between the wheels
-  private: Param<float> *wheelSepP;
+  private: ParamT<float> *wheelSepP;
 
   /// Diameter of the wheels
-  private: Param<float> *wheelDiamP;
+  private: ParamT<float> *wheelDiamP;
 
   ///Torque applied to the wheels
-  private: Param<float> *torqueP;
+  private: ParamT<float> *torqueP;
 
   /// Speeds of the wheels
   private: float wheelSpeed[2];
@@ -127,8 +127,8 @@ class Differential_Position2d : public Controller
 
   private: PhysicsEngine  *physicsEngine;
 
-  private: Param<std::string> *leftJointNameP;
-  private: Param<std::string> *rightJointNameP;
+  private: ParamT<std::string> *leftJointNameP;
+  private: ParamT<std::string> *rightJointNameP;
 };
 
 /** \} */

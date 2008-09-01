@@ -49,8 +49,10 @@ Stereo_Camera::Stereo_Camera(Entity *parent)
 {
   this->myParent = dynamic_cast<StereoCameraSensor*>(this->parent);
 
-  this->leftCameraNameP = new Param<std::string>("leftcamera","", 1);
-  this->rightCameraNameP = new Param<std::string>("rightcamera","", 1);
+  Param::Begin(&this->parameters);
+  this->leftCameraNameP = new ParamT<std::string>("leftcamera","", 1);
+  this->rightCameraNameP = new ParamT<std::string>("rightcamera","", 1);
+  Param::End();
 
   if (!this->myParent)
     gzthrow("Stereo_Camera controller requires a Stereo Camera Sensor as its parent");

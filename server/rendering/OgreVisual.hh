@@ -140,13 +140,14 @@ namespace gazebo
 
     private: Entity *entity;
 
-    private: Param<Vector3> *xyzP;
-    private: Param<Quatern> *rpyP;
-    private: Param<std::string> *meshNameP;
-    private: Param<std::string> *materialNameP;
-    private: Param<bool> *castShadowsP;
-    private: Param<Vector3> *sizeP;
-    private: Param<Vector3> *scaleP;
+    private: ParamT<Vector3> *xyzP;
+    private: ParamT<Quatern> *rpyP;
+    private: ParamT<std::string> *meshNameP;
+    private: ParamT<std::string> *materialNameP;
+    private: ParamT<bool> *castShadowsP;
+    private: ParamT<Vector3> *sizeP;
+    private: ParamT<Vector3> *scaleP;
+    private: std::vector<Param*> parameters;
   };
 }
 

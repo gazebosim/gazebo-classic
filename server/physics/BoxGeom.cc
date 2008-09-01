@@ -37,7 +37,9 @@ using namespace gazebo;
 BoxGeom::BoxGeom(Body *body)
     : Geom(body)
 {
-  this->sizeP = new Param<Vector3>("size",Vector3(1,1,1),1);
+  Param::Begin(&this->parameters);
+  this->sizeP = new ParamT<Vector3>("size",Vector3(1,1,1),1);
+  Param::End();
 }
 
 

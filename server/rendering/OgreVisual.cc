@@ -58,13 +58,15 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
 
   this->entity = owner;
 
-  this->xyzP = new Param<Vector3>("xyz", Vector3(0,0,0), 0);
-  this->rpyP = new Param<Quatern>("rpy", Quatern(1,0,0,0), 0);
-  this->meshNameP = new Param<std::string>("mesh","",1);
-  this->materialNameP = new Param<std::string>("material",std::string(),0);
-  this->castShadowsP = new Param<bool>("castShadows",true,0);
-  this->scaleP = new Param<Vector3>("scale", Vector3(1,1,1), 0);
-  this->sizeP = new Param<Vector3>("size", Vector3(1,1,1), 0);
+  Param::Begin(&this->parameters);
+  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  this->meshNameP = new ParamT<std::string>("mesh","",1);
+  this->materialNameP = new ParamT<std::string>("material",std::string(),0);
+  this->castShadowsP = new ParamT<bool>("castShadows",true,0);
+  this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
+  this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
+  Param::End();
 
   this->staticGeometry = NULL;
   this->boundingBoxNode = NULL;

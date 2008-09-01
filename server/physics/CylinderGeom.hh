@@ -83,7 +83,7 @@ namespace gazebo
     /// \brief Save child parameters
     protected: void SaveChild(std::string &prefix, std::ostream &stream);
 
-    private: Param<Vector2<double> > *sizeP;
+    private: ParamT<Vector2<double> > *sizeP;
   };
 
   /// \}

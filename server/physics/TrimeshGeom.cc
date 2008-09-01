@@ -40,8 +40,10 @@ using namespace gazebo;
 // Constructor
 TrimeshGeom::TrimeshGeom(Body *body) : Geom(body)
 {
-  this->meshNameP = new Param<std::string>("mesh","",1);
-  this->scaleP = new Param<Vector3>("scale",Vector3(1,1,1),0);
+  Param::Begin(&this->parameters);
+  this->meshNameP = new ParamT<std::string>("mesh","",1);
+  this->scaleP = new ParamT<Vector3>("scale",Vector3(1,1,1),0);
+  Param::End();
 }
 
 

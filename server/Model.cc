@@ -59,12 +59,12 @@ Model::Model(Model *parent)
   this->type = "";
   this->joint = NULL;
 
-  this->canonicalBodyNameP = new Param<std::string>("canonicalBody",
+  Param::Begin(&this->parameters);
+  this->canonicalBodyNameP = new ParamT<std::string>("canonicalBody",
                                                    std::string(),0);
-  this->xyzP = new Param<Vector3>("xyz", Vector3(0,0,0), 0);
-  this->rpyP = new Param<Quatern>("rpy", Quatern(1,0,0,0), 0);
-
-  this->parameters.push_back( this->canonicalBodyNameP );
+  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  Param::End();
 
   this->parentBodyNameP = NULL;
   this->myBodyNameP = NULL;
@@ -342,6 +342,8 @@ int Model::Update()
   if (!this->canonicalBodyNameP->GetValue().empty())
   {
     this->pose = this->bodies[this->canonicalBodyNameP->GetValue()]->GetPose();
+    this->xyzP->SetValue(this->pose.pos);
+    this->rpyP->SetValue(this->pose.rot);
   }
 
   return this->UpdateChild();
@@ -632,8 +634,10 @@ void Model::Attach(XMLConfigNode *node)
 {
   Model *parentModel = NULL;
 
-  this->parentBodyNameP = new Param<std::string>("parentBody","canonical",1);
-  this->myBodyNameP = new Param<std::string>("myBody",this->canonicalBodyNameP->GetValue(),1);
+  Param::Begin(&this->parameters);
+  this->parentBodyNameP = new ParamT<std::string>("parentBody","canonical",1);
+  this->myBodyNameP = new ParamT<std::string>("myBody",this->canonicalBodyNameP->GetValue(),1);
+  Param::End();
 
   if (node)
   {
