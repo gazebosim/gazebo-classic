@@ -27,8 +27,11 @@
 #include <stdio.h>
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Input.H>
 #include <FL/Fl_Button.H>
 
+#include "Body.hh"
+#include "Geom.hh"
 #include "Entity.hh"
 #include "Model.hh"
 #include "Simulator.hh"
@@ -48,7 +51,7 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->columnWidths[1] = 120;
   this->columnWidths[2] = 0;
 
-  this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*5, "Attributes");
+  this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*10, "Attributes");
   this->entityBrowser->align(FL_ALIGN_TOP);
   this->entityBrowser->column_char('~');
   this->entityBrowser->column_widths( columnWidths );
@@ -68,74 +71,44 @@ Toolbar::~Toolbar()
 void Toolbar::Update()
 {
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
-  std::vector<Param*> *parameters;
-  std::vector<Param*>::iterator iter;
 
+  this->attrCount = 0;
   if (entity)
   {
-    //Model *model = dynamic_cast<Model *>(entity);
+    std::string value = "@b@B52@s@cModel ";
+    this->AddToBrowser(value);
+    this->AddEntityToAttributeBrowser(entity, "");
 
-    parameters = entity->GetParameters();
-
-    int i=0;
-    for (iter = parameters->begin(); iter != parameters->end(); iter++, i++)
+    Model *model = dynamic_cast<Model *>(entity);
+    if (model)
     {
+      const std::map<std::string, Body *> *bodies = model->GetBodies();
+      const std::vector< Geom *> *geoms;;
+      std::map<std::string, Body *>::const_iterator iter;
+      std::vector<Geom*>::const_iterator giter;
       std::string value;
-      //boost::any anyValue = (*iter)->Get();
-      //std::string typeName = (*iter)->GetTypename();
-      std::string colorStr = "";
 
-      /*if ( i%2 == 0)
-        colorStr = "@B50";
-        */
-
-      value = colorStr + "@b@s" + (*iter)->GetKey() + ":~" + colorStr + "@s";
-      value += (*iter)->GetAsString();
-
-
-      // Convert the variable value to a string
-      /*if (typeName == typeid(float).name())
-        value += boost::lexical_cast<std::string>(
-            boost::any_cast<float>( anyValue ));
-      else if (typeName == typeid(double).name())
-        value += boost::lexical_cast<std::string>(
-            boost::any_cast<double>( anyValue )); 
-      else if (typeName == typeid(int).name())
-        value += boost::lexical_cast<std::string>(
-            boost::any_cast<int>( anyValue ));
-      else if (typeName == typeid(bool).name())
-        value += boost::lexical_cast<std::string>( 
-            boost::any_cast<bool>(anyValue) );
-      else if (typeName == typeid(long).name())
-        value += boost::lexical_cast<std::string>( 
-            boost::any_cast<long>(anyValue) );
-      else if (typeName == typeid(Quatern).name())
-        value += boost::lexical_cast<std::string>(
-            boost::any_cast<Quatern>( anyValue ));
-      else if (typeName == typeid(Vector3).name())
-        value += boost::lexical_cast<std::string>(
-            boost::any_cast<Vector3>( anyValue ));
-      else if (typeName == typeid(std::string).name())
-        value += boost::any_cast<std::string>( anyValue );
-      else
-        gzerr(0) << "Unknown typename[" << typeName << "]\n";
-        */
-
-      if (!this->entityBrowser->text(i+1))
+      for (iter = bodies->begin(); iter != bodies->end(); iter++)
       {
-        this->entityBrowser->add( value.c_str() );
-      }
-      else if (strcmp(this->entityBrowser->text(i+1), value.c_str()) != 0)
-      {
-        this->entityBrowser->text( i+1, value.c_str() );
+        value = "@b@B52@s-Body:";
+        this->AddToBrowser(value);
+        this->AddEntityToAttributeBrowser( iter->second, "  " );
+
+        geoms = iter->second->GetGeoms();
+
+        for (giter = geoms->begin(); giter != geoms->end(); giter++)
+        {
+          value = "@b@B52@s  -Geom:";
+          this->AddToBrowser(value);
+          this->AddEntityToAttributeBrowser( (*giter), "    " );
+        }
       }
     }
 
     // Clear the remaining lines
-    while ( this->entityBrowser->text(i+1) != NULL )
+    while ( this->entityBrowser->text(this->attrCount+1) != NULL )
     {
-      this->entityBrowser->text( i+1, "" );
-      i++;
+      this->AddToBrowser("");
     }
 
   }
@@ -147,4 +120,46 @@ void Toolbar::Update()
 void Toolbar::AttributeBrowserCB( Fl_Widget * w, void *data)
 {
   printf("Callback\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add entity to browser
+void Toolbar::AddEntityToAttributeBrowser(Entity *entity, std::string prefix)
+{
+  std::vector<Param*> *parameters;
+  std::vector<Param*>::iterator iter;
+  std::string value;
+  std::string colorStr = "";
+
+  parameters = entity->GetParameters();
+
+  // Process all the parameters in the entity
+  for (iter = parameters->begin(); iter != parameters->end(); iter++)
+  {
+
+    /*if ( i%2 == 0)
+      colorStr = "@B50";
+      */
+
+    value = colorStr + "@b@s" + prefix + (*iter)->GetKey() + ":~" + 
+      colorStr + "@s" + (*iter)->GetAsString();
+
+    this->AddToBrowser( value );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a line to the attribute browser
+void Toolbar::AddToBrowser(const std::string &line)
+{
+  if (!this->entityBrowser->text(this->attrCount+1))
+  {
+    this->entityBrowser->add( line.c_str() );
+  }
+  else if (strcmp(this->entityBrowser->text(this->attrCount+1), line.c_str()) != 0)
+  {
+    this->entityBrowser->text( this->attrCount+1, line.c_str() );
+  }
+
+  this->attrCount++;
 }

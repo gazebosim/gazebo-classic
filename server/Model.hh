@@ -126,6 +126,9 @@ namespace gazebo
     /// \brief Get a body by name
     /// \return Pointer to the body
     public: Body *GetBody(const std::string &name);
+
+    /// \brief Get a map of all the bodies
+    public: const std::map<std::string, Body*> *GetBodies() const;
   
     /// \brief Attach this model to its parent
     public: void Attach(XMLConfigNode *node);
@@ -184,6 +187,7 @@ namespace gazebo
     private: ParamT<Quatern> *rpyP;
     private: ParamT<std::string> *parentBodyNameP;
     private: ParamT<std::string> *myBodyNameP;
+
 
     // Name of a light (if the model is renderable:light)
     private: std::string lightName;

@@ -614,6 +614,13 @@ Body *Model::GetBody()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get a map of all the bodies
+const std::map<std::string, Body*> *Model::GetBodies() const
+{
+  return &(this->bodies);
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 /// Get a body by name
 Body *Model::GetBody(const std::string &name)
 {

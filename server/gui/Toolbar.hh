@@ -32,10 +32,12 @@
 
 class Fl_Value_Output;
 class Fl_Output;
+class Fl_Input;
 class Fl_Button;
 
 namespace gazebo
 {
+  class Entity;
 
   /// \brief Toolbar
   class Toolbar : public Fl_Group
@@ -51,9 +53,13 @@ namespace gazebo
 
     public: static void AttributeBrowserCB( Fl_Widget * w, void *data);
 
+    private: void AddEntityToAttributeBrowser(Entity *ent, std::string prefix);
+    private: void AddToBrowser(const std::string &line);
+
     private: Fl_Hold_Browser *entityBrowser;
 
     private: int columnWidths[3];
+    private: int attrCount;
   };
   
 }

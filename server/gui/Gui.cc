@@ -59,7 +59,7 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   // The order of creation matters! Menubar first, followed by FrameManager,
   // then statusbar
   {
-    int toolbarWidth = 200;
+    int toolbarWidth = 250;
 
     // Create a main menu
     new MainMenu(0,0,w(),30,(char *)"MainMenu");

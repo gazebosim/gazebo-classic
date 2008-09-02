@@ -679,3 +679,10 @@ Vector3 Body::GetTorque() const
 
   return torque;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the vector of all geoms
+const std::vector<Geom*> *Body::GetGeoms() const
+{
+  return &(this->geoms);
+}

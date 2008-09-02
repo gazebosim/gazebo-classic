@@ -139,6 +139,9 @@ namespace gazebo
   
     /// \brief Get the torque applied to the body
     public: Vector3 GetTorque() const;
+
+    /// \brief Get the vector of all geoms
+    public: const std::vector<Geom*> *GetGeoms() const;
   
     /// Load a new geom helper function
     /// \param node XMLConfigNode used to load the geom
