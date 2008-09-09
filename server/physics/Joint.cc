@@ -87,6 +87,9 @@ void Joint::Load(XMLConfigNode *node)
   this->body2NameP->Load(node);
   this->anchorBodyNameP->Load(node);
   this->anchorOffsetP->Load(node);
+  this->erpP->Load(node);
+  this->cfmP->Load(node);
+  this->suspensionCfmP->Load(node);
 
   Body *body1 = this->model->GetBody( **(this->body1NameP));
   Body *body2 = this->model->GetBody(**(this->body2NameP));
@@ -100,25 +103,12 @@ void Joint::Load(XMLConfigNode *node)
 
   Vector3 anchorVec = anchorBody->GetPosition() + **(this->anchorOffsetP);
 
-  this->Attach(body1,body2);
-
-  // Set the anchor vector
-  if (anchorBody)
-  {
-    this->SetAnchor(anchorVec);
-    //joint->SetAnchor(anchorBody->GetPosition());
-  }
-  /*else
-  {
-    joint->SetAnchor(anchorVec);
-    this->bodies.erase(node->GetString("anchor",std::string(),0));
-  }*/
-
-
   // Set joint parameters
   this->SetParam(dParamSuspensionERP, **(this->erpP));
   this->SetParam(dParamSuspensionCFM, **(this->suspensionCfmP));
   this->SetParam(dParamCFM, **(this->cfmP));
+
+  this->Attach(body1,body2);
 
   /// Add a renderable for the joint
   this->visual = new OgreVisual(this->model->GetVisualNode());
@@ -140,6 +130,12 @@ void Joint::Load(XMLConfigNode *node)
   this->line2->AddPoint(Vector3(0,0,0));
 
   this->LoadChild(node);
+
+  // Set the anchor vector
+  if (anchorBody)
+  {
+    this->SetAnchor(anchorVec);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

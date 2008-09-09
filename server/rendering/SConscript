@@ -1,5 +1,5 @@
 #Import variable
-Import('env staticObjs sharedObjs headers')
+Import('env sharedObjs headers')
 
 sources = ['OgreCreator.cc',
            'OgreAdaptor.cc',
@@ -30,5 +30,5 @@ headers.append(
            '#/server/rendering/UserCamera.hh'
            ] )
 
-staticObjs.append( env.StaticObject(sources) )
+#staticObjs.append( env.StaticObject(sources) )
 sharedObjs.append( env.SharedObject(sources) )

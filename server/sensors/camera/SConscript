@@ -1,10 +1,10 @@
 #Import variable
-Import('env staticObjs sharedObjs')
+Import('env sharedObjs')
 
 sources = [
            'MonoCameraSensor.cc',
            'StereoCameraSensor.cc'
           ]
 
-staticObjs.append(env.StaticObject(sources))
+#staticObjs.append(env.StaticObject(sources))
 sharedObjs.append(env.SharedObject(sources))

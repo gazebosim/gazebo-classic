@@ -164,14 +164,14 @@ if not env.GetOption('clean'):
   #  conf.env.Append(LIBS="boost_python")
 
 
-staticObjs = []
+#staticObjs = []
 sharedObjs = []
 headers = []
 
 #
 # Export the environment
 #
-Export('env install_prefix version staticObjs sharedObjs headers subdirs')
+Export('env install_prefix version sharedObjs headers subdirs')
 
 #
 # Process subdirectories
@@ -183,13 +183,13 @@ for subdir in subdirs:
 #
 # Create the gazebo executable
 #
-gazebo = env.Program('gazebo',staticObjs)
+gazebo = env.Program('gazebo',sharedObjs)
 
 Depends(gazebo, 'libgazebo/libgazebo.so')
 #
 # Create static and shared libraries for the server
 #
-libgazeboServerStatic = env.StaticLibrary('gazeboServer', staticObjs)
+#libgazeboServerStatic = env.StaticLibrary('gazeboServer', staticObjs)
 libgazeboServerShared = env.SharedLibrary('gazeboServer', sharedObjs)
 
 #
@@ -199,6 +199,6 @@ env.Alias('install', install_prefix)
 env.Install(install_prefix+'/bin',gazebo)
 env.Install(install_prefix+'/share/gazebo','Media')
 env.Install(install_prefix+'/include/gazebo',headers)
-env.Install(install_prefix+'/lib',libgazeboServerStatic )
+#env.Install(install_prefix+'/lib',libgazeboServerStatic )
 env.Install(install_prefix+'/lib',libgazeboServerShared )
 env.Install(install_prefix+'/share/gazebo','worlds')

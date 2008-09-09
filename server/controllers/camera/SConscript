@@ -1,5 +1,5 @@
 #Import variable
-Import('env staticObjs sharedObjs')
+Import('env sharedObjs')
 
 dirs = [
          'generic',

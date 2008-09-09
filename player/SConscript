@@ -1,5 +1,5 @@
 import os
-Import('env install_prefix staticObjs sharedObjs subdirs')
+Import('env install_prefix sharedObjs subdirs')
 
 parseConfigs = ['pkg-config --cflags --libs playerc++']
 
@@ -40,14 +40,14 @@ for cfg in parseConfigs:
 
 if ('player' in subdirs):
   
-  staticPlayerObjs = playerEnv.StaticObject(sources)
+#staticPlayerObjs = playerEnv.StaticObject(sources)
   sharedPlayerObjs = playerEnv.SharedObject(sources)
   
-  staticPlayerObjs.append(staticObjs);
+#staticPlayerObjs.append(staticObjs);
   sharedPlayerObjs.append(sharedObjs);
   
   sharedLib = playerEnv.SharedLibrary('gazeboplugin', sharedPlayerObjs)
-  staticLib = playerEnv.StaticLibrary('gazeboplugin', staticPlayerObjs)
+# staticLib = playerEnv.StaticLibrary('gazeboplugin', staticPlayerObjs)
   
   env.Install(install_prefix+'/lib', sharedLib)
-  env.Install(install_prefix+'/lib', staticLib)
+#env.Install(install_prefix+'/lib', staticLib)
