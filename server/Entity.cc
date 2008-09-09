@@ -45,6 +45,7 @@ Entity::Entity(Entity *parent)
   Param::Begin(&this->parameters);
   this->nameP = new ParamT<std::string>("name","",1);
   this->staticP = new ParamT<bool>("static",false,0);
+  //this->staticP->Callback( &Entity::SetStatic, this);
   Param::End();
  
   this->selected = false;
@@ -142,7 +143,7 @@ std::string Entity::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this entity is static: immovable
-void Entity::SetStatic(bool s)
+void Entity::SetStatic(const bool &s)
 {
   std::vector< Entity *>::iterator iter;
   Body *body = NULL;
@@ -200,9 +201,29 @@ bool Entity::operator==(const Entity &ent) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the parameters 
-std::vector<Param*> *Entity::GetParameters()
+std::vector<Param*> *Entity::GetParams()
 {
   return &this->parameters;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get a parameter by name
+Param *Entity::GetParam(const std::string &key) const
+{
+  std::vector<Param*>::const_iterator iter;
+  Param *result = NULL;
 
+  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
+  {
+    if ((*iter)->GetKey() == key)
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  if (result == NULL)
+    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+
+  return result;
+}

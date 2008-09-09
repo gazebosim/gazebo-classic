@@ -63,8 +63,14 @@ Geom::Geom( Body *body)
 
   Param::Begin(&this->parameters);
   this->massP = new ParamT<double>("mass",0.001,0);
+  this->massP->Callback( &Geom::SetMass, this);
+
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
+  this->xyzP->Callback( &Geom::SetPosition, this);
+
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
+  this->rpyP->Callback( &Geom::SetRotation, this);
+
   this->laserFiducialIdP = new ParamT<int>("laserFiducialId",-1,0);
   this->laserRetroP = new ParamT<float>("laserRetro",-1,0);
   Param::End();
@@ -502,3 +508,13 @@ void Geom::ShowPhysics(bool show)
     */
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the mass
+void Geom::SetMass(const double &mass)
+{
+  dMassAdjust(&this->mass, mass);
+  this->body->UpdateCoM();
+}
+
+

@@ -70,10 +70,10 @@ namespace gazebo
     /// It adds itself to the Visual node parent, it will those change parent
     /// properties if needed, to avoid this create a child visual node for the 
     /// plane
-    public: static void CreatePlane(const Vector3 &normal, 
+    public: static std::string CreatePlane(const Vector3 &normal, 
                 const Vector2<double> &size, const Vector2<double> &segments, 
                 const Vector2<double> &uvTile, const std::string &material, 
-                bool castShadows, OgreVisual *parent);
+                bool castShadows, OgreVisual *parent, const std::string &name);
     
     /// \brief Create a light source 
     /// \return The name of the light source
@@ -112,6 +112,9 @@ namespace gazebo
    
     /// \brief Draw the uniform grid pattern
     public: static void DrawGrid();
+
+    /// \brief Remove a mesh by name
+    public: static void RemoveMesh(const std::string &name);
 
     private: static unsigned int lightCounter;
     private: static unsigned int windowCounter;

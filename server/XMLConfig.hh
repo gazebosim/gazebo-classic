@@ -131,7 +131,8 @@ namespace gazebo
     public: std::string GetValue() const;
   
     /// \brief Get an attribute string value
-    public: std::string GetString( const std::string &key, const std::string &def, 
+    public: std::string GetString( const std::string &key, 
+                                   const std::string &def, 
                                    int require = 0 ) const;
   
     /// \brief Get a attribute character value

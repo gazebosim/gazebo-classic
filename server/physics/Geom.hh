@@ -137,8 +137,11 @@ namespace gazebo
     /// \brief Set the visibility of the joints
     public: void ShowJoints(bool show);
 
-   /// \brief Set the visibility of the physical entity of this geom
+    /// \brief Set the visibility of the physical entity of this geom
     public: void ShowPhysics(bool);
+
+    /// \brief Set the mass
+    public: void SetMass(const double &mass);
 
     ///  Contact parameters
     public: ContactParams *contact; 

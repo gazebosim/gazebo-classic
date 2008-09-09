@@ -78,7 +78,6 @@ namespace gazebo
     public: void DecActiveCamera();
 
     /// \brief Connect a boost::slot the the AddCamera signal
-    
     public: template<typename T>
             void ConnectAddCameraSignal( T subscriber )
             {

@@ -37,6 +37,8 @@ CylinderGeom::CylinderGeom(Body *body)
 {
   Param::Begin(&this->parameters);
   this->sizeP = new ParamT<Vector2<double> >("size", Vector2<double>(1.0,1.0), 1);
+  this->sizeP->Callback( &CylinderGeom::SetSize, this);
+
   Param::End();
 }
 
@@ -52,6 +54,14 @@ CylinderGeom::~CylinderGeom()
 void CylinderGeom::LoadChild(XMLConfigNode *node)
 {
   this->sizeP->Load(node);
+  this->SetSize( this->sizeP->GetValue() );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the size of the cylinder
+void CylinderGeom::SetSize( const Vector2<double> &size )
+{
+  this->sizeP->SetValue( size );
 
   // Initialize mass matrix
   dMassSetCylinderTotal(&this->mass, this->massP->GetValue(), 3, 
@@ -59,7 +69,6 @@ void CylinderGeom::LoadChild(XMLConfigNode *node)
 
   this->SetGeom( dCreateCylinder( 0, this->sizeP->GetValue().x, 
         this->sizeP->GetValue().y ), true );
-
 }
 
 //////////////////////////////////////////////////////////////////////////////

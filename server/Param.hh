@@ -31,6 +31,8 @@
 #include <vector>
 #include <boost/lexical_cast.hpp>
 #include <boost/any.hpp>
+#include <boost/bind.hpp>
+#include <boost/signal.hpp>
 #include <typeinfo>
 #include <string>
 
@@ -61,6 +63,9 @@ namespace gazebo
     /// \brief Get the type
     public: virtual std::string GetAsString() const {return std::string();}
 
+    /// \brief Set the parameter value from a string
+    public: virtual void SetFromString(std::string &, bool callback=false) {}
+
     /// List of created parameters
     private: static std::vector<Param*> *params;
 
@@ -81,7 +86,11 @@ namespace gazebo
     /// \brief Load the param from an XML config file
     public: void Load(XMLConfigNode *node);
 
+    /// \brief Get the parameter value as a string
     public: virtual std::string GetAsString() const;
+
+    /// \brief Set the parameter value from a string
+    public: virtual void SetFromString( std::string &str, bool callback=false );
 
     /// \brief Get the value
     public: T GetValue() const;
@@ -97,12 +106,20 @@ namespace gazebo
 
               return out;
             }
-  
+
+    public: template< typename C>
+            void Callback( void (C::*func)(const T &), C *c)
+            {
+              changeSignal.connect( boost::bind( func, c, _1) ); 
+            }
+
+ 
     private: T value;
   
     private: T defaultValue;
     private: int required;
   
+    private: boost::signal<void (T)> changeSignal;
   };
  
 
@@ -138,28 +155,39 @@ namespace gazebo
     std::string input = node->GetString(this->key, stream.str(), 
                                         this->required);
 
+    this->SetFromString( input );
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Get value as string
+  template<typename T>
+  std::string ParamT<T>::GetAsString() const
+  {
+    return boost::lexical_cast<std::string>(this->value);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Set value from string
+  template<typename T>
+  void ParamT<T>::SetFromString(std::string &str, bool callback)
+  {
     // "true" and "false" doesn't work properly
-    if (input == "true")
-      input = "1";
-    else if (input == "false")
-      input = "0";
+    if (str == "true")
+      str = "1";
+    else if (str == "false")
+      str = "0";
 
     try
     {
-      this->value = boost::lexical_cast<T>(input);
+      this->value = boost::lexical_cast<T>(str);
     }
     catch (boost::bad_lexical_cast &e)
     {
       std::cerr << "Unable to read value with key[" << this->key << "]\n";
     }
-  }
 
-  //////////////////////////////////////////////////////////////////////////////
-  // Get value as boost
-  template<typename T>
-  std::string ParamT<T>::GetAsString() const
-  {
-    return boost::lexical_cast<std::string>(this->value);
+    if (callback)
+      this->changeSignal(this->value);
   }
 
   //////////////////////////////////////////////////////////////////////////////

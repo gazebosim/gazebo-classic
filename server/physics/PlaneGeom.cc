@@ -42,14 +42,26 @@ PlaneGeom::PlaneGeom(Body *body)
 {
   Param::Begin(&this->parameters);
   this->normalP = new ParamT<Vector3>("normal",Vector3(0,0,1),0);
+  this->normalP->Callback( &PlaneGeom::SetNormal, this );
+
   this->sizeP = new ParamT<Vector2<double> >("size",
       Vector2<double>(1000, 1000), 0);
+  this->sizeP->Callback( &PlaneGeom::SetSize, this );
+  
   this->segmentsP = new ParamT<Vector2<double> >("segments",
       Vector2<double>(10, 10), 0);
+  this->segmentsP->Callback( &PlaneGeom::SetSegments, this );
+
   this->uvTileP = new ParamT<Vector2<double> >("uvTile",
       Vector2<double>(1, 1), 0);
+  this->uvTileP->Callback( &PlaneGeom::SetUVTile, this );
+
   this->materialP = new ParamT<std::string>("material","",1);
+  this->materialP->Callback( &PlaneGeom::SetMaterial, this );
+
   this->castShadowsP = new ParamT<bool>("castShadows", false, 0);
+  this->castShadowsP->Callback( &PlaneGeom::SetCastShadows, this );
+
   Param::End();
 }
 
@@ -83,18 +95,25 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
 {
   Vector3 perp;
 
-  double altitude = 0;
-
   this->normalP->Load(node);
   this->sizeP->Load(node);
   this->segmentsP->Load(node);
   this->uvTileP->Load(node);
   this->materialP->Load(node);
   this->castShadowsP->Load(node);
+  this->CreatePlane();
+}
 
-  OgreCreator::CreatePlane(**(this->normalP), **(this->sizeP), 
-      **(this->segmentsP), **(this->uvTileP), **(this->materialP),
-      **(this->castShadowsP), this->GetVisualNode());
+////////////////////////////////////////////////////////////////////////////////
+// Create the plane
+void PlaneGeom::CreatePlane()
+{
+  double altitude = 0;
+
+  this->meshName = OgreCreator::CreatePlane(**(this->normalP), 
+      **(this->sizeP), **(this->segmentsP), **(this->uvTileP), 
+      **(this->materialP), **(this->castShadowsP), this->GetVisualNode(), 
+      this->meshName);
 
   this->SetGeom(dCreatePlane(this->spaceId, this->normalP->GetValue().x, 
         this->normalP->GetValue().y, this->normalP->GetValue().z, altitude),false);
@@ -103,6 +122,61 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
   this->contact->kd = 0;
   this->contact->mu1 = dInfinity;
   this->contact->mu2 = dInfinity;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the normal
+void PlaneGeom::SetNormal( const Vector3 &norm )
+{
+  OgreCreator::RemoveMesh(this->meshName);
+  this->normalP->SetValue( norm );
+  this->CreatePlane();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the size
+void PlaneGeom::SetSize( const Vector2<double> &size )
+{
+  OgreCreator::RemoveMesh(this->meshName);
+  this->sizeP->SetValue( size );
+  this->CreatePlane();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the number of segments
+void PlaneGeom::SetSegments(const Vector2<double> &seg)
+{
+  OgreCreator::RemoveMesh(this->meshName);
+  this->segmentsP->SetValue( seg );
+  this->CreatePlane();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the uvtile
+void PlaneGeom::SetUVTile(const Vector2<double> &uv)
+{
+  OgreCreator::RemoveMesh(this->meshName);
+  this->uvTileP->SetValue( uv );
+  this->CreatePlane();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the material
+void PlaneGeom::SetMaterial(const std::string &mat)
+{
+  OgreCreator::RemoveMesh(this->meshName);
+  this->materialP->SetValue( mat );
+  this->CreatePlane();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set cast shadows
+void PlaneGeom::SetCastShadows(const bool &cast)
+{
+  OgreCreator::RemoveMesh(this->meshName);
+  this->castShadowsP->SetValue( cast );
+  this->CreatePlane();
 }
 
 //////////////////////////////////////////////////////////////////////////////

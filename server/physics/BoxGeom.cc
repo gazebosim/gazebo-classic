@@ -39,6 +39,7 @@ BoxGeom::BoxGeom(Body *body)
 {
   Param::Begin(&this->parameters);
   this->sizeP = new ParamT<Vector3>("size",Vector3(1,1,1),1);
+  this->sizeP->Callback( &BoxGeom::SetSize, this );
   Param::End();
 }
 
@@ -55,24 +56,13 @@ BoxGeom::~BoxGeom()
 void BoxGeom::LoadChild(XMLConfigNode *node)
 {
   this->sizeP->Load(node);
-
-  // Initialize box mass matrix
-  dMassSetBoxTotal(&this->mass, this->massP->GetValue(),
-      this->sizeP->GetValue().x,
-      this->sizeP->GetValue().y,
-      this->sizeP->GetValue().z);
-
-  // Create a box geometry with box mass matrix
-  this->SetGeom(dCreateBox( 0, this->sizeP->GetValue().x, 
-                            this->sizeP->GetValue().y,
-                            this->sizeP->GetValue().z), true );
+  this->SetSize( this->sizeP->GetValue() );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the size of the box
-void BoxGeom::SetSize( Vector3 size )
+void BoxGeom::SetSize( const Vector3 &size )
 {
-
   this->sizeP->SetValue( size );
 
   // Initialize box mass matrix

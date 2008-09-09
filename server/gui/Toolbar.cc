@@ -57,6 +57,13 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->entityBrowser->column_widths( columnWidths );
   this->entityBrowser->callback(&Toolbar::AttributeBrowserCB, this);
 
+  y = this->entityBrowser->y() + this->entityBrowser->h() + 20;
+  this->attributeInput = new Fl_Input(x+10, y, w-20, 20, "Input:");
+  this->attributeInput->align(FL_ALIGN_TOP);
+  this->attributeInput->labelsize(12);
+  this->attributeInput->when( FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
+  this->attributeInput->callback(&Toolbar::AttributeInputCB, this);
+
   this->end();
 
   this->resizable(NULL);
@@ -64,6 +71,7 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
 
 Toolbar::~Toolbar()
 {
+  delete this->attributeInput;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,14 +91,14 @@ void Toolbar::Update()
     if (model)
     {
       const std::map<std::string, Body *> *bodies = model->GetBodies();
-      const std::vector< Geom *> *geoms;;
-      std::map<std::string, Body *>::const_iterator iter;
-      std::vector<Geom*>::const_iterator giter;
+      const std::map<std::string, Geom *> *geoms;
+      std::map<std::string, Body*>::const_iterator iter;
+      std::map<std::string, Geom*>::const_iterator giter;
       std::string value;
 
       for (iter = bodies->begin(); iter != bodies->end(); iter++)
       {
-        value = "@b@B52@s-Body:";
+        value = "@b@B52@s-Body:~@b@B52@s" + iter->second->GetName();
         this->AddToBrowser(value);
         this->AddEntityToAttributeBrowser( iter->second, "  " );
 
@@ -98,9 +106,9 @@ void Toolbar::Update()
 
         for (giter = geoms->begin(); giter != geoms->end(); giter++)
         {
-          value = "@b@B52@s  -Geom:";
+          value = "@b@B52@s  -Geom:~@b@B52@s" + giter->second->GetName();
           this->AddToBrowser(value);
-          this->AddEntityToAttributeBrowser( (*giter), "    " );
+          this->AddEntityToAttributeBrowser( giter->second, "    " );
         }
       }
     }
@@ -119,7 +127,103 @@ void Toolbar::Update()
 // Attribute browser callback
 void Toolbar::AttributeBrowserCB( Fl_Widget * w, void *data)
 {
-  printf("Callback\n");
+  Fl_Hold_Browser *browser = (Fl_Hold_Browser*)(w);
+  Toolbar *toolbar = (Toolbar*)(data);
+  int selected = browser->value();
+  std::string lineText = browser->text(selected);
+  std::string lbl;
+  int beginLbl = 0;
+  int endLbl = 0;
+  int beginValue = 0;
+
+  if (lineText.find("-Body") != std::string::npos || 
+      lineText.find("-Geom") != std::string::npos)
+  {
+    toolbar->attributeInput->deactivate();
+    return;
+  }
+  else
+    toolbar->attributeInput->activate();
+
+  endLbl = lineText.find("~");
+  while (lineText[beginLbl] == '@') beginLbl+=2; 
+  while (lineText[beginLbl] == ' ') beginLbl++;
+
+  beginValue = endLbl+1;
+  while (lineText[beginValue] == '@') beginValue+=2; 
+
+  toolbar->attributeInputLbl = lineText.substr(beginLbl, endLbl-beginLbl);
+
+  toolbar->attributeInput->label(toolbar->attributeInputLbl.c_str());
+
+  toolbar->attributeInput->value( lineText.substr(beginValue, lineText.size() - beginValue).c_str() );
+
+  toolbar->attributeInput->redraw();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Attribute modification callback
+void Toolbar::AttributeInputCB( Fl_Widget *w, void *data)
+{
+  Fl_Input *input = (Fl_Input*)(w);
+  Toolbar *toolbar = (Toolbar*)(data);
+  Fl_Hold_Browser *browser = toolbar->entityBrowser;
+  int selected = browser->value();
+  Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
+  Body *body = NULL;
+  Geom *geom = NULL;
+  std::string geomName, bodyName, value, label;
+
+  // Make sure we have a valid model
+  if (!model)
+  {
+    gzerr(0) << "Somehow you selected something that is not a model.\n";
+    return;
+  }
+
+  value = input->value();
+  label = input->label();
+
+  // Get rid of the ':' at the end
+  label = label.substr(0, label.size()-1);
+
+  // Get the name of the body and geom.
+  while (selected > 0)
+  {
+    std::string lineText = browser->text(selected);
+    int lastAmp = lineText.rfind("@")+2;
+
+    if (lineText.find("-Geom:") != std::string::npos && geomName.empty())
+      geomName = lineText.substr( lastAmp, lineText.size()-lastAmp );
+    else if (lineText.find("-Body:") != std::string::npos && bodyName.empty())
+      bodyName = lineText.substr( lastAmp, lineText.size()-lastAmp );
+      
+    selected--;
+  }
+
+  // Get the body
+  if (!bodyName.empty())
+    body = model->GetBody(bodyName);
+
+  // Get the geom
+  if (!geomName.empty() && body)
+    geom = body->GetGeom(geomName);
+
+  // Get the parameter
+  Param *param = NULL;
+  if (geom)
+    param = geom->GetParam(label);
+  else if (body)
+    param = body->GetParam(label);
+  else
+    param = model->GetParam(label);
+
+  if (param)
+  {
+    param->SetFromString( value, true );
+  }
+
+  std::cout << "Label[" << label << "] Value[" << value << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +235,7 @@ void Toolbar::AddEntityToAttributeBrowser(Entity *entity, std::string prefix)
   std::string value;
   std::string colorStr = "";
 
-  parameters = entity->GetParameters();
+  parameters = entity->GetParams();
 
   // Process all the parameters in the entity
   for (iter = parameters->begin(); iter != parameters->end(); iter++)

@@ -101,7 +101,13 @@ namespace gazebo
   
     /// \brief Set the current pose
     public: void SetPose(const Pose3d &pose);
-  
+
+    /// \brief Set the position of the model
+    public: void SetPosition( const Vector3 &pos );
+
+    /// \brief Set the rotation of the model
+    public: void SetRotation( const Quatern &rot );
+ 
     /// \brief Get the current pose
     public: const Pose3d &GetPose() const;
   

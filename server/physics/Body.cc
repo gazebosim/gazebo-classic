@@ -66,7 +66,10 @@ Body::Body(Entity *parent, dWorldID worldId)
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
+  this->xyzP->Callback( &Body::SetPosition, this );
+
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
+  this->rpyP->Callback( &Body::SetRotation, this );
   Param::End();
 }
 
@@ -75,12 +78,12 @@ Body::Body(Entity *parent, dWorldID worldId)
 // Destructor
 Body::~Body()
 {
-  std::vector< Geom* >::iterator giter;
+  std::map< std::string, Geom* >::iterator giter;
   std::vector< Sensor* >::iterator siter;
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    GZ_DELETE (*giter);
+    GZ_DELETE (giter->second);
   }
   this->geoms.clear();
 
@@ -143,7 +146,7 @@ void Body::Load(XMLConfigNode *node)
 // Save the body based on our XMLConfig node
 void Body::Save(std::string &prefix, std::ostream &stream)
 {
-  std::vector< Geom* >::iterator giter;
+  std::map<std::string, Geom* >::iterator giter;
   std::vector< Sensor* >::iterator siter;
   Model *model = dynamic_cast<Model*>(this->parent);
   //Vector3 pose = model->GetPose() - this->GetPose();
@@ -160,7 +163,7 @@ void Body::Save(std::string &prefix, std::ostream &stream)
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
     stream << "\n";
-    (*giter)->Save(p, stream);
+    giter->second->Save(p, stream);
   }
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
@@ -213,7 +216,7 @@ void Body::Init()
 void Body::Update()
 {
   std::vector< Sensor* >::iterator sensorIter;
-  std::vector< Geom* >::iterator geomIter;
+  std::map< std::string, Geom* >::iterator geomIter;
 
   this->UpdatePose();
 
@@ -226,7 +229,7 @@ void Body::Update()
   for (geomIter=this->geoms.begin();
        geomIter!=this->geoms.end(); geomIter++)
   {
-    (*geomIter)->Update();
+    geomIter->second->Update();
   }
 
   for (sensorIter=this->sensors.begin();
@@ -251,7 +254,13 @@ void Body::AttachGeom( Geom *geom )
     }
   }
 
-  this->geoms.push_back(geom);
+  std::map<std::string, Geom*>::iterator iter = this->geoms.find(geom->GetName());
+
+  if (iter == this->geoms.end())
+    this->geoms[geom->GetName()] = geom;
+  else
+    gzerr(0) << "Attempting to add two geoms with the same name[" << geom->GetName() << "] to body[" << this->GetName() << "].\n";
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -267,7 +276,7 @@ void Body::SetPose(const Pose3d &pose)
     Pose3d newPose;
     this->staticPose = pose;
 
-    std::vector<Geom*>::iterator iter;
+    std::map<std::string, Geom*>::iterator iter;
 
     //this->SetPosition(this->staticPose.pos);
     //this->SetRotation(this->staticPose.rot);
@@ -275,9 +284,9 @@ void Body::SetPose(const Pose3d &pose)
     for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
     {
       //newPose = (*iter)->GetPose() - this->staticPose;
-      newPose = (*iter)->GetPose() - oldPose;
+      newPose = iter->second->GetPose() - oldPose;
       newPose += this->staticPose;
-      (*iter)->SetPose(newPose);
+      iter->second->SetPose(newPose);
     }
   }
   else
@@ -498,7 +507,7 @@ void Body::UpdateCoM()
 {
   const dMass *lmass;
   Pose3d oldPose, newPose, pose;
-  std::vector< Geom* >::iterator giter;
+  std::map< std::string, Geom* >::iterator giter;
 
   if (!this->bodyId)
     return;
@@ -508,8 +517,8 @@ void Body::UpdateCoM()
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    lmass = (*giter)->GetBodyMassMatrix();
-    if ((*giter)->IsPlaceable() && (*giter)->GetGeomId())
+    lmass = giter->second->GetBodyMassMatrix();
+    if (giter->second->IsPlaceable() && giter->second->GetGeomId())
     {
       dMassAdd( &this->mass, lmass );
     }
@@ -535,12 +544,12 @@ void Body::UpdateCoM()
   // Fixup the poses of the geoms (they are attached to the CoM)
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    if ((*giter)->IsPlaceable())
+    if (giter->second->IsPlaceable())
     {
       this->comPose = oldPose;
-      pose = (*giter)->GetPose();
+      pose = giter->second->GetPose();
       this->comPose = newPose;
-      (*giter)->SetPose(pose, false);
+      giter->second->SetPose(pose, false);
     }
   }
 
@@ -682,7 +691,25 @@ Vector3 Body::GetTorque() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the vector of all geoms
-const std::vector<Geom*> *Body::GetGeoms() const
+const std::map<std::string, Geom*> *Body::GetGeoms() const
 {
   return &(this->geoms);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a geom by name
+Geom *Body::GetGeom(const std::string &name) const
+{
+  std::map<std::string, Geom*>::const_iterator iter = this->geoms.find(name);
+
+  if (iter != this->geoms.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    gzerr(0) << "Unknown geom[" << name << "]\n";
+    return NULL;
+  }
+}
+ 

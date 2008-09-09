@@ -85,7 +85,7 @@ namespace gazebo
     protected: void SaveChild(std::string &prefix, std::ostream &stream);
 
     /// \brief Set the size of the box
-    public: void SetSize( Vector3 size );
+    public: void SetSize( const Vector3 &size );
 
     private: ParamT<Vector3> *sizeP;
   };

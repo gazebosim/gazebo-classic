@@ -52,6 +52,7 @@ namespace gazebo
     public: void Update();
 
     public: static void AttributeBrowserCB( Fl_Widget * w, void *data);
+    public: static void AttributeInputCB( Fl_Widget * w, void *data);
 
     private: void AddEntityToAttributeBrowser(Entity *ent, std::string prefix);
     private: void AddToBrowser(const std::string &line);
@@ -60,6 +61,9 @@ namespace gazebo
 
     private: int columnWidths[3];
     private: int attrCount;
+
+    private: Fl_Input *attributeInput;
+    private: std::string attributeInputLbl;
   };
   
 }

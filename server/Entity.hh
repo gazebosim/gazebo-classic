@@ -97,7 +97,7 @@ namespace gazebo
   
     /// \brief Set whether this entity is static: immovable
     /// \param s Bool, true = static
-    public: void SetStatic(bool s);
+    public: void SetStatic(const bool &s);
   
     /// \brief Return whether this entity is static
     /// \return bool True = static
@@ -114,7 +114,10 @@ namespace gazebo
     public: bool operator==(const Entity &ent) const;
 
     /// \brief Get the parameters 
-    public: std::vector<Param*> *GetParameters();
+    public: std::vector<Param*> *GetParams();
+
+    /// \brief Get a parameter by name
+    public: Param *GetParam(const std::string &key) const;
  
     /// \brief Parent of this entity
     protected: Entity *parent;

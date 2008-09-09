@@ -62,8 +62,12 @@ Model::Model(Model *parent)
   Param::Begin(&this->parameters);
   this->canonicalBodyNameP = new ParamT<std::string>("canonicalBody",
                                                    std::string(),0);
+
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->xyzP->Callback(&Model::SetPosition, this);
+
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  this->rpyP->Callback( &Model::SetRotation, this);
   Param::End();
 
   this->parentBodyNameP = NULL;
@@ -466,6 +470,26 @@ void Model::SetPose(const Pose3d &setPose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the position of the model
+void Model::SetPosition( const Vector3 &pos)
+{
+  Pose3d pose = this->GetPose();
+  pose.pos = pos;
+
+  this->SetPose(pose);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the rotation of the model
+void Model::SetRotation( const Quatern &rot)
+{
+  Pose3d pose = this->GetPose();
+  pose.rot = rot;
+
+  this->SetPose(pose);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Get the current pose
 const Pose3d &Model::GetPose() const
 {
@@ -688,6 +712,7 @@ Body *Model::GetCanonicalBody()
 {
   return this->bodies[this->canonicalBodyNameP->GetValue()];
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a renderable model (like a light source).

@@ -28,7 +28,7 @@
 #define BODY_HH
 
 #include <ode/ode.h>
-#include <list>
+#include <map>
 #include <vector>
 
 #include "XMLConfig.hh"
@@ -141,7 +141,10 @@ namespace gazebo
     public: Vector3 GetTorque() const;
 
     /// \brief Get the vector of all geoms
-    public: const std::vector<Geom*> *GetGeoms() const;
+    public: const std::map<std::string, Geom*> *GetGeoms() const;
+
+    /// \brief Get a geom by name
+    public: Geom *GetGeom(const std::string &name) const;
   
     /// Load a new geom helper function
     /// \param node XMLConfigNode used to load the geom
@@ -158,7 +161,7 @@ namespace gazebo
     private: void UpdatePose();
  
     /// List of geometries attached to this body
-    private: std::vector< Geom* > geoms;
+    private: std::map< std::string, Geom* > geoms;
   
     /// List of attached sensors
     private: std::vector< Sensor* > sensors;

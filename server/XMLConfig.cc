@@ -458,7 +458,7 @@ xmlChar* XMLConfigNode::GetNodeValue( const std::string &key ) const
     while (value[i] == ' ') i++;
     while (value[j] == ' ') j--;
     result = xmlStrndup(value+i, j-i+1);
-    delete value;
+    xmlFree(value);
   }
 
   return result;

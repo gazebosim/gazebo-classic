@@ -78,6 +78,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~SphereGeom();
 
+    /// \brief Set the size
+    public: void SetSize(const double &radius);
+
     /// \brief Load the sphere
     protected: void LoadChild(XMLConfigNode *node);
 

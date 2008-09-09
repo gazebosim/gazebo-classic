@@ -77,6 +77,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~CylinderGeom();
 
+    /// \brief Set the size of the cylinder
+    public: void SetSize( const Vector2<double> &size );
+
     /// \brief Load the cylinder
     protected: void LoadChild(XMLConfigNode *node);
 

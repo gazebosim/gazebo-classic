@@ -74,9 +74,10 @@ void OgreCreator::LoadBasicShapes()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
-void OgreCreator::CreatePlane(const Vector3 &normal, const Vector2<double> &size, const Vector2<double> &segments, const Vector2<double> &uvTile, const std::string &material, bool castShadows, OgreVisual *parent)
+std::string OgreCreator::CreatePlane(const Vector3 &normal, const Vector2<double> &size, const Vector2<double> &segments, const Vector2<double> &uvTile, const std::string &material, bool castShadows, OgreVisual *parent, const std::string &name)
 {
   Vector3 n = normal;
+  std::string resultName;
 
   n.Normalize();
   Vector3 perp = n.GetPerpendicular();
@@ -85,7 +86,13 @@ void OgreCreator::CreatePlane(const Vector3 &normal, const Vector2<double> &size
 
 //FIXME: only one plane per parent
 //TODO:names and parents
-  Ogre::MeshManager::getSingleton().createPlane(parent->GetName() + "_PLANE",
+
+  if (name.empty())
+    resultName = parent->GetName() + "_PLANE";
+  else
+    resultName = name;
+
+  Ogre::MeshManager::getSingleton().createPlane(resultName,
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
       size.x, size.y,
       (int)segments.x, (int)segments.y,
@@ -97,6 +104,8 @@ void OgreCreator::CreatePlane(const Vector3 &normal, const Vector2<double> &size
   parent->SetMaterial(material);
 
   parent->SetCastShadows(castShadows);
+
+  return resultName;
 }
 
 
@@ -530,6 +539,14 @@ void OgreCreator::DrawGrid()
   // etc
   gridObject->end();
   gridObjectNode->attachObject(gridObject);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Remove a mesh by name
+void OgreCreator::RemoveMesh(const std::string &name)
+{
+  if (!name.empty() && Ogre::MeshManager::getSingleton().resourceExists(name))
+    Ogre::MeshManager::getSingleton().remove(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

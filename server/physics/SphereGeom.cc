@@ -39,6 +39,7 @@ SphereGeom::SphereGeom(Body *body)
 {
   Param::Begin(&this->parameters);
   this->radiusP = new ParamT<double>("size",1.0,0);
+  this->radiusP->Callback( &SphereGeom::SetSize, this );
   Param::End();
 }
 
@@ -55,15 +56,24 @@ SphereGeom::~SphereGeom()
 void SphereGeom::LoadChild(XMLConfigNode *node)
 {
   this->radiusP->Load(node);
+  this->SetSize( this->radiusP->GetValue() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the size
+void SphereGeom::SetSize(const double &radius)
+{
+  this->radiusP->SetValue( radius );
 
   // Initialize box mass matrix
-  dMassSetSphereTotal(&this->mass, this->massP->GetValue(), this->radiusP->GetValue());
+  dMassSetSphereTotal(&this->mass, this->massP->GetValue(), 
+                      this->radiusP->GetValue());
 
   // Create the sphere geometry
   this->SetGeom( dCreateSphere(0, this->radiusP->GetValue()), true);
 }
 
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Save sphere parameters
 void SphereGeom::SaveChild(std::string &prefix, std::ostream &stream)
 {
