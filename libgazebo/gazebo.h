@@ -346,8 +346,6 @@ class GazeboData
 
   /// Type of model that owns this interface
   public: std::string modelType;
-
-
 };
 
 /** \} */

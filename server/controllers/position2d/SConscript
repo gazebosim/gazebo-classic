@@ -1,12 +1,7 @@
 #Import variable
 Import('env sharedObjs')
 
-dirs = Split('differential steering')
+dirs = Split('differential steering holonome3sw')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)
-
-#sources = Split('')
-
-#staticObjs.append(env.StaticObject(sources))
-#sharedObjs.append(env.SharedObject(sources))
