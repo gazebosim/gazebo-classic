@@ -1,0 +1,17 @@
+
+# 3rd party packages
+parseConfigs=['pkg-config --cflags --libs libgazebo',
+              'pkg-config --cflags --libs libgazeboServer']
+
+
+env = Environment (
+  CC = 'g++',
+  CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+)
+
+
+# Parse all the pacakge configurations
+for cfg in parseConfigs:
+  env.ParseConfig(cfg)
+
+env.Program('bumper','bumper.cc')
