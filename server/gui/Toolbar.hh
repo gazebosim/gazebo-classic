@@ -51,19 +51,33 @@ namespace gazebo
     /// \brief Update the toolbar data
     public: void Update();
 
-    public: static void AttributeBrowserCB( Fl_Widget * w, void *data);
-    public: static void AttributeInputCB( Fl_Widget * w, void *data);
+    /// \brief Callback for the parameter browser
+    public: static void ParamBrowserCB( Fl_Widget * w, void *data);
 
-    private: void AddEntityToAttributeBrowser(Entity *ent, std::string prefix);
-    private: void AddToBrowser(const std::string &line);
+    /// \brief Callback for parameter modification
+    public: static void ParamInputCB( Fl_Widget * w, void *data);
+
+    /// \brief Callback for entity browser
+    public: static void EntityBrowserCB( Fl_Widget *w, void *data );
+
+    /// \brief Add an entity ot the param browser
+    private: void AddEntityToParamBrowser(Entity *ent, std::string prefix);
+
+    /// \brief Add a line to the param browser
+    private: void AddToParamBrowser(const std::string &line);
+
+
+    /// \brief Update entity browser
+    private: void UpdateEntityBrowser();
 
     private: Fl_Hold_Browser *entityBrowser;
 
-    private: int columnWidths[3];
-    private: int attrCount;
+    private: Fl_Hold_Browser *paramBrowser;
+    private: Fl_Input *paramInput;
+    private: std::string paramInputLbl;
 
-    private: Fl_Input *attributeInput;
-    private: std::string attributeInputLbl;
+    private: int paramColumnWidths[3];
+    private: int paramCount;
   };
   
 }

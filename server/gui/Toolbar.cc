@@ -30,6 +30,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Button.H>
 
+#include "World.hh"
 #include "Body.hh"
 #include "Geom.hh"
 #include "Entity.hh"
@@ -42,52 +43,69 @@
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
   this->box(FL_UP_BOX);
 
-  this->columnWidths[0] = 80;
-  this->columnWidths[1] = 120;
-  this->columnWidths[2] = 0;
-
-  this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*10, "Attributes");
+  this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*5,"Models");
   this->entityBrowser->align(FL_ALIGN_TOP);
-  this->entityBrowser->column_char('~');
-  this->entityBrowser->column_widths( columnWidths );
-  this->entityBrowser->callback(&Toolbar::AttributeBrowserCB, this);
+  this->entityBrowser->callback( &Toolbar::EntityBrowserCB, this );
+
+  this->paramColumnWidths[0] = 80;
+  this->paramColumnWidths[1] = 120;
+  this->paramColumnWidths[2] = 0;
 
   y = this->entityBrowser->y() + this->entityBrowser->h() + 20;
-  this->attributeInput = new Fl_Input(x+10, y, w-20, 20, "Input:");
-  this->attributeInput->align(FL_ALIGN_TOP);
-  this->attributeInput->labelsize(12);
-  this->attributeInput->when( FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
-  this->attributeInput->callback(&Toolbar::AttributeInputCB, this);
+  this->paramBrowser = new Fl_Hold_Browser(x+10, y, w-20,25*10,"Parameters");
+  this->paramBrowser->align(FL_ALIGN_TOP);
+  this->paramBrowser->column_char('~');
+  this->paramBrowser->column_widths( this->paramColumnWidths );
+  this->paramBrowser->callback(&Toolbar::ParamBrowserCB, this);
+
+  y = this->paramBrowser->y() + this->paramBrowser->h() + 20;
+  this->paramInput = new Fl_Input(x+10, y, w-20, 20, "Param:");
+  this->paramInput->align(FL_ALIGN_TOP);
+  this->paramInput->labelsize(12);
+  this->paramInput->when( FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
+  this->paramInput->callback(&Toolbar::ParamInputCB, this);
 
   this->end();
 
   this->resizable(NULL);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 Toolbar::~Toolbar()
 {
-  delete this->attributeInput;
+  delete this->paramBrowser;
+  delete this->paramInput;
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the toolbar data
 void Toolbar::Update()
 {
+  if (this->entityBrowser->size() == 0)
+    this->UpdateEntityBrowser();
+
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
 
-  this->attrCount = 0;
+  this->paramCount = 0;
+
   if (entity)
   {
     std::string value = "@b@B52@s@cModel ";
-    this->AddToBrowser(value);
-    this->AddEntityToAttributeBrowser(entity, "");
+    this->AddToParamBrowser(value);
+    this->AddEntityToParamBrowser(entity, "");
 
-    Model *model = dynamic_cast<Model *>(entity);
+    Model *model = dynamic_cast<Model*>(entity);
+    
     if (model)
     {
       const std::map<std::string, Body *> *bodies = model->GetBodies();
@@ -99,24 +117,24 @@ void Toolbar::Update()
       for (iter = bodies->begin(); iter != bodies->end(); iter++)
       {
         value = "@b@B52@s-Body:~@b@B52@s" + iter->second->GetName();
-        this->AddToBrowser(value);
-        this->AddEntityToAttributeBrowser( iter->second, "  " );
+        this->AddToParamBrowser(value);
+        this->AddEntityToParamBrowser( iter->second, "  " );
 
         geoms = iter->second->GetGeoms();
 
         for (giter = geoms->begin(); giter != geoms->end(); giter++)
         {
           value = "@b@B52@s  -Geom:~@b@B52@s" + giter->second->GetName();
-          this->AddToBrowser(value);
-          this->AddEntityToAttributeBrowser( giter->second, "    " );
+          this->AddToParamBrowser(value);
+          this->AddEntityToParamBrowser( giter->second, "    " );
         }
       }
     }
 
     // Clear the remaining lines
-    while ( this->entityBrowser->text(this->attrCount+1) != NULL )
+    while ( this->paramBrowser->text(this->paramCount+1) != NULL )
     {
-      this->AddToBrowser("");
+      this->AddToParamBrowser("");
     }
 
   }
@@ -125,7 +143,7 @@ void Toolbar::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attribute browser callback
-void Toolbar::AttributeBrowserCB( Fl_Widget * w, void *data)
+void Toolbar::ParamBrowserCB( Fl_Widget * w, void *data)
 {
   Fl_Hold_Browser *browser = (Fl_Hold_Browser*)(w);
   Toolbar *toolbar = (Toolbar*)(data);
@@ -139,11 +157,11 @@ void Toolbar::AttributeBrowserCB( Fl_Widget * w, void *data)
   if (lineText.find("-Body") != std::string::npos || 
       lineText.find("-Geom") != std::string::npos)
   {
-    toolbar->attributeInput->deactivate();
+    toolbar->paramInput->deactivate();
     return;
   }
   else
-    toolbar->attributeInput->activate();
+    toolbar->paramInput->activate();
 
   endLbl = lineText.find("~");
   while (lineText[beginLbl] == '@') beginLbl+=2; 
@@ -152,22 +170,22 @@ void Toolbar::AttributeBrowserCB( Fl_Widget * w, void *data)
   beginValue = endLbl+1;
   while (lineText[beginValue] == '@') beginValue+=2; 
 
-  toolbar->attributeInputLbl = lineText.substr(beginLbl, endLbl-beginLbl);
+  toolbar->paramInputLbl = lineText.substr(beginLbl, endLbl-beginLbl);
 
-  toolbar->attributeInput->label(toolbar->attributeInputLbl.c_str());
+  toolbar->paramInput->label(toolbar->paramInputLbl.c_str());
 
-  toolbar->attributeInput->value( lineText.substr(beginValue, lineText.size() - beginValue).c_str() );
+  toolbar->paramInput->value( lineText.substr(beginValue, lineText.size() - beginValue).c_str() );
 
-  toolbar->attributeInput->redraw();
+  toolbar->paramInput->redraw();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attribute modification callback
-void Toolbar::AttributeInputCB( Fl_Widget *w, void *data)
+void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
 {
   Fl_Input *input = (Fl_Input*)(w);
   Toolbar *toolbar = (Toolbar*)(data);
-  Fl_Hold_Browser *browser = toolbar->entityBrowser;
+  Fl_Hold_Browser *browser = toolbar->paramBrowser;
   int selected = browser->value();
   Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
   Body *body = NULL;
@@ -222,13 +240,23 @@ void Toolbar::AttributeInputCB( Fl_Widget *w, void *data)
   {
     param->SetFromString( value, true );
   }
+}
 
-  std::cout << "Label[" << label << "] Value[" << value << "]\n";
+////////////////////////////////////////////////////////////////////////////////
+/// Callback for entity browser
+void Toolbar::EntityBrowserCB( Fl_Widget *w, void *data )
+{
+  Fl_Hold_Browser *browser = (Fl_Hold_Browser*)(w);
+  int selected = browser->value();
+  std::string lineText = browser->text(selected);
+
+  Model *model = World::Instance()->GetModelByName(lineText);
+  Simulator::Instance()->SetSelectedEntity(model);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add entity to browser
-void Toolbar::AddEntityToAttributeBrowser(Entity *entity, std::string prefix)
+void Toolbar::AddEntityToParamBrowser(Entity *entity, std::string prefix)
 {
   std::vector<Param*> *parameters;
   std::vector<Param*>::iterator iter;
@@ -248,22 +276,35 @@ void Toolbar::AddEntityToAttributeBrowser(Entity *entity, std::string prefix)
     value = colorStr + "@b@s" + prefix + (*iter)->GetKey() + ":~" + 
       colorStr + "@s" + (*iter)->GetAsString();
 
-    this->AddToBrowser( value );
+    this->AddToParamBrowser( value );
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the attribute browser
-void Toolbar::AddToBrowser(const std::string &line)
+void Toolbar::AddToParamBrowser(const std::string &line)
 {
-  if (!this->entityBrowser->text(this->attrCount+1))
+  if (!this->paramBrowser->text(this->paramCount+1))
   {
-    this->entityBrowser->add( line.c_str() );
+    this->paramBrowser->add( line.c_str() );
   }
-  else if (strcmp(this->entityBrowser->text(this->attrCount+1), line.c_str()) != 0)
+  else if (strcmp(this->paramBrowser->text(this->paramCount+1), line.c_str()) != 0)
   {
-    this->entityBrowser->text( this->attrCount+1, line.c_str() );
+    this->paramBrowser->text( this->paramCount+1, line.c_str() );
   }
 
-  this->attrCount++;
+  this->paramCount++;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Update entity browser
+void Toolbar::UpdateEntityBrowser()
+{
+  std::vector<Model*>::iterator iter;
+  std::vector<Model*> models = World::Instance()->GetModels();
+
+  for (iter = models.begin(); iter != models.end(); iter++)
+  {
+    this->entityBrowser->add( (*iter)->GetName().c_str() );
+  }
 }
