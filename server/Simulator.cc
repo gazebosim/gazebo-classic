@@ -294,12 +294,12 @@ void Simulator::MainLoop()
     if (physicsUpdateRate == 0 || 
         currTime - this->prevPhysicsTime >= physicsUpdatePeriod) 
     {
-      this->simTime += step;
 
       // Update the physics engine
       if (!this->GetUserPause() ||
           (this->GetUserPause() && this->GetUserStepInc()))
       {
+        this->simTime += step;
         this->iterations++;
         this->pause=false;
         this->SetUserStepInc(!this->GetUserStepInc());
@@ -310,9 +310,9 @@ void Simulator::MainLoop()
         this->pause=true;
       }
 
-      World::Instance()->Update();
-
       this->prevPhysicsTime = this->GetRealTime();
+
+      World::Instance()->Update();
     }
 
     // Update the rendering
