@@ -287,10 +287,13 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         contact.surface.slip2 = MIN(geom1->contact->slip2, 
                                     geom2->contact->slip2);
 
-
-
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
+
+        // Call the geom's contact callbacks
+        geom1->contact->contactSignal( geom1, geom2 );
+        geom2->contact->contactSignal( geom2, geom1 );
+
         dJointAttach (c,b1,b2);
       }
     }

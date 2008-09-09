@@ -58,6 +58,7 @@ GZ_REGISTER_IFACE("actarray", ActarrayIface);
 GZ_REGISTER_IFACE("ptz", PTZIface);
 GZ_REGISTER_IFACE("stereocamera", StereoCameraIface);
 GZ_REGISTER_IFACE("opaque", OpaqueIface);
+GZ_REGISTER_IFACE("bumper", BumperIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface

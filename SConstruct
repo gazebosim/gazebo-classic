@@ -45,6 +45,7 @@ env = Environment (
    '#server/sensors', 
    '#server/sensors/camera',
    '#server/sensors/ray',
+   '#server/sensors/contact',
    '#server/physics',
    '#server/physics/ode',
    '#server/controllers',

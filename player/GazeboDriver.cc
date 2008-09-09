@@ -39,6 +39,7 @@
 #include "ActarrayInterface.hh"
 #include "OpaqueInterface.hh"
 #include "PTZInterface.hh"
+#include "BumperInterface.hh"
 #include "GripperInterface.hh"
 
 /*
@@ -310,6 +311,12 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
         if (!player_quiet_startup) printf(" a gripper interface.\n");
         ifsrc = new GripperInterface( playerAddr,  this, cf, section );
         break;
+
+      case PLAYER_BUMPER_CODE:
+        if (!player_quiet_startup) printf(" a bumper interface.\n");
+        ifsrc = new BumperInterface( playerAddr,  this, cf, section );
+        break;
+
 
         /*      case PLAYER_POWER_CODE:
                 if (!player_quiet_startup) printf(" a power interface.\n");

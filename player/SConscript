@@ -16,7 +16,8 @@ sources = ['GazeboDriver.cc',
            'PTZInterface.cc',
            'OpaqueInterface.cc',
            'ActarrayInterface.cc',
-           'GripperInterface.cc' 
+           'GripperInterface.cc',
+           'BumperInterface.cc'
            ]
 
 # Position3dInterface.cc PowerInterface.cc SonarInterface.ccGpsInterface.cc ')

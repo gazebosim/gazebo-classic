@@ -27,47 +27,60 @@
 #ifndef CONTACTPARAMS_HH
 #define CONTACTPARAMS_HH
 
+#include <boost/signal.hpp>
+#include <boost/bind.hpp>
+
 namespace gazebo
 {
 
+  class Geom;
+
   class XMLConfigNode;
 
-/// \brief Contact params
-class ContactParams
-{
-  /// Constructor
-  public: ContactParams();
-
-  /// \brief Load the contact params
-  public: void Load(XMLConfigNode *node);
-
-  /// Spring constant
-  public: double kp;   
-
-  /// Damping constant
-  public: double kd;
-
-  /// 0..1, 0=no bounciness
-  public: double bounce;
+  /// \brief Contact params
+  class ContactParams
+  {
+    /// Constructor
+    public: ContactParams();
   
-  /// first coefficient of friction 
-  public: double mu1;
-
-  /// second coefficient of friction 
-  public: double mu2;
-
-  /// Force-dependent-slip direction 1
-  public: double slip1;
-
-  /// Force-dependent-slip direction 2
-  public: double slip2;   
-
-  /// \brief bounce vel
-  public: double bounceVel;
-
-  /// \brief soft constraint force mixing
-  public: double softCfm;
-};
-
+    /// \brief Load the contact params
+    public: void Load(XMLConfigNode *node);
+  
+    public: template< typename C>
+            void Callback( void (C::*func)(Geom *, Geom*), C *c )
+            {
+              contactSignal.connect( boost::bind( func, c, _1, _2 ) );
+            }
+  
+    /// Spring constant
+    public: double kp;   
+  
+    /// Damping constant
+    public: double kd;
+  
+    /// 0..1, 0=no bounciness
+    public: double bounce;
+    
+    /// first coefficient of friction 
+    public: double mu1;
+  
+    /// second coefficient of friction 
+    public: double mu2;
+  
+    /// Force-dependent-slip direction 1
+    public: double slip1;
+  
+    /// Force-dependent-slip direction 2
+    public: double slip2;   
+  
+    /// \brief bounce vel
+    public: double bounceVel;
+  
+    /// \brief soft constraint force mixing
+    public: double softCfm;
+  
+    public: boost::signal< void (Geom*, Geom*)> contactSignal;
+  };
 }
+
 #endif

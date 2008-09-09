@@ -1411,6 +1411,63 @@ class StereoCameraIface : public Iface
 /** \} */
 /// \}
 
+
+/***************************************************************************/
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup bumper_iface Bumper
+
+  \brief Bumper interface
+
+The bumper interface allows a client to read data from a bumper/contact sensor 
+\{
+*/
+
+#define GAZEBO_MAX_BUMPER_COUNT 128
+
+/// \brief Bumper data
+class BumperData
+{
+  public: GazeboData head;
+
+  /// State of the bumpers
+  public: uint8_t bumpers[GAZEBO_MAX_BUMPER_COUNT];
+
+  /// Bumper count
+  public: unsigned int bumper_count;
+}; 
+
+/// \brief Bumper interface
+class BumperIface : public Iface
+{
+  /// \brief Constructor
+  public: BumperIface():Iface("bumper", sizeof(BumperIface)+sizeof(BumperData)) {}
+
+  /// \brief Destructor
+  public: virtual ~BumperIface() {this->data = NULL;}
+
+  /// \brief Create the server
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (BumperData*)this->mMap; 
+          }
+
+  /// \brief Open the iface 
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (BumperData*)this->mMap; 
+          }
+
+  /// Pointer to the bumper data
+  public: BumperData *data;
+};
+
+/** \} */
+/// \}
+
+
 /***************************************************************************/
 /// \addtogroup libgazebo_iface
 /// \{

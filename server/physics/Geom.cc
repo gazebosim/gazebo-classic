@@ -517,4 +517,3 @@ void Geom::SetMass(const double &mass)
   this->body->UpdateCoM();
 }
 
-
