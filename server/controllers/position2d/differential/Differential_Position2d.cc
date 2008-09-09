@@ -158,6 +158,8 @@ void Differential_Position2d::UpdateChild()
   double dr, da;
   double stepTime;
 
+  this->myIface->Lock(1);
+
   this->GetPositionCmd();
 
   wd = **(this->wheelDiamP);
@@ -206,6 +208,8 @@ void Differential_Position2d::UpdateChild()
   }*/
 
   this->PutPositionData();
+
+  this->myIface->Unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,40 +225,30 @@ void Differential_Position2d::GetPositionCmd()
 {
   double vr, va;
 
-  if (this->myIface->Lock(1))
-  {
+  vr = this->myIface->data->cmdVelocity.pos.x;
+  va = this->myIface->data->cmdVelocity.yaw;
 
-    vr = this->myIface->data->cmdVelocity.pos.x;
-    va = this->myIface->data->cmdVelocity.yaw;
+  this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
 
-    this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
+  this->wheelSpeed[LEFT] = vr + va * **(this->wheelSepP) / 2;
+  this->wheelSpeed[RIGHT] = vr - va * **(this->wheelSepP) / 2;
 
-    this->wheelSpeed[LEFT] = vr + va * **(this->wheelSepP) / 2;
-    this->wheelSpeed[RIGHT] = vr - va * **(this->wheelSepP) / 2;
-
-    this->myIface->Unlock();
-  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the data in the interface
 void Differential_Position2d::PutPositionData()
 {
-  if (this->myIface->Lock(1))
-  {
-    // TODO: Data timestamp
-    this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
+  // TODO: Data timestamp
+  this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
 
-    this->myIface->data->pose.pos.x = this->odomPose[0];
-    this->myIface->data->pose.pos.y = this->odomPose[1];
-    this->myIface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
+  this->myIface->data->pose.pos.x = this->odomPose[0];
+  this->myIface->data->pose.pos.y = this->odomPose[1];
+  this->myIface->data->pose.yaw = NORMALIZE(this->odomPose[2]);
 
-    this->myIface->data->velocity.pos.x = this->odomVel[0];
-    this->myIface->data->velocity.yaw = this->odomVel[2];
+  this->myIface->data->velocity.pos.x = this->odomVel[0];
+  this->myIface->data->velocity.yaw = this->odomVel[2];
 
-    // TODO
-    this->myIface->data->stall = 0;
-
-    this->myIface->Unlock();
-  }
+  // TODO
+  this->myIface->data->stall = 0;
 }
