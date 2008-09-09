@@ -1413,6 +1413,63 @@ class StereoCameraIface : public Iface
 /** \} */
 /// \}
 
+/***************************************************************************/
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup opaque_iface opaque
+
+  \brief Interface for arbitrary data transfer
+The opaque interface can transmit any data
+
+\{
+ */
+/// Maximum amount of data we will be sending. 8MB is the maximum dictated by Player
+#define GAZEBO_MAX_OPAQUE_DATA 1024*1024*8
+/// \brief opaque data
+class OpaqueData
+{
+  public: GazeboData head;
+
+  /// The length of the data (in bytes)
+  public: uint32_t data_count;
+
+  /// The data we will be sending
+  public: uint8_t data[GAZEBO_MAX_OPAQUE_DATA];
+};
+
+
+/// \brief Opaque interface
+class OpaqueIface : public Iface
+{
+    /// \brief Constructor
+    public: OpaqueIface():Iface("opaque", sizeof(OpaqueIface)+sizeof(OpaqueData)) {}
+
+    /// \brief Destructor
+    public: virtual ~OpaqueIface() {this->data = NULL;}
+
+    /// \brief Create the server
+    public: virtual void Create(Server *server, std::string id)
+    {
+        Iface::Create(server,id);
+        this->data = (OpaqueData*)this->mMap;
+    }
+
+    /// \brief Open the iface
+    public: virtual void Open(Client *client, std::string id)
+    {
+        Iface::Open(client,id);
+        this->data = (OpaqueData*)this->mMap;
+    }
+
+    /// Pointer to the opaque data
+    public: OpaqueData *data;
+};
+
+/** \} */
+/// \}
+
+
+
 }
 
 

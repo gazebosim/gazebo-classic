@@ -14,6 +14,7 @@ sources = ['GazeboDriver.cc',
            'CameraInterface.cc',
            'FiducialInterface.cc',
            'PTZInterface.cc',
+           'OpaqueInterface.cc',
            'ActarrayInterface.cc',
            'GripperInterface.cc' 
            ]

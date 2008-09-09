@@ -49,6 +49,7 @@ Joint::Joint()
   this->body2NameP = new ParamT<std::string>("body2",std::string(),1);
   this->anchorBodyNameP = new ParamT<std::string>("anchor",std::string(),0);
   this->anchorOffsetP = new ParamT<Vector3>("anchorOffset",Vector3(0,0,0), 0);
+  this->provideFeedbackP = new ParamT<bool>("provideFeedback", false, 0);
   Param::End();
 }
 
@@ -66,6 +67,7 @@ Joint::~Joint()
   delete this->body2NameP;
   delete this->anchorBodyNameP;
   delete this->anchorOffsetP;
+  delete this->provideFeedbackP;
 }
 
 
@@ -90,6 +92,7 @@ void Joint::Load(XMLConfigNode *node)
   this->erpP->Load(node);
   this->cfmP->Load(node);
   this->suspensionCfmP->Load(node);
+  this->provideFeedbackP->Load(node);
 
   Body *body1 = this->model->GetBody( **(this->body1NameP));
   Body *body2 = this->model->GetBody(**(this->body2NameP));
@@ -128,6 +131,12 @@ void Joint::Load(XMLConfigNode *node)
   this->line1->AddPoint(Vector3(0,0,0));
   this->line2->AddPoint(Vector3(0,0,0));
   this->line2->AddPoint(Vector3(0,0,0));
+
+  if (**this->provideFeedbackP)
+  {
+    this->feedback = new dJointFeedback;
+    dJointSetFeedback(this->jointId, this->feedback);
+  }
 
   this->LoadChild(node);
 
@@ -334,6 +343,13 @@ void Joint::SetCFM(double newCFM)
 double Joint::GetCFM()
 {
   return this->GetParam(dParamSuspensionCFM);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the feedback data structure for this joint, if set
+dJointFeedback *Joint::GetFeedback()
+{
+  return dJointGetFeedback(this->jointId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -131,6 +131,9 @@ namespace gazebo
     /// \brief Get the CFM of this joint
     public: double GetCFM();
 
+    /// \brief Get the feedback data structure for this joint, if set
+    public: dJointFeedback *GetFeedback();
+
     /// \brief Get the high stop of an axis(index).
     public: double GetHighStop(int index=0);
 
@@ -158,6 +161,10 @@ namespace gazebo
     private: ParamT<std::string> *body2NameP;
     private: ParamT<std::string> *anchorBodyNameP;
     private: ParamT<Vector3> *anchorOffsetP;
+    private: ParamT<bool> *provideFeedbackP;
+
+    /// Feedback data for this joint
+    private: dJointFeedback *feedback;
 
     protected: std::vector<Param*> parameters;
 
