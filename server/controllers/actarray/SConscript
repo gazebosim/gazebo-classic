@@ -1,7 +1,7 @@
 #Import variable
 Import('env sharedObjs')
 
-dirs = Split('bandit')
+dirs = Split('bandit generic')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)
