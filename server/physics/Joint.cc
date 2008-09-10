@@ -36,12 +36,12 @@ using namespace gazebo;
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 Joint::Joint()
+  : Common()
 {
   this->visual = NULL;
   this->model = NULL;
 
   Param::Begin(&this->parameters);
-  this->nameP = new ParamT<std::string>("name","",1);
   this->erpP = new ParamT<double>("erp",0.4,0);
   this->cfmP = new ParamT<double>("cfm",10e-3,0);
   this->suspensionCfmP = new ParamT<double>("suspensionCfm",0.0,0);
@@ -59,7 +59,6 @@ Joint::Joint()
 Joint::~Joint()
 {
   dJointDestroy( this->jointId );
-  delete this->nameP;
   delete this->erpP;
   delete this->cfmP;
   delete this->suspensionCfmP;

@@ -18,8 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
-/* Desc: External interfaces for Gazebo
+/* Desc: Base class for all physical entities
  * Author: Nate Koenig
  * Date: 03 Apr 2007
  * SVN: $Id$
@@ -32,6 +31,7 @@
 #include <string>
 #include <ode/ode.h>
 
+#include "Common.hh"
 #include "Param.hh"
 
 namespace gazebo
@@ -46,7 +46,7 @@ namespace gazebo
   /*
    * Facilitates meshing of physics engine with rendering engine
    */
-  class Entity
+  class Entity : public Common
   {
     /// \brief Constructor
     /// \param parent Parent of the entity.
@@ -54,11 +54,7 @@ namespace gazebo
   
     /// \brief Destructor
     public: virtual ~Entity();
-  
-    /// \brief Return the ID of this entity. This id is unique
-    /// \return Integer ID
-    public: int GetId() const;
-  
+ 
     /// \brief Return the ID of the parent
     /// \return Integer ID
     public: int GetParentId() const;
@@ -86,15 +82,7 @@ namespace gazebo
     /// \brief Set the scene node
     /// \param sceneNode Ogre scene node
     public: void SetVisualNode(OgreVisual *visualNode);
-  
-    /// \brief Set the name of the entity
-    /// \param name Body name
-    public: void SetName(const std::string &name);
-  
-    /// \brief Return the name of the entity
-    /// \return Name of the entity
-    public: std::string GetName() const;
-  
+ 
     /// \brief Set whether this entity is static: immovable
     /// \param s Bool, true = static
     public: void SetStatic(const bool &s);
@@ -113,23 +101,11 @@ namespace gazebo
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;
 
-    /// \brief Get the parameters 
-    public: std::vector<Param*> *GetParams();
-
-    /// \brief Get a parameter by name
-    public: Param *GetParam(const std::string &key) const;
- 
     /// \brief Parent of this entity
     protected: Entity *parent;
   
     /// \brief Children of this entity
     protected: std::vector< Entity* > children;
-  
-    /// \brief This entities ID
-    private: unsigned int id;
-  
-    /// \brief Used to automaticaly chose a unique ID on creation
-    private: static unsigned int idCounter;
   
     // is this an static entity
     protected: ParamT<bool> *staticP;
@@ -140,14 +116,7 @@ namespace gazebo
     /// \brief ODE Stuff (should be go somewhere else)
     public: dSpaceID spaceId;
   
-    /// \brief Name of the entity
-    protected: ParamT<std::string> *nameP;
-
-    /// List of all the parameters
-    protected: std::vector<Param*> parameters;
-  
     private: bool selected;
-  
   };
   
   /// \}

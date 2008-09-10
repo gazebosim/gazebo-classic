@@ -33,6 +33,7 @@
 #include "Pose3d.hh"
 #include "Quatern.hh"
 #include "Vector3.hh"
+#include "Common.hh"
 #include "Param.hh"
 
 namespace gazebo
@@ -42,7 +43,7 @@ namespace gazebo
   class Entity;
 
   /// \brief Ogre Visual Object
-  class OgreVisual : public Ogre::UserDefinedObject
+  class OgreVisual : public Common, public Ogre::UserDefinedObject
   {
     /// \brief Constructor
     public: OgreVisual (OgreVisual *node, Entity *owner = NULL);
@@ -82,7 +83,7 @@ namespace gazebo
     public: void SetHighlight( bool highlight);
 
     /// \brief Set whether the visual should cast shadows
-    public: void SetCastShadows(bool shadows);
+    public: void SetCastShadows(const bool &shadows);
 
     /// \brief Set whether the visual is visible
     /// \param visible set this node visible
@@ -123,7 +124,6 @@ namespace gazebo
     //         user selection
     public: void ShowSelectionBox( bool value );
 
-
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: Ogre::SceneBlendType sceneBlendType;
@@ -147,7 +147,6 @@ namespace gazebo
     private: ParamT<bool> *castShadowsP;
     private: ParamT<Vector3> *sizeP;
     private: ParamT<Vector3> *scaleP;
-    private: std::vector<Param*> parameters;
   };
 }
 

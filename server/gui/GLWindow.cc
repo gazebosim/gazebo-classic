@@ -351,8 +351,6 @@ void GLWindow::HandleKeyRelease(int keyNum)
 {
   this->keys[keyNum] = 0;
 
-  Simulator* sim = Simulator::Instance();
-
   // Handle all toggle keys
   switch (keyNum)
   {

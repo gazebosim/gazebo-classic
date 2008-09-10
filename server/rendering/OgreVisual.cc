@@ -39,6 +39,7 @@ unsigned int OgreVisual::visualCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
+  : Common()
 {
   std::ostringstream stream;
 
@@ -60,10 +61,19 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->xyzP->Callback( &OgreVisual::SetPosition, this );
+
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  this->rpyP->Callback( &OgreVisual::SetRotation, this );
+
   this->meshNameP = new ParamT<std::string>("mesh","",1);
+
   this->materialNameP = new ParamT<std::string>("material",std::string(),0);
+  this->materialNameP->Callback( &OgreVisual::SetMaterial, this );
+
   this->castShadowsP = new ParamT<bool>("castShadows",true,0);
+  this->castShadowsP->Callback( &OgreVisual::SetCastShadows, this );
+
   this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
   this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
   Param::End();
@@ -277,7 +287,10 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 
   // Clone the material. This will allow us to change the look of each geom
   // individually.
-  this->myMaterial = this->origMaterial->clone(myMaterialName);
+  if (Ogre::MaterialManager::getSingleton().resourceExists(myMaterialName))
+    this->myMaterial = (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(myMaterialName));
+  else
+    this->myMaterial = this->origMaterial->clone(myMaterialName);
 
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
 
@@ -421,7 +434,7 @@ void OgreVisual::SetHighlight(bool highlight)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual should cast shadows
-void OgreVisual::SetCastShadows(bool shadows)
+void OgreVisual::SetCastShadows(const bool &shadows)
 {
   for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
@@ -566,5 +579,3 @@ void OgreVisual::ShowSelectionBox( bool value )
   if (node)
     node->showBoundingBox(value);
 }
-
-

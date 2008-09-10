@@ -37,7 +37,7 @@ class Fl_Button;
 
 namespace gazebo
 {
-  class Entity;
+  class Common;
 
   /// \brief Toolbar
   class Toolbar : public Fl_Group
@@ -61,7 +61,7 @@ namespace gazebo
     public: static void EntityBrowserCB( Fl_Widget *w, void *data );
 
     /// \brief Add an entity ot the param browser
-    private: void AddEntityToParamBrowser(Entity *ent, std::string prefix);
+    private: void AddEntityToParamBrowser(Common *ent, std::string prefix);
 
     /// \brief Add a line to the param browser
     private: void AddToParamBrowser(const std::string &line);

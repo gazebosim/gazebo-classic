@@ -18,63 +18,84 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Parameter class
+
+/* Desc: Base class shared by all classes in Gazebo.
  * Author: Nate Koenig
- * Date: 14 Aug 2008
+ * Date: 09 Sept. 2008
  * SVN: $Id:$
  */
 
-#include "GazeboError.hh"
-#include "Param.hh"
+#include "Common.hh"
+#include "GazeboMessage.hh"
 
 using namespace gazebo;
 
-std::vector<Param*> *Param::params = NULL;
+unsigned int Common::idCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Constructor
-Param::Param(Param *newParam) 
+/// Constructor
+Common::Common()
 {
-  if (params == NULL)
-    gzthrow("Param vector is NULL\n");
-  params->push_back(newParam);
+  this->id = ++idCounter;
+
+  Param::Begin(&this->parameters);
+  this->nameP = new ParamT<std::string>("name","noname",1);
+  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Destructor
-Param::~Param() 
+/// Destructor
+Common::~Common()
 {
+  delete this->nameP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Begin a block of "new ParamT<>"
-void Param::Begin(std::vector<Param*> *_params)
+/// Set the name of the entity
+void Common::SetName(const std::string &name)
 {
-  if (params != NULL)
-    gzthrow("Calling Begin before an End\n");
-  params = _params;
+  this->nameP->SetValue( name );
+}
+  
+////////////////////////////////////////////////////////////////////////////////
+/// Return the name of the entity
+std::string Common::GetName() const
+{
+  return this->nameP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//  End a block of "new ParamT<>"
-void Param::End()
+/// Get the parameters 
+std::vector<Param*> *Common::GetParams()
 {
-  if (params == NULL)
-    gzthrow("Calling End before a Begin\n");
-
-  params = NULL;
+  return &this->parameters;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// The name of the key
-std::string Param::GetKey() const
+/// Get a parameter by name
+Param *Common::GetParam(const std::string &key) const
 {
-  return this->key;
-}
+  std::vector<Param*>::const_iterator iter;
+  Param *result = NULL;
 
+  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
+  {
+    if ((*iter)->GetKey() == key)
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  if (result == NULL)
+    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+
+  return result;
+}
+   
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the name of the param's data type
-std::string Param::GetTypename() const
+/// Return the ID of this entity. This id is unique
+int Common::GetId() const
 {
-  return this->typeName;
+  return this->id;
 }

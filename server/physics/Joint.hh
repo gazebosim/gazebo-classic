@@ -29,6 +29,7 @@
 
 #include <ode/ode.h>
 
+#include "Common.hh"
 #include "Param.hh"
 #include "Vector3.hh"
 
@@ -45,7 +46,7 @@ namespace gazebo
   class OgreVisual; 
 
   /// \brief Base class for all joints
-  class Joint
+  class Joint : public Common
   {
     /// \brief Type of joint
     public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL};
@@ -153,7 +154,6 @@ namespace gazebo
     private: Body *body2;
 
     /// Name of this joint
-    private: ParamT<std::string> *nameP;
     private: ParamT<double> *erpP;
     private: ParamT<double> *cfmP;
     private: ParamT<double> *suspensionCfmP;
@@ -165,8 +165,6 @@ namespace gazebo
 
     /// Feedback data for this joint
     private: dJointFeedback *feedback;
-
-    protected: std::vector<Param*> parameters;
 
     private: OgreVisual *visual;
 

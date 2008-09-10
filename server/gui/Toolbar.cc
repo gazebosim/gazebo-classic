@@ -30,13 +30,17 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Button.H>
 
+#include <boost/lexical_cast.hpp>
+
 #include "World.hh"
 #include "Body.hh"
 #include "Geom.hh"
 #include "Entity.hh"
+#include "Common.hh"
 #include "Model.hh"
 #include "Simulator.hh"
 #include "CameraManager.hh"
+#include "OgreVisual.hh"
 #include "OgreCamera.hh"
 #include "Toolbar.hh"
 #include "Global.hh"
@@ -127,6 +131,16 @@ void Toolbar::Update()
           value = "@b@B52@s  -Geom:~@b@B52@s" + giter->second->GetName();
           this->AddToParamBrowser(value);
           this->AddEntityToParamBrowser( giter->second, "    " );
+
+          for (unsigned int i=0; i < giter->second->GetVisualCount(); i++)
+          {
+            OgreVisual *vis = giter->second->GetVisual(i);
+            std::ostringstream stream;
+            stream << vis->GetId();
+            value = "@b@B52@s    -Visual:~@b@B52@s" + stream.str();
+            this->AddToParamBrowser(value);
+            this->AddEntityToParamBrowser( vis, "      " );
+          }
         }
       }
     }
@@ -190,7 +204,9 @@ void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
   Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
   Body *body = NULL;
   Geom *geom = NULL;
-  std::string geomName, bodyName, value, label;
+  OgreVisual *vis = NULL;
+
+  std::string geomName, bodyName, visNum, value, label;
 
   // Make sure we have a valid model
   if (!model)
@@ -215,6 +231,8 @@ void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
       geomName = lineText.substr( lastAmp, lineText.size()-lastAmp );
     else if (lineText.find("-Body:") != std::string::npos && bodyName.empty())
       bodyName = lineText.substr( lastAmp, lineText.size()-lastAmp );
+    else if (lineText.find("-Visual:") != std::string::npos && visNum.empty())
+      visNum = lineText.substr( lastAmp, lineText.size()-lastAmp );
       
     selected--;
   }
@@ -227,9 +245,14 @@ void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
   if (!geomName.empty() && body)
     geom = body->GetGeom(geomName);
 
+  if (!visNum.empty() && geom)
+    vis = geom->GetVisualById(boost::lexical_cast<int>(visNum));
+
   // Get the parameter
   Param *param = NULL;
-  if (geom)
+  if (vis)
+    param = vis->GetParam(label);
+  else if (geom)
     param = geom->GetParam(label);
   else if (body)
     param = body->GetParam(label);
@@ -256,7 +279,7 @@ void Toolbar::EntityBrowserCB( Fl_Widget *w, void *data )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add entity to browser
-void Toolbar::AddEntityToParamBrowser(Entity *entity, std::string prefix)
+void Toolbar::AddEntityToParamBrowser(Common *entity, std::string prefix)
 {
   std::vector<Param*> *parameters;
   std::vector<Param*>::iterator iter;

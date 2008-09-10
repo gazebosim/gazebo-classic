@@ -517,3 +517,32 @@ void Geom::SetMass(const double &mass)
   this->body->UpdateCoM();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of visuals
+unsigned int Geom::GetVisualCount() const
+{
+  return this->visuals.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a visual
+OgreVisual *Geom::GetVisual(unsigned int index) const
+{
+  if (index < this->visuals.size())
+    return this->visuals[index];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a visual
+OgreVisual *Geom::GetVisualById(int id) const
+{
+  std::vector<OgreVisual*>::const_iterator iter;
+
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    if ( (*iter)->GetId() == id)
+      return *iter;
+  }
+
+  return NULL;
+}

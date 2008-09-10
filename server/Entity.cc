@@ -34,16 +34,14 @@
 #include "Entity.hh"
 
 using namespace gazebo;
-unsigned int Entity::idCounter = 0;
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 Entity::Entity(Entity *parent)
-: parent(parent),
-  id(++idCounter),
-  visualNode(0)
+: Common(), parent(parent), visualNode(0)
 {
   Param::Begin(&this->parameters);
-  this->nameP = new ParamT<std::string>("name","",1);
   this->staticP = new ParamT<bool>("static",false,0);
   //this->staticP->Callback( &Entity::SetStatic, this);
   Param::End();
@@ -65,39 +63,38 @@ Entity::Entity(Entity *parent)
   World::Instance()->GetPhysicsEngine()->AddEntity(this);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 Entity::~Entity()
 {
-  delete this->nameP;
   delete this->staticP;
 
   GZ_DELETE(this->visualNode);
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 }
 
-int Entity::GetId() const
-{
-  return this->id;
-}
-
+////////////////////////////////////////////////////////////////////////////////
 // Return the ID of the parent
 int Entity::GetParentId() const
 {
   return this->parent == NULL ? 0 : this->parent->GetId();
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
 // Set the parent
 void Entity::SetParent(Entity *parent)
 {
   this->parent = parent;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Get the parent
 Entity *Entity::GetParent() const
 {
   return this->parent;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Add a child to this entity
 void Entity::AddChild(Entity *child)
 {
@@ -108,38 +105,26 @@ void Entity::AddChild(Entity *child)
   this->children.push_back(child);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Get all children
 std::vector< Entity* > &Entity::GetChildren() 
 {
   return this->children;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Return this entitie's sceneNode
 OgreVisual *Entity::GetVisualNode() const
 {
   return this->visualNode;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Set the scene node
 void Entity::SetVisualNode(OgreVisual *visualNode)
 {
   this->visualNode = visualNode;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the name of the body
-void Entity::SetName(const std::string &name)
-{
-  this->nameP->SetValue( name );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the name of the body
-std::string Entity::GetName() const
-{
-  return this->nameP->GetValue();
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this entity is static: immovable
@@ -197,33 +182,4 @@ bool Entity::IsSelected() const
 bool Entity::operator==(const Entity &ent) const 
 {
   return ent.GetName() == this->GetName();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the parameters 
-std::vector<Param*> *Entity::GetParams()
-{
-  return &this->parameters;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a parameter by name
-Param *Entity::GetParam(const std::string &key) const
-{
-  std::vector<Param*>::const_iterator iter;
-  Param *result = NULL;
-
-  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
-  {
-    if ((*iter)->GetKey() == key)
-    {
-      result = *iter;
-      break;
-    }
-  }
-
-  if (result == NULL)
-    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
-
-  return result;
 }

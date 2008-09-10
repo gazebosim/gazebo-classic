@@ -143,6 +143,15 @@ namespace gazebo
     /// \brief Set the mass
     public: void SetMass(const double &mass);
 
+    /// \brief Get the number of visuals
+    public: unsigned int GetVisualCount() const;
+
+    /// \brief Get a visual
+    public: OgreVisual *GetVisual(unsigned int index) const; 
+
+    /// \brief Get a visual by id
+    public: OgreVisual *GetVisualById( int id ) const;
+
     ///  Contact parameters
     public: ContactParams *contact; 
   
