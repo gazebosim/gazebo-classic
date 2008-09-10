@@ -129,7 +129,11 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
 
       FullWheel *wheel=new FullWheel();
       wheel->Connect(this->myParent->GetJoint(jointName), type);
-      wheel->SetTorque(torque);
+      // If the wheel is not full, FMax2 should be 0 otherwise joint will lock
+      if(type == FULL)
+         wheel->SetTorque(torque);
+      else
+         wheel->SetTorque(0);
       wheel->SetSteerTorque(steerTorque);
       wheel->SetSteerPD(steerKp, steerKd);
       wheel->SetSteerMaxAngle(maxAngle);
