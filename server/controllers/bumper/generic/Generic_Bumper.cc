@@ -81,9 +81,10 @@ void Generic_Bumper::UpdateChild()
 
   this->myIface->data->bumper_count = this->myParent->GetContactCount();
 
+  this->myIface->data->head.time = Simulator::Instance()->GetRealTime();
+
   for (unsigned int i=0; i < this->myParent->GetContactCount(); i++)
   {
-    this->myIface->data->head.time = this->myParent->GetContactTime(i);
     this->myIface->data->bumpers[i] = this->myParent->GetContactState(i); 
   }
 

@@ -102,6 +102,7 @@ void BumperInterface::Update()
 
     // Copy bumper data
     this->data.bumpers_count = this->iface->data->bumper_count;
+
     memcpy( this->data.bumpers, this->iface->data->bumpers, 
             sizeof(uint8_t) * this->data.bumpers_count );
 
