@@ -558,8 +558,8 @@
     <anchor>upperlip_body</anchor>
     <anchorOffset>0 -0.042 0.0</anchorOffset>
     <axis>0 1 0</axis>
-    <lowStop>-20</lowStop>
-    <highStop>20</highStop>
+    <lowStop>-30</lowStop>
+    <highStop>30</highStop>
   </joint:hinge>
 
   <body name="lowerlip_body">
@@ -586,8 +586,8 @@
     <anchor>lowerlip_body</anchor>
     <anchorOffset>0.0 -0.042 0</anchorOffset>
     <axis>0 1 0</axis>
-    <lowStop>-20</lowStop>
-    <highStop>20</highStop>
+    <lowStop>-30</lowStop>
+    <highStop>30</highStop>
   </joint:hinge>
 
 

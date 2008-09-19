@@ -24,8 +24,21 @@ int main()
       // This blocks until new data comes
       robot.Read();
 
-      ap.MoveTo(3, -M_PI/2.0);
-      player_actarray_actuator_t data = ap.GetActuatorData(3);
+      //ap.MoveTo(3, -M_PI/2.0);
+      
+      // Left eyebrow
+      ap.MoveTo(16, 0.5);
+
+      // Right eyebrow
+      ap.MoveTo(17, -0.5);
+
+      // lower lip
+      ap.MoveTo(18, 0.4);
+
+      // upper lip
+      ap.MoveTo(19, 0.4);
+
+      player_actarray_actuator_t data = ap.GetActuatorData(17);
       printf("Pos[%f] Speed[%f]\n",data.position, data.speed);
     }
   }
