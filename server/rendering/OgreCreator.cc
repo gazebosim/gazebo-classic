@@ -484,8 +484,8 @@ void OgreCreator::DrawGrid()
     textNode->attachObject(msg);
     textNode->translate(0, y, 0.02);
 
-    delete name;
-    delete text;
+    delete [] name;
+    delete [] text;
 
   }
 
@@ -532,8 +532,8 @@ void OgreCreator::DrawGrid()
     textNode->attachObject(msg);
     textNode->translate(x, 0, 0.02);
 
-    delete name;
-    delete text;
+    delete [] name;
+    delete [] text;
   }
 
   // etc
