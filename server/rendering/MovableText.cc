@@ -228,7 +228,6 @@ void MovableText::_setupGeometry()
   Ogre::VertexBufferBinding *bind = NULL;
   Ogre::HardwareVertexBufferSharedPtr ptbuf;
   Ogre::HardwareVertexBufferSharedPtr cbuf;
-  size_t charlen = this->text.size();
   float *pVert = NULL;
   float largestWidth = 0;
   float left = 0;

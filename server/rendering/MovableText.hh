@@ -117,13 +117,8 @@ class MovableText : public Ogre::MovableObject, public Ogre::Renderable
   /// \brief Get the squared view depth (from MovableObject)
   protected: float getSquaredViewDepth(const Ogre::Camera *cam) const;
 
-  private: float viewportAspectCoef;
-
   private: std::string fontName;
   private: Ogre::UTFString text;
-
-  private: HorizAlign horizAlign;
-  private: VertAlign vertAlign;
 
   private: Ogre::ColourValue color;
   private: Ogre::RenderOperation renderOp;
@@ -131,18 +126,21 @@ class MovableText : public Ogre::MovableObject, public Ogre::Renderable
   private: Ogre::LightList lightList;
 
   private: float charHeight;
-  private: float spaceWidth;
 
   private: bool needUpdate;
-  private: bool updateColors;
-  private: bool onTop;
 
   private: float radius;
-  private: float baseline;
 
   private: Ogre::Camera *camera;
   private: Ogre::RenderWindow *renderWindow;
+  private: float viewportAspectCoef;
   private: Ogre::Font *font;
+  private: float spaceWidth;
+  private: bool updateColors;
+  private: VertAlign vertAlign;
+  private: HorizAlign horizAlign;
+  private: bool onTop;
+  private: float baseline;
   private: Ogre::MaterialPtr material;
   private: Ogre::MaterialPtr backgroundMaterial;
 
