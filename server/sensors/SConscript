@@ -1,7 +1,7 @@
 #Import variable
 Import('env sharedObjs headers')
 
-dirs = Split('camera ray contact')
+dirs = Split('camera ray contact imu')
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)

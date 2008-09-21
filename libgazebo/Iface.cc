@@ -59,6 +59,7 @@ GZ_REGISTER_IFACE("ptz", PTZIface);
 GZ_REGISTER_IFACE("stereocamera", StereoCameraIface);
 GZ_REGISTER_IFACE("opaque", OpaqueIface);
 GZ_REGISTER_IFACE("bumper", BumperIface);
+GZ_REGISTER_IFACE("imu", ImuIface);
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface

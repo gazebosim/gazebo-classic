@@ -765,8 +765,28 @@ class Graphics3dIface : public Iface
 /** @} */
 /// @}
 
+class ImuData
+{
+  public: GazeboData head;
+  public: Pose velocity;
+};
 
-  
+class ImuIface : public Iface
+{
+  public: ImuIface():Iface("imu", sizeof(ImuIface)+sizeof(ImuData)) {}
+  public: virtual ~ImuIface() {this->data = NULL;}
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id);
+            this->data = (ImuData*)this->mMap;
+          }
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id);
+            this->data = (ImuData*)this->mMap;
+          }
+  public: ImuData *data;    
+}; 
 /***************************************************************************/
 /// @addtogroup libgazebo_iface
 /// @{
