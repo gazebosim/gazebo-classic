@@ -1,0 +1,6 @@
+#Import variable
+Import('env sharedObjs')
+
+sources = Split('Generic_Imu.cc')
+
+sharedObjs.append(env.SharedObject(sources))

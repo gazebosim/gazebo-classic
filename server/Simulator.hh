@@ -45,6 +45,7 @@ namespace gazebo
   class GazeboConfig;
   class OgreAdaptor;
   class Entity;
+  class Model;
 
 /// \brief The World
 /*
@@ -155,6 +156,9 @@ namespace gazebo
     /// \brief Get the selected entity
     public: Entity *GetSelectedEntity() const;
 
+    /// \brief Get the model that currently selected
+    public: Model *GetSelectedModel() const;
+
     ///pointer to the XML Data
     private: XMLConfig *xmlFile;
 
@@ -162,7 +166,8 @@ namespace gazebo
     private: Gui *gui;
 
     private: OgreAdaptor *renderEngine;
-/// Pointer to the selected Gui 
+
+    /// Pointer to the selected Gui 
     private: GazeboConfig *gazeboConfig;
 
     /// Flag to know if we have a simulation loaded

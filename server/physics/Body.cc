@@ -697,6 +697,13 @@ const std::map<std::string, Geom*> *Body::GetGeoms() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the model that this body belongs to
+Model *Body::GetModel() const
+{
+  return dynamic_cast<Model*>(this->GetParent());
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 /// Get a geom by name
 Geom *Body::GetGeom(const std::string &name) const
 {

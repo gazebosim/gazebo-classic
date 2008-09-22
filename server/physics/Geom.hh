@@ -37,6 +37,7 @@
 namespace gazebo
 {
 
+  class Model;
   class Body;
   class ContactParams;
   class XMLConfigNode;
@@ -152,8 +153,15 @@ namespace gazebo
     /// \brief Get a visual by id
     public: OgreVisual *GetVisualById( int id ) const;
 
+    /// \brief Get the body this geom belongs to
+    public: Body *GetBody() const;
+
+    /// \brief Get the model this geom belongs to
+    public: Model *GetModel() const;
+
     ///  Contact parameters
     public: ContactParams *contact; 
+
   
     /// The body this geom belongs to
     protected: Body *body;

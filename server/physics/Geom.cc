@@ -546,3 +546,17 @@ OgreVisual *Geom::GetVisualById(int id) const
 
   return NULL;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the body this geom belongs to
+Body *Geom::GetBody() const
+{
+  return this->body;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the model this geom belongs to
+Model *Geom::GetModel() const
+{
+  return this->body->GetModel();
+}

@@ -98,49 +98,43 @@ void Toolbar::Update()
   if (this->entityBrowser->size() == 0)
     this->UpdateEntityBrowser();
 
-  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  Model *model = Simulator::Instance()->GetSelectedModel();
 
   this->paramCount = 0;
 
-  if (entity)
+  if (model)
   {
     std::string value = "@b@B52@s@cModel ";
     this->AddToParamBrowser(value);
-    this->AddEntityToParamBrowser(entity, "");
+    this->AddEntityToParamBrowser(model, "");
 
-    Model *model = dynamic_cast<Model*>(entity);
-    
-    if (model)
+    const std::map<std::string, Body *> *bodies = model->GetBodies();
+    const std::map<std::string, Geom *> *geoms;
+    std::map<std::string, Body*>::const_iterator iter;
+    std::map<std::string, Geom*>::const_iterator giter;
+
+    for (iter = bodies->begin(); iter != bodies->end(); iter++)
     {
-      const std::map<std::string, Body *> *bodies = model->GetBodies();
-      const std::map<std::string, Geom *> *geoms;
-      std::map<std::string, Body*>::const_iterator iter;
-      std::map<std::string, Geom*>::const_iterator giter;
-      std::string value;
+      value = "@b@B52@s-Body:~@b@B52@s" + iter->second->GetName();
+      this->AddToParamBrowser(value);
+      this->AddEntityToParamBrowser( iter->second, "  " );
 
-      for (iter = bodies->begin(); iter != bodies->end(); iter++)
+      geoms = iter->second->GetGeoms();
+
+      for (giter = geoms->begin(); giter != geoms->end(); giter++)
       {
-        value = "@b@B52@s-Body:~@b@B52@s" + iter->second->GetName();
+        value = "@b@B52@s  -Geom:~@b@B52@s" + giter->second->GetName();
         this->AddToParamBrowser(value);
-        this->AddEntityToParamBrowser( iter->second, "  " );
+        this->AddEntityToParamBrowser( giter->second, "    " );
 
-        geoms = iter->second->GetGeoms();
-
-        for (giter = geoms->begin(); giter != geoms->end(); giter++)
+        for (unsigned int i=0; i < giter->second->GetVisualCount(); i++)
         {
-          value = "@b@B52@s  -Geom:~@b@B52@s" + giter->second->GetName();
+          OgreVisual *vis = giter->second->GetVisual(i);
+          std::ostringstream stream;
+          stream << vis->GetId();
+          value = "@b@B52@s    -Visual:~@b@B52@s" + stream.str();
           this->AddToParamBrowser(value);
-          this->AddEntityToParamBrowser( giter->second, "    " );
-
-          for (unsigned int i=0; i < giter->second->GetVisualCount(); i++)
-          {
-            OgreVisual *vis = giter->second->GetVisual(i);
-            std::ostringstream stream;
-            stream << vis->GetId();
-            value = "@b@B52@s    -Visual:~@b@B52@s" + stream.str();
-            this->AddToParamBrowser(value);
-            this->AddEntityToParamBrowser( vis, "      " );
-          }
+          this->AddEntityToParamBrowser( vis, "      " );
         }
       }
     }
@@ -168,10 +162,32 @@ void Toolbar::ParamBrowserCB( Fl_Widget * w, void *data)
   int endLbl = 0;
   int beginValue = 0;
 
-  if (lineText.find("-Body") != std::string::npos || 
-      lineText.find("-Geom") != std::string::npos)
+  if (lineText.find("-Body") != std::string::npos)
   {
+    /*beginLbl = lineText.rfind("@") + 2;
+
+    std::string bodyName = lineText.substr(beginLbl, lineText.size()-beginLbl);
+    std::cout << "Body Name[" << bodyName << "]\n";
+
+    Model *model = Simulator::Instance()->GetSelectedModel();
+    Body *body = model->GetBody(bodyName);
+    Simulator::Instance()->SetSelectedEntity(body);
+    */
+  }
+  else if (lineText.find("-Geom") != std::string::npos)
+  {
+    /*beginLbl = lineText.rfind("@") + 2;
+
+    std::string geomName = lineText.substr(beginLbl, lineText.size()-beginLbl);
+    std::cout << "Geom Name[" << geomName << "]\n";
+
+    Model *model = Simulator::Instance()->GetSelectedModel();
+    Geom *geom = model->GetGeom(geomName);
+    Simulator::Instance()->SetSelectedEntity(geom);
+
     toolbar->paramInput->deactivate();
+    Simulator::Instance()->SetSelectedEntity( );
+    */
     return;
   }
   else

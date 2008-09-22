@@ -1,0 +1,6 @@
+#Import variable
+Import('env sharedObjs')
+
+sources = Split('ImuSensor.cc')
+
+sharedObjs.append(env.SharedObject(sources))

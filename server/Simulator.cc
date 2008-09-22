@@ -28,6 +28,8 @@
 #include <fstream>
 #include <sys/time.h>
 
+#include "Body.hh"
+#include "Geom.hh"
 #include "Model.hh"
 #include "Entity.hh"
 #include "OgreVisual.hh"
@@ -507,4 +509,26 @@ Entity *Simulator::GetSelectedEntity() const
   return this->selectedEntity;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the model that currently selected
+Model *Simulator::GetSelectedModel() const
+{
+  Model *model = NULL;
+  Body *body = NULL;
+  Geom *geom = NULL;
 
+  if (!this->selectedEntity)
+    return NULL;
+
+  if ( (model = dynamic_cast<Model*>(this->selectedEntity)) != NULL )
+    return model;
+  else
+  {
+    if ( (body = dynamic_cast<Body*>(this->selectedEntity)) != NULL )
+      model = body->GetModel();
+    else if ( (geom = dynamic_cast<Geom*>(this->selectedEntity)) != NULL )
+      model = geom->GetModel();
+    else
+      gzerr(0) << "Unknown type\n";
+  }
+}

@@ -39,6 +39,7 @@
 
 namespace gazebo
 {
+  class Model;
   class Geom;
   class Sensor;
 
@@ -145,6 +146,9 @@ namespace gazebo
 
     /// \brief Get a geom by name
     public: Geom *GetGeom(const std::string &name) const;
+
+    /// \brief Get the model that this body belongs to
+    public: Model *GetModel() const;
   
     /// Load a new geom helper function
     /// \param node XMLConfigNode used to load the geom
