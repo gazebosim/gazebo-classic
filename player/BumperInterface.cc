@@ -21,7 +21,7 @@
 /* Desc: Bumper Interface for Player
  * Author: Nate Koenig
  * Date: 09 Sept. 2008
- * CVS: $Id:$
+ * CVS: $Id$
  */
 
 /**

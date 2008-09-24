@@ -21,7 +21,7 @@
 /* Desc: PTZ Interface for Player
  * Author: Nate Koenig
  * Date: 2 March 2006
- * CVS: $Id: PTZInterface.hh 154 2007-11-26 19:14:04Z natepak $
+ * CVS: $Id$
  */
 
 #ifndef PTZINTERFACE_HH
