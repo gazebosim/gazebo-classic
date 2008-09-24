@@ -22,7 +22,7 @@
  * Desc: Stereo camera controller.
  * Author: Nathan Koenig
  * Date: 06 April 2008
- * SVN info: $Id: Stereo_Camera.cc 4436 2008-03-24 17:42:45Z robotos $
+ * SVN info: $Id$
  */
 
 #include <algorithm>

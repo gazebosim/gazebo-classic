@@ -22,7 +22,7 @@
  * Desc: Position2d controller for a Differential drive.
  * Author: Nathan Koenig
  * Date: 01 Feb 2007
- * SVN: $Id: Differential_Position2d.hh 198 2007-12-18 00:20:58Z natepak $
+ * SVN: $Id$
  */
 #ifndef DIFFERENTIAL_POSITION2D_HH
 #define DIFFERENTIAL_POSITION2D_HH

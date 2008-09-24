@@ -22,7 +22,7 @@
  * Desc: A generic ptz controller
  * Author: Nathan Koenig
  * Date: 26 Nov 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <algorithm>

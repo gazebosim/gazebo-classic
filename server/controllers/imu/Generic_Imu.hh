@@ -22,7 +22,7 @@
  * Desc: generic IMU controller.
  * Author: Matt Thompson
  * Date: 07 Sep 2008
- * SVN: $Id: $
+ * SVN: $Id$
  */
 
 #ifndef GENERIC_IMU_HH

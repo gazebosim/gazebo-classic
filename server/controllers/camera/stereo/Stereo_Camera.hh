@@ -22,7 +22,7 @@
  * Desc: A stereo camera controller
  * Author: Nathan Koenig
  * Date: 06 April 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef STEREO_CAMERA_HH

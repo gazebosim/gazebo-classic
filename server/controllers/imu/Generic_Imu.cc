@@ -22,7 +22,7 @@
  * Desc:  Generic IMU controller.
  * Author: Matt Thompson
  * Date: 07 September 2008
- * SVN info: $Id: $
+ * SVN info: $Id$
  */
 
 #include <algorithm>
