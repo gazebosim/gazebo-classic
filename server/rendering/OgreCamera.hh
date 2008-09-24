@@ -21,7 +21,7 @@
 /* Desc: A persepective OGRE Camera
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id: OgreCamera.hh 6338 2008-04-16 17:24:32Z natepak $
+ * CVS: $Id$
  */
 
 #ifndef CAMERASENSOR_HH

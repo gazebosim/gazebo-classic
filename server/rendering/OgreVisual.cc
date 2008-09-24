@@ -21,7 +21,7 @@
 /* Desc: Ogre Visual Class
  * Author: Nate Koenig
  * Date: 14 Dec 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 #include <Ogre.h>
 #include "Entity.hh"

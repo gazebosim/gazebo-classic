@@ -21,7 +21,7 @@
 /* Desc: Class to manage all cameras
  * Author: Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id: CameraManager.cc 4436 2008-03-24 17:42:45Z robotos $
+ * SVN: $Id$
  */
 
 #include "OgreCamera.hh"
