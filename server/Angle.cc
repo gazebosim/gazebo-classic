@@ -21,7 +21,7 @@
 /* Desc: Angle class
  * Author: Nate Koenig
  * Date: 18 Aug 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <math.h>

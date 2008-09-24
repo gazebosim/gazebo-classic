@@ -20,7 +20,7 @@
 /* Desc: Local Gazebo configuration 
  * Author: Jordi Polo
  * Date: 3 May 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 #include <assert.h>
 #include <iostream>

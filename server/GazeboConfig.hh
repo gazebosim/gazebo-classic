@@ -20,7 +20,7 @@
 /* Desc: Gazebo configuration on this computer 
  * Author: Jordi Polo
  * Date: 3 May 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef GAZEBOCONFIG_HH

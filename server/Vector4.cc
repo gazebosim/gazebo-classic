@@ -21,7 +21,7 @@
 /* Desc: Vector 4
  * Author: Andrew Howard and Nate Koenig
  * Date: 4 Apr 2007
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <math.h>

@@ -21,7 +21,7 @@
 /* Desc: 4 tuple
  * Author: Nate Koenig
  * Date: 19 Aug 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef VECTOR4_HH
