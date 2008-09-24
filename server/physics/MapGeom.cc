@@ -42,6 +42,8 @@
 
 using namespace gazebo;
 
+unsigned int MapGeom::geomCounter = 0;
+
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 MapGeom::MapGeom(Body *body)
@@ -57,6 +59,7 @@ MapGeom::MapGeom(Body *body)
   this->materialP = new ParamT<std::string>("material", "", 0);
   this->granularityP = new ParamT<int>("granularity", 5, 0);
   Param::End();
+
 }
 
 
@@ -152,7 +155,10 @@ void MapGeom::CreateBoxes(QuadNode *node)
     float ySize = (node->height) * this->scaleP->GetValue();
     float zSize = this->wallHeightP->GetValue();
 
-    stream << "<geom:box name='map_geom'>";
+    char geomName[256];
+    sprintf(geomName,"map_geom_%d",geomCounter++);
+
+    stream << "<geom:box name='" << geomName << "'>";
     stream << "  <mass>0.0</mass>";
     stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
     stream << "  <rpy>0 0 0</rpy>";

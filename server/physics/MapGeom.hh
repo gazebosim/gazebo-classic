@@ -146,6 +146,7 @@ namespace gazebo
     private: QuadNode *root;
 
     private: bool merged;
+    private: static unsigned int geomCounter;
   };
 
 
@@ -186,6 +187,7 @@ namespace gazebo
     public: bool leaf;
 
     public: bool valid;
+
   };
 
   /// \}
