@@ -21,7 +21,7 @@
 /* Desc: StatusBar
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 #ifndef STATUSBAR_HH
 #define STATUSBAR_HH

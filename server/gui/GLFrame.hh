@@ -21,7 +21,7 @@
 /* Desc: FLTK GL Frame
  * Author: Nate Koenig
  * Date: 18 Jun 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef GLFRAME_HH

@@ -21,7 +21,7 @@
 /* Desc: FLTK main menu
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <FL/Fl_File_Chooser.H>

@@ -21,7 +21,7 @@
 /* Desc: Toolbar
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #include <stdio.h>

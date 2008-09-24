@@ -21,7 +21,7 @@
 /* Desc: FLTK GL Frame manager
  * Author: Nate Koenig
  * Date: 18 Jun 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef GLFRAMEMANAGER_HH

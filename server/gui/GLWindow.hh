@@ -21,7 +21,7 @@
 /* Desc: GL Window
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef FLTKGUI_HH
