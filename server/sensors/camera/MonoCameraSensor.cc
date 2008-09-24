@@ -21,7 +21,7 @@
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id: MonoCameraSensor.cc 4436 2008-03-24 17:42:45Z robotos $
+ * CVS: $Id$
  */
 
 #include <sstream>

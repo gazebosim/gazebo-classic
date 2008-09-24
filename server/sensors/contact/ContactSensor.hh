@@ -21,7 +21,7 @@
 /* Desc: Contact sensor
  * Author: Nate Koenig
  * Date: 09 Sept. 2008
- * SVN: $Id:$
+ * SVN: $Id$
 */
 
 #ifndef CONTACTSENSOR_HH

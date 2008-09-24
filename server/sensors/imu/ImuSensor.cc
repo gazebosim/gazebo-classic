@@ -21,7 +21,7 @@
 /* Desc: IMU sensor
  * Author: Matt Thompson
  * Date: 6 September 2008
- * SVN: $Id: $
+ * SVN: $Id$
 */
 
 #include <assert.h>

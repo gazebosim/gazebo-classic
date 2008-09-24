@@ -21,7 +21,7 @@
 /* Desc: Stereo Camera Sensor
  * Author: Nate Koenig
  * Date: 25 March 2008
- * SVN: $Id:$
+ * SVN: $Id$
  */
 
 #ifndef STEREOCAMERASENSOR_HH

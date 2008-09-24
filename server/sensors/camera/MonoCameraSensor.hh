@@ -21,7 +21,7 @@
 /* Desc: A persepective X11 OpenGL Camera Sensor
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id: CameraSensor.hh 208 2008-01-05 15:33:33Z robotos $
+ * CVS: $Id$
  */
 
 #ifndef MONOCAMERASENSOR_HH
