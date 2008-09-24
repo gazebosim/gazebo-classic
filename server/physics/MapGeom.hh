@@ -21,7 +21,7 @@
 /* Desc: Occupancy grid geom
  * Author: Nate Koenig
  * Date: 14 Jly 2008
- * CVS: $Id:$
+ * CVS: $Id$
  */
 
 #ifndef MAPGEOM_HH

@@ -21,7 +21,7 @@
 /* Desc: Map geometry
  * Author: Nate Koenig
  * Date: 14 July 2008
- * CVS: $Id:$
+ * CVS: $Id$
  */
 
 #include <ode/ode.h>
