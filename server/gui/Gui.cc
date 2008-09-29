@@ -88,6 +88,7 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   this->end();
   this->show();
 
+  Fl::check();
 
   // Create a dummy rendering window. This creates a context, and allows Ogre
   // to initialize properly

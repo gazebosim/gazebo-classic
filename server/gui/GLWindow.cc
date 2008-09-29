@@ -92,6 +92,7 @@ GLWindow::~GLWindow()
 void GLWindow::Init()
 {
   this->show();
+  Fl::check();
   this->mouseDrag = false;
 
   // Create the default camera.
