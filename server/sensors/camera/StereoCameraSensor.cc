@@ -254,8 +254,8 @@ void StereoCameraSensor::UpdateChild()
     autoParamDataSource.setCurrentViewport(vp);
     autoParamDataSource.setCurrentRenderTarget(this->renderTargets[i]);
     autoParamDataSource.setCurrentSceneManager(sceneMgr);
-    autoParamDataSource.setCurrentCamera(this->GetOgreCamera());
-    pass->_updateAutoParamsNoLights(autoParamDataSource);
+    autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
+    pass->_updateAutoParamsNoLights(&autoParamDataSource);
 
     // These two lines don't seem to do anything useful
     renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS()); 
@@ -381,9 +381,9 @@ void StereoCameraSensor::SaveFrame()
 
   fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y);
 
-  for (unsigned int i = 0; i<this->imageSizeP->GetValue().x; i++)
+  for (unsigned int i = 0; i< (unsigned int)this->imageSizeP->GetValue().x; i++)
   {
-    for (unsigned int j =0; j<this->imageSizeP->GetValue().y; j++)
+    for (unsigned int j =0; j<(unsigned int)this->imageSizeP->GetValue().y; j++)
     {
       double f = this->depthBuffer[0][i*this->imageSizeP->GetValue().x+j];
      

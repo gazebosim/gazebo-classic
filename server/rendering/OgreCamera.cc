@@ -183,13 +183,13 @@ void OgreCamera::UpdateCam()
     this->camera->setPolygonMode(Ogre::PM_SOLID);
   }
 
-  Ogre::Vector3 v = this->sceneNode->getWorldPosition();
+  Ogre::Vector3 v = this->sceneNode->_getDerivedPosition();
 
   this->pose.pos.x = v.x;
   this->pose.pos.y = v.y;
   this->pose.pos.z = v.z;
 
-  Ogre::Quaternion q = this->pitchNode->getWorldOrientation();
+  Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
 
   this->pose.rot.u = q.w;
   this->pose.rot.x = q.x;

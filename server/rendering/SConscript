@@ -1,14 +1,15 @@
 #Import variable
 Import('env sharedObjs headers')
 
-sources = ['OgreCreator.cc',
+sources = [
+           'MovableText.cc',
+           'OgreCreator.cc',
            'OgreAdaptor.cc',
            'OgreFrameListener.cc',
            'OgreDynamicRenderable.cc',
            'OgreDynamicLines.cc',
            'OgreSimpleShape.cc',
            'OgreHUD.cc',
-           'MovableText.cc',
            'OgreVisual.cc',
            'OgreCamera.cc',
            'CameraManager.cc',

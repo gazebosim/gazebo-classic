@@ -8,7 +8,6 @@
  * @update  2007 by independentCreations see independentCreations@gmail.com
  */
 
-
 #include "MovableText.hh"
 
 #include <OgreFontManager.h>
@@ -16,6 +15,8 @@
 
 #define POS_TEX_BINDING    0
 #define COLOUR_BINDING     1
+
+using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -685,3 +686,13 @@ void MovableText::_updateRenderQueue(Ogre::RenderQueue* queue)
     queue->addRenderable(this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY);
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Method to allow a caller to abstractly iterate over the Renderable instances
+void MovableText::visitRenderables( Ogre::Renderable::Visitor* /*visitor*/,
+                                 bool /*debug*/) 
+{
+  return;
+}
+
+
