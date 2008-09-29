@@ -142,10 +142,18 @@ void Stereo_Camera::UpdateChild()
     this->stereoIface->Lock(1);
     if (this->stereoIface->data->head.openCount > 0)
       this->PutStereoData();
+
+    strcpy( this->stereoIface->data->left_camera_iface_name, 
+            (**this->leftCameraNameP).c_str() );
+
+    strcpy( this->stereoIface->data->right_camera_iface_name, 
+            (**this->rightCameraNameP).c_str() );
+
     this->stereoIface->Unlock();
 
     this->stereoIface->Post();
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

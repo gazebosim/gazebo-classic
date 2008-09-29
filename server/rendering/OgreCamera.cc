@@ -66,8 +66,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->farClipP = new ParamT<double>("farClip",100,0);
   this->saveFramesP = new ParamT<bool>("saveFrames",false,0);
   this->savePathnameP = new ParamT<std::string>("saveFramePath","",0);
-  this->imageWidthP = new ParamT<unsigned int>("imageSize",640,0);
-  this->imageHeightP = new ParamT<unsigned int>("imageSize",480,0);
+  this->imageSizeP = new ParamT< Vector2<int> >("imageSize", Vector2<int>(640,480),0);
   this->visMaskP = new ParamT<std::string>("mask","none",0);
   this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
   Param::End();
@@ -88,8 +87,7 @@ OgreCamera::~OgreCamera()
   delete this->farClipP;
   delete this->saveFramesP;
   delete this->savePathnameP;
-  delete this->imageWidthP;
-  delete this->imageHeightP;
+  delete this->imageSizeP;
   delete this->visMaskP;
   delete this->hfovP;
 }
@@ -107,8 +105,7 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
     this->farClipP->Load(node);
     this->saveFramesP->Load(node);
     this->savePathnameP->Load(node);
-    this->imageWidthP->Load(node);
-    this->imageHeightP->Load(node);
+    this->imageSizeP->Load(node);
     this->visMaskP->Load(node);
     this->hfovP->Load(node);
 
@@ -146,8 +143,7 @@ void OgreCamera::SaveCam(std::string &prefix, std::ostream &stream)
   stream << prefix << (*this->farClipP) << "\n";
   stream << prefix << (*this->saveFramesP) << "\n";
   stream << prefix << (*this->savePathnameP) << "\n";
-  stream << prefix << (*this->imageWidthP) << "\n";
-  stream << prefix << (*this->imageHeightP) << "\n";
+  stream << prefix << (*this->imageSizeP) << "\n";
   stream << prefix << (*this->visMaskP) << "\n";
   stream << prefix << (*this->hfovP) << "\n";
 }
@@ -275,14 +271,14 @@ Angle OgreCamera::GetVFOV() const
 /// Get the width of the image
 unsigned int OgreCamera::GetImageWidth() const
 {
-  return this->imageWidthP->GetValue();
+  return this->imageSizeP->GetValue().x;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the image
 unsigned int OgreCamera::GetImageHeight() const
 {
-  return this->imageHeightP->GetValue();
+  return this->imageSizeP->GetValue().y;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -304,7 +300,7 @@ unsigned int OgreCamera::GetTextureHeight() const
 // Get the image size in bytes
 size_t OgreCamera::GetImageByteSize() const
 {
-  return this->imageHeightP->GetValue() * this->imageWidthP->GetValue() * 3;
+  return this->imageSizeP->GetValue().y * this->imageSizeP->GetValue().x * 3;
 }
 
 

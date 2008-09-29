@@ -67,7 +67,8 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
   this->LoadCam( node );
 
   // Do some sanity checks
-  if (this->imageWidthP->GetValue() == 0 || this->imageHeightP->GetValue() == 0)
+  if (this->imageSizeP->GetValue().x == 0 || 
+      this->imageSizeP->GetValue().y == 0)
   {
     gzthrow("image has zero size");
   }
@@ -82,8 +83,8 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
                           this->ogreTextureName,
                           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                           Ogre::TEX_TYPE_2D,
-                          this->imageWidthP->GetValue(), 
-                          this->imageHeightP->GetValue(), 0,
+                          this->imageSizeP->GetValue().x, 
+                          this->imageSizeP->GetValue().y, 0,
                           Ogre::PF_R8G8B8,
                           Ogre::TU_RENDERTARGET);
 
@@ -147,7 +148,7 @@ void MonoCameraSensor::UpdateChild()
   // Get access to the buffer and make an image and write it to file
   mBuffer = this->renderTexture->getBuffer(0, 0);
 
-  size = this->imageWidthP->GetValue() * this->imageHeightP->GetValue() * 3;
+  size = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * 3;
 
   // Allocate buffer
   if (!this->saveFrameBuffer)
@@ -155,18 +156,18 @@ void MonoCameraSensor::UpdateChild()
 
   mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
 
-  int top = (int)((mBuffer->getHeight() - this->imageHeightP->GetValue()) / 2.0);
-  int left = (int)((mBuffer->getWidth() - this->imageWidthP->GetValue()) / 2.0);
-  int right = left + this->imageWidthP->GetValue();
-  int bottom = top + this->imageHeightP->GetValue();
+  int top = (int)((mBuffer->getHeight() - this->imageSizeP->GetValue().y) / 2.0);
+  int left = (int)((mBuffer->getWidth() - this->imageSizeP->GetValue().x) / 2.0);
+  int right = left + this->imageSizeP->GetValue().x;
+  int bottom = top + this->imageSizeP->GetValue().y;
 
   // Get the center of the texture in RGB 24 bit format
   mBuffer->blitToMemory(
     Ogre::Box(left, top, right, bottom),
 
     Ogre::PixelBox(
-      this->imageWidthP->GetValue(),
-      this->imageHeightP->GetValue(),
+      this->imageSizeP->GetValue().x,
+      this->imageSizeP->GetValue().y,
       1,
       Ogre::PF_B8G8R8,
       this->saveFrameBuffer)
@@ -215,8 +216,8 @@ void MonoCameraSensor::SaveFrame()
   // Create image data structure
   imgData  = new Ogre::ImageCodec::ImageData();
 
-  imgData->width = this->imageWidthP->GetValue();
-  imgData->height = this->imageHeightP->GetValue();
+  imgData->width = this->imageSizeP->GetValue().x;
+  imgData->height = this->imageSizeP->GetValue().y;
   imgData->depth = 1;
   imgData->format = Ogre::PF_B8G8R8;
   size = this->GetImageByteSize();

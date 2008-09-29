@@ -178,8 +178,8 @@ void StereoCameraSensor::InitChild()
   //this->renderTargets[0]->addListener(&this->leftCameraListener);
   //this->renderTargets[1]->addListener(&this->rightCameraListener);
  
-  this->rgbBufferSize = this->imageWidthP->GetValue()*this->imageHeightP->GetValue() * 3;
-  this->depthBufferSize = this->imageWidthP->GetValue()*this->imageHeightP->GetValue();
+  this->rgbBufferSize = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * 3;
+  this->depthBufferSize = this->imageSizeP->GetValue().x*this->imageSizeP->GetValue().y;
 
   // Allocate buffers
   this->depthBuffer[0] = new float[this->depthBufferSize];
@@ -338,22 +338,22 @@ void StereoCameraSensor::FillBuffers()
 
     hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
 
-    top = (int)((hardwareBuffer->getHeight() - this->imageHeightP->GetValue()) / 2.0);
-    left = (int)((hardwareBuffer->getWidth() - this->imageWidthP->GetValue()) / 2.0);
-    right = left + this->imageWidthP->GetValue();
-    bottom = top + this->imageHeightP->GetValue();
+    top = (int)((hardwareBuffer->getHeight() - this->imageSizeP->GetValue().y) / 2.0);
+    left = (int)((hardwareBuffer->getWidth() - this->imageSizeP->GetValue().x) / 2.0);
+    right = left + this->imageSizeP->GetValue().x;
+    bottom = top + this->imageSizeP->GetValue().y;
 
     if (i < 2)
     {
       hardwareBuffer->blitToMemory ( Ogre::Box(left,top,right,bottom),
-          Ogre::PixelBox( this->imageWidthP->GetValue(), this->imageHeightP->GetValue(),
+          Ogre::PixelBox( this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y,
             1, PF_RGB, this->rgbBuffer[i])
           );
     }
     else
     {
       hardwareBuffer->blitToMemory (Ogre::Box(left,top,right,bottom),
-          Ogre::PixelBox( this->imageWidthP->GetValue(), this->imageHeightP->GetValue(),
+          Ogre::PixelBox( this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y,
             1, PF_FLOAT, this->depthBuffer[i-2])
           );
     }
@@ -379,13 +379,13 @@ void StereoCameraSensor::SaveFrame()
     return;
   }
 
-  fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", this->imageWidthP->GetValue(), this->imageHeightP->GetValue());
+  fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y);
 
-  for (unsigned int i = 0; i<this->imageHeightP->GetValue(); i++)
+  for (unsigned int i = 0; i<this->imageSizeP->GetValue().x; i++)
   {
-    for (unsigned int j =0; j<this->imageWidthP->GetValue(); j++)
+    for (unsigned int j =0; j<this->imageSizeP->GetValue().y; j++)
     {
-      double f = this->depthBuffer[0][i*this->imageWidthP->GetValue()+j];
+      double f = this->depthBuffer[0][i*this->imageSizeP->GetValue().x+j];
      
       unsigned char value = static_cast<unsigned char>(f * 255);
       fwrite( &value, 1, 1, fp );
@@ -538,7 +538,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
       name, 
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
-      this->imageWidthP->GetValue(), this->imageHeightP->GetValue(), 0,
+      this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y, 0,
       pf,
       Ogre::TU_RENDERTARGET);
 }

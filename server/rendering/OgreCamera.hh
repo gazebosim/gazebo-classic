@@ -174,7 +174,7 @@ namespace gazebo
 
     protected: ParamT<Angle> *hfovP;
     protected: ParamT<double> *nearClipP, *farClipP;
-    protected: ParamT<unsigned int> *imageWidthP, *imageHeightP;
+    protected: ParamT< Vector2<int> > *imageSizeP;
     protected: unsigned int textureWidth, textureHeight;
   
     private: Ogre::Camera *camera;

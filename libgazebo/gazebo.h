@@ -1398,6 +1398,8 @@ class StereoCameraData
   /// Right depth map (float)
   public: float right_depth[GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE];
 
+  public: char left_camera_iface_name[256];
+  public: char right_camera_iface_name[256];
 }; 
 
 
