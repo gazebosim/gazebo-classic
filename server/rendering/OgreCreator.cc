@@ -68,7 +68,8 @@ void OgreCreator::LoadBasicShapes()
   // Create some basic shapes
   OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
   OgreSimpleShape::CreateSphere("joint_anchor",0.01, 32, 32);
-  OgreSimpleShape::CreateBox("unit_box", Vector3(1,1,1));
+  OgreSimpleShape::CreateBox("unit_box_U1V1", Vector3(1,1,1), 
+                             Vector2<double>(1,1));
   OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
 }
 
@@ -159,7 +160,7 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
 
   // Set the direction which the light points
   vec = node->GetVector3("direction", Vector3(0.0, 0.0, -1.0));
-  light->setDirection(vec.x, vec.y, vec.z);
+  //light->setDirection(vec.x, vec.y, vec.z);
 
   // Absolute range of light in world coordinates
   range = node->GetTupleDouble("attenuation",0,1000);
@@ -571,6 +572,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   Ogre::RenderWindow *window = NULL;
 
   params["parentWindowHandle"] = Ogre::StringConverter::toString(display) + ":" + Ogre::StringConverter::toString(screen) + ":" + Ogre::StringConverter::toString(winId);
+  //params["FSAA"] = Ogre::StringConverter::toString(2);
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";

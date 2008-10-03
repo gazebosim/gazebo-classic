@@ -24,6 +24,7 @@
  * SVN: $Id$
  */
 #include <Ogre.h>
+#include "OgreSimpleShape.hh"
 #include "Entity.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
@@ -67,6 +68,8 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
   this->rpyP->Callback( &OgreVisual::SetRotation, this );
 
   this->meshNameP = new ParamT<std::string>("mesh","",1);
+  this->meshTileP = new ParamT< Vector2<double> >("uvTile", 
+      Vector2<double>(1.0, 1.0), 0 );
 
   this->materialNameP = new ParamT<std::string>("material",std::string(),0);
   this->materialNameP->Callback( &OgreVisual::SetMaterial, this );
@@ -89,6 +92,7 @@ OgreVisual::~OgreVisual()
   delete this->xyzP;
   delete this->rpyP;
   delete this->meshNameP;
+  delete this->meshTileP;
   delete this->materialNameP;
   delete this->castShadowsP;
 }
@@ -106,6 +110,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   this->xyzP->Load(node);
   this->rpyP->Load(node);
   this->meshNameP->Load(node);
+  this->meshTileP->Load(node);
   this->materialNameP->Load(node);
   this->castShadowsP->Load(node);
 
@@ -117,7 +122,21 @@ void OgreVisual::Load(XMLConfigNode *node)
   {
     // Create the entity
     stream << "ENTITY_" << this->sceneNode->getName();
-    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), this->meshNameP->GetValue());
+    std::string meshName = (**this->meshNameP);
+
+    if ( meshName == "unit_box")
+    {
+      meshName += "_U" + 
+        boost::lexical_cast<std::string>(this->meshTileP->GetValue().x) + "V" +
+        boost::lexical_cast<std::string>(this->meshTileP->GetValue().y);
+
+      if (!this->sceneNode->getCreator()->hasEntity(meshName))
+      {
+        OgreSimpleShape::CreateBox(meshName, Vector3(1,1,1), **this->meshTileP);
+      }
+    }
+
+    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
   }
   catch (Ogre::Exception e)
   {
@@ -537,7 +556,7 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
   this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str());
   this->boundingBoxNode->setInheritScale(false);
 
-  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box"));
+  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box_U1V1"));
 
   this->boundingBoxNode->attachObject(odeObj);
   Vector3 diff = max-min;

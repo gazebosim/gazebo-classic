@@ -29,6 +29,7 @@
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Choice.H>
+#include <FL/Fl_Gl_Window.H>
 
 #include "Global.hh"
 #include "XMLConfig.hh"
@@ -89,6 +90,7 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   this->show();
 
   Fl::check();
+  Fl::wait(0.3);
 
   // Create a dummy rendering window. This creates a context, and allows Ogre
   // to initialize properly

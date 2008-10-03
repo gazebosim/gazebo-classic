@@ -158,6 +158,7 @@ void OgreCamera::InitCam()
   this->pitchNode = this->sceneNode->createChildSceneNode( this->cameraName + "PitchNode");
   this->pitchNode->pitch(Ogre::Degree(0));
   this->pitchNode->attachObject(this->camera);
+  this->camera->setAutoAspectRatio(true);
 
   this->saveCount = 0;
 

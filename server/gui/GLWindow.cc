@@ -450,7 +450,7 @@ int GLWindow::handle(int event)
 // Handle resizing the window
 void GLWindow::resize(int x, int y, int w, int h)
 {
-  Fl_Window::resize(x,y,w,h);
+  Fl_Gl_Window::resize(x,y,w,h);
   this->userCamera->Resize(w,h);
 
   this->redraw();

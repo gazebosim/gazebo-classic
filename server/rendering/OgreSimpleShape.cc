@@ -162,7 +162,8 @@ void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int ri
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a Box mesh
-void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
+void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides,
+    const Vector2<double> &uvCoords)
 {
   Ogre::MeshPtr mesh;
   Ogre::SubMesh *subMesh;
@@ -237,33 +238,33 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
   // Vertex values
   float v[8][3] =
   {
-    {-1, -1, -1}, {+1, -1, -1}, {+1, +1, -1}, {-1, +1, -1},
-    {-1, -1, +1}, {+1, -1, +1}, {+1, +1, +1}, {-1, +1, +1}
+    {-1, -1, -1}, {-1, -1, +1}, {+1, -1, +1}, {+1, -1, -1},
+    {-1, +1, -1}, {-1, +1, +1}, {+1, +1, +1}, {+1, +1, -1}
   };
 
   // Normals for each vertex
   float n[8][3]=
   {
     {-0.577350, -0.577350, -0.577350},
-    {0.577350, -0.577350, -0.577350},
-    {0.577350, 0.577350, -0.577350},
-    {-0.577350, 0.577350, -0.577350},
     {-0.577350, -0.577350, 0.577350},
     {0.577350, -0.577350, 0.577350},
+    {0.577350, -0.577350, -0.577350},
+    {-0.577350, 0.577350, -0.577350},
+    {-0.577350, 0.577350, 0.577350},
     {0.577350, 0.577350, 0.577350},
-    {-0.577350, 0.577350, 0.577350}
+    {0.577350, 0.577350, -0.577350}
   };
 
   // Texture coords
-  int t[4][2] =
+  float t[4][2] =
   {
-    {0, 1}, {1,1}, {1, 0}, {0,0}
+    {uvCoords.x, 0}, {0, 0}, {0,uvCoords.y}, {uvCoords.x, uvCoords.y}
   };
 
   // Vertices
   int faces[6][4] =
   {
-    {2, 1, 0, 3}, {6, 7, 4, 5},
+    {2, 1, 0, 3}, {5, 6, 7, 4},
     {2, 6, 5, 1}, {1, 5, 4, 0},
     {0, 4, 7, 3}, {6, 2, 3, 7}
   };
@@ -275,14 +276,14 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
     2, 3, 0,
     4, 5, 7,
     7, 5, 6,
-    8, 9, 11,
-    11, 9, 10,
+    11,8,9,
+    9,10,11,
     12, 13, 15,
     15, 13, 14,
     16, 17, 18,
     18, 19, 16,
-    20, 21, 23,
-    23, 21, 22
+    21,22,23,
+    23,20,21,
   };
 
   // Compute the vertices
@@ -301,7 +302,9 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides)
     {
       // Set the vertex
       for (j=0; j<3; j++)
+      {
         *vertices++ = v[faces[i][k]][j];
+      }
 
       // Set the normal
       for (j=0; j<3; j++)

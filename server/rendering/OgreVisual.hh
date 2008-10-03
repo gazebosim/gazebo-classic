@@ -147,6 +147,7 @@ namespace gazebo
     private: ParamT<bool> *castShadowsP;
     private: ParamT<Vector3> *sizeP;
     private: ParamT<Vector3> *scaleP;
+    private: ParamT<Vector2<double> > *meshTileP;
   };
 }
 

@@ -158,6 +158,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
         // Create the GUI
         this->gui = new Gui(x, y, width, height, "Gazebo");
+        Fl::check();
+        Fl::wait(0.3);
         this->gui->Load(childNode);
       }
     }
