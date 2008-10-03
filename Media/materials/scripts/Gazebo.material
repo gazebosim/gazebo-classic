@@ -134,6 +134,23 @@ material Gazebo/Red
 		{
 			ambient 1.000000 0.000000 0.000000 1.000000
 			diffuse 1.000000 0.000000 0.000000 1.000000
+			specular 0.200000 0.000000 0.000000 1.000000 
+			emissive 0.000000 0.000000 0.000000 1.000000
+      lighting on
+		}
+	}
+}
+
+material Gazebo/Green
+{
+	receive_shadows on
+
+	technique
+	{
+		pass
+		{
+			ambient 0.000000 1.000000 0.000000 1.000000
+			diffuse 0.000000 1.000000 0.000000 1.000000
 			specular 0.000000 0.000000 0.000000 1.000000 
 			emissive 0.000000 0.000000 0.000000 0.000000
       lighting on
@@ -210,6 +227,59 @@ material Gazebo/Blue
 	}
 }
 
+material Gazebo/WoodFloor
+{
+  receive_shadows on
+
+  technique
+  {
+    pass
+    {
+			ambient 0.5 0.5 0.5 1.000000
+
+      texture_unit
+      {
+        texture hardwood_floor.jpg
+      }
+    }
+  }
+}
+
+material Gazebo/CeilingTiled
+{
+  receive_shadows on
+
+  technique
+  {
+    pass
+    {
+			ambient 0.5 0.5 0.5 1.000000
+
+      texture_unit
+      {
+        texture ceiling_tiled.jpg
+      }
+    }
+  }
+}
+
+material Gazebo/PaintedWall
+{
+  receive_shadows on
+
+  technique
+  {
+    pass
+    {
+			ambient 0.5 0.5 0.5 1.000000
+
+      texture_unit
+      {
+        texture paintedWall.jpg
+      }
+    }
+  }
+}
 material Gazebo/PioneerBody
 {
 	receive_shadows on
