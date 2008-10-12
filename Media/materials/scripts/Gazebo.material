@@ -59,16 +59,15 @@ material Gazebo/White
 material Gazebo/Grey
 {
   receive_shadows on
+  lighting on
 
 	technique
 	{
 		pass
 		{
-			ambient 0 0 0 1.000000
-      texture_unit
-      {
-        colour_op_ex source1 src_manual src_current 0.8 0.8 0.8
-      }
+			ambient 0.3 0.3 0.3 1.0
+      diffuse 0.5 0.5 0.5 1.0
+      specular 0.8 0.8 0.8 1
 		}
 	}
 }
