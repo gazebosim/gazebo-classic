@@ -44,6 +44,8 @@
       <linearStart>10</linearStart>
       <linearEnd>100</linearEnd>
     </fog>
+
+    <shadowTechnique>stencilAdditive</shadowTechnique>
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -122,15 +124,14 @@
     </include>
   </model:physical>
 
-  <!-- White Directional light -->
-  <model:renderable name="directional_white">
-    <xyz>0 0 2</xyz>
+  <!-- White Point light -->
+  <model:renderable name="point_white">
+    <xyz>0 2 2</xyz>
     <light>
       <type>point</type>
-      <direction>0 -0.6 -0.4</direction>
       <diffuseColor>0.8 0.8 0.8</diffuseColor>
       <specularColor>0.1 0.1 0.1</specularColor>
-      <attenuation>10 0.8 0.1 0</attenuation>
+      <attenuation>20 0.5 0.1 0</attenuation>
     </light>
   </model:renderable>
 

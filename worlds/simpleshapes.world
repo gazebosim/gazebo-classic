@@ -28,11 +28,11 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>1.0 1.0 1.0 1.0</ambient>
+    <ambient>0.1 0.1 0.1 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-    <grid>false</grid>
+    <grid>true</grid>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
@@ -102,7 +102,7 @@
     <body:plane name="plane1_body">
       <geom:plane name="plane1_geom">
         <normal>0 0 1</normal>
-        <size>2000 2000</size>
+        <size>100 100</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
         <material>Gazebo/Grey</material>
@@ -113,8 +113,8 @@
   </model:physical>
 
   <!-- White Directional light -->
-  <model:renderable name="directional_white">
-    <xyz>0 0 2</xyz>
+  <model:renderable name="point_white">
+    <xyz>0 2 2</xyz>
     <light>
       <type>point</type>
       <diffuseColor>0.8 0.8 0.8</diffuseColor>
