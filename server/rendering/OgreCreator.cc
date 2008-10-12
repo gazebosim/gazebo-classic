@@ -388,20 +388,18 @@ void OgreCreator::DrawGrid()
 
   Ogre::SceneNode* gridObjectNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode("__OGRE_GRID_NODE__");
 
-  Ogre::MaterialPtr gridObjectMaterialX = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_X__","debugger1");
-  gridObjectMaterialX->setReceiveShadows(true);
+  Ogre::MaterialPtr gridObjectMaterialX = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_X__","General");
   gridObjectMaterialX->getTechnique(0)->setLightingEnabled(true);
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.2,0.2,0.2,0);
+  gridObjectMaterialX->getTechnique(0)->getPass(0)->setDiffuse(0.2,0.2,0.2,1);
   gridObjectMaterialX->getTechnique(0)->getPass(0)->setAmbient(0.2,0.2,0.2);
-  gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.0);
+  //gridObjectMaterialX->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.0);
   gridObjectMaterialX->setReceiveShadows(false);
 
-  Ogre::MaterialPtr gridObjectMaterialY = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_Y__","debugger2");
-  gridObjectMaterialY->setReceiveShadows(true);
+  Ogre::MaterialPtr gridObjectMaterialY = Ogre::MaterialManager::getSingleton().create("__OGRE_GRID_MATERIAL_Y__","General");
   gridObjectMaterialY->getTechnique(0)->setLightingEnabled(true);
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.2,0.2,0.2,0);
+  gridObjectMaterialY->getTechnique(0)->getPass(0)->setDiffuse(0.2,0.2,0.2,1);
   gridObjectMaterialY->getTechnique(0)->getPass(0)->setAmbient(0.2,0.2,0.2);
-  gridObjectMaterialY->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.0);
+  //gridObjectMaterialY->getTechnique(0)->getPass(0)->setSelfIllumination(0.0,0.0,0.0);
   gridObjectMaterialY->setReceiveShadows(false);
 
 
@@ -540,6 +538,7 @@ void OgreCreator::DrawGrid()
   // etc
   gridObject->end();
   gridObjectNode->attachObject(gridObject);
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -571,8 +570,19 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
-  params["parentWindowHandle"] = Ogre::StringConverter::toString(display) + ":" + Ogre::StringConverter::toString(screen) + ":" + Ogre::StringConverter::toString(winId);
-  //params["FSAA"] = Ogre::StringConverter::toString(2);
+  /// Ogre 1.4 required this method to create windows
+  /*params["parentWindowHandle"] = Ogre::StringConverter::toString(display) + 
+    ":" + Ogre::StringConverter::toString(screen) + 
+    ":" + Ogre::StringConverter::toString(winId);
+    */
+
+  /// As of Ogre 1.6 this is the params method that makes a resizable window
+  params["externalWindowHandle"] =  Ogre::StringConverter::toString(display) + 
+    ":" + Ogre::StringConverter::toString(screen) + 
+    ":" + Ogre::StringConverter::toString(winId) + 
+    ":" + Ogre::StringConverter::toString(fl_visual);
+
+  params["FSAA"] = "2";
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";

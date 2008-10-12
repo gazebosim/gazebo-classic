@@ -98,14 +98,8 @@ void UserCamera::Fini()
 /// Resize the camera
 void UserCamera::Resize(unsigned int w, unsigned int h)
 {
-  //this->window->resize(w, h);
-  //this->viewport->setDimensions(0,0,1,1);
-  //this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
-  //this->viewport->update();
-  //this->viewport->_updateDimensions();
-
-  this->window->windowMovedOrResized();
-  printf("Resize[%d %d] new[%d %d]\n", w, h, this->window->getWidth(), this->window->getHeight());
+  this->window->resize(w, h);
+  this->viewport->setDimensions(0,0,1,1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
