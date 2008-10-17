@@ -1,0 +1,9 @@
+/home/nate/work/psg/player/libplayercore/plugins.cc:158 trying to load /home/nate/work/psg/gazebo/trunk/examples/player/laser/./libgazeboplugin...
+/home/nate/work/psg/player/libplayercore/plugins.cc:162 failed (/home/nate/work/psg/gazebo/trunk/examples/player/laser/./libgazeboplugin.so: cannot open shared object file: No such file or directory)
+
+/home/nate/work/psg/player/libplayercore/plugins.cc:173 trying to load /home/nate/local/lib/libgazeboplugin...
+/home/nate/work/psg/player/libplayercore/plugins.cc:175 success
+/home/nate/work/psg/player/libplayercore/plugins.cc:215 invoking player_driver_init()...
+/home/nate/work/psg/player/libplayercore/plugins.cc:231 success
+/home/nate/work/psg/player/libplayertcp/playertcp.cc:288 accepted TCP client 0 on port 6665, fd 7
+/home/nate/work/psg/player/libplayertcp/playertcp.cc:385 closing TCP connection to client 0 on port 6665
