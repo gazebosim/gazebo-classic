@@ -313,6 +313,21 @@ void OgreCamera::EnableSaveFrame(bool enable)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Set the save frame pathname
+void OgreCamera::SetSaveFramePathname(const std::string &pathname)
+{
+  this->savePathnameP->SetValue( pathname );
+
+  // Create the directory to store frames
+  if (this->saveFramesP->GetValue())
+  {
+    std::string command;
+    command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
+    system(command.c_str());
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// Toggle saving of frames
 void OgreCamera::ToggleSaveFrame()
 {

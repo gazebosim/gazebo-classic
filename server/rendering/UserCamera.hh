@@ -80,6 +80,7 @@ namespace gazebo
 
     private: std::string name;
     private: static unsigned int cameraCount;
+    private: static int count;
   };
 }
 

@@ -141,7 +141,10 @@ namespace gazebo
   
     /// \brief Enable or disable saving
     public: void EnableSaveFrame(bool enable);
-  
+ 
+    /// \brief Set the save frame pathname
+    public: void SetSaveFramePathname(const std::string &pathname);
+
     /// \brief Toggle saving of frames
     public: void ToggleSaveFrame();
   

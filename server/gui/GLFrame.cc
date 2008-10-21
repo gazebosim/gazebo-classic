@@ -107,11 +107,14 @@ GLFrame::~GLFrame()
 // Load the frame
 void GLFrame::Load( XMLConfigNode *node )
 {
+  this->saveFrames = false;
 
   if (node)
   {
     this->startPose.pos = node->GetVector3("xyz", Vector3(0,0,0));
     this->startPose.rot = node->GetRotation("rpy", Quatern());
+    this->saveFrames = node->GetBool("saveFrames",false,0);
+    this->savePathname = node->GetString("saveFramePath","",0);
   }
 
 }
@@ -122,6 +125,8 @@ void GLFrame::Init()
 {
   this->glWindow->Init();
   this->glWindow->GetCamera()->SetWorldPose(this->startPose);
+  this->glWindow->GetCamera()->EnableSaveFrame(this->saveFrames);
+  this->glWindow->GetCamera()->SetSaveFramePathname(this->savePathname);
 
   CameraManager::Instance()->ConnectAddCameraSignal( boost::bind(&GLFrame::CameraAddedSlot, this, _1) );
 }

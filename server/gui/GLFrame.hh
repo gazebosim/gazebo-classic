@@ -96,6 +96,9 @@ namespace gazebo
 
     /// Starting pose of the camera
     private: Pose3d startPose;
+
+    private: bool saveFrames;
+    private: std::string savePathname;
   };
 }
 

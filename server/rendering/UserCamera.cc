@@ -36,13 +36,21 @@
 
 using namespace gazebo;
 
+int UserCamera::count = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 UserCamera::UserCamera(GLWindow *parentWindow)
   : OgreCamera("UserCamera")
 {
+  std::stringstream stream;
+
   this->window = OgreCreator::CreateWindow(parentWindow, 
                      parentWindow->w(), parentWindow->h());
+
+
+  stream << "UserCamera_" << this->count++;
+  this->name = stream.str(); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +83,7 @@ void UserCamera::Init()
   this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
 
   this->viewport->setVisibilityMask(this->visibilityMask);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,6 +93,25 @@ void UserCamera::Update()
   OgreCamera::UpdateCam();
 
   OgreAdaptor::Instance()->UpdateWindow(this->window, this);
+
+
+  if (this->saveFramesP->GetValue())
+  {
+    char tmp[1024];
+    if (!this->savePathnameP->GetValue().empty())
+    {
+      sprintf(tmp, "%s/%s-%04d.jpg", this->savePathnameP->GetValue().c_str(),
+          this->name.c_str(), this->saveCount);
+    }
+    else
+    {
+      sprintf(tmp, "%s-%04d.jpg", this->name.c_str(), this->saveCount);
+    }
+
+    this->window->writeContentsToFile(tmp);
+
+    this->saveCount++;
+  }
 }
 
 
