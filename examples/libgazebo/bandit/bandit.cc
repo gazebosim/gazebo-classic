@@ -1,6 +1,17 @@
 #include <gazebo/gazebo.h>
 #include <gazebo/GazeboError.hh>
 
+#include <math.h>
+
+#define DTOR(d) ((d) * M_PI / 180)
+#define RTOD(r) ((r) * 180 / M_PI)
+
+enum Joint {HEAD, NECK, R_SHOULDER, R_SHOULDER2, R_ELBOW, R_ELBOW2, 
+  R_WRIST, R_WRIST2, R_HAND, 
+  L_SHOULDER, L_SHOULDER2, L_ELBOW, L_ELBOW2, L_WRIST, 
+  L_WRIST2, L_HAND, NUM_JOINTS};
+
+
 int main()
 {
   gazebo::Client *client = new gazebo::Client();
@@ -43,7 +54,27 @@ int main()
     return -1;
   }
 
-  while (true)
+  printf("Shoulder2[%f]\n", RTOD(actarrayIface->data->actuators[R_SHOULDER2].position));
+
+  actarrayIface->data->cmd_pos[R_SHOULDER2] = DTOR(80);
+  actarrayIface->data->cmd_pos[R_ELBOW] = DTOR(90);
+  usleep(1000000);
+  actarrayIface->data->cmd_pos[R_ELBOW2] = DTOR(100);
+  usleep(500000);
+  actarrayIface->data->cmd_pos[R_ELBOW2] = DTOR(0);
+  usleep(500000);
+
+  actarrayIface->data->cmd_pos[R_ELBOW2] = DTOR(100);
+  usleep(500000);
+  actarrayIface->data->cmd_pos[R_ELBOW2] = DTOR(0);
+  usleep(500000);
+  actarrayIface->data->cmd_pos[R_ELBOW2] = DTOR(100);
+
+  actarrayIface->data->cmd_pos[R_ELBOW2] = DTOR(0);
+  actarrayIface->data->cmd_pos[R_SHOULDER2] = DTOR(0);
+  sleep(2);
+
+  /*while (true)
   {
     actarrayIface->Lock(1);
     actarrayIface->data->cmd_pos[16] = 0.3;
@@ -52,8 +83,7 @@ int main()
     actarrayIface->data->cmd_pos[19] = -0.3;
     actarrayIface->Unlock();
 
-    usleep(100000);
-  }
+  }*/
   return 0;
 }
 

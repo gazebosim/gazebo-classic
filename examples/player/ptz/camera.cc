@@ -16,10 +16,16 @@ int main()
     // Subscribe to the camera proxy
     PtzProxy ptzp(&robot, 0);
 
+    while (true)
+    {
+      robot.Read();
+      ptzp.SetCam(30,10,0 );
+    }
   }
   catch (PlayerCc::PlayerError e)
   {
     std::cerr << "Error:" << e << std::endl;
     return -1;
   }
+
 }
