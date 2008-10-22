@@ -90,7 +90,7 @@
       <hfov>60</hfov>
       <nearClip>0.1</nearClip>
       <farClip>100</farClip>
-      <saveFrames>true</saveFrames>
+      <saveFrames>false</saveFrames>
       <saveFramePath>frames</saveFramePath>
 
       <controller:generic_camera name="sonyvid30_camera_controller">
