@@ -584,7 +584,7 @@ class CameraData
   /// Pose of the camera
   public: Pose camera_pose;
 
-  public: bool saveFrames;
+  public: int saveFrames;
 };
 
 /// \brief The camera interface
