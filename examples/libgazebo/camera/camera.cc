@@ -68,6 +68,19 @@ int main()
     return -1;
   }
 
+  // Save frames using gazebo's build in method
+  printf("Save frames on\n");
+  camIface->Lock(1);
+  camIface->data->saveFrames = true;
+  camIface->Unlock();
+  usleep(1000000);
+
+  printf("Save frames off\n");
+  camIface->Lock(1);
+  camIface->data->saveFrames = false;
+  camIface->Unlock();
+
+  // Manually save frames
   int count = 0;
   char filename[50];
   while (true)
@@ -76,10 +89,10 @@ int main()
     camIface->Lock(1);
     SaveFrame(filename, camIface->data);
     camIface->Unlock();
-
     usleep(100000);
     count++;
   }
+
   return 0;
 }
 
