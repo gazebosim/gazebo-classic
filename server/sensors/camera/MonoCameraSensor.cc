@@ -27,6 +27,7 @@
 #include <sstream>
 #include <OgreImageCodec.h>
 #include <Ogre.h>
+#include <dirent.h>
 
 #include "Controller.hh"
 #include "Global.hh"
@@ -177,7 +178,9 @@ void MonoCameraSensor::UpdateChild()
 
 
   if (this->saveFramesP->GetValue())
+  {
     this->SaveFrame();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -209,6 +212,15 @@ void MonoCameraSensor::SaveFrame()
   size_t size, pos;
 
   this->GetImageData();
+
+  // Create a directory if not present
+  DIR *dir = opendir( this->savePathnameP->GetValue().c_str() );
+  if (!dir)
+  {
+    std::string command;
+    command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
+    system(command.c_str());
+  }
 
   // Get access to the buffer and make an image and write it to file
   mBuffer = this->renderTexture->getBuffer(0, 0);

@@ -135,6 +135,8 @@ void Generic_Camera::PutCameraData()
 
   memcpy(dst, src, data->image_size);
 
+  this->myParent->EnableSaveFrame( data->saveFrames );
+
   this->cameraIface->Unlock();
 
   // New data is available
