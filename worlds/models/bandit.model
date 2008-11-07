@@ -74,7 +74,7 @@
       <hfov>60</hfov>
       <nearClip>0.1</nearClip>
       <farClip>100</farClip>
-      <saveFrames>true</saveFrames>
+      <saveFrames>false</saveFrames>
       <saveFramePath>frames</saveFramePath>
       <baseline>0.2</baseline>
 

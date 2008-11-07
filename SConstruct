@@ -86,12 +86,12 @@ subdirs = ['libgazebo','server', 'player']
 
 # Set the compile mode
 if env['mode'] == 'debug':
-  env['CCFLAGS'] += Split('-ggdb -g2 -Wall -Wno-deprecated')
+  env['CCFLAGS'] += Split('-ggdb -g2 -Wall -Wno-deprecated -fPIC')
 elif env['mode'] == 'profile':
-  env['CCFLAGS'] += Split('-ggdb -g2 -pg') 
+  env['CCFLAGS'] += Split('-ggdb -g2 -pg -fPIC') 
   env['LINKFLAGS'] += Split('-pg') 
 elif env['mode'] == 'optimized':
-  env['CCFLAGS'] += Split('-O3') 
+  env['CCFLAGS'] += Split('-O3 -fPIC') 
 
 if env['with_audio'] == 'yes':
   parseConfigs+=['pkg-config --cflags --libs OgreAL']
