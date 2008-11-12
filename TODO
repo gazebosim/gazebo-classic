@@ -2,6 +2,7 @@ Open:
 - Make headless
 - Mouse picking
   -Implement in CameraSensor class.
+- FSAA: See OgreCreator::CreateWindow
 - Shadows draw on multiple surfaces(seem to pass through walls).
 - Removing the sky results in a black screen
 - Apply Linear and Angular Damping, see OGREODE sources.
