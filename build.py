@@ -34,9 +34,21 @@ def CreateRelease():
   os.system(sysCmd)
 
   
+def CheckPkgConfig(context, version):
+  context.Message( 'Checking for pkg-config... ' )
+  ret = context.TryAction('pkg-config --atleast-pkgconfig-version=%s' % version)[0]
+  context.Result( ret )
+  return ret
+
+def CheckPkg(context, name):
+  context.Message( 'Checking for %s...' % name)
+  action = 'PKG_CONFIG_PATH=%s pkg-config --exists \'%s\'' % (os.environ['PKG_CONFIG_PATH'], name);
+  ret = context.TryAction(action)[0]
+  context.Result(ret)
+  return ret
 
 def CheckODELib(context):
-  context.Message('Checking for ODE...')
+  context.Message('Checking for ODE trimesh support...')
   oldLibs = context.env['LIBS']
   context.env.Replace(LIBS='ode')
   result = context.TryLink(ode_test_source_file, '.cpp')
