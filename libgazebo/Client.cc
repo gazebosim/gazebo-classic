@@ -195,8 +195,9 @@ void Client::SemInit()
   if (this->semId < 0)
   {
     std::ostringstream stream;
-    stream << "Failed to allocate semaphore [" << strerror(errno) << "]\n"
-    << "The server does not appear to be running";
+    stream << "libgazebo client failed to allocate semaphore [" 
+      << strerror(errno) << "]\n" << "The server does not appear to be running."
+      << "Make sure you have started gazebo before running a client program.";
     throw(stream.str());
   }
 }

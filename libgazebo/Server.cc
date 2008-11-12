@@ -225,7 +225,7 @@ void Server::SemInit(int force)
   // Create semaphores for clients
   if (this->semId < 0)
   {
-    stream << "Failed to allocate semaphore [" << strerror(errno) << "]";
+    stream << "libgazebo server failed to allocate semaphore [" << strerror(errno) << "]";
 
     if (errno == EEXIST)
     {
