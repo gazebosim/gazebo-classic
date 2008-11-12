@@ -62,7 +62,7 @@ Generic_PTZ::Generic_PTZ(Entity *parent)
   this->panJointNameP = new ParamT<std::string>("panJoint", "", 1);
   this->tiltJointNameP = new ParamT<std::string>("tiltJoint", "", 1);
   this->motionGainP = new ParamT<double>("motionGain",2,0);
-  this->forceP = new ParamT<double>("force",0.1,0);
+  this->forceP = new ParamT<double>("force",0.01,0);
   Param::End();
 }
 
@@ -156,11 +156,10 @@ void Generic_PTZ::UpdateChild()
     this->cmdPan = -M_PI*0.3;
 
   // Apply limits on commanded zoom
-  /*if (this->cmdZoom < this->zoomMin)
-    this->cmdZoom = this->zoomMin;
-  if (this->cmdZoom > this->zoomMax)
-    this->cmdZoom = this->zoomMax;
-    */
+  //if (this->cmdZoom < this->zoomMin)
+   // this->cmdZoom = this->zoomMin;
+  //if (this->cmdZoom > this->zoomMax)
+   // this->cmdZoom = this->zoomMax;
 
   // Set the pan and tilt motors; can't set angles so track cmds with
   // a proportional control
