@@ -5,6 +5,10 @@ import commands
 
 exec(open('build.py'))
 
+PKG_CONFIG_VERSION = '0.23'
+OGRE_VERSION = '= 1.6.0'
+ODE_VERSION = '>= 0.10.1'
+
 if 'release' in COMMAND_LINE_TARGETS:
   CreateRelease()
   exit()
@@ -96,8 +100,26 @@ elif env['mode'] == 'optimized':
 if env['with_audio'] == 'yes':
   parseConfigs+=['pkg-config --cflags --libs OgreAL']
 
-
 optimize_for_cpu(env);
+
+# Setup the configuration environment.
+conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib,
+                                      'CheckPkgConfig' : CheckPkgConfig,
+                                      'CheckPkg' : CheckPkg})
+# Check for pkg-config 
+if not conf.CheckPkgConfig(PKG_CONFIG_VERSION):
+  print '  Error: pkg-config version >= 0.23 not found.'
+  Exit(1)
+
+# Check for the correct OGRE version
+if not conf.CheckPkg('OGRE ' + OGRE_VERSION):
+  print ' Error: OGRE version = ' + OGRE_VERSION + ' not found.'
+  Exit(1)
+
+# Check for the correct ODE version
+if not conf.CheckPkg('ode ' + ODE_VERSION):
+  print ' Error: ODE version = ' + ODE_VERSION + ' not found.'
+  Exit(1)
 
 #
 # Parse all the pacakge configurations
@@ -131,39 +153,36 @@ if not env.GetOption('clean'):
         print "http://www.ogre3d.org/phpBB2addons/viewtopic.php?t=3293"
         Exit(1)
 
-   #FIXME: if this check fails, it makes it fail the check for ODE  
-  # This test should be done outside of the configure context below, because
-  # otherwise it tries to link against the not-yet-built libgazebo, causing
-  # the test to always fail.
-  simpleenv = Environment()
-  simpleconf = Configure(env)
-  if not simpleconf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
-    print "  Warning: Failed to find ltdl, no plugin support will be included"
-    env["HAVE_LTDL"]=False
-  else:
-    env["HAVE_LTDL"]=True
-    env["CCFLAGS"].append("-DHAVE_LTDL")
-  simpleconf.Finish()
+# Check for trimesh support in ODE
+if not conf.CheckODELib():
+  print '  Error: ODE not compiled with trimesh support.'
+  Exit(1)
 
-  conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib})
-   
-  #Check for the ODE library and header
-  if not conf.CheckCHeader('ode/ode.h'):
-    print "  Error: Install ODE (http://www.ode.org)"
-    Exit(1)
-    
-  # Check for trimesh support in ODE
-  if not conf.CheckODELib():
-    print '  Error: ODE not compiled with trimesh support.'
-    Exit(1)
-  env = conf.Finish()
-  
-  # # Check for boost_python
-  #if not conf.CheckLibWithHeader('boost_python', 'boost/python.hpp', 'C'):
-  #  print 'Did not find libboost_python exiting'
-  #  Exit(1)
-  #else:
-  #  conf.env.Append(LIBS="boost_python")
+env = conf.Finish()
+
+
+
+# FIXME: if this check fails, it makes it fail the check for ODE  
+# This test should be done outside of the configure context below, because
+# otherwise it tries to link against the not-yet-built libgazebo, causing
+# the test to always fail.
+simpleenv = Environment()
+simpleconf = Configure(env)
+if not simpleconf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
+  print "  Warning: Failed to find ltdl, no plugin support will be included"
+  env["HAVE_LTDL"]=False
+else:
+  env["HAVE_LTDL"]=True
+  env["CCFLAGS"].append("-DHAVE_LTDL")
+simpleconf.Finish()
+
+
+# # Check for boost_python
+#if not conf.CheckLibWithHeader('boost_python', 'boost/python.hpp', 'C'):
+#  print 'Did not find libboost_python exiting'
+#  Exit(1)
+#else:
+#  conf.env.Append(LIBS="boost_python")
 
 
 #staticObjs = []
