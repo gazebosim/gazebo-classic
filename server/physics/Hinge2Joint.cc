@@ -45,6 +45,7 @@ Hinge2Joint::Hinge2Joint( dWorldID worldId )
   this->hiStop1P = new ParamT<Angle>("highStop1",M_PI,0);
   this->loStop2P = new ParamT<Angle>("lowStop2",-M_PI,0);
   this->hiStop2P = new ParamT<Angle>("highStop2",M_PI,0);
+  this->suspensionCfmP = new ParamT<double>("suspensionCfm",0.0,0);
   Param::End();
 }
 
@@ -59,6 +60,7 @@ Hinge2Joint::~Hinge2Joint()
   delete this->hiStop1P;
   delete this->loStop2P;
   delete this->hiStop2P;
+  delete this->suspensionCfmP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -71,6 +73,7 @@ void Hinge2Joint::LoadChild(XMLConfigNode *node)
   this->hiStop1P->Load(node);
   this->loStop2P->Load(node);
   this->hiStop2P->Load(node);
+  this->suspensionCfmP->Load(node);
 
   this->SetAxis1(**(this->axis1P));
   this->SetAxis2(**(this->axis2P));
@@ -86,6 +89,9 @@ void Hinge2Joint::LoadChild(XMLConfigNode *node)
   this->SetParam(dParamHiStop2, this->hiStop2P->GetValue().GetAsRadian());
   this->SetParam(dParamLoStop2, this->loStop2P->GetValue().GetAsRadian());
   this->SetParam(dParamHiStop2, this->hiStop2P->GetValue().GetAsRadian());
+
+  // Suspension CFM is only valid for Hinge2 joints
+  this->SetParam(dParamSuspensionCFM, **(this->suspensionCfmP));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -99,6 +105,8 @@ void Hinge2Joint::SaveChild(std::string &prefix, std::ostream &stream)
   stream << prefix << *(this->axis2P) << "\n";
   stream << prefix << *(this->loStop2P) << "\n";
   stream << prefix << *(this->hiStop2P) << "\n";
+
+  stream << prefix << "  " << *(this->suspensionCfmP) << "\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

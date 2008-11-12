@@ -44,12 +44,12 @@ Joint::Joint()
   Param::Begin(&this->parameters);
   this->erpP = new ParamT<double>("erp",0.4,0);
   this->cfmP = new ParamT<double>("cfm",10e-3,0);
-  this->suspensionCfmP = new ParamT<double>("suspensionCfm",0.0,0);
   this->body1NameP = new ParamT<std::string>("body1",std::string(),1);
   this->body2NameP = new ParamT<std::string>("body2",std::string(),1);
   this->anchorBodyNameP = new ParamT<std::string>("anchor",std::string(),0);
   this->anchorOffsetP = new ParamT<Vector3>("anchorOffset",Vector3(0,0,0), 0);
   this->provideFeedbackP = new ParamT<bool>("provideFeedback", false, 0);
+  this->fudgeFactorP = new ParamT<double>( "fudgeFactor", 1.0, 0 );
   Param::End();
 }
 
@@ -61,12 +61,12 @@ Joint::~Joint()
   dJointDestroy( this->jointId );
   delete this->erpP;
   delete this->cfmP;
-  delete this->suspensionCfmP;
   delete this->body1NameP;
   delete this->body2NameP;
   delete this->anchorBodyNameP;
   delete this->anchorOffsetP;
   delete this->provideFeedbackP;
+  delete this->fudgeFactorP;
 }
 
 
@@ -90,8 +90,8 @@ void Joint::Load(XMLConfigNode *node)
   this->anchorOffsetP->Load(node);
   this->erpP->Load(node);
   this->cfmP->Load(node);
-  this->suspensionCfmP->Load(node);
   this->provideFeedbackP->Load(node);
+  this->fudgeFactorP->Load(node);
 
   Body *body1 = this->model->GetBody( **(this->body1NameP));
   Body *body2 = this->model->GetBody(**(this->body2NameP));
@@ -107,8 +107,11 @@ void Joint::Load(XMLConfigNode *node)
 
   // Set joint parameters
   this->SetParam(dParamSuspensionERP, **(this->erpP));
-  this->SetParam(dParamSuspensionCFM, **(this->suspensionCfmP));
   this->SetParam(dParamCFM, **(this->cfmP));
+  this->SetParam(dParamFudgeFactor, **(this->fudgeFactorP));
+  this->SetParam(dParamVel,0);
+  this->SetParam(dParamFMax,0);
+  this->SetParam(dParamBounce, 0);
 
   this->Attach(body1,body2);
 
@@ -169,7 +172,7 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 
   stream << prefix << "  " << *(this->erpP) << "\n";
   stream << prefix << "  " << *(this->cfmP) << "\n";
-  stream << prefix << "  " << *(this->suspensionCfmP) << "\n";
+  stream << prefix << "  " << *(this->fudgeFactorP) << "\n";
 
   std::string p = prefix + "  ";
   this->SaveChild(p,stream);

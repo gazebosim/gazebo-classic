@@ -154,6 +154,8 @@ class Hinge2Joint : public Joint
   private: ParamT<Vector3> *axis2P;
   private: ParamT<Angle> *loStop2P;
   private: ParamT<Angle> *hiStop2P; 
+
+  private: ParamT<double> *suspensionCfmP;
 };
 
 /// \}

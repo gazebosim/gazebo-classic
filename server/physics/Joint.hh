@@ -156,12 +156,12 @@ namespace gazebo
     /// Name of this joint
     private: ParamT<double> *erpP;
     private: ParamT<double> *cfmP;
-    private: ParamT<double> *suspensionCfmP;
     private: ParamT<std::string> *body1NameP;
     private: ParamT<std::string> *body2NameP;
     private: ParamT<std::string> *anchorBodyNameP;
     private: ParamT<Vector3> *anchorOffsetP;
     private: ParamT<bool> *provideFeedbackP;
+    private: ParamT<double> *fudgeFactorP;
 
     /// Feedback data for this joint
     private: dJointFeedback *feedback;
