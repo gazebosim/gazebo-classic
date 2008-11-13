@@ -186,6 +186,42 @@ void StereoCameraSensor::InitChild()
   this->depthBuffer[1] = new float[this->depthBufferSize];
   this->rgbBuffer[0] = new unsigned char[this->rgbBufferSize];
   this->rgbBuffer[1] = new unsigned char[this->rgbBufferSize];
+
+  Ogre::MaterialPtr debugMat = Ogre::MaterialManager::getSingleton().create(
+      "Ogre/DebugShadowMap0", 
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+  debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+  Ogre::TexturePtr shadowTex = OgreAdaptor::Instance()->sceneMgr->getShadowTexture(0);
+  Ogre::TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(shadowTex->getName());
+  t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+
+  /*debugMat = Ogre::MaterialManager::getSingleton().create(
+      "Ogre/DebugShadowMap1", 
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+  shadowTex = OgreAdaptor::Instance()->sceneMgr->getShadowTexture(1);
+  t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(shadowTex->getName());
+  t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+
+
+  Ogre::OverlayContainer* debugPanel = (Ogre::OverlayContainer*)
+    (Ogre::OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugShadowPanel0"));
+  debugPanel->_setPosition(0.8, 0);
+  debugPanel->_setDimensions(0.2, 0.2);
+  debugPanel->setMaterialName("Ogre/DebugShadowMap0");
+  Ogre::Overlay* debugOverlay = Ogre::OverlayManager::getSingleton().getByName("Core/DebugOverlay");
+  if (!debugOverlay)
+    printf("NULL\n");
+  debugOverlay->add2D(debugPanel);
+                          
+  debugPanel = (Ogre::OverlayContainer*)
+    (Ogre::OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugShadowPanel1"));
+  debugPanel->_setPosition(0.8, 0.2);
+  debugPanel->_setDimensions(0.2, 0.2);
+  debugPanel->setMaterialName("Ogre/DebugShadowMap1");
+  debugOverlay->add2D(debugPanel);
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -281,10 +317,10 @@ void StereoCameraSensor::UpdateChild()
   sceneMgr->_suppressRenderStateChanges(false); 
 
   // Render the image texture
-  for (i=0; i<2; i++)
+  /*for (i=0; i<2; i++)
   {
     this->renderTargets[i]->update();
-  }
+  }*/
 
   if (gridNode)
     gridNode->setVisible(true);

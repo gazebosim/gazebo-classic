@@ -129,6 +129,9 @@ void GLFrame::Init()
   this->glWindow->GetCamera()->SetSaveFramePathname(this->savePathname);
 
   CameraManager::Instance()->ConnectAddCameraSignal( boost::bind(&GLFrame::CameraAddedSlot, this, _1) );
+
+  this->show();
+  this->redraw();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
