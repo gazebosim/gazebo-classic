@@ -128,16 +128,12 @@ void StereoCameraSensor::InitChild()
   for (i = 2; i<4; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], true);
+    printf("RTT WH[%d %d]\n",this->renderTexture[i]->getWidth(),this->renderTexture[i]->getHeight());
     this->renderTargets[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
     this->renderTargets[i]->setAutoUpdated(false);
   }
 
-  // Create the camera
-  /*this->camera = OgreCreator::CreateCamera(this->GetName(),
-                 this->nearClip, this->farClip, this->hfov, 
-                 this->renderTargets[D_LEFT]);
-                 */
-  this->renderTarget = this->renderTargets[D_LEFT];
+    this->renderTarget = this->renderTargets[D_LEFT];
 
   this->InitCam();
 
@@ -158,6 +154,10 @@ void StereoCameraSensor::InitChild()
     matPtr = Ogre::MaterialManager::getSingleton().create(
              this->materialName[i],
              Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    matPtr->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
+    matPtr->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
+    matPtr->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+    
 
     matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
         this->textureName[i] );
@@ -172,12 +172,6 @@ void StereoCameraSensor::InitChild()
   this->textureHeight = mBuffer->getHeight();
 
 
-  //this->leftCameraListener.Init(this, this->renderTargets[0], true);
-  //this->rightCameraListener.Init(this, this->renderTargets[1], false);
-
-  //this->renderTargets[0]->addListener(&this->leftCameraListener);
-  //this->renderTargets[1]->addListener(&this->rightCameraListener);
- 
   this->rgbBufferSize = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * 3;
   this->depthBufferSize = this->imageSizeP->GetValue().x*this->imageSizeP->GetValue().y;
 
@@ -187,41 +181,19 @@ void StereoCameraSensor::InitChild()
   this->rgbBuffer[0] = new unsigned char[this->rgbBufferSize];
   this->rgbBuffer[1] = new unsigned char[this->rgbBufferSize];
 
-  Ogre::MaterialPtr debugMat = Ogre::MaterialManager::getSingleton().create(
-      "Ogre/DebugShadowMap0", 
-      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  // Uncomment this section to create a debug overaly
+  /*{
+    Ogre::Overlay *overlay = Ogre::OverlayManager::getSingletonPtr()->create("__GAZEBO_STEREO_DEBUG_OVERLAY__");
 
-  debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-  Ogre::TexturePtr shadowTex = OgreAdaptor::Instance()->sceneMgr->getShadowTexture(0);
-  Ogre::TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(shadowTex->getName());
-  t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+    Ogre::OverlayContainer *overlayPanel = (Ogre::OverlayContainer*)(Ogre::OverlayManager::getSingletonPtr()->createOverlayElement("Panel", "__GAZEBO_PANEL"));
+    overlayPanel->setPosition(0.5, 0);
+    overlayPanel->_setDimensions(0.5, 0.5);
+    overlayPanel->setMaterialName(this->materialName[D_LEFT]);
 
-  /*debugMat = Ogre::MaterialManager::getSingleton().create(
-      "Ogre/DebugShadowMap1", 
-      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-  debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-  shadowTex = OgreAdaptor::Instance()->sceneMgr->getShadowTexture(1);
-  t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState(shadowTex->getName());
-  t->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
+    overlay->add2D(overlayPanel);
 
-
-  Ogre::OverlayContainer* debugPanel = (Ogre::OverlayContainer*)
-    (Ogre::OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugShadowPanel0"));
-  debugPanel->_setPosition(0.8, 0);
-  debugPanel->_setDimensions(0.2, 0.2);
-  debugPanel->setMaterialName("Ogre/DebugShadowMap0");
-  Ogre::Overlay* debugOverlay = Ogre::OverlayManager::getSingleton().getByName("Core/DebugOverlay");
-  if (!debugOverlay)
-    printf("NULL\n");
-  debugOverlay->add2D(debugPanel);
-                          
-  debugPanel = (Ogre::OverlayContainer*)
-    (Ogre::OverlayManager::getSingleton().createOverlayElement("Panel", "Ogre/DebugShadowPanel1"));
-  debugPanel->_setPosition(0.8, 0.2);
-  debugPanel->_setDimensions(0.2, 0.2);
-  debugPanel->setMaterialName("Ogre/DebugShadowMap1");
-  debugOverlay->add2D(debugPanel);
-  */
+    overlay->show();
+  }*/
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -262,8 +234,6 @@ void StereoCameraSensor::UpdateChild()
 
   sceneMgr->_suppressRenderStateChanges(true);
 
-  //prev_pass = sceneMgr->getPass();
-
   // Get pointer to the material pass
   pass = this->depthMaterial->getBestTechnique()->getPass(0);
 
@@ -292,7 +262,10 @@ void StereoCameraSensor::UpdateChild()
     autoParamDataSource.setCurrentSceneManager(sceneMgr);
     autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
     pass->_updateAutoParamsNoLights(&autoParamDataSource);
-
+    
+    renderSys->setLightingEnabled(false);
+    renderSys->_setFog(Ogre::FOG_NONE);
+    
     // These two lines don't seem to do anything useful
     renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS()); 
     renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
@@ -310,22 +283,24 @@ void StereoCameraSensor::UpdateChild()
       renderSys->bindGpuProgram( pass->getFragmentProgram()->_getBindingDelegate() );
       renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
           pass->getFragmentProgramParameters());
-    }   
+    }
+    
+
     this->renderTargets[i]->update();
   }
 
   sceneMgr->_suppressRenderStateChanges(false); 
 
   // Render the image texture
-  /*for (i=0; i<2; i++)
+  for (i=0; i<2; i++)
   {
     this->renderTargets[i]->update();
-  }*/
+  }
 
   if (gridNode)
     gridNode->setVisible(true);
 
-  this->FillBuffers();
+    this->FillBuffers();
 
   if (this->saveFramesP->GetValue())
     this->SaveFrame();
@@ -389,7 +364,8 @@ void StereoCameraSensor::FillBuffers()
     else
     {
       hardwareBuffer->blitToMemory (Ogre::Box(left,top,right,bottom),
-          Ogre::PixelBox( this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y,
+          Ogre::PixelBox( this->imageSizeP->GetValue().x, 
+            this->imageSizeP->GetValue().y,
             1, PF_FLOAT, this->depthBuffer[i-2])
           );
     }
@@ -417,9 +393,9 @@ void StereoCameraSensor::SaveFrame()
 
   fprintf( fp, "P6\n# Gazebo\n%d %d\n255\n", this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y);
 
-  for (unsigned int i = 0; i< (unsigned int)this->imageSizeP->GetValue().x; i++)
+  for (unsigned int i = 0; i< (unsigned int)this->imageSizeP->GetValue().y; i++)
   {
-    for (unsigned int j =0; j<(unsigned int)this->imageSizeP->GetValue().y; j++)
+    for (unsigned int j =0; j<(unsigned int)this->imageSizeP->GetValue().x; j++)
     {
       double f = this->depthBuffer[0][i*this->imageSizeP->GetValue().x+j];
      

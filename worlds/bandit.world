@@ -124,8 +124,9 @@
   </model:physical>
 
   <model:physical name="cylinder1_model">
-    <xyz>10 0 0.5</xyz>
+    <xyz>5 0 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
+    <static>true</static>
 
     <body:cylinder name="cylinder1_body">
       <geom:cylinder name="cylinder1_geom">
@@ -139,15 +140,33 @@
     </body:cylinder>
   </model:physical>
 
+
+  <model:physical name="cylinder2_model">
+    <xyz>10 0 2.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <static>true</static>
+
+    <body:cylinder name="cylinder2_body">
+      <geom:cylinder name="cylinder2_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+
   <!-- White Directional light -->
-  <model:renderable name="directional_white">
+  <model:renderable name="point_white">
+    <xyz>0 2 2</xyz>
     <light>
-      <type>directional</type>
-      <direction>-1 1.0 -0.5</direction>
-      <diffuseColor>0.2 0.2 0.2</diffuseColor>
-      <specularColor>0.0 0.0 0.0</specularColor>
-      <attenuation>100 0.0 1.0 0.4</attenuation>
+      <type>point</type>
+      <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      <specularColor>0.1 0.1 0.1</specularColor>
+      <attenuation>10 0.8 0.1 0.0</attenuation>
     </light>
   </model:renderable>
-
+ 
 </gazebo:world>
