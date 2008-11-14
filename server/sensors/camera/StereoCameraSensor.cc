@@ -128,7 +128,6 @@ void StereoCameraSensor::InitChild()
   for (i = 2; i<4; i++)
   {
     this->renderTexture[i] = this->CreateRTT(this->textureName[i], true);
-    printf("RTT WH[%d %d]\n",this->renderTexture[i]->getWidth(),this->renderTexture[i]->getHeight());
     this->renderTargets[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
     this->renderTargets[i]->setAutoUpdated(false);
   }

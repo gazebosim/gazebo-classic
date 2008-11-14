@@ -100,7 +100,7 @@
         <imageSize>320 240</imageSize>
         <hfov>60</hfov>
         <nearClip>0.1</nearClip>
-        <farClip>1000</farClip>
+        <farClip>10</farClip>
         <saveFrames>false</saveFrames>
         <saveFramePath>frames</saveFramePath>
         <baseline>0.2</baseline>
