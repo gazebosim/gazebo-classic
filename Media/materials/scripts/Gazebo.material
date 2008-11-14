@@ -6,6 +6,7 @@ vertex_program Gazebo/DepthMapVS glsl
 
   default_params
   {
+    param_named_auto texelOffsets texel_offsets
     param_named_auto pNear near_clip_distance
     param_named_auto pFar far_clip_distance
   }
@@ -652,12 +653,8 @@ material Gazebo/DepthMap
 {
   technique
   {
-    pass Z-write
+    pass
     {
-      //cull_hardware none
-      //cull_software none
-      //depth_check off
-
       vertex_program_ref Gazebo/DepthMapVS
       {
       }
