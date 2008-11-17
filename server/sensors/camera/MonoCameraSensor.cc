@@ -37,6 +37,7 @@
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "OgreFrameListener.hh"
+#include "Simulator.hh"
 
 #include "SensorFactory.hh"
 #include "CameraManager.hh"
@@ -240,8 +241,12 @@ void MonoCameraSensor::SaveFrame()
   char tmp[1024];
   if (!this->savePathnameP->GetValue().empty())
   {
-    sprintf(tmp, "%s/%s-%04d.jpg", this->savePathnameP->GetValue().c_str(),
-            this->GetName().c_str(), this->saveCount);
+    double simTime = Simulator::Instance()->GetSimTime();
+    int min = (int)(simTime / 60.0);
+    int sec = (int)(simTime - min*60);
+    int msec = (int)(simTime*1000 - min*60000 - sec*1000);
+
+    sprintf(tmp, "%s/%s-%04d-%03dm_%02ds_%03dms.jpg", this->savePathnameP->GetValue().c_str(), this->GetName().c_str(), this->saveCount, min, sec, msec);
   }
   else
   {
