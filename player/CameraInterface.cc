@@ -146,8 +146,8 @@ void CameraInterface::Subscribe()
   catch (std::string e)
   {
     //std::ostringstream stream;
-    std::cout << "Error Subscribing to Gazebo Camera Interface\n"
-    << e << "\n";
+    std::cout << "Error Subscribing to Gazebo Camera Interface[" 
+      << this->gz_id << "]\n" << e << "\n";
     //gzthrow(stream.str());
     exit(0);
   }

@@ -242,7 +242,6 @@ void StereoCameraSensor::UpdateChild()
   // Render the depth texture
   for (i=2; i<4; i++)
   {
-
     // OgreSceneManager::_render function automatically sets farClip to 0.
     // Which normally equates to infinite distance. We don't want this. So
     // we have to set the distance every time.
@@ -283,8 +282,7 @@ void StereoCameraSensor::UpdateChild()
       renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
           pass->getFragmentProgramParameters());
     }
-    
-
+   
     this->renderTargets[i]->update();
   }
 
@@ -299,7 +297,7 @@ void StereoCameraSensor::UpdateChild()
   if (gridNode)
     gridNode->setVisible(true);
 
-    this->FillBuffers();
+  this->FillBuffers();
 
   if (this->saveFramesP->GetValue())
     this->SaveFrame();
@@ -371,6 +369,7 @@ void StereoCameraSensor::FillBuffers()
 
     hardwareBuffer->unlock();
   }
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////

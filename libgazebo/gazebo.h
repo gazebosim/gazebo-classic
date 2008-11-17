@@ -58,13 +58,13 @@ namespace gazebo
 class Vec3
 {
   /// X value
-  public: double x;
+  public: float x;
 
   /// Y value
-  public: double y;
+  public: float y;
 
   /// Z value
-  public: double z;
+  public: float z;
 };
 
 
@@ -75,13 +75,13 @@ class Pose
   public: Vec3 pos;
 
   /// Rotation information. Roll Euler angle
-  public: double roll;
+  public: float roll;
 
   /// Rotation information. Pitch Euler angle
-  public: double pitch;
+  public: float pitch;
 
   /// Rotation information. Yaw Euler angle
-  public: double yaw; 
+  public: float yaw; 
 };
 
 /// \brief Color class
@@ -332,7 +332,7 @@ class GazeboData
   /// Number of times the interface has been opened
   public: int openCount;
 
-  public: double time;
+  public: float time;
 
   public: int version;
 
@@ -389,13 +389,13 @@ class SimulationData
   public: GazeboData head;
 
   /// Elapsed simulation time
-  public: double simTime;
+  public: float simTime;
 
   /// Accumpated pause time (this interface may be updated with the server is paused).
-  public: double pauseTime;
+  public: float pauseTime;
 
   /// Elapsed real time since start of simulation (from system clock)
-  public: double realTime;
+  public: float realTime;
 
   /// state of the simulation : 0 paused, 1 running -1 not_started/exiting
   public: int state;
@@ -467,7 +467,7 @@ class AudioData
   public: GazeboData head;
 
   /// Data timestamp
-  public: double time;
+  public: float time;
 
   /// Play in a loop?
   public: bool loop;
@@ -576,10 +576,10 @@ class CameraData
   public: unsigned char image[GAZEBO_CAMERA_MAX_IMAGE_SIZE];
 
   /// Horizontal field of view of the camera in radians
-  public: double hfov;
+  public: float hfov;
 
   /// Vertical field of view of the camera in radians
-  public: double vfov;
+  public: float vfov;
 
   /// Pose of the camera
   public: Pose camera_pose;
@@ -812,25 +812,25 @@ class LaserData
   public: GazeboData head;
   
   /// Range scan min angle
-  public: double min_angle;
+  public: float min_angle;
 
   /// Range scan max angle
-  public: double max_angle;
+  public: float max_angle;
 
   /// Angular resolution
-  public: double res_angle;
+  public: float res_angle;
 
   /// Range resolution
-  public: double res_range;
+  public: float res_range;
 
   /// Max range value
-  public: double max_range;
+  public: float max_range;
 
   /// Number of range readings
   public: int range_count;
   
   /// Range readings
-  public: double ranges[GZ_LASER_MAX_RANGES];
+  public: float ranges[GZ_LASER_MAX_RANGES];
 
   /// Intensity readings
   public: int intensity[GZ_LASER_MAX_RANGES];
@@ -842,13 +842,13 @@ class LaserData
   public: int cmd_new_length;
 
   /// Commanded range value
-  public: double cmd_max_range;
+  public: float cmd_max_range;
 
   /// Commaned min angle
-  public: double cmd_min_angle;
+  public: float cmd_min_angle;
 
   /// Commaned max angle
-  public: double cmd_max_angle;
+  public: float cmd_max_angle;
 
   /// Commaned range count
   public: int cmd_range_count;
@@ -1299,22 +1299,22 @@ class PTZData
   public: GazeboData head;
 
   /// Measured pan angle (radians)
-  public: double pan;
+  public: float pan;
 
   /// Measured tilt angle (radians)
-  public: double tilt;
+  public: float tilt;
 
   /// Measured field of view (radians)
-  public: double zoom;
+  public: float zoom;
 
   /// Commanded pan angle (radians)
-  public: double cmd_pan;
+  public: float cmd_pan;
 
   /// Commanded tilt angle (radians)
-  public: double cmd_tilt;
+  public: float cmd_tilt;
 
   /// Commanded field of view (radians)
-  public: double cmd_zoom;
+  public: float cmd_zoom;
   
 }; 
 
@@ -1382,10 +1382,10 @@ class StereoCameraData
   public: float nearClip;
 
   /// Horizontal field of view of the camera in radians
-  public: double hfov;
+  public: float hfov;
 
   /// Vertical field of view of the camera in radians
-  public: double vfov;
+  public: float vfov;
 
   /// Left depth map size
   public: unsigned int left_depth_size;
