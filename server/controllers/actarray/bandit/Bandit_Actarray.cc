@@ -151,10 +151,11 @@ void Bandit_Actarray::UpdateChild()
       angle = cmdAngle - joint->GetAngle();
 
       if (fabs(angle) > 0.01)
-      {
         joint->SetParam( dParamVel, **(this->gainsP[i]) * angle);
-        joint->SetParam( dParamFMax, **(this->forcesP[i]) );
-      }
+      else
+        joint->SetParam(dParamVel, 0);
+
+      joint->SetParam( dParamFMax, **(this->forcesP[i]) );
 
     }
     else if (this->myIface->data->joint_mode[i] == GAZEBO_ACTARRAY_JOINT_SPEED_MODE)

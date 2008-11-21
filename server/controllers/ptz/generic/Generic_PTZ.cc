@@ -166,10 +166,18 @@ void Generic_PTZ::UpdateChild()
   float tilt = this->cmdTilt - this->tiltJoint->GetAngle();
   float pan = this->cmdPan - this->panJoint->GetAngle();
 
-  this->tiltJoint->SetParam( dParamVel, **(this->motionGainP) * tilt);
+  if (fabs(tilt) > 0.01)
+    this->tiltJoint->SetParam( dParamVel, **(this->motionGainP) * tilt);
+  else
+    this->tiltJoint->SetParam( dParamVel, 0);
+
   this->tiltJoint->SetParam( dParamFMax, **(this->forceP) );
 
-  this->panJoint->SetParam( dParamVel, **(this->motionGainP) * pan);
+  if (fabs(pan) > 0.01)
+    this->panJoint->SetParam( dParamVel, **(this->motionGainP) * pan);
+  else
+    this->panJoint->SetParam( dParamVel, 0);
+
   this->panJoint->SetParam( dParamFMax, **(this->forceP) );
 
   this->PutPTZData();

@@ -124,6 +124,9 @@
   <controller:generic_ptz name="sonyvid30_controller">
     <panJoint>pan_joint</panJoint>
     <tiltJoint>tilt_joint</tiltJoint>
+
+    <motionGain>1</motionGain>
+    <force>0.01</force>
     <interface:ptz name="ptz_iface_1"/>
   </controller:generic_ptz>
 

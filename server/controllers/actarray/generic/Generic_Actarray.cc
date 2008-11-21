@@ -153,10 +153,11 @@ void Generic_Actarray::UpdateChild()
     delta_position = target_position - actual_position;
 
     if (fabs(delta_position) > tolerances[i])
-    {
       joint->SetParam( dParamVel,  this->gains[i] * delta_position);
-      joint->SetParam( dParamFMax, this->forces[i] );
-    }
+    else
+      joint->SetParam( dParamVel,  0);
+
+    joint->SetParam( dParamFMax, this->forces[i] );
 
     this->myIface->data->actuators[i].position = actual_position;
     this->myIface->data->actuators[i].speed = actual_speed;

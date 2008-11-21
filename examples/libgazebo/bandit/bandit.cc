@@ -56,7 +56,7 @@ int main()
 
   printf("Shoulder2[%f]\n", RTOD(actarrayIface->data->actuators[R_SHOULDER2].position));
 
-  actarrayIface->data->cmd_pos[R_SHOULDER2] = DTOR(80);
+  actarrayIface->data->cmd_pos[R_SHOULDER2] = DTOR(79);
   actarrayIface->data->cmd_pos[R_ELBOW] = DTOR(90);
   usleep(1000000);
   actarrayIface->data->cmd_pos[R_ELBOW2] = DTOR(100);
@@ -84,6 +84,7 @@ int main()
     actarrayIface->Unlock();
 
   }*/
+
   return 0;
 }
 
