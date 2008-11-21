@@ -1,6 +1,7 @@
 #include <sstream>
 #include <gazebo/gazebo.h>
 #include <gazebo/GazeboError.hh>
+#include <string.h>
 
 int main()
 {
@@ -57,10 +58,13 @@ int main()
       stream <<   "<xyz>" << i*0.5 << " 0 1</xyz>";
       stream <<   "<body:sphere name='sphere_body_" << i << "'>";
       stream <<     "<geom:sphere name='sphere_geom_" << i << "'>";
-      stream <<       "<mesh>default</mesh>";
       stream <<       "<size>0.1</size>";
       stream <<       "<density>1.0</density>";
-      stream <<       "<material>Gazebo/Rocky</material>";
+      stream <<       "<visual>";
+      stream <<         "<size>0.1 0.1 0.1</size>";
+      stream <<         "<material>Gazebo/Rocky</material>";
+      stream <<         "<mesh>unit_sphere</mesh>";
+      stream <<       "</visual>";
       stream <<     "</geom:sphere>";
       stream <<   "</body:sphere>";
       stream << "</model:physical>";

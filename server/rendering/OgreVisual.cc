@@ -95,6 +95,16 @@ OgreVisual::~OgreVisual()
   delete this->meshTileP;
   delete this->materialNameP;
   delete this->castShadowsP;
+
+  if (this->parentNode)
+    this->parentNode->removeChild( this->sceneNode );
+
+  this->sceneNode->removeAndDestroyAllChildren();
+
+  if (this->sceneNode)
+    OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);
+  if (this->boundingBoxNode)
+    OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->boundingBoxNode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
