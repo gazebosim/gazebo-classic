@@ -6,7 +6,7 @@ import commands
 exec(open('build.py'))
 
 PKG_CONFIG_VERSION = '0.22'
-OGRE_VERSION = '= 1.6.0'
+OGRE_VERSION = '>= 1.6.0'
 ODE_VERSION = '>= 0.10.1'
 
 if 'release' in COMMAND_LINE_TARGETS:
