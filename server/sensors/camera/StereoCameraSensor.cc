@@ -43,7 +43,7 @@
 #include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
 
-#define PF_FLOAT Ogre::PF_FLOAT32_R
+#define PF_FLOAT Ogre::PF_FLOAT16_R
 #define PF_RGB Ogre::PF_B8G8R8
 
 using namespace gazebo;
@@ -365,6 +365,12 @@ void StereoCameraSensor::FillBuffers()
             this->imageSizeP->GetValue().y,
             1, PF_FLOAT, this->depthBuffer[i-2])
           );
+
+      for (int i=0; i < this->depthBufferSize; i++)
+      {
+        printf("%f ",this->depthBuffer[i]);
+      }
+      printf("\n");
     }
 
     hardwareBuffer->unlock();

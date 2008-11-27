@@ -41,6 +41,7 @@
 #include "PTZInterface.hh"
 #include "BumperInterface.hh"
 #include "GripperInterface.hh"
+#include "IRInterface.hh"
 
 /*
 #include "PowerInterface.hh"
@@ -315,6 +316,11 @@ int GazeboDriver::LoadDevices(ConfigFile* cf, int section)
       case PLAYER_BUMPER_CODE:
         if (!player_quiet_startup) printf(" a bumper interface.\n");
         ifsrc = new BumperInterface( playerAddr,  this, cf, section );
+        break;
+        
+      case PLAYER_IR_CODE:
+        if (!player_quiet_startup) printf(" an ir interface.\n");
+        ifsrc = new IRInterface( playerAddr,  this, cf, section );
         break;
 
 

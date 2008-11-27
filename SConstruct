@@ -51,11 +51,13 @@ env = Environment (
    '#server/sensors/ray',
    '#server/sensors/contact',
    '#server/sensors/imu',
+   '#server/sensors/ir',
    '#server/physics',
    '#server/physics/ode',
    '#server/controllers',
    '#server/controllers/position2d',
    '#server/controllers/position2d/pioneer2dx',
+   '#server/controllers/irarray',
    ],
 
   LIBPATH=Split('#libgazebo'),
@@ -154,9 +156,9 @@ if not env.GetOption('clean'):
         Exit(1)
 
 # Check for trimesh support in ODE
-if not conf.CheckODELib():
-  print '  Error: ODE not compiled with trimesh support.'
-  Exit(1)
+#if not conf.CheckODELib():
+#  print '  Error: ODE not compiled with trimesh support.'
+#  Exit(1)
 
 env = conf.Finish()
 

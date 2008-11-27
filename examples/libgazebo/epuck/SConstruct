@@ -1,0 +1,23 @@
+
+# 3rd party packages
+parseConfigs=['pkg-config --cflags --libs libgazebo',
+              'pkg-config --cflags --libs libgazeboServer']
+
+env = Environment (
+  CC = 'g++',
+
+  CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+
+  #LIBPATH=Split('#libgazebo'),
+    
+  #LIBS=Split('gazebo boost_python')
+)
+
+
+# Parse all the pacakge configurations
+for cfg in parseConfigs:
+  env.ParseConfig(cfg)
+  
+sources = Split('main.cc EpuckModel.cc')
+
+env.Program('swarm',sources)

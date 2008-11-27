@@ -603,6 +603,20 @@ material Gazebo/Fish
   }
 }
 
+material Gazebo/LightWood
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture lightwood.png
+      }
+    }
+  }
+}
+
 material Gazebo/WoodTile
 {
   technique
@@ -664,3 +678,203 @@ material Gazebo/DepthMap
     }
   }
 }
+
+material Gazebo/PCBGreen
+{
+	technique
+	{
+        	pass
+        	{
+    		  scene_blend alpha_blend
+     		  depth_write off
+	
+     	 	  texture_unit
+     		  {
+     		     colour_op_ex source1 src_manual src_current 0.2 0.43 0.36
+     	  	     alpha_op_ex source1 src_manual src_current 0.2
+    	 	  }
+   		}
+	}
+}
+
+material Gazebo/Turret
+{
+	technique
+	{
+		pass
+		{
+                       lighting off
+
+
+                        ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0 0 0 0
+			emissive 0 0 0
+
+			alpha_rejection greater 128
+			depth_write on
+
+			texture_unit
+			{
+				texture turret_new.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}
+
+
+material Gazebo/EpuckBody
+{
+  technique
+  {
+    pass
+		{
+			lighting off
+
+			ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0 0 0 0
+			emissive 1 1 1
+
+
+			scene_blend alpha_blend
+			depth_write off
+
+			texture_unit
+			{
+			 colour_op_ex source1 src_manual src_current 0.523613 0.500817 0.499183
+                         alpha_op_ex source1 src_manual src_current 0.8
+			}
+		}
+
+  }
+}
+
+material Gazebo/EpuckRing
+{
+  technique
+  {
+    pass
+		{
+			lighting off
+
+			ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0 0 0 0
+			emissive 0 0 0
+
+			scene_blend alpha_blend
+			depth_write off
+
+			texture_unit
+			{
+			 colour_op_ex source1 src_manual src_current 0.8 0.8 0.8
+                         alpha_op_ex source1 src_manual src_current 0.5
+			}
+		}
+
+  }
+}
+
+material Gazebo/EpuckPlate
+{
+	technique
+	{
+		pass
+		{
+                        lighting off
+
+
+                        ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0 0 0 0
+			emissive 0 0 0
+
+
+			alpha_rejection greater 128
+			depth_write on
+
+			texture_unit
+			{
+				texture plate.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}
+
+material Gazebo/EpuckLogo
+{
+	technique
+	{
+		pass
+		{
+                        lighting off
+
+
+                        ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0 0 0 0
+			emissive 0 0 0
+
+			alpha_rejection greater 128
+			depth_write on
+
+			texture_unit
+			{
+				texture logo.png
+				tex_coord_set 0
+				colour_op modulate
+			}
+		}
+	}
+}
+
+material Gazebo/EpuckMagenta
+{
+  receive_shadows on
+  technique
+  {
+    pass
+    {
+      ambient 0.000000 0.000000 0.000000
+      diffuse 0.523613 0.500817 0.499183
+      specular 0.500000 0.500000 0.500000 50.000000
+      emissive 0.000000 0.000000 0.000000
+    }
+  }
+}
+
+material Gazebo/EpuckGold
+{
+
+  technique
+  {
+    pass
+    {
+   
+      
+                        lighting off
+
+
+                        ambient 1 1 1 1
+			diffuse 1 1 1 1
+			specular 0 0 0 0
+			emissive 0 0 0
+
+		
+			texture_unit
+			{
+			 colour_op_ex source1 src_manual src_current 1.000000 0.671000 0.000000
+                         alpha_op_ex source1 src_manual src_current 0.5
+			}
+    }
+  }
+}
+
+
+
+1

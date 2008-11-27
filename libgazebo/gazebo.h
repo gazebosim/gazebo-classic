@@ -979,7 +979,7 @@ class FactoryData
   public: GazeboData head;
 
   /// String describing the model to be initiated
-  public: uint8_t newModel[4096];
+  public: uint8_t newModel[4096*4];
 
   /// Delete a model by name
   public: uint8_t deleteModel[512];
@@ -1546,6 +1546,71 @@ class OpaqueIface : public Iface
 /** \} */
 /// \}
 
+
+/***************************************************************************/
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup ir_iface opaque
+
+  \brief Interface for IR
+
+\{
+ */
+
+/// Max number of IR ranges
+#define GZ_IR_MAX_RANGES 32
+
+/// \brief IR interface data
+class IRData
+{
+  public: GazeboData head;
+  
+  //number of ir
+  public: int ir_count;
+  
+  /// Number of range readings
+  public: int range_count;
+  
+  /// Range readings
+  public: double ranges[GZ_IR_MAX_RANGES];
+  
+  public: Pose poses[GZ_IR_MAX_RANGES];
+
+};
+
+/// \brief IR interface
+class IRIface : public Iface
+{
+  /// \brief Constructor
+  public: IRIface():Iface("irarray", sizeof(IRIface)+sizeof(IRData)) {}
+
+  /// \brief Destructor
+  public: virtual ~IRIface() {this->data = NULL;}
+
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (IRData*)this->mMap; 
+          }
+
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (IRData*)this->mMap; 
+          }
+
+  /// Pointer to the laser data
+  public: IRData *data;
+};
+
+/** \} */
+/// \}
 
 
 }

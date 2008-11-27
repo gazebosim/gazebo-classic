@@ -81,6 +81,14 @@ void Controller::Load(XMLConfigNode *node)
   this->lastUpdate = -1e6;
 
   childNode = node->GetChildByNSPrefix("interface");
+  
+  Entity * test = this->parent;
+  while(test->GetParent()!=NULL)
+  {
+    	test = test->GetParent();
+  }
+  
+  
 
   // Create the interfaces
   while (childNode)
@@ -103,10 +111,13 @@ void Controller::Load(XMLConfigNode *node)
     }
     catch (...) //TODO: Show the exception text here (subclass exception?)
     {
-      gzmsg(1) << "No manager for the interface " << ifaceType << " found. Disabled.\n";
+      gzmsg(1) << "No libgazebo Iface for the interface[" << ifaceType << "] found. Disabled.\n";
       childNode = childNode->GetNextByNSPrefix("interface");
       continue;
     }
+    
+    
+    ifaceName = test->GetName()+"-" + ifaceName;
 
     // Create the iface
     try
@@ -117,6 +128,10 @@ void Controller::Load(XMLConfigNode *node)
     {
       gzthrow(e);
     }
+    
+    
+    
+    std::cout<<ifaceName<<std::endl;
 
     this->ifaces.push_back(iface);
 
