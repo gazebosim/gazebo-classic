@@ -43,6 +43,11 @@ def CheckPkgConfig(context, version):
 def CheckPkg(context, name):
   context.Message( 'Checking for %s...' % name)
   action = 'PKG_CONFIG_PATH=%s pkg-config --exists \'%s\'' % (os.environ['PKG_CONFIG_PATH'], name);
+  pkg_config_cmd = "pkg-config"
+  if os.environ.has_key("PKG_CONFIG_PATH"):
+    pkg_config_cmd = "PKG_CONFIG_PATH="+os.environ["PKG_CONFIG_PATH"]+" pkg-config"  
+  action = '%s --exists \'%s\'' % (pkg_config_cmd, name);
+
   ret = context.TryAction(action)[0]
   context.Result(ret)
   return ret

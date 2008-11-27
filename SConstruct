@@ -5,7 +5,7 @@ import commands
 
 exec(open('build.py'))
 
-PKG_CONFIG_VERSION = '0.23'
+PKG_CONFIG_VERSION = '0.22'
 OGRE_VERSION = '= 1.6.0'
 ODE_VERSION = '>= 0.10.1'
 
@@ -110,7 +110,7 @@ conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib,
                                       'CheckPkg' : CheckPkg})
 # Check for pkg-config 
 if not conf.CheckPkgConfig(PKG_CONFIG_VERSION):
-  print '  Error: pkg-config version >= 0.23 not found.'
+  print '  Error: pkg-config version >= ' + PKG_CONFIG_VERSION + ' not found.'
   Exit(1)
 
 # Check for the correct OGRE version
