@@ -530,6 +530,8 @@ OgreVisual *Geom::GetVisual(unsigned int index) const
 {
   if (index < this->visuals.size())
     return this->visuals[index];
+
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
