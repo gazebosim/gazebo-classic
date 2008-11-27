@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003  
+ *  Copyright (C) 2003
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -47,97 +47,97 @@ namespace gazebo
   /// \addtogroup gazebo_physics
   /// \brief The body class
   /// \{
-  
+
   /// Body class
   class Body : public Entity
   {
     /// \brief Constructor
     public: Body(Entity *parent, dWorldID worldId);
-  
+
     /// \brief Destructor
     public: virtual ~Body();
-  
+
     /// \brief Load the body based on an XMLConfig node
     /// \param node XMLConfigNode pointer
     public: virtual void Load(XMLConfigNode *node);
-  
+
     /// \brief Save the body based on our XMLConfig node
     public: virtual void Save(std::string &prefix, std::ostream &stream);
-    
+
     /// \brief Initialize the body
     public: virtual void Init();
-  
+
     /// \brief Finalize the body
     public: void Fini();
-  
+
     /// \brief Update the body
     public: virtual void Update();
-  
+
     /// \brief Attach a geom to this body
     /// \param geom Geometery to attach to this body
     public: void AttachGeom( Geom *geom );
-  
+
     /// \brief Set the pose of the body
     /// \param pose New pose of the body
     public: void SetPose(const Pose3d &pose);
-  
+
     /// \brief Return the pose of the body
     /// \return Pose of the body
     public: Pose3d GetPose() const;
-  
+
     /// \brief Set the position of the body
     /// \param pos Vector position
     public: void SetPosition(const Vector3 &pos);
-  
+
     /// \brief Set the rotation of the body
     /// \param rot Quaternion rotation
     public: void SetRotation(const Quatern &rot);
-  
+
     /// \brief Return the position of the body
     /// \return Position vector
     public: Vector3 GetPosition() const;
-  
+
     /// \brief Return the rotation
     /// \return Rotation quaternion
     public: Quatern GetRotation() const;
-  
+
     /// \brief Return the ID of this body
     /// \return ODE body id
     public: dBodyID GetId() const;
-  
+
     /// \brief Set whether this body is enabled
     public: void SetEnabled(bool enable) const;
-  
+
     /// \brief Update the center of mass
     public: void UpdateCoM();
-  
+
     /// \brief Get the Center of Mass pose
     public: const Pose3d &GetCoMPose() const;
-  
+
     /// \brief Set whether gravity affects this body
     public: void SetGravityMode(bool mode);
-  
+
     /// \brief Set the linear velocity of the body
     public: void SetLinearVel(const Vector3 &vel);
-  
+
     /// \brief Get the linear velocity of the body
     public: Vector3 GetLinearVel() const;
-  
+
     /// \brief Set the angular velocity of the body
     public: void SetAngularVel(const Vector3 &vel);
-  
+
     /// \brief Get the angular velocity of the body
     public: Vector3 GetAngularVel() const;
-  
+
     /// \brief Set the force applied to the body
     public: void SetForce(const Vector3 &force);
-  
+
     /// \brief Get the force applied to the body
     public: Vector3 GetForce() const;
-  
+
     /// \brief Set the torque applied to the body
     public: void SetTorque(const Vector3 &force);
-  
+
     /// \brief Get the torque applied to the body
     public: Vector3 GetTorque() const;
 
@@ -149,43 +149,48 @@ namespace gazebo
 
     /// \brief Get the model that this body belongs to
     public: Model *GetModel() const;
-  
+
+    /// \brief Get the mass of the body
+    public: float GetMass() { return mass.mass; }
+
     /// Load a new geom helper function
     /// \param node XMLConfigNode used to load the geom
     private: void LoadGeom(XMLConfigNode *node);
-  
+
     /// Load a new sensor
     /// \param node XMLConfigNode used to load the geom
     private: void LoadSensor(XMLConfigNode *node);
-  
+
     /// \brief Load a renderable
     private: void LoadVisual(XMLConfigNode *node);
 
     /// \brief Update the pose of the body
     private: void UpdatePose();
- 
+
     /// List of geometries attached to this body
     private: std::map< std::string, Geom* > geoms;
-  
+
     /// List of attached sensors
     private: std::vector< Sensor* > sensors;
-    
+
     /// ODE body handle
     private: dBodyID bodyId;
-  
+
     /// Mass properties of the object
     private: dMass mass;
-  
+
     private: bool isStatic;
-  
+
     private: Pose3d comPose;
     private: Pose3d staticPose;
     private: Pose3d pose;
-  
+
     private: ParamT<Vector3> *xyzP;
     private: ParamT<Quatern> *rpyP;
+
+    private: ParamT<double> *dampingFactorP;
   };
-  
+
   /// \}
 }
 

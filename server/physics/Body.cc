@@ -70,6 +70,9 @@ Body::Body(Entity *parent, dWorldID worldId)
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
   this->rpyP->Callback( &Body::SetRotation, this );
+
+  this->dampingFactorP = new ParamT<double>("dampingFactor", 0.03, 0);
+
   Param::End();
 }
 
@@ -95,6 +98,7 @@ Body::~Body()
 
   delete this->xyzP;
   delete this->rpyP;
+  delete this->dampingFactorP;
 
 }
 
@@ -107,6 +111,7 @@ void Body::Load(XMLConfigNode *node)
   this->nameP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
+  this->dampingFactorP->Load(node);
   Pose3d initPose;
 
   initPose.pos = **(this->xyzP);
@@ -217,6 +222,10 @@ void Body::Update()
 {
   std::vector< Sensor* >::iterator sensorIter;
   std::map< std::string, Geom* >::iterator geomIter;
+  Vector3 vel;
+  Vector3 avel;
+
+  double force;
 
   this->UpdatePose();
 
@@ -237,6 +246,17 @@ void Body::Update()
   {
     (*sensorIter)->Update();
   }
+
+  if(this->GetId())
+  {
+	  force = this->dampingFactorP->GetValue() * this->mass.mass;
+	  vel = this->GetLinearVel();
+	  dBodyAddForce(this->GetId(), -((vel.x * fabs(vel.x)) * force), -((vel.y * fabs(vel.y)) * force), -((vel.z * fabs(vel.z)) * force));
+
+	  avel = this->GetAngularVel();
+	  dBodyAddTorque(this->GetId(), -avel.x * force, -avel.y * force, -avel.z * force);
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,7 +300,7 @@ void Body::SetPose(const Pose3d &pose)
 
     //this->SetPosition(this->staticPose.pos);
     //this->SetRotation(this->staticPose.rot);
-   
+
     for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
     {
       //newPose = (*iter)->GetPose() - this->staticPose;
@@ -702,7 +722,7 @@ Model *Body::GetModel() const
 {
   return dynamic_cast<Model*>(this->GetParent());
 }
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a geom by name
 Geom *Body::GetGeom(const std::string &name) const
@@ -719,4 +739,4 @@ Geom *Body::GetGeom(const std::string &name) const
     return NULL;
   }
 }
- 
+
