@@ -587,7 +587,14 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
 
-  window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
+  try
+  {
+    window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
+  }
+  catch (...)
+  {
+    gzerr(0) << " Unable to create the rendering window\n";
+  }
 
   window->setActive(true);
   window->setAutoUpdated(true);

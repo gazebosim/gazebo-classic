@@ -96,10 +96,15 @@ OgreVisual::~OgreVisual()
   delete this->materialNameP;
   delete this->castShadowsP;
 
-  if (this->parentNode)
-    this->parentNode->removeChild( this->sceneNode );
+  // Having this chunk of code causes a segfault when closing the
+  // application.
+  /*if (this->parentNode && this->sceneNode)
+  {
+   this->parentNode->removeChild( this->sceneNode );
+  }
 
   this->sceneNode->removeAndDestroyAllChildren();
+  */
 
   if (this->sceneNode)
     OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);

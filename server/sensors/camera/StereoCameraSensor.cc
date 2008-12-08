@@ -181,7 +181,7 @@ void StereoCameraSensor::InitChild()
   this->rgbBuffer[1] = new unsigned char[this->rgbBufferSize];
 
   // Uncomment this section to create a debug overaly
-  /*{
+  {
     Ogre::Overlay *overlay = Ogre::OverlayManager::getSingletonPtr()->create("__GAZEBO_STEREO_DEBUG_OVERLAY__");
 
     Ogre::OverlayContainer *overlayPanel = (Ogre::OverlayContainer*)(Ogre::OverlayManager::getSingletonPtr()->createOverlayElement("Panel", "__GAZEBO_PANEL"));
@@ -192,7 +192,7 @@ void StereoCameraSensor::InitChild()
     overlay->add2D(overlayPanel);
 
     overlay->show();
-  }*/
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -365,12 +365,6 @@ void StereoCameraSensor::FillBuffers()
             this->imageSizeP->GetValue().y,
             1, PF_FLOAT, this->depthBuffer[i-2])
           );
-
-      for (int i=0; i < this->depthBufferSize; i++)
-      {
-        printf("%f ",this->depthBuffer[i]);
-      }
-      printf("\n");
     }
 
     hardwareBuffer->unlock();

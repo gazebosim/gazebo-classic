@@ -82,14 +82,6 @@ void Controller::Load(XMLConfigNode *node)
 
   childNode = node->GetChildByNSPrefix("interface");
   
-  Entity * test = this->parent;
-  while(test->GetParent()!=NULL)
-  {
-    	test = test->GetParent();
-  }
-  
-  
-
   // Create the interfaces
   while (childNode)
   {
@@ -116,9 +108,6 @@ void Controller::Load(XMLConfigNode *node)
       continue;
     }
     
-    
-    ifaceName = test->GetName()+"-" + ifaceName;
-
     // Create the iface
     try
     {
