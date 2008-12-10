@@ -298,16 +298,17 @@ void Body::SetPose(const Pose3d &pose)
 
     std::map<std::string, Geom*>::iterator iter;
 
-    //this->SetPosition(this->staticPose.pos);
-    //this->SetRotation(this->staticPose.rot);
+    this->SetPosition(this->staticPose.pos);
+    this->SetRotation(this->staticPose.rot);
 
-    for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+    // This loop doesn't work properly when rotating objects
+    /*for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
     {
       //newPose = (*iter)->GetPose() - this->staticPose;
       newPose = iter->second->GetPose() - oldPose;
       newPose += this->staticPose;
       iter->second->SetPose(newPose);
-    }
+    }*/
   }
   else
   {
