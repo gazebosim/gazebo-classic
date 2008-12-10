@@ -89,7 +89,7 @@
       <imageSize>320 240</imageSize>
       <hfov>60</hfov>
       <nearClip>0.1</nearClip>
-      <farClip>100</farClip>
+      <farClip>50</farClip>
       <saveFrames>false</saveFrames>
       <saveFramePath>frames</saveFramePath>
 
