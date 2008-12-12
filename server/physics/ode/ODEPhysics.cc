@@ -138,7 +138,7 @@ void ODEPhysics::Update()
 
   // Update the dynamical model
   dWorldStep( this->worldId, this->stepTimeP->GetValue() );
-  //dWorldQuickStep(this->worldId, this->stepTime);
+  //dWorldQuickStep(this->worldId, this->stepTimeP->GetValue());
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );

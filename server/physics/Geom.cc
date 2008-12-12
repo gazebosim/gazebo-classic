@@ -287,7 +287,7 @@ bool Geom::IsPlaceable() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose relative to the body
-void Geom::SetPose(const Pose3d &pose, bool updateCoM)
+void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
 {
   if (this->placeable && this->geomId)
   {
@@ -295,7 +295,7 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     dQuaternion q;
 
     // Transform into CoM relative Pose
-    localPose = pose - this->body->GetCoMPose();
+    localPose = newPose - this->body->GetCoMPose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -307,7 +307,7 @@ void Geom::SetPose(const Pose3d &pose, bool updateCoM)
     dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
     dGeomSetQuaternion(this->geomId, q);
 
-    this->visualNode->SetPose(pose);
+    this->visualNode->SetPose(newPose);
 
     if (updateCoM)
     {

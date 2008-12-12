@@ -43,7 +43,7 @@
 #include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
 
-#define PF_FLOAT Ogre::PF_FLOAT16_R
+#define PF_FLOAT Ogre::PF_FLOAT32_R
 #define PF_RGB Ogre::PF_B8G8R8
 
 using namespace gazebo;

@@ -110,6 +110,16 @@ class Quatern
   /// \param scale Amount to scale this rotation
   public: void Scale(double scale);
 
+  /// \brief Addition operator
+  /// \param qt Quatern for addition
+  /// \return This quatern + qt
+  public: Quatern operator+( const Quatern &qt ) const;
+
+  /// \brief Substraction operator
+  /// \param qt Quatern for substraction
+  /// \return This quatern - qt
+  public: Quatern operator-( const Quatern &qt ) const;
+
   /// \brief Multiplication operator
   /// \param qt Quatern for multiplication
   /// \return This quatern multiplied by the parameter

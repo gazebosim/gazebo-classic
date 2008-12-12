@@ -102,6 +102,8 @@ Quatern Quatern::GetInverse() const
   q.y = -this->y;
   q.z = -this->z;
 
+  //q.Normalize();
+
   return q;
 }
 
@@ -240,15 +242,33 @@ void Quatern::Scale(double scale)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Addition operator
+Quatern Quatern::operator+( const Quatern &qt ) const
+{
+  Quatern result(this->u + qt.u, this->x + qt.x, 
+                 this->y + qt.y, this->z + qt.z);
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Substraction operator
+Quatern Quatern::operator-( const Quatern &qt ) const
+{
+  Quatern result(this->u - qt.u, this->x - qt.x, 
+                 this->y - qt.y, this->z - qt.z);
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Multiplication operator
 Quatern Quatern::operator*( const Quatern &qt ) const
 {
   Quatern c;
 
-  c.u = this->u * qt.u - this->x * qt.x - this->y * qt.y - this->z * qt.z;
   c.x = this->u * qt.x + this->x * qt.u + this->y * qt.z - this->z * qt.y;
   c.y = this->u * qt.y - this->x * qt.z + this->y * qt.u + this->z * qt.x;
   c.z = this->u * qt.z + this->x * qt.y - this->y * qt.x + this->z * qt.u;
+  c.u = this->u * qt.u - this->x * qt.x - this->y * qt.y - this->z * qt.z;
 
   return c;
 }

@@ -183,7 +183,9 @@ Quatern Pose3d::CoordRotationAdd(const Quatern &rot) const
 // Subtract one rotation from another: result = this->rot - rot
 Quatern Pose3d::CoordRotationSub(const Quatern &rot) const
 {
-  return rot.GetInverse() * this->rot;
+  Quatern result(rot.GetInverse() * this->rot);
+  result.Normalize();
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

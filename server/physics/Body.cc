@@ -287,7 +287,6 @@ void Body::AttachGeom( Geom *geom )
 // Set the pose of the body
 void Body::SetPose(const Pose3d &pose)
 {
-
   this->pose = pose;
 
   if (this->IsStatic())
@@ -298,17 +297,13 @@ void Body::SetPose(const Pose3d &pose)
 
     std::map<std::string, Geom*>::iterator iter;
 
-    this->SetPosition(this->staticPose.pos);
-    this->SetRotation(this->staticPose.rot);
-
     // This loop doesn't work properly when rotating objects
-    /*for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+    for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
     {
-      //newPose = (*iter)->GetPose() - this->staticPose;
       newPose = iter->second->GetPose() - oldPose;
       newPose += this->staticPose;
       iter->second->SetPose(newPose);
-    }*/
+    }
   }
   else
   {
