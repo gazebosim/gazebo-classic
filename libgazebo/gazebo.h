@@ -852,6 +852,12 @@ class LaserData
 
   /// Commaned range count
   public: int cmd_range_count;
+
+  /// Pose of the laser
+  public: Pose pose; 
+
+  /// Size of the laser
+  public: Vec3 size;
 };
 
 /// \brief Laser interface

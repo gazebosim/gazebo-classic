@@ -25,7 +25,6 @@
  */
 
 /* TODO
-PLAYER_LASER_REQ_GET_GEOM
 */
 
 #include <math.h>
@@ -79,7 +78,7 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
                             PLAYER_LASER_REQ_SET_CONFIG,
                             this->device_addr))
   {
-    player_laser_config_t* plc = (player_laser_config_t*)data;
+    //player_laser_config_t* plc = (player_laser_config_t*)data;
 
     if ( hdr->size == sizeof(player_laser_config_t) )
     {
@@ -137,14 +136,17 @@ int LaserInterface::ProcessMessage(QueuePointer &respQueue,
   {
     player_laser_geom_t rep;
 
+
     // TODO: get geometry from somewhere
     memset(&rep.pose, 0, sizeof(rep.pose));
     memset(&rep.size, 0, sizeof(rep.size));
-//     rep.pose.px = 0.0;
-//     rep.pose.py = 0.0;
-//     rep.pose.pyaw = 0.0;
-//     rep.size.sw = 0.0;
-//     rep.size.sl = 0.0;
+
+    rep.pose.px = this->iface->data->pose.pos.x;
+    rep.pose.py = this->iface->data->pose.pos.y;
+    rep.pose.pyaw = this->iface->data->pose.yaw;
+
+    rep.size.sw = this->iface->data->size.x;
+    rep.size.sl = this->iface->data->size.y;
 
     this->driver->Publish(this->device_addr, respQueue,
                           PLAYER_MSGTYPE_RESP_ACK,

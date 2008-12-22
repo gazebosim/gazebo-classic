@@ -16,10 +16,20 @@ int main()
     // Subscribe to the laser proxy
     LaserProxy lp(&robot, 0);
 
+    robot.Read();
+
     // Print out some stuff
     std::cout << robot << std::endl;
 
-    for (;;)
+    lp.RequestGeom();
+
+    player_pose3d_t laserPose = lp.GetPose();
+
+    // Print out laser stuff
+    std::cout << "Laser Pose[" << laserPose.px << " " <<
+      laserPose.py << " " << laserPose.pyaw << "]\n";
+
+    /*for (;;)
     {
       // This blocks until new data comes
       robot.Read();
@@ -29,7 +39,7 @@ int main()
         printf("[%f %d]", lp.GetRange(i), lp.GetIntensity(i) );
       }
       printf("\n");
-    }
+    }*/
   }
   catch (PlayerCc::PlayerError e)
   {

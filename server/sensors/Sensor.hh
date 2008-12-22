@@ -28,6 +28,7 @@
 #define SENSOR_HH
 
 #include "Param.hh"
+#include "Pose3d.hh"
 #include "Entity.hh"
 
 namespace gazebo
@@ -68,6 +69,9 @@ namespace gazebo
     /// \brief  Finalize the sensor
     public: void Fini();
 
+    /// \brief Get the current pose
+    public: const Pose3d &GetPose() const;
+ 
     /// \brief Set whether the sensor is active or not
     public: void SetActive(bool value);
 
