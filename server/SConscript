@@ -1,7 +1,7 @@
 #Import variables
 Import('env install_prefix sharedObjs headers')
 
-dirs = Split('physics rendering sensors controllers gui')# bindings')
+dirs = Split('physics rendering sensors controllers gui audio_video')# bindings')
 
 for subdir in dirs:
   SConscript('%s/SConscript' % subdir)

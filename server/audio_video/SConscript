@@ -1,0 +1,41 @@
+#Import variable
+Import('env sharedObjs headers')
+
+parseConfigs = [
+  'pkg-config --cflags --libs libavformat',
+  'pkg-config --cflags --libs libavcodec',
+  'pkg-config --cflags --libs openal',
+  'pkg-config --cflags --libs freealut'
+]
+
+myEnv = env.Clone()
+
+sources = ['AudioDecoder.cc', 
+           'OpenAL.cc'
+           ]
+
+headers.append( 
+          ['server/audio_video/AudioDecoder.hh',
+           'server/audio_video/OpenAL.hh',
+           ] )
+#
+# Parse all the pacakge configurations
+#
+if not myEnv.GetOption('clean'):
+  for cfg in parseConfigs:
+    print "Checking for ["+cfg+"]"
+    try:
+      myEnv.ParseConfig(cfg)
+      print "  Success"
+    except OSError,e:
+      print "Unable to parse config ["+cfg+"]"
+      if cfg.find("OpenAL") >= 0:
+        print "OpenAL not found. 3D audio is disabled."
+        print "  http://connect.creativelabs.com/"
+        Exit(1)
+      if cfg.find("avcodec") >= 0 or cfg.find("avformat") >= 0:
+        print "FFMpeg not found. Audio decoding disabled."
+        print "  http://ffmpeg.mplayerhq.hu/"
+        Exit(1)
+
+myEnv.SharedLibrary('gazeboav', sources)
