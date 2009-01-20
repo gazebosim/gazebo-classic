@@ -58,12 +58,13 @@ env = Environment (
    '#server/controllers/position2d',
    '#server/controllers/position2d/pioneer2dx',
    '#server/controllers/irarray',
+   '#server/audio_video',
    ],
 
-  LIBPATH=Split('#libgazebo'),
+  LIBPATH=Split('#libgazebo #server/audio_video'),
     
   #LIBS=Split('gazebo boost_python')
-  LIBS=Split('gazebo boost_signals'),
+  LIBS=Split('gazebo gazeboav boost_signals'),
   LINKFLAGS=Split('-export-dynamic'),
 
   TARFLAGS = '-c -z',

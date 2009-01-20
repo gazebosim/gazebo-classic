@@ -2,32 +2,37 @@
 #include <unistd.h>
 #include <iostream>
 
-#include <AL/alut.h>
+#ifdef ENABLE_OPENAL
 #include <AL/alc.h>
+#endif
 
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "AudioDecoder.hh"
 #include "OpenAL.hh"
 
-#ifndef NULL
-#define NULL 0
-#endif
-
+using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 ///// Constructor
 OpenAL::OpenAL()
 {
+#ifdef ENABLE_OPENAL
+  printf("CONSTRUCTOR!!!!|\n\n\n");
   this->context = NULL;
   this->audioDevice = NULL;
 
   this->pos[0] = this->pos[1] = this->pos[2] = 0.0;
   this->pos[0] = -10.0;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 OpenAL::~OpenAL()
 {
+
+#ifdef ENABLE_OPENAL
   if (this->context && this->audioDevice)
   {
     this->context = alcGetCurrentContext();
@@ -36,6 +41,7 @@ OpenAL::~OpenAL()
     alcDestroyContext(this->context);
     alcCloseDevice(this->audioDevice);
   }
+#endif
 
   this->sources.clear();
   this->buffers.clear();
@@ -45,8 +51,11 @@ OpenAL::~OpenAL()
 /// Initialize
 int OpenAL::Init()
 {
+#ifdef ENABLE_OPENAL
+
   // Open the default audio device
   this->audioDevice = alcOpenDevice("ALSA Software on HDA Intel");
+
   if (this->audioDevice == NULL)
   {
     printf("Unable to open audio device\n");
@@ -59,6 +68,7 @@ int OpenAL::Init()
 
   //Clear error code
   alGetError();
+#endif
 
   // TODO: put in function to set distance model
   //alDistanceModel(AL_EXPONENT_DISTANCE);
@@ -69,6 +79,15 @@ int OpenAL::Init()
 /// Create a sound source
 unsigned int OpenAL::CreateSource()
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
   unsigned int source;
 
   //Create 1 source
@@ -76,16 +95,29 @@ unsigned int OpenAL::CreateSource()
 
   this->sources.push_back(source);
 
+#endif
+
   return this->sources.size()-1;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create an audio data buffer
 unsigned int OpenAL::CreateBuffer(const std::string &audioFile)
 {
+
+#ifdef ENABLE_OPENAL
+
   unsigned int buffer;
   uint8_t *dataBuffer = NULL;
   unsigned int dataBufferSize;
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
 
   // Create an audio decoder
   AudioDecoder audioDecoder;
@@ -106,6 +138,7 @@ unsigned int OpenAL::CreateBuffer(const std::string &audioFile)
 
   if (dataBuffer)
     delete [] dataBuffer; 
+#endif
 
   return this->buffers.size()-1;
 }
@@ -115,8 +148,17 @@ unsigned int OpenAL::CreateBuffer(const std::string &audioFile)
 /// Update all the sources and the listener
 void OpenAL::Update()
 {
+#ifdef ENABLE_OPENAL
+
   //ALfloat pos[3];
   ALfloat vel[3];
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(10) << "Audio device not open\n";
+    return;
+  }
 
   //for (int i=0; i< this->sourceCount; i++)
   {
@@ -135,12 +177,22 @@ void OpenAL::Update()
     //printf("p[%f %f %f] v[%f %f %f]\n", pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]);
     this->SetSourcePos(0, this->pos[0], this->pos[1], this->pos[2] );
   }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the data
 int OpenAL::SetData(unsigned int index, uint8_t *data, unsigned int dataSize, unsigned int freq)
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
   // Clear the error buffer;
   alGetError();
 
@@ -158,8 +210,7 @@ int OpenAL::SetData(unsigned int index, uint8_t *data, unsigned int dataSize, un
     alDeleteBuffers(1, &this->buffers[index]);
     return -1;
   }
-
-
+#endif
   return 0;
 }
 
@@ -167,6 +218,15 @@ int OpenAL::SetData(unsigned int index, uint8_t *data, unsigned int dataSize, un
 /// \brief Attach a buffer to a source
 int OpenAL::SetSourceBuffer(unsigned int sourceIndex, unsigned int bufferIndex)
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
   if (sourceIndex >= this->sources.size())
   {
     std::cerr << "Invalid source index\n";
@@ -190,6 +250,7 @@ int OpenAL::SetSourceBuffer(unsigned int sourceIndex, unsigned int bufferIndex)
     return -1;
   }
 
+#endif
 
   return 0;
 }
@@ -198,6 +259,15 @@ int OpenAL::SetSourceBuffer(unsigned int sourceIndex, unsigned int bufferIndex)
 // Play the source
 void OpenAL::Play( unsigned int index )
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return;
+  }
+
   // Play the source
   alSourcePlay( this->sources[index] );
 
@@ -210,13 +280,22 @@ void OpenAL::Play( unsigned int index )
     alGetSourcei(this->sources[index], AL_SOURCE_STATE, &state);
   } while ( state == AL_PLAYING);
   */
-
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the listener position
 int OpenAL::SetListenerPos( float x, float y, float z )
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
   // Clear error state
   alGetError();
 
@@ -227,7 +306,7 @@ int OpenAL::SetListenerPos( float x, float y, float z )
     std::cerr << "OpenAL SetListenerPos Error: [%d]\n" << this->error << "\n";
     return -1;
   }
-
+#endif
   return 0;
 }
 
@@ -235,6 +314,15 @@ int OpenAL::SetListenerPos( float x, float y, float z )
 /// Set the listener velocity
 int OpenAL::SetListenerVel( float x, float y, float z )
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
   // Clear error state
   alGetError();
 
@@ -244,7 +332,7 @@ int OpenAL::SetListenerVel( float x, float y, float z )
     std::cerr << "OpenAL SetListenerVel Error: [%d]" << this->error << "\n";
     return -1;
   }
-
+#endif
   return 0;
 }
 
@@ -253,7 +341,15 @@ int OpenAL::SetListenerVel( float x, float y, float z )
 int OpenAL::SetListenerOrient( float cx, float cy, float cz,
                                float ux, float uy, float uz )
 {
+#ifdef ENABLE_OPENAL
   ALfloat orient[]={cx, cy, cz, ux, uy, uz};
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
 
   // Clear error state
   alGetError();
@@ -265,7 +361,7 @@ int OpenAL::SetListenerOrient( float cx, float cy, float cz,
     std::cerr << "OpenAL SetListenerOrientation Error: [%d]" << this->error << "\n";
     return -1;
   }
-
+#endif
   return 0;
 }
 
@@ -273,7 +369,15 @@ int OpenAL::SetListenerOrient( float cx, float cy, float cz,
 // Set the position of the source
 int OpenAL::SetSourcePos(unsigned int index, float x, float y, float z)
 {
+#ifdef ENABLE_OPENAL
   ALfloat p[3] = {x, y, z};
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
 
   if (index >= this->sources.size())
   {
@@ -291,7 +395,7 @@ int OpenAL::SetSourcePos(unsigned int index, float x, float y, float z)
     std::cerr << "OpenAL::SetSourcePos Error: [%d]" << this->error << "\n";
     return -1;
   }
-
+#endif
   return 0;
 }
 
@@ -299,7 +403,16 @@ int OpenAL::SetSourcePos(unsigned int index, float x, float y, float z)
 // Set the position of the source
 int OpenAL::SetSourceVel(unsigned int index, float x, float y, float z)
 {
+#ifdef ENABLE_OPENAL
   ALfloat v[3] = {x, y, z};
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
 
   if (index >= this->sources.size())
   {
@@ -317,7 +430,7 @@ int OpenAL::SetSourceVel(unsigned int index, float x, float y, float z)
     std::cerr << "OpenAL::SetSourceVel Error: [%d]" << this->error << "\n";
     return -1;
   }
-
+#endif
   return 0;
 }
 
@@ -325,6 +438,16 @@ int OpenAL::SetSourceVel(unsigned int index, float x, float y, float z)
 // Set the pitch of the source
 int OpenAL::SetSourcePitch(unsigned int index, float p)
 {
+
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
   if (index >= this->sources.size())
   {
     std::cerr << "Invalid source index[" << index <<" ]\n";
@@ -341,7 +464,7 @@ int OpenAL::SetSourcePitch(unsigned int index, float p)
     std::cerr << "OpenAL::SetSourcePitch Error: [%d]\n" << this->error;
     return -1;
   }
-
+#endif
   return 0;
 }
 
@@ -349,6 +472,16 @@ int OpenAL::SetSourcePitch(unsigned int index, float p)
 // Set the pitch of the source
 int OpenAL::SetSourceGain(unsigned int index, float g)
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
+
   if (index >= this->sources.size())
   {
     std::cerr << "Invalid source index[" << index <<" ]\n";
@@ -365,7 +498,7 @@ int OpenAL::SetSourceGain(unsigned int index, float g)
     std::cerr << "OpenAL::SetSourceGain Error: [%d]\n" << this->error;
     return -1;
   }
-
+#endif
   return 0;
 }
 
@@ -373,6 +506,16 @@ int OpenAL::SetSourceGain(unsigned int index, float g)
 // Set whether the source loops the audio 
 int OpenAL::SetSourceLoop(unsigned int index, bool state)
 {
+#ifdef ENABLE_OPENAL
+
+  // Make sure we have an audio device
+  if (!this->audioDevice)
+  {
+    gzerr(0) << "Audio device not open\n";
+    return -1;
+  }
+
+
   if (index >= this->sources.size())
   {
     std::cerr << "Invalid source index[" << index <<" ]\n";
@@ -390,7 +533,7 @@ int OpenAL::SetSourceLoop(unsigned int index, bool state)
     std::cerr << "OpenAL::SetSourceLoop Error: [%d]\n" << this->error << "\n";
     return -1;
   }
-
+#endif
 
   return 0;
 }

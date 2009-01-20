@@ -38,6 +38,7 @@
 #include "Simulator.hh"
 #include "gazebo.h"
 #include "World.hh"
+#include "OpenAL.hh"
 #include "Geom.hh"
 
 using namespace gazebo;
@@ -170,7 +171,11 @@ int World::Init()
     (*miter)->Init();
   }
 
+  // Initialize the physics engine
   this->physicsEngine->Init();
+
+  // Initialize openal
+  OpenAL::Instance()->Init();
 
   this->toAddModels.clear();
   this->toDeleteModels.clear();
@@ -218,6 +223,9 @@ int World::Update()
   }
 
   this->toDeleteModels.clear();
+
+  // Update the audio
+  OpenAL::Instance()->Update();
 
   return 0;
 }
