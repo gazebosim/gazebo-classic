@@ -47,6 +47,25 @@ int main()
     return -1;
   }
 
+  printf("Play\n");
+  /// Play the sound in the buffer
+  audioIface->Lock(1);
+  audioIface->data->cmd_play = 1;
+  audioIface->Unlock();
+
+  usleep(1000000);
+
+  printf("Pause\n");
+  /// Pause the sound
+  audioIface->Lock(1);
+  audioIface->data->cmd_pause = 1;
+  audioIface->Unlock();
+
+  usleep(1000000);
+
+  printf("Continue\n");
+
+  /// Play the sound in the buffer
   audioIface->Lock(1);
   audioIface->data->cmd_play = 1;
   audioIface->Unlock();
