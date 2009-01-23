@@ -20,7 +20,6 @@ opts = Options()
 opts.Add('prefix', 'The install path "prefix"', '/usr/local')
 opts.Add('destdir', 'The root directory to install into. Useful mainly for binary package building', '/')
 opts.Add('mode','Defines how Gazebo will be built, options available: optimized, profile, debug','debug')
-opts.Add('with_audio','Builds support for 3d sound. Options available: no, yes ', 'no')
 
 #
 # 3rd party packages
@@ -29,7 +28,11 @@ parseConfigs=['pkg-config --cflags --libs OGRE',
               'xml2-config --cflags --libs', 
       	      'ode-config --cflags --libs',
               'fltk-config --cflags --libs --ldflags --use-gl --use-images',
-              'pkg-config --cflags --libs xft'
+              'pkg-config --cflags --libs xft',
+
+              'pkg-config --cflags --libs libavformat',
+              'pkg-config --cflags --libs libavcodec',
+              'pkg-config --cflags --libs openal'
               ]
 
 #
@@ -64,7 +67,7 @@ env = Environment (
   LIBPATH=Split('#libgazebo #server/audio_video'),
     
   #LIBS=Split('gazebo boost_python')
-  LIBS=Split('gazebo gazeboav boost_signals'),
+  LIBS=Split('gazebo boost_signals'),
   LINKFLAGS=Split('-export-dynamic'),
 
   TARFLAGS = '-c -z',
@@ -72,6 +75,7 @@ env = Environment (
 
   options=opts
 )
+
 
 Help(opts.GenerateHelpText(env))
 
@@ -100,8 +104,6 @@ elif env['mode'] == 'profile':
 elif env['mode'] == 'optimized':
   env['CCFLAGS'] += Split('-O3 -fPIC') 
 
-if env['with_audio'] == 'yes':
-  parseConfigs+=['pkg-config --cflags --libs OgreAL']
 
 optimize_for_cpu(env);
 
@@ -151,9 +153,13 @@ if not env.GetOption('clean'):
         print "libfltk & development files are required, but not found."
         print "  http://www.fltk.org"
         Exit(1)
-      elif cfg.find("OgreAL") >= 0:
-        print "You requested to activate the support for 3D audio. But OgreAL is not found."
+      elif cfg.find("OpenAL") >= 0:
+        print "OpenAL not found. 3D audio is disabled"
         print "http://www.ogre3d.org/phpBB2addons/viewtopic.php?t=3293"
+        Exit(1)
+      elif cfg.find("avcodec") >= 0 or cfg.find("avformat") >= 0:
+        print "FFMpeg not found. MP3 decoding is disabled"
+        print "  http://ffmpeg.mplayerhq.hu/"
         Exit(1)
 
 # Check for trimesh support in ODE
@@ -165,18 +171,22 @@ env = conf.Finish()
 
 
 
-# FIXME: if this check fails, it makes it fail the check for ODE  
-# This test should be done outside of the configure context below, because
-# otherwise it tries to link against the not-yet-built libgazebo, causing
-# the test to always fail.
-simpleenv = Environment()
-simpleconf = Configure(env)
+simpleenv = Environment(CPPPATH="/usr/include/AL")
+simpleconf = Configure(simpleenv)
+
+# Test for libtool
 if not simpleconf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
   print "  Warning: Failed to find ltdl, no plugin support will be included"
   env["HAVE_LTDL"]=False
 else:
   env["HAVE_LTDL"]=True
-  env["CCFLAGS"].append("-DHAVE_LTDL")
+  env.Append(CCFLAGS = " -DHAVE_LTDL")
+  env.Append(LIBS = "ltdl")
+
+# Test for openal
+if simpleconf.CheckLibWithHeader('openal', 'al.h', 'CXX'):
+  env["HAVE_OPENAL"] = True
+
 simpleconf.Finish()
 
 

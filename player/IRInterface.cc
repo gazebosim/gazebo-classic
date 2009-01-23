@@ -82,7 +82,7 @@ int IRInterface::ProcessMessage(QueuePointer &respQueue,
 	rep.poses_count =  this->iface->data->ir_count;
 	rep.poses = new player_pose3d_t[rep.poses_count];
 	
-	for(int i=0;i<rep.poses_count;i++)
+	for(unsigned int i=0;i<rep.poses_count;i++)
 	{
 		rep.poses[i].px = this->iface->data->poses[i].pos.x;
 		rep.poses[i].py = this->iface->data->poses[i].pos.y;
@@ -115,10 +115,6 @@ void IRInterface::Update()
     // Only Update when new data is present
   if (this->iface->data->head.time > this->datatime)
     {
-      int i;
-      float rangeRes;
-      float angleRes;
-
       this->datatime = this->iface->data->head.time;
 
       ts.tv_sec = (int) (this->iface->data->head.time);
@@ -129,7 +125,7 @@ void IRInterface::Update()
       this->data.ranges_count = this->iface->data->ir_count;
       this->data.voltages_count = this->iface->data->ir_count;
       
-      if(oldCount != this->data.ranges_count)
+      if(oldCount != (int)this->data.ranges_count)
       {
       	delete []this->data.ranges;
       	delete []this->data.voltages;
@@ -139,7 +135,7 @@ void IRInterface::Update()
       }
       
 
-      for (int i = 0; i < this->data.ranges_count; i++)
+      for (unsigned int i = 0; i < this->data.ranges_count; i++)
       {
          this->data.ranges[i] = (float)this->iface->data->ranges[i];
          this->data.voltages[i]=0;

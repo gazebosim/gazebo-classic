@@ -14,7 +14,8 @@ int main()
     PlayerClient robot(PlayerCc::PLAYER_HOSTNAME, PlayerCc::PLAYER_PORTNUM);
 
     // Subscribe to the simulation proxy
-    Position2dProxy pp(&robot, 1);
+    Position2dProxy pp(&robot, 0);
+    
 
     // Print out some stuff
     std::cout << robot << std::endl;

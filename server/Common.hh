@@ -35,7 +35,6 @@
 
 namespace gazebo
 {
-
   class Common
   {
     /// \brief Constructor

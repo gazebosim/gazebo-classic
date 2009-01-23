@@ -56,8 +56,6 @@ World::World()
   this->showPhysics = false;
   this->physicsEngine = NULL;
   this->server = NULL;
-  this->simIface = NULL;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +124,8 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
     gzthrow(err);
   }
 
+  // Load OpenAL audio 
+  OpenAL::Instance()->Load( rootNode->GetChild("openal", "audio") );
 
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 
@@ -224,9 +224,6 @@ int World::Update()
 
   this->toDeleteModels.clear();
 
-  // Update the audio
-  OpenAL::Instance()->Update();
-
   return 0;
 }
 
@@ -262,6 +259,9 @@ int World::Fini()
   {
     gzthrow(e);
   }
+
+  // Close the openal server
+  OpenAL::Instance()->Fini();
 
   return 0;
 }
@@ -545,7 +545,7 @@ void World::UpdateSimulationIface()
 
   unsigned int requestCount = this->simIface->data->requestCount;
 
-  // Max sure the request count is valid
+  // Make sure the request count is valid
   if (this->simIface->data->requestCount > GAZEBO_SIMULATION_MAX_REQUESTS)
   {
     gzerr(0) << "Request count[" << this->simIface->data->requestCount << "] greater than max allowable[" << GAZEBO_SIMULATION_MAX_REQUESTS << "]\n";

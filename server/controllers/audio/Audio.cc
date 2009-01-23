@@ -19,9 +19,9 @@
  *
  */
 /*
- * Desc: Audio controller
- * Author: Jordi Polo
- * Date: 23 Feb 2008
+ * Desc: Audio Output controller 
+ * Author: Nate Koenig
+ * Date: 23 Jan 2009
  */
 
 #include "Global.hh"
@@ -32,48 +32,45 @@
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Audio.hh"
-#include "OgreVisual.hh"
+
 #include <string.h>
-#include <OgreAL.h>
 
 using namespace gazebo;
 
 GZ_REGISTER_STATIC_CONTROLLER("audio", AudioController);
-
-enum {DRIVE, STEER, FULL};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 AudioController::AudioController(Entity *parent )
     : Controller(parent)
 {
-  this->soundManager =0;
-// this->myParent = dynamic_cast<Model*>(this->parent);
+  this->myParent = dynamic_cast<Model*>(this->parent);
 
-//  if (!this->myParent)
-//    gzthrow("AudioController controller requires a Model as its parent");
+  if (!this->myParent)
+    gzthrow("AudioController controller requires a geom as its parent");
 
+  this->audioIface = NULL;
+  this->openALSource = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 AudioController::~AudioController()
 {
-  GZ_DELETE(this->soundManager)
+  if (this->openALSource)
+    delete this->openALSource;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the controller
 void AudioController::LoadChild(XMLConfigNode *node)
 {
+  this->audioIface = dynamic_cast<AudioIface*>(this->ifaces[0]);
 
-  this->myIface = dynamic_cast<AudioIface*>(this->ifaces[0]);
-
-  if (!this->myIface)
+  if (!this->audioIface)
     gzthrow("Audio controller requires an audio interface");
 
-  this->loopSound= node->GetBool("loop",false,0);
-  this->stream=node->GetBool("stream",false,0);
+  this->openALSource = OpenAL::Instance()->CreateSource( node );
 
 }
 
@@ -81,84 +78,36 @@ void AudioController::LoadChild(XMLConfigNode *node)
 // Initialize the controller
 void AudioController::InitChild()
 {
-  try
-  {
-    this->soundManager = new OgreAL::SoundManager();
-  }
-  catch (Ogre::Exception e)
-  {
-    gzthrow("The 3d Sound manager can not be initialized, check your OpenAL and OgreAL installation\n");
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Reset the controller
 void AudioController::ResetChild()
 {
-  //this->cmdReset=1;
+  this->openALSource->Rewind();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
 void AudioController::UpdateChild()
 {
-
-  OgreAL::Sound *sound;
-  std::string uniqueSoundName = this->GetUniqueName() + this->url;
-  this->GetAudioCmd();
-
-  if (cmdPlay)
+  // Update the position of the audio source, if it exists
+  if (this->openALSource)
   {
+    this->GetAudioCmd();
 
-    if (!soundManager->hasSound(uniqueSoundName)
-        sound = soundManager->createSound(uniqueSoundName, this->url, this->loopSound, this->stream);
-        else
-          sound = soundManager->getSound(uniqueSoundName);
-          //TODO: check what happens if I call this twice
-          this->parent->GetVisualNode()->AttachObject(sound);
-          sound->addSoundFinishedHandler(this, &AudioController::SoundFinished);
-          sound->play();
-          this->state=1;
-        }
-    if (cmdStop)
-  {
-    sound = soundManager->getSound(uniqueSoundName);
-    if (sound)
-    {
-      sound->stop();
-      this->state=1;
-    }
+    this->PutAudioData();
+
+    this->openALSource->SetPos(this->myParent->GetPose().pos);
   }
-  if (cmdPause)
-  {
-    sound = soundManager->getSound(uniqueSoundName);
-    if (sound)
-    {
-      sound->pause();
-      this->state=2;
-    }
-
-  }
-  if (cmdReset)
-  {
-
-  }
-
-  //more stuff here
-
-  this->PutAudioData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the controller
 void AudioController::FiniChild()
 {
-}
-
-
-void AudioController::soundFinished(OgreAL::Sound *sound)
-{
-  this->state=0;
+  delete this->openALSource;
+  this->openALSource = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -166,38 +115,51 @@ void AudioController::soundFinished(OgreAL::Sound *sound)
 void AudioController::GetAudioCmd()
 {
 
-  if (this->myIface->Lock(1))
+  if (this->audioIface->Lock(1))
   {
+    // Control output of the audio
+    if (this->audioIface->data->cmd_play)
+      this->openALSource->Play();
+    else if (this->audioIface->data->cmd_pause)
+      this->openALSource->Pause();
+    else if (this->audioIface->data->cmd_stop)
+      this->openALSource->Stop();
+    else if (this->audioIface->data->cmd_rewind)
+      this->openALSource->Rewind();
 
-    this->cmdPlay = this->myIface->data->cmd_play;
-    this->cmdPause = this->myIface->data->cmd_pause;
-    this->cmdStop = this->myIface->data->cmd_stop;
-    this->cmdReset = this->myIface->data->cmd_reset;
-    this->gain = this->myIface->data->gain;
+    // Loop the audio
+    if (this->audioIface->data->cmd_loop)
+      this->openALSource->SetLoop(1);
 
-    if (this->cmdPlay)
-      this->url = ((const char *)this->myIface->data->url);
+    // Set the gain and pitch
+    if (this->audioIface->data->cmd_gain > 0)
+      this->openALSource->SetGain( this->audioIface->data->cmd_gain );
+    if (this->audioIface->data->cmd_pitch > 0)
+      this->openALSource->SetPitch(this->audioIface->data->cmd_pitch );
+ 
+    // Reset the cmd variables
+    this->audioIface->data->cmd_play=0;
+    this->audioIface->data->cmd_pause=0;
+    this->audioIface->data->cmd_stop=0;
+    this->audioIface->data->cmd_rewind=0;
+    this->audioIface->data->cmd_loop=0;
 
-    //we got the command, not sure if this is correct
-    this->myIface->data->cmd_reset=0;
-    this->myIface->data->cmd_play=0;
-    this->myIface->data->cmd_pause=0;
-    this->myIface->data->cmd_stop=0;
-
-    this->myIface->Unlock();
+    this->audioIface->data->cmd_pitch = 0;
+    this->audioIface->data->cmd_gain = 0;
+ 
+    this->audioIface->Unlock();
   }
-  std::cout << this->url << std::endl;
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the data in the interface
 void AudioController::PutAudioData()
 {
-  if (this->myIface->Lock(1))
+  if (this->audioIface->Lock(1))
   {
-    this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
-    this->myIface->data->state = this->state;
-
-    this->myIface->Unlock();
+    this->audioIface->data->head.time = Simulator::Instance()->GetSimTime();
+    this->audioIface->data->state = this->openALSource->IsPlaying();
+    this->audioIface->Unlock();
   }
 }

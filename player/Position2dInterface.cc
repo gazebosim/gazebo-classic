@@ -76,6 +76,7 @@ Position2dInterface::~Position2dInterface()
 int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
                                         player_msghdr_t *hdr, void *data)
 {
+  printf("Recived Message\n");
   if (this->iface->Lock(1))
   {
 
@@ -195,11 +196,18 @@ int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
 
       return 0;
     }
+    else
+    {
+      printf("Unhandled\n");
+    }
 
     this->iface->Unlock();
   }
   else
+  {
+    printf("unable to get lock\n");
     this->Unsubscribe();
+  }
 
   return -1;
 

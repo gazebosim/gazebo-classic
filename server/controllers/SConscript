@@ -3,8 +3,8 @@ Import('env sharedObjs headers')
 
 dirs = Split('position2d laser camera factory gripper actarray ptz opaque bumper imu irarray')
 
-if env['with_audio'] == 'yes':
-  dirs+=Split('audio')
+if env["HAVE_OPENAL"] == True:
+  dirs.append("audio")
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)

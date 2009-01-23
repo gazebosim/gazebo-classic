@@ -533,4 +533,6 @@ Model *Simulator::GetSelectedModel() const
     else
       gzerr(0) << "Unknown type\n";
   }
+
+  return model;
 }

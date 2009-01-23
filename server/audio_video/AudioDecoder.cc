@@ -44,7 +44,7 @@ int AudioDecoder::Decode(uint8_t **outBuffer, unsigned int *outBufferSize)
 
   if (this->codec == NULL)
   {
-    printf("Set and audio file before decoding.\n");
+    printf("Set an audio file before decoding.\n");
     return -1;
   }
 

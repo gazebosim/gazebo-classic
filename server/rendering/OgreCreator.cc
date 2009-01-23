@@ -587,13 +587,23 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
 
-  try
+  int attempts = 0;
+  while (window == NULL && (attempts++) < 10)
   {
-    window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
+    try
+    {
+      window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
+    }
+    catch (...)
+    {
+      //gzerr(0) << " Unable to create the rendering window\n";
+      window = NULL;
+    }
   }
-  catch (...)
+
+  if (attempts >= 10)
   {
-    gzerr(0) << " Unable to create the rendering window\n";
+    gzthrow("Unable to create the rendering window\n");
   }
 
   window->setActive(true);

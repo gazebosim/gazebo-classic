@@ -203,6 +203,7 @@ namespace gazebo
     private: XMLConfigNode *xmlNode;
 
     private: std::string typeName;
+
   };
 
   /// \}

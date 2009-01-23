@@ -74,6 +74,7 @@ Geom::Geom( Body *body)
   this->laserFiducialIdP = new ParamT<int>("laserFiducialId",-1,0);
   this->laserRetroP = new ParamT<float>("laserRetro",-1,0);
   Param::End();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,9 +170,7 @@ void Geom::Load(XMLConfigNode *node)
     World::Instance()->RegisterGeom(this);
     this->ShowPhysics(false);
   }
-
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -252,6 +251,7 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 void Geom::Update()
 {
   this->UpdateChild();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

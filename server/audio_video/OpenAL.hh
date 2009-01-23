@@ -1,95 +1,145 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: OpenAL Server
+ * Author: Nathan Koenig
+ * Date: 20 Jan 2008
+ * SVN: $Id:$
+ */
+
 #ifndef OPENAL_HH
 #define OPENAL_HH
 
-#ifndef DISABLE_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alext.h>
-#endif 
 
 #include <stdint.h>
+#include <string>
 
-#include <deque>
-
-#include "SingletonT.hh"
+#include "Vector3.hh"
 
 namespace gazebo
 {
+
+  class OpenALIface;
+  class XMLConfigNode;
+  class OpenALSource;
   
-  class OpenAL : public SingletonT<OpenAL>
+  class OpenAL
   {
     /// \brief Constructor
     private: OpenAL();
   
     /// \brief Destructor
     private: virtual ~OpenAL();
+
+    /// \brief Load the OpenAL server
+    public: void Load(XMLConfigNode *node);
+
+    // \brief Get an instance of this class
+    public: static OpenAL *Instance();
   
     /// \brief Initialize
-    public: int Init();
-  
-    /// \brief Update all the sources and the listener
-    public: void Update();
-  
-    /// \brief Create a sound source
-    public: unsigned int CreateSource();
-  
-    /// \brief Create an audio data buffer
-    public: unsigned int CreateBuffer(const std::string &audioFile);
-  
-    /// \brief Set the data
-    public: int SetData(unsigned int index, uint8_t *data, unsigned int dataSize, unsigned int freq);
-  
-    /// \brief Attach a buffer to a source
-    public: int SetSourceBuffer(unsigned int sourceIndex, unsigned int bufferIndex);
-  
-    /// \brief Play a sound
-    public: void Play(unsigned int source);
-  
+    public: void Init();
+
+    /// \brief Finalize
+    public: void Fini();
+
+    /// \brief Create an OpenALSource object from XML node
+    /// \param node The XML config node containing the auiod information
+    /// \return A pointer to an OpenALSource object
+    public: OpenALSource *CreateSource( XMLConfigNode *node );
+
     /// \brief Set the listener position
-    public: int SetListenerPos( float x, float y, float z );
+    public: void SetListenerPos( const Vector3 pos );
   
     /// \brief Set the listener velocity
-    public: int SetListenerVel( float x, float y, float z );
+    public: void SetListenerVel( const Vector3 vel );
   
     /// \brief Set the listener orientation
-    public: int SetListenerOrient(float cx, float cy, float cz,
+    public: void SetListenerOrient(float cx, float cy, float cz,
                                         float ux, float uy, float uz);
-  
-    /// \brief Set the position of the source
-    public: int SetSourcePos(unsigned int index, float x, float y, float z);
-  
-    /// \brief Set the position of the source
-    public: int SetSourceVel(unsigned int index, float x, float y, float z);
-  
-    /// \brief Set the pitch of the source
-    public: int SetSourcePitch(unsigned int index, float p);
-  
-    /// \brief Set the pitch of the source
-    public: int SetSourceGain(unsigned int index, float g);
-  
-    /// \brief Set whether the source loops the audio 
-    public: int SetSourceLoop(unsigned int index, bool state);
 
-#ifndef DISABLE_OPENAL
     private: ALCcontext *context;
     private: ALCdevice *audioDevice;
   
-    private: ALfloat pos[3];
-
-    // OpenAL error code
-    private: ALenum error;
-#endif
-
-    // Audio sources. 
-    private: std::deque<unsigned int> sources;
-  
-    // Audio data buffers
-    private: std::deque<unsigned int> buffers;
-  
-    private: friend class DestroyerT<OpenAL>;
-    private: friend class SingletonT<OpenAL>;
+    private: static OpenAL *myself;
   };
+
+
+  /// \brief OpenAL Source. This can be thought of as a speaker.
+  class OpenALSource
+  {
+    /// \brief Constructor
+    public: OpenALSource();
+
+    /// \brief Destructor
+    public: virtual ~OpenALSource();
+
+    /// \brief Load the source from xml
+    public: void Load(XMLConfigNode *node);
+
+    /// \brief Set the position of the source
+    public: int SetPos(const Vector3 &pos);
   
+    /// \brief Set the velocity of the source
+    public: int SetVel(const Vector3 &vel);
+  
+    /// \brief Set the pitch of the source
+    public: int SetPitch(float p);
+  
+    /// \brief Set the pitch of the source
+    public: int SetGain(float g);
+  
+    /// \brief Set whether the source loops the audio 
+    public: int SetLoop(bool state);
+ 
+    /// \brief Play a sound
+    public: void Play();
+
+    /// \brief Pause a sound
+    public: void Pause();
+
+    /// \brief Stop a sound
+    public: void Stop();
+
+    /// \brief Rewind the sound to the beginning
+    public: void Rewind();
+
+    /// \brief Is the audio playing
+    public: bool IsPlaying();
+
+    /// \brief Fill the OpenAL audio buffer from PCM data
+    public: void FillBufferFromPCM(uint8_t *pcmData, unsigned int dataCount, 
+                                   int sampleRate );
+
+    /// \brief Fill the OpenAL audio buffer with data from a sound file
+    public: void FillBufferFromFile( const std::string &audioFile );
+
+    // OpenAL source index
+    private: unsigned int alSource;
+
+    // OpenAL buffer index
+    private: unsigned int alBuffer;
+  };
 }
 
 #endif

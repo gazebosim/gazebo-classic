@@ -139,6 +139,29 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
 
   }
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_ACTARRAY_REQ_SPEED, this->device_addr))
+  {
+    assert(hdr->size >= sizeof(player_actarray_speed_config_t));
+    player_actarray_speed_config_t *req;
+    player_actarray_speed_config_t response;
+
+    req = (player_actarray_speed_config_t*)(data);
+
+    if (req->joint < GAZEBO_ACTARRAY_MAX_NUM_ACTUATORS)
+    {
+      this->iface->Lock(1);
+
+      response.joint = req->joint;
+      response.speed = this->iface->data->actuators[req->joint].speed;
+
+      this->iface->Unlock();
+
+      driver->Publish(this->device_addr, respQueue,
+          PLAYER_MSGTYPE_RESP_ACK, PLAYER_ACTARRAY_REQ_SPEED, &response);
+
+    }
+  }
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_ACTARRAY_REQ_BRAKES, this->device_addr))
   {
     assert(hdr->size >= sizeof(player_actarray_brakes_config_t));
@@ -233,9 +256,6 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void ActarrayInterface::Update()
 {
-
-  struct timeval ts;
-
   this->iface->Lock(1);
 
   // Only Update when new data is present

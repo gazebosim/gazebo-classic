@@ -29,26 +29,28 @@
 
 #include "Controller.hh"
 #include "Entity.hh"
-#include "OgreAL.h"
+#include "OpenAL.hh"
 
 namespace gazebo
 {
+  class Model;
+  class OpenALSource;
   class AudioIface;
-  class OgreAL::SoundManager;
 
 /// \addtogroup gazebo_controller
 /// \{
 /** \defgroup audio audio
 
-  \brief Audio controller
+  \brief Audio output controller
 
-  Controller for the sounds 
+  Controller for output of sounds 
 
   \verbatim
-    <controller:audio name="talking_box">
+    <controller:audio name="audio_1">
+      <pitch>1</pitch>
+      <gain>1</gain>
       <loop>false</loop>
-      <stream>false</stream>
-      <interface:audio name="audio_iface_0">
+      <interface:audio name="audio_iface_0"/>
     </controller:audio>
   \endverbatim
   \{
@@ -64,7 +66,6 @@ class AudioController : public Controller
   public: virtual ~AudioController();
 
   /// Load the controller
-  /// \param node XML config node
   protected: virtual void LoadChild(XMLConfigNode *node);
 
   /// Init the controller
@@ -86,20 +87,11 @@ class AudioController : public Controller
   private: void GetAudioCmd();
 
   /// The Position interface
-  private: AudioIface *myIface;
+  private: AudioIface *audioIface;
   
-  private: bool loopSound;
-  private: bool stream;
-  private: int state;
-  private: bool cmdPlay;
-  private: bool cmdPause;
-  private: bool cmdStop;
-  private: bool cmdReset;
-  private: float gain;
-  private: std::string url;
-  private: OgreAL::SoundManager *soundManager;
+  private: OpenALSource *openALSource;
 
-
+  private: Model *myParent;
 };
 
 /** \} */

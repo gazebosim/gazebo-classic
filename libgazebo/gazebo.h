@@ -444,6 +444,7 @@ class SimulationIface : public Iface
 /// \}
 
 
+
 /***************************************************************************/
 /// \addtogroup libgazebo_iface 
 /// \{
@@ -451,54 +452,38 @@ class SimulationIface : public Iface
 
   \brief Audio interface
 
-The audio interface allows clients send and receive audio from the 
-simulated world. 
-It implements the microphones and also the sounds that can be 
-sent to the world.
-
+  The audio interface controls playback of sound.
 \{
 */
-
-#define GAZEBO_MAX_URL_SIZE 256
 
 /// \brief Audio interface data
 class AudioData
 {
   public: GazeboData head;
 
-  /// Data timestamp
-  public: float time;
+  /// Set the gain. Value >= 0
+  public: float cmd_gain;
 
-  /// Play in a loop?
-  public: bool loop;
+  // Set the pitch. Value >= 0
+  public: float cmd_pitch;
 
-  /// Gain
-  public: float gain;
-
-  ///streaming of the file?
-  public: bool stream;
-
-  ///Play
+  /// Play. 1 = play
   public: int cmd_play;
 
-  ///Pause
+  /// Pause. 1 = pause
   public: int cmd_pause;
 
-  ///Stop
+  /// Stop. 1 = stop
   public: int cmd_stop;
-  
-///Reset to the beginning
-  public: int cmd_reset;
-  
-  ///state given by the server, 1 for playing.
-  public: int state;
- 
-  /// location of the file
-  public: char url[GAZEBO_MAX_URL_SIZE];
 
-  /// 3D Pose of the audio, given by the server 
-  public: Pose audio_pose;
+  /// Play in a loop? 1 = loop
+  public: int cmd_loop;
   
+  /// Rewind to the beginning. 1 = rewind
+  public: int cmd_rewind;
+
+  /// Play state given by the server. 1 = playing
+  public: int state;
 };
 
 /// \brief The audio interface
@@ -1611,7 +1596,7 @@ class IRIface : public Iface
             this->data = (IRData*)this->mMap; 
           }
 
-  /// Pointer to the laser data
+  /// Pointer to the IR data
   public: IRData *data;
 };
 
@@ -1619,7 +1604,69 @@ class IRIface : public Iface
 /// \}
 
 
-}
+/***************************************************************************/
+/// \addtogroup libgazebo_iface
+/// \{
+/** \defgroup openal_iface openal
 
+  \brief OpenAL interface
+
+\{
+ */
+/*
+#define GAZEBO_OPENAL_MAX_REQUESTS 20
+
+class OpenALRequest
+{
+  public: enum Type {PLAY, PAUSE, STOP};
+  public: Type type;
+  public: char sourceName[512];
+};
+
+/// \brief OpenAL interface data
+class OpenALData
+{
+  public: GazeboData head;
+
+  public: OpenALRequest requests[GAZEBO_OPENAL_MAX_REQUESTS];
+  public: unsigned int requestCount;
+};
+
+/// \brief OpenAL interface
+class OpenALIface : public Iface
+{
+  /// \brief Constructor
+  public: OpenALIface():Iface("openal", sizeof(OpenALIface)+sizeof(OpenALData)) {}
+
+  /// \brief Destructor
+  public: virtual ~OpenALIface() {this->data = NULL;}
+
+  /// \brief Create the interface (used by Gazebo server)
+  /// \param server Pointer to the server
+  /// \param id Id of the interface
+  public: virtual void Create(Server *server, std::string id)
+          {
+            Iface::Create(server,id); 
+            this->data = (OpenALData*)this->mMap; 
+          }
+
+  /// \brief Open an existing interface
+  /// \param client Pointer to the client
+  /// \param id Id of the interface
+  public: virtual void Open(Client *client, std::string id)
+          {
+            Iface::Open(client,id); 
+            this->data = (OpenALData*)this->mMap; 
+          }
+
+  /// Pointer to the laser data
+  public: OpenALData *data;
+};
+*/
+
+/** \} */
+/// \}
+
+}
 
 #endif

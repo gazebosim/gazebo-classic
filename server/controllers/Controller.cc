@@ -118,10 +118,6 @@ void Controller::Load(XMLConfigNode *node)
       gzthrow(e);
     }
     
-    
-    
-    std::cout<<ifaceName<<std::endl;
-
     this->ifaces.push_back(iface);
 
     childNode = childNode->GetNextByNSPrefix("interface");
