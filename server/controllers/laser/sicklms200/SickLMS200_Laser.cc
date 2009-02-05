@@ -86,6 +86,27 @@ void SickLMS200_Laser::LoadChild(XMLConfigNode *node)
 // Initialize the controller
 void SickLMS200_Laser::InitChild()
 {
+
+  this->laserIface->Lock(1);
+
+  Quatern rot = this->myParent->GetPose().rot;
+  Vector3 pos = this->myParent->GetPose().pos;
+
+  // Update the pose
+  this->laserIface->data->pose.pos.x = pos.x;
+  this->laserIface->data->pose.pos.y = pos.y;
+  this->laserIface->data->pose.pos.z = pos.z;
+
+  this->laserIface->data->pose.roll = rot.GetRoll();
+  this->laserIface->data->pose.pitch = rot.GetPitch();
+  this->laserIface->data->pose.yaw = rot.GetYaw();
+
+  this->laserIface->data->size.x = 0.1;
+  this->laserIface->data->size.y = 0.1;
+  this->laserIface->data->size.z = 0.1;
+
+
+  this->laserIface->Unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
