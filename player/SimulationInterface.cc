@@ -225,6 +225,8 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       req->value = NULL;
     }
   }
+  else
+    printf("Unhandled Process message[%d][%d]\n",0,0);
 
   return 0;
 }
