@@ -95,6 +95,9 @@ void Sensor::Save(std::string &prefix, std::ostream &stream)
 /// Initialize the sensor
 void Sensor::Init()
 {
+  if (this->controller)
+    this->controller->Init();
+
   this->lastUpdate = Simulator::Instance()->GetSimTime();
 
   this->InitChild();
