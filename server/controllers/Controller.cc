@@ -58,7 +58,6 @@ Controller::Controller(Entity *entity )
 /// Destructor
 Controller::~Controller()
 {
-  this->Fini();
   delete this->nameP;
   delete this->updatePeriodP;
 }
@@ -198,7 +197,6 @@ void Controller::Fini()
   {
     delete *iter;
   }
-
   this->ifaces.clear();
 
   this->FiniChild();
