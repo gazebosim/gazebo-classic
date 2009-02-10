@@ -22,7 +22,7 @@
     <stepTime>0.03</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-5</cfm>
-    <erp>0.1</erp>
+    <erp>0.3</erp>
     <updateRate>2</updateRate>
   </physics:ode>
 
@@ -36,7 +36,7 @@
       <row height="100%">
         <camera width="100%">
           <xyz>0.35 -0.5 0.43</xyz>
-          <rpy>0, 14, 111.5</rpy>
+          <rpy>0 14 111.5</rpy>
         </camera>
       </row>
     </frames>

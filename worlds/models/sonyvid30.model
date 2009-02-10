@@ -23,7 +23,7 @@
       <xyz>0.0 0.0 0.02</xyz>
       <rpy>0 0 90</rpy>
       <size>0.15 0.14 0.04</size>
-      <mass>0.01</mass>
+      <mass>0.1</mass>
 
       <visual>
         <rpy>0 0 -90</rpy>
@@ -61,7 +61,7 @@
     <geom:box name="camera_top_geom">
       <rpy>0 0 90</rpy>
       <size>0.12 0.119 0.03</size>
-      <mass>0.01</mass>
+      <mass>0.0</mass>
 
       <visual>
         <xyz>0.0 0.06 -0.015</xyz>
@@ -76,7 +76,7 @@
       <xyz>0.045 -0.002 -0.002</xyz>
       <rpy>0 90 0</rpy>
       <size>0.01 0.04</size>
-      <mass>0.01</mass>
+      <mass>0.0</mass>
 
       <visual>
         <size>0.025 0.025 0.04</size>
@@ -106,7 +106,7 @@
     <axis>0 0 1</axis>
     <lowStop>-170</lowStop>
     <highStop>170</highStop>
-    <erp>0.1</erp>
+    <erp>0.2</erp>
     <cfm>10e-5</cfm>
   </joint:hinge>
 
@@ -117,7 +117,7 @@
     <axis>0 1 0</axis>
     <lowStop>-20</lowStop>
     <highStop>20</highStop>
-    <erp>0.8</erp>
+    <erp>0.2</erp>
     <cfm>10e-5</cfm>
   </joint:hinge>
 
@@ -126,7 +126,7 @@
     <tiltJoint>tilt_joint</tiltJoint>
 
     <motionGain>1</motionGain>
-    <force>0.01</force>
+    <force>0.001</force>
     <interface:ptz name="ptz_iface_1"/>
   </controller:generic_ptz>
 
