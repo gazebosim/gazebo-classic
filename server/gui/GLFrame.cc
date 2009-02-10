@@ -95,6 +95,8 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   // Set default starting pose of the camera
   this->startPose.pos.Set(-2, 0, 2);
   this->startPose.rot.SetFromEuler( Vector3(0, DTOR(30), 0) );
+
+  this->saveFrames = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,6 +109,7 @@ GLFrame::~GLFrame()
 // Load the frame
 void GLFrame::Load( XMLConfigNode *node )
 {
+
   this->saveFrames = false;
 
   if (node)

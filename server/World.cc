@@ -125,7 +125,8 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   }
 
   // Load OpenAL audio 
-  OpenAL::Instance()->Load( rootNode->GetChild("openal", "audio") );
+  if (rootNode->GetChild("openal","audio"))
+    OpenAL::Instance()->Load( rootNode->GetChild("openal", "audio") );
 
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 

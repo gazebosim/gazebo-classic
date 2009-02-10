@@ -121,16 +121,16 @@ void OpenAL::Init()
 /// Finalize
 void OpenAL::Fini()
 {
+  if (this->audioDevice)
+  {
+    alcCloseDevice(this->audioDevice);
+  }
+
   if (this->context)
   {
     this->context = alcGetCurrentContext();
     alcMakeContextCurrent(NULL);
     alcDestroyContext(this->context);
-  }
-    
-  if (this->audioDevice)
-  {
-    alcCloseDevice(this->audioDevice);
   }
 }
 
