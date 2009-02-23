@@ -73,7 +73,6 @@ PTZInterface::~PTZInterface()
 int PTZInterface::ProcessMessage(QueuePointer &respQueue,
                                  player_msghdr_t *hdr, void *data)
 {
-
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
                             PLAYER_PTZ_CMD_STATE, this->device_addr))
   {
@@ -88,10 +87,32 @@ int PTZInterface::ProcessMessage(QueuePointer &respQueue,
     this->iface->data->cmd_pan = cmd->pan;
     this->iface->data->cmd_tilt = cmd->tilt;
     this->iface->data->cmd_zoom = cmd->zoom;
+    this->iface->data->cmd_tilt_speed = cmd->tiltspeed;
+    this->iface->data->cmd_pan_speed = cmd->panspeed;
 
     this->iface->Unlock();
 
     return 0;
+  }
+
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
+                                 PLAYER_PTZ_REQ_CONTROL_MODE, this->device_addr))
+  {
+    player_ptz_req_control_mode_t *req;
+
+    assert(hdr->size >= sizeof(player_ptz_req_control_mode_t));
+
+    req = (player_ptz_req_control_mode_t *) data;
+
+    if (req->mode == PLAYER_PTZ_VELOCITY_CONTROL)
+      this->iface->data->control_mode = GAZEBO_PTZ_VELOCITY_CONTROL;
+    else
+      this->iface->data->control_mode = GAZEBO_PTZ_POSITION_CONTROL;
+
+    this->driver->Publish( this->device_addr, respQueue,
+                             PLAYER_MSGTYPE_RESP_ACK,
+                             PLAYER_PTZ_REQ_CONTROL_MODE);
+    return(0);
   }
 
   // Is it a request for ptz geometry?

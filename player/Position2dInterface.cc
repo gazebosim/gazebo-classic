@@ -76,7 +76,6 @@ Position2dInterface::~Position2dInterface()
 int Position2dInterface::ProcessMessage(QueuePointer &respQueue,
                                         player_msghdr_t *hdr, void *data)
 {
-  printf("Recived Message\n");
   if (this->iface->Lock(1))
   {
 
