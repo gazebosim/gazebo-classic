@@ -117,8 +117,9 @@
 </joint:slider>
 
 <controller:pioneer2_gripper name="pioneer2gripper_controller">
-	<leftJoint>left_paddle_joint</leftJoint>
-	<rightJoint>right_paddle_joint</rightJoint>
+  <leftJoint name="left_paddle_joint" force="0.001"/>
+  <rightJoint name="right_paddle_joint" force="0.001"/>
+  <liftJoint name="lift_paddle_joint" force="0.1"/>
 	<interface:gripper name="gripper_iface_0"/>
 </controller:pioneer2_gripper>
 
