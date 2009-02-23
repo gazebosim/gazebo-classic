@@ -39,7 +39,7 @@ using namespace gazebo;
 
 GZ_REGISTER_STATIC_CONTROLLER("pioneer2_gripper", Pioneer2_Gripper);
 
-enum {RIGHT, LEFT};
+enum {LEFT, RIGHT, LIFT};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -50,30 +50,79 @@ Pioneer2_Gripper::Pioneer2_Gripper(Entity *parent )
 
   if (!this->myParent)
     gzthrow("Pioneer2_Gripper controller requires a Model as its parent");
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Pioneer2_Gripper::~Pioneer2_Gripper()
 {
+  for (int i=0; i<3; i++)
+  {
+    GZ_DELETE(this->jointNamesP[i]);
+    GZ_DELETE(this->gainsP[i]);
+    GZ_DELETE(this->forcesP[i]);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the controller
 void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
 {
+  int i;
+  XMLConfigNode *jNode;
   this->myIface = dynamic_cast<GripperIface*>(this->ifaces[0]);
 
   if (!this->myIface)
     gzthrow("Pioneer2_Gripper controller requires a GripperIface");
 
   Param::Begin(&this->parameters);
-  this->leftJointNameP = new ParamT<std::string>("leftJoint", "", 1);
-  this->rightJointNameP = new ParamT<std::string>("rightJoint", "", 1);
-  Param::End();
+  jNode = node->GetChild("leftJoint");
+  if (jNode)
+  {
+    this->jointNamesP[LEFT] = new ParamT<std::string>("name", "", 1); 
+    this->jointNamesP[LEFT]->Load(jNode);
 
-  this->joints[LEFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->leftJointNameP->GetValue()));
-  this->joints[RIGHT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->rightJointNameP->GetValue()));
+    this->forcesP[LEFT] = new ParamT<float>("force",0.01,0);
+    this->forcesP[LEFT]->Load(jNode);
+
+    this->gainsP[LEFT] = new ParamT<float>("gain",0.01,0);
+    this->gainsP[LEFT]->Load(jNode);
+
+    this->joints[LEFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->jointNamesP[LEFT]->GetValue()));
+  }
+
+  jNode = node->GetChild("rightJoint");
+  if (jNode)
+  {
+    this->jointNamesP[RIGHT] = new ParamT<std::string>("name", "", 1); 
+    this->jointNamesP[RIGHT]->Load(jNode);
+
+    this->forcesP[RIGHT] = new ParamT<float>("force",0.01,0);
+    this->forcesP[RIGHT]->Load(jNode);
+
+    this->gainsP[RIGHT] = new ParamT<float>("gain",0.01,0);
+    this->gainsP[RIGHT]->Load(jNode);
+
+    this->joints[RIGHT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->jointNamesP[RIGHT]->GetValue()));
+  }
+
+  jNode = node->GetChild("liftJoint");
+  if (jNode)
+  {
+    this->jointNamesP[LIFT] = new ParamT<std::string>("name", "", 1); 
+    this->jointNamesP[LIFT]->Load(jNode);
+
+    this->forcesP[LIFT] = new ParamT<float>("force",0.01,0);
+    this->forcesP[LIFT]->Load(jNode);
+
+    this->gainsP[LIFT] = new ParamT<float>("gain",0.01,0);
+    this->gainsP[LIFT]->Load(jNode);
+
+    this->joints[LIFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->jointNamesP[LIFT]->GetValue()));
+  }
+
+  Param::End();
 
   if (!this->joints[LEFT])
     gzthrow("couldn't get left slider joint");
@@ -81,14 +130,22 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   if (!this->joints[RIGHT])
     gzthrow("couldn't get right slider joint");
 
+  if (!this->joints[LIFT])
+    gzthrow("couldn't get lift slider joint");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save the controller
 void Pioneer2_Gripper::SaveChild(std::string &prefix, std::ostream &stream)
 {
-  stream << prefix << *(this->leftJointNameP) << "\n";
-  stream << prefix << *(this->rightJointNameP) << "\n";
+  for (int i=0; i < 3; i++)
+  {
+    stream << prefix << "<joint name=\"" << this->jointNamesP[i]->GetValue() << "\">\n";
+    stream << prefix << "  " << *(this->forcesP[i]) << "\n";
+    stream << prefix << "  " << *(this->gainsP[i]) << "\n";
+    stream << prefix << "</joint>\n";
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,18 +172,42 @@ void Pioneer2_Gripper::UpdateChild()
   switch( this->myIface->data->cmd)
   {
     case GAZEBO_GRIPPER_CMD_OPEN:
-        this->joints[RIGHT]->SetParam(dParamVel,0.1);
-        this->joints[LEFT]->SetParam(dParamVel, -0.1);
+      this->joints[RIGHT]->SetParam(dParamVel,0.1);
+      this->joints[LEFT]->SetParam(dParamVel, -0.1);
       break;
 
     case GAZEBO_GRIPPER_CMD_CLOSE:
       this->joints[RIGHT]->SetParam(dParamVel,-0.1);
       this->joints[LEFT]->SetParam(dParamVel,0.1);
       break;
+
+    case GAZEBO_GRIPPER_CMD_STORE:
+      this->joints[LIFT]->SetParam(dParamVel, 0.2);
+      break;
+
+    case GAZEBO_GRIPPER_CMD_RETRIEVE:
+      this->joints[LIFT]->SetParam(dParamVel, -0.2);
+      break;
+
+    case GAZEBO_GRIPPER_CMD_STOP:
+      this->joints[RIGHT]->SetParam(dParamVel,0);
+      this->joints[LEFT]->SetParam(dParamVel,0);
+      this->joints[LIFT]->SetParam(dParamVel,0);
+      break;
+
+
+    /*default:
+      this->joints[RIGHT]->SetParam(dParamVel,0.0);
+      this->joints[LEFT]->SetParam(dParamVel,0.0);
+      this->joints[LIFT]->SetParam(dParamVel,0.0);
+      break;
+      */
   }
 
-  this->joints[LEFT]->SetParam(dParamFMax,.01);
-  this->joints[RIGHT]->SetParam(dParamFMax,.01);
+
+  this->joints[LEFT]->SetParam(dParamFMax, **(this->forcesP[LEFT]));
+  this->joints[RIGHT]->SetParam(dParamFMax, **(this->forcesP[RIGHT]));
+  this->joints[LIFT]->SetParam(dParamFMax, **(this->forcesP[LIFT]));
 
   this->myIface->Unlock();
 }

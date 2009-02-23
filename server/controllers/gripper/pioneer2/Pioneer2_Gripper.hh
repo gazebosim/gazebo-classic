@@ -93,10 +93,12 @@ class Pioneer2_Gripper : public Controller
   /// The parent Model
   private: Model *myParent;
 
-  private: SliderJoint *joints[2];
+  private: SliderJoint *joints[3];
 
-  private: ParamT<std::string> *leftJointNameP;
-  private: ParamT<std::string> *rightJointNameP;
+  private: ParamT<std::string> *jointNamesP[3];
+  private: ParamT<float> *gainsP[3];
+  private: ParamT<float> *forcesP[3];
+
 };
 
 /** \} */

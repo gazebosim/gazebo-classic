@@ -136,45 +136,55 @@ void Generic_PTZ::ResetChild()
 // Update the controller
 void Generic_PTZ::UpdateChild()
 {
-  this->ptzIface->Lock(1);
+  float tiltSpeed = 0;  
+  float panSpeed = 0; 
 
-  this->cmdPan = this->ptzIface->data->cmd_pan;
-  this->cmdTilt = this->ptzIface->data->cmd_tilt;
-  //this->cmdZoom = this->hfov / this->ptzIface->data->cmd_zoom;
+  this->ptzIface->Lock(1);
+  if (this->ptzIface->data->control_mode == GAZEBO_PTZ_POSITION_CONTROL)
+  {
+    this->cmdPan = this->ptzIface->data->cmd_pan;
+    this->cmdTilt = this->ptzIface->data->cmd_tilt;
+    //this->cmdZoom = this->hfov / this->ptzIface->data->cmd_zoom;
+
+    // Apply joint limits to commanded pan/tilt angles
+    if (this->cmdTilt > M_PI*0.3)
+      this->cmdTilt = M_PI*0.3;
+    else if (this->cmdTilt < -M_PI*0.3)
+      this->cmdTilt = -M_PI*0.3;
+
+    if (this->cmdPan > M_PI*0.3)
+      this->cmdPan = M_PI*0.3;
+    else if (this->cmdPan < -M_PI*0.3)
+      this->cmdPan = -M_PI*0.3;
+
+    // Apply limits on commanded zoom
+    //if (this->cmdZoom < this->zoomMin)
+    // this->cmdZoom = this->zoomMin;
+    //if (this->cmdZoom > this->zoomMax)
+    // this->cmdZoom = this->zoomMax;
+
+    // Set the pan and tilt motors; can't set angles so track cmds with
+    // a proportional control
+    tiltSpeed = this->cmdTilt - this->tiltJoint->GetAngle();
+    panSpeed = this->cmdPan - this->panJoint->GetAngle();
+  }
+  else
+  {
+    tiltSpeed = this->ptzIface->data->cmd_tilt_speed;
+    panSpeed = this->ptzIface->data->cmd_pan_speed;
+  }
 
   this->ptzIface->Unlock();
 
-  // Apply joint limits to commanded pan/tilt angles
-  if (this->cmdTilt > M_PI*0.3)
-    this->cmdTilt = M_PI*0.3;
-  else if (this->cmdTilt < -M_PI*0.3)
-    this->cmdTilt = -M_PI*0.3;
-
-  if (this->cmdPan > M_PI*0.3)
-    this->cmdPan = M_PI*0.3;
-  else if (this->cmdPan < -M_PI*0.3)
-    this->cmdPan = -M_PI*0.3;
-
-  // Apply limits on commanded zoom
-  //if (this->cmdZoom < this->zoomMin)
-   // this->cmdZoom = this->zoomMin;
-  //if (this->cmdZoom > this->zoomMax)
-   // this->cmdZoom = this->zoomMax;
-
-  // Set the pan and tilt motors; can't set angles so track cmds with
-  // a proportional control
-  float tilt = this->cmdTilt - this->tiltJoint->GetAngle();
-  float pan = this->cmdPan - this->panJoint->GetAngle();
-
-  if (fabs(tilt) > 0.01)
-    this->tiltJoint->SetParam( dParamVel, **(this->motionGainP) * tilt);
+  if (fabs(tiltSpeed) > 0.01)
+    this->tiltJoint->SetParam( dParamVel, **(this->motionGainP) * tiltSpeed);
   else
     this->tiltJoint->SetParam( dParamVel, 0);
 
   this->tiltJoint->SetParam( dParamFMax, **(this->forceP) );
 
-  if (fabs(pan) > 0.01)
-    this->panJoint->SetParam( dParamVel, **(this->motionGainP) * pan);
+  if (fabs(panSpeed) > 0.01)
+    this->panJoint->SetParam( dParamVel, **(this->motionGainP) * panSpeed);
   else
     this->panJoint->SetParam( dParamVel, 0);
 
