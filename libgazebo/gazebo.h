@@ -1284,6 +1284,9 @@ The ptz interface allows control of a pan-tilt-zoom unit
 \{
 */
 
+#define GAZEBO_PTZ_POSITION_CONTROL 0
+#define GAZEBO_PTZ_VELOCITY_CONTROL 1
+
 /// \brief PTZ data
 class PTZData
 {
@@ -1306,7 +1309,14 @@ class PTZData
 
   /// Commanded field of view (radians)
   public: float cmd_zoom;
-  
+
+  /// Commanded pan speed  (rad/s)
+  public: float cmd_pan_speed;
+
+  /// Commanded tilt (rad/s)
+  public: float cmd_tilt_speed;
+
+  public: unsigned int control_mode;
 }; 
 
 
