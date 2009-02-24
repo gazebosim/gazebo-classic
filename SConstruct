@@ -186,6 +186,8 @@ else:
 # Test for openal
 if simpleconf.CheckLibWithHeader('openal', 'al.h', 'CXX'):
   env["HAVE_OPENAL"] = True
+else:
+  env["HAVE_OPENAL"] = False
 
 simpleconf.Finish()
 
