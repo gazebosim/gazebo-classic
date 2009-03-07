@@ -1,7 +1,8 @@
 
 # 3rd party packages
 parseConfigs=['pkg-config --cflags --libs libgazebo',
-              'pkg-config --cflags --libs libgazeboServer']
+              'pkg-config --cflags --libs libgazeboServer',
+              'pkg-config --cflags --libs playerc++']
 
 
 env = Environment (

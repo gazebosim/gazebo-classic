@@ -306,6 +306,7 @@ void RaySensor::UpdateChild()
     dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
                     ( dGeomID ) ( ode->GetSpaceId() ),
                     this, &UpdateCallback );
+                    
   }
 }
 

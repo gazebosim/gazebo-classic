@@ -490,6 +490,36 @@ void Model::SetRotation( const Quatern &rot)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the linear velocity of the model
+void Model::SetLinearVel( const Vector3 &vel )
+{
+  Body *body;
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetLinearVel( vel );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the angular velocity of the model
+void Model::SetAngularVel( const Vector3 &vel )
+{
+  Body *body;
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetAngularVel( vel );
+  }
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 // Get the current pose
 const Pose3d &Model::GetPose() const
 {

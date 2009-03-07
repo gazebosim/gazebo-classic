@@ -584,6 +584,40 @@ void World::UpdateSimulationIface()
         Simulator::Instance()->Save();
         break;
 
+      case SimulationRequestData::SET_STATE:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+
+          if (model)
+          {
+            Pose3d pose;
+            Vector3 linearVel( req->modelLinearVel.x,
+                               req->modelLinearVel.y,
+                               req->modelLinearVel.z);
+            Vector3 angularVel( req->modelAngularVel.x,
+                                req->modelAngularVel.y,
+                                req->modelAngularVel.z);
+
+            pose.pos.x = req->modelPose.pos.x;
+            pose.pos.y = req->modelPose.pos.y;
+            pose.pos.z = req->modelPose.pos.z;
+
+            pose.rot.SetFromEuler(
+                Vector3(req->modelPose.roll, 
+                  req->modelPose.pitch,
+                  req->modelPose.yaw));
+            model->SetPose(pose);
+
+            model->SetLinearVel(linearVel);
+            model->SetAngularVel(angularVel);
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->modelName 
+                     << "] in simulation interface Set State Request.\n";
+          }
+          break;
+        }
       case SimulationRequestData::SET_POSE3D:
         {
           Pose3d pose;

@@ -107,6 +107,12 @@ namespace gazebo
 
     /// \brief Set the rotation of the model
     public: void SetRotation( const Quatern &rot );
+
+    /// \brief Set the linear velocity of the model
+    public: void SetLinearVel( const Vector3 &vel );
+
+    /// \brief Set the angular velocity of the model
+    public: void SetAngularVel( const Vector3 &vel );
  
     /// \brief Get the current pose
     public: const Pose3d &GetPose() const;

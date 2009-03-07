@@ -41,11 +41,30 @@ int main()
 
     gazebo::SimulationRequestData *request = &(simIface->data->requests[simIface->data->requestCount++]);
 
-    request->type = gazebo::SimulationRequestData::SET_POSE2D;
+    request->type = gazebo::SimulationRequestData::SET_STATE;
+    memcpy(request->modelName, name, 512);
+
+    request->modelPose.pos.x = i+1;
+    request->modelPose.pos.y = 0;
+    request->modelPose.pos.z = 0;
+    request->modelPose.roll = 0;
+    request->modelPose.pitch = 0;
+    request->modelPose.yaw = 0;
+
+    request->modelLinearVel.x = 0.1;
+    request->modelLinearVel.y = 0;
+    request->modelLinearVel.z = 0;
+
+    request->modelAngularVel.x = 0.1;
+    request->modelAngularVel.y = 0;
+    request->modelAngularVel.z = 0;
+
+    /*request->type = gazebo::SimulationRequestData::SET_POSE2D;
     memcpy(request->modelName, name, 512);
 
     request->modelPose.pos.x = i+.1;
     request->modelPose.pos.y = 0;
+    */
 
     simIface->Unlock();
 

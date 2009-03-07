@@ -375,12 +375,17 @@ class SimulationRequestData
                       GET_POSE2D,
                       SET_POSE3D,
                       SET_POSE2D,
+                      SET_STATE
                    };
 
   public: Type type; 
   public: char modelName[512];
   public: Pose modelPose;
 
+  public: Vec3 modelLinearVel;
+  public: Vec3 modelAngularVel;
+  public: Vec3 modelLinearAccel;
+  public: Vec3 modelAngularAccel;
 };
 
 /// \brief Simulation interface data
