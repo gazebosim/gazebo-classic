@@ -5,65 +5,117 @@ import commands
 
 exec(open('build.py'))
 
+
 PKG_CONFIG_VERSION = '0.22'
 OGRE_VERSION = '>= 1.6.0'
 ODE_VERSION = '>= 0.10.1'
 
+#######
+# Create a release
+#######
 if 'release' in COMMAND_LINE_TARGETS:
   CreateRelease()
   exit()
 
-#
+#######
 # Setup the Options
-#
+#######
 opts = Options()
 opts.Add('prefix', 'The install path "prefix"', '/usr/local')
 opts.Add('destdir', 'The root directory to install into. Useful mainly for binary package building', '/')
 opts.Add('mode','Defines how Gazebo will be built, options available: optimized, profile, debug','debug')
 
-#
-# 3rd party packages
-#
-parseConfigs=['pkg-config --cflags --libs OGRE',
-              'xml2-config --cflags --libs', 
-      	      'ode-config --cflags --libs',
-              'fltk-config --cflags --libs --ldflags --use-gl --use-images',
-              'pkg-config --cflags --libs xft',
 
-              'pkg-config --cflags --libs libavformat',
-              'pkg-config --cflags --libs libavcodec',
-              'pkg-config --cflags --libs openal'
-              ]
+#######
+# List of all the required packages
+#######
+packages = { 
+  'OGRE' : {
+            'pkgcfg': 'pkg-config --cflags --libs OGRE', 
+            'check' : 'OGRE ' + OGRE_VERSION, 
+            'msg' : 'Error: Ogre3d and development files are required, but not\
+                     found. ',
+            'flags' : '',
+            'web' : 'http://www.ogre3d.org' 
+           },
 
-#
+  'ODE'  : {
+            'pkgcfg' : 'pkg-config --cflags --libs ode', 
+            'check' : 'ode ' + ODE_VERSION,
+            'msg' : 'Error: ODE and development files are required, but not\
+                     found.',
+            'flags' : '',
+            'web' : 'http://www.ode.org'
+           },
+
+  'OpenAL' : {
+              'pkgcfg' : 'pkg-config --cflags --libs openal', 
+              'check' : 'openal',
+              'msg' : 'Warning: OpenAL not found. 3D audio will be disbled',
+              'flags' : ['-DHAVE_OPENAL'],
+              'web' : 'http://www.openal.org'
+             },
+
+  'XFT' : {
+           'pkgcfg' : 'pkg-config --cflags --libs xft',
+           'check' : 'xft',
+           'msg' : 'Error: ',
+           'flags' : '',
+           'web' : 'http://www.xft.org' 
+          },
+
+  'avformat' : {
+                'pkgcfg' : 'pkg-config --cflags --libs libavformat',
+                'check' : 'libavformat',
+                'msg' : 'Warning: FFMpeg pkg-config not found. MP3 decoding\
+                         is disabled',
+                'flags' : '',
+                'web' : 'http://ffmpeg.mplayerhq.hu/' 
+               },
+
+  'avcodec' : {
+               'pkgcfg' : 'pkg-config --cflags --libs libavcodec',
+               'check' : 'libavcodec',
+               'msg' : 'Warning: FFMpeg pkg-config not found. MP3 decoding is\
+                         disabled',
+               'flags' : '',
+               'web' : 'http://ffmpeg.mplayerhq.hu/' 
+              },
+
+  'XML2' : {
+            'pkgcfg' : 'xml2-config --cflags --libs',
+            'check' : '',
+            'msg' : 'Error: libxml2 and development files are required, but\
+                      not found.',
+            'flags' : '',
+            'web' : 'http://www.xmlsoft.org' 
+           },
+
+  'FLTK' : {
+            'pkgcfg' : 'fltk-config --cflags --libs --ldflags --use-gl\
+                         --use-images',
+            'check' : '',
+            'msg' : 'Error: libfltk & development files are required, but not\
+                     found.',
+            'flags' : '',
+            'web' : 'http://www.fltk.org' 
+           },
+  'Player' : {
+              'pkgcfg' : 'pkg-config --cflags --libs playerc++',
+              'check' : 'playerc++',
+              'msg' : 'Warning: Player not found, bindings will not be built.',
+              'flags' : ['-DHAVE_PLAYER'],
+              'web' :  'http://playerstage.sourceforge.net'
+           },
+} 
+
+#######
 # setup the build environment
-#
+#######
 env = Environment (
-  CC = 'g++',
-
-  CPPPATH = [
-   '#.', 
-   '#server',
-   '#server/models',
-   '#server/gui',
-   '#server/gui/fltk',
-   '#libgazebo', 
-   '#server/rendering',
-   '#server/sensors', 
-   '#server/sensors/camera',
-   '#server/sensors/ray',
-   '#server/sensors/contact',
-   '#server/sensors/imu',
-   '#server/sensors/ir',
-   '#server/physics',
-   '#server/physics/ode',
-   '#server/controllers',
-   '#server/controllers/position2d',
-   '#server/controllers/position2d/pioneer2dx',
-   '#server/controllers/irarray',
-   '#server/audio_video',
-   ],
-
+  CC = 'gcc',
+  CXX = 'g++',
+  CPPPATH = [ '#.' ],
   LIBPATH=Split('#libgazebo #server/audio_video'),
     
   #LIBS=Split('gazebo boost_python')
@@ -73,18 +125,44 @@ env = Environment (
   TARFLAGS = '-c -z',
   TARSUFFIX = '.tar.gz',
 
-  options=opts
+  options = opts,
+
+  # Static object compile string
+  CXXCOMSTR = 'Compiling $TARGET',
+  CCCOMSTR = 'Compiling $TARGET',
+  LINKCOMSTR = 'Linking $TARGET',
+
+  # Shared object compile strings
+  SHCXXCOMSTR = 'Compiling $TARGET',
+  SHCCCOMSTR = 'Compiling $TARGET',
+  SHLINKCOMSTR = 'Linking $TARGET',
 )
 
 
+#######
+# DEFAULT list of subdirectories to build
+#######
+subdirs = ['libgazebo','server', 'player']
+
+
+#######
+# Generate help text
+#######
 Help(opts.GenerateHelpText(env))
 
+
+#######
+# Setup default install destination
+#######
 if env['destdir'] != '/':
   install_prefix = env['destdir'] + '/' + env['prefix']
 else:
   install_prefix = env['prefix']
 
 
+#######
+# Create the custom builder
+#######
 env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
 pkgconfig = env.PkgConfig(target='libgazeboServer.pc', source=Value(install_prefix))
 env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
@@ -92,10 +170,9 @@ env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
 env['BUILDERS']['RCConfig'] = Builder(action = createGazeborc)
 rcconfig = env.RCConfig(target='gazeborc', source=Value(install_prefix))
 
-# DEFAULT list of subdirectories to build
-subdirs = ['libgazebo','server', 'player']
-
+#######
 # Set the compile mode
+#######
 if env['mode'] == 'debug':
   env['CCFLAGS'] += Split('-ggdb -g2 -Wall -Wno-deprecated -fPIC')
 elif env['mode'] == 'profile':
@@ -104,137 +181,54 @@ elif env['mode'] == 'profile':
 elif env['mode'] == 'optimized':
   env['CCFLAGS'] += Split('-O3 -fPIC') 
 
+optimize_for_cpu(env)
 
-optimize_for_cpu(env);
+#######
+# Conifgure the system
+#######
+Config(env, packages)
 
-# Setup the configuration environment.
-conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib,
-                                      'CheckPkgConfig' : CheckPkgConfig,
-                                      'CheckPkg' : CheckPkg})
-# Check for pkg-config 
-if not conf.CheckPkgConfig(PKG_CONFIG_VERSION):
-  print '  Error: pkg-config version >= ' + PKG_CONFIG_VERSION + ' not found.'
-  Exit(1)
-
-# Check for the correct OGRE version
-if not conf.CheckPkg('OGRE ' + OGRE_VERSION):
-  print ' Error: OGRE version = ' + OGRE_VERSION + ' not found.'
-  Exit(1)
-
-# Check for the correct ODE version
-if not conf.CheckPkg('ode ' + ODE_VERSION):
-  print ' Error: ODE version = ' + ODE_VERSION + ' not found.'
-  Exit(1)
-
-#
-# Parse all the pacakge configurations
-#
-if not env.GetOption('clean'):
-  for cfg in parseConfigs:
-    print "Checking for ["+cfg+"]"
-    try:
-      env.ParseConfig(cfg)
-      print "  Success"
-    except OSError,e:
-      print "Unable to parse config ["+cfg+"]"
-      if cfg.find("OGRE") >= 0:
-        print "Ogre3d and development files are required, but not found."
-        print "  http://www.ogre3d.org/"
-        Exit(1)
-      elif cfg.find("ode") >= 0:
-        print "ODE and development files are required, but not found."
-        print "  http://www.ode.org"
-        Exit(1)
-      elif cfg.find("xml2") >= 0:
-        print "libxml2 and development files are required, but not found."
-        print "  http://www.xmlsoft.org"
-        Exit(1)
-      elif cfg.find("fltk") >= 0:
-        print "libfltk & development files are required, but not found."
-        print "  http://www.fltk.org"
-        Exit(1)
-      elif cfg.find("OpenAL") >= 0:
-        print "OpenAL not found. 3D audio is disabled"
-        print "http://www.ogre3d.org/phpBB2addons/viewtopic.php?t=3293"
-        Exit(1)
-      elif cfg.find("avcodec") >= 0 or cfg.find("avformat") >= 0:
-        print "FFMpeg not found. MP3 decoding is disabled"
-        print "  http://ffmpeg.mplayerhq.hu/"
-        Exit(1)
-
-# Check for trimesh support in ODE
-#if not conf.CheckODELib():
-#  print '  Error: ODE not compiled with trimesh support.'
-#  Exit(1)
-
-env = conf.Finish()
-
-
-
-simpleenv = Environment(CPPPATH="/usr/include/AL")
-simpleconf = Configure(simpleenv)
-
-# Test for libtool
-if not simpleconf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
-  print "  Warning: Failed to find ltdl, no plugin support will be included"
-  env["HAVE_LTDL"]=False
-else:
-  env["HAVE_LTDL"]=True
-  env.Append(CCFLAGS = " -DHAVE_LTDL")
-  env.Append(LIBS = "ltdl")
-
-# Test for openal
-if simpleconf.CheckLibWithHeader('openal', 'al.h', 'CXX'):
-  env["HAVE_OPENAL"] = True
-else:
-  env["HAVE_OPENAL"] = False
-
-simpleconf.Finish()
-
-
-# # Check for boost_python
-#if not conf.CheckLibWithHeader('boost_python', 'boost/python.hpp', 'C'):
-#  print 'Did not find libboost_python exiting'
-#  Exit(1)
-#else:
-#  conf.env.Append(LIBS="boost_python")
-
-
+#######
+# Export the environment
+#######
 #staticObjs = []
 sharedObjs = []
 headers = []
-
-#
-# Export the environment
-#
 Export('env install_prefix version sharedObjs headers subdirs')
 
-#
-# Process subdirectories
-#
+
+#######
+# Parse subdirectories
+#######
 for subdir in subdirs:
-  print subdir
+  print 'Parsing sub directory ' + subdir
   SConscript('%s/SConscript' % subdir)
 
-#
-# Create the gazebo executable
-#
-gazebo = env.Program('gazebo',sharedObjs)
+print ''
 
-Depends(gazebo, 'libgazebo/libgazebo.so')
-#
-# Create static and shared libraries for the server
-#
-#libgazeboServerStatic = env.StaticLibrary('gazeboServer', staticObjs)
-libgazeboServerShared = env.SharedLibrary('gazeboServer', sharedObjs)
 
-#
-# Install gazebo
-#
-env.Alias('install', install_prefix)
-env.Install(install_prefix+'/bin',gazebo)
-env.Install(install_prefix+'/share/gazebo','Media')
-env.Install(install_prefix+'/include/gazebo',headers)
-#env.Install(install_prefix+'/lib',libgazeboServerStatic )
-env.Install(install_prefix+'/lib',libgazeboServerShared )
-env.Install(install_prefix+'/share/gazebo','worlds')
+#######
+# Create the gazebo executable and libraries
+#######
+if not 'configure' in COMMAND_LINE_TARGETS:
+  #Progress('Evaluating $TARGET\n')
+
+  gazebo = env.Program('gazebo',sharedObjs)
+  Depends(gazebo, 'libgazebo/libgazebo.so')
+
+  #libgazeboServerStatic = env.StaticLibrary('gazeboServer', staticObjs)
+  libgazeboServerShared = env.SharedLibrary('gazeboServer', sharedObjs)
+
+  #
+  # Install gazebo
+  #
+  env.Alias('install', install_prefix)
+  env.Install(install_prefix+'/bin',gazebo)
+  env.Install(install_prefix+'/share/gazebo','Media')
+  env.Install(install_prefix+'/include/gazebo',headers)
+  #env.Install(install_prefix+'/lib',libgazeboServerStatic )
+  env.Install(install_prefix+'/lib',libgazeboServerShared )
+  env.Install(install_prefix+'/share/gazebo','worlds')
+else:
+  print 'Configure done'
+  Exit()

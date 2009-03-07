@@ -1,6 +1,8 @@
 #Import variable
 Import('env sharedObjs')
 
+env.Append(CPPPATH = '#server/sensors/imu')
+
 sources = Split('ImuSensor.cc')
 
 sharedObjs.append(env.SharedObject(sources))

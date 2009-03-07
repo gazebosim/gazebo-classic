@@ -229,7 +229,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   // Create a data stream for loading the terrain into Ogre
   char *mstr = new char[1024];//stream.str().size()];
   bzero (mstr, 1024);
-  sprintf(mstr, stream.str().c_str());
+  sprintf(mstr, (char*)(stream.str().c_str()));
   Ogre::DataStreamPtr dataStream(
     new Ogre::MemoryDataStream(mstr,strlen(mstr)) );
 

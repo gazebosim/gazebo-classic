@@ -1,5 +1,7 @@
 #Import variable
-Import('install_prefix version')
+Import('*')
+
+env.Append(CPPPATH = '#libgazebo')
 
 #
 # Create the pkg-config file
@@ -23,6 +25,16 @@ def createPkgConfig(target,source, env):
 env = Environment (
   CC = 'g++',
   CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+
+  CXXCOMSTR = 'Compiling $TARGET',
+  CCCOMSTR = 'Compiling $TARGET',
+
+  SHCXXCOMSTR = 'Compiling $TARGET',
+  SHCCCOMSTR = 'Compiling $TARGET',
+
+  SHLINKCOMSTR = 'Linking $TARGET',
+  LINKCOMSTR = 'Linking $TARGET',
+
 )
 
 env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)

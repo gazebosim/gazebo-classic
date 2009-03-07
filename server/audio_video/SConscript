@@ -1,5 +1,7 @@
 #Import variable
-Import('env sharedObjs headers install_prefix')
+Import('*')
+
+env.Append(CPPPATH = '#server/audio_video')
 
 sources = ['AudioDecoder.cc', 
            'OpenAL.cc'

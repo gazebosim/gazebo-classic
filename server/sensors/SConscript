@@ -1,5 +1,7 @@
 #Import variable
-Import('env sharedObjs headers')
+Import('*')
+
+env.Append(CPPPATH = '#server/sensors')
 
 dirs = Split('camera ray contact imu ir')
 

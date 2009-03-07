@@ -1,10 +1,15 @@
 #Import variable
-Import('env sharedObjs headers')
+Import('*')
+
+env.Append(CPPPATH = '#server/controllers')
 
 dirs = Split('position2d laser camera factory gripper actarray ptz opaque bumper imu irarray')
 
-if env["HAVE_OPENAL"] == True:
+try:
+  env["CCFLAGS"].index('-DHAVE_OPENAL')
   dirs.append("audio")
+except ValueError,e:
+  garbage = 1
 
 for subdir in dirs :
   SConscript('%s/SConscript' % subdir)

@@ -69,7 +69,6 @@ Pioneer2_Gripper::~Pioneer2_Gripper()
 // Load the controller
 void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
 {
-  int i;
   XMLConfigNode *jNode;
   this->myIface = dynamic_cast<GripperIface*>(this->ifaces[0]);
 

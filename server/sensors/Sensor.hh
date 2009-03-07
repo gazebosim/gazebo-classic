@@ -70,7 +70,7 @@ namespace gazebo
     public: void Fini();
 
     /// \brief Get the current pose
-    public: const Pose3d &GetPose() const;
+    public: const Pose3d GetPose() const;
  
     /// \brief Set whether the sensor is active or not
     public: void SetActive(bool value);

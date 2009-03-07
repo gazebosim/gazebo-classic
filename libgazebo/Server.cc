@@ -106,7 +106,9 @@ void Server::Init(int serverId, int force)
     if(fp) 
     {
       int pid;
-      fscanf(fp, "%d", &pid);
+      if (fscanf(fp, "%d", &pid) != 0)
+        std::cerr << "Error\n";
+
       fclose(fp);
       std::cout << "found a pid file: pid=" << pid << "\n";
 
@@ -188,7 +190,8 @@ void Server::Fini()
     << "] : [" << strerror(errno) << "]\n";
 
     snprintf(cmd, sizeof(cmd), "rm -rf %s", this->filename.c_str());
-    system(cmd);
+    if (system(cmd))
+      std::cerr << "System cmd invalid\n";
   }
 
   // Finalize semaphores

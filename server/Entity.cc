@@ -168,6 +168,8 @@ bool Entity::SetSelected( bool s )
     if (body)
       body->SetEnabled(!s);
   }
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

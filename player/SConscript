@@ -1,7 +1,5 @@
 import os
-Import('env install_prefix sharedObjs subdirs')
-
-parseConfigs = ['pkg-config --cflags --libs playerc++']
+Import('*')
 
 sources = ['GazeboDriver.cc',
            'GazeboClient.cc',
@@ -23,34 +21,19 @@ sources = ['GazeboDriver.cc',
 
 # Position3dInterface.cc PowerInterface.cc SonarInterface.ccGpsInterface.cc ')
 
-playerEnv = env.Clone()
-
-for cfg in parseConfigs:
-  print "Checking for ["+cfg+"]"
-  try:
-    playerEnv.ParseConfig(cfg)
-    print "  Success"
-  except OSError,e:
-    print "Unable to parse config ["+cfg+"]"
-    if cfg.find("player") >=0:
-      print "\n================================================================"
-      print "Player not found, bindings will not be built."
-      print "  To install player visit(http://playerstage.sourceforge.net)"
-      print "================================================================"
-      subdirs.remove('player')
-      Return
-      #time.sleep(3)
-
-if ('player' in subdirs):
+try:
+  env["CCFLAGS"].index('-DHAVE_PLAYER')
   
-#staticPlayerObjs = playerEnv.StaticObject(sources)
-  sharedPlayerObjs = playerEnv.SharedObject(sources)
-  
-#staticPlayerObjs.append(staticObjs);
+  #staticPlayerObjs = env.StaticObject(sources)
+  sharedPlayerObjs = env.SharedObject(sources)
+    
+  #staticPlayerObjs.append(staticObjs);
   sharedPlayerObjs.append(sharedObjs);
-  
-  sharedLib = playerEnv.SharedLibrary('gazeboplugin', sharedPlayerObjs)
-# staticLib = playerEnv.StaticLibrary('gazeboplugin', staticPlayerObjs)
-  
+    
+  sharedLib = env.SharedLibrary('gazeboplugin', sharedPlayerObjs)
+  # staticLib = env.StaticLibrary('gazeboplugin', staticPlayerObjs)
+    
   env.Install(install_prefix+'/lib', sharedLib)
-#env.Install(install_prefix+'/lib', staticLib)
+  #env.Install(install_prefix+'/lib', staticLib)
+except ValueError,e:
+  garbage = 1

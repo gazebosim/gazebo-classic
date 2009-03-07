@@ -1,5 +1,6 @@
-#Import variable
-Import('env sharedObjs')
+Import('*')
+
+env.Append(CPPPATH = '#server/sensors/ray')
 
 sources = Split('RaySensor.cc')
 

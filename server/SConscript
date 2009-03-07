@@ -1,12 +1,18 @@
 #Import variables
-Import('env install_prefix sharedObjs headers')
+Import('*')
+
+env.Append(CPPPATH = '#server')
 
 dirs = Split('physics rendering sensors controllers gui')# bindings')
 
-if env["HAVE_OPENAL"] == True:
+try:
+  env["CCFLAGS"].index('-DHAVE_OPENAL')
   dirs.append("audio_video")
+except ValueError,e:
+  garbage = 1
 
 for subdir in dirs:
+  print 'Parsing sub directory ' + subdir
   SConscript('%s/SConscript' % subdir)
 
 sources = ['main.cc',

@@ -38,7 +38,11 @@
 #include "Simulator.hh"
 #include "gazebo.h"
 #include "World.hh"
+
+#ifdef HAVE_OPENAL
 #include "OpenAL.hh"
+#endif
+
 #include "Geom.hh"
 
 using namespace gazebo;
@@ -124,9 +128,11 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
     gzthrow(err);
   }
 
+#ifdef HAVE_OPENAL
   // Load OpenAL audio 
   if (rootNode->GetChild("openal","audio"))
     OpenAL::Instance()->Load( rootNode->GetChild("openal", "audio") );
+#endif
 
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 
@@ -176,7 +182,9 @@ int World::Init()
   this->physicsEngine->Init();
 
   // Initialize openal
+#ifdef HAVE_OPENAL
   OpenAL::Instance()->Init();
+#endif
 
   this->toAddModels.clear();
   this->toDeleteModels.clear();
@@ -262,7 +270,9 @@ int World::Fini()
   }
 
   // Close the openal server
+#ifdef HAVE_OPENAL
   OpenAL::Instance()->Fini();
+#endif
 
   return 0;
 }

@@ -1,7 +1,9 @@
 #Import variable
-Import('env sharedObjs')
+Import('*')
 
-sources = Split('ODEPhysics.cc')
+env.Append(CPPPATH = '#server/physics/ode')
+
+sources = ['ODEPhysics.cc']
 
 #staticObjs.append(env.StaticObject('ODEPhysics.cc'))
-sharedObjs.append(env.SharedObject('ODEPhysics.cc'))
+sharedObjs.append(env.SharedObject(sources))

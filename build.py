@@ -114,3 +114,96 @@ def optimize_for_cpu(env):
   env['CCFLAGS'] += Split (line_atr)
   print "detected CPU atributes: " +line_atr
 
+
+def Config(env, packages):
+  # Setup the configuration environment.
+  conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib,
+                                        'CheckPkgConfig' : CheckPkgConfig,
+                                        'CheckPkg' : CheckPkg})
+  
+  print '\n=== 3rd Party Dependency Checks === '
+  
+  # Check for pkg-config 
+  if not conf.CheckPkgConfig(PKG_CONFIG_VERSION):
+    print '  Error: pkg-config version >= ' + PKG_CONFIG_VERSION + ' not found.'
+    Exit(1)
+  
+  #
+  # Parse all the pacakge configurations
+  #
+  for key in packages:
+    pkgcfg = packages[key]['pkgcfg']
+    check = packages[key]['check']
+    msg = packages[key]['msg']
+    web = packages[key]['web']
+    flags = packages[key]['flags']
+    docfg = True
+    valid = True
+  
+    # Check for the package
+    if check and not conf.CheckPkg(check):
+      docfg = False
+      valid = False
+      print '  !!' + msg + key + ' not found.'
+      print '  See: ' + web
+      if msg.find('Error') > 0:
+        Exit(1)
+  
+    # Try parsing the pkg-config
+    if docfg:
+      try:
+        if not check:
+          print "Checking for "+key+"...",
+        env.ParseConfig(pkgcfg)
+        if not check:
+          print 'yes'
+      except OSError,e:
+        valid = False
+        if not check:
+          print 'no'
+        print "Unable to parse config ["+pkgcfg+"]"
+        print '  !!' + msg + key + ' not found.'
+        print '  See: ' + web
+        if msg.find('Error') > 0:
+          Exit(1)
+  
+    # If valid so far, apply any flags to the environment
+    if valid:
+      for flag in flags:
+        env.Append(CCFLAGS = " " + flag)
+  
+  # Check for trimesh support in ODE
+  #if not conf.CheckODELib():
+  #  print '  Error: ODE not compiled with trimesh support.'
+  #  Exit(1)
+  
+  env = conf.Finish()
+  
+  #simpleenv = Environment(CPPPATH="/usr/include/AL")
+  #simpleconf = Configure(simpleenv)
+  #
+  ## Test for libtool
+  #if not simpleconf.CheckLibWithHeader('ltdl','ltdl.h','CXX'):
+  #  print "  Warning: Failed to find ltdl, no plugin support will be included"
+  #  env["HAVE_LTDL"]=False
+  #else:
+  #  env["HAVE_LTDL"]=True
+  #  env.Append(CCFLAGS = " -DHAVE_LTDL")
+  #  env.Append(LIBS = "ltdl")
+ 
+  #if not simpleconf.CheckHeader('boost/signal.hpp',language='C++'):
+  #  print "Error: Boost signals not found. Please install."
+  #  Exit(0)
+  #
+  #simpleconf.Finish()
+  
+  # # Check for boost_python
+  #if not conf.CheckLibWithHeader('boost_python', 'boost/python.hpp', 'C'):
+  #  print 'Did not find libboost_python exiting'
+  #  Exit(1)
+  #else:
+  #  conf.env.Append(LIBS="boost_python")
+  
+  print '=== Done ===\n'
+
+
