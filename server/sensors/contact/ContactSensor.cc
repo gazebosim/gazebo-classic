@@ -140,7 +140,7 @@ void ContactSensor::LoadChild(XMLConfigNode *node)
   this->contactStates = new uint8_t[ this->contactCount ];
 
   memset(this->contactStates,0, sizeof(uint8_t) * this->contactCount);
-  memset(this->contactStates,0, sizeof(double) * this->contactCount);
+  memset(this->contactTimes,0, sizeof(double) * this->contactCount);
 }
 
 //////////////////////////////////////////////////////////////////////////////
