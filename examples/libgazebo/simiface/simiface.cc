@@ -40,9 +40,9 @@ int main()
   {
    
     gazebo::Pose pose;
-    gazebo::Vec3 linearVel(0, 0, 0);
+    gazebo::Vec3 linearVel(0.1, 0, 0);
     gazebo::Vec3 angularVel(0, 0, 0);
-    gazebo::Vec3 linearAccel(50, 0, 0);
+    gazebo::Vec3 linearAccel(0, 0, 0);
     gazebo::Vec3 angularAccel(0, 0, 0);
 
     simIface->SetState(name, pose, linearVel, angularVel, 

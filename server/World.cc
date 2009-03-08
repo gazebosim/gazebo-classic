@@ -614,15 +614,15 @@ void World::UpdateSimulationIface()
                 Vector3(req->modelPose.roll, 
                   req->modelPose.pitch,
                   req->modelPose.yaw));
-            //model->SetPose(pose);
+            model->SetPose(pose);
 
             // Set the model's linear and angular velocity
-            //model->SetLinearVel(linearVel);
-            //model->SetAngularVel(angularVel);
+            model->SetLinearVel(linearVel);
+            model->SetAngularVel(angularVel);
 
             // Set the model's linear and angular acceleration
             model->SetLinearAccel(linearAccel);
-            //model->SetAngularAccel(angularAccel);
+            model->SetAngularAccel(angularAccel);
           }
           else
           {
