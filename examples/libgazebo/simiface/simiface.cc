@@ -1,5 +1,6 @@
+#include <string.h>
+#include <iostream>
 #include <gazebo/gazebo.h>
-#include <gazebo/GazeboError.hh>
 
 int main()
 {
@@ -13,7 +14,7 @@ int main()
   {
     client->ConnectWait(serverId, GZ_CLIENT_ID_USER_FIRST);
   }
-  catch (gazebo::GazeboError e)
+  catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect\n" << e << "\n";
     return -1;
@@ -33,54 +34,30 @@ int main()
   //simIface->data->reset = 1;
 
   // Example of how to move a model (box1_model)
-  uint8_t name[512] = "pioneer2dx_model1";
+  char name[512] = "pioneer2dx_model1";
 
   for (int i=0; i< 10; i++)
   {
-    simIface->Lock(1);
+   
+    gazebo::Pose pose;
+    gazebo::Vec3 linearVel(0, 0, 0);
+    gazebo::Vec3 angularVel(0, 0, 0);
+    gazebo::Vec3 linearAccel(50, 0, 0);
+    gazebo::Vec3 angularAccel(0, 0, 0);
 
-    gazebo::SimulationRequestData *request = &(simIface->data->requests[simIface->data->requestCount++]);
-
-    request->type = gazebo::SimulationRequestData::SET_STATE;
-    memcpy(request->modelName, name, 512);
-
-    request->modelPose.pos.x = i+1;
-    request->modelPose.pos.y = 0;
-    request->modelPose.pos.z = 0;
-    request->modelPose.roll = 0;
-    request->modelPose.pitch = 0;
-    request->modelPose.yaw = 0;
-
-    request->modelLinearVel.x = 0.1;
-    request->modelLinearVel.y = 0;
-    request->modelLinearVel.z = 0;
-
-    request->modelAngularVel.x = 0.1;
-    request->modelAngularVel.y = 0;
-    request->modelAngularVel.z = 0;
-
-    /*request->type = gazebo::SimulationRequestData::SET_POSE2D;
-    memcpy(request->modelName, name, 512);
-
-    request->modelPose.pos.x = i+.1;
-    request->modelPose.pos.y = 0;
-    */
-
-    simIface->Unlock();
-
-    usleep(100000);
+    simIface->SetState(name, pose, linearVel, angularVel, 
+                       linearAccel, angularAccel );
+    usleep(9000000);
   }
 
 
   // Example of resetting the simulator
-  /*simIface->Lock(1);
-  simIface->data->reset = 1;
-  simIface->Unlock();
-  */
+  // simIface->Reset();
 
   usleep(1000000);
 
   simIface->Close();
+
   delete simIface;
   return 0;
 }

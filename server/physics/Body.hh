@@ -129,6 +129,18 @@ namespace gazebo
     /// \brief Get the angular velocity of the body
     public: Vector3 GetAngularVel() const;
 
+    /// \brief Set the linear acceleration of the body
+    public: void SetLinearAccel(const Vector3 &accel);
+
+    /// \brief Get the linear acceleration of the body
+    public: Vector3 GetLinearAccel() const;
+
+    /// \brief Set the angular acceleration of the body
+    public: void SetAngularAccel(const Vector3 &accel);
+
+    /// \brief Get the angular acceleration of the body
+    public: Vector3 GetAngularAccel() const;
+
     /// \brief Set the force applied to the body
     public: void SetForce(const Vector3 &force);
 
@@ -151,7 +163,7 @@ namespace gazebo
     public: Model *GetModel() const;
 
     /// \brief Get the mass of the body
-    public: float GetMass() { return mass.mass; }
+    public: float GetMass() const { return mass.mass; }
 
     /// Load a new geom helper function
     /// \param node XMLConfigNode used to load the geom

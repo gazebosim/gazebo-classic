@@ -518,7 +518,36 @@ void Model::SetAngularVel( const Vector3 &vel )
     body->SetAngularVel( vel );
   }
 }
- 
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the linear acceleration of the model
+void Model::SetLinearAccel( const Vector3 &accel )
+{
+  Body *body;
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetLinearAccel( accel );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the angular acceleration of the model
+void Model::SetAngularAccel( const Vector3 &accel )
+{
+  Body *body;
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetAngularAccel( accel );
+  }
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Get the current pose
 const Pose3d &Model::GetPose() const

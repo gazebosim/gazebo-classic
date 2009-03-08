@@ -597,19 +597,32 @@ void World::UpdateSimulationIface()
             Vector3 angularVel( req->modelAngularVel.x,
                                 req->modelAngularVel.y,
                                 req->modelAngularVel.z);
+            Vector3 linearAccel( req->modelLinearAccel.x,
+                                 req->modelLinearAccel.y,
+                                 req->modelLinearAccel.z);
+            Vector3 angularAccel( req->modelAngularAccel.x,
+                                  req->modelAngularAccel.y,
+                                  req->modelAngularAccel.z);
+
 
             pose.pos.x = req->modelPose.pos.x;
             pose.pos.y = req->modelPose.pos.y;
             pose.pos.z = req->modelPose.pos.z;
 
+            // The the model's pose
             pose.rot.SetFromEuler(
                 Vector3(req->modelPose.roll, 
                   req->modelPose.pitch,
                   req->modelPose.yaw));
-            model->SetPose(pose);
+            //model->SetPose(pose);
 
-            model->SetLinearVel(linearVel);
-            model->SetAngularVel(angularVel);
+            // Set the model's linear and angular velocity
+            //model->SetLinearVel(linearVel);
+            //model->SetAngularVel(angularVel);
+
+            // Set the model's linear and angular acceleration
+            model->SetLinearAccel(linearAccel);
+            //model->SetAngularAccel(angularAccel);
           }
           else
           {

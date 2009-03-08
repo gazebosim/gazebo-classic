@@ -224,11 +224,11 @@ if not 'configure' in COMMAND_LINE_TARGETS:
   #
   env.Alias('install', install_prefix)
   env.Install(install_prefix+'/bin',gazebo)
-  env.Install(install_prefix+'/share/gazebo','Media')
   env.Install(install_prefix+'/include/gazebo',headers)
   #env.Install(install_prefix+'/lib',libgazeboServerStatic )
   env.Install(install_prefix+'/lib',libgazeboServerShared )
   env.Install(install_prefix+'/share/gazebo','worlds')
+  env.Install(install_prefix+'/share/gazebo','Media')
 else:
   print 'Configure done'
   Exit()

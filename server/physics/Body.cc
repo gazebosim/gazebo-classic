@@ -650,12 +650,43 @@ Vector3 Body::GetAngularVel() const
 
   return vel;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the linear acceleration of the body
+void Body::SetLinearAccel(const Vector3 &accel)
+{
+  this->SetForce( accel * this->GetMass());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the body
+Vector3 Body::GetLinearAccel() const
+{
+  return this->GetForce() /  this->GetMass();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the angular acceleration of the body
+void Body::SetAngularAccel(const Vector3 &accel)
+{
+  this->SetTorque( accel * this->GetMass());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the body
+Vector3 Body::GetAngularAccel() const
+{
+  return this->GetTorque() /  this->GetMass();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Set the force applied to the body
 void Body::SetForce(const Vector3 &force)
 {
   if (this->bodyId)
-    dBodySetForce(this->bodyId, force.x, force.y, force.z);
+  {
+    dBodyAddForce(this->bodyId, force.x, force.y, force.z);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -22,7 +22,7 @@ def createPkgConfig(target,source, env):
 # setup a special build environment for libgazebo. Do this so we can control
 # what libgazebo depends upon
 #
-env = Environment (
+myEnv = Environment (
   CC = 'g++',
   CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
 
@@ -41,11 +41,11 @@ env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
 pkgconfig = env.PkgConfig(target='libgazebo.pc', source=Value(install_prefix))
 env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
 
-sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc')
+sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc SimIface.cc')
 headers = Split('gazebo.h IfaceFactory.hh')
 
-sharedLib = env.SharedLibrary('gazebo', sources)
-staticLib = env.StaticLibrary('gazebo', sources)
+sharedLib = myEnv.SharedLibrary('gazebo', sources)
+staticLib = myEnv.StaticLibrary('gazebo', sources)
 
 env.Install(install_prefix+'/lib', sharedLib)
 env.Install(install_prefix+'/lib', staticLib)

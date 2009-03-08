@@ -57,6 +57,15 @@ namespace gazebo
 /// \brief Vector 3 class
 class Vec3
 {
+  /// \brief Default Constructor
+  public: Vec3() : x(0), y(0), z(0) {}
+          
+  /// \brief Constructor
+  public: Vec3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
+
+  /// \brief Copy constructor
+  public: Vec3(const Vec3 &vec) : x(vec.x), y(vec.y), z(vec.z) {}
+
   /// X value
   public: float x;
 
@@ -71,6 +80,17 @@ class Vec3
 /// \brief Pose class
 class Pose
 {
+  /// \brief Default constructor
+  public: Pose() : pos(0,0,0), roll(0), pitch(0), yaw(0) {}
+
+  /// \brief Constructor
+  public: Pose(const Vec3 &_pos, float _roll, float _pitch, float _yaw)
+          : pos(_pos), roll(_roll), pitch(_pitch), yaw(_yaw) {} 
+
+  /// \brief Copy constructor
+  public: Pose(const Pose &pose)
+          : pos(pose.pos), roll(pose.roll), pitch(pose.pitch), yaw(pose.yaw) {} 
+
   /// 3d position
   public: Vec3 pos;
 
@@ -381,7 +401,6 @@ class SimulationRequestData
   public: Type type; 
   public: char modelName[512];
   public: Pose modelPose;
-
   public: Vec3 modelLinearVel;
   public: Vec3 modelAngularVel;
   public: Vec3 modelLinearAccel;
@@ -412,6 +431,7 @@ class SimulationData
   /// Array of request responses from the simulator
   public: SimulationRequestData responses[GAZEBO_SIMULATION_MAX_REQUESTS];
   public: unsigned int responseCount;
+
 };
 
 /// \brief Common simulation interface
@@ -440,6 +460,32 @@ class SimulationIface : public Iface
             Iface::Open(client,id); 
             this->data = (SimulationData*)((char*)this->mMap+sizeof(SimulationIface)); 
           }
+
+  /// \brief Pause the simulation
+  public: void Pause();
+
+  /// \brief Reset the simulation
+  public: void Reset();
+
+  /// \brief Save the simulation
+  public: void Save();
+
+  /// \brief Get the 3d pose of a model
+  public: void GetPose3d(const char *modelName);
+
+  /// \brief Get the 2d pose of a model
+  public: void GetPose2d(const char *modelName);
+
+  /// \brief Set the 3d pose of a model
+  public: void SetPose3d(const char *modelName, const Pose &modelPose);
+
+  /// \brief Set the 2d pose of a model
+  public: void SetPose2d(const char *modelName, float x, float y, float yaw);
+
+  /// \brief Set the complete state of a model
+  public: void SetState(const char *modelName, const Pose &modelPose, 
+              const Vec3 &linearVel, const Vec3 &angularVel, 
+              const Vec3 &linearAccel, const Vec3 &angularAccel );
 
   /// Pointer to the simulation data
   public: SimulationData *data;
