@@ -158,8 +158,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
         // Create the GUI
         this->gui = new Gui(x, y, width, height, "Gazebo");
-        Fl::check();
-        Fl::wait(0.3);
         this->gui->Load(childNode);
       }
     }
@@ -219,8 +217,27 @@ int Simulator::Init()
 void Simulator::Save(const std::string& filename)
 {
   std::fstream output;
+  std::string real_filename;
 
-  output.open(filename.c_str(), std::ios::out);
+  if (filename.empty())
+  {
+    int index = 0;
+    std::string name = "worldfile";
+    std::string random_name = "worldfile.world";
+    
+    while (!std::ifstream(random_name.c_str()).is_open())
+    {
+      std::ostringstream os; 
+      ++index;
+      os << index;
+      random_name = name + os.str() + ".world";
+    }
+    real_filename = random_name; 
+  }
+  else
+    real_filename = filename;
+
+  output.open(real_filename.c_str(), std::ios::out);
 
   // Write out the xml header
   output << "<?xml version=\"1.0\"?>\n";
@@ -253,8 +270,11 @@ void Simulator::Save(const std::string& filename)
     this->GetRenderEngine()->Save(prefix, output);
     output << "\n";
 
-    this->gui->Save(prefix, output);
-    output << "\n";
+    if (this->gui) //TODO: running with -g and saving the world deletes the gui part of the file?
+    {
+      this->gui->Save(prefix, output);
+      output << "\n";
+    }
 
     World::Instance()->Save(prefix, output);
     output << "\n";

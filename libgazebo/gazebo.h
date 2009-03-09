@@ -391,6 +391,10 @@ class SimulationRequestData
   public: enum Type { PAUSE,
                       RESET,
                       SAVE,
+                      SAVEFILENAME,
+                      LOAD,
+                      CLOSE,
+                      EXIT,
                       GET_POSE3D,
                       GET_POSE2D,
                       SET_POSE3D,
@@ -399,6 +403,7 @@ class SimulationRequestData
                    };
 
   public: Type type; 
+  public: char fileName[512];
   public: char modelName[512];
   public: Pose modelPose;
   public: Vec3 modelLinearVel;
@@ -467,8 +472,20 @@ class SimulationIface : public Iface
   /// \brief Reset the simulation
   public: void Reset();
 
-  /// \brief Save the simulation
+  /// \brief Save the simulation (automatic file)
   public: void Save();
+
+  /// \brief Save the simulation (named file)
+  public: void Save(const char* fileName);
+
+  /// \brief Load the simulation 
+  public: void Load(const char* fileName);
+
+  /// \brief Close current simulation (not exit)
+  public: void Close();
+
+  /// \brief Exit current simulation 
+  public: void Exit();
 
   /// \brief Get the 3d pose of a model
   public: void GetPose3d(const char *modelName);

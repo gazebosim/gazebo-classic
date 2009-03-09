@@ -584,6 +584,18 @@ void World::UpdateSimulationIface()
         Simulator::Instance()->Save();
         break;
 
+      case SimulationRequestData::SAVEFILENAME:
+        Simulator::Instance()->Save(req->fileName);
+        break;
+
+      case SimulationRequestData::CLOSE:
+        Simulator::Instance()->Close();
+        break;
+
+      case SimulationRequestData::EXIT:
+        Simulator::Instance()->SetUserQuit();
+        break;
+
       case SimulationRequestData::SET_STATE:
         {
           Model *model = this->GetModelByName((char*)req->modelName);

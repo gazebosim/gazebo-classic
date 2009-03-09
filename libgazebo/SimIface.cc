@@ -34,6 +34,48 @@ void SimulationIface::Save()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Save the simulation
+void SimulationIface::Save(const char* fileName)
+{
+  this->Lock(1);
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::SAVEFILENAME;
+  memcpy(request->fileName, fileName, 512);
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load the simulation
+void SimulationIface::Load(const char* fileName)
+{
+  this->Lock(1);
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::LOAD;
+  memcpy(request->fileName, fileName, 512);
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the simulation
+void SimulationIface::Close()
+{
+  this->Lock(1);
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::CLOSE;
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the simulation
+void SimulationIface::Exit()
+{
+  this->Lock(1);
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::EXIT;
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the 3d pose of a model
 void SimulationIface::GetPose3d(const char *modelName)
 {
