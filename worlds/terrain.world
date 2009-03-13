@@ -17,8 +17,8 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.02</stepTime>
-    <gravity>0 0 -9.80665</gravity>
+    <stepTime>0.002</stepTime>
+    <gravity>0 0 -1.80665</gravity>
     <cfm>10e-5</cfm>
     <erp>0.3</erp>
   </physics:ode>
@@ -27,6 +27,14 @@
     <type>fltk</type>
     <size>800 600</size>
     <pos>0 0</pos>
+    <frames>
+      <row height="100%">
+        <camera width="100%">
+          <xyz>214 -74.74 1.13</xyz>
+          <rpy>0 3.50 -79.5</rpy>
+        </camera>
+      </row>
+    </frames>
   </rendering:gui>
 
   <rendering:ogre>
@@ -38,7 +46,9 @@
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
-    <xyz>197 130 4.0</xyz>
+    <!--<xyz>197 130 4.0</xyz>-->
+
+    <xyz>214.76 -79.34 4.29</xyz>
     <static>false</static>
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
@@ -80,8 +90,8 @@
     </body:plane>
   </model:physical>
 
-  <model:physical name="pioneer2dx_model2">
-    <xyz>214.76 -79.34 1.29</xyz>
+  <!--<model:physical name="pioneer2dx_model2">
+    <xyz>214.76 -79.34 2.29</xyz>
     <rpy>0 0 20</rpy>
     <controller:differential_position2d name="controller1">
       <leftJoint>left_wheel_hinge</leftJoint>
@@ -103,5 +113,6 @@
       <xi:include href="models/pioneer2dx.model" />
     </include>
   </model:physical>
+  -->
 
 </gazebo:world>

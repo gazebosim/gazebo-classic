@@ -118,7 +118,7 @@ void CameraInterface::Update()
     this->driver->Publish(this->device_addr,
                           PLAYER_MSGTYPE_DATA,
                           PLAYER_CAMERA_DATA_STATE,
-                          (void*)&this->data, size, &this->datatime);
+                          &this->data);//, 0, NULL, false);//, size, &this->datatime);
 
     // Save frames
     if (this->save)

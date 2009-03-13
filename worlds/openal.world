@@ -64,7 +64,7 @@
     <controller:audio name="audio_controller_1">
       <pitch>1.0</pitch>
       <gain>1.0</gain>
-      <loop>false</loop>
+      <loop>true</loop>
       <mp3>test.mp3</mp3>
       <interface:audio name="audio_iface_1"/>
     </controller:audio>

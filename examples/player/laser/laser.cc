@@ -11,23 +11,27 @@ int main()
 
     // Create a player client object, using the variables assigned by the
     // call to parse_args()
-    PlayerClient robot(PlayerCc::PLAYER_HOSTNAME, PlayerCc::PLAYER_PORTNUM);
+    //PlayerClient robot(PlayerCc::PLAYER_HOSTNAME, PlayerCc::PLAYER_PORTNUM);
+    PlayerClient robot("localhost");
 
     // Subscribe to the laser proxy
-    LaserProxy lp(&robot, 0);
+    //LaserProxy lp(&robot, 0);
 
+    printf("Read\n");
     robot.Read();
+    printf("Done\n");
 
     // Print out some stuff
     std::cout << robot << std::endl;
 
-    lp.RequestGeom();
+/*    lp.RequestGeom();
 
     player_pose3d_t laserPose = lp.GetPose();
 
     // Print out laser stuff
     std::cout << "Laser Pose[" << laserPose.px << " " <<
       laserPose.py << " " << laserPose.pyaw << "]\n";
+      */
 
     /*for (;;)
     {
