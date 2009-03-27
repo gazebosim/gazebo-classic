@@ -227,9 +227,8 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   stream << "MaxMipMapLevel=2\n";
 
   // Create a data stream for loading the terrain into Ogre
-  char *mstr = new char[1024];//stream.str().size()];
-  bzero (mstr, 1024);
-  sprintf(mstr, (char*)(stream.str().c_str()));
+  char *mstr = strdup(stream.str().c_str());
+
   Ogre::DataStreamPtr dataStream(
     new Ogre::MemoryDataStream(mstr,strlen(mstr)) );
 
@@ -287,7 +286,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   pose.rot = pose.rot * quat;
   this->body->SetPose(pose);
 
-  delete [] mstr;
+  free(mstr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

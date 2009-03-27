@@ -5,10 +5,10 @@ import commands
 
 exec(open('build.py'))
 
-
 PKG_CONFIG_VERSION = '0.22'
 OGRE_VERSION = '>= 1.6.0'
 ODE_VERSION = '>= 0.10.1'
+
 
 #######
 # Create a release
@@ -16,6 +16,7 @@ ODE_VERSION = '>= 0.10.1'
 if 'release' in COMMAND_LINE_TARGETS:
   CreateRelease()
   exit()
+
 
 #######
 # Setup the Options
@@ -36,7 +37,8 @@ packages = {
             'msg' : 'Error: Ogre3d and development files are required, but not\
                      found. ',
             'flags' : '',
-            'web' : 'http://www.ogre3d.org' 
+            'web' : 'http://www.ogre3d.org',
+            'required' : True
            },
 
   'ODE'  : {
@@ -45,7 +47,8 @@ packages = {
             'msg' : 'Error: ODE and development files are required, but not\
                      found.',
             'flags' : '',
-            'web' : 'http://www.ode.org'
+            'web' : 'http://www.ode.org',
+            'required' : True
            },
 
   'OpenAL' : {
@@ -53,7 +56,8 @@ packages = {
               'check' : 'openal',
               'msg' : 'Warning: OpenAL not found. 3D audio will be disbled',
               'flags' : ['-DHAVE_OPENAL'],
-              'web' : 'http://www.openal.org'
+              'web' : 'http://www.openal.org',
+              'required' : False
              },
 
   'XFT' : {
@@ -61,7 +65,8 @@ packages = {
            'check' : 'xft',
            'msg' : 'Error: ',
            'flags' : '',
-           'web' : 'http://www.xft.org' 
+           'web' : 'http://www.xft.org',
+           'required' : True
           },
 
   'avformat' : {
@@ -70,7 +75,8 @@ packages = {
                 'msg' : 'Warning: FFMpeg pkg-config not found. MP3 decoding\
                          is disabled',
                 'flags' : '',
-                'web' : 'http://ffmpeg.mplayerhq.hu/' 
+                'web' : 'http://ffmpeg.mplayerhq.hu/',
+                'required' : False
                },
 
   'avcodec' : {
@@ -79,7 +85,8 @@ packages = {
                'msg' : 'Warning: FFMpeg pkg-config not found. MP3 decoding is\
                          disabled',
                'flags' : '',
-               'web' : 'http://ffmpeg.mplayerhq.hu/' 
+               'web' : 'http://ffmpeg.mplayerhq.hu/',
+               'required' : False
               },
 
   'XML2' : {
@@ -88,7 +95,8 @@ packages = {
             'msg' : 'Error: libxml2 and development files are required, but\
                       not found.',
             'flags' : '',
-            'web' : 'http://www.xmlsoft.org' 
+            'web' : 'http://www.xmlsoft.org',
+            'required' : True
            },
 
   'FLTK' : {
@@ -98,14 +106,48 @@ packages = {
             'msg' : 'Error: libfltk & development files are required, but not\
                      found.',
             'flags' : '',
-            'web' : 'http://www.fltk.org' 
+            'web' : 'http://www.fltk.org',
+            'required' : True
            },
   'Player' : {
               'pkgcfg' : 'pkg-config --cflags --libs playerc++',
               'check' : 'playerc++',
               'msg' : 'Warning: Player not found, bindings will not be built.',
               'flags' : ['-DHAVE_PLAYER'],
-              'web' :  'http://playerstage.sourceforge.net'
+              'web' :  'http://playerstage.sourceforge.net',
+              'required' : False
+           },
+  'event' : {
+             'header' : 'event.h',
+             'lib' : 'event',
+             'msg' : 'Warning: libevent not found. Webgazebo will no be built.',
+             'flags' : ['-DHAVE_EVENT'],
+             'web' :  'http://www.monkey.org/~provos/libevent/',
+            'required' : False
+           },
+  'yaml' : {
+             'header' : 'yaml.h',
+             'lib' : 'yaml',
+             'msg' : 'Warning: yaml not found. Webgazebo will not be built.',
+             'flags' : ['-DHAVE_YAML'],
+             'web' :  'http://www.yaml.org',
+             'required' : False
+           },
+  'websim' : {
+              'pkgcfg' : 'pkg-config --cflags --libs websim',
+              'check' : 'websim',
+              'msg' : 'Warning: websim not found. Webgazebo will not be built.',
+              'flags' : ['-DHAVE_WEBSIM'],
+              'web' :  'http://www.playerstage.sourceforge.net',
+              'required' : False
+           },
+  'glib' : {
+              'pkgcfg' : 'pkg-config --cflags --libs glib-2.0',
+              'check' : 'glib-2.0',
+              'msg' : 'Warning: glib not found. Webgazebo will not be built.',
+              'flags' : '',
+              'web' :  'http://www.gtk.org',
+              'required' : False
            },
 } 
 
@@ -131,11 +173,15 @@ env = Environment (
   CXXCOMSTR = 'Compiling $TARGET',
   CCCOMSTR = 'Compiling $TARGET',
   LINKCOMSTR = 'Linking $TARGET',
+  ARCOMSTR = 'Linking $TARGET',
 
   # Shared object compile strings
   SHCXXCOMSTR = 'Compiling $TARGET',
   SHCCCOMSTR = 'Compiling $TARGET',
   SHLINKCOMSTR = 'Linking $TARGET',
+  SHARCOMSTR = 'Linking $TARGET',
+
+  HAS_ERROR = False,
 )
 
 
@@ -143,7 +189,14 @@ env = Environment (
 # DEFAULT list of subdirectories to build
 #######
 subdirs = ['libgazebo','server', 'player']
-
+# Need test for <event.h>
+try:
+  env["CCFLAGS"].index("-DHAVE_WEBSIM")
+  env["CCFLAGS"].index("-DHAVE_YAML")
+  env["CCFLAGS"].index("-DHAVE_EVENT")
+  subdirs.append('webgazebo')
+except ValueError, e:
+  garbage = 1
 
 #######
 # Generate help text
@@ -187,6 +240,11 @@ optimize_for_cpu(env)
 # Conifgure the system
 #######
 Config(env, packages)
+
+
+if env['HAS_ERROR'] == True:
+  print "Build failed due to missing packages. See above errors"
+  Exit()
 
 #######
 # Export the environment
@@ -232,3 +290,4 @@ if not 'configure' in COMMAND_LINE_TARGETS:
 else:
   print 'Configure done'
   Exit()
+

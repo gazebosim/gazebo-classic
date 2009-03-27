@@ -32,15 +32,17 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 
-
+#include "Simulator.hh"
+#include "Geom.hh"
 #include "Global.hh"
 #include "Entity.hh"
 #include "XMLConfig.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
-#include "MovableText.hh"
+#include "OgreMovableText.hh"
 #include "OgreAdaptor.hh"
 #include "OgreVisual.hh"
+#include "OgreDynamicLines.hh"
 #include "OgreSimpleShape.hh"
 #include "OgreCreator.hh"
 
@@ -267,8 +269,8 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
     // Setup the viewport to use the texture
     cviewport = renderTarget->addViewport(camera);
     cviewport->setClearEveryFrame(true);
-    cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
-    //cviewport->setOverlaysEnabled(false);
+    //cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+    cviewport->setBackgroundColour( Ogre::ColourValue::Blue );
 
     double ratio = (double)cviewport->getActualWidth() / (double)cviewport->getActualHeight();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
@@ -465,7 +467,7 @@ void OgreCreator::DrawGrid()
     sprintf(name,"(%d %d)_yaxis",0,y);
     sprintf(text,"%d",y);
 
-    MovableText* msg = new MovableText();
+    OgreMovableText* msg = new OgreMovableText();
     try
     {
       msg->Load(name, text,"Arial",0.08);
@@ -476,7 +478,7 @@ void OgreCreator::DrawGrid()
       stream <<  "Unable to create the text. " << e.getDescription() <<std::endl;
       gzthrow(stream.str() );
     }
-    msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
+    msg->SetTextAlignment(OgreMovableText::H_CENTER, OgreMovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
 
@@ -513,7 +515,7 @@ void OgreCreator::DrawGrid()
     sprintf(name,"(%d %d)_xaxis",x,0);
     sprintf(text,"%d",x);
 
-    MovableText* msg = new MovableText();
+    OgreMovableText* msg = new OgreMovableText();
     try
     {
       msg->Load(name, text,"Arial",0.08);
@@ -524,7 +526,7 @@ void OgreCreator::DrawGrid()
       stream <<  "Unable to create the text. " << e.getDescription() <<std::endl;
       gzthrow(stream.str() );
     }
-    msg->SetTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
+    msg->SetTextAlignment(OgreMovableText::H_CENTER, OgreMovableText::V_ABOVE);
 
     Ogre::SceneNode *textNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(std::string(name)+"_node");
 
@@ -553,11 +555,17 @@ void OgreCreator::RemoveMesh(const std::string &name)
 // Create a window for Ogre
 Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int width, unsigned int height)
 {
+  Ogre::RenderWindow *win = NULL;
+
   if (flWindow)
-    return OgreCreator::CreateWindow( (long)fl_display, fl_visual->screen, 
+  {
+    win = OgreCreator::CreateWindow( (long)fl_display, fl_visual->screen, 
         (long)(Fl_X::i(flWindow)->xid), width, height);
-  else
-    return NULL;
+    if (win)
+      this->windows.push_back(win);
+  }
+
+  return win;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -566,6 +574,9 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
                                               long winId, unsigned int width, 
                                               unsigned int height)
 {
+  width = 800;
+  height = 600;
+
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
@@ -609,5 +620,166 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   window->setActive(true);
   window->setAutoUpdated(true);
 
+  this->windows.push_back(window);
+
   return window;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a material from a color definition
+std::string OgreCreator::CreateMaterial(float r, float g, float b, float a)
+{
+  std::ostringstream matNameStream;
+
+  matNameStream << "Color[" << r << "," << g << "," << b << "," << a << "]";
+
+  if (!Ogre::MaterialManager::getSingleton().resourceExists(matNameStream.str()))
+  {
+    Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
+        matNameStream.str(),"General");
+
+    matPtr->getTechnique(0)->setLightingEnabled(true);
+    matPtr->getTechnique(0)->getPass(0)->setDiffuse(r,g,b,a);
+    matPtr->getTechnique(0)->getPass(0)->setAmbient(r,g,b);
+//    matPtr->getTechnique(0)->getPass(0)->setSelfIllumination(r,g,b);
+  //  matPtr->setReceiveShadows(false);
+  }
+
+  return matNameStream.str();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Create a material from a texture file
+std::string OgreCreator::CreateMaterialFromTexFile(const std::string &filename)
+{
+  if (!Ogre::MaterialManager::getSingleton().resourceExists(filename))
+  {
+    Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
+        filename, "General");
+    Ogre::Pass *pass = matPtr->getTechnique(0)->createPass();
+
+    matPtr->setLightingEnabled(false);
+
+    //pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+    //pass->setDepthWriteEnabled(false);
+    pass->createTextureUnitState(filename);
+  }
+
+  return filename;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a dynamic line
+OgreDynamicLines *OgreCreator::CreateDynamicLine(OgreDynamicRenderable::OperationType opType)
+{
+  OgreDynamicLines *line = new OgreDynamicLines(opType);
+
+  this->lines.push_back( line );
+
+  return line;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Update all the entities
+void OgreCreator::Update()
+{
+  std::list<OgreDynamicLines*>::iterator iter;
+  std::list<OgreMovableText*>::iterator titer;
+  std::list<Ogre::RenderWindow*>::iterator witer;
+  std::map<std::string, OgreVisual*>::iterator viter;
+
+  OgreVisual *vis = NULL;
+  Entity *owner = NULL;
+
+  // Update the text
+  for (titer = this->text.begin(); titer != this->text.end(); titer++)
+  {
+    (*titer)->Update();
+  }
+
+  // Update the lines
+  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
+  {
+    (*iter)->Update();
+  }
+
+  {
+    boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMutex());
+    // Update the visuals
+    for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
+    {
+      vis = viter->second;
+      owner = vis->GetOwner();
+      if (!owner)
+        continue;
+
+      Geom *geom = dynamic_cast<Geom*>(owner);
+
+      if (geom || !owner->GetParent())
+        vis->SetPose(owner->GetPose());
+      else
+        vis->SetPose(owner->GetPose() - owner->GetParent()->GetPose());
+
+    }
+  }
+
+  /*for (witer = this->windows.begin(); witer != this->windows.end(); witer++)
+  {
+    (*witer)->update();
+  }
+  */
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Create a new ogre visual 
+OgreVisual *OgreCreator::CreateVisual( const std::string &name,
+    OgreVisual *parent, Entity *owner)
+{
+  OgreVisual *newVis = NULL;
+  std::map<std::string, OgreVisual*>::iterator iter;
+
+  iter = this->visuals.find(name);
+
+  if (iter == this->visuals.end())
+  {
+    newVis = new OgreVisual(parent, owner);
+    newVis->SetName(name);
+    this->visuals[name] = newVis;
+  }
+  else
+    gzthrow(std::string("Name of ogre visual already exists: ") + name);
+
+  return newVis;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Delete a visual
+void OgreCreator::DeleteVisual( OgreVisual *visual )
+{
+  std::map<std::string, OgreVisual*>::iterator iter;
+
+  iter = this->visuals.find(visual->GetName());
+
+  if (iter != this->visuals.end())
+  {
+    delete iter->second;
+    iter->second = NULL;
+    this->visuals.erase(iter);
+  }
+  else
+  {
+    gzerr(0) << "Unknown visual[" << visual->GetName() << "]\n";
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Create a movable text object
+OgreMovableText *OgreCreator::CreateMovableText()
+{
+  OgreMovableText *newText = new OgreMovableText();
+  this->text.push_back(newText);
+  return newText;
+}
+

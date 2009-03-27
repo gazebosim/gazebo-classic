@@ -24,8 +24,8 @@
  * Date: 29 July 2007
  * SVN: $Id$
  */
-#ifndef FACTORY_POSITION2D_HH
-#define FACTORY_POSITION2D_HH
+#ifndef FACTORY_HH
+#define FACTORY_HH
 
 #include "Controller.hh"
 #include "Entity.hh"

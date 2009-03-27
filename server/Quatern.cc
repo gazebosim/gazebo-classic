@@ -274,6 +274,28 @@ Quatern Quatern::operator*( const Quatern &qt ) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Rotate a vector using the quaternion
+Vector3 Quatern::RotateVector(Vector3 vec) const
+{
+  Quatern tmp;
+  Vector3 result;
+
+  tmp.u = 0.0;
+  tmp.x = vec.x;
+  tmp.y = vec.y;
+  tmp.z = vec.z;
+
+  tmp = (*this) * (tmp * this->GetInverse());
+
+  result.x = tmp.x;
+  result.y = tmp.y;
+  result.z = tmp.z;
+
+  return result;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // See if a quatern is finite (e.g., not nan)
 bool Quatern::IsFinite() const
 {

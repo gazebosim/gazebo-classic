@@ -158,12 +158,11 @@ void ODEPhysics::AddEntity(Entity *entity)
   // Only the top level parent should have a new space
   if (entity->GetParent() == NULL)
   {
-    //entity->spaceId = this->spaceId;
-    entity->spaceId = dSimpleSpaceCreate(this->spaceId);
+    entity->SetSpaceId( dSimpleSpaceCreate(this->spaceId) );
   }
   else
   {
-    entity->spaceId = entity->GetParent()->spaceId;
+    entity->SetSpaceId( entity->GetParent()->GetSpaceId() ) ;
   }
 }
 

@@ -1,7 +1,6 @@
 
 # 3rd party packages
-parseConfigs=['pkg-config --cflags --libs libgazebo',
-              'pkg-config --cflags --libs libgazeboServer']
+parseConfigs=['pkg-config --cflags --libs libgazebo'];
 
 env = Environment (
   CC = 'g++',

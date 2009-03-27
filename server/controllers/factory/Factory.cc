@@ -87,6 +87,13 @@ void Factory::UpdateChild()
   {
     std::string xmlString;
     std::string xmlMiddle = (const char*)(this->factoryIface->data->newModel);
+    
+    // Strip leading <?xml...?> tag, if present, to allow the client to
+    // pass the contents of a valid .model file
+    std::string xmlVersion = "<?xml version=\"1.0\"?>";
+    int i = xmlMiddle.find(xmlVersion);
+    if(i >= 0)
+      xmlMiddle.replace(i, xmlVersion.length(), "");
 
     xmlString = this->xmlPrefix + xmlMiddle + this->xmlSuffix;
 
@@ -105,7 +112,7 @@ void Factory::UpdateChild()
     }
 
     // Add the new models into the World
-    World::Instance()->LoadEntities( xmlConfig->GetRootNode(), NULL );
+    World::Instance()->LoadEntities( xmlConfig->GetRootNode(), NULL, true );
 
     // Cleanup
     delete xmlConfig;

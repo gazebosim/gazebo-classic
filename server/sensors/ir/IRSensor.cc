@@ -126,12 +126,10 @@ void IRSensor::LoadChild(XMLConfigNode *node)
   this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
 
   // Set collision bits
-  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
-  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
+  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
+  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
-  //this->body->spaceId = this->superSpaceId;
-  this->body->spaceId = this->raySpaceId;
-
+  this->body->SetSpaceId( this->raySpaceId );
 }
 
 //////////////////////////////////////////////////////////////////////////////

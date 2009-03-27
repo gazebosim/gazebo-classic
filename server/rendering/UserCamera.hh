@@ -72,6 +72,9 @@ namespace gazebo
     /// \brief Get the average FPS
     public: virtual float GetAvgFPS();
 
+    /// \brief Get the ogre window
+    public: Ogre::RenderWindow *GetWindow();
+
     /// Pointer to the viewport
     protected: Ogre::Viewport *viewport;
 

@@ -94,7 +94,7 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 
   // Create a dummy rendering window. This creates a context, and allows Ogre
   // to initialize properly
-  OgreCreator::CreateWindow(this, 1, 1);
+  OgreCreator::Instance()->CreateWindow(this, 1, 1);
 
   this->hasFocus = true;
 }
@@ -148,7 +148,9 @@ void Gui::Update()
   this->toolbar->Update();
   this->statusbar->Update();
   this->frameMgr->Update();
+
   Fl::check();
+
   //Fl::wait(0.3);
 }
 

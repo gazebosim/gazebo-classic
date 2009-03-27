@@ -29,6 +29,7 @@
 #include "GazeboError.hh"
 #include "Global.hh"
 #include "OgreVisual.hh"
+#include "OgreCreator.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Entity.hh"
@@ -48,15 +49,20 @@ Entity::Entity(Entity *parent)
  
   this->selected = false;
 
+  std::ostringstream visname;
+  visname << "Entity_" << this->GetId() << "_VISUAL";
+
   if (this->parent)
   {
     this->parent->AddChild(this);
-    this->visualNode=new OgreVisual(this->parent->GetVisualNode());
+    this->visualNode = OgreCreator::Instance()->CreateVisual(
+        visname.str(), this->parent->GetVisualNode(), this);
     this->SetStatic(parent->IsStatic());
   }
   else
   {
-    this->visualNode = new OgreVisual(NULL);
+    this->visualNode = OgreCreator::Instance()->CreateVisual( 
+                                                              visname.str(), NULL, this );
   }
 
   // Add this to the phyic's engine
@@ -69,8 +75,10 @@ Entity::~Entity()
 {
   delete this->staticP;
 
-  GZ_DELETE(this->visualNode);
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
+
+  OgreCreator::Instance()->DeleteVisual(this->visualNode);
+  //GZ_DELETE(this->visualNode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,8 +188,30 @@ bool Entity::IsSelected() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the space id
+void Entity::SetSpaceId( dSpaceID spaceid )
+{
+  this->spaceId = spaceid;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return the space id
+dSpaceID Entity::GetSpaceId() const
+{
+  return this->spaceId;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Returns true if the entities are the same. Checks only the name
 bool Entity::operator==(const Entity &ent) const 
 {
   return ent.GetName() == this->GetName();
+}
+
+Pose3d Entity::GetPoseRelative() const
+{
+  if (this->parent)
+    return this->parent->GetPose() - this->GetPose();
+  else
+    return this->GetPose();
 }

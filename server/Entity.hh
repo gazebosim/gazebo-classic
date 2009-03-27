@@ -32,6 +32,7 @@
 #include <ode/ode.h>
 
 #include "Common.hh"
+#include "Pose3d.hh"
 #include "Param.hh"
 
 namespace gazebo
@@ -97,7 +98,17 @@ namespace gazebo
   
     /// \brief True if the entity is selected by the user
     public: bool IsSelected() const;
-  
+
+    /// \brief Set the space id
+    public: void SetSpaceId( dSpaceID spaceid );
+
+    /// \brief Return the space id
+    public: dSpaceID GetSpaceId() const;
+
+    /// \brief Get the pose of the entity
+    public: virtual Pose3d GetPose() const = 0;// { return Pose3d(); }
+    public: Pose3d GetPoseRelative() const;
+
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;
 
@@ -113,8 +124,8 @@ namespace gazebo
     /// \brief Visual stuff
     protected: OgreVisual *visualNode;
   
-    /// \brief ODE Stuff (should be go somewhere else)
-    public: dSpaceID spaceId;
+    /// \brief ODE Stuff 
+    protected: dSpaceID spaceId;
   
     private: bool selected;
   };

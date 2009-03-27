@@ -45,9 +45,8 @@ UserCamera::UserCamera(GLWindow *parentWindow)
 {
   std::stringstream stream;
 
-  this->window = OgreCreator::CreateWindow(parentWindow, 
-                     parentWindow->w(), parentWindow->h());
-
+  this->window = OgreCreator::Instance()->CreateWindow(parentWindow, 
+                         parentWindow->w(), parentWindow->h());
 
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
@@ -75,7 +74,7 @@ void UserCamera::Init()
 {
   this->SetCameraSceneNode( OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode( this->GetCameraName() + "_SceneNode") );
 
-  OgreCamera::InitCam();
+  this->InitCam();
 
   this->viewport = this->window->addViewport(this->GetOgreCamera());
   this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
@@ -84,6 +83,7 @@ void UserCamera::Init()
 
   this->viewport->setVisibilityMask(this->visibilityMask);
 
+  this->renderTarget = this->window;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,9 +91,7 @@ void UserCamera::Init()
 void UserCamera::Update()
 {
   OgreCamera::UpdateCam();
-
-  OgreAdaptor::Instance()->UpdateWindow(this->window, this);
-
+  this->window->update();
 
   if (this->saveFramesP->GetValue())
   {
@@ -134,7 +132,7 @@ void UserCamera::Resize(unsigned int w, unsigned int h)
 // Set the dimensions of the viewport
 void UserCamera::SetViewportDimensions(float x, float y, float w, float h)
 {
-  this->viewport->setDimensions(0, 0, 0.5, 0.5);
+  this->viewport->setDimensions(x, y, w, h);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,4 +143,11 @@ float UserCamera::GetAvgFPS()
   this->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
 
   return avgFPS;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the ogre window
+Ogre::RenderWindow *UserCamera::GetWindow()
+{
+  return this->window;
 }

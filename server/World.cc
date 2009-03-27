@@ -28,6 +28,7 @@
 #include <sstream>
 #include <fstream>
 
+#include "GraphicsIfaceHandler.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -60,6 +61,7 @@ World::World()
   this->showPhysics = false;
   this->physicsEngine = NULL;
   this->server = NULL;
+  this->graphics = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +76,6 @@ World::~World()
 void World::Close()
 {
   std::vector< Model* >::iterator miter;
-
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
   {
     if (*miter)
@@ -86,24 +87,37 @@ void World::Close()
   this->models.clear();
   this->geometries.clear();
 
-  GZ_DELETE (this->physicsEngine)
-  GZ_DELETE (this->server)
+  if (this->physicsEngine)
+  {
+    delete this->physicsEngine;
+    this->physicsEngine = NULL;
+  }
+
+  if (this->server)
+  {
+    delete this->server;
+    this->server =NULL;
+  }
 
   try
   {
-    GZ_DELETE (this->simIface)
+    if (this->simIface)
+    {
+      delete this->simIface;
+      this->simIface = NULL;
+    }
   }
   catch (std::string e)
   {
     gzthrow(e);
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
 void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 {
-
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
 
@@ -116,7 +130,6 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
     gzthrow (err);
   }
 
-
   // Create the simulator interface
   try
   {
@@ -128,6 +141,10 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
     gzthrow(err);
   }
 
+  // Create the graphics iface handler
+  this->graphics = new GraphicsIfaceHandler();
+  this->graphics->Load("default");
+
 #ifdef HAVE_OPENAL
   // Load OpenAL audio 
   if (rootNode->GetChild("openal","audio"))
@@ -136,7 +153,7 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 
-  this->LoadEntities(rootNode, NULL);
+  this->LoadEntities(rootNode, NULL, false);
 
   /*std::vector<Model*>::iterator miter;
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
@@ -145,6 +162,7 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   }*/
 
   this->physicsEngine->Load(rootNode);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,6 +190,8 @@ int World::Init()
 {
   std::vector< Model* >::iterator miter;
 
+  this->simPauseTime = 0;
+
   // Init all models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
@@ -189,6 +209,8 @@ int World::Init()
   this->toAddModels.clear();
   this->toDeleteModels.clear();
 
+  this->graphics->Init();
+
   return 0;
 }
 
@@ -198,6 +220,24 @@ int World::Update()
 {
   std::vector< Model* >::iterator miter;
   std::vector< Model* >::iterator miter2;
+
+  if (this->simPauseTime > 0)
+  {
+    if (Simulator::Instance()->GetSimTime() >= this->simPauseTime)
+    {
+      //printf("SimTime[%f] PauseTime[%f]\n", Simulator::Instance()->GetSimTime(), this->simPauseTime);
+
+      this->simPauseTime = 0;
+      Simulator::Instance()->SetPaused(true);
+
+      // Tell the simiface that it's okay to trigger the go ack
+      this->simIface->GoAckPost();
+    }
+    else
+    {
+      Simulator::Instance()->SetPaused(false);
+    }
+  }
 
   // Update all the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
@@ -214,33 +254,25 @@ int World::Update()
     this->physicsEngine->Update();
   }
 
-  this->UpdateSimulationIface();
-
-  // Copy the newly created models into the main model vector
-  std::copy(this->toAddModels.begin(), this->toAddModels.end(),
-            std::back_inserter(this->models));
-  this->toAddModels.clear();
-
-
-  // Remove and delete all models that are marked for deletion
-  for (miter=this->toDeleteModels.begin();
-       miter!=this->toDeleteModels.end(); miter++)
-  {
-    this->models.erase(
-      std::remove(this->models.begin(), this->models.end(), *miter) );
-    delete *miter;
-  }
-
-  this->toDeleteModels.clear();
+  this->graphics->Update();
 
   return 0;
 }
+
+void World::ProcessMessages()
+{
+  this->UpdateSimulationIface();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the world
 int World::Fini()
 {
   std::vector< Model* >::iterator miter;
+
+  if (this->graphics)
+    delete this->graphics;
 
   // Finalize the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
@@ -294,7 +326,7 @@ PhysicsEngine *World::GetPhysicsEngine() const
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-int World::LoadEntities(XMLConfigNode *node, Model *parent)
+int World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate)
 {
   XMLConfigNode *cnode;
   Model *model = NULL;
@@ -304,16 +336,17 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent)
     // Check for model nodes
     if (node->GetNSPrefix() == "model")
     {
-      model = this->LoadModel(node, parent);
+      model = this->LoadModel(node, parent, removeDuplicate);
     }
   }
 
   // Load children
   for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
   {
-    if (this->LoadEntities( cnode, model ) != 0)
+    if (this->LoadEntities( cnode, model, removeDuplicate ) != 0)
       return -1;
   }
+
 
   return 0;
 }
@@ -328,21 +361,24 @@ void World::DeleteEntity(const char *name)
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     if ((*miter)->GetName() == name)
+    {
+      (*miter)->Fini();
       this->toDeleteModels.push_back(*miter);
+    }
   }
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a model
-Model *World::LoadModel(XMLConfigNode *node, Model *parent)
+Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate)
 {
   Pose3d pose;
   Model *model = new Model(parent);
 
   //model->SetParent(parent);
   // Load the model
-  if (model->Load( node ) != 0)
+  if (model->Load( node, removeDuplicate ) != 0)
     return NULL;
 
   // Set the model's pose (relative to parent)
@@ -541,11 +577,14 @@ void World::UpdateSimulationIface()
   //TODO: Move this method to simulator? Hard because of the models
   this->simIface->Lock(1);
 
+  /* This call releases our lock, which can lead to hard-to-track-down
+   * synchronization bugs.  Besides, it's a small optimization at best
   if (this->simIface->GetOpenCount() <= 0)
   {
     this->simIface->Unlock();
     return;
   }
+  */
 
   response = this->simIface->data->responses;
 
@@ -584,18 +623,6 @@ void World::UpdateSimulationIface()
         Simulator::Instance()->Save();
         break;
 
-      case SimulationRequestData::SAVEFILENAME:
-        Simulator::Instance()->Save(req->fileName);
-        break;
-
-      case SimulationRequestData::CLOSE:
-        Simulator::Instance()->Close();
-        break;
-
-      case SimulationRequestData::EXIT:
-        Simulator::Instance()->SetUserQuit();
-        break;
-
       case SimulationRequestData::SET_STATE:
         {
           Model *model = this->GetModelByName((char*)req->modelName);
@@ -623,10 +650,17 @@ void World::UpdateSimulationIface()
 
             // The the model's pose
             pose.rot.SetFromEuler(
-                Vector3(req->modelPose.roll, 
+                Vector3(
+                  req->modelPose.roll, 
                   req->modelPose.pitch,
                   req->modelPose.yaw));
             model->SetPose(pose);
+
+            linearVel = pose.rot.RotateVector(linearVel);
+            angularVel = pose.rot.RotateVector(angularVel);
+
+            linearAccel = pose.rot.RotateVector(linearAccel);
+            angularAccel = pose.rot.RotateVector(angularAccel);
 
             // Set the model's linear and angular velocity
             model->SetLinearVel(linearVel);
@@ -698,7 +732,16 @@ void World::UpdateSimulationIface()
           break;
         }
 
-     case SimulationRequestData::SET_POSE2D:
+      case SimulationRequestData::GO:
+        {
+          this->simPauseTime = Simulator::Instance()->GetSimTime() 
+                                  + req->runTime * 10e-6;
+
+          Simulator::Instance()->SetPaused(false);
+          break;
+        }
+
+      case SimulationRequestData::SET_POSE2D:
         {
           Model *model = this->GetModelByName((char*)req->modelName);
           if (model)
@@ -729,5 +772,27 @@ void World::UpdateSimulationIface()
   }
 
   this->simIface->Unlock();
+
+
+  std::vector< Model* >::iterator miter;
+
+  // Copy the newly created models into the main model vector
+  std::copy(this->toAddModels.begin(), this->toAddModels.end(),
+      std::back_inserter(this->models));
+  this->toAddModels.clear();
+
+
+  // Remove and delete all models that are marked for deletion
+  for (miter=this->toDeleteModels.begin();
+      miter!=this->toDeleteModels.end(); miter++)
+  {
+    std::cout << "Erasing a model[" << (*miter)->GetName() << "]\n";
+//    (*miter)->Fini();
+    this->models.erase(
+        std::remove(this->models.begin(), this->models.end(), *miter) );
+    delete *miter;
+  }
+
+  this->toDeleteModels.clear();
 }
 

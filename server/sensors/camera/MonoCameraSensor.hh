@@ -72,13 +72,7 @@ class MonoCameraSensor : public Sensor, public OgreCamera
   /// \brief Return the material the camera renders to
   public: virtual std::string GetMaterialName() const;
 
-  /// \brief Get a pointer to the image data
-  public: virtual const unsigned char *GetImageData(unsigned int i=0);
-
   public: virtual std::string GetName() const { return Sensor::GetName(); }
-
-  // Save the camera frame
-  private: void SaveFrame();
 
 };
 

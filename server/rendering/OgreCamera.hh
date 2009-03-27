@@ -77,7 +77,10 @@ namespace gazebo
   
     /// \brief Initialize the camera
     public: void InitCam();
-  
+
+    /// \brief Render the camera
+    public: void Render();
+
     /// \brief Update the sensor information
     public: void UpdateCam();
   
@@ -175,6 +178,21 @@ namespace gazebo
     /// \brief Set the camera's scene node
     public: void SetCameraSceneNode( Ogre::SceneNode *node );
 
+    /// \brief Get a pointer to the image data
+    public: virtual const unsigned char *GetImageData(unsigned int i=0);
+
+    /// \brief Get the camera's name
+    public: std::string GetCamName();
+
+    /// \brief Set the camera's name
+    public: void SetCamName( const std::string &name );
+
+    // Save the camera frame
+    protected: virtual void SaveFrame();
+
+
+    private: std::string name;
+
     protected: ParamT<Angle> *hfovP;
     protected: ParamT<double> *nearClipP, *farClipP;
     protected: ParamT< Vector2<int> > *imageSizeP;
@@ -206,6 +224,8 @@ namespace gazebo
     private: unsigned int myCount;
 
     private: std::string cameraName;
+
+    protected: bool captureData;
 
     private: bool userMovable;
     protected: std::vector<Param*> camParameters;

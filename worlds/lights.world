@@ -56,6 +56,7 @@
   <model:renderable name="spot_red">
     <xyz>0.0 0.0 2.0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
+    <enableGravity>false</enableGravity>
 
     <light>
       <type>spot</type>
@@ -70,6 +71,7 @@
   <model:renderable name="spot_green">
     <xyz>0.0 1.0 2.0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
+    <enableGravity>false</enableGravity>
 
     <light>
       <type>spot</type>
@@ -98,6 +100,7 @@
     <model:renderable name="spot_blue">
       <xyz>0.0 0 0</xyz>
       <rpy>0.0 0.0 0.0</rpy>
+      <enableGravity>false</enableGravity>
 
       <light>
         <type>spot</type>
@@ -115,6 +118,8 @@
   <!-- Yellow Point light -->
   <model:renderable name="point_yellow">
     <xyz>5 5 5</xyz>
+    <enableGravity>false</enableGravity>
+
     <light>
       <type>point</type>
       <diffuseColor>0.1 0.1 0.0</diffuseColor>
@@ -125,6 +130,7 @@
 
   <!-- White Directional light -->
   <model:renderable name="directional_white">
+    <enableGravity>false</enableGravity>
     <light>
       <type>directional</type>
       <direction>0 -1 0</direction>

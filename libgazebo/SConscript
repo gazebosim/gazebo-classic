@@ -25,6 +25,7 @@ def createPkgConfig(target,source, env):
 myEnv = Environment (
   CC = 'g++',
   CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
+  LIBS=Split('boost_signals boost_thread'),
 
   CXXCOMSTR = 'Compiling $TARGET',
   CCCOMSTR = 'Compiling $TARGET',
@@ -41,7 +42,7 @@ env['BUILDERS']['PkgConfig'] = Builder(action = createPkgConfig)
 pkgconfig = env.PkgConfig(target='libgazebo.pc', source=Value(install_prefix))
 env.Install(dir=install_prefix+'/lib/pkgconfig', source=pkgconfig)
 
-sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc SimIface.cc')
+sources = Split('Server.cc Client.cc Iface.cc IfaceFactory.cc SimIface.cc Graphics3dIface.cc')
 headers = Split('gazebo.h IfaceFactory.hh')
 
 sharedLib = myEnv.SharedLibrary('gazebo', sources)

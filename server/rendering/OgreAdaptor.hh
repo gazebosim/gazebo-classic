@@ -94,13 +94,16 @@ namespace gazebo
   
     /// \brief Get the desired update rate
     public: double GetUpdateRate();
- 
-    /// \brief Update a window
-    public: void UpdateWindow(Ogre::RenderWindow *window, OgreCamera *camera);
+
+    /// \brief Update all the cameras 
+    public: void UpdateCameras();
 
     /// \brief Get an entity at a pixel location using a camera. Used for
     ///        mouse picking. 
     public: Entity *GetEntityAt(OgreCamera *camera, Vector2<int> mousePos);
+
+    /// \brief Register a user camera
+    public: void RegisterCamera( OgreCamera *cam );
 
     private: void LoadPlugins();
     private: void SetupResources();
@@ -157,6 +160,8 @@ namespace gazebo
     private: ParamT<bool> *drawGridP;
     private: ParamT<std::string> *skyMaterialP;
     private: std::vector<Param*> parameters;
+
+    private: std::vector<OgreCamera*> cameras;
   };
   
  

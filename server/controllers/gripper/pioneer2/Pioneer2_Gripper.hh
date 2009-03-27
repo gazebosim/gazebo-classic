@@ -36,6 +36,8 @@ namespace gazebo
 {
   class SliderJoint;
   class GripperIface;
+  class ActarrayIface;
+  class RaySensor;
 
 /// \addtogroup gazebo_controller
 /// \{
@@ -60,13 +62,19 @@ namespace gazebo
 /// This is a controller that simulates a Pioneer 2DX motion
 class Pioneer2_Gripper : public Controller
 {
-  /// Constructor
+  /// \brief Constructor
   public: Pioneer2_Gripper(Entity *parent);
 
-  /// Destructor
+  /// \brief Destructor
   public: virtual ~Pioneer2_Gripper();
 
-  /// Load the controller
+  /// \brief Left paddle contact callback
+  public: void LeftPaddleCB(Geom *g1, Geom *g2);
+
+  /// \brief Right paddle contact callback
+  public: void RightPaddleCB(Geom *g1, Geom *g2);
+
+  /// \brief Load the controller
   /// \param node XML config node
   /// \return 0 on success
   protected: virtual void LoadChild(XMLConfigNode *node);
@@ -87,18 +95,28 @@ class Pioneer2_Gripper : public Controller
   /// \return 0 on success
   protected: virtual void FiniChild();
 
-  /// The Position interface
-  private: GripperIface *myIface;
+  /// The gripper interface
+  private: GripperIface *gripIface;
+
+  // The interface for the lift
+  private: ActarrayIface *actIface;
+
+  private: RaySensor *breakBeams[2];
 
   /// The parent Model
   private: Model *myParent;
 
   private: SliderJoint *joints[3];
+  private: SliderJoint *holdJoint;
+
+  private: Geom *paddles[2];
+  private: Geom *contactGeoms[2];
 
   private: ParamT<std::string> *jointNamesP[3];
   private: ParamT<float> *gainsP[3];
   private: ParamT<float> *forcesP[3];
-
+  private: ParamT<std::string> *breakBeamNamesP[2];
+  private: ParamT<std::string> *paddleNamesP[2];
 };
 
 /** \} */

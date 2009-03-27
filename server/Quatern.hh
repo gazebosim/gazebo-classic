@@ -125,6 +125,10 @@ class Quatern
   /// \return This quatern multiplied by the parameter
   public: Quatern operator*( const Quatern &qt ) const;
 
+  /// \brief Rotate a vector using the quaternion
+  /// \return The rotated vector
+  public: Vector3 RotateVector(Vector3 vec) const;
+
   /// \brief See if a quatern is finite (e.g., not nan)
   /// \return True if quatern is finite
   public: bool IsFinite() const;

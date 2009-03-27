@@ -46,6 +46,7 @@ namespace gazebo
   class Geom;
   class PhysicsEngine;
   class XMLConfigNode;
+  class GraphicsIfaceHandler;
    
 /// \brief The World
 /*
@@ -95,8 +96,9 @@ class World : public SingletonT<World>
   /// \brief Load all entities
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
+  /// \param removeDuplicate Remove existing model of same name
   /// \return 0 on success
-  public: int LoadEntities(XMLConfigNode *node, Model *parent);
+  public: int LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate);
 
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete
@@ -140,6 +142,8 @@ class World : public SingletonT<World>
   /// \brief Get whether to view as wireframe
   public: bool GetShowPhysics();
 
+  public: void ProcessMessages();
+
   /// Set to true to show bounding boxes
   private: bool showBoundingBoxes;
 
@@ -154,8 +158,9 @@ class World : public SingletonT<World>
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
   /// \param parent The parent model
+  /// \param removeDuplicate Remove existing model of same name
   /// \return The model that was created
-  private: Model *LoadModel(XMLConfigNode *node, Model *parent);
+  private: Model *LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate);
 
   /// \brief Set the model pose and the pose of it's attached children 
   /// \param model The model to set
@@ -185,6 +190,10 @@ class World : public SingletonT<World>
 
   /// Simulation interface
   private: SimulationIface *simIface;
+  private: GraphicsIfaceHandler *graphics;
+
+  /// Length of time to run before receiving a "go" command
+  private: double simPauseTime;
 
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;

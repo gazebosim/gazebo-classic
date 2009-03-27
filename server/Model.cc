@@ -29,6 +29,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "OgreVisual.hh"
+#include "GraphicsIfaceHandler.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -68,8 +70,19 @@ Model::Model(Model *parent)
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
   this->rpyP->Callback( &Model::SetRotation, this);
+
+  this->enableGravityP = new ParamT<bool>("enableGravity", true, 0);
+  this->enableGravityP->Callback( &Model::SetGravityMode, this );
+
+  this->enableFrictionP = new ParamT<bool>("enableFriction", true, 0);
+  this->enableFrictionP->Callback( &Model::SetFrictionMode, this );
+
+  this->collideP = new ParamT<std::string>("collide", "all", 0);
+  this->collideP->Callback( &Model::SetCollideMode, this );
+
   Param::End();
 
+  this->graphicsHandler = NULL;
   this->parentBodyNameP = NULL;
   this->myBodyNameP = NULL;
 }
@@ -82,47 +95,94 @@ Model::~Model()
   std::map< std::string, Joint* >::iterator jiter;
   std::map< std::string, Controller* >::iterator citer;
 
+  if (this->graphicsHandler)
+  {
+    delete this->graphicsHandler;
+    this->graphicsHandler = NULL;
+  }
+
   for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
   {
-    GZ_DELETE(biter->second);
+    if (biter->second)
+    {
+      delete biter->second;
+      biter->second = NULL;
+    }
   }
   this->bodies.clear();
 
   for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
   {
-    GZ_DELETE( jiter->second );
+    if (jiter->second)
+    {
+      delete jiter->second;
+      jiter->second=NULL;
+    }
   }
   this->joints.clear();
 
   for (citer = this->controllers.begin();
        citer != this->controllers.end(); citer++)
   {
-    GZ_DELETE( citer->second );
+    if (citer->second)
+    {
+      delete citer->second;
+      citer->second = NULL;
+    }
   }
   this->controllers.clear();
 
-  GZ_DELETE(this->parentBodyNameP);
-  GZ_DELETE(this->myBodyNameP);
+  if (this->parentBodyNameP)
+  {
+    delete this->parentBodyNameP;
+    this->parentBodyNameP = NULL;
+  }
+
+  if (this->myBodyNameP)
+  {
+    delete this->myBodyNameP;
+    this->myBodyNameP = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the model
-int Model::Load(XMLConfigNode *node)
+int Model::Load(XMLConfigNode *node, bool removeDuplicate)
 {
   XMLConfigNode *childNode;
   Pose3d pose;
+  Model* dup;
 
   this->nameP->Load(node);
+  // Look for existing models by the same name
+  if((dup = World::Instance()->GetModelByName(this->nameP->GetValue())) != NULL)
+  {
+    if(!removeDuplicate)
+    {
+      gzthrow("Duplicate model name" + this->nameP->GetValue() + "\n");
+    }
+    else
+    {
+      // Delete the existing one (this should only be reached when called
+      // via the factory interface).
+      printf("Queuing duplicate model %s (%p) for deletion\n", this->nameP->GetValue().c_str(), dup);
+      World::Instance()->DeleteEntity(this->nameP->GetValue().c_str());
+    }
+  }
+
   this->staticP->Load(node);
 
   this->canonicalBodyNameP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
+  this->enableGravityP->Load(node);
+  this->enableFrictionP->Load(node);
+  this->collideP->Load(node);
 
   this->xmlNode = node;
   this->type=node->GetName();
 
-  this->SetStatic(this->staticP->GetValue());
+  this->SetStatic( **(this->staticP) );
 
   if (this->type == "physical")
     this->LoadPhysical(node);
@@ -172,6 +232,19 @@ int Model::Load(XMLConfigNode *node)
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);
 
+  // This must be placed after creation of the bodies
+  // Static variable overrides the gravity
+  if (**this->staticP == false)
+    this->SetGravityMode( **this->enableGravityP );
+
+  this->SetFrictionMode( **this->enableFrictionP );
+
+  this->SetCollideMode( **this->collideP );
+
+  // Create the graphics iface handler
+  this->graphicsHandler = new GraphicsIfaceHandler();
+  this->graphicsHandler->Load(this->GetName(), this);
+
   return 0;
 
   // Get the name of the python module
@@ -181,18 +254,18 @@ int Model::Load(XMLConfigNode *node)
   // Import the python module
   if (this->pName)
   {
-    this->pModule.reset(PyImport_Import(this->pName));
-    Py_DECREF(this->pName);
+  this->pModule.reset(PyImport_Import(this->pName));
+  Py_DECREF(this->pName);
   }
 
   // Get the Update function from the module
   if (this->pModule)
   {
-    this->pFuncUpdate.reset(PyObject_GetAttrString(this->pModule, "Update"));
-    if (this->pFuncUpdate && !PyCallable_Check(this->pFuncUpdate))
-      this->pFuncUpdate = NULL;
+  this->pFuncUpdate.reset(PyObject_GetAttrString(this->pModule, "Update"));
+  if (this->pFuncUpdate && !PyCallable_Check(this->pFuncUpdate))
+  this->pFuncUpdate = NULL;
   }
-  */
+   */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -224,6 +297,9 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   stream << " name=\"" << this->nameP->GetValue() << "\">\n"; 
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
+  stream << prefix << "  " << *(this->enableGravityP) << "\n";
+  stream << prefix << "  " << *(this->enableFrictionP) << "\n";
+  stream << prefix << "  " << *(this->collideP) << "\n";
 
   if (this->type == "physical")
   {
@@ -288,6 +364,8 @@ int Model::Init()
   std::map<std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
 
+  this->graphicsHandler->Init();
+
   for (biter = this->bodies.begin(); biter!=this->bodies.end(); biter++)
     biter->second->Init();
 
@@ -350,6 +428,8 @@ int Model::Update()
     this->rpyP->SetValue(this->pose.rot);
   }
 
+  if (this->graphicsHandler)
+    this->graphicsHandler->Update();
   return this->UpdateChild();
 }
 
@@ -369,6 +449,12 @@ int Model::Fini()
   for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
   {
     biter->second->Fini();
+  }
+
+  if (this->graphicsHandler)
+  {
+    delete this->graphicsHandler;
+    this->graphicsHandler = NULL;
   }
 
   return this->FiniChild();
@@ -467,6 +553,7 @@ void Model::SetPose(const Pose3d &setPose)
       childModel->SetPose(newPose);
     }
   }
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -550,10 +637,11 @@ void Model::SetAngularAccel( const Vector3 &accel )
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Get the current pose
-const Pose3d &Model::GetPose() const
+Pose3d Model::GetPose() const
 {
   return this->pose;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create and return a new body
@@ -677,6 +765,7 @@ void Model::LoadController(XMLConfigNode *node)
       std::cerr << "Error Loading Controller[" <<  controllerName
       << "]\n" << e << std::endl;
       delete controller;
+      controller = NULL;
       return;
     }
 
@@ -702,7 +791,39 @@ const std::map<std::string, Body*> *Model::GetBodies() const
 {
   return &(this->bodies);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a sensor by name
+Sensor *Model::GetSensor(const std::string &name) const
+{
+  Sensor *sensor = NULL;
+  std::map< std::string, Body* >::const_iterator biter;
+
+  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  {
+    if ( (sensor = biter->second->GetSensor(name)) != NULL)
+      break;
+  }
+
+  return sensor;
+}
  
+////////////////////////////////////////////////////////////////////////////////
+/// Get a geom by name
+Geom *Model::GetGeom(const std::string &name) const
+{
+  Geom *geom = NULL;
+  std::map< std::string, Body* >::const_iterator biter;
+
+  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  {
+    if ( (geom = biter->second->GetGeom(name)) != NULL)
+      break;
+  }
+
+  return geom;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a body by name
 Body *Model::GetBody(const std::string &name)
@@ -756,13 +877,6 @@ void Model::Attach(XMLConfigNode *node)
   this->joint->SetAxis( Vector3(0,1,0) );
   this->joint->SetParam( dParamHiStop, 0);
   this->joint->SetParam( dParamLoStop, 0);
-
-  /*  if (this->spaceId)
-    {
-      dSpaceDestroy(this->spaceId);
-      this->spaceId = parentModel->spaceId;
-    }
-    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -772,6 +886,52 @@ Body *Model::GetCanonicalBody()
   return this->bodies[this->canonicalBodyNameP->GetValue()];
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set the gravity mode of the model
+void Model::SetGravityMode( const bool &v )
+{
+  Body *body;
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetGravityMode( v );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the gravity mode of the model
+void Model::SetFrictionMode( const bool &v )
+{
+  Body *body;
+
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetFrictionMode( v );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the collide mode of the model
+void Model::SetCollideMode( const std::string &m )
+{
+  Body *body;
+
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetCollideMode( m );
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a renderable model (like a light source).
@@ -785,7 +945,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
   char lightNumBuf[8];
   sprintf(lightNumBuf, "%d", lightNumber++);
   body->SetName(this->GetName() + "_RenderableBody_" + lightNumBuf);
-  body->SetGravityMode(false);
+  //body->SetGravityMode(false);
   body->SetPose(Pose3d());
   this->bodies[body->GetName()] = body;
 

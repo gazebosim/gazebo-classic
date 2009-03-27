@@ -36,6 +36,11 @@
 #include "Common.hh"
 #include "Param.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 { 
 
@@ -57,16 +62,21 @@ namespace gazebo
     /// \brief Attach a renerable object to the visual
     public: void AttachObject( Ogre::MovableObject *obj);
 
+    /// \brief Detach all objects
+    public: void DetachObjects();
+
+    /// \brief Get the number of attached objects
+    public: unsigned short GetNumAttached();
+
+    /// \brief Get an attached object
+    public: Ogre::MovableObject *GetAttached(unsigned short num);
+
     /// \brief Attach a mesh to this visual by name
     public: void AttachMesh( const std::string &meshName );
 
     /// \brief Save the visual
     public: void Save(std::string &prefix, std::ostream &stream);
     
-    /// \brief Return an unique name for this object
-    /// \return Unique name for the object
-    public: std::string GetName() const;
-
     /// \brief Set the scale
     public: void SetScale( const Vector3 &scale );
 
@@ -118,7 +128,7 @@ namespace gazebo
     public: void MakeStatic();
 
     /// \brief Get the entity that manages this visual
-    public: Entity *GetEntity() const;
+    public: Entity *GetOwner() const;
 
     /// \brief Set to true to show a white bounding box, used to indicate 
     //         user selection
@@ -138,7 +148,7 @@ namespace gazebo
 
     private: static unsigned int visualCounter;
 
-    private: Entity *entity;
+    private: Entity *owner;
 
     private: ParamT<Vector3> *xyzP;
     private: ParamT<Quatern> *rpyP;
@@ -148,6 +158,8 @@ namespace gazebo
     private: ParamT<Vector3> *sizeP;
     private: ParamT<Vector3> *scaleP;
     private: ParamT<Vector2<double> > *meshTileP;
+
+    private: boost::recursive_mutex *mutex;
   };
 }
 

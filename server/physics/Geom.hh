@@ -34,6 +34,11 @@
 #include "Pose3d.hh"
 #include "Vector3.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
 
@@ -99,7 +104,7 @@ namespace gazebo
     public: void SetPose(const Pose3d &pose, bool updateCoM=true);
   
     /// \brief Return the pose of the geom
-    public: Pose3d GetPose() const;
+    public: virtual Pose3d GetPose() const;
   
     /// \brief Set the position
     /// \param pos Vector3 position
@@ -159,9 +164,11 @@ namespace gazebo
     /// \brief Get the model this geom belongs to
     public: Model *GetModel() const;
 
+    /// \brief Set the friction mode of the geom
+    public: void SetFrictionMode( const bool &v );
+
     ///  Contact parameters
     public: ContactParams *contact; 
-
   
     /// The body this geom belongs to
     protected: Body *body;
@@ -181,7 +188,7 @@ namespace gazebo
 
     /// mass of the body
     protected: dMass bodyMass;
- 
+
     private: ParamT<int> *laserFiducialIdP;
     private: ParamT<float> *laserRetroP;
 
@@ -204,6 +211,7 @@ namespace gazebo
 
     private: std::string typeName;
 
+    private: boost::recursive_mutex *mutex;
   };
 
   /// \}

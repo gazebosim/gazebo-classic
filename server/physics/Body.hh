@@ -36,6 +36,10 @@
 #include "Pose3d.hh"
 #include "Param.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
 
 namespace gazebo
 {
@@ -83,7 +87,7 @@ namespace gazebo
 
     /// \brief Return the pose of the body
     /// \return Pose of the body
-    public: Pose3d GetPose() const;
+    public: virtual Pose3d GetPose() const;
 
     /// \brief Set the position of the body
     /// \param pos Vector position
@@ -116,6 +120,12 @@ namespace gazebo
 
     /// \brief Set whether gravity affects this body
     public: void SetGravityMode(bool mode);
+
+    /// \brief Set the friction mode of the body
+    public: void SetFrictionMode( const bool &v );
+
+    /// \brief Set the collide mode of the body
+    public: void SetCollideMode( const std::string &m );
 
     /// \brief Set the linear velocity of the body
     public: void SetLinearVel(const Vector3 &vel);
@@ -165,6 +175,9 @@ namespace gazebo
     /// \brief Get the mass of the body
     public: float GetMass() const { return mass.mass; }
 
+    /// \brief Get a sensor by name
+    public: Sensor *GetSensor( const std::string &name ) const;
+
     /// Load a new geom helper function
     /// \param node XMLConfigNode used to load the geom
     private: void LoadGeom(XMLConfigNode *node);
@@ -201,6 +214,8 @@ namespace gazebo
     private: ParamT<Quatern> *rpyP;
 
     private: ParamT<double> *dampingFactorP;
+
+    private: boost::recursive_mutex *mutex;
   };
 
   /// \}

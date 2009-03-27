@@ -116,8 +116,10 @@ def optimize_for_cpu(env):
 
 
 def Config(env, packages):
+  simpleEnv = Environment(CC="g++")
+
   # Setup the configuration environment.
-  conf = Configure(env, custom_tests = {'CheckODELib' : CheckODELib,
+  conf = Configure(simpleEnv, custom_tests = {'CheckODELib' : CheckODELib,
                                         'CheckPkgConfig' : CheckPkgConfig,
                                         'CheckPkg' : CheckPkg})
   
@@ -132,11 +134,32 @@ def Config(env, packages):
   # Parse all the pacakge configurations
   #
   for key in packages:
-    pkgcfg = packages[key]['pkgcfg']
-    check = packages[key]['check']
+    pkgcfg =''
+    header=''
+    lib=''
+    check=''
+    requred = True
+
+    if packages[key].has_key('pkgcfg'):
+      pkgcfg = packages[key]['pkgcfg']
+
+    if packages[key].has_key('header'):
+      header = packages[key]['header']
+
+    if packages[key].has_key('lib'):
+      lib = packages[key]['lib']
+
+    if packages[key].has_key('check'):
+      check = packages[key]['check']
+
+    if packages[key].has_key('required'):
+      required = packages[key]['required']
+
+
     msg = packages[key]['msg']
     web = packages[key]['web']
     flags = packages[key]['flags']
+
     docfg = True
     valid = True
   
@@ -146,11 +169,11 @@ def Config(env, packages):
       valid = False
       print '  !!' + msg + key + ' not found.'
       print '  See: ' + web
-      if msg.find('Error') > 0:
-        Exit(1)
-  
+      if required:
+        env['HAS_ERROR'] = True;
+ 
     # Try parsing the pkg-config
-    if docfg:
+    if docfg and pkgcfg:
       try:
         if not check:
           print "Checking for "+key+"...",
@@ -164,20 +187,40 @@ def Config(env, packages):
         print "Unable to parse config ["+pkgcfg+"]"
         print '  !!' + msg + key + ' not found.'
         print '  See: ' + web
-        if msg.find('Error') > 0:
-          Exit(1)
+        if required:
+          env['HAS_ERROR'] = True;
+    elif header and lib:
+      if not conf.CheckLibWithHeader(lib, header, 'c'):
+        valid = False
+        print msg
+      else:
+        env.Append(LIBS = lib)
+        valid = True
   
     # If valid so far, apply any flags to the environment
     if valid:
       for flag in flags:
-        env.Append(CCFLAGS = " " + flag)
+        env.Append(CCFLAGS = flag)
   
   # Check for trimesh support in ODE
   #if not conf.CheckODELib():
   #  print '  Error: ODE not compiled with trimesh support.'
   #  Exit(1)
-  
-  env = conf.Finish()
+
+  if not conf.CheckCHeader('avformat.h'):
+    if conf.CheckCHeader('libavformat/avformat.h'):
+      env.Append( CCFLAGS = '-DSPECIAL_LIBAVFORMAT')
+    else:
+      print "Unable to find libavformat"
+
+  if not conf.CheckCHeader('avcodec.h'):
+    if conf.CheckCHeader('libavcodec/avcodec.h'):
+      env.Append( CCFLAGS = '-DSPECIAL_LIBAVCODEC')
+    else:
+      print "Unable to find libavcodec"
+
+    
+  simpleEnv = conf.Finish()
   
   #simpleenv = Environment(CPPPATH="/usr/include/AL")
   #simpleconf = Configure(simpleenv)

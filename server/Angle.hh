@@ -28,6 +28,7 @@
 #define ANGLE_HH
 
 #include <iostream>
+#include <math.h>
 
 namespace gazebo
 {

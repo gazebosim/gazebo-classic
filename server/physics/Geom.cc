@@ -25,8 +25,10 @@
  */
 
 #include <sstream>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "OgreVisual.hh"
+#include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "ContactParams.hh"
@@ -43,10 +45,12 @@ int Geom::geomIdCounter = 0;
 Geom::Geom( Body *body)
     : Entity(body)
 {
+  this->mutex = new boost::recursive_mutex();
+
   this->typeName = "unknown";
 
   this->body = body;
-  this->spaceId = this->body->spaceId;
+  this->SetSpaceId(this->body->GetSpaceId());
 
   // Create the contact parameters
   this->contact = new ContactParams();
@@ -89,11 +93,15 @@ Geom::~Geom()
   if (this->transId)
     dGeomDestroy(this->transId);
 
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  delete this->mutex;
+  this->mutex = NULL;
+
+  /*for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
     GZ_DELETE (*iter)
   }
   this->visuals.clear();
+  */
 
   delete this->massP;
   delete this->xyzP;
@@ -107,6 +115,7 @@ Geom::~Geom()
 void Geom::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode = NULL;
+
 
   this->xmlNode=node;
 
@@ -140,7 +149,12 @@ void Geom::Load(XMLConfigNode *node)
   childNode = node->GetChild("visual");
   while (childNode)
   {
-    OgreVisual *visual = new OgreVisual(this->visualNode, this);
+    std::ostringstream visname;
+    visname << this->GetName() << "_VISUAL_" << this->visuals.size();
+
+    OgreVisual *visual = OgreCreator::Instance()->CreateVisual(
+        visname.str(), this->visualNode, NULL);
+
     visual->Load(childNode);
     this->visuals.push_back(visual);
     childNode = childNode->GetNext("visual");
@@ -160,7 +174,11 @@ void Geom::Load(XMLConfigNode *node)
     Vector3 min(aabb[0], aabb[2], aabb[4]);
     Vector3 max(aabb[1], aabb[3], aabb[5]);
 
-    this->bbVisual = new OgreVisual(this->visualNode);
+    std::ostringstream visname;
+    visname << this->GetName() << "_BBVISUAL" ;
+
+    this->bbVisual = OgreCreator::Instance()->CreateVisual(
+        visname.str(), this->visualNode);
     this->bbVisual->AttachBoundingBox(min,max);
   }
 
@@ -170,6 +188,7 @@ void Geom::Load(XMLConfigNode *node)
     World::Instance()->RegisterGeom(this);
     this->ShowPhysics(false);
   }
+
 }
 
 
@@ -239,6 +258,12 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
+  else
+  {
+    this->SetCategoryBits(GZ_ALL_COLLIDE);
+    //this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
+
 
   // Create a new name of the geom's mesh entity
   //std::ostringstream stream;
@@ -251,7 +276,6 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 void Geom::Update()
 {
   this->UpdateChild();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,6 +313,8 @@ bool Geom::IsPlaceable() const
 // Set the pose relative to the body
 void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
 {
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
   if (this->placeable && this->geomId)
   {
     Pose3d localPose;
@@ -307,8 +333,6 @@ void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
     dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
     dGeomSetQuaternion(this->geomId, q);
 
-    this->visualNode->SetPose(newPose);
-
     if (updateCoM)
     {
       this->body->UpdateCoM();
@@ -321,6 +345,8 @@ void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
 Pose3d Geom::GetPose() const
 {
   Pose3d pose;
+
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   if (this->placeable && this->geomId)
   {
@@ -345,8 +371,6 @@ Pose3d Geom::GetPose() const
     // Transform into body relative pose
     pose += this->body->GetCoMPose();
   }
-  else
-    pose = this->body->GetPose();
 
   return pose;
 }
@@ -356,6 +380,7 @@ Pose3d Geom::GetPose() const
 void Geom::SetPosition(const Vector3 &pos)
 {
   Pose3d pose;
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   pose = this->GetPose();
   pose.pos = pos;
@@ -367,6 +392,7 @@ void Geom::SetPosition(const Vector3 &pos)
 void Geom::SetRotation(const Quatern &rot)
 {
   Pose3d pose;
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   pose = this->GetPose();
   pose.rot = rot;
@@ -377,16 +403,20 @@ void Geom::SetRotation(const Quatern &rot)
 /// Set the category bits, used during collision detection
 void Geom::SetCategoryBits(unsigned int bits)
 {
-  dGeomSetCategoryBits(this->geomId, bits);
-  dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
+  if (this->geomId)
+    dGeomSetCategoryBits(this->geomId, bits);
+  if (this->spaceId)
+    dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide bits, used during collision detection
 void Geom::SetCollideBits(unsigned int bits)
 {
-  dGeomSetCollideBits(this->geomId, bits);
-  dGeomSetCollideBits((dGeomID)this->spaceId, bits);
+  if (this->geomId)
+    dGeomSetCollideBits(this->geomId, bits);
+  if (this->spaceId)
+    dGeomSetCollideBits((dGeomID)this->spaceId, bits);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -562,3 +592,25 @@ Model *Geom::GetModel() const
 {
   return this->body->GetModel();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the friction mode of the geom
+void Geom::SetFrictionMode( const bool &v )
+{
+  if (v == false)
+  {
+    this->contact->mu1 = 0;
+    this->contact->mu2 = 0;
+    this->contact->slip1 = 0;
+    this->contact->slip2 = 0;
+  }
+  else
+  {
+    this->contact->mu1 = dInfinity;
+    this->contact->mu2 = dInfinity;
+    this->contact->slip1 = 0.1;
+    this->contact->slip2 = 0.1;
+
+  }
+}
+

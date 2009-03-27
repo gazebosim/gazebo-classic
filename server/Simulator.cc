@@ -27,6 +27,8 @@
 #include <iostream>
 #include <fstream>
 #include <sys/time.h>
+#include <boost/bind.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "Body.hh"
 #include "Geom.hh"
@@ -74,13 +76,50 @@ Simulator::Simulator()
   timeout(-1),
   selectedEntity(NULL)
 {
+
+  this->mutex = new boost::recursive_mutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Simulator::~Simulator()
 {
-  this->Close();
+
+  if (this->gazeboConfig)
+  {
+    delete this->gazeboConfig;
+    this->gazeboConfig = NULL;
+  }
+
+  if (this->xmlFile)
+  {
+    delete this->xmlFile;
+    this->xmlFile = NULL;
+  }
+
+  if (this->mutex)
+  {
+    delete this->mutex;
+    this->mutex = NULL;
+  }
+
+  if (this->gui)
+  {
+    delete this->gui;
+    this->gui = NULL;
+  }
+
+  if (this->physicsThread)
+  {
+    delete this->physicsThread;
+    this->physicsThread = NULL;
+  }
+
+  if (this->mutex)
+  {
+    delete this->mutex;
+    this->mutex = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,13 +129,8 @@ void Simulator::Close()
   if (!this->loaded)
     return;
 
-  GZ_DELETE (this->gui)
-  GZ_DELETE (this->xmlFile)
-  GZ_DELETE (this->gazeboConfig)
   gazebo::World::Instance()->Close();
   gazebo::OgreAdaptor::Instance()->Close();
-
-  //GZ_DELETE(this->renderEngine);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +192,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
         // Create the GUI
         this->gui = new Gui(x, y, width, height, "Gazebo");
+        Fl::check();
+        Fl::wait(0.3);
         this->gui->Load(childNode);
       }
     }
@@ -167,7 +203,9 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     }
   }
   else
+  {
     this->gui = NULL;
+  }
 
   //Initialize RenderEngine
   try
@@ -217,27 +255,8 @@ int Simulator::Init()
 void Simulator::Save(const std::string& filename)
 {
   std::fstream output;
-  std::string real_filename;
 
-  if (filename.empty())
-  {
-    int index = 0;
-    std::string name = "worldfile";
-    std::string random_name = "worldfile.world";
-    
-    while (!std::ifstream(random_name.c_str()).is_open())
-    {
-      std::ostringstream os; 
-      ++index;
-      os << index;
-      random_name = name + os.str() + ".world";
-    }
-    real_filename = random_name; 
-  }
-  else
-    real_filename = filename;
-
-  output.open(real_filename.c_str(), std::ios::out);
+  output.open(filename.c_str(), std::ios::out);
 
   // Write out the xml header
   output << "<?xml version=\"1.0\"?>\n";
@@ -270,11 +289,8 @@ void Simulator::Save(const std::string& filename)
     this->GetRenderEngine()->Save(prefix, output);
     output << "\n";
 
-    if (this->gui) //TODO: running with -g and saving the world deletes the gui part of the file?
-    {
-      this->gui->Save(prefix, output);
-      output << "\n";
-    }
+    this->gui->Save(prefix, output);
+    output << "\n";
 
     World::Instance()->Save(prefix, output);
     output << "\n";
@@ -293,77 +309,46 @@ void Simulator::Save(const std::string& filename)
 void Simulator::Fini( )
 {
   gazebo::World::Instance()->Fini();
+
+  this->Close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
 {
-  double step = World::Instance()->GetPhysicsEngine()->GetStepTime();
-  double physicsUpdateRate = World::Instance()->GetPhysicsEngine()->GetUpdateRate();
-  double renderUpdateRate = OgreAdaptor::Instance()->GetUpdateRate();
-  double physicsUpdatePeriod = 1.0 / physicsUpdateRate;
-  double renderUpdatePeriod = 1.0 / renderUpdateRate;
+  double currTime, lastTime;
+  double freq = 30.0;
 
-  double currTime;
-  double elapsedTime;
+  this->physicsThread = new boost::thread( boost::bind(&Simulator::PhysicsLoop, this));
 
-  this->prevPhysicsTime = this->GetRealTime();
-  this->prevRenderTime = this->GetRealTime();
- 
+  // Update the gui
   while (!this->userQuit)
   {
-    currTime = this->GetRealTime();
-
-    if (physicsUpdateRate == 0 || 
-        currTime - this->prevPhysicsTime >= physicsUpdatePeriod) 
+    currTime = this->GetWallTime();
+    if ( currTime - lastTime > 1/freq)
     {
+      lastTime = this->GetWallTime();
 
-      // Update the physics engine
-      if (!this->GetUserPause() ||
-          (this->GetUserPause() && this->GetUserStepInc()))
+      OgreAdaptor::Instance()->UpdateCameras();
+
+      if (this->gui)
+        this->gui->Update();
+
+      currTime = this->GetWallTime();
+
+      if (currTime - lastTime < 1/freq)
       {
-        this->simTime += step;
-        this->iterations++;
-        this->pause=false;
-        this->SetUserStepInc(!this->GetUserStepInc());
+        usleep((1/freq - (currTime - lastTime)) * 1e6);
       }
-      else
-      {
-        this->pauseTime += step;
-        this->pause=true;
-      }
-
-      this->prevPhysicsTime = this->GetRealTime();
-
-      World::Instance()->Update();
     }
-
-    // Update the rendering
-    if (renderUpdateRate == 0 || 
-        currTime - this->prevRenderTime >= renderUpdatePeriod)
+    else
     {
-      //this->GetRenderEngine()->Render(); 
-      //this->prevRenderTime = this->GetRealTime();
+      usleep((1/freq - currTime - lastTime) * 1e6);
     }
-
-    // Update the gui
-    if (this->gui)
-    {
-      this->gui->Update();
-    }
-
-    elapsedTime = (this->GetRealTime() - currTime);
-
-    // Wait if we're going too fast
-    /*if ( elapsedTime < 1.0/MAX_FRAME_RATE )
-    {
-      usleep( (int)((1.0/MAX_FRAME_RATE - elapsedTime) * 1e6)  );
-    }*/
-
-    if (this->timeout > 0 && this->GetRealTime() > this->timeout)
-      break;
   }
+
+  this->physicsThread->join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,6 +377,12 @@ bool Simulator::IsPaused() const
   return this->pause;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether the simulation is paused
+void Simulator::SetPaused(bool p)
+{
+  this->pause = p;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of iterations of this simulation session
@@ -556,3 +547,72 @@ Model *Simulator::GetSelectedModel() const
 
   return model;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Function to run physics. Used by physicsThread
+void Simulator::PhysicsLoop()
+{
+  World *world = World::Instance();
+
+  double step = world->GetPhysicsEngine()->GetStepTime();
+  double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
+  //double renderUpdateRate = OgreAdaptor::Instance()->GetUpdateRate();
+  double physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+  //double renderUpdatePeriod = 1.0 / renderUpdateRate;
+
+  double currTime;
+
+  this->prevPhysicsTime = this->GetRealTime();
+  this->prevRenderTime = this->GetRealTime();
+
+  while (!this->userQuit)
+  {
+    currTime = this->GetRealTime();
+
+    if (physicsUpdateRate == 0 || 
+        currTime - this->prevPhysicsTime >= physicsUpdatePeriod) 
+    {
+
+      // Update the physics engine
+      //if (!this->GetUserPause()  && !this->IsPaused() ||
+       //   (this->GetUserPause() && this->GetUserStepInc()))
+      if (!this->IsPaused())
+      {
+        this->simTime += step;
+        this->iterations++;
+        this->SetUserStepInc(!this->GetUserStepInc());
+      }
+      else
+      {
+        this->pauseTime += step;
+      //  this->pause=true;
+      }
+
+      this->prevPhysicsTime = this->GetRealTime();
+
+      {
+        boost::recursive_mutex::scoped_lock lock(*this->mutex);
+        world->Update();
+      }
+      usleep(1);
+    }
+
+    // Process all incoming messages from simiface
+    world->ProcessMessages();
+
+    if (this->timeout > 0 && this->GetRealTime() > this->timeout)
+    {
+      this->userQuit = true;
+      break;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the simulator mutex
+boost::recursive_mutex *Simulator::GetMutex()
+{
+  return this->mutex;
+}
+
+

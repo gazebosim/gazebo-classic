@@ -48,6 +48,9 @@ namespace gazebo
   class Body;
   class Controller;
   class HingeJoint;
+  class GraphicsIfaceHandler;
+  class Sensor;
+  class Geom;
 
   /// \addtogroup gazebo_server
   /// \brief A model
@@ -63,7 +66,8 @@ namespace gazebo
     public: virtual ~Model();
   
     /// \brief Load the model
-    public: int Load(XMLConfigNode *node);
+    /// \param removeDuplicate Remove existing model of same name
+    public: int Load(XMLConfigNode *node, bool removeDuplicate);
   
     /// \brief Save the model
     public: void Save(std::string &prefix, std::ostream &stream);
@@ -121,7 +125,7 @@ namespace gazebo
     public: void SetAngularAccel( const Vector3 &vel );
  
     /// \brief Get the current pose
-    public: const Pose3d &GetPose() const;
+    public: virtual Pose3d GetPose() const;
   
     /// \brief Create and return a new body
     /// \return Pointer to a new body.
@@ -147,6 +151,12 @@ namespace gazebo
 
     /// \brief Get a map of all the bodies
     public: const std::map<std::string, Body*> *GetBodies() const;
+
+    /// \brief Get a sensor by name
+    public: Sensor *GetSensor(const std::string &name) const;
+
+    /// \brief Get a geom by name
+    public: Geom *GetGeom(const std::string &name) const;
   
     /// \brief Attach this model to its parent
     public: void Attach(XMLConfigNode *node);
@@ -154,6 +164,15 @@ namespace gazebo
     /// \brief Get the canonical body. Used for connected Model heirarchies
     /// \return Pointer to the body
     public: Body *GetCanonicalBody();
+
+    /// \brief Set the gravity mode of the model
+    public: void SetGravityMode( const bool &v );
+
+    /// \brief Set the friction mode of the model
+    public: void SetFrictionMode( const bool &v );
+
+    /// \brief Set the collide mode of the model
+    public: void SetCollideMode( const std::string &m );
 
     /// \brief Load a body helper function
     /// \param node XML Configuration node
@@ -205,10 +224,14 @@ namespace gazebo
     private: ParamT<Quatern> *rpyP;
     private: ParamT<std::string> *parentBodyNameP;
     private: ParamT<std::string> *myBodyNameP;
-
+    private: ParamT<bool> *enableGravityP;
+    private: ParamT<bool> *enableFrictionP;
+    private: ParamT<std::string> *collideP;
 
     // Name of a light (if the model is renderable:light)
     private: std::string lightName;
+
+    private: GraphicsIfaceHandler *graphicsHandler;
 
   /*  private: PyObject *pName;
       private: PyObject *pModule;

@@ -18,8 +18,8 @@
   <physics:ode>
     <stepTime>0.03</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>0.008</cfm>
-    <erp>0.2</erp>
+    <cfm>10e-5</cfm>
+    <erp>0.3</erp>
   </physics:ode>
 
   <rendering:gui>
@@ -87,9 +87,10 @@
     <rpy>0.0 0.0 0.0</rpy>
 
     <body:cylinder name="cylinder1_body">
-      <sensor:microphone>
+      <!--<sensor:microphone name="microphone_sensor">
         <gain>1.0</gain>
       </sensor:microphone>
+      -->
       <geom:cylinder name="cylinder1_geom">
         <size>0.5 1</size>
         <mass>1.0</mass>
@@ -134,5 +135,19 @@
       </sensor:camera>
     </body:empty>
   </model:physical>
+
+  <!-- White Point light -->
+  <model:renderable name="point_white">
+    <xyz>0 2 2</xyz>
+    <enableGravity>false</enableGravity>
+
+    <light>
+      <type>point</type>
+      <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      <specularColor>0.1 0.1 0.1</specularColor>
+      <attenuation>20 0.5 0.1 0</attenuation>
+    </light>
+  </model:renderable>
+
 
 </gazebo:world>

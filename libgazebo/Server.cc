@@ -107,7 +107,7 @@ void Server::Init(int serverId, int force)
     {
       int pid;
       if (fscanf(fp, "%d", &pid) != 0)
-        std::cerr << "Error\n";
+        std::cerr << "Error in libgazebo Server.\n";
 
       fclose(fp);
       std::cout << "found a pid file: pid=" << pid << "\n";

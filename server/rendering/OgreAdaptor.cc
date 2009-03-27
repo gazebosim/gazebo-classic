@@ -37,7 +37,7 @@
 #include "Model.hh"
 #include "OgreVisual.hh"
 #include "UserCamera.hh"
-#include "MovableText.hh"
+#include "OgreMovableText.hh"
 #include "OgreHUD.hh"
 #include "Entity.hh"
 #include "GazeboError.hh"
@@ -186,8 +186,9 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
                                           this->dummyVisual, NULL, 1);
 
     glXMakeCurrent(this->dummyDisplay, this->dummyWindowId, this->dummyContext);
-    OgreCreator::CreateWindow((long)this->dummyDisplay, screen, 
-                              (long)this->dummyWindowId,1,1);
+
+    OgreCreator::Instance()->CreateWindow((long)this->dummyDisplay, screen, 
+                                          (long)this->dummyWindowId,1,1);
   }
 
   // Set default mipmap level (NB some APIs ignore this)
@@ -455,12 +456,31 @@ void OgreAdaptor::SetupRenderSystem(bool create)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Update a window
-void OgreAdaptor::UpdateWindow(Ogre::RenderWindow *window, OgreCamera *camera)
+// Update the user cameras
+void OgreAdaptor::UpdateCameras()
 {
+  UserCamera *userCam;
+
+  std::vector<OgreCamera*>::iterator iter;
+
+  OgreCreator::Instance()->Update();
+
   this->root->_fireFrameStarted();
 
-  window->update();
+  // Draw all the non-user cameras
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  {
+    if (dynamic_cast<UserCamera*>((*iter)) == NULL)
+      (*iter)->Render();
+  }
+
+  // Must update the user camera's last.
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  {
+    userCam = dynamic_cast<UserCamera*>((*iter));
+    if (userCam)
+      userCam->Update();
+  }
 
   this->root->_fireFrameEnded();
 }
@@ -489,9 +509,9 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos)
     {
 
       OgreVisual *vis = dynamic_cast<OgreVisual*>(iter->movable->getUserObject());
-      if (vis && vis->GetEntity())
+      if (vis && vis->GetOwner())
       {
-        entity = vis->GetEntity();
+        entity = vis->GetOwner();
         entity->GetVisualNode()->ShowSelectionBox(true);
         Model *model = NULL;
         
@@ -516,4 +536,11 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos)
 double OgreAdaptor::GetUpdateRate()
 {
   return **(this->updateRateP);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Register a user camera
+void OgreAdaptor::RegisterCamera( OgreCamera *cam )
+{
+  this->cameras.push_back( cam );
 }

@@ -18,7 +18,7 @@
   <physics:ode>
     <stepTime>0.03</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>10e-1</cfm>
+    <cfm>10e-5</cfm>
     <erp>0.3</erp>
   </physics:ode>
 
@@ -161,6 +161,7 @@
   <!-- White Directional light -->
   <model:renderable name="point_white">
     <xyz>0 2 2</xyz>
+    <enableGravity>false</enableGravity>
     <light>
       <type>point</type>
       <diffuseColor>0.8 0.8 0.8</diffuseColor>

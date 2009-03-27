@@ -142,5 +142,6 @@ void Generic_Camera::PutCameraData()
   // New data is available
   this->cameraIface->Post();
 
+
 }
 

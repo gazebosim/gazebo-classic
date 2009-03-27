@@ -25,6 +25,7 @@
  */
 
 #include <sstream>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "Model.hh"
 #include "GazeboMessage.hh"
@@ -53,6 +54,8 @@ Body::Body(Entity *parent, dWorldID worldId)
     : Entity(parent)
 {
 
+  this->mutex = new boost::recursive_mutex();
+
   if ( !this->IsStatic() )
   {
     this->bodyId = dBodyCreate(worldId);
@@ -74,6 +77,7 @@ Body::Body(Entity *parent, dWorldID worldId)
   this->dampingFactorP = new ParamT<double>("dampingFactor", 0.03, 0);
 
   Param::End();
+
 }
 
 
@@ -100,6 +104,8 @@ Body::~Body()
   delete this->rpyP;
   delete this->dampingFactorP;
 
+  delete this->mutex;
+  this->mutex = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +204,48 @@ void Body::Fini()
 void Body::SetGravityMode(bool mode)
 {
   if (this->bodyId)
-    dBodySetGravityMode(this->bodyId, mode);
+    dBodySetGravityMode(this->bodyId, mode ? 1: 0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the friction mode of the body
+void Body::SetFrictionMode( const bool &v )
+{
+  std::map< std::string, Geom* >::iterator giter;
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    giter->second->SetFrictionMode( v );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the collide mode of the body
+void Body::SetCollideMode( const std::string &m )
+{
+  std::map< std::string, Geom* >::iterator giter;
+
+  unsigned int collideBits;
+
+  if (m == "all")
+    collideBits =  GZ_ALL_COLLIDE;
+  else if (m == "none")
+    collideBits =  GZ_NONE_COLLIDE;
+  else if (m == "sensors")
+    collideBits = GZ_SENSOR_COLLIDE;
+  else if (m == "ghost")
+    collideBits = GZ_GHOST_COLLIDE;
+  else
+  {
+    gzerr(0) << "Unknown collide mode[" << m << "]\n";
+    return;
+  }
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    giter->second->SetCategoryBits(collideBits);
+    giter->second->SetCollideBits(collideBits);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,12 +275,6 @@ void Body::Update()
   double force;
 
   this->UpdatePose();
-
-  if (!this->IsStatic())
-  {
-    // Set the pose of the scene node
-    this->visualNode->SetPose(this->pose);
-  }
 
   for (geomIter=this->geoms.begin();
        geomIter!=this->geoms.end(); geomIter++)
@@ -285,15 +326,17 @@ void Body::AttachGeom( Geom *geom )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the body
-void Body::SetPose(const Pose3d &pose)
+void Body::SetPose(const Pose3d &_pose)
 {
-  this->pose = pose;
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   if (this->IsStatic())
   {
     Pose3d oldPose = this->staticPose;
     Pose3d newPose;
-    this->staticPose = pose;
+    this->staticPose = _pose;
+
+    this->pose = this->staticPose;
 
     std::map<std::string, Geom*>::iterator iter;
 
@@ -310,8 +353,9 @@ void Body::SetPose(const Pose3d &pose)
     Pose3d localPose;
 
     // Compute pose of CoM
-    localPose = this->comPose + this->pose;
+    localPose = this->comPose + _pose;
 
+    this->pose = localPose;
     this->SetPosition(localPose.pos);
     this->SetRotation(localPose.rot);
   }
@@ -321,16 +365,20 @@ void Body::SetPose(const Pose3d &pose)
 // Return the pose of the body
 Pose3d Body::GetPose() const
 {
-  if (this->IsStatic())
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  /*if (this->IsStatic())
     return this->staticPose;
   else
-    return this->pose;
+  */
+  return this->pose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the pose of the body
 void Body::UpdatePose()
 {
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->pose.pos = this->GetPosition();
   this->pose.rot = this->GetRotation();
 
@@ -343,9 +391,6 @@ void Body::SetPosition(const Vector3 &pos)
 {
   if (this->bodyId)
     dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
-
-  // Set the position of the scene node
-  this->visualNode->SetPosition(pos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -364,9 +409,6 @@ void Body::SetRotation(const Quatern &rot)
     // Set the rotation of the ODE body
     dBodySetQuaternion(this->bodyId, q);
   }
-
-  // Set the orientation of the scene node
-  this->visualNode->SetRotation(rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -751,19 +793,33 @@ Model *Body::GetModel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get a sensor by name
+Sensor *Body::GetSensor( const std::string &name ) const
+{
+  Sensor *sensor = NULL;
+  std::vector< Sensor* >::const_iterator iter;
+
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  {
+    if ((*iter)->GetName() == name)
+    {
+      sensor = (*iter);
+      break;
+    }
+  }
+
+  return sensor;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get a geom by name
 Geom *Body::GetGeom(const std::string &name) const
 {
   std::map<std::string, Geom*>::const_iterator iter = this->geoms.find(name);
 
   if (iter != this->geoms.end())
-  {
     return iter->second;
-  }
   else
-  {
-    gzerr(0) << "Unknown geom[" << name << "]\n";
     return NULL;
-  }
 }
 

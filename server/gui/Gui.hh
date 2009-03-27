@@ -88,6 +88,7 @@ namespace gazebo
     private: ParamT<Vector2<int> > *sizeP;
     private: ParamT<Vector2<int> > *posP;
     private: std::vector<Param*> parameters;
+
   };
 }
 

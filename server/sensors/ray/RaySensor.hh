@@ -36,8 +36,10 @@
 namespace gazebo
 {
 
+  class OgreDynamicLines;
   class XMLConfigNode;
   class RayGeom;
+
 /// \addtogroup gazebo_sensor
 /// \brief Sensor with one or more rays.
 /// \{
@@ -140,8 +142,10 @@ class RaySensor: public Sensor
   private: ParamT<int> *rangeCountP;
   
   /// Display rays when rendering images
-  private: ParamT<bool> *displayRaysP;
+  private: ParamT<std::string> *displayRaysP;
 
+  private: OgreDynamicLines *rayFan;
+  private: OgreDynamicLines *rayFanOutline;
 };
 /// \}
 /// \}

@@ -33,10 +33,15 @@
 #include <OgreUserDefinedObject.h>
 #include <string>
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
   /// \brief Movable text
-  class MovableText : public Ogre::MovableObject, public Ogre::Renderable
+  class OgreMovableText : public Ogre::MovableObject, public Ogre::Renderable
   {
     /// \brief Horizontal alignment
     public: enum HorizAlign {H_LEFT, H_CENTER};
@@ -45,10 +50,10 @@ namespace gazebo
     public: enum VertAlign  {V_BELOW, V_ABOVE};
   
     /// \brief Constructor
-    public: MovableText();
+    public: OgreMovableText();
   
     /// \brief Destructor
-    public: virtual ~MovableText();
+    public: virtual ~OgreMovableText();
   
     /// \brief Loads text and font info 
     public: void Load(const std::string &name, 
@@ -111,6 +116,9 @@ namespace gazebo
     public: virtual void visitRenderables( Ogre::Renderable::Visitor* visitor,
                                    bool debug = false );
   
+    /// \brief Update the text
+    public: void Update();
+
     /// \brief setup the geometry (from MovableText)
     protected: void _setupGeometry();
   
@@ -170,8 +178,10 @@ namespace gazebo
   
     /// \brief Get the lights
     protected: const Ogre::LightList &getLights(void) const; //{return mLList;}; 
-  
+    private: bool dirty;
+
+    private: boost::recursive_mutex *mutex;
   };
-  }
+}
 
 #endif

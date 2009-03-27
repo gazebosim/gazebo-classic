@@ -192,6 +192,24 @@ material Gazebo/GreenEmissive
   }
 }
 
+material Gazebo/BlueLaser
+{
+  receive_shadows off
+
+  technique
+  {
+    pass
+    {
+      scene_blend alpha_blend
+      ambient 0.000000 0.000000 0.900000 0.2
+      diffuse 0.000000 0.000000 0.900000 0.2
+      specular 0.000000 0.000000 0.100000 0.1
+      emissive 0.000000 0.000000 1.000000 0.2
+      lighting on
+    }
+  }
+}
+
 material Gazebo/BlueEmissive
 {
   receive_shadows off

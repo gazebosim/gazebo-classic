@@ -27,6 +27,7 @@
 #include <Ogre.h>
 #include <cassert>
 #include <cmath>
+#include <math.h>
 #include <sstream>
 
 #include "GazeboError.hh"
@@ -90,7 +91,7 @@ void OgreDynamicLines::Clear()
 
 void OgreDynamicLines::Update()
 {
-  if (this->dirty)
+  if (this->dirty && this->points.size() > 1)
     this->FillHardwareBuffers();
 }
 
@@ -121,7 +122,8 @@ void OgreDynamicLines::FillHardwareBuffers()
   Ogre::HardwareVertexBufferSharedPtr vbuf =
     this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(0);
 
-  Ogre::Real *prPos = static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+  //Ogre::Real *prPos = static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+  Ogre::Real *prPos = static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
   {
     for (int i = 0; i < size; i++)
     {
@@ -155,8 +157,26 @@ void OgreDynamicLines::FillHardwareBuffers()
   if ((float)vaabMin.z >= (float)vaabMax.z)
     vaabMin.z = vaabMax.z - 10;
 
+  if (!finite(vaabMin.x))
+    vaabMin.x = 0;
+  if (!finite(vaabMin.y))
+    vaabMin.y = 0;
+  if (!finite(vaabMin.z))
+    vaabMin.z = 0;
+
+  if (!finite(vaabMax.x))
+    vaabMax.x = 0;
+  if (!finite(vaabMax.y))
+    vaabMax.y = 0;
+  if (!finite(vaabMax.z))
+    vaabMax.z = 0;
+
+  /*printf("Min[%f %f %f] Max[%f %f %f]\n",vaabMin.x, vaabMin.y, vaabMin.z,
+      vaabMax.x, vaabMax.y, vaabMax.z);
+      */
+
   this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z),
-                        Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );
+      Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );
 
   this->dirty = false;
 }

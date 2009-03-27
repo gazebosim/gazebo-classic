@@ -32,6 +32,11 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <boost/signal.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/bind.hpp>
 
 #include "IfaceFactory.hh"
 
@@ -53,6 +58,28 @@ namespace gazebo
 
 /// \addtogroup libgazebo
 /// \{
+
+
+/// \brief Vector 2 class
+class Vec2
+{
+  /// \brief Default Constructor
+  public: Vec2() : x(0), y(0) {}
+          
+  /// \brief Constructor
+  public: Vec2(float _x, float _y) : x(_x), y(_y) {}
+
+  /// \brief Copy constructor
+  public: Vec2(const Vec2 &vec) : x(vec.x), y(vec.y) {}
+
+  /// X value
+  public: float x;
+
+  /// Y value
+  public: float y;
+
+};
+
 
 /// \brief Vector 3 class
 class Vec3
@@ -352,7 +379,7 @@ class GazeboData
   /// Number of times the interface has been opened
   public: int openCount;
 
-  public: float time;
+  public: double time;
 
   public: int version;
 
@@ -391,25 +418,22 @@ class SimulationRequestData
   public: enum Type { PAUSE,
                       RESET,
                       SAVE,
-                      SAVEFILENAME,
-                      LOAD,
-                      CLOSE,
-                      EXIT,
                       GET_POSE3D,
                       GET_POSE2D,
                       SET_POSE3D,
                       SET_POSE2D,
-                      SET_STATE
+                      SET_STATE,
+                      GO
                    };
 
   public: Type type; 
-  public: char fileName[512];
   public: char modelName[512];
   public: Pose modelPose;
   public: Vec3 modelLinearVel;
   public: Vec3 modelAngularVel;
   public: Vec3 modelLinearAccel;
   public: Vec3 modelAngularAccel;
+  public: unsigned int runTime;
 };
 
 /// \brief Simulation interface data
@@ -437,33 +461,50 @@ class SimulationData
   public: SimulationRequestData responses[GAZEBO_SIMULATION_MAX_REQUESTS];
   public: unsigned int responseCount;
 
+  public: int semId;
+  public: int semKey;
+
 };
 
 /// \brief Common simulation interface
 class SimulationIface : public Iface
 {
   /// \brief Create an interface
-  public: SimulationIface(): Iface("simulation",sizeof(SimulationIface)+sizeof(SimulationData)) {}
+  public: SimulationIface();
 
   /// \brief Destroy an interface
-  public: virtual ~SimulationIface() {this->data = NULL;}
+  public: virtual ~SimulationIface();
 
   /// \brief Create a simulation interface
   /// \brief server Pointer to the server
   /// \brief id String id
-  public: virtual void Create(Server *server, std::string id)
-          {
-            Iface::Create(server,id); 
-            this->data = (SimulationData*)((char*)this->mMap+sizeof(SimulationIface)); 
-          }
+  public: virtual void Create(Server *server, std::string id);
 
   /// \brief Open a simulation interface
   /// \param client Pointer to the client
   /// \param id String name of the client
-  public: virtual void Open(Client *client, std::string id)
+  public: virtual void Open(Client *client, std::string id);
+
+  /// \brief Tell gazebo to execute for a specified amount of time
+  /// \param ms Number of milliseconds to run
+  public: template<typename T>
+          void Go(unsigned int us,T subscriber)
           {
-            Iface::Open(client,id); 
-            this->data = (SimulationData*)((char*)this->mMap+sizeof(SimulationIface)); 
+            // Send the go command to Gazebo
+            this->Lock(1);
+            SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+            request->type = SimulationRequestData::GO;
+            request->runTime = us;
+            this->Unlock();
+
+            {
+              if (this->currentConnection.connected())
+                this->currentConnection.disconnect();
+
+              // Connect the callback. This is signaled when the thread
+              // (below) finishes waiting 
+              this->currentConnection = this->goAckSignal.connect( subscriber );
+            }
           }
 
   /// \brief Pause the simulation
@@ -472,20 +513,8 @@ class SimulationIface : public Iface
   /// \brief Reset the simulation
   public: void Reset();
 
-  /// \brief Save the simulation (automatic file)
+  /// \brief Save the simulation
   public: void Save();
-
-  /// \brief Save the simulation (named file)
-  public: void Save(const char* fileName);
-
-  /// \brief Load the simulation 
-  public: void Load(const char* fileName);
-
-  /// \brief Close current simulation (not exit)
-  public: void Close();
-
-  /// \brief Exit current simulation 
-  public: void Exit();
 
   /// \brief Get the 3d pose of a model
   public: void GetPose3d(const char *modelName);
@@ -503,6 +532,14 @@ class SimulationIface : public Iface
   public: void SetState(const char *modelName, const Pose &modelPose, 
               const Vec3 &linearVel, const Vec3 &angularVel, 
               const Vec3 &linearAccel, const Vec3 &angularAccel );
+
+  public: void GoAckWait();
+  public: void GoAckPost();
+
+  private: void BlockThread();
+  private: boost::signal<void (void)> goAckSignal;
+  private: boost::signals::connection currentConnection;
+  private: boost::thread *goAckThread;
 
   /// Pointer to the simulation data
   public: SimulationData *data;
@@ -762,53 +799,88 @@ opengl funcitons.
 
 /// Maximum number of points that can be drawn
 #define GAZEBO_GRAPHICS3D_MAX_POINTS 1024
+#define GAZEBO_GRAPHICS3D_MAX_NAME 128
+#define GAZEBO_GRAPHICS3D_MAX_COMMANDS 128
 
-/// \brief Graphics3d interface data
-class Graphics3dData
+class Graphics3dDrawData
 {
   /// Type of drawing to perform
-  enum DrawMode {POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON};
+  public: enum DrawMode { POINTS, LINES, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, 
+                          TRIANGLE_FAN, PLANE, SPHERE, CUBE, CYLINDER,
+                          BILLBOARD, TEXT };
 
   /// Drawing mode
-  public: DrawMode drawmode;
+  public: DrawMode drawMode;
+
+  /// Unique name of the operation
+  public: char name[GAZEBO_GRAPHICS3D_MAX_NAME];
+
+  /// Text to display
+  public: char text[GAZEBO_GRAPHICS3D_MAX_NAME];
 
   /// Number of vertices
-  public: unsigned int point_count; 
+  public: unsigned int pointCount; 
 
   /// Vertices 
   public: Vec3 points[GAZEBO_GRAPHICS3D_MAX_POINTS];
 
   /// Drawing color
   public: Color color;
+
+  /// Texture to apply to a billboard. Only applicable when 
+  //  drawMode == BILLBOARD
+  public: char billboardTexture[GAZEBO_GRAPHICS3D_MAX_NAME];
+
+  /// Pose at which to draw a shape
+  public: Pose pose;
+
+  /// Size of the shape
+  public: Vec3 size;
 };
+
+/// \brief Graphics3d interface data
+class Graphics3dData
+{
+  public: Graphics3dDrawData commands[GAZEBO_GRAPHICS3D_MAX_COMMANDS];
+  public: unsigned int cmdCount;
+};
+
 
 /// \brief Graphics3d interface
 class Graphics3dIface : public Iface
 {
 
   /// \brief Constructor
-  public: Graphics3dIface():Iface("graphics3d", sizeof(Graphics3dIface)+sizeof(Graphics3dData)) {}
+  public: Graphics3dIface();
 
   /// \brief Destructor
-  public: virtual ~Graphics3dIface() {this->data = NULL;}
+  public: virtual ~Graphics3dIface();
 
   /// \brief Create the interface (used by Gazebo server)
   /// \param server Pointer to the server
   /// \param id Id of the interface
-  public: virtual void Create(Server *server, std::string id)
-          {
-            Iface::Create(server,id); 
-            this->data = (Graphics3dData*)this->mMap; 
-          }
+  public: virtual void Create(Server *server, std::string id);
 
   /// \brief Open an existing interface
   /// \param client Pointer to the client
   /// \param id Id of the interface
-  public: virtual void Open(Client *client, std::string id)
-          {
-            Iface::Open(client,id); 
-            this->data = (Graphics3dData*)this->mMap; 
-          }
+  public: virtual void Open(Client *client, std::string id);
+
+  /// \brief Draw a simple object, that is defined by a series of points
+  public: void DrawSimple(const char *name, Graphics3dDrawData::DrawMode mode, 
+                          Vec3 *point, unsigned int numPoints, Color clr );
+
+  /// \brief Draw a shape
+  public: void DrawShape(const char *name, Graphics3dDrawData::DrawMode mode,
+                         Vec3 pos, Vec3 size, Color clr);
+
+  /// \brief Draw a billboard
+  public: void DrawBillboard(const char *name, const char *texture, 
+                             Vec3 pos, Vec2 size); 
+
+  /// \brief Draw text
+  public: void DrawText(const char *name, const char *text, Vec3 pos, 
+                        float fontSize); 
 
 
   /// Pointer to the graphics3d data

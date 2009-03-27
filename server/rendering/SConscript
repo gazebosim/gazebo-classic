@@ -4,7 +4,7 @@ Import('*')
 env.Append(CPPPATH = '#server/rendering')
 
 sources = [
-           'MovableText.cc',
+           'OgreMovableText.cc',
            'OgreCreator.cc',
            'OgreAdaptor.cc',
            'OgreFrameListener.cc',
@@ -19,7 +19,7 @@ sources = [
 	        ]
 
 headers.append( 
-          ['#/server/rendering/MovableText.hh',
+          ['#/server/rendering/OgreMovableText.hh',
            '#/server/rendering/OgreAdaptor.hh',
            '#/server/rendering/OgreCreator.hh',
            '#/server/rendering/OgreDynamicLines.hh',

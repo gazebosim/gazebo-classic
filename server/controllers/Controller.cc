@@ -58,6 +58,7 @@ Controller::Controller(Entity *entity )
 /// Destructor
 Controller::~Controller()
 {
+  std::cout << "Deleting Controller[" << **this->nameP << "]\n";
   delete this->nameP;
   delete this->updatePeriodP;
 }

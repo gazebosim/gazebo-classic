@@ -64,7 +64,7 @@
     <controller:audio name="audio_controller_1">
       <pitch>1.0</pitch>
       <gain>1.0</gain>
-      <loop>true</loop>
+      <loop>false</loop>
       <mp3>test.mp3</mp3>
       <interface:audio name="audio_iface_1"/>
     </controller:audio>
@@ -130,6 +130,8 @@
   <!-- White Directional light -->
   <model:renderable name="point_white">
     <xyz>0 2 2</xyz>
+    <enableGravity>false</enableGravity>
+
     <light>
       <type>point</type>
       <diffuseColor>0.8 0.8 0.8</diffuseColor>

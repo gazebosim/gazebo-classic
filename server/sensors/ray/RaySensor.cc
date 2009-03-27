@@ -28,6 +28,9 @@
 #include <float.h>
 #include <sstream>
 
+#include "OgreCreator.hh"
+#include "OgreVisual.hh"
+#include "OgreDynamicLines.hh"
 #include "SensorFactory.hh"
 #include "XMLConfig.hh"
 #include "Global.hh"
@@ -55,6 +58,13 @@ RaySensor::RaySensor(Body *body)
 
   this->typeName = "ray";
 
+  this->rayFan = OgreCreator::Instance()->CreateDynamicLine(
+      OgreDynamicRenderable::OT_TRIANGLE_FAN);
+
+  this->rayFanOutline = OgreCreator::Instance()->CreateDynamicLine(
+      OgreDynamicRenderable::OT_LINE_STRIP);
+
+
   Param::Begin(&this->parameters);
   this->rayCountP = new ParamT<int>("rayCount",0,1);
   this->rangeCountP = new ParamT<int>("rangeCount",0,1);
@@ -63,7 +73,7 @@ RaySensor::RaySensor(Body *body)
   this->minRangeP = new ParamT<double>("minRange",0,1);
   this->maxRangeP = new ParamT<double>("maxRange",0,1);
   this->originP = new ParamT<Vector3>("origin", Vector3(0,0,0), 0);
-  this->displayRaysP = new ParamT<bool>("displayRays", true, 0);
+  this->displayRaysP = new ParamT<std::string>("displayRays", "off", 0);
   Param::End();
 }
 
@@ -72,6 +82,12 @@ RaySensor::RaySensor(Body *body)
 // Destructor
 RaySensor::~RaySensor()
 {
+  if (this->rayFan)
+    delete this->rayFan;
+
+  if (this->rayFanOutline)
+    delete this->rayFanOutline;
+
   delete this->rayCountP;
   delete this->rangeCountP;
   delete this->minAngleP;
@@ -108,12 +124,10 @@ void RaySensor::LoadChild(XMLConfigNode *node)
   this->raySpaceId = dSimpleSpaceCreate( this->superSpaceId );
 
   // Set collision bits
-  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_LASER_COLLIDE);
-  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_LASER_COLLIDE);
+  dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
+  dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
-  //this->body->spaceId = this->superSpaceId;
-  this->body->spaceId = this->raySpaceId;
-
+  this->body->SetSpaceId( this->raySpaceId );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -141,29 +155,48 @@ void RaySensor::InitChild()
 
   bodyPose = this->body->GetPose();
   this->prevPose = bodyPose;
-
   // Create and array of ray geoms
   for (int i = 0; i < this->rayCountP->GetValue(); i++)
-  //for (int i = this->rayCount-1; i >= 0; i--)
   {
     double diff = (**(this->maxAngleP) - **(this->minAngleP)).GetAsRadian();
 
-    angle = i * diff / (rayCountP->GetValue() - 1) + (**(this->minAngleP)).GetAsRadian();
+    angle = i * diff / (rayCountP->GetValue()) + (**(this->minAngleP)).GetAsRadian();
 
     axis.Set(cos(angle), sin(angle),0);
 
     start = (axis * this->minRangeP->GetValue()) + this->originP->GetValue();
     end = (axis * this->maxRangeP->GetValue()) + this->originP->GetValue();
 
-    ray = new RayGeom(this->body, displayRaysP->GetValue());
+    ray = new RayGeom(this->body, (**this->displayRaysP) == "lines");
+
+    if ((**this->displayRaysP) == "fan")
+    {
+      if (i == 0)
+      {
+        this->rayFan->AddPoint(start);
+        this->rayFanOutline->AddPoint(start);
+      }
+
+      this->rayFan->AddPoint(end);
+      this->rayFanOutline->AddPoint(end);
+    }
+    
 
     ray->SetPoints(start, end);
-//    ray->SetCategoryBits( GZ_LASER_COLLIDE );
-    //ray->SetCollideBits( ~GZ_LASER_COLLIDE );
 
     this->rays.push_back(ray);
+  }
 
-    //this->body->AttachGeom(ray);
+  if ((**this->displayRaysP) == "fan")
+  {
+    this->rayFan->AddPoint(this->rayFan->GetPoint(0));
+    this->rayFan->setMaterial("Gazebo/BlueLaser");
+
+    this->rayFanOutline->AddPoint(this->rayFanOutline->GetPoint(0));
+    this->rayFanOutline->setMaterial("Gazebo/BlueEmissive");
+
+    this->visualNode->AttachObject(this->rayFan);
+    this->visualNode->AttachObject(this->rayFanOutline);
   }
 
 }
@@ -273,11 +306,12 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild()
 {
-//  if (this->active)
+  //  if (this->active)
   {
     std::vector<RayGeom*>::iterator iter;
     Pose3d poseDelta;
     Vector3 a, b;
+    int i = 1;
 
     // Get the pose of the sensor body (global cs)
     poseDelta = this->body->GetPose() - this->prevPose;
@@ -285,14 +319,16 @@ void RaySensor::UpdateChild()
 
     // Reset the ray lengths and mark the geoms as dirty (so they get
     // redrawn)
-    for (iter = this->rays.begin(); iter != this->rays.end(); iter++)
+    for (iter = this->rays.begin(); iter != this->rays.end(); iter++, i++)
     {
+
       (*iter)->SetLength( this->maxRangeP->GetValue() );
       (*iter)->SetRetro( 0.0 );
       (*iter)->SetFiducial( -1 );
 
       // Get the global points of the line
       (*iter)->Update();
+
     }
 
     ODEPhysics *ode = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());
@@ -304,9 +340,22 @@ void RaySensor::UpdateChild()
 
     // Do collision detection
     dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
-                    ( dGeomID ) ( ode->GetSpaceId() ),
-                    this, &UpdateCallback );
-                    
+        ( dGeomID ) ( ode->GetSpaceId() ),
+        this, &UpdateCallback );
+
+    if ((**this->displayRaysP) == "fan")
+    { 
+      i = 1;
+      for (iter = this->rays.begin(); iter != this->rays.end(); iter++, i++)
+      {
+        (*iter)->Update();
+
+        (*iter)->GetRelativePoints(a,b);
+
+        this->rayFan->SetPoint(i,b);
+        this->rayFanOutline->SetPoint(i,b);
+      }
+    }
   }
 }
 

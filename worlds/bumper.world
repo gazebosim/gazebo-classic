@@ -137,6 +137,7 @@
 
   <!-- White Directional light -->
   <model:renderable name="directional_white">
+    <enableGravity>false</enableGravity>
     <light>
       <type>directional</type>
       <direction>0 -0.6 -0.4</direction>

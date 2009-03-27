@@ -77,6 +77,14 @@
       <material>Gazebo/Black</material>
     </visual>
   </geom:box>
+
+  <sensor:ray name="breakbeam1">
+    <rayCount>1</rayCount>
+    <origin>0 0 0</origin>
+    <displayRays>true</displayRays>
+    <minRange>0.01</minRange>
+    <maxRange>0.5</maxRange>
+  </sensor:ray>
 </body:box>
 
 

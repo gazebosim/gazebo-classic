@@ -2,8 +2,18 @@
 #define AUDIODECODER_HH
 
 extern "C" {
+
+#ifdef SPECIAL_LIBAVFORMAT
 #include <libavformat/avformat.h>
+#else
+#include <avformat.h>
+#endif
+
+#ifdef SPECIAL_LIBAVCODEC
 #include <libavcodec/avcodec.h>
+#else
+#include <avcodec.h>
+#endif
 }
 
 #include <string>

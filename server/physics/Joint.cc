@@ -24,6 +24,7 @@
  * CVS: $Id$
  */
 #include "OgreVisual.hh"
+#include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
 #include "Global.hh"
 #include "Body.hh"
@@ -51,6 +52,9 @@ Joint::Joint()
   this->provideFeedbackP = new ParamT<bool>("provideFeedback", false, 0);
   this->fudgeFactorP = new ParamT<double>( "fudgeFactor", 1.0, 0 );
   Param::End();
+
+  this->body1 = NULL;
+  this->body2 = NULL;
 }
 
 
@@ -115,13 +119,17 @@ void Joint::Load(XMLConfigNode *node)
 
   this->Attach(body1,body2);
 
+  std::ostringstream visname;
+  visname << this->GetName() << "_VISUAL";
+
   /// Add a renderable for the joint
-  this->visual = new OgreVisual(this->model->GetVisualNode());
+  this->visual = OgreCreator::Instance()->CreateVisual(
+      visname.str(), this->model->GetVisualNode());
   this->visual->AttachMesh("joint_anchor");
   this->visual->SetVisible(false);
 
-  this->line1 = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
-  this->line2 = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
+  this->line1 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+  this->line2 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
   this->line1->setMaterial("Gazebo/BlueEmissive");
   this->line2->setMaterial("Gazebo/BlueEmissive");
@@ -197,14 +205,14 @@ void Joint::Update()
   {
     start = this->body1->GetPose().pos - this->GetAnchor();
     this->line1->SetPoint(0, start);
-    this->line1->Update();
+    //this->line1->Update();
   }
 
   if (this->body2)
   {
     start = this->body2->GetPose().pos - this->GetAnchor();
     this->line2->SetPoint(0, start);
-    this->line2->Update();
+    //this->line2->Update();
   }
 }
 
@@ -231,9 +239,10 @@ Body *Joint::GetJointBody( int index ) const
 
   if ( index==0 || index==1 )
   {
-    if (dJointGetBody( this->jointId, index ) == this->body1->GetId())
+    if (this->body1 &&
+        dJointGetBody( this->jointId, index ) == this->body1->GetId())
       result = this->body1;
-    else
+    else if (this->body2)
       result = this->body2;
   }
 
@@ -293,6 +302,8 @@ void Joint::Attach( Body *one, Body *two )
 // Detach this joint from all bodies
 void Joint::Detach()
 {
+  this->body1 = NULL;
+  this->body2 = NULL;
   dJointAttach( this->jointId, 0, 0 );
   return;
 }

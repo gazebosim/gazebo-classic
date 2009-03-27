@@ -24,6 +24,8 @@
  * SVN: $Id$
  */
 #include <Ogre.h>
+#include <boost/thread/recursive_mutex.hpp>
+
 #include "OgreSimpleShape.hh"
 #include "Entity.hh"
 #include "GazeboMessage.hh"
@@ -39,9 +41,11 @@ unsigned int OgreVisual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
+OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   : Common()
 {
+  this->mutex = new boost::recursive_mutex();
+
   std::ostringstream stream;
 
   if (!node)
@@ -58,7 +62,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
   // Create the scene node
   this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
 
-  this->entity = owner;
+  this->owner = _owner;
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
@@ -89,6 +93,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *owner)
 /// Destructor
 OgreVisual::~OgreVisual()
 {
+  delete this->mutex;
   delete this->xyzP;
   delete this->rpyP;
   delete this->meshNameP;
@@ -116,6 +121,8 @@ OgreVisual::~OgreVisual()
 // Load the visual
 void OgreVisual::Load(XMLConfigNode *node)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
   std::ostringstream stream;
   Pose3d pose;
   Vector3 size;
@@ -211,6 +218,7 @@ void OgreVisual::Load(XMLConfigNode *node)
 // Save the visual in XML format
 void OgreVisual::Save(std::string &prefix, std::ostream &stream)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   stream << prefix << "<visual>\n";
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
@@ -221,27 +229,44 @@ void OgreVisual::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "</visual>\n";
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Return an unique name for the Visual
-std::string OgreVisual::GetName() const
-{
-  return this->sceneNode->getName();
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a renerable object to the visual
 void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->sceneNode->attachObject(obj);
   obj->setUserObject( this );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Detach all objects
+void OgreVisual::DetachObjects()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  this->sceneNode->detachAllObjects();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of attached objects
+unsigned short OgreVisual::GetNumAttached()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  return this->sceneNode->numAttachedObjects();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get an attached object
+Ogre::MovableObject *OgreVisual::GetAttached(unsigned short num)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  return this->sceneNode->getAttachedObject(num);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach a static object
 void OgreVisual::MakeStatic()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (!this->staticGeometry)
     this->staticGeometry = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
@@ -259,6 +284,7 @@ void OgreVisual::MakeStatic()
 /// Attach a mesh to this visual by name
 void OgreVisual::AttachMesh( const std::string &meshName )
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   std::ostringstream stream;
   Ogre::MovableObject *obj;
   stream << this->sceneNode->getName() << "_ENTITY_" << meshName;
@@ -272,6 +298,7 @@ void OgreVisual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void OgreVisual::SetScale(const Vector3 &scale )
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   Ogre::Vector3 vscale;
   vscale.x=scale.x;
   vscale.y=scale.y;
@@ -283,6 +310,7 @@ void OgreVisual::SetScale(const Vector3 &scale )
 /// Get the scale
 Vector3 OgreVisual::GetScale()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   Ogre::Vector3 vscale;
   vscale=this->sceneNode->getScale();
   return Vector3(vscale.x, vscale.y, vscale.z);
@@ -293,6 +321,8 @@ Vector3 OgreVisual::GetScale()
 // Set the material
 void OgreVisual::SetMaterial(const std::string &materialName)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
   if (materialName.empty())
     return;
 
@@ -360,10 +390,14 @@ void OgreVisual::SetMaterial(const std::string &materialName)
   }
 }
 
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the transparency
 void OgreVisual::SetTransparency( float trans )
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   unsigned short i = 0, j=0;
   Ogre::ColourValue sc, dc;
   Ogre::Technique *t;
@@ -428,6 +462,7 @@ void OgreVisual::SetTransparency( float trans )
 
 void OgreVisual::SetHighlight(bool highlight)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   /*
   #include <OgreParticleSystem.h>
   #include <iostream>
@@ -470,18 +505,19 @@ void OgreVisual::SetHighlight(bool highlight)
 /// Set whether the visual should cast shadows
 void OgreVisual::SetCastShadows(const bool &shadows)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
     obj->setCastShadows(shadows);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual is visible
 void OgreVisual::SetVisible(bool visible, bool cascade)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->sceneNode->setVisible( visible, cascade );
 }
 
@@ -490,6 +526,7 @@ void OgreVisual::SetVisible(bool visible, bool cascade)
 // Set the position of the visual
 void OgreVisual::SetPosition( const Vector3 &pos)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 }
 
@@ -497,6 +534,7 @@ void OgreVisual::SetPosition( const Vector3 &pos)
 // Set the rotation of the visual
 void OgreVisual::SetRotation( const Quatern &rot)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->sceneNode->setOrientation(rot.u, rot.x, rot.y, rot.z);
 }
 
@@ -504,6 +542,7 @@ void OgreVisual::SetRotation( const Quatern &rot)
 // Set the pose of the visual
 void OgreVisual::SetPose( const Pose3d &pose)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
 }
@@ -512,6 +551,7 @@ void OgreVisual::SetPose( const Pose3d &pose)
 // Set the position of the visual
 Vector3 OgreVisual::GetPosition()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   Ogre::Vector3 vpos;
   Vector3 pos;
   vpos=this->sceneNode->getPosition();
@@ -525,6 +565,7 @@ Vector3 OgreVisual::GetPosition()
 // Get the rotation of the visual
 Quatern OgreVisual::GetRotation( )
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   Ogre::Quaternion vquatern;
   Quatern quatern;
   vquatern=this->sceneNode->getOrientation();
@@ -539,6 +580,7 @@ Quatern OgreVisual::GetRotation( )
 // Get the pose of the visual
 Pose3d OgreVisual::GetPose()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   Pose3d pos;
   pos.pos=this->GetPosition();
   pos.rot=this->GetRotation();
@@ -549,6 +591,7 @@ Pose3d OgreVisual::GetPose()
 // Get this visual Ogre node
 Ogre::SceneNode * OgreVisual::GetSceneNode()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return this->sceneNode;
 }
 
@@ -557,6 +600,7 @@ Ogre::SceneNode * OgreVisual::GetSceneNode()
 ///  Create a bounding box for this visual
 void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   std::ostringstream nodeName;
 
   nodeName << this->sceneNode->getName()<<"_AABB_NODE";
@@ -595,15 +639,17 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the entity that manages this visual
-Entity *OgreVisual::GetEntity() const
+Entity *OgreVisual::GetOwner() const
 {
-  return this->entity;
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  return this->owner;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set to true to show a white bounding box, used to indicate user selection
 void OgreVisual::ShowSelectionBox( bool value )
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   Ogre::SceneNode *node = this->sceneNode;
 
   while (node && node->numAttachedObjects() == 0)

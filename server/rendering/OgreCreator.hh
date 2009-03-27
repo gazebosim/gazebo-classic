@@ -31,6 +31,9 @@
 //#include <X11/Xutil.h>
 
 #include <string>
+#include <vector>
+#include "OgreDynamicRenderable.hh"
+#include "SingletonT.hh"
 #include "Vector3.hh"
 #include "Vector2.hh"
 
@@ -48,23 +51,25 @@ namespace gazebo
   class XMLConfigNode;
   class Entity;
   class OgreVisual;
+  class OgreMovableText;
+  class OgreDynamicLines;
 
 /// \addtogroup gazebo_rendering
 /// \{
 
 
    /// \brief Functions that creates Ogre3d objects
-  class OgreCreator
+  class OgreCreator : public SingletonT<OgreCreator>
   {
 
     /// \brief Constructor
-    public: OgreCreator();
+    private: OgreCreator();
 
     /// \brief Destructor
-    public: virtual ~OgreCreator();
+    private: virtual ~OgreCreator();
 
     /// \brief Load some simple shapes on the render engine
-      public: static void LoadBasicShapes();
+    public: static void LoadBasicShapes();
 
     /// \brief Create a Plane
     /// It adds itself to the Visual node parent, it will those change parent
@@ -98,26 +103,75 @@ namespace gazebo
     public: static void CreateSky(std::string material);
 
     /// \brief Create a new window
-    public: static Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 
+    public: Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 
                                                     unsigned int width, 
                                                     unsigned int height);
 
 
     /// \brief Create a window for Ogre
-    public: static Ogre::RenderWindow *CreateWindow(long display, 
-                                                    int screen, 
-                                                    long winId, 
-                                                    unsigned int width, 
-                                                    unsigned int height);
-   
+    public: Ogre::RenderWindow *CreateWindow(long display, 
+                                             int screen, 
+                                             long winId, 
+                                             unsigned int width, 
+                                             unsigned int height);
+  
     /// \brief Draw the uniform grid pattern
     public: static void DrawGrid();
 
     /// \brief Remove a mesh by name
     public: static void RemoveMesh(const std::string &name);
 
+    /// \brief Create a material from a color definition
+    /// \return The name of the material
+    public: static std::string CreateMaterial(float r, float g, 
+                                              float b, float a);
+
+    /// \brief Create a material from a texture file
+    public: static std::string CreateMaterialFromTexFile(const std::string &filename);
+
+    public: OgreDynamicLines *CreateDynamicLine(OgreDynamicRenderable::OperationType opType);
+
+    /// \brief Create a new ogre visual 
+    /// \param name Unique name for the new visual
+    /// \param parent Parent visual
+    /// \param owner The entity that owns the visual
+    /// \return The new ogre visual
+    public: OgreVisual *CreateVisual( const std::string &name,
+                                      OgreVisual *parent=NULL, 
+                                      Entity *owner = NULL );
+
+    /// \brief Delete a visual
+    public: void DeleteVisual( OgreVisual *visual );
+
+    /// \brief Remove a visual
+    /// \param name Unique name of the visual to remove
+    public: void RemoveVisual( const std::string &name );
+
+
+    /// \brief Create a movable text object
+    /// \return A new movable text object
+    public: OgreMovableText *CreateMovableText();
+
+    /// \brief Update all the entities
+    public: void Update();
+
     private: static unsigned int lightCounter;
     private: static unsigned int windowCounter;
+
+    // List of all the lines created
+    private: std::list<OgreDynamicLines*> lines;
+
+    // List of all the movable text
+    private: std::list<OgreMovableText*> text;
+
+    // All the visuals 
+    private: std::map<std::string, OgreVisual*> visuals;
+
+    // All the windows
+    private: std::list<Ogre::RenderWindow *> windows;
+ 
+    private: friend class DestroyerT<OgreCreator>;
+    private: friend class SingletonT<OgreCreator>;
 
 /// \}
 

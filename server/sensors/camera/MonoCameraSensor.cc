@@ -26,8 +26,7 @@
 
 #include <sstream>
 #include <OgreImageCodec.h>
-#include <Ogre.h>
-#include <dirent.h>
+//#include <Ogre.h>
 
 #include "Controller.hh"
 #include "Global.hh"
@@ -53,6 +52,7 @@ MonoCameraSensor::MonoCameraSensor(Body *body)
     : Sensor(body), OgreCamera("Mono")
 {
   this->typeName = "monocamera";
+  this->captureData = true;
 }
 
 
@@ -75,7 +75,6 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
     gzthrow("image has zero size");
   }
 
-  this->SetCameraSceneNode( this->GetVisualNode()->GetSceneNode() );
 
   this->ogreTextureName = this->GetName() + "_RttTex";
   this->ogreMaterialName = this->GetName() + "_RttMat";
@@ -83,10 +82,11 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
   // Create the render texture
   this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
                           this->ogreTextureName,
-                          Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                          "General",
                           Ogre::TEX_TYPE_2D,
                           this->imageSizeP->GetValue().x, 
-                          this->imageSizeP->GetValue().y, 0,
+                          this->imageSizeP->GetValue().y,
+                          0,
                           Ogre::PF_R8G8B8,
                           Ogre::TU_RENDERTARGET);
 
@@ -105,22 +105,26 @@ void MonoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 // Initialize the camera
 void MonoCameraSensor::InitChild()
 {
-  this->InitCam();
+  this->SetCameraSceneNode( this->GetVisualNode()->GetSceneNode() );
 
-  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
+  this->InitCam();
+  this->SetCamName(this->GetName());
+
+  /*Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
                             this->ogreMaterialName,
                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 
   mat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreTextureName);
+*/
 
   Ogre::HardwarePixelBufferSharedPtr mBuffer;
-
   // Get access to the buffer and make an image and write it to file
   mBuffer = this->renderTexture->getBuffer(0, 0);
 
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
+  
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -141,47 +145,6 @@ void MonoCameraSensor::UpdateChild()
     return;
 
   this->UpdateCam();
-
-  this->renderTarget->update();
-
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-  size_t size;
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  size = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * 3;
-
-  // Allocate buffer
-  if (!this->saveFrameBuffer)
-    this->saveFrameBuffer = new unsigned char[size];
-
-  mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
-
-  int top = (int)((mBuffer->getHeight() - this->imageSizeP->GetValue().y) / 2.0);
-  int left = (int)((mBuffer->getWidth() - this->imageSizeP->GetValue().x) / 2.0);
-  int right = left + this->imageSizeP->GetValue().x;
-  int bottom = top + this->imageSizeP->GetValue().y;
-
-  // Get the center of the texture in RGB 24 bit format
-  mBuffer->blitToMemory(
-    Ogre::Box(left, top, right, bottom),
-
-    Ogre::PixelBox(
-      this->imageSizeP->GetValue().x,
-      this->imageSizeP->GetValue().y,
-      1,
-      Ogre::PF_B8G8R8,
-      this->saveFrameBuffer)
-  );
-
-  mBuffer->unlock();
-
-
-  if (this->saveFramesP->GetValue())
-  {
-    this->SaveFrame();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,81 +155,3 @@ std::string MonoCameraSensor::GetMaterialName() const
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-/// Get a pointer to the image data
-const unsigned char *MonoCameraSensor::GetImageData(unsigned int i)
-{
-  if (i!=0)
-    gzerr(0) << "Camera index must be zero for mono cam";
-
-  return this->saveFrameBuffer;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Save the current frame to disk
-void MonoCameraSensor::SaveFrame()
-{
-  Ogre::HardwarePixelBufferSharedPtr mBuffer;
-  std::ostringstream sstream;
-  Ogre::ImageCodec::ImageData *imgData;
-  Ogre::Codec * pCodec;
-  size_t size, pos;
-
-  this->GetImageData();
-
-  // Create a directory if not present
-  DIR *dir = opendir( this->savePathnameP->GetValue().c_str() );
-  if (!dir)
-  {
-    std::string command;
-    command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
-    system(command.c_str());
-  }
-
-  // Get access to the buffer and make an image and write it to file
-  mBuffer = this->renderTexture->getBuffer(0, 0);
-
-  // Create image data structure
-  imgData  = new Ogre::ImageCodec::ImageData();
-
-  imgData->width = this->imageSizeP->GetValue().x;
-  imgData->height = this->imageSizeP->GetValue().y;
-  imgData->depth = 1;
-  imgData->format = Ogre::PF_B8G8R8;
-  size = this->GetImageByteSize();
-
-  // Wrap buffer in a chunk
-  Ogre::MemoryDataStreamPtr stream(new Ogre::MemoryDataStream( this->saveFrameBuffer, size, false));
-
-  char tmp[1024];
-  if (!this->savePathnameP->GetValue().empty())
-  {
-    double simTime = Simulator::Instance()->GetSimTime();
-    int min = (int)(simTime / 60.0);
-    int sec = (int)(simTime - min*60);
-    int msec = (int)(simTime*1000 - min*60000 - sec*1000);
-
-    sprintf(tmp, "%s/%s-%04d-%03dm_%02ds_%03dms.jpg", this->savePathnameP->GetValue().c_str(), this->GetName().c_str(), this->saveCount, min, sec, msec);
-  }
-  else
-  {
-    sprintf(tmp, "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
-  }
-
-  // Get codec
-  Ogre::String filename = tmp;
-  pos = filename.find_last_of(".");
-  Ogre::String extension;
-
-  while (pos != filename.length() - 1)
-    extension += filename[++pos];
-
-  // Get the codec
-  pCodec = Ogre::Codec::getCodec(extension);
-
-  // Write out
-  Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
-  pCodec->codeToFile(stream, filename, codecDataPtr);
-
-  this->saveCount++;
-}

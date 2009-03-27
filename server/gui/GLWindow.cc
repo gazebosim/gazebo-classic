@@ -138,11 +138,6 @@ void GLWindow::Update()
   }
 
   this->lastUpdateTime = Simulator::Instance()->GetRealTime();
-
-  if (this->userCamera != this->activeCamera)
-    this->activeCamera->UpdateCam();
-  else
-    this->userCamera->Update();
 }
 
 

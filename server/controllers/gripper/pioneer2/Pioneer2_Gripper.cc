@@ -25,6 +25,13 @@
  * SVN info: $Id$
  */
 
+#include <boost/bind.hpp>
+
+#include "PhysicsEngine.hh"
+#include "Geom.hh"
+#include "ContactParams.hh"
+#include "Simulator.hh"
+#include "RaySensor.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
@@ -57,11 +64,34 @@ Pioneer2_Gripper::Pioneer2_Gripper(Entity *parent )
 // Destructor
 Pioneer2_Gripper::~Pioneer2_Gripper()
 {
+  if (this->holdJoint)
+    delete this->holdJoint;
+  this->holdJoint = NULL;
+
   for (int i=0; i<3; i++)
   {
-    GZ_DELETE(this->jointNamesP[i]);
-    GZ_DELETE(this->gainsP[i]);
-    GZ_DELETE(this->forcesP[i]);
+    if (this->jointNamesP[i])
+      delete this->jointNamesP[i];
+    this->jointNamesP[i] = NULL;
+
+    if (this->gainsP[i])
+      delete this->gainsP[i];
+    this->gainsP[i] = NULL;
+
+    if (this->forcesP[i])
+      delete this->forcesP[i];
+    this->forcesP[i] = NULL;
+  }
+
+  for (int i =0; i<2; i++)
+  {
+    if (this->breakBeamNamesP[i])
+      delete this->breakBeamNamesP[i];
+    this->breakBeamNamesP[i] = NULL;
+
+    if (this->paddleNamesP[i])
+      delete this->paddleNamesP[i];
+    this->paddleNamesP[i] = NULL;
   }
 }
 
@@ -70,10 +100,22 @@ Pioneer2_Gripper::~Pioneer2_Gripper()
 void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
 {
   XMLConfigNode *jNode;
-  this->myIface = dynamic_cast<GripperIface*>(this->ifaces[0]);
+  this->gripIface = dynamic_cast<GripperIface*>(this->ifaces[0]);
 
-  if (!this->myIface)
-    gzthrow("Pioneer2_Gripper controller requires a GripperIface");
+  if (!this->gripIface)
+  {
+    this->gripIface = dynamic_cast<GripperIface*>(this->ifaces[1]);
+    if (!this->gripIface)
+      gzthrow("Pioneer2_Gripper controller requires a GripperIface");
+  }
+
+  this->actIface = dynamic_cast<ActarrayIface*>(this->ifaces[1]);
+  if (!this->actIface)
+  {
+    this->actIface = dynamic_cast<ActarrayIface*>(this->ifaces[0]);
+    if (!this->actIface)
+      gzthrow("Pioneer2_Gripper controller requires an ActarrayIface");
+  }
 
   Param::Begin(&this->parameters);
   jNode = node->GetChild("leftJoint");
@@ -121,7 +163,25 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
     this->joints[LIFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->jointNamesP[LIFT]->GetValue()));
   }
 
+  this->breakBeamNamesP[0] = new ParamT<std::string>("name","",1);
+  this->breakBeamNamesP[1] = new ParamT<std::string>("name","",1);
+
+  this->breakBeamNamesP[0]->Load(node->GetChild("outerBreakBeam"));
+  this->breakBeamNamesP[1]->Load(node->GetChild("innerBreakBeam"));
+
+  this->paddleNamesP[LEFT] = new ParamT<std::string>("name","",1);
+  this->paddleNamesP[RIGHT] = new ParamT<std::string>("name","",1);
+
+  this->paddleNamesP[LEFT]->Load(node->GetChild("leftPaddle"));
+  this->paddleNamesP[RIGHT]->Load(node->GetChild("rightPaddle"));
+
   Param::End();
+
+  this->breakBeams[0] = dynamic_cast<RaySensor*>(this->myParent->GetSensor(**this->breakBeamNamesP[0]));
+  this->breakBeams[1] = dynamic_cast<RaySensor*>(this->myParent->GetSensor(**this->breakBeamNamesP[1]));
+
+  this->paddles[LEFT] = dynamic_cast<Geom*>(this->myParent->GetGeom(**this->paddleNamesP[LEFT]));
+  this->paddles[RIGHT] = dynamic_cast<Geom*>(this->myParent->GetGeom(**this->paddleNamesP[RIGHT]));
 
   if (!this->joints[LEFT])
     gzthrow("couldn't get left slider joint");
@@ -131,6 +191,24 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
 
   if (!this->joints[LIFT])
     gzthrow("couldn't get lift slider joint");
+
+  if (!this->breakBeams[0])
+    gzthrow("Couldn't get outer breakbeam sensor");
+
+  if (!this->breakBeams[1])
+    gzthrow("Couldn't get inner breakbeam sensor");
+
+  if (!this->paddles[LEFT])
+    gzthrow("Couldn't get the left paddle geom");
+
+  if (!this->paddles[RIGHT])
+    gzthrow("Couldn't get the right paddle geom");
+
+  this->holdJoint = (SliderJoint*)World::Instance()->GetPhysicsEngine()->CreateJoint(Joint::SLIDER);
+  this->holdJoint->SetName(this->GetName() + "_Hold_Joint");
+
+  this->paddles[LEFT]->contact->Callback(&Pioneer2_Gripper::LeftPaddleCB, this);
+  this->paddles[RIGHT]->contact->Callback(&Pioneer2_Gripper::RightPaddleCB, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,24 +229,49 @@ void Pioneer2_Gripper::SaveChild(std::string &prefix, std::ostream &stream)
 // Initialize the controller
 void Pioneer2_Gripper::InitChild()
 {
+  // Initially keep the gripper closed
+  this->joints[RIGHT]->SetParam(dParamVel,-0.1);
+  this->joints[LEFT]->SetParam(dParamVel,0.1);
+  this->joints[LEFT]->SetParam(dParamFMax, **(this->forcesP[LEFT]));
+  this->joints[RIGHT]->SetParam(dParamFMax, **(this->forcesP[RIGHT]));
+
+
+  // Initially lower the lift
+  this->joints[LIFT]->SetParam(dParamFMax, **(this->forcesP[LIFT]));
+  this->joints[LIFT]->SetParam(dParamFMax, **(this->forcesP[LIFT]));
+
+  this->contactGeoms[LEFT] = this->contactGeoms[RIGHT] = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the controller
 void Pioneer2_Gripper::UpdateChild()
 {
-  /*double leftPaddleHiStop = this->joints[LEFT]->GetParam(dParamHiStop);
-  double leftPaddleLoStop = this->joints[LEFT]->GetParam(dParamLoStop);
-  double rightPaddleHiStop = this->joints[RIGHT]->GetParam(dParamHiStop);
-  double rightPaddleLoStop = this->joints[RIGHT]->GetParam(dParamLoStop);
+  // Create a hold joint, if both paddles are touching the same geom
+  if (this->contactGeoms[LEFT] && this->contactGeoms[RIGHT] &&
+      this->contactGeoms[LEFT]->GetName() == 
+      this->contactGeoms[RIGHT]->GetName())
+  {
+    if (!this->holdJoint->AreConnected(this->myParent->GetBody(),
+          this->contactGeoms[LEFT]->GetBody()))
+    {
+      this->holdJoint->Attach(this->myParent->GetBody(), 
+                              this->contactGeoms[LEFT]->GetBody()); 
+      this->holdJoint->SetAxis(Vector3(0,0,1));
 
-  double leftPaddlePos = this->joints[LEFT]->GetPosition();
-  double rightPaddlePos = this->joints[RIGHT]->GetPosition();
-  */
+    }
+  }
+  // Otherwise disconnect the joint if it has been created
+  else if (this->holdJoint->GetJointBody(0))
+  {
+    this->holdJoint->Detach();
+    this->contactGeoms[LEFT] = this->contactGeoms[RIGHT] = NULL;
+  }
 
-  this->myIface->Lock(1);
+  this->gripIface->Lock(1);
 
-  switch( this->myIface->data->cmd)
+  // Move the paddles
+  switch( this->gripIface->data->cmd)
   {
     case GAZEBO_GRIPPER_CMD_OPEN:
       this->joints[RIGHT]->SetParam(dParamVel,0.1);
@@ -180,39 +283,126 @@ void Pioneer2_Gripper::UpdateChild()
       this->joints[LEFT]->SetParam(dParamVel,0.1);
       break;
 
-    case GAZEBO_GRIPPER_CMD_STORE:
-      this->joints[LIFT]->SetParam(dParamVel, 0.2);
-      break;
-
-    case GAZEBO_GRIPPER_CMD_RETRIEVE:
-      this->joints[LIFT]->SetParam(dParamVel, -0.2);
-      break;
-
     case GAZEBO_GRIPPER_CMD_STOP:
       this->joints[RIGHT]->SetParam(dParamVel,0);
       this->joints[LEFT]->SetParam(dParamVel,0);
-      this->joints[LIFT]->SetParam(dParamVel,0);
       break;
-
-
-    /*default:
-      this->joints[RIGHT]->SetParam(dParamVel,0.0);
-      this->joints[LEFT]->SetParam(dParamVel,0.0);
-      this->joints[LIFT]->SetParam(dParamVel,0.0);
-      break;
-      */
   }
 
+  // Move the lift
+  if (this->actIface->data->cmd_pos[0] > 0.5)
+  {
+    this->joints[LIFT]->SetParam(dParamVel, 0.2);
+  }
+  else if (this->actIface->data->cmd_pos[0] < 0.5)
+  {
+    this->joints[LIFT]->SetParam(dParamVel, -0.2);
+  }
 
   this->joints[LEFT]->SetParam(dParamFMax, **(this->forcesP[LEFT]));
   this->joints[RIGHT]->SetParam(dParamFMax, **(this->forcesP[RIGHT]));
   this->joints[LIFT]->SetParam(dParamFMax, **(this->forcesP[LIFT]));
 
-  this->myIface->Unlock();
+
+  // DEBUG Statements
+  /*printf("Left Pos[%f] High[%f] Low[%f]\n",this->joints[LEFT]->GetPosition(), this->joints[LEFT]->GetHighStop(),this->joints[LEFT]->GetLowStop() );
+  printf("Right Pos[%f] High[%f] Low[%f]\n",this->joints[RIGHT]->GetPosition(), this->joints[RIGHT]->GetHighStop(),this->joints[RIGHT]->GetLowStop() );
+  printf("Lift Pos[%f] High[%f] Low[%f]\n", this->joints[LIFT]->GetPosition(),
+  this->joints[LIFT]->GetHighStop(), this->joints[LIFT]->GetLowStop());
+  */
+
+  // Set the state of the left paddle pressure sensor
+  if (this->contactGeoms[LEFT])
+    this->gripIface->data->left_paddle_open = 0;
+  else
+    this->gripIface->data->left_paddle_open = 1;
+    
+  // Set the state of the right paddle pressure sensor
+  if (this->contactGeoms[RIGHT])
+    this->gripIface->data->right_paddle_open = 0;
+  else
+    this->gripIface->data->right_paddle_open = 1;
+
+
+  // Set the OPEN/CLOSED/MOVING state of the gripper
+  if (fabs(this->joints[LEFT]->GetPosition() - 
+           this->joints[LEFT]->GetHighStop()) < 0.01 &&
+      fabs(this->joints[RIGHT]->GetPosition() - 
+           this->joints[RIGHT]->GetLowStop()) < 0.01)
+  {
+    this->gripIface->data->state = GAZEBO_GRIPPER_STATE_CLOSED;
+  }
+  else if (fabs(this->joints[LEFT]->GetPosition() - 
+                this->joints[LEFT]->GetLowStop()) < 0.01 &&
+           fabs(this->joints[RIGHT]->GetPosition() - 
+                this->joints[RIGHT]->GetHighStop()) < 0.01)
+  {
+    this->gripIface->data->state = GAZEBO_GRIPPER_STATE_OPEN;
+  }
+  else
+  {
+    this->gripIface->data->state = GAZEBO_GRIPPER_STATE_MOVING;
+  }
+
+  // Set the UP/DOWN state of the lift
+  if (fabs(this->joints[LIFT]->GetPosition() -
+           this->joints[LIFT]->GetHighStop()) < 0.01)
+  {
+    this->actIface->data->actuators[0].position = 1;
+  }
+  else if (fabs(this->joints[LIFT]->GetPosition() -
+                this->joints[LIFT]->GetLowStop()) < 0.01)
+  {
+    this->actIface->data->actuators[0].position = 0;
+  }
+
+
+  // Check the break beams
+  if (this->gripIface->data->state == GAZEBO_GRIPPER_STATE_OPEN)
+  {
+    if (this->breakBeams[0]->GetRange(0) < 0.22)
+      this->gripIface->data->outer_beam_obstruct = 1;
+    else
+      this->gripIface->data->outer_beam_obstruct = 0;
+
+    if (this->breakBeams[1]->GetRange(0) < 0.22)
+      this->gripIface->data->inner_beam_obstruct = 1;
+    else
+      this->gripIface->data->inner_beam_obstruct = 0;
+  }
+
+  this->actIface->data->actuators_count = 1;
+
+  this->gripIface->data->head.time = Simulator::Instance()->GetSimTime();
+  this->gripIface->Post();
+  this->gripIface->Unlock();
+
+  // Reset these flags.
+  this->contactGeoms[LEFT] = this->contactGeoms[RIGHT] = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the controller
 void Pioneer2_Gripper::FiniChild()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Left paddle contact callback
+void Pioneer2_Gripper::LeftPaddleCB(Geom *g1, Geom *g2)
+{
+  if (g1->GetName() != this->paddles[LEFT]->GetName())
+    this->contactGeoms[LEFT] = g1;
+  else
+    this->contactGeoms[LEFT] = g2;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Right paddle contact callback
+void Pioneer2_Gripper::RightPaddleCB(Geom *g1, Geom *g2)
+{
+  if (g1->GetName() != this->paddles[RIGHT]->GetName())
+    this->contactGeoms[RIGHT] = g1;
+  else
+    this->contactGeoms[RIGHT] = g2;
 }

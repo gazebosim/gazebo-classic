@@ -27,8 +27,14 @@
 #define SIMULATOR_HH
 
 #include <string>
+#include <boost/thread.hpp>
 
 #include "SingletonT.hh"
+
+namespace boost
+{
+  class recursive_mutex;
+}
 
 namespace gazebo
 {
@@ -89,6 +95,9 @@ namespace gazebo
 
     /// \brief Returns the state of the simulation true if paused
     public: bool IsPaused() const;
+
+    /// \brief Set whether the simulation is paused
+    public: void SetPaused(bool p);
 
     /// \brief Get the number of iterations
     public: unsigned long GetIterations() const;
@@ -159,6 +168,12 @@ namespace gazebo
     /// \brief Get the model that currently selected
     public: Model *GetSelectedModel() const;
 
+    /// \brief Get the simulator mutex
+    public:boost::recursive_mutex *GetMutex();
+
+    /// \brief Function to run gui. Used by guiThread
+    private: void PhysicsLoop();
+
     ///pointer to the XML Data
     private: XMLConfig *xmlFile;
 
@@ -213,8 +228,16 @@ namespace gazebo
     /// Length of time the simulation should run
     private: double timeout;
 
+    /// Length of time the simulator is allowed to run
+    private: double updateTime;
+
     /// The entity currently selected by the user
     private: Entity *selectedEntity;
+
+    /// Thread in which to run the gui
+    private: boost::thread *physicsThread;
+
+    private: boost::recursive_mutex *mutex;
 
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;

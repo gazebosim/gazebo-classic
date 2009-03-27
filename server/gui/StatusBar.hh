@@ -54,6 +54,7 @@ namespace gazebo
     public: static void StepButtonCB( Fl_Widget *w, void *data );
 
     private: Fl_Value_Output *iterations;
+    private: Fl_Value_Output *percent;
     private: Fl_Value_Output *fps;
     private: Fl_Value_Output *realTime;
     private: Fl_Value_Output *pauseTime;
@@ -63,6 +64,8 @@ namespace gazebo
     private: Fl_Button *stepButton;
 
     public: Gui *gui;
+
+    private: double lastUpdateTime;
   };
   
 }

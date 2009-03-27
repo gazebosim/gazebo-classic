@@ -3,7 +3,18 @@ Import('*')
 
 env.Append(CPPPATH = '#server/controllers')
 
-dirs = Split('position2d laser camera factory gripper actarray ptz opaque bumper imu irarray')
+dirs = ['position2d',
+        'laser',
+        'camera',
+        'factory',
+        'gripper',
+        'actarray',
+        'ptz',
+        'opaque',
+        'bumper',
+        'imu',
+        'irarray'
+        ]
 
 try:
   env["CCFLAGS"].index('-DHAVE_OPENAL')

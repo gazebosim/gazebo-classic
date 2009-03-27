@@ -114,9 +114,6 @@ namespace gazebo
     /// Start and end positions of the ray in global cs
     private: Vector3 globalStartPos;
     private: Vector3 globalEndPos;
-
-    private: OgreVisual *visual;
-  
   };
   
   /// \}

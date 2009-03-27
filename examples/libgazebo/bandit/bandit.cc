@@ -1,5 +1,4 @@
 #include <gazebo/gazebo.h>
-#include <gazebo/GazeboError.hh>
 
 #include <math.h>
 
@@ -25,7 +24,7 @@ int main()
   {
     client->ConnectWait(serverId, GZ_CLIENT_ID_USER_FIRST);
   }
-  catch (gazebo::GazeboError e)
+  catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect\n" << e << "\n";
     return -1;
@@ -36,7 +35,7 @@ int main()
   {
     simIface->Open(client, "default");
   }
-  catch (gazebo::GazeboError e)
+  catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect to the sim interface\n" << e << "\n";
     return -1;

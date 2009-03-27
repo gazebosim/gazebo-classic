@@ -30,6 +30,7 @@
 
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
+#include "OgreCreator.hh"
 #include "Body.hh"
 #include "Global.hh"
 #include "RayGeom.hh"
@@ -49,7 +50,7 @@ RayGeom::RayGeom( Body *body, bool displayRays )
 
   if (displayRays)
   {
-    this->line = new OgreDynamicLines(OgreDynamicRenderable::OT_LINE_LIST);
+    this->line = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
     // Add two points
     this->line->AddPoint(Vector3(0,0,0));
@@ -78,6 +79,8 @@ RayGeom::~RayGeom()
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Update the ray geom
 void RayGeom::Update()
 {
   Vector3 dir;
@@ -124,7 +127,6 @@ void RayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
     // Set the line's position relative to it's parent scene node
     this->line->SetPoint(0, this->relativeStartPos);
     this->line->SetPoint(1, this->relativeEndPos);
-    this->line->Update();
   }
 }
 
@@ -151,13 +153,14 @@ void RayGeom::SetLength( const double len )
   //dGeomRaySetLength( this->geomId, len );
   this->contactLen=len;
 
+  Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  dir.Normalize();
+
+  this->relativeEndPos = dir * len + this->relativeStartPos;
+
   if (this->line)
   {
-    Vector3 dir = this->relativeEndPos - this->relativeStartPos;
-    dir.Normalize();
-
-    this->line->SetPoint(1,  dir * len + this->relativeStartPos);
-    this->line->Update();
+    this->line->SetPoint(1,  this->relativeEndPos);
   }
 }
 

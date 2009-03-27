@@ -246,6 +246,7 @@ void SimulationInterface::Update()
     switch (response->type)
     {
       case gazebo::SimulationRequestData::SET_STATE:
+      case gazebo::SimulationRequestData::GO:
       case gazebo::SimulationRequestData::PAUSE:
       case gazebo::SimulationRequestData::RESET:
       case gazebo::SimulationRequestData::SAVE:

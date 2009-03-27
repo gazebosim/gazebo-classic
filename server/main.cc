@@ -119,6 +119,7 @@ double optTimeout = -1;
 unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
 bool optPhysicsEnabled  = true;
+bool optPaused = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -156,13 +157,18 @@ int ParseArgs(int argc, char **argv)
 {
   FILE *tmpFile;
   int ch;
-  char *flags = (char*)("l:hd:s:fgxt:nqp");
+  char *flags = (char*)("l:hd:s:fgxt:nqpe");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
   {
     switch (ch)
     {
+      case 'e':
+        std::cout << "Running in federation mode!\n";
+        optPaused = true;
+        break;
+
       case 'd':
         // Verbose mode
         optMsgLevel = atoi(optarg);
@@ -267,11 +273,13 @@ int main(int argc, char **argv)
     gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
     gazebo::Simulator::Instance()->SetTimeout(optTimeout);
     gazebo::Simulator::Instance()->SetPhysicsEnabled(optPhysicsEnabled);
+    gazebo::Simulator::Instance()->SetPaused(optPaused);
   }
   catch (gazebo::GazeboError e)
   {
-    std::cerr << "Loading Gazebo" << std::endl;
+    std::cerr << "Error Loading Gazebo" << std::endl;
     std::cerr << e << std::endl;
+    gazebo::Simulator::Instance()->Fini();
     return -1;
   }
 
@@ -284,6 +292,7 @@ int main(int argc, char **argv)
   {
     std::cerr << "Initialization failed" << std::endl;
     std::cerr << e << std::endl;
+    gazebo::Simulator::Instance()->Fini();
     return -1;
   }
 
@@ -296,6 +305,7 @@ int main(int argc, char **argv)
   {
     std::cerr << "Main simulation loop failed" << std::endl;
     std::cerr << e << std::endl;
+    gazebo::Simulator::Instance()->Fini();
     return -1;
   }
 

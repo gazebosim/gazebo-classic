@@ -120,6 +120,8 @@
   <!-- White Directional light -->
   <model:renderable name="directional_white">
     <xyz>2.0 0 2.0</xyz>
+    <enableGravity>false</enableGravity>
+
     <light>
       <type>spot</type>
       <range>1000 1000 100</range>
