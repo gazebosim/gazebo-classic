@@ -182,18 +182,8 @@ void LaserInterface::Update()
       ts.tv_sec = (int) (this->iface->data->head.time);
       ts.tv_usec = (int) (fmod(this->iface->data->head.time, 1) * 1e6);
 
-
-      // Pick the rage resolution to use (1, 10, 100)
-      if (this->iface->data->max_range <= 8.192)
-        rangeRes = 1.0;
-      else if (this->iface->data->max_range <= 81.92)
-        rangeRes = 10.0;
-      else
-        rangeRes = 100.0;
-
+      rangeRes = this->iface->data->res_range;
       angleRes = this->iface->data->res_angle;
-
-      //printf("range res = %f %f\n", rangeRes, this->iface->data->max_range);
 
       double oldCount = this->data.ranges_count;
 

@@ -94,6 +94,9 @@ class RaySensor: public Sensor
   /// \return The maximum range
   public: double GetMaxRange() const;
 
+  /// \brief Get the range resolution
+  public: double GetResRange() const;
+
   /// \brief Get the ray count
   /// \return The number of rays
   public: int GetRayCount() const;
@@ -134,7 +137,7 @@ class RaySensor: public Sensor
   private: std::vector<RayGeom*> rays;
 
   private: ParamT<Angle> *minAngleP, *maxAngleP;
-  private: ParamT<double> *minRangeP, *maxRangeP;
+  private: ParamT<double> *minRangeP, *maxRangeP, *resRangeP;
   private: ParamT<Vector3> *originP;
 
   private: Pose3d prevPose;

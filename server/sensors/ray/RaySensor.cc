@@ -72,6 +72,7 @@ RaySensor::RaySensor(Body *body)
   this->maxAngleP = new ParamT<Angle>("maxAngle",DTOR(-90),1);
   this->minRangeP = new ParamT<double>("minRange",0,1);
   this->maxRangeP = new ParamT<double>("maxRange",0,1);
+  this->resRangeP = new ParamT<double>("resRange",0.1,1);
   this->originP = new ParamT<Vector3>("origin", Vector3(0,0,0), 0);
   this->displayRaysP = new ParamT<std::string>("displayRays", "off", 0);
   Param::End();
@@ -94,6 +95,7 @@ RaySensor::~RaySensor()
   delete this->maxAngleP;
   delete this->minRangeP;
   delete this->maxRangeP;
+  delete this->resRangeP;
   delete this->originP;
   delete this->displayRaysP;
 }
@@ -113,6 +115,7 @@ void RaySensor::LoadChild(XMLConfigNode *node)
   this->maxAngleP->Load(node);
   this->minRangeP->Load(node);
   this->maxRangeP->Load(node);
+  this->resRangeP->Load(node);
   this->originP->Load(node);
   this->displayRaysP->Load(node);
 
@@ -138,6 +141,7 @@ void RaySensor::SaveChild(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->maxAngleP) << "\n";
   stream << prefix << "  " << *(this->minRangeP) << "\n";
   stream << prefix << "  " << *(this->maxRangeP) << "\n";
+  stream << prefix << "  " << *(this->resRangeP) << "\n";
   stream << prefix << "  " << *(this->originP) << "\n";
   stream << prefix << "  " << *(this->rayCountP) << "\n";
   stream << prefix << "  " << *(this->rangeCountP) << "\n";
@@ -239,6 +243,13 @@ double RaySensor::GetMinRange() const
 double RaySensor::GetMaxRange() const
 {
   return this->maxRangeP->GetValue();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+///  Get the range resolution
+double RaySensor::GetResRange() const
+{
+  return this->resRangeP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////

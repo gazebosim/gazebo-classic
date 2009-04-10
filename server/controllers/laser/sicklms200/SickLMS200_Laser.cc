@@ -184,6 +184,8 @@ void SickLMS200_Laser::PutLaserData()
   double minRange = this->myParent->GetMinRange();
   int rayCount = this->myParent->GetRayCount();
   int rangeCount = this->myParent->GetRangeCount();
+  float resRange = this->myParent->GetResRange();
+
 
   if (this->laserIface->Lock(1))
   {
@@ -194,7 +196,7 @@ void SickLMS200_Laser::PutLaserData()
     this->laserIface->data->min_angle = minAngle.GetAsRadian();
     this->laserIface->data->max_angle = maxAngle.GetAsRadian();
     this->laserIface->data->res_angle = (maxAngle.GetAsRadian() - minAngle.GetAsRadian()) / (rangeCount - 1);
-    this->laserIface->data->res_range = 0.1;
+    this->laserIface->data->res_range = resRange;
     this->laserIface->data->max_range = maxRange;
     this->laserIface->data->range_count = rangeCount;
 

@@ -44,13 +44,14 @@
       <rangeCount>361</rangeCount>
       <origin>0.05 0.0 0</origin>
 
-      <displayRays>false</displayRays>
+      <displayRays>fan</displayRays>
 
       <minAngle>-90</minAngle>
       <maxAngle>90</maxAngle>
 
       <minRange>0.1</minRange>
       <maxRange>8</maxRange>
+      <resRange>.1</resRange>
 
       <controller:sicklms200_laser name="laser_controller_1">
         <interface:laser name="laser_iface_0"/>
