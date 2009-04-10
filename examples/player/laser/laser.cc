@@ -29,7 +29,7 @@ int main()
     std::cout << "Laser Pose[" << laserPose.px << " " <<
       laserPose.py << " " << laserPose.pyaw << "]\n";
 
-    /*for (;;)
+    for (;;)
     {
       // This blocks until new data comes
       robot.Read();
@@ -39,7 +39,7 @@ int main()
         printf("[%f %d]", lp.GetRange(i), lp.GetIntensity(i) );
       }
       printf("\n");
-    }*/
+    }
   }
   catch (PlayerCc::PlayerError e)
   {
