@@ -29,6 +29,11 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
 
@@ -84,6 +89,7 @@ class IRInterface : public GazeboInterface
 
 
   private: player_ir_data_t data;
+  private: static boost::recursive_mutex *mutex;
 };
 
 /// \} 

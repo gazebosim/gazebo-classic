@@ -297,7 +297,6 @@ void Body::Update()
 	  avel = this->GetAngularVel();
 	  dBodyAddTorque(this->GetId(), -avel.x * force, -avel.y * force, -avel.z * force);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -328,7 +327,6 @@ void Body::AttachGeom( Geom *geom )
 // Set the pose of the body
 void Body::SetPose(const Pose3d &_pose)
 {
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   if (this->IsStatic())
   {
@@ -365,7 +363,6 @@ void Body::SetPose(const Pose3d &_pose)
 // Return the pose of the body
 Pose3d Body::GetPose() const
 {
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   /*if (this->IsStatic())
     return this->staticPose;
@@ -378,7 +375,6 @@ Pose3d Body::GetPose() const
 // Update the pose of the body
 void Body::UpdatePose()
 {
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->pose.pos = this->GetPosition();
   this->pose.rot = this->GetRotation();
 

@@ -29,6 +29,11 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
 
@@ -85,6 +90,8 @@ class LaserInterface : public GazeboInterface
   private: int scanId;
 
   private: player_laser_data_t data;
+
+  private: static boost::recursive_mutex *mutex;
 };
 
 /// \} 

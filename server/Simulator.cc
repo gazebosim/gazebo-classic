@@ -333,7 +333,9 @@ void Simulator::MainLoop()
       OgreAdaptor::Instance()->UpdateCameras();
 
       if (this->gui)
+      {
         this->gui->Update();
+      }
 
       currTime = this->GetWallTime();
 

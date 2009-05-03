@@ -33,6 +33,7 @@
 
 #include <math.h>
 #include <libplayerxdr/playerxdr.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -40,6 +41,8 @@
 #include "FiducialInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *FiducialInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -60,6 +63,8 @@ FiducialInterface::FiducialInterface(player_devaddr_t addr,
 
   memset(&this->data, 0, sizeof(this->data));
 
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,6 +82,7 @@ FiducialInterface::~FiducialInterface()
 int FiducialInterface::ProcessMessage(QueuePointer &respQueue,
                                       player_msghdr_t *hdr, void *data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Request the pose and size of the fiducial device
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                             PLAYER_FIDUCIAL_REQ_GET_GEOM, this->device_addr))
@@ -161,6 +167,7 @@ void FiducialInterface::Update()
 {
   struct timeval ts;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
@@ -219,6 +226,7 @@ void FiducialInterface::Subscribe()
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -236,5 +244,6 @@ void FiducialInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void FiducialInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

@@ -177,6 +177,7 @@ def Config(env, packages):
       try:
         if not check:
           print "Checking for "+key+"...",
+        pkgcfg = "PKG_CONFIG_PATH="+os.environ["PKG_CONFIG_PATH"]+" "+pkgcfg;
         env.ParseConfig(pkgcfg)
         if not check:
           print 'yes'
@@ -199,8 +200,7 @@ def Config(env, packages):
   
     # If valid so far, apply any flags to the environment
     if valid:
-      for flag in flags:
-        env.Append(CCFLAGS = flag)
+        env.Append(CCFLAGS = flags)
   
   # Check for trimesh support in ODE
   #if not conf.CheckODELib():

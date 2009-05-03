@@ -29,6 +29,11 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
 
@@ -65,6 +70,7 @@ class Graphics3dInterface : public GazeboInterface
   /// \brief Gazebo id. This needs to match and ID in a Gazebo WorldFile
   private: char *gz_id;
 
+  private: static boost::recursive_mutex *mutex;
 };
 
 }

@@ -429,7 +429,9 @@ int Model::Update()
   }
 
   if (this->graphicsHandler)
+  {
     this->graphicsHandler->Update();
+  }
   return this->UpdateChild();
 }
 

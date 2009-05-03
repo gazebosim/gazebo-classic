@@ -30,6 +30,7 @@ PLAYER_LASER_REQ_GET_GEOM
 
 #include <math.h>
 #include <libplayerxdr/playerxdr.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -37,6 +38,8 @@ PLAYER_LASER_REQ_GET_GEOM
 #include "IRInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *IRInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -54,7 +57,8 @@ IRInterface::IRInterface(player_devaddr_t addr,
 
   this->datatime = -1;
 
-  
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,6 +77,7 @@ int IRInterface::ProcessMessage(QueuePointer &respQueue,
                                    player_msghdr_t *hdr, void *data)
 {
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                                  PLAYER_IR_REQ_POSE, this->device_addr))
   {
@@ -110,6 +115,7 @@ void IRInterface::Update()
 {
   struct timeval ts;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
     // Only Update when new data is present
@@ -160,6 +166,7 @@ void IRInterface::Subscribe()
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -177,5 +184,6 @@ void IRInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void IRInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

@@ -30,6 +30,7 @@ PLAYER_POSITION3D_RESET_ODOM
 */
 
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -37,6 +38,8 @@ PLAYER_POSITION3D_RESET_ODOM
 #include "Position3dInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *Position3dInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -53,6 +56,10 @@ Position3dInterface::Position3dInterface(player_devaddr_t addr,
   this->iface = new PositionIface();
 
   this->datatime = -1;
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,6 +75,7 @@ Position3dInterface::~Position3dInterface()
 int Position3dInterface::ProcessMessage(QueuePointer &respQueue,
                                         player_msghdr_t *hdr, void *data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // COMMAND VELOCITY:
@@ -198,6 +206,7 @@ void Position3dInterface::Update()
   player_position3d_data_t data;
   struct timeval ts;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
@@ -244,6 +253,7 @@ void Position3dInterface::Subscribe()
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -260,5 +270,6 @@ void Position3dInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void Position3dInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

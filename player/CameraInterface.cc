@@ -25,6 +25,7 @@
  */
 
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
 #include "GazeboError.hh"
@@ -32,6 +33,8 @@
 #include "CameraInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *CameraInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -52,6 +55,9 @@ CameraInterface::CameraInterface(player_devaddr_t addr,
   this->frameno = 0;
 
   this->datatime = -1;
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,10 +86,12 @@ void CameraInterface::Update()
 
   struct timeval ts;
 
+  // Thread safe locking
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
-  if (this->iface->data->head.time > this->datatime)
+  if (this->iface->data->head.time > this->datatime )
   {
     this->datatime = this->iface->data->head.time;
 
@@ -126,10 +134,11 @@ void CameraInterface::Update()
       snprintf(filename, sizeof(filename), "click-%04d.ppm",this->frameno++);
       this->SaveFrame(filename);
     }
-
   }
 
+  // Done with the interface
   this->iface->Unlock();
+
 }
 
 
@@ -138,9 +147,11 @@ void CameraInterface::Update()
 // GazeboDriver::Subscribe
 void CameraInterface::Subscribe()
 {
+
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -151,12 +162,15 @@ void CameraInterface::Subscribe()
     //gzthrow(stream.str());
     exit(0);
   }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void CameraInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
   this->iface->Close();
 }
 

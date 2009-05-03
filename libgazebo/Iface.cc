@@ -331,23 +331,28 @@ void Iface::Close()
 
 //////////////////////////////////////////////////////////////////////////////
 // Lock the interface.
-int Iface::Lock(int /*blocking*/)
+bool Iface::Lock(int blocking)
 {
   // Some 2.4 kernels seem to screw up the lock count somehow; keep an eye out
 
   //printf("  lock %p %s\n", this, this->filename);
 
+  int op = LOCK_EX;
+
+  if (!blocking)
+    op |= LOCK_NB;
+
   // Lock the file
-  if (flock(this->mmapFd, LOCK_EX) != 0)
+  if (flock(this->mmapFd, op) != 0)
   {
     std::ostringstream stream;
     stream << "flock " <<  this->filename.c_str() << "error: " <<  strerror(errno);
     std::cout << "ERROR[" << stream.str() << "]\n";
-    return 0;
+    return false;
     //throw(stream.str().c_str());
   }
 
-  return 1;
+  return true;
 }
 
 
@@ -400,9 +405,11 @@ int Iface::GetOpenCount()
 
   if (this->mMap)
   {
-    this->Lock(1);
-    result = ((GazeboData*)this->mMap)->openCount;
-    this->Unlock();
+    if (this->Lock(1))
+    {
+      result = ((GazeboData*)this->mMap)->openCount;
+      this->Unlock();
+    }
   }
 
   return result;

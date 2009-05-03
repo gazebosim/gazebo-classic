@@ -786,7 +786,6 @@ void World::UpdateSimulationIface()
   for (miter=this->toDeleteModels.begin();
       miter!=this->toDeleteModels.end(); miter++)
   {
-    std::cout << "Erasing a model[" << (*miter)->GetName() << "]\n";
 //    (*miter)->Fini();
     this->models.erase(
         std::remove(this->models.begin(), this->models.end(), *miter) );

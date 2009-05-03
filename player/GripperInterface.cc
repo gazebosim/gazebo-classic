@@ -36,12 +36,15 @@
 
 #include <iostream>
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "GripperInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *GripperInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -59,6 +62,9 @@ GripperInterface::GripperInterface(player_devaddr_t addr,
   this->iface = new GripperIface();
 
   this->datatime = -1;
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,6 +81,7 @@ int GripperInterface::ProcessMessage(QueuePointer &respQueue,
                                      player_msghdr_t *hdr, void *data)
 {
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
     if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
@@ -157,6 +164,7 @@ void GripperInterface::Update()
   player_gripper_data_t data;
   struct timeval ts;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
@@ -209,6 +217,7 @@ void GripperInterface::Subscribe()
 {
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open( GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -223,5 +232,6 @@ void GripperInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void GripperInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

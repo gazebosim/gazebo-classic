@@ -29,6 +29,7 @@
 
 #include <math.h>
 #include <libplayerxdr/playerxdr.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -36,6 +37,7 @@
 #include "LaserInterface.hh"
 
 using namespace gazebo;
+boost::recursive_mutex *LaserInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -56,6 +58,10 @@ LaserInterface::LaserInterface(player_devaddr_t addr,
   this->datatime = -1;
 
   memset(&this->data, 0, sizeof(this->data));
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,6 +79,7 @@ LaserInterface::~LaserInterface()
 int LaserInterface::ProcessMessage(QueuePointer &respQueue,
                                    player_msghdr_t *hdr, void *data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Is it a request to set the laser's config?
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                             PLAYER_LASER_REQ_SET_CONFIG,
@@ -167,6 +174,7 @@ void LaserInterface::Update()
 {
   struct timeval ts;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
 
@@ -233,6 +241,7 @@ void LaserInterface::Subscribe()
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -249,5 +258,6 @@ void LaserInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void LaserInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

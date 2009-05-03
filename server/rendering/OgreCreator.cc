@@ -704,7 +704,10 @@ void OgreCreator::Update()
   }
 
   {
+    //printf("OgreCreator scoped lock\n");
     boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMutex());
+    //printf("OgreCreator got lock\n");
+
     // Update the visuals
     for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
     {

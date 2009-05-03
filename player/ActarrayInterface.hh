@@ -28,6 +28,11 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
 /// \addtogroup player_iface
@@ -72,6 +77,8 @@ namespace gazebo
     private: double datatime;
 
     private: player_actarray_data_t actData;
+
+    private: static boost::recursive_mutex *mutex;
   };
   
   /// \} 

@@ -21,7 +21,7 @@ if 'release' in COMMAND_LINE_TARGETS:
 #######
 # Setup the Options
 #######
-opts = Options()
+opts = Variables()
 opts.Add('prefix', 'The install path "prefix"', '/usr/local')
 opts.Add('destdir', 'The root directory to install into. Useful mainly for binary package building', '/')
 opts.Add('mode','Defines how Gazebo will be built, options available: optimized, profile, debug','debug')
@@ -55,7 +55,7 @@ packages = {
               'pkgcfg' : 'pkg-config --cflags --libs openal', 
               'check' : 'openal',
               'msg' : 'Warning: OpenAL not found. 3D audio will be disbled',
-              'flags' : ['-DHAVE_OPENAL'],
+              'flags' : '-DHAVE_OPENAL',
               'web' : 'http://www.openal.org',
               'required' : False
              },
@@ -113,7 +113,7 @@ packages = {
               'pkgcfg' : 'pkg-config --cflags --libs playerc++',
               'check' : 'playerc++',
               'msg' : 'Warning: Player not found, bindings will not be built.',
-              'flags' : ['-DHAVE_PLAYER'],
+              'flags' : '-DHAVE_PLAYER',
               'web' :  'http://playerstage.sourceforge.net',
               'required' : False
            },
@@ -121,7 +121,7 @@ packages = {
              'header' : 'event.h',
              'lib' : 'event',
              'msg' : 'Warning: libevent not found. Webgazebo will no be built.',
-             'flags' : ['-DHAVE_EVENT'],
+             'flags' : '-DHAVE_EVENT',
              'web' :  'http://www.monkey.org/~provos/libevent/',
             'required' : False
            },
@@ -129,7 +129,7 @@ packages = {
              'header' : 'yaml.h',
              'lib' : 'yaml',
              'msg' : 'Warning: yaml not found. Webgazebo will not be built.',
-             'flags' : ['-DHAVE_YAML'],
+             'flags' : '-DHAVE_YAML',
              'web' :  'http://www.yaml.org',
              'required' : False
            },
@@ -137,7 +137,7 @@ packages = {
               'pkgcfg' : 'pkg-config --cflags --libs websim',
               'check' : 'websim',
               'msg' : 'Warning: websim not found. Webgazebo will not be built.',
-              'flags' : ['-DHAVE_WEBSIM'],
+              'flags' : '-DHAVE_WEBSIM',
               'web' :  'http://www.playerstage.sourceforge.net',
               'required' : False
            },

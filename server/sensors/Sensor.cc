@@ -114,7 +114,9 @@ void Sensor::Update()
   }
 
   if (this->controller)
+  {
     this->controller->Update();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

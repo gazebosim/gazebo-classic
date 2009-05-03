@@ -40,6 +40,7 @@
 
 #include "IfaceFactory.hh"
 
+
 namespace gazebo
 {
 
@@ -328,8 +329,8 @@ class Iface
 
   /// \brief Lock the interface. 
   /// \param blocking 1=caller should block, 0=no-block
-  /// \return 0 if the lock is acquired
-  public: int Lock(int blocking);
+  /// \return True if the lock is acquired
+  public: bool Lock(int blocking);
 
   /// \brief Unlock the interface
   public: int Unlock();

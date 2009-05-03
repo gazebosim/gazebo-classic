@@ -36,12 +36,14 @@
 
 #include <iostream>
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "BumperInterface.hh"
 
 using namespace gazebo;
+boost::recursive_mutex *BumperInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -62,6 +64,9 @@ BumperInterface::BumperInterface(player_devaddr_t addr,
 
   this->data.bumpers_count = 1;
   this->data.bumpers = new uint8_t[1];
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,6 +92,7 @@ int BumperInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void BumperInterface::Update()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
@@ -123,6 +129,7 @@ void BumperInterface::Subscribe()
 {
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open( GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -137,5 +144,6 @@ void BumperInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void BumperInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

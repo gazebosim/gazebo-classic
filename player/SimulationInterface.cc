@@ -25,6 +25,7 @@
  */
 
 #include <time.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
 #include "GazeboError.hh"
@@ -32,6 +33,8 @@
 #include "SimulationInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *SimulationInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -56,6 +59,9 @@ SimulationInterface::SimulationInterface(player_devaddr_t addr, GazeboDriver *dr
 
   memset( &this->pose3dReq, 0, sizeof(this->pose3dReq) ); 
   memset( &this->pose2dReq, 0, sizeof(this->pose2dReq) ); 
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,6 +82,7 @@ SimulationInterface::~SimulationInterface()
 int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                         player_msghdr_t *hdr, void *data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->responseQueue)
     delete this->responseQueue;
 
@@ -236,6 +243,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void SimulationInterface::Update()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   gazebo::SimulationRequestData *response = NULL;
   this->iface->Lock(1);
 
@@ -322,6 +330,7 @@ void SimulationInterface::Subscribe()
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -338,5 +347,6 @@ void SimulationInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void SimulationInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

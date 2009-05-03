@@ -29,6 +29,10 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
 
 namespace gazebo
 {
@@ -83,6 +87,7 @@ namespace gazebo
     private: int save;
     private: int frameno;
 
+    private: static boost::recursive_mutex *mutex;
   };
 
 /// \}

@@ -313,7 +313,6 @@ bool Geom::IsPlaceable() const
 // Set the pose relative to the body
 void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
 {
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   if (this->placeable && this->geomId)
   {
@@ -346,7 +345,6 @@ Pose3d Geom::GetPose() const
 {
   Pose3d pose;
 
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   if (this->placeable && this->geomId)
   {
@@ -380,7 +378,6 @@ Pose3d Geom::GetPose() const
 void Geom::SetPosition(const Vector3 &pos)
 {
   Pose3d pose;
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   pose = this->GetPose();
   pose.pos = pos;

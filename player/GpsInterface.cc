@@ -30,12 +30,14 @@
 - PLAYER_GPS_DATA_STATE
 */
 
-
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "GpsInterface.hh"
+
+boost::recursive_mutex *GpsInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -52,6 +54,9 @@ GpsInterface::GpsInterface(player_devaddr_t addr, GazeboDriver *driver,
   this->iface = gz_gps_alloc();
 
   this->datatime = -1;
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,6 +84,7 @@ void GpsInterface::Update()
   double e[3];
   struct timeval ts;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   gz_gps_lock(this->iface, 1);
 
   // Only Update when new data is present
@@ -117,6 +123,7 @@ void GpsInterface::Update()
 // GazeboDriver::Subscribe
 void GpsInterface::Subscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   // Open the interface
   if (gz_gps_open(this->iface, GazeboClient::client, this->gz_id) != 0)
   {
@@ -128,5 +135,6 @@ void GpsInterface::Subscribe()
 // Close a GPS interface.  This is called from GazeboDriver::Unsubscribe
 void GpsInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   gz_gps_close(this->iface);
 }

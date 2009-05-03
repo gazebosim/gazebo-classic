@@ -29,6 +29,12 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
+
 // Forward declarations
 typedef struct gz_gps gz_gps_t;
 
@@ -65,6 +71,7 @@ class GpsInterface : public GazeboInterface
   /// @brief Timestamp on last data update
   private: double datatime;
 
+  private: static boost::recursive_mutex *mutex;
 };
 #endif
 

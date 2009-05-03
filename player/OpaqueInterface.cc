@@ -34,6 +34,7 @@ Do we need these?
 - PLAYER_OPAQUE_REQ_DATA
 */
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -41,6 +42,8 @@ Do we need these?
 #include "OpaqueInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *OpaqueInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -57,6 +60,9 @@ OpaqueInterface::OpaqueInterface(player_devaddr_t addr,
   this->iface = new OpaqueIface();
 
   this->datatime = -1;
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,6 +78,8 @@ OpaqueInterface::~OpaqueInterface()
 int OpaqueInterface::ProcessMessage(QueuePointer &respQueue,
                    player_msghdr_t *hdr, void *data)
 {
+
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (this->iface->Lock(1))
   {
     // nothing yet
@@ -88,6 +96,7 @@ int OpaqueInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void OpaqueInterface::Update()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   player_opaque_data_t data;
   struct timeval ts;
 
@@ -126,6 +135,7 @@ void OpaqueInterface::Subscribe()
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -142,5 +152,6 @@ void OpaqueInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void OpaqueInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

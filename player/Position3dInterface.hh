@@ -29,6 +29,11 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 // Forward declarations
 namespace gazebo
 {
@@ -74,6 +79,7 @@ namespace gazebo
 
     /// \brief Timestamp on last data update
     private: double datatime;
+    private: static boost::recursive_mutex *mutex;
   };
 }
 

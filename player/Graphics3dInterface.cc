@@ -31,12 +31,16 @@
 - PLAYER_GRAPHICS3D_CMD_DRAW
 */
 
+#include <boost/thread/recursive_mutex.hpp>
+
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "GazeboDriver.hh"
 #include "Graphics3dInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *Graphics3dInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -51,6 +55,10 @@ Graphics3dInterface::Graphics3dInterface(player_devaddr_t addr,
 
   // Allocate a Graphics3d Interface
   this->iface = new Graphics3dIface();
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,6 +76,7 @@ int Graphics3dInterface::ProcessMessage(QueuePointer &/*respQueue*/,
 {
   int result = -1;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // COMMAND CLEAR:
@@ -129,6 +138,7 @@ void Graphics3dInterface::Subscribe()
   // Open the interface
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -145,5 +155,6 @@ void Graphics3dInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void Graphics3dInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

@@ -29,6 +29,11 @@
 
 #include "GazeboInterface.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
 /// \addtogroup player_iface 
@@ -87,6 +92,7 @@ class SimulationInterface : public GazeboInterface
   private: player_simulation_pose3d_req_t pose3dReq;
 
   private: player_simulation_pose2d_req_t pose2dReq;
+  private: static boost::recursive_mutex *mutex;
 };
 
   /// \} 

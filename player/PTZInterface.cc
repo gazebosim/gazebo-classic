@@ -35,6 +35,7 @@ PLAYER_PTZ_REQ_GEOM
 */
 
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -42,6 +43,8 @@ PLAYER_PTZ_REQ_GEOM
 #include "PTZInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *PTZInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -58,6 +61,9 @@ PTZInterface::PTZInterface(player_devaddr_t addr,
   this->iface = new PTZIface();
 
   this->datatime = -1;
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,6 +79,7 @@ PTZInterface::~PTZInterface()
 int PTZInterface::ProcessMessage(QueuePointer &respQueue,
                                  player_msghdr_t *hdr, void *data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
                             PLAYER_PTZ_CMD_STATE, this->device_addr))
   {
@@ -155,6 +162,7 @@ void PTZInterface::Update()
   player_ptz_data_t data;
   struct timeval ts;
 
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
@@ -188,6 +196,7 @@ void PTZInterface::Subscribe()
 {
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -203,5 +212,6 @@ void PTZInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void PTZInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }

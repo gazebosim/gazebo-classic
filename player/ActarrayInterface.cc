@@ -26,6 +26,7 @@
 
 
 #include <math.h>
+#include <boost/thread/recursive_mutex.hpp>
 
 #include "GazeboError.hh"
 #include "gazebo.h"
@@ -33,6 +34,8 @@
 #include "ActarrayInterface.hh"
 
 using namespace gazebo;
+
+boost::recursive_mutex *ActarrayInterface::mutex = NULL;
 
 //
 // The data for the interface (gz_actarray_data_t in gazebo.h) contains information about each joint
@@ -63,6 +66,9 @@ ActarrayInterface::ActarrayInterface(player_devaddr_t addr,
   memset(&this->actData, 0, sizeof(this->actData));
 
   this->datatime = -1;
+
+  if (this->mutex == NULL)
+    this->mutex = new boost::recursive_mutex();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,6 +88,8 @@ ActarrayInterface::~ActarrayInterface()
 int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
                                       player_msghdr_t *hdr, void *data)
 {
+
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
                             PLAYER_ACTARRAY_CMD_POS, this->device_addr))
   {
@@ -256,6 +264,7 @@ int ActarrayInterface::ProcessMessage(QueuePointer &respQueue,
 // called from GazeboDriver::Update
 void ActarrayInterface::Update()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Lock(1);
 
   // Only Update when new data is present
@@ -309,6 +318,7 @@ void ActarrayInterface::Subscribe()
 {
   try
   {
+    boost::recursive_mutex::scoped_lock lock(*this->mutex);
     this->iface->Open(GazeboClient::client, this->gz_id);
   }
   catch (std::string e)
@@ -324,5 +334,6 @@ void ActarrayInterface::Subscribe()
 // Close a SHM interface. This is called from GazeboDriver::Unsubscribe
 void ActarrayInterface::Unsubscribe()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->iface->Close();
 }
