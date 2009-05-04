@@ -177,7 +177,8 @@ def Config(env, packages):
       try:
         if not check:
           print "Checking for "+key+"...",
-        pkgcfg = "PKG_CONFIG_PATH="+os.environ["PKG_CONFIG_PATH"]+" "+pkgcfg;
+        if os.environ.has_key("PKG_CONFIG_PATH"):
+          pkgcfg = "PKG_CONFIG_PATH="+os.environ["PKG_CONFIG_PATH"]+" "+pkgcfg;
         env.ParseConfig(pkgcfg)
         if not check:
           print 'yes'
