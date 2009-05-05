@@ -85,7 +85,6 @@ SET (headers Entity.hh
 
 APPEND_TO_SERVER_SOURCES(${sources})
 
-INCLUDE_DIRECTORIES( ${gazeboserver_include_dirs} )
 
 ADD_EXECUTABLE(gazebo ${gazeboserver_sources} main.cc)
 
