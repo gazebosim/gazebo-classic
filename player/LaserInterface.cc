@@ -28,10 +28,10 @@
 */
 
 #include <math.h>
+#include <iostream>
 #include <libplayerxdr/playerxdr.h>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"

@@ -29,10 +29,10 @@ PLAYER_LASER_REQ_GET_GEOM
 */
 
 #include <math.h>
+#include <iostream>
 #include <libplayerxdr/playerxdr.h>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "IRInterface.hh"

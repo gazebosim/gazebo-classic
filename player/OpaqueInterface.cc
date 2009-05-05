@@ -34,9 +34,9 @@ Do we need these?
 - PLAYER_OPAQUE_REQ_DATA
 */
 #include <math.h>
+#include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "OpaqueInterface.hh"

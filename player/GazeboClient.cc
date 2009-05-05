@@ -26,9 +26,9 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <iostream>
 #include <libplayercore/playercore.h>
 
-#include "GazeboError.hh"
 #include "GazeboTime.hh"
 #include "GazeboClient.hh"
 

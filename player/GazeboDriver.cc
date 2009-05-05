@@ -25,9 +25,8 @@
  */
 
 #include <stdlib.h>
+#include <iostream>
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
 #include "GazeboInterface.hh"
 #include "SimulationInterface.hh"
 #include "Position2dInterface.hh"
@@ -90,14 +89,7 @@ extern "C"
 {
   int player_driver_init(DriverTable* table)
   {
-    try
-    {
-      GazeboDriver_Register(table);
-    }
-    catch (GazeboError e)
-    {
-      gzmsg(-1) << "Error: " << e << "\n";
-    }
+    GazeboDriver_Register(table);
     return(0);
   }
 }
@@ -114,13 +106,9 @@ GazeboDriver::GazeboDriver(ConfigFile* cf, int section)
   this->deviceCount = 0;
   this->deviceMaxCount = 0;
 
-  try
+  if (this->LoadDevices(cf,section) < 0)
   {
-    this->LoadDevices(cf,section);
-  }
-  catch (GazeboError e)
-  {
-    gzmsg(-1) << "Error: " << e << "\n";
+    std::cout << "Error: Loading devices\n";
   }
 
 }

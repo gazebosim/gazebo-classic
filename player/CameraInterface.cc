@@ -25,10 +25,10 @@
  */
 
 #include <math.h>
+#include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
-#include "GazeboError.hh"
 #include "GazeboDriver.hh"
 #include "CameraInterface.hh"
 

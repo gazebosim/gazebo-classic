@@ -30,9 +30,9 @@ PLAYER_POSITION3D_RESET_ODOM
 */
 
 #include <math.h>
+#include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "GazeboError.hh"
 #include "gazebo.h"
 #include "GazeboDriver.hh"
 #include "Position3dInterface.hh"

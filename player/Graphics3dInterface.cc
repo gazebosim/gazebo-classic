@@ -31,10 +31,10 @@
 - PLAYER_GRAPHICS3D_CMD_DRAW
 */
 
+#include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
-#include "GazeboError.hh"
 #include "GazeboDriver.hh"
 #include "Graphics3dInterface.hh"
 
