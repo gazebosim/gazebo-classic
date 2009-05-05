@@ -96,4 +96,9 @@ TARGET_LINK_LIBRARIES( gazebo ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${Boos
 INSTALL (TARGETS gazebo DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
 
+########################################
+# Make the gazebo rc file
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc @ONLY)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION ~/)
+
 GAZEBOSERVER_RESET_LISTS()

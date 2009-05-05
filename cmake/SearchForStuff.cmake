@@ -5,6 +5,7 @@ INCLUDE (FindBoost)
 INCLUDE (FindPkgConfig)
 
 SET (INCLUDE_AV ON CACHE BOOL "Include audio/video functionality" FORCE)
+SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
 ########################################
 # Find packages
@@ -13,6 +14,8 @@ IF (PKG_CONFIG_FOUND)
   IF (NOT OGRE_FOUND)
     MESSAGE (SEND_ERROR "\nError: Ogre3d and development files not found. See the following website: http://www.orge3d.org")
   ELSE (NOT OGRE_FOUND)
+ 
+    SET (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
                           ${OGRE_INCLUDE_DIRS})
     APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
@@ -112,15 +115,17 @@ ENDIF (NOT Boost_FOUND)
 
 ########################################
 # Find avformat and avcodec
-SET (libavformat_search_path 
-  /usr/include /usr/include/libavformat /usr/local/include 
-  /usr/local/include/libavformat
-)
-
-SET (libavcodec_search_path 
-  /usr/include /usr/include/libavcodec /usr/local/include 
-  /usr/local/include/libavcodec
-)
-
-FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
-FIND_PATH(LIBAVCODEC_PATH avcodec.h ${libavcodec_search_path})
+IF (INCLUDE_AV)
+  SET (libavformat_search_path 
+    /usr/include /usr/include/libavformat /usr/local/include 
+    /usr/local/include/libavformat
+  )
+  
+  SET (libavcodec_search_path 
+    /usr/include /usr/include/libavcodec /usr/local/include 
+    /usr/local/include/libavcodec
+  )
+  
+  FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
+  FIND_PATH(LIBAVCODEC_PATH avcodec.h ${libavcodec_search_path})
+ENDIF (INCLUDE_AV)

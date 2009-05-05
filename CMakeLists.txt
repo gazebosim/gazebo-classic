@@ -23,7 +23,7 @@ SET (OGRE_VERSION 1.6.0 CACHE INTERNAL "Ogre Version Requirement")
 SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE Version Requirement")
 
 SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
-set (gazebo_cflags "-ggdb -g2 -Wall -fPIC" CACHE INTERNAL "Gazebo CFlags")
+SET (gazebo_cflags "-ggdb -g2 -Wall -fPIC" CACHE INTERNAL "Gazebo CFlags")
 
 ADD_SUBDIRECTORY(libgazebo)
 ADD_SUBDIRECTORY(server)
