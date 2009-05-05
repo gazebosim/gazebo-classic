@@ -1,4 +1,3 @@
-
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6 FATAL_ERROR )
 
 IF(COMMAND CMAKE_POLICY)
@@ -17,15 +16,31 @@ SET (gazeboserver_include_dirs_desc "List of server include directories"
 SET (gazeboserver_link_dirs_desc "List of server link directories" 
      CACHE INTERNAL "Link dirs description" FORCE)
 SET (gazeboserver_link_libs_desc "List of server link libraries" 
-     CACHE INTERNAL "Link libs" FORCE)
+     CACHE INTERNAL "Link libs description" FORCE)
+SET (gazeboserver_cflags_desc "List of server cflags" 
+     CACHE INTERNAL "Server cflags description" FORCE)
 
 SET (OGRE_VERSION 1.6.0 CACHE INTERNAL "Ogre Version Requirement")
 SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE Version Requirement")
 
-SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
-SET (gazebo_cflags "-ggdb -g2 -Wall -fPIC" CACHE INTERNAL "Gazebo CFlags")
+SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
+     "Location of CMake scripts")
+
+MESSAGE (STATUS "====== Finding 3rd Party Packages ======")
+INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
+MESSAGE (STATUS "----------------------------------------")
+
+
 
 ADD_SUBDIRECTORY(libgazebo)
 ADD_SUBDIRECTORY(server)
-#ADD_SUBDIRECTORY(player)
+
+IF (INCLUDE_PLAYER)
+  ADD_SUBDIRECTORY(player)
+ENDIF (INCLUDE_PLAYER)
+
+IF (INCLUDE_WEBGAZEBO)
+  Add_SUBDIRECTORY(webgazebo)
+ENDIF (INCLUDE_WEBGAZEBO)
+
 

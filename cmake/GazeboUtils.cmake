@@ -21,6 +21,15 @@ MACRO (APPEND_TO_SERVER_SOURCES)
 ENDMACRO (APPEND_TO_SERVER_SOURCES)
 
 ###############################################################################
+# Macro to turn a list into a string (why doesn't CMake have this built-in?)
+MACRO (LIST_TO_STRING _string _list)
+    SET (${_string})
+    FOREACH (_item ${_list})
+        SET (${_string} "${${_string}} ${_item}")
+    ENDFOREACH (_item)
+ENDMACRO (LIST_TO_STRING)
+
+###############################################################################
 # Reset lists
 MACRO (GAZEBOSERVER_RESET_LISTS)
   SET (gazeboserver_sources "" CACHE INTERNAL 
@@ -31,4 +40,6 @@ MACRO (GAZEBOSERVER_RESET_LISTS)
        ${gazeboserver_link_dirs_desc} FORCE)
   SET (gazeboserver_link_libs "" CACHE INTERNAL 
        ${gazeboserver_link_libs_desc} FORCE)
+  SET (gazeboserver_cflags "" CACHE INTERNAL 
+       ${gazeboserver_cflags_desc} FORCE)
 ENDMACRO (GAZEBOSERVER_RESET_LISTS)

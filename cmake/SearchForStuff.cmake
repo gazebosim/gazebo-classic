@@ -5,6 +5,7 @@ INCLUDE (FindBoost)
 INCLUDE (FindPkgConfig)
 
 SET (INCLUDE_AV ON CACHE BOOL "Include audio/video functionality" FORCE)
+SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
 ########################################
@@ -16,48 +17,72 @@ IF (PKG_CONFIG_FOUND)
   ELSE (NOT OGRE_FOUND)
  
     SET (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
                           ${OGRE_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
                           ${OGRE_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${OGRE_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${OGRE_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${OGRE_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${OGRE_LIBRARIES})
   ENDIF (NOT OGRE_FOUND)
 
   pkg_check_modules(ODE ode>=${ODE_VERSION})
   IF (NOT ODE_FOUND)
     MESSAGE (SEND_ERROR "\nError: ODE and development files not found. See the following website: http://www.ode.org")
   ELSE (NOT ODE_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
                           ${ODE_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
                           ${ODE_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${ODE_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${ODE_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ODE_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ODE_LIBRARIES})
   ENDIF (NOT ODE_FOUND)
 
   pkg_check_modules(XML libxml-2.0)
   IF (NOT XML_FOUND)
     MESSAGE (SEND_ERROR "\nError: libxml2 and development files not found. See the following website: http://www.xmlsoft.org")
   ELSE (NOT XML_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
                           ${XML_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
                           ${XML_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${XML_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${XML_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${XML_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${XML_LIBRARIES})
   ENDIF (NOT XML_FOUND)
 
   pkg_check_modules(XFT xft)
   IF (NOT XFT_FOUND)
     MESSAGE (SEND_ERROR "\nError: XFT and development files not found. See the following website: http://www.fontconfig.org")
   ELSE (NOT XFT_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
                           ${XFT_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
                           ${XFT_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${XFT_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${XFT_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${XFT_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${XFT_LIBRARIES})
   ENDIF (NOT XFT_FOUND)
 
   pkg_check_modules(OAL openal)
@@ -65,12 +90,20 @@ IF (PKG_CONFIG_FOUND)
     SET (INCLUDE_AV OFF CACHE BOOL "Include audio/video functionality" FORCE)
     MESSAGE (STATUS "Warning: Openal and development files not found. Audio capabilities will be disabled. See the following website: http://connect.creativelabs.com/openal/default.aspx")
   ELSE (NOT OAL_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
+                          ${gazeboserver_cflags_desc} "-DHAVE_OPENAL" )
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
                           ${OAL_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
                           ${OAL_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${OAL_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${OAL_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${OAL_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${OAL_LIBRARIES})
   ENDIF (NOT OAL_FOUND)
 
   pkg_check_modules(AVF libavformat)
@@ -78,12 +111,18 @@ IF (PKG_CONFIG_FOUND)
     SET (INCLUDE_AV OFF CACHE BOOL "Include audio/video functionality" FORCE)
     MESSAGE (STATUS "Warning: libavformat and development files not found. Audio capabilities will be disabled.")
   ELSE (NOT AVF_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
                           ${AVF_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
                           ${AVF_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${AVF_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${AVF_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${AVF_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${AVF_LIBRARIES})
   ENDIF (NOT AVF_FOUND)
 
   pkg_check_modules(AVC libavcodec)
@@ -91,13 +130,41 @@ IF (PKG_CONFIG_FOUND)
     SET (INCLUDE_AV OFF CACHE BOOL "Include audio/video functionality" FORCE)
     MESSAGE (STATUS "Warning: libavcodec and development files not found. Audio capabilities will be disabled.")
   ELSE (NOT AVC_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs "Include dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
                           ${AVC_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs "Link dirs" 
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
                           ${AVC_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${AVC_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs "Link libs" ${AVC_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${AVC_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${AVC_LIBRARIES})
   ENDIF (NOT AVC_FOUND)
+
+  pkg_check_modules(PLAYER playerc++)
+  IF (NOT PLAYER_FOUND)
+    SET (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
+    MESSAGE (STATUS "Warning: Player not found. The gazebo plugin for player will not be built. See the following website: http://playerstage.sourceforge.net")
+  ELSE (NOT PLAYER_FOUND)
+    SET (INCLUDE_PLAYER ON CACHE BOOL "Build gazebo plugin for player" FORCE)
+    SET (PLAYER_INCLUDE_DIRS ${PLAYER_INCLUDE_DIRS} CACHE INTERNAL
+         "Player include directory")
+    SET (PLAYER_LINK_DIRS ${PLAYER_LINK_DIRS} CACHE INTERNAL
+         "Player link directory")
+    SET (PLAYER_LINK_LIBS ${PLAYER_LIBRARIES} CACHE INTERNAL
+         "Player libraries")
+  ENDIF (NOT PLAYER_FOUND)
+
+  pkg_check_modules(WEBSIM websim)
+  IF (NOT WEBSIM_FOUND)
+    SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Build webgazebo" FORCE)
+    MESSAGE (STATUS "Warning: Websim not found. Webgazebo will not be built")
+  ELSE (NOT WEBSIM_FOUND)
+  ENDIF (NOT WEBSIM_FOUND)
+
 
 ELSE (PKG_CONFIG_FOUND)
   MESSAGE (FATAL_ERROR "\nError: pkg-config not found")
@@ -127,5 +194,47 @@ IF (INCLUDE_AV)
   )
   
   FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
+  IF (NOT LIBAVFORMAT_PATH)
+    MESSAGE (STATUS "Looking for avformat.h - not found")
+    MESSAGE (STATUS "  Warning: audio/video will not be built")
+  ELSE (NOT LIBAVFORMAT_PATH)
+    MESSAGE (STATUS "Looking for avformat.h - found")
+  ENDIF (NOT LIBAVFORMAT_PATH)
+
   FIND_PATH(LIBAVCODEC_PATH avcodec.h ${libavcodec_search_path})
+  IF (NOT LIBAVCODEC_PATH)
+    MESSAGE (STATUS "Looking for avcodec.h - not found")
+    MESSAGE (STATUS "  Warning: audio/video will not be built")
+  ELSE (NOT LIBAVCODEC_PATH)
+    MESSAGE (STATUS "Looking for avcodec.h - found")
+  ENDIF (NOT LIBAVCODEC_PATH)
+
 ENDIF (INCLUDE_AV)
+
+
+########################################
+# Find libevent
+SET (libevent_search_path /usr/include /usr/local/include)
+FIND_PATH(LIBEVENT_PATH event.h ${libevent_search_path})
+IF (NOT LIBEVENT_PATH)
+  MESSAGE (STATUS "Looking for event.h - not found")
+  MESSAGE (STATUS "  Warning: webgazebo will not be built")
+  SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Found libevent" FORCE)
+ELSE (NOT LIBEVENT_PATH)
+  MESSAGE (STATUS "Looking for event.h - found")
+ENDIF (NOT LIBEVENT_PATH)
+
+########################################
+# Find yaml
+SET (libyaml_search_path /usr/include /usr/local/include)
+FIND_PATH(LIBYAML_PATH yaml.h ${libyaml_search_path})
+IF (NOT LIBYAML_PATH)
+  MESSAGE (STATUS "Looking for yaml.h - not found")
+  MESSAGE (STATUS "  Warning: webgazebo will not be built")
+  SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Found libevent" FORCE)
+ELSE (NOT LIBYAML_PATH)
+  MESSAGE (STATUS "Looking for yaml.h - found")
+ENDIF (NOT LIBYAML_PATH)
+
+## TODO: Finish webgazebo....needs list for directories and libs. Add in glib
+
