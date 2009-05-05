@@ -32,7 +32,6 @@ INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
 MESSAGE (STATUS "----------------------------------------")
 
 
-
 ADD_SUBDIRECTORY(libgazebo)
 ADD_SUBDIRECTORY(server)
 ADD_SUBDIRECTORY(worlds)

@@ -1,0 +1,2 @@
+ADD_SUBDIRECTORY(pioneer2at/Pioneer2at)
+ADD_SUBDIRECTORY(pioneer2dx/Pioneer2dx)

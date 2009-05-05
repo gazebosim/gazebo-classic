@@ -1,0 +1,21 @@
+ADD_SUBDIRECTORY(bandit)
+ADD_SUBDIRECTORY(blender)
+ADD_SUBDIRECTORY(epuck)
+ADD_SUBDIRECTORY(PioneerArm)
+ADD_SUBDIRECTORY(sonyvid30)
+
+SET (files column.mesh
+           geosphere4500.mesh
+           geosphere8000.mesh
+           kitchen.mesh
+           knot.mesh
+           razor.mesh
+           robot.mesh
+           sicklms200.mesh
+           sphere.mesh
+           unitpyramid.mesh
+           wheel.mesh
+           WoodPallet.mesh
+)
+
+INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models)

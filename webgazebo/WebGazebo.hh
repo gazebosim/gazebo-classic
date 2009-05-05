@@ -60,10 +60,14 @@ class WebGazebo : public websim::WebSim
                              const websim::Acceleration& a,
                              std::string& error);
     virtual bool GetModelPVA(const std::string& name, 
+                             websim::Time &t,
                              websim::Pose& p,
                              websim::Velocity& v,
                              websim::Acceleration& a,
                              std::string& error);
+
+  /** Get the current simulation time */
+  virtual websim::Time GetTime();
 
   private:
     double sq_dist_tol, sq_ang_tol;

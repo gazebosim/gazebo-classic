@@ -88,11 +88,11 @@ APPEND_TO_SERVER_SOURCES(${sources})
 
 ADD_EXECUTABLE(gazebo ${gazeboserver_sources} main.cc)
 
-APPEND_TO_CACHED_LIST(gazeboserver_cflags ${gazeboserver_cflags_desc} "-fPIC;-WAll")
+APPEND_TO_CACHED_LIST(gazeboserver_cflags ${gazeboserver_cflags_desc} "-fPIC;-Wall")
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
 
 SET_SOURCE_FILES_PROPERTIES(${gazeboserver_sources} PROPERTIES COMPILE_FLAGS ${GAZEBO_CFLAGS})
-TARGET_LINK_LIBRARIES( gazebo ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${Boost_LIBRARIES} gazeboshm)
+TARGET_LINK_LIBRARIES( gazebo gazeboshm ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${Boost_LIBRARIES})
 
 INSTALL (TARGETS gazebo DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)

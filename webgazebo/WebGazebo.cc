@@ -35,7 +35,7 @@
 #include <time.h>
 #include <string.h>
 
-#include "../server/Quatern.hh"
+#include "Quatern.hh"
 
 // TODO:
 //   - make ghost models not collide, fall, etc.
@@ -43,7 +43,7 @@
 WebGazebo::WebGazebo(const std::string& fedfile,
                      const std::string& host, unsigned short port,
                      double dtol, double atol) :
-        websim::WebSim(fedfile, host, port), 
+        websim::WebSim(host, port), 
         sq_dist_tol(dtol*dtol), sq_ang_tol(atol*atol)
 {
   // Hook up to Gazebo
@@ -69,6 +69,7 @@ WebGazebo::~WebGazebo()
 
 bool
 WebGazebo::GetModelPVA(const std::string& name, 
+                       websim::Time &t,
                        websim::Pose& p,
                        websim::Velocity& v,
                        websim::Acceleration& a,
@@ -107,6 +108,19 @@ WebGazebo::GetModelPVA(const std::string& name,
 
   return true;
 }
+
+/** Get the current simulation time */
+websim::Time 
+WebGazebo::GetTime()
+{
+  websim::Time t;
+
+  t.sec = (unsigned long)this->simIface->data->simTime;
+  t.usec = (this->simIface->data->simTime - t.sec) * 1e6;
+
+  return t;
+}
+
 
 bool
 WebGazebo::SetModelPVA(const std::string& name, 

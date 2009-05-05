@@ -163,6 +163,12 @@ IF (PKG_CONFIG_FOUND)
     SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Build webgazebo" FORCE)
     MESSAGE (STATUS "Warning: Websim not found. Webgazebo will not be built")
   ELSE (NOT WEBSIM_FOUND)
+    SET (WEBSIM_INCLUDE_DIRS ${WEBSIM_INCLUDE_DIRS} CACHE INTERNAL
+         "Websim include directory")
+    SET (WEBSIM_LINK_DIRS ${WEBSIM_LINK_DIRS} CACHE INTERNAL 
+         "Websim link directory")
+    SET (WEBSIM_LINK_LIBS ${WEBSIM_LIBRARIES} CACHE INTERNAL
+         "Websim libraries")
   ENDIF (NOT WEBSIM_FOUND)
 
 ELSE (PKG_CONFIG_FOUND)
@@ -234,6 +240,3 @@ IF (NOT LIBYAML_PATH)
 ELSE (NOT LIBYAML_PATH)
   MESSAGE (STATUS "Looking for yaml.h - found")
 ENDIF (NOT LIBYAML_PATH)
-
-## TODO: Finish webgazebo....needs list for directories and libs. Add in glib
-

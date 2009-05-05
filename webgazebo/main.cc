@@ -54,7 +54,7 @@ main(int argc, char** argv)
 
   for(;;)
   {
-    wg.Update();
+    //wg.Update();
     wg.Go(1.0);
   }
 
