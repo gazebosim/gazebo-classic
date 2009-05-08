@@ -27,10 +27,41 @@ SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE Version Requirement")
 SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")
 
+# Build type cflags
+SET (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -fPIC -Wall " CACHE INTERNAL "C Flags for release" FORCE)
+SET (CMAKE_C_FLAGS_DEBUG " -ggdb -fPIC " CACHE INTERNAL "C Flags fro debug" FORCE)
+SET (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
+
+# Build type link flags
+SET (CMAKE_LINK_FLAGS_RELEASE "" CACHE INTERNAL "Link flags fro release" FORCE)
+SET (CMAKE_LINK_FLAGS_DEBUG "" CACHE INTERNAL "Link flags for debug" FORCE)
+SET (CMAKE_LINK_FLAGS_PROFILE "" CACHE INTERNAL "Link flags for profile" FORCE)
+
+FIND_LIBRARY(PROFILER "profiler")
+IF (PROFILER)
+  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
+       CACHE INTERNAL "Link flags for profile" FORCE)
+ENDIF (PROFILER)
+
+FIND_LIBRARY(TCMALLOC "tcmalloc")
+IF (TCMALLOC)
+  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
+       CACHE INTERNAL "Link flags for profile" FORCE)
+ENDIF (TCMALLOC)
+
+IF (NOT CMAKE_BUILD_TYPE)
+  SET (CMAKE_BUILD_TYPE "release" CACHE STRING 
+    "Choose the type of build, options are: debug release profile" FORCE)
+ENDIF (NOT CMAKE_BUILD_TYPE)
+
+STRING(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+
+MESSAGE (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+
+
 MESSAGE (STATUS "====== Finding 3rd Party Packages ======")
 INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
 MESSAGE (STATUS "----------------------------------------")
-
 
 ADD_SUBDIRECTORY(libgazebo)
 ADD_SUBDIRECTORY(server)
