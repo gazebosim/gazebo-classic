@@ -1,7 +1,6 @@
 INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 INCLUDE (FindFLTK)
-INCLUDE (FindBoost)
 INCLUDE (FindPkgConfig)
 
 SET (INCLUDE_AV ON CACHE BOOL "Include audio/video functionality" FORCE)
@@ -178,12 +177,33 @@ ENDIF (PKG_CONFIG_FOUND)
 
 
 ########################################
-# Find Boost
-FIND_PACKAGE( Boost 1.34.1 COMPONENTS thread signals)
-IF (NOT Boost_FOUND)
-  MESSAGE (FATAL_ERROR "Boost thread and signals not found")
-  SET (BUILD_GAZEBO OFF CACHE BOOL "Build Gazebo" FORCE)
-ENDIF (NOT Boost_FOUND)
+# Find Boost, if not specified manually
+IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
+  MESSAGE(STATUS "HERE")
+  INCLUDE (FindBoost)
+  FIND_PACKAGE( Boost 1.34.1 COMPONENTS thread signals)
+  IF (NOT Boost_FOUND)
+    MESSAGE (FATAL_ERROR "Boost thread and signals not found")
+    SET (BUILD_GAZEBO OFF CACHE BOOL "Build Gazebo" FORCE)
+  ENDIF (NOT Boost_FOUND)
+
+
+  LIST_TO_STRING(tmp "${Boost_INCLUDE_DIRS}")
+  SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
+    "Boost include paths. Use this to override automatic detection." FORCE)
+
+  LIST_TO_STRING(tmp "${Boost_LIBRARY_DIRS}")
+  SET (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING 
+    "Boost library paths. Use this to override automatic detection." FORCE)
+
+  LIST_TO_STRING(tmp "${Boost_LIBRARIES}")
+  SET (boost_libraries ${Boost_LIBRARIES} CACHE STRING 
+    "Boost libraries. Use this to override automatic detection." FORCE)
+ENDIF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
+
+MESSAGE (STATUS "Boost IDIRS ${boost_include_dirs}")
+MESSAGE (STATUS "Boost LDIRS ${boost_library_dirs}")
+MESSAGE (STATUS "Boost LIBS ${boost_libraries}")
 
 ########################################
 # Find avformat and avcodec
@@ -240,3 +260,21 @@ IF (NOT LIBYAML_PATH)
 ELSE (NOT LIBYAML_PATH)
   MESSAGE (STATUS "Looking for yaml.h - found")
 ENDIF (NOT LIBYAML_PATH)
+
+########################################
+# Find profiler library, optional
+FIND_LIBRARY(PROFILER "profiler")
+IF (PROFILER)
+  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
+       CACHE INTERNAL "Link flags for profile" FORCE)
+ENDIF (PROFILER)
+
+########################################
+# Find tcmalloc library, optional
+FIND_LIBRARY(TCMALLOC "tcmalloc")
+IF (TCMALLOC)
+  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -ltcmalloc" 
+       CACHE INTERNAL "Link flags for profile" FORCE)
+ENDIF (TCMALLOC)
+
+
