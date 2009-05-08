@@ -1,5 +1,14 @@
 
 ################################################################################
+#APPEND_TO_CACHED_STRING(_string _cacheDesc [items...])
+# Appends items to a cached list.
+MACRO (APPEND_TO_CACHED_STRING _string _cacheDesc)
+  FOREACH (newItem ${ARGN})
+    SET (${_string} "${${_string}} ${newItem}" CACHE INTERNAL ${_cacheDesc} FORCE)
+  ENDFOREACH (newItem ${ARGN})
+ENDMACRO (APPEND_TO_CACHED_STRING)
+                 
+################################################################################
 # APPEND_TO_CACHED_LIST (_list _cacheDesc [items...]
 # Appends items to a cached list.
 MACRO (APPEND_TO_CACHED_LIST _list _cacheDesc)

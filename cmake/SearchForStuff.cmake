@@ -179,7 +179,6 @@ ENDIF (PKG_CONFIG_FOUND)
 ########################################
 # Find Boost, if not specified manually
 IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
-  MESSAGE(STATUS "HERE")
   INCLUDE (FindBoost)
   FIND_PACKAGE( Boost 1.34.1 COMPONENTS thread signals)
   IF (NOT Boost_FOUND)
@@ -187,23 +186,24 @@ IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
     SET (BUILD_GAZEBO OFF CACHE BOOL "Build Gazebo" FORCE)
   ENDIF (NOT Boost_FOUND)
 
-
   LIST_TO_STRING(tmp "${Boost_INCLUDE_DIRS}")
   SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
     "Boost include paths. Use this to override automatic detection." FORCE)
 
-  LIST_TO_STRING(tmp "${Boost_LIBRARY_DIRS}")
-  SET (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING 
-    "Boost library paths. Use this to override automatic detection." FORCE)
+  FOREACH (dir ${Boost_LIBRARY_DIRS})
+    APPEND_TO_CACHED_STRING(boost_link_flags 
+      "Boost link flags. Use this to override automatic detection." "-L${dir}" )
+  ENDFOREACH (dir Boost_LIBRARY_DIRS)
 
-  LIST_TO_STRING(tmp "${Boost_LIBRARIES}")
-  SET (boost_libraries ${Boost_LIBRARIES} CACHE STRING 
-    "Boost libraries. Use this to override automatic detection." FORCE)
+  FOREACH (lib ${Boost_LIBRARIES})
+    APPEND_TO_CACHED_STRING (boost_link_flags 
+      "Boost link flags. Use this to override automatic detection." "-l${lib}" )
+  ENDFOREACH (lib Boost_LIBRARIES)
+
 ENDIF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
 
 MESSAGE (STATUS "Boost IDIRS ${boost_include_dirs}")
-MESSAGE (STATUS "Boost LDIRS ${boost_library_dirs}")
-MESSAGE (STATUS "Boost LIBS ${boost_libraries}")
+MESSAGE (STATUS "Boost LFLAGS ${boost_link_flags}")
 
 ########################################
 # Find avformat and avcodec
