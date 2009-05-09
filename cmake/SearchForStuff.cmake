@@ -180,30 +180,34 @@ ENDIF (PKG_CONFIG_FOUND)
 # Find Boost, if not specified manually
 IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   INCLUDE (FindBoost)
-  FIND_PACKAGE( Boost 1.34.1 COMPONENTS thread signals)
+  SET(Boost_ADDITIONAL_VERSIONS "1.37.0")
+  FIND_PACKAGE( Boost 1.37.0 COMPONENTS thread signals)
   IF (NOT Boost_FOUND)
     MESSAGE (FATAL_ERROR "Boost thread and signals not found")
     SET (BUILD_GAZEBO OFF CACHE BOOL "Build Gazebo" FORCE)
   ENDIF (NOT Boost_FOUND)
 
-  LIST_TO_STRING(tmp "${Boost_INCLUDE_DIRS}")
   SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
     "Boost include paths. Use this to override automatic detection." FORCE)
 
-  FOREACH (dir ${Boost_LIBRARY_DIRS})
-    APPEND_TO_CACHED_STRING(boost_link_flags 
-      "Boost link flags. Use this to override automatic detection." "-L${dir}" )
-  ENDFOREACH (dir Boost_LIBRARY_DIRS)
+  SET (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
+    "Boost link dirs. Use this to override automatic detection." FORCE)
 
-  FOREACH (lib ${Boost_LIBRARIES})
-    APPEND_TO_CACHED_STRING (boost_link_flags 
-      "Boost link flags. Use this to override automatic detection." "-l${lib}" )
-  ENDFOREACH (lib Boost_LIBRARIES)
+  LIST_TO_STRING(tmp "${Boost_LIBRARIES}")
+  SET (boost_libraries ${tmp} CACHE STRING 
+    "Boost libraries. Use this to override automatic detection." FORCE )
 
-ENDIF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
+ENDIF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries ) 
 
-MESSAGE (STATUS "Boost IDIRS ${boost_include_dirs}")
-MESSAGE (STATUS "Boost LFLAGS ${boost_link_flags}")
+STRING(REGEX REPLACE "(^| )-L" " " boost_library_dirs "${boost_library_dirs}")
+STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
+STRING(STRIP ${boost_library_dirs} boost_library_dirs)
+STRING(STRIP ${boost_libraries} boost_libraries)
+STRING(REGEX REPLACE " " ";" boost_libraries "${boost_libraries}")
+
+MESSAGE (STATUS "Boost Include Path: ${boost_include_dirs}")
+MESSAGE (STATUS "Boost Library Path: ${boost_library_dirs}")
+MESSAGE (STATUS "Boost Libraries: ${boost_libraries}")
 
 ########################################
 # Find avformat and avcodec

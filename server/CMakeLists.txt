@@ -26,9 +26,7 @@ INCLUDE_DIRECTORIES( .
 ########################################
 # All the library search paths
 LINK_DIRECTORIES(  
-  ${CMAKE_SOURCE_DIR}/libgazebo 
-  ${boost_library_dirs}
-  ${gazeboserver_link_dirs}
+ ${CMAKE_SOURCE_DIR}/libgazebo ${boost_library_dirs} ${gazeboserver_link_dirs} 
 )
 
 ########################################
@@ -85,22 +83,18 @@ SET (headers Entity.hh
 
 APPEND_TO_SERVER_SOURCES(${sources})
 
-
 ADD_EXECUTABLE(gazebo ${gazeboserver_sources} main.cc)
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
 
 SET_SOURCE_FILES_PROPERTIES(${gazeboserver_sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
 
-# Construct the aggregate link flags
-APPEND_TO_CACHED_STRING(GAZEBO_LFLAGS "gazebo link flags" ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-APPEND_TO_CACHED_STRING(GAZEBO_LFLAGS "gazebo link flags" ${boost_link_flags})
-MESSAGE (STATUS "GAZEBO LINK FLAGS|${GAZEBO_LFLAGS}|")
+IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  SET_SOURCE_FILES_PROPERTIES(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-SET_SOURCE_FILES_PROPERTIES(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
-                            ${GAZEBO_LFLAGS})
-
-TARGET_LINK_LIBRARIES( gazebo gazeboshm ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${boost_libraries})
+TARGET_LINK_LIBRARIES( gazebo ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${boost_libraries} gazeboshm )
 
 INSTALL (TARGETS gazebo DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)

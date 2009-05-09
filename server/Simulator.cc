@@ -317,7 +317,8 @@ void Simulator::Fini( )
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
 {
-  double currTime, lastTime;
+  double currTime = 0;
+  double lastTime = 0;
   double freq = 30.0;
 
   this->physicsThread = new boost::thread( boost::bind(&Simulator::PhysicsLoop, this));

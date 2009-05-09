@@ -28,10 +28,8 @@ SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH
      "Location of CMake scripts")
 
 SET (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
-SET (boost_link_flags "" CACHE STRING "Boost link flags. Use this to override automatic detection.")
-#SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
-#SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
-
+SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
+SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
 
 #####################################
 # Build type cflags

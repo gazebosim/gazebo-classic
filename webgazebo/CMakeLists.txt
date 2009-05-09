@@ -1,7 +1,8 @@
 SET (sources WebGazebo.cc ../server/Quatern.cc ../server/Vector3.cc ../server/Angle.cc)
 
 INCLUDE_DIRECTORIES( .. ../server ${WEBSIM_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/libgazebo )
-LINK_DIRECTORIES( ${WEBSIM_LINK_DIRS} gazeboshm)
+
+LINK_DIRECTORIES( ${WEBSIM_LINK_DIRS} ${boost_library_dirs} gazeboshm)
 
 SET_SOURCE_FILES_PROPERTIES(${sources} PROPERTIES COMPILE_FLAGS 
                             '-DINSTALL_PREFIX="/usr/local/"')

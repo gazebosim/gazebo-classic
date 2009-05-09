@@ -125,8 +125,8 @@ void OgreVisual::Load(XMLConfigNode *node)
 
   std::ostringstream stream;
   Pose3d pose;
-  Vector3 size;
-  Ogre::Vector3 meshSize;
+  Vector3 size(0,0,0);
+  Ogre::Vector3 meshSize(0,0,0);
   Ogre::MovableObject *obj = NULL;
 
   this->xyzP->Load(node);

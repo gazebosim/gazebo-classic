@@ -4,8 +4,9 @@
 # Appends items to a cached list.
 MACRO (APPEND_TO_CACHED_STRING _string _cacheDesc)
   FOREACH (newItem ${ARGN})
-    SET (${_string} "${${_string}} ${newItem}" CACHE INTERNAL ${_cacheDesc} FORCE)
+    SET (${_string} "${${_string}} ${newItem}" CACHE STRING ${_cacheDesc} FORCE)
   ENDFOREACH (newItem ${ARGN})
+  STRING(STRIP ${${_string}} ${_string})
 ENDMACRO (APPEND_TO_CACHED_STRING)
                  
 ################################################################################
@@ -34,8 +35,9 @@ ENDMACRO (APPEND_TO_SERVER_SOURCES)
 MACRO (LIST_TO_STRING _string _list)
     SET (${_string})
     FOREACH (_item ${_list})
-        SET (${_string} "${${_string}} ${_item}")
+      SET (${_string} "${${_string}} ${_item}")
     ENDFOREACH (_item)
+    STRING(STRIP ${${_string}} ${_string})
 ENDMACRO (LIST_TO_STRING)
 
 ###############################################################################

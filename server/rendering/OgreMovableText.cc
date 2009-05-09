@@ -281,7 +281,9 @@ void OgreMovableText::_setupGeometry()
   float len = 0.0f;
 
   // for calculation of AABB
-  Ogre::Vector3 min, max, currPos;
+  Ogre::Vector3 min(0,0,0);
+  Ogre::Vector3 max(0,0,0);
+  Ogre::Vector3 currPos(0,0,0);
 
   unsigned int vertexCount = static_cast<unsigned int>(this->text.size() * 6);
 

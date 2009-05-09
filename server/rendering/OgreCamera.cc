@@ -128,7 +128,8 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
   {
     std::string command;
     command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
-    system(command.c_str());
+    if (system(command.c_str()) < 0)
+      std::cerr << "Error making directory\n";
   }
 
   if (this->hfovP->GetValue() < Angle(0.01) || 
@@ -392,7 +393,8 @@ void OgreCamera::SetSaveFramePathname(const std::string &pathname)
   {
     std::string command;
     command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
-    system(command.c_str());
+    if (system(command.c_str()) <0)
+      std::cerr << "Error making directory\n";
   }
 }
 
@@ -523,7 +525,8 @@ void OgreCamera::SaveFrame()
   {
     std::string command;
     command = "mkdir " + this->savePathnameP->GetValue() + " 2>>/dev/null";
-    system(command.c_str());
+    if (system(command.c_str()) < 0)
+      std::cerr << "Error making directory\n";
   }
 
   // Get access to the buffer and make an image and write it to file

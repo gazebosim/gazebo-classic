@@ -197,7 +197,10 @@ void GLFrameManager::Split(GLFrame *parent, const std::string &type)
   GLFrame *glFrame = NULL;
   unsigned int origWidth = parent->w();
   unsigned int origHeight = parent->h();
-  unsigned int newWidth, newHeight, originX, originY;
+  unsigned int newWidth = 0;
+  unsigned int newHeight = 0;
+  unsigned int originX = 0;
+  unsigned int originY = 0;
   int windowCount = this->children();
 
   if (type == "horz")
