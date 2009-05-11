@@ -10,6 +10,9 @@ STRING (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 SET (GAZEBO_VERSION 0.9.0)
 MESSAGE (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
+
+SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
+
 SET (gazeboserver_sources_desc "List of server sources" 
      CACHE INTERNAL "Gazebo server sources list description" FORCE)
 SET (gazeboserver_include_dirs_desc "List of server include directories" 
@@ -33,9 +36,9 @@ SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override auto
 
 #####################################
 # Build type cflags
-SET (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -fPIC -Wall " CACHE INTERNAL "C Flags for release" FORCE)
-SET (CMAKE_C_FLAGS_DEBUG " -ggdb -fPIC " CACHE INTERNAL "C Flags fro debug" FORCE)
-SET (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
+SET (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -Wall " CACHE INTERNAL "C Flags for release" FORCE)
+SET (CMAKE_C_FLAGS_DEBUG " -ggdb " CACHE INTERNAL "C Flags fro debug" FORCE)
+SET (CMAKE_C_FLAGS_PROFILE " -ggdb -pg " CACHE INTERNAL "C Flags for profile" FORCE)
 
 #####################################
 # Build type link flags
@@ -55,18 +58,22 @@ MESSAGE (STATUS "====== Finding 3rd Party Packages ======")
 INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
 MESSAGE (STATUS "----------------------------------------")
 
-ADD_SUBDIRECTORY(libgazebo)
-ADD_SUBDIRECTORY(server)
-ADD_SUBDIRECTORY(worlds)
-ADD_SUBDIRECTORY(Media)
+IF (BUILD_GAZEBO)
+  ADD_SUBDIRECTORY(libgazebo)
+  ADD_SUBDIRECTORY(server)
+  ADD_SUBDIRECTORY(worlds)
+  ADD_SUBDIRECTORY(Media)
+  
+  IF (INCLUDE_PLAYER)
+    ADD_SUBDIRECTORY(player)
+  ENDIF (INCLUDE_PLAYER)
+  
+  IF (INCLUDE_WEBGAZEBO)
+    Add_SUBDIRECTORY(webgazebo)
+  ENDIF (INCLUDE_WEBGAZEBO)
+  
+  MESSAGE (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+  MESSAGE (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
+ENDIF (BUILD_GAZEBO)
 
-IF (INCLUDE_PLAYER)
-  ADD_SUBDIRECTORY(player)
-ENDIF (INCLUDE_PLAYER)
-
-IF (INCLUDE_WEBGAZEBO)
-  Add_SUBDIRECTORY(webgazebo)
-ENDIF (INCLUDE_WEBGAZEBO)
-
-MESSAGE (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-MESSAGE (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
+GAZEBOSERVER_RESET_LISTS()

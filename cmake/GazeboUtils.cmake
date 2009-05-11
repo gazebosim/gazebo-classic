@@ -53,4 +53,5 @@ MACRO (GAZEBOSERVER_RESET_LISTS)
        ${gazeboserver_link_libs_desc} FORCE)
   SET (gazeboserver_cflags "" CACHE INTERNAL 
        ${gazeboserver_cflags_desc} FORCE)
+
 ENDMACRO (GAZEBOSERVER_RESET_LISTS)
