@@ -10,8 +10,7 @@ STRING (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 SET (GAZEBO_VERSION 0.9.0)
 MESSAGE (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
-
-SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
+SET (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
 SET (gazeboserver_sources_desc "List of server sources" 
      CACHE INTERNAL "Gazebo server sources list description" FORCE)
@@ -24,8 +23,9 @@ SET (gazeboserver_link_libs_desc "List of server link libraries"
 SET (gazeboserver_cflags_desc "List of server cflags" 
      CACHE INTERNAL "Server cflags description" FORCE)
 
-SET (OGRE_VERSION 1.6.0 CACHE INTERNAL "Ogre Version Requirement")
-SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE Version Requirement")
+SET (OGRE_VERSION 1.6.1 CACHE INTERNAL "Ogre version requirement" FORCE)
+SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
+SET (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
 SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")

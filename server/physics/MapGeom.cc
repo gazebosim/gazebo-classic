@@ -144,7 +144,8 @@ void MapGeom::LoadChild(XMLConfigNode *node)
 
   this->CreateBoxes(this->root);
 
-  this->visualNode->MakeStatic();
+  if (this->visualNode)
+    this->visualNode->MakeStatic();
 }
 
 
@@ -371,7 +372,8 @@ void MapGeom::BuildTree(QuadNode *node)
         newY += ceil(newH);
     }
 
-    node->occupied = true;
+    //node->occupied = true;
+    node->occupied = false;
     node->leaf = false;
   }
   else if (occPixels == 0)

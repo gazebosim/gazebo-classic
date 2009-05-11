@@ -179,24 +179,20 @@ ENDIF (PKG_CONFIG_FOUND)
 ########################################
 # Find Boost, if not specified manually
 IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
-  SET(Boost_ADDITIONAL_VERSIONS "1.37.0")
 
   # Clear some variables to ensure that the checks for boost are 
   # always run
   SET (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
   SET (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
-  SET (Boost_INCLUDE_DIR "" CACHE INTERNAL "" FORCE)
 
+  SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" CACHE INTERNAL "Boost Additional versions" FORCE)
   INCLUDE (FindBoost)
 
-  FIND_PACKAGE( Boost 1.37.0 COMPONENTS thread signals)
+  FIND_PACKAGE( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals )
 
   IF (NOT Boost_FOUND)
     SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-    MESSAGE (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version 1.37.0 or higher.")
-
-  ELSE (NOT Boost_FOUND)
-    MESSAGE (STATUS "Found Boost!")
+    MESSAGE (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
   ENDIF (NOT Boost_FOUND)
 
   SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
