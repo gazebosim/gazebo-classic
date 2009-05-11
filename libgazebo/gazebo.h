@@ -647,7 +647,7 @@ Images are in packed RGB888 format.
 
 
 /// Maximum image pixels (width x height)
-#define GAZEBO_CAMERA_MAX_IMAGE_SIZE 640 * 480 * 3
+#define GAZEBO_CAMERA_MAX_IMAGE_SIZE 1024 * 1024 * 3
 
 /// \brief Camera interface data
 class CameraData
@@ -1503,7 +1503,7 @@ The stereo interface allows a client to read data from a stereo camera unit
 \{
 */
 
-#define GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE 640 * 480 * 3
+#define GAZEBO_STEREO_CAMERA_MAX_RGB_SIZE 640 * 480 * 9
 #define GAZEBO_STEREO_CAMERA_MAX_DISPARITY_SIZE 640 * 480
 
 /// \brief Stereo data

@@ -108,7 +108,6 @@ Gui::~Gui()
   delete this->sizeP;
   delete this->posP;
 
-  //GZ_DELETE (this->toolbar)
   //delete this->statusbar;
 }
 

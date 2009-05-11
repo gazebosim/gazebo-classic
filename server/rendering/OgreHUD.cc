@@ -94,7 +94,9 @@ OgreHUD *OgreHUD::Instance()
 // Get a pointer to the text renderer
 void OgreHUD::Close()
 {
-  GZ_DELETE(myself)
+  if (myself)
+    delete myself;
+  myself = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

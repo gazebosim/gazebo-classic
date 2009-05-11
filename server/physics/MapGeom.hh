@@ -27,7 +27,6 @@
 #ifndef MAPGEOM_HH
 #define MAPGEOM_HH
 
-#include <Ogre.h>
 #include <deque>
 
 #include "Vector2.hh"
@@ -36,6 +35,8 @@
 
 namespace gazebo
 {
+  class Image;
+
   /// \addtogroup gazebo_physics_geom
   /// \{
   /** \defgroup gazebo_map_geom Map geom
@@ -141,7 +142,7 @@ namespace gazebo
 
     private: ParamT<double> *wallHeightP;
 
-    private: Ogre::Image mapImage;
+    private: Image *mapImage;
 
     private: QuadNode *root;
 

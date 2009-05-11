@@ -57,9 +57,17 @@ Bandit_Actarray::~Bandit_Actarray()
 {
   for (int i=0; i<JOINTCNT; i++)
   {
-    GZ_DELETE(this->jointNamesP[i]);
-    GZ_DELETE(this->forcesP[i]);
-    GZ_DELETE(this->gainsP[i]);
+    if (this->jointNamesP[i])
+      delete this->jointNamesP[i];
+    this->jointNamesP[i] = NULL;
+      
+    if(this->forcesP[i])
+      delete this->forcesP[i];
+    this->forcesP[i] = NULL;
+
+    if(this->gainsP[i])
+      delete this->gainsP[i];
+    this->gainsP[i] = NULL;
   }
 }
 

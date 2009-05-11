@@ -98,7 +98,9 @@ Geom::~Geom()
 
   /*for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
-    GZ_DELETE (*iter)
+    if (*iter)
+      delete *iter;
+    *iter = NULL;
   }
   this->visuals.clear();
   */

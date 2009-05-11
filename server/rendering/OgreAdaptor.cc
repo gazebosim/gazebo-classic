@@ -84,14 +84,6 @@ OgreAdaptor::OgreAdaptor()
 /// Destructor
 OgreAdaptor::~OgreAdaptor()
 {
-  //GZ_DELETE (this->backgroundColor)
-  //GZ_DELETE (this->frameListener)
-  //GZ_DELETE (this->logManager)
-//  this->root->shutdown();
-  //GZ_DELETE (this->root)
-//  GZ_DELETE (this->sceneMgr) //this objects seems to be destroyed by root
-//  GZ_DELETE (this->viewport)
-
   if (this->dummyDisplay)
   {
     glXDestroyContext(this->dummyDisplay, this->dummyContext);
@@ -113,10 +105,9 @@ OgreAdaptor::~OgreAdaptor()
 // Closes and free
 void OgreAdaptor::Close()
 {
-  GZ_DELETE (this->frameListener)
-
-  // This causes a seg fault. Need to fix
-  //GZ_DELETE (this->root)
+  if (this->frameListener)
+    delete this->frameListener;
+  this->frameListener = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

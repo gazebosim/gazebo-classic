@@ -24,18 +24,18 @@
  * CVS: $Id$
  */
 
+
 #include <ode/ode.h>
-#include <Ogre.h>
 #include <iostream>
 #include <string.h>
 #include <math.h>
 
+#include "GazeboConfig.hh"
+#include "OgreVisual.hh"
+#include "Image.hh"
 #include "BoxGeom.hh"
 #include "GazeboError.hh"
-#include "OgreAdaptor.hh"
 #include "Simulator.hh"
-#include "OgreAdaptor.hh"
-#include "OgreVisual.hh"
 #include "Global.hh"
 #include "Body.hh"
 #include "MapGeom.hh"
@@ -70,6 +70,10 @@ MapGeom::~MapGeom()
   if (this->root)
     delete this->root;
 
+  if (this->mapImage)
+    delete this->mapImage;
+  this->mapImage = NULL;
+
   delete this->negativeP;
   delete this->thresholdP;
   delete this->wallHeightP;
@@ -88,9 +92,6 @@ void MapGeom::UpdateChild()
 /// Load the heightmap
 void MapGeom::LoadChild(XMLConfigNode *node)
 {
-  OgreAdaptor *ogreAdaptor;
-
-  ogreAdaptor = Simulator::Instance()->GetRenderEngine();
 
   std::string imageFilename = node->GetString("image","",1);
 
@@ -107,13 +108,30 @@ void MapGeom::LoadChild(XMLConfigNode *node)
   if (this->wallHeightP->GetValue() <= 0) this->wallHeightP->SetValue( 1.0 );
 
   // Load the image 
-  this->mapImage.load(imageFilename,
-                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  this->mapImage = new Image();
+
+  std::list<std::string>::iterator iter;
+  GazeboConfig *gzcfg = Simulator::Instance()->GetGazeboConfig();
+  std::string filename;
+
+  for (iter = gzcfg->GetGazeboPaths().begin(); 
+       iter != gzcfg->GetGazeboPaths().end(); iter++)
+  {
+    filename = (*iter) + "/Media/materials/textures/" + imageFilename;
+    if (this->mapImage->Load(filename) >= 0)
+    {
+      break;
+    }
+  }
+
+  if (!this->mapImage->Valid())
+    gzthrow(std::string("Unable to open image file[") + imageFilename + "]" );
 
   this->root->x = 0;
   this->root->y = 0;
-  this->root->width = this->mapImage.getWidth();
-  this->root->height = this->mapImage.getHeight();
+
+  this->root->width = this->mapImage->GetWidth();
+  this->root->height = this->mapImage->GetHeight();
 
   this->BuildTree(this->root);
 
@@ -376,7 +394,7 @@ void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart,
                                  unsigned int &freePixels, 
                                  unsigned int &occPixels )
 {
-  Ogre::ColourValue pixColor;
+  Color pixColor;
   unsigned char v;
   unsigned int x,y;
 
@@ -386,8 +404,9 @@ void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart,
   {
     for (x = xStart; x < xStart + width; x++)
     {
-      pixColor = this->mapImage.getColourAt(x, y, 0);
-      v = (unsigned char)(255 * ((pixColor[0] + pixColor[1] + pixColor[2]) / 3.0));
+      pixColor = this->mapImage->GetPixel(x, y);
+
+      v = (unsigned char)(255 * ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));
       if (this->negativeP->GetValue())
         v = 255 - v;
 

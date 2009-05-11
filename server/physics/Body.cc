@@ -90,13 +90,17 @@ Body::~Body()
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    GZ_DELETE (giter->second);
+    if (giter->second)
+      delete giter->second;
+    giter->second = NULL;
   }
   this->geoms.clear();
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
   {
-    GZ_DELETE (*siter);
+    if (*siter)
+      delete (*siter);
+    (*siter) = NULL;
   }
   this->sensors.clear();
 

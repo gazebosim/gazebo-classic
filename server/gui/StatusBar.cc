@@ -44,23 +44,33 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   y += 5;
 
   this->box(FL_UP_BOX);
-  this->fps = new Fl_Value_Output(x,y,35,20,"FPS");
+  this->fps = new Fl_Value_Output(x,y,25,20,"FPS");
+  this->fps->labelsize(11);
+  this->fps->textsize(11);
   this->fps->precision(0);
 
-  x = this->fps->x() + this->fps->w() + 95;
-  this->percent = new Fl_Value_Output(x,y,65,20,"% Real Time");
-  this->percent->precision(2);
+  x = this->fps->x() + this->fps->w() + 75;
+  this->percentOutput = new Fl_Value_Output(x,y,40,20,"Sim speed");
+  this->percentOutput->labelsize(11);
+  this->percentOutput->textsize(11);
+  this->percentOutput->precision(2);
 
-  x = this->percent->x() + this->percent->w() + 120;
-  this->realTime = new Fl_Value_Output(x,y,55,20,"Real Time (sec)");
+  x = this->percentOutput->x() + this->percentOutput->w() + 100;
+  this->realTime = new Fl_Value_Output(x,y,45,20,"Real Time (sec)");
+  this->realTime->labelsize(11);
+  this->realTime->textsize(11);
   this->realTime->precision(2);
 
-  x = this->realTime->x() + this->realTime->w() + 120;
-  this->simTime = new Fl_Value_Output(x,y,65,20,"Sim Time (sec)");
+  x = this->realTime->x() + this->realTime->w() + 100;
+  this->simTime = new Fl_Value_Output(x,y,45,20,"Sim Time (sec)");
+  this->simTime->labelsize(11);
+  this->simTime->textsize(11);
   this->simTime->precision(2);
 
-  x = this->simTime->x() + this->simTime->w() + 100;
-  this->pauseTime = new Fl_Value_Output(x,y,55,20,"Pause Time");
+  x = this->simTime->x() + this->simTime->w() + 80;
+  this->pauseTime = new Fl_Value_Output(x,y,45,20,"Pause Time");
+  this->pauseTime->labelsize(11);
+  this->pauseTime->textsize(11);
   this->pauseTime->precision(2);
 
   x = this->pauseTime->x() + this->pauseTime->w() + 20;
@@ -90,11 +100,12 @@ void StatusBar::Update()
   float avgFPS = 0;
   float percent = 0;
   float sim = 0;
+  float real = 0;
 
   if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > 0.05)
   {
     avgFPS = this->gui->GetAvgFPS();
-    percent = 100. * (Simulator::Instance()->GetSimTime() / Simulator::Instance()->GetRealTime());
+    percent = (Simulator::Instance()->GetSimTime() / Simulator::Instance()->GetRealTime());
 
     sim = Simulator::Instance()->GetSimTime();
     if (sim > 99999)
@@ -113,15 +124,30 @@ void StatusBar::Update()
       this->simTime->label("Sim Time (min)");
     }
 
-    //this->iterations->value(Simulator::Instance()->GetIterations());
-    this->fps->value(avgFPS);
-    this->percent->value(percent);
-
-    if (Simulator::Instance()->GetRealTime() - this->realTime->value() > 0.1)
+    real = Simulator::Instance()->GetRealTime();
+    if (sim > 99999)
     {
-      this->realTime->value(Simulator::Instance()->GetRealTime());
+      real /= (120*24);
+      this->realTime->label("Real Time (dys)");
+    }
+    else if (real > 9999)
+    {
+      real /= 120;
+      this->realTime->label("Real Time (hrs)");
+    }
+    else if (real > 999)
+    {
+      real /= 60;
+      this->realTime->label("Real Time (min)");
     }
 
+    //this->iterations->value(Simulator::Instance()->GetIterations());
+    this->fps->value(avgFPS);
+    this->percentOutput->value(percent);
+
+    //if (Simulator::Instance()->GetRealTime() - this->realTime->value() > 0.1)
+
+    this->realTime->value(real);
     this->simTime->value(sim);
     this->pauseTime->value(Simulator::Instance()->GetPauseTime());
 

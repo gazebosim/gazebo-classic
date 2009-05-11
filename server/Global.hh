@@ -81,12 +81,6 @@
 #define ISEVEN(x) ( ((x) % 2) == 0)
 #define ISODD(x) ( ((x) % 2) != 0)
 
-// Min and Max macros
-#define MAX(x,y) ( (x) > (y) ? (x) : (y) )
-#define MIN(x,y) ( (x) < (y) ? (x) : (y) )
-
 #define ROUND(x) ( (int)( floor((x)+0.5) ) )
-
-#define GZ_DELETE(p) { if(p) { delete (p);  (p)=NULL; } }
 
 #endif

@@ -12,6 +12,8 @@ SET (sources OgreMovableText.cc
              OgreCamera.cc
              CameraManager.cc
              UserCamera.cc
+             Image.cc
+             Color.cc
 )
 
 APPEND_TO_SERVER_SOURCES(${sources})

@@ -275,15 +275,15 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         contact.surface.soft_erp = h * kp / (h * kp + kd);
         contact.surface.soft_cfm = 1 / (h * kp + kd);
 
-        contact.surface.mu = MIN(geom1->contact->mu1, geom2->contact->mu1);
-        contact.surface.mu2 = MIN(geom1->contact->mu2, geom2->contact->mu2);
-        contact.surface.bounce = MIN(geom1->contact->bounce, 
+        contact.surface.mu = std::min(geom1->contact->mu1, geom2->contact->mu1);
+        contact.surface.mu2 = std::min(geom1->contact->mu2, geom2->contact->mu2);
+        contact.surface.bounce = std::min(geom1->contact->bounce, 
                                      geom2->contact->bounce);
-        contact.surface.bounce_vel = MIN(geom1->contact->bounceVel, 
+        contact.surface.bounce_vel = std::min(geom1->contact->bounceVel, 
                                          geom2->contact->bounceVel);
-        contact.surface.slip1 = MIN(geom1->contact->slip1, 
+        contact.surface.slip1 = std::min(geom1->contact->slip1, 
                                     geom2->contact->slip1);
-        contact.surface.slip2 = MIN(geom1->contact->slip2, 
+        contact.surface.slip2 = std::min(geom1->contact->slip2, 
                                     geom2->contact->slip2);
 
         dJointID c = dJointCreateContact (self->worldId,
@@ -387,7 +387,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
       // Compute friction effects; this is standard Coulomb friction
       contactInfo.surface.mode |= dContactApprox1;
-      contactInfo.surface.mu = MIN(geom1->contact->mu1, geom2->contact->mu1);
+      contactInfo.surface.mu = std::min(geom1->contact->mu1, geom2->contact->mu1);
       contactInfo.surface.mu2 = 0;
       contactInfo.surface.bounce = 0.1;
       contactInfo.surface.bounce_vel = 0.1;
