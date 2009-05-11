@@ -15,8 +15,11 @@ sources = [
            'OgreVisual.cc',
            'OgreCamera.cc',
            'CameraManager.cc',
-           'UserCamera.cc'
+           'UserCamera.cc',
+           'Image.cc',
+           'Color.cc'
 	        ]
+
 
 headers.append( 
           ['#/server/rendering/OgreMovableText.hh',
@@ -30,7 +33,9 @@ headers.append(
            '#/server/rendering/OgreVisual.hh',
            '#/server/rendering/OgreCamera.hh',
            '#/server/rendering/CameraManager.hh',
-           '#/server/rendering/UserCamera.hh'
+           '#/server/rendering/UserCamera.hh',
+           '#/server/rendering/Image.hh',
+           '#/server/rendering/Color.hh'
            ] )
 
 #staticObjs.append( env.StaticObject(sources) )
