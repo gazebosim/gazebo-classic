@@ -76,6 +76,8 @@ void Factory::LoadChild(XMLConfigNode *node)
 // Initialize the controller
 void Factory::InitChild()
 {
+  // initialize newModel to blank
+  strcpy((char*)this->factoryIface->data->newModel,"");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,8 +85,10 @@ void Factory::InitChild()
 void Factory::UpdateChild()
 {
   // If there is a string, then add the contents to the world
+  this->factoryIface->Lock(1);
   if (strcmp((const char*)this->factoryIface->data->newModel,"")!=0)
   {
+    //std::cout << " factory update: " << this->factoryIface->data->newModel << std::endl;
     std::string xmlString;
     std::string xmlMiddle = (const char*)(this->factoryIface->data->newModel);
     
@@ -128,6 +132,7 @@ void Factory::UpdateChild()
 
     strcpy((char*)this->factoryIface->data->deleteModel,"");
   }
+  this->factoryIface->Unlock();
 
 }
 

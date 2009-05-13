@@ -1,7 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-dirs = Split('jointforce')
-
-for subdir in dirs :
-  SConscript('%s/SConscript' % subdir)

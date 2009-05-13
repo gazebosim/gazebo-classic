@@ -1,8 +1,0 @@
-#Import variable
-Import('*')
-
-env.Append(CPPPATH = '#server/sensors/contact')
-
-sources = Split('ContactSensor.cc')
-
-sharedObjs.append(env.SharedObject(sources))

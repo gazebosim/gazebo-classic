@@ -433,9 +433,9 @@ unsigned int OgreCamera::GetViewportWidth() const
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualWidth();
   else
-    return 0;
+    return this->camera->getViewport()->getActualWidth();
+    //return 0;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the viewport height in pixels
@@ -444,7 +444,8 @@ unsigned int OgreCamera::GetViewportHeight() const
   if (this->renderTarget)
     return this->renderTarget->getViewport(0)->getActualHeight();
   else
-    return 0;
+    return this->camera->getViewport()->getActualHeight();
+    //return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -452,6 +453,33 @@ unsigned int OgreCamera::GetViewportHeight() const
 void OgreCamera::SetAspectRatio( float ratio )
 {
   this->camera->setAspectRatio( ratio );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the viewport up vector
+Vector3 OgreCamera::GetUp()
+{
+  //std::cout << "ogre cam position " <<  this->camera->getRealPosition() << std::endl;
+  Ogre::Vector3 up = this->camera->getRealUp();
+  //std::cout << "ogre up " <<  up << std::endl;
+  return Vector3(up.x,up.y,up.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the viewport right vector
+Vector3 OgreCamera::GetRight()
+{
+  Ogre::Vector3 right = this->camera->getRealRight();
+  //std::cout << "ogre right " <<  right << std::endl;
+  return Vector3(right.x,right.y,right.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the camera position in the world
+Vector3 OgreCamera::GetCameraPosition()
+{
+  Ogre::Vector3 camPos = this->camera->getRealPosition();
+  return Vector3(camPos.x,camPos.y,camPos.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

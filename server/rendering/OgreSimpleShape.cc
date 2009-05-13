@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 
+#include "GazeboMessage.hh"
 #include "OgreSimpleShape.hh"
 #include "Vector3.hh"
 
@@ -177,6 +178,11 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides,
   size_t currOffset = 0;
   int i,j,k;
 
+  if (Ogre::MeshManager::getSingleton().resourceExists(name))
+  {
+    return;
+  }
+
   // Create a new mesh specifically for manual definition.
   mesh = Ogre::MeshManager::getSingleton().createManual(name,
          Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -289,9 +295,9 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides,
   // Compute the vertices
   for (i = 0; i < 8; i++)
   {
-    v[i][0] *= sides.x / 2;
-    v[i][1] *= sides.y / 2;
-    v[i][2] *= sides.z / 2;
+    v[i][0] *= sides.x * 0.5;
+    v[i][1] *= sides.y * 0.5;
+    v[i][2] *= sides.z * 0.5;
   }
 
   // For each face
@@ -330,8 +336,9 @@ void OgreSimpleShape::CreateBox(const std::string &name, const Vector3 &sides,
   subMesh->useSharedVertices = true;
 
   mesh->_setBounds( Ogre::AxisAlignedBox(
-                      Ogre::Vector3(-sides.x/2.0, -sides.y/2.0, -sides.z/2.0),
-                      Ogre::Vector3(sides.x/2.0, sides.y/2.0, sides.z/2.0)), false);
+                      Ogre::Vector3(-sides.x*0.5, -sides.y*0.5, -sides.z*0.5),
+                      Ogre::Vector3(sides.x*0.5, sides.y*0.5, sides.z*0.5)), 
+                    false);
 
   // this line makes clear the mesh is loaded (avoids memory leaks)
   mesh->load();

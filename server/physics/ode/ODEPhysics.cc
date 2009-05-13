@@ -44,6 +44,10 @@
 #include "XMLConfig.hh"
 #include "ODEPhysics.hh"
 
+#ifdef TIMING
+#include "Simulator.hh"// for timing
+#endif
+
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,6 +74,9 @@ ODEPhysics::ODEPhysics()
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
+  this->quickStepP = new ParamT<bool>("quickStep", false, 0);
+  this->quickStepItersP = new ParamT<int>("quickStepIters", 20, 0);
+  this->quickStepWP = new ParamT<double>("quickStepW", 1.3, 0);  /// over_relaxation value for SOR
   Param::End();
 }
 
@@ -88,6 +95,7 @@ ODEPhysics::~ODEPhysics()
 
   delete this->globalCFMP;
   delete this->globalERPP;
+  delete this->quickStepP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +111,9 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->updateRateP->Load(cnode);
   this->globalCFMP->Load(cnode);
   this->globalERPP->Load(cnode);
+  this->quickStepP->Load(cnode);
+  this->quickStepItersP->Load(cnode);
+  this->quickStepWP->Load(cnode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,6 +126,7 @@ void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->updateRateP) << "\n";
   stream << prefix << "  " << *(this->globalCFMP) << "\n";
   stream << prefix << "  " << *(this->globalERPP) << "\n";
+  stream << prefix << "  " << *(this->quickStepP) << "\n";
   stream << prefix << "</physics:ode>\n";
 }
 
@@ -126,24 +138,91 @@ void ODEPhysics::Init()
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
   dWorldSetCFM(this->worldId, this->globalCFMP->GetValue());
   dWorldSetERP(this->worldId, this->globalERPP->GetValue());
+  dWorldSetQuickStepNumIterations(this->worldId, this->quickStepItersP->GetValue() );
+  dWorldSetQuickStepW(this->worldId, this->quickStepWP->GetValue() );
+}
 
+////////////////////////////////////////////////////////////////////////////////
+// Update the ODE collisions, create joints
+void ODEPhysics::UpdateCollision()
+{
+#ifdef TIMING
+  double tmpT1 = Simulator::Instance()->GetWallTime();
+#endif
+  
+  this->LockMutex(); 
+  // Do collision detection; this will add contacts to the contact group
+  dSpaceCollide( this->spaceId, this, CollisionCallback );
+  this->UnlockMutex(); 
+
+  //usleep(1000000);
+#ifdef TIMING
+  double tmpT2 = Simulator::Instance()->GetWallTime();
+  std::cout << "      Collision DT (" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the ODE engine
-void ODEPhysics::Update()
+// void ODEPhysics::UpdatePhysics()
+// {
+// #ifdef TIMING
+//   double tmpT1 = Simulator::Instance()->GetWallTime();
+// #endif
+//
+//   // Update the dynamical model
+//   if (this->quickStepP->GetValue())
+//     dWorldQuickStep(this->worldId, this->stepTimeP->GetValue() );
+//   else
+//     dWorldStep( this->worldId, this->stepTimeP->GetValue() );
+//
+// #ifdef TIMING
+//   double tmpT3 = Simulator::Instance()->GetWallTime();
+//   std::cout << "      ODE step DT (" << tmpT3-tmpT1 << ")" << std::endl;
+//   //std::cout << "  Physics Total DT (" << tmpT3-tmpT1 << ")" << std::endl;
+// #endif
+//
+//   // Very important to clear out the contact group
+//   dJointGroupEmpty( this->contactGroup );
+//
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+// Update the ODE engine
+void ODEPhysics::UpdatePhysics()
 {
+#ifdef TIMING
+  double tmpT1 = Simulator::Instance()->GetWallTime();
+#endif
+ 
+  this->LockMutex(); 
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
+  //usleep(1000000);
+#ifdef TIMING
+  double tmpT2 = Simulator::Instance()->GetWallTime();
+  std::cout << "      Collision DT (" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
+
   // Update the dynamical model
-  dWorldStep( this->worldId, this->stepTimeP->GetValue() );
-  //dWorldQuickStep(this->worldId, this->stepTimeP->GetValue());
+  if (this->quickStepP->GetValue())
+    dWorldQuickStep(this->worldId, this->stepTimeP->GetValue() );
+  else
+    dWorldStep( this->worldId, this->stepTimeP->GetValue() );
+
+#ifdef TIMING
+  double tmpT3 = Simulator::Instance()->GetWallTime();
+  std::cout << "      ODE step DT (" << tmpT3-tmpT2 << ")" << std::endl;
+  //std::cout << "  Physics Total DT (" << tmpT3-tmpT1 << ")" << std::endl;
+#endif
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
 
+  this->UnlockMutex(); 
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the ODE engine
@@ -262,18 +341,19 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           continue;
 
         contact.geom = contactGeoms[i];
-        contact.surface.mode = dContactSlip1 | dContactSlip2 | 
-                               dContactSoftERP | dContactSoftCFM |  
-                               dContactBounce | dContactMu2 | dContactApprox1;
-
+        //contact.surface.mode = dContactSlip1 | dContactSlip2 | 
+        //                       dContactSoftERP | dContactSoftCFM |  
+        //                       dContactBounce | dContactMu2 | dContactApprox1;
+        contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
+        // with dContactSoftERP | dContactSoftCFM the test_pr2_collision overshoots the cup
 
         // Compute the CFM and ERP by assuming the two bodies form a
         // spring-damper system.
         h = self->stepTimeP->GetValue();
-        kp = 1 / (1 / geom1->contact->kp + 1 / geom2->contact->kp);
+        kp = 1.0 / (1.0 / geom1->contact->kp + 1.0 / geom2->contact->kp);
         kd = geom1->contact->kd + geom2->contact->kd;
         contact.surface.soft_erp = h * kp / (h * kp + kd);
-        contact.surface.soft_cfm = 1 / (h * kp + kd);
+        contact.surface.soft_cfm = 1.0 / (h * kp + kd);
 
         contact.surface.mu = std::min(geom1->contact->mu1, geom2->contact->mu1);
         contact.surface.mu2 = std::min(geom1->contact->mu2, geom2->contact->mu2);
@@ -288,6 +368,11 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
+
+        // save "dJointID *c" in Geom, so we can do a
+        // dJointFeedback *jft = dJointGetFeedback( c[i] ) later
+        geom1->cID = c;
+        geom2->cID = c;
 
         // Call the geom's contact callbacks
         geom1->contact->contactSignal( geom1, geom2 );

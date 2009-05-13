@@ -114,6 +114,9 @@ class Pose3d
   /// \brief Reset the pose
   public: void Reset();
 
+  /// \brief Rotate vector part of a pose about the origin
+  public: Pose3d RotatePositionAboutOrigin(const Quatern &rot) const;
+
   /// \brief The position
   public: Vector3 pos;
 

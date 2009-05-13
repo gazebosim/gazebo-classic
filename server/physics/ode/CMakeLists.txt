@@ -1,5 +1,5 @@
-include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+#include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-SET (sources ODEPhysics.cc )
+#SET (sources ODEPhysics.cc )
 
-APPEND_TO_SERVER_SOURCES(${sources})
+#ADD_LIBRARY(gazebo_physics_ode ${sources})

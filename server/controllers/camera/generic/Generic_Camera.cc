@@ -86,7 +86,24 @@ void Generic_Camera::InitChild()
 // Update the controller
 void Generic_Camera::UpdateChild()
 {
-  this->PutCameraData();
+
+  // do this first so there's chance for sensor to run 1 frame after activate
+  if (this->myParent->IsActive())
+    this->PutCameraData();
+
+  // activate if iface open
+  if (this->cameraIface->Lock(1))
+  {
+    if (this->cameraIface->GetOpenCount() > 0)
+      this->myParent->SetActive(true);
+    else
+      this->myParent->SetActive(false);
+
+    //std::cout << " camera open count " << this->cameraIface->GetOpenCount() << std::endl;
+    this->cameraIface->Unlock();
+  }
+  //std::cout << " camera     active " << this->myParent->IsActive() << std::endl;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

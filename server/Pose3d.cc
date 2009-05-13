@@ -213,3 +213,20 @@ Pose3d Pose3d::CoordPoseSolve(const Pose3d &b) const
 
   return a;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// Rotate a vector by a quaternion, added for computing CG location for the Body
+Pose3d Pose3d::RotatePositionAboutOrigin(const Quatern &rot) const
+{
+  Pose3d a = *this;
+  a.pos.x =  (1.0 - 2.0*rot.y*rot.y - 2.0*rot.z*rot.z) * this->pos.x
+            +(2.0*(rot.x*rot.y+rot.u*rot.z)          ) * this->pos.y
+            +(2.0*(rot.x*rot.z-rot.u*rot.y)          ) * this->pos.z;
+  a.pos.y =  (2.0*(rot.x*rot.y-rot.u*rot.z)          ) * this->pos.x
+            +(1.0 - 2.0*rot.x*rot.x - 2.0*rot.z*rot.z) * this->pos.y
+            +(2.0*(rot.y*rot.z+rot.u*rot.x)          ) * this->pos.z;
+  a.pos.z =  (2.0*(rot.x*rot.z+rot.u*rot.y)          ) * this->pos.x
+            +(2.0*(rot.y*rot.z-rot.u*rot.x)          ) * this->pos.y
+            +(1.0 - 2.0*rot.x*rot.x - 2.0*rot.y*rot.y) * this->pos.z;
+  return a;
+}

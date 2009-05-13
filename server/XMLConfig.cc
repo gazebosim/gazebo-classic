@@ -515,29 +515,59 @@ unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int requ
 ///////////////////////////////////////////////////////////////////////////
 // Get a file name.  Always returns an absolute path.  If the filename
 // is entered as a relative path, we prepend the world file path.
+// std::string XMLConfigNode::GetFilename( const std::string &key, const std::string &def, int require) const
+// {
+//   std::string filename = this->GetString( key, def, require );
+//
+//   if (filename.empty())
+//     return "";
+//
+//   if (filename[0] == '/' || filename[0] == '~')
+//     return filename;
+//   else
+//   {
+//     std::string result;
+//
+//     if (this->config->filename[0] != '/' && this->config->filename[0] != '~')
+//       result = "/";
+//
+//     unsigned int last = this->config->filename.rfind("/");
+//     if (last==0 || last+1 != this->config->filename.size())
+//       result += this->config->filename + "/" + filename;
+//     else
+//       result += this->config->filename.substr(0,last) + "/" + filename;
+//
+//     return result;
+//   }
+// }
+///////////////////////////////////////////////////////////////////////////
+// Get a file name.  Always returns an absolute path.  If the filename
+// is entered as a relative path, we prepend the world file path.
+//
+// patch by stu to do relative path.  FIXME: what was the original implementation that's broken?
+// sglaser: Was completely broken.  Now returns a path relative to the
+// (original) working directory.
 std::string XMLConfigNode::GetFilename( const std::string &key, const std::string &def, int require) const
 {
   std::string filename = this->GetString( key, def, require );
 
-  if (filename.empty())
-    return "";
+  if (filename.empty() && require)
+  {
+    gzthrow("unable to find required filename attribute[" << key << "] in world file node["
+            << this->GetName() << "]");
+  }
+  else if (filename.empty())
+    return def;
 
-  if (filename[0] == '/' || filename[0] == '~')
+  if (filename[0] == '/')
     return filename;
   else
   {
-    std::string result;
-
-    if (this->config->filename[0] != '/' && this->config->filename[0] != '~')
-      result = "/";
-
-    unsigned int last = this->config->filename.rfind("/");
-    if (last==0 || last+1 != this->config->filename.size())
-      result += this->config->filename + "/" + filename;
+    int last_slash = this->config->filename.rfind("/");
+    if (last_slash < 0)
+      return filename;
     else
-      result += this->config->filename.substr(0,last) + "/" + filename;
-
-    return result;
+      return this->config->filename.substr(0,last_slash) + "/" + filename;
   }
 }
 

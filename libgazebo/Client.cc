@@ -189,8 +189,14 @@ void Client::SemInit()
 {
   this->semKey = GZ_SEM_KEY + this->serverId;
 
-  // Get the client semaphore group
-  this->semId = semget(this->semKey, 0, S_IRWXU);
+  // While loop to wait for directory
+  this->semId = -1;
+  while(this->semId < 0)
+  {
+    // Get the client semaphore group
+    this->semId = semget(this->semKey, 0, S_IRWXU);
+    usleep(1000000);
+  }
 
   if (this->semId < 0)
   {

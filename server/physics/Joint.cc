@@ -23,6 +23,8 @@
  * Date: 21 May 2003
  * CVS: $Id$
  */
+
+#include "PhysicsEngine.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
@@ -45,6 +47,8 @@ Joint::Joint()
   Param::Begin(&this->parameters);
   this->erpP = new ParamT<double>("erp",0.4,0);
   this->cfmP = new ParamT<double>("cfm",10e-3,0);
+  this->stopKpP = new ParamT<double>("stopKp",1000000.0,0);
+  this->stopKdP = new ParamT<double>("stopKd",1.0,0);
   this->body1NameP = new ParamT<std::string>("body1",std::string(),1);
   this->body2NameP = new ParamT<std::string>("body2",std::string(),1);
   this->anchorBodyNameP = new ParamT<std::string>("anchor",std::string(),0);
@@ -65,6 +69,8 @@ Joint::~Joint()
   dJointDestroy( this->jointId );
   delete this->erpP;
   delete this->cfmP;
+  delete this->stopKpP;
+  delete this->stopKdP;
   delete this->body1NameP;
   delete this->body2NameP;
   delete this->anchorBodyNameP;
@@ -94,6 +100,8 @@ void Joint::Load(XMLConfigNode *node)
   this->anchorOffsetP->Load(node);
   this->erpP->Load(node);
   this->cfmP->Load(node);
+  this->stopKpP->Load(node);
+  this->stopKdP->Load(node);
   this->provideFeedbackP->Load(node);
   this->fudgeFactorP->Load(node);
 
@@ -108,6 +116,12 @@ void Joint::Load(XMLConfigNode *node)
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
   Vector3 anchorVec = anchorBody->GetPosition() + **(this->anchorOffsetP);
+
+  double h = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
+  double stopCfm = 1.0 / (h * (**this->stopKpP) + (**this->stopKdP));
+  this->SetParam(dParamStopERP, stopErp);
+  this->SetParam(dParamStopCFM, stopCfm);
 
   // Set joint parameters
   this->SetParam(dParamSuspensionERP, **(this->erpP));
@@ -125,22 +139,25 @@ void Joint::Load(XMLConfigNode *node)
   /// Add a renderable for the joint
   this->visual = OgreCreator::Instance()->CreateVisual(
       visname.str(), this->model->GetVisualNode());
-  this->visual->AttachMesh("joint_anchor");
-  this->visual->SetVisible(false);
+  if (this->visual)
+  {
+    this->visual->AttachMesh("joint_anchor");
+    this->visual->SetVisible(false);
 
-  this->line1 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
-  this->line2 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+    this->line1 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+    this->line2 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
-  this->line1->setMaterial("Gazebo/BlueEmissive");
-  this->line2->setMaterial("Gazebo/BlueEmissive");
+    this->line1->setMaterial("Gazebo/BlueEmissive");
+    this->line2->setMaterial("Gazebo/BlueEmissive");
 
-  this->visual->AttachObject(this->line1);
-  this->visual->AttachObject(this->line2);
+    this->visual->AttachObject(this->line1);
+    this->visual->AttachObject(this->line2);
 
-  this->line1->AddPoint(Vector3(0,0,0));
-  this->line1->AddPoint(Vector3(0,0,0));
-  this->line2->AddPoint(Vector3(0,0,0));
-  this->line2->AddPoint(Vector3(0,0,0));
+    this->line1->AddPoint(Vector3(0,0,0));
+    this->line1->AddPoint(Vector3(0,0,0));
+    this->line2->AddPoint(Vector3(0,0,0));
+    this->line2->AddPoint(Vector3(0,0,0));
+  }
 
   if (**this->provideFeedbackP)
   {
@@ -193,26 +210,29 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 void Joint::Update()
 {
 //TODO: Evaluate impact of this code on performance
-  this->visual->SetVisible(World::Instance()->GetShowJoints());
+  if (this->visual)
+    this->visual->SetVisible(World::Instance()->GetShowJoints());
 
   if (!World::Instance()->GetShowJoints())
     return;
 
-  this->visual->SetPosition(this->GetAnchor());
+  if (this->visual)
+    this->visual->SetPosition(this->GetAnchor());
 
   Vector3 start;
   if (this->body1)
   {
     start = this->body1->GetPose().pos - this->GetAnchor();
-    this->line1->SetPoint(0, start);
-    //this->line1->Update();
+
+    if (this->line1)
+      this->line1->SetPoint(0, start);
   }
 
   if (this->body2)
   {
     start = this->body2->GetPose().pos - this->GetAnchor();
-    this->line2->SetPoint(0, start);
-    //this->line2->Update();
+    if (this->line2)
+      this->line2->SetPoint(0, start);
   }
 }
 

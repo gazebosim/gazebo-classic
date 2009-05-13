@@ -22,6 +22,10 @@ SET (gazeboserver_link_libs_desc "List of server link libraries"
      CACHE INTERNAL "Link libs description" FORCE)
 SET (gazeboserver_cflags_desc "List of server cflags" 
      CACHE INTERNAL "Server cflags description" FORCE)
+SET (gazebosensor_sources_desc "List of sensor sources" 
+     CACHE INTERNAL "Gazebo sensor sources list description" FORCE)
+SET (gazebocontroller_sources_desc "List of controller sources" 
+     CACHE INTERNAL "Gazebo controller sources list description" FORCE)
 
 SET (OGRE_VERSION 1.6.1 CACHE INTERNAL "Ogre version requirement" FORCE)
 SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)

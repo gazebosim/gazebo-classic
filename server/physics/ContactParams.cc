@@ -35,10 +35,17 @@ using namespace gazebo;
 // Default constructor
 ContactParams::ContactParams()
 {
-  this->kp = 10000.0; //dInfinity;
-  this->kd = 0;
-  this->bounce = 0.1;
-  this->bounceVel = 0.1;
+  this->kp = 100000000.0;
+
+  // Damping constraint
+  this->kd = 1.0;
+
+  // Bounce param
+  this->bounce = 0.0;
+
+  // Minumum velocity before bouce is applied
+  this->bounceVel = 10.0;
+
   this->softCfm = 0.01;
 
   this->mu1 = dInfinity;

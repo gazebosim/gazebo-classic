@@ -67,31 +67,34 @@ void GazeboConfig::Load()
     this->gazeboPaths.push_back(gazebo_resource_path);
   }
 
-  // if both paths are set, don't check the config file or use the defaults.
-  if(ogre_resource_path && gazebo_resource_path) 
-    return;
-
-
   if (cfgFile)
   {
     XMLConfig rc;
     XMLConfigNode *node;
     rc.Load(rcFilename);
 
-    node = rc.GetRootNode()->GetChild("gazeboPath");
-    while (node)
+    // if gazebo path is set, skip reading from .gazeborc
+    if(!gazebo_resource_path)
     {
-      gzmsg(1) << "Gazebo Path[" << node->GetValue() << "]\n";
-      this->gazeboPaths.push_back(node->GetValue());
-      node = node->GetNext("gazeboPath");
+      node = rc.GetRootNode()->GetChild("gazeboPath");
+      while (node)
+      {
+        gzmsg(1) << "Gazebo Path[" << node->GetValue() << "]\n";
+        this->gazeboPaths.push_back(node->GetValue());
+        node = node->GetNext("gazeboPath");
+      }
     }
 
-    node = rc.GetRootNode()->GetChild("ogrePath");
-    while (node)
+    // if ogre path is set, skip reading from .gazeborc
+    if(!ogre_resource_path)
     {
-      gzmsg(1) << "Ogre Path[" << node->GetValue() << "]\n";
-      this->ogrePaths.push_back( node->GetValue() );
-      node = node->GetNext("ogrePath");
+      node = rc.GetRootNode()->GetChild("ogrePath");
+      while (node)
+      {
+        gzmsg(1) << "Ogre Path[" << node->GetValue() << "]\n";
+        this->ogrePaths.push_back( node->GetValue() );
+        node = node->GetNext("ogrePath");
+      }
     }
     this->RTTMode = rc.GetRootNode()->GetString("RTTMode", "PBuffer");
 
@@ -99,9 +102,18 @@ void GazeboConfig::Load()
   else
   {
     gzmsg(0) << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
-    this->gazeboPaths.push_back("/usr/local/share/gazebo");
-    this->ogrePaths.push_back("/usr/local/lib/OGRE");
-    this->ogrePaths.push_back("/usr/lib/OGRE");
+
+    if ( !gazebo_resource_path )
+    {
+	this->gazeboPaths.push_back("/usr/local/share/gazebo");
+    }
+
+    if ( !ogre_resource_path )
+    {
+	this->ogrePaths.push_back("/usr/local/lib/OGRE");
+	this->ogrePaths.push_back("/usr/lib/OGRE");
+    }
+
     this->RTTMode="PBuffer";
   }
 }

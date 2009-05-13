@@ -59,7 +59,7 @@ TrimeshGeom::~TrimeshGeom()
 /// Update function.
 void TrimeshGeom::UpdateChild()
 {
-
+  /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
   // this is fairly important for good results.
 
@@ -89,7 +89,7 @@ void TrimeshGeom::UpdateChild()
   this->last_matrix_index = !this->last_matrix_index;
 
   dGeomTriMeshSetLastTransform( this->geomId,
-                                *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
+      *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -198,13 +198,16 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   }
 
 
+
+  /// FIXME: use below to setup trimesh geometry for collision without using above Ogre codes
+
   /// This will hold the vertex data of the triangle mesh
   this->odeData = dGeomTriMeshDataCreate();
 
   // Build the ODE triangle mesh
   dGeomTriMeshDataBuildSingle( this->odeData,
-                               (float*)vertices, 3*sizeof(float), numVertices,
-                               (int*)indices, numIndices, 3*sizeof(int));
+      (float*)vertices, 3*sizeof(float), numVertices,
+      (int*)indices, numIndices, 3*sizeof(int));
 
   this->geomId = dCreateTriMesh( this->spaceId, this->odeData,0,0,0 );
 

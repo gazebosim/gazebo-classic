@@ -35,6 +35,7 @@
 
 #include "Param.hh"
 #include "Entity.hh"
+#include "Body.hh"
 #include "OgreCamera.hh"
 #include "OgreCreator.hh"
 #include "Simulator.hh"
@@ -62,9 +63,9 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
 {
   this->end();
 
-  this->moveAmount = 1.0;
+  this->moveAmount = 0.1;
   this->moveScale = 1;
-  this->rotateAmount = 0.5;
+  this->rotateAmount = 0.1;
 
   this->directionVec.x = 0;
   this->directionVec.y = 0;
@@ -138,6 +139,22 @@ void GLWindow::Update()
   }
 
   this->lastUpdateTime = Simulator::Instance()->GetRealTime();
+
+  // continuously apply force to selected body
+  Entity *entity = Simulator::Instance()->GetSelectedEntity(); 
+
+  if (entity->IsBody())
+  {
+    Body *body = (Body*)(entity);
+    if (this->rightMousePressed && body)
+    {
+      body->SetForce(this->forceVec);
+    }
+    if (this->leftMousePressed && body)
+    {
+      body->SetTorque(this->torqueVec);
+    }
+  }
 }
 
 
@@ -164,10 +181,12 @@ void GLWindow::HandleMousePush()
   {
     case FL_LEFT_MOUSE:
       this->leftMousePressed = true;
+      //this->torqueVec = Vector3(0,0,0); // not necessary
       break;
 
     case FL_RIGHT_MOUSE:
       this->rightMousePressed = true;
+      //this->forceVec = Vector3(0,0,0); // not necessary
       break;
 
     case FL_MIDDLE_MOUSE:
@@ -198,11 +217,39 @@ void GLWindow::HandleMouseRelease()
 
   if (!this->mouseDrag)
   {
-    Entity *ent = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, this->mousePos);
+    Entity *entity = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
+                                                          this->mousePos);
 
-    if (ent)
+    Model *currModel = Simulator::Instance()->GetParentModel(
+        Simulator::Instance()->GetSelectedEntity());
+
+    Model *model = Simulator::Instance()->GetParentModel(entity);
+    Body *body = Simulator::Instance()->GetParentBody(entity);
+
+    if (currModel == model)
     {
-      Simulator::Instance()->SetSelectedEntity( ent );
+      printf("Same\n");
+      Simulator::Instance()->SetSelectedEntity(NULL);
+      return;
+    }
+
+
+    switch (Fl::event_button())
+    {
+      case FL_LEFT_MOUSE:
+        if (model) 
+          Simulator::Instance()->SetSelectedEntity( model );
+        this->mouseOriginPos = Vector2<int>( Fl::event_x(), Fl::event_y() );
+        break;
+
+      case FL_RIGHT_MOUSE:
+        if (body) 
+          Simulator::Instance()->SetSelectedEntity( body );
+        this->mouseOriginPos = Vector2<int>( Fl::event_x(), Fl::event_y() );
+        break;
+
+      case FL_MIDDLE_MOUSE:
+        break;
     }
   }
 
@@ -215,36 +262,206 @@ void GLWindow::HandleMouseDrag()
 {
   if (this->activeCamera && this->activeCamera->GetUserMovable())
   {
-    Vector2<int> d = this->mousePos - this->prevMousePos;
+    Vector2<int> drag = this->mousePos - this->prevMousePos;
+
+    double vpw        = this->activeCamera->GetViewportWidth();
+    double vph        = this->activeCamera->GetViewportHeight();
+    Vector3 camUp     = this->activeCamera->GetUp();
+    Vector3 camRight  = this->activeCamera->GetRight();
+
+    Entity *entity = Simulator::Instance()->GetSelectedEntity();
+
     if (this->leftMousePressed)
     {
-      this->activeCamera->RotateYaw(DTOR(-d.x * this->rotateAmount));
-      this->activeCamera->RotatePitch(DTOR(d.y * this->rotateAmount));
-    }
-    else if (this->rightMousePressed)
-    {
-      Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
-      if (model)
+      if (entity->IsModel() || entity->IsBody())
       {
-        Pose3d pose = model->GetPose();
-        pose.pos.y -= d.x * 0.05;
-        pose.pos.x -= d.y * 0.05;
-        model->SetPose(pose);
+        if (entity->IsModel())
+        {
+          Model *model = (Model*)(entity);
+
+          //
+          // interactively change rotation pose to selected item, 
+          // rotate about axis perpendicular to view port plane
+          //
+          Pose3d modelPose = model->GetPose();
+
+          double distance = (modelPose.pos - this->activeCamera->GetCameraPosition()).GetLength();
+          double scaleX = distance * tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          //double scaleY = distance * 
+          //  tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
+
+          // axis perpendicular to view port plane
+          Vector3 camRay = camRight.GetCrossProd(camUp);
+          Quatern yawDragQ; 
+          yawDragQ.SetFromAxis( camRay.x,camRay.y,camRay.z,drag.x/vpw*scaleX);
+
+          modelPose.rot = yawDragQ * modelPose.rot;
+          Vector3 eul = modelPose.rot.GetAsEuler();
+          /*std::cout << "Set euler angles r(" << eul.x << ") p(" 
+                    << eul.y << ") to model (" << model->GetName() 
+                    << ")" << std::endl;
+                    */
+
+          model->SetPose(modelPose);
+        }
+
+        if (entity->IsBody())
+        {
+          Body *body = (Body*)(entity);
+          double distance, scaleX, scaleY, torqueScale;
+          Quatern qUp, qRight, upRightDragQ;
+
+          //
+          // interactively set torque selected item
+          //
+          Pose3d bodyPose = body->GetPose();
+
+          distance = (bodyPose.pos - 
+              this->activeCamera->GetCameraPosition()).GetLength();
+          scaleX = distance * tan 
+            (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          scaleY = distance * tan 
+            (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
+
+          qUp.SetFromAxis(camUp.x,camUp.y,camUp.z,(double)drag.x/vpw*scaleX);
+
+          qRight.SetFromAxis(camRight.x,camRight.y,camRight.z,
+                             (double)drag.y/vpw*scaleY);
+          upRightDragQ = qUp * qRight;
+
+          torqueScale = 10000.0;
+          this->torqueVec = upRightDragQ.GetAsEuler()*torqueScale;
+          /*std::cout << "set euler torques (" << this->torqueVec 
+                    << ") to body (" << body->GetName() << ")" << std::endl;
+                    */
+          body->SetTorque(this->torqueVec);
+        }
       }
       else
       {
-        Vector2<int> d = this->mousePos - this->prevMousePos;
+        //
+        // interactively rotate view
+        //
+        this->activeCamera->RotateYaw(DTOR(-drag.x * this->rotateAmount));
+        this->activeCamera->RotatePitch(DTOR(drag.y * this->rotateAmount));
+      }
+    }
+    else if (this->rightMousePressed)
+    {
+      if (entity->IsModel() || entity->IsBody())
+      {
+        if (entity->IsModel())
+        {
+          Model *model = (Model*)(entity);
+          double distance, scaleX, scaleY;
+          Pose3d modelPose;
+          Vector3 moveVector;
+
+          //
+          // interactively set pose to selected model
+          //
+          modelPose = model->GetPose();
+          distance = (modelPose.pos - 
+              this->activeCamera->GetCameraPosition()).GetLength();
+          scaleX = distance * 
+            tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          scaleY = distance * 
+            tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          moveVector = (camRight*drag.x/vpw*scaleX - camUp*drag.y/vph*scaleY);
+          // std::cout << " vpw " << vpw
+          //           << " vph " << vph
+          //           << " distance " << distance
+          //           << " scaleX " << scaleX
+          //           << " scaleY " << scaleY
+          //           << std::endl;
+
+          modelPose.pos += moveVector;
+          model->SetPose(modelPose);
+          std::cout << "set pose (" << modelPose << ") to model (" 
+                    << model->GetName() << ")" << std::endl;
+        }
+
+        if (entity->IsBody())
+        {
+          double distance, scaleX, scaleY, forceScale;
+          Pose3d bodyPose;
+          Vector3 moveVector;
+          Body *body = (Body*)(body);
+
+          //
+          // interactively set force to selected body
+          //
+          bodyPose = body->GetPose();
+          distance = (bodyPose.pos - 
+              this->activeCamera->GetCameraPosition()).GetLength();
+          scaleX = distance * 
+            tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          scaleY = distance * 
+            tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          moveVector = (camRight*drag.x/vpw*scaleX - camUp*drag.y/vph*scaleY);
+          // std::cout << " vpw " << vpw
+          //           << " vph " << vph
+          //           << " distance " << distance
+          //           << " scaleX " << scaleX
+          //           << " scaleY " << scaleY
+          //           << std::endl;
+
+          forceScale = 10000.0;
+          this->forceVec = moveVector*forceScale;
+          std::cout << "set body force to" << this->forceVec 
+                    << " to body " << body->GetName() << std::endl;
+        }
+      }
+      else
+      {
+        //
+        // interactively pan view
+        //
         this->directionVec.x = 0;
-        this->directionVec.y =  d.x * this->moveAmount;
-        this->directionVec.z =  d.y * this->moveAmount;
+        this->directionVec.y =  drag.x * this->moveAmount;
+        this->directionVec.z =  drag.y * this->moveAmount;
       }
     }
     else if (this->middleMousePressed)
     {
-      Vector2<int> d = this->mousePos - this->prevMousePos;
-      this->directionVec.x =  d.y * this->moveAmount;
-      this->directionVec.y =  0;
-      this->directionVec.z =  0;
+      if (entity->IsBody())
+      {
+        double distance, scaleX, scaleY;
+        Vector3 moveVector;
+        Pose3d bodyPose;
+
+        Body *body = (Body*)(entity);
+
+        //
+        // interactively set pose to selected body
+        //
+        bodyPose = body->GetPose();
+
+        //Vector2<double> ddrag((double)drag.x,(double)drag.y);
+        //if (drag.x*drag.x + drag.y*drag.y > 0)
+        //  ddrag.Normalize();
+        //Vector3 dragVector     = (camRight*ddrag.x - camUp*ddrag.y);
+        //bodyPose.pos += dragVector*0.05;
+
+        distance = (bodyPose.pos - 
+            this->activeCamera->GetCameraPosition()).GetLength();
+        scaleX = distance * 
+          tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
+        scaleY = distance * 
+          tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
+        moveVector = (camRight*drag.x/vpw*scaleX - camUp*drag.y/vph*scaleY);
+
+        bodyPose.pos += moveVector;
+        body->SetPose(bodyPose);
+        std::cout << "set pose (" << bodyPose << ") to Body (" 
+                  << body->GetName() << ")" << std::endl;
+      }
+      else
+      {
+        this->directionVec.x =  drag.y * this->moveAmount;
+        this->directionVec.y =  0;
+        this->directionVec.z =  0;
+      }
     }
   }
 
@@ -255,12 +472,37 @@ void GLWindow::HandleMouseDrag()
 // Handle mouse wheel movement
 void GLWindow::HandleMouseWheel(int dx, int dy)
 {
-  Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
-  if (model)
+  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+
+  if (entity->IsModel() || entity->IsBody())
   {
-    Pose3d pose = model->GetPose();
-    pose.pos.z += dy * 0.05;
-    model->SetPose(pose);
+    // FIXME: old
+    if (entity->IsModel())
+    {
+      Model *model = (Model*)(entity);
+
+      Pose3d pose = model->GetPose();
+      pose.pos.z += dy * 0.05;
+      model->SetPose(pose);
+      std::cout << "set pose z(" << pose.pos.z << ") to model (" 
+                << model->GetName() << ")" << std::endl;
+    }
+    // FIXME: old
+    if (entity->IsBody())
+    {
+      Body *body = (Body*)(entity);
+      Pose3d pose = body->GetPose();
+      pose.pos.z += dy * 0.05;
+      body->SetPose(pose);
+      std::cout << "set pose z(" << pose.pos.z << ") to body (" 
+                << body->GetName() << ")" << std::endl;
+    }
+  }
+  else if (this->activeCamera && this->activeCamera->GetUserMovable())
+  {
+    this->directionVec.x -=  50.0 * dy * this->moveAmount;
+    this->directionVec.y =  0;
+    this->directionVec.z =  0;
   }
 
 }
@@ -302,6 +544,25 @@ void GLWindow::HandleKeyPress(int keyNum)
         case '-':
         case '_':
           this->moveAmount *= 0.5;
+          break;
+
+        case XK_j:
+          this->forceVec.z -= 100*this->moveAmount;
+          break;
+        case XK_k:
+          this->forceVec.z += 100*this->moveAmount;
+          break;
+        case XK_h:
+          this->forceVec.y -= 100*this->moveAmount;
+          break;
+        case XK_l:
+          this->forceVec.y += 100*this->moveAmount;
+          break;
+        case XK_x:
+          this->forceVec.x += 100*this->moveAmount;
+          break;
+        case XK_z:
+          this->forceVec.x -= 100*this->moveAmount;
           break;
 
         case XK_Up:

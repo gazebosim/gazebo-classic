@@ -1,7 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-sources = Split('Stereo_Camera.cc')
-
-#staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

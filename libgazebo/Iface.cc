@@ -265,6 +265,15 @@ void Iface::Open(Client *client, std::string id)
 
   // Open the mmap file
   this->mmapFd = open(this->filename.c_str(), O_RDWR);
+
+  // this patch is needed so Gazebo sits and waits for Iface to open when
+  // spawning robot dynamically
+  while (this->mmapFd <= 0)
+  {
+    this->mmapFd = open(this->filename.c_str(), O_RDWR);
+    usleep(1000000); // wait and try again
+  }
+
   if (this->mmapFd <= 0)
   {
     stream << "error opening device file " <<  this->filename.c_str() << " : "

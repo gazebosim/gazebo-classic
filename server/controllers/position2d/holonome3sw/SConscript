@@ -1,6 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-sources = Split('Holonome3Sw_Position2d.cc')
-
-sharedObjs.append(env.SharedObject(sources))

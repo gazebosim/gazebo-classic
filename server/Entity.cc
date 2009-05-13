@@ -25,6 +25,8 @@
  * SVN: $Id$
  */
 
+#include "Geom.hh"
+#include "Model.hh"
 #include "Body.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -33,6 +35,7 @@
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Entity.hh"
+#include "Simulator.hh"
 
 using namespace gazebo;
 
@@ -55,14 +58,17 @@ Entity::Entity(Entity *parent)
   if (this->parent)
   {
     this->parent->AddChild(this);
-    this->visualNode = OgreCreator::Instance()->CreateVisual(
-        visname.str(), this->parent->GetVisualNode(), this);
+
+//    if (Simulator::Instance()->GetRenderEngineEnabled())
+      this->visualNode = OgreCreator::Instance()->CreateVisual(
+            visname.str(), this->parent->GetVisualNode(), this);
     this->SetStatic(parent->IsStatic());
   }
   else
   {
+    //if (Simulator::Instance()->GetRenderEngineEnabled())
     this->visualNode = OgreCreator::Instance()->CreateVisual( 
-                                                              visname.str(), NULL, this );
+        visname.str(), NULL, this );
   }
 
   // Add this to the phyic's engine
@@ -167,13 +173,17 @@ bool Entity::SetSelected( bool s )
   Body *body = NULL;
 
   this->selected = s;
+  //std::cout << " SetSelected Entity : " << this->GetName() << " selected(" << s << ")" << std::endl;
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
+    //std::cout << " SetSelected Entity Children: " << (*iter)->GetName() << std::endl;
     (*iter)->SetSelected(s);
     body = dynamic_cast<Body*>(*iter);
-    if (body)
-      body->SetEnabled(!s);
+
+    //enabling SetEnabled(!s) makes body unstabel upon unselection
+    //if (body)
+      //body->SetEnabled(!s);
   }
 
   return true;
@@ -207,6 +217,29 @@ bool Entity::operator==(const Entity &ent) const
   return ent.GetName() == this->GetName();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the entity is a geom
+bool Entity::IsGeom()
+{
+  return dynamic_cast<Geom*>(this) != NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the entity is a body
+bool Entity::IsBody()
+{
+  return dynamic_cast<Body*>(this) != NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the entity is a model
+bool Entity::IsModel()
+{
+  return dynamic_cast<Model*>(this) != NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the pose of the entity relative to its parent
 Pose3d Entity::GetPoseRelative() const
 {
   if (this->parent)

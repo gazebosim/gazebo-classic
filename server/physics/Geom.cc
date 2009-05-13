@@ -25,8 +25,8 @@
  */
 
 #include <sstream>
-#include <boost/thread/recursive_mutex.hpp>
 
+#include "PhysicsEngine.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "Global.hh"
@@ -35,6 +35,7 @@
 #include "World.hh"
 #include "Body.hh"
 #include "Geom.hh"
+#include "Simulator.hh"
 
 using namespace gazebo;
 
@@ -45,7 +46,7 @@ int Geom::geomIdCounter = 0;
 Geom::Geom( Body *body)
     : Entity(body)
 {
-  this->mutex = new boost::recursive_mutex();
+  this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
   this->typeName = "unknown";
 
@@ -93,9 +94,6 @@ Geom::~Geom()
   if (this->transId)
     dGeomDestroy(this->transId);
 
-  delete this->mutex;
-  this->mutex = NULL;
-
   /*for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
     if (*iter)
@@ -116,13 +114,15 @@ Geom::~Geom()
 /// Load the geom
 void Geom::Load(XMLConfigNode *node)
 {
-  XMLConfigNode *childNode = NULL;
 
+  XMLConfigNode *childNode = NULL;
 
   this->xmlNode=node;
 
   this->typeName = node->GetName();
 
+  this->nameP->Load(node);
+  this->SetName(this->nameP->GetValue());
   this->nameP->Load(node);
   this->massP->Load(node);
   this->xyzP->Load(node);
@@ -148,6 +148,7 @@ void Geom::Load(XMLConfigNode *node)
 
   // TODO: This should probably be true....but "true" breaks trimesh postions.
   this->SetPose(pose, true);
+
   childNode = node->GetChild("visual");
   while (childNode)
   {
@@ -155,17 +156,17 @@ void Geom::Load(XMLConfigNode *node)
     visname << this->GetName() << "_VISUAL_" << this->visuals.size();
 
     OgreVisual *visual = OgreCreator::Instance()->CreateVisual(
-        visname.str(), this->visualNode, NULL);
+        visname.str(), this->visualNode, this);
 
-    visual->Load(childNode);
-    this->visuals.push_back(visual);
+    if (visual)
+    {
+      visual->Load(childNode);
+      visual->SetIgnorePoseUpdates(true);
+
+      this->visuals.push_back(visual);
+    }
     childNode = childNode->GetNext("visual");
   }
-
-  /*if (this->IsStatic())
-  {
-    this->visualNode->MakeStatic();
-  }*/
 
   // Create the bounding box
   if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass)
@@ -181,7 +182,9 @@ void Geom::Load(XMLConfigNode *node)
 
     this->bbVisual = OgreCreator::Instance()->CreateVisual(
         visname.str(), this->visualNode);
-    this->bbVisual->AttachBoundingBox(min,max);
+
+    if (this->bbVisual)
+      this->bbVisual->AttachBoundingBox(min,max);
   }
 
   if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass && 
@@ -222,7 +225,8 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
-    (*iter)->Save(p, stream);
+    if (*iter)
+      (*iter)->Save(p, stream);
   }
 
   stream << prefix << "</geom:" << this->typeName << ">\n";
@@ -232,6 +236,8 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
 // Set the encapsulated geometry object
 void Geom::SetGeom(dGeomID geomId, bool placeable)
 {
+  this->physicsEngine->LockMutex();
+
   this->placeable = placeable;
 
   this->geomId = geomId;
@@ -266,6 +272,7 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
     //this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
 
+  this->physicsEngine->UnlockMutex();
 
   // Create a new name of the geom's mesh entity
   //std::ostringstream stream;
@@ -298,10 +305,16 @@ dGeomID Geom::GetTransId() const
 /// Get the ODE geom class
 int Geom::GetGeomClass() const
 {
+  int result = 0;
+
   if (this->geomId)
-    return dGeomGetClass(this->geomId);
-  else
-    return 0;
+  {
+    this->physicsEngine->LockMutex();
+    result= dGeomGetClass(this->geomId);
+    this->physicsEngine->UnlockMutex();
+  }
+
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -315,6 +328,7 @@ bool Geom::IsPlaceable() const
 // Set the pose relative to the body
 void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
 {
+  this->physicsEngine->LockMutex();
 
   if (this->placeable && this->geomId)
   {
@@ -339,14 +353,17 @@ void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
       this->body->UpdateCoM();
     }
   }
+
+  this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the pose of the geom relative to the body
 Pose3d Geom::GetPose() const
 {
-  Pose3d pose;
+  this->physicsEngine->LockMutex();
 
+  Pose3d pose;
 
   if (this->placeable && this->geomId)
   {
@@ -357,7 +374,6 @@ Pose3d Geom::GetPose() const
     // the CoM
     p = dGeomGetPosition(this->geomId);
     dGeomGetQuaternion(this->geomId, r);
-
 
     pose.pos.x = p[0];
     pose.pos.y = p[1];
@@ -371,6 +387,8 @@ Pose3d Geom::GetPose() const
     // Transform into body relative pose
     pose += this->body->GetCoMPose();
   }
+
+  this->physicsEngine->UnlockMutex();
 
   return pose;
 }
@@ -391,7 +409,6 @@ void Geom::SetPosition(const Vector3 &pos)
 void Geom::SetRotation(const Quatern &rot)
 {
   Pose3d pose;
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   pose = this->GetPose();
   pose.rot = rot;
@@ -402,51 +419,63 @@ void Geom::SetRotation(const Quatern &rot)
 /// Set the category bits, used during collision detection
 void Geom::SetCategoryBits(unsigned int bits)
 {
+  this->physicsEngine->LockMutex();
+
   if (this->geomId)
     dGeomSetCategoryBits(this->geomId, bits);
   if (this->spaceId)
     dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
+
+  this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide bits, used during collision detection
 void Geom::SetCollideBits(unsigned int bits)
 {
+  this->physicsEngine->LockMutex();
+
   if (this->geomId)
     dGeomSetCollideBits(this->geomId, bits);
   if (this->spaceId)
     dGeomSetCollideBits((dGeomID)this->spaceId, bits);
+
+  this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the mass of the geom
 const dMass *Geom::GetBodyMassMatrix()
 {
+
   Pose3d pose;
   dQuaternion q;
   dMatrix3 r;
-  dMass bodyMass;
 
   if (!this->placeable)
     return NULL;
 
-  pose = this->GetPose();
+  this->physicsEngine->LockMutex();
+  pose = this->GetPose(); // get pose of the geometry
 
   q[0] = pose.rot.u;
   q[1] = pose.rot.x;
   q[2] = pose.rot.y;
   q[3] = pose.rot.z;
 
-  dQtoR(q,r);
+  dQtoR(q,r); // turn quaternion into rotation matrix
 
-
+  // this->mass was init to zero at start,
+  // read user specified mass into this->dblMass and dMassAdd in this->mass
   this->bodyMass = this->mass;
+
 
   if (dMassCheck(&this->bodyMass))
   {
     dMassRotate(&this->bodyMass, r);
     dMassTranslate( &this->bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
   }
+  this->physicsEngine->UnlockMutex();
 
   return &this->bodyMass;
 }
@@ -498,14 +527,22 @@ void Geom::ShowJoints(bool show)
   {
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
-      (*iter)->SetTransparency(0.6);
+      if (*iter)
+      {
+        (*iter)->SetVisible(false, false);
+        (*iter)->SetTransparency(0.6);
+      }
     }
-  }
+  } 
   else
   {
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
-      (*iter)->SetTransparency(0.0);
+      if (*iter)
+      {
+        (*iter)->SetVisible(true, false);
+        (*iter)->SetTransparency(1.0);
+      }
     }
   }
 }
@@ -520,21 +557,17 @@ void Geom::ShowPhysics(bool show)
   {
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
-      (*iter)->SetVisible(false, false);
+      if (*iter)
+        (*iter)->SetVisible(false, false);
     }
-    /*this->visualNode->SetVisible(true, false);
-    this->visualNode->SetTransparency(0.6);
-    */
   }
   else
   {
     for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     {
-      (*iter)->SetVisible(true, false);
+      if (*iter)
+        (*iter)->SetVisible(true, false);
     }
-    /*this->visualNode->SetVisible(false, false);
-    this->visualNode->SetTransparency(1.0);
-    */
   }
 }
 
@@ -542,8 +575,12 @@ void Geom::ShowPhysics(bool show)
 /// Set the mass
 void Geom::SetMass(const double &mass)
 {
+  this->physicsEngine->LockMutex();
   dMassAdjust(&this->mass, mass);
+  this->physicsEngine->UnlockMutex();
+
   this->body->UpdateCoM();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -559,8 +596,8 @@ OgreVisual *Geom::GetVisual(unsigned int index) const
 {
   if (index < this->visuals.size())
     return this->visuals[index];
-
-  return NULL;
+  else
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -571,7 +608,7 @@ OgreVisual *Geom::GetVisualById(int id) const
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
-    if ( (*iter)->GetId() == id)
+    if ( (*iter) && (*iter)->GetId() == id)
       return *iter;
   }
 

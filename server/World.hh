@@ -93,6 +93,26 @@ class World : public SingletonT<World>
   /// \return Pointer to the physics engine
   public: PhysicsEngine *GetPhysicsEngine() const;
 
+  /// Get the simulation time
+  /// \return The simulation time
+  public: double GetSimTime() const;
+
+  /// Get the pause time
+  /// \return The pause time
+  public: double GetPauseTime() const;
+
+  /// Get the start time
+  /// \return The start time
+  public: double GetStartTime() const;
+
+  /// Get the real time (elapsed time)
+  /// \return The real time
+  public: double GetRealTime() const;
+
+  /// \brief Get the wall clock time
+  /// \return The wall clock time
+  public: double GetWallTime() const;
+
   /// \brief Load all entities
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
@@ -197,6 +217,7 @@ class World : public SingletonT<World>
 
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;
+
 };
 
 

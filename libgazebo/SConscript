@@ -22,7 +22,10 @@ def createPkgConfig(target,source, env):
 # setup a special build environment for libgazebo. Do this so we can control
 # what libgazebo depends upon
 #
-myEnv = Environment (
+#  CC = '/opt/intel/cc/10.1.008/bin/icc',
+#  CXX = '/opt/intel/cc/10.1.008/bin/icpc',
+#  LD = '/opt/intel/cc/10.1.008/bin/xild',
+env = Environment (
   CC = 'g++',
   CCFLAGS = Split ('-pthread -pipe  -W -Wall -O2'),
   LIBS=Split('boost_signals boost_thread'),

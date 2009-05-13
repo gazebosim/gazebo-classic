@@ -1,9 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-dirs = Split('sicklms200')
-
-for subdir in dirs :
-  SConscript('%s/SConscript' % subdir)
-
-

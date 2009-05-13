@@ -34,6 +34,8 @@
 #include "World.hh"
 #include "Controller.hh"
 #include "Simulator.hh"
+#include "PhysicsEngine.hh"
+#include "Global.hh"
 
 using namespace gazebo;
 
@@ -43,6 +45,7 @@ Controller::Controller(Entity *entity )
 {
   Param::Begin(&this->parameters);
   this->nameP = new ParamT<std::string>("name","",1);
+  this->alwaysOnP = new ParamT<bool>("alwaysOn", false, 0);
   this->updatePeriodP = new ParamT<double>("updateRate", 10, 0);
   Param::End();
 
@@ -58,8 +61,8 @@ Controller::Controller(Entity *entity )
 /// Destructor
 Controller::~Controller()
 {
-  std::cout << "Deleting Controller[" << **this->nameP << "]\n";
   delete this->nameP;
+  delete this->alwaysOnP;
   delete this->updatePeriodP;
 }
 
@@ -75,10 +78,17 @@ void Controller::Load(XMLConfigNode *node)
   this->typeName = node->GetName();
 
   this->nameP->Load(node);
-  this->updatePeriodP->Load(node);
-  this->updatePeriod = 1.0 / (this->updatePeriodP->GetValue() + 1e-6);
 
-  this->lastUpdate = -1e6;
+  this->alwaysOnP->Load(node);
+
+  this->updatePeriodP->Load(node);
+
+  double updateRate  = this->updatePeriodP->GetValue();
+  if (updateRate == 0)
+    this->updatePeriod = 0.0; // no throttling if updateRate is 0
+  else
+    this->updatePeriod = 1.0 / updateRate;
+  this->lastUpdate   = Simulator::Instance()->GetSimTime();
 
   childNode = node->GetChildByNSPrefix("interface");
   
@@ -178,12 +188,30 @@ void Controller::Reset()
 /// Update the controller. Called every cycle.
 void Controller::Update()
 {
-  if (this->IsConnected())
+  if (this->IsConnected() || this->alwaysOnP->GetValue())
   {
-    if (lastUpdate + updatePeriod <= Simulator::Instance()->GetSimTime())
+    // round time difference to this->physicsEngine->GetStepTime()
+    double physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
+
+    // if (this->GetName() == std::string("p3d_base_controller"))
+    // std::cout << " sim update: " << this->GetName()
+    //           << " , " << Simulator::Instance()->GetSimTime() - lastUpdate
+    //           << " , " << lastUpdate
+    //           << " , " << updatePeriod
+    //           << " i1 " << round((Simulator::Instance()->GetSimTime()-lastUpdate)/physics_dt)
+    //           << " i2 " << round(updatePeriod/physics_dt)
+    //           << std::endl;
+#ifdef TIMING
+    double tmpT1 = Simulator::Instance()->GetWallTime();
+#endif
+    if (round((Simulator::Instance()->GetSimTime()-lastUpdate-updatePeriod)/physics_dt) >= 0)
     {
       this->UpdateChild();
       lastUpdate = Simulator::Instance()->GetSimTime();
+#ifdef TIMING
+      double tmpT2 = Simulator::Instance()->GetWallTime();
+      std::cout << "           Controller::Update() Name (" << this->GetName() << ") dt (" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
     }
   }
 }
@@ -208,6 +236,10 @@ void Controller::Fini()
 bool Controller::IsConnected() const
 {
   std::vector<Iface*>::const_iterator iter;
+
+  // if the alwaysOn flag is true, this controller is connected
+  if (this->alwaysOnP->GetValue())
+    return true;
 
   for (iter=this->ifaces.begin(); iter!=this->ifaces.end(); iter++)
   {

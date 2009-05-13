@@ -1,6 +1,13 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-ADD_SUBDIRECTORY(ode)
+INCLUDE_DIRECTORIES(. 
+  ode 
+  ${CMAKE_SOURCE_DIR}/libgazebo 
+  ${CMAKE_SOURCE_DIR}/server 
+  ${CMAKE_SOURCE_DIR}/server/rendering 
+  ${CMAKE_SOURCE_DIR}/server/sensors 
+  ${gazeboserver_include_dirs} 
+)
 
 SET (sources BallJoint.cc
              Body.cc
@@ -20,6 +27,7 @@ SET (sources BallJoint.cc
              TrimeshGeom.cc
              HeightmapGeom.cc
              MapGeom.cc
+             ode/ODEPhysics.cc
 ) 
 
-APPEND_TO_SERVER_SOURCES(${sources})
+ADD_LIBRARY(gazebo_physics STATIC ${sources})

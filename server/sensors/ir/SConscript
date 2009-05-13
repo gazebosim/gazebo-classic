@@ -1,9 +1,0 @@
-#Import variable
-Import('*')
-
-env.Append(CPPPATH = '#server/sensors/ir')
-
-sources = Split('IRSensor.cc')
-
-#staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

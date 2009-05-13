@@ -1,5 +1,12 @@
+INCLUDE_DIRECTORIES( 
+  ${CMAKE_SOURCE_DIR}/server
+  ${LIBAVCODEC_PATH}
+  ${LIBAVFORMAT_PATH}
+  ${gazeboserver_include_dirs}
+)
+
 SET (sources AudioDecoder.cc
              OpenAL.cc
 )
 
-APPEND_TO_SERVER_SOURCES(${sources})
+ADD_LIBRARY(gazebo_av STATIC ${sources})

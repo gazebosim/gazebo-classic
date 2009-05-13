@@ -25,6 +25,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
@@ -40,40 +41,46 @@ using namespace gazebo;
 StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
-  x += 30;
+  x += 5;
   y += 5;
 
   this->box(FL_UP_BOX);
   this->fps = new Fl_Value_Output(x,y,25,20,"FPS");
   this->fps->labelsize(11);
   this->fps->textsize(11);
+  this->fps->align(FL_ALIGN_RIGHT);
   this->fps->precision(0);
 
-  x = this->fps->x() + this->fps->w() + 75;
-  this->percentOutput = new Fl_Value_Output(x,y,40,20,"Sim speed");
+  x = this->fps->x() + this->fps->w() + 35;
+  this->percentOutput = new Fl_Value_Output(x,y,40,20,"x Real Time");
   this->percentOutput->labelsize(11);
+  this->percentOutput->align(FL_ALIGN_RIGHT);
   this->percentOutput->textsize(11);
   this->percentOutput->precision(2);
 
-  x = this->percentOutput->x() + this->percentOutput->w() + 100;
-  this->realTime = new Fl_Value_Output(x,y,45,20,"Real Time (sec)");
+  x = this->percentOutput->x() + this->percentOutput->w() + 85;
+  this->realTime = new Fl_Value_Output(x,y,45,20,"(sec) Real Time");
   this->realTime->labelsize(11);
   this->realTime->textsize(11);
+  this->realTime->align(FL_ALIGN_RIGHT);
   this->realTime->precision(2);
 
-  x = this->realTime->x() + this->realTime->w() + 100;
-  this->simTime = new Fl_Value_Output(x,y,45,20,"Sim Time (sec)");
+  x = this->realTime->x() + this->realTime->w() + 105;
+  this->simTime = new Fl_Value_Output(x,y,45,20,"(sec) Sim Time");
   this->simTime->labelsize(11);
   this->simTime->textsize(11);
+  this->simTime->align(FL_ALIGN_RIGHT);
   this->simTime->precision(2);
 
-  x = this->simTime->x() + this->simTime->w() + 80;
+  x = this->simTime->x() + this->simTime->w() + 100;
   this->pauseTime = new Fl_Value_Output(x,y,45,20,"Pause Time");
   this->pauseTime->labelsize(11);
   this->pauseTime->textsize(11);
+  this->pauseTime->align(FL_ALIGN_RIGHT);
   this->pauseTime->precision(2);
 
-  x = this->pauseTime->x() + this->pauseTime->w() + 20;
+  x = this->w() - 80;
+  //x = this->pauseTime->x() + this->pauseTime->w() + 80;
   this->playButton = new Fl_Button(x, y, 30, 20, "@||");
   this->playButton->callback( &gazebo::StatusBar::PlayPauseButtonCB, this );
 
@@ -111,34 +118,34 @@ void StatusBar::Update()
     if (sim > 99999)
     {
       sim /= (120*24);
-      this->simTime->label("Sim Time (dys)");
+      this->simTime->label("(dys) Sim Time");
     }
     else if (sim > 9999)
     {
       sim /= 120;
-      this->simTime->label("Sim Time (hrs)");
+      this->simTime->label("(hrs) Sim Time");
     }
     else if (sim > 999)
     {
       sim /= 60;
-      this->simTime->label("Sim Time (min)");
+      this->simTime->label("(min) Sim Time");
     }
 
     real = Simulator::Instance()->GetRealTime();
     if (sim > 99999)
     {
       real /= (120*24);
-      this->realTime->label("Real Time (dys)");
+      this->realTime->label("(dys) Real Time");
     }
     else if (real > 9999)
     {
       real /= 120;
-      this->realTime->label("Real Time (hrs)");
+      this->realTime->label("(hrs) Real Time");
     }
     else if (real > 999)
     {
       real /= 60;
-      this->realTime->label("Real Time (min)");
+      this->realTime->label("(min) Real Time");
     }
 
     //this->iterations->value(Simulator::Instance()->GetIterations());

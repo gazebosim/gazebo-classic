@@ -1,7 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-sources = Split('Pioneer2_Gripper.cc')
-
-#staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

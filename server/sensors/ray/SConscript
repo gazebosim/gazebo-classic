@@ -1,8 +1,0 @@
-Import('*')
-
-env.Append(CPPPATH = '#server/sensors/ray')
-
-sources = Split('RaySensor.cc')
-
-#staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

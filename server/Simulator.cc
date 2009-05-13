@@ -72,11 +72,12 @@ Simulator::Simulator()
   userStepInc(false),
   userQuit(false),
   guiEnabled(true),
+  renderEngineEnabled(true),
   physicsEnabled(true),
   timeout(-1),
-  selectedEntity(NULL)
+  selectedEntity(NULL),
+  selectedBody(NULL)
 {
-
   this->mutex = new boost::recursive_mutex();
 }
 
@@ -130,7 +131,8 @@ void Simulator::Close()
     return;
 
   gazebo::World::Instance()->Close();
-  gazebo::OgreAdaptor::Instance()->Close();
+  if (this->renderEngineEnabled)
+    gazebo::OgreAdaptor::Instance()->Close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,10 +174,11 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   // Load the Ogre rendering system
-  OgreAdaptor::Instance()->Load(rootNode);
+  if (this->renderEngineEnabled)
+    OgreAdaptor::Instance()->Load(rootNode);
 
   // Create and initialize the Gui
-  if (this->guiEnabled)
+  if (this->renderEngineEnabled && this->guiEnabled)
   {
     try
     {
@@ -208,14 +211,17 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   //Initialize RenderEngine
-  try
+  if (this->renderEngineEnabled)
   {
-    OgreAdaptor::Instance()->Init(rootNode);
-    this->renderEngine = OgreAdaptor::Instance();
-  }
-  catch (gazebo::GazeboError e)
-  {
-    gzthrow("Failed to Initialize the Rendering engine subsystem\n" << e );
+    try
+    {
+      OgreAdaptor::Instance()->Init(rootNode);
+      this->renderEngine = OgreAdaptor::Instance();
+    }
+    catch (gazebo::GazeboError e)
+    {
+      gzthrow("Failed to Initialize the Rendering engine subsystem\n" << e );
+    }
   }
 
   // Initialize the GUI
@@ -286,8 +292,11 @@ void Simulator::Save(const std::string& filename)
     World::Instance()->GetPhysicsEngine()->Save(prefix, output);
     output << "\n";
 
-    this->GetRenderEngine()->Save(prefix, output);
-    output << "\n";
+    if (this->renderEngineEnabled)
+    {
+      this->GetRenderEngine()->Save(prefix, output);
+      output << "\n";
+    }
 
     this->gui->Save(prefix, output);
     output << "\n";
@@ -321,7 +330,14 @@ void Simulator::MainLoop()
   double lastTime = 0;
   double freq = 30.0;
 
-  this->physicsThread = new boost::thread( boost::bind(&Simulator::PhysicsLoop, this));
+#ifdef TIMING
+    double tmpT1 = this->GetWallTime();
+    std::cout << "--------------------------- START Simulator::MainLoop() --------------------------" << std::endl;
+    std::cout << "Simulator::MainLoop() simTime(" << this->simTime << ") world time (" << tmpT1 << ")" << std::endl;
+#endif
+
+  this->physicsThread = new boost::thread( 
+                         boost::bind(&Simulator::PhysicsLoop, this));
 
   // Update the gui
   while (!this->userQuit)
@@ -352,6 +368,11 @@ void Simulator::MainLoop()
   }
 
   this->physicsThread->join();
+
+#ifdef TIMING
+    std::cout << "--------------------------- END Simulator::MainLoop() --------------------------" << std::endl;
+#endif
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -370,7 +391,10 @@ GazeboConfig *Simulator::GetGazeboConfig() const
 
 OgreAdaptor *Simulator::GetRenderEngine() const
 {
-  return this->renderEngine;
+  if (this->renderEngineEnabled)
+    return this->renderEngine;
+  else
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -477,6 +501,20 @@ bool Simulator::GetGuiEnabled() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// True if the gui is to be used
+void Simulator::SetRenderEngineEnabled( bool enabled )
+{
+  this->renderEngineEnabled = enabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the gui is enabled
+bool Simulator::GetRenderEngineEnabled() const
+{
+  return this->renderEngineEnabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set the length of time the simulation should run.
 void Simulator::SetTimeout(double time)
 {
@@ -501,17 +539,29 @@ bool Simulator::GetPhysicsEnabled() const
 /// Set the selected entity
 void Simulator::SetSelectedEntity( Entity *ent )
 {
+  // unselect selectedEntity
   if (this->selectedEntity)
   {
     this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
     this->selectedEntity->SetSelected(false);
+    this->selectedEntity = NULL;
   }
 
+  // if a different entity is selected, show bounding box and SetSelected(true)
   if (this->selectedEntity != ent)
   {
+    // set selected entity to ent
     this->selectedEntity = ent;
     this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
     this->selectedEntity->SetSelected(true);
+    //std::cout << " SetSelected Entity : " << this->selectedEntity->GetName() 
+    //          << std::endl;
+    //std::cout << " ------------------------------------------------------- " 
+    //          << std::endl;
+    //std::cout << " Drag with left mouse button to rotate in the plane of the
+    //               camera view port." << std::endl;
+    //std::cout << " Drag with right mouse button to reposition object in the
+    //               plane of the camera view port." << std::endl;
   }
   else
     this->selectedEntity = NULL;
@@ -526,29 +576,39 @@ Entity *Simulator::GetSelectedEntity() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the model that currently selected
-Model *Simulator::GetSelectedModel() const
+/// Get the model that contains the entity
+Model *Simulator::GetParentModel( Entity *entity ) const
 {
   Model *model = NULL;
-  Body *body = NULL;
-  Geom *geom = NULL;
 
-  if (!this->selectedEntity)
+  if (entity == NULL)
     return NULL;
 
-  if ( (model = dynamic_cast<Model*>(this->selectedEntity)) != NULL )
-    return model;
-  else
+  do 
   {
-    if ( (body = dynamic_cast<Body*>(this->selectedEntity)) != NULL )
-      model = body->GetModel();
-    else if ( (geom = dynamic_cast<Geom*>(this->selectedEntity)) != NULL )
-      model = geom->GetModel();
-    else
-      gzerr(0) << "Unknown type\n";
-  }
+    model = dynamic_cast<Model*>(entity);
+    entity = entity->GetParent();
+  } while (model == NULL);
 
   return model;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the body that contains the entity
+Body *Simulator::GetParentBody( Entity *entity ) const
+{
+  Body *body = NULL;
+
+  if (entity == NULL)
+    return NULL;
+
+  do 
+  {
+    body = dynamic_cast<Body*>(entity);
+    entity = entity->GetParent();
+  } while (body == NULL);
+
+  return body;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -49,6 +49,10 @@
 #include "IfaceFactory.hh"
 #include "Model.hh"
 
+#ifdef TIMING
+#include "Simulator.hh"
+#endif
+
 using namespace gazebo;
 
 uint Model::lightNumber = 0;
@@ -394,6 +398,10 @@ int Model::Update()
 
   Pose3d bodyPose, newPose, oldPose;
 
+#ifdef TIMING
+  double tmpT1 = Simulator::Instance()->GetWallTime();
+#endif
+
   for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
     if (bodyIter->second)
@@ -401,6 +409,11 @@ int Model::Update()
       bodyIter->second->Update();
     }
   }
+
+#ifdef TIMING
+  double tmpT2 = Simulator::Instance()->GetWallTime();
+  std::cout << "      ALL Bodies DT (" << this->GetName() << ") (" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
 
   for (contIter=this->controllers.begin();
        contIter!=this->controllers.end(); contIter++)
@@ -410,10 +423,22 @@ int Model::Update()
       contIter->second->Update();
   }
 
+#ifdef TIMING
+  double tmpT3 = Simulator::Instance()->GetWallTime();
+  std::cout << "      ALL Controllers DT (" << this->GetName() << ") (" << tmpT3-tmpT2 << ")" << std::endl;
+#endif
+
   for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
   {
     jointIter->second->Update();
   }
+
+#ifdef TIMING
+  double tmpT4 = Simulator::Instance()->GetWallTime();
+  std::cout << "      ALL Joints/canonical body (" << this->GetName() << ") DT (" << tmpT4-tmpT3 << ")" << std::endl;
+#endif
+
+
 
   // Call the model's python update function, if one exists
   /*if (this->pFuncUpdate)
@@ -432,6 +457,24 @@ int Model::Update()
   {
     this->graphicsHandler->Update();
   }
+
+  
+#ifdef TIMING
+  int update_error = this->UpdateChild();
+  double tmpT5 = Simulator::Instance()->GetWallTime();
+  std::cout << "      ALL child (" << this->GetName() << ") update DT (" 
+            << tmpT5-tmpT4 << ")" << std::endl;
+  std::cout << "      Models::Update() (" << this->GetName() 
+            << ") Total DT (" << tmpT5-tmpT1 << ")" << std::endl;
+  return update_error;
+#else
+     return this->UpdateChild();
+#endif
+
+
+
+
+
   return this->UpdateChild();
 }
 
@@ -555,7 +598,6 @@ void Model::SetPose(const Pose3d &setPose)
       childModel->SetPose(newPose);
     }
   }
-  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -643,7 +685,6 @@ Pose3d Model::GetPose() const
 {
   return this->pose;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create and return a new body

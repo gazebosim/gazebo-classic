@@ -26,12 +26,9 @@
 #ifndef OGRECREATOR
 #define OGRECREATOR
 
-
-//#include <X11/Xlib.h>
-//#include <X11/Xutil.h>
-
 #include <string>
 #include <vector>
+
 #include "OgreDynamicRenderable.hh"
 #include "SingletonT.hh"
 #include "Vector3.hh"

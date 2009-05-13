@@ -134,6 +134,10 @@ namespace gazebo
     //         user selection
     public: void ShowSelectionBox( bool value );
 
+    /// \brief Set to true to discard all calls to "SetPose"
+    /// This is useful for the visual node children that are part of a Geom
+    public: void SetIgnorePoseUpdates( bool value );
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: Ogre::SceneBlendType sceneBlendType;
@@ -160,6 +164,8 @@ namespace gazebo
     private: ParamT<Vector2<double> > *meshTileP;
 
     private: boost::recursive_mutex *mutex;
+
+    private: bool ignorePoseUpdates;
   };
 }
 

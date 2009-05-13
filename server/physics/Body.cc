@@ -25,26 +25,38 @@
  */
 
 #include <sstream>
-#include <boost/thread/recursive_mutex.hpp>
 
+#include "XMLConfig.hh"
 #include "Model.hh"
 #include "GazeboMessage.hh"
+
 #include "HeightmapGeom.hh"
 #include "MapGeom.hh"
-#include "OgreVisual.hh"
-#include "Global.hh"
-#include "Vector2.hh"
-#include "Quatern.hh"
-#include "GazeboError.hh"
-#include "SensorFactory.hh"
-#include "Sensor.hh"
 #include "SphereGeom.hh"
 #include "TrimeshGeom.hh"
 #include "BoxGeom.hh"
 #include "CylinderGeom.hh"
 #include "PlaneGeom.hh"
 #include "Geom.hh"
+
+#include "OgreVisual.hh"
+#include "OgreCreator.hh"
+#include "Global.hh"
+#include "Vector2.hh"
+#include "Quatern.hh"
+#include "GazeboError.hh"
+#include "SensorFactory.hh"
+#include "Sensor.hh"
+#include "Simulator.hh"
+#include "World.hh"
+#include "ODEPhysics.hh"
+#include "PhysicsEngine.hh"
+
 #include "Body.hh"
+
+#ifdef TIMING
+#include "Simulator.hh"// for timing
+#endif
 
 using namespace gazebo;
 
@@ -53,8 +65,7 @@ using namespace gazebo;
 Body::Body(Entity *parent, dWorldID worldId)
     : Entity(parent)
 {
-
-  this->mutex = new boost::recursive_mutex();
+  this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
   if ( !this->IsStatic() )
   {
@@ -73,8 +84,26 @@ Body::Body(Entity *parent, dWorldID worldId)
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
   this->rpyP->Callback( &Body::SetRotation, this );
-
   this->dampingFactorP = new ParamT<double>("dampingFactor", 0.03, 0);
+
+  // option to turn gravity off for individual body
+  this->turnGravityOffP = new ParamT<bool>("turnGravityOff", false, 0);
+
+  // option to make body collide with bodies of the same parent
+  this->selfCollideP = new ParamT<bool>("selfCollide", false, 0);
+
+  // User can specify mass/inertia property for the body
+  this->customMassMatrixP = new ParamT<bool>("massMatrix",false,0);
+  this->cxP = new ParamT<double>("cx",0.0,0);
+  this->cyP = new ParamT<double>("cy",0.0,0);
+  this->czP = new ParamT<double>("cz",0.0,0);
+  this->bodyMassP = new ParamT<double>("mass",0.001,0);
+  this->ixxP = new ParamT<double>("ixx",1e-6,0);
+  this->iyyP = new ParamT<double>("iyy",1e-6,0);
+  this->izzP = new ParamT<double>("izz",1e-6,0);
+  this->ixyP = new ParamT<double>("ixy",0.0,0);
+  this->ixzP = new ParamT<double>("ixz",0.0,0);
+  this->iyzP = new ParamT<double>("iyz",0.0,0);
 
   Param::End();
 
@@ -107,26 +136,75 @@ Body::~Body()
   delete this->xyzP;
   delete this->rpyP;
   delete this->dampingFactorP;
+  delete this->turnGravityOffP;
+  delete this->selfCollideP;
 
-  delete this->mutex;
-  this->mutex = NULL;
+  delete this->customMassMatrixP;
+  delete this->cxP ;
+  delete this->cyP ;
+  delete this->czP ;
+  delete this->bodyMassP;
+  delete this->ixxP;
+  delete this->iyyP;
+  delete this->izzP;
+  delete this->ixyP;
+  delete this->ixzP;
+  delete this->iyzP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the body based on an XMLConfig node
 void Body::Load(XMLConfigNode *node)
 {
+
+  // before loading child geometry, we have to figure out of selfCollide is true
+  // and modify parent class Entity so this body has its own spaceId
+  this->selfCollideP->Load(node);
+  if (this->selfCollideP->GetValue())
+  {
+    //std::cout << "setting self collide: " << this->nameP->GetValue() << std::endl;
+    ODEPhysics* pe = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());
+    this->spaceId = dSimpleSpaceCreate( pe->spaceId);
+  }
+
+  // option to enter full mass matrix
+  // load custom inertia matrix for the body
+  this->customMassMatrixP->Load(node);
+  this->cxP ->Load(node);
+  this->cyP ->Load(node);
+  this->czP ->Load(node);
+  this->bodyMassP->Load(node);
+  this->ixxP->Load(node);
+  this->iyyP->Load(node);
+  this->izzP->Load(node);
+  this->ixyP->Load(node);
+  this->ixzP->Load(node);
+  this->iyzP->Load(node);
+
+  this->customMassMatrix = this->customMassMatrixP->GetValue();
+  this->cx  = this->cxP ->GetValue();
+  this->cy  = this->cyP ->GetValue();
+  this->cz  = this->czP ->GetValue();
+  this->bodyMass = this->bodyMassP->GetValue();
+  this->ixx = this->ixxP->GetValue();
+  this->iyy = this->iyyP->GetValue();
+  this->izz = this->izzP->GetValue();
+  this->ixy = this->ixyP->GetValue();
+  this->ixz = this->ixzP->GetValue();
+  this->iyz = this->iyzP->GetValue();
+
   XMLConfigNode *childNode;
 
   this->nameP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
   this->dampingFactorP->Load(node);
+  this->turnGravityOffP->Load(node);
+
   Pose3d initPose;
 
   initPose.pos = **(this->xyzP);
   initPose.rot = **(this->rpyP);
-
 
   childNode = node->GetChildByNSPrefix("geom");
 
@@ -137,6 +215,24 @@ void Body::Load(XMLConfigNode *node)
     this->LoadGeom(childNode);
     childNode = childNode->GetNextByNSPrefix("geom");
   }
+
+  /// Attach mesh for CG visualization
+  /// Add a renderable visual for CG, make visible in Update()
+  if (this->mass.mass > 0.0)
+  {
+    std::ostringstream visname;
+    visname << this->GetName() << "_CGVISUAL" ;
+
+    this->cgVisual = OgreCreator::Instance()->CreateVisual(visname.str(),
+                        this->GetModel()->GetVisualNode());
+    if (this->cgVisual)
+    {
+      this->cgVisual->AttachMesh("body_cg");
+      this->cgVisual->SetVisible(false);
+      this->cgVisual->SetMaterial("Gazebo/Red");
+    }
+  }
+
 
   childNode = node->GetChildByNSPrefix("sensor");
 
@@ -149,12 +245,14 @@ void Body::Load(XMLConfigNode *node)
   }
 
   // If no geoms are attached, then don't let gravity affect the body.
-  if (this->geoms.size()==0)
+  if (this->geoms.size()==0 || this->turnGravityOffP->GetValue())
   {
+    //std::cout << "setting gravity to zero for: " << this->nameP->GetValue() << std::endl;
     this->SetGravityMode(false);
   }
 
   this->SetPose(initPose);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +306,11 @@ void Body::Fini()
 void Body::SetGravityMode(bool mode)
 {
   if (this->bodyId)
+  {
+    this->physicsEngine->LockMutex();
     dBodySetGravityMode(this->bodyId, mode ? 1: 0);
+    this->physicsEngine->UnlockMutex();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -253,6 +355,13 @@ void Body::SetCollideMode( const std::string &m )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Return Self-Collision Setting
+bool Body::GetSelfCollide()
+{
+  return this->selfCollideP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the body
 void Body::Init()
 {
@@ -278,13 +387,53 @@ void Body::Update()
 
   double force;
 
+#ifdef TIMING
+  double tmpT1 = Simulator::Instance()->GetWallTime();
+#endif
+
   this->UpdatePose();
+
+#ifdef TIMING
+  double tmpT2 = Simulator::Instance()->GetWallTime();
+  std::cout << "           Body Name (" << this->nameP->GetValue() << ")" << std::endl;
+  std::cout << "               UpdatePose dt (" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
+
+  // Merged from ogre-1.4.9 branch...not sure if we want this
+  /*if (!this->IsStatic())
+  {
+    // Set the pose of the scene node
+      this->visualNode->SetPose(this->pose);
+
+      if (this->mass.mass > 0.0)
+      {
+        // Visualization of Body CG
+        if (this->cgVisual)
+        {
+          this->cgVisual->SetVisible(true);
+
+          // set visual pose of CG (CoM)
+          // comPose is only good for initial pose, to represent dynamically changing CoM, rotate by pose.rot
+          this->cgVisual->SetPose(this->pose + this->comPose.RotatePositionAboutOrigin(this->pose.rot.GetInverse()));
+        }
+      }
+  }*/
+
+#ifdef TIMING
+  double tmpT3 = Simulator::Instance()->GetWallTime();
+  std::cout << "               Static SetPose dt (" << tmpT3-tmpT2 << ")" << std::endl;
+#endif
 
   for (geomIter=this->geoms.begin();
        geomIter!=this->geoms.end(); geomIter++)
   {
     geomIter->second->Update();
   }
+
+#ifdef TIMING
+  double tmpT4 = Simulator::Instance()->GetWallTime();
+  std::cout << "               Geom Update DT (" << tmpT4-tmpT3 << ")" << std::endl;
+#endif
 
   for (sensorIter=this->sensors.begin();
        sensorIter!=this->sensors.end(); sensorIter++)
@@ -294,13 +443,27 @@ void Body::Update()
 
   if(this->GetId())
   {
+    this->physicsEngine->LockMutex();
+
 	  force = this->dampingFactorP->GetValue() * this->mass.mass;
 	  vel = this->GetLinearVel();
-	  dBodyAddForce(this->GetId(), -((vel.x * fabs(vel.x)) * force), -((vel.y * fabs(vel.y)) * force), -((vel.z * fabs(vel.z)) * force));
+	  dBodyAddForce(this->GetId(), -((vel.x * fabs(vel.x)) * force), 
+                  -((vel.y * fabs(vel.y)) * force), 
+                  -((vel.z * fabs(vel.z)) * force));
 
 	  avel = this->GetAngularVel();
-	  dBodyAddTorque(this->GetId(), -avel.x * force, -avel.y * force, -avel.z * force);
+	  dBodyAddTorque(this->GetId(), -avel.x * force, -avel.y * force, 
+                   -avel.z * force);
+
+    this->physicsEngine->UnlockMutex();
   }
+
+#ifdef TIMING
+  double tmpT5 = Simulator::Instance()->GetWallTime();
+  std::cout << "               ALL Sensors Update DT (" << tmpT5-tmpT4 << ")" << std::endl;
+  std::cout << "               Body::Update Total DT (" << tmpT5-tmpT1 << ")" << std::endl;
+#endif
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,10 +474,15 @@ void Body::AttachGeom( Geom *geom )
   {
     if (geom->IsPlaceable())
     {
+
+      this->physicsEngine->LockMutex();
+
       if (geom->GetTransId())
         dGeomSetBody(geom->GetTransId(), this->bodyId);
       else if (geom->GetGeomId())
         dGeomSetBody(geom->GetGeomId(), this->bodyId);
+
+      this->physicsEngine->UnlockMutex();
     }
   }
 
@@ -331,6 +499,17 @@ void Body::AttachGeom( Geom *geom )
 // Set the pose of the body
 void Body::SetPose(const Pose3d &_pose)
 {
+
+  // check if pose is NaN, if so, constraint solver likely blew up
+  if (std::isnan(pose.pos.x) || std::isnan(pose.pos.y) || 
+      std::isnan(pose.pos.z) || std::isnan(pose.rot.u) || 
+      std::isnan(pose.rot.x) || std::isnan(pose.rot.y) || 
+      std::isnan(pose.rot.z))
+  {
+    std::cout << "Trying to SetPose() for Body(" << this->GetName() 
+              << ") with some NaN's (" << pose << ")" << std::endl;
+    return;
+  }
 
   if (this->IsStatic())
   {
@@ -390,16 +569,21 @@ void Body::UpdatePose()
 void Body::SetPosition(const Vector3 &pos)
 {
   if (this->bodyId)
+  {
+    this->physicsEngine->LockMutex();
     dBodySetPosition(this->bodyId, pos.x, pos.y, pos.z);
+    this->physicsEngine->UnlockMutex();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the body
 void Body::SetRotation(const Quatern &rot)
 {
-
   if (this->bodyId)
   {
+    this->physicsEngine->LockMutex();
+
     dQuaternion q;
     q[0] = rot.u;
     q[1] = rot.x;
@@ -408,6 +592,8 @@ void Body::SetRotation(const Quatern &rot)
 
     // Set the rotation of the ODE body
     dBodySetQuaternion(this->bodyId, q);
+
+    this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -419,6 +605,7 @@ Vector3 Body::GetPosition() const
 
   if (this->bodyId)
   {
+    this->physicsEngine->LockMutex();
     const dReal *p;
 
     p = dBodyGetPosition(this->bodyId);
@@ -426,6 +613,16 @@ Vector3 Body::GetPosition() const
     pos.x = p[0];
     pos.y = p[1];
     pos.z = p[2];
+
+    // check for NaN
+    if (std::isnan(pos.x) || std::isnan(pos.y) || std::isnan(pos.z))
+    {
+      std::cout << "Your simulation has exploded, position of body(" << this->GetName() << ") has NaN(" << pos << ")" << std::endl;
+      //pos = this->pose.pos;
+      assert(0);
+    }
+
+    this->physicsEngine->UnlockMutex();
   }
   else
   {
@@ -446,12 +643,22 @@ Quatern Body::GetRotation() const
   {
     const dReal *r;
 
+    this->physicsEngine->LockMutex();
     r = dBodyGetQuaternion(this->bodyId);
+    this->physicsEngine->UnlockMutex();
 
     rot.u = r[0];
     rot.x = r[1];
     rot.y = r[2];
     rot.z = r[3];
+
+    // check for NaN
+    if (std::isnan(rot.u) || std::isnan(rot.x) || std::isnan(rot.y) || std::isnan(rot.z))
+    {
+      std::cout << "Your simulation has exploded, rotation of body(" << this->GetName() << ") has NaN(" << rot << ")" << std::endl;
+      //rot = this->pose.rot;
+      assert(0);
+    }
   }
   else
   {
@@ -459,6 +666,95 @@ Quatern Body::GetRotation() const
   }
 
   return rot;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the position of the body. in global CS
+Vector3 Body::GetPositionRate() const
+{
+  Vector3 vel;
+
+  if (this->bodyId)
+  {
+    const dReal *v;
+
+    this->physicsEngine->LockMutex();
+    v = dBodyGetLinearVel(this->bodyId);
+    this->physicsEngine->UnlockMutex();
+
+    vel.x = v[0];
+    vel.y = v[1];
+    vel.z = v[2];
+  }
+  else
+  {
+    vel.x = 0;
+    vel.y = 0;
+    vel.z = 0;
+  }
+
+  return vel;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the rotation
+Quatern Body::GetRotationRate() const
+{
+  Quatern velQ;
+  Vector3 vel;
+
+  if (this->bodyId)
+  {
+    const dReal *v;
+
+    this->physicsEngine->LockMutex();
+    v = dBodyGetAngularVel(this->bodyId);
+    this->physicsEngine->UnlockMutex();
+
+    vel.x = v[0];
+    vel.y = v[1];
+    vel.z = v[2];
+
+    velQ.SetFromEuler(vel);
+  }
+  else
+  {
+    vel.x = 0;
+    vel.y = 0;
+    vel.z = 0;
+    velQ.SetFromEuler(vel);
+  }
+
+  return velQ;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the rotation
+Vector3 Body::GetEulerRate() const
+{
+  Vector3 vel;
+
+  if (this->bodyId)
+  {
+    const dReal *v;
+
+    this->physicsEngine->LockMutex();
+    v = dBodyGetAngularVel(this->bodyId);
+    this->physicsEngine->UnlockMutex();
+    vel.x = v[0];
+    vel.y = v[1];
+    vel.z = v[2];
+
+  }
+  else
+  {
+    vel.x = 0;
+    vel.y = 0;
+    vel.z = 0;
+  }
+
+  return vel;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -476,10 +772,14 @@ void Body::SetEnabled(bool enable) const
   if (!this->bodyId)
     return;
 
+  this->physicsEngine->LockMutex();
+
   if (enable)
     dBodyEnable(this->bodyId);
   else
     dBodyDisable(this->bodyId);
+
+  this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -505,7 +805,7 @@ void Body::LoadGeom(XMLConfigNode *node)
   }
   else if (node->GetName() == "map")
   {
-    //this->SetStatic(true);
+    this->SetStatic(true);
     geom = new MapGeom(this);
   }
   else
@@ -563,71 +863,177 @@ void Body::LoadSensor(XMLConfigNode *node)
 */
 void Body::UpdateCoM()
 {
-  const dMass *lmass;
-  Pose3d oldPose, newPose, pose;
-  std::map< std::string, Geom* >::iterator giter;
-
   if (!this->bodyId)
     return;
 
-  // Construct the mass matrix by combining all the geoms
-  dMassSetZero( &this->mass );
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  // user can specify custom mass matrix or alternatively, UpdateCoM will calculate CoM for
+  // combined mass of all children geometries.
+  if (this->customMassMatrix)
   {
-    lmass = giter->second->GetBodyMassMatrix();
-    if (giter->second->IsPlaceable() && giter->second->GetGeomId())
+    // Old pose for the CoM
+    Pose3d oldPose, newPose, tmpPose;
+
+    // oldPose is the last comPose
+    // newPose is mass CoM
+    oldPose = this->comPose;
+
+    //std::cout << " in UpdateCoM, name: " << this->GetName() << std::endl;
+    //std::cout << " in UpdateCoM, comPose or oldPose: " << this->comPose << std::endl;
+
+    // New pose for the CoM
+    newPose.pos.x = this->cx;
+    newPose.pos.y = this->cy;
+    newPose.pos.z = this->cz;
+
+    std::map< std::string, Geom* >::iterator giter;
+    // Fixup the poses of the geoms (they are attached to the CoM)
+    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
     {
-      dMassAdd( &this->mass, lmass );
+      if (giter->second->IsPlaceable())
+      {
+        // FOR GEOMS:
+        // get pose with comPose set to oldPose
+        this->comPose = oldPose;
+        tmpPose = giter->second->GetPose();
+
+        // get pose with comPose set to newPose
+        this->comPose = newPose;
+        giter->second->SetPose(tmpPose, false);
+      }
     }
+
+    // FOR BODY: Fixup the pose of the CoM (ODE body)
+    // get pose with comPose set to oldPose
+    this->comPose = oldPose;
+    tmpPose = this->GetPose();
+    // get pose with comPose set to newPose
+    this->comPose = newPose;
+    this->SetPose(tmpPose);
+
+    // Settle on the new CoM pose
+    this->comPose = newPose;
+
+
+
+    // comPose is zero in this case, we'll keep cx, cy, cz
+    this->comPose.Reset();
+
+    this->comPose.pos.x = this->cx;
+    this->comPose.pos.y = this->cy;
+    this->comPose.pos.z = this->cz;
+
+    this->physicsEngine->LockMutex();
+    // setup this->mass as well
+    dMassSetParameters(&this->mass, this->bodyMass,
+                       this->cx, this->cy, this->cz,
+                       //0,0,0,
+                       this->ixx,this->iyy,this->izz,
+                       this->ixy,this->ixz,this->iyz);
+
+    dMassTranslate( &this->mass, -this->cx, -this->cy, -this->cz);
+
+    // dMatrix3 rot;
+    // dMassRotate(&this->mass, rot);
+
+    // Set the mass matrix
+    if (this->mass.mass > 0)
+      dBodySetMass( this->bodyId, &this->mass );
+
+    // std::cout << " c[0] " << this->mass.c[0] << std::endl;
+    // std::cout << " c[1] " << this->mass.c[1] << std::endl;
+    // std::cout << " c[2] " << this->mass.c[2] << std::endl;
+    // std::cout << " I[0] " << this->mass.I[0] << std::endl;
+    // std::cout << " I[1] " << this->mass.I[1] << std::endl;
+    // std::cout << " I[2] " << this->mass.I[2] << std::endl;
+    // std::cout << " I[3] " << this->mass.I[3] << std::endl;
+    // std::cout << " I[4] " << this->mass.I[4] << std::endl;
+    // std::cout << " I[5] " << this->mass.I[5] << std::endl;
+    // std::cout << " I[6] " << this->mass.I[6] << std::endl;
+    // std::cout << " I[7] " << this->mass.I[7] << std::endl;
+    // std::cout << " I[8] " << this->mass.I[8] << std::endl;
+
+    this->physicsEngine->UnlockMutex();
+  }
+  else
+  {
+
+    // original gazebo subroutine that gathers mass from all geoms and sums into one single mass matrix
+
+    const dMass *lmass;
+    std::map< std::string, Geom* >::iterator giter;
+
+    this->physicsEngine->LockMutex();
+    // Construct the mass matrix by combining all the geoms
+    dMassSetZero( &this->mass );
+
+    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+    {
+      lmass = giter->second->GetBodyMassMatrix();
+      if (giter->second->IsPlaceable() && giter->second->GetGeomId())
+      {
+        dMassAdd( &this->mass, lmass );
+      }
+    }
+
+    // Old pose for the CoM
+    Pose3d oldPose, newPose, tmpPose;
+
+    // oldPose is the last comPose
+    // newPose is mass CoM
+    oldPose = this->comPose;
+
+    if (std::isnan(this->mass.c[0]))
+      this->mass.c[0] = 0;
+
+    if (std::isnan(this->mass.c[1]))
+      this->mass.c[1] = 0;
+
+    if (std::isnan(this->mass.c[2]))
+      this->mass.c[2] = 0;
+
+    // New pose for the CoM
+    newPose.pos.x = this->mass.c[0];
+    newPose.pos.y = this->mass.c[1];
+    newPose.pos.z = this->mass.c[2];
+
+    // Fixup the poses of the geoms (they are attached to the CoM)
+    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+    {
+      if (giter->second->IsPlaceable())
+      {
+        // FOR GEOMS:
+        // get pose with comPose set to oldPose
+        this->comPose = oldPose;
+        tmpPose = giter->second->GetPose();
+
+        // get pose with comPose set to newPose
+        this->comPose = newPose;
+        giter->second->SetPose(tmpPose, false);
+      }
+    }
+
+    // FOR BODY: Fixup the pose of the CoM (ODE body)
+    // get pose with comPose set to oldPose
+    this->comPose = oldPose;
+    tmpPose = this->GetPose();
+    // get pose with comPose set to newPose
+    this->comPose = newPose;
+    this->SetPose(tmpPose);
+
+
+    // Settle on the new CoM pose
+    this->comPose = newPose;
+
+    // My Cheap Hack, to put the center of mass at the origin
+    this->mass.c[0] = this->mass.c[1] = this->mass.c[2] = 0;
+
+    // Set the mass matrix
+    if (this->mass.mass > 0)
+      dBodySetMass( this->bodyId, &this->mass );
+
+    this->physicsEngine->UnlockMutex();
   }
 
-  // Old pose for the CoM
-  oldPose = this->comPose;
-
-  if (std::isnan(this->mass.c[0]))
-    this->mass.c[0] = 0;
-
-  if (std::isnan(this->mass.c[1]))
-    this->mass.c[1] = 0;
-
-  if (std::isnan(this->mass.c[2]))
-    this->mass.c[2] = 0;
-
-  // New pose for the CoM
-  newPose.pos.x = this->mass.c[0];
-  newPose.pos.y = this->mass.c[1];
-  newPose.pos.z = this->mass.c[2];
-
-  // Fixup the poses of the geoms (they are attached to the CoM)
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-  {
-    if (giter->second->IsPlaceable())
-    {
-      this->comPose = oldPose;
-      pose = giter->second->GetPose();
-      this->comPose = newPose;
-      giter->second->SetPose(pose, false);
-    }
-  }
-
-
-  // Fixup the pose of the CoM (ODE body)
-  this->comPose = oldPose;
-  pose = this->GetPose();
-  this->comPose = newPose;
-  this->SetPose(pose);
-
-
-  // Settle on the new CoM pose
-  this->comPose = newPose;
-
-  // My Cheap Hack, to put the center of mass at the origin
-  this->mass.c[0] = this->mass.c[1] = this->mass.c[2] = 0;
-
-  // Set the mass matrix
-  if (this->mass.mass > 0)
-    dBodySetMass( this->bodyId, &this->mass );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -642,7 +1048,11 @@ const Pose3d &Body::GetCoMPose() const
 void Body::SetLinearVel(const Vector3 &vel)
 {
   if (this->bodyId)
+  {
+    this->physicsEngine->LockMutex();
     dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
+    this->physicsEngine->UnlockMutex();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -655,7 +1065,9 @@ Vector3 Body::GetLinearVel() const
   {
     const dReal *dvel;
 
+    this->physicsEngine->LockMutex();
     dvel = dBodyGetLinearVel(this->bodyId);
+    this->physicsEngine->UnlockMutex();
 
     vel.x = dvel[0];
     vel.y = dvel[1];
@@ -670,7 +1082,11 @@ Vector3 Body::GetLinearVel() const
 void Body::SetAngularVel(const Vector3 &vel)
 {
   if (this->bodyId)
+  {
+    this->physicsEngine->LockMutex();
     dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
+    this->physicsEngine->UnlockMutex();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -683,7 +1099,9 @@ Vector3 Body::GetAngularVel() const
   {
     const dReal *dvel;
 
+    this->physicsEngine->LockMutex();
     dvel = dBodyGetAngularVel(this->bodyId);
+    this->physicsEngine->UnlockMutex();
 
     vel.x = dvel[0];
     vel.y = dvel[1];
@@ -727,7 +1145,9 @@ void Body::SetForce(const Vector3 &force)
 {
   if (this->bodyId)
   {
+    this->physicsEngine->LockMutex();
     dBodyAddForce(this->bodyId, force.x, force.y, force.z);
+    this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -741,7 +1161,9 @@ Vector3 Body::GetForce() const
   {
     const dReal *dforce;
 
+    this->physicsEngine->LockMutex();
     dforce = dBodyGetForce(this->bodyId);
+    this->physicsEngine->UnlockMutex();
 
     force.x = dforce[0];
     force.y = dforce[1];
@@ -756,7 +1178,11 @@ Vector3 Body::GetForce() const
 void Body::SetTorque(const Vector3 &torque)
 {
   if (this->bodyId)
+  {
+    this->physicsEngine->LockMutex();
     dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
+    this->physicsEngine->UnlockMutex();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -764,11 +1190,14 @@ void Body::SetTorque(const Vector3 &torque)
 Vector3 Body::GetTorque() const
 {
   Vector3 torque;
+
   if (this->bodyId)
   {
     const dReal *dtorque;
 
+    this->physicsEngine->LockMutex();
     dtorque = dBodyGetTorque(this->bodyId);
+    this->physicsEngine->UnlockMutex();
 
     torque.x = dtorque[0];
     torque.y = dtorque[1];
@@ -822,4 +1251,3 @@ Geom *Body::GetGeom(const std::string &name) const
   else
     return NULL;
 }
-

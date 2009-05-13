@@ -1111,7 +1111,7 @@ class FactoryData
   public: GazeboData head;
 
   /// String describing the model to be initiated
-  public: uint8_t newModel[4096*4];
+  public: uint8_t newModel[409600];
 
   /// Delete a model by name
   public: uint8_t deleteModel[512];

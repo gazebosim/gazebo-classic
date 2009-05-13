@@ -107,6 +107,36 @@ uint8_t ContactSensor::GetContactState(unsigned int index) const
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// Return the contact geom name
+std::string ContactSensor::GetContactGeomName(unsigned int index) const
+{
+  if (index < this->contactCount)
+    return this->contactNames[index];
+
+  return std::string("");
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Return the contact feedback forces and torques
+dJointFeedback ContactSensor::GetContactFeedback(unsigned int index) const
+{
+  if (index < this->contactCount)
+    return this->contactFeedbacks[index];
+  return dJointFeedback();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+/// Return the self geom name
+std::string ContactSensor::GetGeomName(unsigned int index) const
+{
+  if (index < this->contactCount)
+    return this->geomNamesP[index]->GetValue();
+
+  return std::string("");
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// Reset the contact states
 void ContactSensor::ResetContactStates()
 {
@@ -138,7 +168,10 @@ void ContactSensor::LoadChild(XMLConfigNode *node)
   this->contactCount = this->geomNamesP.size();
   this->contactTimes = new double[ this->contactCount ];
   this->contactStates = new uint8_t[ this->contactCount ];
+  for (unsigned int i=0; i< this->contactCount; i++)
+    this->contactNames.push_back("");
 
+  memset(this->contactTimes,0, sizeof(double) * this->contactCount);
   memset(this->contactStates,0, sizeof(uint8_t) * this->contactCount);
   memset(this->contactTimes,0, sizeof(double) * this->contactCount);
 }
@@ -195,6 +228,11 @@ void ContactSensor::UpdateChild()
 /// Contact callback
 void ContactSensor::ContactCallback(Geom *g1, Geom *g2)
 {
+
+  // somehow here, extract contact information when user requests it
+  //
+
+
   std::vector< ParamT<std::string> *>::iterator iter;
   int i = 0;
 
@@ -204,9 +242,29 @@ void ContactSensor::ContactCallback(Geom *g1, Geom *g2)
   {
     if ( **(*iter) == g1->GetName() || **(*iter) == g2->GetName() )
     {
+      if (i < GAZEBO_MAX_CONTACT_FB_DATA)
+      {
+        dJointSetFeedback(g1->cID, this->contactFeedbacks+i);
+
+        // std::cout << "contact id:" << i
+        //           << " geom1:" << g1->GetName()
+        //           << " geom2:" << g2->GetName();
+        // std::cout << " contact joint ID:" << g1->cID
+        //           << " f1:"<<this->contactFeedbacks[i].f1[0]<<","<<this->contactFeedbacks[i].f1[1]<<","<<this->contactFeedbacks[i].f1[2]<<","<<this->contactFeedbacks[i].f1[3]
+        //           << " t1:"<<this->contactFeedbacks[i].t1[0]<<","<<this->contactFeedbacks[i].t1[1]<<","<<this->contactFeedbacks[i].t1[2]<<","<<this->contactFeedbacks[i].t1[3]
+        //           << " f1_magnitude:" << dLENGTH(this->contactFeedbacks[i].f1)
+        //           << " f2:"<<this->contactFeedbacks[i].f2[0]<<","<<this->contactFeedbacks[i].f2[1]<<","<<this->contactFeedbacks[i].f2[2]<<","<<this->contactFeedbacks[i].f2[3]
+        //           << " t2:"<<this->contactFeedbacks[i].t2[0]<<","<<this->contactFeedbacks[i].t2[1]<<","<<this->contactFeedbacks[i].t2[2]<<","<<this->contactFeedbacks[i].t2[3]
+        //           << " f2_magnitude:" << dLENGTH(this->contactFeedbacks[i].f2)
+        //           << std::endl;
+      }
+
       this->contactStates[i] = 1;
       this->contactTimes[i] = Simulator::Instance()->GetRealTime();
+      this->contactNames[i] = **(*iter)==g1->GetName()? g2->GetName() : g1->GetName();
     }
   }
 
 }
+
+

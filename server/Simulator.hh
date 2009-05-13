@@ -51,6 +51,7 @@ namespace gazebo
   class GazeboConfig;
   class OgreAdaptor;
   class Entity;
+  class Body;
   class Model;
 
 /// \brief The World
@@ -150,6 +151,12 @@ namespace gazebo
     /// \brief Return true if the gui is enabled
     public: bool GetGuiEnabled() const;
 
+    /// \brief True if the gui is to be used
+    public: void SetRenderEngineEnabled( bool enabled );
+
+    /// \brief Return true if the gui is enabled
+    public: bool GetRenderEngineEnabled() const;
+
     /// \brief Set the length of time the simulation should run.
     public: void SetTimeout(double time);
 
@@ -162,11 +169,17 @@ namespace gazebo
     /// \brief Set the selected entity
     public: void SetSelectedEntity( Entity *ent );
 
+    /// \brief Set the selected body
+    public: void SetSelectedBody( Body *bod );
+
     /// \brief Get the selected entity
     public: Entity *GetSelectedEntity() const;
 
-    /// \brief Get the model that currently selected
-    public: Model *GetSelectedModel() const;
+    /// \brief Get the model that contains the entity
+    public: Model *GetParentModel( Entity *entity ) const;
+
+    /// \brief Get the body that contains the entity
+    public: Body *GetParentBody( Entity *entity ) const;
 
     /// \brief Get the simulator mutex
     public:boost::recursive_mutex *GetMutex();
@@ -222,6 +235,9 @@ namespace gazebo
     /// True if the GUI is enabled
     private: bool guiEnabled;
 
+    /// True if the Rendering Engine is enabled
+    private: bool renderEngineEnabled;
+
     /// True if physics is enabled
     private: bool physicsEnabled;
 
@@ -233,6 +249,7 @@ namespace gazebo
 
     /// The entity currently selected by the user
     private: Entity *selectedEntity;
+    private: Body *selectedBody;
 
     /// Thread in which to run the gui
     private: boost::thread *physicsThread;

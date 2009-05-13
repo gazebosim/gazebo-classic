@@ -24,6 +24,8 @@
  * SVN: $Id$
  */
 
+#include <boost/thread/recursive_mutex.hpp>
+
 #include "PhysicsEngine.hh"
 
 using namespace gazebo;
@@ -37,6 +39,8 @@ PhysicsEngine::PhysicsEngine()
   this->updateRateP = new ParamT<double>("maxUpdateRate", 0.0, 0);
   this->stepTimeP = new ParamT<double>("stepTime",0.025,0);
   Param::End();
+
+  this->mutex = new boost::recursive_mutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +50,9 @@ PhysicsEngine::~PhysicsEngine()
   delete this->gravityP;
   delete this->updateRateP;
   delete this->stepTimeP;
+
+  delete this->mutex;
+  this->mutex = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,3 +76,16 @@ double PhysicsEngine::GetStepTime() const
   return this->stepTimeP->GetValue();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Lock the physics engine mutex
+void PhysicsEngine::LockMutex()
+{
+  this->mutex->lock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Lock the physics engine mutex
+void PhysicsEngine::UnlockMutex()
+{
+  this->mutex->unlock();
+}

@@ -34,7 +34,6 @@
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "GazeboError.hh"
-#include "ODEPhysics.hh"
 #include "XMLConfig.hh"
 #include "Controller.hh"
 #include "ImuSensor.hh"

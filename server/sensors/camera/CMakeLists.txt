@@ -4,4 +4,4 @@ set (sources MonoCameraSensor.cc
              StereoCameraSensor.cc
 )
 
-APPEND_TO_SERVER_SOURCES(${sources})
+APPEND_TO_SENSOR_SOURCES(${sources})

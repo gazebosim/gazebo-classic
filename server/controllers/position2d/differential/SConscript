@@ -1,7 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-sources = Split('Differential_Position2d.cc')
-
-#staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

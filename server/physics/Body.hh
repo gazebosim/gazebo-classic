@@ -31,22 +31,17 @@
 #include <map>
 #include <vector>
 
-#include "XMLConfig.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Param.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
   class Model;
   class Geom;
   class Sensor;
-
+  class XMLConfigNode;
+  class PhysicsEngine;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class
@@ -105,6 +100,18 @@ namespace gazebo
     /// \return Rotation quaternion
     public: Quatern GetRotation() const;
 
+    /// \brief Return the velocity of the body
+    /// \return Velocity vector
+    public: Vector3 GetPositionRate() const;
+
+    /// \brief Return the rotation rates
+    /// \return Rotation Rate quaternion
+    public: Quatern GetRotationRate() const;
+
+    /// \brief Return the rotation rates
+    /// \return Rotation Rate Euler Angles RPY
+    public: Vector3 GetEulerRate() const;
+
     /// \brief Return the ID of this body
     /// \return ODE body id
     public: dBodyID GetId() const;
@@ -126,6 +133,10 @@ namespace gazebo
 
     /// \brief Set the collide mode of the body
     public: void SetCollideMode( const std::string &m );
+
+    /// \brief Get Self-Collision Flag, if this is true, this body will collide
+    //         with other bodies even if they share the same parent.
+    public: bool GetSelfCollide();
 
     /// \brief Set the linear velocity of the body
     public: void SetLinearVel(const Vector3 &vel);
@@ -192,6 +203,9 @@ namespace gazebo
     /// \brief Update the pose of the body
     private: void UpdatePose();
 
+    /// \brief Set transparency for all child geometries
+    public: void SetTransparency(float t);
+
     /// List of geometries attached to this body
     private: std::map< std::string, Geom* > geoms;
 
@@ -215,7 +229,27 @@ namespace gazebo
 
     private: ParamT<double> *dampingFactorP;
 
-    private: boost::recursive_mutex *mutex;
+    private: PhysicsEngine *physicsEngine;
+
+    private: ParamT<bool> *turnGravityOffP;
+    private: ParamT<bool> *selfCollideP;
+
+    private: OgreVisual *cgVisual;
+
+    ///  User specified Mass Matrix
+    protected: ParamT<bool> *customMassMatrixP;
+    protected: ParamT<double> *cxP ;
+    protected: ParamT<double> *cyP ;
+    protected: ParamT<double> *czP ;
+    protected: ParamT<double> *bodyMassP;
+    protected: ParamT<double> *ixxP;
+    protected: ParamT<double> *iyyP;
+    protected: ParamT<double> *izzP;
+    protected: ParamT<double> *ixyP;
+    protected: ParamT<double> *ixzP;
+    protected: ParamT<double> *iyzP;
+    protected: bool customMassMatrix;
+    protected: double cx,cy,cz,bodyMass,ixx,iyy,izz,ixy,ixz,iyz;
   };
 
   /// \}

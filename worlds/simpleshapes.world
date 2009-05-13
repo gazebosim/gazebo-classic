@@ -15,10 +15,10 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.003</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>10e-5</cfm>
-    <erp>0.3</erp>
+    <cfm>10e-2</cfm>
+    <erp>0.2</erp>
   </physics:ode>
 
   <rendering:gui>
@@ -28,10 +28,11 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.1 0.1 0.1 1.0</ambient>
+    <ambient>0.0 0.0 0.0 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+    <shadowTechnique>stencilAdditive</shadowTechnique>
     <grid>true</grid>
   </rendering:ogre>
 
@@ -42,13 +43,13 @@
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
-        <size>0.25</size>
+        <size>0.2</size>
         <mass>0.0</mass>
 
         <mu1>109999.0</mu1>
 
         <visual>
-          <size>0.5 0.5 0.5</size>
+          <size>0.4 0.4 0.4</size>
           <mesh>unit_sphere</mesh>
           <material>Gazebo/Rocky</material>
         </visual>
@@ -57,22 +58,23 @@
   </model:physical>
 
   <model:physical name="box1_model">
-    <xyz>1 1.5 0.5</xyz>
+    <xyz>1 1.5 0.25</xyz>
     <canonicalBody>box1_body</canonicalBody>
     <static>false</static>
 
     <body:box name="box1_body">
-
-      <geom:box name="box1_geom">
-        <size>1 1 1</size>
+      <geom:box name="box1_geom1">
+        <size>0.5 0.5 0.5</size>
         <mass>0.1</mass>
+
         <visual>
-          <size>1 1 1</size>
+          <size>0.5 0.5 0.5</size>
           <mesh>unit_box</mesh>
           <material>Gazebo/Rocky</material>
         </visual>
       </geom:box>
     </body:box>
+
   </model:physical>
 
   <model:physical name="cylinder1_model">
@@ -105,21 +107,21 @@
         <size>100 100</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/Grey</material>
+        <material>Gazebo/Rockwall</material>
         <mu1>109999.0</mu1>
         <mu2>1000.0</mu2>
       </geom:plane>
     </body:plane>
   </model:physical>
 
-  <!-- White Directional light -->
+  <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>0 2 2</xyz>
+    <xyz>1 1 4</xyz>
     <enableGravity>false</enableGravity>
 
     <light>
       <type>point</type>
-      <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      <diffuseColor>0.9 0.9 0.9</diffuseColor>
       <specularColor>0.1 0.1 0.1</specularColor>
       <attenuation>10 0.8 0.1 0.0</attenuation>
     </light>

@@ -32,6 +32,9 @@
 #include "Param.hh"
 #include "PhysicsEngine.hh"
 
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+
 namespace gazebo
 {
   class SphereGeom;
@@ -98,8 +101,11 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Initialize the ODE engine
   public: virtual void Init();
 
+  /// \brief Update the ODE collision
+  public: virtual void UpdateCollision();
+
   /// \brief Update the ODE engine
-  public: virtual void Update();
+  public: virtual void UpdatePhysics();
 
   /// \brief Finilize the ODE engine
   public: virtual void Fini();
@@ -126,13 +132,16 @@ class ODEPhysics : public PhysicsEngine
   private: dWorldID worldId;
 
   /// \brief Top-level space for all sub-spaces/geoms
-  private: dSpaceID spaceId;
+  public: dSpaceID spaceId;
 
   /// \brief Collision attributes
   private: dJointGroupID contactGroup;
 
   private: ParamT<double> *globalCFMP; 
   private: ParamT<double> *globalERPP; 
+  private: ParamT<bool> *quickStepP; 
+  private: ParamT<int> *quickStepItersP; 
+  private: ParamT<double> *quickStepWP; 
 };
 
 /** \}*/

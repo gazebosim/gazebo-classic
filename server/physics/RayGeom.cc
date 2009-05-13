@@ -34,6 +34,7 @@
 #include "Body.hh"
 #include "Global.hh"
 #include "RayGeom.hh"
+#include "Simulator.hh"
 
 using namespace gazebo;
 

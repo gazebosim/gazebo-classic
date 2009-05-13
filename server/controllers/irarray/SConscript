@@ -1,7 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-sources = Split('IR_Array.cc')
-
-#staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

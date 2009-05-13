@@ -34,11 +34,6 @@
 #include "Pose3d.hh"
 #include "Vector3.hh"
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
 
@@ -47,6 +42,7 @@ namespace gazebo
   class ContactParams;
   class XMLConfigNode;
   class OgreVisual;
+  class PhysicsEngine;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
@@ -169,6 +165,8 @@ namespace gazebo
 
     ///  Contact parameters
     public: ContactParams *contact; 
+    ///  Save Contact Joint ID
+    public: dJointID cID; 
   
     /// The body this geom belongs to
     protected: Body *body;
@@ -211,7 +209,8 @@ namespace gazebo
 
     private: std::string typeName;
 
-    private: boost::recursive_mutex *mutex;
+    private: PhysicsEngine *physicsEngine;
+
   };
 
   /// \}

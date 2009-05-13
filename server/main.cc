@@ -115,6 +115,7 @@ const char *optLogFileName = NULL;
 unsigned int optServerId = 0;
 bool optServerForce = true;
 bool optGuiEnabled = true;
+bool optRenderEngineEnabled = true;
 double optTimeout = -1;
 unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
@@ -132,6 +133,7 @@ void PrintUsage()
   fprintf(stderr, "  -d <-1:9>      : Verbose mode: -1 = none, 0 = critical (default), 9 = all)\n");
   fprintf(stderr, "  -t <sec>      : Timeout and quit after <sec> seconds\n");
   fprintf(stderr, "  -g            : Run without a GUI\n");
+  fprintf(stderr, "  -r            : Run without a rendering engine\n");
   fprintf(stderr, "  -l <logfile>  : Log to indicated file.\n");
   fprintf(stderr, "  -n            : Do not do any time control\n");
   fprintf(stderr,"   -p            : Run without physics engine\n");
@@ -157,7 +159,8 @@ int ParseArgs(int argc, char **argv)
 {
   FILE *tmpFile;
   int ch;
-  char *flags = (char*)("l:hd:s:fgxt:nqpe");
+
+  char *flags = (char*)("l:hd:s:fgxt:nqper");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
@@ -200,6 +203,10 @@ int ParseArgs(int argc, char **argv)
 
       case 'g':
         optGuiEnabled = false;
+        break;
+
+      case 'r':
+        optRenderEngineEnabled = false;
         break;
 
       case 'p':
@@ -253,6 +260,14 @@ void SignalHandler( int /*dummy*/ )
 int main(int argc, char **argv)
 {
 
+
+  // force a cpu affinity for CPU 0, this slow down sim by about 4X
+  // cpu_set_t cpuSet;
+  // CPU_ZERO(&cpuSet);
+  // CPU_SET(0, &cpuSet);
+  // sched_setaffinity( 0, sizeof(cpuSet), &cpuSet);
+
+
   //Application Setup
   if (ParseArgs(argc, argv) != 0)
     return -1;
@@ -266,6 +281,7 @@ int main(int argc, char **argv)
   }
 
   gazebo::Simulator::Instance()->SetGuiEnabled( optGuiEnabled );
+  gazebo::Simulator::Instance()->SetRenderEngineEnabled( optRenderEngineEnabled );
 
   //Load the simulator
   try

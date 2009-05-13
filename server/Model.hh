@@ -39,6 +39,10 @@
 #include "Entity.hh"
 #include "gazebo.h"
 
+namespace boost
+{
+  class recursive_mutex;
+}
 
 namespace gazebo
 {
@@ -227,6 +231,7 @@ namespace gazebo
     private: ParamT<bool> *enableGravityP;
     private: ParamT<bool> *enableFrictionP;
     private: ParamT<std::string> *collideP;
+
 
     // Name of a light (if the model is renderable:light)
     private: std::string lightName;

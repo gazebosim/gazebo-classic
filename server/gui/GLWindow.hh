@@ -40,6 +40,7 @@
 #include <FL/Fl_Gl_Window.H>
 
 #include "Gui.hh"
+#include "Pose3d.hh"
 #include "Vector3.hh"
 #include "Vector2.hh"
 
@@ -139,6 +140,9 @@ namespace gazebo
     private: bool middleMousePressed;
     private: Vector2<int> prevMousePos;
     private: Vector2<int> mousePos;
+    private: Vector2<int> mouseOriginPos; // for applying external forces
+    private: Vector3 forceVec; // for applying external forces
+    private: Vector3 torqueVec; // for applying external forces
     private: std::map<int,int> keys;
 
     private: double lastUpdateTime;

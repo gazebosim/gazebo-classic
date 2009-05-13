@@ -100,6 +100,9 @@ namespace gazebo
 
     /// \brief Get an entity at a pixel location using a camera. Used for
     ///        mouse picking. 
+    /// \param camera The ogre camera, used to do mouse picking
+    /// \param mousePos The position of the mouse in screen coordinates
+    /// \return The selected entity, or NULL
     public: Entity *GetEntityAt(OgreCamera *camera, Vector2<int> mousePos);
 
     /// \brief Register a user camera

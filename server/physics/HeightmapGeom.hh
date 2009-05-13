@@ -27,13 +27,13 @@
 #ifndef HEIGHTMAPGEOM_HH
 #define HEIGHTMAPGEOM_HH
 
-#include <Ogre.h>
-
 #include "Vector2.hh"
 #include "Geom.hh"
 
 namespace gazebo
 {
+  class OgreHeightmap;
+
   /// \addtogroup gazebo_physics_geom
   /// \{
   /** \defgroup gazebo_heightmap_geom Height map geom
@@ -74,7 +74,7 @@ namespace gazebo
 
 
   /// \brief Height map geom
-  class HeightmapGeom : public Geom, public Ogre::RaySceneQueryListener
+  class HeightmapGeom : public Geom
   {
     /// \brief Constructor
     public: HeightmapGeom(Body *body);
@@ -84,15 +84,6 @@ namespace gazebo
 
     /// \brief Update function 
     public: void UpdateChild();
-
-    /// \brief Get the height of the heightmap as a specific coordinate
-    public: float GetHeightAt(const Vector2<float> &pos);
-
-    /// \brief Overloaded Ogre function for Ray Scene Queries
-    public: virtual bool queryResult(Ogre::MovableObject *obj, Ogre::Real dist);
-
-    /// \brief Overloaded Ogre function for Ray Scene Queries
-    public: virtual bool queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist);
 
     /// \brief Load the heightmap
     protected: virtual void LoadChild(XMLConfigNode *node);
@@ -109,18 +100,9 @@ namespace gazebo
     private: dHeightfieldDataID odeData;
 
     private: Vector3 terrainSize;
-    private: Vector3 terrainScale;
 
     private: unsigned int odeVertSize;
     private: Vector3 odeScale;
-
-    private: unsigned int terrainVertSize;
-    private: std::string terrainImage;
-
-    private: Ogre::Ray ray;
-    private: Ogre::RaySceneQuery *rayQuery;
-
-    private: double distToTerrain;
 
     private: std::vector<double> heights;
 
@@ -130,6 +112,7 @@ namespace gazebo
     private: ParamT<Vector3> *sizeP;
     private: ParamT<Vector3> *offsetP;
 
+    private: OgreHeightmap *ogreHeightmap;
   };
 
   /// \}

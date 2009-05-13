@@ -105,6 +105,9 @@ class Controller
   /// \brief The entity that owns this controller
   protected: Entity *parent;
 
+  /// \breif flag to keep controllers updating continuously
+  protected: ParamT<bool> *alwaysOnP;
+
   /// \brief Update period 
   protected: double updatePeriod;
   protected: ParamT<double> *updatePeriodP;

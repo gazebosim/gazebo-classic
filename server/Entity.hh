@@ -37,7 +37,11 @@
 
 namespace gazebo
 {
-  
+ 
+  class Geom; 
+  class Body;
+  class Model;
+
   class OgreVisual;
   /// \addtogroup gazebo_server
   /// \{
@@ -107,10 +111,21 @@ namespace gazebo
 
     /// \brief Get the pose of the entity
     public: virtual Pose3d GetPose() const = 0;// { return Pose3d(); }
+
+    /// \brief Get the pose of the entity relative to its parent
     public: Pose3d GetPoseRelative() const;
 
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;
+
+    /// \brief Return true if the entity is a geom
+    public: bool IsGeom();
+
+    /// \brief Return true if the entity is a body
+    public: bool IsBody();
+
+    /// \brief Return true if the entity is a model
+    public: bool IsModel();
 
     /// \brief Parent of this entity
     protected: Entity *parent;

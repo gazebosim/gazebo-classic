@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <sstream>
 #include <fstream>
+#include <sys/time.h> //gettimeofday
 
 #include "GraphicsIfaceHandler.hh"
 #include "Global.hh"
@@ -218,8 +219,6 @@ int World::Init()
 // Update the world
 int World::Update()
 {
-  std::vector< Model* >::iterator miter;
-  std::vector< Model* >::iterator miter2;
 
   if (this->simPauseTime > 0)
   {
@@ -239,7 +238,12 @@ int World::Update()
     }
   }
 
+#ifdef TIMING
+  double tmpT1 = Simulator::Instance()->GetWallTime();
+#endif
+
   // Update all the models
+  std::vector< Model* >::iterator miter;
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     if (*miter)
@@ -248,22 +252,33 @@ int World::Update()
     }
   }
 
+#ifdef TIMING
+  double tmpT2 = Simulator::Instance()->GetWallTime();
+  std::cout << " World::Update() ALL Models update DT(" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
+
   if (!Simulator::Instance()->IsPaused() &&
        Simulator::Instance()->GetPhysicsEnabled())
   {
-    this->physicsEngine->Update();
+    this->physicsEngine->UpdatePhysics();
   }
 
   this->graphics->Update();
 
+#ifdef TIMING
+  double tmpT4 = Simulator::Instance()->GetWallTime();
+  std::cout << " World::Update() Physics engine DT(" << tmpT4-tmpT2 << ")" << std::endl;
+#endif
+
   return 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Process messages
 void World::ProcessMessages()
 {
   this->UpdateSimulationIface();
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the world

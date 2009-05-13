@@ -70,6 +70,8 @@ void HingeJoint::LoadChild(XMLConfigNode *node)
   this->SetParam(dParamHiStop, this->hiStopP->GetValue().GetAsRadian());
   this->SetParam(dParamLoStop, this->loStopP->GetValue().GetAsRadian());
   this->SetParam(dParamHiStop, this->hiStopP->GetValue().GetAsRadian());
+  this->SetParam(dParamFMax, 0);
+  this->SetTorque(0);
 
   this->SetAxis(**(this->axisP));
 }

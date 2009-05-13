@@ -23,9 +23,10 @@
  * Date: 14 Dec 2007
  * SVN: $Id$
  */
-#include <Ogre.h>
+
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Simulator.hh"
 #include "OgreSimpleShape.hh"
 #include "Entity.hh"
 #include "GazeboMessage.hh"
@@ -44,23 +45,9 @@ unsigned int OgreVisual::visualCounter = 0;
 OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   : Common()
 {
-  this->mutex = new boost::recursive_mutex();
-
   std::ostringstream stream;
 
-  if (!node)
-    this->parentNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
-  else
-    this->parentNode = node->GetSceneNode();
-
-  this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
-
-  // Create a unique name for the scene node
-  //FIXME: what if we add the capability to delete and add new children?
-  stream << this->parentNode->getName() << "_VISUAL_" << visualCounter++;
-  
-  // Create the scene node
-  this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
+  this->mutex = new boost::recursive_mutex();
 
   this->owner = _owner;
 
@@ -74,8 +61,10 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   this->meshNameP = new ParamT<std::string>("mesh","",1);
   this->meshTileP = new ParamT< Vector2<double> >("uvTile", 
       Vector2<double>(1.0, 1.0), 0 );
-
-  this->materialNameP = new ParamT<std::string>("material",std::string(),0);
+ 
+  //default to Gazebo/White
+  this->materialNameP = new ParamT<std::string>("material",
+                                                std::string("Gazebo/White"),0);
   this->materialNameP->Callback( &OgreVisual::SetMaterial, this );
 
   this->castShadowsP = new ParamT<bool>("castShadows",true,0);
@@ -87,6 +76,25 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
 
   this->staticGeometry = NULL;
   this->boundingBoxNode = NULL;
+
+  this->ignorePoseUpdates = false;
+
+  if (Simulator::Instance()->GetRenderEngineEnabled())
+  {
+    if (!node)
+      this->parentNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
+    else
+      this->parentNode = node->GetSceneNode();
+
+    this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
+
+    // Create a unique name for the scene node
+    //FIXME: what if we add the capability to delete and add new children?
+    stream << this->parentNode->getName() << "_VISUAL_" << visualCounter++;
+
+    // Create the scene node
+    this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +148,10 @@ void OgreVisual::Load(XMLConfigNode *node)
   pose.pos = this->xyzP->GetValue();
   pose.rot = this->rpyP->GetValue();
 
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   try
   {
     // Create the entity
@@ -158,7 +170,8 @@ void OgreVisual::Load(XMLConfigNode *node)
       }
     }
 
-    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(stream.str(), meshName);
+    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
+            stream.str(), meshName);
   }
   catch (Ogre::Exception e)
   {
@@ -209,8 +222,7 @@ void OgreVisual::Load(XMLConfigNode *node)
   this->SetMaterial(this->materialNameP->GetValue());
 
   // Allow the mesh to cast shadows
-  this->SetCastShadows(this->castShadowsP->GetValue());
-
+  this->SetCastShadows((**this->castShadowsP));
 }
 
 
@@ -234,6 +246,11 @@ void OgreVisual::Save(std::string &prefix, std::ostream &stream)
 void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   this->sceneNode->attachObject(obj);
   obj->setUserObject( this );
 }
@@ -243,6 +260,11 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 void OgreVisual::DetachObjects()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   this->sceneNode->detachAllObjects();
 }
 
@@ -251,6 +273,11 @@ void OgreVisual::DetachObjects()
 unsigned short OgreVisual::GetNumAttached()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return 0;
+
   return this->sceneNode->numAttachedObjects();
 }
 
@@ -259,6 +286,11 @@ unsigned short OgreVisual::GetNumAttached()
 Ogre::MovableObject *OgreVisual::GetAttached(unsigned short num)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
+
   return this->sceneNode->getAttachedObject(num);
 }
 
@@ -267,6 +299,11 @@ Ogre::MovableObject *OgreVisual::GetAttached(unsigned short num)
 void OgreVisual::MakeStatic()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   if (!this->staticGeometry)
     this->staticGeometry = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
@@ -285,6 +322,11 @@ void OgreVisual::MakeStatic()
 void OgreVisual::AttachMesh( const std::string &meshName )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   std::ostringstream stream;
   Ogre::MovableObject *obj;
   stream << this->sceneNode->getName() << "_ENTITY_" << meshName;
@@ -299,6 +341,12 @@ void OgreVisual::AttachMesh( const std::string &meshName )
 void OgreVisual::SetScale(const Vector3 &scale )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+
   Ogre::Vector3 vscale;
   vscale.x=scale.x;
   vscale.y=scale.y;
@@ -311,6 +359,11 @@ void OgreVisual::SetScale(const Vector3 &scale )
 Vector3 OgreVisual::GetScale()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return Vector3(0,0,0);
+
   Ogre::Vector3 vscale;
   vscale=this->sceneNode->getScale();
   return Vector3(vscale.x, vscale.y, vscale.z);
@@ -322,6 +375,10 @@ Vector3 OgreVisual::GetScale()
 void OgreVisual::SetMaterial(const std::string &materialName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
 
   if (materialName.empty())
     return;
@@ -398,6 +455,12 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 void OgreVisual::SetTransparency( float trans )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+
   unsigned short i = 0, j=0;
   Ogre::ColourValue sc, dc;
   Ogre::Technique *t;
@@ -406,8 +469,8 @@ void OgreVisual::SetTransparency( float trans )
 
   if (this->myMaterial.isNull())
   {
-    gzmsg(0) << "The visual " << this->sceneNode->getName() << " can't set transparency for this geom without a material\n";
-
+    gzmsg(0) << "The visual can't set transparency for this geom (" << /*geom name? << */ ") without a material"
+             << " sceneNode(" << this->sceneNode->getName() << ")\n";
     return;
   }
 
@@ -463,6 +526,11 @@ void OgreVisual::SetTransparency( float trans )
 void OgreVisual::SetHighlight(bool highlight)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   /*
   #include <OgreParticleSystem.h>
   #include <iostream>
@@ -506,6 +574,11 @@ void OgreVisual::SetHighlight(bool highlight)
 void OgreVisual::SetCastShadows(const bool &shadows)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
@@ -518,6 +591,11 @@ void OgreVisual::SetCastShadows(const bool &shadows)
 void OgreVisual::SetVisible(bool visible, bool cascade)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   this->sceneNode->setVisible( visible, cascade );
 }
 
@@ -527,6 +605,14 @@ void OgreVisual::SetVisible(bool visible, bool cascade)
 void OgreVisual::SetPosition( const Vector3 &pos)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  if (this->ignorePoseUpdates)
+    return;
+
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 }
 
@@ -535,6 +621,14 @@ void OgreVisual::SetPosition( const Vector3 &pos)
 void OgreVisual::SetRotation( const Quatern &rot)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  if (this->ignorePoseUpdates)
+    return;
+
   this->sceneNode->setOrientation(rot.u, rot.x, rot.y, rot.z);
 }
 
@@ -543,6 +637,14 @@ void OgreVisual::SetRotation( const Quatern &rot)
 void OgreVisual::SetPose( const Pose3d &pose)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  if (this->ignorePoseUpdates)
+    return;
+
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
 }
@@ -552,6 +654,11 @@ void OgreVisual::SetPose( const Pose3d &pose)
 Vector3 OgreVisual::GetPosition()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return Vector3();
+
   Ogre::Vector3 vpos;
   Vector3 pos;
   vpos=this->sceneNode->getPosition();
@@ -566,6 +673,11 @@ Vector3 OgreVisual::GetPosition()
 Quatern OgreVisual::GetRotation( )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return Quatern();
+
   Ogre::Quaternion vquatern;
   Quatern quatern;
   vquatern=this->sceneNode->getOrientation();
@@ -581,6 +693,11 @@ Quatern OgreVisual::GetRotation( )
 Pose3d OgreVisual::GetPose()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return Pose3d();
+
   Pose3d pos;
   pos.pos=this->GetPosition();
   pos.rot=this->GetRotation();
@@ -592,6 +709,11 @@ Pose3d OgreVisual::GetPose()
 Ogre::SceneNode * OgreVisual::GetSceneNode()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
+
   return this->sceneNode;
 }
 
@@ -601,6 +723,11 @@ Ogre::SceneNode * OgreVisual::GetSceneNode()
 void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   std::ostringstream nodeName;
 
   nodeName << this->sceneNode->getName()<<"_AABB_NODE";
@@ -641,7 +768,7 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 /// Get the entity that manages this visual
 Entity *OgreVisual::GetOwner() const
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return this->owner;
 }
 
@@ -650,6 +777,11 @@ Entity *OgreVisual::GetOwner() const
 void OgreVisual::ShowSelectionBox( bool value )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   Ogre::SceneNode *node = this->sceneNode;
 
   while (node && node->numAttachedObjects() == 0)
@@ -658,4 +790,12 @@ void OgreVisual::ShowSelectionBox( bool value )
   }
   if (node)
     node->showBoundingBox(value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set to true to discard all calls to "SetPose". This is useful for the 
+/// visual node children that are part of a Geom
+void OgreVisual::SetIgnorePoseUpdates( bool value )
+{
+  this->ignorePoseUpdates = value;
 }

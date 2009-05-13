@@ -74,6 +74,7 @@ namespace gazebo
  
     /// \brief Set whether the sensor is active or not
     public: void SetActive(bool value);
+    public: bool IsActive();
 
     /// \brief  Load the child sensor
     protected: virtual void LoadChild(XMLConfigNode * /*node*/) {};
@@ -105,7 +106,6 @@ namespace gazebo
     protected: double lastUpdate;
     protected: std::string typeName;
   };
-  
   /// \}
 }
 #endif

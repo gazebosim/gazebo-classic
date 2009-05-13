@@ -75,6 +75,12 @@ RaySensor::RaySensor(Body *body)
   this->resRangeP = new ParamT<double>("resRange",0.1,1);
   this->originP = new ParamT<Vector3>("origin", Vector3(0,0,0), 0);
   this->displayRaysP = new ParamT<std::string>("displayRays", "off", 0);
+
+  // for block rays, vertical setting
+  this->verticalRayCountP = new ParamT<int>("verticalRayCount", 1, 0);
+  this->verticalRangeCountP = new ParamT<int>("verticalRangeCount", 1, 0);
+  this->verticalMinAngleP = new ParamT<Angle>("verticalMinAngle", DTOR(0), 0);
+  this->verticalMaxAngleP = new ParamT<Angle>("verticalMaxAngle", DTOR(0), 0);
   Param::End();
 }
 
@@ -98,6 +104,11 @@ RaySensor::~RaySensor()
   delete this->resRangeP;
   delete this->originP;
   delete this->displayRaysP;
+
+  delete this->verticalRayCountP;
+  delete this->verticalRangeCountP;
+  delete this->verticalMinAngleP;
+  delete this->verticalMaxAngleP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -118,6 +129,10 @@ void RaySensor::LoadChild(XMLConfigNode *node)
   this->resRangeP->Load(node);
   this->originP->Load(node);
   this->displayRaysP->Load(node);
+  this->verticalRayCountP->Load(node);
+  this->verticalRangeCountP->Load(node);
+  this->verticalMinAngleP->Load(node);
+  this->verticalMaxAngleP->Load(node);
 
 
   // Create a space to contain the ray space
@@ -146,6 +161,10 @@ void RaySensor::SaveChild(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->rayCountP) << "\n";
   stream << prefix << "  " << *(this->rangeCountP) << "\n";
   stream << prefix << "  " << *(this->displayRaysP) << "\n";
+  stream << prefix << "  " << *(this->verticalRayCountP) << "\n";
+  stream << prefix << "  " << *(this->verticalRangeCountP) << "\n";
+  stream << prefix << "  " << *(this->verticalMinAngleP) << "\n";
+  stream << prefix << "  " << *(this->verticalMaxAngleP) << "\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -153,42 +172,55 @@ void RaySensor::SaveChild(std::string &prefix, std::ostream &stream)
 void RaySensor::InitChild()
 {
   Pose3d bodyPose;
-  double angle;
+  double yawAngle, pitchAngle;
   Vector3 start, end, axis;
   RayGeom *ray;
 
   bodyPose = this->body->GetPose();
   this->prevPose = bodyPose;
+  double pDiff = (**(this->verticalMaxAngleP) - 
+                  **(this->verticalMinAngleP)).GetAsRadian();
+  double yDiff = (**(this->maxAngleP) - **(this->minAngleP)).GetAsRadian();
+
   // Create and array of ray geoms
-  for (int i = 0; i < this->rayCountP->GetValue(); i++)
+  for (int j = 0; j < this->verticalRayCountP->GetValue(); j++)
   {
-    double diff = (**(this->maxAngleP) - **(this->minAngleP)).GetAsRadian();
 
-    angle = i * diff / (rayCountP->GetValue()) + (**(this->minAngleP)).GetAsRadian();
-
-    axis.Set(cos(angle), sin(angle),0);
-
-    start = (axis * this->minRangeP->GetValue()) + this->originP->GetValue();
-    end = (axis * this->maxRangeP->GetValue()) + this->originP->GetValue();
-
-    ray = new RayGeom(this->body, (**this->displayRaysP) == "lines");
-
-    if ((**this->displayRaysP) == "fan")
+    for (int i = 0; i < this->rayCountP->GetValue(); i++)
     {
-      if (i == 0)
+
+      yawAngle = (rayCountP->GetValue() == 1)? 0 : 
+                   i * yDiff / (rayCountP->GetValue() - 1) + 
+                   (**(this->minAngleP)).GetAsRadian();
+
+      pitchAngle = (verticalRayCountP->GetValue() == 1)? 0 :  
+                     j * pDiff / (verticalRayCountP->GetValue() - 1) + 
+                     (**(this->verticalMinAngleP)).GetAsRadian();
+
+      axis.Set(cos(pitchAngle)*cos(yawAngle), sin(yawAngle),
+               sin(pitchAngle)*cos(yawAngle));
+
+      start = (axis * this->minRangeP->GetValue()) + this->originP->GetValue();
+      end = (axis * this->maxRangeP->GetValue()) + this->originP->GetValue();
+
+      ray = new RayGeom(this->body, (**this->displayRaysP) == "lines");
+
+      if ((**this->displayRaysP) == "fan")
       {
-        this->rayFan->AddPoint(start);
-        this->rayFanOutline->AddPoint(start);
+        if (i == 0)
+        {
+          this->rayFan->AddPoint(start);
+          this->rayFanOutline->AddPoint(start);
+        }
+
+        this->rayFan->AddPoint(end);
+        this->rayFanOutline->AddPoint(end);
       }
 
-      this->rayFan->AddPoint(end);
-      this->rayFanOutline->AddPoint(end);
+      ray->SetPoints(start, end);
+
+      this->rays.push_back(ray);
     }
-    
-
-    ray->SetPoints(start, end);
-
-    this->rays.push_back(ray);
   }
 
   if ((**this->displayRaysP) == "fan")
@@ -264,6 +296,34 @@ int RaySensor::GetRayCount() const
 int RaySensor::GetRangeCount() const
 {
   return this->rangeCountP->GetValue();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the vertical scan line count
+int RaySensor::GetVerticalRayCount() const
+{
+  return this->verticalRayCountP->GetValue();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the vertical scan line count
+int RaySensor::GetVerticalRangeCount() const
+{
+  return this->verticalRangeCountP->GetValue();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the vertical min angle
+Angle RaySensor::GetVerticalMinAngle() const
+{
+  return this->verticalMinAngleP->GetValue();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the vertical max angle
+Angle RaySensor::GetVerticalMaxAngle() const
+{
+  return this->verticalMaxAngleP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -349,10 +409,12 @@ void RaySensor::UpdateChild()
       gzthrow( "Invalid physics engine. Must use ODE." );
     }
 
+    ode->LockMutex();
     // Do collision detection
     dSpaceCollide2( ( dGeomID ) ( this->superSpaceId ),
         ( dGeomID ) ( ode->GetSpaceId() ),
         this, &UpdateCallback );
+    ode->UnlockMutex();
 
     if ((**this->displayRaysP) == "fan")
     { 

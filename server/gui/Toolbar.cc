@@ -98,12 +98,14 @@ void Toolbar::Update()
   if (this->entityBrowser->size() == 0)
     this->UpdateEntityBrowser();
 
-  Model *model = Simulator::Instance()->GetSelectedModel();
+  Entity *entity = Simulator::Instance()->GetSelectedEntity();
 
   this->paramCount = 0;
 
-  if (model)
+  if (entity->IsModel())
   {
+    Model *model = (Model*)(entity);
+
     std::string value = "@b@B52@s@cModel ";
     this->AddToParamBrowser(value);
     this->AddEntityToParamBrowser(model, "");

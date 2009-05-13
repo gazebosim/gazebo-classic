@@ -32,6 +32,7 @@
 #include "Body.hh"
 #include "ContactParams.hh"
 #include "PlaneGeom.hh"
+#include "Simulator.hh"
 
 using namespace gazebo;
 
@@ -129,6 +130,7 @@ void PlaneGeom::CreatePlane()
 void PlaneGeom::SetNormal( const Vector3 &norm )
 {
   OgreCreator::RemoveMesh(this->meshName);
+
   this->normalP->SetValue( norm );
   this->CreatePlane();
 }

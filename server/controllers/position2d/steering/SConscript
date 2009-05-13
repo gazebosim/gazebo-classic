@@ -1,7 +1,0 @@
-#Import variable
-Import('env sharedObjs')
-
-sources = Split('Steering_Position2d.cc Wheel.cc DriveWheel.cc FullWheel.cc')
-
-#staticObjs.append(env.StaticObject(sources))
-sharedObjs.append(env.SharedObject(sources))

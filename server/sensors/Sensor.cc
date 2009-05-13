@@ -33,6 +33,9 @@
 #include "ControllerFactory.hh"
 #include "Simulator.hh"
 #include "Sensor.hh"
+#include "Simulator.hh"
+#include "PhysicsEngine.hh"
+#include "Global.hh"
 
 using namespace gazebo;
 
@@ -71,6 +74,14 @@ void Sensor::Load(XMLConfigNode *node)
 
   this->LoadController( node->GetChildByNSPrefix("controller") );
   this->LoadChild(node);
+
+  double updateRate  = node->GetDouble("updateRate", 0, 0);
+  if (updateRate == 0)
+    this->updatePeriod = 0.0; // no throttling if updateRate is 0
+  else
+    this->updatePeriod = 1.0 / updateRate;
+  this->lastUpdate   = Simulator::Instance()->GetSimTime();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,16 +118,31 @@ void Sensor::Init()
 /// Update the sensor
 void Sensor::Update()
 {
-  if (this->lastUpdate + this->updatePeriod <= Simulator::Instance()->GetSimTime())
+
+#ifdef TIMING
+  double tmpT4 = Simulator::Instance()->GetWallTime();
+#endif
+
+
+
+  double physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  if (round((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->updatePeriod)/physics_dt) >= 0)
   {
     this->UpdateChild();
     this->lastUpdate = Simulator::Instance()->GetSimTime();
   }
 
+  // update any controllers that are children of sensors, e.g. ros_bumper
   if (this->controller)
   {
     this->controller->Update();
   }
+
+#ifdef TIMING
+  double tmpT5 = Simulator::Instance()->GetWallTime();
+  std::cout << "               Sensor::Update (" << this->GetName() << ") dt (" << tmpT5-tmpT4 << ")" << std::endl;
+#endif
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,6 +214,13 @@ void Sensor::LoadController(XMLConfigNode *node)
 void Sensor::SetActive(bool value)
 {
   this->active = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Set whether the sensor is active or not
+bool Sensor::IsActive()
+{
+  return this->active;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

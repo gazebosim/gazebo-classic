@@ -33,6 +33,8 @@
 #include "Sensor.hh"
 #include "Body.hh"
 
+#define GAZEBO_MAX_CONTACT_FB_DATA 10
+
 namespace gazebo
 {
 
@@ -68,6 +70,15 @@ namespace gazebo
     /// \brief Return a contact state
     public: uint8_t GetContactState(unsigned int index) const;
 
+    /// \brief Return contact geometry name
+    public: std::string GetContactGeomName(unsigned int index) const;
+
+    /// \brief Return contact feedback, f1,f2,t1,t2
+    public:  dJointFeedback GetContactFeedback(unsigned int index) const;
+
+    /// \brief Return geometry name
+    public: std::string GetGeomName(unsigned int index) const;
+
     /// \brief Reset the contact states
     public: void ResetContactStates();
 
@@ -93,9 +104,14 @@ namespace gazebo
     /// Geom name parameter
     private: std::vector< ParamT<std::string> *> geomNamesP;
 
+    private: std::vector<std::string> geomNames;
     private: uint8_t *contactStates;
     private: double *contactTimes;
     private: unsigned int contactCount;
+    private: std::vector<std::string> contactNames;
+    /// \brief a place for storing joint feedbacks, including contact joints
+    private:  dJointFeedback contactFeedbacks[GAZEBO_MAX_CONTACT_FB_DATA];
+
   };
   /// \}
   /// \}

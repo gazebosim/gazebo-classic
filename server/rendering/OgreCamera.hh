@@ -160,6 +160,15 @@ namespace gazebo
     /// \brief Get the viewport height in pixels
     public: unsigned int GetViewportHeight() const;
 
+    /// \brief Get the viewport up vector
+    public: Vector3 GetUp();
+
+    /// \brief Get the viewport right vector
+    public: Vector3 GetRight();
+
+    /// \brief Get the camera position in the world
+    public: Vector3 GetCameraPosition();
+
     /// \brief Get the average FPS
     public: virtual float GetAvgFPS() { return 0;}
 

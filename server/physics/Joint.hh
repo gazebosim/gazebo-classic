@@ -156,6 +156,13 @@ namespace gazebo
     /// Name of this joint
     private: ParamT<double> *erpP;
     private: ParamT<double> *cfmP;
+
+    // joint limit Kp setting
+    private: ParamT<double> *stopKpP;
+
+    // joint limit Kd setting
+    private: ParamT<double> *stopKdP;
+
     private: ParamT<std::string> *body1NameP;
     private: ParamT<std::string> *body2NameP;
     private: ParamT<std::string> *anchorBodyNameP;

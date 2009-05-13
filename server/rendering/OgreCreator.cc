@@ -33,7 +33,6 @@
 #include <FL/x.H>
 
 #include "Simulator.hh"
-#include "Geom.hh"
 #include "Global.hh"
 #include "Entity.hh"
 #include "XMLConfig.hh"
@@ -70,6 +69,9 @@ void OgreCreator::LoadBasicShapes()
   // Create some basic shapes
   OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
   OgreSimpleShape::CreateSphere("joint_anchor",0.01, 32, 32);
+  //OgreSimpleShape::CreateSphere("body_cg",0.01, 32, 32);
+  OgreSimpleShape::CreateBox("body_cg", Vector3(0.014,0.014,0.014), 
+                             Vector2<double>(0.014,0.014));
   OgreSimpleShape::CreateBox("unit_box_U1V1", Vector3(1,1,1), 
                              Vector2<double>(1,1));
   OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
@@ -77,8 +79,14 @@ void OgreCreator::LoadBasicShapes()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
-std::string OgreCreator::CreatePlane(const Vector3 &normal, const Vector2<double> &size, const Vector2<double> &segments, const Vector2<double> &uvTile, const std::string &material, bool castShadows, OgreVisual *parent, const std::string &name)
+std::string OgreCreator::CreatePlane(const Vector3 &normal, 
+    const Vector2<double> &size, const Vector2<double> &segments, 
+    const Vector2<double> &uvTile, const std::string &material, 
+    bool castShadows, OgreVisual *parent, const std::string &name)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return std::string();
+
   Vector3 n = normal;
   std::string resultName;
 
@@ -118,6 +126,9 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal, const Vector2<double
 /// we don't need a Light class. 
 std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return std::string();
+
   Vector3 vec;
   double range,constant,linear,quad;
   Ogre::Light *light;
@@ -162,7 +173,7 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
 
   // Set the direction which the light points
   vec = node->GetVector3("direction", Vector3(0.0, 0.0, -1.0));
-  //light->setDirection(vec.x, vec.y, vec.z);
+  light->setDirection(vec.x, vec.y, vec.z);
 
   // Absolute range of light in world coordinates
   range = node->GetTupleDouble("attenuation",0,1000);
@@ -198,6 +209,9 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
 void OgreCreator::SaveLight(const std::string &prefix, 
                            const std::string lightName, std::ostream &stream)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   Ogre::Light *light = NULL;
   std::string type;
 
@@ -246,8 +260,13 @@ void OgreCreator::SaveLight(const std::string &prefix,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper function to create a camera
-Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip, double farClip, double hfov, Ogre::RenderTarget *renderTarget)
+Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, 
+    double nearClip, double farClip, double hfov, 
+    Ogre::RenderTarget *renderTarget)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
+
   Ogre::Camera *camera;
   Ogre::Viewport *cviewport;
 
@@ -284,6 +303,9 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, double nearClip
 ////////////////////////////////////////////////////////////////////////////////
 void OgreCreator::CreateFog(XMLConfigNode *cnode)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   if (cnode)
   {
     Ogre::ColourValue backgroundColor;
@@ -316,6 +338,9 @@ void OgreCreator::CreateFog(XMLConfigNode *cnode)
 ////////////////////////////////////////////////////////////////////////////////
 void OgreCreator::SaveFog(std::string &prefix, std::ostream &stream)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
   Ogre::Real start = OgreAdaptor::Instance()->sceneMgr->getFogStart();
   Ogre::Real end = OgreAdaptor::Instance()->sceneMgr->getFogEnd();
@@ -352,6 +377,9 @@ void OgreCreator::SaveFog(std::string &prefix, std::ostream &stream)
 // Create a sky
 void OgreCreator::CreateSky(std::string material)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   if (!material.empty())
   {
     try
@@ -384,6 +412,9 @@ void OgreCreator::CreateSky(std::string material)
 // Draw a grid on the ground
 void OgreCreator::DrawGrid()
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   Ogre::ManualObject* gridObject =  OgreAdaptor::Instance()->sceneMgr->createManualObject("__OGRE_GRID__");
 
   gridObject->setCastShadows(false);
@@ -547,6 +578,9 @@ void OgreCreator::DrawGrid()
 /// Remove a mesh by name
 void OgreCreator::RemoveMesh(const std::string &name)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   if (!name.empty() && Ogre::MeshManager::getSingleton().resourceExists(name))
     Ogre::MeshManager::getSingleton().remove(name);
 }
@@ -555,6 +589,9 @@ void OgreCreator::RemoveMesh(const std::string &name)
 // Create a window for Ogre
 Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int width, unsigned int height)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
+
   Ogre::RenderWindow *win = NULL;
 
   if (flWindow)
@@ -574,18 +611,12 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
                                               long winId, unsigned int width, 
                                               unsigned int height)
 {
-  width = 800;
-  height = 600;
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
 
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
-
-  /// Ogre 1.4 required this method to create windows
-  /*params["parentWindowHandle"] = Ogre::StringConverter::toString(display) + 
-    ":" + Ogre::StringConverter::toString(screen) + 
-    ":" + Ogre::StringConverter::toString(winId);
-    */
 
   /// As of Ogre 1.6 this is the params method that makes a resizable window
   params["externalWindowHandle"] =  Ogre::StringConverter::toString(display) + 
@@ -629,6 +660,10 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
 // Create a material from a color definition
 std::string OgreCreator::CreateMaterial(float r, float g, float b, float a)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return std::string();
+
+
   std::ostringstream matNameStream;
 
   matNameStream << "Color[" << r << "," << g << "," << b << "," << a << "]";
@@ -652,6 +687,9 @@ std::string OgreCreator::CreateMaterial(float r, float g, float b, float a)
 /// Create a material from a texture file
 std::string OgreCreator::CreateMaterialFromTexFile(const std::string &filename)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return std::string();
+
   if (!Ogre::MaterialManager::getSingleton().resourceExists(filename))
   {
     Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
@@ -672,6 +710,9 @@ std::string OgreCreator::CreateMaterialFromTexFile(const std::string &filename)
 // Create a dynamic line
 OgreDynamicLines *OgreCreator::CreateDynamicLine(OgreDynamicRenderable::OperationType opType)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
+
   OgreDynamicLines *line = new OgreDynamicLines(opType);
 
   this->lines.push_back( line );
@@ -683,6 +724,9 @@ OgreDynamicLines *OgreCreator::CreateDynamicLine(OgreDynamicRenderable::Operatio
 // Update all the entities
 void OgreCreator::Update()
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   std::list<OgreDynamicLines*>::iterator iter;
   std::list<OgreMovableText*>::iterator titer;
   std::list<Ogre::RenderWindow*>::iterator witer;
@@ -704,34 +748,27 @@ void OgreCreator::Update()
   }
 
   {
-    //printf("OgreCreator scoped lock\n");
     boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMutex());
-    //printf("OgreCreator got lock\n");
 
     // Update the visuals
     for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
     {
       vis = viter->second;
       owner = vis->GetOwner();
-      if (!owner)
+
+      if (owner == NULL)
         continue;
 
-      Geom *geom = dynamic_cast<Geom*>(owner);
+      Pose3d pose;
 
-      if (geom || !owner->GetParent())
-        vis->SetPose(owner->GetPose());
+      if (owner->IsGeom() || !owner->GetParent())
+      {
+        vis->SetPose( owner->GetPose() );
+      }
       else
         vis->SetPose(owner->GetPose() - owner->GetParent()->GetPose());
-
     }
   }
-
-  /*for (witer = this->windows.begin(); witer != this->windows.end(); witer++)
-  {
-    (*witer)->update();
-  }
-  */
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -739,6 +776,9 @@ void OgreCreator::Update()
 OgreVisual *OgreCreator::CreateVisual( const std::string &name,
     OgreVisual *parent, Entity *owner)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
+
   OgreVisual *newVis = NULL;
   std::map<std::string, OgreVisual*>::iterator iter;
 
@@ -748,6 +788,7 @@ OgreVisual *OgreCreator::CreateVisual( const std::string &name,
   {
     newVis = new OgreVisual(parent, owner);
     newVis->SetName(name);
+
     this->visuals[name] = newVis;
   }
   else
@@ -760,6 +801,9 @@ OgreVisual *OgreCreator::CreateVisual( const std::string &name,
 /// Delete a visual
 void OgreCreator::DeleteVisual( OgreVisual *visual )
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   std::map<std::string, OgreVisual*>::iterator iter;
 
   iter = this->visuals.find(visual->GetName());
@@ -781,6 +825,9 @@ void OgreCreator::DeleteVisual( OgreVisual *visual )
 /// Create a movable text object
 OgreMovableText *OgreCreator::CreateMovableText()
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return NULL;
+
   OgreMovableText *newText = new OgreMovableText();
   this->text.push_back(newText);
   return newText;

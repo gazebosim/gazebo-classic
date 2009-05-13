@@ -70,10 +70,10 @@ Generic_PTZ::Generic_PTZ(Entity *parent)
 // Destructor
 Generic_PTZ::~Generic_PTZ()
 {
-  if (this->panJoint)
-    delete this->panJoint;
-  if (this->tiltJoint)
-    delete this->tiltJoint;
+  //if (this->panJoint)
+  //  delete this->panJoint;
+  //if (this->tiltJoint)
+  //  delete this->tiltJoint;
 
   this->panJoint = NULL;
   this->tiltJoint = NULL;

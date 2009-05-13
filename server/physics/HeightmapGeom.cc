@@ -25,16 +25,14 @@
  */
 
 #include <ode/ode.h>
-#include <Ogre.h>
 #include <iostream>
 #include <string.h>
 #include <math.h>
 
-#include "GazeboError.hh"
-#include "OgreAdaptor.hh"
-#include "Simulator.hh"
-#include "OgreAdaptor.hh"
+#include "Image.hh"
 #include "Global.hh"
+#include "OgreHeightmap.hh"
+#include "GazeboError.hh"
 #include "Body.hh"
 #include "HeightmapGeom.hh"
 
@@ -52,6 +50,8 @@ HeightmapGeom::HeightmapGeom(Body *body)
   this->sizeP = new ParamT<Vector3>("size",Vector3(10,10,10), 0);
   this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
   Param::End();
+
+  this->ogreHeightmap = new OgreHeightmap();
 }
 
 
@@ -59,34 +59,19 @@ HeightmapGeom::HeightmapGeom(Body *body)
 // Destructor
 HeightmapGeom::~HeightmapGeom()
 {
-  OgreAdaptor *ogreAdaptor = Simulator::Instance()->GetRenderEngine();
-  ogreAdaptor->sceneMgr->destroyQuery(this->rayQuery);
-
   delete this->imageFilenameP;
   delete this->worldTextureP;
   delete this->detailTextureP;
   delete this->sizeP;
   delete this->offsetP;
+
+  delete this->ogreHeightmap;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
 void HeightmapGeom::UpdateChild()
 {
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// get height at a point
-float HeightmapGeom::GetHeightAt(const Vector2<float> &pos)
-{
-  Ogre::Vector3 pos3(pos.x,this->terrainSize.z,pos.y);
-
-  this->ray.setOrigin(pos3);
-  this->rayQuery->setRay(this->ray);
-  this->distToTerrain = 0;
-  this->rayQuery->execute(this);
-
-  return this->terrainSize.z - this->distToTerrain;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +90,7 @@ void HeightmapGeom::FillHeightMap()
     for (x=0; x<this->odeVertSize; x++)
     {
       // Find the height at a vertex
-      h = this->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
+      h = this->ogreHeightmap->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
 
       // Store the height for future use
       this->heights[y*this->odeVertSize + x] = h;
@@ -124,29 +109,10 @@ dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Overloaded Ogre function for Ray Scene Queries
-bool HeightmapGeom::queryResult(Ogre::MovableObject *obj, Ogre::Real dist)
-{
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Overloaded Ogre function for Ray Scene Queries
-bool HeightmapGeom::queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist)
-{
-  this->distToTerrain = dist;
-  return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
 void HeightmapGeom::LoadChild(XMLConfigNode *node)
 {
-  Ogre::Image tmpImage;
-  int tileSize;
-  OgreAdaptor *ogreAdaptor;
-
-  ogreAdaptor = Simulator::Instance()->GetRenderEngine();
+  Image tmpImage;
 
   this->imageFilenameP->Load(node);
   this->worldTextureP->Load(node);
@@ -154,106 +120,38 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   this->sizeP->Load(node);
   this->offsetP->Load(node);
 
-
   // Use the image to get the size of the heightmap
-  tmpImage.load(this->imageFilenameP->GetValue(),Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  tmpImage.Load( (**this->imageFilenameP) );
 
   // Width and height must be the same
-  if (tmpImage.getWidth() != tmpImage.getHeight())
+  if (tmpImage.GetWidth() != tmpImage.GetHeight())
   {
     gzthrow("Heightmap image must be square\n");
   }
 
-  this->terrainVertSize = tmpImage.getWidth();
-
-  float nf = (float)(log(this->terrainVertSize-1)/log(2));
-  int ni = (int)(log(this->terrainVertSize-1)/log(2));
-
-  // Make sure the heightmap image size is (2^n)+1 in size
-  if ( nf - ni != 0)
-  {
-    gzthrow("Heightmap image size must be (2^n)+1\n");
-  }
-
-  // Calculate a good tile size
-  tileSize = (int)(pow( 2,  ni/2 ));
-
-
-  if (tileSize <= 2)
-  {
-    tileSize = 4;
-  }
-
-  tileSize++;
-
-  this->terrainSize = this->sizeP->GetValue();
-
-  this->terrainScale = this->terrainSize / this->terrainVertSize;
-
-  this->odeVertSize = this->terrainVertSize * 4;
+  this->terrainSize = (**this->sizeP);
+  this->odeVertSize = tmpImage.GetWidth() * 4;
   this->odeScale = this->terrainSize / this->odeVertSize;
 
 
-  std::ostringstream stream;
- 
-  /*std::cout << "Terrain Scale[" << this->terrainScale << "]\n";
+  /*std::ostringstream stream;
   std::cout << "ODE Scale[" << this->odeScale << "]\n";
   std::cout << "Terrain Image[" << this->imageFilenameP->GetValue() << "] Size[" << this->terrainSize << "]\n";
   printf("Terrain Size[%f %f %f]\n", this->terrainSize.x, this->terrainSize.y, this->terrainSize.z);
-  printf("VertSize[%d] Tile Size[%d]\n", this->terrainVertSize, tileSize);
   */
 
-  stream << "WorldTexture=" << worldTextureP->GetValue() << "\n";
-  //The detail texture
-  stream << "DetailTexture=" << detailTextureP->GetValue() << "\n";
-  // number of times the detail texture will tile in a terrain tile
-  stream << "DetailTile=3\n";
-  // Heightmap source
-  stream << "PageSource=Heightmap\n";
-  // Heightmap-source specific settings
-  stream << "Heightmap.image=" << this->imageFilenameP->GetValue() << "\n";
-  // How large is a page of tiles (in vertices)? Must be (2^n)+1
-  stream << "PageSize=" << this->terrainVertSize << "\n";
-  // How large is each tile? Must be (2^n)+1 and be smaller than PageSize
-  stream << "TileSize=" << tileSize << "\n";
-  // The maximum error allowed when determining which LOD to use
-  stream << "MaxPixelError=4\n";
-  // The size of a terrain page, in world units
-  stream << "PageWorldX=" << this->terrainSize.x << "\n";
-  stream << "PageWorldZ=" << this->terrainSize.y << "\n";
-  // Maximum height of the terrain
-  stream << "MaxHeight="<< this->terrainSize.z << "\n";
-  // Upper LOD limit
-  stream << "MaxMipMapLevel=2\n";
+  // Step 1: Create the Ogre height map: Performs a ray scene query
+  this->ogreHeightmap->Load( (**this->imageFilenameP), (**this->worldTextureP),
+      (**this->detailTextureP), this->terrainSize );
 
-  // Create a data stream for loading the terrain into Ogre
-  char *mstr = strdup(stream.str().c_str());
-
-  Ogre::DataStreamPtr dataStream(
-    new Ogre::MemoryDataStream(mstr,strlen(mstr)) );
-
-  // Set the static terrain in Ogre
-  ogreAdaptor->sceneMgr->setWorldGeometry(dataStream);
-
-  // HACK to make the terrain oriented properly
-  Ogre::SceneNode *tnode = ogreAdaptor->sceneMgr->getSceneNode("Terrain");
-  tnode->pitch(Ogre::Degree(90));
-  tnode->translate(Ogre::Vector3(-this->terrainSize.x*0.5, this->terrainSize.y*0.5, 0));
-
-  // Setup the ray scene query, which is used to determine the heights of
-  // the vertices for ODE
-  this->ray = Ogre::Ray(Ogre::Vector3::ZERO, Ogre::Vector3::NEGATIVE_UNIT_Y);
-  this->rayQuery = ogreAdaptor->sceneMgr->createRayQuery(this->ray);
-  this->rayQuery->setQueryTypeMask(Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
-  this->rayQuery->setWorldFragmentType(Ogre::SceneQuery::WFT_SINGLE_INTERSECTION);
-
-  // Construct the heightmap lookup table
+  // Step 2: Construct the heightmap lookup table, using the ogre ray scene
+  // query functionality
   this->FillHeightMap();
 
-  // Create the ODE heightfield
+  // Step 3: Create the ODE heightfield geom
   this->odeData = dGeomHeightfieldDataCreate();
 
-  // Setup a callback method for ODE
+  // Step 4: Setup a callback method for ODE
   dGeomHeightfieldDataBuildCallback(
     this->odeData,
     this,
@@ -268,7 +166,7 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
     0 // wrap mode
   );
 
-  // Restrict the bounds of the AABB to improve efficiency
+  // Step 5: Restrict the bounds of the AABB to improve efficiency
   dGeomHeightfieldDataSetBounds( this->odeData, 0, this->terrainSize.z);
 
   this->geomId = dCreateHeightfield( this->spaceId, this->odeData, 1);
@@ -285,8 +183,6 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   pose.rot = pose.rot * quat;
   this->body->SetPose(pose);
-
-  free(mstr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -299,5 +195,3 @@ void HeightmapGeom::SaveChild(std::string &prefix, std::ostream &stream)
   stream << prefix << *(this->sizeP) << "\n";
   stream << prefix << *(this->offsetP) << "\n";
 }
-
-

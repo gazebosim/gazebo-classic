@@ -34,7 +34,6 @@
 #include <iostream>
 #include <string.h>
 
-#include "Model.hh"
 #include "OgreVisual.hh"
 #include "UserCamera.hh"
 #include "OgreMovableText.hh"
@@ -137,7 +136,7 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   // Setup the available resources
   this->SetupResources();
 
-  this->videoMode = "800 x 600 @ 16-bit colour";
+  this->videoMode = "800 x 600 @ 32-bit colour";
 
   // Setup the rendering system, and create the context
   this->SetupRenderSystem(true);
@@ -222,11 +221,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->sceneMgr->setAmbientLight(ambient);
 
   this->sceneMgr->setShadowTextureSelfShadow(true);
-  this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT32_R);
+  this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
   this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
   this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
-
-
+  
   // Settings for shadow mapping
   if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
@@ -427,7 +425,7 @@ void OgreAdaptor::SetupRenderSystem(bool create)
 
 
     renderSys->setConfigOption("Full Screen","No");
-    renderSys->setConfigOption("FSAA","2");
+    //renderSys->setConfigOption("FSAA","2");
 
     // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy", can be set in the .gazeborc file
     renderSys->setConfigOption("RTT Preferred Mode", Simulator::Instance()->GetGazeboConfig()->GetRTTMode());
@@ -498,24 +496,27 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos)
   {
     if (iter->movable)
     {
-
       OgreVisual *vis = dynamic_cast<OgreVisual*>(iter->movable->getUserObject());
+
       if (vis && vis->GetOwner())
       {
         entity = vis->GetOwner();
-        entity->GetVisualNode()->ShowSelectionBox(true);
-        Model *model = NULL;
-        
-        do 
-        {
-          model = dynamic_cast<Model*>(entity);
-          entity = entity->GetParent();
-        } while (model == NULL);
+        if (!entity)
+          continue;
 
-        return model;
+        return entity;
+
+        /*entity->GetVisualNode()->ShowSelectionBox(true);
+
+        if (entityType == "model")
+          return (Entity*)(Simulator::Instance()->GetParentModel(entity));
+        else if (entityType == "body")
+          return (Entity*)(Simulator::Instance()->GetParentBody(entity));
+        else
+          return entity;
+          */
       }
     }
-
   }
 
   return NULL;

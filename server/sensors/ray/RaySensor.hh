@@ -105,6 +105,22 @@ class RaySensor: public Sensor
   /// \return The number of ranges
   public: int GetRangeCount() const;
 
+  /// \brief Get the vertical scan line count
+  /// \return The number of scan lines vertically
+  public: int GetVerticalRayCount() const;
+
+  /// \brief Get the vertical scan line count
+  /// \return The number of scan lines vertically
+  public: int GetVerticalRangeCount() const;
+
+  /// \brief Get the vertical scan bottom angle
+  /// \return The minimum angle of the scan block
+  public: Angle GetVerticalMinAngle() const;
+
+  /// \brief Get the vertical scan line top angle
+  /// \return The Maximum angle of the scan block
+  public: Angle GetVerticalMaxAngle() const;
+
   /// \brief Set ray parameters
   /// \param index Rayindex (from 0 to rayCount - 1).
   /// \param a, b Ray endpoints (initial and final points).  These are
@@ -149,6 +165,12 @@ class RaySensor: public Sensor
 
   private: OgreDynamicLines *rayFan;
   private: OgreDynamicLines *rayFanOutline;
+
+  // For ray blocks such as Velodyne
+  private: ParamT<int> *verticalRayCountP;
+  private: ParamT<int> *verticalRangeCountP;
+  private: ParamT<Angle> *verticalMinAngleP;
+  private: ParamT<Angle> *verticalMaxAngleP;
 };
 /// \}
 /// \}

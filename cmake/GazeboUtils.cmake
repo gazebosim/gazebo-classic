@@ -21,7 +21,7 @@ MACRO (APPEND_TO_CACHED_LIST _list _cacheDesc)
 ENDMACRO(APPEND_TO_CACHED_LIST)
 
 ###############################################################################
-# Append sources to the server sources
+# Append sources to the server sources list
 MACRO (APPEND_TO_SERVER_SOURCES)
   FOREACH (src ${ARGN})
     APPEND_TO_CACHED_LIST(gazeboserver_sources 
@@ -29,6 +29,27 @@ MACRO (APPEND_TO_SERVER_SOURCES)
                           ${CMAKE_CURRENT_SOURCE_DIR}/${src})
   ENDFOREACH (src ${ARGN})
 ENDMACRO (APPEND_TO_SERVER_SOURCES)
+
+###############################################################################
+# Append sources to the sensor sources list
+MACRO (APPEND_TO_SENSOR_SOURCES)
+  FOREACH (src ${ARGN})
+    APPEND_TO_CACHED_LIST(gazebosensor_sources 
+                          ${gazebosensor_sources_desc}                   
+                          ${CMAKE_CURRENT_SOURCE_DIR}/${src})
+  ENDFOREACH (src ${ARGN})
+ENDMACRO (APPEND_TO_SENSOR_SOURCES)
+
+###############################################################################
+# Append sources to the controller sources list
+MACRO (APPEND_TO_CONTROLLER_SOURCES)
+  FOREACH (src ${ARGN})
+    APPEND_TO_CACHED_LIST(gazebocontroller_sources 
+                          ${gazebocontroller_sources_desc}                   
+                          ${CMAKE_CURRENT_SOURCE_DIR}/${src})
+  ENDFOREACH (src ${ARGN})
+ENDMACRO (APPEND_TO_CONTROLLER_SOURCES)
+
 
 ###############################################################################
 # Macro to turn a list into a string (why doesn't CMake have this built-in?)
@@ -53,5 +74,8 @@ MACRO (GAZEBOSERVER_RESET_LISTS)
        ${gazeboserver_link_libs_desc} FORCE)
   SET (gazeboserver_cflags "" CACHE INTERNAL 
        ${gazeboserver_cflags_desc} FORCE)
-
+  SET (gazebosensor_sources "" CACHE INTERNAL 
+       ${gazebosensor_sources_desc} FORCE)
+  SET (gazebocontroller_sources "" CACHE INTERNAL 
+       ${gazebocontroller_sources_desc} FORCE)
 ENDMACRO (GAZEBOSERVER_RESET_LISTS)

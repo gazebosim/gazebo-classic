@@ -32,8 +32,15 @@
 #include "Joint.hh"
 #include "Param.hh"
 
+
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
+
   
   class Entity;
   class Body;
@@ -89,8 +96,11 @@ namespace gazebo
     /// \brief Initialize the physics engine
     public: virtual void Init() = 0;
   
+    /// \brief Update the physics engine collision
+    public: virtual void UpdateCollision() = 0;
+
     /// \brief Update the physics engine
-    public: virtual void Update() = 0;
+    public: virtual void UpdatePhysics() = 0;
   
     /// \brief Finilize the physics engine
     public: virtual void Fini() = 0;
@@ -118,7 +128,13 @@ namespace gazebo
     /// \brief Get the physics time steps in the virtual world
     /// \return step time 
     public: double GetStepTime() const;
-  
+
+    /// \brief Lock the physics engine mutex
+    public: void LockMutex();
+
+    /// \brief Unlock the physics engine mutex
+    public: void UnlockMutex();
+
     /// The gravity vector
     protected: ParamT<Vector3> *gravityP;
   
@@ -131,6 +147,8 @@ namespace gazebo
     protected: ParamT<double> *updateRateP;
 
     protected: std::vector<Param*> parameters;
+
+    private: boost::recursive_mutex *mutex;
   };
   
   /** \}*/

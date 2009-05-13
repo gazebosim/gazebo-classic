@@ -77,11 +77,15 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   int y1 = this->footerBar->y() + 5;
   this->outputXYZ = new Fl_Output(x1, y1, 150, 20,"XYZ");
   this->outputXYZ->box(FL_NO_BOX);
+  this->outputXYZ->labelsize(10);
+  this->outputXYZ->textsize(10);
   this->outputXYZ->value("[0.0 0.0 0.0]");
 
-  x1 += this->outputXYZ->w() + 30;
+  x1 += this->outputXYZ->w() + 5;
   this->outputRPY = new Fl_Output(x1, y1, 150, 20,"RPY");
   this->outputRPY->box(FL_NO_BOX);
+  this->outputRPY->labelsize(10);
+  this->outputRPY->textsize(10);
   this->outputRPY->value("[0.0 0.0 0.0]");
 
   this->footerBar->end();

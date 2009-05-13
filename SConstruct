@@ -5,8 +5,8 @@ import commands
 
 exec(open('build.py'))
 
-PKG_CONFIG_VERSION = '0.22'
-OGRE_VERSION = '>= 1.6.0'
+PKG_CONFIG_VERSION = '0.23'
+OGRE_VERSION = '>= 1.6.1'
 ODE_VERSION = '>= 0.10.1'
 
 
