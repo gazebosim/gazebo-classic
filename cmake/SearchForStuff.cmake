@@ -7,9 +7,18 @@ SET (INCLUDE_AV ON CACHE BOOL "Include audio/video functionality" FORCE)
 SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
+SET (freeimage_include_dir "/usr/include/" CACHE STRING "FreeImage include paths")
+SET (freeimage_library_dir "/usr/lib" CACHE STRING "FreeImage library paths")
+SET (freeimage_library "freeimage" CACHE STRING "FreeImage library")
+
+SET (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
+SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
+SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
+
 ########################################
 # Find packages
 IF (PKG_CONFIG_FOUND)
+
   pkg_check_modules(OGRE OGRE>=${OGRE_VERSION})
   IF (NOT OGRE_FOUND)
     MESSAGE (SEND_ERROR "\nError: Ogre3d and development files not found. See the following website: http://www.orge3d.org")
@@ -209,13 +218,31 @@ ENDIF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries
 
 STRING(REGEX REPLACE "(^| )-L" " " boost_library_dirs "${boost_library_dirs}")
 STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
-STRING(STRIP ${boost_library_dirs} boost_library_dirs)
-STRING(STRIP ${boost_libraries} boost_libraries)
+#STRING(STRIP ${boost_library_dirs} boost_library_dirs)
+#STRING(STRIP ${boost_libraries} boost_libraries)
 STRING(REGEX REPLACE " " ";" boost_libraries "${boost_libraries}")
 
 MESSAGE (STATUS "Boost Include Path: ${boost_include_dirs}")
 MESSAGE (STATUS "Boost Library Path: ${boost_library_dirs}")
 MESSAGE (STATUS "Boost Libraries: ${boost_libraries}")
+
+########################################
+# Find freeimage
+FIND_PATH(freeimage_include_dir FreeImage.h ${freeimage_include_dir})
+IF (NOT freeimage_include_dir)
+  MESSAGE (STATUS "Looking for FreeImage.h - not found")
+  MESSAGE (FATAL_ERROR "Unable to find FreeImage.h")
+ELSE (NOT freeimage_include_dir)
+  MESSAGE (STATUS "Looking for FreeImage.h - found")
+ENDIF (NOT freeimage_include_dir)
+
+FIND_LIBRARY(freeimage_library freeimage ${freeimage_library_dir})
+IF (NOT freeimage_library)
+  MESSAGE (STATUS "Looking for libfreeimage - not found")
+  MESSAGE (FATAL_ERROR "Unable to find libfreeimage")
+ELSE (NOT freeimage_library)
+  MESSAGE (STATUS "Looking for libfreeimage - found")
+ENDIF (NOT freeimage_library)
 
 ########################################
 # Find avformat and avcodec

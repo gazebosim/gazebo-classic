@@ -1,17 +1,6 @@
 INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 
-########################################
-# All the library search paths
-ADD_SUBDIRECTORY(rendering)
-ADD_SUBDIRECTORY(physics)
-ADD_SUBDIRECTORY(sensors)
-ADD_SUBDIRECTORY(gui)
-ADD_SUBDIRECTORY(controllers)
-IF (INCLUDE_AV)
-  ADD_SUBDIRECTORY(audio_video)
-ENDIF (INCLUDE_AV)
-
 #${FLTK_INCLUDE_DIR}
 ########################################
 # Include all the search paths for headers
@@ -32,15 +21,28 @@ INCLUDE_DIRECTORIES(
   sensors/ray
   ${gazeboserver_include_dirs}
   ${boost_include_dirs}
+  ${freeimage_include_dir}
 )
 
 LINK_DIRECTORIES(  
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${boost_library_dirs} 
+ ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
  sensors
  controllers
 )
+
+########################################
+# All the library search paths
+ADD_SUBDIRECTORY(rendering)
+ADD_SUBDIRECTORY(physics)
+ADD_SUBDIRECTORY(sensors)
+ADD_SUBDIRECTORY(gui)
+ADD_SUBDIRECTORY(controllers)
+IF (INCLUDE_AV)
+  ADD_SUBDIRECTORY(audio_video)
+ENDIF (INCLUDE_AV)
 
 ########################################
 # Process all the subdirectories
@@ -101,7 +103,7 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui gazebo_sensors gazebo_physics gazebo_rendering gazebo_controllers gazebo_av ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${boost_libraries} gazebo )
+TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui gazebo_sensors gazebo_physics gazebo_rendering gazebo_controllers gazebo_av ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${boost_libraries} ${freeimage_library} gazebo )
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)

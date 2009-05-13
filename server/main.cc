@@ -106,7 +106,7 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include <iostream>
 
-#include "config.h"
+#include <config.h>
 #include "Simulator.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
