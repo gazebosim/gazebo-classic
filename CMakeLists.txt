@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6 FATAL_ERROR )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.4.6 FATAL_ERROR )
 
 IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
@@ -30,6 +30,10 @@ SET (gazebocontroller_sources_desc "List of controller sources"
 SET (OGRE_VERSION 1.6.1 CACHE INTERNAL "Ogre version requirement" FORCE)
 SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
 SET (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
+
+# Write the config.h file
+CONFIGURE_FILE (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+
 
 SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")
