@@ -8,6 +8,10 @@ SET (sources Server.cc
 
 SET (headers gazebo.h IfaceFactory.hh)
 
+INCLUDE_DIRECTORIES(
+  ${boost_include_dirs}
+)
+
 LINK_DIRECTORIES(${boost_library_dirs})
 
 ADD_LIBRARY(gazeboshm SHARED ${sources})

@@ -17,7 +17,12 @@ SET (sources GazeboDriver.cc
              IRInterface.cc
 )
 
-INCLUDE_DIRECTORIES( ${PLAYER_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/libgazebo )
+INCLUDE_DIRECTORIES( 
+  ${PLAYER_INCLUDE_DIRS} 
+  ${CMAKE_SOURCE_DIR}/libgazebo 
+  ${boost_include_dirs}
+)
+
 LINK_DIRECTORIES( ${PLAYER_LINK_DIRS} gazeboshm)
 
 ADD_LIBRARY(gazeboplugin SHARED ${sources})

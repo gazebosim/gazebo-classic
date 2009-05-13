@@ -25,7 +25,7 @@
  * SVN: $Id: gazebo.h 7398 2009-03-09 07:21:49Z natepak $
  */
 
-#include "webgazebo/WebGazebo.hh"
+#include "WebGazebo.hh"
 
 #include <stdlib.h>
 

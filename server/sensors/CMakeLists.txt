@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES (
   ${CMAKE_SOURCE_DIR}/server/physics/ode
   ${CMAKE_SOURCE_DIR}/server/rendering
   ${gazeboserver_include_dirs} 
+  ${boost_include_dirs}
 )
 
 LINK_DIRECTORIES(  

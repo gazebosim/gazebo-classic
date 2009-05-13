@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES(
   ${LIBAVCODEC_PATH}
   ${LIBAVFORMAT_PATH}
   ${gazeboserver_include_dirs}
+  ${boost_include_dirs}
 )
 
 SET (sources AudioDecoder.cc

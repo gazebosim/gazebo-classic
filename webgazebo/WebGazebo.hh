@@ -32,9 +32,8 @@
 #include <sys/types.h>
 #include <sys/queue.h>
 
-// libgazebo; the libgazebo directory is used because we're building
-// against the source tree
-#include <libgazebo/gazebo.h>
+// libgazebo;
+#include "gazebo.h"
 
 #include "websim/websim.hh"
 

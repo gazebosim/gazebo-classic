@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/server
   ${CMAKE_SOURCE_DIR}/server/gui
   ${gazeboserver_include_dirs} 
+  ${boost_include_dirs}
 )
 
 SET (sources OgreMovableText.cc

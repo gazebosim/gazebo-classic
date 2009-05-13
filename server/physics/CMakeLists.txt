@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(.
   ${CMAKE_SOURCE_DIR}/server/rendering 
   ${CMAKE_SOURCE_DIR}/server/sensors 
   ${gazeboserver_include_dirs} 
+  ${boost_include_dirs}
 )
 
 SET (sources BallJoint.cc
