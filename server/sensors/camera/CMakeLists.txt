@@ -4,4 +4,10 @@ set (sources MonoCameraSensor.cc
              StereoCameraSensor.cc
 )
 
+set (headers MonoCameraSensor.hh
+             StereoCameraSensor.hh
+)
+
+
 APPEND_TO_SENSOR_SOURCES(${sources})
+APPEND_TO_SERVER_HEADERS(${headers})

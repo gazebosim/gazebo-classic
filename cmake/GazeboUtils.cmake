@@ -31,6 +31,16 @@ MACRO (APPEND_TO_SERVER_SOURCES)
 ENDMACRO (APPEND_TO_SERVER_SOURCES)
 
 ###############################################################################
+# Append headers to the server headers list
+MACRO (APPEND_TO_SERVER_HEADERS)
+  FOREACH (src ${ARGN})
+    APPEND_TO_CACHED_LIST(gazeboserver_headers
+                          ${gazeboserver_headers_desc}                   
+                          ${CMAKE_CURRENT_SOURCE_DIR}/${src})
+  ENDFOREACH (src ${ARGN})
+ENDMACRO (APPEND_TO_SERVER_HEADERS)
+
+###############################################################################
 # Append sources to the sensor sources list
 MACRO (APPEND_TO_SENSOR_SOURCES)
   FOREACH (src ${ARGN})
@@ -65,6 +75,8 @@ ENDMACRO (LIST_TO_STRING)
 # Reset lists
 MACRO (GAZEBOSERVER_RESET_LISTS)
   SET (gazeboserver_sources "" CACHE INTERNAL 
+       ${gazeboserver_sources_desc} FORCE)
+  SET (gazeboserver_headers "" CACHE INTERNAL 
        ${gazeboserver_sources_desc} FORCE)
   SET (gazeboserver_include_dirs "" CACHE INTERNAL 
        ${gazeboserver_include_dirs_desc} FORCE)

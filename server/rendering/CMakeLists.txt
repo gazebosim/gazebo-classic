@@ -24,4 +24,22 @@ SET (sources OgreMovableText.cc
              OgreHeightmap.cc
 )
 
+SET (headers OgreMovableText.hh
+             OgreCreator.hh
+             OgreAdaptor.hh
+             OgreFrameListener.hh
+             OgreDynamicRenderable.hh
+             OgreDynamicLines.hh
+             OgreSimpleShape.hh
+             OgreHUD.hh
+             OgreVisual.hh
+             OgreCamera.hh
+             CameraManager.hh
+             UserCamera.hh
+             Image.hh
+             Color.hh
+             OgreHeightmap.hh
+)
+
 ADD_LIBRARY(gazebo_rendering ${sources})
+APPEND_TO_SERVER_HEADERS(${headers})

@@ -65,28 +65,30 @@ SET (sources Common.cc
              GraphicsIfaceHandler.cc
 )
 
-SET (headers Entity.hh
-           GazeboError.hh
-           GazeboMessage.hh
-           Global.hh
-           Model.hh
-           Pose3d.hh
-           Quatern.hh
-           Simulator.hh
-           SingletonT.hh
-           StaticPluginRegister.hh
-           Time.hh
-           Vector2.hh
-           Vector3.hh
-           Vector4.hh
-           World.hh
-           XMLConfig.hh
-           GazeboConfig.hh
-           Angle.hh
-           Param.hh
-           GraphicsIfaceHandler.hh
+SET (headers Common.hh
+             Entity.hh
+             GazeboError.hh
+             GazeboMessage.hh
+             Global.hh
+             Model.hh
+             Pose3d.hh
+             Quatern.hh
+             Simulator.hh
+             SingletonT.hh
+             StaticPluginRegister.hh
+             Time.hh
+             Vector2.hh
+             Vector3.hh
+             Vector4.hh
+             World.hh
+             XMLConfig.hh
+             GazeboConfig.hh
+             Angle.hh
+             Param.hh
+             GraphicsIfaceHandler.hh
 )
 
+APPEND_TO_SERVER_HEADERS(${headers})
 APPEND_TO_SERVER_SOURCES(${sources})
 
 #ADD_LIBRARY(gazeboserver STATIC ${gazeboserver_sources})
@@ -106,7 +108,7 @@ ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui gazebo_sensors gazebo_physics gazebo_rendering gazebo_controllers gazebo_av ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${boost_libraries} ${freeimage_library} gazebo )
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-INSTALL (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
+INSTALL (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
 
 ########################################
 # Make the gazebo rc file

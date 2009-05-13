@@ -31,4 +31,26 @@ SET (sources BallJoint.cc
              ode/ODEPhysics.cc
 ) 
 
+SET (headers BallJoint.hh
+             Body.hh
+             BoxGeom.hh
+             ContactParams.hh
+             CylinderGeom.hh
+             Geom.hh
+             Hinge2Joint.hh
+             HingeJoint.hh
+             Joint.hh
+             PhysicsEngine.hh
+             PlaneGeom.hh
+             SliderJoint.hh
+             SphereGeom.hh
+             UniversalJoint.hh
+             RayGeom.hh
+             TrimeshGeom.hh
+             HeightmapGeom.hh
+             MapGeom.hh
+             ode/ODEPhysics.hh
+)
+
 ADD_LIBRARY(gazebo_physics STATIC ${sources})
+APPEND_TO_SERVER_HEADERS(${headers})

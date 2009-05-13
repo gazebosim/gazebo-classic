@@ -27,4 +27,9 @@ SET (sources Sensor.cc
              SensorFactory.cc
 ) 
 
+SET (headers Sensor.hh
+             SensorFactory.hh
+)
+
 ADD_LIBRARY(gazebo_sensors STATIC ${gazebosensor_sources} ${sources})
+APPEND_TO_SERVER_HEADERS(${headers})

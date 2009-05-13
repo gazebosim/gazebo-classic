@@ -14,6 +14,8 @@ SET (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
 SET (gazeboserver_sources_desc "List of server sources" 
      CACHE INTERNAL "Gazebo server sources list description" FORCE)
+SET (gazeboserver_headers_desc "List of server headers" 
+     CACHE INTERNAL "Gazebo server headers list description" FORCE)
 SET (gazeboserver_include_dirs_desc "List of server include directories" 
      CACHE INTERNAL "Include dirs description")
 SET (gazeboserver_link_dirs_desc "List of server link directories" 

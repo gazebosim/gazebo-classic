@@ -16,4 +16,14 @@ SET (sources Gui.cc
              GLFrame.cc
 )
 
+SET (headers Gui.hh
+             GLWindow.hh
+             MainMenu.hh
+             Toolbar.hh
+             StatusBar.hh
+             GLFrameManager.hh
+             GLFrame.hh
+)
 ADD_LIBRARY(gazebo_gui STATIC ${sources})
+
+APPEND_TO_SERVER_HEADERS(${headers})

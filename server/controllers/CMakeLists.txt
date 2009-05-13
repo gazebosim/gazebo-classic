@@ -36,4 +36,10 @@ SET (sources Controller.cc
              ControllerFactory.cc
 )
 
+SET (headers Controller.hh
+             ControllerFactory.hh
+)
+
+
+APPEND_TO_SERVER_HEADERS(${headers})
 APPEND_TO_SERVER_SOURCES(${sources})
