@@ -36,9 +36,8 @@
 #include "Entity.hh"
 #include "OgreVisual.hh"
 #include "World.hh"
-#include "Gui.hh"
 #include "XMLConfig.hh"
-#include "Gui.hh"
+#include "GuiAPI.hh"
 #include "GazeboConfig.hh"
 #include "gazebo.h"
 #include "PhysicsEngine.hh"
@@ -191,12 +190,11 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
         int x = childNode->GetTupleInt("pos",0,0);
         int y = childNode->GetTupleInt("pos",1,0);
 
-        //gzmsg(1) << "Creating GUI: Pos[" << x << " " << y << "] Size[" << width << " " << height << "]\n";
+        //gzmsg(1) << "Creating GUI: Pos[" << x << " " << y 
+        //         << "] Size[" << width << " " << height << "]\n";
 
         // Create the GUI
-        this->gui = new Gui(x, y, width, height, "Gazebo");
-        Fl::check();
-        Fl::wait(0.3);
+        this->gui = new GuiAPI(x, y, width, height, "Gazebo");
         this->gui->Load(childNode);
       }
     }
@@ -378,13 +376,6 @@ void Simulator::MainLoop()
     std::cout << "--------------------------- END Simulator::MainLoop() --------------------------" << std::endl;
 #endif
 
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Gets our current GUI interface
-Gui *Simulator::GetUI() const
-{
-  return this->gui;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

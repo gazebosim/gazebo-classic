@@ -28,11 +28,10 @@ INCLUDE_DIRECTORIES(
 
 LINK_DIRECTORIES(  
  ${CMAKE_BINARY_DIR}/libgazebo 
+ ${CMAKE_BINARY_DIR}/server/gui 
  ${boost_library_dirs} 
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
- sensors
- controllers
 )
 
 ########################################
@@ -64,6 +63,8 @@ SET (sources Common.cc
              Angle.cc
              Param.cc
              GraphicsIfaceHandler.cc
+             GuiAPI.cc
+             Simulator.cc
 )
 
 SET (headers Common.hh
@@ -86,6 +87,8 @@ SET (headers Common.hh
              Angle.hh
              Param.hh
              GraphicsIfaceHandler.hh
+             GuiAPI.hh
+             Simulator.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})
@@ -93,7 +96,7 @@ APPEND_TO_SERVER_SOURCES(${sources})
 
 ADD_LIBRARY(gazebo_server SHARED ${gazeboserver_sources})
 
-ADD_EXECUTABLE(gazebo-exec Simulator.cc main.cc)
+ADD_EXECUTABLE(gazebo-exec main.cc)
 SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
@@ -105,16 +108,17 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui 
+TARGET_LINK_LIBRARIES( gazebo-exec 
                                    ${gazeboserver_link_libs} 
                                    ${FLTK_LIBRARIES} 
                                    ${boost_libraries} 
                                    ${freeimage_library} 
                                    gazebo_server
+                                   gazebo_gui
                                    gazebo 
 )
 
-TARGET_LINK_LIBRARIES( gazebo_server ${gazeboserver_link_libs} )
+TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES} gazebo)
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

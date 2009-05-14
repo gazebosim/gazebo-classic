@@ -43,7 +43,7 @@ namespace gazebo
 /// \{
 
 // Forward declarations
-  class Gui;
+  class GuiAPI;
   class Server;
   class SimulationIface;
   class XMLConfig;
@@ -84,9 +84,6 @@ namespace gazebo
 
     /// \brief Main simulation loop, when this loop ends the simulation finish
     public: void MainLoop();
-
-    /// \brief Gets our current GUI interface
-    public: Gui *GetUI() const;
 
     /// \brief Gets the local configuration for this computer
     public: GazeboConfig *GetGazeboConfig() const;
@@ -191,11 +188,10 @@ namespace gazebo
     private: XMLConfig *xmlFile;
 
     /// Pointer to the selected Gui 
-    private: Gui *gui;
+    private: GuiAPI *gui;
 
     private: OgreAdaptor *renderEngine;
 
-    /// Pointer to the selected Gui 
     private: GazeboConfig *gazeboConfig;
 
     /// Flag to know if we have a simulation loaded

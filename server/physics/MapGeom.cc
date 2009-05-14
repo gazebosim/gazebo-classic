@@ -326,7 +326,7 @@ void MapGeom::BuildTree(QuadNode *node)
 
   //int diff = labs(freePixels - occPixels);
 
-  if (node->width*node->height > this->granularityP->GetValue())
+  if ((int)(node->width*node->height) > (**this->granularityP))
   {
     float newX, newY;
     float newW, newH;
