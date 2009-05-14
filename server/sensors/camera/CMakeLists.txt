@@ -9,5 +9,5 @@ set (headers MonoCameraSensor.hh
 )
 
 
-APPEND_TO_SENSOR_SOURCES(${sources})
+APPEND_TO_SERVER_SOURCES(${sources})
 APPEND_TO_SERVER_HEADERS(${headers})

@@ -19,6 +19,8 @@ INCLUDE_DIRECTORIES(
   sensors/imu
   sensors/ir
   sensors/ray
+  ${LIBAVCODEC_PATH}
+  ${LIBAVFORMAT_PATH}
   ${gazeboserver_include_dirs}
   ${boost_include_dirs}
   ${freeimage_include_dir}
@@ -91,9 +93,9 @@ SET (headers Common.hh
 APPEND_TO_SERVER_HEADERS(${headers})
 APPEND_TO_SERVER_SOURCES(${sources})
 
-#ADD_LIBRARY(gazeboserver STATIC ${gazeboserver_sources})
+ADD_LIBRARY(gazebo_server SHARED ${gazeboserver_sources})
 
-ADD_EXECUTABLE(gazebo-exec ${gazeboserver_sources} main.cc)
+ADD_EXECUTABLE(gazebo-exec main.cc)
 SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
@@ -105,19 +107,18 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui 
-                                   gazebo_sensors 
-                                   gazebo_physics 
-                                   gazebo_rendering 
-                                   gazebo_av 
-                                   ${gazeboserver_link_libs} 
+TARGET_LINK_LIBRARIES( gazebo-exec ${gazeboserver_link_libs} 
                                    ${FLTK_LIBRARIES} 
                                    ${boost_libraries} 
                                    ${freeimage_library} 
+                                   gazebo_server
                                    gazebo 
 )
 
+TARGET_LINK_LIBRARIES( gazebo_server ${gazeboserver_link_libs} )
+
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+INSTALL (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 INSTALL (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
 
 ########################################

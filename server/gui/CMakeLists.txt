@@ -1,12 +1,3 @@
-INCLUDE_DIRECTORIES( 
-  ${CMAKE_SOURCE_DIR}/libgazebo 
-  ${CMAKE_SOURCE_DIR}/server 
-  ${CMAKE_SOURCE_DIR}/server/rendering 
-  ${CMAKE_SOURCE_DIR}/server/physics 
-  ${gazeboserver_include_dirs}
-  ${boost_include_dirs}
-)
-
 SET (sources Gui.cc
              GLWindow.cc
              MainMenu.cc
@@ -24,6 +15,7 @@ SET (headers Gui.hh
              GLFrameManager.hh
              GLFrame.hh
 )
-ADD_LIBRARY(gazebo_gui STATIC ${sources})
+#ADD_LIBRARY(gazebo_gui STATIC ${sources})
 
+APPEND_TO_SERVER_SOURCES(${sources})
 APPEND_TO_SERVER_HEADERS(${headers})

@@ -1,11 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/server
-  ${CMAKE_SOURCE_DIR}/server/gui
-  ${gazeboserver_include_dirs} 
-  ${boost_include_dirs}
-)
 
 SET (sources OgreMovableText.cc
              OgreCreator.cc
@@ -41,5 +35,6 @@ SET (headers OgreMovableText.hh
              OgreHeightmap.hh
 )
 
-ADD_LIBRARY(gazebo_rendering ${sources})
+#ADD_LIBRARY(gazebo_rendering ${sources})
+APPEND_TO_SERVER_SOURCES(${sources})
 APPEND_TO_SERVER_HEADERS(${headers})
