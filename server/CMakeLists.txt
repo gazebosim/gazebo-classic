@@ -105,7 +105,17 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui gazebo_sensors gazebo_physics gazebo_rendering gazebo_controllers gazebo_av ${gazeboserver_link_libs} ${FLTK_LIBRARIES} ${boost_libraries} ${freeimage_library} gazebo )
+TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui 
+                                   gazebo_sensors 
+                                   gazebo_physics 
+                                   gazebo_rendering 
+                                   gazebo_av 
+                                   ${gazeboserver_link_libs} 
+                                   ${FLTK_LIBRARIES} 
+                                   ${boost_libraries} 
+                                   ${freeimage_library} 
+                                   gazebo 
+)
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
