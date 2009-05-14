@@ -206,6 +206,9 @@ namespace gazebo
     /// \brief Set transparency for all child geometries
     public: void SetTransparency(float t);
 
+    /// Returns list of sensors
+    public:  std::vector< Sensor* > &GetSensors();
+
     /// List of geometries attached to this body
     private: std::map< std::string, Geom* > geoms;
 

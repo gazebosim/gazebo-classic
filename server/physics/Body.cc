@@ -1253,3 +1253,10 @@ Geom *Body::GetGeom(const std::string &name) const
   else
     return NULL;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Get all children
+std::vector< Sensor* > &Body::GetSensors() 
+{
+  return this->sensors;
+}
