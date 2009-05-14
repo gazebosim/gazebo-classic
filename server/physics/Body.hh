@@ -51,7 +51,7 @@ namespace gazebo
   class Body : public Entity
   {
     /// \brief Constructor
-    public: Body(Entity *parent, dWorldID worldId);
+    public: Body(Entity *parent);
 
     /// \brief Destructor
     public: virtual ~Body();

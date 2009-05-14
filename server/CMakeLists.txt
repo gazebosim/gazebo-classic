@@ -61,7 +61,6 @@ SET (sources Common.cc
              GazeboError.cc
              GazeboMessage.cc
              Model.cc
-             Simulator.cc
              Angle.cc
              Param.cc
              GraphicsIfaceHandler.cc
@@ -75,7 +74,6 @@ SET (headers Common.hh
              Model.hh
              Pose3d.hh
              Quatern.hh
-             Simulator.hh
              SingletonT.hh
              StaticPluginRegister.hh
              Time.hh
@@ -95,7 +93,7 @@ APPEND_TO_SERVER_SOURCES(${sources})
 
 ADD_LIBRARY(gazebo_server SHARED ${gazeboserver_sources})
 
-ADD_EXECUTABLE(gazebo-exec main.cc)
+ADD_EXECUTABLE(gazebo-exec Simulator.cc main.cc)
 SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")

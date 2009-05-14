@@ -255,7 +255,14 @@ void ODEPhysics::RemoveEntity(Entity *entity)
 // Create a new body
 Body *ODEPhysics::CreateBody(Entity *parent)
 {
-  return new Body(parent, this->worldId);
+  return new Body(parent);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the world id
+dWorldID ODEPhysics::GetWorldId()
+{
+  return this->worldId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

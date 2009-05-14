@@ -125,6 +125,9 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Return the space id 
   public: dSpaceID GetSpaceId() const;
 
+  /// \brief Get the world id
+  public: dWorldID GetWorldId();
+
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
 
@@ -132,7 +135,7 @@ class ODEPhysics : public PhysicsEngine
   private: dWorldID worldId;
 
   /// \brief Top-level space for all sub-spaces/geoms
-  public: dSpaceID spaceId;
+  private: dSpaceID spaceId;
 
   /// \brief Collision attributes
   private: dJointGroupID contactGroup;

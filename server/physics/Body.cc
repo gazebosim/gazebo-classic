@@ -62,14 +62,16 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Body::Body(Entity *parent, dWorldID worldId)
+Body::Body(Entity *parent)
     : Entity(parent)
 {
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
   if ( !this->IsStatic() )
   {
-    this->bodyId = dBodyCreate(worldId);
+    ODEPhysics *odePhysics = (ODEPhysics*)(this->physicsEngine);
+
+    this->bodyId = dBodyCreate(odePhysics->GetWorldId());
 
     dMassSetZero( &this->mass );
   }
@@ -164,7 +166,7 @@ void Body::Load(XMLConfigNode *node)
   {
     //std::cout << "setting self collide: " << this->nameP->GetValue() << std::endl;
     ODEPhysics* pe = dynamic_cast<ODEPhysics*>(World::Instance()->GetPhysicsEngine());
-    this->spaceId = dSimpleSpaceCreate( pe->spaceId);
+    this->spaceId = dSimpleSpaceCreate( pe->GetSpaceId());
   }
 
   // option to enter full mass matrix
