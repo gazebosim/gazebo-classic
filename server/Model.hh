@@ -71,32 +71,32 @@ namespace gazebo
   
     /// \brief Load the model
     /// \param removeDuplicate Remove existing model of same name
-    public: int Load(XMLConfigNode *node, bool removeDuplicate);
+    public: void Load(XMLConfigNode *node, bool removeDuplicate);
   
     /// \brief Save the model
     public: void Save(std::string &prefix, std::ostream &stream);
 
     /// \brief Initialize the model
-    public: int Init();
+    public: void Init();
   
     /// \brief Update the model
     /// \param params Update parameters
-    public: int Update();
+    public: void Update();
   
     /// \brief Finalize the model
-    public: int Fini();
+    public: void Fini();
 
     /// \brief Reset the model
     public: void Reset();
   
     /// \brief Initialize the child model
-    protected: virtual int InitChild() {return 0;}
+    protected: virtual void InitChild() {}
   
     /// \brief Update the child model
-    protected: virtual int UpdateChild() {return 0;}
+    protected: virtual void UpdateChild() {}
   
     /// \brief Finilaize thie child model
-    protected: virtual int FiniChild() {return 0;}
+    protected: virtual void FiniChild() {}
     
     /// \brief Get the type of the model
     public: const std::string &GetType() const;

@@ -63,7 +63,7 @@ namespace gazebo
   
     /// \brief Save config back into file
     ///        Set filename to NULL to save back into the original file
-    public: int Save(const std::string &filename );
+    public: void Save(const std::string &filename );
   
     /// \brief Get the root node
     public: XMLConfigNode *GetRootNode() const;

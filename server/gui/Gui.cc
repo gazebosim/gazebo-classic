@@ -97,6 +97,9 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   OgreCreator::Instance()->CreateWindow(this, 1, 1);
 
   this->hasFocus = true;
+
+  Fl::check();
+  Fl::wait(0.3);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

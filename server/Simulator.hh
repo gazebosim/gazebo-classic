@@ -77,7 +77,7 @@ namespace gazebo
     public: void Save(const std::string& filename=std::string());
 
     /// \brief Initialize the simulation
-    public: int Init( );
+    public: void Init( );
 
     /// \brief Finalize the simulation
     public: void Fini( );

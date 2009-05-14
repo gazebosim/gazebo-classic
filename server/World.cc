@@ -187,7 +187,7 @@ void World::Save(std::string &prefix, std::ostream &stream)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the world
-int World::Init()
+void World::Init()
 {
   std::vector< Model* >::iterator miter;
 
@@ -212,12 +212,11 @@ int World::Init()
 
   this->graphics->Init();
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the world
-int World::Update()
+void World::Update()
 {
 
   if (this->simPauseTime > 0)
@@ -270,7 +269,6 @@ int World::Update()
   std::cout << " World::Update() Physics engine DT(" << tmpT4-tmpT2 << ")" << std::endl;
 #endif
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -282,7 +280,7 @@ void World::ProcessMessages()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the world
-int World::Fini()
+void World::Fini()
 {
   std::vector< Model* >::iterator miter;
 
@@ -303,7 +301,7 @@ int World::Fini()
     this->simIface->Destroy();
   }
   catch (std::string e)
-  {
+  { 
     gzmsg(-1) << "Problem destroying simIface[" << e << "]\n";
   }
 
@@ -320,8 +318,6 @@ int World::Fini()
 #ifdef HAVE_OPENAL
   OpenAL::Instance()->Fini();
 #endif
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -341,7 +337,7 @@ PhysicsEngine *World::GetPhysicsEngine() const
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-int World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate)
+void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate)
 {
   XMLConfigNode *cnode;
   Model *model = NULL;
@@ -358,12 +354,9 @@ int World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate
   // Load children
   for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
   {
-    if (this->LoadEntities( cnode, model, removeDuplicate ) != 0)
-      return -1;
+    this->LoadEntities( cnode, model, removeDuplicate );
   }
 
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -393,8 +386,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
 
   //model->SetParent(parent);
   // Load the model
-  if (model->Load( node, removeDuplicate ) != 0)
-    return NULL;
+  model->Load( node, removeDuplicate );
 
   // Set the model's pose (relative to parent)
   this->SetModelPose(model, model->GetInitPose());

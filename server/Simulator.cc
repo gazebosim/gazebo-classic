@@ -245,15 +245,20 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the simulation
-int Simulator::Init()
+void Simulator::Init()
 {
   this->startTime = this->GetWallTime();
 
   //Initialize the world
-  if (gazebo::World::Instance()->Init() != 0)
-    return -1;
+  try
+  {
+    gazebo::World::Instance()->Init();
+  }
+  catch (GazeboError e)
+  {
+    gzthrow("Failed to Initialize the World\n"  << e);
+  }
 
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

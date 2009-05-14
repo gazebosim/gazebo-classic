@@ -74,16 +74,13 @@ class World : public SingletonT<World>
   public: void Save(std::string &prefix, std::ostream &stream);
 
   /// Initialize the world
-  /// \return 0 on success
-  public: int Init();
+  public: void Init();
 
   /// Update the world
-  /// \return 0 on success
-  public: int Update();
+  public: void Update();
 
   /// Finilize the world
-  /// \return 0 on success
-  public: int Fini();
+  public: void Fini();
 
   /// Retun the libgazebo server
   /// \return Pointer the the libgazebo server
@@ -117,8 +114,7 @@ class World : public SingletonT<World>
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
   /// \param removeDuplicate Remove existing model of same name
-  /// \return 0 on success
-  public: int LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate);
+  public: void LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate);
 
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete

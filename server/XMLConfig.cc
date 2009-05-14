@@ -88,14 +88,17 @@ void XMLConfig::LoadString( const std::string &str )
 
 ////////////////////////////////////////////////////////////////////////////
 //  Save config back into file
-int XMLConfig::Save(const std::string &filename )
+void XMLConfig::Save(const std::string &filename )
 {
   int result=0;
   if (filename == std::string())
     result=xmlSaveFileEnc(this->filename.c_str(), this->xmlDoc, "UTF-8");
   else
     result=xmlSaveFileEnc(filename.c_str(), this->xmlDoc, "UTF-8");
-  return result;
+  if ( result != 0)
+  {
+     gzthrow( "Error saving the XML file back to the disk " );
+  }
 }
 
 

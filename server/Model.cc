@@ -151,7 +151,7 @@ Model::~Model()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the model
-int Model::Load(XMLConfigNode *node, bool removeDuplicate)
+void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 {
   XMLConfigNode *childNode;
   Pose3d pose;
@@ -249,7 +249,6 @@ int Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->graphicsHandler = new GraphicsIfaceHandler();
   this->graphicsHandler->Load(this->GetName(), this);
 
-  return 0;
 
   // Get the name of the python module
   /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
@@ -363,7 +362,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the model
-int Model::Init()
+void Model::Init()
 {
   std::map<std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
@@ -385,12 +384,12 @@ int Model::Init()
   this->sceneNode->attachObject(this->mtext);
   */
 
-  return this->InitChild();
+  this->InitChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the model
-int Model::Update()
+void Model::Update()
 {
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
@@ -466,21 +465,21 @@ int Model::Update()
             << tmpT5-tmpT4 << ")" << std::endl;
   std::cout << "      Models::Update() (" << this->GetName() 
             << ") Total DT (" << tmpT5-tmpT1 << ")" << std::endl;
-  return update_error;
+  gzthrow( update_error );
 #else
-     return this->UpdateChild();
+     this->UpdateChild();
 #endif
 
 
 
 
 
-  return this->UpdateChild();
+  this->UpdateChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the model
-int Model::Fini()
+void Model::Fini()
 {
   std::map<std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
@@ -502,7 +501,7 @@ int Model::Fini()
     this->graphicsHandler = NULL;
   }
 
-  return this->FiniChild();
+  this->FiniChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
