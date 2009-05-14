@@ -1,3 +1,7 @@
+INCLUDE_DIRECTORIES(
+  ${FLTK_INCLUDE_DIR}
+)
+
 SET (sources Gui.cc
              GLWindow.cc
              MainMenu.cc
@@ -18,6 +22,9 @@ SET (headers Gui.hh
 
 ADD_LIBRARY(gazebo_gui STATIC ${sources})
 ADD_LIBRARY(gazebo_gui-shared SHARED ${sources})
+
+TARGET_LINK_LIBRARIES(gazebo_gui ${FLTK_LIBRARIES} )
+TARGET_LINK_LIBRARIES(gazebo_gui-shared ${FLTK_LIBRARIES} )
 
 #SET_TARGET_PROPERTIES(gazebo_gui-static PROPERTIES OUTPUT_NAME "gazebo_gui")
 SET_TARGET_PROPERTIES(gazebo_gui-shared PROPERTIES OUTPUT_NAME "gazebo_gui")

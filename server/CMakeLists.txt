@@ -1,7 +1,6 @@
 INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 
-#${FLTK_INCLUDE_DIR}
 ########################################
 # Include all the search paths for headers
 INCLUDE_DIRECTORIES(
@@ -64,6 +63,7 @@ SET (sources Common.cc
              Param.cc
              GraphicsIfaceHandler.cc
              GuiAPI.cc
+             OpenALAPI.cc
              Simulator.cc
 )
 
@@ -88,6 +88,7 @@ SET (headers Common.hh
              Param.hh
              GraphicsIfaceHandler.hh
              GuiAPI.hh
+             OpenALAPI.hh
              Simulator.hh
 )
 
@@ -110,7 +111,6 @@ ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 TARGET_LINK_LIBRARIES( gazebo-exec 
                                    ${gazeboserver_link_libs} 
-                                   ${FLTK_LIBRARIES} 
                                    ${boost_libraries} 
                                    ${freeimage_library} 
                                    gazebo_server

@@ -47,6 +47,7 @@ namespace gazebo
   class PhysicsEngine;
   class XMLConfigNode;
   class GraphicsIfaceHandler;
+  class OpenALAPI;
    
 /// \brief The World
 /*
@@ -210,6 +211,8 @@ class World : public SingletonT<World>
 
   /// Length of time to run before receiving a "go" command
   private: double simPauseTime;
+
+  private: OpenALAPI *openAL;
 
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;

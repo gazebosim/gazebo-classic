@@ -41,9 +41,7 @@
 #include "gazebo.h"
 #include "World.hh"
 
-#ifdef HAVE_OPENAL
-#include "OpenAL.hh"
-#endif
+#include "OpenALAPI.hh"
 
 #include "Geom.hh"
 
@@ -63,6 +61,7 @@ World::World()
   this->physicsEngine = NULL;
   this->server = NULL;
   this->graphics = NULL;
+  this->openAL = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +112,10 @@ void World::Close()
     gzthrow(e);
   }
 
+  if (this->openAL)
+    delete this->openAL;
+  this->openAL = NULL;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,11 +149,12 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   this->graphics = new GraphicsIfaceHandler();
   this->graphics->Load("default");
 
-#ifdef HAVE_OPENAL
   // Load OpenAL audio 
   if (rootNode->GetChild("openal","audio"))
-    OpenAL::Instance()->Load( rootNode->GetChild("openal", "audio") );
-#endif
+  {
+    this->openAL = new OpenALAPI();
+    this->openAL->Load(rootNode->GetChild("openal", "audio"));
+  }
 
   this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
 
@@ -203,9 +207,8 @@ void World::Init()
   this->physicsEngine->Init();
 
   // Initialize openal
-#ifdef HAVE_OPENAL
-  OpenAL::Instance()->Init();
-#endif
+  if (this->openAL)
+    this->openAL->Init();
 
   this->toAddModels.clear();
   this->toDeleteModels.clear();
@@ -315,9 +318,8 @@ void World::Fini()
   }
 
   // Close the openal server
-#ifdef HAVE_OPENAL
-  OpenAL::Instance()->Fini();
-#endif
+  if (this->openAL)
+    this->openAL->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
