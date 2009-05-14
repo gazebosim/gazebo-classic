@@ -24,8 +24,12 @@
  * SVN: $Id$
  */
 
+#ifndef OPENALAPI_HH
+#define OPENALAPI_HH
+
 namespace gazebo
 {
+  class OpenALSource;
   class XMLConfigNode;
 
   class OpenALAPI
@@ -42,7 +46,16 @@ namespace gazebo
     /// \brief Initialize
     public: void Init();
 
+    /// \brief Create an OpenALSource object from XML node
+    /// \param node The XML config node containing the auiod information
+    /// \return A pointer to an OpenALSource object
+    //public: OpenALSource *CreateSource( XMLConfigNode *node );
+
     /// \brief Finalize
     public: void Fini();
   };
+
+
 }
+
+#endif

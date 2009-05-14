@@ -41,3 +41,4 @@ void OpenALAPI::Fini()
   OpenAL::Instance()->Fini( );
 #endif
 }
+

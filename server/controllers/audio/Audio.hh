@@ -29,7 +29,6 @@
 
 #include "Controller.hh"
 #include "Entity.hh"
-#include "OpenAL.hh"
 
 namespace gazebo
 {

@@ -83,7 +83,6 @@ namespace gazebo
     private: static OpenAL *myself;
   };
 
-
   /// \brief OpenAL Source. This can be thought of as a speaker.
   class OpenALSource
   {

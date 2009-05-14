@@ -31,6 +31,7 @@
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
+#include "OpenAL.hh"
 #include "Audio.hh"
 
 #include <string.h>

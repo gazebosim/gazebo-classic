@@ -24,6 +24,9 @@
  * SVN: $Id:$
  */
 
+#ifndef GUIAPI_HH
+#define GUIAPI_HH
+
 #include <string>
 #include <iostream>
 
@@ -54,5 +57,6 @@ namespace gazebo
 
     private: Gui *gui;
   };
-
 }
+
+#endif
