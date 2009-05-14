@@ -28,7 +28,10 @@
 #include <unistd.h>
 #include <iostream>
 
+
+#include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/alext.h>
 
 #include "XMLConfig.hh"
 #include "GazeboError.hh"

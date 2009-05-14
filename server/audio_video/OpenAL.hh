@@ -27,14 +27,13 @@
 #ifndef OPENAL_HH
 #define OPENAL_HH
 
-#include <AL/al.h>
-#include <AL/alc.h>
-#include <AL/alext.h>
-
 #include <stdint.h>
 #include <string>
 
 #include "Vector3.hh"
+
+struct ALCcontext_struct;
+struct ALCdevice_struct;
 
 namespace gazebo
 {
@@ -78,8 +77,8 @@ namespace gazebo
     public: void SetListenerOrient(float cx, float cy, float cz,
                                         float ux, float uy, float uz);
 
-    private: ALCcontext *context;
-    private: ALCdevice *audioDevice;
+    private: ALCcontext_struct *context;
+    private: ALCdevice_struct *audioDevice;
   
     private: static OpenAL *myself;
   };

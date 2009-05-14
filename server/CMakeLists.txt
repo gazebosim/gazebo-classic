@@ -114,6 +114,7 @@ TARGET_LINK_LIBRARIES( gazebo-exec
                                    ${boost_libraries} 
                                    ${freeimage_library} 
                                    gazebo_server
+                                   gazebo_av
                                    gazebo_gui
                                    gazebo 
 )
