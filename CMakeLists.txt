@@ -33,10 +33,6 @@ SET (OGRE_VERSION 1.6.1 CACHE INTERNAL "Ogre version requirement" FORCE)
 SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
 SET (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
-# Write the config.h file
-CONFIGURE_FILE (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-
 SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")
 
@@ -63,6 +59,11 @@ STRING(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 MESSAGE (STATUS "====== Finding 3rd Party Packages ======")
 INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
 MESSAGE (STATUS "----------------------------------------")
+
+# Write the config.h file
+CONFIGURE_FILE (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+
 
 IF (BUILD_GAZEBO)
   ADD_SUBDIRECTORY(libgazebo)

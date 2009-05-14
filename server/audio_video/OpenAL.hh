@@ -30,7 +30,10 @@
 #include <stdint.h>
 #include <string>
 
+#include "config.h"
 #include "Vector3.hh"
+
+#ifdef HAVE_OPENAL
 
 struct ALCcontext_struct;
 struct ALCdevice_struct;
@@ -140,4 +143,5 @@ namespace gazebo
   };
 }
 
+#endif
 #endif

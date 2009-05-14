@@ -40,9 +40,7 @@ ADD_SUBDIRECTORY(physics)
 ADD_SUBDIRECTORY(sensors)
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(controllers)
-IF (INCLUDE_AV)
-  ADD_SUBDIRECTORY(audio_video)
-ENDIF (INCLUDE_AV)
+ADD_SUBDIRECTORY(audio_video)
 
 ########################################
 # Process all the subdirectories

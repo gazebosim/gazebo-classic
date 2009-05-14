@@ -3,7 +3,6 @@ INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 INCLUDE (FindFLTK)
 INCLUDE (FindPkgConfig)
 
-SET (INCLUDE_AV ON CACHE BOOL "Include audio/video functionality" FORCE)
 SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
@@ -95,11 +94,9 @@ IF (PKG_CONFIG_FOUND)
 
   pkg_check_modules(OAL openal)
   IF (NOT OAL_FOUND)
-    SET (INCLUDE_AV OFF CACHE BOOL "Include audio/video functionality" FORCE)
     MESSAGE (STATUS "Warning: Openal and development files not found. Audio capabilities will be disabled. See the following website: http://connect.creativelabs.com/openal/default.aspx")
   ELSE (NOT OAL_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
-                          ${gazeboserver_cflags_desc} "-DHAVE_OPENAL" )
+    SET (HAVE_OPENAL TRUE)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
                           ${OAL_INCLUDE_DIRS})
@@ -116,7 +113,6 @@ IF (PKG_CONFIG_FOUND)
 
   pkg_check_modules(AVF libavformat)
   IF (NOT AVF_FOUND)
-    SET (INCLUDE_AV OFF CACHE BOOL "Include audio/video functionality" FORCE)
     MESSAGE (STATUS "Warning: libavformat and development files not found. Audio capabilities will be disabled.")
   ELSE (NOT AVF_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
@@ -135,7 +131,6 @@ IF (PKG_CONFIG_FOUND)
 
   pkg_check_modules(AVC libavcodec)
   IF (NOT AVC_FOUND)
-    SET (INCLUDE_AV OFF CACHE BOOL "Include audio/video functionality" FORCE)
     MESSAGE (STATUS "Warning: libavcodec and development files not found. Audio capabilities will be disabled.")
   ELSE (NOT AVC_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
@@ -151,6 +146,10 @@ IF (PKG_CONFIG_FOUND)
                           ${gazeboserver_link_libs_desc} 
                           ${AVC_LIBRARIES})
   ENDIF (NOT AVC_FOUND)
+
+  IF (AVF_FOUND AND AVC_FOUND)
+    SET (HAVE_FFMPEG TRUE)
+  ENDIF (AVF_FOUND AND AVC_FOUND)
 
   pkg_check_modules(PLAYER playerc++)
   IF (NOT PLAYER_FOUND)
@@ -246,7 +245,7 @@ ENDIF (NOT freeimage_library)
 
 ########################################
 # Find avformat and avcodec
-IF (INCLUDE_AV)
+IF (HAVE_FFMPEG)
   SET (libavformat_search_path 
     /usr/include /usr/include/libavformat /usr/local/include 
     /usr/local/include/libavformat
@@ -273,7 +272,7 @@ IF (INCLUDE_AV)
     MESSAGE (STATUS "Looking for avcodec.h - found")
   ENDIF (NOT LIBAVCODEC_PATH)
 
-ENDIF (INCLUDE_AV)
+ENDIF (HAVE_FFMPEG)
 
 
 ########################################

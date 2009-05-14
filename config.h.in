@@ -2,3 +2,6 @@
 
 /* Version number */
 #define GAZEBO_VERSION "${GAZEBO_VERSION}"
+
+#cmakedefine HAVE_OPENAL 1
+#cmakedefine HAVE_FFMPEG 1

@@ -24,6 +24,10 @@
  * SVN: $Id:$
  */
 
+#include "config.h"
+
+#ifdef HAVE_OPENAL
+
 #include <stdio.h>
 #include <unistd.h>
 #include <iostream>
@@ -499,6 +503,7 @@ void OpenALSource::FillBufferFromFile( const std::string &audioFile )
   uint8_t *dataBuffer = NULL;
   unsigned int dataBufferSize;
 
+#ifdef HAVE_FFMPEG
   // Create an audio decoder
   AudioDecoder audioDecoder;
 
@@ -511,7 +516,12 @@ void OpenALSource::FillBufferFromFile( const std::string &audioFile )
   // AL_FORMAT_STEREO16
   this->FillBufferFromPCM( dataBuffer, dataBufferSize, 
                            audioDecoder.GetSampleRate());
+#else
+  std::cerr << "No FFMPEG audio decoder. Missing FFMPEG libraries.\n";
+#endif
 
   if (dataBuffer)
     delete [] dataBuffer; 
 }
+
+#endif

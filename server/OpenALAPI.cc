@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include "OpenAL.hh"
 #include "OpenALAPI.hh"
 
