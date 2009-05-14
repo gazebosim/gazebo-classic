@@ -107,7 +107,8 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-TARGET_LINK_LIBRARIES( gazebo-exec ${gazeboserver_link_libs} 
+TARGET_LINK_LIBRARIES( gazebo-exec gazebo_gui 
+                                   ${gazeboserver_link_libs} 
                                    ${FLTK_LIBRARIES} 
                                    ${boost_libraries} 
                                    ${freeimage_library} 
