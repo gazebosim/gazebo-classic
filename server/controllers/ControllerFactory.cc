@@ -25,11 +25,15 @@
  * SVN info: $Id$
  */
 
+#include "config.h"
+
 #include "GazeboError.hh"
 #include "Entity.hh"
 #include "gazebo.h"
 #include "Controller.hh"
 #include "ControllerFactory.hh"
+
+
 #ifdef HAVE_LTDL
 #include <ltdl.h>
 #endif // HAVE_LTDL

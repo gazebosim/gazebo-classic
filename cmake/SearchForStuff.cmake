@@ -318,4 +318,25 @@ IF (TCMALLOC)
        CACHE INTERNAL "Link flags for profile" FORCE)
 ENDIF (TCMALLOC)
 
+########################################
+# Find libtool
+FIND_PATH(libtool_include_dir ltdl.h /usr/include /usr/local/include)
+IF (NOT libtool_include_dir)
+  MESSAGE (STATUS "Looking for ltdl.h - not found")
+  MESSAGE (STATUS "Warning: Unable to find libtool, plugins will not be supported.")
+  SET (libtool_include_dir /usr/include)
+ELSE (NOT libtool_include_dir)
+  MESSAGE (STATUS "Looking for ltdl.h - found")
+ENDIF (NOT libtool_include_dir)
 
+FIND_LIBRARY(libtool_library ltdl /usr/lib /usr/local/lib)
+IF (NOT libtool_library)
+  MESSAGE (STATUS "Looking for libltdl - not found")
+  MESSAGE (STATUS "Warning: Unable to find libtool, plugins will not be supported.")
+ELSE (NOT libtool_library)
+  MESSAGE (STATUS "Looking for libltdl - found")
+ENDIF (NOT libtool_library)
+
+IF (libtool_library AND libtool_include_dir)
+  SET (HAVE_LTDL TRUE)
+ENDIF (libtool_library AND libtool_include_dir)

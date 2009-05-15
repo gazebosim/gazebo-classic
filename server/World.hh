@@ -124,7 +124,7 @@ class World : public SingletonT<World>
   //  (encoded as an XML string) onto a list. The Graphics Thread will then
   //  call the ProcessEntitiesToLoad function to actually make the new
   //  entities. This Producer-Consumer model is necessary for thread safety.
-  public: void InsertEntity(const std::string xmlString);
+  public: void InsertEntity(std::string xmlString);
 
   /// \brief Load all the entities that have been queued
   public: void ProcessEntitiesToLoad();

@@ -20,6 +20,7 @@ INCLUDE_DIRECTORIES(
   sensors/ray
   ${LIBAVCODEC_PATH}
   ${LIBAVFORMAT_PATH}
+  ${libtool_include_path}
   ${gazeboserver_include_dirs}
   ${boost_include_dirs}
   ${freeimage_include_dir}
@@ -107,7 +108,7 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-TARGET_LINK_LIBRARIES( gazebo-exec 
+TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
                                    ${freeimage_library} 
@@ -115,9 +116,10 @@ TARGET_LINK_LIBRARIES( gazebo-exec
                                    gazebo_av
                                    gazebo_gui
                                    gazebo 
+
 )
 
-TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES} gazebo)
+TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES} ${libtool_library} gazebo)
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
