@@ -62,7 +62,6 @@ SET (sources Common.cc
              Param.cc
              GraphicsIfaceHandler.cc
              GuiAPI.cc
-             OpenALAPI.cc
              Simulator.cc
 )
 
@@ -87,7 +86,6 @@ SET (headers Common.hh
              Param.hh
              GraphicsIfaceHandler.hh
              GuiAPI.hh
-             OpenALAPI.hh
              Simulator.hh
 )
 
