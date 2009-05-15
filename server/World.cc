@@ -41,7 +41,7 @@
 #include "gazebo.h"
 #include "World.hh"
 
-#include "OpenALAPI.hh"
+#include "OpenAL.hh"
 
 #include "Geom.hh"
 
@@ -111,11 +111,6 @@ void World::Close()
   {
     gzthrow(e);
   }
-
-  if (this->openAL)
-    delete this->openAL;
-  this->openAL = NULL;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +147,9 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   // Load OpenAL audio 
   if (rootNode->GetChild("openal","audio"))
   {
-    this->openAL = new OpenALAPI();
+    //this->openAL = new OpenALAPI();
+    //this->openAL->Load(rootNode->GetChild("openal", "audio"));
+    this->openAL = OpenAL::Instance();
     this->openAL->Load(rootNode->GetChild("openal", "audio"));
   }
 

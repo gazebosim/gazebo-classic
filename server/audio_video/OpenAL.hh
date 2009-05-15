@@ -34,9 +34,9 @@
 #include "Vector3.hh"
 
 #ifdef HAVE_OPENAL
-
 struct ALCcontext_struct;
 struct ALCdevice_struct;
+#endif
 
 namespace gazebo
 {
@@ -80,8 +80,10 @@ namespace gazebo
     public: void SetListenerOrient(float cx, float cy, float cz,
                                         float ux, float uy, float uz);
 
+#ifdef HAVE_OPENAL
     private: ALCcontext_struct *context;
     private: ALCdevice_struct *audioDevice;
+#endif
   
     private: static OpenAL *myself;
   };
@@ -143,5 +145,4 @@ namespace gazebo
   };
 }
 
-#endif
 #endif
