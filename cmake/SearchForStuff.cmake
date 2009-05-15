@@ -272,6 +272,9 @@ IF (HAVE_FFMPEG)
     MESSAGE (STATUS "Looking for avcodec.h - found")
   ENDIF (NOT LIBAVCODEC_PATH)
 
+ELSE (HAVE_FFMPEG)
+  SET (LIBAVFORMAT_PATH /usr/include)
+  SET (LIBAVCODEC_PATH /usr/include)
 ENDIF (HAVE_FFMPEG)
 
 

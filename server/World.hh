@@ -29,6 +29,8 @@
 
 #include <iostream>
 #include <vector>
+#include <boost/tuple/tuple.hpp>
+
 #include "SingletonT.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
@@ -115,7 +117,17 @@ class World : public SingletonT<World>
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
   /// \param removeDuplicate Remove existing model of same name
-  public: void LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate);
+  public: void LoadEntities(XMLConfigNode *node, Model *parent, 
+                            bool removeDuplicate);
+
+  /// \brief Insert an entity into the world. This function pushes the model
+  //  (encoded as an XML string) onto a list. The Graphics Thread will then
+  //  call the ProcessEntitiesToLoad function to actually make the new
+  //  entities. This Producer-Consumer model is necessary for thread safety.
+  public: void InsertEntity(const std::string xmlString);
+
+  /// \brief Load all the entities that have been queued
+  public: void ProcessEntitiesToLoad();
 
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete
@@ -201,6 +213,8 @@ class World : public SingletonT<World>
 
   /// List of models to delete from the world
   private: std::vector< Model* > toDeleteModels;
+
+  private: std::vector< std::string > toLoadEntities;
 
   /// Simulator control interface
   private: Server *server;

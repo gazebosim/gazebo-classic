@@ -1,7 +1,3 @@
-INCLUDE_DIRECTORIES(
-  ${FLTK_INCLUDE_DIR}
-)
-
 SET (sources Gui.cc
              GLWindow.cc
              MainMenu.cc

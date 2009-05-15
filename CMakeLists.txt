@@ -60,10 +60,16 @@ MESSAGE (STATUS "====== Finding 3rd Party Packages ======")
 INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
 MESSAGE (STATUS "----------------------------------------")
 
+########################################
 # Write the config.h file
 CONFIGURE_FILE (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
+########################################
+# Make the gazebo rc file
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
+
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 IF (BUILD_GAZEBO)
   ADD_SUBDIRECTORY(libgazebo)

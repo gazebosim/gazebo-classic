@@ -357,6 +357,8 @@ void Simulator::MainLoop()
         this->gui->Update();
       }
 
+      World::Instance()->ProcessEntitiesToLoad();
+
       currTime = this->GetWallTime();
 
       if (currTime - lastTime < 1/freq)

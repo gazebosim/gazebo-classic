@@ -17,4 +17,4 @@ env = Environment (
 for cfg in parseConfigs:
   env.ParseConfig(cfg)
 
-env.Program('factory','factory.cc')
+env.Program('factory','factory2.cc')

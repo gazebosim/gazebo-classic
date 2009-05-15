@@ -6,5 +6,5 @@ Name: libgazeboshm
 Description: Shared memory interface to Gazebo
 Version: @GAZEBO_VERSION@
 Requires:
-Libs: -L${libdir} -lgazeboshm
+Libs: -L${libdir} -lgazebo
 CFlags: -I${includedir}

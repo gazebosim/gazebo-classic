@@ -212,6 +212,7 @@ void World::Init()
 
   this->toAddModels.clear();
   this->toDeleteModels.clear();
+  this->toLoadEntities.clear();
 
   this->graphics->Init();
 
@@ -359,6 +360,43 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
     this->LoadEntities( cnode, model, removeDuplicate );
   }
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a new entity to the world
+void World::InsertEntity( const std::string xmlString)
+{
+  this->toLoadEntities.push_back( xmlString );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Load all the entities that have been queued
+void World::ProcessEntitiesToLoad()
+{
+  std::vector< std::string >::iterator iter;
+
+  for (iter = this->toLoadEntities.begin(); 
+       iter != this->toLoadEntities.end(); iter++)
+  {
+    // Create the world file
+    XMLConfig *xmlConfig = new XMLConfig();
+
+    // Load the XML tree from the given string
+    try
+    {
+      xmlConfig->LoadString( *iter );
+    }
+    catch (gazebo::GazeboError e)
+    {
+      gzerr(0) << "The world could not load the XML data [" << e << "]\n";
+      continue;
+    }
+
+    this->LoadEntities( xmlConfig->GetRootNode(), NULL, true); 
+    delete xmlConfig;
+  }
+ 
+  this->toLoadEntities.clear(); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
