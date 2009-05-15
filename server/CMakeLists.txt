@@ -126,5 +126,5 @@ INSTALL (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/inclu
 ########################################
 # Make the gazebo rc file
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc @ONLY)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION ~/)
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
 
