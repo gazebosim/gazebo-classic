@@ -111,8 +111,8 @@ TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
                                    ${boost_libraries} 
                                    ${freeimage_library} 
                                    gazebo_server
-                                   gazebo_av
-                                   gazebo_gui
+                                   gazebo_av-shared
+                                   gazebo_gui-shared
                                    gazebo 
 
 )
