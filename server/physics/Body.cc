@@ -246,13 +246,6 @@ void Body::Load(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("sensor");
   }
 
-  // If no geoms are attached, then don't let gravity affect the body.
-  if (this->geoms.size()==0 || this->turnGravityOffP->GetValue())
-  {
-    //std::cout << "setting gravity to zero for: " << this->nameP->GetValue() << std::endl;
-    this->SetGravityMode(false);
-  }
-
   this->SetPose(initPose);
 
 }
@@ -367,6 +360,12 @@ bool Body::GetSelfCollide()
 // Initialize the body
 void Body::Init()
 {
+  // If no geoms are attached, then don't let gravity affect the body.
+  if (this->geoms.size()==0 || this->turnGravityOffP->GetValue())
+  {
+    this->SetGravityMode(false);
+  }
+
   // Set the intial pose. Must do this to handle static models
   this->SetPose(this->GetPose());
 
