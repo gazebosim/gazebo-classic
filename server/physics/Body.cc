@@ -932,7 +932,7 @@ void Body::UpdateCoM()
                        this->ixx,this->iyy,this->izz,
                        this->ixy,this->ixz,this->iyz);
 
-    dMassTranslate( &this->mass, -this->cx, -this->cy, -this->cz);
+    //dMassTranslate( &this->mass, -this->cx, -this->cy, -this->cz);
 
     // dMatrix3 rot;
     // dMassRotate(&this->mass, rot);

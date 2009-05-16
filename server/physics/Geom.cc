@@ -147,7 +147,7 @@ void Geom::Load(XMLConfigNode *node)
   pose.rot = this->rpyP->GetValue();
 
   // TODO: This should probably be true....but "true" breaks trimesh postions.
-  this->SetPose(pose, true);
+  this->SetPose(pose, false);
 
   childNode = node->GetChild("visual");
   while (childNode)
