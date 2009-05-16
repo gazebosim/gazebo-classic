@@ -900,7 +900,7 @@ void Body::UpdateCoM()
 
         // get pose with comPose set to newPose
         this->comPose = newPose;
-        giter->second->SetPose(tmpPose, false);
+        giter->second->SetPose(tmpPose, true);
       }
     }
 
