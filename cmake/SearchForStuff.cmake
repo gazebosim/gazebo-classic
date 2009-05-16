@@ -36,6 +36,9 @@ IF (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${OGRE_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${OGRE_LDFLAGS})
   ENDIF (NOT OGRE_FOUND)
 
   pkg_check_modules(ODE ode>=${ODE_VERSION})
@@ -54,6 +57,9 @@ IF (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${ODE_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ODE_LDFLAGS})
   ENDIF (NOT ODE_FOUND)
 
   pkg_check_modules(XML libxml-2.0)
