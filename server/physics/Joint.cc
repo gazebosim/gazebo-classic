@@ -138,7 +138,7 @@ void Joint::Load(XMLConfigNode *node)
 
   /// Add a renderable for the joint
   this->visual = OgreCreator::Instance()->CreateVisual(
-      visname.str(), this->model->GetVisualNode());
+      visname.str(), NULL);
   if (this->visual)
   {
     this->visual->AttachMesh("joint_anchor");
