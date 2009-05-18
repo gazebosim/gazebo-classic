@@ -386,7 +386,7 @@ void GLWindow::HandleMouseDrag()
           double distance, scaleX, scaleY, forceScale;
           Pose3d bodyPose;
           Vector3 moveVector;
-          Body *body = (Body*)(body);
+          Body *body = (Body*)(entity);
 
           //
           // interactively set force to selected body
