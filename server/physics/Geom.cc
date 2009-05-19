@@ -184,7 +184,11 @@ void Geom::Load(XMLConfigNode *node)
         visname.str(), this->visualNode);
 
     if (this->bbVisual)
+    {
       this->bbVisual->AttachBoundingBox(min,max);
+      //this->bbVisual->SetPosition(pose.pos);
+      this->bbVisual->SetRotation(pose.rot);
+    }
   }
 
   if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass && 
