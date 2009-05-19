@@ -218,6 +218,13 @@ void Body::Load(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("geom");
   }
 
+  // update mass CoM if using customMassMatrix
+  if (this->customMassMatrix)
+  {
+    this->UpdateCoM();
+    this->UpdatePose();
+  }
+
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
   if (this->mass.mass > 0.0)
@@ -878,9 +885,6 @@ void Body::UpdateCoM()
     // newPose is mass CoM
     oldPose = this->comPose;
 
-    //std::cout << " in UpdateCoM, name: " << this->GetName() << std::endl;
-    //std::cout << " in UpdateCoM, comPose or oldPose: " << this->comPose << std::endl;
-
     // New pose for the CoM
     newPose.pos.x = this->cx;
     newPose.pos.y = this->cy;
@@ -899,7 +903,7 @@ void Body::UpdateCoM()
 
         // get pose with comPose set to newPose
         this->comPose = newPose;
-        giter->second->SetPose(tmpPose, true);
+        giter->second->SetPose(tmpPose, false);
       }
     }
 
@@ -911,20 +915,15 @@ void Body::UpdateCoM()
     this->comPose = newPose;
     this->SetPose(tmpPose);
 
+
     // Settle on the new CoM pose
     this->comPose = newPose;
 
-
-
-    // comPose is zero in this case, we'll keep cx, cy, cz
-    this->comPose.Reset();
-
-    this->comPose.pos.x = this->cx;
-    this->comPose.pos.y = this->cy;
-    this->comPose.pos.z = this->cz;
+    // My Cheap Hack, to put the center of mass at the origin
+    this->cx = this->cy = this->cz = 0;
 
     this->physicsEngine->LockMutex();
-    // setup this->mass as well
+
     dMassSetParameters(&this->mass, this->bodyMass,
                        this->cx, this->cy, this->cz,
                        //0,0,0,
@@ -932,9 +931,7 @@ void Body::UpdateCoM()
                        this->ixy,this->ixz,this->iyz);
 
     //dMassTranslate( &this->mass, -this->cx, -this->cy, -this->cz);
-
-    // dMatrix3 rot;
-    // dMassRotate(&this->mass, rot);
+    //dMassTranslate( &this->mass, this->cx, this->cy, this->cz);
 
     // Set the mass matrix
     if (this->mass.mass > 0)
@@ -954,6 +951,7 @@ void Body::UpdateCoM()
     // std::cout << " I[8] " << this->mass.I[8] << std::endl;
 
     this->physicsEngine->UnlockMutex();
+
   }
   else
   {
