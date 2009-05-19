@@ -115,13 +115,8 @@ void Joint::Load(XMLConfigNode *node)
   if (!body2)
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
-  Pose3d tmpPose = anchorBody->GetCoMPose().CoordPoseSolve(anchorBody->GetPose());
-  // std::cout << "anchor body  " << anchorBody->GetName()
-  //           << " ab pos " <<  tmpPose
-  //           << " com pos " <<  anchorBody->GetCoMPose()
-  //           << " off " << **(this->anchorOffsetP)
-  //           << std::endl;
-  Vector3 anchorVec = tmpPose.pos + **(this->anchorOffsetP);
+  // setting anchor relative to gazebo body frame origin
+  Vector3 anchorVec = anchorBody->GetPose().pos + **(this->anchorOffsetP);
 
   double h = World::Instance()->GetPhysicsEngine()->GetStepTime();
   double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
