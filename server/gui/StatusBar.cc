@@ -29,6 +29,7 @@
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Box.H>
 #include <string.h>
 
 #include "Gui.hh"
@@ -79,8 +80,11 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->pauseTime->align(FL_ALIGN_RIGHT);
   this->pauseTime->precision(2);
 
-  x = this->w() - 80;
-  //x = this->pauseTime->x() + this->pauseTime->w() + 80;
+  x = this->pauseTime->x() + this->pauseTime->w();
+  int width = this->w() - (x + 90);
+  Fl_Box *spacingBox = new Fl_Box(x, y, width, 20);
+
+  x = spacingBox->x() + spacingBox->w();
   this->playButton = new Fl_Button(x, y, 30, 20, "@||");
   this->playButton->callback( &gazebo::StatusBar::PlayPauseButtonCB, this );
 
@@ -89,7 +93,8 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->stepButton->callback( &gazebo::StatusBar::StepButtonCB, this );
   this->stepButton->deactivate();
 
-  this->resizable(NULL);
+  this->resizable(spacingBox);
+
   this->end();
   this->show();
 

@@ -554,11 +554,6 @@ void Body::SetPose(const Pose3d &_pose)
 // Return the pose of the body
 Pose3d Body::GetPose() const
 {
-
-  /*if (this->IsStatic())
-    return this->staticPose;
-  else
-  */
   return this->pose;
 }
 

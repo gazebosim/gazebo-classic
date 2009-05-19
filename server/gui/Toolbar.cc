@@ -157,12 +157,16 @@ void Toolbar::ParamBrowserCB( Fl_Widget * w, void *data)
 {
   Fl_Hold_Browser *browser = (Fl_Hold_Browser*)(w);
   Toolbar *toolbar = (Toolbar*)(data);
-  int selected = browser->value();
-  std::string lineText = browser->text(selected);
-  std::string lbl;
+  std::string lineText, lbl;
   int beginLbl = 0;
   int endLbl = 0;
   int beginValue = 0;
+  int selected = browser->value();
+
+  if (selected <= 0)
+    return;
+
+  lineText = browser->text(selected);
 
   if (lineText.find("-Body") != std::string::npos)
   {
@@ -220,6 +224,8 @@ void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
   Fl_Hold_Browser *browser = toolbar->paramBrowser;
   int selected = browser->value();
   Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
+
+
   Body *body = NULL;
   Geom *geom = NULL;
   OgreVisual *vis = NULL;
@@ -288,8 +294,13 @@ void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
 void Toolbar::EntityBrowserCB( Fl_Widget *w, void *data )
 {
   Fl_Hold_Browser *browser = (Fl_Hold_Browser*)(w);
+  std::string lineText;
   int selected = browser->value();
-  std::string lineText = browser->text(selected);
+
+  if (selected <=0)
+    return;
+
+  lineText = browser->text(selected);
 
   Model *model = World::Instance()->GetModelByName(lineText);
   Simulator::Instance()->SetSelectedEntity(model);

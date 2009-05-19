@@ -761,11 +761,9 @@ void OgreCreator::Update()
 
       Pose3d pose;
 
-      if (owner->IsGeom() || !owner->GetParent())
-      {
+      if ((owner->IsGeom() && !owner->IsStatic()) || !owner->GetParent())
         vis->SetPose( owner->GetPose() );
-      }
-      else
+      else 
         vis->SetPose(owner->GetPose() - owner->GetParent()->GetPose());
     }
   }
