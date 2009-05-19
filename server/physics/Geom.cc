@@ -186,8 +186,7 @@ void Geom::Load(XMLConfigNode *node)
     if (this->bbVisual)
     {
       this->bbVisual->AttachBoundingBox(min,max);
-      //this->bbVisual->SetPosition(pose.pos);
-      this->bbVisual->SetRotation(pose.rot);
+      this->bbVisual->SetRotation(pose.rot.GetInverse()); //transform aabb from global frame back to local frame
     }
   }
 
