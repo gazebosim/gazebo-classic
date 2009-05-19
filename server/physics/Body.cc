@@ -505,6 +505,7 @@ void Body::AttachGeom( Geom *geom )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the body
+// SetPose(Gazebo Body Origin Pose)
 void Body::SetPose(const Pose3d &_pose)
 {
 
@@ -544,7 +545,7 @@ void Body::SetPose(const Pose3d &_pose)
     // Compute pose of CoM
     localPose = this->comPose + _pose;
 
-    this->pose = localPose;
+    this->pose = _pose;
     this->SetPosition(localPose.pos);
     this->SetRotation(localPose.rot);
   }
@@ -866,6 +867,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 */
 void Body::UpdateCoM()
 {
+  std::cout << "calling UpdateCoM() " << this->GetName() << std::endl;
   if (!this->bodyId)
     return;
 
@@ -893,10 +895,12 @@ void Body::UpdateCoM()
       {
         // FOR GEOMS:
         // get pose with comPose set to oldPose
+        //   pose of geom relative to old CoM location
         this->comPose = oldPose;
         tmpPose = giter->second->GetPose();
 
         // get pose with comPose set to newPose
+        //   using new CoM location, set relative pose of geom
         this->comPose = newPose;
         giter->second->SetPose(tmpPose, false);
       }
@@ -904,11 +908,25 @@ void Body::UpdateCoM()
 
     // FOR BODY: Fixup the pose of the CoM (ODE body)
     // get pose with comPose set to oldPose
-    this->comPose = oldPose;
-    tmpPose = this->GetPose();
     // get pose with comPose set to newPose
+    //
+    std::cout << " name : " << this->GetName();
+    std::cout << " pose : " << this->GetPose();
+
+    // get pose of gazebo body origin given new comPose
     this->comPose = newPose;
+    this->UpdatePose();
+    std::cout << " UpdatePose : " << this->GetPose();
+    tmpPose = this->GetPose();
+    std::cout << " tmpPose : " << tmpPose;
+
+
+    // set pose
+    this->comPose = oldPose;
+    std::cout << " oldPose : " << oldPose;
     this->SetPose(tmpPose);
+    std::cout << " final pose : " << this->GetPose();
+    std::cout << std::endl;
 
 
     // Settle on the new CoM pose
