@@ -115,7 +115,13 @@ void Joint::Load(XMLConfigNode *node)
   if (!body2)
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
-  Vector3 anchorVec = anchorBody->GetPosition() + **(this->anchorOffsetP);
+  Pose3d tmpPose = anchorBody->GetCoMPose().CoordPoseSolve(anchorBody->GetPose());
+  // std::cout << "anchor body  " << anchorBody->GetName()
+  //           << " ab pos " <<  tmpPose
+  //           << " com pos " <<  anchorBody->GetCoMPose()
+  //           << " off " << **(this->anchorOffsetP)
+  //           << std::endl;
+  Vector3 anchorVec = tmpPose.pos + **(this->anchorOffsetP);
 
   double h = World::Instance()->GetPhysicsEngine()->GetStepTime();
   double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
