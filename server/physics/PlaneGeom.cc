@@ -103,6 +103,8 @@ void PlaneGeom::LoadChild(XMLConfigNode *node)
   this->materialP->Load(node);
   this->castShadowsP->Load(node);
   this->CreatePlane();
+
+  this->contact->Load(node);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,10 +121,10 @@ void PlaneGeom::CreatePlane()
   this->SetGeom(dCreatePlane(this->spaceId, this->normalP->GetValue().x, 
         this->normalP->GetValue().y, this->normalP->GetValue().z, altitude),false);
 
-  this->contact->kp = dInfinity;
-  this->contact->kd = 0;
-  this->contact->mu1 = dInfinity;
-  this->contact->mu2 = dInfinity;
+  //this->contact->kp = dInfinity;
+  //this->contact->kd = 0;
+  //this->contact->mu1 = dInfinity;
+  //this->contact->mu2 = dInfinity;
 }
 
 //////////////////////////////////////////////////////////////////////////////
