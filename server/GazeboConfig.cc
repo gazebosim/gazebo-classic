@@ -56,15 +56,35 @@ void GazeboConfig::Load()
 
   cfgFile.open(rcFilename.c_str(), std::ios::in);
 
+  std::string delim(":");
+
   char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
   if(ogre_resource_path) 
   {
-    this->ogrePaths.push_back(ogre_resource_path);
+    std::string str(ogre_resource_path);
+    int pos1 = 0;
+    int pos2 = str.find(delim);
+    while (pos2 != std::string::npos)
+    {
+      this->ogrePaths.push_back(str.substr(pos1,pos2-pos1+1));
+      pos1 = pos2+1;
+      pos2 = str.find(delim,pos2+1);
+    }
+    this->ogrePaths.push_back(str.substr(pos1,str.size()));
   }
   char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
   if(gazebo_resource_path) 
   {
-    this->gazeboPaths.push_back(gazebo_resource_path);
+    std::string str(gazebo_resource_path);
+    int pos1 = 0;
+    int pos2 = str.find(delim);
+    while (pos2 != std::string::npos)
+    {
+      this->gazeboPaths.push_back(str.substr(pos1,pos2-pos1+1));
+      pos1 = pos2+1;
+      pos2 = str.find(delim,pos2+1);
+    }
+    this->gazeboPaths.push_back(str.substr(pos1,str.size()));
   }
 
   if (cfgFile)
