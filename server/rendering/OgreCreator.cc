@@ -806,11 +806,11 @@ void OgreCreator::DeleteVisual( OgreVisual *visual )
 
   iter = this->visuals.find(visual->GetName());
 
-  if (iter != this->visuals.end())
+  if (iter != this->visuals.end() && iter->second != NULL)
   {
     delete iter->second;
     iter->second = NULL;
-    this->visuals.erase(iter);
+    //this->visuals.erase(iter);
   }
   else
   {

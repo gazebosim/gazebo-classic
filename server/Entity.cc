@@ -83,7 +83,9 @@ Entity::~Entity()
 
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 
-  OgreCreator::Instance()->DeleteVisual(this->visualNode);
+  if (this->visualNode)
+    OgreCreator::Instance()->DeleteVisual(this->visualNode);
+  this->visualNode = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
