@@ -70,7 +70,7 @@ void GazeboConfig::Load()
       pos1 = pos2+1;
       pos2 = str.find(delim,pos2+1);
     }
-    this->ogrePaths.push_back(str.substr(pos1,str.size()));
+    this->ogrePaths.push_back(str.substr(pos1,str.size()-pos1));
   }
   char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
   if(gazebo_resource_path) 
@@ -80,11 +80,11 @@ void GazeboConfig::Load()
     int pos2 = str.find(delim);
     while (pos2 != std::string::npos)
     {
-      this->gazeboPaths.push_back(str.substr(pos1,pos2-pos1+1));
+      this->gazeboPaths.push_back(str.substr(pos1,pos2-pos1));
       pos1 = pos2+1;
       pos2 = str.find(delim,pos2+1);
     }
-    this->gazeboPaths.push_back(str.substr(pos1,str.size()));
+    this->gazeboPaths.push_back(str.substr(pos1,str.size()-pos1));
   }
 
   if (cfgFile)
