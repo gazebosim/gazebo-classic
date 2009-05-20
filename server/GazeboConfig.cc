@@ -64,7 +64,7 @@ void GazeboConfig::Load()
     std::string str(ogre_resource_path);
     int pos1 = 0;
     int pos2 = str.find(delim);
-    while (pos2 != std::string::npos)
+    while (pos2 != (int)std::string::npos)
     {
       this->ogrePaths.push_back(str.substr(pos1,pos2-pos1+1));
       pos1 = pos2+1;
@@ -78,7 +78,7 @@ void GazeboConfig::Load()
     std::string str(gazebo_resource_path);
     int pos1 = 0;
     int pos2 = str.find(delim);
-    while (pos2 != std::string::npos)
+    while (pos2 != (int)std::string::npos)
     {
       this->gazeboPaths.push_back(str.substr(pos1,pos2-pos1));
       pos1 = pos2+1;

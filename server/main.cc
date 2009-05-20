@@ -297,7 +297,7 @@ int main(int argc, char **argv)
   {
     std::cerr << "Error Loading Gazebo" << std::endl;
     std::cerr << e << std::endl;
-    gazebo::Simulator::Instance()->Close();
+    gazebo::Simulator::Instance()->Fini();
     return -1;
   }
 
