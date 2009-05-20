@@ -133,8 +133,6 @@ void Client::ConnectWait(int serverId, int clientId)
 // Disconnect from the server
 void Client::Disconnect()
 {
-  std::cout << "closing " << this->filename << "\n";
-
   // Finalize semaphores
   if (this->clientId >= 0)
     this->SemFini();

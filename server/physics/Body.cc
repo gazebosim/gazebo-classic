@@ -867,7 +867,6 @@ void Body::LoadSensor(XMLConfigNode *node)
 */
 void Body::UpdateCoM()
 {
-  std::cout << "calling UpdateCoM() " << this->GetName() << std::endl;
   if (!this->bodyId)
     return;
 

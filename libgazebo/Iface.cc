@@ -332,7 +332,6 @@ void Iface::Close()
     this->mMap = NULL;
 
     // Close the file
-    std::cout <<  "closing " <<  this->filename << "\n";
     close(this->mmapFd);
   }
 }
