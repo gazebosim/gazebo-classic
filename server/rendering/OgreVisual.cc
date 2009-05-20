@@ -170,7 +170,6 @@ void OgreVisual::Load(XMLConfigNode *node)
       }
     }
 
-    std::cout << "Creating Mesh[" << meshName << "]\n";
     obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
             stream.str(), meshName);
   }
