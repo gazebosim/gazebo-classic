@@ -63,7 +63,9 @@
       <direction>0 -1 0</direction>
       <diffuseColor>0.1 0.0 0.0</diffuseColor>
       <specularColor>0.2 0.0 0.0</specularColor>
-      <attenuation>5 0.2 0.2 0.00</attenuation>
+      <range>5</range>
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.2 0.2 0.00</attenuation>
     </light>
   </model:renderable>
 
@@ -78,7 +80,9 @@
       <direction>0 -1 0</direction>
       <diffuseColor>0.0 0.1 0.0</diffuseColor>
       <specularColor>0.0 0.2 0.0</specularColor>
-      <attenuation>10 0.2 0.1 0.00</attenuation>
+      <range>10</range>
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.2 0.1 0.00</attenuation>
     </light>
   </model:renderable>
 
@@ -108,7 +112,9 @@
         <diffuseColor>0.0 0.0 0.1</diffuseColor>
         <specularColor>0.0 0.0 0.2</specularColor>
         <attenuation>100 0.2 0.1 0.00</attenuation>
-        <range>8.0, 10.0, 2.0</range> 
+
+        <!-- InnerAngle OutterAngle Falloff -->
+        <spotCone>8.0 10.0 2.0</spotCone> 
       </light>
     </model:renderable>
 
@@ -124,7 +130,10 @@
       <type>point</type>
       <diffuseColor>0.1 0.1 0.0</diffuseColor>
       <specularColor>0.3 0.3 0.3</specularColor>
-      <attenuation>10 0.4 0.1 0.0</attenuation>
+      <range>10</range>
+
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.4 0.1 0.0</attenuation>
     </light>
   </model:renderable>
 
@@ -136,7 +145,10 @@
       <direction>0 -1 0</direction>
       <diffuseColor>0.4 0.4 0.4</diffuseColor>
       <specularColor>0.0 0.0 0.0</specularColor>
-      <attenuation>100 0.0 1.0 0.4</attenuation>
+      <range>100</range>
+
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.0 1.0 0.4</attenuation>
     </light>
   </model:renderable>
 

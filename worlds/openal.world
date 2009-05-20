@@ -136,7 +136,10 @@
       <type>point</type>
       <diffuseColor>0.8 0.8 0.8</diffuseColor>
       <specularColor>0.1 0.1 0.1</specularColor>
-      <attenuation>10 0.8 0.1 0.0</attenuation>
+      <range>10</range>
+
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.8 0.1 0.0</attenuation>
     </light>
   </model:renderable>
  

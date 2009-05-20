@@ -176,16 +176,24 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
   light->setDirection(vec.x, vec.y, vec.z);
 
   // Absolute range of light in world coordinates
-  range = node->GetTupleDouble("attenuation",0,1000);
+  range = node->GetDouble("range",0,100);
 
   // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
-  constant = node->GetTupleDouble("attenuation",1,1.0);
+  constant = node->GetTupleDouble("attenuation",0,1.0);
+  if (constant < 0)
+    constant = 0;
+  else if (constant > 1.0)
+    constant = 1.0;
 
   // Linear factor. 1 means attenuate evenly over the distance
-  linear = node->GetTupleDouble("attenuation",2,0);
+  linear = node->GetTupleDouble("attenuation",1,0);
+  if (linear < 0)
+    linear = 0;
+  else if (linear > 1.0)
+    linear = 1.0;
 
   // Quadartic factor.adds a curvature to the attenuation formula
-  quad = node->GetTupleDouble("attenuation",3,0);
+  quad = node->GetTupleDouble("attenuation",2,0);
 
   // Set attenuation
   light->setAttenuation(range, constant, linear, quad);
@@ -194,7 +202,7 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
   //  options for spotlights
   if (lightType == "spot")
   {
-    vec = node->GetVector3("range", Vector3(5.0, 10.0, 1.0));
+    vec = node->GetVector3("spotCone", Vector3(5.0, 10.0, 1.0));
     light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), 
         Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
   }

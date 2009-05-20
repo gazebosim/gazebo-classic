@@ -148,7 +148,10 @@
       <direction>0 -0.6 -0.4</direction>
       <diffuseColor>1.0 1.0 1.0</diffuseColor>
       <specularColor>0.2 0.2 0.2</specularColor>
-      <attenuation>1000 1.0 0.0 0</attenuation>
+      <range>100</range>
+
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>1.0 0.0 0</attenuation>
     </light>
   </model:renderable>
 
