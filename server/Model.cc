@@ -459,15 +459,14 @@ void Model::Update()
 
   
 #ifdef TIMING
-  int update_error = this->UpdateChild();
+  this->UpdateChild();
   double tmpT5 = Simulator::Instance()->GetWallTime();
   std::cout << "      ALL child (" << this->GetName() << ") update DT (" 
             << tmpT5-tmpT4 << ")" << std::endl;
   std::cout << "      Models::Update() (" << this->GetName() 
             << ") Total DT (" << tmpT5-tmpT1 << ")" << std::endl;
-  gzthrow( update_error );
 #else
-     this->UpdateChild();
+   this->UpdateChild();
 #endif
 
 
