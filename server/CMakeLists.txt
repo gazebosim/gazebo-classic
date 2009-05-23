@@ -63,6 +63,7 @@ SET (sources Common.cc
              GraphicsIfaceHandler.cc
              GuiAPI.cc
              Simulator.cc
+             Rand.cc
 )
 
 SET (headers Common.hh
@@ -87,6 +88,7 @@ SET (headers Common.hh
              GraphicsIfaceHandler.hh
              GuiAPI.hh
              Simulator.hh
+             Rand.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})
