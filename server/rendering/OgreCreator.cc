@@ -173,6 +173,7 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
 
   // Set the direction which the light points
   vec = node->GetVector3("direction", Vector3(0.0, 0.0, -1.0));
+  vec.Normalize();
   light->setDirection(vec.x, vec.y, vec.z);
 
   // Absolute range of light in world coordinates
@@ -206,6 +207,8 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
     light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), 
         Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
   }
+
+  light->setCastShadows(node->GetBool("castShadows",false,0));
 
   parent->AttachObject(light);
 

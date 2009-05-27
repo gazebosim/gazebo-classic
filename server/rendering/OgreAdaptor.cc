@@ -196,8 +196,9 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   else
   {
     this->sceneType= SCENE_EXT;
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
+    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
+    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
   }
 
   Param::Begin(&this->parameters);
@@ -211,32 +212,41 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->drawGridP->Load(node);
   this->updateRateP->Load(node);
 
+  //Preload basic shapes that can be used anywhere
+  OgreCreator::LoadBasicShapes();
 
   ambient.r = (**(this->ambientP)).x;
   ambient.g = (**(this->ambientP)).y;
   ambient.b = (**(this->ambientP)).z;
   ambient.a = (**(this->ambientP)).w;
 
-  // Ambient lighting
-  this->sceneMgr->setAmbientLight(ambient);
-
-  this->sceneMgr->setShadowTextureSelfShadow(true);
-  this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
-  this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
-  this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
-  
+ 
   // Settings for shadow mapping
   if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
+  else if (**(this->shadowTechniqueP) == std::string("stencilModulative"))
+    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
   else if (**(this->shadowTechniqueP) == std::string("textureAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
+  else if (**(this->shadowTechniqueP) == std::string("textureModulative"))
+    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_MODULATIVE );
   else if (**(this->shadowTechniqueP) == std::string("none"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
   else 
     gzthrow(std::string("Unsupported shadow technique: ") + **(this->shadowTechniqueP) + "\n");
 
-  //Preload basic shapes that can be used anywhere
-  OgreCreator::LoadBasicShapes();
+  this->sceneMgr->setShadowTextureSelfShadow(true);
+  this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
+  this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
+  this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
+
+  // Ambient lighting
+  this->sceneMgr->setAmbientLight(ambient);
+
+  this->sceneMgr->setShadowTextureSettings(512,2);
+  this->sceneMgr->setShowDebugShadows(true);
+  this->sceneMgr->setShadowColour(Ogre::ColourValue(0.2, 0.2, 0.2));
+  this->sceneMgr->setShadowFarDistance(30);
 
   // Add a sky dome to our scene
   if (node->GetChild("sky"))
