@@ -89,7 +89,7 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
                           this->imageSizeP->GetValue().x, 
                           this->imageSizeP->GetValue().y,
                           0,
-                          Ogre::PF_R8G8B8,
+                          this->imageFormat,
                           Ogre::TU_RENDERTARGET);
 
     this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();

@@ -179,7 +179,7 @@ namespace gazebo
     public: Body *GetParentBody( Entity *entity ) const;
 
     /// \brief Get the simulator mutex
-    public:boost::recursive_mutex *GetMutex();
+    public:boost::recursive_mutex *GetMRMutex();
 
     /// \brief Function to run gui. Used by guiThread
     private: void PhysicsLoop();

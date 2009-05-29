@@ -73,6 +73,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->imageSizeP = new ParamT< Vector2<int> >("imageSize", Vector2<int>(320, 240),0);
   this->visMaskP = new ParamT<std::string>("mask","none",0);
   this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
+  this->imageFormatP = new ParamT<std::string>("imageFormat", "R8G8B8", 0);
   Param::End();
 
   this->captureData = false;
@@ -96,6 +97,7 @@ OgreCamera::~OgreCamera()
   delete this->saveFramesP;
   delete this->savePathnameP;
   delete this->imageSizeP;
+  delete this->imageFormatP;
   delete this->visMaskP;
   delete this->hfovP;
 }
@@ -114,12 +116,25 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
     this->saveFramesP->Load(node);
     this->savePathnameP->Load(node);
     this->imageSizeP->Load(node);
+    this->imageFormatP->Load(node);
     this->visMaskP->Load(node);
     this->hfovP->Load(node);
 
     if (this->visMaskP->GetValue() == "laser")
     {
       this->visibilityMask ^= GZ_LASER_CAMERA;
+    }
+
+    if (this->imageFormatP->GetValue() == "L8")
+      this->imageFormat = Ogre::PF_L8;
+    else if (this->imageFormatP->GetValue() == "R8G8B8")
+      this->imageFormat = Ogre::PF_R8G8B8;
+    else if (this->imageFormatP->GetValue() == "B8G8R8")
+      this->imageFormat = Ogre::PF_B8G8R8;
+    else
+    {
+      std::cerr << "Error parsing image format, using default Ogre::PF_R8G8B8\n";
+      this->imageFormat = Ogre::PF_R8G8B8;
     }
   }
 
@@ -153,6 +168,7 @@ void OgreCamera::SaveCam(std::string &prefix, std::ostream &stream)
   stream << prefix << (*this->saveFramesP) << "\n";
   stream << prefix << (*this->savePathnameP) << "\n";
   stream << prefix << (*this->imageSizeP) << "\n";
+  stream << prefix << (*this->imageFormatP) << "\n";
   stream << prefix << (*this->visMaskP) << "\n";
   stream << prefix << (*this->hfovP) << "\n";
 }
@@ -224,19 +240,21 @@ void OgreCamera::Render()
 
   if (this->captureData)
   {
+    boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
     Ogre::HardwarePixelBufferSharedPtr mBuffer;
     size_t size;
 
     // Get access to the buffer and make an image and write it to file
     mBuffer = this->renderTexture->getBuffer(0, 0);
 
-    size = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * 3;
+    size = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * this->GetImageDepth();
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
       this->saveFrameBuffer = new unsigned char[size];
 
     memset(this->saveFrameBuffer,128,size);
+
     mBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
 
     int top = (int)((mBuffer->getHeight() - this->imageSizeP->GetValue().y) / 2.0);
@@ -252,7 +270,7 @@ void OgreCamera::Render()
           this->imageSizeP->GetValue().x,
           this->imageSizeP->GetValue().y,
           1,
-          Ogre::PF_B8G8R8,
+          this->imageFormat,
           this->saveFrameBuffer)
         );
 
@@ -353,6 +371,30 @@ unsigned int OgreCamera::GetImageHeight() const
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// \brief Get the height of the image
+int OgreCamera::GetImageDepth() const
+{
+  if (this->imageFormatP->GetValue() == "L8")
+    return 1;
+  else if (this->imageFormatP->GetValue() == "R8G8B8")
+    return 3;
+  else if (this->imageFormatP->GetValue() == "B8G8R8")
+    return 3;
+  else
+  {
+    std::cerr << "Error parsing image format, using default Ogre::PF_R8G8B8\n";
+    return 3;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// \brief Get the height of the image
+std::string OgreCamera::GetImageFormat() const
+{
+  return this->imageFormatP->GetValue();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// Get the width of the texture
 unsigned int OgreCamera::GetTextureWidth() const
 {
@@ -371,7 +413,7 @@ unsigned int OgreCamera::GetTextureHeight() const
 // Get the image size in bytes
 size_t OgreCamera::GetImageByteSize() const
 {
-  return this->imageSizeP->GetValue().y * this->imageSizeP->GetValue().x * 3;
+  return this->imageSizeP->GetValue().y * this->imageSizeP->GetValue().x * this->GetImageDepth();
 }
 
 
@@ -565,8 +607,8 @@ void OgreCamera::SaveFrame()
 
   imgData->width = this->imageSizeP->GetValue().x;
   imgData->height = this->imageSizeP->GetValue().y;
-  imgData->depth = 1;
-  imgData->format = Ogre::PF_B8G8R8;
+  imgData->depth = this->GetImageDepth();
+  imgData->format = this->imageFormat;
   size = this->GetImageByteSize();
 
   // Wrap buffer in a chunk

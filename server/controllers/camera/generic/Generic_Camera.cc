@@ -128,7 +128,7 @@ void Generic_Camera::PutCameraData()
 
   data->width = this->myParent->GetImageWidth();
   data->height = this->myParent->GetImageHeight();
-  data->image_size = data->width * data->height * 3;
+  data->image_size = data->width * data->height * this->myParent->GetImageDepth();
 
   // GetFOV() returns radians
   data->hfov = *(this->myParent->GetHFOV());
@@ -150,6 +150,7 @@ void Generic_Camera::PutCameraData()
   src = this->myParent->GetImageData(0);
   dst = data->image;
 
+  boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
   memcpy(dst, src, data->image_size);
 
   this->myParent->EnableSaveFrame( data->saveFrames );

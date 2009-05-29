@@ -343,8 +343,18 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       {
         double h, kp, kd;
 
-        // skip 0 depth contacts
-        if(contactGeoms[i].depth == 0)
+        if (0)
+        std::cout << "dContactGeoms: "
+                  << " geom1: " << geom1->GetName()
+                  << " geom2: " << geom2->GetName()
+                  << " contact points: " << numc
+                  << " contact: " << i
+                  << " pos: " << contactGeoms[i].pos[0]<<","<< contactGeoms[i].pos[1]<<","<< contactGeoms[i].pos[2]<<","<< contactGeoms[i].pos[3]
+                  << " norm: " << contactGeoms[i].normal[0]<<","<< contactGeoms[i].normal[1]<<","<< contactGeoms[i].normal[2]<<","<< contactGeoms[i].normal[3]
+                  << " depth: " << contactGeoms[i].depth
+                  << std::endl;
+        // skip negative depth contacts
+        if(contactGeoms[i].depth < 0)
           continue;
 
         contact.geom = contactGeoms[i];

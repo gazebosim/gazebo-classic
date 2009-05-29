@@ -123,6 +123,12 @@ namespace gazebo
     /// \brief Get the height of the image
     public: unsigned int GetImageHeight() const;
   
+    /// \brief Get the height of the image
+    public: int GetImageDepth() const;
+
+    /// \brief Get the height of the image
+    public: std::string GetImageFormat() const;
+
     /// \brief Get the height of the texture 
     public: unsigned int GetTextureHeight() const;
   
@@ -218,8 +224,10 @@ namespace gazebo
     protected: unsigned int saveCount;
     protected: ParamT<bool> *saveFramesP;
     protected: ParamT<std::string> *savePathnameP;
+    protected: ParamT<std::string> *imageFormatP;
  
     protected: ParamT<std::string> *visMaskP;
+    protected: Ogre::PixelFormat imageFormat;
     protected: unsigned int visibilityMask;
 
     protected: Ogre::RenderTarget *renderTarget;

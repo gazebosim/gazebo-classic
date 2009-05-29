@@ -628,6 +628,9 @@ void Simulator::PhysicsLoop()
 
   while (!this->userQuit)
   {
+#ifdef TIMING
+    double tmpT1 = this->GetWallTime();
+#endif
     currTime = this->GetRealTime();
 
     if (physicsUpdateRate == 0 || 
@@ -666,12 +669,16 @@ void Simulator::PhysicsLoop()
       this->userQuit = true;
       break;
     }
+#ifdef TIMING
+    double tmpT2 = this->GetWallTime();
+    std::cout << " Simulator::PhysicsLoop() DT(" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the simulator mutex
-boost::recursive_mutex *Simulator::GetMutex()
+boost::recursive_mutex *Simulator::GetMRMutex()
 {
   return this->mutex;
 }

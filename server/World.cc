@@ -363,7 +363,7 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
 // Add a new entity to the world
 void World::InsertEntity( std::string xmlString)
 {
-  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMutex());
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   this->toLoadEntities.push_back( xmlString );
 }
 
@@ -371,7 +371,7 @@ void World::InsertEntity( std::string xmlString)
 // Load all the entities that have been queued
 void World::ProcessEntitiesToLoad()
 {
-  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMutex());
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   std::vector< std::string >::iterator iter;
 
   for (iter = this->toLoadEntities.begin(); 
