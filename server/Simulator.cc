@@ -350,7 +350,8 @@ void Simulator::MainLoop()
     {
       lastTime = this->GetWallTime();
 
-      OgreAdaptor::Instance()->UpdateCameras();
+      if (this->renderEngineEnabled)
+        OgreAdaptor::Instance()->UpdateCameras();
 
       if (this->gui)
       {
