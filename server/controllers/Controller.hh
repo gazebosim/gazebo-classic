@@ -124,7 +124,7 @@ class Controller
   protected: double lastUpdate;
 
   /// \brief Array of all the iface for this controller
-  protected: std::vector<Iface*> ifaces;
+  private: std::vector<Iface*> ifaces;
 
   protected: std::vector<Param*> parameters;
 };

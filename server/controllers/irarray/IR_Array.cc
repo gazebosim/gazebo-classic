@@ -68,16 +68,7 @@ IR_Array::~IR_Array()
 // Load the controller
 void IR_Array::LoadChild(XMLConfigNode *node)
 {
-  std::vector<Iface*>::iterator iter;
-
-  for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
-  {
-  	if ((*iter)->GetType() == "irarray")
-      this->irIface = dynamic_cast<IRIface*>(*iter);
-  }
-
-  if (!this->irIface) gzthrow("IR_Array controller requires a IRIface");
-
+  this->irIface = dynamic_cast<IRIface*>(this->GetIface("irarray"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

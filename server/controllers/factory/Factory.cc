@@ -66,10 +66,7 @@ Factory::~Factory()
 // Load the controller
 void Factory::LoadChild(XMLConfigNode *node)
 {
-  this->factoryIface = dynamic_cast<FactoryIface*>(this->ifaces[0]);
-
-  if (!this->factoryIface)
-    gzthrow("Factory controller requires a factoryIface");
+  this->factoryIface = dynamic_cast<FactoryIface*>(this->GetIface("factory"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
