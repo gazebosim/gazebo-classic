@@ -77,11 +77,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
 {
   XMLConfigNode *jNode;
   int i =0;
-  this->myIface = dynamic_cast<ActarrayIface*>(this->ifaces[0]);
-
-  if (!this->myIface)
-    gzthrow("Bandit_Actarray controller requires a Actarray Iface");
-
+  this->myIface = dynamic_cast<ActarrayIface*>(this->GetIface("actarray"));
 
   Param::Begin(&this->parameters);
   for (i=0, jNode = node->GetChild("joint"); jNode; i++)

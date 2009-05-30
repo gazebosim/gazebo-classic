@@ -68,18 +68,8 @@ SickLMS200_Laser::~SickLMS200_Laser()
 // Load the controller
 void SickLMS200_Laser::LoadChild(XMLConfigNode *node)
 {
-  std::vector<Iface*>::iterator iter;
-
-  for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
-  {
-    if ((*iter)->GetType() == "laser")
-      this->laserIface = dynamic_cast<LaserIface*>(*iter);
-    else if ((*iter)->GetType() == "fiducial")
-      this->fiducialIface = dynamic_cast<FiducialIface*>(*iter);
-  }
-
-  if (!this->laserIface) gzthrow("SickLMS200_Laser controller requires a LaserIface");
-
+  this->laserIface = dynamic_cast<LaserIface*>(this->GetIface("laser"));
+  this->fiducialIface = dynamic_cast<FiducialIface*>(this->GetIface("fiducial", false));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

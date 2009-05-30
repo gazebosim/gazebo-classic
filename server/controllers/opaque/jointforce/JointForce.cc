@@ -64,10 +64,7 @@ void JointForce::LoadChild(XMLConfigNode *node)
     std::string jointName;
     dJointFeedback *jFeedback = new dJointFeedback;
     int i =0;
-    this->myIface = dynamic_cast<OpaqueIface*>(this->ifaces[0]);
-    if (!this->myIface) {
-        gzthrow("JointForce controller requires an  OpaqueIface");
-    }
+    this->myIface = dynamic_cast<OpaqueIface*>(this->GetIface("opaque"));
     jNode = node->GetChild("joint");
     while(jNode && i < GAZEBO_JOINTFORCE_CONTROLLER_MAX_FEEDBACKS)
     {

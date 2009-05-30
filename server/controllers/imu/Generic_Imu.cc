@@ -64,16 +64,7 @@ Generic_Imu::~Generic_Imu()
 // Load the controller
 void Generic_Imu::LoadChild(XMLConfigNode *node)
 {
-  std::vector<Iface*>::iterator iter;
-
-  for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
-  {
-    if ((*iter)->GetType() == "imu")
-      this->imuIface = dynamic_cast<ImuIface*>(*iter);
-  }
-
-  if (!this->imuIface) gzthrow("GenericImu controller requires a ImuIface");
-
+  this->imuIface = dynamic_cast<ImuIface*>(this->GetIface("imu"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

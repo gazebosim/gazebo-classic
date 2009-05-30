@@ -83,11 +83,7 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
   float defaultMaxAngle;
 
 
-  this->myIface = dynamic_cast<PositionIface*>(this->ifaces[0]);
-
-  if (!this->myIface)
-    gzthrow("Steering_Position2d controller requires a PositionIface");
-
+  this->myIface = dynamic_cast<PositionIface*>(this->GetIface("position"));
 
   //general
   defaultTorque = node->GetFloat("torque", 1000, 0);

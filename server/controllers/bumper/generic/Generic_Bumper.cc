@@ -59,12 +59,7 @@ Generic_Bumper::~Generic_Bumper()
 // Load the controller
 void Generic_Bumper::LoadChild(XMLConfigNode *node)
 {
-  this->myIface = dynamic_cast<BumperIface*>(this->ifaces[0]);
-
-  if (!this->myIface) 
-  {
-    gzthrow("Generic_Bumper controller requires an BumperIface");
-  }
+  this->myIface = dynamic_cast<BumperIface*>(this->GetIface("bumper"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

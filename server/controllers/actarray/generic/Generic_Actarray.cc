@@ -73,10 +73,7 @@ Generic_Actarray::~Generic_Actarray()
 void Generic_Actarray::LoadChild(XMLConfigNode *node)
 {
   XMLConfigNode *jNode;
-  this->myIface = dynamic_cast<ActarrayIface*>(this->ifaces[0]);
-
-  if (!this->myIface)
-    gzthrow("Generic_Actarray controller requires a Actarray Iface");
+  this->myIface = dynamic_cast<ActarrayIface*>(this->GetIface("actarray"));
 
   for (n_joints=0, jNode = node->GetChild("joint"); jNode; n_joints++, jNode = jNode->GetNext("joint"))
   {

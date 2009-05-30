@@ -63,10 +63,7 @@ Generic_Camera::~Generic_Camera()
 // Load the controller
 void Generic_Camera::LoadChild(XMLConfigNode *node)
 {
-  this->cameraIface = dynamic_cast<CameraIface*>(this->ifaces[0]);
-
-  if (!this->cameraIface)
-    gzthrow("Generic_Camera controller requires a CameraIface");
+  this->cameraIface = dynamic_cast<CameraIface*>(this->GetIface("camera"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

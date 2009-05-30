@@ -98,14 +98,20 @@ class Controller
   /// \brief Return the name of this controller
   /// \return The name of the controller
   public: std::string GetName() const;
-
+  
+  /// \brief Return Iface by type
+  /// \param type The type of the iface to retrieve
+  /// \param number If several ifaces of the same type present, which one
+  /// \return Iface, or exception if not found. 
+  protected: Iface* GetIface(std::string type, bool mandatory=true, int number=0);
+  
   /// \brief The controller's name
   protected: ParamT<std::string> *nameP;
 
   /// \brief The entity that owns this controller
   protected: Entity *parent;
 
-  /// \breif flag to keep controllers updating continuously
+  /// \brief flag to keep controllers updating continuously
   protected: ParamT<bool> *alwaysOnP;
 
   /// \brief Update period 
@@ -119,9 +125,6 @@ class Controller
 
   /// \brief Array of all the iface for this controller
   protected: std::vector<Iface*> ifaces;
-
-  private: std::vector< std::string > ifaceTypes; 
-  private: std::vector< std::string > ifaceNames; 
 
   protected: std::vector<Param*> parameters;
 };

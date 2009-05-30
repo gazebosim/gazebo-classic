@@ -66,11 +66,7 @@ AudioController::~AudioController()
 // Load the controller
 void AudioController::LoadChild(XMLConfigNode *node)
 {
-  this->audioIface = dynamic_cast<AudioIface*>(this->ifaces[0]);
-
-  if (!this->audioIface)
-    gzthrow("Audio controller requires an audio interface");
-
+  this->audioIface = dynamic_cast<AudioIface*>(this->GetIface("audio"));
   this->openALSource = OpenAL::Instance()->CreateSource( node );
 
 }

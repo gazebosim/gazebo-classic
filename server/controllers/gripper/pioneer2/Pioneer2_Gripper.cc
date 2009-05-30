@@ -100,22 +100,8 @@ Pioneer2_Gripper::~Pioneer2_Gripper()
 void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
 {
   XMLConfigNode *jNode;
-  this->gripIface = dynamic_cast<GripperIface*>(this->ifaces[0]);
-
-  if (!this->gripIface)
-  {
-    this->gripIface = dynamic_cast<GripperIface*>(this->ifaces[1]);
-    if (!this->gripIface)
-      gzthrow("Pioneer2_Gripper controller requires a GripperIface");
-  }
-
-  this->actIface = dynamic_cast<ActarrayIface*>(this->ifaces[1]);
-  if (!this->actIface)
-  {
-    this->actIface = dynamic_cast<ActarrayIface*>(this->ifaces[0]);
-    if (!this->actIface)
-      gzthrow("Pioneer2_Gripper controller requires an ActarrayIface");
-  }
+  this->gripIface = dynamic_cast<GripperIface*>(this->GetIface("gripper"));
+  this->actIface = dynamic_cast<ActarrayIface*>(this->GetIface("actarray"));
 
   Param::Begin(&this->parameters);
   jNode = node->GetChild("leftJoint");

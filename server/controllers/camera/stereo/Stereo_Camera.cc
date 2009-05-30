@@ -70,24 +70,17 @@ Stereo_Camera::~Stereo_Camera()
 // Load the controller
 void Stereo_Camera::LoadChild(XMLConfigNode *node)
 {
-  std::vector<Iface*>::iterator iter;
+  CameraIface *ciface = NULL;
 
-  for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
-  {
-    if ((*iter)->GetType() == "stereo")
-      this->stereoIface = dynamic_cast<StereoCameraIface*>(*iter);
-    else if ((*iter)->GetType() == "camera")
-    {
-      CameraIface *ciface = dynamic_cast<CameraIface*>(*iter);
-      this->cameraIfaces[ciface->GetId()] = ciface;
-    }
-  }
+  this->stereoIface = dynamic_cast<StereoCameraIface*>(this->GetIface("stereo"));
+
+  ciface = dynamic_cast<CameraIface*>(this->GetIface("camera",true,0));
+  this->cameraIfaces[ciface->GetId()] = ciface;
+  ciface = dynamic_cast<CameraIface*>(this->GetIface("camera",true,1));
+  this->cameraIfaces[ciface->GetId()] = ciface;
 
   this->leftCameraNameP->Load(node);
   this->rightCameraNameP->Load(node);
-
-  if (!this->stereoIface)
-    gzthrow("Stereo_Camera controller requires a StereoCameraIface");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

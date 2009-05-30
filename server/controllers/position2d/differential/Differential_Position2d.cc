@@ -84,10 +84,7 @@ Differential_Position2d::~Differential_Position2d()
 // Load the controller
 void Differential_Position2d::LoadChild(XMLConfigNode *node)
 {
-  this->myIface = dynamic_cast<PositionIface*>(this->ifaces[0]);
-
-  if (!this->myIface)
-    gzthrow("Differential_Position2d controller requires a PositionIface");
+  this->myIface = dynamic_cast<PositionIface*>(this->GetIface("position"));
 
   // the defaults are from pioneer2dx
   this->wheelSepP->Load(node);

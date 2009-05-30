@@ -103,9 +103,6 @@ void Controller::Load(XMLConfigNode *node)
     // Get the name of the iface
     std::string ifaceName = childNode->GetString("name","",1);
 
-    this->ifaceTypes.push_back(ifaceType);
-    this->ifaceNames.push_back(ifaceName);
-
     try
     {
       // Use the factory to get a new iface based on the type
@@ -155,19 +152,16 @@ void Controller::Init()
 /// Save the controller.
 void Controller::Save(std::string &prefix, std::ostream &stream)
 {
-  std::vector<std::string>::iterator iter1;
-  std::vector<std::string>::iterator iter2;
+  std::vector<Iface*>::iterator iter;
 
   stream << prefix << "<controller:" << this->typeName << " name=\"" << this->nameP->GetValue() << "\">\n";
 
   stream << prefix << "  " << *(this->updatePeriodP) << "\n";
 
   // Ouptut the interfaces
-  for (iter1 = this->ifaceTypes.begin(), iter2=this->ifaceNames.begin(); 
-       iter1 != this->ifaceTypes.end() && iter2 != this->ifaceNames.end(); 
-       iter1++, iter2++)
+  for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
   {
-    stream << prefix << "  <interface:" << *(iter1) << " name=\"" << *(iter2) << "\"/>\n";
+    stream << prefix << "  <interface:" << (*iter)->GetType() << " name=\"" << (*iter)->GetId() << "\"/>\n";
   }
 
   std::string p = prefix + "  ";
@@ -255,4 +249,32 @@ bool Controller::IsConnected() const
 std::string Controller::GetName() const
 {
   return this->nameP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get a interface of the controller
+Iface* Controller::GetIface(std::string type, bool mandatory, int number)
+{
+  std::vector<Iface*>::iterator iter;
+  int order = number;
+  Iface *iface = NULL;
+
+  for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
+  {
+    if ((*iter)->GetType() == type)
+    {
+      if (order == 0)
+        iface = (*iter);
+      else
+        order --;
+    }
+  }
+  
+  if ((iface == NULL) and mandatory)
+  {
+    std::ostringstream stream;
+    stream << "Controller " << this->GetName() << "trying to get " << type << " interface but it is not defined";
+    gzthrow(stream.str());
+  }
+  return iface;
 }

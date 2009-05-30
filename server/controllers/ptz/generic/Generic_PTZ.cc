@@ -88,10 +88,7 @@ Generic_PTZ::~Generic_PTZ()
 // Load the controller
 void Generic_PTZ::LoadChild(XMLConfigNode *node)
 {
-  this->ptzIface = dynamic_cast<PTZIface*>(this->ifaces[0]);
-
-  if (!this->ptzIface)
-    gzthrow("Generic_PTZ controller requires a PTZIface");
+  this->ptzIface = dynamic_cast<PTZIface*>(this->GetIface("ptz"));
 
   this->panJointNameP->Load(node);
   this->tiltJointNameP->Load(node);
