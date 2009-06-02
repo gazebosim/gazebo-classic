@@ -36,7 +36,7 @@ PhysicsEngine::PhysicsEngine()
 {
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
-  this->updateRateP = new ParamT<double>("maxUpdateRate", 0.0, 0);
+  this->updateRateP = new ParamT<double>("updateRate", 0.0, 0);
   this->stepTimeP = new ParamT<double>("stepTime",0.025,0);
   Param::End();
 

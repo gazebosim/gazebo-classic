@@ -431,7 +431,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
   this->SetModelPose(model, model->GetInitPose());
 
   // Add the model to our list
-  if (Simulator::Instance()->GetIterations() == 0)
+  if (Simulator::Instance()->GetSimTime() == 0)
     this->models.push_back(model);
   else
   {

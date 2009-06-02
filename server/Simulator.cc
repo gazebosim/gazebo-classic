@@ -60,7 +60,6 @@ Simulator::Simulator()
   gazeboConfig(NULL),
   loaded(false),
   pause(false),
-  iterations(0),
   simTime(0.0),
   pauseTime(0.0),
   startTime(0.0),
@@ -411,13 +410,6 @@ void Simulator::SetPaused(bool p)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the number of iterations of this simulation session
-unsigned long Simulator::GetIterations() const
-{
-  return this->iterations;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Get the simulation time
 double Simulator::GetSimTime() const
 {
@@ -618,33 +610,31 @@ void Simulator::PhysicsLoop()
 
   double step = world->GetPhysicsEngine()->GetStepTime();
   double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
-  //double renderUpdateRate = OgreAdaptor::Instance()->GetUpdateRate();
   double physicsUpdatePeriod = 1.0 / physicsUpdateRate;
-  //double renderUpdatePeriod = 1.0 / renderUpdateRate;
-
+ 
+  double diffTime;
   double currTime;
-
-  this->prevPhysicsTime = this->GetRealTime();
-  this->prevRenderTime = this->GetRealTime();
+  double lastTime = this->GetRealTime();
+  struct timespec req, rem;
 
   while (!this->userQuit)
   {
 #ifdef TIMING
     double tmpT1 = this->GetWallTime();
 #endif
+
     currTime = this->GetRealTime();
 
-    if (physicsUpdateRate == 0 || 
-        currTime - this->prevPhysicsTime >= physicsUpdatePeriod) 
+    //if (physicsUpdateRate == 0 || 
+        //currTime - lastTime >= physicsUpdatePeriod) 
     {
 
       // Update the physics engine
       //if (!this->GetUserPause()  && !this->IsPaused() ||
-       //   (this->GetUserPause() && this->GetUserStepInc()))
+      //   (this->GetUserPause() && this->GetUserStepInc()))
       if (!this->IsPaused())
       {
         this->simTime += step;
-        this->iterations++;
         this->SetUserStepInc(!this->GetUserStepInc());
       }
       else
@@ -653,13 +643,42 @@ void Simulator::PhysicsLoop()
       //  this->pause=true;
       }
 
-      this->prevPhysicsTime = this->GetRealTime();
+      lastTime = this->GetRealTime();
 
       {
         boost::recursive_mutex::scoped_lock lock(*this->mutex);
         world->Update();
       }
-      usleep(1);
+
+      currTime = this->GetRealTime();
+
+      // Set a default sleep time
+      req.tv_sec  = 0;
+      req.tv_nsec = 10000;
+
+      // If the physicsUpdateRate < 0, then we should try to match the
+      // update rate to real time
+      if ( physicsUpdateRate < 0 &&
+                (this->GetSimTime() + this->GetPauseTime()) > 
+                 this->GetRealTime()) 
+      {
+        diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
+                    this->GetRealTime();
+        req.tv_sec  = (int) floor(diffTime);
+        req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
+      }
+      // Otherwise try to match the update rate to the one specified in
+      // the xml file
+      else if (physicsUpdateRate > 0 && 
+               currTime - lastTime < physicsUpdatePeriod)
+      {
+        diffTime = physicsUpdatePeriod - (currTime - lastTime);
+
+        req.tv_sec  = (int) floor(diffTime);
+        req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
+      }
+   
+      nanosleep(&req, &rem);
     }
 
     // Process all incoming messages from simiface
@@ -670,9 +689,11 @@ void Simulator::PhysicsLoop()
       this->userQuit = true;
       break;
     }
+
 #ifdef TIMING
     double tmpT2 = this->GetWallTime();
-    std::cout << " Simulator::PhysicsLoop() DT(" << tmpT2-tmpT1 << ")" << std::endl;
+    std::cout << " Simulator::PhysicsLoop() DT(" << tmpT2-tmpT1 
+              << ")" << std::endl;
 #endif
   }
 }

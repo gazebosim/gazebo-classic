@@ -23,6 +23,10 @@
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-5</cfm>
     <erp>0.3</erp>
+    <!-- updateRate: <0 == throttle simTime to match realTime.
+                      0 == No throttling
+                     >0 == Frequency at which to throttle the sim --> 
+    <updateRate>-1</updateRate>
   </physics:ode>
 
   <rendering:gui>

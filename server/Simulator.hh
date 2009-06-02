@@ -97,15 +97,6 @@ namespace gazebo
     /// \brief Set whether the simulation is paused
     public: void SetPaused(bool p);
 
-    /// \brief Get the number of iterations
-    public: unsigned long GetIterations() const;
-/*
-    /// \brief Set the number of iterations
-    public: static void SetIterations(unsigned long count);
-
-    /// \brief Increment the number of iterations
-    public: static void IncIterations();
-*/
     /// Get the simulation time
     /// \return The simulation time
     public: double GetSimTime() const;
@@ -200,12 +191,8 @@ namespace gazebo
     /// Flag set if simulation is paused
     private: bool pause;
 
-    ///  Count of the number of iterations
-    private: unsigned long iterations;
-
     /// Current simulation time
     private: double simTime, pauseTime, startTime;
-    private: double prevPhysicsTime, prevRenderTime;
 
     //upper limits on updating
     //how many updates we have done in this slot
