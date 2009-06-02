@@ -23,7 +23,7 @@ INCLUDE_DIRECTORIES(
   ${boost_include_dirs}
 )
 
-LINK_DIRECTORIES( ${PLAYER_LINK_DIRS} gazeboshm)
+LINK_DIRECTORIES( ${PLAYER_LINK_DIRS} ${boost_library_dirs} gazeboshm)
 
 ADD_LIBRARY(gazeboplugin SHARED ${gazeboplugin_sources})
 TARGET_LINK_LIBRARIES(gazeboplugin ${PLAYER_LINK_LIBS} gazeboshm )
