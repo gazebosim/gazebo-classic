@@ -13,17 +13,19 @@ and can be downloaded from the Player/Stage homepage:
 
 Installation
 ------------
-Read the installation instructions in the online manual for generic instructions.  For most people, the following
-sequence will suffice:
+Read the installation instructions in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
-  $ scons install
+  $ mkdir build (inside the gazebo-trunk directory)
+  $ cd build
+  $ cmake ..
+  $ make
 
 
 Uninstallation
 --------------
 Read the installation instructions in the online manual for generic instructions.  For most people, the following sequence will suffice:
 
-  $ scons -c install 
+  $ make install (inside the gazebo-trunk/build directory)
 
 
 3rd Party Libraries
