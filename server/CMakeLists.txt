@@ -99,6 +99,10 @@ ADD_LIBRARY(gazebo_server SHARED ${gazeboserver_sources})
 ADD_EXECUTABLE(gazebo-exec main.cc)
 SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
 
+# Removes colon separated rpath. This breaks Ubuntu-intrepid 
+# (possibly gcc-4.3.2).
+SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES SKIP_BUILD_RPATH TRUE)
+
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
 
 SET_SOURCE_FILES_PROPERTIES(${gazeboserver_sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
