@@ -86,7 +86,7 @@ Body::Body(Entity *parent)
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
   this->rpyP->Callback( &Body::SetRotation, this );
-  this->dampingFactorP = new ParamT<double>("dampingFactor", 0.03, 0);
+  this->dampingFactorP = new ParamT<double>("dampingFactor", 0.0, 0);
 
   // option to turn gravity off for individual body
   this->turnGravityOffP = new ParamT<bool>("turnGravityOff", false, 0);
@@ -382,6 +382,16 @@ void Body::Init()
   {
     (*siter)->Init();
   }
+
+  // global-inertial damping is implemented in ode svn trunk
+  if(this->GetId() && this->dampingFactorP->GetValue() > 0)
+  {
+    this->physicsEngine->LockMutex();
+    dBodySetLinearDamping(this->GetId(),this->dampingFactorP->GetValue()); 
+    dBodySetAngularDamping(this->GetId(),this->dampingFactorP->GetValue()); 
+    this->physicsEngine->UnlockMutex();
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -447,23 +457,6 @@ void Body::Update()
        sensorIter!=this->sensors.end(); sensorIter++)
   {
     (*sensorIter)->Update();
-  }
-
-  if(this->GetId())
-  {
-    this->physicsEngine->LockMutex();
-
-	  force = this->dampingFactorP->GetValue() * this->mass.mass;
-	  vel = this->GetLinearVel();
-	  dBodyAddForce(this->GetId(), -((vel.x * fabs(vel.x)) * force), 
-                  -((vel.y * fabs(vel.y)) * force), 
-                  -((vel.z * fabs(vel.z)) * force));
-
-	  avel = this->GetAngularVel();
-	  dBodyAddTorque(this->GetId(), -avel.x * force, -avel.y * force, 
-                   -avel.z * force);
-
-    this->physicsEngine->UnlockMutex();
   }
 
 #ifdef TIMING
