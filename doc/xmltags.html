@@ -14,6 +14,7 @@ The following XML tags are general attributes that are applicable to all world f
     <gravity># # #</gravity> <!-- Gravity vector. (default=0 0 -9.8)-->
     <cfm>#</cfm> <!-- Constraint force mixing. (default = 10e-5) -->
     <erp>#</erp> <!-- Error reduction. (default=0.3) -->
+    <updateRate> # </updateRate> <!--if <0 then run in realtime, if 0 then run as fast as possible, if >0 the number indicates the update rate-->
   </physics:ode>
 
   <!-- Parameters for the GUI -->
