@@ -52,6 +52,8 @@ ContactParams::ContactParams()
   this->mu2 = dInfinity;
   this->slip1 = 0.01;
   this->slip2 = 0.01;
+
+  this->enableFriction = true;
 }
 
 //////////////////////////////////////////////////////////////////////////////

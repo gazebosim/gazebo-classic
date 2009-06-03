@@ -78,6 +78,8 @@ namespace gazebo
   
     /// \brief soft constraint force mixing
     public: double softCfm;
+
+    public: bool enableFriction;
             
     public: boost::signal< void (Geom*, Geom*)> contactSignal;
   };

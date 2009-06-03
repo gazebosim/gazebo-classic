@@ -372,17 +372,29 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         contact.surface.soft_erp = h * kp / (h * kp + kd);
         contact.surface.soft_cfm = 1.0 / (h * kp + kd);
 
-        contact.surface.mu = std::min(geom1->contact->mu1, geom2->contact->mu1);
-        contact.surface.mu2 = std::min(geom1->contact->mu2, geom2->contact->mu2);
+        if (geom1->contact->enableFriction && geom2->contact->enableFriction)
+        {
+          contact.surface.mu = std::min(geom1->contact->mu1, 
+              geom2->contact->mu1);
+          contact.surface.mu2 = std::min(geom1->contact->mu2, 
+              geom2->contact->mu2);
+          contact.surface.slip1 = std::min(geom1->contact->slip1, 
+              geom2->contact->slip1);
+          contact.surface.slip2 = std::min(geom1->contact->slip2, 
+              geom2->contact->slip2);
+        }
+        else
+        {
+          contact.surface.mu = 0; 
+          contact.surface.mu2 = 0;
+          contact.surface.slip1 = 0.1;
+          contact.surface.slip2 = 0.1;
+        }
+
         contact.surface.bounce = std::min(geom1->contact->bounce, 
                                      geom2->contact->bounce);
         contact.surface.bounce_vel = std::min(geom1->contact->bounceVel, 
                                          geom2->contact->bounceVel);
-        contact.surface.slip1 = std::min(geom1->contact->slip1, 
-                                    geom2->contact->slip1);
-        contact.surface.slip2 = std::min(geom1->contact->slip2, 
-                                    geom2->contact->slip2);
-
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
 

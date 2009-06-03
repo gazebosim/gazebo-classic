@@ -636,20 +636,5 @@ Model *Geom::GetModel() const
 /// Set the friction mode of the geom
 void Geom::SetFrictionMode( const bool &v )
 {
-  if (v == false)
-  {
-    this->contact->mu1 = 0;
-    this->contact->mu2 = 0;
-    this->contact->slip1 = 0;
-    this->contact->slip2 = 0;
-  }
-  else
-  {
-    this->contact->mu1 = dInfinity;
-    this->contact->mu2 = dInfinity;
-    this->contact->slip1 = 0.1;
-    this->contact->slip2 = 0.1;
-
-  }
+  this->contact->enableFriction = v;
 }
-
