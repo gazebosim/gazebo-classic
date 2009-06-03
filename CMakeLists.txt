@@ -30,6 +30,7 @@ SET (gazebocontroller_sources_desc "List of controller sources"
      CACHE INTERNAL "Gazebo controller sources list description" FORCE)
 
 SET (OGRE_VERSION 1.6.1 CACHE INTERNAL "Ogre version requirement" FORCE)
+SET (FREEIMAGE_VERSION 3.11.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
 SET (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 

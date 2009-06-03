@@ -62,6 +62,41 @@ IF (PKG_CONFIG_FOUND)
                           ${ODE_LDFLAGS})
   ENDIF (NOT ODE_FOUND)
 
+  pkg_check_modules(FI freeimage>=${FREEIMAGE_VERSION})
+  IF (NOT FI_FOUND)
+    MESSAGE (STATUS "freeimage.pc not found, trying freeimage_include_dir and freeimage_library_dir flags.")
+    FIND_PATH(freeimage_include_dir FreeImage.h ${freeimage_include_dir})
+    IF (NOT freeimage_include_dir)
+      MESSAGE (STATUS "Looking for FreeImage.h - not found")
+      MESSAGE (FATAL_ERROR "Unable to find FreeImage.h")
+    ELSE (NOT freeimage_include_dir)
+      MESSAGE (STATUS "Looking for FreeImage.h - found")
+    ENDIF (NOT freeimage_include_dir)
+    FIND_LIBRARY(freeimage_library freeimage ${freeimage_library_dir})
+    IF (NOT freeimage_library)
+      MESSAGE (STATUS "Looking for libfreeimage - not found")
+      MESSAGE (FATAL_ERROR "Unable to find libfreeimage")
+    ELSE (NOT freeimage_library)
+      MESSAGE (STATUS "Looking for libfreeimage - found")
+    ENDIF (NOT freeimage_library)
+  ELSE (NOT FI_FOUND)
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
+                          ${FI_INCLUDE_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
+                          ${FI_LIBRARY_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${FI_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${FI_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${FI_LDFLAGS})
+  ENDIF (NOT FI_FOUND)
+
   pkg_check_modules(XML libxml-2.0)
   IF (NOT XML_FOUND)
     MESSAGE (SEND_ERROR "\nError: libxml2 and development files not found. See the following website: http://www.xmlsoft.org")
@@ -230,24 +265,6 @@ STRING(REGEX REPLACE " " ";" boost_libraries "${boost_libraries}")
 MESSAGE (STATUS "Boost Include Path: ${boost_include_dirs}")
 MESSAGE (STATUS "Boost Library Path: ${boost_library_dirs}")
 MESSAGE (STATUS "Boost Libraries: ${boost_libraries}")
-
-########################################
-# Find freeimage
-FIND_PATH(freeimage_include_dir FreeImage.h ${freeimage_include_dir})
-IF (NOT freeimage_include_dir)
-  MESSAGE (STATUS "Looking for FreeImage.h - not found")
-  MESSAGE (FATAL_ERROR "Unable to find FreeImage.h")
-ELSE (NOT freeimage_include_dir)
-  MESSAGE (STATUS "Looking for FreeImage.h - found")
-ENDIF (NOT freeimage_include_dir)
-
-FIND_LIBRARY(freeimage_library freeimage ${freeimage_library_dir})
-IF (NOT freeimage_library)
-  MESSAGE (STATUS "Looking for libfreeimage - not found")
-  MESSAGE (FATAL_ERROR "Unable to find libfreeimage")
-ELSE (NOT freeimage_library)
-  MESSAGE (STATUS "Looking for libfreeimage - found")
-ENDIF (NOT freeimage_library)
 
 ########################################
 # Find avformat and avcodec
