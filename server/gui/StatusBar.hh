@@ -66,6 +66,10 @@ namespace gazebo
     public: Gui *gui;
 
     private: double lastUpdateTime;
+
+    // calculated percent speedup in last percentWindowDuration seconds real time.
+    private: double percent, percentLastRealTime, percentLastSimTime;
+    private: static const double statusUpdatePeriod = 0.05;
   };
   
 }

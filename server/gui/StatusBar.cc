@@ -110,24 +110,42 @@ StatusBar::~StatusBar()
 void StatusBar::Update()
 {
   float avgFPS = 0;
-  float percent = 0;
+  //float percent = 0;
   float sim = 0;
   float real = 0;
 
-  if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > 0.05)
+  if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
   {
     avgFPS = this->gui->GetAvgFPS();
-    percent = (Simulator::Instance()->GetSimTime() / Simulator::Instance()->GetRealTime());
+
+    if (Simulator::Instance()->GetRealTime() < this->statusUpdatePeriod )
+    {
+      this->percent = (Simulator::Instance()->GetSimTime() / Simulator::Instance()->GetRealTime());
+      this->percentLastRealTime =0;
+      this->percentLastSimTime = 0;
+    }
+    else
+    {
+      this->percent = ((Simulator::Instance()->GetSimTime()-this->percentLastSimTime)
+               / (Simulator::Instance()->GetRealTime()-this->percentLastRealTime)  );
+      this->percentLastRealTime =Simulator::Instance()->GetRealTime();
+      this->percentLastSimTime = Simulator::Instance()->GetSimTime();
+    }
 
     sim = Simulator::Instance()->GetSimTime();
-    if (sim > 99999)
+    if (sim > 31536000)
     {
-      sim /= (120*24);
+      sim /= (31536000);
       this->simTime->label("(dys) Sim Time");
     }
-    else if (sim > 9999)
+    else if (sim > 86400)
     {
-      sim /= 120;
+      sim /= (86400);
+      this->simTime->label("(dys) Sim Time");
+    }
+    else if (sim > 3600)
+    {
+      sim /= 3600;
       this->simTime->label("(hrs) Sim Time");
     }
     else if (sim > 999)
@@ -137,14 +155,19 @@ void StatusBar::Update()
     }
 
     real = Simulator::Instance()->GetRealTime();
-    if (sim > 99999)
+    if (sim > 31536000)
     {
-      real /= (120*24);
+      real /= (31536000);
       this->realTime->label("(dys) Real Time");
     }
-    else if (real > 9999)
+    else if (sim > 86400)
     {
-      real /= 120;
+      real /= (86400);
+      this->realTime->label("(dys) Real Time");
+    }
+    else if (real > 3600)
+    {
+      real /= 3600;
       this->realTime->label("(hrs) Real Time");
     }
     else if (real > 999)
@@ -155,7 +178,7 @@ void StatusBar::Update()
 
     //this->iterations->value(Simulator::Instance()->GetIterations());
     this->fps->value(avgFPS);
-    this->percentOutput->value(percent);
+    this->percentOutput->value(this->percent);
 
     //if (Simulator::Instance()->GetRealTime() - this->realTime->value() > 0.1)
 
