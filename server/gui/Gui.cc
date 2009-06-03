@@ -48,7 +48,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Gui::Gui (int x, int y, int width, int height, const std::string &t)
-  : Fl_Window(x, y, width, height, t.c_str())
+  : Fl_Double_Window(x, y, width, height, t.c_str())
 {
   Fl::scheme("plastic");
 
@@ -91,10 +91,6 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 
   Fl::check();
   Fl::wait(0.3);
-
-  // Create a dummy rendering window. This creates a context, and allows Ogre
-  // to initialize properly
-  OgreCreator::Instance()->CreateWindow(this, 1, 1);
 
   this->hasFocus = true;
 

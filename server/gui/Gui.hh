@@ -31,7 +31,7 @@
 #include <X11/Xutil.h>
 
 #include <FL/Fl.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <string>
 #include <iostream>
 
@@ -48,7 +48,7 @@ namespace gazebo
   class XMLConfigNode;
 
   /// \brief FLTK Main Window
-  class Gui : public Fl_Window
+  class Gui : public Fl_Double_Window
   {
     /// \brief Constructor
     public: Gui (int x, int y, int w, int h, const std::string &t);

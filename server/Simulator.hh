@@ -43,7 +43,7 @@ namespace gazebo
 /// \{
 
 // Forward declarations
-  class GuiAPI;
+  class Gui;
   class Server;
   class SimulationIface;
   class XMLConfig;
@@ -179,7 +179,7 @@ namespace gazebo
     private: XMLConfig *xmlFile;
 
     /// Pointer to the selected Gui 
-    private: GuiAPI *gui;
+    private: Gui *gui;
 
     private: OgreAdaptor *renderEngine;
 

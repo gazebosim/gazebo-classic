@@ -72,6 +72,7 @@ void GazeboConfig::Load()
     }
     this->ogrePaths.push_back(str.substr(pos1,str.size()-pos1));
   }
+
   char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
   if(gazebo_resource_path) 
   {
@@ -116,7 +117,6 @@ void GazeboConfig::Load()
         node = node->GetNext("ogrePath");
       }
     }
-    this->RTTMode = rc.GetRootNode()->GetString("RTTMode", "PBuffer");
 
   }
   else
@@ -125,16 +125,15 @@ void GazeboConfig::Load()
 
     if ( !gazebo_resource_path )
     {
-	this->gazeboPaths.push_back("/usr/local/share/gazebo");
+      this->gazeboPaths.push_back("/usr/local/share/gazebo");
     }
 
     if ( !ogre_resource_path )
     {
-	this->ogrePaths.push_back("/usr/local/lib/OGRE");
-	this->ogrePaths.push_back("/usr/lib/OGRE");
+      this->ogrePaths.push_back("/usr/local/lib/OGRE");
+      this->ogrePaths.push_back("/usr/lib/OGRE");
     }
 
-    this->RTTMode="PBuffer";
   }
 }
 
@@ -147,9 +146,3 @@ std::list<std::string> &GazeboConfig::GetOgrePaths()
 {
   return this->ogrePaths;
 }
-
-std::string &GazeboConfig::GetRTTMode() 
-{
-  return this->RTTMode;
-}
-

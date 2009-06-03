@@ -183,6 +183,14 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
 
   pose.rot = pose.rot * quat;
   this->body->SetPose(pose);
+
+  dQuaternion q;
+  q[0] = pose.rot.u;
+  q[1] = pose.rot.x;
+  q[2] = pose.rot.y;
+  q[3] = pose.rot.z;
+
+  dGeomSetQuaternion(this->geomId, q);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

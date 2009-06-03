@@ -53,15 +53,11 @@ namespace gazebo
     /// \brief Get paths to ogre install
     public: std::list<std::string>& GetOgrePaths();
  
-    public: std::string& GetRTTMode();
-
     /// Paths gazebo install
     private: std::list<std::string> gazeboPaths;
     
     /// Paths to the ogre install
     private: std::list<std::string> ogrePaths;
-
-    private: std::string RTTMode;
 
   };
 

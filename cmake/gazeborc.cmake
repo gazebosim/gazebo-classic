@@ -2,5 +2,4 @@
 <gazeborc>
   <gazeboPath>@CMAKE_INSTALL_PREFIX@/share/gazebo</gazeboPath>
   <ogrePath>@OGRE_LIBRARY_PATH@/OGRE</ogrePath>
-  <RTTMode>PBuffer</RTTMode>
 </gazeborc>

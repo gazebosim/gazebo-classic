@@ -53,7 +53,7 @@
 	
 	<model:physical name="Observercam_model">
 		<xyz>0 0 2.65</xyz>
-		<rpy>-90 90 0</rpy>
+		<rpy>90 90 0</rpy>
 		<static>true</static>
 		<body:empty name="Observercam_body">
 			<sensor:camera name="Observercam_sensor">

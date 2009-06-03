@@ -136,10 +136,8 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   // Setup the available resources
   this->SetupResources();
 
-  this->videoMode = "800 x 600 @ 32-bit colour";
-
   // Setup the rendering system, and create the context
-  this->SetupRenderSystem(true);
+  this->SetupRenderSystem();
 
   // Initialize the root node, and don't create a window
   this->root->initialise(false);
@@ -154,8 +152,9 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   node = rootNode->GetChild("ogre", "rendering");
 
-  /// Create a dummy rendering context if the GUI is disabled
-  if (!Simulator::Instance()->GetGuiEnabled())
+  /// Create a dummy rendering context.
+  /// This will allow gazebo to run headless. And it also allows OGRE to 
+  /// initialize properly
   {
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay) 
@@ -163,8 +162,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
     int screen = DefaultScreen(this->dummyDisplay);
 
-    int attribList[8] = {GLX_RGBA, GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8,
-                         GLX_BLUE_SIZE, 8,	None};
+    int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
+                    GLX_STENCIL_SIZE, 8, None };
 
     this->dummyVisual = glXChooseVisual(this->dummyDisplay, screen, 
                                         (int *)attribList);
@@ -405,52 +404,45 @@ void OgreAdaptor::SetupResources()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Setup render system
-void OgreAdaptor::SetupRenderSystem(bool create)
+void OgreAdaptor::SetupRenderSystem()
 {
-
   Ogre::RenderSystem *renderSys;
 
   // Set parameters of render system (window size, etc.)
-  //if (!this->root->restoreConfig())
+  Ogre::RenderSystemList *rsList = this->root->getAvailableRenderers();
+  int c = 0;
+
+  renderSys = NULL;
+
+  do
   {
-    Ogre::RenderSystemList *rsList = this->root->getAvailableRenderers();
-    int c = 0;
+    if (c == (int)rsList->size())
+      break;
 
-    renderSys = NULL;
-
-    do
-    {
-      if (c == (int)rsList->size())
-        break;
-
-      renderSys = rsList->at(c);
-      c++;
-    }
-    while (renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
-
-    if (renderSys == NULL)
-    {
-      gzthrow( "unable to find rendering system" );
-    }
-
-
-    renderSys->setConfigOption("Full Screen","No");
-    //renderSys->setConfigOption("FSAA","2");
-
-    // Set the preferred RRT mode. Options are: "PBuffer", "FBO", and "Copy", can be set in the .gazeborc file
-    renderSys->setConfigOption("RTT Preferred Mode", Simulator::Instance()->GetGazeboConfig()->GetRTTMode());
-
-    if (create && this->videoMode != "None")
-    {
-      renderSys->setConfigOption("Video Mode",this->videoMode);
-      this->root->setRenderSystem(renderSys);
-    }
-    else
-    {
-      std::cerr << "No render system selected\n";
-    }
-
+    renderSys = rsList->at(c);
+    c++;
   }
+  while (renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
+
+  if (renderSys == NULL)
+  {
+    gzthrow( "unable to find rendering system" );
+  }
+
+  // We operate in windowed mode
+  renderSys->setConfigOption("Full Screen","No");
+
+  // Full screen anti-aliasing
+  renderSys->setConfigOption("FSAA","2");
+
+  /// We used to allow the user to set the RTT mode to PBuffer, FBO, or Copy. 
+  ///   Copy is slow, and there doesn't seem to be a good reason to use it
+  ///   PBuffer limits the size of the renderable area of the RTT to the
+  ///           size of the first window created.
+  ///   FBO seem to be the only good option
+  renderSys->setConfigOption("RTT Preferred Mode", "FBO");
+
+  this->root->setRenderSystem(renderSys);
 }
 
 

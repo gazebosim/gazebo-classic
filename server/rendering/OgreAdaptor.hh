@@ -110,7 +110,7 @@ namespace gazebo
 
     private: void LoadPlugins();
     private: void SetupResources();
-    private: void SetupRenderSystem(bool create);
+    private: void SetupRenderSystem();
   
     /// Pointer to the root scene node
     public: Ogre::Root *root;
@@ -127,8 +127,6 @@ namespace gazebo
     private: OgreFrameListener *frameListener;
   
     public: Ogre::ColourValue *backgroundColor;
-  
-    private: std::string videoMode;
   
     private: Ogre::RaySceneQuery *raySceneQuery;
 

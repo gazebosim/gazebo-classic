@@ -625,15 +625,37 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
 
+  std::stringstream ogreHandle;
+
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
+  std::string screenStr = DisplayString(display);
+  std::string::size_type dotPos = screenStr.find(".");
+  screenStr = screenStr.substr(dotPos+1, screenStr.size());
+
+  int attrList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
+                    GLX_STENCIL_SIZE, 8, None };
+  XVisualInfo *vi = glXChooseVisual(fl_display, DefaultScreen(display), 
+                                    attrList);
+  XSync(fl_display, false);
+
+  ogreHandle << (unsigned long)fl_display 
+             << ":" << screenStr 
+             << ":" << (unsigned long)winId 
+             << ":" << (unsigned long)vi;
+
+  std::cout << "Ogre Handle[" << ogreHandle.str() << "]\n";
+
   /// As of Ogre 1.6 this is the params method that makes a resizable window
-  params["externalWindowHandle"] =  Ogre::StringConverter::toString(display) + 
+  /*params["externalWindowHandle"] =  Ogre::StringConverter::toString(display) + 
     ":" + Ogre::StringConverter::toString(screen) + 
     ":" + Ogre::StringConverter::toString(winId) + 
     ":" + Ogre::StringConverter::toString(fl_visual);
+    */
+
+  params["externalWindowHandle"] = ogreHandle.str();
 
   params["FSAA"] = "2";
 
@@ -645,7 +667,8 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   {
     try
     {
-      window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), width, height, false, &params);
+      window = OgreAdaptor::Instance()->root->createRenderWindow( stream.str(), 
+                     width, height, false, &params);
     }
     catch (...)
     {
@@ -660,6 +683,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   }
 
   window->setActive(true);
+  window->setVisible(true);
   window->setAutoUpdated(true);
 
   this->windows.push_back(window);

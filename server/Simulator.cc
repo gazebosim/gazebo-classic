@@ -37,7 +37,7 @@
 #include "OgreVisual.hh"
 #include "World.hh"
 #include "XMLConfig.hh"
-#include "GuiAPI.hh"
+#include "Gui.hh"
 #include "GazeboConfig.hh"
 #include "gazebo.h"
 #include "PhysicsEngine.hh"
@@ -184,16 +184,19 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
       if (childNode)
       {
-        int width = childNode->GetTupleInt("size",0,640);
-        int height = childNode->GetTupleInt("size",1,480);
+        int width = childNode->GetTupleInt("size", 0, 800);
+        int height = childNode->GetTupleInt("size", 1, 600);
         int x = childNode->GetTupleInt("pos",0,0);
         int y = childNode->GetTupleInt("pos",1,0);
 
         //gzmsg(1) << "Creating GUI: Pos[" << x << " " << y 
         //         << "] Size[" << width << " " << height << "]\n";
 
+        printf("New gui\n");
         // Create the GUI
-        this->gui = new GuiAPI(x, y, width, height, "Gazebo");
+        this->gui = new Gui(x, y, width, height, "Gazebo");
+
+        printf("Load Gui\n");
         this->gui->Load(childNode);
       }
     }
@@ -224,6 +227,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   // Initialize the GUI
   if (this->gui)
   {
+    printf("Init gui\n");
     this->gui->Init();
   }
 
