@@ -255,9 +255,9 @@ void OgreCamera::Render()
     Ogre::PixelFormat format = pixelBuffer->getFormat();
     renderViewport = rTexture->getViewport(0);
 
-    std::cout << "Render viewport[" 
-      << renderViewport->getActualWidth() << " "
-      << renderViewport->getActualHeight() << "]\n";
+    // std::cout << "Render viewport[" 
+    //   << renderViewport->getActualWidth() << " "
+    //   << renderViewport->getActualHeight() << "]\n";
 
     size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
                                           (**this->imageSizeP).y, 
@@ -265,8 +265,7 @@ void OgreCamera::Render()
                                           format);
 
     //size = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * this->GetImageDepth();
-
-    printf("Size[%d] [%d]\n",size, this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * this->GetImageDepth());
+    //printf("Size[%d] [%d]\n",size, this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * this->GetImageDepth());
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
