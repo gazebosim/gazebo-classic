@@ -106,7 +106,7 @@ namespace gazebo
 
 
     /// \brief Create a window for Ogre
-    public: Ogre::RenderWindow *CreateWindow(long display, 
+    public: Ogre::RenderWindow *CreateWindow(Display *display, 
                                              int screen, 
                                              long winId, 
                                              unsigned int width, 

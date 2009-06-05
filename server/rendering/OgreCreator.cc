@@ -607,7 +607,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int 
 
   if (flWindow)
   {
-    win = OgreCreator::CreateWindow( (long)fl_display, fl_visual->screen, 
+    win = OgreCreator::CreateWindow( fl_display, fl_visual->screen, 
         (long)(Fl_X::i(flWindow)->xid), width, height);
     if (win)
       this->windows.push_back(win);
@@ -618,7 +618,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window for Ogre
-Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen, 
+Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen, 
                                               long winId, unsigned int width, 
                                               unsigned int height)
 {
@@ -631,29 +631,20 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(long display, int screen,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
-  std::string screenStr = DisplayString(display);
+  std::string screenStr = DisplayString((long)display);
   std::string::size_type dotPos = screenStr.find(".");
   screenStr = screenStr.substr(dotPos+1, screenStr.size());
 
   int attrList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
                     GLX_STENCIL_SIZE, 8, None };
-  XVisualInfo *vi = glXChooseVisual(fl_display, DefaultScreen(display), 
+  XVisualInfo *vi = glXChooseVisual(display, DefaultScreen((long)display), 
                                     attrList);
   XSync(fl_display, false);
 
-  ogreHandle << (unsigned long)fl_display 
+  ogreHandle << (unsigned long)display 
              << ":" << screenStr 
              << ":" << (unsigned long)winId 
              << ":" << (unsigned long)vi;
-
-  std::cout << "Ogre Handle[" << ogreHandle.str() << "]\n";
-
-  /// As of Ogre 1.6 this is the params method that makes a resizable window
-  /*params["externalWindowHandle"] =  Ogre::StringConverter::toString(display) + 
-    ":" + Ogre::StringConverter::toString(screen) + 
-    ":" + Ogre::StringConverter::toString(winId) + 
-    ":" + Ogre::StringConverter::toString(fl_visual);
-    */
 
   params["externalWindowHandle"] = ogreHandle.str();
 

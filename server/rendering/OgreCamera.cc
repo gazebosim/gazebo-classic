@@ -255,45 +255,16 @@ void OgreCamera::Render()
     Ogre::PixelFormat format = pixelBuffer->getFormat();
     renderViewport = rTexture->getViewport(0);
 
-    // std::cout << "Render viewport[" 
-    //   << renderViewport->getActualWidth() << " "
-    //   << renderViewport->getActualHeight() << "]\n";
-
     size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
                                           (**this->imageSizeP).y, 
                                           1, 
                                           format);
-
-    //size = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * this->GetImageDepth();
-    //printf("Size[%d] [%d]\n",size, this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * this->GetImageDepth());
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
       this->saveFrameBuffer = new unsigned char[size];
 
     memset(this->saveFrameBuffer,128,size);
-
-    /*pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_READ_ONLY);
-
-    int top = (int)((mBuffer->getHeight() - this->imageSizeP->GetValue().y) / 2.0);
-    int left = (int)((mBuffer->getWidth() - this->imageSizeP->GetValue().x) / 2.0);
-    int right = left + this->imageSizeP->GetValue().x;
-    int bottom = top + this->imageSizeP->GetValue().y;
-
-    // Get the center of the texture in RGB 24 bit format
-    pixelBuffer->blitToMemory(
-        Ogre::Box(left, top, right, bottom),
-
-        Ogre::PixelBox(
-          this->imageSizeP->GetValue().x,
-          this->imageSizeP->GetValue().y,
-          1,
-          this->imageFormat,
-          this->saveFrameBuffer)
-        );
-
-    pixelBuffer->unlock();
-    */
 
     Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
                         1, this->imageFormat, this->saveFrameBuffer);
