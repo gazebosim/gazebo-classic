@@ -443,13 +443,13 @@ class SimulationData
   public: GazeboData head;
 
   /// Elapsed simulation time
-  public: float simTime;
+  public: double simTime;
 
   /// Accumpated pause time (this interface may be updated with the server is paused).
-  public: float pauseTime;
+  public: double pauseTime;
 
   /// Elapsed real time since start of simulation (from system clock)
-  public: float realTime;
+  public: double realTime;
 
   /// state of the simulation : 0 paused, 1 running -1 not_started/exiting
   public: int state;
