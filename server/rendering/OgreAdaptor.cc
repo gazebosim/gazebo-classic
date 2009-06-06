@@ -176,7 +176,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
     glXMakeCurrent(this->dummyDisplay, this->dummyWindowId, this->dummyContext);
 
-    OgreCreator::Instance()->CreateWindow((long)this->dummyDisplay, screen, 
+    OgreCreator::Instance()->CreateWindow(this->dummyDisplay, screen, 
                                           (long)this->dummyWindowId,1,1);
   }
 

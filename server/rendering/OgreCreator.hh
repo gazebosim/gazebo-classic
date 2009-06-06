@@ -26,6 +26,7 @@
 #ifndef OGRECREATOR
 #define OGRECREATOR
 
+#include <X11/Xlib.h>
 #include <string>
 #include <vector>
 
