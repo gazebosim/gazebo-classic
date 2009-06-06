@@ -74,8 +74,13 @@ void GazeboClient::Init(int serverid, const char *prefixid)
 
   // steal the global clock - a bit aggressive, but a simple approach
   if (GlobalTime)
+  {
     delete GlobalTime;
-  assert((GlobalTime = new GazeboTime()));
+    GlobalTime = NULL;
+  }
+
+  GlobalTime = new GazeboTime();
+  assert(GlobalTime != 0);
 
 }
 
