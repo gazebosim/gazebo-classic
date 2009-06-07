@@ -228,7 +228,6 @@ void GLWindow::HandleMouseRelease()
 
     if (currModel == model)
     {
-      printf("Same\n");
       Simulator::Instance()->SetSelectedEntity(NULL);
       return;
     }
