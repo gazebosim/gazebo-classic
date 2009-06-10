@@ -192,12 +192,11 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
         //gzmsg(1) << "Creating GUI: Pos[" << x << " " << y 
         //         << "] Size[" << width << " " << height << "]\n";
 
-        printf("New gui\n");
         // Create the GUI
         this->gui = new Gui(x, y, width, height, "Gazebo");
 
-        printf("Load Gui\n");
         this->gui->Load(childNode);
+        this->gui->CreateCameras();
       }
     }
     catch (GazeboError e)

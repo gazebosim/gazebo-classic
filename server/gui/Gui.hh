@@ -62,6 +62,9 @@ namespace gazebo
     /// \brief Save the gui params in xml format
     public: virtual void Save(std::string &prefix, std::ostream &stream);
 
+    /// \brief Create the user camera's 
+    public: void CreateCameras();
+
     /// \brief Initalize the gui
     public: virtual void Init();
 

@@ -52,6 +52,9 @@ namespace gazebo
     /// \brief Load the frame
     public: void Load( XMLConfigNode *node );
 
+    /// \brief Create user cameras
+    public: void CreateCameras();
+
     /// \brief Initialize 
     public: void Init();
 

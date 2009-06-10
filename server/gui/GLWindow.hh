@@ -61,6 +61,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~GLWindow();
 
+    /// \brief Create user cameras
+    public: void CreateCameras();
+
     /// \brief Initalize the gui
     public: virtual void Init();
 

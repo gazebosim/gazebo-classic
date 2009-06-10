@@ -167,6 +167,17 @@ void GLFrameManager::Save(std::string &prefix, std::ostream &stream)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Create user cameras
+void GLFrameManager::CreateCameras()
+{
+  std::vector<GLFrame *>::iterator iter;
+  for (iter = this->frames.begin(); iter != this->frames.end(); iter++)
+  {
+    (*iter)->CreateCameras();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Initalize the window manager
 void GLFrameManager::Init()
 {

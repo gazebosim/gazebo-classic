@@ -89,6 +89,21 @@ GLWindow::~GLWindow()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Create user cameras
+void GLWindow::CreateCameras()
+{
+  this->show();
+  Fl::check();
+
+  this->make_current();
+
+  // Create the default camera.
+  this->userCamera = new UserCamera( this );
+  this->userCamera->Load(NULL);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Init
 void GLWindow::Init()
 {
@@ -96,9 +111,6 @@ void GLWindow::Init()
   Fl::check();
   this->mouseDrag = false;
 
-  // Create the default camera.
-  this->userCamera = new UserCamera( this );
-  this->userCamera->Load(NULL);
   this->userCamera->Init();
   this->userCamera->RotatePitch( DTOR(30) );
   this->userCamera->Translate( Vector3(-5, 0, 1) );

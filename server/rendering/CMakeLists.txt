@@ -1,6 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-
 SET (sources OgreMovableText.cc
              OgreCreator.cc
              OgreAdaptor.cc

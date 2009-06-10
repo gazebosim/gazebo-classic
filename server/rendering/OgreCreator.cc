@@ -208,7 +208,7 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
         Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
   }
 
-  light->setCastShadows(node->GetBool("castShadows",false,0));
+  light->setCastShadows(node->GetBool("castShadows",true,0));
 
   parent->AttachObject(light);
 
@@ -631,23 +631,29 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
-  std::string screenStr = DisplayString((long)display);
+  /*std::string screenStr = DisplayString((long)display);
   std::string::size_type dotPos = screenStr.find(".");
   screenStr = screenStr.substr(dotPos+1, screenStr.size());
 
   int attrList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
-                    GLX_STENCIL_SIZE, 8, None };
+                    GLX_STENCIL_SIZE, 16, None };
   XVisualInfo *vi = glXChooseVisual(display, DefaultScreen((long)display), 
                                     attrList);
-  XSync(fl_display, false);
 
   ogreHandle << (unsigned long)display 
              << ":" << screenStr 
              << ":" << (unsigned long)winId 
              << ":" << (unsigned long)vi;
+  */
+             
+  XSync(fl_display, false);
 
-  params["externalWindowHandle"] = ogreHandle.str();
+  ogreHandle << winId;
 
+  params["parentWindowHandle"] = ogreHandle.str();
+  //params["currentGLContext"] = ogreHandle.str();
+
+  //params["vsync"] = "true";
   params["FSAA"] = "2";
 
   std::ostringstream stream;

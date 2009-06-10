@@ -155,6 +155,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   /// Create a dummy rendering context.
   /// This will allow gazebo to run headless. And it also allows OGRE to 
   /// initialize properly
+  if (!Simulator::Instance()->GetGuiEnabled())
   {
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay) 
@@ -163,7 +164,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     int screen = DefaultScreen(this->dummyDisplay);
 
     int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
-                    GLX_STENCIL_SIZE, 8, None };
+                        GLX_STENCIL_SIZE, 8, None };
 
     this->dummyVisual = glXChooseVisual(this->dummyDisplay, screen, 
                                         (int *)attribList);
@@ -183,9 +184,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
 
-  // Load Resources
-  Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
   // Get the SceneManager, in this case a generic one
   if (node->GetChild("bsp"))
   {
@@ -195,10 +193,13 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   else
   {
     this->sceneType= SCENE_EXT;
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
+    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
     //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
+    this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
   }
+
+  // Load Resources
+  Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
   Param::Begin(&this->parameters);
   this->shadowIndexSizeP = new ParamT<int>("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize(), 0);
@@ -219,11 +220,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   ambient.b = (**(this->ambientP)).z;
   ambient.a = (**(this->ambientP)).w;
 
-  this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
-  this->sceneMgr->setAmbientLight(Ogre::ColourValue(0,0,0));
- 
   // Settings for shadow mapping
-  /*if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
+  if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
   else if (**(this->shadowTechniqueP) == std::string("stencilModulative"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
@@ -235,9 +233,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
   else 
     gzthrow(std::string("Unsupported shadow technique: ") + **(this->shadowTechniqueP) + "\n");
-    */
 
-  /*this->sceneMgr->setShadowTextureSelfShadow(true);
+  this->sceneMgr->setShadowTextureSelfShadow(true);
   this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
   this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
   this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
@@ -246,13 +243,11 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->sceneMgr->setAmbientLight(ambient);
 
   this->sceneMgr->setShadowTextureSettings(512,2);
-  this->sceneMgr->setShowDebugShadows(true);
   this->sceneMgr->setShadowColour(Ogre::ColourValue(0.2, 0.2, 0.2));
   this->sceneMgr->setShadowFarDistance(30);
-  */
 
   // Add a sky dome to our scene
-  /*if (node->GetChild("sky"))
+  if (node->GetChild("sky"))
   {
     this->skyMaterialP->Load(node->GetChild("sky"));
     OgreCreator::CreateSky(**(this->skyMaterialP));
@@ -279,7 +274,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
       exit(-1);
     }
   }
-  */
 
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener();
@@ -437,9 +431,6 @@ void OgreAdaptor::SetupRenderSystem()
   // We operate in windowed mode
   renderSys->setConfigOption("Full Screen","No");
 
-  // Full screen anti-aliasing
-  renderSys->setConfigOption("FSAA","2");
-
   /// We used to allow the user to set the RTT mode to PBuffer, FBO, or Copy. 
   ///   Copy is slow, and there doesn't seem to be a good reason to use it
   ///   PBuffer limits the size of the renderable area of the RTT to the
@@ -469,6 +460,7 @@ void OgreAdaptor::UpdateCameras()
     if (dynamic_cast<UserCamera*>((*iter)) == NULL)
       (*iter)->Render();
   }
+  
 
   // Must update the user camera's last.
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
