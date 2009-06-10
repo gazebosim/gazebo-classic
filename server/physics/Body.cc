@@ -403,8 +403,6 @@ void Body::Update()
   Vector3 vel;
   Vector3 avel;
 
-  double force;
-
 #ifdef TIMING
   double tmpT1 = Simulator::Instance()->GetWallTime();
 #endif

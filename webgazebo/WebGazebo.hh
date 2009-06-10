@@ -65,6 +65,34 @@ class WebGazebo : public websim::WebSim
                              websim::Acceleration& a,
                              std::string& error);
 
+  virtual bool GetLaserData(const std::string& name,
+									websim::Time& t,
+									uint32_t& resolution,
+									double& fov,
+						 			websim::Pose& p,
+									std::vector<double>& ranges,
+									std::string& response) { return true;}
+
+	 
+  virtual bool GetRangerData(const std::string& name,
+									websim::Time& t,
+									std::vector<websim::Pose>& p,
+									std::vector<double>& ranges,
+  								std::string& response) {return true;}
+  
+  
+   virtual bool GetModelExtent(const std::string& name,
+									double& bx,
+									double& by,
+									double& bz,
+									websim::Pose& center,
+									std::string& response) {return true;}
+
+  virtual bool GetNumberOfRobots(unsigned int& n) {return true;}
+  
+  virtual bool GetSayStrings(std::vector<std::string>& sayings) {return true;}
+
+
   /** Get the current simulation time */
   virtual websim::Time GetTime();
 

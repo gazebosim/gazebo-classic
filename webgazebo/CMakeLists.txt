@@ -24,9 +24,9 @@ ADD_LIBRARY(webgz ${sources})
 ADD_EXECUTABLE(webgazebo main.cc)
 ADD_EXECUTABLE(client client.cc)
 
-TARGET_LINK_LIBRARIES( webgz yaml event ${WEBSIM_LINK_LIBS})
-TARGET_LINK_LIBRARIES( webgazebo gazebo yaml event ${WEBSIM_LINK_LIBS} ${boost_libraries} webgz)
-TARGET_LINK_LIBRARIES( client gazebo yaml event ${WEBSIM_LINK_LIBS} ${boost_libraries} webgz)
+TARGET_LINK_LIBRARIES( webgz event ${WEBSIM_LINK_LIBS})
+TARGET_LINK_LIBRARIES( webgazebo gazebo event ${WEBSIM_LINK_LIBS} ${boost_libraries} webgz)
+TARGET_LINK_LIBRARIES( client gazebo event ${WEBSIM_LINK_LIBS} ${boost_libraries} webgz)
 
 INSTALL(TARGETS webgazebo DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL(TARGETS webgz DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

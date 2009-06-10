@@ -332,18 +332,6 @@ ELSE (NOT LIBEVENT_PATH)
 ENDIF (NOT LIBEVENT_PATH)
 
 ########################################
-# Find yaml
-SET (libyaml_search_path /usr/include /usr/local/include)
-FIND_PATH(LIBYAML_PATH yaml.h ${libyaml_search_path})
-IF (NOT LIBYAML_PATH)
-  MESSAGE (STATUS "Looking for yaml.h - not found")
-  MESSAGE (STATUS "  Warning: webgazebo will not be built")
-  SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Found libevent" FORCE)
-ELSE (NOT LIBYAML_PATH)
-  MESSAGE (STATUS "Looking for yaml.h - found")
-ENDIF (NOT LIBYAML_PATH)
-
-########################################
 # Find profiler library, optional
 FIND_LIBRARY(PROFILER "profiler")
 IF (PROFILER)

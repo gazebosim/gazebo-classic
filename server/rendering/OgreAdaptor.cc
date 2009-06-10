@@ -219,9 +219,11 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   ambient.b = (**(this->ambientP)).z;
   ambient.a = (**(this->ambientP)).w;
 
+  this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
+  this->sceneMgr->setAmbientLight(Ogre::ColourValue(0,0,0));
  
   // Settings for shadow mapping
-  if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
+  /*if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
   else if (**(this->shadowTechniqueP) == std::string("stencilModulative"))
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
@@ -233,8 +235,9 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
   else 
     gzthrow(std::string("Unsupported shadow technique: ") + **(this->shadowTechniqueP) + "\n");
+    */
 
-  this->sceneMgr->setShadowTextureSelfShadow(true);
+  /*this->sceneMgr->setShadowTextureSelfShadow(true);
   this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
   this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
   this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
@@ -246,9 +249,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->sceneMgr->setShowDebugShadows(true);
   this->sceneMgr->setShadowColour(Ogre::ColourValue(0.2, 0.2, 0.2));
   this->sceneMgr->setShadowFarDistance(30);
+  */
 
   // Add a sky dome to our scene
-  if (node->GetChild("sky"))
+  /*if (node->GetChild("sky"))
   {
     this->skyMaterialP->Load(node->GetChild("sky"));
     OgreCreator::CreateSky(**(this->skyMaterialP));
@@ -275,6 +279,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
       exit(-1);
     }
   }
+  */
 
   // Create our frame listener and register it
   this->frameListener = new OgreFrameListener();

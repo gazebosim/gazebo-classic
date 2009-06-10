@@ -26,7 +26,6 @@
 #ifndef OGRECREATOR
 #define OGRECREATOR
 
-#include <X11/Xlib.h>
 #include <string>
 #include <vector>
 
@@ -43,6 +42,7 @@ namespace Ogre
 }
 
 class Fl_Window;
+typedef struct _XDisplay Display;
 
 namespace gazebo
 {
@@ -102,8 +102,8 @@ namespace gazebo
 
     /// \brief Create a new window
     public: Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 
-                                                    unsigned int width, 
-                                                    unsigned int height);
+                                             unsigned int width, 
+                                             unsigned int height);
 
 
     /// \brief Create a window for Ogre
