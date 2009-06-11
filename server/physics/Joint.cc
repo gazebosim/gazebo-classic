@@ -142,7 +142,9 @@ void Joint::Load(XMLConfigNode *node)
       visname.str(), NULL);
   if (this->visual)
   {
+    this->visual->SetCastShadows(false);
     this->visual->AttachMesh("joint_anchor");
+    this->visual->SetMaterial("Gazebo/JointAnchor");
     this->visual->SetVisible(false);
 
     this->line1 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);

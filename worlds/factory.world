@@ -30,7 +30,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>1.0 1.0 1.0 1.0</ambient>
+    <ambient>0.1 0.1 0.1 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -89,16 +89,17 @@
 
   <!-- White Point light -->
   <model:renderable name="directional_white">
+    <xyz>1 1 1</xyz>
     <enableGravity>false</enableGravity>
+
     <light>
       <type>point</type>
-      <direction>0 -0.5 -0.5</direction>
-      <diffuseColor>0.4 0.4 0.4</diffuseColor>
-      <specularColor>0.0 0.0 0.0</specularColor>
-      <range>100</range>
+      <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      <specularColor>0.1 0.1 0.1</specularColor>
+      <range>10</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.0 1.0 0.4</attenuation>
+      <attenuation>0.2 0.01 0.0</attenuation>
     </light>
   </model:renderable>
   

@@ -164,6 +164,7 @@ void Geom::Load(XMLConfigNode *node)
       visual->SetIgnorePoseUpdates(true);
 
       this->visuals.push_back(visual);
+      visual->SetCastShadows(true);
     }
     childNode = childNode->GetNext("visual");
   }
@@ -182,6 +183,7 @@ void Geom::Load(XMLConfigNode *node)
 
     this->bbVisual = OgreCreator::Instance()->CreateVisual(
         visname.str(), this->visualNode);
+    this->bbVisual->SetCastShadows(false);
 
     if (this->bbVisual)
     {
