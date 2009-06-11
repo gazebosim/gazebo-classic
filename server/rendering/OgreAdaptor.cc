@@ -70,7 +70,7 @@ OgreAdaptor::OgreAdaptor()
   this->dummyDisplay = false;
 
   Param::Begin(&this->parameters);
-  this->ambientP = new ParamT<Vector4>("ambient",Vector4(.1,.1,.1,1),0);
+  this->ambientP = new ParamT<Vector4>("ambient",Vector4(.1,.1,.1,.1),0);
   this->shadowTextureSizeP = new ParamT<int>("shadowTextureSize", 512,0);
   this->shadowTechniqueP = new ParamT<std::string>("shadowTechnique", "stencilAdditive", 0);
   this->drawGridP = new ParamT<bool>("grid", true, 0);

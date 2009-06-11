@@ -46,12 +46,14 @@ material Gazebo/White
 			ambient 1.000000 1.000000 1.000000 1.000000
       diffuse 1.0 1.0 1.0 1.0
       specular 0.8 0.8 0.8 1 20
+      shading phong
 		}
 		pass PointLight
 		{
 			ambient 1.000000 1.000000 1.000000 1.000000
       diffuse 1.0 1.0 1.0 1.0
       specular 0.8 0.8 0.8 1 20
+      shading phong
 		}
 
 	}
@@ -69,6 +71,7 @@ material Gazebo/Grey
 			ambient 0.3 0.3 0.3 1.0
       diffuse 0.5 0.5 0.5 1.0
       specular 0.8 0.8 0.8 1
+      shading phong
 		}
 	}
 }
@@ -120,6 +123,7 @@ material Gazebo/Black
 			specular 0.000000 0.000000 0.000000 1.000000 
 			emissive 0.000000 0.000000 0.000000 0.000000
       lighting on
+      shading phong
 		}
 	}
 }
@@ -137,6 +141,7 @@ material Gazebo/Red
 			specular 0.200000 0.000000 0.000000 1.000000 
 			emissive 0.000000 0.000000 0.000000 1.000000
       lighting on
+      shading phong
 		}
 	}
 }
@@ -154,6 +159,7 @@ material Gazebo/Green
 			specular 0.000000 0.000000 0.000000 1.000000 
 			emissive 0.000000 0.000000 0.000000 0.000000
       lighting on
+      shading phong
 		}
 	}
 }
@@ -257,6 +263,7 @@ material Gazebo/Blue
 			specular 0.000000 0.000000 0.200000 1.000000
 			emissive 0.000000 0.000000 0.000000 1.000000
       lighting on
+      shading phong
 		}
 	}
 }
@@ -454,6 +461,21 @@ material Gazebo/BumpyMetal
 	}
 }
 
+material Gazebo/GrayGrid
+{
+	technique
+	{
+		pass
+		{
+			//ambient 0.2 0.2 0.2
+
+			texture_unit
+			{
+				texture grayGrid.png
+			}
+		}
+	}
+}
 
 material Gazebo/Rocky
 {

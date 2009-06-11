@@ -38,7 +38,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.2 0.2 0.2 1.0</ambient>
+    <ambient>0.2 0.2 0.2 0.2</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -48,6 +48,8 @@
       <linearStart>10</linearStart>
       <linearEnd>100</linearEnd>
     </fog>
+
+    <grid>false</grid>
 
     <shadowTechnique>stencilAdditive</shadowTechnique>
   </rendering:ogre>
@@ -63,8 +65,8 @@
         <normal>0 0 1</normal>
         <size>2000 2000</size>
         <segments>10 10</segments>
-        <uvTile>100 100</uvTile>
-        <material>Gazebo/Grey</material>
+        <uvTile>2000 2000</uvTile>
+        <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
   </model:physical>
@@ -160,7 +162,7 @@
       <range>20</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.5 0.1 0</attenuation>
+      <attenuation>0.3 0.01 0</attenuation>
     </light>
   </model:renderable>
 

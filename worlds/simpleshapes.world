@@ -33,12 +33,12 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.0 0.0 0.0 1.0</ambient>
+    <ambient>0 0 0 0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
     <shadowTechnique>stencilAdditive</shadowTechnique>
-    <grid>true</grid>
+    <grid>false</grid>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
@@ -111,26 +111,43 @@
         <size>100 100</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/Rockwall</material>
+        <material>Gazebo/GrayGrid</material>
         <mu1>109999.0</mu1>
         <mu2>1000.0</mu2>
       </geom:plane>
     </body:plane>
   </model:physical>
 
+  <!-- Directional light -->
+  <model:renderable name="directional_white">
+    <enableGravity>false</enableGravity>
+
+    <light>
+      <type>directional</type>
+      <direction>0 0 -1</direction>
+      <diffuseColor>0.3 0.3 0.3</diffuseColor>
+      <specularColor>.1 .1 .1</specularColor>
+      <range>20</range>
+      <castShadows>false</castShadows>
+
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.2 0.01 0.001</attenuation>
+    </light>
+  </model:renderable>
+ 
   <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>2 1 2</xyz>
+    <xyz>-4 4 5</xyz>
     <enableGravity>false</enableGravity>
 
     <light>
       <type>point</type>
-      <diffuseColor>0.9 0.9 0.9</diffuseColor>
-      <specularColor>1 1 1</specularColor>
+      <diffuseColor>0.4 0.4 0.4</diffuseColor>
+      <specularColor>.1 .1 .1</specularColor>
       <range>20</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.2 0.01 0.0</attenuation>
+      <attenuation>0.5 0.01 0.001</attenuation>
     </light>
   </model:renderable>
  
