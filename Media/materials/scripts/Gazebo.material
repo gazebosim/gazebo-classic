@@ -227,6 +227,22 @@ material Gazebo/BlueEmissive
   }
 }
 
+material Gazebo/JointAnchor
+{
+  receive_shadows off
+
+  technique
+  {
+    pass
+    {
+      ambient 1.000000 1.000000 1.000000 1.000000
+      diffuse 1.000000 1.000000 1.000000 1.000000
+      specular 1.000000 1.000000 1.000000 1.000000
+      emissive 1.000000 1.000000 1.000000 1.000000
+      lighting off
+    }
+  }
+}
 
 material Gazebo/Blue
 {
