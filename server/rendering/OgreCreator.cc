@@ -32,6 +32,8 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 
+#include "config.h"
+
 #include "Simulator.hh"
 #include "Global.hh"
 #include "Entity.hh"
@@ -650,8 +652,11 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
 
   ogreHandle << winId;
 
+#ifdef ENABLE_SHADOWS
   params["parentWindowHandle"] = ogreHandle.str();
-  //params["currentGLContext"] = ogreHandle.str();
+#else
+  params["externalWindowHandle"] = ogreHandle.str();
+#endif
 
   //params["vsync"] = "true";
   params["FSAA"] = "2";

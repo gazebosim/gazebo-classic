@@ -10,6 +10,7 @@ STRING (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 SET (GAZEBO_VERSION 0.9.0)
 MESSAGE (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
+SET (ENABLE_SHADOWS OFF CACHE BOOL "If ON, must apply ogre_patch.diff to Ogre sources")
 SET (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
 SET (gazeboserver_sources_desc "List of server sources" 
