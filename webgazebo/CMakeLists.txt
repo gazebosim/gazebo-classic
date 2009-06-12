@@ -1,11 +1,9 @@
-SET (sources WebGazebo.cc 
+SET (sources   WebGazebo.cc  
+               Properties.cc
              ../server/Quatern.cc 
              ../server/Vector3.cc 
              ../server/Angle.cc
 )
-
-MESSAGE( STATUS "websim include dirs ${WEBSIM_INCLUDE_DIRS}" )
-MESSAGE( STATUS "websim library dirs ${WEBSIM_LIBRARY_DIRS}" )
 
 INCLUDE_DIRECTORIES( 
   ${CMAKE_SOURCE_DIR}/server
