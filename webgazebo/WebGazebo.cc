@@ -44,7 +44,8 @@ WebGazebo::WebGazebo(const std::string& fedfile,
                      const std::string& host, unsigned short port,
                      double dtol, double atol) :
         websim::WebSim(host, port), 
-        sq_dist_tol(dtol*dtol), sq_ang_tol(atol*atol)
+        sq_dist_tol(dtol*dtol), 
+	sq_ang_tol(atol*atol)
 {
   // Hook up to Gazebo
   printf("[webgazebo] Opening Gazebo simulation interface...");
@@ -55,7 +56,9 @@ WebGazebo::WebGazebo(const std::string& fedfile,
   this->client->ConnectWait(0, GZ_CLIENT_ID_USER_FIRST);
   // Open the Simulation Interface; let exceptions leak out
   this->simIface->Open(this->client, "default");
-  this->factoryIface->Open(this->client, "factory_iface");
+  puts( "(opened sim interface)" );
+  //this->factoryIface->Open(this->client, "factory_iface");
+  //puts( "(opened factory interface)" );
   puts("Done.");
 
   puts("[webgazebo] Ready");
@@ -301,8 +304,7 @@ bool
 WebGazebo::Go(double t)
 {
   unsigned int us = (unsigned int)rint(t*1e6);
-  this->simIface->Go(us,
-                     boost::bind(&WebGazebo::GoCallback, this));
+  this->simIface->Go(us, boost::bind(&WebGazebo::GoCallback, this));
   // Wait for the callback to fire
   boost::mutex::scoped_lock lock(this->goMutex);
   this->goCond.wait(lock);

@@ -35,58 +35,58 @@
 // libgazebo;
 #include "gazebo.h"
 
-#include "websim/websim.hh"
+#include "websim.hh"
 
 class WebGazebo : public websim::WebSim
 {
-  public:
-    WebGazebo(const std::string& fedfile,
-              const std::string& host, unsigned short port,
-              double dtol, double atol);
-    virtual ~WebGazebo();
+public:
+  WebGazebo(const std::string& fedfile,
+	    const std::string& host, unsigned short port,
+	    double dtol, double atol);
+  virtual ~WebGazebo();
 
-    bool Go(double t);
+  bool Go(double t);
     
-    // Interface to be implemented by simulators
-    virtual bool CreateModel(const std::string& name, 
-                             const std::string& type,
-                             std::string& error);
-    virtual bool DeleteModel(const std::string& name,
-                             std::string& error);
-    virtual bool SetModelPVA(const std::string& name, 
-                             const websim::Pose& p,
-                             const websim::Velocity& v,
-                             const websim::Acceleration& a,
-                             std::string& error);
-    virtual bool GetModelPVA(const std::string& name, 
-                             websim::Time &t,
-                             websim::Pose& p,
-                             websim::Velocity& v,
-                             websim::Acceleration& a,
-                             std::string& error);
+  // Interface to be implemented by simulators
+  virtual bool CreateModel(const std::string& name, 
+			   const std::string& type,
+			   std::string& error);
+  virtual bool DeleteModel(const std::string& name,
+			   std::string& error);
+  virtual bool SetModelPVA(const std::string& name, 
+			   const websim::Pose& p,
+			   const websim::Velocity& v,
+			   const websim::Acceleration& a,
+			   std::string& error);
+  virtual bool GetModelPVA(const std::string& name, 
+			   websim::Time &t,
+			   websim::Pose& p,
+			   websim::Velocity& v,
+			   websim::Acceleration& a,
+			   std::string& error);
 
   virtual bool GetLaserData(const std::string& name,
-									websim::Time& t,
-									uint32_t& resolution,
-									double& fov,
-						 			websim::Pose& p,
-									std::vector<double>& ranges,
-									std::string& response) { return true;}
+			    websim::Time& t,
+			    uint32_t& resolution,
+			    double& fov,
+			    websim::Pose& p,
+			    std::vector<double>& ranges,
+			    std::string& response) { return true;}
 
 	 
   virtual bool GetRangerData(const std::string& name,
-									websim::Time& t,
-									std::vector<websim::Pose>& p,
-									std::vector<double>& ranges,
-  								std::string& response) {return true;}
+			     websim::Time& t,
+			     std::vector<websim::Pose>& p,
+			     std::vector<double>& ranges,
+			     std::string& response) {return true;}
   
   
-   virtual bool GetModelExtent(const std::string& name,
-									double& bx,
-									double& by,
-									double& bz,
-									websim::Pose& center,
-									std::string& response) {return true;}
+  virtual bool GetModelExtent(const std::string& name,
+			      double& bx,
+			      double& by,
+			      double& bz,
+			      websim::Pose& center,
+			      std::string& response) {return true;}
 
   virtual bool GetNumberOfRobots(unsigned int& n) {return true;}
   
@@ -96,22 +96,25 @@ class WebGazebo : public websim::WebSim
   /** Get the current simulation time */
   virtual websim::Time GetTime();
 
-  private:
-    double sq_dist_tol, sq_ang_tol;
-    boost::mutex goMutex;
-    boost::condition goCond;
+private:
+  double sq_dist_tol;
+  double sq_ang_tol;
 
-    gazebo::Client *client;
-    gazebo::SimulationIface *simIface;
-    gazebo::FactoryIface *factoryIface;
+  boost::mutex goMutex;
+  boost::condition goCond;
 
-    // Available models
-    std::map<std::string,int> models;
+  gazebo::Client *client;
+  gazebo::SimulationIface *simIface;
+  gazebo::FactoryIface *factoryIface;
 
-    bool CheckTolerances(gazebo::Pose p, gazebo::Pose q);
-    bool GetModel(const std::string& name,
-                  const std::string& type,
-                  std::string& xmldata,
-                  std::string& response);
-    void GoCallback();
+  // Available models
+  std::map<std::string,int> models;
+
+  bool CheckTolerances(gazebo::Pose p, gazebo::Pose q);
+  bool GetModel(const std::string& name,
+		const std::string& type,
+		std::string& xmldata,
+		std::string& response);
+  void GoCallback();
 };
+

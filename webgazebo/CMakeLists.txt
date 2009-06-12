@@ -4,6 +4,9 @@ SET (sources WebGazebo.cc
              ../server/Angle.cc
 )
 
+MESSAGE( STATUS "websim include dirs ${WEBSIM_INCLUDE_DIRS}" )
+MESSAGE( STATUS "websim library dirs ${WEBSIM_LIBRARY_DIRS}" )
+
 INCLUDE_DIRECTORIES( 
   ${CMAKE_SOURCE_DIR}/server
   ${CMAKE_SOURCE_DIR}/libgazebo 
@@ -12,13 +15,14 @@ INCLUDE_DIRECTORIES(
 )
 
 LINK_DIRECTORIES( 
-  ${WEBSIM_LINK_DIRS} 
+  ${WEBSIM_LIBRARY_DIRS} 
   ${boost_library_dirs} 
   ${CMAKE_BINARY_DIR}/libgazebo 
 )
 
 SET_SOURCE_FILES_PROPERTIES(${sources} PROPERTIES COMPILE_FLAGS 
-                            '-DINSTALL_PREFIX="/usr/local/"')
+                            '-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}"')
+
 ADD_LIBRARY(webgz ${sources})
 
 ADD_EXECUTABLE(webgazebo main.cc)
@@ -28,5 +32,7 @@ TARGET_LINK_LIBRARIES( webgz event ${WEBSIM_LINK_LIBS})
 TARGET_LINK_LIBRARIES( webgazebo gazebo event ${WEBSIM_LINK_LIBS} ${boost_libraries} webgz)
 TARGET_LINK_LIBRARIES( client gazebo event ${WEBSIM_LINK_LIBS} ${boost_libraries} webgz)
 
-INSTALL(TARGETS webgazebo DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-INSTALL(TARGETS webgz DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+INSTALL(TARGETS webgazebo webgz client 
+       LIBRARY DESTINATION lib
+       ARCHIVE DESTINATION lib
+       RUNTIME DESTINATION bin )

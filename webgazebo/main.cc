@@ -20,7 +20,7 @@
  */
 
 /* Desc: HTTP portal to libgazebo
- * Author: Brian Gerkey
+ * Author: Brian Gerkey, Richard Vaughan
  * Date: 9 March 2009
  * SVN: $Id: gazebo.h 7398 2009-03-09 07:21:49Z natepak $
  */
@@ -54,8 +54,12 @@ main(int argc, char** argv)
 
   for(;;)
   {
+    //puts( "WGZ LOOP START" );
     //wg.Update();
-    wg.Go(1.0);
+    //wg.Go(1.0);
+    //puts( "WGZ LOOP END" );
+    wg.Wait();
+    usleep( 1e3 );
   }
 
   return 0;
