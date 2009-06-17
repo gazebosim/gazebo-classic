@@ -609,6 +609,8 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int 
 
   if (flWindow)
   {
+    XSync(fl_display, false);
+
     win = OgreCreator::CreateWindow( fl_display, fl_visual->screen, 
         (long)(Fl_X::i(flWindow)->xid), width, height);
     if (win)
@@ -648,7 +650,6 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
              << ":" << (unsigned long)vi;
   */
              
-  XSync(fl_display, false);
 
   ogreHandle << winId;
 
