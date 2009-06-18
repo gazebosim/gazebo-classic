@@ -241,6 +241,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   this->loaded=true;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -259,6 +260,9 @@ void Simulator::Init()
     gzthrow("Failed to Initialize the World\n"  << e);
   }
 
+  // This is not a debug line. This is useful for external programs that 
+  // launch Gazebo and wait till it is ready   
+  std::cout << "Gazebo successfully initialized" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

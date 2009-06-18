@@ -233,18 +233,6 @@ int ParseArgs(int argc, char **argv)
 
   // Get the world file name
   worldFileName = argv[0];
-  tmpFile = fopen(worldFileName, "r");
-
-  if (tmpFile == NULL)
-  {
-    char tmpStr[256];
-    sprintf(tmpStr, "WorldFile [%s]", worldFileName);
-
-    perror(tmpStr);
-    return  -1;
-  }
-  fclose(tmpFile);
-
   return 0;
 }
 

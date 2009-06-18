@@ -88,7 +88,7 @@ void GazeboConfig::Load()
     this->gazeboPaths.push_back(str.substr(pos1,str.size()-pos1));
   }
 
-  if (cfgFile)
+  if (cfgFile.is_open())
   {
     XMLConfig rc;
     XMLConfigNode *node;

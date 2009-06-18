@@ -294,12 +294,14 @@ void World::Fini()
     (*miter)->Fini();
   }
 
-  this->physicsEngine->Fini();
+  if (this->physicsEngine)
+    this->physicsEngine->Fini();
 
   // Done with the external interface
   try
   {
-    this->simIface->Destroy();
+    if (this->simIface)
+      this->simIface->Destroy();
   }
   catch (std::string e)
   { 
@@ -308,7 +310,8 @@ void World::Fini()
 
   try
   {
-    this->server->Fini();
+    if (this->server)
+      this->server->Fini();
   }
   catch (std::string e)
   {

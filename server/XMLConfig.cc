@@ -29,6 +29,7 @@
 #include <math.h>
 #include <string.h>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 
 #include <libxml/xinclude.h>
@@ -66,6 +67,14 @@ XMLConfig::~XMLConfig()
 void XMLConfig::Load( const std::string &filename )
 {
   this->filename = filename;
+
+  std::ifstream fin;
+  fin.open(this->filename.c_str(), std::ios::in);
+  if( !fin.is_open() )
+  {
+    gzthrow( "The world file can not be opened, check path and permissions" );
+  }
+  fin.close();
 
   // Enable line numbering
   xmlLineNumbersDefault( 1 );
