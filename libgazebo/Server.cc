@@ -105,32 +105,37 @@ void Server::Init(int serverId, int force)
     FILE *fp = fopen(pidfn.c_str(), "r");
     if(fp) 
     {
-      int pid;
-      if (fscanf(fp, "%d", &pid) != 0)
-        std::cerr << "Error in libgazebo Server.\n";
-
+      int pid = 0;
+      fscanf(fp, "%d", &pid);
       fclose(fp);
-      std::cout << "found a pid file: pid=" << pid << "\n";
-
-      if(kill(pid, 0) == 0) 
+      
+      if (pid != 0)
       {
-        // a gazebo process is still alive.
-        errStream << "directory [" <<  this->filename
-          <<  "] already exists (previous crash?)\n"
-          << "gazebo (pid=" << pid << ") is still running.";
-        throw(errStream.str());
-      } 
-      else 
-      {
-        // the gazebo process is not alive.
-        // remove directory.
-        std::cout << "The gazebo process is not alive.\n";
-
-        // remove the existing directory.
-        std::string cmd = "rm -rf '" + this->filename + "'";
-        if(system(cmd.c_str()) != 0) {
-          errStream << "couldn't remove directory [" <<  this->filename << "]";
+        if(kill(pid, 0) == 0) 
+        {
+          // a gazebo process is still alive.
+          errStream << "directory [" <<  this->filename
+            <<  "] already exists (previous crash?)\n"
+            << "gazebo (pid=" << pid << ") is still running.\n" 
+            << "re-launch gazebo with a different server id or kill the previous instance" ;
           throw(errStream.str());
+        } 
+        else 
+        {
+          // the gazebo process is not alive.
+          // remove directory.
+          std::cout << "directory [" <<  this->filename
+            <<  "] already exists (previous crash?)\n"
+            << "but the owner gazebo server (pid=" << pid << ") is not running.\n" 
+            << "deleting the directory [" <<  this-> filename 
+            << " old  information" ;
+
+          // remove the existing directory.
+          std::string cmd = "rm -rf '" + this->filename + "'";
+          if(system(cmd.c_str()) != 0) {
+            errStream << "couldn't remove directory [" <<  this->filename << "]";
+            throw(errStream.str());
+          }
         }
       }
     }
