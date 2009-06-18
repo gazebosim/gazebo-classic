@@ -127,8 +127,7 @@ void Server::Init(int serverId, int force)
           std::cout << "directory [" <<  this->filename
             <<  "] already exists (previous crash?)\n"
             << "but the owner gazebo server (pid=" << pid << ") is not running.\n" 
-            << "deleting the directory [" <<  this-> filename 
-            << " old  information" ;
+            << "deleting the old information of the directory [" <<  this-> filename << "]\n"; 
 
           // remove the existing directory.
           std::string cmd = "rm -rf '" + this->filename + "'";

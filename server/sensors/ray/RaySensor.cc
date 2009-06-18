@@ -205,16 +205,19 @@ void RaySensor::InitChild()
 
       ray = new RayGeom(this->body, (**this->displayRaysP) == "lines");
 
-      if ((**this->displayRaysP) == "fan")
+      if (this->rayFan and this->rayFanOutline)
       {
-        if (i == 0)
+        if ((**this->displayRaysP) == "fan")
         {
-          this->rayFan->AddPoint(start);
-          this->rayFanOutline->AddPoint(start);
+          if (i == 0)
+          {
+            this->rayFan->AddPoint(start);
+            this->rayFanOutline->AddPoint(start);
+          }
+ 
+          this->rayFan->AddPoint(end);
+          this->rayFanOutline->AddPoint(end);
         }
-
-        this->rayFan->AddPoint(end);
-        this->rayFanOutline->AddPoint(end);
       }
 
       ray->SetPoints(start, end);
@@ -223,16 +226,19 @@ void RaySensor::InitChild()
     }
   }
 
-  if ((**this->displayRaysP) == "fan")
+  if (this->rayFan and this->rayFanOutline)
   {
-    this->rayFan->AddPoint(this->rayFan->GetPoint(0));
-    this->rayFan->setMaterial("Gazebo/BlueLaser");
+    if ((**this->displayRaysP) == "fan")
+    {
+      this->rayFan->AddPoint(this->rayFan->GetPoint(0));
+      this->rayFan->setMaterial("Gazebo/BlueLaser");
 
-    this->rayFanOutline->AddPoint(this->rayFanOutline->GetPoint(0));
-    this->rayFanOutline->setMaterial("Gazebo/BlueEmissive");
+      this->rayFanOutline->AddPoint(this->rayFanOutline->GetPoint(0));
+      this->rayFanOutline->setMaterial("Gazebo/BlueEmissive");
 
-    this->visualNode->AttachObject(this->rayFan);
-    this->visualNode->AttachObject(this->rayFanOutline);
+      this->visualNode->AttachObject(this->rayFan);
+      this->visualNode->AttachObject(this->rayFanOutline);
+    }
   }
 
 }
@@ -416,17 +422,20 @@ void RaySensor::UpdateChild()
         this, &UpdateCallback );
     ode->UnlockMutex();
 
-    if ((**this->displayRaysP) == "fan")
-    { 
-      i = 1;
-      for (iter = this->rays.begin(); iter != this->rays.end(); iter++, i++)
-      {
-        (*iter)->Update();
+    if (this->rayFan and this->rayFanOutline)
+    {
+      if ((**this->displayRaysP) == "fan")
+      { 
+        i = 1;
+        for (iter = this->rays.begin(); iter != this->rays.end(); iter++, i++)
+        {
+          (*iter)->Update();
 
-        (*iter)->GetRelativePoints(a,b);
+          (*iter)->GetRelativePoints(a,b);
 
-        this->rayFan->SetPoint(i,b);
-        this->rayFanOutline->SetPoint(i,b);
+          this->rayFan->SetPoint(i,b);
+          this->rayFanOutline->SetPoint(i,b);
+        }
       }
     }
   }
