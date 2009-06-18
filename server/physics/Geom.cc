@@ -183,10 +183,10 @@ void Geom::Load(XMLConfigNode *node)
 
     this->bbVisual = OgreCreator::Instance()->CreateVisual(
         visname.str(), this->visualNode);
-    this->bbVisual->SetCastShadows(false);
 
     if (this->bbVisual)
     {
+      this->bbVisual->SetCastShadows(false);
       this->bbVisual->AttachBoundingBox(min,max);
       this->bbVisual->SetRotation(pose.rot.GetInverse()); //transform aabb from global frame back to local frame
     }
