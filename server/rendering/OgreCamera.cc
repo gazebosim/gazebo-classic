@@ -107,6 +107,9 @@ OgreCamera::~OgreCamera()
 void OgreCamera::LoadCam( XMLConfigNode *node )
 {
 
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    gzthrow("Cameras can not be used when running Gazebo without rendering engine");
+
   this->visibilityMask = GZ_ALL_CAMERA; 
 
   if (node)

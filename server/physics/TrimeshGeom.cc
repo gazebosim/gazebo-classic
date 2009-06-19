@@ -117,6 +117,9 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
+  
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    gzthrow("Trimesh objects are not supported when running Gazebo without rendering engine");
 
   mesh = Ogre::MeshManager::getSingleton().load(this->meshNameP->GetValue(),Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
