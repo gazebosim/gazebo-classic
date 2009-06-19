@@ -65,21 +65,19 @@ public:
 			   websim::Acceleration& a,
 			   std::string& error);
 
-  virtual bool GetLaserData(const std::string& name,
-			    websim::Time& t,
-			    uint32_t& resolution,
-			    double& fov,
-			    websim::Pose& p,
-			    std::vector<double>& ranges,
-			    std::string& response) { return true;}
+  virtual bool GetModelType(const std::string& name, std::string& type){return true;}
 
-	 
-  virtual bool GetRangerData(const std::string& name,
-			     websim::Time& t,
-			     std::vector<websim::Pose>& p,
-			     std::vector<double>& ranges,
-			     std::string& response) {return true;}
   
+
+  virtual bool GetModelData(const std::string& name, 
+									std::string& response,
+									websim::Format format,
+									void* xmlnode );
+
+  
+  
+  virtual bool GetModelChildren(const std::string& model, 
+									std::vector<std::string>& children){return true;}
   
   virtual bool GetModelExtent(const std::string& name,
 			      double& bx,
@@ -106,7 +104,7 @@ private:
   gazebo::Client *client;
   gazebo::SimulationIface *simIface;
   gazebo::FactoryIface *factoryIface;
-
+  gazebo::LaserIface *laserIface;
   // Available models
   std::map<std::string,int> models;
 

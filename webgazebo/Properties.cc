@@ -120,6 +120,57 @@ WebGazebo::SetModelPVA(const std::string& name,
   return true;
 }
 
+bool 
+WebGazebo::GetModelData(const std::string& name, 
+									std::string& response,
+									websim::Format format,
+									void* xmlnode )
+{/*
+  puts("data request:");
+  puts(name.c_str());
+  std::string mname = name;
+  int i=mname.find(".");        
+  if(i>0){
+  	mname.erase(i,1);
+  	mname.insert(i,"-");
+  }
+ 
+  websim::Time t= GetTime();
+  puts("laser:::");
+  puts(mname.c_str());
+
+  this->laserIface->Open(this->client, mname);
+  uint32_t resolution;
+  double fov;
+  websim::Pose p;
+  std::vector<double> ranges;                                                                
+
+  p.x = laserIface->data->pose.pos.x;
+  p.y = laserIface->data->pose.pos.y;
+  p.z = laserIface->data->pose.pos.z;
+  p.r = laserIface->data->pose.roll;
+  p.p = laserIface->data->pose.pitch;
+  p.a = laserIface->data->pose.yaw;
+  
+  //resolution = laserIface->data->res_angle;
+ 
+  int count = laserIface->data->range_count;
+
+  float maxRange = 0;
+  for (int i = 0; i < count; i++)
+  {
+        ranges.push_back(laserIface->data->ranges[i]);
+        
+  }
+  
+  WebSim::GetLaserData(name, t, resolution, fov, p, ranges, format, response, xmlnode);
+
+  this->laserIface->Close();
+*/
+  return true;
+
+}
+
 bool
 WebGazebo::CheckTolerances(gazebo::Pose p, gazebo::Pose q)
 {

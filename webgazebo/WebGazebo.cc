@@ -50,6 +50,7 @@ WebGazebo::WebGazebo(const std::string& fedfile,
   this->client = new gazebo::Client();
   this->simIface = new gazebo::SimulationIface();
   this->factoryIface = new gazebo::FactoryIface();
+  this->laserIface = new gazebo::LaserIface();
   this->client->ConnectWait(0, GZ_CLIENT_ID_USER_FIRST);
   // Open the Simulation Interface; let exceptions leak out
   this->simIface->Open(this->client, "default");
@@ -63,6 +64,7 @@ WebGazebo::WebGazebo(const std::string& fedfile,
 
 WebGazebo::~WebGazebo()
 {
+  delete this->laserIface;
   delete this->simIface;
   delete this->client;
 }
