@@ -237,6 +237,35 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       req->value = NULL;
     }
   }
+/* This depends on Player SVN, wait to the release of Player 3.0 to uncomment? 
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_SIMULATION_CMD_PAUSE, 
+                                 this->device_addr))
+  {
+    this->iface->Lock(1);
+    SimulationRequestData *gzReq = &&(this->iface->data->requests[this->iface->data->requestCount++]);
+    gzReq->type = SimulationRequestData::PAUSE;
+    this->iface->Unlock();
+  } 
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_SIMULATION_CMD_RESET, 
+                                 this->device_addr))
+  {
+    this->iface->Lock(1);
+    SimulationRequestData *gzReq = &&(this->iface->data->requests[this->iface->data->requestCount++]);
+    gzReq->type = SimulationRequestData::RESET;
+    this->iface->Unlock();
+  } 
+  else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
+                                 PLAYER_SIMULATION_CMD_SAVE, 
+                                 this->device_addr))
+  {
+    this->iface->Lock(1);
+    SimulationRequestData *gzReq = &&(this->iface->data->requests[this->iface->data->requestCount++]);
+    gzReq->type = SimulationRequestData::SAVE;
+    this->iface->Unlock();
+  }
+*/ 
   else
     printf("Unhandled Process message[%d][%d]\n",0,0);
 
