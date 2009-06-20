@@ -215,6 +215,11 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       {
         memcpy(req->value, &this->iface->data->realTime, sizeof(double));
       }
+      else if (prop == "state")
+      {
+        memcpy(req->value, &this->iface->data->state, sizeof(int));
+      }
+
     }
     else
     {
