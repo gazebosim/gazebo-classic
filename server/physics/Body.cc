@@ -364,6 +364,34 @@ bool Body::GetSelfCollide()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the laser fiducial integer id of this body
+void Body::SetLaserFiducialId(int id)
+{
+  std::map< std::string, Geom* >::iterator giter;
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    giter->second->SetLaserFiducialId( id );
+  }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the laser retro reflectiveness of this body
+void Body::SetLaserRetro(float retro)
+{
+  std::map< std::string, Geom* >::iterator giter;
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+  {
+    giter->second->SetLaserRetro( retro );
+  }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Initialize the body
 void Body::Init()
 {

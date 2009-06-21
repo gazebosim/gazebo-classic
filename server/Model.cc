@@ -84,6 +84,12 @@ Model::Model(Model *parent)
   this->collideP = new ParamT<std::string>("collide", "all", 0);
   this->collideP->Callback( &Model::SetCollideMode, this );
 
+  this->laserFiducialP = new ParamT<int>("laserFiducialId", -1, 0);
+  this->laserFiducialP->Callback( &Model::SetLaserFiducialId, this );
+
+  this->laserRetroP = new ParamT<float>("laserRetro", -1, 0);
+  this->laserRetroP->Callback( &Model::SetLaserRetro, this );
+
   Param::End();
 
   this->graphicsHandler = NULL;
@@ -244,6 +250,9 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->SetFrictionMode( **this->enableFrictionP );
 
   this->SetCollideMode( **this->collideP );
+
+  this->SetLaserFiducialId( **this->laserFiducialP);
+  this->SetLaserRetro( **this->laserRetroP);
 
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();
@@ -971,6 +980,38 @@ void Model::SetCollideMode( const std::string &m )
     body = iter->second;
 
     body->SetCollideMode( m );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the collide mode of the model
+void Model::SetLaserFiducialId( const int &id )
+{
+  Body *body;
+
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetLaserFiducialId( id );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the collide mode of the model
+void Model::SetLaserRetro( const float &retro )
+{
+  Body *body;
+
+  std::map<std::string, Body* >::iterator iter;
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    body = iter->second;
+
+    body->SetLaserRetro( retro );
   }
 }
 

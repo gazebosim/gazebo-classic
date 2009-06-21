@@ -138,6 +138,12 @@ namespace gazebo
     //         with other bodies even if they share the same parent.
     public: bool GetSelfCollide();
 
+    /// \brief Set the laser fiducial integer id
+    public: void SetLaserFiducialId(int id);
+
+   /// \brief Set the laser retro reflectiveness
+    public: void SetLaserRetro(float retro);
+
     /// \brief Set the linear velocity of the body
     public: void SetLinearVel(const Vector3 &vel);
 

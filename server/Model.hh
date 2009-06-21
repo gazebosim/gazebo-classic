@@ -178,6 +178,12 @@ namespace gazebo
     /// \brief Set the collide mode of the model
     public: void SetCollideMode( const std::string &m );
 
+    /// \brief Set the laser fiducial integer Id of the model
+    public: void SetLaserFiducialId( const int &id );
+
+    /// \brief Set the laser retro reflectiveness of the model
+    public: void SetLaserRetro( const float &retro );
+
     /// \brief Load a body helper function
     /// \param node XML Configuration node
     private: void LoadBody(XMLConfigNode *node);
@@ -230,6 +236,8 @@ namespace gazebo
     private: ParamT<std::string> *myBodyNameP;
     private: ParamT<bool> *enableGravityP;
     private: ParamT<bool> *enableFrictionP;
+    private: ParamT<int> *laserFiducialP;
+    private: ParamT<float> *laserRetroP;
     private: ParamT<std::string> *collideP;
 
 
