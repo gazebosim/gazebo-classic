@@ -15,6 +15,15 @@
 
 <canonicalBody>chassis_body</canonicalBody>
 
+<controller:differential_position2d name="controller1">
+  <leftJoint>left_front_wheel_hinge</leftJoint>
+  <rightJoint>right_front_wheel_hinge</rightJoint>
+  <wheelSeparation>0.34</wheelSeparation>
+  <wheelDiameter>0.15</wheelDiameter>
+  <torque>10.0</torque>
+  <interface:position name="position_iface_0"/>
+</controller:differential_position2d>
+
 <body:box name="chassis_body">
   <geom:box name="chassis_geom">
     <size>0.497 0.247 0.191</size>

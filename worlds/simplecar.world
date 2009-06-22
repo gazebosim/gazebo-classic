@@ -75,33 +75,6 @@
     <xyz>0 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
-  <controller:steering_position2d name="a car">
-    <wheel>
-       <joint>left_front_wheel_hinge</joint>
-       <type>steer</type>
-       <torque>1000</torque>
-        <steerTorque>1000</steerTorque>
-    </wheel>
-    <wheel>
-       <joint>right_front_wheel_hinge</joint>
-       <type>steer</type>
-       <torque>1000</torque>
-        <steerTorque>1000</steerTorque>
-    </wheel>
-    <wheel>
-      <joint>left_rear_wheel_hinge</joint>
-       <type>drive</type>
-       <torque>1000</torque>
-    </wheel>
-    <wheel>
-      <joint>right_rear_wheel_hinge</joint>
-       <type>drive</type>
-       <torque>1000</torque>
-    </wheel>
-    <steerPD>10 0</steerPD>
-    <steerMaxAngle>50</steerMaxAngle>
-    <interface:position name="position_iface_0"/>
-  </controller:steering_position2d>
 
     <!-- 
     The include should be last within a model. All previous statements

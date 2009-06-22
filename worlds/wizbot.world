@@ -99,15 +99,6 @@
     <xyz>1 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
-    <controller:differential_position2d name="controller1">
-      <leftJoint>left_wheel_hinge</leftJoint>
-      <rightJoint>right_wheel_hinge</rightJoint>
-      <wheelSeparation>0.34</wheelSeparation>
-      <wheelDiameter>0.15</wheelDiameter>
-      <torque>5</torque>
-      <interface:position name="position_iface_1"/>
-    </controller:differential_position2d>
-
     <model:physical name="laser">
       <xyz>0.15 0 0.18</xyz>
 
@@ -129,30 +120,6 @@
   <model:physical name="wizbot_model1">
     <xyz>0 0 0.1</xyz>
     <rpy>0 0 0</rpy>
-
-    <controller:holonome3sw_position2d name="controller1">
-
-      <wheels>
-	<radius>0.075</radius>
-	<distance>0.175</distance>
-	<torque>2</torque>
-	<swedish0>
-	  <joint>wheel0_hinge</joint>
-	  <alpha>0</alpha>
-	</swedish0>
-	<swedish1>
-	  <joint>wheel1_hinge</joint>
-	  <alpha>120</alpha>
-	</swedish1>
-	<swedish2>
-	  <joint>wheel2_hinge</joint>
-	  <alpha>240</alpha>
-	</swedish2>
-      </wheels>
-      
-      <interface:position name="position_iface_0"/>
-      
-    </controller:holonome3sw_position2d>
     
     <include embedded="true">
       <xi:include href="models/wizbot.model" />

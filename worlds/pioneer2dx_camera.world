@@ -86,15 +86,6 @@
     <xyz>0 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
-    <controller:differential_position2d name="controller1">
-      <leftJoint>left_wheel_hinge</leftJoint>
-      <rightJoint>right_wheel_hinge</rightJoint>
-      <wheelSeparation>0.34</wheelSeparation>
-      <wheelDiameter>0.15</wheelDiameter>
-      <torque>5</torque>
-      <interface:position name="position_iface_0"/>
-    </controller:differential_position2d>
-
     <model:physical name="sonyvid30_model">
       <xyz>0.15 0 0.09</xyz>
 
