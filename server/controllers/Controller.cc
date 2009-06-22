@@ -103,6 +103,16 @@ void Controller::Load(XMLConfigNode *node)
     // Get the name of the iface
     std::string ifaceName = childNode->GetString("name","",1);
 
+    // Constructor the heirarchical name for the iface
+    Entity *p = parent;
+    while (p != NULL)
+    {
+      Model *m = dynamic_cast<Model*>(p);
+      if (m)
+        ifaceName.insert(0, m->GetName()+"::");
+      p = p->GetParent();
+    }
+
     try
     {
       // Use the factory to get a new iface based on the type

@@ -114,11 +114,6 @@ Simulator::~Simulator()
     this->physicsThread = NULL;
   }
 
-  if (this->mutex)
-  {
-    delete this->mutex;
-    this->mutex = NULL;
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
