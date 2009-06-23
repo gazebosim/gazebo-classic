@@ -14,6 +14,15 @@
 	<rpy>0 0 0</rpy>
 	
 	<canonicalBody>epuck_chassis</canonicalBody>
+        <controller:differential_position2d name="controller1">
+                <leftJoint>left_wheel_hinge</leftJoint>
+                <rightJoint>right_wheel_hinge</rightJoint>
+                <wheelSeparation>0.052</wheelSeparation>
+                <wheelDiameter>0.042</wheelDiameter>
+                <torque>10</torque>
+                <interface:position name="position_iface_0"/>
+        </controller:differential_position2d>
+ 
 	<body:box name="epuck_chassis">
 		<xyz>0.0 0.0 0.02</xyz>
 		<geom:box name="chassis_geom">

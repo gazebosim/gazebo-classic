@@ -167,35 +167,12 @@
 		<xyz>-0.1 0.2 0.0</xyz>
 		<rpy>0 0 -10</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
-		<model:physical name="cam">
-			<body:empty name="epuck_camera">
-				<rpy>0.0 0.0 180.0</rpy>
-				<xyz>-0.026 0.0 0.030</xyz>
-				<sensor:camera name="epuck_cam_sensor">
-					<imageSize>200 150</imageSize>
-					<hfov>60</hfov>
-					<nearClip>0.02</nearClip>
-					<farClip>20</farClip>
-					<saveFrames>false</saveFrames>
-					<saveFramePath>frames</saveFramePath>
-				</sensor:camera>
-			</body:empty>
-			
-			<attach>
-				<parentBody>epuck_chassis</parentBody>
-				<myBody>epuck_camera</myBody>
-			</attach>
-		</model:physical>
+
+		<model:physical name="camera">	
+  		        <include embedded="true">
+			        <xi:include href="models/epuck_camera.model"/>
+		        </include>
+                </model:physical>
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -205,16 +182,7 @@
 		<xyz>0.1 0.2 0.0</xyz>
 		<rpy>0 0 -36</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -224,16 +192,7 @@
 		<xyz>-0.3 0.2 0.0</xyz>
 		<rpy>0 0 180</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -243,16 +202,7 @@
 		<xyz>0.3 0.2 0.0</xyz>
 		<rpy>0 0 -90</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -262,16 +212,7 @@
 		<xyz>-0.5 0.2 0.0</xyz>
 		<rpy>0 0 90</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -281,16 +222,7 @@
 		<xyz>0.5 0.2 0.0</xyz>
 		<rpy>0 0 0</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -300,16 +232,7 @@
 		<xyz>-0.7 0.2 0.0</xyz>
 		<rpy>0 0 -220</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -319,16 +242,7 @@
 		<xyz>0.7 0.2 0.0</xyz>
 		<rpy>0 0 220</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -338,16 +252,7 @@
 		<xyz>-0.1 -0.2 0.0</xyz>
 		<rpy>0 0 -120</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
+	
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -357,15 +262,6 @@
 		<xyz>0.1 -0.2 0.0</xyz>
 		<rpy>0 0 120</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
 		
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
@@ -377,15 +273,6 @@
 		<rpy>0 0 -50</rpy>
 		<static>false</static>
 		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -395,15 +282,6 @@
 		<xyz>0.3 -0.2 0.0</xyz>
 		<rpy>0 0 50</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
 		
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
@@ -415,15 +293,6 @@
 		<rpy>0 0 -80</rpy>
 		<static>false</static>
 		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -433,15 +302,6 @@
 		<xyz>0.5 -0.2 0.0</xyz>
 		<rpy>0 0 80</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
 		
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
@@ -453,17 +313,6 @@
 		<rpy>0 0 20</rpy>
 		<static>false</static>
 		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
-		
-		
-		
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
 		</include>
@@ -473,15 +322,6 @@
 		<xyz>0.7 -0.2 0.0</xyz>
 		<rpy>0 0 -20</rpy>
 		<static>false</static>
-		
-		<controller:differential_position2d name="controller1">
-			<leftJoint>left_wheel_hinge</leftJoint>
-			<rightJoint>right_wheel_hinge</rightJoint>
-			<wheelSeparation>0.052</wheelSeparation>
-			<wheelDiameter>0.042</wheelDiameter>
-			<torque>10</torque>
-			<interface:position name="position_iface_0"/>
-		</controller:differential_position2d>
 		
 		<include embedded="true">
 			<xi:include href="models/epuck_new.model"/>
