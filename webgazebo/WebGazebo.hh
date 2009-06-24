@@ -25,17 +25,8 @@
  * SVN: $Id: gazebo.h 7398 2009-03-09 07:21:49Z natepak $
  */
 
-#include <string>
-#include <map>
-
-// These headers must be included prior to the libevent headers
-#include <sys/types.h>
-#include <sys/queue.h>
-
-// libgazebo;
-#include "gazebo.h"
-
-#include "websim.hh"
+#include <gazebo.h>
+#include <websim.hh>
 
 class WebGazebo : public websim::WebSim
 {
@@ -45,19 +36,29 @@ public:
 	    double dtol, double atol);
   virtual ~WebGazebo();
 
-  bool Go(double t);
-    
-  // Interface to be implemented by simulators
+    bool Go(double t);
+  
+  // start WebSim Interface ============================================================
+  
+  virtual std::string IdentificationString()
+  { return "WebGazebo"; }
+  
+  virtual std::string VersionString()
+  {  return "0.1"; }
+
   virtual bool CreateModel(const std::string& name, 
 			   const std::string& type,
 			   std::string& error);
+
   virtual bool DeleteModel(const std::string& name,
 			   std::string& error);
+
   virtual bool SetModelPVA(const std::string& name, 
 			   const websim::Pose& p,
 			   const websim::Velocity& v,
 			   const websim::Acceleration& a,
 			   std::string& error);
+
   virtual bool GetModelPVA(const std::string& name, 
 			   websim::Time &t,
 			   websim::Pose& p,
@@ -65,42 +66,46 @@ public:
 			   websim::Acceleration& a,
 			   std::string& error);
 
-  virtual bool GetModelType(const std::string& name, std::string& type){return true;}
-
-  
+  virtual bool GetModelType(const std::string& name, std::string& type)
+  {return true;}
 
   virtual bool GetModelData(const std::string& name, 
-									std::string& response,
-									websim::Format format,
-									void* xmlnode );
-
-  
+			    std::string& response,
+			    websim::Format format,
+			    void* xmlnode );
   
   virtual bool GetModelChildren(const std::string& model, 
-									std::vector<std::string>& children){return true;}
+				std::vector<std::string>& children)
+  {return true;}
   
   virtual bool GetModelExtent(const std::string& name,
 			      double& bx,
 			      double& by,
 			      double& bz,
 			      websim::Pose& center,
-			      std::string& response) {return true;}
-
-  virtual bool GetNumberOfRobots(unsigned int& n) {return true;}
+			      std::string& response) 
+  {return true;}
   
-  virtual bool GetSayStrings(std::vector<std::string>& sayings) {return true;}
-
-
+  virtual bool GetNumberOfRobots(unsigned int& n)
+  {return true;}
+  
+  virtual bool GetSayStrings(std::vector<std::string>& sayings) 
+  {return true;}
+    
   /** Get the current simulation time */
   virtual websim::Time GetTime();
 
-private:
+  // end WebSim Interface ============================================================
+
+
+private: // all private members are specific to WebGazebo
+
   double sq_dist_tol;
   double sq_ang_tol;
-
+  
   boost::mutex goMutex;
   boost::condition goCond;
-
+  
   gazebo::Client *client;
   gazebo::SimulationIface *simIface;
   gazebo::FactoryIface *factoryIface;

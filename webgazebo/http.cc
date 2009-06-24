@@ -30,19 +30,23 @@ cb(evhttp_request* req, void* arg)
 }
 
 int
-main(void)
+main( int argc, char* argv[] )
 {
-  struct evhttp_connection* ec;
-  struct evhttp_request* er;
-
+  // initialize libevent
   event_init();
-
-  ec = evhttp_connection_new("localhost", 8000);
+  
+  struct evhttp_connection* ec( evhttp_connection_new("localhost", 8000) );
   assert(ec);
+  
+  struct evhttp_request* er(evhttp_request_new(cb, NULL));
+  assert( er );
+ 
+  char* request = (char*)"";
 
-  er = evhttp_request_new(cb, NULL);
+  if( argc == 1 && argv[1] )
+    request = argv[1];
 
-  int ret = evhttp_make_request(ec, er, EVHTTP_REQ_GET, "/foo");
+  int ret = evhttp_make_request(ec, er, EVHTTP_REQ_GET, request );
   printf("ret: %d\n", ret);
 
   event_dispatch();

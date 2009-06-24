@@ -51,6 +51,7 @@ main(int argc, char** argv)
   }
 
   WebGazebo wg(g_fedfile, g_host, g_port, g_dtol, g_atol);
+  wg.Startup( true );
 
   for(;;)
   {

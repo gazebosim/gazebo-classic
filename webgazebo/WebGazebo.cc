@@ -38,11 +38,13 @@
 #include "Quatern.hh"
 
 WebGazebo::WebGazebo(const std::string& fedfile,
-                     const std::string& host, unsigned short port,
-                     double dtol, double atol) :
-        websim::WebSim(host, port), 
-        sq_dist_tol(dtol*dtol), 
-	sq_ang_tol(atol*atol)
+                     const std::string& host, 
+		     unsigned short port,
+                     double dtol, 
+		     double atol) :
+  websim::WebSim(host, port), 
+  sq_dist_tol(dtol*dtol), 
+  sq_ang_tol(atol*atol)
 {
   // Hook up to Gazebo
   printf("[webgazebo] Opening Gazebo simulation interface...");
@@ -55,8 +57,8 @@ WebGazebo::WebGazebo(const std::string& fedfile,
   // Open the Simulation Interface; let exceptions leak out
   this->simIface->Open(this->client, "default");
   puts( "(opened sim interface)" );
-  //this->factoryIface->Open(this->client, "factory_iface");
-  //puts( "(opened factory interface)" );
+  this->factoryIface->Open(this->client, "factory_model::factory_iface");
+  puts( "(opened factory interface)" );
   puts("Done.");
 
   puts("[webgazebo] Ready");
@@ -68,6 +70,7 @@ WebGazebo::~WebGazebo()
   delete this->simIface;
   delete this->client;
 }
+  
 
 /** Get the current simulation time */
 websim::Time 
