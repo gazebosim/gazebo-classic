@@ -252,7 +252,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->SetCollideMode( **this->collideP );
 
   this->SetLaserFiducialId( **this->laserFiducialP);
-  this->SetLaserRetro( **this->laserRetroP);
+  //this->SetLaserRetro( **this->laserRetroP);
 
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();
