@@ -95,6 +95,7 @@ APPEND_TO_SERVER_HEADERS(${headers})
 APPEND_TO_SERVER_SOURCES(${sources})
 
 ADD_LIBRARY(gazebo_server SHARED ${gazeboserver_sources})
+SET_TARGET_PROPERTIES(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
 
 ADD_EXECUTABLE(gazebo-exec main.cc)
 SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")

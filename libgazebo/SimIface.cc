@@ -6,6 +6,7 @@
 #include <sys/sem.h>
 #include <signal.h>
 
+#include <stdio.h>
 
 #include "gazebo.h"
 

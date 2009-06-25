@@ -1,14 +1,14 @@
 INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+INCLUDE (${gazebo_cmake_dir}/FindOS.cmake)
+SET(FLTK_SKIP_FLUID TRUE)
 INCLUDE (FindFLTK)
 INCLUDE (FindPkgConfig)
+INCLUDE (${gazebo_cmake_dir}/FindOde.cmake)
+INCLUDE (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
 SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
-
-SET (freeimage_include_dir "/usr/include/" CACHE STRING "FreeImage include paths")
-SET (freeimage_library_dir "/usr/lib" CACHE STRING "FreeImage library paths")
-SET (freeimage_library "freeimage" CACHE STRING "FreeImage library")
 
 SET (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
@@ -40,78 +40,6 @@ IF (PKG_CONFIG_FOUND)
                           ${gazeboserver_link_libs_desc} 
                           ${OGRE_LDFLAGS})
   ENDIF (NOT OGRE_FOUND)
-
-  pkg_check_modules(ODE ode>=${ODE_VERSION})
-  IF (NOT ODE_FOUND)
-    MESSAGE (SEND_ERROR "\nError: ODE and development files not found. See the following website: http://www.ode.org")
-  ELSE (NOT ODE_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${ODE_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${ODE_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LDFLAGS})
-  ENDIF (NOT ODE_FOUND)
-
-  pkg_check_modules(FI freeimage>=${FREEIMAGE_VERSION})
-  IF (NOT FI_FOUND)
-    MESSAGE (STATUS "freeimage.pc not found, trying freeimage_include_dir and freeimage_library_dir flags.")
-
-    FIND_PATH(freeimage_include_dir FreeImage.h ${freeimage_include_dir})
-    IF (NOT freeimage_include_dir)
-      MESSAGE (STATUS "Looking for FreeImage.h - not found")
-      MESSAGE (FATAL_ERROR "Unable to find FreeImage.h")
-    ELSE (NOT freeimage_include_dir)
-
-      # Check the FreeImage header for the right version
-      SET (testFreeImageSource ${CMAKE_CURRENT_BINARY_DIR}/CMakeTmp/test_freeimage.cc)
-      FILE (WRITE ${testFreeImageSource}
-            "#include <FreeImage.h>\nint main () { if (FREEIMAGE_MAJOR_VERSION >= ${FREEIMAGE_MAJOR_VERSION} && FREEIMAGE_MINOR_VERSION >= ${FREEIMAGE_MINOR_VERSION}) return 1; else return 0;} \n")
-      TRY_RUN(FREEIMAGE_RUNS FREEIMAGE_COMPILES ${CMAKE_CURRENT_BINARY_DIR} 
-                ${testFreeImageSource})
-      IF (NOT FREEIMAGE_RUNS)
-        MESSAGE (FATAL_ERROR "Invalid FreeImage Version. Requires 
-                  ${FREEIMAGE_VERSION}")
-      ELSE (NOT FREEIMAGE_RUNS)
-        MESSAGE (STATUS "Looking for FreeImage.h - found")
-      ENDIF (NOT FREEIMAGE_RUNS)
-
-    ENDIF (NOT freeimage_include_dir)
-
-    FIND_LIBRARY(freeimage_library freeimage ${freeimage_library_dir})
-    IF (NOT freeimage_library)
-      MESSAGE (STATUS "Looking for libfreeimage - not found")
-      MESSAGE (FATAL_ERROR "Unable to find libfreeimage")
-    ELSE (NOT freeimage_library)
-      MESSAGE (STATUS "Looking for libfreeimage - found")
-    ENDIF (NOT freeimage_library)
-
-  ELSE (NOT FI_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${FI_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${FI_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${FI_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${FI_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${FI_LDFLAGS})
-  ENDIF (NOT FI_FOUND)
 
   pkg_check_modules(XML libxml-2.0)
   IF (NOT XML_FOUND)
@@ -208,7 +136,7 @@ IF (PKG_CONFIG_FOUND)
     SET (HAVE_FFMPEG TRUE)
   ENDIF (AVF_FOUND AND AVC_FOUND)
 
-  pkg_check_modules(PLAYER playerc++)
+  pkg_check_modules(PLAYER playerc++>=2.1)
   IF (NOT PLAYER_FOUND)
     SET (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
     MESSAGE (STATUS "Warning: Player not found. The gazebo plugin for player will not be built. See the following website: http://playerstage.sourceforge.net")

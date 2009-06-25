@@ -29,6 +29,8 @@
 
 #include <vector>
 
+#include <stdint.h>
+
 #include "Angle.hh"
 #include "Sensor.hh"
 #include "Body.hh"
