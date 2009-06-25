@@ -199,7 +199,7 @@ int main()
     simIface->Open(client, "default");
 
     g3dIface->Open(client, "default");
-    posIface->Open(client, "position_iface_0");
+    posIface->Open(client, "pioneer2dx_model1::position_iface_0");
     pioneerG3DIface->Open(client,"pioneer2dx_model1");
   }
   catch (std::string e)

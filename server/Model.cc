@@ -464,12 +464,6 @@ void Model::Update()
     this->xyzP->SetValue(this->pose.pos);
     this->rpyP->SetValue(this->pose.rot);
   }
-
-  if (this->graphicsHandler)
-  {
-    this->graphicsHandler->Update();
-  }
-
   
 #ifdef TIMING
   this->UpdateChild();
@@ -482,12 +476,19 @@ void Model::Update()
    this->UpdateChild();
 #endif
 
-
-
-
-
-  this->UpdateChild();
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Primarily used to update the graphics interfaces
+void Model::GraphicsUpdate()
+{
+  if (this->graphicsHandler)
+  {
+    this->graphicsHandler->Update();
+  }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finalize the model

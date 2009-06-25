@@ -216,6 +216,21 @@ void World::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Primarily used to update the graphics interfaces
+void World::GraphicsUpdate()
+{
+  // Update all the models
+  std::vector< Model* >::iterator miter;
+  for (miter=this->models.begin(); miter!=this->models.end(); miter++)
+  {
+    if (*miter)
+    {
+      (*miter)->GraphicsUpdate();
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Update the world
 void World::Update()
 {

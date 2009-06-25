@@ -82,7 +82,10 @@ namespace gazebo
     /// \brief Update the model
     /// \param params Update parameters
     public: void Update();
-  
+
+    /// \brief Primarily used to update the graphics interfaces
+    public: void GraphicsUpdate();
+
     /// \brief Finalize the model
     public: void Fini();
 

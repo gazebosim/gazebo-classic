@@ -360,6 +360,7 @@ void Simulator::MainLoop()
       }
 
       World::Instance()->ProcessEntitiesToLoad();
+      World::Instance()->GraphicsUpdate();
 
       currTime = this->GetWallTime();
 

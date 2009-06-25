@@ -82,6 +82,9 @@ class World : public SingletonT<World>
   /// Update the world
   public: void Update();
 
+  /// \brief Primarily used to update the graphics interfaces
+  public: void GraphicsUpdate();
+
   /// Finilize the world
   public: void Fini();
 
