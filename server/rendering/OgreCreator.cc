@@ -77,6 +77,7 @@ void OgreCreator::LoadBasicShapes()
   OgreSimpleShape::CreateBox("unit_box_U1V1", Vector3(1,1,1), 
                              Vector2<double>(1,1));
   OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
+  OgreSimpleShape::CreateCone("unit_cone", 0.5, 1.0, 5, 32);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -66,7 +66,7 @@ void GazeboConfig::Load()
     int pos2 = str.find(delim);
     while (pos2 != (int)std::string::npos)
     {
-      this->ogrePaths.push_back(str.substr(pos1,pos2-pos1+1));
+      this->ogrePaths.push_back(str.substr(pos1,pos2-pos1));
       pos1 = pos2+1;
       pos2 = str.find(delim,pos2+1);
     }

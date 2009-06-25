@@ -99,6 +99,25 @@
     </body:cylinder>
   </model:physical>
 
+  <model:physical name="cone1_model">
+    <xyz>1 -3.5 0.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <body:cone name="cone_body">
+      <geom:cylinder name="cylinder_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cone</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cone>
+  </model:physical>
+
+
    <!-- Ground Plane -->
    <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>

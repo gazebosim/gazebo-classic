@@ -310,6 +310,7 @@ void OgreAdaptor::LoadPlugins()
   {
     std::string path(*iter);
     DIR *dir=opendir(path.c_str()); 
+
     if (dir == NULL)
     {
       continue;
@@ -330,7 +331,6 @@ void OgreAdaptor::LoadPlugins()
       {
         // Load the plugin into OGRE
         this->root->loadPlugin(*piter);
-        //gzmsg(2) << "Loaded plugin:" << (*piter);
       }
       catch (Ogre::Exception e)
       {
@@ -380,7 +380,6 @@ void OgreAdaptor::SetupResources()
       while ( (dir_entry_p = readdir(dir))!=NULL )
       {
         filename =(*iter)+"/Media/sets/"+ dir_entry_p->d_name;
-        //std::cout << filename << std::endl;
         archNames.push_back(filename);
       }
       closedir(dir);

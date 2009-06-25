@@ -28,8 +28,12 @@ class OgreSimpleShape
                                 const Vector2<double> &uvCoords);
 
   /// \brief Create a cylinder mesh
-  public: static void CreateCylinder(const std::string &name, float radius, float height, int rings, int segments);
+  public: static void CreateCylinder(const std::string &name, float radius, 
+                                     float height, int rings, int segments);
 
+  /// \brief Create a cone mesh
+  public: static void CreateCone(const std::string &name, float radius, 
+                                 float height, int rings, int segments);
 };
 
 /// \}
