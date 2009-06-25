@@ -95,6 +95,9 @@ public:
   /** Get the current simulation time */
   virtual websim::Time GetTime();
 
+  virtual bool ClockStart() {return true;}
+
+  virtual bool ClockStop() {return true;}
   // end WebSim Interface ============================================================
 
 

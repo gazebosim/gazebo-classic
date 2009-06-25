@@ -20,7 +20,7 @@ IF (PKG_CONFIG_FOUND)
 
   pkg_check_modules(OGRE OGRE>=${OGRE_VERSION})
   IF (NOT OGRE_FOUND)
-    MESSAGE (SEND_ERROR "\nError: Ogre3d version ${OGRE_VERSION} and development files not found. See the following website: http://www.orge3d.org")
+    MESSAGE (SEND_ERROR "\nError: Ogre3d version >=${OGRE_VERSION} and development files not found. See the following website: http://www.orge3d.org")
   ELSE (NOT OGRE_FOUND)
  
     SET (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")

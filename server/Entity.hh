@@ -127,6 +127,10 @@ namespace gazebo
     /// \brief Return true if the entity is a model
     public: bool IsModel();
 
+    /// \brief Return the name of this entity with the model scope
+    ///        model1::...::modelN::entityName
+    public: std::string GetScopedName();
+
     /// \brief Parent of this entity
     protected: Entity *parent;
   

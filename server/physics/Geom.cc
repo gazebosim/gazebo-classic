@@ -153,7 +153,7 @@ void Geom::Load(XMLConfigNode *node)
   while (childNode)
   {
     std::ostringstream visname;
-    visname << this->GetName() << "_VISUAL_" << this->visuals.size();
+    visname << this->GetScopedName() << "_VISUAL_" << this->visuals.size();
 
     OgreVisual *visual = OgreCreator::Instance()->CreateVisual(
         visname.str(), this->visualNode, this);
@@ -179,7 +179,7 @@ void Geom::Load(XMLConfigNode *node)
     Vector3 max(aabb[1], aabb[3], aabb[5]);
 
     std::ostringstream visname;
-    visname << this->GetName() << "_BBVISUAL" ;
+    visname << this->GetScopedName() << "_BBVISUAL" ;
 
     this->bbVisual = OgreCreator::Instance()->CreateVisual(
         visname.str(), this->visualNode);

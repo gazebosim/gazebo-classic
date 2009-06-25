@@ -7,20 +7,12 @@
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
   xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
   xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
   >
 
 <xyz>0 0 0.0</xyz>
 <rpy>0.0 0.0 0.0</rpy>
-
-<controller:differential_position2d name="controller1">
-  <leftJoint>left_wheel_hinge</leftJoint>
-  <rightJoint>right_wheel_hinge</rightJoint>
-  <wheelSeparation>0.39</wheelSeparation>
-  <wheelDiameter>0.15</wheelDiameter>
-  <torque>5</torque>
-  <interface:position name="position_iface_0"/>
-</controller:differential_position2d>
-
 
 <canonicalBody>chassis_body</canonicalBody>
 
@@ -180,6 +172,15 @@
   <erp>0.8</erp>
   <cfm>10e-5</cfm>
 </joint:ball>
+
+<controller:differential_position2d name="controller1">
+  <leftJoint>left_wheel_hinge</leftJoint>
+  <rightJoint>right_wheel_hinge</rightJoint>
+  <wheelSeparation>0.39</wheelSeparation>
+  <wheelDiameter>0.15</wheelDiameter>
+  <torque>5</torque>
+  <interface:position name="position_iface_0"/>
+</controller:differential_position2d>
 
 
 </model:physical>

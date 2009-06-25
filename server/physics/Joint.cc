@@ -135,7 +135,7 @@ void Joint::Load(XMLConfigNode *node)
   this->Attach(body1,body2);
 
   std::ostringstream visname;
-  visname << this->GetName() << "_VISUAL";
+  visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
 
   /// Add a renderable for the joint
   this->visual = OgreCreator::Instance()->CreateVisual(

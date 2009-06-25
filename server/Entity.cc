@@ -241,6 +241,26 @@ bool Entity::IsModel()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Return the name of this entity with the model scope
+/// model1::...::modelN::entityName
+std::string Entity::GetScopedName()
+{
+  Entity *p = this->parent;
+  std::string scopedName = this->GetName();
+
+  while (p)
+  {
+    Model *m = dynamic_cast<Model*>(p);
+    if (m)
+      scopedName.insert(0, m->GetName()+"::");
+    p = p->GetParent();
+  }
+
+  return scopedName;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the entity relative to its parent
 Pose3d Entity::GetPoseRelative() const
 {

@@ -160,23 +160,27 @@ Model::~Model()
 void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 {
   XMLConfigNode *childNode;
+  std::string scopedName;
   Pose3d pose;
   Model* dup;
 
   this->nameP->Load(node);
+
+  scopedName = this->GetScopedName();
+
   // Look for existing models by the same name
-  if((dup = World::Instance()->GetModelByName(this->nameP->GetValue())) != NULL)
+  if((dup = World::Instance()->GetModelByName(scopedName)) != NULL)
   {
     if(!removeDuplicate)
     {
-      gzthrow("Duplicate model name" + this->nameP->GetValue() + "\n");
+      gzthrow("Duplicate model name" + scopedName + "\n");
     }
     else
     {
       // Delete the existing one (this should only be reached when called
       // via the factory interface).
-      printf("Queuing duplicate model %s (%p) for deletion\n", this->nameP->GetValue().c_str(), dup);
-      World::Instance()->DeleteEntity(this->nameP->GetValue().c_str());
+      printf("Queuing duplicate model %s (%p) for deletion\n", scopedName.c_str(), dup);
+      World::Instance()->DeleteEntity(scopedName.c_str());
     }
   }
 
@@ -256,7 +260,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();
-  this->graphicsHandler->Load(this->GetName(), this);
+  this->graphicsHandler->Load(this->GetScopedName(), this);
 
 
   // Get the name of the python module
