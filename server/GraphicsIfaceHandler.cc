@@ -129,6 +129,7 @@ void GraphicsIfaceHandler::Update()
       case Graphics3dDrawData::SPHERE:
       case Graphics3dDrawData::CUBE:
       case Graphics3dDrawData::BILLBOARD:
+      case Graphics3dDrawData::CONE:
         this->DrawShape(vis, &this->threeDIface->data->commands[i] );
         break;
 
@@ -251,6 +252,23 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
         break;
       }
 
+    case Graphics3dDrawData::CONE:
+      {
+        if (vis->GetNumAttached() <= 0)
+          vis->AttachMesh("unit_cone");
+
+        vis->SetMaterial( OgreCreator::CreateMaterial( data->color.r,
+                                                 data->color.g,
+                                                 data->color.b,
+                                                 data->color.a ));
+
+        vis->SetScale(Vector3(data->size.x, data->size.y, data->size.z) );
+        vis->SetPosition(Vector3(data->pose.pos.x, 
+                                 data->pose.pos.y, 
+                                 data->pose.pos.z) );
+        break;
+      }
+
     case Graphics3dDrawData::SPHERE:
       {
         if (vis->GetNumAttached() <= 0)
@@ -293,8 +311,14 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
               data->pose.pos.z));
 
         billboard->setDimensions(data->size.x, data->size.y);
-        bset->setMaterialName(
-            OgreCreator::CreateMaterialFromTexFile( data->billboardTexture));
+
+        std::string textureName = data->billboardTexture;
+
+        if (textureName.find(".") != std::string::npos)
+          bset->setMaterialName( textureName );
+        else 
+          bset->setMaterialName( 
+              OgreCreator::CreateMaterialFromTexFile( textureName ));
 
         if (!attached)
           vis->AttachObject(bset);

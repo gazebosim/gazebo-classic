@@ -172,11 +172,10 @@ void Geom::Load(XMLConfigNode *node)
   // Create the bounding box
   if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass)
   {
-    dReal aabb[6];
-    dGeomGetAABB(this->geomId, aabb);
+    Vector3 min;
+    Vector3 max;
 
-    Vector3 min(aabb[0], aabb[2], aabb[4]);
-    Vector3 max(aabb[1], aabb[3], aabb[5]);
+    this->GetBoundingBox(min,max);
 
     std::ostringstream visname;
     visname << this->GetScopedName() << "_BBVISUAL" ;
@@ -639,4 +638,15 @@ Model *Geom::GetModel() const
 void Geom::SetFrictionMode( const bool &v )
 {
   this->contact->enableFriction = v;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the bounding box for this geom
+void Geom::GetBoundingBox(Vector3 &min, Vector3 &max) const
+{
+  dReal aabb[6];
+  dGeomGetAABB(this->geomId, aabb);
+
+  min.Set(aabb[0], aabb[2], aabb[4]);
+  max.Set(aabb[1], aabb[3], aabb[5]);
 }

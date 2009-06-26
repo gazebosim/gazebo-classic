@@ -51,7 +51,7 @@
 
     <grid>false</grid>
 
-    <shadowTechnique>stencilAdditive</shadowTechnique>
+    <shadowTechnique>stencilModulative</shadowTechnique>
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -158,7 +158,7 @@
         <visual>
           <size>1 1 1</size>
           <mesh>unit_box</mesh>
-          <material>Gazebo/Rocky</material>
+          <material>Gazebo/SmileyHappy</material>
         </visual>
       </geom:box>
     </body:box>

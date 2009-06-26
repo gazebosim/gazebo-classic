@@ -66,8 +66,7 @@ public:
 			   websim::Acceleration& a,
 			   std::string& error);
 
-  virtual bool GetModelType(const std::string& name, std::string& type)
-  {return true;}
+  virtual bool GetModelType(const std::string& name, std::string& type);
 
   virtual bool GetModelData(const std::string& name, 
 			    std::string& response,
@@ -75,33 +74,34 @@ public:
 			    void* xmlnode );
   
   virtual bool GetModelChildren(const std::string& model, 
-				std::vector<std::string>& children)
-  {return true;}
+				std::vector<std::string>& children);
   
   virtual bool GetModelExtent(const std::string& name,
 			      double& bx,
 			      double& by,
 			      double& bz,
 			      websim::Pose& center,
-			      std::string& response) 
-  {return true;}
-  
-  virtual bool GetNumberOfRobots(unsigned int& n)
-  {return true;}
-  
+			      std::string& response);
+ 
+  virtual bool GetNumberOfRobots(unsigned int& n);
+ 
   virtual bool GetSayStrings(std::vector<std::string>& sayings) 
-  {return true;}
+  { std::cout << "GetSayStrings not implemented\n"; return true;}
     
   /** Get the current simulation time */
   virtual websim::Time GetTime();
 
-  virtual bool ClockStart() {return true;}
+  virtual bool ClockStart() { simIface->Unpause(); return true;}
 
-  virtual bool ClockStop() {return true;}
-  // end WebSim Interface ============================================================
+  virtual bool ClockStop() { simIface->Pause(); return true;}
+
+  // end WebSim Interface =====================================================
 
 
 private: // all private members are specific to WebGazebo
+
+
+  bool WaitForResponse();
 
   double sq_dist_tol;
   double sq_ang_tol;

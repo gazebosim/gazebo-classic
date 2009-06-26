@@ -163,6 +163,9 @@ namespace gazebo
     /// \brief Set the friction mode of the geom
     public: void SetFrictionMode( const bool &v );
 
+    /// \brief Get the bounding box for this geom
+    public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;
+
     ///  Contact parameters
     public: ContactParams *contact; 
     ///  Save Contact Joint ID

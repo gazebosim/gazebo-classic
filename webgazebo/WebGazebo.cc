@@ -91,6 +91,8 @@ WebGazebo::GetModel(const std::string& name,
                     std::string& xmldata,
                     std::string& response)
 {
+  std::cout << "GetModel[" << name << "] type[" << type << "]\n";
+
   std::vector<std::string> gmpath_parts;
   // Search GAZEBO_MODEL_PATH for a matching .model file
   const char* gmpath = getenv("GAZEBO_MODEL_PATH");
@@ -134,8 +136,12 @@ WebGazebo::CreateModel(const std::string& name,
                        const std::string& type,
                        std::string& response)
 {
+
+  std::cout << "CreateModel name[" << name << "] type[" << type << "]\n";
+
   std::string xmldata;
-  if(!GetModel(name,type,xmldata,response))
+
+  if(!this->GetModel(name,type,xmldata,response))
     return false;
 
   struct timespec sleeptime = {0, 1e08};
@@ -202,3 +208,28 @@ WebGazebo::Go(double t)
   this->goCond.wait(lock);
   return true;
 }
+
+bool WebGazebo::WaitForResponse()
+{
+  // Wait for the response
+  double timeout = 3.0;
+  struct timeval t0, t1;
+  gettimeofday(&t0, NULL);
+  struct timespec sleeptime = {0, 1000000};
+
+  while(this->simIface->data->responseCount == 0)
+  {
+    gettimeofday(&t1, NULL);
+    if(((t1.tv_sec + t1.tv_usec/1e6) - (t0.tv_sec + t0.tv_usec/1e6)) 
+        > timeout)
+    {
+      return false;
+    }
+    nanosleep(&sleeptime, NULL);
+  }
+
+  return true;
+}
+
+
+

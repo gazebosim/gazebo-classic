@@ -48,33 +48,18 @@ WebGazebo::GetModelPVA(const std::string& name,
   // Discard any leftover responses
   this->simIface->data->responseCount = 0;
 
-  // Ask Gazebo
-  this->simIface->GetPose3d(name.c_str());
-  
-  // Wait for the response
-  double timeout = 3.0;
-  struct timeval t0, t1;
-  gettimeofday(&t0, NULL);
-  struct timespec sleeptime = {0, 1000000};
-  while(this->simIface->data->responseCount == 0)
-  {
-    gettimeofday(&t1, NULL);
-    if(((t1.tv_sec + t1.tv_usec/1e6) - (t0.tv_sec + t0.tv_usec/1e6)) 
-       > timeout)
-    {
-      response= "Timeout";
-      return false;
-    }
-    nanosleep(&sleeptime, NULL);
-  }
+  gazebo::Pose pose;
 
-  assert(this->simIface->data->responseCount == 1);
-  p.x = this->simIface->data->responses[0].modelPose.pos.x;
-  p.y = this->simIface->data->responses[0].modelPose.pos.y;
-  p.z = this->simIface->data->responses[0].modelPose.pos.z;
-  p.r = this->simIface->data->responses[0].modelPose.roll;
-  p.p = this->simIface->data->responses[0].modelPose.pitch;
-  p.a = this->simIface->data->responses[0].modelPose.yaw;
+  // Ask Gazebo
+  if (!this->simIface->GetPose3d(name.c_str(), pose))
+    return false;
+  
+  p.x = pose.pos.x;
+  p.y = pose.pos.y;
+  p.z = pose.pos.z;
+  p.r = pose.roll;
+  p.p = pose.pitch;
+  p.a = pose.yaw;
 
   return true;
 }
@@ -198,5 +183,108 @@ WebGazebo::CheckTolerances(gazebo::Pose p, gazebo::Pose q)
     return false;
 
   return true;
+}
+
+
+bool 
+WebGazebo::GetModelType(const std::string& name, std::string& type)
+{
+  // Discard any leftover responses
+  this->simIface->data->responseCount = 0;
+
+  // Ask Gazebo
+  if (!this->simIface->GetModelType( name.c_str(), type ))
+    return false;
+
+  return true;
+}
+
+bool
+WebGazebo::GetModelChildren(const std::string& model, 
+				                    std::vector<std::string>& children)
+{
+  unsigned int num;
+  std::string name;
+
+  if (model.empty())
+  {
+    // Ask Gazebo
+    if (!this->simIface->GetNumModels(num))
+      return false;
+
+    for (unsigned int i = 0; i < num; i++)
+    {
+      if (!this->simIface->GetModelName(i, name))
+        return false;
+
+      children.push_back(name);
+    }
+  }
+  else
+  {
+
+    // Ask Gazebo
+    if (!this->simIface->GetNumChildren( model.c_str(), num ))
+      return false;
+
+    for (unsigned int i = 0; i < num; i++)
+    {
+      if (!this->simIface->GetChildName(model.c_str(), i, name))
+        return false;
+
+      children.push_back(name);
+    }
+  }
+  
+  return true;
+}
+
+bool
+WebGazebo::GetNumberOfRobots(unsigned int &n)
+{
+  // Discard any leftover responses
+  this->simIface->data->responseCount = 0;
+
+  /// Get the number of models 
+  if (!this->simIface->GetNumModels(n))
+    return false;
+
+  return true;
+}
+
+bool WebGazebo::GetModelExtent(const std::string& name, double& bx, double& by,
+                        double& bz, websim::Pose& center, std::string& response) 
+{
+  if (name == "sim")
+  {
+    bx = 0;
+    by = 0;
+    bz = 0;
+  }
+  else
+  {
+    gazebo::Vec3 ext;
+    gazebo::Pose pose;
+
+    if (!this->simIface->GetModelExtent(name.c_str(), ext))
+    {
+      response = "timeout";
+      return false;
+    }
+
+    bx = ext.x;
+    by = ext.y;
+    bz = ext.z;
+
+    if (!this->simIface->GetPose3d(name.c_str(), pose))
+    {
+      response = "timeout";
+      return false;
+    }
+
+    center.x = pose.pos.x;
+    center.y = pose.pos.y;
+    center.z = pose.pos.z;
+  }
 }
 

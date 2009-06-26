@@ -72,7 +72,7 @@ OgreAdaptor::OgreAdaptor()
   Param::Begin(&this->parameters);
   this->ambientP = new ParamT<Vector4>("ambient",Vector4(.1,.1,.1,.1),0);
   this->shadowTextureSizeP = new ParamT<int>("shadowTextureSize", 512,0);
-  this->shadowTechniqueP = new ParamT<std::string>("shadowTechnique", "stencilAdditive", 0);
+  this->shadowTechniqueP = new ParamT<std::string>("shadowTechnique", "stencilModulative", 0);
   this->drawGridP = new ParamT<bool>("grid", true, 0);
   this->updateRateP = new ParamT<double>("maxUpdateRate",0,0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
@@ -238,6 +238,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
   this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
   this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
+  
 
   // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient);
@@ -322,8 +323,8 @@ void OgreAdaptor::LoadPlugins()
 
     plugins.push_back(path+"/RenderSystem_GL.so");
     plugins.push_back(path+"/Plugin_ParticleFX.so");
-    plugins.push_back(path+"/Plugin_BSPSceneManager.so");
-    plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+    //plugins.push_back(path+"/Plugin_BSPSceneManager.so");
+    //plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {

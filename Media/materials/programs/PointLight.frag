@@ -1,48 +1,34 @@
-uniform vec4 lightAttenuation;
-uniform vec4 lightPositionOS;
-uniform vec4 cameraPositionOS;
+varying vec4 diffuse,ambientGlobal, ambient;
+varying vec3 normal,lightDir,halfVector;
+varying float dist;
 
-varying vec4 diffuse, specular;
-varying vec3 normal;
-varying vec4 position;
-
-void main()
+void main(void)
 {
-  vec4 color;
+  /*vec4 color = ambientGlobal;
+
   vec3 n,halfV,viewV,ldir;
   float NdotL,NdotHV;
+  float att;
 
-  color = vec4(0.0, 0.0, 0.0, 0.0);
+  n = normalize(normal);
 
-  if (gl_LightSource[1].spotCosCutoff < 0.0)
-  {
-    float att;
+  NdotL = max(dot(n,normalize(lightDir)),0.0);
 
-    vec3 aux = vec3 (lightPositionOS - position);
-    vec3 lightDir = normalize(aux);
-    vec3 halfVector = vec3(lightDir + normalize(vec3(cameraPositionOS - position)));
+  if (NdotL > 0.0) {
 
-    /* a fragment shader can't write a verying variable, hence we need
-     *    a new variable to store the normalized interpolated normal */
-    n = normalize(normal);
+    att = 1.0 / (gl_LightSource[0].constantAttenuation +
+        gl_LightSource[0].linearAttenuation * dist +
+        gl_LightSource[0].quadraticAttenuation * dist * dist);
+    color += att * (diffuse * NdotL + ambient);
 
-    /* compute the dot product between normal and ldir */
-    NdotL = max(dot(n,normalize(lightDir)), 0.0);
 
-    if (NdotL > 0.0) 
-    {
-      float toLightDist = length(aux);
-
-      att = 1.0 / (lightAttenuation.y +
-          lightAttenuation.z * toLightDist +
-          lightAttenuation.w * toLightDist * toLightDist);
-      color += att * (diffuse * NdotL);
-
-      halfV = normalize(halfVector);
-      NdotHV = max(dot(n,halfV),0.0);
-      color += att * specular * pow(NdotHV,gl_FrontMaterial.shininess);
-    }
+    halfV = normalize(halfVector);
+    NdotHV = max(dot(n,halfV),0.0);
+    color += att * gl_FrontMaterial.specular * gl_LightSource[0].specular * 
+      pow(NdotHV,gl_FrontMaterial.shininess);
   }
 
-  gl_FragColor = color;
-} 
+  */
+  gl_FragColor = gl_Color;
+}
+

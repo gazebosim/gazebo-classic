@@ -133,6 +133,9 @@ namespace gazebo
  
     /// \brief Get the current pose
     public: virtual Pose3d GetPose() const;
+
+    /// \brief Get the size of the bounding box
+    public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;
   
     /// \brief Create and return a new body
     /// \return Pointer to a new body.

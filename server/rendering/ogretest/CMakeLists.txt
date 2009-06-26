@@ -16,7 +16,7 @@ endif (PKG_CONFIG_FOUND)
 
 include_directories(${OGRE_INCLUDE_DIRS})
 
-set (sources main.cc GLWindow.cc)
+set (sources main.cc)
 
 add_executable(ogretest ${sources})
 

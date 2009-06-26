@@ -35,35 +35,37 @@
       <material>Gazebo/CloudySky</material>
     </sky>
 
-    <!--
     <fog>
       <color>0.8 0.8 0.8</color>
       <type>linear</type>
       <mass>0.1</mass>
-      <linearStart>50.0</linearStart>
-      <linearEnd>515.0</linearEnd>
+      <linearStart>20.0</linearStart>
+      <linearEnd>50.0</linearEnd>
     </fog>
-    -->
+    <grid>false</grid>
   </rendering:ogre>
 
-  <!--<model:physical name="sphere1_model">
-    <xyz>0 0 10.1</xyz>
+
+  <model:physical name="sphere1_model">
+    <xyz>1 0 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
+    <static>false</static>
 
     <body:sphere name="sphere1_body">
-      <xyz>0.0 0.0 0.0</xyz>
-      <rpy>0.0 0.0 0.0</rpy>
-
       <geom:sphere name="sphere1_geom">
-        <xyz>0 0 0.0</xyz>
-        <mesh>default</mesh>
         <size>0.2</size>
-        <mass>5.0</mass>
-        <material>Gazebo/Rocky</material>
+        <mass>0.0</mass>
+
+        <mu1>109999.0</mu1>
+
+        <visual>
+          <size>0.4 0.4 0.4</size>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Rocky</material>
+        </visual>
       </geom:sphere>
     </body:sphere>
   </model:physical>
-  -->
 
   <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
@@ -75,8 +77,8 @@
         <normal>0 0 1</normal>
         <size>2000 2000</size>
         <segments>10 10</segments>
-        <uvTile>100 100</uvTile>
-        <material>Gazebo/Grey</material>
+        <uvTile>2000 2000</uvTile>
+        <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
   </model:physical>

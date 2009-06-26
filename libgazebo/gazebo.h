@@ -417,6 +417,7 @@ of the server, such as the current simulation time-step.
 class SimulationRequestData
 {
   public: enum Type { PAUSE,
+                      UNPAUSE,
                       RESET,
                       SAVE,
                       GET_POSE3D,
@@ -424,11 +425,21 @@ class SimulationRequestData
                       SET_POSE3D,
                       SET_POSE2D,
                       SET_STATE,
-                      GO
+                      GO,
+                      GET_MODEL_TYPE,
+                      GET_NUM_MODELS,
+                      GET_NUM_CHILDREN,
+                      GET_CHILD_NAME,
+                      GET_MODEL_NAME,
+                      GET_MODEL_EXTENT
                    };
 
   public: Type type; 
   public: char modelName[512];
+  public: char strValue[512];
+  public: Vec3 vec3Value;
+  public: unsigned int uintValue;
+
   public: Pose modelPose;
   public: Vec3 modelLinearVel;
   public: Vec3 modelAngularVel;
@@ -511,6 +522,9 @@ class SimulationIface : public Iface
   /// \brief Pause the simulation
   public: void Pause();
 
+  /// \brief Unpause the simulation
+  public: void Unpause();
+
   /// \brief Reset the simulation
   public: void Reset();
 
@@ -518,10 +532,10 @@ class SimulationIface : public Iface
   public: void Save();
 
   /// \brief Get the 3d pose of a model
-  public: void GetPose3d(const char *modelName);
+  public: bool GetPose3d(const char *modelName, Pose &pose);
 
   /// \brief Get the 2d pose of a model
-  public: void GetPose2d(const char *modelName);
+  public: bool GetPose2d(const char *modelName, Pose &pose);
 
   /// \brief Set the 3d pose of a model
   public: void SetPose3d(const char *modelName, const Pose &modelPose);
@@ -534,10 +548,33 @@ class SimulationIface : public Iface
               const Vec3 &linearVel, const Vec3 &angularVel, 
               const Vec3 &linearAccel, const Vec3 &angularAccel );
 
+  /// \brief Get the type of this model
+  public: bool GetModelType(const char *modelName, std::string &type);
+
+  /// \brief Get the number of models 
+  public: bool GetNumModels(unsigned int &num);
+
+  /// \brief Get the number of children a model has
+  public: bool GetNumChildren(const char *modelName, unsigned int &num);
+
+  /// \brief Get the name of a model
+  public: bool GetModelName(unsigned int child, std::string &name);
+
+  /// \brief Get the name of a child
+  public: bool GetChildName(const char *modelName, unsigned int child, 
+                            std::string &name);
+
+  /// \brief Get the extents of a model
+  public: bool GetModelExtent(const char *modelName, Vec3 &ext);
+
   public: void GoAckWait();
   public: void GoAckPost();
 
   private: void BlockThread();
+
+  /// \brief Wait for a return message
+  private: bool WaitForResponse();
+
   private: boost::signal<void (void)> goAckSignal;
   private: boost::signals::connection currentConnection;
   private: boost::thread *goAckThread;
@@ -807,7 +844,7 @@ class Graphics3dDrawData
 {
   /// Type of drawing to perform
   public: enum DrawMode { POINTS, LINES, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, 
-                          TRIANGLE_FAN, PLANE, SPHERE, CUBE, CYLINDER,
+                          TRIANGLE_FAN, PLANE, SPHERE, CUBE, CYLINDER, CONE,
                           BILLBOARD, TEXT };
 
   /// Drawing mode

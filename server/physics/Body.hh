@@ -212,8 +212,11 @@ namespace gazebo
     /// \brief Set transparency for all child geometries
     public: void SetTransparency(float t);
 
-    /// Returns list of sensors
+    /// \brief Returns list of sensors
     public:  std::vector< Sensor* > &GetSensors();
+
+    /// \brief  Get the size of the body
+    public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;
 
     /// List of geometries attached to this body
     private: std::map< std::string, Geom* > geoms;

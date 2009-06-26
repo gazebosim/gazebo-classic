@@ -674,6 +674,10 @@ void World::UpdateSimulationIface()
 
     switch (req->type)
     {
+
+      case SimulationRequestData::UNPAUSE: 
+        Simulator::Instance()->SetUserPause(false);
+        break;
       case SimulationRequestData::PAUSE: 
         Simulator::Instance()->SetUserPause(
             !Simulator::Instance()->GetUserPause());
@@ -761,6 +765,126 @@ void World::UpdateSimulationIface()
           {
             gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Set Pose 3d Request.\n";
           }
+
+          break;
+        }
+
+      case SimulationRequestData::GET_NUM_MODELS:
+        {
+          response->type= req->type;
+          response->uintValue = this->models.size();
+          response++;
+          this->simIface->data->responseCount += 1;
+          break;
+        }
+
+      case SimulationRequestData::GET_NUM_CHILDREN:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+
+          if (model)
+          {
+            response->type= req->type;
+            response->uintValue = model->GetChildren().size();
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Get Num Children.\n";
+          break;
+        }
+
+      case SimulationRequestData::GET_MODEL_NAME:
+        {
+          unsigned int index = req->uintValue;
+
+          if (index < this->models.size())
+          {
+            Model *model = this->models[index];
+            memset(response->modelName, 0, 512);
+
+            strncpy(response->modelName, model->GetName().c_str(), 512);
+            response->strValue[511] = '\0';
+
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Get Model Name.\n";
+
+          break;
+        }
+
+      case SimulationRequestData::GET_CHILD_NAME:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+
+          if (model)
+          {
+            Entity *ent;
+            unsigned int index;
+            response->type= req->type;
+
+            index = req->uintValue;
+
+            ent = model->GetChildren()[index];
+            if (ent)
+            {
+              memset(response->strValue, 0, 512);
+              strncpy(response->modelName, ent->GetName().c_str(), 512);
+              response->strValue[511] = '\0';
+
+              response++;
+              this->simIface->data->responseCount += 1;
+            }
+            else
+            gzerr(0) << "Invalid child  index in simulation interface Get Num Children.\n";
+          }
+          else
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Get Num Children.\n";
+
+          break;
+        }
+
+
+      case SimulationRequestData::GET_MODEL_TYPE:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+
+          if (model)
+          {
+            response->type = req->type;
+            memset(response->strValue, 0, 512);
+            strncpy(response->strValue, model->GetType().c_str(), 512);
+            response->strValue[511] = '\0';
+
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Get Model Type.\n";
+          break;
+        }
+
+      case SimulationRequestData::GET_MODEL_EXTENT:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+          if (model)
+          {
+            Vector3 min, max;
+            model->GetBoundingBox(min, max);
+
+            response->type = req->type;
+            strcpy( response->modelName, req->modelName);
+            response->vec3Value.x = max.x - min.x;
+            response->vec3Value.y = max.y - min.y;
+            response->vec3Value.z = max.z - min.z;
+
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Get Model Extent.\n";
 
           break;
         }

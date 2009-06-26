@@ -699,6 +699,29 @@ Pose3d Model::GetPose() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the size of the bounding box
+void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
+{
+  Vector3 bbmin, bbmax;
+  std::map<std::string, Body* >::const_iterator iter;
+
+  min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  max.Set(0,0,0);
+
+  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  {
+    iter->second->GetBoundingBox(bbmin, bbmax);
+    min.x = std::min(bbmin.x, min.x);
+    min.y = std::min(bbmin.y, min.y);
+    min.z = std::min(bbmin.z, min.z);
+
+    max.x = std::max(bbmax.x, max.x);
+    max.y = std::max(bbmax.y, max.y);
+    max.z = std::max(bbmax.z, max.z);
+  }
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 // Create and return a new body
 Body *Model::CreateBody()
 {

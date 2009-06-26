@@ -33,6 +33,29 @@ SimulationIface::~SimulationIface()
   this->data = NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Wait for a return message
+bool SimulationIface::WaitForResponse()
+{
+  // Wait for the response
+  double timeout = 3.0;
+  struct timeval t0, t1;
+  gettimeofday(&t0, NULL);
+  struct timespec sleeptime = {0, 1000000};
+
+  while(this->data->responseCount == 0)
+  {
+    gettimeofday(&t1, NULL);
+    if(((t1.tv_sec + t1.tv_usec/1e6) - (t0.tv_sec + t0.tv_usec/1e6)) 
+        > timeout)
+    {
+      return false;
+    }
+    nanosleep(&sleeptime, NULL);
+  }
+
+  return true;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a simulation interface
@@ -103,8 +126,22 @@ void SimulationIface::BlockThread()
 void SimulationIface::Pause()
 {
   this->Lock(1);
-  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = 
+    &(this->data->requests[this->data->requestCount++]);
   request->type = SimulationRequestData::PAUSE;
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Unpause the simulation
+void SimulationIface::Unpause()
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = 
+    &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::UNPAUSE;
   this->Unlock();
 }
 
@@ -113,6 +150,7 @@ void SimulationIface::Pause()
 void SimulationIface::Reset()
 {
   this->Lock(1);
+  this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
   request->type = SimulationRequestData::RESET;
   this->Unlock();
@@ -123,6 +161,7 @@ void SimulationIface::Reset()
 void SimulationIface::Save()
 {
   this->Lock(1);
+  this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
   request->type = SimulationRequestData::SAVE;
   this->Unlock();
@@ -130,23 +169,32 @@ void SimulationIface::Save()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the 3d pose of a model
-void SimulationIface::GetPose3d(const char *modelName)
+bool SimulationIface::GetPose3d(const char *modelName, Pose &pose)
 {
   this->Lock(1);
+  this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
   request->type = SimulationRequestData::GET_POSE3D;
   memset(request->modelName, 0, 512);
   strncpy(request->modelName, modelName, 512);
   request->modelName[511] = '\0';
-
   this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  pose = this->data->responses[0].modelPose;
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the 2d pose of a model
-void SimulationIface::GetPose2d(const char *modelName)
+bool SimulationIface::GetPose2d(const char *modelName, Pose &pose)
 {
   this->Lock(1);
+  this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
   request->type = SimulationRequestData::GET_POSE2D;
   memset(request->modelName, 0, 512);
@@ -154,6 +202,15 @@ void SimulationIface::GetPose2d(const char *modelName)
   request->modelName[511] = '\0';
 
   this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  pose = this->data->responses[0].modelPose;
+
+  return true;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,6 +218,7 @@ void SimulationIface::GetPose2d(const char *modelName)
 void SimulationIface::SetPose3d(const char *modelName, const Pose &modelPose)
 {
   this->Lock(1);
+  this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
   request->type = SimulationRequestData::SET_POSE3D;
@@ -178,6 +236,7 @@ void SimulationIface::SetPose3d(const char *modelName, const Pose &modelPose)
 void SimulationIface::SetPose2d(const char *modelName, float x, float y, float yaw)
 {
   this->Lock(1);
+  this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
   request->type = gazebo::SimulationRequestData::SET_POSE2D;
@@ -200,6 +259,7 @@ void SimulationIface::SetState(const char *modelName, const Pose &modelPose,
     const Vec3 &angularAccel )
 {
   this->Lock(1);
+  this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
   request->type = gazebo::SimulationRequestData::SET_STATE;
@@ -221,6 +281,7 @@ void SimulationIface::SetState(const char *modelName, const Pose &modelPose,
 // Wait for a post on the go ack semaphore
 void SimulationIface::GoAckWait()
 {
+  this->data->responseCount = 0;
   struct sembuf semoperation;
 
   semoperation.sem_num = 0;
@@ -234,10 +295,164 @@ void SimulationIface::GoAckWait()
 // Post the go ack semaphore
 void SimulationIface::GoAckPost()
 {
+  this->data->responseCount = 0;
+
   struct sembuf semoperation;
   semoperation.sem_num = 0;
   semoperation.sem_op = 1;
   semoperation.sem_flg = 0;
 
   semop(this->data->semId, &semoperation, 1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the type of this model
+bool SimulationIface::GetModelType(const char *modelName, std::string &type)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+
+  SimulationRequestData *request;
+ 
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_MODEL_TYPE;
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+
+  this->Unlock();
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  type = data->responses[0].strValue;
+
+  return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of models 
+bool SimulationIface::GetNumModels(unsigned int &num)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+
+  SimulationRequestData *request;
+ 
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_NUM_MODELS;
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  num = data->responses[0].uintValue;
+
+  return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of children a model has
+bool SimulationIface::GetNumChildren(const char *modelName, unsigned int &num)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+
+  SimulationRequestData *request;
+ 
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_NUM_CHILDREN;
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  num = data->responses[0].uintValue;
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the name of a child
+bool SimulationIface::GetModelName(unsigned int model, std::string &modelName)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+ 
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_MODEL_NAME;
+  request->uintValue = model;
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  modelName = data->responses[0].modelName;
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the name of a child
+bool SimulationIface::GetChildName(const char *modelName, unsigned int child,
+                                   std::string &childName)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+
+  SimulationRequestData *request;
+ 
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_CHILD_NAME;
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+  request->uintValue = child;
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  childName = data->responses[0].modelName;
+
+  return true;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the extents of a model
+bool SimulationIface::GetModelExtent(const char *modelName, Vec3 &ext)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_MODEL_EXTENT;
+
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  ext = this->data->responses[0].vec3Value;
+
+  return true;
 }

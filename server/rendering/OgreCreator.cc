@@ -735,10 +735,11 @@ std::string OgreCreator::CreateMaterialFromTexFile(const std::string &filename)
         filename, "General");
     Ogre::Pass *pass = matPtr->getTechnique(0)->createPass();
 
-    matPtr->setLightingEnabled(false);
+    //matPtr->setLightingEnabled(false);
 
     //pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
     //pass->setDepthWriteEnabled(false);
+    //pass->setDepthCheckEnabled(false);
     pass->createTextureUnitState(filename);
   }
 

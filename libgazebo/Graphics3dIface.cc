@@ -73,7 +73,8 @@ void Graphics3dIface::DrawShape(const char *name,
 
   if (mode != Graphics3dDrawData::SPHERE && 
       mode != Graphics3dDrawData::CUBE && 
-      mode != Graphics3dDrawData::CYLINDER)
+      mode != Graphics3dDrawData::CYLINDER &&
+      mode != Graphics3dDrawData::CONE)
   {
     std::cerr << "Invalid shape draw mode[" << mode << "]\n";
     return;

@@ -94,7 +94,7 @@ void UpdateSphere()
 
 void UpdatePath()
 {
-  gazebo::Vec3 rPos;
+  gazebo::Pose rPos;
   gazebo::Vec3 blockSize;
   gazebo::Color clr;
   std::ostringstream blockName;
@@ -107,22 +107,18 @@ void UpdatePath()
   simIface->Lock(1);
   simIface->data->requestCount = 0;
   simIface->Unlock();
-  simIface->GetPose2d("pioneer2dx_model1");
-  while (simIface->data->requestCount == 0)
-    usleep(1000);
+  simIface->GetPose2d("pioneer2dx_model1", rPos);
 
-  rPos.x = simIface->data->responses[0].modelPose.pos.x;
-  rPos.y = simIface->data->responses[0].modelPose.pos.y;
-  rPos.z = 0.15;
+  rPos.pos.z = 0.15;
 
   // Draw the robot's path
   if (positions.size() == 0 ||
-      sqrt( pow(positions[positions.size()-1].x - rPos.x,2) +
-            pow(positions[positions.size()-1].y - rPos.y,2)) > 0.5)
+      sqrt( pow(positions[positions.size()-1].x - rPos.pos.x,2) +
+            pow(positions[positions.size()-1].y - rPos.pos.y,2)) > 0.5)
   {
 
     // Store the new position
-    positions.push_back(rPos);
+    positions.push_back(rPos.pos);
 
     gazebo::Vec3 tmpvec[positions.size()];
     for (unsigned int j =0; j < positions.size(); j++)
@@ -220,8 +216,8 @@ int main()
   sphereSize.z = 0.1;
 
   // Draw a billboard
-  pioneerG3DIface->DrawBillboard("mybillboard", "heartpsg.png",
-      gazebo::Vec3(0.4,0.0,0.1), gazebo::Vec2(0.2, 0.2)  );
+  pioneerG3DIface->DrawBillboard("mybillboard", "Gazebo/SmileySad",
+      gazebo::Vec3(0.4,0.0,0.4), gazebo::Vec2(0.2, 0.2)  );
 
   // Update all the drawables
   while (true)

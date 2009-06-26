@@ -21,16 +21,50 @@ fragment_program Gazebo/DepthMapFS glsl
   }
 }
 
+vertex_program Gazebo/AmbientVS glsl
+{
+  source Ambient.vert
+}
+
+vertex_program Gazebo/AmbientFS glsl
+{
+  source Ambient.frag
+}
+
+vertex_program Gazebo/PointLightVS glsl
+{
+  source PointLight.vert
+}
+
+vertex_program Gazebo/PointLightFS glsl
+{
+  source PointLight.frag
+}
 
 material Gazebo/test
 {
   technique
   {
-    pass Ambient
+    pass
     {
       ambient 0.3 0.3 0.3 1
       diffuse 0.5 0.5 0.5 1
       specular 0.1 0.1 0.1 1
+    }
+
+    pass
+    {
+      scene_blend add
+      lightning on 
+      iteration per_light point
+
+      fragment_program_ref Gazebo/PointLightFS
+      {
+      }
+
+      vertex_program_ref Gazebo/PointLightVS
+      {
+      }
     }
   }
 }
@@ -62,7 +96,6 @@ material Gazebo/White
 material Gazebo/Grey
 {
   receive_shadows on
-  lighting on
 
 	technique
 	{
@@ -102,9 +135,7 @@ material Gazebo/FlatBlack
 		pass
 		{
 			ambient 0.0 0.0 0.0 1.000000
-      texture_unit
-      {
-        colour_op_ex source1 src_manual src_current 0 0 0
+      texture_unit { colour_op_ex source1 src_manual src_current 0 0 0
       }
 		}
 	}
@@ -266,6 +297,108 @@ material Gazebo/Blue
       shading phong
 		}
 	}
+}
+
+material Gazebo/Skull
+{
+  technique
+  {
+    pass
+    {
+      depth_write off
+      scene_blend alpha_blend
+
+      texture_unit
+      {
+        texture skull.png
+      }
+    }
+  }
+}
+
+material Gazebo/ExclamationPoint
+{
+  technique
+  {
+    pass
+    {
+      depth_write off
+      scene_blend alpha_blend
+
+      texture_unit
+      {
+        texture exclamationPoint.png
+      }
+    }
+  }
+}
+
+material Gazebo/SmileyHappy
+{
+  technique
+  {
+    pass
+    {
+      depth_write alpha_rejection
+      scene_blend alpha_blend
+
+      texture_unit
+      {
+        texture smileyHappy.png
+      }
+    }
+  }
+}
+
+material Gazebo/SmileySad
+{
+  technique
+  {
+    pass
+    {
+      depth_write alpha_rejection
+      scene_blend alpha_blend
+
+      texture_unit
+      {
+        texture smileySad.png
+      }
+    }
+  }
+}
+
+material Gazebo/SmileyDead
+{
+  technique
+  {
+    pass
+    {
+      depth_write off
+      scene_blend alpha_blend
+
+      texture_unit
+      {
+        texture smileyDead.png
+      }
+    }
+  }
+}
+
+material Gazebo/SmileyPlain
+{
+  technique
+  {
+    pass
+    {
+      depth_write off
+      scene_blend alpha_blend
+
+      texture_unit
+      {
+        texture smileyPlain.png
+      }
+    }
+  }
 }
 
 material Gazebo/WoodFloor
@@ -712,8 +845,8 @@ material Gazebo/TransparentTest
 
       texture_unit
       {
-        colour_op_ex source1 src_manual src_current 1 0 1
-        alpha_op_ex source1 src_manual src_current 0.2
+        colour_op_ex source1 src_manual src_current 1 0 0
+        alpha_op_ex source1 src_manual src_current 0.1
       }
     }
 	}

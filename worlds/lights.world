@@ -30,11 +30,12 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0 0 0 0</ambient>
+    <ambient>0 0 0 1</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
     <grid>false</grid>
+    <shadowTechnique>none</shadowTechnique>
   </rendering:ogre>
 
   <!-- Ground Plane -->
@@ -49,10 +50,32 @@
         <size>1000 1000</size>
         <segments>200 200</segments>
         <uvTile>1000 1000</uvTile>
-        <material>Gazebo/GrayGrid</material>
+        <material>Gazebo/test</material>
       </geom:plane>
     </body:plane>
   </model:physical>
+
+  <model:physical name="sphere1_model">
+    <xyz>0 0 0.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <static>false</static>
+
+    <body:sphere name="sphere1_body">
+      <geom:sphere name="sphere1_geom">
+        <size>0.2</size>
+        <mass>0.0</mass>
+
+        <mu1>109999.0</mu1>
+
+        <visual>
+          <size>0.4 0.4 0.4</size>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Rocky</material>
+        </visual>
+      </geom:sphere>
+    </body:sphere>
+  </model:physical>
+
 
   <!-- Red Spot light -->
   <!--<model:renderable name="spot_red">
@@ -129,7 +152,7 @@
     -->
 
   <!-- Yellow Point light -->
-  <!--<model:renderable name="point_yellow">
+  <model:renderable name="point_yellow">
     <xyz>0 0 .5</xyz>
     <enableGravity>false</enableGravity>
 
@@ -142,11 +165,10 @@
       <attenuation>0.4 0.1 0.001</attenuation>
     </light>
   </model:renderable>
-  -->
   
 
   <!-- White Directional light -->
-  <model:renderable name="directional_white">
+  <!--<model:renderable name="directional_white">
     <enableGravity>false</enableGravity>
     <light>
       <type>directional</type>
@@ -157,5 +179,7 @@
       <attenuation>0.2 0.0 0.0</attenuation>
     </light>
   </model:renderable>
+  -->
+  
 
 </gazebo:world>
