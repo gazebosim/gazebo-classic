@@ -87,6 +87,7 @@ SET (files 10points.png
            grayGrid.png
            skull.png
            exclamationPoint.png
+           questionMark.png
            smileySad.png
            smileyDead.png
            smileyPlain.png
