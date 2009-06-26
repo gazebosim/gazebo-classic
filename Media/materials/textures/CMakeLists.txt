@@ -85,6 +85,12 @@ SET (files 10points.png
            willowMap.png
            WoodPallet.png
            grayGrid.png
+           skull.png
+           exclamationPoint.png
+           smileySad.png
+           smileyDead.png
+           smileyPlain.png
+           smileyHappy.png
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)
