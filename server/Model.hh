@@ -39,6 +39,7 @@
 #include "Entity.hh"
 #include "gazebo.h"
 
+
 namespace boost
 {
   class recursive_mutex;
@@ -189,6 +190,9 @@ namespace gazebo
 
     /// \brief Set the laser retro reflectiveness of the model
     public: void SetLaserRetro( const float &retro );
+
+    /// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
+    public: void GetModelInterfaceNames(std::vector<std::string>& list) const;
 
     /// \brief Load a body helper function
     /// \param node XML Configuration node

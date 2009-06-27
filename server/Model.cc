@@ -49,6 +49,7 @@
 #include "IfaceFactory.hh"
 #include "Model.hh"
 
+
 #ifdef TIMING
 #include "Simulator.hh"
 #endif
@@ -1108,3 +1109,47 @@ void Model::LoadPhysical(XMLConfigNode *node)
   }
 
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Get the list of model interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
+void Model::GetModelInterfaceNames(std::vector<std::string>& list) const{
+
+	    
+	    //std::vector<Entity*>::iterator eiter;
+	    std::map<std::string, Controller* >::const_iterator contIter;
+
+  	    for (contIter=this->controllers.begin();
+       			contIter!=this->controllers.end(); contIter++)
+  	    {
+		contIter->second->GetInterfaceNames(list);	
+    			
+  	    }
+
+
+	    std::map< std::string, Body* >::const_iterator biter;
+
+  	    for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  	    {
+
+		biter->second->GetInterfaceNames(list);
+  		
+
+  	    }
+   	
+
+	 	    
+/*
+	    for (eiter=this->GetChildren().begin();  eiter!=this->GetChildren().end(); eiter++)
+  	    {
+		Model* m;
+		m = dynamic_cast<Model*>(*eiter);
+		if(m)
+		  m->GetModelInterfaceNames(list);
+
+	    }
+*/
+	  
+}
+
+

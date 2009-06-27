@@ -69,8 +69,14 @@ namespace gazebo
     /// \brief  Finalize the sensor
     public: void Fini();
 
+    /// \brief Get the type of the sensor
+    public: std::string GetSensorType(){return typeName;}
+
     /// \brief Get the current pose
     public: virtual Pose3d GetPose() const;
+
+    /// \brief Get the name of the interfaces define in the sensor controller
+    public: void GetInterfaceNames(std::vector<std::string>& list) const;
  
     /// \brief Set whether the sensor is active or not
     public: void SetActive(bool value);

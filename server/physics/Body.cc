@@ -1289,6 +1289,19 @@ std::vector< Sensor* > &Body::GetSensors()
   return this->sensors;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
+void Body::GetInterfaceNames(std::vector<std::string>& list) const{
+
+  std::vector< Sensor* >::const_iterator iter;
+
+  for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
+  {
+	(*iter)->GetInterfaceNames(list);
+  }
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the body
 void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const

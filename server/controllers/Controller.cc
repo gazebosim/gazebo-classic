@@ -288,3 +288,18 @@ Iface* Controller::GetIface(std::string type, bool mandatory, int number)
   }
   return iface;
 }
+
+void Controller::GetInterfaceNames(std::vector<std::string>& list) const{
+  
+  std::vector<Iface*>::const_iterator iter;
+  
+  for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
+  {
+    std::string str;
+    str=(*iter)->GetId()+">>"+(*iter)->GetType();
+    list.push_back(str);
+    
+  }
+
+
+}  

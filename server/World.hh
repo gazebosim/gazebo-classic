@@ -34,6 +34,7 @@
 #include "SingletonT.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
+#include "Entity.hh"
 
 namespace gazebo
 {
@@ -201,6 +202,9 @@ class World : public SingletonT<World>
 
   /// \brief Update the simulation iface
   private: void UpdateSimulationIface();
+
+  /// \brif Get the names of interfaces defined in the tree of a model
+  private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
 
   /// Pointer the physics engine
   private: PhysicsEngine *physicsEngine;

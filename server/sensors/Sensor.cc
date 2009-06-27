@@ -229,3 +229,9 @@ Pose3d Sensor::GetPose() const
 {
   return this->body->GetPose();
 }
+///////////////////////////////////////////////////////////////////////////////
+/// Get the name of the interfaces define in the sensor controller
+void Sensor::GetInterfaceNames(std::vector<std::string>& list) const
+{
+  controller->GetInterfaceNames(list);
+}

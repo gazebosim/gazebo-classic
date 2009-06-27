@@ -99,6 +99,8 @@ class Controller
   /// \return The name of the controller
   public: std::string GetName() const;
   
+  public: void GetInterfaceNames(std::vector<std::string>& list) const;  
+
   /// \brief Return Iface by type
   /// \param type The type of the iface to retrieve
   /// \param number If several ifaces of the same type present, which one
