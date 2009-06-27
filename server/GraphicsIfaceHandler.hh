@@ -64,6 +64,9 @@ namespace gazebo
     /// \brief Helper funciton used to draw text
     private: void DrawText(OgreVisual *vis, Graphics3dDrawData *data);
 
+    /// \brief Helper function used to draw a progress bar
+    private: void DrawMeterBar(OgreVisual *vis, Graphics3dDrawData *data );
+
     private: std::string name;
     private: std::map<std::string, OgreVisual* > visuals;
     private: Graphics3dIface *threeDIface;

@@ -49,9 +49,12 @@ WebGazebo::GetModelPVA(const std::string& name,
   this->simIface->data->responseCount = 0;
 
   gazebo::Pose pose;
+  gazebo::Vec3 linearVel, angularVel;
+  gazebo::Vec3 linearAccel, angularAccel;
 
   // Ask Gazebo
-  if (!this->simIface->GetPose3d(name.c_str(), pose))
+  if (!this->simIface->GetState(name.c_str(), pose, linearVel, angularVel,
+        linearAccel, angularAccel))
     return false;
   
   p.x = pose.pos.x;
@@ -60,6 +63,20 @@ WebGazebo::GetModelPVA(const std::string& name,
   p.r = pose.roll;
   p.p = pose.pitch;
   p.a = pose.yaw;
+
+  v.x = linearVel.x;
+  v.y = linearVel.y;
+  v.z = linearVel.z;
+  v.r = angularVel.x;
+  v.p = angularVel.y;
+  v.y = angularVel.z;
+
+  a.x = linearAccel.x;
+  a.y = linearAccel.y;
+  a.z = linearAccel.z;
+  a.r = angularAccel.x;
+  a.p = angularAccel.y;
+  a.y = angularAccel.z;
 
   return true;
 }

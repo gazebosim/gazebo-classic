@@ -167,6 +167,7 @@ material Gazebo/Red
 	{
 		pass
 		{
+
 			ambient 1.000000 0.000000 0.000000 1.000000
 			diffuse 1.000000 0.000000 0.000000 1.000000
 			specular 0.200000 0.000000 0.000000 1.000000 
@@ -328,6 +329,23 @@ material Gazebo/ExclamationPoint
       texture_unit
       {
         texture exclamationPoint.png
+      }
+    }
+  }
+}
+
+material Gazebo/QuestionMark
+{
+  technique
+  {
+    pass
+    {
+      depth_write off
+      scene_blend alpha_blend
+
+      texture_unit
+      {
+        texture questionMark.png
       }
     }
   }

@@ -158,3 +158,35 @@ void Graphics3dIface::DrawText(const char *name, const char *text, Vec3 pos,
 
   this->Unlock();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Draw a meter bar (progress bar)
+void Graphics3dIface::DrawMeterBar(const char *name, Vec3 pos, Vec2 size, 
+                                   Color clr, float percent)
+{
+  this->Lock(1);
+  Graphics3dDrawData *cmd = &(this->data->commands[this->data->cmdCount++]);
+
+  cmd->drawMode = Graphics3dDrawData::METERBAR;
+
+  // Set the name of the graphics drawable
+  memset( cmd->name, 0, GAZEBO_GRAPHICS3D_MAX_NAME);
+  strcpy( cmd->name, name);
+
+  cmd->pose.pos.x = pos.x;
+  cmd->pose.pos.y = pos.y;
+  cmd->pose.pos.z = pos.z;
+
+  cmd->size.x = size.x;
+  cmd->size.y = size.y;
+  cmd->size.z = 0;
+
+  cmd->color.r = clr.r;
+  cmd->color.g = clr.g;
+  cmd->color.b = clr.b;
+  cmd->color.a = clr.a;
+
+  cmd->fltVar = percent;
+
+  this->Unlock();
+}

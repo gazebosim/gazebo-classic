@@ -216,8 +216,20 @@ int main()
   sphereSize.z = 0.1;
 
   // Draw a billboard
+  // The material used can be any of the predefined materials:
+  //   Gazebo/SmileyHappy, Gazebo/SmileySad, Gazebo/SmileyPlain,
+  //   Gazebo/SmileyDead, Gazebo/ExclamationPoint, Gazebo/QuestionMark
   pioneerG3DIface->DrawBillboard("mybillboard", "Gazebo/SmileySad",
       gazebo::Vec3(0.4,0.0,0.4), gazebo::Vec2(0.2, 0.2)  );
+
+  gazebo::Color barClr;
+  barClr.r = 1.0;
+  barClr.g = 1.0;
+  barClr.b = 0.0;
+  barClr.a = 0.5;
+
+  float percent = 0.0;
+  int dir = 1.0;
 
   // Update all the drawables
   while (true)
@@ -226,6 +238,13 @@ int main()
     UpdateSphere();
     UpdatePath();
     UpdateText();
+
+    pioneerG3DIface->DrawMeterBar("mymeterbar", gazebo::Vec3(0.0, 0.0, 0.8),
+        gazebo::Vec2(0.5, 0.1),barClr, percent );
+
+    percent += dir * 0.01;
+    if (percent >= 1.0 || percent <= 0.0)
+      dir *= -1;
 
     usleep(20000);
   }

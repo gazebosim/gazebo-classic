@@ -889,6 +889,59 @@ void World::UpdateSimulationIface()
           break;
         }
 
+      case SimulationRequestData::GET_STATE:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+          if (model)
+          {
+            Pose3d pose;
+            Vector3 linearVel;
+            Vector3 angularVel;
+            Vector3 linearAccel;
+            Vector3 angularAccel;
+
+            pose = model->GetPose();
+
+            // Get the model's linear and angular velocity
+            linearVel = model->GetLinearVel();
+            angularVel = model->GetAngularVel();
+
+            // Get the model's linear and angular acceleration
+            linearAccel = model->GetLinearAccel();
+            angularAccel = model->GetAngularAccel();
+
+            response->modelPose.pos.x = pose.pos.x;
+            response->modelPose.pos.y = pose.pos.y;
+            response->modelPose.pos.z = pose.pos.z;
+
+            response->modelPose.roll = pose.rot.GetAsEuler().x;
+            response->modelPose.pitch = pose.rot.GetAsEuler().y;
+            response->modelPose.yaw = pose.rot.GetAsEuler().z;
+
+            response->modelLinearVel.x = linearVel.x;
+            response->modelLinearVel.y = linearVel.y;
+            response->modelLinearVel.z = linearVel.z;
+
+            response->modelAngularVel.x = angularVel.x;
+            response->modelAngularVel.y = angularVel.y;
+            response->modelAngularVel.z = angularVel.z;
+
+            response->modelLinearAccel.x = linearAccel.x;
+            response->modelLinearAccel.y = linearAccel.y;
+            response->modelLinearAccel.z = linearAccel.z;
+
+            response->modelAngularAccel.x = angularAccel.x;
+            response->modelAngularAccel.y = angularAccel.y;
+            response->modelAngularAccel.z = angularAccel.z;
+
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid model name[" << req->modelName << "] in simulation interface Get State Request.\n";
+          break;
+        }
+ 
       case SimulationRequestData::GET_POSE2D:
       case SimulationRequestData::GET_POSE3D:
         {

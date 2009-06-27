@@ -692,6 +692,43 @@ void Model::SetAngularAccel( const Vector3 &accel )
     body->SetAngularAccel( accel );
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear velocity of the model
+Vector3 Model::GetLinearVel() const
+{
+  std::map<std::string, Body* >::const_iterator iter;
+  iter = this->bodies.begin();
+  return iter->second->GetLinearVel();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular velocity of the model
+Vector3 Model::GetAngularVel() const
+{
+  std::map<std::string, Body* >::const_iterator iter;
+  iter = this->bodies.begin();
+  return iter->second->GetAngularVel();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the model
+Vector3 Model::GetLinearAccel() const
+{
+  std::map<std::string, Body* >::const_iterator iter;
+  iter = this->bodies.begin();
+  return iter->second->GetLinearAccel();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the model
+Vector3 Model::GetAngularAccel() const
+{
+  std::map<std::string, Body* >::const_iterator iter;
+  iter = this->bodies.begin();
+  return iter->second->GetAngularAccel();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Get the current pose
 Pose3d Model::GetPose() const

@@ -251,6 +251,9 @@ namespace gazebo
 
     private: OgreVisual *cgVisual;
 
+    private: Vector3 linearAccel;
+    private: Vector3 angularAccel;
+
     ///  User specified Mass Matrix
     protected: ParamT<bool> *customMassMatrixP;
     protected: ParamT<double> *cxP ;

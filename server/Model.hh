@@ -131,6 +131,18 @@ namespace gazebo
 
     /// \brief Set the angular acceleration of the model
     public: void SetAngularAccel( const Vector3 &vel );
+
+    /// \brief Get the linear velocity of the model
+    public: Vector3 GetLinearVel() const;
+
+    /// \brief Get the angular velocity of the model
+    public: Vector3 GetAngularVel() const;
+
+    /// \brief Get the linear acceleration of the model
+    public: Vector3 GetLinearAccel() const;
+
+    /// \brief Get the angular acceleration of the model
+    public: Vector3 GetAngularAccel() const;
  
     /// \brief Get the current pose
     public: virtual Pose3d GetPose() const;

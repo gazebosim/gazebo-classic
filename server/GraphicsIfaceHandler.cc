@@ -137,6 +137,10 @@ void GraphicsIfaceHandler::Update()
         this->DrawText(vis, &this->threeDIface->data->commands[i] );
         break;
 
+      case Graphics3dDrawData::METERBAR:
+        this->DrawMeterBar(vis, &this->threeDIface->data->commands[i] );
+        break;
+
       default:
         gzerr(0) << "Unknown draw mode[" 
           << this->threeDIface->data->commands[i].drawMode << "\n";
@@ -285,6 +289,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
                                  data->pose.pos.z) );
         break;
       }
+
     case Graphics3dDrawData::BILLBOARD:
       {
         bool attached = false;
@@ -370,3 +375,162 @@ void GraphicsIfaceHandler::DrawText(OgreVisual *vis, Graphics3dDrawData *data)
     vis->AttachObject( msg );
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Helper function used to draw a progress bar
+void GraphicsIfaceHandler::DrawMeterBar(OgreVisual *vis, 
+                                        Graphics3dDrawData *data )
+{
+  bool attached = false;
+  Ogre::BillboardSet *bset = NULL;
+  std::ostringstream bname;
+  Ogre::TexturePtr texture;
+  Ogre::MaterialPtr material;
+
+  unsigned int width = 64;
+  unsigned int height = 64;
+  unsigned int rowWidth = width*4;
+
+  bname << "METERBAR_" << this->name;
+
+  if (vis->GetNumAttached() >0)
+  {
+    bset = (Ogre::BillboardSet *)vis->GetAttached(0);
+    bset->clear();
+    attached = true;
+    texture = Ogre::TextureManager::getSingleton().getByName(
+                                                     bname.str()+"texture");
+    material = Ogre::MaterialManager::getSingleton().getByName(
+                                                     bname.str()+"material");
+  }
+  else
+  {
+    bset = OgreAdaptor::Instance()->sceneMgr->createBillboardSet(
+        bname.str().c_str());
+
+    // Create the texture
+    texture = Ogre::TextureManager::getSingleton().createManual(
+        bname.str()+"texture",
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        Ogre::TEX_TYPE_2D,
+        width, height,
+        0,                // number of mipmaps
+        Ogre::PF_BYTE_RGBA,     // pixel format
+        Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);      // usage; 
+                             //should be TU_DYNAMIC_WRITE_ONLY_DISCARDABLE 
+                             //for textures updated very often (e.g. each frame)
+                             
+                             // Create a material using the texture
+    material = Ogre::MaterialManager::getSingleton().create(
+        bname.str()+"material", 
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+    material->getTechnique(0)->getPass(0)->createTextureUnitState(
+        bname.str()+"texture");
+    material->getTechnique(0)->getPass(0)->setSceneBlending(
+        Ogre::SBT_TRANSPARENT_ALPHA);
+  }
+
+  Ogre::Billboard *billboard = bset->createBillboard(
+      Ogre::Vector3(data->pose.pos.x,
+        data->pose.pos.y,
+        data->pose.pos.z));
+
+  billboard->setDimensions(data->size.x, data->size.y);
+
+  // Get the pixel buffer
+  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = texture->getBuffer();
+
+  // Lock the pixel buffer and get a pixel box
+  pixelBuffer->lock(Ogre::HardwareBuffer::HBL_NORMAL);
+
+  // for best performance use HBL_DISCARD!
+  const Ogre::PixelBox& pixelBox = pixelBuffer->getCurrentLock();
+
+  uint8* pDest = static_cast<uint8*>(pixelBox.data);
+
+  char red = data->color.b*255; 
+  char green = data->color.g*255; 
+  char blue = data->color.r*255; 
+
+  // Fill in some pixel data.
+  for (size_t j = 0; j < height; j++)
+  {
+    for(size_t i = 0; i < width; i++)
+    {
+      pDest[j*rowWidth + i*4 + 0] = red; 
+      pDest[j*rowWidth + i*4 + 1] = green; 
+      pDest[j*rowWidth + i*4 + 2] = blue;
+
+      if (i < width * data->fltVar)
+      {
+        pDest[j*rowWidth + i*4 + 3] = 180;
+      }
+      else
+        pDest[j*rowWidth + i*4 + 3] = 0;
+    }
+  }
+
+  
+  for (size_t j =0; j < width; j++)
+  {
+    // 2-pixel top border
+    pDest[j*4+0] = red;
+    pDest[j*4+1] = green;
+    pDest[j*4+2] = blue;
+    pDest[j*4+3] = 255;
+
+    pDest[rowWidth +j*4+0] = red;
+    pDest[rowWidth +j*4+1] = green;
+    pDest[rowWidth +j*4+2] = blue;
+    pDest[rowWidth +j*4+3] = 255;
+
+    // 2-pixel bottom border
+    pDest[(height-1)*rowWidth+j*4+0] = red;
+    pDest[(height-1)*rowWidth+j*4+1] = green;
+    pDest[(height-1)*rowWidth+j*4+2] = blue;
+    pDest[(height-1)*rowWidth+j*4+3] = 255;
+
+    pDest[(height-2)*rowWidth+j*4+0] = red;
+    pDest[(height-2)*rowWidth+j*4+1] = green;
+    pDest[(height-2)*rowWidth+j*4+2] = blue;
+    pDest[(height-2)*rowWidth+j*4+3] = 255;
+  }
+
+
+  for (size_t j =0; j < height; j++)
+  {
+    // 2-pixel left border
+    pDest[rowWidth*j+0] = red;
+    pDest[rowWidth*j+1] = green;
+    pDest[rowWidth*j+2] = blue;
+    pDest[rowWidth*j+3] = 255;
+
+    pDest[rowWidth*j+4] =  red;
+    pDest[rowWidth*j+5] =  green;
+    pDest[rowWidth*j+6] =  blue;
+    pDest[rowWidth*j+7] = 255;
+
+    // 2-pixel right border
+    pDest[rowWidth*j + (width-1)*4+0] = red;
+    pDest[rowWidth*j + (width-1)*4+1] = green;
+    pDest[rowWidth*j + (width-1)*4+2] = blue;
+    pDest[rowWidth*j + (width-1)*4+3] = 255;
+
+    pDest[rowWidth*j + (width-2)*4+0] = red;
+    pDest[rowWidth*j + (width-2)*4+1] = green;
+    pDest[rowWidth*j + (width-2)*4+2] = blue;
+    pDest[rowWidth*j + (width-2)*4+3] = 255;
+  }
+
+  // Unlock the pixel buffer
+  pixelBuffer->unlock();
+
+  bset->setMaterialName(bname.str()+"material");
+
+  if (!attached)
+  {
+    vis->AttachObject(bset);
+  }
+
+}

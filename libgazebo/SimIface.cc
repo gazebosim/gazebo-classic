@@ -117,8 +117,6 @@ void SimulationIface::BlockThread()
     // Signal the callback function
     this->goAckSignal();
   }
-
-  printf("Done with the thread\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +187,7 @@ bool SimulationIface::GetPose3d(const char *modelName, Pose &pose)
   return true;
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the 2d pose of a model
 bool SimulationIface::GetPose2d(const char *modelName, Pose &pose)
@@ -254,9 +253,9 @@ void SimulationIface::SetPose2d(const char *modelName, float x, float y, float y
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the complete state of a model
-void SimulationIface::SetState(const char *modelName, const Pose &modelPose, 
-    const Vec3 &linearVel, const Vec3 &angularVel, const Vec3 &linearAccel, 
-    const Vec3 &angularAccel )
+void SimulationIface::SetState(const char *modelName, Pose &modelPose, 
+    Vec3 &linearVel, Vec3 &angularVel, Vec3 &linearAccel, 
+    Vec3 &angularAccel )
 {
   this->Lock(1);
   this->data->responseCount = 0;
@@ -266,6 +265,20 @@ void SimulationIface::SetState(const char *modelName, const Pose &modelPose,
   memset(request->modelName, 0, 512);
   strncpy(request->modelName, modelName, 512);
   request->modelName[511] = '\0';
+
+  if (isnan(linearVel.x)) linearVel.x = 0.0;
+  if (isnan(linearVel.y)) linearVel.y = 0.0;
+  if (isnan(linearVel.z)) linearVel.z = 0.0;
+  if (isnan(angularVel.x)) angularVel.x = 0.0;
+  if (isnan(angularVel.y)) angularVel.y = 0.0;
+  if (isnan(angularVel.z)) angularVel.z = 0.0;
+
+  if (isnan(linearAccel.x)) linearAccel.x = 0.0;
+  if (isnan(linearAccel.y)) linearAccel.y = 0.0;
+  if (isnan(linearAccel.z)) linearAccel.z = 0.0;
+  if (isnan(angularAccel.x)) angularAccel.x = 0.0;
+  if (isnan(angularAccel.y)) angularAccel.y = 0.0;
+  if (isnan(angularAccel.z)) angularAccel.z = 0.0;
 
   request->modelPose = modelPose;
   request->modelLinearVel = linearVel;
@@ -309,6 +322,38 @@ void SimulationIface::GetInterfaceType(const char *modelName)
   this->Unlock();
 }
 ///////////////////////////////////////////////////////////////////////////////
+/// Get the complete state of a model
+bool SimulationIface::GetState(const char *modelName, Pose &modelPose, 
+              Vec3 &linearVel, Vec3 &angularVel, 
+              Vec3 &linearAccel, Vec3 &angularAccel )
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = gazebo::SimulationRequestData::GET_STATE;
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  modelPose = this->data->responses[0].modelPose;
+
+  linearVel = this->data->responses[0].modelLinearVel;
+  angularVel = this->data->responses[0].modelAngularVel;
+
+  linearAccel = this->data->responses[0].modelLinearAccel;
+  angularAccel = this->data->responses[0].modelAngularAccel;
+
+  return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Wait for a post on the go ack semaphore
 void SimulationIface::GoAckWait()
 {

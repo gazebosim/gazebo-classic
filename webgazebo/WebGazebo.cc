@@ -128,6 +128,15 @@ WebGazebo::GetModel(const std::string& name,
         return false;
       int j = xmldata.find("\"", i+tag2.length());
       xmldata.replace(i,j-i+1,std::string("name=\"" + name + "\""));
+
+
+      tag1 = "<model:physical";
+      tag2 = ">";
+      i = xmldata.find(tag1);
+      i = xmldata.find(tag2,i);
+
+      xmldata.insert(i+1, "<collide>none</collide><enableGravity>false</enableGravity>" );
+
       return true;
     }
   }

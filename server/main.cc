@@ -138,7 +138,8 @@ void PrintUsage()
   fprintf(stderr, "  -r            : Run without a rendering engine\n");
   fprintf(stderr, "  -l <logfile>  : Log to indicated file.\n");
   fprintf(stderr, "  -n            : Do not do any time control\n");
-  fprintf(stderr,"   -p            : Run without physics engine\n");
+  fprintf(stderr, "  -p            : Run without physics engine\n");
+  fprintf(stderr, "  -u            : Start the simulation paused\n");
   fprintf(stderr, "  <worldfile>   : load the the indicated world file\n");
   return;
 }
@@ -162,15 +163,14 @@ int ParseArgs(int argc, char **argv)
   FILE *tmpFile;
   int ch;
 
-  char *flags = (char*)("l:hd:s:fgxt:nqper");
+  char *flags = (char*)("l:hd:s:fgxt:nqperu");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
   {
     switch (ch)
     {
-      case 'e':
-        std::cout << "Running in federation mode!\n";
+      case 'u':
         optPaused = true;
         break;
 

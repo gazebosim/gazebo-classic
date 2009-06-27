@@ -426,6 +426,7 @@ class SimulationRequestData
                       SET_POSE3D,
                       SET_POSE2D,
                       SET_STATE,
+                      GET_STATE,
                       GO,
 		      GET_MODEL_TYPE,
                       GET_NUM_MODELS,
@@ -552,10 +553,14 @@ class SimulationIface : public Iface
   public: void SetPose2d(const char *modelName, float x, float y, float yaw);
 
   /// \brief Set the complete state of a model
-  public: void SetState(const char *modelName, const Pose &modelPose, 
-              const Vec3 &linearVel, const Vec3 &angularVel, 
-              const Vec3 &linearAccel, const Vec3 &angularAccel );
+  public: void SetState(const char *modelName, Pose &modelPose, 
+              Vec3 &linearVel, Vec3 &angularVel, 
+              Vec3 &linearAccel, Vec3 &angularAccel );
 
+  /// \brief Get the complete state of a model
+  public: bool GetState(const char *modelName, Pose &modelPose, 
+              Vec3 &linearVel, Vec3 &angularVel, 
+              Vec3 &linearAccel, Vec3 &angularAccel );
 
   /// \brief Get the child interfaces of a model
   public: void GetChildInterfaces(const char *modelName);
@@ -861,7 +866,7 @@ class Graphics3dDrawData
   /// Type of drawing to perform
   public: enum DrawMode { POINTS, LINES, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, 
                           TRIANGLE_FAN, PLANE, SPHERE, CUBE, CYLINDER, CONE,
-                          BILLBOARD, TEXT };
+                          BILLBOARD, TEXT, METERBAR };
 
   /// Drawing mode
   public: DrawMode drawMode;
@@ -890,6 +895,8 @@ class Graphics3dDrawData
 
   /// Size of the shape
   public: Vec3 size;
+
+  public: float fltVar;
 };
 
 /// \brief Graphics3d interface data
@@ -935,6 +942,10 @@ class Graphics3dIface : public Iface
   /// \brief Draw text
   public: void DrawText(const char *name, const char *text, Vec3 pos, 
                         float fontSize); 
+
+  /// \brief Draw a meter bar (progress bar)
+  public: void DrawMeterBar(const char *name, Vec3 pos, Vec2 size, Color clr,
+                            float percent);
 
 
   /// Pointer to the graphics3d data

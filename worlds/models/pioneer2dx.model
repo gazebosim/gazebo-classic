@@ -66,7 +66,7 @@
 
   <geom:cylinder name="left_wheel_geom">
     <size>0.075 0.05</size>
-    <mass>0.1</mass>
+    <mass>0.5</mass>
     <mu1>0.5</mu1>
 
     <visual>
@@ -101,7 +101,7 @@
 
   <geom:cylinder name="right_wheel_geom">
     <size>0.075 0.05</size>
-    <mass>0.1</mass>
+    <mass>0.5</mass>
     <mu1>0.5</mu1>
 
     <visual>
@@ -134,7 +134,7 @@
   <rpy>0 0 0</rpy>
   <geom:sphere name="castor_geom">
     <size>0.04</size>
-    <mass>0.1</mass>
+    <mass>0.5</mass>
     <mu1>0.5</mu1>
 
     <visual>

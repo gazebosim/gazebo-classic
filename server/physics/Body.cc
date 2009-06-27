@@ -420,6 +420,8 @@ void Body::Init()
     this->physicsEngine->UnlockMutex();
   }
 
+  this->linearAccel.Set(0,0,0);
+  this->angularAccel.Set(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -462,6 +464,13 @@ void Body::Update()
         }
       }
   }*/
+
+
+  // Apply our linear accel
+  this->SetForce(this->linearAccel);
+
+  // Apply our angular accel
+  this->SetTorque(this->angularAccel);
 
 #ifdef TIMING
   double tmpT3 = Simulator::Instance()->GetWallTime();
@@ -1145,7 +1154,7 @@ Vector3 Body::GetAngularVel() const
 /// Set the linear acceleration of the body
 void Body::SetLinearAccel(const Vector3 &accel)
 {
-  this->SetForce( accel * this->GetMass());
+  this->linearAccel = accel;// * this->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1159,7 +1168,7 @@ Vector3 Body::GetLinearAccel() const
 /// Set the angular acceleration of the body
 void Body::SetAngularAccel(const Vector3 &accel)
 {
-  this->SetTorque( accel * this->GetMass());
+  this->angularAccel = accel * this->GetMass();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
