@@ -276,8 +276,39 @@ void SimulationIface::SetState(const char *modelName, const Pose &modelPose,
 
   this->Unlock();
 }
+//////////////////////////////////////////////////////////////////////////////////
+/// Get then children of a model
+void SimulationIface::GetChildInterfaces(const char *modelName)
+{
 
-////////////////////////////////////////////////////////////////////////////////
+  this->Lock(1);
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = gazebo::SimulationRequestData::GET_MODEL_INTERFACES;
+
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+
+  this->Unlock();
+
+}
+///////////////////////////////////////////////////////////////////////////////////
+/// \brief Get the Type of a model e.g. "laser" "model" "fiducial"
+void SimulationIface::GetInterfaceType(const char *modelName)
+{
+  this->Lock(1);
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = gazebo::SimulationRequestData::GET_INTERFACE_TYPE;
+
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+
+  this->Unlock();
+}
+///////////////////////////////////////////////////////////////////////////////
 // Wait for a post on the go ack semaphore
 void SimulationIface::GoAckWait()
 {

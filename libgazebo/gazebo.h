@@ -413,6 +413,7 @@ of the server, such as the current simulation time-step.
 */
 
 #define GAZEBO_SIMULATION_MAX_REQUESTS 128
+#define GAZEBO_MAX_NUMBER_OF_CHILDREN 256
 
 class SimulationRequestData
 {
@@ -426,12 +427,15 @@ class SimulationRequestData
                       SET_POSE2D,
                       SET_STATE,
                       GO,
-                      GET_MODEL_TYPE,
+		      GET_MODEL_TYPE,
                       GET_NUM_MODELS,
                       GET_NUM_CHILDREN,
                       GET_CHILD_NAME,
                       GET_MODEL_NAME,
-                      GET_MODEL_EXTENT
+                      GET_MODEL_EXTENT,
+		      GET_MODEL_INTERFACES, // for getting interfaces as well as the models which are ancestors of interfaces
+		      GET_INTERFACE_TYPE   // if the model is not an interface 'unknown' is returned
+		      
                    };
 
   public: Type type; 
@@ -446,6 +450,10 @@ class SimulationRequestData
   public: Vec3 modelLinearAccel;
   public: Vec3 modelAngularAccel;
   public: unsigned int runTime;
+  public: char childInterfaces[GAZEBO_MAX_NUMBER_OF_CHILDREN][512];
+  public: int nChildInterfaces;
+  //public: char modelType[512];
+
 };
 
 /// \brief Simulation interface data
@@ -548,6 +556,13 @@ class SimulationIface : public Iface
               const Vec3 &linearVel, const Vec3 &angularVel, 
               const Vec3 &linearAccel, const Vec3 &angularAccel );
 
+
+  /// \brief Get the child interfaces of a model
+  public: void GetChildInterfaces(const char *modelName);
+
+  /// \brief Get the Type of an interface e.g. "laser" "model" "fiducial"
+  public: void GetInterfaceType(const char *modelName);
+
   /// \brief Get the type of this model
   public: bool GetModelType(const char *modelName, std::string &type);
 
@@ -566,6 +581,7 @@ class SimulationIface : public Iface
 
   /// \brief Get the extents of a model
   public: bool GetModelExtent(const char *modelName, Vec3 &ext);
+
 
   public: void GoAckWait();
   public: void GoAckPost();
