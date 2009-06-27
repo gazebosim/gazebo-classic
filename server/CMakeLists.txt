@@ -64,6 +64,7 @@ SET (sources Common.cc
              GuiAPI.cc
              Simulator.cc
              Rand.cc
+             Factory.cc
 )
 
 SET (headers Common.hh
@@ -89,6 +90,7 @@ SET (headers Common.hh
              GuiAPI.hh
              Simulator.hh
              Rand.hh
+             Factory.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})

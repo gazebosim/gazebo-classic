@@ -29,6 +29,7 @@
 #include <fstream>
 #include <sys/time.h> //gettimeofday
 
+#include "Factory.hh"
 #include "GraphicsIfaceHandler.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
@@ -62,6 +63,7 @@ World::World()
   this->server = NULL;
   this->graphics = NULL;
   this->openAL = NULL;
+  this->factory = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +113,10 @@ void World::Close()
   {
     gzthrow(e);
   }
+
+  if (this->factory)
+    delete this->factory;
+  this->factory = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,6 +145,9 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   {
     gzthrow(err);
   }
+
+  // Create the default factory
+  this->factory = new Factory();
 
   // Create the graphics iface handler
   this->graphics = new GraphicsIfaceHandler();
@@ -213,12 +222,15 @@ void World::Init()
 
   this->graphics->Init();
 
+  this->factory->Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Primarily used to update the graphics interfaces
 void World::GraphicsUpdate()
 {
+  this->graphics->Update();
+
   // Update all the models
   std::vector< Model* >::iterator miter;
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
@@ -228,6 +240,7 @@ void World::GraphicsUpdate()
       (*miter)->GraphicsUpdate();
     }
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +291,8 @@ void World::Update()
     this->physicsEngine->UpdatePhysics();
   }
 
-  this->graphics->Update();
+
+  this->factory->Update();
 
 #ifdef TIMING
   double tmpT4 = Simulator::Instance()->GetWallTime();

@@ -51,6 +51,7 @@ namespace gazebo
   class XMLConfigNode;
   class GraphicsIfaceHandler;
   class OpenAL;
+  class Factory;
    
 /// \brief The World
 /*
@@ -228,6 +229,9 @@ class World : public SingletonT<World>
 
   /// Simulation interface
   private: SimulationIface *simIface;
+
+  private: Factory *factory;
+
   private: GraphicsIfaceHandler *graphics;
 
   /// Length of time to run before receiving a "go" command

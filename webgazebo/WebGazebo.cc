@@ -57,8 +57,8 @@ WebGazebo::WebGazebo(const std::string& fedfile,
   // Open the Simulation Interface; let exceptions leak out
   this->simIface->Open(this->client, "default");
   puts( "(opened sim interface)" );
- // this->factoryIface->Open(this->client, "factory_model::factory_iface");
-  //puts( "(opened factory interface)" );
+  this->factoryIface->Open(this->client, "default");
+  puts( "(opened factory interface)" );
   puts("Done.");
 
   puts("[webgazebo] Ready");
