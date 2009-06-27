@@ -110,51 +110,240 @@ WebGazebo::GetModelData(const std::string& name,
 									std::string& response,
 									websim::Format format,
 									void* xmlnode )
-{/*
-  puts("data request:");
-  puts(name.c_str());
+{
+
+  //puts("data request:");
+  std::string type;
+  this->GetModelType(name, type);
+
   std::string mname = name;
   int i=mname.find(".");        
-  if(i>0){
-  	mname.erase(i,1);
-  	mname.insert(i,"-");
+
+  while(i>-1){
+
+	mname.erase(i,1);
+	mname.insert(i,"::");
+	i= mname.find(".");
   }
- 
+
   websim::Time t= GetTime();
-  puts("laser:::");
-  puts(mname.c_str());
 
-  this->laserIface->Open(this->client, mname);
-  uint32_t resolution;
-  double fov;
-  websim::Pose p;
-  std::vector<double> ranges;                                                                
 
-  p.x = laserIface->data->pose.pos.x;
-  p.y = laserIface->data->pose.pos.y;
-  p.z = laserIface->data->pose.pos.z;
-  p.r = laserIface->data->pose.roll;
-  p.p = laserIface->data->pose.pitch;
-  p.a = laserIface->data->pose.yaw;
+  if(type=="laser"){
+
+  	  gazebo::LaserIface* laseriface;
+
+	  std::map<std::string,gazebo::Iface*>::iterator itr = interfaces.find(mname);
+ 	  if(itr == interfaces.end()){
+  	  	laseriface = new gazebo::LaserIface();
+		laseriface->Open(this->client, mname);
+		interfaces.insert( make_pair(mname, laseriface));
+	  }else {
+
+		laseriface = (gazebo::LaserIface*) itr->second;	
+	  }
+
+	  uint32_t resolution;
+	  double fov;
+	  websim::Pose p;
+	  std::vector<double> ranges;                                                                
+
+	  laseriface->Lock(1);
+
+	  p.x = laseriface->data->pose.pos.x;
+	  p.y = laseriface->data->pose.pos.y;
+	  p.z = laseriface->data->pose.pos.z;
+	  p.r = laseriface->data->pose.roll;
+	  p.p = laseriface->data->pose.pitch;
+	  p.a = laseriface->data->pose.yaw;
   
-  //resolution = laserIface->data->res_angle;
- 
-  int count = laserIface->data->range_count;
+  
+	  int count = laseriface->data->range_count;
+	  fov = laseriface->data->max_angle - laseriface->data->min_angle;
+	  resolution = fov/count;
 
-  float maxRange = 0;
-  for (int i = 0; i < count; i++)
-  {
-        ranges.push_back(laserIface->data->ranges[i]);
+
+  
+	  for (int i = 0; i < count; i++)
+	  {
+	        ranges.push_back(laseriface->data->ranges[i]);
         
-  }
-  
-  WebSim::GetLaserData(name, t, resolution, fov, p, ranges, format, response, xmlnode);
+	  }
 
-  this->laserIface->Close();
-*/
+	  laseriface->Unlock();
+  
+	  WebSim::GetLaserData(name, t, resolution, fov, p, ranges, format, response, xmlnode);
+
+	  
+
+  }else if(type == "fiducial"){
+
+
+  	  gazebo::FiducialIface* fiducialiface;
+
+	  std::map<std::string,gazebo::Iface*>::iterator itr = interfaces.find(mname);
+ 	  if(itr == interfaces.end()){
+  	  	fiducialiface = new gazebo::FiducialIface();
+		fiducialiface->Open(this->client, mname);
+		interfaces.insert( make_pair(mname, fiducialiface));
+	  }else {
+
+		fiducialiface = (gazebo::FiducialIface*) itr->second;	
+	  }
+
+	  std::vector<websim::Fiducial> fids;
+
+	  fiducialiface->Lock(1);
+
+	  for(int i=0;i<fiducialiface->data->count;i++){
+		
+		websim::Fiducial f;
+		f.id = fiducialiface->data->fids[i].id;
+		f.pos.x = fiducialiface->data->fids[i].pose.pos.x;
+		f.pos.y = fiducialiface->data->fids[i].pose.pos.y;
+		f.pos.z = fiducialiface->data->fids[i].pose.pos.z;
+		f.pos.r = fiducialiface->data->fids[i].pose.roll;
+		f.pos.p = fiducialiface->data->fids[i].pose.pitch;
+		f.pos.a = fiducialiface->data->fids[i].pose.yaw;
+	  }
+	  
+
+
+	  fiducialiface->Unlock();
+  
+	  WebSim::GetFiducialData(name, t, fids, format, response, xmlnode);
+
+
+  
+  }else if(type == "ranger"){
+
+
+  	  gazebo::IRIface* iriface;
+
+	  std::map<std::string,gazebo::Iface*>::iterator itr = interfaces.find(mname);
+ 	  if(itr == interfaces.end()){
+  	  	iriface = new gazebo::IRIface();
+		iriface->Open(this->client, mname);
+		interfaces.insert( make_pair(mname, iriface));
+	  }else {
+
+		iriface = (gazebo::IRIface*) itr->second;	
+	  }
+
+	  
+	  std::vector<websim::Pose> ps;
+	  std::vector<double> ranges;
+
+	  iriface->Lock(1);
+	  for(int i=0;i<iriface->data->range_count;i++){
+		websim::Pose p;
+		p.x = iriface->data->poses[i].pos.x;
+		p.y = iriface->data->poses[i].pos.y;
+		p.z = iriface->data->poses[i].pos.z;
+		p.r = iriface->data->poses[i].roll;
+		p.p = iriface->data->poses[i].pitch;
+		p.a = iriface->data->poses[i].yaw;
+		ps.push_back(p);
+		ranges.push_back(iriface->data->ranges[i]);
+
+	  }
+	
+
+	  iriface->Unlock();
+  
+	  WebSim::GetRangerData(name, t, ps, ranges, format, response, xmlnode);
+
+
+  }
+
   return true;
 
 }
+  
+bool 
+WebGazebo::GetModelChildren(const std::string& model, 
+									std::vector<std::string>& children){
+  this->simIface->Lock(1);
+  this->simIface->data->responseCount = 0;
+  this->simIface->data->responses[0].nChildInterfaces=0;
+
+  // Ask Gazebo
+  this->simIface->GetChildInterfaces(model.c_str());
+  
+  // Wait for the response
+  double timeout = 3.0;
+  struct timeval t0, t1;
+  gettimeofday(&t0, NULL);
+  struct timespec sleeptime = {0, 1000000};
+  while(this->simIface->data->responseCount == 0)
+  {
+    gettimeofday(&t1, NULL);
+    if(((t1.tv_sec + t1.tv_usec/1e6) - (t0.tv_sec + t0.tv_usec/1e6)) 
+       > timeout)
+    {
+      //response= "Timeout";
+
+      return false;
+    }
+    nanosleep(&sleeptime, NULL);
+  }
+
+  assert(this->simIface->data->responseCount == 1);
+  
+
+  for(int i=0;i< this->simIface->data->responses[0].nChildInterfaces;i++){
+	//printf("%s\n",this->simIface->data->responses[0].modelChildren[i]);
+	children.push_back(std::string(this->simIface->data->responses[0].childInterfaces[i]));
+  }
+  this->simIface->data->responses[0].nChildInterfaces=0;
+
+  this->simIface->Unlock();
+
+return true;
+}
+
+bool 
+WebGazebo::GetModelType(const std::string& name, std::string& type){
+
+
+  this->simIface->Lock(1);
+
+  this->simIface->data->responseCount = 0;
+
+  
+  // Ask Gazebo
+  this->simIface->GetInterfaceType(name.c_str());
+  
+  // Wait for the response
+  double timeout = 3.0;
+  struct timeval t0, t1;
+  gettimeofday(&t0, NULL);
+  struct timespec sleeptime = {0, 1000000};
+  while(this->simIface->data->responseCount == 0)
+  {
+    gettimeofday(&t1, NULL);
+    if(((t1.tv_sec + t1.tv_usec/1e6) - (t0.tv_sec + t0.tv_usec/1e6)) 
+       > timeout)
+    {
+       printf("GetModeType() Timeout \n");
+
+      return false;
+    }
+    nanosleep(&sleeptime, NULL);
+  }
+
+  assert(this->simIface->data->responseCount == 1);
+  
+
+  type = this->simIface->data->responses[0].strValue;
+  //printf("recieved modelType: %s\n", type.c_str());
+  this->simIface->Unlock();
+
+
+
+  return true;
+}
+
 
 bool
 WebGazebo::CheckTolerances(gazebo::Pose p, gazebo::Pose q)
@@ -185,7 +374,7 @@ WebGazebo::CheckTolerances(gazebo::Pose p, gazebo::Pose q)
   return true;
 }
 
-
+/*
 bool 
 WebGazebo::GetModelType(const std::string& name, std::string& type)
 {
@@ -198,8 +387,8 @@ WebGazebo::GetModelType(const std::string& name, std::string& type)
 
   return true;
 }
-
-bool
+*/
+/*bool
 WebGazebo::GetModelChildren(const std::string& model, 
 				                    std::vector<std::string>& children)
 {
@@ -238,21 +427,10 @@ WebGazebo::GetModelChildren(const std::string& model,
   
   return true;
 }
+*/
 
-bool
-WebGazebo::GetNumberOfRobots(unsigned int &n)
-{
-  // Discard any leftover responses
-  this->simIface->data->responseCount = 0;
 
-  /// Get the number of models 
-  if (!this->simIface->GetNumModels(n))
-    return false;
-
-  return true;
-}
-
-bool WebGazebo::GetModelExtent(const std::string& name, double& bx, double& by,
+bool WebGazebo::GetModelGeometry(const std::string& name, double& bx, double& by,
                         double& bz, websim::Pose& center, std::string& response) 
 {
   if (name == "sim")
@@ -286,5 +464,6 @@ bool WebGazebo::GetModelExtent(const std::string& name, double& bx, double& by,
     center.y = pose.pos.y;
     center.z = pose.pos.z;
   }
+  return true;
 }
 

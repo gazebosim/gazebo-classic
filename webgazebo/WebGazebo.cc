@@ -57,8 +57,8 @@ WebGazebo::WebGazebo(const std::string& fedfile,
   // Open the Simulation Interface; let exceptions leak out
   this->simIface->Open(this->client, "default");
   puts( "(opened sim interface)" );
-  this->factoryIface->Open(this->client, "factory_model::factory_iface");
-  puts( "(opened factory interface)" );
+ // this->factoryIface->Open(this->client, "factory_model::factory_iface");
+  //puts( "(opened factory interface)" );
   puts("Done.");
 
   puts("[webgazebo] Ready");
@@ -66,7 +66,14 @@ WebGazebo::WebGazebo(const std::string& fedfile,
 
 WebGazebo::~WebGazebo()
 {
-  delete this->laserIface;
+  //delete this->laserIface;
+  std::map<std::string, gazebo::Iface*>::iterator itr;
+  for(itr = interfaces.begin(); itr != interfaces.end(); itr++)
+  {
+	itr->second->Close();
+	delete itr->second;
+  }
+
   delete this->simIface;
   delete this->client;
 }
@@ -209,7 +216,7 @@ WebGazebo::Go(double t)
   return true;
 }
 
-bool WebGazebo::WaitForResponse()
+/*bool WebGazebo::WaitForResponse()
 {
   // Wait for the response
   double timeout = 3.0;
@@ -231,5 +238,5 @@ bool WebGazebo::WaitForResponse()
   return true;
 }
 
-
+*/
 

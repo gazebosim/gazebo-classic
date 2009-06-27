@@ -76,18 +76,13 @@ public:
   virtual bool GetModelChildren(const std::string& model, 
 				std::vector<std::string>& children);
   
-  virtual bool GetModelExtent(const std::string& name,
+  virtual bool GetModelGeometry(const std::string& name,
 			      double& bx,
 			      double& by,
 			      double& bz,
 			      websim::Pose& center,
 			      std::string& response);
- 
-  virtual bool GetNumberOfRobots(unsigned int& n);
- 
-  virtual bool GetSayStrings(std::vector<std::string>& sayings) 
-  { std::cout << "GetSayStrings not implemented\n"; return true;}
-    
+
   /** Get the current simulation time */
   virtual websim::Time GetTime();
 
@@ -113,6 +108,9 @@ private: // all private members are specific to WebGazebo
   gazebo::SimulationIface *simIface;
   gazebo::FactoryIface *factoryIface;
   gazebo::LaserIface *laserIface;
+
+  std::map<std::string,gazebo::Iface*> interfaces;
+
   // Available models
   std::map<std::string,int> models;
 
