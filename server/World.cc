@@ -669,7 +669,7 @@ void World::UpdateSimulationIface()
   this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
   this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
   this->simIface->data->realTime = Simulator::Instance()->GetRealTime();
-  this->simIface->data->state = !Simulator::Instance()->GetUserPause();
+  this->simIface->data->state = !Simulator::Instance()->IsPaused();
 
   unsigned int requestCount = this->simIface->data->requestCount;
 
@@ -688,13 +688,12 @@ void World::UpdateSimulationIface()
 
     switch (req->type)
     {
-
       case SimulationRequestData::UNPAUSE: 
-        Simulator::Instance()->SetUserPause(false);
+        Simulator::Instance()->SetPaused(false);
         break;
       case SimulationRequestData::PAUSE: 
-        Simulator::Instance()->SetUserPause(
-            !Simulator::Instance()->GetUserPause());
+        Simulator::Instance()->SetPaused(
+            !Simulator::Instance()->IsPaused());
         break;
 
       case SimulationRequestData::RESET:

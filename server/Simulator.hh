@@ -121,17 +121,11 @@ namespace gazebo
     /// \brief Simulator finished by the user
     public: void SetUserQuit();
 
-    /// \brief Return true if the user has pased
-    public: bool GetUserPause() const;
-
-    /// \brief Set whether the user has paused
-    public: void SetUserPause(bool pause);
-    
     /// \brief Return true if the step has incremented
-    public: bool GetUserStepInc() const;
+    public: bool GetStepInc() const;
 
     /// \brief Set whether the step has incremented
-    public: void SetUserStepInc(bool step);
+    public: void SetStepInc(bool step);
 
     /// \brief True if the gui is to be used
     public: void SetGuiEnabled( bool enabled );
@@ -204,13 +198,9 @@ namespace gazebo
     // render updates
     private: int  renderUpdates;
 
-    // UserIteractions 
-    /// \brief Set to true to pause the simulation
-    private: bool userPause;
-
     /// Set to true to increment the simulation once. This is only
     ///  valid when paused.
-    private: bool userStepInc;
+    private: bool stepInc;
 
     //The user has somewhat signaled the end of the program
     private: bool userQuit;

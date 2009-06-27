@@ -428,15 +428,14 @@ class SimulationRequestData
                       SET_STATE,
                       GET_STATE,
                       GO,
-		      GET_MODEL_TYPE,
+                      GET_MODEL_TYPE,
                       GET_NUM_MODELS,
                       GET_NUM_CHILDREN,
                       GET_CHILD_NAME,
                       GET_MODEL_NAME,
                       GET_MODEL_EXTENT,
-		      GET_MODEL_INTERFACES, // for getting interfaces as well as the models which are ancestors of interfaces
-		      GET_INTERFACE_TYPE   // if the model is not an interface 'unknown' is returned
-		      
+                      GET_MODEL_INTERFACES, // for getting interfaces as well as the models which are ancestors of interfaces
+                      GET_INTERFACE_TYPE,   // if the model is not an interface 'unknown' is returned
                    };
 
   public: Type type; 
@@ -540,6 +539,9 @@ class SimulationIface : public Iface
   /// \brief Save the simulation
   public: void Save();
 
+  /// \brief Run the specified amount of simulation time
+  public: void Run(double simTime);
+
   /// \brief Get the 3d pose of a model
   public: bool GetPose3d(const char *modelName, Pose &pose);
 
@@ -586,7 +588,6 @@ class SimulationIface : public Iface
 
   /// \brief Get the extents of a model
   public: bool GetModelExtent(const char *modelName, Vec3 &ext);
-
 
   public: void GoAckWait();
   public: void GoAckPost();

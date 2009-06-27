@@ -188,6 +188,18 @@ void StatusBar::Update()
 
     this->lastUpdateTime = Simulator::Instance()->GetRealTime();
   }
+
+  if (Simulator::Instance()->IsPaused())
+  {
+    this->playButton->label("@>");
+    this->stepButton->activate();
+  }
+  else
+  {
+    this->playButton->label("@||");
+    this->stepButton->deactivate();
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -198,14 +210,14 @@ void StatusBar::PlayPauseButtonCB( Fl_Widget *w, void *data )
 
   if (strcmp(w->label(), "@||") == 0)
   {
-    Simulator::Instance()->SetUserPause(true);
+    Simulator::Instance()->SetPaused(true);
 
     sb->stepButton->activate();
     w->label("@>");
   }
   else
   {
-    Simulator::Instance()->SetUserPause(false);
+    Simulator::Instance()->SetPaused(false);
     sb->stepButton->deactivate();
     w->label("@||");
   }
@@ -217,5 +229,5 @@ void StatusBar::PlayPauseButtonCB( Fl_Widget *w, void *data )
 /// Set button callback
 void StatusBar::StepButtonCB( Fl_Widget * /*w*/, void * /*data*/ )
 {
-  Simulator::Instance()->SetUserStepInc( true );
+  Simulator::Instance()->SetStepInc( true );
 }

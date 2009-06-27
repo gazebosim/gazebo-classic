@@ -66,8 +66,7 @@ Simulator::Simulator()
   physicsUpdates(0),
   checkpoint(0.0),
   renderUpdates(0),
-  userPause(false),
-  userStepInc(false),
+  stepInc(false),
   userQuit(false),
   guiEnabled(true),
   renderEngineEnabled(true),
@@ -221,7 +220,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   // Initialize the GUI
   if (this->gui)
   {
-    printf("Init gui\n");
     this->gui->Init();
   }
 
@@ -409,6 +407,7 @@ bool Simulator::IsPaused() const
 /// Set whether the simulation is paused
 void Simulator::SetPaused(bool p)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
   this->pause = p;
 }
 
@@ -457,27 +456,16 @@ void Simulator::SetUserQuit()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Simulator::GetUserPause() const
+bool Simulator::GetStepInc() const
 {
-  return this->userPause;
+  return this->stepInc;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Simulator::SetUserPause(bool pause)
+void Simulator::SetStepInc(bool step)
 {
-  this->userPause = pause;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-bool Simulator::GetUserStepInc() const
-{
-  return this->userStepInc;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void Simulator::SetUserStepInc(bool step)
-{
-  this->userStepInc = step;
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  this->stepInc = step;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -614,7 +602,8 @@ void Simulator::PhysicsLoop()
   double step = world->GetPhysicsEngine()->GetStepTime();
   double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
   double physicsUpdatePeriod = 1.0 / physicsUpdateRate;
- 
+
+  bool userStepped;
   double diffTime;
   double currTime;
   double lastTime = this->GetRealTime();
@@ -628,61 +617,61 @@ void Simulator::PhysicsLoop()
 
     currTime = this->GetRealTime();
 
-    //if (physicsUpdateRate == 0 || 
-        //currTime - lastTime >= physicsUpdatePeriod) 
+    userStepped = false;
+
+    // Update the physics engine
+    //if (!this->GetUserPause()  && !this->IsPaused() ||
+    //   (this->GetUserPause() && this->GetUserStepInc()))
+    if (!this->IsPaused() || this->GetStepInc())
     {
+      this->simTime += step;
+      this->SetPaused(false);
 
-      // Update the physics engine
-      //if (!this->GetUserPause()  && !this->IsPaused() ||
-      //   (this->GetUserPause() && this->GetUserStepInc()))
-      if (!this->IsPaused())
-      {
-        this->simTime += step;
-        this->SetUserStepInc(!this->GetUserStepInc());
-      }
-      else
-      {
-        this->pauseTime += step;
-      //  this->pause=true;
-      }
-
-      lastTime = this->GetRealTime();
-
-      {
-        boost::recursive_mutex::scoped_lock lock(*this->mutex);
-        world->Update();
-      }
-
-      currTime = this->GetRealTime();
-
-      // Set a default sleep time
-      req.tv_sec  = 0;
-      req.tv_nsec = 10000;
-
-      // If the physicsUpdateRate < 0, then we should try to match the
-      // update rate to real time
-      if ( physicsUpdateRate < 0 &&
-                (this->GetSimTime() + this->GetPauseTime()) > 
-                 this->GetRealTime()) 
-      {
-        diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
-                    this->GetRealTime();
-        req.tv_sec  = (int) floor(diffTime);
-        req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
-      }
-      // Otherwise try to match the update rate to the one specified in
-      // the xml file
-      else if (physicsUpdateRate > 0 && 
-               currTime - lastTime < physicsUpdatePeriod)
-      {
-        diffTime = physicsUpdatePeriod - (currTime - lastTime);
-
-        req.tv_sec  = (int) floor(diffTime);
-        req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
-      }
-   
-      nanosleep(&req, &rem);
+      if (this->GetStepInc())
+          userStepped = true;
     }
+    else
+    {
+      this->pauseTime += step;
+      //  this->pause=true;
+    }
+
+    lastTime = this->GetRealTime();
+
+    {
+      boost::recursive_mutex::scoped_lock lock(*this->mutex);
+      world->Update();
+    }
+
+    currTime = this->GetRealTime();
+
+    // Set a default sleep time
+    req.tv_sec  = 0;
+    req.tv_nsec = 10000;
+
+    // If the physicsUpdateRate < 0, then we should try to match the
+    // update rate to real time
+    if ( physicsUpdateRate < 0 &&
+        (this->GetSimTime() + this->GetPauseTime()) > 
+        this->GetRealTime()) 
+    {
+      diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
+        this->GetRealTime();
+      req.tv_sec  = (int) floor(diffTime);
+      req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
+    }
+    // Otherwise try to match the update rate to the one specified in
+    // the xml file
+    else if (physicsUpdateRate > 0 && 
+        currTime - lastTime < physicsUpdatePeriod)
+    {
+      diffTime = physicsUpdatePeriod - (currTime - lastTime);
+
+      req.tv_sec  = (int) floor(diffTime);
+      req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
+    }
+
+    nanosleep(&req, &rem);
 
     // Process all incoming messages from simiface
     world->ProcessMessages();
@@ -693,10 +682,16 @@ void Simulator::PhysicsLoop()
       break;
     }
 
+    if (userStepped)
+    {
+      this->SetStepInc(false);
+      this->SetPaused(true);
+    }
+
 #ifdef TIMING
     double tmpT2 = this->GetWallTime();
     std::cout << " Simulator::PhysicsLoop() DT(" << tmpT2-tmpT1 
-              << ")" << std::endl;
+      << ")" << std::endl;
 #endif
   }
 }
