@@ -6,7 +6,6 @@ SET (files audio.world
            bumper.world
            epuck_single.world
            epuck.world
-           factory.world
            federation.world
            laser.world
            lights.world
