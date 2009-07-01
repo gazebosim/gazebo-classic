@@ -26,9 +26,12 @@
 #ifndef AUDIOCONTROLLER_HH
 #define AUDIOCONTROLLER_HH
 
+#include "config.h"
 
 #include "Controller.hh"
 #include "Entity.hh"
+
+#ifdef HAVE_OPENAL
 
 namespace gazebo
 {
@@ -98,5 +101,6 @@ class AudioController : public Controller
 
 }
 
+#endif
 #endif
 

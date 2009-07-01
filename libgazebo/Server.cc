@@ -106,7 +106,7 @@ void Server::Init(int serverId, int force)
     if(fp) 
     {
       int pid = 0;
-      fscanf(fp, "%d", &pid);
+      int result = fscanf(fp, "%d", &pid);
       fclose(fp);
       
       if (pid != 0)

@@ -36,7 +36,7 @@ public:
 	    double dtol, double atol);
   virtual ~WebGazebo();
 
-    bool Go(double t);
+  bool Go(double t);
   
   // start WebSim Interface ============================================================
   

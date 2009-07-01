@@ -36,6 +36,8 @@
 
 #include <string.h>
 
+#ifdef HAVE_OPENAL
+
 using namespace gazebo;
 
 GZ_REGISTER_STATIC_CONTROLLER("audio", AudioController);
@@ -160,3 +162,5 @@ void AudioController::PutAudioData()
     this->audioIface->Unlock();
   }
 }
+
+#endif

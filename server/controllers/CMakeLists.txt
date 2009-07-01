@@ -10,10 +10,7 @@ ADD_SUBDIRECTORY(laser)
 ADD_SUBDIRECTORY(opaque)
 ADD_SUBDIRECTORY(position2d)
 ADD_SUBDIRECTORY(ptz)
-
-IF (INCLUDE_AV)
-  ADD_SUBDIRECTORY(audio)
-ENDIF (INCLUDE_AV)
+ADD_SUBDIRECTORY(audio)
 
 SET (sources Controller.cc 
              ControllerFactory.cc
