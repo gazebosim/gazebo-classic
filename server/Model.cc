@@ -193,6 +193,9 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->enableGravityP->Load(node);
   this->enableFrictionP->Load(node);
   this->collideP->Load(node);
+  this->laserFiducialP->Load(node);
+  this->laserRetroP->Load(node);
+
 
   this->xmlNode = node;
   this->type=node->GetName();
@@ -257,7 +260,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->SetCollideMode( **this->collideP );
 
   this->SetLaserFiducialId( **this->laserFiducialP);
-  //this->SetLaserRetro( **this->laserRetroP);
+  this->SetLaserRetro( **this->laserRetroP);
 
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();
@@ -1054,7 +1057,6 @@ void Model::SetCollideMode( const std::string &m )
 void Model::SetLaserFiducialId( const int &id )
 {
   Body *body;
-
   std::map<std::string, Body* >::iterator iter;
 
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
