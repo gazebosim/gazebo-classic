@@ -1053,7 +1053,7 @@ void Model::SetCollideMode( const std::string &m )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the collide mode of the model
+/// Set the Fiducial Id of the model
 void Model::SetLaserFiducialId( const int &id )
 {
   Body *body;
@@ -1068,7 +1068,16 @@ void Model::SetLaserFiducialId( const int &id )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the collide mode of the model
+/// Get the Fiducial Id of the Model
+int Model::GetLaserFiducialId( )
+{
+ //this is not correct if geoms set their own Fiducial. 
+ //you can not expect it to be correct in that case anyway ...
+  return **this->laserFiducialP; 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the Laser retro property of the model
 void Model::SetLaserRetro( const float &retro )
 {
   Body *body;

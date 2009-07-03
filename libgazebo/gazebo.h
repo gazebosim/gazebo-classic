@@ -433,6 +433,7 @@ class SimulationRequestData
                       GET_NUM_CHILDREN,
                       GET_CHILD_NAME,
                       GET_MODEL_NAME,
+                      GET_MODEL_FIDUCIAL_ID,
                       GET_MODEL_EXTENT,
                       GET_MODEL_INTERFACES, // for getting interfaces as well as the models which are ancestors of interfaces
                       GET_INTERFACE_TYPE,   // if the model is not an interface 'unknown' is returned

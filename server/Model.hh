@@ -200,6 +200,9 @@ namespace gazebo
     /// \brief Set the laser fiducial integer Id of the model
     public: void SetLaserFiducialId( const int &id );
 
+    /// \brief Get the laser fiducial integer Id of the model
+    public: int GetLaserFiducialId();
+
     /// \brief Set the laser retro reflectiveness of the model
     public: void SetLaserRetro( const float &retro );
 

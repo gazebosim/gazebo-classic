@@ -192,6 +192,8 @@ void FiducialInterface::Update()
       this->data.fiducials = new player_fiducial_item_t[this->data.fiducials_count];
     }
 
+    std::cout << "fiducial count " << this->iface->data->count << std::endl;
+
     for (i = 0; i < this->iface->data->count; i++)
     {
       fid = this->iface->data->fids + i;

@@ -197,9 +197,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     std::string name = req->name;
     std::string prop = req->prop;
 
-    this->iface->Lock(1);
     if (name == "world")
     {
+      this->iface->Lock(1);
       req->value = new char[ sizeof(double) ];
       req->value_count = sizeof(double);
 
@@ -219,31 +219,71 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       {
         memcpy(req->value, &this->iface->data->state, sizeof(int));
       }
+      this->iface->Unlock();
 
+      this->driver->Publish(this->device_addr, respQueue,
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY, req, sizeof(*req), NULL);
+
+      if (req->value)
+      {
+        delete [] req->value;
+        req->value = NULL;
+      }
     }
     else
     {
-      std::cerr << "Invalid Name[" << name << "]. Must be \"world\".\n";
+      this->iface->Lock(1);
+      gazebo::SimulationRequestData *gzReq = NULL;
+      gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
+
+      if (prop == "num_children")
+      {
+        gzReq->type = gazebo::SimulationRequestData::GET_NUM_CHILDREN;
+        strcpy((char*)gzReq->modelName, req->name);   
+      }
+      else if (prop == "model_name")
+      {
+        gzReq->type = gazebo::SimulationRequestData::GET_MODEL_NAME;
+        gzReq->uintValue = req->index;
+      }
+      else if (prop == "child_name")
+      {
+        gzReq->type = gazebo::SimulationRequestData::GET_CHILD_NAME;
+        gzReq->uintValue = req->index;
+        strcpy((char*)gzReq->modelName, req->name);   
+      }
+       else if (prop == "fiducial_id")
+      {
+        gzReq->type = gazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID;
+        strcpy((char*)gzReq->modelName, req->name);   
+      }
+      else if (prop == "model_type")
+      {
+        gzReq->type = gazebo::SimulationRequestData::GET_MODEL_TYPE;
+        strcpy((char*)gzReq->modelName, req->name);   
+      }
+      else if ((prop == "num_models") && (name == "world"))
+      { 
+        gazebo::SimulationRequestData *gzReq = NULL;
+        gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
+        gzReq->type = gazebo::SimulationRequestData::GET_NUM_MODELS;
+      }
+      else 
+      {
+        this->iface->data->requestCount--; //we did ++ but didnt introduced real request 
+        std::cerr << "The object [" << name << "] does not have the property [" << prop << "].\n";
+      }
+      this->iface->Unlock();
     }
 
-    this->iface->Unlock();
-
-    this->driver->Publish(this->device_addr, respQueue,
-                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY, req, sizeof(*req), NULL);
-
-    if (req->value)
-    {
-      delete [] req->value;
-      req->value = NULL;
-    }
   }
-/* This depends on Player SVN, wait to the release of Player 3.0 to uncomment? 
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
                                  PLAYER_SIMULATION_CMD_PAUSE, 
                                  this->device_addr))
   {
     this->iface->Lock(1);
-    SimulationRequestData *gzReq = &&(this->iface->data->requests[this->iface->data->requestCount++]);
+    gazebo::SimulationRequestData *gzReq = NULL;
+    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
     gzReq->type = SimulationRequestData::PAUSE;
     this->iface->Unlock();
   } 
@@ -252,7 +292,8 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  this->device_addr))
   {
     this->iface->Lock(1);
-    SimulationRequestData *gzReq = &&(this->iface->data->requests[this->iface->data->requestCount++]);
+    gazebo::SimulationRequestData *gzReq = NULL;
+    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
     gzReq->type = SimulationRequestData::RESET;
     this->iface->Unlock();
   } 
@@ -261,16 +302,17 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  this->device_addr))
   {
     this->iface->Lock(1);
-    SimulationRequestData *gzReq = &&(this->iface->data->requests[this->iface->data->requestCount++]);
+    gazebo::SimulationRequestData *gzReq = NULL;
+    gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
     gzReq->type = SimulationRequestData::SAVE;
     this->iface->Unlock();
   }
-*/ 
   else
     printf("Unhandled Process message[%d][%d]\n",0,0);
 
   return 0;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Update this interface, publish new info. This is
@@ -346,6 +388,22 @@ void SimulationInterface::Update()
 
           break;
         }
+
+      case gazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
+        {
+          player_simulation_property_req_t *req ;
+          memset (req, 0, sizeof(player_simulation_property_req_t));
+
+          memcpy(req->value, (const void *) response->uintValue, sizeof(response->uintValue));
+          req->value_count = sizeof(response->uintValue);
+          this->driver->Publish(this->device_addr, *(this->responseQueue),
+                          PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_PROPERTY, req, sizeof(*req), NULL);
+          break;
+        }
+
+
+
+
     }
   }
 

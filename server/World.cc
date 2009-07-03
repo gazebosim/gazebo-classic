@@ -859,7 +859,18 @@ void World::UpdateSimulationIface()
           break;
         }
 
-
+      case SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
+        {
+          Model *model = this->GetModelByName((char*)req->modelName);
+          if (model)
+          {
+            response->type = req->type;
+            response->uintValue = model->GetLaserFiducialId();
+            response++;
+            this->simIface->data->responseCount += 1;
+            break;
+          } 
+        }
       case SimulationRequestData::GET_MODEL_TYPE:
         {
           Model *model = this->GetModelByName((char*)req->modelName);
