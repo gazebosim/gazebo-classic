@@ -242,7 +242,6 @@ void Body::Load(XMLConfigNode *node)
     }
   }
 
-
   childNode = node->GetChildByNSPrefix("sensor");
 
   // Load the sensors
@@ -976,6 +975,8 @@ void Body::UpdateCoM()
     // Set the mass matrix
     if (this->mass.mass > 0)
       dBodySetMass( this->bodyId, &this->mass );
+    else
+      gzthrow("Setting custom Body "+this->GetName()+"mass to zero!");
 
     // std::cout << " c[0] " << this->mass.c[0] << std::endl;
     // std::cout << " c[1] " << this->mass.c[1] << std::endl;
