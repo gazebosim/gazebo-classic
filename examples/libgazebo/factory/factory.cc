@@ -35,7 +35,7 @@ int main()
   /// Open the Factory interface
   try
   {
-    factoryIface->Open(client, "factory_iface");
+    factoryIface->Open(client, "default");
   }
   catch (std::string e)
   {
@@ -60,7 +60,7 @@ int main()
       stream <<       "<size>0.1</size>";
       stream <<       "<density>1.0</density>";
       stream <<       "<visual>";
-      stream <<         "<size>0.1 0.1 0.1</size>";
+      stream <<         "<size>0.2 0.2 0.2</size>";
       stream <<         "<material>Gazebo/Rocky</material>";
       stream <<         "<mesh>unit_sphere</mesh>";
       stream <<       "</visual>";
@@ -75,7 +75,7 @@ int main()
     usleep(1000000);
   }
 
-  for (int i=0; i<3; i++)
+  /*for (int i=0; i<3; i++)
   {
     factoryIface->Lock(1);
     if (!strcmp((const char*)factoryIface->data->deleteModel,""))
@@ -90,7 +90,7 @@ int main()
     factoryIface->Unlock();
     usleep(1000000);
 
-  }
+  }*/
   return 0;
 }
 

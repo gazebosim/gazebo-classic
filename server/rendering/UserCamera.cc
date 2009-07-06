@@ -50,6 +50,8 @@ UserCamera::UserCamera(GLWindow *parentWindow)
 
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
+
+  this->viewport = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +128,9 @@ void UserCamera::Resize(unsigned int w, unsigned int h)
 {
   this->window->resize(w, h);
   this->window->windowMovedOrResized();
-  this->viewport->setDimensions(0,0,1,1);
+
+  if (this->viewport)
+    this->viewport->setDimensions(0,0,1,1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
