@@ -275,7 +275,6 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       }
       this->iface->Unlock();
     }
-
   }
   else if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_CMD,
                                  PLAYER_SIMULATION_CMD_PAUSE, 

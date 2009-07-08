@@ -999,65 +999,68 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GET_INTERFACE_TYPE:
         {
-	  //printf("Model Type Request\n");
-	  std::vector<std::string> list;
-            			
-	  response->type = req->type;
+          //printf("Model Type Request\n");
+          std::vector<std::string> list;
+
+          response->type = req->type;
           strcpy( response->modelName, req->modelName);
-  	  std::vector<Model*>::iterator miter;
+          std::vector<Model*>::iterator miter;
 
-   	  for (miter=models.begin(); miter!=models.end(); miter++)
-  	      	  GetInterfaceNames((*miter), list);
-  	
-	  std::string mname = req->modelName;		
-	  unsigned int i=mname.find(".");        
-  	  while(i!= std::string::npos){
-	
-  		mname.erase(i,1);
-  		mname.insert(i,"::");
-  		i= mname.find(".");
-  	  }
-	
-	  
-	  std::vector<std::string> candids;
+          for (miter=models.begin(); miter!=models.end(); miter++)
+            GetInterfaceNames((*miter), list);
 
-	  for(unsigned int j=0;j<list.size();j++){
+          std::string mname = req->modelName;		
+          unsigned int i=mname.find(".");        
 
-		int ind = list[j].find(mname);
-		if(ind==0 && ind!=std::string::npos && list[j].size() > mname.size()){
-			candids.push_back(list[j].substr(ind+mname.size(),list[j].size()-ind-mname.size()));
-		}
-	  }
+          while(i!= std::string::npos)
+          {
+            mname.erase(i,1);
+            mname.insert(i,"::");
+            i= mname.find(".");
+          }
 
-	  /*for(unsigned int ii=0;ii<candids.size();ii++)
-	  	printf("candidatetypes: %s\n",candids[ii].c_str());*/
+          std::vector<std::string> candids;
 
-	  for(i=0; i<candids.size(); i++){
-		if(candids[i][0]=='>'){
+          for(unsigned int j=0;j<list.size();j++)
+          {
+            size_t ind = list[j].find(mname);
+            if( ind==0 && ind != std::string::npos && 
+               list[j].size() > mname.size())
+            {
+              candids.push_back(list[j].substr(ind+mname.size(),
+                    list[j].size()-ind-mname.size()) );
+            }
+          }
 
-			strcpy(response->strValue,candids[i].substr(2,candids[i].size()-2).c_str());
-      			response->strValue[511]='\0';
-			i=candids.size()+5;
-			
-		}
-	  }
-	  
-	  if(strcmp(response->strValue,"irarray")==0){
-		strcpy(response->strValue,"ranger");
-      		response->strValue[511]='\0';		
-	  }
+          /*for(unsigned int ii=0;ii<candids.size();ii++)
+            printf("candidatetypes: %s\n",candids[ii].c_str());*/
 
-	  if(i<candids.size()+4) // the model is not an interface
-	  {
+          for(i=0; i<candids.size(); i++)
+          {
+            if(candids[i][0]=='>')
+            {
+              strcpy(response->strValue,
+                     candids[i].substr(2,candids[i].size()-2).c_str());
+              response->strValue[511]='\0';
+              i=candids.size()+5;
+            }
+          }
 
-			strcpy(response->strValue,"unkown");
-      			response->strValue[511]='\0';
+          if(strcmp(response->strValue,"irarray")==0)
+          {
+            strcpy(response->strValue,"ranger");
+            response->strValue[511]='\0';		
+          }
 
-      	  }
+          if(i<candids.size()+4) // the model is not an interface
+          {
+            strcpy(response->strValue,"unkown");
+            response->strValue[511]='\0';
+          }
 
-	  //printf("-> modeltype: %s \n", response->modelType);
+          //printf("-> modeltype: %s \n", response->modelType);
 
-	  response++;
+          response++;
           this->simIface->data->responseCount += 1;
 
           break;
@@ -1065,109 +1068,95 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GET_MODEL_INTERFACES:
         {
- 	  
-	  //printf("Requested the children\n");
-	  //printf("-> %s", req->modelName);
-	  
-       	     
-	  response->nChildInterfaces=0;
-  	  //std::vector<Entity*>::iterator iter;
-	  std::vector<std::string> list;
-            			
-	  response->type = req->type;
+          response->nChildInterfaces=0;
+          std::vector<std::string> list;
+
+          response->type = req->type;
           strcpy( response->modelName, req->modelName);
-  	  std::vector<Model*>::iterator miter;
+          std::vector<Model*>::iterator miter;
 
-   	  for (miter=models.begin(); miter!=models.end(); miter++)
-  	      	  GetInterfaceNames((*miter), list);
-	 /*
-	  for(unsigned int ii=0;ii<list.size();ii++)
-	  	printf("interface: %s\n",list[ii].c_str());
-	  */
-	  // removing the ">>type" from the end of each interface names 
-	  for(unsigned int jj=0;jj<list.size();jj++){
-		unsigned int index = list[jj].find(">>");
-		if(index !=std::string::npos)
-			list[jj].replace(index,list[jj].size(),"");
-	 	//printf("-->> %s \n",list[jj].c_str()); 
-	  }
-	  
-	  
-	  if(strcmp((char*)req->modelName,"")==0){
+          for (miter=models.begin(); miter!=models.end(); miter++)
+            GetInterfaceNames((*miter), list);
 
-		std::vector<std::string> chlist;
-		for(unsigned int i=0;i<list.size();i++){
-      		
-			std::string str = list[i].substr(0,list[i].find("::"));
-			std::vector<std::string>::iterator itr;
-			itr = std::find(chlist.begin(),chlist.end(), str);
+          // removing the ">>type" from the end of each interface names 
+          for(unsigned int jj=0;jj<list.size();jj++)
+          {
+            unsigned int index = list[jj].find(">>");
+            if(index !=std::string::npos)
+              list[jj].replace(index,list[jj].size(),"");
+          }
 
-			if(itr!=chlist.end() || str=="")
-				continue;
+          if(strcmp((char*)req->modelName,"")==0)
+          {
+            std::vector<std::string> chlist;
+            for(unsigned int i=0;i<list.size();i++)
+            {
 
-			chlist.push_back(str);
-			strcpy(response->childInterfaces[response->nChildInterfaces++],str.c_str());
-      			response->childInterfaces[response->nChildInterfaces-1][511]='\0';
-		}
-		
+              std::string str = list[i].substr(0,list[i].find("::"));
+              std::vector<std::string>::iterator itr;
+              itr = std::find(chlist.begin(),chlist.end(), str);
 
-	  }else{
-	  				
-	  		
-			std::vector<std::string> newlist;
-			std::string mname = (char*)req->modelName;
-			
-  			unsigned int i=mname.find(".");        
-  			while(i>-1){
-	
-  				mname.erase(i,1);
-  				mname.insert(i,"::");
-  				i= mname.find(".");
-  			}
-			
-			for(unsigned int j=0;j<list.size();j++){
+              if(itr!=chlist.end() || str=="")
+                continue;
 
-				unsigned int ind = list[j].find(mname);
-				if(ind==0 && ind!=std::string::npos && list[j].size() > mname.size()){
-					newlist.push_back(list[j].substr(ind+mname.size()+2,list[j].size()-ind-mname.size()-2));
-				}
-			}
-			
-	    		/*for(unsigned int ii=0;ii<newlist.size();ii++)
-	    			printf("child interface: %s\n",newlist[ii].c_str());
-*/
-			std::vector<std::string> chlist;
-			for( i=0;i<newlist.size();i++){
-      		
-				unsigned int indx = newlist[i].find("::");
-				indx = (indx==std::string::npos)?newlist[i].size():indx;
-				std::string str = newlist[i].substr(0,indx);
-				std::vector<std::string>::iterator itr;
-				itr = std::find(chlist.begin(),chlist.end(), str);
+              chlist.push_back(str);
+              strcpy(response->childInterfaces[response->nChildInterfaces++],
+                  str.c_str());
+              response->childInterfaces[response->nChildInterfaces-1][511]='\0';
+            }
+          }
+          else
+          {
+            std::vector<std::string> newlist;
+            std::string mname = (char*)req->modelName;
 
-				if(itr!=chlist.end() || str=="")
-					continue;
+            size_t i=mname.find(".");        
+            while( i != std::string::npos)
+            {
+              mname.erase(i,1);
+              mname.insert(i,"::");
+              i= mname.find(".");
+            }
 
-				chlist.push_back(str);
-				// Adding the parent name to the child name e.g "parent.child" 
-				str=mname+"::"+str;
+            for(unsigned int j=0;j<list.size();j++)
+            {
+              unsigned int ind = list[j].find(mname);
+              if(ind==0 && ind!=std::string::npos && 
+                  list[j].size() > mname.size())
+              {
+                newlist.push_back(list[j].substr(ind+mname.size()+2,
+                      list[j].size()-ind-mname.size()-2));
+              }
+            }
 
-				strcpy(response->childInterfaces[response->nChildInterfaces++],str.c_str());
-      				response->childInterfaces[response->nChildInterfaces-1][511]='\0';
-			}
+            std::vector<std::string> chlist;
+            for( i=0;i<newlist.size();i++)
+            {
+              unsigned int indx = newlist[i].find("::");
+              indx = (indx==std::string::npos)?newlist[i].size():indx;
+              std::string str = newlist[i].substr(0,indx);
+              std::vector<std::string>::iterator itr;
+              itr = std::find(chlist.begin(),chlist.end(), str);
 
-								
+              if(itr!=chlist.end() || str=="")
+                continue;
 
-	
-          		
-	   }
+              chlist.push_back(str);
+              // Adding the parent name to the child name e.g "parent.child" 
+              str=mname+"::"+str;
 
- 	    response++;
-	    this->simIface->data->responseCount += 1;
+              strcpy(response->childInterfaces[response->nChildInterfaces++],
+                  str.c_str());
+              response->childInterfaces[response->nChildInterfaces-1][511]='\0';
+            }
+          }
 
-          
+          response++;
+          this->simIface->data->responseCount += 1;
+
           break;
         }
+
       case SimulationRequestData::GO:
         {
           this->simPauseTime = Simulator::Instance()->GetSimTime() 
