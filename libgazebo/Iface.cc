@@ -268,10 +268,14 @@ void Iface::Open(Client *client, std::string id)
 
   // this patch is needed so Gazebo sits and waits for Iface to open when
   // spawning robot dynamically
+  int retries = 10;
   while (this->mmapFd <= 0)
   {
     this->mmapFd = open(this->filename.c_str(), O_RDWR);
-    usleep(1000000); // wait and try again
+    usleep(500000); // wait 0.5sec and try again
+    retries--;
+    if (retries <0)
+      break;
   }
 
   if (this->mmapFd <= 0)
