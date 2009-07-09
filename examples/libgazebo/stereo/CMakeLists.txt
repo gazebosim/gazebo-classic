@@ -28,4 +28,4 @@ set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "-ggdb -g2 -Wall
 
 add_executable(stereo ${sources})
 
-target_link_libraries(stereo ${LINK_LIBS} )
+target_link_libraries(stereo ${LINK_LIBS} gazebo_server ogre3d)

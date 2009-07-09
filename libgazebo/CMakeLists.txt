@@ -12,6 +12,8 @@ INCLUDE_DIRECTORIES(
   ${boost_include_dirs}
 )
 
+ADD_SUBDIRECTORY(bindings)
+
 LINK_DIRECTORIES(${boost_library_dirs})
 
 ADD_LIBRARY(gazeboshm SHARED ${sources})

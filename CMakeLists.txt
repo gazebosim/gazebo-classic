@@ -46,9 +46,9 @@ INCLUDE (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
 # Build type cflags
-SET (CMAKE_C_FLAGS_RELEASE " -O3 -DNDEBUG -Wall " CACHE INTERNAL "C Flags for release" FORCE)
-SET (CMAKE_C_FLAGS_DEBUG " -ggdb " CACHE INTERNAL "C Flags fro debug" FORCE)
-SET (CMAKE_C_FLAGS_PROFILE " -ggdb -pg " CACHE INTERNAL "C Flags for profile" FORCE)
+SET (CMAKE_C_FLAGS_RELEASE " -O2 -DNDEBUG -Wall " CACHE INTERNAL "C Flags for release" FORCE)
+SET (CMAKE_C_FLAGS_DEBUG " -ggdb  -Wall " CACHE INTERNAL "C Flags for debug" FORCE)
+SET (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -Wall " CACHE INTERNAL "C Flags for profile" FORCE)
 
 #####################################
 # Build type link flags
