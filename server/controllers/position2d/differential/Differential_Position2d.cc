@@ -184,17 +184,18 @@ void Differential_Position2d::UpdateChild()
   this->odomVel[1] = 0.0;
   this->odomVel[2] = da / stepTime;
 
+
   //if (this->enableMotors)
   {
     this->joints[LEFT]->SetParam( dParamVel,
-                                  this->wheelSpeed[LEFT] / **(this->wheelDiamP) * 2.0 );
+                                  this->wheelSpeed[LEFT] /  **(this->wheelDiamP) / 2.0 );
 
     this->joints[RIGHT]->SetParam( dParamVel,
-                                   this->wheelSpeed[RIGHT] / **(this->wheelDiamP) * 2.0 );
+                                   this->wheelSpeed[RIGHT] /  **(this->wheelDiamP) / 2.0 );
     this->joints[LEFT]->SetParam( dParamFMax, **(this->torqueP) );
     this->joints[RIGHT]->SetParam( dParamFMax, **(this->torqueP) );
 
-    //printf("Set Speed[%f %f]\n",this->wheelSpeed[LEFT], this->wheelSpeed[RIGHT]);
+    printf("Set Speed[%f %f]\n",this->wheelSpeed[LEFT], this->wheelSpeed[RIGHT]);
   }
   /*else
   {
