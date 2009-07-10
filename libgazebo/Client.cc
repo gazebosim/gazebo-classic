@@ -41,7 +41,6 @@
 
 #include "gazebo.h"
 
-
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,50 +82,100 @@ void Client::Connect(int serverId)
 // Connect to the server
 void Client::ConnectWait(int serverId, int clientId)
 {
-  std::ostringstream stream;
-  char *tmpdir;
-  char *user;
+  bool simulationIfaceIsValid = false;
 
-  // Check client id
-  if (clientId >= 0 && clientId >= 16)
+  while (!simulationIfaceIsValid)
   {
-    stream << "invalid client ID [" << clientId << "]";
-    throw(stream.str());
-  }
+    std::ostringstream stream;
+    // Check client id
+    if (clientId >= 0 && clientId >= 16)
+    {
+      stream << "invalid client ID [" << clientId << "]";
+      throw(stream.str());
+    }
 
-  this->serverId = serverId;
-  this->clientId = clientId;
+    this->serverId = serverId;
+    this->clientId = clientId;
 
-  // Initialize semaphores
-  if (this->clientId >= 0)
-  {
+    // Initialize semaphores
+    if (this->clientId >= 0)
+    {
+      try
+      {
+        this->SemInit();
+      }
+      catch (std::string e)
+      {
+        std::cerr << "Error[" << e << "]\n";
+        throw(e);
+      }
+    }
+
+    char *tmpdir;
+    char *user;
+    // Get the tmp dir
+    tmpdir = getenv("TMP");
+    if (!tmpdir)
+      tmpdir = (char*)"/tmp";
+
+    // Get the user
+    user = getenv("USER");
+    if (!user)
+      user = (char*)"nobody";
+
+    // Figure out the directory name
+    stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
+
+    this->filename = stream.str();
+
+    std::cout << "opening " << this->filename << "\n";
+
+    // Connect to gazebo::SimulationIface and check for changing realTime,
+    // if simulationIface->data->realTime is not changing, the server might
+    // be stale leftovers from previous gazebo crash,
+    // disconnect and reconnect client
+    gazebo::SimulationIface simulationIface;
     try
     {
-      this->SemInit();
+      simulationIface.Open(this,"default");
     }
     catch (std::string e)
     {
-      std::cerr << "Error[" << e << "]\n";
-      throw(e);
+      std::cerr << "Error Opening SimulationIface [" << e << "]\n";
+      exit(0);
+    }
+    // check realTime for updates
+    simulationIface.Lock(1);
+    double simTime0 = simulationIface.data->realTime;
+    simulationIface.Unlock();
+    double simTime1 = simTime0;
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    double start_time = tv.tv_sec + tv.tv_usec * 1e-6;
+    double current_time = start_time;
+    const double timeout = 1; // timeout, disconnect and reconnect client
+    while(current_time - start_time < timeout)
+    {
+      usleep(200000);
+      simulationIface.Lock(1);
+      simTime1 = simulationIface.data->realTime;
+      simulationIface.Unlock();
+      if (simTime1 != simTime0)
+      {
+        simulationIfaceIsValid = true;
+        break;
+      }
+      //std::cout << "realTime has not changed, retrying SimulationIface->data->realTime:" << simTime1 << " : " << simTime0 << std::endl;
+      gettimeofday(&tv, NULL);
+      current_time = tv.tv_sec + tv.tv_usec * 1e-6;
+    }
+    if (!simulationIfaceIsValid)
+    {
+      this->Disconnect();
     }
   }
 
-  // Get the tmp dir
-  tmpdir = getenv("TMP");
-  if (!tmpdir)
-    tmpdir = (char*)"/tmp";
-
-  // Get the user
-  user = getenv("USER");
-  if (!user)
-    user = (char*)"nobody";
-
-  // Figure out the directory name
-  stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
-
-  this->filename = stream.str();
-
-  std::cout << "opening " << this->filename << "\n";
 }
 
 
