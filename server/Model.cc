@@ -255,17 +255,10 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   if (**this->staticP == false)
     this->SetGravityMode( **this->enableGravityP );
 
-  this->SetFrictionMode( **this->enableFrictionP );
-
-  this->SetCollideMode( **this->collideP );
-
-  this->SetLaserFiducialId( **this->laserFiducialP);
-  this->SetLaserRetro( **this->laserRetroP);
-
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();
   this->graphicsHandler->Load(this->GetScopedName(), this);
-
+  assert(this->graphicsHandler);
 
   // Get the name of the python module
   /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
