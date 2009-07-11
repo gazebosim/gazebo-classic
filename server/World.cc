@@ -115,8 +115,10 @@ void World::Close()
   }
 
   if (this->factory)
+  {
     delete this->factory;
-  this->factory = NULL;
+    this->factory = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -335,6 +337,18 @@ void World::Fini()
   catch (std::string e)
   { 
     gzmsg(-1) << "Problem destroying simIface[" << e << "]\n";
+  }
+  try
+  {
+    if (this->factory)
+    {
+      delete this->factory;
+      this->factory = NULL;
+    }
+  }
+  catch (std::string e)
+  { 
+    gzmsg(-1) << "Problem destroying factory[" << e << "]\n";
   }
 
   try
