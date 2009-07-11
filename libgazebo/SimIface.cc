@@ -532,3 +532,29 @@ bool SimulationIface::GetModelExtent(const char *modelName, Vec3 &ext)
 
   return true;
 }
+////////////////////////////////////////////////////////////////////////////////
+/// Get the Fiducial ID of this model 
+bool SimulationIface::GetModelFiducialID(const char *modelName, unsigned int &id)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+ 
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_MODEL_FIDUCIAL_ID;
+
+  memset(request->modelName, 0, 512);
+  strncpy(request->modelName, modelName, 512);
+  request->modelName[511] = '\0';
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  id = data->responses[0].uintValue;
+
+  return true;
+}

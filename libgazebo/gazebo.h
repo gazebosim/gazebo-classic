@@ -590,6 +590,9 @@ class SimulationIface : public Iface
   /// \brief Get the extents of a model
   public: bool GetModelExtent(const char *modelName, Vec3 &ext);
 
+  /// \brief Get the model Fiducial ID (if one global ID was set)
+  public: bool GetModelFiducialID(const char *modelName, unsigned int &id);
+
   public: void GoAckWait();
   public: void GoAckPost();
 

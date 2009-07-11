@@ -220,7 +220,7 @@ void Client::SemQuery(int serverId)
     // No semaphore, so no server
     if (errno == ENOENT)
     {
-      throw("No semphaore, so no server");
+      throw("No semaphore, so no server");
     }
 
     // Ooops, some kind of error

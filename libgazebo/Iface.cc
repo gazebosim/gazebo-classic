@@ -74,6 +74,8 @@ Iface::Iface(const std::string &type, size_t size)
   this->client = NULL;
 
   this->creator = false;
+
+  this->mMap = NULL;
 }
 
 
@@ -327,6 +329,11 @@ void Iface::Open(Client *client, std::string id)
 // Close the interface (client)
 void Iface::Close()
 {
+  if (this->mMap == 0) //Closing without opening!
+  {
+    throw("mmap file not opened. Closing interface without opening it first?");
+  }
+
   ((GazeboData*)this->mMap)->openCount--;
 
   if (((GazeboData*)this->mMap)->openCount <= 0)
