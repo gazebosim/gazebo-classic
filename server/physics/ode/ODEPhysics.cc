@@ -92,6 +92,10 @@ ODEPhysics::~ODEPhysics()
   delete this->globalCFMP;
   delete this->globalERPP;
   delete this->quickStepP;
+  delete this->quickStepItersP;
+  delete this->quickStepWP;
+  delete this->contactMaxCorrectingVelP;
+  delete this->contactSurfaceLayerP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
