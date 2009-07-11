@@ -64,7 +64,13 @@ Factory::Factory()
 // Destructor
 Factory::~Factory()
 {
-  delete this->factoryIface;
+  if (this->factoryIface)
+  {
+    this->factoryIface->Close();
+    this->factoryIface->Destroy();
+    delete this->factoryIface;
+    this->factoryIface = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,12 +110,12 @@ void Factory::Update()
   }
 
   // Attempt to delete a model by name, if the string is present
-  /*if (strcmp((const char*)this->factoryIface->data->deleteModel,"")!=0)
+  if (strcmp((const char*)this->factoryIface->data->deleteModel,"")!=0)
   {
     World::Instance()->DeleteEntity((const char*)this->factoryIface->data->deleteModel);
 
     strcpy((char*)this->factoryIface->data->deleteModel,"");
-  }*/
+  }
   this->factoryIface->Unlock();
 
 }
