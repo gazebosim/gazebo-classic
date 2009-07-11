@@ -65,18 +65,14 @@ ODEPhysics::ODEPhysics()
 
   this->contactGroup = dJointGroupCreate(0);
 
-  // Help prevent "popping of deeply embedded object
-  dWorldSetContactMaxCorrectingVel(this->worldId, 10.0);
-
-  // This helps prevent jittering problems.
-  dWorldSetContactSurfaceLayer(this->worldId, 0.01);
-
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
   this->quickStepP = new ParamT<bool>("quickStep", false, 0);
   this->quickStepItersP = new ParamT<int>("quickStepIters", 20, 0);
   this->quickStepWP = new ParamT<double>("quickStepW", 1.3, 0);  /// over_relaxation value for SOR
+  this->contactMaxCorrectingVelP = new ParamT<double>("contactMaxCorrectingVel", 10.0, 0);
+  this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   Param::End();
 }
 
@@ -114,6 +110,15 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->quickStepP->Load(cnode);
   this->quickStepItersP->Load(cnode);
   this->quickStepWP->Load(cnode);
+  this->contactMaxCorrectingVelP->Load(cnode);
+  this->contactSurfaceLayerP->Load(cnode);
+
+  // Help prevent "popping of deeply embedded object
+  dWorldSetContactMaxCorrectingVel(this->worldId, contactMaxCorrectingVelP->GetValue());
+
+  // This helps prevent jittering problems.
+  dWorldSetContactSurfaceLayer(this->worldId, contactSurfaceLayerP->GetValue());
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

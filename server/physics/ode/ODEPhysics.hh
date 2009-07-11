@@ -145,6 +145,8 @@ class ODEPhysics : public PhysicsEngine
   private: ParamT<bool> *quickStepP; 
   private: ParamT<int> *quickStepItersP; 
   private: ParamT<double> *quickStepWP; 
+  private: ParamT<double> *contactMaxCorrectingVelP;
+  private: ParamT<double> *contactSurfaceLayerP;
 };
 
 /** \}*/
