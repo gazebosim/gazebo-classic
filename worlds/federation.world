@@ -48,12 +48,6 @@
     <shadowTechnique>stencilAdditive</shadowTechnique>
   </rendering:ogre>
 
-  <model:empty name="factory_model">
-    <controller:factory name="factory_controller">
-      <interface:factory name="factory_iface"/>
-    </controller:factory>
-  </model:empty>
-
    <!-- Ground Plane -->
   <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>

@@ -35,30 +35,33 @@
 #include <time.h>
 #include <string.h>
 
-#include "Quatern.hh"
-
 WebGazebo::WebGazebo(const std::string& fedfile,
                      const std::string& host, 
-		     unsigned short port,
-                     double dtol, 
-		     double atol) :
+					 unsigned short port,
+                     double distance_tolerance, 
+					 double angle_tolerance ) : 
   websim::WebSim(host, port), 
-  sq_dist_tol(dtol*dtol), 
-  sq_ang_tol(atol*atol)
+  distance_tolerance(distance_tolerance), 
+  angle_tolerance(angle_tolerance),
+  goMutex(),
+  goCond(),
+  client(NULL),
+  simIface(NULL),
+  factoryIface(NULL)
 {
   // Hook up to Gazebo
   printf("[webgazebo] Opening Gazebo simulation interface...");
   fflush(stdout);
+
   this->client = new gazebo::Client();
   this->simIface = new gazebo::SimulationIface();
   this->factoryIface = new gazebo::FactoryIface();
-  this->laserIface = new gazebo::LaserIface();
+
   this->client->ConnectWait(0, GZ_CLIENT_ID_USER_FIRST);
+
   // Open the Simulation Interface; let exceptions leak out
   this->simIface->Open(this->client, "default");
-  puts( "(opened sim interface)" );
   this->factoryIface->Open(this->client, "default");
-  puts( "(opened factory interface)" );
   puts("Done.");
 
   puts("[webgazebo] Ready");
@@ -66,7 +69,7 @@ WebGazebo::WebGazebo(const std::string& fedfile,
 
 WebGazebo::~WebGazebo()
 {
-  //delete this->laserIface;
+  // delete all open interfaces
   std::map<std::string, gazebo::Iface*>::iterator itr;
   for(itr = interfaces.begin(); itr != interfaces.end(); itr++)
   {
@@ -75,6 +78,7 @@ WebGazebo::~WebGazebo()
   }
 
   delete this->simIface;
+  delete this->factoryIface;
   delete this->client;
 }
   
@@ -90,7 +94,6 @@ WebGazebo::GetTime()
 
   return t;
 }
-
 
 bool
 WebGazebo::GetModel(const std::string& name,
@@ -215,9 +218,9 @@ WebGazebo::GoCallback()
 }
 
 bool
-WebGazebo::Go(double t)
+WebGazebo::ClockRunFor( double seconds )
 {
-  unsigned int us = (unsigned int)rint(t*1e6);
+  unsigned int us = (unsigned int)rint(seconds*1e6);
   this->simIface->Go(us, boost::bind(&WebGazebo::GoCallback, this));
   // Wait for the callback to fire
   boost::mutex::scoped_lock lock(this->goMutex);

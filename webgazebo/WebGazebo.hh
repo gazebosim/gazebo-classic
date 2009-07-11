@@ -20,7 +20,7 @@
  */
 
 /* Desc: HTTP portal to libgazebo
- * Author: Brian Gerkey
+ * Author: Brian Gerkey, Richard Vaughan, Nate Koenig, Abbas Sadat
  * Date: 9 March 2009
  * SVN: $Id: gazebo.h 7398 2009-03-09 07:21:49Z natepak $
  */
@@ -38,14 +38,14 @@ public:
 
   bool Go(double t);
   
-  // start WebSim Interface ============================================================
+  // start WebSim Interface ===================================================
   
   virtual std::string IdentificationString()
   { return "WebGazebo"; }
   
   virtual std::string VersionString()
   {  return "0.1"; }
-
+  
   virtual bool CreateModel(const std::string& name, 
 			   const std::string& type,
 			   std::string& error);
@@ -83,23 +83,24 @@ public:
 			      websim::Pose& center,
 			      std::string& response);
 
-  /** Get the current simulation time */
   virtual websim::Time GetTime();
 
   virtual bool ClockStart() { simIface->Unpause(); return true;}
 
   virtual bool ClockStop() { simIface->Pause(); return true;}
 
-  // end WebSim Interface =====================================================
+  virtual bool ClockRunFor( double seconds );
+
+  // end WebSim Interface ====================================================
 
 
 private: // all private members are specific to WebGazebo
 
 
-  bool WaitForResponse();
+  //bool WaitForResponse();
 
-  double sq_dist_tol;
-  double sq_ang_tol;
+  double distance_tolerance;
+  double angle_tolerance;
   
   boost::mutex goMutex;
   boost::condition goCond;
@@ -107,18 +108,19 @@ private: // all private members are specific to WebGazebo
   gazebo::Client *client;
   gazebo::SimulationIface *simIface;
   gazebo::FactoryIface *factoryIface;
-  gazebo::LaserIface *laserIface;
 
   std::map<std::string,gazebo::Iface*> interfaces;
 
   // Available models
   std::map<std::string,int> models;
 
-  bool CheckTolerances(gazebo::Pose p, gazebo::Pose q);
+  //bool CheckTolerances(gazebo::Pose p, gazebo::Pose q);
+
   bool GetModel(const std::string& name,
 		const std::string& type,
 		std::string& xmldata,
 		std::string& response);
+
   void GoCallback();
 };
 

@@ -362,34 +362,34 @@ WebGazebo::GetModelType(const std::string& name, std::string& type){
 }
 
 
-bool
-WebGazebo::CheckTolerances(gazebo::Pose p, gazebo::Pose q)
-{
-  // Check position
-  double sq_dd = ((p.pos.x - q.pos.x)*(p.pos.x - q.pos.x) +
-                  (p.pos.y - q.pos.y)*(p.pos.y - q.pos.y) +
-                  (p.pos.z - q.pos.z)*(p.pos.z - q.pos.z));
-  if((sq_dist_tol > 0) && (sq_dd > sq_dist_tol))
-    return false;
+// bool
+// WebGazebo::CheckTolerances(gazebo::Pose p, gazebo::Pose q)
+// {
+//   // Check position
+//   double sq_dd = ((p.pos.x - q.pos.x)*(p.pos.x - q.pos.x) +
+//                   (p.pos.y - q.pos.y)*(p.pos.y - q.pos.y) +
+//                   (p.pos.z - q.pos.z)*(p.pos.z - q.pos.z));
+//   if((sq_dist_tol > 0) && (sq_dd > sq_dist_tol))
+//     return false;
 
-  // Check orientation
-  gazebo::Quatern p_quat, q_quat;
-  gazebo::Vector3 pv(p.roll, p.pitch, p.yaw);
-  gazebo::Vector3 qv(q.roll, q.pitch, q.yaw);
-  p_quat.SetFromEuler(pv);
-  q_quat.SetFromEuler(qv);
-  gazebo::Quatern da = p_quat - q_quat;
-  //da.Normalize();
+//   // Check orientation
+//   gazebo::Quatern p_quat, q_quat;
+//   gazebo::Vector3 pv(p.roll, p.pitch, p.yaw);
+//   gazebo::Vector3 qv(q.roll, q.pitch, q.yaw);
+//   p_quat.SetFromEuler(pv);
+//   q_quat.SetFromEuler(qv);
+//   gazebo::Quatern da = p_quat - q_quat;
+//   //da.Normalize();
 
-  double sq_da = ((da.u*da.u) +
-                  (da.x*da.x) +
-                  (da.y*da.y) +
-                  (da.z*da.z));
-  if((sq_ang_tol > 0) && (sq_da > sq_ang_tol))
-    return false;
+//   double sq_da = ((da.u*da.u) +
+//                   (da.x*da.x) +
+//                   (da.y*da.y) +
+//                   (da.z*da.z));
+//   if((sq_ang_tol > 0) && (sq_da > sq_ang_tol))
+//     return false;
 
-  return true;
-}
+//   return true;
+// }
 
 /*
 bool 
