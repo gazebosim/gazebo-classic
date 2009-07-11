@@ -273,7 +273,7 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   else
   {
     this->SetCategoryBits(GZ_ALL_COLLIDE);
-    //this->SetCollideBits(~GZ_FIXED_COLLIDE);
+    this->SetCollideBits(GZ_ALL_COLLIDE);
   }
 
   this->physicsEngine->UnlockMutex();
