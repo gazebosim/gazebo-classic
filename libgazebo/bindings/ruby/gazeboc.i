@@ -42,6 +42,10 @@
   catch (std::string er) {
     rb_raise(rb_eRuntimeError,er.c_str());
   }
+  catch (const char *er) {
+    rb_raise(rb_eRuntimeError,er);
+  }
+  
 }
 
 %apply const std::string& {std::string* id};

@@ -34,6 +34,7 @@ endif (RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
             SWIG_LINK_LIBRARIES (${RUBY_MODULE_NAME} ${RUBY_LIBRARY})
       
             ADD_DEPENDENCIES (${RUBY_MODULE_NAME} ${RUBY_INTERFACE_FILE})
+            ADD_DEPENDENCIES (${RUBY_MODULE_NAME} ${LIBGAZEBO_DIR}/gazebo.h)
             TARGET_LINK_LIBRARIES (${RUBY_MODULE_NAME} gazebo)
 
             #TODO: find ruby in windows, check install dir is correct
