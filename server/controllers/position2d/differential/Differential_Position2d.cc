@@ -188,10 +188,10 @@ void Differential_Position2d::UpdateChild()
   //if (this->enableMotors)
   {
     this->joints[LEFT]->SetParam( dParamVel,
-                                  this->wheelSpeed[LEFT] /  **(this->wheelDiamP) / 2.0 );
+                                  this->wheelSpeed[LEFT] /  (**(this->wheelDiamP) / 2.0) );
 
     this->joints[RIGHT]->SetParam( dParamVel,
-                                   this->wheelSpeed[RIGHT] /  **(this->wheelDiamP) / 2.0 );
+                                   this->wheelSpeed[RIGHT] /  (**(this->wheelDiamP) / 2.0) );
     this->joints[LEFT]->SetParam( dParamFMax, **(this->torqueP) );
     this->joints[RIGHT]->SetParam( dParamFMax, **(this->torqueP) );
 
