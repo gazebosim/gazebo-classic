@@ -1018,20 +1018,28 @@ void World::UpdateSimulationIface()
 
           response->type = req->type;
           strcpy( response->modelName, req->modelName);
-          std::vector<Model*>::iterator miter;
+          std::vector<Model*>::iterator mmiter;
 
-          for (miter=models.begin(); miter!=models.end(); miter++)
-            GetInterfaceNames((*miter), list);
+          for (mmiter=models.begin(); mmiter!=models.end(); mmiter++)
+            GetInterfaceNames((*mmiter), list);
 
           std::string mname = req->modelName;		
           unsigned int i=mname.find(".");        
+/*
 
+		unsigned int ind = list[j].find(mname);
+		if(ind==0 && ind!=std::string::npos && list[j].size() > mname.size()){
+			candids.push_back(list[j].substr(ind+mname.size(),list[j].size()-ind-mname.size()));
+		}
+	  }
+*/
           while(i!= std::string::npos)
           {
             mname.erase(i,1);
             mname.insert(i,"::");
             i= mname.find(".");
           }
+
 
           std::vector<std::string> candids;
 
@@ -1087,10 +1095,27 @@ void World::UpdateSimulationIface()
 
           response->type = req->type;
           strcpy( response->modelName, req->modelName);
-          std::vector<Model*>::iterator miter;
+          std::vector<Model*>::iterator mmiter;
 
-          for (miter=models.begin(); miter!=models.end(); miter++)
+
+   	  for (mmiter=models.begin(); mmiter!=models.end(); mmiter++)
+  	      	  GetInterfaceNames((*mmiter), list);
+
+
+	  // removing the ">>type" from the end of each interface names 
+	  for(unsigned int jj=0;jj<list.size();jj++){
+		unsigned int index = list[jj].find(">>");
+		if(index !=std::string::npos)
+			list[jj].replace(index,list[jj].size(),"");
+	 	//printf("-->> %s \n",list[jj].c_str()); 
+	  }
+	  
+	  
+	  //if(strcmp((char*)req->modelName,"")==0){
+		  /*
+		     for (miter=models.begin(); miter!=models.end(); miter++)
             GetInterfaceNames((*miter), list);
+*/
 
           // removing the ">>type" from the end of each interface names 
           for(unsigned int jj=0;jj<list.size();jj++)
@@ -1106,18 +1131,29 @@ void World::UpdateSimulationIface()
             for(unsigned int i=0;i<list.size();i++)
             {
 
-              std::string str = list[i].substr(0,list[i].find("::"));
-              std::vector<std::string>::iterator itr;
-              itr = std::find(chlist.begin(),chlist.end(), str);
 
-              if(itr!=chlist.end() || str=="")
-                continue;
 
-              chlist.push_back(str);
-              strcpy(response->childInterfaces[response->nChildInterfaces++],
-                  str.c_str());
-              response->childInterfaces[response->nChildInterfaces-1][511]='\0';
-            }
+              		std::string str = list[i].substr(0,list[i].find("::"));
+              		std::vector<std::string>::iterator itr;
+              		itr = std::find(chlist.begin(),chlist.end(), str);
+
+              		if(itr!=chlist.end() || str=="")
+                		continue;
+
+	  		unsigned int ii=str.find("::");        
+  	  		while(ii!= std::string::npos){
+	
+	 			str.erase(ii,2);
+  				str.insert(ii,".");
+  				ii= str.find("::");
+  	  		}
+
+			chlist.push_back(str);
+			strcpy(response->childInterfaces[response->nChildInterfaces++],str.c_str());
+      			response->childInterfaces[response->nChildInterfaces-1][511]='\0';
+		
+	    }
+  		
           }
           else
           {
@@ -1152,12 +1188,20 @@ void World::UpdateSimulationIface()
               std::vector<std::string>::iterator itr;
               itr = std::find(chlist.begin(),chlist.end(), str);
 
+
               if(itr!=chlist.end() || str=="")
                 continue;
 
               chlist.push_back(str);
               // Adding the parent name to the child name e.g "parent.child" 
-              str=mname+"::"+str;
+              str=mname+"."+str;
+ 	      
+	      unsigned int i=str.find("::");        
+  	      while(i!=std::string::npos){
+			str.erase(i,2);
+  			str.insert(i,".");
+  			i= str.find("::");
+  	      }
 
               strcpy(response->childInterfaces[response->nChildInterfaces++],
                   str.c_str());
@@ -1168,8 +1212,9 @@ void World::UpdateSimulationIface()
           response++;
           this->simIface->data->responseCount += 1;
 
-          break;
+          break;  
         }
+	
 
       case SimulationRequestData::GO:
         {
