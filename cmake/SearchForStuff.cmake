@@ -136,7 +136,7 @@ IF (PKG_CONFIG_FOUND)
     SET (HAVE_FFMPEG TRUE)
   ENDIF (AVF_FOUND AND AVC_FOUND)
 
-  pkg_check_modules(PLAYER playerc++>=2.1)
+  pkg_check_modules(PLAYER playercore>=3.0)
   IF (NOT PLAYER_FOUND)
     SET (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
     MESSAGE (STATUS "Warning: Player not found. The gazebo plugin for player will not be built. See the following website: http://playerstage.sourceforge.net")
