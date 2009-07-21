@@ -109,10 +109,10 @@ void Joint::Load(XMLConfigNode *node)
   Body *body2 = this->model->GetBody(**(this->body2NameP));
   Body *anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
 
-  if (!body1)
+  if (!body1 && this->body1NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
 
-  if (!body2)
+  if (!body2 && this->body2NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
   // setting anchor relative to gazebo body frame origin
