@@ -24,7 +24,7 @@ endif (RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
             INCLUDE_DIRECTORIES (${LIBGAZEBO_DIR})
             INCLUDE_DIRECTORIES( ${boost_include_dirs} )
 
-            LINK_DIRECTORIES(${boost_library_dirs})
+            LINK_DIRECTORIES(${boost_library_dirs} ${PROJECT_BINARY_DIR}/libgazebo)
 
             SET (CMAKE_SWIG_FLAGS "-w801 -c++ -I$LIBGAZEBO_DIR")
 
