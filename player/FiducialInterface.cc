@@ -33,7 +33,6 @@
 
 #include <math.h>
 #include <iostream>
-#include <libplayerinterface/playerxdr.h>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo.h"
