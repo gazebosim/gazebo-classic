@@ -101,6 +101,9 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Initialize the ODE engine
   public: virtual void Init();
 
+  /// \brief Initialize for separate thread
+  public: virtual void InitForThread();
+
   /// \brief Update the ODE collision
   public: virtual void UpdateCollision();
 

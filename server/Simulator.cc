@@ -599,6 +599,8 @@ void Simulator::PhysicsLoop()
 {
   World *world = World::Instance();
 
+  world->GetPhysicsEngine()->InitForThread();
+
   double step = world->GetPhysicsEngine()->GetStepTime();
   double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
   double physicsUpdatePeriod = 1.0 / physicsUpdateRate;

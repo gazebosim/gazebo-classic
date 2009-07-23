@@ -95,6 +95,9 @@ namespace gazebo
   
     /// \brief Initialize the physics engine
     public: virtual void Init() = 0;
+
+    /// \brief Initialize for separate thread
+    public: virtual void InitForThread() = 0;
   
     /// \brief Update the physics engine collision
     public: virtual void UpdateCollision() = 0;

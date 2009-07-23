@@ -56,7 +56,9 @@ ODEPhysics::ODEPhysics()
     : PhysicsEngine()
 {
   // Collision detection init
-  dInitODE();
+  dInitODE2(0);
+
+  dAllocateODEDataForThread(dAllocateMaskAll);
 
   this->worldId = dWorldCreate();
 
@@ -80,6 +82,8 @@ ODEPhysics::ODEPhysics()
 // Destructor
 ODEPhysics::~ODEPhysics()
 {
+  dCloseODE();
+
   if (this->spaceId)
     dSpaceDestroy(this->spaceId);
 
@@ -149,6 +153,13 @@ void ODEPhysics::Init()
   dWorldSetERP(this->worldId, this->globalERPP->GetValue());
   dWorldSetQuickStepNumIterations(this->worldId, this->quickStepItersP->GetValue() );
   dWorldSetQuickStepW(this->worldId, this->quickStepWP->GetValue() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Initialize for separate thread
+void ODEPhysics::InitForThread()
+{
+  dAllocateODEDataForThread(dAllocateMaskAll);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
