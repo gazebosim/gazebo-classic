@@ -35,6 +35,8 @@
 #include "OgreAdaptor.hh"
 #include "MainMenu.hh"
 
+#include <boost/thread.hpp>
+
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,6 +137,8 @@ void MainMenu::ShowPhysicsCB(Fl_Widget * /*w*/, void * /*data*/)
 // Reset the world
 void MainMenu::ResetCB(Fl_Widget * /*w*/, void * /*data*/)
 {
+  // stop simulation when this is happening
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   World::Instance()->Reset();
 }
 
