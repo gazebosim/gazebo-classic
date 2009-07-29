@@ -52,6 +52,8 @@
 #include "GLFrame.hh"
 #include "GLWindow.hh"
 
+#include <boost/thread.hpp>
+
 using namespace gazebo;
 
 GLWindow *GLWindow::activeWin = NULL;
@@ -271,6 +273,9 @@ void GLWindow::HandleMouseRelease()
 /// Handle a mouse drag
 void GLWindow::HandleMouseDrag()
 {
+  // stop simulation when this is happening
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+
   if (this->activeCamera && this->activeCamera->GetUserMovable())
   {
     Vector2<int> drag = this->mousePos - this->prevMousePos;
@@ -483,6 +488,9 @@ void GLWindow::HandleMouseDrag()
 // Handle mouse wheel movement
 void GLWindow::HandleMouseWheel(int dx, int dy)
 {
+  // stop simulation when this is happening
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
 
   if (entity->IsModel() || entity->IsBody())
