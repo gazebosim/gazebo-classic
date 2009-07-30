@@ -239,6 +239,8 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   if (this->canonicalBodyNameP->GetValue().empty())
   {
+    /// FIXME: Model::pose is set to the pose of first body
+    ///        seems like there should be a warning for users
     this->canonicalBodyNameP->SetValue( this->bodies.begin()->first );
   }
 
@@ -457,7 +459,20 @@ void Model::Update()
 
   if (!this->canonicalBodyNameP->GetValue().empty())
   {
+    /// model pose is the canonical body pose of the body + a transform from body frame to model frame
+    /// the tranform is defined by initModelOffset in body frame,
+
+    /// recover the transform in inertial frame based on body pose
     this->pose = this->bodies[this->canonicalBodyNameP->GetValue()]->GetPose();
+    Quatern body_rot = this->pose.rot;
+    Pose3d offset_transform = this->bodies[this->canonicalBodyNameP->GetValue()]->initModelOffset;
+    Vector3 xyz_offset = (offset_transform.RotatePositionAboutOrigin(body_rot.GetInverse())).pos;
+    Quatern q_offset = offset_transform.rot;
+
+    // apply transform to get model pose
+    this->pose.pos = this->pose.pos + xyz_offset;
+    this->pose.rot = this->pose.CoordRotationAdd(q_offset);
+
     this->xyzP->SetValue(this->pose.pos);
     this->rpyP->SetValue(this->pose.rot);
   }
@@ -535,13 +550,13 @@ void Model::Reset()
     jiter->second->Reset();
   }
 
-  /*for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
   {
     biter->second->SetLinearVel(v);
     biter->second->SetAngularVel(v);
     biter->second->SetForce(v);
     biter->second->SetTorque(v);
-  }*/
+  }
 }
 
 

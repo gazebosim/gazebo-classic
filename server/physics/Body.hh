@@ -235,6 +235,10 @@ namespace gazebo
 
     private: bool isStatic;
 
+    /// Used by Model if this body is the canonical body
+    ///   model pose = body pose + initModelOffset
+    public: Pose3d initModelOffset;
+
     private: Pose3d comPose;
     private: Pose3d staticPose;
     private: Pose3d pose;

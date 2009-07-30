@@ -208,6 +208,12 @@ void Body::Load(XMLConfigNode *node)
   initPose.pos = **(this->xyzP);
   initPose.rot = **(this->rpyP);
 
+  // save transform from this Parent Model Frame to this Body Frame
+  // this is only used in setting Model pose from canonicalBody
+  // the true model pose given a canonical body is
+  //   this body's pose - this body's offsetFromModelFrame
+  this->initModelOffset = initPose.CoordPoseSolve(Pose3d());
+
   childNode = node->GetChildByNSPrefix("geom");
 
   // Load the geometries
@@ -253,7 +259,6 @@ void Body::Load(XMLConfigNode *node)
   }
 
   this->SetPose(initPose);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -936,23 +941,23 @@ void Body::UpdateCoM()
     // get pose with comPose set to oldPose
     // get pose with comPose set to newPose
     //
-    std::cout << " name : " << this->GetName();
-    std::cout << " pose : " << this->GetPose();
+    //std::cout << " name : " << this->GetName();
+    //std::cout << " pose : " << this->GetPose();
 
     // get pose of gazebo body origin given new comPose
     this->comPose = newPose;
     this->UpdatePose();
-    std::cout << " UpdatePose : " << this->GetPose();
+    //std::cout << " UpdatePose : " << this->GetPose();
     tmpPose = this->GetPose();
-    std::cout << " tmpPose : " << tmpPose;
+    //std::cout << " tmpPose : " << tmpPose;
 
 
     // set pose
     this->comPose = oldPose;
-    std::cout << " oldPose : " << oldPose;
+    //std::cout << " oldPose : " << oldPose;
     this->SetPose(tmpPose);
-    std::cout << " final pose : " << this->GetPose();
-    std::cout << std::endl;
+    //std::cout << " final pose : " << this->GetPose();
+    //std::cout << std::endl;
 
 
     // Settle on the new CoM pose
