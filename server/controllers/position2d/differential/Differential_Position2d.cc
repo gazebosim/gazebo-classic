@@ -195,7 +195,7 @@ void Differential_Position2d::UpdateChild()
     this->joints[LEFT]->SetParam( dParamFMax, **(this->torqueP) );
     this->joints[RIGHT]->SetParam( dParamFMax, **(this->torqueP) );
 
-    printf("Set Speed[%f %f]\n",this->wheelSpeed[LEFT], this->wheelSpeed[RIGHT]);
+    //printf("Set Speed[%f %f]\n",this->wheelSpeed[LEFT], this->wheelSpeed[RIGHT]);
   }
   /*else
   {
