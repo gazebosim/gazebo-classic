@@ -249,7 +249,10 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 
   if (this->placeable && !this->IsStatic())
   {
-    if (dGeomGetClass(geomId) != dTriMeshClass)
+    /// Not sure why this if statement was here
+    /// trimesh loading works fine without it
+    /// commenting out for now
+    //if (dGeomGetClass(geomId) != dTriMeshClass)
     {
       this->transId = dCreateGeomTransform( this->spaceId );
       dGeomTransformSetGeom( this->transId, this->geomId );
@@ -272,6 +275,7 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   }
   else
   {
+    // collide with all
     this->SetCategoryBits(GZ_ALL_COLLIDE);
     this->SetCollideBits(GZ_ALL_COLLIDE);
   }
