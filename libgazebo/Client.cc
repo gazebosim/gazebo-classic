@@ -138,41 +138,41 @@ void Client::ConnectWait(int serverId, int clientId)
     try
     {
       simulationIface.Open(this,"default");
+      // check realTime for updates
+      simulationIface.Lock(1);
+      double simTime0 = simulationIface.data->realTime;
+      simulationIface.Unlock();
+      double simTime1 = simTime0;
+
+      struct timeval tv;
+      gettimeofday(&tv, NULL);
+      double start_time = tv.tv_sec + tv.tv_usec * 1e-6;
+      double current_time = start_time;
+      const double timeout = 1; // timeout, disconnect and reconnect client
+      while(current_time - start_time < timeout)
+      {
+        usleep(200000);
+        simulationIface.Lock(1);
+        simTime1 = simulationIface.data->realTime;
+        simulationIface.Unlock();
+        if (simTime1 != simTime0)
+        {
+          simulationIfaceIsValid = true;
+          break;
+        }
+        //std::cout << "realTime has not changed, retrying SimulationIface->data->realTime:" << simTime1 << " : " << simTime0 << std::endl;
+        gettimeofday(&tv, NULL);
+        current_time = tv.tv_sec + tv.tv_usec * 1e-6;
+      }
+      if (!simulationIfaceIsValid)
+      {
+        this->Disconnect();
+      }
     }
     catch (std::string e)
     {
       std::cerr << "Error Opening SimulationIface [" << e << "]\n";
-      exit(0);
-    }
-    // check realTime for updates
-    simulationIface.Lock(1);
-    double simTime0 = simulationIface.data->realTime;
-    simulationIface.Unlock();
-    double simTime1 = simTime0;
-
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    double start_time = tv.tv_sec + tv.tv_usec * 1e-6;
-    double current_time = start_time;
-    const double timeout = 1; // timeout, disconnect and reconnect client
-    while(current_time - start_time < timeout)
-    {
-      usleep(200000);
-      simulationIface.Lock(1);
-      simTime1 = simulationIface.data->realTime;
-      simulationIface.Unlock();
-      if (simTime1 != simTime0)
-      {
-        simulationIfaceIsValid = true;
-        break;
-      }
-      //std::cout << "realTime has not changed, retrying SimulationIface->data->realTime:" << simTime1 << " : " << simTime0 << std::endl;
-      gettimeofday(&tv, NULL);
-      current_time = tv.tv_sec + tv.tv_usec * 1e-6;
-    }
-    if (!simulationIfaceIsValid)
-    {
-      this->Disconnect();
+      //exit(0); // don't exit, retry
     }
   }
 
