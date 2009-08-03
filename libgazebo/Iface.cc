@@ -190,13 +190,11 @@ void Iface::Create(Server *server, std::string id)
   std::ios_base::fmtflags origFlags = std::cout.flags();
 
   // Print the name, version info
-  std::cout << "creating " << this->filename.c_str() << " "
-
-  << setiosflags(std::ios::hex | std::ios::showbase)
-  << std::setw(3) << ((GazeboData*) this->mMap)->version << " "
-
-  << std::setiosflags(std::ios::dec | ~std::ios::showbase)
-  << ((GazeboData*) this->mMap)->size << "\n";
+  // std::cout << "creating " << this->filename.c_str() << " "
+  // << setiosflags(std::ios::hex | std::ios::showbase)
+  // << std::setw(3) << ((GazeboData*) this->mMap)->version << " "
+  // << std::setiosflags(std::ios::dec | ~std::ios::showbase)
+  // << ((GazeboData*) this->mMap)->size << "\n";
 
   std::cout.flags(origFlags);
 

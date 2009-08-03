@@ -393,8 +393,8 @@ void GLWindow::HandleMouseDrag()
 
           modelPose.pos += moveVector;
           model->SetPose(modelPose);
-          std::cout << "set pose (" << modelPose << ") to model (" 
-                    << model->GetName() << ")" << std::endl;
+          //std::cout << "set pose (" << modelPose << ") to model (" 
+          //          << model->GetName() << ")" << std::endl;
         }
 
         if (entity->IsBody())
@@ -424,8 +424,8 @@ void GLWindow::HandleMouseDrag()
 
           forceScale = 10000.0;
           this->forceVec = moveVector*forceScale;
-          std::cout << "set body force to" << this->forceVec 
-                    << " to body " << body->GetName() << std::endl;
+          //std::cout << "set body force to" << this->forceVec 
+          //          << " to body " << body->GetName() << std::endl;
         }
       }
       else
@@ -469,8 +469,8 @@ void GLWindow::HandleMouseDrag()
 
         bodyPose.pos += moveVector;
         body->SetPose(bodyPose);
-        std::cout << "set pose (" << bodyPose << ") to Body (" 
-                  << body->GetName() << ")" << std::endl;
+        //std::cout << "set pose (" << bodyPose << ") to Body (" 
+        //          << body->GetName() << ")" << std::endl;
       }
       else
       {
@@ -503,8 +503,8 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
       Pose3d pose = model->GetPose();
       pose.pos.z += dy * 0.05;
       model->SetPose(pose);
-      std::cout << "set pose z(" << pose.pos.z << ") to model (" 
-                << model->GetName() << ")" << std::endl;
+      //std::cout << "set pose z(" << pose.pos.z << ") to model (" 
+      //          << model->GetName() << ")" << std::endl;
     }
     // FIXME: old
     if (entity->IsBody())
@@ -513,8 +513,8 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
       Pose3d pose = body->GetPose();
       pose.pos.z += dy * 0.05;
       body->SetPose(pose);
-      std::cout << "set pose z(" << pose.pos.z << ") to body (" 
-                << body->GetName() << ")" << std::endl;
+      //std::cout << "set pose z(" << pose.pos.z << ") to body (" 
+      //          << body->GetName() << ")" << std::endl;
     }
   }
   else if (this->activeCamera && this->activeCamera->GetUserMovable())

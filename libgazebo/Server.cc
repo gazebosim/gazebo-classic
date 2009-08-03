@@ -91,8 +91,6 @@ void Server::Init(int serverId, int force)
   stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
   this->filename = stream.str();
 
-  std::cout << "creating " << this->filename << "\n";
-
   // check to see if there is already a directory created.
   struct stat astat;
   if (stat(this->filename.c_str(), &astat) == 0) 
