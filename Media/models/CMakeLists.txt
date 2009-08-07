@@ -3,6 +3,7 @@ ADD_SUBDIRECTORY(blender)
 ADD_SUBDIRECTORY(epuck)
 ADD_SUBDIRECTORY(PioneerArm)
 ADD_SUBDIRECTORY(sonyvid30)
+ADD_SUBDIRECTORY(rovio)
 
 SET (files column.mesh
            geosphere4500.mesh
