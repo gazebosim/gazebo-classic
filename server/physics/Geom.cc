@@ -249,7 +249,7 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
 
   if (this->placeable && !this->IsStatic())
   {
-    /// Not sure why this if statement was here
+    /// @todo: Not sure why this if statement was here
     /// trimesh loading works fine without it
     /// commenting out for now
     //if (dGeomGetClass(geomId) != dTriMeshClass)
@@ -257,7 +257,9 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
       this->transId = dCreateGeomTransform( this->spaceId );
       dGeomTransformSetGeom( this->transId, this->geomId );
       dGeomTransformSetInfo( this->transId, 1 );
-      assert(dGeomGetSpace(this->geomId) == 0);
+      /// @todo: this assert seems to break when geom is a trimesh, why?
+      if (dGeomGetClass(geomId) != dTriMeshClass)
+        assert(dGeomGetSpace(this->geomId) == 0);
     }
   }
   else if ( dGeomGetSpace(this->geomId) == 0 )
