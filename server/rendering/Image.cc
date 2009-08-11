@@ -174,14 +174,18 @@ Color Image::GetPixel(unsigned int x, unsigned int y)
       return clr;
     }
 
+#ifdef FREEIMAGE_COLORORDER
     if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
-    {
       clr.Set(  firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
-    }
     else
-    {
       clr.Set( firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
-    }
+#else
+#ifdef FREEIMAGE_BIGENDIAN
+    clr.Set(  firgb.rgbRed, firgb.rgbGreen, firgb.rgbBlue);
+#else
+    clr.Set( firgb.rgbBlue, firgb.rgbGreen, firgb.rgbRed);
+#endif
+#endif
 
   }
   else
