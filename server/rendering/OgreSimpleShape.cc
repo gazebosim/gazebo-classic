@@ -1,3 +1,28 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003  
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+/* Desc: Create various 3d shapes
+ * Author: Nathan Koenig
+ * Date: 3 Jan 2008
+ */
+
 #include <cmath>
 #include <iostream>
 
@@ -22,6 +47,8 @@ OgreSimpleShape::~OgreSimpleShape()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Create a sphere
 void OgreSimpleShape::CreateSphere(const std::string &name, float radius, int rings, int segments)
 {
   Ogre::MeshPtr mesh;
@@ -783,4 +810,228 @@ void OgreSimpleShape::CreateCone(const std::string &name, float radius, float he
     std::cerr << "Unable to create a basic Unit cylinder object" << std::endl;
   }
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Create a tube mesh
+void OgreSimpleShape::CreateTube(const std::string &name, float innerRadius, float outterRadius, float height, int rings, int segments)
+{
+  Ogre::MeshPtr mesh;
+  Ogre::SubMesh *subMesh;
+  Ogre::VertexData *vertexData;
+  Ogre::VertexDeclaration* vertexDecl;
+  Ogre::HardwareVertexBufferSharedPtr vBuf;
+  Ogre::HardwareIndexBufferSharedPtr iBuf;
+  float *vertices, *vertStart;
+  unsigned short *indices, *indStart;
+  Vector3 vert, norm;
+  unsigned short verticeIndex = 0;
+  size_t currOffset = 0;
+  int ring, seg;
+  float deltaSegAngle = (2.0 * M_PI / segments);
+
+  try
+  {
+    // Create a new mesh specifically for manual definition.
+    mesh = Ogre::MeshManager::getSingleton().createManual(name,
+           Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+    subMesh = mesh->createSubMesh();
+
+    mesh->sharedVertexData = new Ogre::VertexData();
+    vertexData = mesh->sharedVertexData;
+
+    // define the vertex format
+    vertexDecl = vertexData->vertexDeclaration;
+
+    // The vertexDecl should contain positions, blending weights, normals,
+    // diffiuse colors, specular colors, tex coords. In that order.
+
+    // positions
+    vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+    currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+
+    // TODO: blending weights
+
+    // normals
+    vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
+    currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+
+    // TODO: diffuse colors
+
+    // TODO: specular colors
+
+    // two dimensional texture coordinates
+    vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
+                           Ogre::VES_TEXTURE_COORDINATES, 0);
+    currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
+
+
+    // Needs at lest 2 rings, and 3 segments
+    rings = std::max(rings,1);
+    segments = std::max(segments,3);
+
+    // allocate the vertex buffer
+    vertexData->vertexCount = (rings+1) * (segments+1) * 2;
+
+    vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+             vertexDecl->getVertexSize(0),
+             vertexData->vertexCount,
+             Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+             false);
+
+    vertexData->vertexBufferBinding->setBinding(0, vBuf);
+    vertices = static_cast<float*>(vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+
+    // allocate index buffer
+    subMesh->indexData->indexCount = (6 * rings * (segments+1)) * 2 + ((segments+1) * 6) * 2;
+
+    subMesh->indexData->indexBuffer =
+      Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+        Ogre::HardwareIndexBuffer::IT_16BIT,
+        subMesh->indexData->indexCount,
+        Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+        false);
+
+    iBuf = subMesh->indexData->indexBuffer;
+    indices = static_cast<unsigned short*>(iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+
+    vertStart = vertices;
+    indStart = indices;
+
+    float radius= 0;
+
+    radius = outterRadius;
+
+    // Generate the group of rings for the outsides of the cylinder
+    for (ring = 0; ring <= rings; ring++)
+    {
+      printf("RING[%d]\n", ring);
+      vert.z = ring * height/rings - height/2.0;
+
+      // Generate the group of segments for the current ring
+      for (seg = 0; seg <= segments; seg++)
+      {
+        printf("Seg[%d]\n", seg);
+        vert.y = radius * cosf(seg * deltaSegAngle);
+        vert.x = radius * sinf(seg * deltaSegAngle);
+        printf("Vertexp[%f %f %f]\n", vert.x, vert.y, vert.z);
+
+        // TODO: Don't think these normals are correct.
+        norm = vert;
+        norm.Normalize();
+
+        // Add one vertex to the strip which makes up the tube
+        *vertices++ = vert.x;
+        *vertices++ = vert.y;
+        *vertices++ = vert.z;
+
+        *vertices++ = norm.x;
+        *vertices++ = norm.y;
+        *vertices++ = norm.z;
+
+        // Texture coords
+        *vertices++ = (float) seg / (float) segments;
+        *vertices++ = (float) ring / (float) rings;
+
+        if (ring != rings)
+        {
+          // each vertex (except the last) has six indices
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex;
+          *indices++ = verticeIndex + segments;
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex + 1;
+          *indices++ = verticeIndex;
+        }
+        else
+        {
+          // This indices form the top cap
+          *indices++ = verticeIndex;
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex+1;
+          *indices++ = verticeIndex+1;
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex + segments + 2;
+        }
+
+        // There indices form the bottom cap
+        if (ring == 0 && seg < segments)
+        {
+          *indices++ = verticeIndex+1;
+          *indices++ = verticeIndex + (segments+1) * (((rings+1)*2)-1);
+          *indices++ = verticeIndex;
+          *indices++ = verticeIndex + (segments+1) * (((rings+1)*2)-1) + 1;
+          *indices++ = verticeIndex + (segments+1) * (((rings+1)*2)-1);
+          *indices++ = verticeIndex+1;
+        }
+
+        verticeIndex++;
+      }
+    }
+
+    // Generate the group of rings for the inside of the cylinder
+    radius = innerRadius;
+    for (ring = 0; ring <= rings; ring++)
+    {
+      vert.z = (height/2.0) - (ring * height/rings);
+
+      // Generate the group of segments for the current ring
+      for (seg = 0; seg <= segments; seg++)
+      {
+        vert.y = radius * cosf(seg * deltaSegAngle);
+        vert.x = radius * sinf(seg * deltaSegAngle);
+
+        // TODO: Don't think these normals are correct.
+        norm = vert;
+        norm.Normalize();
+
+        // Add one vertex to the strip which makes up the tube
+        *vertices++ = vert.x;
+        *vertices++ = vert.y;
+        *vertices++ = vert.z;
+
+        *vertices++ = norm.x;
+        *vertices++ = norm.y;
+        *vertices++ = norm.z;
+
+        // Texture coords
+        *vertices++ = (float) seg / (float) segments;
+        *vertices++ = (float) ring / (float) rings;
+
+        if (ring != rings)
+        {
+          // each vertex (except the last) has six indices
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex;
+          *indices++ = verticeIndex + segments;
+
+          *indices++ = verticeIndex + segments + 1;
+          *indices++ = verticeIndex + 1;
+          *indices++ = verticeIndex;
+        }
+
+        verticeIndex++;
+      }
+    }
+
+    // Unlock
+    vBuf->unlock();
+    iBuf->unlock();
+
+    // Generate face list
+    subMesh->useSharedVertices = true;
+
+    mesh->_setBounds( Ogre::AxisAlignedBox(
+                        Ogre::Vector3(-outterRadius, -height/2, -outterRadius),
+                        Ogre::Vector3(outterRadius, height/2, outterRadius)), 
+                        false );
+
+    // this line makes clear the mesh is loaded (avoids memory leaks)
+    mesh->load();
+  }
+  catch (Ogre::Exception e)
+  {
+    std::cerr << "Unable to create a basic Unit cylinder object" << std::endl;
+  }
 }
