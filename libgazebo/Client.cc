@@ -171,8 +171,8 @@ void Client::ConnectWait(int serverId, int clientId)
     }
     catch (std::string e)
     {
-      std::cerr << "Error Opening SimulationIface [" << e << "]\n";
-      //exit(0); // don't exit, retry
+      stream << "Error Opening SimulationIface [" << e << "]\n";
+      throw(stream.str());
     }
   }
 
