@@ -49,7 +49,7 @@ RayGeom::RayGeom( Body *body, bool displayRays )
   // Create default ray with unit length
   this->SetGeom( dCreateRay( this->spaceId, 1.0 ),  false );
 
-  if (displayRays)
+  if ( displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
   {
     this->line = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
