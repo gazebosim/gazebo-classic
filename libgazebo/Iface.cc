@@ -288,6 +288,12 @@ void Iface::Open(Client *client, std::string id)
   // Map the mmap file
   this->mMap = mmap(0, this->size, PROT_READ | PROT_WRITE, MAP_SHARED, this->mmapFd, 0);
 
+  // flushes changes made to the in-core copy of a mmap file
+  if (msync( this->mMap, this->size, MS_SYNC))
+  {
+    stream << "error msync mmap: " << strerror(errno);
+    throw(stream.str());
+  }
 
   if (this->mMap == MAP_FAILED)
   {

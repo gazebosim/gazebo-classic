@@ -176,8 +176,6 @@ class World : public SingletonT<World>
   /// \brief Get whether to view as wireframe
   public: bool GetShowPhysics();
 
-  public: void ProcessMessages();
-
   /// Set to true to show bounding boxes
   private: bool showBoundingBoxes;
 
@@ -202,7 +200,7 @@ class World : public SingletonT<World>
   private: void SetModelPose(Model *model , Pose3d pose);
 
   /// \brief Update the simulation iface
-  private: void UpdateSimulationIface();
+  public: void UpdateSimulationIface();
 
   /// \brif Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
@@ -215,9 +213,6 @@ class World : public SingletonT<World>
 
   /// List of all the registered geometries
   private: std::vector< Geom* > geometries;
-
-  /// List of models to add into the world
-  private: std::vector< Model* > toAddModels;
 
   /// List of models to delete from the world
   private: std::vector< Model* > toDeleteModels;

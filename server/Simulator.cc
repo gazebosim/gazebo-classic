@@ -676,7 +676,7 @@ void Simulator::PhysicsLoop()
     nanosleep(&req, &rem);
 
     // Process all incoming messages from simiface
-    world->ProcessMessages();
+    world->UpdateSimulationIface();
 
     if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {

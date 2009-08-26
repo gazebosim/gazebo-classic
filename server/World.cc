@@ -218,7 +218,6 @@ void World::Init()
   if (this->openAL)
     this->openAL->Init();
 
-  this->toAddModels.clear();
   this->toDeleteModels.clear();
   this->toLoadEntities.clear();
 
@@ -301,13 +300,6 @@ void World::Update()
   std::cout << " World::Update() Physics engine DT(" << tmpT4-tmpT2 << ")" << std::endl;
 #endif
 
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Process messages
-void World::ProcessMessages()
-{
-  this->UpdateSimulationIface();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -477,13 +469,10 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
   this->SetModelPose(model, model->GetInitPose());
 
   // Add the model to our list
-  if (Simulator::Instance()->GetSimTime() == 0)
-    this->models.push_back(model);
-  else
-  {
+  this->models.push_back(model);
+
+  if (Simulator::Instance()->GetSimTime() > 0)
     model->Init();
-    this->toAddModels.push_back(model);
-  }
 
   if (parent != NULL)
     model->Attach(node->GetChild("attach"));
@@ -1257,16 +1246,8 @@ void World::UpdateSimulationIface()
 
   this->simIface->Unlock();
 
-
-  std::vector< Model* >::iterator miter;
-
-  // Copy the newly created models into the main model vector
-  std::copy(this->toAddModels.begin(), this->toAddModels.end(),
-      std::back_inserter(this->models));
-  this->toAddModels.clear();
-
-
   // Remove and delete all models that are marked for deletion
+  std::vector< Model* >::iterator miter;
   for (miter=this->toDeleteModels.begin();
       miter!=this->toDeleteModels.end(); miter++)
   {
