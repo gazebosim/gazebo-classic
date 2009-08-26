@@ -1,3 +1,5 @@
+INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
 SET (sources Gui.cc
              GLWindow.cc
              MainMenu.cc
@@ -15,6 +17,9 @@ SET (headers Gui.hh
              GLFrameManager.hh
              GLFrame.hh
 )
+
+LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
+SET_SOURCE_FILES_PROPERTIES(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
 
 #ADD_LIBRARY(gazebo_gui STATIC ${sources})
 ADD_LIBRARY(gazebo_gui-shared SHARED ${sources})
