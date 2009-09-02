@@ -4637,9 +4637,792 @@
   <model:physical name="cylinder1_model">
     <xyz>1 -1.5 0.5</xyz>
     <rpy>0.0 0.0 0.0</rpy>
-
     <body:cylinder name="cylinder1_body">
       <geom:cylinder name="cylinder1_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder2_model">
+    <xyz>1 -1.5 1.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder2_body">
+      <geom:cylinder name="cylinder2_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder3_model">
+    <xyz>1 -1.5 2.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder3_body">
+      <geom:cylinder name="cylinder3_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder4_model">
+    <xyz>1 -1.5 3.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder4_body">
+      <geom:cylinder name="cylinder4_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder5_model">
+    <xyz>1 -1.5 4.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder5_body">
+      <geom:cylinder name="cylinder5_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder6_model">
+    <xyz>1 -1.5 5.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder6_body">
+      <geom:cylinder name="cylinder6_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder7_model">
+    <xyz>1 -1.5 6.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder7_body">
+      <geom:cylinder name="cylinder7_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder8_model">
+    <xyz>1 -1.5 7.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder8_body">
+      <geom:cylinder name="cylinder8_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder9_model">
+    <xyz>1 -1.5 8.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder9_body">
+      <geom:cylinder name="cylinder9_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder10_model">
+    <xyz>1 -1.5 9.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder10_body">
+      <geom:cylinder name="cylinder10_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder11_model">
+    <xyz>1 -1.5 10.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder11_body">
+      <geom:cylinder name="cylinder11_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder12_model">
+    <xyz>1 -1.5 11.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder12_body">
+      <geom:cylinder name="cylinder12_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder13_model">
+    <xyz>1 -1.5 12.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder13_body">
+      <geom:cylinder name="cylinder13_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder14_model">
+    <xyz>1 -1.5 13.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder14_body">
+      <geom:cylinder name="cylinder14_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder15_model">
+    <xyz>1 -1.5 14.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder15_body">
+      <geom:cylinder name="cylinder15_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder16_model">
+    <xyz>1 -1.5 15.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder16_body">
+      <geom:cylinder name="cylinder16_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder17_model">
+    <xyz>1 -1.5 16.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder17_body">
+      <geom:cylinder name="cylinder17_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder18_model">
+    <xyz>1 -1.5 17.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder18_body">
+      <geom:cylinder name="cylinder18_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder19_model">
+    <xyz>1 -1.5 18.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder19_body">
+      <geom:cylinder name="cylinder19_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder20_model">
+    <xyz>1 -1.5 19.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder20_body">
+      <geom:cylinder name="cylinder20_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder21_model">
+    <xyz>1 -1.5 20.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder21_body">
+      <geom:cylinder name="cylinder21_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder22_model">
+    <xyz>1 -1.5 21.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder22_body">
+      <geom:cylinder name="cylinder22_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder23_model">
+    <xyz>1 -1.5 22.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder23_body">
+      <geom:cylinder name="cylinder23_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder24_model">
+    <xyz>1 -1.5 23.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder24_body">
+      <geom:cylinder name="cylinder24_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder25_model">
+    <xyz>1 -1.5 24.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder25_body">
+      <geom:cylinder name="cylinder25_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder26_model">
+    <xyz>1 -1.5 25.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder26_body">
+      <geom:cylinder name="cylinder26_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder27_model">
+    <xyz>1 -1.5 26.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder27_body">
+      <geom:cylinder name="cylinder27_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder28_model">
+    <xyz>1 -1.5 27.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder28_body">
+      <geom:cylinder name="cylinder28_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder29_model">
+    <xyz>1 -1.5 28.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder29_body">
+      <geom:cylinder name="cylinder29_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder30_model">
+    <xyz>1 -1.5 29.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder30_body">
+      <geom:cylinder name="cylinder30_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder31_model">
+    <xyz>1 -1.5 30.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder31_body">
+      <geom:cylinder name="cylinder31_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder32_model">
+    <xyz>1 -1.5 31.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder32_body">
+      <geom:cylinder name="cylinder32_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder33_model">
+    <xyz>1 -1.5 32.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder33_body">
+      <geom:cylinder name="cylinder33_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder34_model">
+    <xyz>1 -1.5 33.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder34_body">
+      <geom:cylinder name="cylinder34_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder35_model">
+    <xyz>1 -1.5 34.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder35_body">
+      <geom:cylinder name="cylinder35_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder36_model">
+    <xyz>1 -1.5 35.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder36_body">
+      <geom:cylinder name="cylinder36_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder37_model">
+    <xyz>1 -1.5 36.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder37_body">
+      <geom:cylinder name="cylinder37_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder38_model">
+    <xyz>1 -1.5 37.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder38_body">
+      <geom:cylinder name="cylinder38_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder39_model">
+    <xyz>1 -1.5 38.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder39_body">
+      <geom:cylinder name="cylinder39_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder40_model">
+    <xyz>1 -1.5 39.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder40_body">
+      <geom:cylinder name="cylinder40_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder41_model">
+    <xyz>1 -1.5 40.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder41_body">
+      <geom:cylinder name="cylinder41_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder42_model">
+    <xyz>1 -1.5 41.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder42_body">
+      <geom:cylinder name="cylinder42_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder43_model">
+    <xyz>1 -1.5 42.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder43_body">
+      <geom:cylinder name="cylinder43_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder44_model">
+    <xyz>1 -1.5 43.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder44_body">
+      <geom:cylinder name="cylinder44_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder45_model">
+    <xyz>1 -1.5 44.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder45_body">
+      <geom:cylinder name="cylinder45_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder46_model">
+    <xyz>1 -1.5 45.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder46_body">
+      <geom:cylinder name="cylinder46_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder47_model">
+    <xyz>1 -1.5 46.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder47_body">
+      <geom:cylinder name="cylinder47_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder48_model">
+    <xyz>1 -1.5 47.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder48_body">
+      <geom:cylinder name="cylinder48_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder49_model">
+    <xyz>1 -1.5 48.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder49_body">
+      <geom:cylinder name="cylinder49_geom">
+        <size>0.5 1</size>
+        <mass>1.0</mass>
+        <mu1>1000.0</mu1>
+
+        <visual>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/RustyBarrel</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+  </model:physical>
+  <model:physical name="cylinder50_model">
+    <xyz>1 -1.5 49.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <body:cylinder name="cylinder50_body">
+      <geom:cylinder name="cylinder50_geom">
         <size>0.5 1</size>
         <mass>1.0</mass>
         <mu1>1000.0</mu1>
