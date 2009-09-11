@@ -270,7 +270,7 @@ void Body::Save(std::string &prefix, std::ostream &stream)
   Model *model = dynamic_cast<Model*>(this->parent);
   //Vector3 pose = model->GetPose() - this->GetPose();
 
-  this->xyzP->SetValue( this->GetPose().pos - model->GetPose().pos );
+  this->xyzP->SetValue( this->GetPose().pos );
   this->rpyP->SetValue( this->GetRotation() );
 
   stream << prefix << "<body name=\"" << this->nameP->GetValue() << "\">\n";

@@ -291,6 +291,8 @@ void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<rendering:ogre>\n";
   stream << prefix << "  " << *(this->ambientP) << "\n";
+  stream << prefix << "  " << *(this->drawGridP) << "\n";
+  stream << prefix << "  " << *(this->updateRateP) << "\n";
   stream << prefix << "  <sky>\n";
   stream << prefix << "    " << *(this->skyMaterialP) << "\n";
   stream << prefix << "  </sky>\n";

@@ -266,7 +266,9 @@ void OgreCreator::SaveLight(const std::string &prefix,
          << specularColor.g << " " << specularColor.b << " "
          << specularColor.a << "</specularColor>\n";
 
-  stream << prefix << "  <attenuation>" << attRange << " " << attConst 
+  stream << prefix << "  <range>"<< attRange << "</range>\n";
+
+  stream << prefix << "  <attenuation>" << " " << attConst 
          << " " << attLinear << " " << attQuadric << "</attenuation>\n";
   stream << prefix << "</light>\n";
 }
@@ -323,29 +325,31 @@ void OgreCreator::CreateFog(XMLConfigNode *cnode)
   if (cnode)
   {
     Ogre::ColourValue backgroundColor;
-    //Ogre::FogMode fogType = Ogre::FOG_NONE;
-    //std::string type;
+    Ogre::FogMode fogType = Ogre::FOG_NONE;
+    std::string type;
     //double density;
     double linearStart, linearEnd;
 
     backgroundColor.r = cnode->GetTupleDouble("color",0,0);
     backgroundColor.g = cnode->GetTupleDouble("color",1,0);
     backgroundColor.b = cnode->GetTupleDouble("color",2,0);
-    //type = cnode->GetString("type","linear",0);
+    type = cnode->GetString("type","linear",0);
     //density = cnode->GetDouble("density",0,0);
     linearStart = cnode->GetDouble("linearStart",0,0);
     linearEnd = cnode->GetDouble("linearEnd",1.0,0);
 
-    /*if (type == "linear")
+    if (type == "linear")
       fogType = Ogre::FOG_LINEAR;
-      else if (type == "exp")
+    else if (type == "exp")
       fogType = Ogre::FOG_EXP;
-      else if (type == "exp2")
+    else if (type == "exp2")
       fogType = Ogre::FOG_EXP2;
-      */
 
-    //OgreAdaptor::Instance()->sceneMgr->setFog(fogType, backgroundColor, density, linearStart, linearEnd);
-    OgreAdaptor::Instance()->sceneMgr->setFog(Ogre::FOG_LINEAR, backgroundColor, 0, linearStart, linearEnd);
+    if (type != "none")
+    {
+      //OgreAdaptor::Instance()->sceneMgr->setFog(fogType, backgroundColor, density, linearStart, linearEnd);
+      OgreAdaptor::Instance()->sceneMgr->setFog(Ogre::FOG_LINEAR, backgroundColor, 0, linearStart, linearEnd);
+    }
   }
 }
 

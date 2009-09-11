@@ -12,7 +12,9 @@ INCLUDE_DIRECTORIES(
   ${boost_include_dirs}
 )
 
-ADD_SUBDIRECTORY(bindings)
+IF (${ENABLE_BINDINGS})
+  ADD_SUBDIRECTORY(bindings)
+ENDIF (${ENABLE_BINDINGS})
 
 LINK_DIRECTORIES(${boost_library_dirs})
 

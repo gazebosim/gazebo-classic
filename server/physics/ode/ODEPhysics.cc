@@ -134,12 +134,16 @@ void ODEPhysics::Load(XMLConfigNode *node)
 void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<physics:ode>\n";
-  stream << prefix << "  " << *(this->gravityP) << "\n";
   stream << prefix << "  " << *(this->stepTimeP) << "\n";
+  stream << prefix << "  " << *(this->gravityP) << "\n";
   stream << prefix << "  " << *(this->updateRateP) << "\n";
   stream << prefix << "  " << *(this->globalCFMP) << "\n";
   stream << prefix << "  " << *(this->globalERPP) << "\n";
   stream << prefix << "  " << *(this->quickStepP) << "\n";
+  stream << prefix << "  " << *(this->quickStepItersP) << "\n";
+  stream << prefix << "  " << *(this->quickStepWP) << "\n";
+  stream << prefix << "  " << *(this->contactMaxCorrectingVelP) << "\n";
+  stream << prefix << "  " << *(this->contactSurfaceLayerP) << "\n";
   stream << prefix << "</physics:ode>\n";
 }
 
