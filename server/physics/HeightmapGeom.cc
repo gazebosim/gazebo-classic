@@ -112,7 +112,7 @@ dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
 /// Load the heightmap
 void HeightmapGeom::LoadChild(XMLConfigNode *node)
 {
-  Image tmpImage;
+  Image img;
 
   this->imageFilenameP->Load(node);
   this->worldTextureP->Load(node);
@@ -121,16 +121,18 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   this->offsetP->Load(node);
 
   // Use the image to get the size of the heightmap
-  tmpImage.Load( (**this->imageFilenameP) );
+  img.Load( (**this->imageFilenameP) );
 
   // Width and height must be the same
-  if (tmpImage.GetWidth() != tmpImage.GetHeight())
+  if (img.GetWidth() != img.GetHeight())
   {
     gzthrow("Heightmap image must be square\n");
   }
 
   this->terrainSize = (**this->sizeP);
-  this->odeVertSize = tmpImage.GetWidth() * 4;
+
+  // sampling size along image width and height
+  this->odeVertSize = img.GetWidth() * 4;
   this->odeScale = this->terrainSize / this->odeVertSize;
 
 
@@ -156,13 +158,13 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
     this->odeData,
     this,
     HeightmapGeom::GetHeightCallback,
-    this->terrainSize.x,
-    this->terrainSize.y,
-    this->odeVertSize,
-    this->odeVertSize,
-    1.0, // scale
-    0.0, // vertical offset
-    0.0, // vertical thickness
+    this->terrainSize.x, // in meters
+    this->terrainSize.y, // in meters
+    this->odeVertSize, // width sampling size
+    this->odeVertSize, // depth sampling size (along height of image)
+    1.0, // vertical (z-axis) scaling
+    0.0, // vertical (z-axis) offset
+    0.1, // vertical thickness for closing the height map mesh
     0 // wrap mode
   );
 

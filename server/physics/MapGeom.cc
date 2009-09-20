@@ -109,20 +109,7 @@ void MapGeom::LoadChild(XMLConfigNode *node)
 
   // Load the image 
   this->mapImage = new Image();
-
-  std::list<std::string>::iterator iter;
-  GazeboConfig *gzcfg = Simulator::Instance()->GetGazeboConfig();
-  std::string filename;
-
-  for (iter = gzcfg->GetGazeboPaths().begin(); 
-       iter != gzcfg->GetGazeboPaths().end(); iter++)
-  {
-    filename = (*iter) + "/Media/materials/textures/" + imageFilename;
-    if (this->mapImage->Load(filename) >= 0)
-    {
-      break;
-    }
-  }
+  this->mapImage->Load(imageFilename);
 
   if (!this->mapImage->Valid())
     gzthrow(std::string("Unable to open image file[") + imageFilename + "]" );

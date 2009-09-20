@@ -28,12 +28,16 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <string.h>
 
 //#include <GL/gl.h>
 
 #include "Vector3.hh"
 #include "GazeboMessage.hh"
 #include "Image.hh"
+#include "Simulator.hh"
+#include "GazeboConfig.hh"
 
 using namespace gazebo;
 
@@ -72,31 +76,67 @@ int Image::Load(const std::string &filename)
 {
   struct stat st;
 
-  if (stat(filename.c_str(), &st) != 0)
+  // @todo: fix path search. for now repeat similar path search in OgreAdaptor
+  std::list<std::string> gazeboPaths=Simulator::Instance()->GetGazeboConfig()->GetGazeboPaths();
+ 
+  for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
+       iter!=gazeboPaths.end(); ++iter)
   {
-    gzerr(5) << "Unable to open image file[" << filename << "]\n";
-    return -1;
+    std::vector<std::string> pathNames;
+    pathNames.push_back((*iter)+"/Media");
+    pathNames.push_back((*iter)+"/Media/fonts");
+    pathNames.push_back((*iter)+"/Media/materials/programs");
+    pathNames.push_back((*iter)+"/Media/materials/scripts");
+    pathNames.push_back((*iter)+"/Media/materials/textures");
+    pathNames.push_back((*iter)+"/Media/models");
+    pathNames.push_back((*iter)+"/Media/sets");
+    pathNames.push_back((*iter)+"/Media/maps");
+
+    for (std::vector<std::string>::iterator piter = pathNames.begin();piter!=pathNames.end();piter++)
+    {
+      std::string path(*piter);
+      DIR *dir=opendir(path.c_str()); 
+
+      //std::cout << "searching path[" << path << "]\n";
+      // if directory exist
+      if (dir != NULL)
+      {
+        closedir(dir);
+
+        std::string fullName = (((*piter)+"/")+filename);
+        //std::cout << "searching file[" << fullName << "]\n";
+        // if file exist
+        if (stat(fullName.c_str(), &st) == 0)
+        {
+          FREE_IMAGE_FORMAT fifmt = FreeImage_GetFIFFromFilename(fullName.c_str());
+
+          if (this->bitmap)
+            FreeImage_Unload(this->bitmap);
+          this->bitmap = NULL;
+
+          if (fifmt == FIF_PNG)
+            this->bitmap = FreeImage_Load(fifmt, fullName.c_str(), PNG_DEFAULT);
+          else if (fifmt == FIF_JPEG)
+            this->bitmap = FreeImage_Load(fifmt, fullName.c_str(), JPEG_DEFAULT);
+          else if (fifmt == FIF_BMP)
+            this->bitmap = FreeImage_Load(fifmt, fullName.c_str(), BMP_DEFAULT);
+          else
+          {
+            gzerr(5) << "Unknown image format[" << fullName << "]\n";
+            return -1;
+          }
+
+          return 0;
+        }
+      }
+      
+    }
+
   }
 
-  FREE_IMAGE_FORMAT fifmt = FreeImage_GetFIFFromFilename(filename.c_str());
+  gzerr(5) << "Unable to open image file[" << filename << "]\n";
+  return -1;
 
-  if (this->bitmap)
-    FreeImage_Unload(this->bitmap);
-  this->bitmap = NULL;
-
-  if (fifmt == FIF_PNG)
-    this->bitmap = FreeImage_Load(fifmt, filename.c_str(), PNG_DEFAULT);
-  else if (fifmt == FIF_JPEG)
-    this->bitmap = FreeImage_Load(fifmt, filename.c_str(), JPEG_DEFAULT);
-  else if (fifmt == FIF_BMP)
-    this->bitmap = FreeImage_Load(fifmt, filename.c_str(), BMP_DEFAULT);
-  else
-  {
-    std::cerr << "Unknown image format[" << filename << "]\n";
-    return -1;
-  }
-
-  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
