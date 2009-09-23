@@ -157,6 +157,12 @@ namespace gazebo
     private: OgreCamera *activeCamera;
 
     private: static GLWindow *activeWin;
+
+    /// gui interface, prerequisite to selecting Model / Body
+    ///   press control+left click Model to toggle select.  Left mouse button drag updates model rotation about camera view axis, right mouse button drag udpates model position in camera view plane.
+    ///   press control+right click Body to toggle select body select.  Left mouse button drag applies torque, right mouse button drag applies linear force.
+    private: bool controlKeyPressed;
+    private: bool altKeyPressed;
   };
 
 }
