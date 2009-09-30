@@ -118,8 +118,8 @@ ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
-                                   ${freeimage_library} 
                                    gazebo_server
+                                   ${freeimage_library} 
                                    gazebo_av-shared
                                    gazebo_gui-shared
                                    gazebo 
