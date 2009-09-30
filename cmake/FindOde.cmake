@@ -34,7 +34,7 @@ IF (NOT ODE_FOUND)
 ENDIF (NOT ODE_FOUND)
 
 IF (NOT ODE_FOUND)
-  MESSAGE (SEND_ERROR "\nError: ODE and development files not found. See the following website: http://www.ode.org")
+  BUILD_ERROR ("ODE and development files not found. See the following website: http://www.ode.org")
 ELSE (NOT ODE_FOUND)
   #SET (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${ODE_CFLAGS_OTHER}" CACHE INTERNAL "added dSINGLE" FORCE)
   #SET (CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   ${ODE_CFLAGS_OTHER}" CACHE INTERNAL "added dSINGLE" FORCE)

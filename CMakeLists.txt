@@ -66,54 +66,68 @@ IF (NOT CMAKE_BUILD_TYPE)
 ENDIF (NOT CMAKE_BUILD_TYPE)
 STRING(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
-MESSAGE (STATUS "====== Finding 3rd Party Packages ======")
+SET (build_errors "" CACHE INTERNAL "build errors" FORCE)
+
+MESSAGE (STATUS "\n\n====== Finding 3rd Party Packages ======")
 INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
-MESSAGE (STATUS "----------------------------------------")
+MESSAGE (STATUS "----------------------------------------\n")
 
-########################################
-# Write the config.h file
-CONFIGURE_FILE (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
-
-########################################
-# Make the gazebo rc file
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
-
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-
-message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
-
-IF (BUILD_GAZEBO)
-  ADD_SUBDIRECTORY(libgazebo)
-  ADD_SUBDIRECTORY(server)
-  ADD_SUBDIRECTORY(worlds)
-  ADD_SUBDIRECTORY(Media)
+if ( build_errors )
+  message(STATUS "!!! BUILD ERRORS !!!")
+  message(STATUS "These errors must be resolved before compiling")
+  foreach (msg ${build_errors})
+    message(STATUS ${msg})
+  endforeach (msg ${build_errors})
+  message(STATUS "!!! END BUILD ERRORS !!!\n")
+else (build_errors)
+  ########################################
+  # Write the config.h file
+  CONFIGURE_FILE (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
   
-  IF (INCLUDE_PLAYER)
-    ADD_SUBDIRECTORY(player)
-  ENDIF (INCLUDE_PLAYER)
+  ########################################
+  # Make the gazebo rc file
+  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
+  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
   
-  IF (INCLUDE_WEBGAZEBO)
-    Add_SUBDIRECTORY(webgazebo)
-  ENDIF (INCLUDE_WEBGAZEBO)
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
   
-  MESSAGE (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-  MESSAGE (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
-ENDIF (BUILD_GAZEBO)
+  message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
+  
+  IF (BUILD_GAZEBO)
+    ADD_SUBDIRECTORY(libgazebo)
+    ADD_SUBDIRECTORY(server)
+    ADD_SUBDIRECTORY(worlds)
+    ADD_SUBDIRECTORY(Media)
+    
+    IF (INCLUDE_PLAYER)
+      ADD_SUBDIRECTORY(player)
+    ENDIF (INCLUDE_PLAYER)
+    
+    IF (INCLUDE_WEBGAZEBO)
+      Add_SUBDIRECTORY(webgazebo)
+    ENDIF (INCLUDE_WEBGAZEBO)
+    
+    MESSAGE (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+    MESSAGE (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
+  ENDIF (BUILD_GAZEBO)
+  
+  # Cpack stuff
+  INCLUDE (InstallRequiredSystemLibraries)
+  SET (CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+  SET (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
+  SET (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
+  SET (CPACK_PACKAGE_VERSION_PATCH "${GAZEBO_REVISION_VERSION}")
+  SET (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Gazebo robot simulator")
+  SET (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_VERSION}")
+  SET (CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_VERSION}")
+  SET (CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
+  SET (CPACK_GENERATOR "TBZ2")
+  SET (CPACK_SOURCE_GENERATOR "TBZ2")
+  LIST (APPEND CPACK_SOURCE_IGNORE_FILES "/.svn/;.swp$;/build/")
+  INCLUDE (CPack)
 
-# Cpack stuff
-INCLUDE (InstallRequiredSystemLibraries)
-SET (CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-SET (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
-SET (CPACK_PACKAGE_VERSION_MINOR "${GAZEBO_MINOR_VERSION}")
-SET (CPACK_PACKAGE_VERSION_PATCH "${GAZEBO_REVISION_VERSION}")
-SET (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Gazebo robot simulator")
-SET (CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_VERSION}")
-SET (CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME_LOWER}-${GAZEBO_VERSION}")
-SET (CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
-SET (CPACK_GENERATOR "TBZ2")
-SET (CPACK_SOURCE_GENERATOR "TBZ2")
-LIST (APPEND CPACK_SOURCE_IGNORE_FILES "/.svn/;.swp$;/build/")
-INCLUDE (CPack)
+  message(STATUS "Configuration successful. Type make to compile gazebo")
+
+endif(build_errors)
 
 GAZEBOSERVER_RESET_LISTS()

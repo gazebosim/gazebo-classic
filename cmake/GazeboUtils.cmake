@@ -71,6 +71,14 @@ MACRO (LIST_TO_STRING _string _list)
     #STRING(STRIP ${${_string}} ${_string})
 ENDMACRO (LIST_TO_STRING)
 
+macro (BUILD_ERROR)
+  foreach (str ${ARGN})
+    SET (msg "ERROR: ${str}" )
+    MESSAGE (STATUS ${msg} )
+    APPEND_TO_CACHED_LIST(build_errors "build errors" ${msg})
+  endforeach (str ${ARGN})
+endmacro (BUILD_ERROR)
+
 ###############################################################################
 # Reset lists
 MACRO (GAZEBOSERVER_RESET_LISTS)

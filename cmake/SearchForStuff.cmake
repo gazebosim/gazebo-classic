@@ -20,7 +20,7 @@ IF (PKG_CONFIG_FOUND)
 
   pkg_check_modules(OGRE OGRE>=${OGRE_VERSION})
   IF (NOT OGRE_FOUND)
-    MESSAGE (SEND_ERROR "\nError: Ogre3d version >=${OGRE_VERSION} and development files not found. See the following website: http://www.orge3d.org")
+    BUILD_ERROR("Ogre3d version >=${OGRE_VERSION} and development files not found. See the following website for installation instructions: http://www.orge3d.org")
   ELSE (NOT OGRE_FOUND)
  
     SET (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")
@@ -43,7 +43,7 @@ IF (PKG_CONFIG_FOUND)
 
   pkg_check_modules(XML libxml-2.0)
   IF (NOT XML_FOUND)
-    MESSAGE (SEND_ERROR "\nError: libxml2 and development files not found. See the following website: http://www.xmlsoft.org")
+    BUILD_ERROR("libxml2 and development files not found. See the following website: http://www.xmlsoft.org")
   ELSE (NOT XML_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
@@ -61,7 +61,7 @@ IF (PKG_CONFIG_FOUND)
 
   pkg_check_modules(XFT xft)
   IF (NOT XFT_FOUND)
-    MESSAGE (SEND_ERROR "\nError: XFT and development files not found. See the following website: http://www.fontconfig.org")
+    BUILD_ERROR("XFT and development files not found. See the following website: http://www.fontconfig.org")
   ELSE (NOT XFT_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
