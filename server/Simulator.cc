@@ -47,8 +47,6 @@
 
 #include "Simulator.hh"
 
-#define MAX_FRAME_RATE 60
-
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +74,9 @@ Simulator::Simulator()
   selectedBody(NULL)
 {
   this->mutex = new boost::recursive_mutex();
+
+  printf("Simulator Init\n");
+  this->startTime = this->GetWallTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,8 +242,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 /// Initialize the simulation
 void Simulator::Init()
 {
-  this->startTime = this->GetWallTime();
-
   //Initialize the world
   try
   {
@@ -330,7 +329,7 @@ void Simulator::MainLoop()
 {
   double currTime = 0;
   double lastTime = 0;
-  double freq = 30.0;
+  double freq = 80.0;
 
 #ifdef TIMING
     double tmpT1 = this->GetWallTime();
@@ -345,7 +344,7 @@ void Simulator::MainLoop()
   while (!this->userQuit)
   {
     currTime = this->GetWallTime();
-    if ( currTime - lastTime > 1/freq)
+    if ( currTime - lastTime > 1.0/freq)
     {
       lastTime = this->GetWallTime();
 
@@ -353,9 +352,7 @@ void Simulator::MainLoop()
         OgreAdaptor::Instance()->UpdateCameras();
 
       if (this->gui)
-      {
         this->gui->Update();
-      }
 
       World::Instance()->ProcessEntitiesToLoad();
       World::Instance()->GraphicsUpdate();

@@ -140,6 +140,14 @@ void MonoCameraSensor::FiniChild()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// Set whether the sensor is active or not
+void MonoCameraSensor::SetActive(bool value)
+{
+  Sensor::SetActive(value);
+  this->SetRenderingEnabled(value);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Update the drawing
 void MonoCameraSensor::UpdateChild()
 {

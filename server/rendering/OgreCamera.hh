@@ -86,6 +86,12 @@ namespace gazebo
   
     /// Finalize the camera
     public: void FiniCam();
+
+    /// \brief Set to true to enable rendering
+    public: void SetRenderingEnabled(bool value);
+
+    /// \brief Get whether the rendering is enabled
+    public: bool GetRenderingEnabled() const;
   
     /// \brief Get the global pose of the camera
     public: Pose3d GetWorldPose() const;
@@ -209,7 +215,7 @@ namespace gazebo
     private: std::string name;
 
     protected: ParamT<Angle> *hfovP;
-    protected: ParamT<double> *nearClipP, *farClipP;
+    protected: ParamT<double> *nearClipP, *farClipP, *updateRateP;
     protected: ParamT< Vector2<int> > *imageSizeP;
     protected: unsigned int textureWidth, textureHeight;
   
@@ -246,6 +252,11 @@ namespace gazebo
 
     private: bool userMovable;
     protected: std::vector<Param*> camParameters;
+
+    protected: bool renderingEnabled;
+
+    protected: double renderPeriod;
+    protected: double lastUpdate;
   };
   
   /// \}

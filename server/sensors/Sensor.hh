@@ -79,7 +79,7 @@ namespace gazebo
     public: void GetInterfaceNames(std::vector<std::string>& list) const;
  
     /// \brief Set whether the sensor is active or not
-    public: void SetActive(bool value);
+    public: virtual void SetActive(bool value);
     public: bool IsActive();
 
     /// \brief  Load the child sensor

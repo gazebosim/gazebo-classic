@@ -69,6 +69,9 @@ class MonoCameraSensor : public Sensor, public OgreCamera
   /// Finalize the camera
   protected: virtual void FiniChild();
 
+  /// \brief Set whether the sensor is active or not
+  public: virtual void SetActive(bool value);
+
   /// \brief Return the material the camera renders to
   public: virtual std::string GetMaterialName() const;
 

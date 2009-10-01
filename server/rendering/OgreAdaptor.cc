@@ -74,7 +74,6 @@ OgreAdaptor::OgreAdaptor()
   this->shadowTextureSizeP = new ParamT<int>("shadowTextureSize", 512,0);
   this->shadowTechniqueP = new ParamT<std::string>("shadowTechnique", "stencilModulative", 0);
   this->drawGridP = new ParamT<bool>("grid", true, 0);
-  this->updateRateP = new ParamT<double>("maxUpdateRate",0,0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
   Param::End();
 }
@@ -95,7 +94,6 @@ OgreAdaptor::~OgreAdaptor()
   delete this->shadowIndexSizeP;
   delete this->shadowTechniqueP;
   delete this->drawGridP;
-  delete this->updateRateP;
   delete this->skyMaterialP;
 
 }
@@ -210,7 +208,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->shadowIndexSizeP->Load(node);
   this->shadowTechniqueP->Load(node);
   this->drawGridP->Load(node);
-  this->updateRateP->Load(node);
 
   //Preload basic shapes that can be used anywhere
   OgreCreator::LoadBasicShapes();
@@ -292,7 +289,6 @@ void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "<rendering:ogre>\n";
   stream << prefix << "  " << *(this->ambientP) << "\n";
   stream << prefix << "  " << *(this->drawGridP) << "\n";
-  stream << prefix << "  " << *(this->updateRateP) << "\n";
   stream << prefix << "  <sky>\n";
   stream << prefix << "    " << *(this->skyMaterialP) << "\n";
   stream << prefix << "  </sky>\n";
@@ -523,13 +519,6 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos)
   return NULL;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the desired update rate
-double OgreAdaptor::GetUpdateRate()
-{
-  return **(this->updateRateP);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Register a user camera

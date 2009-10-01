@@ -654,15 +654,10 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
              << ":" << (unsigned long)winId 
              << ":" << (unsigned long)vi;
   */
-             
 
   ogreHandle << winId;
 
-#ifdef ENABLE_SHADOWS
   params["parentWindowHandle"] = ogreHandle.str();
-#else
-  params["externalWindowHandle"] = ogreHandle.str();
-#endif
 
   //params["vsync"] = "true";
   params["FSAA"] = "2";

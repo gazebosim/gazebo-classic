@@ -29,6 +29,7 @@
 #include <Ogre.h>
 #include <dirent.h>
 
+#include "PhysicsEngine.hh"
 #include "Global.hh"
 #include "World.hh"
 #include "GazeboError.hh"
@@ -74,6 +75,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->visMaskP = new ParamT<std::string>("mask","none",0);
   this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
   this->imageFormatP = new ParamT<std::string>("imageFormat", "R8G8B8", 0);
+  this->updateRateP = new ParamT<double>("updateRate",30,0);
   Param::End();
 
   this->captureData = false;
@@ -82,6 +84,9 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   CameraManager::Instance()->AddCamera(this);
 
   this->camera = NULL;
+
+  this->renderPeriod = 1.0/(**this->updateRateP);
+  this->renderingEnabled = true;
 }
 
 
@@ -106,7 +111,6 @@ OgreCamera::~OgreCamera()
 // Load the camera
 void OgreCamera::LoadCam( XMLConfigNode *node )
 {
-
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     gzthrow("Cameras can not be used when running Gazebo without rendering engine");
 
@@ -160,6 +164,7 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
     gzthrow("near clipping plane (min depth) <= zero");
   }
 
+  this->lastUpdate = Simulator::Instance()->GetSimTime();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -236,48 +241,72 @@ void OgreCamera::UpdateCam()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set to true to enable rendering
+void OgreCamera::SetRenderingEnabled(bool value)
+{
+  this->renderingEnabled = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether the rendering is enabled
+bool OgreCamera::GetRenderingEnabled() const
+{
+  return this->renderingEnabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Render the camera
 void OgreCamera::Render()
 {
-  this->renderTarget->update();
+  if (!this->renderingEnabled)
+    return;
 
-  if (this->captureData)
+  double physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  if (round((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
-    boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
 
-    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-    Ogre::RenderTexture *rTexture;
-    Ogre::Viewport* renderViewport;
+    this->renderTarget->update();
 
-    size_t size;
-
-    // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->renderTexture->getBuffer();
-    rTexture = pixelBuffer->getRenderTarget();
-
-    Ogre::PixelFormat format = pixelBuffer->getFormat();
-    renderViewport = rTexture->getViewport(0);
-
-    size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
-                                          (**this->imageSizeP).y, 
-                                          1, 
-                                          format);
-
-    // Allocate buffer
-    if (!this->saveFrameBuffer)
-      this->saveFrameBuffer = new unsigned char[size];
-
-    memset(this->saveFrameBuffer,128,size);
-
-    Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
-                        1, this->imageFormat, this->saveFrameBuffer);
-
-    pixelBuffer->blitToMemory( box );
-
-    if (this->saveFramesP->GetValue())
+    if (this->captureData)
     {
-      this->SaveFrame();
+      boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
+
+      Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+      Ogre::RenderTexture *rTexture;
+      Ogre::Viewport* renderViewport;
+
+      size_t size;
+
+      // Get access to the buffer and make an image and write it to file
+      pixelBuffer = this->renderTexture->getBuffer();
+      rTexture = pixelBuffer->getRenderTarget();
+
+      Ogre::PixelFormat format = pixelBuffer->getFormat();
+      renderViewport = rTexture->getViewport(0);
+
+      size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
+          (**this->imageSizeP).y, 
+          1, 
+          format);
+
+      // Allocate buffer
+      if (!this->saveFrameBuffer)
+        this->saveFrameBuffer = new unsigned char[size];
+
+      memset(this->saveFrameBuffer,128,size);
+
+      Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
+          1, this->imageFormat, this->saveFrameBuffer);
+
+      pixelBuffer->blitToMemory( box );
+
+      if (this->saveFramesP->GetValue())
+      {
+        this->SaveFrame();
+      }
     }
+
+    this->lastUpdate = Simulator::Instance()->GetSimTime();
   }
 
 }

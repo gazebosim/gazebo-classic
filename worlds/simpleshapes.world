@@ -23,7 +23,7 @@
     <!-- updateRate: <0 == throttle simTime to match realTime.
                       0 == No throttling
                      >0 == Frequency at which to throttle the sim --> 
-    <updateRate>-1</updateRate>
+    <updateRate>0</updateRate>
   </physics:ode>
 
   <rendering:gui>

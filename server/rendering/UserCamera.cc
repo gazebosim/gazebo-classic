@@ -27,6 +27,7 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "Simulator.hh"
 #include "Global.hh"
 #include "GLWindow.hh"
 #include "OgreCamera.hh"
@@ -68,6 +69,7 @@ void UserCamera::Load(XMLConfigNode *node)
 
   this->SetClipDist(0.1, 50);
   this->SetFOV( DTOR(60) );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,12 +88,21 @@ void UserCamera::Init()
   this->viewport->setVisibilityMask(this->visibilityMask);
 
   this->renderTarget = this->window;
+
+  printf("User Camera Init\n");
+  this->lastUpdate = Simulator::Instance()->GetRealTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update
 void UserCamera::Update()
 {
+  if (Simulator::Instance()->GetRealTime() - this->lastUpdate < 
+      this->renderPeriod)
+    return;
+
+  this->lastUpdate = Simulator::Instance()->GetRealTime();
+
   OgreCamera::UpdateCam();
   this->window->update();
 
@@ -112,6 +123,7 @@ void UserCamera::Update()
 
     this->saveCount++;
   }
+
 }
 
 
