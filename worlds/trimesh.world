@@ -17,10 +17,16 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.001</stepTime>
+    <stepTime>0.0001</stepTime>
     <gravity>0 0 -9.80665</gravity>
-    <cfm>10e-5</cfm>
+    <cfm>10e-8</cfm>
     <erp>0.3</erp>
+    <quickStep>true</quickStep>
+    <quickStepIters>50</quickStepIters>
+    <quickStepW>1.3</quickStepW>
+    <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
+    <contactSurfaceLayer>0.001</contactSurfaceLayer>
+
     <updateRate>0</updateRate>
   </physics:ode>
 
@@ -62,7 +68,7 @@
       <geom:trimesh name="pallet_geom">
         <mesh>WoodPallet.mesh</mesh>
         <scale>.2 .2 .2</scale>
-        <mass>0.1</mass>
+        <mass>1.0</mass>
 
         <visual>
           <scale>.2 .2 .2</scale>
@@ -95,7 +101,6 @@
     </body:sphere>
   </model:physical>
 
-
   <!-- White Directional light -->
   <model:renderable name="directional_white">
     <enableGravity>false</enableGravity>
@@ -106,7 +111,6 @@
       <specularColor>0.0 0.0 0.0</specularColor>
       <range>100</range>
       
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
       <attenuation>0.0 1.0 0.4</attenuation>
     </light>
   </model:renderable>

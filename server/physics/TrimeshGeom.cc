@@ -58,7 +58,7 @@ TrimeshGeom::~TrimeshGeom()
 /// Update function.
 void TrimeshGeom::UpdateChild()
 {
-/*  /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
+  /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
   // this is fairly important for good results.
 
@@ -89,7 +89,6 @@ void TrimeshGeom::UpdateChild()
 
   dGeomTriMeshSetLastTransform( this->geomId,
       *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
-      */
 }
 
 //////////////////////////////////////////////////////////////////////////////

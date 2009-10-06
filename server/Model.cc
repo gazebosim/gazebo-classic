@@ -196,7 +196,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->laserFiducialP->Load(node);
   this->laserRetroP->Load(node);
 
-
   this->xmlNode = node;
   this->type=node->GetName();
 
@@ -414,6 +413,9 @@ void Model::Update()
   std::map<std::string, Joint* >::iterator jointIter;
 
   Pose3d bodyPose, newPose, oldPose;
+
+  if (this->GetName() == "wood_pallet")
+    std::cout << "Pose[" << this->GetPose().pos << "]\n";
 
 #ifdef TIMING
   double tmpT1 = Simulator::Instance()->GetWallTime();

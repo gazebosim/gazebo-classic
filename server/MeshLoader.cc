@@ -21,16 +21,12 @@ void MeshLoader::Load(const std::string &filename)
 
   gazeboPaths = Simulator::Instance()->GetGazeboConfig()->GetGazeboPaths();
 
-  printf("Num Paths[%d]\n",gazeboPaths.size()); 
   for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
        iter!=gazeboPaths.end(); ++iter)
   {
     fullname = (*iter)+"/Media/models/"+filename;
-    std::cout << "Fullname[" << fullname << "]\n";
     if (stat(fullname.c_str(), &st) == 0)
     {
-      printf("Loading mesh from file[%s]\n",fullname.c_str());
-
       std::string extension = fullname.substr(fullname.rfind(".")+1, 
           fullname.size());
       if (extension == "mesh")
