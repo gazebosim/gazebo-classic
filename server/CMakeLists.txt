@@ -24,6 +24,7 @@ INCLUDE_DIRECTORIES(
   ${gazeboserver_include_dirs}
   ${boost_include_dirs}
   ${freeimage_include_dir}
+  ${FLTK_INCLUDE_DIR}
 )
 
 LINK_DIRECTORIES(  
