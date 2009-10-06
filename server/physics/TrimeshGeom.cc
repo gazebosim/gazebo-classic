@@ -95,6 +95,8 @@ void TrimeshGeom::UpdateChild()
 /// Load the trimesh
 void TrimeshGeom::LoadChild(XMLConfigNode *node)
 {
+  MeshLoader *meshLoader;
+
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
   float *vertices = NULL;
@@ -102,21 +104,18 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
-  
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    gzthrow("Trimesh objects are not supported when running Gazebo without rendering engine");
 
-  MeshLoader meshLoader;
-  meshLoader.Load( this->meshNameP->GetValue() );
+  meshLoader = new MeshLoader();
+  meshLoader->Load( this->meshNameP->GetValue() );
 
-  numIndices = meshLoader.GetNumIndices();
-  numVertices = meshLoader.GetNumVertices();
+  numIndices = meshLoader->GetNumIndices();
+  numVertices = meshLoader->GetNumVertices();
 
   // Create the vertex and index arrays
   vertices = new float[numVertices*3];
   indices = new unsigned int[numIndices];
 
-  meshLoader.FillArrays(&vertices, &indices);
+  meshLoader->FillArrays(&vertices, &indices);
 
   for (unsigned int i=0; i < numVertices; i++)
   {
@@ -142,6 +141,8 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;
+
+  delete meshLoader;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -74,8 +74,6 @@ Simulator::Simulator()
   selectedBody(NULL)
 {
   this->mutex = new boost::recursive_mutex();
-
-  printf("Simulator Init\n");
   this->startTime = this->GetWallTime();
 }
 

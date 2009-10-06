@@ -100,7 +100,7 @@ void GazeboConfig::Load()
       node = rc.GetRootNode()->GetChild("gazeboPath");
       while (node)
       {
-        gzmsg(1) << "Gazebo Path[" << node->GetValue() << "]\n";
+        gzmsg(2) << "Gazebo Path[" << node->GetValue() << "]\n";
         this->gazeboPaths.push_back(node->GetValue());
         node = node->GetNext("gazeboPath");
       }
@@ -112,7 +112,7 @@ void GazeboConfig::Load()
       node = rc.GetRootNode()->GetChild("ogrePath");
       while (node)
       {
-        gzmsg(1) << "Ogre Path[" << node->GetValue() << "]\n";
+        gzmsg(2) << "Ogre Path[" << node->GetValue() << "]\n";
         this->ogrePaths.push_back( node->GetValue() );
         node = node->GetNext("ogrePath");
       }

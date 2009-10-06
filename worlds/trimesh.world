@@ -14,7 +14,7 @@
   xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
   xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
 
-  <verbosity>5</verbosity>
+  <verbosity>1</verbosity>
 
   <physics:ode>
     <stepTime>0.0001</stepTime>

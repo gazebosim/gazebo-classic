@@ -89,7 +89,6 @@ void UserCamera::Init()
 
   this->renderTarget = this->window;
 
-  printf("User Camera Init\n");
   this->lastUpdate = Simulator::Instance()->GetRealTime();
 }
 

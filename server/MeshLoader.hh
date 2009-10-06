@@ -62,6 +62,12 @@ namespace gazebo
   /// \brief This class will load vertex information for a mesh
   class MeshLoader
   {
+    /// \brief Constructor
+    public: MeshLoader();
+
+    /// \brief Destructor
+    public: virtual ~MeshLoader();
+
     /// \brief Load a mesh from file
     public: void Load(const std::string &filename);
 
@@ -94,7 +100,7 @@ namespace gazebo
                if (id == 0x1000)
                {
                  std::string version = ReadString(file);
-                 printf("Version %s\n",version.c_str());
+                 //printf("Version %s\n",version.c_str());
                  return true;
                }
   
@@ -163,14 +169,17 @@ namespace gazebo
               return sizeof(this->id) + sizeof(this->length);
             }
   
-    public: void Read(FILE *file)
+    public: bool Read(FILE *file)
             {
               if (!feof(file) && 
                   fread(&this->id, sizeof(this->id), 1, file) < 1)
-                printf("Error in Read\n");
+                return false;
+                
               if (!feof(file) && 
                   fread(&this->length, sizeof(this->length), 1, file) < 1)
-                printf("Error in Read\n");
+                return false;
+
+              return true;
             }
   };
 }

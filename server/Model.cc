@@ -414,9 +414,6 @@ void Model::Update()
 
   Pose3d bodyPose, newPose, oldPose;
 
-  if (this->GetName() == "wood_pallet")
-    std::cout << "Pose[" << this->GetPose().pos << "]\n";
-
 #ifdef TIMING
   double tmpT1 = Simulator::Instance()->GetWallTime();
 #endif

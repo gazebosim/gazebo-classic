@@ -137,8 +137,6 @@ void Geom::Load(XMLConfigNode *node)
 
   this->contact->Load(node);
 
-  std::cout << "Loading geom[" << this->GetName() << "]\n";
-
   this->LoadChild(node);
 
   this->body->AttachGeom(this);
