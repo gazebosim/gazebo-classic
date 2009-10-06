@@ -65,6 +65,7 @@ SET (sources Common.cc
              Simulator.cc
              Rand.cc
              Factory.cc
+             MeshLoader.cc
 )
 
 SET (headers Common.hh
@@ -91,6 +92,8 @@ SET (headers Common.hh
              Simulator.hh
              Rand.hh
              Factory.hh
+             MeshLoader.cc
+             ivcon.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})

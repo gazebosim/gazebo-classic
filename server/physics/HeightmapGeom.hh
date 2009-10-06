@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Trimesh geometry
+/* Desc: Heightmap geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
  * CVS: $Id$

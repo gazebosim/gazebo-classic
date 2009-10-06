@@ -25,9 +25,8 @@
  */
 
 #include <ode/ode.h>
-#include <Ogre.h>
 
-#include "OgreVisual.hh"
+#include "MeshLoader.hh"
 #include "Body.hh"
 #include "TrimeshGeom.hh"
 #include "GazeboError.hh"
@@ -59,7 +58,7 @@ TrimeshGeom::~TrimeshGeom()
 /// Update function.
 void TrimeshGeom::UpdateChild()
 {
-  /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
+/*  /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
   // this is fairly important for good results.
 
@@ -90,30 +89,17 @@ void TrimeshGeom::UpdateChild()
 
   dGeomTriMeshSetLastTransform( this->geomId,
       *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
+      */
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the trimesh
 void TrimeshGeom::LoadChild(XMLConfigNode *node)
 {
-  Ogre::SubMesh* subMesh;
-  Ogre::MeshPtr mesh;
-
-  unsigned int i,j;
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
-  const Ogre::VertexElement* elem;
-  Ogre::VertexData *vertexData;
-  Ogre::HardwareVertexBufferSharedPtr vbuf;
-  Ogre::HardwareIndexBufferSharedPtr ibuf;
-  unsigned short* indTmp = NULL;
-  unsigned char* pData = NULL;
-  float *pFloat = NULL;
-  float *vertPtr = NULL;
   float *vertices = NULL;
-  int *indices = NULL;
-  int vindex = 0;
-  int iindex = 0;
+  unsigned int *indices = NULL;
 
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
@@ -121,88 +107,24 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     gzthrow("Trimesh objects are not supported when running Gazebo without rendering engine");
 
-  mesh = Ogre::MeshManager::getSingleton().load(this->meshNameP->GetValue(),Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  MeshLoader meshLoader;
+  meshLoader.Load( this->meshNameP->GetValue() );
 
-  if (mesh.isNull())
-    gzthrow("Failed to load trimesh "+ this->meshNameP->GetValue());
-
-  // Count the number of vertices and indices
-  // for (i=0; i<mesh->getNumSubMeshes(); i++)
-  for (i=0; i<1; i++)
-  {
-    subMesh = mesh->getSubMesh(i);
-    if (subMesh->useSharedVertices)
-      numVertices += mesh->sharedVertexData->vertexCount;
-    else
-      numVertices += subMesh->vertexData->vertexCount;
-    numIndices += subMesh->indexData->indexCount;
-  }
+  numIndices = meshLoader.GetNumIndices();
+  numVertices = meshLoader.GetNumVertices();
 
   // Create the vertex and index arrays
   vertices = new float[numVertices*3];
-  indices = new int[numIndices];
+  indices = new unsigned int[numIndices];
 
+  meshLoader.FillArrays(&vertices, &indices);
 
-  // Copy the vertex and index data from OGRE
-  //for (i = 0; i < mesh->getNumSubMeshes(); i++)
-  for (i = 0; i < 1; i++)
+  for (unsigned int i=0; i < numVertices; i++)
   {
-    subMesh = mesh->getSubMesh(i);
-
-    if (subMesh->useSharedVertices)
-      vertexData=mesh->sharedVertexData;
-    else
-      vertexData=subMesh->vertexData;
-
-    elem = vertexData->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
-    vbuf = vertexData->vertexBufferBinding->getBuffer(elem->getSource());
-
-    // Pointer to vertex array.
-    vertPtr = &(vertices[vindex]);
-    vindex += vertexData->vertexCount*3;
-
-    pData = static_cast<unsigned char*>(vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-
-    // Add vertices to the vertex array
-    for (j = 0; j < vertexData->vertexCount; j++)
-    {
-      elem->baseVertexPointerToElement(pData, &pFloat);
-
-      *(vertPtr+0) = (*pFloat++) * this->scaleP->GetValue().x;
-      *(vertPtr+1) = (*pFloat++) * this->scaleP->GetValue().y;
-      *(vertPtr+2) = (*pFloat++) * this->scaleP->GetValue().z;
-
-      vertPtr += 3;
-
-      pData += vbuf->getVertexSize();
-    }
-
-    vbuf->unlock();
-
-    // Get the indices
-    ibuf = subMesh->indexData->indexBuffer;
-    indTmp = new unsigned short[subMesh->indexData->indexCount];
-
-    ibuf->readData(0, ibuf->getSizeInBytes(), indTmp);
-
-    /// Copy the indices
-    for (j = 0; j < subMesh->indexData->indexCount; j++)
-    {
-      indices[j+iindex] = indTmp[j];
-    }
-
-    iindex += subMesh->indexData->indexCount;
-
-    if (indTmp)
-    {
-      delete [] indTmp;
-      indTmp = NULL;
-    }
+    vertices[i*3+0] = vertices[i*3+0] * (**this->scaleP).x;
+    vertices[i*3+1] = vertices[i*3+1] * (**this->scaleP).y;
+    vertices[i*3+2] = vertices[i*3+2] * (**this->scaleP).z;
   }
-
-
-
-  /// FIXME: use below to setup trimesh geometry for collision without using above Ogre codes
 
   /// This will hold the vertex data of the triangle mesh
   this->odeData = dGeomTriMeshDataCreate();
@@ -212,7 +134,7 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
       (float*)vertices, 3*sizeof(float), numVertices,
       (int*)indices, numIndices, 3*sizeof(int));
 
-  this->geomId = dCreateTriMesh( this->spaceId, this->odeData,0,0,0 );
+  this->geomId = dCreateTriMesh( 0,/*this->spaceId,*/ this->odeData,0,0,0 );
 
   dMassSetTrimesh(&this->mass, this->massP->GetValue(), this->geomId);
 

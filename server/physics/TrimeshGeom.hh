@@ -31,8 +31,6 @@
 
 namespace gazebo
 {
-  class OgreVisual;
-
   /// \addtogroup gazebo_physics_geom
   /// \{
   /** \defgroup gazebo_trimesh_geom Triangle Mesh geom

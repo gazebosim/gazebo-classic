@@ -822,7 +822,7 @@ void Body::SetEnabled(bool enable) const
 // Load a new geom helper function
 void Body::LoadGeom(XMLConfigNode *node)
 {
-  Geom *geom;
+  Geom *geom = NULL;
 
   if (node->GetName() == "sphere")
     geom = new SphereGeom(this);
@@ -849,7 +849,8 @@ void Body::LoadGeom(XMLConfigNode *node)
     gzthrow("Unknown Geometry Type["+node->GetString("name",std::string(),0)+"]");
   }
 
-  geom->Load(node);
+  if (geom)
+    geom->Load(node);
 
 }
 
