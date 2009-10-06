@@ -17,10 +17,11 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.02</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.80665</gravity>
     <cfm>10e-5</cfm>
     <erp>0.3</erp>
+    <updateRate>0</updateRate>
   </physics:ode>
 
   <rendering:gui>
@@ -34,6 +35,7 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
+    <grid>false</grid>
   </rendering:ogre>
 
   <model:physical name="plane1_model">
@@ -47,13 +49,13 @@
         <size>2000 2000</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/Grey</material>
+        <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
   </model:physical>
 
   <model:physical name="wood_pallet">
-    <xyz>0 0 1.0</xyz>
+    <xyz>0 0 1.5</xyz>
     <rpy>90 0 0</rpy>
     <static>false</static>
     <body:trimesh name="pallet_body">
@@ -71,6 +73,28 @@
       </geom:trimesh>
     </body:trimesh>
   </model:physical>
+
+  <model:physical name="sphere1_model">
+    <xyz>0.1 0.1 0.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <static>false</static>
+
+    <body:sphere name="sphere1_body">
+      <geom:sphere name="sphere1_geom">
+        <size>0.2</size>
+        <mass>0.0</mass>
+
+        <mu1>109999.0</mu1>
+
+        <visual>
+          <size>0.4 0.4 0.4</size>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Rocky</material>
+        </visual>
+      </geom:sphere>
+    </body:sphere>
+  </model:physical>
+
 
   <!-- White Directional light -->
   <model:renderable name="directional_white">
