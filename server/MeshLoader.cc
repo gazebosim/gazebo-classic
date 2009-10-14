@@ -6,6 +6,7 @@
 
 #include "Simulator.hh"
 #include "GazeboConfig.hh"
+#include "GazeboMessage.hh"
 #include "MeshLoader.hh"
 
 using namespace gazebo;
@@ -28,27 +29,47 @@ void MeshLoader::Load(const std::string &filename)
 {
   struct stat st;
   std::string fullname;
+  bool found = false;
 
-  std::list<std::string> gazeboPaths;
+  std::string extension;
 
-  gazeboPaths = Simulator::Instance()->GetGazeboConfig()->GetGazeboPaths();
-
-  for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
-       iter!=gazeboPaths.end(); ++iter)
+  fullname =  std::string("./")+filename;
+  if (stat(fullname.c_str(), &st) == 0)
   {
-    fullname = (*iter)+"/Media/models/"+filename;
-    if (stat(fullname.c_str(), &st) == 0)
+    found = true;
+  }
+  else if ( stat(filename.c_str(), &st) == 0)
+  {
+    fullname =  filename;
+    found = true;
+  }
+  else
+  {
+    std::list<std::string> gazeboPaths;
+    gazeboPaths = Simulator::Instance()->GetGazeboConfig()->GetGazeboPaths();
+    for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
+        iter!=gazeboPaths.end(); ++iter)
     {
-      std::string extension = fullname.substr(fullname.rfind(".")+1, 
-          fullname.size());
-      if (extension == "mesh")
-        this->LoadOgre(fullname);
-      else
-        this->ivcon.Load(fullname, this->vertices, this->indices);
-      break;
+      fullname = (*iter)+"/Media/models/"+filename;
+      if (stat(fullname.c_str(), &st) == 0)
+      {
+        found = true;
+        break;
+      }
     }
   }
 
+  if (found)
+  {
+    extension = fullname.substr(fullname.rfind(".")+1, fullname.size());
+
+    if (extension == "mesh")
+      this->LoadOgre(fullname);
+    else
+      this->ivcon.Load(fullname, this->vertices, this->indices);
+  }
+  else
+    gzerr(0) << "Unable to find file[" << filename << "]\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
