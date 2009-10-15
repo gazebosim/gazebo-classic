@@ -1,23 +1,24 @@
-
 /**
 @page install Installation (Linux)
 
-Gazebo relies on a number of third-party libraries that make
-installation a little bit tricky.  If things go wrong, please check
-the archives of the Gazebo <a
-href="http://sourceforge.net/mailarchive/forum.php?forum_id=33909">mailing
+If things go wrong, please check the @ref install_problems section and the archives 
+of the Gazebo <a href="http://sourceforge.net/mailarchive/forum.php?forum_id=33909">mailing
 list</a>.  Please read the instructions below @b carefully before
 reporting posting to the mailing list.
 
 <b> These are the Linux installation instructions, OS X users should
-go install_osx "here". </b>
+go @ref install_osx "here". </b>
+
+@section installing from binary files
+For Ubuntu, use this PPA:
+https://launchpad.net/~thjc/+archive/ppa/+packages
+
+@section Installing elsewhere /installing developing system
+
+First see @ref prerequisites and check that get everything needed installed.
 
 
-\section install_required Required 3rd Party Libraries
-
-See \ref prerequisites
-
-\section install_prepare Preparing your system
+@section install_prepare Preparing your system
 
 The default install path for many source packages (Gazebo included) is:
 @verbatim
@@ -55,15 +56,21 @@ source dependencies).
 @verbatim
 $ tar xvzf gazebo-<version>.tar.gz
 $ cd gazebo-<version>
-$ scons
+$ cmake . 
+$ make
 @endverbatim
-Note that scons will fail if any of the required packages are missing.
+Note that cmake will fail if any of the required packages are missing.
 Once Gazebo has been built, it can be installed: 
 @verbatim
 $ su
-$ scons install
+$ cmake install
 $ exit
 @endverbatim
+or 
+@verbatim
+$ sudo cmake install
+@endverbatim
+
 
 Gazebo is now ready to run; try:
 @verbatim
@@ -108,7 +115,7 @@ project pretty soon)
 
 - Build and install Gazebo using the "prefix" argument:
 @verbatim
-$ scons prefix=/home/[username]/local install
+$ cmake prefix=/home/[username]/local install
 @endverbatim
 
 Everything should now work seamlessly, and your locally installed
@@ -137,14 +144,18 @@ To uninstall Gazebo, all we have to do is clean the installation of our SVN copy
 
 @verbatim
 $ su
-$ scons -c install
+$ make uninstall
 $ exit
+@endverbatim
+or 
+@verbatim
+$ sudo make uninstall
 @endverbatim
 
 If you installed a local copy, simply: 
 
 @verbatim
-$ scons -c install
+$ make uninstall
 @endverbatim
 
 
