@@ -1,83 +1,86 @@
-Open:
-- Make headless
-- Mouse picking
-  -Implement in CameraSensor class.
-- FSAA: See OgreCreator::CreateWindow
-- Shadows draw on multiple surfaces(seem to pass through walls).
-- Removing the sky results in a black screen
-- Apply Linear and Angular Damping, see OGREODE sources.
-- A static geom which is offset does not actually move the geom, so collision
-  detection does not work
-- Force sensors
-- Why order on hinge and hinge2 joints matters? Should we avoid this?
-- Add spring force between bodies of a model to keep the together. See ODE example test_joints.cpp
-- Python scripts to models, allow dynamic (movable) meshes
-- Slider has to be the first in the XML file, when loading a bunch of joints in a model.
-- Add note in Controller tutorial about the Controller Factory
-- Overlays in Gazebo with Mac doesn't work
-- Implement Speech interface
-- Add in user adjustment of simple solids texture units
-- Fix sicklms200 PutFiducialData. Breaks when using large angles
-- Paging heightmaps. 
-  - Positioning the current heightmap is a big hack
+///////////////////////////////////////
+  OPEN
+///////////////////////////////////////
 
-- Intelligent positioning of nested models
-- BSP worlds
-
-- Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
-- Pioneer2DX
-
-- Create libraries so that it's easy to include the core of gazebo without linking in Ogre, fltk, etc, etc. 
-
-- Write a tutorial for creating new meshes
-- Install for OSX
-
-- Graphics3d interface
-- Improve build system. Put all the platform checks in on place. 
-
-- BSP loader
-
-- Replace our Time class with boost
-
-- GPS 
-- WiFi
-
-- Multilevel map extruder
-
--run gprof, and valgrind
-
+GUI
 - Hand of god
   - Select models and get info
   - Move models
+  -Implement in CameraSensor class.
+- Allow person to display and change XML parameters through the GUI.
 - Better fonts
-- reorganize the Media
 - Better camera movement. Translate is too slow over long distances
 
--Fog
+Rendering
+- FSAA: See OgreCreator::CreateWindow
+- Shadows draw on multiple surfaces(seem to pass through walls).
+- Removing the sky results in a black screen
+- Paging heightmaps. 
+  - Positioning the current heightmap is a big hack
+- BSP loader and worlds
+- Fog
 - Anti Aliasing
-- Threading. Make use of dual-core machines.
-- Implement triggers with callbacks.
-
 - Better lights
   - GLSL per pixel lighting. Make this user selectable.
-
-- Pick a formatting standard for XML file
 - Dynamic textures
-- Scripting interface for models and sensors
+
+
+Physics
+- Apply Linear and Angular Damping, see OGREODE sources.
+- A static geom which is offset does not actually move the geom, so collision
+  detection does not work
+- Why order on hinge and hinge2 joints matters? Should we avoid this?
+- Add spring force between bodies of a model to keep the together. See ODE example test_joints.cpp
+- Slider has to be the first in the XML file, when loading a bunch of joints in a model.
+- Merge PAL patch http://sourceforge.net/tracker/index.php?func=detail&aid=1881646&group_id=42445&atid=433166
+
+Simulator
+- Force sensors
+- Python/Ruby scripts to models, controllers, sensors, allow dynamic (movable) meshes
+- Add note in Controller tutorial about the Controller Factory
+- Implement Speech interface
+- Add in user adjustment of simple solids texture units
+- Fix sicklms200 PutFiducialData. Breaks when using large angles
+- Intelligent positioning of nested models
+- Pioneer2DX
+- Write a tutorial for creating new meshes
+- Graphics3d interface
+- GPS 
+- WiFi
 - Google Earth API interface
 - Check laser sampling rate
+- The bodies set their scenenode based on a global pose. They should set their scenenodes based a pose relative to the model. The model currently doesn't move it's scene node, so it's always at (0,0,0). Basically should make all Body Pose stuff relative to the parent.
+- Look into COLLADA, OPAL
+- Multilevel map extruder
+
+Software-Engineering
+- Improve build system. Put all the platform checks in on place. 
+- Replace our Time class with boost
+- Create libraries so that it's easy to include the core of gazebo without linking in Ogre, fltk, etc, etc. 
+- run gprof, and valgrind
+- Threading. Make use of dual-core machines.
+- Implement triggers with callbacks.
+- Pick a formatting standard for XML file
 - Standardize internal API
 - Data Logger
-- The bodies set their scenenode based on a global pose. They should set their scenenodes based a pose relative to the model. The model currently doesn't move it's scene node, so it's always at (0,0,0). Basically should make all Body Pose stuff relative to the parent.
--Allow person to display and change XML parameters through the GUI.
--Look into COLLADA, OPAL
--Merge PAL patch http://sourceforge.net/tracker/index.php?func=detail&aid=1881646&group_id=42445&atid=433166
--Add "Angle" class, will handle ROTD and DTOR.
--Templatize Vector, Quaternion, Pose
+- Rethink media organization 
+- Templatize Vector, Quaternion, Pose
 - Replace all return int, with throws
 
 
-Completed:
+Platform-specific
+- Install for OSX
+- Overlays in Gazebo with Mac doesn't work
+- Apply patches for OSX from Nathan Michael. Add a OSX howto to the docs.
+
+
+
+
+///////////////////////////////////////
+COMPLETED
+///////////////////////////////////////
+-Add "Angle" class, will handle ROTD and DTOR.
+- Make headless
 - Laser and Camera Interfaces
 - Pose3d Interface. Thanks Toby
 - Lights, and global ambient

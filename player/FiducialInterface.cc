@@ -191,8 +191,6 @@ void FiducialInterface::Update()
       this->data.fiducials = new player_fiducial_item_t[this->data.fiducials_count];
     }
 
-    std::cout << "fiducial count " << this->iface->data->count << std::endl;
-
     for (i = 0; i < this->iface->data->count; i++)
     {
       fid = this->iface->data->fids + i;
@@ -233,7 +231,7 @@ void FiducialInterface::Subscribe()
   catch (std::string e)
   {
     //std::ostringstream stream;
-    std::cout << "Error Subscribing to Gazebo Fiducial Interface\n"
+    std::cerr << "Error Subscribing to Gazebo Fiducial Interface\n"
     << e << "\n";
     //gzthrow(stream.str());
     exit(0);
