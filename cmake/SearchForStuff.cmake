@@ -178,7 +178,7 @@ IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   SET (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
   SET (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
 
-  SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" CACHE INTERNAL "Boost Additional versions" FORCE)
+  SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
   INCLUDE (FindBoost)
 
   FIND_PACKAGE( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals )
@@ -215,12 +215,12 @@ MESSAGE (STATUS "Boost Libraries: ${boost_libraries}")
 IF (HAVE_FFMPEG)
   SET (libavformat_search_path 
     /usr/include /usr/include/libavformat /usr/local/include 
-    /usr/local/include/libavformat
+    /usr/local/include/libavformat /usr/include/ffmpeg
   )
   
   SET (libavcodec_search_path 
     /usr/include /usr/include/libavcodec /usr/local/include 
-    /usr/local/include/libavcodec
+    /usr/local/include/libavcodec /usr/include/ffmpeg
   )
   
   FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
