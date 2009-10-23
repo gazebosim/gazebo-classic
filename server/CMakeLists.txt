@@ -130,7 +130,7 @@ TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
 
 )
 
-TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES} ${libtool_library} gazebo)
+TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES} ${libtool_library} ${freeimage_library} gazebo)
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
