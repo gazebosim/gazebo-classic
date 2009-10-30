@@ -98,15 +98,15 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 {
   MeshManager *meshManager = MeshManager::Instance();
 
-  unsigned int numVertices = 0;
-  unsigned int numIndices = 0;
   float *vertices = NULL;
   unsigned int *indices = NULL;
 
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
 
-  const Mesh *mesh = meshManager->Load( this->meshNameP->GetValue() );
+  const Mesh *mesh = meshManager->Load( **this->meshNameP );
+  if (!mesh)
+    gzthrow("Invalid mesh");
 
   mesh->FillArrays(&vertices, &indices);
 

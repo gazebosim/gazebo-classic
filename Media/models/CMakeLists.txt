@@ -19,6 +19,7 @@ SET (files column.mesh
            unitpyramid.mesh
            wheel.mesh
            WoodPallet.mesh
+           willowgarage.dae
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models)
