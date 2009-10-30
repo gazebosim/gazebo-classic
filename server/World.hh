@@ -31,10 +31,16 @@
 #include <vector>
 #include <boost/tuple/tuple.hpp>
 
+#ifdef USE_THREADPOOL
+#include "boost/threadpool.hpp"
+#include "boost/thread/mutex.hpp"
+#endif
+
 #include "SingletonT.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
 #include "Entity.hh"
+#include "Global.hh"
 
 namespace gazebo
 {
@@ -233,6 +239,13 @@ class World : public SingletonT<World>
   private: double simPauseTime;
 
   private: OpenAL *openAL;
+
+#ifdef USE_THREADPOOL
+  private: ParamT<int>* threadsP;
+  /// List of all the parameters
+  protected: std::vector<Param*> parameters;
+  public: boost::threadpool::pool* threadPool;
+#endif
 
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;

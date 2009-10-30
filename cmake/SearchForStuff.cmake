@@ -13,6 +13,7 @@ SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 SET (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
 SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
+SET (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
 
 ########################################
 # Find packages
@@ -209,6 +210,11 @@ STRING(REGEX REPLACE " " ";" boost_libraries "${boost_libraries}")
 MESSAGE (STATUS "Boost Include Path: ${boost_include_dirs}")
 MESSAGE (STATUS "Boost Library Path: ${boost_library_dirs}")
 MESSAGE (STATUS "Boost Libraries: ${boost_libraries}")
+
+
+########################################
+# For Threadpool
+message (STATUS "Threadpool Include Path: ${threadpool_include_dirs}")
 
 ########################################
 # Find avformat and avcodec

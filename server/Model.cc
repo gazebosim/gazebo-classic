@@ -36,6 +36,7 @@
 #include "GazeboMessage.hh"
 #include "XMLConfig.hh"
 #include "World.hh"
+#include "Simulator.hh"
 #include "OgreCreator.hh"
 #include "Body.hh"
 #include "HingeJoint.hh"
@@ -256,11 +257,9 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   if (**this->staticP == false)
     this->SetGravityMode( **this->enableGravityP );
 
-
   //global fiducial and retro id
   this->SetLaserFiducialId(**this->laserFiducialP);
   this->SetLaserRetro(**this->laserRetroP);
-
 
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();
@@ -353,7 +352,8 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   {
     if (!this->lightName.empty())
     {
-      OgreCreator::SaveLight(p, this->lightName, stream);
+      if (Simulator::Instance()->GetRenderEngineEnabled())
+        OgreCreator::SaveLight(p, this->lightName, stream);
     }
   }
 
@@ -408,6 +408,10 @@ void Model::Init()
 // Update the model
 void Model::Update()
 {
+#ifdef USE_THREADPOOL
+  World::Instance()->GetPhysicsEngine()->InitForThread();
+#endif
+
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   std::map<std::string, Joint* >::iterator jointIter;
@@ -422,7 +426,11 @@ void Model::Update()
   {
     if (bodyIter->second)
     {
+#ifdef USE_THREADPOOL
+      World::Instance()->threadPool->schedule(boost::bind(&Body::Update,(bodyIter->second)));
+#else
       bodyIter->second->Update();
+#endif
     }
   }
 
@@ -434,9 +442,14 @@ void Model::Update()
   for (contIter=this->controllers.begin();
        contIter!=this->controllers.end(); contIter++)
   {
-
     if (contIter->second)
+    {
+#ifdef USE_THREADPOOL
+      World::Instance()->threadPool->schedule(boost::bind(&Controller::Update,(contIter->second)));
+#else
       contIter->second->Update();
+#endif
+    }
   }
 
 #ifdef TIMING
@@ -446,15 +459,17 @@ void Model::Update()
 
   for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
   {
+#ifdef USE_THREADPOOL
+    World::Instance()->threadPool->schedule(boost::bind(&Joint::Update,(jointIter->second)));
+#else
     jointIter->second->Update();
+#endif
   }
 
 #ifdef TIMING
   double tmpT4 = Simulator::Instance()->GetWallTime();
   std::cout << "      ALL Joints/canonical body (" << this->GetName() << ") DT (" << tmpT4-tmpT3 << ")" << std::endl;
 #endif
-
-
 
   // Call the model's python update function, if one exists
   /*if (this->pFuncUpdate)
@@ -481,16 +496,15 @@ void Model::Update()
     this->xyzP->SetValue(this->pose.pos);
     this->rpyP->SetValue(this->pose.rot);
   }
+
+  this->UpdateChild();
   
 #ifdef TIMING
-  this->UpdateChild();
   double tmpT5 = Simulator::Instance()->GetWallTime();
   std::cout << "      ALL child (" << this->GetName() << ") update DT (" 
             << tmpT5-tmpT4 << ")" << std::endl;
   std::cout << "      Models::Update() (" << this->GetName() 
             << ") Total DT (" << tmpT5-tmpT1 << ")" << std::endl;
-#else
-   this->UpdateChild();
 #endif
 
 }
@@ -1121,9 +1135,11 @@ void Model::LoadRenderable(XMLConfigNode *node)
   body->SetPose(Pose3d());
   this->bodies[body->GetName()] = body;
 
-  if ((childNode = node->GetChild("light")))
+  if (Simulator::Instance()->GetRenderEngineEnabled() && 
+      (childNode = node->GetChild("light")))
   {
-    this->lightName = OgreCreator::CreateLight(childNode, body->GetVisualNode());
+    this->lightName = OgreCreator::CreateLight(childNode, 
+        body->GetVisualNode());
   }
 
 }

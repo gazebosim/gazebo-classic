@@ -64,6 +64,12 @@ World::World()
   this->graphics = NULL;
   this->openAL = NULL;
   this->factory = NULL;
+
+#ifdef USE_THREADPOOL
+  Param::Begin(&this->parameters);
+  this->threadsP = new ParamT<int>("threads",2,0);
+  Param::End();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +125,12 @@ void World::Close()
     delete this->factory;
     this->factory = NULL;
   }
+
+#ifdef USE_THREADPOOL
+  delete this->threadsP;
+  delete this->threadPool;
+#endif
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,8 +164,11 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   this->factory = new Factory();
 
   // Create the graphics iface handler
-  this->graphics = new GraphicsIfaceHandler();
-  this->graphics->Load("default");
+  if (Simulator::Instance()->GetRenderEngineEnabled())
+  {
+    this->graphics = new GraphicsIfaceHandler();
+    this->graphics->Load("default");
+  }
 
   // Load OpenAL audio 
   if (rootNode->GetChild("openal","audio"))
@@ -176,6 +191,11 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
   this->physicsEngine->Load(rootNode);
 
+#ifdef USE_THREADPOOL
+  // start a thread pool with X threads
+  this->threadsP->Load(rootNode);
+  this->threadPool = new boost::threadpool::pool(this->threadsP->GetValue());
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +241,8 @@ void World::Init()
   this->toDeleteModels.clear();
   this->toLoadEntities.clear();
 
-  this->graphics->Init();
+  if (Simulator::Instance()->GetRenderEngineEnabled())
+    this->graphics->Init();
 
   this->factory->Init();
 }
@@ -277,9 +298,18 @@ void World::Update()
   {
     if (*miter)
     {
+#ifdef USE_THREADPOOL
+      this->threadPool->schedule(boost::bind(&Model::Update,(*miter)));
+#else
       (*miter)->Update();
+#endif
     }
   }
+
+#ifdef USE_THREADPOOL
+  this->threadPool->wait();
+#endif
+
 
 #ifdef TIMING
   double tmpT2 = Simulator::Instance()->GetWallTime();
@@ -291,7 +321,6 @@ void World::Update()
   {
     this->physicsEngine->UpdatePhysics();
   }
-
 
   this->factory->Update();
 
@@ -308,7 +337,7 @@ void World::Fini()
 {
   std::vector< Model* >::iterator miter;
 
-  if (this->graphics)
+  if (Simulator::Instance()->GetRenderEngineEnabled() && this->graphics)
     delete this->graphics;
 
   // Finalize the models
@@ -401,7 +430,6 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
 // Add a new entity to the world
 void World::InsertEntity( std::string xmlString)
 {
-  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   this->toLoadEntities.push_back( xmlString );
 }
 
@@ -409,31 +437,37 @@ void World::InsertEntity( std::string xmlString)
 // Load all the entities that have been queued
 void World::ProcessEntitiesToLoad()
 {
-  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
-  std::vector< std::string >::iterator iter;
-
-  for (iter = this->toLoadEntities.begin(); 
-       iter != this->toLoadEntities.end(); iter++)
+  if (!this->toLoadEntities.empty())
   {
-    // Create the world file
-    XMLConfig *xmlConfig = new XMLConfig();
+    // maybe try try_lock here instead
+    boost::recursive_mutex::scoped_lock lock(
+        *Simulator::Instance()->GetMRMutex());
 
-    // Load the XML tree from the given string
-    try
+    std::vector< std::string >::iterator iter;
+
+    for (iter = this->toLoadEntities.begin(); 
+        iter != this->toLoadEntities.end(); iter++)
     {
-      xmlConfig->LoadString( *iter );
-    }
-    catch (gazebo::GazeboError e)
-    {
-      gzerr(0) << "The world could not load the XML data [" << e << "]\n";
-      continue;
+      // Create the world file
+      XMLConfig *xmlConfig = new XMLConfig();
+
+      // Load the XML tree from the given string
+      try
+      {
+        xmlConfig->LoadString( *iter );
+      }
+      catch (gazebo::GazeboError e)
+      {
+        gzerr(0) << "The world could not load the XML data [" << e << "]\n";
+        continue;
+      }
+
+      this->LoadEntities( xmlConfig->GetRootNode(), NULL, true); 
+      delete xmlConfig;
     }
 
-    this->LoadEntities( xmlConfig->GetRootNode(), NULL, true); 
-    delete xmlConfig;
+    this->toLoadEntities.clear();
   }
- 
-  this->toLoadEntities.clear(); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////

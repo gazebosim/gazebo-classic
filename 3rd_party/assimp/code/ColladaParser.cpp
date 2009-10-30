@@ -76,7 +76,6 @@ ColladaParser::ColladaParser( IOSystem* pIOHandler, const std::string& pFile)
 	if( !mReader)
 		ThrowException( "Collada: Unable to open file.");
 
-  std::cout << "Read Contents\n";
 	// start reading
 	ReadContents();
 }

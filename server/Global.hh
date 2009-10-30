@@ -80,6 +80,7 @@
 
 #define ROUND(x) ( (int)( floor((x)+0.5) ) )
 
-//#define TIMING
+#undef TIMING
+#undef USE_THREADPOOL
 
 #endif

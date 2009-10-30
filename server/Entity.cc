@@ -59,16 +59,16 @@ Entity::Entity(Entity *parent)
   {
     this->parent->AddChild(this);
 
-//    if (Simulator::Instance()->GetRenderEngineEnabled())
+    if (Simulator::Instance()->GetRenderEngineEnabled())
       this->visualNode = OgreCreator::Instance()->CreateVisual(
-            visname.str(), this->parent->GetVisualNode(), this);
+          visname.str(), this->parent->GetVisualNode(), this);
     this->SetStatic(parent->IsStatic());
   }
   else
   {
-    //if (Simulator::Instance()->GetRenderEngineEnabled())
-    this->visualNode = OgreCreator::Instance()->CreateVisual( 
-        visname.str(), NULL, this );
+    if (Simulator::Instance()->GetRenderEngineEnabled())
+      this->visualNode = OgreCreator::Instance()->CreateVisual( 
+          visname.str(), NULL, this );
   }
 
   // Add this to the phyic's engine
@@ -83,8 +83,9 @@ Entity::~Entity()
 
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
 
-  if (this->visualNode)
-    OgreCreator::Instance()->DeleteVisual(this->visualNode);
+  if (Simulator::Instance()->GetRenderEngineEnabled())
+    if (this->visualNode)
+      OgreCreator::Instance()->DeleteVisual(this->visualNode);
   this->visualNode = NULL;
 }
 

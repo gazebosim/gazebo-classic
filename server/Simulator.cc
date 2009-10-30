@@ -353,7 +353,9 @@ void Simulator::MainLoop()
         this->gui->Update();
 
       World::Instance()->ProcessEntitiesToLoad();
-      World::Instance()->GraphicsUpdate();
+
+      if (this->renderEngineEnabled)
+        World::Instance()->GraphicsUpdate();
 
       currTime = this->GetWallTime();
 
@@ -637,8 +639,17 @@ void Simulator::PhysicsLoop()
 
     {
       boost::recursive_mutex::scoped_lock lock(*this->mutex);
+#ifdef TIMING
+      double tmpT2 = Simulator::Instance()->GetWallTime();
+      std::cout << " LOCK DT(" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
       world->Update();
     }
+
+#ifdef TIMING
+    double tmpT2 = Simulator::Instance()->GetWallTime();
+    std::cout << " World::Update() DT(" << tmpT2-tmpT1 << ")" << std::endl;
+#endif
 
     currTime = this->GetRealTime();
 
@@ -673,6 +684,11 @@ void Simulator::PhysicsLoop()
     // Process all incoming messages from simiface
     world->UpdateSimulationIface();
 
+#ifdef TIMING
+    double tmpT3 = Simulator::Instance()->GetWallTime();
+    std::cout << " World::UpdatSimulationIface() DT(" << tmpT3-tmpT2 << ")" << std::endl;
+#endif
+
     if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
       this->userQuit = true;
@@ -686,8 +702,8 @@ void Simulator::PhysicsLoop()
     }
 
 #ifdef TIMING
-    double tmpT2 = this->GetWallTime();
-    std::cout << " Simulator::PhysicsLoop() DT(" << tmpT2-tmpT1 
+    double tmpT4 = this->GetWallTime();
+    std::cout << " Simulator::PhysicsLoop() DT(" << tmpT4-tmpT1 
       << ")" << std::endl;
 #endif
   }

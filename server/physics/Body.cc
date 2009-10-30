@@ -432,6 +432,11 @@ void Body::Init()
 // Update the body
 void Body::Update()
 {
+#ifdef USE_THREADPOOL
+  // If calling Body::Update in threadpool
+  World::Instance()->GetPhysicsEngine()->InitForThread();
+#endif
+
   std::vector< Sensor* >::iterator sensorIter;
   std::map< std::string, Geom* >::iterator geomIter;
   Vector3 vel;
@@ -484,7 +489,11 @@ void Body::Update()
   for (geomIter=this->geoms.begin();
        geomIter!=this->geoms.end(); geomIter++)
   {
+#ifdef USE_THREADPOOL
+    World::Instance()->threadpool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
+#else
     geomIter->second->Update();
+#endif
   }
 
 #ifdef TIMING
@@ -495,7 +504,11 @@ void Body::Update()
   for (sensorIter=this->sensors.begin();
        sensorIter!=this->sensors.end(); sensorIter++)
   {
+#ifdef USE_THREADPOOL
+    World::Instance()->threadpool->schedule(boost::bind(&Sensor::Update, (sensorIter)));
+#else
     (*sensorIter)->Update();
+#endif
   }
 
 #ifdef TIMING

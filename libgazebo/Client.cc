@@ -84,6 +84,7 @@ void Client::Connect(int serverId)
 void Client::ConnectWait(int serverId, int clientId)
 {
   bool simulationIfaceIsValid = false;
+  gazebo::SimulationIface simulationIface;
 
   while (!simulationIfaceIsValid)
   {
@@ -129,13 +130,12 @@ void Client::ConnectWait(int serverId, int clientId)
 
     this->filename = stream.str();
 
-    std::cout << "opening " << this->filename << "\n";
+    //std::cout << "opening " << this->filename << "\n";
 
     // Connect to gazebo::SimulationIface and check for changing realTime,
     // if simulationIface->data->realTime is not changing, the server might
     // be stale leftovers from previous gazebo crash,
     // disconnect and reconnect client
-    gazebo::SimulationIface simulationIface;
     try
     {
       simulationIface.Open(this,"default");
@@ -177,6 +177,7 @@ void Client::ConnectWait(int serverId, int clientId)
     }
   }
 
+  simulationIface.Close();
 }
 
 

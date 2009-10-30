@@ -160,7 +160,9 @@ void MonoCameraSensor::UpdateChild()
        !this->saveFramesP->GetValue())
     return;
 
-  this->UpdateCam();
+  // Or skip if user sets camera to inactive
+  if (this->active)
+    this->UpdateCam();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

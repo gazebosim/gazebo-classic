@@ -112,7 +112,8 @@ OgreCamera::~OgreCamera()
 void OgreCamera::LoadCam( XMLConfigNode *node )
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
-    gzthrow("Cameras can not be used when running Gazebo without rendering engine");
+    return;
+    //gzthrow("Cameras can not be used when running Gazebo without rendering engine");
 
   this->visibilityMask = GZ_ALL_CAMERA; 
 
@@ -185,6 +186,9 @@ void OgreCamera::SaveCam(std::string &prefix, std::ostream &stream)
 // Initialize the camera
 void OgreCamera::InitCam()
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   this->camera = OgreCreator::CreateCamera(this->cameraName, this->nearClipP->GetValue(), this->farClipP->GetValue(), *(this->hfovP->GetValue()), this->renderTarget );
 
   // Create a scene node to control pitch motion
@@ -208,6 +212,9 @@ void OgreCamera::FiniCam()
 // Update the drawing
 void OgreCamera::UpdateCam()
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   if (this->camera)
   {
     if (World::Instance()->GetWireframe())
@@ -258,6 +265,11 @@ bool OgreCamera::GetRenderingEnabled() const
 // Render the camera
 void OgreCamera::Render()
 {
+  // disable rendering if "-r" option is given
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  // disable rendering if sensor not set to active
   if (!this->renderingEnabled)
     return;
 
@@ -323,6 +335,9 @@ Pose3d OgreCamera::GetWorldPose() const
 /// Set the global pose of the camera
 void OgreCamera::SetWorldPose(const Pose3d &pose)
 {
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
   this->pose = pose;
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
   this->pitchNode->setOrientation( this->pose.rot.u, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);

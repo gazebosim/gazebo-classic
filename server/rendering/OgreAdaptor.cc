@@ -192,8 +192,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   {
     this->sceneType= SCENE_EXT;
     //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
+    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
   }
 
   // Load Resources
@@ -233,7 +233,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
   this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
   
-
   // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient);
 
@@ -318,8 +317,8 @@ void OgreAdaptor::LoadPlugins()
 
     plugins.push_back(path+"/RenderSystem_GL.so");
     plugins.push_back(path+"/Plugin_ParticleFX.so");
-    //plugins.push_back(path+"/Plugin_BSPSceneManager.so");
-    //plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+    plugins.push_back(path+"/Plugin_BSPSceneManager.so");
+    plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {

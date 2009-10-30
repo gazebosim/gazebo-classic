@@ -1,5 +1,6 @@
 INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
 
 ########################################
 # Include all the search paths for headers
@@ -24,6 +25,7 @@ INCLUDE_DIRECTORIES(
   ${gazeboserver_include_dirs}
   ${boost_include_dirs}
   ${freeimage_include_dir}
+  ${threadpool_include_dirs_split}
   ${FLTK_INCLUDE_DIR}
 )
 

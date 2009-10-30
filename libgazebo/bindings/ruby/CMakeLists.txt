@@ -2,6 +2,8 @@ FIND_PACKAGE (Ruby)
 
 if(RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
     SET(RUBY_FOUND TRUE)
+    message(STATUS "Found Ruby libraries: ${RUBY_LIBRARY}")
+    message(STATUS "Found Ruby includes: ${RUBY_INCLUDE_PATH}")
 endif (RUBY_LIBRARY AND RUBY_INCLUDE_PATH)
 
   IF(RUBY_FOUND)
