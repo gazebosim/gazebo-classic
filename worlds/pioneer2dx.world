@@ -169,23 +169,6 @@
   </model:physical>
 
 
-  <!-- Directional  light -->
-  <model:renderable name="directional_white">
-    <enableGravity>false</enableGravity>
-
-    <light>
-      <type>directional</type>
-      <direction>0 0 -1</direction>
-      <diffuseColor>0.4 0.4 0.4</diffuseColor>
-      <specularColor>0.1 0.1 0.1</specularColor>
-      <range>40</range>
-
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0 0 0</attenuation>
-    </light>
-  </model:renderable>
-
-
   <!-- White Point light -->
   <model:renderable name="point_white">
     <xyz>0 3 5</xyz>

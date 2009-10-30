@@ -87,12 +87,13 @@ else (build_errors)
   # Make the gazebo rc file
   CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
   INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
-  
+ 
   INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
   
   message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
   
   IF (BUILD_GAZEBO)
+    ADD_SUBDIRECTORY(3rd_party)
     ADD_SUBDIRECTORY(libgazebo)
     ADD_SUBDIRECTORY(server)
     ADD_SUBDIRECTORY(worlds)

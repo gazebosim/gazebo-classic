@@ -17,7 +17,7 @@
   <verbosity>1</verbosity>
 
   <physics:ode>
-    <stepTime>0.0001</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.80665</gravity>
     <cfm>10e-8</cfm>
     <erp>0.3</erp>
@@ -37,7 +37,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>1.0 1.0 1.0 1.0</ambient>
+    <ambient>0.1 0.1 0.1 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -101,18 +101,22 @@
     </body:sphere>
   </model:physical>
 
-  <!-- White Directional light -->
-  <model:renderable name="directional_white">
+  <!-- White Point light -->
+  <model:renderable name="point_white">
+    <xyz>0 0 10</xyz>
     <enableGravity>false</enableGravity>
+
     <light>
-      <type>directional</type>
-      <direction>0 -0.5 -0.5</direction>
-      <diffuseColor>0.4 0.4 0.4</diffuseColor>
-      <specularColor>0.0 0.0 0.0</specularColor>
-      <range>100</range>
-      
-      <attenuation>0.0 1.0 0.4</attenuation>
+      <castShadows>false</castShadows>
+      <type>point</type>
+      <diffuseColor>0.5 0.48 0.5</diffuseColor>
+      <specularColor>.1 .1 .1</specularColor>
+      <range>50</range>
+
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.1 0.01 0.00</attenuation>
     </light>
   </model:renderable>
- 
+  
+
 </gazebo:world>
