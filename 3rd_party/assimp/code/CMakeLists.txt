@@ -311,28 +311,28 @@ SOURCE_GROUP( ConvertUTF FILES
 	../contrib/ConvertUTF/ConvertUTF.c
 )
 
-SOURCE_GROUP( zlib FILES
-	../contrib/zlib/adler32.c
-	../contrib/zlib/compress.c
-	../contrib/zlib/crc32.c
-	../contrib/zlib/crc32.h
-	../contrib/zlib/deflate.c
-	../contrib/zlib/deflate.h
-	../contrib/zlib/inffast.c
-	../contrib/zlib/inffast.h
-	../contrib/zlib/inffixed.h
-	../contrib/zlib/inflate.c
-	../contrib/zlib/inflate.h
-	../contrib/zlib/inftrees.c
-	../contrib/zlib/inftrees.h
-	../contrib/zlib/trees.c
-	../contrib/zlib/trees.h
-	../contrib/zlib/zconf.h
-	../contrib/zlib/zconf.in.h
-	../contrib/zlib/zlib.h
-	../contrib/zlib/zutil.c
-	../contrib/zlib/zutil.h
-)
+#SOURCE_GROUP( zlib FILES
+#	../contrib/zlib/adler32.c
+#	../contrib/zlib/compress.c
+#	../contrib/zlib/crc32.c
+#	../contrib/zlib/crc32.h
+#	../contrib/zlib/deflate.c
+#	../contrib/zlib/deflate.h
+#	../contrib/zlib/inffast.c
+#	../contrib/zlib/inffast.h
+#	../contrib/zlib/inffixed.h
+#	../contrib/zlib/inflate.c
+#	../contrib/zlib/inflate.h
+#	../contrib/zlib/inftrees.c
+#	../contrib/zlib/inftrees.h
+#	../contrib/zlib/trees.c
+#	../contrib/zlib/trees.h
+#	../contrib/zlib/zconf.h
+#	../contrib/zlib/zconf.in.h
+#	../contrib/zlib/zlib.h
+#	../contrib/zlib/zutil.c
+#	../contrib/zlib/zutil.h
+#)
 
 
 
@@ -564,26 +564,26 @@ ADD_LIBRARY( assimp SHARED
 	../contrib/irrXML/irrTypes.h
 	../contrib/irrXML/irrXML.cpp
 	../contrib/irrXML/irrXML.h
-	../contrib/zlib/adler32.c
-	../contrib/zlib/compress.c
-	../contrib/zlib/crc32.c
-	../contrib/zlib/crc32.h
-	../contrib/zlib/deflate.c
-	../contrib/zlib/deflate.h
-	../contrib/zlib/inffast.c
-	../contrib/zlib/inffast.h
-	../contrib/zlib/inffixed.h
-	../contrib/zlib/inflate.c
-	../contrib/zlib/inflate.h
-	../contrib/zlib/inftrees.c
-	../contrib/zlib/inftrees.h
-	../contrib/zlib/trees.c
-	../contrib/zlib/trees.h
-	../contrib/zlib/zconf.h
-	../contrib/zlib/zconf.in.h
-	../contrib/zlib/zlib.h
-	../contrib/zlib/zutil.c
-	../contrib/zlib/zutil.h
+  #	../contrib/zlib/adler32.c
+  #	../contrib/zlib/compress.c
+  #	../contrib/zlib/crc32.c
+  #	../contrib/zlib/crc32.h
+  #	../contrib/zlib/deflate.c
+  #	../contrib/zlib/deflate.h
+  #	../contrib/zlib/inffast.c
+  #	../contrib/zlib/inffast.h
+  #	../contrib/zlib/inffixed.h
+  #	../contrib/zlib/inflate.c
+  #	../contrib/zlib/inflate.h
+  #	../contrib/zlib/inftrees.c
+  #	../contrib/zlib/inftrees.h
+  #	../contrib/zlib/trees.c
+  #	../contrib/zlib/trees.h
+  #	../contrib/zlib/zconf.h
+  #	../contrib/zlib/zconf.in.h
+  #	../contrib/zlib/zlib.h
+  #	../contrib/zlib/zutil.c
+  #	../contrib/zlib/zutil.h
 	../contrib/ConvertUTF/ConvertUTF.c
 )
 

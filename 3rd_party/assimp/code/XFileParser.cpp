@@ -53,7 +53,7 @@ using namespace Assimp::XFile;
 
 #ifndef ASSIMP_BUILD_NO_COMPRESSED_X
 
-#include "../contrib/zlib/zlib.h"
+#include "zlib.h"
 
 // Magic identifier for MSZIP compressed data
 #define MSZIP_MAGIC 0x4B43
