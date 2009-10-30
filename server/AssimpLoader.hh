@@ -11,6 +11,7 @@
 
 namespace gazebo
 {
+  /// \brief Wrapper around the Assimp asset loader
   class AssimpLoader : public MeshLoader
   {
     /// \brief Constructor

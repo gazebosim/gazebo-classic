@@ -12,6 +12,7 @@ namespace gazebo
 {
   class OgreLoader;
   class AssimpLoader;
+  class STLLoader;
   class Mesh;
   
   class MeshManager : public SingletonT<MeshManager>
@@ -54,6 +55,7 @@ namespace gazebo
  
     private: OgreLoader *ogreLoader;
     private: AssimpLoader *assimpLoader;
+    private: STLLoader *stlLoader;
 
     private: std::map<std::string, Mesh*> meshes;
 

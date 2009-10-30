@@ -8,6 +8,7 @@
 #include "Mesh.hh"
 #include "OgreLoader.hh"
 #include "AssimpLoader.hh"
+#include "STLLoader.hh"
 
 #include "MeshManager.hh"
 
@@ -19,6 +20,7 @@ MeshManager::MeshManager()
 {
   this->assimpLoader = new AssimpLoader();
   this->ogreLoader = new OgreLoader();
+  this->stlLoader = new STLLoader();
 
   // Create some basic shapes
   this->CreateSphere("unit_sphere",1.0, 32, 32);
@@ -37,6 +39,7 @@ MeshManager::~MeshManager()
 {
   delete this->assimpLoader;
   delete this->ogreLoader;
+  delete this->stlLoader;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,13 +85,11 @@ const Mesh *MeshManager::Load(const std::string &filename)
     MeshLoader *loader = NULL;
 
     if (extension == "mesh")
-    {
       loader = this->ogreLoader;
-    }
+    else if (extension == "stl" || extension == "stlb" || extension == "stla")
+      loader= this->stlLoader;
     else
-    {
       loader = this->assimpLoader;
-    }
 
     try 
     {

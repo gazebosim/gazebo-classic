@@ -73,8 +73,7 @@ SET (sources Common.cc
              MeshLoader.cc
              OgreLoader.cc
              AssimpLoader.cc
-             Material.cc
-             Color.cc
+             STLLoader.cc
 )
 
 SET (headers Common.hh
@@ -106,8 +105,7 @@ SET (headers Common.hh
              MeshLoader.hh
              OgreLoader.hh
              AssimpLoader.hh
-             Material.hh
-             Color.hh
+             STLLoader.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})

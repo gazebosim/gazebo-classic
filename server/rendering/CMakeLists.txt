@@ -13,6 +13,8 @@ SET (sources OgreMovableText.cc
              UserCamera.cc
              Image.cc
              OgreHeightmap.cc
+             Color.cc
+             Material.cc
 )
 
 SET (headers OgreMovableText.hh
@@ -28,6 +30,8 @@ SET (headers OgreMovableText.hh
              UserCamera.hh
              Image.hh
              OgreHeightmap.hh
+             Color.hh
+             Material.hh
 )
 
 #ADD_LIBRARY(gazebo_rendering ${sources})

@@ -1,5 +1,5 @@
-#ifndef LOADER_HH
-#define LOADER_HH
+#ifndef MESHLOADER_HH
+#define MESHLOADER_HH
 
 #include <string>
 
