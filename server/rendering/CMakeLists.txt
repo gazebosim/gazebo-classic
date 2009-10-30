@@ -6,14 +6,12 @@ SET (sources OgreMovableText.cc
              OgreFrameListener.cc
              OgreDynamicRenderable.cc
              OgreDynamicLines.cc
-             OgreSimpleShape.cc
              OgreHUD.cc
              OgreVisual.cc
              OgreCamera.cc
              CameraManager.cc
              UserCamera.cc
              Image.cc
-             Color.cc
              OgreHeightmap.cc
 )
 
@@ -23,14 +21,12 @@ SET (headers OgreMovableText.hh
              OgreFrameListener.hh
              OgreDynamicRenderable.hh
              OgreDynamicLines.hh
-             OgreSimpleShape.hh
              OgreHUD.hh
              OgreVisual.hh
              OgreCamera.hh
              CameraManager.hh
              UserCamera.hh
              Image.hh
-             Color.hh
              OgreHeightmap.hh
 )
 

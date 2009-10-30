@@ -26,13 +26,14 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "MeshManager.hh"
 #include "Simulator.hh"
-#include "OgreSimpleShape.hh"
 #include "Entity.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "OgreAdaptor.hh"
+#include "OgreCreator.hh"
 #include "Global.hh"
 #include "OgreVisual.hh"
 
@@ -64,7 +65,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
  
   //default to Gazebo/White
   this->materialNameP = new ParamT<std::string>("material",
-                                                std::string("Gazebo/White"),0);
+                                                std::string("none"),0);
   this->materialNameP->Callback( &OgreVisual::SetMaterial, this );
 
   this->castShadowsP = new ParamT<bool>("castShadows",true,0);
@@ -164,11 +165,18 @@ void OgreVisual::Load(XMLConfigNode *node)
         boost::lexical_cast<std::string>(this->meshTileP->GetValue().x) + "V" +
         boost::lexical_cast<std::string>(this->meshTileP->GetValue().y);
 
-      if (!this->sceneNode->getCreator()->hasEntity(meshName))
+      if (!MeshManager::Instance()->HasMesh(meshName));
       {
-        OgreSimpleShape::CreateBox(meshName, Vector3(1,1,1), **this->meshTileP);
+        MeshManager::Instance()->CreateBox(meshName, Vector3(1,1,1), 
+                                           **this->meshTileP);
       }
     }
+
+    if (!MeshManager::Instance()->HasMesh(meshName))
+      MeshManager::Instance()->Load(meshName);
+
+    // Add the mesh into OGRE
+    OgreCreator::InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
 
     obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
             stream.str(), meshName);
@@ -219,7 +227,8 @@ void OgreVisual::Load(XMLConfigNode *node)
   }
 
   // Set the material of the mesh
-  this->SetMaterial(this->materialNameP->GetValue());
+  if (**this->materialNameP != "none")
+    this->SetMaterial(this->materialNameP->GetValue());
 
   // Allow the mesh to cast shadows
   this->SetCastShadows((**this->castShadowsP));
@@ -330,6 +339,13 @@ void OgreVisual::AttachMesh( const std::string &meshName )
   std::ostringstream stream;
   Ogre::MovableObject *obj;
   stream << this->sceneNode->getName() << "_ENTITY_" << meshName;
+
+  // Add the mesh into OGRE
+  if (!this->sceneNode->getCreator()->hasEntity(meshName) &&
+      MeshManager::Instance()->HasMesh(meshName))
+  {
+    OgreCreator::InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
+  }
 
   obj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
 
@@ -741,6 +757,12 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 
   this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str());
   this->boundingBoxNode->setInheritScale(false);
+
+  if (!this->sceneNode->getCreator()->hasEntity("unit_box_U1V1"))
+  {
+    // Add the mesh into OGRE
+    OgreCreator::InsertMesh(MeshManager::Instance()->GetMesh("unit_box_U1V1"));
+  }
 
   Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box_U1V1"));
 

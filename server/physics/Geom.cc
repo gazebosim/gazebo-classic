@@ -94,15 +94,6 @@ Geom::~Geom()
   if (this->transId)
     dGeomDestroy(this->transId);
 
-  /*for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-  {
-    if (*iter)
-      delete *iter;
-    *iter = NULL;
-  }
-  this->visuals.clear();
-  */
-
   delete this->massP;
   delete this->xyzP;
   delete this->rpyP;

@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 
+#include "Mesh.hh"
 #include "OgreDynamicRenderable.hh"
 #include "SingletonT.hh"
 #include "Vector3.hh"
@@ -65,9 +66,6 @@ namespace gazebo
 
     /// \brief Destructor
     private: virtual ~OgreCreator();
-
-    /// \brief Load some simple shapes on the render engine
-    public: static void LoadBasicShapes();
 
     /// \brief Create a Plane
     /// It adds itself to the Visual node parent, it will those change parent
@@ -112,7 +110,10 @@ namespace gazebo
                                              long winId, 
                                              unsigned int width, 
                                              unsigned int height);
-  
+
+    /// \brief Insert a mesh into Ogre 
+    public: static void InsertMesh( const Mesh *mesh);
+
     /// \brief Draw the uniform grid pattern
     public: static void DrawGrid();
 
@@ -123,6 +124,9 @@ namespace gazebo
     /// \return The name of the material
     public: static std::string CreateMaterial(float r, float g, 
                                               float b, float a);
+
+    /// \brief Create a material from a gazebo material
+    public: static std::string CreateMaterial(const Material *mat);
 
     /// \brief Create a material from a texture file
     public: static std::string CreateMaterialFromTexFile(const std::string &filename);

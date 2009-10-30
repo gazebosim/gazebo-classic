@@ -267,7 +267,7 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 {
   std::map<std::string, Geom* >::iterator giter;
   std::vector< Sensor* >::iterator siter;
-  Model *model = dynamic_cast<Model*>(this->parent);
+  //Model *model = dynamic_cast<Model*>(this->parent);
   //Vector3 pose = model->GetPose() - this->GetPose();
 
   this->xyzP->SetValue( this->GetPose().pos );

@@ -42,15 +42,7 @@ Color::Color()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Color::Color( const float &r, const float &g, const float &b )
-  : r(r), g(g), b(b), a(0)
-{
-  this->Clamp();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Constructor
-Color::Color( const float &r, const float &g, const float &b, const float &a )
+Color::Color( float r, float g, float b, const float a)
   : r(r), g(g), b(b), a(a)
 {
   this->Clamp();

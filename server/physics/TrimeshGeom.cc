@@ -26,7 +26,8 @@
 
 #include <ode/ode.h>
 
-#include "MeshLoader.hh"
+#include "MeshManager.hh"
+#include "Mesh.hh"
 #include "Body.hh"
 #include "TrimeshGeom.hh"
 #include "GazeboError.hh"
@@ -95,7 +96,7 @@ void TrimeshGeom::UpdateChild()
 /// Load the trimesh
 void TrimeshGeom::LoadChild(XMLConfigNode *node)
 {
-  MeshLoader *meshLoader;
+  MeshManager *meshManager = MeshManager::Instance();
 
   unsigned int numVertices = 0;
   unsigned int numIndices = 0;
@@ -105,19 +106,11 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
 
-  meshLoader = new MeshLoader();
-  meshLoader->Load( this->meshNameP->GetValue() );
+  const Mesh *mesh = meshManager->Load( this->meshNameP->GetValue() );
 
-  numIndices = meshLoader->GetNumIndices();
-  numVertices = meshLoader->GetNumVertices();
+  mesh->FillArrays(&vertices, &indices);
 
-  // Create the vertex and index arrays
-  vertices = new float[numVertices*3];
-  indices = new unsigned int[numIndices];
-
-  meshLoader->FillArrays(&vertices, &indices);
-
-  for (unsigned int i=0; i < numVertices; i++)
+  for (unsigned int i=0; i < mesh->GetVertexCount(); i++)
   {
     vertices[i*3+0] = vertices[i*3+0] * (**this->scaleP).x;
     vertices[i*3+1] = vertices[i*3+1] * (**this->scaleP).y;
@@ -129,10 +122,10 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 
   // Build the ODE triangle mesh
   dGeomTriMeshDataBuildSingle( this->odeData,
-      (float*)vertices, 3*sizeof(float), numVertices,
-      (int*)indices, numIndices, 3*sizeof(int));
+      (float*)vertices, 3*sizeof(float), mesh->GetVertexCount(),
+      (int*)indices, mesh->GetIndexCount(), 3*sizeof(int));
 
-  this->geomId = dCreateTriMesh( 0,/*this->spaceId,*/ this->odeData,0,0,0 );
+  this->geomId = dCreateTriMesh( 0, this->odeData,0,0,0 );
 
   dMassSetTrimesh(&this->mass, this->massP->GetValue(), this->geomId);
 
@@ -141,8 +134,6 @@ void TrimeshGeom::LoadChild(XMLConfigNode *node)
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;
-
-  delete meshLoader;
 }
 
 //////////////////////////////////////////////////////////////////////////////

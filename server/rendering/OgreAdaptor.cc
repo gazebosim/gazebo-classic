@@ -209,9 +209,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->shadowTechniqueP->Load(node);
   this->drawGridP->Load(node);
 
-  //Preload basic shapes that can be used anywhere
-  OgreCreator::LoadBasicShapes();
-
   ambient.r = (**(this->ambientP)).x;
   ambient.g = (**(this->ambientP)).y;
   ambient.b = (**(this->ambientP)).z;

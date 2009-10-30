@@ -28,8 +28,6 @@
 #define COLOR_HH
 
 #include <iostream>
-//#include <math.h>
-//#include <fstream>
 #include "Vector3.hh"
 
 namespace gazebo
@@ -37,20 +35,23 @@ namespace gazebo
 
   class Color
   {
-    // Constructors
+    /// \brief Constructor
     public: Color();
-    public: Color( const float &r, const float &g, const float &b );
-    public: Color( const float &r, const float &g, const float &b, 
-                   const float &a );
+
+    /// \brief Constructor
+    public: Color( float r, float g, float b, float a=1.0 );
+
+    /// \brief Copy Constructor
     public: Color( const Color &clr );
   
-    // Destructor
+    /// \brief Destructor
     public: virtual ~Color();
 
+    /// \brief Reset the color to default values
     public: void Reset();
   
     /// \brief Set the contents of the vector
-    public: void Set(float r = 0, float g =0 , float b = 0, float a = 0);
+    public: void Set(float r = 1, float g =1 , float b = 1, float a = 1);
 
     /// \brief Get the color in HSV colorspace
     public: Vector3 GetAsHSV() const;
@@ -64,7 +65,7 @@ namespace gazebo
     /// \brief Set from yuv
     public: void SetFromYUV(float y, float u, float v);
 
-    // Equal operator
+    /// \brief Equal operator
     public: const Color &operator=( const Color &pt );
 
     /// \brief Array index operator

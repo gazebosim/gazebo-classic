@@ -34,6 +34,7 @@
 
 #include "config.h"
 
+#include "Material.hh"
 #include "Simulator.hh"
 #include "Global.hh"
 #include "Entity.hh"
@@ -44,7 +45,6 @@
 #include "OgreAdaptor.hh"
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
-#include "OgreSimpleShape.hh"
 #include "OgreCreator.hh"
 
 using namespace gazebo;
@@ -62,22 +62,6 @@ OgreCreator::OgreCreator()
 // Destructor
 OgreCreator::~OgreCreator()
 {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Create the basic shapes
-void OgreCreator::LoadBasicShapes()
-{
-  // Create some basic shapes
-  OgreSimpleShape::CreateSphere("unit_sphere",1.0, 32, 32);
-  OgreSimpleShape::CreateSphere("joint_anchor",0.01, 32, 32);
-  //OgreSimpleShape::CreateSphere("body_cg",0.01, 32, 32);
-  OgreSimpleShape::CreateBox("body_cg", Vector3(0.014,0.014,0.014), 
-                             Vector2<double>(0.014,0.014));
-  OgreSimpleShape::CreateBox("unit_box_U1V1", Vector3(1,1,1), 
-                             Vector2<double>(1,1));
-  OgreSimpleShape::CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
-  OgreSimpleShape::CreateCone("unit_cone", 0.5, 1.0, 5, 32);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +98,7 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
       uvTile.x, uvTile.y,
       Ogre::Vector3(perp.x, perp.y, perp.z));
   
-  parent->AttachMesh(parent->GetName() + "_PLANE");
+  parent->AttachMesh(resultName);
   parent->SetMaterial(material);
 
   parent->SetCastShadows(castShadows);
@@ -722,6 +706,36 @@ std::string OgreCreator::CreateMaterial(float r, float g, float b, float a)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Create a material from a gazebo material
+std::string OgreCreator::CreateMaterial(const Material *mat)
+{
+  if (Ogre::MaterialManager::getSingleton().resourceExists(mat->GetName()))
+    return mat->GetName();
+
+  Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create(
+      mat->GetName(),"General");
+
+  Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
+
+  Color ambient = mat->GetAmbient();
+  Color diffuse = mat->GetDiffuse();
+  Color specular = mat->GetSpecular();
+  Color emissive = mat->GetEmissive();
+
+  matPtr->getTechnique(0)->setLightingEnabled(true);
+  pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
+  pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
+
+  //pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
+  //pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
+  pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
+  pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
+  pass->setShininess(mat->GetShininess());
+
+  return mat->GetName();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Create a material from a texture file
 std::string OgreCreator::CreateMaterialFromTexFile(const std::string &filename)
 {
@@ -870,3 +884,144 @@ OgreMovableText *OgreCreator::CreateMovableText()
   return newText;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Insert a mesh into Ogre 
+void OgreCreator::InsertMesh( const Mesh *mesh)
+{
+  Ogre::MeshPtr ogreMesh;
+
+  try
+  {
+    // Create a new mesh specifically for manual definition.
+    ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+    for (unsigned int i=0; i < mesh->GetSubMeshCount(); i++)
+    {
+      Ogre::SubMesh *ogreSubMesh;
+      Ogre::VertexData *vertexData;
+      Ogre::VertexDeclaration* vertexDecl;
+      Ogre::HardwareVertexBufferSharedPtr vBuf;
+      Ogre::HardwareIndexBufferSharedPtr iBuf;
+      float *vertices;
+      unsigned short *indices;
+
+
+      size_t currOffset = 0;
+
+      const SubMesh *subMesh = mesh->GetSubMesh(i);
+
+      ogreSubMesh = ogreMesh->createSubMesh();
+      ogreSubMesh->useSharedVertices = false;
+      ogreSubMesh->vertexData = new Ogre::VertexData();
+      vertexData = ogreSubMesh->vertexData;
+      vertexDecl = vertexData->vertexDeclaration;
+
+      // The vertexDecl should contain positions, blending weights, normals,
+      // diffiuse colors, specular colors, tex coords. In that order.
+      vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, 
+                             Ogre::VES_POSITION);
+      currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+
+      // TODO: blending weights
+      
+      // normals
+      if (subMesh->GetNormalCount() > 0 )
+      {
+        vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, 
+                               Ogre::VES_NORMAL);
+        currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+      }
+
+      // TODO: diffuse colors
+
+      // TODO: specular colors
+
+      // two dimensional texture coordinates
+      if (subMesh->GetTexCoordCount() > 0)
+      {
+        vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
+            Ogre::VES_TEXTURE_COORDINATES, 0);
+        currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
+      }
+
+      // allocate the vertex buffer
+      vertexData->vertexCount = subMesh->GetVertexCount();
+
+      vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+                 vertexDecl->getVertexSize(0),
+                 vertexData->vertexCount,
+                 Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+                 false);
+
+      vertexData->vertexBufferBinding->setBinding(0, vBuf);
+      vertices = static_cast<float*>(vBuf->lock(
+                      Ogre::HardwareBuffer::HBL_DISCARD));
+
+      // allocate index buffer
+      ogreSubMesh->indexData->indexCount = subMesh->GetIndexCount();
+
+      ogreSubMesh->indexData->indexBuffer =
+        Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+            Ogre::HardwareIndexBuffer::IT_16BIT,
+            ogreSubMesh->indexData->indexCount,
+            Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            false);
+
+      iBuf = ogreSubMesh->indexData->indexBuffer;
+      indices = static_cast<unsigned short*>(
+          iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+
+      unsigned int j;
+
+      // Add all the vertices
+      for (j =0; j < subMesh->GetVertexCount(); j++)
+      {
+        *vertices++ = subMesh->GetVertex(j).x;
+        *vertices++ = subMesh->GetVertex(j).y;
+        *vertices++ = subMesh->GetVertex(j).z;
+
+        if (subMesh->GetNormalCount() > 0)
+        {
+          *vertices++ = subMesh->GetNormal(j).x;
+          *vertices++ = subMesh->GetNormal(j).y;
+          *vertices++ = subMesh->GetNormal(j).z;
+        }
+
+        if (subMesh->GetTexCoordCount() > 0)
+        {
+          *vertices++ = subMesh->GetTexCoord(j).x;
+          *vertices++ = subMesh->GetTexCoord(j).y;
+        }
+      }
+
+      // Add all the indices
+      for (j =0; j < subMesh->GetIndexCount(); j++)
+        *indices++ = subMesh->GetIndex(j);
+
+      const Material *material;
+      material = mesh->GetMaterial( subMesh->GetMaterialIndex() );
+      if (material)
+        ogreSubMesh->setMaterialName( OgreCreator::CreateMaterial( material ) );
+
+      // Unlock
+      vBuf->unlock();
+      iBuf->unlock();
+    }
+
+    Vector3 max = mesh->GetMax();
+    Vector3 min = mesh->GetMin();
+
+    ogreMesh->_setBounds( Ogre::AxisAlignedBox(
+          Ogre::Vector3(min.x, min.y, min.z),
+          Ogre::Vector3(max.x, max.y, max.z)), 
+          false );
+
+    // this line makes clear the mesh is loaded (avoids memory leaks)
+    ogreMesh->load();
+  }
+  catch (Ogre::Exception e)
+  {
+    std::cerr << "Unable to create a basic Unit cylinder object" << std::endl;
+  }
+}

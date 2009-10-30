@@ -158,7 +158,6 @@ class Vector3
     return in;
   }
 
-
 };
 
 /// \}
