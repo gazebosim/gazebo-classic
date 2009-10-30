@@ -143,6 +143,12 @@ namespace gazebo
     /// \brief Get the material index
     public: unsigned int GetMaterialIndex() const;
 
+    /// \brief Return true if this submesh has the vertex
+    public: bool HasVertex( const Vector3 &v ) const;
+
+    /// \brief Get the index of the vertex
+    public: unsigned int GetVertexIndex(const Vector3 &v) const;
+
     /// \brief Put all the data into flat arrays
     public: void FillArrays(float **vertArr, unsigned int **indArr) const;
 

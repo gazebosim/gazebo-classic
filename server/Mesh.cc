@@ -466,6 +466,32 @@ unsigned int SubMesh::GetMaterialIndex() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Return true if this submesh has the vertex
+bool SubMesh::HasVertex( const Vector3 &v ) const
+{
+  std::vector< Vector3 >::const_iterator iter;
+
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+    if (v == (*iter))
+      return true;
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the index of the vertex
+unsigned int SubMesh::GetVertexIndex(const Vector3 &v) const
+{
+  std::vector< Vector3 >::const_iterator iter;
+
+  for (iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+    if (v == (*iter))
+      return iter - this->vertices.begin();
+
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Put all the data into flat arrays
 void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
 {

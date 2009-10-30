@@ -32,10 +32,17 @@ Mesh *STLLoader::Load( const std::string &filename )
 
   FILE *file = fopen(filename.c_str(), "r");
 
-  if (extension == "stl" || extension == "stla")
+  std::cout << "SLT Load\n";
+
+  /*if (extension == "stl" || extension == "stla")
     this->ReadAscii(file, mesh);
   else if (extension == "stlb")
     this->ReadBinary(file, mesh);
+    */
+
+  this->ReadBinary(file, mesh);
+
+  fclose(file);
 
   return mesh;
 }
@@ -45,34 +52,22 @@ Mesh *STLLoader::Load( const std::string &filename )
 void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
 {
   int   count;
-  int   i;
-  int   icor3;
   int   ivert;
   char *next;
   float r1;
   float r2;
   float r3;
   float r4;
-  float temp[3];
   char  token[LINE_MAX_LEN];
   int   width;
-  float face_normal[3][FACE_MAX];
-  int face[ORDER_MAX][FACE_MAX];
-  int face_order[FACE_MAX];
-  int    vertex_material[ORDER_MAX][FACE_MAX];
-  float  vertex_normal[3][ORDER_MAX][FACE_MAX];
-  int text_num;
-  int face_num;
-  int cor3_num;
-  int object_num;
-  int dup_num;
   char input[LINE_MAX_LEN];
-  float cor3[3][COR3_MAX];
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
 
   // Read the next line of the file into INPUT. 
   while ( fgets ( input, LINE_MAX_LEN, filein ) != NULL ) 
   {
-    text_num = text_num + 1;
 
     // Advance to the first nonspace character in INPUT. 
     for ( next = input; *next != '\0' && isspace(*next); next++ );
@@ -90,80 +85,54 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
     //FACET
     if (this->Leqi(token, (char*)"facet"))
     { 
+      Vector3 normal;
+
       //Get the XYZ coordinates of the normal vector to the face. 
       sscanf ( next, "%*s %e %e %e", &r1, &r2, &r3 );  
 
-      if ( face_num < FACE_MAX ) 
-      {
-        face_normal[0][face_num] = r1;
-        face_normal[1][face_num] = r2;
-        face_normal[2][face_num] = r3;
-      }
+      normal.x = r1;
+      normal.y = r2;
+      normal.z = r3;
 
       fgets ( input, LINE_MAX_LEN, filein );
-      text_num = text_num + 1;
 
       ivert = 0;
 
       for ( ;; ) 
       {
+        Vector3 vertex;
         fgets ( input, LINE_MAX_LEN, filein );
-        text_num = text_num + 1;
 
         count = sscanf ( input, "%*s %e %e %e", &r1, &r2, &r3 );
 
         if ( count != 3 ) 
           break;
 
-        temp[0] = r1;
-        temp[1] = r2;
-        temp[2] = r3;
+        vertex.x = r1;
+        vertex.y = r2;
+        vertex.z = r3;
 
-        if ( cor3_num < 1000 )
-          icor3 = this->RcolFind(cor3, 3, cor3_num, temp);
-        else
-          icor3 = -1;
-
-        if ( icor3 == -1 ) 
+        if (!subMesh->HasVertex(vertex))
         {
-          icor3 = cor3_num;
-
-          if ( cor3_num < COR3_MAX ) 
-          {
-            for ( i = 0; i < 3; i++ )
-              cor3[i][cor3_num] = temp[i];
-          }
-          cor3_num = cor3_num + 1;
+          subMesh->AddVertex(vertex);
+          subMesh->AddNormal(normal);
         }
-        else
-          dup_num = dup_num + 1;
-
-        if ( ivert < ORDER_MAX && face_num < FACE_MAX ) 
-        {
-          face[ivert][face_num] = icor3;
-          vertex_material[ivert][face_num] = 0;
-          for ( i = 0; i < 3; i++ )
-            vertex_normal[i][ivert][face_num] = face_normal[i][face_num];
-        }
+        subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
 
         ivert = ivert + 1;
       } 
 
       fgets ( input, LINE_MAX_LEN, filein );
-      text_num = text_num + 1;
-
-      if ( face_num < FACE_MAX ) 
-        face_order[face_num] = ivert;
-
-      face_num = face_num + 1;
-
     }
     // COLOR 
     else if ( this->Leqi ( token, (char*)"color" )) 
+    {
       sscanf ( next, "%*s %f %f %f %f", &r1, &r2, &r3, &r4 );
+    }
     // SOLID 
     else if ( this->Leqi ( token, (char*)"solid" ))
-      object_num = object_num + 1;
+    {
+    }
     // ENDSOLID 
     else if ( this->Leqi ( token, (char*)"endsolid" ))
     {
@@ -172,20 +141,11 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
     else 
     {
       printf ( "\n" );
-      printf ( "STLA_READ - Fatal error!\n" );
+      printf ( "stl - Fatal error!\n" );
       printf ( "  Unrecognized first word on line.\n" );
     }
   }
 
-  SubMesh *subMesh = new SubMesh();
-  mesh->AddSubMesh(subMesh);
-
-  for (int i=0; i < face_num; i++)
-    subMesh->AddVertex( cor3[0][i], cor3[1][i], cor3[2][i] );
-
-  for (int i=0; i < face_num; i++)
-    for (int j=0; j < face_order[i]; j++)
-      subMesh->AddIndex(face[j][i]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -194,31 +154,19 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
 {
   short int attribute = 0;
   char c;
-  float cvec[3];
-  int icor3;
   int i;
   int iface;
-  int ivert;
   int face_num;
-  int face_order[FACE_MAX];
-  int face_material[FACE_MAX];
-  int bytes_num;
-  int cor3_num;
-  int dup_num;
-  float cor3[3][COR3_MAX];
-  float face_normal[3][FACE_MAX];
-  int face[3][FACE_MAX];
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
 
   //80 byte Header.
   for ( i = 0; i < 80; i++ ) 
-  {
     c = (char)fgetc(filein);
-    bytes_num = bytes_num + 1;
-  }
 
   //Number of faces.
   face_num = this->LongIntRead(filein);
-  bytes_num = bytes_num + 4;
 
   //For each (triangular) face,
   //  components of normal vector,
@@ -226,59 +174,32 @@ void STLLoader::ReadBinary ( FILE *filein, Mesh *mesh )
   //  2 byte "attribute".
   for (iface = 0; iface < face_num; iface++)
   {
-    face_order[iface] = 3;
-    face_material[iface] = 0;
+    Vector3 normal;
 
-    for ( i = 0; i < 3; i++ ) 
+    // Get the normal for the face
+    normal.x =  this->FloatRead(filein);
+    normal.y =  this->FloatRead(filein);
+    normal.z =  this->FloatRead(filein);
+
+    // Get three vertices
+    for (i = 0; i < 3; i++) 
     {
-      face_normal[i][iface] = this->FloatRead(filein);
-      bytes_num = bytes_num + 4;
-    }
+      Vector3 vertex;
 
-    for (ivert = 0; ivert < face_order[iface]; ivert++) 
-    {
-      for ( i = 0; i < 3; i++ ) 
+      vertex.x = this->FloatRead(filein);
+      vertex.y = this->FloatRead(filein);
+      vertex.z = this->FloatRead(filein);
+
+      if (!subMesh->HasVertex(vertex))
       {
-        cvec[i] = this->FloatRead(filein);
-        bytes_num = bytes_num + 4;
+        subMesh->AddVertex(vertex);
+        subMesh->AddNormal(normal);
       }
-
-      if ( cor3_num < 1000 ) 
-        icor3 = this->RcolFind(cor3, 3, cor3_num, cvec);
-      else
-        icor3 = -1;
-
-      if (icor3 == -1) 
-      {
-        icor3 = cor3_num;
-        if (cor3_num < COR3_MAX) 
-        {
-          cor3[0][cor3_num] = cvec[0];
-          cor3[1][cor3_num] = cvec[1];
-          cor3[2][cor3_num] = cvec[2];
-        }
-        cor3_num = cor3_num + 1;
-      }
-      else 
-        dup_num = dup_num + 1;
-
-      face[ivert][iface] = icor3;
+      subMesh->AddIndex( subMesh->GetVertexIndex(vertex) );
     }
 
     attribute = ShortIntRead ( filein );
-
-    bytes_num = bytes_num + 2;
   }
-
-  SubMesh *subMesh = new SubMesh();
-  mesh->AddSubMesh(subMesh);
-
-  for (int i=0; i < face_num; i++)
-    subMesh->AddVertex( cor3[0][i], cor3[1][i], cor3[2][i] );
-
-  for (int i=0; i < face_num; i++)
-    for (int j=0; j < face_order[i]; j++)
-      subMesh->AddIndex(face[j][i]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
