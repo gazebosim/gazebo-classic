@@ -31,7 +31,7 @@
 
 namespace gazebo
 {
-  class HingeJoint;
+  class Joint;
 
 /// \addtogroup gazebo_controller
 /// \{
@@ -72,7 +72,7 @@ class DriveWheel: public Wheel
   /// \brief Set the suspension of this wheel
   public: void SetSuspension(float spring, float damping, float step);
 
-  private: HingeJoint *joint;
+  private: Joint *joint;
   private: float torque;
   private: float steerTorque; 
   private: float speedCmd;

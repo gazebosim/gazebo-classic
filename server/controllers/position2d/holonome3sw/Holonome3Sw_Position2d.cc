@@ -28,7 +28,7 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Global.hh"
-#include "HingeJoint.hh"
+#include "Joint.hh"
 #include "World.hh"
 #include "Simulator.hh"
 #include "gazebo.h"
@@ -44,8 +44,8 @@ enum {RIGHT, LEFT};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Holonome3Sw_Position2d::Holonome3Sw_Position2d(Entity *parent )
-  : Controller(parent)
+  Holonome3Sw_Position2d::Holonome3Sw_Position2d(Entity *parent )
+: Controller(parent)
 {
   this->myParent = dynamic_cast<Model*>(this->parent);
 
@@ -81,83 +81,84 @@ void Holonome3Sw_Position2d::LoadChild(XMLConfigNode *node)
 
   // Get params for each wheels
   for (size_t i = 0; i < 3; ++i)
-    {
-      std::ostringstream sw; sw << "swedish" << i;
-      XMLConfigNode *lnode = node->GetChild(sw.str());
-      if (!lnode)
-        gzthrow("The controller couldn't get swedish wheels " + sw.str());
-      
-      std::string joint =  lnode->GetString("joint", "", 1);
-      this->joint[i] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(joint));
-      if (!this->joint[i])
-        gzthrow("The controller couldn't get hinge joint for " + sw.str());
+  {
+    std::ostringstream sw; sw << "swedish" << i;
+    XMLConfigNode *lnode = node->GetChild(sw.str());
+    if (!lnode)
+      gzthrow("The controller couldn't get swedish wheels " + sw.str());
 
-      this->ALPHA[i] = lnode->GetFloat("alpha", 1000000, 1);
-      if (this->ALPHA[i] == 1000000)
-         gzthrow("The controller could't get alpha param for " + sw.str());
+    std::string joint =  lnode->GetString("joint", "", 1);
+    this->joint[i] = this->myParent->GetJoint(joint);
 
-      this->DIST[i] = lnode->GetFloat("distance", distdef, 0);
-      if (!this->DIST[i])
-        gzthrow("The controller could't get distance param for " + sw.str());
+    if (!this->joint[i])
+      gzthrow("The controller couldn't get hinge joint for " + sw.str());
 
-      this->BETA[i] = lnode->GetFloat("beta", betadef, 0);
+    this->ALPHA[i] = lnode->GetFloat("alpha", 1000000, 1);
+    if (this->ALPHA[i] == 1000000)
+      gzthrow("The controller could't get alpha param for " + sw.str());
 
-      this->GAMMA[i] = lnode->GetFloat("gamma", gammadef, 0);
+    this->DIST[i] = lnode->GetFloat("distance", distdef, 0);
+    if (!this->DIST[i])
+      gzthrow("The controller could't get distance param for " + sw.str());
 
-      this->RADIUS[i] = lnode->GetFloat("radius", radiusdef, 0);
-      if (!this->RADIUS[i])
-        gzthrow("The controller could't get radius param for " + sw.str());
+    this->BETA[i] = lnode->GetFloat("beta", betadef, 0);
 
-      this->MAXTORQUE[i] = lnode->GetFloat("torque", maxtorquedef, 0);
-      if (!this->MAXTORQUE[i])
-        gzthrow("The controller could't get torque param for " + sw.str());
+    this->GAMMA[i] = lnode->GetFloat("gamma", gammadef, 0);
 
-      // Pre-compute some constants
-      A[i] = (2*3.14159265358979)*fmodf(ALPHA[i]+BETA[i]+GAMMA[i], 360)/360;
-      L[i] = DIST[i]*cos((2*3.14159265358979)*fmodf(BETA[i]+GAMMA[i], 360)/360);
-      R[i] = RADIUS[i]*cos((2*3.14159265358979)*fmodf(GAMMA[i], 360)/360);
-    }
+    this->RADIUS[i] = lnode->GetFloat("radius", radiusdef, 0);
+    if (!this->RADIUS[i])
+      gzthrow("The controller could't get radius param for " + sw.str());
+
+    this->MAXTORQUE[i] = lnode->GetFloat("torque", maxtorquedef, 0);
+    if (!this->MAXTORQUE[i])
+      gzthrow("The controller could't get torque param for " + sw.str());
+
+    // Pre-compute some constants
+    A[i] = (2*3.14159265358979)*fmodf(ALPHA[i]+BETA[i]+GAMMA[i], 360)/360;
+    L[i] = DIST[i]*cos((2*3.14159265358979)*fmodf(BETA[i]+GAMMA[i], 360)/360);
+    R[i] = RADIUS[i]*cos((2*3.14159265358979)*fmodf(GAMMA[i], 360)/360);
+  }
 
 #if 0
-    std::cout << "Holonomous robot, here are the params:" << std::endl;
-    for (size_t i = 0; i < 3; ++i)
-    {
-      std::cout << " - swedish" << i << std::endl;
-      std::cout << "   alpha =      " << ALPHA[i] << std::endl;
-      std::cout << "   beta =       " << BETA[i] << std::endl;
-      std::cout << "   gamma =      " << GAMMA[i] << std::endl;
-      std::cout << "   dist =       " << DIST[i] << std::endl;
-      std::cout << "   radius =     " << RADIUS[i] << std::endl;
-      std::cout << "   max-torque = " << MAXTORQUE[i] << std::endl;
-      std::cout << "   A =          " << A[i] << std::endl;
-      std::cout << "   L =          " << L[i] << std::endl;
-      std::cout << "   R =          " << R[i] << std::endl;
-      std::cout << std::endl;      
-    }
+  std::cout << "Holonomous robot, here are the params:" << std::endl;
+  for (size_t i = 0; i < 3; ++i)
+  {
+    std::cout << " - swedish" << i << std::endl;
+    std::cout << "   alpha =      " << ALPHA[i] << std::endl;
+    std::cout << "   beta =       " << BETA[i] << std::endl;
+    std::cout << "   gamma =      " << GAMMA[i] << std::endl;
+    std::cout << "   dist =       " << DIST[i] << std::endl;
+    std::cout << "   radius =     " << RADIUS[i] << std::endl;
+    std::cout << "   max-torque = " << MAXTORQUE[i] << std::endl;
+    std::cout << "   A =          " << A[i] << std::endl;
+    std::cout << "   L =          " << L[i] << std::endl;
+    std::cout << "   R =          " << R[i] << std::endl;
+    std::cout << std::endl;      
+  }
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the controller
 /*void Holonome3Sw_Position2d::SaveChild(XMLConfigNode *node)
-{
+  {
   node = node->GetChild("wheels");
   if (!node)
-    gzthrow("No such child node: wheels");
+  gzthrow("No such child node: wheels");
   for (size_t i = 0; i < 3; ++i)
-    {
-      std::ostringstream sw; sw << "swedish" << i;
-      XMLConfigNode *lnode = node->GetChild(sw.str());
-      if (!lnode)
-        gzthrow("No such child node wheels/" + sw.str());
-      lnode->SetValue("alpha", this->ALPHA[i]);
-      lnode->SetValue("distance", this->DIST[i]);
-      lnode->SetValue("beta", this->BETA[i]);
-      lnode->SetValue("gamma", this->GAMMA[i]);
-      lnode->SetValue("radius", this->RADIUS[i]);
-      lnode->SetValue("max-torque", this->MAXTORQUE[i]);
-      // "joint" ???
-    }
+  {
+  std::ostringstream sw; sw << "swedish" << i;
+  XMLConfigNode *lnode = node->GetChild(sw.str());
+  if (!lnode)
+  gzthrow("No such child node wheels/" + sw.str());
+  lnode->SetValue("alpha", this->ALPHA[i]);
+  lnode->SetValue("distance", this->DIST[i]);
+  lnode->SetValue("beta", this->BETA[i]);
+  lnode->SetValue("gamma", this->GAMMA[i]);
+  lnode->SetValue("radius", this->RADIUS[i]);
+  lnode->SetValue("max-torque", this->MAXTORQUE[i]);
+// "joint" ???
+}
 }*/
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,19 +181,18 @@ void Holonome3Sw_Position2d::UpdateChild()
 
   //std::cout << "Anchors: {";
   for (size_t i = 0; i < 3; ++i)
+  {
+    if (this->enableMotors)
     {
-      //std::cout << "[" << this->joint[i]->GetAnchor() << "] ";
-      if (this->enableMotors)
-        {
-          this->joint[i]->SetParam( dParamVel, this->PhiP[i]);
-          this->joint[i]->SetParam( dParamFMax, this->MAXTORQUE[i] );
-        }
-      else
-        {
-          this->joint[i]->SetParam( dParamVel, 0 ); 
-          this->joint[i]->SetParam( dParamVel, 0 );
-        }
+      this->joint[i]->SetVelocity( 0, this->PhiP[i]);
+      this->joint[i]->SetMaxForce( 0, this->MAXTORQUE[i] );
     }
+    else
+    {
+      this->joint[i]->SetVelocity( 0, 0 ); 
+      this->joint[i]->SetMaxForce( 0, 0 );
+    }
+  }
   //std::cout << "}" << std::endl;
   this->PutPositionData();
 }
@@ -208,11 +208,11 @@ void Holonome3Sw_Position2d::FiniChild()
 void Holonome3Sw_Position2d::ResetData()
 {
   for (size_t i = 0; i < 3; ++i)
-    {
-      Xi[i] = 0;
-      XiP[i] = 0;
-      PhiP[i] = 0;
-    }
+  {
+    Xi[i] = 0;
+    XiP[i] = 0;
+    PhiP[i] = 0;
+  }
   this->enableMotors = true;
 }
 
@@ -221,24 +221,24 @@ void Holonome3Sw_Position2d::ResetData()
 void Holonome3Sw_Position2d::GetPositionCmd()
 {
   if (this->myIface->Lock(1))
+  {
+    double vx = this->myIface->data->cmdVelocity.pos.x;
+    double vy = this->myIface->data->cmdVelocity.pos.y;
+    double va = this->myIface->data->cmdVelocity.yaw;
+    for (size_t i = 0; i < 3; ++i)
     {
-      double vx = this->myIface->data->cmdVelocity.pos.x;
-      double vy = this->myIface->data->cmdVelocity.pos.y;
-      double va = this->myIface->data->cmdVelocity.yaw;
-      for (size_t i = 0; i < 3; ++i)
-        {
-          this->PhiP[i] = -(1/R[i])*(-sin(A[i])*vx +
-                                     cos(A[i])*vy +
-                                     L[i]*va);
-        }
-      this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
-      this->myIface->Unlock();
-#if 0
-      std::cout << "Xi=[" << Xi[0] << ", " << Xi[1] << ", " << Xi[2] << "]; ";
-      std::cout << "vx=" << vx <<", vy=" << vy << ", va=" << va << "; ";
-      std::cout << "PhiP=[" << PhiP[0] << ", " << PhiP[1] << ", " << PhiP[2] << "];\n";
-#endif
+      this->PhiP[i] = -(1/R[i])*(-sin(A[i])*vx +
+          cos(A[i])*vy +
+          L[i]*va);
     }
+    this->enableMotors = this->myIface->data->cmdEnableMotors > 0;
+    this->myIface->Unlock();
+#if 0
+    std::cout << "Xi=[" << Xi[0] << ", " << Xi[1] << ", " << Xi[2] << "]; ";
+    std::cout << "vx=" << vx <<", vy=" << vy << ", va=" << va << "; ";
+    std::cout << "PhiP=[" << PhiP[0] << ", " << PhiP[1] << ", " << PhiP[2] << "];\n";
+#endif
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -246,21 +246,21 @@ void Holonome3Sw_Position2d::GetPositionCmd()
 void Holonome3Sw_Position2d::PutPositionData()
 {
   if (this->myIface->Lock(1))
-    {
-      // TODO: Data timestamp
-      this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
+  {
+    // TODO: Data timestamp
+    this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
 
-      this->myIface->data->pose.pos.x = this->Xi[0];
-      this->myIface->data->pose.pos.y = this->Xi[1];
-      this->myIface->data->pose.yaw = NORMALIZE(this->Xi[2]);
+    this->myIface->data->pose.pos.x = this->Xi[0];
+    this->myIface->data->pose.pos.y = this->Xi[1];
+    this->myIface->data->pose.yaw = NORMALIZE(this->Xi[2]);
 
-      this->myIface->data->velocity.pos.x = 0;
-      this->myIface->data->velocity.pos.y = 0;
-      this->myIface->data->velocity.yaw = 0;
+    this->myIface->data->velocity.pos.x = 0;
+    this->myIface->data->velocity.pos.y = 0;
+    this->myIface->data->velocity.yaw = 0;
 
-      // TODO
-      this->myIface->data->stall = 0;
+    // TODO
+    this->myIface->data->stall = 0;
 
-      this->myIface->Unlock();
-    }
+    this->myIface->Unlock();
+  }
 }

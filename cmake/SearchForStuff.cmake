@@ -303,3 +303,70 @@ ENDIF (NOT libtool_library)
 IF (libtool_library AND libtool_include_dir)
   SET (HAVE_LTDL TRUE)
 ENDIF (libtool_library AND libtool_include_dir)
+
+########################################
+# Find bullet
+FIND_PATH( bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
+IF (NOT bullet_include_dir)
+  MESSAGE (STATUS "Looking for btBulletDynamicsCommon.h - not found")
+  SET (bullet_include_dir /usr/include)
+ELSE (NOT bullet_include_dir)
+  MESSAGE (STATUS "Looking for btBulletDynamicsCommon.h - found")
+ENDIF (NOT bullet_include_dir)
+
+FIND_LIBRARY(bullet_dynamics_library NAMES BulletDynamics 
+  PATHS ${bullet_dynamics_dirs} ENV LD_LIBRARY_PATH)
+FIND_LIBRARY(bullet_collision_library NAMES BulletCollision  
+  PATHS ${bullet_collision_dirs} ENV LD_LIBRARY_PATH)
+FIND_LIBRARY(bullet_softbody_library NAMES BulletSoftBody  
+  PATHS ${bullet_softbody_dirs} ENV LD_LIBRARY_PATH)
+FIND_LIBRARY(bullet_math_library NAMES LinearMath
+  PATHS ${bullet_math_dirs} ENV LD_LIBRARY_PATH)
+
+IF (NOT bullet_dynamics_library OR 
+    NOT bullet_collision_library OR 
+    NOT bullet_softbody_library OR
+    NOT bullet_math_library)
+  MESSAGE (STATUS "Looking for bullet libraries - not found")
+ELSE (NOT bullet_dynamics_library OR 
+      NOT bullet_collision_library OR 
+      NOT bullet_softbody_library OR
+      NOT bullet_math_library)
+  MESSAGE (STATUS "Looking for bullet libraries - found")
+ENDIF (NOT bullet_dynamics_library OR 
+       NOT bullet_collision_library OR 
+       NOT bullet_softbody_library OR
+       NOT bullet_math_library)
+
+IF (bullet_dynamics_library AND 
+    bullet_collision_library AND 
+    bullet_softbody_library  AND 
+    bullet_math_library AND
+    bullet_include_dir)
+  SET (INCLUDE_BULLET TRUE CACHE BOOL "Include support for Bullet")
+  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                        ${gazeboserver_link_libs_desc} 
+                        BulletDynamics)
+  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                        ${gazeboserver_link_libs_desc} 
+                        BulletCollision)
+  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                        ${gazeboserver_link_libs_desc} 
+                        BulletSoftBody)
+  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                      ${gazeboserver_link_libs_desc} 
+                      LinearMath)
+
+
+ELSE (bullet_dynamics_library AND 
+    bullet_collision_library AND 
+    bullet_softbody_library  AND 
+    bullet_math_library AND
+    bullet_include_dir)
+  MESSAGE (STATUS "Warning: Unable to find bullet. The bullet physics engine will not be supported.")
+ENDIF (bullet_dynamics_library AND 
+       bullet_collision_library AND 
+       bullet_softbody_library  AND 
+       bullet_math_library AND
+       bullet_include_dir)
+

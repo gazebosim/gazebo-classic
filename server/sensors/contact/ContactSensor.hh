@@ -75,8 +75,10 @@ namespace gazebo
     /// \brief Return contact geometry name
     public: std::string GetContactGeomName(unsigned int index) const;
 
+            /* BULLET
     /// \brief Return contact feedback, f1,f2,t1,t2
     public:  dJointFeedback GetContactFeedback(unsigned int index) const;
+    */
 
     /// \brief Return geometry name
     public: std::string GetGeomName(unsigned int index) const;
@@ -111,8 +113,6 @@ namespace gazebo
     private: double *contactTimes;
     private: unsigned int contactCount;
     private: std::vector<std::string> contactNames;
-    /// \brief a place for storing joint feedbacks, including contact joints
-    private:  dJointFeedback contactFeedbacks[GAZEBO_MAX_CONTACT_FB_DATA];
 
   };
   /// \}

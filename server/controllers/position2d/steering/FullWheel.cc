@@ -27,7 +27,7 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
-#include "Hinge2Joint.hh"
+#include "Joint.hh"
 #include "World.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
@@ -57,17 +57,17 @@ FullWheel::~FullWheel( )
 // Connects the wheel to a given Joint
 void FullWheel::Connect(Joint *joint, int type)
 {
-  this->joint= dynamic_cast<Hinge2Joint*>(joint);
+  this->joint= joint;
   this->type=type;
-  if (!joint)
+  if (!this->joint)
   {
     std::ostringstream stream;
-    stream << "The controller couldn't get the joint " << joint->GetName();
+    stream << "The controller couldn't get the joint " <<this->joint->GetName();
     gzthrow(stream.str());
   }
 
   //avoid an initial impulse to the joints that would make the vehicle flip
-  this->joint->SetParam(dParamFudgeFactor, 0.1);
+  this->joint->SetAttribute(Joint::FUDGE_FACTOR,0, 0.1);
 }
 
 
@@ -75,31 +75,27 @@ void FullWheel::Connect(Joint *joint, int type)
 // Stops the wheel
 void FullWheel::Stop()
 {
-  this->joint->SetParam(dParamVel, 0);
-  this->joint->SetParam(dParamFMax, 0);
-  this->joint->SetParam(dParamVel2, 0);
-  this->joint->SetParam(dParamFMax2, 0);
+  this->joint->SetVelocity(0, 0);
+  this->joint->SetMaxForce(0, 0);
+  this->joint->SetVelocity(1, 0);
+  this->joint->SetMaxForce(1, 0);
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the torque
 void FullWheel::SetTorque( float newTorque)
 {
   this->torque=newTorque;
-  this->joint->SetParam(dParamFMax2, this->torque);
+  this->joint->SetMaxForce(1, this->torque);
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the steering torque
 void FullWheel::SetSteerTorque(float newTorque)
 {
   this->steerTorque=newTorque;
-  this->joint->SetParam(dParamFMax, this->steerTorque);
+  this->joint->SetMaxForce(0, this->steerTorque);
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the steering parameters
@@ -109,14 +105,12 @@ void FullWheel::SetSteerPD(float kp, float kd)
   this->steerKd=kd;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Set the steering max angle
 void FullWheel::SetSteerMaxAngle(float maxAngle)
 {
   this->steerMaxAngle=maxAngle;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Updates
@@ -141,24 +135,25 @@ void FullWheel::Update(float speed, float steer)
   kd = this->steerKd;
 
   // Set the turn angle; PD control
-  v = kp * (this->cmdSteer - this->joint->GetAngle1())
-      - kd * this->joint->GetAngle1Rate();
-  this->joint->SetParam(dParamVel, v);
+  v = kp * (this->cmdSteer - this->joint->GetAngle(0).GetAsRadian())
+      - kd * this->joint->GetVelocity(0);
+  this->joint->SetVelocity(0, v);
 
-  this->joint->SetParam(dParamFMax, this->steerTorque);
+  this->joint->SetMaxForce(0, this->steerTorque);
+
   if (type==FULL)
   {
-    this->joint->SetParam(dParamFMax2, this->torque);
-    this->joint->SetParam(dParamVel2, this->cmdSpeed);
+    this->joint->SetMaxForce(1, this->torque);
+    this->joint->SetVelocity(1, this->cmdSpeed);
   }
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the suspension
 void FullWheel::SetSuspension(float spring, float damping, float step)
 {
-  joint->SetParam(dParamSuspensionERP, step*spring/(step*spring+damping));
-  joint->SetParam(dParamSuspensionCFM, 1.0/(step*spring+damping));
+  joint->SetAttribute(Joint::SUSPENSION_ERP,0, 
+      step*spring/(step*spring+damping));
+  joint->SetAttribute(Joint::SUSPENSION_CFM,0, 1.0/(step*spring+damping));
 }

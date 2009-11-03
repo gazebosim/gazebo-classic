@@ -38,6 +38,8 @@ namespace gazebo
 
   class XMLConfigNode;
   class RayGeom;
+  class RaySensor;
+
 /// \addtogroup gazebo_sensor
 /// \brief Sensor with one or more rays.
 /// \{
@@ -73,68 +75,17 @@ class IRSensor: public Sensor
   /// Finalize the ray
   protected: virtual void FiniChild();
 
-  /// \brief Get the minimum angle
-  /// \return The minimum angle
-  public: double GetMinAngle() const;
-
-  /// \brief Get the maximum angle
-  /// \return the maximum angle
-  public: double GetMaxAngle() const;
-
-  /// \brief Get the minimum range
-  /// \return The minimum range
-  public: double GetMinRange() const;
-
-  /// \brief Get the maximum range
-  /// \return The maximum range
-  public: double GetMaxRange() const;
-
   /// \brief Get the ray count
   /// \return The number of rays
-  public: int GetIRCount() const;
-
-  /// \brief Get the range count
-  /// \return The number of ranges
-  public: int GetRangeCount() const;
-
-  /// \brief Set ray parameters
-  /// \param index Rayindex (from 0 to rayCount - 1).
-  /// \param a, b Ray endpoints (initial and final points).  These are
-  /// in body-relative coordiantes.
-  public: void SetRay(int index, const Vector3 &a, const Vector3 &b);
-
-  /// Get ray parameters
-  /// \param index Ray index (from 0 to rayCount -1).
-  /// \param pos, dir Ray position and direction.
-  public: void GetRay(int index, Vector3 &pos, Vector3 &dir);
+  public: unsigned int GetIRCount() const;
 
   /// \brief Get detected range for a ray.
   /// \returns Returns DBL_MAX for no detection.
-  public: double GetRange(int index);   
-  public: Pose  GetPose(int index);
+  public: double GetRange(unsigned int index) const;
 
-  /// \brief Ray-intersection callback
-  private: static void UpdateCallback( void *data, dGeomID o1, dGeomID o2 );
-  
-  /// Ray space for collision detector
-  private: dSpaceID superSpaceId;
-  private: dSpaceID raySpaceId; 
+  public: Pose3d GetPose(unsigned int index) const;
 
-  /// Ray data
-  private: std::vector<RayGeom*> rays;
-  
-
-  private: double *minAngle, *maxAngle;
-  private: double *minRange, *maxRange;
-  private: Vector3 *origin;
-
-  private: Pose3d prevPose;
-  private: int *rayCount;
-  private: int *rangeCount;
-  private: int IRCount;
-  
-  /// Display rays when rendering images
-  private: bool displayRays;
+  private: std::vector<RaySensor*> irBeams;
 
 };
 /// \}

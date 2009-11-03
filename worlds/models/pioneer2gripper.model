@@ -91,8 +91,6 @@
 <joint:slider name="lift_slider_joint">
   <body1>gripper_base_body</body1>
   <body2>gripper_lift_body</body2>
-  <anchor>gripper_base_body</anchor>
-  <anchorOffset>0 0 0</anchorOffset>
   <axis>0 0 -1</axis>
   <lowStop>-0.05</lowStop>
   <highStop>0.05</highStop>
@@ -103,8 +101,6 @@
 <joint:slider name="left_paddle_joint">
   <body1>gripper_lift_body</body1>
   <body2>gripper_left_paddle_body</body2>
-  <anchor>gripper_lift_body</anchor>
-  <anchorOffset>0 0 0</anchorOffset>
   <axis>0 1 0</axis>
   <lowStop>-0.12</lowStop>
   <highStop>0.0</highStop>
@@ -115,8 +111,6 @@
 <joint:slider name="right_paddle_joint">
   <body1>gripper_lift_body</body1>
   <body2>gripper_right_paddle_body</body2>
-  <anchor>gripper_lift_body</anchor>
-  <anchorOffset>0 0 0</anchorOffset>
   <axis>0 1 0</axis>
   <lowStop>0.0</lowStop>
   <highStop>0.12</highStop>

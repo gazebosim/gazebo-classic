@@ -1,48 +1,50 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+add_subdirectory(ode)
+add_subdirectory(bullet)
 
-SET (sources BallJoint.cc
-             Body.cc
-             BoxGeom.cc
-             ContactParams.cc
-             CylinderGeom.cc
-             Geom.cc
-             Hinge2Joint.cc
-             HingeJoint.cc
-             Joint.cc
+set (sources Body.cc
+             PhysicsFactory.cc
              PhysicsEngine.cc
-             PlaneGeom.cc
-             SliderJoint.cc
-             SphereGeom.cc
-             UniversalJoint.cc
-             RayGeom.cc
-             TrimeshGeom.cc
-             HeightmapGeom.cc
-             MapGeom.cc
-             ode/ODEPhysics.cc
+             ContactParams.cc
+             Mass.cc
+             Joint.cc
+             Geom.cc
+             Shape.cc
+             BoxShape.cc
+             CylinderShape.cc
+             PlaneShape.cc
+             SphereShape.cc
+             RayShape.cc
+             MultiRayShape.cc
+             TrimeshShape.cc
+             #HeightmapGeom.cc
+             #MapGeom.cc
 ) 
 
-SET (headers BallJoint.hh
+set (headers BallJoint.hh
              Body.hh
-             BoxGeom.hh
+             PhysicsFactory.hh
              ContactParams.hh
-             CylinderGeom.hh
-             Geom.hh
              Hinge2Joint.hh
              HingeJoint.hh
              Joint.hh
              PhysicsEngine.hh
-             PlaneGeom.hh
              SliderJoint.hh
-             SphereGeom.hh
              UniversalJoint.hh
-             RayGeom.hh
-             TrimeshGeom.hh
-             HeightmapGeom.hh
-             MapGeom.hh
-             ode/ODEPhysics.hh
+             Mass.hh
+             Geom.hh
+             BoxShape.hh
+             CylinderShape.hh
+             #HeightmapShape.hh
+             #MapShape.hh
+             PlaneShape.hh
+             RayShape.hh
+             MultiRayShape.hh
+             SphereShape.hh
+             TrimeshShape.hh
 )
 
-#ADD_LIBRARY(gazebo_physics STATIC ${sources})
+#add_library(gazebo_physics STATIC ${sources})
 APPEND_TO_SERVER_SOURCES(${sources})
 APPEND_TO_SERVER_HEADERS(${headers})

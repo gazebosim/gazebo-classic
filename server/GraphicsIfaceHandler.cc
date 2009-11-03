@@ -24,6 +24,8 @@
  * SVN: $Id:$
  */
 
+#include <stdint.h>
+
 #include "gazebo.h"
 #include "World.hh"
 #include "Entity.hh"
@@ -449,7 +451,7 @@ void GraphicsIfaceHandler::DrawMeterBar(OgreVisual *vis,
   // for best performance use HBL_DISCARD!
   const Ogre::PixelBox& pixelBox = pixelBuffer->getCurrentLock();
 
-  uint8* pDest = static_cast<uint8*>(pixelBox.data);
+  uint8_t* pDest = static_cast<uint8_t*>(pixelBox.data);
 
   char red = data->color.b*255; 
   char green = data->color.g*255; 

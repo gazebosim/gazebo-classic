@@ -84,6 +84,9 @@ class Quatern
   /// \param z Z axis
   /// \param a Angle in radians
   public: void SetFromAxis(double x, double y, double z, double a);
+
+  /// \brief Set this quaternion from another
+  public: void Set(double u, double x, double y, double z);
          
   /// \brief Set the quaternion from Euler angles
   /// \param vec  Euler angle
@@ -115,15 +118,33 @@ class Quatern
   /// \return This quatern + qt
   public: Quatern operator+( const Quatern &qt ) const;
 
+  /// \brief Addition operator
+  /// \param qt Quatern for addition
+  /// \return This quatern + qt
+  public: Quatern operator+=( const Quatern &qt );
+
   /// \brief Substraction operator
   /// \param qt Quatern for substraction
   /// \return This quatern - qt
   public: Quatern operator-( const Quatern &qt ) const;
 
+  /// \brief Substraction operator
+  /// \param qt Quatern for substraction
+  /// \return This quatern - qt
+  public: Quatern operator-=( const Quatern &qt );
+
   /// \brief Multiplication operator
   /// \param qt Quatern for multiplication
   /// \return This quatern multiplied by the parameter
   public: Quatern operator*( const Quatern &qt ) const;
+
+  /// \brief Multiplication operator
+  /// \param qt Quatern for multiplication
+  /// \return This quatern multiplied by the parameter
+  public: Quatern operator*=( const Quatern &qt );
+
+  /// \brief Vector3 multiplication operator
+  public: Vector3 operator*( const Vector3 &v ) const;
 
   /// \brief Rotate a vector using the quaternion
   /// \return The rotated vector

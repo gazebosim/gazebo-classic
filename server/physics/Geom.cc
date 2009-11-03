@@ -26,6 +26,8 @@
 
 #include <sstream>
 
+#include "Shape.hh"
+#include "Mass.hh"
 #include "PhysicsEngine.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
@@ -39,11 +41,9 @@
 
 using namespace gazebo;
 
-int Geom::geomIdCounter = 0;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Geom::Geom( Body *body)
+Geom::Geom( Body *body )
     : Entity(body)
 {
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
@@ -51,58 +51,46 @@ Geom::Geom( Body *body)
   this->typeName = "unknown";
 
   this->body = body;
-  this->SetSpaceId(this->body->GetSpaceId());
 
   // Create the contact parameters
   this->contact = new ContactParams();
-  this->geomId = NULL;
-  this->transId = NULL;
 
   this->bbVisual = NULL;
 
-  // Zero out the mass
-  dMassSetZero(&this->mass);
-  dMassSetZero(&this->bodyMass);
-
   this->transparency = 0;
+
+  this->shape = NULL;
 
   Param::Begin(&this->parameters);
   this->massP = new ParamT<double>("mass",0.001,0);
   this->massP->Callback( &Geom::SetMass, this);
 
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
-  this->xyzP->Callback( &Geom::SetPosition, this);
+  this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this);
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
-  this->rpyP->Callback( &Geom::SetRotation, this);
+  this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
   this->laserFiducialIdP = new ParamT<int>("laserFiducialId",-1,0);
   this->laserRetroP = new ParamT<float>("laserRetro",-1,0);
   Param::End();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Geom::~Geom()
 {
-  std::vector<OgreVisual*>::iterator iter;
-
-  if (this->geomId)
-    dGeomDestroy(this->geomId);
-
-  if (this->transId)
-    dGeomDestroy(this->transId);
-
   delete this->massP;
   delete this->xyzP;
   delete this->rpyP;
   delete this->laserFiducialIdP;
   delete this->laserRetroP;
+
+  delete this->shape;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load the geom
+// First step in the loading process
 void Geom::Load(XMLConfigNode *node)
 {
 
@@ -121,30 +109,25 @@ void Geom::Load(XMLConfigNode *node)
   this->laserFiducialIdP->Load(node);
   this->laserRetroP->Load(node);
 
-  if (this->massP->GetValue() <= 0)
-  {
-    this->massP->SetValue( 0.001 );
-  }
+  // TODO: This should probably be true....but "true" breaks trimesh postions.
+  this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP ) );
+  //this->SetPose(Pose3d( **this->xyzP, **this->rpyP ), false);
+
+  this->mass.SetMass( **this->massP );
 
   this->contact->Load(node);
 
-  this->LoadChild(node);
+  this->shape->Load(node);
+
+  this->CreateBoundingBox();
 
   this->body->AttachGeom(this);
-
-  Pose3d pose;
-
-  pose.pos = this->xyzP->GetValue();
-  pose.rot = this->rpyP->GetValue();
-
-  // TODO: This should probably be true....but "true" breaks trimesh postions.
-  this->SetPose(pose, false);
 
   childNode = node->GetChild("visual");
   while (childNode)
   {
     std::ostringstream visname;
-    visname << this->GetScopedName() << "_VISUAL_" << this->visuals.size();
+    visname << this->GetCompleteScopedName() << "_VISUAL_" << this->visuals.size();
 
     OgreVisual *visual = OgreCreator::Instance()->CreateVisual(
         visname.str(), this->visualNode, this);
@@ -160,8 +143,20 @@ void Geom::Load(XMLConfigNode *node)
     childNode = childNode->GetNext("visual");
   }
 
+
+  if (this->GetType() != Shape::PLANE && this->GetType() != Shape::HEIGHTMAP)
+  {
+    World::Instance()->RegisterGeom(this);
+    this->ShowPhysics(false);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create the bounding box for the geom
+void Geom::CreateBoundingBox()
+{
   // Create the bounding box
-  if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass)
+  if (this->GetType() != Shape::PLANE)
   {
     Vector3 min;
     Vector3 max;
@@ -169,7 +164,7 @@ void Geom::Load(XMLConfigNode *node)
     this->GetBoundingBox(min,max);
 
     std::ostringstream visname;
-    visname << this->GetScopedName() << "_BBVISUAL" ;
+    visname << this->GetCompleteScopedName() << "_BBVISUAL" ;
 
     this->bbVisual = OgreCreator::Instance()->CreateVisual(
         visname.str(), this->visualNode);
@@ -178,32 +173,22 @@ void Geom::Load(XMLConfigNode *node)
     {
       this->bbVisual->SetCastShadows(false);
       this->bbVisual->AttachBoundingBox(min,max);
-      this->bbVisual->SetRotation(pose.rot.GetInverse()); //transform aabb from global frame back to local frame
     }
   }
-
-  if (this->geomId && dGeomGetClass(this->geomId) != dPlaneClass && 
-      dGeomGetClass(this->geomId) != dHeightfieldClass)
-  {
-    World::Instance()->RegisterGeom(this);
-    this->ShowPhysics(false);
-  }
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the body based on our XMLConfig node
 void Geom::Save(std::string &prefix, std::ostream &stream)
 {
-  if (this->GetGeomClass() == dRayClass)
+  if (this->GetType() == Shape::RAY)
     return;
 
   std::string p = prefix + "  ";
   std::vector<OgreVisual*>::iterator iter;
 
-  this->xyzP->SetValue( this->GetPose().pos );
-  this->rpyP->SetValue( this->GetPose().rot );
+  this->xyzP->SetValue( this->GetRelativePose().pos );
+  this->rpyP->SetValue( this->GetRelativePose().rot );
 
   stream << prefix << "<geom:" << this->typeName << " name=\"" 
          << this->nameP->GetValue() << "\">\n";
@@ -211,7 +196,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
 
-  this->SaveChild(p, stream);
+  this->shape->Save(p,stream);
 
   stream << prefix << "  " << *(this->massP) << "\n";
 
@@ -229,37 +214,11 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the encapsulated geometry object
-void Geom::SetGeom(dGeomID geomId, bool placeable)
+void Geom::SetGeom(bool placeable)
 {
   this->physicsEngine->LockMutex();
 
   this->placeable = placeable;
-
-  this->geomId = geomId;
-  this->transId = NULL;
-
-  if (this->placeable && !this->IsStatic())
-  {
-    /// @todo: Not sure why this if statement was here
-    /// trimesh loading works fine without it
-    /// commenting out for now
-    //if (dGeomGetClass(geomId) != dTriMeshClass)
-    {
-      this->transId = dCreateGeomTransform( this->spaceId );
-      dGeomTransformSetGeom( this->transId, this->geomId );
-      dGeomTransformSetInfo( this->transId, 1 );
-      /// @todo: this assert seems to break when geom is a trimesh, why?
-      if (dGeomGetClass(geomId) != dTriMeshClass)
-        assert(dGeomGetSpace(this->geomId) == 0);
-    }
-  }
-  else if ( dGeomGetSpace(this->geomId) == 0 )
-  {
-    dSpaceAdd(this->spaceId, this->geomId);
-    assert(dGeomGetSpace(this->geomId) != 0);
-  }
-
-  dGeomSetData(this->geomId, this);
 
   if (this->IsStatic())
   {
@@ -274,48 +233,12 @@ void Geom::SetGeom(dGeomID geomId, bool placeable)
   }
 
   this->physicsEngine->UnlockMutex();
-
-  // Create a new name of the geom's mesh entity
-  //std::ostringstream stream;
-  //stream << "Entity[" << (int)this->geomId << "]";
-  //this->SetName(stream.str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update
 void Geom::Update()
 {
-  this->UpdateChild();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the geom id
-dGeomID Geom::GetGeomId() const
-{
-  return this->geomId;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the transform id
-dGeomID Geom::GetTransId() const
-{
-  return this->transId;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ODE geom class
-int Geom::GetGeomClass() const
-{
-  int result = 0;
-
-  if (this->geomId)
-  {
-    this->physicsEngine->LockMutex();
-    result= dGeomGetClass(this->geomId);
-    this->physicsEngine->UnlockMutex();
-  }
-
-  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,127 +249,8 @@ bool Geom::IsPlaceable() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the pose relative to the body
-void Geom::SetPose(const Pose3d &newPose, bool updateCoM)
-{
-  this->physicsEngine->LockMutex();
-
-  if (this->placeable && this->geomId)
-  {
-    Pose3d localPose;
-    dQuaternion q;
-
-    // Transform into CoM relative Pose
-    localPose = newPose - this->body->GetCoMPose();
-
-    q[0] = localPose.rot.u;
-    q[1] = localPose.rot.x;
-    q[2] = localPose.rot.y;
-    q[3] = localPose.rot.z;
-
-    // Set the pose of the encapsulated geom; this is always relative
-    // to the CoM
-    dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
-    dGeomSetQuaternion(this->geomId, q);
-
-    if (updateCoM)
-    {
-      this->body->UpdateCoM();
-    }
-  }
-
-  this->physicsEngine->UnlockMutex();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the pose of the geom relative to the body
-Pose3d Geom::GetPose() const
-{
-  this->physicsEngine->LockMutex();
-
-  Pose3d pose;
-
-  if (this->placeable && this->geomId)
-  {
-    const dReal *p;
-    dQuaternion r;
-
-    // Get the pose of the encapsulated geom; this is always relative to
-    // the CoM
-    p = dGeomGetPosition(this->geomId);
-    dGeomGetQuaternion(this->geomId, r);
-
-    pose.pos.x = p[0];
-    pose.pos.y = p[1];
-    pose.pos.z = p[2];
-
-    pose.rot.u = r[0];
-    pose.rot.x = r[1];
-    pose.rot.y = r[2];
-    pose.rot.z = r[3];
-
-    // Transform into body relative pose
-    pose += this->body->GetCoMPose();
-  }
-
-  this->physicsEngine->UnlockMutex();
-
-  return pose;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the position
-void Geom::SetPosition(const Vector3 &pos)
-{
-  Pose3d pose;
-
-  pose = this->GetPose();
-  pose.pos = pos;
-  this->SetPose(pose);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the rotation
-void Geom::SetRotation(const Quatern &rot)
-{
-  Pose3d pose;
-
-  pose = this->GetPose();
-  pose.rot = rot;
-  this->SetPose(pose);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the category bits, used during collision detection
-void Geom::SetCategoryBits(unsigned int bits)
-{
-  this->physicsEngine->LockMutex();
-
-  if (this->geomId)
-    dGeomSetCategoryBits(this->geomId, bits);
-  if (this->spaceId)
-    dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
-
-  this->physicsEngine->UnlockMutex();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the collide bits, used during collision detection
-void Geom::SetCollideBits(unsigned int bits)
-{
-  this->physicsEngine->LockMutex();
-
-  if (this->geomId)
-    dGeomSetCollideBits(this->geomId, bits);
-  if (this->spaceId)
-    dGeomSetCollideBits((dGeomID)this->spaceId, bits);
-
-  this->physicsEngine->UnlockMutex();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the mass of the geom
-const dMass *Geom::GetBodyMassMatrix()
+/*const dMass *Geom::GetBodyMassMatrix()
 {
 
   Pose3d pose;
@@ -479,7 +283,7 @@ const dMass *Geom::GetBodyMassMatrix()
   this->physicsEngine->UnlockMutex();
 
   return &this->bodyMass;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the laser fiducial integer id
@@ -574,14 +378,18 @@ void Geom::ShowPhysics(bool show)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the mass
-void Geom::SetMass(const double &mass)
+void Geom::SetMass(const Mass &_mass)
 {
-  this->physicsEngine->LockMutex();
-  dMassAdjust(&this->mass, mass);
-  this->physicsEngine->UnlockMutex();
+  this->mass = _mass;
+  //this->body->UpdateCoM();
+}
 
-  this->body->UpdateCoM();
-
+////////////////////////////////////////////////////////////////////////////////
+/// Set the mass
+void Geom::SetMass(const double &_mass)
+{
+  this->mass.SetMass( _mass );
+  //this->body->UpdateCoM();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -637,13 +445,34 @@ void Geom::SetFrictionMode( const bool &v )
   this->contact->enableFriction = v;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the bounding box for this geom
-void Geom::GetBoundingBox(Vector3 &min, Vector3 &max) const
-{
-  dReal aabb[6];
-  dGeomGetAABB(this->geomId, aabb);
 
-  min.Set(aabb[0], aabb[2], aabb[4]);
-  max.Set(aabb[1], aabb[3], aabb[5]);
+////////////////////////////////////////////////////////////////////////////////
+/// Get a pointer to the mass
+const Mass &Geom::GetMass() const
+{
+  return this->mass;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the shape type
+Shape::Type Geom::GetType()
+{
+  return this->shape->GetType();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the shape for this geom
+void Geom::SetShape(Shape *shape)
+{
+  this->shape = shape;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the attached shape
+Shape *Geom::GetShape() const
+{
+  return this->shape;
+}
+
+
+

@@ -19,7 +19,7 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.03</stepTime>
+    <stepTime>0.0005</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-5</cfm>
     <erp>0.3</erp>
@@ -38,7 +38,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.2 0.2 0.2 0.2</ambient>
+    <ambient>0.8 0.8 0.8 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -52,6 +52,7 @@
     <grid>false</grid>
 
     <shadowTechnique>stencilModulative</shadowTechnique>
+    <!--<shadowTechnique>none</shadowTechnique>-->
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -72,7 +73,7 @@
   </model:physical>
 
   <model:physical name="sphere1_model">
-    <xyz>2.15 -1.68 .3</xyz>
+    <xyz>2.15 -1.68 1.2</xyz>
     <rpy>0.0 0.0 0.0</rpy>
     <static>false</static>
     <laserFiducialId>1</laserFiducialId>
@@ -80,10 +81,10 @@
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
-        <size>0.1</size>
-
+        <size>0.2</size>
+        <mass>1</mass>
         <visual>
-          <scale>0.1 0.1 0.1</scale>
+          <scale>0.2 0.2 0.2</scale>
           <mesh>unit_sphere</mesh>
           <material>Gazebo/Rocky</material>
         </visual>
@@ -104,7 +105,6 @@
   <model:physical name="pioneer2dx_model1">
     <xyz>0 0 .145</xyz>
     <rpy>0.0 0.0 90.0</rpy>
-    <collide>all</collide>
 
     <model:physical name="laser">
       <xyz>0.15 0 0.18</xyz>
@@ -147,7 +147,6 @@
     </include>
   </model:physical>
 
-
   <model:physical name="box1_model">
     <xyz>1 1.5 0.5</xyz>
     <canonicalBody>box1_body</canonicalBody>
@@ -162,7 +161,7 @@
         <visual>
           <size>1 1 1</size>
           <mesh>unit_box</mesh>
-          <material>Gazebo/SmileyHappy</material>
+          <material>Gazebo/Grey</material>
         </visual>
       </geom:box>
     </body:box>
@@ -171,7 +170,7 @@
 
   <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>0 3 5</xyz>
+    <xyz>-3 0 5</xyz>
     <enableGravity>false</enableGravity>
 
     <light>

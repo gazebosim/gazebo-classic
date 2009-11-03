@@ -35,7 +35,7 @@
 
 namespace gazebo
 {
-  class HingeJoint;
+  class Joint;
   class PositionIface;
 
 /// \addtogroup gazebo_controller
@@ -93,7 +93,7 @@ class Bandit_Actarray : public Controller
   private: Model *myParent;
 
   private: ParamT<std::string> *jointNamesP[JOINTCNT];
-  private: HingeJoint *joints[JOINTCNT];
+  private: Joint *joints[JOINTCNT];
   private: ParamT<float> *forcesP[JOINTCNT];
   private: ParamT<float> *gainsP[JOINTCNT];
 

@@ -91,62 +91,85 @@ namespace gazebo
 /// \{
 
 /// \brief A universal joint
-class UniversalJoint : public Joint
+template<class T>
+class UniversalJoint : public T
 {
   /// \brief Constructor
-  public: UniversalJoint(dWorldID worldId);
+  public: UniversalJoint() : T()
+          {
+            this->type = Joint::UNIVERSAL;
+
+            Param::Begin(&this->parameters);
+            this->axis1P = new ParamT<Vector3>("axis1",Vector3(0,0,1),0);
+            this->axis2P = new ParamT<Vector3>("axis2",Vector3(0,0,1),0);
+
+            this->loStop1P = new ParamT<Angle>("lowStop1",-M_PI,0);
+            this->hiStop1P = new ParamT<Angle>("highStop1",M_PI,0);
+            this->loStop2P = new ParamT<Angle>("lowStop2",-M_PI,0);
+            this->hiStop2P = new ParamT<Angle>("highStop2",M_PI,0);
+            Param::End();
+          }
 
   /// \brief Destuctor
-  public: virtual ~UniversalJoint();
+  public: virtual ~UniversalJoint()
+          {
+            delete this->axis1P;
+            delete this->axis2P;
+            delete this->loStop1P;
+            delete this->hiStop1P;
+            delete this->loStop2P;
+            delete this->hiStop2P;
+          }
 
   /// \brief Load the joint
-  protected: virtual void LoadChild(XMLConfigNode *node);
+  protected: virtual void Load(XMLConfigNode *node)
+             {
+               this->axis1P->Load(node);
+               this->axis2P->Load(node);
+
+               this->loStop1P->Load(node);
+               this->hiStop1P->Load(node);
+               this->loStop2P->Load(node);
+               this->hiStop2P->Load(node);
+
+               T::Load(node);
+
+               this->SetAxis(0,**(this->axis1P));
+               this->SetAxis(1,**(this->axis1P));
+
+               // Perform this three step ordering to ensure the parameters 
+               // are set properly. This is taken from the ODE wiki.
+               this->SetHighStop(0,**this->hiStop1P);
+               this->SetLowStop(0,**this->loStop1P);
+               this->SetHighStop(0,**this->hiStop1P);
+
+               // Perform this three step ordering to ensure the parameters 
+               // are set properly. This is taken from the ODE wiki.
+               this->SetHighStop(1,**this->hiStop2P);
+               this->SetLowStop(1,**this->loStop2P);
+               this->SetHighStop(1,**this->hiStop2P);
+             }
 
   /// \brief Save a joint to a stream in XML format
-  protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
+  protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream)
+             {
+               T::SaveJoint(prefix, stream);
 
-  /// \brief Get the anchor point
-  public: virtual Vector3 GetAnchor() const;
+               stream << prefix << *(this->axis1P) << "\n";
+               stream << prefix << *(this->loStop1P) << "\n";
+               stream << prefix << *(this->hiStop1P) << "\n";
 
-  /// \brief Get the first axis of rotation
-  public: Vector3 GetAxis1() const;
+               stream << prefix << *(this->axis2P) << "\n";
+               stream << prefix << *(this->loStop2P) << "\n";
+               stream << prefix << *(this->hiStop2P) << "\n";
+             }
 
-  /// \brief Get the second axis of rotation
-  public: Vector3 GetAxis2() const;
-
-  /// \brief Get the angle of axis 1
-  public: double GetAngle1() const;
-
-  /// \brief Get the angle of axis 2
-  public: double GetAngle2() const;
-
-  /// \brief Get the angular rate of axis 1
-  public: double GetAngleRate1() const;
-
-  /// \brief Get the angular rate of axis 2
-  public: double GetAngleRate2() const;
-
-  /// \brief Set the anchor point
-  public: virtual void SetAnchor( const Vector3 &anchor );
-
-  /// \brief Set the first axis of rotation
-  public: void SetAxis1( const Vector3 &axis );
-
-  /// \brief Set the second axis of rotation
-  public: void SetAxis2( const Vector3 &axis );
-
-  /// \brief Set the parameter to value
-  public: virtual void SetParam( int parameter, double value );
-
-  /// \brief Set the torque of a joint.
-  public: virtual void SetTorque(double torque1, double torque2);
-
-  private: ParamT<Vector3> *axis1P;
-  private: ParamT<Vector3> *axis2P;
-  private: ParamT<Angle> *loStop1P;
-  private: ParamT<Angle> *hiStop1P;
-  private: ParamT<Angle> *loStop2P;
-  private: ParamT<Angle> *hiStop2P;
+  protected: ParamT<Vector3> *axis1P;
+  protected: ParamT<Vector3> *axis2P;
+  protected: ParamT<Angle> *loStop1P;
+  protected: ParamT<Angle> *hiStop1P;
+  protected: ParamT<Angle> *loStop2P;
+  protected: ParamT<Angle> *hiStop2P;
 
 };
 

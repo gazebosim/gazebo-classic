@@ -49,7 +49,7 @@
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>1.0</mass>
 
         <mu1>109999.0</mu1>
 

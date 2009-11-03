@@ -84,9 +84,12 @@ void Vector3::Normalize()
 {
   double d = sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 
-  this->x /= d;
-  this->y /= d;
-  this->z /= d;
+  if (d != 0.0)
+  {
+    this->x /= d;
+    this->y /= d;
+    this->z /= d;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -28,6 +28,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <float.h>
 
 #include "OgreVisual.hh"
 #include "GraphicsIfaceHandler.hh"
@@ -40,10 +41,6 @@
 #include "OgreCreator.hh"
 #include "Body.hh"
 #include "HingeJoint.hh"
-#include "Hinge2Joint.hh"
-#include "BallJoint.hh"
-#include "UniversalJoint.hh"
-#include "SliderJoint.hh"
 #include "PhysicsEngine.hh"
 #include "Controller.hh"
 #include "ControllerFactory.hh"
@@ -72,10 +69,10 @@ Model::Model(Model *parent)
                                                    std::string(),0);
 
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
-  this->xyzP->Callback(&Model::SetPosition, this);
+  this->xyzP->Callback(&Entity::SetRelativePosition, (Entity*)this);
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
-  this->rpyP->Callback( &Model::SetRotation, this);
+  this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
   this->enableGravityP = new ParamT<bool>("enableGravity", true, 0);
   this->enableGravityP->Callback( &Model::SetGravityMode, this );
@@ -202,6 +199,9 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   this->SetStatic( **(this->staticP) );
 
+  // Set the relative pose of the model
+  this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP) );
+
   if (this->type == "physical")
     this->LoadPhysical(node);
   else if (this->type == "renderable")
@@ -246,8 +246,8 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   // Get the position and orientation of the model (relative to parent)
   pose.Reset();
-  pose.pos = this->xyzP->GetValue();
-  pose.rot = this->rpyP->GetValue();
+  pose.pos = **this->xyzP;
+  pose.rot = **this->rpyP;
 
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);
@@ -296,16 +296,9 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   std::map<std::string, Joint* >::iterator jointIter;
-  Vector3 pos = this->pose.pos;
 
-  if (this->parent)
-  {
-    Model *pmodel = dynamic_cast<Model*>(this->parent);
-    pos = this->pose.pos - pmodel->GetPose().pos;
-  }
-
-  this->xyzP->SetValue( pos );
-  this->rpyP->SetValue( this->pose.rot );
+  this->xyzP->SetValue( this->GetRelativePose().pos );
+  this->rpyP->SetValue( this->GetRelativePose().rot );
 
   if (this->type=="renderable")
     typeName = "renderable";
@@ -477,15 +470,16 @@ void Model::Update()
     boost::python::call<void>(this->pFuncUpdate, this);
   }*/
 
-  if (!this->canonicalBodyNameP->GetValue().empty())
+  // BULLET:
+  /*if (!this->canonicalBodyNameP->GetValue().empty())
   {
     /// model pose is the canonical body pose of the body + a transform from body frame to model frame
     /// the tranform is defined by initModelOffset in body frame,
 
     /// recover the transform in inertial frame based on body pose
-    this->pose = this->bodies[this->canonicalBodyNameP->GetValue()]->GetPose();
+    this->pose = this->bodies[**this->canonicalBodyNameP]->GetPose();
     Quatern body_rot = this->pose.rot;
-    Pose3d offset_transform = this->bodies[this->canonicalBodyNameP->GetValue()]->initModelOffset;
+    Pose3d offset_transform = this->bodies[**this->canonicalBodyNameP]->initModelOffset;
     Vector3 xyz_offset = (offset_transform.RotatePositionAboutOrigin(body_rot.GetInverse())).pos;
     Quatern q_offset = offset_transform.rot;
 
@@ -495,7 +489,7 @@ void Model::Update()
 
     this->xyzP->SetValue(this->pose.pos);
     this->rpyP->SetValue(this->pose.rot);
-  }
+  }*/
 
   this->UpdateChild();
   
@@ -552,6 +546,7 @@ void Model::Fini()
 // Reset the model
 void Model::Reset()
 {
+  std::cout << "Model[" << this->GetName() << "] Reset\n";
   std::map<std::string, Joint* >::iterator jiter;
   std::map< std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator citer;
@@ -602,8 +597,9 @@ const Pose3d &Model::GetInitPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the current pose
-void Model::SetPose(const Pose3d &setPose)
+/*void Model::SetPose(const Pose3d &setPose)
 {
+  std::cout << "Set model[" << this->GetName() << "] Pose to[" <<setPose<<"]\n";
   Body *body;
   std::map<std::string, Body* >::iterator iter;
 
@@ -641,27 +637,8 @@ void Model::SetPose(const Pose3d &setPose)
       childModel->SetPose(newPose);
     }
   }
-}
+}*/
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set the position of the model
-void Model::SetPosition( const Vector3 &pos)
-{
-  Pose3d pose = this->GetPose();
-  pose.pos = pos;
-
-  this->SetPose(pose);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the rotation of the model
-void Model::SetRotation( const Quatern &rot)
-{
-  Pose3d pose = this->GetPose();
-  pose.rot = rot;
-
-  this->SetPose(pose);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear velocity of the model
@@ -760,13 +737,6 @@ Vector3 Model::GetAngularAccel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the current pose
-Pose3d Model::GetPose() const
-{
-  return this->pose;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the bounding box
 void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
 {
@@ -774,7 +744,7 @@ void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
   std::map<std::string, Body* >::const_iterator iter;
 
   min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  max.Set(0,0,0);
+  max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
   for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
   {
@@ -795,13 +765,6 @@ Body *Model::CreateBody()
 {
   // Create a new body
   return World::Instance()->GetPhysicsEngine()->CreateBody(this);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Create and return a new joint
-Joint *Model::CreateJoint(Joint::Type type)
-{
-  return World::Instance()->GetPhysicsEngine()->CreateJoint(type);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -836,7 +799,6 @@ void Model::LoadBody(XMLConfigNode *node)
 
   // Store the pointer to this body
   this->bodies[body->GetName()] = body;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -847,22 +809,25 @@ void Model::LoadJoint(XMLConfigNode *node)
     gzthrow("Trying to load a joint with NULL XML information");
 
   Joint *joint;
+  Joint::Type jtype;
 
   // Create a Hinge Joint
   if (node->GetName() == "hinge")
-    joint = this->CreateJoint(Joint::HINGE);
+    jtype = Joint::HINGE;
   else if (node->GetName() == "ball")
-    joint = this->CreateJoint(Joint::BALL);
+    jtype = Joint::BALL;
   else if (node->GetName() == "slider")
-    joint = this->CreateJoint(Joint::SLIDER);
+    jtype = Joint::SLIDER;
   else if (node->GetName() == "hinge2")
-    joint = this->CreateJoint(Joint::HINGE2);
+    jtype = Joint::HINGE2;
   else if (node->GetName() == "universal")
-    joint = this->CreateJoint(Joint::UNIVERSAL);
+    jtype = Joint::UNIVERSAL;
   else
   {
     gzthrow("Uknown joint[" + node->GetName() + "]\n");
   }
+
+  joint = World::Instance()->GetPhysicsEngine()->CreateJoint(jtype);
 
   joint->SetModel(this);
 
@@ -1007,7 +972,7 @@ void Model::Attach(XMLConfigNode *node)
   if (parentModel == NULL)
     gzthrow("Parent cannot be NULL when attaching two models");
 
-  this->joint = (HingeJoint*)this->CreateJoint(Joint::HINGE);
+  this->joint =World::Instance()->GetPhysicsEngine()->CreateJoint(Joint::HINGE);
 
   Body *myBody = this->GetBody(**(this->myBodyNameP));
   Body *pBody = parentModel->GetBody(**(this->parentBodyNameP));
@@ -1019,10 +984,10 @@ void Model::Attach(XMLConfigNode *node)
     gzthrow("Parent has no canonical body");
 
   this->joint->Attach(myBody, pBody);
-  this->joint->SetAnchor( myBody->GetPosition() );
-  this->joint->SetAxis( Vector3(0,1,0) );
-  this->joint->SetParam( dParamHiStop, 0);
-  this->joint->SetParam( dParamLoStop, 0);
+  this->joint->SetAnchor(0, myBody->GetAbsPose().pos );
+  this->joint->SetAxis(0, Vector3(0,1,0) );
+  this->joint->SetHighStop(0,Angle(0));
+  this->joint->SetLowStop(0,Angle(0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1132,7 +1097,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
   sprintf(lightNumBuf, "%d", lightNumber++);
   body->SetName(this->GetName() + "_RenderableBody_" + lightNumBuf);
   //body->SetGravityMode(false);
-  body->SetPose(Pose3d());
+  body->SetRelativePose(Pose3d());
   this->bodies[body->GetName()] = body;
 
   if (Simulator::Instance()->GetRenderEngineEnabled() && 
@@ -1188,45 +1153,24 @@ void Model::LoadPhysical(XMLConfigNode *node)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
-// Get the list of model interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
-void Model::GetModelInterfaceNames(std::vector<std::string>& list) const{
+////////////////////////////////////////////////////////////////////////////////
+/// Get the list of model interfaces 
+/// e.g "pioneer2dx_model1::laser::laser_iface0->laser"
+void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
+{
+  std::map< std::string, Body* >::const_iterator biter;
+  std::map<std::string, Controller* >::const_iterator contIter;
 
-	    
-	    //std::vector<Entity*>::iterator eiter;
-	    std::map<std::string, Controller* >::const_iterator contIter;
+  for (contIter=this->controllers.begin();
+      contIter!=this->controllers.end(); contIter++)
+  {
+    contIter->second->GetInterfaceNames(list);	
 
-  	    for (contIter=this->controllers.begin();
-       			contIter!=this->controllers.end(); contIter++)
-  	    {
-		contIter->second->GetInterfaceNames(list);	
-    			
-  	    }
+  }
 
+  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  {
 
-	    std::map< std::string, Body* >::const_iterator biter;
-
-  	    for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
-  	    {
-
-		biter->second->GetInterfaceNames(list);
-  		
-
-  	    }
-   	
-
-	 	    
-/*
-	    for (eiter=this->GetChildren().begin();  eiter!=this->GetChildren().end(); eiter++)
-  	    {
-		Model* m;
-		m = dynamic_cast<Model*>(*eiter);
-		if(m)
-		  m->GetModelInterfaceNames(list);
-
-	    }
-*/
-	  
+    biter->second->GetInterfaceNames(list);
+  }
 }
-
-

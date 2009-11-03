@@ -36,6 +36,8 @@
 
 using namespace gazebo;
 
+std::string Joint::TypeNames[Joint::TYPE_COUNT] = {"slider", "hinge", "hinge2", "ball", "universal"};
+
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 Joint::Joint()
@@ -59,6 +61,8 @@ Joint::Joint()
 
   this->body1 = NULL;
   this->body2 = NULL;
+
+  this->physics = World::Instance()->GetPhysicsEngine();
 }
 
 
@@ -66,7 +70,6 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
-  dJointDestroy( this->jointId );
   delete this->erpP;
   delete this->cfmP;
   delete this->stopKpP;
@@ -105,41 +108,29 @@ void Joint::Load(XMLConfigNode *node)
   this->provideFeedbackP->Load(node);
   this->fudgeFactorP->Load(node);
 
-  Body *body1 = this->model->GetBody( **(this->body1NameP));
-  Body *body2 = this->model->GetBody(**(this->body2NameP));
+  std::ostringstream visname;
+  visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
+
+  this->body1 = this->model->GetBody( **(this->body1NameP));
+  this->body2 = this->model->GetBody(**(this->body2NameP));
+
   Body *anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
 
-  if (!body1 && this->body1NameP->GetValue() != std::string("world"))
+  if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
 
-  if (!body2 && this->body2NameP->GetValue() != std::string("world"))
+  if (!this->body2 && this->body2NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
   // setting anchor relative to gazebo body frame origin
-  Vector3 anchorVec = anchorBody->GetPose().pos + **(this->anchorOffsetP);
+  this->anchorPos = anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
 
-  double h = World::Instance()->GetPhysicsEngine()->GetStepTime();
-  double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
-  double stopCfm = 1.0 / (h * (**this->stopKpP) + (**this->stopKdP));
-  this->SetParam(dParamStopERP, stopErp);
-  this->SetParam(dParamStopCFM, stopCfm);
-
-  // Set joint parameters
-  this->SetParam(dParamSuspensionERP, **(this->erpP));
-  this->SetParam(dParamCFM, **(this->cfmP));
-  this->SetParam(dParamFudgeFactor, **(this->fudgeFactorP));
-  this->SetParam(dParamVel,0);
-  this->SetParam(dParamFMax,0);
-  this->SetParam(dParamBounce, 0);
-
-  this->Attach(body1,body2);
-
-  std::ostringstream visname;
-  visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
+  this->Attach(this->body1, this->body2);
 
   /// Add a renderable for the joint
   this->visual = OgreCreator::Instance()->CreateVisual(
       visname.str(), NULL);
+
   if (this->visual)
   {
     this->visual->SetCastShadows(false);
@@ -162,18 +153,10 @@ void Joint::Load(XMLConfigNode *node)
     this->line2->AddPoint(Vector3(0,0,0));
   }
 
-  if (**this->provideFeedbackP)
-  {
-    this->feedback = new dJointFeedback;
-    dJointSetFeedback(this->jointId, this->feedback);
-  }
-
-  this->LoadChild(node);
-
   // Set the anchor vector
   if (anchorBody)
   {
-    this->SetAnchor(anchorVec);
+    this->SetAnchor(0, this->anchorPos);
   }
 }
 
@@ -185,11 +168,24 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 
   switch (this->type)
   {
-    case SLIDER: typeName="slider"; break;
-    case HINGE: typeName = "hinge"; break;
-    case HINGE2: typeName = "hinge2"; break;
-    case BALL: typeName = "ball"; break;
-    case UNIVERSAL: typeName = "universal"; break;
+    case SLIDER: 
+      typeName="slider"; 
+      break;
+    case HINGE: 
+      typeName = "hinge"; 
+      break;
+    case HINGE2: 
+      typeName = "hinge2"; 
+      break;
+    case BALL: 
+      typeName = "ball"; 
+      break;
+    case UNIVERSAL: 
+      typeName = "universal"; 
+      break;
+    default:
+      gzthrow("Unable to save joint of type[" << this->type << "]\n");
+      break;
   }
 
   stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
@@ -202,8 +198,9 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->cfmP) << "\n";
   stream << prefix << "  " << *(this->fudgeFactorP) << "\n";
 
+  this->SaveJoint(prefix, stream);
+
   std::string p = prefix + "  ";
-  this->SaveChild(p,stream);
 
   stream << prefix << "</joint:" << typeName << ">\n";
 }
@@ -219,23 +216,26 @@ void Joint::Update()
   if (!World::Instance()->GetShowJoints())
     return;
 
-  if (this->visual)
-    this->visual->SetPosition(this->GetAnchor());
-
   Vector3 start;
   if (this->body1)
   {
-    start = this->body1->GetPose().pos - this->GetAnchor();
+    start = this->body1->GetAbsPose().pos - this->GetAnchor(0);
 
     if (this->line1)
-      this->line1->SetPoint(0, start);
+    {
+      this->line1->SetPoint(0, this->body1->GetAbsPose().pos);
+      this->line1->SetPoint(1, this->GetAnchor(0));
+    }
   }
 
   if (this->body2)
   {
-    start = this->body2->GetPose().pos - this->GetAnchor();
+    start = this->body2->GetAbsPose().pos - this->GetAnchor(0);
     if (this->line2)
-      this->line2->SetPoint(0, start);
+    {
+      this->line2->SetPoint(0, this->body2->GetAbsPose().pos);
+      this->line2->SetPoint(1, this->GetAnchor(0));
+    }
   }
 }
 
@@ -243,7 +243,14 @@ void Joint::Update()
 /// \brief Reset the joint
 void Joint::Reset()
 {
-  this->ResetChild();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// \brief Attach the two bodies with this joint
+void Joint::Attach( Body *one, Body *two )
+{
+  this->body1 = one;
+  this->body2 = two;
 }
 
 
@@ -252,172 +259,4 @@ void Joint::Reset()
 void Joint::SetModel(Model *model)
 {
   this->model = model;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Get the body to which the joint is attached according the _index
-Body *Joint::GetJointBody( int index ) const
-{
-  Body *result=0;
-
-  if ( index==0 || index==1 )
-  {
-    if (this->body1 &&
-        dJointGetBody( this->jointId, index ) == this->body1->GetId())
-      result = this->body1;
-    else if (this->body2)
-      result = this->body2;
-  }
-
-  return result;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Determines of the two bodies are connected by a joint
-bool Joint::AreConnected( Body *one, Body *two ) const
-{
-  return dAreConnected( one->GetId(), two->GetId() );
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// The default function does nothing. This should be overriden in the
-// child classes where appropriate
-double Joint::GetParam( int /*parameter*/ ) const
-{
-  return 0;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Make this joint a fixed joint, use this only when absolutely necessary
-void Joint::SetFixed()
-{
-  dJointSetFixed( this->jointId );
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Attach the two bodies with this joint
-void Joint::Attach( Body *one, Body *two )
-{
-  if (!one && two)
-  {
-    dJointAttach( this->jointId, 0, two->GetId() );
-    this->body2 = two;
-  }
-  else if (one && !two)
-  {
-    dJointAttach( this->jointId, one->GetId(), 0 );
-    this->body1 = one;
-  }
-  else if (one && two)
-  {
-    dJointAttach( this->jointId, one->GetId(), two->GetId() );
-    this->body1 = one;
-    this->body2 = two;
-  }
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Detach this joint from all bodies
-void Joint::Detach()
-{
-  this->body1 = NULL;
-  this->body2 = NULL;
-  dJointAttach( this->jointId, 0, 0 );
-  return;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// By default this does nothing. It should be overridden in child classes
-// where appropriate
-void Joint::SetParam(int /*parameter*/, double /*value*/)
-{
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Get the name of this joint
-std::string Joint::GetName() const
-{
-  return this->nameP->GetValue();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the name of this joint
-void Joint::SetName(const std::string &newName)
-{
-  this->nameP->SetValue(newName);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the ERP of this joint
-void Joint::SetERP(double newERP)
-{
-  this->SetParam(dParamSuspensionERP, newERP);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ERP of this joint
-double Joint::GetERP()
-{
-  return this->GetParam(dParamSuspensionERP);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the CFM of this joint
-void Joint::SetCFM(double newCFM)
-{
-  this->SetParam(dParamSuspensionCFM, newCFM);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ERP of this joint
-double Joint::GetCFM()
-{
-  return this->GetParam(dParamSuspensionCFM);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the feedback data structure for this joint, if set
-dJointFeedback *Joint::GetFeedback()
-{
-  return dJointGetFeedback(this->jointId);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the high stop of an axis(index).
-double Joint::GetHighStop(int index)
-{
-  switch (index)
-  {
-    case 0:
-      return this->GetParam(dParamHiStop);
-    case 1:
-      return this->GetParam(dParamHiStop2);
-    case 2:
-      return this->GetParam(dParamHiStop3);
-  };
-
-  return 0;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the low stop of an axis(index).
-double Joint::GetLowStop(int index)
-{
-  switch (index)
-  {
-    case 0:
-      return this->GetParam(dParamLoStop);
-    case 1:
-      return this->GetParam(dParamLoStop2);
-    case 2:
-      return this->GetParam(dParamLoStop3);
-  };
-
-  return 0;
 }

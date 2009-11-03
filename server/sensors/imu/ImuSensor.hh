@@ -30,41 +30,37 @@
 namespace gazebo
 {
 
-class XMLConfigNode;
-class ImuSensor: public Sensor
-{
-  /// \brief Constructor
-  /// \param body The IMU sensor must be attached to a body.
-  public: ImuSensor(Body *body);
-
-  /// \brief Destructor
-  public: virtual ~ImuSensor();
-
-  /// \param node The XMLConfig node
-  protected: virtual void LoadChild(XMLConfigNode *node);
-
-  /// \brief Save the sensor info in XML format
-  protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
-
-  /// Initialize the ray
-  protected: virtual void InitChild();
-
-  ///  Update sensed values
-  protected: virtual void UpdateChild();
+  class XMLConfigNode;
+  class ImuSensor: public Sensor
+  {
+    /// \brief Constructor
+    /// \param body The IMU sensor must be attached to a body.
+    public: ImuSensor(Body *body);
   
-  /// Finalize the ray
-  protected: virtual void FiniChild();
-
-  public: Pose3d GetVelocity();
-
-  private: Pose3d prevPose;
-  private: Pose3d imuVel;
-/*
-  private: ParamT<int> *rayCountP;
-  private: ParamT<int> *rangeCountP;
-*/
+    /// \brief Destructor
+    public: virtual ~ImuSensor();
   
-
-};
+    /// \param node The XMLConfig node
+    protected: virtual void LoadChild(XMLConfigNode *node);
+  
+    /// \brief Save the sensor info in XML format
+    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
+  
+    /// Initialize the ray
+    protected: virtual void InitChild();
+  
+    ///  Update sensed values
+    protected: virtual void UpdateChild();
+    
+    /// Finalize the ray
+    protected: virtual void FiniChild();
+  
+    public: Pose3d GetVelocity();
+  
+    private: Pose3d prevPose;
+    private: Pose3d imuVel;
+  
+  };
+}
 
 #endif

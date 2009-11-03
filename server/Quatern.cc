@@ -156,6 +156,16 @@ void Quatern::SetFromAxis(double ax, double ay, double az, double aa)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set this quaternion from another
+void Quatern::Set(double u, double x, double y, double z)
+{
+  this->u = u;
+  this->x = x;
+  this->y = y;
+  this->z = z;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Set the quaternion from Euler angles
 void Quatern::SetFromEuler(const Vector3 &vec)
 {
@@ -256,6 +266,23 @@ Quatern Quatern::operator+( const Quatern &qt ) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Addition operator
+Quatern Quatern::operator+=( const Quatern &qt ) 
+{
+  *this = *this + qt;
+
+  return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Subtraction operator
+Quatern Quatern::operator-=( const Quatern &qt )
+{
+  *this = *this - qt;
+  return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Substraction operator
 Quatern Quatern::operator-( const Quatern &qt ) const
 {
@@ -276,6 +303,25 @@ Quatern Quatern::operator*( const Quatern &qt ) const
   c.u = this->u * qt.u - this->x * qt.x - this->y * qt.y - this->z * qt.z;
 
   return c;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Multiplication operator
+Quatern Quatern::operator*=( const Quatern &qt )
+{
+  *this = *this * qt;
+  return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Rotate a vector 
+Vector3 Quatern::operator*( const Vector3 &v ) const
+{
+  Quatern tmp(0.0, v.x, v.y, v.z);
+  
+  tmp = (*this) * (tmp * this->GetInverse());
+
+  return Vector3(tmp.x, tmp.y, tmp.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

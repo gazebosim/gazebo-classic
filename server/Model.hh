@@ -52,7 +52,6 @@ namespace gazebo
   class XMLConfigNode;
   class Body;
   class Controller;
-  class HingeJoint;
   class GraphicsIfaceHandler;
   class Sensor;
   class Geom;
@@ -111,15 +110,6 @@ namespace gazebo
     /// \brief Get the initial pose
     public: const Pose3d &GetInitPose() const;
   
-    /// \brief Set the current pose
-    public: void SetPose(const Pose3d &pose);
-
-    /// \brief Set the position of the model
-    public: void SetPosition( const Vector3 &pos );
-
-    /// \brief Set the rotation of the model
-    public: void SetRotation( const Quatern &rot );
-
     /// \brief Set the linear velocity of the model
     public: void SetLinearVel( const Vector3 &vel );
 
@@ -144,20 +134,12 @@ namespace gazebo
     /// \brief Get the angular acceleration of the model
     public: Vector3 GetAngularAccel() const;
  
-    /// \brief Get the current pose
-    public: virtual Pose3d GetPose() const;
-
     /// \brief Get the size of the bounding box
     public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;
   
     /// \brief Create and return a new body
     /// \return Pointer to a new body.
     public: Body *CreateBody();
-  
-    /// \brief Create and return a new joint
-    /// \param type Type of the joint.
-    /// \return Pointer to a new joint.
-    public: Joint *CreateJoint(Joint::Type type);
   
     /// \brief Get a joint
     /// \param name The name of the joint, specified in the world file
@@ -235,10 +217,7 @@ namespace gazebo
   
     /// \brief Initial pose of the model
     private: Pose3d initPose;
-  
-    /// \brief Current pose
-    private: Pose3d pose;
-  
+ 
     /// \brief Map of the bodies. std::string == body_name
     protected: std::map<std::string, Body* > bodies;
   
@@ -249,7 +228,7 @@ namespace gazebo
     protected: std::map<std::string, Controller* > controllers;
   
     /// \brief Joint used to connected models (parent->child).
-    private: HingeJoint *joint;
+    private: Joint *joint;
   
     /// \brief Light numbering variable to give a unique name to all light entities
     private: static uint lightNumber;

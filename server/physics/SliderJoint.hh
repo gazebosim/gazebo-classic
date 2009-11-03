@@ -27,10 +27,9 @@
 #ifndef SLIDERJOINT_HH
 #define SLIDERJOINT_HH
 
+#include <float.h>
 #include "Param.hh"
 #include "Joint.hh"
-
-class JointGroup;
 
 namespace gazebo
 {
@@ -84,47 +83,64 @@ namespace gazebo
 /// \{
 
   /// \brief A slider joint
-  class SliderJoint : public Joint
+  template<class T>
+  class SliderJoint : public T
   {
     /// \brief Constructor
-    public: SliderJoint( dWorldID worldId );
-  
+    public: SliderJoint( ) : T()
+            {
+              this->type = Joint::SLIDER;
+
+              Param::Begin(&this->parameters);
+              this->axisP = new ParamT<Vector3>("axis",Vector3(0,0,1), 0);
+              this->loStopP = new ParamT<double>("lowStop",-DBL_MAX,0);
+              this->hiStopP = new ParamT<double>("highStop",DBL_MAX,0);
+              Param::End();
+            } 
+
     /// \brief Destructor
-    public: virtual ~SliderJoint();
-  
+    public: virtual ~SliderJoint()
+            {
+              delete this->axisP;
+              delete this->loStopP;
+              delete this->hiStopP;
+            }
+
     /// \brief Load the joint
-    protected: virtual void LoadChild(XMLConfigNode *node);
+    protected: virtual void Load(XMLConfigNode *node)
+               {
+                 this->axisP->Load(node);
+                 this->loStopP->Load(node);
+                 this->hiStopP->Load(node);
+
+                 T::Load(node);
+
+                 this->SetAxis(0, **(this->axisP));
+
+                 // Perform this three step ordering to ensure the parameters 
+                 // are set properly. This is taken from the ODE wiki.
+                 this->SetHighStop(0,**(this->hiStopP));
+                 this->SetLowStop(0,**(this->loStopP));
+                 this->SetHighStop(0,**(this->hiStopP));
+               }
   
     /// \brief Save a joint to a stream in XML format
-    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
-  
-    /// \brief Get the axis of rotation
-    public: Vector3 GetAxis() const;
-  
-    /// \brief Get the position of the joint
-    public: double GetPosition() const;
-  
-    /// \brief Get the rate of change
-    public: double GetPositionRate() const;
-  
-    /// \brief Get the _parameter
-    public: virtual double GetParam( int parameter ) const;
-  
-    /// \brief Set the axis of motion
-    public: void SetAxis( const Vector3 &axis );
-  
-    /// \brief Set the _parameter
-    public: virtual void SetParam( int parameter, double value);
-  
+    protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream)
+               {
+                 T::SaveJoint(prefix, stream);
+                 stream << prefix << *(this->axisP) << "\n";
+                 stream << prefix << *(this->loStopP) << "\n";
+                 stream << prefix << *(this->hiStopP) << "\n";
+               }
     /// \brief Set the anchor
-    public: virtual void SetAnchor( const Vector3 &anchor) {}
-  
-    /// \brief Set the slider force
-    public: void SetSliderForce(double force);
-  
-    private: ParamT<Vector3> *axisP;
-    private: ParamT<double> *loStopP;
-    private: ParamT<double> *hiStopP; 
+    public: virtual void SetAnchor( int index, const Vector3 &anchor) {}
+
+    /// \brief Get the anchor
+    public: virtual Vector3 GetAnchor(int index) const {return Vector3();}
+ 
+    protected: ParamT<Vector3> *axisP;
+    protected: ParamT<double> *loStopP;
+    protected: ParamT<double> *hiStopP; 
   };
   
 /// \}

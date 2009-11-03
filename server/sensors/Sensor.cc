@@ -227,7 +227,7 @@ bool Sensor::IsActive()
 /// Get the current pose
 Pose3d Sensor::GetPose() const
 {
-  return this->body->GetPose();
+  return this->body->GetAbsPose();
 }
 ///////////////////////////////////////////////////////////////////////////////
 /// Get the name of the interfaces define in the sensor controller

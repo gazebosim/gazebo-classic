@@ -106,8 +106,6 @@ void IR_Array::FiniChild()
 // Put laser data to the interface
 void IR_Array::PutIRData()
 {
-
-
   if (this->irIface->Lock(1))
   {
     // Data timestamp
@@ -115,15 +113,21 @@ void IR_Array::PutIRData()
     
     this->irIface->data->ir_count = this->myParent->GetIRCount();
     
-    this->irIface->data->range_count=this->myParent->GetIRCount();
+    this->irIface->data->range_count = this->myParent->GetIRCount();
     
     for(int i=0;i<this->irIface->data->ir_count;i++)
     {
-       this->irIface->data->ranges[i]=this->myParent->GetRange(i);
-       this->irIface->data->poses[i] = this->myParent->GetPose(i);
-    }
-    
+       this->irIface->data->ranges[i] = this->myParent->GetRange(i);
+       Pose3d pose = this->myParent->GetPose(i);
 
+       this->irIface->data->poses[i].pos.x = pose.pos.x;
+       this->irIface->data->poses[i].pos.y = pose.pos.y;
+       this->irIface->data->poses[i].pos.z = pose.pos.z;
+
+       this->irIface->data->poses[i].roll = pose.rot.GetRoll();
+       this->irIface->data->poses[i].pitch = pose.rot.GetPitch();
+       this->irIface->data->poses[i].yaw = pose.rot.GetYaw();
+    }
 
     this->irIface->Unlock();
 

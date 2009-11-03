@@ -35,7 +35,7 @@
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "PhysicsEngine.hh"
-#include "ODEPhysics.hh"
+#include "PhysicsFactory.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Simulator.hh"
@@ -63,6 +63,8 @@ World::World()
   this->server = NULL;
   this->graphics = NULL;
   this->openAL = NULL;
+
+  PhysicsFactory::RegisterAll();
   this->factory = NULL;
 
 #ifdef USE_THREADPOOL
@@ -179,7 +181,9 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
     this->openAL->Load(rootNode->GetChild("openal", "audio"));
   }
 
-  this->physicsEngine = new ODEPhysics(); //TODO: use exceptions here
+  XMLConfigNode *physicsNode = rootNode->GetChildByNSPrefix("physics");
+  if (Simulator::Instance()->GetPhysicsEnabled() && physicsNode)
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( physicsNode->GetName());
 
   this->LoadEntities(rootNode, NULL, false);
 
@@ -500,7 +504,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
   model->Load( node, removeDuplicate );
 
   // Set the model's pose (relative to parent)
-  this->SetModelPose(model, model->GetInitPose());
+  //this->SetModelPose(model, model->GetInitPose());
 
   // Add the model to our list
   this->models.push_back(model);
@@ -519,6 +523,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
 // Set the model pose and the pose of it's attached children
 void World::SetModelPose(Model *model , Pose3d pose)
 {
+  /*printf("World::SetModelPose\n");
   std::vector<Entity*>::iterator iter;
   Pose3d origPose, newPose, childPose;
   Model *parent = dynamic_cast<Model*>(model->GetParent());
@@ -555,6 +560,7 @@ void World::SetModelPose(Model *model , Pose3d pose)
   }
 
   model->SetPose(newPose);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -772,7 +778,7 @@ void World::UpdateSimulationIface()
                   req->modelPose.roll, 
                   req->modelPose.pitch,
                   req->modelPose.yaw));
-            model->SetPose(pose);
+            model->SetAbsPose(pose);
 
             linearVel = pose.rot.RotateVector(linearVel);
             angularVel = pose.rot.RotateVector(angularVel);
@@ -809,7 +815,7 @@ void World::UpdateSimulationIface()
                 Vector3(req->modelPose.roll, 
                   req->modelPose.pitch,
                   req->modelPose.yaw));
-            model->SetPose(pose);
+            model->SetAbsPose(pose);
           }
           else
           {
@@ -961,7 +967,7 @@ void World::UpdateSimulationIface()
             Vector3 linearAccel;
             Vector3 angularAccel;
 
-            pose = model->GetPose();
+            pose = model->GetAbsPose();
 
             // Get the model's linear and angular velocity
             linearVel = model->GetLinearVel();
@@ -1009,7 +1015,7 @@ void World::UpdateSimulationIface()
           Model *model = this->GetModelByName((char*)req->modelName);
           if (model)
           {
-            Pose3d pose = model->GetPose();
+            Pose3d pose = model->GetAbsPose();
             Vector3 rot = pose.rot.GetAsEuler();
 
             response->type = req->type;
@@ -1253,7 +1259,7 @@ void World::UpdateSimulationIface()
           Model *model = this->GetModelByName((char*)req->modelName);
           if (model)
           {
-            Pose3d pose = model->GetPose();
+            Pose3d pose = model->GetAbsPose();
             Vector3 rot = pose.rot.GetAsEuler();
 
             pose.pos.x = req->modelPose.pos.x;
@@ -1261,7 +1267,7 @@ void World::UpdateSimulationIface()
 
             pose.rot.SetFromEuler(Vector3(rot.x, rot.y,
                   req->modelPose.yaw));
-            model->SetPose(pose);
+            model->SetAbsPose(pose);
           }
           else
           {

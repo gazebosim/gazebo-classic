@@ -33,7 +33,7 @@
 
 namespace gazebo
 {
-  class HingeJoint;
+  class Joint;
   class PTZIface;
 
 /// @addtogroup gazebo_controller
@@ -99,10 +99,10 @@ namespace gazebo
     private: Model *myParent;
 
     /// Pan joint
-    private: HingeJoint *panJoint;
+    private: Joint *panJoint;
 
     /// Tilt joint
-    private: HingeJoint *tiltJoint;
+    private: Joint *tiltJoint;
 
     private: float cmdTilt;
     private: float cmdPan;

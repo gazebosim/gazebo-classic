@@ -90,8 +90,6 @@
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
-    
-
   </geom:cylinder>
 </body:cylinder>
 
@@ -100,6 +98,7 @@
   <rpy>0 90 90</rpy>
 
   <geom:cylinder name="right_wheel_geom">
+    <rpy>0 0 0</rpy>
     <size>0.075 0.05</size>
     <mass>0.5</mass>
     <mu1>0.5</mu1>
@@ -125,6 +124,7 @@
       <mesh>unit_cylinder</mesh>
       <material>Gazebo/Black</material>
     </visual>
+
   </geom:cylinder>
 
 </body:cylinder>
@@ -173,7 +173,7 @@
   <cfm>10e-5</cfm>
 </joint:ball>
 
-<controller:differential_position2d name="controller1">
+<!--<controller:differential_position2d name="controller1">
   <leftJoint>left_wheel_hinge</leftJoint>
   <rightJoint>right_wheel_hinge</rightJoint>
   <wheelSeparation>0.39</wheelSeparation>
@@ -181,6 +181,7 @@
   <torque>5</torque>
   <interface:position name="position_iface_0"/>
 </controller:differential_position2d>
+-->
 
 
 </model:physical>

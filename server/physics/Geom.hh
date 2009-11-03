@@ -27,16 +27,15 @@
 #ifndef GEOM_HH
 #define GEOM_HH
 
-#include <ode/ode.h>
-
+#include "Shape.hh"
 #include "Param.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Vector3.hh"
+#include "Mass.hh"
 
 namespace gazebo
 {
-
   class Model;
   class Body;
   class ContactParams;
@@ -51,7 +50,6 @@ namespace gazebo
   /// \brief Base class for all geoms
   class Geom : public Entity
   {
-  
     /// \brief Constructor
     //public: Geom(Body *body, const std::string &name);
     public: Geom(Body *body);
@@ -60,66 +58,30 @@ namespace gazebo
     public: virtual ~Geom();
 
     /// \brief Load the geom
-    public: virtual void Load(XMLConfigNode *node);
+    public: void Load(XMLConfigNode *node);
 
     /// \brief Load the geom
-    public: virtual void Save(std::string &prefix, std::ostream &stream);
-
-    /// \brief Save child parameters
-    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream) = 0;
-
-    /// \brief Load child class
-    protected: virtual void LoadChild(XMLConfigNode *node) = 0;
-  
+    public: void Save(std::string &prefix, std::ostream &stream);
+ 
     /// \brief Set the encapsulated geometry object
-    public: void SetGeom(dGeomID geomId, bool placeable);
+    public: void SetGeom(bool placeable);
   
     /// \brief Update function for geoms
     public: void Update();
-
-    /// \brief Update child class
-    public: virtual void UpdateChild() {};
-  
-    /// \brief Return the geom id
-    /// \return The geom id
-    public: dGeomID GetGeomId() const;
-  
-    /// \brief Return the transform id
-    /// \return The transform id
-    public: dGeomID GetTransId() const;
-  
-    /// \brief Get the ODE geom class
-    public: int GetGeomClass() const;
-  
+ 
     /// \brief Return whether this geom is placeable
     public: bool IsPlaceable() const;
-  
-    /// \brief Set the pose
-    /// \param pose New pose
-    /// \param updateCoM True to update the bodies Center of Mass
-    public: void SetPose(const Pose3d &pose, bool updateCoM=true);
-  
-    /// \brief Return the pose of the geom
-    public: virtual Pose3d GetPose() const;
-  
-    /// \brief Set the position
-    /// \param pos Vector3 position
-    public: void SetPosition(const Vector3 &pos);
-  
-    /// \brief Set the rotation
-    /// \param rot Quaternion rotation
-    public: void SetRotation(const Quatern &rot);
-  
+    
     /// \brief Set the category bits, used during collision detection
     /// \param bits The bits
-    public: void SetCategoryBits(unsigned int bits);
+    public: virtual void SetCategoryBits(unsigned int bits) = 0;
   
     /// \brief Set the collide bits, used during collision detection
     /// \param bits The bits
-    public: void SetCollideBits(unsigned int bits);
+    public: virtual void SetCollideBits(unsigned int bits) = 0;
   
     /// \brief Get the mass of the geom
-    public: const dMass *GetBodyMassMatrix();
+    public: virtual Mass GetBodyMassMatrix() = 0;
   
     /// \brief Set the laser fiducial integer id
     public: void SetLaserFiducialId(int id);
@@ -145,6 +107,9 @@ namespace gazebo
     /// \brief Set the mass
     public: void SetMass(const double &mass);
 
+    /// \brief Set the mass
+    public: void SetMass(const Mass &mass);
+
     /// \brief Get the number of visuals
     public: unsigned int GetVisualCount() const;
 
@@ -164,40 +129,41 @@ namespace gazebo
     public: void SetFrictionMode( const bool &v );
 
     /// \brief Get the bounding box for this geom
-    public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;
+    public: virtual void GetBoundingBox(Vector3 &min, Vector3 &max) const = 0;
+
+    /// \brief Get a pointer to the mass
+    public: const Mass &GetMass() const;
+
+    /// \brief Get the shape type
+    public: Shape::Type GetType();
+
+    /// \brief Set the shape for this geom
+    public: void SetShape(Shape *shape);
+            
+    /// \brief Get the attached shape
+    public: Shape *GetShape() const;
+
+    /// \brief Create the bounding box for the geom
+    private: void CreateBoundingBox();
 
     ///  Contact parameters
     public: ContactParams *contact; 
-    ///  Save Contact Joint ID
-    public: dJointID cID; 
-  
+ 
     /// The body this geom belongs to
     protected: Body *body;
   
-    private: bool placeable;
+    protected: bool placeable;
 
-    /// ID for the transform geom
-    protected: dGeomID transId;
-
-    ///  ID for the sub-geom
-    protected: dGeomID geomId;
-  
-    private: static int geomIdCounter;
-  
-    ///  Mass of this geometry
-    protected: dMass mass;
-
-    /// mass of the body
-    protected: dMass bodyMass;
+    protected: Mass mass;
 
     private: ParamT<int> *laserFiducialIdP;
     private: ParamT<float> *laserRetroP;
 
     ///  Mass as a double
-    protected: ParamT<double> *massP;
+    private: ParamT<double> *massP;
 
-    private: ParamT<Vector3> *xyzP;
-    private: ParamT<Quatern> *rpyP;
+    protected: ParamT<Vector3> *xyzP;
+    protected: ParamT<Quatern> *rpyP;
 
     /// Special bounding box visual
     private: OgreVisual *bbVisual;
@@ -212,8 +178,9 @@ namespace gazebo
 
     private: std::string typeName;
 
-    private: PhysicsEngine *physicsEngine;
+    protected: PhysicsEngine *physicsEngine;
 
+    protected: Shape *shape;
   };
 
   /// \}

@@ -26,6 +26,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Shape.hh"
 #include "PhysicsEngine.hh"
 
 using namespace gazebo;
@@ -88,4 +89,15 @@ void PhysicsEngine::LockMutex()
 void PhysicsEngine::UnlockMutex()
 {
   this->mutex->unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Create a geom
+Geom *PhysicsEngine::CreateGeom(std::string typeName, Body *body)
+{
+  for (unsigned int i = 0; i < Shape::TYPE_COUNT; i++)
+    if (typeName == Shape::TypeNames[i])
+      return this->CreateGeom( (Shape::Type)i, body );
+
+  return NULL; 
 }

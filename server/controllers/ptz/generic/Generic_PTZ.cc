@@ -35,7 +35,7 @@
 #include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
-#include "HingeJoint.hh"
+#include "Joint.hh"
 #include "Generic_PTZ.hh"
 
 using namespace gazebo;
@@ -95,8 +95,8 @@ void Generic_PTZ::LoadChild(XMLConfigNode *node)
   this->motionGainP->Load(node);
   this->forceP->Load(node);
 
-  this->panJoint = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->panJointNameP->GetValue()));
-  this->tiltJoint = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->tiltJointNameP->GetValue()));
+  this->panJoint = this->myParent->GetJoint(**this->panJointNameP);
+  this->tiltJoint = this->myParent->GetJoint(**this->tiltJointNameP);
 
   if (!this->panJoint)
     gzthrow("couldn't get pan hinge joint");
@@ -162,8 +162,8 @@ void Generic_PTZ::UpdateChild()
 
     // Set the pan and tilt motors; can't set angles so track cmds with
     // a proportional control
-    tiltSpeed = this->cmdTilt - this->tiltJoint->GetAngle();
-    panSpeed = this->cmdPan - this->panJoint->GetAngle();
+    tiltSpeed = this->cmdTilt - this->tiltJoint->GetAngle(0).GetAsRadian();
+    panSpeed = this->cmdPan - this->panJoint->GetAngle(0).GetAsRadian();
   }
   else
   {
@@ -174,18 +174,18 @@ void Generic_PTZ::UpdateChild()
   this->ptzIface->Unlock();
 
   if (fabs(tiltSpeed) > 0.01)
-    this->tiltJoint->SetParam( dParamVel, **(this->motionGainP) * tiltSpeed);
+    this->tiltJoint->SetVelocity( 0, **(this->motionGainP) * tiltSpeed);
   else
-    this->tiltJoint->SetParam( dParamVel, 0);
+    this->tiltJoint->SetVelocity( 0, 0);
 
-  this->tiltJoint->SetParam( dParamFMax, **(this->forceP) );
+  this->tiltJoint->SetMaxForce( 0, **(this->forceP) );
 
   if (fabs(panSpeed) > 0.01)
-    this->panJoint->SetParam( dParamVel, **(this->motionGainP) * panSpeed);
+    this->panJoint->SetVelocity( 0, **(this->motionGainP) * panSpeed);
   else
-    this->panJoint->SetParam( dParamVel, 0);
+    this->panJoint->SetVelocity( 0, 0);
 
-  this->panJoint->SetParam( dParamFMax, **(this->forceP) );
+  this->panJoint->SetMaxForce( 0, **(this->forceP) );
 
   this->PutPTZData();
 }
@@ -207,8 +207,8 @@ void Generic_PTZ::PutPTZData()
   // Data timestamp
   data->head.time = Simulator::Instance()->GetSimTime();
 
-  data->pan = this->panJoint->GetAngle();
-  data->tilt = this->tiltJoint->GetAngle();
+  data->pan = this->panJoint->GetAngle(0).GetAsRadian();
+  data->tilt = this->tiltJoint->GetAngle(0).GetAsRadian();
   //data->zoom = this->camera->GetFOV();
 
   this->ptzIface->Unlock();

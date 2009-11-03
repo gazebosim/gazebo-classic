@@ -301,7 +301,7 @@ void GLWindow::HandleMouseDrag()
           // interactively change rotation pose to selected item, 
           // rotate about axis perpendicular to view port plane
           //
-          Pose3d modelPose = model->GetPose();
+          Pose3d modelPose = model->GetAbsPose();
 
           double distance = (modelPose.pos - this->activeCamera->GetCameraPosition()).GetLength();
           double scaleX = distance * tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
@@ -320,7 +320,7 @@ void GLWindow::HandleMouseDrag()
                     << ")" << std::endl;
                     */
 
-          model->SetPose(modelPose);
+          model->SetAbsPose(modelPose);
         }
 
         if (entity->IsBody())
@@ -332,7 +332,7 @@ void GLWindow::HandleMouseDrag()
           //
           // interactively set torque selected item
           //
-          Pose3d bodyPose = body->GetPose();
+          Pose3d bodyPose = body->GetAbsPose();
 
           distance = (bodyPose.pos - 
               this->activeCamera->GetCameraPosition()).GetLength();
@@ -378,7 +378,7 @@ void GLWindow::HandleMouseDrag()
           //
           // interactively set pose to selected model
           //
-          modelPose = model->GetPose();
+          modelPose = model->GetAbsPose();
           distance = (modelPose.pos - 
               this->activeCamera->GetCameraPosition()).GetLength();
           scaleX = distance * 
@@ -394,7 +394,7 @@ void GLWindow::HandleMouseDrag()
           //           << std::endl;
 
           modelPose.pos += moveVector;
-          model->SetPose(modelPose);
+          model->SetAbsPose(modelPose);
           //std::cout << "set pose (" << modelPose << ") to model (" 
           //          << model->GetName() << ")" << std::endl;
         }
@@ -409,7 +409,7 @@ void GLWindow::HandleMouseDrag()
           //
           // interactively set force to selected body
           //
-          bodyPose = body->GetPose();
+          bodyPose = body->GetAbsPose();
           distance = (bodyPose.pos - 
               this->activeCamera->GetCameraPosition()).GetLength();
           scaleX = distance * 
@@ -453,7 +453,7 @@ void GLWindow::HandleMouseDrag()
         //
         // interactively set pose to selected body
         //
-        bodyPose = body->GetPose();
+        bodyPose = body->GetAbsPose();
 
         //Vector2<double> ddrag((double)drag.x,(double)drag.y);
         //if (drag.x*drag.x + drag.y*drag.y > 0)
@@ -470,7 +470,7 @@ void GLWindow::HandleMouseDrag()
         moveVector = (camRight*drag.x/vpw*scaleX - camUp*drag.y/vph*scaleY);
 
         bodyPose.pos += moveVector;
-        body->SetPose(bodyPose);
+        body->SetAbsPose(bodyPose);
         //std::cout << "set pose (" << bodyPose << ") to Body (" 
         //          << body->GetName() << ")" << std::endl;
       }
@@ -502,9 +502,9 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
     {
       Model *model = (Model*)(entity);
 
-      Pose3d pose = model->GetPose();
+      Pose3d pose = model->GetAbsPose();
       pose.pos.z += dy * 0.05;
-      model->SetPose(pose);
+      model->SetAbsPose(pose);
       //std::cout << "set pose z(" << pose.pos.z << ") to model (" 
       //          << model->GetName() << ")" << std::endl;
     }
@@ -512,9 +512,9 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
     if (entity->IsBody())
     {
       Body *body = (Body*)(entity);
-      Pose3d pose = body->GetPose();
+      Pose3d pose = body->GetAbsPose();
       pose.pos.z += dy * 0.05;
-      body->SetPose(pose);
+      body->SetAbsPose(pose);
       //std::cout << "set pose z(" << pose.pos.z << ") to body (" 
       //          << body->GetName() << ")" << std::endl;
     }

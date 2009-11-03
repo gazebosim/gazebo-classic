@@ -71,8 +71,6 @@ Entity::Entity(Entity *parent)
           visname.str(), NULL, this );
   }
 
-  // Add this to the phyic's engine
-  World::Instance()->GetPhysicsEngine()->AddEntity(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,20 +198,6 @@ bool Entity::IsSelected() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the space id
-void Entity::SetSpaceId( dSpaceID spaceid )
-{
-  this->spaceId = spaceid;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Return the space id
-dSpaceID Entity::GetSpaceId() const
-{
-  return this->spaceId;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Returns true if the entities are the same. Checks only the name
 bool Entity::operator==(const Entity &ent) const 
 {
@@ -260,13 +244,112 @@ std::string Entity::GetScopedName()
   return scopedName;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Return the name of this entity with the model scope
+/// model1::...::modelN::entityName
+std::string Entity::GetCompleteScopedName()
+{
+  Entity *p = this->parent;
+  std::string scopedName = this->GetName();
+
+  while (p)
+  {
+    scopedName.insert(0, p->GetName()+"::");
+    p = p->GetParent();
+  }
+
+  return scopedName;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the absolute pose of the entity
+Pose3d Entity::GetAbsPose() const
+{
+  if (this->parent)
+  {
+    Pose3d p = this->relativePose + this->parent->GetAbsPose();
+
+    /*if (this->GetName() == "cylinder1_body")
+      printf("Get ABS: Rel[%4.2f %4.2f %4.2f] Parent[%4.2f %4.2f %4.2f] Result[%4.2f %4.2f %4.2f]\n", this->relativePose.pos.x, this->relativePose.pos.y, this->relativePose.pos.z, this->parent->GetAbsPose().pos.x,this->parent->GetAbsPose().pos.y,this->parent->GetAbsPose().pos.z, p.pos.x, p.pos.y, p.pos.z);
+      */
+
+    /*Pose3d p = this->parent->GetAbsPose();
+    p.pos += this->relativePose.pos;
+    p.rot *= this->relativePose.rot;
+    */
+    return p;
+  }
+  else
+    return this->relativePose;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the entity relative to its parent
-Pose3d Entity::GetPoseRelative() const
+Pose3d Entity::GetRelativePose() const
 {
+  return this->relativePose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the pose of the entity relative to its parent
+void Entity::SetRelativePose(const Pose3d &pose, bool notify)
+{
+  this->relativePose = pose;
+  this->PoseChange(notify);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the abs pose of the entity
+void Entity::SetAbsPose(const Pose3d &pose, bool notify)
+{
+  Pose3d p = pose;
   if (this->parent)
-    return this->parent->GetPose() - this->GetPose();
-  else
-    return this->GetPose();
+  {
+    p -= this->parent->GetAbsPose();
+    /*p.pos = p.pos - this->parent->GetAbsPose().pos;
+    p.rot = this->parent->GetAbsPose().rot.GetInverse() * p.rot;
+    */
+
+    /*if (this->GetName() == "cylinder1_body")
+    {
+      printf("SetABS: Cylinder Body Old[%4.2f %4.2f %4.2f] Set[%4.2f %4.2f %4.2f] Parent[%4.2f %4.2f %4.2f] New[%4.2f %4.2f %4.2f]\n" ,
+    this->relativePose.pos.x,this->relativePose.pos.y, this->relativePose.pos.z,
+    pose.pos.x, pose.pos.y,pose.pos.z,
+    this->parent->GetAbsPose().pos.x,this->parent->GetAbsPose().pos.y,
+    this->parent->GetAbsPose().pos.z,
+    p.pos.x, p.pos.y, p.pos.z);
+    }*/
+  }
+  this->SetRelativePose(p, notify);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the position of the entity relative to its parent
+void Entity::SetRelativePosition(const Vector3 &pos)
+{
+  this->relativePose.pos = pos;
+  this->PoseChange();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the rotation of the entity relative to its parent
+void Entity::SetRelativeRotation(const Quatern &rot)
+{
+  this->relativePose.rot = rot;
+  this->PoseChange();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Handle a change of pose
+void Entity::PoseChange(bool notify)
+{
+  this->visualNode->SetDirty(true, this->relativePose);
+  if (notify)
+  {
+    this->OnPoseChange();
+
+    std::vector<Entity*>::iterator iter;
+    for  (iter = this->children.begin(); iter != this->children.end(); iter++)
+      (*iter)->OnPoseChange();
+  }
 }

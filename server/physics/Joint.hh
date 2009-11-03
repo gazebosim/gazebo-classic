@@ -27,8 +27,6 @@
 #ifndef JOINT_HH
 #define JOINT_HH
 
-#include <ode/ode.h>
-
 #include "Common.hh"
 #include "Param.hh"
 #include "Vector3.hh"
@@ -38,7 +36,8 @@ namespace gazebo
   /// \addtogroup gazebo_physics
   /// \brief Base class for all joints
   /// \{
-  
+
+  class PhysicsEngine;  
   class Body;
   class XMLConfigNode;
   class Model;
@@ -49,7 +48,11 @@ namespace gazebo
   class Joint : public Common
   {
     /// \brief Type of joint
-    public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL};
+    public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL, TYPE_COUNT};
+    public: enum Attribute {FUDGE_FACTOR, SUSPENSION_ERP, SUSPENSION_CFM};
+
+    /// \brief Type names of joint
+    public: static std::string TypeNames[TYPE_COUNT]; 
 
     /// \brief Constructor
     public: Joint();
@@ -58,25 +61,17 @@ namespace gazebo
     public: virtual ~Joint();
 
     /// \brief Load a joint
-    public: void Load(XMLConfigNode *node);
+    public: virtual void Load(XMLConfigNode *node);
 
     /// \brief Save a joint to a stream in XML format
     public: void Save(std::string &prefix, std::ostream &stream);
-
-    /// \brief Save a joint to a stream in XML format
-    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream) {}
-
-    /// \brief Load child joint
-    protected: virtual void LoadChild(XMLConfigNode *node) {}
+    protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream) {}
 
     /// \brief Update the joint
     public: void Update();
 
     /// \brief Reset the joint
-    public: void Reset();
-
-    /// \brief Reset the child joint
-    protected: virtual void ResetChild() {};
+    public: virtual void Reset();
 
     /// \brief Set the model this joint belongs too
     public: void SetModel(Model *model);
@@ -85,100 +80,101 @@ namespace gazebo
     public: Joint::Type GetType() const;
 
     /// \brief Get the body to which the joint is attached according the _index
-    public: Body *GetJointBody( int index ) const;
+    public: virtual Body *GetJointBody( int index ) const = 0;
 
     /// \brief Determines of the two bodies are connected by a joint
-    public: bool AreConnected( Body *one, Body *two ) const;
-
-    /// \brief Get the _parameter
-    public: virtual double GetParam(int parameter) const;
-
-    /// \brief Make this joint a fixed joint
-    /// Use this only when absolutely necessary
-    public: void SetFixed();
+    public: virtual bool AreConnected( Body *one, Body *two ) const = 0;
 
     /// \brief Attach the two bodies with this joint
-    public: void Attach( Body *one, Body *two );
+    public: virtual void Attach( Body *one, Body *two );
 
     /// \brief Detach this joint from all bodies
-    public: void Detach();
+    public: virtual void Detach() = 0;
+
+    /// \brief Set the axis of rotation
+    public: virtual void SetAxis(int index, const Vector3 &axis) = 0;
+  
+    /// \brief Get the axis of rotation
+    public: virtual Vector3 GetAxis(int index) const = 0;
 
     /// \brief Set the anchor point
-    public: virtual void SetAnchor( const gazebo::Vector3 & /*anchor*/ ) {}
+    public: virtual void SetAnchor( int index, const Vector3 &anchor ) = 0;
 
     /// \brief Get the anchor point
-    public: virtual gazebo::Vector3 GetAnchor() const
-            {return gazebo::Vector3(0,0,0);}
+    public: virtual Vector3 GetAnchor(int index) const = 0;
 
+    /// \brief Set the high stop of an axis(index).
+    public: virtual void SetHighStop(int index, Angle angle) = 0;
 
-    /// \brief Set the _parameter to _value
-    public: virtual void SetParam( int parameter, double value );
-
-    /// \brief Get the name of this joint
-    public: std::string GetName() const;
-
-    /// \brief Set the name of this joint
-    public: void SetName(const std::string &name);
-
-     /// \brief Set the ERP of this joint
-    public: void SetERP(double newERP);
-
-    /// \brief Get the ERP of this joint
-    public: double GetERP();
-
-     /// \brief Set the CFM  of this joint
-    public: void SetCFM(double newERP);
-
-    /// \brief Get the CFM of this joint
-    public: double GetCFM();
-
-    /// \brief Get the feedback data structure for this joint, if set
-    public: dJointFeedback *GetFeedback();
-
+    /// \brief Set the low stop of an axis(index).
+    public: virtual void SetLowStop(int index, Angle angle) = 0;
+ 
     /// \brief Get the high stop of an axis(index).
-    public: double GetHighStop(int index=0);
+    public: virtual Angle GetHighStop(int index) = 0;
 
     /// \brief Get the low stop of an axis(index).
-    public: double GetLowStop(int index=0);
-   
-    /// This is our id
-    protected: dJointID jointId;
+    public: virtual Angle GetLowStop(int index) = 0;
 
+    /// \brief Set the velocity of an axis(index).
+    public: virtual void SetVelocity(int index, double v) = 0;
+
+    /// \brief Get the rotation rate of an axis(index)
+    public: virtual double GetVelocity(int index) const = 0;
+ 
+    /// \brief Set the max allowed force of an axis(index).
+    public: virtual void SetMaxForce(int index, double t) = 0;
+
+    /// \brief Get the max allowed force of an axis(index).
+    public: virtual double GetMaxForce(int index) = 0;
+
+    /// \brief Get the angle of rotation of an axis(index)
+    public: virtual Angle GetAngle(int index) const = 0;
+
+    /// \brief Get the force the joint applies to the first body
+    /// \param index The index of the body( 0 or 1 )
+    public: virtual Vector3 GetBodyForce(unsigned int index) const = 0;
+
+    /// \brief Get the torque the joint applies to the first body
+    /// \param index The index of the body( 0 or 1 )
+    public: virtual Vector3 GetBodyTorque(unsigned int index) const = 0;
+
+    /// \brief Set a parameter for the joint
+    public: virtual void SetAttribute( Attribute, int index, double value) = 0;
+  
     /// Type of Joint
     protected: Type type;
 
     /// The first body this joint connects to
-    private: Body *body1;
+    protected: Body *body1;
 
     /// The second body this joint connects to
-    private: Body *body2;
+    protected: Body *body2;
 
     /// Name of this joint
-    private: ParamT<double> *erpP;
-    private: ParamT<double> *cfmP;
+    protected: ParamT<double> *erpP;
+    protected: ParamT<double> *cfmP;
 
     // joint limit Kp setting
-    private: ParamT<double> *stopKpP;
+    protected: ParamT<double> *stopKpP;
 
     // joint limit Kd setting
-    private: ParamT<double> *stopKdP;
+    protected: ParamT<double> *stopKdP;
 
-    private: ParamT<std::string> *body1NameP;
-    private: ParamT<std::string> *body2NameP;
-    private: ParamT<std::string> *anchorBodyNameP;
-    private: ParamT<Vector3> *anchorOffsetP;
-    private: ParamT<bool> *provideFeedbackP;
-    private: ParamT<double> *fudgeFactorP;
+    protected: ParamT<std::string> *body1NameP;
+    protected: ParamT<std::string> *body2NameP;
+    protected: ParamT<std::string> *anchorBodyNameP;
+    protected: ParamT<Vector3> *anchorOffsetP;
+    protected: ParamT<bool> *provideFeedbackP;
+    protected: ParamT<double> *fudgeFactorP;
 
-    /// Feedback data for this joint
-    private: dJointFeedback *feedback;
+    protected: OgreVisual *visual;
 
-    private: OgreVisual *visual;
+    protected: Model *model;
 
-    private: Model *model;
-
-    private: OgreDynamicLines *line1;
-    private: OgreDynamicLines *line2;
+    protected: OgreDynamicLines *line1;
+    protected: OgreDynamicLines *line2;
+    protected: PhysicsEngine *physics;
+    protected: Vector3 anchorPos;
   };
 
   /// \}

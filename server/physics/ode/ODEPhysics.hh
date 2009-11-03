@@ -31,16 +31,13 @@
 
 #include "Param.hh"
 #include "PhysicsEngine.hh"
+#include "Shape.hh"
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
 namespace gazebo
 {
-  class SphereGeom;
-  class PlaneGeom;
-  class BoxGeom;
-  class CylinderGeom;
   class Entity;
   class XMLConfigNode;
 
@@ -113,7 +110,7 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Finilize the ODE engine
   public: virtual void Fini();
 
-  /// \brief Add an entity
+  /// \brief Add an entity to the world
   public: virtual void AddEntity(Entity *entity);
 
   /// \brief Remove an entity from the physics engine
@@ -122,6 +119,9 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Create a new body
   public: virtual Body *CreateBody(Entity *parent);
 
+  /// \brief Create a geom
+  public: virtual Geom *CreateGeom(Shape::Type type, Body *parent);
+ 
   /// \brief Create a new joint
   public: virtual Joint *CreateJoint(Joint::Type type);
 
@@ -130,6 +130,12 @@ class ODEPhysics : public PhysicsEngine
 
   /// \brief Get the world id
   public: dWorldID GetWorldId();
+
+  /// \brief Convert an odeMass to Mass
+  public: virtual void ConvertMass(Mass *mass, void *odeMass);
+
+  /// \brief Convert an odeMass to Mass
+  public: virtual void ConvertMass(void *odeMass, const Mass &mass);
 
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);

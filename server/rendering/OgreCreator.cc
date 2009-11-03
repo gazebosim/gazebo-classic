@@ -785,9 +785,6 @@ void OgreCreator::Update()
   std::list<Ogre::RenderWindow*>::iterator witer;
   std::map<std::string, OgreVisual*>::iterator viter;
 
-  OgreVisual *vis = NULL;
-  Entity *owner = NULL;
-
   // Update the text
   for (titer = this->text.begin(); titer != this->text.end(); titer++)
   {
@@ -800,24 +797,18 @@ void OgreCreator::Update()
     (*iter)->Update();
   }
 
+  // We only need this loop because we are using threads. The physics engine
+  // can't reliably set the pose of the visuals when it's running in a 
+  // separate thread.
   if (!this->visuals.empty())
   {
     boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
     // Update the visuals
     for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
     {
-      vis = viter->second;
-      owner = vis->GetOwner();
-
-      if (owner == NULL)
+      if (!viter->second->IsDirty())
         continue;
-
-      Pose3d pose;
-
-      if ((owner->IsGeom() && !owner->IsStatic()) || !owner->GetParent())
-        vis->SetPose( owner->GetPose() );
-      else 
-        vis->SetPose(owner->GetPose() - owner->GetParent()->GetPose());
+      viter->second->SetToDirtyPose();
     }
   }
 }

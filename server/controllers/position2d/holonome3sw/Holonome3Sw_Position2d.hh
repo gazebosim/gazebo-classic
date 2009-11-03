@@ -35,7 +35,7 @@
 
 namespace gazebo
 {
-  class HingeJoint;
+  class Joint;
   class Entity;
   class PositionIface;
 
@@ -167,7 +167,7 @@ class Holonome3Sw_Position2d : public Controller
 
 
   // The wheel joints.
-  private: HingeJoint *joint[3];
+  private: Joint *joint[3];
 
   /// Polar coordinate of the center of the wheels
   private: float DIST[3];

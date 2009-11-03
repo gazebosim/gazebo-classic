@@ -268,6 +268,7 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 /// Detach all objects
 void OgreVisual::DetachObjects()
 {
+  printf("Detaching objects\n");
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
@@ -719,6 +720,37 @@ Pose3d OgreVisual::GetPose()
   pos.rot=this->GetRotation();
   return pos;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the global pose of the node
+Pose3d OgreVisual::GetAbsPose()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return Pose3d();
+
+  Pose3d pose;
+
+  Ogre::Vector3 vpos;
+  Ogre::Quaternion vquatern;
+
+  vpos=this->sceneNode->_getDerivedPosition();
+  pose.pos.x=vpos.x;
+  pose.pos.y=vpos.y;
+  pose.pos.z=vpos.z;
+
+  vquatern=this->sceneNode->getOrientation();
+  pose.rot.u =vquatern.w;
+  pose.rot.x=vquatern.x;
+  pose.rot.y=vquatern.y;
+  pose.rot.z=vquatern.z;
+
+
+  return pose;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get this visual Ogre node

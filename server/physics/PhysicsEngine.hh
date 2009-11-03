@@ -31,7 +31,7 @@
 
 #include "Joint.hh"
 #include "Param.hh"
-
+#include "Geom.hh"
 
 namespace boost
 {
@@ -40,7 +40,6 @@ namespace boost
 
 namespace gazebo
 {
-
   
   class Entity;
   class Body;
@@ -107,15 +106,21 @@ namespace gazebo
   
     /// \brief Finilize the physics engine
     public: virtual void Fini() = 0;
-  
-    /// \brief Add an entity
+
+    /// \brief Add an entity to the world
     public: virtual void AddEntity(Entity *entity) = 0;
-  
+
     /// \brief Remove an entity from the physics engine
     public: virtual void RemoveEntity(Entity *entity) = 0;
   
     /// \brief Create a new body
     public: virtual Body *CreateBody(Entity *parent) = 0;
+
+    /// \brief Create a geom
+    public: virtual Geom *CreateGeom(Shape::Type type, Body *body) = 0;
+
+    /// \brief Create a geom
+    public: Geom *CreateGeom(std::string typeName, Body *body);
   
     /// \brief Create a new joint
     public: virtual Joint *CreateJoint(Joint::Type type) = 0;
@@ -137,6 +142,12 @@ namespace gazebo
 
     /// \brief Unlock the physics engine mutex
     public: void UnlockMutex();
+
+    /// \brief Convert an engine specific mass to a gazeboMass
+    public: virtual void ConvertMass(Mass *mass, void *engineMass) = 0;
+
+    /// \brief Convert a Gazebo mass to an engine specific mass
+    public: virtual void ConvertMass(void *engineMass, const Mass &mass) = 0;
 
     /// The gravity vector
     protected: ParamT<Vector3> *gravityP;

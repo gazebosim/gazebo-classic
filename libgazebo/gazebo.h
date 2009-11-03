@@ -1714,6 +1714,7 @@ The opaque interface can transmit any data
  */
 /// Maximum amount of data we will be sending. 8MB is the maximum dictated by Player
 #define GAZEBO_MAX_OPAQUE_DATA 1024*1024*8
+
 /// \brief opaque data
 class OpaqueData
 {

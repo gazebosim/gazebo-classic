@@ -63,6 +63,13 @@ bool Pose3d::IsFinite() const
   return this->pos.IsFinite() && this->rot.IsFinite();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the inverse of this pose
+Pose3d Pose3d::GetInverse() const
+{
+  Quatern inv = this->rot.GetInverse();
+  return Pose3d( inv * this->pos, inv );
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add two poses: result = this + obj
@@ -109,6 +116,13 @@ const Pose3d &Pose3d::operator-=(const Pose3d &obj)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Multiplication operator
+Pose3d Pose3d::operator*(const Pose3d &pose)
+{
+  return Pose3d(this->CoordPositionAdd(pose), this->rot * pose.rot);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Add one point to a vector: result = this + pos
 Vector3 Pose3d::CoordPositionAdd(const Vector3 &pos) const
 {
@@ -142,7 +156,9 @@ Vector3 Pose3d::CoordPositionAdd(const Pose3d &pose) const
   tmp.y = this->pos.y;
   tmp.z = this->pos.z;
 
+  //tmp = (tmp * pose.rot) * pose.rot.GetInverse();
   tmp = pose.rot * (tmp * pose.rot.GetInverse());
+
   result.x = pose.pos.x + tmp.x;
   result.y = pose.pos.y + tmp.y;
   result.z = pose.pos.z + tmp.z;

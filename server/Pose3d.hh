@@ -62,6 +62,9 @@ class Pose3d
   /// \brief See if a pose is finite (e.g., not nan)
   public: bool IsFinite() const;
 
+  /// \brief Get the inverse of this pose
+  public: Pose3d GetInverse() const;
+
   /// \brief Addition operator
   /// \param pose Pose to add to this pose
   /// \return The resulting pose
@@ -81,6 +84,9 @@ class Pose3d
   /// \param pose Pose to subtract from this one
   /// \return The resulting pose
   public: const Pose3d &operator-=(const Pose3d &pose);
+
+  /// \brief Multiplication operator
+  public: Pose3d operator*(const Pose3d &pose);
           
   /// \brief Add one point to a vector: result = this + pos
   /// \param pos Position to add to this pose

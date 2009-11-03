@@ -1,5 +1,19 @@
-#include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-#SET (sources ODEPhysics.cc )
+SET (sources ODEPhysics.cc
+             ODEGeom.cc
+             ODEBody.cc
+             ODEJoint.cc
+             ODESliderJoint.cc
+             ODEHingeJoint.cc
+             ODEHinge2Joint.cc
+             ODEUniversalJoint.cc
+             ODEBallJoint.cc
+             ODETrimeshShape.cc
+             ODERayShape.cc
+             ODEMultiRayShape.cc
+)
 
-#ADD_LIBRARY(gazebo_physics_ode ${sources})
+ADD_LIBRARY(gazebo_physics_ode SHARED ${sources})
+TARGET_LINK_LIBRARIES( gazebo_physics_ode ${ODE_LIBRARIES})
+INSTALL ( TARGETS gazebo_physics_ode DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

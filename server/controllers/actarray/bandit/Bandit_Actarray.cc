@@ -28,7 +28,7 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
-#include "HingeJoint.hh"
+#include "Joint.hh"
 #include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
@@ -91,7 +91,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
     this->gainsP[i] = new ParamT<float>("gain",0.0,1);
     this->gainsP[i]->Load(jNode);
    
-    this->joints[i] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->jointNamesP[i]->GetValue()));
+    this->joints[i] = this->myParent->GetJoint(**this->jointNamesP[i]);
 
     jNode = jNode->GetNext("joint");
   }
@@ -117,8 +117,8 @@ void Bandit_Actarray::InitChild()
 {
   for (int i=0; i<JOINTCNT; i++)
   {
-    this->joints[i]->SetParam( dParamVel, 0.0);
-    this->joints[i]->SetParam( dParamFMax, **(this->forcesP[i]) );
+    this->joints[i]->SetVelocity(0, 0.0);
+    this->joints[i]->SetMaxForce(0, **(this->forcesP[i]) );
   }
 }
 
@@ -126,8 +126,8 @@ void Bandit_Actarray::InitChild()
 // Update the controller
 void Bandit_Actarray::UpdateChild()
 {
-  HingeJoint *joint = NULL;
-  float angle;
+  Joint *joint = NULL;
+  Angle angle;
 
   this->myIface->Lock(1);
   this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
@@ -136,41 +136,41 @@ void Bandit_Actarray::UpdateChild()
 
   for (unsigned int i=0; i<JOINTCNT; i++)
   {
-    double cmdAngle = this->myIface->data->cmd_pos[i];
+    Angle cmdAngle = this->myIface->data->cmd_pos[i];
     double cmdSpeed = this->myIface->data->cmd_speed[i];
 
-    joint = dynamic_cast<HingeJoint*>(this->joints[i]);
+    joint = this->joints[i];
 
     if (this->myIface->data->joint_mode[i] == GAZEBO_ACTARRAY_JOINT_POSITION_MODE)
     {
-      if (cmdAngle > joint->GetHighStop())
+      if (cmdAngle > joint->GetHighStop(0))
       {
-        cmdAngle = joint->GetHighStop();
+        cmdAngle = joint->GetHighStop(0);
       }
-      else if (cmdAngle < joint->GetLowStop())
+      else if (cmdAngle < joint->GetLowStop(0))
       {
-        cmdAngle = joint->GetLowStop();
+        cmdAngle = joint->GetLowStop(0);
       }
 
-      angle = cmdAngle - joint->GetAngle();
+      angle = cmdAngle - joint->GetAngle(0);
 
-      if (fabs(angle) > 0.01)
-        joint->SetParam( dParamVel, **(this->gainsP[i]) * angle);
+      if (fabs(angle.GetAsRadian()) > 0.01)
+        joint->SetVelocity(0, **(this->gainsP[i]) * angle.GetAsRadian());
       else
-        joint->SetParam(dParamVel, 0);
+        joint->SetVelocity(0, 0);
 
-      joint->SetParam( dParamFMax, **(this->forcesP[i]) );
+      joint->SetMaxForce( 0, **(this->forcesP[i]) );
 
     }
     else if (this->myIface->data->joint_mode[i] == GAZEBO_ACTARRAY_JOINT_SPEED_MODE)
     {
-      joint->SetParam( dParamVel, cmdSpeed );
-      joint->SetParam( dParamFMax, **(this->forcesP[i]) );
+      joint->SetVelocity( 0, cmdSpeed );
+      joint->SetMaxForce( 0, **(this->forcesP[i]) );
     }
 
-
-    this->myIface->data->actuators[i].position = joint->GetAngle();
-    this->myIface->data->actuators[i].speed = joint->GetAngleRate();
+    this->myIface->data->actuators[i].position = 
+      joint->GetAngle(0).GetAsRadian();
+    this->myIface->data->actuators[i].speed = joint->GetVelocity(0);
   }
 
   this->myIface->data->new_cmd = 0;

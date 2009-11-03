@@ -27,8 +27,7 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
-#include "HingeJoint.hh"
-#include "Hinge2Joint.hh"
+#include "Joint.hh"
 #include "World.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
@@ -57,50 +56,48 @@ DriveWheel::~DriveWheel( )
 
 void DriveWheel::Connect(Joint *joint, int type)
 {
-  this->joint= dynamic_cast<HingeJoint*>(joint);
+  this->joint= joint;
   this->type=type;
-  if (!joint)
+  if (!this->joint)
   {
     std::ostringstream stream;
-    stream << "The controller couldn't get the joint " << joint->GetName();
+    stream << "The controller couldn't get the joint " <<this->joint->GetName();
     gzthrow(stream.str());
   }
+
   //avoid an initial impulse to the joints that would make the vehicle flip
-  this->joint->SetParam(dParamFudgeFactor, 0.1);
+  this->joint->SetAttribute(Joint::FUDGE_FACTOR,0 , 0.1);
 }
 
 void DriveWheel::Stop()
 {
-  this->joint->SetParam(dParamVel, 0);
-  this->joint->SetParam(dParamFMax, 0);
+  this->joint->SetVelocity(0, 0);
+  this->joint->SetMaxForce(0, 0);
 }
 
 void DriveWheel::SetTorque( float newTorque)
 {
   this->torque=newTorque;
-  this->joint->SetParam(dParamFMax, this->torque);
+  this->joint->SetMaxForce(0, this->torque);
 }
-
 
 void DriveWheel::SetSteerTorque(float newTorque)
 {
-
 }
-
-
 
 void DriveWheel::Update(float speed, float steer)
 {
   this->cmdSpeed=speed;
 
   // TODO: proper acceleration model
-  this->joint->SetParam(dParamFMax, this->torque);
-  this->joint->SetParam(dParamVel, this->cmdSpeed);
+  this->joint->SetMaxForce(0, this->torque);
+  this->joint->SetVelocity(0, this->cmdSpeed);
 }
 
 void DriveWheel::SetSuspension(float spring, float damping, float step)
 {
-  joint->SetParam(dParamSuspensionERP, step*spring/(step*spring+damping));
-  joint->SetParam(dParamSuspensionCFM, 1.0/(step*spring+damping));
+  joint->SetAttribute(Joint::SUSPENSION_ERP,0, 
+      step*spring/(step*spring+damping));
+  joint->SetAttribute(Joint::SUSPENSION_CFM,0, 1.0/(step*spring+damping));
 }
 

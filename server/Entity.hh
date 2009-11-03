@@ -29,7 +29,6 @@
 
 #include <vector>
 #include <string>
-#include <ode/ode.h>
 
 #include "Common.hh"
 #include "Pose3d.hh"
@@ -103,17 +102,27 @@ namespace gazebo
     /// \brief True if the entity is selected by the user
     public: bool IsSelected() const;
 
-    /// \brief Set the space id
-    public: void SetSpaceId( dSpaceID spaceid );
-
-    /// \brief Return the space id
-    public: dSpaceID GetSpaceId() const;
-
-    /// \brief Get the pose of the entity
-    public: virtual Pose3d GetPose() const = 0;// { return Pose3d(); }
+    /// \brief Get the absolute pose of the entity
+    public: virtual Pose3d GetAbsPose() const;
 
     /// \brief Get the pose of the entity relative to its parent
-    public: Pose3d GetPoseRelative() const;
+    public: Pose3d GetRelativePose() const;
+
+    /// \brief Set the pose of the entity relative to its parent
+    public: void SetRelativePose(const Pose3d &pose, bool notify = true);
+
+    /// \brief Set the abs pose of the entity
+    public: void SetAbsPose(const Pose3d &pose, bool notify=true);
+
+    /// \brief Set the position of the entity relative to its parent
+    public: void SetRelativePosition(const Vector3 &pos);
+
+    /// \brief Set the rotation of the entity relative to its parent
+    public: void SetRelativeRotation(const Quatern &rot);
+
+    /// \brief This function is called when the entity's (or one of its parents)
+    ///        pose of the parent has changed
+    protected: virtual void OnPoseChange() {}
 
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;
@@ -131,6 +140,13 @@ namespace gazebo
     ///        model1::...::modelN::entityName
     public: std::string GetScopedName();
 
+    /// \brief Return the name of this entity with the model+body+geom scope
+    ///        model1::...::modelN::bodyN::entityName
+    public: std::string GetCompleteScopedName();
+
+    /// \brief Handle a change of pose
+    private: void PoseChange(bool notify = true);
+
     /// \brief Parent of this entity
     protected: Entity *parent;
   
@@ -143,10 +159,9 @@ namespace gazebo
     /// \brief Visual stuff
     protected: OgreVisual *visualNode;
   
-    /// \brief ODE Stuff 
-    protected: dSpaceID spaceId;
-  
     private: bool selected;
+
+    private: Pose3d relativePose;
   };
   
   /// \}

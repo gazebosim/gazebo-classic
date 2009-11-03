@@ -35,54 +35,48 @@ namespace gazebo
   class IRSensor;
 
 
-/// \brief Sick LMS 200 laser controller.
-/// 
-/// This is a controller that simulates a ir array
-class IR_Array : public Controller
-{
-  /// \brief Constructor
-  /// \param parent The parent entity, must be a Model or a Sensor
-  public: IR_Array(Entity *parent);
-
-  /// \brief Destructor
-  public: virtual ~IR_Array();
-
-  /// \brief Load the controller
-  /// \param node XML config node
-  /// \return 0 on success
-  protected: virtual void LoadChild(XMLConfigNode *node);
-
-  /// \brief Init the controller
-  /// \return 0 on success
-  protected: virtual void InitChild();
-
-  /// \brief Update the controller
-  /// \return 0 on success
-  protected: virtual void UpdateChild();
-
-  /// \brief Finalize the controller
-  /// \return 0 on success
-  protected: virtual void FiniChild();
-
-  /// \brief Put laser data to the iface
-  private: void PutIRData();
-
-
-
-  /// The ir interface
-  private: IRIface *irIface;
-
-
-  /// The parent sensor
-  private: IRSensor *myParent;
+  /// \brief Sick LMS 200 laser controller.
+  /// 
+  /// This is a controller that simulates a ir array
+  class IR_Array : public Controller
+  {
+    /// \brief Constructor
+    /// \param parent The parent entity, must be a Model or a Sensor
+    public: IR_Array(Entity *parent);
   
-
-};
-
-/** /} */
-/// @}
-
+    /// \brief Destructor
+    public: virtual ~IR_Array();
+  
+    /// \brief Load the controller
+    /// \param node XML config node
+    /// \return 0 on success
+    protected: virtual void LoadChild(XMLConfigNode *node);
+  
+    /// \brief Init the controller
+    /// \return 0 on success
+    protected: virtual void InitChild();
+  
+    /// \brief Update the controller
+    /// \return 0 on success
+    protected: virtual void UpdateChild();
+  
+    /// \brief Finalize the controller
+    /// \return 0 on success
+    protected: virtual void FiniChild();
+  
+    /// \brief Put laser data to the iface
+    private: void PutIRData();
+  
+    /// The ir interface
+    private: IRIface *irIface;
+  
+    /// The parent sensor
+    private: IRSensor *myParent;
+  
+  };
+  
+  /** /} */
+  /// @}
 }
 
 #endif
-

@@ -34,7 +34,6 @@
 
 namespace gazebo
 {
-  class SliderJoint;
   class GripperIface;
   class ActarrayIface;
   class RaySensor;
@@ -106,8 +105,8 @@ class Pioneer2_Gripper : public Controller
   /// The parent Model
   private: Model *myParent;
 
-  private: SliderJoint *joints[3];
-  private: SliderJoint *holdJoint;
+  private: Joint *joints[3];
+  private: Joint *holdJoint;
 
   private: Geom *paddles[2];
   private: Geom *contactGeoms[2];

@@ -34,7 +34,7 @@
 
 namespace gazebo
 {
-  class HingeJoint;
+  class Joint;
   class Entity;
   class PositionIface;
 
@@ -123,7 +123,7 @@ class Differential_Position2d : public Controller
   private: float odomPose[3];
   private: float odomVel[3];
 
-  private: HingeJoint *joints[2];
+  private: Joint *joints[2];
 
   private: PhysicsEngine  *physicsEngine;
 

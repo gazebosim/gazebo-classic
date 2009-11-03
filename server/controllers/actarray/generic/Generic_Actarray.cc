@@ -28,8 +28,7 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
-#include "HingeJoint.hh"
-#include "SliderJoint.hh"
+#include "Joint.hh"
 #include "Simulator.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
@@ -103,8 +102,8 @@ void Generic_Actarray::InitChild()
 {
     for (int i=0; i<n_joints; i++)
   {
-    this->joints[i]->SetParam( dParamVel, 0.0);
-    this->joints[i]->SetParam( dParamFMax, this->forces[i] );
+    this->joints[i]->SetVelocity( 0, 0.0);
+    this->joints[i]->SetMaxForce( 0, this->forces[i] );
   }
 }
 
@@ -113,8 +112,8 @@ void Generic_Actarray::InitChild()
 void Generic_Actarray::UpdateChild()
 {
   Joint *joint;
-  float delta_position;
-  float actual_position;
+  Angle delta_position;
+  Angle actual_position;
   float actual_speed;
 
   this->myIface->Lock(1);
@@ -124,39 +123,31 @@ void Generic_Actarray::UpdateChild()
 
   for (int i=0; i<n_joints; i++)
   {
-    double target_position = this->myIface->data->cmd_pos[i];
+    Angle target_position( this->myIface->data->cmd_pos[i]);
     joint = this->joints[i];
 
-    if (target_position > joint->GetHighStop())
+    if (target_position > joint->GetHighStop(0))
     {
-      target_position = joint->GetHighStop();
+      target_position = joint->GetHighStop(0);
     }
-    else if (target_position < joint->GetLowStop())
+    else if (target_position < joint->GetLowStop(0))
     {
-      target_position = joint->GetLowStop();
+      target_position = joint->GetLowStop(0);
     }
-    if(dynamic_cast<HingeJoint*>(joint)) {
-      actual_position = dynamic_cast<HingeJoint*>(joint)->GetAngle();
-      actual_speed    = dynamic_cast<HingeJoint*>(joint)->GetAngleRate();
-    }
-    else if(dynamic_cast<SliderJoint*>(joint)) {
-      actual_position = dynamic_cast<SliderJoint*>(joint)->GetPosition();
-      actual_speed    = dynamic_cast<SliderJoint*>(joint)->GetPositionRate();
-    }
-    else {
-        gzthrow("The joint type " << typeid(joint).name() << " is not supported by the GenericActarray controller");
-    }
+
+    actual_position = joint->GetAngle(0);
+    actual_speed    = joint->GetVelocity(0);
 
     delta_position = target_position - actual_position;
 
-    if (fabs(delta_position) > tolerances[i])
-      joint->SetParam( dParamVel,  this->gains[i] * delta_position);
+    if (fabs(delta_position.GetAsRadian()) > tolerances[i])
+      joint->SetVelocity( 0,  this->gains[i] * delta_position.GetAsRadian());
     else
-      joint->SetParam( dParamVel,  0);
+      joint->SetVelocity( 0,  0);
 
-    joint->SetParam( dParamFMax, this->forces[i] );
+    joint->SetMaxForce( 0, this->forces[i] );
 
-    this->myIface->data->actuators[i].position = actual_position;
+    this->myIface->data->actuators[i].position = actual_position.GetAsRadian();
     this->myIface->data->actuators[i].speed = actual_speed;
   }
 

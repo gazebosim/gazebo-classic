@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(
   gui 
   physics 
   physics/ode
+  physics/bullet
   audio_video
   controllers 
   rendering 
@@ -25,6 +26,7 @@ INCLUDE_DIRECTORIES(
   ${gazeboserver_include_dirs}
   ${boost_include_dirs}
   ${freeimage_include_dir}
+  ${bullet_include_dir}
   ${threadpool_include_dirs_split}
   ${FLTK_INCLUDE_DIR}
 )
@@ -32,6 +34,7 @@ INCLUDE_DIRECTORIES(
 LINK_DIRECTORIES(  
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
+ ${CMAKE_BINARY_DIR}/server/physics/bullet 
  ${boost_library_dirs} 
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
@@ -137,8 +140,9 @@ TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
                                    ${freeimage_library} 
                                    gazebo_av-shared
                                    gazebo_gui-shared
+                                   gazebo_physics_ode
+                                   gazebo_physics_bullet
                                    gazebo 
-
 )
 
 TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES} ${libtool_library} ${freeimage_library} gazebo)

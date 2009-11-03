@@ -3,8 +3,8 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 ADD_SUBDIRECTORY(camera)
 ADD_SUBDIRECTORY(contact)
 ADD_SUBDIRECTORY(imu)
-ADD_SUBDIRECTORY(ir)
 ADD_SUBDIRECTORY(ray)
+ADD_SUBDIRECTORY(ir)
 
 SET (sources Sensor.cc
              SensorFactory.cc

@@ -118,6 +118,9 @@ namespace gazebo
     /// \brief Get the pose of the visual
     public: Pose3d GetPose();
 
+    /// \brief Get the global pose of the node
+    public: Pose3d GetAbsPose();
+
     /// \brief Return the scene Node of this visual entity
     public: Ogre::SceneNode * GetSceneNode();
 
@@ -137,6 +140,10 @@ namespace gazebo
     /// \brief Set to true to discard all calls to "SetPose"
     /// This is useful for the visual node children that are part of a Geom
     public: void SetIgnorePoseUpdates( bool value );
+
+    public: void SetDirty(bool d, Pose3d pose) {dirty =d; dirtyPose = pose;}
+    public: bool IsDirty() const {return dirty;}
+    public: void SetToDirtyPose() {SetPose(dirtyPose); dirty=false;}
 
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
@@ -166,6 +173,8 @@ namespace gazebo
     private: boost::recursive_mutex *mutex;
 
     private: bool ignorePoseUpdates;
+    private: bool dirty;
+    private: Pose3d dirtyPose;
   };
 }
 

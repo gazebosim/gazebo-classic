@@ -35,7 +35,7 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
-#include "SliderJoint.hh"
+#include "Joint.hh"
 #include "World.hh"
 #include "gazebo.h"
 #include "GazeboError.hh"
@@ -116,7 +116,7 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
     this->gainsP[LEFT] = new ParamT<float>("gain",0.01,0);
     this->gainsP[LEFT]->Load(jNode);
 
-    this->joints[LEFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->jointNamesP[LEFT]->GetValue()));
+    this->joints[LEFT] = this->myParent->GetJoint(**this->jointNamesP[LEFT]);
   }
 
   jNode = node->GetChild("rightJoint");
@@ -131,7 +131,7 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
     this->gainsP[RIGHT] = new ParamT<float>("gain",0.01,0);
     this->gainsP[RIGHT]->Load(jNode);
 
-    this->joints[RIGHT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->jointNamesP[RIGHT]->GetValue()));
+    this->joints[RIGHT] = this->myParent->GetJoint(**this->jointNamesP[RIGHT]);
   }
 
   jNode = node->GetChild("liftJoint");
@@ -146,7 +146,7 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
     this->gainsP[LIFT] = new ParamT<float>("gain",0.01,0);
     this->gainsP[LIFT]->Load(jNode);
 
-    this->joints[LIFT] = dynamic_cast<SliderJoint*>(this->myParent->GetJoint(this->jointNamesP[LIFT]->GetValue()));
+    this->joints[LIFT] = this->myParent->GetJoint(**this->jointNamesP[LIFT]);
   }
 
   this->breakBeamNamesP[0] = new ParamT<std::string>("name","",1);
@@ -190,7 +190,7 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   if (!this->paddles[RIGHT])
     gzthrow("Couldn't get the right paddle geom");
 
-  this->holdJoint = (SliderJoint*)World::Instance()->GetPhysicsEngine()->CreateJoint(Joint::SLIDER);
+  this->holdJoint = World::Instance()->GetPhysicsEngine()->CreateJoint(Joint::SLIDER);
   this->holdJoint->SetName(this->GetName() + "_Hold_Joint");
 
   this->paddles[LEFT]->contact->Callback(&Pioneer2_Gripper::LeftPaddleCB, this);
@@ -216,15 +216,15 @@ void Pioneer2_Gripper::SaveChild(std::string &prefix, std::ostream &stream)
 void Pioneer2_Gripper::InitChild()
 {
   // Initially keep the gripper closed
-  this->joints[RIGHT]->SetParam(dParamVel,-0.1);
-  this->joints[LEFT]->SetParam(dParamVel,0.1);
-  this->joints[LEFT]->SetParam(dParamFMax, **(this->forcesP[LEFT]));
-  this->joints[RIGHT]->SetParam(dParamFMax, **(this->forcesP[RIGHT]));
+  this->joints[RIGHT]->SetVelocity(0, -0.1);
+  this->joints[LEFT]->SetVelocity(0, 0.1);
+  this->joints[LEFT]->SetMaxForce(0, **(this->forcesP[LEFT]));
+  this->joints[RIGHT]->SetMaxForce(0, **(this->forcesP[RIGHT]));
 
 
   // Initially lower the lift
-  this->joints[LIFT]->SetParam(dParamFMax, **(this->forcesP[LIFT]));
-  this->joints[LIFT]->SetParam(dParamFMax, **(this->forcesP[LIFT]));
+  this->joints[LIFT]->SetMaxForce(0, **(this->forcesP[LIFT]));
+  this->joints[LIFT]->SetMaxForce(0, **(this->forcesP[LIFT]));
 
   this->contactGeoms[LEFT] = this->contactGeoms[RIGHT] = NULL;
 }
@@ -243,7 +243,7 @@ void Pioneer2_Gripper::UpdateChild()
     {
       this->holdJoint->Attach(this->myParent->GetBody(), 
                               this->contactGeoms[LEFT]->GetBody()); 
-      this->holdJoint->SetAxis(Vector3(0,0,1));
+      this->holdJoint->SetAxis(0, Vector3(0,0,1));
 
     }
   }
@@ -260,34 +260,34 @@ void Pioneer2_Gripper::UpdateChild()
   switch( this->gripIface->data->cmd)
   {
     case GAZEBO_GRIPPER_CMD_OPEN:
-      this->joints[RIGHT]->SetParam(dParamVel,0.1);
-      this->joints[LEFT]->SetParam(dParamVel, -0.1);
+      this->joints[RIGHT]->SetVelocity(0, 0.1);
+      this->joints[LEFT]->SetVelocity(0, -0.1);
       break;
 
     case GAZEBO_GRIPPER_CMD_CLOSE:
-      this->joints[RIGHT]->SetParam(dParamVel,-0.1);
-      this->joints[LEFT]->SetParam(dParamVel,0.1);
+      this->joints[RIGHT]->SetVelocity(0, -0.1);
+      this->joints[LEFT]->SetVelocity(0,0.1);
       break;
 
     case GAZEBO_GRIPPER_CMD_STOP:
-      this->joints[RIGHT]->SetParam(dParamVel,0);
-      this->joints[LEFT]->SetParam(dParamVel,0);
+      this->joints[RIGHT]->SetVelocity(0,0);
+      this->joints[LEFT]->SetVelocity(0,0);
       break;
   }
 
   // Move the lift
   if (this->actIface->data->cmd_pos[0] > 0.5)
   {
-    this->joints[LIFT]->SetParam(dParamVel, 0.2);
+    this->joints[LIFT]->SetVelocity(0, 0.2);
   }
   else if (this->actIface->data->cmd_pos[0] < 0.5)
   {
-    this->joints[LIFT]->SetParam(dParamVel, -0.2);
+    this->joints[LIFT]->SetVelocity(0, -0.2);
   }
 
-  this->joints[LEFT]->SetParam(dParamFMax, **(this->forcesP[LEFT]));
-  this->joints[RIGHT]->SetParam(dParamFMax, **(this->forcesP[RIGHT]));
-  this->joints[LIFT]->SetParam(dParamFMax, **(this->forcesP[LIFT]));
+  this->joints[LEFT]->SetMaxForce(0, **(this->forcesP[LEFT]));
+  this->joints[RIGHT]->SetMaxForce(0, **(this->forcesP[RIGHT]));
+  this->joints[LIFT]->SetMaxForce(0, **(this->forcesP[LIFT]));
 
 
   // DEBUG Statements
@@ -310,37 +310,28 @@ void Pioneer2_Gripper::UpdateChild()
     this->gripIface->data->right_paddle_open = 1;
 
 
+  Angle leftAngleDiff = this->joints[LEFT]->GetAngle(0) - 
+                        this->joints[LEFT]->GetHighStop(0);
+
+  Angle rightAngleDiff = this->joints[RIGHT]->GetAngle(0) - 
+                         this->joints[RIGHT]->GetHighStop(0);
+
+
   // Set the OPEN/CLOSED/MOVING state of the gripper
-  if (fabs(this->joints[LEFT]->GetPosition() - 
-           this->joints[LEFT]->GetHighStop()) < 0.01 &&
-      fabs(this->joints[RIGHT]->GetPosition() - 
-           this->joints[RIGHT]->GetLowStop()) < 0.01)
-  {
+  if (fabs(leftAngleDiff.GetAsRadian()) < 0.01 &&
+      fabs(rightAngleDiff.GetAsRadian()) < 0.01)
     this->gripIface->data->state = GAZEBO_GRIPPER_STATE_CLOSED;
-  }
-  else if (fabs(this->joints[LEFT]->GetPosition() - 
-                this->joints[LEFT]->GetLowStop()) < 0.01 &&
-           fabs(this->joints[RIGHT]->GetPosition() - 
-                this->joints[RIGHT]->GetHighStop()) < 0.01)
-  {
+  else if (fabs(leftAngleDiff.GetAsRadian()) < 0.01 &&
+           fabs(rightAngleDiff.GetAsRadian()) < 0.01)
     this->gripIface->data->state = GAZEBO_GRIPPER_STATE_OPEN;
-  }
   else
-  {
     this->gripIface->data->state = GAZEBO_GRIPPER_STATE_MOVING;
-  }
 
   // Set the UP/DOWN state of the lift
-  if (fabs(this->joints[LIFT]->GetPosition() -
-           this->joints[LIFT]->GetHighStop()) < 0.01)
-  {
+  if (fabs(leftAngleDiff.GetAsRadian()) < 0.01)
     this->actIface->data->actuators[0].position = 1;
-  }
-  else if (fabs(this->joints[LIFT]->GetPosition() -
-                this->joints[LIFT]->GetLowStop()) < 0.01)
-  {
+  else if (fabs(rightAngleDiff.GetAsRadian()) < 0.01)
     this->actIface->data->actuators[0].position = 0;
-  }
 
 
   // Check the break beams

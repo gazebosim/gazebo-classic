@@ -26,22 +26,31 @@
 
 #include <assert.h>
 
-#include "RayGeom.hh"
+#include "PhysicsFactory.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "World.hh"
 #include "Vector3.hh"
-#include "Geom.hh"
-#include "Body.hh"
+#include "ODEGeom.hh"
+#include "ODEBody.hh"
 #include "ContactParams.hh"
 #include "Entity.hh"
-#include "SliderJoint.hh"
-#include "HingeJoint.hh"
-#include "Hinge2Joint.hh"
-#include "BallJoint.hh"
-#include "UniversalJoint.hh"
 #include "XMLConfig.hh"
+
+#include "ODEHingeJoint.hh"
+#include "ODEHinge2Joint.hh"
+#include "ODESliderJoint.hh"
+#include "ODEBallJoint.hh"
+#include "ODEUniversalJoint.hh"
+
+#include "ODEBoxShape.hh"
+#include "ODESphereShape.hh"
+#include "ODECylinderShape.hh"
+#include "ODEPlaneShape.hh"
+#include "ODETrimeshShape.hh"
+#include "ODEMultiRayShape.hh"
+
 #include "ODEPhysics.hh"
 
 #ifdef TIMING
@@ -49,6 +58,8 @@
 #endif
 
 using namespace gazebo;
+
+GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -66,6 +77,9 @@ ODEPhysics::ODEPhysics()
   this->spaceId = dHashSpaceCreate(0);
 
   this->contactGroup = dJointGroupCreate(0);
+
+  dWorldSetAutoDisableFlag(this->worldId, 1);
+  dWorldSetAutoDisableTime(this->worldId, 2.0);
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
@@ -220,6 +234,7 @@ void ODEPhysics::UpdatePhysics()
 #endif
  
   this->LockMutex(); 
+
   // Do collision detection; this will add contacts to the contact group
   dSpaceCollide( this->spaceId, this, CollisionCallback );
 
@@ -255,18 +270,9 @@ void ODEPhysics::Fini()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add an entity
+/// Add an entity to the world
 void ODEPhysics::AddEntity(Entity *entity)
 {
-  // Only the top level parent should have a new space
-  if (entity->GetParent() == NULL)
-  {
-    entity->SetSpaceId( dSimpleSpaceCreate(this->spaceId) );
-  }
-  else
-  {
-    entity->SetSpaceId( entity->GetParent()->GetSpaceId() ) ;
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,7 +285,49 @@ void ODEPhysics::RemoveEntity(Entity *entity)
 // Create a new body
 Body *ODEPhysics::CreateBody(Entity *parent)
 {
-  return new Body(parent);
+  ODEBody *body = new ODEBody(parent);
+  ODEBody *odeParent = dynamic_cast<ODEBody*>(parent);
+
+  if (parent == NULL || odeParent == NULL)
+    body->SetSpaceId( dSimpleSpaceCreate(this->spaceId) );
+  else
+    body->SetSpaceId( odeParent->GetSpaceId() ) ;
+
+  return body;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a new geom
+Geom *ODEPhysics::CreateGeom(Shape::Type type, Body *body)
+{
+  ODEGeom *geom = new ODEGeom(body);
+  Shape *shape = NULL;
+
+  switch (type)
+  {
+    case Shape::SPHERE:
+      shape = new ODESphereShape(geom);
+      break;
+    case Shape::PLANE:
+      shape = new ODEPlaneShape(geom);
+      break;
+    case Shape::BOX:
+      shape = new ODEBoxShape(geom);
+      break;
+    case Shape::CYLINDER:
+      shape = new ODECylinderShape(geom);
+      break;
+    case Shape::MULTIRAY:
+      shape = new ODEMultiRayShape(geom);
+      break;
+    case Shape::TRIMESH:
+      shape = new ODETrimeshShape(geom);
+      break;
+    default:
+      gzerr(0) << "Unable to create geom of type["<<type<<"]\n";
+  }
+
+  return geom;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -290,21 +338,54 @@ dWorldID ODEPhysics::GetWorldId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Convert an odeMass to Mass
+void ODEPhysics::ConvertMass(Mass *mass, void *engineMass)
+{
+  dMass *odeMass = (dMass*)engineMass;
+
+  mass->SetMass(odeMass->mass);
+  mass->SetCoG( odeMass->c[0], odeMass->c[1], odeMass->c[2] );
+  mass->SetInertiaMatrix( odeMass->I[0*4+0], odeMass->I[1*4+1],
+      odeMass->I[2*4+2], odeMass->I[0*4+1],
+      odeMass->I[0*4+2], odeMass->I[1*4+2] );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Convert an odeMass to Mass
+void ODEPhysics::ConvertMass(void *engineMass, const Mass &mass)
+{
+  dMass *odeMass = (dMass*)(engineMass);
+
+  odeMass->mass = mass.GetAsDouble();
+  odeMass->c[0] = mass.GetCoG()[0];
+  odeMass->c[1] = mass.GetCoG()[1];
+  odeMass->c[2] = mass.GetCoG()[2];
+
+  odeMass->I[0*4+0] = mass.GetPrincipalMoments()[0];
+  odeMass->I[1*4+1] = mass.GetPrincipalMoments()[1];
+  odeMass->I[2*4+2] = mass.GetPrincipalMoments()[2];
+
+  odeMass->I[0*4+1] = mass.GetProductsofInertia()[0];
+  odeMass->I[0*4+2] = mass.GetProductsofInertia()[1];
+  odeMass->I[1*4+2] = mass.GetProductsofInertia()[2];
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Create a new joint
 Joint *ODEPhysics::CreateJoint(Joint::Type type)
 {
   switch (type)
   {
     case Joint::SLIDER:
-      return new SliderJoint(this->worldId);
+      return new ODESliderJoint(this->worldId);
     case Joint::HINGE:
-      return new HingeJoint(this->worldId);
+      return new ODEHingeJoint(this->worldId);
     case Joint::HINGE2:
-      return new Hinge2Joint(this->worldId);
+      return new ODEHinge2Joint(this->worldId);
     case Joint::BALL:
-      return new BallJoint(this->worldId);
+      return new ODEBallJoint(this->worldId);
     case Joint::UNIVERSAL:
-      return new UniversalJoint(this->worldId);
+      return new ODEUniversalJoint(this->worldId);
     default:
       return NULL;
   }
@@ -320,8 +401,8 @@ dSpaceID ODEPhysics::GetSpaceId() const
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
   ODEPhysics *self;
-  Geom *geom1 = NULL;
-  Geom *geom2 = NULL;
+  ODEGeom *geom1 = NULL;
+  ODEGeom *geom2 = NULL;
   int i;
   int numc = 0;
   dContactGeom contactGeoms[64];
@@ -351,14 +432,14 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     // Get pointers to the underlying geoms
     if (dGeomGetClass(o1) == dGeomTransformClass)
-      geom1 = (Geom*) dGeomGetData(dGeomTransformGetGeom(o1));
+      geom1 = (ODEGeom*) dGeomGetData(dGeomTransformGetGeom(o1));
     else
-      geom1 = (Geom*) dGeomGetData(o1);
+      geom1 = (ODEGeom*) dGeomGetData(o1);
 
     if (dGeomGetClass(o2) == dGeomTransformClass)
-      geom2 = (Geom*) dGeomGetData(dGeomTransformGetGeom(o2));
+      geom2 = (ODEGeom*) dGeomGetData(dGeomTransformGetGeom(o2));
     else
-      geom2 = (Geom*) dGeomGetData(o2);
+      geom2 = (ODEGeom*) dGeomGetData(o2);
 
     numc = dCollide(o1,o2,64, contactGeoms, sizeof(contactGeoms[0]));
     if (numc != 0)

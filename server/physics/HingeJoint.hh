@@ -31,6 +31,9 @@
 #include "Vector3.hh"
 #include "Param.hh"
 #include "Joint.hh"
+#include "XMLConfig.hh"
+#include "World.hh"
+#include "Global.hh"
 
 namespace gazebo
 {
@@ -82,53 +85,61 @@ namespace gazebo
   /// \{
   
   ///\brief A single axis hinge joint
-  class HingeJoint : public Joint
+  template<class T>
+  class HingeJoint : public T
   {
-    ///  Constructor
-    public: HingeJoint(dWorldID worldId);
-  
-    /// Destructor
-    public: virtual ~HingeJoint();
-  
+    /// \brief Constructor
+    public: HingeJoint() : T()
+            {
+              this->type = Joint::HINGE;
+
+              Param::Begin(&this->parameters);
+              this->axisP = new ParamT<Vector3>("axis",Vector3(0,1,0), 1);
+              this->loStopP = new ParamT<Angle>("lowStop",-M_PI,0);
+              this->hiStopP = new ParamT<Angle>("highStop",M_PI,0);
+              Param::End();
+            }
+ 
+    ///  \brief Destructor
+    public: virtual ~HingeJoint()
+            {
+              delete this->axisP;
+              delete this->loStopP;
+              delete this->hiStopP;
+            }
+
     /// \brief Load joint
-    protected: virtual void LoadChild(XMLConfigNode *node);
+    protected: virtual void Load(XMLConfigNode *node)
+               {
+                 this->axisP->Load(node);
+                 this->loStopP->Load(node);
+                 this->hiStopP->Load(node);
 
+                 T::Load(node);
+
+                 // Perform this three step ordering to ensure the parameters 
+                 // are set properly. This is taken from the ODE wiki.
+                 this->SetHighStop(0, this->hiStopP->GetValue());
+                 this->SetLowStop(0,this->loStopP->GetValue());
+                 this->SetHighStop(0, this->hiStopP->GetValue());
+
+                 this->SetAxis(0, **(this->axisP));
+               }
+ 
     /// \brief Save a joint to a stream in XML format
-    protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
+    protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream)
+               {
+                 T::SaveJoint(prefix, stream);
+                 stream << prefix << *(this->axisP) << "\n";
+                 stream << prefix << *(this->loStopP) << "\n";
+                 stream << prefix << *(this->hiStopP) << "\n";
+               }
 
-    /// Get the angle of rotation
-    public: double GetAngle() const;
-  
-    /// Get the rotation rate
-    public: double GetAngleRate() const;
-  
-    /// Get the specified parameter
-    public: virtual double GetParam( int parameter ) const;
-  
-    /// Set the anchor point
-    public: virtual void SetAnchor(const Vector3 &anchor);
-  
-    /// Set the axis of rotation
-    public: void SetAxis(const Vector3 &axis);
-  
-    /// Get the anchor point
-    public: virtual Vector3 GetAnchor() const;
-  
-    /// Get the axis of rotation
-    public: Vector3 GetAxis() const;
-  
-    /// Set the parameter to value
-    public: virtual void SetParam( int parameter, double value);
-  
-    /// Set the torque of a joint.
-    public: void SetTorque(double torque);
-  
-    private: ParamT<Vector3> *axisP;
-    private: ParamT<Angle> *loStopP;
-    private: ParamT<Angle> *hiStopP; 
+    protected: ParamT<Vector3> *axisP;
+    protected: ParamT<Angle> *loStopP;
+    protected: ParamT<Angle> *hiStopP; 
   };
   /// \}
-  
 }
 #endif
 

@@ -40,13 +40,13 @@ GZ_REGISTER_STATIC_CONTROLLER("jointforce", JointForce);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-JointForce::JointForce(Entity *parent )
-  : Controller(parent)
+  JointForce::JointForce(Entity *parent )
+: Controller(parent)
 {
-    this->myParent = dynamic_cast<Model*>(this->parent);
+  this->myParent = dynamic_cast<Model*>(this->parent);
 
-    if (!this->myParent)
-        gzthrow("ControllerStub controller requires a Model as its parent");
+  if (!this->myParent)
+    gzthrow("ControllerStub controller requires a Model as its parent");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,32 +59,27 @@ JointForce::~JointForce()
 // Load the controller
 void JointForce::LoadChild(XMLConfigNode *node)
 {
-    XMLConfigNode *jNode;
-    Joint *joint;
-    std::string jointName;
-    dJointFeedback *jFeedback = new dJointFeedback;
-    int i =0;
-    this->myIface = dynamic_cast<OpaqueIface*>(this->GetIface("opaque"));
-    jNode = node->GetChild("joint");
-    while(jNode && i < GAZEBO_JOINTFORCE_CONTROLLER_MAX_FEEDBACKS)
-    {
-        jointName = jNode->GetString("name","",1);
-        joint = this->myParent->GetJoint(jointName);
-        jFeedback = joint->GetFeedback();
-        if(jFeedback) {
-            this->jointfeedbacks[i] = jFeedback;
-            i++;
-        }
-        jNode = jNode->GetNext("joint");
-    }
-    this->n_joints = i;
+  XMLConfigNode *jNode;
+  Joint *joint;
+  std::string jointName;
+
+  this->myIface = dynamic_cast<OpaqueIface*>(this->GetIface("opaque"));
+
+  jNode = node->GetChild("joint");
+
+  while(jNode)// && i < GAZEBO_JOINTFORCE_CONTROLLER_MAX_FEEDBACKS)
+  {
+    jointName = jNode->GetString("name","",1);
+    joint = this->myParent->GetJoint(jointName);
+    this->joints.push_back(joint);
+    jNode = jNode->GetNext("joint");
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the controller
 void JointForce::InitChild()
 {
-    //this->myIface->data->data = new uint8_t[sizeof(dJointFeedback)*n_joints];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,21 +88,39 @@ void JointForce::UpdateChild()
 {
   this->myIface->Lock(1);
   this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
-  // Let me explain this number: each joint reports 4 vectors: Force and torque
-  // on each jointed object, respectively. These vectors have 4 elements: x,y,z
-  // and a fourth one. So we transmit 4 dReals per vector.
-  this->myIface->data->data_count = n_joints*4*4*sizeof(dReal);
 
-  for(int i=0; i< n_joints; i++) {
-    // Copy vector for force on first object
-    memcpy(this->myIface->data->data + (i*4 + 0)*4*sizeof(dReal), this->jointfeedbacks[i]->f1, 4*sizeof(dReal));
-    // Copy vector for torque on first object
-    memcpy(this->myIface->data->data + (i*4 + 1)*4*sizeof(dReal), this->jointfeedbacks[i]->t1, 4*sizeof(dReal));
-    // Copy vector for force on second object
-    memcpy(this->myIface->data->data + (i*4 + 2)*4*sizeof(dReal), this->jointfeedbacks[i]->f2, 4*sizeof(dReal));
-    // Copy vector for torque on second object
-    memcpy(this->myIface->data->data + (i*4 + 3)*4*sizeof(dReal), this->jointfeedbacks[i]->t2, 4*sizeof(dReal));
+  // Let me explain this number: each joint reports 4 vectors: Force and torque
+  // on each jointed object, respectively. These vectors have 3 elements: x,y,z.
+  // So we transmit 3 doubles per vector.
+  this->myIface->data->data_count = this->joints.size()*4*3*sizeof(double);
+
+  uint8_t *ptr = this->myIface->data->data;
+
+  for(unsigned int i=0; i< this->joints.size(); i++) 
+  {
+    Vector3 bf1, bf2, bt1, bt2;
+    bf1 = this->joints[i]->GetBodyForce(0);
+    bf2 = this->joints[i]->GetBodyForce(1);
+    bt1 = this->joints[i]->GetBodyTorque(0);
+    bt2 = this->joints[i]->GetBodyTorque(1);
+
+    *(ptr++) = bf1.x; 
+    *(ptr++) = bf1.y; 
+    *(ptr++) = bf1.z; 
+
+    *(ptr++) = bt1.x; 
+    *(ptr++) = bt1.y; 
+    *(ptr++) = bt1.z; 
+
+    *(ptr++) = bf2.x; 
+    *(ptr++) = bf2.y; 
+    *(ptr++) = bf2.z; 
+
+    *(ptr++) = bt2.x; 
+    *(ptr++) = bt2.y; 
+    *(ptr++) = bt2.z; 
   }
+
   this->myIface->Unlock();
 }
 

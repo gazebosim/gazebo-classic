@@ -27,13 +27,13 @@
 #ifndef BODY_HH
 #define BODY_HH
 
-#include <ode/ode.h>
 #include <map>
 #include <vector>
 
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Param.hh"
+#include "Mass.hh"
 
 namespace gazebo
 {
@@ -74,59 +74,31 @@ namespace gazebo
 
     /// \brief Attach a geom to this body
     /// \param geom Geometery to attach to this body
-    public: void AttachGeom( Geom *geom );
-
-    /// \brief Set the pose of the body
-    /// \param pose New pose of the body
-    public: void SetPose(const Pose3d &pose);
-
-    /// \brief Return the pose of the body
-    /// \return Pose of the body
-    public: virtual Pose3d GetPose() const;
-
-    /// \brief Set the position of the body
-    /// \param pos Vector position
-    public: void SetPosition(const Vector3 &pos);
-
-    /// \brief Set the rotation of the body
-    /// \param rot Quaternion rotation
-    public: void SetRotation(const Quatern &rot);
-
-    /// \brief Return the position of the body
-    /// \return Position vector
-    public: Vector3 GetPosition() const;
-
-    /// \brief Return the rotation
-    /// \return Rotation quaternion
-    public: Quatern GetRotation() const;
+    public: virtual void AttachGeom( Geom *geom );
 
     /// \brief Return the velocity of the body
     /// \return Velocity vector
-    public: Vector3 GetPositionRate() const;
+    public: virtual Vector3 GetPositionRate() const = 0;
 
     /// \brief Return the rotation rates
     /// \return Rotation Rate quaternion
-    public: Quatern GetRotationRate() const;
+    public: virtual Quatern GetRotationRate() const = 0;
 
     /// \brief Return the rotation rates
     /// \return Rotation Rate Euler Angles RPY
-    public: Vector3 GetEulerRate() const;
-
-    /// \brief Return the ID of this body
-    /// \return ODE body id
-    public: dBodyID GetId() const;
+    public: virtual Vector3 GetEulerRate() const = 0;
 
     /// \brief Set whether this body is enabled
-    public: void SetEnabled(bool enable) const;
+    public: virtual void SetEnabled(bool enable) const = 0;
 
     /// \brief Update the center of mass
-    public: void UpdateCoM();
+    public: virtual void UpdateCoM();
 
     /// \brief Get the Center of Mass pose
     public: const Pose3d &GetCoMPose() const;
 
     /// \brief Set whether gravity affects this body
-    public: void SetGravityMode(bool mode);
+    public: virtual void SetGravityMode(bool mode) = 0;
 
     /// \brief Set the friction mode of the body
     public: void SetFrictionMode( const bool &v );
@@ -145,16 +117,16 @@ namespace gazebo
     public: void SetLaserRetro(float retro);
 
     /// \brief Set the linear velocity of the body
-    public: void SetLinearVel(const Vector3 &vel);
+    public: virtual void SetLinearVel(const Vector3 &vel) = 0;
 
     /// \brief Get the linear velocity of the body
-    public: Vector3 GetLinearVel() const;
+    public: virtual Vector3 GetLinearVel() const = 0;
 
     /// \brief Set the angular velocity of the body
-    public: void SetAngularVel(const Vector3 &vel);
+    public: virtual void SetAngularVel(const Vector3 &vel) = 0;
 
     /// \brief Get the angular velocity of the body
-    public: Vector3 GetAngularVel() const;
+    public: virtual Vector3 GetAngularVel() const = 0;
 
     /// \brief Set the linear acceleration of the body
     public: void SetLinearAccel(const Vector3 &accel);
@@ -169,16 +141,16 @@ namespace gazebo
     public: Vector3 GetAngularAccel() const;
 
     /// \brief Set the force applied to the body
-    public: void SetForce(const Vector3 &force);
+    public: virtual void SetForce(const Vector3 &force) = 0;
 
     /// \brief Get the force applied to the body
-    public: Vector3 GetForce() const;
+    public: virtual Vector3 GetForce() const = 0;
 
     /// \brief Set the torque applied to the body
-    public: void SetTorque(const Vector3 &force);
+    public: virtual void SetTorque(const Vector3 &force) = 0;
 
     /// \brief Get the torque applied to the body
-    public: Vector3 GetTorque() const;
+    public: virtual Vector3 GetTorque() const = 0;
 
     /// \brief Get the vector of all geoms
     public: const std::map<std::string, Geom*> *GetGeoms() const;
@@ -190,7 +162,7 @@ namespace gazebo
     public: Model *GetModel() const;
 
     /// \brief Get the mass of the body
-    public: float GetMass() const { return mass.mass; }
+    public: const Mass &GetMass() const { return mass; }
 
     /// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
     public: void GetInterfaceNames(std::vector<std::string>& list) const;
@@ -210,7 +182,7 @@ namespace gazebo
     private: void LoadVisual(XMLConfigNode *node);
 
     /// \brief Update the pose of the body
-    private: void UpdatePose();
+    //protected: void UpdatePose();
 
     /// \brief Set transparency for all child geometries
     public: void SetTransparency(float t);
@@ -221,42 +193,48 @@ namespace gazebo
     /// \brief  Get the size of the body
     public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;
 
+    /// \brief Set the linear damping factor
+    public: virtual void SetLinearDamping(double damping) = 0;
+
+    /// \brief Set the angular damping factor
+    public: virtual void SetAngularDamping(double damping) = 0;
+
     /// List of geometries attached to this body
-    private: std::map< std::string, Geom* > geoms;
+    protected: std::map< std::string, Geom* > geoms;
 
     /// List of attached sensors
-    private: std::vector< Sensor* > sensors;
-
-    /// ODE body handle
-    private: dBodyID bodyId;
+    protected: std::vector< Sensor* > sensors;
 
     /// Mass properties of the object
-    private: dMass mass;
+    protected: Mass mass;
 
-    private: bool isStatic;
+    protected: bool isStatic;
 
     /// Used by Model if this body is the canonical body
     ///   model pose = body pose + initModelOffset
     public: Pose3d initModelOffset;
 
-    private: Pose3d comPose;
-    private: Pose3d staticPose;
-    private: Pose3d pose;
+    protected: Pose3d comPose;
 
-    private: ParamT<Vector3> *xyzP;
-    private: ParamT<Quatern> *rpyP;
 
-    private: ParamT<double> *dampingFactorP;
+    /// The pose of the body relative to the model. Can also think of this
+    /// as the body's pose offset.
+    protected: Pose3d relativePose;
 
-    private: PhysicsEngine *physicsEngine;
+    protected: ParamT<Vector3> *xyzP;
+    protected: ParamT<Quatern> *rpyP;
 
-    private: ParamT<bool> *turnGravityOffP;
-    private: ParamT<bool> *selfCollideP;
+    protected: ParamT<double> *dampingFactorP;
 
-    private: OgreVisual *cgVisual;
+    protected: PhysicsEngine *physicsEngine;
 
-    private: Vector3 linearAccel;
-    private: Vector3 angularAccel;
+    protected: ParamT<bool> *turnGravityOffP;
+    protected: ParamT<bool> *selfCollideP;
+
+    protected: OgreVisual *cgVisual;
+
+    protected: Vector3 linearAccel;
+    protected: Vector3 angularAccel;
 
     ///  User specified Mass Matrix
     protected: ParamT<bool> *customMassMatrixP;

@@ -28,7 +28,7 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Global.hh"
-#include "HingeJoint.hh"
+#include "Joint.hh"
 #include "World.hh"
 #include "Simulator.hh"
 #include "gazebo.h"
@@ -94,8 +94,8 @@ void Differential_Position2d::LoadChild(XMLConfigNode *node)
   this->leftJointNameP->Load(node);
   this->rightJointNameP->Load(node);
 
-  this->joints[LEFT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->leftJointNameP->GetValue()));
-  this->joints[RIGHT] = dynamic_cast<HingeJoint*>(this->myParent->GetJoint(this->rightJointNameP->GetValue()));
+  this->joints[LEFT] = this->myParent->GetJoint(**this->leftJointNameP);
+  this->joints[RIGHT] = this->myParent->GetJoint(**this->rightJointNameP);
 
   if (!this->joints[LEFT])
     gzthrow("The controller couldn't get left hinge joint");
@@ -168,8 +168,8 @@ void Differential_Position2d::UpdateChild()
   this->prevUpdateTime = Simulator::Instance()->GetSimTime();
 
   // Distance travelled by front wheels
-  d1 = stepTime * wd / 2 * this->joints[LEFT]->GetAngleRate();
-  d2 = stepTime * wd / 2 * this->joints[RIGHT]->GetAngleRate();
+  d1 = stepTime * wd / 2 * this->joints[LEFT]->GetVelocity(0);
+  d2 = stepTime * wd / 2 * this->joints[RIGHT]->GetVelocity(0);
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / ws;
@@ -184,27 +184,17 @@ void Differential_Position2d::UpdateChild()
   this->odomVel[1] = 0.0;
   this->odomVel[2] = da / stepTime;
 
-
-  //if (this->enableMotors)
+  if (this->enableMotors)
   {
-    this->joints[LEFT]->SetParam( dParamVel,
-                                  this->wheelSpeed[LEFT] /  (**(this->wheelDiamP) / 2.0) );
+    this->joints[LEFT]->SetVelocity( 0, this->wheelSpeed[LEFT] /  
+                                        (**(this->wheelDiamP) / 2.0) );
 
-    this->joints[RIGHT]->SetParam( dParamVel,
-                                   this->wheelSpeed[RIGHT] /  (**(this->wheelDiamP) / 2.0) );
-    this->joints[LEFT]->SetParam( dParamFMax, **(this->torqueP) );
-    this->joints[RIGHT]->SetParam( dParamFMax, **(this->torqueP) );
+    this->joints[RIGHT]->SetVelocity( 0, this->wheelSpeed[RIGHT] /  
+                                         (**(this->wheelDiamP) / 2.0) );
 
-    //printf("Set Speed[%f %f]\n",this->wheelSpeed[LEFT], this->wheelSpeed[RIGHT]);
+    this->joints[LEFT]->SetMaxForce( 0, **(this->torqueP) );
+    this->joints[RIGHT]->SetMaxForce( 0, **(this->torqueP) );
   }
-  /*else
-  {
-    this->joints[LEFT]->SetParam( dParamVel, 0 );
-    this->joints[RIGHT]->SetParam( dParamVel, 0 );
-
-    this->joints[LEFT]->SetParam( dParamFMax, 0 );
-    this->joints[RIGHT]->SetParam( dParamFMax, 0 );
-  }*/
 
   this->PutPositionData();
 

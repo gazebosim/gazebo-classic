@@ -129,5 +129,3 @@ void Generic_Imu::PutImuData()
     this->imuIface->Post();
   }
 }
-
-}
