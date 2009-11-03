@@ -24,6 +24,7 @@
  * CVS: $Id$
  */
 
+#include <float.h>
 #include "XMLConfig.hh"
 #include "ContactParams.hh"
 
@@ -46,8 +47,8 @@ ContactParams::ContactParams()
 
   this->softCfm = 0.01;
 
-  this->mu1 = dInfinity;
-  this->mu2 = dInfinity;
+  this->mu1 = FLT_MAX;
+  this->mu2 = FLT_MAX;
   this->slip1 = 0.01;
   this->slip2 = 0.01;
 
