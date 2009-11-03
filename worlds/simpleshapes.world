@@ -14,7 +14,7 @@
 
   <verbosity>5</verbosity>
 
-  <physics:ode>
+  <physics:bullet>
     <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-2</cfm>
@@ -24,7 +24,7 @@
                       0 == No throttling
                      >0 == Frequency at which to throttle the sim --> 
     <updateRate>0</updateRate>
-  </physics:ode>
+  </physics:bullet>
 
   <rendering:gui>
     <type>fltk</type>

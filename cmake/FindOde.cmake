@@ -39,11 +39,9 @@ ENDIF (NOT ODE_FOUND)
 
 IF (NOT ODE_FOUND)
   BUILD_ERROR ("ODE and development files not found. See the following website: http://www.ode.org")
+  SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
 ELSE (NOT ODE_FOUND)
-  #SET (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${ODE_CFLAGS_OTHER}" CACHE INTERNAL "added dSINGLE" FORCE)
-  #SET (CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   ${ODE_CFLAGS_OTHER}" CACHE INTERNAL "added dSINGLE" FORCE)
-  #SET (CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_PROFILE} ${ODE_CFLAGS_OTHER}" CACHE INTERNAL "added dSINGLE" FORCE)
-  #MESSAGE (STATUS "\n\ndebug\n" ${CMAKE_C_FLAGS_DEBUG} "\n\n")
+  SET (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
 
   APPEND_TO_CACHED_LIST(gazeboserver_cflags
                         ${gazeboserver_cflags_desc}

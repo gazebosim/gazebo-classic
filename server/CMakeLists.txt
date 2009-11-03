@@ -140,12 +140,19 @@ TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
                                    ${freeimage_library} 
                                    gazebo_av-shared
                                    gazebo_gui-shared
-                                   gazebo_physics_ode
-                                   gazebo_physics_bullet
                                    gazebo 
 )
 
-TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES} ${libtool_library} ${freeimage_library} gazebo)
+if (INCLUDE_BULLET)
+  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_bullet)
+endif (INCLUDE_BULLET)
+
+if (INCLUDE_ODE)
+  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_ode)
+  TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES})
+endif (INCLUDE_ODE)
+
+TARGET_LINK_LIBRARIES( gazebo_server ${libtool_library} ${freeimage_library} gazebo)
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

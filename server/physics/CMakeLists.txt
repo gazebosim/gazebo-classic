@@ -1,7 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-add_subdirectory(ode)
-add_subdirectory(bullet)
+if (INCLUDE_ODE)
+  add_subdirectory(ode)
+endif (INCLUDE_ODE)
+
+if (INCLUDE_BULLET)
+  add_subdirectory(bullet)
+endif (INCLUDE_BULLET)
 
 set (sources Body.cc
              PhysicsFactory.cc

@@ -363,6 +363,7 @@ ELSE (bullet_dynamics_library AND
     bullet_softbody_library  AND 
     bullet_math_library AND
     bullet_include_dir)
+  SET (INCLUDE_BULLET FALSE CACHE BOOL "Include support for Bullet")
   MESSAGE (STATUS "Warning: Unable to find bullet. The bullet physics engine will not be supported.")
 ENDIF (bullet_dynamics_library AND 
        bullet_collision_library AND 

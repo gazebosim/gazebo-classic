@@ -27,9 +27,15 @@
 
 #include "PhysicsEngine.hh"
 #include "PhysicsFactory.hh"
+#include "config.h"
 
+#ifdef INCLUDE_ODE
 void RegisterODEPhysics();
+#endif
+
+#ifdef INCLUDE_BULLET
 void RegisterBulletPhysics();
+#endif
 
 using namespace gazebo;
 
@@ -39,8 +45,13 @@ std::map<std::string, PhysicsFactoryFn> PhysicsFactory::engines;
 /// Register everything
 void PhysicsFactory::RegisterAll()
 {
+#ifdef INCLUDE_ODE
   RegisterODEPhysics();
+#endif
+
+#ifdef INCLUDE_BULLET
   RegisterBulletPhysics();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

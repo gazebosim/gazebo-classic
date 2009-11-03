@@ -183,7 +183,11 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
   XMLConfigNode *physicsNode = rootNode->GetChildByNSPrefix("physics");
   if (Simulator::Instance()->GetPhysicsEnabled() && physicsNode)
+  {
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine( physicsNode->GetName());
+    if (this->physicsEngine == NULL)
+      gzthrow("Unable to create physics engine\n");
+  }
 
   this->LoadEntities(rootNode, NULL, false);
 
