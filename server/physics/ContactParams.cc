@@ -24,8 +24,6 @@
  * CVS: $Id$
  */
 
-#include <ode/ode.h>
-
 #include "XMLConfig.hh"
 #include "ContactParams.hh"
 

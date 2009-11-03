@@ -34,7 +34,6 @@
 #include "ODEGeom.hh"
 #include "Quatern.hh"
 #include "GazeboError.hh"
-#include "ODEPhysics.hh"
 #include "PhysicsEngine.hh"
 #include "Mass.hh"
 

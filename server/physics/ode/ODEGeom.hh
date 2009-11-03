@@ -27,8 +27,7 @@
 #ifndef ODEGEOM_HH
 #define ODEGEOM_HH
 
-#include <ode/ode.h>
-
+#include "ODEPhysics.hh"
 #include "Param.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
@@ -44,7 +43,6 @@ namespace gazebo
   class XMLConfigNode;
   class OgreVisual;
   class PhysicsEngine;
-  class ODEPhysics;
 
   /// \addtogroup gazebo_physics_ode
   /// \brief Base class for all ODE geoms

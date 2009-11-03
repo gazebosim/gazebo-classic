@@ -27,7 +27,7 @@
 #ifndef ODEJOINT_HH
 #define ODEJOINT_HH
 
-#include <ode/ode.h>
+#include "ODEPhysics.hh"
 #include "Joint.hh"
 
 namespace gazebo

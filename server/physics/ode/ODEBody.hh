@@ -27,14 +27,12 @@
 #ifndef ODEBODY_HH
 #define ODEBODY_HH
 
-#include <ode/ode.h>
-
+#include "ODEPhysics.hh"
 #include "Body.hh"
 
 namespace gazebo
 {
   class XMLConfigNode;
-  class ODEPhysics;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class

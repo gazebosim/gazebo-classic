@@ -24,7 +24,6 @@
  * CVS: $Id$
  */
 
-#include <ode/ode.h>
 #include <iostream>
 #include <string.h>
 #include <math.h>

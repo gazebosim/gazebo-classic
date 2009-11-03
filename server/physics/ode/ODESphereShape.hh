@@ -1,8 +1,7 @@
 #ifndef ODESPHERESHAPE_HH
 #define ODESPHERESHAPE_HH
 
-#include <ode/ode.h>
-
+#include "ODEPhysics.hh"
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
 #include "SphereShape.hh"
