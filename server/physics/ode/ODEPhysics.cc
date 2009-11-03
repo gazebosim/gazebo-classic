@@ -503,10 +503,16 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
 
-        // save "dJointID *c" in Geom, so we can do a
-        // dJointFeedback *jft = dJointGetFeedback( c[i] ) later
-        geom1->cID = c;
-        geom2->cID = c;
+        dJointFeedback *feedback = dJointGetFeedback(c);
+        geom1->contact->body1Force.Set(feedback->f1[0],feedback->f1[1],
+                                       feedback->f1[2]);
+        geom2->contact->body2Force.Set(feedback->f2[0],feedback->f2[1],
+                                       feedback->f2[2]);
+
+        geom1->contact->body1Torque.Set(feedback->t1[0],feedback->t1[1],
+                                        feedback->t1[2]);
+        geom1->contact->body2Torque.Set(feedback->t2[0],feedback->t2[1],
+                                        feedback->t2[2]);
 
         // Call the geom's contact callbacks
         geom1->contact->contactSignal( geom1, geom2 );

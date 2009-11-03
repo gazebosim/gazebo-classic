@@ -80,7 +80,12 @@ namespace gazebo
     public: double softCfm;
 
     public: bool enableFriction;
-            
+
+    public: Vector3 body1Force;
+    public: Vector3 body1Torque;
+    public: Vector3 body2Force;
+    public: Vector3 body2Torque;
+
     public: boost::signal< void (Geom*, Geom*)> contactSignal;
   };
 }

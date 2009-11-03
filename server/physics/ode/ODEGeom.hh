@@ -104,8 +104,6 @@ namespace gazebo
 
     ///  ID for the sub-geom
     protected: dGeomID geomId;
-
-    public: dJointID cID;
   };
 
   /// \}

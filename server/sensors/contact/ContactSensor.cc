@@ -29,8 +29,6 @@
 #include <sstream>
 
 #include "Global.hh"
-//#include "World.hh"
-//#include "Controller.hh"
 
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
@@ -52,11 +50,7 @@ ContactSensor::ContactSensor(Body *body)
     : Sensor(body)
 {
   this->active = false;
-
   this->typeName = "contact";
-
-  this->contactCount = 0;
-  this->contactStates = NULL;
 }
 
 
@@ -65,26 +59,21 @@ ContactSensor::ContactSensor(Body *body)
 ContactSensor::~ContactSensor()
 {
   std::vector< ParamT<std::string> *>::iterator iter;
-
-  if (this->contactStates)
-    delete [] this->contactStates;
-
-  if (this->contactTimes)
-    delete [] this->contactTimes;
+  std::vector<ContactState>::iterator citer;
 
   for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
-  {
     delete *iter;
-  }
   this->geomNamesP.clear();
+
+  this->contacts.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the contact time
 double ContactSensor::GetContactTime(unsigned int index) const
 {
-  if (index < this->contactCount)
-    return this->contactTimes[ index ];
+  if (index < this->contacts.size())
+    return this->contacts[index].time;
 
   return 0;
 }
@@ -93,15 +82,15 @@ double ContactSensor::GetContactTime(unsigned int index) const
 /// Return the number of contacts
 unsigned int ContactSensor::GetContactCount() const
 {
-  return this->contactCount;
+  return this->contacts.size();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Return the contact states
 uint8_t ContactSensor::GetContactState(unsigned int index) const
 {
-  if (index < this->contactCount)
-    return this->contactStates[index];
+  if (index < this->contacts.size())
+    return this->contacts[index].state;
 
   return 0;
 }
@@ -110,17 +99,41 @@ uint8_t ContactSensor::GetContactState(unsigned int index) const
 /// Return the contact geom name
 std::string ContactSensor::GetContactGeomName(unsigned int index) const
 {
-  if (index < this->contactCount)
-    return this->contactNames[index];
+  if (index < this->contacts.size())
+    return this->contacts[index].name;
 
   return std::string("");
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Return contact force on the first body
+Vector3 ContactSensor::GetContactBody1Force(unsigned int index) const
+{
+  Vector3 result;
+
+  if (index < this->contacts.size())
+    result = this->contacts[index].body1Force;
+ 
+  return result; 
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Return contact force on the second body
+Vector3 ContactSensor::GetContactBody2Force(unsigned int index) const
+{
+  Vector3 result;
+
+  if (index < this->contacts.size())
+    result = this->contacts[index].body2Force;
+ 
+  return result; 
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Return the self geom name
 std::string ContactSensor::GetGeomName(unsigned int index) const
 {
-  if (index < this->contactCount)
+  if (index < this->contacts.size())
     return this->geomNamesP[index]->GetValue();
 
   return std::string("");
@@ -130,7 +143,9 @@ std::string ContactSensor::GetGeomName(unsigned int index) const
 /// Reset the contact states
 void ContactSensor::ResetContactStates()
 {
-  memset(this->contactStates, 0, sizeof(uint8_t) * this->contactCount);
+  std::vector<ContactState>::iterator iter;
+  for (iter = this->contacts.begin(); iter != this->contacts.end(); iter++)
+    (*iter).state = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -140,9 +155,7 @@ void ContactSensor::LoadChild(XMLConfigNode *node)
   XMLConfigNode *geomNode = NULL;
 
   if (this->body == NULL)
-  {
     gzthrow("Null body in the contact sensor");
-  }
 
   Param::Begin(&this->parameters);
   geomNode = node->GetChild("geom");
@@ -154,16 +167,6 @@ void ContactSensor::LoadChild(XMLConfigNode *node)
     geomNode = geomNode->GetNext("geom");
   }
   Param::End();
-
-  this->contactCount = this->geomNamesP.size();
-  this->contactTimes = new double[ this->contactCount ];
-  this->contactStates = new uint8_t[ this->contactCount ];
-  for (unsigned int i=0; i< this->contactCount; i++)
-    this->contactNames.push_back("");
-
-  memset(this->contactTimes,0, sizeof(double) * this->contactCount);
-  memset(this->contactStates,0, sizeof(uint8_t) * this->contactCount);
-  memset(this->contactTimes,0, sizeof(double) * this->contactCount);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -173,9 +176,7 @@ void ContactSensor::SaveChild(std::string &prefix, std::ostream &stream)
   std::vector< ParamT<std::string> *>::iterator iter;
 
   for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
-  {
     stream << prefix << "  " << *(iter) << "\n";
-  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -191,15 +192,10 @@ void ContactSensor::InitChild()
 
     // Set the callback
     if (geom)
-    {
       geom->contact->Callback( &ContactSensor::ContactCallback, this );
-    }
     else
-    {
       gzthrow("Unable to find geom[" + **(*iter) + "]");
-    }
   }
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -218,30 +214,23 @@ void ContactSensor::UpdateChild()
 /// Contact callback
 void ContactSensor::ContactCallback(Geom *g1, Geom *g2)
 {
-
   // somehow here, extract contact information when user requests it
   //
-
-
   std::vector< ParamT<std::string> *>::iterator iter;
   int i = 0;
-
 
   for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); 
        iter++, i++)
   {
     if ( **(*iter) == g1->GetName() || **(*iter) == g2->GetName() )
     {
-      if (i < GAZEBO_MAX_CONTACT_FB_DATA)
-      {
-        /* BULLET
-        dJointSetFeedback(g1->cID, this->contactFeedbacks+i);
-        */
-      }
-
-      this->contactStates[i] = 1;
-      this->contactTimes[i] = Simulator::Instance()->GetRealTime();
-      this->contactNames[i] = **(*iter)==g1->GetName()? g2->GetName() : g1->GetName();
+      this->contacts[i].state = 1;
+      this->contacts[i].time = Simulator::Instance()->GetRealTime();
+      this->contacts[i].name = **(*iter)==g1->GetName()? g2->GetName() : g1->GetName();
+      this->contacts[i].body1Force = g1->contact->body1Force;
+      this->contacts[i].body2Force = g1->contact->body2Force;
+      this->contacts[i].body1Torque = g1->contact->body1Torque;
+      this->contacts[i].body2Torque = g1->contact->body2Torque;
     }
   }
 
