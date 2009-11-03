@@ -120,6 +120,12 @@ namespace gazebo
 
     /// \brief Get the rotation rate of an axis(index)
     public: virtual double GetVelocity(int index) const = 0;
+
+    /// \brief Set the force applied to an axis
+    public: virtual void SetForce(int index, double f) {}
+
+    /// \brief Get the force applied to an axis
+    public: virtual double GetForce(int index) {return 0;}
  
     /// \brief Set the max allowed force of an axis(index).
     public: virtual void SetMaxForce(int index, double t) = 0;

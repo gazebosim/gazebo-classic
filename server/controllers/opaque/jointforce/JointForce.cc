@@ -104,21 +104,41 @@ void JointForce::UpdateChild()
     bt1 = this->joints[i]->GetBodyTorque(0);
     bt2 = this->joints[i]->GetBodyTorque(1);
 
-    *(ptr++) = bf1.x; 
-    *(ptr++) = bf1.y; 
-    *(ptr++) = bf1.z; 
+    *ptr = bf1.x; 
+    ptr += sizeof(double);
 
-    *(ptr++) = bt1.x; 
-    *(ptr++) = bt1.y; 
-    *(ptr++) = bt1.z; 
+    *ptr = bf1.y; 
+    ptr += sizeof(double);
 
-    *(ptr++) = bf2.x; 
-    *(ptr++) = bf2.y; 
-    *(ptr++) = bf2.z; 
+    *ptr = bf1.z; 
+    ptr += sizeof(double);
 
-    *(ptr++) = bt2.x; 
-    *(ptr++) = bt2.y; 
-    *(ptr++) = bt2.z; 
+    *ptr++ = bt1.x; 
+    ptr += sizeof(double);
+
+    *ptr++ = bt1.y; 
+    ptr += sizeof(double);
+
+    *ptr++ = bt1.z; 
+    ptr += sizeof(double);
+
+    *ptr = bf2.x; 
+    ptr += sizeof(double);
+
+    *ptr = bf2.y; 
+    ptr += sizeof(double);
+
+    *ptr = bf2.z; 
+    ptr += sizeof(double);
+
+    *ptr = bt2.x; 
+    ptr += sizeof(double);
+
+    *ptr = bt2.y; 
+    ptr += sizeof(double);
+
+    *ptr = bt2.z; 
+    ptr += sizeof(double);
   }
 
   this->myIface->Unlock();
