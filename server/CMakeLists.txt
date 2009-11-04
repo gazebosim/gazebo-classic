@@ -4,6 +4,7 @@ STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs
 
 ########################################
 # Include all the search paths for headers
+STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
 INCLUDE_DIRECTORIES(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
