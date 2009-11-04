@@ -144,12 +144,13 @@ TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
 )
 
 if (INCLUDE_BULLET)
-  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_bullet)
+  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_bullet ${bullet_link_libs})
+  TARGET_LINK_LIBRARIES(gazebo_server gazebo_physics_bullet ${bullet_link_libs})
 endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
-  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_ode)
-  TARGET_LINK_LIBRARIES( gazebo_server ${ODE_LIBRARIES})
+  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
+  TARGET_LINK_LIBRARIES(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
 endif (INCLUDE_ODE)
 
 TARGET_LINK_LIBRARIES( gazebo_server ${libtool_library} ${freeimage_library} gazebo)

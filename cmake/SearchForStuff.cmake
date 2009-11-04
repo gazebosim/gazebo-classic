@@ -344,18 +344,18 @@ IF (bullet_dynamics_library AND
     bullet_math_library AND
     bullet_include_dir)
   SET (INCLUDE_BULLET TRUE CACHE BOOL "Include support for Bullet")
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
+  APPEND_TO_CACHED_LIST(bullet_link_libs 
+                        ${bullet_link_libs_desc} 
                         BulletDynamics)
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
+  APPEND_TO_CACHED_LIST(bullet_link_libs 
+                        ${bullet_link_libs_desc} 
                         BulletCollision)
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
+  APPEND_TO_CACHED_LIST(bullet_link_libs 
+                        ${bullet_link_libs_desc} 
                         BulletSoftBody)
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                      ${gazeboserver_link_libs_desc} 
-                      LinearMath)
+  APPEND_TO_CACHED_LIST(bullet_link_libs 
+                        ${bullet_link_libs_desc} 
+                        LinearMath)
 
 
 ELSE (bullet_dynamics_library AND 

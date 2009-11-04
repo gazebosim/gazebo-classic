@@ -28,14 +28,15 @@
 #define BULLETPHYSICS_HH
 
 #include <btBulletDynamicsCommon.h>
+#include <btBulletCollisionCommon.h>
+
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "Param.hh"
 #include "PhysicsEngine.hh"
 #include "Geom.hh"
 #include "Shape.hh"
-
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 
 namespace gazebo
 {

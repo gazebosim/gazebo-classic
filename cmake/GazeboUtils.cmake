@@ -98,4 +98,6 @@ MACRO (GAZEBOSERVER_RESET_LISTS)
        ${gazebosensor_sources_desc} FORCE)
   SET (gazebocontroller_sources "" CACHE INTERNAL 
        ${gazebocontroller_sources_desc} FORCE)
+  set (bullet_link_libs "" CACHE INTERNAL 
+       ${bullet_link_libs_desc} FORCE)
 ENDMACRO (GAZEBOSERVER_RESET_LISTS)

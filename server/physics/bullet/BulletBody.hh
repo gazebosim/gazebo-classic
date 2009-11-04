@@ -27,15 +27,12 @@
 #ifndef BulletBODY_HH
 #define BulletBODY_HH
 
-#include <btBulletCollisionCommon.h>
-#include <btBulletDynamicsCommon.h>
-
+#include "BulletPhysics.hh"
 #include "Body.hh"
 
 namespace gazebo
 {
   class XMLConfigNode;
-  class BulletPhysics;
   class BulletMotionState;
   class BulletGeom;
 

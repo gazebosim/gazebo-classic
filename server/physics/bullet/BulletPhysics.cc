@@ -24,8 +24,6 @@
  * SVN: $Id: BulletPhysics.cc 7714 2009-05-23 18:08:49Z natepak $
  */
 
-#include <assert.h>
-
 #include "BulletBody.hh"
 #include "BulletPlaneShape.hh"
 #include "BulletSphereShape.hh"
@@ -50,9 +48,9 @@
 #include "Entity.hh"
 
 #include "XMLConfig.hh"
-#include "BulletPhysics.hh"
-
 #include "Simulator.hh"
+
+#include "BulletPhysics.hh"
 
 using namespace gazebo;
 
