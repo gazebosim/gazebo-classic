@@ -90,7 +90,13 @@ ODEPhysics::ODEPhysics()
   this->contactMaxCorrectingVelP = new ParamT<double>("contactMaxCorrectingVel", 10.0, 0);
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   Param::End();
+
+  //this->contactFeedbacks.resize(100);
+
+  // Reset the contact pointer
+  //this->contactFeedbackIter = this->contactFeedbacks.begin();
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -193,6 +199,32 @@ void ODEPhysics::UpdateCollision()
   dSpaceCollide( this->spaceId, this, CollisionCallback );
   this->UnlockMutex(); 
 
+  // Process all the contacts, get the feedback info, and call the geom
+  // callbacks
+  /*for (std::vector<ContactFeedback>::iterator iter = 
+        this->contactFeedbacks.begin(); 
+        iter != this->contactFeedbackIter; iter++)
+  {
+
+    (*iter).geom1->contact->body1Force.Set(
+        (*iter).feedback.f1[0], (*iter).feedback.f1[1], (*iter).feedback.f1[2]);
+    (*iter).geom2->contact->body2Force.Set(
+        (*iter).feedback.f2[0], (*iter).feedback.f2[1], (*iter).feedback.f2[2]);
+
+    (*iter).geom1->contact->body1Torque.Set(
+        (*iter).feedback.t1[0], (*iter).feedback.t1[1], (*iter).feedback.t1[2]);
+    (*iter).geom1->contact->body2Torque.Set(
+        (*iter).feedback.t2[0], (*iter).feedback.t2[1], (*iter).feedback.t2[2]);
+
+    // Call the geom's contact callbacks
+    (*iter).geom1->contact->contactSignal( (*iter).geom1, (*iter).geom2 );
+    (*iter).geom2->contact->contactSignal( (*iter).geom2, (*iter).geom1 );
+  }
+
+  // Reset the contact pointer
+  this->contactFeedbackIter = this->contactFeedbacks.begin();
+  */
+
   //usleep(1000000);
 #ifdef TIMING
   double tmpT2 = Simulator::Instance()->GetWallTime();
@@ -234,9 +266,10 @@ void ODEPhysics::UpdatePhysics()
 #endif
  
   this->LockMutex(); 
+  this->UpdateCollision();
 
   // Do collision detection; this will add contacts to the contact group
-  dSpaceCollide( this->spaceId, this, CollisionCallback );
+  //dSpaceCollide( this->spaceId, this, CollisionCallback );
 
   //usleep(1000000);
 #ifdef TIMING
@@ -503,20 +536,17 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
 
-        dJointFeedback *feedback = dJointGetFeedback(c);
-        geom1->contact->body1Force.Set(feedback->f1[0],feedback->f1[1],
-                                       feedback->f1[2]);
-        geom2->contact->body2Force.Set(feedback->f2[0],feedback->f2[1],
-                                       feedback->f2[2]);
-
-        geom1->contact->body1Torque.Set(feedback->t1[0],feedback->t1[1],
-                                        feedback->t1[2]);
-        geom1->contact->body2Torque.Set(feedback->t2[0],feedback->t2[1],
-                                        feedback->t2[2]);
-
-        // Call the geom's contact callbacks
-        geom1->contact->contactSignal( geom1, geom2 );
-        geom2->contact->contactSignal( geom2, geom1 );
+        /*if (self->contactFeedbackIter == self->contactFeedbacks.end())
+        {
+          self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
+          fprintf(stderr, "Resize\n");
+        }
+ 
+        (*self->contactFeedbackIter).geom1 = geom1;
+        (*self->contactFeedbackIter).geom2 = geom2;
+        dJointSetFeedback(c, &(*self->contactFeedbackIter).feedback);
+        self->contactFeedbackIter++;
+        */
 
         dJointAttach (c,b1,b2);
       }

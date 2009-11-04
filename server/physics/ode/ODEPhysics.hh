@@ -159,6 +159,16 @@ class ODEPhysics : public PhysicsEngine
   private: ParamT<double> *quickStepWP; 
   private: ParamT<double> *contactMaxCorrectingVelP;
   private: ParamT<double> *contactSurfaceLayerP;
+
+  private: class ContactFeedback
+           {
+             public: dJointFeedback feedback;
+             public: Geom *geom1;
+             public: Geom *geom2;
+           };
+
+  private: std::vector<ContactFeedback> contactFeedbacks;
+  private: std::vector<ContactFeedback>::iterator contactFeedbackIter;
 };
 
 /** \}*/

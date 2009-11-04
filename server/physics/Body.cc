@@ -350,10 +350,8 @@ void Body::Init()
   // global-inertial damping is implemented in ode svn trunk
   if(this->GetId() && this->dampingFactorP->GetValue() > 0)
   {
-    this->physicsEngine->LockMutex();
     this->SetLinearDamping(**this->dampingFactorP);
     this->SetAngularDamping(**this->dampingFactorP);
-    this->physicsEngine->UnlockMutex();
   }
 
   this->linearAccel.Set(0,0,0);

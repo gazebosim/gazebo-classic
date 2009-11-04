@@ -175,8 +175,6 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   // Load OpenAL audio 
   if (rootNode->GetChild("openal","audio"))
   {
-    //this->openAL = new OpenALAPI();
-    //this->openAL->Load(rootNode->GetChild("openal", "audio"));
     this->openAL = OpenAL::Instance();
     this->openAL->Load(rootNode->GetChild("openal", "audio"));
   }
@@ -445,6 +443,7 @@ void World::InsertEntity( std::string xmlString)
 // Load all the entities that have been queued
 void World::ProcessEntitiesToLoad()
 {
+
   if (!this->toLoadEntities.empty())
   {
     // maybe try try_lock here instead
@@ -473,7 +472,6 @@ void World::ProcessEntitiesToLoad()
       this->LoadEntities( xmlConfig->GetRootNode(), NULL, true); 
       delete xmlConfig;
     }
-
     this->toLoadEntities.clear();
   }
 }

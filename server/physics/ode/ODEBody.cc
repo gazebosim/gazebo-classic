@@ -114,7 +114,7 @@ void ODEBody::MoveCallback(dBodyID id)
 
   //std::cout << "Body Move[" << pose << "]\n";
   self->SetAbsPose(pose, false);
-  self->physicsEngine->LockMutex();
+  self->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,12 +153,12 @@ void ODEBody::AttachGeom( Geom *geom )
 
   if ( this->bodyId && odeGeom->IsPlaceable())
   {
-    this->physicsEngine->LockMutex();
-
     if (odeGeom->GetGeomId())
+    {
+      this->physicsEngine->LockMutex();
       dGeomSetBody(odeGeom->GetGeomId(), this->bodyId);
-
-    this->physicsEngine->UnlockMutex();
+      this->physicsEngine->UnlockMutex();
+    }
   }
 }
 
@@ -183,10 +183,8 @@ void ODEBody::OnPoseChange()
   // Set the rotation of the ODE body
   dBodySetQuaternion(this->bodyId, q);
   this->physicsEngine->UnlockMutex();
-
 }
 
-////////////////////////////////////////////////////////////////////////////////
 // Return the position of the body. in global CS
 Vector3 ODEBody::GetPositionRate() const
 {

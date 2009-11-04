@@ -203,9 +203,13 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP) );
 
   if (this->type == "physical")
+  {
     this->LoadPhysical(node);
+  }
   else if (this->type == "renderable")
+  {
     this->LoadRenderable(node);
+  }
   else if (this->type != "empty")
   {
     gzthrow("Invalid model type[" + this->type + "]\n");
@@ -873,7 +877,7 @@ void Model::LoadController(XMLConfigNode *node)
     }
     catch (GazeboError e)
     {
-      std::cerr << "Error Loading Controller[" <<  controllerName
+      gzerr(0) << "Error Loading Controller[" <<  controllerName
       << "]\n" << e << std::endl;
       delete controller;
       controller = NULL;
@@ -1142,14 +1146,13 @@ void Model::LoadPhysical(XMLConfigNode *node)
     }
     catch (GazeboError e)
     {
-      std::cerr << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
-      std::cerr <<  e << std::endl;
+      gzerr(0) << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
+      gzerr(0) <<  e << std::endl;
       childNode = childNode->GetNextByNSPrefix("joint");
       continue;
     }
     childNode = childNode->GetNextByNSPrefix("joint");
   }
-
 }
 
 
