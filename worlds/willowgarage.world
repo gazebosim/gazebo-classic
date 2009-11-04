@@ -17,7 +17,7 @@
   <verbosity>1</verbosity>
 
   <physics:ode>
-    <stepTime>0.0001</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.80665</gravity>
     <cfm>10e-8</cfm>
     <erp>0.3</erp>
@@ -74,6 +74,7 @@
   <model:physical name="wg_model">
     <xyz>0 0 0.0</xyz>
     <static>true</static>
+
     <body:trimesh name="wg_body">
       <geom:trimesh name="wg_geom">
         <scale>0.1 0.1 0.1</scale>
@@ -90,7 +91,7 @@
   <!-- White Point light -->
   <model:renderable name="point_white">
     <xyz>200 200 100</xyz>
-    <enableGravity>false</enableGravity>
+    <static>true</static>
 
     <light>
       <castShadows>false</castShadows>
@@ -108,7 +109,7 @@
    <!-- White Point light -->
    <model:renderable name="point_white1">
     <xyz>20 20 100</xyz>
-    <enableGravity>false</enableGravity>
+    <static>true</static>
 
     <light>
       <castShadows>false</castShadows>
@@ -125,7 +126,7 @@
   <!-- White Point light -->
   <model:renderable name="point_white2">
     <xyz>0 200 100</xyz>
-    <enableGravity>false</enableGravity>
+    <static>true</static>
 
     <light>
       <castShadows>false</castShadows>
@@ -142,7 +143,7 @@
   <!-- White Point light -->
   <model:renderable name="point_white3">
     <xyz>200 0 100</xyz>
-    <enableGravity>false</enableGravity>
+    <static>true</static>
 
     <light>
       <castShadows>false</castShadows>
@@ -159,7 +160,7 @@
   <!-- White Point light -->
   <model:renderable name="point_white4">
     <xyz>100 100 100</xyz>
-    <enableGravity>false</enableGravity>
+    <static>true</static>
 
     <light>
       <castShadows>true</castShadows>

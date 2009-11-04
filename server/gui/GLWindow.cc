@@ -75,9 +75,6 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
   this->leftMousePressed = false;
   this->rightMousePressed = false;
   this->middleMousePressed = false;
-  this->controlKeyPressed = false;
-  this->altKeyPressed = false;
-
 
   this->keys.clear();
 
@@ -231,7 +228,8 @@ void GLWindow::HandleMouseRelease()
       break;
   }
 
-  if (!this->mouseDrag && this->controlKeyPressed)
+  if (!this->mouseDrag && 
+      (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
   {
     Entity *entity = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
                                                           this->mousePos);
@@ -546,14 +544,6 @@ void GLWindow::HandleKeyPress(int keyNum)
         case FL_Control_L:
         case FL_Control_R:
           moveAmount = this->moveAmount * 10;
-          this->controlKeyPressed = true;
-          //std::cout << "press control" << std::endl;
-          break;
-
-        case FL_Alt_L:
-        case FL_Alt_R:
-          this->altKeyPressed = true;
-          //std::cout << "press alt" << std::endl;
           break;
       }
     }
@@ -623,17 +613,6 @@ void GLWindow::HandleKeyPress(int keyNum)
         case XK_q:
           this->directionVec.z -= this->moveAmount;
           break;
-
-        case XK_Control_L:
-        case XK_Control_R:
-          this->controlKeyPressed = true;
-          break;
-
-        case XK_Alt_L:
-        case XK_Alt_R:
-          this->altKeyPressed = true;
-          break;
-
         default:
           break;
       }
@@ -660,18 +639,6 @@ void GLWindow::HandleKeyRelease(int keyNum)
 
     case ']':
       CameraManager::Instance()->DecActiveCamera();
-      break;
-
-    case FL_Control_L:
-    case FL_Control_R:
-      this->controlKeyPressed = false;
-      //std::cout << "releasing control" << std::endl;
-      break;
-
-    case FL_Alt_L:
-    case FL_Alt_R:
-      this->altKeyPressed = false;
-      //std::cout << "releasing alt" << std::endl;
       break;
   }
 

@@ -359,7 +359,7 @@ void Body::Init()
 
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
-  if (this->mass.GetAsDouble() > 0.0)
+  /*if (this->mass.GetAsDouble() > 0.0)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
@@ -388,7 +388,7 @@ void Body::Init()
         line->AddPoint(giter->second->GetRelativePose().pos);
       }
     }
-  }
+  }*/
 
 
 }

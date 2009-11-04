@@ -88,7 +88,7 @@
   <model:physical name="pioneer2dx_model1">
     <xyz>2 2 .145</xyz>
     <rpy>0.0 0.0 90.0</rpy>
-    <enableGravity>false</enableGravity>
+    <static>true</static>
     <enableFriction>false</enableFriction>
 
     <controller:differential_position2d name="controller1">
@@ -102,7 +102,7 @@
 
     <model:physical name="laser">
       <xyz>0.15 0 0.18</xyz>
-      <enableGravity>false</enableGravity>
+      <static>true</static>
 
       <attach>
         <parentBody>chassis_body</parentBody>
@@ -123,7 +123,7 @@
   <!-- White Point light -->
   <model:renderable name="point_white">
     <xyz>0 2 2</xyz>
-    <enableGravity>false</enableGravity>
+    <static>true</static>
 
     <light>
       <type>point</type>

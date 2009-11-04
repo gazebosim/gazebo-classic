@@ -25,6 +25,7 @@
  */
 
 #include "GazeboError.hh"
+#include "World.hh"
 #include "ODEGeom.hh"
 #include "ODEPhysics.hh"
 #include "ODETrimeshShape.hh"
@@ -90,6 +91,7 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
   dMass odeMass;
   Mass mass;
   ODEGeom *pgeom = (ODEGeom*)this->parent;
+  PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
 
   TrimeshShape::Load(node);
 
@@ -106,6 +108,9 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
   mass = this->parent->GetMass();
 
   dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
+
+  physics->ConvertMass(&mass, &odeMass);
+  this->parent->SetMass(mass);
 
   // Create the trimesh geometry
   //pgeom->SetGeom(this->geomId, true);

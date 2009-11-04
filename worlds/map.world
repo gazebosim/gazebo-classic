@@ -77,7 +77,7 @@
   </model:physical>
 
   <model:renderable name="directional_white">
-    <enableGravity>false</enableGravity>
+    <static>true</static>
     <light>
       <type>directional</type>
       <direction>0 -0.6 -0.4</direction>

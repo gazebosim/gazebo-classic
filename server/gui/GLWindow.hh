@@ -134,6 +134,7 @@ namespace gazebo
 
     private: float moveAmount;
     private: float moveScale;
+
     private: float rotateAmount;
 
     private: Vector3 directionVec;
@@ -161,8 +162,7 @@ namespace gazebo
     /// gui interface, prerequisite to selecting Model / Body
     ///   press control+left click Model to toggle select.  Left mouse button drag updates model rotation about camera view axis, right mouse button drag udpates model position in camera view plane.
     ///   press control+right click Body to toggle select body select.  Left mouse button drag applies torque, right mouse button drag applies linear force.
-    private: bool controlKeyPressed;
-    private: bool altKeyPressed;
+    ///   press and hold shift to move the user camera around faster
   };
 
 }

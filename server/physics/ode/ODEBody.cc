@@ -326,9 +326,9 @@ void ODEBody::UpdateCoM()
     this->physicsEngine->ConvertMass(&odeMass, this->mass);
 
     // Center of Gravity must be at (0,0,0) in the body frame
-    odeMass.c[0] = 0;
-    odeMass.c[1] = 0;
-    odeMass.c[2] = 0;
+    odeMass.c[0] = 0.0;
+    odeMass.c[1] = 0.0;
+    odeMass.c[2] = 0.0;
 
     // Set the mass of the ODE body
     dBodySetMass( this->bodyId, &odeMass );

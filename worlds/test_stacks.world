@@ -5457,7 +5457,7 @@
   <!-- White Point light -->
   <model:renderable name="point_white">
     <xyz>1 1 100</xyz>
-    <enableGravity>false</enableGravity>
+    <statice>true</static>
 
     <light>
       <type>point</type>
