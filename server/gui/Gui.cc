@@ -65,12 +65,12 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
     // Create a main menu
     new MainMenu(0,0,w(),30,(char *)"MainMenu");
 
-    // Create the frame mamanger
-    this->frameMgr = new GLFrameManager(0, 30, 
-                         this->w()-toolbarWidth, this->h()-60, "");
-
-    this->toolbar = new Toolbar(this->w() - toolbarWidth, 30,
+    this->toolbar = new Toolbar(0, 30,
                                 toolbarWidth, this->h() - 60);
+
+    // Create the frame mamanger
+    this->frameMgr = new GLFrameManager(toolbarWidth, 30, 
+                         this->w()-toolbarWidth, this->h()-60, "");
 
     // Create the status bar
     this->statusbar = new StatusBar(0, height-30, 
