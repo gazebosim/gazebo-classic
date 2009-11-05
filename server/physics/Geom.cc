@@ -162,7 +162,6 @@ void Geom::CreateBoundingBox()
     Vector3 max;
 
     this->GetBoundingBox(min,max);
-    std::cout << "Bounding Box[" << min << "][" << max << "]\n";
 
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "_BBVISUAL" ;

@@ -320,7 +320,32 @@ void ODEBody::UpdateCoM()
 {
   Body::UpdateCoM();
 
-  if (this->bodyId)
+  if (!this->bodyId)
+    return;
+
+  if (**this->customMassMatrixP)
+  {
+    this->physicsEngine->LockMutex();
+    dMass odeMass;
+    dMassSetZero(&odeMass);
+
+    Vector3 cog = this->customMass.GetCoG();
+    Vector3 principals = this->customMass.GetPrincipalMoments();
+    Vector3 products = this->customMass.GetProductsofInertia();
+
+    dMassSetParameters(&odeMass, this->customMass.GetAsDouble(),
+                       cog.x, cog.y, cog.z,
+                       principals.x, principals.y, principals.z,
+                       products.x, products.y, products.z);
+    if (this->customMass.GetAsDouble() > 0)
+      dBodySetMass(this->bodyId, &odeMass);
+    else
+      gzthrow("Setting custom body " + this->GetName()+"mass to zero!");
+
+    this->physicsEngine->ConvertMass(&this->customMass, &odeMass);
+    this->physicsEngine->UnlockMutex();
+  }
+  else
   { 
     dMass odeMass;
     this->physicsEngine->ConvertMass(&odeMass, this->mass);

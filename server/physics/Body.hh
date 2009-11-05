@@ -248,8 +248,7 @@ namespace gazebo
     protected: ParamT<double> *ixyP;
     protected: ParamT<double> *ixzP;
     protected: ParamT<double> *iyzP;
-    protected: bool customMassMatrix;
-    protected: double cx,cy,cz,bodyMass,ixx,iyy,izz,ixy,ixz,iyz;
+    protected: Mass customMass;
   };
 
   /// \}

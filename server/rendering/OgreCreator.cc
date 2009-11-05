@@ -1003,6 +1003,12 @@ void OgreCreator::InsertMesh( const Mesh *mesh)
     Vector3 max = mesh->GetMax();
     Vector3 min = mesh->GetMin();
 
+    if (!max.IsFinite())
+      gzthrow("Max bounding box is not finite[" << max << "]\n");
+
+    if (!min.IsFinite())
+      gzthrow("Min bounding box is not finite[" << min << "]\n");
+
     ogreMesh->_setBounds( Ogre::AxisAlignedBox(
           Ogre::Vector3(min.x, min.y, min.z),
           Ogre::Vector3(max.x, max.y, max.z)), 

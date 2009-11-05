@@ -159,18 +159,11 @@ void Body::Load(XMLConfigNode *node)
   this->ixzP->Load(node);
   this->iyzP->Load(node);
 
-  this->customMassMatrix = this->customMassMatrixP->GetValue();
-  this->cx  = this->cxP ->GetValue();
-  this->cy  = this->cyP ->GetValue();
-  this->cz  = this->czP ->GetValue();
-  this->bodyMass = this->bodyMassP->GetValue();
-  this->ixx = this->ixxP->GetValue();
-  this->iyy = this->iyyP->GetValue();
-  this->izz = this->izzP->GetValue();
-  this->ixy = this->ixyP->GetValue();
-  this->ixz = this->ixzP->GetValue();
-  this->iyz = this->iyzP->GetValue();
-
+  this->customMass.SetCoG(**this->cxP, **this->cyP,** this->czP);
+  this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
+                                     **this->ixyP, **this->ixzP, **this->iyzP);
+  this->customMass.SetMass(**this->bodyMassP);
+     
   XMLConfigNode *childNode;
 
   this->nameP->Load(node);
@@ -198,7 +191,7 @@ void Body::Load(XMLConfigNode *node)
   }
 
   // update mass CoM if using customMassMatrix
-  if (this->customMassMatrix)
+  if (**this->customMassMatrixP)
   {
     this->UpdateCoM();
   }
@@ -641,17 +634,15 @@ std::vector< Sensor* > &Body::GetSensors()
   return this->sensors;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-/// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
-void Body::GetInterfaceNames(std::vector<std::string>& list) const{
-
+////////////////////////////////////////////////////////////////////////////////
+/// Get the list of interfaces e.g 
+/// "pioneer2dx_model1::laser::laser_iface0->laser"
+void Body::GetInterfaceNames(std::vector<std::string>& list) const
+{
   std::vector< Sensor* >::const_iterator iter;
 
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
-  {
-	(*iter)->GetInterfaceNames(list);
-  }
-
+    (*iter)->GetInterfaceNames(list);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

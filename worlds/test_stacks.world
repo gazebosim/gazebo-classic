@@ -63,7 +63,7 @@
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -86,7 +86,7 @@
     <body:sphere name="sphere2_body">
       <geom:sphere name="sphere2_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -109,7 +109,7 @@
     <body:sphere name="sphere3_body">
       <geom:sphere name="sphere3_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -132,7 +132,7 @@
     <body:sphere name="sphere4_body">
       <geom:sphere name="sphere4_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -155,7 +155,7 @@
     <body:sphere name="sphere5_body">
       <geom:sphere name="sphere5_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -178,7 +178,7 @@
     <body:sphere name="sphere6_body">
       <geom:sphere name="sphere6_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -201,7 +201,7 @@
     <body:sphere name="sphere7_body">
       <geom:sphere name="sphere7_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -224,7 +224,7 @@
     <body:sphere name="sphere8_body">
       <geom:sphere name="sphere8_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -247,7 +247,7 @@
     <body:sphere name="sphere9_body">
       <geom:sphere name="sphere9_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -270,7 +270,7 @@
     <body:sphere name="sphere10_body">
       <geom:sphere name="sphere10_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -293,7 +293,7 @@
     <body:sphere name="sphere11_body">
       <geom:sphere name="sphere11_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -316,7 +316,7 @@
     <body:sphere name="sphere12_body">
       <geom:sphere name="sphere12_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -339,7 +339,7 @@
     <body:sphere name="sphere13_body">
       <geom:sphere name="sphere13_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -362,7 +362,7 @@
     <body:sphere name="sphere14_body">
       <geom:sphere name="sphere14_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -385,7 +385,7 @@
     <body:sphere name="sphere15_body">
       <geom:sphere name="sphere15_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -408,7 +408,7 @@
     <body:sphere name="sphere16_body">
       <geom:sphere name="sphere16_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -431,7 +431,7 @@
     <body:sphere name="sphere17_body">
       <geom:sphere name="sphere17_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -454,7 +454,7 @@
     <body:sphere name="sphere18_body">
       <geom:sphere name="sphere18_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -477,7 +477,7 @@
     <body:sphere name="sphere19_body">
       <geom:sphere name="sphere19_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -500,7 +500,7 @@
     <body:sphere name="sphere20_body">
       <geom:sphere name="sphere20_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -523,7 +523,7 @@
     <body:sphere name="sphere21_body">
       <geom:sphere name="sphere21_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -546,7 +546,7 @@
     <body:sphere name="sphere22_body">
       <geom:sphere name="sphere22_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -569,7 +569,7 @@
     <body:sphere name="sphere23_body">
       <geom:sphere name="sphere23_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -592,7 +592,7 @@
     <body:sphere name="sphere24_body">
       <geom:sphere name="sphere24_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -615,7 +615,7 @@
     <body:sphere name="sphere25_body">
       <geom:sphere name="sphere25_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -638,7 +638,7 @@
     <body:sphere name="sphere26_body">
       <geom:sphere name="sphere26_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -661,7 +661,7 @@
     <body:sphere name="sphere27_body">
       <geom:sphere name="sphere27_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -684,7 +684,7 @@
     <body:sphere name="sphere28_body">
       <geom:sphere name="sphere28_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -707,7 +707,7 @@
     <body:sphere name="sphere29_body">
       <geom:sphere name="sphere29_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -730,7 +730,7 @@
     <body:sphere name="sphere30_body">
       <geom:sphere name="sphere30_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -753,7 +753,7 @@
     <body:sphere name="sphere31_body">
       <geom:sphere name="sphere31_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -776,7 +776,7 @@
     <body:sphere name="sphere32_body">
       <geom:sphere name="sphere32_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -799,7 +799,7 @@
     <body:sphere name="sphere33_body">
       <geom:sphere name="sphere33_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -822,7 +822,7 @@
     <body:sphere name="sphere34_body">
       <geom:sphere name="sphere34_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -845,7 +845,7 @@
     <body:sphere name="sphere35_body">
       <geom:sphere name="sphere35_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -868,7 +868,7 @@
     <body:sphere name="sphere36_body">
       <geom:sphere name="sphere36_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -891,7 +891,7 @@
     <body:sphere name="sphere37_body">
       <geom:sphere name="sphere37_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -914,7 +914,7 @@
     <body:sphere name="sphere38_body">
       <geom:sphere name="sphere38_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -937,7 +937,7 @@
     <body:sphere name="sphere39_body">
       <geom:sphere name="sphere39_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -960,7 +960,7 @@
     <body:sphere name="sphere40_body">
       <geom:sphere name="sphere40_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -983,7 +983,7 @@
     <body:sphere name="sphere41_body">
       <geom:sphere name="sphere41_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1006,7 +1006,7 @@
     <body:sphere name="sphere42_body">
       <geom:sphere name="sphere42_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1029,7 +1029,7 @@
     <body:sphere name="sphere43_body">
       <geom:sphere name="sphere43_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1052,7 +1052,7 @@
     <body:sphere name="sphere44_body">
       <geom:sphere name="sphere44_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1075,7 +1075,7 @@
     <body:sphere name="sphere45_body">
       <geom:sphere name="sphere45_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1098,7 +1098,7 @@
     <body:sphere name="sphere46_body">
       <geom:sphere name="sphere46_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1121,7 +1121,7 @@
     <body:sphere name="sphere47_body">
       <geom:sphere name="sphere47_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1144,7 +1144,7 @@
     <body:sphere name="sphere48_body">
       <geom:sphere name="sphere48_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1167,7 +1167,7 @@
     <body:sphere name="sphere49_body">
       <geom:sphere name="sphere49_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1190,7 +1190,7 @@
     <body:sphere name="sphere50_body">
       <geom:sphere name="sphere50_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1213,7 +1213,7 @@
     <body:sphere name="sphere51_body">
       <geom:sphere name="sphere51_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1236,7 +1236,7 @@
     <body:sphere name="sphere52_body">
       <geom:sphere name="sphere52_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1259,7 +1259,7 @@
     <body:sphere name="sphere53_body">
       <geom:sphere name="sphere53_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1282,7 +1282,7 @@
     <body:sphere name="sphere54_body">
       <geom:sphere name="sphere54_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1305,7 +1305,7 @@
     <body:sphere name="sphere55_body">
       <geom:sphere name="sphere55_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1328,7 +1328,7 @@
     <body:sphere name="sphere56_body">
       <geom:sphere name="sphere56_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1351,7 +1351,7 @@
     <body:sphere name="sphere57_body">
       <geom:sphere name="sphere57_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1374,7 +1374,7 @@
     <body:sphere name="sphere58_body">
       <geom:sphere name="sphere58_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1397,7 +1397,7 @@
     <body:sphere name="sphere59_body">
       <geom:sphere name="sphere59_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1420,7 +1420,7 @@
     <body:sphere name="sphere60_body">
       <geom:sphere name="sphere60_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1443,7 +1443,7 @@
     <body:sphere name="sphere61_body">
       <geom:sphere name="sphere61_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1466,7 +1466,7 @@
     <body:sphere name="sphere62_body">
       <geom:sphere name="sphere62_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1489,7 +1489,7 @@
     <body:sphere name="sphere63_body">
       <geom:sphere name="sphere63_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1512,7 +1512,7 @@
     <body:sphere name="sphere64_body">
       <geom:sphere name="sphere64_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1535,7 +1535,7 @@
     <body:sphere name="sphere65_body">
       <geom:sphere name="sphere65_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1558,7 +1558,7 @@
     <body:sphere name="sphere66_body">
       <geom:sphere name="sphere66_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1581,7 +1581,7 @@
     <body:sphere name="sphere67_body">
       <geom:sphere name="sphere67_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1604,7 +1604,7 @@
     <body:sphere name="sphere68_body">
       <geom:sphere name="sphere68_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1627,7 +1627,7 @@
     <body:sphere name="sphere69_body">
       <geom:sphere name="sphere69_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1650,7 +1650,7 @@
     <body:sphere name="sphere70_body">
       <geom:sphere name="sphere70_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1673,7 +1673,7 @@
     <body:sphere name="sphere71_body">
       <geom:sphere name="sphere71_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1696,7 +1696,7 @@
     <body:sphere name="sphere72_body">
       <geom:sphere name="sphere72_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1719,7 +1719,7 @@
     <body:sphere name="sphere73_body">
       <geom:sphere name="sphere73_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1742,7 +1742,7 @@
     <body:sphere name="sphere74_body">
       <geom:sphere name="sphere74_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1765,7 +1765,7 @@
     <body:sphere name="sphere75_body">
       <geom:sphere name="sphere75_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1788,7 +1788,7 @@
     <body:sphere name="sphere76_body">
       <geom:sphere name="sphere76_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1811,7 +1811,7 @@
     <body:sphere name="sphere77_body">
       <geom:sphere name="sphere77_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1834,7 +1834,7 @@
     <body:sphere name="sphere78_body">
       <geom:sphere name="sphere78_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1857,7 +1857,7 @@
     <body:sphere name="sphere79_body">
       <geom:sphere name="sphere79_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1880,7 +1880,7 @@
     <body:sphere name="sphere80_body">
       <geom:sphere name="sphere80_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1903,7 +1903,7 @@
     <body:sphere name="sphere81_body">
       <geom:sphere name="sphere81_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1926,7 +1926,7 @@
     <body:sphere name="sphere82_body">
       <geom:sphere name="sphere82_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1949,7 +1949,7 @@
     <body:sphere name="sphere83_body">
       <geom:sphere name="sphere83_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1972,7 +1972,7 @@
     <body:sphere name="sphere84_body">
       <geom:sphere name="sphere84_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -1995,7 +1995,7 @@
     <body:sphere name="sphere85_body">
       <geom:sphere name="sphere85_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2018,7 +2018,7 @@
     <body:sphere name="sphere86_body">
       <geom:sphere name="sphere86_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2041,7 +2041,7 @@
     <body:sphere name="sphere87_body">
       <geom:sphere name="sphere87_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2064,7 +2064,7 @@
     <body:sphere name="sphere88_body">
       <geom:sphere name="sphere88_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2087,7 +2087,7 @@
     <body:sphere name="sphere89_body">
       <geom:sphere name="sphere89_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2110,7 +2110,7 @@
     <body:sphere name="sphere90_body">
       <geom:sphere name="sphere90_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2133,7 +2133,7 @@
     <body:sphere name="sphere91_body">
       <geom:sphere name="sphere91_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2156,7 +2156,7 @@
     <body:sphere name="sphere92_body">
       <geom:sphere name="sphere92_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2179,7 +2179,7 @@
     <body:sphere name="sphere93_body">
       <geom:sphere name="sphere93_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2202,7 +2202,7 @@
     <body:sphere name="sphere94_body">
       <geom:sphere name="sphere94_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2225,7 +2225,7 @@
     <body:sphere name="sphere95_body">
       <geom:sphere name="sphere95_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2248,7 +2248,7 @@
     <body:sphere name="sphere96_body">
       <geom:sphere name="sphere96_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2271,7 +2271,7 @@
     <body:sphere name="sphere97_body">
       <geom:sphere name="sphere97_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2294,7 +2294,7 @@
     <body:sphere name="sphere98_body">
       <geom:sphere name="sphere98_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2317,7 +2317,7 @@
     <body:sphere name="sphere99_body">
       <geom:sphere name="sphere99_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -2340,7 +2340,7 @@
     <body:sphere name="sphere100_body">
       <geom:sphere name="sphere100_geom">
         <size>0.2</size>
-        <mass>0.0</mass>
+        <mass>0.1</mass>
 
         <mu1>10.0</mu1>
         <mu2>10.0</mu2>
@@ -5457,7 +5457,7 @@
   <!-- White Point light -->
   <model:renderable name="point_white">
     <xyz>1 1 100</xyz>
-    <statice>true</static>
+    <static>true</static>
 
     <light>
       <type>point</type>
