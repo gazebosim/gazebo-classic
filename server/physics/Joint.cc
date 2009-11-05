@@ -240,13 +240,13 @@ void Joint::Update()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// \brief Reset the joint
+/// Reset the joint
 void Joint::Reset()
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// \brief Attach the two bodies with this joint
+/// Attach the two bodies with this joint
 void Joint::Attach( Body *one, Body *two )
 {
   this->body1 = one;

@@ -125,8 +125,8 @@ void ODEJoint::Attach(Body *one, Body *two)
   ODEBody *odeBody1 = dynamic_cast<ODEBody*>(this->body1);
   ODEBody *odeBody2 = dynamic_cast<ODEBody*>(this->body2);
 
-  if (odeBody1 == NULL || odeBody2 == NULL)
-    gzthrow("ODEJoint requires ODE bodies\n");
+  if (odeBody1 == NULL && odeBody2 == NULL)
+    gzthrow("ODEJoint requires at least one ODE body\n");
 
   if (!odeBody1 && odeBody2)
   {
