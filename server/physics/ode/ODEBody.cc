@@ -344,6 +344,8 @@ void ODEBody::UpdateCoM()
 
     this->physicsEngine->ConvertMass(&this->mass, &odeMass);
     this->physicsEngine->UnlockMutex();
+
+    this->cgVisual->SetPosition(cog);
   }
   else
   { 
