@@ -329,9 +329,13 @@ void ODEBody::UpdateCoM()
     dMass odeMass;
     dMassSetZero(&odeMass);
 
-    Vector3 cog = this->customMass.GetCoG();
+    // The CoG must always be (0,0,0)
+    Vector3 cog;
+
     Vector3 principals = this->customMass.GetPrincipalMoments();
     Vector3 products = this->customMass.GetProductsofInertia();
+
+    std::cout << "Custom Mass[" << this->customMass << "]\n";
 
     dMassSetParameters(&odeMass, this->customMass.GetAsDouble(),
                        cog.x, cog.y, cog.z,
@@ -344,8 +348,6 @@ void ODEBody::UpdateCoM()
 
     this->physicsEngine->ConvertMass(&this->mass, &odeMass);
     this->physicsEngine->UnlockMutex();
-
-    this->cgVisual->SetPosition(cog);
   }
   else
   { 

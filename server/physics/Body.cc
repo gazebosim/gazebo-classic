@@ -366,9 +366,9 @@ void Body::Init()
     if (this->cgVisual)
     {
       this->cgVisual->AttachMesh("body_cg");
-      this->cgVisual->SetVisible(true);
       this->cgVisual->SetMaterial("Gazebo/Red");
       this->cgVisual->SetCastShadows(false);
+      this->cgVisual->SetVisible(true);
 
       std::map< std::string, Geom* >::iterator giter;
 
@@ -382,7 +382,6 @@ void Body::Init()
         line->AddPoint(giter->second->GetRelativePose().pos);
       }
 
-      this->cgVisual->SetVisible(false);
     }
   }
 
@@ -481,10 +480,11 @@ void Body::UpdateCoM()
   std::map<std::string, Geom*>::iterator iter;
   this->mass.Reset();
 
-  for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
-  {
-    this->mass += iter->second->GetMass();
-  }
+  if (**this->customMassMatrixP)
+    this->mass = this->customMass;
+  else
+    for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+      this->mass += iter->second->GetMass();
 
   // Translate all the geoms so that the CoG is at (0,0,0) in the body
   // frame
