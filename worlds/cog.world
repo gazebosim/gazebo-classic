@@ -64,8 +64,26 @@
     </body:plane>
   </model:physical>
 
+  <model:physical name="test">
+    <static>true</static>
+    <xyz>2.0 0 3.1</xyz>
+
+     <body:box name="base_body1">
+       <geom:box name="geom">
+         <size>0.1 0.1 0.1</size>
+         <mass>0.2</mass>
+         <visual>
+           <scale>0.1 0.1 0.1</scale>
+           <mesh>unit_box</mesh>
+           <material>Gazebo/Green</material>
+         </visual>
+       </geom:box>
+     </body:box>
+  </model:physical>
+
+
   <model:physical name="base_model">
-    <xyz>0 0 0.1</xyz>
+    <xyz>0 0 1.1</xyz>
 
     <!-- Bottom & Upright of the pendulum -->
     <body:box name="base_body">
@@ -76,12 +94,12 @@
       <ixx>0.1</ixx>
       <ixy>0.0</ixy>
       <ixz>0.0</ixz>
-      <iyy>1.1</iyy>
+      <iyy>0.216</iyy>
       <iyz>0.0</iyz>
       <izz>0.1</izz>
       <mass>1.0</mass>
      <geom:box name="upright_geom">
-        <xyz>0 0 1.1</xyz>
+        <xyz>0 0 0</xyz>
         <size>0.2 0.2 2.0</size>
         <mass>0.2</mass>
         <visual>

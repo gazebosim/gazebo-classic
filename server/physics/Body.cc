@@ -190,12 +190,6 @@ void Body::Load(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("geom");
   }
 
-  // update mass CoM if using customMassMatrix
-  if (**this->customMassMatrixP)
-  {
-    this->UpdateCoM();
-  }
-
   childNode = node->GetChildByNSPrefix("sensor");
 
   // Load the sensors
