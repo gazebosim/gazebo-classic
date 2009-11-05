@@ -321,7 +321,6 @@ void Geom::ShowBoundingBox(bool show)
     this->bbVisual->SetVisible(show);
 }
 
-// FIXME: ShowJoints and ShowPhysics will mess with each other and with the user's defined transparency visibility
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the visibility of the joints of this geometry
 void Geom::ShowJoints(bool show)
@@ -356,24 +355,7 @@ void Geom::ShowJoints(bool show)
 /// Set the visibility of the physical entity of this geom
 void Geom::ShowPhysics(bool show)
 {
-  std::vector<OgreVisual*>::iterator iter;
-
-  if (show)
-  {
-    for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-    {
-      if (*iter)
-        (*iter)->SetVisible(false, false);
-    }
-  }
-  else
-  {
-    for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-    {
-      if (*iter)
-        (*iter)->SetVisible(true, false);
-    }
-  }
+  this->body->ShowPhysics(show);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

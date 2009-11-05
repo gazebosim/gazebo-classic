@@ -56,7 +56,7 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
 
     { "View", 0, 0, 0, FL_SUBMENU, FL_NORMAL_LABEL, 0, 14, 0},
     { "Wireframe", 0, &gazebo::MainMenu::WireframeCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
-//      { "Show Physics", 0, &gazebo::MainMenu::ShowPhysicsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+    { "Show Physics", 0, &gazebo::MainMenu::ShowPhysicsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { 0 },

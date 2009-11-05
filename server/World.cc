@@ -622,7 +622,7 @@ void World::SetShowBoundingBoxes(bool show)
 
   std::vector< Geom *>::iterator iter;
 
-  for (iter = geometries.begin(); iter != geometries.end(); iter++)
+  for (iter = this->geometries.begin(); iter != this->geometries.end(); iter++)
   {
     (*iter)->ShowBoundingBox(this->showBoundingBoxes);
   }
@@ -644,11 +644,10 @@ void World::SetShowJoints(bool show)
 
   std::vector< Geom *>::iterator iter;
 
-  for (iter = geometries.begin(); iter != geometries.end(); iter++)
+  for (iter = this->geometries.begin(); iter != this->geometries.end(); iter++)
   {
     (*iter)->ShowJoints(this->showJoints);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -680,9 +679,9 @@ void World::SetShowPhysics(bool show)
 {
   this->showPhysics = show;
 
-  std::vector< Geom *>::iterator iter;
+  std::vector< Geom*>::iterator iter;
 
-  for (iter = geometries.begin(); iter != geometries.end(); iter++)
+  for (iter = this->geometries.begin(); iter != this->geometries.end(); iter++)
   {
     (*iter)->ShowPhysics(this->showPhysics);
   }

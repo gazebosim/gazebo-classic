@@ -342,7 +342,7 @@ void ODEBody::UpdateCoM()
     else
       gzthrow("Setting custom body " + this->GetName()+"mass to zero!");
 
-    this->physicsEngine->ConvertMass(&this->customMass, &odeMass);
+    this->physicsEngine->ConvertMass(&this->mass, &odeMass);
     this->physicsEngine->UnlockMutex();
   }
   else

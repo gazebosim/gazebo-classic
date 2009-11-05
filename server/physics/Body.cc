@@ -352,7 +352,7 @@ void Body::Init()
 
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
-  /*if (this->mass.GetAsDouble() > 0.0)
+  if (this->mass.GetAsDouble() > 0.0)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
@@ -369,6 +369,7 @@ void Body::Init()
       this->cgVisual->SetVisible(true);
       this->cgVisual->SetMaterial("Gazebo/Red");
       this->cgVisual->SetCastShadows(false);
+
       std::map< std::string, Geom* >::iterator giter;
 
       // Create a line to each geom
@@ -380,8 +381,10 @@ void Body::Init()
         line->AddPoint(Vector3(0,0,0));
         line->AddPoint(giter->second->GetRelativePose().pos);
       }
+
+      this->cgVisual->SetVisible(false);
     }
-  }*/
+  }
 
 
 }
@@ -668,3 +671,13 @@ void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
     max.z = std::max(bbmax.z, max.z);
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set to true to show the physics visualizations
+void Body::ShowPhysics(bool show)
+{
+  if (this->cgVisual)
+    this->cgVisual->SetVisible(show);
+}
+
+
