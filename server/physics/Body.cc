@@ -163,6 +163,8 @@ void Body::Load(XMLConfigNode *node)
   this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
                                      **this->ixyP, **this->ixzP, **this->iyzP);
   this->customMass.SetMass(**this->bodyMassP);
+
+  this->mass = this->customMass;
      
   XMLConfigNode *childNode;
 
@@ -460,7 +462,13 @@ void Body::AttachGeom( Geom *geom )
   if (iter == this->geoms.end())
   {
     this->geoms[geom->GetName()] = geom;
-    this->mass += geom->GetMass();
+
+    if (!**this->customMassMatrixP)
+    {
+      Mass tmpMass = geom->GetMass();
+      tmpMass.Rotate( this->GetRelativePose().rot );
+      this->mass += tmpMass;
+    }
   }
   else
     gzerr(0) << "Attempting to add two geoms with the same name[" << geom->GetName() << "] to body[" << this->GetName() << "].\n";
@@ -471,25 +479,24 @@ void Body::AttachGeom( Geom *geom )
 /// Update the center of mass
 void Body::UpdateCoM()
 {
+  Pose3d bodyPose;
+  Pose3d origPose, newPose;
   std::map<std::string, Geom*>::iterator iter;
-  this->mass.Reset();
 
   if (**this->customMassMatrixP)
     this->mass = this->customMass;
-  else
-    for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
-      this->mass += iter->second->GetMass();
 
-  // Translate all the geoms so that the CoG is at (0,0,0) in the body
-  // frame
+  bodyPose = this->GetRelativePose();
+
+  // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
-    Pose3d newPose;
-    Pose3d origPose = iter->second->GetRelativePose();
-
+    Vector3 offset;
+    origPose = iter->second->GetRelativePose();
     newPose = origPose;
-    newPose.pos -= this->mass.GetCoG();
 
+    offset = bodyPose.rot.GetInverse().RotateVector(this->mass.GetCoG());
+    newPose.pos -= offset;
     iter->second->SetRelativePose(newPose, true);
   }
 

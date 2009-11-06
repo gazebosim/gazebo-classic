@@ -104,13 +104,14 @@
     </body:box>
 
     <body:box name="swing_body">
-      <xyz>-0.5 -0.4 4.45</xyz>
+      <!--<xyz>-0.46 0.7 2.235</xyz>-->
+      <xyz>-0.46 0.7 2.15</xyz>
       <rpy>90 0 0</rpy>
       <dampingFactor>0.00006</dampingFactor>
       <geom:box name="swing_geom">
-        <xyz>0.0 1.88 -1.55</xyz>
+        <xyz>0.0 0 0</xyz>
         <size>0.1 0.1 1.5</size>
-        <mass>00.1</mass>
+        <mass>0.1</mass>
         <visual>
           <scale>0.1 0.1 1.5</scale>
           <mesh>unit_box</mesh>
@@ -118,7 +119,7 @@
         </visual>
       </geom:box>
       <geom:sphere name="weight_geom">
-        <xyz>0 1.88 -2.4</xyz>
+        <xyz>0 0 -0.9</xyz>
         <size>0.2</size>
         <mass>1.0</mass>
         <visual>
@@ -132,12 +133,13 @@
     <joint:hinge name="left_wheel_hinge">
       <body1>base_body</body1>
       <body2>swing_body</body2>
-      <anchor>base_body</anchor>
-      <anchorOffset>-0.45 0 2.1</anchorOffset>
+      <anchor>swing_body</anchor>
+      <anchorOffset>0 -0.7 0</anchorOffset>
       <axis>1 0 0</axis>
       <erp>0.8</erp>
       <cfm>10e-5</cfm>
     </joint:hinge>
+
   </model:physical>
 
  <model:renderable name="point_white">

@@ -124,6 +124,7 @@ void Joint::Load(XMLConfigNode *node)
 
   // setting anchor relative to gazebo body frame origin
   this->anchorPos = anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
+  this->anchorPos -= anchorBody->GetMass().GetCoG();
 
   this->Attach(this->body1, this->body2);
 

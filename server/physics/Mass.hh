@@ -27,6 +27,7 @@
 #ifndef MASS_HH
 #define MASS_HH
 
+#include "Quatern.hh"
 #include "Vector3.hh"
 
 namespace gazebo
@@ -74,6 +75,9 @@ namespace gazebo
 
     /// \brief Get the products of inertia (Ixy, Ixy, Iyz)
     public: Vector3 GetProductsofInertia() const;
+
+    /// \brief Rotate this mass
+    public: void Rotate(const Quatern &rot);
 
     /// \brief Equal operator
     public: void operator=(const Mass &mass);
