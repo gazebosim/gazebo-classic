@@ -73,15 +73,15 @@ void ODEBody::Load(XMLConfigNode *node)
 {
   Body::Load(node);
 
-  // Updat teh Center of Mass.
+  // Update the Center of Mass.
   this->UpdateCoM();
 
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  if (**this->selfCollideP)
+  /*if (**this->selfCollideP)
   {
     this->spaceId = dSimpleSpaceCreate( this->odePhysics->GetSpaceId() );
-  }
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
