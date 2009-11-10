@@ -103,7 +103,7 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
       (float*)this->vertices, 3*sizeof(float), this->numVertices,
       (int*)this->indices, this->numIndices, 3*sizeof(int));
 
-  pgeom->SetGeom( dCreateTriMesh( 0, this->odeData,0,0,0 ), true );
+  pgeom->SetGeom( dCreateTriMesh( pgeom->GetSpaceId(), this->odeData,0,0,0 ), true );
 
   mass = this->parent->GetMass();
 
@@ -111,9 +111,6 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
 
   physics->ConvertMass(&mass, &odeMass);
   this->parent->SetMass(mass);
-
-  // Create the trimesh geometry
-  //pgeom->SetGeom(this->geomId, true);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;

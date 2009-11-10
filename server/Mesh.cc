@@ -51,6 +51,9 @@ Vector3 Mesh::GetMax() const
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
   {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
+
     Vector3 smax = (*iter)->GetMax();
     max.x = std::max(max.x, smax.x);
     max.y = std::max(max.y, smax.y);
@@ -73,6 +76,9 @@ Vector3 Mesh::GetMin() const
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
   {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
+
     Vector3 smin = (*iter)->GetMin();
     min.x = std::min(min.x, smin.x);
     min.y = std::min(min.y, smin.y);
@@ -90,7 +96,11 @@ unsigned int Mesh::GetVertexCount() const
   std::vector<SubMesh *>::const_iterator iter;
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
     sum += (*iter)->GetVertexCount();
+  }
 
   return sum;
 }
@@ -103,7 +113,11 @@ unsigned int Mesh::GetNormalCount() const
   std::vector<SubMesh *>::const_iterator iter;
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
     sum += (*iter)->GetNormalCount();
+  }
 
   return sum;
 }
@@ -116,7 +130,11 @@ unsigned int Mesh::GetIndexCount() const
   std::vector<SubMesh *>::const_iterator iter;
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
     sum += (*iter)->GetIndexCount();
+  }
 
   return sum;
 }
@@ -129,7 +147,11 @@ unsigned int Mesh::GetTexCoordCount() const
   std::vector<SubMesh *>::const_iterator iter;
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
+  {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
     sum += (*iter)->GetTexCoordCount();
+  }
 
   return sum;
 }
@@ -194,6 +216,8 @@ void Mesh::FillArrays(float **vertArr, unsigned int **indArr) const
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
   {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
     vertCount += (*iter)->GetVertexCount();
     indCount += (*iter)->GetIndexCount();
   }
@@ -213,6 +237,9 @@ void Mesh::FillArrays(float **vertArr, unsigned int **indArr) const
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
   {
+    if ((*iter)->GetVertexCount() <= 2)
+      continue;
+
     float *vertTmp = NULL;
     unsigned int *indTmp = NULL;
     (*iter)->FillArrays(&vertTmp, &indTmp);

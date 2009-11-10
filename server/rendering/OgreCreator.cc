@@ -881,6 +881,9 @@ void OgreCreator::InsertMesh( const Mesh *mesh)
 {
   Ogre::MeshPtr ogreMesh;
 
+  if (mesh->GetSubMeshCount() == 0)
+    return;
+
   try
   {
     // Create a new mesh specifically for manual definition.
@@ -1003,11 +1006,14 @@ void OgreCreator::InsertMesh( const Mesh *mesh)
     Vector3 max = mesh->GetMax();
     Vector3 min = mesh->GetMin();
 
+    std::cout << "Max[" << max << "] Min[" << min << "]\n";
+
     if (!max.IsFinite())
       gzthrow("Max bounding box is not finite[" << max << "]\n");
 
     if (!min.IsFinite())
       gzthrow("Min bounding box is not finite[" << min << "]\n");
+
 
     ogreMesh->_setBounds( Ogre::AxisAlignedBox(
           Ogre::Vector3(min.x, min.y, min.z),

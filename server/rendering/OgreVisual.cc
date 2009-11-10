@@ -175,6 +175,8 @@ void OgreVisual::Load(XMLConfigNode *node)
     if (!MeshManager::Instance()->HasMesh(meshName))
       MeshManager::Instance()->Load(meshName);
 
+    std::cout << "Loading mesh[" << meshName << "]\n";
+
     // Add the mesh into OGRE
     OgreCreator::InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
 
