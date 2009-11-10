@@ -24,6 +24,7 @@
  * SVN: $Id$
  */
 
+#include "Mesh.hh"
 #include "GazeboError.hh"
 #include "World.hh"
 #include "ODEGeom.hh"
@@ -95,19 +96,49 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
 
   TrimeshShape::Load(node);
 
-  /// This will hold the vertex data of the triangle mesh
-  this->odeData = dGeomTriMeshDataCreate();
-
-  // Build the ODE triangle mesh
-  dGeomTriMeshDataBuildSingle( this->odeData,
-      (float*)this->vertices, 3*sizeof(float), this->numVertices,
-      (int*)this->indices, this->numIndices, 3*sizeof(int));
-
-  pgeom->SetGeom( dCreateTriMesh( pgeom->GetSpaceId(), this->odeData,0,0,0 ), true );
-
   mass = this->parent->GetMass();
 
-  dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
+  for (unsigned int i=0; i < this->mesh->GetSubMeshCount(); i++)
+  {
+    dTriMeshDataID odeData;
+
+    const SubMesh *subMesh = mesh->GetSubMesh(i);
+    if (subMesh->GetVertexCount() < 3)
+      continue;
+
+    /// This will hold the vertex data of the triangle mesh
+    odeData = dGeomTriMeshDataCreate();
+
+    unsigned int numVertices = 0;
+    unsigned int numIndices = 0;
+    float *vertices = NULL;
+    unsigned int *indices = NULL;
+
+    subMesh->FillArrays(&vertices, &indices);
+
+    numIndices = subMesh->GetIndexCount();
+    numVertices = subMesh->GetVertexCount();
+
+    for (unsigned int j=0;  j < numVertices; j++)
+    {
+      vertices[j*3+0] = vertices[j*3+0] * (**this->scaleP).x;
+      vertices[j*3+1] = vertices[j*3+1] * (**this->scaleP).y;
+      vertices[j*3+2] = vertices[j*3+2] * (**this->scaleP).z;
+    }
+
+    // Build the ODE triangle mesh
+    dGeomTriMeshDataBuildSingle( odeData,
+        (float*)vertices, 3*sizeof(float), numVertices,
+        (int*)indices, numIndices, 3*sizeof(int));
+
+    pgeom->SetGeom( dCreateTriMesh( pgeom->GetSpaceId(), odeData,0,0,0 ), true );
+
+    if (!pgeom->IsStatic())
+    {
+      double massV = mass.GetAsDouble()/this->mesh->GetSubMeshCount();
+      dMassSetTrimeshTotal(&odeMass, massV , pgeom->GetGeomId());
+    }
+  }
 
   physics->ConvertMass(&mass, &odeMass);
   this->parent->SetMass(mass);

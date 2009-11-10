@@ -1006,8 +1006,6 @@ void OgreCreator::InsertMesh( const Mesh *mesh)
     Vector3 max = mesh->GetMax();
     Vector3 min = mesh->GetMin();
 
-    std::cout << "Max[" << max << "] Min[" << min << "]\n";
-
     if (!max.IsFinite())
       gzthrow("Max bounding box is not finite[" << max << "]\n");
 

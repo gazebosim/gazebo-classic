@@ -31,6 +31,8 @@
 
 namespace gazebo
 {
+  class Mesh;
+
   /// \addtogroup gazebo_physics_geom
   /// \{
   /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
@@ -87,11 +89,14 @@ namespace gazebo
     protected: ParamT<std::string> *meshNameP;
 
     protected: ParamT<Vector3> *scaleP;
-
+/*
     protected: unsigned int numVertices;
     protected: unsigned int numIndices;
     protected: float *vertices;
     protected: unsigned int *indices;
+    */
+
+    protected: const Mesh *mesh;
   };
 
   /// \}

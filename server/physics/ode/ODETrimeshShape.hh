@@ -80,7 +80,7 @@ namespace gazebo
     /// \brief Load the trimesh
     protected: virtual void Load(XMLConfigNode *node);
 
-    private: dTriMeshDataID odeData;
+    //private: dTriMeshDataID odeData;
 
     private: dReal matrix_dblbuff[16*2];
     private: int last_matrix_index;
