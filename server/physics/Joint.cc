@@ -127,16 +127,6 @@ void Joint::Load(XMLConfigNode *node)
   this->anchorPos = this->anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
   this->anchorPos -= this->anchorBody->GetMass().GetCoG();
 
-  std::cout << "Joint Name[" << this->GetName() << "]\n";
-  if (this->body1)
-    std::cout << " Body1[" << this->body1->GetName() << "]\n";
-  if (this->body2)
-    std::cout << " Body2[" << this->body2->GetName() << "]\n";
-  std::cout << " AnchorBody[" << this->anchorBody->GetName() << "]\n";
-  std::cout << " AnchorBody[" << this->anchorBody->GetAbsPose().pos << "]\n";
-  std::cout << " Offset[" << **(this->anchorOffsetP) << "]\n";
-  std::cout << " Anchor Pos[" << this->anchorPos << "]\n";
-
   this->Attach(this->body1, this->body2);
 
   /// Add a renderable for the joint

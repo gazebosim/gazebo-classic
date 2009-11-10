@@ -71,7 +71,6 @@ const Mesh *MeshManager::Load(const std::string &filename)
         iter!=gazeboPaths.end(); ++iter)
     {
       fullname = (*iter)+"/Media/models/"+filename;
-      std::cout << "FUllname[" << fullname << "]\n";
       if (stat(fullname.c_str(), &st) == 0)
       {
         found = true;

@@ -102,9 +102,6 @@ void ODEGeom::OnPoseChange()
     // Transform into global pose since a static geom does not have a body 
     localPose = this->GetAbsPose();
 
-    std::cout << "Geom[" << this->GetName() << "]\n";
-    std::cout << "Static Pos[" << localPose << "]\n";
-
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
     q[2] = localPose.rot.y;
