@@ -32,8 +32,6 @@ Mesh *STLLoader::Load( const std::string &filename )
 
   FILE *file = fopen(filename.c_str(), "r");
 
-  std::cout << "SLT Load\n";
-
   /*if (extension == "stl" || extension == "stla")
     this->ReadAscii(file, mesh);
   else if (extension == "stlb")

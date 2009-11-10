@@ -17,8 +17,13 @@
   <physics:bullet>
     <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>10e-2</cfm>
+    <cfm>10e-10</cfm>
     <erp>0.2</erp>
+    <quickStep>true</quickStep>
+    <quickStepIters>50</quickStepIters>
+    <quickStepW>1.3</quickStepW>
+    <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
+    <contactSurfaceLayer>0.001</contactSurfaceLayer>
 
     <!-- updateRate: <0 == throttle simTime to match realTime.
                       0 == No throttling

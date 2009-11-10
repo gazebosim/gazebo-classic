@@ -852,6 +852,7 @@ void Model::LoadJoint(XMLConfigNode *node)
     gzthrow( "can't have two joint with the same name");
 
   this->joints.push_back( joint );
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////

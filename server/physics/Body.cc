@@ -369,7 +369,6 @@ void Body::Init()
       this->cgVisual->AttachMesh("body_cg");
       this->cgVisual->SetMaterial("Gazebo/Red");
       this->cgVisual->SetCastShadows(false);
-      this->cgVisual->SetVisible(false);
 
       std::map< std::string, Geom* >::iterator giter;
 
@@ -383,6 +382,7 @@ void Body::Init()
         line->AddPoint(giter->second->GetRelativePose().pos);
       }
 
+      this->cgVisual->SetVisible(false);
     }
   }
 

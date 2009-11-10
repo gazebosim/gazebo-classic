@@ -80,9 +80,8 @@ ODEPhysics::ODEPhysics()
 
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
-  /*dWorldSetAutoDisableFlag(this->worldId, 1);
+  dWorldSetAutoDisableFlag(this->worldId, 1);
   dWorldSetAutoDisableTime(this->worldId, 2.0);
-  */
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
@@ -94,10 +93,10 @@ ODEPhysics::ODEPhysics()
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   Param::End();
 
-  //this->contactFeedbacks.resize(100);
+  this->contactFeedbacks.resize(100);
 
   // Reset the contact pointer
-  //this->contactFeedbackIter = this->contactFeedbacks.begin();
+  this->contactFeedbackIter = this->contactFeedbacks.begin();
 }
 
 
@@ -204,7 +203,7 @@ void ODEPhysics::UpdateCollision()
 
   // Process all the contacts, get the feedback info, and call the geom
   // callbacks
-  /*for (std::vector<ContactFeedback>::iterator iter = 
+  for (std::vector<ContactFeedback>::iterator iter = 
         this->contactFeedbacks.begin(); 
         iter != this->contactFeedbackIter; iter++)
   {
@@ -226,39 +225,12 @@ void ODEPhysics::UpdateCollision()
 
   // Reset the contact pointer
   this->contactFeedbackIter = this->contactFeedbacks.begin();
-  */
 
-  //usleep(1000000);
 #ifdef TIMING
   double tmpT2 = Simulator::Instance()->GetWallTime();
   std::cout << "      Collision DT (" << tmpT2-tmpT1 << ")" << std::endl;
 #endif
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Update the ODE engine
-// void ODEPhysics::UpdatePhysics()
-// {
-// #ifdef TIMING
-//   double tmpT1 = Simulator::Instance()->GetWallTime();
-// #endif
-//
-//   // Update the dynamical model
-//   if (this->quickStepP->GetValue())
-//     dWorldQuickStep(this->worldId, this->stepTimeP->GetValue() );
-//   else
-//     dWorldStep( this->worldId, this->stepTimeP->GetValue() );
-//
-// #ifdef TIMING
-//   double tmpT3 = Simulator::Instance()->GetWallTime();
-//   std::cout << "      ODE step DT (" << tmpT3-tmpT1 << ")" << std::endl;
-//   //std::cout << "  Physics Total DT (" << tmpT3-tmpT1 << ")" << std::endl;
-// #endif
-//
-//   // Very important to clear out the contact group
-//   dJointGroupEmpty( this->contactGroup );
-//
-// }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the ODE engine
@@ -268,18 +240,14 @@ void ODEPhysics::UpdatePhysics()
   double tmpT1 = Simulator::Instance()->GetWallTime();
 #endif
  
-  this->LockMutex(); 
   this->UpdateCollision();
 
-  // Do collision detection; this will add contacts to the contact group
-  //dSpaceCollide( this->spaceId, this, CollisionCallback );
-
-  //usleep(1000000);
 #ifdef TIMING
   double tmpT2 = Simulator::Instance()->GetWallTime();
   std::cout << "      Collision DT (" << tmpT2-tmpT1 << ")" << std::endl;
 #endif
 
+  this->LockMutex(); 
   // Update the dynamical model
   if (this->quickStepP->GetValue())
     dWorldQuickStep(this->worldId, this->stepTimeP->GetValue() );
@@ -544,7 +512,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
 
-        /*if (self->contactFeedbackIter == self->contactFeedbacks.end())
+        if (self->contactFeedbackIter == self->contactFeedbacks.end())
         {
           self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
           fprintf(stderr, "Resize\n");
@@ -554,7 +522,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         (*self->contactFeedbackIter).geom2 = geom2;
         dJointSetFeedback(c, &(*self->contactFeedbackIter).feedback);
         self->contactFeedbackIter++;
-        */
 
         dJointAttach (c,b1,b2);
       }
