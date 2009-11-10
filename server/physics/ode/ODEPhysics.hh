@@ -169,6 +169,8 @@ class ODEPhysics : public PhysicsEngine
 
   private: std::vector<ContactFeedback> contactFeedbacks;
   private: std::vector<ContactFeedback>::iterator contactFeedbackIter;
+
+  private: std::map<std::string, dSpaceID> spaces;
 };
 
 /** \}*/

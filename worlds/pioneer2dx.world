@@ -92,7 +92,6 @@
     </body:sphere>
   </model:physical>
 
-
   <!-- 
   Include the complete model described in the .model file
   This assumes the root node is a <model:...>
@@ -127,7 +126,6 @@
   <model:physical name="pioneer2dx_model2">
     <xyz>0 -1 .145</xyz>
     <rpy>0.0 0.0 -90.0</rpy>
-    <collide>all</collide>
 
     <model:physical name="laser">
       <xyz>0.15 0 0.18</xyz>
@@ -166,7 +164,6 @@
       </geom:box>
     </body:box>
   </model:physical>
-
 
   <!-- White Point light -->
   <model:renderable name="point_white">

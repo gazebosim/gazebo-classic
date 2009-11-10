@@ -133,14 +133,15 @@ namespace gazebo
                  stream << prefix << *(this->hiStopP) << "\n";
                }
     /// \brief Set the anchor
-    public: virtual void SetAnchor( int index, const Vector3 &anchor) {}
+    public: virtual void SetAnchor( int index, const Vector3 &anchor) {fakeAnchor = anchor;}
 
     /// \brief Get the anchor
-    public: virtual Vector3 GetAnchor(int index) const {return Vector3();}
+    public: virtual Vector3 GetAnchor(int index) const {return fakeAnchor;}
  
     protected: ParamT<Vector3> *axisP;
     protected: ParamT<double> *loStopP;
     protected: ParamT<double> *hiStopP; 
+    protected: Vector3 fakeAnchor;
   };
   
 /// \}

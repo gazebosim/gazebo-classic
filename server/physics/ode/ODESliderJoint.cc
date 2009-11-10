@@ -55,7 +55,9 @@ void ODESliderJoint::Load(XMLConfigNode *node)
 Vector3 ODESliderJoint::GetAxis(int /*index*/) const
 {
   dVector3 result;
+  this->physics->LockMutex();
   dJointGetSliderAxis( this->jointId, result );
+  this->physics->UnlockMutex();
 
   return Vector3(result[0], result[1], result[2]);
 }
@@ -64,19 +66,27 @@ Vector3 ODESliderJoint::GetAxis(int /*index*/) const
 // Get the position of the joint
 Angle ODESliderJoint::GetAngle(int index) const
 {
-  return dJointGetSliderPosition( this->jointId );
+  this->physics->LockMutex();
+  Angle result = dJointGetSliderPosition( this->jointId );
+  this->physics->UnlockMutex();
+  
+  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the rate of change
 double ODESliderJoint::GetVelocity(int /*index*/) const
 {
-  return dJointGetSliderPositionRate( this->jointId );
+  this->physics->LockMutex();
+  double result = dJointGetSliderPositionRate( this->jointId );
+  this->physics->UnlockMutex();
+
+  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of an axis(index).
-void ODESliderJoint::SetVelocity(int index, double angle)
+void ODESliderJoint::SetVelocity(int /*index*/, double angle)
 {
   this->SetParam(dParamVel, angle);
 }
@@ -85,28 +95,38 @@ void ODESliderJoint::SetVelocity(int index, double angle)
 // Set the axis of motion
 void ODESliderJoint::SetAxis( int /*index*/, const Vector3 &axis )
 {
+  this->physics->LockMutex();
   dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the slider force
 void ODESliderJoint::SetForce(int /*index*/, double force)
 {
+  this->physics->LockMutex();
   dJointAddSliderForce(this->jointId, force);
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the _parameter
 void ODESliderJoint::SetParam( int parameter, double value )
 {
+  this->physics->LockMutex();
   dJointSetSliderParam( this->jointId, parameter, value );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the _parameter
 double ODESliderJoint::GetParam( int parameter ) const
 {
-  return dJointGetSliderParam( this->jointId, parameter );
+  this->physics->LockMutex();
+  double result = dJointGetSliderParam( this->jointId, parameter );
+  this->physics->UnlockMutex();
+
+  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -122,4 +142,3 @@ double ODESliderJoint::GetMaxForce(int index)
 {
   this->GetParam(dParamFMax);
 }
-

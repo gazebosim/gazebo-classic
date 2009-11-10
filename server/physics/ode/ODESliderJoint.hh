@@ -93,7 +93,7 @@ namespace gazebo
   
     /// \brief Load the joint
     protected: virtual void Load(XMLConfigNode *node);
-  
+
     /// \brief Get the axis of rotation
     public: virtual Vector3 GetAxis(int index) const;
 

@@ -74,10 +74,13 @@ void ODEHinge2Joint::SaveJoint(std::string &prefix, std::ostream &stream)
 Vector3 ODEHinge2Joint::GetAnchor(int index) const
 {
   dVector3 result;
+
+  this->physics->LockMutex();
   if (index == 0)
     dJointGetHinge2Anchor( this->jointId, result );
   else
     dJointGetHinge2Anchor2( this->jointId, result );
+  this->physics->UnlockMutex();
 
   return Vector3(result[0], result[1], result[2]);
 }
@@ -86,17 +89,21 @@ Vector3 ODEHinge2Joint::GetAnchor(int index) const
 // Set the anchor point
 void ODEHinge2Joint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
+  this->physics->LockMutex();
   dJointSetHinge2Anchor( this->jointId, anchor.x, anchor.y, anchor.z );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
 void ODEHinge2Joint::SetAxis( int index, const Vector3 &axis )
 {
+  this->physics->LockMutex();
   if (index == 0)
     dJointSetHinge2Axis1( this->jointId, axis.x, axis.y, axis.z );
   else
     dJointSetHinge2Axis2( this->jointId, axis.x, axis.y, axis.z );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -104,10 +111,14 @@ void ODEHinge2Joint::SetAxis( int index, const Vector3 &axis )
 Vector3 ODEHinge2Joint::GetAxis(int index) const
 {
   dVector3 result;
+
+  this->physics->LockMutex();
   if (index == 0)
     dJointGetHinge2Axis1( this->jointId, result );
   else
     dJointGetHinge2Axis2( this->jointId, result );
+  this->physics->UnlockMutex();
+
   return Vector3(result[0], result[1], result[2]);
 }
 
@@ -115,10 +126,13 @@ Vector3 ODEHinge2Joint::GetAxis(int index) const
 // Get angle of rotation about first axis
 Angle ODEHinge2Joint::GetAngle(int index) const
 {
+  this->physics->LockMutex();
   if (index == 0)
     return dJointGetHinge2Angle1( this->jointId );
   else
     gzerr(0) << "ODE has not function to get the second angle in a hinge2 joint";
+  this->physics->UnlockMutex();
+
   return Angle(0);
 }
 
@@ -126,10 +140,14 @@ Angle ODEHinge2Joint::GetAngle(int index) const
 // Get rate of rotation about first axis
 double ODEHinge2Joint::GetVelocity(int index) const
 {
+  double result;
+
+  this->physics->LockMutex();
   if (index == 0)
-    return dJointGetHinge2Angle1Rate( this->jointId );
+    result = dJointGetHinge2Angle1Rate( this->jointId );
   else
-    return dJointGetHinge2Angle2Rate( this->jointId );
+    result = dJointGetHinge2Angle2Rate( this->jointId );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -168,22 +186,30 @@ void ODEHinge2Joint::SetMaxForce(int index, double t)
 // Set _parameter with _value
 void ODEHinge2Joint::SetForce(int index, double torque)
 {
+  this->physics->LockMutex();
   if (index == 0)
     dJointAddHinge2Torques(this->jointId, torque, 0);
   else
     dJointAddHinge2Torques(this->jointId, 0, torque);
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the specified parameter
 double ODEHinge2Joint::GetParam( int parameter ) const
 {
-  return dJointGetHinge2Param( this->jointId, parameter );
+  this->physics->LockMutex();
+  double result = dJointGetHinge2Param( this->jointId, parameter );
+  this->physics->UnlockMutex();
+
+  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set _parameter with _value
 void ODEHinge2Joint::SetParam( int parameter, double value)
 {
+  this->physics->LockMutex();
   dJointSetHinge2Param( this->jointId, parameter, value );
+  this->physics->UnlockMutex();
 }

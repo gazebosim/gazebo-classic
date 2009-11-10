@@ -47,7 +47,10 @@ ODEUniversalJoint::~ODEUniversalJoint()
 Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
+  this->physics->LockMutex();
   dJointGetUniversalAnchor( this->jointId, result );
+  this->physics->UnlockMutex();
+
   return Vector3( result[0], result[1], result[2] );
 }
 
@@ -55,7 +58,9 @@ Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void ODEUniversalJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
+  this->physics->LockMutex();
   dJointSetUniversalAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -63,10 +68,14 @@ void ODEUniversalJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 Vector3 ODEUniversalJoint::GetAxis(int index ) const
 {
   dVector3 result;
+
+  this->physics->LockMutex();
   if (index == 0)
     dJointGetUniversalAxis1( this->jointId, result );
   else
     dJointGetUniversalAxis2( this->jointId, result );
+  this->physics->UnlockMutex();
+
   return Vector3( result[0], result[1], result[2] );
 }
 
@@ -74,30 +83,42 @@ Vector3 ODEUniversalJoint::GetAxis(int index ) const
 // Set the first axis of rotation
 void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
 {
+  this->physics->LockMutex();
   if (index == 0)
     dJointSetUniversalAxis1( this->jointId, axis.x, axis.y, axis.z );
   else
     dJointSetUniversalAxis2( this->jointId, axis.x, axis.y, axis.z );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of an axis
 Angle ODEUniversalJoint::GetAngle(int /*index*/) const
 {
+  Angle result;
+
+  this->physics->LockMutex();
   if (index == 0)
-    return dJointGetUniversalAngle1( this->jointId );
+    result = dJointGetUniversalAngle1( this->jointId );
   else
-    return dJointGetUniversalAngle2( this->jointId );
+    result = dJointGetUniversalAngle2( this->jointId );
+  this->physics->UnlockMutex();
+
+  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angular rate of an axis
 double ODEUniversalJoint::GetVelocity(int index) const
 {
+  double result;
+
+  this->physics->LockMutex();
   if (index == 0)
-    return dJointGetUniversalAngle1Rate( this->jointId );
+    result = dJointGetUniversalAngle1Rate( this->jointId );
   else 
-    return dJointGetUniversalAngle2Rate( this->jointId );
+    result = dJointGetUniversalAngle2Rate( this->jointId );
+  this->physics->UnlockMutex();
 }
  
 //////////////////////////////////////////////////////////////////////////////
@@ -114,11 +135,12 @@ void ODEUniversalJoint::SetVelocity(int index,double angle)
 // Set the torque of this joint
 void ODEUniversalJoint::SetForce(int index, double torque)
 {
+  this->physics->LockMutex();
   if (index == 0)
     dJointAddUniversalTorques( this->jointId, torque, 0);
   else
     dJointAddUniversalTorques( this->jointId, 0, torque);
-
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -145,7 +167,9 @@ double ODEUniversalJoint::GetMaxForce(int index)
 // Set the parameter to value
 void ODEUniversalJoint::SetParam( int parameter, double value)
 {
+  this->physics->LockMutex();
   dJointSetUniversalParam( this->jointId, parameter, value );
+  this->physics->UnlockMutex();
 }
 
 

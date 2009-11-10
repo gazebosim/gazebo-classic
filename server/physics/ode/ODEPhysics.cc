@@ -78,8 +78,11 @@ ODEPhysics::ODEPhysics()
 
   this->contactGroup = dJointGroupCreate(0);
 
-  dWorldSetAutoDisableFlag(this->worldId, 1);
+  // If auto-disable is active, then user interaction with the joints 
+  // doesn't behave properly
+  /*dWorldSetAutoDisableFlag(this->worldId, 1);
   dWorldSetAutoDisableTime(this->worldId, 2.0);
+  */
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
@@ -318,13 +321,18 @@ void ODEPhysics::RemoveEntity(Entity *entity)
 // Create a new body
 Body *ODEPhysics::CreateBody(Entity *parent)
 {
-  ODEBody *body = new ODEBody(parent);
-  ODEBody *odeParent = dynamic_cast<ODEBody*>(parent);
+  if (parent == NULL)
+    gzthrow("Body must have a parent\n");
 
-  if (parent == NULL || odeParent == NULL)
-    body->SetSpaceId( dSimpleSpaceCreate(this->spaceId) );
-  else
-    body->SetSpaceId( odeParent->GetSpaceId() ) ;
+  std::map<std::string, dSpaceID>::iterator iter;
+  iter = this->spaces.find(parent->GetName());
+
+  if (iter == this->spaces.end())
+    this->spaces[parent->GetName()] = dSimpleSpaceCreate(this->spaceId);
+
+  ODEBody *body = new ODEBody(parent);
+
+  body->SetSpaceId( this->spaces[parent->GetName()] );
 
   return body;
 }

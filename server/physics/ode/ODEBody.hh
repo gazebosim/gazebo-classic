@@ -117,6 +117,9 @@ namespace gazebo
     /// \brief Set whether gravity affects this body
     public: virtual void SetGravityMode(bool mode);
 
+    /// \brief Set whether this body will collide with others in the model
+    public: void SetSelfCollide(bool collide);
+
     /// \brief Get the body's space ID
     public: dSpaceID GetSpaceId() const;
 

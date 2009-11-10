@@ -47,7 +47,10 @@ ODEBallJoint::~ODEBallJoint()
 Vector3 ODEBallJoint::GetAnchor(int index) const
 {
   dVector3 result;
+  this->physics->LockMutex();
   dJointGetBallAnchor( jointId, result );
+  this->physics->UnlockMutex();
+
   return Vector3(result[0], result[1], result[2]);
 }
 
@@ -56,6 +59,8 @@ Vector3 ODEBallJoint::GetAnchor(int index) const
 // Set the joints anchor point
 void ODEBallJoint::SetAnchor(int index, const Vector3 &anchor)
 {
+  this->physics->LockMutex();
   dJointSetBallAnchor( jointId, anchor.x, anchor.y, anchor.z );
+  this->physics->UnlockMutex();
 }
 

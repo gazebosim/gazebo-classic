@@ -108,6 +108,9 @@ namespace gazebo
     /// \brief Get the pose of the entity relative to its parent
     public: Pose3d GetRelativePose() const;
 
+    /// \brief Get the pose relative to the model this entity belongs to
+    public: Pose3d GetModelRelativePose() const;
+
     /// \brief Set the pose of the entity relative to its parent
     public: void SetRelativePose(const Pose3d &pose, bool notify = true);
 
@@ -128,13 +131,13 @@ namespace gazebo
     public: bool operator==(const Entity &ent) const;
 
     /// \brief Return true if the entity is a geom
-    public: bool IsGeom();
+    public: bool IsGeom() const;
 
     /// \brief Return true if the entity is a body
-    public: bool IsBody();
+    public: bool IsBody() const;
 
     /// \brief Return true if the entity is a model
-    public: bool IsModel();
+    public: bool IsModel() const;
 
     /// \brief Return the name of this entity with the model scope
     ///        model1::...::modelN::entityName

@@ -181,6 +181,8 @@ namespace gazebo
     protected: OgreDynamicLines *line2;
     protected: PhysicsEngine *physics;
     protected: Vector3 anchorPos;
+    protected: Body *anchorBody;
+
   };
 
   /// \}

@@ -76,13 +76,9 @@ void ODEBody::Load(XMLConfigNode *node)
   // Update the Center of Mass.
   this->UpdateCoM();
 
-  // before loading child geometry, we have to figure out of selfCollide is true
-  // and modify parent class Entity so this body has its own spaceId
-  /*if (**this->selfCollideP)
-  {
-    this->spaceId = dSimpleSpaceCreate( this->odePhysics->GetSpaceId() );
-  }*/
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Init the ODE body
@@ -112,7 +108,6 @@ void ODEBody::MoveCallback(dBodyID id)
   pose.pos.Set(p[0], p[1], p[2]);
   pose.rot.Set(r[0], r[1], r[2], r[3] );
 
-  //std::cout << "Body Move[" << pose << "]\n";
   self->SetAbsPose(pose, false);
   self->physicsEngine->UnlockMutex();
 }
@@ -141,6 +136,14 @@ void ODEBody::SetGravityMode(bool mode)
     dBodySetGravityMode(this->bodyId, mode ? 1: 0);
     this->physicsEngine->UnlockMutex();
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set whether this body will collide with others in the model
+void ODEBody::SetSelfCollide(bool collide)
+{
+  if (collide)
+    this->spaceId = dSimpleSpaceCreate( this->odePhysics->GetSpaceId() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -335,8 +338,6 @@ void ODEBody::UpdateCoM()
     Vector3 principals = this->customMass.GetPrincipalMoments();
     Vector3 products = this->customMass.GetProductsofInertia();
 
-    std::cout << "Custom Mass[" << this->customMass << "]\n";
-
     dMassSetParameters(&odeMass, this->customMass.GetAsDouble(),
                        cog.x, cog.y, cog.z,
                        principals.x, principals.y, principals.z,
@@ -363,202 +364,6 @@ void ODEBody::UpdateCoM()
     dBodySetMass( this->bodyId, &odeMass );
   }
 }
-
-/*
-  printf("Update COM\n");
-  if (!this->bodyId)
-    return;
-
-  // user can specify custom mass matrix or alternatively, UpdateCoM will calculate CoM for
-  // combined mass of all children geometries.
-  if (this->customMassMatrix)
-  {
-    // Old pose for the CoM
-    Pose3d oldPose, newPose, tmpPose;
-
-    // oldPose is the last comPose
-    // newPose is mass CoM
-    oldPose = this->comPose;
-
-    // New pose for the CoM
-    newPose.pos.x = this->cx;
-    newPose.pos.y = this->cy;
-    newPose.pos.z = this->cz;
-
-    std::map< std::string, Geom* >::iterator giter;
-    // Fixup the poses of the geoms (they are attached to the CoM)
-    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    {
-      if (giter->second->IsPlaceable())
-      {
-        // FOR GEOMS:
-        // get pose with comPose set to oldPose
-        //   pose of geom relative to old CoM location
-        this->comPose = oldPose;
-        tmpPose = giter->second->GetAbsPose();
-
-        // get pose with comPose set to newPose
-        //   using new CoM location, set relative pose of geom
-        this->comPose = newPose;
-        giter->second->SetAbsPose(tmpPose, false);
-      }
-    }
-
-    // FOR BODY: Fixup the pose of the CoM (ODE body)
-    // get pose with comPose set to oldPose
-    // get pose with comPose set to newPose
-    //
-    //std::cout << " name : " << this->GetName();
-    //std::cout << " pose : " << this->GetPose();
-
-    // get pose of gazebo body origin given new comPose
-    this->comPose = newPose;
-    //this->UpdatePose();
-    //std::cout << " UpdatePose : " << this->GetPose();
-    tmpPose = this->GetAbsPose();
-    //std::cout << " tmpPose : " << tmpPose;
-
-
-    // set pose
-    this->comPose = oldPose;
-    //std::cout << " oldPose : " << oldPose;
-    this->SetAbsPose(tmpPose);
-    //std::cout << " final pose : " << this->GetPose();
-    //std::cout << std::endl;
-
-
-    // Settle on the new CoM pose
-    this->comPose = newPose;
-
-    // My Cheap Hack, to put the center of mass at the origin
-    this->cx = this->cy = this->cz = 0;
-
-    this->physicsEngine->LockMutex();
-
-    dMass odeMass;
-    dMassSetZero(&odeMass);
-
-    Vector3 cog = this->mass->GetCoG();
-    Vector3 principals = this->mass->GetPrincipalMoments();
-    Vector3 products = this->mass->GetProductsofInertia();
-
-    dMassSetParameters(&odeMass, this->mass->GetAsDouble(),
-                       cog.x, cog.y, cog.z,
-                       principals.x, principals.y, principals.z,
-                       products.x, products.y, products.z);
-
-
-    //dMassTranslate( &odeMass, -cog.x, -cog.y, -cog.z);
-
-    // Set the mass matrix
-    if (this->mass->GetAsDouble() > 0)
-      dBodySetMass( this->bodyId, &odeMass );
-    else
-      gzthrow("Setting custom Body "+this->GetName()+"mass to zero!");
-
-    this->physicsEngine->ConvertMass(this->mass, &odeMass);
-
-    this->physicsEngine->UnlockMutex();
-
-  }
-  else
-  {
-
-    // original gazebo subroutine that gathers mass from all geoms and sums into one single mass matrix
-
-    Mass geomMass;
-    dMass odeMassSum, odeGeomMass;
-    Vector3 cog, principals, products;
-    std::map< std::string, Geom* >::iterator giter;
-
-    this->physicsEngine->LockMutex();
-
-    // Construct the mass matrix by combining all the geoms
-    dMassSetZero( &odeMassSum );
-    dMassSetZero( &odeGeomMass);
-
-    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    {
-      geomMass = giter->second->GetBodyMassMatrix();
-
-      cog = geomMass.GetCoG();
-      principals = geomMass.GetPrincipalMoments();
-      products = geomMass.GetProductsofInertia();
-
-      dMassSetZero( &odeGeomMass );
-      dMassSetParameters(&odeGeomMass, geomMass.GetAsDouble(),
-          cog.x, cog.y, cog.z,
-          principals.x, principals.y, principals.z,
-          products.x, products.y, products.z );
-
-      if (giter->second->IsPlaceable() && 
-          ((ODEGeom*)giter->second)->GetGeomId())
-      {
-        dMassAdd( &odeMassSum, &odeGeomMass );
-      }
-    }
-
-    // Old pose for the CoM
-    Pose3d oldPose, newPose, tmpPose;
-
-    // oldPose is the last comPose
-    // newPose is mass CoM
-    oldPose = this->comPose;
-
-    if (std::isnan(odeMassSum.c[0]))
-      odeMassSum.c[0] = 0;
-
-    if (std::isnan(odeMassSum.c[1]))
-      odeMassSum.c[1] = 0;
-
-    if (std::isnan(odeMassSum.c[2]))
-      odeMassSum.c[2] = 0;
-
-    // New pose for the CoM
-    newPose.pos.x = odeMassSum.c[0];
-    newPose.pos.y = odeMassSum.c[1];
-    newPose.pos.z = odeMassSum.c[2];
-
-    // Fixup the poses of the geoms (they are attached to the CoM)
-    for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    {
-      if (giter->second->IsPlaceable())
-      {
-        // FOR GEOMS:
-        // get pose with comPose set to oldPose
-        this->comPose = oldPose;
-        tmpPose = giter->second->GetAbsPose();
-
-        // get pose with comPose set to newPose
-        this->comPose = newPose;
-        giter->second->SetAbsPose(tmpPose, false);
-      }
-    }
-
-    // FOR BODY: Fixup the pose of the CoM (ODE body)
-    // get pose with comPose set to oldPose
-    this->comPose = oldPose;
-    tmpPose = this->GetAbsPose();
-    // get pose with comPose set to newPose
-    this->comPose = newPose;
-    this->SetAbsPose(tmpPose);
-
-    // Settle on the new CoM pose
-    this->comPose = newPose;
-
-    // My Cheap Hack, to put the center of mass at the origin
-    odeMassSum.c[0] = odeMassSum.c[1] = odeMassSum.c[2] = 0;
-
-    // Set the mass matrix
-    if (this->mass->GetAsDouble() > 0)
-      dBodySetMass( this->bodyId, &odeMassSum );
-
-    this->physicsEngine->ConvertMass(this->mass, &odeMassSum);
-    this->physicsEngine->UnlockMutex();
-  }
-
-}*/
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body

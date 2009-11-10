@@ -38,7 +38,6 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
   this->verticalMinAngleP = new ParamT<Angle>("verticalMinAngle", DTOR(0), 0);
   this->verticalMaxAngleP = new ParamT<Angle>("verticalMaxAngle", DTOR(0), 0);
   Param::End();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

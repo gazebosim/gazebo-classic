@@ -101,7 +101,7 @@ Model::Model(Model *parent)
 Model::~Model()
 {
   std::map< std::string, Body* >::iterator biter;
-  std::map< std::string, Joint* >::iterator jiter;
+  JointContainer::iterator jiter;
   std::map< std::string, Controller* >::iterator citer;
 
   if (this->graphicsHandler)
@@ -121,13 +121,8 @@ Model::~Model()
   this->bodies.clear();
 
   for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
-  {
-    if (jiter->second)
-    {
-      delete jiter->second;
-      jiter->second=NULL;
-    }
-  }
+    if (*jiter)
+      delete *jiter;
   this->joints.clear();
 
   for (citer = this->controllers.begin();
@@ -202,6 +197,14 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   // Set the relative pose of the model
   this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP) );
 
+  // Get the position and orientation of the model (relative to parent)
+  pose.Reset();
+  pose.pos = **this->xyzP;
+  pose.rot = **this->rpyP;
+
+  // Record the model's initial pose (for reseting)
+  this->SetInitPose(pose);
+
   if (this->type == "physical")
   {
     this->LoadPhysical(node);
@@ -248,14 +251,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     this->canonicalBodyNameP->SetValue( this->bodies.begin()->first );
   }
 
-  // Get the position and orientation of the model (relative to parent)
-  pose.Reset();
-  pose.pos = **this->xyzP;
-  pose.rot = **this->rpyP;
-
-  // Record the model's initial pose (for reseting)
-  this->SetInitPose(pose);
-
   // This must be placed after creation of the bodies
   // Static variable overrides the gravity
   if (**this->staticP == false)
@@ -268,7 +263,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();
   this->graphicsHandler->Load(this->GetScopedName(), this);
-  assert(this->graphicsHandler);
 
   // Get the name of the python module
   /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
@@ -299,7 +293,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   std::string typeName;
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
-  std::map<std::string, Joint* >::iterator jointIter;
+  JointContainer::iterator jointIter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
@@ -332,10 +326,8 @@ void Model::Save(std::string &prefix, std::ostream &stream)
     // Save all the joints
     for (jointIter = this->joints.begin(); jointIter != this->joints.end(); 
         jointIter++)
-    {
-      if (jointIter->second)
-        jointIter->second->Save(p, stream);
-    }
+      if (*jointIter)
+        (*jointIter)->Save(p, stream);
 
     // Save all the controllers
     for (contIter=this->controllers.begin();
@@ -411,7 +403,7 @@ void Model::Update()
 
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
-  std::map<std::string, Joint* >::iterator jointIter;
+  JointContainer::iterator jointIter;
 
   Pose3d bodyPose, newPose, oldPose;
 
@@ -457,9 +449,9 @@ void Model::Update()
   for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
   {
 #ifdef USE_THREADPOOL
-    World::Instance()->threadPool->schedule(boost::bind(&Joint::Update,(jointIter->second)));
+    World::Instance()->threadPool->schedule(boost::bind(&Joint::Update,*jointIter));
 #else
-    jointIter->second->Update();
+    (*jointIter)->Update();
 #endif
   }
 
@@ -551,7 +543,7 @@ void Model::Fini()
 void Model::Reset()
 {
   std::cout << "Model[" << this->GetName() << "] Reset\n";
-  std::map<std::string, Joint* >::iterator jiter;
+  JointContainer::iterator jiter;
   std::map< std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator citer;
   Vector3 v(0,0,0);
@@ -565,7 +557,7 @@ void Model::Reset()
 
   for (jiter=this->joints.begin(); jiter!=this->joints.end(); jiter++)
   {
-    jiter->second->Reset();
+    (*jiter)->Reset();
   }
 
   for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
@@ -772,15 +764,33 @@ Body *Model::CreateBody()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the number of joints
+unsigned int Model::GetJointCount() const
+{
+  return this->joints.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a joing by index
+Joint *Model::GetJoint( unsigned int index ) const
+{
+  if (index >= this->joints.size())
+    gzthrow("Invalid joint index[" << index << "]\n");
+
+  return this->joints[index];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get a joint by name
 Joint *Model::GetJoint(std::string name)
 {
-  std::map<std::string, Joint* >::const_iterator iter;
-  iter = this->joints.find(name);
+  JointContainer::iterator iter;
 
-  if (iter != this->joints.end())
-    return iter->second;
-  else
-    return NULL;
+  for (iter = this->joints.begin(); iter != this->joints.end(); iter++)
+    if ( (*iter)->GetName() == name)
+      return (*iter);
+
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -838,10 +848,10 @@ void Model::LoadJoint(XMLConfigNode *node)
   // Load each joint
   joint->Load(node);
 
-  if (this->joints.find(joint->GetName()) != this->joints.end())
+  if (this->GetJoint( joint->GetName() ) != NULL)
     gzthrow( "can't have two joint with the same name");
 
-  this->joints[joint->GetName()] = joint;
+  this->joints.push_back( joint );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

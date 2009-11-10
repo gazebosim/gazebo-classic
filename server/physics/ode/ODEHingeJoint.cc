@@ -63,7 +63,10 @@ void ODEHingeJoint::Load(XMLConfigNode *node)
 Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
+
+  this->physics->LockMutex();
   dJointGetHingeAnchor( this->jointId, result );
+  this->physics->UnlockMutex();
 
   return Vector3(result[0], result[1], result[2]);
 }
@@ -72,7 +75,9 @@ Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void ODEHingeJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
+  this->physics->LockMutex();
   dJointSetHingeAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
+  this->physics->UnlockMutex();
 }
 
 
@@ -81,7 +86,10 @@ void ODEHingeJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 {
   dVector3 result;
+
+  this->physics->LockMutex();
   dJointGetHingeAxis( this->jointId, result );
+  this->physics->UnlockMutex();
 
   return Vector3(result[0], result[1], result[2]);
 }
@@ -90,21 +98,31 @@ Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 // Set the axis of rotation
 void ODEHingeJoint::SetAxis( int /*index*/, const Vector3 &axis )
 {
+  this->physics->LockMutex();
   dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of rotation
 Angle ODEHingeJoint::GetAngle(int /*index*/) const
 {
-  return dJointGetHingeAngle( this->jointId );
+  this->physics->LockMutex();
+  Angle result = dJointGetHingeAngle( this->jointId );
+  this->physics->UnlockMutex();
+
+  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the rotation rate
 double ODEHingeJoint::GetVelocity(int /*index*/) const
 {
-  return dJointGetHingeAngleRate( this->jointId );
+  this->physics->LockMutex();
+  double result = dJointGetHingeAngleRate( this->jointId );
+  this->physics->UnlockMutex();
+
+  return result;
 } 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -132,19 +150,27 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 // Set the torque of this joint
 void ODEHingeJoint::SetForce(int /*index*/, double torque)
 {
+  this->physics->LockMutex();
   dJointAddHingeTorque( this->jointId, torque );
+  this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the specified parameter
 double ODEHingeJoint::GetParam( int parameter ) const
 {
-  return dJointGetHingeParam( this->jointId, parameter );
+  this->physics->LockMutex();
+  double result = dJointGetHingeParam( this->jointId, parameter );
+  this->physics->UnlockMutex();
+
+  return result; 
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the _parameter to _value
 void ODEHingeJoint::SetParam( int parameter, double value)
 {
+  this->physics->LockMutex();
   dJointSetHingeParam( this->jointId, parameter, value );
+  this->physics->UnlockMutex();
 }

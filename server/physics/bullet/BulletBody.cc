@@ -210,6 +210,12 @@ void BulletBody::SetGravityMode(bool mode)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set whether this body will collide with others in the model
+void BulletBody::SetSelfCollide(bool collide)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Attach a geom to this body
 void BulletBody::AttachGeom( Geom *geom )
 {

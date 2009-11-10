@@ -34,6 +34,8 @@ class Fl_Value_Output;
 class Fl_Output;
 class Fl_Input;
 class Fl_Button;
+class Fl_Choice;
+class Fl_Value_Slider;
 
 namespace gazebo
 {
@@ -60,6 +62,15 @@ namespace gazebo
     /// \brief Callback for entity browser
     public: static void EntityBrowserCB( Fl_Widget *w, void *data );
 
+    /// \brief Joint choice callback
+    public: static void JointChoiceCB( Fl_Widget *w, void *data );
+
+    /// \brief Joint force slider callback
+    public: static void JointForceSliderCB( Fl_Widget *w, void *data );
+
+    /// \brief Joint velocity slider callback
+    public: static void JointVelocitySliderCB( Fl_Widget *w, void *data );
+
     /// \brief Add an entity ot the param browser
     private: void AddEntityToParamBrowser(Common *ent, std::string prefix);
 
@@ -71,6 +82,10 @@ namespace gazebo
     private: void UpdateEntityBrowser();
 
     private: Fl_Hold_Browser *entityBrowser;
+
+    private: Fl_Choice *jointChoice;
+    private: Fl_Value_Slider *jointForceSlider;
+    private: Fl_Value_Slider *jointVelocitySlider;
 
     private: Fl_Hold_Browser *paramBrowser;
     private: Fl_Input *paramInput;

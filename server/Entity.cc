@@ -206,23 +206,23 @@ bool Entity::operator==(const Entity &ent) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if the entity is a geom
-bool Entity::IsGeom()
+bool Entity::IsGeom() const
 {
-  return dynamic_cast<Geom*>(this) != NULL;
+  return dynamic_cast<const Geom*>(this) != NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if the entity is a body
-bool Entity::IsBody()
+bool Entity::IsBody() const
 {
-  return dynamic_cast<Body*>(this) != NULL;
+  return dynamic_cast<const Body*>(this) != NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if the entity is a model
-bool Entity::IsModel()
+bool Entity::IsModel() const
 {
-  return dynamic_cast<Model*>(this) != NULL;
+  return dynamic_cast<const Model*>(this) != NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,19 +266,7 @@ std::string Entity::GetCompleteScopedName()
 Pose3d Entity::GetAbsPose() const
 {
   if (this->parent)
-  {
-    Pose3d p = this->relativePose + this->parent->GetAbsPose();
-
-    /*if (this->GetName() == "cylinder1_body")
-      printf("Get ABS: Rel[%4.2f %4.2f %4.2f] Parent[%4.2f %4.2f %4.2f] Result[%4.2f %4.2f %4.2f]\n", this->relativePose.pos.x, this->relativePose.pos.y, this->relativePose.pos.z, this->parent->GetAbsPose().pos.x,this->parent->GetAbsPose().pos.y,this->parent->GetAbsPose().pos.z, p.pos.x, p.pos.y, p.pos.z);
-      */
-
-    /*Pose3d p = this->parent->GetAbsPose();
-    p.pos += this->relativePose.pos;
-    p.rot *= this->relativePose.rot;
-    */
-    return p;
-  }
+    return this->relativePose + this->parent->GetAbsPose();
   else
     return this->relativePose;
 }
@@ -288,6 +276,16 @@ Pose3d Entity::GetAbsPose() const
 Pose3d Entity::GetRelativePose() const
 {
   return this->relativePose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the pose relative to the model this entity belongs to
+Pose3d Entity::GetModelRelativePose() const
+{
+  if (this->IsModel() || !this->parent)
+    return Pose3d();
+
+  return this->relativePose + this->parent->GetModelRelativePose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -304,22 +302,8 @@ void Entity::SetAbsPose(const Pose3d &pose, bool notify)
 {
   Pose3d p = pose;
   if (this->parent)
-  {
     p -= this->parent->GetAbsPose();
-    /*p.pos = p.pos - this->parent->GetAbsPose().pos;
-    p.rot = this->parent->GetAbsPose().rot.GetInverse() * p.rot;
-    */
 
-    /*if (this->GetName() == "cylinder1_body")
-    {
-      printf("SetABS: Cylinder Body Old[%4.2f %4.2f %4.2f] Set[%4.2f %4.2f %4.2f] Parent[%4.2f %4.2f %4.2f] New[%4.2f %4.2f %4.2f]\n" ,
-    this->relativePose.pos.x,this->relativePose.pos.y, this->relativePose.pos.z,
-    pose.pos.x, pose.pos.y,pose.pos.z,
-    this->parent->GetAbsPose().pos.x,this->parent->GetAbsPose().pos.y,
-    this->parent->GetAbsPose().pos.z,
-    p.pos.x, p.pos.y, p.pos.z);
-    }*/
-  }
   this->SetRelativePose(p, notify);
 }
 

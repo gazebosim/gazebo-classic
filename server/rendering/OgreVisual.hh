@@ -110,16 +110,16 @@ namespace gazebo
     public: void SetPose( const Pose3d &pose);
 
     /// \brief Get the position of the visual
-    public: Vector3 GetPosition();
+    public: Vector3 GetPosition() const;
 
     /// \brief Get the rotation of the visual
-    public: Quatern GetRotation();
+    public: Quatern GetRotation() const;
 
     /// \brief Get the pose of the visual
-    public: Pose3d GetPose();
+    public: Pose3d GetPose() const;
 
     /// \brief Get the global pose of the node
-    public: Pose3d GetAbsPose();
+    public: Pose3d GetAbsPose() const;
 
     /// \brief Return the scene Node of this visual entity
     public: Ogre::SceneNode * GetSceneNode();

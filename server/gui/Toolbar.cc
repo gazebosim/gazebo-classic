@@ -29,6 +29,8 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Value_Slider.H>
 
 #include <boost/lexical_cast.hpp>
 
@@ -76,6 +78,26 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->paramInput->when( FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
   this->paramInput->callback(&Toolbar::ParamInputCB, this);
 
+  /*
+  y = this->paramInput->y() + this->paramInput->h() + 20;
+  this->jointChoice = new Fl_Choice(x+50, y, w-70, 20, "Joint:");
+  this->jointChoice->callback(&Toolbar::JointChoiceCB, this);
+  this->jointChoice->labelsize(12);
+
+  y = this->jointChoice->y() + this->jointChoice->h() + 20;
+  this->jointForceSlider = new Fl_Value_Slider(x+50, y, w-70, 20, "Force:");
+  this->jointForceSlider->labelsize(12);
+  this->jointForceSlider->type(FL_HOR_NICE_SLIDER);
+  this->jointForceSlider->callback(&Toolbar::JointForceSliderCB, this);
+
+  y = this->jointForceSlider->y() + this->jointForceSlider->h() + 20;
+  this->jointVelocitySlider = new Fl_Value_Slider(x+50, y, w-70, 20, "Velocity:");
+  this->jointVelocitySlider->labelsize(12);
+  this->jointVelocitySlider->type(FL_HOR_NICE_SLIDER);
+  this->jointVelocitySlider->callback(&Toolbar::JointVelocitySliderCB, this);
+  */
+
+
   this->end();
 
   this->resizable(NULL);
@@ -114,6 +136,12 @@ void Toolbar::Update()
     const std::map<std::string, Geom *> *geoms;
     std::map<std::string, Body*>::const_iterator iter;
     std::map<std::string, Geom*>::const_iterator giter;
+
+    for (unsigned int i=0; i < model->GetJointCount(); i++)
+    {
+      Joint *joint = model->GetJoint(i);
+      this->jointChoice->add(joint->GetName().c_str(),0,0);
+    }
 
     for (iter = bodies->begin(); iter != bodies->end(); iter++)
     {
@@ -358,5 +386,73 @@ void Toolbar::UpdateEntityBrowser()
   for (iter = models.begin(); iter != models.end(); iter++)
   {
     this->entityBrowser->add( (*iter)->GetName().c_str() );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Joint choice callback
+void Toolbar::JointChoiceCB( Fl_Widget *w, void *data )
+{
+  Toolbar *self = (Toolbar*)(data);
+  Fl_Choice *choice = (Fl_Choice*)(w);
+
+  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  if (entity->IsModel())
+  {
+    Model *model = (Model*)(entity);
+
+    Joint *joint = model->GetJoint( choice->text() );
+    Angle lowStop = joint->GetLowStop(0);
+    Angle highStop = joint->GetHighStop(0);
+
+    self->jointForceSlider->bounds(-500,500); 
+    self->jointVelocitySlider->bounds(-100,100); 
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Joint choice callback
+void Toolbar::JointForceSliderCB( Fl_Widget *w, void *data )
+{
+  Toolbar *self = (Toolbar*)(data);
+  Fl_Value_Slider *slider = (Fl_Value_Slider*)(w);
+
+  // Only valid when a joint has been selected
+  if(self->jointChoice->value() <0)
+    return;
+
+  double value = slider->value();
+
+  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  if (entity->IsModel())
+  {
+    Model *model = (Model*)(entity);
+
+    Joint *joint = model->GetJoint( self->jointChoice->text() );
+    joint->SetMaxForce( 0, value );
+    joint->SetForce( 0, value );
+    std::cout << "Set Force[" << value << "]\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Joint velocity slider callback
+void Toolbar::JointVelocitySliderCB( Fl_Widget *w, void *data )
+{
+  Toolbar *self = (Toolbar*)(data);
+  Fl_Value_Slider *slider = (Fl_Value_Slider*)(w);
+
+  // Only valid when a joint has been selected
+  if(self->jointChoice->value() <0)
+    return;
+
+  double value = slider->value();
+
+  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  if (entity->IsModel())
+  {
+    Model *model = (Model*)(entity);
+    Joint *joint = model->GetJoint( self->jointChoice->text() );
+    joint->SetVelocity( 0, value );
   }
 }

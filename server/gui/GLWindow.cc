@@ -289,7 +289,8 @@ void GLWindow::HandleMouseDrag()
 
     if (this->leftMousePressed)
     {
-      if (entity->IsModel() || entity->IsBody())
+      if ( (entity->IsModel() || entity->IsBody()) && 
+           (this->keys[FL_Control_L] || this->keys[FL_Control_R])  )
       {
         if (entity->IsModel())
         {
@@ -364,7 +365,8 @@ void GLWindow::HandleMouseDrag()
     }
     else if (this->rightMousePressed)
     {
-      if (entity->IsModel() || entity->IsBody())
+      if ( (entity->IsModel() || entity->IsBody()) && 
+           (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
       {
         if (entity->IsModel())
         {
@@ -440,7 +442,8 @@ void GLWindow::HandleMouseDrag()
     }
     else if (this->middleMousePressed)
     {
-      if (entity->IsBody())
+      if (entity->IsBody() && 
+          (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
       {
         double distance, scaleX, scaleY;
         Vector3 moveVector;
@@ -493,7 +496,8 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
 
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
 
-  if (entity->IsModel() || entity->IsBody())
+  if ( (entity->IsModel() || entity->IsBody()) && 
+      (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
   {
     // FIXME: old
     if (entity->IsModel())

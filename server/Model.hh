@@ -63,6 +63,8 @@ namespace gazebo
   /// \brief A model
   class Model : public Entity
   {
+    public: typedef std::vector<Joint*> JointContainer;
+
     /// \brief Constructor
     public: Model(Model *parent);
   
@@ -140,7 +142,16 @@ namespace gazebo
     /// \brief Create and return a new body
     /// \return Pointer to a new body.
     public: Body *CreateBody();
-  
+
+    /// \brief Get the number of joints
+    /// \return Get the number of joints
+    public: unsigned int GetJointCount() const;
+
+    /// \brief Get a joing by index
+    /// \param index Index of the joint
+    /// \return A pointer to the joint
+    public: Joint *GetJoint( unsigned int index ) const;
+
     /// \brief Get a joint
     /// \param name The name of the joint, specified in the world file
     /// \return Pointer to the joint
@@ -222,7 +233,8 @@ namespace gazebo
     protected: std::map<std::string, Body* > bodies;
   
     /// \brief Map of the joints
-    protected: std::map<std::string, Joint* > joints;
+    //protected: std::map<std::string, Joint* > joints;
+    protected: std::vector<Joint* > joints;
   
     /// \brief Map of the controllers
     protected: std::map<std::string, Controller* > controllers;

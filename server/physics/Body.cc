@@ -145,6 +145,7 @@ void Body::Load(XMLConfigNode *node)
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->selfCollideP->Load(node);
+
   // option to enter full mass matrix
   // load custom inertia matrix for the body
   this->customMassMatrixP->Load(node);
@@ -175,6 +176,10 @@ void Body::Load(XMLConfigNode *node)
   this->turnGravityOffP->Load(node);
 
   this->SetRelativePose(Pose3d(**this->xyzP, **this->rpyP));
+
+  // before loading child geometry, we have to figure out of selfCollide is true
+  // and modify parent class Entity so this body has its own spaceId
+  this->SetSelfCollide( **this->selfCollideP );
 
   // save transform from this Parent Model Frame to this Body Frame
   // this is only used in setting Model pose from canonicalBody
@@ -328,7 +333,7 @@ void Body::SetLaserRetro(float retro)
 void Body::Init()
 {
   // If no geoms are attached, then don't let gravity affect the body.
-  if (this->geoms.size()==0 || this->turnGravityOffP->GetValue())
+  if (this->geoms.size()==0 || **this->turnGravityOffP)
     this->SetGravityMode(false);
 
   std::vector< Sensor* >::iterator siter;
@@ -488,6 +493,9 @@ void Body::UpdateCoM()
 
   bodyPose = this->GetRelativePose();
 
+  if (this->GetName() == "torso_lift_link")
+    std::cout << "Before Pose[" << this->GetAbsPose().pos << "]\n";
+
   // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
@@ -503,7 +511,13 @@ void Body::UpdateCoM()
   // Apply the CoG offset to the body
   Pose3d p = this->GetRelativePose();
   p.pos += this->mass.GetCoG();
+
   this->SetRelativePose( p, true );
+
+  if (this->GetName() == "torso_lift_link")
+    std::cout << "After Pose[" << this->GetAbsPose().pos << "]\n";
+
+
 }
 
 

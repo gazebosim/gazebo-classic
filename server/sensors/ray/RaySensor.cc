@@ -76,8 +76,8 @@ void RaySensor::LoadChild(XMLConfigNode *node)
 /// Save the sensor info in XML format
 void RaySensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
-
-  this->laserShape->Save(prefix, stream);}
+  this->laserShape->Save(prefix, stream);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Init the ray
@@ -98,14 +98,14 @@ void RaySensor::FiniChild()
 /// Get the minimum angle
 Angle RaySensor::GetMinAngle() const
 {
-  return this->laserShape->GetMinAngle();//**(this->minAngleP);
+  return this->laserShape->GetMinAngle();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the maximum angle
 Angle RaySensor::GetMaxAngle() const
 {
-  return this->laserShape->GetMaxAngle();//**(this->maxAngleP);
+  return this->laserShape->GetMaxAngle();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -196,6 +196,6 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild()
 {
-  if (this->active)
+  //if (this->active)
     this->laserShape->Update();
 }

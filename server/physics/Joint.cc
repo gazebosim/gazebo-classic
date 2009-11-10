@@ -114,7 +114,7 @@ void Joint::Load(XMLConfigNode *node)
   this->body1 = this->model->GetBody( **(this->body1NameP));
   this->body2 = this->model->GetBody(**(this->body2NameP));
 
-  Body *anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
+  this->anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
 
   if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
@@ -122,9 +122,20 @@ void Joint::Load(XMLConfigNode *node)
   if (!this->body2 && this->body2NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
+
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
-  this->anchorPos -= anchorBody->GetMass().GetCoG();
+  this->anchorPos = this->anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
+  this->anchorPos -= this->anchorBody->GetMass().GetCoG();
+
+  std::cout << "Joint Name[" << this->GetName() << "]\n";
+  if (this->body1)
+    std::cout << " Body1[" << this->body1->GetName() << "]\n";
+  if (this->body2)
+    std::cout << " Body2[" << this->body2->GetName() << "]\n";
+  std::cout << " AnchorBody[" << this->anchorBody->GetName() << "]\n";
+  std::cout << " AnchorBody[" << this->anchorBody->GetAbsPose().pos << "]\n";
+  std::cout << " Offset[" << **(this->anchorOffsetP) << "]\n";
+  std::cout << " Anchor Pos[" << this->anchorPos << "]\n";
 
   this->Attach(this->body1, this->body2);
 
@@ -134,6 +145,7 @@ void Joint::Load(XMLConfigNode *node)
 
   if (this->visual)
   {
+    this->visual->SetPosition(this->anchorPos);
     this->visual->SetCastShadows(false);
     this->visual->AttachMesh("joint_anchor");
     this->visual->SetMaterial("Gazebo/JointAnchor");
@@ -155,7 +167,7 @@ void Joint::Load(XMLConfigNode *node)
   }
 
   // Set the anchor vector
-  if (anchorBody)
+  if (this->anchorBody)
   {
     this->SetAnchor(0, this->anchorPos);
   }
@@ -210,34 +222,23 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 /// Update the joint
 void Joint::Update()
 {
-//TODO: Evaluate impact of this code on performance
+  //TODO: Evaluate impact of this code on performance
   if (this->visual)
     this->visual->SetVisible(World::Instance()->GetShowJoints());
 
-  if (!World::Instance()->GetShowJoints())
-    return;
+  // setting anchor relative to gazebo body frame origin
+  this->anchorPos = this->anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
+  this->anchorPos -= this->anchorBody->GetMass().GetCoG();
 
-  Vector3 start;
-  if (this->body1)
-  {
-    start = this->body1->GetAbsPose().pos - this->GetAnchor(0);
+  //this->anchorPos = this->GetAnchor(0);
 
-    if (this->line1)
-    {
-      this->line1->SetPoint(0, this->body1->GetAbsPose().pos);
-      this->line1->SetPoint(1, this->GetAnchor(0));
-    }
-  }
+  this->visual->SetPosition(this->anchorPos);
+
+  if (this->body1) 
+    this->line1->SetPoint(1, this->body1->GetAbsPose().pos - this->anchorPos);
 
   if (this->body2)
-  {
-    start = this->body2->GetAbsPose().pos - this->GetAnchor(0);
-    if (this->line2)
-    {
-      this->line2->SetPoint(0, this->body2->GetAbsPose().pos);
-      this->line2->SetPoint(1, this->GetAnchor(0));
-    }
-  }
+    this->line2->SetPoint(1, this->body2->GetAbsPose().pos - this->anchorPos);
 }
 
 //////////////////////////////////////////////////////////////////////////////

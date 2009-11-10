@@ -668,7 +668,7 @@ void OgreVisual::SetPose( const Pose3d &pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-Vector3 OgreVisual::GetPosition()
+Vector3 OgreVisual::GetPosition() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -687,7 +687,7 @@ Vector3 OgreVisual::GetPosition()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the rotation of the visual
-Quatern OgreVisual::GetRotation( )
+Quatern OgreVisual::GetRotation( ) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -707,7 +707,7 @@ Quatern OgreVisual::GetRotation( )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the visual
-Pose3d OgreVisual::GetPose()
+Pose3d OgreVisual::GetPose() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -723,7 +723,7 @@ Pose3d OgreVisual::GetPose()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global pose of the node
-Pose3d OgreVisual::GetAbsPose()
+Pose3d OgreVisual::GetAbsPose() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -839,11 +839,24 @@ void OgreVisual::ShowSelectionBox( bool value )
   Ogre::SceneNode *node = this->sceneNode;
 
   while (node && node->numAttachedObjects() == 0)
-  {
     node = dynamic_cast<Ogre::SceneNode*>(node->getChild(0));
-  }
+
   if (node)
+  {
+    /*node = this->sceneNode;
+    std::cout << "Num CHildren[" << node->numChildren() << "]\n";
+    Ogre::AxisAlignedBox box = node->_getWorldAABB();
+    box.scale( node->getScale() );
+    Ogre::Vector3 min = box.getMinimum();
+    Ogre::Vector3 max = box.getMaximum();
+    printf("Scale[%f %f %f]\n", node->getScale().x, 
+        node->getScale().y, node->getScale().z);
+    printf("Box Min[%f %f %f] Max[%f %f %f]\n", min.x, min.y, min.z,
+        max.x, max.y, max.z);
+        */
+
     node->showBoundingBox(value);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
