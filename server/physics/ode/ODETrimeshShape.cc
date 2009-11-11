@@ -50,7 +50,7 @@ ODETrimeshShape::~ODETrimeshShape()
 /// Update function.
 void ODETrimeshShape::Update()
 {
-  ODEGeom *ogeom = ((ODEGeom*)this->parent);
+  /*ODEGeom *ogeom = ((ODEGeom*)this->parent);
 
   /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
@@ -83,6 +83,7 @@ void ODETrimeshShape::Update()
 
   dGeomTriMeshSetLastTransform( ogeom->GetGeomId(),
       *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -109,12 +110,12 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
   //{
     dTriMeshDataID odeData;
 
-    const SubMesh *subMesh = mesh->GetSubMesh(i);
+    /*const SubMesh *subMesh = mesh->GetSubMesh(i);
     if (subMesh->GetVertexCount() < 3)
     {
       printf("ODETrimesh invalid mesh\n");
       return;
-    }
+    }*/
 
     /// This will hold the vertex data of the triangle mesh
     odeData = dGeomTriMeshDataCreate();
@@ -124,10 +125,10 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
     float *vertices = NULL;
     unsigned int *indices = NULL;
 
-    subMesh->FillArrays(&vertices, &indices);
+    mesh->FillArrays(&vertices, &indices);
 
-    numIndices = subMesh->GetIndexCount();
-    numVertices = subMesh->GetVertexCount();
+    numIndices = mesh->GetIndexCount();
+    numVertices = mesh->GetVertexCount();
 
     for (unsigned int j=0;  j < numVertices; j++)
     {

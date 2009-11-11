@@ -75,6 +75,7 @@ ODEPhysics::ODEPhysics()
 
   //this->spaceId = dSimpleSpaceCreate(0);
   this->spaceId = dHashSpaceCreate(0);
+  dHashSpaceSetLevels(this->spaceId, -2, 8);
 
   this->contactGroup = dJointGroupCreate(0);
 
@@ -451,7 +452,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     //std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
 
-    numc = dCollide(o1,o2,10, contactGeoms, sizeof(contactGeoms[0]));
+    numc = dCollide(o1,o2,64, contactGeoms, sizeof(contactGeoms[0]));
+
     if (numc != 0)
     {
       for (i=0; i<numc; i++)
