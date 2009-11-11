@@ -17,12 +17,12 @@
   <verbosity>1</verbosity>
 
   <physics:ode>
-    <stepTime>0.001</stepTime>
+    <stepTime>0.0001</stepTime>
     <gravity>0 0 -9.80665</gravity>
     <cfm>10e-8</cfm>
     <erp>0.3</erp>
     <quickStep>true</quickStep>
-    <quickStepIters>50</quickStepIters>
+    <quickStepIters>20</quickStepIters>
     <quickStepW>1.3</quickStepW>
     <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
     <contactSurfaceLayer>0.001</contactSurfaceLayer>
@@ -54,11 +54,32 @@
         <normal>0 0 1</normal>
         <size>2000 2000</size>
         <segments>10 10</segments>
-        <uvTile>100 100</uvTile>
+        <uvTile>1000 1000</uvTile>
         <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
   </model:physical>
+
+  <model:physical name="wood_pallet1">
+    <xyz>0 0 2.5</xyz>
+    <rpy>90 0 0</rpy>
+    <static>false</static>
+    <body:trimesh name="pallet_body">
+      <geom:trimesh name="pallet_geom">
+        <mesh>WoodPallet.mesh</mesh>
+        <scale>.2 .2 .2</scale>
+        <mass>0.1</mass>
+
+        <visual>
+          <scale>.2 .2 .2</scale>
+          <rpy>0 0 0</rpy>
+          <mesh>WoodPallet.mesh</mesh>
+          <material>Gazebo/WoodPallet</material>
+        </visual>
+      </geom:trimesh>
+    </body:trimesh>
+  </model:physical>
+
 
   <model:physical name="wood_pallet">
     <xyz>0 0 1.5</xyz>
@@ -68,7 +89,7 @@
       <geom:trimesh name="pallet_geom">
         <mesh>WoodPallet.mesh</mesh>
         <scale>.2 .2 .2</scale>
-        <mass>1.0</mass>
+        <mass>0.1</mass>
 
         <visual>
           <scale>.2 .2 .2</scale>
@@ -88,7 +109,7 @@
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
         <size>0.2</size>
-        <mass>1.0</mass>
+        <mass>0.1</mass>
 
         <mu1>109999.0</mu1>
 

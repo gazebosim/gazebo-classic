@@ -217,13 +217,15 @@ void ContactSensor::ContactCallback(Geom *g1, Geom *g2)
   // somehow here, extract contact information when user requests it
   //
   std::vector< ParamT<std::string> *>::iterator iter;
-  int i = 0;
+  unsigned int i = 0;
 
-  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); 
-       iter++, i++)
+  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
   {
     if ( **(*iter) == g1->GetName() || **(*iter) == g2->GetName() )
     {
+      if (i >= this->contacts.size())
+        this->contacts.resize( this->contacts.size() + 10);
+
       this->contacts[i].state = 1;
       this->contacts[i].time = Simulator::Instance()->GetRealTime();
       this->contacts[i].name = **(*iter)==g1->GetName()? g2->GetName() : g1->GetName();
@@ -231,6 +233,7 @@ void ContactSensor::ContactCallback(Geom *g1, Geom *g2)
       this->contacts[i].body2Force = g1->contact->body2Force;
       this->contacts[i].body1Torque = g1->contact->body1Torque;
       this->contacts[i].body2Torque = g1->contact->body2Torque;
+      i++;
     }
   }
 

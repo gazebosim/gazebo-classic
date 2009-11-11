@@ -94,7 +94,7 @@ ODEPhysics::ODEPhysics()
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   Param::End();
 
-  this->contactFeedbacks.resize(100);
+  this->contactFeedbacks.resize(1000);
 
   // Reset the contact pointer
   this->contactFeedbackIter = this->contactFeedbacks.begin();
@@ -208,6 +208,12 @@ void ODEPhysics::UpdateCollision()
         this->contactFeedbacks.begin(); 
         iter != this->contactFeedbackIter; iter++)
   {
+
+    if ((*iter).geom1 == NULL)
+      printf("Geom1 is null\n");
+
+    if ((*iter).geom2 == NULL)
+      printf("Geom2 is null\n");
 
     (*iter).geom1->contact->body1Force.Set(
         (*iter).feedback.f1[0], (*iter).feedback.f1[1], (*iter).feedback.f1[2]);
@@ -450,9 +456,12 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
-    //std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
+    int numContacts = 5;
 
-    numc = dCollide(o1,o2,64, contactGeoms, sizeof(contactGeoms[0]));
+    if (geom1->GetType() == Shape::TRIMESH && geom2->GetType()==Shape::TRIMESH)
+      numContacts = 64;
+
+    numc = dCollide(o1,o2,numContacts, contactGeoms, sizeof(contactGeoms[0]));
 
     if (numc != 0)
     {
@@ -506,7 +515,9 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
                                           self->contactGroup, &contact);
 
         if (self->contactFeedbackIter == self->contactFeedbacks.end())
-          self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
+        {
+          self->contactFeedbacks.resize( self->contactFeedbacks.size() + 500);
+        }
  
         (*self->contactFeedbackIter).geom1 = geom1;
         (*self->contactFeedbackIter).geom2 = geom2;
@@ -518,118 +529,3 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     }
   }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/*void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
-{
-  int i,n;
-  ODEPhysics *self;
-  Geom *geom1, *geom2;
-  dContactGeom contactGeoms[10];
-  dContact contactInfo;
-  dJointID joint;
-  int num;
-
-  self = (ODEPhysics*) data;
-
-  // Maximum number of contacts
-  num = sizeof(contactGeoms) / sizeof(contactGeoms[0]);
-
-  // If either geom is a space...
-  if (dGeomIsSpace( o1 ) || dGeomIsSpace( o2 ))
-  {
-    // If the spaces/geoms belong to different spaces, collide them
-    if (dGeomGetSpace(o1) != dGeomGetSpace(o2))
-      dSpaceCollide2( o1, o2, self, &CollisionCallback );
-
-    // If the spaces belong the world space, collide them
-    else if (dGeomGetSpace(o1) == self->spaceId || dGeomGetSpace(o2) == self->spaceId)
-      dSpaceCollide2( o1, o2, self, &CollisionCallback );
-  }
-  else
-  {
-    // There should be no geoms in the world space
-    assert(dGeomGetSpace(o1) != self->spaceId);
-    assert(dGeomGetSpace(o2) != self->spaceId);
-
-    // We should never test two geoms in the same space
-    assert(dGeomGetSpace(o1) != dGeomGetSpace(o2));
-
-    // Get pointers to the underlying geoms
-    geom1 = NULL;
-    if (dGeomGetClass(o1) == dGeomTransformClass)
-      geom1 = (Geom*) dGeomGetData(dGeomTransformGetGeom(o1));
-    else
-      geom1 = (Geom*) dGeomGetData(o1);
-
-    geom2 = NULL;
-    if (dGeomGetClass(o2) == dGeomTransformClass)
-      geom2 = (Geom*) dGeomGetData(dGeomTransformGetGeom(o2));
-    else
-      geom2 = (Geom*) dGeomGetData(o2);
-
-    //std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
-
-    assert(geom1 && geom2);
-
-    if (geom1->IsStatic() && geom2->IsStatic())
-      printf("Geoms are static\n");
-
-    // Detect collisions betweed geoms
-    n = dCollide(o1, o2, num, contactGeoms, sizeof(contactGeoms[0]));
-
-    printf("Num COllisions[%d]\n",n);
-    for (i=0; i < n; i++)
-    {
-      dBodyID body1 = dGeomGetBody(contactGeoms[i].g1);
-      dBodyID body2 = dGeomGetBody(contactGeoms[i].g2);
-      printf("Bodies[%d %d]\n",body1, body2);
-
-      // Dont add contact joints between already connected bodies.
-      // Sometimes the body is unspecified; should probably figure out
-      // what this means
-      if (body1 && body2)
-        if (dAreConnectedExcluding(body1, body2, dJointTypeContact))
-          continue;
-
-      contactInfo.geom = contactGeoms[i];
-      contactInfo.surface.mode = 0;
-
-      // Compute the CFM and ERP by assuming the two bodies form a
-      // spring-damper system.
-      double h, kp, kd;
-      h = self->stepTime;
-      kp = 1 / (1 / geom1->contact->kp + 1 / geom2->contact->kp);
-      kd = geom1->contact->kd + geom2->contact->kd;
-      contactInfo.surface.mode |= dContactSoftERP | dContactSoftCFM;
-      contactInfo.surface.soft_erp = h * kp / (h * kp + kd);
-      contactInfo.surface.soft_cfm = 1 / (h * kp + kd);
-
-      // Compute friction effects; this is standard Coulomb friction
-      contactInfo.surface.mode |= dContactApprox1;
-      contactInfo.surface.mu = std::min(geom1->contact->mu1, geom2->contact->mu1);
-      contactInfo.surface.mu2 = 0;
-      contactInfo.surface.bounce = 0.1;
-      contactInfo.surface.bounce_vel = 0.1;
-
-
-     // contactInfo.surface.mode = dContactSlip1 | dContactSlip2 | dContactSoftERP | dContactSoftCFM | dContactApprox1;
-
-      //contactInfo.surface.soft_erp = 0.8;
-      //contactInfo.surface.soft_cfm = 0.01;
-      //contactInfo.surface.slip1 = 0.0;
-      //contactInfo.surface.slip2 = 0.0;
-      //contactInfo.surface.mu = 1;
-
-      // Compute slipping effects
-      //contactInfo.surface.slip1 = (geom1->contact->slip1 + geom2->contact->slip1)/2.0;
-      //contactInfo.surface.slip2 = (geom1->contact->slip2 + geom2->contact->slip2)/2.0;
-
-    std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
-      // Construct a contact joint between the two bodies
-      joint = dJointCreateContact(self->worldId, self->contactGroup, &contactInfo);
-      dJointAttach(joint, body1, body2);
-    }
-  }
-}*/
-

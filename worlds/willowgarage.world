@@ -72,7 +72,7 @@
   </model:physical>
 
   <model:physical name="wg_model">
-    <xyz>0 0 0.0</xyz>
+    <xyz>-8 -4 0.0</xyz>
     <static>true</static>
 
     <body:trimesh name="wg_body">
@@ -89,7 +89,7 @@
   </model:physical>
 
   <model:physical name="pr2_model">
-    <xyz>8 4 0</xyz>
+    <xyz>0 0 0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
     <include embedded="true">

@@ -96,6 +96,7 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
   PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
 
   TrimeshShape::Load(node);
+
   /*if (this->mesh->GetSubMeshCount() > 1)
   {
     printf("ODETrimesh submesh count >1\n");
@@ -106,16 +107,14 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
 
   unsigned int i =0;
 
-  //for (unsigned int i=0; i < this->mesh->GetSubMeshCount(); i++)
-  //{
     dTriMeshDataID odeData;
 
-    /*const SubMesh *subMesh = mesh->GetSubMesh(i);
+    const SubMesh *subMesh = mesh->GetSubMesh(i);
     if (subMesh->GetVertexCount() < 3)
     {
       printf("ODETrimesh invalid mesh\n");
       return;
-    }*/
+    }
 
     /// This will hold the vertex data of the triangle mesh
     odeData = dGeomTriMeshDataCreate();
@@ -125,10 +124,10 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
     float *vertices = NULL;
     unsigned int *indices = NULL;
 
-    mesh->FillArrays(&vertices, &indices);
+    subMesh->FillArrays(&vertices, &indices);
 
-    numIndices = mesh->GetIndexCount();
-    numVertices = mesh->GetVertexCount();
+    numIndices = subMesh->GetIndexCount();
+    numVertices = subMesh->GetVertexCount();
 
     for (unsigned int j=0;  j < numVertices; j++)
     {
