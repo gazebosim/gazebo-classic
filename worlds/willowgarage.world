@@ -22,7 +22,7 @@
     <cfm>10e-8</cfm>
     <erp>0.3</erp>
     <quickStep>true</quickStep>
-    <quickStepIters>50</quickStepIters>
+    <quickStepIters>10</quickStepIters>
     <quickStepW>1.3</quickStepW>
     <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
     <contactSurfaceLayer>0.001</contactSurfaceLayer>
@@ -37,8 +37,8 @@
     <frames>
       <row height="100%">
         <camera width="100%">
-          <xyz>5 3 50</xyz>
-          <rpy>0 22 21</rpy>
+          <xyz>2.94 -2.44 7.24</xyz>
+          <rpy>0 31.1 47.20</rpy>
         </camera>
       </row>
     </frames>
@@ -65,7 +65,7 @@
         <normal>0 0 1</normal>
         <size>2000 2000</size>
         <segments>10 10</segments>
-        <uvTile>100 100</uvTile>
+        <uvTile>1000 1000</uvTile>
         <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
@@ -77,16 +77,47 @@
 
     <body:trimesh name="wg_body">
       <geom:trimesh name="wg_geom">
-        <scale>0.1 0.1 0.1</scale>
+        <scale>0.0254 0.0254 0.0254</scale>
         <mesh>willowgarage.dae</mesh>
 
         <visual>
-          <scale>0.1 0.1 0.1</scale>
+          <scale>0.0254 0.0254 0.0254</scale>
           <mesh>willowgarage.dae</mesh>
         </visual>
       </geom:trimesh>
     </body:trimesh>
   </model:physical>
+
+  <model:physical name="pr2_model">
+    <xyz>8 4 0</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+
+    <include embedded="true">
+      <xi:include href="models/pr2.model" />
+    </include>
+  </model:physical>
+
+  <model:physical name="sphere1_model">
+    <xyz>10 10 5.5</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
+    <static>false</static>
+
+    <body:sphere name="sphere1_body">
+      <geom:sphere name="sphere1_geom">
+        <size>1.2</size>
+        <mass>1.0</mass>
+
+        <mu1>109999.0</mu1>
+
+        <visual>
+          <scale>1.2 1.2 1.2</scale>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Rocky</material>
+        </visual>
+      </geom:sphere>
+    </body:sphere>
+  </model:physical>
+
 
   <!-- White Point light -->
   <model:renderable name="point_white">
@@ -125,7 +156,7 @@
 
   <!-- White Point light -->
   <model:renderable name="point_white2">
-    <xyz>0 200 100</xyz>
+    <xyz>45 30 10</xyz>
     <static>true</static>
 
     <light>
@@ -136,13 +167,13 @@
       <range>500</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.01 0.0001</attenuation>
+      <attenuation>0.1 0.1 0.001</attenuation>
     </light>
   </model:renderable>
   
   <!-- White Point light -->
   <model:renderable name="point_white3">
-    <xyz>200 0 100</xyz>
+    <xyz>20 20 30</xyz>
     <static>true</static>
 
     <light>
@@ -150,27 +181,27 @@
       <type>point</type>
       <diffuseColor>0.5 0.48 0.5</diffuseColor>
       <specularColor>.1 .1 .1</specularColor>
-      <range>500</range>
+      <range>100</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.01 0.0001</attenuation>
+      <attenuation>0.1 0.01 0.001</attenuation>
     </light>
   </model:renderable>
 
   <!-- White Point light -->
   <model:renderable name="point_white4">
-    <xyz>100 100 100</xyz>
+    <xyz>10 5 20</xyz>
     <static>true</static>
 
     <light>
       <castShadows>true</castShadows>
       <type>point</type>
-      <diffuseColor>0.5 0.48 0.5</diffuseColor>
+      <diffuseColor>0.2 0.2 0.2</diffuseColor>
       <specularColor>.1 .1 .1</specularColor>
-      <range>500</range>
+      <range>50</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.01 0.0001</attenuation>
+      <attenuation>0.1 0.1 0.001</attenuation>
     </light>
   </model:renderable>
 

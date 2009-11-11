@@ -98,13 +98,14 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
 
   mass = this->parent->GetMass();
 
-  for (unsigned int i=0; i < this->mesh->GetSubMeshCount(); i++)
+  //for (unsigned int i=0; i < this->mesh->GetSubMeshCount(); i++)
   {
     dTriMeshDataID odeData;
 
-    const SubMesh *subMesh = mesh->GetSubMesh(i);
+    /*const SubMesh *subMesh = mesh->GetSubMesh(i);
     if (subMesh->GetVertexCount() < 3)
       continue;
+      */
 
     /// This will hold the vertex data of the triangle mesh
     odeData = dGeomTriMeshDataCreate();
@@ -114,10 +115,10 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
     float *vertices = NULL;
     unsigned int *indices = NULL;
 
-    subMesh->FillArrays(&vertices, &indices);
+    mesh->FillArrays(&vertices, &indices);
 
-    numIndices = subMesh->GetIndexCount();
-    numVertices = subMesh->GetVertexCount();
+    numIndices = mesh->GetIndexCount();
+    numVertices = mesh->GetVertexCount();
 
     for (unsigned int j=0;  j < numVertices; j++)
     {
