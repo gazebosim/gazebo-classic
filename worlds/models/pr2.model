@@ -61,6 +61,8 @@
         </geom:box>
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
+
+        <!--
         <sensor:ray name="base_laser">
             <rayCount>120</rayCount>
             <rangeCount>640</rangeCount>
@@ -74,6 +76,7 @@
             <resRange>0.01</resRange>
             <updateRate>20.0</updateRate>
         </sensor:ray>
+        -->
     </body:box>
     <joint:hinge name="base_laser_joint">
         <body1>base_laser_link</body1>
@@ -2150,6 +2153,7 @@
         </geom:box>
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:ray name="laser_tilt">
             <rayCount>120</rayCount>
             <rangeCount>640</rangeCount>
@@ -2163,6 +2167,7 @@
             <resRange>0.01</resRange>
             <updateRate>40.0</updateRate>
         </sensor:ray>
+        -->
     </body:box>
     <joint:hinge name="laser_tilt_joint">
         <body1>laser_tilt_link</body1>

@@ -151,11 +151,12 @@ void ODEGeom::Update()
 // Set the encapsulated geometry object
 void ODEGeom::SetGeom(dGeomID geomId, bool placeable)
 {
+  // Must go first in this function
+  this->geomId = geomId;
+
   Geom::SetGeom(placeable);
 
   this->physicsEngine->LockMutex();
-
-  this->geomId = geomId;
 
   if ( dGeomGetSpace(this->geomId) == 0 )
   {

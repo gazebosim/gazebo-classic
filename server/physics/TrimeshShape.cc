@@ -24,8 +24,11 @@
  * SVN: $Id$
  */
 
+#include "PhysicsEngine.hh"
 #include "MeshManager.hh"
 #include "Mesh.hh"
+#include "Mass.hh"
+#include "Geom.hh"
 #include "TrimeshShape.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
@@ -69,6 +72,56 @@ void TrimeshShape::Load(XMLConfigNode *node)
   this->scaleP->Load(node);
 
   this->mesh = meshManager->Load( **this->meshNameP );
+
+  Mass mass = this->parent->GetMass();
+
+  if (this->mesh->GetSubMeshCount() > 1)
+  {
+    // Create a mesh for each of the submeshes.
+    for (unsigned int i=1; i < this->mesh->GetSubMeshCount(); i++)
+    {
+      SubMesh *subMesh = const_cast<SubMesh*>(mesh->GetSubMesh(i));
+
+      if (subMesh->GetVertexCount() < 3)
+        continue;
+
+      std::ostringstream newName;
+      newName << this->mesh->GetName() << "_" << i;
+
+      Mesh *newMesh = new Mesh();
+      newMesh->SetName( newName.str() );
+      newMesh->AddSubMesh( subMesh );
+     
+      meshManager->AddMesh( newMesh ); 
+
+      std::ostringstream stream;
+
+      stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
+
+      stream << "<geom:trimesh name='" << newName.str() << "_geom'>";
+      stream << "  <mass>" << 
+        mass.GetAsDouble() / this->mesh->GetSubMeshCount() << "</mass>";
+      stream << "  <xyz>0 0 0</xyz>";
+      stream << "  <scale>" << **this->scaleP << "</scale>";
+      stream << "  <mesh>" << newName.str() << "</mesh>";
+      stream << "  <visual>";
+      stream << "    <mesh>" << newName.str() << "</mesh>";
+      stream << "    <scale>" << **this->scaleP << "</scale>";
+      stream << "  </visual>";
+      stream << "</geom:trimesh>";
+      stream << "</gazebo:world>";
+
+      XMLConfig *config = new XMLConfig();
+      config->LoadString( stream.str() );
+
+      Geom *newGeom = this->physicsEngine->CreateGeom( "trimesh", 
+          this->parent->GetBody() );
+
+      newGeom->Load( config->GetRootNode()->GetChild() );
+
+      delete config;
+    }
+  }
 
   /*const Mesh *mesh = meshManager->Load( **this->meshNameP );
 

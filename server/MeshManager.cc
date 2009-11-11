@@ -53,6 +53,9 @@ const Mesh *MeshManager::Load(const std::string &filename)
 
   std::string extension;
 
+  if (this->HasMesh(filename))
+    return this->meshes[filename];
+
   fullname =  std::string("./")+filename;
   if (stat(fullname.c_str(), &st) == 0)
   {
@@ -116,6 +119,14 @@ const Mesh *MeshManager::Load(const std::string &filename)
     gzerr(0) << "Unable to find file[" << filename << "]\n";
 
   return mesh;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add a mesh to the manager
+void MeshManager::AddMesh(Mesh *mesh)
+{
+  if (!this->HasMesh(mesh->GetName()))
+    this->meshes[mesh->GetName()] = mesh;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

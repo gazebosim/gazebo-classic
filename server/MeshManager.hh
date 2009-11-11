@@ -26,6 +26,9 @@ namespace gazebo
     /// \brief Load a mesh from a file
     public: const Mesh *Load(const std::string &filename);
 
+    /// \brief Add a mesh to the manager
+    public: void AddMesh(Mesh *mesh);
+
     /// \brief Get a mesh by name
     public: const Mesh *GetMesh(const std::string &name) const;
 

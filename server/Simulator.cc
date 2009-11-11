@@ -327,7 +327,7 @@ void Simulator::MainLoop()
 {
   double currTime = 0;
   double lastTime = 0;
-  double freq = 80.0;
+  double freq = 40.0;
 
 #ifdef TIMING
     double tmpT1 = this->GetWallTime();
@@ -337,6 +337,8 @@ void Simulator::MainLoop()
 
   this->physicsThread = new boost::thread( 
                          boost::bind(&Simulator::PhysicsLoop, this));
+
+  struct timespec timeSpec;
 
   // Update the gui
   while (!this->userQuit)
@@ -361,12 +363,19 @@ void Simulator::MainLoop()
 
       if (currTime - lastTime < 1/freq)
       {
-        usleep((1/freq - (currTime - lastTime)) * 1e6);
+        double sleepTime = (1/freq - (currTime - lastTime));
+        timeSpec.tv_sec = (int)(sleepTime);
+        timeSpec.tv_nsec = (sleepTime - timeSpec.tv_sec) *1e9;
+
+        nanosleep(&timeSpec, NULL);
       }
     }
     else
     {
-      usleep((1/freq - currTime - lastTime) * 1e6);
+      double sleepTime = (1/freq - (currTime - lastTime));
+      timeSpec.tv_sec = (int)(sleepTime);
+      timeSpec.tv_nsec = (sleepTime - timeSpec.tv_sec) *1e9;
+      nanosleep(&timeSpec, NULL);
     }
   }
 

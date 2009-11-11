@@ -248,6 +248,7 @@ void ODEPhysics::UpdatePhysics()
 #endif
 
   this->LockMutex(); 
+
   // Update the dynamical model
   if (this->quickStepP->GetValue())
     dWorldQuickStep(this->worldId, this->stepTimeP->GetValue() );
@@ -423,10 +424,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 
-
   if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact))
     return;
-
 
   // Check if either are spaces
   if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
@@ -450,23 +449,15 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
-    numc = dCollide(o1,o2,64, contactGeoms, sizeof(contactGeoms[0]));
+    //std::cout << "Geom1[" << geom1->GetName() << "] Geom2[" << geom2->GetName() << "]\n";
+
+    numc = dCollide(o1,o2,10, contactGeoms, sizeof(contactGeoms[0]));
     if (numc != 0)
     {
       for (i=0; i<numc; i++)
       {
         double h, kp, kd;
 
-        if (0)
-        std::cout << "dContactGeoms: "
-                  << " geom1: " << geom1->GetName()
-                  << " geom2: " << geom2->GetName()
-                  << " contact points: " << numc
-                  << " contact: " << i
-                  << " pos: " << contactGeoms[i].pos[0]<<","<< contactGeoms[i].pos[1]<<","<< contactGeoms[i].pos[2]<<","<< contactGeoms[i].pos[3]
-                  << " norm: " << contactGeoms[i].normal[0]<<","<< contactGeoms[i].normal[1]<<","<< contactGeoms[i].normal[2]<<","<< contactGeoms[i].normal[3]
-                  << " depth: " << contactGeoms[i].depth
-                  << std::endl;
         // skip negative depth contacts
         if(contactGeoms[i].depth < 0)
           continue;
@@ -513,10 +504,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
                                           self->contactGroup, &contact);
 
         if (self->contactFeedbackIter == self->contactFeedbacks.end())
-        {
           self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
-          fprintf(stderr, "Resize\n");
-        }
  
         (*self->contactFeedbackIter).geom1 = geom1;
         (*self->contactFeedbackIter).geom2 = geom2;

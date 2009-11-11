@@ -493,9 +493,6 @@ void Body::UpdateCoM()
 
   bodyPose = this->GetRelativePose();
 
-  if (this->GetName() == "torso_lift_link")
-    std::cout << "Before Pose[" << this->GetAbsPose().pos << "]\n";
-
   // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
@@ -513,11 +510,6 @@ void Body::UpdateCoM()
   p.pos += this->mass.GetCoG();
 
   this->SetRelativePose( p, true );
-
-  if (this->GetName() == "torso_lift_link")
-    std::cout << "After Pose[" << this->GetAbsPose().pos << "]\n";
-
-
 }
 
 

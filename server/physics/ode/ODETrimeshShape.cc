@@ -95,17 +95,26 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
   PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
 
   TrimeshShape::Load(node);
+  /*if (this->mesh->GetSubMeshCount() > 1)
+  {
+    printf("ODETrimesh submesh count >1\n");
+    return;
+  }*/
 
   mass = this->parent->GetMass();
 
+  unsigned int i =0;
+
   //for (unsigned int i=0; i < this->mesh->GetSubMeshCount(); i++)
-  {
+  //{
     dTriMeshDataID odeData;
 
-    /*const SubMesh *subMesh = mesh->GetSubMesh(i);
+    const SubMesh *subMesh = mesh->GetSubMesh(i);
     if (subMesh->GetVertexCount() < 3)
-      continue;
-      */
+    {
+      printf("ODETrimesh invalid mesh\n");
+      return;
+    }
 
     /// This will hold the vertex data of the triangle mesh
     odeData = dGeomTriMeshDataCreate();
@@ -115,10 +124,10 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
     float *vertices = NULL;
     unsigned int *indices = NULL;
 
-    mesh->FillArrays(&vertices, &indices);
+    subMesh->FillArrays(&vertices, &indices);
 
-    numIndices = mesh->GetIndexCount();
-    numVertices = mesh->GetVertexCount();
+    numIndices = subMesh->GetIndexCount();
+    numVertices = subMesh->GetVertexCount();
 
     for (unsigned int j=0;  j < numVertices; j++)
     {
@@ -132,14 +141,12 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
         (float*)vertices, 3*sizeof(float), numVertices,
         (int*)indices, numIndices, 3*sizeof(int));
 
-    pgeom->SetGeom( dCreateTriMesh( pgeom->GetSpaceId(), odeData,0,0,0 ), true );
+    pgeom->SetSpaceId( dSimpleSpaceCreate(pgeom->GetSpaceId()) );
+    pgeom->SetGeom( dCreateTriMesh(pgeom->GetSpaceId(), odeData,0,0,0 ), true);
 
     if (!pgeom->IsStatic())
-    {
-      double massV = mass.GetAsDouble()/this->mesh->GetSubMeshCount();
-      dMassSetTrimeshTotal(&odeMass, massV , pgeom->GetGeomId());
-    }
-  }
+      dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
+  //}
 
   physics->ConvertMass(&mass, &odeMass);
   this->parent->SetMass(mass);

@@ -1,3 +1,4 @@
+#include "World.hh"
 #include "Geom.hh"
 #include "Shape.hh"
 
@@ -11,6 +12,7 @@ Shape::Shape(Geom *p)
   : parent(p) 
 {
   this->parent->SetShape(this);
+  this->physicsEngine = World::Instance()->GetPhysicsEngine();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

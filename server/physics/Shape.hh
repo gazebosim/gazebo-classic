@@ -11,6 +11,7 @@
 namespace gazebo
 {
   class Geom;
+  class PhysicsEngine;
 
   /// \brief Base class for all shapes
   class Shape : public Common
@@ -37,6 +38,7 @@ namespace gazebo
 
     protected: Geom *parent;
     protected: Type type;
+    protected: PhysicsEngine *physicsEngine;
   };
 }
 
