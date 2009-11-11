@@ -134,7 +134,7 @@ Vector3 ContactSensor::GetContactBody2Force(unsigned int index) const
 std::string ContactSensor::GetGeomName(unsigned int index) const
 {
   if (index < this->contacts.size())
-    return this->geomNamesP[index]->GetValue();
+    return this->contacts[index].name;
 
   return std::string("");
 }
