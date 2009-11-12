@@ -97,7 +97,7 @@ void AudioController::UpdateChild()
 
     this->PutAudioData();
 
-    this->openALSource->SetPos(this->myParent->GetPose().pos);
+    this->openALSource->SetPos(this->myParent->GetAbsPose().pos);
   }
 }
 

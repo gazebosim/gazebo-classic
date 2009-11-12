@@ -93,7 +93,7 @@ void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of an axis
-Angle ODEUniversalJoint::GetAngle(int /*index*/) const
+Angle ODEUniversalJoint::GetAngle(int index) const
 {
   Angle result;
 
