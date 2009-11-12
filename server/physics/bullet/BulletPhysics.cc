@@ -29,7 +29,8 @@
 #include "BulletSphereShape.hh"
 #include "BulletBoxShape.hh"
 #include "BulletCylinderShape.hh"
-//#include "BulletTrimeshShape.hh"
+#include "BulletTrimeshShape.hh"
+#include "MapShape.hh"
 
 #include "BulletHingeJoint.hh"
 #include "BulletHinge2Joint.hh"
@@ -215,6 +216,12 @@ Geom *BulletPhysics::CreateGeom(Shape::Type type, Body *parent)
       break;
     case Shape::PLANE:
       shape = new BulletPlaneShape(geom);
+      break;
+    case Shape::TRIMESH:
+      shape = new BulletTrimeshShape(geom);
+      break;
+    case Shape::MAP:
+      shape = new MapShape(geom);
       break;
     default:
       gzthrow("Unable to create a geom of type[" << type << "]");

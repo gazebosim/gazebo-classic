@@ -10,6 +10,7 @@ SET (sources BulletPhysics.cc
              BulletHinge2Joint.cc
              BulletUniversalJoint.cc
              BulletBallJoint.cc
+             BulletTrimeshShape.cc
              #BulletRayGeom.cc
 )
 

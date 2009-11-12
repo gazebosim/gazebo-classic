@@ -18,37 +18,38 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Map geometry
+/* Desc: Map shape
  * Author: Nate Koenig
  * Date: 14 July 2008
- * CVS: $Id$
+ * SVN: $Id$
  */
 
 #include <iostream>
 #include <string.h>
 #include <math.h>
 
+#include "PhysicsEngine.hh"
 #include "GazeboConfig.hh"
 #include "OgreVisual.hh"
 #include "Image.hh"
-#include "BoxGeom.hh"
+#include "BoxShape.hh"
 #include "GazeboError.hh"
 #include "Simulator.hh"
 #include "Global.hh"
 #include "Body.hh"
-#include "MapGeom.hh"
+#include "Geom.hh"
+#include "MapShape.hh"
 
 using namespace gazebo;
 
-unsigned int MapGeom::geomCounter = 0;
+unsigned int MapShape::geomCounter = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-MapGeom::MapGeom(Body *body)
-    : Geom(body)
+MapShape::MapShape(Geom *parent)
+    : Shape(parent)
 {
-
-  this->type = Geom::MAP;
+  this->type = Shape::MAP;
 
   this->root = new QuadNode(NULL);
 
@@ -61,12 +62,13 @@ MapGeom::MapGeom(Body *body)
   this->granularityP = new ParamT<int>("granularity", 5, 0);
   Param::End();
 
+  this->visualNode = parent->GetVisualNode();
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-MapGeom::~MapGeom()
+MapShape::~MapShape()
 {
   if (this->root)
     delete this->root;
@@ -85,15 +87,14 @@ MapGeom::~MapGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void MapGeom::UpdateChild()
+void MapShape::Update()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void MapGeom::LoadChild(XMLConfigNode *node)
+void MapShape::Load(XMLConfigNode *node)
 {
-
   std::string imageFilename = node->GetString("image","",1);
 
   this->negativeP->Load(node);
@@ -139,7 +140,7 @@ void MapGeom::LoadChild(XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Create the ODE boxes
-void MapGeom::CreateBoxes(QuadNode *node)
+void MapShape::CreateBoxes(QuadNode *node)
 {
   if (node->leaf)
   {
@@ -149,7 +150,7 @@ void MapGeom::CreateBoxes(QuadNode *node)
     std::ostringstream stream;
 
     // Create the box geometry
-    BoxGeom* newBox = new BoxGeom( this->body );
+    Geom *geom = this->physicsEngine->CreateGeom("box",this->parent->GetBody());
 
     XMLConfig *boxConfig = new XMLConfig();
 
@@ -166,7 +167,6 @@ void MapGeom::CreateBoxes(QuadNode *node)
     sprintf(geomName,"map_geom_%d",geomCounter++);
 
     stream << "<geom:box name='" << geomName << "'>";
-    stream << "  <mass>0.0</mass>";
     stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
     stream << "  <rpy>0 0 0</rpy>";
     stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
@@ -180,7 +180,9 @@ void MapGeom::CreateBoxes(QuadNode *node)
 
     boxConfig->LoadString( stream.str() );
 
-    newBox->Load( boxConfig->GetRootNode()->GetChild() );
+    geom->Load( boxConfig->GetRootNode()->GetChild() );
+    geom->SetStatic(true);
+
     delete boxConfig;
   }
   else
@@ -195,7 +197,7 @@ void MapGeom::CreateBoxes(QuadNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Reduce the size of the quad tree
-void MapGeom::ReduceTree(QuadNode *node)
+void MapShape::ReduceTree(QuadNode *node)
 {
   std::deque<QuadNode*>::iterator iter;
 
@@ -254,7 +256,7 @@ void MapGeom::ReduceTree(QuadNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Merege quad tree cells
-void MapGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
+void MapShape::Merge(QuadNode *nodeA, QuadNode *nodeB)
 {
   std::deque<QuadNode*>::iterator iter;
 
@@ -304,7 +306,7 @@ void MapGeom::Merge(QuadNode *nodeA, QuadNode *nodeB)
 
 //////////////////////////////////////////////////////////////////////////////
 // Construct the quad tree
-void MapGeom::BuildTree(QuadNode *node)
+void MapShape::BuildTree(QuadNode *node)
 {
   QuadNode *newNode = NULL;
   unsigned int freePixels, occPixels;
@@ -379,7 +381,7 @@ void MapGeom::BuildTree(QuadNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get a count of pixels within a given area
-void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart, 
+void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart, 
                                  unsigned int width, unsigned int height, 
                                  unsigned int &freePixels, 
                                  unsigned int &occPixels )
@@ -410,7 +412,7 @@ void MapGeom::GetPixelCount(unsigned int xStart, unsigned int yStart,
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save child parameters
-void MapGeom::SaveChild(std::string &prefix, std::ostream &stream)
+void MapShape::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << *(this->negativeP) << "\n";
   stream << prefix << *(this->thresholdP) << "\n";

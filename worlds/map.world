@@ -42,6 +42,7 @@
       <linearStart>10</linearStart>
       <linearEnd>100</linearEnd>
     </fog>
+    <grid>false</grid>
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -55,12 +56,11 @@
         <normal>0 0 1</normal>
         <size>2000 2000</size>
         <segments>10 10</segments>
-        <uvTile>100 100</uvTile>
-        <material>Gazebo/Grey</material>
+        <uvTile>1000 1000</uvTile>
+        <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
   </model:physical>
-
 
   <model:physical name="map">
     <static>true</static>
@@ -75,20 +75,6 @@
       </geom:map>
     </body:map>
   </model:physical>
-
-  <model:renderable name="directional_white">
-    <static>true</static>
-    <light>
-      <type>directional</type>
-      <direction>0 -0.6 -0.4</direction>
-      <diffuseColor>1.0 1.0 1.0</diffuseColor>
-      <specularColor>0.2 0.2 0.2</specularColor>
-      <range>100</range>
-
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>1.0 0.0 0</attenuation>
-    </light>
-  </model:renderable>
 
   <model:physical name="pioneer2dx_model1">
     <xyz>0 0 0.145</xyz>
@@ -112,5 +98,21 @@
     </include>
   </model:physical>
 
+  <!-- White Point light -->
+  <model:renderable name="point_white">
+    <xyz>-4 4 5</xyz>
+    <static>true</static>
+
+    <light>
+      <type>point</type>
+      <diffuseColor>0.4 0.4 0.4</diffuseColor>
+      <specularColor>.1 .1 .1</specularColor>
+      <range>20</range>
+
+      <!-- Constant(0-1) Linear(0-1) Quadratic -->
+      <attenuation>0.5 0.01 0.001</attenuation>
+    </light>
+  </model:renderable>
+ 
 
 </gazebo:world>

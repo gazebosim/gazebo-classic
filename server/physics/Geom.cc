@@ -156,7 +156,7 @@ void Geom::Load(XMLConfigNode *node)
 void Geom::CreateBoundingBox()
 {
   // Create the bounding box
-  if (this->GetType() != Shape::PLANE)
+  if (this->GetType() != Shape::PLANE && this->GetType() != Shape::MAP)
   {
     Vector3 min;
     Vector3 max;

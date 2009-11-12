@@ -50,7 +50,7 @@ ODETrimeshShape::~ODETrimeshShape()
 /// Update function.
 void ODETrimeshShape::Update()
 {
-  /*ODEGeom *ogeom = ((ODEGeom*)this->parent);
+  ODEGeom *ogeom = ((ODEGeom*)this->parent);
 
   /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
@@ -83,7 +83,6 @@ void ODETrimeshShape::Update()
 
   dGeomTriMeshSetLastTransform( ogeom->GetGeomId(),
       *(dMatrix4*)( this->matrix_dblbuff + this->last_matrix_index * 16) );
-  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -97,56 +96,49 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
 
   TrimeshShape::Load(node);
 
-  /*if (this->mesh->GetSubMeshCount() > 1)
-  {
-    printf("ODETrimesh submesh count >1\n");
-    return;
-  }*/
-
   mass = this->parent->GetMass();
 
   unsigned int i =0;
 
-    dTriMeshDataID odeData;
+  dTriMeshDataID odeData;
 
-    const SubMesh *subMesh = mesh->GetSubMesh(i);
-    if (subMesh->GetVertexCount() < 3)
-    {
-      printf("ODETrimesh invalid mesh\n");
-      return;
-    }
+  const SubMesh *subMesh = mesh->GetSubMesh(i);
+  if (subMesh->GetVertexCount() < 3)
+  {
+    gzerr(0) << "ODETrimesh invalid mesh\n";
+    return;
+  }
 
-    /// This will hold the vertex data of the triangle mesh
-    odeData = dGeomTriMeshDataCreate();
+  /// This will hold the vertex data of the triangle mesh
+  odeData = dGeomTriMeshDataCreate();
 
-    unsigned int numVertices = 0;
-    unsigned int numIndices = 0;
-    float *vertices = NULL;
-    unsigned int *indices = NULL;
+  unsigned int numVertices = 0;
+  unsigned int numIndices = 0;
+  float *vertices = NULL;
+  unsigned int *indices = NULL;
 
-    subMesh->FillArrays(&vertices, &indices);
+  subMesh->FillArrays(&vertices, &indices);
 
-    numIndices = subMesh->GetIndexCount();
-    numVertices = subMesh->GetVertexCount();
+  numIndices = subMesh->GetIndexCount();
+  numVertices = subMesh->GetVertexCount();
 
-    for (unsigned int j=0;  j < numVertices; j++)
-    {
-      vertices[j*3+0] = vertices[j*3+0] * (**this->scaleP).x;
-      vertices[j*3+1] = vertices[j*3+1] * (**this->scaleP).y;
-      vertices[j*3+2] = vertices[j*3+2] * (**this->scaleP).z;
-    }
+  for (unsigned int j=0;  j < numVertices; j++)
+  {
+    vertices[j*3+0] = vertices[j*3+0] * (**this->scaleP).x;
+    vertices[j*3+1] = vertices[j*3+1] * (**this->scaleP).y;
+    vertices[j*3+2] = vertices[j*3+2] * (**this->scaleP).z;
+  }
 
-    // Build the ODE triangle mesh
-    dGeomTriMeshDataBuildSingle( odeData,
-        (float*)vertices, 3*sizeof(float), numVertices,
-        (int*)indices, numIndices, 3*sizeof(int));
+  // Build the ODE triangle mesh
+  dGeomTriMeshDataBuildSingle( odeData,
+      (float*)vertices, 3*sizeof(float), numVertices,
+      (int*)indices, numIndices, 3*sizeof(int));
 
-    pgeom->SetSpaceId( dSimpleSpaceCreate(pgeom->GetSpaceId()) );
-    pgeom->SetGeom( dCreateTriMesh(pgeom->GetSpaceId(), odeData,0,0,0 ), true);
+  pgeom->SetSpaceId( dSimpleSpaceCreate(pgeom->GetSpaceId()) );
+  pgeom->SetGeom( dCreateTriMesh(pgeom->GetSpaceId(), odeData,0,0,0 ), true);
 
-    if (!pgeom->IsStatic())
-      dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
-  //}
+  if (!pgeom->IsStatic())
+    dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
 
   physics->ConvertMass(&mass, &odeMass);
   this->parent->SetMass(mass);

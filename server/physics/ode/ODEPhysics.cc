@@ -50,6 +50,7 @@
 #include "ODEPlaneShape.hh"
 #include "ODETrimeshShape.hh"
 #include "ODEMultiRayShape.hh"
+#include "MapShape.hh"
 
 #include "ODEPhysics.hh"
 
@@ -339,6 +340,9 @@ Geom *ODEPhysics::CreateGeom(Shape::Type type, Body *body)
       break;
     case Shape::TRIMESH:
       shape = new ODETrimeshShape(geom);
+      break;
+    case Shape::MAP:
+      shape = new MapShape(geom);
       break;
     default:
       gzerr(0) << "Unable to create geom of type["<<type<<"]\n";

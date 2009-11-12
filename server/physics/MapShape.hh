@@ -24,8 +24,8 @@
  * CVS: $Id$
  */
 
-#ifndef MAPGEOM_HH
-#define MAPGEOM_HH
+#ifndef MAPSHAPE_HH
+#define MAPSHAPE_HH
 
 #include <deque>
 
@@ -88,22 +88,22 @@ namespace gazebo
   class QuadNode;
 
   /// \brief Map geom
-  class MapGeom : public Geom
+  class MapShape : public Shape
   {
     /// \brief Constructor
-    public: MapGeom(Body *body);
+    public: MapShape(Geom *parent);
 
     /// \brief Destructor
-    public: virtual ~MapGeom();
+    public: virtual ~MapShape();
 
     /// \brief Update function 
-    public: void UpdateChild();
+    public: void Update();
 
-    /// \brief Load the heightmap
-    protected: virtual void LoadChild(XMLConfigNode *node);
+    /// \brief Load the map
+    protected: virtual void Load(XMLConfigNode *node);
 
-    /// \brief Save child parameters
-    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+    /// \brief Save parameters
+    protected: void Save(std::string &prefix, std::ostream &stream);
  
     /// \brief Build the quadtree
     private: void BuildTree(QuadNode *node);
@@ -148,6 +148,7 @@ namespace gazebo
 
     private: bool merged;
     private: static unsigned int geomCounter;
+    private: OgreVisual *visualNode;
   };
 
 

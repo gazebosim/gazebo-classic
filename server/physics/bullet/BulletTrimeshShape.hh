@@ -24,10 +24,10 @@
  * SVN: $Id:$
  */
 
-#ifndef BULLETTRIMESHGEOM_HH
-#define BULLETTRIMESHGEOM_HH
+#ifndef BULLETTRIMESHSHAPE_HH
+#define BULLETTRIMESHSHAPE_HH
 
-#include "BulletGeom.hh"
+#include "TrimeshShape.hh"
 
 namespace gazebo
 {
@@ -68,27 +68,19 @@ namespace gazebo
 
 
   /// \brief Triangle mesh geom
-  class BulletTrimeshGeom : public BulletGeom
+  class BulletTrimeshShape : public TrimeshShape
   {
     /// \brief Constructor
-    public: BulletTrimeshGeom(Body *body);
+    public: BulletTrimeshShape(Geom *parent);
 
     /// \brief Destructor
-    public: virtual ~BulletTrimeshGeom();
+    public: virtual ~BulletTrimeshShape();
 
     /// \brief Update function 
     public: void Update();
 
     /// \brief Load the trimesh
     public: virtual void Load(XMLConfigNode *node);
-
-    /// \brief Save child parameters
-    public: void Save(std::string &prefix, std::ostream &stream);
- 
-    ///  name of the mesh
-    private: ParamT<std::string> *meshNameP;
-
-    private: ParamT<Vector3> *scaleP;
   };
 
   /// \}

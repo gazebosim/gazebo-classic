@@ -45,12 +45,6 @@ TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
   this->meshNameP = new ParamT<std::string>("mesh","",1);
   this->scaleP = new ParamT<Vector3>("scale",Vector3(1,1,1),0);
   Param::End();
-
-  /*this->numVertices = 0;
-  this->numIndices = 0;
-  this->vertices = NULL;
-  this->indices = NULL;
-  */
 }
 
 
@@ -122,24 +116,6 @@ void TrimeshShape::Load(XMLConfigNode *node)
       delete config;
     }
   }
-
-  /*const Mesh *mesh = meshManager->Load( **this->meshNameP );
-
-  if (!mesh)
-    gzthrow("Invalid mesh");
-
-  mesh->FillArrays(&this->vertices, &this->indices);
-
-  this->numIndices = mesh->GetIndexCount();
-  this->numVertices = mesh->GetVertexCount();
-
-  for (unsigned int i=0; i < this->numVertices; i++)
-  {
-    this->vertices[i*3+0] = this->vertices[i*3+0] * (**this->scaleP).x;
-    this->vertices[i*3+1] = this->vertices[i*3+1] * (**this->scaleP).y;
-    this->vertices[i*3+2] = this->vertices[i*3+2] * (**this->scaleP).z;
-  }
-  */
 }
 
 //////////////////////////////////////////////////////////////////////////////

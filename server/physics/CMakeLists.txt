@@ -23,8 +23,8 @@ set (sources Body.cc
              RayShape.cc
              MultiRayShape.cc
              TrimeshShape.cc
+             MapShape.cc
              #HeightmapGeom.cc
-             #MapGeom.cc
 ) 
 
 set (headers BallJoint.hh
@@ -41,13 +41,13 @@ set (headers BallJoint.hh
              Geom.hh
              BoxShape.hh
              CylinderShape.hh
-             #HeightmapShape.hh
-             #MapShape.hh
+             MapShape.hh
              PlaneShape.hh
              RayShape.hh
              MultiRayShape.hh
              SphereShape.hh
              TrimeshShape.hh
+             #HeightmapShape.hh
 )
 
 #add_library(gazebo_physics STATIC ${sources})

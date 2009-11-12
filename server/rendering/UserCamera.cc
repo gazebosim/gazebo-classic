@@ -83,11 +83,11 @@ void UserCamera::Init()
   this->InitCam();
 
   this->visual = new OgreVisual(this->pitchNode);
+
+  // The lines draw a visualization of the camera
   OgreDynamicLines *line = OgreCreator::Instance()->CreateDynamicLine(
       OgreDynamicRenderable::OT_LINE_LIST);
 
-  float d = 0.5;
-  float b = 0.01;
   float f = 0.2;
 
   // Create the front face

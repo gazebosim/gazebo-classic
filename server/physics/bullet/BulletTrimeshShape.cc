@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Trimesh geometry
+/* Desc: Trimesh shape
  * Author: Nate Keonig
  * Date: 21 May 2009
  * SVN: $Id:$
@@ -27,53 +27,36 @@
 #include "BulletPhysics.hh"
 #include "OgreVisual.hh"
 #include "Body.hh"
-#include "BulletTrimeshGeom.hh"
 #include "GazeboError.hh"
 #include "Simulator.hh"
 #include "OgreAdaptor.hh"
+
+#include "BulletTrimeshShape.hh"
 
 using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletTrimeshGeom::BulletTrimeshGeom(Body *body) 
-  : BulletGeom(body)
+BulletTrimeshShape::BulletTrimeshShape(Geom *parent) 
+  : TrimeshShape(parent)
 {
-  Param::Begin(&this->parameters);
-  this->meshNameP = new ParamT<std::string>("mesh","",1);
-  this->scaleP = new ParamT<Vector3>("scale",Vector3(1,1,1),0);
-  Param::End();
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-BulletTrimeshGeom::~BulletTrimeshGeom()
+BulletTrimeshShape::~BulletTrimeshShape()
 {
-  delete this->meshNameP;
-  delete this->scaleP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void BulletTrimeshGeom::Update()
+void BulletTrimeshShape::Update()
 {
-  BulletGeom::Update();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the trimesh
-void BulletTrimeshGeom::Load(XMLConfigNode *node)
+void BulletTrimeshShape::Load(XMLConfigNode *node)
 {
-  BulletGeom::Load(node);
 }
-
-//////////////////////////////////////////////////////////////////////////////
-/// Save child parameters
-void BulletTrimeshGeom::Save(std::string &prefix, std::ostream &stream)
-{
-  BulletGeom::Save(prefix, stream);
-  stream << prefix << *(this->meshNameP) << "\n";
-  stream << prefix << *(this->scaleP) << "\n";
-}
- 
