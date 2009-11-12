@@ -144,6 +144,12 @@ void GLFrame::Init()
 
   CameraManager::Instance()->ConnectAddCameraSignal( boost::bind(&GLFrame::CameraAddedSlot, this, _1) );
 
+  // Add all the current cameras
+  for (unsigned int i=0; i < CameraManager::Instance()->GetNumCameras(); i++)
+  {
+    this->CameraAddedSlot( CameraManager::Instance()->GetCamera(i) );
+  }
+
   this->show();
   this->redraw();
 }

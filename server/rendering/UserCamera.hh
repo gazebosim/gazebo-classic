@@ -55,6 +55,8 @@ namespace gazebo
     /// \brief Initialize
     public: void Init();
 
+    public: void SetCamera( OgreCamera *cam );
+
     /// \brief Update
     public: void Update();
 

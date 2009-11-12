@@ -95,6 +95,20 @@
     <include embedded="true">
       <xi:include href="models/pr2.model" />
     </include>
+
+    <body:box name="camera_body">
+      <xyz>-0.5 0 1.5</xyz>
+      <rpy>0 30 0</rpy>
+      <sensor:camera name="r_forearm_cam_sensor">
+        <imageSize>640.0 480.0</imageSize>
+        <imageFormat>L8</imageFormat>
+        <hfov>90.0</hfov>
+        <nearClip>0.1</nearClip>
+        <farClip>100</farClip>
+        <updateRate>20.0</updateRate>
+      </sensor:camera>
+    </body:box>
+
   </model:physical>
 
   <!--

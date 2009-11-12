@@ -33,6 +33,7 @@
 
 #include <GL/glx.h>
 
+#include <Ogre.h>
 #include "Param.hh"
 #include "Entity.hh"
 #include "Body.hh"
@@ -786,7 +787,8 @@ void GLWindow::SetViewStyle(std::string view)
   }
   else
   {
-    this->activeCamera = CameraManager::Instance()->GetCamera( view );
+    OgreCamera *cam = CameraManager::Instance()->GetCamera( view );
+    ((UserCamera*)this->activeCamera)->SetCamera(cam);
   }
 
   cam->SetWorldPose( pose );

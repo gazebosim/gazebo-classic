@@ -236,7 +236,7 @@ namespace gazebo
     protected: Ogre::PixelFormat imageFormat;
     protected: unsigned int visibilityMask;
 
-    protected: Ogre::RenderTarget *renderTarget;
+    public: Ogre::RenderTarget *renderTarget;
 
     protected: Ogre::TexturePtr renderTexture;
 

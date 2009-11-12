@@ -138,18 +138,27 @@ void UserCamera::Init()
 
   this->visual->AttachObject(line);
 
+  //this->renderTarget = this->window;
 
-  this->viewport = this->window->addViewport(this->GetOgreCamera());
+  this->SetCamera(this);
+  this->lastUpdate = Simulator::Instance()->GetRealTime();
+}
+
+void UserCamera::SetCamera( OgreCamera *cam )
+{
+  this->window->removeAllViewports();
+
+  if (cam == NULL)
+    cam = this;
+
+  this->viewport = this->window->addViewport(cam->GetOgreCamera());
   this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
 
   this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
 
   this->viewport->setVisibilityMask(this->visibilityMask);
-
-  this->renderTarget = this->window;
-
-  this->lastUpdate = Simulator::Instance()->GetRealTime();
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update
