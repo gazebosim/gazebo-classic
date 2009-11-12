@@ -18,16 +18,17 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Heightmap geometry
+/* Desc: Heightmap shape
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
  * CVS: $Id$
  */
 
-#ifndef HEIGHTMAPGEOM_HH
-#define HEIGHTMAPGEOM_HH
+#ifndef HEIGHTMAPSHAPE_HH
+#define HEIGHTMAPSHAPE_HH
 
 #include "Vector2.hh"
+#include "Image.hh"
 #include "Geom.hh"
 
 namespace gazebo
@@ -74,45 +75,35 @@ namespace gazebo
 
 
   /// \brief Height map geom
-  class HeightmapGeom : public Geom
+  class HeightmapShape : public Shape
   {
     /// \brief Constructor
-    public: HeightmapGeom(Body *body);
+    public: HeightmapShape(Geom *parent);
 
     /// \brief Destructor
-    public: virtual ~HeightmapGeom();
+    public: virtual ~HeightmapShape();
 
     /// \brief Update function 
-    public: void UpdateChild();
+    public: void Update();
 
     /// \brief Load the heightmap
-    protected: virtual void LoadChild(XMLConfigNode *node);
+    protected: virtual void Load(XMLConfigNode *node);
 
     /// \brief Save child parameters
-    protected: void SaveChild(std::string &prefix, std::ostream &stream);
+    protected: void Save(std::string &prefix, std::ostream &stream);
 
-    /// Create a lookup table of the terrain's height
-    private: void FillHeightMap();
+    protected: Vector3 terrainSize;
 
-    /// \brief Called by ODE to get the height at a vertex
-    private: static dReal GetHeightCallback(void *data, int x, int y);
+    protected: std::vector<double> heights;
 
-    private: dHeightfieldDataID odeData;
+    protected: Image img;
+    protected: ParamT<std::string> *imageFilenameP;
+    protected: ParamT<std::string> *worldTextureP;
+    protected: ParamT<std::string> *detailTextureP;
+    protected: ParamT<Vector3> *sizeP;
+    protected: ParamT<Vector3> *offsetP;
 
-    private: Vector3 terrainSize;
-
-    private: unsigned int odeVertSize;
-    private: Vector3 odeScale;
-
-    private: std::vector<double> heights;
-
-    private: ParamT<std::string> *imageFilenameP;
-    private: ParamT<std::string> *worldTextureP;
-    private: ParamT<std::string> *detailTextureP;
-    private: ParamT<Vector3> *sizeP;
-    private: ParamT<Vector3> *offsetP;
-
-    private: OgreHeightmap *ogreHeightmap;
+    protected: OgreHeightmap *ogreHeightmap;
   };
 
   /// \}

@@ -17,7 +17,7 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.02</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.80665</gravity>
     <cfm>10e-5</cfm>
     <erp>0.3</erp>
@@ -27,6 +27,14 @@
     <type>fltk</type>
     <size>800 600</size>
     <pos>0 0</pos>
+    <frames>
+      <row height="100%">
+        <camera width="100%">
+          <xyz>-1.5 5.9 15</xyz>
+          <rpy>0 0 -45</rpy>
+        </camera>
+      </row>
+    </frames>
   </rendering:gui>
 
   <rendering:ogre>
@@ -38,7 +46,7 @@
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
-    <xyz>197 130 4.0</xyz>
+    <xyz>00 0 20.0</xyz>
     <static>false</static>
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">

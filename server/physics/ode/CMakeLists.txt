@@ -12,6 +12,7 @@ SET (sources ODEPhysics.cc
              ODETrimeshShape.cc
              ODERayShape.cc
              ODEMultiRayShape.cc
+             ODEHeightmapShape.cc
 )
 
 ADD_LIBRARY(gazebo_physics_ode SHARED ${sources})

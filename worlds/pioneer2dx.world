@@ -102,7 +102,7 @@
   -->
 
   <model:physical name="pioneer2dx_model1">
-    <xyz>0 0 .145</xyz>
+    <xyz>0 0 1.145</xyz>
     <rpy>0.0 0.0 90.0</rpy>
 
     <model:physical name="laser">
@@ -124,8 +124,8 @@
   </model:physical>
 
   <model:physical name="pioneer2dx_model2">
-    <xyz>0 -1 .145</xyz>
-    <rpy>0.0 0.0 -90.0</rpy>
+    <xyz>-0.5 -1 1.145</xyz>
+    <rpy>0.0 0.0 0.0</rpy>
 
     <model:physical name="laser">
       <xyz>0.15 0 0.18</xyz>
@@ -144,6 +144,40 @@
       <xi:include href="models/pioneer2dx.model" />
     </include>
   </model:physical>
+
+
+  <model:physical name="ramp_model">
+    <xyz>0 2 0.0725</xyz>
+    <rpy>-20 0 0</rpy>
+    <static>true</static>
+    <body:box name="ramp_body">
+      <geom:box name="ramp_geom">
+        <size>2 5 .1</size>
+        <visual>
+          <scale>2 5 .1</scale>
+          <mesh>unit_box</mesh>
+          <material>Gazebo/Grey</material>
+        </visual>
+      </geom:box>
+    </body:box>
+  </model:physical>
+
+  <model:physical name="ramp_model2">
+    <xyz>1.5 -1.2 0.0725</xyz>
+    <rpy>0 20 0</rpy>
+    <static>true</static>
+    <body:box name="ramp2_body">
+      <geom:box name="ramp2_geom">
+        <size>5 2 .1</size>
+        <visual>
+          <scale>5 2 .1</scale>
+          <mesh>unit_box</mesh>
+          <material>Gazebo/Grey</material>
+        </visual>
+      </geom:box>
+    </body:box>
+  </model:physical>
+
 
   <model:physical name="box1_model">
     <xyz>1 1.5 0.5</xyz>

@@ -50,6 +50,7 @@
 #include "ODEPlaneShape.hh"
 #include "ODETrimeshShape.hh"
 #include "ODEMultiRayShape.hh"
+#include "ODEHeightmapShape.hh"
 #include "MapShape.hh"
 
 #include "ODEPhysics.hh"
@@ -340,6 +341,9 @@ Geom *ODEPhysics::CreateGeom(Shape::Type type, Body *body)
       break;
     case Shape::TRIMESH:
       shape = new ODETrimeshShape(geom);
+      break;
+    case Shape::HEIGHTMAP:
+      shape = new ODEHeightmapShape(geom);
       break;
     case Shape::MAP:
       shape = new MapShape(geom);

@@ -99,6 +99,7 @@ void ODEGeom::OnPoseChange()
 
   if (this->IsStatic() && this->geomId && this->placeable)
   {
+
     // Transform into global pose since a static geom does not have a body 
     localPose = this->GetAbsPose();
 

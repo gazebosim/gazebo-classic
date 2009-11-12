@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Heightmap geometry
+/* Desc: Heightmap shape
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
  * CVS: $Id$
@@ -33,16 +33,16 @@
 #include "OgreHeightmap.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
-#include "HeightmapGeom.hh"
+#include "HeightmapShape.hh"
 
 using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-HeightmapGeom::HeightmapGeom(Body *body)
-    : Geom(body)
+HeightmapShape::HeightmapShape(Geom *parent)
+    : Shape(parent)
 {
-  this->type = Geom::HEIGHTMAP;
+  this->type = Shape::HEIGHTMAP;
 
   Param::Begin(&this->parameters);
   this->imageFilenameP = new ParamT<std::string>("image","",1);
@@ -58,7 +58,7 @@ HeightmapGeom::HeightmapGeom(Body *body)
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-HeightmapGeom::~HeightmapGeom()
+HeightmapShape::~HeightmapShape()
 {
   delete this->imageFilenameP;
   delete this->worldTextureP;
@@ -71,50 +71,14 @@ HeightmapGeom::~HeightmapGeom()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Update function.
-void HeightmapGeom::UpdateChild()
+void HeightmapShape::Update()
 {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Create a lookup table of the terrain's height
-void HeightmapGeom::FillHeightMap()
-{
-  unsigned int x,y;
-  float h;
-
-  // Resize the vector to match the size of the vertices
-  this->heights.resize(this->odeVertSize*this->odeVertSize);
-
-  // Iterate over all the verices
-  for (y=0; y<this->odeVertSize; y++)
-  {
-    for (x=0; x<this->odeVertSize; x++)
-    {
-      // Find the height at a vertex
-      h = this->ogreHeightmap->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
-
-      // Store the height for future use
-      this->heights[y*this->odeVertSize + x] = h;
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Called by ODE to get the height at a vertex
-dReal HeightmapGeom::GetHeightCallback(void *data, int x, int y)
-{
-  HeightmapGeom *geom = (HeightmapGeom*)(data);
-
-  // Return the height at a specific vertex
-  return geom->heights[y * geom->odeVertSize + x];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void HeightmapGeom::LoadChild(XMLConfigNode *node)
+void HeightmapShape::Load(XMLConfigNode *node)
 {
-  Image img;
-
   this->imageFilenameP->Load(node);
   this->worldTextureP->Load(node);
   this->detailTextureP->Load(node);
@@ -122,83 +86,18 @@ void HeightmapGeom::LoadChild(XMLConfigNode *node)
   this->offsetP->Load(node);
 
   // Use the image to get the size of the heightmap
-  img.Load( (**this->imageFilenameP) );
+  this->img.Load( (**this->imageFilenameP) );
 
   // Width and height must be the same
-  if (img.GetWidth() != img.GetHeight())
-  {
+  if (this->img.GetWidth() != this->img.GetHeight())
     gzthrow("Heightmap image must be square\n");
-  }
 
   this->terrainSize = (**this->sizeP);
-
-  // sampling size along image width and height
-  this->odeVertSize = img.GetWidth() * 4;
-  this->odeScale = this->terrainSize / this->odeVertSize;
-
-
-  /*std::ostringstream stream;
-  std::cout << "ODE Scale[" << this->odeScale << "]\n";
-  std::cout << "Terrain Image[" << this->imageFilenameP->GetValue() << "] Size[" << this->terrainSize << "]\n";
-  printf("Terrain Size[%f %f %f]\n", this->terrainSize.x, this->terrainSize.y, this->terrainSize.z);
-  */
-
-  // Step 1: Create the Ogre height map: Performs a ray scene query
-  this->ogreHeightmap->Load( (**this->imageFilenameP), (**this->worldTextureP),
-      (**this->detailTextureP), this->terrainSize );
-
-  // Step 2: Construct the heightmap lookup table, using the ogre ray scene
-  // query functionality
-  this->FillHeightMap();
-
-  // Step 3: Create the ODE heightfield geom
-  this->odeData = dGeomHeightfieldDataCreate();
-
-  // Step 4: Setup a callback method for ODE
-  dGeomHeightfieldDataBuildCallback(
-    this->odeData,
-    this,
-    HeightmapGeom::GetHeightCallback,
-    this->terrainSize.x, // in meters
-    this->terrainSize.y, // in meters
-    this->odeVertSize, // width sampling size
-    this->odeVertSize, // depth sampling size (along height of image)
-    1.0, // vertical (z-axis) scaling
-    0.0, // vertical (z-axis) offset
-    0.1, // vertical thickness for closing the height map mesh
-    0 // wrap mode
-  );
-
-  // Step 5: Restrict the bounds of the AABB to improve efficiency
-  dGeomHeightfieldDataSetBounds( this->odeData, 0, this->terrainSize.z);
-
-  this->geomId = dCreateHeightfield( this->spaceId, this->odeData, 1);
-
-  this->SetGeom(this->geomId, false);
-
-  this->SetStatic(true);
-
-  //Rotate so Z is up, not Y (which is the default orientation)
-  Quatern quat;
-  Pose3d pose = this->GetPose();
-
-  quat.SetFromEuler(Vector3(DTOR(90),0,0));
-
-  pose.rot = pose.rot * quat;
-  this->body->SetPose(pose);
-
-  dQuaternion q;
-  q[0] = pose.rot.u;
-  q[1] = pose.rot.x;
-  q[2] = pose.rot.y;
-  q[3] = pose.rot.z;
-
-  dGeomSetQuaternion(this->geomId, q);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save child parameters
-void HeightmapGeom::SaveChild(std::string &prefix, std::ostream &stream)
+void HeightmapShape::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << *(this->imageFilenameP) << "\n";
   stream << prefix << *(this->worldTextureP) << "\n";

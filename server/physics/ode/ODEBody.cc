@@ -175,6 +175,7 @@ void ODEBody::OnPoseChange()
 
   Pose3d pose = this->GetAbsPose();
   this->physicsEngine->LockMutex();
+
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 
   dQuaternion q;

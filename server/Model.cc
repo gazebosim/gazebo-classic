@@ -194,29 +194,26 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   this->SetStatic( **(this->staticP) );
 
-  // Set the relative pose of the model
-  this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP) );
-
   // Get the position and orientation of the model (relative to parent)
   pose.Reset();
   pose.pos = **this->xyzP;
   pose.rot = **this->rpyP;
 
-  // Record the model's initial pose (for reseting)
-  this->SetInitPose(pose);
+  if (this->IsStatic())
+    this->SetRelativePose( pose );
 
   if (this->type == "physical")
-  {
     this->LoadPhysical(node);
-  }
   else if (this->type == "renderable")
-  {
     this->LoadRenderable(node);
-  }
   else if (this->type != "empty")
-  {
     gzthrow("Invalid model type[" + this->type + "]\n");
-  }
+
+  // Set the relative pose of the model
+  this->SetRelativePose( pose );
+
+  // Record the model's initial pose (for reseting)
+  this->SetInitPose(pose);
 
   // Load controllers
   childNode = node->GetChildByNSPrefix("controller");

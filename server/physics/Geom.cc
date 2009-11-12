@@ -109,9 +109,7 @@ void Geom::Load(XMLConfigNode *node)
   this->laserFiducialIdP->Load(node);
   this->laserRetroP->Load(node);
 
-  // TODO: This should probably be true....but "true" breaks trimesh postions.
   this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP ) );
-  //this->SetPose(Pose3d( **this->xyzP, **this->rpyP ), false);
 
   this->mass.SetMass( **this->massP );
 
