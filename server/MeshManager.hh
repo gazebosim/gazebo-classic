@@ -55,6 +55,9 @@ namespace gazebo
     public: void CreateTube(const std::string &name, float innerRadius, 
                             float outterRadius, float height, int rings, 
                             int segments);
+
+    /// \brief Create a Camera mesh
+    public: void CreateCamera(const std::string &name, float scale);
  
     private: OgreLoader *ogreLoader;
     private: AssimpLoader *assimpLoader;

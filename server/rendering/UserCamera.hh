@@ -39,6 +39,7 @@ namespace gazebo
 {
   class GLWindow;
   class XMLConfigNode;
+  class OgreVisual;
 
   class UserCamera : public OgreCamera
   {
@@ -84,6 +85,8 @@ namespace gazebo
     private: std::string name;
     private: static unsigned int cameraCount;
     private: static int count;
+
+    private: OgreVisual *visual;
   };
 }
 

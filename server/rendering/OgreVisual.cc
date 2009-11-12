@@ -46,11 +46,34 @@ unsigned int OgreVisual::visualCounter = 0;
 OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   : Common()
 {
-  std::ostringstream stream;
-
-  this->mutex = new boost::recursive_mutex();
-
+  Ogre::SceneNode *pnode = NULL;
   this->owner = _owner;
+
+  if (Simulator::Instance()->GetRenderEngineEnabled())
+  {
+    if (!node)
+      pnode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
+    else
+      pnode = node->GetSceneNode();
+  }
+
+  this->ConstructorHelper(pnode);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Constructor
+OgreVisual::OgreVisual (Ogre::SceneNode *node)
+{
+  this->owner = NULL;
+  this->ConstructorHelper(node);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Helper for the contructor
+void OgreVisual::ConstructorHelper(Ogre::SceneNode *node)
+{
+  std::ostringstream stream;
+  this->mutex = new boost::recursive_mutex();
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
@@ -82,11 +105,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    if (!node)
-      this->parentNode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
-    else
-      this->parentNode = node->GetSceneNode();
-
+    this->parentNode = node;
     this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
 
     // Create a unique name for the scene node
@@ -97,6 +116,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
     this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
   }
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
@@ -268,7 +288,6 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 /// Detach all objects
 void OgreVisual::DetachObjects()
 {
-  printf("Detaching objects\n");
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled

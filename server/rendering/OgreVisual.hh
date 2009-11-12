@@ -53,6 +53,12 @@ namespace gazebo
     /// \brief Constructor
     public: OgreVisual (OgreVisual *node, Entity *owner = NULL);
 
+    /// \brief Constructor
+    public: OgreVisual (Ogre::SceneNode *node);
+
+    /// \brief Helper for the contructor
+    private: void ConstructorHelper(Ogre::SceneNode *node);
+
     /// \brief Destructor
     public: virtual ~OgreVisual();
 

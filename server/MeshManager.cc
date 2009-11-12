@@ -31,6 +31,7 @@ MeshManager::MeshManager()
                              Vector2<double>(1,1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
+  this->CreateCamera("unit_camera", 0.5);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -314,6 +315,101 @@ void MeshManager::CreateBox(const std::string &name, const Vector3 &sides,
     subMesh->AddIndex(ind[i]);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Create a Camera mesh
+void MeshManager::CreateCamera(const std::string &name, float scale)
+{
+  int i,k;
+
+  if (this->HasMesh(name))
+  {
+    return;
+  }
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(name);
+  this->meshes.insert( std::make_pair(name, mesh) );
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  // Vertex values
+  float v[8][3] =
+  {
+    {-1, -1, -1}, {-1, -1, +1}, {+1, -1, +1}, {+1, -1, -1},
+    {-1, +1, -1}, {-1, +1, +1}, {+1, +1, +1}, {+1, +1, -1}
+  };
+
+  // Normals for each vertex
+  float n[8][3]=
+  {
+    {-0.577350, -0.577350, -0.577350},
+    {-0.577350, -0.577350, 0.577350},
+    {0.577350, -0.577350, 0.577350},
+    {0.577350, -0.577350, -0.577350},
+    {-0.577350, 0.577350, -0.577350},
+    {-0.577350, 0.577350, 0.577350},
+    {0.577350, 0.577350, 0.577350},
+    {0.577350, 0.577350, -0.577350}
+  };
+
+  // Texture coords
+  /*float t[4][2] =
+  {
+    {uvCoords.x, 0}, {0, 0}, {0,uvCoords.y}, {uvCoords.x, uvCoords.y}
+  };*/
+
+  // Vertices
+  int faces[6][4] =
+  {
+    {2, 1, 0, 3}, {5, 6, 7, 4},
+    {2, 6, 5, 1}, {1, 5, 4, 0},
+    {0, 4, 7, 3}, {6, 2, 3, 7}
+  };
+
+  // Indices
+  int ind[36] =
+  {
+    0, 1, 2,
+    2, 3, 0,
+    4, 5, 7,
+    7, 5, 6,
+    11,8,9,
+    9,10,11,
+    12, 13, 15,
+    15, 13, 14,
+    16, 17, 18,
+    18, 19, 16,
+    21,22,23,
+    23,20,21,
+  };
+
+  // Compute the vertices
+  for (i = 0; i < 8; i++)
+  {
+    v[i][0] *= scale * 0.5;
+    v[i][1] *= scale * 0.5;
+    v[i][2] *= scale * 0.5;
+  }
+
+  // For each face
+  for (i = 0; i < 6; i++)
+  {
+    // For each vertex in the face
+    for (k=0; k<4; k++)
+    {
+      subMesh->AddVertex(v[faces[i][k]][0], v[faces[i][k]][1], 
+          v[faces[i][k]][2]);
+      subMesh->AddNormal(n[faces[i][k]][0], n[faces[i][k]][1], 
+          n[faces[i][k]][2]);
+      //subMesh->AddTexCoord(t[k][0], t[k][1]);
+    }
+  }
+
+  // Set the indices
+  for (i=0;i<36; i++)
+    subMesh->AddIndex(ind[i]);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a cylinder mesh

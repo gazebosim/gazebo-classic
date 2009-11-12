@@ -65,6 +65,7 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
 {
   this->end();
 
+  this->userCamera = NULL;
   this->moveAmount = 0.1;
   this->moveScale = 1;
   this->rotateAmount = 0.1;
@@ -111,6 +112,13 @@ void GLWindow::Init()
   this->show();
   Fl::check();
   this->mouseDrag = false;
+
+  if (this->userCamera == NULL)
+  {
+    // Create the default camera.
+    this->userCamera = new UserCamera( this );
+    this->userCamera->Load(NULL);
+  }
 
   this->userCamera->Init();
   this->userCamera->RotatePitch( DTOR(30) );
@@ -775,6 +783,10 @@ void GLWindow::SetViewStyle(std::string view)
   else if (view == "Front")
   {
     pose.rot.SetFromEuler( Vector3(0, 0,0) );
+  }
+  else
+  {
+    this->activeCamera = CameraManager::Instance()->GetCamera( view );
   }
 
   cam->SetWorldPose( pose );

@@ -220,8 +220,8 @@ namespace gazebo
     protected: unsigned int textureWidth, textureHeight;
   
     private: Ogre::Camera *camera;
-    private: Ogre::SceneNode *sceneNode;
-    private: Ogre::SceneNode *pitchNode;
+    protected: Ogre::SceneNode *sceneNode;
+    protected: Ogre::SceneNode *pitchNode;
   
     private: Pose3d pose;
   

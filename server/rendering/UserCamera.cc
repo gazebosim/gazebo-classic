@@ -33,6 +33,8 @@
 #include "OgreCamera.hh"
 #include "OgreAdaptor.hh"
 #include "OgreCreator.hh"
+#include "OgreVisual.hh"
+#include "OgreDynamicLines.hh"
 #include "UserCamera.hh"   
 
 using namespace gazebo;
@@ -79,6 +81,63 @@ void UserCamera::Init()
   this->SetCameraSceneNode( OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode( this->GetCameraName() + "_SceneNode") );
 
   this->InitCam();
+
+  this->visual = new OgreVisual(this->pitchNode);
+  OgreDynamicLines *line = OgreCreator::Instance()->CreateDynamicLine(
+      OgreDynamicRenderable::OT_LINE_LIST);
+
+  float d = 0.5;
+  float b = 0.01;
+  float f = 0.2;
+
+  // Create the front face
+  line->AddPoint(Vector3(0, -f, -f)); 
+  line->AddPoint(Vector3(0, -f, +f)); 
+
+  line->AddPoint(Vector3(0, -f, +f)); 
+  line->AddPoint(Vector3(0, +f, +f)); 
+
+  line->AddPoint(Vector3(0, +f, +f)); 
+  line->AddPoint(Vector3(0, +f, -f)); 
+
+  line->AddPoint(Vector3(0, +f, -f)); 
+  line->AddPoint(Vector3(0, -f, -f)); 
+
+
+  // Create the connecting lines
+  line->AddPoint(Vector3(-0.4, 0, 0)); 
+  line->AddPoint(Vector3(+0.0, -f, -f)); 
+
+  line->AddPoint(Vector3(-0.4, 0, 0)); 
+  line->AddPoint(Vector3(+0.0, -f, +f)); 
+
+  line->AddPoint(Vector3(-0.4, 0, 0)); 
+  line->AddPoint(Vector3(+0.0, +f, +f)); 
+
+  line->AddPoint(Vector3(-0.4, 0, 0)); 
+  line->AddPoint(Vector3(+0.0, +f, -f)); 
+
+  line->AddPoint(Vector3(-0.4, 0, 0)); 
+  line->AddPoint(Vector3(+0.0, -f, -f)); 
+
+  // Draw up arrow
+  line->AddPoint(Vector3(0, 0, +f)); 
+  line->AddPoint(Vector3(0, 0, +f+0.1)); 
+
+  line->AddPoint(Vector3(0.0, -0.02, +f+0.1)); 
+  line->AddPoint(Vector3(0.0, +0.02, +f+0.1)); 
+
+  line->AddPoint(Vector3(0.0, +0.02, +f+0.1)); 
+  line->AddPoint(Vector3(0.0, +0.00, +f+0.15)); 
+
+  line->AddPoint(Vector3(0.0, +0.00, +f+0.15)); 
+  line->AddPoint(Vector3(0.0, -0.02, +f+0.1)); 
+
+  line->setMaterial("Gazebo/WhiteEmissive");
+  line->setVisibilityFlags(GZ_LASER_CAMERA);
+
+  this->visual->AttachObject(line);
+
 
   this->viewport = this->window->addViewport(this->GetOgreCamera());
   this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
