@@ -246,7 +246,7 @@ namespace gazebo
     private: static unsigned int cameraCounter;
     private: unsigned int myCount;
 
-    private: std::string cameraName;
+    protected: std::string cameraName;
 
     protected: bool captureData;
 

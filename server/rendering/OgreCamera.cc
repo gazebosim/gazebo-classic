@@ -80,9 +80,6 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   this->captureData = false;
 
-  // This should be last in the constructor
-  CameraManager::Instance()->AddCamera(this);
-
   this->camera = NULL;
 
   this->renderPeriod = 1.0/(**this->updateRateP);
@@ -111,9 +108,11 @@ OgreCamera::~OgreCamera()
 // Load the camera
 void OgreCamera::LoadCam( XMLConfigNode *node )
 {
+  // This should be last in the constructor
+  CameraManager::Instance()->AddCamera(this);
+
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
-    //gzthrow("Cameras can not be used when running Gazebo without rendering engine");
 
   this->visibilityMask = GZ_ALL_CAMERA; 
 

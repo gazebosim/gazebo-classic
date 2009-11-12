@@ -210,6 +210,7 @@ void GLFrame::SplitCB(Fl_Widget *widget, void *data)
 // Switch view callback
 void GLFrame::ViewCB(Fl_Widget *widget, void *data)
 {
+  printf("VIEW CB\n");
   GLFrame *frame = reinterpret_cast<GLFrame *>(data);
   Fl_Choice *choice = dynamic_cast<Fl_Choice *>(widget);
 

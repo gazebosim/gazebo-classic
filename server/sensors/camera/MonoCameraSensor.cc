@@ -67,7 +67,9 @@ MonoCameraSensor::~MonoCameraSensor()
 // Load the camera
 void MonoCameraSensor::LoadChild( XMLConfigNode *node )
 {
+  this->cameraName = this->GetName();
   this->LoadCam( node );
+
 
   // Do some sanity checks
   if (this->imageSizeP->GetValue().x == 0 || 
