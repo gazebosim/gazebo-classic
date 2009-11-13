@@ -15,6 +15,6 @@ SET (sources ODEPhysics.cc
              ODEHeightmapShape.cc
 )
 
-ADD_LIBRARY(gazebo_physics_ode SHARED ${sources})
-TARGET_LINK_LIBRARIES( gazebo_physics_ode ${ODE_LIBRARIES})
-INSTALL ( TARGETS gazebo_physics_ode DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+add_library(gazebo_physics_ode SHARED ${sources})
+target_link_libraries( gazebo_physics_ode ${ODE_LIBRARIES})
+install ( TARGETS gazebo_physics_ode DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

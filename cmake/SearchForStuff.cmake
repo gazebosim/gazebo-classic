@@ -25,6 +25,7 @@ IF (PKG_CONFIG_FOUND)
   ELSE (NOT OGRE_FOUND)
  
     SET (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")
+
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
                           ${OGRE_INCLUDE_DIRS})

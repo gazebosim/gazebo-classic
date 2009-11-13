@@ -134,27 +134,29 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-TARGET_LINK_LIBRARIES( gazebo-exec ${libtool_library}
+target_link_libraries( gazebo-exec ${libtool_library}
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
                                    gazebo_server
                                    ${freeimage_library} 
+                                   gazebo_rendering
                                    gazebo_av-shared
                                    gazebo_gui-shared
+                                   gazebo_physics
                                    gazebo 
 )
 
 if (INCLUDE_BULLET)
-  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_bullet ${bullet_link_libs})
-  TARGET_LINK_LIBRARIES(gazebo_server gazebo_physics_bullet ${bullet_link_libs})
+  target_link_libraries(gazebo-exec gazebo_physics_bullet ${bullet_link_libs})
+  target_link_libraries(gazebo_server gazebo_physics_bullet ${bullet_link_libs})
 endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
-  TARGET_LINK_LIBRARIES(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
-  TARGET_LINK_LIBRARIES(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
 endif (INCLUDE_ODE)
 
-TARGET_LINK_LIBRARIES( gazebo_server ${libtool_library} ${freeimage_library} gazebo)
+TARGET_LINK_LIBRARIES( gazebo_server ${libtool_library} ${freeimage_library} gazebo gazebo_rendering gazebo_physics )
 
 INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 INSTALL (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

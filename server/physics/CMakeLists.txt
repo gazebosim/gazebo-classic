@@ -50,6 +50,7 @@ set (headers BallJoint.hh
              HeightmapShape.hh
 )
 
-#add_library(gazebo_physics STATIC ${sources})
-APPEND_TO_SERVER_SOURCES(${sources})
-APPEND_TO_SERVER_HEADERS(${headers})
+add_library(gazebo_physics SHARED ${sources})
+install ( TARGETS gazebo_physics DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+#APPEND_TO_SERVER_SOURCES(${sources})
+#APPEND_TO_SERVER_HEADERS(${headers})

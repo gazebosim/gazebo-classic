@@ -92,14 +92,16 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
       normal.y = r2;
       normal.z = r3;
 
-      fgets ( input, LINE_MAX_LEN, filein );
+      if (fgets ( input, LINE_MAX_LEN, filein ) == NULL)
+        std::cerr << "Error..\n";
 
       ivert = 0;
 
       for ( ;; ) 
       {
         Vector3 vertex;
-        fgets ( input, LINE_MAX_LEN, filein );
+        if (fgets ( input, LINE_MAX_LEN, filein ) == NULL)
+          std::cerr << "Error...\n";
 
         count = sscanf ( input, "%*s %e %e %e", &r1, &r2, &r3 );
 
@@ -120,7 +122,8 @@ void STLLoader::ReadAscii( FILE *filein, Mesh *mesh )
         ivert = ivert + 1;
       } 
 
-      fgets ( input, LINE_MAX_LEN, filein );
+      if (fgets ( input, LINE_MAX_LEN, filein ) == NULL)
+        printf("Error...\n");
     }
     // COLOR 
     else if ( this->Leqi ( token, (char*)"color" )) 
@@ -268,7 +271,9 @@ int STLLoader::RcolFind ( float a[][COR3_MAX], int m, int n, float r[] )
 float STLLoader::FloatRead ( FILE *filein )
 {
   float rval;
-  fread ( &rval, sizeof ( float ), 1, filein );
+  if (fread ( &rval, sizeof ( float ), 1, filein ) == 0)
+    printf("Error...\n");
+
   return rval;
 }
 

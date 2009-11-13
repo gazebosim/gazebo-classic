@@ -1,6 +1,13 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-SET (sources OgreMovableText.cc
+message(STATUS "OGRE INCLUDE DIRS ${OGRE_INCLUDE_DIRS}")
+
+include_directories (
+  .
+  ${OGRE_INCLUDE_DIRS}
+)
+
+set (sources OgreMovableText.cc
              OgreCreator.cc
              OgreAdaptor.cc
              OgreFrameListener.cc
@@ -17,7 +24,7 @@ SET (sources OgreMovableText.cc
              Material.cc
 )
 
-SET (headers OgreMovableText.hh
+set (headers OgreMovableText.hh
              OgreCreator.hh
              OgreAdaptor.hh
              OgreFrameListener.hh
@@ -34,6 +41,6 @@ SET (headers OgreMovableText.hh
              Material.hh
 )
 
-#ADD_LIBRARY(gazebo_rendering ${sources})
-APPEND_TO_SERVER_SOURCES(${sources})
-APPEND_TO_SERVER_HEADERS(${headers})
+add_library(gazebo_rendering SHARED ${sources})
+target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES})
+install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
