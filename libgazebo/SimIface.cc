@@ -4,7 +4,9 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/time.h>
 #include <signal.h>
+#include <math.h>
 
 #include <stdio.h>
 
