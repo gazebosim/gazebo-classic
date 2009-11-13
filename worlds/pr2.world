@@ -81,12 +81,12 @@
   </model:physical>
 
   <model:renderable name="point_white">
-    <xyz>-3 0 5</xyz>
+    <xyz>0 3  5</xyz>
     <static>true</static>
 
     <light>
       <type>point</type>
-      <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      <diffuseColor>0.2 0.2 0.2</diffuseColor>
       <specularColor>0.1 0.1 0.1</specularColor>
       <range>20</range>
 
@@ -102,7 +102,7 @@
     <light>
       <type>point</type>
       <castShadows>false</castShadows>
-      <diffuseColor>0.8 0.8 0.8</diffuseColor>
+      <diffuseColor>0.2 0.2 0.2</diffuseColor>
       <specularColor>0.1 0.1 0.1</specularColor>
       <range>20</range>
 

@@ -229,7 +229,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     gzthrow(std::string("Unsupported shadow technique: ") + **(this->shadowTechniqueP) + "\n");
 
   // Not sure if this does something useful.
-  /*if (**(this->shadowTechniqueP) != std::string("none"))
+  if (**(this->shadowTechniqueP) != std::string("none"))
   {
     this->sceneMgr->setShadowTextureSelfShadow(true);
     this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
@@ -238,7 +238,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->sceneMgr->setShadowTextureSettings(512,2);
     this->sceneMgr->setShadowColour(Ogre::ColourValue(0.2, 0.2, 0.2));
     this->sceneMgr->setShadowFarDistance(30);
-  }*/
+  }
 
   // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient);

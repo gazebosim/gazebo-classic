@@ -1099,6 +1099,93 @@ material Gazebo/EpuckGold
   }
 }
 
+material PR2/White
+{
+ technique
+  {
+    pass
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1.0
+      specular 0.1 0.1 0.1
+      emissive 0 0 0
+      shading phong
+    }
+  }
+}
+
+material PR2/Black
+{
+ technique
+  {
+    pass
+    {
+      ambient 0.0 0.0 0.0 1.0
+      diffuse 0.0 0.0 0.0 1.0
+      specular 0.2 0.2 0.2
+      emissive 0.0 0.0 0.0
+      shading phong
+    }
+  }
+}
+
+material PR2/Grey0
+{
+ technique
+  {
+    pass
+    {
+      ambient 0.85 0.85 0.85 1.0
+      diffuse 0.85 0.85 0.85 1.0
+      specular 0.0 0.0 0.0
+      emissive 0.0 0.0 0.0
+      shading phong
+    }
+  }
+}
 
 
-1
+material PR2/Grey1
+{
+ technique
+  {
+    pass
+    {
+      ambient 0.65 0.65 0.65 1.0
+      diffuse 0.65 0.65 0.65 1.0
+      specular 0.0 0.0 0.0
+      emissive 0.0 0.0 0.0
+      shading phong
+    }
+  }
+}
+
+material PR2/Grey2
+{
+ technique
+  {
+    pass
+    {
+      ambient 0.58 0.6 0.612 1.0
+      diffuse 0.58 0.6 0.612 1.0
+      specular 1.0 1.0 1.0
+      emissive 0 0 0
+      shading phong
+    }
+  }
+}
+
+material PR2/Grey3
+{
+ technique
+  {
+    pass
+    {
+      ambient 0.38 0.4 0.412 1.0
+      diffuse 0.38 0.4 0.412 1.0
+      specular 0.1 0.1 0.1
+      emissive 0 0 0
+      shading phong
+    }
+  }
+}

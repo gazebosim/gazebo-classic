@@ -45,13 +45,12 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.3 0.3 0.3 1.0</ambient>
+    <ambient>0.1 0.1 0.1 1.0</ambient>
     <sky>
       <material>Gazebo/Grey</material>
     </sky>
     <grid>false</grid>
-
-    <shadowTechnique>stencilModulative</shadowTechnique>
+    <shadowTechnique>stencilAdditive</shadowTechnique>
     <shadowIndexSize>100000</shadowIndexSize>
   </rendering:ogre>
 
@@ -111,51 +110,41 @@
 
   </model:physical>
 
-  <!--
-  <model:physical name="sphere1_model">
-    <xyz>10 10 5.5</xyz>
-    <rpy>0.0 0.0 0.0</rpy>
-    <static>false</static>
-
-    <body:sphere name="sphere1_body">
-      <geom:sphere name="sphere1_geom">
-        <size>1.2</size>
-        <mass>1.0</mass>
-
-        <mu1>109999.0</mu1>
-
-        <visual>
-          <scale>1.2 1.2 1.2</scale>
-          <mesh>unit_sphere</mesh>
-          <material>Gazebo/Rocky</material>
-        </visual>
-      </geom:sphere>
-    </body:sphere>
-  </model:physical>
-  -->
-
 
   <!-- White Point light -->
-  <model:renderable name="point_white">
-    <xyz>200 200 100</xyz>
+  <model:renderable name="point_white2">
+    <xyz>10 10 50</xyz>
+    <static>true</static>
+
+    <light>
+      <castShadows>true</castShadows>
+      <type>point</type>
+      <diffuseColor>1.0 1.0 1.0</diffuseColor>
+      <specularColor>0 0 0</specularColor>
+      <range>100</range>
+
+      <attenuation>0 0.01 0.001</attenuation>
+    </light>
+  </model:renderable>
+  
+  <!-- White Point light -->
+  <model:renderable name="point_white3">
+    <xyz>00 00 30</xyz>
     <static>true</static>
 
     <light>
       <castShadows>false</castShadows>
       <type>point</type>
-      <diffuseColor>0.5 0.48 0.5</diffuseColor>
-      <specularColor>.1 .1 .1</specularColor>
-      <range>500</range>
-
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.01 0.0001</attenuation>
+      <diffuseColor>0.9 0.9 0.9</diffuseColor>
+      <specularColor>.0 .0 .0</specularColor>
+      <range>90</range>
+      <attenuation>0.0 0.1 0.001</attenuation>
     </light>
   </model:renderable>
 
-
-   <!-- White Point light -->
-   <model:renderable name="point_white1">
-    <xyz>20 20 100</xyz>
+  <!-- White Point light -->
+  <!--<model:renderable name="point_white4">
+    <xyz>10 5 50</xyz>
     <static>true</static>
 
     <light>
@@ -163,62 +152,11 @@
       <type>point</type>
       <diffuseColor>0.4 0.4 0.4</diffuseColor>
       <specularColor>.1 .1 .1</specularColor>
-      <range>500</range>
+      <range>200</range>
 
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.001 0.0001</attenuation>
+      <attenuation>0.1 0.01 0.0001</attenuation>
     </light>
   </model:renderable>
-
-  <!-- White Point light -->
-  <model:renderable name="point_white2">
-    <xyz>45 30 10</xyz>
-    <static>true</static>
-
-    <light>
-      <castShadows>false</castShadows>
-      <type>point</type>
-      <diffuseColor>0.5 0.48 0.5</diffuseColor>
-      <specularColor>.1 .1 .1</specularColor>
-      <range>500</range>
-
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.1 0.001</attenuation>
-    </light>
-  </model:renderable>
-  
-  <!-- White Point light -->
-  <model:renderable name="point_white3">
-    <xyz>20 20 30</xyz>
-    <static>true</static>
-
-    <light>
-      <castShadows>false</castShadows>
-      <type>point</type>
-      <diffuseColor>0.5 0.48 0.5</diffuseColor>
-      <specularColor>.1 .1 .1</specularColor>
-      <range>100</range>
-
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.01 0.001</attenuation>
-    </light>
-  </model:renderable>
-
-  <!-- White Point light -->
-  <model:renderable name="point_white4">
-    <xyz>10 5 20</xyz>
-    <static>true</static>
-
-    <light>
-      <castShadows>true</castShadows>
-      <type>point</type>
-      <diffuseColor>0.2 0.2 0.2</diffuseColor>
-      <specularColor>.1 .1 .1</specularColor>
-      <range>50</range>
-
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.1 0.1 0.001</attenuation>
-    </light>
-  </model:renderable>
+  -->
 
 </gazebo:world>
