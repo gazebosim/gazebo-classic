@@ -7,6 +7,11 @@ INCLUDE (FindPkgConfig)
 INCLUDE (${gazebo_cmake_dir}/FindOde.cmake)
 INCLUDE (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
+if (NOT FLTK_FOUND)
+  BUILD_ERROR("FLTK libraries and development files not found. See the following website for installation instructions: http://fltk.org")
+endif (NOT FLTK_FOUND)
+
+
 SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 

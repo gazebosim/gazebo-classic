@@ -1,6 +1,8 @@
-INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-SET (sources Gui.cc
+include_directories( ${FLTK_INCLUDE_DIR} )
+
+set (sources Gui.cc
              GLWindow.cc
              MainMenu.cc
              Toolbar.cc
@@ -9,7 +11,7 @@ SET (sources Gui.cc
              GLFrame.cc
 )
 
-SET (headers Gui.hh
+set (headers Gui.hh
              GLWindow.hh
              MainMenu.hh
              Toolbar.hh
@@ -19,15 +21,12 @@ SET (headers Gui.hh
 )
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
-SET_SOURCE_FILES_PROPERTIES(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
+set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
 
-#ADD_LIBRARY(gazebo_gui STATIC ${sources})
-ADD_LIBRARY(gazebo_gui-shared SHARED ${sources})
+add_library(gazebo_gui SHARED ${sources})
 
-#TARGET_LINK_LIBRARIES(gazebo_gui ${FLTK_LIBRARIES} )
-TARGET_LINK_LIBRARIES(gazebo_gui-shared ${FLTK_LIBRARIES} )
+target_link_libraries(gazebo_gui ${FLTK_LIBRARIES} )
 
-#SET_TARGET_PROPERTIES(gazebo_gui PROPERTIES OUTPUT_NAME "gazebo_gui")
-SET_TARGET_PROPERTIES(gazebo_gui-shared PROPERTIES OUTPUT_NAME "gazebo_gui" VERSION ${GAZEBO_VERSION})
+set_target_properties(gazebo_gui PROPERTIES OUTPUT_NAME "gazebo_gui" VERSION ${GAZEBO_VERSION})
 
-INSTALL (TARGETS gazebo_gui-shared DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install (TARGETS gazebo_gui DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

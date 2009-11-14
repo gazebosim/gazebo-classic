@@ -141,9 +141,10 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    ${freeimage_library} 
                                    gazebo_rendering
                                    gazebo_av-shared
-                                   gazebo_gui-shared
+                                   gazebo_gui
                                    gazebo_physics
                                    gazebo 
+                                   assimp
 )
 
 if (INCLUDE_BULLET)
