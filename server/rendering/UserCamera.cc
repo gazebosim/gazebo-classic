@@ -69,9 +69,8 @@ void UserCamera::Load(XMLConfigNode *node)
 {
   OgreCamera::LoadCam(node);
 
-  this->SetClipDist(0.1, 50);
   this->SetFOV( DTOR(60) );
-
+  this->SetClipDist(0.2, 50);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,10 +137,17 @@ void UserCamera::Init()
 
   this->visual->AttachObject(line);
 
-  //this->renderTarget = this->window;
-
   this->SetCamera(this);
   this->lastUpdate = Simulator::Instance()->GetRealTime();
+
+  double ratio = (double)this->viewport->getActualWidth() / (double)this->viewport->getActualHeight();
+  double vfov = fabs(2.0 * atan(tan(this->GetHFOV().GetAsRadian() / 2.0) / ratio));
+  this->GetOgreCamera()->setAspectRatio(ratio);
+  this->GetOgreCamera()->setFOVy(Ogre::Radian(vfov));
+
+  this->viewport->setClearEveryFrame(true);
+  this->viewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+  this->viewport->setVisibilityMask(this->visibilityMask);
 }
 
 void UserCamera::SetCamera( OgreCamera *cam )
@@ -152,11 +158,9 @@ void UserCamera::SetCamera( OgreCamera *cam )
     cam = this;
 
   this->viewport = this->window->addViewport(cam->GetOgreCamera());
-  this->viewport->setBackgroundColour(Ogre::ColourValue::Black);
 
   this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
 
-  this->viewport->setVisibilityMask(this->visibilityMask);
 }
 
 
@@ -227,6 +231,13 @@ float UserCamera::GetAvgFPS()
   this->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
 
   return avgFPS;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the triangle count
+unsigned int UserCamera::GetTriangleCount()
+{
+  return this->window->getTriangleCount();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

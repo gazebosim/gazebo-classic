@@ -327,7 +327,7 @@ void Simulator::MainLoop()
 {
   double currTime = 0;
   double lastTime = 0;
-  double freq = 40.0;
+  double freq = 80.0;
 
 #ifdef TIMING
     double tmpT1 = this->GetWallTime();
@@ -351,6 +351,8 @@ void Simulator::MainLoop()
       if (this->renderEngineEnabled)
         OgreAdaptor::Instance()->UpdateCameras();
 
+      currTime = this->GetWallTime();
+
       if (this->gui)
         this->gui->Update();
 
@@ -358,8 +360,6 @@ void Simulator::MainLoop()
 
       if (this->renderEngineEnabled)
         World::Instance()->GraphicsUpdate();
-
-      currTime = this->GetWallTime();
 
       if (currTime - lastTime < 1/freq)
       {

@@ -570,6 +570,7 @@ material Gazebo/CloudySky
 		pass
 		{
 			depth_write off
+      lighting off
 
 			texture_unit
 			{

@@ -195,6 +195,13 @@ float GLWindow::GetAvgFPS() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the number of triangles being rendered
+unsigned int GLWindow::GetTriangleCount() const
+{
+  return this->activeCamera->GetTriangleCount();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Handle a mouse button push
 void GLWindow::HandleMousePush()
 {

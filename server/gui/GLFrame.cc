@@ -81,15 +81,38 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->outputXYZ->textsize(10);
   this->outputXYZ->value("[0.0 0.0 0.0]");
 
-  x1 += this->outputXYZ->w() + 5;
+  x1 += this->outputXYZ->w() + 20;
   this->outputRPY = new Fl_Output(x1, y1, 150, 20,"RPY");
   this->outputRPY->box(FL_NO_BOX);
   this->outputRPY->labelsize(10);
   this->outputRPY->textsize(10);
   this->outputRPY->value("[0.0 0.0 0.0]");
 
+  x1 += this->outputRPY->w();
+
+  Fl_Box *fillerBox = new Fl_Box(x1,y1,this->w() - (x1-x + 175) ,20);
+
+  x1 += fillerBox->w();
+
+  Fl_Group *statsGroup = new Fl_Group(x1, y1,100,20);
+  this->fps = new Fl_Value_Output(x1,y1,25,20,"FPS");
+  this->fps->labelsize(10);
+  this->fps->textsize(10);
+  this->fps->align(FL_ALIGN_RIGHT);
+  this->fps->precision(0);
+
+  x1 += this->fps->w() + 30;
+  this->triangleCount = new Fl_Value_Output(x1,y1,50,20,"Triangles");
+  this->triangleCount->labelsize(10);
+  this->triangleCount->textsize(10);
+  this->triangleCount->align(FL_ALIGN_RIGHT);
+  this->triangleCount->precision(0);
+  statsGroup->resizable(NULL);
+  statsGroup->end();
+
   this->footerBar->end();
   this->footerBar->resizable(NULL);
+  this->footerBar->resizable(fillerBox);
 
   this->end();
 
@@ -169,6 +192,9 @@ void GLFrame::Update()
   sprintf( buff,"[%6.2f, %6.2f, %6.2f]", RTOD(pose.rot.GetRoll()),
      RTOD(pose.rot.GetPitch()), RTOD(pose.rot.GetYaw()) );
   this->outputRPY->value(buff);
+
+  this->fps->value(this->glWindow->GetAvgFPS());
+  this->triangleCount->value(this->glWindow->GetTriangleCount());
 
   this->footerBar->redraw();
 }

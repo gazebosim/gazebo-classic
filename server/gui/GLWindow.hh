@@ -93,8 +93,11 @@ namespace gazebo
     /// \brief Get a pointer to the camera
     public: UserCamera *GetCamera() const;
 
-    // \brief Get the average FPS for this window
+    /// \brief Get the average FPS for this window
     public: float GetAvgFPS() const;
+
+    /// \brief Get the number of triangles being rendered
+    public: unsigned int GetTriangleCount() const;
 
     /// \brief Set the active camera
     public: void SetActiveCamera( OgreCamera *camera );

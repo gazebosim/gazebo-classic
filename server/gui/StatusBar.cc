@@ -46,13 +46,7 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   y += 5;
 
   this->box(FL_UP_BOX);
-  this->fps = new Fl_Value_Output(x,y,25,20,"FPS");
-  this->fps->labelsize(11);
-  this->fps->textsize(11);
-  this->fps->align(FL_ALIGN_RIGHT);
-  this->fps->precision(0);
 
-  x = this->fps->x() + this->fps->w() + 35;
   this->percentOutput = new Fl_Value_Output(x,y,40,20,"x Real Time");
   this->percentOutput->labelsize(11);
   this->percentOutput->align(FL_ALIGN_RIGHT);
@@ -109,15 +103,12 @@ StatusBar::~StatusBar()
 /// Update the toolbar data
 void StatusBar::Update()
 {
-  float avgFPS = 0;
   //float percent = 0;
   float sim = 0;
   float real = 0;
 
   if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
   {
-    avgFPS = this->gui->GetAvgFPS();
-
     if (Simulator::Instance()->GetRealTime() < this->statusUpdatePeriod )
     {
       this->percent = (Simulator::Instance()->GetSimTime() / Simulator::Instance()->GetRealTime());
@@ -177,7 +168,6 @@ void StatusBar::Update()
     }
 
     //this->iterations->value(Simulator::Instance()->GetIterations());
-    this->fps->value(avgFPS);
     this->percentOutput->value(this->percent);
 
     //if (Simulator::Instance()->GetRealTime() - this->realTime->value() > 0.1)

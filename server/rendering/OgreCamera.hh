@@ -184,6 +184,9 @@ namespace gazebo
     /// \brief Get the average FPS
     public: virtual float GetAvgFPS() { return 0;}
 
+    /// \brief Get the triangle count
+    public: virtual unsigned int GetTriangleCount() {return 0;}
+
     /// \brief Set the aspect ratio
     public: void SetAspectRatio( float ratio );
 
@@ -211,7 +214,6 @@ namespace gazebo
     // Save the camera frame
     protected: virtual void SaveFrame();
 
-
     private: std::string name;
 
     protected: ParamT<Angle> *hfovP;
@@ -219,7 +221,7 @@ namespace gazebo
     protected: ParamT< Vector2<int> > *imageSizeP;
     protected: unsigned int textureWidth, textureHeight;
   
-    private: Ogre::Camera *camera;
+    protected: Ogre::Camera *camera;
     protected: Ogre::SceneNode *sceneNode;
     protected: Ogre::SceneNode *pitchNode;
   

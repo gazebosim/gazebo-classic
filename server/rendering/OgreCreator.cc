@@ -288,11 +288,11 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name,
     // Setup the viewport to use the texture
     cviewport = renderTarget->addViewport(camera);
     cviewport->setClearEveryFrame(true);
-    //cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
-    cviewport->setBackgroundColour( Ogre::ColourValue::Blue );
+    cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
 
     double ratio = (double)cviewport->getActualWidth() / (double)cviewport->getActualHeight();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
+    std::cout << "VFOV[" << vfov << "]\n";
     camera->setAspectRatio(ratio);
     camera->setFOVy(Ogre::Radian(vfov));
   }
@@ -397,7 +397,8 @@ void OgreCreator::CreateSky(std::string material)
         {*/
       Ogre::Quaternion orientation;
       orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
-      OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
+      //OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
+      OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,10,8, 4, true, orientation);
       //}
 
     }

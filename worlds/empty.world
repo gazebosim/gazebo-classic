@@ -37,6 +37,7 @@
     <shadowTechnique>stencilAdditive</shadowTechnique>
     <grid>false</grid>
   </rendering:ogre>
+
    <!-- Ground Plane -->
    <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>

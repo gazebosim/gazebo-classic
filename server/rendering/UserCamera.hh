@@ -75,6 +75,9 @@ namespace gazebo
     /// \brief Get the average FPS
     public: virtual float GetAvgFPS();
 
+    /// \brief Get the triangle count
+    public: unsigned int GetTriangleCount();
+
     /// \brief Get the ogre window
     public: Ogre::RenderWindow *GetWindow();
 

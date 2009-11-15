@@ -68,7 +68,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   Param::Begin(&this->camParameters);
   this->nearClipP = new ParamT<double>("nearClip",0.1,0);
-  this->farClipP = new ParamT<double>("farClip",100,0);
+  this->farClipP = new ParamT<double>("farClip",50,0);
   this->saveFramesP = new ParamT<bool>("saveFrames",false,0);
   this->savePathnameP = new ParamT<std::string>("saveFramePath","",0);
   this->imageSizeP = new ParamT< Vector2<int> >("imageSize", Vector2<int>(320, 240),0);
@@ -188,7 +188,9 @@ void OgreCamera::InitCam()
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  this->camera = OgreCreator::CreateCamera(this->cameraName, this->nearClipP->GetValue(), this->farClipP->GetValue(), *(this->hfovP->GetValue()), this->renderTarget );
+  this->camera = OgreCreator::CreateCamera(this->cameraName, 
+      **this->nearClipP, **this->farClipP, *(**this->hfovP), 
+      this->renderTarget );
 
   // Create a scene node to control pitch motion
   this->pitchNode = this->sceneNode->createChildSceneNode( this->cameraName + "PitchNode");

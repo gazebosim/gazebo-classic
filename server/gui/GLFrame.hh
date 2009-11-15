@@ -31,6 +31,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Box.H>
 #include <string>
 
 #include "Pose3d.hh"
@@ -96,6 +97,9 @@ namespace gazebo
 
     private: Fl_Output *outputXYZ;
     private: Fl_Output *outputRPY;
+
+    private: Fl_Value_Output *fps;
+    private: Fl_Value_Output *triangleCount;
 
     /// Starting pose of the camera
     private: Pose3d startPose;
