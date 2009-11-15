@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-message(STATUS "OGRE INCLUDE DIRS ${OGRE_INCLUDE_DIRS}")
-
 include_directories (
   .
   ${OGRE_INCLUDE_DIRS}

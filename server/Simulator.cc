@@ -327,7 +327,7 @@ void Simulator::MainLoop()
 {
   double currTime = 0;
   double lastTime = 0;
-  double freq = 80.0;
+  double freq = 40.0;
 
 #ifdef TIMING
     double tmpT1 = this->GetWallTime();

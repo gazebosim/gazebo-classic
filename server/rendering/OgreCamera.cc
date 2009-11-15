@@ -75,7 +75,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->visMaskP = new ParamT<std::string>("mask","none",0);
   this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
   this->imageFormatP = new ParamT<std::string>("imageFormat", "R8G8B8", 0);
-  this->updateRateP = new ParamT<double>("updateRate",30,0);
+  this->updateRateP = new ParamT<double>("updateRate",32,0);
   Param::End();
 
   this->captureData = false;

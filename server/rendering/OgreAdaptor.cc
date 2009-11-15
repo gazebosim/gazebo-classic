@@ -422,9 +422,7 @@ void OgreAdaptor::SetupRenderSystem()
   while (renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
 
   if (renderSys == NULL)
-  {
     gzthrow( "unable to find rendering system" );
-  }
 
   // We operate in windowed mode
   renderSys->setConfigOption("Full Screen","No");
@@ -435,6 +433,19 @@ void OgreAdaptor::SetupRenderSystem()
   ///           size of the first window created.
   ///   FBO seem to be the only good option
   renderSys->setConfigOption("RTT Preferred Mode", "FBO");
+
+  renderSys->setConfigOption("FSAA", "2");
+
+  /* Print out the list of options
+  Ogre::ConfigOptionMap map = renderSys->getConfigOptions();
+  Ogre::ConfigOptionMap::iterator iter;
+
+  printf("KEYS-------------------------\n");
+  for (iter = map.begin(); iter != map.end(); iter++)
+  {
+    std::cout << "Key[" << iter->first << "] Name[" << iter->second.name << "] Value[" << iter->second.currentValue << "]\n";
+  }
+  */
 
   this->root->setRenderSystem(renderSys);
 }
