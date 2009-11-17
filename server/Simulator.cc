@@ -348,13 +348,13 @@ void Simulator::MainLoop()
     {
       lastTime = this->GetWallTime();
 
+      if (this->gui)
+        this->gui->Update();
+
       if (this->renderEngineEnabled)
         OgreAdaptor::Instance()->UpdateCameras();
 
       currTime = this->GetWallTime();
-
-      if (this->gui)
-        this->gui->Update();
 
       World::Instance()->ProcessEntitiesToLoad();
 

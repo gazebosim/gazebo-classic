@@ -41,6 +41,8 @@ Common::Common()
   Param::Begin(&this->parameters);
   this->nameP = new ParamT<std::string>("name","noname",1);
   Param::End();
+
+  this->saveable = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,4 +100,20 @@ Param *Common::GetParam(const std::string &key) const
 int Common::GetId() const
 {
   return this->id;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether the object should be "saved", when the user
+///        selects to save the world to xml
+void Common::SetSaveable(bool v)
+{
+  this->saveable = v;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether the object should be "saved", when the user
+/// selects to save the world to xml
+bool Common::GetSaveable() const
+{
+  return this->saveable;
 }

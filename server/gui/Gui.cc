@@ -126,6 +126,9 @@ void Gui::Save(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
 
+  this->sizeP->SetValue(Vector2<int>(this->GetWidth(), this->GetHeight()));
+  this->posP->SetValue(Vector2<int>(this->x(), this->y()));
+
   stream << prefix <<  "<rendering:gui>\n";
   stream << prefix <<  "  " << *(this->sizeP) << "\n";
   stream << prefix <<  "  " << *(this->posP) << "\n";

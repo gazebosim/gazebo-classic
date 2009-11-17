@@ -53,6 +53,8 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
   this->contactLen = DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
+
+  this->parent->SetSaveable(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -93,7 +93,6 @@ Geom::~Geom()
 // First step in the loading process
 void Geom::Load(XMLConfigNode *node)
 {
-
   XMLConfigNode *childNode = NULL;
 
   this->xmlNode=node;
@@ -138,6 +137,9 @@ void Geom::Load(XMLConfigNode *node)
       this->visuals.push_back(visual);
       visual->SetCastShadows(true);
     }
+    if (this->IsStatic())
+      visual->MakeStatic();
+
     childNode = childNode->GetNext("visual");
   }
 
@@ -179,7 +181,7 @@ void Geom::CreateBoundingBox()
 // Save the body based on our XMLConfig node
 void Geom::Save(std::string &prefix, std::ostream &stream)
 {
-  if (this->GetType() == Shape::RAY)
+  if (!this->GetSaveable())
     return;
 
   std::string p = prefix + "  ";

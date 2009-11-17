@@ -157,7 +157,6 @@ namespace gazebo
     private: ParamT<std::string> *shadowTechniqueP;
     private: ParamT<int> *shadowTextureSizeP;
     private: ParamT<int> *shadowIndexSizeP;
-    private: ParamT<double> *updateRateP;
     private: ParamT<bool> *drawGridP;
     private: ParamT<std::string> *skyMaterialP;
     private: std::vector<Param*> parameters;

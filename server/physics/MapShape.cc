@@ -151,6 +151,7 @@ void MapShape::CreateBoxes(QuadNode *node)
 
     // Create the box geometry
     Geom *geom = this->physicsEngine->CreateGeom("box",this->parent->GetBody());
+    geom->SetSaveable(false);
 
     XMLConfig *boxConfig = new XMLConfig();
 

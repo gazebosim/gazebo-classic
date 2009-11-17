@@ -54,10 +54,10 @@ namespace gazebo
     public: OgreVisual (OgreVisual *node, Entity *owner = NULL);
 
     /// \brief Constructor
-    public: OgreVisual (Ogre::SceneNode *node);
+    public: OgreVisual (Ogre::SceneNode *node, bool isStatic=false);
 
     /// \brief Helper for the contructor
-    private: void ConstructorHelper(Ogre::SceneNode *node);
+    private: void ConstructorHelper(Ogre::SceneNode *node, bool isStatic=false);
 
     /// \brief Destructor
     public: virtual ~OgreVisual();
@@ -151,6 +151,9 @@ namespace gazebo
     public: bool IsDirty() const {return dirty;}
     public: void SetToDirtyPose() {SetPose(dirtyPose); dirty=false;}
 
+    /// \brief Return true if the  visual is a static geometry
+    public: bool IsStatic() const;
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: Ogre::SceneBlendType sceneBlendType;
@@ -160,8 +163,6 @@ namespace gazebo
     private: Ogre::SceneNode *boundingBoxNode;
 
     private: float transparency;
-
-    private: Ogre::StaticGeometry *staticGeometry;
 
     private: static unsigned int visualCounter;
 
@@ -181,6 +182,9 @@ namespace gazebo
     private: bool ignorePoseUpdates;
     private: bool dirty;
     private: Pose3d dirtyPose;
+
+    private: bool isStatic;
+    private: Ogre::StaticGeometry *staticGeom;
   };
 }
 

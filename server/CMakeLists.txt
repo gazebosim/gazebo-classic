@@ -68,7 +68,6 @@ SET (sources Common.cc
              Angle.cc
              Param.cc
              GraphicsIfaceHandler.cc
-             GuiAPI.cc
              Simulator.cc
              Rand.cc
              Factory.cc
@@ -100,7 +99,6 @@ SET (headers Common.hh
              Angle.hh
              Param.hh
              GraphicsIfaceHandler.hh
-             GuiAPI.hh
              Simulator.hh
              Rand.hh
              Factory.hh

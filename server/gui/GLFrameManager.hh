@@ -68,6 +68,7 @@ namespace gazebo
 
     /// Vector of all the frames
     private: std::vector<GLFrame *> frames;
+    private: XMLConfigNode *configNode;
   };
 }
 #endif

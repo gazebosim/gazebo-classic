@@ -46,6 +46,7 @@ unsigned int OgreVisual::visualCounter = 0;
 OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   : Common()
 {
+  bool isStatic = false;
   Ogre::SceneNode *pnode = NULL;
   this->owner = _owner;
 
@@ -57,20 +58,26 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
       pnode = node->GetSceneNode();
   }
 
-  this->ConstructorHelper(pnode);
+  if (this->owner)
+  {
+    this->SetName(this->owner->GetName() + "_visual");
+    isStatic = this->owner->IsStatic();
+  }
+
+  this->ConstructorHelper(pnode, isStatic);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-OgreVisual::OgreVisual (Ogre::SceneNode *node)
+OgreVisual::OgreVisual (Ogre::SceneNode *node, bool isStatic)
 {
   this->owner = NULL;
-  this->ConstructorHelper(node);
+  this->ConstructorHelper(node, isStatic);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper for the contructor
-void OgreVisual::ConstructorHelper(Ogre::SceneNode *node)
+void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 {
   std::ostringstream stream;
   this->mutex = new boost::recursive_mutex();
@@ -98,7 +105,6 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node)
   this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
   Param::End();
 
-  this->staticGeometry = NULL;
   this->boundingBoxNode = NULL;
 
   this->ignorePoseUpdates = false;
@@ -115,6 +121,14 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node)
     // Create the scene node
     this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
   }
+
+  this->isStatic = isStatic;
+
+  if (this->isStatic)
+    this->staticGeom = this->sceneNode->getCreator()->createStaticGeometry(
+        this->GetName() + "_staticgeom");
+  else
+    this->staticGeom = NULL;
 }
 
 
@@ -281,6 +295,7 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
     return;
 
   this->sceneNode->attachObject(obj);
+
   obj->setUserObject( this );
 }
 
@@ -333,17 +348,17 @@ void OgreVisual::MakeStatic()
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  if (!this->staticGeometry)
-    this->staticGeometry = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
+  if (!this->staticGeom)
+    this->staticGeom = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
   // Detach the scene node from the parent. Prevents double rendering
   this->sceneNode->getParent()->removeChild(this->sceneNode);
 
   // Add the scene node to the static geometry
-  this->staticGeometry->addSceneNode(this->sceneNode);
+  this->staticGeom->addSceneNode(this->sceneNode);
 
   // Build the static geometry
-  this->staticGeometry->build();
+  this->staticGeom->build();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -369,7 +384,7 @@ void OgreVisual::AttachMesh( const std::string &meshName )
 
   obj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
 
-  this->sceneNode->attachObject((Ogre::Entity*)obj);
+  this->AttachObject( obj );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -382,11 +397,11 @@ void OgreVisual::SetScale(const Vector3 &scale )
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-
   Ogre::Vector3 vscale;
   vscale.x=scale.x;
   vscale.y=scale.y;
   vscale.z=scale.z;
+
   this->sceneNode->setScale(vscale);
 }
 
@@ -620,6 +635,9 @@ void OgreVisual::SetCastShadows(const bool &shadows)
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
     obj->setCastShadows(shadows);
   }
+
+  if (this->IsStatic())
+    this->staticGeom->setCastShadows(shadows);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -885,3 +903,12 @@ void OgreVisual::SetIgnorePoseUpdates( bool value )
 {
   this->ignorePoseUpdates = value;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the  visual is a static geometry
+bool OgreVisual::IsStatic() const
+{
+  return this->isStatic;
+}
+
+

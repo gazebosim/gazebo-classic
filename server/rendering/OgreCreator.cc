@@ -49,7 +49,6 @@
 
 using namespace gazebo;
 
-unsigned int OgreCreator::lightCounter = 0;
 unsigned int OgreCreator::windowCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,11 +110,19 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
 /// Create a light source and attach it to the visual node
 /// Note that the properties here are not modified afterwards and thus, 
 /// we don't need a Light class. 
-std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
+//std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
+//{
+  /*if (!Simulator::Instance()->GetRenderEngineEnabled())
     return std::string();
 
+  Light *light = new Light(parent);
+  light->Load(node);
+  this->lights.push_back(light);
+
+  return light->GetName();
+  */
+
+  /*
   Vector3 vec;
   double range,constant,linear,quad;
   Ogre::Light *light;
@@ -200,62 +207,8 @@ std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
   parent->AttachObject(light);
 
   return stream.str();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Save a light's information in xml format
-void OgreCreator::SaveLight(const std::string &prefix, 
-                           const std::string lightName, std::ostream &stream)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  Ogre::Light *light = NULL;
-  std::string type;
-
-  if (!OgreAdaptor::Instance()->sceneMgr->hasLight(lightName))
-  {
-    gzerr(0) << "Unknown light[" << lightName << "]\n";
-    return;
-  }
-
-  light = OgreAdaptor::Instance()->sceneMgr->getLight(lightName);
-
-  if (light->getType() == Ogre::Light::LT_POINT)
-    type = "point";
-  else if (light->getType() == Ogre::Light::LT_DIRECTIONAL)
-    type = "directional";
-  else 
-    type = "spot";
-
-  Ogre::ColourValue diffuseColor = light->getDiffuseColour();
-  Ogre::ColourValue specularColor = light->getDiffuseColour();
-  Ogre::Vector3 dir = light->getDirection();
-  Ogre::Real attRange = light->getAttenuationRange();
-  Ogre::Real attConst = light->getAttenuationConstant();
-  Ogre::Real attLinear = light->getAttenuationLinear();
-  Ogre::Real attQuadric = light->getAttenuationQuadric();
-
-  stream << prefix << "<light>\n";
-  stream << prefix << "  <type>" << type << "</type>\n";
-
-  stream << prefix << "  <direction>" << dir.x << " " << dir.y << " " 
-         << dir.z << "</direction>\n";
-
-  stream << prefix << "  <diffuseColor>" << diffuseColor.r << " " 
-         << diffuseColor.g << " " << diffuseColor.b << " " << diffuseColor.a 
-         << "</diffuseColor>\n";
-
-  stream << prefix << "  <specularColor>" << specularColor.r << " " 
-         << specularColor.g << " " << specularColor.b << " "
-         << specularColor.a << "</specularColor>\n";
-
-  stream << prefix << "  <range>"<< attRange << "</range>\n";
-
-  stream << prefix << "  <attenuation>" << " " << attConst 
-         << " " << attLinear << " " << attQuadric << "</attenuation>\n";
-  stream << prefix << "</light>\n";
-}
+  */
+//}
 
 
 ////////////////////////////////////////////////////////////////////////////////

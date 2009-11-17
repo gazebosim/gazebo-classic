@@ -60,6 +60,14 @@ namespace gazebo
     /// \brief Return the ID of this entity. This id is unique
     /// \return Integer ID
     public: int GetId() const;
+
+    /// \brief Set whether the object should be "saved", when the user
+    ///        selects to save the world to xml
+    public: void SetSaveable(bool v);
+
+    /// \brief Get whether the object should be "saved", when the user
+    ///        selects to save the world to xml
+    public: bool GetSaveable() const;
    
     /// \brief This entities ID
     private: unsigned int id;
@@ -72,6 +80,9 @@ namespace gazebo
 
     /// List of all the parameters
     protected: std::vector<Param*> parameters;
+
+    /// \brief Set to true if the object should be saved.
+    protected: bool saveable;
   };
 }
 

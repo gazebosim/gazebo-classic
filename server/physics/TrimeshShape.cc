@@ -111,6 +111,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
       Geom *newGeom = this->physicsEngine->CreateGeom( "trimesh", 
           this->parent->GetBody() );
 
+      newGeom->SetSaveable(false);
       newGeom->Load( config->GetRootNode()->GetChild() );
 
       delete config;

@@ -47,6 +47,8 @@ GLFrameManager::GLFrameManager(int x, int y, int w, int h, const std::string &na
   this->end();
 
   this->resizable(this);
+
+  this->configNode = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,69 +68,15 @@ GLFrameManager::~GLFrameManager()
 // Load from xml
 void GLFrameManager::Load( XMLConfigNode *node )
 {
+  this->configNode = node;
   GLFrame *frame = NULL;
   int windowCount = 0;
-  XMLConfigNode *rowNode = NULL;
-  XMLConfigNode *camNode = NULL;
 
-  if (node)
-  {
-    rowNode = node->GetChild("row");
-
-    float frameHeight, frameWidth;
-    int width = this->w();
-    int height = this->h();
-    int x = this->x();
-    int y = this->y();
-
-    // Process each row
-    while (rowNode)
-    {
-      camNode = rowNode->GetChild("camera");
-
-      std::string heightStr = rowNode->GetString("height","",1);
-
-      frameHeight = atof( heightStr.substr(0, heightStr.find( "%", 0 ) ).c_str() );
-
-      frameHeight = frameHeight/100.0 * height;
-
-      // Process each camera
-      while (camNode)
-      {
-        std::string widthStr = camNode->GetString("width","",1);
-        frameWidth = atof( widthStr.substr(0, widthStr.find( "%", 0 ) ).c_str() );
-
-        frameWidth = frameWidth/100.0 * width;
-
-        windowCount = this->children();
-
-        // Create the frame
-        frame = new GLFrame( x, y, (int)frameWidth, (int)frameHeight, "" );
-        frame->Load(camNode);
-
-        this->frames.push_back( frame );
-        this->insert(*frame, windowCount);
-
-        x += (int)frameWidth;
-
-        camNode = camNode->GetNext();
-      }
-
-      y += (int)frameHeight;
-      x = this->x();
-
-      rowNode = rowNode->GetNext();
-    }
-  }
-
-  // Create a big default window if no frames have been defined
-  if (this->frames.size() == 0)
-  {
-    frame = new GLFrame( this->x(), this->y(), this->w(), this->h(), "" );
-    this->frames.push_back( frame );
-    this->insert(*frame, windowCount);
-  }
-  
+  // First, create one big window
+  frame = new GLFrame( this->x(), this->y(), this->w(), this->h(), "" );
+  this->frames.push_back( frame );
+  this->insert(*frame, windowCount);
+ 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,29 +88,22 @@ void GLFrameManager::Save(std::string &prefix, std::ostream &stream)
 
   stream << prefix << "<frames>\n";
 
-  int cy = -1;
   for (iter = this->frames.begin(); iter != this->frames.end(); iter++)
   {
-    int height = (int)( ((float)(*iter)->h() / this->h()) * 100 );
-    int width = (int)( ((float)(*iter)->w() / this->w()) * 100 );
+    int width = (*iter)->w();
+    int height = (*iter)->h();
+    int x = (*iter)->x();
+    int y = (*iter)->y();
     Pose3d pose = (*iter)->GetCameraPose();
 
-    if ((*iter)->y() != cy)
-    {
-      if (cy != -1)
-        stream << prefix << "  </row>\n";
-
-      cy = (*iter)->y();
-      stream << prefix << "  <row height=\"" << height << "%\">\n";
-    }
-
-    stream << prefix << "    <camera width=\"" << width << "%\">\n";
+    stream << prefix << "    <camera width=\"" << width 
+      << "\" height=\"" << height << "\" x=\"" << x << "\" y=\""
+      <<  y << "\">\n";
     stream << prefix << "      <xyz>" << pose.pos << "</xyz>\n";
     stream << prefix << "      <rpy>" << pose.rot << "</rpy>\n";
     stream << prefix << "    </camera>\n";
   }
 
-  stream << prefix << "  </row>\n";
   stream << prefix << "</frames>\n";
 }
 
@@ -181,6 +122,42 @@ void GLFrameManager::CreateCameras()
 /// Initalize the window manager
 void GLFrameManager::Init()
 {
+  // Create all the frames
+  if (this->configNode)
+  {
+    GLFrame *frame = this->frames[0];
+    XMLConfigNode *camNode = NULL;
+    camNode = this->configNode->GetChild("camera");
+
+    int i = 0;
+    while (camNode)
+    {
+      int width = camNode->GetInt("width",this->w(),1);
+      int height = camNode->GetInt("height",this->h(),1);
+      int x = camNode->GetInt("x",this->x(),1);
+      int y = camNode->GetInt("y",this->y(),1);
+      std::ostringstream stream;
+      stream << "GL Window " << i;
+
+      // Create the frame
+      if (i==0)
+        frame->resize(x,y,width,height);
+      else
+      {
+        frame = new GLFrame( x, y, width, height, stream.str() );
+        frame->Load(camNode);
+
+        this->frames.push_back( frame );
+        this->insert(*frame, i);
+      }
+
+      i++;
+      camNode = camNode->GetNext();
+      this->redraw();
+    }
+  }
+
+
   std::vector<GLFrame *>::iterator iter;
   for (iter = this->frames.begin(); iter != this->frames.end(); iter++)
   {

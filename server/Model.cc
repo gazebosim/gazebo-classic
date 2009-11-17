@@ -31,6 +31,7 @@
 #include <float.h>
 
 #include "OgreVisual.hh"
+#include "Light.hh"
 #include "GraphicsIfaceHandler.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
@@ -94,6 +95,8 @@ Model::Model(Model *parent)
   this->graphicsHandler = NULL;
   this->parentBodyNameP = NULL;
   this->myBodyNameP = NULL;
+
+  this->light = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,11 +339,8 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   }
   else
   {
-    if (!this->lightName.empty())
-    {
-      if (Simulator::Instance()->GetRenderEngineEnabled())
-        OgreCreator::SaveLight(p, this->lightName, stream);
-    }
+    if (this->light)
+      this->light->Save(p, stream);
   }
 
   if (this->parentBodyNameP && this->myBodyNameP)
@@ -1115,8 +1115,8 @@ void Model::LoadRenderable(XMLConfigNode *node)
   if (Simulator::Instance()->GetRenderEngineEnabled() && 
       (childNode = node->GetChild("light")))
   {
-    this->lightName = OgreCreator::CreateLight(childNode, 
-        body->GetVisualNode());
+    this->light = new Light(body);
+    this->light->Load(childNode);
   }
 
 }

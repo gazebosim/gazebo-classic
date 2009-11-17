@@ -78,11 +78,7 @@ namespace gazebo
     
     /// \brief Create a light source 
     /// \return The name of the light source
-    public: static std::string CreateLight(XMLConfigNode *node, OgreVisual *parent);
-
-    /// \brief Save a light source info in xml format
-    public: static void SaveLight(const std::string &prefix, 
-                           const std::string lightName, std::ostream &stream);
+    //public: static std::string CreateLight(XMLConfigNode *node, OgreVisual *parent);
 
     /// \brief Helper function to create a camera
     public: static Ogre::Camera *CreateCamera(const std::string &name, 
@@ -157,7 +153,6 @@ namespace gazebo
     /// \brief Update all the entities
     public: void Update();
 
-    private: static unsigned int lightCounter;
     private: static unsigned int windowCounter;
 
     // List of all the lines created

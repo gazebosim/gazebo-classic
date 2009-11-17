@@ -51,6 +51,7 @@ namespace gazebo
   class GazeboConfig;
   class OgreAdaptor;
   class Entity;
+  class Common;
   class Body;
   class Model;
 

@@ -194,7 +194,6 @@ void UserCamera::Update()
 
     this->saveCount++;
   }
-
 }
 
 

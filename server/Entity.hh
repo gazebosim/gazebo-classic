@@ -97,7 +97,7 @@ namespace gazebo
   
     /// \brief Set whether this entity has been selected by the user through 
     //         the gui
-    public: bool SetSelected( bool s );
+    public: virtual bool SetSelected( bool s );
   
     /// \brief True if the entity is selected by the user
     public: bool IsSelected() const;

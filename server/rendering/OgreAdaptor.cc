@@ -75,6 +75,8 @@ OgreAdaptor::OgreAdaptor()
   this->shadowTechniqueP = new ParamT<std::string>("shadowTechnique", "stencilModulative", 0);
   this->drawGridP = new ParamT<bool>("grid", true, 0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
+  this->shadowIndexSizeP = new ParamT<int>("shadowIndexSize",32768, 0);
+
   Param::End();
 }
 
@@ -199,10 +201,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Load Resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  Param::Begin(&this->parameters);
-  this->shadowIndexSizeP = new ParamT<int>("shadowIndexSize",this->sceneMgr->getShadowIndexBufferSize(), 0);
-  Param::End();
-
   this->ambientP->Load(node);
   this->shadowTextureSizeP->Load(node);
   this->shadowIndexSizeP->Load(node);
@@ -293,6 +291,9 @@ void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "    " << *(this->skyMaterialP) << "\n";
   stream << prefix << "  </sky>\n";
   OgreCreator::SaveFog(prefix, stream);
+  stream << prefix << "  " << *(this->shadowTechniqueP) << "\n";
+  stream << prefix << "  " << *(this->shadowTextureSizeP) << "\n";
+  stream << prefix << "  " << *(this->shadowIndexSizeP) << "\n";
   stream << prefix << "</rendering:ogre>\n";
 }
 

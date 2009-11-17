@@ -55,6 +55,7 @@ namespace gazebo
   class GraphicsIfaceHandler;
   class Sensor;
   class Geom;
+  class Light;
 
   /// \addtogroup gazebo_server
   /// \brief A model
@@ -258,7 +259,7 @@ namespace gazebo
 
 
     // Name of a light (if the model is renderable:light)
-    private: std::string lightName;
+    private: Light *light;
 
     private: GraphicsIfaceHandler *graphicsHandler;
 

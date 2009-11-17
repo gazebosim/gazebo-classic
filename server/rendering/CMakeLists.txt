@@ -20,6 +20,7 @@ set (sources OgreMovableText.cc
              OgreHeightmap.cc
              Color.cc
              Material.cc
+             Light.cc
 )
 
 set (headers OgreMovableText.hh
@@ -37,6 +38,7 @@ set (headers OgreMovableText.hh
              OgreHeightmap.hh
              Color.hh
              Material.hh
+             Light.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})
