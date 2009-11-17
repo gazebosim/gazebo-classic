@@ -174,17 +174,11 @@ bool Entity::SetSelected( bool s )
   Body *body = NULL;
 
   this->selected = s;
-  //std::cout << " SetSelected Entity : " << this->GetName() << " selected(" << s << ")" << std::endl;
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    //std::cout << " SetSelected Entity Children: " << (*iter)->GetName() << std::endl;
     (*iter)->SetSelected(s);
     body = dynamic_cast<Body*>(*iter);
-
-    //enabling SetEnabled(!s) makes body unstabel upon unselection
-    //if (body)
-      //body->SetEnabled(!s);
   }
 
   return true;

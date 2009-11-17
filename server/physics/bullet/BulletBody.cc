@@ -290,7 +290,10 @@ void BulletBody::SetEnabled(bool enable) const
   if (!this->rigidBody)
     return;
 
-  this->rigidBody->setActivationState(WANTS_DEACTIVATION);
+  if (enable)
+    this->rigidBody->activate(true);
+  else
+    this->rigidBody->setActivationState(WANTS_DEACTIVATION);
 }
 
 /////////////////////////////////////////////////////////////////////

@@ -687,4 +687,12 @@ void Body::ShowPhysics(bool show)
     this->cgVisual->SetVisible(show);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether this entity has been selected by the user through the gui
+bool Body::SetSelected( bool s )
+{
+  Entity::SetSelected(s);
 
+  if (s == false)
+    this->SetEnabled(true);
+}
