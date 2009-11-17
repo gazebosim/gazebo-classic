@@ -59,9 +59,6 @@ namespace gazebo
     private: Fl_Value_Output *pauseTime;
     private: Fl_Value_Output *simTime;
 
-    private: Fl_Button *playButton;
-    private: Fl_Button *stepButton;
-
     public: Gui *gui;
 
     private: double lastUpdateTime;

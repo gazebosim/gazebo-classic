@@ -131,7 +131,6 @@ int Image::Load(const std::string &filename)
       }
       
     }
-
   }
 
   gzerr(5) << "Unable to open image file[" << filename << "]\n";
@@ -160,6 +159,51 @@ void Image::SetFromData( const unsigned char *data, unsigned int width,
   this->bitmap = NULL;
 
   this->bitmap = FreeImage_ConvertFromRawBits((BYTE*)data, width, height, scanline_bytes, bpp, redmask, greenmask, bluemask);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the image as a data array
+void Image::GetData( unsigned char **data, unsigned int &count )
+{
+  int redmask = FI_RGBA_RED_MASK;
+  //int bluemask = 0x00ff0000;
+
+  int greenmask = FI_RGBA_GREEN_MASK;
+  //int greenmask = 0x0000ff00;
+
+  int bluemask = FI_RGBA_BLUE_MASK;
+  //int redmask = 0x000000ff;
+
+  int scan_width = FreeImage_GetPitch(this->bitmap);
+
+  if (*data)
+    delete [] *data;
+
+  count = scan_width * this->GetHeight();
+  *data = new unsigned char[count];
+
+  FreeImage_ConvertToRawBits( (BYTE*)(*data), this->bitmap, 
+      scan_width, this->GetBPP(),redmask, greenmask, bluemask, true);
+
+#ifdef FREEIMAGE_COLORORDER
+    if (FREEIMAGE_COLORORDER == FREEIMAGE_COLORORDER_RGB)
+      return;
+#else
+#ifdef FREEIMAGE_BIGENDIAN
+      return;
+#endif
+#endif
+
+  int i=0;
+  for (unsigned int y=0; y<this->GetHeight(); y++)
+  {
+    for (unsigned int x=0; x < this->GetWidth(); x++)
+    {
+      std::swap( (*data)[i], (*data)[i+2]); 
+      i += 4;
+    }
+  }
+      
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,9 +245,9 @@ Color Image::GetPixel(unsigned int x, unsigned int y)
   if (!this->Valid())
     return clr;
 
-  unsigned int colorsUsed = FreeImage_GetImageType(this->bitmap);
+  FREE_IMAGE_COLOR_TYPE type = FreeImage_GetColorType(this->bitmap);
 
-  if (colorsUsed == 0)
+  if (type == FIC_RGB || type == FIC_RGBALPHA)
   {
     RGBQUAD firgb;
 
@@ -233,7 +277,7 @@ Color Image::GetPixel(unsigned int x, unsigned int y)
     BYTE byteValue;
     if (FreeImage_GetPixelIndex(this->bitmap, x, y, &byteValue) == FALSE)
     {
-      std::cerr << "Image: Coordinates out of range[" 
+      std::cerr << "Image: Coordinates out of range   [" 
         << x << " " << y << "] \n";
       return clr;
     }

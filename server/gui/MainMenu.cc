@@ -44,6 +44,9 @@ using namespace gazebo;
 MainMenu::MainMenu(int x, int y, int w, int h, char *name)
     : Fl_Menu_Bar(x,y,w,h,name)
 {
+  this->box(FL_NO_BOX);
+  this->color(BG_COLOR, BG_COLOR);
+
   const Fl_Menu_Item menuitems[] =
   {
     { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },

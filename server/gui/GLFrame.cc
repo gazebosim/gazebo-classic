@@ -33,6 +33,7 @@
 #include "GLWindow.hh"
 #include "GLFrameManager.hh"
 #include "UserCamera.hh"
+#include "Gui.hh"
 #include "GLFrame.hh"
 
 using namespace gazebo;
@@ -43,10 +44,12 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   : Fl_Group(x,y,w,h, "")
 {
 
-  this->box(FL_DOWN_BOX);
+  this->box(FL_ENGRAVED_BOX);
+  this->color(BG_COLOR);
 
   this->headerBar = new Fl_Group(x,y,w,30);
-  this->headerBar->box(FL_UP_BOX);
+  this->headerBar->box(FL_NO_BOX);
+  this->headerBar->color(BG_COLOR);
 
   this->viewChoice = new Fl_Choice(x+2, y+2, 150,26);
   this->viewChoice->add("View");
@@ -56,14 +59,18 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->viewChoice->add("Left", "",  &gazebo::GLFrame::ViewCB, this);
   this->viewChoice->add("User", "", &gazebo::GLFrame::ViewCB, this);
   this->viewChoice->value(0);
+  this->viewChoice->color(BG_COLOR);
 
-  this->splitChoice = new Fl_Choice(this->viewChoice->x()+this->viewChoice->w()+2, this->viewChoice->y(), 150, 26);
+  this->splitChoice = new Fl_Choice(
+      this->viewChoice->x() + this->viewChoice->w()+2, 
+      this->viewChoice->y(), 150, 26);
 
   this->splitChoice->add("Split Window");
-  this->splitChoice->mode(0,FL_MENU_DIVIDER);
+  this->splitChoice->mode(0, FL_MENU_DIVIDER);
   this->splitChoice->add("Horizontal","", &gazebo::GLFrame::SplitCB, this);
   this->splitChoice->add("Vertical","",  &gazebo::GLFrame::SplitCB, this);
   this->splitChoice->value(0);
+  this->splitChoice->color(BG_COLOR);
 
   this->headerBar->end();
   this->headerBar->resizable(NULL);
@@ -71,42 +78,47 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->glWindow = new GLWindow(x+1,y+30, w-2, h-60);
 
   this->footerBar = new Fl_Group(x,y+h-30,w,30);
-  this->footerBar->box(FL_UP_BOX);
 
   int x1 = this->footerBar->x() + 35;
   int y1 = this->footerBar->y() + 5;
-  this->outputXYZ = new Fl_Output(x1, y1, 150, 20,"XYZ");
-  this->outputXYZ->box(FL_NO_BOX);
+
+  Fl_Group *posGroup = new Fl_Group(x1,y1,280,20);
+  this->outputXYZ = new Fl_Output(x1, y1, 140, 20,"XYZ");
   this->outputXYZ->labelsize(10);
   this->outputXYZ->textsize(10);
-  this->outputXYZ->value("[0.0 0.0 0.0]");
+  this->outputXYZ->value("0.0 0.0 0.0");
+  this->outputXYZ->box(FL_ENGRAVED_BOX);
 
-  x1 += this->outputXYZ->w() + 20;
-  this->outputRPY = new Fl_Output(x1, y1, 150, 20,"RPY");
-  this->outputRPY->box(FL_NO_BOX);
+  x1 += this->outputXYZ->w() + 30;
+  this->outputRPY = new Fl_Output(x1, y1, 140, 20,"RPY");
   this->outputRPY->labelsize(10);
   this->outputRPY->textsize(10);
-  this->outputRPY->value("[0.0 0.0 0.0]");
+  this->outputRPY->value("0.0 0.0 0.0");
+  this->outputRPY->box(FL_ENGRAVED_BOX);
+  posGroup->resizable(NULL);
+  posGroup->end();
 
   x1 += this->outputRPY->w();
 
   Fl_Box *fillerBox = new Fl_Box(x1,y1,this->w() - (x1-x + 175) ,20);
-
   x1 += fillerBox->w();
 
   Fl_Group *statsGroup = new Fl_Group(x1, y1,100,20);
   this->fps = new Fl_Value_Output(x1,y1,25,20,"FPS");
   this->fps->labelsize(10);
   this->fps->textsize(10);
-  this->fps->align(FL_ALIGN_RIGHT);
   this->fps->precision(0);
+  this->fps->color(FL_WHITE);
+  this->fps->box(FL_ENGRAVED_BOX);
 
-  x1 += this->fps->w() + 30;
+  x1 += this->fps->w() + 60;
   this->triangleCount = new Fl_Value_Output(x1,y1,50,20,"Triangles");
   this->triangleCount->labelsize(10);
   this->triangleCount->textsize(10);
-  this->triangleCount->align(FL_ALIGN_RIGHT);
   this->triangleCount->precision(0);
+  this->triangleCount->color(FL_WHITE);
+  this->triangleCount->box(FL_ENGRAVED_BOX);
+
   statsGroup->resizable(NULL);
   statsGroup->end();
 
@@ -186,17 +198,15 @@ void GLFrame::Update()
 
   Pose3d pose = this->glWindow->GetCamera()->GetWorldPose();
 
-  sprintf(buff, "[%6.2f, %6.2f, %6.2f]", pose.pos.x, pose.pos.y, pose.pos.z);
+  sprintf(buff, "%6.2f %6.2f %6.2f", pose.pos.x, pose.pos.y, pose.pos.z);
   this->outputXYZ->value(buff);
 
-  sprintf( buff,"[%6.2f, %6.2f, %6.2f]", RTOD(pose.rot.GetRoll()),
+  sprintf( buff,"%6.2f %6.2f %6.2f", RTOD(pose.rot.GetRoll()),
      RTOD(pose.rot.GetPitch()), RTOD(pose.rot.GetYaw()) );
   this->outputRPY->value(buff);
 
   this->fps->value(this->glWindow->GetAvgFPS());
   this->triangleCount->value(this->glWindow->GetTriangleCount());
-
-  this->footerBar->redraw();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -18,14 +18,14 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Toolbar
+/* Desc: Sidebar
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id$
  */
 
-#ifndef TOOLBAR_HH
-#define TOOLBAR_HH
+#ifndef SIDEBAR_HH
+#define SIDEBAR_HH
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Hold_Browser.H>
@@ -41,14 +41,14 @@ namespace gazebo
 {
   class Common;
 
-  /// \brief Toolbar
-  class Toolbar : public Fl_Group
+  /// \brief Sidebar
+  class Sidebar : public Fl_Group
   {
     /// \brief Constructor
-    public: Toolbar (int x, int y, int w, int h, const char *l=0);
+    public: Sidebar (int x, int y, int w, int h, const char *l=0);
   
     /// \brief Destructor
-    public: virtual ~Toolbar();
+    public: virtual ~Sidebar();
 
     /// \brief Update the toolbar data
     public: void Update();

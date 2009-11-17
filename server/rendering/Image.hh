@@ -54,6 +54,11 @@ namespace gazebo
     public: void SetFromData( const unsigned char *data, unsigned int width,
                      unsigned int height, int scanline_bytes, unsigned int bpp);
 
+    /// \brief Get the image as a data array
+    /// \param data Pointer to a NULL array of char.
+    /// \param count The resulting data array size
+    public: void GetData( unsigned char **data, unsigned int &count );
+
     /// \brief Get the width
     public: unsigned int GetWidth() const;
 

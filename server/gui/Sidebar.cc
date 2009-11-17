@@ -18,7 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-/* Desc: Toolbar
+/* Desc: Sidebar
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  * SVN: $Id$
@@ -34,6 +34,7 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include "Gui.hh"
 #include "World.hh"
 #include "Body.hh"
 #include "Geom.hh"
@@ -44,21 +45,23 @@
 #include "CameraManager.hh"
 #include "OgreVisual.hh"
 #include "OgreCamera.hh"
-#include "Toolbar.hh"
+#include "Sidebar.hh"
 #include "Global.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
+Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
-  this->box(FL_UP_BOX);
+  this->box(FL_NO_BOX);
+  this->color(BG_COLOR);
 
   this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*5,"Models");
   this->entityBrowser->align(FL_ALIGN_TOP);
-  this->entityBrowser->callback( &Toolbar::EntityBrowserCB, this );
+  this->entityBrowser->callback( &Sidebar::EntityBrowserCB, this );
+  this->entityBrowser->color(FL_WHITE);
 
   this->paramColumnWidths[0] = 80;
   this->paramColumnWidths[1] = 120;
@@ -69,35 +72,35 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->paramBrowser->align(FL_ALIGN_TOP);
   this->paramBrowser->column_char('~');
   this->paramBrowser->column_widths( this->paramColumnWidths );
-  this->paramBrowser->callback(&Toolbar::ParamBrowserCB, this);
+  this->paramBrowser->callback(&Sidebar::ParamBrowserCB, this);
+  this->paramBrowser->color(FL_WHITE);
 
   y = this->paramBrowser->y() + this->paramBrowser->h() + 20;
   this->paramInput = new Fl_Input(x+10, y, w-20, 20, "Param:");
   this->paramInput->align(FL_ALIGN_TOP);
   this->paramInput->labelsize(12);
   this->paramInput->when( FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
-  this->paramInput->callback(&Toolbar::ParamInputCB, this);
+  this->paramInput->callback(&Sidebar::ParamInputCB, this);
+  this->paramInput->color(FL_WHITE);
 
   /*
   y = this->paramInput->y() + this->paramInput->h() + 20;
   this->jointChoice = new Fl_Choice(x+50, y, w-70, 20, "Joint:");
-  this->jointChoice->callback(&Toolbar::JointChoiceCB, this);
+  this->jointChoice->callback(&Sidebar::JointChoiceCB, this);
   this->jointChoice->labelsize(12);
 
   y = this->jointChoice->y() + this->jointChoice->h() + 20;
   this->jointForceSlider = new Fl_Value_Slider(x+50, y, w-70, 20, "Force:");
   this->jointForceSlider->labelsize(12);
   this->jointForceSlider->type(FL_HOR_NICE_SLIDER);
-  this->jointForceSlider->callback(&Toolbar::JointForceSliderCB, this);
+  this->jointForceSlider->callback(&Sidebar::JointForceSliderCB, this);
 
   y = this->jointForceSlider->y() + this->jointForceSlider->h() + 20;
   this->jointVelocitySlider = new Fl_Value_Slider(x+50, y, w-70, 20, "Velocity:");
   this->jointVelocitySlider->labelsize(12);
   this->jointVelocitySlider->type(FL_HOR_NICE_SLIDER);
-  this->jointVelocitySlider->callback(&Toolbar::JointVelocitySliderCB, this);
+  this->jointVelocitySlider->callback(&Sidebar::JointVelocitySliderCB, this);
   */
-
-
   this->end();
 
   this->resizable(NULL);
@@ -105,7 +108,7 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Toolbar::~Toolbar()
+Sidebar::~Sidebar()
 {
   delete this->paramBrowser;
   delete this->paramInput;
@@ -115,7 +118,7 @@ Toolbar::~Toolbar()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the toolbar data
-void Toolbar::Update()
+void Sidebar::Update()
 {
   if (this->entityBrowser->size() == 0)
     this->UpdateEntityBrowser();
@@ -181,10 +184,10 @@ void Toolbar::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attribute browser callback
-void Toolbar::ParamBrowserCB( Fl_Widget * w, void *data)
+void Sidebar::ParamBrowserCB( Fl_Widget * w, void *data)
 {
   Fl_Hold_Browser *browser = (Fl_Hold_Browser*)(w);
-  Toolbar *toolbar = (Toolbar*)(data);
+  Sidebar *toolbar = (Sidebar*)(data);
   std::string lineText, lbl;
   int beginLbl = 0;
   int endLbl = 0;
@@ -245,10 +248,10 @@ void Toolbar::ParamBrowserCB( Fl_Widget * w, void *data)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attribute modification callback
-void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
+void Sidebar::ParamInputCB( Fl_Widget *w, void *data)
 {
   Fl_Input *input = (Fl_Input*)(w);
-  Toolbar *toolbar = (Toolbar*)(data);
+  Sidebar *toolbar = (Sidebar*)(data);
   Fl_Hold_Browser *browser = toolbar->paramBrowser;
   int selected = browser->value();
   Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
@@ -319,7 +322,7 @@ void Toolbar::ParamInputCB( Fl_Widget *w, void *data)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Callback for entity browser
-void Toolbar::EntityBrowserCB( Fl_Widget *w, void *data )
+void Sidebar::EntityBrowserCB( Fl_Widget *w, void *data )
 {
   Fl_Hold_Browser *browser = (Fl_Hold_Browser*)(w);
   std::string lineText;
@@ -336,7 +339,7 @@ void Toolbar::EntityBrowserCB( Fl_Widget *w, void *data )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add entity to browser
-void Toolbar::AddEntityToParamBrowser(Common *entity, std::string prefix)
+void Sidebar::AddEntityToParamBrowser(Common *entity, std::string prefix)
 {
   std::vector<Param*> *parameters;
   std::vector<Param*>::iterator iter;
@@ -362,7 +365,7 @@ void Toolbar::AddEntityToParamBrowser(Common *entity, std::string prefix)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the attribute browser
-void Toolbar::AddToParamBrowser(const std::string &line)
+void Sidebar::AddToParamBrowser(const std::string &line)
 {
   if (!this->paramBrowser->text(this->paramCount+1))
   {
@@ -378,7 +381,7 @@ void Toolbar::AddToParamBrowser(const std::string &line)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update entity browser
-void Toolbar::UpdateEntityBrowser()
+void Sidebar::UpdateEntityBrowser()
 {
   std::vector<Model*>::iterator iter;
   std::vector<Model*> models = World::Instance()->GetModels();
@@ -391,9 +394,9 @@ void Toolbar::UpdateEntityBrowser()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Joint choice callback
-void Toolbar::JointChoiceCB( Fl_Widget *w, void *data )
+void Sidebar::JointChoiceCB( Fl_Widget *w, void *data )
 {
-  Toolbar *self = (Toolbar*)(data);
+  Sidebar *self = (Sidebar*)(data);
   Fl_Choice *choice = (Fl_Choice*)(w);
 
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
@@ -412,9 +415,9 @@ void Toolbar::JointChoiceCB( Fl_Widget *w, void *data )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Joint choice callback
-void Toolbar::JointForceSliderCB( Fl_Widget *w, void *data )
+void Sidebar::JointForceSliderCB( Fl_Widget *w, void *data )
 {
-  Toolbar *self = (Toolbar*)(data);
+  Sidebar *self = (Sidebar*)(data);
   Fl_Value_Slider *slider = (Fl_Value_Slider*)(w);
 
   // Only valid when a joint has been selected
@@ -437,9 +440,9 @@ void Toolbar::JointForceSliderCB( Fl_Widget *w, void *data )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Joint velocity slider callback
-void Toolbar::JointVelocitySliderCB( Fl_Widget *w, void *data )
+void Sidebar::JointVelocitySliderCB( Fl_Widget *w, void *data )
 {
-  Toolbar *self = (Toolbar*)(data);
+  Sidebar *self = (Sidebar*)(data);
   Fl_Value_Slider *slider = (Fl_Value_Slider*)(w);
 
   // Only valid when a joint has been selected

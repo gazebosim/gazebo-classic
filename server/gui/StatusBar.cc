@@ -39,19 +39,24 @@
 
 using namespace gazebo;
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
   x += 5;
   y += 5;
 
-  this->box(FL_UP_BOX);
+  this->box(FL_NO_BOX);
+  this->color(BG_COLOR);
 
   this->percentOutput = new Fl_Value_Output(x,y,40,20,"x Real Time");
   this->percentOutput->labelsize(11);
   this->percentOutput->align(FL_ALIGN_RIGHT);
   this->percentOutput->textsize(11);
   this->percentOutput->precision(2);
+  this->percentOutput->box(FL_BORDER_BOX);
+  this->percentOutput->color(FL_WHITE);
 
   x = this->percentOutput->x() + this->percentOutput->w() + 85;
   this->realTime = new Fl_Value_Output(x,y,45,20,"(sec) Real Time");
@@ -59,6 +64,8 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->realTime->textsize(11);
   this->realTime->align(FL_ALIGN_RIGHT);
   this->realTime->precision(2);
+  this->realTime->box(FL_BORDER_BOX);
+  this->realTime->color(FL_WHITE);
 
   x = this->realTime->x() + this->realTime->w() + 105;
   this->simTime = new Fl_Value_Output(x,y,45,20,"(sec) Sim Time");
@@ -66,6 +73,8 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->simTime->textsize(11);
   this->simTime->align(FL_ALIGN_RIGHT);
   this->simTime->precision(2);
+  this->simTime->box(FL_BORDER_BOX);
+  this->simTime->color(FL_WHITE);
 
   x = this->simTime->x() + this->simTime->w() + 100;
   this->pauseTime = new Fl_Value_Output(x,y,45,20,"Pause Time");
@@ -73,21 +82,10 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->pauseTime->textsize(11);
   this->pauseTime->align(FL_ALIGN_RIGHT);
   this->pauseTime->precision(2);
+  this->pauseTime->box(FL_BORDER_BOX);
+  this->pauseTime->color(FL_WHITE);
 
-  x = this->pauseTime->x() + this->pauseTime->w();
-  int width = this->w() - (x + 90);
-  Fl_Box *spacingBox = new Fl_Box(x, y, width, 20);
-
-  x = spacingBox->x() + spacingBox->w();
-  this->playButton = new Fl_Button(x, y, 30, 20, "@||");
-  this->playButton->callback( &gazebo::StatusBar::PlayPauseButtonCB, this );
-
-  x = this->playButton->x() + this->playButton->w() + 15;
-  this->stepButton = new Fl_Button(x, y, 30, 20, "@>|");
-  this->stepButton->callback( &gazebo::StatusBar::StepButtonCB, this );
-  this->stepButton->deactivate();
-
-  this->resizable(spacingBox);
+  this->resizable(NULL);
 
   this->end();
   this->show();
@@ -95,6 +93,8 @@ StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
   this->lastUpdateTime = 0;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 StatusBar::~StatusBar()
 {
 }
@@ -167,10 +167,7 @@ void StatusBar::Update()
       this->realTime->label("(min) Real Time");
     }
 
-    //this->iterations->value(Simulator::Instance()->GetIterations());
     this->percentOutput->value(this->percent);
-
-    //if (Simulator::Instance()->GetRealTime() - this->realTime->value() > 0.1)
 
     this->realTime->value(real);
     this->simTime->value(sim);
@@ -178,46 +175,4 @@ void StatusBar::Update()
 
     this->lastUpdateTime = Simulator::Instance()->GetRealTime();
   }
-
-  if (Simulator::Instance()->IsPaused())
-  {
-    this->playButton->label("@>");
-    this->stepButton->activate();
-  }
-  else
-  {
-    this->playButton->label("@||");
-    this->stepButton->deactivate();
-  }
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Play pause button callback
-void StatusBar::PlayPauseButtonCB( Fl_Widget *w, void *data )
-{
-  StatusBar *sb = (StatusBar*)(data);
-
-  if (strcmp(w->label(), "@||") == 0)
-  {
-    Simulator::Instance()->SetPaused(true);
-
-    sb->stepButton->activate();
-    w->label("@>");
-  }
-  else
-  {
-    Simulator::Instance()->SetPaused(false);
-    sb->stepButton->deactivate();
-    w->label("@||");
-  }
-
-  w->clear_visible_focus();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set button callback
-void StatusBar::StepButtonCB( Fl_Widget * /*w*/, void * /*data*/ )
-{
-  Simulator::Instance()->SetStepInc( true );
 }

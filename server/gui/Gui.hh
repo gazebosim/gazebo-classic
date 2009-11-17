@@ -38,10 +38,13 @@
 #include "Param.hh"
 #include "Vector2.hh"
 
+#define BG_COLOR fl_rgb_color(235,225,208 )
+
 namespace gazebo
 {
 
   class GLWindow;
+  class Sidebar;
   class Toolbar;
   class StatusBar;
   class GLFrameManager;
@@ -83,6 +86,7 @@ namespace gazebo
     public: float GetAvgFPS() const;
 
     private: Toolbar *toolbar;
+    private: Sidebar *sidebar;
     private: StatusBar *statusbar;
     private: GLFrameManager *frameMgr;
 
@@ -91,9 +95,8 @@ namespace gazebo
     private: ParamT<Vector2<int> > *sizeP;
     private: ParamT<Vector2<int> > *posP;
     private: std::vector<Param*> parameters;
-
   };
+
 }
 
 #endif
-

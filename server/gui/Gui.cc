@@ -30,6 +30,7 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Gl_Window.H>
+#include <FL/fl_draw.H>
 
 #include "Global.hh"
 #include "XMLConfig.hh"
@@ -40,17 +41,19 @@
 #include "GLWindow.hh"
 #include "MainMenu.hh"
 #include "Toolbar.hh"
+#include "Sidebar.hh"
 #include "StatusBar.hh"
 #include "Gui.hh"
 
 using namespace gazebo;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Gui::Gui (int x, int y, int width, int height, const std::string &t)
   : Fl_Double_Window(x, y, width, height, t.c_str())
 {
-  Fl::scheme("plastic");
+  this->color(BG_COLOR);
 
   Param::Begin(&this->parameters);
   this->sizeP = new ParamT<Vector2<int> >("size", Vector2<int>(800, 600), 0);
@@ -63,27 +66,23 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
     int toolbarWidth = 250;
 
     // Create a main menu
-    new MainMenu(0,0,w(),30,(char *)"MainMenu");
+    new MainMenu(0, 0, w(), 20, (char *)"MainMenu");
 
-    this->toolbar = new Toolbar(0, 30,
-                                toolbarWidth, this->h() - 60);
+    this->toolbar = new Toolbar(0, 20, this->w(), 30);
+    this->sidebar = new Sidebar(0, 60, toolbarWidth, this->h() - 90);
 
     // Create the frame mamanger
-    this->frameMgr = new GLFrameManager(toolbarWidth, 30, 
-                         this->w()-toolbarWidth, this->h()-60, "");
+    this->frameMgr = new GLFrameManager(toolbarWidth, 60, 
+                         this->w()-toolbarWidth, this->h()-90, "");
 
     // Create the status bar
-    this->statusbar = new StatusBar(0, height-30, 
+    this->statusbar = new StatusBar(0, this->h()-30, 
                          width, 30);
 
     this->statusbar->gui = this;
   }
 
-  // Create the toolbar
-  //this->toolbar = new Toolbar(this->w()-200, 30, 200, this->h()-60);
-
   this->resizable(this->statusbar);
-  //this->resizable(this->toolbar);
   this->resizable(this->frameMgr);
 
   this->end();
@@ -153,7 +152,7 @@ void Gui::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void Gui::Update()
 {
-  this->toolbar->Update();
+  this->sidebar->Update();
   this->statusbar->Update();
   this->frameMgr->Update();
 

@@ -6,6 +6,7 @@ set (sources Gui.cc
              GLWindow.cc
              MainMenu.cc
              Toolbar.cc
+             Sidebar.cc
              StatusBar.cc
              GLFrameManager.cc
              GLFrame.cc
@@ -15,6 +16,7 @@ set (headers Gui.hh
              GLWindow.hh
              MainMenu.hh
              Toolbar.hh
+             Sidebar.hh
              StatusBar.hh
              GLFrameManager.hh
              GLFrame.hh

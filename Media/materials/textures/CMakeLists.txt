@@ -92,6 +92,18 @@ SET (files 10points.png
            smileyDead.png
            smileyPlain.png
            smileyHappy.png
+           green_play_button.png
+           green_stop_button.png
+           green_end_button.png
+           green_pause_button.png
+           grey_pause_button.png
+           grey_play_button.png
+           grey_step_button.png
+           blue_jaiqua.jpg
+           blue_pause_button.png
+           blue_play_button.png
+           blue_step_button.png
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)
+

@@ -36,14 +36,6 @@ using namespace gazebo;
 // Constructor
 GLFrameManager::GLFrameManager(int x, int y, int w, int h, const std::string &name) : Fl_Tile(x,y,w,h, name.c_str())
 {
-  //GLFrame *frame = NULL;
-
-  // Create a deafult view
-  /*frame = new GLFrame(x, y, w, h,"");
-  this->frames.push_back(frame);
-  this->add(frame);
-  */
-
   this->end();
 
   this->resizable(this);
@@ -61,7 +53,6 @@ GLFrameManager::~GLFrameManager()
     if (*iter) 
       delete (*iter);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +67,6 @@ void GLFrameManager::Load( XMLConfigNode *node )
   frame = new GLFrame( this->x(), this->y(), this->w(), this->h(), "" );
   this->frames.push_back( frame );
   this->insert(*frame, windowCount);
- 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
