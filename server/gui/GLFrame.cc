@@ -75,7 +75,7 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->headerBar->end();
   this->headerBar->resizable(NULL);
 
-  this->glWindow = new GLWindow(x+1,y+30, w-2, h-60);
+  this->glWindow = new GLWindow(x+4,y+30, w-8, h-60);
 
   this->footerBar = new Fl_Group(x,y+h-30,w,30);
 
