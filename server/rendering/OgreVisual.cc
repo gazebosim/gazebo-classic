@@ -351,14 +351,22 @@ void OgreVisual::MakeStatic()
   if (!this->staticGeom)
     this->staticGeom = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
-  // Detach the scene node from the parent. Prevents double rendering
-  this->sceneNode->getParent()->removeChild(this->sceneNode);
+  //this->staticGeom->setRegionDimensions(Ogre::Vector3(1,1,1));
+  //this->staticGeom->setOrigin(Ogre::Vector3(2,2,1));
+
+  //this->sceneNode->setVisible(true);
 
   // Add the scene node to the static geometry
   this->staticGeom->addSceneNode(this->sceneNode);
 
   // Build the static geometry
   this->staticGeom->build();
+
+  // Detach the scene node from the parent. Prevents double rendering
+  this->sceneNode->setVisible(false);
+  /*if (this->sceneNode->getParent())
+    this->sceneNode->getParent()->removeChild(this->sceneNode);
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -668,6 +676,17 @@ void OgreVisual::SetPosition( const Vector3 &pos)
     return;
 
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
+
+  if (this->IsStatic())
+  {
+    //this->sceneNode->setParent( this->owner->GetVisu
+    //this->staticGeom->reset();
+    //this->MakeStatic();
+  }
+  else
+  {
+    //std::cout << "Dynamic SceneNodePos[" << this->sceneNode->_getDerivedPosition() << "] [" << pos << "]\n";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

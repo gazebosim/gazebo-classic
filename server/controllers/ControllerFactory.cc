@@ -73,7 +73,8 @@ Controller *ControllerFactory::NewController(const std::string &classname, Entit
 void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string &classname)
 {
 #ifdef HAVE_LTDL
-	
+
+  std::cout << "Load Plugin[" << plugin << "] Classname[" << classname << "]\n";  
 	static bool init_done = false;
 
 	if (!init_done)
@@ -82,7 +83,8 @@ void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string 
 		if (errors)
 		{
 			std::ostringstream stream;
-		    stream << "Error(s) initializing dynamic loader (" << errors << ", " << lt_dlerror() << ")";
+		    stream << "Error(s) initializing dynamic loader (" 
+               << errors << ", " << lt_dlerror() << ")";
 		    gzthrow(stream.str());
 		}
 		else

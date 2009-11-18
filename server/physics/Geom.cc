@@ -132,11 +132,12 @@ void Geom::Load(XMLConfigNode *node)
     if (visual)
     {
       visual->Load(childNode);
-      visual->SetIgnorePoseUpdates(true);
+      //visual->SetIgnorePoseUpdates(true);
 
       this->visuals.push_back(visual);
       visual->SetCastShadows(true);
     }
+
     if (this->IsStatic())
       visual->MakeStatic();
 

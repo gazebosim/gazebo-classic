@@ -62,6 +62,8 @@ namespace gazebo
  */
   class Simulator : public SingletonT<Simulator>
   {
+    public: enum State {LOAD, INIT, RUN};
+
     /// \brief Private constructor
     private: Simulator();
 
@@ -167,6 +169,9 @@ namespace gazebo
     /// \brief Get the simulator mutex
     public:boost::recursive_mutex *GetMRMutex();
 
+    /// \brief Get the state of the simulation
+    public: State GetState() const;
+
     /// \brief Function to run gui. Used by guiThread
     private: void PhysicsLoop();
 
@@ -229,6 +234,8 @@ namespace gazebo
     private: boost::thread *physicsThread;
 
     private: boost::recursive_mutex *mutex;
+
+    private: State state;
 
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;

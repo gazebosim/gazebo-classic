@@ -537,3 +537,26 @@ void OgreAdaptor::RegisterCamera( OgreCamera *cam )
 {
   this->cameras.push_back( cam );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Print scene graph
+void OgreAdaptor::PrintSceneGraph()
+{
+  this->PrintSceneGraphHelper("", this->sceneMgr->getRootSceneNode());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Print scene graph
+void OgreAdaptor::PrintSceneGraphHelper(std::string prefix, 
+                                         Ogre::Node *node)
+{
+  std::cout << prefix << node->getName() << std::endl;
+
+  prefix += "  ";
+  for (unsigned int i=0; i < node->numChildren(); i++)
+  {
+    this->PrintSceneGraphHelper( prefix, node->getChild(i) );
+  }
+}
+
+

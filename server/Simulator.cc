@@ -131,6 +131,8 @@ void Simulator::Close()
 /// Any error that reach this level must make the simulator exit
 void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 {
+  this->state = LOAD;
+
   if (loaded)
   {
     this->Close();
@@ -234,12 +236,15 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 
   this->loaded=true;
 
+  //OgreAdaptor::Instance()->PrintSceneGraph();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the simulation
 void Simulator::Init()
 {
+  this->state = INIT;
+
   //Initialize the world
   try
   {
@@ -325,6 +330,8 @@ void Simulator::Fini( )
 /// Main simulation loop, when this loop ends the simulation finish
 void Simulator::MainLoop()
 {
+  this->state = RUN;
+
   double currTime = 0;
   double lastTime = 0;
   double freq = 80.0;
@@ -725,4 +732,9 @@ boost::recursive_mutex *Simulator::GetMRMutex()
   return this->mutex;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+/// Get the state of the simulation
+Simulator::State Simulator::GetState() const
+{
+  return this->state;
+}

@@ -321,8 +321,11 @@ void Entity::SetRelativeRotation(const Quatern &rot)
 // Handle a change of pose
 void Entity::PoseChange(bool notify)
 {
+  if (Simulator::Instance()->GetState() == Simulator::RUN)
+    this->visualNode->SetDirty(true, this->relativePose);
+  else
+    this->visualNode->SetPose(this->relativePose);
 
-  this->visualNode->SetDirty(true, this->relativePose);
   if (notify)
   {
     this->OnPoseChange();

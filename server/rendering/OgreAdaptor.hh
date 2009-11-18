@@ -108,6 +108,12 @@ namespace gazebo
     /// \brief Register a user camera
     public: void RegisterCamera( OgreCamera *cam );
 
+    public: void PrintSceneGraph();
+
+    /// \brief Print scene graph
+    private: void PrintSceneGraphHelper(std::string prefix, 
+                                        Ogre::Node *node);
+
     private: void LoadPlugins();
     private: void SetupResources();
     private: void SetupRenderSystem();

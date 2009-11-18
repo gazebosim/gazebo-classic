@@ -176,7 +176,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     {
       // Delete the existing one (this should only be reached when called
       // via the factory interface).
-      printf("Queuing duplicate model %s (%p) for deletion\n", scopedName.c_str(), dup);
       World::Instance()->DeleteEntity(scopedName.c_str());
     }
   }
@@ -203,7 +202,9 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   pose.rot = **this->rpyP;
 
   if (this->IsStatic())
+  {
     this->SetRelativePose( pose );
+  }
 
   if (this->type == "physical")
     this->LoadPhysical(node);
