@@ -47,6 +47,7 @@ namespace Ogre
 namespace gazebo
 {
   class XMLConfigNode;
+  class Model;
 
   /// \addtogroup gazebo_rendering
   /// \brief Basic camera 
@@ -211,6 +212,9 @@ namespace gazebo
     /// \brief Set the camera's name
     public: void SetCamName( const std::string &name );
 
+    /// \brief Set the camera to track an entity
+    public: void TrackModel( Model *model );
+
     // Save the camera frame
     protected: virtual void SaveFrame();
 
@@ -222,6 +226,7 @@ namespace gazebo
     protected: unsigned int textureWidth, textureHeight;
   
     protected: Ogre::Camera *camera;
+    protected: Ogre::SceneNode *origParentNode;
     protected: Ogre::SceneNode *sceneNode;
     protected: Ogre::SceneNode *pitchNode;
   

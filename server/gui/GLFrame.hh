@@ -41,6 +41,7 @@ namespace gazebo
   class GLWindow;
   class OgreCamera;
   class XMLConfigNode;
+  class Entity;
 
   class GLFrame : public Fl_Group
   {
@@ -74,11 +75,17 @@ namespace gazebo
     /// \brief Boost slot, called when a new camera is added.
     public: void CameraAddedSlot(OgreCamera *newCamera);
 
+    /// \brief Boost slot, called when a new entity is added.
+    public: void EntityAddedSlot(Entity *newEntity);
+
     /// \brief Split frame callback
     private: static void SplitCB(Fl_Widget *widget, void *data);
 
     /// \brief Switch view callback
     private: static void ViewCB(Fl_Widget *widget, void *data);
+
+    /// \brief Switch view callback
+    private: static void TrackCB(Fl_Widget *widget, void *data);
 
     /// Pointer to the actual render window
     private: GLWindow *glWindow;
@@ -94,6 +101,9 @@ namespace gazebo
 
     /// Split window chooser
     private: Fl_Choice *splitChoice;
+
+    /// Choose to have the camera track an entity
+    private: Fl_Choice *trackChoice;
 
     private: Fl_Output *outputXYZ;
     private: Fl_Output *outputRPY;

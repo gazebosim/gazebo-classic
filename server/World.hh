@@ -30,6 +30,7 @@
 #include <iostream>
 #include <vector>
 #include <boost/tuple/tuple.hpp>
+#include <boost/signal.hpp>
 
 #ifdef USE_THREADPOOL
 #include "boost/threadpool.hpp"
@@ -208,6 +209,13 @@ class World : public SingletonT<World>
   /// \brief Update the simulation iface
   public: void UpdateSimulationIface();
 
+  /// \brief Connect a boost::slot the the add entity signal
+  public: template<typename T>
+          void ConnectAddEntitySignal( T subscriber )
+          {
+            addEntitySignal.connect(subscriber);
+          }
+ 
   /// \brif Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
 
@@ -250,6 +258,7 @@ class World : public SingletonT<World>
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;
 
+  private: boost::signal<void (Entity*)> addEntitySignal;
 };
 
 

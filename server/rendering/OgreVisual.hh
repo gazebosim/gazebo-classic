@@ -154,6 +154,12 @@ namespace gazebo
     /// \brief Return true if the  visual is a static geometry
     public: bool IsStatic() const;
 
+    /// \brief Set one visual to track/follow another
+    public: void EnableTrackVisual( OgreVisual *vis );
+
+    /// \brief Disable tracking of a visual
+    public: void DisableTrackVisual();
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: Ogre::SceneBlendType sceneBlendType;

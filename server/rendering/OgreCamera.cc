@@ -37,6 +37,8 @@
 #include "OgreCreator.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
+#include "Model.hh"
+#include "Body.hh"
 
 #include "OgreAdaptor.hh"
 #include "CameraManager.hh"
@@ -165,6 +167,7 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
   }
 
   this->lastUpdate = Simulator::Instance()->GetSimTime();
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -201,6 +204,8 @@ void OgreCamera::InitCam()
   this->saveCount = 0;
 
   OgreAdaptor::Instance()->RegisterCamera(this);
+
+  this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -691,4 +696,21 @@ void OgreCamera::SaveFrame()
   pCodec->codeToFile(stream, filename, codecDataPtr);
 
   this->saveCount++;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the camera to track an entity
+void OgreCamera::TrackModel( Model *model )
+{
+  this->sceneNode->getParent()->removeChild(this->sceneNode);
+
+  if (model)
+  {
+    Body *b = model->GetCanonicalBody();
+    b->GetVisualNode()->GetSceneNode()->addChild(this->sceneNode);
+  }
+  else
+  {
+    this->origParentNode->addChild(this->sceneNode);
+  }
 }

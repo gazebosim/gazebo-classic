@@ -26,6 +26,8 @@
 
 #include <boost/bind.hpp>
 
+#include "World.hh"
+#include "Model.hh"
 #include "XMLConfig.hh"
 #include "CameraManager.hh"
 #include "Global.hh"
@@ -71,6 +73,15 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->splitChoice->add("Vertical","",  &gazebo::GLFrame::SplitCB, this);
   this->splitChoice->value(0);
   this->splitChoice->color(BG_COLOR);
+
+  this->trackChoice = new Fl_Choice(
+      this->splitChoice->x() + this->splitChoice->w()+2, 
+      this->splitChoice->y(), 150, 26);
+  this->trackChoice->add("Track Model");
+  this->trackChoice->mode(0, FL_MENU_DIVIDER);
+  this->trackChoice->add("None","", &gazebo::GLFrame::TrackCB, this);
+  this->trackChoice->value(0);
+  this->trackChoice->color(BG_COLOR);
 
   this->headerBar->end();
   this->headerBar->resizable(NULL);
@@ -179,6 +190,8 @@ void GLFrame::Init()
 
   CameraManager::Instance()->ConnectAddCameraSignal( boost::bind(&GLFrame::CameraAddedSlot, this, _1) );
 
+  World::Instance()->ConnectAddEntitySignal( boost::bind(&GLFrame::EntityAddedSlot, this, _1) );
+
   // Add all the current cameras
   for (unsigned int i=0; i < CameraManager::Instance()->GetNumCameras(); i++)
   {
@@ -218,6 +231,14 @@ void GLFrame::CameraAddedSlot(OgreCamera *newCamera)
     this->viewChoice->add(newCamera->GetCameraName().c_str(), "", &gazebo::GLFrame::ViewCB, this);
     this->viewChoice->redraw();
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Boost slot, called when a new entity is added.
+void GLFrame::EntityAddedSlot(Entity *newEntity)
+{
+  this->trackChoice->add(newEntity->GetName().c_str(), "", &gazebo::GLFrame::TrackCB, this);
+  this->trackChoice->redraw();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -271,4 +292,21 @@ void GLFrame::SetCameraPose( const Pose3d &pose )
 GLWindow *GLFrame::GetWindow() const
 {
   return this->glWindow;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Switch view callback
+void GLFrame::TrackCB(Fl_Widget *widget, void *data)
+{
+  GLFrame *frame = reinterpret_cast<GLFrame *>(data);
+  Fl_Choice *choice = dynamic_cast<Fl_Choice *>(widget);
+
+  if (std::string(choice->text()) == "None" || 
+      std::string(choice->text()) == "Track Model")
+    frame->glWindow->GetCamera()->TrackModel( NULL );
+  else
+  {
+    Model *model = World::Instance()->GetModelByName(choice->text() );
+    frame->glWindow->GetCamera()->TrackModel( model );
+  }
 }

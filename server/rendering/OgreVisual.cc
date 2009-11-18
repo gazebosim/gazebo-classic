@@ -931,3 +931,16 @@ bool OgreVisual::IsStatic() const
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set one visual to track/follow another
+void OgreVisual::EnableTrackVisual( OgreVisual *vis )
+{
+  this->sceneNode->setAutoTracking(true, vis->GetSceneNode() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Disable tracking of a visual
+void OgreVisual::DisableTrackVisual()
+{
+  this->sceneNode->setAutoTracking(false);
+}

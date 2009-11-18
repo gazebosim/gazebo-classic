@@ -421,6 +421,7 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
     if (node->GetNSPrefix() == "model")
     {
       model = this->LoadModel(node, parent, removeDuplicate);
+      this->addEntitySignal(model);
     }
   }
 
