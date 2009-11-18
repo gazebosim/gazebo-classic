@@ -60,10 +60,12 @@ namespace gazebo
     private: Fl_Button *playButton;
     private: Fl_Button *pauseButton;
     private: Fl_Button *stepButton;
+    private: Fl_Button *moveButton;
 
     private: Fl_RGB_Image *playImage[2];
     private: Fl_RGB_Image *pauseImage[2];
     private: Fl_RGB_Image *stepImage[2];
+
   };
   
 }

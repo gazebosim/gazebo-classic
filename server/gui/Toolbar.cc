@@ -97,7 +97,7 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
 
   x += 5;
   y += 5;
-  this->playButton = new Fl_Button(x, y, 30, 20);
+  this->playButton = new Fl_Button(x, y, 20, 20);
   this->playButton->callback( &gazebo::Toolbar::PlayButtonCB, this );
   this->playButton->color(BG_COLOR, BG_COLOR);
   this->playButton->image(this->playImage[1]);
@@ -105,19 +105,22 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->playButton->deactivate();
 
   x = this->playButton->x() + this->playButton->w() + 10;
-  this->pauseButton = new Fl_Button(x, y, 30, 20);
+  this->pauseButton = new Fl_Button(x, y, 20, 20);
   this->pauseButton->callback( &gazebo::Toolbar::PauseButtonCB, this );
   this->pauseButton->color(BG_COLOR, BG_COLOR);
   this->pauseButton->image(this->pauseImage[0]);
   this->pauseButton->box(FL_NO_BOX);
 
   x = this->pauseButton->x() + this->pauseButton->w() + 10;
-  this->stepButton = new Fl_Button(x, y, 30, 20);
+  this->stepButton = new Fl_Button(x, y, 20, 20);
   this->stepButton->callback( &gazebo::Toolbar::StepButtonCB, this );
   this->stepButton->color(BG_COLOR, BG_COLOR);
   this->stepButton->image(this->stepImage[1]);
   this->stepButton->box(FL_NO_BOX);
   this->stepButton->deactivate();
+
+  //x = this->stepButton->x() + this->stepButton->w() + 10;
+  //this->moveButton = new Fl_Button(x,y,20,20);
 
   this->end();
   this->resizable(NULL);

@@ -135,11 +135,12 @@ void GLFrameManager::Init()
       else
       {
         frame = new GLFrame( x, y, width, height, stream.str() );
-        frame->Load(camNode);
 
         this->frames.push_back( frame );
         this->insert(*frame, i);
       }
+
+      frame->Load(camNode);
 
       i++;
       camNode = camNode->GetNext();
