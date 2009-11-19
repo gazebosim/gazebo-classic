@@ -29,7 +29,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Bitmap.H>
-#include <FL/Fl_RGB_Image.H>
+#include <FL/Fl_Image.H>
 
 #include "Image.hh"
 #include "Gui.hh"
