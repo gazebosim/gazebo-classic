@@ -104,6 +104,9 @@ namespace gazebo
     /// \return The simulation time
     public: double GetSimTime() const;
 
+    /// \brief Set the sim time
+    public: void SetSimTime(double t);
+
     /// Get the pause time
     /// \return The pause time
     public: double GetPauseTime() const;

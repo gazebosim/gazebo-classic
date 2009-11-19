@@ -44,3 +44,4 @@ set (headers OgreMovableText.hh
 add_library(gazebo_rendering SHARED ${sources})
 target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES})
 install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+APPEND_TO_SERVER_HEADERS(${headers})
