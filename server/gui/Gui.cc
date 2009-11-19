@@ -153,6 +153,7 @@ void Gui::Init()
 void Gui::Update()
 {
   this->sidebar->Update();
+  this->toolbar->Update();
   this->statusbar->Update();
   this->frameMgr->Update();
 

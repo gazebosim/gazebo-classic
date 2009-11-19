@@ -202,9 +202,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   pose.rot = **this->rpyP;
 
   if (this->IsStatic())
-  {
     this->SetRelativePose( pose );
-  }
 
   if (this->type == "physical")
     this->LoadPhysical(node);
@@ -1110,7 +1108,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
   sprintf(lightNumBuf, "%d", lightNumber++);
   body->SetName(this->GetName() + "_RenderableBody_" + lightNumBuf);
   //body->SetGravityMode(false);
-  body->SetRelativePose(Pose3d());
+  //body->SetRelativePose(Pose3d());
   this->bodies[body->GetName()] = body;
 
   if (Simulator::Instance()->GetRenderEngineEnabled() && 

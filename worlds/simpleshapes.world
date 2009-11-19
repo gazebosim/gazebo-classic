@@ -122,7 +122,6 @@
     </body:cone>
   </model:physical>
 
-
    <!-- Ground Plane -->
    <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
@@ -144,8 +143,8 @@
 
   <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>-4 4 5</xyz>
-    <static>true</static>
+    <xyz>-2 2 5</xyz>
+    <static>false</static>
 
     <light>
       <type>point</type>
@@ -154,7 +153,7 @@
       <range>20</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.5 0.01 0.001</attenuation>
+      <attenuation>0.1 0.01 0.001</attenuation>
     </light>
   </model:renderable>
  

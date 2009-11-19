@@ -70,16 +70,6 @@
     </body:plane>
   </model:physical>
 
-  <model:physical name="pr2_model">
-    <xyz>0 0 0</xyz>
-    <rpy>0.0 0.0 0.0</rpy>
-
-    <include embedded="true">
-      <xi:include href="models/pr2.model" />
-    </include>
-
-  </model:physical>
-
   <model:renderable name="point_white">
     <xyz>0 3  5</xyz>
     <static>true</static>

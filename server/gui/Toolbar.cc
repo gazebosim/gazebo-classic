@@ -138,13 +138,25 @@ void Toolbar::Update()
 {
   if (Simulator::Instance()->IsPaused())
   {
-    //this->playButton->label("@>");
-    //this->stepButton->activate();
+    this->stepButton->activate();
+    this->stepButton->image(this->stepImage[0]);
+
+    this->pauseButton->deactivate();
+    this->pauseButton->image(this->pauseImage[1]);
+
+    this->playButton->activate();
+    this->playButton->image( this->playImage[0] );
   }
   else
   {
-    //this->playButton->label("@||");
-    //this->stepButton->deactivate();
+    this->stepButton->deactivate();
+    this->stepButton->image(this->stepImage[1]);
+
+    this->pauseButton->activate();
+    this->pauseButton->image(this->pauseImage[0]);
+
+    this->playButton->deactivate();
+    this->playButton->image( this->playImage[1] );
   }
 }
 
@@ -153,18 +165,6 @@ void Toolbar::Update()
 void Toolbar::PlayButtonCB( Fl_Widget *w, void *data )
 {
   Toolbar *tb = (Toolbar*)(data);
-/*
-  if (strcmp(w->label(), "@||") == 0)
-  {
-    Simulator::Instance()->SetPaused(true);
-
-    tb->stepButton->activate();
-    w->label("@>");
-  }
-  else
-  {
-    w->label("@||");
-  }*/
 
   if (Simulator::Instance()->IsPaused())
   {

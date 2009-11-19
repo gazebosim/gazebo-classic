@@ -82,6 +82,8 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
   std::ostringstream stream;
   this->mutex = new boost::recursive_mutex();
 
+  this->dirty = false;
+
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
   this->xyzP->Callback( &OgreVisual::SetPosition, this );
@@ -124,10 +126,11 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 
   this->isStatic = isStatic;
 
-  if (this->isStatic)
+/*  if (this->isStatic)
     this->staticGeom = this->sceneNode->getCreator()->createStaticGeometry(
         this->GetName() + "_staticgeom");
   else
+  */
     this->staticGeom = NULL;
 }
 
@@ -644,8 +647,9 @@ void OgreVisual::SetCastShadows(const bool &shadows)
     obj->setCastShadows(shadows);
   }
 
-  if (this->IsStatic())
+  /*if (this->IsStatic())
     this->staticGeom->setCastShadows(shadows);
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
