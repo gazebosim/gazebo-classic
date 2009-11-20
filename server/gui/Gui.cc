@@ -32,6 +32,7 @@
 #include <FL/Fl_Gl_Window.H>
 #include <FL/fl_draw.H>
 
+#include "World.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "GLFrameManager.hh"
@@ -69,11 +70,18 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
     new MainMenu(0, 0, w(), 20, (char *)"MainMenu");
 
     this->toolbar = new Toolbar(0, 20, this->w(), 30);
-    this->sidebar = new Sidebar(0, 60, toolbarWidth, this->h() - 90);
+    this->sidebar = new Sidebar(0, 60, toolbarWidth, this->h() - 115);
 
     // Create the frame mamanger
     this->frameMgr = new GLFrameManager(toolbarWidth, 60, 
-                         this->w()-toolbarWidth, this->h()-90, "");
+                         this->w()-toolbarWidth, this->h()-115, "");
+
+    this->timeSlider = new Fl_Slider(35,this->h()-50,this->w()-35,20,"Time:" );
+    this->timeSlider->type(FL_HOR_NICE_SLIDER);
+    this->timeSlider->align(FL_ALIGN_LEFT);
+    this->timeSlider->labelsize(10);
+    this->timeSlider->callback(&Gui::TimeSliderCB, this);
+    this->timeSlider->value(1.0);
 
     // Create the status bar
     this->statusbar = new StatusBar(0, this->h()-30, 
@@ -156,6 +164,9 @@ void Gui::Update()
   this->toolbar->Update();
   this->statusbar->Update();
   this->frameMgr->Update();
+  
+  if (!Simulator::Instance()->IsPaused())
+    this->timeSlider->value(1.0);
 
   Fl::check();
 
@@ -204,4 +215,11 @@ float Gui::GetAvgFPS() const
   return this->frameMgr->GetFPS();
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Time slider CB
+void Gui::TimeSliderCB( Fl_Widget * w, void *data)
+{
+  //Gui *self = (Gui*)(data);
+  Fl_Slider *slider = (Fl_Slider*)(w);
+  World::Instance()->GotoTime( slider->value() );
+}

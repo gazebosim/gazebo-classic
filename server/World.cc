@@ -29,6 +29,7 @@
 #include <fstream>
 #include <sys/time.h> //gettimeofday
 
+#include "Body.hh"
 #include "Factory.hh"
 #include "GraphicsIfaceHandler.hh"
 #include "Global.hh"
@@ -72,6 +73,11 @@ World::World()
   this->threadsP = new ParamT<int>("threads",2,0);
   Param::End();
 #endif
+
+  this->worldStates.resize(10000);
+  this->worldStatesInsertIter = this->worldStates.begin();
+  this->worldStatesEndIter = this->worldStates.end()-1;
+  this->worldStatesCurrentIter = this->worldStatesInsertIter;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,6 +332,8 @@ void World::Update()
        Simulator::Instance()->GetPhysicsEnabled())
   {
     this->physicsEngine->UpdatePhysics();
+
+    this->SaveState();
   }
 
   this->factory->Update();
@@ -602,10 +610,17 @@ void World::Reset()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// The plane and heighweighmap will not be registered
+// Register a geom
 void World::RegisterGeom(Geom *geom)
 {
   this->geometries.push_back(geom);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Register a body
+void World::RegisterBody( Body *body )
+{
+  this->bodies.push_back(body);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1302,25 +1317,93 @@ void World::UpdateSimulationIface()
   this->toDeleteModels.clear();
 }
 
-void World::GetInterfaceNames(Entity* en, std::vector<std::string>& list){
-		
-	
+void World::GetInterfaceNames(Entity* en, std::vector<std::string>& list)
+{
 	Model* m = dynamic_cast<Model*>(en);
-	if(m){
+
+	if(m)
 		m->GetModelInterfaceNames(list);
-	}
 	
 	std::vector<Entity*>::iterator citer;
-	for (citer=en->GetChildren().begin();  citer!=en->GetChildren().end(); citer++)
-  	{
-
-	
+	for (citer=en->GetChildren().begin(); citer!=en->GetChildren().end(); citer++)
 		this->GetInterfaceNames((*citer),list);
-	
+}
 
-	}
+////////////////////////////////////////////////////////////////////////////////
+// Save the state of the world
+void World::SaveState()
+{
+  std::vector<Model*>::iterator mIter;
+  std::vector<Body*>::iterator bIter;
+  std::vector<Geom*>::iterator gIter;
 
+  WorldState *ws = &(*this->worldStatesInsertIter);
+  for (mIter = this->models.begin(); mIter != this->models.end(); mIter++)
+    ws->modelPoses[(*mIter)->GetName()] = (*mIter)->GetRelativePose();
+
+  for (bIter = this->bodies.begin(); bIter !=this->bodies.end(); bIter++)
+    ws->bodyPoses[(*bIter)->GetName()] = (*bIter)->GetRelativePose();
+
+  for (gIter = this->geometries.begin(); gIter !=this->geometries.end(); 
+       gIter++)
+    ws->geomPoses[(*gIter)->GetName()] = (*gIter)->GetRelativePose();
+
+  this->worldStatesInsertIter++;
+  if (this->worldStatesInsertIter == this->worldStates.end())
+    this->worldStatesInsertIter = this->worldStates.begin();
+
+  if (this->worldStatesInsertIter == this->worldStatesEndIter)
+  {
+    this->worldStatesEndIter++;
+    if (this->worldStatesEndIter == this->worldStates.end())
+      this->worldStatesEndIter = this->worldStates.begin();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the state of the world to the pos pointed to by the iterator
+void World::SetState(std::deque<WorldState>::iterator iter)
+{
+  std::vector<Model*>::iterator mIter;
+  std::vector<Body*>::iterator bIter;
+  std::vector<Geom*>::iterator gIter;
+
+  WorldState *ws = &(*iter);
+  for (mIter = this->models.begin(); mIter != this->models.end(); mIter++)
+    (*mIter)->SetRelativePose( ws->modelPoses[(*mIter)->GetName()] );
+
+  for (bIter = this->bodies.begin(); bIter !=this->bodies.end(); bIter++)
+    (*bIter)->SetRelativePose( ws->bodyPoses[(*bIter)->GetName()] );
+
+  for (gIter = this->geometries.begin(); gIter !=this->geometries.end(); 
+       gIter++)
+    (*gIter)->SetRelativePose( ws->geomPoses[(*gIter)->GetName()] );
+
+  this->worldStatesCurrentIter = iter;
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Goto a position in time
+void World::GotoTime(double pos)
+{
+  Simulator::Instance()->SetPaused(true);
 
+  this->worldStatesCurrentIter = this->worldStatesInsertIter;
+
+  int i = (int)(this->worldStates.size() * (1.0-pos));
+
+  if (this->worldStatesCurrentIter == this->worldStates.begin())
+    this->worldStatesCurrentIter = this->worldStates.end()--;
+
+  for (;i>=0;i--, this->worldStatesCurrentIter--)
+  {
+    if (this->worldStatesCurrentIter == this->worldStates.begin())
+      this->worldStatesCurrentIter = this->worldStates.end()-1;
+
+    if (this->worldStatesCurrentIter == this->worldStatesEndIter)
+      break;
+  }
+
+  this->SetState(this->worldStatesCurrentIter);
+}

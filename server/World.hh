@@ -29,6 +29,10 @@
 
 #include <iostream>
 #include <vector>
+#include <deque>
+#include <map>
+#include <string>
+
 #include <boost/tuple/tuple.hpp>
 #include <boost/signal.hpp>
 
@@ -59,6 +63,7 @@ namespace gazebo
   class GraphicsIfaceHandler;
   class OpenAL;
   class Factory;
+  class WorldState;
    
 /// \brief The World
 /*
@@ -154,8 +159,11 @@ class World : public SingletonT<World>
   /// \brief Reset the simulation to the initial settings
   public: void Reset();
 
-  /// \brief register a geom This method is no more than a manually-done signal system
+  /// \brief register a geom
   public: void RegisterGeom(Geom *geom);
+
+  /// \brief Register a body 
+  public: void RegisterBody(Body *body);
 
   // User control of how the world is viewed 
   // If this section grows it may become a model-view structure ...
@@ -182,6 +190,15 @@ class World : public SingletonT<World>
 
   /// \brief Get whether to view as wireframe
   public: bool GetShowPhysics();
+
+  /// \brief Goto a position in time
+  public: void GotoTime(double pos);
+
+  /// \brief Save the state of the world
+  private: void SaveState();
+
+  /// \breif Set the state of the world to the pos pointed to by the iterator
+  private: void SetState(std::deque<WorldState>::iterator iter);
 
   /// Set to true to show bounding boxes
   private: bool showBoundingBoxes;
@@ -228,6 +245,9 @@ class World : public SingletonT<World>
   /// List of all the registered geometries
   private: std::vector< Geom* > geometries;
 
+  /// List of all the registered bodies
+  private: std::vector< Body* > bodies;
+
   /// List of models to delete from the world
   private: std::vector< Model* > toDeleteModels;
 
@@ -259,8 +279,19 @@ class World : public SingletonT<World>
   private: friend class SingletonT<World>;
 
   private: boost::signal<void (Entity*)> addEntitySignal;
+
+  private: std::deque<WorldState> worldStates;
+  private: std::deque<WorldState>::iterator worldStatesInsertIter;
+  private: std::deque<WorldState>::iterator worldStatesEndIter;
+  private: std::deque<WorldState>::iterator worldStatesCurrentIter;
 };
 
+class WorldState
+{
+  public: std::map<std::string, Pose3d> modelPoses;
+  public: std::map<std::string, Pose3d> bodyPoses;
+  public: std::map<std::string, Pose3d> geomPoses;
+};
 
 /// \}
 }

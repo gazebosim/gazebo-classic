@@ -206,6 +206,8 @@ void Body::Load(XMLConfigNode *node)
     this->LoadSensor(childNode);
     childNode = childNode->GetNextByNSPrefix("sensor");
   }
+
+  World::Instance()->RegisterBody(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

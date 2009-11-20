@@ -32,17 +32,18 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Slider.H>
 #include <string>
 #include <iostream>
 
 #include "Param.hh"
 #include "Vector2.hh"
 
-#define BG_COLOR fl_rgb_color(235,225,208 )
+//#define BG_COLOR fl_rgb_color(235,225,208 )
+#define BG_COLOR FL_BACKGROUND_COLOR
 
 namespace gazebo
 {
-
   class GLWindow;
   class Sidebar;
   class Toolbar;
@@ -85,6 +86,9 @@ namespace gazebo
     /// \brief Get the average FPS
     public: float GetAvgFPS() const;
 
+    /// \brief Time slider cb
+    private: static void TimeSliderCB( Fl_Widget * w, void *data);
+
     private: Toolbar *toolbar;
     private: Sidebar *sidebar;
     private: StatusBar *statusbar;
@@ -95,8 +99,9 @@ namespace gazebo
     private: ParamT<Vector2<int> > *sizeP;
     private: ParamT<Vector2<int> > *posP;
     private: std::vector<Param*> parameters;
-  };
 
+    private: Fl_Slider *timeSlider;
+  };
 }
 
 #endif
