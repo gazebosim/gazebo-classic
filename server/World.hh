@@ -200,6 +200,9 @@ class World : public SingletonT<World>
   /// \breif Set the state of the world to the pos pointed to by the iterator
   private: void SetState(std::deque<WorldState>::iterator iter);
 
+  /// \brief Pause callback
+  private: void PauseSlot(bool p);
+
   /// Set to true to show bounding boxes
   private: bool showBoundingBoxes;
 

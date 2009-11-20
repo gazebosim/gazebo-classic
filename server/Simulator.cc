@@ -421,6 +421,11 @@ bool Simulator::IsPaused() const
 void Simulator::SetPaused(bool p)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  if (this->pause == p)
+    return;
+
+  this->pauseSignal(p);
   this->pause = p;
 }
 
@@ -647,7 +652,7 @@ void Simulator::PhysicsLoop()
     if (!this->IsPaused() || this->GetStepInc())
     {
       this->simTime += step;
-      this->SetPaused(false);
+      //this->SetPaused(false);
 
       if (this->GetStepInc())
           userStepped = true;

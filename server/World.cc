@@ -76,7 +76,7 @@ World::World()
 
   this->worldStates.resize(10000);
   this->worldStatesInsertIter = this->worldStates.begin();
-  this->worldStatesEndIter = this->worldStates.end()-1;
+  this->worldStatesEndIter = this->worldStates.begin();
   this->worldStatesCurrentIter = this->worldStatesInsertIter;
 }
 
@@ -145,6 +145,9 @@ void World::Close()
 // Load the world
 void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 {
+  Simulator::Instance()->ConnectPauseSignal( 
+      boost::bind(&World::PauseSlot, this, _1) );
+  
   // Create the server object (needs to be done before models initialize)
   this->server = new Server();
 
@@ -286,8 +289,6 @@ void World::Update()
   {
     if (Simulator::Instance()->GetSimTime() >= this->simPauseTime)
     {
-      //printf("SimTime[%f] PauseTime[%f]\n", Simulator::Instance()->GetSimTime(), this->simPauseTime);
-
       this->simPauseTime = 0;
       Simulator::Instance()->SetPaused(true);
 
@@ -1356,8 +1357,11 @@ void World::SaveState()
   {
     this->worldStatesEndIter++;
     if (this->worldStatesEndIter == this->worldStates.end())
+    {
       this->worldStatesEndIter = this->worldStates.begin();
+    }
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1391,19 +1395,29 @@ void World::GotoTime(double pos)
 
   this->worldStatesCurrentIter = this->worldStatesInsertIter;
 
-  int i = (int)(this->worldStates.size() * (1.0-pos));
+  int diff = this->worldStatesInsertIter - this->worldStatesEndIter;
+
+  int i = (int)(diff * (1.0-pos));
 
   if (this->worldStatesCurrentIter == this->worldStates.begin())
     this->worldStatesCurrentIter = this->worldStates.end()--;
 
-  for (;i>=0;i--, this->worldStatesCurrentIter--)
+  for (;i>=0; i--, this->worldStatesCurrentIter--)
   {
-    if (this->worldStatesCurrentIter == this->worldStates.begin())
-      this->worldStatesCurrentIter = this->worldStates.end()-1;
-
     if (this->worldStatesCurrentIter == this->worldStatesEndIter)
       break;
+
+    if (this->worldStatesCurrentIter == this->worldStates.begin())
+      this->worldStatesCurrentIter = this->worldStates.end()-1;
   }
 
   this->SetState(this->worldStatesCurrentIter);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Pause callback
+void World::PauseSlot(bool p)
+{
+  if (!p)
+    this->worldStatesInsertIter = this->worldStatesCurrentIter;
 }

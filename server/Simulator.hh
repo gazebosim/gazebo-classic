@@ -28,6 +28,7 @@
 
 #include <string>
 #include <boost/thread.hpp>
+#include <boost/signal.hpp>
 
 #include "SingletonT.hh"
 
@@ -175,6 +176,13 @@ namespace gazebo
     /// \brief Get the state of the simulation
     public: State GetState() const;
 
+    /// \brief Connect a boost::slot the the pause signal
+    public: template<typename T>
+            void ConnectPauseSignal( T subscriber )
+            {
+              pauseSignal.connect(subscriber);
+            }
+ 
     /// \brief Function to run gui. Used by guiThread
     private: void PhysicsLoop();
 
@@ -240,10 +248,14 @@ namespace gazebo
 
     private: State state;
 
+    private: boost::signal<void (bool)> pauseSignal;
+
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;
     private: friend class SingletonT<Simulator>;
+
 };
+
 
 /// \}
 }
