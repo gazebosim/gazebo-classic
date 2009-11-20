@@ -33,7 +33,7 @@ SET (gazebocontroller_sources_desc "List of controller sources"
 SET (bullet_link_libs_desc "List of bullet link libraries" 
      CACHE INTERNAL "Bullet link libs description" FORCE)
 
-SET (OGRE_VERSION 1.6.4 CACHE INTERNAL "Ogre version requirement" FORCE)
+SET (OGRE_VERSION 1.6.3 CACHE INTERNAL "Ogre version requirement" FORCE)
 
 SET (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
 SET (FREEIMAGE_MINOR_VERSION 10 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
