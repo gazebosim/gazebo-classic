@@ -54,7 +54,7 @@
     <size>1365 1085</size>
     <pos>5 49</pos>
     <frames>
-      <camera width="1115" height="995" x="250"
+      <camera width="1115" height="965" x="250"
         y="60">
         <xyz>1.9 -2.53 1.65</xyz>
         <rpy>0 14.6 113.70</rpy>

@@ -63,6 +63,7 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->viewChoice->value(0);
   this->viewChoice->color(BG_COLOR);
 
+
   this->splitChoice = new Fl_Choice(
       this->viewChoice->x() + this->viewChoice->w()+2, 
       this->viewChoice->y(), 150, 26);
@@ -82,6 +83,12 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->trackChoice->add("None","", &gazebo::GLFrame::TrackCB, this);
   this->trackChoice->value(0);
   this->trackChoice->color(BG_COLOR);
+
+  std::vector<Model*> models = World::Instance()->GetModels();
+  std::vector<Model*>::iterator iter;
+  for (iter = models.begin(); iter != models.end(); iter++)
+    this->EntityAddedSlot(*iter);
+
 
   this->headerBar->end();
   this->headerBar->resizable(NULL);
