@@ -27,6 +27,10 @@
 #ifndef GEOM_HH
 #define GEOM_HH
 
+#include <boost/signal.hpp>
+#include <boost/bind.hpp>
+
+#include "Contact.hh"
 #include "Shape.hh"
 #include "Param.hh"
 #include "Entity.hh"
@@ -38,7 +42,7 @@ namespace gazebo
 {
   class Model;
   class Body;
-  class ContactParams;
+  class SurfaceParams;
   class XMLConfigNode;
   class OgreVisual;
   class PhysicsEngine;
@@ -143,11 +147,31 @@ namespace gazebo
     /// \brief Get the attached shape
     public: Shape *GetShape() const;
 
+    /// \brief Add an occurance of a contact to this geom
+    public: void AddContact(const Contact &contact);
+
+    /// \brief Clear all contact info
+    public: void ClearContacts();
+
+    /// \brief Get the number of contacts
+    public: unsigned int GetContactCount() const;
+            
+    /// \brief Get a specific contact
+    public: Contact GetContact(unsigned int i) const;
+
+    public: template< typename C>
+            void ContactCallback( void (C::*func)(const Contact&), C *c )
+            {
+              contactSignal.connect( boost::bind(func, c, _1) );
+            }
+ 
     /// \brief Create the bounding box for the geom
     private: void CreateBoundingBox();
 
     ///  Contact parameters
-    public: ContactParams *contact; 
+    public: SurfaceParams *surface; 
+
+    public: std::vector<Contact> contacts;
  
     /// The body this geom belongs to
     protected: Body *body;
@@ -181,6 +205,8 @@ namespace gazebo
     protected: PhysicsEngine *physicsEngine;
 
     protected: Shape *shape;
+
+    public: boost::signal< void (const Contact &)> contactSignal;
   };
 
   /// \}

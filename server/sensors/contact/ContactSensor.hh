@@ -34,12 +34,12 @@
 #include "Angle.hh"
 #include "Sensor.hh"
 #include "Body.hh"
+#include "Contact.hh"
 
 namespace gazebo
 {
 
   class XMLConfigNode;
-  class ContactParams;
 
   /// \addtogroup gazebo_sensor
   /// \brief Contact sensor.
@@ -61,64 +61,35 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~ContactSensor();
 
-    /// \brief Return the number of contacts
-    public: unsigned int GetContactCount() const;
-
-    /// \brief Get a contact time
-    public: double GetContactTime(unsigned int index) const;
-
-    /// \brief Return a contact state
-    public: uint8_t GetContactState(unsigned int index) const;
-
-    /// \brief Return contact geometry name
-    public: std::string GetContactGeomName(unsigned int index) const;
-
-    /// \brief Return contact force on the first body
-    public:  Vector3 GetContactBody1Force(unsigned int index) const;
-
-    /// \brief Return contact force on the second body
-    public:  Vector3 GetContactBody2Force(unsigned int index) const;
-
-    /// \brief Return geometry name
-    public: std::string GetGeomName(unsigned int index) const;
-
-    /// \brief Reset the contact states
-    public: void ResetContactStates();
-
     /// Load the contact sensor using parameter from an XMLConfig node
     /// \param node The XMLConfig node
     protected: virtual void LoadChild(XMLConfigNode *node);
   
-    /// \brief Save the sensor info in XML format
-    protected: virtual void SaveChild(std::string &prefix,std::ostream &stream);
-
     /// Initialize the sensor
     protected: virtual void InitChild();
   
     ///  Update sensed values
     protected: virtual void UpdateChild();
-    
+
+     /// \brief Save the sensor info in XML format
+    protected: virtual void SaveChild(std::string &prefix,std::ostream &stream);
+   
     /// Finalize the sensor
     protected: virtual void FiniChild();
 
-    /// \brief Contact callback
-    private: void ContactCallback(Geom *g1, Geom *g2);
+    /// \brief Get the number of geoms that the sensor is observing
+    public: unsigned int GetGeomCount() const;
+
+    /// \brief Return the number of contacts for an observed geom
+    public: unsigned int GetGeomContactCount(unsigned int geomIndex) const;
+
+    /// \brief Get a contact for a geom by index
+    public: Contact GetContact(unsigned int geom, unsigned int index) const;
 
     /// Geom name parameter
     private: std::vector< ParamT<std::string> *> geomNamesP;
 
-    private: class ContactState
-             {
-               public: std::string name;
-               public: Vector3 body1Force;
-               public: Vector3 body2Force;
-               public: Vector3 body1Torque;
-               public: Vector3 body2Torque;
-               public: double time;
-               public: uint8_t state;
-             };
-
-    private: std::vector<ContactState> contacts;
+    private: std::vector<Geom *> geoms;
   };
   /// \}
   /// \}

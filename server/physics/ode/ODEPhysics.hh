@@ -163,8 +163,7 @@ class ODEPhysics : public PhysicsEngine
   private: class ContactFeedback
            {
              public: dJointFeedback feedback;
-             public: Geom *geom1;
-             public: Geom *geom2;
+             public: Contact contact;
            };
 
   private: std::vector<ContactFeedback> contactFeedbacks;

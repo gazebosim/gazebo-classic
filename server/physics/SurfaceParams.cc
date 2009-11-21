@@ -26,13 +26,13 @@
 
 #include <float.h>
 #include "XMLConfig.hh"
-#include "ContactParams.hh"
+#include "SurfaceParams.hh"
 
 using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Default constructor
-ContactParams::ContactParams()
+SurfaceParams::SurfaceParams()
 {
   this->kp = 100000000.0;
 
@@ -57,7 +57,7 @@ ContactParams::ContactParams()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the contact params
-void ContactParams::Load(XMLConfigNode *node)
+void SurfaceParams::Load(XMLConfigNode *node)
 {
   this->kp = node->GetDouble("kp",this->kp);
   this->kd = node->GetDouble("kd",this->kd);

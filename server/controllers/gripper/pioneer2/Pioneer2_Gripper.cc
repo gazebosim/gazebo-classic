@@ -29,7 +29,6 @@
 
 #include "PhysicsEngine.hh"
 #include "Geom.hh"
-#include "ContactParams.hh"
 #include "Simulator.hh"
 #include "RaySensor.hh"
 #include "Global.hh"
@@ -193,8 +192,8 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   this->holdJoint = World::Instance()->GetPhysicsEngine()->CreateJoint(Joint::SLIDER);
   this->holdJoint->SetName(this->GetName() + "_Hold_Joint");
 
-  this->paddles[LEFT]->contact->Callback(&Pioneer2_Gripper::LeftPaddleCB, this);
-  this->paddles[RIGHT]->contact->Callback(&Pioneer2_Gripper::RightPaddleCB, this);
+  this->paddles[LEFT]->ContactCallback(&Pioneer2_Gripper::LeftPaddleCB, this);
+  this->paddles[RIGHT]->ContactCallback(&Pioneer2_Gripper::RightPaddleCB, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -366,20 +365,20 @@ void Pioneer2_Gripper::FiniChild()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Left paddle contact callback
-void Pioneer2_Gripper::LeftPaddleCB(Geom *g1, Geom *g2)
+void Pioneer2_Gripper::LeftPaddleCB(const Contact &contact)
 {
-  if (g1->GetName() != this->paddles[LEFT]->GetName())
-    this->contactGeoms[LEFT] = g1;
+  if (contact.geom1->GetName() != this->paddles[LEFT]->GetName())
+    this->contactGeoms[LEFT] = contact.geom1;
   else
-    this->contactGeoms[LEFT] = g2;
+    this->contactGeoms[LEFT] = contact.geom2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Right paddle contact callback
-void Pioneer2_Gripper::RightPaddleCB(Geom *g1, Geom *g2)
+void Pioneer2_Gripper::RightPaddleCB(const Contact &contact)
 {
-  if (g1->GetName() != this->paddles[RIGHT]->GetName())
-    this->contactGeoms[RIGHT] = g1;
+  if (contact.geom1->GetName() != this->paddles[RIGHT]->GetName())
+    this->contactGeoms[RIGHT] = contact.geom1;
   else
-    this->contactGeoms[RIGHT] = g2;
+    this->contactGeoms[RIGHT] = contact.geom2;
 }

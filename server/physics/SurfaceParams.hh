@@ -27,31 +27,21 @@
 #ifndef CONTACTPARAMS_HH
 #define CONTACTPARAMS_HH
 
-#include <boost/signal.hpp>
-#include <boost/bind.hpp>
-
 namespace gazebo
 {
-
   class Geom;
 
   class XMLConfigNode;
 
-  /// \brief Contact params
-  class ContactParams
+  /// \brief Surface params
+  class SurfaceParams
   {
     /// Constructor
-    public: ContactParams();
+    public: SurfaceParams();
   
     /// \brief Load the contact params
     public: void Load(XMLConfigNode *node);
-  
-    public: template< typename C>
-            void Callback( void (C::*func)(Geom *, Geom*), C *c )
-            {
-              contactSignal.connect( boost::bind( func, c, _1, _2 ) );
-            }
-  
+ 
     /// Spring constant
     public: double kp;   
   
@@ -81,12 +71,6 @@ namespace gazebo
 
     public: bool enableFriction;
 
-    public: Vector3 body1Force;
-    public: Vector3 body1Torque;
-    public: Vector3 body2Force;
-    public: Vector3 body2Torque;
-
-    public: boost::signal< void (Geom*, Geom*)> contactSignal;
   };
 }
 

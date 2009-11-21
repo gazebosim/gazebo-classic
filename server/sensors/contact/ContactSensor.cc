@@ -35,7 +35,6 @@
 #include "Simulator.hh"
 #include "SensorFactory.hh"
 #include "Geom.hh"
-#include "ContactParams.hh"
 #include "ContactSensor.hh"
 
 #include "Vector3.hh"
@@ -59,93 +58,13 @@ ContactSensor::ContactSensor(Body *body)
 ContactSensor::~ContactSensor()
 {
   std::vector< ParamT<std::string> *>::iterator iter;
-  std::vector<ContactState>::iterator citer;
+  std::vector<Contact>::iterator citer;
 
   for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
     delete *iter;
   this->geomNamesP.clear();
 
-  this->contacts.clear();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Get the contact time
-double ContactSensor::GetContactTime(unsigned int index) const
-{
-  if (index < this->contacts.size())
-    return this->contacts[index].time;
-
-  return 0;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Return the number of contacts
-unsigned int ContactSensor::GetContactCount() const
-{
-  return this->contacts.size();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Return the contact states
-uint8_t ContactSensor::GetContactState(unsigned int index) const
-{
-  if (index < this->contacts.size())
-    return this->contacts[index].state;
-
-  return 0;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Return the contact geom name
-std::string ContactSensor::GetContactGeomName(unsigned int index) const
-{
-  if (index < this->contacts.size())
-    return this->contacts[index].name;
-
-  return std::string("");
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Return contact force on the first body
-Vector3 ContactSensor::GetContactBody1Force(unsigned int index) const
-{
-  Vector3 result;
-
-  if (index < this->contacts.size())
-    result = this->contacts[index].body1Force;
- 
-  return result; 
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Return contact force on the second body
-Vector3 ContactSensor::GetContactBody2Force(unsigned int index) const
-{
-  Vector3 result;
-
-  if (index < this->contacts.size())
-    result = this->contacts[index].body2Force;
- 
-  return result; 
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Return the self geom name
-std::string ContactSensor::GetGeomName(unsigned int index) const
-{
-  if (index < this->contacts.size())
-    return this->contacts[index].name;
-
-  return std::string("");
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Reset the contact states
-void ContactSensor::ResetContactStates()
-{
-  std::vector<ContactState>::iterator iter;
-  for (iter = this->contacts.begin(); iter != this->contacts.end(); iter++)
-    (*iter).state = 0;
+  this->geoms.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -159,6 +78,7 @@ void ContactSensor::LoadChild(XMLConfigNode *node)
 
   Param::Begin(&this->parameters);
   geomNode = node->GetChild("geom");
+
   while (geomNode)
   {
     ParamT<std::string> *geomName = new ParamT<std::string>("geom","",1);
@@ -167,6 +87,20 @@ void ContactSensor::LoadChild(XMLConfigNode *node)
     geomNode = geomNode->GetNext("geom");
   }
   Param::End();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Init the contact
+void ContactSensor::InitChild()
+{
+  std::vector< ParamT<std::string> *>::iterator iter;
+
+  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
+  {
+    // Get the geom from the body
+    Geom *geom = this->body->GetGeom( **(*iter) );
+    this->geoms.push_back(geom);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -180,22 +114,10 @@ void ContactSensor::SaveChild(std::string &prefix, std::ostream &stream)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Init the contact
-void ContactSensor::InitChild()
+// Update the sensor information
+void ContactSensor::UpdateChild()
 {
-  std::vector< ParamT<std::string> *>::iterator iter;
-
-  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
-  {
-    // Get the geom from the body
-    Geom *geom = this->body->GetGeom( **(*iter) );
-
-    // Set the callback
-    if (geom)
-      geom->contact->Callback( &ContactSensor::ContactCallback, this );
-    else
-      gzthrow("Unable to find geom[" + **(*iter) + "]");
-  }
+  //this->contacts.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -205,38 +127,28 @@ void ContactSensor::FiniChild()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Update the sensor information
-void ContactSensor::UpdateChild()
+/// Get the number of geoms that the sensor is observing
+unsigned int ContactSensor::GetGeomCount() const
 {
+  return this->geoms.size();
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Contact callback
-void ContactSensor::ContactCallback(Geom *g1, Geom *g2)
+/// Return the number of contacts for an observed geom
+unsigned int ContactSensor::GetGeomContactCount(unsigned int geomIndex) const
 {
-  // somehow here, extract contact information when user requests it
-  //
-  std::vector< ParamT<std::string> *>::iterator iter;
-  unsigned int i = 0;
+  if (geomIndex < this->geoms.size())
+    return this->geoms[geomIndex]->GetContactCount();
 
-  for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
-  {
-    if ( **(*iter) == g1->GetName() || **(*iter) == g2->GetName() )
-    {
-      if (i >= this->contacts.size())
-        this->contacts.resize( this->contacts.size() + 10);
-
-      this->contacts[i].state = 1;
-      this->contacts[i].time = Simulator::Instance()->GetRealTime();
-      this->contacts[i].name = **(*iter)==g1->GetName()? g2->GetName() : g1->GetName();
-      this->contacts[i].body1Force = g1->contact->body1Force;
-      this->contacts[i].body2Force = g1->contact->body2Force;
-      this->contacts[i].body1Torque = g1->contact->body1Torque;
-      this->contacts[i].body2Torque = g1->contact->body2Torque;
-      i++;
-    }
-  }
-
+  return 0;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+/// Get a contact for a geom by index
+Contact ContactSensor::GetContact(unsigned int geom, unsigned int index) const
+{
+  if (geom < this->geoms.size())
+    return this->geoms[geom]->GetContact( index );
 
+  return Contact();
+}

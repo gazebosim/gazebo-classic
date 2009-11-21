@@ -33,7 +33,7 @@
 #include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
-#include "ContactParams.hh"
+#include "SurfaceParams.hh"
 #include "World.hh"
 #include "ODEBody.hh"
 #include "Simulator.hh"

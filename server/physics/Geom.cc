@@ -33,7 +33,7 @@
 #include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
-#include "ContactParams.hh"
+#include "SurfaceParams.hh"
 #include "World.hh"
 #include "Body.hh"
 #include "Geom.hh"
@@ -53,7 +53,7 @@ Geom::Geom( Body *body )
   this->body = body;
 
   // Create the contact parameters
-  this->contact = new ContactParams();
+  this->surface = new SurfaceParams();
 
   this->bbVisual = NULL;
 
@@ -112,7 +112,7 @@ void Geom::Load(XMLConfigNode *node)
 
   this->mass.SetMass( **this->massP );
 
-  this->contact->Load(node);
+  this->surface->Load(node);
 
   this->shape->Load(node);
 
@@ -240,6 +240,7 @@ void Geom::SetGeom(bool placeable)
 // Update
 void Geom::Update()
 {
+  this->ClearContacts();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -248,43 +249,6 @@ bool Geom::IsPlaceable() const
 {
   return this->placeable;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the mass of the geom
-/*const dMass *Geom::GetBodyMassMatrix()
-{
-
-  Pose3d pose;
-  dQuaternion q;
-  dMatrix3 r;
-
-  if (!this->placeable)
-    return NULL;
-
-  this->physicsEngine->LockMutex();
-  pose = this->GetPose(); // get pose of the geometry
-
-  q[0] = pose.rot.u;
-  q[1] = pose.rot.x;
-  q[2] = pose.rot.y;
-  q[3] = pose.rot.z;
-
-  dQtoR(q,r); // turn quaternion into rotation matrix
-
-  // this->mass was init to zero at start,
-  // read user specified mass into this->dblMass and dMassAdd in this->mass
-  this->bodyMass = this->mass;
-
-
-  if (dMassCheck(&this->bodyMass))
-  {
-    dMassRotate(&this->bodyMass, r);
-    dMassTranslate( &this->bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
-  }
-  this->physicsEngine->UnlockMutex();
-
-  return &this->bodyMass;
-}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the laser fiducial integer id
@@ -425,7 +389,7 @@ Model *Geom::GetModel() const
 /// Set the friction mode of the geom
 void Geom::SetFrictionMode( const bool &v )
 {
-  this->contact->enableFriction = v;
+  this->surface->enableFriction = v;
 }
 
 
@@ -457,5 +421,36 @@ Shape *Geom::GetShape() const
   return this->shape;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Add an occurance of a contact to this geom
+void Geom::AddContact(const Contact &contact)
+{
+  this->contacts.push_back( contact.Clone() );
+  this->contactSignal( contact );
+}
 
+////////////////////////////////////////////////////////////////////////////////
+/// Clear all contact info
+void Geom::ClearContacts()
+{
+  this->contacts.clear();
+}
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of contacts
+unsigned int Geom::GetContactCount() const
+{
+  return this->contacts.size();
+}
+            
+////////////////////////////////////////////////////////////////////////////////
+/// Get a specific contact
+Contact Geom::GetContact(unsigned int i) const
+{
+  if (i < this->contacts.size())
+    return this->contacts[i];
+  else
+    gzerr(0) << "Invalid contact index\n";
+
+  return Contact();
+}

@@ -68,10 +68,10 @@ class Pioneer2_Gripper : public Controller
   public: virtual ~Pioneer2_Gripper();
 
   /// \brief Left paddle contact callback
-  public: void LeftPaddleCB(Geom *g1, Geom *g2);
+  public: void LeftPaddleCB(const Contact &contact);
 
   /// \brief Right paddle contact callback
-  public: void RightPaddleCB(Geom *g1, Geom *g2);
+  public: void RightPaddleCB(const Contact &contact);
 
   /// \brief Load the controller
   /// \param node XML config node

@@ -34,9 +34,9 @@
 #include "Vector3.hh"
 #include "ODEGeom.hh"
 #include "ODEBody.hh"
-#include "ContactParams.hh"
 #include "Entity.hh"
 #include "XMLConfig.hh"
+#include "SurfaceParams.hh"
 
 #include "ODEHingeJoint.hh"
 #include "ODEHinge2Joint.hh"
@@ -211,25 +211,24 @@ void ODEPhysics::UpdateCollision()
         iter != this->contactFeedbackIter; iter++)
   {
 
-    if ((*iter).geom1 == NULL)
-      printf("Geom1 is null\n");
+    if ((*iter).contact.geom1 == NULL)
+      gzerr(0) << "collision update Geom1 is null\n";
 
-    if ((*iter).geom2 == NULL)
-      printf("Geom2 is null\n");
+    if ((*iter).contact.geom2 == NULL)
+      gzerr(0) << "Collision update Geom2 is null\n";
 
-    (*iter).geom1->contact->body1Force.Set(
-        (*iter).feedback.f1[0], (*iter).feedback.f1[1], (*iter).feedback.f1[2]);
-    (*iter).geom2->contact->body2Force.Set(
-        (*iter).feedback.f2[0], (*iter).feedback.f2[1], (*iter).feedback.f2[2]);
+    (*iter).contact.forces.body1Force.Set( (*iter).feedback.f1[0], 
+        (*iter).feedback.f1[1], (*iter).feedback.f1[2]);
+    (*iter).contact.forces.body2Force.Set( (*iter).feedback.f2[0], 
+        (*iter).feedback.f2[1], (*iter).feedback.f2[2]);
+    (*iter).contact.forces.body1Torque.Set((*iter).feedback.t1[0], 
+        (*iter).feedback.t1[1], (*iter).feedback.t1[2]);
+    (*iter).contact.forces.body2Torque.Set((*iter).feedback.t2[0], 
+        (*iter).feedback.t2[1], (*iter).feedback.t2[2]);
 
-    (*iter).geom1->contact->body1Torque.Set(
-        (*iter).feedback.t1[0], (*iter).feedback.t1[1], (*iter).feedback.t1[2]);
-    (*iter).geom1->contact->body2Torque.Set(
-        (*iter).feedback.t2[0], (*iter).feedback.t2[1], (*iter).feedback.t2[2]);
-
-    // Call the geom's contact callbacks
-    (*iter).geom1->contact->contactSignal( (*iter).geom1, (*iter).geom2 );
-    (*iter).geom2->contact->contactSignal( (*iter).geom2, (*iter).geom1 );
+    // Add the contact to each geom
+    (*iter).contact.geom1->AddContact( (*iter).contact );
+    (*iter).contact.geom2->AddContact( (*iter).contact );
   }
 
   // Reset the contact pointer
@@ -423,6 +422,8 @@ dSpaceID ODEPhysics::GetSpaceId() const
   return this->spaceId;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Handle a collision
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
   ODEPhysics *self;
@@ -449,7 +450,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   }
   else
   {
-
     // We should never test two geoms in the same space
     assert(dGeomGetSpace(o1) != dGeomGetSpace(o2));
 
@@ -491,21 +491,21 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         // Compute the CFM and ERP by assuming the two bodies form a
         // spring-damper system.
         h = self->stepTimeP->GetValue();
-        kp = 1.0 / (1.0 / geom1->contact->kp + 1.0 / geom2->contact->kp);
-        kd = geom1->contact->kd + geom2->contact->kd;
+        kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
+        kd = geom1->surface->kd + geom2->surface->kd;
         contact.surface.soft_erp = h * kp / (h * kp + kd);
         contact.surface.soft_cfm = 1.0 / (h * kp + kd);
 
-        if (geom1->contact->enableFriction && geom2->contact->enableFriction)
+        if (geom1->surface->enableFriction && geom2->surface->enableFriction)
         {
-          contact.surface.mu = std::min(geom1->contact->mu1, 
-              geom2->contact->mu1);
-          contact.surface.mu2 = std::min(geom1->contact->mu2, 
-              geom2->contact->mu2);
-          contact.surface.slip1 = std::min(geom1->contact->slip1, 
-              geom2->contact->slip1);
-          contact.surface.slip2 = std::min(geom1->contact->slip2, 
-              geom2->contact->slip2);
+          contact.surface.mu = std::min(geom1->surface->mu1, 
+              geom2->surface->mu1);
+          contact.surface.mu2 = std::min(geom1->surface->mu2, 
+              geom2->surface->mu2);
+          contact.surface.slip1 = std::min(geom1->surface->slip1, 
+              geom2->surface->slip1);
+          contact.surface.slip2 = std::min(geom1->surface->slip2, 
+              geom2->surface->slip2);
         }
         else
         {
@@ -515,10 +515,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           contact.surface.slip2 = 0.1;
         }
 
-        contact.surface.bounce = std::min(geom1->contact->bounce, 
-                                     geom2->contact->bounce);
-        contact.surface.bounce_vel = std::min(geom1->contact->bounceVel, 
-                                         geom2->contact->bounceVel);
+        contact.surface.bounce = std::min(geom1->surface->bounce, 
+                                     geom2->surface->bounce);
+        contact.surface.bounce_vel = std::min(geom1->surface->bounceVel, 
+                                         geom2->surface->bounceVel);
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
 
@@ -526,9 +526,17 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         {
           self->contactFeedbacks.resize( self->contactFeedbacks.size() + 500);
         }
- 
-        (*self->contactFeedbackIter).geom1 = geom1;
-        (*self->contactFeedbackIter).geom2 = geom2;
+
+        // Store the contact info 
+        (*self->contactFeedbackIter).contact.geom1 = geom1;
+        (*self->contactFeedbackIter).contact.geom2 = geom2;
+        (*self->contactFeedbackIter).contact.depth = contact.geom.depth;
+        (*self->contactFeedbackIter).contact.pos.x = contact.geom.pos[0];
+        (*self->contactFeedbackIter).contact.pos.y = contact.geom.pos[1];
+        (*self->contactFeedbackIter).contact.pos.z = contact.geom.pos[2];
+        (*self->contactFeedbackIter).contact.normal.x = contact.geom.normal[0];
+        (*self->contactFeedbackIter).contact.normal.y = contact.geom.normal[1];
+        (*self->contactFeedbackIter).contact.normal.z = contact.geom.normal[2];
         dJointSetFeedback(c, &(*self->contactFeedbackIter).feedback);
         self->contactFeedbackIter++;
 

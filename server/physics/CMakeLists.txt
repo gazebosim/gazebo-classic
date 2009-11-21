@@ -11,7 +11,7 @@ endif (INCLUDE_BULLET)
 set (sources Body.cc
              PhysicsFactory.cc
              PhysicsEngine.cc
-             ContactParams.cc
+             SurfaceParams.cc
              Mass.cc
              Joint.cc
              Geom.cc
@@ -25,12 +25,13 @@ set (sources Body.cc
              TrimeshShape.cc
              MapShape.cc
              HeightmapShape.cc
+             Contact.cc
 ) 
 
 set (headers BallJoint.hh
              Body.hh
              PhysicsFactory.hh
-             ContactParams.hh
+             SurfaceParams.hh
              Hinge2Joint.hh
              HingeJoint.hh
              Joint.hh
@@ -49,6 +50,8 @@ set (headers BallJoint.hh
              SphereShape.hh
              TrimeshShape.hh
              HeightmapShape.hh
+             Contact.hh
+
 )
 
 add_library(gazebo_physics SHARED ${sources})

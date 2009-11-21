@@ -74,16 +74,15 @@ void Generic_Bumper::UpdateChild()
 {
   this->myIface->Lock(1);
 
-  this->myIface->data->bumper_count = this->myParent->GetContactCount();
+  this->myIface->data->bumper_count = this->myParent->GetGeomCount();
 
   this->myIface->data->head.time = Simulator::Instance()->GetRealTime();
 
-  for (unsigned int i=0; i < this->myParent->GetContactCount(); i++)
+  for (unsigned int i=0; i < this->myParent->GetGeomCount(); i++)
   {
-    this->myIface->data->bumpers[i] = this->myParent->GetContactState(i); 
+    this->myIface->data->bumpers[i] = 
+      this->myParent->GetGeomContactCount(i) > 0 ? 1 : 0; 
   }
-
-  this->myParent->ResetContactStates();
 
   this->myIface->Unlock();
 }

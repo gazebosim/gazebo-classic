@@ -45,7 +45,6 @@
 #include "GazeboError.hh"
 #include "World.hh"
 #include "Vector3.hh"
-#include "ContactParams.hh"
 #include "Entity.hh"
 
 #include "XMLConfig.hh"
