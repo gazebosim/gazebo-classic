@@ -27,13 +27,17 @@
 #ifndef CONTACT_HH
 #define CONTACT_HH
 
+#include <vector>
+
 #include "Vector3.hh"
 #include "JointFeedback.hh"
 
 namespace gazebo
 {
   class Geom;
-  
+ 
+  /// \brief A contact between two geoms. Each contact can consist of
+  ///        a numnber of contact points 
   class Contact
   {
     /// \brief Constructor
@@ -50,16 +54,19 @@ namespace gazebo
   
     /// \brief Operator =
     public: const Contact &operator=(const Contact &contact);
+
+    /// \brief Reset
+    public: void Reset();
   
     public: Geom *geom1;
     public: Geom *geom2;
  
-    public: JointFeedback forces;
+    public: std::vector<JointFeedback> forces;
 
-    public: Vector3 pos;
-    public: Vector3 normal;
+    public: std::vector<Vector3> positions;
+    public: std::vector<Vector3> normals;
   
-    public: double depth;
+    public: std::vector<double> depths;
   };
 }
 

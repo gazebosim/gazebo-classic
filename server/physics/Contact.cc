@@ -63,9 +63,29 @@ const Contact &Contact::operator=(const Contact &contact)
 {
   this->geom1 = contact.geom1;
   this->geom2 = contact.geom2;
-  this->forces = contact.forces;
-  this->pos = contact.pos;
-  this->normal = contact.normal;
-  this->depth = contact.depth;
+
+  this->forces.clear();
+  this->positions.clear();
+  this->normals.clear();
+
+  std::copy(contact.forces.begin(), contact.forces.end(), 
+            std::back_inserter(this->forces));
+  std::copy(contact.positions.begin(), contact.positions.end(), 
+            std::back_inserter(this->positions));
+  std::copy(contact.normals.begin(), contact.normals.end(), 
+            std::back_inserter(this->normals));
+  std::copy(contact.depths.begin(), contact.depths.end(), 
+            std::back_inserter(this->depths));
+
   return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Reset
+void Contact::Reset()
+{
+  this->depths.clear();
+  this->positions.clear();
+  this->normals.clear();
+  this->forces.clear();
 }

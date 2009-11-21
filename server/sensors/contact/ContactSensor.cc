@@ -145,7 +145,7 @@ unsigned int ContactSensor::GetGeomContactCount(unsigned int geomIndex) const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get a contact for a geom by index
-Contact ContactSensor::GetContact(unsigned int geom, unsigned int index) const
+Contact ContactSensor::GetGeomContact(unsigned int geom, unsigned int index) const
 {
   if (geom < this->geoms.size())
     return this->geoms[geom]->GetContact( index );

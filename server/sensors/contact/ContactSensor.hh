@@ -80,11 +80,14 @@ namespace gazebo
     /// \brief Get the number of geoms that the sensor is observing
     public: unsigned int GetGeomCount() const;
 
+    /// \brief Get a geom
+    public: Geom *GetGeom(unsigned int index);
+
     /// \brief Return the number of contacts for an observed geom
     public: unsigned int GetGeomContactCount(unsigned int geomIndex) const;
 
     /// \brief Get a contact for a geom by index
-    public: Contact GetContact(unsigned int geom, unsigned int index) const;
+    public: Contact GetGeomContact(unsigned int geom, unsigned int index) const;
 
     /// Geom name parameter
     private: std::vector< ParamT<std::string> *> geomNamesP;

@@ -195,6 +195,9 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
+  std::vector<ContactFeedback>::iterator iter;
+  std::vector<dJointFeedback>::iterator jiter;
+
 #ifdef TIMING
   double tmpT1 = Simulator::Instance()->GetWallTime();
 #endif
@@ -206,25 +209,30 @@ void ODEPhysics::UpdateCollision()
 
   // Process all the contacts, get the feedback info, and call the geom
   // callbacks
-  for (std::vector<ContactFeedback>::iterator iter = 
-        this->contactFeedbacks.begin(); 
-        iter != this->contactFeedbackIter; iter++)
+  for (iter = this->contactFeedbacks.begin(); 
+       iter != this->contactFeedbackIter; iter++)
   {
-
     if ((*iter).contact.geom1 == NULL)
       gzerr(0) << "collision update Geom1 is null\n";
 
     if ((*iter).contact.geom2 == NULL)
       gzerr(0) << "Collision update Geom2 is null\n";
 
-    (*iter).contact.forces.body1Force.Set( (*iter).feedback.f1[0], 
-        (*iter).feedback.f1[1], (*iter).feedback.f1[2]);
-    (*iter).contact.forces.body2Force.Set( (*iter).feedback.f2[0], 
-        (*iter).feedback.f2[1], (*iter).feedback.f2[2]);
-    (*iter).contact.forces.body1Torque.Set((*iter).feedback.t1[0], 
-        (*iter).feedback.t1[1], (*iter).feedback.t1[2]);
-    (*iter).contact.forces.body2Torque.Set((*iter).feedback.t2[0], 
-        (*iter).feedback.t2[1], (*iter).feedback.t2[2]);
+    (*iter).contact.forces.clear();
+
+    // Copy all the joint forces to the contact
+    for (jiter = (*iter).feedbacks.begin(); jiter != (*iter).feedbacks.end();
+        jiter++)
+    {
+      JointFeedback feedback;
+      feedback.body1Force.Set( (*jiter).f1[0], (*jiter).f1[1], (*jiter).f1[2] );
+      feedback.body2Force.Set( (*jiter).f2[0], (*jiter).f2[1], (*jiter).f2[2] );
+
+      feedback.body1Torque.Set((*jiter).t1[0], (*jiter).t1[1], (*jiter).t1[2]);
+      feedback.body2Torque.Set((*jiter).t2[0], (*jiter).t2[1], (*jiter).t2[2]);
+
+      (*iter).contact.forces.push_back(feedback);
+    }
 
     // Add the contact to each geom
     (*iter).contact.geom1->AddContact( (*iter).contact );
@@ -473,6 +481,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     if (numc != 0)
     {
+      (*self->contactFeedbackIter).contact.geom1 = geom1;
+      (*self->contactFeedbackIter).contact.geom2 = geom2;
+      (*self->contactFeedbackIter).feedbacks.resize(numc);
+
       for (i=0; i<numc; i++)
       {
         double h, kp, kd;
@@ -522,26 +534,24 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
 
-        if (self->contactFeedbackIter == self->contactFeedbacks.end())
-        {
-          self->contactFeedbacks.resize( self->contactFeedbacks.size() + 500);
-        }
-
         // Store the contact info 
-        (*self->contactFeedbackIter).contact.geom1 = geom1;
-        (*self->contactFeedbackIter).contact.geom2 = geom2;
-        (*self->contactFeedbackIter).contact.depth = contact.geom.depth;
-        (*self->contactFeedbackIter).contact.pos.x = contact.geom.pos[0];
-        (*self->contactFeedbackIter).contact.pos.y = contact.geom.pos[1];
-        (*self->contactFeedbackIter).contact.pos.z = contact.geom.pos[2];
-        (*self->contactFeedbackIter).contact.normal.x = contact.geom.normal[0];
-        (*self->contactFeedbackIter).contact.normal.y = contact.geom.normal[1];
-        (*self->contactFeedbackIter).contact.normal.z = contact.geom.normal[2];
-        dJointSetFeedback(c, &(*self->contactFeedbackIter).feedback);
-        self->contactFeedbackIter++;
+        (*self->contactFeedbackIter).contact.depths.push_back(
+            contact.geom.depth);
+        (*self->contactFeedbackIter).contact.positions.push_back(
+            Vector3(contact.geom.pos[0], contact.geom.pos[1], 
+                    contact.geom.pos[2]) );
+        (*self->contactFeedbackIter).contact.normals.push_back(
+            Vector3(contact.geom.normal[0], contact.geom.normal[1], 
+                    contact.geom.normal[2]) );
+
+        dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));
 
         dJointAttach (c,b1,b2);
       }
+
+      self->contactFeedbackIter++;
+      if (self->contactFeedbackIter == self->contactFeedbacks.end())
+        self->contactFeedbacks.resize( self->contactFeedbacks.size() + 500);
     }
   }
 }
