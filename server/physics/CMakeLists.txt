@@ -51,7 +51,7 @@ set (headers BallJoint.hh
              TrimeshShape.hh
              HeightmapShape.hh
              Contact.hh
-
+             JointFeedback.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})
