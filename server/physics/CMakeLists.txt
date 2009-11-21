@@ -39,6 +39,7 @@ set (headers BallJoint.hh
              UniversalJoint.hh
              Mass.hh
              Geom.hh
+             Shape.hh
              BoxShape.hh
              CylinderShape.hh
              MapShape.hh
