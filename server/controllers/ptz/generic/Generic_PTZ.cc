@@ -205,7 +205,7 @@ void Generic_PTZ::PutPTZData()
   this->ptzIface->Lock(1);
 
   // Data timestamp
-  data->head.time = Simulator::Instance()->GetSimTime();
+  data->head.time = Simulator::Instance()->GetSimTime().Double();
 
   data->pan = this->panJoint->GetAngle(0).GetAsRadian();
   data->tilt = this->tiltJoint->GetAngle(0).GetAsRadian();

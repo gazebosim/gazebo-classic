@@ -28,6 +28,8 @@
 
 #include <FL/Fl_Group.H>
 
+#include "Time.hh"
+
 class Fl_Value_Output;
 class Fl_Output;
 class Fl_Button;
@@ -61,11 +63,11 @@ namespace gazebo
 
     public: Gui *gui;
 
-    private: double lastUpdateTime;
+    private: Time lastUpdateTime;
 
     // calculated percent speedup in last percentWindowDuration seconds real time.
-    private: double percent, percentLastRealTime, percentLastSimTime;
-    private: static const double statusUpdatePeriod = 0.05;
+    private: Time percent, percentLastRealTime, percentLastSimTime;
+    private: static gazebo::Time statusUpdatePeriod;
   };
   
 }

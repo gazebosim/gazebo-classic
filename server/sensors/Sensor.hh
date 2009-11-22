@@ -108,8 +108,8 @@ namespace gazebo
     protected: bool active;
 
     protected: ParamT<double> *updateRateP;
-    protected: double updatePeriod;
-    protected: double lastUpdate;
+    protected: Time updatePeriod;
+    protected: Time lastUpdate;
     protected: std::string typeName;
   };
   /// \}

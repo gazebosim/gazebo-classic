@@ -53,11 +53,11 @@ class Time
 
   /// \brief Constructor
   /// \param sec Seconds
-  /// \param usec Microseconds
-  public: Time( int sec,  int usec );
+  /// \param nsec Microseconds
+  public: Time( int32_t sec,  int32_t nsec );
 
   /// \brief Constuctor
-  /// \param time Time in double format sec.usec
+  /// \param time Time in double format sec.nsec
   public: Time( double time );
 
   /// \brief Destructor
@@ -69,10 +69,10 @@ class Time
   /// \brief Set the time to the wall time
   public: void SetToWallTime();
 
-  /// \brief Set to sec and usec
+  /// \brief Set to sec and nsec
   /// \param sec Seconds
-  /// \param usec micro seconds
-  public: void Set( int sec, int usec );
+  /// \param nsec micro seconds
+  public: void Set( int32_t sec, int32_t nsec );
 
   /// \brief Set to seconds
   /// \param seconds Number of seconds
@@ -174,13 +174,25 @@ class Time
   public: bool operator>=( double time ) const;
 
   /// Stream operators
-  public: friend std::ostream &operator<<(std::ostream &out, const Time &time);
+  public: friend std::ostream &operator<<(std::ostream &out, const gazebo::Time &time)
+          {
+            out << time.Double();
+            return out;
+          }
+
+  public: friend std::istream &operator>>(std::istream &in, gazebo::Time &time)
+          {
+            double t;
+            in >> t;
+            time.Set(t);
+            return in;
+          }
 
   /// Seconds
-  public: int sec;
+  public: int32_t sec;
 
   /// Microseconds
-  public: int usec;
+  public: int32_t nsec;
 
   /// Correct the time
   private: void Correct();

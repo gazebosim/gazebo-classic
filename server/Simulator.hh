@@ -30,6 +30,7 @@
 #include <boost/thread.hpp>
 #include <boost/signal.hpp>
 
+#include "Time.hh"
 #include "SingletonT.hh"
 
 namespace boost
@@ -103,26 +104,26 @@ namespace gazebo
 
     /// Get the simulation time
     /// \return The simulation time
-    public: double GetSimTime() const;
+    public: Time GetSimTime() const;
 
     /// \brief Set the sim time
-    public: void SetSimTime(double t);
+    public: void SetSimTime(Time t);
 
     /// Get the pause time
     /// \return The pause time
-    public: double GetPauseTime() const;
+    public: Time GetPauseTime() const;
 
     /// Get the start time
     /// \return The start time
-    public: double GetStartTime() const;
+    public: Time GetStartTime() const;
 
     /// Get the real time (elapsed time)
     /// \return The real time
-    public: double GetRealTime() const;
+    public: Time GetRealTime() const;
 
     /// \brief Get the wall clock time
     /// \return The wall clock time
-    public: double GetWallTime() const;
+    public: Time GetWallTime() const;
 
     //User Iteractions
     /// \brief Simulator finished by the user
@@ -203,7 +204,7 @@ namespace gazebo
     private: bool pause;
 
     /// Current simulation time
-    private: double simTime, pauseTime, startTime;
+    private: Time simTime, pauseTime, startTime;
 
     //upper limits on updating
     //how many updates we have done in this slot

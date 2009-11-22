@@ -153,7 +153,7 @@ void Differential_Position2d::UpdateChild()
   double wd, ws;
   double d1, d2;
   double dr, da;
-  double stepTime;
+  Time stepTime;
 
   this->myIface->Lock(1);
 
@@ -168,8 +168,8 @@ void Differential_Position2d::UpdateChild()
   this->prevUpdateTime = Simulator::Instance()->GetSimTime();
 
   // Distance travelled by front wheels
-  d1 = stepTime * wd / 2 * this->joints[LEFT]->GetVelocity(0);
-  d2 = stepTime * wd / 2 * this->joints[RIGHT]->GetVelocity(0);
+  d1 = stepTime.Double() * wd / 2 * this->joints[LEFT]->GetVelocity(0);
+  d2 = stepTime.Double() * wd / 2 * this->joints[RIGHT]->GetVelocity(0);
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / ws;
@@ -180,9 +180,9 @@ void Differential_Position2d::UpdateChild()
   this->odomPose[2] += da;
 
   // Compute odometric instantaneous velocity
-  this->odomVel[0] = dr / stepTime;
+  this->odomVel[0] = dr / stepTime.Double();
   this->odomVel[1] = 0.0;
-  this->odomVel[2] = da / stepTime;
+  this->odomVel[2] = da / stepTime.Double();
 
   if (this->enableMotors)
   {
@@ -229,7 +229,7 @@ void Differential_Position2d::GetPositionCmd()
 void Differential_Position2d::PutPositionData()
 {
   // TODO: Data timestamp
-  this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
+  this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
 
   this->myIface->data->pose.pos.x = this->odomPose[0];
   this->myIface->data->pose.pos.y = this->odomPose[1];

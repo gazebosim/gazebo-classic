@@ -217,7 +217,6 @@ MESSAGE (STATUS "Boost Include Path: ${boost_include_dirs}")
 MESSAGE (STATUS "Boost Library Path: ${boost_library_dirs}")
 MESSAGE (STATUS "Boost Libraries: ${boost_libraries}")
 
-
 ########################################
 # For Threadpool
 message (STATUS "Threadpool Include Path: ${threadpool_include_dirs}")

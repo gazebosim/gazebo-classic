@@ -115,7 +115,7 @@ class Differential_Position2d : public Controller
   private: float wheelSpeed[2];
 
   // Simulation time of the last update
-  private: double prevUpdateTime;
+  private: Time prevUpdateTime;
 
   /// True = enable motors
   private: bool enableMotors;

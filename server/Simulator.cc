@@ -30,6 +30,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Timer.hh"
 #include "Body.hh"
 #include "Geom.hh"
 #include "Model.hh"
@@ -332,9 +333,10 @@ void Simulator::MainLoop()
 {
   this->state = RUN;
 
-  double currTime = 0;
-  double lastTime = 0;
+  Time currTime = 0;
+  Time lastTime = 0;
   double freq = 80.0;
+
 
 #ifdef TIMING
     double tmpT1 = this->GetWallTime();
@@ -370,18 +372,18 @@ void Simulator::MainLoop()
 
       if (currTime - lastTime < 1/freq)
       {
-        double sleepTime = (1/freq - (currTime - lastTime));
-        timeSpec.tv_sec = (int)(sleepTime);
-        timeSpec.tv_nsec = (sleepTime - timeSpec.tv_sec) *1e9;
+        Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+        timeSpec.tv_sec = sleepTime.sec;
+        timeSpec.tv_nsec = sleepTime.nsec;
 
         nanosleep(&timeSpec, NULL);
       }
     }
     else
     {
-      double sleepTime = (1/freq - (currTime - lastTime));
-      timeSpec.tv_sec = (int)(sleepTime);
-      timeSpec.tv_nsec = (sleepTime - timeSpec.tv_sec) *1e9;
+      Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+      timeSpec.tv_sec = sleepTime.sec;
+      timeSpec.tv_nsec = sleepTime.nsec;
       nanosleep(&timeSpec, NULL);
     }
   }
@@ -431,49 +433,50 @@ void Simulator::SetPaused(bool p)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the simulation time
-double Simulator::GetSimTime() const
+gazebo::Time Simulator::GetSimTime() const
 {
   return this->simTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the sim time
-void Simulator::SetSimTime(double t)
+void Simulator::SetSimTime(Time t)
 {
   this->simTime = t;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pause time
-double Simulator::GetPauseTime() const
+gazebo::Time Simulator::GetPauseTime() const
 {
   return this->pauseTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the start time
-double Simulator::GetStartTime() const
+gazebo::Time Simulator::GetStartTime() const
 {
   return this->startTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the real time (elapsed time)
-double Simulator::GetRealTime() const
+gazebo::Time Simulator::GetRealTime() const
 {
   return this->GetWallTime() - this->startTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the wall clock time
-double Simulator::GetWallTime() const
+gazebo::Time Simulator::GetWallTime() const
 {
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  return tv.tv_sec + tv.tv_usec * 1e-6;
+  Time t;
+  t.SetToWallTime();
+  return t;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Set the user quit flag
 void Simulator::SetUserQuit()
 {
   //  this->Save("test.xml");
@@ -626,20 +629,23 @@ void Simulator::PhysicsLoop()
 
   world->GetPhysicsEngine()->InitForThread();
 
-  double step = world->GetPhysicsEngine()->GetStepTime();
+  Time step = world->GetPhysicsEngine()->GetStepTime();
   double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
-  double physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+  Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
 
   bool userStepped;
-  double diffTime;
-  double currTime;
-  double lastTime = this->GetRealTime();
+  Time diffTime;
+  Time currTime;
+  Time lastTime = this->GetRealTime();
   struct timespec req, rem;
+
+  Timer timer(Timer::REAL_TIMER);
 
   while (!this->userQuit)
   {
+
 #ifdef TIMING
-    double tmpT1 = this->GetWallTime();
+    timer.Start();
 #endif
 
     currTime = this->GetRealTime();
@@ -667,16 +673,17 @@ void Simulator::PhysicsLoop()
 
     {
       boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
 #ifdef TIMING
-      double tmpT2 = Simulator::Instance()->GetWallTime();
-      std::cout << " LOCK DT(" << tmpT2-tmpT1 << ")" << std::endl;
+      timer.Report("Lock DT");
+      //double tmpT2 = Simulator::Instance()->GetWallTime();
+      //std::cout << " LOCK DT(" << tmpT2-tmpT1 << ")" << std::endl;
 #endif
       world->Update();
     }
 
 #ifdef TIMING
-    double tmpT2 = Simulator::Instance()->GetWallTime();
-    std::cout << " World::Update() DT(" << tmpT2-tmpT1 << ")" << std::endl;
+    std::cout << " World::Update() DT(" << timer << ")" << std::endl;
 #endif
 
     currTime = this->GetRealTime();
@@ -692,9 +699,9 @@ void Simulator::PhysicsLoop()
         this->GetRealTime()) 
     {
       diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
-        this->GetRealTime();
-      req.tv_sec  = (int) floor(diffTime);
-      req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
+                 this->GetRealTime();
+      req.tv_sec  = diffTime.sec;
+      req.tv_nsec = diffTime.nsec;
     }
     // Otherwise try to match the update rate to the one specified in
     // the xml file
@@ -703,8 +710,8 @@ void Simulator::PhysicsLoop()
     {
       diffTime = physicsUpdatePeriod - (currTime - lastTime);
 
-      req.tv_sec  = (int) floor(diffTime);
-      req.tv_nsec = (int) (fmod(diffTime, 1.0) * 1e9);
+      req.tv_sec  = diffTime.sec;
+      req.tv_nsec = diffTime.nsec;
     }
 
     nanosleep(&req, &rem);
@@ -713,8 +720,7 @@ void Simulator::PhysicsLoop()
     world->UpdateSimulationIface();
 
 #ifdef TIMING
-    double tmpT3 = Simulator::Instance()->GetWallTime();
-    std::cout << " World::UpdatSimulationIface() DT(" << tmpT3-tmpT2 << ")" << std::endl;
+    std::cout << " World::UpdatSimulationIface() DT(" << timer << ")" << std::endl;
 #endif
 
     if (this->timeout > 0 && this->GetRealTime() > this->timeout)
@@ -730,9 +736,7 @@ void Simulator::PhysicsLoop()
     }
 
 #ifdef TIMING
-    double tmpT4 = this->GetWallTime();
-    std::cout << " Simulator::PhysicsLoop() DT(" << tmpT4-tmpT1 
-      << ")" << std::endl;
+    std::cout << " Simulator::PhysicsLoop() DT(" << timer << ")" << std::endl;
 #endif
   }
 }

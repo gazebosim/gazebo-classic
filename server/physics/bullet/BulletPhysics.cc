@@ -142,15 +142,15 @@ void BulletPhysics::UpdateCollision()
 // Update the Bullet engine
 void BulletPhysics::UpdatePhysics()
 {
-  double time = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
-  int steps = time / (**this->stepTimeP);
+  Time time = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
+  int steps = (int) round( (time / **this->stepTimeP).Double() );
 
   steps = std::max(steps,1);
 
   //time = 0.000001;
   //steps = 1;
   //this->dynamicsWorld->stepSimulation(time,  steps, (**this->stepTimeP));
-  this->dynamicsWorld->stepSimulation(**this->stepTimeP);
+  this->dynamicsWorld->stepSimulation((**this->stepTimeP).Double());
 
   this->lastUpdateTime = Simulator::Instance()->GetRealTime();
 }

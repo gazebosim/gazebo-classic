@@ -109,7 +109,7 @@ void IR_Array::PutIRData()
   if (this->irIface->Lock(1))
   {
     // Data timestamp
-    this->irIface->data->head.time = Simulator::Instance()->GetSimTime();
+    this->irIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
     
     this->irIface->data->ir_count = this->myParent->GetIRCount();
     

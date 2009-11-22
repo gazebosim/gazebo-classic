@@ -152,7 +152,7 @@ namespace gazebo
     private: Vector3 torqueVec; // for applying external forces
     private: std::map<int,int> keys;
 
-    private: double lastUpdateTime;
+    private: Time lastUpdateTime;
 
     private: bool mouseDrag;
 

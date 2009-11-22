@@ -29,6 +29,7 @@
 
 #include <vector>
 
+#include "Time.hh"
 #include "Vector3.hh"
 #include "JointFeedback.hh"
 
@@ -68,7 +69,7 @@ namespace gazebo
   
     public: std::vector<double> depths;
 
-    public: double time;
+    public: Time time;
   };
 }
 

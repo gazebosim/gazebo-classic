@@ -167,7 +167,7 @@ void Stereo_Camera::PutStereoData()
   float *disp_dst;
 
   // Data timestamp
-  stereo_data->head.time = Simulator::Instance()->GetSimTime();
+  stereo_data->head.time = Simulator::Instance()->GetSimTime().Double();
 
   stereo_data->width = this->myParent->GetImageWidth();
   stereo_data->height = this->myParent->GetImageHeight();
@@ -204,7 +204,7 @@ void Stereo_Camera::PutCameraData(CameraData *camera_data, unsigned int camera)
   unsigned char *rgb_dst = NULL;
   Pose3d cameraPose;
 
-  camera_data->head.time = Simulator::Instance()->GetSimTime();
+  camera_data->head.time = Simulator::Instance()->GetSimTime().Double();
 
   camera_data->width = this->myParent->GetImageWidth();
   camera_data->height = this->myParent->GetImageHeight();

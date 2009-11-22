@@ -135,7 +135,7 @@ namespace gazebo
   
     /// \brief Get the physics time steps in the virtual world
     /// \return step time 
-    public: double GetStepTime() const;
+    public: Time GetStepTime() const;
 
     /// \brief Lock the physics engine mutex
     public: void LockMutex();
@@ -154,7 +154,7 @@ namespace gazebo
   
     /// time steps the physical engine will take 
     /// how much time will pass on each update
-    protected: ParamT<double> *stepTimeP;
+    protected: ParamT<Time> *stepTimeP;
     
     /// update rate of the physical engine, how many times
     /// it is called 

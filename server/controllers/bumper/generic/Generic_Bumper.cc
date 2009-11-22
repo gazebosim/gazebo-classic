@@ -76,7 +76,7 @@ void Generic_Bumper::UpdateChild()
 
   this->myIface->data->bumper_count = this->myParent->GetGeomCount();
 
-  this->myIface->data->head.time = Simulator::Instance()->GetRealTime();
+  this->myIface->data->head.time =Simulator::Instance()->GetRealTime().Double();
 
   for (unsigned int i=0; i < this->myParent->GetGeomCount(); i++)
   {

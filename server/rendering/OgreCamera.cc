@@ -84,7 +84,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   this->camera = NULL;
 
-  this->renderPeriod = 1.0/(**this->updateRateP);
+  this->renderPeriod = Time(1.0/(**this->updateRateP));
   this->renderingEnabled = true;
 }
 
@@ -279,8 +279,8 @@ void OgreCamera::Render()
   if (!this->renderingEnabled)
     return;
 
-  double physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
-  if (round((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
+  Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
 
     this->renderTarget->update();
@@ -668,7 +668,7 @@ void OgreCamera::SaveFrame()
   char tmp[1024];
   if (!this->savePathnameP->GetValue().empty())
   {
-    double simTime = Simulator::Instance()->GetSimTime();
+    double simTime = Simulator::Instance()->GetSimTime().Double();
     int min = (int)(simTime / 60.0);
     int sec = (int)(simTime - min*60);
     int msec = (int)(simTime*1000 - min*60000 - sec*1000);

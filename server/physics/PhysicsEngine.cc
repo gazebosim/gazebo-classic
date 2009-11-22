@@ -38,7 +38,7 @@ PhysicsEngine::PhysicsEngine()
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
   this->updateRateP = new ParamT<double>("updateRate", 0.0, 0);
-  this->stepTimeP = new ParamT<double>("stepTime",0.025,0);
+  this->stepTimeP = new ParamT<Time>("stepTime",0.025,0);
   Param::End();
 
   this->mutex = new boost::recursive_mutex();
@@ -72,9 +72,9 @@ double PhysicsEngine::GetUpdateRate() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
-double PhysicsEngine::GetStepTime() const
+Time PhysicsEngine::GetStepTime() const
 {
-  return this->stepTimeP->GetValue();
+  return **this->stepTimeP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -39,6 +39,8 @@
 
 using namespace gazebo;
 
+gazebo::Time StatusBar::statusUpdatePeriod = 0.05;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 StatusBar::StatusBar(int x, int y, int w, int h, const char *l)
@@ -104,8 +106,8 @@ StatusBar::~StatusBar()
 void StatusBar::Update()
 {
   //float percent = 0;
-  float sim = 0;
-  float real = 0;
+  Time sim = 0;
+  Time real = 0;
 
   if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
   {
@@ -117,9 +119,9 @@ void StatusBar::Update()
     }
     else
     {
-      this->percent = ((Simulator::Instance()->GetSimTime()-this->percentLastSimTime)
-               / (Simulator::Instance()->GetRealTime()-this->percentLastRealTime)  );
-      this->percentLastRealTime =Simulator::Instance()->GetRealTime();
+      this->percent = ((Simulator::Instance()->GetSimTime()-this->percentLastSimTime) / (Simulator::Instance()->GetRealTime()-this->percentLastRealTime)).Double();
+
+      this->percentLastRealTime = Simulator::Instance()->GetRealTime();
       this->percentLastSimTime = Simulator::Instance()->GetSimTime();
     }
 
@@ -167,11 +169,11 @@ void StatusBar::Update()
       this->realTime->label("(min) Real Time");
     }
 
-    this->percentOutput->value(this->percent);
+    this->percentOutput->value(this->percent.Double());
 
-    this->realTime->value(real);
-    this->simTime->value(sim);
-    this->pauseTime->value(Simulator::Instance()->GetPauseTime());
+    this->realTime->value(real.Double());
+    this->simTime->value(sim.Double());
+    this->pauseTime->value(Simulator::Instance()->GetPauseTime().Double());
 
     this->lastUpdateTime = Simulator::Instance()->GetRealTime();
   }

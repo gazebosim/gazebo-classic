@@ -130,7 +130,7 @@ void Bandit_Actarray::UpdateChild()
   Angle angle;
 
   this->myIface->Lock(1);
-  this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
+  this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
 
   this->myIface->data->actuators_count = JOINTCNT;
 

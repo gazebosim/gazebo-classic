@@ -61,6 +61,7 @@ SET (sources Common.cc
              XMLConfig.cc
              GazeboConfig.cc
              Time.cc
+             Timer.cc
              Entity.cc
              GazeboError.cc
              GazeboMessage.cc
@@ -90,6 +91,7 @@ SET (headers Common.hh
              SingletonT.hh
              StaticPluginRegister.hh
              Time.hh
+             Timer.hh
              Vector2.hh
              Vector3.hh
              Vector4.hh

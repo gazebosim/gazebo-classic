@@ -153,7 +153,7 @@ class BulletPhysics : public PhysicsEngine
   private: btSequentialImpulseConstraintSolver *solver;
   private: btDiscreteDynamicsWorld *dynamicsWorld;
 
-  private: double lastUpdateTime;
+  private: Time lastUpdateTime;
 };
 
 /** \}*/

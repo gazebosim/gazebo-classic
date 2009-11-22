@@ -88,7 +88,7 @@ void Controller::Load(XMLConfigNode *node)
     this->updatePeriod = 0.0; // no throttling if updateRate is 0
   else
     this->updatePeriod = 1.0 / updateRate;
-  this->lastUpdate   = Simulator::Instance()->GetSimTime();
+  this->lastUpdate = Simulator::Instance()->GetSimTime();
 
   childNode = node->GetChildByNSPrefix("interface");
   
@@ -195,7 +195,7 @@ void Controller::Update()
   if (this->IsConnected() || this->alwaysOnP->GetValue())
   {
     // round time difference to this->physicsEngine->GetStepTime()
-    double physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
+    Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
 
     // if (this->GetName() == std::string("p3d_base_controller"))
     // std::cout << " sim update: " << this->GetName()
@@ -208,7 +208,8 @@ void Controller::Update()
 #ifdef TIMING
     double tmpT1 = Simulator::Instance()->GetWallTime();
 #endif
-    if (round((Simulator::Instance()->GetSimTime()-lastUpdate-updatePeriod)/physics_dt) >= 0)
+    Time simTime = Simulator::Instance()->GetSimTime();
+    if ((simTime-lastUpdate-updatePeriod)/physics_dt >= 0)
     {
       this->UpdateChild();
       lastUpdate = Simulator::Instance()->GetSimTime();

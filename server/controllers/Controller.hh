@@ -123,7 +123,7 @@ class Controller
   private: std::string typeName;
 
   /// \brief Last update time
-  protected: double lastUpdate;
+  protected: Time lastUpdate;
 
   /// \brief Array of all the iface for this controller
   private: std::vector<Iface*> ifaces;

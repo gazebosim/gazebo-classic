@@ -155,8 +155,8 @@ void GLWindow::Update()
 {
   if (this->activeCamera && this->activeCamera->GetUserMovable())
   {
-    this->activeCamera->Translate( 
-        this->directionVec * (Simulator::Instance()->GetRealTime() - this->lastUpdateTime) );
+    Time diff = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
+    this->activeCamera->Translate( this->directionVec * diff.Double()  );
     this->directionVec.Set(0,0,0);
   }
 

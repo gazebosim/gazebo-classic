@@ -80,7 +80,7 @@ void Sensor::Load(XMLConfigNode *node)
     this->updatePeriod = 0.0; // no throttling if updateRate is 0
   else
     this->updatePeriod = 1.0 / updateRate;
-  this->lastUpdate   = Simulator::Instance()->GetSimTime();
+  this->lastUpdate = Simulator::Instance()->GetSimTime();
 
 }
 
@@ -123,10 +123,8 @@ void Sensor::Update()
   double tmpT4 = Simulator::Instance()->GetWallTime();
 #endif
 
-
-
-  double physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
-  if (round((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->updatePeriod)/physics_dt) >= 0)
+  Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
+  if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->updatePeriod)/physics_dt) >= 0)
   {
     this->UpdateChild();
     this->lastUpdate = Simulator::Instance()->GetSimTime();

@@ -349,7 +349,7 @@ void Pioneer2_Gripper::UpdateChild()
 
   this->actIface->data->actuators_count = 1;
 
-  this->gripIface->data->head.time = Simulator::Instance()->GetSimTime();
+  this->gripIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
   this->gripIface->Post();
   this->gripIface->Unlock();
 

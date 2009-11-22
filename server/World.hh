@@ -267,7 +267,7 @@ class World : public SingletonT<World>
   private: GraphicsIfaceHandler *graphics;
 
   /// Length of time to run before receiving a "go" command
-  private: double simPauseTime;
+  private: Time simPauseTime;
 
   private: OpenAL *openAL;
 

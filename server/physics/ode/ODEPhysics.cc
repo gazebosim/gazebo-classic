@@ -267,9 +267,9 @@ void ODEPhysics::UpdatePhysics()
 
   // Update the dynamical model
   if (this->quickStepP->GetValue())
-    dWorldQuickStep(this->worldId, this->stepTimeP->GetValue() );
+    dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
   else
-    dWorldStep( this->worldId, this->stepTimeP->GetValue() );
+    dWorldStep( this->worldId, (**this->stepTimeP).Double() );
 
 #ifdef TIMING
   double tmpT3 = Simulator::Instance()->GetWallTime();
@@ -502,7 +502,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
         // Compute the CFM and ERP by assuming the two bodies form a
         // spring-damper system.
-        h = self->stepTimeP->GetValue();
+        h = (**self->stepTimeP).Double();
         kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
         kd = geom1->surface->kd + geom2->surface->kd;
         contact.surface.soft_erp = h * kp / (h * kp + kd);

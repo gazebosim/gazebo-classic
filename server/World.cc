@@ -727,9 +727,9 @@ void World::UpdateSimulationIface()
 
   response = this->simIface->data->responses;
 
-  this->simIface->data->simTime = Simulator::Instance()->GetSimTime();
-  this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime();
-  this->simIface->data->realTime = Simulator::Instance()->GetRealTime();
+  this->simIface->data->simTime = Simulator::Instance()->GetSimTime().Double();
+  this->simIface->data->pauseTime = Simulator::Instance()->GetPauseTime().Double();
+  this->simIface->data->realTime = Simulator::Instance()->GetRealTime().Double();
   this->simIface->data->state = !Simulator::Instance()->IsPaused();
 
   unsigned int requestCount = this->simIface->data->requestCount;
@@ -1266,7 +1266,7 @@ void World::UpdateSimulationIface()
       case SimulationRequestData::GO:
         {
           this->simPauseTime = Simulator::Instance()->GetSimTime() 
-                                  + req->runTime * 10e-6;
+                                  + Time(req->runTime);
 
           Simulator::Instance()->SetPaused(false);
           break;

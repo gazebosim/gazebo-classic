@@ -117,7 +117,7 @@ void Generic_Actarray::UpdateChild()
   float actual_speed;
 
   this->myIface->Lock(1);
-  this->myIface->data->head.time = Simulator::Instance()->GetSimTime();
+  this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
 
   this->myIface->data->actuators_count = n_joints;
 

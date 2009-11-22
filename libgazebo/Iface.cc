@@ -314,10 +314,8 @@ void Iface::Open(Client *client, std::string id)
 
   // Print the name, version info
   std::cout << "opening " << this->filename.c_str() << " "
-
   << std::setiosflags(std::ios::hex | std::ios::showbase)
   << std::setw(3) << ((GazeboData*) this->mMap)->version << " "
-
   << std::setiosflags(std::ios::dec | ~std::ios::showbase)
   << ((GazeboData*) this->mMap)->size << "\n";
 

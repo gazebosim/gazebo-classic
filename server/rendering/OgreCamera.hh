@@ -262,8 +262,8 @@ namespace gazebo
 
     protected: bool renderingEnabled;
 
-    protected: double renderPeriod;
-    protected: double lastUpdate;
+    protected: Time renderPeriod;
+    protected: Time lastUpdate;
   };
   
   /// \}
