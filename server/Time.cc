@@ -88,8 +88,7 @@ void Time::Set( int32_t sec,  int32_t nsec )
 void Time::Set(double seconds)
 {
   this->sec = (int32_t)(floor(seconds));
-  this->nsec = (int32_t)(round(seconds - this->sec) * 1e9);
-
+  this->nsec = (int32_t)(round((seconds - this->sec) * 1e9));
   this->Correct();
 }
 

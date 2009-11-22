@@ -106,26 +106,30 @@ StatusBar::~StatusBar()
 void StatusBar::Update()
 {
   //float percent = 0;
-  Time sim = 0;
-  Time real = 0;
+  double sim = 0;
+  double real = 0;
 
   if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
   {
-    if (Simulator::Instance()->GetRealTime() < this->statusUpdatePeriod )
+    Time simTime = Simulator::Instance()->GetSimTime();
+    Time realTime = Simulator::Instance()->GetRealTime();
+    
+    if (realTime < this->statusUpdatePeriod )
     {
-      this->percent = (Simulator::Instance()->GetSimTime() / Simulator::Instance()->GetRealTime());
+      this->percent = ( simTime / realTime);
       this->percentLastRealTime =0;
       this->percentLastSimTime = 0;
     }
     else
     {
-      this->percent = ((Simulator::Instance()->GetSimTime()-this->percentLastSimTime) / (Simulator::Instance()->GetRealTime()-this->percentLastRealTime)).Double();
+      this->percent = ((simTime - this->percentLastSimTime) / 
+                       (realTime - this->percentLastRealTime)).Double();
 
-      this->percentLastRealTime = Simulator::Instance()->GetRealTime();
-      this->percentLastSimTime = Simulator::Instance()->GetSimTime();
+      this->percentLastRealTime = realTime;
+      this->percentLastSimTime = simTime;
     }
 
-    sim = Simulator::Instance()->GetSimTime();
+    sim = Simulator::Instance()->GetSimTime().Double();
     if (sim > 31536000)
     {
       sim /= (31536000);
@@ -147,7 +151,7 @@ void StatusBar::Update()
       this->simTime->label("(min) Sim Time");
     }
 
-    real = Simulator::Instance()->GetRealTime();
+    real = Simulator::Instance()->GetRealTime().Double();
     if (sim > 31536000)
     {
       real /= (31536000);
@@ -171,8 +175,8 @@ void StatusBar::Update()
 
     this->percentOutput->value(this->percent.Double());
 
-    this->realTime->value(real.Double());
-    this->simTime->value(sim.Double());
+    this->realTime->value(real);
+    this->simTime->value(sim);
     this->pauseTime->value(Simulator::Instance()->GetPauseTime().Double());
 
     this->lastUpdateTime = Simulator::Instance()->GetRealTime();

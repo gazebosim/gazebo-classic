@@ -26,6 +26,8 @@
 #ifndef TIME_HH
 #define TIME_HH
 
+#include <stdlib.h>
+
 #include <time.h>
 #include <iostream>
 
