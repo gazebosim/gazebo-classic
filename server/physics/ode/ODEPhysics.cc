@@ -543,7 +543,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         (*self->contactFeedbackIter).contact.normals.push_back(
             Vector3(contact.geom.normal[0], contact.geom.normal[1], 
                     contact.geom.normal[2]) );
-
+        (*self->contactFeedbackIter).contact.time = 
+          Simulator::Instance()->GetSimTime();
         dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));
 
         dJointAttach (c,b1,b2);

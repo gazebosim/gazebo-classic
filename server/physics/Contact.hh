@@ -67,6 +67,8 @@ namespace gazebo
     public: std::vector<Vector3> normals;
   
     public: std::vector<double> depths;
+
+    public: double time;
   };
 }
 
