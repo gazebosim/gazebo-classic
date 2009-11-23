@@ -309,7 +309,7 @@ void World::Update()
   std::vector< Model* >::iterator miter;
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
-    if (*miter)
+    if (!(*miter)->IsStatic())
     {
 #ifdef USE_THREADPOOL
       this->threadPool->schedule(boost::bind(&Model::Update,(*miter)));
@@ -333,7 +333,6 @@ void World::Update()
        Simulator::Instance()->GetPhysicsEnabled())
   {
     this->physicsEngine->UpdatePhysics();
-
     this->SaveState();
   }
 

@@ -140,9 +140,12 @@ void Geom::Load(XMLConfigNode *node)
 
     if (this->IsStatic())
       visual->MakeStatic();
+      
 
     childNode = childNode->GetNext("visual");
   }
+
+
 
 
   if (this->GetType() != Shape::PLANE && this->GetType() != Shape::HEIGHTMAP)

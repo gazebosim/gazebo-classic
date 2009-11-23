@@ -139,6 +139,10 @@ namespace gazebo
     /// \brief Return true if the entity is a model
     public: bool IsModel() const;
 
+    /// \brief Get the parent model, if one exists
+    /// \return Pointer to a model, or NULL if no parent model exists
+    public: Model *GetParentModel() const;
+
     /// \brief Return the name of this entity with the model scope
     ///        model1::...::modelN::entityName
     public: std::string GetScopedName();

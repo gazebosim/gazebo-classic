@@ -235,7 +235,7 @@ class World : public SingletonT<World>
           {
             addEntitySignal.connect(subscriber);
           }
- 
+
   /// \brif Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
 

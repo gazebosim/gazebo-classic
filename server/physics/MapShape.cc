@@ -174,15 +174,15 @@ void MapShape::CreateBoxes(QuadNode *node)
     stream << "  <visual>";
     stream << "    <mesh>unit_box</mesh>";
     stream << "    <material>" << this->materialP->GetValue() << "</material>";
-    stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
+    stream << "    <size>" << xSize << " "<< ySize << " " << zSize << "</size>";
     stream << "  </visual>";
     stream << "</geom:box>";
     stream << "</gazebo:world>";
 
     boxConfig->LoadString( stream.str() );
 
-    geom->Load( boxConfig->GetRootNode()->GetChild() );
     geom->SetStatic(true);
+    geom->Load( boxConfig->GetRootNode()->GetChild() );
 
     delete boxConfig;
   }

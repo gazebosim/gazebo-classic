@@ -538,7 +538,6 @@ void Model::Fini()
 // Reset the model
 void Model::Reset()
 {
-  std::cout << "Model[" << this->GetName() << "] Reset\n";
   JointContainer::iterator jiter;
   std::map< std::string, Body* >::iterator biter;
   std::map<std::string, Controller* >::iterator citer;

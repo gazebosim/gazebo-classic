@@ -126,11 +126,12 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 
   this->isStatic = isStatic;
 
-/*  if (this->isStatic)
+  if (this->isStatic)
+  {
     this->staticGeom = this->sceneNode->getCreator()->createStaticGeometry(
         this->GetName() + "_staticgeom");
+  }
   else
-  */
     this->staticGeom = NULL;
 }
 
@@ -354,22 +355,14 @@ void OgreVisual::MakeStatic()
   if (!this->staticGeom)
     this->staticGeom = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
-  //this->staticGeom->setRegionDimensions(Ogre::Vector3(1,1,1));
-  //this->staticGeom->setOrigin(Ogre::Vector3(2,2,1));
-
-  //this->sceneNode->setVisible(true);
-
   // Add the scene node to the static geometry
   this->staticGeom->addSceneNode(this->sceneNode);
 
   // Build the static geometry
   this->staticGeom->build();
 
-  // Detach the scene node from the parent. Prevents double rendering
+  // Prevent double rendering
   this->sceneNode->setVisible(false);
-  /*if (this->sceneNode->getParent())
-    this->sceneNode->getParent()->removeChild(this->sceneNode);
-    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -647,9 +640,8 @@ void OgreVisual::SetCastShadows(const bool &shadows)
     obj->setCastShadows(shadows);
   }
 
-  /*if (this->IsStatic())
+  if (this->IsStatic())
     this->staticGeom->setCastShadows(shadows);
-    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -683,9 +675,10 @@ void OgreVisual::SetPosition( const Vector3 &pos)
 
   if (this->IsStatic())
   {
-    //this->sceneNode->setParent( this->owner->GetVisu
+    //this->sceneNode->setParent(this->owner->GetVisualNode()->GetSceneNode() );
     //this->staticGeom->reset();
     //this->MakeStatic();
+    //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
   }
   else
   {

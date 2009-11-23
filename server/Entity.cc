@@ -151,6 +151,9 @@ void Entity::SetStatic(const bool &s)
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
+    if ( (*iter)->IsStatic())
+      continue;
+
     (*iter)->SetStatic(s);
     body = dynamic_cast<Body*>(*iter);
     if (body)
@@ -321,10 +324,11 @@ void Entity::SetRelativeRotation(const Quatern &rot)
 // Handle a change of pose
 void Entity::PoseChange(bool notify)
 {
-  if (Simulator::Instance()->GetState() == Simulator::RUN)// || this->IsStatic())
+/*  if (Simulator::Instance()->GetState() == Simulator::RUN)
     this->visualNode->SetDirty(true, this->relativePose);
   else
-    this->visualNode->SetPose(this->relativePose);
+  */
+  this->visualNode->SetPose(this->relativePose);
 
   if (notify)
   {
@@ -334,4 +338,16 @@ void Entity::PoseChange(bool notify)
     for  (iter = this->children.begin(); iter != this->children.end(); iter++)
       (*iter)->OnPoseChange();
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the parent model, if one exists
+Model *Entity::GetParentModel() const
+{
+  Entity *p = this->parent;
+
+  while (p && !p->IsModel())
+    p = p->GetParent();
+
+  return (Model*)p;
 }

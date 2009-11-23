@@ -1,5 +1,6 @@
 #include <Ogre.h>
 
+#include "Model.hh"
 #include "OgreDynamicLines.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
@@ -62,6 +63,7 @@ void Light::Load(XMLConfigNode *node)
   else if (lightType == "directional")
   {
     this->light->setType(Ogre::Light::LT_DIRECTIONAL);
+    this->parent->GetParentModel()->SetStatic(true);
   }
   else if (lightType == "spot")
   {
