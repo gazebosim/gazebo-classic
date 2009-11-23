@@ -110,7 +110,8 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
   */
   this->end();
 
-  this->resizable(NULL);
+  this->resizable( this->entityBrowser );
+  this->resizable( this->paramBrowser );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
