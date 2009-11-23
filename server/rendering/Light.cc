@@ -167,6 +167,9 @@ void Light::Save(const std::string &prefix, std::ostream &stream)
 // Helper node to create a visual representation of the light
 void Light::CreateVisual()
 {
+  if (this->light->getType() == Ogre::Light::LT_DIRECTIONAL)
+    return;
+
   this->visual = new OgreVisual(this->parent->GetVisualNode());
 
   // The lines draw a visualization of the camera
