@@ -96,7 +96,7 @@ ODEPhysics::ODEPhysics()
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   Param::End();
 
-  this->contactFeedbacks.resize(1000);
+  this->contactFeedbacks.resize(100);
 
   // Reset the contact pointer
   this->contactFeedbackIter = this->contactFeedbacks.begin();
@@ -481,9 +481,11 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     if (numc != 0)
     {
+      (*self->contactFeedbackIter).contact.Reset();
       (*self->contactFeedbackIter).contact.geom1 = geom1;
       (*self->contactFeedbackIter).contact.geom2 = geom2;
       (*self->contactFeedbackIter).feedbacks.resize(numc);
+      
 
       for (i=0; i<numc; i++)
       {
@@ -552,7 +554,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
       self->contactFeedbackIter++;
       if (self->contactFeedbackIter == self->contactFeedbacks.end())
-        self->contactFeedbacks.resize( self->contactFeedbacks.size() + 500);
+        self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
+        
     }
   }
 }

@@ -428,6 +428,9 @@ Shape *Geom::GetShape() const
 /// Add an occurance of a contact to this geom
 void Geom::AddContact(const Contact &contact)
 {
+  if (this->GetType() == Shape::RAY || this->GetType() == Shape::PLANE)
+    return;
+
   this->contacts.push_back( contact.Clone() );
   this->contactSignal( contact );
 }
