@@ -61,6 +61,12 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   this->posP = new ParamT<Vector2<int> >("pos",Vector2<int>(0,0),0);
   Param::End();
 
+  width = std::max(800, this->w());
+  height = std::max(480, this->h());
+
+  this->w(width);
+  this->h(height);
+
   // The order of creation matters! Menubar first, followed by FrameManager,
   // then statusbar
   {

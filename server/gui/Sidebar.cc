@@ -58,7 +58,12 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
   this->box(FL_NO_BOX);
   this->color(BG_COLOR);
 
-  this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*5,"Models");
+  fprintf(stderr,"Entity Height[%d]\n",(this->h()-20)*0.25);
+  fprintf(stderr,"Param Height[%d]\n",(this->h()-20)*0.5);
+
+  //this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 25*5,"Models");
+  this->entityBrowser = new Fl_Hold_Browser(x+10, y+20, w-20, 
+      (this->h()-20)*0.25,"Models");
   this->entityBrowser->align(FL_ALIGN_TOP);
   this->entityBrowser->callback( &Sidebar::EntityBrowserCB, this );
   this->entityBrowser->color(FL_WHITE);
@@ -68,7 +73,9 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
   this->paramColumnWidths[2] = 0;
 
   y = this->entityBrowser->y() + this->entityBrowser->h() + 20;
-  this->paramBrowser = new Fl_Hold_Browser(x+10, y, w-20,25*10,"Parameters");
+  //this->paramBrowser = new Fl_Hold_Browser(x+10, y, w-20,25*10,"Parameters");
+  this->paramBrowser = new Fl_Hold_Browser(x+10, y, w-20,
+      (this->h()-20)*0.5,"Parameters");
   this->paramBrowser->align(FL_ALIGN_TOP);
   this->paramBrowser->column_char('~');
   this->paramBrowser->column_widths( this->paramColumnWidths );
