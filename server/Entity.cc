@@ -328,7 +328,8 @@ void Entity::PoseChange(bool notify)
     this->visualNode->SetDirty(true, this->relativePose);
   else
   */
-  this->visualNode->SetPose(this->relativePose);
+  if (Simulator::Instance()->GetRenderEngineEnabled())
+    this->visualNode->SetPose(this->relativePose);
 
   if (notify)
   {
