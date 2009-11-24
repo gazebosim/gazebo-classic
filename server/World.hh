@@ -46,6 +46,7 @@
 #include "Pose3d.hh"
 #include "Entity.hh"
 #include "Global.hh"
+#include "Timer.hh"
 
 namespace gazebo
 {
@@ -64,6 +65,8 @@ namespace gazebo
   class OpenAL;
   class Factory;
   class WorldState;
+  class Timer;
+  class Time;
    
 /// \brief The World
 /*
@@ -271,10 +274,12 @@ class World : public SingletonT<World>
 
   private: OpenAL *openAL;
 
-#ifdef USE_THREADPOOL
-  private: ParamT<int>* threadsP;
   /// List of all the parameters
   protected: std::vector<Param*> parameters;
+
+  private: ParamT<int>* threadsP;
+
+#ifdef USE_THREADPOOL
   public: boost::threadpool::pool* threadPool;
 #endif
 
@@ -287,6 +292,10 @@ class World : public SingletonT<World>
   private: std::deque<WorldState>::iterator worldStatesInsertIter;
   private: std::deque<WorldState>::iterator worldStatesEndIter;
   private: std::deque<WorldState>::iterator worldStatesCurrentIter;
+
+  private: Timer saveStateTimer;
+  private: ParamT<Time> *saveStateTimeoutP;
+  private: ParamT<unsigned int> *saveStateBufferSizeP;
 };
 
 class WorldState

@@ -38,7 +38,7 @@ namespace gazebo
     /// \brief Constructor
     /// \param t The type of timer (based on either the simulation or real
     ///          time)
-    public: Timer(Type t);
+    public: Timer(Type t=Timer::REAL_TIMER);
             
     /// \brief Destructor
     public: virtual ~Timer();

@@ -68,16 +68,12 @@ World::World()
   PhysicsFactory::RegisterAll();
   this->factory = NULL;
 
-#ifdef USE_THREADPOOL
   Param::Begin(&this->parameters);
   this->threadsP = new ParamT<int>("threads",2,0);
+  this->saveStateTimeoutP = new ParamT<Time>("saveStateResolution",0.1,0);
+  this->saveStateBufferSizeP = new ParamT<unsigned int>("saveStateBufferSize",1000,0);
   Param::End();
-#endif
 
-  this->worldStates.resize(10000);
-  this->worldStatesInsertIter = this->worldStates.begin();
-  this->worldStatesEndIter = this->worldStates.begin();
-  this->worldStatesCurrentIter = this->worldStatesInsertIter;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,8 +130,12 @@ void World::Close()
     this->factory = NULL;
   }
 
-#ifdef USE_THREADPOOL
+  delete this->saveStateTimeoutP;
+  delete this->saveStateBufferSizeP;
+
   delete this->threadsP;
+
+#ifdef USE_THREADPOOL
   delete this->threadPool;
 #endif
 
@@ -206,9 +206,18 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
   this->physicsEngine->Load(rootNode);
 
+  this->threadsP->Load(rootNode);
+  this->saveStateTimeoutP->Load(rootNode);
+  this->saveStateBufferSizeP->Load(rootNode);
+
+  this->worldStates.resize(**this->saveStateBufferSizeP);
+  this->worldStatesInsertIter = this->worldStates.begin();
+  this->worldStatesEndIter = this->worldStates.begin();
+  this->worldStatesCurrentIter = this->worldStatesInsertIter;
+
+
 #ifdef USE_THREADPOOL
   // start a thread pool with X threads
-  this->threadsP->Load(rootNode);
   this->threadPool = new boost::threadpool::pool(this->threadsP->GetValue());
 #endif
 }
@@ -218,6 +227,10 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 void World::Save(std::string &prefix, std::ostream &stream)
 {
   std::vector< Model* >::iterator miter;
+
+  std::cout << prefix << "  " << *(this->threadsP);
+  std::cout << prefix << "  " << *(this->saveStateTimeoutP);
+  std::cout << prefix << "  " << *(this->saveStateBufferSizeP);
 
   // Save all the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
@@ -260,6 +273,7 @@ void World::Init()
     this->graphics->Init();
 
   this->factory->Init();
+  this->saveStateTimer.Start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,7 +347,12 @@ void World::Update()
        Simulator::Instance()->GetPhysicsEnabled())
   {
     this->physicsEngine->UpdatePhysics();
-    this->SaveState();
+
+    if (this->saveStateTimer.GetElapsed() > **this->saveStateTimeoutP)
+    {
+      this->SaveState();
+      this->saveStateTimer.Start();
+    }
   }
 
   this->factory->Update();
