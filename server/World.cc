@@ -298,7 +298,6 @@ void World::GraphicsUpdate()
 // Update the world
 void World::Update()
 {
-
   if (this->simPauseTime > 0)
   {
     if (Simulator::Instance()->GetSimTime() >= this->simPauseTime)
@@ -315,15 +314,12 @@ void World::Update()
     }
   }
 
-#ifdef TIMING
-  double tmpT1 = Simulator::Instance()->GetWallTime();
-#endif
 
-  // Update all the models
-  std::vector< Model* >::iterator miter;
-  for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
-    if (!(*miter)->IsStatic())
+    DiagnosticTimer timer("World::Update Models");
+    // Update all the models
+    std::vector< Model* >::iterator miter;
+    for (miter=this->models.begin(); miter!=this->models.end(); miter++)
     {
 #ifdef USE_THREADPOOL
       this->threadPool->schedule(boost::bind(&Model::Update,(*miter)));
@@ -337,31 +333,22 @@ void World::Update()
   this->threadPool->wait();
 #endif
 
-
-#ifdef TIMING
-  double tmpT2 = Simulator::Instance()->GetWallTime();
-  std::cout << " World::Update() ALL Models update DT(" << tmpT2-tmpT1 << ")" << std::endl;
-#endif
-
   if (!Simulator::Instance()->IsPaused() &&
        Simulator::Instance()->GetPhysicsEnabled())
   {
-    this->physicsEngine->UpdatePhysics();
+    {
+      DiagnosticTimer timer("World::Update Physics");
+      this->physicsEngine->UpdatePhysics();
+    }
 
-    if (this->saveStateTimer.GetElapsed() > **this->saveStateTimeoutP)
+    /*if (this->saveStateTimer.GetElapsed() > **this->saveStateTimeoutP)
     {
       this->SaveState();
       this->saveStateTimer.Start();
-    }
+    }*/
   }
 
   this->factory->Update();
-
-#ifdef TIMING
-  double tmpT4 = Simulator::Instance()->GetWallTime();
-  std::cout << " World::Update() Physics engine DT(" << tmpT4-tmpT2 << ")" << std::endl;
-#endif
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

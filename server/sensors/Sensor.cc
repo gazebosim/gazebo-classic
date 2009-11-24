@@ -23,6 +23,7 @@
  * SVN: $Id$
  */
 
+#include "Timer.hh"
 #include "Controller.hh"
 #include "gazebo.h"
 #include "GazeboMessage.hh"
@@ -118,10 +119,7 @@ void Sensor::Init()
 /// Update the sensor
 void Sensor::Update()
 {
-
-#ifdef TIMING
-  double tmpT4 = Simulator::Instance()->GetWallTime();
-#endif
+  DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
 
   Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
   if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->updatePeriod)/physics_dt) >= 0)
@@ -135,12 +133,6 @@ void Sensor::Update()
   {
     this->controller->Update();
   }
-
-#ifdef TIMING
-  double tmpT5 = Simulator::Instance()->GetWallTime();
-  std::cout << "               Sensor::Update (" << this->GetName() << ") dt (" << tmpT5-tmpT4 << ")" << std::endl;
-#endif
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

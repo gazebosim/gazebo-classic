@@ -26,6 +26,7 @@
 #ifndef TIMER_HH
 #define TIMER_HH
 
+#include "GazeboMessage.hh"
 #include "Time.hh"
 
 namespace gazebo
@@ -61,6 +62,36 @@ namespace gazebo
 
     private: Time start;
     private: Type type;
+  };
+
+  /// \brief A timer designed for diagnostics
+  class DiagnosticTimer : public Timer
+  {
+    /// \brief Constructor
+    public: DiagnosticTimer(const std::string &name, int level = 5, 
+                            Type t=Timer::REAL_TIMER) : Timer(t) 
+            {
+              this->name = name; 
+              this->msgLevel = level; 
+              this->Report("Start @ ");
+            }
+
+    /// \brief Destructor
+    public: virtual ~DiagnosticTimer() 
+            { 
+              this->Report("Complete @ "); 
+            }
+
+    /// \brief Report a time
+    public: void Report(const std::string msg)
+            {
+              gzmsg(this->msgLevel) << this->name << "["
+                << msg << *this << "]\n";
+            }
+
+    private: int msgLevel;
+    private: std::string name;
+
   };
 }
 

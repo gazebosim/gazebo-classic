@@ -25,6 +25,7 @@
  * SVN info: $Id$
  */
 
+#include "Timer.hh"
 #include "Model.hh"
 #include "Sensor.hh"
 #include "gazebo.h"
@@ -192,8 +193,9 @@ void Controller::Reset()
 /// Update the controller. Called every cycle.
 void Controller::Update()
 {
-  if (this->IsConnected() || this->alwaysOnP->GetValue())
+  if (this->IsConnected() || **this->alwaysOnP)
   {
+    DiagnosticTimer timer("Controller[" + this->GetName() +"] Update Timer");
     // round time difference to this->physicsEngine->GetStepTime()
     Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
 
@@ -205,18 +207,14 @@ void Controller::Update()
     //           << " i1 " << round((Simulator::Instance()->GetSimTime()-lastUpdate)/physics_dt)
     //           << " i2 " << round(updatePeriod/physics_dt)
     //           << std::endl;
-#ifdef TIMING
-    double tmpT1 = Simulator::Instance()->GetWallTime();
-#endif
+    timer.Start();
+
     Time simTime = Simulator::Instance()->GetSimTime();
     if ((simTime-lastUpdate-updatePeriod)/physics_dt >= 0)
     {
       this->UpdateChild();
       lastUpdate = Simulator::Instance()->GetSimTime();
-#ifdef TIMING
-      double tmpT2 = Simulator::Instance()->GetWallTime();
-      std::cout << "           Controller::Update() Name (" << this->GetName() << ") dt (" << tmpT2-tmpT1 << ")" << std::endl;
-#endif
+      timer.Report("Update() dt");
     }
   }
 }

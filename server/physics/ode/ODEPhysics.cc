@@ -26,6 +26,7 @@
 
 #include <assert.h>
 
+#include "Timer.hh"
 #include "PhysicsFactory.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
@@ -55,10 +56,6 @@
 
 #include "ODEPhysics.hh"
 
-#ifdef TIMING
-#include "Simulator.hh"// for timing
-#endif
-
 using namespace gazebo;
 
 GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
@@ -83,8 +80,8 @@ ODEPhysics::ODEPhysics()
 
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
-  dWorldSetAutoDisableFlag(this->worldId, 1);
-  dWorldSetAutoDisableTime(this->worldId, 2.0);
+  //dWorldSetAutoDisableFlag(this->worldId, 1);
+  //dWorldSetAutoDisableTime(this->worldId, 2.0);
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
@@ -195,15 +192,14 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
+  DiagnosticTimer timer("ODEPhysics Collision Update");
   std::vector<ContactFeedback>::iterator iter;
   std::vector<dJointFeedback>::iterator jiter;
+ 
+  timer.Start();
 
-#ifdef TIMING
-  double tmpT1 = Simulator::Instance()->GetWallTime();
-#endif
-  
-  this->LockMutex(); 
   // Do collision detection; this will add contacts to the contact group
+  this->LockMutex(); 
   dSpaceCollide( this->spaceId, this, CollisionCallback );
   this->UnlockMutex(); 
 
@@ -241,41 +237,23 @@ void ODEPhysics::UpdateCollision()
 
   // Reset the contact pointer
   this->contactFeedbackIter = this->contactFeedbacks.begin();
-
-#ifdef TIMING
-  double tmpT2 = Simulator::Instance()->GetWallTime();
-  std::cout << "      Collision DT (" << tmpT2-tmpT1 << ")" << std::endl;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
-#ifdef TIMING
-  double tmpT1 = Simulator::Instance()->GetWallTime();
-#endif
- 
   this->UpdateCollision();
 
-#ifdef TIMING
-  double tmpT2 = Simulator::Instance()->GetWallTime();
-  std::cout << "      Collision DT (" << tmpT2-tmpT1 << ")" << std::endl;
-#endif
-
   this->LockMutex(); 
+
+  DiagnosticTimer timer("ODEPhysics Step Update");
 
   // Update the dynamical model
   if (this->quickStepP->GetValue())
     dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
   else
     dWorldStep( this->worldId, (**this->stepTimeP).Double() );
-
-#ifdef TIMING
-  double tmpT3 = Simulator::Instance()->GetWallTime();
-  std::cout << "      ODE step DT (" << tmpT3-tmpT2 << ")" << std::endl;
-  //std::cout << "  Physics Total DT (" << tmpT3-tmpT1 << ")" << std::endl;
-#endif
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );

@@ -333,21 +333,14 @@ void Simulator::MainLoop()
 {
   this->state = RUN;
 
+  DiagnosticTimer timer("--------------------------- START Simulator::MainLoop() --------------------------");
   Time currTime = 0;
   Time lastTime = 0;
+  struct timespec timeSpec;
   double freq = 80.0;
-
-
-#ifdef TIMING
-    double tmpT1 = this->GetWallTime();
-    std::cout << "--------------------------- START Simulator::MainLoop() --------------------------" << std::endl;
-    std::cout << "Simulator::MainLoop() simTime(" << this->simTime << ") world time (" << tmpT1 << ")" << std::endl;
-#endif
 
   this->physicsThread = new boost::thread( 
                          boost::bind(&Simulator::PhysicsLoop, this));
-
-  struct timespec timeSpec;
 
   // Update the gui
   while (!this->userQuit)
@@ -389,11 +382,6 @@ void Simulator::MainLoop()
   }
 
   this->physicsThread->join();
-
-#ifdef TIMING
-    std::cout << "--------------------------- END Simulator::MainLoop() --------------------------" << std::endl;
-#endif
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -639,14 +627,10 @@ void Simulator::PhysicsLoop()
   Time lastTime = this->GetRealTime();
   struct timespec req, rem;
 
-  Timer timer(Timer::REAL_TIMER);
 
   while (!this->userQuit)
   {
-
-#ifdef TIMING
-    timer.Start();
-#endif
+    DiagnosticTimer timer("PhysicsLoop Timer ");
 
     currTime = this->GetRealTime();
 
@@ -673,18 +657,8 @@ void Simulator::PhysicsLoop()
 
     {
       boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-#ifdef TIMING
-      timer.Report("Lock DT");
-      //double tmpT2 = Simulator::Instance()->GetWallTime();
-      //std::cout << " LOCK DT(" << tmpT2-tmpT1 << ")" << std::endl;
-#endif
       world->Update();
     }
-
-#ifdef TIMING
-    std::cout << " World::Update() DT(" << timer << ")" << std::endl;
-#endif
 
     currTime = this->GetRealTime();
 
@@ -716,12 +690,12 @@ void Simulator::PhysicsLoop()
 
     nanosleep(&req, &rem);
 
-    // Process all incoming messages from simiface
-    world->UpdateSimulationIface();
+    {
+      DiagnosticTimer timer("PhysicsLoop UpdateSimIfaces ");
 
-#ifdef TIMING
-    std::cout << " World::UpdatSimulationIface() DT(" << timer << ")" << std::endl;
-#endif
+      // Process all incoming messages from simiface
+      world->UpdateSimulationIface();
+    }
 
     if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
@@ -734,10 +708,6 @@ void Simulator::PhysicsLoop()
       this->SetStepInc(false);
       this->SetPaused(true);
     }
-
-#ifdef TIMING
-    std::cout << " Simulator::PhysicsLoop() DT(" << timer << ")" << std::endl;
-#endif
   }
 }
 

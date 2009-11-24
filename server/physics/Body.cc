@@ -31,7 +31,7 @@
 #include "Model.hh"
 #include "GazeboMessage.hh"
 #include "Geom.hh"
-
+#include "Timer.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
@@ -46,10 +46,6 @@
 #include "PhysicsEngine.hh"
 
 #include "Body.hh"
-
-#ifdef TIMING
-#include "Simulator.hh"// for timing
-#endif
 
 using namespace gazebo;
 
@@ -395,6 +391,8 @@ void Body::Init()
 // Update the body
 void Body::Update()
 {
+  DiagnosticTimer timer("Body[" + this->GetName() +"] Update");
+
 #ifdef USE_THREADPOOL
   // If calling Body::Update in threadpool
   World::Instance()->GetPhysicsEngine()->InitForThread();
@@ -405,57 +403,39 @@ void Body::Update()
   Vector3 vel;
   Vector3 avel;
 
-#ifdef TIMING
-  double tmpT1 = Simulator::Instance()->GetWallTime();
-#endif
-
-#ifdef TIMING
-  double tmpT2 = Simulator::Instance()->GetWallTime();
-  std::cout << "           Body Name (" << this->nameP->GetValue() << ")" << std::endl;
-  std::cout << "               UpdatePose dt (" << tmpT2-tmpT1 << ")" << std::endl;
-#endif
-
   // Apply our linear accel
   this->SetForce(this->linearAccel);
 
   // Apply our angular accel
   this->SetTorque(this->angularAccel);
 
-#ifdef TIMING
-  double tmpT3 = Simulator::Instance()->GetWallTime();
-  std::cout << "               Static SetPose dt (" << tmpT3-tmpT2 << ")" << std::endl;
-#endif
-
-  for (geomIter=this->geoms.begin();
-       geomIter!=this->geoms.end(); geomIter++)
   {
+    DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
+
+    for (geomIter=this->geoms.begin();
+        geomIter!=this->geoms.end(); geomIter++)
+    {
 #ifdef USE_THREADPOOL
-    World::Instance()->threadpool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
+      World::Instance()->threadpool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
 #else
-    geomIter->second->Update();
+      geomIter->second->Update();
 #endif
+    }
   }
 
-#ifdef TIMING
-  double tmpT4 = Simulator::Instance()->GetWallTime();
-  std::cout << "               Geom Update DT (" << tmpT4-tmpT3 << ")" << std::endl;
-#endif
-
-  for (sensorIter=this->sensors.begin();
-       sensorIter!=this->sensors.end(); sensorIter++)
   {
-#ifdef USE_THREADPOOL
-    World::Instance()->threadpool->schedule(boost::bind(&Sensor::Update, (sensorIter)));
-#else
-    (*sensorIter)->Update();
-#endif
-  }
+    DiagnosticTimer timer("Body[" + this->GetName() +"] Update Sensors");
 
-#ifdef TIMING
-  double tmpT5 = Simulator::Instance()->GetWallTime();
-  std::cout << "               ALL Sensors Update DT (" << tmpT5-tmpT4 << ")" << std::endl;
-  std::cout << "               Body::Update Total DT (" << tmpT5-tmpT1 << ")" << std::endl;
+    for (sensorIter=this->sensors.begin();
+        sensorIter!=this->sensors.end(); sensorIter++)
+    {
+#ifdef USE_THREADPOOL
+      World::Instance()->threadpool->schedule(boost::bind(&Sensor::Update, (sensorIter)));
+#else
+      (*sensorIter)->Update();
 #endif
+    }
+  }
 
 }
 

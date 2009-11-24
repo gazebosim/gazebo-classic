@@ -48,11 +48,6 @@
 #include "IfaceFactory.hh"
 #include "Model.hh"
 
-
-#ifdef TIMING
-#include "Simulator.hh"
-#endif
-
 using namespace gazebo;
 
 uint Model::lightNumber = 0;
@@ -393,6 +388,11 @@ void Model::Init()
 // Update the model
 void Model::Update()
 {
+  if (this->controllers.size() == 0 && this->IsStatic())
+    return;
+
+  DiagnosticTimer timer("Model[" + this->GetName() + "] Update ");
+
 #ifdef USE_THREADPOOL
   World::Instance()->GetPhysicsEngine()->InitForThread();
 #endif
@@ -403,58 +403,53 @@ void Model::Update()
 
   Pose3d bodyPose, newPose, oldPose;
 
-#ifdef TIMING
-  double tmpT1 = Simulator::Instance()->GetWallTime();
-#endif
-
-  for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
   {
-    if (bodyIter->second)
+    DiagnosticTimer timer("Model[" + this->GetName() + "] Bodies Update ");
+
+    for (bodyIter=this->bodies.begin(); 
+         bodyIter!=this->bodies.end(); bodyIter++)
     {
+      if (bodyIter->second)
+      {
 #ifdef USE_THREADPOOL
-      World::Instance()->threadPool->schedule(boost::bind(&Body::Update,(bodyIter->second)));
+        World::Instance()->threadPool->schedule(
+            boost::bind(&Body::Update,(bodyIter->second)));
 #else
-      bodyIter->second->Update();
+        bodyIter->second->Update();
 #endif
+      }
     }
   }
 
-#ifdef TIMING
-  double tmpT2 = Simulator::Instance()->GetWallTime();
-  std::cout << "      ALL Bodies DT (" << this->GetName() << ") (" << tmpT2-tmpT1 << ")" << std::endl;
-#endif
-
-  for (contIter=this->controllers.begin();
-       contIter!=this->controllers.end(); contIter++)
   {
-    if (contIter->second)
+    DiagnosticTimer timer("Model[" + this->GetName() + "] Controllers Update ");
+
+    for (contIter=this->controllers.begin();
+        contIter!=this->controllers.end(); contIter++)
     {
+      if (contIter->second)
+      {
 #ifdef USE_THREADPOOL
-      World::Instance()->threadPool->schedule(boost::bind(&Controller::Update,(contIter->second)));
+        World::Instance()->threadPool->schedule(boost::bind(&Controller::Update,(contIter->second)));
 #else
-      contIter->second->Update();
+        contIter->second->Update();
 #endif
+      }
     }
   }
 
-#ifdef TIMING
-  double tmpT3 = Simulator::Instance()->GetWallTime();
-  std::cout << "      ALL Controllers DT (" << this->GetName() << ") (" << tmpT3-tmpT2 << ")" << std::endl;
-#endif
 
-  for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
   {
+    DiagnosticTimer timer("Model[" + this->GetName() + "] Joints Update ");
+    for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
+    {
 #ifdef USE_THREADPOOL
-    World::Instance()->threadPool->schedule(boost::bind(&Joint::Update,*jointIter));
+      World::Instance()->threadPool->schedule(boost::bind(&Joint::Update,*jointIter));
 #else
-    (*jointIter)->Update();
+      (*jointIter)->Update();
 #endif
+    }
   }
-
-#ifdef TIMING
-  double tmpT4 = Simulator::Instance()->GetWallTime();
-  std::cout << "      ALL Joints/canonical body (" << this->GetName() << ") DT (" << tmpT4-tmpT3 << ")" << std::endl;
-#endif
 
   // Call the model's python update function, if one exists
   /*if (this->pFuncUpdate)
@@ -483,16 +478,10 @@ void Model::Update()
     this->rpyP->SetValue(this->pose.rot);
   }*/
 
-  this->UpdateChild();
-  
-#ifdef TIMING
-  double tmpT5 = Simulator::Instance()->GetWallTime();
-  std::cout << "      ALL child (" << this->GetName() << ") update DT (" 
-            << tmpT5-tmpT4 << ")" << std::endl;
-  std::cout << "      Models::Update() (" << this->GetName() 
-            << ") Total DT (" << tmpT5-tmpT1 << ")" << std::endl;
-#endif
-
+  {
+    DiagnosticTimer timer("Model[" + this->GetName() + "] Children Update ");
+    this->UpdateChild();
+  }
 }
 
 
