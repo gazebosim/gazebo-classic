@@ -27,8 +27,6 @@ INCLUDE_DIRECTORIES(
   ${FLTK_INCLUDE_DIR}
 )
 
-message(status "\n\nha\n${bullet_dynamics_dirs}\n${boost_library_dirs}\n\n")
-
 LINK_DIRECTORIES(  
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 

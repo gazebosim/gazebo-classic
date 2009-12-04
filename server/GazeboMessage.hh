@@ -102,8 +102,13 @@ namespace gazebo
    
     /// \brief True if logging data
     private: bool logData;
-  
-    private: std::ostringstream nullStream;
+ 
+    private: class NullStream : public std::ostream
+             {
+               public: NullStream() : std::ios(0), std::ostream(0) {}
+             };
+
+    private: NullStream nullStream;
     private: std::ostream *msgStream;
     private: std::ostream *errStream;
     private: std::ofstream logStream;

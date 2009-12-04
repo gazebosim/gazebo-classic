@@ -4,9 +4,6 @@ INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 # Include all the search paths for headers
 STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
 
-
-message(status "\n\n\nhihi\n\n\n${CMAKE_SOURCE_DIR}/3rd_party/assimp/include\n\n\n")
-
 INCLUDE_DIRECTORIES(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 

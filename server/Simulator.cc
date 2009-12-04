@@ -642,16 +642,12 @@ void Simulator::PhysicsLoop()
     if (!this->IsPaused() || this->GetStepInc())
     {
       this->simTime += step;
-      //this->SetPaused(false);
 
       if (this->GetStepInc())
           userStepped = true;
     }
     else
-    {
       this->pauseTime += step;
-      //  this->pause=true;
-    }
 
     lastTime = this->GetRealTime();
 
