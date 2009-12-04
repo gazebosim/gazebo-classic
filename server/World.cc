@@ -130,13 +130,22 @@ void World::Close()
     this->factory = NULL;
   }
 
-  delete this->saveStateTimeoutP;
-  delete this->saveStateBufferSizeP;
+  if (this->saveStateTimeoutP)
+    delete this->saveStateTimeoutP;
+  this->saveStateTimeoutP = NULL;
 
-  delete this->threadsP;
+  if (this->saveStateBufferSizeP)
+    delete this->saveStateBufferSizeP;
+  this->saveStateBufferSizeP = NULL;
+
+  if (this->threadsP)
+    delete this->threadsP;
+  this->threadsP = NULL;
 
 #ifdef USE_THREADPOOL
-  delete this->threadPool;
+  if (this->threadPool)
+    delete this->threadPool;
+  this->threadPool = NULL;
 #endif
 
 }

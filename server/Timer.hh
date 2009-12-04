@@ -68,7 +68,7 @@ namespace gazebo
   class DiagnosticTimer : public Timer
   {
     /// \brief Constructor
-    public: DiagnosticTimer(const std::string &name, int level = 5, 
+    public: DiagnosticTimer(const std::string &name, int level = 6, 
                             Type t=Timer::REAL_TIMER) : Timer(t) 
             {
               this->name = name; 
