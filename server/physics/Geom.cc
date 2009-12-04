@@ -136,17 +136,13 @@ void Geom::Load(XMLConfigNode *node)
 
       this->visuals.push_back(visual);
       visual->SetCastShadows(true);
-    }
 
-    if (this->IsStatic())
-      visual->MakeStatic();
-      
+      if (this->IsStatic())
+        visual->MakeStatic();
+    }
 
     childNode = childNode->GetNext("visual");
   }
-
-
-
 
   if (this->GetType() != Shape::PLANE && this->GetType() != Shape::HEIGHTMAP)
   {
