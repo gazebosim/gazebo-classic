@@ -1,10 +1,12 @@
 INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
-
 ########################################
 # Include all the search paths for headers
 STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
+
+
+message(status "\n\n\nhihi\n\n\n${CMAKE_SOURCE_DIR}/3rd_party/assimp/include\n\n\n")
+
 INCLUDE_DIRECTORIES(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
@@ -21,6 +23,7 @@ INCLUDE_DIRECTORIES(
   sensors/imu
   sensors/ir
   sensors/ray
+  ${CMAKE_SOURCE_DIR}/3rd_party/assimp/include
   ${LIBAVCODEC_PATH}
   ${LIBAVFORMAT_PATH}
   ${libtool_include_path}
@@ -33,10 +36,15 @@ INCLUDE_DIRECTORIES(
 )
 
 LINK_DIRECTORIES(  
+ ${CMAKE_BINARY_DIR}/3rd_party/assimp 
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
  ${boost_library_dirs} 
+ ${bullet_dynamics_dirs} 
+ ${bullet_collision_dirs} 
+ ${bullet_softbody_dirs} 
+ ${bullet_math_dirs} 
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
 )

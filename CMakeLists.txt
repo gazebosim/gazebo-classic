@@ -36,7 +36,7 @@ SET (bullet_link_libs_desc "List of bullet link libraries"
 SET (OGRE_VERSION 1.6.3 CACHE INTERNAL "Ogre version requirement" FORCE)
 
 SET (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
-SET (FREEIMAGE_MINOR_VERSION 10 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
+SET (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
 SET (FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
 SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
 SET (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)

@@ -133,8 +133,9 @@ void MapShape::Load(XMLConfigNode *node)
 
   this->CreateBoxes(this->root);
 
-  if (this->visualNode)
+  /*if (this->visualNode)
     this->visualNode->MakeStatic();
+    */
 }
 
 
@@ -171,6 +172,7 @@ void MapShape::CreateBoxes(QuadNode *node)
     stream << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
     stream << "  <rpy>0 0 0</rpy>";
     stream << "  <size>" << xSize << " " << ySize << " " << zSize << "</size>";
+    stream << "  <static>true</static>";
     stream << "  <visual>";
     stream << "    <mesh>unit_box</mesh>";
     stream << "    <material>" << this->materialP->GetValue() << "</material>";

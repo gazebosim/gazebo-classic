@@ -126,13 +126,13 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 
   this->isStatic = isStatic;
 
-  if (this->isStatic)
-  {
+  /*if (this->isStatic)
     this->staticGeom = this->sceneNode->getCreator()->createStaticGeometry(
         this->GetName() + "_staticgeom");
-  }
   else
     this->staticGeom = NULL;
+    */
+  this->staticGeom = NULL;
 }
 
 
@@ -640,7 +640,7 @@ void OgreVisual::SetCastShadows(const bool &shadows)
     obj->setCastShadows(shadows);
   }
 
-  if (this->IsStatic())
+  if (this->IsStatic() && this->staticGeom)
     this->staticGeom->setCastShadows(shadows);
 }
 
@@ -671,19 +671,19 @@ void OgreVisual::SetPosition( const Vector3 &pos)
   if (this->ignorePoseUpdates)
     return;
 
+  /*if (this->IsStatic() && this->staticGeom)
+  {
+    this->staticGeom->reset();
+    delete this->staticGeom;
+    this->staticGeom = NULL;
+    //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
+  }*/
+
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 
-  if (this->IsStatic())
-  {
-    //this->sceneNode->setParent(this->owner->GetVisualNode()->GetSceneNode() );
-    //this->staticGeom->reset();
-    //this->MakeStatic();
-    //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
-  }
-  else
-  {
-    //std::cout << "Dynamic SceneNodePos[" << this->sceneNode->_getDerivedPosition() << "] [" << pos << "]\n";
-  }
+  /*if (this->IsStatic())
+    this->MakeStatic();
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

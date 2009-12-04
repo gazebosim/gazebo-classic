@@ -207,7 +207,8 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     gzthrow("Invalid model type[" + this->type + "]\n");
 
   // Set the relative pose of the model
-  this->SetRelativePose( pose );
+  if (!this->IsStatic())
+    this->SetRelativePose( pose );
 
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);

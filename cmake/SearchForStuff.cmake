@@ -7,9 +7,9 @@ INCLUDE (FindPkgConfig)
 INCLUDE (${gazebo_cmake_dir}/FindOde.cmake)
 INCLUDE (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
-if (NOT FLTK_FOUND)
-  BUILD_ERROR("FLTK libraries and development files not found. See the following website for installation instructions: http://fltk.org")
-endif (NOT FLTK_FOUND)
+#if (NOT FLTK_FOUND)
+#  BUILD_ERROR("FLTK libraries and development files not found. See the following website for installation instructions: http://fltk.org")
+#endif (NOT FLTK_FOUND)
 
 
 SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
@@ -18,6 +18,11 @@ SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 SET (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
 SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
+SET (bullet_dynamics_dirs "" CACHE STRING "Bullet Dynamics libraries. Use this to override automatic detection.")
+SET (bullet_collision_dirs "" CACHE STRING "Bullet Collision libraries. Use this to override automatic detection.")
+SET (bullet_softbody_dirs "" CACHE STRING "Bullet Softbody libraries. Use this to override automatic detection.")
+SET (bullet_math_dirs "" CACHE STRING "Bullet LinearMath libraries. Use this to override automatic detection.")
+SET (bullet_cflags "" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
 SET (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
 
 ########################################
