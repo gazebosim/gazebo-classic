@@ -103,7 +103,7 @@ SET (files 10points.png
            blue_pause_button.png
            blue_play_button.png
            blue_step_button.png
-           gazebo_icon.jpg
+           gazebo_icon.png
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)
