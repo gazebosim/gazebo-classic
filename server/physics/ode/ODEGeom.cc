@@ -74,7 +74,7 @@ void ODEGeom::Load(XMLConfigNode *node)
 
     // Transform into CoM relative Pose
     //localPose = newPose - this->body->GetCoMPose();
-    localPose = this->GetRelativePose();
+    localPose = this->GetCoMRelativePose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -101,7 +101,7 @@ void ODEGeom::OnPoseChange()
   {
 
     // Transform into global pose since a static geom does not have a body 
-    localPose = this->GetAbsPose();
+    localPose = this->GetCoMAbsPose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -109,14 +109,14 @@ void ODEGeom::OnPoseChange()
     q[3] = localPose.rot.z;
 
     dGeomSetPosition(this->geomId, localPose.pos.x, localPose.pos.y, 
-        localPose.pos.z);
+                     localPose.pos.z);
     dGeomSetQuaternion(this->geomId, q);
   }
   else if (this->geomId && this->placeable)
   {
     // Transform into CoM relative Pose
     //localPose = newPose - this->body->GetCoMPose();
-    localPose = this->GetRelativePose();
+    localPose = this->GetCoMRelativePose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -311,7 +311,7 @@ Mass ODEGeom::GetBodyMassMatrix()
   products = this->mass.GetProductsofInertia();
 
   this->physicsEngine->LockMutex();
-  pose = this->GetAbsPose(); // get pose of the geometry
+  pose = this->GetCoMAbsPose(); // get pose of the geometry
 
   q[0] = pose.rot.u;
   q[1] = pose.rot.x;

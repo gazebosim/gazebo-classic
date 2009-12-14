@@ -475,6 +475,8 @@ void Body::UpdateCoM()
 
   bodyPose = this->GetRelativePose();
 
+  this->comOffset = this->mass.GetCoG();
+
   // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
@@ -487,9 +489,7 @@ void Body::UpdateCoM()
     iter->second->SetRelativePose(newPose, true);
   }
 
-  // Apply the CoG offset to the body
   Pose3d p = this->GetRelativePose();
-  p.pos += this->mass.GetCoG();
 
   this->SetRelativePose( p, true );
 }

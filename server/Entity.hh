@@ -105,8 +105,16 @@ namespace gazebo
     /// \brief Get the absolute pose of the entity
     public: virtual Pose3d GetAbsPose() const;
 
+    /// \brief Get the absolute pose of the entity.  The result
+    ///        is based on the center of mass of the bodies
+    public: virtual Pose3d GetCoMAbsPose() const;
+
     /// \brief Get the pose of the entity relative to its parent
     public: Pose3d GetRelativePose() const;
+
+    /// \brief Get the pose of the entity relative to its parent. The result
+    ///        is based on the center of mass of the bodies
+    public: Pose3d GetCoMRelativePose() const;
 
     /// \brief Get the pose relative to the model this entity belongs to
     public: Pose3d GetModelRelativePose() const;
@@ -169,6 +177,9 @@ namespace gazebo
     private: bool selected;
 
     private: Pose3d relativePose;
+
+    // Center of Mass offset
+    protected: Vector3 comOffset;
   };
   
   /// \}

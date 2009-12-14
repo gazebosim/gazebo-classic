@@ -269,10 +269,30 @@ Pose3d Entity::GetAbsPose() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the absolute pose of the entity
+Pose3d Entity::GetCoMAbsPose() const
+{
+  if (this->parent)
+    return this->GetCoMRelativePose() + this->parent->GetCoMAbsPose();
+  else
+    return this->GetCoMRelativePose();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the entity relative to its parent
 Pose3d Entity::GetRelativePose() const
 {
   return this->relativePose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the pose of the entity relative to its parent
+Pose3d Entity::GetCoMRelativePose() const
+{
+  Vector3 rotateCOM = this->relativePose.rot.RotateVector(this->comOffset);
+
+  return Pose3d(this->relativePose.pos + rotateCOM,
+                this->relativePose.rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -328,9 +348,9 @@ void Entity::PoseChange(bool notify)
   {
     if (Simulator::Instance()->GetState() == Simulator::RUN &&
         !this->IsStatic())
-      this->visualNode->SetDirty(true, this->relativePose);
+      this->visualNode->SetDirty(true, this->GetCoMRelativePose());
     else
-      this->visualNode->SetPose(this->relativePose);
+      this->visualNode->SetPose(this->GetCoMRelativePose());
   }
 
   if (notify)
