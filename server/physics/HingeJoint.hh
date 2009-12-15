@@ -124,11 +124,6 @@ namespace gazebo
                  this->SetHighStop(0, this->hiStopP->GetValue());
 
                  Vector3 a = **this->axisP;
-                 //std::cout << "Axis[" << a << "]\n";
-                 //std::cout << "Abs Rot[" << this->anchorBody->GetAbsPose().rot << "]\n";
-                 //a = this->anchorBody->GetAbsPose().rot.RotateVector(a);
-                 //a.Normalize();
-                 //std::cout << "Axis Rot[" << a << "]\n";
                  this->SetAxis(0, a);
                }
  
