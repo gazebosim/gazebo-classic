@@ -15,11 +15,14 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
   this->rayFanOutline = OgreCreator::Instance()->CreateDynamicLine(
       OgreDynamicRenderable::OT_LINE_STRIP);
 
-  this->parent->GetVisualNode()->AttachObject(this->rayFan);
-  this->parent->GetVisualNode()->AttachObject(this->rayFanOutline);
+  if (this->rayFan && this->rayFanOutline)
+  {
+    this->parent->GetVisualNode()->AttachObject(this->rayFan);
+    this->parent->GetVisualNode()->AttachObject(this->rayFanOutline);
 
-  this->rayFan->setMaterial("Gazebo/BlueLaser");
-  this->rayFanOutline->setMaterial("Gazebo/BlueEmissive");
+    this->rayFan->setMaterial("Gazebo/BlueLaser");
+    this->rayFanOutline->setMaterial("Gazebo/BlueEmissive");
+  }
 
   Param::Begin(&this->parameters);
   this->rayCountP = new ParamT<int>("rayCount",0,1);

@@ -252,8 +252,11 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     this->SetGravityMode( **this->enableGravityP );
 
   //global fiducial and retro id
-  this->SetLaserFiducialId(**this->laserFiducialP);
-  this->SetLaserRetro(**this->laserRetroP);
+  if (**this->laserFiducialP != -1.0 )
+    this->SetLaserFiducialId(**this->laserFiducialP);
+
+  if (**this->laserRetroP != -1.0)
+    this->SetLaserRetro(**this->laserRetroP);
 
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler();

@@ -66,8 +66,6 @@ void ODERayShape::Update()
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  //std::cout << "Start[" << this->relativeStartPos << "] End[" << this->relativeEndPos << "] Dir[" << dir << "]\n";
-
   if (this->contactLen != 0)
   {
     dGeomRaySet(geom->GetGeomId(), this->globalStartPos.x,

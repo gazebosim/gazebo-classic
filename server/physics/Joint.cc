@@ -210,18 +210,21 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 /// Update the joint
 void Joint::Update()
 {
+  this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + 
+                     this->anchorBody->GetAbsPose()).pos;
+
   //TODO: Evaluate impact of this code on performance
   if (this->visual)
+  {
     this->visual->SetVisible(World::Instance()->GetShowJoints());
 
-  this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern())+ this->anchorBody->GetAbsPose()).pos;
-  
-  this->visual->SetPosition(this->anchorPos);
-  if (this->body1) 
-    this->line1->SetPoint(1, this->body1->GetAbsPose().pos - this->anchorPos);
+    this->visual->SetPosition(this->anchorPos);
+    if (this->body1) 
+      this->line1->SetPoint(1, this->body1->GetAbsPose().pos - this->anchorPos);
 
-  if (this->body2)
-    this->line2->SetPoint(1, this->body2->GetAbsPose().pos - this->anchorPos);
+    if (this->body2)
+      this->line2->SetPoint(1, this->body2->GetAbsPose().pos - this->anchorPos);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
