@@ -123,8 +123,7 @@ void Joint::Load(XMLConfigNode *node)
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = this->anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
-  this->anchorPos -= this->anchorBody->GetMass().GetCoG();
+  this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + this->anchorBody->GetAbsPose()).pos ;
 
   this->Attach(this->body1, this->body2);
 
@@ -215,14 +214,9 @@ void Joint::Update()
   if (this->visual)
     this->visual->SetVisible(World::Instance()->GetShowJoints());
 
-  // setting anchor relative to gazebo body frame origin
-  this->anchorPos = this->anchorBody->GetAbsPose().pos + **(this->anchorOffsetP);
-  this->anchorPos -= this->anchorBody->GetMass().GetCoG();
-
-  //this->anchorPos = this->GetAnchor(0);
-
+  this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern())+ this->anchorBody->GetAbsPose()).pos;
+  
   this->visual->SetPosition(this->anchorPos);
-
   if (this->body1) 
     this->line1->SetPoint(1, this->body1->GetAbsPose().pos - this->anchorPos);
 

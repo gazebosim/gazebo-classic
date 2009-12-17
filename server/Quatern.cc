@@ -91,9 +91,11 @@ void Quatern::SetToIdentity()
 // Invert the quaternion
 void Quatern::Invert()
 {
-  this->x = -this->x;
-  this->y = -this->y;
-  this->z = -this->z;
+  double norm = this->u*this->u+this->x*this->x+this->y*this->y+this->z*this->z;
+  this->u = this->u/norm;
+  this->x = -this->x/norm;
+  this->y = -this->y/norm;
+  this->z = -this->z/norm;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,12 +104,15 @@ Quatern Quatern::GetInverse() const
 {
   Quatern q;
 
-  q.u = this->u;
-  q.x = -this->x;
-  q.y = -this->y;
-  q.z = -this->z;
+  double norm = this->u*this->u+this->x*this->x+this->y*this->y+this->z*this->z;
 
-  //q.Normalize();
+  if (norm > 0.0)
+  {
+    q.u = this->u / norm;
+    q.x = -this->x / norm;
+    q.y = -this->y / norm;
+    q.z = -this->z / norm;
+  }
 
   return q;
 }

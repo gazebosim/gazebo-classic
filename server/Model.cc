@@ -984,7 +984,7 @@ void Model::Attach(XMLConfigNode *node)
     gzthrow("Parent has no canonical body");
 
   this->joint->Attach(myBody, pBody);
-  this->joint->SetAnchor(0, myBody->GetCoMAbsPose().pos );
+  this->joint->SetAnchor(0, myBody->GetAbsPose().pos );
   this->joint->SetAxis(0, Vector3(0,1,0) );
   this->joint->SetHighStop(0,Angle(0));
   this->joint->SetLowStop(0,Angle(0));

@@ -54,6 +54,8 @@ using namespace gazebo;
 Body::Body(Entity *parent)
     : Entity(parent)
 {
+  this->comEntity = new Entity(this);
+
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
   this->cgVisual = NULL;
@@ -172,7 +174,7 @@ void Body::Load(XMLConfigNode *node)
   this->turnGravityOffP->Load(node);
 
   this->SetRelativePose(Pose3d(**this->xyzP, **this->rpyP));
-
+  
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide( **this->selfCollideP );
@@ -358,7 +360,7 @@ void Body::Init()
 
     if (this->cgVisual == NULL)
       this->cgVisual = OgreCreator::Instance()->CreateVisual(visname.str(),
-          this->GetVisualNode());
+          this->comEntity->GetVisualNode());
     else
       this->cgVisual->DetachObjects();
 
@@ -453,7 +455,7 @@ void Body::AttachGeom( Geom *geom )
     if (!**this->customMassMatrixP)
     {
       Mass tmpMass = geom->GetMass();
-      tmpMass.Rotate( this->GetRelativePose().rot );
+      //tmpMass.Rotate( this->GetRelativePose().rot );
       this->mass += tmpMass;
     }
   }
@@ -470,12 +472,12 @@ void Body::UpdateCoM()
   Pose3d origPose, newPose;
   std::map<std::string, Geom*>::iterator iter;
 
-  if (**this->customMassMatrixP)
-    this->mass = this->customMass;
-
   bodyPose = this->GetRelativePose();
 
-  this->comOffset = this->mass.GetCoG();
+  if (**this->customMassMatrixP)
+  {
+    this->mass = this->customMass;
+  }
 
   // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
@@ -484,14 +486,12 @@ void Body::UpdateCoM()
     origPose = iter->second->GetRelativePose();
     newPose = origPose;
 
-    offset = bodyPose.rot.GetInverse().RotateVector(this->mass.GetCoG());
-    newPose.pos -= offset;
+    newPose.pos -= this->mass.GetCoG();
     iter->second->SetRelativePose(newPose, true);
   }
 
-  Pose3d p = this->GetRelativePose();
-
-  this->SetRelativePose( p, true );
+  this->comEntity->SetRelativePose(Pose3d(this->mass.GetCoG(),Quatern()),true);
+  this->OnPoseChange();
 }
 
 
@@ -537,13 +537,6 @@ void Body::LoadSensor(XMLConfigNode *node)
     stream << "Null sensor. Invalid sensor name[" << node->GetString("name",std::string(), 0) << "]";
     gzthrow(stream.str());
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the Center of Mass pose
-const Pose3d &Body::GetCoMPose() const
-{
-  return this->comPose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

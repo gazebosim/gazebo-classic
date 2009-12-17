@@ -98,9 +98,6 @@ namespace gazebo
     /// \brief Update the center of mass
     public: virtual void UpdateCoM();
 
-    /// \brief Get the Center of Mass pose
-    public: const Pose3d &GetCoMPose() const;
-
     /// \brief Set whether gravity affects this body
     public: virtual void SetGravityMode(bool mode) = 0;
 
@@ -209,6 +206,8 @@ namespace gazebo
     /// \brief Set to true to show the physics visualizations
     public: void ShowPhysics(bool show);
 
+    public: Entity *GetCoMEntity() { return this->comEntity; }
+
     /// List of geometries attached to this body
     protected: std::map< std::string, Geom* > geoms;
 
@@ -224,8 +223,8 @@ namespace gazebo
     ///   model pose = body pose + initModelOffset
     public: Pose3d initModelOffset;
 
-    protected: Pose3d comPose;
-
+    // Helper entity for separating body pose from center-of-mass pose
+    protected: Entity *comEntity;
 
     /// The pose of the body relative to the model. Can also think of this
     /// as the body's pose offset.

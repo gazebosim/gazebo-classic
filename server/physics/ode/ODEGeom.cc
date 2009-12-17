@@ -73,8 +73,7 @@ void ODEGeom::Load(XMLConfigNode *node)
     dQuaternion q;
 
     // Transform into CoM relative Pose
-    //localPose = newPose - this->body->GetCoMPose();
-    localPose = this->GetCoMRelativePose();
+    localPose = this->GetRelativePose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -99,9 +98,8 @@ void ODEGeom::OnPoseChange()
 
   if (this->IsStatic() && this->geomId && this->placeable)
   {
-
     // Transform into global pose since a static geom does not have a body 
-    localPose = this->GetCoMAbsPose();
+    localPose = this->GetAbsPose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -115,8 +113,7 @@ void ODEGeom::OnPoseChange()
   else if (this->geomId && this->placeable)
   {
     // Transform into CoM relative Pose
-    //localPose = newPose - this->body->GetCoMPose();
-    localPose = this->GetCoMRelativePose();
+    localPose = this->GetRelativePose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -195,76 +192,6 @@ int ODEGeom::GetGeomClass() const
  
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set the global pose relative to the body
-/*void ODEGeom::SetPose(const Pose3d &newPose, bool updateCoM)
-{
-  this->physicsEngine->LockMutex();
-
-  if (this->placeable && this->geomId)
-  {
-    Pose3d localPose;
-    dQuaternion q;
-
-    // Transform into CoM relative Pose
-    localPose = newPose - this->body->GetCoMPose();
-
-    q[0] = localPose.rot.u;
-    q[1] = localPose.rot.x;
-    q[2] = localPose.rot.y;
-    q[3] = localPose.rot.z;
-
-    // Set the pose of the encapsulated geom; this is always relative
-    // to the CoM
-    dGeomSetOffsetPosition(this->geomId, localPose.pos.x, localPose.pos.y, localPose.pos.z);
-    dGeomSetOffsetQuaternion(this->geomId, q);
-
-    if (updateCoM)
-    {
-      this->body->UpdateCoM();
-    }
-  }
-
-  this->physicsEngine->UnlockMutex();
-}*/
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the pose of the geom relative to the body
-/*Pose3d ODEGeom::GetPose() const
-{
-  this->physicsEngine->LockMutex();
-
-  Pose3d pose;
-
-  if (this->placeable && this->geomId)
-  {
-    const dReal *p;
-    dQuaternion r;
-
-    // Get the pose of the encapsulated geom; this is always relative to
-    // the CoM
-    p = dGeomGetPosition(this->geomId);
-    dGeomGetQuaternion(this->geomId, r);
-
-    pose.pos.x = p[0];
-    pose.pos.y = p[1];
-    pose.pos.z = p[2];
-
-    pose.rot.u = r[0];
-    pose.rot.x = r[1];
-    pose.rot.y = r[2];
-    pose.rot.z = r[3];
-
-    // Transform into body relative pose
-    pose += this->body->GetCoMPose();
-  }
-
-  this->physicsEngine->UnlockMutex();
-
-  return pose;
-}*/
-
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the category bits, used during collision detection
 void ODEGeom::SetCategoryBits(unsigned int bits)
 {
@@ -311,7 +238,7 @@ Mass ODEGeom::GetBodyMassMatrix()
   products = this->mass.GetProductsofInertia();
 
   this->physicsEngine->LockMutex();
-  pose = this->GetCoMAbsPose(); // get pose of the geometry
+  pose = this->GetAbsPose(); // get pose of the geometry
 
   q[0] = pose.rot.u;
   q[1] = pose.rot.x;

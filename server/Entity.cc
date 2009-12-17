@@ -263,19 +263,9 @@ std::string Entity::GetCompleteScopedName()
 Pose3d Entity::GetAbsPose() const
 {
   if (this->parent)
-    return this->relativePose + this->parent->GetAbsPose();
+    return this->GetRelativePose() + this->parent->GetAbsPose();
   else
-    return this->relativePose;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the absolute pose of the entity
-Pose3d Entity::GetCoMAbsPose() const
-{
-  if (this->parent)
-    return this->GetCoMRelativePose() + this->parent->GetCoMAbsPose();
-  else
-    return this->GetCoMRelativePose();
+    return this->GetRelativePose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -286,13 +276,11 @@ Pose3d Entity::GetRelativePose() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the pose of the entity relative to its parent
-Pose3d Entity::GetCoMRelativePose() const
+/// Set the pose of the entity relative to its parent
+void Entity::SetRelativePose(const Pose3d &pose, bool notify)
 {
-  Vector3 rotateCOM = this->relativePose.rot.RotateVector(this->comOffset);
-
-  return Pose3d(this->relativePose.pos + rotateCOM,
-                this->relativePose.rot);
+  this->relativePose = pose;
+  this->PoseChange(notify);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -302,15 +290,7 @@ Pose3d Entity::GetModelRelativePose() const
   if (this->IsModel() || !this->parent)
     return Pose3d();
 
-  return this->relativePose + this->parent->GetModelRelativePose();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the pose of the entity relative to its parent
-void Entity::SetRelativePose(const Pose3d &pose, bool notify)
-{
-  this->relativePose = pose;
-  this->PoseChange(notify);
+  return this->GetRelativePose() + this->parent->GetModelRelativePose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -328,16 +308,14 @@ void Entity::SetAbsPose(const Pose3d &pose, bool notify)
 /// Set the position of the entity relative to its parent
 void Entity::SetRelativePosition(const Vector3 &pos)
 {
-  this->relativePose.pos = pos;
-  this->PoseChange();
+  this->SetRelativePose( Pose3d( pos, this->GetRelativePose().rot), true );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the rotation of the entity relative to its parent
 void Entity::SetRelativeRotation(const Quatern &rot)
 {
-  this->relativePose.rot = rot;
-  this->PoseChange();
+  this->SetRelativePose( Pose3d( this->GetRelativePose().pos, rot), true );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -348,9 +326,9 @@ void Entity::PoseChange(bool notify)
   {
     if (Simulator::Instance()->GetState() == Simulator::RUN &&
         !this->IsStatic())
-      this->visualNode->SetDirty(true, this->GetCoMRelativePose());
+      this->visualNode->SetDirty(true, this->GetRelativePose());
     else
-      this->visualNode->SetPose(this->GetCoMRelativePose());
+      this->visualNode->SetPose(this->GetRelativePose());
   }
 
   if (notify)

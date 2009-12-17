@@ -108,10 +108,9 @@ void ODEBody::MoveCallback(dBodyID id)
   pose.pos.Set(p[0], p[1], p[2]);
   pose.rot.Set(r[0], r[1], r[2], r[3] );
 
-  Vector3 rotateCOM = pose.rot.RotateVector(self->comOffset);
-  pose.pos -=  rotateCOM;
+  Pose3d pp = self->comEntity->GetRelativePose().GetInverse() + pose;
 
-  self->SetAbsPose(pose, false);
+  self->SetAbsPose(pp, false);
   self->physicsEngine->UnlockMutex();
 }
 
@@ -176,7 +175,7 @@ void ODEBody::OnPoseChange()
   if (this->bodyId == NULL)
     return;
 
-  Pose3d pose = this->GetCoMAbsPose();
+  Pose3d pose = this->comEntity->GetAbsPose();
   this->physicsEngine->LockMutex();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);

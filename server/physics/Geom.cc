@@ -44,7 +44,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Geom::Geom( Body *body )
-    : Entity(body)
+    : Entity(body->GetCoMEntity())
 {
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 

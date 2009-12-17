@@ -68,7 +68,7 @@ bool Pose3d::IsFinite() const
 Pose3d Pose3d::GetInverse() const
 {
   Quatern inv = this->rot.GetInverse();
-  return Pose3d( inv * this->pos, inv );
+  return Pose3d( inv * (this->pos*-1), inv );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
