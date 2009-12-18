@@ -333,7 +333,7 @@ void Simulator::MainLoop()
 {
   this->state = RUN;
 
-  DiagnosticTimer timer("--------------------------- START Simulator::MainLoop() --------------------------");
+  //DiagnosticTimer timer("--------------------------- START Simulator::MainLoop() --------------------------");
   Time currTime = 0;
   Time lastTime = 0;
   struct timespec timeSpec;
@@ -630,7 +630,7 @@ void Simulator::PhysicsLoop()
 
   while (!this->userQuit)
   {
-    DiagnosticTimer timer("PhysicsLoop Timer ");
+    //DiagnosticTimer timer("PhysicsLoop Timer ");
 
     currTime = this->GetRealTime();
 
@@ -687,7 +687,7 @@ void Simulator::PhysicsLoop()
     nanosleep(&req, &rem);
 
     {
-      DiagnosticTimer timer("PhysicsLoop UpdateSimIfaces ");
+      //DiagnosticTimer timer("PhysicsLoop UpdateSimIfaces ");
 
       // Process all incoming messages from simiface
       world->UpdateSimulationIface();

@@ -8,10 +8,12 @@ ADD_SUBDIRECTORY(ir)
 
 SET (sources Sensor.cc
              SensorFactory.cc
+             SensorManager.cc
 ) 
 
 SET (headers Sensor.hh
              SensorFactory.hh
+             SensorManager.hh
 )
 
 #ADD_LIBRARY(gazebo_sensors STATIC ${gazebosensor_sources} ${sources})

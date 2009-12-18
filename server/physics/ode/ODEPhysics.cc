@@ -515,25 +515,31 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
                                           self->contactGroup, &contact);
 
         // Store the contact info 
-        (*self->contactFeedbackIter).contact.depths.push_back(
-            contact.geom.depth);
-        (*self->contactFeedbackIter).contact.positions.push_back(
-            Vector3(contact.geom.pos[0], contact.geom.pos[1], 
-                    contact.geom.pos[2]) );
-        (*self->contactFeedbackIter).contact.normals.push_back(
-            Vector3(contact.geom.normal[0], contact.geom.normal[1], 
-                    contact.geom.normal[2]) );
-        (*self->contactFeedbackIter).contact.time = 
-          Simulator::Instance()->GetSimTime();
-        dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));
+        if (geom1->GetContactsEnabled() ||
+            geom2->GetContactsEnabled())
+        {
+          (*self->contactFeedbackIter).contact.depths.push_back(
+              contact.geom.depth);
+          (*self->contactFeedbackIter).contact.positions.push_back(
+              Vector3(contact.geom.pos[0], contact.geom.pos[1], 
+                contact.geom.pos[2]) );
+          (*self->contactFeedbackIter).contact.normals.push_back(
+              Vector3(contact.geom.normal[0], contact.geom.normal[1], 
+                contact.geom.normal[2]) );
+          (*self->contactFeedbackIter).contact.time = 
+            Simulator::Instance()->GetSimTime();
+          dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));
+        }
 
         dJointAttach (c,b1,b2);
       }
 
-      self->contactFeedbackIter++;
-      if (self->contactFeedbackIter == self->contactFeedbacks.end())
-        self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
-        
+      if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
+      {
+        self->contactFeedbackIter++;
+        if (self->contactFeedbackIter == self->contactFeedbacks.end())
+          self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
+      }
     }
   }
 }

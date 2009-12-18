@@ -61,6 +61,8 @@ Geom::Geom( Body *body )
 
   this->shape = NULL;
 
+  this->contactsEnabled = false;
+
   Param::Begin(&this->parameters);
   this->massP = new ParamT<double>("mass",0.001,0);
   this->massP->Callback( &Geom::SetMass, this);
@@ -421,9 +423,26 @@ Shape *Geom::GetShape() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Turn contact recording on or off
+void Geom::SetContactsEnabled(bool enable)
+{
+  this->contactsEnabled = enable;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return true of contact recording is on
+bool Geom::GetContactsEnabled() const
+{
+  return this->contactsEnabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Add an occurance of a contact to this geom
 void Geom::AddContact(const Contact &contact)
 {
+  if (!this->contactsEnabled)
+    return;
+
   if (this->GetType() == Shape::RAY || this->GetType() == Shape::PLANE)
     return;
 

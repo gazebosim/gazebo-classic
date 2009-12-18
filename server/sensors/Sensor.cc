@@ -49,6 +49,9 @@ Sensor::Sensor(Body *body)
   this->controller = NULL;
   this->active = true;
 
+  this->world = World::Instance();
+  this->simulator = Simulator::Instance();
+
   Param::Begin(&this->parameters);
   this->updateRateP = new ParamT<double>("updateRate", 0, 0);
   Param::End();
@@ -119,20 +122,19 @@ void Sensor::Init()
 /// Update the sensor
 void Sensor::Update()
 {
-  DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
+  //DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
 
-  Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
-  if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->updatePeriod)/physics_dt) >= 0)
+  Time physics_dt = this->world->GetPhysicsEngine()->GetStepTime();
+
+  if (((this->simulator->GetSimTime() - this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
   {
     this->UpdateChild();
-    this->lastUpdate = Simulator::Instance()->GetSimTime();
+    this->lastUpdate = this->simulator->GetSimTime();
   }
 
   // update any controllers that are children of sensors, e.g. ros_bumper
   if (this->controller)
-  {
     this->controller->Update();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

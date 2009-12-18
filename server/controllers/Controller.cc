@@ -195,26 +195,19 @@ void Controller::Update()
 {
   if (this->IsConnected() || **this->alwaysOnP)
   {
-    DiagnosticTimer timer("Controller[" + this->GetName() +"] Update Timer");
+    //DiagnosticTimer timer("Controller[" + this->GetName() +"] Update Timer");
+
     // round time difference to this->physicsEngine->GetStepTime()
     Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
 
-    // if (this->GetName() == std::string("p3d_base_controller"))
-    // std::cout << " sim update: " << this->GetName()
-    //           << " , " << Simulator::Instance()->GetSimTime() - lastUpdate
-    //           << " , " << lastUpdate
-    //           << " , " << updatePeriod
-    //           << " i1 " << round((Simulator::Instance()->GetSimTime()-lastUpdate)/physics_dt)
-    //           << " i2 " << round(updatePeriod/physics_dt)
-    //           << std::endl;
-    timer.Start();
+    //timer.Start();
 
     Time simTime = Simulator::Instance()->GetSimTime();
     if ((simTime-lastUpdate-updatePeriod)/physics_dt >= 0)
     {
       this->UpdateChild();
       lastUpdate = Simulator::Instance()->GetSimTime();
-      timer.Report("Update() dt");
+      //timer.Report("Update() dt");
     }
   }
 }

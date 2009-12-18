@@ -26,6 +26,7 @@
  */
 
 #include "Sensor.hh"
+#include "SensorManager.hh"
 #include "Body.hh"
 #include "SensorFactory.hh"
 
@@ -48,7 +49,9 @@ Sensor *SensorFactory::NewSensor(const std::string &classname, Body *body)
 {
   if (sensors[classname])
   {
-    return (sensors[classname]) (body);
+    Sensor *sensor = (sensors[classname]) (body);
+    SensorManager::Instance()->AddSensor(sensor);
+    return sensor;
   }
 
   return NULL;

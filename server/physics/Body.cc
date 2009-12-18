@@ -27,6 +27,7 @@
 #include <sstream>
 #include <float.h>
 
+#include "SensorManager.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "GazeboMessage.hh"
@@ -107,12 +108,7 @@ Body::~Body()
   this->geoms.clear();
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-  {
-    if (*siter)
-      delete (*siter);
-    (*siter) = NULL;
-  }
-  this->sensors.clear();
+    SensorManager::Instance()->RemoveSensor(*siter);
 
   if (this->cgVisual)
     delete this->cgVisual;
@@ -206,6 +202,8 @@ void Body::Load(XMLConfigNode *node)
   }
 
   World::Instance()->RegisterBody(this);
+
+  //this->GetModel()->ConnectUpdateSignal( boost::bind(&Body::Update, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -245,11 +243,8 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 void Body::Fini()
 {
   std::vector< Sensor* >::iterator siter;
-
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-  {
     (*siter)->Fini();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,17 +331,16 @@ void Body::Init()
   if (this->geoms.size()==0 || **this->turnGravityOffP)
     this->SetGravityMode(false);
 
-  std::vector< Sensor* >::iterator siter;
-
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-    (*siter)->Init();
-
   // global-inertial damping is implemented in ode svn trunk
   if(this->GetId() && this->dampingFactorP->GetValue() > 0)
   {
     this->SetLinearDamping(**this->dampingFactorP);
     this->SetAngularDamping(**this->dampingFactorP);
   }
+
+  std::vector< Sensor* >::iterator siter;
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+    (*siter)->Init();
 
   this->linearAccel.Set(0,0,0);
   this->angularAccel.Set(0,0,0);
@@ -393,14 +387,12 @@ void Body::Init()
 // Update the body
 void Body::Update()
 {
-  DiagnosticTimer timer("Body[" + this->GetName() +"] Update");
+  //DiagnosticTimer timer("Body[" + this->GetName() +"] Update");
 
 #ifdef USE_THREADPOOL
   // If calling Body::Update in threadpool
   World::Instance()->GetPhysicsEngine()->InitForThread();
 #endif
-
-  std::vector< Sensor* >::iterator sensorIter;
   std::map< std::string, Geom* >::iterator geomIter;
   Vector3 vel;
   Vector3 avel;
@@ -412,7 +404,7 @@ void Body::Update()
   this->SetTorque(this->angularAccel);
 
   {
-    DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
+    //DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
 
     for (geomIter=this->geoms.begin();
         geomIter!=this->geoms.end(); geomIter++)
@@ -424,21 +416,6 @@ void Body::Update()
 #endif
     }
   }
-
-  {
-    DiagnosticTimer timer("Body[" + this->GetName() +"] Update Sensors");
-
-    for (sensorIter=this->sensors.begin();
-        sensorIter!=this->sensors.end(); sensorIter++)
-    {
-#ifdef USE_THREADPOOL
-      World::Instance()->threadpool->schedule(boost::bind(&Sensor::Update, (sensorIter)));
-#else
-      (*sensorIter)->Update();
-#endif
-    }
-  }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

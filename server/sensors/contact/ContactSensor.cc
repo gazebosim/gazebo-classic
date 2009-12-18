@@ -99,6 +99,7 @@ void ContactSensor::InitChild()
   {
     // Get the geom from the body
     Geom *geom = this->body->GetGeom( **(*iter) );
+    geom->SetContactsEnabled(true);
     this->geoms.push_back(geom);
   }
 }

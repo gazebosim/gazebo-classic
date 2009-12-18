@@ -147,6 +147,12 @@ namespace gazebo
     /// \brief Get the attached shape
     public: Shape *GetShape() const;
 
+    /// \brief Turn contact recording on or off
+    public: void SetContactsEnabled(bool enable);
+
+    /// \brief Return true of contact recording is on
+    public: bool GetContactsEnabled() const;
+
     /// \brief Add an occurance of a contact to this geom
     public: void AddContact(const Contact &contact);
 
@@ -205,6 +211,8 @@ namespace gazebo
     protected: PhysicsEngine *physicsEngine;
 
     protected: Shape *shape;
+
+    private: bool contactsEnabled;
 
     public: boost::signal< void (const Contact &)> contactSignal;
   };

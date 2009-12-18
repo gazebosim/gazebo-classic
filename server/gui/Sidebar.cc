@@ -33,6 +33,7 @@
 #include <FL/Fl_Value_Slider.H>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/bind.hpp>
 
 #include "Gui.hh"
 #include "World.hh"
@@ -107,6 +108,10 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
 
   this->resizable( this->entityBrowser );
   this->resizable( this->paramBrowser );
+
+
+  World::Instance()->ConnectAddEntitySignal( 
+      boost::bind(&Sidebar::AddEntityToBrowser, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,11 +148,11 @@ void Sidebar::Update()
     std::map<std::string, Body*>::const_iterator iter;
     std::map<std::string, Geom*>::const_iterator giter;
 
-    for (unsigned int i=0; i < model->GetJointCount(); i++)
+    /*for (unsigned int i=0; i < model->GetJointCount(); i++)
     {
       Joint *joint = model->GetJoint(i);
       this->jointChoice->add(joint->GetName().c_str(),0,0);
-    }
+    }*/
 
     for (iter = bodies->begin(); iter != bodies->end(); iter++)
     {
@@ -390,9 +395,14 @@ void Sidebar::UpdateEntityBrowser()
   std::vector<Model*> models = World::Instance()->GetModels();
 
   for (iter = models.begin(); iter != models.end(); iter++)
-  {
-    this->entityBrowser->add( (*iter)->GetName().c_str() );
-  }
+    this->AddEntityToBrowser((*iter));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add an entity to the browser
+void Sidebar::AddEntityToBrowser(Entity *entity)
+{
+  this->entityBrowser->add( entity->GetName().c_str() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

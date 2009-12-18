@@ -35,6 +35,8 @@ namespace gazebo
 {
   class XMLConfigNode;
   class Body;
+  class World;
+  class Simulator;
   class Controller;
 
   /// \addtogroup gazebo_sensor
@@ -100,6 +102,8 @@ namespace gazebo
   
     /// The body this sensor is attached to
     protected: Body *body;
+    protected: World *world;
+    protected: Simulator *simulator;
 
     /// \brief Pointer to the controller of the sensor
     protected: Controller *controller;

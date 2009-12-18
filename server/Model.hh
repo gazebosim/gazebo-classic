@@ -29,6 +29,7 @@
 
 //#include <python2.4/Python.h>
 #include <boost/any.hpp>
+#include <boost/signal.hpp>
 #include <map>
 #include <string>
 #include <vector>
@@ -203,6 +204,13 @@ namespace gazebo
     /// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
     public: void GetModelInterfaceNames(std::vector<std::string>& list) const;
 
+    /// \brief Connect a boost::slot the the model's update  signal
+    public: template<typename T>
+            void ConnectUpdateSignal( T subscriber )
+            {
+              updateSignal.connect(subscriber);
+            }
+
     /// \brief Load a body helper function
     /// \param node XML Configuration node
     private: void LoadBody(XMLConfigNode *node);
@@ -263,10 +271,13 @@ namespace gazebo
 
     private: GraphicsIfaceHandler *graphicsHandler;
 
+    private: boost::signal<void ()> updateSignal;
+
   /*  private: PyObject *pName;
       private: PyObject *pModule;
       private: PyObject *pFuncUpdate;
     */
+
   };
   /// \}
 }

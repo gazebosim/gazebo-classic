@@ -395,7 +395,7 @@ void Model::Update()
   if (this->controllers.size() == 0 && this->IsStatic())
     return;
 
-  DiagnosticTimer timer("Model[" + this->GetName() + "] Update ");
+  //DiagnosticTimer timer("Model[" + this->GetName() + "] Update ");
 
 #ifdef USE_THREADPOOL
   World::Instance()->GetPhysicsEngine()->InitForThread();
@@ -407,8 +407,10 @@ void Model::Update()
 
   Pose3d bodyPose, newPose, oldPose;
 
+  //this->updateSignal();
+
   {
-    DiagnosticTimer timer("Model[" + this->GetName() + "] Bodies Update ");
+    //DiagnosticTimer timer("Model[" + this->GetName() + "] Bodies Update ");
 
     for (bodyIter=this->bodies.begin(); 
          bodyIter!=this->bodies.end(); bodyIter++)
@@ -426,8 +428,7 @@ void Model::Update()
   }
 
   {
-    DiagnosticTimer timer("Model[" + this->GetName() + "] Controllers Update ");
-
+    //DiagnosticTimer timer("Model[" + this->GetName() + "] Controllers Update ");
     for (contIter=this->controllers.begin();
         contIter!=this->controllers.end(); contIter++)
     {
@@ -443,12 +444,15 @@ void Model::Update()
   }
 
 
+  if (World::Instance()->GetShowJoints())
   {
-    DiagnosticTimer timer("Model[" + this->GetName() + "] Joints Update ");
-    for (jointIter = this->joints.begin(); jointIter != this->joints.end(); jointIter++)
+    //DiagnosticTimer timer("Model[" + this->GetName() + "] Joints Update ");
+    for (jointIter = this->joints.begin(); 
+         jointIter != this->joints.end(); jointIter++)
     {
 #ifdef USE_THREADPOOL
-      World::Instance()->threadPool->schedule(boost::bind(&Joint::Update,*jointIter));
+      World::Instance()->threadPool->schedule(
+          boost::bind(&Joint::Update,*jointIter));
 #else
       (*jointIter)->Update();
 #endif
@@ -483,7 +487,7 @@ void Model::Update()
   }*/
 
   {
-    DiagnosticTimer timer("Model[" + this->GetName() + "] Children Update ");
+    //DiagnosticTimer timer("Model[" + this->GetName() + "] Children Update ");
     this->UpdateChild();
   }
 }
@@ -578,51 +582,6 @@ const Pose3d &Model::GetInitPose() const
 {
   return this->initPose;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the current pose
-/*void Model::SetPose(const Pose3d &setPose)
-{
-  std::cout << "Set model[" << this->GetName() << "] Pose to[" <<setPose<<"]\n";
-  Body *body;
-  std::map<std::string, Body* >::iterator iter;
-
-  Pose3d newPose, origPose;
-
-  origPose = this->pose;
-  this->pose = setPose;
-
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
-  {
-    if (!iter->second)
-      continue;
-
-    body = iter->second;
-
-    // Compute the pose relative to the model
-    newPose = body->GetPose() - origPose;
-
-    // Compute the new pose
-    newPose += this->pose;
-
-    body->SetPose(newPose);
-  }
-
-  // Update the child models as well
-  std::vector<Entity*>::iterator citer;
-  for (citer = this->children.begin(); citer != this->children.end(); citer++)
-  {
-    Model *childModel = dynamic_cast<Model*>(*citer);
-    if (childModel)
-    {
-      newPose = childModel->GetPose() - origPose;
-      newPose += this->pose;
-
-      childModel->SetPose(newPose);
-    }
-  }
-}*/
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear velocity of the model

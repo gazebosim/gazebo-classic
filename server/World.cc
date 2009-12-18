@@ -39,6 +39,7 @@
 #include "PhysicsFactory.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
+#include "SensorManager.hh"
 #include "Simulator.hh"
 #include "gazebo.h"
 #include "World.hh"
@@ -325,7 +326,8 @@ void World::Update()
 
 
   {
-    DiagnosticTimer timer("World::Update Models");
+    //DiagnosticTimer timer("World::Update Models");
+
     // Update all the models
     std::vector< Model* >::iterator miter;
     for (miter=this->models.begin(); miter!=this->models.end(); miter++)
@@ -336,17 +338,21 @@ void World::Update()
       (*miter)->Update();
 #endif
     }
-  }
 
 #ifdef USE_THREADPOOL
   this->threadPool->wait();
 #endif
 
+  }
+
+  /// Update all the sensors
+  SensorManager::Instance()->Update();
+
   if (!Simulator::Instance()->IsPaused() &&
        Simulator::Instance()->GetPhysicsEnabled())
   {
     {
-      DiagnosticTimer timer("World::Update Physics");
+      //DiagnosticTimer timer("World::Update Physics");
       this->physicsEngine->UpdatePhysics();
     }
 
