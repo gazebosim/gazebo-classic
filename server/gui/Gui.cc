@@ -26,11 +26,13 @@
 
 #include <string>
 
+#include <X11/xpm.h>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Gl_Window.H>
 #include <FL/fl_draw.H>
+#include <FL/x.H>
 
 #include "World.hh"
 #include "Global.hh"
@@ -45,6 +47,8 @@
 #include "Sidebar.hh"
 #include "StatusBar.hh"
 #include "Gui.hh"
+
+#include "icon.xpm"
 
 using namespace gazebo;
 
@@ -161,6 +165,17 @@ void Gui::CreateCameras()
 void Gui::Init()
 {
   this->frameMgr->Init();
+
+  Pixmap p, mask;
+  XpmCreatePixmapFromData(fl_display, RootWindow(fl_display, fl_screen),
+      const_cast<char**>(icon_xpm), &p, &mask, NULL);
+
+  XWMHints *hints;
+  hints = XGetWMHints(fl_display, fl_xid(this));
+  hints->icon_pixmap = p;
+  hints->icon_mask = mask;
+  hints->flags = IconPixmapHint | IconMaskHint;
+  XSetWMHints(fl_display, fl_xid(this), hints);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
