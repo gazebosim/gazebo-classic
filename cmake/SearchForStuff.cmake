@@ -315,6 +315,29 @@ IF (libtool_library AND libtool_include_dir)
 ENDIF (libtool_library AND libtool_include_dir)
 
 ########################################
+# Find libdl
+FIND_PATH(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
+IF (NOT libdl_include_dir)
+  MESSAGE (STATUS "Looking for dlfcn.h - not found")
+  MESSAGE (STATUS "Warning: Unable to find libdl, plugins will not be supported.")
+  SET (libdl_include_dir /usr/include)
+ELSE (NOT libdl_include_dir)
+  MESSAGE (STATUS "Looking for dlfcn.h - found")
+ENDIF (NOT libdl_include_dir)
+
+FIND_LIBRARY(libdl_library dl /usr/lib /usr/local/lib)
+IF (NOT libdl_library)
+  MESSAGE (STATUS "Looking for libdl - not found")
+  MESSAGE (STATUS "Warning: Unable to find libdl, plugins will not be supported.")
+ELSE (NOT libdl_library)
+  MESSAGE (STATUS "Looking for libdl - found")
+ENDIF (NOT libdl_library)
+
+IF (libdl_library AND libdl_include_dir)
+  SET (HAVE_DL TRUE)
+ENDIF (libdl_library AND libdl_include_dir)
+
+########################################
 # Find bullet
 FIND_PATH( bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
 IF (NOT bullet_include_dir)

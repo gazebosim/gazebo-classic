@@ -66,6 +66,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
   this->scaleP->Load(node);
 
   this->mesh = meshManager->Load( **this->meshNameP );
+  //this->mesh->Print();
 
   Mass mass = this->parent->GetMass();
 

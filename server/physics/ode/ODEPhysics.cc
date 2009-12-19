@@ -417,7 +417,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   ODEGeom *geom2 = NULL;
   int i;
   int numc = 0;
-  dContactGeom contactGeoms[64];
+  dContactGeom contactGeoms[3000];
   dContact contact;
 
   self = (ODEPhysics*) data;
@@ -453,7 +453,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     int numContacts = 5;
 
     if (geom1->GetType() == Shape::TRIMESH && geom2->GetType()==Shape::TRIMESH)
-      numContacts = 64;
+      numContacts = 3000;
 
     numc = dCollide(o1,o2,numContacts, contactGeoms, sizeof(contactGeoms[0]));
 

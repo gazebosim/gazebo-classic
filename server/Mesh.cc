@@ -294,6 +294,13 @@ void SubMesh::AddIndex( unsigned int i)
 /// Add a vertex to the mesh
 void SubMesh::AddVertex( Vector3 v )
 {
+  if (fabs(v.x) < 0.00001)
+    v.x = 0.0;
+  if (fabs(v.y) < 0.00001)
+    v.y = 0.0;
+  if (fabs(v.z) < 0.00001)
+    v.z = 0.0;
+
   this->vertices.push_back( v );
 }
 
@@ -308,6 +315,14 @@ void SubMesh::AddVertex(double x, double y, double z )
 /// Add a normal to the mesh
 void SubMesh::AddNormal( Vector3 n )
 {
+  if (fabs(n.x) < 0.00001)
+    n.x = 0.0;
+  if (fabs(n.y) < 0.00001)
+    n.y = 0.0;
+  if (fabs(n.z) < 0.00001)
+    n.z = 0.0;
+
+
   this->normals.push_back(n);
 }
 
