@@ -26,7 +26,13 @@ namespace gazebo
   
     /// \brief Get the name of the material
     public: std::string GetName() const;
-  
+
+    /// \brief Set a texture image
+    public: void SetTextureImage(const std::string tex);
+
+    /// \brief Get a thie texture image
+    public: std::string GetTextureImage() const;
+
     /// \brief Set the ambient color
     public: void SetAmbient(const Color &clr);
   
@@ -78,6 +84,12 @@ namespace gazebo
     /// \brief Get the shading mode
     public: ShadeMode GetShadeMode() const;
 
+    /// \brief Set the point size
+    public: void SetPointSize(double size);
+
+    /// \brief Get the point size
+    public: double GetPointSize() const;
+
     /// \brief Ostream operator
     public: friend std::ostream &operator<<( std::ostream &out, 
                                              const gazebo::Material &m )
@@ -85,6 +97,7 @@ namespace gazebo
 
               out << "Material:\n"; 
               out << "\tName: " << m.name << "\n";
+              out << "\tTexture: " << m.texImage << "\n";
               out << "\tAmbient: " << m.ambient << "\n";
               out << "\tDiffuse: " << m.diffuse << "\n";
               out << "\tSpecular: " << m.specular << "\n";
@@ -98,13 +111,15 @@ namespace gazebo
 
 
     private: std::string name;
+    private: std::string texImage;
     private: Color ambient;
     private: Color diffuse;
     private: Color specular;
     private: Color emissive;
     private: float transparency;
     private: float shininess;
-  
+    private: double pointSize;
+
     private: BlendMode blendMode;
     private: ShadeMode shadeMode;
   };

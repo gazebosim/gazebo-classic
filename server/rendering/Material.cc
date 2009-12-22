@@ -39,6 +39,21 @@ std::string Material::GetName() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Set a texture image
+void Material::SetTextureImage(const std::string tex)
+{
+  this->texImage = tex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a thie texture image
+std::string Material::GetTextureImage() const
+{
+  return this->texImage;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set the ambient color
 void Material::SetAmbient(const Color &clr)
 {
@@ -156,4 +171,18 @@ void Material::SetShadeMode(ShadeMode s)
 Material::ShadeMode Material::GetShadeMode() const
 {
   return this->shadeMode;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the point size
+void Material::SetPointSize(double size)
+{
+  this->pointSize = size;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the point size
+double Material::GetPointSize() const
+{
+  return this->pointSize;
 }

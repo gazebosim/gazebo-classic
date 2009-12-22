@@ -54,6 +54,9 @@ namespace gazebo
     public: static void WireframeCB(Fl_Widget * /*w*/, void * /*data*/);
 
     public: static void SplitCB(Fl_Widget * /*w*/, void * /*data*/);
+
+    public: static void ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/);
+
   };
 }
 

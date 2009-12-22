@@ -26,8 +26,11 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "World.hh"
+#include "OgreDynamicLines.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
+#include "Material.hh"
 #include "Shape.hh"
 #include "PhysicsEngine.hh"
 
@@ -45,10 +48,32 @@ PhysicsEngine::PhysicsEngine()
 
   this->mutex = new boost::recursive_mutex();
   this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
-  this->visual->SetCastShadows(false);
-  this->visual->SetPosition(Vector3(0,0,0));
-  this->visual->AttachMesh("joint_anchor");
   this->visual->SetVisible(false);
+  this->contactLines.resize(100);
+
+  Material *mat = new Material();
+  mat->SetName("ContactPointsMaterial");
+  mat->SetPointSize(10);
+  mat->SetAmbient(Color(1,1,0,1));
+  mat->SetDiffuse(Color(1,1,0,1));
+  mat->SetEmissive(Color(1,1,0,1));
+  std::string matName = OgreCreator::CreateMaterial(mat);
+
+  unsigned int i=0;
+  for (this->contactLinesIter = this->contactLines.begin();
+       this->contactLinesIter != this->contactLines.end(); 
+       this->contactLinesIter++, i++)
+  {
+    (*this->contactLinesIter) = OgreCreator::Instance()->CreateDynamicLine(
+        OgreDynamicRenderable::OT_LINE_LIST);
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->setMaterial(matName);
+    this->visual->AttachObject(*this->contactLinesIter);
+  }
+
+  this->contactLinesIter = this->contactLines.begin();
+  delete mat;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,6 +89,21 @@ PhysicsEngine::~PhysicsEngine()
   this->mutex = NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Update the physics engine
+void PhysicsEngine::UpdatePhysics()
+{
+  if (World::Instance()->GetShowContacts())
+  {
+    this->visual->SetVisible(true);
+    this->contactLinesIter = this->contactLines.begin();
+  }
+  else
+  {
+    this->visual->SetVisible(false);
+  }
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
 Vector3 PhysicsEngine::GetGravity() const
@@ -114,5 +154,14 @@ Geom *PhysicsEngine::CreateGeom(std::string typeName, Body *body)
 /// Add a contact visual
 void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 {
-  this->visual->SetDirty(true, Pose3d(pos, Quatern()));
+  if (!World::Instance()->GetShowContacts())
+    return;
+
+  (*this->contactLinesIter)->SetPoint(0, pos);
+  (*this->contactLinesIter)->SetPoint(1, pos+(norm*0.1));
+
+  this->contactLinesIter++;
+
+  if (this->contactLinesIter == this->contactLines.end())
+    this->contactLinesIter = this->contactLines.begin();
 }

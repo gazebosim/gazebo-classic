@@ -62,6 +62,7 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
     { "Show Physics", 0, &gazebo::MainMenu::ShowPhysicsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { "Show Bounding Boxes", 0, &gazebo::MainMenu::ShowBoundingBoxesCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+    { "Show Contacts", 0, &gazebo::MainMenu::ShowContactsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { 0 },
 
     { 0 }
@@ -152,3 +153,9 @@ void MainMenu::WireframeCB(Fl_Widget * /*w*/, void * /*data*/)
   World::Instance()->SetWireframe( !World::Instance()->GetWireframe() );
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// View the contacts
+void MainMenu::ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  World::Instance()->SetShowContacts( !World::Instance()->GetShowContacts() );
+}

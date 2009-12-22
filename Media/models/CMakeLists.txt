@@ -20,6 +20,9 @@ SET (files column.mesh
            wheel.mesh
            WoodPallet.mesh
            willowgarage.dae
+           hanoi_red_disk.dae
+           hanoi_green_disk.dae
+           hanoi_blue_disk.dae
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models)

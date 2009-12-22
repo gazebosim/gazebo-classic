@@ -59,6 +59,7 @@ World::World()
   this->simIface = NULL;
   this->showBoundingBoxes = false;
   this->showJoints = false;
+  this->showContacts = false;
   this->wireframe = false;
   this->showPhysics = false;
   this->physicsEngine = NULL;
@@ -685,6 +686,20 @@ void World::SetShowJoints(bool show)
   {
     (*iter)->ShowJoints(this->showJoints);
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to show the joints
+void World::SetShowContacts(bool show)
+{
+  this->showContacts = show;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether to show the joints
+bool World::GetShowContacts() const
+{
+  return this->showContacts;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

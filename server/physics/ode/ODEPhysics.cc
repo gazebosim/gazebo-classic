@@ -81,8 +81,8 @@ ODEPhysics::ODEPhysics()
 
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
-  //dWorldSetAutoDisableFlag(this->worldId, 1);
-  //dWorldSetAutoDisableTime(this->worldId, 2.0);
+  dWorldSetAutoDisableFlag(this->worldId, 1);
+  dWorldSetAutoDisableTime(this->worldId, 1.0);
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
@@ -244,6 +244,8 @@ void ODEPhysics::UpdateCollision()
 // Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
+  PhysicsEngine::UpdatePhysics();
+
   this->UpdateCollision();
 
   this->LockMutex(); 
@@ -418,12 +420,13 @@ dSpaceID ODEPhysics::GetSpaceId() const
 // Handle a collision
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
+  int maxContacts = 10000;
   ODEPhysics *self;
   ODEGeom *geom1 = NULL;
   ODEGeom *geom2 = NULL;
   int i;
   int numc = 0;
-  dContactGeom contactGeoms[3000];
+  dContactGeom contactGeoms[maxContacts];
   dContact contact;
 
   self = (ODEPhysics*) data;
@@ -459,7 +462,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     int numContacts = 5;
 
     if (geom1->GetType() == Shape::TRIMESH && geom2->GetType()==Shape::TRIMESH)
-      numContacts = 3000;
+      numContacts = maxContacts;
+      
 
     numc = dCollide(o1,o2,numContacts, contactGeoms, sizeof(contactGeoms[0]));
 
@@ -469,7 +473,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       (*self->contactFeedbackIter).contact.geom1 = geom1;
       (*self->contactFeedbackIter).contact.geom2 = geom2;
       (*self->contactFeedbackIter).feedbacks.resize(numc);
-      
 
       for (i=0; i<numc; i++)
       {
@@ -540,7 +543,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));
         }
 
-        dJointAttach (c,b1,b2);
+        dJointAttach (c, b1, b2);
       }
 
       if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())

@@ -49,7 +49,15 @@ Mesh *AssimpLoader::Load(const std::string &filename)
       aiMaterialProperty *prop = amat->mProperties[j];
       std::string propKey = prop->mKey.data;
 
-      if (propKey == "?mat.name")
+      if (propKey == "$tex.file")
+      {
+        aiString texName;
+        aiTextureMapping mapping;
+        unsigned int uvIndex;
+        amat->GetTexture(aiTextureType_DIFFUSE,0, &texName, &mapping, &uvIndex);
+        mat->SetTextureImage(texName.data);
+      }
+      else if (propKey == "?mat.name")
       {
         aiString matName;
         amat->Get(AI_MATKEY_NAME, matName);
@@ -188,6 +196,12 @@ void AssimpLoader::BuildMesh(aiNode *node, Mesh *mesh)
       p *= transform;
 
       subMesh->AddVertex(p.x, p.y, p.z); 
+
+      if (aMesh->mNumUVComponents[0])
+        subMesh->AddTexCoord(aMesh->mTextureCoords[0][j].x, 
+                             aMesh->mTextureCoords[0][j].y);
+      else
+        subMesh->AddTexCoord(0,0);
     }
 
     mesh->AddSubMesh(subMesh);

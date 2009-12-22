@@ -182,6 +182,15 @@ class World : public SingletonT<World>
   /// \brief Set whether to show the joints
   public: void SetShowJoints(bool show);
 
+  /// \brief Get whether to show the joints
+  public: bool GetShowJoints() const;
+
+  /// \brief Set whether to show the contacts
+  public: void SetShowContacts(bool show);
+
+  /// \brief Get whether to show the contacts
+  public: bool GetShowContacts() const;
+
   /// \brief Set to view as wireframe
   public: void SetWireframe( bool wire );
 
@@ -211,6 +220,8 @@ class World : public SingletonT<World>
 
   /// Set to true to show joints
   private: bool showJoints;
+
+  private: bool showContacts;
 
   private: bool showPhysics;
 

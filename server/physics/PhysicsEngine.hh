@@ -103,7 +103,7 @@ namespace gazebo
     public: virtual void UpdateCollision() = 0;
 
     /// \brief Update the physics engine
-    public: virtual void UpdatePhysics() = 0;
+    public: virtual void UpdatePhysics();
   
     /// \brief Finilize the physics engine
     public: virtual void Fini() = 0;
@@ -169,6 +169,9 @@ namespace gazebo
     private: boost::recursive_mutex *mutex;
 
     protected: OgreVisual *visual;
+
+    private: std::vector<OgreDynamicLines*> contactLines;
+    private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;
   };
   
   /** \}*/

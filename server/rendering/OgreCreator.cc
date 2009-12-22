@@ -678,12 +678,17 @@ std::string OgreCreator::CreateMaterial(const Material *mat)
   matPtr->getTechnique(0)->setLightingEnabled(true);
   pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
   pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
+  pass->setPointSize(mat->GetPointSize());
 
-  //pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
-  //pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
   pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
   pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
   pass->setShininess(mat->GetShininess());
+
+  if (!mat->GetTextureImage().empty())
+  {
+    Ogre::TextureUnitState *texState = pass->createTextureUnitState();
+    texState->setTextureName( mat->GetTextureImage() );
+  }
 
   return mat->GetName();
 }

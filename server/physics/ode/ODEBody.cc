@@ -521,13 +521,15 @@ void ODEBody::SetSpaceId(dSpaceID spaceid)
 /// Set the linear damping factor
 void ODEBody::SetLinearDamping(double damping)
 {
-  dBodySetLinearDamping(this->GetODEId(), damping); 
+  if (this->GetODEId())
+    dBodySetLinearDamping(this->GetODEId(), damping); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular damping factor
 void ODEBody::SetAngularDamping(double damping)
 {
-  dBodySetAngularDamping(this->GetODEId(), damping); 
+  if (this->GetODEId())
+    dBodySetAngularDamping(this->GetODEId(), damping); 
 }
 
