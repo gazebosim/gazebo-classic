@@ -107,9 +107,6 @@ SET (files 10points.png
            hanoi_red_disk.tga
            hanoi_green_disk.tga
            hanoi_blue_disk.tga
-           red_fog.jpg
-           green_fog.jpg
-           blue_fog.jpg
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)
