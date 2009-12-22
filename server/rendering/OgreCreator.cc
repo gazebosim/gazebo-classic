@@ -555,7 +555,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int 
     XSync(fl_display, false);
 
     win = OgreCreator::CreateWindow( fl_display, fl_visual->screen, 
-        (long)(Fl_X::i(flWindow)->xid), width, height);
+        (int32_t)(Fl_X::i(flWindow)->xid), width, height);
     if (win)
       this->windows.push_back(win);
   }
@@ -566,8 +566,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window for Ogre
 Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen, 
-                                              long winId, unsigned int width, 
-                                              unsigned int height)
+                                              int32_t winId, unsigned int width,                                              unsigned int height)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
@@ -741,15 +740,11 @@ void OgreCreator::Update()
 
   // Update the text
   for (titer = this->text.begin(); titer != this->text.end(); titer++)
-  {
     (*titer)->Update();
-  }
 
   // Update the lines
   for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
-  {
     (*iter)->Update();
-  }
 
   // We only need this loop because we are using threads. The physics engine
   // can't reliably set the pose of the visuals when it's running in a 
@@ -977,6 +972,6 @@ void OgreCreator::InsertMesh( const Mesh *mesh)
   }
   catch (Ogre::Exception e)
   {
-    std::cerr << "Unable to create a basic Unit cylinder object" << std::endl;
+    gzerr(0) << "Unable to create a basic Unit cylinder object" << std::endl;
   }
 }

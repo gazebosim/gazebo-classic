@@ -23,6 +23,7 @@
  * Date: 13 Feb 2006
  * CVS: $Id$
  */
+#include <stdint.h>
 
 #include <Ogre.h>
 #include <OgreDataStream.h>
@@ -178,7 +179,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     glXMakeCurrent(this->dummyDisplay, this->dummyWindowId, this->dummyContext);
 
     OgreCreator::Instance()->CreateWindow(this->dummyDisplay, screen, 
-                                          (long)this->dummyWindowId,1,1);
+                                          (int32_t)this->dummyWindowId,1,1);
   }
 
   // Set default mipmap level (NB some APIs ignore this)

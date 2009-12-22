@@ -44,6 +44,7 @@ namespace gazebo
   class Entity;
   class Body;
   class XMLConfigNode;
+  class OgreVisual;
   
   /// \addtogroup gazebo_physics_engine
   /** \{
@@ -149,6 +150,9 @@ namespace gazebo
     /// \brief Convert a Gazebo mass to an engine specific mass
     public: virtual void ConvertMass(void *engineMass, const Mass &mass) = 0;
 
+    /// \brief Add a contact visual
+    protected: void AddContactVisual(Vector3 pos, Vector3 norm);
+
     /// The gravity vector
     protected: ParamT<Vector3> *gravityP;
   
@@ -163,6 +167,8 @@ namespace gazebo
     protected: std::vector<Param*> parameters;
 
     private: boost::recursive_mutex *mutex;
+
+    protected: OgreVisual *visual;
   };
   
   /** \}*/

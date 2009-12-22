@@ -101,7 +101,6 @@ void ODEBody::MoveCallback(dBodyID id)
   const dReal *r;
   ODEBody *self = (ODEBody*)(dBodyGetData(id));
 
-  self->physicsEngine->LockMutex();
   p = dBodyGetPosition(id);
   r = dBodyGetQuaternion(id);
 
@@ -111,7 +110,6 @@ void ODEBody::MoveCallback(dBodyID id)
   Pose3d pp = self->comEntity->GetRelativePose().GetInverse() + pose;
 
   self->SetAbsPose(pp, false);
-  self->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

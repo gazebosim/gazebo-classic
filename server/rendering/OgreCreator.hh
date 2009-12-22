@@ -26,6 +26,7 @@
 #ifndef OGRECREATOR
 #define OGRECREATOR
 
+#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -103,7 +104,7 @@ namespace gazebo
     /// \brief Create a window for Ogre
     public: Ogre::RenderWindow *CreateWindow(Display *display, 
                                              int screen, 
-                                             long winId, 
+                                             int32_t winId, 
                                              unsigned int width, 
                                              unsigned int height);
 

@@ -279,11 +279,11 @@ float STLLoader::FloatRead ( FILE *filein )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Reads a long int from a binary file.
-long int STLLoader::LongIntRead ( FILE *filein )
+uint32_t STLLoader::LongIntRead ( FILE *filein )
 {
   union 
   {
-    long int yint;
+    uint32_t yint;
     char ychar[4];
   } y;
 
@@ -297,11 +297,11 @@ long int STLLoader::LongIntRead ( FILE *filein )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Reads a short int from a binary file.
-short int STLLoader::ShortIntRead ( FILE *filein )
+uint16_t STLLoader::ShortIntRead ( FILE *filein )
 {
-  unsigned char  c1;
-  unsigned char  c2;
-  short int      ival;
+  uint8_t  c1;
+  uint8_t  c2;
+  uint16_t      ival;
 
   c1 = fgetc ( filein );
   c2 = fgetc ( filein );

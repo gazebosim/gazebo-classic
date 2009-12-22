@@ -632,6 +632,7 @@ void Simulator::PhysicsLoop()
   {
     //DiagnosticTimer timer("PhysicsLoop Timer ");
 
+
     currTime = this->GetRealTime();
 
     userStepped = false;

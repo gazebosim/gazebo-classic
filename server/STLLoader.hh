@@ -1,6 +1,8 @@
 #ifndef STLLOADER_HH
 #define STLLOADER_HH
 
+#include <stdint.h>
+
 #include "MeshLoader.hh"
 
 #define LINE_MAX_LEN 256
@@ -36,10 +38,10 @@ namespace gazebo
     private: int RcolFind ( float a[][COR3_MAX], int m, int n, float r[] );
 
     /// Reads a long int from a binary file.
-    private: long int LongIntRead ( FILE *filein );
+    private: uint32_t LongIntRead ( FILE *filein );
 
     /// Reads a short int from a binary file.
-    private: short int ShortIntRead ( FILE *filein );
+    private: uint16_t ShortIntRead ( FILE *filein );
 
     /// Read 1 float from a binary file.
     private: float FloatRead ( FILE *filein );

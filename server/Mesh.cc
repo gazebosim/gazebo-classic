@@ -178,7 +178,7 @@ const SubMesh *Mesh::GetSubMesh(unsigned int i) const
   if (i < this->submeshes.size())
     return this->submeshes[i];
   else
-    gzthrow("Invalid index\n");
+    gzthrow("Invalid index: " << i << " >= " << this->submeshes.size() << "\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

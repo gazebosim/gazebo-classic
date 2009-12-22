@@ -65,6 +65,7 @@ GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 ODEPhysics::ODEPhysics()
     : PhysicsEngine()
 {
+
   // Collision detection init
   dInitODE2(0);
 
@@ -192,11 +193,11 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
-  DiagnosticTimer timer("ODEPhysics Collision Update");
+  //DiagnosticTimer timer("ODEPhysics Collision Update");
   std::vector<ContactFeedback>::iterator iter;
   std::vector<dJointFeedback>::iterator jiter;
  
-  timer.Start();
+  //timer.Start();
 
   // Do collision detection; this will add contacts to the contact group
   this->LockMutex(); 
@@ -247,18 +248,23 @@ void ODEPhysics::UpdatePhysics()
 
   this->LockMutex(); 
 
-  DiagnosticTimer timer("ODEPhysics Step Update");
+  //DiagnosticTimer timer("ODEPhysics Step Update");
 
   // Update the dynamical model
-  if (this->quickStepP->GetValue())
+  if (**this->quickStepP)
+  {
     dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
+  }
   else
+  {
     dWorldStep( this->worldId, (**this->stepTimeP).Double() );
+  }
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
 
   this->UnlockMutex(); 
+
 }
 
 
@@ -514,18 +520,21 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         dJointID c = dJointCreateContact (self->worldId,
                                           self->contactGroup, &contact);
 
+        Vector3 contactPos(contact.geom.pos[0], contact.geom.pos[1], 
+                           contact.geom.pos[2]);
+        Vector3 contactNorm(contact.geom.normal[0], contact.geom.normal[1], 
+                            contact.geom.normal[2]);
+
+        self->AddContactVisual(contactPos, contactNorm);
+
         // Store the contact info 
         if (geom1->GetContactsEnabled() ||
             geom2->GetContactsEnabled())
         {
           (*self->contactFeedbackIter).contact.depths.push_back(
               contact.geom.depth);
-          (*self->contactFeedbackIter).contact.positions.push_back(
-              Vector3(contact.geom.pos[0], contact.geom.pos[1], 
-                contact.geom.pos[2]) );
-          (*self->contactFeedbackIter).contact.normals.push_back(
-              Vector3(contact.geom.normal[0], contact.geom.normal[1], 
-                contact.geom.normal[2]) );
+          (*self->contactFeedbackIter).contact.positions.push_back(contactPos);
+          (*self->contactFeedbackIter).contact.normals.push_back(contactNorm);
           (*self->contactFeedbackIter).contact.time = 
             Simulator::Instance()->GetSimTime();
           dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));

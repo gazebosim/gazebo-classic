@@ -26,6 +26,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "OgreVisual.hh"
+#include "OgreCreator.hh"
 #include "Shape.hh"
 #include "PhysicsEngine.hh"
 
@@ -42,12 +44,18 @@ PhysicsEngine::PhysicsEngine()
   Param::End();
 
   this->mutex = new boost::recursive_mutex();
+  this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
+  this->visual->SetCastShadows(false);
+  this->visual->SetPosition(Vector3(0,0,0));
+  this->visual->AttachMesh("joint_anchor");
+  this->visual->SetVisible(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
+  delete this->visual;
   delete this->gravityP;
   delete this->updateRateP;
   delete this->stepTimeP;
@@ -100,4 +108,11 @@ Geom *PhysicsEngine::CreateGeom(std::string typeName, Body *body)
       return this->CreateGeom( (Shape::Type)i, body );
 
   return NULL; 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add a contact visual
+void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
+{
+  this->visual->SetDirty(true, Pose3d(pos, Quatern()));
 }
