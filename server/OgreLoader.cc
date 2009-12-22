@@ -1,6 +1,8 @@
+#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <iostream>
 #include <float.h>
+#include <stdint.h>
 #include <list>
 
 #include "Mesh.hh"
@@ -31,6 +33,9 @@ Mesh *OgreLoader::Load(const std::string &filename)
 {
   FILE *file = fopen(filename.c_str(), "rb");
 
+  if (!file)
+    gzthrow("Unable to open file[" << filename << "]");
+
   Mesh *mesh = new Mesh();
 
   if (this->ReadFileHeader(file))
@@ -41,7 +46,11 @@ Mesh *OgreLoader::Load(const std::string &filename)
     if (chunk.id == 0x3000)
       this->ReadMesh(file, mesh);
     else
-      printf("Unable to process chunk with id[%d]\n", chunk.id);
+      gzthrow("Unable to process chunk with id[" << chunk.id << "]");
+  }
+  else
+  {
+    gzthrow("Unable to read file header");
   }
 
   fclose(file);
@@ -57,18 +66,18 @@ void OgreLoader::ReadSubMesh(FILE *file, Mesh *mesh)
   // Ignore the material name
   std::string materialName = ReadString(file);
 
-  bool useSharedVertices = ReadValue<bool>(file);
+  bool useSharedVertices = ReadValue<uint8_t>(file);
 
   int indexCount = ReadValue<int>(file);
 
-  bool idx32Bit = ReadValue<bool>(file);
+  bool idx32Bit = ReadValue<uint8_t>(file);
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh( subMesh );
 
   if (indexCount > 0)
   {
-    /*unsigned int offset = 0;
+    /*uint32_t offset = 0;
    
     if (mesh->GetIndexCount() > 0)
       offset = mesh->GetMaxIndex() + 1;
@@ -76,19 +85,19 @@ void OgreLoader::ReadSubMesh(FILE *file, Mesh *mesh)
 
     if (idx32Bit)
     {
-      std::list<unsigned int> values;
-      std::list<unsigned int>::iterator iter;
+      std::list<uint32_t> values;
+      std::list<uint32_t>::iterator iter;
 
-      values = ReadValues<unsigned int>(file, indexCount);
+      values = ReadValues<uint32_t>(file, indexCount);
 
       for (iter = values.begin(); iter != values.end(); iter++)
         subMesh->AddIndex( (*iter) );
     }
     else
     {
-      std::list<unsigned short> values;
-      std::list<unsigned short>::iterator iter;
-      values = ReadValues<unsigned short>(file, indexCount);
+      std::list<uint16_t> values;
+      std::list<uint16_t>::iterator iter;
+      values = ReadValues<uint16_t>(file, indexCount);
 
       for (iter = values.begin(); iter != values.end(); iter++)
         subMesh->AddIndex( (*iter) );
@@ -112,7 +121,7 @@ void OgreLoader::ReadSubMesh(FILE *file, Mesh *mesh)
   // Else use the global vertex data
   else
   {
-    for (unsigned int i=0; i < subMesh->GetIndexCount(); i++)
+    for (uint32_t i=0; i < subMesh->GetIndexCount(); i++)
     {
       subMesh->AddVertex( gSubMesh->GetVertex( subMesh->GetIndex(i) ) );
     }
@@ -147,14 +156,14 @@ void OgreLoader::ReadSubMesh(FILE *file, Mesh *mesh)
 // Read the geometry (vertices, normals, and optionally texture coords)
 void OgreLoader::ReadGeometry(FILE *file, Mesh *mesh, SubMesh *subMesh)
 { 
-  unsigned short index;
+  uint16_t index;
   MeshChunk chunk;
-  std::vector<unsigned short> types;
-  std::vector<unsigned short> semantics;
-  std::vector<unsigned short> offsets;
-  std::vector<unsigned short> sources;
+  std::vector<uint16_t> types;
+  std::vector<uint16_t> semantics;
+  std::vector<uint16_t> offsets;
+  std::vector<uint16_t> sources;
 
-  unsigned int vertexCount = this->ReadValue<unsigned int>(file);
+  uint32_t vertexCount = this->ReadValue<uint32_t>(file);
 
   // Read optional geom parameters
   if (!feof(file))
@@ -172,19 +181,19 @@ void OgreLoader::ReadGeometry(FILE *file, Mesh *mesh, SubMesh *subMesh)
         while (!feof(file) && chunk.id == M_GEOMETRY_VERTEX_ELEMENT)
         {
           // The source
-          unsigned short source = ReadValue<unsigned short>(file);
+          uint16_t source = ReadValue<uint16_t>(file);
 
           // The data type of the data used to store the vertex info
-          unsigned short type = ReadValue<unsigned short>(file);
+          uint16_t type = ReadValue<uint16_t>(file);
 
           // The meaning of the data (position, normal, etc)
-          unsigned short semantic = ReadValue<unsigned short>(file);
+          uint16_t semantic = ReadValue<uint16_t>(file);
 
           // Offset in bytes where this element is located in the buffer
-          unsigned short offset = ReadValue<unsigned short>(file);
+          uint16_t offset = ReadValue<uint16_t>(file);
 
           // We can ignore the index
-          index = ReadValue<unsigned short>(file);
+          index = ReadValue<uint16_t>(file);
 
           sources.push_back(source);
           types.push_back(type);
@@ -206,10 +215,10 @@ void OgreLoader::ReadGeometry(FILE *file, Mesh *mesh, SubMesh *subMesh)
       // VERTEX_BUFFER contains the vertex data
       else if (chunk.id == M_GEOMETRY_VERTEX_BUFFER)
       {
-        unsigned short bindIndex, vertexSize;
+        uint16_t bindIndex, vertexSize;
 
-        bindIndex = ReadValue<unsigned short>(file);
-        vertexSize = ReadValue<unsigned short>(file);
+        bindIndex = ReadValue<uint16_t>(file);
+        vertexSize = ReadValue<uint16_t>(file);
 
         chunk.Read(file);
         if (chunk.id != M_GEOMETRY_VERTEX_BUFFER_DATA)
@@ -219,17 +228,17 @@ void OgreLoader::ReadGeometry(FILE *file, Mesh *mesh, SubMesh *subMesh)
         }
 
         // Read the data buffer 
-        unsigned char *vbuf = new unsigned char[vertexCount * vertexSize];
+        uint8_t *vbuf = new uint8_t[vertexCount * vertexSize];
         if (fread(vbuf, vertexSize, vertexCount, file) < vertexCount)
           printf("Error reading the vertex buffer\n");
 
         Vector3 vec;
-        unsigned short semantic, type, offset;
+        uint16_t semantic, type, offset;
 
         // Extract the information from the buffer
-        for (unsigned int v = 0; v < vertexCount; v++)
+        for (uint32_t v = 0; v < vertexCount; v++)
         {
-          for (unsigned int i = 0; i < types.size(); i++)
+          for (uint32_t i = 0; i < types.size(); i++)
           {
             if (sources[i] != bindIndex)
               continue;
@@ -288,13 +297,15 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
 {
   MeshChunk chunk;
 
-  if (ReadValue<bool>(file))
-    printf("Warning: this doesn't fully support animated meshes\n");
+  uint8_t v = ReadValue<uint8_t>(file);
+  if (v)
+    gzmsg(0) << "Warning: this doesn't fully support animated meshes." << v << "]\n";
 
   if (!feof(file))
   {
     chunk.Read(file);
 
+    std::cerr << "Chunk ID[" << chunk.id << "]\n";
     while (!feof(file) &&
           (chunk.id == M_GEOMETRY ||
            chunk.id == M_SUBMESH ||
@@ -308,6 +319,7 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
            chunk.id == M_ANIMATIONS ||
            chunk.id == M_TABLE_EXTREMES))
     {
+      std::cerr << "Chunk ID[" << chunk.id << "]\n";
       switch (chunk.id)
       {
         case M_GEOMETRY:
@@ -315,12 +327,14 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
             if (this->gSubMesh == NULL)
               this->gSubMesh = new SubMesh();
 
+            std::cerr << "Read Geom[\n";
             // Global vertex data
             this->ReadGeometry(file, mesh, gSubMesh);
             break;
           }
         case M_SUBMESH:
           {
+            std::cerr << "Read Submesh[\n";
             // Load a submesh
             this->ReadSubMesh(file, mesh);
             break;
@@ -345,6 +359,10 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
 
     if (!feof(file))
       fseek(file, -chunk.SizeOf(), SEEK_CUR);
+  }
+  else
+  {
+    gzthrow("Immediate end of file!!");
   }
 
   return true;

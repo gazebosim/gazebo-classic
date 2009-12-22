@@ -35,6 +35,7 @@
 #include <vector>
 
 #include "MeshLoader.hh"
+#include "GazeboError.hh"
 #include "Vector3.hh"
 
 #define M_MESH 0x3000
@@ -79,7 +80,7 @@ namespace gazebo
     /// \brief Read the file header
     private: bool ReadFileHeader(FILE *file)
              {
-               unsigned short id;
+               uint16_t id;
   
                if (fread(&id, sizeof(id), 1, file) < 1)
                  printf("Error in ReadFileHeader\n");
@@ -100,16 +101,16 @@ namespace gazebo
              {
                T result;
                if (fread(&result, sizeof(T), 1, file) < 1)
-                 printf( "Error in ReadValue\n");
+                 gzthrow( "Error in ReadValue");
                return result;
              }
   
     /// \brief Read a list of values
     private: template<typename T>
-             std::list<T> ReadValues(FILE *file, unsigned int count)
+             std::list<T> ReadValues(FILE *file, uint32_t count)
              {
                std::list<T> result;
-               for (unsigned int i=0; i < count; i++)
+               for (uint32_t i=0; i < count; i++)
                  result.push_back(ReadValue<T>(file));
                return result;
              }
@@ -144,8 +145,8 @@ namespace gazebo
   
   class MeshChunk
   {
-    public: unsigned short id;
-    public: unsigned long length;
+    public: uint16_t id;
+    public: uint32_t length;
     public: size_t SizeOf() const
             {
               return sizeof(this->id) + sizeof(this->length);
