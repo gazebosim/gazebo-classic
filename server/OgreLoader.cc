@@ -305,7 +305,6 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
   {
     chunk.Read(file);
 
-    std::cerr << "Chunk ID[" << chunk.id << "]\n";
     while (!feof(file) &&
           (chunk.id == M_GEOMETRY ||
            chunk.id == M_SUBMESH ||
@@ -319,7 +318,6 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
            chunk.id == M_ANIMATIONS ||
            chunk.id == M_TABLE_EXTREMES))
     {
-      std::cerr << "Chunk ID[" << chunk.id << "]\n";
       switch (chunk.id)
       {
         case M_GEOMETRY:
@@ -327,14 +325,12 @@ bool OgreLoader::ReadMesh(FILE *file, Mesh *mesh)
             if (this->gSubMesh == NULL)
               this->gSubMesh = new SubMesh();
 
-            std::cerr << "Read Geom[\n";
             // Global vertex data
             this->ReadGeometry(file, mesh, gSubMesh);
             break;
           }
         case M_SUBMESH:
           {
-            std::cerr << "Read Submesh[\n";
             // Load a submesh
             this->ReadSubMesh(file, mesh);
             break;
