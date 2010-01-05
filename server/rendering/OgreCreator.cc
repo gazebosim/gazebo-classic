@@ -245,7 +245,6 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name,
 
     double ratio = (double)cviewport->getActualWidth() / (double)cviewport->getActualHeight();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    std::cout << "VFOV[" << vfov << "]\n";
     camera->setAspectRatio(ratio);
     camera->setFOVy(Ogre::Radian(vfov));
   }

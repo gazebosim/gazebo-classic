@@ -98,7 +98,6 @@ void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string 
 
 #elif HAVE_LTDL
 
-  std::cout << "Load Plugin[" << plugin << "] Classname[" << classname << "]\n";  
 	static bool init_done = false;
 
 	if (!init_done)
