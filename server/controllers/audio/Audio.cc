@@ -157,7 +157,7 @@ void AudioController::PutAudioData()
 {
   if (this->audioIface->Lock(1))
   {
-    this->audioIface->data->head.time = Simulator::Instance()->GetSimTime();
+    this->audioIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
     this->audioIface->data->state = this->openALSource->IsPlaying();
     this->audioIface->Unlock();
   }
