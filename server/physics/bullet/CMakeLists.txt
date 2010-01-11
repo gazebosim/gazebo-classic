@@ -55,8 +55,7 @@ SET (sources BulletPhysics.cc
 )
 
 add_definitions(${bullet_cflags})
-
-#ADD_DEFINITIONS(-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
+#add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
 ADD_LIBRARY(gazebo_physics_bullet SHARED ${sources})
 TARGET_LINK_LIBRARIES( gazebo_physics_bullet BulletDynamics BulletCollision LinearMath )
 INSTALL( TARGETS gazebo_physics_bullet DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

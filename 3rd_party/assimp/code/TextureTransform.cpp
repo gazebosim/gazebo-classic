@@ -439,7 +439,7 @@ void TextureTransformStep::Execute( aiScene* pScene)
 		if (size > AI_MAX_NUMBER_OF_TEXTURECOORDS) {
 
 			if (!DefaultLogger::isNullLogger()) {
-				::sprintf(buffer,"%i UV channels required but just %i available", 
+				::sprintf(buffer,"%d UV channels required but just %d available", 
 					trafo.size(),AI_MAX_NUMBER_OF_TEXTURECOORDS);
 
 				DefaultLogger::get()->error(buffer);

@@ -695,7 +695,7 @@ void MD5Importer::LoadMD5CameraFile ()
 	for (std::vector<unsigned int>::const_iterator it = cuts.begin(); it != cuts.end()-1; ++it) {
 	
 		aiAnimation* anim = *tmp++ = new aiAnimation();
-		anim->mName.length = ::sprintf(anim->mName.data,"anim%i_from_%i_to_%i",it-cuts.begin(),(*it),*(it+1));
+		anim->mName.length = ::sprintf(anim->mName.data,"anim%lu_from_%lu_to_%lu",it-cuts.begin(),(*it),*(it+1));
 		
 		anim->mTicksPerSecond = cameraParser.fFrameRate;
 		anim->mChannels = new aiNodeAnim*[anim->mNumChannels = 1];

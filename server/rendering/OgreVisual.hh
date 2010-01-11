@@ -48,7 +48,7 @@ namespace gazebo
   class Entity;
 
   /// \brief Ogre Visual Object
-  class OgreVisual : public Common, public Ogre::UserDefinedObject
+  class OgreVisual : public Common, public Ogre::Any
   {
     /// \brief Constructor
     public: OgreVisual (OgreVisual *node, Entity *owner = NULL);

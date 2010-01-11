@@ -30,7 +30,6 @@
 #include <Ogre.h>
 #include <OgreMovableObject.h>
 #include <OgreRenderable.h>
-#include <OgreUserDefinedObject.h>
 #include <string>
 
 namespace boost

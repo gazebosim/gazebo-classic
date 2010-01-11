@@ -206,7 +206,6 @@ void BulletBody::SetGravityMode(bool mode)
     this->compoundShape->calculateLocalInertia(btMass,fallInertia);
     this->rigidBody->setMassProps(btMass, fallInertia);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -421,14 +420,16 @@ btRigidBody *BulletBody::GetBulletBody() const
 /// Set the linear damping factor
 void BulletBody::SetLinearDamping(double damping)
 {
-  this->rigidBody->setDamping(damping, this->rigidBody->getAngularDamping());
+  this->rigidBody->setDamping((btScalar)damping, 
+      (btScalar)this->rigidBody->getAngularDamping());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular damping factor
 void BulletBody::SetAngularDamping(double damping)
 {
-  this->rigidBody->setDamping(this->rigidBody->getLinearDamping(), damping);
+  this->rigidBody->setDamping(
+      (btScalar)this->rigidBody->getLinearDamping(), (btScalar)damping);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

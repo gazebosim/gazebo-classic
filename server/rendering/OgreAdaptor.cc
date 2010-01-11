@@ -408,17 +408,17 @@ void OgreAdaptor::SetupRenderSystem()
   Ogre::RenderSystem *renderSys;
 
   // Set parameters of render system (window size, etc.)
-  Ogre::RenderSystemList *rsList = this->root->getAvailableRenderers();
+  Ogre::RenderSystemList rsList = this->root->getAvailableRenderers();
   int c = 0;
 
   renderSys = NULL;
 
   do
   {
-    if (c == (int)rsList->size())
+    if (c == (int)rsList.size())
       break;
 
-    renderSys = rsList->at(c);
+    renderSys = rsList.at(c);
     c++;
   }
   while (renderSys->getName().compare("OpenGL Rendering Subsystem")!= 0);
@@ -505,7 +505,8 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos)
   {
     if (iter->movable)
     {
-      OgreVisual *vis = dynamic_cast<OgreVisual*>(iter->movable->getUserObject());
+      //OgreVisual *vis = dynamic_cast<OgreVisual*>(iter->movable->getUserObject());
+      OgreVisual *vis = Ogre::any_cast<OgreVisual*>(iter->movable->getUserAny());
 
       if (vis && vis->GetOwner())
       {

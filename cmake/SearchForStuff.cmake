@@ -22,7 +22,7 @@ SET (bullet_dynamics_dirs "" CACHE STRING "Bullet Dynamics libraries. Use this t
 SET (bullet_collision_dirs "" CACHE STRING "Bullet Collision libraries. Use this to override automatic detection.")
 SET (bullet_softbody_dirs "" CACHE STRING "Bullet Softbody libraries. Use this to override automatic detection.")
 SET (bullet_math_dirs "" CACHE STRING "Bullet LinearMath libraries. Use this to override automatic detection.")
-SET (bullet_cflags "" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
+SET (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
 SET (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
 
 ########################################
@@ -377,18 +377,19 @@ IF (bullet_dynamics_library AND
     bullet_math_library AND
     bullet_include_dir)
   SET (INCLUDE_BULLET TRUE CACHE BOOL "Include support for Bullet")
+
   APPEND_TO_CACHED_LIST(bullet_link_libs 
                         ${bullet_link_libs_desc} 
-                        BulletDynamics)
+                        ${bullet_dynamics_library})
   APPEND_TO_CACHED_LIST(bullet_link_libs 
                         ${bullet_link_libs_desc} 
-                        BulletCollision)
+                        ${bullet_collision_library})
   APPEND_TO_CACHED_LIST(bullet_link_libs 
                         ${bullet_link_libs_desc} 
-                        BulletSoftBody)
+                        ${bullet_softbody_library})
   APPEND_TO_CACHED_LIST(bullet_link_libs 
                         ${bullet_link_libs_desc} 
-                        LinearMath)
+                        ${bullet_math_library})
 
 
 ELSE (bullet_dynamics_library AND 
@@ -403,4 +404,3 @@ ENDIF (bullet_dynamics_library AND
        bullet_softbody_library  AND 
        bullet_math_library AND
        bullet_include_dir)
-

@@ -149,7 +149,7 @@
   <body1>left_wheel</body1>
   <body2>chassis_body</body2>
   <anchor>left_wheel</anchor>
-  <anchorOffset>0 0.04 0</anchorOffset>
+  <anchorOffset>0 0 0.04</anchorOffset>
   <axis>0 1 0</axis>
   <erp>0.8</erp>
   <cfm>10e-5</cfm>
@@ -159,7 +159,7 @@
   <body1>right_wheel</body1>
   <body2>chassis_body</body2>
   <anchor>right_wheel</anchor>
-  <anchorOffset>0 -0.04 0</anchorOffset>
+  <anchorOffset>0 0 -0.04</anchorOffset>
   <axis>0 1 0</axis>
   <erp>0.8</erp>
   <cfm>10e-5</cfm>

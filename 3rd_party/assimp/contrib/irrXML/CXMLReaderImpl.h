@@ -665,7 +665,7 @@ private:
 
 			// MSVC debugger complains here about loss of data ...
 			for (int i=0; i<sizeWithoutHeader; ++i)
-				TextData[i] = char_type( source[i] & (src_char_type)((((uint64_t)1u << (sizeof( char_type)*8)) - 1)));
+				TextData[i] = char_type( source[i] & (src_char_type)((((uint64_t)1u << (sizeof(char_type)*8)) - 1)));
 
 			TextBegin = TextData;
 			TextSize = sizeWithoutHeader;

@@ -140,20 +140,32 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 target_link_libraries( gazebo-exec ${libtool_library}
+                                   BulletDynamics
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
                                    gazebo_server
+                                   BulletDynamics
                                    ${freeimage_library} 
+                                   BulletDynamics
                                    gazebo_rendering
+                                   BulletDynamics
                                    gazebo_av-shared
+                                   BulletDynamics
                                    gazebo_gui
+                                   BulletDynamics
                                    gazebo_physics
+                                   BulletDynamics
                                    gazebo 
+                                   BulletDynamics
                                    assimp
+                                   BulletDynamics
 )
+
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazebo gazebo_rendering gazebo_physics )
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo-exec gazebo_physics_bullet ${bullet_link_libs})
+  target_link_libraries(gazebo-exec BulletDynamics)
   target_link_libraries(gazebo_server gazebo_physics_bullet ${bullet_link_libs})
 endif (INCLUDE_BULLET)
 
@@ -162,8 +174,7 @@ if (INCLUDE_ODE)
   target_link_libraries(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
 endif (INCLUDE_ODE)
 
-TARGET_LINK_LIBRARIES( gazebo_server ${libtool_library} ${freeimage_library} gazebo gazebo_rendering gazebo_physics )
 
-INSTALL (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-INSTALL (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-INSTALL (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
+install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)

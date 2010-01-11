@@ -300,7 +300,7 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 
   this->sceneNode->attachObject(obj);
 
-  obj->setUserObject( this );
+  obj->setUserAny( Ogre::Any(this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
