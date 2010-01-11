@@ -27,6 +27,7 @@
 
 #include "WebGazebo.hh"
 
+#include <iostream>
 #include <fstream>
 
 #include <stdio.h>
@@ -218,9 +219,9 @@ WebGazebo::GoCallback()
 }
 
 bool
-WebGazebo::ClockRunFor( double seconds )
+WebGazebo::ClockRunFor( uint32_t msec )
 {
-  unsigned int us = (unsigned int)rint(seconds*1e6);
+  unsigned int us = (unsigned int)rint(msec*1e3);
   this->simIface->Go(us, boost::bind(&WebGazebo::GoCallback, this));
   // Wait for the callback to fire
   boost::mutex::scoped_lock lock(this->goMutex);

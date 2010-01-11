@@ -28,6 +28,7 @@
 #include "WebGazebo.hh"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #define USAGE "USAGE: webgazebo [-f <file.fed>] [-h <host>] [-p <port>] [-d <dtol>] [-a <atol>]\n"
 

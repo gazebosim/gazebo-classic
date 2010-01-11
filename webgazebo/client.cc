@@ -67,7 +67,7 @@ cb(evhttp_request* req, void* arg)
   g_cnt++;
   if(g_cnt >= g_target_cnt)
   {
-    printf("Total: %d transactions / %.6fs = %.6f tran/s\n",
+    printf("Total: %lu transactions / %.6fs = %.6f tran/s\n",
            g_cnt, g_dt, g_cnt / g_dt);
     exit(0);
   }

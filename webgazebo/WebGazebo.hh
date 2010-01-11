@@ -89,7 +89,7 @@ public:
 
   virtual bool ClockStop() { simIface->Pause(); return true;}
 
-  virtual bool ClockRunFor( double seconds );
+  virtual bool ClockRunFor( uint32_t msec );
 
   // end WebSim Interface ====================================================
 
