@@ -35,6 +35,8 @@
 #include <iostream>
 #include <string.h>
 
+#include "config.h"
+
 #include "OgreVisual.hh"
 #include "UserCamera.hh"
 #include "OgreMovableText.hh"
@@ -400,15 +402,23 @@ void OgreAdaptor::SetupResources()
   }
 }
 
+#define OGRE_VERSION_MAJOR 1
+#define OGRE_VERSION_MINOR 7
 
 ////////////////////////////////////////////////////////////////////////////////
 // Setup render system
 void OgreAdaptor::SetupRenderSystem()
 {
   Ogre::RenderSystem *renderSys;
+  const Ogre::RenderSystemList *rsList;
 
   // Set parameters of render system (window size, etc.)
-  Ogre::RenderSystemList *rsList = this->root->getAvailableRenderers();
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+    rsList = this->root->getAvailableRenderers();
+#else
+    rsList = &(this->root->getAvailableRenderers());
+#endif
+
   int c = 0;
 
   renderSys = NULL;

@@ -12,33 +12,35 @@ INCLUDE (${gazebo_cmake_dir}/FindFreeimage.cmake)
 #endif (NOT FLTK_FOUND)
 
 
-SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
-SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
+set (use_internal_assimp OFF CACHE BOOL "Use internal assimp" FORCE)
 
-SET (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
-SET (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
-SET (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
+set (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
+set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
-SET (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
-SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
-SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
-SET (bullet_dynamics_dirs "" CACHE STRING "Bullet Dynamics libraries. Use this to override automatic detection.")
-SET (bullet_collision_dirs "" CACHE STRING "Bullet Collision libraries. Use this to override automatic detection.")
-SET (bullet_softbody_dirs "" CACHE STRING "Bullet Softbody libraries. Use this to override automatic detection.")
-SET (bullet_math_dirs "" CACHE STRING "Bullet LinearMath libraries. Use this to override automatic detection.")
-SET (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
-SET (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
+set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
+set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
+set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
+
+set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
+set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
+set (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
+set (bullet_dynamics_dirs "" CACHE STRING "Bullet Dynamics libraries. Use this to override automatic detection.")
+set (bullet_collision_dirs "" CACHE STRING "Bullet Collision libraries. Use this to override automatic detection.")
+set (bullet_softbody_dirs "" CACHE STRING "Bullet Softbody libraries. Use this to override automatic detection.")
+set (bullet_math_dirs "" CACHE STRING "Bullet LinearMath libraries. Use this to override automatic detection.")
+set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
+set (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
 
 ########################################
 # Find packages
-IF (PKG_CONFIG_FOUND)
+if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(OGRE OGRE>=${OGRE_VERSION})
-  IF (NOT OGRE_FOUND)
-    BUILD_ERROR("Ogre3d version >=${OGRE_VERSION} and development files not found. See the following website for installation instructions: http://www.orge3d.org")
-  ELSE (NOT OGRE_FOUND)
+  pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
+  if (NOT OGRE_FOUND)
+    BUILD_ERROR("Ogre3d version >=${MIN_OGRE_VERSION} and development files not found. See the following website for installation instructions: http://www.orge3d.org")
+  else (NOT OGRE_FOUND)
  
-    SET (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")
+    set (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")
 
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
@@ -55,7 +57,7 @@ IF (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${OGRE_LDFLAGS})
-  ENDIF (NOT OGRE_FOUND)
+  endif (NOT OGRE_FOUND)
 
   pkg_check_modules(XML libxml-2.0)
   IF (NOT XML_FOUND)
@@ -343,34 +345,38 @@ ENDIF (libdl_library AND libdl_include_dir)
 
 ########################################
 # Find assimp
-IF (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
+if (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
 
-  FIND_PATH(assimp_include_dir assimp.h ${assimp_include_dirs} ENV CPATH)
+  find_path(assimp_include_dir assimp.h ${assimp_include_dirs} ENV CPATH)
   
-  IF (NOT assimp_include_dir)
-    BUILD_ERROR("assimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
-    MESSAGE (STATUS "Looking for assimp.h - not found")
-    SET (assimp_include_dirs /usr/include CACHE STRING
+  if (NOT assimp_include_dir)
+    #BUILD_ERROR("assimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
+    message (STATUS "Looking for assimp.h - not found. Using built in version.")
+    set (assimp_include_dirs /usr/include CACHE STRING
       "Assimp include paths. Use this to override automatic detection.")
-  ELSE (NOT assimp_include_dir)
-    MESSAGE (STATUS "Looking for assimp.h - found")
+  else (NOT assimp_include_dir)
+    message (STATUS "Looking for assimp.h - found")
     set (assim_include_dirs ${assimp_include_dir} CACHE STRING
       "Assimp include paths. Use this to override automatic detection.")
-  ENDIF (NOT assimp_include_dir)
+  endif (NOT assimp_include_dir)
   
-  FIND_LIBRARY(assimp_library assimp ENV LD_LIBRARY_PATH)
+  find_library(assimp_library assimp ENV LD_LIBRARY_PATH)
   
-  IF (NOT assimp_library)
-    MESSAGE (STATUS "Looking for libassimp - not found")
-    BUILD_ERROR("libassimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
-  ELSE (NOT assimp_library)
-    MESSAGE (STATUS "Looking for libassimp - found")
+  if (NOT assimp_library)
+    message (STATUS "Looking for libassimp - not found. Using builtin version.")
+    #BUILD_ERROR("libassimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
+  else (NOT assimp_library)
+    message (STATUS "Looking for libassimp - found")
     APPEND_TO_CACHED_LIST(assimp_libraries
                           "Assimp libraries Use this to override automatic detection."
                           ${assimp_library})
-  ENDIF (NOT assimp_library)
-  
-ENDIF (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
+  endif (NOT assimp_library)
+ 
+  if (NOT assimp_include_dir AND NOT assimp_library)
+    set (use_internal_assimp ON CACHE BOOL "Use internal assimp" FORCE)
+  endif (NOT assimp_include_dir AND NOT assimp_library)
+
+endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
 
 ########################################
 # Find bullet

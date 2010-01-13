@@ -259,7 +259,12 @@ void StereoCameraSensor::UpdateChild()
     autoParamDataSource.setCurrentRenderTarget(this->renderTargets[i]);
     autoParamDataSource.setCurrentSceneManager(sceneMgr);
     autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     pass->_updateAutoParamsNoLights(&autoParamDataSource);
+#else
+    pass->_updateAutoParams(&autoParamDataSource,1);
+#endif
     
     renderSys->setLightingEnabled(false);
     renderSys->_setFog(Ogre::FOG_NONE);
@@ -271,16 +276,30 @@ void StereoCameraSensor::UpdateChild()
     // NOTE: We MUST bind parameters AFTER updating the autos
     if (pass->hasVertexProgram())
     {
-      renderSys->bindGpuProgram( pass->getVertexProgram()->_getBindingDelegate() );
+      renderSys->bindGpuProgram( 
+          pass->getVertexProgram()->_getBindingDelegate() );
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
       renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
           pass->getVertexProgramParameters());
+#else
+        renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
+            pass->getVertexProgramParameters(), 1);
+#endif
     }
 
     if (pass->hasFragmentProgram())
     {   
-      renderSys->bindGpuProgram( pass->getFragmentProgram()->_getBindingDelegate() );
+      renderSys->bindGpuProgram( 
+          pass->getFragmentProgram()->_getBindingDelegate() );
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
       renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
-          pass->getFragmentProgramParameters());
+            pass->getFragmentProgramParameters());
+#else
+        renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
+            pass->getFragmentProgramParameters(), 1);
+#endif
     }
    
     this->renderTargets[i]->update();

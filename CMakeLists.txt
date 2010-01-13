@@ -11,39 +11,39 @@ STRING (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 SET (GAZEBO_VERSION 0.9.0)
 MESSAGE (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
-SET (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
+set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
-SET (gazeboserver_sources_desc "List of server sources" 
+set (gazeboserver_sources_desc "List of server sources" 
      CACHE INTERNAL "Gazebo server sources list description" FORCE)
-SET (gazeboserver_headers_desc "List of server headers" 
+set (gazeboserver_headers_desc "List of server headers" 
      CACHE INTERNAL "Gazebo server headers list description" FORCE)
-SET (gazeboserver_include_dirs_desc "List of server include directories" 
+set (gazeboserver_include_dirs_desc "List of server include directories" 
      CACHE INTERNAL "Include dirs description")
-SET (gazeboserver_link_dirs_desc "List of server link directories" 
+set (gazeboserver_link_dirs_desc "List of server link directories" 
      CACHE INTERNAL "Link dirs description" FORCE)
-SET (gazeboserver_link_libs_desc "List of server link libraries" 
+set (gazeboserver_link_libs_desc "List of server link libraries" 
      CACHE INTERNAL "Link libs description" FORCE)
-SET (gazeboserver_cflags_desc "List of server cflags" 
+set (gazeboserver_cflags_desc "List of server cflags" 
      CACHE INTERNAL "Server cflags description" FORCE)
-SET (gazebosensor_sources_desc "List of sensor sources" 
+set (gazebosensor_sources_desc "List of sensor sources" 
      CACHE INTERNAL "Gazebo sensor sources list description" FORCE)
-SET (gazebocontroller_sources_desc "List of controller sources" 
+set (gazebocontroller_sources_desc "List of controller sources" 
      CACHE INTERNAL "Gazebo controller sources list description" FORCE)
 
-SET (bullet_link_libs_desc "List of bullet link libraries" 
+set (bullet_link_libs_desc "List of bullet link libraries" 
      CACHE INTERNAL "Bullet link libs description" FORCE)
 
-SET (OGRE_VERSION 1.6.3 CACHE INTERNAL "Ogre version requirement" FORCE)
+set (MIN_OGRE_VERSION 1.6.3 CACHE INTERNAL "Ogre version requirement" FORCE)
 
-SET (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
-SET (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
-SET (FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
-SET (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
-SET (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
+set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
+set (FREEIMAGE_MINOR_VERSION 9 CACHE INTERNAL "FreeImage minor version requirement" FORCE)
+set (FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 CACHE INTERNAL "FreeImage version requirement" FORCE)
+set (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
+set (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
-SET (ENABLE_BINDINGS OFF CACHE BOOL "Enable libgazebo bindings")
+set (ENABLE_BINDINGS OFF CACHE BOOL "Enable libgazebo bindings")
 
-SET (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
+set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")
 
 INCLUDE (${gazebo_cmake_dir}/DissectVersion.cmake)
@@ -95,24 +95,28 @@ else (build_errors)
   
   message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
   
-  IF (BUILD_GAZEBO)
-    #ADD_SUBDIRECTORY(3rd_party)
-    ADD_SUBDIRECTORY(libgazebo)
-    ADD_SUBDIRECTORY(server)
-    ADD_SUBDIRECTORY(worlds)
-    ADD_SUBDIRECTORY(Media)
+  if (BUILD_GAZEBO)
+
+    if (use_internal_assimp)
+      add_subdirectory(3rd_party)
+    endif (use_internal_assimp)
+
+    add_subdirectory(libgazebo)
+    add_subdirectory(server)
+    add_subdirectory(worlds)
+    add_subdirectory(Media)
     
-    IF (INCLUDE_PLAYER)
-      ADD_SUBDIRECTORY(player)
-    ENDIF (INCLUDE_PLAYER)
+    if (INCLUDE_PLAYER)
+      add_subdirectory(player)
+    endif (INCLUDE_PLAYER)
     
-    IF (INCLUDE_WEBGAZEBO)
-      Add_SUBDIRECTORY(webgazebo)
-    ENDIF (INCLUDE_WEBGAZEBO)
+    if (INCLUDE_WEBGAZEBO)
+      add_subdirectory(webgazebo)
+    endif (INCLUDE_WEBGAZEBO)
     
-    MESSAGE (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-    MESSAGE (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
-  ENDIF (BUILD_GAZEBO)
+    message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+    message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
+  endif (BUILD_GAZEBO)
   
   # Cpack stuff
   INCLUDE (InstallRequiredSystemLibraries)

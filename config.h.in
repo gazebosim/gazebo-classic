@@ -6,6 +6,6 @@
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1
 #cmakedefine HAVE_LTDL 1
-#cmakedefine ENABLE_SHADOWS 0
+#cmakedefine ENABLE_SHADOWS 1
 #cmakedefine INCLUDE_BULLET 0
 #cmakedefine INCLUDE_ODE 1

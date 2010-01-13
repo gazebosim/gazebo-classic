@@ -1,4 +1,4 @@
-INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 add_subdirectory(assimp)
 

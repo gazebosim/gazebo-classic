@@ -20,7 +20,6 @@ INCLUDE_DIRECTORIES(
   sensors/imu
   sensors/ir
   sensors/ray
-  #${CMAKE_SOURCE_DIR}/3rd_party/assimp/include
   ${LIBAVCODEC_PATH}
   ${LIBAVFORMAT_PATH}
   ${libtool_include_path}
@@ -34,7 +33,6 @@ INCLUDE_DIRECTORIES(
 )
 
 LINK_DIRECTORIES(  
-  #${CMAKE_BINARY_DIR}/3rd_party/assimp 
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
@@ -47,6 +45,12 @@ LINK_DIRECTORIES(
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
 )
+
+if (use_internal_assimp)
+  include_directories( ${CMAKE_SOURCE_DIR}/3rd_party/assimp/include/assimp)
+  link_directories( ${CMAKE_BINARY_DIR}/3rd_party/assimp )
+endif (use_internal_assimp)
+
 
 ########################################
 # All the library search paths
