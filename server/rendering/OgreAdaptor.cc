@@ -402,9 +402,6 @@ void OgreAdaptor::SetupResources()
   }
 }
 
-#define OGRE_VERSION_MAJOR 1
-#define OGRE_VERSION_MINOR 7
-
 ////////////////////////////////////////////////////////////////////////////////
 // Setup render system
 void OgreAdaptor::SetupRenderSystem()
