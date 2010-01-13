@@ -65,6 +65,7 @@ ODEBody::ODEBody(Entity *parent)
 // Destructor
 ODEBody::~ODEBody()
 {
+  dBodyDestroy(this->bodyId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
