@@ -199,7 +199,7 @@ void AssimpLoader::BuildMesh(aiNode *node, Mesh *mesh)
 
       if (aMesh->mNumUVComponents[0])
         subMesh->AddTexCoord(aMesh->mTextureCoords[0][j].x, 
-                             aMesh->mTextureCoords[0][j].y);
+                             1.0-aMesh->mTextureCoords[0][j].y);
       else
         subMesh->AddTexCoord(0,0);
     }
