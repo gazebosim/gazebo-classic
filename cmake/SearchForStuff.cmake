@@ -17,9 +17,9 @@ set (use_internal_assimp OFF CACHE BOOL "Use internal assimp" FORCE)
 set (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
-set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
-set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
-set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
+set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection." FORCE)
+set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection." FORCE)
+set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection." FORCE)
 
 set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
@@ -347,15 +347,15 @@ ENDIF (libdl_library AND libdl_include_dir)
 # Find assimp
 if (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
 
-  find_path(assimp_include_dir assimp.h ${assimp_include_dirs} ENV CPATH)
+  find_path(assimp_include_dir assimp.hpp ${assimp_include_dirs} ENV CPATH)
   
   if (NOT assimp_include_dir)
     #BUILD_ERROR("assimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
-    message (STATUS "Looking for assimp.h - not found. Using built in version.")
+    message (STATUS "Looking for assimp.hpp - not found. Using built in version.")
     set (assimp_include_dirs /usr/include CACHE STRING
       "Assimp include paths. Use this to override automatic detection.")
   else (NOT assimp_include_dir)
-    message (STATUS "Looking for assimp.h - found")
+    message (STATUS "Looking for assimp.hpp - found")
     set (assim_include_dirs ${assimp_include_dir} CACHE STRING
       "Assimp include paths. Use this to override automatic detection.")
   endif (NOT assimp_include_dir)
@@ -372,9 +372,9 @@ if (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries
                           ${assimp_library})
   endif (NOT assimp_library)
  
-  if (NOT assimp_include_dir AND NOT assimp_library)
+  if (NOT assimp_include_dir OR NOT assimp_library)
     set (use_internal_assimp ON CACHE BOOL "Use internal assimp" FORCE)
-  endif (NOT assimp_include_dir AND NOT assimp_library)
+  endif (NOT assimp_include_dir OR NOT assimp_library)
 
 endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
 
