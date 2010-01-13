@@ -146,26 +146,17 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 target_link_libraries( gazebo-exec ${libtool_library}
-                                   BulletDynamics
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
                                    ${assimp_libraries} 
                                    gazebo_server
-                                   BulletDynamics
                                    ${freeimage_library} 
-                                   BulletDynamics
                                    gazebo_rendering
-                                   BulletDynamics
                                    gazebo_av-shared
-                                   BulletDynamics
                                    gazebo_gui
-                                   BulletDynamics
                                    gazebo_physics
-                                   BulletDynamics
                                    gazebo 
-                                   BulletDynamics
                                    assimp
-                                   BulletDynamics
 )
 
 target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazebo gazebo_rendering gazebo_physics )
