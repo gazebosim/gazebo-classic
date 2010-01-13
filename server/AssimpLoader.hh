@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include <assimp/assimp.hpp>
-#include <assimp/aiScene.h>
-#include <assimp/aiPostProcess.h>
+#include <assimp.hpp>
+#include <aiScene.h>
+#include <aiPostProcess.h>
 
 #include "MeshLoader.hh"
 

@@ -20,12 +20,13 @@ INCLUDE_DIRECTORIES(
   sensors/imu
   sensors/ir
   sensors/ray
-  ${CMAKE_SOURCE_DIR}/3rd_party/assimp/include
+  #${CMAKE_SOURCE_DIR}/3rd_party/assimp/include
   ${LIBAVCODEC_PATH}
   ${LIBAVFORMAT_PATH}
   ${libtool_include_path}
   ${gazeboserver_include_dirs}
   ${boost_include_dirs}
+  ${assimp_include_dirs}
   ${freeimage_include_dir}
   ${bullet_include_dir}
   ${threadpool_include_dirs_split}
@@ -33,11 +34,12 @@ INCLUDE_DIRECTORIES(
 )
 
 LINK_DIRECTORIES(  
- ${CMAKE_BINARY_DIR}/3rd_party/assimp 
+  #${CMAKE_BINARY_DIR}/3rd_party/assimp 
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
  ${boost_library_dirs} 
+ ${assimp_library_dirs} 
  ${bullet_dynamics_dirs} 
  ${bullet_collision_dirs} 
  ${bullet_softbody_dirs} 
@@ -143,6 +145,7 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    BulletDynamics
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
+                                   ${assimp_libraries} 
                                    gazebo_server
                                    BulletDynamics
                                    ${freeimage_library} 

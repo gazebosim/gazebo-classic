@@ -15,6 +15,10 @@ INCLUDE (${gazebo_cmake_dir}/FindFreeimage.cmake)
 SET (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 SET (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
+SET (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
+SET (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
+SET (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
+
 SET (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 SET (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
 SET (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
@@ -336,6 +340,37 @@ ENDIF (NOT libdl_library)
 IF (libdl_library AND libdl_include_dir)
   SET (HAVE_DL TRUE)
 ENDIF (libdl_library AND libdl_include_dir)
+
+########################################
+# Find assimp
+IF (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
+
+  FIND_PATH(assimp_include_dir assimp.h ${assimp_include_dirs} ENV CPATH)
+  
+  IF (NOT assimp_include_dir)
+    BUILD_ERROR("assimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
+    MESSAGE (STATUS "Looking for assimp.h - not found")
+    SET (assimp_include_dirs /usr/include CACHE STRING
+      "Assimp include paths. Use this to override automatic detection.")
+  ELSE (NOT assimp_include_dir)
+    MESSAGE (STATUS "Looking for assimp.h - found")
+    set (assim_include_dirs ${assimp_include_dir} CACHE STRING
+      "Assimp include paths. Use this to override automatic detection.")
+  ENDIF (NOT assimp_include_dir)
+  
+  FIND_LIBRARY(assimp_library assimp ENV LD_LIBRARY_PATH)
+  
+  IF (NOT assimp_library)
+    MESSAGE (STATUS "Looking for libassimp - not found")
+    BUILD_ERROR("libassimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
+  ELSE (NOT assimp_library)
+    MESSAGE (STATUS "Looking for libassimp - found")
+    APPEND_TO_CACHED_LIST(assimp_libraries
+                          "Assimp libraries Use this to override automatic detection."
+                          ${assimp_library})
+  ENDIF (NOT assimp_library)
+  
+ENDIF (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
 
 ########################################
 # Find bullet

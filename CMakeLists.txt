@@ -96,7 +96,7 @@ else (build_errors)
   message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
   
   IF (BUILD_GAZEBO)
-    ADD_SUBDIRECTORY(3rd_party)
+    #ADD_SUBDIRECTORY(3rd_party)
     ADD_SUBDIRECTORY(libgazebo)
     ADD_SUBDIRECTORY(server)
     ADD_SUBDIRECTORY(worlds)

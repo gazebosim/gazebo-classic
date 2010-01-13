@@ -19,7 +19,6 @@ SET (files audio.world
            simpleshapes.world
            stereocamera.world
            terrain.world
-           test.world
            trimesh.world
            wizbot.world
 )

@@ -43,7 +43,7 @@ add_library(gazebo_gui SHARED ${sources})
 
 #target_link_libraries(gazebo_gui ${FLTK_LIBRARIES} BulletDynamics BulletCollision LinearMath)
 
-target_link_libraries(gazebo_gui ${FLTK_LIBRARIES})
+target_link_libraries(gazebo_gui ${FLTK_LIBRARIES} Xpm)
 
 set_target_properties(gazebo_gui PROPERTIES OUTPUT_NAME "gazebo_gui" VERSION ${GAZEBO_VERSION})
 

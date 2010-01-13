@@ -259,7 +259,7 @@ void StereoCameraSensor::UpdateChild()
     autoParamDataSource.setCurrentRenderTarget(this->renderTargets[i]);
     autoParamDataSource.setCurrentSceneManager(sceneMgr);
     autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
-    pass->_updateAutoParams(&autoParamDataSource,1);
+    pass->_updateAutoParamsNoLights(&autoParamDataSource);
     
     renderSys->setLightingEnabled(false);
     renderSys->_setFog(Ogre::FOG_NONE);
@@ -273,14 +273,14 @@ void StereoCameraSensor::UpdateChild()
     {
       renderSys->bindGpuProgram( pass->getVertexProgram()->_getBindingDelegate() );
       renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
-          pass->getVertexProgramParameters(),1);
+          pass->getVertexProgramParameters());
     }
 
     if (pass->hasFragmentProgram())
     {   
       renderSys->bindGpuProgram( pass->getFragmentProgram()->_getBindingDelegate() );
       renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
-          pass->getFragmentProgramParameters(),1);
+          pass->getFragmentProgramParameters());
     }
    
     this->renderTargets[i]->update();
