@@ -17,9 +17,9 @@ set (use_internal_assimp OFF CACHE BOOL "Use internal assimp" FORCE)
 set (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
-set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection." FORCE)
-set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection." FORCE)
-set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection." FORCE)
+set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
+set (assimp_library_dirs "" CACHE STRING "Assimp library paths. Use this to override automatic detection.")
+set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override automatic detection.")
 
 set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
