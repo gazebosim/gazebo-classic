@@ -80,7 +80,12 @@ PhysicsEngine::PhysicsEngine()
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
-  delete this->visual;
+  if (this->visual)
+  {
+    OgreCreator::Instance()->DeleteVisual( this->visual );
+    this->visual = NULL;
+  }
+
   delete this->gravityP;
   delete this->updateRateP;
   delete this->stepTimeP;

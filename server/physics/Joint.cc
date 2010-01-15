@@ -70,6 +70,12 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
+  if (this->visual)
+  {
+    OgreCreator::Instance()->DeleteVisual( this->visual );
+    this->visual = NULL;
+  }
+
   delete this->erpP;
   delete this->cfmP;
   delete this->stopKpP;
