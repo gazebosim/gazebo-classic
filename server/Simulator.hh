@@ -171,8 +171,11 @@ namespace gazebo
     /// \brief Get the body that contains the entity
     public: Body *GetParentBody( Entity *entity ) const;
 
-    /// \brief Get the simulator mutex
+    /// \brief Get the simulator mutex for rendering lock
     public:boost::recursive_mutex *GetMRMutex();
+
+    /// \brief Get the simulator mutex for model deletion lock
+    public:boost::recursive_mutex *GetMDMutex();
 
     /// \brief Get the state of the simulation
     public: State GetState() const;
@@ -245,7 +248,8 @@ namespace gazebo
     /// Thread in which to run the gui
     private: boost::thread *physicsThread;
 
-    private: boost::recursive_mutex *mutex;
+    private: boost::recursive_mutex *render_mutex;
+    private: boost::recursive_mutex *model_delete_mutex;
 
     private: State state;
 

@@ -74,7 +74,8 @@ Simulator::Simulator()
   selectedEntity(NULL),
   selectedBody(NULL)
 {
-  this->mutex = new boost::recursive_mutex();
+  this->render_mutex = new boost::recursive_mutex();
+  this->model_delete_mutex = new boost::recursive_mutex();
   this->startTime = this->GetWallTime();
 }
 
@@ -95,10 +96,16 @@ Simulator::~Simulator()
     this->xmlFile = NULL;
   }
 
-  if (this->mutex)
+  if (this->render_mutex)
   {
-    delete this->mutex;
-    this->mutex = NULL;
+    delete this->render_mutex;
+    this->render_mutex = NULL;
+  }
+
+  if (this->model_delete_mutex)
+  {
+    delete this->model_delete_mutex;
+    this->model_delete_mutex = NULL;
   }
 
   if (this->gui)
@@ -356,12 +363,13 @@ void Simulator::MainLoop()
       if (this->renderEngineEnabled)
         OgreAdaptor::Instance()->UpdateCameras();
 
+      if (this->renderEngineEnabled)
+        World::Instance()->GraphicsUpdate();
+
       currTime = this->GetWallTime();
 
       World::Instance()->ProcessEntitiesToLoad();
-
-      if (this->renderEngineEnabled)
-        World::Instance()->GraphicsUpdate();
+      World::Instance()->ProcessEntitiesToDelete();
 
       if (currTime - lastTime < 1/freq)
       {
@@ -410,7 +418,7 @@ bool Simulator::IsPaused() const
 /// Set whether the simulation is paused
 void Simulator::SetPaused(bool p)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
 
   if (this->pause == p)
     return;
@@ -480,7 +488,7 @@ bool Simulator::GetStepInc() const
 ////////////////////////////////////////////////////////////////////////////////
 void Simulator::SetStepInc(bool step)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
   this->stepInc = step;
 }
 
@@ -653,7 +661,8 @@ void Simulator::PhysicsLoop()
     lastTime = this->GetRealTime();
 
     {
-      boost::recursive_mutex::scoped_lock lock(*this->mutex);
+      boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
+      boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
       world->Update();
     }
 
@@ -712,7 +721,14 @@ void Simulator::PhysicsLoop()
 /// Get the simulator mutex
 boost::recursive_mutex *Simulator::GetMRMutex()
 {
-  return this->mutex;
+  return this->render_mutex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the simulator mutex
+boost::recursive_mutex *Simulator::GetMDMutex()
+{
+  return this->model_delete_mutex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
