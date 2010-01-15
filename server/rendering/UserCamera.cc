@@ -61,6 +61,11 @@ UserCamera::UserCamera(GLWindow *parentWindow)
 /// Destructor
 UserCamera::~UserCamera()
 {
+  if (this->visual)
+  {
+    OgreCreator::Instance()->DeleteVisual( this->visual );
+    this->visual = NULL;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
