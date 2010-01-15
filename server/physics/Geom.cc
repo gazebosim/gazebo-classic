@@ -82,6 +82,22 @@ Geom::Geom( Body *body )
 // Destructor
 Geom::~Geom()
 {
+  for (std::vector<OgreVisual*>::iterator iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    if (*iter)
+    {
+      OgreCreator::Instance()->DeleteVisual( (*iter) );
+      (*iter) = NULL;
+    }
+  }
+
+  std::cerr << "deleting bbVisual for Geom" << std::endl;
+  if (this->bbVisual)
+  {
+    OgreCreator::Instance()->DeleteVisual( this->bbVisual );
+    this->bbVisual = NULL;
+  }
+
   delete this->massP;
   delete this->xyzP;
   delete this->rpyP;
