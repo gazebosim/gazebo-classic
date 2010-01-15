@@ -149,6 +149,9 @@ class World : public SingletonT<World>
   /// \brief Load all the entities that have been queued
   public: void ProcessEntitiesToLoad();
 
+  /// \brief Delete all the entities that have been queued
+  public: void ProcessEntitiesToDelete();
+
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete
   public: void DeleteEntity(const char *name);

@@ -508,6 +508,32 @@ void World::ProcessEntitiesToLoad()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Load all the entities that have been queued
+void World::ProcessEntitiesToDelete()
+{
+  if (!this->toDeleteModels.empty())
+  {
+    // maybe try try_lock here instead
+    boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
+
+    // Remove and delete all models that are marked for deletion
+    std::vector< Model* >::iterator miter;
+    for (miter=this->toDeleteModels.begin();
+        miter!=this->toDeleteModels.end(); miter++)
+    {
+      //std::cerr << "ProcessEngitiesToDelete " <<  (*miter)->GetName() << std::endl;
+      (*miter)->Fini();
+      this->models.erase(
+          std::remove(this->models.begin(), this->models.end(), *miter) );
+      delete (*miter);
+    }
+
+    this->toDeleteModels.clear();
+  }
+ 
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Delete an entity by name
 void World::DeleteEntity(const char *name)
 {
