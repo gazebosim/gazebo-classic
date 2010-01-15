@@ -759,9 +759,12 @@ void OgreCreator::Update()
     // Update the visuals
     for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
     {
-      if (!viter->second->IsDirty())
-        continue;
-      viter->second->SetToDirtyPose();
+      if (viter->second)
+      {
+        if (!viter->second->IsDirty())
+          continue;
+        viter->second->SetToDirtyPose();
+      }
     }
   }
 }
@@ -807,7 +810,7 @@ void OgreCreator::DeleteVisual( OgreVisual *visual )
   {
     delete iter->second;
     iter->second = NULL;
-    //this->visuals.erase(iter);
+    this->visuals.erase(iter);
   }
   else
   {
