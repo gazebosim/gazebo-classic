@@ -111,7 +111,10 @@ Body::~Body()
     SensorManager::Instance()->RemoveSensor(*siter);
 
   if (this->cgVisual)
-    delete this->cgVisual;
+  {
+    OgreCreator::Instance()->DeleteVisual( this->cgVisual );
+    this->cgVisual = NULL;
+  }
 
   delete this->xyzP;
   delete this->rpyP;
