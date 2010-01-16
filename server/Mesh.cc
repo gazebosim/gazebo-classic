@@ -294,13 +294,6 @@ void SubMesh::AddIndex( unsigned int i)
 /// Add a vertex to the mesh
 void SubMesh::AddVertex( Vector3 v )
 {
-  if (fabs(v.x) < 0.00001)
-    v.x = 0.0;
-  if (fabs(v.y) < 0.00001)
-    v.y = 0.0;
-  if (fabs(v.z) < 0.00001)
-    v.z = 0.0;
-
   this->vertices.push_back( v );
 }
 
@@ -315,15 +308,7 @@ void SubMesh::AddVertex(double x, double y, double z )
 /// Add a normal to the mesh
 void SubMesh::AddNormal( Vector3 n )
 {
-  if (fabs(n.x) < 0.00001)
-    n.x = 0.0;
-  if (fabs(n.y) < 0.00001)
-    n.y = 0.0;
-  if (fabs(n.z) < 0.00001)
-    n.z = 0.0;
-
-
-  this->normals.push_back(n);
+  this->normals.push_back( n );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -556,9 +541,9 @@ void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end(); 
        viter++)
   {
-    (*vertArr)[i++] =  (*viter).x;
-    (*vertArr)[i++] =  (*viter).y;
-    (*vertArr)[i++] =  (*viter).z;
+    (*vertArr)[i++] =  (float)(*viter).x;
+    (*vertArr)[i++] =  (float)(*viter).y;
+    (*vertArr)[i++] =  (float)(*viter).z;
   }
 
   for (iiter = this->indices.begin(), i=0; 
