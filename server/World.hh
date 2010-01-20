@@ -194,6 +194,12 @@ class World : public SingletonT<World>
   /// \brief Get whether to show the contacts
   public: bool GetShowContacts() const;
 
+  /// \brief Set whether to show the light source visuals
+  public: void SetShowLights(bool show);
+
+  /// \brief Get whether to show the light source visuals
+  public: bool GetShowLights() const;
+
   /// \brief Set to view as wireframe
   public: void SetWireframe( bool wire );
 
@@ -226,6 +232,8 @@ class World : public SingletonT<World>
 
   private: bool showContacts;
 
+  private: bool showLights;
+
   private: bool showPhysics;
 
   private: bool wireframe;
@@ -251,6 +259,13 @@ class World : public SingletonT<World>
           void ConnectAddEntitySignal( T subscriber )
           {
             addEntitySignal.connect(subscriber);
+          }
+
+  /// \brief Connect a boost::slot the the show light source signal
+  public: template<typename T>
+          void ConnectShowLightsSignal( T subscriber )
+          {
+            showLightsSignal.connect(subscriber);
           }
 
   /// \brif Get the names of interfaces defined in the tree of a model
@@ -301,6 +316,7 @@ class World : public SingletonT<World>
   private: friend class SingletonT<World>;
 
   private: boost::signal<void (Entity*)> addEntitySignal;
+  private: boost::signal<void (bool)> showLightsSignal;
 
   private: std::deque<WorldState> worldStates;
   private: std::deque<WorldState>::iterator worldStatesInsertIter;

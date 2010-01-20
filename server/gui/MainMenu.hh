@@ -57,6 +57,8 @@ namespace gazebo
 
     public: static void ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/);
 
+    public: static void ShowLightsCB(Fl_Widget * /*w*/, void * /*data*/);
+
   };
 }
 

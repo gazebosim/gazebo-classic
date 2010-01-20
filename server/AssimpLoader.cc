@@ -61,7 +61,8 @@ Mesh *AssimpLoader::Load(const std::string &filename)
       {
         aiString matName;
         amat->Get(AI_MATKEY_NAME, matName);
-        mat->SetName(matName.data);
+        std::string uniqueMatName = filename + matName.data;
+        mat->SetName(uniqueMatName);
       }
       else if (propKey == "$clr.diffuse")
       {

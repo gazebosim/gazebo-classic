@@ -145,6 +145,9 @@ Model::~Model()
     delete this->myBodyNameP;
     this->myBodyNameP = NULL;
   }
+
+  if (this->light)
+    OgreCreator::Instance()->DeleteLight(this->light);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1065,7 +1068,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
   if (Simulator::Instance()->GetRenderEngineEnabled() && 
       (childNode = node->GetChild("light")))
   {
-    this->light = new Light(body);
+    this->light = OgreCreator::Instance()->CreateLight(body);
     this->light->Load(childNode);
   }
 

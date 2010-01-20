@@ -365,6 +365,7 @@ void OgreAdaptor::SetupResources()
     }
     closedir(dir);
 
+    archNames.push_back((*iter)+"/");
     archNames.push_back((*iter)+"/Media");
     archNames.push_back((*iter)+"/Media/fonts");
     archNames.push_back((*iter)+"/Media/materials/programs");

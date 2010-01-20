@@ -21,10 +21,10 @@ namespace gazebo
   class Light : public Entity
   {
     /// \brief Constructor
-    public: Light(Entity *parent);
+    private: Light(Entity *parent);
 
     /// \brief Destructor
-    public: virtual ~Light();
+    private: virtual ~Light();
 
     /// \brief Load the light
     public: void Load(XMLConfigNode *node);
@@ -35,6 +35,9 @@ namespace gazebo
     /// \brief Set whether this entity has been selected by the user through  
     ///        the gui
     public: virtual bool SetSelected( bool s );
+
+    /// \brief Set whether to show the visual
+    public: void ShowVisual(bool s);
 
     /// \private Helper node to create a visual representation of the light
     private: void CreateVisual();
@@ -47,6 +50,8 @@ namespace gazebo
     private: OgreDynamicLines *line;
 
     private: static unsigned int lightCounter;
+
+    private: friend class OgreCreator;
   };
 }
 #endif

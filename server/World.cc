@@ -60,6 +60,7 @@ World::World()
   this->showBoundingBoxes = false;
   this->showJoints = false;
   this->showContacts = false;
+  this->showLights = false;
   this->wireframe = false;
   this->showPhysics = false;
   this->physicsEngine = NULL;
@@ -726,6 +727,21 @@ void World::SetShowContacts(bool show)
 bool World::GetShowContacts() const
 {
   return this->showContacts;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to show the light source visuals
+void World::SetShowLights(bool show)
+{
+  this->showLights = show;
+  this->showLightsSignal(this->showLights);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether to show the light source visuals
+bool World::GetShowLights() const
+{
+  return this->showLights;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

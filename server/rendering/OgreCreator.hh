@@ -53,6 +53,7 @@ namespace gazebo
   class OgreVisual;
   class OgreMovableText;
   class OgreDynamicLines;
+  class Light;
 
 /// \addtogroup gazebo_rendering
 /// \{
@@ -76,10 +77,12 @@ namespace gazebo
                 const Vector2<double> &size, const Vector2<double> &segments, 
                 const Vector2<double> &uvTile, const std::string &material, 
                 bool castShadows, OgreVisual *parent, const std::string &name);
-    
-    /// \brief Create a light source 
-    /// \return The name of the light source
-    //public: static std::string CreateLight(XMLConfigNode *node, OgreVisual *parent);
+
+    /// \brief Create a light source and attach it to the visual node
+    public: Light *CreateLight(Entity *parent);
+
+    /// \brief Remove a light
+    public: void DeleteLight(Light *light);
 
     /// \brief Helper function to create a camera
     public: static Ogre::Camera *CreateCamera(const std::string &name, 
@@ -162,12 +165,15 @@ namespace gazebo
     // List of all the movable text
     private: std::list<OgreMovableText*> text;
 
+    // List of all the light sources
+    private: std::list<Light*> lights;
+
     // All the visuals 
     private: std::map<std::string, OgreVisual*> visuals;
 
     // All the windows
     private: std::list<Ogre::RenderWindow *> windows;
- 
+
     private: friend class DestroyerT<OgreCreator>;
     private: friend class SingletonT<OgreCreator>;
 

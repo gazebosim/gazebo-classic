@@ -70,7 +70,6 @@ Entity::Entity(Entity *parent)
       this->visualNode = OgreCreator::Instance()->CreateVisual( 
           visname.str(), NULL, this );
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 #include <Ogre.h>
+#include <boost/bind.hpp>
 
+#include "World.hh"
 #include "Model.hh"
 #include "OgreDynamicLines.hh"
 #include "OgreVisual.hh"
@@ -26,6 +28,8 @@ Light::Light(Entity *parent)
   this->SetName(stream.str());
 
   this->lightCounter++;
+
+  World::Instance()->ConnectShowLightsSignal( boost::bind(&Light::ShowVisual, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +227,9 @@ void Light::CreateVisual()
   this->line->setVisibilityFlags(GZ_LASER_CAMERA);
 
   this->visual->AttachObject(line);
+
+  // turn off light source box visuals by default
+  this->visual->SetVisible(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -237,4 +244,9 @@ bool Light::SetSelected( bool s )
     this->line->setMaterial("Gazebo/WhiteEmissive");
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Set whether to show the visual
+void Light::ShowVisual(bool s)
+{
+  this->visual->SetVisible(s);
+}

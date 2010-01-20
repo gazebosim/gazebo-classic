@@ -34,6 +34,7 @@
 
 #include "config.h"
 
+#include "Light.hh"
 #include "Material.hh"
 #include "Simulator.hh"
 #include "Global.hh"
@@ -108,108 +109,30 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a light source and attach it to the visual node
-/// Note that the properties here are not modified afterwards and thus, 
-/// we don't need a Light class. 
-//std::string OgreCreator::CreateLight(XMLConfigNode *node, OgreVisual *parent)
-//{
-  /*if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return std::string();
+Light *OgreCreator::CreateLight(Entity *parent)
+{
+  Light *newLight = new Light(parent);
+  this->lights.push_back(newLight);
+  return newLight;
+}
 
-  Light *light = new Light(parent);
-  light->Load(node);
-  this->lights.push_back(light);
+////////////////////////////////////////////////////////////////////////////////
+// Remove a light
+void OgreCreator::DeleteLight(Light *light)
+{
+  if (!light)
+    return;
 
-  return light->GetName();
-  */
-
-  /*
-  Vector3 vec;
-  double range,constant,linear,quad;
-  Ogre::Light *light;
-
-  // Create the light
-  std::ostringstream stream;
-  stream << parent->GetName() << "_LIGHT" << lightCounter;
-  lightCounter++;
-
-  try
+  std::list<Light*>::iterator iter;
+  for (iter = this->lights.begin(); iter != this->lights.end(); iter++)
   {
-    light = OgreAdaptor::Instance()->sceneMgr->createLight(stream.str());
-  } 
-  catch (Ogre::Exception e)
-  {
-    gzthrow("Ogre Error:" << e.getFullDescription() << "\n" << \
-             "Unable to create a light on " + parent->GetName());
+    if (*iter == light)
+    {
+      this->lights.erase(iter);
+      break;
+    }
   }
-  
-  // Set the light type
-  std::string lightType = node->GetString("type","point",0);
-  if (lightType == "point")
-  {
-    light->setType(Ogre::Light::LT_POINT);
-  }
-  else if (lightType == "directional")
-  {
-    light->setType(Ogre::Light::LT_DIRECTIONAL);
-  }
-  else if (lightType == "spot")
-  {
-    light->setType(Ogre::Light::LT_SPOTLIGHT);
-  }
-
-  // Set the diffuse color
-  vec = node->GetVector3("diffuseColor",Vector3(1.0, 1.0, 1.0));
-  light->setDiffuseColour(vec.x, vec.y, vec.z);
-
-  // Sets the specular color
-  vec = node->GetVector3("specularColor",Vector3(1.0, 1.0, 1.0));
-  light->setSpecularColour(vec.x, vec.y, vec.z);
-
-  // Set the direction which the light points
-  vec = node->GetVector3("direction", Vector3(0.0, 0.0, -1.0));
-  vec.Normalize();
-  light->setDirection(vec.x, vec.y, vec.z);
-
-  // Absolute range of light in world coordinates
-  range = node->GetDouble("range",0,100);
-
-  // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
-  constant = node->GetTupleDouble("attenuation",0,1.0);
-  if (constant < 0)
-    constant = 0;
-  else if (constant > 1.0)
-    constant = 1.0;
-
-  // Linear factor. 1 means attenuate evenly over the distance
-  linear = node->GetTupleDouble("attenuation",1,0);
-  if (linear < 0)
-    linear = 0;
-  else if (linear > 1.0)
-    linear = 1.0;
-
-  // Quadartic factor.adds a curvature to the attenuation formula
-  quad = node->GetTupleDouble("attenuation",2,0);
-
-  // Set attenuation
-  light->setAttenuation(range, constant, linear, quad);
-
-  // TODO: More options for Spot lights, etc.
-  //  options for spotlights
-  if (lightType == "spot")
-  {
-    vec = node->GetVector3("spotCone", Vector3(5.0, 10.0, 1.0));
-    light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), 
-        Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
-  }
-
-  light->setCastShadows(node->GetBool("castShadows",true,0));
-
-  parent->AttachObject(light);
-
-  return stream.str();
-  */
-//}
-
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper function to create a camera
@@ -749,6 +672,7 @@ void OgreCreator::Update()
   // Update the lines
   for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
     (*iter)->Update();
+
 
   // We only need this loop because we are using threads. The physics engine
   // can't reliably set the pose of the visuals when it's running in a 
