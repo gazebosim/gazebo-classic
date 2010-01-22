@@ -91,7 +91,6 @@ Geom::~Geom()
     }
   }
 
-  std::cerr << "deleting bbVisual for Geom" << std::endl;
   if (this->bbVisual)
   {
     OgreCreator::Instance()->DeleteVisual( this->bbVisual );
