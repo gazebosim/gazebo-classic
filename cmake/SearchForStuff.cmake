@@ -347,15 +347,15 @@ ENDIF (libdl_library AND libdl_include_dir)
 # Find assimp
 if (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
 
-  find_path(assimp_include_dir assimp.hpp ${assimp_include_dirs} ENV CPATH)
+  find_path(assimp_include_dir assimp/assimp.hpp ${assimp_include_dirs} ENV CPATH)
   
   if (NOT assimp_include_dir)
     #BUILD_ERROR("assimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
-    message (STATUS "Looking for assimp.hpp - not found. Using built in version.")
+    message (STATUS "Looking for assimp/assimp.hpp - not found. Using built in version.")
     set (assimp_include_dirs /usr/include CACHE STRING
       "Assimp include paths. Use this to override automatic detection.")
   else (NOT assimp_include_dir)
-    message (STATUS "Looking for assimp.hpp - found")
+    message (STATUS "Looking for assimp/assimp.hpp - found")
     set (assim_include_dirs ${assimp_include_dir} CACHE STRING
       "Assimp include paths. Use this to override automatic detection.")
   endif (NOT assimp_include_dir)
