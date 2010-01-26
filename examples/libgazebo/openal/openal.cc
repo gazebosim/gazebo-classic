@@ -1,5 +1,6 @@
+#include <stdio.h>
+#include <iostream>
 #include <gazebo/gazebo.h>
-#include <gazebo/GazeboError.hh>
 
 gazebo::Client *client = NULL;
 gazebo::SimulationIface *simIface = NULL;
@@ -18,7 +19,7 @@ int main()
   {
     client->ConnectWait(serverId, GZ_CLIENT_ID_USER_FIRST);
   }
-  catch (gazebo::GazeboError e)
+  catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect\n" << e << "\n";
     return -1;
@@ -29,7 +30,7 @@ int main()
   {
     simIface->Open(client, "default");
   }
-  catch (gazebo::GazeboError e)
+  catch (std::string e)
   {
     std::cout << "Gazebo error: Unable to connect to the sim interface\n" << e << "\n";
     return -1;
@@ -38,7 +39,7 @@ int main()
   /// Open the OpenAL interface
   try
   {
-    audioIface->Open(client, "audio_iface_1");
+    audioIface->Open(client, "sphere1_model::audio_iface_1");
   }
   catch (std::string e)
   {
