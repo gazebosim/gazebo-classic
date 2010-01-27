@@ -304,6 +304,20 @@ class World : public SingletonT<World>
             showPhysicsSignal.connect(subscriber);
           }
 
+  /// \brief Connect a boost::slot the the show joints signal
+  public: template<typename T>
+          void ConnectShowJointsSignal( T subscriber )
+          {
+            showJointsSignal.connect(subscriber);
+          }
+
+  /// \brief Connect a boost::slot the the show bounding boxes signal
+  public: template<typename T>
+          void ConnectShowBoundingBoxesSignal( T subscriber )
+          {
+            showBoundingBoxesSignal.connect(subscriber);
+          }
+
 
   /// \brief Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
@@ -358,6 +372,8 @@ class World : public SingletonT<World>
   private: boost::signal<void (bool)> showContactsSignal;
   private: boost::signal<void (bool)> wireframeSignal;
   private: boost::signal<void (bool)> showPhysicsSignal;
+  private: boost::signal<void (bool)> showJointsSignal;
+  private: boost::signal<void (bool)> showBoundingBoxesSignal;
 
   private: std::deque<WorldState> worldStates;
   private: std::deque<WorldState>::iterator worldStatesInsertIter;

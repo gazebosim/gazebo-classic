@@ -64,6 +64,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
     isStatic = this->owner->IsStatic();
   }
 
+  this->visible = true;
   this->ConstructorHelper(pnode, isStatic);
 }
 
@@ -655,8 +656,15 @@ void OgreVisual::SetVisible(bool visible, bool cascade)
     return;
 
   this->sceneNode->setVisible( visible, cascade );
+  this->visible = visible;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether the visual is visible
+bool OgreVisual::GetVisible() const
+{
+  return this->visible;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual

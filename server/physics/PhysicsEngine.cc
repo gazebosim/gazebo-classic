@@ -102,8 +102,6 @@ void PhysicsEngine::UpdatePhysics()
 {
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
 Vector3 PhysicsEngine::GetGravity() const

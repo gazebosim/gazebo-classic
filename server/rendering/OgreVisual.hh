@@ -106,6 +106,9 @@ namespace gazebo
     /// \param cascade setting this parameter in children too
     public: void SetVisible(bool visible, bool cascade=true);
 
+    /// \brief Get whether the visual is visible
+    public: bool GetVisible() const;
+
     /// \brief Set the position of the visual
     public: void SetPosition( const Vector3 &pos);
 
@@ -191,6 +194,7 @@ namespace gazebo
 
     private: bool isStatic;
     private: Ogre::StaticGeometry *staticGeom;
+    private: bool visible;
   };
 }
 

@@ -254,19 +254,14 @@ void ODEPhysics::UpdatePhysics()
 
   // Update the dynamical model
   if (**this->quickStepP)
-  {
     dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
-  }
   else
-  {
     dWorldStep( this->worldId, (**this->stepTimeP).Double() );
-  }
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
 
   this->UnlockMutex(); 
-
 }
 
 

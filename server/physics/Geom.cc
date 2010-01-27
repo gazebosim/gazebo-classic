@@ -78,6 +78,8 @@ Geom::Geom( Body *body )
   Param::End();
 
   World::Instance()->ConnectShowPhysicsSignal( boost::bind(&Geom::ShowPhysics, this, _1) );
+  World::Instance()->ConnectShowJointsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
+  World::Instance()->ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

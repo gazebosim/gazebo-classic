@@ -327,7 +327,6 @@ void World::Update()
     }
   }
 
-
   {
     //DiagnosticTimer timer("World::Update Models");
 
@@ -685,14 +684,7 @@ bool World::GetShowBoundingBoxes()
 void World::SetShowBoundingBoxes(bool show)
 {
   this->showBoundingBoxes = show;
-
-  std::vector< Geom *>::iterator iter;
-
-  for (iter = this->geometries.begin(); iter != this->geometries.end(); iter++)
-  {
-    (*iter)->ShowBoundingBox(this->showBoundingBoxes);
-  }
-
+  this->showBoundingBoxesSignal(this->showBoundingBoxes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -707,13 +699,7 @@ bool World::GetShowJoints()
 void World::SetShowJoints(bool show)
 {
   this->showJoints = show;
-
-  std::vector< Geom *>::iterator iter;
-
-  for (iter = this->geometries.begin(); iter != this->geometries.end(); iter++)
-  {
-    (*iter)->ShowJoints(this->showJoints);
-  }
+  this->showJointsSignal(show);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -791,13 +777,6 @@ void World::SetShowPhysics(bool show)
 {
   this->showPhysics = show;
   this->showPhysicsSignal(this->showPhysics);
-
-  /*std::vector< Geom*>::iterator iter;
-
-  for (iter = this->geometries.begin(); iter != this->geometries.end(); iter++)
-  {
-    (*iter)->ShowPhysics(this->showPhysics);
-  }*/
 }
 
 
