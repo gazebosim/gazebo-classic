@@ -215,6 +215,9 @@ namespace gazebo
     /// \brief Set the camera to track an entity
     public: void TrackModel( Model *model );
 
+    /// \brief Set whether to view the world in wireframe
+    public: void ShowWireframe(bool s);
+
     // Save the camera frame
     protected: virtual void SaveFrame();
 

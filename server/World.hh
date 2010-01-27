@@ -200,6 +200,12 @@ class World : public SingletonT<World>
   /// \brief Get whether to show the light source visuals
   public: bool GetShowLights() const;
 
+  /// \brief Set whether to show the camera visuals
+  public: void SetShowCameras(bool show);
+
+  /// \brief Get whether to show the camera visuals
+  public: bool GetShowCameras() const;
+
   /// \brief Set to view as wireframe
   public: void SetWireframe( bool wire );
 
@@ -233,6 +239,8 @@ class World : public SingletonT<World>
   private: bool showContacts;
 
   private: bool showLights;
+
+  private: bool showCameras;
 
   private: bool showPhysics;
 
@@ -268,7 +276,36 @@ class World : public SingletonT<World>
             showLightsSignal.connect(subscriber);
           }
 
-  /// \brif Get the names of interfaces defined in the tree of a model
+  /// \brief Connect a boost::slot the the show camera source signal
+  public: template<typename T>
+          void ConnectShowCamerasSignal( T subscriber )
+          {
+            showCamerasSignal.connect(subscriber);
+          }
+
+  /// \brief Connect a boost::slot the the show contacts signal
+  public: template<typename T>
+          void ConnectShowContactsSignal( T subscriber )
+          {
+            showContactsSignal.connect(subscriber);
+          }
+
+  /// \brief Connect a boost::slot the the show wireframe signal
+  public: template<typename T>
+          void ConnectShowWireframeSignal( T subscriber )
+          {
+            wireframeSignal.connect(subscriber);
+          }
+
+  /// \brief Connect a boost::slot the the show physics signal
+  public: template<typename T>
+          void ConnectShowPhysicsSignal( T subscriber )
+          {
+            showPhysicsSignal.connect(subscriber);
+          }
+
+
+  /// \brief Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
 
   /// Pointer the physics engine
@@ -317,6 +354,10 @@ class World : public SingletonT<World>
 
   private: boost::signal<void (Entity*)> addEntitySignal;
   private: boost::signal<void (bool)> showLightsSignal;
+  private: boost::signal<void (bool)> showCamerasSignal;
+  private: boost::signal<void (bool)> showContactsSignal;
+  private: boost::signal<void (bool)> wireframeSignal;
+  private: boost::signal<void (bool)> showPhysicsSignal;
 
   private: std::deque<WorldState> worldStates;
   private: std::deque<WorldState>::iterator worldStatesInsertIter;

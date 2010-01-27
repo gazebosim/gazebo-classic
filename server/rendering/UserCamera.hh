@@ -81,6 +81,9 @@ namespace gazebo
     /// \brief Get the ogre window
     public: Ogre::RenderWindow *GetWindow();
 
+    /// \brief Set whether to show the visual
+    private: void ShowVisual(bool s);
+
     /// Pointer to the viewport
     protected: Ogre::Viewport *viewport;
 

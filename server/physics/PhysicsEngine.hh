@@ -150,6 +150,9 @@ namespace gazebo
     /// \brief Convert a Gazebo mass to an engine specific mass
     public: virtual void ConvertMass(void *engineMass, const Mass &mass) = 0;
 
+    /// \brief Set whether to show contacts
+    public: void ShowVisual(bool show);
+
     /// \brief Add a contact visual
     protected: void AddContactVisual(Vector3 pos, Vector3 norm);
 

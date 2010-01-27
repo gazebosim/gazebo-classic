@@ -59,6 +59,8 @@ namespace gazebo
 
     public: static void ShowLightsCB(Fl_Widget * /*w*/, void * /*data*/);
 
+    public: static void ShowCamerasCB(Fl_Widget * /*w*/, void * /*data*/);
+
   };
 }
 

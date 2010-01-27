@@ -64,6 +64,7 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
     { "Show Joints", 0, &gazebo::MainMenu::ShowJointsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { "Show Contacts", 0, &gazebo::MainMenu::ShowContactsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { "Show Lights", 0, &gazebo::MainMenu::ShowLightsCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
+    { "Show Cameras", 0, &gazebo::MainMenu::ShowCamerasCB,0, FL_MENU_TOGGLE, FL_NORMAL_LABEL, 0, 14, 0},
     { 0 },
 
     { 0 }
@@ -166,4 +167,11 @@ void MainMenu::ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/)
 void MainMenu::ShowLightsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   World::Instance()->SetShowLights( !World::Instance()->GetShowLights() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// View the light source visuals
+void MainMenu::ShowCamerasCB(Fl_Widget * /*w*/, void * /*data*/)
+{
+  World::Instance()->SetShowCameras( !World::Instance()->GetShowCameras() );
 }

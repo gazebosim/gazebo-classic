@@ -86,6 +86,8 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   this->renderPeriod = Time(1.0/(**this->updateRateP));
   this->renderingEnabled = true;
+
+  World::Instance()->ConnectShowWireframeSignal( boost::bind(&OgreCamera::ShowWireframe, this, _1) );
 }
 
 
@@ -220,18 +222,6 @@ void OgreCamera::UpdateCam()
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
-
-  if (this->camera)
-  {
-    if (World::Instance()->GetWireframe())
-    {
-      this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
-    }
-    else
-    {
-      this->camera->setPolygonMode(Ogre::PM_SOLID);
-    }
-  }
 
   if (this->sceneNode)
   {
@@ -712,5 +702,22 @@ void OgreCamera::TrackModel( Model *model )
   else
   {
     this->origParentNode->addChild(this->sceneNode);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set whether to view the world in wireframe
+void OgreCamera::ShowWireframe(bool s)
+{
+  if (this->camera)
+  {
+    if (s)
+    {
+      this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
+    }
+    else
+    {
+      this->camera->setPolygonMode(Ogre::PM_SOLID);
+    }
   }
 }

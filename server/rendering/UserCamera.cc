@@ -35,6 +35,7 @@
 #include "OgreCreator.hh"
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
+#include "World.hh"
 #include "UserCamera.hh"   
 
 using namespace gazebo;
@@ -55,6 +56,8 @@ UserCamera::UserCamera(GLWindow *parentWindow)
   this->name = stream.str(); 
 
   this->viewport = NULL;
+
+  World::Instance()->ConnectShowCamerasSignal( boost::bind(&UserCamera::ShowVisual, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +144,7 @@ void UserCamera::Init()
   line->setVisibilityFlags(GZ_LASER_CAMERA);
 
   this->visual->AttachObject(line);
+  this->visual->SetVisible(false);
 
   this->SetCamera(this);
   this->lastUpdate = Simulator::Instance()->GetRealTime();
@@ -249,4 +253,11 @@ unsigned int UserCamera::GetTriangleCount()
 Ogre::RenderWindow *UserCamera::GetWindow()
 {
   return this->window;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set whether to show the visual
+void UserCamera::ShowVisual(bool s)
+{
+  this->visual->SetVisible(s);
 }

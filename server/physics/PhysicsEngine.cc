@@ -72,6 +72,8 @@ PhysicsEngine::PhysicsEngine()
     this->visual->AttachObject(*this->contactLinesIter);
   }
 
+  World::Instance()->ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
+
   this->contactLinesIter = this->contactLines.begin();
   delete mat;
 }
@@ -98,17 +100,10 @@ PhysicsEngine::~PhysicsEngine()
 /// Update the physics engine
 void PhysicsEngine::UpdatePhysics()
 {
-  if (World::Instance()->GetShowContacts())
-  {
-    this->visual->SetVisible(true);
-    this->contactLinesIter = this->contactLines.begin();
-  }
-  else
-  {
-    this->visual->SetVisible(false);
-  }
 }
- 
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
 Vector3 PhysicsEngine::GetGravity() const
@@ -168,5 +163,14 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
   this->contactLinesIter++;
 
   if (this->contactLinesIter == this->contactLines.end())
+    this->contactLinesIter = this->contactLines.begin();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set whether to show contacts
+void PhysicsEngine::ShowVisual(bool show)
+{
+  this->visual->SetVisible(show);
+  if (show)
     this->contactLinesIter = this->contactLines.begin();
 }

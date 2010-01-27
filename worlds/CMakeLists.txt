@@ -1,7 +1,6 @@
 ADD_SUBDIRECTORY(models)
 
-SET (files audio.world 
-           bandit.world
+SET (files bandit.world
            bsp.world
            bumper.world
            epuck_single.world

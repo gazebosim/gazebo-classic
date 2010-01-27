@@ -61,6 +61,7 @@ World::World()
   this->showJoints = false;
   this->showContacts = false;
   this->showLights = false;
+  this->showCameras = false;
   this->wireframe = false;
   this->showPhysics = false;
   this->physicsEngine = NULL;
@@ -720,6 +721,7 @@ void World::SetShowJoints(bool show)
 void World::SetShowContacts(bool show)
 {
   this->showContacts = show;
+  this->showContactsSignal(this->showContacts);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -745,10 +747,26 @@ bool World::GetShowLights() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set whether to show the camera visuals
+void World::SetShowCameras(bool show)
+{
+  this->showCameras = show;
+  this->showCamerasSignal(this->showCameras);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether to show the camera visuals
+bool World::GetShowCameras() const
+{
+  return this->showCameras;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set to view as wireframe
 void World::SetWireframe( bool wire )
 {
   this->wireframe = wire;
+  this->wireframeSignal(this->wireframe);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -772,16 +790,15 @@ bool World::GetShowPhysics()
 void World::SetShowPhysics(bool show)
 {
   this->showPhysics = show;
+  this->showPhysicsSignal(this->showPhysics);
 
-  std::vector< Geom*>::iterator iter;
+  /*std::vector< Geom*>::iterator iter;
 
   for (iter = this->geometries.begin(); iter != this->geometries.end(); iter++)
   {
     (*iter)->ShowPhysics(this->showPhysics);
-  }
-
+  }*/
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
