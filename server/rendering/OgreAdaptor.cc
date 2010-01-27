@@ -50,6 +50,7 @@
 #include "Simulator.hh"
 #include "OgreFrameListener.hh"
 #include "OgreCreator.hh"
+#include "RTShaderSystem.hh"
 #include "OgreAdaptor.hh"
 
 using namespace gazebo;
@@ -281,6 +282,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->raySceneQuery = this->sceneMgr->createRayQuery( Ogre::Ray() );
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
+
+  RTShaderSystem::Instance()->Init();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -368,6 +371,7 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/");
     archNames.push_back((*iter)+"/Media");
     archNames.push_back((*iter)+"/Media/fonts");
+    archNames.push_back((*iter)+"/Media/rtshaderlib");
     archNames.push_back((*iter)+"/Media/materials/programs");
     archNames.push_back((*iter)+"/Media/materials/scripts");
     archNames.push_back((*iter)+"/Media/materials/textures");
@@ -568,5 +572,3 @@ void OgreAdaptor::PrintSceneGraphHelper(std::string prefix,
     this->PrintSceneGraphHelper( prefix, node->getChild(i) );
   }
 }
-
-

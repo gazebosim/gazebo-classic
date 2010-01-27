@@ -1,13 +1,13 @@
-ADD_SUBDIRECTORY(bandit)
-ADD_SUBDIRECTORY(blender)
-ADD_SUBDIRECTORY(epuck)
-ADD_SUBDIRECTORY(PioneerArm)
-ADD_SUBDIRECTORY(pioneer2dx)
-ADD_SUBDIRECTORY(pioneer2at)
-ADD_SUBDIRECTORY(sonyvid30)
-ADD_SUBDIRECTORY(rovio)
+add_subdirectory(bandit)
+add_subdirectory(blender)
+add_subdirectory(epuck)
+add_subdirectory(PioneerArm)
+add_subdirectory(pioneer2dx)
+add_subdirectory(pioneer2at)
+add_subdirectory(sonyvid30)
+add_subdirectory(rovio)
 
-SET (files column.mesh
+set (files column.mesh
            geosphere4500.mesh
            geosphere8000.mesh
            kitchen.mesh
@@ -25,4 +25,4 @@ SET (files column.mesh
            hanoi_blue_disk.dae
 )
 
-INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models)

@@ -28,6 +28,7 @@
 #include <sstream>
 
 #include "Simulator.hh"
+#include "RTShaderSystem.hh"
 #include "Global.hh"
 #include "GLWindow.hh"
 #include "OgreCamera.hh"
@@ -157,6 +158,8 @@ void UserCamera::Init()
   this->viewport->setClearEveryFrame(true);
   this->viewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
   this->viewport->setVisibilityMask(this->visibilityMask);
+
+  RTShaderSystem::AttachViewport(this->viewport);
 }
 
 void UserCamera::SetCamera( OgreCamera *cam )

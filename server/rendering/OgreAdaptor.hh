@@ -144,9 +144,6 @@ namespace gazebo
     //private: unsigned int terrainVertSize;
     //private: std::string terrainImage;
   
-    private: friend class DestroyerT<OgreAdaptor>;
-    private: friend class SingletonT<OgreAdaptor>;
-
     /// ID for a dummy window. Used for gui-less operation
     protected: Window dummyWindowId;
 
@@ -168,6 +165,9 @@ namespace gazebo
     private: std::vector<Param*> parameters;
 
     private: std::vector<OgreCamera*> cameras;
+
+    private: friend class DestroyerT<OgreAdaptor>;
+    private: friend class SingletonT<OgreAdaptor>;
   };
   
  

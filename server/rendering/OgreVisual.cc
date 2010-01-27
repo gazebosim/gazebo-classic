@@ -26,6 +26,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "RTShaderSystem.hh"
 #include "MeshManager.hh"
 #include "Simulator.hh"
 #include "Entity.hh"
@@ -219,6 +220,7 @@ void OgreVisual::Load(XMLConfigNode *node)
 
     obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
             stream.str(), meshName);
+    RTShaderSystem::Instance()->GenerateShaders((Ogre::Entity*)(obj));
   }
   catch (Ogre::Exception e)
   {

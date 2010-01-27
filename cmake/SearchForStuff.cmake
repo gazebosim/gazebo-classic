@@ -57,6 +57,18 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${OGRE_LDFLAGS})
+
+  # Try to find the OGRE RTShaderSystem library
+  find_library(ogre_rtshader_lib OgreRTShaderSystem ENV LD_LIBRARY_PATH)
+  if (ogre_rtshader_lib)
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ogre_rtshader_lib})
+    add_definitions(-DUSE_RTSHADER_SYSTEM)
+    add_definitions(-DRTSHADER_SYSTEM_BUILD_CORE_SHADERS)
+    add_definitions(-DRTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+  endif (ogre_rtshader_lib)
+
   endif (NOT OGRE_FOUND)
 
   pkg_check_modules(XML libxml-2.0)

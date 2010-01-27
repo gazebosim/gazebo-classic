@@ -200,7 +200,7 @@
 
   <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>-3 0 5</xyz>
+    <xyz>-3 0 10</xyz>
     <static>true</static>
 
     <light>
@@ -210,7 +210,7 @@
       <range>20</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.3 0.01 0</attenuation>
+      <attenuation>0.8 0.02 0</attenuation>
     </light>
   </model:renderable>
 
