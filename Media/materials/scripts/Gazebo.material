@@ -196,6 +196,63 @@ material Gazebo/Green
 	}
 }
 
+material Gazebo/Yellow
+{
+	receive_shadows on
+
+	technique
+	{
+		pass
+		{
+
+			ambient 1.000000 1.000000 0.000000 1.000000
+			diffuse 1.000000 1.000000 0.000000 1.000000
+			specular 0.200000 0.200000 0.000000 1.000000 
+			emissive 0.000000 0.000000 0.000000 1.000000
+      lighting on
+      shading phong
+		}
+	}
+}
+
+material Gazebo/Purple
+{
+	receive_shadows on
+
+	technique
+	{
+		pass
+		{
+
+			ambient 1.000000 0.000000 1.000000 1.000000
+			diffuse 1.000000 0.000000 1.000000 1.000000
+			specular 0.200000 0.000000 0.200000 1.000000 
+			emissive 0.000000 0.000000 0.000000 1.000000
+      lighting on
+      shading phong
+		}
+	}
+}
+
+material Gazebo/Turquoise
+{
+	receive_shadows on
+
+	technique
+	{
+		pass
+		{
+
+			ambient 0.000000 1.000000 1.000000 1.000000
+			diffuse 0.000000 1.000000 1.000000 1.000000
+			specular 0.000000 0.200000 0.200000 1.000000 
+			emissive 0.000000 0.000000 0.000000 1.000000
+      lighting on
+      shading phong
+		}
+	}
+}
+
 material Gazebo/WhiteEmissive
 {
 	receive_shadows off
