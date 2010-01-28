@@ -85,7 +85,6 @@ const Mesh *MeshManager::Load(const std::string &filename)
         iter!=gazeboPaths.end(); ++iter)
     {
       fullname = (*iter)+"/Media/models/"+filename;
-      //std::cout << "FullName[" << fullname << "]\n";
       if (stat(fullname.c_str(), &st) == 0)
       {
         found = true;
@@ -129,6 +128,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
   else
     gzerr(0) << "Unable to find file[" << filename << "]\n";
 
+  mesh->RecalculateNormals();
   return mesh;
 }
 

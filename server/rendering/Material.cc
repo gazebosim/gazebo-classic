@@ -16,6 +16,8 @@ Material::Material()
   this->shadeMode= GOURAUD;
   this->transparency = 0;
   this->shininess = 0;
+  this->ambient.Set(1,1,1,1);
+  this->diffuse.Set(1,1,1,1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
