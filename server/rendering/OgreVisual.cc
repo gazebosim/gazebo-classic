@@ -450,6 +450,7 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 
   try
   {
+    this->origMaterialName = materialName;
     // Get the original material
     this->origMaterial= Ogre::MaterialManager::getSingleton().getByName (materialName);;
   }
@@ -469,12 +470,12 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 
 
   // Create a custom material name
-  std::string myMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
+  this->myMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
 
   // Clone the material. This will allow us to change the look of each geom
   // individually.
-  if (Ogre::MaterialManager::getSingleton().resourceExists(myMaterialName))
-    this->myMaterial = (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(myMaterialName));
+  if (Ogre::MaterialManager::getSingleton().resourceExists(this->myMaterialName))
+    this->myMaterial = (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(this->myMaterialName));
   else
     this->myMaterial = this->origMaterial->clone(myMaterialName);
 
@@ -499,9 +500,9 @@ void OgreVisual::SetMaterial(const std::string &materialName)
       Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
       if (dynamic_cast<Ogre::Entity*>(obj))
-        ((Ogre::Entity*)obj)->setMaterialName(myMaterialName);
+        ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
       else
-        ((Ogre::SimpleRenderable*)obj)->setMaterial(myMaterialName);
+        ((Ogre::SimpleRenderable*)obj)->setMaterial(this->myMaterialName);
     }
 
   }
@@ -541,7 +542,6 @@ void OgreVisual::SetTransparency( float trans )
 
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
 
-
   while ( techniqueIt.hasMoreElements() )
   {
     t = techniqueIt.getNext ();
@@ -551,13 +551,12 @@ void OgreVisual::SetTransparency( float trans )
 
     while (passIt.hasMoreElements ())
     {
-      sc = this->origMaterial->getTechnique(i)->getPass(j)->getDiffuse();
+      sc = this->myMaterial->getTechnique(i)->getPass(j)->getDiffuse();
 
       if (this->transparency >0.0)
         passIt.peekNext ()->setDepthWriteEnabled (false);
       else
         passIt.peekNext ()->setDepthWriteEnabled (true);
-
 
       switch (this->sceneBlendType)
       {
@@ -572,8 +571,9 @@ void OgreVisual::SetTransparency( float trans )
         case Ogre::SBT_TRANSPARENT_ALPHA:
         default:
           dc = sc;
-          dc.a = sc.a * (1.0f - this->transparency);
-          passIt.peekNext()->setAmbient(this->origMaterial->getTechnique(i)->getPass(j)->getAmbient());
+          //dc.a = sc.a * (1.0f - this->transparency);
+          dc.a =  (1.0f - this->transparency);
+          passIt.peekNext()->setAmbient(this->myMaterial->getTechnique(i)->getPass(j)->getAmbient());
           break;
       }
       passIt.peekNext ()->setDiffuse (dc);

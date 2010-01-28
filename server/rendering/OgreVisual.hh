@@ -165,6 +165,8 @@ namespace gazebo
 
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
+    private: std::string myMaterialName;
+    private: std::string origMaterialName;
     private: Ogre::SceneBlendType sceneBlendType;
 
     private: Ogre::SceneNode *parentNode;
