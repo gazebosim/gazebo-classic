@@ -80,6 +80,7 @@ OgreAdaptor::OgreAdaptor()
   this->drawGridP = new ParamT<bool>("grid", true, 0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
   this->shadowIndexSizeP = new ParamT<int>("shadowIndexSize",32768, 0);
+  this->shadowColorP = new ParamT<Vector3>("shadowColor",Vector3(0.4,0.4,0.4), 0);
 
   Param::End();
 }
@@ -99,6 +100,7 @@ OgreAdaptor::~OgreAdaptor()
   delete this->shadowTextureSizeP;
   delete this->shadowIndexSizeP;
   delete this->shadowTechniqueP;
+  delete this->shadowColorP;
   delete this->drawGridP;
   delete this->skyMaterialP;
 
@@ -209,6 +211,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->shadowTextureSizeP->Load(node);
   this->shadowIndexSizeP->Load(node);
   this->shadowTechniqueP->Load(node);
+  this->shadowColorP->Load(node);
   this->drawGridP->Load(node);
 
   ambient.r = (**(this->ambientP)).x;
@@ -238,7 +241,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
     this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
     this->sceneMgr->setShadowTextureSettings(512,2);
-    this->sceneMgr->setShadowColour(Ogre::ColourValue(0.2, 0.2, 0.2));
+    this->sceneMgr->setShadowColour(Ogre::ColourValue(
+          (**this->shadowColorP).x,
+          (**this->shadowColorP).y,
+          (**this->shadowColorP).z));
     this->sceneMgr->setShadowFarDistance(30);
   }
 
