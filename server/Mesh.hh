@@ -64,6 +64,9 @@ namespace gazebo
     /// \brief Put all the data into flat arrays
     public: void FillArrays(float **vertArr, unsigned int **indArr) const;
 
+    /// \brief Recalculate all the normals.
+    public: void RecalculateNormals();
+
     private: std::string name;
     private: std::vector<SubMesh *> submeshes;
     private: std::vector<Material *> materials;
@@ -151,6 +154,9 @@ namespace gazebo
 
     /// \brief Put all the data into flat arrays
     public: void FillArrays(float **vertArr, unsigned int **indArr) const;
+
+    /// \brief Recalculate all the normals.
+    public: void RecalculateNormals();
 
     private: std::vector< Vector3 > vertices;
     private: std::vector< Vector3 > normals;

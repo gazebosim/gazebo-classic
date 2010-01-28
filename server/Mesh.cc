@@ -261,6 +261,16 @@ void Mesh::FillArrays(float **vertArr, unsigned int **indArr) const
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Recalculate all the normals.
+void Mesh::RecalculateNormals()
+{
+  std::vector<SubMesh*>::iterator iter;
+  for (iter = this->submeshes.begin(); iter != this->submeshes.begin(); iter++)
+    (*iter)->RecalculateNormals();
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -549,4 +559,31 @@ void SubMesh::FillArrays(float **vertArr, unsigned int **indArr) const
   for (iiter = this->indices.begin(), i=0; 
        iiter != this->indices.end(); iiter++)
     (*indArr)[i++] = (*iiter);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Recalculate all the normals.
+void SubMesh::RecalculateNormals()
+{
+  unsigned int i;
+
+  // Reset all the normals
+  for (i=0; i < this->normals.size(); i++)
+    this->normals[i].Set(0,0,0);
+
+  // For each face, which is defined by three indices, calculate the normals
+  for (i=0; i < this->indices.size(); i+=3)
+  {
+    Vector3 v1 = this->vertices[this->indices[i]];
+    Vector3 v2 = this->vertices[this->indices[i+1]];
+    Vector3 v3 = this->vertices[this->indices[i+2]];
+    Vector3 n = Vector3::GetNormal(v1, v2, v3);
+    this->normals[this->indices[i]] += n;
+    this->normals[this->indices[i+1]] += n;
+    this->normals[this->indices[i+2]] += n;
+  }
+
+  // Normalize the results
+  for (i=0; i < this->normals.size(); i++)
+    this->normals[i].Normalize();
 }

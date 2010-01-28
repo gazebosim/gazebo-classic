@@ -24,6 +24,8 @@
  * SVN: $Id:$
  */
 
+#include <boost/bind.hpp>
+#include "World.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "OgreAdaptor.hh"
@@ -35,6 +37,10 @@ using namespace gazebo;
 /// Constructor
 RTShaderSystem::RTShaderSystem()
 {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+  World::Instance()->ConnectPerPixelLightingSignal( boost::bind(&RTShaderSystem::SetPerPixelLighting, this, _1) );
+  this->curLightingModel = RTShaderSystem::SSLM_PerPixelLighting;
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,10 +152,60 @@ void RTShaderSystem::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Set an Ogre::Entity to use RT shaders
+void RTShaderSystem::AttachEntity(Ogre::Entity *entity)
+{
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+  this->GenerateShaders(entity);
+  this->entities.push_back(entity);
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Remove and entity
+void RTShaderSystem::DetachEntity(Ogre::Entity *entity)
+{
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+  this->entities.remove(entity);
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the lighting model
+void RTShaderSystem::SetLightingModel(LightingModel model)
+{
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+  if (model == this->curLightingModel)
+    return;
+
+  this->curLightingModel = model;
+
+  std::list<Ogre::Entity*>::iterator iter;
+
+  // Update all the shaders
+  for (iter = this->entities.begin(); iter != this->entities.end(); iter++)
+  {
+    this->GenerateShaders(*iter);
+  }
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the lighting model to per pixel or per vertex
+void RTShaderSystem::SetPerPixelLighting( bool s)
+{
+  if (s)
+    this->SetLightingModel( SSLM_PerPixelLighting );
+  else
+    this->SetLightingModel( SSLM_PerVertexLighting );
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Generate shaders for an entity
 void RTShaderSystem::GenerateShaders(Ogre::Entity *entity)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+
   for (unsigned int i=0; i < entity->getNumSubEntities(); ++i)
   {
     Ogre::SubEntity* curSubEntity = entity->getSubEntity(i);
@@ -188,25 +244,33 @@ void RTShaderSystem::GenerateShaders(Ogre::Entity *entity)
       // Remove all sub render states.
       renderState->reset();
 
-/*#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-      if (mCurLightingModel == SSLM_PerVertexLighting)
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+      if (this->curLightingModel == SSLM_PerVertexLighting)
       {
-        RTShader::SubRenderState* perPerVertexLightModel = mShaderGenerator->createSubRenderState(RTShader::FFPLighting::Type);
+        Ogre::RTShader::SubRenderState* perPerVertexLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::FFPLighting::Type);
 
         renderState->addSubRenderState(perPerVertexLightModel);
       }
 #endif
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-      else if (mCurLightingModel == SSLM_PerPixelLighting)
+      else if (this->curLightingModel == SSLM_PerPixelLighting)
       {
-      */
-      Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+        Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
 
         renderState->addSubRenderState(perPixelLightModel);
-      //}
+      }
     }
+
+    // Invalidate this material in order to re-generate its shaders.
+    this->shaderGenerator->invalidateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName);
+
+
   }
 #endif
+
+
+#endif
 }
- 
+
+

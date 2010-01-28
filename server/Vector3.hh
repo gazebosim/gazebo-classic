@@ -72,6 +72,10 @@ class Vector3
   /// \brief Return a vector that is perpendicular to this one.
   public: Vector3 GetPerpendicular() const;
 
+  /// \brief Get a normal vector to a triangle
+  public: static Vector3 GetNormal(const Vector3 &v1, const Vector3 &v2, 
+                                   const Vector3 &v3);
+
   /// \brief Equal operator
   public: const Vector3 &operator=( const Vector3 &pt );
 

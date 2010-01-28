@@ -218,6 +218,12 @@ class World : public SingletonT<World>
   /// \brief Get whether to view as wireframe
   public: bool GetShowPhysics();
 
+  /// \brief Set to use perpixel lighting or pervertex lighting
+  public: void SetPerPixelLighting( bool pp );
+
+  /// \brief Get use perpixel lighting or pervertex lighting
+  public: bool GetPerPixelLighting();
+
   /// \brief Goto a position in time
   public: void GotoTime(double pos);
 
@@ -245,6 +251,8 @@ class World : public SingletonT<World>
   private: bool showPhysics;
 
   private: bool wireframe;
+
+  private: bool perPixelLighting;
 
 
   /// \brief Load a model
@@ -318,6 +326,12 @@ class World : public SingletonT<World>
             showBoundingBoxesSignal.connect(subscriber);
           }
 
+  /// \brief Connect a boost::slot the use per pixel lighting signal
+  public: template<typename T>
+          void ConnectPerPixelLightingSignal( T subscriber )
+          {
+            perPixelLightingSignal.connect(subscriber);
+          }
 
   /// \brief Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
@@ -374,6 +388,7 @@ class World : public SingletonT<World>
   private: boost::signal<void (bool)> showPhysicsSignal;
   private: boost::signal<void (bool)> showJointsSignal;
   private: boost::signal<void (bool)> showBoundingBoxesSignal;
+  private: boost::signal<void (bool)> perPixelLightingSignal;
 
   private: std::deque<WorldState> worldStates;
   private: std::deque<WorldState>::iterator worldStatesInsertIter;

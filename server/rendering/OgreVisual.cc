@@ -160,10 +160,15 @@ OgreVisual::~OgreVisual()
   this->sceneNode->removeAndDestroyAllChildren();
   */
 
+  for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
+    RTShaderSystem::Instance()->DetachEntity(
+        (Ogre::Entity*)(this->sceneNode->getAttachedObject(i)) );
+
   if (this->sceneNode)
     OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);
   if (this->boundingBoxNode)
     OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->boundingBoxNode);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -220,7 +225,6 @@ void OgreVisual::Load(XMLConfigNode *node)
 
     obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
             stream.str(), meshName);
-    RTShaderSystem::Instance()->GenerateShaders((Ogre::Entity*)(obj));
   }
   catch (Ogre::Exception e)
   {
@@ -302,6 +306,9 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
     return;
 
   this->sceneNode->attachObject(obj);
+  Ogre::Entity *ent = dynamic_cast<Ogre::Entity*>(obj);
+  if (ent)
+    RTShaderSystem::Instance()->AttachEntity(ent);
 
   obj->setUserAny( Ogre::Any(this) );
 }

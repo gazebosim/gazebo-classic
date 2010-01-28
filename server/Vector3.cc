@@ -130,6 +130,17 @@ Vector3 Vector3::GetPerpendicular() const
   return perp;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get a normal vector to a triangle
+Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2, 
+                           const Vector3 &v3)
+{
+  Vector3 a = v2 - v1;
+  Vector3 b = v3 - v1;
+  Vector3 n = a.GetCrossProd(b);
+  n.Normalize();
+  return n;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equals operator

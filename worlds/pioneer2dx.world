@@ -38,7 +38,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0.8 0.8 0.8 1.0</ambient>
+    <ambient>0.1 0.1 0.1 1.0</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -67,7 +67,7 @@
         <size>2000 2000</size>
         <segments>10 10</segments>
         <uvTile>2000 2000</uvTile>
-        <material>Gazebo/GrayGrid</material>
+        <material>Gazebo/Grey</material>
       </geom:plane>
     </body:plane>
   </model:physical>
@@ -86,7 +86,7 @@
         <visual>
           <scale>0.2 0.2 0.2</scale>
           <mesh>unit_sphere</mesh>
-          <material>Gazebo/Rocky</material>
+          <material>Gazebo/Grey</material>
         </visual>
       </geom:sphere>
     </body:sphere>
@@ -200,17 +200,17 @@
 
   <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>-3 0 10</xyz>
+    <xyz>0 0 5</xyz>
     <static>true</static>
 
     <light>
       <type>point</type>
       <diffuseColor>0.8 0.8 0.8</diffuseColor>
       <specularColor>0.1 0.1 0.1</specularColor>
-      <range>20</range>
+      <range>10</range>
 
       <!-- Constant(0-1) Linear(0-1) Quadratic -->
-      <attenuation>0.8 0.02 0</attenuation>
+      <attenuation>0.5 0.01 0</attenuation>
     </light>
   </model:renderable>
 

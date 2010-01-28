@@ -64,6 +64,7 @@ World::World()
   this->showCameras = false;
   this->wireframe = false;
   this->showPhysics = false;
+  this->perPixelLighting = true;
   this->physicsEngine = NULL;
   this->server = NULL;
   this->graphics = NULL;
@@ -770,7 +771,6 @@ bool World::GetShowPhysics()
   return this->showPhysics;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether to show the joints
 void World::SetShowPhysics(bool show)
@@ -779,6 +779,20 @@ void World::SetShowPhysics(bool show)
   this->showPhysicsSignal(this->showPhysics);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set to use perpixel lighting or pervertex lighting
+void World::SetPerPixelLighting( bool pp )
+{
+  this->perPixelLighting = pp;
+  this->perPixelLightingSignal(pp);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get to use perpixel lighting or pervertex lighting
+bool World::GetPerPixelLighting()
+{
+  return this->perPixelLighting;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the simulation interface

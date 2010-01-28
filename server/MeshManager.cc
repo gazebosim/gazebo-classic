@@ -225,6 +225,8 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
       }
     }
   }
+
+  mesh->RecalculateNormals();
 }
 
 
@@ -323,6 +325,8 @@ void MeshManager::CreateBox(const std::string &name, const Vector3 &sides,
   // Set the indices
   for (i=0;i<36; i++)
     subMesh->AddIndex(ind[i]);
+
+  subMesh->RecalculateNormals();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -419,6 +423,8 @@ void MeshManager::CreateCamera(const std::string &name, float scale)
   // Set the indices
   for (i=0;i<36; i++)
     subMesh->AddIndex(ind[i]);
+
+  mesh->RecalculateNormals();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -522,6 +528,8 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
     for (j=0; j<3; j++)
       subMesh->SetNormal(subMesh->GetIndex(i+j), norm );
   }
+
+  mesh->RecalculateNormals();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -632,6 +640,8 @@ void MeshManager::CreateCone(const std::string &name, float radius,
     for (j=0; j<3; j++)
       subMesh->SetNormal(subMesh->GetIndex(i+j), norm );
   }
+
+  mesh->RecalculateNormals();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -755,5 +765,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
       verticeIndex++;
     }
   }
+
+  mesh->RecalculateNormals();
 }
 

@@ -59,7 +59,7 @@ if (PKG_CONFIG_FOUND)
                           ${OGRE_LDFLAGS})
 
   # Try to find the OGRE RTShaderSystem library
-  find_library(ogre_rtshader_lib OgreRTShaderSystem ENV LD_LIBRARY_PATH)
+  find_library(ogre_rtshader_lib OgreRTShaderSystem ${OGRE_LIBRARY_DIRS} ENV LD_LIBRARY_PATH)
   if (ogre_rtshader_lib)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 

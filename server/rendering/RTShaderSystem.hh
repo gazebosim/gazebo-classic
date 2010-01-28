@@ -28,6 +28,7 @@
 #define RTSHADERSYSTEM_HH
 
 #include <Ogre.h>
+#include <list>
 #include "config.h"
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
@@ -42,6 +43,14 @@ namespace gazebo
 
   class RTShaderSystem : public SingletonT<RTShaderSystem>
   {
+    public: enum LightingModel
+            {
+              SSLM_PerVertexLighting,
+              SSLM_PerPixelLighting,
+              SSLM_NormalMapLightingTangentSpace,
+              SSLM_NormalMapLightingObjectSpace,
+            };
+
     /// \brief Constructor
     private: RTShaderSystem();
 
@@ -51,9 +60,16 @@ namespace gazebo
     /// \brief Init the run time shader system
     public: void Init();
 
-    /// \brief Generate shaders for an entity
-    public: void GenerateShaders(Ogre::Entity *entity);
-            
+    /// \brief Set the lighting model
+    public: void SetLightingModel(LightingModel model);
+
+    /// \brief Set an Ogre::Entity to use RT shaders
+    public: void AttachEntity(Ogre::Entity *entity);
+
+    /// \brief Remove and entity
+    public: void DetachEntity(Ogre::Entity *entity);
+
+    /// \brief Set a viewport to use shaders
     public: static void AttachViewport(Ogre::Viewport *vp)
             {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
@@ -62,9 +78,18 @@ namespace gazebo
 #endif
             }
 
+    /// Set the lighting model to per pixel or per vertex
+    public: void SetPerPixelLighting( bool s);
+
+    /// \brief Generate shaders for an entity
+    private: void GenerateShaders(Ogre::Entity *entity);
+
+
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
     private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
     private: ShaderGeneratorTechniqueResolverListener *materialMgrListener;
+    private: LightingModel curLightingModel;
+    private: std::list<Ogre::Entity*> entities;
 #endif
 
     private: friend class DestroyerT<RTShaderSystem>;
