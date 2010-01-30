@@ -64,7 +64,6 @@ World::World()
   this->showCameras = false;
   this->wireframe = false;
   this->showPhysics = false;
-  this->perPixelLighting = true;
   this->physicsEngine = NULL;
   this->server = NULL;
   this->graphics = NULL;
@@ -777,21 +776,6 @@ void World::SetShowPhysics(bool show)
 {
   this->showPhysics = show;
   this->showPhysicsSignal(this->showPhysics);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set to use perpixel lighting or pervertex lighting
-void World::SetPerPixelLighting( bool pp )
-{
-  this->perPixelLighting = pp;
-  this->perPixelLightingSignal(pp);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get to use perpixel lighting or pervertex lighting
-bool World::GetPerPixelLighting()
-{
-  return this->perPixelLighting;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

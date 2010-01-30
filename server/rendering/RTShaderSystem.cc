@@ -25,6 +25,8 @@
  */
 
 #include <boost/bind.hpp>
+
+#include "OgreVisual.hh"
 #include "World.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -37,11 +39,6 @@ using namespace gazebo;
 /// Constructor
 RTShaderSystem::RTShaderSystem()
 {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  World::Instance()->ConnectPerPixelLightingSignal( boost::bind(&RTShaderSystem::SetPerPixelLighting, this, _1) );
-  this->curLightingModel = RTShaderSystem::SSLM_PerPixelLighting;
-  //this->curLightingModel = RTShaderSystem::SSLM_NormalMapLightingObjectSpace;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,136 +151,123 @@ void RTShaderSystem::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set an Ogre::Entity to use RT shaders
-void RTShaderSystem::AttachEntity(Ogre::Entity *entity)
+void RTShaderSystem::AttachEntity(OgreVisual *vis)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  this->GenerateShaders(entity);
-  this->entities.push_back(entity);
+  this->GenerateShaders(vis);
+  this->entities.push_back(vis);
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove and entity
-void RTShaderSystem::DetachEntity(Ogre::Entity *entity)
+void RTShaderSystem::DetachEntity(OgreVisual *vis)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  this->entities.remove(entity);
+  this->entities.remove(vis);
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the lighting model
-void RTShaderSystem::SetLightingModel(LightingModel model)
+/// Update the shaders
+void RTShaderSystem::UpdateShaders()
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  if (model == this->curLightingModel)
-    return;
-
-  this->curLightingModel = model;
-
-  std::list<Ogre::Entity*>::iterator iter;
+  std::list<OgreVisual*>::iterator iter;
 
   // Update all the shaders
   for (iter = this->entities.begin(); iter != this->entities.end(); iter++)
-  {
     this->GenerateShaders(*iter);
-  }
 #endif
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the lighting model to per pixel or per vertex
-void RTShaderSystem::SetPerPixelLighting( bool s)
-{
-  if (s)
-    this->SetLightingModel( SSLM_PerPixelLighting );
-  else
-    this->SetLightingModel( SSLM_PerVertexLighting );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Generate shaders for an entity
-void RTShaderSystem::GenerateShaders(Ogre::Entity *entity)
+void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 
-  for (unsigned int i=0; i < entity->getNumSubEntities(); ++i)
+  for (unsigned int k=0; k < vis->sceneNode->numAttachedObjects(); k++)
   {
-    Ogre::SubEntity* curSubEntity = entity->getSubEntity(i);
-    const Ogre::String& curMaterialName = curSubEntity->getMaterialName();
-    bool success;
+    Ogre::MovableObject *obj = vis->sceneNode->getAttachedObject(k);
+    Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
+    if (!entity)
+      continue;
 
-    // Create the shader based technique of this material.
-    success = this->shaderGenerator->createShaderBasedTechnique(curMaterialName,
-        Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-        Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-    // Setup custom shader sub render states according to current setup.
-    if (success)
+    for (unsigned int i=0; i < entity->getNumSubEntities(); ++i)
     {
-      Ogre::MaterialPtr curMaterial = 
-        Ogre::MaterialManager::getSingleton().getByName(curMaterialName);
+      Ogre::SubEntity* curSubEntity = entity->getSubEntity(i);
+      const Ogre::String& curMaterialName = curSubEntity->getMaterialName();
+      bool success;
 
-      Ogre::Pass* curPass = curMaterial->getTechnique(0)->getPass(0);
+      // Create the shader based technique of this material.
+      success = this->shaderGenerator->createShaderBasedTechnique(curMaterialName,
+          Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+          Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-      // Grab the first pass render state. 
-      // NOTE: For more complicated samples iterate over the passes and build
-      // each one of them as desired.
-      Ogre::RTShader::RenderState* renderState = this->shaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName, 0);
+      // Setup custom shader sub render states according to current setup.
+      if (success)
+      {
+        Ogre::MaterialPtr curMaterial = 
+          Ogre::MaterialManager::getSingleton().getByName(curMaterialName);
 
-      // Remove all sub render states.
-      renderState->reset();
+        Ogre::Pass* curPass = curMaterial->getTechnique(0)->getPass(0);
+
+        // Grab the first pass render state. 
+        // NOTE: For more complicated samples iterate over the passes and build
+        // each one of them as desired.
+        Ogre::RTShader::RenderState* renderState = this->shaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName, 0);
+
+        // Remove all sub render states.
+        renderState->reset();
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-      if (this->curLightingModel == SSLM_PerVertexLighting)
-      {
-        Ogre::RTShader::SubRenderState* perPerVertexLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::FFPLighting::Type);
+        if (vis->GetShader() == "vertex")
+        {
+          Ogre::RTShader::SubRenderState* perPerVertexLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::FFPLighting::Type);
 
-        renderState->addSubRenderState(perPerVertexLightModel);
-      }
+          renderState->addSubRenderState(perPerVertexLightModel);
+        }
 #endif
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-      else if (this->curLightingModel == SSLM_PerPixelLighting)
-      {
-        Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+        else if (vis->GetShader() == "pixel")
+        {
+          Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
 
-        renderState->addSubRenderState(perPixelLightModel);
-      }
+          renderState->addSubRenderState(perPixelLightModel);
+        }
 
-      else if (this->curLightingModel == SSLM_NormalMapLightingObjectSpace)
-      {
-        Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
-        Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
-        Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
+        else if (vis->GetShader() == "normal_map_objectspace")
+        {
+          Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
+          Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
+          Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
 
-        normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
-        rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String("skin.tga")));
-        renderState->addSubRenderState(normalMapSubRS);
-      }
+          normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
+          rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String(vis->GetNormalMap())));
+          renderState->addSubRenderState(normalMapSubRS);
+        }
+        else if (vis->GetShader() == "normal_map_tangetspace")
+        {
+          Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
+          Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
+          Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
 
-      else if (this->curLightingModel == SSLM_NormalMapLightingTangentSpace)
-      {
-        Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
-        Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
-        Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
+          normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
+          rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String(vis->GetNormalMap())));
 
-        normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
-        rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String("skin.tga")));
-
-        renderState->addSubRenderState(normalMapSubRS);
-      }
+          renderState->addSubRenderState(normalMapSubRS);
+        }
 #endif
+
       }
 
-    // Invalidate this material in order to re-generate its shaders.
-    this->shaderGenerator->invalidateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName);
+      // Invalidate this material in order to re-generate its shaders.
+      this->shaderGenerator->invalidateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName);
 
 
+    }
   }
-
-
 #endif
 }
-
-

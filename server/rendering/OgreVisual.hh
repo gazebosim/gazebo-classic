@@ -163,6 +163,18 @@ namespace gazebo
     /// \brief Disable tracking of a visual
     public: void DisableTrackVisual();
 
+    /// \brief Get the normal map
+    public: std::string GetNormalMap() const;
+
+    /// \brief Set the normal map
+    public: void SetNormalMap(const std::string &nmap);
+
+    /// \brief Get the shader
+    public: std::string GetShader() const;
+
+    /// \brief Set the shader
+    public: void SetShader(const std::string &shader);
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: std::string myMaterialName;
@@ -170,7 +182,7 @@ namespace gazebo
     private: Ogre::SceneBlendType sceneBlendType;
 
     private: Ogre::SceneNode *parentNode;
-    private: Ogre::SceneNode *sceneNode;
+    public: Ogre::SceneNode *sceneNode;
     private: Ogre::SceneNode *boundingBoxNode;
 
     private: float transparency;
@@ -183,6 +195,8 @@ namespace gazebo
     private: ParamT<Quatern> *rpyP;
     private: ParamT<std::string> *meshNameP;
     private: ParamT<std::string> *materialNameP;
+    private: ParamT<std::string> *normalMapNameP;
+    private: ParamT<std::string> *shaderP;
     private: ParamT<bool> *castShadowsP;
     private: ParamT<Vector3> *sizeP;
     private: ParamT<Vector3> *scaleP;

@@ -40,6 +40,7 @@
 namespace gazebo
 {
   class ShaderGeneratorTechniqueResolverListener;
+  class OgreVisual;
 
   class RTShaderSystem : public SingletonT<RTShaderSystem>
   {
@@ -60,14 +61,14 @@ namespace gazebo
     /// \brief Init the run time shader system
     public: void Init();
 
-    /// \brief Set the lighting model
-    public: void SetLightingModel(LightingModel model);
+    /// \brief Update the shaders
+    public: void UpdateShaders();
 
     /// \brief Set an Ogre::Entity to use RT shaders
-    public: void AttachEntity(Ogre::Entity *entity);
+    public: void AttachEntity(OgreVisual *vis);
 
     /// \brief Remove and entity
-    public: void DetachEntity(Ogre::Entity *entity);
+    public: void DetachEntity(OgreVisual *vis);
 
     /// \brief Set a viewport to use shaders
     public: static void AttachViewport(Ogre::Viewport *vp)
@@ -82,14 +83,13 @@ namespace gazebo
     public: void SetPerPixelLighting( bool s);
 
     /// \brief Generate shaders for an entity
-    private: void GenerateShaders(Ogre::Entity *entity);
+    private: void GenerateShaders(OgreVisual *vis);
 
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
     private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
     private: ShaderGeneratorTechniqueResolverListener *materialMgrListener;
-    private: LightingModel curLightingModel;
-    private: std::list<Ogre::Entity*> entities;
+    private: std::list<OgreVisual*> entities;
 #endif
 
     private: friend class DestroyerT<RTShaderSystem>;

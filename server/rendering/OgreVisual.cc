@@ -67,6 +67,8 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
 
   this->visible = true;
   this->ConstructorHelper(pnode, isStatic);
+
+  RTShaderSystem::Instance()->AttachEntity(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,6 +109,13 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 
   this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
   this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
+
+  this->normalMapNameP = new ParamT<std::string>("normalMap",
+                                                std::string("none"),0);
+  this->normalMapNameP->Callback( &OgreVisual::SetNormalMap, this );
+
+  this->shaderP = new ParamT<std::string>("shader", std::string("pixel"),0);
+  this->shaderP->Callback( &OgreVisual::SetShader, this );
   Param::End();
 
   this->boundingBoxNode = NULL;
@@ -160,9 +169,7 @@ OgreVisual::~OgreVisual()
   this->sceneNode->removeAndDestroyAllChildren();
   */
 
-  for (int i=0; i < this->sceneNode->numAttachedObjects(); i++)
-    RTShaderSystem::Instance()->DetachEntity(
-        (Ogre::Entity*)(this->sceneNode->getAttachedObject(i)) );
+  RTShaderSystem::Instance()->DetachEntity(this);
 
   if (this->sceneNode)
     OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);
@@ -189,6 +196,8 @@ void OgreVisual::Load(XMLConfigNode *node)
   this->meshTileP->Load(node);
   this->materialNameP->Load(node);
   this->castShadowsP->Load(node);
+  this->shaderP->Load(node);
+  this->normalMapNameP->Load(node);
 
   // Read the desired position and rotation of the mesh
   pose.pos = this->xyzP->GetValue();
@@ -306,9 +315,7 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
     return;
 
   this->sceneNode->attachObject(obj);
-  Ogre::Entity *ent = dynamic_cast<Ogre::Entity*>(obj);
-  if (ent)
-    RTShaderSystem::Instance()->AttachEntity(ent);
+  RTShaderSystem::Instance()->UpdateShaders();
 
   obj->setUserAny( Ogre::Any(this) );
 }
@@ -957,4 +964,34 @@ void OgreVisual::EnableTrackVisual( OgreVisual *vis )
 void OgreVisual::DisableTrackVisual()
 {
   this->sceneNode->setAutoTracking(false);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the normal map
+std::string OgreVisual::GetNormalMap() const
+{
+  return (**this->normalMapNameP);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the normal map
+void OgreVisual::SetNormalMap(const std::string &nmap)
+{
+  this->normalMapNameP->SetValue(nmap);
+  RTShaderSystem::Instance()->UpdateShaders();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the shader
+std::string OgreVisual::GetShader() const
+{
+  return (**this->shaderP);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the shader
+void OgreVisual::SetShader(const std::string &shader)
+{
+  this->shaderP->SetValue(shader);
+  RTShaderSystem::Instance()->UpdateShaders();
 }
