@@ -40,6 +40,7 @@ RTShaderSystem::RTShaderSystem()
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
   World::Instance()->ConnectPerPixelLightingSignal( boost::bind(&RTShaderSystem::SetPerPixelLighting, this, _1) );
   this->curLightingModel = RTShaderSystem::SSLM_PerPixelLighting;
+  //this->curLightingModel = RTShaderSystem::SSLM_NormalMapLightingObjectSpace;
 #endif
 }
 
@@ -225,17 +226,6 @@ void RTShaderSystem::GenerateShaders(Ogre::Entity *entity)
 
       Ogre::Pass* curPass = curMaterial->getTechnique(0)->getPass(0);
 
-      /*if (mSpecularEnable)
-      {
-        curPass->setSpecular(ColourValue::White);
-        curPass->setShininess(32.0);
-      }
-      else
-      {
-        curPass->setSpecular(ColourValue::Black);
-        curPass->setShininess(0.0);
-      }*/
-
       // Grab the first pass render state. 
       // NOTE: For more complicated samples iterate over the passes and build
       // each one of them as desired.
@@ -260,14 +250,37 @@ void RTShaderSystem::GenerateShaders(Ogre::Entity *entity)
 
         renderState->addSubRenderState(perPixelLightModel);
       }
-    }
+
+      else if (this->curLightingModel == SSLM_NormalMapLightingObjectSpace)
+      {
+        Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
+        Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
+        Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
+
+        normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
+        rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String("skin.tga")));
+        renderState->addSubRenderState(normalMapSubRS);
+      }
+
+      else if (this->curLightingModel == SSLM_NormalMapLightingTangentSpace)
+      {
+        Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
+        Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
+        Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
+
+        normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
+        rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String("skin.tga")));
+
+        renderState->addSubRenderState(normalMapSubRS);
+      }
+#endif
+      }
 
     // Invalidate this material in order to re-generate its shaders.
     this->shaderGenerator->invalidateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName);
 
 
   }
-#endif
 
 
 #endif
