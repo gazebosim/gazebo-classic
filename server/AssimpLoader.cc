@@ -198,6 +198,11 @@ void AssimpLoader::BuildMesh(aiNode *node, Mesh *mesh)
 
       subMesh->AddVertex(p.x, p.y, p.z); 
 
+      p.x = aMesh->mNormals[j].x;
+      p.y = aMesh->mNormals[j].y;
+      p.z = aMesh->mNormals[j].z;
+
+      subMesh->AddNormal(p.x, p.y, p.z); 
       if (aMesh->mNumUVComponents[0])
         subMesh->AddTexCoord(aMesh->mTextureCoords[0][j].x, 
                              1.0-aMesh->mTextureCoords[0][j].y);
