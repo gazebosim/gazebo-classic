@@ -34,6 +34,7 @@
 
 #include "config.h"
 
+#include "RTShaderSystem.hh"
 #include "Light.hh"
 #include "Material.hh"
 #include "Simulator.hh"
@@ -170,6 +171,8 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name,
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     camera->setAspectRatio(ratio);
     camera->setFOVy(Ogre::Radian(vfov));
+
+    RTShaderSystem::Instance()->AttachViewport(cviewport);
   }
 
   return camera;
