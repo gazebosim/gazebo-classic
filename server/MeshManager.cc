@@ -56,16 +56,20 @@ const Mesh *MeshManager::Load(const std::string &filename)
 
   if (this->HasMesh(filename))
   {
-    //return this->meshes[filename];
+    return this->meshes[filename];
     
-    // erase mesh from this->meshes. This allows a mesh to be modified and
-    // inserted into gazebo again without closing gazebo.
-    std::map<std::string, Mesh*>::iterator iter;
-    iter = this->meshes.find(filename);
-    delete iter->second;
-    iter->second = NULL;
-    this->meshes.erase(iter);
+    // This breaks trimesh geom. Each new trimesh should have a unique name.
+    /*
+      // erase mesh from this->meshes. This allows a mesh to be modified and
+      // inserted into gazebo again without closing gazebo.
+      std::map<std::string, Mesh*>::iterator iter;
+      iter = this->meshes.find(filename);
+      delete iter->second;
+      iter->second = NULL;
+      this->meshes.erase(iter);
+    */
   }
+
 
   fullname =  std::string("./")+filename;
   if (stat(fullname.c_str(), &st) == 0)
