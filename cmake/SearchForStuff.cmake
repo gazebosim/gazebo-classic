@@ -24,12 +24,19 @@ set (assimp_libraries "" CACHE STRING "Assimp libraries Use this to override aut
 set (boost_include_dirs "" CACHE STRING "Boost include paths. Use this to override automatic detection.")
 set (boost_library_dirs "" CACHE STRING "Boost library paths. Use this to override automatic detection.")
 set (boost_libraries "" CACHE STRING "Boost libraries. Use this to override automatic detection.")
-set (bullet_dynamics_dirs "" CACHE STRING "Bullet Dynamics libraries. Use this to override automatic detection.")
-set (bullet_collision_dirs "" CACHE STRING "Bullet Collision libraries. Use this to override automatic detection.")
-set (bullet_softbody_dirs "" CACHE STRING "Bullet Softbody libraries. Use this to override automatic detection.")
-set (bullet_math_dirs "" CACHE STRING "Bullet LinearMath libraries. Use this to override automatic detection.")
+
+set (bullet_include_dirs "" CACHE STRING "Bullet include paths. Use this to override automatic detection.")
+set (bullet_library_dirs "" CACHE STRING "Bullet library paths. Use this to override automatic detection.")
+set (bullet_lflags "" CACHE STRING "Bullet libraries Use this to override automatic detection.")
 set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
+
 set (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
+
+SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
+
+set (FLTK_LIBRARIES "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
+set (FLTK_INCLUDE_DIR "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
+
 
 ########################################
 # Find packages
@@ -392,68 +399,38 @@ endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_librar
 
 ########################################
 # Find bullet
-FIND_PATH( bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
-IF (NOT bullet_include_dir)
-  MESSAGE (STATUS "Looking for btBulletDynamicsCommon.h - not found")
-  SET (bullet_include_dir /usr/include)
-ELSE (NOT bullet_include_dir)
-  MESSAGE (STATUS "Looking for btBulletDynamicsCommon.h - found")
-ENDIF (NOT bullet_include_dir)
+if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
-FIND_LIBRARY(bullet_dynamics_library NAMES BulletDynamics 
-  PATHS ${bullet_dynamics_dirs} ENV LD_LIBRARY_PATH)
-FIND_LIBRARY(bullet_collision_library NAMES BulletCollision  
-  PATHS ${bullet_collision_dirs} ENV LD_LIBRARY_PATH)
-FIND_LIBRARY(bullet_softbody_library NAMES BulletSoftBody  
-  PATHS ${bullet_softbody_dirs} ENV LD_LIBRARY_PATH)
-FIND_LIBRARY(bullet_math_library NAMES LinearMath
-  PATHS ${bullet_math_dirs} ENV LD_LIBRARY_PATH)
+  find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
+  
+  if (NOT bullet_include_dir)
+    #BUILD_ERROR("bullet not found. See the following website for installation instructions: http://bullet.sourceforge.net")
+    message (STATUS "Looking for btBulletDynamicsCommon.h - not found. Using built in version.")
+    set (bullet_include_dirs /usr/include CACHE STRING
+      "bullet include paths. Use this to override automatic detection.")
+  else (NOT bullet_include_dir)
+    message (STATUS "Looking for btBulletDynamicsCommon.h - found")
+    set (assim_include_dirs ${bullet_include_dir} CACHE STRING
+      "bullet include paths. Use this to override automatic detection.")
+  endif (NOT bullet_include_dir)
+  
+  find_library(bullet_library BulletDynamics ENV LD_LIBRARY_PATH)
+  
+  if (NOT bullet_library)
+    message (STATUS "Looking for libBulletDynamics - not found. Using builtin version.")
+    #BUILD_ERROR("libbullet not found. See the following website for installation instructions: http://bullet.sourceforge.net")
+  else (NOT bullet_library)
+    message (STATUS "Looking for libBulletDynamics - found")
+    APPEND_TO_CACHED_LIST(bullet_lflags
+                          "bullet libraries Use this to override automatic detection."
+                          ${bullet_library})
+  endif (NOT bullet_library)
+ 
+  if (NOT bullet_include_dir OR NOT bullet_library)
+    message (STATUS "bullet not found")
+  endif (NOT bullet_include_dir OR NOT bullet_library)
 
-IF (NOT bullet_dynamics_library OR 
-    NOT bullet_collision_library OR 
-    NOT bullet_softbody_library OR
-    NOT bullet_math_library)
-  MESSAGE (STATUS "Looking for bullet libraries - not found")
-ELSE (NOT bullet_dynamics_library OR 
-      NOT bullet_collision_library OR 
-      NOT bullet_softbody_library OR
-      NOT bullet_math_library)
-  MESSAGE (STATUS "Looking for bullet libraries - found")
-ENDIF (NOT bullet_dynamics_library OR 
-       NOT bullet_collision_library OR 
-       NOT bullet_softbody_library OR
-       NOT bullet_math_library)
+endif (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
-IF (bullet_dynamics_library AND 
-    bullet_collision_library AND 
-    bullet_softbody_library  AND 
-    bullet_math_library AND
-    bullet_include_dir)
-  SET (INCLUDE_BULLET TRUE CACHE BOOL "Include support for Bullet")
+set (INCLUDE_BULLET ON BOOL)
 
-  APPEND_TO_CACHED_LIST(bullet_link_libs 
-                        ${bullet_link_libs_desc} 
-                        ${bullet_dynamics_library})
-  APPEND_TO_CACHED_LIST(bullet_link_libs 
-                        ${bullet_link_libs_desc} 
-                        ${bullet_collision_library})
-  APPEND_TO_CACHED_LIST(bullet_link_libs 
-                        ${bullet_link_libs_desc} 
-                        ${bullet_softbody_library})
-  APPEND_TO_CACHED_LIST(bullet_link_libs 
-                        ${bullet_link_libs_desc} 
-                        ${bullet_math_library})
-
-
-ELSE (bullet_dynamics_library AND 
-    bullet_collision_library AND 
-    bullet_softbody_library  AND 
-    bullet_math_library AND
-    bullet_include_dir)
-  SET (INCLUDE_BULLET FALSE CACHE BOOL "Include support for Bullet")
-  MESSAGE (STATUS "Warning: Unable to find bullet. The bullet physics engine will not be supported.")
-ENDIF (bullet_dynamics_library AND 
-       bullet_collision_library AND 
-       bullet_softbody_library  AND 
-       bullet_math_library AND
-       bullet_include_dir)

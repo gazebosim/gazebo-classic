@@ -1,5 +1,13 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+########################################
+# Include all the search paths for headers
+STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
+STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
+STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
+STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
+STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
+
 INCLUDE_DIRECTORIES(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
@@ -20,9 +28,9 @@ INCLUDE_DIRECTORIES(
   ${LIBAVFORMAT_PATH}
   ${libtool_include_path}
   ${gazeboserver_include_dirs}
-  ${boost_include_dirs}
+  ${boost_include_dirs_split}
   ${freeimage_include_dir}
-  ${bullet_include_dir}
+  ${bullet_include_dirs_split}
   ${threadpool_include_dirs_split}
   ${FLTK_INCLUDE_DIR}
 )
@@ -31,11 +39,8 @@ LINK_DIRECTORIES(
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
- ${boost_library_dirs} 
- ${bullet_dynamics_dirs} 
- ${bullet_collision_dirs} 
- ${bullet_softbody_dirs} 
- ${bullet_math_dirs} 
+ ${boost_library_dirs_split} 
+ ${bullet_library_dirs_split} 
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
 )
@@ -54,8 +59,10 @@ SET (sources BulletPhysics.cc
              #BulletRayGeom.cc
 )
 
+
+
 add_definitions(${bullet_cflags})
 #add_definitions(mDBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX)
 ADD_LIBRARY(gazebo_physics_bullet SHARED ${sources})
-TARGET_LINK_LIBRARIES( gazebo_physics_bullet BulletDynamics BulletCollision LinearMath )
+TARGET_LINK_LIBRARIES( gazebo_physics_bullet ${bullet_lflags} )
 INSTALL( TARGETS gazebo_physics_bullet DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

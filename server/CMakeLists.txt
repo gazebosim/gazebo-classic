@@ -2,7 +2,15 @@ INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 ########################################
 # Include all the search paths for headers
+STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
+STRING (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
+STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
 STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
+STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
+STRING (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
+STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
+
+
 
 INCLUDE_DIRECTORIES(
   .
@@ -24,10 +32,10 @@ INCLUDE_DIRECTORIES(
   ${LIBAVFORMAT_PATH}
   ${libtool_include_path}
   ${gazeboserver_include_dirs}
-  ${boost_include_dirs}
-  ${assimp_include_dirs}
+  ${boost_include_dirs_split}
+  ${assimp_include_dirs_split}
   ${freeimage_include_dir}
-  ${bullet_include_dir}
+  ${bullet_include_dirs_split}
   ${threadpool_include_dirs_split}
   ${FLTK_INCLUDE_DIR}
 )
@@ -36,12 +44,9 @@ LINK_DIRECTORIES(
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
- ${boost_library_dirs} 
- ${assimp_library_dirs} 
- ${bullet_dynamics_dirs} 
- ${bullet_collision_dirs} 
- ${bullet_softbody_dirs} 
- ${bullet_math_dirs} 
+ ${boost_library_dirs_split} 
+ ${assimp_library_dirs_split} 
+ ${bullet_library_dirs_split} 
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
 )
@@ -145,6 +150,8 @@ IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
+SET_TARGET_PROPERTIES( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+
 target_link_libraries( gazebo-exec ${libtool_library}
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
@@ -162,9 +169,8 @@ target_link_libraries( gazebo-exec ${libtool_library}
 target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazebo gazebo_rendering gazebo_physics )
 
 if (INCLUDE_BULLET)
-  target_link_libraries(gazebo-exec gazebo_physics_bullet ${bullet_link_libs})
-  target_link_libraries(gazebo-exec BulletDynamics)
-  target_link_libraries(gazebo_server gazebo_physics_bullet ${bullet_link_libs})
+  target_link_libraries(gazebo-exec gazebo_physics_bullet ${bullet_lflags})
+  target_link_libraries(gazebo_server gazebo_physics_bullet ${bullet_lflags})
 endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
