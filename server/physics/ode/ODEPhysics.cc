@@ -82,7 +82,10 @@ ODEPhysics::ODEPhysics()
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   dWorldSetAutoDisableFlag(this->worldId, 1);
-  dWorldSetAutoDisableTime(this->worldId, 1.0);
+  dWorldSetAutoDisableTime(this->worldId, 2.0);
+  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
+  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
+  dWorldSetAutoDisableSteps(this->worldId, 20);
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
@@ -430,6 +433,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 
+
   if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact))
     return;
 
@@ -454,11 +458,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
-    int numContacts = 5;
+    int numContacts = 100;
 
     if (geom1->GetType() == Shape::TRIMESH && geom2->GetType()==Shape::TRIMESH)
       numContacts = maxContacts;
-      
 
     numc = dCollide(o1,o2,numContacts, contactGeoms, sizeof(contactGeoms[0]));
 
