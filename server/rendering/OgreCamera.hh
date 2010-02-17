@@ -218,6 +218,9 @@ namespace gazebo
     /// \brief Set whether to view the world in wireframe
     public: void ShowWireframe(bool s);
 
+    /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
+    private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
+
     // Save the camera frame
     protected: virtual void SaveFrame();
 
@@ -237,6 +240,7 @@ namespace gazebo
   
     // Info for saving images
     protected: unsigned char *saveFrameBuffer;
+    protected: unsigned char *bayerFrameBuffer;
     protected: unsigned int saveCount;
     protected: ParamT<bool> *saveFramesP;
     protected: ParamT<std::string> *savePathnameP;

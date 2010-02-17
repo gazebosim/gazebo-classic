@@ -58,6 +58,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   this->saveFrameBuffer = NULL;
   this->saveCount = 0;
+  this->bayerFrameBuffer = NULL;
 
   this->myCount = cameraCounter++;
 
@@ -97,6 +98,9 @@ OgreCamera::~OgreCamera()
 {
   if (this->saveFrameBuffer)
     delete [] this->saveFrameBuffer;
+
+  if (this->bayerFrameBuffer)
+    delete [] this->bayerFrameBuffer;
 
   delete this->nearClipP;
   delete this->farClipP;
@@ -142,9 +146,18 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
       this->imageFormat = Ogre::PF_R8G8B8;
     else if (this->imageFormatP->GetValue() == "B8G8R8")
       this->imageFormat = Ogre::PF_B8G8R8;
+    else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
+              (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
+              (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
+              (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
+    {
+      // let ogre generate rgb8 images for all bayer format requests
+      // then post process to produce actual bayer images
+      this->imageFormat = Ogre::PF_R8G8B8;
+    }
     else
     {
-      std::cerr << "Error parsing image format, using default Ogre::PF_R8G8B8\n";
+      std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
       this->imageFormat = Ogre::PF_R8G8B8;
     }
   }
@@ -417,9 +430,14 @@ int OgreCamera::GetImageDepth() const
     return 3;
   else if (this->imageFormatP->GetValue() == "B8G8R8")
     return 3;
+  else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
+            (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
+            (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
+            (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
+    return 1;
   else
   {
-    std::cerr << "Error parsing image format, using default Ogre::PF_R8G8B8\n";
+    std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
 }
@@ -600,7 +618,22 @@ const unsigned char *OgreCamera::GetImageData(unsigned int i)
   if (i!=0)
     gzerr(0) << "Camera index must be zero for mono cam";
 
-  return this->saveFrameBuffer;
+  int width = this->imageSizeP->GetValue().x;
+  int height = this->imageSizeP->GetValue().y;
+
+  // do last minute conversion if Bayer pattern is requested, go from R8G8B8
+  if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
+       (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
+       (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
+       (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
+  {
+    if (!this->bayerFrameBuffer)
+      this->bayerFrameBuffer = new unsigned char[width*height];
+    this->ConvertRGBToBAYER(this->bayerFrameBuffer,this->saveFrameBuffer,this->imageFormatP->GetValue(),width,height);
+    return this->bayerFrameBuffer;
+  }
+  else
+    return this->saveFrameBuffer;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -720,4 +753,108 @@ void OgreCamera::ShowWireframe(bool s)
       this->camera->setPolygonMode(Ogre::PM_SOLID);
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// post process, convert from rgb to bayer
+void OgreCamera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height)
+{
+  // do last minute conversion if Bayer pattern is requested, go from R8G8B8
+  if (format == "BAYER_RGGB8")
+  {
+    for (int i=0;i<width;i++)
+    {
+      for (int j=0;j<height;j++)
+      {
+        //
+        // RG
+        // GB
+        //
+        // determine position
+        if (j%2) // even column
+          if (i%2) // even row, red
+            dst[i+j*width] = src[i*3+j*width*3+0];
+          else // odd row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+        else // odd column
+          if (i%2) // even row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+          else // odd row, blue
+            dst[i+j*width] = src[i*3+j*width*3+2];
+      }
+    }
+  }
+  else if (format == "BAYER_BGGR8")
+  {
+    for (int i=0;i<width;i++)
+    {
+      for (int j=0;j<height;j++)
+      {
+        //
+        // BG
+        // GR
+        //
+        // determine position
+        if (j%2) // even column
+          if (i%2) // even row, blue
+            dst[i+j*width] = src[i*3+j*width*3+2];
+          else // odd row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+        else // odd column
+          if (i%2) // even row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+          else // odd row, red
+            dst[i+j*width] = src[i*3+j*width*3+0];
+      }
+    }
+  }
+  else if (format == "BAYER_GBRG8")
+  {
+    for (int i=0;i<width;i++)
+    {
+      for (int j=0;j<height;j++)
+      {
+        //
+        // GB
+        // RG
+        //
+        // determine position
+        if (j%2) // even column
+          if (i%2) // even row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+          else // odd row, blue
+            dst[i+j*width] = src[i*3+j*width*3+2];
+        else // odd column
+          if (i%2) // even row, red
+            dst[i+j*width] = src[i*3+j*width*3+0];
+          else // odd row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+      }
+    }
+  }
+  else if (format == "BAYER_GRBG8")
+  {
+    for (int i=0;i<width;i++)
+    {
+      for (int j=0;j<height;j++)
+      {
+        //
+        // GR
+        // BG
+        //
+        // determine position
+        if (j%2) // even column
+          if (i%2) // even row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+          else // odd row, red
+            dst[i+j*width] = src[i*3+j*width*3+0];
+        else // odd column
+          if (i%2) // even row, blue
+            dst[i+j*width] = src[i*3+j*width*3+2];
+          else // odd row, green
+            dst[i+j*width] = src[i*3+j*width*3+1];
+      }
+    }
+  }
+
 }
