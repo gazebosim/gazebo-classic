@@ -24,19 +24,20 @@ STLLoader::~STLLoader()
 /// Load a mesh
 Mesh *STLLoader::Load( const std::string &filename )
 {
-  std::string extension;
- 
-  extension = filename.substr(filename.rfind(".")+1, filename.size());
 
   Mesh *mesh = new Mesh();
 
   FILE *file = fopen(filename.c_str(), "r");
 
-  /*if (extension == "stl" || extension == "stla")
+  /*
+  std::string extension;
+  extension = filename.substr(filename.rfind(".")+1, filename.size());
+  std::transform(extension.begin(),extension.end(),extension.begin(),::tolower);
+  if (extension == "stl" || extension == "stla")
     this->ReadAscii(file, mesh);
   else if (extension == "stlb")
     this->ReadBinary(file, mesh);
-    */
+  */
 
   this->ReadBinary(file, mesh);
 

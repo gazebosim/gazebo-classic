@@ -100,6 +100,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
   if (found)
   {
     extension = fullname.substr(fullname.rfind(".")+1, fullname.size());
+    std::transform(extension.begin(),extension.end(),extension.begin(),::tolower);
     MeshLoader *loader = NULL;
 
     if (extension == "mesh")
