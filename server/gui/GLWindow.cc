@@ -165,7 +165,8 @@ void GLWindow::Update()
   // continuously apply force to selected body
   Entity *entity = Simulator::Instance()->GetSelectedEntity(); 
 
-  if (entity->IsBody())
+  if (entity->IsBody() &&
+      (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
   {
     Body *body = (Body*)(entity);
     if (this->rightMousePressed && body)
@@ -205,6 +206,10 @@ unsigned int GLWindow::GetTriangleCount() const
 /// Handle a mouse button push
 void GLWindow::HandleMousePush()
 {
+  // reset applied forces to 0
+  this->forceVec = 0;
+  this->torqueVec = 0;
+
   // Get the mouse button that was pressed (if one was pressed)
   switch (Fl::event_button())
   {
@@ -256,12 +261,9 @@ void GLWindow::HandleMouseRelease()
     Model *model = Simulator::Instance()->GetParentModel(entity);
     Body *body = Simulator::Instance()->GetParentBody(entity);
 
-    if (currModel == model)
-    {
-      Simulator::Instance()->SetSelectedEntity(NULL);
-      return;
-    }
-
+    // reset applied forces to 0
+    this->forceVec = 0;
+    this->torqueVec = 0;
 
     switch (Fl::event_button())
     {
