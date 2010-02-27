@@ -521,14 +521,14 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos)
 
   for (iter = result.begin(); iter != result.end(); iter++)
   {
+    // is the result a MovableObject
     if (iter->movable)
     {
-      //OgreVisual *vis = dynamic_cast<OgreVisual*>(iter->movable->getUserObject());
-      OgreVisual *vis = Ogre::any_cast<OgreVisual*>(iter->movable->getUserAny());
+      OgreVisual* const* vis = Ogre::any_cast<OgreVisual*>(&iter->movable->getUserAny());
 
-      if (vis && vis->GetOwner())
+      if (vis && (*vis)->GetOwner())
       {
-        entity = vis->GetOwner();
+        entity = (*vis)->GetOwner();
         if (!entity)
           continue;
 
