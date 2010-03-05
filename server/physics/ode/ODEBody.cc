@@ -36,7 +36,7 @@
 #include "GazeboError.hh"
 #include "PhysicsEngine.hh"
 #include "Mass.hh"
-
+#include "Model.hh"
 #include "ODEBody.hh"
 
 using namespace gazebo;
@@ -113,6 +113,11 @@ void ODEBody::MoveCallback(dBodyID id)
   Pose3d pp = self->comEntity->GetRelativePose().GetInverse() + pose;
 
   self->SetAbsPose(pp, false);
+
+  // if this is a canonical body, update model's relative pose
+  if (self->canonicalModel)
+    self->canonicalModel->OnPoseChange();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -183,6 +183,10 @@ namespace gazebo
     /// \return Pointer to the body
     public: Body *GetCanonicalBody();
 
+    /// \brief Called when the pose of the entity (or one of its parents) has
+    /// changed
+    public: virtual void OnPoseChange();
+
     /// \brief Set the gravity mode of the model
     public: void SetGravityMode( const bool &v );
 
@@ -253,6 +257,8 @@ namespace gazebo
   
     /// \brief Light numbering variable to give a unique name to all light entities
     private: static uint lightNumber;
+
+    public: Pose3d GetAbsPose();
 
     private: ParamT<std::string> *canonicalBodyNameP;
     private: ParamT<Vector3> *xyzP;

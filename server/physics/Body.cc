@@ -61,6 +61,9 @@ Body::Body(Entity *parent)
 
   this->cgVisual = NULL;
 
+  // preset canonicalModel to null
+  this->canonicalModel = NULL;
+
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this );
@@ -133,6 +136,13 @@ Body::~Body()
   delete this->ixyP;
   delete this->ixzP;
   delete this->iyzP;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// setting model point if this is the canonical body of a model
+void Body::SetCanonicalModel(Model* model)
+{
+  this->canonicalModel = model;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

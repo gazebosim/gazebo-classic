@@ -389,6 +389,30 @@ void Model::Init()
   */
 
   this->InitChild();
+
+  // this updates the relativePose of the Model Entity
+  // set model pointer of the canonical body so when body updates,
+  // one can callback to the model
+  if (!this->bodies.empty())
+  {
+    Body* canonicalBody;
+    if (this->bodies.find(this->canonicalBodyNameP->GetValue()) != this->bodies.end())
+    {
+      canonicalBody = this->bodies[this->canonicalBodyNameP->GetValue()];
+      canonicalBody->SetCanonicalModel(this);
+      // std::cout << "model " << this->GetName()
+      //           << " canoncal body: " << canonicalBody->GetName() << std::endl;
+    }
+    else
+    {
+      //std::cout << "bad canonical body?" << std::endl;
+    }
+  }
+  else
+  {
+    //std::cout << "model " << this->GetName() << " has no bodies" << std::endl;
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -495,6 +519,35 @@ void Model::Update()
   }
 }
 
+void Model::OnPoseChange()
+{
+
+  /// \brief set the pose of the model, which is the pose of the canonical body
+  // this updates the relativePose of the Model Entity
+  if (!this->bodies.empty())
+  {
+    Body* canonicalBody;
+    if (this->bodies.find(this->canonicalBodyNameP->GetValue()) != this->bodies.end())
+    {
+      canonicalBody = this->bodies[this->canonicalBodyNameP->GetValue()];
+      this->SetAbsPose(canonicalBody->GetAbsPose(),false); // do not recurse
+      // std::cout << " Model OnPoseChange " << this->GetName()
+      //           << " canoncal body: " << canonicalBody->GetName()
+      //           << " pose " << this->GetRelativePose() << std::endl;
+    }
+    else
+    {
+      //std::cout << " has no canonical body" << std::endl;
+    }
+  }
+  else
+  {
+    //std::cout << " Model " << this->GetName() << " OnPoseChange has no bodies" << std::endl;
+  }
+
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Primarily used to update the graphics interfaces
@@ -543,7 +596,7 @@ void Model::Reset()
   std::map<std::string, Controller* >::iterator citer;
   Vector3 v(0,0,0);
 
-//  this->SetPose(this->initPose);
+  this->SetRelativePose(this->initPose);  // this has to be relative for nested models to work
 
   for (citer=this->controllers.begin(); citer!=this->controllers.end(); citer++)
   {
@@ -1137,4 +1190,14 @@ void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 
     biter->second->GetInterfaceNames(list);
   }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return Model Absolute Pose
+/// this is redundant as long as Model's relativePose is maintained
+/// which is done in Model::OnPoseChange and during Model initialization
+Pose3d Model::GetAbsPose()
+{
+      return this->bodies[**this->canonicalBodyNameP]->GetAbsPose();
 }

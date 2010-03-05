@@ -262,9 +262,18 @@ std::string Entity::GetCompleteScopedName()
 Pose3d Entity::GetAbsPose() const
 {
   if (this->parent)
+  {
+    //std::cout << " GetAbsPose for model " << this->GetName()
+    //          << " relative " << this->GetRelativePose()
+    //          << " parent-abs " << this->parent->GetAbsPose() << std::endl;
     return this->GetRelativePose() + this->parent->GetAbsPose();
+  }
   else
+  {
+    //std::cout << " GetAbsPose for model " << this->GetName()
+    //          << " relative " << this->GetRelativePose() << std::endl;
     return this->GetRelativePose();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

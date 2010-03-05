@@ -258,6 +258,13 @@ namespace gazebo
     protected: ParamT<double> *ixzP;
     protected: ParamT<double> *iyzP;
     protected: Mass customMass;
+
+    /// \brief if this is the canonical :ody of a model, point back
+    protected: Model* canonicalModel;
+
+    /// \brief this is how you set canonical body from the model
+    public: void SetCanonicalModel(Model* model);
+
   };
 
   /// \}
