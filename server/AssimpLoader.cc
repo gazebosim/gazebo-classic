@@ -3,6 +3,7 @@
 #include "Mesh.hh"
 #include "Material.hh"
 #include "AssimpLoader.hh"
+#include <sys/stat.h>
 
 using namespace gazebo;
 
@@ -55,7 +56,19 @@ Mesh *AssimpLoader::Load(const std::string &filename)
         aiTextureMapping mapping;
         unsigned int uvIndex;
         amat->GetTexture(aiTextureType_DIFFUSE,0, &texName, &mapping, &uvIndex);
-        mat->SetTextureImage(texName.data);
+
+        // attempt to find fully qualified filename for texture image
+        // in the same place as the collada file
+        // pathname of the collada dae file
+        std::string dae_pathname = filename.rfind("/")==std::string::npos ?
+                  std::string("") : filename.substr(0,filename.rfind("/")+1);
+        // fully qualified texture filename
+        std::string texture_fqfn = dae_pathname + texName.data;
+        struct stat st;
+        if (stat(texture_fqfn.c_str(), &st) == 0)
+          mat->SetTextureImage(texture_fqfn); // use fqfn if it exists
+        else
+          mat->SetTextureImage(texName.data); // use defaut filename, rely on ogre path
       }
       else if (propKey == "?mat.name")
       {
