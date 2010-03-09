@@ -953,9 +953,12 @@ material Gazebo/TransparentTest
       scene_blend alpha_blend
       depth_write off
 
+      ambient 1.0 0.0 0.0 1
+      diffuse 1.0 0.0 0.0 1
+
       texture_unit
       {
-        colour_op_ex source1 src_manual src_current 1 0 0
+        colour_op_ex source1 src_current src_current 1 0 0
         alpha_op_ex source1 src_manual src_current 0.1
       }
     }
@@ -990,7 +993,7 @@ material Gazebo/PCBGreen
      	 	  texture_unit
      		  {
      		     colour_op_ex source1 src_manual src_current 0.2 0.43 0.36
-     	  	     alpha_op_ex source1 src_manual src_current 0.2
+   	  	     alpha_op_ex source1 src_manual src_current 0.2
     	 	  }
    		}
 	}

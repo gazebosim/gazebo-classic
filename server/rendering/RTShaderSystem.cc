@@ -102,7 +102,7 @@ void RTShaderSystem::Init()
 
       for (; it != itEnd; ++it)
       {
-        if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
+        if ((*it)->archive->getName().find("rtshaderlib") != Ogre::String::npos)
         {
           shaderCoreLibsPath = (*it)->archive->getName() + "/";
           shaderCachePath = shaderCoreLibsPath;
@@ -123,10 +123,10 @@ void RTShaderSystem::Init()
       return;
     }
 
-#ifdef _RTSS_WRITE_SHADERS_TO_DISK
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(shaderCoreLibsPath, "FileSystem");
+
     // Set shader cache path.
-   this->shaderGenerator->setShaderCachePath(shaderCachePath);
-#endif
+    this->shaderGenerator->setShaderCachePath(shaderCachePath);
 
     // Create and register the material manager listener.  
     this->materialMgrListener = new ShaderGeneratorTechniqueResolverListener(this->shaderGenerator);
