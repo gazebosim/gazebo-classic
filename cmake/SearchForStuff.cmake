@@ -464,10 +464,16 @@ if (INCLUDE_BULLET)
 int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
 
   set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
+  STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}") #for cmake 2.4-7
+  STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}") #for cmake 2.4-7
+  set( CMAKE_REQUIRED_INCLUDES ${bullet_include_dirs_split} )
   set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
+  set( CMAKE_REQUIRED_FLAGS  ${bullet_lflags} )
   CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
   set (CMAKE_REQUIRED_LIBRARIES)
   set (CMAKE_REQUIRED_DEFINITIONS)
+  set( CMAKE_REQUIRED_INCLUDES)
+  set( CMAKE_REQUIRED_FLAGS)
 
   if (NOT BULLET_DOUBLE_PRECISION)
     BUILD_ERROR("bullet was not compiled to use double precision.")
