@@ -66,7 +66,9 @@ Mesh *AssimpLoader::Load(const std::string &filename)
         std::string texture_fqfn = dae_pathname + texName.data;
         struct stat st;
         if (stat(texture_fqfn.c_str(), &st) == 0)
-          mat->SetTextureImage(texture_fqfn); // use fqfn if it exists
+        {
+          mat->SetTextureImage(texName.data,dae_pathname); // use fqfn if it exists
+        }
         else
           mat->SetTextureImage(texName.data); // use defaut filename, rely on ogre path
       }
@@ -223,7 +225,20 @@ void AssimpLoader::BuildMesh(aiNode *node, Mesh *mesh)
         subMesh->AddTexCoord(aMesh->mTextureCoords[0][j].x, 
                              1.0-aMesh->mTextureCoords[0][j].y);
       else
-        subMesh->AddTexCoord(0,0);
+      {
+        // Auto-generate projected texture coordinates, projected from center of aabb
+        // @todo: implement globally for all meshes as an option, or move this to Material.cc
+        double x = p.x;
+        double y = p.y;
+        double z = p.z;
+        double r = std::max(0.000001,sqrt(x*x+y*y+z*z));
+        double s = std::min(1.0,std::max(-1.0,z/r));
+        double t = std::min(1.0,std::max(-1.0,y/r));
+        double u = acos(s) / M_PI;
+        double v = acos(t) / M_PI;
+        //std::cerr << "uv1 debug: " << u << "," << v << std::endl;
+        subMesh->AddTexCoord(u,v);
+      }
     }
 
     mesh->AddSubMesh(subMesh);
