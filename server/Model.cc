@@ -393,25 +393,9 @@ void Model::Init()
   // this updates the relativePose of the Model Entity
   // set model pointer of the canonical body so when body updates,
   // one can callback to the model
-  if (!this->bodies.empty())
-  {
-    Body* canonicalBody;
-    if (this->bodies.find(this->canonicalBodyNameP->GetValue()) != this->bodies.end())
-    {
-      canonicalBody = this->bodies[this->canonicalBodyNameP->GetValue()];
-      canonicalBody->SetCanonicalModel(this);
-      // std::cout << "model " << this->GetName()
-      //           << " canoncal body: " << canonicalBody->GetName() << std::endl;
-    }
-    else
-    {
-      //std::cout << "bad canonical body?" << std::endl;
-    }
-  }
-  else
-  {
-    //std::cout << "model " << this->GetName() << " has no bodies" << std::endl;
-  }
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    cb->SetCanonicalModel(this);
 
 }
 
@@ -524,27 +508,9 @@ void Model::OnPoseChange()
 
   /// \brief set the pose of the model, which is the pose of the canonical body
   // this updates the relativePose of the Model Entity
-  if (!this->bodies.empty())
-  {
-    Body* canonicalBody;
-    if (this->bodies.find(this->canonicalBodyNameP->GetValue()) != this->bodies.end())
-    {
-      canonicalBody = this->bodies[this->canonicalBodyNameP->GetValue()];
-      this->SetAbsPose(canonicalBody->GetAbsPose(),false); // do not recurse
-      // std::cout << " Model OnPoseChange " << this->GetName()
-      //           << " canoncal body: " << canonicalBody->GetName()
-      //           << " pose " << this->GetRelativePose() << std::endl;
-    }
-    else
-    {
-      //std::cout << " has no canonical body" << std::endl;
-    }
-  }
-  else
-  {
-    //std::cout << " Model " << this->GetName() << " OnPoseChange has no bodies" << std::endl;
-  }
-
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    this->SetAbsPose(cb->GetAbsPose(),false);
 
 }
 
@@ -703,36 +669,44 @@ void Model::SetAngularAccel( const Vector3 &accel )
 /// Get the linear velocity of the model
 Vector3 Model::GetLinearVel() const
 {
-  std::map<std::string, Body* >::const_iterator iter;
-  iter = this->bodies.begin();
-  return iter->second->GetLinearVel();
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetLinearVel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the model
 Vector3 Model::GetAngularVel() const
 {
-  std::map<std::string, Body* >::const_iterator iter;
-  iter = this->bodies.begin();
-  return iter->second->GetAngularVel();
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetAngularVel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the model
 Vector3 Model::GetLinearAccel() const
 {
-  std::map<std::string, Body* >::const_iterator iter;
-  iter = this->bodies.begin();
-  return iter->second->GetLinearAccel();
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetLinearAccel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the model
 Vector3 Model::GetAngularAccel() const
 {
-  std::map<std::string, Body* >::const_iterator iter;
-  iter = this->bodies.begin();
-  return iter->second->GetAngularAccel();
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetAngularAccel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1010,9 +984,17 @@ void Model::Attach(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the canonical body. Used for connected Model heirarchies
-Body *Model::GetCanonicalBody()
+Body * Model::GetCanonicalBody() const
 {
-  return this->bodies[this->canonicalBodyNameP->GetValue()];
+  if (!this->bodies.empty())
+  {
+    if (this->bodies.find(this->canonicalBodyNameP->GetValue()) != this->bodies.end())
+    {
+      return this->bodies.find(this->canonicalBodyNameP->GetValue())->second;
+    }
+  }
+
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1199,5 +1181,9 @@ void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 /// which is done in Model::OnPoseChange and during Model initialization
 Pose3d Model::GetAbsPose()
 {
-      return this->bodies[**this->canonicalBodyNameP]->GetAbsPose();
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetAbsPose();
+  else // GetCanonicalBody() returns NULL only if this->bodies is empty
+    return Pose3d();
 }

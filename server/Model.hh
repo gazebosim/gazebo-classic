@@ -180,7 +180,7 @@ namespace gazebo
   
     /// \brief Get the canonical body. Used for connected Model heirarchies
     /// \return Pointer to the body
-    public: Body *GetCanonicalBody();
+    public: Body *GetCanonicalBody() const;
 
     /// \brief Called when the pose of the entity (or one of its parents) has
     /// changed
