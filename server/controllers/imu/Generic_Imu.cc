@@ -31,7 +31,6 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "World.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Generic_Imu.hh"

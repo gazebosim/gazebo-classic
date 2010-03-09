@@ -1,4 +1,4 @@
-#include "gazebo.h"
+#include "gz.h"
 
 #include <iostream>
 

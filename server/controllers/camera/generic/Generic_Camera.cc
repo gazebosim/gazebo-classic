@@ -32,7 +32,6 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "MonoCameraSensor.hh"

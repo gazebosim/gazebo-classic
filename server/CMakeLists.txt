@@ -131,33 +131,34 @@ SET (headers Common.hh
 APPEND_TO_SERVER_HEADERS(${headers})
 APPEND_TO_SERVER_SOURCES(${sources})
 
-ADD_LIBRARY(gazebo_server SHARED ${gazeboserver_sources})
-SET_TARGET_PROPERTIES(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
+add_library(gazebo_server SHARED ${gazeboserver_sources})
+set_target_properties(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
 
-ADD_EXECUTABLE(gazebo-exec main.cc)
-SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
+add_executable(gazebo-exec main.cc)
+set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
 
 # Removes colon separated rpath. This breaks Ubuntu-intrepid 
 # (possibly gcc-4.3.2).
-SET_TARGET_PROPERTIES(gazebo-exec PROPERTIES SKIP_BUILD_RPATH TRUE)
+set_target_properties(gazebo-exec PROPERTIES SKIP_BUILD_RPATH TRUE)
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
 
-SET_SOURCE_FILES_PROPERTIES(${gazeboserver_sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
+set_source_files_properties(${gazeboserver_sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
 
-IF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  SET_SOURCE_FILES_PROPERTIES(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
+if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  set_source_files_properties(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-ENDIF (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-SET_TARGET_PROPERTIES( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 
+message (STATUS "GZ: ${bullet_lflags}")
 target_link_libraries( gazebo-exec ${libtool_library}
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
                                    ${assimp_libraries} 
-                                   gazebo_server
                                    ${freeimage_library} 
+                                   gazebo_server
                                    gazebo_rendering
                                    gazebo_av-shared
                                    gazebo_gui
@@ -169,16 +170,20 @@ target_link_libraries( gazebo-exec ${libtool_library}
 target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazebo gazebo_rendering gazebo_physics )
 
 if (INCLUDE_BULLET)
-  target_link_libraries(gazebo-exec gazebo_physics_bullet ${bullet_lflags})
-  target_link_libraries(gazebo_server gazebo_physics_bullet ${bullet_lflags})
+  #target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
+  #target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
+
+  #string (REPLACE " " ";" bullet_libraries_split "${bullet_lflags}")
+  target_link_libraries(gazebo_server "-L/home/nate/local/lib -lBulletCollision -lBulletDynamics -lBulletSoftBody" gazebo_physics_bullet )
+  target_link_libraries(gazebo-exec "-L/home/nate/local/lib -lBulletCollision -lBulletDynamics -lBulletSoftBody" gazebo_physics_bullet )
 endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
-  target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
   target_link_libraries(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
 endif (INCLUDE_ODE)
 
 
-install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)

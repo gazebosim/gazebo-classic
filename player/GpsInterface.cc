@@ -33,7 +33,7 @@
 #include <math.h>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gazebo.h"
+#include "gz.h"
 #include "GazeboDriver.hh"
 #include "GpsInterface.hh"
 

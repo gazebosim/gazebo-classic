@@ -28,7 +28,7 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Simulator.hh"
-#include "gazebo.h"
+#include "gz.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "OpenAL.hh"

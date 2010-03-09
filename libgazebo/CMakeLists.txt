@@ -6,7 +6,7 @@ SET (sources Server.cc
              Graphics3dIface.cc
 )
 
-SET (headers gazebo.h IfaceFactory.hh)
+SET (headers gz.h IfaceFactory.hh)
 
 INCLUDE_DIRECTORIES(
   ${boost_include_dirs}

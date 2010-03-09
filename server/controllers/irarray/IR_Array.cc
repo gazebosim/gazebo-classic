@@ -33,7 +33,6 @@
 #include "Model.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "IRSensor.hh"

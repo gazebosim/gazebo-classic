@@ -28,7 +28,6 @@
 #include "Timer.hh"
 #include "Model.hh"
 #include "Sensor.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "XMLConfig.hh"

@@ -31,7 +31,6 @@
 #include "Joint.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "PhysicsEngine.hh"
 #include "ControllerFactory.hh"

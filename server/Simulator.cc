@@ -40,7 +40,7 @@
 #include "XMLConfig.hh"
 #include "Gui.hh"
 #include "GazeboConfig.hh"
-#include "gazebo.h"
+#include "gz.h"
 #include "PhysicsEngine.hh"
 #include "OgreAdaptor.hh"
 #include "GazeboMessage.hh"

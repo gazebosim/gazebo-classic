@@ -40,7 +40,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "gazebo.h"
+#include "gz.h"
 
 using namespace gazebo;
 

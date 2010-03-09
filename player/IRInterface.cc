@@ -32,7 +32,7 @@ PLAYER_LASER_REQ_GET_GEOM
 #include <iostream>
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gazebo.h"
+#include "gz.h"
 #include "GazeboDriver.hh"
 #include "IRInterface.hh"
 

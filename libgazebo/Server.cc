@@ -40,7 +40,7 @@
 #include <iostream>
 #include <signal.h>
 
-#include "gazebo.h"
+#include "gz.h"
 
 using namespace gazebo;
 

@@ -1,16 +1,5 @@
-INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
-
-INCLUDE (${gazebo_cmake_dir}/FindOS.cmake)
-SET(FLTK_SKIP_FLUID TRUE)
-INCLUDE (FindFLTK)
-INCLUDE (FindPkgConfig)
-INCLUDE (${gazebo_cmake_dir}/FindOde.cmake)
-INCLUDE (${gazebo_cmake_dir}/FindFreeimage.cmake)
-
-#if (NOT FLTK_FOUND)
-#  BUILD_ERROR("FLTK libraries and development files not found. See the following website for installation instructions: http://fltk.org")
-#endif (NOT FLTK_FOUND)
-
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include (CheckCXXSourceCompiles)
 
 set (use_internal_assimp OFF CACHE BOOL "Use internal assimp" FORCE)
 
@@ -36,6 +25,21 @@ SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo execut
 
 set (FLTK_LIBRARIES "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
 set (FLTK_INCLUDE_DIR "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
+
+include (${gazebo_cmake_dir}/FindOS.cmake)
+include (FindPkgConfig)
+include (${gazebo_cmake_dir}/FindOde.cmake)
+include (${gazebo_cmake_dir}/FindFreeimage.cmake)
+
+
+set(FLTK_SKIP_FLUID TRUE)
+include (FindFLTK)
+if (FLTK_LIBRARIES AND FLTK_INCLUDE_DIR)
+  set (FLTK_FOUND ON BOOL FORCE)
+endif (FLTK_LIBRARIES AND FLTK_INCLUDE_DIR)
+if (NOT FLTK_FOUND)
+  BUILD_ERROR("FLTK libraries and development files not found. See the following website for installation instructions: http://fltk.org")
+endif (NOT FLTK_FOUND)
 
 
 ########################################
@@ -72,8 +76,8 @@ if (PKG_CONFIG_FOUND)
                           ${gazeboserver_link_libs_desc} 
                           ${ogre_rtshader_lib})
     add_definitions(-DUSE_RTSHADER_SYSTEM)
-    add_definitions(-DRTSHADER_SYSTEM_BUILD_CORE_SHADERS)
-    add_definitions(-DRTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+    #add_definitions(-DRTSHADER_SYSTEM_BUILD_CORE_SHADERS)
+    #add_definitions(-DRTSHADER_SYSTEM_BUILD_EXT_SHADERS)
   endif (ogre_rtshader_lib)
 
   endif (NOT OGRE_FOUND)
@@ -243,10 +247,6 @@ STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
 #STRING(STRIP ${boost_libraries} boost_libraries)
 STRING(REGEX REPLACE " " ";" boost_libraries "${boost_libraries}")
 
-MESSAGE (STATUS "Boost Include Path: ${boost_include_dirs}")
-MESSAGE (STATUS "Boost Library Path: ${boost_library_dirs}")
-MESSAGE (STATUS "Boost Libraries: ${boost_libraries}")
-
 ########################################
 # For Threadpool
 message (STATUS "Threadpool Include Path: ${threadpool_include_dirs}")
@@ -401,36 +401,78 @@ endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_librar
 # Find bullet
 if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
+
   find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
   
   if (NOT bullet_include_dir)
     #BUILD_ERROR("bullet not found. See the following website for installation instructions: http://bullet.sourceforge.net")
-    message (STATUS "Looking for btBulletDynamicsCommon.h - not found. Using built in version.")
+    message (STATUS "Looking for btBulletDynamicsCommon.h - not found.")
     set (bullet_include_dirs /usr/include CACHE STRING
       "bullet include paths. Use this to override automatic detection.")
   else (NOT bullet_include_dir)
     message (STATUS "Looking for btBulletDynamicsCommon.h - found")
-    set (assim_include_dirs ${bullet_include_dir} CACHE STRING
+    set (bullet_include_dirs ${bullet_include_dir} CACHE STRING
       "bullet include paths. Use this to override automatic detection.")
   endif (NOT bullet_include_dir)
   
-  find_library(bullet_library BulletDynamics ENV LD_LIBRARY_PATH)
+  find_library(bullet_math_library LinearMath ENV LD_LIBRARY_PATH)
+  find_library(bullet_collision_library BulletCollision ENV LD_LIBRARY_PATH)
+  find_library(bullet_softbody_library BulletSoftBody  ENV LD_LIBRARY_PATH)
+  find_library(bullet_dynamics_library BulletDynamics ENV LD_LIBRARY_PATH)
   
-  if (NOT bullet_library)
-    message (STATUS "Looking for libBulletDynamics - not found. Using builtin version.")
-    #BUILD_ERROR("libbullet not found. See the following website for installation instructions: http://bullet.sourceforge.net")
-  else (NOT bullet_library)
+  if (NOT bullet_dynamics_library)
+    message (STATUS "Looking for libBulletDynamics - not found.")
+  else (NOT bullet_dynamics_library)
     message (STATUS "Looking for libBulletDynamics - found")
-    APPEND_TO_CACHED_LIST(bullet_lflags
-                          "bullet libraries Use this to override automatic detection."
-                          ${bullet_library})
-  endif (NOT bullet_library)
- 
-  if (NOT bullet_include_dir OR NOT bullet_library)
-    message (STATUS "bullet not found")
-  endif (NOT bullet_include_dir OR NOT bullet_library)
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_dynamics_library})
+  endif (NOT bullet_dynamics_library)
 
+  if (NOT bullet_collision_library)
+    message (STATUS "Looking for libBulletCollision - not found.")
+  else (NOT bullet_collision_library)
+    message (STATUS "Looking for libBulletCollision - found")
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_collision_library})
+  endif (NOT bullet_collision_library)
+  
+  if (NOT bullet_math_library)
+    message (STATUS "Looking for libLinearMath - not found.")
+  else (NOT bullet_math_library)
+    message (STATUS "Looking for libLinearMath - found")
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_math_library})
+  endif (NOT bullet_math_library)
+
+  if (NOT bullet_softbody_library)
+    message (STATUS "Looking for libBulletSoftBody - not found.")
+  else (NOT bullet_softbody_library)
+    message (STATUS "Looking for libBulletSoftBody - found")
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_softbody_library})
+  endif (NOT bullet_softbody_library)
+
+  if (NOT bullet_include_dir OR NOT bullet_dynamics_library)
+    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
+  else (NOT bullet_include_dir OR NOT bullet_dynamics_library)
+    set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
+  endif (NOT bullet_include_dir OR NOT bullet_dynamics_library)
+
+else (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
+  set (INCLUDE_BULLET ON CACHE BOOL "Include Bullet" FORCE)
 endif (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
-set (INCLUDE_BULLET ON BOOL)
+# Check to make sure bullet was compiled with DOUBLE_PRECISION
+if (INCLUDE_BULLET)
+  set (check_bullet_code "#include <btBulletDynamicsCommon.h> 
+int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
+
+  set (CMAKE_REQUIRED_DEFINITIONS "-DBT_USE_DOUBLE_PRECISION")
+  set (CMAKE_REQUIRED_LIBRARIES BulletDynamics BulletCollision LinearMath)
+  CHECK_CXX_SOURCE_COMPILES ("${check_bullet_code}" BULLET_DOUBLE_PRECISION)
+  set (CMAKE_REQUIRED_LIBRARIES)
+  set (CMAKE_REQUIRED_DEFINITIONS)
+
+  if (NOT BULLET_DOUBLE_PRECISION)
+    BUILD_ERROR("bullet was not compiled to use double precision.")
+    set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)
+  endif (NOT BULLET_DOUBLE_PRECISION)
+endif (INCLUDE_BULLET)
+
 

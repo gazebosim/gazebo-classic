@@ -41,7 +41,7 @@
 #include <unistd.h>
 #include <sstream>
 
-#include "gazebo.h"
+#include "gz.h"
 
 using namespace gazebo;
 

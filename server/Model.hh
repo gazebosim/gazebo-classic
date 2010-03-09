@@ -38,8 +38,7 @@
 #include "Pose3d.hh"
 #include "Joint.hh"
 #include "Entity.hh"
-#include "gazebo.h"
-
+#include "gz.h"
 
 namespace boost
 {

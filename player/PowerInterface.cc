@@ -31,7 +31,7 @@
 
 #include <math.h>
 
-#include "gazebo.h"
+#include "gz.h"
 #include "GazeboDriver.hh"
 #include "PowerInterface.hh"
 

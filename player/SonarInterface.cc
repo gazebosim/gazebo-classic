@@ -36,7 +36,7 @@ PLAYER_SONAR_REQ_POWER
 
 #include <math.h>
 
-#include "gazebo.h"
+#include "gz.h"
 #include "GazeboDriver.hh"
 #include "SonarInterface.hh"
 

@@ -28,7 +28,6 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "World.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Simulator.hh"

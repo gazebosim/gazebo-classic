@@ -28,7 +28,6 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Simulator.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Steering_Position2d.hh"

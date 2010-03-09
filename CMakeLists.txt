@@ -89,12 +89,15 @@ if ( build_errors )
 else (build_errors)
   ########################################
   # Write the config.h file
-  CONFIGURE_FILE (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+  configure_file (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+
+  configure_file (${PROJECT_SOURCE_DIR}/gazebo.h.in ${PROJECT_BINARY_DIR}/gazebo.h)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazebo.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
   
   ########################################
   # Make the gazebo rc file
-  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
-  INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
+  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
   

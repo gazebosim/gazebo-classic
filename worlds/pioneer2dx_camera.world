@@ -44,9 +44,6 @@
 
   <rendering:ogre>
     <ambient>0.5 0.5 0.5 1.0</ambient>
-    <sky>
-      <material>Gazebo/CloudySky</material>
-    </sky>
   </rendering:ogre>
 
    <!-- Ground Plane -->

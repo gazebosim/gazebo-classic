@@ -27,7 +27,7 @@
 #ifndef GAZEBOCLIENT_HH
 #define GAZEBOCLIENT_HH
 
-#include "gazebo.h"
+#include "gz.h"
 
 namespace gazebo
 {

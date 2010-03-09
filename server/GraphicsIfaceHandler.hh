@@ -28,7 +28,7 @@
 #define GRAPHICS_HH
 
 #include <map>
-#include "gazebo.h"
+#include "gz.h"
 
 namespace gazebo
 {

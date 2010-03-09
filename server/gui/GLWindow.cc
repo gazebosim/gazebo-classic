@@ -255,9 +255,6 @@ void GLWindow::HandleMouseRelease()
     Entity *entity = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
                                                           this->mousePos);
 
-    Model *currModel = Simulator::Instance()->GetParentModel(
-        Simulator::Instance()->GetSelectedEntity());
-
     Model *model = Simulator::Instance()->GetParentModel(entity);
     Body *body = Simulator::Instance()->GetParentBody(entity);
 

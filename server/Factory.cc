@@ -29,9 +29,8 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "World.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
-#include "gazebo.h"
+#include "gz.h"
 #include "Factory.hh"
 
 using namespace gazebo;

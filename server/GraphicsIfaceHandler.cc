@@ -26,7 +26,6 @@
 
 #include <stdint.h>
 
-#include "gazebo.h"
 #include "World.hh"
 #include "Entity.hh"
 #include "GazeboError.hh"

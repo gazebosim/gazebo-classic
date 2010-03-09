@@ -33,6 +33,7 @@
 #include "OgreAdaptor.hh"
 #include "RTShaderSystem.hh"
 
+#define MINOR_VERSION 7
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +46,7 @@ RTShaderSystem::RTShaderSystem()
 /// Destructor
 RTShaderSystem::~RTShaderSystem()
 {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   // Restore default scheme.
   Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
@@ -54,7 +55,6 @@ RTShaderSystem::~RTShaderSystem()
   {
     Ogre::MaterialManager::getSingleton().removeListener(
         this->materialMgrListener);
-    delete this->materialMgrListener;
     this->materialMgrListener = NULL;
   }
 
@@ -71,7 +71,7 @@ RTShaderSystem::~RTShaderSystem()
 /// Init the run time shader system
 void RTShaderSystem::Init()
 {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   if (Ogre::RTShader::ShaderGenerator::initialize())
   {
     Ogre::StringVector groupVector;
@@ -80,7 +80,7 @@ void RTShaderSystem::Init()
     this->shaderGenerator->addSceneManager(OgreAdaptor::Instance()->sceneMgr);
  
     // Setup the core libraries and shader cache path 
-    groupVector =Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
+    groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
     Ogre::StringVector::iterator itGroup = groupVector.begin();
     Ogre::StringVector::iterator itGroupEnd = groupVector.end();
     Ogre::String shaderCoreLibsPath;
@@ -102,7 +102,7 @@ void RTShaderSystem::Init()
 
       for (; it != itEnd; ++it)
       {
-        if ((*it)->archive->getName().find("rtshaderlib") != Ogre::String::npos)
+        if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
         {
           shaderCoreLibsPath = (*it)->archive->getName() + "/";
           shaderCachePath = shaderCoreLibsPath;
@@ -139,7 +139,7 @@ void RTShaderSystem::Init()
 
     Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
 
-    schemRenderState->addSubRenderState(perPixelLightModel);
+    schemRenderState->addTemplateSubRenderState(perPixelLightModel);
 
     // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
     this->shaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -153,7 +153,7 @@ void RTShaderSystem::Init()
 // Set an Ogre::Entity to use RT shaders
 void RTShaderSystem::AttachEntity(OgreVisual *vis)
 {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   this->GenerateShaders(vis);
   this->entities.push_back(vis);
 #endif
@@ -163,7 +163,7 @@ void RTShaderSystem::AttachEntity(OgreVisual *vis)
 // Remove and entity
 void RTShaderSystem::DetachEntity(OgreVisual *vis)
 {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   this->entities.remove(vis);
 #endif
 }
@@ -172,7 +172,7 @@ void RTShaderSystem::DetachEntity(OgreVisual *vis)
 /// Update the shaders
 void RTShaderSystem::UpdateShaders()
 {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   std::list<OgreVisual*>::iterator iter;
 
   // Update all the shaders
@@ -185,7 +185,7 @@ void RTShaderSystem::UpdateShaders()
 /// Generate shaders for an entity
 void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
 
   for (unsigned int k=0; k < vis->sceneNode->numAttachedObjects(); k++)
   {
@@ -201,9 +201,11 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
       bool success;
 
       // Create the shader based technique of this material.
-      success = this->shaderGenerator->createShaderBasedTechnique(curMaterialName,
+      success = this->shaderGenerator->createShaderBasedTechnique(
+          curMaterialName,
           Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
           Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
 
       // Setup custom shader sub render states according to current setup.
       if (success)
@@ -226,7 +228,7 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
         {
           Ogre::RTShader::SubRenderState* perPerVertexLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::FFPLighting::Type);
 
-          renderState->addSubRenderState(perPerVertexLightModel);
+          renderState->addTemplateSubRenderState(perPerVertexLightModel);
         }
 #endif
 
@@ -235,29 +237,27 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
         {
           Ogre::RTShader::SubRenderState* perPixelLightModel = this->shaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
 
-          renderState->addSubRenderState(perPixelLightModel);
+          renderState->addTemplateSubRenderState(perPixelLightModel);
         }
 
         else if (vis->GetShader() == "normal_map_objectspace")
         {
           Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
           Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
-          Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
 
           normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_OBJECT);
-          rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String(vis->GetNormalMap())));
-          renderState->addSubRenderState(normalMapSubRS);
+          normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
+          renderState->addTemplateSubRenderState(normalMapSubRS);
         }
         else if (vis->GetShader() == "normal_map_tangetspace")
         {
           Ogre::RTShader::SubRenderState* subRenderState = this->shaderGenerator->createSubRenderState(Ogre::RTShader::NormalMapLighting::Type);
           Ogre::RTShader::NormalMapLighting* normalMapSubRS = static_cast<Ogre::RTShader::NormalMapLighting*>(subRenderState);
-          Ogre::UserObjectBindings* rtssBindings = Ogre::any_cast<Ogre::UserObjectBindings*>(curPass->getUserObjectBindings().getUserAny(Ogre::RTShader::ShaderGenerator::BINDING_OBJECT_KEY));
 
           normalMapSubRS->setNormalMapSpace(Ogre::RTShader::NormalMapLighting::NMS_TANGENT);
-          rtssBindings->setUserAny(Ogre::RTShader::NormalMapLighting::NormalMapTextureNameKey, Ogre::Any(Ogre::String(vis->GetNormalMap())));
+          normalMapSubRS->setNormalMapTextureName(vis->GetNormalMap());
 
-          renderState->addSubRenderState(normalMapSubRS);
+          renderState->addTemplateSubRenderState(normalMapSubRS);
         }
 #endif
 
@@ -265,7 +265,6 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 
       // Invalidate this material in order to re-generate its shaders.
       this->shaderGenerator->invalidateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName);
-
 
     }
   }

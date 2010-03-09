@@ -41,7 +41,7 @@
 #include "Model.hh"
 #include "SensorManager.hh"
 #include "Simulator.hh"
-#include "gazebo.h"
+#include "gz.h"
 #include "World.hh"
 
 #include "OpenAL.hh"

@@ -28,7 +28,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "gazebo.h"
+#include "gz.h"
 #include "IfaceFactory.hh"
 
 using namespace gazebo;

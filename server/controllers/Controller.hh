@@ -31,6 +31,7 @@
 #include <vector>
 
 #include "Param.hh"
+#include "gz.h"
 
 namespace gazebo
 {

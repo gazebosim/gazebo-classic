@@ -31,7 +31,6 @@
 
 #include "Sensor.hh"
 #include "Body.hh"
-#include <gazebo.h>
 
 namespace gazebo
 {

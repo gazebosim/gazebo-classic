@@ -36,7 +36,6 @@
 #include "Model.hh"
 #include "Joint.hh"
 #include "World.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Pioneer2_Gripper.hh"

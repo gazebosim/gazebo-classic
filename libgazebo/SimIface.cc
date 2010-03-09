@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#include "gazebo.h"
+#include "gz.h"
 
 using namespace gazebo;
 

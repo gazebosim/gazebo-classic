@@ -67,61 +67,6 @@
     </body:sphere>
   </model:physical>
 
-  <model:physical name="box1_model">
-    <xyz>1 1.5 0.25</xyz>
-    <canonicalBody>box1_body</canonicalBody>
-    <static>false</static>
-
-    <body:box name="box1_body">
-      <geom:box name="box1_geom1">
-        <size>0.5 0.5 0.5</size>
-        <mass>0.1</mass>
-
-        <visual>
-          <size>0.5 0.5 0.5</size>
-          <mesh>unit_box</mesh>
-          <material>Gazebo/Rocky</material>
-        </visual>
-      </geom:box>
-    </body:box>
-  </model:physical>
-
-  <model:physical name="cylinder1_model">
-    <xyz>1 -1.5 0.5</xyz>
-    <rpy>0.0 0.0 0.0</rpy>
-
-    <body:cylinder name="cylinder1_body">
-      <geom:cylinder name="cylinder1_geom">
-        <size>0.5 1</size>
-        <mass>1.0</mass>
-        <mu1>1000.0</mu1>
-
-        <visual>
-          <mesh>unit_cylinder</mesh>
-          <material>Gazebo/RustyBarrel</material>
-        </visual>
-      </geom:cylinder>
-    </body:cylinder>
-  </model:physical>
-
-  <model:physical name="cone1_model">
-    <xyz>1 -3.5 0.5</xyz>
-    <rpy>0.0 0.0 0.0</rpy>
-
-    <body:cone name="cone_body">
-      <geom:cylinder name="cylinder_geom">
-        <size>0.5 1</size>
-        <mass>1.0</mass>
-        <mu1>1000.0</mu1>
-
-        <visual>
-          <mesh>unit_cone</mesh>
-          <material>Gazebo/RustyBarrel</material>
-        </visual>
-      </geom:cylinder>
-    </body:cone>
-  </model:physical>
-
    <!-- Ground Plane -->
    <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>

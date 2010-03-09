@@ -29,7 +29,7 @@
 
 #include "Controller.hh"
 #include "Entity.hh"
-#include "gazebo.h"
+#include "gz.h"
 
 
 namespace gazebo

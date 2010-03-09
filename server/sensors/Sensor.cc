@@ -25,7 +25,6 @@
 
 #include "Timer.hh"
 #include "Controller.hh"
-#include "gazebo.h"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "Body.hh"

@@ -29,7 +29,7 @@
 
 #include "GazeboError.hh"
 #include "Entity.hh"
-#include "gazebo.h"
+#include "gz.h"
 #include "Controller.hh"
 #include "ControllerFactory.hh"
 

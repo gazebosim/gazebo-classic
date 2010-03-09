@@ -30,7 +30,6 @@
 #include "HingeJoint.hh"
 #include "Hinge2Joint.hh"
 #include "World.hh"
-#include "gazebo.h"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Steering_Position2d.hh"
