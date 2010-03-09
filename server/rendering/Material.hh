@@ -30,6 +30,9 @@ namespace gazebo
     /// \brief Set a texture image
     public: void SetTextureImage(const std::string tex);
 
+    /// \brief Set a texture image
+    public: void SetTextureImage(const std::string tex,const std::string resource_path);
+
     /// \brief Get a thie texture image
     public: std::string GetTextureImage() const;
 

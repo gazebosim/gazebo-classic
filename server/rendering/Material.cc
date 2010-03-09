@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "Material.hh"
+#include <Ogre.h>
 
 using namespace gazebo;
 
@@ -44,6 +45,14 @@ std::string Material::GetName() const
 // Set a texture image
 void Material::SetTextureImage(const std::string tex)
 {
+  this->texImage = tex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set a texture image with resource_path
+void Material::SetTextureImage(const std::string tex,const std::string resource_path)
+{
+  Ogre::ResourceGroupManager::getSingleton().addResourceLocation( resource_path, "FileSystem", "General");
   this->texImage = tex;
 }
 
