@@ -152,7 +152,6 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 
-message (STATUS "GZ: ${bullet_lflags}")
 target_link_libraries( gazebo-exec ${libtool_library}
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
