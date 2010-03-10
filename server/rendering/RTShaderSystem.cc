@@ -25,6 +25,7 @@
  */
 
 #include <boost/bind.hpp>
+#include <sys/stat.h>
 
 #include "OgreVisual.hh"
 #include "World.hh"
@@ -102,12 +103,16 @@ void RTShaderSystem::Init()
 
       for (; it != itEnd; ++it)
       {
-        if ((*it)->archive->getName().find("rtshaderlib") != Ogre::String::npos)
+        struct stat st;
+        if (stat((*it)->archive->getName().c_str(), &st) == 0)
         {
-          shaderCoreLibsPath = (*it)->archive->getName() + "/";
-          shaderCachePath = shaderCoreLibsPath;
-          coreLibsFound = true;
-          break;
+          if ((*it)->archive->getName().find("rtshaderlib") != Ogre::String::npos)
+          {
+            shaderCoreLibsPath = (*it)->archive->getName() + "/";
+            shaderCachePath = shaderCoreLibsPath;
+            coreLibsFound = true;
+            break;
+          }
         }
       }
 
