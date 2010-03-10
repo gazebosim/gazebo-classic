@@ -173,8 +173,8 @@ if (INCLUDE_BULLET)
   #target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
 
   #string (REPLACE " " ";" bullet_libraries_split "${bullet_lflags}")
-  target_link_libraries(gazebo_server "-L/home/nate/local/lib -lBulletCollision -lBulletDynamics -lBulletSoftBody" gazebo_physics_bullet )
-  target_link_libraries(gazebo-exec "-L/home/nate/local/lib -lBulletCollision -lBulletDynamics -lBulletSoftBody" gazebo_physics_bullet )
+  target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
+  target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
 endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
