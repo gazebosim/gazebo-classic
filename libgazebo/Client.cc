@@ -39,6 +39,7 @@
 #include <sys/sem.h>
 #include <sstream>
 #include <iostream>
+#include <signal.h>
 
 #include "gz.h"
 
@@ -84,7 +85,6 @@ void Client::Connect(int serverId)
 void Client::ConnectWait(int serverId, int clientId)
 {
   bool simulationIfaceIsValid = false;
-  gazebo::SimulationIface simulationIface;
 
   while (!simulationIfaceIsValid)
   {
@@ -113,6 +113,11 @@ void Client::ConnectWait(int serverId, int clientId)
       }
     }
 
+    // this is essentially the same check in Server.cc that looks
+    // for running gazebo with the given pid
+    // but we might catch gazebo in a booting-up state where
+    // the interfaces ae not setup quite yet completely
+    // Iface fail to work correctly
     char *tmpdir;
     char *user;
     // Get the tmp dir
@@ -127,57 +132,47 @@ void Client::ConnectWait(int serverId, int clientId)
 
     // Figure out the directory name
     stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
-
     this->filename = stream.str();
 
-    //std::cout << "opening " << this->filename << "\n";
-
-    // Connect to gazebo::SimulationIface and check for changing realTime,
-    // if simulationIface->data->realTime is not changing, the server might
-    // be stale leftovers from previous gazebo crash,
-    // disconnect and reconnect client
-    try
+    // check to see if there is already a directory created.
+    struct stat astat;
+    if (stat(this->filename.c_str(), &astat) == 0) 
     {
-      simulationIface.Open(this,"default");
-      // check realTime for updates
-      simulationIface.Lock(1);
-      double simTime0 = simulationIface.data->realTime;
-      simulationIface.Unlock();
-      double simTime1 = simTime0;
+      // directory already exists, check gazebo.pid to see if 
+      // another gazebo is already running.
 
-      struct timeval tv;
-      gettimeofday(&tv, NULL);
-      double start_time = tv.tv_sec + tv.tv_usec * 1e-6;
-      double current_time = start_time;
-      const double timeout = 1; // timeout, disconnect and reconnect client
-      while(current_time - start_time < timeout)
+      std::string pidfn = this->filename + "/gazebo.pid";
+
+      FILE *fp = fopen(pidfn.c_str(), "r");
+      if(fp) 
       {
-        usleep(200000);
-        simulationIface.Lock(1);
-        simTime1 = simulationIface.data->realTime;
-        simulationIface.Unlock();
-        if (simTime1 != simTime0)
+        int pid = 0;
+        int result = fscanf(fp, "%d", &pid);
+        fclose(fp);
+        
+        if (pid != 0)
         {
-          simulationIfaceIsValid = true;
-          break;
+          if(kill(pid, 0) == 0) 
+          {
+            // a gazebo process is still alive.
+            simulationIfaceIsValid = true;
+            // it might however, still being booted up, so we need to check somehow
+            // or is it?
+          } 
+          else 
+          {
+            // the gazebo process is not alive. wait
+            usleep(1000);
+          }
         }
-        //std::cout << "realTime has not changed, retrying SimulationIface->data->realTime:" << simTime1 << " : " << simTime0 << std::endl;
-        gettimeofday(&tv, NULL);
-        current_time = tv.tv_sec + tv.tv_usec * 1e-6;
       }
-      if (!simulationIfaceIsValid)
-      {
+    }
+
+    if (!simulationIfaceIsValid)
         this->Disconnect();
-      }
-    }
-    catch (std::string e)
-    {
-      stream << "Error Opening SimulationIface [" << e << "]\n";
-      throw(stream.str());
-    }
+    //std::cout << "opening " << this->filename << "\n";
   }
 
-  simulationIface.Close();
 }
 
 
