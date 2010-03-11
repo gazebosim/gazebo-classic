@@ -51,6 +51,9 @@ Factory::Factory()
   try
   {
     this->factoryIface->Create(World::Instance()->GetGzServer(), "default");
+    this->factoryIface->Lock(1); // lock it right away to clear up data
+    strcpy((char*)this->factoryIface->data->newModel,"");
+    this->factoryIface->Unlock();
   }
   catch (std::string e)
   {
@@ -76,8 +79,6 @@ Factory::~Factory()
 // Initialize the controller
 void Factory::Init()
 {
-  // initialize newModel to blank
-  strcpy((char*)this->factoryIface->data->newModel,"");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
