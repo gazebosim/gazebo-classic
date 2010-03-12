@@ -129,6 +129,7 @@ void OgreCreator::DeleteLight(Light *light)
   {
     if (*iter == light)
     {
+      delete *iter;
       this->lights.erase(iter);
       break;
     }

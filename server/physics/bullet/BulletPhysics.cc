@@ -86,7 +86,9 @@ BulletPhysics::~BulletPhysics()
   delete this->collisionConfig;
   delete this->dispatcher;
   delete this->solver;
-  delete this->dynamicsWorld;
+
+  // TODO: Fix this line
+  //delete this->dynamicsWorld;
 
   this->broadPhase = NULL;
   this->collisionConfig = NULL;

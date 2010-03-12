@@ -102,6 +102,11 @@ Model::~Model()
   JointContainer::iterator jiter;
   std::map< std::string, Controller* >::iterator citer;
 
+  if (this->light)
+  {
+    OgreCreator::Instance()->DeleteLight(this->light);
+  }
+
   if (this->graphicsHandler)
   {
     delete this->graphicsHandler;
@@ -146,8 +151,6 @@ Model::~Model()
     this->myBodyNameP = NULL;
   }
 
-  if (this->light)
-    OgreCreator::Instance()->DeleteLight(this->light);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

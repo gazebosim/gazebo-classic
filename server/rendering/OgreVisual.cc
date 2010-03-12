@@ -151,6 +151,7 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 /// Destructor
 OgreVisual::~OgreVisual()
 {
+
   delete this->mutex;
   delete this->xyzP;
   delete this->rpyP;
@@ -172,9 +173,13 @@ OgreVisual::~OgreVisual()
   RTShaderSystem::Instance()->DetachEntity(this);
 
   if (this->sceneNode)
+  {
     OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);
+  }
   if (this->boundingBoxNode)
+  {
     OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->boundingBoxNode);
+  }
 
 }
 

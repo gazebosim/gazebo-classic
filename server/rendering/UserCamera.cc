@@ -67,7 +67,7 @@ UserCamera::~UserCamera()
 {
   if (this->visual)
   {
-    OgreCreator::Instance()->DeleteVisual( this->visual );
+    delete this->visual;
     this->visual = NULL;
   }
 }

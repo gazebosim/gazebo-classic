@@ -34,7 +34,7 @@ Mesh *AssimpLoader::Load(const std::string &filename)
 
   if (!scene)
   {
-    std::cout << "Importer Error:" << this->importer.GetErrorString();
+    gzerr(0) << "Importer Error:" << this->importer.GetErrorString();
     gzthrow("Unable to import mesh file[" << filename << "] using assimp");
   }
 

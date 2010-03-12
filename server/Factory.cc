@@ -90,7 +90,6 @@ void Factory::Update()
 
   if (strcmp((const char*)this->factoryIface->data->newModel,"")!=0)
   {
-    //std::cout << " factory update: " << this->factoryIface->data->newModel << std::endl;
     std::string xmlString;
     std::string xmlMiddle = (const char*)(this->factoryIface->data->newModel);
     

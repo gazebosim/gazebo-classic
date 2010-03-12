@@ -92,6 +92,7 @@ Body::Body(Entity *parent)
   this->iyzP = new ParamT<double>("iyz",0.0,0);
 
   Param::End();
+
 }
 
 
@@ -112,6 +113,7 @@ Body::~Body()
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     SensorManager::Instance()->RemoveSensor(*siter);
+
 
   if (this->cgVisual)
   {
@@ -136,6 +138,10 @@ Body::~Body()
   delete this->ixyP;
   delete this->ixzP;
   delete this->iyzP;
+
+  if (this->comEntity)
+    delete this->comEntity;
+  this->comEntity = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,8 +27,8 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "World.hh"
-#include "OgreDynamicLines.hh"
 #include "OgreVisual.hh"
+#include "OgreDynamicLines.hh"
 #include "OgreCreator.hh"
 #include "Material.hh"
 #include "Shape.hh"
