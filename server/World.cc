@@ -1375,6 +1375,9 @@ void World::UpdateSimulationIface()
 
   this->simIface->Unlock();
 
+  // lock so models is not used
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
+
   // Remove and delete all models that are marked for deletion
   std::vector< Model* >::iterator miter;
   for (miter=this->toDeleteModels.begin();
