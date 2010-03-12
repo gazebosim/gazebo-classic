@@ -285,8 +285,10 @@ void OgreCamera::Render()
   Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
   if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
-
-    this->renderTarget->update();
+    {
+      boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
+      this->renderTarget->update();
+    }
 
     if (this->captureData)
     {
