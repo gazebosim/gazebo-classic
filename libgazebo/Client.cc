@@ -85,6 +85,7 @@ void Client::Connect(int serverId)
 void Client::ConnectWait(int serverId, int clientId)
 {
   bool simulationIfaceIsValid = false;
+  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
 
   while (!simulationIfaceIsValid)
   {
@@ -155,9 +156,36 @@ void Client::ConnectWait(int serverId, int clientId)
           if(kill(pid, 0) == 0) 
           {
             // a gazebo process is still alive.
-            simulationIfaceIsValid = true;
-            // it might however, still being booted up, so we need to check somehow
-            // or is it?
+            // it might however, still being booted up, so we need to check by connecting
+            // Connect to gazebo::SimulationIface and check for changing realTime,
+            // if simulationIface->data->realTime is not changing, the server might
+            // be stale leftovers from previous gazebo crash,
+            // disconnect and reconnect client
+            try
+            {
+              // Open the Simulation Interface
+              gazebo::SimulationIface simulationIface;
+              simulationIface.Open(this,"default");
+              // grab a t0
+              simulationIface.Lock(1);
+              double simTime0 = simulationIface.data->realTime;
+              simulationIface.Unlock();
+              // now check and wait for sim time to change
+              usleep(10000);
+              simulationIface.Lock(1);
+              double simTime1 = simulationIface.data->realTime;
+              simulationIface.Unlock();
+              if (simTime0 != simTime1)  // simTime changed, wait is over
+                simulationIfaceIsValid = true;
+              simulationIface.Close();
+
+            }
+            catch (std::string e)
+            {
+              //std::cout << "Gazebo error: Unable to connect to the sim interface\n" << e << "\n";
+            }
+
+
           } 
           else 
           {
