@@ -761,102 +761,104 @@ void OgreCamera::ShowWireframe(bool s)
 /// post process, convert from rgb to bayer
 void OgreCamera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height)
 {
-  // do last minute conversion if Bayer pattern is requested, go from R8G8B8
-  if (format == "BAYER_RGGB8")
+  if (src)
   {
-    for (int i=0;i<width;i++)
+    // do last minute conversion if Bayer pattern is requested, go from R8G8B8
+    if (format == "BAYER_RGGB8")
     {
-      for (int j=0;j<height;j++)
+      for (int i=0;i<width;i++)
       {
-        //
-        // RG
-        // GB
-        //
-        // determine position
-        if (j%2) // even column
-          if (i%2) // even row, red
-            dst[i+j*width] = src[i*3+j*width*3+0];
-          else // odd row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-        else // odd column
-          if (i%2) // even row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-          else // odd row, blue
-            dst[i+j*width] = src[i*3+j*width*3+2];
+        for (int j=0;j<height;j++)
+        {
+          //
+          // RG
+          // GB
+          //
+          // determine position
+          if (j%2) // even column
+            if (i%2) // even row, red
+              dst[i+j*width] = src[i*3+j*width*3+0];
+            else // odd row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+          else // odd column
+            if (i%2) // even row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+            else // odd row, blue
+              dst[i+j*width] = src[i*3+j*width*3+2];
+        }
+      }
+    }
+    else if (format == "BAYER_BGGR8")
+    {
+      for (int i=0;i<width;i++)
+      {
+        for (int j=0;j<height;j++)
+        {
+          //
+          // BG
+          // GR
+          //
+          // determine position
+          if (j%2) // even column
+            if (i%2) // even row, blue
+              dst[i+j*width] = src[i*3+j*width*3+2];
+            else // odd row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+          else // odd column
+            if (i%2) // even row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+            else // odd row, red
+              dst[i+j*width] = src[i*3+j*width*3+0];
+        }
+      }
+    }
+    else if (format == "BAYER_GBRG8")
+    {
+      for (int i=0;i<width;i++)
+      {
+        for (int j=0;j<height;j++)
+        {
+          //
+          // GB
+          // RG
+          //
+          // determine position
+          if (j%2) // even column
+            if (i%2) // even row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+            else // odd row, blue
+              dst[i+j*width] = src[i*3+j*width*3+2];
+          else // odd column
+            if (i%2) // even row, red
+              dst[i+j*width] = src[i*3+j*width*3+0];
+            else // odd row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+        }
+      }
+    }
+    else if (format == "BAYER_GRBG8")
+    {
+      for (int i=0;i<width;i++)
+      {
+        for (int j=0;j<height;j++)
+        {
+          //
+          // GR
+          // BG
+          //
+          // determine position
+          if (j%2) // even column
+            if (i%2) // even row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+            else // odd row, red
+              dst[i+j*width] = src[i*3+j*width*3+0];
+          else // odd column
+            if (i%2) // even row, blue
+              dst[i+j*width] = src[i*3+j*width*3+2];
+            else // odd row, green
+              dst[i+j*width] = src[i*3+j*width*3+1];
+        }
       }
     }
   }
-  else if (format == "BAYER_BGGR8")
-  {
-    for (int i=0;i<width;i++)
-    {
-      for (int j=0;j<height;j++)
-      {
-        //
-        // BG
-        // GR
-        //
-        // determine position
-        if (j%2) // even column
-          if (i%2) // even row, blue
-            dst[i+j*width] = src[i*3+j*width*3+2];
-          else // odd row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-        else // odd column
-          if (i%2) // even row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-          else // odd row, red
-            dst[i+j*width] = src[i*3+j*width*3+0];
-      }
-    }
-  }
-  else if (format == "BAYER_GBRG8")
-  {
-    for (int i=0;i<width;i++)
-    {
-      for (int j=0;j<height;j++)
-      {
-        //
-        // GB
-        // RG
-        //
-        // determine position
-        if (j%2) // even column
-          if (i%2) // even row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-          else // odd row, blue
-            dst[i+j*width] = src[i*3+j*width*3+2];
-        else // odd column
-          if (i%2) // even row, red
-            dst[i+j*width] = src[i*3+j*width*3+0];
-          else // odd row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-      }
-    }
-  }
-  else if (format == "BAYER_GRBG8")
-  {
-    for (int i=0;i<width;i++)
-    {
-      for (int j=0;j<height;j++)
-      {
-        //
-        // GR
-        // BG
-        //
-        // determine position
-        if (j%2) // even column
-          if (i%2) // even row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-          else // odd row, red
-            dst[i+j*width] = src[i*3+j*width*3+0];
-        else // odd column
-          if (i%2) // even row, blue
-            dst[i+j*width] = src[i*3+j*width*3+2];
-          else // odd row, green
-            dst[i+j*width] = src[i*3+j*width*3+1];
-      }
-    }
-  }
-
 }
