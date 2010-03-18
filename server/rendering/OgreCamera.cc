@@ -89,6 +89,10 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->renderingEnabled = true;
 
   World::Instance()->ConnectShowWireframeSignal( boost::bind(&OgreCamera::ShowWireframe, this, _1) );
+
+  this->pitchNode = NULL;
+  this->sceneNode = NULL;
+  this->origParentNode = NULL;
 }
 
 
