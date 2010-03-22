@@ -279,7 +279,6 @@ int main(int argc, char **argv)
     gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
     gazebo::Simulator::Instance()->SetTimeout(optTimeout);
     gazebo::Simulator::Instance()->SetPhysicsEnabled(optPhysicsEnabled);
-    gazebo::Simulator::Instance()->SetPaused(optPaused);
   }
   catch (gazebo::GazeboError e)
   {
@@ -293,6 +292,7 @@ int main(int argc, char **argv)
   try
   {
     gazebo::Simulator::Instance()->Init();
+    gazebo::Simulator::Instance()->SetPaused(optPaused);
   }
   catch (gazebo::GazeboError e)
   {

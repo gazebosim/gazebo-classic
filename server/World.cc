@@ -209,7 +209,9 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
       gzthrow("Unable to create physics engine\n");
   }
 
-  this->LoadEntities(rootNode, NULL, false);
+  // last bool is initModel, init model is not needed as Init()
+  // is called separately from main.cc
+  this->LoadEntities(rootNode, NULL, false, false);
 
   /*std::vector<Model*>::iterator miter;
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
@@ -441,7 +443,7 @@ PhysicsEngine *World::GetPhysicsEngine() const
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate)
+void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate, bool initModel)
 {
   XMLConfigNode *cnode;
   Model *model = NULL;
@@ -451,7 +453,7 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
     // Check for model nodes
     if (node->GetNSPrefix() == "model")
     {
-      model = this->LoadModel(node, parent, removeDuplicate);
+      model = this->LoadModel(node, parent, removeDuplicate, initModel);
       this->addEntitySignal(model);
     }
   }
@@ -459,7 +461,7 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
   // Load children
   for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
   {
-    this->LoadEntities( cnode, model, removeDuplicate );
+    this->LoadEntities( cnode, model, removeDuplicate, initModel);
   }
 
 }
@@ -501,7 +503,8 @@ void World::ProcessEntitiesToLoad()
         continue;
       }
 
-      this->LoadEntities( xmlConfig->GetRootNode(), NULL, true); 
+      // last bool is initModel, yes, init model after loading it
+      this->LoadEntities( xmlConfig->GetRootNode(), NULL, true, true); 
       delete xmlConfig;
     }
     this->toLoadEntities.clear();
@@ -554,7 +557,7 @@ void World::DeleteEntity(const char *name)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a model
-Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate)
+Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate, bool initModel)
 {
   Pose3d pose;
   Model *model = new Model(parent);
@@ -569,8 +572,14 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
   // Add the model to our list
   this->models.push_back(model);
 
-  if (Simulator::Instance()->GetSimTime() > 0)
-    model->Init();
+  // If calling LoadEntity()->LoadModel()from Simulator::Load()->World::Load()
+  // GetWorldInitialized() is false, in this case, model->Init() is
+  // called later directly from main.cc through Simulator::Init()
+  // on the other hand
+  // LoadEntity()->LoadModel() is also called from ProcessEntitesToLoad(),
+  // in this case, GetWorldInitialized should return true, and we want
+  // to call model->Init() here
+  if (initModel) model->Init();
 
   if (parent != NULL)
     model->Attach(node->GetChild("attach"));

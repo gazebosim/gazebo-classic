@@ -138,7 +138,7 @@ class World : public SingletonT<World>
   /// \param parent Parent of the model to load
   /// \param removeDuplicate Remove existing model of same name
   public: void LoadEntities(XMLConfigNode *node, Model *parent, 
-                            bool removeDuplicate);
+                            bool removeDuplicate,bool initModel);
 
   /// \brief Insert an entity into the world. This function pushes the model
   //  (encoded as an XML string) onto a list. The Graphics Thread will then
@@ -252,7 +252,7 @@ class World : public SingletonT<World>
   /// \param parent The parent model
   /// \param removeDuplicate Remove existing model of same name
   /// \return The model that was created
-  private: Model *LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate);
+  private: Model *LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate,bool initModel);
 
   /// \brief Set the model pose and the pose of it's attached children 
   /// \param model The model to set
