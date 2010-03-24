@@ -160,26 +160,28 @@ OgreVisual::~OgreVisual()
   delete this->materialNameP;
   delete this->castShadowsP;
 
-  // Having this chunk of code causes a segfault when closing the
-  // application.
-  /*if (this->parentNode && this->sceneNode)
-  {
-   this->parentNode->removeChild( this->sceneNode );
-  }
-
-  this->sceneNode->removeAndDestroyAllChildren();
-  */
-
   RTShaderSystem::Instance()->DetachEntity(this);
 
-  if (this->sceneNode)
+  // Having this chunk of code causes a segfault when closing the
+  // application.
+  if (this->parentNode != NULL)
   {
-    OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);
+    if (this->sceneNode != NULL)
+    {
+      if (this->boundingBoxNode != NULL)
+      {
+        this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
+      }
+      this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
+    }
   }
-  if (this->boundingBoxNode)
-  {
-    OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->boundingBoxNode);
-  }
+
+  //is below equivalent?
+  //this->sceneNode->removeAndDestroyAllChildren();
+  //if (this->sceneNode)
+  //  OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);
+  //if (this->boundingBoxNode)
+  //  OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->boundingBoxNode);
 
 }
 
