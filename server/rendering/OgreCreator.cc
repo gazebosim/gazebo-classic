@@ -689,6 +689,8 @@ void OgreCreator::Update()
     {
       if (viter->second)
       {
+        // lock in case the visual is being dynamically destroyed
+        boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
         if (!viter->second->IsDirty())
           continue;
         viter->second->SetToDirtyPose();
