@@ -19,7 +19,7 @@
   <verbosity>5</verbosity>
 
   <physics:ode>
-    <stepTime>0.03</stepTime>
+    <stepTime>0.01</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-5</cfm>
     <erp>0.3</erp>
@@ -68,9 +68,19 @@
     <rpy>0.0 0.0 0.0</rpy>
 
     <body:cylinder name="cylinder1_body">
+      <massMatrix>true</massMatrix> 
+      <mass>1.0</mass>
+      <ixx>0.01</ixx>
+      <ixy>0.00</ixy>
+      <ixz>0.00</ixz>
+      <iyy>0.01</iyy>
+      <iyz>0.00</iyz>
+      <izz>0.01</izz>
+      <cx>0.0</cx>
+      <cy>0.0</cy>
+      <cz>0.0</cz>
       <geom:cylinder name="cylinder1_geom">
         <size>0.5 1</size>
-        <mass>1.0</mass>
         <visual>
           <mesh>unit_cylinder</mesh>
           <material>Gazebo/RustyBarrel</material>

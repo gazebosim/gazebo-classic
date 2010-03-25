@@ -19,11 +19,21 @@
     <xyz>0.0 0.0 0.0</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
+    <massMatrix>true</massMatrix> 
+    <mass>0.1</mass>
+    <ixx>0.01</ixx>
+    <ixy>0.00</ixy>
+    <ixz>0.00</ixz>
+    <iyy>0.01</iyy>
+    <iyz>0.00</iyz>
+    <izz>0.01</izz>
+    <cx>0.0</cx>
+    <cy>0.0</cy>
+    <cz>0.0</cz>
     <geom:box name="camera_bottom_geom">
       <xyz>0.0 0.0 0.02</xyz>
       <rpy>0 0 90</rpy>
       <size>0.15 0.14 0.04</size>
-      <mass>0.1</mass>
 
       <visual>
         <rpy>0 0 -90</rpy>
@@ -38,11 +48,21 @@
     <xyz>0.0 0.0 0.04</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
+    <massMatrix>true</massMatrix> 
+    <mass>0.01</mass>
+    <ixx>0.001</ixx>
+    <ixy>0.00</ixy>
+    <ixz>0.00</ixz>
+    <iyy>0.001</iyy>
+    <iyz>0.00</iyz>
+    <izz>0.001</izz>
+    <cx>0.0</cx>
+    <cy>0.0</cy>
+    <cz>0.0</cz>
     <geom:box name="camera_column_geom">
       <xyz>0.02 0.00 0.0</xyz>
       <rpy>0 0 90</rpy>
       <size>0.11 0.11 0.03</size>
-      <mass>0.01</mass>
 
       <visual>
         <rpy>0 0 -90</rpy>
@@ -58,10 +78,20 @@
     <xyz>0.0 0.0 0.06</xyz>
     <rpy>0.0 0.0 0.0</rpy>
 
+    <massMatrix>true</massMatrix> 
+    <mass>0.01</mass>
+    <ixx>0.001</ixx>
+    <ixy>0.00</ixy>
+    <ixz>0.00</ixz>
+    <iyy>0.001</iyy>
+    <iyz>0.00</iyz>
+    <izz>0.001</izz>
+    <cx>0.0</cx>
+    <cy>0.0</cy>
+    <cz>0.0</cz>
     <geom:box name="camera_top_geom">
       <rpy>0 0 90</rpy>
       <size>0.12 0.119 0.03</size>
-      <mass>0.0</mass>
 
       <visual>
         <xyz>0.0 0.06 -0.015</xyz>
@@ -76,7 +106,6 @@
       <xyz>0.045 -0.002 -0.002</xyz>
       <rpy>0 90 0</rpy>
       <size>0.01 0.04</size>
-      <mass>0.0</mass>
 
       <visual>
         <size>0.025 0.025 0.04</size>
