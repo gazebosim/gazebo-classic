@@ -53,6 +53,7 @@ Sensor::Sensor(Body *body)
 
   Param::Begin(&this->parameters);
   this->updateRateP = new ParamT<double>("updateRate", 0, 0);
+  this->alwaysActiveP = new ParamT<bool>("alwaysActive", false, 0);
   Param::End();
 }
 
@@ -61,6 +62,7 @@ Sensor::Sensor(Body *body)
 Sensor::~Sensor()
 {
   delete this->updateRateP;
+  delete this->alwaysActiveP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,6 +71,7 @@ void Sensor::Load(XMLConfigNode *node)
 {
   this->nameP->Load(node);
   this->updateRateP->Load(node);
+  this->alwaysActiveP->Load(node);
 
   if (**(this->updateRateP) == 0)
     this->updatePeriod = 0.0;
