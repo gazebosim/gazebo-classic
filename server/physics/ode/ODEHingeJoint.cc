@@ -129,7 +129,7 @@ double ODEHingeJoint::GetVelocity(int /*index*/) const
 /// Set the velocity of an axis(index).
 void ODEHingeJoint::SetVelocity(int /*index*/, double angle)
 {
-  this->SetParam(angle, dParamVel);
+  this->SetParam(dParamVel,angle);
 }
 
 //////////////////////////////////////////////////////////////////////////////
