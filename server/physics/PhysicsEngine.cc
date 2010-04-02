@@ -86,6 +86,8 @@ PhysicsEngine::PhysicsEngine()
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
+  World::Instance()->DisconnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
+
   if (this->visual)
   {
     OgreCreator::Instance()->DeleteVisual( this->visual );

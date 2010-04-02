@@ -91,6 +91,9 @@ namespace gazebo
     /// \brief Set whether this body is enabled
     public: virtual void SetEnabled(bool enable) const = 0;
 
+    /// \brief Get whether this body is enabled in the physics engine
+    public: virtual bool GetEnabled() const = 0;
+
     /// \brief Set whether this entity has been selected by the user 
     ///        through the gui
     public: virtual bool SetSelected( bool s );

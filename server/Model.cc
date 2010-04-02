@@ -411,15 +411,9 @@ void Model::Update()
 
   //DiagnosticTimer timer("Model[" + this->GetName() + "] Update ");
 
-#ifdef USE_THREADPOOL
-  World::Instance()->GetPhysicsEngine()->InitForThread();
-#endif
-
   std::map<std::string, Body* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   JointContainer::iterator jointIter;
-
-  Pose3d bodyPose, newPose, oldPose;
 
   //this->updateSignal();
 
@@ -474,31 +468,31 @@ void Model::Update()
   }
 
   // Call the model's python update function, if one exists
-  /*if (this->pFuncUpdate)
-  {
-    boost::python::call<void>(this->pFuncUpdate, this);
-  }*/
+  //if (this->pFuncUpdate)
+  //{
+  //  boost::python::call<void>(this->pFuncUpdate, this);
+  //}
 
   // BULLET:
-  /*if (!this->canonicalBodyNameP->GetValue().empty())
-  {
-    /// model pose is the canonical body pose of the body + a transform from body frame to model frame
-    /// the tranform is defined by initModelOffset in body frame,
+  //if (!this->canonicalBodyNameP->GetValue().empty())
+  //{
+  //  /// model pose is the canonical body pose of the body + a transform from body frame to model frame
+  //  /// the tranform is defined by initModelOffset in body frame,
 
-    /// recover the transform in inertial frame based on body pose
-    this->pose = this->bodies[**this->canonicalBodyNameP]->GetPose();
-    Quatern body_rot = this->pose.rot;
-    Pose3d offset_transform = this->bodies[**this->canonicalBodyNameP]->initModelOffset;
-    Vector3 xyz_offset = (offset_transform.RotatePositionAboutOrigin(body_rot.GetInverse())).pos;
-    Quatern q_offset = offset_transform.rot;
+  //  /// recover the transform in inertial frame based on body pose
+  //  this->pose = this->bodies[**this->canonicalBodyNameP]->GetPose();
+  //  Quatern body_rot = this->pose.rot;
+  //  Pose3d offset_transform = this->bodies[**this->canonicalBodyNameP]->initModelOffset;
+  //  Vector3 xyz_offset = (offset_transform.RotatePositionAboutOrigin(body_rot.GetInverse())).pos;
+  //  Quatern q_offset = offset_transform.rot;
 
-    // apply transform to get model pose
-    this->pose.pos = this->pose.pos + xyz_offset;
-    this->pose.rot = this->pose.CoordRotationAdd(q_offset);
+  //  // apply transform to get model pose
+  //  this->pose.pos = this->pose.pos + xyz_offset;
+  //  this->pose.rot = this->pose.CoordRotationAdd(q_offset);
 
-    this->xyzP->SetValue(this->pose.pos);
-    this->rpyP->SetValue(this->pose.rot);
-  }*/
+  //  this->xyzP->SetValue(this->pose.pos);
+  //  this->rpyP->SetValue(this->pose.rot);
+  //}
 
   {
     //DiagnosticTimer timer("Model[" + this->GetName() + "] Children Update ");

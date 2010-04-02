@@ -17,13 +17,19 @@
   <physics:ode>
     <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>10e-2</cfm>
+    <cfm>0.0000000001</cfm>
     <erp>0.2</erp>
+
+    <quickStep>true</quickStep>
+    <quickStepIters>10</quickStepIters>
+    <quickStepW>1.3</quickStepW>
+    <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
+    <contactSurfaceLayer>0.001</contactSurfaceLayer>
 
     <!-- updateRate: <0 == throttle simTime to match realTime.
                       0 == No throttling
                      >0 == Frequency at which to throttle the sim --> 
-    <updateRate>0</updateRate>
+    <!--<updateRate>0</updateRate>-->
   </physics:ode>
 
   <rendering:gui>
@@ -34,7 +40,7 @@
 
   <rendering:ogre>
     <ambient>1 1 1 1</ambient>
-    <shadowTechnique>stencilAdditive</shadowTechnique>
+    <shadowTechnique>stencilModulative</shadowTechnique>
     <grid>false</grid>
   </rendering:ogre>
 

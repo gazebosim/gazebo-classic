@@ -82,10 +82,10 @@ ODEPhysics::ODEPhysics()
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   dWorldSetAutoDisableFlag(this->worldId, 1);
-  dWorldSetAutoDisableTime(this->worldId, 2.0);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableSteps(this->worldId, 20);
+  dWorldSetAutoDisableTime(this->worldId, 1.0);
+  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
+  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
+  dWorldSetAutoDisableSteps(this->worldId, 10);
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
@@ -196,15 +196,15 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
-  //DiagnosticTimer timer("ODEPhysics Collision Update");
   std::vector<ContactFeedback>::iterator iter;
   std::vector<dJointFeedback>::iterator jiter;
  
-  //timer.Start();
-
   // Do collision detection; this will add contacts to the contact group
   this->LockMutex(); 
-  dSpaceCollide( this->spaceId, this, CollisionCallback );
+  {
+    //DiagnosticTimer timer("ODEPhysics Collision Update");
+    dSpaceCollide( this->spaceId, this, CollisionCallback );
+  }
   this->UnlockMutex(); 
 
   // Process all the contacts, get the feedback info, and call the geom
@@ -418,24 +418,15 @@ dSpaceID ODEPhysics::GetSpaceId() const
 // Handle a collision
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
-  int maxContacts = 10000;
-  ODEPhysics *self;
-  ODEGeom *geom1 = NULL;
-  ODEGeom *geom2 = NULL;
-  int i;
-  int numc = 0;
-  dContactGeom contactGeoms[maxContacts];
-  dContact contact;
-
-  self = (ODEPhysics*) data;
-
-  // exit without doing anything if the two bodies are connected by a joint
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 
-
+  // exit without doing anything if the two bodies are connected by a joint
   if (b1 && b2 && dAreConnectedExcluding(b1,b2,dJointTypeContact))
     return;
+
+  ODEPhysics *self;
+  self = (ODEPhysics*) data;
 
   // Check if either are spaces
   if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
@@ -444,8 +435,23 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   }
   else
   {
-    // We should never test two geoms in the same space
-    assert(dGeomGetSpace(o1) != dGeomGetSpace(o2));
+    ODEGeom *geom1 = NULL;
+    ODEGeom *geom2 = NULL;
+    /*if (b1 && b2)
+    {
+      ODEBody *odeBody1 = (ODEBody*)dBodyGetData(b1);
+      ODEBody *odeBody2 = (ODEBody*)dBodyGetData(b1);
+      if (odeBody1->IsStatic() && odeBody2->IsStatic())
+        return;
+    }*/
+
+    // Exit if both bodies are not enabled
+    if ( (b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) || 
+         (!b2 && b1 && !dBodyIsEnabled(b1)) || 
+         (!b1 && b2 && !dBodyIsEnabled(b2)) )
+    {
+      return;
+    }
 
     // Get pointers to the underlying geoms
     if (dGeomGetClass(o1) == dGeomTransformClass)
@@ -458,12 +464,18 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
+
+    int maxContacts = 1000;
     int numContacts = 100;
+    int i;
+    int numc = 0;
+    dContact contact;
 
     if (geom1->GetType() == Shape::TRIMESH && geom2->GetType()==Shape::TRIMESH)
       numContacts = maxContacts;
 
-    numc = dCollide(o1,o2,numContacts, contactGeoms, sizeof(contactGeoms[0]));
+    numc = dCollide(o1,o2,numContacts, self->contactGeoms, 
+                    sizeof(self->contactGeoms[0]));
 
     if (numc != 0)
     {
@@ -472,15 +484,14 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       (*self->contactFeedbackIter).contact.geom2 = geom2;
       (*self->contactFeedbackIter).feedbacks.resize(numc);
 
+      double h, kp, kd;
       for (i=0; i<numc; i++)
       {
-        double h, kp, kd;
-
         // skip negative depth contacts
-        if(contactGeoms[i].depth < 0)
+        if(self->contactGeoms[i].depth < 0)
           continue;
 
-        contact.geom = contactGeoms[i];
+        contact.geom = self->contactGeoms[i];
         //contact.surface.mode = dContactSlip1 | dContactSlip2 | 
         //                       dContactSoftERP | dContactSoftCFM |  
         //                       dContactBounce | dContactMu2 | dContactApprox1;

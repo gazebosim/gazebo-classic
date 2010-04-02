@@ -264,6 +264,11 @@ void World::Save(std::string &prefix, std::ostream &stream)
 // Initialize the world
 void World::Init()
 {
+#ifdef USE_THREADPOOL
+  // If calling Body::Update in threadpool
+  this->physicsEngine->InitForThread();
+#endif
+
   std::vector< Model* >::iterator miter;
 
   this->simPauseTime = 0;

@@ -14,7 +14,7 @@
 
   <verbosity>5</verbosity>
 
-  <physics:bullet>
+  <physics:ode>
     <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-10</cfm>
@@ -29,7 +29,7 @@
                       0 == No throttling
                      >0 == Frequency at which to throttle the sim --> 
     <updateRate>0</updateRate>
-  </physics:bullet>
+  </physics:ode>
 
   <rendering:gui>
     <type>fltk</type>
@@ -68,7 +68,7 @@
   </model:physical>
 
    <!-- Ground Plane -->
-   <model:physical name="plane1_model">
+  <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
     <static>true</static>
@@ -97,7 +97,6 @@
       <specularColor>.1 .1 .1</specularColor>
       <range>20</range>
 
-      <!-- Constant(0-1) Linear(0-1) Quadratic -->
       <attenuation>0.1 0.01 0.001</attenuation>
     </light>
   </model:renderable>

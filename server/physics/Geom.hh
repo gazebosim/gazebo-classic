@@ -62,7 +62,7 @@ namespace gazebo
     public: virtual ~Geom();
 
     /// \brief Load the geom
-    public: void Load(XMLConfigNode *node);
+    public: virtual void Load(XMLConfigNode *node);
 
     /// \brief Load the geom
     public: void Save(std::string &prefix, std::ostream &stream);

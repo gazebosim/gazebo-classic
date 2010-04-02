@@ -36,6 +36,8 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/signal.hpp>
 
+#include "Global.hh"
+
 #ifdef USE_THREADPOOL
 #include "boost/threadpool.hpp"
 #include "boost/thread/mutex.hpp"
@@ -45,7 +47,6 @@
 #include "Vector3.hh"
 #include "Pose3d.hh"
 #include "Entity.hh"
-#include "Global.hh"
 #include "Timer.hh"
 
 namespace gazebo
@@ -264,59 +265,74 @@ class World : public SingletonT<World>
 
   /// \brief Connect a boost::slot the the add entity signal
   public: template<typename T>
-          void ConnectAddEntitySignal( T subscriber )
-          {
-            addEntitySignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectAddEntitySignal( T subscriber )
+          { return addEntitySignal.connect(subscriber); }
+
+  public: template<typename T>
+          void DisconnectAddEntitySignal( T subscriber)
+          { addEntitySignal.disconnect(subscriber); }
 
   /// \brief Connect a boost::slot the the show light source signal
   public: template<typename T>
-          void ConnectShowLightsSignal( T subscriber )
-          {
-            showLightsSignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectShowLightsSignal( T subscriber )
+          { return showLightsSignal.connect(subscriber); }
+
+  public: template<typename T>
+          void DisconnectShowLightsSignal( T subscriber )
+          { showLightsSignal.disconnect(subscriber); }
 
   /// \brief Connect a boost::slot the the show camera source signal
   public: template<typename T>
-          void ConnectShowCamerasSignal( T subscriber )
-          {
-            showCamerasSignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectShowCamerasSignal( T subscriber )
+          { return showCamerasSignal.connect(subscriber); }
+  public: template<typename T>
+          void DisconnectShowCamerasSignal( T subscriber )
+          { showCamerasSignal.disconnect(subscriber); }
 
   /// \brief Connect a boost::slot the the show contacts signal
   public: template<typename T>
-          void ConnectShowContactsSignal( T subscriber )
-          {
-            showContactsSignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectShowContactsSignal( T subscriber )
+          { return showContactsSignal.connect(subscriber); }
+  public: template<typename T>
+          void DisconnectShowContactsSignal( T subscriber )
+          { showContactsSignal.disconnect(subscriber); }
+
 
   /// \brief Connect a boost::slot the the show wireframe signal
   public: template<typename T>
-          void ConnectShowWireframeSignal( T subscriber )
-          {
-            wireframeSignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectShowWireframeSignal( T subscriber )
+          { return wireframeSignal.connect(subscriber); }
+  public: template<typename T>
+          void DisconnectShowWireframeSignal( T subscriber )
+          { wireframeSignal.disconnect(subscriber); }
+
 
   /// \brief Connect a boost::slot the the show physics signal
   public: template<typename T>
-          void ConnectShowPhysicsSignal( T subscriber )
-          {
-            showPhysicsSignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectShowPhysicsSignal( T subscriber )
+          { return showPhysicsSignal.connect(subscriber); }
+  public: template<typename T>
+          void DisconnectShowPhysicsSignal( T subscriber )
+          { showPhysicsSignal.disconnect(subscriber); }
+
 
   /// \brief Connect a boost::slot the the show joints signal
   public: template<typename T>
-          void ConnectShowJointsSignal( T subscriber )
-          {
-            showJointsSignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectShowJointsSignal( T subscriber )
+          { return showJointsSignal.connect(subscriber); }
+  public: template<typename T>
+          void DisconnectShowJointsSignal( T subscriber )
+          { showJointsSignal.disconnect(subscriber); }
 
   /// \brief Connect a boost::slot the the show bounding boxes signal
   public: template<typename T>
-          void ConnectShowBoundingBoxesSignal( T subscriber )
-          {
-            showBoundingBoxesSignal.connect(subscriber);
-          }
+          boost::signals::connection ConnectShowBoundingBoxesSignal( T subscriber )
+          { return showBoundingBoxesSignal.connect(subscriber); }
+  public: template<typename T>
+          void DisconnectShowBoundingBoxesSignal( T subscriber )
+          { showBoundingBoxesSignal.disconnect(subscriber); }
+
+
   /// \brief Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
 

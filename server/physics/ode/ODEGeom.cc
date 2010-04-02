@@ -67,7 +67,7 @@ void ODEGeom::Load(XMLConfigNode *node)
 {
   Geom::Load(node);
 
-  if (this->geomId && this->placeable)
+  /*if (this->geomId && this->placeable)
   {
     Pose3d localPose;
     dQuaternion q;
@@ -85,8 +85,14 @@ void ODEGeom::Load(XMLConfigNode *node)
     dGeomSetOffsetPosition(this->geomId, localPose.pos.x, localPose.pos.y, 
         localPose.pos.z);
     dGeomSetOffsetQuaternion(this->geomId, q);
-  }
+  }*/
 
+
+  if (this->IsStatic())
+  {
+    this->SetCategoryBits(GZ_FIXED_COLLIDE);
+    this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

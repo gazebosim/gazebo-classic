@@ -85,6 +85,10 @@ namespace gazebo
     /// \brief Set whether this body is enabled
     public: virtual void SetEnabled(bool enable) const;
 
+    /// \brief Get whether this body is enabled in the physics engine
+    public: virtual bool GetEnabled() const {return true;}
+
+
     /// \brief Update the center of mass
     public: virtual void UpdateCoM();
 

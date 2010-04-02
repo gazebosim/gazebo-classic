@@ -55,6 +55,7 @@ ODEBody::ODEBody(Entity *parent)
   {
     this->bodyId = dBodyCreate(this->odePhysics->GetWorldId());
     dBodySetData(this->bodyId, this);
+    dBodySetAutoDisableDefaults(this->bodyId);
   }
   else
     this->bodyId = NULL;
@@ -78,9 +79,7 @@ void ODEBody::Load(XMLConfigNode *node)
 
   // Update the Center of Mass.
   this->UpdateCoM();
-
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -309,6 +308,18 @@ void ODEBody::SetEnabled(bool enable) const
     dBodyDisable(this->bodyId);
 
   this->physicsEngine->UnlockMutex();
+}
+
+/////////////////////////////////////////////////////////////////////
+/// Get whether this body is enabled in the physics engine
+bool ODEBody::GetEnabled() const
+{
+  bool result = false;
+
+  if (this->bodyId)
+    result = dBodyIsEnabled(this->bodyId);
+
+  return result;
 }
 
 /////////////////////////////////////////////////////////////////////

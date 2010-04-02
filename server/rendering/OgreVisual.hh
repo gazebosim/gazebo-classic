@@ -136,6 +136,9 @@ namespace gazebo
     /// \brief Create a bounding box for this visual
     public: void AttachBoundingBox(const Vector3 &min, const Vector3 &max);
 
+    /// \brief Set the material of the bounding box
+    public: void SetBoundingBoxMaterial(const std::string &materialName );
+
     /// \brief Make the visual objects static renderables
     public: void MakeStatic();
 

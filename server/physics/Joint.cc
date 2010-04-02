@@ -73,6 +73,9 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
+  World::Instance()->DisconnectShowJointsSignal( 
+      boost::bind(&Joint::ShowJoints, this, _1) );
+
   if (this->visual)
   {
     OgreCreator::Instance()->DeleteVisual( this->visual );

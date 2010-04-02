@@ -407,11 +407,7 @@ void Body::Init()
 void Body::Update()
 {
   //DiagnosticTimer timer("Body[" + this->GetName() +"] Update");
-
-#ifdef USE_THREADPOOL
-  // If calling Body::Update in threadpool
-  World::Instance()->GetPhysicsEngine()->InitForThread();
-#endif
+  
   std::map< std::string, Geom* >::iterator geomIter;
   Vector3 vel;
   Vector3 avel;
@@ -429,7 +425,7 @@ void Body::Update()
         geomIter!=this->geoms.end(); geomIter++)
     {
 #ifdef USE_THREADPOOL
-      World::Instance()->threadpool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
+      World::Instance()->threadPool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
 #else
       geomIter->second->Update();
 #endif

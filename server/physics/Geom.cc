@@ -86,6 +86,10 @@ Geom::Geom( Body *body )
 // Destructor
 Geom::~Geom()
 {
+  World::Instance()->DisconnectShowPhysicsSignal( boost::bind(&Geom::ShowPhysics, this, _1) );
+  World::Instance()->DisconnectShowJointsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
+  World::Instance()->DisconnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) );
+
   for (std::vector<OgreVisual*>::iterator iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
     if (*iter)
@@ -194,6 +198,7 @@ void Geom::CreateBoundingBox()
     {
       this->bbVisual->SetCastShadows(false);
       this->bbVisual->AttachBoundingBox(min,max);
+      this->bbVisual->SetVisible( World::Instance()->GetShowBoundingBoxes() );
     }
   }
 }
@@ -260,6 +265,14 @@ void Geom::SetGeom(bool placeable)
 // Update
 void Geom::Update()
 {
+  if (this->body && this->bbVisual)
+  {
+    if (this->body->GetEnabled())
+      this->bbVisual->SetBoundingBoxMaterial("Gazebo/GreenTransparent");
+    else
+      this->bbVisual->SetBoundingBoxMaterial("Gazebo/RedTransparent");
+  }
+
   this->ClearContacts();
 }
 

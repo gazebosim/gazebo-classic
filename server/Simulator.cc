@@ -361,10 +361,10 @@ void Simulator::MainLoop()
         this->gui->Update();
 
       if (this->renderEngineEnabled)
+      {
         OgreAdaptor::Instance()->UpdateCameras();
-
-      if (this->renderEngineEnabled)
         World::Instance()->GraphicsUpdate();
+      }
 
       currTime = this->GetWallTime();
 

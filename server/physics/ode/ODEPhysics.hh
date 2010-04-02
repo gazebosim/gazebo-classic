@@ -170,6 +170,8 @@ class ODEPhysics : public PhysicsEngine
   private: std::vector<ContactFeedback>::iterator contactFeedbackIter;
 
   private: std::map<std::string, dSpaceID> spaces;
+
+  private: dContactGeom contactGeoms[1000];
 };
 
 /** \}*/

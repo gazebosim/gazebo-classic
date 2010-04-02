@@ -33,9 +33,6 @@
 
   <rendering:ogre>
     <ambient>0.5 0.5 0.5 1.0</ambient>
-    <sky>
-      <material>Gazebo/CloudySky</material>
-    </sky>
 
     <fog>
       <color>1.0 1.0 1.0</color>
@@ -43,6 +40,8 @@
       <linearEnd>100</linearEnd>
     </fog>
     <grid>false</grid>
+
+    <shadowTechnique>stencilModulative</shadowTechnique>
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -68,7 +67,7 @@
       <geom:map name="map_geom">
         <image>willowMap.png</image>
         <threshold>200</threshold>
-        <granularity>2</granularity>
+        <granularity>10</granularity>
         <negative>false</negative>
         <scale>0.1</scale>
         <material>Gazebo/Rocky</material>
@@ -76,6 +75,7 @@
     </body:map>
   </model:physical>
 
+  <!--
   <model:physical name="pioneer2dx_model1">
     <xyz>0 0 0.145</xyz>
     <rpy>0.0 0.0 0.0</rpy>
@@ -97,6 +97,7 @@
       <xi:include href="models/pioneer2dx.model" />
     </include>
   </model:physical>
+  -->
 
   <!-- White Point light -->
   <model:renderable name="point_white">

@@ -894,12 +894,43 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
   simple = dynamic_cast<Ogre::SimpleRenderable*>(odeObj);
 
   if (ent)
-    ent->setMaterialName("Gazebo/TransparentTest");
+    ent->setMaterialName("Gazebo/GreenTransparent");
   else if (simple)
-    simple->setMaterial("Gazebo/TransparentTest");
+    simple->setMaterial("Gazebo/GreenTransparent");
 
   this->boundingBoxNode->setVisible(false);
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the material of the bounding box
+void OgreVisual::SetBoundingBoxMaterial(const std::string &materialName )
+{
+  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
+  // Stop here if the rendering engine has been disabled
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  if (materialName.empty())
+    return;
+
+  try
+  {
+    for (int i=0; i < this->boundingBoxNode->numAttachedObjects(); i++)
+    {
+      Ogre::MovableObject *obj = this->boundingBoxNode->getAttachedObject(i);
+
+      if (dynamic_cast<Ogre::Entity*>(obj))
+        ((Ogre::Entity*)obj)->setMaterialName(materialName);
+      else
+        ((Ogre::SimpleRenderable*)obj)->setMaterial(materialName);
+    }
+  }
+  catch (Ogre::Exception e)
+  {
+    gzmsg(0) << "Unable to set BoundingBoxMaterial[" << materialName << "][" << e.getFullDescription() << "]\n";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

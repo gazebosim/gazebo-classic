@@ -944,7 +944,7 @@ material Gazebo/Brick
   }
 }
 
-material Gazebo/TransparentTest
+material Gazebo/RedTransparent
 {
 	technique
 	{
@@ -959,6 +959,27 @@ material Gazebo/TransparentTest
       texture_unit
       {
         colour_op_ex source1 src_current src_current 1 0 0
+        alpha_op_ex source1 src_manual src_current 0.1
+      }
+    }
+	}
+}
+
+material Gazebo/GreenTransparent
+{
+	technique
+	{
+    pass
+    {
+      scene_blend alpha_blend
+      depth_write off
+
+      ambient 0.0 1.0 0.0 1
+      diffuse 0.0 1.0 0.0 1
+
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0 1 0
         alpha_op_ex source1 src_manual src_current 0.1
       }
     }
