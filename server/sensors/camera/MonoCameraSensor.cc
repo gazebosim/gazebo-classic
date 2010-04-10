@@ -156,15 +156,20 @@ void MonoCameraSensor::UpdateChild()
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
+  if (this->active || **this->alwaysActiveP || **this->saveFramesP)
+    this->UpdateCam();
+
+
   // Only continue if the controller has an active interface. Or frames need
   // to be saved
-  if ( (this->controller && !this->controller->IsConnected()) &&
+  /*if ( (this->controller && !this->controller->IsConnected()) &&
        !this->saveFramesP->GetValue())
     return;
 
   // Or skip if user sets camera to inactive
   if (this->active)
     this->UpdateCam();
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -80,9 +80,32 @@ Entity::Entity(Entity *parent)
 // Destructor
 Entity::~Entity()
 {
+  if (this->parent)
+    this->parent->RemoveChild(this);
+
   delete this->staticP;
 
+  std::vector<Entity*>::iterator iter;
+
   World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
+
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if (*iter)
+    {
+      (*iter)->SetParent(NULL);
+
+      World::Instance()->GetPhysicsEngine()->RemoveEntity(*iter);
+
+      Model *m = dynamic_cast<Model*>(*iter);
+      if (m)
+      {
+        m->Detach();
+      }
+
+      //delete *iter;
+    }
+  }
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
@@ -92,6 +115,7 @@ Entity::~Entity()
     }
   }
   this->visualNode = NULL;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +148,21 @@ void Entity::AddChild(Entity *child)
 
   // Add this child to our list
   this->children.push_back(child);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Remove a child from this entity
+void Entity::RemoveChild(Entity *child)
+{
+  std::vector<Entity*>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if ((*iter)->GetName() == child->GetName())
+    {
+      this->children.erase(iter);
+      break;
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -74,6 +74,10 @@ namespace gazebo
     /// \brief Add a child to this entity
     /// \param child Child entity
     public: void AddChild(Entity *child);
+
+    /// \brief Remove a child from this entity
+    /// \param child Child to remove
+    public: void RemoveChild(Entity *child);
   
     /// \brief Get all children
     /// \return Vector of children entities

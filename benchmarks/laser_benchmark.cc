@@ -114,9 +114,9 @@ int main()
   if (!out)
     std::cerr << "Unable to open log file";
 
-  for (int y = -5; y < 5; y++)
+  for (int y = -10; y < 10; y++)
   {
-    for (int x = -5; x < 5; x++)
+    for (int x = -10; x < 10; x++)
     {
       spawn_laser(x,y);
 

@@ -134,8 +134,6 @@ void RayShape::SetLength( double len )
 
   this->relativeEndPos = dir * len + this->relativeStartPos;
 
-  //std::cout << "Len[" << len << "] St[" << this->relativeStartPos << "] End[" << this->relativeEndPos << "] dir[" << dir << "]\n";
-
   if (this->line)
   {
     this->line->SetPoint(1,  this->relativeEndPos);

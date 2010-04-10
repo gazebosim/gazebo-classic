@@ -154,6 +154,29 @@ void RTShaderSystem::Init()
 #endif
 }
 
+void RTShaderSystem::Fini()
+{
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+  // Restore default scheme.
+  Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+
+  // Unregister the material manager listener.
+  if (this->materialMgrListener != NULL)
+  {
+    Ogre::MaterialManager::getSingleton().removeListener(
+        this->materialMgrListener);
+    this->materialMgrListener = NULL;
+  }
+
+  // Finalize RTShader system.
+  if (this->shaderGenerator != NULL)
+  {
+    Ogre::RTShader::ShaderGenerator::finalize();
+    this->shaderGenerator = NULL;
+  }
+#endif
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set an Ogre::Entity to use RT shaders
 void RTShaderSystem::AttachEntity(OgreVisual *vis)

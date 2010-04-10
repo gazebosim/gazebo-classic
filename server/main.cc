@@ -327,6 +327,6 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  printf("Done.\n");
+  printf("Gazebo done.\n");
   return 0;
 }

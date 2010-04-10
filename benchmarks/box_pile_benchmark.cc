@@ -9,7 +9,7 @@ gazebo::SimulationIface *simIface = NULL;
 gazebo::FactoryIface *factoryIface = NULL;
 int laser_count = 0;
 
-std::string test_name="Boxes Benchmark";
+std::string test_name="Box Pile Benchmark";
 std::string xlabel = "Box Count";
 std::string ylabel = "Simtime / Realtime";
 std::string data_filename = "/tmp/" + test_name + ".data";
@@ -106,7 +106,7 @@ int main()
     double simTime = 0;
     double realTime = 0;
 
-    for (unsigned int i=0; i < 50; i++)
+    for (unsigned int i=0; i < 30; i++)
     {
       simTime += simIface->data->simTime;
       realTime += simIface->data->realTime;

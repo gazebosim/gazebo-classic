@@ -16,6 +16,8 @@ set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PAT
 
 message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION}")
 
+set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
+
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
 set (gazeboserver_sources_desc "List of server sources" 
@@ -104,6 +106,7 @@ else (build_errors)
   message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
   
   if (BUILD_GAZEBO)
+    include (libgazebo)
 
     if (use_internal_assimp)
       add_subdirectory(3rd_party)
@@ -112,6 +115,7 @@ else (build_errors)
     add_subdirectory(libgazebo)
     add_subdirectory(server)
     add_subdirectory(worlds)
+    add_subdirectory(tools)
     add_subdirectory(Media)
     
     if (INCLUDE_PLAYER)

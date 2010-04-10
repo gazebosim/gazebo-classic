@@ -19,6 +19,8 @@ Shape::Shape(Geom *p)
 // Destructor
 Shape::~Shape()
 {
+  if (this->parent)
+    this->parent->SetShape(NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

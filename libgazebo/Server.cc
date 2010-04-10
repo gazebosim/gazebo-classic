@@ -174,7 +174,7 @@ void Server::Fini()
 {
   char cmd[1024];
 
-  std::cout << "deleting " << this->filename << "\n";
+  //std::cout << "deleting " << this->filename << "\n";
 
   // unlink the pid file
   std::string pidfn = this->filename + "/gazebo.pid";

@@ -56,6 +56,7 @@ Body::Body(Entity *parent)
     : Entity(parent)
 {
   this->comEntity = new Entity(this);
+  this->comEntity->SetName("COM Entity");
 
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
@@ -101,25 +102,34 @@ Body::Body(Entity *parent)
 Body::~Body()
 {
   std::map< std::string, Geom* >::iterator giter;
+  std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
-
-  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-  {
-    if (giter->second)
-      delete giter->second;
-    giter->second = NULL;
-  }
-  this->geoms.clear();
-
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-    SensorManager::Instance()->RemoveSensor(*siter);
-
 
   if (this->cgVisual)
   {
     OgreCreator::Instance()->DeleteVisual( this->cgVisual );
     this->cgVisual = NULL;
   }
+
+  /*if (this->comEntity)
+    delete this->comEntity;
+  this->comEntity = NULL;
+  */
+
+  /*for (iter = this->children.begin(); iter != this->children.end(); iter++)
+    if (*iter)
+    {
+      std::cout << "Deleting[" << *iter << "]\n";
+      delete *iter;
+    }
+    */
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+    if (giter->second)
+      delete giter->second;
+  this->geoms.clear();
+
+  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+    SensorManager::Instance()->RemoveSensor(*siter);
 
   delete this->xyzP;
   delete this->rpyP;
@@ -139,9 +149,6 @@ Body::~Body()
   delete this->ixzP;
   delete this->iyzP;
 
-  if (this->comEntity)
-    delete this->comEntity;
-  this->comEntity = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,8 +269,13 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 void Body::Fini()
 {
   std::vector< Sensor* >::iterator siter;
+  std::map< std::string, Geom* >::iterator giter;
+
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     (*siter)->Fini();
+
+  for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+    giter->second->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -399,7 +411,7 @@ void Body::Init()
     }
   }
 
-
+  this->enabled = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -417,6 +429,12 @@ void Body::Update()
 
   // Apply our angular accel
   this->SetTorque(this->angularAccel);
+
+  if (this->GetEnabled() != this->enabled)
+  {
+    this->enabled = this->GetEnabled();
+    this->enabledSignal(this->enabled);
+  }
 
   {
     //DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");

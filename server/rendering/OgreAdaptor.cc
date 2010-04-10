@@ -104,6 +104,7 @@ OgreAdaptor::~OgreAdaptor()
   delete this->drawGridP;
   delete this->skyMaterialP;
 
+  RTShaderSystem::Instance()->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

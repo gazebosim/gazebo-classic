@@ -544,54 +544,56 @@ class SimulationIface : public Iface
   public: void Run(double simTime);
 
   /// \brief Get the 3d pose of a model
-  public: bool GetPose3d(const char *modelName, Pose &pose);
+  public: bool GetPose3d(const std::string &modelName, Pose &pose);
 
   /// \brief Get the 2d pose of a model
-  public: bool GetPose2d(const char *modelName, Pose &pose);
+  public: bool GetPose2d(const std::string &modelName, Pose &pose);
 
   /// \brief Set the 3d pose of a model
-  public: void SetPose3d(const char *modelName, const Pose &modelPose);
+  public: void SetPose3d(const std::string &modelName, const Pose &modelPose);
 
   /// \brief Set the 2d pose of a model
-  public: void SetPose2d(const char *modelName, float x, float y, float yaw);
+  public: void SetPose2d(const std::string &modelName, float x, float y, 
+                         float yaw);
 
   /// \brief Set the complete state of a model
-  public: void SetState(const char *modelName, Pose &modelPose, 
+  public: void SetState(const std::string &modelName, Pose &modelPose, 
               Vec3 &linearVel, Vec3 &angularVel, 
               Vec3 &linearAccel, Vec3 &angularAccel );
 
   /// \brief Get the complete state of a model
-  public: bool GetState(const char *modelName, Pose &modelPose, 
+  public: bool GetState(const std::string &modelName, Pose &modelPose, 
               Vec3 &linearVel, Vec3 &angularVel, 
               Vec3 &linearAccel, Vec3 &angularAccel );
 
   /// \brief Get the child interfaces of a model
-  public: void GetChildInterfaces(const char *modelName);
+  public: void GetChildInterfaces(const std::string &modelName);
 
   /// \brief Get the Type of an interface e.g. "laser" "model" "fiducial"
-  public: void GetInterfaceType(const char *modelName);
+  public: void GetInterfaceType(const std::string &modelName);
 
   /// \brief Get the type of this model
-  public: bool GetModelType(const char *modelName, std::string &type);
+  public: bool GetModelType(const std::string &modelName, std::string &type);
 
   /// \brief Get the number of models 
   public: bool GetNumModels(unsigned int &num);
 
   /// \brief Get the number of children a model has
-  public: bool GetNumChildren(const char *modelName, unsigned int &num);
+  public: bool GetNumChildren(const std::string &modelName, unsigned int &num);
 
   /// \brief Get the name of a model
-  public: bool GetModelName(unsigned int child, std::string &name);
+  public: bool GetModelName(unsigned int model, std::string &name);
 
   /// \brief Get the name of a child
-  public: bool GetChildName(const char *modelName, unsigned int child, 
+  public: bool GetChildName(const std::string &modelName, unsigned int child, 
                             std::string &name);
 
   /// \brief Get the extents of a model
-  public: bool GetModelExtent(const char *modelName, Vec3 &ext);
+  public: bool GetModelExtent(const std::string &modelName, Vec3 &ext);
 
   /// \brief Get the model Fiducial ID (if one global ID was set)
-  public: bool GetModelFiducialID(const char *modelName, unsigned int &id);
+  public: bool GetModelFiducialID(const std::string &modelName, 
+                                  unsigned int &id);
 
   public: void GoAckWait();
   public: void GoAckPost();
@@ -1208,6 +1210,9 @@ class FactoryIface : public Iface
             Iface::Open(client,id); 
             this->data = (FactoryData*)this->mMap; 
           }
+
+  /// \brief Delete a model by name
+  public: bool DeleteModel(const std::string &model_name);
 
   /// Pointer to the factory data
   public: FactoryData *data;

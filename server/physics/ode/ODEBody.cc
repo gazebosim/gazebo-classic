@@ -98,6 +98,7 @@ void ODEBody::Init()
 // Move callback. Use this to move the visuals
 void ODEBody::MoveCallback(dBodyID id)
 {
+
   Pose3d pose;
   const dReal *p;
   const dReal *r;

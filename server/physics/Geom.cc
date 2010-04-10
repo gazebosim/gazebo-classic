@@ -80,17 +80,16 @@ Geom::Geom( Body *body )
   World::Instance()->ConnectShowPhysicsSignal( boost::bind(&Geom::ShowPhysics, this, _1) );
   World::Instance()->ConnectShowJointsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
   World::Instance()->ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) );
+
+  this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Geom::~Geom()
 {
-  World::Instance()->DisconnectShowPhysicsSignal( boost::bind(&Geom::ShowPhysics, this, _1) );
-  World::Instance()->DisconnectShowJointsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
-  World::Instance()->DisconnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) );
-
-  for (std::vector<OgreVisual*>::iterator iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  for (std::vector<OgreVisual*>::iterator iter = this->visuals.begin(); 
+       iter != this->visuals.end(); iter++)
   {
     if (*iter)
     {
@@ -111,7 +110,26 @@ Geom::~Geom()
   delete this->laserFiducialIdP;
   delete this->laserRetroP;
 
-  delete this->shape;
+  if (this->shape)
+    delete this->shape;
+  this->shape = NULL;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Finalize the geom
+void Geom::Fini()
+{
+  this->body->DisconnectEnabledSignal(boost::bind(&Geom::EnabledCB, this, _1));
+
+  World::Instance()->DisconnectShowPhysicsSignal( 
+      boost::bind(&Geom::ShowPhysics, this, _1) );
+
+  World::Instance()->DisconnectShowJointsSignal( 
+      boost::bind(&Geom::ShowJoints, this, _1) );
+
+  World::Instance()->DisconnectShowBoundingBoxesSignal( 
+      boost::bind(&Geom::ShowBoundingBox, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -265,14 +283,6 @@ void Geom::SetGeom(bool placeable)
 // Update
 void Geom::Update()
 {
-  if (this->body && this->bbVisual)
-  {
-    if (this->body->GetEnabled())
-      this->bbVisual->SetBoundingBoxMaterial("Gazebo/GreenTransparent");
-    else
-      this->bbVisual->SetBoundingBoxMaterial("Gazebo/RedTransparent");
-  }
-
   this->ClearContacts();
 }
 
@@ -506,4 +516,17 @@ Contact Geom::GetContact(unsigned int i) const
     gzerr(0) << "Invalid contact index\n";
 
   return Contact();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Enable callback: Called when the body changes
+void Geom::EnabledCB(bool enabled)
+{
+  if (this->bbVisual)
+  {
+    if (enabled)
+      this->bbVisual->SetBoundingBoxMaterial("Gazebo/GreenTransparent");
+    else
+      this->bbVisual->SetBoundingBoxMaterial("Gazebo/RedTransparent");
+  }
 }

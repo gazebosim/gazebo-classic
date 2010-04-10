@@ -96,6 +96,7 @@ void World::Close()
   {
     if (*miter)
     {
+      (*miter)->Fini();
       delete (*miter);
       (*miter) = NULL;
     }
@@ -530,10 +531,7 @@ void World::ProcessEntitiesToDelete()
     for (miter=this->toDeleteModels.begin();
         miter!=this->toDeleteModels.end(); miter++)
     {
-      //std::cerr << "ProcessEngitiesToDelete " <<  (*miter)->GetName() << std::endl;
       (*miter)->Fini();
-      this->models.erase(
-          std::remove(this->models.begin(), this->models.end(), *miter) );
       delete (*miter);
     }
 
@@ -551,10 +549,10 @@ void World::DeleteEntity(const char *name)
   // Update all the models
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
-    if ((*miter)->GetName() == name)
+    if ((*miter)->GetCompleteScopedName() == name)
     {
-      (*miter)->Fini();
       this->toDeleteModels.push_back(*miter);
+      this->models.erase( std::remove(this->models.begin(), this->models.end(), *miter));
     }
   }
 }
@@ -574,9 +572,6 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
   // Set the model's pose (relative to parent)
   //this->SetModelPose(model, model->GetInitPose());
 
-  // Add the model to our list
-  this->models.push_back(model);
-
   // If calling LoadEntity()->LoadModel()from Simulator::Load()->World::Load()
   // GetWorldInitialized() is false, in this case, model->Init() is
   // called later directly from main.cc through Simulator::Init()
@@ -588,6 +583,9 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate
 
   if (parent != NULL)
     model->Attach(node->GetChild("attach"));
+  else
+    // Add the model to our list
+    this->models.push_back(model);
 
   return model;
 }
@@ -645,7 +643,7 @@ Model *World::GetModelByName(std::string modelName)
 
   for (iter = models.begin(); iter != models.end(); iter++)
   {
-    if ((*iter)->GetName() == modelName)
+    if ((*iter)->GetCompleteScopedName() == modelName)
       return (*iter);
   }
 
@@ -962,7 +960,7 @@ void World::UpdateSimulationIface()
             Model *model = this->models[index];
             memset(response->modelName, 0, 512);
 
-            strncpy(response->modelName, model->GetName().c_str(), 512);
+            strncpy(response->modelName, model->GetCompleteScopedName().c_str(), 512);
             response->strValue[511] = '\0';
 
             response++;
@@ -990,7 +988,7 @@ void World::UpdateSimulationIface()
             if (ent)
             {
               memset(response->strValue, 0, 512);
-              strncpy(response->modelName, ent->GetName().c_str(), 512);
+              strncpy(response->modelName, ent->GetCompleteScopedName().c_str(), 512);
               response->strValue[511] = '\0';
 
               response++;
@@ -1389,21 +1387,7 @@ void World::UpdateSimulationIface()
 
   this->simIface->Unlock();
 
-  // lock so models is not used
-  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
-
-  // Remove and delete all models that are marked for deletion
-  std::vector< Model* >::iterator miter;
-  for (miter=this->toDeleteModels.begin();
-      miter!=this->toDeleteModels.end(); miter++)
-  {
-//    (*miter)->Fini();
-    this->models.erase(
-        std::remove(this->models.begin(), this->models.end(), *miter) );
-    delete *miter;
-  }
-
-  this->toDeleteModels.clear();
+  //this->ProcessEntitiesToDelete();
 }
 
 void World::GetInterfaceNames(Entity* en, std::vector<std::string>& list)

@@ -61,6 +61,9 @@ namespace gazebo
     /// \brief Init the run time shader system
     public: void Init();
 
+    /// \brief Finalize the shader system
+    public: void Fini();
+
     /// \brief Update the shaders
     public: void UpdateShaders();
 

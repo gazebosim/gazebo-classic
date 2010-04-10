@@ -113,13 +113,10 @@ Model::~Model()
     this->graphicsHandler = NULL;
   }
 
-  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  for (biter = this->bodies.begin(); biter != this->bodies.end(); biter++)
   {
     if (biter->second)
-    {
-      delete biter->second;
-      biter->second = NULL;
-    }
+      delete (biter->second);
   }
   this->bodies.clear();
 
@@ -547,6 +544,17 @@ void Model::Fini()
     this->graphicsHandler = NULL;
   }
 
+  std::vector< Entity* >::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if (*iter)
+    {
+      Model *m = dynamic_cast<Model*>(*iter);
+      if (m)
+        m->Fini();
+    }
+  }
+
   this->FiniChild();
 }
 
@@ -937,6 +945,16 @@ Body *Model::GetBody(const std::string &name)
     return this->GetCanonicalBody();
   }
   return NULL;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Detach from parent model
+void Model::Detach()
+{
+  if (this->joint)
+    delete this->joint;
+  this->joint = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

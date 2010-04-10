@@ -240,7 +240,7 @@ void Iface::Destroy()
   this->mmapFd = 0;
 
   // Delete the file
-  std::cout <<  "deleting "<< this->filename << "\n";
+  //std::cout <<  "deleting "<< this->filename << "\n";
 
   if (unlink(this->filename.c_str()) < 0)
   {
@@ -310,7 +310,7 @@ void Iface::Open(Client *client, std::string id)
     throw(stream.str());
   }
 
-  std::ios_base::fmtflags origFlags = std::cout.flags();
+  /*std::ios_base::fmtflags origFlags = std::cout.flags();
 
   // Print the name, version info
   std::cout << "opening " << this->filename.c_str() << " "
@@ -320,6 +320,7 @@ void Iface::Open(Client *client, std::string id)
   << ((GazeboData*) this->mMap)->size << "\n";
 
   std::cout.setf(origFlags);
+  */
 
   this->Lock(1);
   ((GazeboData*)this->mMap)->openCount++;

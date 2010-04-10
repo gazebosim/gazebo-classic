@@ -31,13 +31,13 @@ void make_plot()
     std::cerr << "Error\n";
 }
 
-void spawn_box(double x, double y, double z=10)
+void spawn_camera(double x, double y, double z=1)
 {
   std::ostringstream model;
 
   model << "<model:physical name='camera" << camera_count++ << "'>";
   model << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
-  model << "  <rpy>30 40 0</rpy>";
+  model << "  <static>true</static>";
   model << "  <body:box name='body'>";
 
   model << "    <geom:box name='geom'>";
@@ -50,9 +50,13 @@ void spawn_box(double x, double y, double z=10)
   model << "      </visual>";
   model << "    </geom:box>";
 
-  model << "   <sensor:camera name='camera'>";
+  model << "   <sensor:camera name='camera" << camera_count << "'>";
+  model << "     <alwaysActive>true</alwaysActive>";
   model << "     <imageSize>640 480</imageSize>";
-  model << "     
+  model << "     <hfov>60</hfov>";
+  model << "     <nearClip>0.1</nearClip>";
+  model << "     <farClip>50</farClip>";
+  model << "   </sensor:camera>";
 
   model << "  </body:box>";
   model << "</model:physical>";
@@ -103,24 +107,28 @@ int main()
 
   FILE *out = fopen(data_filename.c_str(), "w");
 
-  for (unsigned int j=0; j < 100; j++)
+  for (int y=-10; y < 10; y++)
   {
-    spawn_box(j+1, 0);
-
-    double simTime = 0;
-    double realTime = 0;
-
-    for (unsigned int i=0; i < 50; i++)
+    for ( int x=-10; x < 10; x++)
     {
-      simTime += simIface->data->simTime;
-      realTime += simIface->data->realTime;
+      spawn_camera(x, y);
 
-      /// Wait .1 seconds 
-      usleep(100000);
+      double simTime = 0;
+      double realTime = 0;
+
+      for (unsigned int i=0; i < 50; i++)
+      {
+        simTime += simIface->data->simTime;
+        realTime += simIface->data->realTime;
+
+        /// Wait .1 seconds 
+        usleep(100000);
+      }
+
+      double percent = simTime / realTime;
+      fprintf(out,"%f\n",percent);
+
     }
-
-    double percent = simTime / realTime;
-    fprintf(out,"%f\n",percent);
   }
   fclose(out);
 

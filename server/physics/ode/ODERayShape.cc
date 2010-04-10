@@ -38,6 +38,8 @@ using namespace gazebo;
 ODERayShape::ODERayShape( Geom *parent, bool displayRays )
     : RayShape(parent, displayRays)
 {
+  this->SetName("ODE Ray Shape");
+
   ODEGeom *geom = (ODEGeom*)this->parent;
 
   // Create default ray with unit length

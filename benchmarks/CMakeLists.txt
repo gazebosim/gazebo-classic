@@ -1,4 +1,4 @@
-project(factory)
+project(benchmarks)
 
 cmake_minimum_required( VERSION 2.4 FATAL_ERROR )
 
@@ -21,7 +21,11 @@ link_directories( ${LINK_DIRS} )
 
 include_directories(.)
 
-set (sources laser_benchmark.cc box_grid_benchmark.cc box_pile_benchmark.cc joint_chain_benchmark.cc)
+set (sources laser_benchmark.cc 
+             box_grid_benchmark.cc 
+             box_pile_benchmark.cc 
+             joint_chain_benchmark.cc
+             camera_benchmark.cc)
 
 set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "-ggdb -g2 -Wall")
 
@@ -29,8 +33,10 @@ add_executable(laser_benchmark laser_benchmark.cc)
 add_executable(box_pile_benchmark box_pile_benchmark.cc)
 add_executable(box_grid_benchmark box_grid_benchmark.cc)
 add_executable(joint_chain_benchmark joint_chain_benchmark.cc)
+add_executable(camera_benchmark camera_benchmark.cc)
 
 target_link_libraries(laser_benchmark ${LINK_LIBS} )
 target_link_libraries(box_grid_benchmark ${LINK_LIBS} )
 target_link_libraries(box_pile_benchmark ${LINK_LIBS} )
 target_link_libraries(joint_chain_benchmark ${LINK_LIBS} )
+target_link_libraries(camera_benchmark ${LINK_LIBS} )

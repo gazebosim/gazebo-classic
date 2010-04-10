@@ -61,6 +61,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~Geom();
 
+    /// \brief Finalize the geom
+    public: void Fini();
+
     /// \brief Load the geom
     public: virtual void Load(XMLConfigNode *node);
 
@@ -170,7 +173,10 @@ namespace gazebo
             {
               contactSignal.connect( boost::bind(func, c, _1) );
             }
- 
+
+    /// \brief Enable callback: Called when the body changes
+    private: void EnabledCB(bool enabled);
+
     /// \brief Create the bounding box for the geom
     private: void CreateBoundingBox();
 

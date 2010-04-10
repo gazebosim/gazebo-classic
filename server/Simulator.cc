@@ -108,12 +108,6 @@ Simulator::~Simulator()
     this->model_delete_mutex = NULL;
   }
 
-  if (this->gui)
-  {
-    delete this->gui;
-    this->gui = NULL;
-  }
-
   if (this->physicsThread)
   {
     delete this->physicsThread;
@@ -129,7 +123,15 @@ void Simulator::Close()
   if (!this->loaded)
     return;
 
+  if (this->gui)
+  {
+    delete this->gui;
+    this->gui = NULL;
+  }
+
+
   gazebo::World::Instance()->Close();
+
   if (this->renderEngineEnabled)
     gazebo::OgreAdaptor::Instance()->Close();
 }

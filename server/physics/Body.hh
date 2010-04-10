@@ -211,6 +211,15 @@ namespace gazebo
 
     public: Entity *GetCoMEntity() { return this->comEntity; }
 
+    /// \brief Connect a boost::slot the the add entity signal
+    public: template<typename T>
+            boost::signals::connection ConnectEnabledSignal( T subscriber )
+            { return enabledSignal.connect(subscriber); }
+
+    public: template<typename T>
+            void DisconnectEnabledSignal( T subscriber )
+            { enabledSignal.disconnect(subscriber); }
+
     /// List of geometries attached to this body
     protected: std::map< std::string, Geom* > geoms;
 
@@ -262,12 +271,17 @@ namespace gazebo
     protected: ParamT<double> *iyzP;
     protected: Mass customMass;
 
+
     /// \brief if this is the canonical :ody of a model, point back
     protected: Model* canonicalModel;
 
     /// \brief this is how you set canonical body from the model
     public: void SetCanonicalModel(Model* model);
 
+    private: boost::signal<void (bool)> enabledSignal;
+
+    /// This flag is used to trigger the enabledSignal
+    private: bool enabled;
   };
 
   /// \}

@@ -174,7 +174,10 @@ namespace gazebo
 
     /// \brief Get a geom by name
     public: Geom *GetGeom(const std::string &name) const;
-  
+
+    /// \brief Detach from parent model
+    public: void Detach();
+
     /// \brief Attach this model to its parent
     public: void Attach(XMLConfigNode *node);
   

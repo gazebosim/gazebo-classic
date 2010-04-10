@@ -1,31 +1,30 @@
-SET (sources Server.cc 
+set (sources Server.cc 
              Client.cc 
              Iface.cc 
              IfaceFactory.cc 
+             FactoryIface.cc 
              SimIface.cc 
              Graphics3dIface.cc
 )
 
-SET (headers gz.h IfaceFactory.hh)
+set (headers gz.h IfaceFactory.hh)
 
-INCLUDE_DIRECTORIES(
-  ${boost_include_dirs}
-)
+include_directories(${boost_include_dirs})
 
-IF (${ENABLE_BINDINGS})
-  ADD_SUBDIRECTORY(bindings)
-ENDIF (${ENABLE_BINDINGS})
+if (${ENABLE_BINDINGS})
+  add_subdirectory(bindings)
+endif (${ENABLE_BINDINGS})
 
-LINK_DIRECTORIES(${boost_library_dirs})
+link_directories(${boost_library_dirs})
 
-ADD_LIBRARY(gazeboshm SHARED ${sources})
-SET_TARGET_PROPERTIES(gazeboshm PROPERTIES OUTPUT_NAME "gazebo" VERSION ${GAZEBO_VERSION})
+add_library(gazeboshm SHARED ${sources})
+set_target_properties(gazeboshm PROPERTIES OUTPUT_NAME "gazebo" VERSION ${GAZEBO_VERSION})
 
-TARGET_LINK_LIBRARIES( gazeboshm ${boost_libraries})
+target_link_libraries( gazeboshm ${boost_libraries})
 
-INSTALL (TARGETS gazeboshm DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-INSTALL (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
+install (TARGETS gazeboshm DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/libgazebo_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/libgazebo.pc @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/libgazebo_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/libgazebo.pc @ONLY)
 
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libgazebo.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libgazebo.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
