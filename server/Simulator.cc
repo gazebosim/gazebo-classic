@@ -74,6 +74,7 @@ Simulator::Simulator()
   selectedEntity(NULL),
   selectedBody(NULL)
 {
+  this->selectedEntity = NULL;
   this->render_mutex = new boost::recursive_mutex();
   this->model_delete_mutex = new boost::recursive_mutex();
   this->startTime = this->GetWallTime();

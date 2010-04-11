@@ -54,7 +54,7 @@ namespace gazebo
     public: void Update();
 
     /// \brief Add an entity to the browser
-    public: void AddEntityToBrowser(Entity *model);
+    public: void AddEntityToBrowser(const Entity *model);
 
     /// \brief Callback for the parameter browser
     public: static void ParamBrowserCB( Fl_Widget * w, void *data);

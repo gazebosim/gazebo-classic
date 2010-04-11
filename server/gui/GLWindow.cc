@@ -166,7 +166,7 @@ void GLWindow::Update()
   // continuously apply force to selected body
   Entity *entity = Simulator::Instance()->GetSelectedEntity(); 
 
-  if (entity->IsBody() &&
+  if (entity && entity->GetType() == Entity::BODY &&
       (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
   {
     Body *body = (Body*)(entity);
@@ -305,10 +305,10 @@ void GLWindow::HandleMouseDrag()
 
     if (this->leftMousePressed)
     {
-      if ( (entity->IsModel() || entity->IsBody()) && 
+      if ( entity && (entity->GetType() == Entity::MODEL || entity->GetType() == Entity::BODY) && 
            (this->keys[FL_Control_L] || this->keys[FL_Control_R])  )
       {
-        if (entity->IsModel())
+        if (entity->GetType() == Entity::MODEL)
         {
           Model *model = (Model*)(entity);
 
@@ -338,7 +338,7 @@ void GLWindow::HandleMouseDrag()
           model->SetAbsPose(modelPose);
         }
 
-        if (entity->IsBody())
+        if (entity->GetType() == Entity::BODY)
         {
           Body *body = (Body*)(entity);
           double distance, scaleX, scaleY, torqueScale;
@@ -381,10 +381,10 @@ void GLWindow::HandleMouseDrag()
     }
     else if (this->rightMousePressed)
     {
-      if ( (entity->IsModel() || entity->IsBody()) && 
+      if ( entity && (entity->GetType() == Entity::MODEL || entity->GetType() == Entity::BODY) && 
            (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
       {
-        if (entity->IsModel())
+        if (entity->GetType() == Entity::MODEL)
         {
           Model *model = (Model*)(entity);
           double distance, scaleX, scaleY;
@@ -415,7 +415,7 @@ void GLWindow::HandleMouseDrag()
           //          << model->GetName() << ")" << std::endl;
         }
 
-        if (entity->IsBody())
+        if (entity->GetType() == Entity::BODY)
         {
           double distance, scaleX, scaleY, forceScale;
           Pose3d bodyPose;
@@ -458,7 +458,7 @@ void GLWindow::HandleMouseDrag()
     }
     else if (this->middleMousePressed)
     {
-      if (entity->IsBody() && 
+      if (entity && entity->GetType() == Entity::BODY && 
           (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
       {
         double distance, scaleX, scaleY;
@@ -512,11 +512,11 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
 
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
 
-  if ( (entity->IsModel() || entity->IsBody()) && 
+  if ( entity && (entity->GetType() == Entity::MODEL || entity->GetType() == Entity::BODY) && 
       (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
   {
     // FIXME: old
-    if (entity->IsModel())
+    if (entity->GetType() == Entity::MODEL)
     {
       Model *model = (Model*)(entity);
 
@@ -527,7 +527,7 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
       //          << model->GetName() << ")" << std::endl;
     }
     // FIXME: old
-    if (entity->IsBody())
+    if (entity->GetType() == Entity::BODY)
     {
       Body *body = (Body*)(entity);
       Pose3d pose = body->GetAbsPose();

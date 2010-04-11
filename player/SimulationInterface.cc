@@ -101,7 +101,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     gzReq = &(this->iface->data->requests[ this->iface->data->requestCount++ ]);
 
     gzReq->type = gazebo::SimulationRequestData::SET_POSE3D;
-    strcpy((char*)gzReq->modelName, req->name);
+    strcpy((char*)gzReq->name, req->name);
 
     gzReq->modelPose.pos.x = req->pose.px;
     gzReq->modelPose.pos.y = req->pose.py;
@@ -135,7 +135,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     gzReq->type = gazebo::SimulationRequestData::SET_POSE2D;
 
-    strcpy((char*)gzReq->modelName, req->name);
+    strcpy((char*)gzReq->name, req->name);
 
     gzReq->modelPose.pos.x = req->pose.px;
     gzReq->modelPose.pos.y = req->pose.py;
@@ -163,7 +163,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     gzReq->type = gazebo::SimulationRequestData::GET_POSE3D;
 
-    strcpy((char*)gzReq->modelName, req->name);
+    strcpy((char*)gzReq->name, req->name);
 
     this->iface->Unlock();
   }
@@ -183,7 +183,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     gzReq->type = gazebo::SimulationRequestData::GET_POSE2D;
 
-    strcpy((char*)gzReq->modelName, req->name);
+    strcpy((char*)gzReq->name, req->name);
 
     this->iface->Unlock();
   }
@@ -239,7 +239,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       if (prop == "num_children")
       {
         gzReq->type = gazebo::SimulationRequestData::GET_NUM_CHILDREN;
-        strcpy((char*)gzReq->modelName, req->name);   
+        strcpy((char*)gzReq->name, req->name);   
       }
       else if (prop == "model_name")
       {
@@ -250,17 +250,17 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
       {
         gzReq->type = gazebo::SimulationRequestData::GET_CHILD_NAME;
         gzReq->uintValue = req->index;
-        strcpy((char*)gzReq->modelName, req->name);   
+        strcpy((char*)gzReq->name, req->name);   
       }
        else if (prop == "fiducial_id")
       {
         gzReq->type = gazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID;
-        strcpy((char*)gzReq->modelName, req->name);   
+        strcpy((char*)gzReq->name, req->name);   
       }
       else if (prop == "model_type")
       {
         gzReq->type = gazebo::SimulationRequestData::GET_MODEL_TYPE;
-        strcpy((char*)gzReq->modelName, req->name);   
+        strcpy((char*)gzReq->name, req->name);   
       }
       else if ((prop == "num_models") && (name == "world"))
       { 
@@ -340,14 +340,14 @@ void SimulationInterface::Update()
       case gazebo::SimulationRequestData::GET_POSE3D:
         {
 
-          if (this->pose3dReq.name_count != strlen(response->modelName))
+          if (this->pose3dReq.name_count != strlen(response->name))
           {
             if (this->pose3dReq.name)
               delete [] this->pose3dReq.name;
-            this->pose3dReq.name = new char[strlen(response->modelName)+1];
+            this->pose3dReq.name = new char[strlen(response->name)+1];
           }
 
-          strcpy(this->pose3dReq.name, response->modelName);
+          strcpy(this->pose3dReq.name, response->name);
           this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
           this->pose3dReq.pose.px = response->modelPose.pos.x;
@@ -367,14 +367,14 @@ void SimulationInterface::Update()
       case gazebo::SimulationRequestData::GET_POSE2D:
         {
 
-          if (this->pose2dReq.name_count != strlen(response->modelName))
+          if (this->pose2dReq.name_count != strlen(response->name))
           {
             if (this->pose2dReq.name)
               delete [] this->pose2dReq.name;
-            this->pose2dReq.name = new char[strlen(response->modelName)+1];
+            this->pose2dReq.name = new char[strlen(response->name)+1];
           }
 
-          strcpy(this->pose2dReq.name, response->modelName);
+          strcpy(this->pose2dReq.name, response->name);
           this->pose2dReq.name_count = strlen(this->pose2dReq.name);
 
           this->pose2dReq.pose.px = response->modelPose.pos.x;

@@ -135,7 +135,7 @@ void Sidebar::Update()
 
   this->paramCount = 0;
 
-  if (entity->IsModel())
+  if (entity && entity->GetType() == Entity::MODEL)
   {
     Model *model = (Model*)(entity);
 
@@ -341,8 +341,10 @@ void Sidebar::EntityBrowserCB( Fl_Widget *w, void *data )
 
   lineText = browser->text(selected);
 
-  Model *model = World::Instance()->GetModelByName(lineText);
-  Simulator::Instance()->SetSelectedEntity(model);
+  Entity *ent = World::Instance()->GetEntityByName(lineText);
+
+  if (ent)
+    Simulator::Instance()->SetSelectedEntity(ent);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -391,8 +393,8 @@ void Sidebar::AddToParamBrowser(const std::string &line)
 /// Update entity browser
 void Sidebar::UpdateEntityBrowser()
 {
-  std::vector<Model*>::iterator iter;
-  std::vector<Model*> models = World::Instance()->GetModels();
+  std::vector<Model*>::const_iterator iter;
+  const std::vector<Model*> models = World::Instance()->GetModels();
 
   for (iter = models.begin(); iter != models.end(); iter++)
     this->AddEntityToBrowser((*iter));
@@ -400,7 +402,7 @@ void Sidebar::UpdateEntityBrowser()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add an entity to the browser
-void Sidebar::AddEntityToBrowser(Entity *entity)
+void Sidebar::AddEntityToBrowser(const Entity *entity)
 {
   this->entityBrowser->add( entity->GetName().c_str() );
 }
@@ -413,7 +415,7 @@ void Sidebar::JointChoiceCB( Fl_Widget *w, void *data )
   Fl_Choice *choice = (Fl_Choice*)(w);
 
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
-  if (entity->IsModel())
+  if (entity->GetType() == Entity::MODEL)
   {
     Model *model = (Model*)(entity);
 
@@ -440,7 +442,7 @@ void Sidebar::JointForceSliderCB( Fl_Widget *w, void *data )
   double value = slider->value();
 
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
-  if (entity->IsModel())
+  if (entity->GetType() == Entity::MODEL)
   {
     Model *model = (Model*)(entity);
 
@@ -465,7 +467,7 @@ void Sidebar::JointVelocitySliderCB( Fl_Widget *w, void *data )
   double value = slider->value();
 
   Entity *entity = Simulator::Instance()->GetSelectedEntity();
-  if (entity->IsModel())
+  if (entity->GetType() == Entity::MODEL)
   {
     Model *model = (Model*)(entity);
     Joint *joint = model->GetJoint( self->jointChoice->text() );

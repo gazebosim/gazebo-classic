@@ -52,13 +52,15 @@ namespace gazebo
    */
   class Entity : public Common
   {
+    public: enum Type{DEFAULT, MODEL, BODY, GEOM};
+
     /// \brief Constructor
     /// \param parent Parent of the entity.
     public: Entity(Entity *parent = NULL);
   
     /// \brief Destructor
     public: virtual ~Entity();
- 
+
     /// \brief Return the ID of the parent
     /// \return Integer ID
     public: int GetParentId() const;
@@ -81,7 +83,7 @@ namespace gazebo
   
     /// \brief Get all children
     /// \return Vector of children entities
-    public: std::vector< Entity* >  &GetChildren();
+    public: const std::vector< Entity* >  &GetChildren() const;
   
     /// \brief Return this entity's sceneNode
     /// \return Ogre scene node
@@ -134,15 +136,6 @@ namespace gazebo
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;
 
-    /// \brief Return true if the entity is a geom
-    public: bool IsGeom() const;
-
-    /// \brief Return true if the entity is a body
-    public: bool IsBody() const;
-
-    /// \brief Return true if the entity is a model
-    public: bool IsModel() const;
-
     /// \brief Get the parent model, if one exists
     /// \return Pointer to a model, or NULL if no parent model exists
     public: Model *GetParentModel() const;
@@ -154,6 +147,12 @@ namespace gazebo
     /// \brief Return the name of this entity with the model+body+geom scope
     ///        model1::...::modelN::bodyN::entityName
     public: std::string GetCompleteScopedName();
+
+    /// \brief Set the type of this entity
+    public: void SetType(Type type);
+
+    /// \brief Get the type of this entity
+    public: Type GetType() const;
 
     /// \brief Handle a change of pose
     private: void PoseChange(bool notify = true);
@@ -173,6 +172,8 @@ namespace gazebo
     private: bool selected;
 
     private: Pose3d relativePose;
+
+    protected: Type type;
   };
   
   /// \}

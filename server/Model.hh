@@ -80,7 +80,7 @@ namespace gazebo
     public: void Save(std::string &prefix, std::ostream &stream);
 
     /// \brief Initialize the model
-    public: void Init();
+    public: virtual void Init();
   
     /// \brief Update the model
     /// \param params Update parameters
@@ -105,7 +105,7 @@ namespace gazebo
     protected: virtual void FiniChild() {}
     
     /// \brief Get the type of the model
-    public: const std::string &GetType() const;
+    public: const std::string &GetModelType() const;
 
     /// \brief Set the initial pose
     public: void SetInitPose(const Pose3d &pose);
@@ -236,7 +236,7 @@ namespace gazebo
     private: void LoadRenderable(XMLConfigNode *node);
   
     /// \brief Type of the model (such as Pioneer2DX, or SimpleSolid)
-    private: std::string type;
+    private: std::string modelType;
   
     /// \brief The node this model was loaded from
     private: XMLConfigNode *xmlNode;

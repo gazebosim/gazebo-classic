@@ -45,6 +45,8 @@ using namespace gazebo;
 Entity::Entity(Entity *parent)
 : Common(), parent(parent), visualNode(0)
 {
+  this->type = DEFAULT;
+
   Param::Begin(&this->parameters);
   this->staticP = new ParamT<bool>("static",false,0);
   //this->staticP->Callback( &Entity::SetStatic, this);
@@ -82,6 +84,7 @@ Entity::~Entity()
 {
   if (this->parent)
     this->parent->RemoveChild(this);
+  this->SetParent(NULL);
 
   delete this->staticP;
 
@@ -114,9 +117,10 @@ Entity::~Entity()
       OgreCreator::Instance()->DeleteVisual(this->visualNode);
     }
   }
-  this->visualNode = NULL;
 
+  this->visualNode = NULL;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the ID of the parent
@@ -167,7 +171,7 @@ void Entity::RemoveChild(Entity *child)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get all children
-std::vector< Entity* > &Entity::GetChildren() 
+const std::vector< Entity* > &Entity::GetChildren() const
 {
   return this->children;
 }
@@ -248,27 +252,6 @@ bool Entity::operator==(const Entity &ent) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Return true if the entity is a geom
-bool Entity::IsGeom() const
-{
-  return dynamic_cast<const Geom*>(this) != NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if the entity is a body
-bool Entity::IsBody() const
-{
-  return dynamic_cast<const Body*>(this) != NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if the entity is a model
-bool Entity::IsModel() const
-{
-  return dynamic_cast<const Model*>(this) != NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Return the name of this entity with the model scope
 /// model1::...::modelN::entityName
 std::string Entity::GetScopedName()
@@ -342,7 +325,7 @@ void Entity::SetRelativePose(const Pose3d &pose, bool notify)
 /// Get the pose relative to the model this entity belongs to
 Pose3d Entity::GetModelRelativePose() const
 {
-  if (this->IsModel() || !this->parent)
+  if (this->type == MODEL || !this->parent)
     return Pose3d();
 
   return this->GetRelativePose() + this->parent->GetModelRelativePose();
@@ -402,8 +385,22 @@ Model *Entity::GetParentModel() const
 {
   Entity *p = this->parent;
 
-  while (p && !p->IsModel())
+  while (p && p->type != MODEL)
     p = p->GetParent();
 
   return (Model*)p;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the type of this entity
+void Entity::SetType(Entity::Type type)
+{
+  this->type = type;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the type of this entity
+Entity::Type Entity::GetType() const
+{
+  return this->type;
 }

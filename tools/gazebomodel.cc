@@ -14,22 +14,24 @@ void print_model(std::string name, std::string prefix)
   std::string type;
   gazebo::Pose pose;
 
-  if (!simIface->GetPose3d(name, pose))
+  /*if (!simIface->GetPose3d(name, pose))
     std::cerr << "Unable to get model[" << name << "] pose\n";
   if (!simIface->GetModelType(name, type))
     std::cerr << "Unable to get model[" << name << "] type\n";
+    */
 
-  std::cout << prefix << "Model[" << name << "]\n";
-  std::cout << prefix << "  Type: " << type << "\n";
+  std::cout << prefix << name << "\n";
+  /*std::cout << prefix << "  Type: " << type << "\n";
   std::cout << prefix << "  XYZ: " << pose.pos.x << " " << pose.pos.y 
             << " " << pose.pos.z << "\n";
   std::cout << prefix << "  RPY: " << pose.roll << " " << pose.pitch 
             << " " << pose.yaw << "\n";
- 
-  /*unsigned int children;
+            */
+
+  unsigned int children;
   if (!simIface->GetNumChildren(name, children))
     std::cerr << "Unable to get the number of children for model[" 
-              << name << "]\n";
+      << name << "]\n";
 
   for (unsigned int i=0; i < children; i++)
   {
@@ -37,8 +39,14 @@ void print_model(std::string name, std::string prefix)
     if (!simIface->GetChildName(name, i, childName))
       std::cerr << "Unable to get model[" << name << "] child name.\n";
     else
-      info(childName, prefix + "  ");
-  }*/
+    {
+      std::string type;
+      simIface->GetEntityType(childName, type);
+      if (type == "model")
+        print_model(childName, prefix+"  ");
+    }
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +55,7 @@ void list(int argc, char **argv)
 {
   unsigned int numModels = 0;
 
+  std::string prefix = "";
   if (!simIface->GetNumModels(numModels))
     std::cerr << "Unable to get the model count\n";
 

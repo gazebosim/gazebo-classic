@@ -313,7 +313,7 @@ void GLFrame::TrackCB(Fl_Widget *widget, void *data)
     frame->glWindow->GetCamera()->TrackModel( NULL );
   else
   {
-    Model *model = World::Instance()->GetModelByName(choice->text() );
+    Model *model = dynamic_cast<Model*>(World::Instance()->GetEntityByName(choice->text() ));
     frame->glWindow->GetCamera()->TrackModel( model );
   }
 }

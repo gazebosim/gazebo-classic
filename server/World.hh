@@ -157,11 +157,12 @@ class World : public SingletonT<World>
   /// \param name The name of the entity to delete
   public: void DeleteEntity(const char *name);
 
-  /// \brief Get a pointer to a model based on a name
-  public: Model *GetModelByName(std::string modelName);
+  /// \brief Get a pointer to a entity based on a name
+  public: Entity *GetEntityByName(const std::string &name) const;
+  private: Entity *GetEntityByNameHelper(const std::string &name, Entity *parent) const;
 
   /// \brief Get an iterator over the models
-  public: std::vector<Model*> &GetModels();
+  public: const std::vector<Model*> &GetModels() const;
 
   /// \brief Reset the simulation to the initial settings
   public: void Reset();
@@ -339,14 +340,8 @@ class World : public SingletonT<World>
   /// Pointer the physics engine
   private: PhysicsEngine *physicsEngine;
 
-  /// List of all the models
-  private: std::vector< Model* > models;
-
-  /// List of all the registered geometries
-  private: std::vector< Geom* > geometries;
-
-  /// List of all the registered bodies
-  private: std::vector< Body* > bodies;
+  /// An abstract entity that is the root of the Entity Tree
+  private: std::vector<Model*> models;
 
   /// List of models to delete from the world
   private: std::vector< Model* > toDeleteModels;

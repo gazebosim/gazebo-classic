@@ -428,6 +428,7 @@ class SimulationRequestData
                       SET_STATE,
                       GET_STATE,
                       GO,
+                      GET_ENTITY_TYPE,
                       GET_MODEL_TYPE,
                       GET_NUM_MODELS,
                       GET_NUM_CHILDREN,
@@ -440,7 +441,7 @@ class SimulationRequestData
                    };
 
   public: Type type; 
-  public: char modelName[512];
+  public: char name[512];
   public: char strValue[512];
   public: Vec3 vec3Value;
   public: unsigned int uintValue;
@@ -571,6 +572,9 @@ class SimulationIface : public Iface
 
   /// \brief Get the Type of an interface e.g. "laser" "model" "fiducial"
   public: void GetInterfaceType(const std::string &modelName);
+
+  /// \brief return the type of the entity (model, body, geom)
+  public: bool GetEntityType(const std::string &name, std::string &type);
 
   /// \brief Get the type of this model
   public: bool GetModelType(const std::string &modelName, std::string &type);

@@ -57,7 +57,8 @@ uint Model::lightNumber = 0;
 Model::Model(Model *parent)
     : Entity(parent)
 {
-  this->type = "";
+  this->type = MODEL;
+  this->modelType = "";
   this->joint = NULL;
 
   Param::Begin(&this->parameters);
@@ -157,18 +158,19 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   XMLConfigNode *childNode;
   std::string scopedName;
   Pose3d pose;
-  Model* dup;
+  Entity* dup;
 
   this->nameP->Load(node);
 
   scopedName = this->GetScopedName();
 
+  dup = World::Instance()->GetEntityByName(scopedName);
   // Look for existing models by the same name
-  if((dup = World::Instance()->GetModelByName(scopedName)) != NULL)
+  if(dup != NULL && dup != this)
   {
     if(!removeDuplicate)
     {
-      gzthrow("Duplicate model name" + scopedName + "\n");
+      gzthrow("Duplicate model name[" + scopedName + "]\n");
     }
     else
     {
@@ -190,7 +192,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->laserRetroP->Load(node);
 
   this->xmlNode = node;
-  this->type=node->GetName();
+  this->modelType=node->GetName();
 
   this->SetStatic( **(this->staticP) );
 
@@ -202,12 +204,12 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   if (this->IsStatic())
     this->SetRelativePose( pose );
 
-  if (this->type == "physical")
+  if (this->modelType == "physical")
     this->LoadPhysical(node);
-  else if (this->type == "renderable")
+  else if (this->modelType == "renderable")
     this->LoadRenderable(node);
-  else if (this->type != "empty")
-    gzthrow("Invalid model type[" + this->type + "]\n");
+  else if (this->modelType != "empty")
+    gzthrow("Invalid model type[" + this->modelType + "]\n");
 
   // Set the relative pose of the model
   if (!this->IsStatic())
@@ -299,9 +301,9 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
 
-  if (this->type=="renderable")
+  if (this->modelType=="renderable")
     typeName = "renderable";
-  else if (this->type=="physical")
+  else if (this->modelType=="physical")
     typeName = "physical";
 
   stream << prefix << "<model:" << typeName;
@@ -312,7 +314,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->enableFrictionP) << "\n";
   stream << prefix << "  " << *(this->collideP) << "\n";
 
-  if (this->type == "physical")
+  if (this->modelType == "physical")
   {
     stream << prefix << "  " << *(this->staticP) << "\n";
 
@@ -592,9 +594,9 @@ void Model::Reset()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the name of the model
-const std::string &Model::GetType() const
+const std::string &Model::GetModelType() const
 {
-  return this->type;
+  return this->modelType;
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Set the initial pose

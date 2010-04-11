@@ -227,8 +227,6 @@ void Body::Load(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("sensor");
   }
 
-  World::Instance()->RegisterBody(this);
-
   //this->GetModel()->ConnectUpdateSignal( boost::bind(&Body::Update, this) );
 }
 
