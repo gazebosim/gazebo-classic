@@ -471,8 +471,11 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     int numc = 0;
     dContact contact;
 
-    if (geom1->GetType() == Shape::TRIMESH && geom2->GetType()==Shape::TRIMESH)
+    if (geom1->GetShapeType() == Shape::TRIMESH && 
+        geom2->GetShapeType()==Shape::TRIMESH)
+    {
       numContacts = maxContacts;
+    }
 
     numc = dCollide(o1,o2,numContacts, self->contactGeoms, 
                     sizeof(self->contactGeoms[0]));

@@ -24,6 +24,7 @@
  * CVS: $Id: ODEHinge2Joint.cc 7129 2008-11-12 19:38:15Z natepak $
  */
 
+#include "Body.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "ODEHinge2Joint.hh"
@@ -90,6 +91,8 @@ Vector3 ODEHinge2Joint::GetAnchor(int index) const
 void ODEHinge2Joint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
   dJointSetHinge2Anchor( this->jointId, anchor.x, anchor.y, anchor.z );
   this->physics->UnlockMutex();
 }
@@ -99,6 +102,9 @@ void ODEHinge2Joint::SetAnchor( int /*index*/, const Vector3 &anchor )
 void ODEHinge2Joint::SetAxis( int index, const Vector3 &axis )
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   if (index == 0)
     dJointSetHinge2Axis1( this->jointId, axis.x, axis.y, axis.z );
   else
@@ -187,6 +193,9 @@ void ODEHinge2Joint::SetMaxForce(int index, double t)
 void ODEHinge2Joint::SetForce(int index, double torque)
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   if (index == 0)
     dJointAddHinge2Torques(this->jointId, torque, 0);
   else
@@ -210,6 +219,7 @@ double ODEHinge2Joint::GetParam( int parameter ) const
 void ODEHinge2Joint::SetParam( int parameter, double value)
 {
   this->physics->LockMutex();
+  ODEJoint::SetParam(parameter, value);
   dJointSetHinge2Param( this->jointId, parameter, value );
   this->physics->UnlockMutex();
 }

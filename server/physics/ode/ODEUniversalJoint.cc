@@ -24,6 +24,7 @@
  * CVS: $Id: ODEUniversalJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
+#include "Body.hh"
 #include "ODEUniversalJoint.hh"
 
 using namespace gazebo;
@@ -59,6 +60,9 @@ Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 void ODEUniversalJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   dJointSetUniversalAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
   this->physics->UnlockMutex();
 }
@@ -84,6 +88,10 @@ Vector3 ODEUniversalJoint::GetAxis(int index ) const
 void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
 {
   this->physics->LockMutex();
+
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   if (index == 0)
     dJointSetUniversalAxis1( this->jointId, axis.x, axis.y, axis.z );
   else
@@ -136,6 +144,8 @@ void ODEUniversalJoint::SetVelocity(int index,double angle)
 void ODEUniversalJoint::SetForce(int index, double torque)
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
   if (index == 0)
     dJointAddUniversalTorques( this->jointId, torque, 0);
   else
@@ -168,6 +178,7 @@ double ODEUniversalJoint::GetMaxForce(int index)
 void ODEUniversalJoint::SetParam( int parameter, double value)
 {
   this->physics->LockMutex();
+  ODEJoint::SetParam(parameter, value);
   dJointSetUniversalParam( this->jointId, parameter, value );
   this->physics->UnlockMutex();
 }

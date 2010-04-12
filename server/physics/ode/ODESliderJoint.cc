@@ -24,6 +24,7 @@
  * CVS: $Id: ODESliderJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
+#include "Body.hh"
 #include "XMLConfig.hh"
 #include "ODESliderJoint.hh"
 
@@ -96,6 +97,9 @@ void ODESliderJoint::SetVelocity(int /*index*/, double angle)
 void ODESliderJoint::SetAxis( int /*index*/, const Vector3 &axis )
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );
   this->physics->UnlockMutex();
 }
@@ -105,6 +109,9 @@ void ODESliderJoint::SetAxis( int /*index*/, const Vector3 &axis )
 void ODESliderJoint::SetForce(int /*index*/, double force)
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   dJointAddSliderForce(this->jointId, force);
   this->physics->UnlockMutex();
 }
@@ -114,6 +121,7 @@ void ODESliderJoint::SetForce(int /*index*/, double force)
 void ODESliderJoint::SetParam( int parameter, double value )
 {
   this->physics->LockMutex();
+  ODEJoint::SetParam(parameter, value);
   dJointSetSliderParam( this->jointId, parameter, value );
   this->physics->UnlockMutex();
 }

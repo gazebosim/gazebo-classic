@@ -76,6 +76,9 @@ Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 void ODEHingeJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   dJointSetHingeAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
   this->physics->UnlockMutex();
 }
@@ -99,6 +102,9 @@ Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 void ODEHingeJoint::SetAxis( int /*index*/, const Vector3 &axis )
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
+
   dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
   this->physics->UnlockMutex();
 }
@@ -151,6 +157,8 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 void ODEHingeJoint::SetForce(int /*index*/, double torque)
 {
   this->physics->LockMutex();
+  this->body1->SetEnabled(true);
+  this->body2->SetEnabled(true);
   dJointAddHingeTorque( this->jointId, torque );
   this->physics->UnlockMutex();
 }
@@ -171,6 +179,8 @@ double ODEHingeJoint::GetParam( int parameter ) const
 void ODEHingeJoint::SetParam( int parameter, double value)
 {
   this->physics->LockMutex();
+  ODEJoint::SetParam(parameter, value);
+
   dJointSetHingeParam( this->jointId, parameter, value );
   this->physics->UnlockMutex();
 }
