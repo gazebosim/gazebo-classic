@@ -1,5 +1,5 @@
 
-SET (gazeboplugin_sources GazeboDriver.cc
+set (gazeboplugin_sources GazeboDriver.cc
              GazeboClient.cc
              GazeboInterface.cc
              GazeboTime.cc
@@ -17,15 +17,15 @@ SET (gazeboplugin_sources GazeboDriver.cc
              IRInterface.cc
 )
 
-INCLUDE_DIRECTORIES( 
+include_directories( 
   ${PLAYER_INCLUDE_DIRS} 
   ${CMAKE_SOURCE_DIR}/libgazebo 
   ${boost_include_dirs}
 )
 
-LINK_DIRECTORIES( ${PLAYER_LINK_DIRS} ${boost_library_dirs} gazeboshm)
+link_directories( ${PLAYER_LINK_DIRS} ${boost_library_dirs} gazeboshm)
 
-ADD_LIBRARY(gazeboplugin SHARED ${gazeboplugin_sources})
-TARGET_LINK_LIBRARIES(gazeboplugin ${PLAYER_LINK_LIBS} gazeboshm )
+add_library(gazeboplugin SHARED ${gazeboplugin_sources})
+target_link_libraries(gazeboplugin ${PLAYER_LINK_LIBS} gazeboshm )
 
-INSTALL(TARGETS gazeboplugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+install(TARGETS gazeboplugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

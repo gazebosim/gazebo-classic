@@ -120,6 +120,7 @@ else (build_errors)
     
     if (INCLUDE_PLAYER)
       add_subdirectory(player)
+      add_subdirectory(player_cfgs)
     endif (INCLUDE_PLAYER)
     
     if (INCLUDE_WEBGAZEBO)
