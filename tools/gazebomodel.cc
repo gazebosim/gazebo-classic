@@ -1,11 +1,20 @@
 #include <iostream>
-//#include <gazebo/gazebo.h>
+#include <stdio.h>
+#include <sys/select.h>
+#include <boost/algorithm/string.hpp>
 #include "libgazebo/gz.h"
+
+#include <yaml.h>
 
 gazebo::Client *client = NULL;
 gazebo::SimulationIface *simIface = NULL;
 gazebo::FactoryIface *factoryIface = NULL;
 
+std::map<std::string, std::string> yamlValues;
+std::vector<std::string> params;
+
+yaml_parser_t parser;
+yaml_event_t event;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Print out info for one model. Recurses through all child models
@@ -14,19 +23,7 @@ void print_model(std::string name, std::string prefix)
   std::string type;
   gazebo::Pose pose;
 
-  /*if (!simIface->GetPose3d(name, pose))
-    std::cerr << "Unable to get model[" << name << "] pose\n";
-  if (!simIface->GetModelType(name, type))
-    std::cerr << "Unable to get model[" << name << "] type\n";
-    */
-
   std::cout << prefix << name << "\n";
-  /*std::cout << prefix << "  Type: " << type << "\n";
-  std::cout << prefix << "  XYZ: " << pose.pos.x << " " << pose.pos.y 
-            << " " << pose.pos.z << "\n";
-  std::cout << prefix << "  RPY: " << pose.roll << " " << pose.pitch 
-            << " " << pose.yaw << "\n";
-            */
 
   unsigned int children;
   if (!simIface->GetNumChildren(name, children))
@@ -51,7 +48,7 @@ void print_model(std::string name, std::string prefix)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Print out a list of all the models
-void list(int argc, char **argv)
+void list()
 {
   unsigned int numModels = 0;
 
@@ -71,26 +68,93 @@ void list(int argc, char **argv)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Show info for a model
-void show(int argc, char **argv)
+void show()
 {
-  if (argc < 3)
+  if (params.size() < 2)
     std::cerr << "Missing model name\n";
   else
-    print_model(argv[2], "");
+  {
+    for (unsigned int i=1; i < params.size(); i++)
+    {
+      std::string name = params[i];
+      std::string type;
+      gazebo::Pose pose;
+      unsigned int paramCount;
+
+      if (!simIface->GetPose3d(name, pose))
+        std::cerr << "Unable to get model[" << name << "] pose\n";
+      if (!simIface->GetModelType(name, type))
+        std::cerr << "Unable to get model[" << name << "] type\n";
+      if (!simIface->GetEntityParamCount(name, paramCount))
+        std::cerr << "Unable to get model[" << name << "] param count\n";
+
+      for (unsigned int i=0; i < paramCount; i++)
+      {
+        std::string paramKey;
+        std::string paramValue;
+
+        if (!simIface->GetEntityParamKey(name, i, paramKey))
+          std::cerr << "Unable to get model[" << name << "] param key\n";
+        if (!simIface->GetEntityParamValue(name, i, paramValue))
+          std::cerr << "Unable to get model[" << name << "] param value\n";
+
+        std::cout << paramKey << ": " << paramValue << "\n";
+      }
+      std::cout << "\n";
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove a model from the world
-void kill(int argc, char **argv)
+void kill()
 {
-  if (argc < 3)
+  if (params.size() < 2)
     std::cerr << "Missing model name\n";
   else
   {
-    factoryIface->DeleteModel( argv[2] );
+    // Kill all the passed in models
+    for (unsigned int i=1; i < params.size(); i++)
+    {
+      factoryIface->DeleteModel( params[i] );
+
+      while (strcmp((const char*)factoryIface->data->deleteModel,"") != 0)
+        usleep(10000);
+    }
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Spawn a new model into the world
+void spawn()
+{
+  //TODO
+  //PROCESS YAML PARAMETER!!!
+  if (params.size() < 2)
+    std::cerr << "Missing model filename\n";
+  else
+  {
+    FILE *file = fopen(params[1].c_str(),"r");
+    if (file)
+    {
+      std::ostringstream stream;
+      while (!feof(file))
+      {
+        char buffer[256];
+        fgets(buffer, 256, file);
+        if (feof(file))
+            break;
+        stream << buffer;
+      }
+      strcpy((char*)factoryIface->data->newModel, stream.str().c_str());
+    }
+    else
+      std::cerr << "Unable to open file[" << params[1] << "]\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Print out help information
 void help()
 {
   std::cout << "gazebomodel is a command-line tool for printing out information about models in a gazebo world.\n";
@@ -100,9 +164,59 @@ void help()
 
   std::cout << "Commands:\n";
   std::cout << "\tgazebomodel list \t List all the models\n";
-  std::cout << "\tgazebomodel show \t Show info about a model\n";
+  std::cout << "\tgazebomodel show \t Show info about a model(s)\n";
+  std::cout << "\tgazebomodel kill \t Remove a model(s) from the world\n";
+  std::cout << "\tgazebomodel spawn \t Insert a model into the world\n";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Parse yaml parameters
+void parseYAML()
+{
+  std::map<std::string, std::string>::iterator iter;
+
+  // Create the yaml parser 
+  yaml_parser_initialize(&parser);
+
+  std::string input = params[params.size()-1];
+  yaml_parser_set_input_string(&parser, 
+      (const unsigned char *)input.c_str(), input.size());
+
+  bool done = false;
+  std::string name;
+  while (!done)
+  {
+    if (!yaml_parser_parse(&parser, &event))
+    {
+      std::cerr << "YAML error: Bad syntax for '" << input << "'\n";
+      break;
+    }
+
+    if (event.type == YAML_SCALAR_EVENT)
+    {
+      if (name.size() == 0)
+        name = (char*)(event.data.scalar.value);
+      else
+      {
+        yamlValues[name] = (char*)event.data.scalar.value;
+        name = "";
+      }
+    }
+
+    done = (event.type == YAML_STREAM_END_EVENT);
+    yaml_event_delete(&event);
+  }
+
+  yaml_parser_delete(&parser);
+
+  /*for (iter = yamlValues.begin(); iter != yamlValues.end(); iter++)
+  {
+    std::cout << "Key[" << iter->first << "] Value[" << iter->second << "]\n";
+  }*/
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Main
 int main(int argc, char **argv)
 {
 
@@ -112,6 +226,32 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  // Get parameters from command line
+  for (int i=1; i < argc; i++)
+  {
+    std::string p = argv[i];
+    boost::trim(p);
+    params.push_back( p );
+  }
+
+  // Get parameters from stdin 
+  if (!isatty(fileno(stdin)))
+  {
+    char str[1024];
+    while (!feof(stdin))
+    {
+      fgets(str, 1024, stdin);
+      if (feof(stdin))
+        break;
+      std::string p = str;
+      boost::trim(p);
+      params.push_back(p);
+    }
+  }
+
+  parseYAML();
+
+  /*
   client = new gazebo::Client();
   simIface = new gazebo::SimulationIface();
   factoryIface = new gazebo::FactoryIface();
@@ -149,13 +289,15 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  std::string cmd = argv[1];
-  if (cmd == "list")
-    list(argc, argv);
-  else if (cmd == "show")
-    show(argc, argv);
-  else if (cmd == "kill")
-    kill(argc, argv);
+  if (params[0] == "list")
+    list();
+  else if (params[0] == "show")
+    show();
+  else if (params[0] == "kill")
+    kill();
+  else if (params[0] == "spawn")
+    spawn();
   else
-    std::cerr << "Unknown command[" << cmd << "]\n";
+    std::cerr << "Unknown command[" << params[0] << "]\n";
+  */
 }

@@ -51,8 +51,11 @@ namespace gazebo
     /// \return Name of the entity
     public: std::string GetName() const;
 
-    /// \brief Get the parameters 
-    public: std::vector<Param*> *GetParams();
+    /// \brief Get the count of the parameters
+    public: unsigned int GetParamCount() const;
+
+    /// \brief Get a param by index
+    public: Param *GetParam(unsigned int index) const;
 
     /// \brief Get a parameter by name
     public: Param *GetParam(const std::string &key) const;

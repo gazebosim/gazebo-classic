@@ -351,23 +351,20 @@ void Sidebar::EntityBrowserCB( Fl_Widget *w, void *data )
 // Add entity to browser
 void Sidebar::AddEntityToParamBrowser(Common *entity, std::string prefix)
 {
-  std::vector<Param*> *parameters;
-  std::vector<Param*>::iterator iter;
   std::string value;
   std::string colorStr = "";
 
-  parameters = entity->GetParams();
-
   // Process all the parameters in the entity
-  for (iter = parameters->begin(); iter != parameters->end(); iter++)
+  for (unsigned int i=0; i < entity->GetParamCount(); i++)
   {
+    Param *param = entity->GetParam(i);
 
     /*if ( i%2 == 0)
       colorStr = "@B50";
       */
 
-    value = colorStr + "@b@s" + prefix + (*iter)->GetKey() + ":~" + 
-      colorStr + "@s" + (*iter)->GetAsString();
+    value = colorStr + "@b@s" + prefix + param->GetKey() + ":~" + 
+      colorStr + "@s" + param->GetAsString();
 
     this->AddToParamBrowser( value );
   }

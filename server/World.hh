@@ -155,7 +155,7 @@ class World : public SingletonT<World>
 
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete
-  public: void DeleteEntity(const char *name);
+  public: void DeleteEntity(const std::string &name);
 
   /// \brief Get a pointer to a entity based on a name
   public: Entity *GetEntityByName(const std::string &name) const;
@@ -344,7 +344,7 @@ class World : public SingletonT<World>
   private: std::vector<Model*> models;
 
   /// List of models to delete from the world
-  private: std::vector< Model* > toDeleteModels;
+  private: std::vector< std::string > toDeleteModels;
 
   private: std::vector< std::string > toLoadEntities;
 

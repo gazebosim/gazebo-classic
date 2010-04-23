@@ -518,13 +518,25 @@ void World::ProcessEntitiesToDelete()
     // maybe try try_lock here instead
     boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
 
+
     // Remove and delete all models that are marked for deletion
-    std::vector< Model* >::iterator miter;
+    std::vector< std::string>::iterator miter;
     for (miter=this->toDeleteModels.begin();
         miter!=this->toDeleteModels.end(); miter++)
     {
-      (*miter)->Fini();
-      delete (*miter);
+      Entity *entity = this->GetEntityByName(*miter);
+      std::cout << "Process Entity to Delete[" << (*miter) << "]\n";
+      if (entity)
+      {
+        Model *model = dynamic_cast<Model*>(entity);
+        if (model)
+        {
+          model->Fini();
+          this->models.erase( std::find(this->models.begin(), 
+                this->models.end(), model) );
+        }
+        delete (entity);
+      }
     }
 
     this->toDeleteModels.clear();
@@ -534,19 +546,19 @@ void World::ProcessEntitiesToDelete()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Delete an entity by name
-void World::DeleteEntity(const char *name)
+void World::DeleteEntity(const std::string &name)
 {
   std::vector< Model* >::iterator miter;
 
-  // Update all the models
-  for (miter=this->models.begin(); miter!=this->models.end(); miter++)
-  {
-    if ((*miter)->GetCompleteScopedName() == name)
-    {
-      this->toDeleteModels.push_back(*miter);
-      this->models.erase( std::remove(this->models.begin(), this->models.end(), *miter));
-    }
-  }
+  Entity *entity = this->GetEntityByName(name);
+
+  if (!entity)
+    return;
+
+  Model *model = dynamic_cast<Model*>(entity);
+
+  if (model)
+    this->toDeleteModels.push_back(model->GetName());
 }
 
 
@@ -947,6 +959,70 @@ void World::UpdateSimulationIface()
           }
           else
             gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Num Children.\n";
+          break;
+        }
+
+      case SimulationRequestData::GET_ENTITY_PARAM_KEY:
+        {
+          Entity *entity = this->GetEntityByName((char*)req->name);
+          if (entity)
+          {
+            Param *param = entity->GetParam(req->uintValue);
+            response->type= req->type;
+            memset(response->strValue, 0, 512);
+
+            if (param)
+              strncpy(response->strValue, param->GetKey().c_str(), 512);
+
+            response->strValue[511] = '\0';
+
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM.\n";
+
+          break;
+        }
+
+      case SimulationRequestData::GET_ENTITY_PARAM_VALUE:
+        {
+          Entity *entity = this->GetEntityByName((char*)req->name);
+          if (entity)
+          {
+            Param *param = entity->GetParam(req->uintValue);
+            response->type= req->type;
+            memset(response->strValue, 0, 512);
+
+            if (param)
+              strncpy(response->strValue, param->GetAsString().c_str(), 512);
+
+            response->strValue[511] = '\0';
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM.\n";
+
+          break;
+        }
+
+
+
+      case SimulationRequestData::GET_ENTITY_PARAM_COUNT:
+        {
+          Entity *entity = this->GetEntityByName((char*)req->name);
+          if (entity)
+          {
+            unsigned int count = entity->GetParamCount();
+            response->type= req->type;
+            response->uintValue = count;
+            response++;
+            this->simIface->data->responseCount += 1;
+          }
+          else
+            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface GET_ENTITY_PARAM_COUNT.\n";
+
           break;
         }
 

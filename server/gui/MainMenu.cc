@@ -51,10 +51,10 @@ MainMenu::MainMenu(int x, int y, int w, int h, char *name)
   {
     { "File", 0, 0, 0, FL_SUBMENU,  FL_NORMAL_LABEL, 0, 14, 0 },
     //  { "Open", 0, &gazebo::MainMenu::OpenCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-    { "Save World", 0, &gazebo::MainMenu::SaveWorldCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Save World", FL_CTRL+'s', &gazebo::MainMenu::SaveWorldCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
     { "Save Frames", 0, &gazebo::MainMenu::SaveFramesCB, 0, FL_MENU_TOGGLE, FL_NORMAL_LABEL,0, 14,0 },
-    { "Reset", 0, &gazebo::MainMenu::ResetCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
-    { "Quit", 0, &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Reset", FL_CTRL+'r', &gazebo::MainMenu::ResetCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
+    { "Quit", FL_CTRL+'q', &gazebo::MainMenu::QuitCB, 0, 0, FL_NORMAL_LABEL,0, 14,0 },
     { 0 },
 
     { "View", 0, 0, 0, FL_SUBMENU, FL_NORMAL_LABEL, 0, 14, 0},

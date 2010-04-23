@@ -14,6 +14,17 @@
 
 using namespace gazebo;
 
+
+union semun 
+{
+  int              val;    /* Value for SETVAL */
+  struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+  unsigned short  *array;  /* Array for GETALL, SETALL */
+  struct seminfo  *__buf;
+} arg;
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Create an interface
 SimulationIface::SimulationIface()
@@ -63,14 +74,6 @@ bool SimulationIface::WaitForResponse()
 /// Create a simulation interface
 void SimulationIface::Create(Server *server, std::string id)
 {
-  union semun 
-  {
-    int              val;    /* Value for SETVAL */
-    struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
-    unsigned short  *array;  /* Array for GETALL, SETALL */
-    struct seminfo  *__buf;
-  } arg;
-
   Iface::Create(server,id); 
   this->data = (SimulationData*)((char*)this->mMap+sizeof(SimulationIface)); 
 
@@ -88,6 +91,20 @@ void SimulationIface::Create(Server *server, std::string id)
   // Set the semaphore value
   if (semctl(this->data->semId, 0, SETVAL, arg) < 0)
    printf("Semctl failed\n"); 
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Destroy the interface (server)
+void SimulationIface::Destroy()
+{
+  if (this->data && semctl(this->data->semId, 0, IPC_RMID, arg) < 0)
+  {
+    std::ostringstream stream;
+    stream << "failed to deallocate semaphore [" << strerror(errno) << "]";
+    throw(stream.str());
+  }
+
+  Iface::Destroy();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -588,6 +605,94 @@ bool SimulationIface::GetModelFiducialID(const std::string &name,
 
   assert(this->data->responseCount == 1);
   id = data->responses[0].uintValue;
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of parameters for an entity 
+bool SimulationIface::GetEntityParamCount(const std::string &entityName, 
+                                          unsigned int &num)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+
+  SimulationRequestData *request;
+ 
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_ENTITY_PARAM_COUNT;
+
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  num = data->responses[0].uintValue;
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a param key for an entity
+bool SimulationIface::GetEntityParamKey(const std::string &entityName, 
+    unsigned int paramIndex, std::string &paramKey )
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_ENTITY_PARAM_KEY;
+
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  request->uintValue = paramIndex;
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  paramKey = data->responses[0].strValue;
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a param value from an entity
+bool SimulationIface::GetEntityParamValue(const std::string &entityName, 
+    unsigned int paramIndex, std::string &paramValue )
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_ENTITY_PARAM_VALUE;
+
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  request->uintValue = paramIndex;
+
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  paramValue = data->responses[0].strValue;
 
   return true;
 }

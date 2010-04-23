@@ -165,6 +165,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   scopedName = this->GetScopedName();
 
   dup = World::Instance()->GetEntityByName(scopedName);
+
   // Look for existing models by the same name
   if(dup != NULL && dup != this)
   {

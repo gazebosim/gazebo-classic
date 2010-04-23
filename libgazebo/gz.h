@@ -317,7 +317,7 @@ class Iface
               int parentModelId);
 
   /// \brief Destroy the interface (server)
-  public: void Destroy();
+  public: virtual void Destroy();
 
   /// \brief Open an existing interface
   /// \param client Pointer to the client
@@ -429,6 +429,9 @@ class SimulationRequestData
                       GET_STATE,
                       GO,
                       GET_ENTITY_TYPE,
+                      GET_ENTITY_PARAM_COUNT,
+                      GET_ENTITY_PARAM_KEY,
+                      GET_ENTITY_PARAM_VALUE,
                       GET_MODEL_TYPE,
                       GET_NUM_MODELS,
                       GET_NUM_CHILDREN,
@@ -501,6 +504,10 @@ class SimulationIface : public Iface
   /// \brief server Pointer to the server
   /// \brief id String id
   public: virtual void Create(Server *server, std::string id);
+
+  /// \brief Destroy the interface (server)
+  public: virtual void Destroy();
+
 
   /// \brief Open a simulation interface
   /// \param client Pointer to the client
@@ -598,6 +605,19 @@ class SimulationIface : public Iface
   /// \brief Get the model Fiducial ID (if one global ID was set)
   public: bool GetModelFiducialID(const std::string &modelName, 
                                   unsigned int &id);
+
+  /// \brief Get the number of parameters for an entity 
+  public: bool GetEntityParamCount(const std::string &entityName, 
+                                    unsigned int &num);
+
+  /// \brief Get a param key for an entity
+  public: bool GetEntityParamKey(const std::string &entityName, 
+                          unsigned int paramIndex, std::string &paramKey );
+
+  /// \brief Get a param value from an entity
+  public: bool GetEntityParamValue(const std::string &entityName, 
+                          unsigned int paramIndex, std::string &paramValue );
+
 
   public: void GoAckWait();
   public: void GoAckPost();

@@ -138,7 +138,7 @@ void ODEGeom::OnPoseChange()
 // Save the body based on our XMLConfig node
 void ODEGeom::Save(std::string &prefix, std::ostream &stream)
 {
-  if (this->GetType() == Shape::RAY)
+  if (this->GetShapeType() == Shape::RAY)
     return;
 
   Geom::Save(prefix, stream);

@@ -55,6 +55,7 @@ using namespace gazebo;
 Body::Body(Entity *parent)
     : Entity(parent)
 {
+  this->type = Entity::BODY;
   this->comEntity = new Entity(this);
   this->comEntity->SetName("COM Entity");
 

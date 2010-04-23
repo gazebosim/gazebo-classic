@@ -67,10 +67,21 @@ std::string Common::GetName() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the parameters 
-std::vector<Param*> *Common::GetParams()
+/// Get the count of the parameters
+unsigned int Common::GetParamCount() const
 {
-  return &this->parameters;
+  return this->parameters.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a param by index
+Param *Common::GetParam(unsigned int index) const
+{
+  if (index < this->parameters.size())
+    return this->parameters[index];
+  else
+    gzerr(0) << "Invalid index[" << index << "]\n";
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
