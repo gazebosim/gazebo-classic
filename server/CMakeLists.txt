@@ -2,15 +2,20 @@ INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 ########################################
 # Include all the search paths for headers
-STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
-STRING (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
-STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
-STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
-STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
-STRING (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
-STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
+#STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
+#STRING (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
+#STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
+#STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
+#STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
+#STRING (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
+#STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
 
+APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
+                      ${gazeboserver_ldflags_desc} 
+                      -lassimp -lgazebo_physics -lgazebo_physics_ode -lgazebo_av -lgazebo_gui -lgazebo_rendering)
 
+STRING (REPLACE ";" " " gazeboserver_ldflags "${gazeboserver_ldflags}")
+message(STATUS "SERVER LDFLAGS ${gazeboserver_ldflags}")
 
 INCLUDE_DIRECTORIES(
   .
@@ -166,13 +171,14 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    assimp
 )
 
+
 target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazebo gazebo_rendering gazebo_physics )
 
 if (INCLUDE_BULLET)
   #target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
   #target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
 
-  #string (REPLACE " " ";" bullet_libraries_split "${bullet_lflags}")
+  #string (REPLACE " " ";" bullet_lflags_split "${bullet_lflags}")
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
   target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
 endif (INCLUDE_BULLET)
@@ -181,6 +187,11 @@ if (INCLUDE_ODE)
   target_link_libraries(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
   target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
 endif (INCLUDE_ODE)
+
+
+configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeboserver_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
+
 
 
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

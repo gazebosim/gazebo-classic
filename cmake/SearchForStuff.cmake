@@ -16,7 +16,7 @@ set (boost_libraries "" CACHE STRING "Boost libraries. Use this to override auto
 
 set (bullet_include_dirs "" CACHE STRING "Bullet include paths. Use this to override automatic detection.")
 set (bullet_library_dirs "" CACHE STRING "Bullet library paths. Use this to override automatic detection.")
-set (bullet_lflags "" CACHE STRING "Bullet libraries Use this to override automatic detection.")
+set (bullet_lflags "" CACHE STRING "Bullet lflags Use this to override automatic detection.")
 set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
 
 set (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
@@ -46,42 +46,53 @@ endif (NOT FLTK_FOUND)
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  if (NOT OGRE_FOUND)
-    BUILD_ERROR("Ogre3d version >=${MIN_OGRE_VERSION} and development files not found. See the following website for installation instructions: http://www.orge3d.org")
-  else (NOT OGRE_FOUND)
- 
-    set (OGRE_LIBRARY_PATH ${OGRE_LIBRARY_DIRS} CACHE INTERNAL "Ogre library path")
 
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${OGRE_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${OGRE_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OGRE_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OGRE_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OGRE_LDFLAGS})
+  #################################################
+  # Find OGRE 
+  pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
+  if (OGRE-RTShaderSystem_FOUND)
 
-  # Try to find the OGRE RTShaderSystem library
-  find_library(ogre_rtshader_lib OgreRTShaderSystem ${OGRE_LIBRARY_DIRS} ENV LD_LIBRARY_PATH)
-  if (ogre_rtshader_lib)
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ogre_rtshader_lib})
+    set(ogre_ldflags ${OGRE-RTShaderSystem_LDFLAGS})
+    set(ogre_include_dirs ${OGRE-RTShaderSystem_INCLUDE_DIRS})
+    set(ogre_library_dirs ${OGRE-RTShaderSystem_LIBRARY_DIRS})
+    set(ogre_libraries ${OGRE-RTShaderSystem_LIBRARIES})
     add_definitions(-DUSE_RTSHADER_SYSTEM)
-    #add_definitions(-DRTSHADER_SYSTEM_BUILD_CORE_SHADERS)
-    #add_definitions(-DRTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-  endif (ogre_rtshader_lib)
 
-  endif (NOT OGRE_FOUND)
+  else (OGRE-RTShaderSystem_FOUND)
 
+    pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
+    if (NOT OGRE_FOUND)
+      BUILD_ERROR("Ogre3d version >=${MIN_OGRE_VERSION} and development files not found. See the following website for installation instructions: http://www.orge3d.org")
+    else (NOT OGRE_FOUND)
+      set(ogre_ldflags ${OGRE_LDFLAGS})
+      set(ogre_include_dirs ${OGRE_INCLUDE_DIRS})
+      set(ogre_library_dirs ${OGRE_LIBRARY_DIRS})
+      set(ogre_libraries ${OGRE_LIBRARIES})
+    endif (NOT OGRE_FOUND)
+      
+  endif (OGRE-RTShaderSystem_FOUND)
+
+  set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
+
+  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                        ${gazeboserver_include_dirs_desc} 
+                        ${ogre_include_dirs})
+  APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                        ${gazeboserver_link_dirs_desc} 
+                        ${ogre_library_dirs})
+  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                        ${gazeboserver_link_libs_desc} 
+                        ${ogre_link_libs})
+  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                        ${gazeboserver_link_libs_desc} 
+                        ${ogre_libraries})
+  APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
+                        ${gazeboserver_ldflags_desc} 
+                        ${ogre_ldflags})
+
+
+  #################################################
+  # Find XML
   pkg_check_modules(XML libxml-2.0)
   IF (NOT XML_FOUND)
     BUILD_ERROR("libxml2 and development files not found. See the following website: http://www.xmlsoft.org")
@@ -98,6 +109,9 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${XML_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
+                          ${gazeboserver_ldflags_desc} 
+                          ${XML_LDFLAGS})
   ENDIF (NOT XML_FOUND)
 
   pkg_check_modules(XFT xft)
@@ -401,7 +415,6 @@ endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_librar
 # Find bullet
 if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
 
-
   find_path(bullet_include_dir btBulletDynamicsCommon.h ${bullet_include_dirs} ENV CPATH)
   
   if (NOT bullet_include_dir)
@@ -424,29 +437,33 @@ if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
     message (STATUS "Looking for libBulletDynamics - not found.")
   else (NOT bullet_dynamics_library)
     message (STATUS "Looking for libBulletDynamics - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_dynamics_library})
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletDynamics)
   endif (NOT bullet_dynamics_library)
 
   if (NOT bullet_collision_library)
     message (STATUS "Looking for libBulletCollision - not found.")
   else (NOT bullet_collision_library)
     message (STATUS "Looking for libBulletCollision - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_collision_library})
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletCollision)
   endif (NOT bullet_collision_library)
   
   if (NOT bullet_math_library)
     message (STATUS "Looking for libLinearMath - not found.")
   else (NOT bullet_math_library)
     message (STATUS "Looking for libLinearMath - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_math_library})
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lLinearMath)
   endif (NOT bullet_math_library)
 
   if (NOT bullet_softbody_library)
     message (STATUS "Looking for libBulletSoftBody - not found.")
   else (NOT bullet_softbody_library)
     message (STATUS "Looking for libBulletSoftBody - found")
-    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." ${bullet_softbody_library})
+    APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
   endif (NOT bullet_softbody_library)
+
+  APPEND_TO_CACHED_LIST(gazeboserver_ldflags
+                        ${gazeboserver_ldflags_desc} 
+                        ${bullet_lflags})
 
   if (NOT bullet_include_dir OR NOT bullet_dynamics_library)
     set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)

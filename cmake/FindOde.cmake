@@ -59,7 +59,7 @@ ELSE (NOT ODE_FOUND)
   APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                         ${gazeboserver_link_libs_desc} 
                         ${ODE_LIBRARIES})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
+  APPEND_TO_CACHED_LIST(gazeboserver_ldflags
+                        ${gazeboserver_ldflags_desc} 
                         ${ODE_LDFLAGS})
 ENDIF (NOT ODE_FOUND)

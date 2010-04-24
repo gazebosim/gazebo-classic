@@ -30,6 +30,8 @@ set (gazeboserver_link_dirs_desc "List of server link directories"
      CACHE INTERNAL "Link dirs description" FORCE)
 set (gazeboserver_link_libs_desc "List of server link libraries" 
      CACHE INTERNAL "Link libs description" FORCE)
+set (gazeboserver_ldflags_desc "List of server ldflags" 
+     CACHE INTERNAL "LDFlags description" FORCE)
 set (gazeboserver_cflags_desc "List of server cflags" 
      CACHE INTERNAL "Server cflags description" FORCE)
 set (gazebosensor_sources_desc "List of sensor sources" 

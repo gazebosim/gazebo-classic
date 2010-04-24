@@ -92,6 +92,8 @@ MACRO (GAZEBOSERVER_RESET_LISTS)
        ${gazeboserver_link_dirs_desc} FORCE)
   SET (gazeboserver_link_libs "" CACHE INTERNAL 
        ${gazeboserver_link_libs_desc} FORCE)
+  SET (gazeboserver_ldflags "" CACHE INTERNAL 
+       ${gazeboserver_ldflags_desc} FORCE)
   SET (gazeboserver_cflags "" CACHE INTERNAL 
        ${gazeboserver_cflags_desc} FORCE)
   SET (gazebosensor_sources "" CACHE INTERNAL 
