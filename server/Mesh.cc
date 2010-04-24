@@ -19,7 +19,7 @@ Mesh::Mesh()
 Mesh::~Mesh()
 {
   std::vector<SubMesh*>::iterator iter;
-  for (iter = this->submeshes.begin(); iter != this->submeshes.begin(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
     delete *iter;
   this->submeshes.clear();
 }
@@ -266,7 +266,7 @@ void Mesh::FillArrays(float **vertArr, unsigned int **indArr) const
 void Mesh::RecalculateNormals()
 {
   std::vector<SubMesh*>::iterator iter;
-  for (iter = this->submeshes.begin(); iter != this->submeshes.begin(); iter++)
+  for (iter = this->submeshes.begin(); iter != this->submeshes.end(); iter++)
     (*iter)->RecalculateNormals();
 }
 
