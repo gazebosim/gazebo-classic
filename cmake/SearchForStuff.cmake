@@ -56,6 +56,8 @@ if (PKG_CONFIG_FOUND)
     set(ogre_include_dirs ${OGRE-RTShaderSystem_INCLUDE_DIRS})
     set(ogre_library_dirs ${OGRE-RTShaderSystem_LIBRARY_DIRS})
     set(ogre_libraries ${OGRE-RTShaderSystem_LIBRARIES})
+    set(ogre_cflags ${OGRE-RTShaderSystem_CFLAGS})
+
     add_definitions(-DUSE_RTSHADER_SYSTEM)
 
   else (OGRE-RTShaderSystem_FOUND)
@@ -68,9 +70,11 @@ if (PKG_CONFIG_FOUND)
       set(ogre_include_dirs ${OGRE_INCLUDE_DIRS})
       set(ogre_library_dirs ${OGRE_LIBRARY_DIRS})
       set(ogre_libraries ${OGRE_LIBRARIES})
+      set(ogre_cflags ${OGRE_CFLAGS})
     endif (NOT OGRE_FOUND)
       
   endif (OGRE-RTShaderSystem_FOUND)
+
 
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
 
@@ -89,6 +93,11 @@ if (PKG_CONFIG_FOUND)
   APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                         ${gazeboserver_ldflags_desc} 
                         ${ogre_ldflags})
+  APPEND_TO_CACHED_LIST(gazeboserver_cflags 
+                        ${gazeboserver_cflags_desc} 
+                        ${ogre_cflags})
+
+  message(STATUS "OGRE C: ${gazeboserver_cflags}")
 
 
   #################################################
@@ -112,6 +121,10 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                           ${gazeboserver_ldflags_desc} 
                           ${XML_LDFLAGS})
+    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
+                          ${gazeboserver_cflags_desc} 
+                          ${XML_CFLAGS})
+
   ENDIF (NOT XML_FOUND)
 
   pkg_check_modules(XFT xft)

@@ -189,8 +189,9 @@ if (INCLUDE_ODE)
                       -lgazebo_physics_ode)
 endif (INCLUDE_ODE)
 
-
+STRING (REPLACE ";" " " gazeboserver_cflags "${gazeboserver_cflags}")
 STRING (REPLACE ";" " " gazeboserver_ldflags "${gazeboserver_ldflags}")
+
 configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeboserver_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
 

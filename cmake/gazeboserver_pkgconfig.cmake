@@ -7,4 +7,4 @@ Description: Gazebo server
 Version: @GAZEBO_VERSION@
 Requires:
 Libs: -L${libdir} -lgazebo_server -lgazebo @gazeboserver_ldflags@ 
-CFlags: -I${includedir}
+CFlags: -I${includedir} @gazeboserver_cflags@
