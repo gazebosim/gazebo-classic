@@ -81,7 +81,8 @@ void SimulationIface::Create(Server *server, std::string id)
   this->data->semKey = GZ_SEM_KEY - 10;
 
   // Create a single semaphore
-  this->data->semId = semget(this->data->semKey,1, IPC_CREAT | S_IRWXU);
+  //this->data->semId = semget(this->data->semKey,1, IPC_CREAT | S_IRWXU);
+  this->data->semId = semget(this->data->semKey, 1, IPC_CREAT| S_IRWXU |S_IRWXG |S_IRWXO  );
 
   if (this->data->semId < 0)
     printf("Error createing semaphore\n");

@@ -223,9 +223,12 @@ void Server::SemInit(int force)
   // If force is set, use the semaphore regardless of who else
   // might currently be using it
   if (force)
-    this->semId = semget(this->semKey, 16, IPC_CREAT | S_IRWXU);
+  {
+  //this->semId = semget(this->semKey, 16, IPC_CREAT | S_IRWXU);
+    this->semId = semget(this->semKey, 16, IPC_CREAT| S_IRWXU |S_IRWXG |S_IRWXO  );
+  }
   else
-    this->semId = semget(this->semKey, 16, IPC_CREAT | IPC_EXCL | S_IRWXU);
+    this->semId = semget(this->semKey, 16, IPC_CREAT | IPC_EXCL | S_IRWXU | S_IRWXG |S_IRWXO);
 
   // Create semaphores for clients
   if (this->semId < 0)
