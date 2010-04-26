@@ -157,8 +157,8 @@ void ODEJoint::Detach()
 // where appropriate
 void ODEJoint::SetParam(int /*parameter*/, double /*value*/)
 {
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
