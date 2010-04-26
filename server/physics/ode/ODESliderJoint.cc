@@ -97,8 +97,8 @@ void ODESliderJoint::SetVelocity(int /*index*/, double angle)
 void ODESliderJoint::SetAxis( int /*index*/, const Vector3 &axis )
 {
   this->physics->LockMutex();
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
 
   dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );
   this->physics->UnlockMutex();
@@ -109,8 +109,8 @@ void ODESliderJoint::SetAxis( int /*index*/, const Vector3 &axis )
 void ODESliderJoint::SetForce(int /*index*/, double force)
 {
   this->physics->LockMutex();
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
 
   dJointAddSliderForce(this->jointId, force);
   this->physics->UnlockMutex();
