@@ -60,8 +60,8 @@ Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 void ODEUniversalJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
   this->physics->LockMutex();
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
 
   dJointSetUniversalAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
   this->physics->UnlockMutex();
@@ -89,8 +89,8 @@ void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
 {
   this->physics->LockMutex();
 
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
 
   if (index == 0)
     dJointSetUniversalAxis1( this->jointId, axis.x, axis.y, axis.z );
@@ -144,8 +144,8 @@ void ODEUniversalJoint::SetVelocity(int index,double angle)
 void ODEUniversalJoint::SetForce(int index, double torque)
 {
   this->physics->LockMutex();
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
   if (index == 0)
     dJointAddUniversalTorques( this->jointId, torque, 0);
   else
