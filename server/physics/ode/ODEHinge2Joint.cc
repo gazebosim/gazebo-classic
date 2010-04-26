@@ -91,8 +91,8 @@ Vector3 ODEHinge2Joint::GetAnchor(int index) const
 void ODEHinge2Joint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
   this->physics->LockMutex();
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
   dJointSetHinge2Anchor( this->jointId, anchor.x, anchor.y, anchor.z );
   this->physics->UnlockMutex();
 }
@@ -102,8 +102,8 @@ void ODEHinge2Joint::SetAnchor( int /*index*/, const Vector3 &anchor )
 void ODEHinge2Joint::SetAxis( int index, const Vector3 &axis )
 {
   this->physics->LockMutex();
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
 
   if (index == 0)
     dJointSetHinge2Axis1( this->jointId, axis.x, axis.y, axis.z );
@@ -193,8 +193,8 @@ void ODEHinge2Joint::SetMaxForce(int index, double t)
 void ODEHinge2Joint::SetForce(int index, double torque)
 {
   this->physics->LockMutex();
-  this->body1->SetEnabled(true);
-  this->body2->SetEnabled(true);
+  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body2) this->body2->SetEnabled(true);
 
   if (index == 0)
     dJointAddHinge2Torques(this->jointId, torque, 0);
