@@ -75,7 +75,6 @@ void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string 
 {
 #ifdef HAVE_DL
 
-  std::cerr << "\n\n\n\n\USING DL\n\n\n\n";
   void* handle = dlopen(plugin.c_str(), RTLD_LAZY|RTLD_GLOBAL);
   if (!handle)
   {

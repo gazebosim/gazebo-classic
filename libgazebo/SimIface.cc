@@ -39,10 +39,6 @@ SimulationIface::SimulationIface()
 /// Destroy an interface
 SimulationIface::~SimulationIface() 
 {
-  if (this->goAckThread)
-    delete this->goAckThread;
-  this->goAckThread = NULL;
-
   this->data = NULL;
 }
 
@@ -95,6 +91,26 @@ void SimulationIface::Create(Server *server, std::string id)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// Close the interface
+void SimulationIface::Close()
+{
+  printf("Close\n");
+
+  //stop BlockThread
+  if (this->goAckThread) 
+  {
+    this->goAckThread->interrupt();  //ask thread to stop
+    this->GoAckPost();
+    this->goAckThread->join();       //wait till it's stopped
+    delete this->goAckThread;
+  }
+  this->goAckThread = NULL;
+  
+
+  Iface::Close();
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Destroy the interface (server)
 void SimulationIface::Destroy()
 {
@@ -128,15 +144,28 @@ void SimulationIface::Open(Client *client, std::string id)
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationIface::BlockThread()
 {
-
-  while (true)
+  printf("Block thread start\n");
+  try
   {
-    // Wait for Gazebo to send a Post
-    this->GoAckWait();
+    while (true)
+    {
+      // Wait for Gazebo to send a Post
+      this->GoAckWait();
 
-    // Signal the callback function
-    this->goAckSignal();
+      //are we getting interrupted?
+      boost::this_thread::interruption_point();
+
+      // Signal the callback function
+      this->goAckSignal();
+    }
+  } 
+  catch (boost::thread_interrupted const &)
+  {
+    fprintf(stderr, "blockthread: thread got interrupted....\n");
+    return;
   }
+
+  printf("Block thread end\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

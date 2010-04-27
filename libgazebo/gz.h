@@ -505,9 +505,11 @@ class SimulationIface : public Iface
   /// \brief id String id
   public: virtual void Create(Server *server, std::string id);
 
+  /// \brief Close the interface
+  public: virtual void Close();
+
   /// \brief Destroy the interface (server)
   public: virtual void Destroy();
-
 
   /// \brief Open a simulation interface
   /// \param client Pointer to the client

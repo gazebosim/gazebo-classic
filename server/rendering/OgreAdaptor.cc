@@ -104,7 +104,6 @@ OgreAdaptor::~OgreAdaptor()
   delete this->drawGridP;
   delete this->skyMaterialP;
 
-  RTShaderSystem::Instance()->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -293,6 +292,13 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   RTShaderSystem::Instance()->Init();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Finalize
+void OgreAdaptor::Fini()
+{
+  RTShaderSystem::Instance()->Fini();
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Save
 void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)

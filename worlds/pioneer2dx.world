@@ -101,7 +101,7 @@
   </include>
   -->
 
-  <model:physical name="pioneer2dx_model1">
+  <model:physical name="pioneer2dx_model">
     <xyz>0 0 1.145</xyz>
     <rpy>0.0 0.0 90.0</rpy>
 

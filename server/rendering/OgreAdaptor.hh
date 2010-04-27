@@ -88,6 +88,9 @@ namespace gazebo
 
     /// \brief Initialize ogre
     public: void Init(XMLConfigNode *rootNode);
+
+    /// \brief Finalize
+    public: void Fini();
   
     /// \brief Save Ogre settings 
     public: void Save(std::string &prefix, std::ostream &stream);

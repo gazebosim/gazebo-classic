@@ -84,7 +84,6 @@ Simulator::Simulator()
 // Destructor
 Simulator::~Simulator()
 {
-
   if (this->gazeboConfig)
   {
     delete this->gazeboConfig;
@@ -333,6 +332,9 @@ void Simulator::Save(const std::string& filename)
 void Simulator::Fini( )
 {
   gazebo::World::Instance()->Fini();
+
+  if (this->renderEngineEnabled)
+    gazebo::OgreAdaptor::Instance()->Fini();
 
   this->Close();
 }

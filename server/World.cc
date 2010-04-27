@@ -1446,8 +1446,11 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GO:
         {
+          int sec = req->runTime/1000;
+          int nsec = (req->runTime - sec) * 1e9;
+
           this->simPauseTime = Simulator::Instance()->GetSimTime() 
-                                  + Time(req->runTime);
+                                  + Time(sec, nsec);
 
           Simulator::Instance()->SetPaused(false);
           break;

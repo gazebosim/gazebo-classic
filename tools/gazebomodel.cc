@@ -141,7 +141,9 @@ void spawn()
       while (!feof(file))
       {
         char buffer[256];
-        fgets(buffer, 256, file);
+        if (fgets(buffer, 256, file) == NULL)
+          std::cerr << "Unable to read file\n";
+
         if (feof(file))
             break;
         stream << buffer;
@@ -240,7 +242,8 @@ int main(int argc, char **argv)
     char str[1024];
     while (!feof(stdin))
     {
-      fgets(str, 1024, stdin);
+      if (fgets(str, 1024, stdin)==NULL)
+        std::cerr << "Unable to read file\n";
       if (feof(stdin))
         break;
       std::string p = str;
