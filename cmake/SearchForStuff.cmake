@@ -97,9 +97,6 @@ if (PKG_CONFIG_FOUND)
                         ${gazeboserver_cflags_desc} 
                         ${ogre_cflags})
 
-  message(STATUS "OGRE C: ${gazeboserver_cflags}")
-
-
   #################################################
   # Find XML
   pkg_check_modules(XML libxml-2.0)
