@@ -124,10 +124,12 @@ if (PKG_CONFIG_FOUND)
 
   ENDIF (NOT XML_FOUND)
 
+  ########################################
+  # Find XFT
   pkg_check_modules(XFT xft)
-  IF (NOT XFT_FOUND)
+  if (NOT XFT_FOUND)
     BUILD_ERROR("XFT and development files not found. See the following website: http://www.fontconfig.org")
-  ELSE (NOT XFT_FOUND)
+  else (NOT XFT_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
                           ${XFT_INCLUDE_DIRS})
@@ -140,13 +142,36 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${XFT_LIBRARIES})
-  ENDIF (NOT XFT_FOUND)
+  endif (NOT XFT_FOUND)
 
+  ########################################
+  # Find libXPM
+  pkg_check_modules(XPM xpm)
+  if (NOT XPM_FOUND)
+    BUILD_ERROR("libXpm and development files not found. See the following website: http://cgit.freedesktop.org/xorg/lib/libXpm")
+  else (NOT XPM_FOUND)
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
+                          ${XPM_INCLUDE_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
+                          ${XPM_LIBRARY_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${XPM_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${XPM_LIBRARIES})
+  endif (NOT XPM_FOUND)
+
+
+  ########################################
+  # Find OpenAL
   pkg_check_modules(OAL openal)
-  IF (NOT OAL_FOUND)
-    MESSAGE (STATUS "Warning: Openal and development files not found. Audio capabilities will be disabled. See the following website: http://connect.creativelabs.com/openal/default.aspx")
-  ELSE (NOT OAL_FOUND)
-    SET (HAVE_OPENAL TRUE)
+  if (NOT OAL_FOUND)
+    message (STATUS "Warning: Openal and development files not found. Audio capabilities will be disabled. See the following website: http://connect.creativelabs.com/openal/default.aspx")
+  else (NOT OAL_FOUND)
+    set (HAVE_OPENAL TRUE)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
                           ${OAL_INCLUDE_DIRS})
@@ -159,12 +184,14 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${OAL_LIBRARIES})
-  ENDIF (NOT OAL_FOUND)
+  endif (NOT OAL_FOUND)
 
+  ########################################
+  # Find AV format
   pkg_check_modules(AVF libavformat)
-  IF (NOT AVF_FOUND)
-    MESSAGE (STATUS "Warning: libavformat and development files not found. Audio capabilities will be disabled.")
-  ELSE (NOT AVF_FOUND)
+  if (NOT AVF_FOUND)
+    message (STATUS "Warning: libavformat and development files not found. Audio capabilities will be disabled.")
+  else (NOT AVF_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
                           ${AVF_INCLUDE_DIRS})
@@ -177,12 +204,14 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${AVF_LIBRARIES})
-  ENDIF (NOT AVF_FOUND)
+  endif (NOT AVF_FOUND)
 
+  ########################################
+  # Find avcodec
   pkg_check_modules(AVC libavcodec)
-  IF (NOT AVC_FOUND)
-    MESSAGE (STATUS "Warning: libavcodec and development files not found. Audio capabilities will be disabled.")
-  ELSE (NOT AVC_FOUND)
+  if (NOT AVC_FOUND)
+    message (STATUS "Warning: libavcodec and development files not found. Audio capabilities will be disabled.")
+  else (NOT AVC_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
                           ${AVC_INCLUDE_DIRS})
@@ -195,43 +224,48 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
                           ${gazeboserver_link_libs_desc} 
                           ${AVC_LIBRARIES})
-  ENDIF (NOT AVC_FOUND)
+  endif (NOT AVC_FOUND)
 
   IF (AVF_FOUND AND AVC_FOUND)
     SET (HAVE_FFMPEG TRUE)
   ENDIF (AVF_FOUND AND AVC_FOUND)
 
+  ########################################
+  # Find Player
   pkg_check_modules(PLAYER playercore>=3.0)
-  IF (NOT PLAYER_FOUND)
-    SET (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
-    MESSAGE (STATUS "Warning: Player not found. The gazebo plugin for player will not be built. See the following website: http://playerstage.sourceforge.net")
-  ELSE (NOT PLAYER_FOUND)
-    SET (INCLUDE_PLAYER ON CACHE BOOL "Build gazebo plugin for player" FORCE)
-    SET (PLAYER_INCLUDE_DIRS ${PLAYER_INCLUDE_DIRS} CACHE INTERNAL
+  if (NOT PLAYER_FOUND)
+    set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
+    message (STATUS "Warning: Player not found. The gazebo plugin for player will not be built. See the following website: http://playerstage.sourceforge.net")
+  else (NOT PLAYER_FOUND)
+    set (INCLUDE_PLAYER ON CACHE BOOL "Build gazebo plugin for player" FORCE)
+    set (PLAYER_INCLUDE_DIRS ${PLAYER_INCLUDE_DIRS} CACHE INTERNAL
          "Player include directory")
-    SET (PLAYER_LINK_DIRS ${PLAYER_LINK_DIRS} CACHE INTERNAL
+    set (PLAYER_LINK_DIRS ${PLAYER_LINK_DIRS} CACHE INTERNAL
          "Player link directory")
-    SET (PLAYER_LINK_LIBS ${PLAYER_LIBRARIES} CACHE INTERNAL
+    set (PLAYER_LINK_LIBS ${PLAYER_LIBRARIES} CACHE INTERNAL
          "Player libraries")
-  ENDIF (NOT PLAYER_FOUND)
+  endif (NOT PLAYER_FOUND)
 
+  ########################################
+  # Find Websim
   pkg_check_modules(WEBSIM websim)
-  IF (NOT WEBSIM_FOUND)
-    SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Build webgazebo" FORCE)
-    MESSAGE (STATUS "Warning: Websim not found. Webgazebo will not be built")
-  ELSE (NOT WEBSIM_FOUND)
-    SET (WEBSIM_INCLUDE_DIRS ${WEBSIM_INCLUDE_DIRS} CACHE INTERNAL
+  if (NOT WEBSIM_FOUND)
+    set (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Build webgazebo" FORCE)
+    message (STATUS "Warning: Websim not found. Webgazebo will not be built")
+  else (NOT WEBSIM_FOUND)
+    set (WEBSIM_INCLUDE_DIRS ${WEBSIM_INCLUDE_DIRS} CACHE INTERNAL
          "Websim include directory")
-    SET (WEBSIM_LINK_DIRS ${WEBSIM_LINK_DIRS} CACHE INTERNAL 
+    set (WEBSIM_LINK_DIRS ${WEBSIM_LINK_DIRS} CACHE INTERNAL 
          "Websim link directory")
-    SET (WEBSIM_LINK_LIBS ${WEBSIM_LIBRARIES} CACHE INTERNAL
+    set (WEBSIM_LINK_LIBS ${WEBSIM_LIBRARIES} CACHE INTERNAL
          "Websim libraries")
-  ENDIF (NOT WEBSIM_FOUND)
+  endif (NOT WEBSIM_FOUND)
 
-ELSE (PKG_CONFIG_FOUND)
-  SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  MESSAGE (FATAL_ERROR "\nError: pkg-config not found")
-ENDIF (PKG_CONFIG_FOUND)
+
+else (PKG_CONFIG_FOUND)
+  set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
+  message (FATAL_ERROR "\nError: pkg-config not found")
+endif (PKG_CONFIG_FOUND)
 
 
 ########################################
