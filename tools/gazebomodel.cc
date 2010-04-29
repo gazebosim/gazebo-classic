@@ -128,8 +128,7 @@ void kill()
 // Spawn a new model into the world
 void spawn()
 {
-  //TODO
-  //PROCESS YAML PARAMETER!!!
+  
   if (params.size() < 2)
     std::cerr << "Missing model filename\n";
   else
@@ -148,7 +147,14 @@ void spawn()
             break;
         stream << buffer;
       }
-      strcpy((char*)factoryIface->data->newModel, stream.str().c_str());
+      std::string model = stream.str();
+      strcpy((char*)factoryIface->data->newModel, model.c_str());
+
+      /*for (iter = yamlValues.begin(); iter != yamlValues.end(); iter++)
+      {
+        std::string reg = iter->first + "
+        boost::regex::regex_replace(model, 
+      }*/
     }
     else
       std::cerr << "Unable to open file[" << params[1] << "]\n";
@@ -211,10 +217,10 @@ void parseYAML()
 
   yaml_parser_delete(&parser);
 
-  /*for (iter = yamlValues.begin(); iter != yamlValues.end(); iter++)
+  for (iter = yamlValues.begin(); iter != yamlValues.end(); iter++)
   {
     std::cout << "Key[" << iter->first << "] Value[" << iter->second << "]\n";
-  }*/
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,7 +260,6 @@ int main(int argc, char **argv)
 
   parseYAML();
 
-  /*
   client = new gazebo::Client();
   simIface = new gazebo::SimulationIface();
   factoryIface = new gazebo::FactoryIface();
@@ -302,5 +307,4 @@ int main(int argc, char **argv)
     spawn();
   else
     std::cerr << "Unknown command[" << params[0] << "]\n";
-  */
 }
