@@ -496,7 +496,7 @@ void ODEBody::SetTorque(const Vector3 &torque)
   if (this->bodyId)
   {
     this->physicsEngine->LockMutex();
-    dBodySetTorque(this->bodyId, torque.x, torque.y, torque.z);
+    dBodyAddTorque(this->bodyId, torque.x, torque.y, torque.z);
     this->physicsEngine->UnlockMutex();
   }
 }
