@@ -94,8 +94,6 @@ void SimulationIface::Create(Server *server, std::string id)
 /// Close the interface
 void SimulationIface::Close()
 {
-  printf("Close\n");
-
   //stop BlockThread
   if (this->goAckThread) 
   {
@@ -144,7 +142,6 @@ void SimulationIface::Open(Client *client, std::string id)
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationIface::BlockThread()
 {
-  printf("Block thread start\n");
   try
   {
     while (true)
@@ -161,11 +158,8 @@ void SimulationIface::BlockThread()
   } 
   catch (boost::thread_interrupted const &)
   {
-    fprintf(stderr, "blockthread: thread got interrupted....\n");
     return;
   }
-
-  printf("Block thread end\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +183,17 @@ void SimulationIface::Unpause()
   SimulationRequestData *request = 
     &(this->data->requests[this->data->requestCount++]);
   request->type = SimulationRequestData::UNPAUSE;
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Step the simulation
+void SimulationIface::Step()
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::STEP;
   this->Unlock();
 }
 
@@ -340,7 +345,8 @@ void SimulationIface::SetState(const std::string &name, Pose &modelPose,
 
   this->Unlock();
 }
-//////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get then children of a model
 void SimulationIface::GetChildInterfaces(const std::string &name)
 {
@@ -372,6 +378,7 @@ void SimulationIface::GetInterfaceType(const std::string &name)
 
   this->Unlock();
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Get the complete state of a model
 bool SimulationIface::GetState(const std::string &name, Pose &modelPose, 
@@ -403,6 +410,93 @@ bool SimulationIface::GetState(const std::string &name, Pose &modelPose,
   return true;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+/// Set the linear velocity
+void SimulationIface::SetLinearVel(const std::string &modelName, Vec3 vel)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = gazebo::SimulationRequestData::SET_LINEAR_VEL;
+  memset(request->name, 0, 512);
+  strncpy(request->name, modelName.c_str(), 512);
+  request->name[511] = '\0';
+
+  if (isnan(vel.x)) vel.x = 0.0;
+  if (isnan(vel.y)) vel.y = 0.0;
+  if (isnan(vel.z)) vel.z = 0.0;
+
+  request->modelLinearVel = vel;
+
+  this->Unlock();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Set the linear acceleration
+void SimulationIface::SetLinearAccel(const std::string &modelName, Vec3 accel)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = gazebo::SimulationRequestData::SET_LINEAR_ACCEL;
+  memset(request->name, 0, 512);
+  strncpy(request->name, modelName.c_str(), 512);
+  request->name[511] = '\0';
+
+  if (isnan(accel.x)) accel.x = 0.0;
+  if (isnan(accel.y)) accel.y = 0.0;
+  if (isnan(accel.z)) accel.z = 0.0;
+
+  request->modelLinearAccel = accel;
+
+  this->Unlock();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Set the angular velocity
+void SimulationIface::SetAngularVel(const std::string &modelName, Vec3 vel)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = gazebo::SimulationRequestData::SET_ANGULAR_VEL;
+  memset(request->name, 0, 512);
+  strncpy(request->name, modelName.c_str(), 512);
+  request->name[511] = '\0';
+
+  if (isnan(vel.x)) vel.x = 0.0;
+  if (isnan(vel.y)) vel.y = 0.0;
+  if (isnan(vel.z)) vel.z = 0.0;
+
+  request->modelAngularVel = vel;
+
+  this->Unlock();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Set the angular acceleration
+void SimulationIface::SetAngularAccel(const std::string &modelName, Vec3 accel)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = gazebo::SimulationRequestData::SET_ANGULAR_ACCEL;
+  memset(request->name, 0, 512);
+  strncpy(request->name, modelName.c_str(), 512);
+  request->name[511] = '\0';
+
+  if (isnan(accel.x)) accel.x = 0.0;
+  if (isnan(accel.y)) accel.y = 0.0;
+  if (isnan(accel.z)) accel.z = 0.0;
+
+  request->modelAngularAccel = accel;
+
+  this->Unlock();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Wait for a post on the go ack semaphore
@@ -723,6 +817,37 @@ bool SimulationIface::GetEntityParamValue(const std::string &entityName,
 
   assert(this->data->responseCount == 1);
   paramValue = data->responses[0].strValue;
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set a param value for an entity
+bool SimulationIface::SetEntityParamValue(const std::string &entityName, 
+                                          const std::string &paramName, 
+                                          const std::string &paramValue )
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::SET_ENTITY_PARAM_VALUE;
+
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  memset(request->strValue, 0, 512);
+  strncpy(request->strValue, paramName.c_str(), 512);
+  request->strValue[511] = '\0';
+
+  memset(request->strValue1, 0, 512);
+  strncpy(request->strValue1, paramValue.c_str(), 512);
+  request->strValue1[511] = '\0';
+
+  this->Unlock();
 
   return true;
 }

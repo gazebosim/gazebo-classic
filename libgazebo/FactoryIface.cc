@@ -4,11 +4,11 @@
 
 using namespace gazebo;
 
-/// \brief Delete a model by name
-bool FactoryIface::DeleteModel(const std::string &model_name)
+/// Delete a model by name
+bool FactoryIface::DeleteEntity(const std::string &model_name)
 {
   this->Lock(1);
-  strcpy((char*)this->data->deleteModel, model_name.c_str());
+  strcpy((char*)this->data->deleteEntity, model_name.c_str());
   this->Unlock();
   return true;
 }

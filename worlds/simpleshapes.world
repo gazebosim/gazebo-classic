@@ -47,8 +47,8 @@
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
-    <xyz>1 0 0.5</xyz>
-    <rpy>0.0 0.0 0.0</rpy>
+    <xyz>0 0 0.2</xyz>
+    <rpy>45 0.0 0.0</rpy>
     <static>false</static>
 
     <body:sphere name="sphere1_body">
@@ -61,6 +61,7 @@
         <visual>
           <size>0.4 0.4 0.4</size>
           <mesh>unit_sphere</mesh>
+          <shader>pixel</shader>
           <material>Gazebo/Rocky</material>
         </visual>
       </geom:sphere>
@@ -88,7 +89,7 @@
 
   <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>-2 2 5</xyz>
+    <xyz>-2 2 10</xyz>
     <static>false</static>
 
     <light>

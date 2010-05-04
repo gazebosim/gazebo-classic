@@ -420,6 +420,7 @@ class SimulationRequestData
   public: enum Type { PAUSE,
                       UNPAUSE,
                       RESET,
+                      STEP,
                       SAVE,
                       GET_POSE3D,
                       GET_POSE2D,
@@ -427,6 +428,10 @@ class SimulationRequestData
                       SET_POSE2D,
                       SET_STATE,
                       GET_STATE,
+                      SET_LINEAR_VEL,
+                      SET_LINEAR_ACCEL,
+                      SET_ANGULAR_VEL,
+                      SET_ANGULAR_ACCEL,
                       GO,
                       GET_ENTITY_TYPE,
                       GET_ENTITY_PARAM_COUNT,
@@ -441,11 +446,13 @@ class SimulationRequestData
                       GET_MODEL_EXTENT,
                       GET_MODEL_INTERFACES, // for getting interfaces as well as the models which are ancestors of interfaces
                       GET_INTERFACE_TYPE,   // if the model is not an interface 'unknown' is returned
+                      SET_ENTITY_PARAM_VALUE,
                    };
 
   public: Type type; 
   public: char name[512];
   public: char strValue[512];
+  public: char strValue1[512];
   public: Vec3 vec3Value;
   public: unsigned int uintValue;
 
@@ -544,6 +551,9 @@ class SimulationIface : public Iface
   /// \brief Unpause the simulation
   public: void Unpause();
 
+  /// \brief Step the simulation
+  public: void Step();
+
   /// \brief Reset the simulation
   public: void Reset();
 
@@ -568,13 +578,25 @@ class SimulationIface : public Iface
 
   /// \brief Set the complete state of a model
   public: void SetState(const std::string &modelName, Pose &modelPose, 
-              Vec3 &linearVel, Vec3 &angularVel, 
-              Vec3 &linearAccel, Vec3 &angularAccel );
+                        Vec3 &linearVel, Vec3 &angularVel, 
+                        Vec3 &linearAccel, Vec3 &angularAccel );
 
   /// \brief Get the complete state of a model
   public: bool GetState(const std::string &modelName, Pose &modelPose, 
-              Vec3 &linearVel, Vec3 &angularVel, 
-              Vec3 &linearAccel, Vec3 &angularAccel );
+                        Vec3 &linearVel, Vec3 &angularVel, 
+                        Vec3 &linearAccel, Vec3 &angularAccel );
+
+  /// \brief Set the linear velocity
+  public: void SetLinearVel(const std::string &modelName, Vec3 vel);
+
+  /// \brief Set the linear acceleration
+  public: void SetLinearAccel(const std::string &modelName,Vec3 acce);
+
+  /// \brief Set the angular velocity
+  public: void SetAngularVel(const std::string &modelName,Vec3 vel);
+
+  /// \brief Set the angular acceleration
+  public: void SetAngularAccel(const std::string &modelName,Vec3 accel);
 
   /// \brief Get the child interfaces of a model
   public: void GetChildInterfaces(const std::string &modelName);
@@ -620,6 +642,10 @@ class SimulationIface : public Iface
   public: bool GetEntityParamValue(const std::string &entityName, 
                           unsigned int paramIndex, std::string &paramValue );
 
+  /// \brief Set a param value for an entity
+  public: bool SetEntityParamValue(const std::string &entityName, 
+                                   const std::string &paramName, 
+                                   const std::string &paramValue );
 
   public: void GoAckWait();
   public: void GoAckPost();
@@ -1210,8 +1236,8 @@ class FactoryData
   /// String describing the model to be initiated
   public: uint8_t newModel[409600];
 
-  /// Delete a model by name
-  public: uint8_t deleteModel[512];
+  /// Delete an entity by name
+  public: uint8_t deleteEntity[512];
 };
 
 /// \brief Factory interface
@@ -1237,8 +1263,8 @@ class FactoryIface : public Iface
             this->data = (FactoryData*)this->mMap; 
           }
 
-  /// \brief Delete a model by name
-  public: bool DeleteModel(const std::string &model_name);
+  /// \brief Delete an entity by name
+  public: bool DeleteEntity(const std::string &model_name);
 
   /// Pointer to the factory data
   public: FactoryData *data;
