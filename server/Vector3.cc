@@ -114,6 +114,20 @@ Vector3 Vector3::GetCrossProd(const Vector3 &pt) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Return the dot product of this vector and pt
+double Vector3::GetDotProd(const Vector3 &pt) const
+{
+  return this->x * pt.x + this->y * pt.y + this->z * pt.z;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the absolute value of the vector
+Vector3 Vector3::GetAbs() const
+{
+  return Vector3(fabs(this->x), fabs(this->y), fabs(this->z));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Return a vector that is perpendicular to this one.
 Vector3 Vector3::GetPerpendicular() const
 {
@@ -138,9 +152,29 @@ Vector3 Vector3::GetNormal(const Vector3 &v1, const Vector3 &v2,
   Vector3 a = v2 - v1;
   Vector3 b = v3 - v1;
   Vector3 n = a.GetCrossProd(b);
-  n.Normalize();
+  //n.Normalize();
   return n;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Get a distance to a plane
+double Vector3::GetDistToPlane(Vector3 dir, Vector3 planeNormal, double d) const
+{
+  double denom = planeNormal.GetDotProd(dir);
+
+  if (fabs(denom) < 1e-3)
+  {
+    // parallel
+    return -1;
+  }
+  else
+  {
+    double nom = this->GetDotProd(planeNormal) + d;
+    double t = -(nom/denom);
+    return t;
+  }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Equals operator

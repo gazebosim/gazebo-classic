@@ -181,6 +181,8 @@ void ODEBody::OnPoseChange()
   if (this->bodyId == NULL)
     return;
 
+  this->SetEnabled(true);
+
   Pose3d pose = this->comEntity->GetAbsPose();
   this->physicsEngine->LockMutex();
 
@@ -393,6 +395,7 @@ void ODEBody::SetLinearVel(const Vector3 &vel)
 {
   if (this->bodyId)
   {
+    this->SetEnabled(true);
     this->physicsEngine->LockMutex();
     dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
     this->physicsEngine->UnlockMutex();
@@ -427,6 +430,7 @@ void ODEBody::SetAngularVel(const Vector3 &vel)
 {
   if (this->bodyId)
   {
+    this->SetEnabled(true);
     this->physicsEngine->LockMutex();
     dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
     this->physicsEngine->UnlockMutex();

@@ -82,10 +82,10 @@ ODEPhysics::ODEPhysics()
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   dWorldSetAutoDisableFlag(this->worldId, 1);
-  dWorldSetAutoDisableTime(this->worldId, 1.0);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
-  dWorldSetAutoDisableSteps(this->worldId, 10);
+  dWorldSetAutoDisableTime(this->worldId, 2.0);
+  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
+  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
+  dWorldSetAutoDisableSteps(this->worldId, 50);
 
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);

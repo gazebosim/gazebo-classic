@@ -64,7 +64,7 @@ namespace gazebo
     public: virtual std::string GetAsString() const {return std::string();}
 
     /// \brief Set the parameter value from a string
-    public: virtual void SetFromString(std::string &, bool callback=false) {}
+    public: virtual void SetFromString(const std::string &, bool callback=false) {}
 
     /// List of created parameters
     private: static std::vector<Param*> *params;
@@ -90,7 +90,7 @@ namespace gazebo
     public: virtual std::string GetAsString() const;
 
     /// \brief Set the parameter value from a string
-    public: virtual void SetFromString( std::string &str, bool callback=false );
+    public: virtual void SetFromString( const std::string &str, bool callback=false );
 
     /// \brief Get the value
     public: T GetValue() const;
@@ -169,17 +169,19 @@ namespace gazebo
   //////////////////////////////////////////////////////////////////////////////
   // Set value from string
   template<typename T>
-  void ParamT<T>::SetFromString(std::string &str, bool callback)
+  void ParamT<T>::SetFromString(const std::string &str, bool callback)
   {
+    std::string tmp = str;
+
     // "true" and "false" doesn't work properly
-    if (str == "true")
-      str = "1";
+    if (tmp == "true")
+      tmp = "1";
     else if (str == "false")
-      str = "0";
+      tmp = "0";
 
     try
     {
-      this->value = boost::lexical_cast<T>(str);
+      this->value = boost::lexical_cast<T>(tmp);
     }
     catch (boost::bad_lexical_cast &e)
     {

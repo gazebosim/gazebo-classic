@@ -112,18 +112,6 @@ Body::~Body()
     this->cgVisual = NULL;
   }
 
-  /*if (this->comEntity)
-    delete this->comEntity;
-  this->comEntity = NULL;
-  */
-
-  /*for (iter = this->children.begin(); iter != this->children.end(); iter++)
-    if (*iter)
-    {
-      std::cout << "Deleting[" << *iter << "]\n";
-      delete *iter;
-    }
-    */
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
     if (giter->second)
       delete giter->second;
@@ -131,6 +119,11 @@ Body::~Body()
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     SensorManager::Instance()->RemoveSensor(*siter);
+
+  if (this->comEntity)
+    delete this->comEntity;
+  this->comEntity = NULL;
+
 
   delete this->xyzP;
   delete this->rpyP;
@@ -552,6 +545,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 /// Set the linear acceleration of the body
 void Body::SetLinearAccel(const Vector3 &accel)
 {
+  this->SetEnabled(true);
   this->linearAccel = accel;// * this->GetMass();
 }
 
@@ -566,6 +560,7 @@ Vector3 Body::GetLinearAccel() const
 /// Set the angular acceleration of the body
 void Body::SetAngularAccel(const Vector3 &accel)
 {
+  this->SetEnabled(true);
   this->angularAccel = accel * this->mass.GetAsDouble();
 }
 

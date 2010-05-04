@@ -541,7 +541,6 @@ unsigned int OgreCamera::GetViewportWidth() const
     return this->renderTarget->getViewport(0)->getActualWidth();
   else
     return this->camera->getViewport()->getActualWidth();
-    //return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -552,7 +551,6 @@ unsigned int OgreCamera::GetViewportHeight() const
     return this->renderTarget->getViewport(0)->getActualHeight();
   else
     return this->camera->getViewport()->getActualHeight();
-    //return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -760,6 +758,20 @@ void OgreCamera::ShowWireframe(bool s)
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a world space ray as cast from the camer through the viewport
+void OgreCamera::GetCameraToViewportRay(int screenx, int screeny,
+                                        Vector3 &origin, Vector3 &dir)
+{
+  Ogre::Ray ray = this->camera->getCameraToViewportRay(
+      (float)screenx / this->GetViewportWidth(),
+      (float)screeny / this->GetViewportHeight());
+
+  origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
+  dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// post process, convert from rgb to bayer

@@ -46,6 +46,7 @@ namespace gazebo
 
   class XMLConfigNode;
   class Entity;
+  class SelectionObj;
 
   /// \brief Ogre Visual Object
   class OgreVisual : public Common, public Ogre::Any
@@ -64,6 +65,9 @@ namespace gazebo
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
+
+    /// \brief Attach a manipulation visual
+    public: void AttachManipulation();
 
     /// \brief Attach a renerable object to the visual
     public: void AttachObject( Ogre::MovableObject *obj);
@@ -214,6 +218,8 @@ namespace gazebo
     private: bool isStatic;
     private: Ogre::StaticGeometry *staticGeom;
     private: bool visible;
+
+    private: static SelectionObj *selectionObj;
   };
 }
 

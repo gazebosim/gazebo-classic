@@ -585,5 +585,7 @@ void SubMesh::RecalculateNormals()
 
   // Normalize the results
   for (i=0; i < this->normals.size(); i++)
+  {
     this->normals[i].Normalize();
+  }
 }

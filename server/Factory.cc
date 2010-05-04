@@ -109,12 +109,12 @@ void Factory::Update()
   }
 
   // Attempt to delete a model by name, if the string is present
-  if (strcmp((const char*)this->factoryIface->data->deleteModel,"")!=0)
+  if (strcmp((const char*)this->factoryIface->data->deleteEntity,"")!=0)
   {
-    const std::string m = (const char*)this->factoryIface->data->deleteModel;
-    World::Instance()->DeleteEntity(m);
+    const std::string e = (const char*)this->factoryIface->data->deleteEntity;
+    World::Instance()->DeleteEntity(e);
 
-    strcpy((char*)this->factoryIface->data->deleteModel,"");
+    strcpy((char*)this->factoryIface->data->deleteEntity,"");
   }
   this->factoryIface->Unlock();
 

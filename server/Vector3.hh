@@ -69,12 +69,22 @@ class Vector3
   /// \brief Return the cross product of this vector and pt
   public: Vector3 GetCrossProd(const Vector3 &pt) const;
 
+  /// \brief Return the dot product of this vector and pt
+  public: double GetDotProd(const Vector3 &pt) const;
+
+  /// \breif Get the absolute value of the vector
+  public: Vector3 GetAbs() const;
+
   /// \brief Return a vector that is perpendicular to this one.
   public: Vector3 GetPerpendicular() const;
 
   /// \brief Get a normal vector to a triangle
   public: static Vector3 GetNormal(const Vector3 &v1, const Vector3 &v2, 
                                    const Vector3 &v3);
+
+  /// \brief Get distance to a plane, given a direction. Treats this 
+  ///        vector as a ray
+  public: double GetDistToPlane(Vector3 dir, Vector3 planeNormal, double d) const;
 
   /// \brief Equal operator
   public: const Vector3 &operator=( const Vector3 &pt );

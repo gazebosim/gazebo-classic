@@ -59,6 +59,9 @@ namespace gazebo
 
     /// \brief Get a parameter by name
     public: Param *GetParam(const std::string &key) const;
+
+     /// \brief Set a parameter by name
+    public: void SetParam(const std::string &key, const std::string &value);
    
     /// \brief Return the ID of this entity. This id is unique
     /// \return Integer ID

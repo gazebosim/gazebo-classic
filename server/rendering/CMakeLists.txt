@@ -22,6 +22,7 @@ set (sources OgreMovableText.cc
              Material.cc
              Light.cc
              RTShaderSystem.cc
+             SelectionObj.cc
 )
 
 set (headers OgreMovableText.hh
@@ -41,6 +42,7 @@ set (headers OgreMovableText.hh
              Material.hh
              Light.hh
              RTShaderSystem.hh
+             SelectionObj.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})

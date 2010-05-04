@@ -256,11 +256,6 @@ class World : public SingletonT<World>
   /// \return The model that was created
   private: Model *LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate,bool initModel);
 
-  /// \brief Set the model pose and the pose of it's attached children 
-  /// \param model The model to set
-  /// \param pose The pose to set the model to
-  private: void SetModelPose(Model *model , Pose3d pose);
-
   /// \brief Update the simulation iface
   public: void UpdateSimulationIface();
 
@@ -344,7 +339,7 @@ class World : public SingletonT<World>
   private: std::vector<Model*> models;
 
   /// List of models to delete from the world
-  private: std::vector< std::string > toDeleteModels;
+  private: std::vector< std::string > toDeleteEntities;
 
   private: std::vector< std::string > toLoadEntities;
 

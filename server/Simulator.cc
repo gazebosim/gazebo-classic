@@ -555,7 +555,6 @@ void Simulator::SetSelectedEntity( Entity *ent )
   {
     this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
     this->selectedEntity->SetSelected(false);
-    this->selectedEntity = NULL;
   }
 
   // if a different entity is selected, show bounding box and SetSelected(true)
@@ -565,14 +564,6 @@ void Simulator::SetSelectedEntity( Entity *ent )
     this->selectedEntity = ent;
     this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
     this->selectedEntity->SetSelected(true);
-    //std::cout << " SetSelected Entity : " << this->selectedEntity->GetName() 
-    //          << std::endl;
-    //std::cout << " ------------------------------------------------------- " 
-    //          << std::endl;
-    //std::cout << " Drag with left mouse button to rotate in the plane of the
-    //               camera view port." << std::endl;
-    //std::cout << " Drag with right mouse button to reposition object in the
-    //               plane of the camera view port." << std::endl;
   }
   else
     this->selectedEntity = NULL;
@@ -597,7 +588,9 @@ Model *Simulator::GetParentModel( Entity *entity ) const
 
   do 
   {
-    model = dynamic_cast<Model*>(entity);
+    if (entity && entity->GetType() == Entity::MODEL)
+      model = (Model*)entity;
+
     entity = entity->GetParent();
   } while (model == NULL);
 
@@ -615,7 +608,8 @@ Body *Simulator::GetParentBody( Entity *entity ) const
 
   do 
   {
-    body = dynamic_cast<Body*>(entity);
+    if (entity && entity->GetType() == Entity::BODY)
+      body = (Body*)(entity);
     entity = entity->GetParent();
   } while (body == NULL);
 
@@ -659,6 +653,7 @@ void Simulator::PhysicsLoop()
 
       if (this->GetStepInc())
           userStepped = true;
+      this->SetPaused(false);
     }
     else
       this->pauseTime += step;

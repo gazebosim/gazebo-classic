@@ -279,7 +279,7 @@ void World::Init()
   if (this->openAL)
     this->openAL->Init();
 
-  this->toDeleteModels.clear();
+  this->toDeleteEntities.clear();
   this->toLoadEntities.clear();
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
@@ -513,7 +513,7 @@ void World::ProcessEntitiesToLoad()
 // Load all the entities that have been queued
 void World::ProcessEntitiesToDelete()
 {
-  if (!this->toDeleteModels.empty())
+  if (!this->toDeleteEntities.empty())
   {
     // maybe try try_lock here instead
     boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
@@ -521,25 +521,27 @@ void World::ProcessEntitiesToDelete()
 
     // Remove and delete all models that are marked for deletion
     std::vector< std::string>::iterator miter;
-    for (miter=this->toDeleteModels.begin();
-        miter!=this->toDeleteModels.end(); miter++)
+    for (miter=this->toDeleteEntities.begin();
+        miter!=this->toDeleteEntities.end(); miter++)
     {
       Entity *entity = this->GetEntityByName(*miter);
-      std::cout << "Process Entity to Delete[" << (*miter) << "]\n";
       if (entity)
       {
-        Model *model = dynamic_cast<Model*>(entity);
-        if (model)
+        if (entity->GetType() == Entity::MODEL)
         {
+          Model *model = (Model*)entity;
           model->Fini();
           this->models.erase( std::find(this->models.begin(), 
                 this->models.end(), model) );
         }
+        else if (entity->GetType() == Entity::BODY)
+          ((Body*)entity)->Fini();
+
         delete (entity);
       }
     }
 
-    this->toDeleteModels.clear();
+    this->toDeleteEntities.clear();
   }
  
 }
@@ -555,10 +557,7 @@ void World::DeleteEntity(const std::string &name)
   if (!entity)
     return;
 
-  Model *model = dynamic_cast<Model*>(entity);
-
-  if (model)
-    this->toDeleteModels.push_back(model->GetName());
+  this->toDeleteEntities.push_back(name);
 }
 
 
@@ -592,51 +591,6 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent,
   return model;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the model pose and the pose of it's attached children
-void World::SetModelPose(Model *model , Pose3d pose)
-{
-  /*printf("World::SetModelPose\n");
-  std::vector<Entity*>::iterator iter;
-  Pose3d origPose, newPose, childPose;
-  Model *parent = dynamic_cast<Model*>(model->GetParent());
-  Model *child = NULL;
-
-  // Get current pose
-  origPose = model->GetPose();
-
-  // Compute new global pose of the model
-  if (parent)
-    newPose = pose + parent->GetPose();
-  else
-    newPose = pose;
-
-  // Recursively move children
-  for (iter=model->GetChildren().begin();
-       iter!=model->GetChildren().end(); iter++)
-  {
-    child = dynamic_cast<Model*>(*iter);
-
-    if (child && child->GetParent() == model)
-    {
-      // Compute the current relative pose of the child
-      childPose = child->GetPose() - origPose;
-
-      // Compute the new global pose of the child
-      childPose = childPose + newPose;
-
-      // Compute the new child pose relative to the current model's pose
-      childPose = childPose - origPose;
-
-      this->SetModelPose( child, childPose );
-    }
-  }
-
-  model->SetPose(newPose);
-  */
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Get a pointer to a model based on a name
 Entity *World::GetEntityByName(const std::string &name) const
@@ -647,7 +601,6 @@ Entity *World::GetEntityByName(const std::string &name) const
   for (iter = this->models.begin(); 
        iter != this->models.end() && result == NULL; iter++)
     result = this->GetEntityByNameHelper(name, (*iter));
-
   return result;
 }
 
@@ -687,7 +640,6 @@ void World::Reset()
 
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
   {
-    this->SetModelPose((*miter), (*miter)->GetInitPose());
     (*miter)->Reset();
   }
 }
@@ -848,6 +800,10 @@ void World::UpdateSimulationIface()
             !Simulator::Instance()->IsPaused());
         break;
 
+      case SimulationRequestData::STEP: 
+        Simulator::Instance()->SetStepInc(true);
+        break;
+
       case SimulationRequestData::RESET:
         this->Reset();
         break;
@@ -856,13 +812,118 @@ void World::UpdateSimulationIface()
         Simulator::Instance()->Save();
         break;
 
+      case SimulationRequestData::SET_ENTITY_PARAM_VALUE:
+        {
+          Entity *ent = this->GetEntityByName((char*)req->name);
+
+          if (ent)
+            ent->SetParam( req->strValue, req->strValue1 );
+          else
+            gzerr(0) << "Invalid entity name[" << req->name 
+                     << "] in simulation interface Set Param Request.\n";
+          break;
+        }
+
+      case SimulationRequestData::SET_LINEAR_VEL:
+        {
+          Entity *ent = this->GetEntityByName((char*)req->name);
+
+          if (ent && ent->GetType() == Entity::MODEL)
+          {
+            Model *model = (Model*)(ent);
+
+            Vector3 linearVel( req->modelLinearVel.x, req->modelLinearVel.y,
+                               req->modelLinearVel.z);
+
+            Pose3d pose = model->GetAbsPose();
+            linearVel = pose.rot.RotateVector(linearVel);
+            model->SetLinearVel(linearVel);
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->name 
+              << "] in simulation interface Set Linear Vel Request.\n";
+          }
+          break;
+        }
+
+      case SimulationRequestData::SET_ANGULAR_VEL:
+        {
+          Entity *ent = this->GetEntityByName((char*)req->name);
+
+          if (ent && ent->GetType() == Entity::MODEL)
+          {
+            Model *model = (Model*)(ent);
+
+            Vector3 vel( req->modelAngularVel.x, req->modelAngularVel.y,
+                         req->modelAngularVel.z);
+
+            Pose3d pose = model->GetAbsPose();
+            vel = pose.rot.RotateVector(vel);
+            model->SetAngularVel(vel);
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->name 
+              << "] in simulation interface Set Angular Vel Request.\n";
+          }
+          break;
+        }
+
+ 
+      case SimulationRequestData::SET_LINEAR_ACCEL:
+        {
+          Entity *ent = this->GetEntityByName((char*)req->name);
+
+          if (ent && ent->GetType() == Entity::MODEL)
+          {
+            Model *model = (Model*)ent;
+
+            Vector3 accel( req->modelLinearAccel.x, req->modelLinearAccel.y,
+                               req->modelLinearAccel.z);
+
+            Pose3d pose = model->GetAbsPose();
+            accel = pose.rot.RotateVector(accel);
+            model->SetLinearAccel(accel);
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->name 
+              << "] in simulation interface Set Linear Accel Request.\n";
+          }
+          break;
+        }
+
+      case SimulationRequestData::SET_ANGULAR_ACCEL:
+        {
+          Entity *ent = this->GetEntityByName((char*)req->name);
+
+          if (ent && ent->GetType() == Entity::MODEL)
+          {
+            Model *model = (Model*)ent;
+            Vector3 accel( req->modelAngularAccel.x, req->modelAngularAccel.y,
+                               req->modelAngularAccel.z);
+
+            Pose3d pose = model->GetAbsPose();
+            accel = pose.rot.RotateVector(accel);
+            model->SetAngularAccel(accel);
+          }
+          else
+          {
+            gzerr(0) << "Invalid model name[" << req->name 
+              << "] in simulation interface Set Linear Accel Request.\n";
+          }
+          break;
+        }
+
       case SimulationRequestData::SET_STATE:
         {
           Entity *ent = this->GetEntityByName((char*)req->name);
-          Model *model = dynamic_cast<Model*>(ent);
 
-          if (model)
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)ent;
+
             Pose3d pose;
             Vector3 linearVel( req->modelLinearVel.x,
                                req->modelLinearVel.y,
@@ -915,10 +976,10 @@ void World::UpdateSimulationIface()
         {
           Pose3d pose;
           Entity *ent = this->GetEntityByName((char*)req->name);
-          Model *model = dynamic_cast<Model*>(ent);
 
-          if (model)
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)(ent);
             pose.pos.x = req->modelPose.pos.x;
             pose.pos.y = req->modelPose.pos.y;
             pose.pos.z = req->modelPose.pos.z;
@@ -948,17 +1009,17 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GET_NUM_CHILDREN:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
+          Entity *entity = this->GetEntityByName((char*)req->name);
 
-          if (model)
+          if (entity)
           {
             response->type= req->type;
-            response->uintValue = model->GetChildren().size();
+            response->uintValue = entity->GetChildren().size();
             response++;
             this->simIface->data->responseCount += 1;
           }
           else
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Num Children.\n";
+            gzerr(0) << "Invalid entity name[" << req->name << "] in simulation interface Get Num Children.\n";
           break;
         }
 
@@ -1049,40 +1110,42 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GET_CHILD_NAME:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
+          Entity *entity = this->GetEntityByName((char*)req->name);
 
-          if (model)
+          if (entity)
           {
-            Entity *ent;
+            Entity *child;
             unsigned int index;
             response->type= req->type;
 
             index = req->uintValue;
 
-            ent = model->GetChildren()[index];
-            if (ent)
+            child = entity->GetChildren()[index];
+            if (child)
             {
               memset(response->strValue, 0, 512);
-              strncpy(response->name, ent->GetCompleteScopedName().c_str(), 512);
+              strncpy(response->name, child->GetCompleteScopedName().c_str(), 512);
               response->strValue[511] = '\0';
 
               response++;
               this->simIface->data->responseCount += 1;
             }
             else
-            gzerr(0) << "Invalid child  index in simulation interface Get Num Children.\n";
+            gzerr(0) << "Invalid child index in simulation interface Get Child Name.\n";
           }
           else
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Num Children.\n";
+            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Child Name.\n";
 
           break;
         }
 
       case SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
-          if (model)
+          Entity *ent = this->GetEntityByName((char*)req->name);
+
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)ent;
             response->type = req->type;
             response->uintValue = model->GetLaserFiducialId();
             response++;
@@ -1115,10 +1178,12 @@ void World::UpdateSimulationIface()
         }
       case SimulationRequestData::GET_MODEL_TYPE:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
+          Entity *ent = this->GetEntityByName((char*)req->name);
 
-          if (model)
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)ent;
+
             response->type = req->type;
             memset(response->strValue, 0, 512);
             strncpy(response->strValue, model->GetModelType().c_str(), 512);
@@ -1134,9 +1199,10 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GET_MODEL_EXTENT:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
-          if (model)
+          Entity *ent = this->GetEntityByName((char*)req->name);
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)ent;
             Vector3 min, max;
             model->GetBoundingBox(min, max);
 
@@ -1157,9 +1223,11 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GET_STATE:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
-          if (model)
+          Entity *ent = this->GetEntityByName((char*)req->name);
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)ent;
+
             Pose3d pose;
             Vector3 linearVel;
             Vector3 angularVel;
@@ -1211,9 +1279,11 @@ void World::UpdateSimulationIface()
       case SimulationRequestData::GET_POSE2D:
       case SimulationRequestData::GET_POSE3D:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
-          if (model)
+          Entity *ent = this->GetEntityByName((char*)req->name);
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)ent;
+
             Pose3d pose = model->GetAbsPose();
             Vector3 rot = pose.rot.GetAsEuler();
 
@@ -1241,7 +1311,6 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::GET_INTERFACE_TYPE:
         {
-          //printf("Model Type Request\n");
           std::vector<std::string> list;
 
           response->type = req->type;
@@ -1458,9 +1527,12 @@ void World::UpdateSimulationIface()
 
       case SimulationRequestData::SET_POSE2D:
         {
-          Model *model = dynamic_cast<Model*>(this->GetEntityByName((char*)req->name));
-          if (model)
+          Entity *ent = this->GetEntityByName((char*)req->name);
+
+          if (ent && ent->GetType() == Entity::MODEL)
           {
+            Model *model = (Model*)ent;
+
             Pose3d pose = model->GetAbsPose();
             Vector3 rot = pose.rot.GetAsEuler();
 
@@ -1487,17 +1559,18 @@ void World::UpdateSimulationIface()
   }
 
   this->simIface->Unlock();
-
-  //this->ProcessEntitiesToDelete();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Get all the interface names
 void World::GetInterfaceNames(Entity* en, std::vector<std::string>& list)
 {
-	Model* m = dynamic_cast<Model*>(en);
+  if (!en || en->GetType() != Entity::MODEL)
+    return;
 
-	if(m)
-		m->GetModelInterfaceNames(list);
-	
+	Model* m = (Model*)(en);
+
+  m->GetModelInterfaceNames(list);
 
   const std::vector<Entity*> children = en->GetChildren();
 	std::vector<Entity*>::const_iterator citer;
@@ -1516,14 +1589,6 @@ void World::SaveState()
   WorldState *ws = &(*this->worldStatesInsertIter);
   for (mIter = this->models.begin(); mIter != this->models.end(); mIter++)
     ws->modelPoses[(*mIter)->GetName()] = (*mIter)->GetRelativePose();
-
-  /*for (bIter = this->bodies.begin(); bIter !=this->bodies.end(); bIter++)
-    ws->bodyPoses[(*bIter)->GetName()] = (*bIter)->GetRelativePose();
-
-  for (gIter = this->geometries.begin(); gIter !=this->geometries.end(); 
-       gIter++)
-    ws->geomPoses[(*gIter)->GetName()] = (*gIter)->GetRelativePose();
-    */
 
   this->worldStatesInsertIter++;
   if (this->worldStatesInsertIter == this->worldStates.end())

@@ -143,9 +143,9 @@ void Sidebar::Update()
     this->AddToParamBrowser(value);
     this->AddEntityToParamBrowser(model, "");
 
-    const std::map<std::string, Body *> *bodies = model->GetBodies();
+    const std::vector<Entity*> bodies = model->GetChildren();
     const std::map<std::string, Geom *> *geoms;
-    std::map<std::string, Body*>::const_iterator iter;
+    std::vector<Entity*>::const_iterator iter;
     std::map<std::string, Geom*>::const_iterator giter;
 
     /*for (unsigned int i=0; i < model->GetJointCount(); i++)
@@ -154,13 +154,17 @@ void Sidebar::Update()
       this->jointChoice->add(joint->GetName().c_str(),0,0);
     }*/
 
-    for (iter = bodies->begin(); iter != bodies->end(); iter++)
+    for (iter = bodies.begin(); iter != bodies.end(); iter++)
     {
-      value = "@b@B52@s-Body:~@b@B52@s" + iter->second->GetName();
-      this->AddToParamBrowser(value);
-      this->AddEntityToParamBrowser( iter->second, "  " );
+      Body *body = dynamic_cast<Body*>(*iter);
+      if (!body)
+        continue;
 
-      geoms = iter->second->GetGeoms();
+      value = "@b@B52@s-Body:~@b@B52@s" + body->GetName();
+      this->AddToParamBrowser(value);
+      this->AddEntityToParamBrowser( body, "  " );
+
+      geoms = body->GetGeoms();
 
       for (giter = geoms->begin(); giter != geoms->end(); giter++)
       {

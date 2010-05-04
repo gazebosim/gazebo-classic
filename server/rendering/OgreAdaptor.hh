@@ -55,6 +55,7 @@ namespace Ogre
   class ColourValue;
   class RenderSystem;
   class RaySceneQuery; 
+  class Mesh;
 }
 
 
@@ -69,6 +70,7 @@ namespace gazebo
   class Entity;
   class UserCamera;
   class OgreCamera;
+  class OgreVisual;
   
   /// \brief Adptor to Ogre3d
   class OgreAdaptor : public SingletonT<OgreAdaptor>
@@ -106,7 +108,7 @@ namespace gazebo
     /// \param camera The ogre camera, used to do mouse picking
     /// \param mousePos The position of the mouse in screen coordinates
     /// \return The selected entity, or NULL
-    public: Entity *GetEntityAt(OgreCamera *camera, Vector2<int> mousePos);
+    public: Entity *GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std::string &mod);
 
     /// \brief Register a user camera
     public: void RegisterCamera( OgreCamera *cam );
@@ -120,7 +122,7 @@ namespace gazebo
     private: void LoadPlugins();
     private: void SetupResources();
     private: void SetupRenderSystem();
-  
+
     /// Pointer to the root scene node
     public: Ogre::Root *root;
   

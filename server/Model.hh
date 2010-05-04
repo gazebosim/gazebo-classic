@@ -86,6 +86,9 @@ namespace gazebo
     /// \param params Update parameters
     public: void Update();
 
+    /// \brief Remove a child
+    public: virtual void RemoveChild(Entity *child);
+
     /// \brief Primarily used to update the graphics interfaces
     public: void GraphicsUpdate();
 
@@ -167,7 +170,7 @@ namespace gazebo
     public: Body *GetBody(const std::string &name);
 
     /// \brief Get a map of all the bodies
-    public: const std::map<std::string, Body*> *GetBodies() const;
+    //public: const std::map<std::string, Body*> *GetBodies() const;
 
     /// \brief Get a sensor by name
     public: Sensor *GetSensor(const std::string &name) const;

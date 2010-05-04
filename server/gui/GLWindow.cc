@@ -34,6 +34,8 @@
 #include <GL/glx.h>
 
 #include <Ogre.h>
+#include "OgreDynamicLines.hh"
+#include "OgreVisual.hh"
 #include "Param.hh"
 #include "Entity.hh"
 #include "Body.hh"
@@ -211,6 +213,14 @@ void GLWindow::HandleMousePush()
   this->forceVec = 0;
   this->torqueVec = 0;
 
+  this->mousePushPos = this->mousePos;
+
+  if (Simulator::Instance()->GetSelectedEntity())
+  {
+    OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
+                                         this->mousePos, this->mouseModifier);
+  }
+
   // Get the mouse button that was pressed (if one was pressed)
   switch (Fl::event_button())
   {
@@ -254,7 +264,7 @@ void GLWindow::HandleMouseRelease()
       (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
   {
     Entity *entity = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
-                                                          this->mousePos);
+                                         this->mousePos, this->mouseModifier);
 
     Model *model = Simulator::Instance()->GetParentModel(entity);
     Body *body = Simulator::Instance()->GetParentBody(entity);
@@ -305,10 +315,11 @@ void GLWindow::HandleMouseDrag()
 
     if (this->leftMousePressed)
     {
-      if ( entity && (entity->GetType() == Entity::MODEL || entity->GetType() == Entity::BODY) && 
+      if ( entity && (entity->GetType() == Entity::MODEL || 
+           entity->GetType() == Entity::BODY) && 
            (this->keys[FL_Control_L] || this->keys[FL_Control_R])  )
       {
-        if (entity->GetType() == Entity::MODEL)
+        if (entity->GetType() == Entity::MODEL && this->mouseModifier.substr(0,3) == "rot")
         {
           Model *model = (Model*)(entity);
 
@@ -316,26 +327,114 @@ void GLWindow::HandleMouseDrag()
           // interactively change rotation pose to selected item, 
           // rotate about axis perpendicular to view port plane
           //
-          Pose3d modelPose = model->GetAbsPose();
+          Pose3d modelPose = model->GetRelativePose();
 
-          double distance = (modelPose.pos - this->activeCamera->GetCameraPosition()).GetLength();
+          /*double distance = (modelPose.pos - this->activeCamera->GetCameraPosition()).GetLength();
           double scaleX = distance * tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          //double scaleY = distance * 
-          //  tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          double scaleY = distance * tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
+          */
 
-          // axis perpendicular to view port plane
-          Vector3 camRay = camRight.GetCrossProd(camUp);
-          Quatern yawDragQ; 
-          yawDragQ.SetFromAxis( camRay.x,camRay.y,camRay.z,drag.x/vpw*scaleX);
+          Vector3 planeNorm, planeNorm2;
+          Vector3 origin1, dir1, p1;
+          Vector3 origin2, dir2, p2;
+          Vector3 a,b;
+          Vector3 ray(0,0,0);
 
-          modelPose.rot = yawDragQ * modelPose.rot;
-          Vector3 eul = modelPose.rot.GetAsEuler();
-          /*std::cout << "Set euler angles r(" << eul.x << ") p(" 
-                    << eul.y << ") to model (" << model->GetName() 
-                    << ")" << std::endl;
-                    */
+          // Cast two rays from the camera into the world
+          this->activeCamera->GetCameraToViewportRay(this->mousePos.x, 
+              this->mousePos.y, origin1, dir1);
+          this->activeCamera->GetCameraToViewportRay(this->prevMousePos.x, 
+              this->prevMousePos.y, origin2, dir2);
 
+          // Figure out which axis to rotate around
+          if (this->mouseModifier == "rotx")
+            ray.x = 1.0;
+          else if (this->mouseModifier == "roty")
+            ray.y = 1.0;
+          else if (this->mouseModifier == "rotz")
+            ray.z = 1.0;
+
+          // Compute the normal to the plane on which to rotate
+          planeNorm = modelPose.rot * ray;
+
+          // Compute the distance from the camera to plane of rotation
+          double d = modelPose.pos.GetDotProd(ray);
+          double dist1 = origin1.GetDistToPlane(dir1, planeNorm, -d);
+          double dist2 = origin2.GetDistToPlane(dir2, planeNorm, -d);
+
+          // Compute two points on the plane. The first point is the current
+          // mouse position, the second is the previous mouse position
+          p1 = origin1 + dir1 * dist1;
+          p2 = origin2 + dir2 * dist2;
+
+          // Get point vectors relative to the entitie's pose
+          a = p1 - entity->GetAbsPose().pos;
+          b = p2 - entity->GetAbsPose().pos;
+
+          a.Normalize();
+          b.Normalize();
+
+          // Get the angle between the two vectors. This is the amount to
+          // rotate the entity 
+          float angle = acos(a.GetDotProd(b));
+          if (isnan(angle))
+            angle = 0;
+
+          // Compute the normal to the plane which is defined by the
+          // direction of rotation
+          planeNorm2 = a.GetCrossProd(b);
+          planeNorm2.Normalize();
+
+          // Switch rotation direction if the two normals don't line up
+          if ( planeNorm.GetDotProd(planeNorm2) > 0)
+            angle *= -1;
+
+          Quatern delta; 
+          delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
+          modelPose.rot = modelPose.rot * delta;
+       
           model->SetAbsPose(modelPose);
+        }
+        else if (this->mouseModifier.substr(0,5) == "trans")
+        {
+          Model *model = (Model*)(entity);
+          Pose3d modelPose = model->GetRelativePose();
+
+          Vector3 origin1, dir1, p1;
+          Vector3 origin2, dir2, p2;
+
+          // Cast two rays from the camera into the world
+          this->activeCamera->GetCameraToViewportRay(this->mousePos.x, 
+              this->mousePos.y, origin1, dir1);
+          this->activeCamera->GetCameraToViewportRay(this->prevMousePos.x, 
+              this->prevMousePos.y, origin2, dir2);
+
+          Vector3 moveVector(0,0,0);
+          Vector3 planeNorm(0,0,1);
+          if (this->mouseModifier == "transx")
+            moveVector.x = 1;
+          else if (this->mouseModifier == "transy")
+            moveVector.y = 1;
+          else if (this->mouseModifier == "transz")
+          {
+            moveVector.z = 1;
+            planeNorm.Set(1,0,0);
+          }
+
+          // Compute the distance from the camera to plane of translation
+          double d = modelPose.pos.GetDotProd(planeNorm);
+          double dist1 = origin1.GetDistToPlane(dir1, planeNorm, -d);
+          double dist2 = origin2.GetDistToPlane(dir2, planeNorm, -d);
+
+          // Compute two points on the plane. The first point is the current
+          // mouse position, the second is the previous mouse position
+          p1 = origin1 + dir1 * dist1;
+          p2 = origin2 + dir2 * dist2;
+
+          moveVector *= p1 - p2;
+
+          modelPose.pos += moveVector;
+          model->SetRelativePose(modelPose);
         }
 
         if (entity->GetType() == Entity::BODY)
@@ -376,7 +475,7 @@ void GLWindow::HandleMouseDrag()
         // interactively rotate view
         //
         this->activeCamera->RotateYaw(DTOR(-drag.x * this->rotateAmount));
-        this->activeCamera->RotatePitch(DTOR(drag.y * this->rotateAmount));
+        this->activeCamera->RotatePitch(DTOR(-drag.y * this->rotateAmount));
       }
     }
     else if (this->rightMousePressed)

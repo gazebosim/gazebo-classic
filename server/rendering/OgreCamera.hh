@@ -218,6 +218,10 @@ namespace gazebo
     /// \brief Set whether to view the world in wireframe
     public: void ShowWireframe(bool s);
 
+    /// \brief Get a world space ray as cast from the camer through the viewport
+    public: void GetCameraToViewportRay(int screenx, int screeny,
+                                        Vector3 &origin, Vector3 &dir);
+
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
 

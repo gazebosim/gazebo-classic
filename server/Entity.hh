@@ -79,7 +79,7 @@ namespace gazebo
 
     /// \brief Remove a child from this entity
     /// \param child Child to remove
-    public: void RemoveChild(Entity *child);
+    public: virtual void RemoveChild(Entity *child);
   
     /// \brief Get all children
     /// \return Vector of children entities

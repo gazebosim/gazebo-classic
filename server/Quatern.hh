@@ -105,9 +105,8 @@ class Quatern
   /// \brief Get the Euler yaw angle in radians
   public: double GetYaw();
 
-  /// \brief Return rotation as axis and angle (x, y, y, rotation)
-  /// \return This quaternion as an axis-angle
-  public: Quatern GetAsAxis();
+  /// \brief Return rotation as axis and angle
+  public: void GetAsAxis(Vector3 &axis, double &angle) const;
 
   /// \brief Scale a Quaternion
   /// \param scale Amount to scale this rotation
@@ -153,6 +152,10 @@ class Quatern
   /// \brief See if a quatern is finite (e.g., not nan)
   /// \return True if quatern is finite
   public: bool IsFinite() const;
+
+  public: Vector3 GetXAxis() const;
+  public: Vector3 GetYAxis() const;
+  public: Vector3 GetZAxis() const;
 
   /// \brief Attributes of the quaternion 
   public: double u;

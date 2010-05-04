@@ -49,7 +49,6 @@ Entity::Entity(Entity *parent)
 
   Param::Begin(&this->parameters);
   this->staticP = new ParamT<bool>("static",false,0);
-  //this->staticP->Callback( &Entity::SetStatic, this);
   Param::End();
  
   this->selected = false;
@@ -100,9 +99,9 @@ Entity::~Entity()
 
       World::Instance()->GetPhysicsEngine()->RemoveEntity(*iter);
 
-      Model *m = dynamic_cast<Model*>(*iter);
-      if (m)
+      if (*iter && (*iter)->GetType() == Entity::MODEL)
       {
+        Model *m = (Model*)*iter;
         m->Detach();
       }
 
@@ -205,9 +204,11 @@ void Entity::SetStatic(const bool &s)
       continue;
 
     (*iter)->SetStatic(s);
-    body = dynamic_cast<Body*>(*iter);
-    if (body)
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
       body->SetEnabled(!s);
+    }
   }
 
 }
@@ -224,15 +225,11 @@ bool Entity::IsStatic() const
 bool Entity::SetSelected( bool s )
 {
   std::vector< Entity *>::iterator iter;
-  Body *body = NULL;
 
   this->selected = s;
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
-  {
     (*iter)->SetSelected(s);
-    body = dynamic_cast<Body*>(*iter);
-  }
 
   return true;
 }
@@ -261,9 +258,11 @@ std::string Entity::GetScopedName()
 
   while (p)
   {
-    Model *m = dynamic_cast<Model*>(p);
-    if (m)
+    if (p && p->GetType() == Entity::MODEL)
+    {
+      Model *m = (Model*)p;
       scopedName.insert(0, m->GetName()+"::");
+    }
     p = p->GetParent();
   }
 

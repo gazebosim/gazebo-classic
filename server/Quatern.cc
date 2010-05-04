@@ -242,10 +242,21 @@ double Quatern::GetYaw()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Return rotation as axis and angle (x, y, y, rotation)
-Quatern Quatern::GetAsAxis()
+// Return rotation as axis and angle
+void Quatern::GetAsAxis(Vector3 &axis, double &angle) const
 {
-  return Quatern(acos(this->u)*2, this->x, this->y, this->z);
+  double len = this->x*this->x + this->y*this->y + this->z*this->z;
+  if (len > 0.0)
+  {
+    angle = 2.0 * acos(this->u);
+    double invLen =  1.0 / sqrt(len);
+    axis.Set( this->x*invLen, this->y*invLen, this->z*invLen);
+  }
+  else
+  {
+    angle = 0.0;
+    axis.Set(1,0,0);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -253,12 +264,14 @@ Quatern Quatern::GetAsAxis()
 void Quatern::Scale(double scale)
 {
   Quatern b;
+  Vector3 axis;
+  double angle;
 
   // Convert to axis-and-angle
-  b = this->GetAsAxis();
-  b.u *= scale;
+  this->GetAsAxis(axis, angle);
+  angle *= scale;
 
-  this->SetFromAxis(b.x, b.y, b.z, b.u);
+  this->SetFromAxis(axis.x, axis.y, axis.z, angle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -322,11 +335,21 @@ Quatern Quatern::operator*=( const Quatern &qt )
 /// Rotate a vector 
 Vector3 Quatern::operator*( const Vector3 &v ) const
 {
-  Quatern tmp(0.0, v.x, v.y, v.z);
+/*  Quatern tmp(0.0, v.x, v.y, v.z);
   
   tmp = (*this) * (tmp * this->GetInverse());
 
   return Vector3(tmp.x, tmp.y, tmp.z);
+  */
+
+  Vector3 uv, uuv;
+  Vector3 qvec(this->x, this->y, this->z);
+  uv = qvec.GetCrossProd(v);
+  uuv = qvec.GetCrossProd(uv);
+  uv *= (2.0f * this->u);
+  uuv *= 2.0f;
+
+  return v + uv + uuv;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -356,5 +379,51 @@ Vector3 Quatern::RotateVector(Vector3 vec) const
 bool Quatern::IsFinite() const
 {
   return finite(this->u) && finite(this->x) && finite(this->y) && finite(this->z);
+}
+
+Vector3 Quatern::GetXAxis() const
+{
+  double fTy  = 2.0f*this->y;
+  double fTz  = 2.0f*this->z;
+
+  double fTwy = fTy*this->u;
+  double fTwz = fTz*this->u;
+  double fTxy = fTy*this->x;
+  double fTxz = fTz*this->x;
+  double fTyy = fTy*this->y;
+  double fTzz = fTz*this->z;
+
+  return Vector3(1.0f-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
+
+}
+
+Vector3 Quatern::GetYAxis() const
+{
+  double fTx  = 2.0f*this->x;
+  double fTy  = 2.0f*this->y;
+  double fTz  = 2.0f*this->z;
+  double fTwx = fTx*this->u;
+  double fTwz = fTz*this->u;
+  double fTxx = fTx*this->x;
+  double fTxy = fTy*this->x;
+  double fTyz = fTz*this->y;
+  double fTzz = fTz*this->z;
+
+  return Vector3(fTxy-fTwz, 1.0f-(fTxx+fTzz), fTyz+fTwx);
+}
+
+Vector3 Quatern::GetZAxis() const
+{
+  double fTx  = 2.0f*this->x;
+  double fTy  = 2.0f*this->y;
+  double fTz  = 2.0f*this->z;
+  double fTwx = fTx*this->u;
+  double fTwy = fTy*this->u;
+  double fTxx = fTx*this->x;
+  double fTxz = fTz*this->x;
+  double fTyy = fTy*this->y;
+  double fTyz = fTz*this->y;
+
+  return Vector3(fTxz+fTwy, fTyz-fTwx, 1.0f-(fTxx+fTyy));
 }
 

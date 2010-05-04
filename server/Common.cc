@@ -105,7 +105,29 @@ Param *Common::GetParam(const std::string &key) const
 
   return result;
 }
-   
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set a parameter by name
+void Common::SetParam(const std::string &key, const std::string &value)
+{
+  std::vector<Param*>::const_iterator iter;
+  Param *result = NULL;
+
+  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
+  {
+    if ((*iter)->GetKey() == key)
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  if (result == NULL)
+    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+  else
+    result->SetFromString( value, true );
+}
+ 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the ID of this entity. This id is unique
 int Common::GetId() const

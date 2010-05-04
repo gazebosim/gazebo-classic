@@ -157,6 +157,18 @@ namespace gazebo
     /// \brief Update all the entities
     public: void Update();
 
+    // \brief Get the mesh information for the given mesh.
+    // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
+    public: static void GetMeshInformation(const Ogre::MeshPtr mesh,
+                                size_t &vertex_count,
+                                Ogre::Vector3* &vertices,
+                                size_t &index_count,
+                                unsigned long* &indices,
+                                const Ogre::Vector3 &position,
+                                const Ogre::Quaternion &orient,
+                                const Ogre::Vector3 &scale);
+
+
     private: static unsigned int windowCounter;
 
     // List of all the lines created

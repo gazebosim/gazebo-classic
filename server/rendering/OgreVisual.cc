@@ -26,6 +26,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "SelectionObj.hh"
 #include "RTShaderSystem.hh"
 #include "MeshManager.hh"
 #include "Simulator.hh"
@@ -40,6 +41,7 @@
 
 using namespace gazebo;
 
+SelectionObj *OgreVisual::selectionObj = 0;
 unsigned int OgreVisual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,20 +171,11 @@ OgreVisual::~OgreVisual()
     if (this->sceneNode != NULL)
     {
       if (this->boundingBoxNode != NULL)
-      {
         this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
-      }
+
       this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
     }
   }
-
-  //is below equivalent?
-  //this->sceneNode->removeAndDestroyAllChildren();
-  //if (this->sceneNode)
-  //  OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->sceneNode);
-  //if (this->boundingBoxNode)
-  //  OgreAdaptor::Instance()->sceneMgr->destroySceneNode(this->boundingBoxNode);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -293,6 +286,7 @@ void OgreVisual::Load(XMLConfigNode *node)
 
   // Allow the mesh to cast shadows
   this->SetCastShadows((**this->castShadowsP));
+
 }
 
 
@@ -881,6 +875,7 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
   }
 
   Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box_U1V1"));
+  odeObj->setQueryFlags(0);
 
   this->boundingBoxNode->attachObject(odeObj);
   Vector3 diff = max-min;
@@ -951,27 +946,16 @@ void OgreVisual::ShowSelectionBox( bool value )
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  Ogre::SceneNode *node = this->sceneNode;
-
-  while (node && node->numAttachedObjects() == 0)
-    node = dynamic_cast<Ogre::SceneNode*>(node->getChild(0));
-
-  if (node)
+  if (!selectionObj)
   {
-    /*node = this->sceneNode;
-    std::cout << "Num CHildren[" << node->numChildren() << "]\n";
-    Ogre::AxisAlignedBox box = node->_getWorldAABB();
-    box.scale( node->getScale() );
-    Ogre::Vector3 min = box.getMinimum();
-    Ogre::Vector3 max = box.getMaximum();
-    printf("Scale[%f %f %f]\n", node->getScale().x, 
-        node->getScale().y, node->getScale().z);
-    printf("Box Min[%f %f %f] Max[%f %f %f]\n", min.x, min.y, min.z,
-        max.x, max.y, max.z);
-        */
-
-    node->showBoundingBox(value);
+    selectionObj = new SelectionObj();
+    selectionObj->Load();
   }
+
+  if (value)
+    selectionObj->Attach(this->sceneNode);
+  else
+    selectionObj->Attach(NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -146,6 +146,7 @@ namespace gazebo
     private: bool rightMousePressed;
     private: bool middleMousePressed;
     private: Vector2<int> prevMousePos;
+    private: Vector2<int> mousePushPos;
     private: Vector2<int> mousePos;
     private: Vector2<int> mouseOriginPos; // for applying external forces
     private: Vector3 forceVec; // for applying external forces
@@ -161,6 +162,8 @@ namespace gazebo
     private: OgreCamera *activeCamera;
 
     private: static GLWindow *activeWin;
+
+    private: std::string mouseModifier;
 
     /// gui interface, prerequisite to selecting Model / Body
     ///   press control+left click Model to toggle select.  Left mouse button drag updates model rotation about camera view axis, right mouse button drag udpates model position in camera view plane.

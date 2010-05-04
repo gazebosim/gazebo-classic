@@ -99,7 +99,9 @@ Model::Model(Model *parent)
 // Destructor
 Model::~Model()
 {
-  std::map< std::string, Body* >::iterator biter;
+  //std::map< std::string, Body* >::iterator biter;
+  std::vector<Entity*>::iterator biter;
+
   JointContainer::iterator jiter;
   std::map< std::string, Controller* >::iterator citer;
 
@@ -113,13 +115,6 @@ Model::~Model()
     delete this->graphicsHandler;
     this->graphicsHandler = NULL;
   }
-
-  for (biter = this->bodies.begin(); biter != this->bodies.end(); biter++)
-  {
-    if (biter->second)
-      delete (biter->second);
-  }
-  this->bodies.clear();
 
   for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
     if (*jiter)
@@ -228,7 +223,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   }
 
   // Create a default body if one does not exist in the XML file
-  if (this->bodies.size() <= 0)
+  if (this->children.size() <= 0)
   {
     std::ostringstream bodyName;
 
@@ -238,9 +233,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     Body *body = this->CreateBody();
     body->SetName(bodyName.str());
 
-    // Store the pointer to this body
-    this->bodies[body->GetName()] = body;
-
     this->canonicalBodyNameP->SetValue( bodyName.str() );
   }
 
@@ -249,7 +241,9 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   {
     /// FIXME: Model::pose is set to the pose of first body
     ///        seems like there should be a warning for users
-    this->canonicalBodyNameP->SetValue( this->bodies.begin()->first );
+    Entity *entity = this->children.front();
+    if (entity && entity->GetType() == Entity::BODY)
+      this->canonicalBodyNameP->SetValue( entity->GetName() );
   }
 
   // This must be placed after creation of the bodies
@@ -295,7 +289,8 @@ void Model::Save(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
   std::string typeName;
-  std::map<std::string, Body* >::iterator bodyIter;
+  //std::map<std::string, Body* >::iterator bodyIter;
+  std::vector<Entity* >::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   JointContainer::iterator jointIter;
 
@@ -319,12 +314,15 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   {
     stream << prefix << "  " << *(this->staticP) << "\n";
 
-    // Save all the bodies
-    for (bodyIter=this->bodies.begin(); bodyIter!=this->bodies.end(); bodyIter++)
+    for (bodyIter=this->children.begin(); bodyIter!=this->children.end(); bodyIter++)
     {
       stream << "\n";
-      if (bodyIter->second)
-        bodyIter->second->Save(p, stream);
+      Entity *entity = *bodyIter;
+      if (entity && entity->GetType() == Entity::BODY)
+      {
+        Body *body = (Body*)(entity);
+        body->Save(p, stream);
+      }
     }
 
     // Save all the joints
@@ -359,9 +357,11 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   std::vector< Entity* >::iterator eiter;
   for (eiter = this->children.begin(); eiter != this->children.end(); eiter++)
   {
-    Model *cmodel = dynamic_cast<Model*>(*eiter);
-    if (cmodel)
+    if (*eiter && (*eiter)->GetType() == Entity::MODEL)
+    {
+      Model *cmodel = (Model*)*eiter;
       cmodel->Save(p, stream);
+    }
   }
 
   stream << prefix << "</model:" << typeName << ">\n";
@@ -371,25 +371,25 @@ void Model::Save(std::string &prefix, std::ostream &stream)
 // Initialize the model
 void Model::Init()
 {
-  std::map<std::string, Body* >::iterator biter;
+  std::vector<Entity* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
 
   this->graphicsHandler->Init();
 
-  for (biter = this->bodies.begin(); biter!=this->bodies.end(); biter++)
-    biter->second->Init();
+  for (biter = this->children.begin(); biter!=this->children.end(); biter++)
+  {
+    if (*biter && (*biter)->GetType() == Entity::BODY)
+    {
+      Body *body = (Body*)*biter;
+      body->Init();
+    }
+  }
 
   for (contIter=this->controllers.begin();
        contIter!=this->controllers.end(); contIter++)
   {
     contIter->second->Init();
   }
-
-  /*this->mtext = new MovableText(this->GetName(), "this is the caption");
-  this->mtext->setTextAlignment(MovableText::H_CENTER, MovableText::V_ABOVE);
-  this->mtext->setAdditionalHeight(0.5);
-  this->sceneNode->attachObject(this->mtext);
-  */
 
   this->InitChild();
 
@@ -411,7 +411,7 @@ void Model::Update()
 
   //DiagnosticTimer timer("Model[" + this->GetName() + "] Update ");
 
-  std::map<std::string, Body* >::iterator bodyIter;
+  std::vector<Entity*>::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
   JointContainer::iterator jointIter;
 
@@ -420,16 +420,17 @@ void Model::Update()
   {
     //DiagnosticTimer timer("Model[" + this->GetName() + "] Bodies Update ");
 
-    for (bodyIter=this->bodies.begin(); 
-         bodyIter!=this->bodies.end(); bodyIter++)
+    for (bodyIter=this->children.begin(); 
+         bodyIter!=this->children.end(); bodyIter++)
     {
-      if (bodyIter->second)
+      if (*bodyIter && (*bodyIter)->GetType() == Entity::BODY)
       {
+        Body *body = (Body*)(*bodyIter);
 #ifdef USE_THREADPOOL
         World::Instance()->threadPool->schedule(
-            boost::bind(&Body::Update,(bodyIter->second)));
+            boost::bind(&Body::Update,body));
 #else
-        bodyIter->second->Update();
+        body->Update();
 #endif
       }
     }
@@ -467,33 +468,6 @@ void Model::Update()
     }
   }
 
-  // Call the model's python update function, if one exists
-  //if (this->pFuncUpdate)
-  //{
-  //  boost::python::call<void>(this->pFuncUpdate, this);
-  //}
-
-  // BULLET:
-  //if (!this->canonicalBodyNameP->GetValue().empty())
-  //{
-  //  /// model pose is the canonical body pose of the body + a transform from body frame to model frame
-  //  /// the tranform is defined by initModelOffset in body frame,
-
-  //  /// recover the transform in inertial frame based on body pose
-  //  this->pose = this->bodies[**this->canonicalBodyNameP]->GetPose();
-  //  Quatern body_rot = this->pose.rot;
-  //  Pose3d offset_transform = this->bodies[**this->canonicalBodyNameP]->initModelOffset;
-  //  Vector3 xyz_offset = (offset_transform.RotatePositionAboutOrigin(body_rot.GetInverse())).pos;
-  //  Quatern q_offset = offset_transform.rot;
-
-  //  // apply transform to get model pose
-  //  this->pose.pos = this->pose.pos + xyz_offset;
-  //  this->pose.rot = this->pose.CoordRotationAdd(q_offset);
-
-  //  this->xyzP->SetValue(this->pose.pos);
-  //  this->rpyP->SetValue(this->pose.rot);
-  //}
-
   {
     //DiagnosticTimer timer("Model[" + this->GetName() + "] Children Update ");
     this->UpdateChild();
@@ -502,15 +476,55 @@ void Model::Update()
 
 void Model::OnPoseChange()
 {
-
-  /// \brief set the pose of the model, which is the pose of the canonical body
-  // this updates the relativePose of the Model Entity
+  /// set the pose of the model, which is the pose of the canonical body
+  /// this updates the relativePose of the Model Entity
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     this->SetAbsPose(cb->GetAbsPose(),false);
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Remove a child
+void Model::RemoveChild(Entity *child)
+{
+  JointContainer::iterator jiter;
+
+  if (child->GetType() == Entity::BODY)
+  {
+    bool done = false;
+
+    while (!done)
+    {
+      done = true;
+
+      for (jiter = this->joints.begin(); jiter != this->joints.end(); jiter++)
+      {
+        if (!(*jiter))
+          continue;
+
+        if ((*jiter)->GetJointBody(0)->GetName() == child->GetName() ||
+            (*jiter)->GetJointBody(1)->GetName() == child->GetName() ||
+            (*jiter)->GetJointBody(0)->GetName() == (*jiter)->GetJointBody(1)->GetName())
+        {
+          Joint *joint = *jiter;
+          this->joints.erase( jiter );
+          done = false;
+          delete joint;
+          break;
+        }
+      }
+    }
+  }
+
+  Entity::RemoveChild(child);
+
+  std::vector<Entity*>::iterator iter;
+  for (iter =this->children.begin(); iter != this->children.end(); iter++)
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+      ((Body*)*iter)->SetEnabled(true);
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Primarily used to update the graphics interfaces
@@ -527,7 +541,7 @@ void Model::GraphicsUpdate()
 // Finalize the model
 void Model::Fini()
 {
-  std::map<std::string, Body* >::iterator biter;
+  std::vector<Entity* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
 
   for (contIter = this->controllers.begin();
@@ -536,9 +550,13 @@ void Model::Fini()
     contIter->second->Fini();
   }
 
-  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    biter->second->Fini();
+    if (*biter && (*biter)->GetType() == Entity::BODY)
+    {
+      Body *body = (Body*)*biter;
+      body->Fini();
+    }
   }
 
   if (this->graphicsHandler)
@@ -550,11 +568,10 @@ void Model::Fini()
   std::vector< Entity* >::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (*iter)
+    if (*iter && (*iter)->GetType() == Entity::MODEL)
     {
-      Model *m = dynamic_cast<Model*>(*iter);
-      if (m)
-        m->Fini();
+      Model *m = (Model*)*iter;
+      m->Fini();
     }
   }
 
@@ -566,7 +583,7 @@ void Model::Fini()
 void Model::Reset()
 {
   JointContainer::iterator jiter;
-  std::map< std::string, Body* >::iterator biter;
+  std::vector< Entity* >::iterator biter;
   std::map<std::string, Controller* >::iterator citer;
   Vector3 v(0,0,0);
 
@@ -582,12 +599,16 @@ void Model::Reset()
     (*jiter)->Reset();
   }
 
-  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    biter->second->SetLinearVel(v);
-    biter->second->SetAngularVel(v);
-    biter->second->SetForce(v);
-    biter->second->SetTorque(v);
+    if (*biter && (*biter)->GetType() == Entity::BODY)
+    {
+      Body *body = (Body*)*biter;
+      body->SetLinearVel(v);
+      body->SetAngularVel(v);
+      body->SetForce(v);
+      body->SetTorque(v);
+    }
   }
 }
 
@@ -618,13 +639,16 @@ const Pose3d &Model::GetInitPose() const
 void Model::SetLinearVel( const Vector3 &vel )
 {
   Body *body;
-  std::map<std::string, Body* >::iterator iter;
+  std::vector<Entity* >::iterator iter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetLinearVel( vel );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetEnabled(true);
+      body->SetLinearVel( vel );
+    }
   }
 }
 
@@ -633,13 +657,16 @@ void Model::SetLinearVel( const Vector3 &vel )
 void Model::SetAngularVel( const Vector3 &vel )
 {
   Body *body;
-  std::map<std::string, Body* >::iterator iter;
+  std::vector<Entity* >::iterator iter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetAngularVel( vel );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetEnabled(true);
+      body->SetAngularVel( vel );
+    }
   }
 }
 
@@ -648,13 +675,16 @@ void Model::SetAngularVel( const Vector3 &vel )
 void Model::SetLinearAccel( const Vector3 &accel )
 {
   Body *body;
-  std::map<std::string, Body* >::iterator iter;
+  std::vector<Entity* >::iterator iter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetLinearAccel( accel );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetEnabled(true);
+      body->SetLinearAccel( accel );
+    }
   }
 }
 
@@ -663,13 +693,16 @@ void Model::SetLinearAccel( const Vector3 &accel )
 void Model::SetAngularAccel( const Vector3 &accel )
 {
   Body *body;
-  std::map<std::string, Body* >::iterator iter;
+  std::vector<Entity* >::iterator iter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetAngularAccel( accel );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetEnabled(true);
+      body->SetAngularAccel( accel );
+    }
   }
 }
 
@@ -722,21 +755,25 @@ Vector3 Model::GetAngularAccel() const
 void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
 {
   Vector3 bbmin, bbmax;
-  std::map<std::string, Body* >::const_iterator iter;
+  std::vector<Entity* >::const_iterator iter;
 
   min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    iter->second->GetBoundingBox(bbmin, bbmax);
-    min.x = std::min(bbmin.x, min.x);
-    min.y = std::min(bbmin.y, min.y);
-    min.z = std::min(bbmin.z, min.z);
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      Body *body = (Body*)*iter;
+      body->GetBoundingBox(bbmin, bbmax);
+      min.x = std::min(bbmin.x, min.x);
+      min.y = std::min(bbmin.y, min.y);
+      min.z = std::min(bbmin.z, min.z);
 
-    max.x = std::max(bbmax.x, max.x);
-    max.y = std::max(bbmax.y, max.y);
-    max.z = std::max(bbmax.z, max.z);
+      max.x = std::max(bbmax.x, max.x);
+      max.y = std::max(bbmax.y, max.y);
+      max.z = std::max(bbmax.z, max.z);
+    }
   }
 }
  
@@ -791,13 +828,6 @@ void Model::LoadBody(XMLConfigNode *node)
   // Load the body using the config node. This also loads all of the
   // bodies geometries
   body->Load(node);
-
-  // Store this body
-  if (this->bodies[body->GetName()])
-    gzmsg(0) << "Body with name[" << body->GetName() << "] already exists!!\n";
-
-  // Store the pointer to this body
-  this->bodies[body->GetName()] = body;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -893,14 +923,7 @@ void Model::LoadController(XMLConfigNode *node)
 // Return the default body
 Body *Model::GetBody()
 {
-  return this->bodies.begin()->second;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get a map of all the bodies
-const std::map<std::string, Body*> *Model::GetBodies() const
-{
-  return &(this->bodies);
+  return dynamic_cast<Body*>(this->children.front());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -908,12 +931,16 @@ const std::map<std::string, Body*> *Model::GetBodies() const
 Sensor *Model::GetSensor(const std::string &name) const
 {
   Sensor *sensor = NULL;
-  std::map< std::string, Body* >::const_iterator biter;
+  std::vector< Entity* >::const_iterator biter;
 
-  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if ( (sensor = biter->second->GetSensor(name)) != NULL)
-      break;
+    if ( *biter && (*biter)->GetType() == Entity::BODY)
+    {
+      Body *body = (Body*)*biter;
+      if ((sensor = body->GetSensor(name)) != NULL)
+        break;
+    }
   }
 
   return sensor;
@@ -924,12 +951,16 @@ Sensor *Model::GetSensor(const std::string &name) const
 Geom *Model::GetGeom(const std::string &name) const
 {
   Geom *geom = NULL;
-  std::map< std::string, Body* >::const_iterator biter;
+  std::vector< Entity* >::const_iterator biter;
 
-  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if ( (geom = biter->second->GetGeom(name)) != NULL)
-      break;
+    if (*biter && (*biter)->GetType() == Entity::BODY)
+    {
+      Body *body = (Body*)*biter;
+      if ((geom = body->GetGeom(name)) != NULL)
+        break;
+    }
   }
 
   return geom;
@@ -939,14 +970,18 @@ Geom *Model::GetGeom(const std::string &name) const
 /// Get a body by name
 Body *Model::GetBody(const std::string &name)
 {
-  if (this->bodies.find(name) != this->bodies.end())
-  {
-    return this->bodies[name];
-  }
-  else if (name == "canonical")
-  {
+  std::vector< Entity* >::const_iterator biter;
+
+  if (name == "canonical")
     return this->GetCanonicalBody();
+
+
+  for (biter=this->children.begin(); biter != this->children.end(); biter++)
+  {
+    if ((*biter)->GetName() == name)
+      return (Body*)*biter;
   }
+ 
   return NULL;
 }
 
@@ -977,7 +1012,8 @@ void Model::Attach(XMLConfigNode *node)
     this->myBodyNameP->Load(node);
   }
 
-  parentModel = dynamic_cast<Model*>(this->parent);
+  if (this->parent->GetType() == Entity::MODEL)
+    parentModel = (Model*)this->parent;
 
   if (parentModel == NULL)
     gzthrow("Parent cannot be NULL when attaching two models");
@@ -1004,12 +1040,18 @@ void Model::Attach(XMLConfigNode *node)
 /// Get the canonical body. Used for connected Model heirarchies
 Body * Model::GetCanonicalBody() const
 {
-  if (!this->bodies.empty())
+  if (!this->children.empty())
   {
-    if (this->bodies.find(this->canonicalBodyNameP->GetValue()) != this->bodies.end())
-    {
-      return this->bodies.find(this->canonicalBodyNameP->GetValue())->second;
-    }
+    std::vector<Entity*>::const_iterator iter;
+    Body *body = NULL;
+    for (iter = this->children.begin(); iter != this->children.end(); iter++)
+      if ((*iter)->GetName() == **this->canonicalBodyNameP)
+      {
+        body = (Body*)(*iter);
+        break;
+      }
+
+    return body;
   }
 
   return NULL;
@@ -1020,13 +1062,16 @@ Body * Model::GetCanonicalBody() const
 void Model::SetGravityMode( const bool &v )
 {
   Body *body;
-  std::map<std::string, Body* >::iterator iter;
+  std::vector<Entity* >::iterator iter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
 
-    body->SetGravityMode( v );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetGravityMode( v );
+    }
   }
 }
 
@@ -1035,14 +1080,15 @@ void Model::SetGravityMode( const bool &v )
 void Model::SetFrictionMode( const bool &v )
 {
   Body *body;
+  std::vector<Entity* >::iterator iter;
 
-  std::map<std::string, Body* >::iterator iter;
-
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetFrictionMode( v );
+    if ((*iter) && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetFrictionMode( v );
+    }
   }
 }
 
@@ -1051,14 +1097,15 @@ void Model::SetFrictionMode( const bool &v )
 void Model::SetCollideMode( const std::string &m )
 {
   Body *body;
+  std::vector<Entity* >::iterator iter;
 
-  std::map<std::string, Body* >::iterator iter;
-
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetCollideMode( m );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetCollideMode( m );
+    }
   }
 }
 
@@ -1067,13 +1114,15 @@ void Model::SetCollideMode( const std::string &m )
 void Model::SetLaserFiducialId( const int &id )
 {
   Body *body;
-  std::map<std::string, Body* >::iterator iter;
+  std::vector<Entity* >::iterator iter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetLaserFiducialId( id );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)(*iter);
+      body->SetLaserFiducialId( id );
+    }
   }
 }
 
@@ -1092,13 +1141,15 @@ void Model::SetLaserRetro( const float &retro )
 {
   Body *body;
 
-  std::map<std::string, Body* >::iterator iter;
+  std::vector<Entity* >::iterator iter;
 
-  for (iter=this->bodies.begin(); iter!=this->bodies.end(); iter++)
+  for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    body = iter->second;
-
-    body->SetLaserRetro( retro );
+    if (*iter && (*iter)->GetType() == Entity::BODY)
+    {
+      body = (Body*)*iter;
+      body->SetLaserRetro( retro );
+    }
   }
 }
 
@@ -1114,9 +1165,6 @@ void Model::LoadRenderable(XMLConfigNode *node)
   char lightNumBuf[8];
   sprintf(lightNumBuf, "%d", lightNumber++);
   body->SetName(this->GetName() + "_RenderableBody_" + lightNumBuf);
-  //body->SetGravityMode(false);
-  //body->SetRelativePose(Pose3d());
-  this->bodies[body->GetName()] = body;
 
   if (Simulator::Instance()->GetRenderEngineEnabled() && 
       (childNode = node->GetChild("light")))
@@ -1175,7 +1223,7 @@ void Model::LoadPhysical(XMLConfigNode *node)
 /// e.g "pioneer2dx_model1::laser::laser_iface0->laser"
 void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 {
-  std::map< std::string, Body* >::const_iterator biter;
+  std::vector< Entity* >::const_iterator biter;
   std::map<std::string, Controller* >::const_iterator contIter;
 
   for (contIter=this->controllers.begin();
@@ -1185,10 +1233,13 @@ void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 
   }
 
-  for (biter=this->bodies.begin(); biter != this->bodies.end(); biter++)
+  for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-
-    biter->second->GetInterfaceNames(list);
+    if (*biter && (*biter)->GetType() == Entity::BODY)
+    {
+      const Body *body = (Body*)*biter;
+      body->GetInterfaceNames(list);
+    }
   }
 }
 
@@ -1202,6 +1253,6 @@ Pose3d Model::GetAbsPose()
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetAbsPose();
-  else // GetCanonicalBody() returns NULL only if this->bodies is empty
+  else 
     return Pose3d();
 }
