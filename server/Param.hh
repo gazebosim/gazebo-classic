@@ -187,7 +187,7 @@ namespace gazebo
     {
       if (str == "inf" || str == "-inf")
       {
-        // int this case, the parser complains, but seems to assign the right values, so skip the spam
+        // int this case, the parser complains, but seems to assign the right values
         std::cout << "INFO [gazebo::Param]: boost throws when lexical casting inf's, but the values are usually passed through correctly (key[" << this->key << "], value[" << str << "])\n";
       }
       else
