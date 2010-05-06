@@ -475,7 +475,7 @@ void GLWindow::HandleMouseDrag()
         // interactively rotate view
         //
         this->activeCamera->RotateYaw(DTOR(-drag.x * this->rotateAmount));
-        this->activeCamera->RotatePitch(DTOR(-drag.y * this->rotateAmount));
+        this->activeCamera->RotatePitch(DTOR(drag.y * this->rotateAmount));
       }
     }
     else if (this->rightMousePressed)
