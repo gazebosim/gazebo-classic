@@ -163,6 +163,7 @@ namespace gazebo
     private: std::vector< Vector2<double> > texCoords;
     private: std::vector<unsigned int> indices;
 
+
     private: int materialIndex;
   };
 }

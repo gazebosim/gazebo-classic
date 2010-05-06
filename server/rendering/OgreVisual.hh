@@ -96,6 +96,8 @@ namespace gazebo
     /// \brief Set the material
     public: void SetMaterial(const std::string &materialName);
 
+    public: void AttachAxes();
+
     /// \brief Set the transparency
     public: void SetTransparency( float trans );
 

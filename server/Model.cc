@@ -378,10 +378,12 @@ void Model::Init()
 
   for (biter = this->children.begin(); biter!=this->children.end(); biter++)
   {
-    if (*biter && (*biter)->GetType() == Entity::BODY)
+    if (*biter)
     {
-      Body *body = (Body*)*biter;
-      body->Init();
+      if ((*biter)->GetType() == Entity::BODY)
+        ((Body*)*biter)->Init();
+      else if ((*biter)->GetType() == Entity::MODEL)
+        ((Model*)*biter)->Init();
     }
   }
 
@@ -399,7 +401,6 @@ void Model::Init()
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     cb->SetCanonicalModel(this);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -415,7 +416,7 @@ void Model::Update()
   std::map<std::string, Controller* >::iterator contIter;
   JointContainer::iterator jointIter;
 
-  //this->updateSignal();
+  this->updateSignal();
 
   {
     //DiagnosticTimer timer("Model[" + this->GetName() + "] Bodies Update ");

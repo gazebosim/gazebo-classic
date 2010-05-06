@@ -32,6 +32,7 @@ MeshManager::MeshManager()
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
+  this->CreateCylinder("axis_cylinder",0.005,0.5,1,32);
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
 }

@@ -247,9 +247,6 @@ namespace gazebo
     /// \brief Initial pose of the model
     private: Pose3d initPose;
  
-    /// \brief Map of the bodies. std::string == body_name
-    protected: std::map<std::string, Body* > bodies;
-  
     /// \brief Map of the joints
     //protected: std::map<std::string, Joint* > joints;
     protected: std::vector<Joint* > joints;

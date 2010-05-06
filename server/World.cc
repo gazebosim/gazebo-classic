@@ -311,6 +311,8 @@ void World::GraphicsUpdate()
 // Update the world
 void World::Update()
 {
+  this->worldUpdateStartSignal();
+
   if (this->simPauseTime > 0)
   {
     if (Simulator::Instance()->GetSimTime() >= this->simPauseTime)
@@ -366,6 +368,8 @@ void World::Update()
   }
 
   this->factory->Update();
+
+  this->worldUpdateEndSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

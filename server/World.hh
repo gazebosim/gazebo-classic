@@ -328,6 +328,25 @@ class World : public SingletonT<World>
           void DisconnectShowBoundingBoxesSignal( T subscriber )
           { showBoundingBoxesSignal.disconnect(subscriber); }
 
+  /// \brief Connect a boost::slot the the world update start signal
+  public: template<typename T>
+          boost::signals::connection ConnectWorldUpdateStartSignal(T subscriber)
+          { return worldUpdateStartSignal.connect(subscriber); }
+  /// \brief Disconnect a boost::slot the the world update start signal
+  public: template<typename T>
+          void DisconnectWorldUpdateStartSignal( T subscriber )
+          { worldUpdateStartSignal.disconnect(subscriber); }
+
+  /// \brief Connect a boost::slot the the world update end signal
+  public: template<typename T>
+          boost::signals::connection ConnectWorldUpdateEndSignal(T subscriber)
+          { return worldUpdateEndSignal.connect(subscriber); }
+  /// \brief Disconnect a boost::slot the the world update end signal
+  public: template<typename T>
+          void DisconnectWorldUpdateEndSignal( T subscriber )
+          { worldUpdateEndSignal.disconnect(subscriber); }
+
+
 
   /// \brief Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
@@ -378,6 +397,9 @@ class World : public SingletonT<World>
   private: boost::signal<void (bool)> showPhysicsSignal;
   private: boost::signal<void (bool)> showJointsSignal;
   private: boost::signal<void (bool)> showBoundingBoxesSignal;
+
+  private: boost::signal<void ()> worldUpdateStartSignal;
+  private: boost::signal<void ()> worldUpdateEndSignal;
 
   private: std::deque<WorldState> worldStates;
   private: std::deque<WorldState>::iterator worldStatesInsertIter;

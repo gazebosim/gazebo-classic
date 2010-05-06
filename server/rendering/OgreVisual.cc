@@ -522,6 +522,50 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 }
 
 
+void OgreVisual::AttachAxes()
+{
+  std::ostringstream nodeName;
+
+  nodeName << this->sceneNode->getName()<<"_AXES_NODE";
+ 
+  if (!this->sceneNode->getCreator()->hasEntity("axis_cylinder"))
+    OgreCreator::InsertMesh(MeshManager::Instance()->GetMesh("axis_cylinder"));
+
+  Ogre::SceneNode *node = this->sceneNode->createChildSceneNode(nodeName.str());
+  Ogre::SceneNode *x, *y, *z;
+
+  x = node->createChildSceneNode(nodeName.str() + "_axisX");
+  x->setInheritScale(true);
+  x->translate(.25,0,0);
+  x->yaw(Ogre::Radian(M_PI/2.0));
+
+  y = node->createChildSceneNode(nodeName.str() + "_axisY");
+  y->setInheritScale(true);
+  y->translate(0,.25,0);
+  y->pitch(Ogre::Radian(M_PI/2.0));
+
+  z = node->createChildSceneNode(nodeName.str() + "_axisZ");
+  z->translate(0,0,.25);
+  z->setInheritScale(true);
+  
+  Ogre::MovableObject *xobj, *yobj, *zobj;
+
+  xobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(nodeName.str()+"X_AXIS", "axis_cylinder"));
+  xobj->setCastShadows(false);
+  ((Ogre::Entity*)xobj)->setMaterialName("Gazebo/Red");
+
+  yobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(nodeName.str()+"Y_AXIS", "axis_cylinder"));
+  yobj->setCastShadows(false);
+  ((Ogre::Entity*)yobj)->setMaterialName("Gazebo/Green");
+
+  zobj = (Ogre::MovableObject*)(node->getCreator()->createEntity(nodeName.str()+"Z_AXIS", "axis_cylinder"));
+  zobj->setCastShadows(false);
+  ((Ogre::Entity*)zobj)->setMaterialName("Gazebo/Blue");
+
+  x->attachObject(xobj);
+  y->attachObject(yobj);
+  z->attachObject(zobj);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
