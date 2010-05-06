@@ -185,7 +185,15 @@ namespace gazebo
     }
     catch (boost::bad_lexical_cast &e)
     {
-      std::cerr << "Unable to read value with key[" << this->key << "]\n";
+      if (str == "inf" || str == "-inf")
+      {
+        // int this case, the parser complains, but seems to assign the right values, so skip the spam
+        std::cout << "INFO [gazebo::Param]: boost throws when lexical casting inf's, but the values are usually passed through correctly (key[" << this->key << "], value[" << str << "])\n";
+      }
+      else
+      {
+        std::cerr << "Unable to read value with key[" << this->key << "] and value[" << str << "]\n";
+      }
     }
 
     if (callback)
