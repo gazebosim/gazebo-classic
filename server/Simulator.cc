@@ -78,6 +78,7 @@ Simulator::Simulator()
   this->render_mutex = new boost::recursive_mutex();
   this->model_delete_mutex = new boost::recursive_mutex();
   this->startTime = this->GetWallTime();
+  this->gazeboConfig=new gazebo::GazeboConfig();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,7 +167,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   gazebo::GazeboMessage::Instance()->Load(rootNode);
 
   // load the configuration options 
-  this->gazeboConfig=new gazebo::GazeboConfig();
   try
   {
     this->gazeboConfig->Load();
