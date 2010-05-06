@@ -33,6 +33,10 @@
 #include "Controller.hh"
 #include "ControllerFactory.hh"
 
+#include <sys/stat.h>
+#include "Simulator.hh"
+#include "GazeboConfig.hh"
+
 #ifdef HAVE_DL
 #include <dlfcn.h>
 #elif HAVE_LTDL
@@ -73,13 +77,27 @@ Controller *ControllerFactory::NewController(const std::string &classname, Entit
 // Load a controller plugin. Used by Model and Sensor when creating controllers.
 void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string &classname)
 {
+  // search and expand plugin with full path by searching GazeboConfig::pluginPaths,
+  // otherwise, leave as is, and let LD_LIBRARY_PATH take care of business
+  struct stat st;
+  bool found = false;
+  std::string fullname;
+  std::list<std::string>::iterator iter;
+  std::list<std::string> pluginPaths=Simulator::Instance()->GetGazeboConfig()->GetPluginPaths();
+  for (iter=pluginPaths.begin(); iter!=pluginPaths.end(); ++iter)
+  {
+    fullname = (*iter)+std::string("/")+plugin;
+    if (stat(fullname.c_str(), &st) == 0) {found=true; break;}
+  }
+  if (!found) fullname = plugin;
+
 #ifdef HAVE_DL
 
-  void* handle = dlopen(plugin.c_str(), RTLD_LAZY|RTLD_GLOBAL);
+  void* handle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
   if (!handle)
   {
     std::ostringstream stream;
-    stream << "Failed to load " << plugin << ": " << dlerror();
+    stream << "Failed to load " << fullname << ": " << dlerror();
     gzthrow(stream.str());
   }
 
@@ -113,12 +131,12 @@ void ControllerFactory::LoadPlugin(const std::string &plugin, const std::string 
 			init_done = true;
 	}
 	
-	lt_dlhandle handle = lt_dlopenext(plugin.c_str());
+	lt_dlhandle handle = lt_dlopenext(fullname.c_str());
 	
 	if (!handle)
 	{
 		std::ostringstream stream;
-		stream << "Failed to load " << plugin << ": " << lt_dlerror();
+		stream << "Failed to load " << fullname << ": " << lt_dlerror();
 		gzthrow(stream.str());
 	}
 	

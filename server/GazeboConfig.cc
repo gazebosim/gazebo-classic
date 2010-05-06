@@ -60,33 +60,15 @@ void GazeboConfig::Load()
 
   char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
   if(ogre_resource_path) 
-  {
-    std::string str(ogre_resource_path);
-    int pos1 = 0;
-    int pos2 = str.find(delim);
-    while (pos2 != (int)std::string::npos)
-    {
-      this->ogrePaths.push_back(str.substr(pos1,pos2-pos1));
-      pos1 = pos2+1;
-      pos2 = str.find(delim,pos2+1);
-    }
-    this->ogrePaths.push_back(str.substr(pos1,str.size()-pos1));
-  }
+    this->AddOgrePaths(std::string(ogre_resource_path));
 
   char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
   if(gazebo_resource_path) 
-  {
-    std::string str(gazebo_resource_path);
-    int pos1 = 0;
-    int pos2 = str.find(delim);
-    while (pos2 != (int)std::string::npos)
-    {
-      this->gazeboPaths.push_back(str.substr(pos1,pos2-pos1));
-      pos1 = pos2+1;
-      pos2 = str.find(delim,pos2+1);
-    }
-    this->gazeboPaths.push_back(str.substr(pos1,str.size()-pos1));
-  }
+    this->AddGazeboPaths(std::string(gazebo_resource_path));
+
+  char *gazebo_plugin_path = getenv("GAZEBO_PLUGIN_PATH");
+  if(gazebo_plugin_path) 
+    this->AddPluginPaths(std::string(gazebo_plugin_path));
 
   if (cfgFile.is_open())
   {
@@ -145,4 +127,60 @@ std::list<std::string> &GazeboConfig::GetGazeboPaths()
 std::list<std::string> &GazeboConfig::GetOgrePaths()
 {
   return this->ogrePaths;
+}
+
+std::list<std::string> &GazeboConfig::GetPluginPaths()
+{
+  return this->pluginPaths;
+}
+
+void GazeboConfig::AddGazeboPaths(std::string gazebo_resource_path)
+{
+  std::string delim(":");
+  if(!gazebo_resource_path.empty()) 
+  {
+    int pos1 = 0;
+    int pos2 = gazebo_resource_path.find(delim);
+    while (pos2 != (int)std::string::npos)
+    {
+      this->gazeboPaths.push_back(gazebo_resource_path.substr(pos1,pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = gazebo_resource_path.find(delim,pos2+1);
+    }
+    this->gazeboPaths.push_back(gazebo_resource_path.substr(pos1,gazebo_resource_path.size()-pos1));
+  }
+}
+
+void GazeboConfig::AddOgrePaths(std::string ogre_resource_path)
+{
+  std::string delim(":");
+  if(!ogre_resource_path.empty()) 
+  {
+    int pos1 = 0;
+    int pos2 = ogre_resource_path.find(delim);
+    while (pos2 != (int)std::string::npos)
+    {
+      this->ogrePaths.push_back(ogre_resource_path.substr(pos1,pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = ogre_resource_path.find(delim,pos2+1);
+    }
+    this->ogrePaths.push_back(ogre_resource_path.substr(pos1,ogre_resource_path.size()-pos1));
+  }
+}
+
+void GazeboConfig::AddPluginPaths(std::string gazebo_plugin_path)
+{
+  std::string delim(":");
+  if(!gazebo_plugin_path.empty()) 
+  {
+    int pos1 = 0;
+    int pos2 = gazebo_plugin_path.find(delim);
+    while (pos2 != (int)std::string::npos)
+    {
+      this->pluginPaths.push_back(gazebo_plugin_path.substr(pos1,pos2-pos1));
+      pos1 = pos2+1;
+      pos2 = gazebo_plugin_path.find(delim,pos2+1);
+    }
+    this->pluginPaths.push_back(gazebo_plugin_path.substr(pos1,gazebo_plugin_path.size()-pos1));
+  }
 }

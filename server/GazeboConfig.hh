@@ -53,11 +53,26 @@ namespace gazebo
     /// \brief Get paths to ogre install
     public: std::list<std::string>& GetOgrePaths();
  
+    /// \brief Get plugin paths
+    public: std::list<std::string>& GetPluginPaths();
+ 
+    /// \brief Add colon delimited paths to Gazebo install 
+    public: void AddGazeboPaths(std::string path);
+
+    /// \brief Add colon delimited paths to ogre install
+    public: void AddOgrePaths(std::string path);
+ 
+    /// \brief Add colon delimited paths to plugins
+    public: void AddPluginPaths(std::string path);
+ 
     /// Paths gazebo install
     private: std::list<std::string> gazeboPaths;
     
     /// Paths to the ogre install
     private: std::list<std::string> ogrePaths;
+
+    /// Paths to the plugins
+    private: std::list<std::string> pluginPaths;
 
   };
 
