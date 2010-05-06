@@ -159,6 +159,8 @@ class ODEPhysics : public PhysicsEngine
   private: ParamT<double> *quickStepWP; 
   private: ParamT<double> *contactMaxCorrectingVelP;
   private: ParamT<double> *contactSurfaceLayerP;
+  private: ParamT<bool> *autoDisableBodyP;
+  private: ParamT<int> *contactFeedbacksP;
 
   private: class ContactFeedback
            {

@@ -79,14 +79,6 @@ ODEPhysics::ODEPhysics()
 
   this->contactGroup = dJointGroupCreate(0);
 
-  // If auto-disable is active, then user interaction with the joints 
-  // doesn't behave properly
-  dWorldSetAutoDisableFlag(this->worldId, 1);
-  dWorldSetAutoDisableTime(this->worldId, 2.0);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableSteps(this->worldId, 50);
-
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
@@ -95,12 +87,10 @@ ODEPhysics::ODEPhysics()
   this->quickStepWP = new ParamT<double>("quickStepW", 1.3, 0);  /// over_relaxation value for SOR
   this->contactMaxCorrectingVelP = new ParamT<double>("contactMaxCorrectingVel", 10.0, 0);
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
+  this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", false, 0);
+  this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0);
   Param::End();
 
-  this->contactFeedbacks.resize(100);
-
-  // Reset the contact pointer
-  this->contactFeedbackIter = this->contactFeedbacks.begin();
 }
 
 
@@ -146,6 +136,8 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->quickStepWP->Load(cnode);
   this->contactMaxCorrectingVelP->Load(cnode);
   this->contactSurfaceLayerP->Load(cnode);
+  this->autoDisableBodyP->Load(cnode);
+  this->contactFeedbacksP->Load(cnode);
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, contactMaxCorrectingVelP->GetValue());
@@ -153,6 +145,19 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId, contactSurfaceLayerP->GetValue());
 
+  // If auto-disable is active, then user interaction with the joints 
+  // doesn't behave properly
+  // disable autodisable by default
+  dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
+  dWorldSetAutoDisableTime(this->worldId, 2.0);
+  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
+  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
+  dWorldSetAutoDisableSteps(this->worldId, 50);
+
+  this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());
+
+  // Reset the contact pointer
+  this->contactFeedbackIter = this->contactFeedbacks.begin();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
