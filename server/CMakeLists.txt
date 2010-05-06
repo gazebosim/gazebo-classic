@@ -163,6 +163,7 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    gazebo_physics
                                    gazebo 
                                    assimp
+                                   pthread
 )
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
