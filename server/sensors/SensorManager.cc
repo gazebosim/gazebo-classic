@@ -95,5 +95,8 @@ void SensorManager::RemoveSensor(Sensor *sensor)
       break;
 
   if (iter != this->sensors.end())
+  {
+    delete (*iter);
     this->sensors.erase(iter);
+  }
 }
