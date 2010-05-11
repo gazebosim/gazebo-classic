@@ -114,11 +114,18 @@ OgreCamera::~OgreCamera()
   delete this->imageFormatP;
   delete this->visMaskP;
   delete this->hfovP;
+
+  if (this->pitchNode)
+  {
+    this->sceneNode->removeAndDestroyChild( this->cameraName + "PitchNode");
+    this->pitchNode = NULL;
+  }
   if (this->camera)
   {
     OgreCreator::DeleteCamera(this->camera);
     this->camera = NULL;
   }
+  OgreAdaptor::Instance()->UnregisterCamera(this);
 }
 
 //////////////////////////////////////////////////////////////////////////////

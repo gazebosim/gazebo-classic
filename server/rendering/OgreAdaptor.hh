@@ -112,6 +112,7 @@ namespace gazebo
 
     /// \brief Register a user camera
     public: void RegisterCamera( OgreCamera *cam );
+    public: void UnregisterCamera( OgreCamera *cam );
 
     public: void PrintSceneGraph();
 

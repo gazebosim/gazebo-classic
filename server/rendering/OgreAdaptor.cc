@@ -258,7 +258,7 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   }
 
   // Default background color
-  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::Black);
+  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::White);
 
   // Load all the plugins
   this->LoadPlugins();
@@ -724,6 +724,21 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std:
 void OgreAdaptor::RegisterCamera( OgreCamera *cam )
 {
   this->cameras.push_back( cam );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Unregister a user camera
+void OgreAdaptor::UnregisterCamera( OgreCamera *cam )
+{
+  std::vector<OgreCamera*>::iterator iter;
+  for(iter=this->cameras.begin();iter != this->cameras.end();iter++)
+  {
+    if ((*iter) == cam)
+    {
+      this->cameras.erase(iter);
+      break;
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
