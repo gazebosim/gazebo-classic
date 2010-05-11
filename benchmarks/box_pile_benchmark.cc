@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <gazebo/gazebo.h>
+#include <libgazebo/gz.h>
 
 gazebo::Client *client = NULL;
 gazebo::SimulationIface *simIface = NULL;

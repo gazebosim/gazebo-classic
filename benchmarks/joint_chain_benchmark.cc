@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <gazebo/gazebo.h>
+#include <libgazebo/gz.h>
 
 gazebo::Client *client = NULL;
 gazebo::SimulationIface *simIface = NULL;
@@ -144,8 +144,8 @@ int main()
       /// Wait .1 seconds 
       usleep(100000);
     }
-    strcpy( (char*)factoryIface->data->deleteModel, "joint_model");
-    while ( strcmp((char*)factoryIface->data->deleteModel, "") != 0)
+    strcpy( (char*)factoryIface->data->deleteEntity, "joint_model");
+    while ( strcmp((char*)factoryIface->data->deleteEntity, "") != 0)
       usleep(10000);
 
     double percent = simTime / realTime;

@@ -9,15 +9,15 @@ endif(COMMAND cmake_policy)
 
 include (FindPkgConfig)
 
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(PKG_CFGS REQUIRED libgazebo)
-  set (INCLUDE_DIRS ${PKG_CFGS_INCLUDE_DIRS})
-  set (LINK_DIRS  ${PKG_CFGS_LIBRARY_DIRS})
-  set (LINK_LIBS ${PKG_CFGS_LINK_LIBS} ${PKG_CFGS_LIBRARIES})
-endif (PKG_CONFIG_FOUND)
+# if (PKG_CONFIG_FOUND)
+#   pkg_check_modules(PKG_CFGS REQUIRED libgazebo)
+#   set (INCLUDE_DIRS ${PKG_CFGS_INCLUDE_DIRS})
+#   set (LINK_DIRS  ${PKG_CFGS_LIBRARY_DIRS})
+#   set (LINK_LIBS ${PKG_CFGS_LINK_LIBS} ${PKG_CFGS_LIBRARIES})
+# endif (PKG_CONFIG_FOUND)
 
-include_directories( ${INCLUDE_DIRS} )
-link_directories( ${LINK_DIRS} )
+link_directories(../libgazebo ${INCLUDE_DIRS})
+include_directories(../libgazebo ${LINK_DIRS})
 
 include_directories(.)
 
@@ -35,8 +35,24 @@ add_executable(box_grid_benchmark box_grid_benchmark.cc)
 add_executable(joint_chain_benchmark joint_chain_benchmark.cc)
 add_executable(camera_benchmark camera_benchmark.cc)
 
-target_link_libraries(laser_benchmark ${LINK_LIBS} )
-target_link_libraries(box_grid_benchmark ${LINK_LIBS} )
-target_link_libraries(box_pile_benchmark ${LINK_LIBS} )
-target_link_libraries(joint_chain_benchmark ${LINK_LIBS} )
-target_link_libraries(camera_benchmark ${LINK_LIBS} )
+target_link_libraries(laser_benchmark       gazebo ${LINK_LIBS} )
+target_link_libraries(box_grid_benchmark    gazebo ${LINK_LIBS} )
+target_link_libraries(box_pile_benchmark    gazebo ${LINK_LIBS} )
+target_link_libraries(joint_chain_benchmark gazebo ${LINK_LIBS} )
+target_link_libraries(camera_benchmark      gazebo ${LINK_LIBS} )
+
+set_target_properties(laser_benchmark       PROPERTIES SKIP_BUILD_RPATH TRUE)
+set_target_properties(box_grid_benchmark    PROPERTIES SKIP_BUILD_RPATH TRUE)
+set_target_properties(box_pile_benchmark    PROPERTIES SKIP_BUILD_RPATH TRUE)
+set_target_properties(joint_chain_benchmark PROPERTIES SKIP_BUILD_RPATH TRUE)
+set_target_properties(camera_benchmark      PROPERTIES SKIP_BUILD_RPATH TRUE)
+
+set_target_properties(laser_benchmark       PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+set_target_properties(box_grid_benchmark    PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+set_target_properties(box_pile_benchmark    PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+set_target_properties(joint_chain_benchmark PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+set_target_properties(camera_benchmark      PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+
+install (TARGETS laser_benchmark box_grid_benchmark box_pile_benchmark joint_chain_benchmark camera_benchmark DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+     
