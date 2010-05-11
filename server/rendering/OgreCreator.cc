@@ -190,6 +190,13 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Helper function to delete a camera
+void OgreCreator::DeleteCamera(Ogre::Camera* camera)
+{
+  OgreAdaptor::Instance()->sceneMgr->destroyCamera(camera);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void OgreCreator::CreateFog(XMLConfigNode *cnode)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())

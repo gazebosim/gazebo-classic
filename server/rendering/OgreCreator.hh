@@ -89,6 +89,8 @@ namespace gazebo
                 double nearClip, double farClip, double hfov, 
                 Ogre::RenderTarget *renderTarget);
 
+    public: static void DeleteCamera(Ogre::Camera* camera);
+
     /// \brief Helper function to create fog
     public: static void CreateFog(XMLConfigNode *node);
 
