@@ -114,6 +114,11 @@ OgreCamera::~OgreCamera()
   delete this->imageFormatP;
   delete this->visMaskP;
   delete this->hfovP;
+  if (this->camera)
+  {
+    OgreCreator::DeleteCamera(this->camera);
+    this->camera = NULL;
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
