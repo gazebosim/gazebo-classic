@@ -118,6 +118,7 @@ else (build_errors)
     add_subdirectory(server)
     add_subdirectory(worlds)
     add_subdirectory(tools)
+    add_subdirectory(benchmarks)
     add_subdirectory(Media)
     
     if (INCLUDE_PLAYER)
