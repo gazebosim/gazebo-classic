@@ -205,6 +205,7 @@ OgreAdaptor::OgreAdaptor()
   this->skyMaterialP = new ParamT<std::string>("material","",1);
   this->shadowIndexSizeP = new ParamT<int>("shadowIndexSize",32768, 0);
   this->shadowColorP = new ParamT<Vector3>("shadowColor",Vector3(0.4,0.4,0.4), 0);
+  this->backgroundColorP = new ParamT<Vector3>("backgroundColor",Vector3(0,0,0), 0);
 
   Param::End();
 }
@@ -225,6 +226,7 @@ OgreAdaptor::~OgreAdaptor()
   delete this->shadowIndexSizeP;
   delete this->shadowTechniqueP;
   delete this->shadowColorP;
+  delete this->backgroundColorP;
   delete this->drawGridP;
   delete this->skyMaterialP;
 
@@ -256,9 +258,6 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   {
     gzthrow("Unable to create an Ogre rendering environment, no Root ");
   }
-
-  // Default background color
-  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue::White);
 
   // Load all the plugins
   this->LoadPlugins();
@@ -336,6 +335,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->shadowIndexSizeP->Load(node);
   this->shadowTechniqueP->Load(node);
   this->shadowColorP->Load(node);
+  this->backgroundColorP->Load(node);
   this->drawGridP->Load(node);
 
   ambient.r = (**(this->ambientP)).x;
@@ -371,6 +371,12 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
           (**this->shadowColorP).z));
     this->sceneMgr->setShadowFarDistance(30);
   }
+
+  // Default background color
+  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue(
+          (**this->backgroundColorP).x,
+          (**this->backgroundColorP).y,
+          (**this->backgroundColorP).z));
 
   // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient);
