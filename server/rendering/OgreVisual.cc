@@ -173,7 +173,10 @@ OgreVisual::~OgreVisual()
       if (this->boundingBoxNode != NULL)
         this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
 
-      this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
+      // delete works, but removeAndDestroyChild segfaults
+      delete this->sceneNode;
+      this->sceneNode = NULL;
+      //this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
     }
   }
 }
