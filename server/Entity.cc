@@ -81,8 +81,16 @@ Entity::Entity(Entity *parent)
 // Destructor
 Entity::~Entity()
 {
-  if (this->parent)
-    this->parent->RemoveChild(this);
+
+  // remove self as a child of the parent
+  //if (this->parent)
+  //  this->parent->RemoveChild(this);
+
+  // remove all connected joints for a Body before delteing it
+  // gazebo::Model* parent_model = dynamic_cast<gazebo::Model*>(this->parent);
+  // if (parent_model)
+  //   parent_model->DeleteConnectedJoints(this);
+
   this->SetParent(NULL);
 
   delete this->staticP;
@@ -119,7 +127,6 @@ Entity::~Entity()
 
   this->visualNode = NULL;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return the ID of the parent

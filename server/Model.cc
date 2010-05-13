@@ -99,8 +99,20 @@ Model::Model(Model *parent)
 // Destructor
 Model::~Model()
 {
-  //std::map< std::string, Body* >::iterator biter;
-  std::vector<Entity*>::iterator biter;
+  std::vector<Entity*>::iterator eiter;
+  for (eiter =this->children.begin(); eiter != this->children.end();)
+    if (*eiter && (*eiter)->GetType() == Entity::BODY)
+    {
+      //printf("~Model:deleting %s\n", (*eiter)->GetName().c_str());
+      delete (*eiter);
+      *eiter = NULL;
+      this->children.erase(eiter); // effectively remove child
+    }
+    else
+    {
+      //printf("~Model:del not body %s\n", (*eiter)->GetName().c_str());
+      eiter++;
+    }
 
   JointContainer::iterator jiter;
   std::map< std::string, Controller* >::iterator citer;
