@@ -53,6 +53,9 @@ namespace gazebo
     /// \brief Update the toolbar data
     public: void Update();
 
+    /// \brief Set the selected entity
+    public: void SetSelectedEntity(Entity *entity);
+
     /// \brief Add an entity to the browser
     public: void AddEntityToBrowser(const Entity *model);
 

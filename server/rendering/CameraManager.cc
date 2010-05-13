@@ -131,3 +131,13 @@ void CameraManager::DecActiveCamera()
 {
   this->activeCamera = (this->activeCamera-1)  % this->cameras.size();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// A frame has started event
+void CameraManager::FrameStarted(double timeSinceLastFrame)
+{
+  if (this->activeCamera < this->cameras.size())
+    this->cameras[this->activeCamera]->FrameStarted(timeSinceLastFrame);
+}
+
+

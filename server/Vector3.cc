@@ -104,11 +104,11 @@ void Vector3::Set(double x, double y, double z)
 ////////////////////////////////////////////////////////////////////////////////
 Vector3 Vector3::GetCrossProd(const Vector3 &pt) const
 {
-  Vector3 c;
+  Vector3 c(0,0,0);
 
-  c.x =  this->y * pt.z - this->z * pt.y;
-  c.y = -this->x * pt.z + this->z * pt.x;
-  c.z =  this->x * pt.y - this->y * pt.x;
+  c.x = this->y * pt.z - this->z * pt.y;
+  c.y = this->z * pt.x - this->x * pt.z;
+  c.z = this->x * pt.y - this->y * pt.x;
 
   return c;
 }

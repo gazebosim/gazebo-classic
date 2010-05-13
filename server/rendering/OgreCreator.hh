@@ -119,7 +119,16 @@ namespace gazebo
     /// \brief Draw the uniform grid pattern
     public: static void DrawGrid();
 
-    /// \brief Remove a mesh by name
+    /// \brief Draw a named line
+    public: static void DrawLine(const Vector3 &start, const Vector3 &end, const std::string &name);
+
+    /// \brief Draw a line strip
+    public: static void DrawLineStrip(const std::vector<Vector3> &pts, const std::string &name);
+
+    /// \brief Hide a visual
+    public: static void SetVisible(const std::string &name, bool visible);
+
+   /// \brief Remove a mesh by name
     public: static void RemoveMesh(const std::string &name);
 
     /// \brief Create a material from a color definition
@@ -143,14 +152,14 @@ namespace gazebo
     public: OgreVisual *CreateVisual( const std::string &name,
                                       OgreVisual *parent=NULL, 
                                       Entity *owner = NULL );
+    /// \brief Get a visual
+    public: OgreVisual *GetVisual( const std::string &name );
 
     /// \brief Delete a visual
     public: void DeleteVisual( OgreVisual *visual );
 
-    /// \brief Remove a visual
-    /// \param name Unique name of the visual to remove
-    public: void RemoveVisual( const std::string &name );
-
+    /// \brief Delete a visual
+    public: void DeleteVisual( const std::string &visname );
 
     /// \brief Create a movable text object
     /// \return A new movable text object
@@ -170,6 +179,11 @@ namespace gazebo
                                 const Ogre::Quaternion &orient,
                                 const Ogre::Vector3 &scale);
 
+    /// \brief Get the world bounding box for a visual
+    public: static void GetVisualBounds(OgreVisual *vis, Vector3 &min, 
+                                        Vector3 &max);
+
+    public: static void GetSceneNodeBounds(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box);
 
     private: static unsigned int windowCounter;
 

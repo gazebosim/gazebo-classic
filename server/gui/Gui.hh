@@ -101,6 +101,8 @@ namespace gazebo
     private: std::vector<Param*> parameters;
 
     private: Fl_Slider *timeSlider;
+
+    public: static double forceMultiplier;
   };
 }
 

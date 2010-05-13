@@ -25,6 +25,7 @@ namespace gazebo
   
     public: virtual bool frameStarted( const Ogre::FrameEvent &evt);
     public: virtual bool frameEnded( const Ogre::FrameEvent &evt);
+    public: virtual bool frameRenderingQueued( const Ogre::FrameEvent &evt);
   
     private: Ogre::Vector3 directionVec;
   

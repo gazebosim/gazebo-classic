@@ -474,6 +474,51 @@ void OgreCreator::DrawGrid()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Draw a named line
+void OgreCreator::DrawLine(const Vector3 &start, const Vector3 &end, 
+                           const std::string &name)
+{
+  Ogre::SceneNode *node = NULL;
+  Ogre::ManualObject *obj = NULL;
+  bool attached = false;
+
+  if ( OgreAdaptor::Instance()->sceneMgr->hasManualObject(name))
+  {
+    node = OgreAdaptor::Instance()->sceneMgr->getSceneNode(name);
+    obj = OgreAdaptor::Instance()->sceneMgr->getManualObject(name);
+    attached = true;
+  }
+  else
+  {
+    node = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(name);
+    obj = OgreAdaptor::Instance()->sceneMgr->createManualObject(name); 
+  }
+
+  node->setVisible(true);
+  obj->setVisible(true);
+
+  obj->clear();
+  obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST); 
+  obj->position(start.x, start.y, start.z); 
+  obj->position(end.x, end.y, end.z); 
+  obj->end(); 
+
+  if (!attached)
+    node->attachObject(obj);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Hide a visual
+void OgreCreator::SetVisible(const std::string &name, bool visible)
+{
+  if (OgreAdaptor::Instance()->sceneMgr->hasSceneNode(name))
+    OgreAdaptor::Instance()->sceneMgr->getSceneNode(name)->setVisible(visible);
+
+  if ( OgreAdaptor::Instance()->sceneMgr->hasManualObject(name))
+    OgreAdaptor::Instance()->sceneMgr->getManualObject(name)->setVisible(visible);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Remove a mesh by name
 void OgreCreator::RemoveMesh(const std::string &name)
 {
@@ -743,6 +788,19 @@ OgreVisual *OgreCreator::CreateVisual( const std::string &name,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get a visual
+OgreVisual *OgreCreator::GetVisual( const std::string &name )
+{
+  std::map<std::string, OgreVisual*>::iterator iter;
+  iter = this->visuals.find(name);
+
+  if (iter != this->visuals.end())
+    return iter->second;
+
+  return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Delete a visual
 void OgreCreator::DeleteVisual( OgreVisual *visual )
 {
@@ -764,6 +822,13 @@ void OgreCreator::DeleteVisual( OgreVisual *visual )
     gzerr(0) << "Unknown visual[" << visual->GetName() << "]\n";
   }
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Delete a visual
+void OgreCreator::DeleteVisual( const std::string &visname )
+{
+  this->DeleteVisual( this->GetVisual(visname) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1055,5 +1120,54 @@ void OgreCreator::GetMeshInformation(const Ogre::MeshPtr mesh,
 
     ibuf->unlock();
     current_offset = next_offset;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the world bounding box for a visual
+void OgreCreator::GetVisualBounds(OgreVisual *vis, Vector3 &min, Vector3 &max)
+{
+  Ogre::AxisAlignedBox box;
+
+  Ogre::SceneNode *node = vis->GetSceneNode();
+  GetSceneNodeBounds(node,box);
+
+  min.x = box.getMinimum().x;
+  min.y = box.getMinimum().y;
+  min.z = box.getMinimum().z;
+
+  max.x = box.getMaximum().x;
+  max.y = box.getMaximum().y;
+  max.z = box.getMaximum().z;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the bounding box for a scene node
+void OgreCreator::GetSceneNodeBounds(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box)
+{
+  node->_updateBounds();
+  //box.merge(node->_getWorldAABB());
+  Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
+
+  for (int i=0; i < node->numAttachedObjects(); i++)
+  {
+    Ogre::MovableObject *obj = node->getAttachedObject(i);
+    if (obj->isVisible() && obj->getMovableType() != "gazebo::ogredynamiclines")
+    {
+      Ogre::Any any = obj->getUserAny();
+      if (any.getType() == typeid(std::string))
+      {
+        std::string str = Ogre::any_cast<std::string>(any);
+        if (str.substr(0,3) == "rot" || str.substr(0,5) == "trans")
+          continue;
+      }
+      box.merge(obj->getWorldBoundingBox());
+    }
+  }
+
+  while(it.hasMoreElements())
+  {
+    Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
+    GetSceneNodeBounds( next, box);
   }
 }

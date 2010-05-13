@@ -85,25 +85,9 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
   this->paramInput->when( FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
   this->paramInput->callback(&Sidebar::ParamInputCB, this);
   this->paramInput->color(FL_WHITE);
+  this->paramInput->value("1.0");
+  this->paramInput->hide();
 
-  /*
-  y = this->paramInput->y() + this->paramInput->h() + 20;
-  this->jointChoice = new Fl_Choice(x+50, y, w-70, 20, "Joint:");
-  this->jointChoice->callback(&Sidebar::JointChoiceCB, this);
-  this->jointChoice->labelsize(12);
-
-  y = this->jointChoice->y() + this->jointChoice->h() + 20;
-  this->jointForceSlider = new Fl_Value_Slider(x+50, y, w-70, 20, "Force:");
-  this->jointForceSlider->labelsize(12);
-  this->jointForceSlider->type(FL_HOR_NICE_SLIDER);
-  this->jointForceSlider->callback(&Sidebar::JointForceSliderCB, this);
-
-  y = this->jointForceSlider->y() + this->jointForceSlider->h() + 20;
-  this->jointVelocitySlider = new Fl_Value_Slider(x+50, y, w-70, 20, "Velocity:");
-  this->jointVelocitySlider->labelsize(12);
-  this->jointVelocitySlider->type(FL_HOR_NICE_SLIDER);
-  this->jointVelocitySlider->callback(&Sidebar::JointVelocitySliderCB, this);
-  */
   this->end();
 
   this->resizable( this->entityBrowser );
@@ -112,6 +96,8 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
 
   World::Instance()->ConnectAddEntitySignal( 
       boost::bind(&Sidebar::AddEntityToBrowser, this, _1) );
+  World::Instance()->ConnectEntitySelectedSignal( 
+      boost::bind(&Sidebar::SetSelectedEntity, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,22 +108,32 @@ Sidebar::~Sidebar()
   delete this->paramInput;
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the toolbar data
 void Sidebar::Update()
 {
-  if (this->entityBrowser->size() == 0)
-    this->UpdateEntityBrowser();
+//  if (this->entityBrowser->size() == 0)
+    //this->UpdateEntityBrowser();
+}
 
-  Entity *entity = Simulator::Instance()->GetSelectedEntity();
-
+////////////////////////////////////////////////////////////////////////////////
+// Set the selected entity
+void Sidebar::SetSelectedEntity(Entity *entity)
+{
   this->paramCount = 0;
+
 
   if (entity && entity->GetType() == Entity::MODEL)
   {
+    this->paramBrowser->deselect();
     Model *model = (Model*)(entity);
+
+    for (int i=1; i <= this->entityBrowser->size(); i++)
+    {
+      std::string lineText = this->entityBrowser->text(i);
+      if (lineText == entity->GetCompleteScopedName())
+        this->entityBrowser->value(i);
+    }
 
     std::string value = "@b@B52@s@cModel ";
     this->AddToParamBrowser(value);
@@ -147,12 +143,6 @@ void Sidebar::Update()
     const std::map<std::string, Geom *> *geoms;
     std::vector<Entity*>::const_iterator iter;
     std::map<std::string, Geom*>::const_iterator giter;
-
-    /*for (unsigned int i=0; i < model->GetJointCount(); i++)
-    {
-      Joint *joint = model->GetJoint(i);
-      this->jointChoice->add(joint->GetName().c_str(),0,0);
-    }*/
 
     for (iter = bodies.begin(); iter != bodies.end(); iter++)
     {
@@ -190,8 +180,23 @@ void Sidebar::Update()
       this->AddToParamBrowser("");
     }
 
+    this->paramInput->hide();
+  }
+  else if (entity && entity->GetType() == Entity::BODY)
+  {
+    this->paramInput->show();
+    this->paramInput->value(boost::lexical_cast<std::string>(Gui::forceMultiplier).c_str());
+    this->paramInput->label("Force Multiplier:");
+  }
+  else if (!entity)
+  {
+    this->entityBrowser->deselect();
+    this->paramBrowser->deselect();
+    this->paramBrowser->value(0);
+    this->paramBrowser->clear();
   }
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,34 +218,33 @@ void Sidebar::ParamBrowserCB( Fl_Widget * w, void *data)
 
   if (lineText.find("-Body") != std::string::npos)
   {
-    /*beginLbl = lineText.rfind("@") + 2;
+    Entity *selected = World::Instance()->GetSelectedEntity();
+
+    beginLbl = lineText.rfind("@") + 2;
 
     std::string bodyName = lineText.substr(beginLbl, lineText.size()-beginLbl);
-    std::cout << "Body Name[" << bodyName << "]\n";
 
-    Model *model = Simulator::Instance()->GetSelectedModel();
-    Body *body = model->GetBody(bodyName);
-    Simulator::Instance()->SetSelectedEntity(body);
-    */
+    std::string modelName = toolbar->entityBrowser->text( toolbar->entityBrowser->value() );
+    std::string scopedName = modelName + "::" + bodyName;
+
+    Entity *ent = World::Instance()->GetEntityByName(scopedName);
+
+    if (selected != ent)
+      World::Instance()->SetSelectedEntity(ent);
   }
   else if (lineText.find("-Geom") != std::string::npos)
   {
-    /*beginLbl = lineText.rfind("@") + 2;
+   beginLbl = lineText.rfind("@") + 2;
 
     std::string geomName = lineText.substr(beginLbl, lineText.size()-beginLbl);
-    std::cout << "Geom Name[" << geomName << "]\n";
 
-    Model *model = Simulator::Instance()->GetSelectedModel();
-    Geom *geom = model->GetGeom(geomName);
-    Simulator::Instance()->SetSelectedEntity(geom);
+    Entity *ent = World::Instance()->GetEntityByName(geomName);
 
-    toolbar->paramInput->deactivate();
-    Simulator::Instance()->SetSelectedEntity( );
-    */
+    if (ent)
+      World::Instance()->SetSelectedEntity(ent);
+
     return;
   }
-  else
-    toolbar->paramInput->activate();
 
   endLbl = lineText.find("~");
   while (lineText[beginLbl] == '@') beginLbl+=2; 
@@ -249,13 +253,14 @@ void Sidebar::ParamBrowserCB( Fl_Widget * w, void *data)
   beginValue = endLbl+1;
   while (lineText[beginValue] == '@') beginValue+=2; 
 
-  toolbar->paramInputLbl = lineText.substr(beginLbl, endLbl-beginLbl);
+  /*toolbar->paramInputLbl = lineText.substr(beginLbl, endLbl-beginLbl);
 
   toolbar->paramInput->label(toolbar->paramInputLbl.c_str());
 
   toolbar->paramInput->value( lineText.substr(beginValue, lineText.size() - beginValue).c_str() );
 
   toolbar->paramInput->redraw();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,10 +268,16 @@ void Sidebar::ParamBrowserCB( Fl_Widget * w, void *data)
 void Sidebar::ParamInputCB( Fl_Widget *w, void *data)
 {
   Fl_Input *input = (Fl_Input*)(w);
+
+  std::string value = input->value();
+  double dblValue = boost::lexical_cast<double>(value);
+  Gui::forceMultiplier = dblValue;
+
+  /*Fl_Input *input = (Fl_Input*)(w);
   Sidebar *toolbar = (Sidebar*)(data);
   Fl_Hold_Browser *browser = toolbar->paramBrowser;
   int selected = browser->value();
-  Model *model = dynamic_cast<Model*>(Simulator::Instance()->GetSelectedEntity());
+  Model *model = dynamic_cast<Model*>(World::Instance()->GetSelectedEntity());
 
 
   Body *body = NULL;
@@ -330,6 +341,7 @@ void Sidebar::ParamInputCB( Fl_Widget *w, void *data)
   {
     param->SetFromString( value, true );
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +360,12 @@ void Sidebar::EntityBrowserCB( Fl_Widget *w, void *data )
   Entity *ent = World::Instance()->GetEntityByName(lineText);
 
   if (ent)
-    Simulator::Instance()->SetSelectedEntity(ent);
+  {
+    World::Instance()->SetSelectedEntity(ent);
+    OgreCamera *cam = CameraManager::Instance()->GetActiveCamera();
+    if (cam)
+      cam->MoveToEntity(ent);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -405,7 +422,7 @@ void Sidebar::UpdateEntityBrowser()
 // Add an entity to the browser
 void Sidebar::AddEntityToBrowser(const Entity *entity)
 {
-  this->entityBrowser->add( entity->GetName().c_str() );
+  this->entityBrowser->add( entity->GetCompleteScopedName().c_str() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -415,7 +432,7 @@ void Sidebar::JointChoiceCB( Fl_Widget *w, void *data )
   Sidebar *self = (Sidebar*)(data);
   Fl_Choice *choice = (Fl_Choice*)(w);
 
-  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  Entity *entity = World::Instance()->GetSelectedEntity();
   if (entity->GetType() == Entity::MODEL)
   {
     Model *model = (Model*)(entity);
@@ -442,7 +459,7 @@ void Sidebar::JointForceSliderCB( Fl_Widget *w, void *data )
 
   double value = slider->value();
 
-  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  Entity *entity = World::Instance()->GetSelectedEntity();
   if (entity->GetType() == Entity::MODEL)
   {
     Model *model = (Model*)(entity);
@@ -450,7 +467,6 @@ void Sidebar::JointForceSliderCB( Fl_Widget *w, void *data )
     Joint *joint = model->GetJoint( self->jointChoice->text() );
     joint->SetMaxForce( 0, value );
     joint->SetForce( 0, value );
-    std::cout << "Set Force[" << value << "]\n";
   }
 }
 
@@ -467,7 +483,7 @@ void Sidebar::JointVelocitySliderCB( Fl_Widget *w, void *data )
 
   double value = slider->value();
 
-  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  Entity *entity = World::Instance()->GetSelectedEntity();
   if (entity->GetType() == Entity::MODEL)
   {
     Model *model = (Model*)(entity);

@@ -81,10 +81,10 @@
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
-        <size>0.2</size>
+        <size>.2</size>
         <mass>1</mass>
         <visual>
-          <scale>0.2 0.2 0.2</scale>
+          <scale>.2 .2 .2</scale>
           <mesh>unit_sphere</mesh>
           <material>Gazebo/Grey</material>
         </visual>

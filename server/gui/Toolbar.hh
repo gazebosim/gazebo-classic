@@ -28,13 +28,14 @@
 #define TOOLBAR_HH
 
 #include <FL/Fl_Group.H>
+#include <FL/Fl_Button.H>
 
-class Fl_Button;
 class Fl_Box;
 
 namespace gazebo
 {
   class Common;
+  class Gui;
 
   /// \brief Toolbar
   class Toolbar : public Fl_Group
@@ -57,15 +58,67 @@ namespace gazebo
     /// \brief Set button callback
     public: static void StepButtonCB( Fl_Widget * /*w*/, void * /*data*/ );
 
+    /// \brief Box button callback
+    public: static void BoxButtonCB( Fl_Widget *w, void * /*data*/ );
+
+    /// \brief Sphere button callback
+    public: static void SphereButtonCB( Fl_Widget *w, void * /*data*/ );
+
+    /// \brief Cylinder button callback
+    public: static void CylinderButtonCB( Fl_Widget *w, void * /*data*/ );
+
+    /// \brief Cursor button callback
+    public: static void CursorButtonCB( Fl_Widget *w, void * /*data*/ );
+
+
+    private: class ToolbarButton : public Fl_Button
+          {
+            public: ToolbarButton(int x, int y, int w, int h, const char *l=0)
+                    : Fl_Button(x,y,w,h,l)
+            {
+              this->box(FL_FLAT_BOX);
+              this->down_box(FL_DOWN_BOX);
+              this->type(FL_RADIO_BUTTON);
+            }
+            public: virtual ~ToolbarButton() {}
+            public: int handle(int event)
+                    {
+                      int ret = Fl_Button::handle(event);
+                      switch(event)
+                      {
+                        case FL_ENTER:
+                          this->box(FL_UP_BOX);
+                          this->redraw();
+                          break;
+                        case FL_LEAVE:
+                          this->box(FL_FLAT_BOX);
+                          this->redraw();
+                          break;
+                      }
+
+                      return ret;
+                    }
+          };
+
+
     private: Fl_Button *playButton;
     private: Fl_Button *pauseButton;
     private: Fl_Button *stepButton;
     private: Fl_Button *moveButton;
+    private: ToolbarButton *boxButton;
+    private: ToolbarButton *sphereButton;
+    private: ToolbarButton *cylinderButton;
+    private: ToolbarButton *cursorButton;
 
     private: Fl_RGB_Image *playImage[2];
     private: Fl_RGB_Image *pauseImage[2];
     private: Fl_RGB_Image *stepImage[2];
+    private: Fl_RGB_Image *boxImage[2];
+    private: Fl_RGB_Image *sphereImage[2];
+    private: Fl_RGB_Image *cylinderImage[2];
+    private: Fl_RGB_Image *cursorImage;
 
+    public: Gui *gui;
   };
   
 }

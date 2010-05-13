@@ -258,7 +258,7 @@ bool Entity::operator==(const Entity &ent) const
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the name of this entity with the model scope
 /// model1::...::modelN::entityName
-std::string Entity::GetScopedName()
+std::string Entity::GetScopedName() const
 {
   Entity *p = this->parent;
   std::string scopedName = this->GetName();
@@ -279,7 +279,7 @@ std::string Entity::GetScopedName()
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the name of this entity with the model scope
 /// model1::...::modelN::entityName
-std::string Entity::GetCompleteScopedName()
+std::string Entity::GetCompleteScopedName() const
 {
   Entity *p = this->parent;
   std::string scopedName = this->GetName();

@@ -368,8 +368,6 @@ void Body::Init()
   this->linearAccel.Set(0,0,0);
   this->angularAccel.Set(0,0,0);
 
-  std::cout << this->GetName() << "Mass[" << this->mass.GetAsDouble() << "]\n";
-
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
   if (this->mass.GetAsDouble() > 0.0)
@@ -377,7 +375,6 @@ void Body::Init()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
-      std::cout << "CG Visual Name[" << visname.str() << "]\n";
     if (this->cgVisual == NULL)
     {
       this->cgVisual = OgreCreator::Instance()->CreateVisual(visname.str(),
@@ -391,7 +388,7 @@ void Body::Init()
       this->cgVisual->AttachMesh("body_cg");
       this->cgVisual->SetMaterial("Gazebo/Red");
       this->cgVisual->SetCastShadows(false);
-      this->cgVisual->AttachAxes();
+      //this->cgVisual->AttachAxes();
 
       std::map< std::string, Geom* >::iterator giter;
 

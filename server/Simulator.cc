@@ -70,15 +70,13 @@ Simulator::Simulator()
   guiEnabled(true),
   renderEngineEnabled(true),
   physicsEnabled(true),
-  timeout(-1),
-  selectedEntity(NULL),
-  selectedBody(NULL)
+  timeout(-1)
 {
-  this->selectedEntity = NULL;
   this->render_mutex = new boost::recursive_mutex();
   this->model_delete_mutex = new boost::recursive_mutex();
   this->startTime = this->GetWallTime();
   this->gazeboConfig=new gazebo::GazeboConfig();
+  this->pause = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -495,6 +493,9 @@ void Simulator::SetStepInc(bool step)
 {
   boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
   this->stepInc = step;
+  this->stepSignal(step);
+
+  this->SetPaused(!step);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -544,37 +545,6 @@ void Simulator::SetPhysicsEnabled( bool enabled )
 bool Simulator::GetPhysicsEnabled() const
 {
   return this->physicsEnabled;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the selected entity
-void Simulator::SetSelectedEntity( Entity *ent )
-{
-  // unselect selectedEntity
-  if (this->selectedEntity)
-  {
-    this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
-    this->selectedEntity->SetSelected(false);
-  }
-
-  // if a different entity is selected, show bounding box and SetSelected(true)
-  if (this->selectedEntity != ent)
-  {
-    // set selected entity to ent
-    this->selectedEntity = ent;
-    this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
-    this->selectedEntity->SetSelected(true);
-  }
-  else
-    this->selectedEntity = NULL;
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the selected entity
-Entity *Simulator::GetSelectedEntity() const
-{
-  return this->selectedEntity;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -643,20 +613,13 @@ void Simulator::PhysicsLoop()
     currTime = this->GetRealTime();
 
     userStepped = false;
-
-    // Update the physics engine
-    //if (!this->GetUserPause()  && !this->IsPaused() ||
-    //   (this->GetUserPause() && this->GetUserStepInc()))
-    if (!this->IsPaused() || this->GetStepInc())
-    {
+    if (this->IsPaused())
+      this->pauseTime += step;
+    else
       this->simTime += step;
 
-      if (this->GetStepInc())
-          userStepped = true;
-      this->SetPaused(false);
-    }
-    else
-      this->pauseTime += step;
+    if (this->GetStepInc())
+      userStepped = true;
 
     lastTime = this->GetRealTime();
 

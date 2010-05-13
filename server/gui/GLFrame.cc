@@ -316,4 +316,6 @@ void GLFrame::TrackCB(Fl_Widget *widget, void *data)
     Model *model = dynamic_cast<Model*>(World::Instance()->GetEntityByName(choice->text() ));
     frame->glWindow->GetCamera()->TrackModel( model );
   }
+
+  frame->glWindow->take_focus();
 }

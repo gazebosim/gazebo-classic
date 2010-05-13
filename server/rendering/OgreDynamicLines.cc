@@ -48,6 +48,13 @@ OgreDynamicLines::~OgreDynamicLines()
 {
 }
 
+/// Returns "gazebo::ogredynamicslines"
+const Ogre::String &OgreDynamicLines::getMovableType() const
+{
+  static Ogre::String moveType = "gazebo::ogredynamiclines";
+  return moveType;
+}
+
 void OgreDynamicLines::AddPoint(const Vector3 &pt)
 {
   this->points.push_back(pt);
@@ -148,15 +155,6 @@ void OgreDynamicLines::FillHardwareBuffers()
   }
   vbuf->unlock();
 
-  if ((float)vaabMin.x >= (float)vaabMax.x)
-    vaabMin.x = vaabMax.x - 10;
-
-  if ((float)vaabMin.y >= (float)vaabMax.y)
-    vaabMin.y = vaabMax.y - 10;
-
-  if ((float)vaabMin.z >= (float)vaabMax.z)
-    vaabMin.z = vaabMax.z - 10;
-
   if (!finite(vaabMin.x))
     vaabMin.x = 0;
   if (!finite(vaabMin.y))
@@ -170,10 +168,6 @@ void OgreDynamicLines::FillHardwareBuffers()
     vaabMax.y = 0;
   if (!finite(vaabMax.z))
     vaabMax.z = 0;
-
-  /*printf("Min[%f %f %f] Max[%f %f %f]\n",vaabMin.x, vaabMin.y, vaabMin.z,
-      vaabMax.x, vaabMax.y, vaabMax.z);
-      */
 
   this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z),
       Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );

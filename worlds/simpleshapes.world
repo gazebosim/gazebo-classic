@@ -38,7 +38,7 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>0 0 0 0</ambient>
+    <ambient>1 1 1 1</ambient>
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
@@ -48,8 +48,8 @@
 
   <model:physical name="sphere1_model">
     <xyz>0 0 0.2</xyz>
-    <rpy>0 0.0 0.0</rpy>
-    <static>false</static>
+    <rpy>45 0.0 0.0</rpy>
+    <static>true</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
@@ -69,7 +69,7 @@
   </model:physical>
 
    <!-- Ground Plane -->
-  <model:physical name="plane1_model">
+   <model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
     <static>true</static>

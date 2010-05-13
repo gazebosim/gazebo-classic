@@ -618,7 +618,7 @@ void OgreAdaptor::UpdateCameras()
 
   OgreCreator::Instance()->Update();
 
-  this->root->_fireFrameStarted();
+  /*this->root->_fireFrameStarted();
 
   // Draw all the non-user cameras
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
@@ -627,6 +627,9 @@ void OgreAdaptor::UpdateCameras()
       (*iter)->Render();
   }
   
+  this->root->_fireFrameEnded();
+*/  
+  this->root->renderOneFrame();
   // Must update the user camera's last.
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {
@@ -635,7 +638,7 @@ void OgreAdaptor::UpdateCameras()
       userCam->Update();
   }
 
-  this->root->_fireFrameEnded();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -724,6 +727,26 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std:
   return NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the world pos of a the first contact at a pixel location
+Vector3 OgreAdaptor::GetFirstContact(OgreCamera *camera, Vector2<int> mousePos)
+{
+  Ogre::Camera *ogreCam = camera->GetOgreCamera();
+  Ogre::Real closest_distance = -1.0f;
+  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
+      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
+      (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
+
+  this->raySceneQuery->setRay( mouseRay );
+
+  // Perform the scene query
+  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
+  Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+  Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
+
+  return Vector3(pt.x, pt.y, pt.z);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Register a user camera

@@ -43,7 +43,10 @@
 #include "Pose3d.hh"
 #include "Vector3.hh"
 #include "Vector2.hh"
-
+#include "SphereMaker.hh"
+#include "BoxMaker.hh"
+#include "CylinderMaker.hh"
+#include "HingeJointMaker.hh"
 
 namespace gazebo
 {
@@ -51,6 +54,7 @@ namespace gazebo
   class OgreCamera;
   class GLFrame;
   class WindowManager;
+  class Entity;
 
   /// \brief OpenGL window to display camera data
   class GLWindow : public Fl_Gl_Window
@@ -105,6 +109,9 @@ namespace gazebo
     /// \brief Set the style of the view = "front, left, top, user"
     public: void SetViewStyle(std::string view);
 
+    public: static Vector3 GetWorldPointOnPlane(int x, int y, 
+                Vector3 planeNorm, double d);
+
     /// \brief Handle a mouse button push
     private: void HandleMousePush();
 
@@ -122,6 +129,18 @@ namespace gazebo
 
     /// \brief Handle mouse wheel movement
     private: void HandleMouseWheel(int dx, int dy);
+
+
+    /// \brief Clear selections
+    private: void ClearSelections();
+
+    /// \brief Rotate and entity, or apply torque
+    private: void EntityRotate(Entity *entity);
+
+    /// \brief Translate an entity, or apply force
+    private: void EntityTranslate(Entity *entity);
+
+    private: void CreateEntity(std::string name);
 
     /// ID of the window
     private: Window windowId;
@@ -165,11 +184,17 @@ namespace gazebo
 
     private: std::string mouseModifier;
 
+    private: BoxMaker boxMaker;
+    private: SphereMaker sphereMaker;
+    private: CylinderMaker cylinderMaker;
+    private: HingeJointMaker hingeJointMaker;
+
     /// gui interface, prerequisite to selecting Model / Body
     ///   press control+left click Model to toggle select.  Left mouse button drag updates model rotation about camera view axis, right mouse button drag udpates model position in camera view plane.
     ///   press control+right click Body to toggle select body select.  Left mouse button drag applies torque, right mouse button drag applies linear force.
     ///   press and hold shift to move the user camera around faster
   };
+
 
 }
 

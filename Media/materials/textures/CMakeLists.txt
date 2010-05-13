@@ -107,6 +107,18 @@ SET (files 10points.png
            hanoi_red_disk.tga
            hanoi_green_disk.tga
            hanoi_blue_disk.tga
+           control_pause.png
+           control_pause_blue.png
+           control_play.png
+           control_play_blue.png
+           control_end.png
+           control_end_blue.png
+           box_create_blue.png
+           box_create_grey.png
+           sphere_create_blue.png
+           sphere_create_grey.png
+           cylinder_create_blue.png
+           cursor.png
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)

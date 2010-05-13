@@ -52,6 +52,7 @@
 
 using namespace gazebo;
 
+double Gui::forceMultiplier = 1;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -80,11 +81,11 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
     new MainMenu(0, 0, w(), 20, (char *)"MainMenu");
 
     this->toolbar = new Toolbar(0, 20, this->w(), 30);
-    this->sidebar = new Sidebar(0, 60, toolbarWidth, this->h() - 115);
+    this->toolbar->gui = this;
+    this->sidebar = new Sidebar(0, this->toolbar->y() + this->toolbar->h(), toolbarWidth, this->h() - 115);
 
     // Create the frame mamanger
-    this->frameMgr = new GLFrameManager(toolbarWidth, 60, 
-                         this->w()-toolbarWidth, this->h()-115, "");
+    this->frameMgr = new GLFrameManager(toolbarWidth, this->toolbar->y() + this->toolbar->h(), this->w()-toolbarWidth, this->h()-115, "");
 
     this->timeSlider = new Fl_Slider(35,this->h()-50,this->w()-35,20,"Time:" );
     this->timeSlider->type(FL_HOR_NICE_SLIDER);
@@ -113,6 +114,7 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
 
   Fl::check();
   Fl::wait(0.3);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -214,6 +216,10 @@ int Gui::handle(int event)
 {
   switch(event)
   {
+    case FL_SHORTCUT:
+      if ( (Fl::event_state()  | FL_CTRL) && Fl::event_key() == 113)
+        Simulator::Instance()->SetUserQuit();
+      break;
     case FL_FOCUS:
       this->hasFocus = true;
       break;
@@ -224,6 +230,12 @@ int Gui::handle(int event)
       if (this->hasFocus)
         Simulator::Instance()->SetUserQuit();
       break;
+  }
+
+  if (Fl::event_key() == FL_Escape)
+  {
+    World::Instance()->SetSelectedEntity(NULL);
+    return 1;
   }
 
   return Fl_Window::handle(event);

@@ -223,6 +223,12 @@ class World : public SingletonT<World>
   /// \brief Goto a position in time
   public: void GotoTime(double pos);
 
+  /// \brief Set the selected entity
+  public: void SetSelectedEntity( Entity *ent );
+
+  /// \brief Get the selected entity
+  public: Entity *GetSelectedEntity() const;
+
   /// \brief Save the state of the world
   private: void SaveState();
 
@@ -346,7 +352,14 @@ class World : public SingletonT<World>
           void DisconnectWorldUpdateEndSignal( T subscriber )
           { worldUpdateEndSignal.disconnect(subscriber); }
 
-
+  /// \brief Connect a boost::slot the the entity selected signal
+  public: template<typename T>
+          boost::signals::connection ConnectEntitySelectedSignal(T subscriber)
+          { return entitySelectedSignal.connect(subscriber); }
+  /// \brief Disconnect a boost::slot the the entity selected signal
+  public: template<typename T>
+          void DisconnectEntitySelectedSignal( T subscriber )
+          { entitySelectedSignal.disconnect(subscriber); }
 
   /// \brief Get the names of interfaces defined in the tree of a model
   private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
@@ -389,6 +402,10 @@ class World : public SingletonT<World>
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;
 
+  /// The entity currently selected by the user
+  private: Entity *selectedEntity;
+
+
   private: boost::signal<void (Entity*)> addEntitySignal;
   private: boost::signal<void (bool)> showLightsSignal;
   private: boost::signal<void (bool)> showCamerasSignal;
@@ -397,6 +414,7 @@ class World : public SingletonT<World>
   private: boost::signal<void (bool)> showPhysicsSignal;
   private: boost::signal<void (bool)> showJointsSignal;
   private: boost::signal<void (bool)> showBoundingBoxesSignal;
+  private: boost::signal<void (Entity*)> entitySelectedSignal;
 
   private: boost::signal<void ()> worldUpdateStartSignal;
   private: boost::signal<void ()> worldUpdateEndSignal;

@@ -110,6 +110,9 @@ namespace gazebo
     /// \return The selected entity, or NULL
     public: Entity *GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std::string &mod);
 
+    /// \brief Get the world pos of a the first contact at a pixel location
+    public: Vector3 GetFirstContact(OgreCamera *camera, Vector2<int> mousePos);
+
     /// \brief Register a user camera
     public: void RegisterCamera( OgreCamera *cam );
     public: void UnregisterCamera( OgreCamera *cam );

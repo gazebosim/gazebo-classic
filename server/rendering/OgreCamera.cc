@@ -54,6 +54,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 {
   this->name = "DefaultCameraName";
 
+  this->animState = NULL;
   this->textureWidth = this->textureHeight = 0;
 
   this->saveFrameBuffer = NULL;
@@ -249,6 +250,19 @@ void OgreCamera::FiniCam()
 // Update the drawing
 void OgreCamera::UpdateCam()
 {
+
+  if (this->animState)
+  {
+    this->animState->addTime(0.01);
+    if (this->animState->hasEnded())
+    {
+      this->animState = NULL;
+
+      OgreAdaptor::Instance()->sceneMgr->destroyAnimation("cameratrack");
+      OgreAdaptor::Instance()->sceneMgr->destroyAnimationState("cameratrack");
+    }
+  }
+
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
@@ -738,6 +752,75 @@ void OgreCamera::SaveFrame()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Move the camera to focus on an entity
+void OgreCamera::MoveToEntity(Entity *entity)
+{
+  if (!entity)
+    return;
+
+  if (OgreAdaptor::Instance()->sceneMgr->hasAnimation("cameratrack"))
+  {
+    OgreAdaptor::Instance()->sceneMgr->destroyAnimation("cameratrack");
+    OgreAdaptor::Instance()->sceneMgr->destroyAnimationState("cameratrack");
+  }
+
+  Ogre::Animation *anim = OgreAdaptor::Instance()->sceneMgr->createAnimation("cameratrack",.5);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+
+  Vector3 start = this->GetWorldPose().pos;
+  Vector3 end = entity->GetAbsPose().pos;
+  Vector3 dir = end - start;
+
+  double yawAngle = atan2(dir.y,dir.x);
+  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
+  Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0,0,1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0,1,0));
+
+  Ogre::TransformKeyFrame *key;
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  Vector3 min, max, size;
+  OgreVisual *vis = entity->GetVisualNode();
+  OgreCreator::GetVisualBounds(vis, min,max);
+  size = max-min;
+
+  double scale = std::max(std::max(size.x, size.y), size.z);
+  scale += 0.5;
+
+  dir.Normalize();
+  double dist = start.Distance(end);
+
+  Vector3 mid = start + dir*(dist*.5 - scale);
+  key = strack->createNodeKeyFrame(.2);
+  key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
+  key->setRotation(yawFinal);
+
+  key = ptrack->createNodeKeyFrame(.2);
+  key->setRotation(pitchFinal);
+
+  end = start + dir*(dist - scale);
+  key = strack->createNodeKeyFrame(.5);
+  key->setTranslate( Ogre::Vector3(end.x, end.y, end.z));
+  key->setRotation(yawFinal);
+
+  key = ptrack->createNodeKeyFrame(.5);
+  key->setRotation(pitchFinal);
+
+  this->animState = OgreAdaptor::Instance()->sceneMgr->createAnimationState("cameratrack");
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// Set the camera to track an entity
 void OgreCamera::TrackModel( Model *model )
 {
@@ -747,10 +830,14 @@ void OgreCamera::TrackModel( Model *model )
   {
     Body *b = model->GetCanonicalBody();
     b->GetVisualNode()->GetSceneNode()->addChild(this->sceneNode);
+    this->camera->setAutoTracking(true, b->GetVisualNode()->GetSceneNode() );
   }
   else
   {
     this->origParentNode->addChild(this->sceneNode);
+    this->camera->setAutoTracking(false, NULL);
+    this->camera->setPosition(Ogre::Vector3(0,0,0));
+    this->camera->setOrientation(Ogre::Quaternion(-.5,-.5,.5,.5));
   }
 }
 
@@ -890,3 +977,27 @@ void OgreCamera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Frame started
+void OgreCamera::FrameStarted(double timeSinceLastFrame)
+{
+  if (this->animState)
+  {
+    //std::cout << "Add Time[" << timeSinceLastFrame << "]\n";
+    //this->animState->addTime(timeSinceLastFrame);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the direction the camera is facing
+Vector3 OgreCamera::GetDirection() const
+{
+  Vector3 result;
+  result.x = this->camera->getDerivedDirection().x;
+  result.y = this->camera->getDerivedDirection().y;
+  result.z = this->camera->getDerivedDirection().z;
+  return result;
+}
+
+

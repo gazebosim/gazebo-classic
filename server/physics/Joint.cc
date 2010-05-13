@@ -121,12 +121,22 @@ void Joint::Load(XMLConfigNode *node)
   this->fudgeFactorP->Load(node);
 
   std::ostringstream visname;
-  visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
 
-  this->body1 = this->model->GetBody( **(this->body1NameP));
-  this->body2 = this->model->GetBody(**(this->body2NameP));
+  if (this->model)
+  {
+    visname << this->model->GetScopedName() << "::" << this->GetName() << "_VISUAL";
 
-  this->anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
+    this->body1 = this->model->GetBody( **(this->body1NameP));
+    this->body2 = this->model->GetBody(**(this->body2NameP));
+    this->anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
+  }
+  else
+  {
+    visname << this->GetName() << "_VISUAL";
+    this->body1 = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->body1NameP) ));
+    this->body2 = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->body2NameP) ));
+    this->anchorBody = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->anchorBodyNameP) ));
+  }
 
   if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));

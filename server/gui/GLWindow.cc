@@ -48,6 +48,7 @@
 #include "CameraManager.hh"
 #include "UserCamera.hh"
 #include "World.hh"
+#include "Gui.hh"
 
 #include "OgreHUD.hh"
 #include "OgreAdaptor.hh"
@@ -56,6 +57,7 @@
 #include "GLWindow.hh"
 
 #include <boost/thread.hpp>
+#include "Events.hh"
 
 using namespace gazebo;
 
@@ -84,12 +86,16 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
 
   if (activeWin == NULL)
     activeWin = this;
+
+  Events::ConnectCreateEntitySignal( boost::bind(&GLWindow::CreateEntity, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 GLWindow::~GLWindow()
 {
+  Events::DisconnectCreateEntitySignal( boost::bind(&GLWindow::CreateEntity, this, _1) );
+
   if (this->userCamera)
     delete this->userCamera;
 }
@@ -166,7 +172,7 @@ void GLWindow::Update()
   this->lastUpdateTime = Simulator::Instance()->GetRealTime();
 
   // continuously apply force to selected body
-  Entity *entity = Simulator::Instance()->GetSelectedEntity(); 
+  Entity *entity = World::Instance()->GetSelectedEntity(); 
 
   if (entity && entity->GetType() == Entity::BODY &&
       (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
@@ -175,10 +181,6 @@ void GLWindow::Update()
     if (this->rightMousePressed && body)
     {
       body->SetForce(this->forceVec);
-    }
-    if (this->leftMousePressed && body)
-    {
-      body->SetTorque(this->torqueVec);
     }
   }
 }
@@ -215,7 +217,16 @@ void GLWindow::HandleMousePush()
 
   this->mousePushPos = this->mousePos;
 
-  if (Simulator::Instance()->GetSelectedEntity())
+  this->boxMaker.MousePushCB(this->mousePos);
+  this->sphereMaker.MousePushCB(this->mousePos);
+  this->cylinderMaker.MousePushCB(this->mousePos);
+  this->hingeJointMaker.MousePushCB(this->mousePos);
+
+  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
+      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+    return;
+
+  if (World::Instance()->GetSelectedEntity())
   {
     OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
                                          this->mousePos, this->mouseModifier);
@@ -244,6 +255,17 @@ void GLWindow::HandleMousePush()
 /// Handle a mouse button release
 void GLWindow::HandleMouseRelease()
 {
+  OgreCreator::SetVisible("guiline", false);
+
+  this->boxMaker.MouseReleaseCB(this->mousePos);
+  this->sphereMaker.MouseReleaseCB(this->mousePos);
+  this->cylinderMaker.MouseReleaseCB(this->mousePos);
+  this->hingeJointMaker.MouseReleaseCB(this->mousePos);
+
+  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
+      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+    return;
+
   // Get the mouse button that was pressed (if one was pressed)
   switch (Fl::event_button())
   {
@@ -277,13 +299,13 @@ void GLWindow::HandleMouseRelease()
     {
       case FL_LEFT_MOUSE:
         if (model) 
-          Simulator::Instance()->SetSelectedEntity( model );
+          World::Instance()->SetSelectedEntity( model );
         this->mouseOriginPos = Vector2<int>( Fl::event_x(), Fl::event_y() );
         break;
 
       case FL_RIGHT_MOUSE:
         if (body) 
-          Simulator::Instance()->SetSelectedEntity( body );
+          World::Instance()->SetSelectedEntity( body );
         this->mouseOriginPos = Vector2<int>( Fl::event_x(), Fl::event_y() );
         break;
 
@@ -301,6 +323,15 @@ void GLWindow::HandleMouseDrag()
 {
   // stop simulation when this is happening
   boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+  this->mouseDrag = true;
+
+  this->boxMaker.MouseDragCB(this->mousePos);
+  this->sphereMaker.MouseDragCB(this->mousePos);
+  this->cylinderMaker.MouseDragCB(this->mousePos);
+  this->hingeJointMaker.MouseDragCB(this->mousePos);
+  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
+      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+    return;
 
   if (this->activeCamera && this->activeCamera->GetUserMovable())
   {
@@ -311,171 +342,29 @@ void GLWindow::HandleMouseDrag()
     Vector3 camUp     = this->activeCamera->GetUp();
     Vector3 camRight  = this->activeCamera->GetRight();
 
-    Entity *entity = Simulator::Instance()->GetSelectedEntity();
+    Entity *entity = World::Instance()->GetSelectedEntity();
 
     if (this->leftMousePressed)
     {
+
       if ( entity && (entity->GetType() == Entity::MODEL || 
            entity->GetType() == Entity::BODY) && 
            (this->keys[FL_Control_L] || this->keys[FL_Control_R])  )
       {
-        if (entity->GetType() == Entity::MODEL && this->mouseModifier.substr(0,3) == "rot")
-        {
-          Model *model = (Model*)(entity);
-
-          //
-          // interactively change rotation pose to selected item, 
-          // rotate about axis perpendicular to view port plane
-          //
-          Pose3d modelPose = model->GetRelativePose();
-
-          /*double distance = (modelPose.pos - this->activeCamera->GetCameraPosition()).GetLength();
-          double scaleX = distance * tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          double scaleY = distance * tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          */
-
-          Vector3 planeNorm, planeNorm2;
-          Vector3 origin1, dir1, p1;
-          Vector3 origin2, dir2, p2;
-          Vector3 a,b;
-          Vector3 ray(0,0,0);
-
-          // Cast two rays from the camera into the world
-          this->activeCamera->GetCameraToViewportRay(this->mousePos.x, 
-              this->mousePos.y, origin1, dir1);
-          this->activeCamera->GetCameraToViewportRay(this->prevMousePos.x, 
-              this->prevMousePos.y, origin2, dir2);
-
-          // Figure out which axis to rotate around
-          if (this->mouseModifier == "rotx")
-            ray.x = 1.0;
-          else if (this->mouseModifier == "roty")
-            ray.y = 1.0;
-          else if (this->mouseModifier == "rotz")
-            ray.z = 1.0;
-
-          // Compute the normal to the plane on which to rotate
-          planeNorm = modelPose.rot * ray;
-
-          // Compute the distance from the camera to plane of rotation
-          double d = modelPose.pos.GetDotProd(ray);
-          double dist1 = origin1.GetDistToPlane(dir1, planeNorm, -d);
-          double dist2 = origin2.GetDistToPlane(dir2, planeNorm, -d);
-
-          // Compute two points on the plane. The first point is the current
-          // mouse position, the second is the previous mouse position
-          p1 = origin1 + dir1 * dist1;
-          p2 = origin2 + dir2 * dist2;
-
-          // Get point vectors relative to the entitie's pose
-          a = p1 - entity->GetAbsPose().pos;
-          b = p2 - entity->GetAbsPose().pos;
-
-          a.Normalize();
-          b.Normalize();
-
-          // Get the angle between the two vectors. This is the amount to
-          // rotate the entity 
-          float angle = acos(a.GetDotProd(b));
-          if (isnan(angle))
-            angle = 0;
-
-          // Compute the normal to the plane which is defined by the
-          // direction of rotation
-          planeNorm2 = a.GetCrossProd(b);
-          planeNorm2.Normalize();
-
-          // Switch rotation direction if the two normals don't line up
-          if ( planeNorm.GetDotProd(planeNorm2) > 0)
-            angle *= -1;
-
-          Quatern delta; 
-          delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
-          modelPose.rot = modelPose.rot * delta;
-       
-          model->SetAbsPose(modelPose);
-        }
+        if ((entity->GetType() == Entity::MODEL || 
+             entity->GetType() == Entity::BODY) && 
+            this->mouseModifier.substr(0,3) == "rot")
+          this->EntityRotate(entity);
         else if (this->mouseModifier.substr(0,5) == "trans")
-        {
-          Model *model = (Model*)(entity);
-          Pose3d modelPose = model->GetRelativePose();
-
-          Vector3 origin1, dir1, p1;
-          Vector3 origin2, dir2, p2;
-
-          // Cast two rays from the camera into the world
-          this->activeCamera->GetCameraToViewportRay(this->mousePos.x, 
-              this->mousePos.y, origin1, dir1);
-          this->activeCamera->GetCameraToViewportRay(this->prevMousePos.x, 
-              this->prevMousePos.y, origin2, dir2);
-
-          Vector3 moveVector(0,0,0);
-          Vector3 planeNorm(0,0,1);
-          if (this->mouseModifier == "transx")
-            moveVector.x = 1;
-          else if (this->mouseModifier == "transy")
-            moveVector.y = 1;
-          else if (this->mouseModifier == "transz")
-          {
-            moveVector.z = 1;
-            planeNorm.Set(1,0,0);
-          }
-
-          // Compute the distance from the camera to plane of translation
-          double d = modelPose.pos.GetDotProd(planeNorm);
-          double dist1 = origin1.GetDistToPlane(dir1, planeNorm, -d);
-          double dist2 = origin2.GetDistToPlane(dir2, planeNorm, -d);
-
-          // Compute two points on the plane. The first point is the current
-          // mouse position, the second is the previous mouse position
-          p1 = origin1 + dir1 * dist1;
-          p2 = origin2 + dir2 * dist2;
-
-          moveVector *= p1 - p2;
-
-          modelPose.pos += moveVector;
-          model->SetRelativePose(modelPose);
-        }
-
-        if (entity->GetType() == Entity::BODY)
-        {
-          Body *body = (Body*)(entity);
-          double distance, scaleX, scaleY, torqueScale;
-          Quatern qUp, qRight, upRightDragQ;
-
-          //
-          // interactively set torque selected item
-          //
-          Pose3d bodyPose = body->GetAbsPose();
-
-          distance = (bodyPose.pos - 
-              this->activeCamera->GetCameraPosition()).GetLength();
-          scaleX = distance * tan 
-            (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          scaleY = distance * tan 
-            (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
-
-          qUp.SetFromAxis(camUp.x,camUp.y,camUp.z,(double)drag.x/vpw*scaleX);
-
-          qRight.SetFromAxis(camRight.x,camRight.y,camRight.z,
-                             (double)drag.y/vpw*scaleY);
-          upRightDragQ = qUp * qRight;
-
-          torqueScale = 10000.0;
-          this->torqueVec = upRightDragQ.GetAsEuler()*torqueScale;
-          /*std::cout << "set euler torques (" << this->torqueVec 
-                    << ") to body (" << body->GetName() << ")" << std::endl;
-                    */
-          body->SetTorque(this->torqueVec);
-        }
+          this->EntityTranslate(entity);
       }
       else
       {
         //
         // interactively rotate view
         //
-        this->activeCamera->RotateYaw(DTOR(-drag.x * this->rotateAmount));
-        this->activeCamera->RotatePitch(DTOR(drag.y * this->rotateAmount));
+        this->activeCamera->RotateYaw(DTOR(drag.x * this->rotateAmount));
+        this->activeCamera->RotatePitch(DTOR(-drag.y * this->rotateAmount));
       }
     }
     else if (this->rightMousePressed)
@@ -599,7 +488,6 @@ void GLWindow::HandleMouseDrag()
     }
   }
 
-  this->mouseDrag = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -609,7 +497,7 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
   // stop simulation when this is happening
   boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
 
-  Entity *entity = Simulator::Instance()->GetSelectedEntity();
+  Entity *entity = World::Instance()->GetSelectedEntity();
 
   if ( entity && (entity->GetType() == Entity::MODEL || entity->GetType() == Entity::BODY) && 
       (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
@@ -649,6 +537,10 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
 /// Handle a key press
 void GLWindow::HandleKeyPress(int keyNum)
 {
+  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
+      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+    return;
+
   std::map<int,int>::iterator iter;
   this->keys[keyNum] = 1;
 
@@ -664,6 +556,9 @@ void GLWindow::HandleKeyPress(int keyNum)
         case FL_Control_R:
           moveAmount = this->moveAmount * 10;
           break;
+        case FL_CTRL+'q':
+          Simulator::Instance()->SetUserQuit();
+          break;
       }
     }
   }
@@ -674,6 +569,10 @@ void GLWindow::HandleKeyPress(int keyNum)
     {
       switch (iter->first)
       {
+        case ' ':
+          Simulator::Instance()->SetPaused(!Simulator::Instance()->IsPaused() );
+          break;
+
         case '=':
         case '+':
           this->moveAmount *= 2;
@@ -760,7 +659,6 @@ void GLWindow::HandleKeyRelease(int keyNum)
       CameraManager::Instance()->DecActiveCamera();
       break;
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -808,7 +706,12 @@ int GLWindow::handle(int event)
 
     case FL_SHORTCUT:
     case FL_KEYDOWN:
-      if (activeWin != this)
+      if (Fl::event_key() == FL_Escape)
+        World::Instance()->SetSelectedEntity(NULL);
+      else if ((Fl::event_state() | FL_CTRL) && Fl::event_key() == 113)
+        // Capture CTRL-q
+        Simulator::Instance()->SetUserQuit();
+      else if (activeWin != this)
         activeWin->HandleKeyPress(Fl::event_key());
       else
         this->HandleKeyPress(Fl::event_key());
@@ -816,7 +719,9 @@ int GLWindow::handle(int event)
       break;
 
     case FL_KEYUP:
-      if (activeWin != this)
+      if (Fl::event_key() == FL_Escape)
+        World::Instance()->SetSelectedEntity(NULL);
+      else if (activeWin != this)
         activeWin->HandleKeyRelease(Fl::event_key());
       else
         this->HandleKeyRelease(Fl::event_key());
@@ -827,12 +732,15 @@ int GLWindow::handle(int event)
       this->HandleMouseWheel(Fl::event_dx(), Fl::event_dy());
       handled = true;
       break;
-
-    default:
-      break;
   }
 
   this->prevMousePos = this->mousePos;
+
+  if (Fl::event_key() == FL_Escape)
+  {
+    return 1;
+  }
+
 
   if (!handled)
     return Fl_Gl_Window::handle(event);
@@ -898,4 +806,165 @@ void GLWindow::SetViewStyle(std::string view)
   }
 
   cam->SetWorldPose( pose );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get point on a plane
+Vector3 GLWindow::GetWorldPointOnPlane(int x, int y, Vector3 planeNorm, double d)
+{
+  Vector3 origin, dir;
+  double dist;
+
+  // Cast two rays from the camera into the world
+  CameraManager::Instance()->GetActiveCamera()->GetCameraToViewportRay(x, y, origin, dir);
+
+  dist = origin.GetDistToPlane(dir, planeNorm, d);
+
+  // Compute two points on the plane. The first point is the current
+  // mouse position, the second is the previous mouse position
+  return origin + dir * dist; 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Rotate and entity, or apply torque
+void GLWindow::EntityRotate(Entity *entity)
+{
+  Vector3 planeNorm, planeNorm2;
+  Vector3 p1, p2;
+  Vector3 a,b;
+  Vector3 ray(0,0,0);
+
+  Pose3d modelPose = entity->GetAbsPose();
+
+  // Figure out which axis to rotate around
+  if (this->mouseModifier == "rotx")
+    ray.x = 1.0;
+  else if (this->mouseModifier == "roty")
+    ray.y = 1.0;
+  else if (this->mouseModifier == "rotz")
+    ray.z = 1.0;
+
+  // Compute the normal to the plane on which to rotate
+  planeNorm = modelPose.rot.RotateVector(ray);
+  double d = -modelPose.pos.GetDotProd(planeNorm);
+
+  p1 = this->GetWorldPointOnPlane( this->mousePos.x, this->mousePos.y,
+      planeNorm, d);
+
+  p2 = this->GetWorldPointOnPlane( this->prevMousePos.x, 
+      this->prevMousePos.y, planeNorm, d);
+
+  OgreCreator::DrawLine(entity->GetAbsPose().pos,p1, "guiline");
+
+  // Get point vectors relative to the entity's pose
+  a = p1 - entity->GetAbsPose().pos;
+  b = p2 - entity->GetAbsPose().pos;
+
+  a.Normalize();
+  b.Normalize();
+
+  // Get the angle between the two vectors. This is the amount to
+  // rotate the entity 
+  float angle = acos(a.GetDotProd(b));
+  if (isnan(angle))
+    angle = 0;
+
+  // Compute the normal to the plane which is defined by the
+  // direction of rotation
+  planeNorm2 = a.GetCrossProd(b);
+  planeNorm2.Normalize();
+
+  // Switch rotation direction if the two normals don't line up
+  if ( planeNorm.GetDotProd(planeNorm2) > 0)
+    angle *= -1;
+
+  if (entity->GetType() == Entity::MODEL) 
+  {
+    Quatern delta; 
+    delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
+    
+    modelPose.rot = modelPose.rot * delta;
+    entity->SetAbsPose(modelPose);
+  }
+  else
+  {
+    ((Body*)entity)->SetTorque(planeNorm * angle * Gui::forceMultiplier);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Translate an entity, or apply force
+void GLWindow::EntityTranslate(Entity *entity)
+{
+  Pose3d pose = entity->GetAbsPose();
+
+  Vector3 origin1, dir1, p1;
+  Vector3 origin2, dir2, p2;
+
+  // Cast two rays from the camera into the world
+  this->activeCamera->GetCameraToViewportRay(this->mousePos.x, 
+      this->mousePos.y, origin1, dir1);
+  this->activeCamera->GetCameraToViewportRay(this->prevMousePos.x, 
+      this->prevMousePos.y, origin2, dir2);
+
+  Vector3 moveVector(0,0,0);
+  Vector3 planeNorm(0,0,1);
+  if (this->mouseModifier == "transx")
+    moveVector.x = 1;
+  else if (this->mouseModifier == "transy")
+    moveVector.y = 1;
+  else if (this->mouseModifier == "transz")
+  {
+    moveVector.z = 1;
+    planeNorm.Set(1,0,0);
+  }
+
+  // Compute the distance from the camera to plane of translation
+  double d = -pose.pos.GetDotProd(planeNorm);
+  double dist1 = origin1.GetDistToPlane(dir1, planeNorm, d);
+  double dist2 = origin2.GetDistToPlane(dir2, planeNorm, d);
+
+  // Compute two points on the plane. The first point is the current
+  // mouse position, the second is the previous mouse position
+  p1 = origin1 + dir1 * dist1;
+  p2 = origin2 + dir2 * dist2;
+
+  OgreCreator::DrawLine(entity->GetAbsPose().pos,p2, "guiline");
+
+  moveVector *= p1 - p2;
+
+  if (entity->GetType() == Entity::MODEL)
+  {
+    pose.pos += moveVector;
+    entity->SetRelativePose(pose);
+  }
+  else if (entity->GetType() == Entity::BODY)
+  {
+    Body *body = (Body*)(entity);
+    moveVector *= Gui::forceMultiplier;
+    body->SetForce(moveVector);
+  }
+}
+
+void GLWindow::CreateEntity(std::string name)
+{
+  World::Instance()->SetSelectedEntity(NULL);
+  this->boxMaker.Stop();
+  this->sphereMaker.Stop();
+  this->cylinderMaker.Stop();
+  this->hingeJointMaker.Stop();
+
+  this->cursor(FL_CURSOR_CROSS);
+
+  if (name == "box")
+    this->boxMaker.Start();
+  else if (name == "cylinder")
+    this->cylinderMaker.Start();
+  else if (name == "sphere")
+    this->sphereMaker.Start();
+  else if (name == "hingejoint")
+    this->hingeJointMaker.Start();
+  else
+    this->cursor(FL_CURSOR_DEFAULT);
+
 }

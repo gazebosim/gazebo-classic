@@ -18,6 +18,11 @@ set (sources Gui.cc
              StatusBar.cc
              GLFrameManager.cc
              GLFrame.cc
+             BoxMaker.cc
+             SphereMaker.cc
+             CylinderMaker.cc
+             HingeJointMaker.cc
+             Events.cc
 )
 
 set (headers Gui.hh
@@ -28,6 +33,11 @@ set (headers Gui.hh
              StatusBar.hh
              GLFrameManager.hh
              GLFrame.hh
+             BoxMaker.hh
+             SphereMaker.hh
+             CylinderMaker.hh
+             HingeJointMaker.hh
+             Events.hh
 )
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")

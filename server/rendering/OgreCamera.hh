@@ -42,12 +42,14 @@ namespace Ogre
   class Camera;
   class Viewport;
   class SceneNode;
+  class AnimationState;
 }
 
 namespace gazebo
 {
   class XMLConfigNode;
   class Model;
+  class Entity;
 
   /// \addtogroup gazebo_rendering
   /// \brief Basic camera 
@@ -212,6 +214,9 @@ namespace gazebo
     /// \brief Set the camera's name
     public: void SetCamName( const std::string &name );
 
+    /// \brief Move the camera to focus on an entity
+    public: void MoveToEntity(Entity *entity);
+
     /// \brief Set the camera to track an entity
     public: void TrackModel( Model *model );
 
@@ -221,6 +226,12 @@ namespace gazebo
     /// \brief Get a world space ray as cast from the camer through the viewport
     public: void GetCameraToViewportRay(int screenx, int screeny,
                                         Vector3 &origin, Vector3 &dir);
+
+    /// \brief Frame started
+    public: void FrameStarted(double timeSinceLastFrame);
+
+    /// \brief Get the direction the camera is facing
+    public: Vector3 GetDirection() const;
 
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
@@ -275,6 +286,7 @@ namespace gazebo
 
     protected: Time renderPeriod;
     protected: Time lastUpdate;
+    private: Ogre::AnimationState *animState;
   };
   
   /// \}

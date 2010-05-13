@@ -156,15 +156,6 @@ namespace gazebo
     /// \brief Get the physics enabled/disabled
     public: bool GetPhysicsEnabled() const;
 
-    /// \brief Set the selected entity
-    public: void SetSelectedEntity( Entity *ent );
-
-    /// \brief Set the selected body
-    public: void SetSelectedBody( Body *bod );
-
-    /// \brief Get the selected entity
-    public: Entity *GetSelectedEntity() const;
-
     /// \brief Get the model that contains the entity
     public: Model *GetParentModel( Entity *entity ) const;
 
@@ -185,6 +176,13 @@ namespace gazebo
             void ConnectPauseSignal( T subscriber )
             {
               pauseSignal.connect(subscriber);
+            }
+
+     /// \brief Connect a boost::slot the the step signal
+    public: template<typename T>
+            void ConnectStepSignal( T subscriber )
+            {
+              stepSignal.connect(subscriber);
             }
  
     /// \brief Function to run gui. Used by guiThread
@@ -241,10 +239,6 @@ namespace gazebo
     /// Length of time the simulator is allowed to run
     private: double updateTime;
 
-    /// The entity currently selected by the user
-    private: Entity *selectedEntity;
-    private: Body *selectedBody;
-
     /// Thread in which to run the gui
     private: boost::thread *physicsThread;
 
@@ -254,6 +248,7 @@ namespace gazebo
     private: State state;
 
     private: boost::signal<void (bool)> pauseSignal;
+    private: boost::signal<void (bool)> stepSignal;
 
     //Singleton implementation
     private: friend class DestroyerT<Simulator>;

@@ -47,6 +47,9 @@ class OgreDynamicLines : public OgreDynamicRenderable
   /// Destructor
   public: virtual ~OgreDynamicLines();
 
+  /// \brief Returns "gazebo::ogredynamicslines"
+  public: virtual const Ogre::String &getMovableType() const;
+
   /// Add a point to the point list
   /// \param pt Vector3 point
   public: void AddPoint(const Vector3 &pt);

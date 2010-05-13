@@ -77,6 +77,9 @@ namespace gazebo
     /// \brief Set the prev camera in the queue to be active
     public: void DecActiveCamera();
 
+    /// \brief A frame has started event
+    public: void FrameStarted(double timeSinceLastFrame);
+
     /// \brief Connect a boost::slot the the AddCamera signal
     public: template<typename T>
             void ConnectAddCameraSignal( T subscriber )

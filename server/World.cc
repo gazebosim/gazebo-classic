@@ -29,6 +29,7 @@
 #include <fstream>
 #include <sys/time.h> //gettimeofday
 
+#include "OgreVisual.hh"
 #include "Body.hh"
 #include "Factory.hh"
 #include "GraphicsIfaceHandler.hh"
@@ -50,7 +51,6 @@
 
 using namespace gazebo;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Private constructor
 World::World()
@@ -68,6 +68,7 @@ World::World()
   this->server = NULL;
   this->graphics = NULL;
   this->openAL = NULL;
+  this->selectedEntity = NULL;
 
   PhysicsFactory::RegisterAll();
   this->factory = NULL;
@@ -1355,9 +1356,6 @@ void World::UpdateSimulationIface()
             }
           }
 
-          /*for(unsigned int ii=0;ii<candids.size();ii++)
-            printf("candidatetypes: %s\n",candids[ii].c_str());*/
-
           for(i=0; i<candids.size(); i++)
           {
             if(candids[i][0]=='>')
@@ -1380,8 +1378,6 @@ void World::UpdateSimulationIface()
             strcpy(response->strValue,"unkown");
             response->strValue[511]='\0';
           }
-
-          //printf("-> modeltype: %s \n", response->modelType);
 
           response++;
           this->simIface->data->responseCount += 1;
@@ -1408,7 +1404,6 @@ void World::UpdateSimulationIface()
 		unsigned int index = list[jj].find(">>");
 		if(index !=std::string::npos)
 			list[jj].replace(index,list[jj].size(),"");
-	 	//printf("-->> %s \n",list[jj].c_str()); 
 	  }
 	  
 	  
@@ -1520,7 +1515,7 @@ void World::UpdateSimulationIface()
       case SimulationRequestData::GO:
         {
           int sec = req->runTime/1000;
-          int nsec = (req->runTime - sec) * 1e9;
+          int nsec = (req->runTime - sec*1000) * 1e9;
 
           this->simPauseTime = Simulator::Instance()->GetSimTime() 
                                   + Time(sec, nsec);
@@ -1666,4 +1661,36 @@ void World::PauseSlot(bool p)
 {
   if (!p)
     this->worldStatesInsertIter = this->worldStatesCurrentIter;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the selected entity
+void World::SetSelectedEntity( Entity *ent )
+{
+  // unselect selectedEntity
+  if (this->selectedEntity)
+  {
+    this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
+    this->selectedEntity->SetSelected(false);
+  }
+
+  // if a different entity is selected, show bounding box and SetSelected(true)
+  if (ent && this->selectedEntity != ent)
+  {
+    // set selected entity to ent
+    this->selectedEntity = ent;
+    this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
+    this->selectedEntity->SetSelected(true);
+  }
+  else
+    this->selectedEntity = NULL;
+
+  this->entitySelectedSignal(this->selectedEntity);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the selected entity
+Entity *World::GetSelectedEntity() const
+{
+  return this->selectedEntity;
 }

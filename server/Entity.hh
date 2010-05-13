@@ -72,7 +72,7 @@ namespace gazebo
     /// \brief Get the parent
     /// \return Pointer to the parent entity
     public: Entity *GetParent() const;
-  
+
     /// \brief Add a child to this entity
     /// \param child Child entity
     public: void AddChild(Entity *child);
@@ -142,11 +142,11 @@ namespace gazebo
 
     /// \brief Return the name of this entity with the model scope
     ///        model1::...::modelN::entityName
-    public: std::string GetScopedName();
+    public: std::string GetScopedName() const;
 
     /// \brief Return the name of this entity with the model+body+geom scope
     ///        model1::...::modelN::bodyN::entityName
-    public: std::string GetCompleteScopedName();
+    public: std::string GetCompleteScopedName() const;
 
     /// \brief Set the type of this entity
     public: void SetType(Type type);

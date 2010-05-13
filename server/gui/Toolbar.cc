@@ -1,6 +1,6 @@
 /*
  *  Gazebo - Outdoor Multi-Robot Simulator
- *  Copyright (C) 2003
+ *  Copyright (C) 2203
  *     Nate Koenig & Andrew Howard
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -15,22 +15,22 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  Foundation, Inc., 59 Temple Place, Suite 322, Boston, MA  02111-1227  USA
  *
  */
 /* Desc: Toolbar
  * Author: Nate Koenig
- * Date: 13 Feb 2006
+ * Date: 13 Feb 2206
  * SVN: $Id$
  */
 
 #include <stdio.h>
 
-#include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Bitmap.H>
 #include <FL/Fl_Image.H>
 
+#include "Events.hh"
 #include "Image.hh"
 #include "Gui.hh"
 #include "Global.hh"
@@ -44,7 +44,7 @@ using namespace gazebo;
 Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
     : Fl_Group(x,y,w,h,l)
 {
-  this->box(FL_THIN_DOWN_BOX);
+  this->box(FL_NO_BOX);
 
   this->color(BG_COLOR);
 
@@ -52,75 +52,132 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   unsigned int dataCount;
 
   Image image;
-  image.Load("blue_play_button.png");
-  image.Rescale(20,20);
+  image.Load("control_play_blue.png");
+  image.Rescale(22,22);
   image.GetData(&data, dataCount);
 
   this->playImage[0] = new Fl_RGB_Image(data, image.GetWidth(), 
                                         image.GetHeight(), 4);
 
   data = NULL;
-  image.Load("grey_play_button.png");
-  image.Rescale(20,20);
+  image.Load("control_play.png");
+  image.Rescale(22,22);
   image.GetData(&data, dataCount);
   this->playImage[1] = new Fl_RGB_Image(data, image.GetWidth(), 
                                         image.GetHeight(), 4);
 
   data = NULL;
-  image.Load("blue_pause_button.png");
-  image.Rescale(20,20);
+  image.Load("control_pause_blue.png");
+  image.Rescale(22,22);
   image.GetData(&data, dataCount);
   this->pauseImage[0] = new Fl_RGB_Image(data, image.GetWidth(), 
                                          image.GetHeight(), 4);
 
   data = NULL;
-  image.Load("grey_pause_button.png");
-  image.Rescale(20,20);
+  image.Load("control_pause.png");
+  image.Rescale(22,22);
   image.GetData(&data, dataCount);
   this->pauseImage[1] = new Fl_RGB_Image(data, image.GetWidth(), 
                                          image.GetHeight(), 4);
 
   data = NULL;
-  image.Load("blue_step_button.png");
-  image.Rescale(20,20);
+  image.Load("control_end_blue.png");
+  image.Rescale(22,22);
   image.GetData(&data, dataCount);
   this->stepImage[0] = new Fl_RGB_Image(data, image.GetWidth(), 
                                         image.GetHeight(), 4);
 
   data = NULL;
-  image.Load("grey_step_button.png");
-  image.Rescale(20,20);
+  image.Load("control_end.png");
+  image.Rescale(22,22);
   image.GetData(&data, dataCount);
   this->stepImage[1] = new Fl_RGB_Image(data, image.GetWidth(), 
                                         image.GetHeight(), 4);
 
+  data = NULL;
+  image.Load("box_create_blue.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  this->boxImage[0] = new Fl_RGB_Image(data, image.GetWidth(), 
+                                        image.GetHeight(), 4);
 
+  data = NULL;
+  image.Load("sphere_create_blue.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  this->sphereImage[0] = new Fl_RGB_Image(data, image.GetWidth(), 
+                                        image.GetHeight(), 4);
+
+  data = NULL;
+  image.Load("cylinder_create_blue.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  this->cylinderImage[0] = new Fl_RGB_Image(data, image.GetWidth(), 
+                                        image.GetHeight(), 4);
+
+
+  data = NULL;
+  image.Load("cursor.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  this->cursorImage = new Fl_RGB_Image(data, image.GetWidth(), 
+                                        image.GetHeight(), 4);
+
+
+  y += 4;
   x += 5;
-  y += 5;
-  this->playButton = new Fl_Button(x, y, 20, 20);
+  y += 0;
+  this->playButton = new Fl_Button(x, y, 22, 22);
   this->playButton->callback( &gazebo::Toolbar::PlayButtonCB, this );
   this->playButton->color(BG_COLOR, BG_COLOR);
   this->playButton->image(this->playImage[1]);
   this->playButton->box(FL_NO_BOX);
   this->playButton->deactivate();
+  this->playButton->clear_visible_focus();
 
   x = this->playButton->x() + this->playButton->w() + 10;
-  this->pauseButton = new Fl_Button(x, y, 20, 20);
+  this->pauseButton = new Fl_Button(x, y, 22, 22);
   this->pauseButton->callback( &gazebo::Toolbar::PauseButtonCB, this );
   this->pauseButton->color(BG_COLOR, BG_COLOR);
   this->pauseButton->image(this->pauseImage[0]);
   this->pauseButton->box(FL_NO_BOX);
+  this->pauseButton->clear_visible_focus();
 
   x = this->pauseButton->x() + this->pauseButton->w() + 10;
-  this->stepButton = new Fl_Button(x, y, 20, 20);
+  this->stepButton = new Fl_Button(x, y, 22, 22);
   this->stepButton->callback( &gazebo::Toolbar::StepButtonCB, this );
   this->stepButton->color(BG_COLOR, BG_COLOR);
   this->stepButton->image(this->stepImage[1]);
   this->stepButton->box(FL_NO_BOX);
   this->stepButton->deactivate();
+  this->stepButton->clear_visible_focus();
 
-  //x = this->stepButton->x() + this->stepButton->w() + 10;
-  //this->moveButton = new Fl_Button(x,y,20,20);
+
+  y = this->y();
+  x = this->stepButton->x() + this->stepButton->w() + 10;
+  this->cursorButton = new ToolbarButton(x, y, 30, 30);
+  this->cursorButton->callback( &gazebo::Toolbar::CursorButtonCB, this );
+  this->cursorButton->image(this->cursorImage);
+  this->cursorButton->set();
+  this->cursorButton->clear_visible_focus();
+
+  x = this->cursorButton->x() + this->cursorButton->w() + 10;
+  this->boxButton = new ToolbarButton(x, y, 30, 30);
+  this->boxButton->callback( &gazebo::Toolbar::BoxButtonCB, this );
+  this->boxButton->image(this->boxImage[0]);
+  this->boxButton->clear_visible_focus();
+
+  x = this->boxButton->x() + this->boxButton->w() + 10;
+  this->sphereButton = new ToolbarButton(x, y, 30, 30);
+  this->sphereButton->callback( &gazebo::Toolbar::SphereButtonCB, this );
+  this->sphereButton->image(this->sphereImage[0]);
+  this->sphereButton->clear_visible_focus();
+
+  x = this->sphereButton->x() + this->sphereButton->w() + 10;
+  this->cylinderButton = new ToolbarButton(x, y, 30, 30);
+  this->cylinderButton->callback( &gazebo::Toolbar::CylinderButtonCB, this );
+  this->cylinderButton->image(this->cylinderImage[0]);
+  this->cylinderButton->clear_visible_focus();
 
   this->end();
   this->resizable(NULL);
@@ -212,4 +269,32 @@ void Toolbar::StepButtonCB( Fl_Widget *w, void * /*data*/ )
 {
   Simulator::Instance()->SetStepInc( true );
   w->clear_visible_focus();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Box button callback
+void Toolbar::BoxButtonCB( Fl_Widget *w, void * /*data*/ )
+{
+  Events::createEntitySignal("box");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Sphere button callback
+void Toolbar::SphereButtonCB( Fl_Widget *w, void * /*data*/ )
+{
+  Events::createEntitySignal("sphere");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Box button callback
+void Toolbar::CylinderButtonCB( Fl_Widget *w, void * /*data*/ )
+{
+  Events::createEntitySignal("cylinder");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Cursor button callback
+void Toolbar::CursorButtonCB( Fl_Widget *w, void * /*data*/ )
+{
+  Events::createEntitySignal("");
 }
