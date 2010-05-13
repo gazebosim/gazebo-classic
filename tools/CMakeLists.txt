@@ -1,6 +1,18 @@
+INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
+STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
+STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
 
-link_directories(../libgazebo)
-include_directories(../libgazebo)
+INCLUDE_DIRECTORIES(
+  .
+  ${CMAKE_SOURCE_DIR}/libgazebo 
+  ${boost_include_dirs_split}
+)
+
+LINK_DIRECTORIES(  
+ ${CMAKE_BINARY_DIR}/libgazebo 
+ ${boost_library_dirs_split} 
+)
+
 
 set (sources gazebomodel.cc gazebobody.cc Toolbase.cc)
 
