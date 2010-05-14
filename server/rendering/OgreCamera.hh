@@ -50,6 +50,8 @@ namespace gazebo
   class XMLConfigNode;
   class Model;
   class Entity;
+  class MouseEvent;
+  class ViewController;
 
   /// \addtogroup gazebo_rendering
   /// \brief Basic camera 
@@ -233,8 +235,12 @@ namespace gazebo
     /// \brief Get the direction the camera is facing
     public: Vector3 GetDirection() const;
 
+    /// \brief Hande a mouse event
+    public: void HandleMouseEvent(const MouseEvent &evt);
+
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
+
 
     // Save the camera frame
     protected: virtual void SaveFrame();
@@ -287,6 +293,8 @@ namespace gazebo
     protected: Time renderPeriod;
     protected: Time lastUpdate;
     private: Ogre::AnimationState *animState;
+
+    private: ViewController *viewController;
   };
   
   /// \}

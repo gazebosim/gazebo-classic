@@ -72,15 +72,10 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
 
   this->userCamera = NULL;
   this->moveAmount = 0.1;
-  this->moveScale = 1;
-  this->rotateAmount = 0.1;
 
   this->directionVec.x = 0;
   this->directionVec.y = 0;
   this->directionVec.z = 0;
-  this->leftMousePressed = false;
-  this->rightMousePressed = false;
-  this->middleMousePressed = false;
 
   this->keys.clear();
 
@@ -125,7 +120,6 @@ void GLWindow::Init()
 {
   this->show();
   Fl::check();
-  this->mouseDrag = false;
 
   if (this->userCamera == NULL)
   {
@@ -166,17 +160,7 @@ void GLWindow::flush()
 // Update function
 void GLWindow::Update()
 {
-  if (this->activeCamera && this->activeCamera->GetUserMovable())
-  {
-    Time diff = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
-    this->activeCamera->Translate( this->directionVec * diff.Double()  );
-    this->directionVec.Set(0,0,0);
-  }
-
-
-  this->lastUpdateTime = Simulator::Instance()->GetRealTime();
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a pointer to the camera
@@ -203,36 +187,36 @@ unsigned int GLWindow::GetTriangleCount() const
 /// Handle a mouse button push
 void GLWindow::HandleMousePush()
 {
-  this->mousePushPos = this->mousePos;
+  this->mouseEvent.pressPos = this->mouseEvent.pos;
 
-  this->boxMaker.MousePushCB(this->mousePos);
-  this->sphereMaker.MousePushCB(this->mousePos);
-  this->cylinderMaker.MousePushCB(this->mousePos);
-  this->hingeJointMaker.MousePushCB(this->mousePos);
+  this->boxMaker.MousePushCB(this->mouseEvent);
+  this->sphereMaker.MousePushCB(this->mouseEvent);
+  this->cylinderMaker.MousePushCB(this->mouseEvent);
 
   if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+      this->cylinderMaker.IsActive())
     return;
 
   if (World::Instance()->GetSelectedEntity())
   {
     OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
-                                         this->mousePos, this->mouseModifier);
+                                         this->mouseEvent.pos, 
+                                         this->mouseModifier);
   }
 
   // Get the mouse button that was pressed (if one was pressed)
   switch (Fl::event_button())
   {
     case FL_LEFT_MOUSE:
-      this->leftMousePressed = true;
+      this->mouseEvent.left = MouseEvent::DOWN;
       break;
 
     case FL_RIGHT_MOUSE:
-      this->rightMousePressed = true;
+      this->mouseEvent.right = MouseEvent::DOWN;
       break;
 
     case FL_MIDDLE_MOUSE:
-      this->middleMousePressed = true;
+      this->mouseEvent.middle = MouseEvent::DOWN;
       break;
   }
 }
@@ -244,35 +228,34 @@ void GLWindow::HandleMouseRelease()
 
   OgreCreator::SetVisible("guiline", false);
 
-  this->boxMaker.MouseReleaseCB(this->mousePos);
-  this->sphereMaker.MouseReleaseCB(this->mousePos);
-  this->cylinderMaker.MouseReleaseCB(this->mousePos);
-  this->hingeJointMaker.MouseReleaseCB(this->mousePos);
+  this->boxMaker.MouseReleaseCB(this->mouseEvent);
+  this->sphereMaker.MouseReleaseCB(this->mouseEvent);
+  this->cylinderMaker.MouseReleaseCB(this->mouseEvent);
 
   if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+      this->cylinderMaker.IsActive())
     return;
 
   // Get the mouse button that was pressed (if one was pressed)
   switch (Fl::event_button())
   {
     case FL_LEFT_MOUSE:
-      this->leftMousePressed = false;
+      this->mouseEvent.left = MouseEvent::UP;
       break;
 
     case FL_RIGHT_MOUSE:
-      this->rightMousePressed = false;
+      this->mouseEvent.right = MouseEvent::UP;
       break;
 
     case FL_MIDDLE_MOUSE:
-      this->middleMousePressed = false;
+      this->mouseEvent.middle = MouseEvent::UP;
       break;
   }
 
-  if (!this->mouseDrag && this->GetCursorState() == "manip")
+  if (!this->mouseEvent.dragging && this->GetCursorState() == "manip")
   {
     Entity *entity = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
-                                         this->mousePos, this->mouseModifier);
+                                         this->mouseEvent.pos, this->mouseModifier);
 
     Model *model = Simulator::Instance()->GetParentModel(entity);
     Body *body = Simulator::Instance()->GetParentBody(entity);
@@ -282,13 +265,11 @@ void GLWindow::HandleMouseRelease()
       case FL_LEFT_MOUSE:
         if (model) 
           World::Instance()->SetSelectedEntity( model );
-        this->mouseOriginPos = Vector2<int>( Fl::event_x(), Fl::event_y() );
         break;
 
       case FL_RIGHT_MOUSE:
         if (body) 
           World::Instance()->SetSelectedEntity( body );
-        this->mouseOriginPos = Vector2<int>( Fl::event_x(), Fl::event_y() );
         break;
 
       case FL_MIDDLE_MOUSE:
@@ -296,7 +277,7 @@ void GLWindow::HandleMouseRelease()
     }
   }
 
-  this->mouseDrag = false;
+  this->mouseEvent.dragging = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,23 +287,22 @@ void GLWindow::HandleMouseDrag()
   // stop simulation when this is happening
   boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
 
-  this->mouseDrag = true;
+  this->mouseEvent.dragging = true;
 
-  this->boxMaker.MouseDragCB(this->mousePos);
-  this->sphereMaker.MouseDragCB(this->mousePos);
-  this->cylinderMaker.MouseDragCB(this->mousePos);
-  this->hingeJointMaker.MouseDragCB(this->mousePos);
+  this->boxMaker.MouseDragCB(this->mouseEvent);
+  this->sphereMaker.MouseDragCB(this->mouseEvent);
+  this->cylinderMaker.MouseDragCB(this->mouseEvent);
   if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+      this->cylinderMaker.IsActive())
     return;
 
-  if (this->activeCamera && this->activeCamera->GetUserMovable())
+  if (this->activeCamera)
   {
-    Vector2<int> drag = this->mousePos - this->prevMousePos;
+    Vector2<int> drag = this->mouseEvent.pos - this->mouseEvent.prevPos;
 
     Entity *entity = World::Instance()->GetSelectedEntity();
 
-    if (this->leftMousePressed)
+    if (this->mouseEvent.left == MouseEvent::DOWN)
     {
       if ( entity && (entity->GetType() == Entity::MODEL || 
            entity->GetType() == Entity::BODY) && 
@@ -335,27 +315,16 @@ void GLWindow::HandleMouseDrag()
       }
       else if(this->GetCursorState() == "default")
       {
-        //
-        // interactively rotate view
-        //
-        this->activeCamera->RotateYaw(DTOR(drag.x * this->rotateAmount));
-        this->activeCamera->RotatePitch(DTOR(-drag.y * this->rotateAmount));
+        this->activeCamera->HandleMouseEvent( this->mouseEvent );
       }
     }
-    else if (this->rightMousePressed && this->GetCursorState() == "default")
+    else if (this->mouseEvent.right == MouseEvent::DOWN && this->GetCursorState() == "default")
     {
-      //
-      // interactively pan view
-      //
-      this->directionVec.x = 0;
-      this->directionVec.y =  drag.x * this->moveAmount;
-      this->directionVec.z =  drag.y * this->moveAmount;
+        this->activeCamera->HandleMouseEvent( this->mouseEvent );
     }
-    else if (this->middleMousePressed && this->GetCursorState() == "default")
+    else if (this->mouseEvent.middle == MouseEvent::DOWN && this->GetCursorState() == "default")
     {
-      this->directionVec.x =  drag.y * this->moveAmount;
-      this->directionVec.y =  0;
-      this->directionVec.z =  0;
+      this->activeCamera->HandleMouseEvent( this->mouseEvent );
     }
   }
 }
@@ -367,12 +336,13 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
   // stop simulation when this is happening
   boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
 
-  if (this->activeCamera && this->activeCamera->GetUserMovable() &&
-      this->GetCursorState() == "default")
+  this->mouseEvent.scroll.x = dx;
+  this->mouseEvent.scroll.y = dy;
+  this->mouseEvent.middle = MouseEvent::SCROLL;
+
+  if (this->activeCamera && this->GetCursorState() == "default")
   {
-    this->directionVec.x -=  50.0 * dy * this->moveAmount;
-    this->directionVec.y =  0;
-    this->directionVec.z =  0;
+    this->activeCamera->HandleMouseEvent(this->mouseEvent);
   }
 }
 
@@ -381,7 +351,7 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
 void GLWindow::HandleKeyPress(int keyNum)
 {
   if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive() || this->hingeJointMaker.IsActive())
+      this->cylinderMaker.IsActive())
     return;
 
   std::map<int,int>::iterator iter;
@@ -501,7 +471,8 @@ int GLWindow::handle(int event)
   bool handled = false;
 
   // Get the mouse position
-  this->mousePos = Vector2<int>( Fl::event_x(), Fl::event_y() );
+  this->mouseEvent.pos.x = Fl::event_x();
+  this->mouseEvent.pos.y = Fl::event_y();
 
   // Handle Events
   switch(event)
@@ -533,7 +504,7 @@ int GLWindow::handle(int event)
       break;
 
     case FL_DRAG:
-      if (this->prevMousePos.Distance(this->mousePos) > 0)
+      if (this->mouseEvent.prevPos.Distance(this->mouseEvent.pos) > 0)
         this->HandleMouseDrag();
       handled = true;
       break;
@@ -568,7 +539,7 @@ int GLWindow::handle(int event)
       break;
   }
 
-  this->prevMousePos = this->mousePos;
+  this->mouseEvent.prevPos = this->mouseEvent.pos;
 
   if (Fl::event_key() == FL_Escape)
   {
@@ -682,11 +653,11 @@ void GLWindow::EntityRotate(Entity *entity)
   planeNorm = modelPose.rot.RotateVector(ray);
   double d = -modelPose.pos.GetDotProd(planeNorm);
 
-  p1 = this->GetWorldPointOnPlane( this->mousePos.x, this->mousePos.y,
-      planeNorm, d);
+  p1 = this->GetWorldPointOnPlane( this->mouseEvent.pos.x, 
+      this->mouseEvent.pos.y, planeNorm, d);
 
-  p2 = this->GetWorldPointOnPlane( this->prevMousePos.x, 
-      this->prevMousePos.y, planeNorm, d);
+  p2 = this->GetWorldPointOnPlane( this->mouseEvent.prevPos.x, 
+      this->mouseEvent.prevPos.y, planeNorm, d);
 
   OgreCreator::DrawLine(entity->GetAbsPose().pos,p1, "guiline");
 
@@ -736,10 +707,10 @@ void GLWindow::EntityTranslate(Entity *entity)
   Vector3 origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  this->activeCamera->GetCameraToViewportRay(this->mousePos.x, 
-      this->mousePos.y, origin1, dir1);
-  this->activeCamera->GetCameraToViewportRay(this->prevMousePos.x, 
-      this->prevMousePos.y, origin2, dir2);
+  this->activeCamera->GetCameraToViewportRay(this->mouseEvent.pos.x, 
+      this->mouseEvent.pos.y, origin1, dir1);
+  this->activeCamera->GetCameraToViewportRay(this->mouseEvent.prevPos.x, 
+      this->mouseEvent.prevPos.y, origin2, dir2);
 
   Vector3 moveVector(0,0,0);
   Vector3 planeNorm(0,0,1);
@@ -786,7 +757,6 @@ void GLWindow::CreateEntity(std::string name)
   this->boxMaker.Stop();
   this->sphereMaker.Stop();
   this->cylinderMaker.Stop();
-  this->hingeJointMaker.Stop();
 
   this->SetCursorState("create");
 
@@ -799,8 +769,6 @@ void GLWindow::CreateEntity(std::string name)
     this->cylinderMaker.Start();
   else if (name == "sphere")
     this->sphereMaker.Start();
-  else if (name == "hingejoint")
-    this->hingeJointMaker.Start();
   else
     this->SetCursorState("default");
 }

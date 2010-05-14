@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "GLWindow.hh"
 #include "OgreVisual.hh"
@@ -14,7 +15,6 @@ CylinderMaker::CylinderMaker()
 {
   this->state = 0;
   this->visualName = "";
-  this->leftMousePressed = false;
   this->index = 0;
 }
 
@@ -52,24 +52,15 @@ bool CylinderMaker::IsActive() const
   return this->state > 0;
 }
 
-void CylinderMaker::MousePushCB(Vector2<int> mousePos)
+void CylinderMaker::MousePushCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
 
-  this->leftMousePressed = false;
-
-  this->mousePushPos = mousePos;
-
-  switch (Fl::event_button())
-  {
-    case FL_LEFT_MOUSE:
-      this->leftMousePressed = true;
-      break;
-  }
+  this->mousePushPos = event.pressPos;
 }
 
-void CylinderMaker::MouseReleaseCB(Vector2<int> mousePos)
+void CylinderMaker::MouseReleaseCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -83,7 +74,7 @@ void CylinderMaker::MouseReleaseCB(Vector2<int> mousePos)
   }
 }
 
-void CylinderMaker::MouseDragCB(Vector2<int> mousePos)
+void CylinderMaker::MouseDragCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -97,7 +88,7 @@ void CylinderMaker::MouseDragCB(Vector2<int> mousePos)
     norm.Set(1,0,0);
 
   p1 = GLWindow::GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
-  p2 = GLWindow::GetWorldPointOnPlane(mousePos.x, mousePos.y ,norm, 0);
+  p2 = GLWindow::GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
 
   OgreVisual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))
@@ -123,7 +114,7 @@ void CylinderMaker::MouseDragCB(Vector2<int> mousePos)
   {
     scale = vis->GetScale();
    // scale.z = p2.z - p1.z;
-    scale.z = (this->mousePushPos.y - mousePos.y)*0.01;
+    scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 

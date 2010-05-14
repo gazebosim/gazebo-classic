@@ -618,7 +618,7 @@ void OgreAdaptor::UpdateCameras()
 
   OgreCreator::Instance()->Update();
 
-  /*this->root->_fireFrameStarted();
+  this->root->_fireFrameStarted();
 
   // Draw all the non-user cameras
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
@@ -626,10 +626,9 @@ void OgreAdaptor::UpdateCameras()
     if (dynamic_cast<UserCamera*>((*iter)) == NULL)
       (*iter)->Render();
   }
-  
-  this->root->_fireFrameEnded();
-*/  
+
   this->root->renderOneFrame();
+
   // Must update the user camera's last.
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {
@@ -638,7 +637,7 @@ void OgreAdaptor::UpdateCameras()
       userCam->Update();
   }
 
-
+  this->root->_fireFrameEnded();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

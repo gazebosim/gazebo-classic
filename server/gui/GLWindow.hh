@@ -46,7 +46,7 @@
 #include "SphereMaker.hh"
 #include "BoxMaker.hh"
 #include "CylinderMaker.hh"
-#include "HingeJointMaker.hh"
+#include "MouseEvent.hh"
 
 namespace gazebo
 {
@@ -156,33 +156,18 @@ namespace gazebo
     /// Pointer to the Xvisual
     private: XVisualInfo *visual;
 
-    /// colormap
-    private: Colormap colormap;
-
     /// pointer to the display
     private: Display *display;
 
     private: float moveAmount;
-    private: float moveScale;
-
-    private: float rotateAmount;
 
     private: Vector3 directionVec;
 
-    private: bool leftMousePressed;
-    private: bool rightMousePressed;
-    private: bool middleMousePressed;
-    private: Vector2<int> prevMousePos;
-    private: Vector2<int> mousePushPos;
-    private: Vector2<int> mousePos;
-    private: Vector2<int> mouseOriginPos; // for applying external forces
-    private: Vector3 forceVec; // for applying external forces
-    private: Vector3 torqueVec; // for applying external forces
+    private: MouseEvent mouseEvent;
+
     private: std::map<int,int> keys;
 
     private: Time lastUpdateTime;
-
-    private: bool mouseDrag;
 
     /// Pointer to the camera
     private: UserCamera *userCamera;
@@ -195,7 +180,6 @@ namespace gazebo
     private: BoxMaker boxMaker;
     private: SphereMaker sphereMaker;
     private: CylinderMaker cylinderMaker;
-    private: HingeJointMaker hingeJointMaker;
 
     private: std::string cursorState;
 

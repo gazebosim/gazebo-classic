@@ -29,6 +29,7 @@
 #include <Ogre.h>
 #include <dirent.h>
 
+#include "FPSViewController.hh"
 #include "PhysicsEngine.hh"
 #include "Global.hh"
 #include "World.hh"
@@ -94,8 +95,9 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->pitchNode = NULL;
   this->sceneNode = NULL;
   this->origParentNode = NULL;
-}
 
+  this->viewController = new FPSViewController(this);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -115,6 +117,7 @@ OgreCamera::~OgreCamera()
   delete this->imageFormatP;
   delete this->visMaskP;
   delete this->hfovP;
+  delete this->viewController;
 
   if (this->pitchNode)
   {
@@ -250,6 +253,7 @@ void OgreCamera::FiniCam()
 // Update the drawing
 void OgreCamera::UpdateCam()
 {
+  this->viewController->Update();
 
   if (this->animState)
   {
@@ -1000,4 +1004,9 @@ Vector3 OgreCamera::GetDirection() const
   return result;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+/// Hande a mouse event
+void OgreCamera::HandleMouseEvent(const MouseEvent &evt)
+{
+  this->viewController->HandleMouseEvent(evt);
+}

@@ -5,6 +5,8 @@
 
 namespace gazebo
 {
+  class MouseEvent;
+
   class BoxMaker
   {
     public: BoxMaker();
@@ -14,9 +16,9 @@ namespace gazebo
     public: void Stop();
     public: bool IsActive() const;
 
-    public: void MousePushCB(Vector2<int> mousePos);
-    public: void MouseReleaseCB(Vector2<int> mousePos);
-    public: void MouseDragCB(Vector2<int> mousePos);
+    public: void MousePushCB(const MouseEvent &event);
+    public: void MouseReleaseCB(const MouseEvent &event);
+    public: void MouseDragCB(const MouseEvent &event);
   
     private: void CreateTheBox();
     private: int state;

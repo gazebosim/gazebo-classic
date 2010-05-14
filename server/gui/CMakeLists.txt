@@ -21,7 +21,6 @@ set (sources Gui.cc
              BoxMaker.cc
              SphereMaker.cc
              CylinderMaker.cc
-             HingeJointMaker.cc
              Events.cc
 )
 
@@ -36,8 +35,8 @@ set (headers Gui.hh
              BoxMaker.hh
              SphereMaker.hh
              CylinderMaker.hh
-             HingeJointMaker.hh
              Events.hh
+             MouseEvent.hh
 )
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")

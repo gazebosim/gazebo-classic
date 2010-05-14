@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "GLWindow.hh"
 #include "OgreVisual.hh"
@@ -14,7 +15,6 @@ SphereMaker::SphereMaker()
 {
   this->state = 0;
   this->visualName = "";
-  this->leftMousePressed = false;
   this->index = 0;
 }
 
@@ -52,24 +52,15 @@ bool SphereMaker::IsActive() const
   return this->state > 0;
 }
 
-void SphereMaker::MousePushCB(Vector2<int> mousePos)
+void SphereMaker::MousePushCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
 
-  this->leftMousePressed = false;
-
-  this->mousePushPos = mousePos;
-
-  switch (Fl::event_button())
-  {
-    case FL_LEFT_MOUSE:
-      this->leftMousePressed = true;
-      break;
-  }
+  this->mousePushPos = event.pressPos;
 }
 
-void SphereMaker::MouseReleaseCB(Vector2<int> mousePos)
+void SphereMaker::MouseReleaseCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -83,7 +74,7 @@ void SphereMaker::MouseReleaseCB(Vector2<int> mousePos)
   }
 }
 
-void SphereMaker::MouseDragCB(Vector2<int> mousePos)
+void SphereMaker::MouseDragCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -94,7 +85,7 @@ void SphereMaker::MouseDragCB(Vector2<int> mousePos)
   norm.Set(0,0,1);
 
   p1 = GLWindow::GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
-  p2 = GLWindow::GetWorldPointOnPlane(mousePos.x, mousePos.y ,norm, 0);
+  p2 = GLWindow::GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
 
   OgreVisual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))

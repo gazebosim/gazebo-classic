@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "GLWindow.hh"
 #include "OgreVisual.hh"
@@ -16,7 +17,6 @@ BoxMaker::BoxMaker()
 {
   this->state = 0;
   this->visualName = "";
-  this->leftMousePressed = false;
   this->index = 0;
 }
 
@@ -54,24 +54,15 @@ bool BoxMaker::IsActive() const
   return this->state > 0;
 }
 
-void BoxMaker::MousePushCB(Vector2<int> mousePos)
+void BoxMaker::MousePushCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
 
-  this->leftMousePressed = false;
-
-  this->mousePushPos = mousePos;
-
-  switch (Fl::event_button())
-  {
-    case FL_LEFT_MOUSE:
-      this->leftMousePressed = true;
-      break;
-  }
+  this->mousePushPos = event.pressPos;
 }
 
-void BoxMaker::MouseReleaseCB(Vector2<int> mousePos)
+void BoxMaker::MouseReleaseCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -85,23 +76,16 @@ void BoxMaker::MouseReleaseCB(Vector2<int> mousePos)
   }
 }
 
-void BoxMaker::MouseDragCB(Vector2<int> mousePos)
+void BoxMaker::MouseDragCB(const MouseEvent &event)
 {
   if (this->state == 0)
     return;
 
-  Vector3 norm;
+  Vector3 norm(0,0,1);
   Vector3 p1, p2;
 
-  //if (this->state == 1)
-    norm.Set(0,0,1);
-  /*else if (this->state == 2)
-  {
-    norm = CameraManager::Instance()->GetActiveCamera()->GetDirection();
-  }*/
-
   p1 = GLWindow::GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
-  p2 = GLWindow::GetWorldPointOnPlane(mousePos.x, mousePos.y ,norm, 0);
+  p2 = GLWindow::GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
 
   OgreVisual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))
@@ -125,7 +109,7 @@ void BoxMaker::MouseDragCB(Vector2<int> mousePos)
   else
   {
     scale = vis->GetScale();
-    scale.z = (this->mousePushPos.y - mousePos.y)*0.01;
+    scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
