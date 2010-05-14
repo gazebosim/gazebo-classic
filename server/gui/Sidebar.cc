@@ -289,8 +289,12 @@ void Sidebar::ParamInputCB( Fl_Widget *w, void *data)
   Fl_Input *input = (Fl_Input*)(w);
 
   std::string value = input->value();
-  double dblValue = boost::lexical_cast<double>(value);
-  Gui::forceMultiplier = dblValue;
+
+  if (value.size() > 0)
+  {
+    double dblValue = boost::lexical_cast<double>(value);
+    Gui::forceMultiplier = dblValue;
+  }
 
   /*Fl_Input *input = (Fl_Input*)(w);
   Sidebar *toolbar = (Sidebar*)(data);
