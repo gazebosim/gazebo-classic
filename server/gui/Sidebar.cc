@@ -28,6 +28,7 @@
 #include <FL/Fl_Value_Output.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Float_Input.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Value_Slider.H>
@@ -79,10 +80,10 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
   this->paramBrowser->color(FL_WHITE);
 
   y = this->paramBrowser->y() + this->paramBrowser->h() + 20;
-  this->paramInput = new Fl_Input(x+10, y, w-20, 20, "Param:");
+  this->paramInput = new Fl_Float_Input(x+10, y, w-20, 20, "Param:");
   this->paramInput->align(FL_ALIGN_TOP);
   this->paramInput->labelsize(12);
-  this->paramInput->when( FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
+  this->paramInput->when(FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE | FL_WHEN_CHANGED);
   this->paramInput->callback(&Sidebar::ParamInputCB, this);
   this->paramInput->color(FL_WHITE);
   this->paramInput->value("1.0");
@@ -96,8 +97,12 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
 
   World::Instance()->ConnectAddEntitySignal( 
       boost::bind(&Sidebar::AddEntityToBrowser, this, _1) );
+
   World::Instance()->ConnectEntitySelectedSignal( 
       boost::bind(&Sidebar::SetSelectedEntity, this, _1) );
+
+  World::Instance()->ConnectDeleteEntitySignal( 
+      boost::bind(&Sidebar::DeleteEntityFromBrowser, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,16 +127,23 @@ void Sidebar::SetSelectedEntity(Entity *entity)
 {
   this->paramCount = 0;
 
+  Model *model = NULL;
 
-  if (entity && entity->GetType() == Entity::MODEL)
+  if (entity && entity->GetType() == Entity::BODY)
+    model = (Model*)(entity->GetParent());
+  else if (entity && entity->GetType() == Entity::MODEL)
   {
     this->paramBrowser->deselect();
-    Model *model = (Model*)(entity);
+    model = (Model*)(entity);
+  }
 
+  if (model)
+  {
+    this->paramBrowser->clear();
     for (int i=1; i <= this->entityBrowser->size(); i++)
     {
       std::string lineText = this->entityBrowser->text(i);
-      if (lineText == entity->GetCompleteScopedName())
+      if (lineText == model->GetCompleteScopedName())
         this->entityBrowser->value(i);
     }
 
@@ -152,6 +164,10 @@ void Sidebar::SetSelectedEntity(Entity *entity)
 
       value = "@b@B52@s-Body:~@b@B52@s" + body->GetName();
       this->AddToParamBrowser(value);
+
+      if (body->GetName() == entity->GetName())
+        this->paramBrowser->value(this->paramBrowser->size());
+
       this->AddEntityToParamBrowser( body, "  " );
 
       geoms = body->GetGeoms();
@@ -182,13 +198,16 @@ void Sidebar::SetSelectedEntity(Entity *entity)
 
     this->paramInput->hide();
   }
-  else if (entity && entity->GetType() == Entity::BODY)
+
+  if (entity && entity->GetType() == Entity::BODY)
   {
     this->paramInput->show();
     this->paramInput->value(boost::lexical_cast<std::string>(Gui::forceMultiplier).c_str());
     this->paramInput->label("Force Multiplier:");
   }
-  else if (!entity)
+
+
+  if (!entity)
   {
     this->entityBrowser->deselect();
     this->paramBrowser->deselect();
@@ -414,8 +433,19 @@ void Sidebar::UpdateEntityBrowser()
   std::vector<Model*>::const_iterator iter;
   const std::vector<Model*> models = World::Instance()->GetModels();
 
+  this->entityBrowser->clear();
   for (iter = models.begin(); iter != models.end(); iter++)
+  {
+    std::vector<Entity*>::const_iterator eiter;
+    for (eiter = (*iter)->GetChildren().begin(); 
+         eiter != (*iter)->GetChildren().end(); eiter++)
+    {
+      if ((*eiter)->GetType() == Entity::MODEL)
+        this->AddEntityToBrowser((Model*)*eiter);
+    }
+
     this->AddEntityToBrowser((*iter));
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -423,6 +453,13 @@ void Sidebar::UpdateEntityBrowser()
 void Sidebar::AddEntityToBrowser(const Entity *entity)
 {
   this->entityBrowser->add( entity->GetCompleteScopedName().c_str() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Delete entity from browser
+void Sidebar::DeleteEntityFromBrowser(const std::string &name)
+{
+  this->UpdateEntityBrowser();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

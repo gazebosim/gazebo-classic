@@ -99,20 +99,17 @@ Model::Model(Model *parent)
 // Destructor
 Model::~Model()
 {
-  std::vector<Entity*>::iterator eiter;
+  /*std::vector<Entity*>::iterator eiter;
   for (eiter =this->children.begin(); eiter != this->children.end();)
     if (*eiter && (*eiter)->GetType() == Entity::BODY)
     {
-      //printf("~Model:deleting %s\n", (*eiter)->GetName().c_str());
       delete (*eiter);
       *eiter = NULL;
       this->children.erase(eiter); // effectively remove child
     }
     else
-    {
-      //printf("~Model:del not body %s\n", (*eiter)->GetName().c_str());
       eiter++;
-    }
+      */
 
   JointContainer::iterator jiter;
   std::map< std::string, Controller* >::iterator citer;
@@ -155,7 +152,6 @@ Model::~Model()
     delete this->myBodyNameP;
     this->myBodyNameP = NULL;
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -516,9 +512,12 @@ void Model::RemoveChild(Entity *child)
         if (!(*jiter))
           continue;
 
-        if ((*jiter)->GetJointBody(0)->GetName() == child->GetName() ||
-            (*jiter)->GetJointBody(1)->GetName() == child->GetName() ||
-            (*jiter)->GetJointBody(0)->GetName() == (*jiter)->GetJointBody(1)->GetName())
+        Body *jbody0 = (*jiter)->GetJointBody(0);
+        Body *jbody1 = (*jiter)->GetJointBody(1);
+
+        if (!jbody0 || !jbody1 || jbody0->GetName() == child->GetName() ||
+            jbody1->GetName() == child->GetName() ||
+            jbody0->GetName() == jbody1->GetName())
         {
           Joint *joint = *jiter;
           this->joints.erase( jiter );

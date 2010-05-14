@@ -112,6 +112,12 @@ namespace gazebo
     public: static Vector3 GetWorldPointOnPlane(int x, int y, 
                 Vector3 planeNorm, double d);
 
+    /// \brief Get the cursor state
+    public: std::string GetCursorState() const;
+
+    /// \brief Set the state of the cursor
+    public: void SetCursorState(const std::string &state);
+
     /// \brief Handle a mouse button push
     private: void HandleMousePush();
 
@@ -130,6 +136,8 @@ namespace gazebo
     /// \brief Handle mouse wheel movement
     private: void HandleMouseWheel(int dx, int dy);
 
+    private: void ManipModeCB(bool mode);
+    private: void MoveModeCB(bool mode);
 
     /// \brief Clear selections
     private: void ClearSelections();
@@ -188,6 +196,8 @@ namespace gazebo
     private: SphereMaker sphereMaker;
     private: CylinderMaker cylinderMaker;
     private: HingeJointMaker hingeJointMaker;
+
+    private: std::string cursorState;
 
     /// gui interface, prerequisite to selecting Model / Body
     ///   press control+left click Model to toggle select.  Left mouse button drag updates model rotation about camera view axis, right mouse button drag udpates model position in camera view plane.

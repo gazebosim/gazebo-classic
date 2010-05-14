@@ -70,6 +70,13 @@ namespace gazebo
     /// \brief Cursor button callback
     public: static void CursorButtonCB( Fl_Widget *w, void * /*data*/ );
 
+    /// \brief Cursor button callback
+    public: static void HandCursorButtonCB( Fl_Widget *w, void * /*data*/ );
+
+    private: void ManipModeCB(bool mode);
+    private: void MoveModeCB(bool mode);
+
+
 
     private: class ToolbarButton : public Fl_Button
           {
@@ -109,6 +116,7 @@ namespace gazebo
     private: ToolbarButton *sphereButton;
     private: ToolbarButton *cylinderButton;
     private: ToolbarButton *cursorButton;
+    private: ToolbarButton *handCursorButton;
 
     private: Fl_RGB_Image *playImage[2];
     private: Fl_RGB_Image *pauseImage[2];
@@ -116,7 +124,7 @@ namespace gazebo
     private: Fl_RGB_Image *boxImage[2];
     private: Fl_RGB_Image *sphereImage[2];
     private: Fl_RGB_Image *cylinderImage[2];
-    private: Fl_RGB_Image *cursorImage;
+    private: Fl_RGB_Image *cursorImage, *handCursorImage;
 
     public: Gui *gui;
   };

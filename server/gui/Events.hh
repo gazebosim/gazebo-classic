@@ -16,7 +16,29 @@ namespace gazebo
             static void DisconnectCreateEntitySignal( T subscriber)
             { createEntitySignal.disconnect(subscriber); }
 
+    /// \brief Connect a boost::slot the the move mode signal
+    public: template<typename T>
+            static boost::signals::connection ConnectMoveModeSignal( T subscriber )
+            { return moveModeSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectMoveModeSignal( T subscriber)
+            { moveModeSignal.disconnect(subscriber); }
+
+    /// \brief Connect a boost::slot the the manip mode signal
+    public: template<typename T>
+            static boost::signals::connection ConnectManipModeSignal( T subscriber )
+            { return manipModeSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectManipModeSignal( T subscriber)
+            { manipModeSignal.disconnect(subscriber); }
+
+
+
     public: static boost::signal<void (std::string)> createEntitySignal;
+    public: static boost::signal<void (bool)>  moveModeSignal;
+    public: static boost::signal<void (bool)>  manipModeSignal;
   };
 
 }

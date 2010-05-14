@@ -36,6 +36,7 @@ class Fl_Input;
 class Fl_Button;
 class Fl_Choice;
 class Fl_Value_Slider;
+class Fl_Float_Input;
 
 namespace gazebo
 {
@@ -58,6 +59,9 @@ namespace gazebo
 
     /// \brief Add an entity to the browser
     public: void AddEntityToBrowser(const Entity *model);
+
+    /// \brief Delete entity from browser
+    public: void DeleteEntityFromBrowser(const std::string &name);
 
     /// \brief Callback for the parameter browser
     public: static void ParamBrowserCB( Fl_Widget * w, void *data);
@@ -94,7 +98,7 @@ namespace gazebo
     private: Fl_Value_Slider *jointVelocitySlider;
 
     private: Fl_Hold_Browser *paramBrowser;
-    private: Fl_Input *paramInput;
+    private: Fl_Float_Input *paramInput;
     private: std::string paramInputLbl;
 
     private: int paramColumnWidths[3];

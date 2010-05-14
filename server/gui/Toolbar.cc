@@ -29,6 +29,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Bitmap.H>
 #include <FL/Fl_Image.H>
+#include <FL/fl_draw.H>
 
 #include "Events.hh"
 #include "Image.hh"
@@ -123,6 +124,13 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->cursorImage = new Fl_RGB_Image(data, image.GetWidth(), 
                                         image.GetHeight(), 4);
 
+  data = NULL;
+  image.Load("hand_cursor.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  this->handCursorImage = new Fl_RGB_Image(data, image.GetWidth(), 
+                                        image.GetHeight(), 4);
+
 
   y += 4;
   x += 5;
@@ -152,16 +160,27 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->stepButton->deactivate();
   this->stepButton->clear_visible_focus();
 
-
   y = this->y();
   x = this->stepButton->x() + this->stepButton->w() + 10;
+  Fl_Box *box = new Fl_Box(x,y+4,3,22);
+  box->box(FL_DOWN_BOX);
+
+  x += 13;
   this->cursorButton = new ToolbarButton(x, y, 30, 30);
   this->cursorButton->callback( &gazebo::Toolbar::CursorButtonCB, this );
   this->cursorButton->image(this->cursorImage);
   this->cursorButton->set();
   this->cursorButton->clear_visible_focus();
 
+
+  y = this->y();
   x = this->cursorButton->x() + this->cursorButton->w() + 10;
+  this->handCursorButton = new ToolbarButton(x, y, 30, 30);
+  this->handCursorButton->callback(&gazebo::Toolbar::HandCursorButtonCB, this);
+  this->handCursorButton->image(this->handCursorImage);
+  this->handCursorButton->clear_visible_focus();
+
+  x = this->handCursorButton->x() + this->handCursorButton->w() + 10;
   this->boxButton = new ToolbarButton(x, y, 30, 30);
   this->boxButton->callback( &gazebo::Toolbar::BoxButtonCB, this );
   this->boxButton->image(this->boxImage[0]);
@@ -181,6 +200,9 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
 
   this->end();
   this->resizable(NULL);
+
+  Events::ConnectMoveModeSignal( boost::bind(&Toolbar::MoveModeCB, this, _1) );
+  Events::ConnectManipModeSignal( boost::bind(&Toolbar::ManipModeCB, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -297,4 +319,26 @@ void Toolbar::CylinderButtonCB( Fl_Widget *w, void * /*data*/ )
 void Toolbar::CursorButtonCB( Fl_Widget *w, void * /*data*/ )
 {
   Events::createEntitySignal("");
+  Events::moveModeSignal(true);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Cursor button callback
+void Toolbar::HandCursorButtonCB( Fl_Widget *w, void * /*data*/ )
+{
+  Events::createEntitySignal("");
+  Events::manipModeSignal(true);
+}
+
+void Toolbar::MoveModeCB(bool mode)
+{
+  if (this->handCursorButton->value() == 1)
+  {
+    this->handCursorButton->value(0);
+    this->cursorButton->set();
+  }
+}
+
+void Toolbar::ManipModeCB(bool mode)
+{
 }

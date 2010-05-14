@@ -710,6 +710,7 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std:
     }
   }
 
+  mod = "";
   if (closestEntity)
   {
     if (closestEntity->getUserAny().getType() == typeid(std::string))

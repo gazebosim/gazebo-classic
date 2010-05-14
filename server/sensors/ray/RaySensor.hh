@@ -131,25 +131,7 @@ namespace gazebo
     /// \brief Get detected fiducial value for a ray.
     public: int GetFiducial(int index);   
   
-    /*private: ParamT<Angle> *minAngleP, *maxAngleP;
-    private: ParamT<double> *minRangeP, *maxRangeP, *resRangeP;
-    private: ParamT<Vector3> *originP;
-    */
-  
     private: Pose3d prevPose;
-    /*private: ParamT<int> *rayCountP;
-    private: ParamT<int> *rangeCountP;
-    
-    /// Display rays when rendering images
-    private: ParamT<std::string> *displayRaysP;
-  
-    // For ray blocks such as Velodyne
-    private: ParamT<int> *verticalRayCountP;
-    private: ParamT<int> *verticalRangeCountP;
-    private: ParamT<Angle> *verticalMinAngleP;
-    private: ParamT<Angle> *verticalMaxAngleP;
-    */
-
     private: Geom *laserGeom;
     private: MultiRayShape *laserShape;
   };

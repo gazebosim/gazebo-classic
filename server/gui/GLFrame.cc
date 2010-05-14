@@ -62,6 +62,7 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->viewChoice->add("User", "", &gazebo::GLFrame::ViewCB, this);
   this->viewChoice->value(0);
   this->viewChoice->color(BG_COLOR);
+  this->viewChoice->clear_visible_focus();
 
 
   this->splitChoice = new Fl_Choice(
@@ -74,6 +75,7 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->splitChoice->add("Vertical","",  &gazebo::GLFrame::SplitCB, this);
   this->splitChoice->value(0);
   this->splitChoice->color(BG_COLOR);
+  this->splitChoice->clear_visible_focus();
 
   this->trackChoice = new Fl_Choice(
       this->splitChoice->x() + this->splitChoice->w()+2, 
@@ -83,6 +85,7 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   this->trackChoice->add("None","", &gazebo::GLFrame::TrackCB, this);
   this->trackChoice->value(0);
   this->trackChoice->color(BG_COLOR);
+  this->trackChoice->clear_visible_focus();
 
   std::vector<Model*> models = World::Instance()->GetModels();
   std::vector<Model*>::iterator iter;
@@ -268,6 +271,8 @@ void GLFrame::SplitCB(Fl_Widget *widget, void *data)
   }
 
   choice->value(0);
+
+  frame->glWindow->take_focus();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -278,6 +283,7 @@ void GLFrame::ViewCB(Fl_Widget *widget, void *data)
   Fl_Choice *choice = dynamic_cast<Fl_Choice *>(widget);
 
   frame->glWindow->SetViewStyle(choice->text());
+  frame->glWindow->take_focus();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

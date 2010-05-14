@@ -216,8 +216,18 @@ int Gui::handle(int event)
 {
   switch(event)
   {
+    case FL_KEYUP:
+      {
+        if (Fl::event_key() == ' ')
+        {
+          printf("Gui Pause\n");
+          Simulator::Instance()->SetPaused(!Simulator::Instance()->IsPaused() );
+          return 1;
+        }
+      }
+
     case FL_SHORTCUT:
-      if ( (Fl::event_state()  | FL_CTRL) && Fl::event_key() == 113)
+      if ( (Fl::event_state() & FL_CTRL) && Fl::event_key() == 113)
         Simulator::Instance()->SetUserQuit();
       break;
     case FL_FOCUS:

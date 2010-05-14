@@ -269,10 +269,17 @@ class World : public SingletonT<World>
   public: template<typename T>
           boost::signals::connection ConnectAddEntitySignal( T subscriber )
           { return addEntitySignal.connect(subscriber); }
-
   public: template<typename T>
           void DisconnectAddEntitySignal( T subscriber)
           { addEntitySignal.disconnect(subscriber); }
+
+  /// \brief Connect a boost::slot the delete entity signal
+  public: template<typename T>
+          boost::signals::connection ConnectDeleteEntitySignal( T subscriber )
+          { return deleteEntitySignal.connect(subscriber); }
+  public: template<typename T>
+          void DisconnectDeleteEntitySignal( T subscriber)
+          { deleteEntitySignal.disconnect(subscriber); }
 
   /// \brief Connect a boost::slot the the show light source signal
   public: template<typename T>
@@ -407,6 +414,7 @@ class World : public SingletonT<World>
 
 
   private: boost::signal<void (Entity*)> addEntitySignal;
+  private: boost::signal<void (std::string)> deleteEntitySignal;
   private: boost::signal<void (bool)> showLightsSignal;
   private: boost::signal<void (bool)> showCamerasSignal;
   private: boost::signal<void (bool)> showContactsSignal;

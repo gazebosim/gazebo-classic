@@ -54,6 +54,8 @@ RaySensor::RaySensor(Body *body)
 // Destructor
 RaySensor::~RaySensor()
 {
+  if (this->laserGeom)
+    delete this->laserGeom;
 }
 
 //////////////////////////////////////////////////////////////////////////////

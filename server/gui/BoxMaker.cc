@@ -42,6 +42,10 @@ void BoxMaker::Start()
 
 void BoxMaker::Stop()
 {
+  OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
+  if (vis)
+    OgreCreator::Instance()->DeleteVisual(this->visualName);
+
   this->state = 0;
 }
 
@@ -137,12 +141,9 @@ void BoxMaker::CreateTheBox()
 
   std::ostringstream newModelStr;
 
-
   OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
-  if (vis == NULL)
-  {
+  if (!vis)
     return;
-  }
 
   newModelStr << "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >";
 

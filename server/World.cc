@@ -523,26 +523,32 @@ void World::ProcessEntitiesToDelete()
     // maybe try try_lock here instead
     boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
 
-
     // Remove and delete all models that are marked for deletion
     std::vector< std::string>::iterator miter;
     for (miter=this->toDeleteEntities.begin();
         miter!=this->toDeleteEntities.end(); miter++)
     {
       Entity *entity = this->GetEntityByName(*miter);
+
       if (entity)
       {
         if (entity->GetType() == Entity::MODEL)
         {
           Model *model = (Model*)entity;
+
           model->Fini();
-          this->models.erase( std::find(this->models.begin(), 
-                this->models.end(), model) );
+
+          std::vector<Model*>::iterator newiter;
+          newiter = std::find(this->models.begin(), this->models.end(), model);
+
+          if (newiter != this->models.end())
+            this->models.erase( newiter );
         }
         else if (entity->GetType() == Entity::BODY)
           ((Body*)entity)->Fini();
 
         delete (entity);
+        this->deleteEntitySignal(*miter);
       }
     }
 

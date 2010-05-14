@@ -88,6 +88,10 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
     activeWin = this;
 
   Events::ConnectCreateEntitySignal( boost::bind(&GLWindow::CreateEntity, this, _1) );
+  Events::ConnectMoveModeSignal( boost::bind(&GLWindow::MoveModeCB, this, _1) );
+  Events::ConnectManipModeSignal( boost::bind(&GLWindow::ManipModeCB, this, _1) );
+
+  this->cursorState = "default";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,20 +173,8 @@ void GLWindow::Update()
     this->directionVec.Set(0,0,0);
   }
 
+
   this->lastUpdateTime = Simulator::Instance()->GetRealTime();
-
-  // continuously apply force to selected body
-  Entity *entity = World::Instance()->GetSelectedEntity(); 
-
-  if (entity && entity->GetType() == Entity::BODY &&
-      (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
-  {
-    Body *body = (Body*)(entity);
-    if (this->rightMousePressed && body)
-    {
-      body->SetForce(this->forceVec);
-    }
-  }
 }
 
 
@@ -211,10 +203,6 @@ unsigned int GLWindow::GetTriangleCount() const
 /// Handle a mouse button push
 void GLWindow::HandleMousePush()
 {
-  // reset applied forces to 0
-  this->forceVec = 0;
-  this->torqueVec = 0;
-
   this->mousePushPos = this->mousePos;
 
   this->boxMaker.MousePushCB(this->mousePos);
@@ -237,12 +225,10 @@ void GLWindow::HandleMousePush()
   {
     case FL_LEFT_MOUSE:
       this->leftMousePressed = true;
-      //this->torqueVec = Vector3(0,0,0); // not necessary
       break;
 
     case FL_RIGHT_MOUSE:
       this->rightMousePressed = true;
-      //this->forceVec = Vector3(0,0,0); // not necessary
       break;
 
     case FL_MIDDLE_MOUSE:
@@ -255,6 +241,7 @@ void GLWindow::HandleMousePush()
 /// Handle a mouse button release
 void GLWindow::HandleMouseRelease()
 {
+
   OgreCreator::SetVisible("guiline", false);
 
   this->boxMaker.MouseReleaseCB(this->mousePos);
@@ -282,18 +269,13 @@ void GLWindow::HandleMouseRelease()
       break;
   }
 
-  if (!this->mouseDrag && 
-      (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
+  if (!this->mouseDrag && this->GetCursorState() == "manip")
   {
     Entity *entity = OgreAdaptor::Instance()->GetEntityAt(this->activeCamera, 
                                          this->mousePos, this->mouseModifier);
 
     Model *model = Simulator::Instance()->GetParentModel(entity);
     Body *body = Simulator::Instance()->GetParentBody(entity);
-
-    // reset applied forces to 0
-    this->forceVec = 0;
-    this->torqueVec = 0;
 
     switch (Fl::event_button())
     {
@@ -323,6 +305,7 @@ void GLWindow::HandleMouseDrag()
 {
   // stop simulation when this is happening
   boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+
   this->mouseDrag = true;
 
   this->boxMaker.MouseDragCB(this->mousePos);
@@ -337,28 +320,20 @@ void GLWindow::HandleMouseDrag()
   {
     Vector2<int> drag = this->mousePos - this->prevMousePos;
 
-    double vpw        = this->activeCamera->GetViewportWidth();
-    double vph        = this->activeCamera->GetViewportHeight();
-    Vector3 camUp     = this->activeCamera->GetUp();
-    Vector3 camRight  = this->activeCamera->GetRight();
-
     Entity *entity = World::Instance()->GetSelectedEntity();
 
     if (this->leftMousePressed)
     {
-
       if ( entity && (entity->GetType() == Entity::MODEL || 
            entity->GetType() == Entity::BODY) && 
-           (this->keys[FL_Control_L] || this->keys[FL_Control_R])  )
+          this->GetCursorState() == "manip" )
       {
-        if ((entity->GetType() == Entity::MODEL || 
-             entity->GetType() == Entity::BODY) && 
-            this->mouseModifier.substr(0,3) == "rot")
+        if (this->mouseModifier.substr(0,3) == "rot")
           this->EntityRotate(entity);
         else if (this->mouseModifier.substr(0,5) == "trans")
           this->EntityTranslate(entity);
       }
-      else
+      else if(this->GetCursorState() == "default")
       {
         //
         // interactively rotate view
@@ -367,127 +342,22 @@ void GLWindow::HandleMouseDrag()
         this->activeCamera->RotatePitch(DTOR(-drag.y * this->rotateAmount));
       }
     }
-    else if (this->rightMousePressed)
+    else if (this->rightMousePressed && this->GetCursorState() == "default")
     {
-      if ( entity && (entity->GetType() == Entity::MODEL || entity->GetType() == Entity::BODY) && 
-           (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
-      {
-        if (entity->GetType() == Entity::MODEL)
-        {
-          Model *model = (Model*)(entity);
-          double distance, scaleX, scaleY;
-          Pose3d modelPose;
-          Vector3 moveVector;
-
-          //
-          // interactively set pose to selected model
-          //
-          modelPose = model->GetAbsPose();
-          distance = (modelPose.pos - 
-              this->activeCamera->GetCameraPosition()).GetLength();
-          scaleX = distance * 
-            tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          scaleY = distance * 
-            tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          moveVector = (camRight*drag.x/vpw*scaleX - camUp*drag.y/vph*scaleY);
-          // std::cout << " vpw " << vpw
-          //           << " vph " << vph
-          //           << " distance " << distance
-          //           << " scaleX " << scaleX
-          //           << " scaleY " << scaleY
-          //           << std::endl;
-
-          modelPose.pos += moveVector;
-          model->SetAbsPose(modelPose);
-          //std::cout << "set pose (" << modelPose << ") to model (" 
-          //          << model->GetName() << ")" << std::endl;
-        }
-
-        if (entity->GetType() == Entity::BODY)
-        {
-          double distance, scaleX, scaleY, forceScale;
-          Pose3d bodyPose;
-          Vector3 moveVector;
-          Body *body = (Body*)(entity);
-
-          //
-          // interactively set force to selected body
-          //
-          bodyPose = body->GetAbsPose();
-          distance = (bodyPose.pos - 
-              this->activeCamera->GetCameraPosition()).GetLength();
-          scaleX = distance * 
-            tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          scaleY = distance * 
-            tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
-          moveVector = (camRight*drag.x/vpw*scaleX - camUp*drag.y/vph*scaleY);
-          // std::cout << " vpw " << vpw
-          //           << " vph " << vph
-          //           << " distance " << distance
-          //           << " scaleX " << scaleX
-          //           << " scaleY " << scaleY
-          //           << std::endl;
-
-          forceScale = 10000.0;
-          this->forceVec = moveVector*forceScale;
-          //std::cout << "set body force to" << this->forceVec 
-          //          << " to body " << body->GetName() << std::endl;
-        }
-      }
-      else
-      {
-        //
-        // interactively pan view
-        //
-        this->directionVec.x = 0;
-        this->directionVec.y =  drag.x * this->moveAmount;
-        this->directionVec.z =  drag.y * this->moveAmount;
-      }
+      //
+      // interactively pan view
+      //
+      this->directionVec.x = 0;
+      this->directionVec.y =  drag.x * this->moveAmount;
+      this->directionVec.z =  drag.y * this->moveAmount;
     }
-    else if (this->middleMousePressed)
+    else if (this->middleMousePressed && this->GetCursorState() == "default")
     {
-      if (entity && entity->GetType() == Entity::BODY && 
-          (this->keys[FL_Control_L] || this->keys[FL_Control_R]))
-      {
-        double distance, scaleX, scaleY;
-        Vector3 moveVector;
-        Pose3d bodyPose;
-
-        Body *body = (Body*)(entity);
-
-        //
-        // interactively set pose to selected body
-        //
-        bodyPose = body->GetAbsPose();
-
-        //Vector2<double> ddrag((double)drag.x,(double)drag.y);
-        //if (drag.x*drag.x + drag.y*drag.y > 0)
-        //  ddrag.Normalize();
-        //Vector3 dragVector     = (camRight*ddrag.x - camUp*ddrag.y);
-        //bodyPose.pos += dragVector*0.05;
-
-        distance = (bodyPose.pos - 
-            this->activeCamera->GetCameraPosition()).GetLength();
-        scaleX = distance * 
-          tan (this->activeCamera->GetHFOV().GetAsRadian() / 2.0f ) * 2.0f;
-        scaleY = distance * 
-          tan (this->activeCamera->GetVFOV().GetAsRadian() / 2.0f ) * 2.0f;
-        moveVector = (camRight*drag.x/vpw*scaleX - camUp*drag.y/vph*scaleY);
-
-        bodyPose.pos += moveVector;
-        body->SetAbsPose(bodyPose);
-        //std::cout << "set pose (" << bodyPose << ") to Body (" 
-        //          << body->GetName() << ")" << std::endl;
-      }
-      else
-      {
-        this->directionVec.x =  drag.y * this->moveAmount;
-        this->directionVec.y =  0;
-        this->directionVec.z =  0;
-      }
+      this->directionVec.x =  drag.y * this->moveAmount;
+      this->directionVec.y =  0;
+      this->directionVec.z =  0;
     }
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -497,40 +367,13 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
   // stop simulation when this is happening
   boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
 
-  Entity *entity = World::Instance()->GetSelectedEntity();
-
-  if ( entity && (entity->GetType() == Entity::MODEL || entity->GetType() == Entity::BODY) && 
-      (this->keys[FL_Control_L] || this->keys[FL_Control_R]) )
-  {
-    // FIXME: old
-    if (entity->GetType() == Entity::MODEL)
-    {
-      Model *model = (Model*)(entity);
-
-      Pose3d pose = model->GetAbsPose();
-      pose.pos.z += dy * 0.05;
-      model->SetAbsPose(pose);
-      //std::cout << "set pose z(" << pose.pos.z << ") to model (" 
-      //          << model->GetName() << ")" << std::endl;
-    }
-    // FIXME: old
-    if (entity->GetType() == Entity::BODY)
-    {
-      Body *body = (Body*)(entity);
-      Pose3d pose = body->GetAbsPose();
-      pose.pos.z += dy * 0.05;
-      body->SetAbsPose(pose);
-      //std::cout << "set pose z(" << pose.pos.z << ") to body (" 
-      //          << body->GetName() << ")" << std::endl;
-    }
-  }
-  else if (this->activeCamera && this->activeCamera->GetUserMovable())
+  if (this->activeCamera && this->activeCamera->GetUserMovable() &&
+      this->GetCursorState() == "default")
   {
     this->directionVec.x -=  50.0 * dy * this->moveAmount;
     this->directionVec.y =  0;
     this->directionVec.z =  0;
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -546,6 +389,7 @@ void GLWindow::HandleKeyPress(int keyNum)
 
   // loop through the keys to find the modifiers -- swh
   float moveAmount = this->moveAmount;
+
   for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
   {
     if (iter->second == 1)
@@ -554,23 +398,11 @@ void GLWindow::HandleKeyPress(int keyNum)
       {
         case FL_Control_L:
         case FL_Control_R:
+          Events::manipModeSignal(true);
           moveAmount = this->moveAmount * 10;
           break;
         case FL_CTRL+'q':
           Simulator::Instance()->SetUserQuit();
-          break;
-      }
-    }
-  }
-
-  for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
-  {
-    if (iter->second == 1)
-    {
-      switch (iter->first)
-      {
-        case ' ':
-          Simulator::Instance()->SetPaused(!Simulator::Instance()->IsPaused() );
           break;
 
         case '=':
@@ -581,25 +413,6 @@ void GLWindow::HandleKeyPress(int keyNum)
         case '-':
         case '_':
           this->moveAmount *= 0.5;
-          break;
-
-        case XK_j:
-          this->forceVec.z -= 100*this->moveAmount;
-          break;
-        case XK_k:
-          this->forceVec.z += 100*this->moveAmount;
-          break;
-        case XK_h:
-          this->forceVec.y -= 100*this->moveAmount;
-          break;
-        case XK_l:
-          this->forceVec.y += 100*this->moveAmount;
-          break;
-        case XK_x:
-          this->forceVec.x += 100*this->moveAmount;
-          break;
-        case XK_z:
-          this->forceVec.x -= 100*this->moveAmount;
           break;
 
         case XK_Up:
@@ -638,6 +451,8 @@ void GLWindow::HandleKeyPress(int keyNum)
   }
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a key release
 void GLWindow::HandleKeyRelease(int keyNum)
@@ -647,6 +462,15 @@ void GLWindow::HandleKeyRelease(int keyNum)
   // Handle all toggle keys
   switch (keyNum)
   {
+    case FL_Control_L:
+    case FL_Control_R:
+      Events::moveModeSignal(true);
+      break;
+
+    case ' ':
+      Simulator::Instance()->SetPaused(!Simulator::Instance()->IsPaused() );
+      break;
+
     case FL_Escape:
       Simulator::Instance()->SetUserQuit();
       break;
@@ -657,6 +481,15 @@ void GLWindow::HandleKeyRelease(int keyNum)
 
     case ']':
       CameraManager::Instance()->DecActiveCamera();
+      break;
+
+    case FL_Delete:
+      Entity *entity = World::Instance()->GetSelectedEntity();
+      if (entity)
+      {
+        World::Instance()->SetSelectedEntity(NULL);
+        World::Instance()->DeleteEntity(entity->GetCompleteScopedName());
+      }
       break;
   }
 }
@@ -700,7 +533,8 @@ int GLWindow::handle(int event)
       break;
 
     case FL_DRAG:
-      this->HandleMouseDrag();
+      if (this->prevMousePos.Distance(this->mousePos) > 0)
+        this->HandleMouseDrag();
       handled = true;
       break;
 
@@ -708,7 +542,7 @@ int GLWindow::handle(int event)
     case FL_KEYDOWN:
       if (Fl::event_key() == FL_Escape)
         World::Instance()->SetSelectedEntity(NULL);
-      else if ((Fl::event_state() | FL_CTRL) && Fl::event_key() == 113)
+      else if ((Fl::event_state() & FL_CTRL) && Fl::event_key() == 113)
         // Capture CTRL-q
         Simulator::Instance()->SetUserQuit();
       else if (activeWin != this)
@@ -948,13 +782,16 @@ void GLWindow::EntityTranslate(Entity *entity)
 
 void GLWindow::CreateEntity(std::string name)
 {
-  World::Instance()->SetSelectedEntity(NULL);
+
   this->boxMaker.Stop();
   this->sphereMaker.Stop();
   this->cylinderMaker.Stop();
   this->hingeJointMaker.Stop();
 
-  this->cursor(FL_CURSOR_CROSS);
+  this->SetCursorState("create");
+
+  if (name.size() > 0)
+    World::Instance()->SetSelectedEntity(NULL);
 
   if (name == "box")
     this->boxMaker.Start();
@@ -965,6 +802,39 @@ void GLWindow::CreateEntity(std::string name)
   else if (name == "hingejoint")
     this->hingeJointMaker.Start();
   else
-    this->cursor(FL_CURSOR_DEFAULT);
-
+    this->SetCursorState("default");
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the cursor state
+std::string GLWindow::GetCursorState() const
+{
+  return this->cursorState;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the cursor state
+void GLWindow::SetCursorState(const std::string &state)
+{
+  this->cursorState = state;
+
+  if (state == "default")
+    this->cursor(FL_CURSOR_DEFAULT);
+  else if (state == "manip")
+    this->cursor(FL_CURSOR_HAND);
+  else if (state == "create")
+    this->cursor(FL_CURSOR_CROSS);
+}
+
+void GLWindow::MoveModeCB(bool mode)
+{
+  if (mode)
+    this->SetCursorState("default");
+}
+
+void GLWindow::ManipModeCB(bool mode)
+{
+  if (mode)
+    this->SetCursorState("manip");
+}
+
