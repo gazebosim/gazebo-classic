@@ -41,7 +41,7 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-    <shadowTechnique>stencilAdditive</shadowTechnique>
+    <shadowTechnique>stencilModulative</shadowTechnique>
     <fog>
       <color>1.0 1.0 1.0</color>
       <linearStart>10</linearStart>

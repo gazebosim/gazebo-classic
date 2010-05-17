@@ -45,7 +45,7 @@
       <linearEnd>100</linearEnd>
     </fog>
 
-    <shadowTechnique>stencilAdditive</shadowTechnique>
+    <shadowTechnique>stencilModulative</shadowTechnique>
   </rendering:ogre>
 
    <!-- Ground Plane -->

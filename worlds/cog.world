@@ -41,7 +41,7 @@
     <sky>
       <material>Gazebo/Grey</material>
     </sky>
-    <shadowTechnique>stencilAdditive</shadowTechnique>
+    <shadowTechnique>stencilModulative</shadowTechnique>
     <grid>false</grid>
   </rendering:ogre>
 
