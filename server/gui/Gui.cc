@@ -223,7 +223,6 @@ int Gui::handle(int event)
       {
         if (Fl::event_key() == ' ')
         {
-          printf("Gui Pause\n");
           Simulator::Instance()->SetPaused(!Simulator::Instance()->IsPaused() );
           return 1;
         }
