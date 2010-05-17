@@ -196,19 +196,24 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   }
 
   // Load OpenAL audio 
-  if (rootNode->GetChild("openal","audio"))
+  if (rootNode && rootNode->GetChild("openal","audio"))
   {
     this->openAL = OpenAL::Instance();
     this->openAL->Load(rootNode->GetChild("openal", "audio"));
   }
 
-  XMLConfigNode *physicsNode = rootNode->GetChildByNSPrefix("physics");
+  XMLConfigNode *physicsNode = NULL;
+  if (rootNode )
+    physicsNode = rootNode->GetChildByNSPrefix("physics");
+
   if (Simulator::Instance()->GetPhysicsEnabled() && physicsNode)
   {
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine( physicsNode->GetName());
     if (this->physicsEngine == NULL)
       gzthrow("Unable to create physics engine\n");
   }
+  else
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode");
 
   // last bool is initModel, init model is not needed as Init()
   // is called separately from main.cc
@@ -451,7 +456,7 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
   XMLConfigNode *cnode;
   Model *model = NULL;
 
-  if (node->GetNSPrefix() != "")
+  if (node && node->GetNSPrefix() != "")
   {
     // Check for model nodes
     if (node->GetNSPrefix() == "model")
@@ -462,11 +467,9 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
   }
 
   // Load children
-  for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
-  {
-    this->LoadEntities( cnode, model, removeDuplicate, initModel);
-  }
-
+  if (node)
+    for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
+      this->LoadEntities( cnode, model, removeDuplicate, initModel);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

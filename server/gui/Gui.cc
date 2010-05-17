@@ -136,7 +136,10 @@ void Gui::Load( XMLConfigNode *node )
   this->sizeP->Load(node);
   this->posP->Load(node);
 
-  this->frameMgr->Load( node->GetChild("frames") );
+  if (node)
+    this->frameMgr->Load( node->GetChild("frames") );
+  else
+    this->frameMgr->Load(NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

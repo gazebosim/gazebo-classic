@@ -245,10 +245,6 @@ void OgreAdaptor::Close()
 /// Load the parameters for Ogre
 void OgreAdaptor::Load(XMLConfigNode *rootNode)
 {
-  XMLConfigNode *node;
-
-  node = rootNode->GetChild("ogre", "rendering");
-
   // Make the root
   try
   {
@@ -276,10 +272,11 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
 // Initialize ogre
 void OgreAdaptor::Init(XMLConfigNode *rootNode)
 {
-  XMLConfigNode *node;
+  XMLConfigNode *node = NULL;
   Ogre::ColourValue ambient;
 
-  node = rootNode->GetChild("ogre", "rendering");
+  if (rootNode)
+    node = rootNode->GetChild("ogre", "rendering");
 
   /// Create a dummy rendering context.
   /// This will allow gazebo to run headless. And it also allows OGRE to 
@@ -314,7 +311,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
 
   // Get the SceneManager, in this case a generic one
-  if (node->GetChild("bsp"))
+  if (node && node->GetChild("bsp"))
   {
     this->sceneType= SCENE_BSP;
     this->sceneMgr = this->root->createSceneManager("BspSceneManager");
@@ -383,14 +380,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
 
   // Add a sky dome to our scene
-  if (node->GetChild("sky"))
+  if (node && node->GetChild("sky"))
   {
     this->skyMaterialP->Load(node->GetChild("sky"));
     OgreCreator::CreateSky(**(this->skyMaterialP));
   }
 
   // Add fog. This changes the background color
-  OgreCreator::CreateFog(node->GetChild("fog"));
+  if (node)
+    OgreCreator::CreateFog(node->GetChild("fog"));
 
   if (**(this->drawGridP))
     OgreCreator::DrawGrid();
@@ -398,7 +396,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Set up the world geometry link
   if (this->sceneType==SCENE_BSP)
   {
-    this->worldGeometry = node->GetString("bsp","",1);
+    if (node)
+      this->worldGeometry = node->GetString("bsp","",1);
 
     try
     {

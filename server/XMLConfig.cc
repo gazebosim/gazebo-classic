@@ -390,7 +390,6 @@ XMLConfigNode *XMLConfigNode::GetChild( const std::string &name, const std::stri
 {
   XMLConfigNode *tmp;
 
-
   for (tmp = this->childFirst; tmp != NULL; tmp = tmp->GetNext() )
   {
     if (tmp->xmlNode->name && name == (const char*)tmp->xmlNode->name)

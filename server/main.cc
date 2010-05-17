@@ -112,7 +112,7 @@ home directory, or to the log file specified with the -l command line option.
 #include "Global.hh"
 
 // Command line options
-const char *worldFileName;
+std::string worldFileName = "";
 const char *optLogFileName = NULL;
 unsigned int optServerId = 0;
 bool optServerForce = true;
@@ -225,14 +225,15 @@ int ParseArgs(int argc, char **argv)
   argc -= optind;
   argv += optind;
 
-  if (argc < 1)
+  /*if (argc < 1)
   {
     PrintUsage();
     return -1;
-  }
+  }*/
 
   // Get the world file name
-  worldFileName = argv[0];
+  if (argc > 1)
+    worldFileName = argv[0];
   return 0;
 }
 

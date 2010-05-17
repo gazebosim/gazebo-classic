@@ -152,8 +152,11 @@ namespace gazebo
     std::ostringstream stream;
     stream << this->defaultValue;
 
-    std::string input = node->GetString(this->key, stream.str(), 
-                                        this->required);
+    std::string input;
+    if (node)
+      input = node->GetString(this->key, stream.str(), this->required);
+    else
+      input = stream.str();
 
     this->SetFromString( input );
   }

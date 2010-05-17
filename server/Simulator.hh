@@ -254,6 +254,7 @@ namespace gazebo
     private: friend class DestroyerT<Simulator>;
     private: friend class SingletonT<Simulator>;
 
+    private: static std::string defaultWorld;
 };
 
 

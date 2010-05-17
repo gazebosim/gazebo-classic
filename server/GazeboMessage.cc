@@ -74,11 +74,6 @@ void GazeboMessage::Load(XMLConfigNode *node)
 {
   char logFilename[50];
 
-  if (!node)
-  {
-    gzthrow("Null XMLConfig node");
-  }
-
   this->verbosityP->Load(node);
   this->logDataP->Load(node);
 

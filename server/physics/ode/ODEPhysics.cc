@@ -130,9 +130,10 @@ ODEPhysics::~ODEPhysics()
 // Load the ODE engine
 void ODEPhysics::Load(XMLConfigNode *node)
 {
-  XMLConfigNode *cnode = node->GetChild("ode", "physics");
-  if (cnode == NULL)
-    gzthrow("Must define a <physics:ode> node in the XML file");
+  XMLConfigNode *cnode = NULL;
+
+  if (node)
+    cnode = node->GetChild("ode", "physics");
 
   this->gravityP->Load(cnode);
   this->stepTimeP->Load(cnode);
