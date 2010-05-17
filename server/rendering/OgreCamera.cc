@@ -30,6 +30,7 @@
 #include <dirent.h>
 
 #include "FPSViewController.hh"
+#include "OrbitViewController.hh"
 #include "PhysicsEngine.hh"
 #include "Global.hh"
 #include "World.hh"
@@ -386,6 +387,17 @@ void OgreCamera::SetWorldPose(const Pose3d &pose)
   this->pose = pose;
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
   this->pitchNode->setOrientation( this->pose.rot.u, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the world position
+void OgreCamera::SetPosition(const Vector3 &pos)
+{
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  this->pose.pos = pos;
+  this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
 }
  
 ////////////////////////////////////////////////////////////////////////////////
@@ -1002,6 +1014,16 @@ Vector3 OgreCamera::GetDirection() const
   result.y = this->camera->getDerivedDirection().y;
   result.z = this->camera->getDerivedDirection().z;
   return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the direction of the camera
+void OgreCamera::SetDirection(Vector3 vec)
+{
+  /*this->pitchNode->setDirection(Ogre::Vector3(vec.x, vec.y, vec.z), Ogre::Node::TS_WORLD, Ogre::Vector3::NEGATIVE_UNIT_X);
+  this->camera->setDirection(Ogre::Vector3(vec.x, vec.y, vec.z));
+  Ogre::Quaternion q = this->camera->getOrientation();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

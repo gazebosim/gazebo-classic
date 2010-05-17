@@ -17,16 +17,26 @@
   <physics:ode>
     <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
-    <cfm>10e-2</cfm>
+    <cfm>10e-10</cfm>
     <erp>0.2</erp>
+    <quickStep>true</quickStep>
+    <quickStepIters>50</quickStepIters>
+    <quickStepW>1.3</quickStepW>
+    <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
+    <contactSurfaceLayer>0.001</contactSurfaceLayer>
+
+    <!-- updateRate: <0 == throttle simTime to match realTime.
+                      0 == No throttling
+                     >0 == Frequency at which to throttle the sim --> 
     <updateRate>0</updateRate>
+
   </physics:ode>
 
   <rendering:gui>
     <type>fltk</type>
     <size>1024 768</size>
     <pos>0 0</pos>
-    <frames>
+    <!--<frames>
       <row height="100%">
         <camera width="100%">
           <xyz>-3.15 4 2.55</xyz>
@@ -34,6 +44,7 @@
         </camera>
       </row>
     </frames>
+    -->
   </rendering:gui>
 
   <rendering:ogre>
@@ -41,7 +52,7 @@
     <sky>
       <material>Gazebo/Grey</material>
     </sky>
-    <shadowTechnique>stencilAdditive</shadowTechnique>
+    <shadowTechnique>stencilModulative</shadowTechnique>
     <grid>false</grid>
   </rendering:ogre>
 
@@ -70,6 +81,7 @@
     <!-- Bottom & Upright of the pendulum -->
     <body:box name="base_body">
       <dampingFactor>1.0</dampingFactor>
+      <static>true</static>
       <geom:box name="base_geom">
         <size>1.0 1.0 0.2</size>
         <mass>10.1</mass>
@@ -104,7 +116,6 @@
     </body:box>
 
     <body:box name="swing_body">
-      <!--<xyz>-0.46 0.7 2.235</xyz>-->
       <xyz>-0.46 0.7 2.15</xyz>
       <rpy>90 0 0</rpy>
       <dampingFactor>0.00006</dampingFactor>
@@ -134,7 +145,7 @@
       <body1>base_body</body1>
       <body2>swing_body</body2>
       <anchor>swing_body</anchor>
-      <anchorOffset>0 -0.7 0</anchorOffset>
+      <anchorOffset>0 0 0.7</anchorOffset>
       <axis>1 0 0</axis>
       <erp>0.8</erp>
       <cfm>10e-5</cfm>
@@ -156,7 +167,7 @@
     </light>
   </model:renderable>
 
-  <model:renderable name="point_white2">
+  <!--  <model:renderable name="point_white2">
     <xyz>-1 2 10</xyz>
     <static>true</static>
 
@@ -170,5 +181,6 @@
       <castShadows>false</castShadows>
     </light>
   </model:renderable>
+  -->
  
 </gazebo:world>

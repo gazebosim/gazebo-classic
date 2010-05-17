@@ -297,7 +297,7 @@ Pose3d GLFrame::GetCameraPose() const
 /// Set the pose of the camera attached to this frame
 void GLFrame::SetCameraPose( const Pose3d &pose )
 {
-  this->glWindow->GetCamera()->SetWorldPose( pose );  
+  //this->glWindow->GetCamera()->SetWorldPose( pose );  
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -159,10 +159,6 @@ namespace gazebo
     /// pointer to the display
     private: Display *display;
 
-    private: float moveAmount;
-
-    private: Vector3 directionVec;
-
     private: MouseEvent mouseEvent;
 
     private: std::map<int,int> keys;

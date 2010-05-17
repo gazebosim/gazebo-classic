@@ -126,26 +126,20 @@ namespace gazebo
     /// \brief Set the linear velocity of the body
     public: virtual void SetLinearVel(const Vector3 &vel) = 0;
 
-    /// \brief Get the linear velocity of the body
-    public: virtual Vector3 GetLinearVel() const = 0;
-
     /// \brief Set the angular velocity of the body
     public: virtual void SetAngularVel(const Vector3 &vel) = 0;
-
-    /// \brief Get the angular velocity of the body
-    public: virtual Vector3 GetAngularVel() const = 0;
 
     /// \brief Set the linear acceleration of the body
     public: void SetLinearAccel(const Vector3 &accel);
 
     /// \brief Get the linear acceleration of the body
-    public: Vector3 GetLinearAccel() const;
+    public: virtual Vector3 GetLinearAccel() const;
 
     /// \brief Set the angular acceleration of the body
     public: void SetAngularAccel(const Vector3 &accel);
 
     /// \brief Get the angular acceleration of the body
-    public: Vector3 GetAngularAccel() const;
+    public: virtual Vector3 GetAngularAccel() const;
 
     /// \brief Set the force applied to the body
     public: virtual void SetForce(const Vector3 &force) = 0;

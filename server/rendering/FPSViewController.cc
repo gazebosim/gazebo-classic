@@ -12,9 +12,6 @@ using namespace gazebo;
 FPSViewController::FPSViewController(OgreCamera *camera)
   : ViewController(camera)
 {
-  this->directionVec.x = 0;
-  this->directionVec.y = 0;
-  this->directionVec.z = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +35,7 @@ void FPSViewController::HandleMouseEvent(const MouseEvent &event)
 
   Vector2<int> drag = event.pos - event.prevPos;
 
-  this->directionVec.Set(0,0,0);
+  Vector3 directionVec(0,0,0);
 
   if (event.left == MouseEvent::DOWN)
   {
@@ -48,23 +45,22 @@ void FPSViewController::HandleMouseEvent(const MouseEvent &event)
   else if (event.right == MouseEvent::DOWN)
   {
     // interactively pan view
-    this->directionVec.x = 0;
-    this->directionVec.y =  drag.x * 0.01;//this->moveAmount;
-    this->directionVec.z =  drag.y * 0.01;//this->moveAmount;
+    directionVec.x = 0;
+    directionVec.y =  drag.x * event.moveScale;
+    directionVec.z =  drag.y * event.moveScale;
   }
   else if (event.middle == MouseEvent::DOWN)
   {
-    this->directionVec.x =  drag.y * 0.01;//this->moveAmount;
-    this->directionVec.y =  0;
-    this->directionVec.z =  0;
+    directionVec.x =  drag.y * event.moveScale;
+    directionVec.y =  0;
+    directionVec.z =  0;
   }
   else if (event.middle == MouseEvent::SCROLL)
   {
-    this->directionVec.x -=  50.0 * event.scroll.y * 0.01;//this->moveAmount;
-    this->directionVec.y =  0;
-    this->directionVec.z =  0;
+    directionVec.x -=  50.0 * event.scroll.y * event.moveScale;
+    directionVec.y =  0;
+    directionVec.z =  0;
   }
 
   this->camera->Translate(directionVec);
-  this->directionVec.Set(0,0,0);
 }

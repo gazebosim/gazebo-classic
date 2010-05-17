@@ -328,6 +328,34 @@ void Entity::SetRelativePose(const Pose3d &pose, bool notify)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the linear velocity of the model
+Vector3 Entity::GetLinearVel() const
+{
+  return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular velocity of the model
+Vector3 Entity::GetAngularVel() const
+{
+  return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the model
+Vector3 Entity::GetLinearAccel() const
+{
+  return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the model
+Vector3 Entity::GetAngularAccel() const
+{
+  return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the pose relative to the model this entity belongs to
 Pose3d Entity::GetModelRelativePose() const
 {

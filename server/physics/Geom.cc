@@ -530,3 +530,44 @@ void Geom::EnabledCB(bool enabled)
       this->bbVisual->SetBoundingBoxMaterial("Gazebo/RedTransparent");
   }
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear velocity of the model
+Vector3 Geom::GetLinearVel() const
+{
+  if (this->body)
+    return this->body->GetLinearVel();
+  else
+    return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular velocity of the model
+Vector3 Geom::GetAngularVel() const
+{
+  if (this->body)
+    return this->body->GetAngularVel();
+  else
+    return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the model
+Vector3 Geom::GetLinearAccel() const
+{
+  if (this->body)
+    return this->body->GetLinearAccel();
+  else
+    return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the model
+Vector3 Geom::GetAngularAccel() const
+{
+  if (this->body)
+    return this->body->GetAngularAccel();
+  else
+    return Vector3();
+}

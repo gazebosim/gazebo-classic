@@ -129,16 +129,16 @@ namespace gazebo
     public: void SetAngularAccel( const Vector3 &vel );
 
     /// \brief Get the linear velocity of the model
-    public: Vector3 GetLinearVel() const;
+    public: virtual Vector3 GetLinearVel() const;
 
     /// \brief Get the angular velocity of the model
-    public: Vector3 GetAngularVel() const;
+    public: virtual Vector3 GetAngularVel() const;
 
     /// \brief Get the linear acceleration of the model
-    public: Vector3 GetLinearAccel() const;
+    public: virtual Vector3 GetLinearAccel() const;
 
     /// \brief Get the angular acceleration of the model
-    public: Vector3 GetAngularAccel() const;
+    public: virtual Vector3 GetAngularAccel() const;
  
     /// \brief Get the size of the bounding box
     public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;

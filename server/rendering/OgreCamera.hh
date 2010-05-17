@@ -103,6 +103,9 @@ namespace gazebo
 
     /// \brief Set the global pose of the camera
     public: void SetWorldPose(const Pose3d &pose);
+
+    /// \brief Set the world position
+    public: void SetPosition(const Vector3 &pos);
   
     /// \brief Translate the camera
     public: void Translate( const Vector3 &direction );
@@ -235,6 +238,9 @@ namespace gazebo
     /// \brief Get the direction the camera is facing
     public: Vector3 GetDirection() const;
 
+    /// Set the direction of the camera
+    public: void SetDirection(Vector3 vec);
+
     /// \brief Hande a mouse event
     public: void HandleMouseEvent(const MouseEvent &evt);
 
@@ -255,7 +261,7 @@ namespace gazebo
     protected: Ogre::Camera *camera;
     protected: Ogre::SceneNode *origParentNode;
     protected: Ogre::SceneNode *sceneNode;
-    protected: Ogre::SceneNode *pitchNode;
+    public: Ogre::SceneNode *pitchNode;
   
     private: Pose3d pose;
   

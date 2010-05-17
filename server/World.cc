@@ -1235,25 +1235,23 @@ void World::UpdateSimulationIface()
       case SimulationRequestData::GET_STATE:
         {
           Entity *ent = this->GetEntityByName((char*)req->name);
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (ent)// && ent->GetType() == Entity::MODEL)
           {
-            Model *model = (Model*)ent;
-
             Pose3d pose;
             Vector3 linearVel;
             Vector3 angularVel;
             Vector3 linearAccel;
             Vector3 angularAccel;
 
-            pose = model->GetAbsPose();
+            pose = ent->GetAbsPose();
 
             // Get the model's linear and angular velocity
-            linearVel = model->GetLinearVel();
-            angularVel = model->GetAngularVel();
+            linearVel = ent->GetLinearVel();
+            angularVel = ent->GetAngularVel();
 
             // Get the model's linear and angular acceleration
-            linearAccel = model->GetLinearAccel();
-            angularAccel = model->GetAngularAccel();
+            linearAccel = ent->GetLinearAccel();
+            angularAccel = ent->GetAngularAccel();
 
             response->modelPose.pos.x = pose.pos.x;
             response->modelPose.pos.y = pose.pos.y;

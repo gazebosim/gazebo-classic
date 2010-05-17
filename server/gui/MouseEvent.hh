@@ -11,13 +11,15 @@ namespace gazebo
 
     public: MouseEvent()
             : pos(0,0), prevPos(0,0), pressPos(0,0), scroll(0,0),
-              dragging(false), left(UP), right(UP), middle(UP)
+              moveScale(0.01),dragging(false), left(UP), right(UP), middle(UP)
             {}
 
     public: Vector2<int> pos; 
     public: Vector2<int> prevPos;
     public: Vector2<int> pressPos; 
     public: Vector2<int> scroll; 
+
+    public: float moveScale;
 
     public: bool dragging;
 

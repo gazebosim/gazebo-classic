@@ -129,9 +129,22 @@ namespace gazebo
     /// \brief Set the rotation of the entity relative to its parent
     public: void SetRelativeRotation(const Quatern &rot);
 
+    /// \brief Get the linear velocity of the model
+    public: virtual Vector3 GetLinearVel() const;
+
+    /// \brief Get the angular velocity of the model
+    public: virtual Vector3 GetAngularVel() const;
+
+    /// \brief Get the linear acceleration of the model
+    public: virtual Vector3 GetLinearAccel() const;
+
+    /// \brief Get the angular acceleration of the model
+    public: virtual Vector3 GetAngularAccel() const;
+
     /// \brief This function is called when the entity's (or one of its parents)
     ///        pose of the parent has changed
     protected: virtual void OnPoseChange() {}
+
 
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;

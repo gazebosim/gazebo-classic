@@ -71,11 +71,6 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
   this->end();
 
   this->userCamera = NULL;
-  this->moveAmount = 0.1;
-
-  this->directionVec.x = 0;
-  this->directionVec.y = 0;
-  this->directionVec.z = 0;
 
   this->keys.clear();
 
@@ -129,8 +124,9 @@ void GLWindow::Init()
   }
 
   this->userCamera->Init();
-  this->userCamera->RotatePitch( DTOR(30) );
-  this->userCamera->Translate( Vector3(-5, 0, 1) );
+
+  //this->userCamera->RotatePitch( DTOR(30) );
+  //this->userCamera->Translate( Vector3(-5, 0, 1) );
 
   this->activeCamera = this->userCamera;
 }
@@ -357,9 +353,7 @@ void GLWindow::HandleKeyPress(int keyNum)
   std::map<int,int>::iterator iter;
   this->keys[keyNum] = 1;
 
-  // loop through the keys to find the modifiers -- swh
-  float moveAmount = this->moveAmount;
-
+  // loop through the keys to find the modifiers
   for (iter = this->keys.begin(); iter!= this->keys.end(); iter++)
   {
     if (iter->second == 1)
@@ -369,7 +363,6 @@ void GLWindow::HandleKeyPress(int keyNum)
         case FL_Control_L:
         case FL_Control_R:
           Events::manipModeSignal(true);
-          moveAmount = this->moveAmount * 10;
           break;
         case FL_CTRL+'q':
           Simulator::Instance()->SetUserQuit();
@@ -377,42 +370,12 @@ void GLWindow::HandleKeyPress(int keyNum)
 
         case '=':
         case '+':
-          this->moveAmount *= 2;
+          this->mouseEvent.moveScale *= 2;
           break;
 
         case '-':
         case '_':
-          this->moveAmount *= 0.5;
-          break;
-
-        case XK_Up:
-        case XK_w:
-          this->directionVec.x += this->moveAmount;
-          break;
-
-        case XK_Down:
-        case XK_s:
-          this->directionVec.x -= this->moveAmount;
-          break;
-
-        case XK_Left:
-        case XK_a:
-          this->directionVec.y += this->moveAmount;
-          break;
-
-        case XK_Right:
-        case XK_d:
-          this->directionVec.y -= this->moveAmount;
-          break;
-
-        case XK_Page_Down:
-        case XK_e:
-          this->directionVec.z += this->moveAmount;
-          break;
-
-        case XK_Page_Up:
-        case XK_q:
-          this->directionVec.z -= this->moveAmount;
+          this->mouseEvent.moveScale *= 0.5;
           break;
         default:
           break;

@@ -2,8 +2,6 @@
 #define FPSVIEWCONTROLLER_HH
 
 #include "ViewController.hh"
-#include "Vector3.hh"
-#include "Time.hh"
 
 namespace gazebo
 {
@@ -21,8 +19,6 @@ namespace gazebo
     /// \brief Handle a mouse event
     public: virtual void HandleMouseEvent(const MouseEvent &event);
 
-    protected: Time lastUpdateTime;
-    protected: Vector3 directionVec;
   };
 }
 #endif
