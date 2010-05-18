@@ -145,6 +145,7 @@ void CylinderMaker::CreateTheCylinder()
     <mesh>unit_cylinder</mesh>\
     <size>" << vis->GetScale() << "</size>\
     <material>Gazebo/Grey</material>\
+    <shader>pixel</shader>\
     </visual>\
     </geom:cylinder>\
     </body:cylinder>\

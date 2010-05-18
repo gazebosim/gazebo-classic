@@ -142,6 +142,7 @@ void BoxMaker::CreateTheBox()
     <mesh>unit_box_U1V1</mesh>\
     <size>" << vis->GetScale() << "</size>\
     <material>Gazebo/Grey</material>\
+    <shader>pixel</shader>\
     </visual>\
     </geom:box>\
     </body:box>\

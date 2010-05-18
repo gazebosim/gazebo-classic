@@ -128,6 +128,7 @@ void SphereMaker::CreateTheSphere()
     <mesh>unit_sphere</mesh>\
     <size>" << vis->GetScale()*2 << "</size>\
     <material>Gazebo/Grey</material>\
+    <shader>pixel</shader>\
     </visual>\
     </geom:sphere>\
     </body:sphere>\
