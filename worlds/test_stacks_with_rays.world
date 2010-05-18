@@ -51,8 +51,6 @@
     <sky>
       <material>Gazebo/CloudySky</material>
     </sky>
-    <shadowTechnique>stencilModulative</shadowTechnique>
-    <grid>true</grid>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">

@@ -56,131 +56,6 @@
 using namespace gazebo;
 
 enum SceneTypes{SCENE_BSP, SCENE_EXT};
-// Get the mesh information for the given mesh.
-// Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
-/*void GetMeshInformation(const Ogre::MeshPtr mesh,
-                                size_t &vertex_count,
-                                Ogre::Vector3* &vertices,
-                                size_t &index_count,
-                                unsigned long* &indices,
-                                const Ogre::Vector3 &position,
-                                const Ogre::Quaternion &orient,
-                                const Ogre::Vector3 &scale)
-{
-  bool added_shared = false;
-  size_t current_offset = 0;
-  size_t shared_offset = 0;
-  size_t next_offset = 0;
-  size_t index_offset = 0;
-
-  vertex_count = index_count = 0;
-
-  // Calculate how many vertices and indices we're going to need
-  for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
-  {
-    Ogre::SubMesh* submesh = mesh->getSubMesh( i );
-
-    // We only need to add the shared vertices once
-    if(submesh->useSharedVertices)
-    {
-      if( !added_shared )
-      {
-        vertex_count += mesh->sharedVertexData->vertexCount;
-        added_shared = true;
-      }
-    }
-    else
-    {
-      vertex_count += submesh->vertexData->vertexCount;
-    }
-
-    // Add the indices
-    index_count += submesh->indexData->indexCount;
-  }
-
-
-  // Allocate space for the vertices and indices
-  vertices = new Ogre::Vector3[vertex_count];
-  indices = new unsigned long[index_count];
-
-  added_shared = false;
-
-  // Run through the submeshes again, adding the data into the arrays
-  for ( unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
-  {
-    Ogre::SubMesh* submesh = mesh->getSubMesh(i);
-
-    Ogre::VertexData* vertex_data = submesh->useSharedVertices ? mesh->sharedVertexData : submesh->vertexData;
-
-    if((!submesh->useSharedVertices)||(submesh->useSharedVertices && !added_shared))
-    {
-      if(submesh->useSharedVertices)
-      {
-        added_shared = true;
-        shared_offset = current_offset;
-      }
-
-      const Ogre::VertexElement* posElem =
-        vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
-
-      Ogre::HardwareVertexBufferSharedPtr vbuf =
-        vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
-
-      unsigned char* vertex =
-        static_cast<unsigned char*>(vbuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-
-      // There is _no_ baseVertexPointerToElement() which takes an Ogre::Real or a double
-      //  as second argument. So make it float, to avoid trouble when Ogre::Real will
-      //  be comiled/typedefed as double:
-      //      Ogre::Real* pReal;
-      float* pReal;
-
-      for( size_t j = 0; j < vertex_data->vertexCount; ++j, vertex += vbuf->getVertexSize())
-      {
-        posElem->baseVertexPointerToElement(vertex, &pReal);
-
-        Ogre::Vector3 pt(pReal[0], pReal[1], pReal[2]);
-
-        vertices[current_offset + j] = (orient * (pt * scale)) + position;
-      }
-
-      vbuf->unlock();
-      next_offset += vertex_data->vertexCount;
-    }
-
-
-    Ogre::IndexData* index_data = submesh->indexData;
-    size_t numTris = index_data->indexCount / 3;
-    Ogre::HardwareIndexBufferSharedPtr ibuf = index_data->indexBuffer;
-
-    bool use32bitindexes = (ibuf->getType() == Ogre::HardwareIndexBuffer::IT_32BIT);
-
-    unsigned long*  pLong = static_cast<unsigned long*>(ibuf->lock(Ogre::HardwareBuffer::HBL_READ_ONLY));
-    unsigned short* pShort = reinterpret_cast<unsigned short*>(pLong);
-
-
-    size_t offset = (submesh->useSharedVertices)? shared_offset : current_offset;
-
-    // Ogre 1.6 patch (commenting the static_cast...) - index offsets start from 0 for each submesh
-    if ( use32bitindexes )
-    {
-      for ( size_t k = 0; k < numTris*3; ++k)
-      {
-        indices[index_offset++] = pLong[k];
-      }
-    }
-    else
-    {
-      for ( size_t k = 0; k < numTris*3; ++k)
-      {
-        indices[index_offset++] = static_cast<unsigned long>(pShort[k]);
-      }
-    }
-
-    ibuf->unlock();
-    current_offset = next_offset;
-  }
-}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -199,13 +74,10 @@ OgreAdaptor::OgreAdaptor()
 
   Param::Begin(&this->parameters);
   this->ambientP = new ParamT<Vector4>("ambient",Vector4(.1,.1,.1,.1),0);
-  this->shadowTextureSizeP = new ParamT<int>("shadowTextureSize", 512,0);
-  this->shadowTechniqueP = new ParamT<std::string>("shadowTechnique", "stencilModulative", 0);
+  this->shadowsP = new ParamT<bool>("shadows", true, 0);
   this->drawGridP = new ParamT<bool>("grid", true, 0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
-  this->shadowIndexSizeP = new ParamT<int>("shadowIndexSize",32768, 0);
-  this->shadowColorP = new ParamT<Vector3>("shadowColor",Vector3(0.4,0.4,0.4), 0);
-  this->backgroundColorP = new ParamT<Vector3>("backgroundColor",Vector3(0,0,0), 0);
+  this->backgroundColorP = new ParamT<Vector3>("backgroundColor",Vector3(0.5,0.5,0.5), 0);
 
   Param::End();
 }
@@ -222,10 +94,7 @@ OgreAdaptor::~OgreAdaptor()
   }
 
   delete this->ambientP;
-  delete this->shadowTextureSizeP;
-  delete this->shadowIndexSizeP;
-  delete this->shadowTechniqueP;
-  delete this->shadowColorP;
+  delete this->shadowsP;
   delete this->backgroundColorP;
   delete this->drawGridP;
   delete this->skyMaterialP;
@@ -328,10 +197,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
   this->ambientP->Load(node);
-  this->shadowTextureSizeP->Load(node);
-  this->shadowIndexSizeP->Load(node);
-  this->shadowTechniqueP->Load(node);
-  this->shadowColorP->Load(node);
+  this->shadowsP->Load(node);
   this->backgroundColorP->Load(node);
   this->drawGridP->Load(node);
 
@@ -340,44 +206,28 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   ambient.b = (**(this->ambientP)).z;
   ambient.a = (**(this->ambientP)).w;
 
-  // Settings for shadow mapping
-  if (**(this->shadowTechniqueP) == std::string("stencilAdditive"))
-    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_ADDITIVE );
-  else if (**(this->shadowTechniqueP) == std::string("stencilModulative"))
-    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
-  else if (**(this->shadowTechniqueP) == std::string("textureAdditive"))
-    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_ADDITIVE );
-  else if (**(this->shadowTechniqueP) == std::string("textureModulative"))
-    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_MODULATIVE );
-  else if (**(this->shadowTechniqueP) == std::string("none"))
-    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_NONE );
-  else 
-    gzthrow(std::string("Unsupported shadow technique: ") + **(this->shadowTechniqueP) + "\n");
-
-  // Not sure if this does something useful.
-  if (**(this->shadowTechniqueP) != std::string("none"))
-  {
-    this->sceneMgr->setShadowTextureSelfShadow(true);
-    this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
-    this->sceneMgr->setShadowTextureSize(**(this->shadowTextureSizeP));
-    this->sceneMgr->setShadowIndexBufferSize(**(this->shadowIndexSizeP) );
-    this->sceneMgr->setShadowTextureSettings(512,2);
-    this->sceneMgr->setShadowColour(Ogre::ColourValue(
-          (**this->shadowColorP).x,
-          (**this->shadowColorP).y,
-          (**this->shadowColorP).z));
-    this->sceneMgr->setShadowFarDistance(30);
-  }
-
   // Default background color
   this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue(
           (**this->backgroundColorP).x,
           (**this->backgroundColorP).y,
           (**this->backgroundColorP).z));
 
-  // Ambient lighting
-  this->sceneMgr->setAmbientLight(ambient);
+  // Not sure if this does something useful.
+  if (**(this->shadowsP))
+  {
+    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
+    this->sceneMgr->setShadowTextureSettings(512,2);
+    this->sceneMgr->setShadowColour(Ogre::ColourValue(0.5,0.5,0.5));
 
+     // Ambient lighting
+     this->sceneMgr->setAmbientLight(ambient);
+
+    this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
+    this->sceneMgr->setShadowTextureSelfShadow(true);
+    this->sceneMgr->setShadowCasterRenderBackFaces(false);
+
+    this->sceneMgr->setShadowFarDistance(20);
+  }
 
   // Add a sky dome to our scene
   if (node && node->GetChild("sky"))
@@ -409,10 +259,12 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
       exit(-1);
     }
   }
+  
 
   // Create our frame listener and register it
-  this->frameListener = new OgreFrameListener();
+  /*this->frameListener = new OgreFrameListener();
   this->root->addFrameListener(this->frameListener);
+  */
 
   this->raySceneQuery = this->sceneMgr->createRayQuery( Ogre::Ray() );
   this->raySceneQuery->setSortByDistance(true);
@@ -439,9 +291,7 @@ void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "    " << *(this->skyMaterialP) << "\n";
   stream << prefix << "  </sky>\n";
   OgreCreator::SaveFog(prefix, stream);
-  stream << prefix << "  " << *(this->shadowTechniqueP) << "\n";
-  stream << prefix << "  " << *(this->shadowTextureSizeP) << "\n";
-  stream << prefix << "  " << *(this->shadowIndexSizeP) << "\n";
+  stream << prefix << "  " << *(this->shadowsP) << "\n";
   stream << prefix << "</rendering:ogre>\n";
 }
 
@@ -472,6 +322,7 @@ void OgreAdaptor::LoadPlugins()
     plugins.push_back(path+"/Plugin_ParticleFX.so");
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+    plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {

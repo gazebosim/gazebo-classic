@@ -116,7 +116,7 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
                                                 std::string("none"),0);
   this->normalMapNameP->Callback( &OgreVisual::SetNormalMap, this );
 
-  this->shaderP = new ParamT<std::string>("shader", std::string("pixel"),0);
+  this->shaderP = new ParamT<std::string>("shader", std::string("vertex"),0);
   this->shaderP->Callback( &OgreVisual::SetShader, this );
   Param::End();
 

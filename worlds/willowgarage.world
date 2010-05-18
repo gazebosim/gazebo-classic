@@ -44,9 +44,6 @@
       <linearEnd>0</linearEnd>
       <density>0</density>
     </fog>
-    <shadowTechnique>stencilModulative</shadowTechnique>
-    <shadowTextureSize>512</shadowTextureSize>
-    <shadowIndexSize>100000</shadowIndexSize>
   </rendering:ogre>
 
   <rendering:gui>

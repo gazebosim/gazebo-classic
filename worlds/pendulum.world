@@ -52,7 +52,6 @@
     <sky>
       <material>Gazebo/Grey</material>
     </sky>
-    <shadowTechnique>stencilModulative</shadowTechnique>
     <grid>false</grid>
   </rendering:ogre>
 

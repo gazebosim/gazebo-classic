@@ -39,9 +39,9 @@
   </rendering:gui>
 
   <rendering:ogre>
-    <ambient>1 1 1 1</ambient>
-    <shadowTechnique>stencilModulative</shadowTechnique>
-    <grid>false</grid>
+    <ambient>0 0 0 1</ambient>
+    <shadows>true</shadows>
+   <grid>false</grid>
   </rendering:ogre>
 
    <!-- Ground Plane -->
@@ -56,11 +56,25 @@
         <size>100 100</size>
         <segments>10 10</segments>
         <uvTile>100 100</uvTile>
-        <material>Gazebo/GrayGrid</material>
         <mu1>109999.0</mu1>
         <mu2>1000.0</mu2>
+        <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
   </model:physical>
+
+  <!-- White Point light -->
+  <model:renderable name="point_white">
+    <xyz>0.0 5.0 10</xyz>
+    <static>true</static>
+    <light>
+      <type>point</type>
+      <diffuseColor>0.4 0.4 0.4</diffuseColor>
+      <specularColor>.1 .1 .1</specularColor>
+      <attenuation>0.2 0.01 0.001</attenuation>
+      <range>30</range>
+      <castShadows>true</castShadows>
+    </light>
+  </model:renderable>
 
 </gazebo:world>

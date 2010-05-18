@@ -50,9 +50,6 @@
     </fog>
 
     <grid>false</grid>
-
-    <shadowTechnique>stencilModulative</shadowTechnique>
-    <shadowColor>0.4 0.4 0.4</shadowColor>
   </rendering:ogre>
 
    <!-- Ground Plane -->

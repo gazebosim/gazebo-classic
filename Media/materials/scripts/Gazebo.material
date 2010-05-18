@@ -21,54 +21,6 @@ fragment_program Gazebo/DepthMapFS glsl
   }
 }
 
-vertex_program Gazebo/AmbientVS glsl
-{
-  source Ambient.vert
-}
-
-vertex_program Gazebo/AmbientFS glsl
-{
-  source Ambient.frag
-}
-
-vertex_program Gazebo/PointLightVS glsl
-{
-  source PointLight.vert
-}
-
-vertex_program Gazebo/PointLightFS glsl
-{
-  source PointLight.frag
-}
-
-material Gazebo/test
-{
-  technique
-  {
-    pass
-    {
-      ambient 0.3 0.3 0.3 1
-      diffuse 0.5 0.5 0.5 1
-      specular 0.1 0.1 0.1 1
-    }
-
-    pass
-    {
-      scene_blend add
-      lightning on 
-      iteration per_light point
-
-      fragment_program_ref Gazebo/PointLightFS
-      {
-      }
-
-      vertex_program_ref Gazebo/PointLightVS
-      {
-      }
-    }
-  }
-}
-
 material Gazebo/White
 {
 	receive_shadows on
@@ -104,7 +56,7 @@ material Gazebo/Grey
 			ambient 0.3 0.3 0.3 1.0
       diffuse 0.5 0.5 0.5 1.0
       specular 0.8 0.8 0.8 1
-      shading phong
+      //shading phong
 		}
 	}
 }
@@ -454,8 +406,8 @@ material Gazebo/SmileyHappy
   {
     pass
     {
-      depth_write alpha_rejection
-      scene_blend alpha_blend
+      //depth_write alpha_rejection
+      //scene_blend alpha_blend
 
       texture_unit
       {
@@ -471,8 +423,8 @@ material Gazebo/SmileySad
   {
     pass
     {
-      depth_write alpha_rejection
-      scene_blend alpha_blend
+      //depth_write alpha_rejection
+      //scene_blend alpha_blend
 
       texture_unit
       {
@@ -488,8 +440,8 @@ material Gazebo/SmileyDead
   {
     pass
     {
-      depth_write off
-      scene_blend alpha_blend
+      //depth_write off
+      //scene_blend alpha_blend
 
       texture_unit
       {
@@ -505,8 +457,8 @@ material Gazebo/SmileyPlain
   {
     pass
     {
-      depth_write off
-      scene_blend alpha_blend
+      //depth_write off
+      //scene_blend alpha_blend
 
       texture_unit
       {
@@ -710,14 +662,16 @@ material Gazebo/BumpyMetal
 	}
 }
 
-material Gazebo/GrayGrid
+material Gazebo/GrayGrid 
 {
+	receive_shadows on
+
 	technique
 	{
+
+    // Decal pass
 		pass
 		{
-			//ambient 0.2 0.2 0.2
-
 			texture_unit
 			{
 				texture grayGrid.png
@@ -732,7 +686,7 @@ material Gazebo/Rocky
 	{
 		pass
 		{
-			ambient 0.2 0.2 0.2
+			//ambient 0.2 0.2 0.2
 
 			texture_unit
 			{
@@ -1233,7 +1187,7 @@ material PR2/White
     {
       ambient 1.0 1.0 1.0 1.0
       diffuse 1.0 1.0 1.0 1.0
-      specular 0.1 0.1 0.1
+      specular 0.1 0.1 0.1 1.0
       emissive 0 0 0
       shading phong
     }
@@ -1248,7 +1202,7 @@ material PR2/Black
     {
       ambient 0.0 0.0 0.0 1.0
       diffuse 0.0 0.0 0.0 1.0
-      specular 0.2 0.2 0.2
+      specular 0.2 0.2 0.2 1.0
       emissive 0.0 0.0 0.0
       shading phong
     }
@@ -1263,7 +1217,7 @@ material PR2/Grey0
     {
       ambient 0.85 0.85 0.85 1.0
       diffuse 0.85 0.85 0.85 1.0
-      specular 0.0 0.0 0.0
+      specular 0.0 0.0 0.0 1.0
       emissive 0.0 0.0 0.0
       shading phong
     }
@@ -1279,7 +1233,7 @@ material PR2/Grey1
     {
       ambient 0.65 0.65 0.65 1.0
       diffuse 0.65 0.65 0.65 1.0
-      specular 0.0 0.0 0.0
+      specular 0.0 0.0 0.0 1.0
       emissive 0.0 0.0 0.0
       shading phong
     }
@@ -1294,7 +1248,7 @@ material PR2/Grey2
     {
       ambient 0.58 0.6 0.612 1.0
       diffuse 0.58 0.6 0.612 1.0
-      specular 1.0 1.0 1.0
+      specular 1.0 1.0 1.0 1.0
       emissive 0 0 0
       shading phong
     }
@@ -1309,7 +1263,7 @@ material PR2/Grey3
     {
       ambient 0.38 0.4 0.412 1.0
       diffuse 0.38 0.4 0.412 1.0
-      specular 0.1 0.1 0.1
+      specular 0.1 0.1 0.1 1.0
       emissive 0 0 0
       shading phong
     }

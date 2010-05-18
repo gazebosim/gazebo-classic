@@ -31,26 +31,68 @@ void SetupResources(void)
 
 void CreateScene()
 {
-  Ogre::Light *pointlight;
+  Ogre::Light *pointlight, *mSunLight;
 
-  sceneMgr->setAmbientLight( Ogre::ColourValue(0,0,0) );
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+  //sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+  //sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+  //sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE);
+
+  //sceneMgr->setShadowTextureCasterMaterial("Ogre/DepthShadowmap/Caster/Float");
+  //sceneMgr->setShadowTextureReceiverMaterial("Ogre/DepthShadowmap/Receiver/Float");
+      
+  sceneMgr->setAmbientLight( Ogre::ColourValue(0.0,0.0,0.0) );
+
+
+  mSunLight = sceneMgr->createLight("SunLight");
+  mSunLight->setType(Ogre::Light::LT_SPOTLIGHT);
+  mSunLight->setPosition(1500,1750,1300);
+  mSunLight->setSpotlightRange(Ogre::Degree(30), Ogre::Degree(50));
+  Ogre::Vector3 dir;
+  dir = -mSunLight->getPosition();
+  dir.normalise();
+  mSunLight->setDirection(dir);
+  mSunLight->setDiffuseColour(0.35, 0.35, 0.38);
+  mSunLight->setSpecularColour(0.9, 0.9, 1);
+  mSunLight->setCastShadows(true);
+
 
   pointlight = sceneMgr->createLight("pointlight");
-  pointlight->setDiffuseColour( Ogre::ColourValue(0.2, 0.2, 0.2) );
+  pointlight->setDiffuseColour( Ogre::ColourValue(0.8, 0.8, 0.8) );
   pointlight->setSpecularColour(1,1,1);
-  pointlight->setAttenuation(8000, .1, 0.001,0);
-  pointlight->setPosition(0, 50, 0);
+  pointlight->setAttenuation(8000, .1, 0.0005,0);
+  pointlight->setPosition(100, 500, 0);
+  pointlight->setCastShadows(true);
+
 
   Ogre::MovablePlane *plane = new Ogre::MovablePlane("mplane");
   plane->normal = Ogre::Vector3::UNIT_Y;
-  plane->d = 100;
+  plane->d = 107;
   Ogre::MeshManager::getSingleton().createPlane("Myplane",
     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, *plane,
-    5500,5500,20,20,true,1,5,5, Ogre::Vector3::UNIT_Z);
+    1500,1500,50,50,true,1,5,5, Ogre::Vector3::UNIT_Z);
 
   Ogre::Entity *planeEnt = sceneMgr->createEntity( "plane", "Myplane" );
-  planeEnt->setMaterialName("test");
+  //planeEnt->setMaterialName("Ogre/DepthShadowmap/Receiver/RockWall");
+  planeEnt->setCastShadows(false);
   sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(planeEnt);
+
+
+  Ogre::SceneNode *node = sceneMgr->getRootSceneNode()->createChildSceneNode();
+  Ogre::Entity *pEnt = sceneMgr->createEntity( "COl", "column.mesh" );
+  pEnt->setMaterialName("Gazebo/Grey");
+  node->attachObject( pEnt );
+  node->translate(0,0, 0);
+
+  /*sceneMgr->setShadowTextureSettings(512,2);
+  sceneMgr->setShadowColour(Ogre::ColourValue(0.5, 0.5, 0.5));
+
+  sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
+  sceneMgr->setShadowTextureCasterMaterial("Ogre/DepthShadowmap/Caster/Float");
+  sceneMgr->setShadowTextureReceiverMaterial("Ogre/DepthShadowmap/Receiver/Float");
+  */
+ 
+  sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
 }
 
 int main(int argc, char **argv)
@@ -73,11 +115,15 @@ int main(int argc, char **argv)
   // Load Resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  // Create the camera
+    // Create scene
+  CreateScene();
+
+// Create the camera
   camera = sceneMgr->createCamera("Camera");
-  camera->setPosition( Ogre::Vector3(0, 1500, 0));
-  camera->lookAt( Ogre::Vector3(0,0 , -150) );
+  camera->setPosition( Ogre::Vector3(350, 200, 800));
+  camera->lookAt( Ogre::Vector3(0,10 ,0) );
   camera->setNearClipDistance(5);
+  camera->setFarClipDistance(100000);
 
   // Create viewports
   viewport = window->addViewport(camera);
@@ -85,8 +131,6 @@ int main(int argc, char **argv)
   camera->setAspectRatio( Ogre::Real(viewport->getActualWidth()) /
                           Ogre::Real(viewport->getActualHeight()) );
 
-  // Create scene
-  CreateScene();
 
   root->startRendering();
 

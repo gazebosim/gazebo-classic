@@ -35,7 +35,6 @@
       <material>Gazebo/CloudySky</material>
     </sky>
     <grid>false</grid>
-    <shadowTechnique>none</shadowTechnique>
   </rendering:ogre>
 
   <!-- Ground Plane -->

@@ -166,10 +166,7 @@ namespace gazebo
     protected: GLXContext dummyContext;
 
     private: ParamT<Vector4> *ambientP;
-    private: ParamT<std::string> *shadowTechniqueP;
-    private: ParamT<int> *shadowTextureSizeP;
-    private: ParamT<int> *shadowIndexSizeP;
-    private: ParamT<Vector3> *shadowColorP;
+    private: ParamT<bool> *shadowsP;
     private: ParamT<Vector3> *backgroundColorP;
     private: ParamT<bool> *drawGridP;
     private: ParamT<std::string> *skyMaterialP;
