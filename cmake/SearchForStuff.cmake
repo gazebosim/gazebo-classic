@@ -280,7 +280,7 @@ IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
   INCLUDE (FindBoost)
 
-  FIND_PACKAGE( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals )
+  FIND_PACKAGE( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex)
 
   IF (NOT Boost_FOUND)
     SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)

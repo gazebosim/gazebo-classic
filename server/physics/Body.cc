@@ -387,7 +387,7 @@ void Body::Init()
       this->cgVisual->AttachMesh("body_cg");
       this->cgVisual->SetMaterial("Gazebo/Red");
       this->cgVisual->SetCastShadows(false);
-      //this->cgVisual->AttachAxes();
+      this->cgVisual->AttachAxes();
 
       std::map< std::string, Geom* >::iterator giter;
 

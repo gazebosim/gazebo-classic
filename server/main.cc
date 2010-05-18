@@ -232,8 +232,10 @@ int ParseArgs(int argc, char **argv)
   }*/
 
   // Get the world file name
-  if (argc > 1)
+  if (argc >= 1)
     worldFileName = argv[0];
+
+  std::cout << "WORLD IFLENAME{" << worldFileName << "]\n";
   return 0;
 }
 

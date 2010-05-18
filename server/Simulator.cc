@@ -232,7 +232,10 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
       if (rootNode)
        childNode = rootNode->GetChild("gui");
 
-      int width, height, x, y;
+      int width=0;
+      int height=0;
+      int x = 0;
+      int y = 0;
 
       if (childNode)
       {
