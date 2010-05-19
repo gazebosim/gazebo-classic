@@ -392,7 +392,7 @@ void Quatern::Correct()
   if (!finite(this->z))
     this->z = 0;
   if (!finite(this->u))
-    this->u = 0;
+    this->u = 1;
 }
 
 
