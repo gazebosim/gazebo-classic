@@ -791,8 +791,11 @@ void OgreCamera::MoveToEntity(Entity *entity)
   Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
 
   Vector3 start = this->GetWorldPose().pos;
+  start.Correct();
   Vector3 end = entity->GetAbsPose().pos;
+  end.Correct();
   Vector3 dir = end - start;
+  dir.Correct();
 
   double yawAngle = atan2(dir.y,dir.x);
   double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
