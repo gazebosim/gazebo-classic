@@ -82,6 +82,7 @@ GLWindow::GLWindow( int x, int y, int w, int h, const std::string &label)
   Events::ConnectManipModeSignal( boost::bind(&GLWindow::ManipModeCB, this, _1) );
 
   this->cursorState = "default";
+  this->currMaker = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,13 +186,12 @@ void GLWindow::HandleMousePush()
 {
   this->mouseEvent.pressPos = this->mouseEvent.pos;
 
-  this->boxMaker.MousePushCB(this->mouseEvent);
-  this->sphereMaker.MousePushCB(this->mouseEvent);
-  this->cylinderMaker.MousePushCB(this->mouseEvent);
-
-  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive())
-    return;
+  if (this->currMaker)
+  {
+    this->currMaker->MousePushCB(this->mouseEvent);
+    if (this->currMaker->IsActive())
+      return;
+  }
 
   if (World::Instance()->GetSelectedEntity())
   {
@@ -221,16 +221,14 @@ void GLWindow::HandleMousePush()
 /// Handle a mouse button release
 void GLWindow::HandleMouseRelease()
 {
-
   OgreCreator::SetVisible("guiline", false);
 
-  this->boxMaker.MouseReleaseCB(this->mouseEvent);
-  this->sphereMaker.MouseReleaseCB(this->mouseEvent);
-  this->cylinderMaker.MouseReleaseCB(this->mouseEvent);
-
-  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive())
-    return;
+  if (this->currMaker)
+  {
+    this->currMaker->MouseReleaseCB(this->mouseEvent);
+    if (this->currMaker->IsActive())
+      return;
+  }
 
   // Get the mouse button that was pressed (if one was pressed)
   switch (Fl::event_button())
@@ -285,12 +283,13 @@ void GLWindow::HandleMouseDrag()
 
   this->mouseEvent.dragging = true;
 
-  this->boxMaker.MouseDragCB(this->mouseEvent);
-  this->sphereMaker.MouseDragCB(this->mouseEvent);
-  this->cylinderMaker.MouseDragCB(this->mouseEvent);
-  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive())
-    return;
+  if (this->currMaker)
+  {
+    this->currMaker->MouseDragCB(this->mouseEvent);
+    if (this->currMaker->IsActive())
+      return;
+  }
+
 
   if (this->activeCamera)
   {
@@ -346,8 +345,7 @@ void GLWindow::HandleMouseWheel(int dx, int dy)
 /// Handle a key press
 void GLWindow::HandleKeyPress(int keyNum)
 {
-  if (this->boxMaker.IsActive() || this->sphereMaker.IsActive() ||
-      this->cylinderMaker.IsActive())
+  if (this->currMaker && this->currMaker->IsActive())
     return;
 
   std::map<int,int>::iterator iter;
@@ -716,10 +714,8 @@ void GLWindow::EntityTranslate(Entity *entity)
 
 void GLWindow::CreateEntity(std::string name)
 {
-
-  this->boxMaker.Stop();
-  this->sphereMaker.Stop();
-  this->cylinderMaker.Stop();
+  if (this->currMaker)
+    this->currMaker->Stop();
 
   this->SetCursorState("create");
 
@@ -727,13 +723,25 @@ void GLWindow::CreateEntity(std::string name)
     World::Instance()->SetSelectedEntity(NULL);
 
   if (name == "box")
-    this->boxMaker.Start();
+    this->currMaker = &this->boxMaker;
   else if (name == "cylinder")
-    this->cylinderMaker.Start();
+    this->currMaker = &this->cylinderMaker;
   else if (name == "sphere")
-    this->sphereMaker.Start();
+    this->currMaker = &this->sphereMaker;
+  else if (name == "pointlight")
+    this->currMaker = &this->pointLightMaker;
+  else if (name == "spotlight")
+    this->currMaker = &this->spotLightMaker;
+  else if (name == "directionallight")
+    this->currMaker = &this->directionalLightMaker;
   else
+  {
+    this->currMaker = NULL;
     this->SetCursorState("default");
+  }
+
+  if (this->currMaker)
+    this->currMaker->Start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

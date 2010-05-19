@@ -41,6 +41,7 @@
 #include "Body.hh"
 #include "Geom.hh"
 #include "Entity.hh"
+#include "Light.hh"
 #include "Common.hh"
 #include "Model.hh"
 #include "Simulator.hh"
@@ -49,6 +50,7 @@
 #include "OgreCamera.hh"
 #include "Sidebar.hh"
 #include "Global.hh"
+#include "ParamBrowser.hh"
 
 using namespace gazebo;
 
@@ -66,16 +68,22 @@ Sidebar::Sidebar(int x, int y, int w, int h, const char *l)
   this->entityBrowser->callback( &Sidebar::EntityBrowserCB, this );
   this->entityBrowser->color(FL_WHITE);
 
+  x = this->entityBrowser->x() + this->entityBrowser->w()*.5 - 25;
+  y = this->entityBrowser->y() + this->entityBrowser->h() + 5;
+  Fl_Button *gotoButton = new Fl_Button(x,y,50,20, "Go To");
+  gotoButton->callback(&Sidebar::GotoCB, this);
+
   this->paramColumnWidths[0] = 80;
   this->paramColumnWidths[1] = 120;
   this->paramColumnWidths[2] = 0;
 
-  y = this->entityBrowser->y() + this->entityBrowser->h() + 20;
-  this->paramBrowser = new Fl_Hold_Browser(x+10, y, w-20,
+  y = gotoButton->y() + gotoButton->h() + 30;
+  x = this->entityBrowser->x();
+  this->paramBrowser = new ParamBrowser(x, y, w-20,
       (this->h()-20)*0.5,"Parameters");
   this->paramBrowser->align(FL_ALIGN_TOP);
-  this->paramBrowser->column_char('~');
-  this->paramBrowser->column_widths( this->paramColumnWidths );
+  //this->paramBrowser->column_char('~');
+  //this->paramBrowser->column_widths( this->paramColumnWidths );
   this->paramBrowser->callback(&Sidebar::ParamBrowserCB, this);
   this->paramBrowser->color(FL_WHITE);
 
@@ -117,8 +125,6 @@ Sidebar::~Sidebar()
 /// Update the toolbar data
 void Sidebar::Update()
 {
-//  if (this->entityBrowser->size() == 0)
-    //this->UpdateEntityBrowser();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,36 +139,38 @@ void Sidebar::SetSelectedEntity(Entity *entity)
     model = (Model*)(entity->GetParent());
   else if (entity && entity->GetType() == Entity::MODEL)
   {
-    this->paramBrowser->deselect();
+    //this->paramBrowser->deselect();
     model = (Model*)(entity);
   }
 
   if (model)
   {
-    this->paramBrowser->clear();
-    for (int i=1; i <= this->entityBrowser->size(); i++)
+    this->paramBrowser->Clear();
+    this->Helper(model);
+
+    // Reference
+    /*for (int i=1; i <= this->entityBrowser->size(); i++)
     {
       std::string lineText = this->entityBrowser->text(i);
       if (lineText == model->GetCompleteScopedName())
         this->entityBrowser->value(i);
     }
 
-    std::string value = "@b@B52@s@cModel ";
+    std::string value = "@b@B52@s@c" + model->GetTypeString();
     this->AddToParamBrowser(value);
     this->AddEntityToParamBrowser(model, "");
 
-    const std::vector<Entity*> bodies = model->GetChildren();
-    const std::map<std::string, Geom *> *geoms;
+    const std::vector<Entity*> children = model->GetChildren();
     std::vector<Entity*>::const_iterator iter;
-    std::map<std::string, Geom*>::const_iterator giter;
-
-    for (iter = bodies.begin(); iter != bodies.end(); iter++)
+    
+    for (iter = children.begin(); iter != children.end(); iter++)
     {
       Body *body = dynamic_cast<Body*>(*iter);
+
       if (!body)
         continue;
 
-      value = "@b@B52@s-Body:~@b@B52@s" + body->GetName();
+      value = std::string("@b@B52@s-") + body->GetTypeString() + ":~@b@B52@s" + body->GetName();
       this->AddToParamBrowser(value);
 
       if (body->GetName() == entity->GetName())
@@ -170,22 +178,36 @@ void Sidebar::SetSelectedEntity(Entity *entity)
 
       this->AddEntityToParamBrowser( body, "  " );
 
-      geoms = body->GetGeoms();
+      const std::vector<Entity*> children2 = body->GetCoMEntity()->GetChildren();
+      std::vector<Entity*>::const_iterator iter2;
 
-      for (giter = geoms->begin(); giter != geoms->end(); giter++)
+      for (iter2 = children2.begin(); iter2 != children2.end(); iter2++)
       {
-        value = "@b@B52@s  -Geom:~@b@B52@s" + giter->second->GetName();
-        this->AddToParamBrowser(value);
-        this->AddEntityToParamBrowser( giter->second, "    " );
+        if ((*iter2)->GetType() != Entity::GEOM && 
+            (*iter2)->GetType() != Entity::LIGHT)
+          continue;
 
-        for (unsigned int i=0; i < giter->second->GetVisualCount(); i++)
+        value = "@b@B52@s  -" + (*iter2)->GetTypeString()+ ":~@b@B52@s" + (*iter2)->GetName();
+        this->AddToParamBrowser(value);
+        this->AddEntityToParamBrowser( (*iter2), "    " );
+
+        if ((*iter2)->GetType() == Entity::GEOM)
         {
-          OgreVisual *vis = giter->second->GetVisual(i);
-          std::ostringstream stream;
-          stream << vis->GetId();
-          value = "@b@B52@s    -Visual:~@b@B52@s" + stream.str();
-          this->AddToParamBrowser(value);
-          this->AddEntityToParamBrowser( vis, "      " );
+          Geom *geom = (Geom*)(*iter2);
+          for (unsigned int i=0; i < geom->GetVisualCount(); i++)
+          {
+            OgreVisual *vis = geom->GetVisual(i);
+            std::ostringstream stream;
+            stream << vis->GetId();
+            value = "@b@B52@s    -Visual:~@b@B52@s" + stream.str();
+            this->AddToParamBrowser(value);
+            this->AddEntityToParamBrowser( vis, "      " );
+          }
+        }
+        else if ((*iter2)->GetType() == Entity::LIGHT)
+        {
+          Light *light = (Light*)(*iter2);
+
         }
       }
     }
@@ -195,6 +217,7 @@ void Sidebar::SetSelectedEntity(Entity *entity)
     {
       this->AddToParamBrowser("");
     }
+    */
 
     this->paramInput->hide();
   }
@@ -210,9 +233,29 @@ void Sidebar::SetSelectedEntity(Entity *entity)
   if (!entity)
   {
     this->entityBrowser->deselect();
-    this->paramBrowser->deselect();
-    this->paramBrowser->value(0);
-    this->paramBrowser->clear();
+    //this->paramBrowser->deselect();
+    //this->paramBrowser->value(0);
+    //this->paramBrowser->clear();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Helper
+void Sidebar::Helper(const Entity *entity)
+{
+  if (!entity)
+    return;
+
+  const std::vector<Entity*> children = entity->GetChildren();
+  std::vector<Entity*>::const_iterator iter;
+
+  this->AddEntityToParamBrowser( entity, "    " );
+
+  for (iter = children.begin(); iter != children.end(); iter++)
+  {
+    std::string value = (*iter)->GetTypeString()+ ":" + (*iter)->GetName();
+    this->paramBrowser->AddDivider((*iter)->GetTypeString(), (*iter)->GetName() );
+    this->Helper(*iter);
   }
 }
 
@@ -385,15 +428,12 @@ void Sidebar::EntityBrowserCB( Fl_Widget *w, void *data )
   if (ent)
   {
     World::Instance()->SetSelectedEntity(ent);
-    OgreCamera *cam = CameraManager::Instance()->GetActiveCamera();
-    if (cam)
-      cam->MoveToEntity(ent);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add entity to browser
-void Sidebar::AddEntityToParamBrowser(Common *entity, std::string prefix)
+void Sidebar::AddEntityToParamBrowser(const Common *entity, std::string prefix)
 {
   std::string value;
   std::string colorStr = "";
@@ -402,32 +442,8 @@ void Sidebar::AddEntityToParamBrowser(Common *entity, std::string prefix)
   for (unsigned int i=0; i < entity->GetParamCount(); i++)
   {
     Param *param = entity->GetParam(i);
-
-    /*if ( i%2 == 0)
-      colorStr = "@B50";
-      */
-
-    value = colorStr + "@b@s" + prefix + param->GetKey() + ":~" + 
-      colorStr + "@s" + param->GetAsString();
-
-    this->AddToParamBrowser( value );
+    this->paramBrowser->AddParam(param);
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Add a line to the attribute browser
-void Sidebar::AddToParamBrowser(const std::string &line)
-{
-  if (!this->paramBrowser->text(this->paramCount+1))
-  {
-    this->paramBrowser->add( line.c_str() );
-  }
-  else if (strcmp(this->paramBrowser->text(this->paramCount+1), line.c_str()) != 0)
-  {
-    this->paramBrowser->text( this->paramCount+1, line.c_str() );
-  }
-
-  this->paramCount++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -530,5 +546,20 @@ void Sidebar::JointVelocitySliderCB( Fl_Widget *w, void *data )
     Model *model = (Model*)(entity);
     Joint *joint = model->GetJoint( self->jointChoice->text() );
     joint->SetVelocity( 0, value );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Goto callback
+void Sidebar::GotoCB( Fl_Widget *w, void *data )
+{
+
+  Entity *ent = World::Instance()->GetSelectedEntity();
+
+  if (ent)
+  {
+    OgreCamera *cam = CameraManager::Instance()->GetActiveCamera();
+    if (cam)
+      cam->MoveToEntity(ent);
   }
 }

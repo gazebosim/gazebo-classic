@@ -62,6 +62,9 @@ class Pose3d
   /// \brief See if a pose is finite (e.g., not nan)
   public: bool IsFinite() const;
 
+  /// \brief Fix any nan values
+  public: void Correct();
+
   /// \brief Get the inverse of this pose
   public: Pose3d GetInverse() const;
 

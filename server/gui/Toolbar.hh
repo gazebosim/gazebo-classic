@@ -72,10 +72,12 @@ namespace gazebo
 
     /// \brief Cursor button callback
     public: static void HandCursorButtonCB( Fl_Widget *w, void * /*data*/ );
+    private: static void PointLightCB( Fl_Widget *w, void * /*data*/ );
+    private: static void SpotLightCB( Fl_Widget *w, void * /*data*/ );
+    private: static void DirectionalLightCB( Fl_Widget *w, void * /*data*/ );
 
     private: void ManipModeCB(bool mode);
     private: void MoveModeCB(bool mode);
-
 
 
     private: class ToolbarButton : public Fl_Button

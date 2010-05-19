@@ -13,7 +13,8 @@
 
 using namespace gazebo;
 
-BoxMaker::BoxMaker()
+BoxMaker::BoxMaker() 
+: EntityMaker()
 {
   this->state = 0;
   this->visualName = "";
@@ -71,7 +72,7 @@ void BoxMaker::MouseReleaseCB(const MouseEvent &event)
 
   if (this->state == 3)
   {
-    this->CreateTheBox();
+    this->CreateTheEntity();
     this->Start();
   }
 }
@@ -119,7 +120,7 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
 
 }
 
-void BoxMaker::CreateTheBox()
+void BoxMaker::CreateTheEntity()
 {
   boost::recursive_mutex::scoped_lock lock( *Simulator::Instance()->GetMRMutex());
 

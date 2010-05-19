@@ -2,25 +2,25 @@
 #define SPHEREMAKER_HH
 
 #include "Vector2.hh"
+#include "EntityMaker.hh"
 
 namespace gazebo
 {
-  class MouseEvent;
-
-  class SphereMaker
+  class SphereMaker : public EntityMaker
   {
     public: SphereMaker();
     public: virtual ~SphereMaker();
   
-    public: void Start();
-    public: void Stop();
-    public: bool IsActive() const;
+    public: virtual void Start();
+    public: virtual void Stop();
+    public: virtual bool IsActive() const;
 
-    public: void MousePushCB(const MouseEvent &event);
-    public: void MouseReleaseCB(const MouseEvent &event);
-    public: void MouseDragCB(const MouseEvent &event);
+    public: virtual void MousePushCB(const MouseEvent &event);
+    public: virtual void MouseReleaseCB(const MouseEvent &event);
+    public: virtual void MouseDragCB(const MouseEvent &event);
   
-    private: void CreateTheSphere();
+    protected: virtual void CreateTheEntity();
+
     private: int state;
     private: bool leftMousePressed;
     private: Vector2<int> mousePushPos;

@@ -385,6 +385,7 @@ void OgreCamera::SetWorldPose(const Pose3d &pose)
     return;
 
   this->pose = pose;
+  this->pose.Correct();
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
   this->pitchNode->setOrientation( this->pose.rot.u, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
 }
@@ -396,7 +397,10 @@ void OgreCamera::SetPosition(const Vector3 &pos)
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
+
   this->pose.pos = pos;
+  this->pose.Correct();
+  
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
 }
  

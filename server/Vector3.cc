@@ -318,6 +318,18 @@ bool Vector3::IsFinite() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Corrects any nan values
+void Vector3::Correct()
+{
+  if (!finite(this->x))
+    this->x = 0;
+  if (!finite(this->y))
+    this->y = 0;
+  if (!finite(this->z))
+    this->z = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// [] operator
 double Vector3::operator[](unsigned int index) const
 {

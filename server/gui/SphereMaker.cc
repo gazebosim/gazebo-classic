@@ -11,7 +11,8 @@
 
 using namespace gazebo;
 
-SphereMaker::SphereMaker()
+SphereMaker::SphereMaker() 
+: EntityMaker()
 {
   this->state = 0;
   this->visualName = "";
@@ -69,7 +70,7 @@ void SphereMaker::MouseReleaseCB(const MouseEvent &event)
 
   if (this->state == 2)
   {
-    this->CreateTheSphere();
+    this->CreateTheEntity();
     this->Start();
   }
 }
@@ -106,7 +107,7 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
   vis->SetScale(Vector3(scale,scale,scale));
 }
 
-void SphereMaker::CreateTheSphere()
+void SphereMaker::CreateTheEntity()
 {
   boost::recursive_mutex::scoped_lock lock( *Simulator::Instance()->GetMRMutex());
   std::ostringstream newModelStr;

@@ -137,6 +137,9 @@ class Vector3
   /// \brief See if a point is finite (e.g., not nan)
   public: bool IsFinite() const;
 
+  /// \brief Corrects any nan values
+  public: void Correct();
+
   /// \brief [] operator
   public: double operator[](unsigned int index) const;
 

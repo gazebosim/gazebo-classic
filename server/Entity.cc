@@ -324,6 +324,7 @@ Pose3d Entity::GetRelativePose() const
 void Entity::SetRelativePose(const Pose3d &pose, bool notify)
 {
   this->relativePose = pose;
+  this->relativePose.Correct();
   this->PoseChange(notify);
 }
 
@@ -370,6 +371,7 @@ Pose3d Entity::GetModelRelativePose() const
 void Entity::SetAbsPose(const Pose3d &pose, bool notify)
 {
   Pose3d p = pose;
+
   if (this->parent)
     p -= this->parent->GetAbsPose();
 
@@ -437,4 +439,12 @@ void Entity::SetType(Entity::Type type)
 Entity::Type Entity::GetType() const
 {
   return this->type;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the type as a string
+std::string Entity::GetTypeString() const
+{
+  static std::string typenames[] = {"default", "model", "body", "geom", "light"};
+  return typenames[this->type];
 }

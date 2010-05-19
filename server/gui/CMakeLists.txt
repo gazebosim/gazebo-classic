@@ -18,10 +18,15 @@ set (sources Gui.cc
              StatusBar.cc
              GLFrameManager.cc
              GLFrame.cc
+             Events.cc
+             EntityMaker.cc
              BoxMaker.cc
              SphereMaker.cc
              CylinderMaker.cc
-             Events.cc
+             PointLightMaker.cc
+             SpotLightMaker.cc
+             DirectionalLightMaker.cc
+             ParamBrowser.cc
 )
 
 set (headers Gui.hh
@@ -32,11 +37,16 @@ set (headers Gui.hh
              StatusBar.hh
              GLFrameManager.hh
              GLFrame.hh
+             Events.hh
+             EntityMaker.hh
              BoxMaker.hh
              SphereMaker.hh
              CylinderMaker.hh
-             Events.hh
              MouseEvent.hh
+             PointLightMaker.hh
+             SpotLightMaker.hh
+             DirectionalLightMaker.hh
+             ParamBrowser.hh
 )
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")

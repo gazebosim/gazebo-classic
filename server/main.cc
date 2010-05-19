@@ -225,17 +225,10 @@ int ParseArgs(int argc, char **argv)
   argc -= optind;
   argv += optind;
 
-  /*if (argc < 1)
-  {
-    PrintUsage();
-    return -1;
-  }*/
-
   // Get the world file name
   if (argc >= 1)
     worldFileName = argv[0];
 
-  std::cout << "WORLD IFLENAME{" << worldFileName << "]\n";
   return 0;
 }
 

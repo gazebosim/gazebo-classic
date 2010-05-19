@@ -120,6 +120,9 @@ SET (files 10points.png
            cylinder_create_blue.png
            cursor.png
            hand_cursor.png
+           pointlight.png
+           spotlight.png
+           directionallight.png
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)

@@ -12,6 +12,7 @@
 using namespace gazebo;
 
 CylinderMaker::CylinderMaker()
+  : EntityMaker()
 {
   this->state = 0;
   this->visualName = "";
@@ -69,7 +70,7 @@ void CylinderMaker::MouseReleaseCB(const MouseEvent &event)
 
   if (this->state == 3)
   {
-    this->CreateTheCylinder();
+    this->CreateTheEntity();
     this->Start();
   }
 }
@@ -122,7 +123,7 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   vis->SetScale(scale);
 }
 
-void CylinderMaker::CreateTheCylinder()
+void CylinderMaker::CreateTheEntity()
 {
   boost::recursive_mutex::scoped_lock lock( *Simulator::Instance()->GetMRMutex());
 

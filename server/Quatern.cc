@@ -381,6 +381,21 @@ bool Quatern::IsFinite() const
   return finite(this->u) && finite(this->x) && finite(this->y) && finite(this->z);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Correct any nan
+void Quatern::Correct()
+{
+  if (!finite(this->x))
+    this->x = 0;
+  if (!finite(this->y))
+    this->y = 0;
+  if (!finite(this->z))
+    this->z = 0;
+  if (!finite(this->u))
+    this->u = 0;
+}
+
+
 Vector3 Quatern::GetXAxis() const
 {
   double fTy  = 2.0f*this->y;

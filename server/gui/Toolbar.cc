@@ -131,6 +131,26 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->handCursorImage = new Fl_RGB_Image(data, image.GetWidth(), 
                                         image.GetHeight(), 4);
 
+  data = NULL;
+  image.Load("pointlight.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  Fl_RGB_Image *pointlightImage = new Fl_RGB_Image(data, image.GetWidth(), 
+                                                   image.GetHeight(), 4);
+  data = NULL;
+  image.Load("spotlight.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  Fl_RGB_Image *spotlightImage = new Fl_RGB_Image(data, image.GetWidth(), 
+                                                   image.GetHeight(), 4);
+
+  data = NULL;
+  image.Load("directionallight.png");
+  image.Rescale(22,22);
+  image.GetData(&data, dataCount);
+  Fl_RGB_Image *directionallightImage = new Fl_RGB_Image(data, image.GetWidth(),
+                                                         image.GetHeight(), 4);
+
 
   y += 4;
   x += 5;
@@ -197,6 +217,25 @@ Toolbar::Toolbar(int x, int y, int w, int h, const char *l)
   this->cylinderButton->callback( &gazebo::Toolbar::CylinderButtonCB, this );
   this->cylinderButton->image(this->cylinderImage[0]);
   this->cylinderButton->clear_visible_focus();
+
+  x = this->cylinderButton->x() + this->cylinderButton->w() + 10;
+  ToolbarButton *pointLightButton = new ToolbarButton(x,y,30,30);
+  pointLightButton->callback( &gazebo::Toolbar::PointLightCB, this );
+  pointLightButton->image(pointlightImage);
+  pointLightButton->clear_visible_focus();
+
+  x = pointLightButton->x() + pointLightButton->w() + 10;
+  ToolbarButton *spotLightButton = new ToolbarButton(x,y,30,30);
+  spotLightButton->callback( &gazebo::Toolbar::SpotLightCB, this );
+  spotLightButton->image(spotlightImage);
+  spotLightButton->clear_visible_focus();
+
+  x = spotLightButton->x() + spotLightButton->w() + 10;
+  ToolbarButton *directionalLightButton = new ToolbarButton(x,y,30,30);
+  directionalLightButton->callback( &gazebo::Toolbar::DirectionalLightCB, this);
+  directionalLightButton->image(directionallightImage);
+  directionalLightButton->clear_visible_focus();
+
 
   this->end();
   this->resizable(NULL);
@@ -339,6 +378,25 @@ void Toolbar::MoveModeCB(bool mode)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Toolbar::ManipModeCB(bool mode)
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Toolbar::PointLightCB(Fl_Widget *w, void * /*data*/)
+{
+  Events::createEntitySignal("pointlight");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Toolbar::SpotLightCB(Fl_Widget *w, void * /*data*/)
+{
+  Events::createEntitySignal("spotlight");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Toolbar::DirectionalLightCB(Fl_Widget *w, void * /*data*/)
+{
+  Events::createEntitySignal("directionallight");
 }

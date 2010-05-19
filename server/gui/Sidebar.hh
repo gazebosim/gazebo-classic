@@ -40,6 +40,7 @@ class Fl_Float_Input;
 
 namespace gazebo
 {
+  class ParamBrowser;
   class Common;
 
   /// \brief Sidebar
@@ -81,12 +82,13 @@ namespace gazebo
     /// \brief Joint velocity slider callback
     public: static void JointVelocitySliderCB( Fl_Widget *w, void *data );
 
+    /// \brief Goto callback
+    public: static void GotoCB( Fl_Widget *w, void *data );
+
     /// \brief Add an entity ot the param browser
-    private: void AddEntityToParamBrowser(Common *ent, std::string prefix);
+    private: void AddEntityToParamBrowser(const Common *ent, std::string prefix);
 
-    /// \brief Add a line to the param browser
-    private: void AddToParamBrowser(const std::string &line);
-
+    private: void Helper(const Entity *entity);
 
     /// \brief Update entity browser
     private: void UpdateEntityBrowser();
@@ -97,7 +99,8 @@ namespace gazebo
     private: Fl_Value_Slider *jointForceSlider;
     private: Fl_Value_Slider *jointVelocitySlider;
 
-    private: Fl_Hold_Browser *paramBrowser;
+    //private: Fl_Hold_Browser *paramBrowser;
+    private: ParamBrowser *paramBrowser;
     private: Fl_Float_Input *paramInput;
     private: std::string paramInputLbl;
 

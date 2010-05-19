@@ -22,12 +22,38 @@ unsigned int Light::lightCounter = 0;
 Light::Light(Entity *parent)
   : Entity(parent)
 {
+  this->type = Entity::LIGHT;
+
   std::ostringstream stream;
 
   stream << this->parent->GetName() << "_LIGHT" << this->lightCounter;
   this->SetName(stream.str());
 
   this->lightCounter++;
+
+  Param::Begin(&this->parameters);
+  this->lightTypeP = new ParamT<std::string>("type", std::string("point"), 1);
+  this->lightTypeP->Callback(&Light::SetLightType, this);
+
+  this->diffuseP  = new ParamT<Vector3>("diffuseColor", Vector3(.5, .5, .5), 0);
+  this->diffuseP->Callback(&Light::SetDiffuseColor, this);
+
+  this->specularP = new ParamT<Vector3>("specularColor", Vector3(.1, .1, .1), 0);
+  this->specularP->Callback(&Light::SetSpecularColor, this);
+
+  this->directionP  = new ParamT<Vector3>("direction", Vector3(0, 0, -1), 0);
+  this->directionP->Callback(&Light::SetDirection, this);
+
+  this->attenuationP  = new ParamT<Vector3>("attenuation", Vector3(.1, 0.01, .001), 1);
+  this->attenuationP->Callback(&Light::SetAttenuation, this);
+
+  this->rangeP  = new ParamT<double>("range",10,1);
+  this->rangeP->Callback(&Light::SetRange, this);
+
+  this->castShadowsP = new ParamT<bool>("castShadows",true,0);
+  this->castShadowsP->Callback(&Light::SetCastShadows, this);
+  Param::End();
+
 
   World::Instance()->ConnectShowLightsSignal( boost::bind(&Light::ShowVisual, this, _1) );
 }
@@ -38,6 +64,14 @@ Light::~Light()
 {
   delete this->line;
   delete this->visual;
+
+  delete this->lightTypeP;
+  delete this->diffuseP;
+  delete this->specularP;
+  delete this->directionP;
+  delete this->attenuationP;
+  delete this->rangeP;
+  delete this->castShadowsP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,68 +92,30 @@ void Light::Load(XMLConfigNode *node)
         "Unable to create a light on " + this->parent->GetName());
   }
 
-  // Set the light type
-  std::string lightType = node->GetString("type","point",0);
-  if (lightType == "point")
-  {
-    this->light->setType(Ogre::Light::LT_POINT);
-  }
-  else if (lightType == "directional")
-  {
-    this->light->setType(Ogre::Light::LT_DIRECTIONAL);
-    this->parent->GetParentModel()->SetStatic(true);
-  }
-  else if (lightType == "spot")
-  {
-    this->light->setType(Ogre::Light::LT_SPOTLIGHT);
-  }
+  this->lightTypeP->Load(node);
+  this->diffuseP->Load(node);
+  this->specularP->Load(node);
+  this->directionP->Load(node);
+  this->attenuationP->Load(node);
+  this->rangeP->Load(node);
+  this->castShadowsP->Load(node);
 
-  // Set the diffuse color
-  vec = node->GetVector3("diffuseColor",Vector3(1.0, 1.0, 1.0));
-  this->light->setDiffuseColour(vec.x, vec.y, vec.z);
-
-  // Sets the specular color
-  vec = node->GetVector3("specularColor",Vector3(1.0, 1.0, 1.0));
-  this->light->setSpecularColour(vec.x, vec.y, vec.z);
-
-  // Set the direction which the light points
-  vec = node->GetVector3("direction", Vector3(0.0, 0.0, -1.0));
-  vec.Normalize();
-  this->light->setDirection(vec.x, vec.y, vec.z);
-
-  // Absolute range of light in world coordinates
-  range = node->GetDouble("range",0,100);
-
-  // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
-  constant = node->GetTupleDouble("attenuation",0,1.0);
-  if (constant < 0)
-    constant = 0;
-  else if (constant > 1.0)
-    constant = 1.0;
-
-  // Linear factor. 1 means attenuate evenly over the distance
-  linear = node->GetTupleDouble("attenuation",1,0);
-  if (linear < 0)
-    linear = 0;
-  else if (linear > 1.0)
-    linear = 1.0;
-
-  // Quadartic factor.adds a curvature to the attenuation formula
-  quad = node->GetTupleDouble("attenuation",2,0);
-
-  // Set attenuation
-  this->light->setAttenuation(range, constant, linear, quad);
+  this->SetLightType( **this->lightTypeP );
+  this->SetDiffuseColor(**this->diffuseP);
+  this->SetSpecularColor(**this->specularP);
+  this->SetDirection(**this->directionP);
+  this->SetAttenuation(**this->attenuationP);
+  this->SetRange(**this->rangeP);
+  this->SetCastShadows(**this->castShadowsP);
 
   // TODO: More options for Spot lights, etc.
   //  options for spotlights
-  if (lightType == "spot")
+  if ((**this->lightTypeP) == "spot")
   {
     vec = node->GetVector3("spotCone", Vector3(5.0, 10.0, 1.0));
     this->light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), 
         Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
   }
-
-  this->light->setCastShadows(node->GetBool("castShadows",true,0));
 
   this->parent->GetVisualNode()->AttachObject(light);
 
@@ -229,7 +225,7 @@ void Light::CreateVisual()
   this->visual->AttachObject(line);
 
   // turn off light source box visuals by default
-  this->visual->SetVisible(false);
+  this->visual->SetVisible(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,10 +234,15 @@ bool Light::SetSelected( bool s )
 {
   Entity::SetSelected(s);
 
-  if (s)
-    this->line->setMaterial("Gazebo/PurpleEmissive");
-  else
-    this->line->setMaterial("Gazebo/WhiteEmissive");
+  if (this->light->getType() != Ogre::Light::LT_DIRECTIONAL)
+  {
+    if (s)
+      this->line->setMaterial("Gazebo/PurpleEmissive");
+    else
+      this->line->setMaterial("Gazebo/WhiteEmissive");
+  }
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,4 +250,104 @@ bool Light::SetSelected( bool s )
 void Light::ShowVisual(bool s)
 {
   this->visual->SetVisible(s);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the light type
+void Light::SetLightType(const std::string &type)
+{
+  // Set the light type
+  if (type == "point")
+    this->light->setType(Ogre::Light::LT_POINT);
+  else if (type == "directional")
+  {
+    this->light->setType(Ogre::Light::LT_DIRECTIONAL);
+    this->parent->GetParentModel()->SetStatic(true);
+  }
+  else if (type == "spot")
+    this->light->setType(Ogre::Light::LT_SPOTLIGHT);
+
+  if (**this->lightTypeP != type)
+    this->lightTypeP->SetValue( type );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the diffuse
+void Light::SetDiffuseColor(const Vector3 &color)
+{
+  if (**this->diffuseP != color)
+    this->diffuseP->SetValue( color );
+
+  this->light->setDiffuseColour(color.x, color.y, color.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the specular color
+void Light::SetSpecularColor(const Vector3 &color)
+{
+  if (**this->specularP != color)
+    this->specularP->SetValue( color );
+
+  this->light->setSpecularColour(color.x, color.y, color.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the direction
+void Light::SetDirection(const Vector3 &dir)
+{
+  // Set the direction which the light points
+  Vector3 vec = dir;
+  vec.Normalize();
+
+  if (**this->directionP != vec)
+    this->directionP->SetValue( vec );
+
+  this->light->setDirection(vec.x, vec.y, vec.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the attenuation
+void Light::SetAttenuation(const Vector3 &att)
+{
+  Vector3 vec = att;
+
+  // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
+  if (vec.x < 0)
+    vec.x = 0;
+  else if (vec.x > 1.0)
+    vec.x = 1.0;
+
+  // Linear factor. 1 means attenuate evenly over the distance
+  if (vec.y < 0)
+    vec.y = 0;
+  else if (vec.y > 1.0)
+    vec.y = 1.0;
+
+  if (**this->attenuationP != vec)
+    this->attenuationP->SetValue( vec );
+
+  // Set attenuation
+  this->light->setAttenuation((**this->rangeP), vec.x, vec.y, vec.z);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the range
+void Light::SetRange(const double &range)
+{
+  if (**this->rangeP != range)
+    this->rangeP->SetValue( range );
+
+  this->light->setAttenuation(range, (**this->attenuationP).x, 
+      (**this->attenuationP).y, (**this->attenuationP).z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set cast shadowsj
+void Light::SetCastShadows(const bool &cast)
+{
+  if (**this->castShadowsP != cast)
+    this->castShadowsP->SetValue( cast );
+
+  this->light->setCastShadows(cast);
 }

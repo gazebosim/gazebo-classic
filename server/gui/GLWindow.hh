@@ -46,6 +46,9 @@
 #include "SphereMaker.hh"
 #include "BoxMaker.hh"
 #include "CylinderMaker.hh"
+#include "PointLightMaker.hh"
+#include "SpotLightMaker.hh"
+#include "DirectionalLightMaker.hh"
 #include "MouseEvent.hh"
 
 namespace gazebo
@@ -55,6 +58,7 @@ namespace gazebo
   class GLFrame;
   class WindowManager;
   class Entity;
+  class EntityMaker;
 
   /// \brief OpenGL window to display camera data
   class GLWindow : public Fl_Gl_Window
@@ -173,9 +177,14 @@ namespace gazebo
 
     private: std::string mouseModifier;
 
+    private: EntityMaker *currMaker;
+
+    private: CylinderMaker cylinderMaker;
     private: BoxMaker boxMaker;
     private: SphereMaker sphereMaker;
-    private: CylinderMaker cylinderMaker;
+    private: PointLightMaker pointLightMaker;
+    private: SpotLightMaker spotLightMaker;
+    private: DirectionalLightMaker directionalLightMaker;
 
     private: std::string cursorState;
 

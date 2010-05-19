@@ -52,7 +52,7 @@ namespace gazebo
    */
   class Entity : public Common
   {
-    public: enum Type{DEFAULT, MODEL, BODY, GEOM};
+    public: enum Type{DEFAULT, MODEL, BODY, GEOM, LIGHT};
 
     /// \brief Constructor
     /// \param parent Parent of the entity.
@@ -166,6 +166,9 @@ namespace gazebo
 
     /// \brief Get the type of this entity
     public: Type GetType() const;
+
+    /// \brief Get the type as a string
+    public: std::string GetTypeString() const;
 
     /// \brief Handle a change of pose
     private: void PoseChange(bool notify = true);

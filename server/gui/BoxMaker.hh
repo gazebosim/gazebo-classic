@@ -2,25 +2,24 @@
 #define BOXMAKER_HH
 
 #include "Vector2.hh"
+#include "EntityMaker.hh"
 
 namespace gazebo
 {
-  class MouseEvent;
-
-  class BoxMaker
+  class BoxMaker : public EntityMaker
   {
     public: BoxMaker();
     public: virtual ~BoxMaker();
   
-    public: void Start();
-    public: void Stop();
-    public: bool IsActive() const;
+    public: virtual void Start();
+    public: virtual void Stop();
+    public: virtual bool IsActive() const;
 
-    public: void MousePushCB(const MouseEvent &event);
-    public: void MouseReleaseCB(const MouseEvent &event);
-    public: void MouseDragCB(const MouseEvent &event);
+    public: virtual void MousePushCB(const MouseEvent &event);
+    public: virtual void MouseReleaseCB(const MouseEvent &event);
+    public: virtual void MouseDragCB(const MouseEvent &event);
   
-    private: void CreateTheBox();
+    private: virtual void CreateTheEntity();
     private: int state;
     private: bool leftMousePressed;
     private: Vector2<int> mousePushPos;

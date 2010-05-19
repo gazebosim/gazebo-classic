@@ -153,6 +153,9 @@ class Quatern
   /// \return True if quatern is finite
   public: bool IsFinite() const;
 
+  /// \brief Correct any nan
+  public: void Correct();
+
   public: Vector3 GetXAxis() const;
   public: Vector3 GetYAxis() const;
   public: Vector3 GetZAxis() const;

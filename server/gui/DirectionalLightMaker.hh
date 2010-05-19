@@ -1,15 +1,15 @@
-#ifndef CYLINDERMAKER_HH
-#define CYLINDERMAKER_HH
+#ifndef DIRECTIONALLIGHTMAKER_HH
+#define DIRECTIONALLIGHTMAKER_HH
 
 #include "Vector2.hh"
 #include "EntityMaker.hh"
 
 namespace gazebo
 {
-  class CylinderMaker : public EntityMaker
+  class DirectionalLightMaker : public EntityMaker
   {
-    public: CylinderMaker();
-    public: virtual ~CylinderMaker();
+    public: DirectionalLightMaker();
+    public: virtual ~DirectionalLightMaker();
   
     public: virtual void Start();
     public: virtual void Stop();
@@ -21,10 +21,10 @@ namespace gazebo
   
     private: virtual void CreateTheEntity();
     private: int state;
-    private: bool leftMousePressed;
     private: Vector2<int> mousePushPos;
-    private: std::string visualName;
+    private: std::string lightName;
     private: int index;
   };
 }
+
 #endif
