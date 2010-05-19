@@ -125,26 +125,6 @@ if (PKG_CONFIG_FOUND)
   ENDIF (NOT XML_FOUND)
 
   ########################################
-  # Find XFT
-  pkg_check_modules(XFT xft)
-  if (NOT XFT_FOUND)
-    BUILD_ERROR("XFT and development files not found. See the following website: http://www.fontconfig.org")
-  else (NOT XFT_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${XFT_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${XFT_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XFT_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XFT_LIBRARIES})
-  endif (NOT XFT_FOUND)
-
-  ########################################
   # Find libXPM
   pkg_check_modules(XPM xpm)
   if (NOT XPM_FOUND)
@@ -345,7 +325,6 @@ ELSE (HAVE_FFMPEG)
   SET (LIBAVCODEC_PATH /usr/include)
 ENDIF (HAVE_FFMPEG)
 
-
 ########################################
 # Find libevent
 SET (libevent_search_path /usr/include /usr/local/include)
@@ -388,7 +367,7 @@ ENDIF (NOT libtool_include_dir)
 FIND_LIBRARY(libtool_library ltdl /usr/lib /usr/local/lib)
 IF (NOT libtool_library)
   MESSAGE (STATUS "Looking for libltdl - not found")
-  MESSAGE (STATUS "Warning: Unable to find libtool, plugins will not be supported.")
+
 ELSE (NOT libtool_library)
   MESSAGE (STATUS "Looking for libltdl - found")
 ENDIF (NOT libtool_library)
@@ -396,6 +375,28 @@ ENDIF (NOT libtool_library)
 IF (libtool_library AND libtool_include_dir)
   SET (HAVE_LTDL TRUE)
 ENDIF (libtool_library AND libtool_include_dir)
+
+
+########################################
+# Find libyaml
+#
+find_path(yaml_include yaml.h ${yaml_include} ENV CPATH)
+if (yaml_include)
+  message (STATUS "Looking for yaml.h - found")
+else ()
+  message (STATUS "Looking for yaml.h - not found")
+endif ()
+
+find_library(libyaml yaml ENV LD_LIBRARY_PATH)
+if (libyaml)
+  message (STATUS "Looking for libyaml - found")
+else ()
+  message (STATUS "Looking for libyaml - not found")
+endif ()
+
+if (NOT libyaml OR NOT yaml_include)
+  BUILD_ERROR("yaml libraries and development files not found. See the following website for installation instructions: http://www.yaml.org")
+endif (NOT libyaml OR NOT yaml_include)
 
 ########################################
 # Find libdl
