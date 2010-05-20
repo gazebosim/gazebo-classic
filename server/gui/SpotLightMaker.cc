@@ -89,6 +89,7 @@ void SpotLightMaker::CreateTheEntity()
 
   newModelStr << "<model:renderable name=\"" << this->lightName << "\">\
     <xyz>" << p1.x << " " << p1.y << " " << 0.1 << "</xyz>\
+    <static>true</static>\
     <light>\
       <type>spot</type>\
       <specularColor>0.1 0.1 0.1</specularColor>\

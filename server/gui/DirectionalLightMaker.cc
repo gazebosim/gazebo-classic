@@ -89,6 +89,7 @@ void DirectionalLightMaker::CreateTheEntity()
 
   newModelStr << "<model:renderable name=\"" << this->lightName << "\">\
     <xyz>" << p1.x << " " << p1.y << " " << 0.1 << "</xyz>\
+    <static>true</static>\
     <light>\
       <type>directional</type>\
       <direction>.1 .1 -.9</direction>\

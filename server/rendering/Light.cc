@@ -144,41 +144,17 @@ void Light::Load(XMLConfigNode *node)
 // Save a light
 void Light::Save(const std::string &prefix, std::ostream &stream)
 {
-  std::string type;
-
-  if (this->light->getType() == Ogre::Light::LT_POINT)
-    type = "point";
-  else if (this->light->getType() == Ogre::Light::LT_DIRECTIONAL)
-    type = "directional";
-  else 
-    type = "spot";
-
-  Ogre::ColourValue diffuseColor = this->light->getDiffuseColour();
-  Ogre::ColourValue specularColor = this->light->getDiffuseColour();
-  Ogre::Vector3 dir = this->light->getDirection();
-  Ogre::Real attRange = this->light->getAttenuationRange();
-  Ogre::Real attConst = this->light->getAttenuationConstant();
-  Ogre::Real attLinear = this->light->getAttenuationLinear();
-  Ogre::Real attQuadric = this->light->getAttenuationQuadric();
-
   stream << prefix << "<light>\n";
-  stream << prefix << "  <type>" << type << "</type>\n";
-
-  stream << prefix << "  <direction>" << dir.x << " " << dir.y << " " 
-         << dir.z << "</direction>\n";
-
-  stream << prefix << "  <diffuseColor>" << diffuseColor.r << " " 
-         << diffuseColor.g << " " << diffuseColor.b << " " << diffuseColor.a 
-         << "</diffuseColor>\n";
-
-  stream << prefix << "  <specularColor>" << specularColor.r << " " 
-         << specularColor.g << " " << specularColor.b << " "
-         << specularColor.a << "</specularColor>\n";
-
-  stream << prefix << "  <range>"<< attRange << "</range>\n";
-
-  stream << prefix << "  <attenuation>" << " " << attConst 
-         << " " << attLinear << " " << attQuadric << "</attenuation>\n";
+  stream << prefix << "  " << *(this->lightTypeP) << "\n";
+  stream << prefix << "  " << *(this->directionP) << "\n";
+  stream << prefix << "  " << *(this->diffuseP) << "\n";
+  stream << prefix << "  " << *(this->specularP) << "\n";
+  stream << prefix << "  " << *(this->rangeP) << "\n";
+  stream << prefix << "  " << *(this->attenuationP) << "\n";
+  stream << prefix << "  " << *(this->spotInnerAngleP) << "\n";
+  stream << prefix << "  " << *(this->spotOutterAngleP) << "\n";
+  stream << prefix << "  " << *(this->spotFalloffP) << "\n";
+  stream << prefix << "  " << *(this->castShadowsP) << "\n";
   stream << prefix << "</light>\n";
 }
 

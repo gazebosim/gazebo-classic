@@ -287,9 +287,14 @@ void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "<rendering:ogre>\n";
   stream << prefix << "  " << *(this->ambientP) << "\n";
   stream << prefix << "  " << *(this->drawGridP) << "\n";
-  stream << prefix << "  <sky>\n";
-  stream << prefix << "    " << *(this->skyMaterialP) << "\n";
-  stream << prefix << "  </sky>\n";
+
+  if ((**this->skyMaterialP).size())
+  {
+    stream << prefix << "  <sky>\n";
+    stream << prefix << "    " << *(this->skyMaterialP) << "\n";
+    stream << prefix << "  </sky>\n";
+  }
+
   OgreCreator::SaveFog(prefix, stream);
   stream << prefix << "  " << *(this->shadowsP) << "\n";
   stream << prefix << "</rendering:ogre>\n";
