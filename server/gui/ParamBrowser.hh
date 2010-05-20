@@ -29,6 +29,7 @@ namespace gazebo
     public: void AddParam(Param *param);
 
     public: static void SetParam(Fl_Widget *w, void *data);
+    public: static void DividerCB(Fl_Widget *w, void *data);
 
     private: class MyOutput : public Fl_Output
              {
@@ -67,7 +68,7 @@ namespace gazebo
                }
              };
 
-    private: std::vector<MyOutput*> labels;
+    private: int lines;
   };
 }
 #endif

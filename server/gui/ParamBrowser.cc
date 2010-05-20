@@ -1,4 +1,6 @@
 #include "Param.hh"
+#include "World.hh"
+#include "Entity.hh"
 #include "ParamBrowser.hh"
 
 using namespace gazebo;
@@ -10,6 +12,7 @@ ParamBrowser::ParamBrowser(int x, int y, int w, int h, const char *l)
 {
   this->end();
   this->resizable(NULL);
+  this->lines = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -23,40 +26,66 @@ ParamBrowser::~ParamBrowser()
 void ParamBrowser::Clear()
 {
   this->clear();
-  this->labels.clear();
+  this->lines = 0;
   this->redraw();
 }
 
 void ParamBrowser::AddDivider(const std::string& key, const std::string value)
 {
-  int y = this->labels.size()*20;
+  int y = this->y() + this->lines*20;
   MyOutput *out = new MyOutput(this->x(), y,this->w()*.5, 20);
   out->box(FL_BORDER_BOX);
   out->value(key.c_str());
   out->textcolor(fl_rgb_color(255,255,255));
-  out->color(fl_rgb_color(3,20,179),fl_rgb_color(255,255,255) );
-  this->labels.push_back(out);
+  out->color(fl_rgb_color(100,100,100));
 
   MyOutput *out2 = new MyOutput(out->x() + out->w(), y, this->w()-out->w(),20);
   out2->box(FL_BORDER_BOX);
   out2->textcolor(fl_rgb_color(255,255,255));
-  out2->color(fl_rgb_color(3,20,179), fl_rgb_color(255,255,255) );
+
+  Entity *ent = World::Instance()->GetSelectedEntity();
+  if (ent && ent->GetName() == value)
+    out2->color(fl_rgb_color(3,20,179));
+  else
+    out2->color(fl_rgb_color(100,100,100));
+
   out2->value(value.c_str());
+  out2->callback(ParamBrowser::DividerCB, this);
+
+  this->lines++;
 
   this->add(out);
   this->add(out2);
   this->redraw();
 }
 
+void ParamBrowser::DividerCB(Fl_Widget *w, void *data)
+{
+  MyOutput *out = (MyOutput*)(w);
+  std::string childName = out->value();
+
+  out->color(fl_rgb_color(3,20,179), fl_rgb_color(255,255,255) );
+  out->redraw();
+
+  Entity *ent = World::Instance()->GetSelectedEntity();
+  Entity *child = NULL;
+
+  if (ent)
+    child = ent->GetChild(childName);
+
+  if (child)
+    World::Instance()->SetSelectedEntity(child);
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a value to the param browser
 void ParamBrowser::AddParam(Param *param)
 {
-  int y = this->labels.size()*20;
+  int y = this->y() + this->lines*20;
   MyOutput *out = new MyOutput(this->x(), y,this->w()*.5, 20);
   out->box(FL_BORDER_BOX);
   out->value(param->GetKey().c_str());
-  this->labels.push_back(out);
 
   MyInput *in = new MyInput(out->x() + out->w(), y, this->w()*.5,20);
   in->box(FL_BORDER_BOX);
@@ -64,7 +93,8 @@ void ParamBrowser::AddParam(Param *param)
   in->callback( &ParamBrowser::SetParam, this );
   in->when(FL_WHEN_ENTER_KEY | FL_WHEN_RELEASE );
   in->user_data( param );
-  //this->inputs.push_back(in);
+
+  this->lines++;
 
   this->add(out);
   this->add(in);

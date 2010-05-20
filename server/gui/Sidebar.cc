@@ -139,86 +139,18 @@ void Sidebar::SetSelectedEntity(Entity *entity)
     model = (Model*)(entity->GetParent());
   else if (entity && entity->GetType() == Entity::MODEL)
   {
-    //this->paramBrowser->deselect();
     model = (Model*)(entity);
   }
 
   if (model)
   {
     this->paramBrowser->Clear();
+
     this->Helper(model);
+    //std::cout << "Value[" << ((Fl_Valuator*)&this->paramBrowser->scrollbar)->value() << "]\n";
 
-    // Reference
-    /*for (int i=1; i <= this->entityBrowser->size(); i++)
-    {
-      std::string lineText = this->entityBrowser->text(i);
-      if (lineText == model->GetCompleteScopedName())
-        this->entityBrowser->value(i);
-    }
-
-    std::string value = "@b@B52@s@c" + model->GetTypeString();
-    this->AddToParamBrowser(value);
-    this->AddEntityToParamBrowser(model, "");
-
-    const std::vector<Entity*> children = model->GetChildren();
-    std::vector<Entity*>::const_iterator iter;
-    
-    for (iter = children.begin(); iter != children.end(); iter++)
-    {
-      Body *body = dynamic_cast<Body*>(*iter);
-
-      if (!body)
-        continue;
-
-      value = std::string("@b@B52@s-") + body->GetTypeString() + ":~@b@B52@s" + body->GetName();
-      this->AddToParamBrowser(value);
-
-      if (body->GetName() == entity->GetName())
-        this->paramBrowser->value(this->paramBrowser->size());
-
-      this->AddEntityToParamBrowser( body, "  " );
-
-      const std::vector<Entity*> children2 = body->GetCoMEntity()->GetChildren();
-      std::vector<Entity*>::const_iterator iter2;
-
-      for (iter2 = children2.begin(); iter2 != children2.end(); iter2++)
-      {
-        if ((*iter2)->GetType() != Entity::GEOM && 
-            (*iter2)->GetType() != Entity::LIGHT)
-          continue;
-
-        value = "@b@B52@s  -" + (*iter2)->GetTypeString()+ ":~@b@B52@s" + (*iter2)->GetName();
-        this->AddToParamBrowser(value);
-        this->AddEntityToParamBrowser( (*iter2), "    " );
-
-        if ((*iter2)->GetType() == Entity::GEOM)
-        {
-          Geom *geom = (Geom*)(*iter2);
-          for (unsigned int i=0; i < geom->GetVisualCount(); i++)
-          {
-            OgreVisual *vis = geom->GetVisual(i);
-            std::ostringstream stream;
-            stream << vis->GetId();
-            value = "@b@B52@s    -Visual:~@b@B52@s" + stream.str();
-            this->AddToParamBrowser(value);
-            this->AddEntityToParamBrowser( vis, "      " );
-          }
-        }
-        else if ((*iter2)->GetType() == Entity::LIGHT)
-        {
-          Light *light = (Light*)(*iter2);
-
-        }
-      }
-    }
-
-    // Clear the remaining lines
-    while ( this->paramBrowser->text(this->paramCount+1) != NULL )
-    {
-      this->AddToParamBrowser("");
-    }
-    */
-
+    //((Fl_Valuator*)&this->paramBrowser->scrollbar)->value(20);
+    this->paramBrowser->redraw();
     this->paramInput->hide();
   }
 
@@ -233,9 +165,7 @@ void Sidebar::SetSelectedEntity(Entity *entity)
   if (!entity)
   {
     this->entityBrowser->deselect();
-    //this->paramBrowser->deselect();
-    //this->paramBrowser->value(0);
-    //this->paramBrowser->clear();
+    this->paramBrowser->Clear();
   }
 }
 
@@ -272,7 +202,7 @@ void Sidebar::ParamBrowserCB( Fl_Widget * w, void *data)
   int endLbl = 0;
   int beginValue = 0;
   int selected = browser->value();
-
+ 
   if (selected <= 0)
     return;
 
@@ -315,14 +245,6 @@ void Sidebar::ParamBrowserCB( Fl_Widget * w, void *data)
   beginValue = endLbl+1;
   while (lineText[beginValue] == '@') beginValue+=2; 
 
-  /*toolbar->paramInputLbl = lineText.substr(beginLbl, endLbl-beginLbl);
-
-  toolbar->paramInput->label(toolbar->paramInputLbl.c_str());
-
-  toolbar->paramInput->value( lineText.substr(beginValue, lineText.size() - beginValue).c_str() );
-
-  toolbar->paramInput->redraw();
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,76 +260,6 @@ void Sidebar::ParamInputCB( Fl_Widget *w, void *data)
     double dblValue = boost::lexical_cast<double>(value);
     Gui::forceMultiplier = dblValue;
   }
-
-  /*Fl_Input *input = (Fl_Input*)(w);
-  Sidebar *toolbar = (Sidebar*)(data);
-  Fl_Hold_Browser *browser = toolbar->paramBrowser;
-  int selected = browser->value();
-  Model *model = dynamic_cast<Model*>(World::Instance()->GetSelectedEntity());
-
-
-  Body *body = NULL;
-  Geom *geom = NULL;
-  OgreVisual *vis = NULL;
-
-  std::string geomName, bodyName, visNum, value, label;
-
-  // Make sure we have a valid model
-  if (!model)
-  {
-    gzerr(0) << "Somehow you selected something that is not a model.\n";
-    return;
-  }
-
-  value = input->value();
-  label = input->label();
-
-  // Get rid of the ':' at the end
-  label = label.substr(0, label.size()-1);
-
-  // Get the name of the body and geom.
-  while (selected > 0)
-  {
-    std::string lineText = browser->text(selected);
-    int lastAmp = lineText.rfind("@")+2;
-
-    if (lineText.find("-Geom:") != std::string::npos && geomName.empty())
-      geomName = lineText.substr( lastAmp, lineText.size()-lastAmp );
-    else if (lineText.find("-Body:") != std::string::npos && bodyName.empty())
-      bodyName = lineText.substr( lastAmp, lineText.size()-lastAmp );
-    else if (lineText.find("-Visual:") != std::string::npos && visNum.empty())
-      visNum = lineText.substr( lastAmp, lineText.size()-lastAmp );
-      
-    selected--;
-  }
-
-  // Get the body
-  if (!bodyName.empty())
-    body = model->GetBody(bodyName);
-
-  // Get the geom
-  if (!geomName.empty() && body)
-    geom = body->GetGeom(geomName);
-
-  if (!visNum.empty() && geom)
-    vis = geom->GetVisualById(boost::lexical_cast<int>(visNum));
-
-  // Get the parameter
-  Param *param = NULL;
-  if (vis)
-    param = vis->GetParam(label);
-  else if (geom)
-    param = geom->GetParam(label);
-  else if (body)
-    param = body->GetParam(label);
-  else
-    param = model->GetParam(label);
-
-  if (param)
-  {
-    param->SetFromString( value, true );
-  }
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

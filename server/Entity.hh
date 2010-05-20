@@ -84,6 +84,9 @@ namespace gazebo
     /// \brief Get all children
     /// \return Vector of children entities
     public: const std::vector< Entity* >  &GetChildren() const;
+
+    /// \brief Get a child by name
+    public: Entity *GetChild(const std::string &name );
   
     /// \brief Return this entity's sceneNode
     /// \return Ogre scene node

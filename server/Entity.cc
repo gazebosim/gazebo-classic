@@ -183,6 +183,14 @@ const std::vector< Entity* > &Entity::GetChildren() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get a child by name
+Entity *Entity::GetChild(const std::string &name )
+{
+  std::string fullName = this->GetCompleteScopedName() + "::" + name;
+  return World::Instance()->GetEntityByName(fullName);
+}
+ 
+////////////////////////////////////////////////////////////////////////////////
 // Return this entitie's sceneNode
 OgreVisual *Entity::GetVisualNode() const
 {

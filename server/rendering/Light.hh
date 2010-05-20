@@ -55,6 +55,15 @@ namespace gazebo
     /// \brief Set the attenuation
     public: void SetAttenuation(const Vector3 &att);
 
+    /// \brief Set the spot light inner angle
+    public: void SetSpotInnerAngle(const double &angle);
+
+    /// \brief Set the spot light outter angle
+    public: void SetSpotOutterAngle(const double &angle);
+
+    /// \brief Set the spot light falloff
+    public: void SetSpotFalloff(const double &angle);
+
     /// \brief Set the range
     public: void SetRange(const double &range);
 
@@ -78,6 +87,9 @@ namespace gazebo
     private: ParamT<Vector3> *attenuationP;
     private: ParamT<double> *rangeP;
     private: ParamT<bool> *castShadowsP;
+    private: ParamT<double> *spotInnerAngleP;
+    private: ParamT<double> *spotOutterAngleP;
+    private: ParamT<double> *spotFalloffP;
 
     private: static unsigned int lightCounter;
 

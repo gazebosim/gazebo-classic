@@ -47,6 +47,15 @@ Light::Light(Entity *parent)
   this->attenuationP  = new ParamT<Vector3>("attenuation", Vector3(.1, 0.01, .001), 1);
   this->attenuationP->Callback(&Light::SetAttenuation, this);
 
+  this->spotInnerAngleP = new ParamT<double>("innerAngle", 10, 0);
+  this->spotInnerAngleP->Callback(&Light::SetSpotInnerAngle, this);
+
+  this->spotOutterAngleP = new ParamT<double>("outterAngle", 5, 0);
+  this->spotOutterAngleP->Callback(&Light::SetSpotOutterAngle, this);
+
+  this->spotFalloffP = new ParamT<double>("falloff", 1, 0);
+  this->spotFalloffP->Callback(&Light::SetSpotFalloff, this);
+
   this->rangeP  = new ParamT<double>("range",10,1);
   this->rangeP->Callback(&Light::SetRange, this);
 
@@ -72,6 +81,9 @@ Light::~Light()
   delete this->attenuationP;
   delete this->rangeP;
   delete this->castShadowsP;
+  delete this->spotInnerAngleP;
+  delete this->spotOutterAngleP;
+  delete this->spotFalloffP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,6 +111,9 @@ void Light::Load(XMLConfigNode *node)
   this->attenuationP->Load(node);
   this->rangeP->Load(node);
   this->castShadowsP->Load(node);
+  this->spotInnerAngleP->Load(node);
+  this->spotOutterAngleP->Load(node);
+  this->spotFalloffP->Load(node);
 
   this->SetLightType( **this->lightTypeP );
   this->SetDiffuseColor(**this->diffuseP);
@@ -107,15 +122,18 @@ void Light::Load(XMLConfigNode *node)
   this->SetAttenuation(**this->attenuationP);
   this->SetRange(**this->rangeP);
   this->SetCastShadows(**this->castShadowsP);
+  this->SetSpotInnerAngle(**this->spotInnerAngleP);
+  this->SetSpotOutterAngle(**this->spotOutterAngleP);
+  this->SetSpotFalloff(**this->spotFalloffP);
 
   // TODO: More options for Spot lights, etc.
   //  options for spotlights
-  if ((**this->lightTypeP) == "spot")
+  /*if ((**this->lightTypeP) == "spot")
   {
     vec = node->GetVector3("spotCone", Vector3(5.0, 10.0, 1.0));
     this->light->setSpotlightRange(Ogre::Radian(Ogre::Degree(vec.x)), 
         Ogre::Radian(Ogre::Degree(vec.y)), vec.z);
-  }
+  }*/
 
   this->parent->GetVisualNode()->AttachObject(light);
 
@@ -350,4 +368,45 @@ void Light::SetCastShadows(const bool &cast)
     this->castShadowsP->SetValue( cast );
 
   this->light->setCastShadows(cast);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the spot light inner angle
+void Light::SetSpotInnerAngle(const double &angle)
+{
+  if (**this->spotInnerAngleP != angle)
+    this->spotInnerAngleP->SetValue( angle );
+
+  this->light->setSpotlightRange(
+      Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
+      Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
+      **this->spotFalloffP);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the spot light outter angle
+void Light::SetSpotOutterAngle(const double &angle)
+{
+  if (**this->spotOutterAngleP != angle)
+    this->spotOutterAngleP->SetValue( angle );
+
+  this->light->setSpotlightRange(
+      Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
+      Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
+      **this->spotFalloffP);
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the spot light falloff
+void Light::SetSpotFalloff(const double &angle)
+{
+  if (**this->spotFalloffP != angle)
+    this->spotFalloffP->SetValue( angle );
+
+  this->light->setSpotlightRange(
+      Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
+      Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
+      **this->spotFalloffP);
+
 }
