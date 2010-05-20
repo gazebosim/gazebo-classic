@@ -377,10 +377,11 @@ void Light::SetSpotInnerAngle(const double &angle)
   if (**this->spotInnerAngleP != angle)
     this->spotInnerAngleP->SetValue( angle );
 
-  this->light->setSpotlightRange(
-      Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
-      Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
-      **this->spotFalloffP);
+  if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
+    this->light->setSpotlightRange(
+        Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
+        Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
+        **this->spotFalloffP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -390,10 +391,11 @@ void Light::SetSpotOutterAngle(const double &angle)
   if (**this->spotOutterAngleP != angle)
     this->spotOutterAngleP->SetValue( angle );
 
-  this->light->setSpotlightRange(
-      Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
-      Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
-      **this->spotFalloffP);
+  if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
+    this->light->setSpotlightRange(
+        Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
+        Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
+        **this->spotFalloffP);
 
 }
 
@@ -404,9 +406,10 @@ void Light::SetSpotFalloff(const double &angle)
   if (**this->spotFalloffP != angle)
     this->spotFalloffP->SetValue( angle );
 
-  this->light->setSpotlightRange(
-      Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
-      Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
-      **this->spotFalloffP);
+  if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
+    this->light->setSpotlightRange(
+        Ogre::Radian(Ogre::Degree(**this->spotInnerAngleP)), 
+        Ogre::Radian(Ogre::Degree(**this->spotOutterAngleP)), 
+        **this->spotFalloffP);
 
 }
