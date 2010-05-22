@@ -584,9 +584,6 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
 
   params["parentWindowHandle"] = ogreHandle.str();
 
-  //params["vsync"] = "true";
-  params["FSAA"] = "2";
-
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
 
