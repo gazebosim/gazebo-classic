@@ -116,9 +116,6 @@ namespace gazebo
     /// \brief Insert a mesh into Ogre 
     public: static void InsertMesh( const Mesh *mesh);
 
-    /// \brief Draw the uniform grid pattern
-    public: static void DrawGrid();
-
     /// \brief Draw a named line
     public: static void DrawLine(const Vector3 &start, const Vector3 &end, const std::string &name);
 

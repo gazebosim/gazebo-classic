@@ -75,7 +75,6 @@ OgreAdaptor::OgreAdaptor()
   Param::Begin(&this->parameters);
   this->ambientP = new ParamT<Vector4>("ambient",Vector4(.1,.1,.1,.1),0);
   this->shadowsP = new ParamT<bool>("shadows", true, 0);
-  this->drawGridP = new ParamT<bool>("grid", true, 0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
   this->backgroundColorP = new ParamT<Vector3>("backgroundColor",Vector3(0.5,0.5,0.5), 0);
 
@@ -96,7 +95,6 @@ OgreAdaptor::~OgreAdaptor()
   delete this->ambientP;
   delete this->shadowsP;
   delete this->backgroundColorP;
-  delete this->drawGridP;
   delete this->skyMaterialP;
 
 }
@@ -199,7 +197,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->ambientP->Load(node);
   this->shadowsP->Load(node);
   this->backgroundColorP->Load(node);
-  this->drawGridP->Load(node);
 
   ambient.r = (**(this->ambientP)).x;
   ambient.g = (**(this->ambientP)).y;
@@ -239,9 +236,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   // Add fog. This changes the background color
   if (node)
     OgreCreator::CreateFog(node->GetChild("fog"));
-
-  if (**(this->drawGridP))
-    OgreCreator::DrawGrid();
 
   // Set up the world geometry link
   if (this->sceneType==SCENE_BSP)
@@ -286,7 +280,6 @@ void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<rendering:ogre>\n";
   stream << prefix << "  " << *(this->ambientP) << "\n";
-  stream << prefix << "  " << *(this->drawGridP) << "\n";
 
   if ((**this->skyMaterialP).size())
   {
@@ -471,7 +464,6 @@ void OgreAdaptor::UpdateCameras()
   std::vector<OgreCamera*>::iterator iter;
 
   OgreCreator::Instance()->Update();
-
   this->root->_fireFrameStarted();
 
   // Draw all the non-user cameras
