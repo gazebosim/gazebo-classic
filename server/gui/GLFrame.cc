@@ -125,7 +125,7 @@ GLFrame::GLFrame(int x, int y, int w, int h, const std::string &name)
   x1 += fillerBox->w();
 
   Fl_Group *statsGroup = new Fl_Group(x1, y1,100,20);
-  this->fps = new Fl_Value_Output(x1,y1,25,20,"FPS");
+  this->fps = new Fl_Value_Output(x1,y1,30,20,"FPS");
   this->fps->labelsize(10);
   this->fps->textsize(10);
   this->fps->precision(0);
