@@ -45,7 +45,6 @@ using namespace gazebo;
 GraphicsIfaceHandler::GraphicsIfaceHandler()
 {
   this->threeDIface = NULL;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +55,7 @@ GraphicsIfaceHandler::~GraphicsIfaceHandler()
   {
     this->threeDIface->Close();
     delete this->threeDIface;
+    this->threeDIface = NULL;
   }
 }
 

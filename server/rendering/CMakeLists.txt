@@ -52,6 +52,14 @@ set (headers OgreMovableText.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})
+
+if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_target_properties(gazebo_rendering PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+
 target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11)
 install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 APPEND_TO_SERVER_HEADERS(${headers})

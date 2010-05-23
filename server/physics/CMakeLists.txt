@@ -55,6 +55,14 @@ set (headers BallJoint.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})
+
+if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_target_properties(gazebo_physics PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+
 install ( TARGETS gazebo_physics DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 #APPEND_TO_SERVER_SOURCES(${sources})
 APPEND_TO_SERVER_HEADERS(${headers})

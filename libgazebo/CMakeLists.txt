@@ -20,6 +20,14 @@ link_directories(${boost_library_dirs})
 add_library(gazeboshm SHARED ${sources})
 set_target_properties(gazeboshm PROPERTIES OUTPUT_NAME "gazebo" VERSION ${GAZEBO_VERSION})
 
+if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_target_properties(gazeboshm PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+
+
 target_link_libraries( gazeboshm ${boost_libraries})
 
 install (TARGETS gazeboshm DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

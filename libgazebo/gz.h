@@ -918,7 +918,7 @@ opengl funcitons.
 /// Maximum number of points that can be drawn
 #define GAZEBO_GRAPHICS3D_MAX_POINTS 1024
 #define GAZEBO_GRAPHICS3D_MAX_NAME 128
-#define GAZEBO_GRAPHICS3D_MAX_COMMANDS 128
+#define GAZEBO_GRAPHICS3D_MAX_COMMANDS 64
 
 class Graphics3dDrawData
 {

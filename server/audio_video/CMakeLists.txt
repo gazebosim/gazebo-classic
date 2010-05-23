@@ -17,6 +17,15 @@ SET (headers AudioDecoder.hh
 #ADD_LIBRARY(gazebo_av STATIC ${sources})
 ADD_LIBRARY(gazebo_av-shared SHARED ${sources})
 
+
+if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_target_properties(gazebo_av-shared PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+
+
 #TARGET_LINK_LIBRARIES(gazebo_av ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES})
 TARGET_LINK_LIBRARIES(gazebo_av-shared ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES})
 
