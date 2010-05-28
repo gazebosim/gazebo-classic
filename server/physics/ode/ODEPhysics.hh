@@ -27,9 +27,6 @@
 #ifndef ODEPHYSICS_HH
 #define ODEPHYSICS_HH
 
-// Use single precision in ODE
-#define dSINGLE 1
-
 #include <ode/ode.h>
 
 #include "Param.hh"

@@ -39,6 +39,8 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC")
+LIST_TO_STRING(MY_ODE_CFLAGS "${ODE_CFLAGS}")
+
+set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC ${MY_ODE_CFLAGS}")
 target_link_libraries( gazebo_physics_ode ${ODE_LIBRARIES})
 install ( TARGETS gazebo_physics_ode DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
