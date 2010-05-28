@@ -1,4 +1,15 @@
 project(benchmarks)
+INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
+STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
+STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
+
+INCLUDE_DIRECTORIES(
+  .
+  ${CMAKE_SOURCE_DIR}/libgazebo
+  ${LINK_DIRS}
+  ${boost_include_dirs_split}
+)
+
 
 cmake_minimum_required( VERSION 2.4 FATAL_ERROR )
 
@@ -17,9 +28,6 @@ include (FindPkgConfig)
 # endif (PKG_CONFIG_FOUND)
 
 link_directories(../libgazebo ${INCLUDE_DIRS})
-include_directories(../libgazebo ${LINK_DIRS})
-
-include_directories(.)
 
 set (sources laser_benchmark.cc 
              box_grid_benchmark.cc 
