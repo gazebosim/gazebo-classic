@@ -28,7 +28,6 @@ set (FLTK_INCLUDE_DIR "" CACHE STRING "Threadpool include paths. Use this to ove
 
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
-include (${gazebo_cmake_dir}/FindOde.cmake)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
 
@@ -123,6 +122,32 @@ if (PKG_CONFIG_FOUND)
                           ${XML_CFLAGS})
 
   ENDIF (NOT XML_FOUND)
+
+  ########################################
+  # Find ODE
+  pkg_check_modules(ODE ode>=${ODE_VERSION})
+  IF (NOT ODE_FOUND)
+    BUILD_ERROR ("ODE and development files not found. See the following website: http://www.ode.org")
+    SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
+  ELSE (NOT ODE_FOUND)
+    SET (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
+  
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
+                          ${ODE_INCLUDE_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
+                          ${ODE_LIBRARY_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ODE_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ODE_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
+                          ${gazeboserver_ldflags_desc} 
+                          ${ODE_LDFLAGS})
+  ENDIF (NOT ODE_FOUND)
 
   ########################################
   # Find libXPM
