@@ -6,6 +6,7 @@
 
 gazebo::Client *client = NULL;
 gazebo::SimulationIface *simIface = NULL;
+gazebo::FactoryIface *factoryIface = NULL;
 
 std::string test_name="Spinning Box Benchmark";
 std::string xlabel = "Spinning Box Count";
@@ -29,10 +30,39 @@ void make_plot()
     std::cerr << "Error\n";
 }
 
+void spawn_box()
+{
+  std::ostringstream model;
+
+  model << "<model:physical name='box'>";
+  model << "  <static>false</static>";
+  model << "  <xyz>0 0 0.5</xyz>";
+  model << "  <rpy>00 00 0</rpy>";
+  model << "  <body:box name='body'>";
+  model << "    <geom:box name='geom'>";
+  model << "      <size>1 1 1</size>";
+  model << "      <mass>1</mass>";
+  model << "      <mu1>.1</mu1>";
+  model << "      <mu2>.1</mu2>";
+  model << "      <visual>";
+  model << "        <size>1 1 1</size>";
+  model << "        <mesh>unit_box</mesh>";
+  model << "        <material>Gazebo/Rocky</material>";
+  model << "      </visual>";
+  model << "    </geom:box>";
+  model << "  </body:box>";
+  model << "</model:physical>";
+
+  factoryIface->Lock(1);
+  strcpy( (char*)factoryIface->data->newModel, model.str().c_str() );
+  factoryIface->Unlock();
+}
+
 int main(int argc, char **argv)
 {
   client = new gazebo::Client();
   simIface = new gazebo::SimulationIface();
+  factoryIface = new gazebo::FactoryIface();
 
   float vel = 1.0;
   if (argc > 1)
@@ -59,6 +89,20 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  // Open the factory iface
+  try
+  {
+    factoryIface->Open(client, "default");
+  }
+  catch( std::string e)
+  {
+    std::cerr << "Gazebo error: Unable to connect to the factory Iface:" 
+              << e << "\n";
+    return -1;
+  }
+  spawn_box();
+
+  usleep(5000000);
   //FILE *out = fopen(data_filename.c_str(), "w");
 
   /*if (!out)
@@ -72,12 +116,13 @@ int main(int argc, char **argv)
   gazebo::Vec3 linearVel, angularVel, linearAccel, angularAccel;
   gazebo::Pose modelPose;
 
+
   bool done = false;
   while (!done)
   {
-    simIface->SetAngularVel("box_model", gazebo::Vec3(0,0,vel));
+    simIface->SetAngularVel("box", gazebo::Vec3(0,0,vel));
     
-    simIface->GetState("box_model", modelPose, linearVel, angularVel, 
+    simIface->GetState("box", modelPose, linearVel, angularVel, 
                        linearAccel, angularAccel);
     printf("Pos[%4.2f %4.2f %4.2f] RPY[%4.2f %4.2f %4.2f] ", modelPose.pos.x, modelPose.pos.y, modelPose.pos.z, modelPose.roll, modelPose.pitch, modelPose.yaw);
     printf("LV[%4.2f %4.2f %4.2f] ",linearVel.x, linearVel.y, linearVel.z );
