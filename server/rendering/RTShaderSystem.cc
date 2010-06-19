@@ -26,6 +26,7 @@
 
 #include <boost/bind.hpp>
 #include <sys/stat.h>
+#include <iostream>
 
 #include "OgreVisual.hh"
 #include "World.hh"
@@ -33,6 +34,7 @@
 #include "GazeboMessage.hh"
 #include "OgreAdaptor.hh"
 #include "RTShaderSystem.hh"
+#include "gz.h"
 
 #define MINOR_VERSION 7
 using namespace gazebo;
@@ -56,13 +58,11 @@ void RTShaderSystem::Init()
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   if (Ogre::RTShader::ShaderGenerator::initialize())
   {
-    Ogre::StringVector groupVector;
-
     this->shaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
     this->shaderGenerator->addSceneManager(OgreAdaptor::Instance()->sceneMgr);
  
     // Setup the core libraries and shader cache path 
-    groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
+    Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
     Ogre::StringVector::iterator itGroup = groupVector.begin();
     Ogre::StringVector::iterator itGroupEnd = groupVector.end();
     Ogre::String shaderCoreLibsPath;
@@ -90,7 +90,35 @@ void RTShaderSystem::Init()
           if ((*it)->archive->getName().find("rtshaderlib") != Ogre::String::npos)
           {
             shaderCoreLibsPath = (*it)->archive->getName() + "/";
-            shaderCachePath = shaderCoreLibsPath;
+
+            // setup patch name for rt shader cache in tmp
+            char *tmpdir;
+            char *user;
+            std::ostringstream stream;
+            std::ostringstream errStream;
+            // Get the tmp dir
+            tmpdir = getenv("TMP");
+            if (!tmpdir)
+              tmpdir = (char*)"/tmp";
+            // Get the user
+            user = getenv("USER");
+            if (!user)
+              user = (char*)"nobody";
+            stream << tmpdir << "/gazebo-" << user << "-rtshaderlibcache" << "/";
+            shaderCachePath = stream.str();
+            struct stat astat;
+            // Create the directory
+            if (mkdir(shaderCachePath.c_str(), S_IRUSR | S_IWUSR | S_IXUSR) != 0)
+            {
+              if (errno != EEXIST)
+              {
+                errStream << "failed to create [" << shaderCachePath << "] : ["
+                <<  strerror(errno) << "]";
+                throw(errStream.str());
+              }
+
+            }
+
             coreLibsFound = true;
             break;
           }
