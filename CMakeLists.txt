@@ -93,7 +93,8 @@ if ( build_errors )
 else (build_errors)
   ########################################
   # Write the config.h file
-  configure_file (${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h)
+  configure_file (${PROJECT_SOURCE_DIR}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
+  install(FILES ${PROJECT_BINARY_DIR}/gazebo_config.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
 
   configure_file (${PROJECT_SOURCE_DIR}/gazebo.h.in ${PROJECT_BINARY_DIR}/gazebo.h)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazebo.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)
@@ -109,10 +110,6 @@ else (build_errors)
   
   if (BUILD_GAZEBO)
     include (libgazebo)
-
-    if (use_internal_assimp)
-      add_subdirectory(3rd_party)
-    endif (use_internal_assimp)
 
     add_subdirectory(libgazebo)
     add_subdirectory(server)
