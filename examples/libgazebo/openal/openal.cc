@@ -2,15 +2,15 @@
 #include <iostream>
 #include <gazebo/gazebo.h>
 
-gazebo::Client *client = NULL;
-gazebo::SimulationIface *simIface = NULL;
-gazebo::AudioIface *audioIface = NULL;
+libgazebo::Client *client = NULL;
+libgazebo::SimulationIface *simIface = NULL;
+libgazebo::AudioIface *audioIface = NULL;
 
 int main()
 {
-  client = new gazebo::Client();
-  simIface = new gazebo::SimulationIface();
-  audioIface = new gazebo::AudioIface();
+  client = new libgazebo::Client();
+  simIface = new libgazebo::SimulationIface();
+  audioIface = new libgazebo::AudioIface();
 
   int serverId = 0;
 

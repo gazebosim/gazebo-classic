@@ -13,9 +13,9 @@ enum Joint {HEAD, NECK, R_SHOULDER, R_SHOULDER2, R_ELBOW, R_ELBOW2,
 
 int main()
 {
-  gazebo::Client *client = new gazebo::Client();
-  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
-  gazebo::ActarrayIface *actarrayIface = new gazebo::ActarrayIface();
+  liblibgazebo::Client *client = new libgazebo::Client();
+  liblibgazebo::SimulationIface *simIface = new libgazebo::SimulationIface();
+  liblibgazebo::ActarrayIface *actarrayIface = new libgazebo::ActarrayIface();
 
   int serverId = 0;
 

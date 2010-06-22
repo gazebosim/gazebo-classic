@@ -3,7 +3,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save an image frame
-void SaveFrame(const char *filename, gazebo::CameraData *data)
+void SaveFrame(const char *filename, libgazebo::CameraData *data)
 {
   int i, width, height;
   FILE *file;
@@ -28,9 +28,9 @@ void SaveFrame(const char *filename, gazebo::CameraData *data)
 
 int main()
 {
-  gazebo::Client *client = new gazebo::Client();
-  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
-  gazebo::CameraIface *camIface = new gazebo::CameraIface();
+  libgazebo::Client *client = new gazebo::Client();
+  libgazebo::SimulationIface *simIface = new gazebo::SimulationIface();
+  libgazebo::CameraIface *camIface = new gazebo::CameraIface();
 
   int serverId = 0;
 
@@ -39,7 +39,7 @@ int main()
   {
     client->ConnectWait(serverId, GZ_CLIENT_ID_USER_FIRST);
   }
-  catch (gazebo::GazeboError e)
+  catch (libgazebo::GazeboError e)
   {
     std::cout << "Gazebo error: Unable to connect\n" << e << "\n";
     return -1;
@@ -50,7 +50,7 @@ int main()
   {
     simIface->Open(client, "default");
   }
-  catch (gazebo::GazeboError e)
+  catch (libgazebo::GazeboError e)
   {
     std::cout << "Gazebo error: Unable to connect to the sim interface\n" << e << "\n";
     return -1;

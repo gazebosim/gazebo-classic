@@ -6,9 +6,9 @@
 
 int main()
 {
-  gazebo::Client *client = new gazebo::Client();
-  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
-  gazebo::LaserIface *laserIface = new gazebo::LaserIface();
+  libgazebo::Client *client = new gazebo::Client();
+  libgazebo::SimulationIface *simIface = new gazebo::SimulationIface();
+  libgazebo::LaserIface *laserIface = new gazebo::LaserIface();
 
   int serverId = 0;
 

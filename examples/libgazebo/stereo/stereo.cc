@@ -1,9 +1,9 @@
 #include <gazebo/gazebo.h>
 #include <gazebo/GazeboError.hh>
 
-gazebo::Client *client = NULL;
-gazebo::SimulationIface *simIface = NULL;
-gazebo::StereoCameraIface *stereoIface = NULL;
+libgazebo::Client *client = NULL;
+libgazebo::SimulationIface *simIface = NULL;
+libgazebo::StereoCameraIface *stereoIface = NULL;
 int saveCount = 0;
 
 void SaveFrame()
@@ -48,9 +48,9 @@ void SaveFrame()
 
 int main()
 {
-  client = new gazebo::Client();
-  simIface = new gazebo::SimulationIface();
-  stereoIface = new gazebo::StereoCameraIface();
+  client = new libgazebo::Client();
+  simIface = new libgazebo::SimulationIface();
+  stereoIface = new libgazebo::StereoCameraIface();
 
 
   int serverId = 0;
@@ -60,7 +60,7 @@ int main()
   {
     client->ConnectWait(serverId, GZ_CLIENT_ID_USER_FIRST);
   }
-  catch (gazebo::GazeboError e)
+  catch (libgazebo::GazeboError e)
   {
     std::cout << "Gazebo error: Unable to connect\n" << e << "\n";
     return -1;
@@ -71,7 +71,7 @@ int main()
   {
     simIface->Open(client, "default");
   }
-  catch (gazebo::GazeboError e)
+  catch (libgazebo::GazeboError e)
   {
     std::cout << "Gazebo error: Unable to connect to the sim interface\n" << e << "\n";
     return -1;

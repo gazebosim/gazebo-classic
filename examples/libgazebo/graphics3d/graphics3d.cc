@@ -8,33 +8,33 @@
 #include <gazebo/gazebo.h>
 
 // All the interfaces
-gazebo::Client *client;
-gazebo::SimulationIface *simIface;
-gazebo::Graphics3dIface *g3dIface;
+libgazebo::Client *client;
+libgazebo::SimulationIface *simIface;
+libgazebo::Graphics3dIface *g3dIface;
 
 // Stuff to draw the square
 std::string squareName = "square";
-gazebo::Vec3 squareSize;
+libgazebo::Vec3 squareSize;
 int dir = 1;
 
 // Stuff to draw the sphere
 std::string sphereName = "sphere";
-gazebo::Vec3 spherePos, sphereSize;
+libgazebo::Vec3 spherePos, sphereSize;
 float radius = 0.2;
 float theta = 0;
 
 // Stuff to draw the robot's path
 std::string pathName = "path";
-std::vector<gazebo::Vec3> positions;
+std::vector<libgazebo::Vec3> positions;
 
 // Stuff to draw the text
 std::string textName = "velocities";
 
 void UpdatePath()
 {
-  gazebo::Pose rPos;
-  gazebo::Vec3 blockSize;
-  gazebo::Color clr;
+  libgazebo::Pose rPos;
+  libgazebo::Vec3 blockSize;
+  libgazebo::Color clr;
   std::ostringstream blockName;
 
   blockSize.x = 0.05;
@@ -58,7 +58,7 @@ void UpdatePath()
     // Store the new position
     positions.push_back(rPos.pos);
 
-    gazebo::Vec3 tmpvec[positions.size()];
+    libgazebo::Vec3 tmpvec[positions.size()];
     for (unsigned int j =0; j < positions.size(); j++)
     {
       tmpvec[j].x = positions[j].x;
@@ -72,7 +72,7 @@ void UpdatePath()
 
     // Draw the line
     g3dIface->DrawSimple(pathName.c_str(),
-        gazebo::Graphics3dDrawData::LINE_STRIP,
+        libgazebo::Graphics3dDrawData::LINE_STRIP,
         tmpvec, positions.size(), clr);
 
     blockName << "path_block:" << positions.size();
@@ -83,7 +83,7 @@ void UpdatePath()
     clr.a = 1.0;
 
     g3dIface->DrawShape(blockName.str().c_str(),
-        gazebo::Graphics3dDrawData::CUBE, tmpvec[positions.size()-1], 
+        libgazebo::Graphics3dDrawData::CUBE, tmpvec[positions.size()-1], 
         blockSize, clr);
   }
 }
@@ -91,9 +91,9 @@ void UpdatePath()
 
 int main()
 {
-  client = new gazebo::Client();
-  simIface = new gazebo::SimulationIface();
-  g3dIface = new gazebo::Graphics3dIface();
+  client = new libgazebo::Client();
+  simIface = new libgazebo::SimulationIface();
+  g3dIface = new libgazebo::Graphics3dIface();
 
   int serverId = 0;
 
@@ -132,7 +132,7 @@ int main()
   sphereSize.y = 0.1;
   sphereSize.z = 0.1;
 
-  gazebo::Color barClr;
+  libgazebo::Color barClr;
   barClr.r = 1.0;
   barClr.g = 1.0;
   barClr.b = 0.0;

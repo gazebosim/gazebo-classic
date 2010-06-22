@@ -3,8 +3,8 @@
 
 int main()
 {
-  gazebo::Client *client = new gazebo::Client();
-  gazebo::BumperIface *bumperIface = new gazebo::BumperIface();
+  libgazebo::Client *client = new gazebo::Client();
+  libgazebo::BumperIface *bumperIface = new gazebo::BumperIface();
 
   int serverId = 0;
 
@@ -13,7 +13,7 @@ int main()
   {
     client->ConnectWait(serverId, GZ_CLIENT_ID_USER_FIRST);
   }
-  catch (gazebo::GazeboError e)
+  catch (libgazebo::GazeboError e)
   {
     std::cout << "Gazebo error: Unable to connect\n" << e << "\n";
     return -1;

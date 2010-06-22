@@ -4,9 +4,9 @@
 
 int main()
 {
-  gazebo::Client *client = new gazebo::Client();
-  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
-  gazebo::FactoryIface *factoryIface = new gazebo::FactoryIface();
+  libgazebo::Client *client = new gazebo::Client();
+  libgazebo::SimulationIface *simIface = new gazebo::SimulationIface();
+  libgazebo::FactoryIface *factoryIface = new gazebo::FactoryIface();
 
   int serverId = 0;
 

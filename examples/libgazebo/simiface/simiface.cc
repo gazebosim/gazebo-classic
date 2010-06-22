@@ -15,8 +15,8 @@ void Callback()
 
 int main()
 {
-  gazebo::Client *client = new gazebo::Client();
-  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
+  libgazebo::Client *client = new gazebo::Client();
+  libgazebo::SimulationIface *simIface = new gazebo::SimulationIface();
 
   int serverId = 0;
 
@@ -47,7 +47,7 @@ int main()
   // Example of how to move a model (box1_model)
   char name[512] = "pioneer2dx_model1";
 
-  gazebo::Pose pose;
+  libgazebo::Pose pose;
   bool got = false;
 
   for (int i=0; i< 600; i++)
@@ -68,14 +68,14 @@ int main()
     simIface->SetPose3d(name, pose);
   }
 
-    /*gazebo::Pose pose;
+    /*libgazebo::Pose pose;
     //pose.pos.x = i+0.1;
     pose.pos.z = .145;
     pose.yaw = M_PI/2;
-    gazebo::Vec3 linearVel(0.2, 0, 0);
-    gazebo::Vec3 angularVel(0, 0, 0);
-    gazebo::Vec3 linearAccel(0, 0, 0);
-    gazebo::Vec3 angularAccel(0, 0, 0);
+    libgazebo::Vec3 linearVel(0.2, 0, 0);
+    libgazebo::Vec3 angularVel(0, 0, 0);
+    libgazebo::Vec3 linearAccel(0, 0, 0);
+    libgazebo::Vec3 angularAccel(0, 0, 0);
 
     simIface->SetState(name, pose, linearVel, angularVel, 
                        linearAccel, angularAccel );
