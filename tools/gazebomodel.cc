@@ -1,5 +1,9 @@
 #include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -14,7 +18,7 @@ class ModelTool : public Toolbase
   public: void PrintModel(std::string name, std::string prefix)
   {
     std::string type;
-    gazebo::Pose pose;
+    libgazebo::Pose pose;
 
     std::cout << prefix << name << "\n";
 
@@ -70,8 +74,8 @@ class ModelTool : public Toolbase
       {
         std::string name = params[i];
         std::string type;
-        gazebo::Pose pose;
-        gazebo::Vec3 linearVel, linearAccel, angularVel, angularAccel;
+        libgazebo::Pose pose;
+        libgazebo::Vec3 linearVel, linearAccel, angularVel, angularAccel;
         unsigned int paramCount;
 
         if (!this->simIface->GetModelType(name, type))
@@ -127,6 +131,7 @@ class ModelTool : public Toolbase
       }
     }
   }
+
 
   //////////////////////////////////////////////////////////////////////////////
   // Spawn a new model into the world
@@ -193,7 +198,7 @@ class ModelTool : public Toolbase
         {
           std::vector<std::string> strs;
           boost::split(strs, iter->second, boost::is_any_of("\t "));
-          gazebo::Vec3 vec( boost::lexical_cast<float>(strs[0]),
+          libgazebo::Vec3 vec( boost::lexical_cast<float>(strs[0]),
                             boost::lexical_cast<float>(strs[1]),
                             boost::lexical_cast<float>(strs[2]));
 

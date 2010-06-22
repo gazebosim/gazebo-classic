@@ -41,9 +41,9 @@ class Toolbase
   /// \brief Print all the commands to stdout
   protected: void PrintCommands(std::string prefix);
 
-  protected: gazebo::Client *client;
-  protected: gazebo::SimulationIface *simIface;
-  protected: gazebo::FactoryIface *factoryIface;
+  protected: libgazebo::Client *client;
+  protected: libgazebo::SimulationIface *simIface;
+  protected: libgazebo::FactoryIface *factoryIface;
 
   protected: std::map<std::string, std::string> yamlValues;
   protected: std::vector<std::string> params;

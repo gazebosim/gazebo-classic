@@ -15,7 +15,7 @@ class BodyTool : public Toolbase
   public: void PrintBody(std::string name, std::string prefix)
   {
     std::string type;
-    gazebo::Pose pose;
+    libgazebo::Pose pose;
 
     this->simIface->GetEntityType(name, type);
     if (type == "body")

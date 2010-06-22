@@ -47,9 +47,9 @@ bool Toolbase::Init(int argc, char **argv)
 
   this->ParseYAML();
 
-  this->client = new gazebo::Client();
-  this->simIface = new gazebo::SimulationIface();
-  this->factoryIface = new gazebo::FactoryIface();
+  this->client = new libgazebo::Client();
+  this->simIface = new libgazebo::SimulationIface();
+  this->factoryIface = new libgazebo::FactoryIface();
 
   try
   {
