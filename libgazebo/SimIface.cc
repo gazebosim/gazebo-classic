@@ -12,7 +12,7 @@
 
 #include "gz.h"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 
 union semun 
@@ -294,7 +294,7 @@ void SimulationIface::SetPose2d(const std::string &name,
   this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::SET_POSE2D;
+  request->type = libgazebo::SimulationRequestData::SET_POSE2D;
 
   memset(request->name, 0, 512);
   strncpy(request->name, name.c_str(), 512);
@@ -317,7 +317,7 @@ void SimulationIface::SetState(const std::string &name, Pose &modelPose,
   this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::SET_STATE;
+  request->type = libgazebo::SimulationRequestData::SET_STATE;
   memset(request->name, 0, 512);
   strncpy(request->name, name.c_str(), 512);
   request->name[511] = '\0';
@@ -354,7 +354,7 @@ void SimulationIface::GetChildInterfaces(const std::string &name)
   this->Lock(1);
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::GET_MODEL_INTERFACES;
+  request->type = libgazebo::SimulationRequestData::GET_MODEL_INTERFACES;
 
   memset(request->name, 0, 512);
   strncpy(request->name, name.c_str(), 512);
@@ -370,7 +370,7 @@ void SimulationIface::GetInterfaceType(const std::string &name)
   this->Lock(1);
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::GET_INTERFACE_TYPE;
+  request->type = libgazebo::SimulationRequestData::GET_INTERFACE_TYPE;
 
   memset(request->name, 0, 512);
   strncpy(request->name, name.c_str(), 512);
@@ -389,7 +389,7 @@ bool SimulationIface::GetState(const std::string &name, Pose &modelPose,
   this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::GET_STATE;
+  request->type = libgazebo::SimulationRequestData::GET_STATE;
   memset(request->name, 0, 512);
   strncpy(request->name, name.c_str(), 512);
   request->name[511] = '\0';
@@ -418,7 +418,7 @@ void SimulationIface::SetLinearVel(const std::string &modelName, Vec3 vel)
   this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::SET_LINEAR_VEL;
+  request->type = libgazebo::SimulationRequestData::SET_LINEAR_VEL;
   memset(request->name, 0, 512);
   strncpy(request->name, modelName.c_str(), 512);
   request->name[511] = '\0';
@@ -440,7 +440,7 @@ void SimulationIface::SetLinearAccel(const std::string &modelName, Vec3 accel)
   this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::SET_LINEAR_ACCEL;
+  request->type = libgazebo::SimulationRequestData::SET_LINEAR_ACCEL;
   memset(request->name, 0, 512);
   strncpy(request->name, modelName.c_str(), 512);
   request->name[511] = '\0';
@@ -462,7 +462,7 @@ void SimulationIface::SetAngularVel(const std::string &modelName, Vec3 vel)
   this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::SET_ANGULAR_VEL;
+  request->type = libgazebo::SimulationRequestData::SET_ANGULAR_VEL;
   memset(request->name, 0, 512);
   strncpy(request->name, modelName.c_str(), 512);
   request->name[511] = '\0';
@@ -484,7 +484,7 @@ void SimulationIface::SetAngularAccel(const std::string &modelName, Vec3 accel)
   this->data->responseCount = 0;
   SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
 
-  request->type = gazebo::SimulationRequestData::SET_ANGULAR_ACCEL;
+  request->type = libgazebo::SimulationRequestData::SET_ANGULAR_ACCEL;
   memset(request->name, 0, 512);
   strncpy(request->name, modelName.c_str(), 512);
   request->name[511] = '\0';
@@ -494,6 +494,50 @@ void SimulationIface::SetAngularAccel(const std::string &modelName, Vec3 accel)
   if (isnan(accel.z)) accel.z = 0.0;
 
   request->modelAngularAccel = accel;
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Apply a force to an entity
+void SimulationIface::ApplyForce(const std::string &entityName, Vec3 force)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = libgazebo::SimulationRequestData::APPLY_FORCE;
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  if (isnan(force.x)) force.x = 0.0;
+  if (isnan(force.y)) force.y = 0.0;
+  if (isnan(force.z)) force.z = 0.0;
+
+  request->vec3Value = force;
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Apply a torque to an entity
+void SimulationIface::ApplyTorque(const std::string &entityName, Vec3 torque)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
+
+  request->type = libgazebo::SimulationRequestData::APPLY_TORQUE;
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  if (isnan(torque.x)) torque.x = 0.0;
+  if (isnan(torque.y)) torque.y = 0.0;
+  if (isnan(torque.z)) torque.z = 0.0;
+
+  request->vec3Value = torque;
 
   this->Unlock();
 }
@@ -850,4 +894,197 @@ bool SimulationIface::SetEntityParamValue(const std::string &entityName,
   this->Unlock();
 
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Start logging entity information
+void SimulationIface::StartLogEntity(const std::string &entityName,
+                                     const std::string &filename)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::START_LOG;
+
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  memset(request->strValue, 0, 512);
+  strncpy(request->strValue, filename.c_str(), 512);
+  request->strValue[511] = '\0';
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Stop logging entity information
+void SimulationIface::StopLogEntity(const std::string &entityName)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::STOP_LOG;
+
+  memset(request->name, 0, 512);
+  strncpy(request->name, entityName.c_str(), 512);
+  request->name[511] = '\0';
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the step time
+void SimulationIface::SetStepTime(double time)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::SET_STEP_TIME;
+  request->dblValue = time;
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the step iteraction
+void SimulationIface::SetStepIterations(unsigned int iters)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::SET_STEP_ITERS;
+  request->uintValue = iters;
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the step type
+void SimulationIface::SetStepType(const std::string &type)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::SET_STEP_TYPE;
+  memset(request->strValue, 0, 512);
+  strncpy(request->strValue, type.c_str(), 512);
+  request->strValue[511] = '\0';
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the step type
+std::string SimulationIface::GetStepType()
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+
+  SimulationRequestData *request;
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_STEP_TYPE;
+
+  this->Unlock();
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  return data->responses[0].strValue;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// The number of plugins in the simulation
+bool SimulationIface::GetPluginCount(unsigned int &count)
+{
+  this->Lock(1);
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_PLUGIN_COUNT;
+  this->Unlock();
+
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  count = data->responses[0].uintValue;
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the name of a plugin 
+bool SimulationIface::GetPluginName(unsigned int i, std::string &name)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::GET_PLUGIN_NAME;
+  request->uintValue = i;
+
+  this->Unlock();
+  if (!this->WaitForResponse())
+    return false;
+
+  assert(this->data->responseCount == 1);
+  name = data->responses[0].strValue;
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add a plugin
+void SimulationIface::AddPlugin(const std::string &filename, const std::string &handle)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::ADD_PLUGIN;
+
+  memset(request->strValue, 0, 512);
+  strncpy(request->strValue, filename.c_str(), 512);
+  request->strValue[511] = '\0';
+
+  memset(request->name, 0, 512);
+  strncpy(request->name, handle.c_str(), 512);
+  request->name[511] = '\0';
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Remove a plugin
+void SimulationIface::RemovePlugin(const std::string &name)
+{
+  this->Lock(1);
+
+  this->data->responseCount = 0;
+  SimulationRequestData *request;
+
+  request = &(this->data->requests[this->data->requestCount++]);
+  request->type = SimulationRequestData::REMOVE_PLUGIN;
+  memset(request->strValue, 0, 512);
+  strncpy(request->strValue, name.c_str(), 512);
+  request->strValue[511] = '\0';
+
+  this->Unlock();
 }

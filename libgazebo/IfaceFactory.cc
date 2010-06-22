@@ -31,7 +31,7 @@
 #include "gz.h"
 #include "IfaceFactory.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 std::map<std::string, IfaceFactoryFn> IfaceFactory::ifaces;
 

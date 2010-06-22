@@ -39,7 +39,7 @@ struct LibgazeboPluginRegister
   }
 };
 
-namespace gazebo
+namespace libgazebo
 {
   class Iface;
 

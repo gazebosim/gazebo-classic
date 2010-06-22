@@ -43,7 +43,7 @@
 
 #include "gz.h"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a client object
@@ -85,7 +85,7 @@ void Client::Connect(int serverId)
 void Client::ConnectWait(int serverId, int clientId)
 {
   bool simulationIfaceIsValid = false;
-  gazebo::SimulationIface *simIface = new gazebo::SimulationIface();
+  libgazebo::SimulationIface *simIface = new libgazebo::SimulationIface();
 
   while (!simulationIfaceIsValid)
   {
@@ -157,14 +157,14 @@ void Client::ConnectWait(int serverId, int clientId)
           {
             // a gazebo process is still alive.
             // it might however, still being booted up, so we need to check by connecting
-            // Connect to gazebo::SimulationIface and check for changing realTime,
+            // Connect to libgazebo::SimulationIface and check for changing realTime,
             // if simulationIface->data->realTime is not changing, the server might
             // be stale leftovers from previous gazebo crash,
             // disconnect and reconnect client
             try
             {
               // Open the Simulation Interface
-              gazebo::SimulationIface simulationIface;
+              libgazebo::SimulationIface simulationIface;
               simulationIface.Open(this,"default");
               // grab a t0
               simulationIface.Lock(1);

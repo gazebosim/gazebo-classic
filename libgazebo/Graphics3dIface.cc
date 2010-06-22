@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-using namespace gazebo;
+using namespace libgazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -187,6 +187,24 @@ void Graphics3dIface::DrawMeterBar(const char *name, Vec3 pos, Vec2 size,
   cmd->color.a = clr.a;
 
   cmd->fltVar = percent;
+
+  this->Unlock();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Draw a ribbon trail following an entity
+void Graphics3dIface::DrawRibbonTrail(const std::string &name)
+{
+  this->Lock(1);
+  Graphics3dDrawData *cmd = &(this->data->commands[this->data->cmdCount++]);
+
+  cmd->drawMode = Graphics3dDrawData::RIBBONTRAIL;
+
+  // Set the name of the graphics drawable
+  memset( cmd->name, 0, GAZEBO_GRAPHICS3D_MAX_NAME);
+  strcpy( cmd->name, name.c_str());
+
+  cmd->intVar = 1;
 
   this->Unlock();
 }

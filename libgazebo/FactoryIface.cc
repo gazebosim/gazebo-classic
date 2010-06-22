@@ -2,7 +2,7 @@
 
 #include "gz.h"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 /// Delete a model by name
 bool FactoryIface::DeleteEntity(const std::string &model_name)

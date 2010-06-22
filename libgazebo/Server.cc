@@ -42,7 +42,7 @@
 
 #include "gz.h"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 union semun
 {

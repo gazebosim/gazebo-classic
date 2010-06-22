@@ -43,7 +43,7 @@
 
 #include "gz.h"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 GZ_REGISTER_IFACE("simulation", SimulationIface);
 GZ_REGISTER_IFACE("position", PositionIface);

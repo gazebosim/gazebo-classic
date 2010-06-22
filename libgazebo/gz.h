@@ -41,7 +41,7 @@
 #include "IfaceFactory.hh"
 
 
-namespace gazebo
+namespace libgazebo
 {
 
 
@@ -447,6 +447,18 @@ class SimulationRequestData
                       GET_MODEL_INTERFACES, // for getting interfaces as well as the models which are ancestors of interfaces
                       GET_INTERFACE_TYPE,   // if the model is not an interface 'unknown' is returned
                       SET_ENTITY_PARAM_VALUE,
+                      START_LOG,
+                      STOP_LOG,
+                      SET_STEP_TIME,
+                      SET_STEP_ITERS,
+                      SET_STEP_TYPE,
+                      GET_STEP_TYPE,
+                      APPLY_FORCE,
+                      APPLY_TORQUE,
+                      GET_PLUGIN_COUNT,
+                      GET_PLUGIN_NAME,
+                      ADD_PLUGIN,
+                      REMOVE_PLUGIN
                    };
 
   public: Type type; 
@@ -455,6 +467,7 @@ class SimulationRequestData
   public: char strValue1[512];
   public: Vec3 vec3Value;
   public: unsigned int uintValue;
+  public: double dblValue;
 
   public: Pose modelPose;
   public: Vec3 modelLinearVel;
@@ -465,7 +478,6 @@ class SimulationRequestData
   public: char childInterfaces[GAZEBO_MAX_NUMBER_OF_CHILDREN][512];
   public: int nChildInterfaces;
   //public: char modelType[512];
-
 };
 
 /// \brief Simulation interface data
@@ -481,6 +493,9 @@ class SimulationData
 
   /// Elapsed real time since start of simulation (from system clock)
   public: double realTime;
+
+  /// Size of a simulation step
+  public: double stepTime;
 
   /// state of the simulation : 0 paused, 1 running -1 not_started/exiting
   public: int state;
@@ -598,6 +613,12 @@ class SimulationIface : public Iface
   /// \brief Set the angular acceleration
   public: void SetAngularAccel(const std::string &modelName,Vec3 accel);
 
+  /// \brief Apply a force to an entity
+  public: void ApplyForce(const std::string &entityName, Vec3 force);
+
+  /// \brief Apply a torque to an entity
+  public: void ApplyTorque(const std::string &entityName, Vec3 torque);
+
   /// \brief Get the child interfaces of a model
   public: void GetChildInterfaces(const std::string &modelName);
 
@@ -649,6 +670,37 @@ class SimulationIface : public Iface
 
   public: void GoAckWait();
   public: void GoAckPost();
+
+  /// \brief Start logging entity information
+  public: void StartLogEntity(const std::string &entityName,
+                              const std::string &filename);
+
+  /// \brief Stop logging entity information
+  public: void StopLogEntity(const std::string &entityName);
+
+  /// \brief Set the step time
+  public: void SetStepTime(double time);
+
+  /// \brief Set the step iteraction
+  public: void SetStepIterations(unsigned int iters);
+
+  /// \brief Set the step type
+  public: void SetStepType(const std::string &type);
+
+  /// \brief Get the step type
+  public: std::string GetStepType();
+
+  /// \brief Get the number of plugins
+  public: bool GetPluginCount(unsigned int &count);
+         
+  /// \brief Get the name of a plugin 
+  public: bool GetPluginName(unsigned int i, std::string &name);
+
+  /// \brief Add a plugin
+  public: void AddPlugin(const std::string &filename,const std::string &handle);
+
+  /// \brief Remove a plugin
+  public: void RemovePlugin(const std::string &name);
 
   private: void BlockThread();
 
@@ -925,7 +977,7 @@ class Graphics3dDrawData
   /// Type of drawing to perform
   public: enum DrawMode { POINTS, LINES, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, 
                           TRIANGLE_FAN, PLANE, SPHERE, CUBE, CYLINDER, CONE,
-                          BILLBOARD, TEXT, METERBAR };
+                          BILLBOARD, TEXT, METERBAR, RIBBONTRAIL };
 
   /// Drawing mode
   public: DrawMode drawMode;
@@ -956,6 +1008,8 @@ class Graphics3dDrawData
   public: Vec3 size;
 
   public: float fltVar;
+
+  public: int intVar;
 };
 
 /// \brief Graphics3d interface data
@@ -1006,6 +1060,8 @@ class Graphics3dIface : public Iface
   public: void DrawMeterBar(const char *name, Vec3 pos, Vec2 size, Color clr,
                             float percent);
 
+  /// \brief Draw a ribbon trail following an entity
+  public: void DrawRibbonTrail(const std::string &name);
 
   /// Pointer to the graphics3d data
   public: Graphics3dData *data;
