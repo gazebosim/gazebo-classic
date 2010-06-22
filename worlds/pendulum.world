@@ -19,9 +19,9 @@
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-10</cfm>
     <erp>0.2</erp>
-    <quickStep>true</quickStep>
-    <quickStepIters>50</quickStepIters>
-    <quickStepW>1.3</quickStepW>
+    <stepType>quick</stepType>
+    <stepIters>50</stepIters>
+    <stepW>1.3</stepW>
     <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
     <contactSurfaceLayer>0.001</contactSurfaceLayer>
 
@@ -79,7 +79,7 @@
 
     <!-- Bottom & Upright of the pendulum -->
     <body:box name="base_body">
-      <dampingFactor>1.0</dampingFactor>
+      <dampingFactor>0.0</dampingFactor>
       <static>true</static>
       <geom:box name="base_geom">
         <size>1.0 1.0 0.2</size>
@@ -117,7 +117,7 @@
     <body:box name="swing_body">
       <xyz>-0.46 0.7 2.15</xyz>
       <rpy>90 0 0</rpy>
-      <dampingFactor>0.00006</dampingFactor>
+      <dampingFactor>0.0000</dampingFactor>
       <geom:box name="swing_geom">
         <xyz>0.0 0 0</xyz>
         <size>0.1 0.1 1.5</size>

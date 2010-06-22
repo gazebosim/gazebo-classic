@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- Generic Pioneer2dx Model -->
-<model:physical name="default_pioneer_model"
+<model:physical name="pioneer_gripper"
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
   xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
@@ -12,7 +12,7 @@
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
   >
 
-<xyz>0 0 0.0</xyz>
+<xyz>0 0 0.065</xyz>
 <rpy>0.0 0.0 0.0</rpy>
 
 <canonicalBody>gripper_base_body</canonicalBody>
@@ -23,7 +23,7 @@
   <geom:box name="gripper_base_geom">
     <xyz>0 0 0</xyz>
     <size>0.053 0.123 0.130</size>
-    <mass>0.01</mass>
+    <mass>10.1</mass>
     
     <visual>
       <size>0.053 0.123 0.130</size>
@@ -33,13 +33,13 @@
   </geom:box>
 </body:box>
 
-<body:box name="gripper_lift_body">
+<body:box name="lift_body">
    <xyz>0.061 0 0</xyz>
 
-  <geom:box name="gripper_lift_body">
+  <geom:box name="lift_geom">
     <xyz>0 0 0</xyz>
     <size>0.069 0.313 0.063</size>
-    <mass>0</mass>
+    <mass>0.1</mass>
 
     <visual>
       <size>0.069 0.313 0.063</size>
@@ -49,35 +49,36 @@
   </geom:box>
 </body:box>
 
-<body:box name="gripper_left_paddle_body">
-  <xyz>0.140 0.0125 0</xyz>
-  <geom:box name="gripper_left_paddle_geom">
+<body:box name="left_paddle_body">
+  <xyz>0.145 0.0135 0</xyz>
+  <geom:box name="left_paddle_geom">
     <xyz>0 0 0</xyz>
     <size>0.095 0.025 0.039</size>
-    <mass>0</mass>
+    <mass>0.1</mass>
 
     <visual>
       <size>0.095 0.025 0.039</size>
       <mesh>unit_box</mesh>
-      <material>Gazebo/Black</material>
+      <material>Gazebo/Blue</material>
     </visual>
   </geom:box>
 </body:box>
 
-<body:box name="gripper_right_paddle_body">
-  <xyz>0.140 -0.0125 0</xyz>
-  <geom:box name="gripper_right_paddle_geom">
+<body:box name="right_paddle_body">
+  <xyz>0.145 -0.0135 0</xyz>
+  <geom:box name="right_paddle_geom">
     <xyz>0 0 0</xyz>
     <size>0.095 0.025 0.039</size>
-    <mass>0</mass>
+    <mass>0.1</mass>
 
     <visual>
       <size>0.095 0.025 0.039</size>
       <mesh>unit_box</mesh>
-      <material>Gazebo/Black</material>
+      <material>Gazebo/Red</material>
     </visual>
   </geom:box>
 
+  <!--
   <sensor:ray name="breakbeam1">
     <rayCount>1</rayCount>
     <origin>0 0 0</origin>
@@ -85,44 +86,65 @@
     <minRange>0.01</minRange>
     <maxRange>0.5</maxRange>
   </sensor:ray>
+  -->
 </body:box>
+
+<!--<joint:hinge name="fixed">
+  <body1>gripper_base_body</body1>
+  <body2>world</body2>
+  <anchor>gripper_base_body</anchor>
+  <anchorOffset>0 0 -0.130</anchorOffset>
+  <axis>0 0 1</axis>
+  <lowStop>0</lowStop>
+  <highStop>0</highStop>
+  <erp>0.4</erp>
+  <cfm>0.01</cfm>
+</joint:hinge>
+-->
 
 
 <joint:slider name="lift_slider_joint">
   <body1>gripper_base_body</body1>
-  <body2>gripper_lift_body</body2>
-  <axis>0 0 -1</axis>
-  <lowStop>-0.05</lowStop>
-  <highStop>0.05</highStop>
+  <body2>lift_body</body2>
+  <anchor>gripper_base_body</anchor>
+  <axis>0 0 1</axis>
+  <lowStop>-0.1</lowStop>
+  <highStop>0.1</highStop>
   <erp>0.3</erp>
   <cfm>10e-5</cfm>
 </joint:slider>
 
 <joint:slider name="left_paddle_joint">
-  <body1>gripper_lift_body</body1>
-  <body2>gripper_left_paddle_body</body2>
+  <body1>lift_body</body1>
+  <body2>left_paddle_body</body2>
+  <anchor>lift_body</anchor>
+  <anchorOffset>0.085 0 0 </anchorOffset>
   <axis>0 1 0</axis>
   <lowStop>-0.12</lowStop>
   <highStop>0.0</highStop>
-  <erp>0.3</erp>
+  <erp>0.1</erp>
   <cfm>10e-5</cfm>
 </joint:slider>
 
 <joint:slider name="right_paddle_joint">
-  <body1>gripper_lift_body</body1>
-  <body2>gripper_right_paddle_body</body2>
+  <body1>lift_body</body1>
+  <body2>right_paddle_body</body2>
+  <anchor>lift_body</anchor>
+  <anchorOffset>0.085 0 0 </anchorOffset>
   <axis>0 1 0</axis>
   <lowStop>0.0</lowStop>
   <highStop>0.12</highStop>
-  <erp>0.3</erp>
+  <erp>0.1</erp>
   <cfm>10e-5</cfm>
 </joint:slider>
 
+<!--
 <controller:pioneer2_gripper name="pioneer2gripper_controller">
   <leftJoint name="left_paddle_joint" force="0.001"/>
   <rightJoint name="right_paddle_joint" force="0.001"/>
   <liftJoint name="lift_paddle_joint" force="0.1"/>
 	<interface:gripper name="gripper_iface_0"/>
 </controller:pioneer2_gripper>
+-->
 
 </model:physical>

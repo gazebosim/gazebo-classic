@@ -67,18 +67,17 @@
   <geom:cylinder name="left_wheel_geom">
     <size>0.075 0.05</size>
     <mass>0.5</mass>
-    <mu1>0.5</mu1>
 
     <visual>
       <rpy>-90 0 0</rpy>
-      <size>0.125 0.05 0.125</size>
+      <size>0.15 0.05 0.15</size>
       <mesh>Pioneer2dx/tire.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
 
     <visual>
       <rpy>-90 0 0</rpy>
-      <size>0.073 0.05 0.073</size>
+      <size>0.088 0.05 0.088</size>
       <mesh>Pioneer2at/wheel.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
@@ -102,18 +101,17 @@
   <geom:cylinder name="right_wheel_geom">
     <size>0.075 0.05</size>
     <mass>0.5</mass>
-    <mu1>0.5</mu1>
 
     <visual>
       <rpy>-90 0 0</rpy>
-      <size>0.125 0.05 0.125</size>
+      <size>0.15 0.05 0.15</size>
       <mesh>Pioneer2dx/tire.mesh</mesh>
       <material>Gazebo/Black</material>
     </visual>
 
     <visual>
       <rpy>-90 0 0</rpy>
-      <size>0.073 0.05 0.073</size>
+      <size>0.088 0.05 0.088</size>
       <mesh>Pioneer2at/wheel.mesh</mesh>
       <material>Gazebo/Gold</material>
     </visual>
@@ -130,12 +128,12 @@
 </body:cylinder>
 
 <body:sphere name="castor_body">
-  <xyz>-0.200 0 -0.11</xyz>
+  <xyz>-0.200 0 -0.108</xyz>
   <rpy>0 0 0</rpy>
+
   <geom:sphere name="castor_geom">
     <size>0.04</size>
     <mass>0.5</mass>
-    <mu1>0.5</mu1>
 
     <visual>
       <scale>0.04 0.04 0.04</scale>

@@ -19,9 +19,9 @@
     <gravity>0 0 -9.8</gravity>
     <cfm>10e-10</cfm>
     <erp>0.2</erp>
-    <quickStep>true</quickStep>
-    <quickStepIters>50</quickStepIters>
-    <quickStepW>1.3</quickStepW>
+    <stepType>robust</stepType>
+    <stepIters>50</stepIters>
+    <stepW>1.3</stepW>
     <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
     <contactSurfaceLayer>0.001</contactSurfaceLayer>
 
@@ -43,6 +43,7 @@
       <material>Gazebo/CloudySky</material>
     </sky>
     <grid>false</grid>
+    <shadows>false</shadows>
   </rendering:ogre>
 
   <model:physical name="sphere1_model">
@@ -59,9 +60,9 @@
 
         <visual>
           <size>0.4 0.4 0.4</size>
-          <mesh>unit_sphere</mesh>
+          <mesh>lightsensor.3ds</mesh>
           <shader>pixel</shader>
-          <material>Gazebo/Rocky</material>
+          <!--<material>Gazebo/Rocky</material>-->
         </visual>
       </geom:sphere>
     </body:sphere>
