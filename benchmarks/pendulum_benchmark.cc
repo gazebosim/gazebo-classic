@@ -4,8 +4,8 @@
 #include <vector>
 #include <libgazebo/gz.h>
 
-gazebo::Client *client = NULL;
-gazebo::SimulationIface *simIface = NULL;
+libgazebo::Client *client = NULL;
+libgazebo::SimulationIface *simIface = NULL;
 
 std::string test_name="Pendulum Benchmark";
 std::string xlabel = "Pendulum Count";
@@ -31,8 +31,8 @@ void make_plot()
 
 int main(int argc, char **argv)
 {
-  client = new gazebo::Client();
-  simIface = new gazebo::SimulationIface();
+  client = new libgazebo::Client();
+  simIface = new libgazebo::SimulationIface();
 
   try
   {
@@ -64,13 +64,13 @@ int main(int argc, char **argv)
   //double simTime = 0;
   //double realTime = 0;
 
-  gazebo::Vec3 linearVel, angularVel, linearAccel, angularAccel;
-  gazebo::Pose modelPose;
+  libgazebo::Vec3 linearVel, angularVel, linearAccel, angularAccel;
+  libgazebo::Pose modelPose;
 
   bool done = false;
   while (!done)
   {
-    //simIface->SetAngularVel("box_model", gazebo::Vec3(0,0,vel));
+    //simIface->SetAngularVel("box_model", libgazebo::Vec3(0,0,vel));
     
     simIface->GetState("base_model::swing_body", modelPose, linearVel, angularVel, 
                        linearAccel, angularAccel);

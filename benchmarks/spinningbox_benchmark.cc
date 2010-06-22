@@ -4,9 +4,9 @@
 #include <vector>
 #include <libgazebo/gz.h>
 
-gazebo::Client *client = NULL;
-gazebo::SimulationIface *simIface = NULL;
-gazebo::FactoryIface *factoryIface = NULL;
+libgazebo::Client *client = NULL;
+libgazebo::SimulationIface *simIface = NULL;
+libgazebo::FactoryIface *factoryIface = NULL;
 
 std::string test_name="Spinning Box Benchmark";
 std::string xlabel = "Spinning Box Count";
@@ -60,9 +60,9 @@ void spawn_box()
 
 int main(int argc, char **argv)
 {
-  client = new gazebo::Client();
-  simIface = new gazebo::SimulationIface();
-  factoryIface = new gazebo::FactoryIface();
+  client = new libgazebo::Client();
+  simIface = new libgazebo::SimulationIface();
+  factoryIface = new libgazebo::FactoryIface();
 
   float vel = 1.0;
   if (argc > 1)
@@ -113,14 +113,14 @@ int main(int argc, char **argv)
   //double realTime = 0;
 
 
-  gazebo::Vec3 linearVel, angularVel, linearAccel, angularAccel;
-  gazebo::Pose modelPose;
+  libgazebo::Vec3 linearVel, angularVel, linearAccel, angularAccel;
+  libgazebo::Pose modelPose;
 
 
   bool done = false;
   while (!done)
   {
-    simIface->SetAngularVel("box", gazebo::Vec3(0,0,vel));
+    simIface->SetAngularVel("box", libgazebo::Vec3(0,0,vel));
     
     simIface->GetState("box", modelPose, linearVel, angularVel, 
                        linearAccel, angularAccel);

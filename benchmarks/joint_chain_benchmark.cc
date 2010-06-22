@@ -4,9 +4,9 @@
 #include <vector>
 #include <libgazebo/gz.h>
 
-gazebo::Client *client = NULL;
-gazebo::SimulationIface *simIface = NULL;
-gazebo::FactoryIface *factoryIface = NULL;
+libgazebo::Client *client = NULL;
+libgazebo::SimulationIface *simIface = NULL;
+libgazebo::FactoryIface *factoryIface = NULL;
 int joint_count = 0;
 
 std::string test_name="Joint Chain Benchmark";
@@ -89,9 +89,9 @@ void spawn_chain(int joint_count)
 
 int main()
 {
-  client = new gazebo::Client();
-  simIface = new gazebo::SimulationIface();
-  factoryIface = new gazebo::FactoryIface();
+  client = new libgazebo::Client();
+  simIface = new libgazebo::SimulationIface();
+  factoryIface = new libgazebo::FactoryIface();
 
   try
   {

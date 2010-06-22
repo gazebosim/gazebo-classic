@@ -3,13 +3,14 @@
 #include <stdlib.h>
 #include <vector>
 #include <libgazebo/gz.h>
+#include <boost/lexical_cast.hpp>
 
 libgazebo::Client *client = NULL;
 libgazebo::SimulationIface *simIface = NULL;
 libgazebo::FactoryIface *factoryIface = NULL;
 int laser_count = 0;
 
-std::string test_name="Box Grid Benchmark";
+std::string test_name="Box Drop Benchmark";
 std::string xlabel = "Box Count";
 std::string ylabel = "Simtime / Realtime";
 std::string data_filename = "/tmp/" + test_name + ".data";
@@ -31,18 +32,23 @@ void make_plot()
     std::cerr << "Error\n";
 }
 
-void spawn_box(double x, double y, double z=.25)
+void spawn_box(double x, double y, double z=1)
 {
   std::ostringstream model;
 
-  model << "<model:physical name='box" << laser_count++ << "'>";
+  model << "<model:physical name='box'>";
   model << "  <xyz>" << x << " " << y << " " << z << "</xyz>";
   model << "  <rpy>0 0 0</rpy>";
   model << "  <body:box name='body'>";
-
   model << "    <geom:box name='geom'>";
   model << "      <size>0.5 0.5 0.5</size>";
   model << "      <mass>1</mass>";
+  model << "      <kp>100000000.0</kp>";
+  model << "      <kd>1.0</kd>";
+  model << "      <bounce>0</bounce>";
+  model << "      <bounceVel>100000</bounceVel>";
+  model << "      <slip1>0.01</slip1>";
+  model << "      <slip2>0.01</slip2>";
   model << "      <visual>";
   model << "        <size>0.5 0.5 0.5</size>";
   model << "        <mesh>unit_box</mesh>";
@@ -57,6 +63,32 @@ void spawn_box(double x, double y, double z=.25)
   strcpy( (char*)factoryIface->data->newModel, model.str().c_str() );
   factoryIface->Unlock();
 }
+
+void RunSim()
+{
+  simIface->StartLogEntity("box", "/tmp/box.log");
+  simIface->Unpause();
+  /*libgazebo::Vec3 linearVel, angularVel, linearAccel, angularAccel;
+  libgazebo::Pose modelPose;
+
+  double time = simIface->data->realTime;
+  while ( simIface->data->realTime - time < 10.0 )
+  {
+    //simIface->GetState("box", modelPose, linearVel, angularVel, linearAccel, angularAccel); 
+
+    //if ( fabs(prev_z - modelPose.pos.z) >= 1e-5)
+      //time = simIface->data->realTime;
+
+    //prev_z = modelPose.pos.z;
+  }
+  */
+  usleep(10000000);
+
+  simIface->StopLogEntity("box");
+  simIface->Pause();
+  simIface->Reset();
+}
+
 
 int main()
 {
@@ -96,38 +128,52 @@ int main()
               << e << "\n";
     return -1;
   }
+  double prev_z = 5;
+  spawn_box(0, 0, prev_z);
+  usleep(10000);
 
-  FILE *out = fopen(data_filename.c_str(), "w");
 
-  // 400 blocks in a grid patter
-  for (int y=-10; y < 10; y++)
+  std::vector<std::string > step_types;
+  std::vector<std::string >::iterator iter;
+  //step_types.push_back("robust");
+  step_types.push_back("world");
+  step_types.push_back("quick");
+
+  for (iter = step_types.begin(); iter != step_types.end(); iter++)
   {
-    for ( int x=-10; x < 10; x++)
+    std::string path = std::string("/home/nate/work/simpar/data/box_drop/") + *iter + "/";
+
+    system((std::string("mkdir -p ")+path).c_str());
+
+    FILE *out = fopen(std::string(path+"index.txt").c_str(), "w");
+    fprintf(out,"# index step_time\n");
+
+    int i = 0;
+
+    simIface->SetStepType(*iter);
+    for (double step=0.1; step > 1e-5; step *= 0.5)
     {
-      spawn_box(x, y);
-      double simTime = 0;
-      double realTime = 0;
-
-      for (unsigned int i=0; i < 30; i++)
+      unsigned int iterations = 10;
+      if (*iter == "world")
+        iterations = 199;
+      for (; iterations < 200; iterations +=20, i++)
       {
-        simTime += simIface->data->simTime;
-        realTime += simIface->data->realTime;
+        simIface->SetStepTime(step);
+        simIface->SetStepIterations(iterations);
 
-        /// Wait .1 seconds 
-        usleep(100000);
+        fprintf(out,"%d %f %d\n",i,step, iterations);
+        std::cout << "Type[" << *iter << "] Step[" << step << "] Iterations[" << iterations << "]\n";
+        RunSim();
+        std::string mv_cmd = std::string("mv /tmp/box.log ") + path + "box_drop_benchmark_" + *iter + "_" + boost::lexical_cast<std::string>(i) + ".data";
+        system(mv_cmd.c_str());
       }
-
-      double percent = simTime / realTime;
-      fprintf(out,"%f\n",percent);
-      std::cout << "Index[" << y <<  " " << x <<  "] " << percent << "\n";
     }
+    fclose(out);
   }
-
-  fclose(out);
-
-  make_plot();
 
   factoryIface->Close();
   simIface->Close();
   client->Disconnect();
 }
+
+
