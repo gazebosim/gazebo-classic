@@ -6,6 +6,7 @@ add_subdirectory(pioneer2dx)
 add_subdirectory(pioneer2at)
 add_subdirectory(sonyvid30)
 add_subdirectory(rovio)
+add_subdirectory(pr2_gripper)
 
 set (files column.mesh
            geosphere4500.mesh
