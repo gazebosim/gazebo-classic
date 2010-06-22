@@ -355,9 +355,6 @@ void World::Update()
 
   }
 
-  /// Update all the sensors
-  SensorManager::Instance()->Update();
-
   if (!Simulator::Instance()->IsPaused() &&
        Simulator::Instance()->GetPhysicsEnabled())
   {
@@ -372,6 +369,10 @@ void World::Update()
       this->saveStateTimer.Start();
     }*/
   }
+
+  /// Update all the sensors
+  SensorManager::Instance()->Update();
+
 
   this->factory->Update();
 
