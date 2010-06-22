@@ -32,7 +32,7 @@
 #include <FL/Fl.H>
 #include <FL/x.H>
 
-#include "config.h"
+#include "gazebo_config.h"
 
 #include "RTShaderSystem.hh"
 #include "Light.hh"
@@ -551,6 +551,24 @@ OgreDynamicLines *OgreCreator::CreateDynamicLine(OgreDynamicRenderable::Operatio
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Create a dynamic line
+void OgreCreator::DeleteDynamicLine(OgreDynamicLines* line)
+{
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  // delete instance from lines vector
+  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();iter!=this->lines.end();iter++)
+  {
+    if (*iter == line)
+    {
+      this->lines.erase(iter);
+      break;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Update all the entities
 void OgreCreator::Update()
 {
@@ -567,8 +585,8 @@ void OgreCreator::Update()
     (*titer)->Update();
 
   // Update the lines
-  //for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
-    //(*iter)->Update();
+  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
+    (*iter)->Update();
 
   // We only need this loop because we are using threads. The physics engine
   // can't reliably set the pose of the visuals when it's running in a 
@@ -582,7 +600,7 @@ void OgreCreator::Update()
       if (viter->second)
       {
         // lock in case the visual is being dynamically destroyed
-        boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
+        //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
         if (!viter->second->IsDirty())
           continue;
         viter->second->SetToDirtyPose();

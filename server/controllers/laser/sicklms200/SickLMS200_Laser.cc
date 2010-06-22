@@ -67,8 +67,8 @@ SickLMS200_Laser::~SickLMS200_Laser()
 // Load the controller
 void SickLMS200_Laser::LoadChild(XMLConfigNode *node)
 {
-  this->laserIface = dynamic_cast<LaserIface*>(this->GetIface("laser"));
-  this->fiducialIface = dynamic_cast<FiducialIface*>(this->GetIface("fiducial", false));
+  this->laserIface = dynamic_cast<libgazebo::LaserIface*>(this->GetIface("laser"));
+  this->fiducialIface = dynamic_cast<libgazebo::FiducialIface*>(this->GetIface("fiducial", false));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ void SickLMS200_Laser::PutLaserData()
 void SickLMS200_Laser::PutFiducialData()
 {
   int i, j, count;
-  FiducialFid *fid;
+  libgazebo::FiducialFid *fid;
   double r, b;
   double ax, ay, bx, by, cx, cy;
 

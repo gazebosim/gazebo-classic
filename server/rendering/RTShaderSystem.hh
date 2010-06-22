@@ -29,7 +29,7 @@
 
 #include <Ogre.h>
 #include <list>
-#include "config.h"
+#include "gazebo_config.h"
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <RTShaderSystem/OgreRTShaderSystem.h>

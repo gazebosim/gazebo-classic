@@ -137,6 +137,46 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Convert an odeMass to Mass
   public: virtual void ConvertMass(void *odeMass, const Mass &mass);
 
+  /// \brief Get the step type
+  public: virtual std::string GetStepType() const;
+
+  /// \brief Set the step type
+  public: virtual void SetStepType(const std::string type);
+
+  /// \brief access functions to set ODE parameters
+  public: void SetWorldCFM(double cfm);
+  /// \brief access functions to set ODE parameters
+  public: void SetWorldERP(double erp);
+  /// \brief access functions to set ODE parameters
+  public: void SetAutoDisableFlag(bool auto_disable);
+  /// \brief access functions to set ODE parameters
+  public: void SetSORPGSIters(unsigned int iters);
+  /// \brief access functions to set ODE parameters
+  public: void SetSORPGSW(double w);
+  /// \brief access functions to set ODE parameters
+  public: void SetContactMaxCorrectingVel(double vel);
+  /// \brief access functions to set ODE parameters
+  public: void SetContactSurfaceLayer(double layer_depth);
+  /// \brief access functions to set ODE parameters
+  public: void SetMaxContacts(double max_contacts);
+
+  /// \brief access functions to set ODE parameters
+  public: double GetWorldCFM();
+  /// \brief access functions to set ODE parameters
+  public: double GetWorldERP();
+  /// \brief access functions to set ODE parameters
+  public: bool GetAutoDisableFlag();
+  /// \brief access functions to set ODE parameters
+  public: int GetSORPGSIters();
+  /// \brief access functions to set ODE parameters
+  public: double GetSORPGSW();
+  /// \brief access functions to set ODE parameters
+  public: double GetContactMaxCorrectingVel();
+  /// \brief access functions to set ODE parameters
+  public: double GetContactSurfaceLayer();
+  /// \brief access functions to set ODE parameters
+  public: double GetMaxContacts();
+
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
 
@@ -151,13 +191,14 @@ class ODEPhysics : public PhysicsEngine
 
   private: ParamT<double> *globalCFMP; 
   private: ParamT<double> *globalERPP; 
-  private: ParamT<bool> *quickStepP; 
-  private: ParamT<int> *quickStepItersP; 
-  private: ParamT<double> *quickStepWP; 
+  private: ParamT<std::string> *stepTypeP; 
+  private: ParamT<unsigned int> *stepItersP; 
+  private: ParamT<double> *stepWP; 
   private: ParamT<double> *contactMaxCorrectingVelP;
   private: ParamT<double> *contactSurfaceLayerP;
   private: ParamT<bool> *autoDisableBodyP;
   private: ParamT<int> *contactFeedbacksP;
+  private: ParamT<int> *maxContactsP;
 
   private: class ContactFeedback
            {
@@ -170,7 +211,7 @@ class ODEPhysics : public PhysicsEngine
 
   private: std::map<std::string, dSpaceID> spaces;
 
-  private: dContactGeom contactGeoms[1000];
+  private: std::vector<dContactGeom> contactGeoms;
 };
 
 /** \}*/

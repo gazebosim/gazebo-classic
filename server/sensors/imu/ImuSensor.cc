@@ -83,7 +83,7 @@ void ImuSensor::SaveChild(std::string &prefix, std::ostream &stream)
 void ImuSensor::InitChild()
 {
   Pose3d bodyPose;
-  bodyPose = this->body->GetAbsPose();
+  bodyPose = this->body->GetWorldPose();
   this->prevPose = bodyPose;
 }
 
@@ -114,12 +114,12 @@ void ImuSensor::UpdateChild()
     Vector3 pose;
 
     // Get the pose of the sensor body (global cs)
-    poseDelta = this->body->GetAbsPose() - this->prevPose;
-    this->prevPose = this->body->GetAbsPose();
+    poseDelta = this->body->GetWorldPose() - this->prevPose;
+    this->prevPose = this->body->GetWorldPose();
 
-    velocity = this->body->GetLinearVel();
-    rot = this->body->GetAbsPose().rot.GetAsEuler();
-    pose = this->body->GetAbsPose().pos;
+    velocity = this->body->GetWorldLinearVel();
+    rot = this->body->GetWorldPose().rot.GetAsEuler();
+    pose = this->body->GetWorldPose().pos;
 
     heading = atan2(velocity.y, velocity.x);
 
@@ -133,7 +133,7 @@ void ImuSensor::UpdateChild()
 
     this->imuVel.pos.z = 0;
    
-    velocity = this->body->GetAngularVel();
+    velocity = this->body->GetWorldAngularVel();
     this->imuVel.rot.x = velocity.x;
     this->imuVel.rot.y = velocity.y;
     this->imuVel.rot.z = velocity.z;

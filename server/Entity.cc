@@ -183,6 +183,23 @@ const std::vector< Entity* > &Entity::GetChildren() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+///  Get the number of children
+unsigned int Entity::GetChildCount() const
+{
+  return this->children.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a child by index
+Entity *Entity::GetChild(unsigned int i)
+{
+  if (i < this->children.size())
+    return this->children[i];
+  
+  return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get a child by name
 Entity *Entity::GetChild(const std::string &name )
 {
@@ -303,18 +320,18 @@ std::string Entity::GetCompleteScopedName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the absolute pose of the entity
-Pose3d Entity::GetAbsPose() const
+Pose3d Entity::GetWorldPose() const
 {
   if (this->parent)
   {
-    //std::cout << " GetAbsPose for model " << this->GetName()
+    //std::cout << " GetWorldPose for model " << this->GetName()
     //          << " relative " << this->GetRelativePose()
-    //          << " parent-abs " << this->parent->GetAbsPose() << std::endl;
-    return this->GetRelativePose() + this->parent->GetAbsPose();
+    //          << " parent-abs " << this->parent->GetWorldPose() << std::endl;
+    return this->GetRelativePose() + this->parent->GetWorldPose();
   }
   else
   {
-    //std::cout << " GetAbsPose for model " << this->GetName()
+    //std::cout << " GetWorldPose for model " << this->GetName()
     //          << " relative " << this->GetRelativePose() << std::endl;
     return this->GetRelativePose();
   }
@@ -337,34 +354,6 @@ void Entity::SetRelativePose(const Pose3d &pose, bool notify)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the model
-Vector3 Entity::GetLinearVel() const
-{
-  return Vector3();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the model
-Vector3 Entity::GetAngularVel() const
-{
-  return Vector3();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the model
-Vector3 Entity::GetLinearAccel() const
-{
-  return Vector3();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the model
-Vector3 Entity::GetAngularAccel() const
-{
-  return Vector3();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the pose relative to the model this entity belongs to
 Pose3d Entity::GetModelRelativePose() const
 {
@@ -376,14 +365,68 @@ Pose3d Entity::GetModelRelativePose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
-void Entity::SetAbsPose(const Pose3d &pose, bool notify)
+void Entity::SetWorldPose(const Pose3d &pose, bool notify)
 {
-  Pose3d p = pose;
-
   if (this->parent)
-    p -= this->parent->GetAbsPose();
-
-  this->SetRelativePose(p, notify);
+  {
+    // if this is the canonical body of a model, then
+    // we want to SetWorldPose of the parent model
+    // by doing some backwards transform
+    if (this->parent->type == MODEL &&
+        ((Model*)this->parent)->GetCanonicalBody() == (Body*)this)
+    {
+      // abs pose of the model + relative pose of cb = abs pose of cb 
+      // so to get abs pose of the model, we need
+      // start with abs pose of cb, inverse rotate by relative pose of cb
+      //  then, inverse translate by relative pose of cb
+      Pose3d model_abs_pose;
+      Pose3d cb_rel_pose = this->GetRelativePose();
+      // anti-rotate cb-abs by cb-rel = model-abs
+      model_abs_pose.rot = pose.rot * this->GetRelativePose().rot.GetInverse();
+      // rotate cb-rel pos by cb-rel rot to get pos offset
+      //Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
+      // finally, model-abs pos is cb-abs pos - pos_offset
+      //model_abs_pose.pos = cb->GetWorldPose().pos - pos_offset;
+      model_abs_pose.pos = pose.pos - model_abs_pose.rot * this->GetRelativePose().pos;
+      //model_abs_pose.pos = pose.pos - this->GetRelativePose().pos;
+      // set abs pose of parent model without propagating
+      // changes to children
+      this->parent->SetWorldPose(model_abs_pose,false);
+      // that should be all, as relative pose of a canonical model
+      // should not change
+    }
+    else
+    {
+      // this is not a canonical Body of a model
+      // simply update it's own RelativePose
+      Pose3d relative_pose = pose - this->parent->GetWorldPose();
+      // relative pose is the pose relative to the parent
+      // if this is called from MoveCallback, notify is false
+      // FIXME: if this is called by user, and notify is true
+      //        use may end up updating the entire model trying
+      //        to set abs pose of a body?  no, the body has no
+      //        children
+      this->SetRelativePose(relative_pose, notify);
+    }
+  }
+  else if (this->type == MODEL)
+  {
+    // race condition with MoveCallback from canonical body calling SetWorldPose
+    // we need to stop canonicalBody from calling SetWorldPose in MoveCallback
+    // so this user request is not overwritten
+    // if this is a model with no parent,
+    // then set own relative pose as incoming
+    // pose and notify all children
+    //  this has to propagate through before MoveCallback
+    //  triggers another SetWorldPose() and overwrites this change
+    this->SetRelativePose(pose, notify);
+    //then, set abs pose of the canonical body
+    //Body* cb = ((Model*)this)->GetCanonicalBody();
+  }
+  else
+  {
+    std::cerr << "No parent and not a model, strange\n";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -455,4 +498,16 @@ std::string Entity::GetTypeString() const
 {
   static std::string typenames[] = {"default", "model", "body", "geom", "light"};
   return typenames[this->type];
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+void Entity::Print(std::string prefix)
+{
+  std::vector<Entity*>::iterator iter;
+  std::cout << prefix << this->GetName() << "\n";
+
+  prefix += "  ";
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+    (*iter)->Print(prefix);
 }

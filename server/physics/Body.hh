@@ -76,18 +76,6 @@ namespace gazebo
     /// \param geom Geometery to attach to this body
     public: virtual void AttachGeom( Geom *geom );
 
-    /// \brief Return the velocity of the body
-    /// \return Velocity vector
-    public: virtual Vector3 GetPositionRate() const = 0;
-
-    /// \brief Return the rotation rates
-    /// \return Rotation Rate quaternion
-    public: virtual Quatern GetRotationRate() const = 0;
-
-    /// \brief Return the rotation rates
-    /// \return Rotation Rate Euler Angles RPY
-    public: virtual Vector3 GetEulerRate() const = 0;
-
     /// \brief Set whether this body is enabled
     public: virtual void SetEnabled(bool enable) const = 0;
 
@@ -132,26 +120,48 @@ namespace gazebo
     /// \brief Set the linear acceleration of the body
     public: void SetLinearAccel(const Vector3 &accel);
 
-    /// \brief Get the linear acceleration of the body
-    public: virtual Vector3 GetLinearAccel() const;
-
     /// \brief Set the angular acceleration of the body
     public: void SetAngularAccel(const Vector3 &accel);
-
-    /// \brief Get the angular acceleration of the body
-    public: virtual Vector3 GetAngularAccel() const;
 
     /// \brief Set the force applied to the body
     public: virtual void SetForce(const Vector3 &force) = 0;
 
-    /// \brief Get the force applied to the body
-    public: virtual Vector3 GetForce() const = 0;
-
     /// \brief Set the torque applied to the body
     public: virtual void SetTorque(const Vector3 &force) = 0;
 
+
+
+    /// \brief Get the linear velocity of the body
+    public: Vector3 GetRelativeLinearVel() const;
+
+    /// \brief Get the angular velocity of the body
+    public: Vector3 GetRelativeAngularVel() const;
+
+    /// \brief Get the linear acceleration of the body
+    public: Vector3 GetRelativeLinearAccel() const;
+
+    /// \brief Get the linear acceleration of the body in the world frame
+    public: Vector3 GetWorldLinearAccel() const;
+
+    /// \brief Get the angular acceleration of the body
+    public: Vector3 GetRelativeAngularAccel() const;
+
+    /// \brief Get the angular acceleration of the body in the world frame
+    public: Vector3 GetWorldAngularAccel() const;
+
+    /// \brief Get the force applied to the body
+    public: Vector3 GetRelativeForce() const;
+
+    /// \brief Get the force applied to the body in the world frame
+    public: virtual Vector3 GetWorldForce() const = 0;
+
     /// \brief Get the torque applied to the body
-    public: virtual Vector3 GetTorque() const = 0;
+    public: Vector3 GetRelativeTorque() const;
+
+    /// \brief Get the torque applied to the body in the world frame
+    public: virtual Vector3 GetWorldTorque() const = 0;
+
+
 
     /// \brief Get the vector of all geoms
     public: const std::map<std::string, Geom*> *GetGeoms() const;
@@ -164,6 +174,9 @@ namespace gazebo
 
     /// \brief Get the mass of the body
     public: const Mass &GetMass() const { return mass; }
+
+    /// \brief Set the mass of the body
+    public: void SetMass(Mass mass);
 
     /// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
     public: void GetInterfaceNames(std::vector<std::string>& list) const;
@@ -264,13 +277,6 @@ namespace gazebo
     protected: ParamT<double> *ixzP;
     protected: ParamT<double> *iyzP;
     protected: Mass customMass;
-
-
-    /// \brief if this is the canonical :ody of a model, point back
-    protected: Model* canonicalModel;
-
-    /// \brief this is how you set canonical body from the model
-    public: void SetCanonicalModel(Model* model);
 
     private: boost::signal<void (bool)> enabledSignal;
 

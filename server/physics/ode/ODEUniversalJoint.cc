@@ -24,6 +24,8 @@
  * CVS: $Id: ODEUniversalJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
+#include "gazebo_config.h"
+#include "GazeboMessage.hh"
 #include "Body.hh"
 #include "ODEUniversalJoint.hh"
 
@@ -97,6 +99,21 @@ void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
   else
     dJointSetUniversalAxis2( this->jointId, axis.x, axis.y, axis.z );
   this->physics->UnlockMutex();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void ODEUniversalJoint::SetDamping( int /*index*/, const double damping )
+{
+#ifdef INCLUDE_ODE_JOINT_DAMPING
+  this->physics->LockMutex();
+  // ode does not yet support Universal joint damping
+  dJointSetDamping( this->jointId, damping);
+  this->physics->UnlockMutex();
+#else
+  // alternaitvely, apply explicit damping
+  gzerr(0) << "joint damping not implemented in ODE ball joint\n";
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////

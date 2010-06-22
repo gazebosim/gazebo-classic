@@ -50,18 +50,18 @@ namespace gazebo
     public: void SetVisual(OgreVisual *vis);
 
     /// \brief Get the pose
-    public: Pose3d GetAbsPose() const;
+    public: Pose3d GetWorldPose() const;
 
     /// \brief Set the position of the body
     /// \param pos Vector position
-    public: virtual void SetAbsPosition(const Vector3 &pos);
+    public: virtual void SetWorldPosition(const Vector3 &pos);
 
     /// \brief Set the rotation of the body
     /// \param rot Quaternion rotation
-    public: virtual void SetAbsRotation(const Quatern &rot);
+    public: virtual void SetWorldRotation(const Quatern &rot);
 
     /// \brief Set the pose
-    public: void SetAbsPose(const Pose3d &pose);
+    public: void SetWorldPose(const Pose3d &pose);
 
     /// \brief Set the center of mass offset
     public: void SetCoMOffset( const Pose3d &com );
@@ -73,7 +73,7 @@ namespace gazebo
     public: virtual void setWorldTransform(const btTransform &worldTrans);
 
     private: OgreVisual *visual;
-    private: Pose3d absPose;
+    private: Pose3d worldPose;
     private: Pose3d comOffset;
     private: Body *body;
   };

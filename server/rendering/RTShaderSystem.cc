@@ -55,7 +55,7 @@ RTShaderSystem::~RTShaderSystem()
 /// Init the run time shader system
 void RTShaderSystem::Init()
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   if (Ogre::RTShader::ShaderGenerator::initialize())
   {
     this->shaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
@@ -165,7 +165,7 @@ void RTShaderSystem::Init()
 
 void RTShaderSystem::Fini()
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   // Restore default scheme.
   Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
@@ -190,7 +190,7 @@ void RTShaderSystem::Fini()
 // Set an Ogre::Entity to use RT shaders
 void RTShaderSystem::AttachEntity(OgreVisual *vis)
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   this->GenerateShaders(vis);
   this->entities.push_back(vis);
 #endif
@@ -200,7 +200,7 @@ void RTShaderSystem::AttachEntity(OgreVisual *vis)
 // Remove and entity
 void RTShaderSystem::DetachEntity(OgreVisual *vis)
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   this->entities.remove(vis);
 #endif
 }
@@ -209,7 +209,7 @@ void RTShaderSystem::DetachEntity(OgreVisual *vis)
 /// Update the shaders
 void RTShaderSystem::UpdateShaders()
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
   std::list<OgreVisual*>::iterator iter;
 
   // Update all the shaders
@@ -222,7 +222,7 @@ void RTShaderSystem::UpdateShaders()
 /// Generate shaders for an entity
 void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 {
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
 
   for (unsigned int k=0; k < vis->sceneNode->numAttachedObjects(); k++)
   {

@@ -62,7 +62,7 @@ void JointForce::LoadChild(XMLConfigNode *node)
   Joint *joint;
   std::string jointName;
 
-  this->myIface = dynamic_cast<OpaqueIface*>(this->GetIface("opaque"));
+  this->myIface = dynamic_cast<libgazebo::OpaqueIface*>(this->GetIface("opaque"));
 
   jNode = node->GetChild("joint");
 

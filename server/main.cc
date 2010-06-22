@@ -106,7 +106,7 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include <iostream>
 
-#include <config.h>
+#include "gazebo_config.h"
 #include "Simulator.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -140,6 +140,8 @@ void PrintUsage()
   fprintf(stderr, "  -n            : Do not do any time control\n");
   fprintf(stderr, "  -p            : Run without physics engine\n");
   fprintf(stderr, "  -u            : Start the simulation paused\n");
+  fprintf(stderr, "  --add_plugin  : Add a plugin to the running gazebo\n");
+  fprintf(stderr, "  --remove_plugin  : Remove a plugin from the running gazebo\n");
   fprintf(stderr, "  <worldfile>   : load the the indicated world file\n");
   return;
 }

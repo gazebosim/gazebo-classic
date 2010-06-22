@@ -30,6 +30,8 @@
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "gazebo_config.h"
+#include "Plugin.hh"
 #include "Timer.hh"
 #include "Body.hh"
 #include "Geom.hh"
@@ -57,9 +59,9 @@ std::string Simulator::defaultWorld =
     <gravity>0 0 -9.8</gravity>\
     <cfm>0.0000000001</cfm>\
     <erp>0.2</erp>\
-    <quickStep>true</quickStep>\
-    <quickStepIters>10</quickStepIters>\
-    <quickStepW>1.3</quickStepW>\
+    <stepType>quick</stepType>\
+    <stepIters>10</stepIters>\
+    <stepW>1.3</stepW>\
     <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>\
     <contactSurfaceLayer>0.001</contactSurfaceLayer>\
   </physics:ode>\
@@ -292,6 +294,14 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   catch (GazeboError e)
   {
     gzthrow("Failed to load the World\n"  << e);
+  }
+
+  XMLConfigNode *pluginNode = rootNode->GetChild("plugin");
+  while (pluginNode != NULL)
+  {
+    this->AddPlugin( pluginNode->GetString("filename","",1), 
+                     pluginNode->GetString("handle","",1) );
+    pluginNode = pluginNode->GetNext("plugin");
   }
 
   this->loaded=true;
@@ -751,4 +761,50 @@ boost::recursive_mutex *Simulator::GetMDMutex()
 Simulator::State Simulator::GetState() const
 {
   return this->state;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of plugins
+unsigned int Simulator::GetPluginCount() const
+{
+  return this->plugins.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the name of a plugin
+std::string Simulator::GetPluginName(unsigned int i) const
+{
+  std::string result;
+  if (i < this->plugins.size())
+    result = this->plugins[i]->GetHandle();
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a plugin
+void Simulator::AddPlugin(const std::string &filename, const std::string &handle)
+{
+  Plugin *plugin = Plugin::Create(filename, handle);
+  if (plugin)
+  {
+    plugin->Load();
+    this->plugins.push_back(plugin);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a plugin
+void Simulator::RemovePlugin(const std::string &name)
+{
+  std::vector<Plugin*>::iterator iter;
+  for (iter = this->plugins.begin(); iter != this->plugins.end(); iter++)
+  {
+    if ((*iter)->GetHandle() == name)
+    {
+      delete (*iter);
+      this->plugins.erase(iter);
+      break;
+    }
+  }
 }

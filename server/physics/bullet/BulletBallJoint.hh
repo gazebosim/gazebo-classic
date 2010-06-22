@@ -80,6 +80,9 @@ namespace gazebo
     /// \brief Set joint's anchor point
     public: void SetAnchor( int index, const Vector3 &anchor );
   
+    /// \brief Set joint damping, not yet implemented
+    public: virtual void SetDamping(int index, const double damping);
+
     /// \brief Attach the two bodies with this joint
     public: void Attach( Body *one, Body *two );
 

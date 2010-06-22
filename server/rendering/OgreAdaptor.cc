@@ -35,7 +35,7 @@
 #include <iostream>
 #include <string.h>
 
-#include "config.h"
+#include "gazebo_config.h"
 
 #include "OgreVisual.hh"
 #include "UserCamera.hh"

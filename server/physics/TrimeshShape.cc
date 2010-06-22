@@ -44,6 +44,8 @@ TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
   Param::Begin(&this->parameters);
   this->meshNameP = new ParamT<std::string>("mesh","",1);
   this->scaleP = new ParamT<Vector3>("scale",Vector3(1,1,1),0);
+  this->centerMeshP = new ParamT<std::string>("centerMesh","none",0);
+  this->genTexCoordP = new ParamT<bool>("genTexCoord",false,0);
   Param::End();
 }
 
@@ -54,6 +56,8 @@ TrimeshShape::~TrimeshShape()
 {
   delete this->meshNameP;
   delete this->scaleP;
+  delete this->centerMeshP;
+  delete this->genTexCoordP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -64,9 +68,33 @@ void TrimeshShape::Load(XMLConfigNode *node)
 
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
-
+  this->centerMeshP->Load(node);
+  this->genTexCoordP->Load(node);
+ 
   this->mesh = meshManager->Load( **this->meshNameP );
   //this->mesh->Print();
+  
+  if (this->centerMeshP->GetValue() == std::string("aabb_center"))
+  {
+    Vector3 center,min_xyz,max_xyz;
+    meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
+    meshManager->SetMeshCenter(this->mesh,center);
+    //std::cout << " aabb center " << std::endl;
+  }
+  else if (this->centerMeshP->GetValue() == std::string("aabb_bottom"))
+  {
+    Vector3 center,min_xyz,max_xyz;
+    meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
+    meshManager->SetMeshCenter(this->mesh,Vector3(center.x,center.y,min_xyz.z));
+    //std::cout << " aabb bottom " << std::endl;
+  }
+
+  if (this->genTexCoordP->GetValue())
+  {
+    Vector3 center,min_xyz,max_xyz;
+    meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
+    meshManager->GenSphericalTexCoord(this->mesh,center);
+  }
 
   Mass mass = this->parent->GetMass();
 

@@ -24,7 +24,7 @@
  * SVN: $Id:$
  */
 
-#include "config.h"
+#include "gazebo_config.h"
 #ifdef HAVE_FFMPEG
 
 #include <stdlib.h>

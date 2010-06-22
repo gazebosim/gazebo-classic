@@ -60,6 +60,13 @@ void BulletBallJoint::SetAnchor(int index, const Vector3 &anchor)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void BulletBallJoint::SetDamping( int /*index*/, const double damping )
+{
+  gzerr(0) << "Not implemented\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// Attach the two bodies with this joint
 void BulletBallJoint::Attach( Body *one, Body *two )
 {
@@ -76,8 +83,8 @@ void BulletBallJoint::Attach( Body *one, Body *two )
   Vector3 pivotA, pivotB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = this->anchorPos - this->body1->GetAbsPose().pos;
-  pivotB = this->anchorPos - this->body2->GetAbsPose().pos;
+  pivotA = this->anchorPos - this->body1->GetWorldPose().pos;
+  pivotB = this->anchorPos - this->body2->GetWorldPose().pos;
 
   this->constraint = new btPoint2PointConstraint( *rigidBody1, *rigidBody2,
       btVector3(pivotA.x, pivotA.y, pivotA.z),

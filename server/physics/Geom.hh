@@ -151,7 +151,7 @@ namespace gazebo
     public: Shape *GetShape() const;
 
     /// \brief Turn contact recording on or off
-    public: void SetContactsEnabled(bool enable);
+    public: void SetContactsEnabled(const bool &enable);
 
     /// \brief Return true of contact recording is on
     public: bool GetContactsEnabled() const;
@@ -168,23 +168,37 @@ namespace gazebo
     /// \brief Get a specific contact
     public: Contact GetContact(unsigned int i) const;
 
-    /// \brief Get the linear velocity of the model
-    public: virtual Vector3 GetLinearVel() const;
+    /// \brief Get the linear velocity of the geom
+    public: virtual Vector3 GetRelativeLinearVel() const;
 
-    /// \brief Get the angular velocity of the model
-    public: virtual Vector3 GetAngularVel() const;
+    /// \brief Get the linear velocity of the geom in the world frame
+    public: virtual Vector3 GetWorldLinearVel() const;
 
-    /// \brief Get the linear acceleration of the model
-    public: virtual Vector3 GetLinearAccel() const;
+    /// \brief Get the angular velocity of the geom
+    public: virtual Vector3 GetRelativeAngularVel() const;
 
-    /// \brief Get the angular acceleration of the model
-    public: virtual Vector3 GetAngularAccel() const;
+    /// \brief Get the angular velocity of the geom in the world frame
+    public: virtual Vector3 GetWorldAngularVel() const;
+
+    /// \brief Get the linear acceleration of the geom
+    public: virtual Vector3 GetRelativeLinearAccel() const;
+            
+    /// \brief Get the linear acceleration of the geom in the world frame
+    public: virtual Vector3 GetWorldLinearAccel() const;
+
+    /// \brief Get the angular acceleration of the geom
+    public: virtual Vector3 GetRelativeAngularAccel() const;
+
+    /// \brief Get the angular acceleration of the geom in the world frame
+    public: virtual Vector3 GetWorldAngularAccel() const;
  
-    public: template< typename C>
-            void ContactCallback( void (C::*func)(const Contact&), C *c )
-            {
-              contactSignal.connect( boost::bind(func, c, _1) );
-            }
+    public: template< typename T>
+            boost::signals::connection ConnectContactCallback( T subscriber )
+            { return contactSignal.connect(subscriber); }
+    public: template< typename T>
+            void DisconnectContactCallback( T subscriber )
+            { contactSignal.disconnect(subscriber); }
+
 
     /// \brief Enable callback: Called when the body changes
     private: void EnabledCB(bool enabled);
@@ -209,9 +223,9 @@ namespace gazebo
 
     ///  Mass as a double
     private: ParamT<double> *massP;
-
     protected: ParamT<Vector3> *xyzP;
     protected: ParamT<Quatern> *rpyP;
+    protected: ParamT<bool> *enableContactsP;
 
     /// Special bounding box visual
     private: OgreVisual *bbVisual;

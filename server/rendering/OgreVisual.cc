@@ -70,6 +70,15 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   this->visible = true;
   this->ConstructorHelper(pnode, isStatic);
 
+  this->ribbonTrail = (Ogre::RibbonTrail*)OgreAdaptor::Instance()->sceneMgr->createMovableObject("RibbonTrail");
+  this->ribbonTrail->setMaterialName("Gazebo/Red");
+  this->ribbonTrail->setTrailLength(200);
+  this->ribbonTrail->setMaxChainElements(1000);
+  this->ribbonTrail->setNumberOfChains(1);
+  this->ribbonTrail->setVisible(false);
+  this->ribbonTrail->setInitialWidth(0,0.05);
+  OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->attachObject(this->ribbonTrail);
+
   RTShaderSystem::Instance()->AttachEntity(this);
 }
 
@@ -164,6 +173,7 @@ OgreVisual::~OgreVisual()
 
   RTShaderSystem::Instance()->DetachEntity(this);
 
+
   // Having this chunk of code causes a segfault when closing the
   // application.
   if (this->parentNode != NULL)
@@ -172,6 +182,15 @@ OgreVisual::~OgreVisual()
     {
       if (this->boundingBoxNode != NULL)
         this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
+
+      // loop through sceneNode an delete attached objects
+      for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+      {
+        Ogre::MovableObject* obj = this->sceneNode->getAttachedObject(i);
+        if (obj) delete obj;
+        obj = NULL;
+      }
+      this->sceneNode->detachAllObjects();
 
       // delete works, but removeAndDestroyChild segfaults
       delete this->sceneNode;
@@ -581,64 +600,65 @@ void OgreVisual::SetTransparency( float trans )
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-
-  unsigned short i = 0, j=0;
-  Ogre::ColourValue sc, dc;
-  Ogre::Technique *t;
-
-  this->transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
-
-  if (this->myMaterial.isNull())
+  double transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
+  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
-    gzmsg(0) << "The visual can't set transparency for this geom (" << /*geom name? << */ ") without a material"
-             << " sceneNode(" << this->sceneNode->getName() << ")\n";
-    return;
-  }
+    Ogre::Entity *entity = NULL;
+    Ogre::SimpleRenderable *simple = NULL;
+    Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
-  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
+    entity = dynamic_cast<Ogre::Entity*>(obj);
+    //simple = dynamic_cast<Ogre::SimpleRenderable*>(obj);
+    if (!entity)
+      continue;
 
-  while ( techniqueIt.hasMoreElements() )
-  {
-    t = techniqueIt.getNext ();
-    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-
-    j = 0;
-
-    while (passIt.hasMoreElements ())
+    for (unsigned int j=0; j < entity->getNumSubEntities(); j++)
     {
-      sc = this->myMaterial->getTechnique(i)->getPass(j)->getDiffuse();
+      Ogre::SubEntity *subEntity = entity->getSubEntity(j);
+      Ogre::MaterialPtr material = subEntity->getMaterial();
+      Ogre::Material::TechniqueIterator techniqueIt = material->getTechniqueIterator();
 
-      if (this->transparency >0.0)
-        passIt.peekNext ()->setDepthWriteEnabled (false);
-      else
-        passIt.peekNext ()->setDepthWriteEnabled (true);
+      unsigned int techniqueCount, passCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+      Ogre::ColourValue sc, dc;
 
-      switch (this->sceneBlendType)
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
+           techniqueCount++)
       {
-        case Ogre::SBT_ADD:
-          dc = sc;
-          dc.r -= sc.r * this->transparency;
-          dc.g -= sc.g  * this->transparency;
-          dc.b -= sc.b * this->transparency;
-          passIt.peekNext()->setAmbient(Ogre::ColourValue::Black);
-          break;
+        technique = material->getTechnique(techniqueCount);
 
-        case Ogre::SBT_TRANSPARENT_ALPHA:
-        default:
-          dc = sc;
-          //dc.a = sc.a * (1.0f - this->transparency);
-          dc.a =  (1.0f - this->transparency);
-          passIt.peekNext()->setAmbient(this->myMaterial->getTechnique(i)->getPass(j)->getAmbient());
-          break;
+        for (passCount=0; passCount < technique->getNumPasses(); passCount++)
+        {
+          pass = technique->getPass(passCount);
+          sc = pass->getDiffuse();
+
+          if (transparency > 0.0)
+            pass->setDepthWriteEnabled(false);
+          else
+            pass->setDepthWriteEnabled(true);
+
+          switch (this->sceneBlendType)
+          {
+            case Ogre::SBT_ADD:
+              dc = sc;
+              dc.r -= sc.r * transparency;
+              dc.g -= sc.g  * transparency;
+              dc.b -= sc.b * transparency;
+              pass->setAmbient(Ogre::ColourValue::Black);
+              break;
+
+            case Ogre::SBT_TRANSPARENT_ALPHA:
+            default:
+              dc = sc;
+              dc.a =  (1.0f - transparency);
+              pass->setAmbient(pass->getAmbient());
+              break;
+          }
+          pass->setDiffuse(dc);
+        }
       }
-      passIt.peekNext ()->setDiffuse (dc);
-
-      passIt.moveNext ();
-
-      ++j;
     }
-
-    ++i;
   }
 
 }
@@ -848,7 +868,7 @@ Pose3d OgreVisual::GetPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global pose of the node
-Pose3d OgreVisual::GetAbsPose() const
+Pose3d OgreVisual::GetWorldPose() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -1063,4 +1083,21 @@ void OgreVisual::SetShader(const std::string &shader)
 {
   this->shaderP->SetValue(shader);
   RTShaderSystem::Instance()->UpdateShaders();
+}
+
+void OgreVisual::SetRibbonTrail(bool value)
+{
+  if (value)
+  {
+    try
+    {
+      this->ribbonTrail->addNode(this->sceneNode);
+    } catch (...) { }
+  }
+  else
+  {
+    this->ribbonTrail->removeNode(this->sceneNode);
+    this->ribbonTrail->clearChain(0);
+  }
+  this->ribbonTrail->setVisible(value);
 }

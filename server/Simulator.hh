@@ -47,7 +47,6 @@ namespace gazebo
 // Forward declarations
   class Gui;
   class Server;
-  class SimulationIface;
   class XMLConfig;
   class XMLConfigNode;
   class GazeboConfig;
@@ -56,6 +55,7 @@ namespace gazebo
   class Common;
   class Body;
   class Model;
+  class Plugin;
 
 /// \brief The World
 /*
@@ -171,6 +171,18 @@ namespace gazebo
     /// \brief Get the state of the simulation
     public: State GetState() const;
 
+    /// \brief Get the number of plugins
+    public: unsigned int GetPluginCount() const;
+
+    /// \brief Get the name of a plugin
+    public: std::string GetPluginName(unsigned int i) const;
+
+    /// \brief Add a plugin
+    public: void AddPlugin(const std::string &plugin, const std::string &handle);
+
+    /// \brief Remove a plugin
+    public: void RemovePlugin(const std::string &plugin);
+
     /// \brief Connect a boost::slot the the pause signal
     public: template<typename T>
             void ConnectPauseSignal( T subscriber )
@@ -255,6 +267,8 @@ namespace gazebo
     private: friend class SingletonT<Simulator>;
 
     private: static std::string defaultWorld;
+
+    private: std::vector<Plugin*> plugins;
 };
 
 

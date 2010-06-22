@@ -115,6 +115,9 @@ class ODEHinge2Joint : public Hinge2Joint<ODEJoint>
   /// \brief Set the first axis of rotation
   public: virtual void SetAxis( int index, const Vector3 &axis );
 
+  /// \brief Set joint damping, not yet implemented
+  public: virtual void SetDamping(int index, const double damping);
+
   /// \brief Get anchor point
   public: virtual Vector3 GetAnchor(int index) const;
 

@@ -53,6 +53,9 @@ SurfaceParams::SurfaceParams()
   this->slip2 = 0.01;
 
   this->enableFriction = true;
+
+  //this->useGlobalERP = false;
+  //this->useGlobalCFM = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////

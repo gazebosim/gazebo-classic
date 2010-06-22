@@ -49,6 +49,12 @@
 #include "Entity.hh"
 #include "Timer.hh"
 
+namespace libgazebo
+{
+  class SimulationIface;
+  class Server;
+}
+
 namespace gazebo
 {
 /// \addtogroup gazebo_server
@@ -56,18 +62,16 @@ namespace gazebo
 /// \{
 
 // Forward declarations
-  class Server;
-  class SimulationIface;
   class Model;
   class Geom;
   class PhysicsEngine;
   class XMLConfigNode;
-  class GraphicsIfaceHandler;
   class OpenAL;
   class Factory;
   class WorldState;
   class Timer;
   class Time;
+  class GraphicsIfaceHandler;
    
 /// \brief The World
 /*
@@ -108,7 +112,7 @@ class World : public SingletonT<World>
 
   /// Retun the libgazebo server
   /// \return Pointer the the libgazebo server
-  public: Server *GetGzServer() const;
+  public: libgazebo::Server *GetGzServer() const;
 
   /// Return the physics engine
   /// \return Pointer to the physics engine
@@ -228,6 +232,9 @@ class World : public SingletonT<World>
 
   /// \brief Get the selected entity
   public: Entity *GetSelectedEntity() const;
+
+  /// \brief Print entity tree
+  public: void PrintEntityTree();
 
   /// \brief Save the state of the world
   private: void SaveState();
@@ -383,10 +390,10 @@ class World : public SingletonT<World>
   private: std::vector< std::string > toLoadEntities;
 
   /// Simulator control interface
-  private: Server *server;
+  private: libgazebo::Server *server;
 
   /// Simulation interface
-  private: SimulationIface *simIface;
+  private: libgazebo::SimulationIface *simIface;
 
   private: Factory *factory;
 

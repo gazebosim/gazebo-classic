@@ -406,9 +406,9 @@ void Model::Init()
   // this updates the relativePose of the Model Entity
   // set model pointer of the canonical body so when body updates,
   // one can callback to the model
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    cb->SetCanonicalModel(this);
+  //Body* cb = this->GetCanonicalBody();
+  //if (cb != NULL)
+    //cb->SetCanonicalModel(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -487,10 +487,9 @@ void Model::OnPoseChange()
 {
   /// set the pose of the model, which is the pose of the canonical body
   /// this updates the relativePose of the Model Entity
-  Body* cb = this->GetCanonicalBody();
-  if (cb != NULL)
-    this->SetAbsPose(cb->GetAbsPose(),false);
-
+  //Body* cb = this->GetCanonicalBody();
+  //if (cb != NULL)
+    //this->SetWorldPose(cb->GetWorldPose(),false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -720,44 +719,89 @@ void Model::SetAngularAccel( const Vector3 &accel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the model
-Vector3 Model::GetLinearVel() const
+Vector3 Model::GetRelativeLinearVel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
-    return cb->GetLinearVel();
+    return cb->GetRelativeLinearVel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear velocity of the entity in the world frame
+Vector3 Model::GetWorldLinearVel() const
+{
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetWorldLinearVel();
   else // return 0 vector if model has no body
     return Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the model
-Vector3 Model::GetAngularVel() const
+Vector3 Model::GetRelativeAngularVel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
-    return cb->GetAngularVel();
+    return cb->GetRelativeAngularVel();
   else // return 0 vector if model has no body
     return Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the model
-Vector3 Model::GetLinearAccel() const
+/// Get the angular velocity of the model in the world frame
+Vector3 Model::GetWorldAngularVel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
-    return cb->GetLinearAccel();
+    return cb->GetWorldAngularVel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the model
+Vector3 Model::GetRelativeLinearAccel() const
+{
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetRelativeLinearAccel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the model in the world frame
+Vector3 Model::GetWorldLinearAccel() const
+{
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetWorldLinearAccel();
   else // return 0 vector if model has no body
     return Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the model
-Vector3 Model::GetAngularAccel() const
+Vector3 Model::GetRelativeAngularAccel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
-    return cb->GetAngularAccel();
+    return cb->GetRelativeAngularAccel();
+  else // return 0 vector if model has no body
+    return Vector3(0,0,0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the model in the world frame
+Vector3 Model::GetWorldAngularAccel() const
+{
+  Body* cb = this->GetCanonicalBody();
+  if (cb != NULL)
+    return cb->GetWorldAngularAccel();
   else // return 0 vector if model has no body
     return Vector3(0,0,0);
 }
@@ -1041,7 +1085,7 @@ void Model::Attach(XMLConfigNode *node)
     gzthrow("Parent has no canonical body");
 
   this->joint->Attach(myBody, pBody);
-  this->joint->SetAnchor(0, myBody->GetAbsPose().pos );
+  this->joint->SetAnchor(0, myBody->GetWorldPose().pos );
   this->joint->SetAxis(0, Vector3(0,1,0) );
   this->joint->SetHighStop(0,Angle(0));
   this->joint->SetLowStop(0,Angle(0));
@@ -1259,11 +1303,11 @@ void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 /// Return Model Absolute Pose
 /// this is redundant as long as Model's relativePose is maintained
 /// which is done in Model::OnPoseChange and during Model initialization
-Pose3d Model::GetAbsPose()
+Pose3d Model::GetWorldPose()
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
-    return cb->GetAbsPose();
+    return cb->GetWorldPose();
   else 
     return Pose3d();
 }

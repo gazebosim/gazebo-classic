@@ -62,7 +62,7 @@ Generic_Camera::~Generic_Camera()
 // Load the controller
 void Generic_Camera::LoadChild(XMLConfigNode *node)
 {
-  this->cameraIface = dynamic_cast<CameraIface*>(this->GetIface("camera"));
+  this->cameraIface = dynamic_cast<libgazebo::CameraIface*>(this->GetIface("camera"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ void Generic_Camera::FiniChild()
 // Put laser data to the interface
 void Generic_Camera::PutCameraData()
 {
-  CameraData *data = this->cameraIface->data;
+  libgazebo::CameraData *data = this->cameraIface->data;
   const unsigned char *src;
   unsigned char *dst;
   Pose3d cameraPose;

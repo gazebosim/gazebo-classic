@@ -32,7 +32,6 @@
 
 namespace gazebo
 {
-  class PositionIface;
   class Wheel;
 
 /// \addtogroup gazebo_controller
@@ -117,7 +116,7 @@ class Steering_Position2d : public Controller
   protected: std::vector<Wheel*> wheels;
 
   /// The Position interface
-  private: PositionIface *myIface;
+  private: libgazebo::PositionIface *myIface;
 
   /// The parent Model
   private: Model *myParent;

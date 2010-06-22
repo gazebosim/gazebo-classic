@@ -37,7 +37,6 @@ namespace gazebo
 {
   class Joint;
   class Entity;
-  class PositionIface;
 
 /// \addtogroup gazebo_controller
 /// \{
@@ -160,7 +159,7 @@ class Holonome3Sw_Position2d : public Controller
   private: void ResetData();
   
   /// The Position interface
-  private: PositionIface *myIface;
+  private: libgazebo::PositionIface *myIface;
 
   /// The parent Model
   private: Model *myParent;

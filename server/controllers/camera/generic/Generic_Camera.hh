@@ -30,10 +30,13 @@
 
 #include "Controller.hh"
 
+namespace libgazebo
+{
+  class CameraIface;
+}
 
 namespace gazebo
 {
-  class CameraIface;
   class MonoCameraSensor;
 
 /// @addtogroup gazebo_controller
@@ -98,7 +101,7 @@ class Generic_Camera : public Controller
   private: void PutCameraData();
 
   /// The camera interface
-  private: CameraIface *cameraIface;
+  private: libgazebo::CameraIface *cameraIface;
 
   /// The parent sensor
   private: MonoCameraSensor *myParent;

@@ -116,6 +116,13 @@ Vector3 PhysicsEngine::GetGravity() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the gavity vector
+void PhysicsEngine::SetGravity(Vector3 gravity) const
+{
+  this->gravityP->SetValue(gravity);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
 double PhysicsEngine::GetUpdateRate() const
 {
@@ -123,10 +130,24 @@ double PhysicsEngine::GetUpdateRate() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Set the time between each update cycle
+void PhysicsEngine::SetUpdateRate(double rate) const
+{
+  this->updateRateP->SetValue(rate);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
 Time PhysicsEngine::GetStepTime() const
 {
   return **this->stepTimeP;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the time between each update cycle
+void PhysicsEngine::SetStepTime(Time time)
+{
+  this->stepTimeP->SetValue(time);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

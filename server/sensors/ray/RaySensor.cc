@@ -87,7 +87,7 @@ void RaySensor::InitChild()
 {
   Pose3d bodyPose;
 
-  bodyPose = this->body->GetAbsPose();
+  bodyPose = this->body->GetWorldPose();
 }
 
 //////////////////////////////////////////////////////////////////////////////

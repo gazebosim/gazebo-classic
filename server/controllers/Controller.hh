@@ -33,9 +33,13 @@
 #include "Param.hh"
 #include "gz.h"
 
-namespace gazebo
+namespace libgazebo
 {
   class Iface;
+}
+
+namespace gazebo
+{
   class XMLConfigNode;
   class Entity;
 
@@ -106,7 +110,7 @@ class Controller
   /// \param type The type of the iface to retrieve
   /// \param number If several ifaces of the same type present, which one
   /// \return Iface, or exception if not found. 
-  protected: Iface* GetIface(std::string type, bool mandatory=true, int number=0);
+  protected: libgazebo::Iface* GetIface(std::string type, bool mandatory=true, int number=0);
   
   /// \brief The controller's name
   protected: ParamT<std::string> *nameP;
@@ -127,7 +131,7 @@ class Controller
   protected: Time lastUpdate;
 
   /// \brief Array of all the iface for this controller
-  private: std::vector<Iface*> ifaces;
+  private: std::vector<libgazebo::Iface*> ifaces;
 
   protected: std::vector<Param*> parameters;
 };

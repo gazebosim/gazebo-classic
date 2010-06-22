@@ -77,7 +77,7 @@ void BulletBody::Load(XMLConfigNode *node)
 
   // Set the initial pose of the body
   this->motionState->SetVisual( this->visualNode );
-  this->motionState->SetAbsPose(this->GetAbsPose());
+  this->motionState->SetWorldPose(this->GetWorldPose());
 
   btTransform principal;
   btVector3 principalInertia;
@@ -238,48 +238,11 @@ void BulletBody::AttachGeom( Geom *geom )
 /// changed
 void BulletBody::OnPoseChange()
 {
-  Pose3d pose = this->GetAbsPose();
+  Pose3d pose = this->GetWorldPose();
 
-  this->motionState->SetAbsPose(pose);
+  this->motionState->SetWorldPose(pose);
   if (this->rigidBody)
     this->rigidBody->setMotionState(this->motionState);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the position of the body. in global CS
-Vector3 BulletBody::GetPositionRate() const
-{
-  btVector3 btVec;
-
-  btVec = this->rigidBody->getLinearVelocity();
-
-  return Vector3(btVec.x(), btVec.y(), btVec.z());
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the rotation
-Quatern BulletBody::GetRotationRate() const
-{
-  Quatern velQ;
-  btVector3 btVec;
-
-  btVec = this->rigidBody->getAngularVelocity();
-
-  velQ.SetFromEuler(Vector3(btVec.x(), btVec.y(), btVec.z()));
-
-  return velQ;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the rotation
-Vector3 BulletBody::GetEulerRate() const
-{
-  btVector3 btVec;
-
-  btVec = this->rigidBody->getAngularVelocity();
-
-  return Vector3(btVec.x(), btVec.y(), btVec.z());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -328,7 +291,7 @@ void BulletBody::SetLinearVel(const Vector3 &vel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body
-Vector3 BulletBody::GetLinearVel() const
+Vector3 BulletBody::GetWorldLinearVel() const
 {
   if (!this->rigidBody)
     return Vector3(0,0,0);
@@ -350,7 +313,7 @@ void BulletBody::SetAngularVel(const Vector3 &vel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body
-Vector3 BulletBody::GetAngularVel() const
+Vector3 BulletBody::GetWorldAngularVel() const
 {
   if (!this->rigidBody)
     return Vector3(0,0,0);
@@ -361,7 +324,7 @@ Vector3 BulletBody::GetAngularVel() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Set the force applied to the body
+/// Set the force applied to the body
 void BulletBody::SetForce(const Vector3 &force)
 {
   if (!this->rigidBody)
@@ -371,8 +334,8 @@ void BulletBody::SetForce(const Vector3 &force)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Get the force applied to the body
-Vector3 BulletBody::GetForce() const
+/// Get the force applied to the body
+Vector3 BulletBody::GetWorldForce() const
 {
   if (!this->rigidBody)
     return Vector3(0,0,0);
@@ -397,7 +360,7 @@ void BulletBody::SetTorque(const Vector3 &torque)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the torque applied to the body
-Vector3 BulletBody::GetTorque() const
+Vector3 BulletBody::GetWorldTorque() const
 {
   if (!this->rigidBody)
     return Vector3(0,0,0);

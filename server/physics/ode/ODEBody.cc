@@ -25,6 +25,7 @@
  */
 
 #include <sstream>
+#include <math.h>
 
 #include "XMLConfig.hh"
 #include "GazeboMessage.hh"
@@ -98,7 +99,6 @@ void ODEBody::Init()
 // Move callback. Use this to move the visuals
 void ODEBody::MoveCallback(dBodyID id)
 {
-
   Pose3d pose;
   const dReal *p;
   const dReal *r;
@@ -112,12 +112,12 @@ void ODEBody::MoveCallback(dBodyID id)
 
   Pose3d pp = self->comEntity->GetRelativePose().GetInverse() + pose;
 
-  self->SetAbsPose(pp, false);
+  pp.Correct();
 
-  // if this is a canonical body, update model's relative pose
-  if (self->canonicalModel)
-    self->canonicalModel->OnPoseChange();
+  if ( isnan(pp.pos.x) || isnan(pp.pos.y) || isnan(pp.pos.z) )
+    printf("NAN!!!\n");
 
+  self->SetWorldPose(pp, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ void ODEBody::OnPoseChange()
 
   this->SetEnabled(true);
 
-  Pose3d pose = this->comEntity->GetAbsPose();
+  Pose3d pose = this->comEntity->GetWorldPose();
   this->physicsEngine->LockMutex();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
@@ -196,96 +196,8 @@ void ODEBody::OnPoseChange()
 
   // Set the rotation of the ODE body
   dBodySetQuaternion(this->bodyId, q);
+
   this->physicsEngine->UnlockMutex();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the position of the body. in global CS
-Vector3 ODEBody::GetPositionRate() const
-{
-  Vector3 vel;
-
-  if (this->bodyId)
-  {
-    const dReal *v;
-
-    this->physicsEngine->LockMutex();
-    v = dBodyGetLinearVel(this->bodyId);
-    this->physicsEngine->UnlockMutex();
-
-    vel.x = v[0];
-    vel.y = v[1];
-    vel.z = v[2];
-  }
-  else
-  {
-    vel.x = 0;
-    vel.y = 0;
-    vel.z = 0;
-  }
-
-  return vel;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the rotation
-Quatern ODEBody::GetRotationRate() const
-{
-  Quatern velQ;
-  Vector3 vel;
-
-  if (this->bodyId)
-  {
-    const dReal *v;
-
-    this->physicsEngine->LockMutex();
-    v = dBodyGetAngularVel(this->bodyId);
-    this->physicsEngine->UnlockMutex();
-
-    vel.x = v[0];
-    vel.y = v[1];
-    vel.z = v[2];
-
-    velQ.SetFromEuler(vel);
-  }
-  else
-  {
-    vel.x = 0;
-    vel.y = 0;
-    vel.z = 0;
-    velQ.SetFromEuler(vel);
-  }
-
-  return velQ;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the rotation
-Vector3 ODEBody::GetEulerRate() const
-{
-  Vector3 vel;
-
-  if (this->bodyId)
-  {
-    const dReal *v;
-
-    this->physicsEngine->LockMutex();
-    v = dBodyGetAngularVel(this->bodyId);
-    this->physicsEngine->UnlockMutex();
-    vel.x = v[0];
-    vel.y = v[1];
-    vel.z = v[2];
-
-  }
-  else
-  {
-    vel.x = 0;
-    vel.y = 0;
-    vel.z = 0;
-  }
-
-  return vel;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -403,8 +315,8 @@ void ODEBody::SetLinearVel(const Vector3 &vel)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the velocity of the body
-Vector3 ODEBody::GetLinearVel() const
+/// Get the velocity of the body in the world frame
+Vector3 ODEBody::GetWorldLinearVel() const
 {
   Vector3 vel;
 
@@ -416,9 +328,7 @@ Vector3 ODEBody::GetLinearVel() const
     dvel = dBodyGetLinearVel(this->bodyId);
     this->physicsEngine->UnlockMutex();
 
-    vel.x = dvel[0];
-    vel.y = dvel[1];
-    vel.z = dvel[2];
+    vel.Set(dvel[0], dvel[1], dvel[2]);
   }
 
   return vel;
@@ -437,23 +347,24 @@ void ODEBody::SetAngularVel(const Vector3 &vel)
   }
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the velocity of the body
-Vector3 ODEBody::GetAngularVel() const
+/// Get the angular velocity of the body in the world frame
+Vector3 ODEBody::GetWorldAngularVel() const
 {
   Vector3 vel;
 
   if (this->bodyId)
   {
     const dReal *dvel;
+    dReal result[3];
 
     this->physicsEngine->LockMutex();
     dvel = dBodyGetAngularVel(this->bodyId);
     this->physicsEngine->UnlockMutex();
 
-    vel.x = dvel[0];
-    vel.y = dvel[1];
-    vel.z = dvel[2];
+    vel.Set(dvel[0], dvel[1], dvel[2]);
   }
 
   return vel;
@@ -471,9 +382,10 @@ void ODEBody::SetForce(const Vector3 &force)
   }
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Get the force applied to the body
-Vector3 ODEBody::GetForce() const
+/// \brief Get the force applied to the body in the world frame
+Vector3 ODEBody::GetWorldForce() const
 {
   Vector3 force;
 
@@ -501,14 +413,15 @@ void ODEBody::SetTorque(const Vector3 &torque)
   {
     this->SetEnabled(true);
     this->physicsEngine->LockMutex();
-    dBodyAddTorque(this->bodyId, torque.x, torque.y, torque.z);
+    dBodyAddRelTorque(this->bodyId, torque.x, torque.y, torque.z);
     this->physicsEngine->UnlockMutex();
   }
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Get the torque applied to the body
-Vector3 ODEBody::GetTorque() const
+/// Get the torque applied to the body in the world frame
+Vector3 ODEBody::GetWorldTorque() const
 {
   Vector3 torque;
 

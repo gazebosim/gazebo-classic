@@ -551,7 +551,7 @@ void GLWindow::SetActiveCamera( OgreCamera *camera )
 void GLWindow::SetViewStyle(std::string view)
 {
   UserCamera *cam =  this->GetCamera();
-  Pose3d pose = cam->GetWorldPose();
+  Pose3d pose = cam->GetCameraWorldPose();
 
   if (view == "Top")
   {
@@ -600,7 +600,7 @@ void GLWindow::EntityRotate(Entity *entity)
   Vector3 a,b;
   Vector3 ray(0,0,0);
 
-  Pose3d modelPose = entity->GetAbsPose();
+  Pose3d modelPose = entity->GetWorldPose();
 
   // Figure out which axis to rotate around
   if (this->mouseModifier == "rotx")
@@ -620,11 +620,11 @@ void GLWindow::EntityRotate(Entity *entity)
   p2 = this->GetWorldPointOnPlane( this->mouseEvent.prevPos.x, 
       this->mouseEvent.prevPos.y, planeNorm, d);
 
-  OgreCreator::DrawLine(entity->GetAbsPose().pos,p1, "guiline");
+  OgreCreator::DrawLine(entity->GetWorldPose().pos,p1, "guiline");
 
   // Get point vectors relative to the entity's pose
-  a = p1 - entity->GetAbsPose().pos;
-  b = p2 - entity->GetAbsPose().pos;
+  a = p1 - entity->GetWorldPose().pos;
+  b = p2 - entity->GetWorldPose().pos;
 
   a.Normalize();
   b.Normalize();
@@ -650,7 +650,7 @@ void GLWindow::EntityRotate(Entity *entity)
     delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
     
     modelPose.rot = modelPose.rot * delta;
-    entity->SetAbsPose(modelPose);
+    entity->SetWorldPose(modelPose);
   }
   else
   {
@@ -662,7 +662,7 @@ void GLWindow::EntityRotate(Entity *entity)
 // Translate an entity, or apply force
 void GLWindow::EntityTranslate(Entity *entity)
 {
-  Pose3d pose = entity->GetAbsPose();
+  Pose3d pose = entity->GetWorldPose();
 
   Vector3 origin1, dir1, p1;
   Vector3 origin2, dir2, p2;
@@ -695,7 +695,7 @@ void GLWindow::EntityTranslate(Entity *entity)
   p1 = origin1 + dir1 * dist1;
   p2 = origin2 + dir2 * dist2;
 
-  OgreCreator::DrawLine(entity->GetAbsPose().pos,p2, "guiline");
+  OgreCreator::DrawLine(entity->GetWorldPose().pos,p2, "guiline");
 
   moveVector *= p1 - p2;
 

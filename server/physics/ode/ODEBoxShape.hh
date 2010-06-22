@@ -19,8 +19,9 @@ namespace gazebo
               ODEGeom *oParent = (ODEGeom*)(this->parent);
 
               Pose3d rpose;
+
               dMass odeMass;
-  
+
               Mass mass = this->parent->GetMass();
   
               // Initialize box mass matrix

@@ -134,7 +134,7 @@ namespace gazebo
     public: Pose3d GetPose() const;
 
     /// \brief Get the global pose of the node
-    public: Pose3d GetAbsPose() const;
+    public: Pose3d GetWorldPose() const;
 
     /// \brief Return the scene Node of this visual entity
     public: Ogre::SceneNode * GetSceneNode();
@@ -184,6 +184,9 @@ namespace gazebo
     /// \brief Set the shader
     public: void SetShader(const std::string &shader);
 
+    /// \brief True on or off a ribbon trail
+    public: void SetRibbonTrail(bool value);
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: std::string myMaterialName;
@@ -222,6 +225,8 @@ namespace gazebo
     private: bool visible;
 
     private: static SelectionObj *selectionObj;
+
+    private: Ogre::RibbonTrail *ribbonTrail;
   };
 }
 

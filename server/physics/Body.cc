@@ -57,14 +57,11 @@ Body::Body(Entity *parent)
 {
   this->type = Entity::BODY;
   this->comEntity = new Entity(this);
-  this->comEntity->SetName("COM Entity");
+  this->comEntity->SetName("COM_Entity");
 
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
   this->cgVisual = NULL;
-
-  // preset canonicalModel to null
-  this->canonicalModel = NULL;
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
@@ -142,13 +139,6 @@ Body::~Body()
   delete this->ixyP;
   delete this->ixzP;
   delete this->iyzP;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// setting model point if this is the canonical body of a model
-void Body::SetCanonicalModel(Model* model)
-{
-  this->canonicalModel = model;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -424,12 +414,13 @@ void Body::Update()
   // Apply our angular accel
   this->SetTorque(this->angularAccel);
 
-  if (this->GetEnabled() != this->enabled)
-  {
-    this->enabled = this->GetEnabled();
-    this->enabledSignal(this->enabled);
-  }
-
+  // FIXME: FIXME: @todo: @todo: race condition on factory-based model loading!!!!!
+  // if (this->GetEnabled() != this->enabled)
+  // {
+  //   this->enabled = this->GetEnabled();
+  //   this->enabledSignal(this->enabled);
+  // }
+ 
   {
     //DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
 
@@ -551,12 +542,7 @@ void Body::SetLinearAccel(const Vector3 &accel)
   this->linearAccel = accel;// * this->GetMass();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the body
-Vector3 Body::GetLinearAccel() const
-{
-  return this->GetForce() / this->mass.GetAsDouble();
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular acceleration of the body
@@ -567,10 +553,59 @@ void Body::SetAngularAccel(const Vector3 &accel)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the body
-Vector3 Body::GetAngularAccel() const
+/// Get the linear velocity of the body
+Vector3 Body::GetRelativeLinearVel() const
 {
-  return this->GetTorque() /  this->mass.GetAsDouble();
+  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldLinearVel());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular velocity of the body
+Vector3 Body::GetRelativeAngularVel() const
+{
+  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldAngularVel());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the body
+Vector3 Body::GetRelativeLinearAccel() const
+{
+  return this->GetRelativeForce() / this->mass.GetAsDouble();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the body
+Vector3 Body::GetWorldLinearAccel() const
+{
+  return this->GetWorldForce() / this->mass.GetAsDouble();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the body
+Vector3 Body::GetRelativeAngularAccel() const
+{
+  return this->GetRelativeTorque() /  this->mass.GetAsDouble();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the body
+Vector3 Body::GetWorldAngularAccel() const
+{
+  return this->GetWorldTorque() /  this->mass.GetAsDouble();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the force applied to the body
+Vector3 Body::GetRelativeForce() const
+{
+  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldForce());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the torque applied to the body
+Vector3 Body::GetRelativeTorque() const
+{
+  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldTorque());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -677,3 +712,13 @@ bool Body::SetSelected( bool s )
   if (s == false)
     this->SetEnabled(true);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Set Mass
+void Body::SetMass(Mass mass)
+{
+  /// @todo: needs verification
+  this->mass = mass;
+  this->customMass = mass;
+}
+

@@ -129,14 +129,29 @@ namespace gazebo
     /// \brief Return the gavity vector
     /// \return The gavity vector
     public: Vector3 GetGravity() const;
-  
+
+    /// \brief Set the gavity vector
+    public: void SetGravity(Vector3 gravity) const;
+
     /// \brief Get the time between each update cycle
     /// \return seconds between updates 
     public: double GetUpdateRate() const;
-  
+
+    /// \brief Set the time between each update cycle
+    public: void SetUpdateRate(double rate) const;
+
     /// \brief Get the physics time steps in the virtual world
     /// \return step time 
     public: Time GetStepTime() const;
+
+    /// \brief Set the step time
+    public: void SetStepTime(Time time);
+
+    /// \brief Get the step type
+    public: virtual std::string GetStepType() const {return "unknown";}
+
+    /// \brief Set the step type
+    public: virtual void SetStepType(const std::string type) {}
 
     /// \brief Lock the physics engine mutex
     public: void LockMutex();
@@ -152,6 +167,40 @@ namespace gazebo
 
     /// \brief Set whether to show contacts
     public: void ShowVisual(bool show);
+
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetWorldCFM(double cfm) {}
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetWorldERP(double erp) {}
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetAutoDisableFlag(bool auto_disable) {}
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetSORPGSIters(unsigned int iters) {}
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetSORPGSW(double w) {}
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetContactMaxCorrectingVel(double vel) {}
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetContactSurfaceLayer(double layer_depth) {}
+    /// \brief access functions to set ODE parameters
+    public: virtual void SetMaxContacts(double max_contacts) {}
+
+    /// \brief access functions to set ODE parameters
+    public: virtual double GetWorldCFM() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual double GetWorldERP() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual bool GetAutoDisableFlag() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual int GetSORPGSIters() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual double GetSORPGSW() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual double GetContactMaxCorrectingVel() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual double GetContactSurfaceLayer() {return 0;}
+    /// \brief access functions to set ODE parameters
+    public: virtual double GetMaxContacts() {return 0;}
 
     /// \brief Add a contact visual
     protected: void AddContactVisual(Vector3 pos, Vector3 norm);

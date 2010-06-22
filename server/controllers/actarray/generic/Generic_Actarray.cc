@@ -71,7 +71,7 @@ Generic_Actarray::~Generic_Actarray()
 void Generic_Actarray::LoadChild(XMLConfigNode *node)
 {
   XMLConfigNode *jNode;
-  this->myIface = dynamic_cast<ActarrayIface*>(this->GetIface("actarray"));
+  this->myIface = dynamic_cast<libgazebo::ActarrayIface*>(this->GetIface("actarray"));
 
   for (n_joints=0, jNode = node->GetChild("joint"); jNode; n_joints++, jNode = jNode->GetNext("joint"))
   {

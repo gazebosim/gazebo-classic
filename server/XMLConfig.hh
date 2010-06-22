@@ -198,7 +198,7 @@ namespace gazebo
     //public: void SetValue(const std::string &key, const StringValue &data, int require =0, int type=0);
 
     /// \brief Get a node's value, which is either a attribute or child node value.
-    protected: xmlChar* GetNodeValue( const std::string &key ) const;
+    protected: std::string GetNodeValue( const std::string &key ) const;
   
     /// \brief Set a node's value, either attribute or child node value (private)
     protected: bool SetNodeValue(const std::string& key,const std::string& value);

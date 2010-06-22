@@ -33,7 +33,6 @@
 namespace gazebo
 {
   class Joint;
-  class PositionIface;
 
 /// \addtogroup gazebo_controller
 /// \{
@@ -80,7 +79,7 @@ class Generic_Actarray : public Controller
   protected: virtual void FiniChild();
 
   /// The actarray interface
-  private: ActarrayIface *myIface;
+  private: libgazebo::ActarrayIface *myIface;
 
   /// The parent Model
   private: Model *myParent;

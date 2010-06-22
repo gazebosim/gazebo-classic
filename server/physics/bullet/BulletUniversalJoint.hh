@@ -113,6 +113,9 @@ namespace gazebo
     /// \brief Set the first axis of rotation
     public: void SetAxis(int index, const Vector3 &axis );
   
+    /// \brief Set joint damping, not yet implemented
+    public: virtual void SetDamping(int index, const double damping);
+
     /// \brief Get the first axis of rotation
     public: virtual Vector3 GetAxis(int index) const;
   

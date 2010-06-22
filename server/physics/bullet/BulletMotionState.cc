@@ -55,31 +55,30 @@ void BulletMotionState::SetVisual(OgreVisual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the pose
-Pose3d BulletMotionState::GetAbsPose() const
+Pose3d BulletMotionState::GetWorldPose() const
 {
-  std::cout << "MotionState: Get Abs Pose[" << this->absPose << "]\n";
-  return this->absPose;
+  return this->worldPose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the position of the body
-void BulletMotionState::SetAbsPosition(const Vector3 &pos)
+void BulletMotionState::SetWorldPosition(const Vector3 &pos)
 {
-  this->absPose.pos = pos;
+  this->worldPose.pos = pos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the rotation of the body
-void BulletMotionState::SetAbsRotation(const Quatern &rot)
+void BulletMotionState::SetWorldRotation(const Quatern &rot)
 {
-  this->absPose.rot = rot;
+  this->worldPose.rot = rot;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the pose
-void BulletMotionState::SetAbsPose(const Pose3d &pose)
+void BulletMotionState::SetWorldPose(const Pose3d &pose)
 {
-  this->absPose = pose;
+  this->worldPose = pose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +92,7 @@ void BulletMotionState::SetCoMOffset( const Pose3d &com )
 // Get the world transform
 void BulletMotionState::getWorldTransform(btTransform &worldTrans) const 
 {
-  Pose3d result = this->absPose;
+  Pose3d result = this->worldPose;
   result.pos += this->comOffset.pos;
 
   worldTrans = BulletPhysics::ConvertPose(result);
@@ -106,10 +105,10 @@ void BulletMotionState::setWorldTransform(const btTransform &worldTrans)
   if (this->visual == NULL)
     return;
 
-  this->absPose = BulletPhysics::ConvertPose( worldTrans );
+  this->worldPose = BulletPhysics::ConvertPose( worldTrans );
 
   //std::cout << "New Pose[" << this->pose << "]\n";
 
-  this->body->SetAbsPose(this->absPose, false);
-  //this->visual->SetDirty(true, this->absPose - this->body->GetAbsPose());
+  this->body->SetWorldPose(this->worldPose, false);
+  //this->visual->SetDirty(true, this->worldPose - this->body->GetWorldPose());
 }

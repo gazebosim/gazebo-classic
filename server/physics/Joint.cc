@@ -145,7 +145,7 @@ void Joint::Load(XMLConfigNode *node)
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + this->anchorBody->GetAbsPose()).pos ;
+  this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + this->anchorBody->GetWorldPose()).pos ;
 
   this->Attach(this->body1, this->body2);
 
@@ -232,19 +232,23 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
 /// Update the joint
 void Joint::Update()
 {
+  this->jointUpdateSignal();
+
   //TODO: Evaluate impact of this code on performance
   if (this->visual && this->visual->GetVisible())
   {
+    if (this->GetName() == "left_paddle_joint")
+      std::cout << "Joint[" << this->GetName() << "] Angle[" << this->GetAngle(0) << "]\n";
     this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + 
-        this->anchorBody->GetAbsPose()).pos;
+        this->anchorBody->GetWorldPose()).pos;
 
     this->visual->SetPosition(this->anchorPos);
 
     if (this->body1) 
-      this->line1->SetPoint(1, this->body1->GetAbsPose().pos - this->anchorPos);
+      this->line1->SetPoint(1, this->body1->GetWorldPose().pos - this->anchorPos);
 
     if (this->body2)
-      this->line2->SetPoint(1, this->body2->GetAbsPose().pos - this->anchorPos);
+      this->line2->SetPoint(1, this->body2->GetWorldPose().pos - this->anchorPos);
   }
 }
 
@@ -260,6 +264,9 @@ void Joint::ShowJoints(bool s)
 /// Reset the joint
 void Joint::Reset()
 {
+  this->SetForce(0,0);
+  this->SetMaxForce(0,0);
+  this->SetVelocity(0,0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -128,18 +128,31 @@ namespace gazebo
     /// \brief Set the angular acceleration of the model
     public: void SetAngularAccel( const Vector3 &vel );
 
-    /// \brief Get the linear velocity of the model
-    public: virtual Vector3 GetLinearVel() const;
+    /// \brief Get the linear velocity of the entity
+    public: virtual Vector3 GetRelativeLinearVel() const;
 
-    /// \brief Get the angular velocity of the model
-    public: virtual Vector3 GetAngularVel() const;
+    /// \brief Get the linear velocity of the entity in the world frame
+    public: virtual Vector3 GetWorldLinearVel() const;
 
-    /// \brief Get the linear acceleration of the model
-    public: virtual Vector3 GetLinearAccel() const;
+    /// \brief Get the angular velocity of the entity
+    public: virtual Vector3 GetRelativeAngularVel() const;
 
-    /// \brief Get the angular acceleration of the model
-    public: virtual Vector3 GetAngularAccel() const;
- 
+    /// \brief Get the angular velocity of the entity in the world frame
+    public: virtual Vector3 GetWorldAngularVel() const;
+
+    /// \brief Get the linear acceleration of the entity
+    public: virtual Vector3 GetRelativeLinearAccel() const;
+
+    /// \brief Get the linear acceleration of the entity in the world frame
+    public: virtual Vector3 GetWorldLinearAccel() const;
+
+    /// \brief Get the angular acceleration of the entity 
+    public: virtual Vector3 GetRelativeAngularAccel() const;
+
+    /// \brief Get the angular acceleration of the entity in the world frame
+    public: virtual Vector3 GetWorldAngularAccel() const;
+
+
     /// \brief Get the size of the bounding box
     public: void GetBoundingBox(Vector3 &min, Vector3 &max) const;
   
@@ -260,7 +273,7 @@ namespace gazebo
     /// \brief Light numbering variable to give a unique name to all light entities
     private: static uint lightNumber;
 
-    public: Pose3d GetAbsPose();
+    public: Pose3d GetWorldPose();
 
     private: ParamT<std::string> *canonicalBodyNameP;
     private: ParamT<Vector3> *xyzP;

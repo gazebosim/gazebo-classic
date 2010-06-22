@@ -34,7 +34,6 @@
 namespace gazebo
 {
   class Joint;
-  class PTZIface;
 
 /// @addtogroup gazebo_controller
 /// @{
@@ -93,7 +92,7 @@ namespace gazebo
     private: void PutPTZData();
   
     /// The camera interface
-    private: PTZIface *ptzIface;
+    private: libgazebo::PTZIface *ptzIface;
   
     /// The parent sensor
     private: Model *myParent;

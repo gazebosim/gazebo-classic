@@ -29,9 +29,13 @@
 
 #include "Controller.hh"
 
-namespace gazebo
+namespace libgazebo
 {
   class IRIface;
+}
+
+namespace gazebo
+{
   class IRSensor;
 
 
@@ -68,7 +72,7 @@ namespace gazebo
     private: void PutIRData();
   
     /// The ir interface
-    private: IRIface *irIface;
+    private: libgazebo::IRIface *irIface;
   
     /// The parent sensor
     private: IRSensor *myParent;

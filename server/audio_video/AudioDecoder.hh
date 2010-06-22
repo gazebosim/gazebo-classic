@@ -27,7 +27,7 @@
 #ifndef AUDIODECODER_HH
 #define AUDIODECODER_HH
 
-#include "config.h"
+#include "gazebo_config.h"
 
 #ifdef HAVE_FFMPEG
 

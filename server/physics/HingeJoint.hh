@@ -95,8 +95,9 @@ namespace gazebo
 
               Param::Begin(&this->parameters);
               this->axisP = new ParamT<Vector3>("axis",Vector3(0,1,0), 1);
-              this->loStopP = new ParamT<Angle>("lowStop",-M_PI,0);
-              this->hiStopP = new ParamT<Angle>("highStop",M_PI,0);
+              this->loStopP = new ParamT<Angle>("lowStop",-std::numeric_limits<float>::max(),0);
+              this->hiStopP = new ParamT<Angle>("highStop",std::numeric_limits<float>::max(),0);
+              this->dampingP = new ParamT<double>("damping",0.0, 0);
               Param::End();
             }
  
@@ -106,6 +107,7 @@ namespace gazebo
               delete this->axisP;
               delete this->loStopP;
               delete this->hiStopP;
+              delete this->dampingP;
             }
 
     /// \brief Load joint
@@ -114,6 +116,7 @@ namespace gazebo
                  this->axisP->Load(node);
                  this->loStopP->Load(node);
                  this->hiStopP->Load(node);
+                 this->dampingP->Load(node);
 
                  T::Load(node);
 
@@ -122,6 +125,7 @@ namespace gazebo
                  this->SetHighStop(0, this->hiStopP->GetValue());
                  this->SetLowStop(0,this->loStopP->GetValue());
                  this->SetHighStop(0, this->hiStopP->GetValue());
+                 //this->SetDamping(0, this->dampingP->GetValue()); // uncomment when opende damping is tested and ready
 
                  Vector3 a = **this->axisP;
                  this->SetAxis(0, a);
@@ -139,6 +143,7 @@ namespace gazebo
     protected: ParamT<Vector3> *axisP;
     protected: ParamT<Angle> *loStopP;
     protected: ParamT<Angle> *hiStopP; 
+    protected: ParamT<double> *dampingP; 
   };
   /// \}
 }

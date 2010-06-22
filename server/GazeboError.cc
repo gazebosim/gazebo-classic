@@ -38,6 +38,7 @@ GazeboError::GazeboError(const char *file, int line, std::string msg)
   this->file = file;
   this->line = line;
   this->str = msg;
+  std::cerr << *this << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

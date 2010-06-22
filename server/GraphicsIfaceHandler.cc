@@ -68,7 +68,7 @@ void GraphicsIfaceHandler::Load(const std::string &_name, Entity *_parent)
   // Create the graphics3d interface
   try
   {
-    this->threeDIface = (Graphics3dIface*)IfaceFactory::NewIface("graphics3d");
+    this->threeDIface = (libgazebo::Graphics3dIface*)libgazebo::IfaceFactory::NewIface("graphics3d");
 
     this->threeDIface->Create(World::Instance()->GetGzServer(), _name);
     this->threeDIface->data->cmdCount = 0;
@@ -122,26 +122,30 @@ void GraphicsIfaceHandler::Update()
 
     switch( this->threeDIface->data->commands[i].drawMode )
     {
-      case Graphics3dDrawData::POINTS:
-      case Graphics3dDrawData::LINES:
-      case Graphics3dDrawData::LINE_STRIP:
+      case libgazebo::Graphics3dDrawData::POINTS:
+      case libgazebo::Graphics3dDrawData::LINES:
+      case libgazebo::Graphics3dDrawData::LINE_STRIP:
         this->DrawSimple(vis, &this->threeDIface->data->commands[i]);
         break;
 
-      case Graphics3dDrawData::PLANE:
-      case Graphics3dDrawData::SPHERE:
-      case Graphics3dDrawData::CUBE:
-      case Graphics3dDrawData::BILLBOARD:
-      case Graphics3dDrawData::CONE:
+      case libgazebo::Graphics3dDrawData::PLANE:
+      case libgazebo::Graphics3dDrawData::SPHERE:
+      case libgazebo::Graphics3dDrawData::CUBE:
+      case libgazebo::Graphics3dDrawData::BILLBOARD:
+      case libgazebo::Graphics3dDrawData::CONE:
         this->DrawShape(vis, &this->threeDIface->data->commands[i] );
         break;
 
-      case Graphics3dDrawData::TEXT:
+      case libgazebo::Graphics3dDrawData::TEXT:
         this->DrawText(vis, &this->threeDIface->data->commands[i] );
         break;
 
-      case Graphics3dDrawData::METERBAR:
+      case libgazebo::Graphics3dDrawData::METERBAR:
         this->DrawMeterBar(vis, &this->threeDIface->data->commands[i] );
+        break;
+
+      case libgazebo::Graphics3dDrawData::RIBBONTRAIL:
+        vis->SetRibbonTrail(this->threeDIface->data->commands[i].intVar);
         break;
 
       default:
@@ -157,7 +161,7 @@ void GraphicsIfaceHandler::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Helper funciton used to draw simple elements
-void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, Graphics3dDrawData *data)
+void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDrawData *data)
 {
   Vector3 pos;
   bool attached = false;
@@ -166,22 +170,22 @@ void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, Graphics3dDrawData *data)
 
   switch(data->drawMode)
   {
-    case Graphics3dDrawData::POINTS:
+    case libgazebo::Graphics3dDrawData::POINTS:
       opType = OgreDynamicRenderable::OT_POINT_LIST;
       break;
-    case Graphics3dDrawData::LINES:
+    case libgazebo::Graphics3dDrawData::LINES:
       opType = OgreDynamicRenderable::OT_LINE_LIST;
       break;
-    case Graphics3dDrawData::LINE_STRIP:
+    case libgazebo::Graphics3dDrawData::LINE_STRIP:
       opType = OgreDynamicRenderable::OT_LINE_STRIP;
       break;
-    case Graphics3dDrawData::TRIANGLES:
+    case libgazebo::Graphics3dDrawData::TRIANGLES:
       opType = OgreDynamicRenderable::OT_TRIANGLE_LIST;
       break;
-    case Graphics3dDrawData::TRIANGLE_STRIP:
+    case libgazebo::Graphics3dDrawData::TRIANGLE_STRIP:
       opType = OgreDynamicRenderable::OT_TRIANGLE_STRIP;
       break;
-    case Graphics3dDrawData::TRIANGLE_FAN:
+    case libgazebo::Graphics3dDrawData::TRIANGLE_FAN:
       opType = OgreDynamicRenderable::OT_TRIANGLE_FAN;
       break;
     default:
@@ -221,11 +225,11 @@ void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, Graphics3dDrawData *data)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Helper funciton used to draw shapes
-void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
+void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, libgazebo::Graphics3dDrawData *data)
 {
   switch(data->drawMode)
   {
-    case Graphics3dDrawData::CUBE:
+    case libgazebo::Graphics3dDrawData::CUBE:
       {
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_box_U1V1");
@@ -241,7 +245,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
         break;
       }
 
-    case Graphics3dDrawData::CYLINDER:
+    case libgazebo::Graphics3dDrawData::CYLINDER:
       {
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_cylinder");
@@ -259,7 +263,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
         break;
       }
 
-    case Graphics3dDrawData::CONE:
+    case libgazebo::Graphics3dDrawData::CONE:
       {
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_cone");
@@ -276,7 +280,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
         break;
       }
 
-    case Graphics3dDrawData::SPHERE:
+    case libgazebo::Graphics3dDrawData::SPHERE:
       {
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_sphere");
@@ -293,7 +297,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
         break;
       }
 
-    case Graphics3dDrawData::BILLBOARD:
+    case libgazebo::Graphics3dDrawData::BILLBOARD:
       {
         bool attached = false;
         Ogre::BillboardSet *bset = NULL;
@@ -344,7 +348,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, Graphics3dDrawData *data)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Helper funciton used to draw text
-void GraphicsIfaceHandler::DrawText(OgreVisual *vis, Graphics3dDrawData *data)
+void GraphicsIfaceHandler::DrawText(OgreVisual *vis, libgazebo::Graphics3dDrawData *data)
 {
   bool attached = false;
   OgreMovableText* msg = NULL;
@@ -382,7 +386,7 @@ void GraphicsIfaceHandler::DrawText(OgreVisual *vis, Graphics3dDrawData *data)
 ////////////////////////////////////////////////////////////////////////////////
 // Helper function used to draw a progress bar
 void GraphicsIfaceHandler::DrawMeterBar(OgreVisual *vis, 
-                                        Graphics3dDrawData *data )
+                                        libgazebo::Graphics3dDrawData *data )
 {
   bool attached = false;
   Ogre::BillboardSet *bset = NULL;

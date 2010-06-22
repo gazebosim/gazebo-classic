@@ -41,7 +41,7 @@ void OrbitViewController::Update()
   pos.y = this->distance * sin( this->yaw ) * sin( this->pitch ) + this->focalPoint.y;
 
   this->camera->SetPosition(pos);
-  Pose3d pose = this->camera->GetWorldPose();
+  Pose3d pose = this->camera->GetCameraWorldPose();
 
   Vector3 vec = pose.rot * (this->focalPoint - pos);
 

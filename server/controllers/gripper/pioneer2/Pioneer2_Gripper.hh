@@ -32,10 +32,14 @@
 #include "Controller.hh"
 #include "Entity.hh"
 
-namespace gazebo
+namespace libgazebo
 {
   class GripperIface;
   class ActarrayIface;
+}
+
+namespace gazebo
+{
   class RaySensor;
 
 /// \addtogroup gazebo_controller
@@ -95,10 +99,10 @@ class Pioneer2_Gripper : public Controller
   protected: virtual void FiniChild();
 
   /// The gripper interface
-  private: GripperIface *gripIface;
+  private: libgazebo::GripperIface *gripIface;
 
   // The interface for the lift
-  private: ActarrayIface *actIface;
+  private: libgazebo::ActarrayIface *actIface;
 
   private: RaySensor *breakBeams[2];
 

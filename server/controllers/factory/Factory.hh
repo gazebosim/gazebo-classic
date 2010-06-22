@@ -31,10 +31,13 @@
 #include "Entity.hh"
 #include "gazebo.h"
 
+namespace
+{
+  class FactoryIface;
+}
 
 namespace gazebo
 {
-  class FactoryIface;
 
 /// \addtogroup gazebo_controller
 /// \{
@@ -80,7 +83,7 @@ class Factory : public Controller
   protected: virtual void FiniChild();
 
   /// The Position interface
-  private: FactoryIface *factoryIface;
+  private: libgazebo::FactoryIface *factoryIface;
 
   /// The parent Model
   private: Model *myParent;

@@ -95,7 +95,7 @@ void Controller::Load(XMLConfigNode *node)
   // Create the interfaces
   while (childNode)
   {
-    Iface *iface=0;
+    libgazebo::Iface *iface=0;
 
     // Get the type of the interface (eg: laser)
     std::string ifaceType = childNode->GetName();
@@ -116,7 +116,7 @@ void Controller::Load(XMLConfigNode *node)
     try
     {
       // Use the factory to get a new iface based on the type
-      iface = IfaceFactory::NewIface(ifaceType);
+      iface = libgazebo::IfaceFactory::NewIface(ifaceType);
     }
     catch (...) //TODO: Show the exception text here (subclass exception?)
     {
@@ -140,13 +140,6 @@ void Controller::Load(XMLConfigNode *node)
     childNode = childNode->GetNextByNSPrefix("interface");
   }
 
-  if (this->ifaces.size() <= 0)
-  {
-    std::ostringstream stream;
-    stream << "No interface defined for " << this->GetName() << " controller";
-    gzthrow(stream.str());
-  }
-
   this->LoadChild(node);
 }
 
@@ -162,7 +155,7 @@ void Controller::Init()
 /// Save the controller.
 void Controller::Save(std::string &prefix, std::ostream &stream)
 {
-  std::vector<Iface*>::iterator iter;
+  std::vector<libgazebo::Iface*>::iterator iter;
 
   stream << prefix << "<controller:" << this->typeName << " name=\"" << this->nameP->GetValue() << "\">\n";
 
@@ -215,7 +208,7 @@ void Controller::Update()
 /// Finialize the controller. Called once on completion.
 void Controller::Fini()
 {
-  std::vector<Iface*>::iterator iter;
+  std::vector<libgazebo::Iface*>::iterator iter;
 
   for (iter=this->ifaces.begin(); iter!=this->ifaces.end(); iter++)
   {
@@ -230,7 +223,7 @@ void Controller::Fini()
 /// Return true if an interface is open 
 bool Controller::IsConnected() const
 {
-  std::vector<Iface*>::const_iterator iter;
+  std::vector<libgazebo::Iface*>::const_iterator iter;
 
   // if the alwaysOn flag is true, this controller is connected
   if (this->alwaysOnP->GetValue())
@@ -254,11 +247,11 @@ std::string Controller::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get a interface of the controller
-Iface* Controller::GetIface(std::string type, bool mandatory, int number)
+libgazebo::Iface* Controller::GetIface(std::string type, bool mandatory, int number)
 {
-  std::vector<Iface*>::iterator iter;
+  std::vector<libgazebo::Iface*>::iterator iter;
   int order = number;
-  Iface *iface = NULL;
+  libgazebo::Iface *iface = NULL;
 
   for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
   {
@@ -282,7 +275,7 @@ Iface* Controller::GetIface(std::string type, bool mandatory, int number)
 
 void Controller::GetInterfaceNames(std::vector<std::string>& list) const{
   
-  std::vector<Iface*>::const_iterator iter;
+  std::vector<libgazebo::Iface*>::const_iterator iter;
   
   for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
   {

@@ -74,7 +74,7 @@ namespace gazebo
     private: ContactSensor *myParent;
   
     /// The Iface. 
-    private: BumperIface *myIface;
+    private: libgazebo::BumperIface *myIface;
   };
   
   /** \} */

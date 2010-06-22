@@ -84,6 +84,7 @@ void GazeboConfig::Load()
       {
         gzmsg(5) << "Gazebo Path[" << node->GetValue() << "]\n";
         this->gazeboPaths.push_back(node->GetValue());
+        this->AddPluginPaths(node->GetValue()+"/plugins");
         node = node->GetNext("gazeboPath");
       }
     }
@@ -108,6 +109,7 @@ void GazeboConfig::Load()
     if ( !gazebo_resource_path )
     {
       this->gazeboPaths.push_back("/usr/local/share/gazebo");
+      this->AddPluginPaths("/usr/local/share/gazebo/plugins");
     }
 
     if ( !ogre_resource_path )

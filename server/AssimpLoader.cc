@@ -89,13 +89,21 @@ Mesh *AssimpLoader::Load(const std::string &filename)
       {
         aiColor3D clr;
         amat->Get(AI_MATKEY_COLOR_AMBIENT, clr);
-        mat->SetAmbient( Color(clr.r, clr.g, clr.b) );
+        // if color are zeros, use 1, otherwise a black object
+        if (clr.r == 0 && clr.g == 0 && clr.b == 0)
+          mat->SetAmbient( Color(1,1,1) ); // model database has wrong ambient (0,0,0,1)
+        else
+          mat->SetAmbient( Color(clr.r, clr.g, clr.b) );
       }
       else if (propKey == "$clr.specular")
       {
         aiColor3D clr;
         amat->Get(AI_MATKEY_COLOR_SPECULAR, clr);
-        mat->SetSpecular( Color(clr.r, clr.g, clr.b) );
+        // if color are zeros, use 1, otherwise a black object
+        if (clr.r == 0 && clr.g == 0 && clr.b == 0)
+          mat->SetSpecular( Color(1,1,1) ); // model database has wrong specular (0,0,0,1)
+        else
+          mat->SetSpecular( Color(clr.r, clr.g, clr.b) );
       }
       else if (propKey == "$clr.emissive")
       {
@@ -224,21 +232,6 @@ void AssimpLoader::BuildMesh(aiNode *node, Mesh *mesh)
       if (aMesh->mNumUVComponents[0])
         subMesh->AddTexCoord(aMesh->mTextureCoords[0][j].x, 
                              1.0-aMesh->mTextureCoords[0][j].y);
-      else
-      {
-        // Auto-generate projected texture coordinates, projected from center of aabb
-        // @todo: implement globally for all meshes as an option, or move this to Material.cc
-        double x = p.x;
-        double y = p.y;
-        double z = p.z;
-        double r = std::max(0.000001,sqrt(x*x+y*y+z*z));
-        double s = std::min(1.0,std::max(-1.0,z/r));
-        double t = std::min(1.0,std::max(-1.0,y/r));
-        double u = acos(s) / M_PI;
-        double v = acos(t) / M_PI;
-        //std::cerr << "uv1 debug: " << u << "," << v << std::endl;
-        subMesh->AddTexCoord(u,v);
-      }
     }
 
     mesh->AddSubMesh(subMesh);

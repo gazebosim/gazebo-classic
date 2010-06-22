@@ -35,6 +35,8 @@
 #include <libxml/xinclude.h>
 #include <libxml/xpointer.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include "GazeboError.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
@@ -426,10 +428,10 @@ void XMLConfigNode::Print()
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a value associated with a node.
-xmlChar* XMLConfigNode::GetNodeValue( const std::string &key ) const
+std::string XMLConfigNode::GetNodeValue( const std::string &key ) const
 {
+  std::string result;
   xmlChar *value=NULL;
-  xmlChar *result=NULL;
 
   // First check if the key is an attribute
   if (xmlHasProp( this->xmlNode, (xmlChar*) key.c_str() ))
@@ -466,11 +468,9 @@ xmlChar* XMLConfigNode::GetNodeValue( const std::string &key ) const
 
   if (value)
   {
-    int j = xmlStrlen(value)-1;
-    int i = 0;
-    while (value[i] == ' ') i++;
-    while (value[j] == ' ') j--;
-    result = xmlStrndup(value+i, j-i+1);
+    result = (char*)value;
+    boost::trim(result);
+
     xmlFree(value);
   }
 
@@ -490,37 +490,31 @@ std::string XMLConfigNode::GetValue() const
 // Get a string value.
 std::string XMLConfigNode::GetString( const std::string &key, const std::string &def, int require) const 
 {
-  xmlChar *value = this->GetNodeValue( key );
+  std::string value = this->GetNodeValue( key );
 
-  if (!value && require)
+  if (value.empty() && require)
   {
     gzthrow( "unable to find required string attribute[" << key << "] in world file node[" << this->GetName() << "]");
   }
-  else if ( !value )
+  else if ( value.empty() )
     return def;
 
   // TODO: cache the value somewhere (currently leaks)
-  return (char *)value;
+  return value;
 }
 
 unsigned char XMLConfigNode::GetChar( const std::string &key, char def, int require ) const
 {
-  unsigned char result = ' ';
+  std::string value = this->GetNodeValue( key );
 
-  xmlChar *value = this->GetNodeValue( key );
-
-  if (!value && require)
+  if (value.empty() && require)
   {
     gzthrow("unable to find required char attribute[" << key << "] in world file node[" << this->GetName() << "]");
   }
-  else if ( !value )
+  else if ( value.empty() )
     return def;
 
-  result = value[0];
-
-  xmlFree( value );
-
-  return result;
+  return value[0];
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -587,16 +581,16 @@ std::string XMLConfigNode::GetFilename( const std::string &key, const std::strin
 // Get an integer
 int XMLConfigNode::GetInt( const std::string &key, int def, int require ) const
 {
-  xmlChar *value = this->GetNodeValue( key );
+  std::string value = this->GetNodeValue( key );
 
-  if (!value && require)
+  if (value.empty() && require)
   {
     gzthrow ("unable to find required int attribute[" << key << "] in world file node[" << this->GetName() << "]");
   }
-  else if ( !value )
+  else if ( value.empty() )
     return def;
 
-  return atoi((const char*) value);
+  return boost::lexical_cast<int>(value);
 }
 
 
@@ -604,32 +598,32 @@ int XMLConfigNode::GetInt( const std::string &key, int def, int require ) const
 // Get a double
 double XMLConfigNode::GetDouble( const std::string &key, double def, int require ) const
 {
-  xmlChar *value = this->GetNodeValue( key );
+  std::string value = this->GetNodeValue( key );
 
-  if (!value && require)
+  if (value.empty() && require)
   {
     gzthrow( "unable to find required double attribute[" << key << "] in world file node[" << this->GetName() << "]");
   }
-  else if ( !value )
+  else if ( value.empty() )
     return def;
 
-  return atof((const char*) value);
+  return boost::lexical_cast<double>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a float
 float XMLConfigNode::GetFloat( const std::string &key, float def, int require ) const
 {
-  xmlChar *value = this->GetNodeValue( key );
+  std::string value = this->GetNodeValue( key );
 
-  if (!value && require)
+  if (value.empty() && require)
   {
     gzthrow( "unable to find required float attribute[" << key << "] in world file node[" << this->GetName() << "]");
   }
-  else if ( !value )
+  else if ( value.empty() )
     return def;
 
-  return (float)(atof((const char*) value));
+  return boost::lexical_cast<float>(value);
 }
 
 
@@ -638,27 +632,22 @@ float XMLConfigNode::GetFloat( const std::string &key, float def, int require ) 
 bool XMLConfigNode::GetBool( const std::string &key, bool def, int require ) const
 {
   bool result = false;
-  xmlChar *value = this->GetNodeValue( key );
+  std::string value = this->GetNodeValue( key );
 
-  if (!value && require)
+  if (value.empty() && require)
   {
-    xmlFree(value);
     gzthrow( "unable to find required bool attribute[" << key << "] in world file node[" << this->GetName() << "]");
   }
-  else if ( !value )
-  {
-    xmlFree(value);
+  else if ( value.empty() )
     return def;
-  }
 
-  if (strcmp((const char*) value, "true") == 0)
+  if (value == "true")
     result = true;
-  else if (strcmp((const char*) value, "false") == 0)
+  else if (value == "false")
     result = false;
   else
-    result = atoi((const char*) value);
+    result = boost::lexical_cast<bool>(value);
 
-  xmlFree(value);
   return result;
 }
 
@@ -757,77 +746,17 @@ Quatern XMLConfigNode::GetRotation( const std::string &key, Quatern def ) const
 ////////////////////////////////////////////////////////////////////////////
 // Get a tuple string value.
 std::string XMLConfigNode::GetTupleString( const std::string &key, int index,
-    const std::string &def) const
+                                           const std::string &def) const
 {
-  xmlChar *value;
-  std::string nvalue;
-  int i, a, b, state, count;
+  std::vector<std::string> split_vector;
+  std::string value = this->GetNodeValue( key );
+  boost::trim(value);
+  boost::split(split_vector, value, boost::is_any_of(" "));
 
-  value = this->GetNodeValue( key );
-
-  if (value == NULL)
+  if (index < (int)split_vector.size())
+    return split_vector[index];
+  else
     return def;
-
-  state = 0;
-  count = 0;
-  a = b = 0;
-
-  for (i = 0; i < (int) strlen((const char*) value); i++)
-  {
-    // Look for start of element
-    if (state == 0)
-    {
-      if (!isspace( value[i] ))
-      {
-        a = i;
-        state = 1;
-      }
-    }
-
-    // Look for end of element
-    else if (state == 1)
-    {
-      if (isspace( value[i] ))
-      {
-        state = 0;
-        b = i - 1;
-        count++;
-        if (count > index)
-          break;
-      }
-    }
-  }
-
-  if (state == 1)
-  {
-    b = i - 1;
-    count++;
-  }
-
-  if (count == index + 1)
-  {
-    //nvalue = strndup( (const char*) value + a, b - a + 2 );
-    const char *s = (const char*) value +a;
-    size_t size = b-a+2;
-    char *end = (char *)memchr(s,0,size);
-
-    if (end)
-      size = end -s + 1;
-
-    char *r = (char *)malloc(size);
-
-    if (size)
-    {
-      memcpy(r, s, size-1);
-      r[size-1] = '\0';
-    }
-
-    nvalue = r;
-  }
-
-  xmlFree( value );
-
-  return nvalue;
 }
 
 ////////////////////////////////////////////////////////////////////////////

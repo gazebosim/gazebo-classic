@@ -105,6 +105,9 @@ namespace gazebo
     /// \brief Set the axis of motion
     public: void SetAxis( int index, const Vector3 &axis );
   
+    /// \brief Set joint damping, not yet implemented
+    public: virtual void SetDamping(int index, const double damping);
+
     /// \brief Set the high stop of an axis(index).
     public: virtual void SetHighStop(int index, Angle angle);
 

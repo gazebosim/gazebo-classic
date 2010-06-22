@@ -30,6 +30,7 @@
 #include "Common.hh"
 #include "Param.hh"
 #include "Vector3.hh"
+#include <boost/signal.hpp>
 
 namespace gazebo
 {
@@ -49,7 +50,7 @@ namespace gazebo
   {
     /// \brief Type of joint
     public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL, TYPE_COUNT};
-    public: enum Attribute {FUDGE_FACTOR, SUSPENSION_ERP, SUSPENSION_CFM};
+    public: enum Attribute {FUDGE_FACTOR, SUSPENSION_ERP, SUSPENSION_CFM, STOP_ERP,STOP_CFM,ERP,CFM,FMAX,VEL,HI_STOP,LO_STOP};
 
     /// \brief Type names of joint
     public: static std::string TypeNames[TYPE_COUNT]; 
@@ -96,7 +97,19 @@ namespace gazebo
 
     /// \brief Set the axis of rotation
     public: virtual void SetAxis(int index, const Vector3 &axis) = 0;
-  
+
+    /// \brief Set the joint damping
+    public: virtual void SetDamping(int index, const double damping) = 0;
+
+    /// \brief Connect a boost::slot the the joint update signal
+    public: template<typename T>
+            boost::signals::connection ConnectJointUpdateSignal(T subscriber)
+            { return jointUpdateSignal.connect(subscriber); }
+    /// \brief Disconnect a boost::slot the the joint update signal
+    public: template<typename T>
+            void DisconnectJointUpdateSignal( T subscriber )
+            { jointUpdateSignal.disconnect(subscriber); }
+
     /// \brief Get the axis of rotation
     public: virtual Vector3 GetAxis(int index) const = 0;
 
@@ -186,6 +199,10 @@ namespace gazebo
     protected: Vector3 anchorPos;
     protected: Body *anchorBody;
 
+    private: boost::signal<void ()> jointUpdateSignal;
+
+    // joint damping_coefficient
+    protected: double damping_coefficient;
   };
 
   /// \}

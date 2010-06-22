@@ -24,6 +24,8 @@
  * SVN: $Id: ODEBallJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
+#include "gazebo_config.h"
+#include "GazeboMessage.hh"
 #include "ODEBallJoint.hh"
 
 using namespace gazebo;
@@ -62,5 +64,20 @@ void ODEBallJoint::SetAnchor(int index, const Vector3 &anchor)
   this->physics->LockMutex();
   dJointSetBallAnchor( jointId, anchor.x, anchor.y, anchor.z );
   this->physics->UnlockMutex();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void ODEBallJoint::SetDamping( int /*index*/, const double damping )
+{
+#ifdef INCLUDE_ODE_JOINT_DAMPING
+  this->physics->LockMutex();
+  // ode does not yet support ball joint damping
+  dJointSetDamping( this->jointId, damping);
+  this->physics->UnlockMutex();
+#else
+  // alternaitvely, apply explicit damping
+  gzerr(0) << "joint damping not implemented in ODE ball joint\n";
+#endif
 }
 

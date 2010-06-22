@@ -76,8 +76,8 @@ void BulletHingeJoint::Attach( Body *one, Body *two )
   btVector3 axisA, axisB;
 
   // Compute the pivot point, based on the anchorPos
-  pivotA = (this->anchorPos - this->body1->GetAbsPose().pos);
-  pivotB = (this->anchorPos - this->body2->GetAbsPose().pos);
+  pivotA = (this->anchorPos - this->body1->GetWorldPose().pos);
+  pivotB = (this->anchorPos - this->body2->GetWorldPose().pos);
 
   axisA = btVector3((**this->axisP).x,(**this->axisP).y,(**this->axisP).z);
   axisB = btVector3((**this->axisP).x,(**this->axisP).y,(**this->axisP).z);
@@ -127,6 +127,13 @@ void BulletHingeJoint::SetAxis( int index, const Vector3 &axis )
   /*btVector3 vec(axis.x, axis.y, axis.z);
   ((btHingeConstraint*)this->constraint)->setAxis(vec);
   */
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void BulletHingeJoint::SetDamping( int /*index*/, const double damping )
+{
+  gzerr(0) << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////////////////////////////////

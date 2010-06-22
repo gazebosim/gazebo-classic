@@ -76,7 +76,7 @@ void Bandit_Actarray::LoadChild(XMLConfigNode *node)
 {
   XMLConfigNode *jNode;
   int i =0;
-  this->myIface = dynamic_cast<ActarrayIface*>(this->GetIface("actarray"));
+  this->myIface = dynamic_cast<libgazebo::ActarrayIface*>(this->GetIface("actarray"));
 
   Param::Begin(&this->parameters);
   for (i=0, jNode = node->GetChild("joint"); jNode; i++)

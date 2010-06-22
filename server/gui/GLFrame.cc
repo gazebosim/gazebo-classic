@@ -219,7 +219,7 @@ void GLFrame::Update()
   char buff[256];
   this->glWindow->Update();
 
-  Pose3d pose = this->glWindow->GetCamera()->GetWorldPose();
+  Pose3d pose = this->glWindow->GetCamera()->GetCameraWorldPose();
 
   sprintf(buff, "%6.2f %6.2f %6.2f", pose.pos.x, pose.pos.y, pose.pos.z);
   this->outputXYZ->value(buff);
@@ -290,7 +290,7 @@ void GLFrame::ViewCB(Fl_Widget *widget, void *data)
 /// Get the pose of the camera attached to this frame
 Pose3d GLFrame::GetCameraPose() const
 {
-  return this->glWindow->GetCamera()->GetWorldPose();  
+  return this->glWindow->GetCamera()->GetCameraWorldPose();  
 }
 
 ////////////////////////////////////////////////////////////////////////////////

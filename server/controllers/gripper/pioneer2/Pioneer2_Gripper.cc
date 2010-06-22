@@ -62,6 +62,9 @@ Pioneer2_Gripper::Pioneer2_Gripper(Entity *parent )
 // Destructor
 Pioneer2_Gripper::~Pioneer2_Gripper()
 {
+  this->paddles[LEFT]->DisconnectContactCallback(boost::bind(&Pioneer2_Gripper::LeftPaddleCB, this));
+  this->paddles[RIGHT]->DisconnectContactCallback(boost::bind(&Pioneer2_Gripper::RightPaddleCB, this));
+
   if (this->holdJoint)
     delete this->holdJoint;
   this->holdJoint = NULL;
@@ -98,8 +101,8 @@ Pioneer2_Gripper::~Pioneer2_Gripper()
 void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
 {
   XMLConfigNode *jNode;
-  this->gripIface = dynamic_cast<GripperIface*>(this->GetIface("gripper"));
-  this->actIface = dynamic_cast<ActarrayIface*>(this->GetIface("actarray"));
+  this->gripIface = dynamic_cast<libgazebo::GripperIface*>(this->GetIface("gripper"));
+  this->actIface = dynamic_cast<libgazebo::ActarrayIface*>(this->GetIface("actarray"));
 
   Param::Begin(&this->parameters);
   jNode = node->GetChild("leftJoint");
@@ -191,8 +194,10 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   this->holdJoint = World::Instance()->GetPhysicsEngine()->CreateJoint(Joint::SLIDER);
   this->holdJoint->SetName(this->GetName() + "_Hold_Joint");
 
-  this->paddles[LEFT]->ContactCallback(&Pioneer2_Gripper::LeftPaddleCB, this);
-  this->paddles[RIGHT]->ContactCallback(&Pioneer2_Gripper::RightPaddleCB, this);
+  this->paddles[LEFT]->ConnectContactCallback(
+      boost::bind(&Pioneer2_Gripper::LeftPaddleCB, this, _1));
+  this->paddles[RIGHT]->ConnectContactCallback(
+      boost::bind(&Pioneer2_Gripper::RightPaddleCB, this, _1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -105,7 +105,7 @@ void ODEGeom::OnPoseChange()
   if (this->IsStatic() && this->geomId && this->placeable)
   {
     // Transform into global pose since a static geom does not have a body 
-    localPose = this->GetAbsPose();
+    localPose = this->GetWorldPose();
 
     q[0] = localPose.rot.u;
     q[1] = localPose.rot.x;
@@ -244,7 +244,7 @@ Mass ODEGeom::GetBodyMassMatrix()
   products = this->mass.GetProductsofInertia();
 
   this->physicsEngine->LockMutex();
-  pose = this->GetAbsPose(); // get pose of the geometry
+  pose = this->GetWorldPose(); // get pose of the geometry
 
   q[0] = pose.rot.u;
   q[1] = pose.rot.x;

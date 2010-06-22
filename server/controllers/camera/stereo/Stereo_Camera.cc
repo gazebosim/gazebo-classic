@@ -69,13 +69,13 @@ Stereo_Camera::~Stereo_Camera()
 // Load the controller
 void Stereo_Camera::LoadChild(XMLConfigNode *node)
 {
-  CameraIface *ciface = NULL;
+  libgazebo::CameraIface *ciface = NULL;
 
-  this->stereoIface = dynamic_cast<StereoCameraIface*>(this->GetIface("stereo"));
+  this->stereoIface = dynamic_cast<libgazebo::StereoCameraIface*>(this->GetIface("stereo"));
 
-  ciface = dynamic_cast<CameraIface*>(this->GetIface("camera",true,0));
+  ciface = dynamic_cast<libgazebo::CameraIface*>(this->GetIface("camera",true,0));
   this->cameraIfaces[ciface->GetId()] = ciface;
-  ciface = dynamic_cast<CameraIface*>(this->GetIface("camera",true,1));
+  ciface = dynamic_cast<libgazebo::CameraIface*>(this->GetIface("camera",true,1));
   this->cameraIfaces[ciface->GetId()] = ciface;
 
   this->leftCameraNameP->Load(node);
@@ -110,7 +110,7 @@ bool Stereo_Camera::StereoIfaceConnected() const
 // Update the controller
 void Stereo_Camera::UpdateChild()
 {
-  std::map< std::string, CameraIface*>::iterator iter;
+  std::map< std::string, libgazebo::CameraIface*>::iterator iter;
 
   for (iter = this->cameraIfaces.begin(); 
        iter != this->cameraIfaces.end(); iter++)
@@ -158,7 +158,7 @@ void Stereo_Camera::FiniChild()
 // Put stereo data to the interface
 void Stereo_Camera::PutStereoData()
 {
-  StereoCameraData *stereo_data = this->stereoIface->data;
+  libgazebo::StereoCameraData *stereo_data = this->stereoIface->data;
   //const unsigned char *rgb_src = NULL;
   //unsigned char *rgb_dst = NULL;
 
@@ -196,7 +196,7 @@ void Stereo_Camera::PutStereoData()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Put camera data to the interface
-void Stereo_Camera::PutCameraData(CameraData *camera_data, unsigned int camera)
+void Stereo_Camera::PutCameraData(libgazebo::CameraData *camera_data, unsigned int camera)
 {
   //CameraData *camera_data = this->cameraIface->data;
   const unsigned char *rgb_src = NULL;

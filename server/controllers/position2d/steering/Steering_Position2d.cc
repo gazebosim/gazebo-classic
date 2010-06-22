@@ -82,7 +82,7 @@ void Steering_Position2d::LoadChild(XMLConfigNode *node)
   float defaultMaxAngle;
 
 
-  this->myIface = dynamic_cast<PositionIface*>(this->GetIface("position"));
+  this->myIface = dynamic_cast<libgazebo::PositionIface*>(this->GetIface("position"));
 
   //general
   defaultTorque = node->GetFloat("torque", 1000, 0);

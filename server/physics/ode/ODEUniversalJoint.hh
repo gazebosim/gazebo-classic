@@ -106,6 +106,9 @@ namespace gazebo
     /// \brief Set the anchor point
     public: virtual void SetAnchor( int index, const Vector3 &anchor );
  
+    /// \brief Set joint damping, not yet implemented
+    public: virtual void SetDamping(int index, const double damping);
+
     /// \brief Get the first axis of rotation
     public: virtual Vector3 GetAxis(int index ) const;
 

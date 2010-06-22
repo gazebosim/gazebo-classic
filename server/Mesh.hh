@@ -67,6 +67,16 @@ namespace gazebo
     /// \brief Recalculate all the normals.
     public: void RecalculateNormals();
 
+    /// \brief Get AABB coordinate
+    public: void GetAABB(Vector3 &center,Vector3 &min_xyz,Vector3 &max_xyz);
+
+    /// \brief Reset mesh center to geometric center
+    public: void SetMeshCenter(Vector3 center);
+
+    /// \brief Generate texture coordinates using spherical projection from center
+    public: void GenSphericalTexCoord(Vector3 center);
+
+
     private: std::string name;
     private: std::vector<SubMesh *> submeshes;
     private: std::vector<Material *> materials;
@@ -157,6 +167,12 @@ namespace gazebo
 
     /// \brief Recalculate all the normals.
     public: void RecalculateNormals();
+
+    /// \brief Reset mesh center to geometric center
+    public: void SetSubMeshCenter(Vector3 center);
+
+    /// \brief Generate texture coordinates using spherical projection from center
+    public: void GenSphericalTexCoord(Vector3 center);
 
     private: std::vector< Vector3 > vertices;
     private: std::vector< Vector3 > normals;

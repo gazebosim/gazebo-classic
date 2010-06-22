@@ -157,7 +157,7 @@ void IRSensor::InitChild()
   RayGeom *ray;
   */
 
-  /*bodyPose = this->body->GetAbsPose();
+  /*bodyPose = this->body->GetWorldPose();
   //this->prevPose = bodyPose;
 
   // Create and array of ray geoms

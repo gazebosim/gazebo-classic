@@ -141,6 +141,30 @@ const Mesh *MeshManager::Load(const std::string &filename)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// modify mesh setting its center to aabb center
+void MeshManager::SetMeshCenter(const Mesh *mesh,Vector3 center)
+{
+  if (this->HasMesh(mesh->GetName()))
+    this->meshes[mesh->GetName()]->SetMeshCenter(center);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// get mesh aabb
+void MeshManager::GetMeshAABB(const Mesh *mesh,Vector3 &center, Vector3 &min_xyz, Vector3 &max_xyz)
+{
+  if (this->HasMesh(mesh->GetName()))
+    this->meshes[mesh->GetName()]->GetAABB(center,min_xyz,max_xyz);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// generate spherical texture coordinates
+void MeshManager::GenSphericalTexCoord(const Mesh *mesh,Vector3 center)
+{
+  if (this->HasMesh(mesh->GetName()))
+    this->meshes[mesh->GetName()]->GenSphericalTexCoord(center);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Add a mesh to the manager
 void MeshManager::AddMesh(Mesh *mesh)
 {

@@ -85,6 +85,12 @@ namespace gazebo
     /// \return Vector of children entities
     public: const std::vector< Entity* >  &GetChildren() const;
 
+    /// \brief Get the number of children
+    public: unsigned int GetChildCount() const;
+
+    /// \brief Get a child by index
+    public: Entity *GetChild(unsigned int i);
+
     /// \brief Get a child by name
     public: Entity *GetChild(const std::string &name );
   
@@ -112,7 +118,7 @@ namespace gazebo
     public: bool IsSelected() const;
 
     /// \brief Get the absolute pose of the entity
-    public: virtual Pose3d GetAbsPose() const;
+    public: virtual Pose3d GetWorldPose() const;
 
     /// \brief Get the pose of the entity relative to its parent
     public: Pose3d GetRelativePose() const;
@@ -124,7 +130,7 @@ namespace gazebo
     public: void SetRelativePose(const Pose3d &pose, bool notify = true);
 
     /// \brief Set the abs pose of the entity
-    public: void SetAbsPose(const Pose3d &pose, bool notify=true);
+    public: void SetWorldPose(const Pose3d &pose, bool notify=true);
 
     /// \brief Set the position of the entity relative to its parent
     public: void SetRelativePosition(const Vector3 &pos);
@@ -132,22 +138,48 @@ namespace gazebo
     /// \brief Set the rotation of the entity relative to its parent
     public: void SetRelativeRotation(const Quatern &rot);
 
-    /// \brief Get the linear velocity of the model
-    public: virtual Vector3 GetLinearVel() const;
 
-    /// \brief Get the angular velocity of the model
-    public: virtual Vector3 GetAngularVel() const;
+    /// \brief Get the linear velocity of the entity
+    public: virtual Vector3 GetRelativeLinearVel() const
+            {return Vector3();}
 
-    /// \brief Get the linear acceleration of the model
-    public: virtual Vector3 GetLinearAccel() const;
+    /// \brief Get the linear velocity of the entity in the world frame
+    public: virtual Vector3 GetWorldLinearVel() const
+            {return Vector3();}
 
-    /// \brief Get the angular acceleration of the model
-    public: virtual Vector3 GetAngularAccel() const;
+
+    /// \brief Get the angular velocity of the entity
+    public: virtual Vector3 GetRelativeAngularVel() const
+            {return Vector3();}
+
+    /// \brief Get the angular velocity of the entity in the world frame
+    public: virtual Vector3 GetWorldAngularVel() const
+            {return Vector3();}
+
+
+    /// \brief Get the linear acceleration of the entity
+    public: virtual Vector3 GetRelativeLinearAccel() const
+            {return Vector3();}
+
+    /// \brief Get the linear acceleration of the entity in the world frame
+    public: virtual Vector3 GetWorldLinearAccel() const
+            {return Vector3();}
+
+
+    /// \brief Get the angular acceleration of the entity 
+    public: virtual Vector3 GetRelativeAngularAccel() const
+            {return Vector3();}
+
+    /// \brief Get the angular acceleration of the entity in the world frame
+    public: virtual Vector3 GetWorldAngularAccel() const
+            {return Vector3();}
+
 
     /// \brief This function is called when the entity's (or one of its parents)
     ///        pose of the parent has changed
     protected: virtual void OnPoseChange() {}
 
+    public: void Print(std::string prefix);
 
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;

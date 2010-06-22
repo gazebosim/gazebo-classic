@@ -30,10 +30,14 @@
 
 #include "Controller.hh"
 
-namespace gazebo
+namespace libgazebo
 {
   class LaserIface;
   class FiducialIface;
+}
+
+namespace gazebo
+{
   class RaySensor;
 
 /// @addtogroup gazebo_controller
@@ -97,9 +101,9 @@ class SickLMS200_Laser : public Controller
   private: void PutFiducialData();
 
   /// The laser interface
-  private: LaserIface *laserIface;
+  private: libgazebo::LaserIface *laserIface;
 
-  private: FiducialIface *fiducialIface;
+  private: libgazebo::FiducialIface *fiducialIface;
 
   /// The parent sensor
   private: RaySensor *myParent;

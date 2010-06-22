@@ -1,17 +1,17 @@
-INCLUDE (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 ########################################
 # Include all the search paths for headers
-STRING (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
-STRING (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
-STRING (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
-STRING (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
-STRING (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
-STRING (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
-STRING (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
+string (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
+string (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
+string (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
+string (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
+string (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
+string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
+string (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
 
 
-INCLUDE_DIRECTORIES(
+include_directories(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
   gui 
@@ -39,7 +39,7 @@ INCLUDE_DIRECTORIES(
   ${FLTK_INCLUDE_DIR}
 )
 
-LINK_DIRECTORIES(  
+link_directories(  
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
@@ -58,12 +58,12 @@ endif (use_internal_assimp)
 
 ########################################
 # All the library search paths
-ADD_SUBDIRECTORY(rendering)
-ADD_SUBDIRECTORY(physics)
-ADD_SUBDIRECTORY(sensors)
-ADD_SUBDIRECTORY(gui)
-ADD_SUBDIRECTORY(controllers)
-ADD_SUBDIRECTORY(audio_video)
+add_subdirectory(rendering)
+add_subdirectory(physics)
+add_subdirectory(sensors)
+add_subdirectory(gui)
+add_subdirectory(controllers)
+add_subdirectory(audio_video)
 
 ########################################
 # Process all the subdirectories
@@ -93,6 +93,8 @@ SET (sources Common.cc
              OgreLoader.cc
              AssimpLoader.cc
              STLLoader.cc
+             Logger.cc
+             Plugin.cc
 )
 
 SET (headers Common.hh
@@ -125,10 +127,19 @@ SET (headers Common.hh
              OgreLoader.hh
              AssimpLoader.hh
              STLLoader.hh
+             Logger.hh
+             Event.hh
+             Plugin.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})
 APPEND_TO_SERVER_SOURCES(${sources})
+
+set (server_includes "" CACHE STRING "server includes auto generated" FORCE)
+foreach (header ${gazeboserver_headers_nopath})
+  set (server_includes "${server_includes} #include <gazebo/${header}>\n" CACHE STRING "server includes auto generated" FORCE)
+endforeach (header ${gazeboserver_headers_nopath})
+
 
 add_library(gazebo_server SHARED ${gazeboserver_sources})
 set_target_properties(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
@@ -194,6 +205,9 @@ endif (INCLUDE_ODE)
 
 STRING (REPLACE ";" " " gazeboserver_cflags "${gazeboserver_cflags}")
 STRING (REPLACE ";" " " gazeboserver_ldflags "${gazeboserver_ldflags}")
+
+configure_file(${PROJECT_SOURCE_DIR}/server/gazeboserver.hh.in ${PROJECT_BINARY_DIR}/gazeboserver.hh)
+install(FILES ${PROJECT_BINARY_DIR}/gazeboserver.hh DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeboserver_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)

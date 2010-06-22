@@ -24,6 +24,8 @@
  * CVS: $Id: ODEHinge2Joint.cc 7129 2008-11-12 19:38:15Z natepak $
  */
 
+#include "gazebo_config.h"
+#include "GazeboMessage.hh"
 #include "Body.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
@@ -110,6 +112,20 @@ void ODEHinge2Joint::SetAxis( int index, const Vector3 &axis )
   else
     dJointSetHinge2Axis2( this->jointId, axis.x, axis.y, axis.z );
   this->physics->UnlockMutex();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void ODEHinge2Joint::SetDamping( int /*index*/, const double damping )
+{
+#ifdef INCLUDE_ODE_JOINT_DAMPING
+  this->physics->LockMutex();
+  // ode does not yet support Hinge2 joint damping
+  dJointSetDamping( this->jointId, damping);
+  this->physics->UnlockMutex();
+#else
+  gzerr(0) << "joint damping not implemented in ODE hinge2 joint\n";
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////

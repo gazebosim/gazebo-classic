@@ -321,7 +321,7 @@ void OgreCamera::Render()
   if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
     {
-      boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
+      //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
       this->renderTarget->update();
     }
 
@@ -372,7 +372,7 @@ void OgreCamera::Render()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the global pose of the camera
-Pose3d OgreCamera::GetWorldPose() const
+Pose3d OgreCamera::GetCameraWorldPose() const
 {
   return this->pose;
 }
@@ -790,9 +790,9 @@ void OgreCamera::MoveToEntity(Entity *entity)
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
   Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
 
-  Vector3 start = this->GetWorldPose().pos;
+  Vector3 start = this->GetCameraWorldPose().pos;
   start.Correct();
-  Vector3 end = entity->GetAbsPose().pos;
+  Vector3 end = entity->GetWorldPose().pos;
   end.Correct();
   Vector3 dir = end - start;
   dir.Correct();

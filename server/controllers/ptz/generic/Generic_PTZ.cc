@@ -87,7 +87,7 @@ Generic_PTZ::~Generic_PTZ()
 // Load the controller
 void Generic_PTZ::LoadChild(XMLConfigNode *node)
 {
-  this->ptzIface = dynamic_cast<PTZIface*>(this->GetIface("ptz"));
+  this->ptzIface = dynamic_cast<libgazebo::PTZIface*>(this->GetIface("ptz"));
 
   this->panJointNameP->Load(node);
   this->tiltJointNameP->Load(node);
@@ -199,7 +199,7 @@ void Generic_PTZ::FiniChild()
 // Put laser data to the interface
 void Generic_PTZ::PutPTZData()
 {
-  PTZData *data = this->ptzIface->data;
+  libgazebo::PTZData *data = this->ptzIface->data;
 
   this->ptzIface->Lock(1);
 

@@ -70,24 +70,11 @@ namespace gazebo
     /// changed
     public: virtual void OnPoseChange();
 
-    /// \brief Return the velocity of the body
-    /// \return Velocity vector
-    public: virtual Vector3 GetPositionRate() const;
-
-    /// \brief Return the rotation rates
-    /// \return Rotation Rate quaternion
-    public: virtual Quatern GetRotationRate() const;
-
-    /// \brief Return the rotation rates
-    /// \return Rotation Rate Euler Angles RPY
-    public: virtual Vector3 GetEulerRate() const;
-
     /// \brief Set whether this body is enabled
     public: virtual void SetEnabled(bool enable) const;
 
     /// \brief Get whether this body is enabled in the physics engine
     public: virtual bool GetEnabled() const {return true;}
-
 
     /// \brief Update the center of mass
     public: virtual void UpdateCoM();
@@ -95,26 +82,26 @@ namespace gazebo
     /// \brief Set the linear velocity of the body
     public: virtual void SetLinearVel(const Vector3 &vel);
 
-    /// \brief Get the linear velocity of the body
-    public: virtual Vector3 GetLinearVel() const;
-
     /// \brief Set the angular velocity of the body
     public: virtual void SetAngularVel(const Vector3 &vel);
-
-    /// \brief Get the angular velocity of the body
-    public: virtual Vector3 GetAngularVel() const;
 
     /// \brief Set the force applied to the body
     public: virtual void SetForce(const Vector3 &force);
 
-    /// \brief Get the force applied to the body
-    public: virtual Vector3 GetForce() const;
-
     /// \brief Set the torque applied to the body
     public: virtual void SetTorque(const Vector3 &force);
 
-    /// \brief Get the torque applied to the body
-    public: virtual Vector3 GetTorque() const;
+    /// \brief Get the linear velocity of the body in the world frame
+    public: virtual Vector3 GetWorldLinearVel() const;
+
+    /// \brief Get the angular velocity of the body in the world frame
+    public: virtual Vector3 GetWorldAngularVel() const;
+
+    /// \brief Get the force applied to the body in the world frame
+    public: virtual Vector3 GetWorldForce() const;
+
+    /// \brief Get the torque applied to the body in the world frame
+    public: virtual Vector3 GetWorldTorque() const;
 
     /// \brief Set whether gravity affects this body
     public: virtual void SetGravityMode(bool mode);

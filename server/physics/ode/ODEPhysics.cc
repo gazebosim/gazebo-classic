@@ -90,13 +90,14 @@ ODEPhysics::ODEPhysics()
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
-  this->quickStepP = new ParamT<bool>("quickStep", false, 0);
-  this->quickStepItersP = new ParamT<int>("quickStepIters", 20, 0);
-  this->quickStepWP = new ParamT<double>("quickStepW", 1.3, 0);  /// over_relaxation value for SOR
+  this->stepTypeP = new ParamT<std::string>("stepType", "quick", 0);
+  this->stepItersP = new ParamT<unsigned int>("stepIters", 100, 0);
+  this->stepWP = new ParamT<double>("stepW", 1.3, 0);  /// over_relaxation value for SOR
   this->contactMaxCorrectingVelP = new ParamT<double>("contactMaxCorrectingVel", 10.0, 0);
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", false, 0);
-  this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0);
+  this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
+  this->maxContactsP = new ParamT<int>("maxContacts",1000,0); // enforced for trimesh-trimesh contacts
   Param::End();
 
 }
@@ -119,11 +120,14 @@ ODEPhysics::~ODEPhysics()
 
   delete this->globalCFMP;
   delete this->globalERPP;
-  delete this->quickStepP;
-  delete this->quickStepItersP;
-  delete this->quickStepWP;
+  delete this->stepTypeP;
+  delete this->stepItersP;
+  delete this->stepWP;
   delete this->contactMaxCorrectingVelP;
   delete this->contactSurfaceLayerP;
+  delete this->autoDisableBodyP;
+  delete this->contactFeedbacksP;
+  delete this->maxContactsP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,13 +144,14 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->updateRateP->Load(cnode);
   this->globalCFMP->Load(cnode);
   this->globalERPP->Load(cnode);
-  this->quickStepP->Load(cnode);
-  this->quickStepItersP->Load(cnode);
-  this->quickStepWP->Load(cnode);
+  this->stepTypeP->Load(cnode);
+  this->stepItersP->Load(cnode);
+  this->stepWP->Load(cnode);
   this->contactMaxCorrectingVelP->Load(cnode);
   this->contactSurfaceLayerP->Load(cnode);
   this->autoDisableBodyP->Load(cnode);
   this->contactFeedbacksP->Load(cnode);
+  this->maxContactsP->Load(cnode);
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, contactMaxCorrectingVelP->GetValue());
@@ -163,10 +168,20 @@ void ODEPhysics::Load(XMLConfigNode *node)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 50);
 
+  this->contactGeoms.resize(this->maxContactsP->GetValue());
   this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());
 
   // Reset the contact pointer
   this->contactFeedbackIter = this->contactFeedbacks.begin();
+
+  Vector3 g = this->gravityP->GetValue();
+  dWorldSetGravity(this->worldId, g.x, g.y, g.z);
+
+  dWorldSetCFM(this->worldId, this->globalCFMP->GetValue());
+  dWorldSetERP(this->worldId, this->globalERPP->GetValue());
+
+  dWorldSetQuickStepNumIterations(this->worldId, **this->stepItersP );
+  dWorldSetQuickStepW(this->worldId, **this->stepWP );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,9 +194,9 @@ void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->updateRateP) << "\n";
   stream << prefix << "  " << *(this->globalCFMP) << "\n";
   stream << prefix << "  " << *(this->globalERPP) << "\n";
-  stream << prefix << "  " << *(this->quickStepP) << "\n";
-  stream << prefix << "  " << *(this->quickStepItersP) << "\n";
-  stream << prefix << "  " << *(this->quickStepWP) << "\n";
+  stream << prefix << "  " << *(this->stepTypeP) << "\n";
+  stream << prefix << "  " << *(this->stepItersP) << "\n";
+  stream << prefix << "  " << *(this->stepWP) << "\n";
   stream << prefix << "  " << *(this->contactMaxCorrectingVelP) << "\n";
   stream << prefix << "  " << *(this->contactSurfaceLayerP) << "\n";
   stream << prefix << "</physics:ode>\n";
@@ -191,12 +206,6 @@ void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
 // Initialize the ODE engine
 void ODEPhysics::Init()
 {
-  Vector3 g = this->gravityP->GetValue();
-  dWorldSetGravity(this->worldId, g.x, g.y, g.z);
-  dWorldSetCFM(this->worldId, this->globalCFMP->GetValue());
-  dWorldSetERP(this->worldId, this->globalERPP->GetValue());
-  dWorldSetQuickStepNumIterations(this->worldId, this->quickStepItersP->GetValue() );
-  dWorldSetQuickStepW(this->worldId, this->quickStepWP->GetValue() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +221,86 @@ void ODEPhysics::UpdateCollision()
 {
   std::vector<ContactFeedback>::iterator iter;
   std::vector<dJointFeedback>::iterator jiter;
- 
+
+  /*ODEBody *leftBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::left_wheel");
+  ODEBody *rightBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::right_wheel");
+  ODEBody *castorBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::castor_body");
+  ODEBody *planeBody = (ODEBody*)World::Instance()->GetEntityByName("plane1_model::plane1_body");
+
+  if (leftBody && rightBody && planeBody && castorBody)
+  {
+    ODEGeom *leftGeom = (ODEGeom*)leftBody->GetGeom("left_wheel_geom");
+    ODEGeom *rightGeom = (ODEGeom*)rightBody->GetGeom("right_wheel_geom");
+    ODEGeom *castorGeom = (ODEGeom*)castorBody->GetGeom("castor_geom");
+    ODEGeom *planeGeom = (ODEGeom*)planeBody->GetGeom("plane1_geom");
+
+    dContactGeom geomLeft, geomRight, geomCastor;
+    geomLeft.pos[0] = leftBody->GetWorldPose().pos.x;
+    geomLeft.pos[1] = leftBody->GetWorldPose().pos.y;
+    geomLeft.pos[2] = 0;
+    geomLeft.normal[0] = 0;
+    geomLeft.normal[1] = 0;
+    geomLeft.normal[2] = 1;
+    geomLeft.depth = 0;
+    geomLeft.g1 = leftGeom->GetGeomId();
+    geomLeft.g2 = planeGeom->GetGeomId();
+
+    geomRight.pos[0] = rightBody->GetWorldPose().pos.x;
+    geomRight.pos[1] = rightBody->GetWorldPose().pos.y;
+    geomRight.pos[2] = 0;
+    geomRight.normal[0] = 0;
+    geomRight.normal[1] = 0;
+    geomRight.normal[2] = 1;
+    geomRight.depth = 0;
+    geomRight.g1 = rightGeom->GetGeomId();
+    geomRight.g2 = planeGeom->GetGeomId();
+
+    geomCastor.pos[0] = castorBody->GetWorldPose().pos.x;
+    geomCastor.pos[1] = castorBody->GetWorldPose().pos.y;
+    geomCastor.pos[2] = 0;
+    geomCastor.normal[0] = 0;
+    geomCastor.normal[1] = 0;
+    geomCastor.normal[2] = 1;
+    geomCastor.depth =0;
+    geomCastor.g1 = castorGeom->GetGeomId();
+    geomCastor.g2 = planeGeom->GetGeomId();
+
+    dContact contact;
+    contact.geom = geomLeft;
+    contact.surface.mode = dContactSoftERP | dContactSoftCFM; 
+    contact.surface.mu = 0; 
+    contact.surface.mu2 = 0;
+    contact.surface.slip1 = 0.1;
+    contact.surface.slip2 = 0.1;
+    contact.surface.bounce =  0;
+    dJointID c = dJointCreateContact(this->worldId, this->contactGroup, &contact);
+    dJointAttach (c, leftBody->GetODEId(), planeBody->GetODEId());
+
+    dContact contact2;
+    contact2.geom = geomRight;
+    contact2.surface.mode = dContactSoftERP | dContactSoftCFM; 
+    contact2.surface.mu = 0; 
+    contact2.surface.mu2 = 0;
+    contact2.surface.slip1 = 0.1;
+    contact2.surface.slip2 = 0.1;
+    contact2.surface.bounce =  0;
+    dJointID c2 = dJointCreateContact(this->worldId, this->contactGroup, &contact2);
+    dJointAttach (c2, rightBody->GetODEId(), planeBody->GetODEId());
+
+    dContact contact3;
+    contact3.geom = geomCastor;
+    contact3.surface.mode = dContactSoftERP | dContactSoftCFM; 
+    contact3.surface.mu = 0; 
+    contact3.surface.mu2 = 0;
+    contact3.surface.slip1 = 0.1;
+    contact3.surface.slip2 = 0.1;
+    contact3.surface.bounce =  0;
+    dJointID c3 = dJointCreateContact(this->worldId, this->contactGroup, &contact3);
+    dJointAttach (c3, castorBody->GetODEId(), planeBody->GetODEId());
+  }
+*/
+
+
   // Do collision detection; this will add contacts to the contact group
   this->LockMutex(); 
   {
@@ -270,10 +358,12 @@ void ODEPhysics::UpdatePhysics()
   //DiagnosticTimer timer("ODEPhysics Step Update");
 
   // Update the dynamical model
-  if (**this->quickStepP)
+  if (**this->stepTypeP == "quick")
     dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
-  else
+  else if (**this->stepTypeP == "world")
     dWorldStep( this->worldId, (**this->stepTimeP).Double() );
+  else
+    gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
@@ -380,6 +470,112 @@ void ODEPhysics::ConvertMass(Mass *mass, void *engineMass)
       odeMass->I[0*4+2], odeMass->I[1*4+2] );
 }
 
+void ODEPhysics::SetAutoDisableFlag(bool auto_disable)
+{
+  this->autoDisableBodyP->SetValue(auto_disable);
+  dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the step iterations
+void ODEPhysics::SetSORPGSIters(unsigned int iters)
+{
+  this->stepItersP->SetValue(iters);
+  dWorldSetQuickStepNumIterations(this->worldId, **this->stepItersP );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ODEPhysics::SetSORPGSW(double w)
+{
+  this->stepWP->SetValue(w);
+  dWorldSetQuickStepW(this->worldId, this->stepWP->GetValue() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ODEPhysics::SetWorldCFM(double cfm)
+{
+  this->globalCFMP->SetValue(cfm);
+  dWorldSetCFM(this->worldId, this->globalCFMP->GetValue() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ODEPhysics::SetWorldERP(double erp)
+{
+  this->globalERPP->SetValue(erp);
+  dWorldSetERP(this->worldId, this->globalERPP->GetValue());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ODEPhysics::SetContactMaxCorrectingVel(double vel)
+{
+  this->contactMaxCorrectingVelP->SetValue(vel);
+  dWorldSetContactMaxCorrectingVel(this->worldId, this->contactMaxCorrectingVelP->GetValue());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ODEPhysics::SetContactSurfaceLayer(double layer_depth)
+{
+  this->contactSurfaceLayerP->SetValue(layer_depth);
+  dWorldSetContactSurfaceLayer(this->worldId, this->contactSurfaceLayerP->GetValue());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void ODEPhysics::SetMaxContacts(double max_contacts)
+{
+  this->maxContactsP->SetValue(max_contacts);
+  // @todo: FIXME: resizes contactGeoms, but can we do this on the fly?
+  //               this might need to be done on a new time step
+  this->contactGeoms.resize(this->maxContactsP->GetValue());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool ODEPhysics::GetAutoDisableFlag()
+{
+  return this->autoDisableBodyP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int ODEPhysics::GetSORPGSIters()
+{
+  return this->stepItersP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+double ODEPhysics::GetSORPGSW()
+{
+  return this->stepWP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+double ODEPhysics::GetWorldCFM()
+{
+  return this->globalCFMP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+double ODEPhysics::GetWorldERP()
+{
+  return this->globalERPP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+double ODEPhysics::GetContactMaxCorrectingVel()
+{
+  return this->contactMaxCorrectingVelP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+double ODEPhysics::GetContactSurfaceLayer()
+{
+  return this->contactSurfaceLayerP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+double ODEPhysics::GetMaxContacts()
+{
+  return this->maxContactsP->GetValue();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert an odeMass to Mass
 void ODEPhysics::ConvertMass(void *engineMass, const Mass &mass)
@@ -426,6 +622,20 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
 dSpaceID ODEPhysics::GetSpaceId() const
 {
   return this->spaceId;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the step type
+std::string ODEPhysics::GetStepType() const
+{
+  return **this->stepTypeP;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the step type
+void ODEPhysics::SetStepType(const std::string type)
+{
+  this->stepTypeP->SetValue(type);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -479,19 +689,21 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
 
-    int maxContacts = 1000;
+    int maxContacts = self->maxContactsP->GetValue();
     int numContacts = 100;
     int i;
     int numc = 0;
     dContact contact;
 
+    // for now, only use maxContacts if both geometries are trimeshes
+    // other types of geometries do not need too many contacts
     if (geom1->GetShapeType() == Shape::TRIMESH && 
         geom2->GetShapeType()==Shape::TRIMESH)
     {
       numContacts = maxContacts;
     }
 
-    numc = dCollide(o1,o2,numContacts, self->contactGeoms, 
+    numc = dCollide(o1,o2,numContacts, &self->contactGeoms[0], 
                     sizeof(self->contactGeoms[0]));
 
     if (numc != 0)
@@ -509,10 +721,10 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           continue;
 
         contact.geom = self->contactGeoms[i];
-        //contact.surface.mode = dContactSlip1 | dContactSlip2 | 
-        //                       dContactSoftERP | dContactSoftCFM |  
-        //                       dContactBounce | dContactMu2 | dContactApprox1;
-        contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
+        contact.surface.mode = dContactSlip1 | dContactSlip2 | 
+                               dContactSoftERP | dContactSoftCFM |  
+                               dContactBounce | dContactMu2 | dContactApprox1;
+        //contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1 | dContactSlip1 | dContactSlip2;
         // with dContactSoftERP | dContactSoftCFM the test_pr2_collision overshoots the cup
 
         // Compute the CFM and ERP by assuming the two bodies form a
@@ -581,3 +793,4 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     }
   }
 }
+

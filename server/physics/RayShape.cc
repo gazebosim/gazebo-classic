@@ -90,9 +90,9 @@ void RayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   this->relativeStartPos = posStart;
   this->relativeEndPos = posEnd;
 
-  this->globalStartPos = this->parent->GetAbsPose().CoordPositionAdd(
+  this->globalStartPos = this->parent->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
-  this->globalEndPos = this->parent->GetAbsPose().CoordPositionAdd(
+  this->globalEndPos = this->parent->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
   // Compute the direction of the ray

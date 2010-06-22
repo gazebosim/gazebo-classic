@@ -34,11 +34,15 @@
 #include "Param.hh"
 #include "Controller.hh"
 
-namespace gazebo
+namespace libgazebo
 {
   class CameraIface;
   class StereoCameraIface;
+}
 
+
+namespace gazebo
+{
 /// @addtogroup gazebo_controller
 /// @{
 /** \defgroup stereocamera stereo camera
@@ -104,11 +108,11 @@ class Stereo_Camera : public Controller
   private: void PutStereoData();
 
   /// \brief Put camera data to the iface
-  private: void PutCameraData(CameraData *camera_data, unsigned int camera);
+  private: void PutCameraData(libgazebo::CameraData *camera_data, unsigned int camera);
 
   /// The camera interface
-  private: StereoCameraIface *stereoIface;
-  private: std::map< std::string, CameraIface*> cameraIfaces;
+  private: libgazebo::StereoCameraIface *stereoIface;
+  private: std::map< std::string, libgazebo::CameraIface*> cameraIfaces;
 
   private: ParamT<std::string> *leftCameraNameP;
   private: ParamT<std::string> *rightCameraNameP;

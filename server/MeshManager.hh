@@ -26,6 +26,17 @@ namespace gazebo
     /// \brief Load a mesh from a file
     public: const Mesh *Load(const std::string &filename);
 
+    /// \bridf set mesh center to be aabb center
+    public: void SetMeshCenter(const Mesh *mesh,Vector3 center);
+
+    /// \bridf get mesh aabb and center
+    public: void GetMeshAABB(const Mesh *mesh,Vector3 &center, 
+                             Vector3 &min_xyz, Vector3 &max_xyz);
+
+    /// \brief generate spherical texture coordinates
+    public: void GenSphericalTexCoord(const Mesh *mesh,Vector3 center);
+
+
     /// \brief Add a mesh to the manager
     public: void AddMesh(Mesh *mesh);
 

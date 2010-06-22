@@ -121,6 +121,13 @@ void BulletSliderJoint::SetAxis( int index, const Vector3 &axis )
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void BulletSliderJoint::SetDamping( int /*index*/, const double damping )
+{
+  gzerr(0) << "Not implemented\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Set the slider force
 void BulletSliderJoint::SetForce(int index, double force)
 {

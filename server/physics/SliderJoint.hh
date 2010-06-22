@@ -95,6 +95,7 @@ namespace gazebo
               this->axisP = new ParamT<Vector3>("axis",Vector3(0,0,1), 0);
               this->loStopP = new ParamT<double>("lowStop",-DBL_MAX,0);
               this->hiStopP = new ParamT<double>("highStop",DBL_MAX,0);
+              this->dampingP = new ParamT<double>("damping",0.0, 0);
               Param::End();
             } 
 
@@ -104,6 +105,7 @@ namespace gazebo
               delete this->axisP;
               delete this->loStopP;
               delete this->hiStopP;
+              delete this->dampingP;
             }
 
     /// \brief Load the joint
@@ -112,6 +114,7 @@ namespace gazebo
                  this->axisP->Load(node);
                  this->loStopP->Load(node);
                  this->hiStopP->Load(node);
+                 this->dampingP->Load(node);
 
                  T::Load(node);
 
@@ -122,6 +125,7 @@ namespace gazebo
                  this->SetHighStop(0,**(this->hiStopP));
                  this->SetLowStop(0,**(this->loStopP));
                  this->SetHighStop(0,**(this->hiStopP));
+                 //this->SetDamping(0, this->dampingP->GetValue()); // uncomment when opende damping is tested and ready
                }
   
     /// \brief Save a joint to a stream in XML format
@@ -141,6 +145,7 @@ namespace gazebo
     protected: ParamT<Vector3> *axisP;
     protected: ParamT<double> *loStopP;
     protected: ParamT<double> *hiStopP; 
+    protected: ParamT<double> *dampingP; 
     protected: Vector3 fakeAnchor;
   };
   

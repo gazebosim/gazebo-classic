@@ -77,7 +77,7 @@ namespace gazebo
   
     /// The Iface. The dJointFeedback structs are rather arbitrary, 
     /// so we use an Opaque Interface
-    private: OpaqueIface *myIface;
+    private: libgazebo::OpaqueIface *myIface;
  
     private: std::vector<Joint*> joints; 
   };

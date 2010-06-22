@@ -99,7 +99,7 @@ namespace gazebo
     public: bool GetRenderingEnabled() const;
   
     /// \brief Get the global pose of the camera
-    public: Pose3d GetWorldPose() const;
+    public: Pose3d GetCameraWorldPose() const;
 
     /// \brief Set the global pose of the camera
     public: void SetWorldPose(const Pose3d &pose);

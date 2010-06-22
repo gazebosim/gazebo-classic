@@ -373,6 +373,27 @@ Vector3 Quatern::RotateVector(Vector3 vec) const
   return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Do the reverse rotation of a vector by this quaternion
+Vector3 Quatern::RotateVectorReverse(Vector3 vec) const
+{
+  Quatern tmp;
+  Vector3 result;
+
+  tmp.u = 0.0;
+  tmp.x = vec.x;
+  tmp.y = vec.y;
+  tmp.z = vec.z;
+
+  tmp =  this->GetInverse() * (tmp * (*this));
+
+  result.x = tmp.x;
+  result.y = tmp.y;
+  result.z = tmp.z;
+
+  return result;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // See if a quatern is finite (e.g., not nan)
@@ -392,6 +413,9 @@ void Quatern::Correct()
   if (!finite(this->z))
     this->z = 0;
   if (!finite(this->u))
+    this->u = 1;
+
+  if (this->u == 0 && this->x == 0 && this->y == 0 && this->z == 0)
     this->u = 1;
 }
 

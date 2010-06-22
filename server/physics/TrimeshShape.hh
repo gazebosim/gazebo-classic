@@ -46,12 +46,21 @@ namespace gazebo
     - scale (float tuple, meters)
       - Scale of the trimesh
       - Default: 1 1 1
+    - centerMesh (re-center trimesh about AABB center or bottom most point)
+      - aabb_center
+      - aabb_bottom
+      - none (default)
+
+    - genTexCoord (generate spherical projected texture coordinates)
+      - true or false, default to false
 
     \par Example
     \verbatim
       <geom:trimesh name="pallet_geom">
         <mesh>WoodPallet.mesh</mesh>
         <scale>.2 .2 .2</scale>
+        <centerMesh>AABBCenter</centerMesh>
+        <genTexCoord>True</genTexCoord>
         <mass>0.1</mass>
 
         <visual>
@@ -89,6 +98,9 @@ namespace gazebo
     protected: ParamT<std::string> *meshNameP;
 
     protected: ParamT<Vector3> *scaleP;
+    protected: ParamT<std::string> *centerMeshP;
+    protected: ParamT<bool> *genTexCoordP;
+
 /*
     protected: unsigned int numVertices;
     protected: unsigned int numIndices;

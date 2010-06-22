@@ -24,9 +24,13 @@
  * CVS: $Id: ODESliderJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
+#include "gazebo_config.h"
+#include "GazeboMessage.hh"
 #include "Body.hh"
 #include "XMLConfig.hh"
 #include "ODESliderJoint.hh"
+#include <boost/signal.hpp>
+#include <boost/bind.hpp>
 
 using namespace gazebo;
 
@@ -102,6 +106,30 @@ void ODESliderJoint::SetAxis( int /*index*/, const Vector3 &axis )
 
   dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );
   this->physics->UnlockMutex();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void ODESliderJoint::SetDamping( int /*index*/, const double damping )
+{
+  this->damping_coefficient = damping;
+#ifdef INCLUDE_ODE_JOINT_DAMPING
+  this->physics->LockMutex();
+  // ode does not yet support slider joint damping
+  dJointSetDamping( this->jointId, this->damping_coefficient);
+  this->physics->UnlockMutex();
+#else
+  // alternaitvely, apply explicit damping
+  this->ConnectJointUpdateSignal(boost::bind(&ODESliderJoint::ApplyDamping,this));
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// callback to apply joint damping force
+void ODESliderJoint::ApplyDamping()
+{
+  double damping_force = this->damping_coefficient * this->GetVelocity(0);
+  this->SetForce(0,damping_force);
 }
 
 //////////////////////////////////////////////////////////////////////////////

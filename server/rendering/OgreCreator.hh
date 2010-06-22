@@ -84,6 +84,9 @@ namespace gazebo
     /// \brief Remove a light
     public: void DeleteLight(Light *light);
 
+    /// \brief Delete a line visual from lines vector
+    public: void DeleteDynamicLine(OgreDynamicLines* line);
+
     /// \brief Helper function to create a camera
     public: static Ogre::Camera *CreateCamera(const std::string &name, 
                 double nearClip, double farClip, double hfov, 

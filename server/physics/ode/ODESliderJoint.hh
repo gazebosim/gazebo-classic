@@ -100,6 +100,12 @@ namespace gazebo
     /// \brief Set the axis of motion
     public: virtual void SetAxis( int index, const Vector3 &axis );
   
+    /// \brief Set joint damping, not yet implemented
+    public: virtual void SetDamping(int index, const double damping);
+
+    /// \brief callback to apply damping force to joint
+    public: void ApplyDamping();
+
     /// \brief Get the position of the joint
     public: virtual Angle GetAngle(int index) const;
 

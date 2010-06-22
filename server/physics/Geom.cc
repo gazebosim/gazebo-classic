@@ -76,6 +76,10 @@ Geom::Geom( Body *body )
 
   this->laserFiducialIdP = new ParamT<int>("laserFiducialId",-1,0);
   this->laserRetroP = new ParamT<float>("laserRetro",-1,0);
+
+  this->enableContactsP = new ParamT<bool>("enableContacts", false, 0);
+  //this->enableContactsP->Callback( &Geom::SetContactsEnabled, this );
+  
   Param::End();
 
   World::Instance()->ConnectShowPhysicsSignal( boost::bind(&Geom::ShowPhysics, this, _1) );
@@ -111,6 +115,7 @@ Geom::~Geom()
   delete this->rpyP;
   delete this->laserFiducialIdP;
   delete this->laserRetroP;
+  delete this->enableContactsP;
 
   if (this->shape)
     delete this->shape;
@@ -152,6 +157,9 @@ void Geom::Load(XMLConfigNode *node)
   this->rpyP->Load(node);
   this->laserFiducialIdP->Load(node);
   this->laserRetroP->Load(node);
+  this->enableContactsP->Load(node);
+
+  this->SetContactsEnabled(**this->enableContactsP);
 
   this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP ) );
 
@@ -467,7 +475,7 @@ Shape *Geom::GetShape() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Turn contact recording on or off
-void Geom::SetContactsEnabled(bool enable)
+void Geom::SetContactsEnabled(const bool &enable)
 {
   this->contactsEnabled = enable;
 }
@@ -532,43 +540,82 @@ void Geom::EnabledCB(bool enabled)
   }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear velocity of the model
-Vector3 Geom::GetLinearVel() const
+/// Get the linear velocity of the geom
+Vector3 Geom::GetRelativeLinearVel() const
 {
   if (this->body)
-    return this->body->GetLinearVel();
+    return this->body->GetRelativeLinearVel();
   else
     return Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the angular velocity of the model
-Vector3 Geom::GetAngularVel() const
+/// Get the linear velocity of the geom in the world frame
+Vector3 Geom::GetWorldLinearVel() const
 {
   if (this->body)
-    return this->body->GetAngularVel();
+    return this->body->GetWorldLinearVel();
   else
     return Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the linear acceleration of the model
-Vector3 Geom::GetLinearAccel() const
+/// Get the angular velocity of the geom
+Vector3 Geom::GetRelativeAngularVel() const
 {
   if (this->body)
-    return this->body->GetLinearAccel();
+    return this->body->GetRelativeAngularVel();
   else
     return Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the angular acceleration of the model
-Vector3 Geom::GetAngularAccel() const
+/// Get the angular velocity of the geom in the world frame
+Vector3 Geom::GetWorldAngularVel() const
 {
   if (this->body)
-    return this->body->GetAngularAccel();
+    return this->body->GetWorldAngularVel();
+  else
+    return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the geom
+Vector3 Geom::GetRelativeLinearAccel() const
+{
+  if (this->body)
+    return this->body->GetRelativeLinearAccel();
+  else
+    return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the linear acceleration of the geom in the world frame
+Vector3 Geom::GetWorldLinearAccel() const
+{
+  if (this->body)
+    return this->body->GetWorldLinearAccel();
+  else
+    return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the geom
+Vector3 Geom::GetRelativeAngularAccel() const
+{
+  if (this->body)
+    return this->body->GetRelativeAngularAccel();
+  else
+    return Vector3();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the angular acceleration of the geom in the world frame
+Vector3 Geom::GetWorldAngularAccel() const
+{
+  if (this->body)
+    return this->body->GetWorldAngularAccel();
   else
     return Vector3();
 }

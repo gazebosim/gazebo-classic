@@ -83,7 +83,7 @@ Differential_Position2d::~Differential_Position2d()
 // Load the controller
 void Differential_Position2d::LoadChild(XMLConfigNode *node)
 {
-  this->myIface = dynamic_cast<PositionIface*>(this->GetIface("position"));
+  this->myIface = dynamic_cast<libgazebo::PositionIface*>(this->GetIface("position"));
 
   // the defaults are from pioneer2dx
   this->wheelSepP->Load(node);

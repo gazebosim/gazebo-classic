@@ -67,7 +67,7 @@ IR_Array::~IR_Array()
 // Load the controller
 void IR_Array::LoadChild(XMLConfigNode *node)
 {
-  this->irIface = dynamic_cast<IRIface*>(this->GetIface("irarray"));
+  this->irIface = dynamic_cast<libgazebo::IRIface*>(this->GetIface("irarray"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

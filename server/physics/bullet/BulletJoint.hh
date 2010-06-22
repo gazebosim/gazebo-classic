@@ -72,6 +72,11 @@ namespace gazebo
                                     const gazebo::Vector3 & /*anchor*/ ) 
             {gzerr(0) << "Not implement in Bullet\n";}
 
+    /// \brief Set the joint damping
+    public: virtual void SetDamping( int /*index*/, 
+                                    const double /*damping*/ ) 
+            {gzerr(0) << "Not implement in Bullet\n";}
+
     /// \brief Get the anchor point
     public: virtual gazebo::Vector3 GetAnchor(int index) const
             {gzerr(0) << "Not implement in Bullet\n"; return Vector3();}

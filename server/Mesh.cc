@@ -589,3 +589,94 @@ void SubMesh::RecalculateNormals()
     this->normals[i].Normalize();
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// find aabb and aabb center of mesh
+void Mesh::GetAABB(Vector3 &center,Vector3 &min_xyz,Vector3 &max_xyz)
+{
+  // find aabb center
+  min_xyz.x =  1e15;
+  max_xyz.x = -1e15;
+  min_xyz.y =  1e15;
+  max_xyz.y = -1e15;
+  min_xyz.z =  1e15;
+  max_xyz.z = -1e15;
+  center.x = 0;
+  center.y = 0;
+  center.z = 0;
+
+  std::vector<SubMesh*>::iterator siter;
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
+  {
+    Vector3 max = (*siter)->GetMax();
+    Vector3 min = (*siter)->GetMin();
+    min_xyz.x = std::min(min_xyz.x,min.x);
+    max_xyz.x = std::max(max_xyz.x,max.x);
+    min_xyz.y = std::min(min_xyz.y,min.y);
+    max_xyz.y = std::max(max_xyz.y,max.y);
+    min_xyz.z = std::min(min_xyz.z,min.z);
+    max_xyz.z = std::max(max_xyz.z,max.z);
+  }
+  center.x = 0.5*(min_xyz.x+max_xyz.x);
+  center.y = 0.5*(min_xyz.y+max_xyz.y);
+  center.z = 0.5*(min_xyz.z+max_xyz.z);
+  //std::cout << "Mesh get aabb " << center << min_xyz << max_xyz << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set mesh center
+void Mesh::SetMeshCenter(Vector3 center)
+{
+  //std::cout << "Mesh set mesh center " << center << std::endl;
+  std::vector<SubMesh*>::iterator siter;
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
+    (*siter)->SetSubMeshCenter(center);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Assign uv coordinates using spherical projection
+void Mesh::GenSphericalTexCoord(Vector3 center)
+{
+  std::vector<SubMesh*>::iterator siter;
+  for (siter = this->submeshes.begin(); siter != this->submeshes.end(); siter++)
+    (*siter)->GenSphericalTexCoord(center);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set submesh center
+void SubMesh::SetSubMeshCenter(Vector3 center)
+{
+  std::vector<Vector3>::iterator viter;
+  for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
+  {
+    // generate projected texture coordinates, projected from center of aabb
+    // get x,y,z for computing texture coordinate projections
+    (*viter).x = (*viter).x-center.x;
+    (*viter).y = (*viter).y-center.y;
+    (*viter).z = (*viter).z-center.z;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Assign uv coordinates using spherical projection
+void SubMesh::GenSphericalTexCoord(Vector3 center)
+{
+  std::vector<Vector3>::const_iterator viter;
+  for (viter = this->vertices.begin(); viter != this->vertices.end(); viter++)
+  {
+    // generate projected texture coordinates, projected from center
+    // get x,y,z for computing texture coordinate projections
+    double x = (*viter).x-center.x;
+    double y = (*viter).y-center.y;
+    double z = (*viter).z-center.z;
+
+    double r = std::max(0.000001,sqrt(x*x+y*y+z*z));
+    double s = std::min(1.0,std::max(-1.0,z/r));
+    double t = std::min(1.0,std::max(-1.0,y/r));
+    double u = acos(s) / M_PI;
+    double v = acos(t) / M_PI;
+    //std::cerr << "uv1 debug: " << u << "," << v << std::endl;
+    this->AddTexCoord(u,v);
+  }
+}
+

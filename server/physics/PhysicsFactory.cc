@@ -27,7 +27,7 @@
 
 #include "PhysicsEngine.hh"
 #include "PhysicsFactory.hh"
-#include "config.h"
+#include "gazebo_config.h"
 
 #ifdef INCLUDE_ODE
 void RegisterODEPhysics();

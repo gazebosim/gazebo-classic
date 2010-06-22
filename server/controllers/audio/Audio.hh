@@ -26,18 +26,22 @@
 #ifndef AUDIOCONTROLLER_HH
 #define AUDIOCONTROLLER_HH
 
-#include "config.h"
+#include "gazebo_config.h"
 
 #include "Controller.hh"
 #include "Entity.hh"
 
 #ifdef HAVE_OPENAL
 
+namespace libgazebo
+{
+  class AudioIface;
+}
+
 namespace gazebo
 {
   class Model;
   class OpenALSource;
-  class AudioIface;
 
 /// \addtogroup gazebo_controller
 /// \{
@@ -89,7 +93,7 @@ class AudioController : public Controller
   private: void GetAudioCmd();
 
   /// The Position interface
-  private: AudioIface *audioIface;
+  private: libgazebo::AudioIface *audioIface;
   
   private: OpenALSource *openALSource;
 

@@ -25,7 +25,7 @@
  * SVN info: $Id$
  */
 
-#include "config.h"
+#include "gazebo_config.h"
 
 #include "GazeboError.hh"
 #include "Entity.hh"

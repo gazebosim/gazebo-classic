@@ -63,7 +63,7 @@ Generic_Imu::~Generic_Imu()
 // Load the controller
 void Generic_Imu::LoadChild(XMLConfigNode *node)
 {
-  this->imuIface = dynamic_cast<ImuIface*>(this->GetIface("imu"));
+  this->imuIface = dynamic_cast<libgazebo::ImuIface*>(this->GetIface("imu"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

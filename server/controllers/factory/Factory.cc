@@ -66,7 +66,7 @@ Factory::~Factory()
 // Load the controller
 void Factory::LoadChild(XMLConfigNode *node)
 {
-  this->factoryIface = dynamic_cast<FactoryIface*>(this->GetIface("factory"));
+  this->factoryIface = dynamic_cast<libgazebo::FactoryIface*>(this->GetIface("factory"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

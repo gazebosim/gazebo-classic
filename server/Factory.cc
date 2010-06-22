@@ -45,7 +45,7 @@ Factory::Factory()
 
   this->xmlSuffix = "</gazebo:world>";
 
-  this->factoryIface = (FactoryIface*)IfaceFactory::NewIface("factory");
+  this->factoryIface = (libgazebo::FactoryIface*)libgazebo::IfaceFactory::NewIface("factory");
 
   // Create the iface
   try

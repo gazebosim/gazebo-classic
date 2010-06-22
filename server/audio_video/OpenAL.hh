@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "config.h"
+#include "gazebo_config.h"
 #include "Vector3.hh"
 
 #ifdef HAVE_OPENAL

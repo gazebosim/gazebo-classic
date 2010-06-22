@@ -149,6 +149,9 @@ class Quatern
   /// \return The rotated vector
   public: Vector3 RotateVector(Vector3 vec) const;
 
+  /// \brief Do the reverse rotation of a vector by this quaternion
+  public: Vector3 RotateVectorReverse(Vector3 vec) const;
+
   /// \brief See if a quatern is finite (e.g., not nan)
   /// \return True if quatern is finite
   public: bool IsFinite() const;

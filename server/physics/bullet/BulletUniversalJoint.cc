@@ -99,6 +99,13 @@ Vector3 BulletUniversalJoint::GetAxis(int index) const
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void BulletUniversalJoint::SetDamping( int /*index*/, const double damping )
+{
+  gzerr(0) << "Not implemented\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
 void BulletUniversalJoint::SetAxis( int index, const Vector3 &axis )
 {

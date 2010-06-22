@@ -32,6 +32,7 @@
 
 #include "GazeboError.hh"
 #include "OgreDynamicLines.hh"
+#include "OgreCreator.hh"
 
 using namespace gazebo;
 
@@ -46,6 +47,7 @@ OgreDynamicLines::OgreDynamicLines(OperationType opType)
 
 OgreDynamicLines::~OgreDynamicLines()
 {
+  OgreCreator::Instance()->DeleteDynamicLine(this);
 }
 
 /// Returns "gazebo::ogredynamicslines"

@@ -144,6 +144,13 @@ void BulletHinge2Joint::SetAxis( int index, const Vector3 &axis )
 
 
 //////////////////////////////////////////////////////////////////////////////
+// Set the joint damping
+void BulletHinge2Joint::SetDamping( int /*index*/, const double damping )
+{
+  gzerr(0) << "Not implemented\n";
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // Set torque
 void BulletHinge2Joint::SetForce(int index, double torque)
 {

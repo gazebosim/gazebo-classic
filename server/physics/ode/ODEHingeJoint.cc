@@ -24,12 +24,16 @@
  * CVS: $Id: ODEHingeJoint.cc 7640 2009-05-13 02:06:08Z natepak $
  */
 
+#include "gazebo_config.h"
+#include "GazeboMessage.hh"
 #include "Model.hh"
 #include "Body.hh"
 #include "World.hh"
 #include "XMLConfig.hh"
 #include "Global.hh"
 #include "ODEHingeJoint.hh"
+#include <boost/signal.hpp>
+#include <boost/bind.hpp>
 
 
 using namespace gazebo;
@@ -107,6 +111,29 @@ void ODEHingeJoint::SetAxis( int /*index*/, const Vector3 &axis )
 
   dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
   this->physics->UnlockMutex();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set the joint damping, either through ODE or callback here
+void ODEHingeJoint::SetDamping( int /*index*/, const double damping )
+{
+  this->damping_coefficient = damping;
+#ifdef INCLUDE_ODE_JOINT_DAMPING
+  this->physics->LockMutex();
+  dJointSetDamping( this->jointId, this->damping_coefficient);
+  this->physics->UnlockMutex();
+#else
+  // alternaitvely, apply explicit damping
+  this->ConnectJointUpdateSignal(boost::bind(&ODEHingeJoint::ApplyDamping,this));
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// callback to apply joint damping force
+void ODEHingeJoint::ApplyDamping()
+{
+  double damping_force = this->damping_coefficient * this->GetVelocity(0);
+  this->SetForce(0,damping_force);
 }
 
 //////////////////////////////////////////////////////////////////////////////

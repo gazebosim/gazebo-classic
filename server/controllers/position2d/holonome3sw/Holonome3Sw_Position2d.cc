@@ -64,7 +64,7 @@ Holonome3Sw_Position2d::~Holonome3Sw_Position2d()
 // Load the controller
 void Holonome3Sw_Position2d::LoadChild(XMLConfigNode *node)
 {
-  this->myIface = dynamic_cast<PositionIface*>(this->GetIface("position"));
+  this->myIface = dynamic_cast<libgazebo::PositionIface*>(this->GetIface("position"));
 
   // Get wheels child
   node = node->GetChild("wheels");

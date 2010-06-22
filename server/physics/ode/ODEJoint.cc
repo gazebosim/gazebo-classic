@@ -52,7 +52,6 @@ ODEJoint::~ODEJoint()
 /// Load a joint
 void ODEJoint::Load(XMLConfigNode *node)
 {
-  Joint::Load(node);
 
   double h = this->physics->GetStepTime().Double();
   double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
@@ -73,6 +72,8 @@ void ODEJoint::Load(XMLConfigNode *node)
     this->feedback = new dJointFeedback;
     dJointSetFeedback(this->jointId, this->feedback);
   }
+
+  Joint::Load(node);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -304,6 +305,30 @@ void ODEJoint::SetAttribute( Attribute attr, int index, double value)
       break;
     case SUSPENSION_CFM:
       this->SetParam(dParamSuspensionCFM, value);
+      break;
+    case STOP_ERP:
+      this->SetParam(dParamStopERP, value);
+      break;
+    case STOP_CFM:
+      this->SetParam(dParamStopCFM, value);
+      break;
+    case ERP:
+      this->SetParam(dParamERP, value);
+      break;
+    case CFM:
+      this->SetParam(dParamCFM, value);
+      break;
+    case FMAX:
+      this->SetParam(dParamFMax, value);
+      break;
+    case VEL:
+      this->SetParam(dParamVel, value);
+      break;
+    case HI_STOP:
+      this->SetParam(dParamHiStop, value);
+      break;
+    case LO_STOP:
+      this->SetParam(dParamLoStop, value);
       break;
     default:
       gzerr(0) << "Unable to handle joint attribute[" << attr << "]\n";

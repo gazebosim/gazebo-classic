@@ -30,9 +30,13 @@
 
 #include "Controller.hh"
 
-namespace gazebo
+namespace libgazebo
 {
   class ImuIface;
+}
+
+namespace gazebo
+{
   class ImuSensor;
 
 class Generic_Imu : public Controller
@@ -65,7 +69,7 @@ class Generic_Imu : public Controller
   private: void PutImuData();
 
   /// The IMU interface
-  private: ImuIface *imuIface;
+  private: libgazebo::ImuIface *imuIface;
 
   /// The parent sensor
   private: ImuSensor *myParent;

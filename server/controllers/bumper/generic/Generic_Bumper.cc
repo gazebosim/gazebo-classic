@@ -58,7 +58,7 @@ Generic_Bumper::~Generic_Bumper()
 // Load the controller
 void Generic_Bumper::LoadChild(XMLConfigNode *node)
 {
-  this->myIface = dynamic_cast<BumperIface*>(this->GetIface("bumper"));
+  this->myIface = dynamic_cast<libgazebo::BumperIface*>(this->GetIface("bumper"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

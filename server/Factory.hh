@@ -34,8 +34,6 @@
 
 namespace gazebo
 {
-  class FactoryIface;
-
 /// \addtogroup gazebo_server
 /// \{
 /** \defgroup factory factory
@@ -64,7 +62,7 @@ class Factory
   public: void Update();
 
   /// The Position interface
-  private: FactoryIface *factoryIface;
+  private: libgazebo::FactoryIface *factoryIface;
 
   private: std::string xmlPrefix;
   private: std::string xmlSuffix;

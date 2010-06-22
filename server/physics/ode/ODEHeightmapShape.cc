@@ -130,7 +130,7 @@ void ODEHeightmapShape::Load(XMLConfigNode *node)
 
   //Rotate so Z is up, not Y (which is the default orientation)
   Quatern quat;
-  Pose3d pose = oParent->GetAbsPose();
+  Pose3d pose = oParent->GetWorldPose();
 
   quat.SetFromEuler(Vector3(DTOR(90),0,0));
 

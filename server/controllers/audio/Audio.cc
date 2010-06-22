@@ -68,7 +68,7 @@ AudioController::~AudioController()
 // Load the controller
 void AudioController::LoadChild(XMLConfigNode *node)
 {
-  this->audioIface = dynamic_cast<AudioIface*>(this->GetIface("audio"));
+  this->audioIface = dynamic_cast<libgazebo::AudioIface*>(this->GetIface("audio"));
   this->openALSource = OpenAL::Instance()->CreateSource( node );
 
 }
@@ -97,7 +97,7 @@ void AudioController::UpdateChild()
 
     this->PutAudioData();
 
-    this->openALSource->SetPos(this->myParent->GetAbsPose().pos);
+    this->openALSource->SetPos(this->myParent->GetWorldPose().pos);
   }
 }
 

@@ -90,7 +90,7 @@ void HingeJointMaker::MouseDragCB(Vector2<int> mousePos)
   Vector3 norm;
   Vector3 p1, p2;
 
-  p1 = this->first->GetAbsPose().pos;
+  p1 = this->first->GetWorldPose().pos;
   p2 = OgreAdaptor::Instance()->GetFirstContact(CameraManager::Instance()->GetActiveCamera(), mousePos);
 
   OgreCreator::DrawLine(p1,p2,"HingeMaker");

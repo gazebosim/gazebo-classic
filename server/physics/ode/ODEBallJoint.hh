@@ -82,6 +82,9 @@ namespace gazebo
     /// \brief Get the axis of rotation
     public: virtual Vector3 GetAxis(int index) const {}
 
+    /// \brief Set joint damping, not yet implemented
+    public: virtual void SetDamping(int index, const double damping);
+
     /// \brief Set the velocity of an axis(index).
     public: virtual void SetVelocity(int index, double angle) {}
 
