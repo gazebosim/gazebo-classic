@@ -37,6 +37,9 @@ MACRO (APPEND_TO_SERVER_HEADERS)
     APPEND_TO_CACHED_LIST(gazeboserver_headers
                           ${gazeboserver_headers_desc}                   
                           ${CMAKE_CURRENT_SOURCE_DIR}/${src})
+    APPEND_TO_CACHED_LIST(gazeboserver_headers_nopath
+                          "gazeboserver_headers_nopath"                   
+                          ${src})
   ENDFOREACH (src ${ARGN})
 ENDMACRO (APPEND_TO_SERVER_HEADERS)
 
@@ -86,6 +89,8 @@ MACRO (GAZEBOSERVER_RESET_LISTS)
        ${gazeboserver_sources_desc} FORCE)
   SET (gazeboserver_headers "" CACHE INTERNAL 
        ${gazeboserver_sources_desc} FORCE)
+  SET (gazeboserver_headers_nopath "" CACHE INTERNAL 
+       "gazeboserver_headers_nopath" FORCE)
   SET (gazeboserver_include_dirs "" CACHE INTERNAL 
        ${gazeboserver_include_dirs_desc} FORCE)
   SET (gazeboserver_link_dirs "" CACHE INTERNAL 

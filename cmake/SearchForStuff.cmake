@@ -1,7 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckCXXSourceCompiles)
 
-set (use_internal_assimp OFF CACHE BOOL "Use internal assimp" FORCE)
+# John - ode version with joint damping
+SET(ODE_JOINT_DAMPING_VERSION 0.11.1.1 CACHE INTERNAL "ODE version with joint damping" FORCE)
 
 set (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
@@ -47,6 +48,40 @@ if (PKG_CONFIG_FOUND)
 
 
   #################################################
+  # Find ODE
+  pkg_check_modules(ODE ode)
+  IF (NOT ODE_FOUND)
+    BUILD_ERROR ("ODE and development files not found. See the following website: http://www.ode.org")
+    set (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
+  else (NOT ODE_FOUND)
+    set (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
+  
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
+                          ${ODE_INCLUDE_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
+                          ${ODE_LIBRARY_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ODE_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${ODE_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
+                          ${gazeboserver_ldflags_desc} 
+                          ${ODE_LDFLAGS})
+  endif (NOT ODE_FOUND)
+
+  pkg_check_modules(ODE_JOINT_DAMPING ode>=${ODE_JOINT_DAMPING_VERSION})
+  if (NOT ODE_JOINT_DAMPING_FOUND)
+    set (INCLUDE_ODE_JOINT_DAMPING FALSE CACHE BOOL "No support for ODE damping")
+  else (NOT ODE_JOINT_DAMPING_FOUND)
+    set (INCLUDE_ODE_JOINT_DAMPING TRUE CACHE BOOL "Include support for ODE damping")
+  endif (NOT ODE_JOINT_DAMPING_FOUND)
+
+
+  #################################################
   # Find OGRE 
   pkg_check_modules(OGRE-RTShaderSystem OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
   if (OGRE-RTShaderSystem_FOUND)
@@ -57,9 +92,11 @@ if (PKG_CONFIG_FOUND)
     set(ogre_libraries ${OGRE-RTShaderSystem_LIBRARIES})
     set(ogre_cflags ${OGRE-RTShaderSystem_CFLAGS})
 
-    add_definitions(-DUSE_RTSHADER_SYSTEM)
+    set (INCLUDE_RTSHADER ON CACHE BOOL "Enable GPU shaders")
 
   else (OGRE-RTShaderSystem_FOUND)
+
+    set (INCLUDE_RTSHADER OFF CACHE BOOL "Enable GPU shaders")
 
     pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
     if (NOT OGRE_FOUND)
@@ -467,18 +504,15 @@ if (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries
   
   find_library(assimp_library assimp ENV LD_LIBRARY_PATH)
   
-  if (NOT assimp_library)
-    message (STATUS "Looking for libassimp - not found. Using builtin version.")
-    #BUILD_ERROR("libassimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
-  else (NOT assimp_library)
+  if (assimp_library)
     message (STATUS "Looking for libassimp - found")
     APPEND_TO_CACHED_LIST(assimp_libraries
                           "Assimp libraries Use this to override automatic detection."
                           ${assimp_library})
-  endif (NOT assimp_library)
+  endif (assimp_library)
  
   if (NOT assimp_include_dir OR NOT assimp_library)
-    set (use_internal_assimp ON CACHE BOOL "Use internal assimp" FORCE)
+    BUILD_ERROR("assimp not found. See the following website for installation instructions: http://assimp.sourceforge.net")
   endif (NOT assimp_include_dir OR NOT assimp_library)
 
 endif (NOT assimp_include_dirs AND NOT assimp_library_dirs AND NOT assimp_libraries )
