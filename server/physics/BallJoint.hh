@@ -100,10 +100,10 @@ namespace gazebo
     public: virtual void SetLowStop(int index, Angle angle) {}
  
     /// \brief Get the high stop of an axis(index).
-    public: virtual Angle GetHighStop(int index) {}
+    public: virtual Angle GetHighStop(int index) {return Angle();}
 
     /// \brief Get the low stop of an axis(index).
-    public: virtual Angle GetLowStop(int index) {}
+    public: virtual Angle GetLowStop(int index) { return Angle();}
 
   };
   
