@@ -60,9 +60,10 @@ void RTShaderSystem::Init()
   {
     this->shaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
     this->shaderGenerator->addSceneManager(OgreAdaptor::Instance()->sceneMgr);
- 
+    Ogre::StringVector groupVector;
+
     // Setup the core libraries and shader cache path 
-    Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
+    groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
     Ogre::StringVector::iterator itGroup = groupVector.begin();
     Ogre::StringVector::iterator itGroupEnd = groupVector.end();
     Ogre::String shaderCoreLibsPath;
