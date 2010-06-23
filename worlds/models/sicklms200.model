@@ -52,6 +52,7 @@
       <minRange>0.1</minRange>
       <maxRange>8</maxRange>
       <resRange>.1</resRange>
+      <alwaysActive>true</alwaysActive>
 
       <controller:sicklms200_laser name="laser_controller_1">
         <interface:laser name="laser_iface_0"/>
