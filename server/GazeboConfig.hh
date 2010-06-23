@@ -64,7 +64,11 @@ namespace gazebo
  
     /// \brief Add colon delimited paths to plugins
     public: void AddPluginPaths(std::string path);
- 
+
+    public: void ClearGazeboPaths();
+    public: void ClearOgrePaths();
+    public: void ClearPluginPaths();
+
     /// Paths gazebo install
     private: std::list<std::string> gazeboPaths;
     

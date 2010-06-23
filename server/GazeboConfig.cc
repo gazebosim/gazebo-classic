@@ -59,15 +59,15 @@ void GazeboConfig::Load()
   std::string delim(":");
 
   char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
-  if(ogre_resource_path) 
+  if(this->ogrePaths.empty() && ogre_resource_path) 
     this->AddOgrePaths(std::string(ogre_resource_path));
 
   char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
-  if(gazebo_resource_path) 
+  if(this->gazeboPaths.empty() && gazebo_resource_path) 
     this->AddGazeboPaths(std::string(gazebo_resource_path));
 
   char *gazebo_plugin_path = getenv("GAZEBO_PLUGIN_PATH");
-  if(gazebo_plugin_path) 
+  if(this->pluginPaths.empty() && gazebo_plugin_path) 
     this->AddPluginPaths(std::string(gazebo_plugin_path));
 
   if (cfgFile.is_open())
@@ -77,7 +77,7 @@ void GazeboConfig::Load()
     rc.Load(rcFilename);
 
     // if gazebo path is set, skip reading from .gazeborc
-    if(!gazebo_resource_path)
+    if(this->ogrePaths.empty() && !ogre_resource_path)
     {
       node = rc.GetRootNode()->GetChild("gazeboPath");
       while (node)
@@ -90,7 +90,7 @@ void GazeboConfig::Load()
     }
 
     // if ogre path is set, skip reading from .gazeborc
-    if(!ogre_resource_path)
+    if(this->ogrePaths.empty() && !ogre_resource_path)
     {
       node = rc.GetRootNode()->GetChild("ogrePath");
       while (node)
@@ -106,19 +106,32 @@ void GazeboConfig::Load()
   {
     gzmsg(0) << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
 
-    if ( !gazebo_resource_path )
+    if (this->gazeboPaths.empty() &&  !gazebo_resource_path )
     {
       this->gazeboPaths.push_back("/usr/local/share/gazebo");
       this->AddPluginPaths("/usr/local/share/gazebo/plugins");
     }
 
-    if ( !ogre_resource_path )
+    if (this->ogrePaths.empty() &&  !ogre_resource_path )
     {
       this->ogrePaths.push_back("/usr/local/lib/OGRE");
       this->ogrePaths.push_back("/usr/lib/OGRE");
     }
 
   }
+}
+
+void GazeboConfig::ClearGazeboPaths()
+{
+  this->gazeboPaths.clear();
+}
+void GazeboConfig::ClearOgrePaths()
+{
+  this->ogrePaths.clear();
+}
+void GazeboConfig::ClearPluginPaths()
+{
+  this->pluginPaths.clear();
 }
 
 std::list<std::string> &GazeboConfig::GetGazeboPaths() 
