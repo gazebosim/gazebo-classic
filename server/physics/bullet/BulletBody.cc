@@ -209,6 +209,16 @@ void BulletBody::SetGravityMode(bool mode)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Get the gravity mode
+bool BulletBody::GetGravityMode()
+{
+  bool result;
+  gzerr(0) << "BulletBody::GetGravityMode not implemented\n";
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set whether this body will collide with others in the model
 void BulletBody::SetSelfCollide(bool collide)
 {

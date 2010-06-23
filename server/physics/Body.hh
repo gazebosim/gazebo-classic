@@ -92,6 +92,10 @@ namespace gazebo
     /// \brief Set whether gravity affects this body
     public: virtual void SetGravityMode(bool mode) = 0;
 
+    /// \brief Get the gravity mode
+    public: virtual bool GetGravityMode() = 0;
+
+
     /// \brief Set whether this body will collide with others in the model
     public: virtual void SetSelfCollide(bool collide) = 0;
 

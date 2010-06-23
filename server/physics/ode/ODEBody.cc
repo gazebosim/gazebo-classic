@@ -147,6 +147,21 @@ void ODEBody::SetGravityMode(bool mode)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Get the gravity mode
+bool ODEBody::GetGravityMode()
+{
+  int mode = 0;
+  if (this->bodyId)
+  {
+    this->physicsEngine->LockMutex();
+    mode = dBodyGetGravityMode(this->bodyId);
+    this->physicsEngine->UnlockMutex();
+  }
+
+  return mode;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Set whether this body will collide with others in the model
 void ODEBody::SetSelfCollide(bool collide)
 {
