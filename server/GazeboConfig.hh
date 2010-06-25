@@ -69,6 +69,10 @@ namespace gazebo
     public: void ClearOgrePaths();
     public: void ClearPluginPaths();
 
+    public: void ClearGazeboPaths();
+    public: void ClearOgrePaths();
+    public: void ClearPluginPaths();
+
     /// Paths gazebo install
     private: std::list<std::string> gazeboPaths;
     

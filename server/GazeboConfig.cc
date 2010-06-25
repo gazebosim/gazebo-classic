@@ -149,6 +149,19 @@ std::list<std::string> &GazeboConfig::GetPluginPaths()
   return this->pluginPaths;
 }
 
+void GazeboConfig::ClearGazeboPaths()
+{
+  this->gazeboPaths.clear();
+}
+void GazeboConfig::ClearOgrePaths()
+{
+  this->ogrePaths.clear();
+}
+void GazeboConfig::ClearPluginPaths()
+{
+  this->pluginPaths.clear();
+}
+
 void GazeboConfig::AddGazeboPaths(std::string gazebo_resource_path)
 {
   std::string delim(":");
