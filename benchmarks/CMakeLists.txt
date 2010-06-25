@@ -19,7 +19,10 @@ include_directories(
   ${boost_include_dirs_split}
 )
 
-link_directories(../libgazebo ${INCLUDE_DIRS})
+link_directories(
+ ${CMAKE_BINARY_DIR}/libgazebo 
+ ${INCLUDE_DIRS}
+)
 
 set (benchmarks laser 
                 box_grid 
