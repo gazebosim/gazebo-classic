@@ -121,19 +121,6 @@ void GazeboConfig::Load()
   }
 }
 
-void GazeboConfig::ClearGazeboPaths()
-{
-  this->gazeboPaths.clear();
-}
-void GazeboConfig::ClearOgrePaths()
-{
-  this->ogrePaths.clear();
-}
-void GazeboConfig::ClearPluginPaths()
-{
-  this->pluginPaths.clear();
-}
-
 std::list<std::string> &GazeboConfig::GetGazeboPaths() 
 {
   return this->gazeboPaths;
