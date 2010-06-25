@@ -81,7 +81,7 @@ namespace gazebo
     public: unsigned int GetGeomCount() const;
 
     /// \brief Get a geom
-    public: Geom *GetGeom(unsigned int index);
+    public: Geom *GetGeom(unsigned int index) const;
 
     /// \brief Return the number of contacts for an observed geom
     public: unsigned int GetGeomContactCount(unsigned int geomIndex) const;

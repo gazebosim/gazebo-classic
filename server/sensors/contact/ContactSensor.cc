@@ -153,3 +153,13 @@ Contact ContactSensor::GetGeomContact(unsigned int geom, unsigned int index) con
 
   return Contact();
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get a contact for a geom by index
+Geom* ContactSensor::GetGeom(unsigned int geom) const
+{
+  if (geom < this->geoms.size())
+    return this->geoms[geom];
+
+  return NULL;
+}
