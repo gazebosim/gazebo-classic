@@ -22,8 +22,8 @@ add_executable(gazebomodel gazebomodel.cc Toolbase.cc)
 add_executable(gazebobody gazebobody.cc Toolbase.cc)
 add_executable(gazeboplugin gazeboplugin.cc Toolbase.cc)
 
-target_link_libraries(gazebomodel gazebo yaml ${boost_libraries})
-target_link_libraries(gazebobody gazebo yaml ${boost_libraries})
+target_link_libraries(gazebomodel gazeboshm yaml ${boost_libraries})
+target_link_libraries(gazebobody gazeboshm yaml ${boost_libraries})
 target_link_libraries(gazeboplugin gazebo yaml ${boost_libraries})
 
 set_target_properties(gazebomodel PROPERTIES SKIP_BUILD_RPATH TRUE)
