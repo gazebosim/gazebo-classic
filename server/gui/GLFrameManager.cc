@@ -59,14 +59,68 @@ GLFrameManager::~GLFrameManager()
 // Load from xml
 void GLFrameManager::Load( XMLConfigNode *node )
 {
-  this->configNode = node;
   GLFrame *frame = NULL;
   int windowCount = 0;
+  XMLConfigNode *rowNode = NULL;
+  XMLConfigNode *camNode = NULL;
 
-  // First, create one big window
-  frame = new GLFrame( this->x(), this->y(), this->w(), this->h(), "" );
-  this->frames.push_back( frame );
-  this->insert(*frame, windowCount);
+  if (node)
+  {
+    rowNode = node->GetChild("row");
+
+    float frameHeight, frameWidth;
+    int width = this->w();
+    int height = this->h();
+    int x = this->x();
+    int y = this->y();
+
+    // Process each row
+    while (rowNode)
+    {
+      camNode = rowNode->GetChild("camera");
+
+      std::string heightStr = rowNode->GetString("height","",1);
+
+      frameHeight = atof( heightStr.substr(0, heightStr.find( "%", 0 ) ).c_str() );
+
+      frameHeight = frameHeight/100.0 * height;
+
+      // Process each camera
+      while (camNode)
+      {
+        std::string widthStr = camNode->GetString("width","",1);
+        frameWidth = atof( widthStr.substr(0, widthStr.find( "%", 0 ) ).c_str() );
+
+        frameWidth = frameWidth/100.0 * width;
+
+        windowCount = this->children();
+
+        // Create the frame
+        frame = new GLFrame( x, y, (int)frameWidth, (int)frameHeight, "" );
+        frame->Load(camNode);
+
+        this->frames.push_back( frame );
+        this->insert(*frame, windowCount);
+
+        x += (int)frameWidth;
+
+        camNode = camNode->GetNext();
+      }
+
+      y += (int)frameHeight;
+      x = this->x();
+
+      rowNode = rowNode->GetNext();
+    }
+  }
+
+  // Create a big default window if no frames have been defined
+  if (this->frames.size() == 0)
+  {
+    frame = new GLFrame( this->x(), this->y(), this->w(), this->h(), "" );
+    this->frames.push_back( frame );
+    this->insert(*frame, windowCount);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
