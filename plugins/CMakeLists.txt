@@ -21,6 +21,7 @@ set (plugins pioneer_line
              ball_drop
              box_push
              box_stack
+             elevator
              )
 
 
