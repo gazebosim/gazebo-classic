@@ -222,6 +222,12 @@ namespace gazebo
 
     public: Entity *GetCoMEntity() { return this->comEntity; }
 
+    /// \brief Set whether this body is in the kinematic state
+    public: virtual void SetKinematic(const bool &) {}
+
+    /// \brief Get whether this body is in the kinematic state
+    public: virtual bool GetKinematic() const {return false;}
+
     /// \brief Connect a boost::slot the the add entity signal
     public: template<typename T>
             boost::signals::connection ConnectEnabledSignal( T subscriber )
@@ -280,6 +286,7 @@ namespace gazebo
     protected: ParamT<double> *ixyP;
     protected: ParamT<double> *ixzP;
     protected: ParamT<double> *iyzP;
+    protected: ParamT<bool> *kinematicP;
     protected: Mass customMass;
 
     private: boost::signal<void (bool)> enabledSignal;

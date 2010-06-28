@@ -90,6 +90,10 @@ Body::Body(Entity *parent)
   this->ixzP = new ParamT<double>("ixz",0.0,0);
   this->iyzP = new ParamT<double>("iyz",0.0,0);
 
+  this->kinematicP = new ParamT<bool>("kinematic",true,0);
+  this->kinematicP->SetHelp("true = kinematic state only, false = dynamic body");
+  this->kinematicP->Callback( &Body::SetKinematic, this );
+
   Param::End();
 
 }
@@ -139,6 +143,7 @@ Body::~Body()
   delete this->ixyP;
   delete this->ixzP;
   delete this->iyzP;
+  delete this->kinematicP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,6 +167,7 @@ void Body::Load(XMLConfigNode *node)
   this->ixyP->Load(node);
   this->ixzP->Load(node);
   this->iyzP->Load(node);
+  this->kinematicP->Load(node);
 
   this->customMass.SetCoG(**this->cxP, **this->cyP,** this->czP);
   this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
@@ -209,6 +215,8 @@ void Body::Load(XMLConfigNode *node)
     this->LoadSensor(childNode);
     childNode = childNode->GetNextByNSPrefix("sensor");
   }
+
+  this->SetKinematic(**this->kinematicP);
 
   //this->GetModel()->ConnectUpdateSignal( boost::bind(&Body::Update, this) );
 }
@@ -721,4 +729,5 @@ void Body::SetMass(Mass mass)
   this->mass = mass;
   this->customMass = mass;
 }
+
 

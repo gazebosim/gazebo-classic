@@ -486,3 +486,27 @@ void ODEBody::SetAngularDamping(double damping)
     dBodySetAngularDamping(this->GetODEId(), damping); 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Set whether this body is in the kinematic state
+void ODEBody::SetKinematic(const bool &state)
+{
+  if (this->bodyId)
+  {
+    if (state)
+      dBodySetKinematic(this->bodyId);
+    else
+      dBodySetDynamic(this->bodyId);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get whether this body is in the kinematic state
+bool ODEBody::GetKinematic() const
+{
+  bool result = false;
+
+  if (this->bodyId)
+    result = dBodyIsKinematic(this->bodyId);
+
+  return result;
+}

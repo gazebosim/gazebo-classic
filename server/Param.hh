@@ -66,11 +66,18 @@ namespace gazebo
     /// \brief Set the parameter value from a string
     public: virtual void SetFromString(const std::string &, bool callback=false) {}
 
+    /// \brief Set the help string
+    public: void SetHelp(const std::string &h) {this->help = h;}
+
+    /// \brief Get the help string
+    public: std::string GetHelp() const {return this->help;}
+
     /// List of created parameters
     private: static std::vector<Param*> *params;
 
     protected: std::string key;
     protected: std::string typeName;
+    protected: std::string help;
   };
 
 
