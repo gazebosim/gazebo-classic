@@ -32,7 +32,7 @@
 #include "GazeboTime.hh"
 #include "GazeboClient.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 Client *GazeboClient::client = NULL;
 SimulationIface *GazeboClient::sim = NULL;

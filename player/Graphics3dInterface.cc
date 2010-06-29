@@ -38,7 +38,7 @@
 #include "GazeboDriver.hh"
 #include "Graphics3dInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *Graphics3dInterface::mutex = NULL;
 

@@ -33,7 +33,7 @@
 #include "GazeboDriver.hh"
 #include "ActarrayInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *ActarrayInterface::mutex = NULL;
 

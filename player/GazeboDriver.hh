@@ -35,7 +35,7 @@
 #include "GazeboClient.hh"
 
 
-namespace gazebo
+namespace libgazebo
 {
 
 /// \addtogroup player

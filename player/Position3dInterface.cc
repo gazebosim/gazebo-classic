@@ -37,7 +37,7 @@ PLAYER_POSITION3D_RESET_ODOM
 #include "GazeboDriver.hh"
 #include "Position3dInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *Position3dInterface::mutex = NULL;
 

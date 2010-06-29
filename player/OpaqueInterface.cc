@@ -41,7 +41,7 @@ Do we need these?
 #include "GazeboDriver.hh"
 #include "OpaqueInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *OpaqueInterface::mutex = NULL;
 

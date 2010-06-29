@@ -44,7 +44,7 @@
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *Position2dInterface::mutex = NULL;
 

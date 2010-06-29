@@ -36,7 +36,7 @@ PLAYER_LASER_REQ_GET_GEOM
 #include "GazeboDriver.hh"
 #include "IRInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *IRInterface::mutex = NULL;
 

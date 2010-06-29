@@ -35,7 +35,7 @@ namespace boost
 }
 
 // Forward declarations
-namespace gazebo
+namespace libgazebo
 {
 
 /// \addtogroup player_iface Interfaces

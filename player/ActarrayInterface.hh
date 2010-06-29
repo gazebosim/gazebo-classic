@@ -33,7 +33,7 @@ namespace boost
   class recursive_mutex;
 }
 
-namespace gazebo
+namespace libgazebo
 {
 /// \addtogroup player_iface
 /// \{

@@ -34,7 +34,7 @@ namespace boost
   class recursive_mutex;
 }
 
-namespace gazebo
+namespace libgazebo
 {
 
 // Forward declarations

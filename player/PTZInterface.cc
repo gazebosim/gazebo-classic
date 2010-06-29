@@ -42,7 +42,7 @@ PLAYER_PTZ_REQ_GEOM
 #include "GazeboDriver.hh"
 #include "PTZInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *PTZInterface::mutex = NULL;
 

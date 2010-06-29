@@ -35,7 +35,7 @@ namespace boost
 }
 
 
-namespace gazebo
+namespace libgazebo
 {
   
   /// \addtogroup player_iface 

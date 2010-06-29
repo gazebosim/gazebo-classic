@@ -53,7 +53,7 @@
 
 #include "GazeboDriver.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 /// \brief A factory creation function, declared outside of the class so that it
 /// can be invoked without any object context (alternatively, you can

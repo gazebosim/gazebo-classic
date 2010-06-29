@@ -42,7 +42,7 @@
 #include "GazeboDriver.hh"
 #include "BumperInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 boost::recursive_mutex *BumperInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////

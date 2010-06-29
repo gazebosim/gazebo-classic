@@ -39,7 +39,7 @@
 #include "GazeboDriver.hh"
 #include "FiducialInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *FiducialInterface::mutex = NULL;
 

@@ -42,7 +42,7 @@
 #include "GazeboDriver.hh"
 #include "GripperInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *GripperInterface::mutex = NULL;
 

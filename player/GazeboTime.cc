@@ -29,7 +29,7 @@
 #include "GazeboClient.hh"
 #include "GazeboTime.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor

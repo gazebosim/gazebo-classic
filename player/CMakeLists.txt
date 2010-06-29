@@ -25,7 +25,7 @@ include_directories(
 
 link_directories( ${PLAYER_LINK_DIRS} ${boost_library_dirs} gazeboshm)
 
-add_library(gazeboplugin SHARED ${gazeboplugin_sources})
-target_link_libraries(gazeboplugin ${PLAYER_LINK_LIBS} gazeboshm )
+add_library(gazeboplayerplugin SHARED ${gazeboplugin_sources})
+target_link_libraries(gazeboplayerplugin ${PLAYER_LINK_LIBS} gazeboshm )
 
-install(TARGETS gazeboplugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+install(TARGETS gazeboplayerplugin DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

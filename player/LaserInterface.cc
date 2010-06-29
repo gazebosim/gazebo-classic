@@ -36,7 +36,7 @@
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 boost::recursive_mutex *LaserInterface::mutex = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////

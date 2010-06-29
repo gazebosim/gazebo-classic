@@ -32,7 +32,7 @@
 #include "GazeboDriver.hh"
 #include "CameraInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *CameraInterface::mutex = NULL;
 

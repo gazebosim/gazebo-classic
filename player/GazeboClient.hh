@@ -29,7 +29,7 @@
 
 #include "gz.h"
 
-namespace gazebo
+namespace libgazebo
 {
   class SimulationIface;
   class Client;
@@ -57,10 +57,10 @@ class GazeboClient
   public: static const char *prefixId;
 
   /// \brief The one and only gazebo client
-  public: static gazebo::Client *client;
+  public: static libgazebo::Client *client;
 
   /// \brief The simulation interface
-  public: static gazebo::SimulationIface *sim;
+  public: static libgazebo::SimulationIface *sim;
 };
 
 /// \}

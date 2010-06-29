@@ -32,7 +32,7 @@
 #include "GazeboDriver.hh"
 #include "SimulationInterface.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 boost::recursive_mutex *SimulationInterface::mutex = NULL;
 
@@ -92,7 +92,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
   if (Message::MatchMessage(hdr, PLAYER_MSGTYPE_REQ,
                             PLAYER_SIMULATION_REQ_SET_POSE3D, this->device_addr))
   {
-    gazebo::SimulationRequestData *gzReq = NULL;
+    libgazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose3d_req_t *req =
       (player_simulation_pose3d_req_t*)(data);
 
@@ -100,7 +100,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     gzReq = &(this->iface->data->requests[ this->iface->data->requestCount++ ]);
 
-    gzReq->type = gazebo::SimulationRequestData::SET_POSE3D;
+    gzReq->type = libgazebo::SimulationRequestData::SET_POSE3D;
     strcpy((char*)gzReq->name, req->name);
 
     gzReq->modelPose.pos.x = req->pose.px;
@@ -124,7 +124,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  PLAYER_SIMULATION_REQ_SET_POSE2D, 
                                  this->device_addr))
   {
-    gazebo::SimulationRequestData *gzReq = NULL;
+    libgazebo::SimulationRequestData *gzReq = NULL;
 
     player_simulation_pose2d_req_t *req =
       (player_simulation_pose2d_req_t*)(data);
@@ -133,7 +133,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     gzReq = &(this->iface->data->requests[ this->iface->data->requestCount++]);
 
-    gzReq->type = gazebo::SimulationRequestData::SET_POSE2D;
+    gzReq->type = libgazebo::SimulationRequestData::SET_POSE2D;
 
     strcpy((char*)gzReq->name, req->name);
 
@@ -153,7 +153,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  PLAYER_SIMULATION_REQ_GET_POSE3D, 
                                  this->device_addr))
   {
-    gazebo::SimulationRequestData *gzReq = NULL;
+    libgazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose3d_req_t *req =
       (player_simulation_pose3d_req_t*)(data);
 
@@ -161,7 +161,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
 
-    gzReq->type = gazebo::SimulationRequestData::GET_POSE3D;
+    gzReq->type = libgazebo::SimulationRequestData::GET_POSE3D;
 
     strcpy((char*)gzReq->name, req->name);
 
@@ -173,7 +173,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  PLAYER_SIMULATION_REQ_GET_POSE2D, 
                                  this->device_addr))
   {
-    gazebo::SimulationRequestData *gzReq = NULL;
+    libgazebo::SimulationRequestData *gzReq = NULL;
     player_simulation_pose2d_req_t *req =
       (player_simulation_pose2d_req_t*)(data);
 
@@ -181,7 +181,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 
     gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
 
-    gzReq->type = gazebo::SimulationRequestData::GET_POSE2D;
+    gzReq->type = libgazebo::SimulationRequestData::GET_POSE2D;
 
     strcpy((char*)gzReq->name, req->name);
 
@@ -233,40 +233,40 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
     else
     {
       this->iface->Lock(1);
-      gazebo::SimulationRequestData *gzReq = NULL;
+      libgazebo::SimulationRequestData *gzReq = NULL;
       gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
 
       if (prop == "num_children")
       {
-        gzReq->type = gazebo::SimulationRequestData::GET_NUM_CHILDREN;
+        gzReq->type = libgazebo::SimulationRequestData::GET_NUM_CHILDREN;
         strcpy((char*)gzReq->name, req->name);   
       }
       else if (prop == "model_name")
       {
-        gzReq->type = gazebo::SimulationRequestData::GET_MODEL_NAME;
+        gzReq->type = libgazebo::SimulationRequestData::GET_MODEL_NAME;
         gzReq->uintValue = req->index;
       }
       else if (prop == "child_name")
       {
-        gzReq->type = gazebo::SimulationRequestData::GET_CHILD_NAME;
+        gzReq->type = libgazebo::SimulationRequestData::GET_CHILD_NAME;
         gzReq->uintValue = req->index;
         strcpy((char*)gzReq->name, req->name);   
       }
        else if (prop == "fiducial_id")
       {
-        gzReq->type = gazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID;
+        gzReq->type = libgazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID;
         strcpy((char*)gzReq->name, req->name);   
       }
       else if (prop == "model_type")
       {
-        gzReq->type = gazebo::SimulationRequestData::GET_MODEL_TYPE;
+        gzReq->type = libgazebo::SimulationRequestData::GET_MODEL_TYPE;
         strcpy((char*)gzReq->name, req->name);   
       }
       else if ((prop == "num_models") && (name == "world"))
       { 
-        gazebo::SimulationRequestData *gzReq = NULL;
+        libgazebo::SimulationRequestData *gzReq = NULL;
         gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
-        gzReq->type = gazebo::SimulationRequestData::GET_NUM_MODELS;
+        gzReq->type = libgazebo::SimulationRequestData::GET_NUM_MODELS;
       }
       else 
       {
@@ -281,7 +281,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  this->device_addr))
   {
     this->iface->Lock(1);
-    gazebo::SimulationRequestData *gzReq = NULL;
+    libgazebo::SimulationRequestData *gzReq = NULL;
     gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
     gzReq->type = SimulationRequestData::PAUSE;
     this->iface->Unlock();
@@ -291,7 +291,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  this->device_addr))
   {
     this->iface->Lock(1);
-    gazebo::SimulationRequestData *gzReq = NULL;
+    libgazebo::SimulationRequestData *gzReq = NULL;
     gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
     gzReq->type = SimulationRequestData::RESET;
     this->iface->Unlock();
@@ -301,7 +301,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
                                  this->device_addr))
   {
     this->iface->Lock(1);
-    gazebo::SimulationRequestData *gzReq = NULL;
+    libgazebo::SimulationRequestData *gzReq = NULL;
     gzReq = &(this->iface->data->requests[this->iface->data->requestCount++]);
     gzReq->type = SimulationRequestData::SAVE;
     this->iface->Unlock();
@@ -319,7 +319,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &respQueue,
 void SimulationInterface::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  gazebo::SimulationRequestData *response = NULL;
+  libgazebo::SimulationRequestData *response = NULL;
   this->iface->Lock(1);
 
   for (unsigned int i=0; i < this->iface->data->responseCount; i++)
@@ -328,16 +328,16 @@ void SimulationInterface::Update()
 
     switch (response->type)
     {
-      case gazebo::SimulationRequestData::SET_STATE:
-      case gazebo::SimulationRequestData::GO:
-      case gazebo::SimulationRequestData::PAUSE:
-      case gazebo::SimulationRequestData::RESET:
-      case gazebo::SimulationRequestData::SAVE:
-      case gazebo::SimulationRequestData::SET_POSE2D:
-      case gazebo::SimulationRequestData::SET_POSE3D:
+      case libgazebo::SimulationRequestData::SET_STATE:
+      case libgazebo::SimulationRequestData::GO:
+      case libgazebo::SimulationRequestData::PAUSE:
+      case libgazebo::SimulationRequestData::RESET:
+      case libgazebo::SimulationRequestData::SAVE:
+      case libgazebo::SimulationRequestData::SET_POSE2D:
+      case libgazebo::SimulationRequestData::SET_POSE3D:
         break;
 
-      case gazebo::SimulationRequestData::GET_POSE3D:
+      case libgazebo::SimulationRequestData::GET_POSE3D:
         {
 
           if (this->pose3dReq.name_count != strlen(response->name))
@@ -364,7 +364,7 @@ void SimulationInterface::Update()
 
           break;
         }
-      case gazebo::SimulationRequestData::GET_POSE2D:
+      case libgazebo::SimulationRequestData::GET_POSE2D:
         {
 
           if (this->pose2dReq.name_count != strlen(response->name))
@@ -388,7 +388,7 @@ void SimulationInterface::Update()
           break;
         }
 
-      case gazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
+      case libgazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
         {
           player_simulation_property_req_t *req ;
           memset (req, 0, sizeof(player_simulation_property_req_t));

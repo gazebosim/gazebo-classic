@@ -29,7 +29,7 @@
 
 #include <libplayercore/playercore.h>
 
-namespace gazebo
+namespace libgazebo
 {
 
 /// \addtogroup player

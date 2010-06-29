@@ -28,7 +28,7 @@
 #include "GazeboInterface.hh"
 #include "GazeboDriver.hh"
 
-using namespace gazebo;
+using namespace libgazebo;
 
 GazeboInterface::GazeboInterface(player_devaddr_t addr, GazeboDriver *driver,
                                  ConfigFile * /*cf*/, int /*section*/)
