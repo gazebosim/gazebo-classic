@@ -43,6 +43,7 @@ using namespace gazebo;
 /// Constructor
 RTShaderSystem::RTShaderSystem()
 {
+  this->initialized = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +159,8 @@ void RTShaderSystem::Init()
 
     // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
     this->shaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+    this->initialized = true;
   }
   else
     gzerr(0) << "RT Shader system failed to initialize\n";
@@ -166,7 +169,9 @@ void RTShaderSystem::Init()
 
 void RTShaderSystem::Fini()
 {
-#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+  if (!this->initialized)
+    return;
+
   // Restore default scheme.
   Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
@@ -184,46 +189,49 @@ void RTShaderSystem::Fini()
     Ogre::RTShader::ShaderGenerator::finalize();
     this->shaderGenerator = NULL;
   }
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set an Ogre::Entity to use RT shaders
 void RTShaderSystem::AttachEntity(OgreVisual *vis)
 {
-#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+  if (!this->initialized)
+    return;
+
   this->GenerateShaders(vis);
   this->entities.push_back(vis);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove and entity
 void RTShaderSystem::DetachEntity(OgreVisual *vis)
 {
-#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+  if (!this->initialized)
+    return;
+
   this->entities.remove(vis);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the shaders
 void RTShaderSystem::UpdateShaders()
 {
-#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+  if (!this->initialized)
+    return;
+
   std::list<OgreVisual*>::iterator iter;
 
   // Update all the shaders
   for (iter = this->entities.begin(); iter != this->entities.end(); iter++)
     this->GenerateShaders(*iter);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Generate shaders for an entity
 void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 {
-#if INCLUDE_RTSHADER && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= MINOR_VERSION
+  if (!this->initialized)
+    return;
 
   for (unsigned int k=0; k < vis->sceneNode->numAttachedObjects(); k++)
   {
@@ -306,5 +314,4 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 
     }
   }
-#endif
 }

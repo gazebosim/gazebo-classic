@@ -95,6 +95,8 @@ namespace gazebo
     private: std::list<OgreVisual*> entities;
 #endif
 
+    private: bool initialized;
+
     private: friend class DestroyerT<RTShaderSystem>;
     private: friend class SingletonT<RTShaderSystem>;
   };

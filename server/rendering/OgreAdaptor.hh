@@ -119,6 +119,9 @@ namespace gazebo
 
     public: void PrintSceneGraph();
 
+    /// \brief Returns true if the graphics card support GLSL
+    public: bool HasGLSL();
+
     /// \brief Print scene graph
     private: void PrintSceneGraphHelper(std::string prefix, 
                                         Ogre::Node *node);
