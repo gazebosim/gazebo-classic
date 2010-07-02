@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 #include "Simulator.hh"
 #include "GazeboConfig.hh"
+#include "GazeboMessage.hh"
 
 #ifdef HAVE_DL
 #include <dlfcn.h>
@@ -65,12 +66,9 @@ Controller *ControllerFactory::NewController(const std::string &classname, Entit
   }
   else
   {
-    std::ostringstream stream;
-    stream << "Unable to make controller of type " << classname;
-    gzthrow(stream.str());
+    gzmsg(0) << "Error Loading Controller of type [" <<  classname << "], skipping\n" << std::endl;
+    return NULL;
   }
-
-  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

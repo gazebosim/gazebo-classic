@@ -199,8 +199,8 @@ void Sensor::LoadController(XMLConfigNode *node)
   // Create the controller based on it's type
   this->controller = ControllerFactory::NewController(controllerType, this);
 
-  // Load the controller
-  this->controller->Load(node);
+  // Load the controller if it's available
+  if (this->controller) this->controller->Load(node);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
