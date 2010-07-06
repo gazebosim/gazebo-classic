@@ -77,7 +77,7 @@ void GazeboConfig::Load()
     rc.Load(rcFilename);
 
     // if gazebo path is set, skip reading from .gazeborc
-    if(this->ogrePaths.empty() && !ogre_resource_path)
+    if(!ogre_resource_path)
     {
       node = rc.GetRootNode()->GetChild("gazeboPath");
       while (node)
@@ -90,7 +90,7 @@ void GazeboConfig::Load()
     }
 
     // if ogre path is set, skip reading from .gazeborc
-    if(this->ogrePaths.empty() && !ogre_resource_path)
+    if(!ogre_resource_path)
     {
       node = rc.GetRootNode()->GetChild("ogrePath");
       while (node)
@@ -106,13 +106,13 @@ void GazeboConfig::Load()
   {
     gzmsg(0) << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
 
-    if (this->gazeboPaths.empty() &&  !gazebo_resource_path )
+    if (!gazebo_resource_path )
     {
       this->gazeboPaths.push_back("/usr/local/share/gazebo");
       this->AddPluginPaths("/usr/local/share/gazebo/plugins");
     }
 
-    if (this->ogrePaths.empty() &&  !ogre_resource_path )
+    if (!ogre_resource_path )
     {
       this->ogrePaths.push_back("/usr/local/lib/OGRE");
       this->ogrePaths.push_back("/usr/lib/OGRE");
