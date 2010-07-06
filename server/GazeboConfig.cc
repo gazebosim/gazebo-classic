@@ -59,15 +59,15 @@ void GazeboConfig::Load()
   std::string delim(":");
 
   char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
-  if(this->ogrePaths.empty() && ogre_resource_path) 
+  if(ogre_resource_path) 
     this->AddOgrePaths(std::string(ogre_resource_path));
 
   char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
-  if(this->gazeboPaths.empty() && gazebo_resource_path) 
+  if(gazebo_resource_path) 
     this->AddGazeboPaths(std::string(gazebo_resource_path));
 
   char *gazebo_plugin_path = getenv("GAZEBO_PLUGIN_PATH");
-  if(this->pluginPaths.empty() && gazebo_plugin_path) 
+  if(gazebo_plugin_path) 
     this->AddPluginPaths(std::string(gazebo_plugin_path));
 
   if (cfgFile.is_open())
