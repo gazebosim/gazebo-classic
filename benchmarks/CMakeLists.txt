@@ -40,7 +40,7 @@ set (benchmarks laser
 foreach (src ${benchmarks})
   set_source_files_properties(${src}_benchmark.cc PROPERTIES COMPILE_FLAGS "-Wall")
   add_executable(${src}_benchmark ${src}_benchmark.cc)
-  target_link_libraries(${src}_benchmark  gazebo ${LINK_LIBS} )
+  target_link_libraries(${src}_benchmark  gazeboshm ${LINK_LIBS} )
   set_target_properties(${src}_benchmark  PROPERTIES SKIP_BUILD_RPATH TRUE)
   set_target_properties(${src}_benchmark  PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
   install (TARGETS ${src}_benchmark DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
