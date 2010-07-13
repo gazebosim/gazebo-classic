@@ -49,12 +49,12 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find ODE
-  pkg_check_modules(ODE ode)
+  pkg_check_modules(ODE ode>=${ODE_VERSION})
   IF (NOT ODE_FOUND)
     BUILD_ERROR ("ODE and development files not found. See the following website: http://www.ode.org")
-    set (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
-  else (NOT ODE_FOUND)
-    set (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
+    SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
+  ELSE (NOT ODE_FOUND)
+    SET (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
   
     APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
                           ${gazeboserver_include_dirs_desc} 
@@ -71,15 +71,7 @@ if (PKG_CONFIG_FOUND)
     APPEND_TO_CACHED_LIST(gazeboserver_ldflags
                           ${gazeboserver_ldflags_desc} 
                           ${ODE_LDFLAGS})
-  endif (NOT ODE_FOUND)
-
-  pkg_check_modules(ODE_JOINT_DAMPING ode>=${ODE_JOINT_DAMPING_VERSION})
-  if (NOT ODE_JOINT_DAMPING_FOUND)
-    set (INCLUDE_ODE_JOINT_DAMPING FALSE CACHE BOOL "No support for ODE damping")
-  else (NOT ODE_JOINT_DAMPING_FOUND)
-    set (INCLUDE_ODE_JOINT_DAMPING TRUE CACHE BOOL "Include support for ODE damping")
-  endif (NOT ODE_JOINT_DAMPING_FOUND)
-
+  ENDIF (NOT ODE_FOUND)
 
   #################################################
   # Find OGRE 
@@ -160,31 +152,6 @@ if (PKG_CONFIG_FOUND)
 
   ENDIF (NOT XML_FOUND)
 
-  ########################################
-  # Find ODE
-  pkg_check_modules(ODE ode>=${ODE_VERSION})
-  IF (NOT ODE_FOUND)
-    BUILD_ERROR ("ODE and development files not found. See the following website: http://www.ode.org")
-    SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
-  ELSE (NOT ODE_FOUND)
-    SET (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
-  
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${ODE_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${ODE_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                          ${gazeboserver_ldflags_desc} 
-                          ${ODE_LDFLAGS})
-  ENDIF (NOT ODE_FOUND)
 
   ########################################
   # Find libXPM
