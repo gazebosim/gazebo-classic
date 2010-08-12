@@ -126,10 +126,20 @@ void Quatern::Normalize()
 
   s = sqrt(this->u * this->u + this->x * this->x + this->y * this->y + this->z * this->z);
 
-  this->u /= s;
-  this->x /= s;
-  this->y /= s;
-  this->z /= s;
+  if (s == 0)
+  {
+    this->u = 0.0;
+    this->x = 0.0;
+    this->y = 0.0;
+    this->z = 1.0;
+  }
+  else
+  {
+    this->u /= s;
+    this->x /= s;
+    this->y /= s;
+    this->z /= s;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +222,8 @@ Vector3 Quatern::GetAsEuler()
   vec.x = atan2(2 * (this->y*this->z + this->u*this->x), squ - sqx - sqy + sqz);
 
   // Pitch
-  vec.y = asin(-2 * (this->x*this->z - this->u * this->y));
+  double sarg = -2 * (this->x*this->z - this->u * this->y);
+  vec.y = sarg <= -1.0 ? -0.5*M_PI : (sarg >= 1.0 ? 0.5*M_PI : asin(sarg));
 
   // Yaw
   vec.z = atan2(2 * (this->x*this->y + this->u*this->z), squ + sqx - sqy - sqz);
