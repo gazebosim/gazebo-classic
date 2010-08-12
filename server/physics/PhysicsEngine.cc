@@ -52,14 +52,14 @@ PhysicsEngine::PhysicsEngine()
   {
     this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
     this->visual->SetVisible(false);
-    this->contactLines.resize(100);
+    this->contactLines.resize(5000);
 
     Material *mat = new Material();
     mat->SetName("ContactPointsMaterial");
     mat->SetPointSize(10);
-    mat->SetAmbient(Color(1,1,0,1));
-    mat->SetDiffuse(Color(1,1,0,1));
-    mat->SetEmissive(Color(1,1,0,1));
+    mat->SetAmbient(Color(1,0,0,1));
+    mat->SetDiffuse(Color(1,0,0,1));
+    mat->SetEmissive(Color(1,0,0,1));
     std::string matName = OgreCreator::CreateMaterial(mat);
 
     unsigned int i=0;
@@ -69,6 +69,20 @@ PhysicsEngine::PhysicsEngine()
     {
       (*this->contactLinesIter) = OgreCreator::Instance()->CreateDynamicLine(
           OgreDynamicRenderable::OT_LINE_LIST);
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->setMaterial(matName);
@@ -182,8 +196,29 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
   if (!World::Instance()->GetShowContacts())
     return;
 
-  (*this->contactLinesIter)->SetPoint(0, pos);
-  (*this->contactLinesIter)->SetPoint(1, pos+(norm*0.1));
+  Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
+  Vector3 e2 = norm.GetCrossProd(e1); e2.Normalize();
+
+  (*this->contactLinesIter)->SetPoint( 0, pos);
+  (*this->contactLinesIter)->SetPoint( 1, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 2, pos);
+  (*this->contactLinesIter)->SetPoint( 3, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 4, pos);
+  (*this->contactLinesIter)->SetPoint( 5, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 6, pos);
+  (*this->contactLinesIter)->SetPoint( 7, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
+
+  (*this->contactLinesIter)->SetPoint( 8, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 9, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
+
+  (*this->contactLinesIter)->SetPoint(10, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint(11, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
+
+  (*this->contactLinesIter)->SetPoint(12, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
+  (*this->contactLinesIter)->SetPoint(13, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
+
+  (*this->contactLinesIter)->SetPoint(14, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
+  (*this->contactLinesIter)->SetPoint(15, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
 
   this->contactLinesIter++;
 
