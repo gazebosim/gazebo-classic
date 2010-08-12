@@ -115,18 +115,16 @@ void OgreDynamicLines::CreateVertexDeclaration()
 
 void OgreDynamicLines::FillHardwareBuffers()
 {
-  Vector3 vaabMin, vaabMax;
   int size = this->points.size();
   this->PrepareHardwareBuffers(size,0);
+
+  //std::cout << "debug size " << size << std::endl;
 
   if (!size)
   {
     this->mBox.setExtents(Ogre::Vector3::ZERO, Ogre::Vector3::ZERO);
     this->dirty=false;
   }
-
-  vaabMin = this->points[0];
-  vaabMax = this->points[0];
 
   Ogre::HardwareVertexBufferSharedPtr vbuf =
     this->mRenderOp.vertexData->vertexBufferBinding->getBuffer(0);
@@ -140,39 +138,24 @@ void OgreDynamicLines::FillHardwareBuffers()
       *prPos++ = this->points[i].y;
       *prPos++ = this->points[i].z;
 
-      if (this->points[i].x < vaabMin.x)
-        vaabMin.x = this->points[i].x;
-      if (this->points[i].y < vaabMin.y)
-        vaabMin.y = this->points[i].y;
-      if (this->points[i].z < vaabMin.z)
-        vaabMin.z = this->points[i].z;
-
-      if (this->points[i].x > vaabMax.x)
-        vaabMax.x = this->points[i].x;
-      if (this->points[i].y > vaabMax.y)
-        vaabMax.y = this->points[i].y;
-      if (this->points[i].z > vaabMax.z)
-        vaabMax.z = this->points[i].z;
+      this->mBox.merge(Ogre::Vector3(this->points[i].x,this->points[i].y,this->points[i].z));
     }
   }
   vbuf->unlock();
 
-  if (!finite(vaabMin.x))
-    vaabMin.x = 0;
-  if (!finite(vaabMin.y))
-    vaabMin.y = 0;
-  if (!finite(vaabMin.z))
-    vaabMin.z = 0;
+  // std::cout << "debug mBox merging "
+  //    << this->getBoundingBox().getMinimum().x << " , "
+  //    << this->getBoundingBox().getMinimum().y << " , "
+  //    << this->getBoundingBox().getMinimum().z << " | "
+  //    << this->getBoundingBox().getMaximum().x << " , "
+  //    << this->getBoundingBox().getMaximum().y << " , "
+  //    << this->getBoundingBox().getMaximum().z << std::endl;
+  //this->mBox.setExtents(Ogre::Vector3(-1e9,-1e9,-1e9),Ogre::Vector3(1e9,1e9,1e9) );
 
-  if (!finite(vaabMax.x))
-    vaabMax.x = 0;
-  if (!finite(vaabMax.y))
-    vaabMax.y = 0;
-  if (!finite(vaabMax.z))
-    vaabMax.z = 0;
+  // need to update after mBox change, otherwise the lines goes in and out of scope based on old mBox
+  this->getParentSceneNode()->needUpdate();
 
-  this->mBox.setExtents(Ogre::Vector3(vaabMin.x, vaabMin.y, vaabMin.z),
-      Ogre::Vector3(vaabMax.x, vaabMax.y, vaabMax.z) );
+  //this->getParentSceneNode()->showBoundingBox(true); // debug
 
   this->dirty = false;
 }
