@@ -53,6 +53,8 @@ ODEJoint::~ODEJoint()
 void ODEJoint::Load(XMLConfigNode *node)
 {
 
+  Joint::Load(node);
+
   double h = this->physics->GetStepTime().Double();
   double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
   double stopCfm = 1.0 / (h * (**this->stopKpP) + (**this->stopKdP));
@@ -72,8 +74,6 @@ void ODEJoint::Load(XMLConfigNode *node)
     this->feedback = new dJointFeedback;
     dJointSetFeedback(this->jointId, this->feedback);
   }
-
-  Joint::Load(node);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
