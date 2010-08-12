@@ -71,6 +71,9 @@ Light::Light(Entity *parent)
 /// Destructor
 Light::~Light()
 {
+  if (this->light)
+    OgreAdaptor::Instance()->sceneMgr->destroyLight(this->GetName());
+    
   delete this->line;
   delete this->visual;
 
