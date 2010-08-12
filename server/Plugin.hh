@@ -28,8 +28,8 @@ namespace gazebo
 }
 
 #define GZ_REGISTER_PLUGIN(name, classname) \
-extern "C" Plugin *RegisterPlugin(); \
-Plugin *RegisterPlugin() \
+extern "C" gazebo::Plugin *RegisterPlugin(); \
+gazebo::Plugin *RegisterPlugin() \
 {\
   return new classname();\
 }
