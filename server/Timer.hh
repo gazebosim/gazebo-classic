@@ -26,10 +26,17 @@
 #ifndef TIMER_HH
 #define TIMER_HH
 
+#include "gazebo_config.h"
 #include "GazeboMessage.hh"
 #include "Time.hh"
 #include <iostream>
 #include <iomanip>
+
+#ifdef ENABLE_TIMERS
+#define DIAGNOSTICTIMER(x) DiagnosticTimer x
+#else
+#define DIAGNOSTICTIMER(x) ((void)0)
+#endif
 
 namespace gazebo
 {

@@ -88,6 +88,16 @@ ODEPhysics::ODEPhysics()
   dWorldSetAutoDisableSteps(this->worldId, 50);
 
   Param::Begin(&this->parameters);
+
+#ifdef QUICKSTEP_EXPERIMENTAL
+  /// experimental ode stuff
+  this->islandThreadsP = new ParamT<int>("islandThreads",0,0); // number of thread pool threads for islands
+  this->quickStepThreadsP = new ParamT<int>("quickStepThreads",0,0); // number of thread pool threads for quickstep
+  this->quickStepChunksP = new ParamT<int>("quickStepChunks",1,0); // number of thread pool threads for islands
+  this->quickStepOverlapP = new ParamT<int>("quickStepOverlap",0,0); // number of thread pool threads for islands
+  this->quickStepToleranceP = new ParamT<double>("quickStepTolerance",0,0); // number of thread pool threads for islands
+#endif
+
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
   this->stepTypeP = new ParamT<std::string>("stepType", "quick", 0);
@@ -110,7 +120,6 @@ ODEPhysics::ODEPhysics()
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 ODEPhysics::~ODEPhysics()
@@ -125,6 +134,15 @@ ODEPhysics::~ODEPhysics()
 
   this->spaceId = NULL;
   this->worldId = NULL;
+
+#ifdef QUICKSTEP_EXPERIMENTAL
+  /// experimental ode stuff
+  delete this->islandThreadsP;
+  delete this->quickStepThreadsP;
+  delete this->quickStepChunksP;
+  delete this->quickStepOverlapP;
+  delete this->quickStepToleranceP;
+#endif
 
   delete this->globalCFMP;
   delete this->globalERPP;
@@ -153,6 +171,20 @@ void ODEPhysics::Load(XMLConfigNode *node)
   if (node)
     cnode = node->GetChild("ode", "physics");
 
+#ifdef QUICKSTEP_EXPERIMENTAL
+  /// experimental ode stuff
+  this->islandThreadsP->Load(cnode);
+  this->quickStepThreadsP->Load(cnode);
+  this->quickStepChunksP->Load(cnode);
+  this->quickStepOverlapP->Load(cnode);
+  this->quickStepToleranceP->Load(cnode);
+  dWorldSetIslandThreads(this->worldId, this->islandThreadsP->GetValue() );
+  dWorldSetQuickStepThreads(this->worldId, this->quickStepThreadsP->GetValue() );
+  dWorldSetQuickStepNumChunks(this->worldId, this->quickStepChunksP->GetValue() );
+  dWorldSetQuickStepNumOverlap(this->worldId, this->quickStepOverlapP->GetValue() );
+  dWorldSetQuickStepTolerance(this->worldId, this->quickStepToleranceP->GetValue() );
+#endif
+ 
   this->gravityP->Load(cnode);
   this->stepTimeP->Load(cnode);
   this->updateRateP->Load(cnode);
@@ -218,6 +250,14 @@ void ODEPhysics::Load(XMLConfigNode *node)
 void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<physics:ode>\n";
+  // experimental ode stuff
+#ifdef QUICKSTEP_EXPERIMENTAL
+  stream << prefix << "  " << *(this->islandThreadsP) << "\n";
+  stream << prefix << "  " << *(this->quickStepThreadsP) << "\n";
+  stream << prefix << "  " << *(this->quickStepChunksP) << "\n";
+  stream << prefix << "  " << *(this->quickStepOverlapP) << "\n";
+  stream << prefix << "  " << *(this->quickStepToleranceP) << "\n";
+#endif
   stream << prefix << "  " << *(this->stepTimeP) << "\n";
   stream << prefix << "  " << *(this->gravityP) << "\n";
   stream << prefix << "  " << *(this->updateRateP) << "\n";
@@ -338,7 +378,7 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   this->LockMutex(); 
   {
-    //DiagnosticTimer timer("ODEPhysics Collision Update");
+    DIAGNOSTICTIMER(timer("ODEPhysics Collision dSpaceCollide",1));
     dSpaceCollide( this->spaceId, this, CollisionCallback );
   }
   this->UnlockMutex(); 
@@ -385,24 +425,32 @@ void ODEPhysics::UpdatePhysics()
 {
   PhysicsEngine::UpdatePhysics();
 
-  this->UpdateCollision();
+  {
+    DIAGNOSTICTIMER(timer("ODEPhysics: UpdateCollision",1));
+    this->UpdateCollision();
+  }
 
-  this->LockMutex(); 
-
-  //DiagnosticTimer timer("ODEPhysics Step Update");
+  {
+    DIAGNOSTICTIMER(timer("ODEPhysics: LockMutex",1));
+    this->LockMutex(); 
+  }
 
   // Update the dynamical model
   /// \brief @todo: quickStepP used here for backwards compatibility,
   ///        should tick tock deprecation as we switch to nested tags
-  if (**this->stepTypeP == "quick" || **this->quickStepP == true)
-    dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
-  else if (**this->stepTypeP == "world")
-    dWorldStep( this->worldId, (**this->stepTimeP).Double() );
-  else
-    gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
+  {
+    DIAGNOSTICTIMER(timer("ODEPhysics: Constraint Solver",1));
 
-  // Very important to clear out the contact group
-  dJointGroupEmpty( this->contactGroup );
+    if (**this->stepTypeP == "quick" || **this->quickStepP == true)
+      dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
+    else if (**this->stepTypeP == "world")
+      dWorldStep( this->worldId, (**this->stepTimeP).Double() );
+    else
+      gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
+
+    // Very important to clear out the contact group
+    dJointGroupEmpty( this->contactGroup );
+  }
 
   this->UnlockMutex(); 
 }

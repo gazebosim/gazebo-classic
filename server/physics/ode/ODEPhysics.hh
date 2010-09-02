@@ -29,6 +29,8 @@
 
 #include <ode/ode.h>
 
+#include "gazebo_config.h"
+
 #include "Param.hh"
 #include "PhysicsEngine.hh"
 #include "Shape.hh"
@@ -218,6 +220,16 @@ class ODEPhysics : public PhysicsEngine
   private: std::map<std::string, dSpaceID> spaces;
 
   private: std::vector<dContactGeom> contactGeoms;
+
+#ifdef QUICKSTEP_EXPERIMENTAL
+  /// experimental ode stuff
+  private: ParamT<int>    *islandThreadsP; // number of thread pool threads for islands
+  private: ParamT<int>    *quickStepThreadsP; // number of thread pool threads for quickstep
+  private: ParamT<int>    *quickStepChunksP; // number of thread pool threads for islands
+  private: ParamT<int>    *quickStepOverlapP; // number of thread pool threads for islands
+  private: ParamT<double> *quickStepToleranceP; // number of thread pool threads for islands
+#endif
+
 };
 
 /** \}*/
