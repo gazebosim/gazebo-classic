@@ -656,24 +656,22 @@ void Simulator::PhysicsLoop()
 
   world->GetPhysicsEngine()->InitForThread();
 
-  Time step = world->GetPhysicsEngine()->GetStepTime();
-  double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
-  Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
-
   bool userStepped;
   Time diffTime;
   Time currTime;
   Time lastTime = this->GetRealTime();
   struct timespec req, rem;
 
+  // hack for ROS, since ROS uses t=0 for special purpose
+  this->simTime = world->GetPhysicsEngine()->GetStepTime();
 
   while (!this->userQuit)
   {
     //DiagnosticTimer timer("PhysicsLoop Timer ");
-
-
     currTime = this->GetRealTime();
 
+    // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
+    Time step = world->GetPhysicsEngine()->GetStepTime();
     userStepped = false;
     if (this->IsPaused())
       this->pauseTime += step;
@@ -697,6 +695,8 @@ void Simulator::PhysicsLoop()
     req.tv_sec  = 0;
     req.tv_nsec = 10000;
 
+    double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
+    Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
     // If the physicsUpdateRate < 0, then we should try to match the
     // update rate to real time
     if ( physicsUpdateRate < 0 &&
