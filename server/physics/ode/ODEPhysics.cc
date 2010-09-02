@@ -378,7 +378,7 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   this->LockMutex(); 
   {
-    DIAGNOSTICTIMER(timer("ODEPhysics Collision dSpaceCollide",1));
+    DIAGNOSTICTIMER(timer("ODEPhysics Collision dSpaceCollide",6));
     dSpaceCollide( this->spaceId, this, CollisionCallback );
   }
   this->UnlockMutex(); 
@@ -426,12 +426,12 @@ void ODEPhysics::UpdatePhysics()
   PhysicsEngine::UpdatePhysics();
 
   {
-    DIAGNOSTICTIMER(timer("ODEPhysics: UpdateCollision",1));
+    DIAGNOSTICTIMER(timer("ODEPhysics: UpdateCollision",6));
     this->UpdateCollision();
   }
 
   {
-    DIAGNOSTICTIMER(timer("ODEPhysics: LockMutex",1));
+    DIAGNOSTICTIMER(timer("ODEPhysics: LockMutex",6));
     this->LockMutex(); 
   }
 
@@ -439,7 +439,7 @@ void ODEPhysics::UpdatePhysics()
   /// \brief @todo: quickStepP used here for backwards compatibility,
   ///        should tick tock deprecation as we switch to nested tags
   {
-    DIAGNOSTICTIMER(timer("ODEPhysics: Constraint Solver",1));
+    DIAGNOSTICTIMER(timer("ODEPhysics: Constraint Solver",6));
 
     if (**this->stepTypeP == "quick" || **this->quickStepP == true)
       dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());

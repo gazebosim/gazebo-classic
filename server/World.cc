@@ -336,7 +336,7 @@ void World::Update()
   }
 
   {
-    //DiagnosticTimer timer("World::Update Models");
+    DIAGNOSTICTIMER(timer("World::Update Models",6));
 
     // Update all the models
     std::vector< Model* >::iterator miter;
@@ -359,7 +359,7 @@ void World::Update()
        Simulator::Instance()->GetPhysicsEnabled())
   {
     {
-      //DiagnosticTimer timer("World::Update Physics");
+      DIAGNOSTICTIMER(timer("World::Update Physics",6));
       this->physicsEngine->UpdatePhysics();
     }
 

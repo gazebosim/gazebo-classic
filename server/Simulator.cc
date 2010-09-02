@@ -405,7 +405,7 @@ void Simulator::MainLoop()
 {
   this->state = RUN;
 
-  //DiagnosticTimer timer("--------------------------- START Simulator::MainLoop() --------------------------");
+  //DIAGNOSTICTIMER(timer("--------------------------- START Simulator::MainLoop() --------------------------",6));
   Time currTime = 0;
   Time lastTime = 0;
   struct timespec timeSpec;
@@ -417,24 +417,41 @@ void Simulator::MainLoop()
   // Update the gui
   while (!this->userQuit)
   {
+    DIAGNOSTICTIMER(timer("GUI LOOP",6));
+
     currTime = this->GetWallTime();
     if ( currTime - lastTime > 1.0/freq)
     {
       lastTime = this->GetWallTime();
 
       if (this->gui)
+      {
+        DIAGNOSTICTIMER(timer("GUI update",6));
         this->gui->Update();
+      }
 
       if (this->renderEngineEnabled)
       {
-        OgreAdaptor::Instance()->UpdateCameras();
-        World::Instance()->GraphicsUpdate();
+        {
+          DIAGNOSTICTIMER(timer("Camera update",6));
+          OgreAdaptor::Instance()->UpdateCameras();
+        }
+        {
+          DIAGNOSTICTIMER(timer("Graphics update",6));
+          World::Instance()->GraphicsUpdate();
+        }
       }
 
       currTime = this->GetWallTime();
 
-      World::Instance()->ProcessEntitiesToLoad();
-      World::Instance()->ProcessEntitiesToDelete();
+      {
+        DIAGNOSTICTIMER(timer("Process Entities to Load",6));
+        World::Instance()->ProcessEntitiesToLoad();
+      }
+      {
+        DIAGNOSTICTIMER(timer("Process Entities to Delete",6));
+        World::Instance()->ProcessEntitiesToDelete();
+      }
 
       if (currTime - lastTime < 1/freq)
       {
@@ -667,7 +684,9 @@ void Simulator::PhysicsLoop()
 
   while (!this->userQuit)
   {
-    //DiagnosticTimer timer("PhysicsLoop Timer ");
+    DIAGNOSTICTIMER(timer("PHYSICS LOOP ",6));
+
+    //DIAGNOSTICTIMER(timer("PhysicsLoop Timer ",6));
     currTime = this->GetRealTime();
 
     // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
@@ -684,9 +703,18 @@ void Simulator::PhysicsLoop()
     lastTime = this->GetRealTime();
 
     {
-      boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
-      boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
-      world->Update();
+      {
+        DIAGNOSTICTIMER(timer("PhysicsLoop Get Rendering Mutex ",6));
+        boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
+      }
+      {
+        DIAGNOSTICTIMER(timer("PhysicsLoop Get Model Mutex ",6));
+        boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
+      }
+      {
+        DIAGNOSTICTIMER(timer("PhysicsLoop world->Update() ",6));
+        world->Update();
+      }
     }
 
     currTime = this->GetRealTime();
@@ -722,7 +750,7 @@ void Simulator::PhysicsLoop()
     nanosleep(&req, &rem);
 
     {
-      //DiagnosticTimer timer("PhysicsLoop UpdateSimIfaces ");
+      DIAGNOSTICTIMER(timer("PhysicsLoop UpdateSimIfaces ",6));
 
       // Process all incoming messages from simiface
       world->UpdateSimulationIface();

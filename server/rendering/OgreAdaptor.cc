@@ -53,6 +53,8 @@
 #include "RTShaderSystem.hh"
 #include "OgreAdaptor.hh"
 
+#include "Timer.hh"
+
 using namespace gazebo;
 
 enum SceneTypes{SCENE_BSP, SCENE_EXT};
@@ -468,23 +470,35 @@ void OgreAdaptor::UpdateCameras()
   this->root->_fireFrameStarted();
 
   // Draw all the non-user cameras
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {
-    if (dynamic_cast<UserCamera*>((*iter)) == NULL)
-      (*iter)->Render();
+    DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
+    for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+    {
+      if (dynamic_cast<UserCamera*>((*iter)) == NULL)
+        (*iter)->Render();
+    }
   }
 
-  this->root->renderOneFrame();
+  {
+    DIAGNOSTICTIMER(timer("UpdateCameras: render one frame",6));
+    this->root->renderOneFrame();
+  }
 
   // Must update the user camera's last.
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {
-    userCam = dynamic_cast<UserCamera*>((*iter));
-    if (userCam)
-      userCam->Update();
+    DIAGNOSTICTIMER(timer("UpdateCameras: UserCamera update",6));
+    for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+    {
+      userCam = dynamic_cast<UserCamera*>((*iter));
+      if (userCam)
+        userCam->Update();
+    }
   }
 
-  this->root->_fireFrameEnded();
+  {
+    DIAGNOSTICTIMER(timer("UpdateCameras: _fireFrameEnded",6));
+    this->root->_fireFrameEnded();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
