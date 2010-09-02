@@ -131,12 +131,16 @@ void SimulationIface::Open(Client *client, std::string id)
 
   // Create the thread which waits "blockTimeUs" microseconds and
   // then signals the goAckSignal
-  if (this->goAckThread == NULL)
-  {
-    this->goAckThread = new boost::thread( 
-        boost::bind(&SimulationIface::BlockThread, this));
-    usleep(100);
-  }
+
+  // this thread causes some kind of race condition
+  // goAckSignal is partially unallocated sometimes
+  // comment out for now
+  // if (this->goAckThread == NULL)
+  // {
+  //   this->goAckThread = new boost::thread( 
+  //       boost::bind(&SimulationIface::BlockThread, this));
+  //   usleep(100);
+  // }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
