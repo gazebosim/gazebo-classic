@@ -164,9 +164,9 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
     if (this->imageFormatP->GetValue() == "L8")
       this->imageFormat = Ogre::PF_L8;
     else if (this->imageFormatP->GetValue() == "R8G8B8")
-      this->imageFormat = Ogre::PF_R8G8B8;
-    else if (this->imageFormatP->GetValue() == "B8G8R8")
       this->imageFormat = Ogre::PF_B8G8R8;
+    else if (this->imageFormatP->GetValue() == "B8G8R8")
+      this->imageFormat = Ogre::PF_R8G8B8;
     else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
               (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
               (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
