@@ -51,16 +51,16 @@ void GazeboConfig::Load()
 {
   std::ifstream cfgFile;
 
-  std::string rcFilename = getenv("HOME");
-  rcFilename += "/.gazeborc";
+  std::string rcFilename = getenv("GAZEBORC");
+  if (rcFilename.empty())
+  {
+    std::string rcFilename = getenv("HOME");
+    rcFilename += "/.gazeborc";
+  }
 
   cfgFile.open(rcFilename.c_str(), std::ios::in);
 
   std::string delim(":");
-
-  char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
-  if(ogre_resource_path) 
-    this->AddOgrePaths(std::string(ogre_resource_path));
 
   char *gazebo_resource_path = getenv("GAZEBO_RESOURCE_PATH");
   if(gazebo_resource_path) 
@@ -70,21 +70,36 @@ void GazeboConfig::Load()
   if(gazebo_plugin_path) 
     this->AddPluginPaths(std::string(gazebo_plugin_path));
 
+  char *ogre_resource_path = getenv("OGRE_RESOURCE_PATH");
+  if(ogre_resource_path) 
+    this->AddOgrePaths(std::string(ogre_resource_path));
+
   if (cfgFile.is_open())
   {
     XMLConfig rc;
     XMLConfigNode *node;
     rc.Load(rcFilename);
 
-    // if gazebo path is set, skip reading from .gazeborc
-    if(!ogre_resource_path)
+    // if gazebo resource path is set, skip reading from .gazeborc
+    if(!gazebo_resource_path)
     {
       node = rc.GetRootNode()->GetChild("gazeboPath");
       while (node)
       {
         gzmsg(5) << "Gazebo Path[" << node->GetValue() << "]\n";
-        this->gazeboPaths.push_back(node->GetValue());
-        this->AddPluginPaths(node->GetValue()+"/plugins");
+        this->AddGazeboPaths(node->GetValue());
+        node = node->GetNext("gazeboPath");
+      }
+    }
+
+    // if gazebo plugins path is set, skip reading from .gazeborc
+    if(!gazebo_plugin_path)
+    {
+      node = rc.GetRootNode()->GetChild("pluginPath");
+      while (node)
+      {
+        gzmsg(5) << "Gazebo Plugins Path[" << node->GetValue() << "]\n";
+        this->AddPluginPaths(node->GetValue());
         node = node->GetNext("gazeboPath");
       }
     }
@@ -96,29 +111,32 @@ void GazeboConfig::Load()
       while (node)
       {
         gzmsg(5) << "Ogre Path[" << node->GetValue() << "]\n";
-        this->ogrePaths.push_back( node->GetValue() );
+        this->AddOgrePaths( node->GetValue() );
         node = node->GetNext("ogrePath");
       }
     }
 
   }
-  else
+
+  // add system paths if paths are empty
+  if (this->gazeboPaths.empty())
   {
-    gzmsg(0) << "Unable to find the file ~/.gazeborc. Using default paths. This may cause OGRE to fail.\n";
-
-    if (!gazebo_resource_path )
-    {
-      this->gazeboPaths.push_back("/usr/local/share/gazebo");
-      this->AddPluginPaths("/usr/local/share/gazebo/plugins");
-    }
-
-    if (!ogre_resource_path )
-    {
-      this->ogrePaths.push_back("/usr/local/lib/OGRE");
-      this->ogrePaths.push_back("/usr/lib/OGRE");
-    }
-
+    gzmsg(0) << "No Gazebo media paths have been specified, using system gazebo media paths.\n";
+    this->AddGazeboPaths("/usr/local/share/gazebo");
   }
+  if (this->pluginPaths.empty())
+  {
+    gzmsg(0) << "No Gazebo plugin paths have been specified, using system plugin paths.\n";
+    this->AddPluginPaths("/usr/local/share/gazebo/plugins");
+  }
+
+  if (this->ogrePaths.empty())
+  {
+    gzmsg(0) << "No Gazebo Ogre paths have been specified, using system ogre paths.\n";
+    this->ogrePaths.push_back("/usr/local/lib/OGRE");
+    this->ogrePaths.push_back("/usr/lib/OGRE");
+  }
+
 }
 
 std::list<std::string> &GazeboConfig::GetGazeboPaths() 
