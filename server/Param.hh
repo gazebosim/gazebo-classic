@@ -85,7 +85,7 @@ namespace gazebo
   class ParamT : public Param
   {
     /// \brief Constructor
-    public: ParamT(std::string key, T defValue, int required);
+    public: ParamT(std::string key, T defValue, int required, bool deprecated=false, std::string deprecate_msg=NULL);
   
     /// \brief Destructor
     public: virtual ~ParamT();
@@ -133,7 +133,7 @@ namespace gazebo
   //////////////////////////////////////////////////////////////////////////////
   // Constructor
   template< typename T>
-  ParamT<T>::ParamT(std::string key, T defValue, int required)
+  ParamT<T>::ParamT(std::string key, T defValue, int required, bool deprecated, std::string deprecate_msg)
     : Param(this)
   {
     this->key = key;
@@ -142,6 +142,7 @@ namespace gazebo
     this->value = this->defaultValue;
 
     this->typeName = typeid(T).name();
+    if (deprecated) std::cerr << "Param [" << key << "] is deprecated: [" << deprecate_msg << "]\n";
   }
   
   //////////////////////////////////////////////////////////////////////////////
