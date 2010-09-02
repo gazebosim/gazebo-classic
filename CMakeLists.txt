@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set (GAZEBO_MAJOR_VERSION 0)
 set (GAZEBO_MINOR_VERSION 10)
-set (GAZEBO_PATCH_VERSION 0)
+set (GAZEBO_PATCH_VERSION 0) # change to 1 for ode damping
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
 
@@ -101,8 +101,8 @@ else (build_errors)
   
   ########################################
   # Make the gazebo rc file
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
+  # configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeborc.cmake ${PROJECT_BINARY_DIR}/.gazeborc @ONLY)
+  # install(FILES ${CMAKE_CURRENT_BINARY_DIR}/.gazeborc DESTINATION $ENV{HOME}/)
  
   include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
   
