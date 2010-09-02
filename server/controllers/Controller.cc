@@ -46,7 +46,7 @@ Controller::Controller(Entity *entity )
   Param::Begin(&this->parameters);
   this->nameP = new ParamT<std::string>("name","",1);
   this->alwaysOnP = new ParamT<bool>("alwaysOn", false, 0);
-  this->updatePeriodP = new ParamT<double>("updateRate", 10, 0);
+  this->updateRateP = new ParamT<double>("updateRate", 10, 0);
   Param::End();
 
   if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
@@ -63,7 +63,7 @@ Controller::~Controller()
 {
   delete this->nameP;
   delete this->alwaysOnP;
-  delete this->updatePeriodP;
+  delete this->updateRateP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,9 +81,9 @@ void Controller::Load(XMLConfigNode *node)
 
   this->alwaysOnP->Load(node);
 
-  this->updatePeriodP->Load(node);
+  this->updateRateP->Load(node);
 
-  double updateRate  = this->updatePeriodP->GetValue();
+  double updateRate  = this->updateRateP->GetValue();
   if (updateRate == 0)
     this->updatePeriod = 0.0; // no throttling if updateRate is 0
   else
@@ -159,7 +159,7 @@ void Controller::Save(std::string &prefix, std::ostream &stream)
 
   stream << prefix << "<controller:" << this->typeName << " name=\"" << this->nameP->GetValue() << "\">\n";
 
-  stream << prefix << "  " << *(this->updatePeriodP) << "\n";
+  stream << prefix << "  " << *(this->updateRateP) << "\n";
 
   // Ouptut the interfaces
   for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)

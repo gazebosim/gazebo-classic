@@ -123,7 +123,7 @@ class Controller
 
   /// \brief Update period 
   protected: double updatePeriod;
-  protected: ParamT<double> *updatePeriodP;
+  protected: ParamT<double> *updateRateP;
 
   private: std::string typeName;
 
