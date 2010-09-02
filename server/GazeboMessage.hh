@@ -85,6 +85,9 @@ namespace gazebo
     /// \brief Set the verbosity
     /// \param level Level of the verbosity
     public: void SetVerbose( int level );
+
+    /// \brief Get the current verbosity level
+    public: int GetVerbose() {return this->level;};
   
     /// \brief Use this to output a message to the terminal
     /// \param level Level of the message
