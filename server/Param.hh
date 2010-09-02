@@ -85,7 +85,7 @@ namespace gazebo
   class ParamT : public Param
   {
     /// \brief Constructor
-    public: ParamT(std::string key, T defValue, int required, bool deprecated=false, std::string deprecate_msg=NULL);
+    public: ParamT(std::string key, T defValue, int required, bool deprecated=false, std::string deprecate_msg=std::string());
   
     /// \brief Destructor
     public: virtual ~ParamT();
