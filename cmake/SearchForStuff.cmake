@@ -1,9 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include (CheckCXXSourceCompiles)
 
-# John - ode version with joint damping
-SET(ODE_JOINT_DAMPING_VERSION 0.11.1.1 CACHE INTERNAL "ODE version with joint damping" FORCE)
-
 set (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
@@ -72,6 +69,15 @@ if (PKG_CONFIG_FOUND)
                           ${gazeboserver_ldflags_desc} 
                           ${ODE_LDFLAGS})
   ENDIF (NOT ODE_FOUND)
+
+  # patched ode version with joint damping
+  SET(ODE_JOINT_DAMPING_VERSION 0.11.1.68 CACHE INTERNAL "ODE version with joint damping" FORCE)
+  pkg_check_modules(ODE_JOINT_DAMPING ode>=${ODE_JOINT_DAMPING_VERSION})
+  IF (NOT ODE_JOINT_DAMPING_FOUND)
+    SET (INCLUDE_ODE_JOINT_DAMPING FALSE CACHE BOOL "No support for ODE damping")
+  ELSE (NOT ODE_JOINT_DAMPING_FOUND)
+    SET (INCLUDE_ODE_JOINT_DAMPING TRUE CACHE BOOL "Include support for ODE damping")
+  ENDIF (NOT ODE_JOINT_DAMPING_FOUND)
 
   #################################################
   # Find OGRE 
