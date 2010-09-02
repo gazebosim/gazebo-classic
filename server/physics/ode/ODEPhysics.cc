@@ -98,9 +98,17 @@ ODEPhysics::ODEPhysics()
   this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", false, 0);
   this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
   this->maxContactsP = new ParamT<int>("maxContacts",1000,0); // enforced for trimesh-trimesh contacts
+
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  this->quickStepP      = new ParamT<bool>  ("quickStep", false, 0, true, "replace quickStep with stepType");
+  this->quickStepItersP = new ParamT<int>   ("quickStepIters", -1, 0, true, "replace quickStepIters with stepIters");
+  this->quickStepWP     = new ParamT<double>("quickStepW", -1.0, 0, true, "replace quickStepW with stepW");
+
   Param::End();
 
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,6 +136,12 @@ ODEPhysics::~ODEPhysics()
   delete this->autoDisableBodyP;
   delete this->contactFeedbacksP;
   delete this->maxContactsP;
+
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  delete this->quickStepP;
+  delete this->quickStepItersP;
+  delete this->quickStepWP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,6 +166,12 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->autoDisableBodyP->Load(cnode);
   this->contactFeedbacksP->Load(cnode);
   this->maxContactsP->Load(cnode);
+
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  this->quickStepP->Load(cnode);
+  this->quickStepItersP->Load(cnode);
+  this->quickStepWP->Load(cnode);
 
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, contactMaxCorrectingVelP->GetValue());
@@ -182,6 +202,15 @@ void ODEPhysics::Load(XMLConfigNode *node)
 
   dWorldSetQuickStepNumIterations(this->worldId, **this->stepItersP );
   dWorldSetQuickStepW(this->worldId, **this->stepWP );
+
+
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  if (this->quickStepItersP->GetValue() > 0) // only set them if specified
+    dWorldSetQuickStepNumIterations(this->worldId, **this->quickStepItersP );
+  if (this->quickStepWP->GetValue() > 0) // only set them if specified
+    dWorldSetQuickStepW(this->worldId, **this->quickStepWP );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,6 +228,11 @@ void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->stepWP) << "\n";
   stream << prefix << "  " << *(this->contactMaxCorrectingVelP) << "\n";
   stream << prefix << "  " << *(this->contactSurfaceLayerP) << "\n";
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  stream << prefix << "  " << *(this->quickStepP) << "\n";
+  stream << prefix << "  " << *(this->quickStepItersP) << "\n";
+  stream << prefix << "  " << *(this->quickStepWP) << "\n";
   stream << prefix << "</physics:ode>\n";
 }
 
@@ -358,7 +392,9 @@ void ODEPhysics::UpdatePhysics()
   //DiagnosticTimer timer("ODEPhysics Step Update");
 
   // Update the dynamical model
-  if (**this->stepTypeP == "quick")
+  /// \brief @todo: quickStepP used here for backwards compatibility,
+  ///        should tick tock deprecation as we switch to nested tags
+  if (**this->stepTypeP == "quick" || **this->quickStepP == true)
     dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
   else if (**this->stepTypeP == "world")
     dWorldStep( this->worldId, (**this->stepTimeP).Double() );
@@ -370,7 +406,6 @@ void ODEPhysics::UpdatePhysics()
 
   this->UnlockMutex(); 
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Finilize the ODE engine
@@ -628,6 +663,10 @@ dSpaceID ODEPhysics::GetSpaceId() const
 /// Get the step type
 std::string ODEPhysics::GetStepType() const
 {
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  if (**this->quickStepP) return "quick";
+
   return **this->stepTypeP;
 }
 
@@ -636,6 +675,10 @@ std::string ODEPhysics::GetStepType() const
 void ODEPhysics::SetStepType(const std::string type)
 {
   this->stepTypeP->SetValue(type);
+
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  this->quickStepP->SetValue(false); // use new tags
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -721,11 +764,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           continue;
 
         contact.geom = self->contactGeoms[i];
-        contact.surface.mode = dContactSlip1 | dContactSlip2 | 
-                               dContactSoftERP | dContactSoftCFM |  
-                               dContactBounce | dContactMu2 | dContactApprox1;
-        //contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1 | dContactSlip1 | dContactSlip2;
-        // with dContactSoftERP | dContactSoftCFM the test_pr2_collision overshoots the cup
+        contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
 
         // Compute the CFM and ERP by assuming the two bodies form a
         // spring-damper system.

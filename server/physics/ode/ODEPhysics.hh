@@ -200,6 +200,12 @@ class ODEPhysics : public PhysicsEngine
   private: ParamT<int> *contactFeedbacksP;
   private: ParamT<int> *maxContactsP;
 
+  /// \brief @todo: for backwards compatibility, should tick tock
+  ///        deprecation as we switch to nested tags
+  private: ParamT<bool>   *quickStepP;
+  private: ParamT<int>    *quickStepItersP;
+  private: ParamT<double> *quickStepWP;
+
   private: class ContactFeedback
            {
              public: Contact contact;
