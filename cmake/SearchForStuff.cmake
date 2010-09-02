@@ -71,13 +71,15 @@ if (PKG_CONFIG_FOUND)
   ENDIF (NOT ODE_FOUND)
 
   # patched ode version with joint damping
-  SET(ODE_JOINT_DAMPING_VERSION 0.11.1.68 CACHE INTERNAL "ODE version with joint damping" FORCE)
-  pkg_check_modules(ODE_JOINT_DAMPING ode>=${ODE_JOINT_DAMPING_VERSION})
-  IF (NOT ODE_JOINT_DAMPING_FOUND)
+  SET(ODE_WG_PATCHES_VERSION 0.11.1.68 CACHE INTERNAL "ODE version with joint damping" FORCE)
+  pkg_check_modules(ODE_WG_PATCHES ode>=${ODE_WG_PATCHES_VERSION})
+  IF (NOT ODE_WG_PATCHES_FOUND)
     SET (INCLUDE_ODE_JOINT_DAMPING FALSE CACHE BOOL "No support for ODE damping")
-  ELSE (NOT ODE_JOINT_DAMPING_FOUND)
+    SET (QUICKSTEP_EXPERIMENTAL FALSE CACHE BOOL "support for ODE quickstep experimental stuff")
+  ELSE (NOT ODE_WG_PATCHES_FOUND)
     SET (INCLUDE_ODE_JOINT_DAMPING TRUE CACHE BOOL "Include support for ODE damping")
-  ENDIF (NOT ODE_JOINT_DAMPING_FOUND)
+    SET (QUICKSTEP_EXPERIMENTAL TRUE CACHE BOOL "support for ODE quickstep experimental stuff")
+  ENDIF (NOT ODE_WG_PATCHES_FOUND)
 
   #################################################
   # Find OGRE 
