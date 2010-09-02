@@ -28,6 +28,8 @@
 
 #include "GazeboMessage.hh"
 #include "Time.hh"
+#include <iostream>
+#include <iomanip>
 
 namespace gazebo
 {
@@ -56,7 +58,7 @@ namespace gazebo
     public: friend std::ostream &operator<<(std::ostream &out, 
                                             const gazebo::Timer &t)
             {
-              out << t.GetElapsed();
+              out << std::fixed << std::setprecision(6) << t.GetElapsed();
               return out;
             }
 
@@ -73,20 +75,26 @@ namespace gazebo
             {
               this->name = name; 
               this->msgLevel = level; 
-              this->Report("Start @ ");
+              //this->Report("Start @ ");
             }
 
     /// \brief Destructor
     public: virtual ~DiagnosticTimer() 
             { 
-              this->Report("Complete @ "); 
+              this->Report("Duration: "); 
             }
 
     /// \brief Report a time
     public: void Report(const std::string msg)
             {
-              gzmsg(this->msgLevel) << this->name << "["
-                << msg << *this << "]\n";
+              //switching to printf so messages do not get broken up into interlaced pieces on multiple threads
+              //(gazebo::GazeboMessage::Instance()->Msg(this->msgLevel)) << this->name << "[" << msg << *this << "]\n";
+              if (gazebo::GazeboMessage::Instance()->GetVerbose() >= this->msgLevel)
+              {
+                std::ostringstream stream;
+                stream << this->name << "[" << msg << *this << "]\n";
+                printf("%s",stream.str().c_str());
+              }
             }
 
     private: int msgLevel;

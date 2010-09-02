@@ -33,6 +33,7 @@ using namespace gazebo;
 Timer::Timer(Type t)
 {
   this->type = t;
+  this->Start(); // auto start on construction, should not hurt
 }
         
 ////////////////////////////////////////////////////////////////////////////////
