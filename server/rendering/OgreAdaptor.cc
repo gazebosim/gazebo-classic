@@ -474,8 +474,6 @@ void OgreAdaptor::UpdateCameras()
       (*iter)->Render();
   }
 
-  this->root->renderOneFrame();
-
   // Must update the user camera's last.
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {

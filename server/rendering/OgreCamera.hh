@@ -244,6 +244,9 @@ namespace gazebo
     /// \brief Hande a mouse event
     public: void HandleMouseEvent(const MouseEvent &evt);
 
+    /// \brief Get the time of the last render update
+    public: gazebo::Time GetLastRenderTime() const; 
+
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
 
@@ -301,6 +304,9 @@ namespace gazebo
     private: Ogre::AnimationState *animState;
 
     private: ViewController *viewController;
+
+    protected: Time lastRenderTime;
+
   };
   
   /// \}
