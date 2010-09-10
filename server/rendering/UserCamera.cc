@@ -186,10 +186,14 @@ void UserCamera::Update()
   this->lastUpdate = Simulator::Instance()->GetRealTime();
 
   {
+    DIAGNOSTICTIMER(timer("UserCamera: UpdateCam with MDMutex",6));
     boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
     OgreCamera::UpdateCam();
   }
-  this->window->update();
+  {
+    DIAGNOSTICTIMER(timer("UserCamera: window->update",6));
+    this->window->update();
+  }
 
   if (this->saveFramesP->GetValue())
   {
