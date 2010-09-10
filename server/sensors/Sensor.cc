@@ -53,7 +53,7 @@ Sensor::Sensor(Body *body)
 
   Param::Begin(&this->parameters);
   this->updateRateP = new ParamT<double>("updateRate", 0, 0);
-  this->updateRateP->Callback(&Sensor::SetUpdateRate, (Sensor*)this);
+  this->updateRateP->Callback(&Sensor::SetUpdateRate, this);
   this->alwaysActiveP = new ParamT<bool>("alwaysActive", false, 0);
   Param::End();
 }
@@ -72,6 +72,9 @@ void Sensor::Load(XMLConfigNode *node)
 {
   this->nameP->Load(node);
   this->updateRateP->Load(node);
+  this->SetUpdateRate(this->updateRateP->GetValue());
+  //printf("updatePeriod loaded %f Rate: %f\n",this->updatePeriod.Double(),**this->updateRateP);
+
   this->alwaysActiveP->Load(node);
 
   this->LoadController( node->GetChildByNSPrefix("controller") );
@@ -81,18 +84,7 @@ void Sensor::Load(XMLConfigNode *node)
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Save the sensor info in XML format
-void Sensor::SetUpdateRate(const double &rate)
-{
 
-  this->updateRateP->SetValue(rate);
-  if (rate == 0)
-    this->updatePeriod = 0.0;
-  else
-    this->updatePeriod = 1.0 / rate;
-
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +115,19 @@ void Sensor::Init()
   this->lastUpdate = Simulator::Instance()->GetSimTime();
 
   this->InitChild();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the sensor info in XML format
+void Sensor::SetUpdateRate(const double &rate)
+{
+
+  if (rate == 0)
+    this->updatePeriod = 0.0;
+  else
+    this->updatePeriod = 1.0 / rate;
+  this->updateRateP->SetValue(rate); // need this when called externally
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

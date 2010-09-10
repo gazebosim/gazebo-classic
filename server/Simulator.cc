@@ -704,15 +704,9 @@ void Simulator::PhysicsLoop()
 
     {
       {
-        DIAGNOSTICTIMER(timer("PhysicsLoop Get Rendering Mutex ",6));
+        DIAGNOSTICTIMER(timer("PhysicsLoop MR MD Mutex and world->Update() ",6));
         boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
-      }
-      {
-        DIAGNOSTICTIMER(timer("PhysicsLoop Get Model Mutex ",6));
         boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
-      }
-      {
-        DIAGNOSTICTIMER(timer("PhysicsLoop world->Update() ",6));
         world->Update();
       }
     }

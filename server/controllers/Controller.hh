@@ -125,7 +125,7 @@ class Controller
   protected: ParamT<bool> *alwaysOnP;
 
   /// \brief Update period 
-  protected: double updatePeriod;
+  protected: Time updatePeriod;
   protected: ParamT<double> *updateRateP;
 
   private: std::string typeName;

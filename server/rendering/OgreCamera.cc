@@ -101,18 +101,6 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->viewController = new FPSViewController(this);
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-// Set update rate for the camera rendering
-void OgreCamera::SetUpdateRate(const double &rate)
-{
-  this->updateRateP->SetValue(rate);
-  if (**this->updateRateP == 0)
-    this->renderPeriod = Time(0.0);
-  else
-    this->renderPeriod = Time(1.0/(**this->updateRateP));
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
 OgreCamera::~OgreCamera()
@@ -123,6 +111,7 @@ OgreCamera::~OgreCamera()
   if (this->bayerFrameBuffer)
     delete [] this->bayerFrameBuffer;
 
+  delete this->updateRateP;
   delete this->nearClipP;
   delete this->farClipP;
   delete this->saveFramesP;
@@ -155,6 +144,10 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
 
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
+
+  this->updateRateP->Load(node);
+  SetUpdateRate(this->updateRateP->GetValue());
+  //printf("renderPeriod loaded %f Rate: %f\n",this->renderPeriod.Double(),**this->updateRateP);
 
   this->visibilityMask = GZ_ALL_CAMERA; 
 
@@ -255,6 +248,8 @@ void OgreCamera::InitCam()
   OgreAdaptor::Instance()->RegisterCamera(this);
 
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
+
+  this->lastUpdate = Simulator::Instance()->GetSimTime();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -316,6 +311,17 @@ void OgreCamera::SetRenderingEnabled(bool value)
 bool OgreCamera::GetRenderingEnabled() const
 {
   return this->renderingEnabled;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Set update rate for the camera rendering
+void OgreCamera::SetUpdateRate(const double &rate)
+{
+  if (rate == 0)
+    this->renderPeriod = 0.0;
+  else
+    this->renderPeriod = 1.0/rate;
+  this->updateRateP->SetValue(rate); // need this when called externally
 }
 
 ////////////////////////////////////////////////////////////////////////////////

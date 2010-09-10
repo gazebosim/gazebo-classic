@@ -47,7 +47,7 @@ Controller::Controller(Entity *entity )
   this->nameP = new ParamT<std::string>("name","",1);
   this->alwaysOnP = new ParamT<bool>("alwaysOn", false, 0);
   this->updateRateP = new ParamT<double>("updateRate", 10, 0);
-  this->updateRateP->Callback(&Controller::SetUpdateRate, (Controller*)this);
+  this->updateRateP->Callback(&Controller::SetUpdateRate, this);
   Param::End();
 
   if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
@@ -83,8 +83,8 @@ void Controller::Load(XMLConfigNode *node)
   this->alwaysOnP->Load(node);
 
   this->updateRateP->Load(node);
-
-  this->lastUpdate = Simulator::Instance()->GetSimTime();
+  this->SetUpdateRate(this->updateRateP->GetValue());
+  //printf("updatePeriod loaded %f Rate: %f\n",this->updatePeriod.Double(),**this->updateRateP);
 
   childNode = node->GetChildByNSPrefix("interface");
   
@@ -144,11 +144,11 @@ void Controller::Load(XMLConfigNode *node)
 void Controller::SetUpdateRate(const double &rate)
 {
 
-  this->updateRateP->SetValue(rate);
   if (rate == 0)
     this->updatePeriod = 0.0;
   else
     this->updatePeriod = 1.0 / rate;
+  this->updateRateP->SetValue(rate); // need this when called externally
 
 }
 
@@ -157,6 +157,8 @@ void Controller::SetUpdateRate(const double &rate)
 /// Initialize the controller. Called once on startup.
 void Controller::Init()
 {
+  this->lastUpdate = Simulator::Instance()->GetSimTime();
+
   this->InitChild();
 }
 
@@ -204,10 +206,10 @@ void Controller::Update()
     //timer.Start();
 
     Time simTime = Simulator::Instance()->GetSimTime();
-    if ((simTime-lastUpdate-updatePeriod)/physics_dt >= 0)
+    if ((simTime-this->lastUpdate-this->updatePeriod)/physics_dt >= 0)
     {
       this->UpdateChild();
-      lastUpdate = Simulator::Instance()->GetSimTime();
+      this->lastUpdate = Simulator::Instance()->GetSimTime();
       //timer.Report("Update() dt");
     }
   }
