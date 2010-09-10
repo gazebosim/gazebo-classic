@@ -55,6 +55,7 @@ unsigned int OgreCamera::cameraCounter = 0;
 OgreCamera::OgreCamera(const std::string &namePrefix)
 {
   this->name = "DefaultCameraName";
+  this->lastRenderTime = Simulator::Instance()->GetSimTime();
 
   this->animState = NULL;
   this->textureWidth = this->textureHeight = 0;
@@ -82,13 +83,13 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
   this->imageFormatP = new ParamT<std::string>("imageFormat", "R8G8B8", 0);
   this->updateRateP = new ParamT<double>("updateRate",32,0);
+  this->updateRateP->Callback(&OgreCamera::SetUpdateRate,this);
   Param::End();
 
   this->captureData = false;
 
   this->camera = NULL;
 
-  this->renderPeriod = Time(1.0/(**this->updateRateP));
   this->renderingEnabled = true;
 
   World::Instance()->ConnectShowWireframeSignal( boost::bind(&OgreCamera::ShowWireframe, this, _1) );
@@ -98,6 +99,18 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->origParentNode = NULL;
 
   this->viewController = new FPSViewController(this);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Set update rate for the camera rendering
+void OgreCamera::SetUpdateRate(const double &rate)
+{
+  this->updateRateP->SetValue(rate);
+  if (**this->updateRateP == 0)
+    this->renderPeriod = Time(0.0);
+  else
+    this->renderPeriod = Time(1.0/(**this->updateRateP));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -321,7 +334,9 @@ void OgreCamera::Render()
   if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
     {
+      DIAGNOSTICTIMER(timer("OgreCamera::Render(): renderTarget update",6));
       //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
+      this->lastRenderTime = Simulator::Instance()->GetSimTime();
       this->renderTarget->update();
     }
 
@@ -1038,4 +1053,11 @@ void OgreCamera::SetDirection(Vector3 vec)
 void OgreCamera::HandleMouseEvent(const MouseEvent &evt)
 {
   this->viewController->HandleMouseEvent(evt);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the time of the last render update
+gazebo::Time OgreCamera::GetLastRenderTime() const
+{
+  return this->lastRenderTime;
 }

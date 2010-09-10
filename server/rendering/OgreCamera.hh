@@ -244,12 +244,18 @@ namespace gazebo
     /// \brief Hande a mouse event
     public: void HandleMouseEvent(const MouseEvent &evt);
 
+    /// \brief Get the time of the last render update
+    public: gazebo::Time GetLastRenderTime() const; 
+
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
 
 
     // Save the camera frame
     protected: virtual void SaveFrame();
+
+    /// \brief set update rate (render rate) of the OgreCamera
+    public: void SetUpdateRate(const double &rate);
 
     private: std::string name;
 
@@ -301,6 +307,9 @@ namespace gazebo
     private: Ogre::AnimationState *animState;
 
     private: ViewController *viewController;
+
+    protected: Time lastRenderTime;
+
   };
   
   /// \}

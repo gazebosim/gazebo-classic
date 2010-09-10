@@ -79,6 +79,9 @@ class Controller
   /// \brief Finialize the controller. Called once on completion.
   public: void Fini();
 
+  /// \brief  Set internal Update Period of the controller based on update rate specified by user
+  private: void SetUpdateRate(const double &rate);
+
   /// \brief Return true if an interface is open 
   public: bool IsConnected() const;
 

@@ -47,6 +47,7 @@ Controller::Controller(Entity *entity )
   this->nameP = new ParamT<std::string>("name","",1);
   this->alwaysOnP = new ParamT<bool>("alwaysOn", false, 0);
   this->updateRateP = new ParamT<double>("updateRate", 10, 0);
+  this->updateRateP->Callback(&Controller::SetUpdateRate, (Controller*)this);
   Param::End();
 
   if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
@@ -83,11 +84,6 @@ void Controller::Load(XMLConfigNode *node)
 
   this->updateRateP->Load(node);
 
-  double updateRate  = this->updateRateP->GetValue();
-  if (updateRate == 0)
-    this->updatePeriod = 0.0; // no throttling if updateRate is 0
-  else
-    this->updatePeriod = 1.0 / updateRate;
   this->lastUpdate = Simulator::Instance()->GetSimTime();
 
   childNode = node->GetChildByNSPrefix("interface");
@@ -141,6 +137,19 @@ void Controller::Load(XMLConfigNode *node)
   }
 
   this->LoadChild(node);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Save the sensor info in XML format
+void Controller::SetUpdateRate(const double &rate)
+{
+
+  this->updateRateP->SetValue(rate);
+  if (rate == 0)
+    this->updatePeriod = 0.0;
+  else
+    this->updatePeriod = 1.0 / rate;
+
 }
 
 

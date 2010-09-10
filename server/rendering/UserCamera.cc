@@ -180,8 +180,7 @@ void UserCamera::SetCamera( OgreCamera *cam )
 /// Update
 void UserCamera::Update()
 {
-  if (Simulator::Instance()->GetRealTime() - this->lastUpdate < 
-      this->renderPeriod)
+  if (Simulator::Instance()->GetRealTime() - this->lastUpdate < this->renderPeriod)
     return;
 
   this->lastUpdate = Simulator::Instance()->GetRealTime();
@@ -189,6 +188,7 @@ void UserCamera::Update()
   {
     boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
     OgreCamera::UpdateCam();
+    this->window->update();
   }
 
   if (this->saveFramesP->GetValue())

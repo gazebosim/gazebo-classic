@@ -479,11 +479,6 @@ void OgreAdaptor::UpdateCameras()
     }
   }
 
-  {
-    DIAGNOSTICTIMER(timer("UpdateCameras: render one frame",6));
-    this->root->renderOneFrame();
-  }
-
   // Must update the user camera's last.
   {
     DIAGNOSTICTIMER(timer("UpdateCameras: UserCamera update",6));

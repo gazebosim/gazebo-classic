@@ -68,6 +68,9 @@ namespace gazebo
     /// \brief  Update the sensor
     public: void Update();
   
+    /// \brief  Set internal Update Period of the sensor based on update rate specified by user
+    public: void SetUpdateRate(const double &rate);
+
     /// \brief  Finalize the sensor
     public: void Fini();
 
