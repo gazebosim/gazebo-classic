@@ -189,8 +189,8 @@ void UserCamera::Update()
   {
     boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
     OgreCamera::UpdateCam();
-    this->window->update();
   }
+  this->window->update();
 
   if (this->saveFramesP->GetValue())
   {
