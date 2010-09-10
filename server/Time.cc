@@ -313,6 +313,11 @@ bool Time::operator>( double time ) const
   return *this > Time(time);
 }
 
+bool Time::operator>( int time ) const
+{
+  return *this > Time((double)time);
+}
+
 bool Time::operator>=( const struct timeval &tv ) const
 {
   return *this >= Time(tv);
@@ -326,6 +331,11 @@ bool Time::operator>=( const Time &time ) const
 bool Time::operator>=( double time ) const
 {
   return *this >= Time(time);
+}
+
+bool Time::operator>=( int time ) const
+{
+  return *this >= Time((double)time);
 }
 
 

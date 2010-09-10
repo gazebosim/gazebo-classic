@@ -138,6 +138,9 @@ class Time
   /// \brief Division operators
   public: const Time &operator /=( const Time &time );
 
+  /// \brief Division operators
+  public: operator double() {return (const double)this->Double();};
+
   /// \brief Equality operators
   public: bool operator==( const struct timeval &tv ) const;
   /// \brief Equality operators
@@ -169,11 +172,15 @@ class Time
   /// \brief Equality operators
   public: bool operator>( double time ) const;
   /// \brief Equality operators
+  public: bool operator>( int time ) const;
+  /// \brief Equality operators
   public: bool operator>=( const struct timeval &tv ) const;
   /// \brief Equality operators
   public: bool operator>=( const Time &time ) const;
   /// \brief Equality operators
   public: bool operator>=( double time ) const;
+  /// \brief Equality operators
+  public: bool operator>=( int time ) const;
 
   /// Stream operators
   public: friend std::ostream &operator<<(std::ostream &out, const gazebo::Time &time)
