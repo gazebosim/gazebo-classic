@@ -72,6 +72,8 @@ OgreAdaptor::OgreAdaptor()
   this->sceneMgr=NULL;
   this->root=NULL;
 
+  this->frameListener = NULL;
+
   this->dummyDisplay = false;
 
   Param::Begin(&this->parameters);
