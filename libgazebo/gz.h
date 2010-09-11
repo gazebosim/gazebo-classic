@@ -1290,7 +1290,7 @@ class FactoryData
   public: GazeboData head;
 
   /// String describing the model to be initiated
-  public: uint8_t newModel[409600];
+  public: uint8_t newModel[4096000];
 
   /// Delete an entity by name
   public: uint8_t deleteEntity[512];
