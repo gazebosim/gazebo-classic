@@ -472,6 +472,7 @@ void OgreAdaptor::UpdateCameras()
   // Draw all the non-user cameras
   {
     DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
+    boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       if (dynamic_cast<UserCamera*>((*iter)) == NULL)
