@@ -348,7 +348,7 @@ void OgreCamera::Render()
 
     if (this->captureData)
     {
-      boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
+      //boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
 
       Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
       Ogre::RenderTexture *rTexture;
