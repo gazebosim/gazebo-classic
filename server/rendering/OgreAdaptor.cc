@@ -52,8 +52,6 @@
 #include "OgreCreator.hh"
 #include "RTShaderSystem.hh"
 #include "OgreAdaptor.hh"
-#include "World.hh"
-#include "PhysicsEngine.hh"
 
 #include "Timer.hh"
 
@@ -473,20 +471,16 @@ void OgreAdaptor::UpdateCameras()
   OgreCreator::Instance()->Update();
   this->root->_fireFrameStarted();
 
-  // Draw all the non-user cameras
+  // Draw all the non-user cameras within the same sim time step
   {
     DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
-    //boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
-    //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
-    //printf("locking physics\n");
-    World::Instance()->GetPhysicsEngine()->LockMutex();
+    boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
+    boost::recursive_mutex::scoped_lock model_delete_lock(*Simulator::Instance()->GetMDMutex());
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       if (dynamic_cast<UserCamera*>((*iter)) == NULL)
         (*iter)->Render();
     }
-    //printf("unlocking physics\n");
-    World::Instance()->GetPhysicsEngine()->UnlockMutex();
   }
 
   // Must update the user camera's last.

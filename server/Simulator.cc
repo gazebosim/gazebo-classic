@@ -500,7 +500,7 @@ bool Simulator::IsPaused() const
 /// Set whether the simulation is paused
 void Simulator::SetPaused(bool p)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
+  boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
 
   if (this->pause == p)
     return;
@@ -570,7 +570,7 @@ bool Simulator::GetStepInc() const
 ////////////////////////////////////////////////////////////////////////////////
 void Simulator::SetStepInc(bool step)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
+  boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
   this->stepInc = step;
   this->stepSignal(step);
 
@@ -686,25 +686,26 @@ void Simulator::PhysicsLoop()
   {
     DIAGNOSTICTIMER(timer("PHYSICS LOOP ",6));
 
-    currTime = this->GetRealTime();
-
-    // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
-    Time step = world->GetPhysicsEngine()->GetStepTime();
-    userStepped = false;
-    if (this->IsPaused())
-      this->pauseTime += step;
-    else
-      this->simTime += step;
-
-    if (this->GetStepInc())
-      userStepped = true;
-
-    lastTime = this->GetRealTime();
-
     {
       DIAGNOSTICTIMER(timer1("PHYSICS MR MD Mutex and world->Update() ",6));
-      boost::recursive_mutex::scoped_lock lock(*this->GetMRMutex());
+      boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
       boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
+
+      currTime = this->GetRealTime();
+
+      // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
+      Time step = world->GetPhysicsEngine()->GetStepTime();
+      userStepped = false;
+      if (this->IsPaused())
+        this->pauseTime += step;
+      else
+        this->simTime += step;
+
+      if (this->GetStepInc())
+        userStepped = true;
+
+      lastTime = this->GetRealTime();
+
       world->Update();
     }
 
