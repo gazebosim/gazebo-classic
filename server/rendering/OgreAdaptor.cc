@@ -565,7 +565,7 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std:
         }
         else
         {
-          printf("OgreAdapter Ray Trace Select Entity Error: vertex indices (%d,%d,%d) out of range! [>%d]\n",vert0,vert1,vert2,vertex_count);
+          fprintf(stderr,"OgreAdapter Ray Trace Select Entity Error: vertex indices (%d,%d,%d) out of range! [>%d]\n",vert0,vert1,vert2,(int)vertex_count);
         }
       }
 
