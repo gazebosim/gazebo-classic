@@ -184,6 +184,9 @@ unsigned int GLWindow::GetTriangleCount() const
 /// Handle a mouse button push
 void GLWindow::HandleMousePush()
 {
+  // stop simulation when this is happening
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+
   this->mouseEvent.pressPos = this->mouseEvent.pos;
 
   if (this->currMaker)
@@ -221,6 +224,9 @@ void GLWindow::HandleMousePush()
 /// Handle a mouse button release
 void GLWindow::HandleMouseRelease()
 {
+  // stop simulation when this is happening
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+
   OgreCreator::SetVisible("guiline", false);
 
   if (this->currMaker)

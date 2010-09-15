@@ -543,18 +543,29 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std:
       bool new_closest_found = false;
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
       {
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, vertices[indices[i]], vertices[indices[i+1]], vertices[indices[i+2]], true, false);
+        int vert0 = indices[i];
+        int vert1 = indices[i+1];
+        int vert2 = indices[i+2];
 
-        // if it was a hit check if its the closest
-        if (hit.first)
+        if (vert0 < vertex_count && vert1 < vertex_count && vert2 < vertex_count)
         {
-          if ((closest_distance < 0.0f) || (hit.second < closest_distance))
+          // check for a hit against this triangle
+          std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, vertices[indices[i]], vertices[indices[i+1]], vertices[indices[i+2]], true, false);
+
+          // if it was a hit check if its the closest
+          if (hit.first)
           {
-            // this is the closest so far, save it off
-            closest_distance = hit.second; 
-            new_closest_found = true;
+            if ((closest_distance < 0.0f) || (hit.second < closest_distance))
+            {
+              // this is the closest so far, save it off
+              closest_distance = hit.second; 
+              new_closest_found = true;
+            }
           }
+        }
+        else
+        {
+          printf("OgreAdapter Ray Trace Select Entity Error: vertex indices (%d,%d,%d) out of range! [>%d]\n",vert0,vert1,vert2,vertex_count);
         }
       }
 
