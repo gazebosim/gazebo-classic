@@ -381,6 +381,15 @@ void GLWindow::HandleKeyPress(int keyNum)
         case '_':
           this->mouseEvent.moveScale *= 0.5;
           break;
+
+        case 'n':
+          World::Instance()->contactMarkerSize*=1.1;
+          break;
+
+        case 'm':
+          World::Instance()->contactMarkerSize*=0.9;
+          break;
+
         default:
           break;
       }

@@ -419,6 +419,7 @@ class World : public SingletonT<World>
   /// The entity currently selected by the user
   private: Entity *selectedEntity;
 
+  public: double contactMarkerSize;
 
   private: boost::signal<void (Entity*)> addEntitySignal;
   private: boost::signal<void (std::string)> deleteEntitySignal;

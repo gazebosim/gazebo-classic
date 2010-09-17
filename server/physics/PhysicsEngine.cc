@@ -196,29 +196,31 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
   if (!World::Instance()->GetShowContacts())
     return;
 
+  double cm_size = World::Instance()->contactMarkerSize;
+
   Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
   Vector3 e2 = norm.GetCrossProd(e1); e2.Normalize();
 
   (*this->contactLinesIter)->SetPoint( 0, pos);
-  (*this->contactLinesIter)->SetPoint( 1, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 1, pos+(norm*cm_size)+(e1*cm_size*0.25)+(e2*cm_size*0.25));
   (*this->contactLinesIter)->SetPoint( 2, pos);
-  (*this->contactLinesIter)->SetPoint( 3, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 3, pos+(norm*cm_size)+(e1*cm_size*0.25)-(e2*cm_size*0.25));
   (*this->contactLinesIter)->SetPoint( 4, pos);
-  (*this->contactLinesIter)->SetPoint( 5, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 5, pos+(norm*cm_size)-(e1*cm_size*0.25)+(e2*cm_size*0.25));
   (*this->contactLinesIter)->SetPoint( 6, pos);
-  (*this->contactLinesIter)->SetPoint( 7, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 7, pos+(norm*cm_size)-(e1*cm_size*0.25)-(e2*cm_size*0.25));
 
-  (*this->contactLinesIter)->SetPoint( 8, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
-  (*this->contactLinesIter)->SetPoint( 9, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint( 8, pos+(norm*cm_size)+(e1*cm_size*0.25)+(e2*cm_size*0.25));
+  (*this->contactLinesIter)->SetPoint( 9, pos+(norm*cm_size)-(e1*cm_size*0.25)+(e2*cm_size*0.25));
 
-  (*this->contactLinesIter)->SetPoint(10, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
-  (*this->contactLinesIter)->SetPoint(11, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
+  (*this->contactLinesIter)->SetPoint(10, pos+(norm*cm_size)-(e1*cm_size*0.25)+(e2*cm_size*0.25));
+  (*this->contactLinesIter)->SetPoint(11, pos+(norm*cm_size)-(e1*cm_size*0.25)-(e2*cm_size*0.25));
 
-  (*this->contactLinesIter)->SetPoint(12, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
-  (*this->contactLinesIter)->SetPoint(13, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
+  (*this->contactLinesIter)->SetPoint(12, pos+(norm*cm_size)-(e1*cm_size*0.25)-(e2*cm_size*0.25));
+  (*this->contactLinesIter)->SetPoint(13, pos+(norm*cm_size)+(e1*cm_size*0.25)-(e2*cm_size*0.25));
 
-  (*this->contactLinesIter)->SetPoint(14, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
-  (*this->contactLinesIter)->SetPoint(15, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
+  (*this->contactLinesIter)->SetPoint(14, pos+(norm*cm_size)+(e1*cm_size*0.25)-(e2*cm_size*0.25));
+  (*this->contactLinesIter)->SetPoint(15, pos+(norm*cm_size)+(e1*cm_size*0.25)+(e2*cm_size*0.25));
 
   this->contactLinesIter++;
 

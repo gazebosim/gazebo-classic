@@ -61,6 +61,7 @@ World::World()
   this->showBoundingBoxes = false;
   this->showJoints = false;
   this->showContacts = false;
+  this->contactMarkerSize = 0.003;
   this->showLights = false;
   this->showCameras = false;
   this->wireframe = false;
