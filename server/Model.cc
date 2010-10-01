@@ -593,6 +593,7 @@ void Model::Fini()
 // Reset the model
 void Model::Reset()
 {
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
   JointContainer::iterator jiter;
   std::vector< Entity* >::iterator biter;
   std::map<std::string, Controller* >::iterator citer;
