@@ -63,6 +63,7 @@ namespace gazebo
 
 // Forward declarations
   class Model;
+  class Body;
   class Geom;
   class PhysicsEngine;
   class XMLConfigNode;
@@ -109,6 +110,15 @@ class World : public SingletonT<World>
 
   /// Finilize the world
   public: void Fini();
+
+  /// \brief Remove all entities from the world
+  public: void Clear();
+
+  /// \brief Get the number of parameters
+  public: unsigned int GetParamCount() const;
+
+  /// \brief Get a param
+  public: Param *GetParam(unsigned int index) const;
 
   /// Retun the libgazebo server
   /// \return Pointer the the libgazebo server
@@ -157,16 +167,11 @@ class World : public SingletonT<World>
   /// \brief Delete all the entities that have been queued
   public: void ProcessEntitiesToDelete();
 
-  /// \brief Delete an entity by name
-  /// \param name The name of the entity to delete
-  public: void DeleteEntity(const std::string &name);
+  /// \brief Get the number of models
+  public: unsigned int GetModelCount() const;
 
-  /// \brief Get a pointer to a entity based on a name
-  public: Entity *GetEntityByName(const std::string &name) const;
-  private: Entity *GetEntityByNameHelper(const std::string &name, Entity *parent) const;
-
-  /// \brief Get an iterator over the models
-  public: const std::vector<Model*> &GetModels() const;
+  /// \brief Get a model based on an index
+  public: Model *GetModel(unsigned int index);
 
   /// \brief Reset the simulation to the initial settings
   public: void Reset();
@@ -227,14 +232,14 @@ class World : public SingletonT<World>
   /// \brief Goto a position in time
   public: void GotoTime(double pos);
 
-  /// \brief Set the selected entity
-  public: void SetSelectedEntity( Entity *ent );
-
   /// \brief Get the selected entity
   public: Entity *GetSelectedEntity() const;
 
   /// \brief Print entity tree
   public: void PrintEntityTree();
+
+  /// \brief Get the server id
+  public: int GetServerId() const;
 
   /// \brief Save the state of the world
   private: void SaveState();
@@ -271,22 +276,6 @@ class World : public SingletonT<World>
 
   /// \brief Update the simulation iface
   public: void UpdateSimulationIface();
-
-  /// \brief Connect a boost::slot the the add entity signal
-  public: template<typename T>
-          boost::signals::connection ConnectAddEntitySignal( T subscriber )
-          { return addEntitySignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectAddEntitySignal( T subscriber)
-          { addEntitySignal.disconnect(subscriber); }
-
-  /// \brief Connect a boost::slot the delete entity signal
-  public: template<typename T>
-          boost::signals::connection ConnectDeleteEntitySignal( T subscriber )
-          { return deleteEntitySignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectDeleteEntitySignal( T subscriber)
-          { deleteEntitySignal.disconnect(subscriber); }
 
   /// \brief Connect a boost::slot the the show light source signal
   public: template<typename T>
@@ -375,8 +364,15 @@ class World : public SingletonT<World>
           void DisconnectEntitySelectedSignal( T subscriber )
           { entitySelectedSignal.disconnect(subscriber); }
 
+  /// \brief Delete an entity by name
+  /// \param name The name of the entity to delete
+  private: void DeleteEntityCB(const std::string &name);
+
+  /// \brief Set the selected entity
+  private: void SetSelectedEntityCB( const std::string &name );
+
   /// \brief Get the names of interfaces defined in the tree of a model
-  private: void GetInterfaceNames(Entity* m, std::vector<std::string>& list);
+  private: void GetInterfaceNames(Common *c, std::vector<std::string>& list);
 
   /// Pointer the physics engine
   private: PhysicsEngine *physicsEngine;
@@ -419,9 +415,6 @@ class World : public SingletonT<World>
   /// The entity currently selected by the user
   private: Entity *selectedEntity;
 
-
-  private: boost::signal<void (Entity*)> addEntitySignal;
-  private: boost::signal<void (std::string)> deleteEntitySignal;
   private: boost::signal<void (bool)> showLightsSignal;
   private: boost::signal<void (bool)> showCamerasSignal;
   private: boost::signal<void (bool)> showContactsSignal;

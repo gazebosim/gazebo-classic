@@ -50,10 +50,11 @@ GZ_REGISTER_STATIC_SENSOR("camera", MonoCameraSensor);
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 MonoCameraSensor::MonoCameraSensor(Body *body)
-    : Sensor(body), OgreCamera("Mono")
+    : Sensor(body)
 {
+  this->camera = new OgreCamera("Mono",0);
   this->typeName = "monocamera";
-  this->captureData = true;
+  this->camera->SetCaptureData(true);
 }
 
 
@@ -61,19 +62,26 @@ MonoCameraSensor::MonoCameraSensor(Body *body)
 // Destructor
 MonoCameraSensor::~MonoCameraSensor()
 {
+  delete this->camera;
+  this->camera = NULL;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the camera
+OgreCamera *MonoCameraSensor::GetCamera()
+{
+  return this->camera;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
 void MonoCameraSensor::LoadChild( XMLConfigNode *node )
 {
-  this->cameraName = this->cameraName+this->GetName();
-  this->LoadCam( node );
-
+  this->camera->Load( node );
 
   // Do some sanity checks
-  if (this->imageSizeP->GetValue().x == 0 || 
-      this->imageSizeP->GetValue().y == 0)
+  if (this->camera->GetImageWidth() == 0 || 
+      this->camera->GetImageHeight() == 0)
   {
     gzthrow("image has zero size");
   }
@@ -81,20 +89,8 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
     this->ogreTextureName = this->GetName() + "_RttTex";
-    this->ogreMaterialName = this->GetName() + "_RttMat";
 
-    // Create the render texture
-    this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
-                          this->ogreTextureName,
-                          "General",
-                          Ogre::TEX_TYPE_2D,
-                          this->imageSizeP->GetValue().x, 
-                          this->imageSizeP->GetValue().y,
-                          0,
-                          this->imageFormat,
-                          Ogre::TU_RENDERTARGET);
-
-    this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
+    this->camera->CreateRenderTexture(this->ogreTextureName);
   }
 }
 
@@ -103,7 +99,7 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
 void MonoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
-  this->SaveCam(p, stream);
+  this->camera->Save(p, stream);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -113,23 +109,8 @@ void MonoCameraSensor::InitChild()
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->SetCameraSceneNode( this->GetVisualNode()->GetSceneNode() );
-    this->InitCam();
-    this->SetCamName(this->GetName());
-
-    /*Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
-                              this->ogreMaterialName,
-                              Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-
-     mat->getTechnique(0)->getPass(0)->createTextureUnitState(this->ogreTextureName);
-*/
-
-    Ogre::HardwarePixelBufferSharedPtr mBuffer;
-    // Get access to the buffer and make an image and write it to file
-    mBuffer = this->renderTexture->getBuffer(0, 0);
-
-    this->textureWidth = mBuffer->getWidth();
-    this->textureHeight = mBuffer->getHeight();
+    this->camera->SetSceneNode( this->GetVisualNode()->GetSceneNode() );
+    this->camera->Init();
   }
   
 }
@@ -138,7 +119,7 @@ void MonoCameraSensor::InitChild()
 // Finalize the camera
 void MonoCameraSensor::FiniChild()
 {
-  this->FiniCam();
+  this->camera->Fini();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -146,7 +127,7 @@ void MonoCameraSensor::FiniChild()
 void MonoCameraSensor::SetActive(bool value)
 {
   Sensor::SetActive(value);
-  this->SetRenderingEnabled(value);
+  this->camera->SetRenderingEnabled(value);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -156,9 +137,8 @@ void MonoCameraSensor::UpdateChild()
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  if (this->active || **this->alwaysActiveP || **this->saveFramesP)
-    this->UpdateCam();
-
+  //if (this->active || **this->alwaysActiveP)
+    //this->camera->Update();
 
   // Only continue if the controller has an active interface. Or frames need
   // to be saved
@@ -170,14 +150,4 @@ void MonoCameraSensor::UpdateChild()
   if (this->active)
     this->UpdateCam();
     */
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Return the material the camera renders to
-std::string MonoCameraSensor::GetMaterialName() const
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return NULL;
-  else
-    return this->ogreMaterialName;
 }

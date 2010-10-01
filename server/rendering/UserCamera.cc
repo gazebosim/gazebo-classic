@@ -27,10 +27,11 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "Scene.hh"
 #include "Simulator.hh"
 #include "RTShaderSystem.hh"
 #include "Global.hh"
-#include "GLWindow.hh"
+#include "RenderControl.hh"
 #include "OgreCamera.hh"
 #include "OgreAdaptor.hh"
 #include "OgreCreator.hh"
@@ -45,13 +46,15 @@ int UserCamera::count = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-UserCamera::UserCamera(GLWindow *parentWindow)
-  : OgreCamera("UserCamera")
+UserCamera::UserCamera(RenderControl *parentWindow, unsigned int sceneIndex )
+  : OgreCamera("UserCamera", sceneIndex)
 {
   std::stringstream stream;
 
-  this->window = OgreCreator::Instance()->CreateWindow(parentWindow, 
-                         parentWindow->w(), parentWindow->h());
+  int w, h;
+  parentWindow->GetSize(&w, &h);
+
+  this->window = OgreCreator::Instance()->CreateWindow(parentWindow, w, h);
 
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
@@ -76,7 +79,7 @@ UserCamera::~UserCamera()
 // Load child
 void UserCamera::Load(XMLConfigNode *node)
 {
-  OgreCamera::LoadCam(node);
+  OgreCamera::Load(node);
 
   this->SetFOV( DTOR(60) );
   this->SetClipDist(0.01, 50);
@@ -86,9 +89,9 @@ void UserCamera::Load(XMLConfigNode *node)
 /// Initialize
 void UserCamera::Init()
 {
-  this->SetCameraSceneNode( OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode( this->GetCameraName() + "_SceneNode") );
+  this->SetSceneNode( this->scene->GetManager()->getRootSceneNode()->createChildSceneNode( this->GetName() + "_SceneNode") );
 
-  this->InitCam();
+  OgreCamera::Init();
 
   this->visual = new OgreVisual(this->pitchNode);
 
@@ -141,13 +144,17 @@ void UserCamera::Init()
   line->AddPoint(Vector3(0.0, +0.00, +f+0.15)); 
   line->AddPoint(Vector3(0.0, -0.02, +f+0.1)); 
 
-  line->setMaterial("Gazebo/WhiteEmissive");
+  line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_LASER_CAMERA);
 
   this->visual->AttachObject(line);
   this->visual->SetVisible(false);
 
-  this->SetCamera(this);
+  this->window->removeAllViewports();
+  this->viewport = this->window->addViewport(this->GetOgreCamera());
+
+  this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
+
   this->lastUpdate = Simulator::Instance()->GetRealTime();
 
   double ratio = (double)this->viewport->getActualWidth() / (double)this->viewport->getActualHeight();
@@ -156,43 +163,34 @@ void UserCamera::Init()
   this->GetOgreCamera()->setFOVy(Ogre::Radian(vfov));
 
   this->viewport->setClearEveryFrame(true);
-  this->viewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+  this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
   this->viewport->setVisibilityMask(this->visibilityMask);
 
-  RTShaderSystem::AttachViewport(this->viewport);
+  RTShaderSystem::AttachViewport(this);
 }
-
-void UserCamera::SetCamera( OgreCamera *cam )
-{
-  this->window->removeAllViewports();
-
-  if (cam == NULL)
-    cam = this;
-
-  this->viewport = this->window->addViewport(cam->GetOgreCamera());
-
-  this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update
-void UserCamera::Update()
+void UserCamera::Render()
 {
   if (Simulator::Instance()->GetRealTime() - this->lastUpdate < 
       this->renderPeriod)
     return;
 
-  this->lastUpdate = Simulator::Instance()->GetRealTime();
-
   {
     boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
-    OgreCamera::UpdateCam();
+    OgreCamera::Update();
+    this->lastUpdate = Simulator::Instance()->GetRealTime();
+    this->newData = true;
+    this->window->update(false);
   }
-  this->window->update();
+}
 
-  if (this->saveFramesP->GetValue())
+void UserCamera::PostRender()
+{
+  this->window->swapBuffers();
+
+  if (this->newData && this->saveFramesP->GetValue())
   {
     char tmp[1024];
     if (!this->savePathnameP->GetValue().empty())
@@ -209,6 +207,7 @@ void UserCamera::Update()
 
     this->saveCount++;
   }
+  this->newData = false;
 }
 
 
@@ -216,7 +215,7 @@ void UserCamera::Update()
 // Finalize
 void UserCamera::Fini()
 {
-  OgreCamera::FiniCam();
+  OgreCamera::Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

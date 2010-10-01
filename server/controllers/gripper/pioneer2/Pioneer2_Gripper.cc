@@ -191,7 +191,7 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   if (!this->paddles[RIGHT])
     gzthrow("Couldn't get the right paddle geom");
 
-  this->holdJoint = World::Instance()->GetPhysicsEngine()->CreateJoint(Joint::SLIDER);
+  this->holdJoint = World::Instance()->GetPhysicsEngine()->CreateJoint("slider");
   this->holdJoint->SetName(this->GetName() + "_Hold_Joint");
 
   this->paddles[LEFT]->ConnectContactCallback(

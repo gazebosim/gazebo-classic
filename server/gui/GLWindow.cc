@@ -105,7 +105,7 @@ void GLWindow::CreateCameras()
   this->make_current();
 
   // Create the default camera.
-  this->userCamera = new UserCamera( this );
+  //this->userCamera = new UserCamera( this );
   this->userCamera->Load(NULL);
 }
 
@@ -120,7 +120,7 @@ void GLWindow::Init()
   if (this->userCamera == NULL)
   {
     // Create the default camera.
-    this->userCamera = new UserCamera( this );
+    //this->userCamera = new UserCamera( this );
     this->userCamera->Load(NULL);
   }
 

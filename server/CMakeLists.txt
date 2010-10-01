@@ -10,11 +10,14 @@ string (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
 string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
 string (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
 
+include_directories( ${wxWidgets_INCLUDE_DIRS} )
+link_directories( ${wxWidgets_LIBRARY_DIRS} )
+include (${wxWidgets_USE_FILE})
 
 include_directories(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
-  gui 
+  wx 
   physics 
   physics/ode
   physics/bullet
@@ -36,12 +39,12 @@ include_directories(
   ${freeimage_include_dir}
   ${bullet_include_dirs_split}
   ${threadpool_include_dirs_split}
-  ${FLTK_INCLUDE_DIR}
+  ${GTK2_INCLUDE_DIRS}
 )
 
 link_directories(  
  ${CMAKE_BINARY_DIR}/libgazebo 
- ${CMAKE_BINARY_DIR}/server/gui 
+ ${CMAKE_BINARY_DIR}/server/wx 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
  ${boost_library_dirs_split} 
  ${assimp_library_dirs_split} 
@@ -61,7 +64,7 @@ endif (use_internal_assimp)
 add_subdirectory(rendering)
 add_subdirectory(physics)
 add_subdirectory(sensors)
-add_subdirectory(gui)
+add_subdirectory(wx)
 add_subdirectory(controllers)
 add_subdirectory(audio_video)
 
@@ -95,6 +98,7 @@ SET (sources Common.cc
              STLLoader.cc
              Logger.cc
              Plugin.cc
+             Events.cc
 )
 
 SET (headers Common.hh
@@ -128,7 +132,7 @@ SET (headers Common.hh
              AssimpLoader.hh
              STLLoader.hh
              Logger.hh
-             Event.hh
+             Events.hh
              Plugin.hh
 )
 
@@ -172,7 +176,7 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    gazebo_server
                                    gazebo_rendering
                                    gazebo_av-shared
-                                   gazebo_gui
+                                   gazebo_wx
                                    gazebo_physics
                                    gazeboshm 
                                    assimp
@@ -180,8 +184,7 @@ target_link_libraries( gazebo-exec ${libtool_library}
 )
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
-                      -lassimp -lgazebo_physics -lgazebo_av -lgazebo_gui 
-                      -lgazebo_rendering)
+                      -lassimp -lgazebo_physics -lgazebo_av -lgazebo_wx -lgazebo_rendering)
 
 
 target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics )

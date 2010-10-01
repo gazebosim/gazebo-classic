@@ -66,7 +66,7 @@ void RaySensor::LoadChild(XMLConfigNode *node)
     gzthrow("Null body in the ray sensor");
 
   this->laserGeom = World::Instance()->GetPhysicsEngine()->CreateGeom(
-      Shape::MULTIRAY, this->body);
+      "multiray", this->body);
   this->laserGeom->SetName("Ray Sensor Geom");
 
   this->laserShape = (MultiRayShape*)(this->laserGeom->GetShape());

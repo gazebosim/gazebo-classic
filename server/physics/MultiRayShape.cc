@@ -7,7 +7,7 @@ using namespace gazebo;
 /// Constructor
 MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
 {
-  this->type = Shape::MULTIRAY;
+  this->type.push_back("multiray");
 
   this->rayFan = OgreCreator::Instance()->CreateDynamicLine(
       OgreDynamicRenderable::OT_TRIANGLE_FAN);
@@ -17,11 +17,11 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
 
   if (this->rayFan && this->rayFanOutline)
   {
-    this->parent->GetVisualNode()->AttachObject(this->rayFan);
-    this->parent->GetVisualNode()->AttachObject(this->rayFanOutline);
+    this->geomParent->GetVisualNode()->AttachObject(this->rayFan);
+    this->geomParent->GetVisualNode()->AttachObject(this->rayFanOutline);
 
     this->rayFan->setMaterial("Gazebo/BlueLaser");
-    this->rayFanOutline->setMaterial("Gazebo/BlueEmissive");
+    this->rayFanOutline->setMaterial("Gazebo/BlueGlow");
   }
 
   Param::Begin(&this->parameters);

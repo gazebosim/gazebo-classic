@@ -123,6 +123,7 @@ SET (files 10points.png
            pointlight.png
            spotlight.png
            directionallight.png
+           grey.png
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/materials/textures/)

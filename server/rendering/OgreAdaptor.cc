@@ -37,6 +37,8 @@
 
 #include "gazebo_config.h"
 
+#include "Scene.hh"
+#include "Grid.hh"
 #include "OgreVisual.hh"
 #include "UserCamera.hh"
 #include "OgreMovableText.hh"
@@ -55,8 +57,6 @@
 
 using namespace gazebo;
 
-enum SceneTypes{SCENE_BSP, SCENE_EXT};
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 OgreAdaptor::OgreAdaptor()
@@ -65,20 +65,10 @@ OgreAdaptor::OgreAdaptor()
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
 
-  this->backgroundColor=NULL;
   this->logManager=NULL;
-  this->sceneMgr=NULL;
   this->root=NULL;
 
   this->dummyDisplay = false;
-
-  Param::Begin(&this->parameters);
-  this->ambientP = new ParamT<Vector4>("ambient",Vector4(.1,.1,.1,.1),0);
-  this->shadowsP = new ParamT<bool>("shadows", true, 0);
-  this->skyMaterialP = new ParamT<std::string>("material","",1);
-  this->backgroundColorP = new ParamT<Vector3>("backgroundColor",Vector3(0.5,0.5,0.5), 0);
-
-  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,27 +81,22 @@ OgreAdaptor::~OgreAdaptor()
     XDestroyWindow(this->dummyDisplay, this->dummyWindowId);
     XCloseDisplay(this->dummyDisplay);
   }
-
-  delete this->ambientP;
-  delete this->shadowsP;
-  delete this->backgroundColorP;
-  delete this->skyMaterialP;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Closes and free
 void OgreAdaptor::Close()
 {
-  if (this->frameListener)
-    delete this->frameListener;
-  this->frameListener = NULL;
+  this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the parameters for Ogre
 void OgreAdaptor::Load(XMLConfigNode *rootNode)
 {
+  if (this->root)
+    return;
+
   // Make the root
   try
   {
@@ -125,16 +110,26 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   // Load all the plugins
   this->LoadPlugins();
 
-  // Setup the available resources
-  this->SetupResources();
-
   // Setup the rendering system, and create the context
   this->SetupRenderSystem();
 
   // Initialize the root node, and don't create a window
   this->root->initialise(false);
 
+  // Setup the available resources
+  this->SetupResources();
 
+  Scene *scene = new Scene("primary_scene");
+  scene->Load(rootNode->GetChild("ogre", "rendering"));
+  this->scenes.push_back( scene );  
+
+  scene = new Scene("viewer_scene");
+  scene->SetType(Scene::GENERIC);
+  scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
+  scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
+  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
+
+  this->scenes.push_back( scene );  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,98 +167,28 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
     glXMakeCurrent(this->dummyDisplay, this->dummyWindowId, this->dummyContext);
 
-    OgreCreator::Instance()->CreateWindow(this->dummyDisplay, screen, 
-                                          (int32_t)this->dummyWindowId,1,1);
+    std::stringstream stream;
+    stream << (int32_t)this->dummyWindowId;
+    OgreCreator::Instance()->CreateWindow( stream.str(), 1,1);
   }
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
-
-  // Get the SceneManager, in this case a generic one
-  if (node && node->GetChild("bsp"))
-  {
-    this->sceneType= SCENE_BSP;
-    this->sceneMgr = this->root->createSceneManager("BspSceneManager");
-  }
-  else
-  {
-    this->sceneType= SCENE_EXT;
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
-  }
-
-  // Load Resources
+  
+  // init the resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  this->ambientP->Load(node);
-  this->shadowsP->Load(node);
-  this->backgroundColorP->Load(node);
-
-  ambient.r = (**(this->ambientP)).x;
-  ambient.g = (**(this->ambientP)).y;
-  ambient.b = (**(this->ambientP)).z;
-  ambient.a = (**(this->ambientP)).w;
-
-  // Default background color
-  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue(
-          (**this->backgroundColorP).x,
-          (**this->backgroundColorP).y,
-          (**this->backgroundColorP).z));
-
-  // Not sure if this does something useful.
-  if (**(this->shadowsP))
-  {
-    this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
-    this->sceneMgr->setShadowTextureSettings(512,2);
-    this->sceneMgr->setShadowColour(Ogre::ColourValue(0.5,0.5,0.5));
-
-     // Ambient lighting
-     this->sceneMgr->setAmbientLight(ambient);
-
-    this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
-    this->sceneMgr->setShadowTextureSelfShadow(true);
-    this->sceneMgr->setShadowCasterRenderBackFaces(false);
-
-    this->sceneMgr->setShadowFarDistance(20);
-  }
-
-  // Add a sky dome to our scene
-  if (node && node->GetChild("sky"))
-  {
-    this->skyMaterialP->Load(node->GetChild("sky"));
-    OgreCreator::CreateSky(**(this->skyMaterialP));
-  }
-
-  // Add fog. This changes the background color
-  if (node)
-    OgreCreator::CreateFog(node->GetChild("fog"));
-
-  // Set up the world geometry link
-  if (this->sceneType==SCENE_BSP)
-  {
-    if (node)
-      this->worldGeometry = node->GetString("bsp","",1);
-
-    try
-    {
-      this->sceneMgr->setWorldGeometry(this->worldGeometry);
-    }
-    catch (Ogre::Exception e)
-    {
-      gzmsg(-1) << "Unable to load BSP geometry." << e.getDescription() << "\n";
-      exit(-1);
-    }
-  }
-
-  this->raySceneQuery = this->sceneMgr->createRayQuery( Ogre::Ray() );
-  this->raySceneQuery->setSortByDistance(true);
-  this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
+  Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
 
   if (this->HasGLSL())
     RTShaderSystem::Instance()->Init();
-}
 
+  for (unsigned int i=0; i < 1; i++)
+    this->scenes[i]->Init(this->root);
+
+  if (this->HasGLSL())
+    RTShaderSystem::Instance()->UpdateShaders();
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,20 +204,9 @@ void OgreAdaptor::Fini()
 void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<rendering:ogre>\n";
-  stream << prefix << "  " << *(this->ambientP) << "\n";
-
-  if ((**this->skyMaterialP).size())
-  {
-    stream << prefix << "  <sky>\n";
-    stream << prefix << "    " << *(this->skyMaterialP) << "\n";
-    stream << prefix << "  </sky>\n";
-  }
-
-  OgreCreator::SaveFog(prefix, stream);
-  stream << prefix << "  " << *(this->shadowsP) << "\n";
+  this->scenes[0]->Save(prefix,stream);
   stream << prefix << "</rendering:ogre>\n";
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load plugins
@@ -320,6 +234,7 @@ void OgreAdaptor::LoadPlugins()
     plugins.push_back(path+"/Plugin_ParticleFX.so");
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+    plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {
@@ -330,10 +245,10 @@ void OgreAdaptor::LoadPlugins()
       }
       catch (Ogre::Exception e)
       {
-        std::string description("Unable to load Ogre Plugins on directory ");
-        description.append(path);
-        description.append("\n Make sure the plugins path in the gazebo configuration file are set correctly.\n");
-        gzthrow( description + e.getDescription() );
+        std::string description("Unable to load Ogre Plugin[");
+        description.append(*piter);
+        description.append("]...Skipping.");
+        gzerr(0) << description << "\n";
       }
     }
   }
@@ -369,7 +284,6 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/Media/sets");
     archNames.push_back((*iter)+"/Media/maps");
 
-
     //we want to add all the material files of the sets
     if ((dir=opendir(((*iter)+"/Media/sets").c_str()))!= NULL)
     {
@@ -395,6 +309,7 @@ void OgreAdaptor::SetupResources()
       }
     }
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -455,186 +370,42 @@ void OgreAdaptor::SetupRenderSystem()
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get a scene 
+Scene *OgreAdaptor::GetScene(unsigned int index)
+{
+  if (index < this->scenes.size())
+    return this->scenes[index];
+  else
+  {
+    std::cerr << "Invalid Scene Index[" << index << "]\n";
+    return NULL;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-// Update the user cameras
-void OgreAdaptor::UpdateCameras()
+/// Get the number of scene 
+unsigned int OgreAdaptor::GetSceneCount() const
 {
-  UserCamera *userCam;
+  return this->scenes.size();
+}
 
-  std::vector<OgreCamera*>::iterator iter;
-
-  OgreCreator::Instance()->Update();
+////////////////////////////////////////////////////////////////////////////////
+/// Update all the scenes 
+void OgreAdaptor::UpdateScenes()
+{
   this->root->_fireFrameStarted();
 
-  // Draw all the non-user cameras
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-  {
-    if (dynamic_cast<UserCamera*>((*iter)) == NULL)
-      (*iter)->Render();
-  }
+  OgreCreator::Instance()->Update();
 
-  // Must update the user camera's last.
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-  {
-    userCam = dynamic_cast<UserCamera*>((*iter));
-    if (userCam)
-      userCam->Update();
-  }
+  for (unsigned int i=0; i < this->scenes.size(); i++)
+    this->scenes[i]->UpdateCameras();
+
+  this->root->_fireFrameRenderingQueued();
 
   this->root->_fireFrameEnded();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std::string &mod) 
-{
-  Entity *entity = NULL;
-  Ogre::Camera *ogreCam = camera->GetOgreCamera();
-  Ogre::Vector3 camPos = ogreCam->getPosition();
-
-  Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
-      (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
-
-  this->raySceneQuery->setRay( mouseRay );
-
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
-  Ogre::Entity *closestEntity = NULL;
-
-  for (iter = result.begin(); iter != result.end(); iter++)
-  {
-    // is the result a MovableObject
-    if (iter->movable && iter->movable->getMovableType().compare("Entity") == 0)
-    {
-      Ogre::Entity *pentity = static_cast<Ogre::Entity*>(iter->movable);
-
-      // mesh data to retrieve         
-      size_t vertex_count;
-      size_t index_count;
-      Ogre::Vector3 *vertices;
-      unsigned long *indices;
-
-      // Get the mesh information
-      OgreCreator::GetMeshInformation(pentity->getMesh(), vertex_count, 
-          vertices, index_count, indices,             
-          pentity->getParentNode()->_getDerivedPosition(),
-          pentity->getParentNode()->_getDerivedOrientation(),
-          pentity->getParentNode()->_getDerivedScale());
-
-      bool new_closest_found = false;
-      for (int i = 0; i < static_cast<int>(index_count); i += 3)
-      {
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay, vertices[indices[i]], vertices[indices[i+1]], vertices[indices[i+2]], true, false);
-
-        // if it was a hit check if its the closest
-        if (hit.first)
-        {
-          if ((closest_distance < 0.0f) || (hit.second < closest_distance))
-          {
-            // this is the closest so far, save it off
-            closest_distance = hit.second; 
-            new_closest_found = true;
-          }
-        }
-      }
-
-      delete [] vertices;
-      delete [] indices;
-
-      if (new_closest_found)
-      {
-        closestEntity = pentity;
-        break;
-      }
-    }
-  }
-
-  mod = "";
-  if (closestEntity)
-  {
-    if (closestEntity->getUserAny().getType() == typeid(std::string))
-      mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
-
-    OgreVisual* const* vis = Ogre::any_cast<OgreVisual*>(&closestEntity->getUserAny());
-
-    if (vis && (*vis)->GetOwner())
-    {
-      entity = (*vis)->GetOwner();
-      return entity;
-    }
-  }
-
-  return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the world pos of a the first contact at a pixel location
-Vector3 OgreAdaptor::GetFirstContact(OgreCamera *camera, Vector2<int> mousePos)
-{
-  Ogre::Camera *ogreCam = camera->GetOgreCamera();
-  Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
-      (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
-
-  this->raySceneQuery->setRay( mouseRay );
-
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
-
-  Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
-
-  return Vector3(pt.x, pt.y, pt.z);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Register a user camera
-void OgreAdaptor::RegisterCamera( OgreCamera *cam )
-{
-  this->cameras.push_back( cam );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Unregister a user camera
-void OgreAdaptor::UnregisterCamera( OgreCamera *cam )
-{
-  std::vector<OgreCamera*>::iterator iter;
-  for(iter=this->cameras.begin();iter != this->cameras.end();iter++)
-  {
-    if ((*iter) == cam)
-    {
-      this->cameras.erase(iter);
-      break;
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Print scene graph
-void OgreAdaptor::PrintSceneGraph()
-{
-  this->PrintSceneGraphHelper("", this->sceneMgr->getRootSceneNode());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Print scene graph
-void OgreAdaptor::PrintSceneGraphHelper(std::string prefix, 
-                                         Ogre::Node *node)
-{
-  std::cout << prefix << node->getName() << std::endl;
-
-  prefix += "  ";
-  for (unsigned int i=0; i < node->numChildren(); i++)
-  {
-    this->PrintSceneGraphHelper( prefix, node->getChild(i) );
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns true if the graphics card support GLSL

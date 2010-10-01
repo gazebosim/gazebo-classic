@@ -1,12 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set (sources MonoCameraSensor.cc
-             StereoCameraSensor.cc
-)
+set (sources MonoCameraSensor.cc)
 
-set (headers MonoCameraSensor.hh
-             StereoCameraSensor.hh
-)
+set (headers MonoCameraSensor.hh)
 
 
 APPEND_TO_SERVER_SOURCES(${sources})

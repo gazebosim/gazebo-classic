@@ -49,11 +49,7 @@ namespace gazebo
   class Joint : public Common
   {
     /// \brief Type of joint
-    public: enum Type {SLIDER, HINGE, HINGE2, BALL, UNIVERSAL, TYPE_COUNT};
     public: enum Attribute {FUDGE_FACTOR, SUSPENSION_ERP, SUSPENSION_CFM, STOP_ERP,STOP_CFM,ERP,CFM,FMAX,VEL,HI_STOP,LO_STOP};
-
-    /// \brief Type names of joint
-    public: static std::string TypeNames[TYPE_COUNT]; 
 
     /// \brief Constructor
     public: Joint();
@@ -79,9 +75,6 @@ namespace gazebo
 
     /// \brief Set the model this joint belongs too
     public: void SetModel(Model *model);
-
-    /// \brief Get the type of the joint
-    public: Joint::Type GetType() const;
 
     /// \brief Get the body to which the joint is attached according the _index
     public: virtual Body *GetJointBody( int index ) const = 0;
@@ -163,9 +156,6 @@ namespace gazebo
     /// \brief Set a parameter for the joint
     public: virtual void SetAttribute( Attribute, int index, double value) = 0;
   
-    /// Type of Joint
-    protected: Type type;
-
     /// The first body this joint connects to
     protected: Body *body1;
 

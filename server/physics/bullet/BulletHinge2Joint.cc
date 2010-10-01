@@ -25,6 +25,8 @@
  */
 
 #include "Global.hh"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "BulletBody.hh"
 #include "XMLConfig.hh"
 #include "BulletPhysics.hh"

@@ -29,12 +29,11 @@
 #include <iostream>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <FL/Fl.H>
-#include <FL/x.H>
 
 #include "gazebo_config.h"
 
 #include "RTShaderSystem.hh"
+#include "RenderControl.hh"
 #include "Light.hh"
 #include "Material.hh"
 #include "Simulator.hh"
@@ -107,7 +106,7 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
     parent->AttachMesh(resultName);
     parent->SetMaterial(material);
 
-    parent->SetCastShadows(castShadows);
+    parent->SetCastShadows(true);
   }
   catch (Ogre::ItemIdentityException e)
   {
@@ -115,241 +114,6 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
   }
 
   return resultName;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Create a light source and attach it to the visual node
-Light *OgreCreator::CreateLight(Entity *parent)
-{
-  Light *newLight = new Light(parent);
-  this->lights.push_back(newLight);
-  return newLight;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Remove a light
-void OgreCreator::DeleteLight(Light *light)
-{
-  if (!light)
-    return;
-
-  std::list<Light*>::iterator iter;
-  for (iter = this->lights.begin(); iter != this->lights.end(); iter++)
-  {
-    if (*iter == light)
-    {
-      delete *iter;
-      this->lights.erase(iter);
-      break;
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Helper function to create a camera
-Ogre::Camera *OgreCreator::CreateCamera(const std::string &name, 
-    double nearClip, double farClip, double hfov, 
-    Ogre::RenderTarget *renderTarget)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return NULL;
-
-  Ogre::Camera *camera;
-  Ogre::Viewport *cviewport;
-
-  camera = OgreAdaptor::Instance()->sceneMgr->createCamera(name);
-
-  // Use X/Y as horizon, Z up
-  camera->pitch(Ogre::Degree(90));
-
-  // Don't yaw along variable axis, causes leaning
-  camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-
-  camera->setDirection(1,0,0);
-
-  camera->setNearClipDistance(nearClip);
-  camera->setFarClipDistance(farClip);
-
-  if (renderTarget)
-  {
-    // Setup the viewport to use the texture
-    cviewport = renderTarget->addViewport(camera);
-    cviewport->setClearEveryFrame(true);
-    cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
-
-    double ratio = (double)cviewport->getActualWidth() / (double)cviewport->getActualHeight();
-    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    camera->setAspectRatio(ratio);
-    camera->setFOVy(Ogre::Radian(vfov));
-
-    RTShaderSystem::Instance()->AttachViewport(cviewport);
-  }
-
-  return camera;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Helper function to delete a camera
-void OgreCreator::DeleteCamera(Ogre::Camera* camera)
-{
-  OgreAdaptor::Instance()->sceneMgr->destroyCamera(camera);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OgreCreator::CreateFog(XMLConfigNode *cnode)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  if (cnode)
-  {
-    Ogre::ColourValue backgroundColor;
-    Ogre::FogMode fogType = Ogre::FOG_NONE;
-    std::string type;
-    double density;
-    double linearStart, linearEnd;
-
-    backgroundColor.r = cnode->GetTupleDouble("color",0,0);
-    backgroundColor.g = cnode->GetTupleDouble("color",1,0);
-    backgroundColor.b = cnode->GetTupleDouble("color",2,0);
-    type = cnode->GetString("type","linear",0);
-    density = cnode->GetDouble("density",0,0);
-    linearStart = cnode->GetDouble("linearStart",0,0);
-    linearEnd = cnode->GetDouble("linearEnd",1.0,0);
-
-    if (type == "linear")
-      fogType = Ogre::FOG_LINEAR;
-    else if (type == "exp")
-      fogType = Ogre::FOG_EXP;
-    else if (type == "exp2")
-      fogType = Ogre::FOG_EXP2;
-
-    if (type != "none")
-    {
-      OgreAdaptor::Instance()->sceneMgr->setFog(fogType, backgroundColor, density, linearStart, linearEnd);
-      //OgreAdaptor::Instance()->sceneMgr->setFog(Ogre::FOG_LINEAR, backgroundColor, 0, linearStart, linearEnd);
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void OgreCreator::SaveFog(std::string &prefix, std::ostream &stream)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  Ogre::ColourValue color=OgreAdaptor::Instance()->sceneMgr->getFogColour();
-  Ogre::Real start = OgreAdaptor::Instance()->sceneMgr->getFogStart();
-  Ogre::Real end = OgreAdaptor::Instance()->sceneMgr->getFogEnd();
-  Ogre::Real density = OgreAdaptor::Instance()->sceneMgr->getFogDensity();
-  std::string fogMode="";
-
-  switch (OgreAdaptor::Instance()->sceneMgr->getFogMode())
-  {
-    case Ogre::FOG_EXP:
-      fogMode="exp";
-      break;
-    case Ogre::FOG_EXP2:
-      fogMode="exp2";
-      break;
-    case Ogre::FOG_LINEAR:
-      //case default:
-      fogMode="linear";
-      break;
-    case Ogre::FOG_NONE:
-      fogMode="none";
-      break;
-  }
-
-  stream << prefix << "  <fog>\n";
-  stream << prefix << "    <type>" << fogMode << "</type>\n";
-  stream << prefix << "    <color>" << color.r << " " << color.g << " " << color.b << " " << color.a << "</color>\n";
-  stream << prefix << "    <linearStart>" << start << "</linearStart>\n";
-  stream << prefix << "    <linearEnd>" << end << "</linearEnd>\n";
-  stream << prefix << "    <density>" << density << "</density>\n";
-  stream << prefix << "  </fog>\n";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Create a sky
-void OgreCreator::CreateSky(std::string material)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  if (!material.empty())
-  {
-    try
-    {
-      /*if (node->GetChild("fog"))
-        {
-        Ogre::Plane plane;
-        plane.d = 49;
-        plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Z;
-        OgreAdaptor::Instance()->sceneMgr->setSkyPlane(true, plane, material, 500, 100, true, 0.5, 150, 150);
-        }
-        else
-        {*/
-      Ogre::Quaternion orientation;
-      orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
-      //OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
-      OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,10,8, 4, true, orientation);
-      //}
-
-    }
-    catch (int)
-    {
-      gzmsg(0) << "Unable to set sky dome to material[" << material << "]\n";
-    }
-
-  }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Draw a named line
-void OgreCreator::DrawLine(const Vector3 &start, const Vector3 &end, 
-                           const std::string &name)
-{
-  Ogre::SceneNode *node = NULL;
-  Ogre::ManualObject *obj = NULL;
-  bool attached = false;
-
-  if ( OgreAdaptor::Instance()->sceneMgr->hasManualObject(name))
-  {
-    node = OgreAdaptor::Instance()->sceneMgr->getSceneNode(name);
-    obj = OgreAdaptor::Instance()->sceneMgr->getManualObject(name);
-    attached = true;
-  }
-  else
-  {
-    node = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode(name);
-    obj = OgreAdaptor::Instance()->sceneMgr->createManualObject(name); 
-  }
-
-  node->setVisible(true);
-  obj->setVisible(true);
-
-  obj->clear();
-  obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST); 
-  obj->position(start.x, start.y, start.z); 
-  obj->position(end.x, end.y, end.z); 
-  obj->end(); 
-
-  if (!attached)
-    node->attachObject(obj);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Hide a visual
-void OgreCreator::SetVisible(const std::string &name, bool visible)
-{
-  if (OgreAdaptor::Instance()->sceneMgr->hasSceneNode(name))
-    OgreAdaptor::Instance()->sceneMgr->getSceneNode(name)->setVisible(visible);
-
-  if ( OgreAdaptor::Instance()->sceneMgr->hasManualObject(name))
-    OgreAdaptor::Instance()->sceneMgr->getManualObject(name)->setVisible(visible);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -365,19 +129,18 @@ void OgreCreator::RemoveMesh(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window for Ogre
-Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int width, unsigned int height)
+Ogre::RenderWindow *OgreCreator::CreateWindow(RenderControl *wxWindow, unsigned int width, unsigned int height)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
 
   Ogre::RenderWindow *win = NULL;
 
-  if (flWindow)
+  if (wxWindow)
   {
-    XSync(fl_display, false);
+    //XSync(fl_display, false);
+    win = OgreCreator::CreateWindow( wxWindow->GetOgreHandle(), width, height);
 
-    win = OgreCreator::CreateWindow( fl_display, fl_visual->screen, 
-        (int32_t)(Fl_X::i(flWindow)->xid), width, height);
     if (win)
       this->windows.push_back(win);
   }
@@ -387,36 +150,17 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Fl_Window *flWindow, unsigned int 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window for Ogre
-Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen, 
-                                              int32_t winId, unsigned int width,                                              unsigned int height)
+Ogre::RenderWindow *OgreCreator::CreateWindow( const std::string ogreHandle,
+                                               unsigned int width,                                                             unsigned int height)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
-
-  std::stringstream ogreHandle;
 
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
   Ogre::RenderWindow *window = NULL;
 
-  /*std::string screenStr = DisplayString((long)display);
-  std::string::size_type dotPos = screenStr.find(".");
-  screenStr = screenStr.substr(dotPos+1, screenStr.size());
-
-  int attrList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
-                    GLX_STENCIL_SIZE, 16, None };
-  XVisualInfo *vi = glXChooseVisual(display, DefaultScreen((long)display), 
-                                    attrList);
-
-  ogreHandle << (unsigned long)display 
-             << ":" << screenStr 
-             << ":" << (unsigned long)winId 
-             << ":" << (unsigned long)vi;
-  */
-
-  ogreHandle << winId;
-
-  params["parentWindowHandle"] = ogreHandle.str();
+  params["parentWindowHandle"] = ogreHandle;
 
   std::ostringstream stream;
   stream << "OgreWindow(" << windowCounter++ << ")";
@@ -442,8 +186,8 @@ Ogre::RenderWindow *OgreCreator::CreateWindow(Display *display, int screen,
   }
 
   window->setActive(true);
-  window->setVisible(true);
-  window->setAutoUpdated(true);
+  //window->setVisible(true);
+  window->setAutoUpdated(false);
 
   this->windows.push_back(window);
 
@@ -578,7 +322,7 @@ void OgreCreator::Update()
   std::list<OgreDynamicLines*>::iterator iter;
   std::list<OgreMovableText*>::iterator titer;
   std::list<Ogre::RenderWindow*>::iterator witer;
-  std::map<std::string, OgreVisual*>::iterator viter;
+  std::list<OgreVisual*>::iterator viter;
 
   // Update the text
   for (titer = this->text.begin(); titer != this->text.end(); titer++)
@@ -597,13 +341,11 @@ void OgreCreator::Update()
     // Update the visuals
     for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
     {
-      if (viter->second)
+      if (*viter)
       {
-        // lock in case the visual is being dynamically destroyed
-        //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
-        if (!viter->second->IsDirty())
+        if ( !(*viter)->IsDirty() )
           continue;
-        viter->second->SetToDirtyPose();
+        (*viter)->SetToDirtyPose();
       }
     }
   }
@@ -612,25 +354,33 @@ void OgreCreator::Update()
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a new ogre visual 
 OgreVisual *OgreCreator::CreateVisual( const std::string &name,
-    OgreVisual *parent, Entity *owner)
+    OgreVisual *parent, Entity *owner, Scene *scene)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
 
   OgreVisual *newVis = NULL;
-  std::map<std::string, OgreVisual*>::iterator iter;
+  std::list<OgreVisual*>::iterator iter;
 
-  iter = this->visuals.find(name);
-
-  if (iter == this->visuals.end())
+  std::string vis_name;
+  if (name.empty())
   {
-    newVis = new OgreVisual(parent, owner);
-    newVis->SetName(name);
-
-    this->visuals[name] = newVis;
+    unsigned int index = 0;
+    std::stringstream stream;
+    do 
+    {
+      stream.str("");
+      stream << "generic_visual_" << index++;
+    } while (this->GetVisual(stream.str()) != NULL);
+    vis_name = stream.str();
   }
   else
-    gzthrow(std::string("Name of ogre visual already exists: ") + name);
+    vis_name = name;
+
+  newVis = new OgreVisual(parent, owner, scene);
+  newVis->SetName(vis_name);
+
+  this->visuals.push_back( newVis );
 
   return newVis;
 }
@@ -639,11 +389,10 @@ OgreVisual *OgreCreator::CreateVisual( const std::string &name,
 // Get a visual
 OgreVisual *OgreCreator::GetVisual( const std::string &name )
 {
-  std::map<std::string, OgreVisual*>::iterator iter;
-  iter = this->visuals.find(name);
-
-  if (iter != this->visuals.end())
-    return iter->second;
+  std::list<OgreVisual*>::iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+    if ( (*iter)->GetName() == name)
+      return (*iter);
 
   return NULL;
 }
@@ -655,21 +404,8 @@ void OgreCreator::DeleteVisual( OgreVisual *visual )
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  std::map<std::string, OgreVisual*>::iterator iter;
-
-  iter = this->visuals.find(visual->GetName());
-
-  if (iter != this->visuals.end() && iter->second != NULL)
-  {
-    delete iter->second;
-    iter->second = NULL;
-    this->visuals.erase(iter);
-  }
-  else
-  {
-    gzerr(0) << "Unknown visual[" << visual->GetName() << "]\n";
-  }
-
+  this->visuals.remove(visual);
+  delete visual;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

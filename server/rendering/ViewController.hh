@@ -19,7 +19,7 @@ namespace gazebo
     /// \brief Handle a mouse event
     public: virtual void HandleMouseEvent(const MouseEvent &event) = 0;
 
-    protected: OgreCamera *camera;
+    protected: OgreCamera *camera; 
   };
 }
 #endif

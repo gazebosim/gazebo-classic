@@ -40,7 +40,7 @@ ODERayShape::ODERayShape( Geom *parent, bool displayRays )
 {
   this->SetName("ODE Ray Shape");
 
-  ODEGeom *geom = (ODEGeom*)this->parent;
+  ODEGeom *geom = (ODEGeom*)this->geomParent;
 
   // Create default ray with unit length
   geom->SetGeom( dCreateRay( geom->GetSpaceId(), 1.0 ),  false );
@@ -56,13 +56,13 @@ ODERayShape::~ODERayShape()
 // Update the ray geom
 void ODERayShape::Update()
 {
-  ODEGeom *geom = (ODEGeom*)this->parent;
+  ODEGeom *geom = (ODEGeom*)this->geomParent;
 
   Vector3 dir;
 
-  this->globalStartPos = this->parent->GetBody()->GetWorldPose().CoordPositionAdd(
+  this->globalStartPos = this->geomParent->GetBody()->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
-  this->globalEndPos = this->parent->GetBody()->GetWorldPose().CoordPositionAdd(
+  this->globalEndPos = this->geomParent->GetBody()->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
   dir = this->globalEndPos - this->globalStartPos;
@@ -84,7 +84,7 @@ void ODERayShape::Update()
 void ODERayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
 {
   Vector3 dir;
-  ODEGeom *geom = (ODEGeom*)this->parent;
+  ODEGeom *geom = (ODEGeom*)this->geomParent;
 
   RayShape::SetPoints(posStart, posEnd);
 

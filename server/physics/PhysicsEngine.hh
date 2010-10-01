@@ -118,20 +118,17 @@ namespace gazebo
     public: virtual Body *CreateBody(Entity *parent) = 0;
 
     /// \brief Create a geom
-    public: virtual Geom *CreateGeom(Shape::Type type, Body *body) = 0;
+    public: virtual Geom *CreateGeom(std::string shapeTypename, Body *body) = 0;
 
-    /// \brief Create a geom
-    public: Geom *CreateGeom(std::string typeName, Body *body);
-  
     /// \brief Create a new joint
-    public: virtual Joint *CreateJoint(Joint::Type type) = 0;
+    public: virtual Joint *CreateJoint(std::string type) = 0;
   
     /// \brief Return the gavity vector
     /// \return The gavity vector
     public: Vector3 GetGravity() const;
 
     /// \brief Set the gavity vector
-    public: void SetGravity(Vector3 gravity) const;
+    public: virtual void SetGravity(const gazebo::Vector3 &gravity) = 0;
 
     /// \brief Get the time between each update cycle
     /// \return seconds between updates 

@@ -29,6 +29,7 @@
 #include <fstream>
 #include <sys/time.h> //gettimeofday
 
+#include "Events.hh"
 #include "OgreVisual.hh"
 #include "Body.hh"
 #include "Factory.hh"
@@ -79,6 +80,9 @@ World::World()
   this->saveStateTimeoutP = new ParamT<Time>("saveStateResolution",0.1,0);
   this->saveStateBufferSizeP = new ParamT<unsigned int>("saveStateBufferSize",1000,0);
   Param::End();
+
+  Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
+  Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,17 +107,12 @@ void World::Close()
       (*iter) = NULL;
     }
   }
+  this->models.clear();
 
   if (this->physicsEngine)
   {
     delete this->physicsEngine;
     this->physicsEngine = NULL;
-  }
-
-  if (this->server)
-  {
-    delete this->server;
-    this->server =NULL;
   }
 
   try
@@ -123,18 +122,27 @@ void World::Close()
       delete this->simIface;
       this->simIface = NULL;
     }
+
+    if (this->graphics)
+      delete this->graphics;
+    this->graphics = NULL;
+
+    if (this->factory)
+      delete this->factory;
+    this->factory = NULL;
   }
   catch (std::string e)
   {
     gzthrow(e);
   }
 
-  if (this->factory)
+  if (this->server)
   {
-    delete this->factory;
-    this->factory = NULL;
+    delete this->server;
+    this->server =NULL;
   }
 
+  /*
   if (this->saveStateTimeoutP)
     delete this->saveStateTimeoutP;
   this->saveStateTimeoutP = NULL;
@@ -146,6 +154,7 @@ void World::Close()
   if (this->threadsP)
     delete this->threadsP;
   this->threadsP = NULL;
+  */
 
 #ifdef USE_THREADPOOL
   if (this->threadPool)
@@ -163,22 +172,28 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
       boost::bind(&World::PauseSlot, this, _1) );
   
   // Create the server object (needs to be done before models initialize)
-  this->server = new libgazebo::Server();
+  if (this->server == NULL)
+  {
+    this->server = new libgazebo::Server();
 
-  try
-  {
-    this->server->Init(serverId, true );
-  }
-  catch ( std::string err)
-  {
-    gzthrow (err);
+    try
+    {
+      this->server->Init(serverId, true );
+    }
+    catch ( std::string err)
+    {
+      gzthrow (err);
+    }
   }
 
   // Create the simulator interface
   try
   {
-    this->simIface = new libgazebo::SimulationIface();
-    this->simIface->Create(this->server, "default" );
+    if (!this->simIface)
+    {
+      this->simIface = new libgazebo::SimulationIface();
+      this->simIface->Create(this->server, "default" );
+    }
   }
   catch (std::string err)
   {
@@ -186,10 +201,11 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   }
 
   // Create the default factory
-  this->factory = new Factory();
+  if (!this->factory)
+    this->factory = new Factory();
 
   // Create the graphics iface handler
-  if (Simulator::Instance()->GetRenderEngineEnabled())
+  if (!this->graphics && Simulator::Instance()->GetRenderEngineEnabled())
   {
     this->graphics = new GraphicsIfaceHandler();
     this->graphics->Load("default");
@@ -208,6 +224,12 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
   if (Simulator::Instance()->GetPhysicsEnabled() && physicsNode)
   {
+    if (this->physicsEngine)
+    {
+      delete this->physicsEngine;
+      this->physicsEngine = NULL;
+    }
+
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine( physicsNode->GetName());
     if (this->physicsEngine == NULL)
       gzthrow("Unable to create physics engine\n");
@@ -438,6 +460,35 @@ void World::Fini()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Remove all entities from the world
+void World::Clear()
+{
+  std::vector<Model*>::iterator iter;
+  for (iter = this->models.begin(); iter != this->models.end(); iter++)
+    Events::deleteEntitySignal((*iter)->GetCompleteScopedName());
+  this->ProcessEntitiesToDelete();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of parameters
+unsigned int World::GetParamCount() const
+{
+  return this->parameters.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a param
+Param *World::GetParam(unsigned int index) const
+{
+  if (index < this->parameters.size())
+    return this->parameters[index];
+  else
+    gzerr(2) << "World::GetParam - Invalid param index\n";
+
+  return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Retun the libgazebo server
 libgazebo::Server *World::GetGzServer() const
 {
@@ -465,7 +516,7 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
     if (node->GetNSPrefix() == "model")
     {
       model = this->LoadModel(node, parent, removeDuplicate, initModel);
-      this->addEntitySignal(model);
+      Events::addEntitySignal(model->GetCompleteScopedName());
     }
   }
 
@@ -534,13 +585,13 @@ void World::ProcessEntitiesToDelete()
     for (miter=this->toDeleteEntities.begin();
         miter!=this->toDeleteEntities.end(); miter++)
     {
-      Entity *entity = this->GetEntityByName(*miter);
+      Common *common = Common::GetByName(*miter);
 
-      if (entity)
+      if (common)
       {
-        if (entity->GetType() == Entity::MODEL)
+        if (common->HasType("model"))
         {
-          Model *model = (Model*)entity;
+          Model *model = (Model*)common;
 
           model->Fini();
 
@@ -550,28 +601,26 @@ void World::ProcessEntitiesToDelete()
           if (newiter != this->models.end())
             this->models.erase( newiter );
         }
-        else if (entity->GetType() == Entity::BODY)
-          ((Body*)entity)->Fini();
+        else if (common->HasType("body"))
+          ((Body*)common)->Fini();
 
-        delete (entity);
-        this->deleteEntitySignal(*miter);
+        delete (common);
       }
     }
 
     this->toDeleteEntities.clear();
   }
- 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Delete an entity by name
-void World::DeleteEntity(const std::string &name)
+void World::DeleteEntityCB(const std::string &name)
 {
   std::vector< Model* >::iterator miter;
 
-  Entity *entity = this->GetEntityByName(name);
+  Common *common = Common::GetByName(name);
 
-  if (!entity)
+  if (!common)
     return;
 
   this->toDeleteEntities.push_back(name);
@@ -608,45 +657,23 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent,
   return model;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get a pointer to a model based on a name
-Entity *World::GetEntityByName(const std::string &name) const
+///////////////////////////////////////////////////////////////////////////////
+/// Get the number of models
+unsigned int World::GetModelCount() const
 {
-  std::vector< Model *>::const_iterator iter;
-  Entity *result = NULL;
-
-  for (iter = this->models.begin(); 
-       iter != this->models.end() && result == NULL; iter++)
-    result = this->GetEntityByNameHelper(name, (*iter));
-  return result;
+  return this->models.size();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Get an entity by name
-Entity *World::GetEntityByNameHelper(const std::string &name, Entity *parent) const
+///////////////////////////////////////////////////////////////////////////////
+/// Get a model based on an index
+Model *World::GetModel(unsigned int index)
 {
-  if (!parent)
-    return NULL;
+  if (index < this->models.size())
+    return this->models[index];
+  else
+    gzerr(2) << "Invalid model index\n";
 
-  if (parent->GetCompleteScopedName() == name)
-    return parent;
-
-  const std::vector<Entity*> children = parent->GetChildren();
-  std::vector< Entity* >::const_iterator iter;
-
-  Entity *result = NULL;
-
-  for (iter = children.begin(); iter != children.end() && result ==NULL; iter++)
-    result = this->GetEntityByNameHelper(name, *iter);
-
-  return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-///  Get an iterator over the models
-const std::vector<Model*> &World::GetModels() const
-{
-  return this->models;
+  return NULL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -832,10 +859,10 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::SET_ENTITY_PARAM_VALUE:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent)
-            ent->SetParam( req->strValue, req->strValue1 );
+          if (common)
+            common->SetParam( req->strValue, req->strValue1 );
           else
             gzerr(0) << "Invalid entity name[" << req->name 
                      << "] in simulation interface Set Param Request.\n";
@@ -844,11 +871,11 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::APPLY_FORCE:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::BODY)
+          if (common && common->HasType("body"))
           {
-            Body *body = (Body*)(ent);
+            Body *body = (Body*)(common);
 
             Vector3 force(req->vec3Value.x, req->vec3Value.y, req->vec3Value.z);
 
@@ -865,11 +892,11 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::APPLY_TORQUE:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::BODY)
+          if (common && common->HasType("body"))
           {
-            Body *body = (Body*)(ent);
+            Body *body = (Body*)(common);
 
             Vector3 torque(req->vec3Value.x,req->vec3Value.y, req->vec3Value.z);
 
@@ -885,11 +912,11 @@ void World::UpdateSimulationIface()
         }
       case libgazebo::SimulationRequestData::SET_LINEAR_VEL:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)(ent);
+            Model *model = (Model*)(common);
 
             Vector3 linearVel( req->modelLinearVel.x, req->modelLinearVel.y,
                                req->modelLinearVel.z);
@@ -908,23 +935,22 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::SET_ANGULAR_VEL:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && (ent->GetType() == Entity::MODEL || 
-              ent->GetType() == Entity::BODY))
+          if (common && (common->HasType("model") || 
+              common->HasType("body")))
           {
 
             Vector3 vel( req->modelAngularVel.x, req->modelAngularVel.y,
                          req->modelAngularVel.z);
 
-            Pose3d pose = ent->GetWorldPose();
+            Pose3d pose = ((Entity*)common)->GetWorldPose();
             vel = pose.rot.RotateVector(vel);
 
-            if (ent->GetType()==Entity::MODEL)
-              ((Model*)ent)->SetAngularVel(vel);
-            else if (ent->GetType() == Entity::BODY)
-              ((Body*)ent)->SetAngularVel(vel);
-
+            if (common->HasType("model"))
+              ((Model*)common)->SetAngularVel(vel);
+            else if (common->HasType("body"))
+              ((Body*)common)->SetAngularVel(vel);
           }
           else
           {
@@ -937,11 +963,11 @@ void World::UpdateSimulationIface()
  
       case libgazebo::SimulationRequestData::SET_LINEAR_ACCEL:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
 
             Vector3 accel( req->modelLinearAccel.x, req->modelLinearAccel.y,
                                req->modelLinearAccel.z);
@@ -960,11 +986,11 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::SET_ANGULAR_ACCEL:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
             Vector3 accel( req->modelAngularAccel.x, req->modelAngularAccel.y,
                                req->modelAngularAccel.z);
 
@@ -982,11 +1008,11 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::SET_STATE:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
 
             Pose3d pose;
             Vector3 linearVel( req->modelLinearVel.x,
@@ -1036,14 +1062,15 @@ void World::UpdateSimulationIface()
           }
           break;
         }
+
       case libgazebo::SimulationRequestData::SET_POSE3D:
         {
           Pose3d pose;
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)(ent);
+            Model *model = (Model*)(common);
             pose.pos.x = req->modelPose.pos.x;
             pose.pos.y = req->modelPose.pos.y;
             pose.pos.z = req->modelPose.pos.z;
@@ -1073,12 +1100,12 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_NUM_CHILDREN:
         {
-          Entity *entity = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (entity)
+          if (common)
           {
             response->type= req->type;
-            response->uintValue = entity->GetChildren().size();
+            response->uintValue = common->GetChildCount();
             response++;
             this->simIface->data->responseCount += 1;
           }
@@ -1089,10 +1116,10 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_ENTITY_PARAM_KEY:
         {
-          Entity *entity = this->GetEntityByName((char*)req->name);
-          if (entity)
+          Common *common = Common::GetByName((char*)req->name);
+          if (common)
           {
-            Param *param = entity->GetParam(req->uintValue);
+            Param *param = common->GetParam(req->uintValue);
             response->type= req->type;
             memset(response->strValue, 0, 512);
 
@@ -1112,10 +1139,10 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_ENTITY_PARAM_VALUE:
         {
-          Entity *entity = this->GetEntityByName((char*)req->name);
-          if (entity)
+          Common *common = Common::GetByName((char*)req->name);
+          if (common)
           {
-            Param *param = entity->GetParam(req->uintValue);
+            Param *param = common->GetParam(req->uintValue);
             response->type= req->type;
             memset(response->strValue, 0, 512);
 
@@ -1136,10 +1163,10 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_ENTITY_PARAM_COUNT:
         {
-          Entity *entity = this->GetEntityByName((char*)req->name);
-          if (entity)
+          Common *common = Common::GetByName((char*)req->name);
+          if (common)
           {
-            unsigned int count = entity->GetParamCount();
+            unsigned int count = common->GetParamCount();
             response->type= req->type;
             response->uintValue = count;
             response++;
@@ -1174,17 +1201,17 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_CHILD_NAME:
         {
-          Entity *entity = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (entity)
+          if (common)
           {
-            Entity *child;
+            Common *child;
             unsigned int index;
             response->type= req->type;
 
             index = req->uintValue;
 
-            child = entity->GetChildren()[index];
+            child = common->GetChild(index);
             if (child)
             {
               memset(response->strValue, 0, 512);
@@ -1205,11 +1232,11 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
             response->type = req->type;
             response->uintValue = model->GetLaserFiducialId();
             response++;
@@ -1219,16 +1246,16 @@ void World::UpdateSimulationIface()
         }
       case libgazebo::SimulationRequestData::GET_ENTITY_TYPE:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
-          if (ent)
+          Common *common = Common::GetByName((char*)req->name);
+          if (common)
           {
             response->type = req->type;
             memset(response->strValue, 0, 512);
-            if (ent->GetType() == Entity::MODEL)
+            if (common->HasType("model"))
               strncpy(response->strValue, "model", 512);
-            else if (ent->GetType() == Entity::BODY)
+            else if (common->HasType("body"))
               strncpy(response->strValue, "body", 512);
-            else if (ent->GetType() == Entity::GEOM)
+            else if (common->HasType("geom"))
               strncpy(response->strValue, "geom", 512);
 
             response->strValue[511] = '\0';
@@ -1242,11 +1269,11 @@ void World::UpdateSimulationIface()
         }
       case libgazebo::SimulationRequestData::GET_MODEL_TYPE:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
 
             response->type = req->type;
             memset(response->strValue, 0, 512);
@@ -1263,10 +1290,10 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_MODEL_EXTENT:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
-          if (ent && ent->GetType() == Entity::MODEL)
+          Common *common = Common::GetByName((char*)req->name);
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
             Vector3 min, max;
             model->GetBoundingBox(min, max);
 
@@ -1287,9 +1314,10 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::GET_STATE:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
-          if (ent)// && ent->GetType() == Entity::MODEL)
+          Common *common = Common::GetByName((char*)req->name);
+          if (common && common->HasType("entity"))
           {
+            Entity *ent = (Entity*)(common);
             Pose3d pose;
             Vector3 linearVel;
             Vector3 angularVel;
@@ -1341,10 +1369,10 @@ void World::UpdateSimulationIface()
       case libgazebo::SimulationRequestData::GET_POSE2D:
       case libgazebo::SimulationRequestData::GET_POSE3D:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
-          if (ent && ent->GetType() == Entity::MODEL)
+          Common *common = Common::GetByName((char*)req->name);
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
 
             Pose3d pose = model->GetWorldPose();
             Vector3 rot = pose.rot.GetAsEuler();
@@ -1639,11 +1667,11 @@ void World::UpdateSimulationIface()
 
       case libgazebo::SimulationRequestData::SET_POSE2D:
         {
-          Entity *ent = this->GetEntityByName((char*)req->name);
+          Common *common = Common::GetByName((char*)req->name);
 
-          if (ent && ent->GetType() == Entity::MODEL)
+          if (common && common->HasType("model"))
           {
-            Model *model = (Model*)ent;
+            Model *model = (Model*)common;
 
             Pose3d pose = model->GetWorldPose();
             Vector3 rot = pose.rot.GetAsEuler();
@@ -1675,19 +1703,16 @@ void World::UpdateSimulationIface()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get all the interface names
-void World::GetInterfaceNames(Entity* en, std::vector<std::string>& list)
+void World::GetInterfaceNames(Common *common, std::vector<std::string>& list)
 {
-  if (!en || en->GetType() != Entity::MODEL)
+  if (!common || !common->HasType("model"))
     return;
 
-	Model* m = (Model*)(en);
+	Model* m = (Model*)(common);
 
   m->GetModelInterfaceNames(list);
-
-  const std::vector<Entity*> children = en->GetChildren();
-	std::vector<Entity*>::const_iterator citer;
-	for (citer=children.begin(); citer!=children.end(); citer++)
-		this->GetInterfaceNames((*citer),list);
+  for (unsigned int i =0; i < common->GetChildCount(); i++)
+		this->GetInterfaceNames(common->GetChild(i), list);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1778,8 +1803,11 @@ void World::PauseSlot(bool p)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the selected entity
-void World::SetSelectedEntity( Entity *ent )
+void World::SetSelectedEntityCB( const std::string &name )
 {
+  Common *common = Common::GetByName(name);
+  Entity *ent = dynamic_cast<Entity*>(common);
+
   // unselect selectedEntity
   if (this->selectedEntity)
   {
@@ -1817,4 +1845,11 @@ void World::PrintEntityTree()
   {
     (*iter)->Print("");
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the server id
+int World::GetServerId() const
+{
+  return this->server->serverId;
 }

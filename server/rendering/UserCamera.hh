@@ -37,14 +37,14 @@ namespace Ogre
 
 namespace gazebo
 {
-  class GLWindow;
+  class RenderControl;
   class XMLConfigNode;
   class OgreVisual;
 
   class UserCamera : public OgreCamera
   {
     /// \brief Constructor
-    public: UserCamera( GLWindow *parentWindow);
+    public: UserCamera( RenderControl *parentWindow, unsigned int sceneIndex);
 
     /// \brief Destructor
     public: virtual ~UserCamera();
@@ -55,17 +55,15 @@ namespace gazebo
     /// \brief Initialize
     public: void Init();
 
-    public: void SetCamera( OgreCamera *cam );
+    /// \brief Render the camera
+    public: virtual void Render();
 
-    /// \brief Update
-    public: void Update();
+    /// \brief Post render
+    public: virtual void PostRender();
 
     /// \brief Finialize
     public: void Fini();
   
-    /// \brief Get the name of the camera
-    public: std::string GetName() const;
-
     /// \brief Resize the camera
     public: void Resize(unsigned int w, unsigned int h);
 
@@ -83,9 +81,6 @@ namespace gazebo
 
     /// \brief Set whether to show the visual
     private: void ShowVisual(bool s);
-
-    /// Pointer to the viewport
-    protected: Ogre::Viewport *viewport;
 
     /// Pointer to the render window
     private: Ogre::RenderWindow *window;

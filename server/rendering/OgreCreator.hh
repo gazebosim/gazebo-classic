@@ -43,17 +43,18 @@ namespace Ogre
   class RenderWindow;
 }
 
-class Fl_Window;
 typedef struct _XDisplay Display;
 
 namespace gazebo
 {
+  class RenderControl;
   class XMLConfigNode;
   class Entity;
   class OgreVisual;
   class OgreMovableText;
   class OgreDynamicLines;
   class Light;
+  class Scene;
 
 /// \addtogroup gazebo_rendering
 /// \{
@@ -78,55 +79,22 @@ namespace gazebo
                 const Vector2<double> &uvTile, const std::string &material, 
                 bool castShadows, OgreVisual *parent, const std::string &name);
 
-    /// \brief Create a light source and attach it to the visual node
-    public: Light *CreateLight(Entity *parent);
-
-    /// \brief Remove a light
-    public: void DeleteLight(Light *light);
-
     /// \brief Delete a line visual from lines vector
     public: void DeleteDynamicLine(OgreDynamicLines* line);
 
-    /// \brief Helper function to create a camera
-    public: static Ogre::Camera *CreateCamera(const std::string &name, 
-                double nearClip, double farClip, double hfov, 
-                Ogre::RenderTarget *renderTarget);
-
-    public: static void DeleteCamera(Ogre::Camera* camera);
-
-    /// \brief Helper function to create fog
-    public: static void CreateFog(XMLConfigNode *node);
-
-    /// \brief Helper function to save the fog settings
-    public: static void SaveFog(std::string &prefix, std::ostream &stream);
-
-    /// \brief Helper function to create the sky 
-    public: static void CreateSky(std::string material);
-
     /// \brief Create a new window
-    public: Ogre::RenderWindow *CreateWindow(Fl_Window *flWindow, 
+    public: Ogre::RenderWindow *CreateWindow(RenderControl *window, 
                                              unsigned int width, 
                                              unsigned int height);
 
 
     /// \brief Create a window for Ogre
-    public: Ogre::RenderWindow *CreateWindow(Display *display, 
-                                             int screen, 
-                                             int32_t winId, 
+    public: Ogre::RenderWindow *CreateWindow(std::string ogreHandle, 
                                              unsigned int width, 
                                              unsigned int height);
 
     /// \brief Insert a mesh into Ogre 
     public: static void InsertMesh( const Mesh *mesh);
-
-    /// \brief Draw a named line
-    public: static void DrawLine(const Vector3 &start, const Vector3 &end, const std::string &name);
-
-    /// \brief Draw a line strip
-    public: static void DrawLineStrip(const std::vector<Vector3> &pts, const std::string &name);
-
-    /// \brief Hide a visual
-    public: static void SetVisible(const std::string &name, bool visible);
 
    /// \brief Remove a mesh by name
     public: static void RemoveMesh(const std::string &name);
@@ -145,13 +113,15 @@ namespace gazebo
     public: OgreDynamicLines *CreateDynamicLine(OgreDynamicRenderable::OperationType opType);
 
     /// \brief Create a new ogre visual 
-    /// \param name Unique name for the new visual
+    /// \param name Unique name for the new visual. Leave empty to generate
+    //              a unique name
     /// \param parent Parent visual
     /// \param owner The entity that owns the visual
     /// \return The new ogre visual
     public: OgreVisual *CreateVisual( const std::string &name,
                                       OgreVisual *parent=NULL, 
-                                      Entity *owner = NULL );
+                                      Entity *owner = NULL,
+                                      Scene *scene = NULL );
     /// \brief Get a visual
     public: OgreVisual *GetVisual( const std::string &name );
 
@@ -193,11 +163,8 @@ namespace gazebo
     // List of all the movable text
     private: std::list<OgreMovableText*> text;
 
-    // List of all the light sources
-    private: std::list<Light*> lights;
-
     // All the visuals 
-    private: std::map<std::string, OgreVisual*> visuals;
+    private: std::list<OgreVisual*> visuals;
 
     // All the windows
     private: std::list<Ogre::RenderWindow *> windows;

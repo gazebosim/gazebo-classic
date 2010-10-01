@@ -45,7 +45,7 @@ namespace gazebo
 /// \{
 
 // Forward declarations
-  class Gui;
+  class SimulationApp;
   class Server;
   class XMLConfig;
   class XMLConfigNode;
@@ -88,7 +88,9 @@ namespace gazebo
     public: void Fini( );
 
     /// \brief Main simulation loop, when this loop ends the simulation finish
-    public: void MainLoop();
+    public: void Run();
+
+    public: void GraphicsUpdate();
 
     /// \brief Gets the local configuration for this computer
     public: GazeboConfig *GetGazeboConfig() const;
@@ -128,6 +130,12 @@ namespace gazebo
     //User Iteractions
     /// \brief Simulator finished by the user
     public: void SetUserQuit();
+
+    /// \brief Stop the physics engine
+    public: void StopPhysics();
+
+    /// \brief Start the physics engine
+    public: void StartPhysics();
 
     /// \brief Return true if the step has incremented
     public: bool GetStepInc() const;
@@ -204,7 +212,7 @@ namespace gazebo
     private: XMLConfig *xmlFile;
 
     /// Pointer to the selected Gui 
-    private: Gui *gui;
+    private: SimulationApp *gui;
 
     private: OgreAdaptor *renderEngine;
 
@@ -235,6 +243,7 @@ namespace gazebo
 
     //The user has somewhat signaled the end of the program
     private: bool userQuit;
+    private: bool physicsQuit;
 
     /// True if the GUI is enabled
     private: bool guiEnabled;

@@ -40,12 +40,13 @@
 #include "OgreVisual.hh"
 #include "World.hh"
 #include "XMLConfig.hh"
-#include "Gui.hh"
+#include "SimulationApp.hh"
 #include "GazeboConfig.hh"
 #include "gz.h"
 #include "PhysicsEngine.hh"
 #include "OgreAdaptor.hh"
 #include "GazeboMessage.hh"
+#include "GazeboError.hh"
 #include "Global.hh"
 
 #include "Simulator.hh"
@@ -96,8 +97,7 @@ std::string Simulator::defaultWorld =
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Simulator::Simulator()
-: xmlFile(NULL),
-  gui(NULL),
+: gui(NULL),
   renderEngine(NULL),
   gazeboConfig(NULL),
   loaded(false),
@@ -110,6 +110,7 @@ Simulator::Simulator()
   renderUpdates(0),
   stepInc(false),
   userQuit(false),
+  physicsQuit(false),
   guiEnabled(true),
   renderEngineEnabled(true),
   physicsEnabled(true),
@@ -130,12 +131,6 @@ Simulator::~Simulator()
   {
     delete this->gazeboConfig;
     this->gazeboConfig = NULL;
-  }
-
-  if (this->xmlFile)
-  {
-    delete this->xmlFile;
-    this->xmlFile = NULL;
   }
 
   if (this->render_mutex)
@@ -165,13 +160,6 @@ void Simulator::Close()
   if (!this->loaded)
     return;
 
-  if (this->gui)
-  {
-    delete this->gui;
-    this->gui = NULL;
-  }
-
-
   gazebo::World::Instance()->Close();
 
   if (this->renderEngineEnabled)
@@ -192,14 +180,14 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   // Load the world file
-  this->xmlFile=new gazebo::XMLConfig();
+  XMLConfig *xmlFile=new gazebo::XMLConfig();
 
   try
   {
     if (worldFileName.size())
-      this->xmlFile->Load(worldFileName);
+      xmlFile->Load(worldFileName);
     else
-      this->xmlFile->LoadString(defaultWorld);
+      xmlFile->LoadString(defaultWorld);
   }
   catch (GazeboError e)
   {
@@ -248,12 +236,10 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
       }
 
         // Create the GUI
-      if (childNode || !rootNode)
+      if (!this->gui && (childNode || !rootNode))
       {
-        this->gui = new Gui(x, y, width, height, "Gazebo");
-
-        this->gui->Load(childNode);
-        this->gui->CreateCameras();
+        this->gui = new SimulationApp();
+        this->gui->Load();
       }
     }
     catch (GazeboError e)
@@ -280,6 +266,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     }
   }
 
+
+
   // Initialize the GUI
   if (this->gui)
   {
@@ -305,8 +293,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   this->loaded=true;
-
-  //OgreAdaptor::Instance()->PrintSceneGraph();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -400,8 +386,33 @@ void Simulator::Fini( )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Stop the physics engine
+void Simulator::StopPhysics()
+{
+  this->physicsQuit = true;
+  if (this->physicsThread)
+  {
+    this->physicsThread->join();
+    delete this->physicsThread;
+    this->physicsThread = NULL;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Start the physics engine
+void Simulator::StartPhysics()
+{
+  if (this->physicsThread)
+    this->StopPhysics();
+
+  this->physicsQuit = false;
+  this->physicsThread = new boost::thread( 
+      boost::bind(&Simulator::PhysicsLoop, this));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Main simulation loop, when this loop ends the simulation finish
-void Simulator::MainLoop()
+void Simulator::Run()
 {
   this->state = RUN;
 
@@ -411,32 +422,68 @@ void Simulator::MainLoop()
   struct timespec timeSpec;
   double freq = 80.0;
 
-  this->physicsThread = new boost::thread( 
-                         boost::bind(&Simulator::PhysicsLoop, this));
+  this->StartPhysics();
 
-  // Update the gui
-  while (!this->userQuit)
+  if (this->gui)
+    this->gui->Run();
+  else
   {
-    currTime = this->GetWallTime();
-    if ( currTime - lastTime > 1.0/freq)
+    while (!this->userQuit)
     {
-      lastTime = this->GetWallTime();
+      currTime = this->GetWallTime();
+      if ( currTime - lastTime > 1.0/freq)
+      {
+        lastTime = this->GetWallTime();
+
+        this->GraphicsUpdate();
+        currTime = this->GetWallTime();
+        if (currTime - lastTime < 1/freq)
+        {
+          Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+          timeSpec.tv_sec = sleepTime.sec;
+          timeSpec.tv_nsec = sleepTime.nsec;
+
+          nanosleep(&timeSpec, NULL);
+        }
+      }
+      else
+      {
+        Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+        timeSpec.tv_sec = sleepTime.sec;
+        timeSpec.tv_nsec = sleepTime.nsec;
+        nanosleep(&timeSpec, NULL);
+      }
+    }
+  }
+
+  this->StopPhysics();
+}
+
+void Simulator::GraphicsUpdate()
+{
+  // Update the gui
+  //while (!this->userQuit)
+  //{
+    //currTime = this->GetWallTime();
+    //if ( currTime - lastTime > 1.0/freq)
+    //{
+      //lastTime = this->GetWallTime();
 
       if (this->gui)
         this->gui->Update();
 
       if (this->renderEngineEnabled)
       {
-        OgreAdaptor::Instance()->UpdateCameras();
+        OgreAdaptor::Instance()->UpdateScenes();
         World::Instance()->GraphicsUpdate();
       }
 
-      currTime = this->GetWallTime();
+      //currTime = this->GetWallTime();
 
       World::Instance()->ProcessEntitiesToLoad();
       World::Instance()->ProcessEntitiesToDelete();
 
-      if (currTime - lastTime < 1/freq)
+      /*if (currTime - lastTime < 1/freq)
       {
         Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
         timeSpec.tv_sec = sleepTime.sec;
@@ -452,9 +499,9 @@ void Simulator::MainLoop()
       timeSpec.tv_nsec = sleepTime.nsec;
       nanosleep(&timeSpec, NULL);
     }
-  }
+    */
+  //}
 
-  this->physicsThread->join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -620,10 +667,10 @@ Model *Simulator::GetParentModel( Entity *entity ) const
 
   do 
   {
-    if (entity && entity->GetType() == Entity::MODEL)
+    if (entity && entity->HasType("model"))
       model = (Model*)entity;
 
-    entity = entity->GetParent();
+    entity = dynamic_cast<Entity*>(entity->GetParent());
   } while (model == NULL);
 
   return model;
@@ -640,9 +687,9 @@ Body *Simulator::GetParentBody( Entity *entity ) const
 
   do 
   {
-    if (entity && entity->GetType() == Entity::BODY)
+    if (entity && entity->HasType("body"))
       body = (Body*)(entity);
-    entity = entity->GetParent();
+    entity = dynamic_cast<Entity*>(entity->GetParent());
   } while (body == NULL);
 
   return body;
@@ -666,8 +713,7 @@ void Simulator::PhysicsLoop()
   Time lastTime = this->GetRealTime();
   struct timespec req, rem;
 
-
-  while (!this->userQuit)
+  while (!this->physicsQuit)
   {
     //DiagnosticTimer timer("PhysicsLoop Timer ");
 

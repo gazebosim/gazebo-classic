@@ -191,7 +191,7 @@ Body *BulletPhysics::CreateBody(Entity *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a new geom
-Geom *BulletPhysics::CreateGeom(Shape::Type type, Body *parent)
+Geom *BulletPhysics::CreateGeom(std::string type, Body *parent)
 {
   BulletGeom *geom = NULL;
   Shape *shape = NULL;
@@ -204,29 +204,20 @@ Geom *BulletPhysics::CreateGeom(Shape::Type type, Body *parent)
 
   geom = new BulletGeom(parent);
 
-  switch(type)
-  {
-    case Shape::SPHERE:
-      shape = new BulletSphereShape(geom);
-      break;
-    case Shape::BOX:
-      shape = new BulletBoxShape(geom);
-      break;
-    case Shape::CYLINDER:
-      shape = new BulletCylinderShape(geom);
-      break;
-    case Shape::PLANE:
-      shape = new BulletPlaneShape(geom);
-      break;
-    case Shape::TRIMESH:
-      shape = new BulletTrimeshShape(geom);
-      break;
-    case Shape::MAP:
-      shape = new MapShape(geom);
-      break;
-    default:
-      gzthrow("Unable to create a geom of type[" << type << "]");
-  }
+  if (type == "sphere")
+    shape = new BulletSphereShape(geom);
+  if (type == "box")
+    shape = new BulletBoxShape(geom);
+  if (type == "cylinder")
+    shape = new BulletCylinderShape(geom);
+  if (type == "plane")
+    shape = new BulletPlaneShape(geom);
+  if (type == "trimesh")
+    shape = new BulletTrimeshShape(geom);
+  if (type == "map")
+    shape = new MapShape(geom);
+  else 
+    gzthrow("Unable to create a geom of type[" << type << "]");
 
   return geom;
 }
@@ -234,24 +225,20 @@ Geom *BulletPhysics::CreateGeom(Shape::Type type, Body *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new joint
-Joint *BulletPhysics::CreateJoint(Joint::Type type)
+Joint *BulletPhysics::CreateJoint(std::string type)
 {
-  switch (type)
-  {
-    case Joint::SLIDER:
-      return new BulletSliderJoint(this->dynamicsWorld);
-    case Joint::HINGE:
-      return new BulletHingeJoint(this->dynamicsWorld);
-    case Joint::HINGE2:
-      return new BulletHinge2Joint(this->dynamicsWorld);
-    case Joint::BALL:
-      return new BulletBallJoint(this->dynamicsWorld);
-    case Joint::UNIVERSAL:
-      return new BulletUniversalJoint(this->dynamicsWorld);
-    default:
-      gzthrow("Unable to create joint of type[" << type << "]");
-      return NULL;
-  }
+  if (type == "slider")
+    return new BulletSliderJoint(this->dynamicsWorld);
+  if (type == "hinge")
+    return new BulletHingeJoint(this->dynamicsWorld);
+  if (type == "hinge2")
+    return new BulletHinge2Joint(this->dynamicsWorld);
+  if (type == "ball")
+    return new BulletBallJoint(this->dynamicsWorld);
+  if (type == "universal")
+    return new BulletUniversalJoint(this->dynamicsWorld);
+  else 
+    gzthrow("Unable to create joint of type[" << type << "]");
 
   return NULL;
 }
@@ -301,4 +288,12 @@ btTransform BulletPhysics::ConvertPose(const Pose3d pose)
   trans.setRotation( btQuaternion( pose.rot.x, pose.rot.y, 
                                    pose.rot.z, pose.rot.u) );
   return trans;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the gavity vector
+void BulletPhysics::SetGravity(const gazebo::Vector3 &gravity)
+{
+  this->gravityP->SetValue(gravity);
+  this->dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 }

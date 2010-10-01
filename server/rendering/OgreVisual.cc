@@ -26,6 +26,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Scene.hh"
 #include "SelectionObj.hh"
 #include "RTShaderSystem.hh"
 #include "MeshManager.hh"
@@ -46,17 +47,24 @@ unsigned int OgreVisual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
-  : Common()
+OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
+  : Common(_owner)
 {
+  this->type.push_back("visual");
+
   bool isStatic = false;
   Ogre::SceneNode *pnode = NULL;
   this->owner = _owner;
 
+  if (scene == NULL)
+    this->scene = OgreAdaptor::Instance()->GetScene(0);
+  else
+    this->scene = scene;
+
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
     if (!node)
-      pnode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
+      pnode = this->scene->GetManager()->getRootSceneNode();
     else
       pnode = node->GetSceneNode();
   }
@@ -70,14 +78,14 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   this->visible = true;
   this->ConstructorHelper(pnode, isStatic);
 
-  this->ribbonTrail = (Ogre::RibbonTrail*)OgreAdaptor::Instance()->sceneMgr->createMovableObject("RibbonTrail");
+  this->ribbonTrail = (Ogre::RibbonTrail*)this->scene->GetManager()->createMovableObject("RibbonTrail");
   this->ribbonTrail->setMaterialName("Gazebo/Red");
   this->ribbonTrail->setTrailLength(200);
   this->ribbonTrail->setMaxChainElements(1000);
   this->ribbonTrail->setNumberOfChains(1);
   this->ribbonTrail->setVisible(false);
   this->ribbonTrail->setInitialWidth(0,0.05);
-  OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->attachObject(this->ribbonTrail);
+  this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
 
   RTShaderSystem::Instance()->AttachEntity(this);
 }
@@ -85,6 +93,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 OgreVisual::OgreVisual (Ogre::SceneNode *node, bool isStatic)
+  : Common(NULL)
 {
   this->owner = NULL;
   this->ConstructorHelper(node, isStatic);
@@ -173,10 +182,29 @@ OgreVisual::~OgreVisual()
 
   RTShaderSystem::Instance()->DetachEntity(this);
 
+  if (this->sceneNode != NULL)
+  {
+    if (this->boundingBoxNode != NULL)
+      this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
+
+    // loop through sceneNode an delete attached objects
+    for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+    {
+      Ogre::MovableObject* obj = this->sceneNode->getAttachedObject(i);
+      if (obj) delete obj;
+      obj = NULL;
+    }
+    this->sceneNode->detachAllObjects();
+
+    // delete works, but removeAndDestroyChild segfaults
+    delete this->sceneNode;
+    this->sceneNode = NULL;
+    //this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
+  }
 
   // Having this chunk of code causes a segfault when closing the
   // application.
-  if (this->parentNode != NULL)
+  /*if (this->parentNode != NULL)
   {
     if (this->sceneNode != NULL)
     {
@@ -197,7 +225,7 @@ OgreVisual::~OgreVisual()
       this->sceneNode = NULL;
       //this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
     }
-  }
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -393,7 +421,7 @@ void OgreVisual::MakeStatic()
     return;
 
   if (!this->staticGeom)
-    this->staticGeom = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
+    this->staticGeom = this->scene->GetManager()->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
   // Add the scene node to the static geometry
   this->staticGeom->addSceneNode(this->sceneNode);
@@ -511,7 +539,7 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 
   Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
 
-  while (techniqueIt.hasMoreElements ())
+  /*while (techniqueIt.hasMoreElements ())
   {
     Ogre::Technique *t = techniqueIt.getNext ();
     Ogre::Technique::PassIterator passIt = t->getPassIterator ();
@@ -521,7 +549,7 @@ void OgreVisual::SetMaterial(const std::string &materialName)
       passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
       passIt.moveNext ();
     }
-  }
+  }*/
 
   try
   {
@@ -670,42 +698,6 @@ void OgreVisual::SetHighlight(bool highlight)
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
-
-  /*
-  #include <OgreParticleSystem.h>
-  #include <iostream>
-  Ogre::ParticleSystem *effect =OgreAdaptor::Instance()->sceneMgr->createParticleSystem(this->parentNode->getName(), "Gazebo/Aureola");
-  OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(effect);
-  //this->sceneNode->createChildSceneNode()->attachObject(effect);
-  Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);
-  std::cout << this->parentNode->getName() << std::endl;
-  */
-
-//FIXME:  Modifying selfIllumination is invasive to the material definition of the user
-// Choose other effect.
-/*
-  Ogre::Technique *t;
-  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
-  while ( techniqueIt.hasMoreElements() )
-  {
-    t = techniqueIt.getNext ();
-    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-
-    while (passIt.hasMoreElements ())
-    {
-      if (highlight)
-      {
-        passIt.peekNext ()->setSelfIllumination (1,1,1);
-      }
-      else
-      {
-        passIt.peekNext ()->setSelfIllumination (0,0,0);
-      }
-      passIt.moveNext ();
-    }
-  }
-  */
-
 }
 
 
@@ -799,6 +791,7 @@ void OgreVisual::SetRotation( const Quatern &rot)
 void OgreVisual::SetPose( const Pose3d &pose)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -1085,6 +1078,7 @@ void OgreVisual::SetShader(const std::string &shader)
   RTShaderSystem::Instance()->UpdateShaders();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void OgreVisual::SetRibbonTrail(bool value)
 {
   if (value)
@@ -1100,4 +1094,14 @@ void OgreVisual::SetRibbonTrail(bool value)
     this->ribbonTrail->clearChain(0);
   }
   this->ribbonTrail->setVisible(value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the size of the bounding box
+Vector3 OgreVisual::GetBoundingBoxSize() const
+{
+  this->sceneNode->_updateBounds();
+  Ogre::AxisAlignedBox box = this->sceneNode->_getWorldAABB();
+  Ogre::Vector3 size = box.getSize();
+  return Vector3(size.x, size.y, size.z);
 }

@@ -6,7 +6,7 @@ using namespace gazebo;
 /// Constructor
 BoxShape::BoxShape(Geom *parent) : Shape(parent)
 {
-  this->type = Shape::BOX;
+  this->type.push_back("box");
 
   Param::Begin(&this->parameters);
   this->sizeP = new ParamT<Vector3>("size",Vector3(1,1,1),1);

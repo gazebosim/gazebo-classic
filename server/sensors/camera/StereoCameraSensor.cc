@@ -53,7 +53,7 @@ GZ_REGISTER_STATIC_SENSOR("stereocamera", StereoCameraSensor);
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 StereoCameraSensor::StereoCameraSensor(Body *body)
-    : Sensor(body), OgreCamera("Stereo")
+    : Sensor(body), OgreCamera("Stereo",0)
 {
   this->depthBuffer[0] = NULL;
   this->depthBuffer[1] = NULL;
@@ -209,7 +209,7 @@ void StereoCameraSensor::UpdateChild()
   OgreAdaptor *adapt = OgreAdaptor::Instance();
   Ogre::RenderSystem *renderSys = adapt->root->getRenderSystem();
   Ogre::Viewport *vp = NULL;
-  Ogre::SceneManager *sceneMgr = adapt->sceneMgr;
+  Ogre::SceneManager *sceneMgr = adapt->GetSceneMgr(0);
   Ogre::Pass *pass;
   Ogre::SceneNode *gridNode = NULL;
   int i;

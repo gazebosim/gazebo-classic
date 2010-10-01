@@ -412,40 +412,29 @@ Body *ODEPhysics::CreateBody(Entity *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new geom
-Geom *ODEPhysics::CreateGeom(Shape::Type type, Body *body)
+Geom *ODEPhysics::CreateGeom(std::string type, Body *body)
 {
   ODEGeom *geom = new ODEGeom(body);
   Shape *shape = NULL;
 
-  switch (type)
-  {
-    case Shape::SPHERE:
-      shape = new ODESphereShape(geom);
-      break;
-    case Shape::PLANE:
-      shape = new ODEPlaneShape(geom);
-      break;
-    case Shape::BOX:
-      shape = new ODEBoxShape(geom);
-      break;
-    case Shape::CYLINDER:
-      shape = new ODECylinderShape(geom);
-      break;
-    case Shape::MULTIRAY:
-      shape = new ODEMultiRayShape(geom);
-      break;
-    case Shape::TRIMESH:
-      shape = new ODETrimeshShape(geom);
-      break;
-    case Shape::HEIGHTMAP:
-      shape = new ODEHeightmapShape(geom);
-      break;
-    case Shape::MAP:
-      shape = new MapShape(geom);
-      break;
-    default:
-      gzerr(0) << "Unable to create geom of type["<<type<<"]\n";
-  }
+  if ( type == "sphere")
+    shape = new ODESphereShape(geom);
+  else if ( type == "plane")
+    shape = new ODEPlaneShape(geom);
+  else if ( type == "box")
+    shape = new ODEBoxShape(geom);
+  else if ( type == "cylinder")
+    shape = new ODECylinderShape(geom);
+  else if ( type == "multiray")
+    shape = new ODEMultiRayShape(geom);
+  else if ( type == "trimesh")
+    shape = new ODETrimeshShape(geom);
+  else if ( type == "heightmap")
+    shape = new ODEHeightmapShape(geom);
+  else if ( type == "map")
+    shape = new MapShape(geom);
+  else
+    gzerr(0) << "Unable to create geom of type["<<type<<"]\n";
 
   return geom;
 }
@@ -598,23 +587,20 @@ void ODEPhysics::ConvertMass(void *engineMass, const Mass &mass)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new joint
-Joint *ODEPhysics::CreateJoint(Joint::Type type)
+Joint *ODEPhysics::CreateJoint(std::string type)
 {
-  switch (type)
-  {
-    case Joint::SLIDER:
-      return new ODESliderJoint(this->worldId);
-    case Joint::HINGE:
-      return new ODEHingeJoint(this->worldId);
-    case Joint::HINGE2:
-      return new ODEHinge2Joint(this->worldId);
-    case Joint::BALL:
-      return new ODEBallJoint(this->worldId);
-    case Joint::UNIVERSAL:
-      return new ODEUniversalJoint(this->worldId);
-    default:
-      return NULL;
-  }
+  if (type == "slider")
+    return new ODESliderJoint(this->worldId);
+  if (type == "hinge")
+    return new ODEHingeJoint(this->worldId);
+  if (type == "hinge2")
+    return new ODEHinge2Joint(this->worldId);
+  if (type == "ball")
+    return new ODEBallJoint(this->worldId);
+  if (type == "universal")
+    return new ODEUniversalJoint(this->worldId);
+  else
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -636,6 +622,14 @@ std::string ODEPhysics::GetStepType() const
 void ODEPhysics::SetStepType(const std::string type)
 {
   this->stepTypeP->SetValue(type);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the gavity vector
+void ODEPhysics::SetGravity(const gazebo::Vector3 &gravity)
+{
+  this->gravityP->SetValue(gravity);
+  dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -697,8 +691,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
     // for now, only use maxContacts if both geometries are trimeshes
     // other types of geometries do not need too many contacts
-    if (geom1->GetShapeType() == Shape::TRIMESH && 
-        geom2->GetShapeType()==Shape::TRIMESH)
+    if (geom1->GetShapeType() == "trimesh" && 
+        geom2->GetShapeType() == "trimesh")
     {
       numContacts = maxContacts;
     }

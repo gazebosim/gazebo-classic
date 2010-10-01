@@ -47,12 +47,13 @@ namespace gazebo
   class XMLConfigNode;
   class Entity;
   class SelectionObj;
+  class Scene;
 
   /// \brief Ogre Visual Object
   class OgreVisual : public Common, public Ogre::Any
   {
     /// \brief Constructor
-    public: OgreVisual (OgreVisual *node, Entity *owner = NULL);
+    public: OgreVisual (OgreVisual *node, Entity *owner = NULL, Scene *scene = NULL);
 
     /// \brief Constructor
     public: OgreVisual (Ogre::SceneNode *node, bool isStatic=false);
@@ -187,6 +188,9 @@ namespace gazebo
     /// \brief True on or off a ribbon trail
     public: void SetRibbonTrail(bool value);
 
+    /// \brief Get the size of the bounding box
+    public: Vector3 GetBoundingBoxSize() const;
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: std::string myMaterialName;
@@ -227,6 +231,8 @@ namespace gazebo
     private: static SelectionObj *selectionObj;
 
     private: Ogre::RibbonTrail *ribbonTrail;
+
+    private: Scene *scene;
   };
 }
 

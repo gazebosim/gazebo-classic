@@ -71,6 +71,7 @@ namespace gazebo
   class UserCamera;
   class OgreCamera;
   class OgreVisual;
+  class Scene;
   
   /// \brief Adptor to Ogre3d
   class OgreAdaptor : public SingletonT<OgreAdaptor>
@@ -100,31 +101,17 @@ namespace gazebo
     /// \brief Get the desired update rate
     public: double GetUpdateRate();
 
-    /// \brief Update all the cameras 
-    public: void UpdateCameras();
+    /// \brief Get a scene manager
+    public: Scene *GetScene(unsigned int index);
 
-    /// \brief Get an entity at a pixel location using a camera. Used for
-    ///        mouse picking. 
-    /// \param camera The ogre camera, used to do mouse picking
-    /// \param mousePos The position of the mouse in screen coordinates
-    /// \return The selected entity, or NULL
-    public: Entity *GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std::string &mod);
+    /// \brief Get the number of scene managers
+    public: unsigned int GetSceneCount() const;
 
-    /// \brief Get the world pos of a the first contact at a pixel location
-    public: Vector3 GetFirstContact(OgreCamera *camera, Vector2<int> mousePos);
-
-    /// \brief Register a user camera
-    public: void RegisterCamera( OgreCamera *cam );
-    public: void UnregisterCamera( OgreCamera *cam );
-
-    public: void PrintSceneGraph();
+    /// \brief Update all the scenes 
+    public: void UpdateScenes();
 
     /// \brief Returns true if the graphics card support GLSL
     public: bool HasGLSL();
-
-    /// \brief Print scene graph
-    private: void PrintSceneGraphHelper(std::string prefix, 
-                                        Ogre::Node *node);
 
     private: void LoadPlugins();
     private: void SetupResources();
@@ -134,28 +121,13 @@ namespace gazebo
     public: Ogre::Root *root;
   
     /// Pointer to the scene manager
-    public: Ogre::SceneManager *sceneMgr;
+    private: std::vector<Scene *> scenes;
   
     /// Pointer to the rendering system
     public: Ogre::RenderSystem *renderSys;
  
     private: Ogre::LogManager *logManager;
-  
-    // Our custom frame listener
-    private: OgreFrameListener *frameListener;
-  
-    public: Ogre::ColourValue *backgroundColor;
-  
-    private: Ogre::RaySceneQuery *raySceneQuery;
-
-    //bsp attributes saved to write XML file back
-    private: int sceneType;
-    private: std::string worldGeometry;
-  
-    //private: Vector3 terrainSize;
-    //private: unsigned int terrainVertSize;
-    //private: std::string terrainImage;
-  
+ 
     /// ID for a dummy window. Used for gui-less operation
     protected: Window dummyWindowId;
 
@@ -167,14 +139,6 @@ namespace gazebo
     
     /// GLX context used to render the scenes.Used for gui-less operation
     protected: GLXContext dummyContext;
-
-    private: ParamT<Vector4> *ambientP;
-    private: ParamT<bool> *shadowsP;
-    private: ParamT<Vector3> *backgroundColorP;
-    private: ParamT<std::string> *skyMaterialP;
-    private: std::vector<Param*> parameters;
-
-    private: std::vector<OgreCamera*> cameras;
 
     private: friend class DestroyerT<OgreAdaptor>;
     private: friend class SingletonT<OgreAdaptor>;

@@ -29,6 +29,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "Scene.hh"
 #include "Image.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
@@ -39,8 +40,9 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreHeightmap::OgreHeightmap()
+OgreHeightmap::OgreHeightmap(unsigned int sceneIndex)
 {
+  this->scene = OgreAdaptor::Instance()->GetScene(sceneIndex);
 }
 
 
@@ -48,7 +50,7 @@ OgreHeightmap::OgreHeightmap()
 // Destructor
 OgreHeightmap::~OgreHeightmap()
 {
-  Simulator::Instance()->GetRenderEngine()->sceneMgr->destroyQuery(this->rayQuery);
+  this->scene->GetManager()->destroyQuery(this->rayQuery);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -160,17 +162,17 @@ void OgreHeightmap::Load( std::string imageFilename,
     new Ogre::MemoryDataStream(mstr,strlen(mstr)) );
 
   // Set the static terrain in Ogre
-  OgreAdaptor::Instance()->sceneMgr->setWorldGeometry(dataStream);
+  this->scene->GetManager()->setWorldGeometry(dataStream);
 
   // HACK to make the terrain oriented properly
-  Ogre::SceneNode *tnode = OgreAdaptor::Instance()->sceneMgr->getSceneNode("Terrain");
+  Ogre::SceneNode *tnode = this->scene->GetManager()->getSceneNode("Terrain");
   tnode->pitch(Ogre::Degree(90));
   tnode->translate(Ogre::Vector3(-this->terrainSize.x*0.5, this->terrainSize.y*0.5, 0));
 
   // Setup the ray scene query, which is used to determine the heights of
   // the vertices for ODE
   this->ray = Ogre::Ray(Ogre::Vector3::ZERO, Ogre::Vector3::NEGATIVE_UNIT_Y);
-  this->rayQuery = OgreAdaptor::Instance()->sceneMgr->createRayQuery(this->ray);
+  this->rayQuery = this->scene->GetManager()->createRayQuery(this->ray);
   this->rayQuery->setQueryTypeMask(Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
   this->rayQuery->setWorldFragmentType(Ogre::SceneQuery::WFT_SINGLE_INTERSECTION);
 

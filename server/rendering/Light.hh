@@ -4,12 +4,14 @@
 #include <string>
 #include <iostream>
 
+#include "Color.hh"
 #include "Param.hh"
 #include "Entity.hh"
 
 namespace Ogre
 {
   class Light;
+  class SceneManager;
 }
 
 namespace gazebo
@@ -17,15 +19,16 @@ namespace gazebo
   class OgreVisual;
   class XMLConfigNode;
   class OgreDynamicLines;
+  class Scene;
 
   /// \brief Wrapper around an ogre light source
   class Light : public Entity
   {
     /// \brief Constructor
-    private: Light(Entity *parent);
+    public: Light(Entity *parent, unsigned int sceneIndex);
 
     /// \brief Destructor
-    private: virtual ~Light();
+    public: virtual ~Light();
 
     /// \brief Load the light
     public: void Load(XMLConfigNode *node);
@@ -44,10 +47,10 @@ namespace gazebo
     public: void SetLightType(const std::string &type);
 
     /// \brief Set the diffuse
-    public: void SetDiffuseColor(const Vector3 &color);
+    public: void SetDiffuseColor(const Color &color);
 
     /// \brief Set the specular color
-    public: void SetSpecularColor(const Vector3 &color);
+    public: void SetSpecularColor(const Color &color);
 
     /// \brief Set the direction
     public: void SetDirection(const Vector3 &dir);
@@ -73,6 +76,10 @@ namespace gazebo
     /// \private Helper node to create a visual representation of the light
     private: void CreateVisual();
 
+    private: void SetupShadows();
+
+    protected: virtual void OnPoseChange() {}
+
     /// The OGRE light source
     private: Ogre::Light *light;
 
@@ -81,8 +88,8 @@ namespace gazebo
     private: OgreDynamicLines *line;
 
     private: ParamT<std::string> *lightTypeP;
-    private: ParamT<Vector3> *diffuseP;
-    private: ParamT<Vector3> *specularP;
+    private: ParamT<Color> *diffuseP;
+    private: ParamT<Color> *specularP;
     private: ParamT<Vector3> *directionP;
     private: ParamT<Vector3> *attenuationP;
     private: ParamT<double> *rangeP;
@@ -92,8 +99,7 @@ namespace gazebo
     private: ParamT<double> *spotFalloffP;
 
     private: static unsigned int lightCounter;
-
-    private: friend class OgreCreator;
+    private: Scene *scene;
   };
 }
 #endif

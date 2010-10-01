@@ -120,10 +120,10 @@ class ODEPhysics : public PhysicsEngine
   public: virtual Body *CreateBody(Entity *parent);
 
   /// \brief Create a geom
-  public: virtual Geom *CreateGeom(Shape::Type type, Body *parent);
+  public: virtual Geom *CreateGeom(std::string shapeTypename, Body *parent);
  
   /// \brief Create a new joint
-  public: virtual Joint *CreateJoint(Joint::Type type);
+  public: virtual Joint *CreateJoint(std::string jointTypename);
 
   /// \brief Return the space id 
   public: dSpaceID GetSpaceId() const;
@@ -142,6 +142,9 @@ class ODEPhysics : public PhysicsEngine
 
   /// \brief Set the step type
   public: virtual void SetStepType(const std::string type);
+
+  /// \brief Set the gavity vector
+  public: virtual void SetGravity(const gazebo::Vector3 &gravity);
 
   /// \brief access functions to set ODE parameters
   public: void SetWorldCFM(double cfm);

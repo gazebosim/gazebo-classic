@@ -46,7 +46,8 @@ using namespace gazebo;
 Geom::Geom( Body *body )
     : Entity(body->GetCoMEntity())
 {
-  this->type = Entity::GEOM;
+  this->type.push_back("geom");
+
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
   this->typeName = "unknown";
@@ -151,7 +152,6 @@ void Geom::Load(XMLConfigNode *node)
 
   this->nameP->Load(node);
   this->SetName(this->nameP->GetValue());
-  this->nameP->Load(node);
   this->massP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
@@ -197,7 +197,7 @@ void Geom::Load(XMLConfigNode *node)
     childNode = childNode->GetNext("visual");
   }
 
-  if (this->GetShapeType() != Shape::PLANE && this->GetShapeType() != Shape::HEIGHTMAP)
+  if (this->GetShapeType() != "plane" && this->GetShapeType() != "heightmap")
   {
     this->ShowPhysics(false);
   }
@@ -208,7 +208,7 @@ void Geom::Load(XMLConfigNode *node)
 void Geom::CreateBoundingBox()
 {
   // Create the bounding box
-  if (this->GetShapeType() != Shape::PLANE && this->GetShapeType() != Shape::MAP)
+  if (this->GetShapeType() != "plane" && this->GetShapeType() != "map")
   {
     Vector3 min;
     Vector3 max;
@@ -454,9 +454,9 @@ const Mass &Geom::GetMass() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the shape type
-Shape::Type Geom::GetShapeType()
+std::string Geom::GetShapeType()
 {
-  return this->shape->GetType();
+  return this->shape->GetLeafType();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -494,7 +494,7 @@ void Geom::AddContact(const Contact &contact)
   if (!this->contactsEnabled)
     return;
 
-  if (this->GetShapeType() == Shape::RAY || this->GetShapeType() == Shape::PLANE)
+  if (this->GetShapeType() == "ray" || this->GetShapeType() == "plane")
     return;
 
   this->contacts.push_back( contact.Clone() );

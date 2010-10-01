@@ -36,8 +36,10 @@
 #include <libxml/xpointer.h>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
 

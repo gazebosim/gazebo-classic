@@ -26,6 +26,8 @@ set (sources OgreMovableText.cc
              ViewController.cc
              FPSViewController.cc
              OrbitViewController.cc
+             Grid.cc
+             Scene.cc
 )
 
 set (headers OgreMovableText.hh
@@ -49,6 +51,8 @@ set (headers OgreMovableText.hh
              ViewController.hh
              FPSViewController.hh
              OrbitViewController.hh
+             Grid.hh
+             Scene.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})

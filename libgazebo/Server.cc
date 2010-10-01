@@ -61,6 +61,7 @@ Server::Server()
 // Destroy a server
 Server::~Server()
 {
+  this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +183,7 @@ void Server::Fini()
   {
     std::ostringstream stream;
     stream << "error deleting pid file: " << strerror(errno);
+    std::cerr << stream.str();
     throw(stream.str());
   }
 

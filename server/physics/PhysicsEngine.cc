@@ -43,6 +43,8 @@ PhysicsEngine::PhysicsEngine()
 {
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
+  this->gravityP->Callback(&PhysicsEngine::SetGravity, this);
+
   this->updateRateP = new ParamT<double>("updateRate", 0.0, 0);
   this->stepTimeP = new ParamT<Time>("stepTime",0.025,0);
   Param::End();
@@ -130,13 +132,6 @@ Vector3 PhysicsEngine::GetGravity() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the gavity vector
-void PhysicsEngine::SetGravity(Vector3 gravity) const
-{
-  this->gravityP->SetValue(gravity);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
 double PhysicsEngine::GetUpdateRate() const
 {
@@ -176,17 +171,6 @@ void PhysicsEngine::LockMutex()
 void PhysicsEngine::UnlockMutex()
 {
   this->mutex->unlock();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Create a geom
-Geom *PhysicsEngine::CreateGeom(std::string typeName, Body *body)
-{
-  for (unsigned int i = 0; i < Shape::TYPE_COUNT; i++)
-    if (typeName == Shape::TypeNames[i])
-      return this->CreateGeom( (Shape::Type)i, body );
-
-  return NULL; 
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -81,7 +81,7 @@ void IRSensor::LoadChild(XMLConfigNode *node)
   while (iNode)
   {
     laserGeom = World::Instance()->GetPhysicsEngine()->CreateGeom(
-                     Shape::MULTIRAY, this->body);
+                     "multiray", this->body);
     laserGeom->SetName("IR Sensor Geom");
 
     laserShape = (MultiRayShape*)(laserGeom->GetShape());

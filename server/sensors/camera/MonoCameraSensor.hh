@@ -45,13 +45,16 @@ namespace gazebo
 /// This sensor is used for simulating standard monocular cameras; is
 /// is used by both camera models (e.g., SonyVID30) and user interface
 /// models (e.g., ObserverCam).
-class MonoCameraSensor : public Sensor, public OgreCamera
+class MonoCameraSensor : public Sensor
 {
   /// \brief Constructor
   public: MonoCameraSensor(Body *body);
 
   /// \brief Destructor
   public: virtual ~MonoCameraSensor();
+
+  /// \brief Get the camera
+  public: OgreCamera *GetCamera();
 
   /// \brief Load the camera using parameter from an XMLConfig node
   /// \param node The XMLConfig node
@@ -72,11 +75,11 @@ class MonoCameraSensor : public Sensor, public OgreCamera
   /// \brief Set whether the sensor is active or not
   public: virtual void SetActive(bool value);
 
-  /// \brief Return the material the camera renders to
-  public: virtual std::string GetMaterialName() const;
-
   public: virtual std::string GetName() const { return Sensor::GetName(); }
 
+  private: OgreCamera *camera;
+
+  protected: std::string ogreTextureName;
 };
 
 /// \}

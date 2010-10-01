@@ -142,7 +142,7 @@ namespace gazebo
     public: const Mass &GetMass() const;
 
     /// \brief Get the shape type
-    public: Shape::Type GetShapeType();
+    public: std::string GetShapeType();
 
     /// \brief Set the shape for this geom
     public: void SetShape(Shape *shape);
@@ -191,7 +191,7 @@ namespace gazebo
 
     /// \brief Get the angular acceleration of the geom in the world frame
     public: virtual Vector3 GetWorldAngularAccel() const;
- 
+
     public: template< typename T>
             boost::signals::connection ConnectContactCallback( T subscriber )
             { return contactSignal.connect(subscriber); }

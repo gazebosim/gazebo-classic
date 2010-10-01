@@ -89,7 +89,7 @@ namespace gazebo
     /// \brief Constructor
     public: SliderJoint( ) : T()
             {
-              this->type = Joint::SLIDER;
+              this->type.push_back("slider");
 
               Param::Begin(&this->parameters);
               this->axisP = new ParamT<Vector3>("axis",Vector3(0,0,1), 0);

@@ -28,6 +28,8 @@
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "Global.hh"
 #include "Body.hh"
 #include "Model.hh"
@@ -36,13 +38,12 @@
 
 using namespace gazebo;
 
-std::string Joint::TypeNames[Joint::TYPE_COUNT] = {"slider", "hinge", "hinge2", "ball", "universal"};
-
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 Joint::Joint()
-  : Common()
+  : Common(NULL)
 {
+  this->type.push_back("joint");
   this->visual = NULL;
   this->model = NULL;
 
@@ -94,14 +95,6 @@ Joint::~Joint()
   delete this->fudgeFactorP;
 }
 
-
-//////////////////////////////////////////////////////////////////////////////
-// Get the type of the joint
-Joint::Type Joint::GetType() const
-{
-  return this->type;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // Load a joint
 void Joint::Load(XMLConfigNode *node)
@@ -133,9 +126,9 @@ void Joint::Load(XMLConfigNode *node)
   else
   {
     visname << this->GetName() << "_VISUAL";
-    this->body1 = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->body1NameP) ));
-    this->body2 = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->body2NameP) ));
-    this->anchorBody = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->anchorBodyNameP) ));
+    this->body1 = dynamic_cast<Body*>(Common::GetByName( **(this->body1NameP) ));
+    this->body2 = dynamic_cast<Body*>(Common::GetByName( **(this->body2NameP) ));
+    this->anchorBody = dynamic_cast<Body*>(Common::GetByName( **(this->anchorBodyNameP) ));
   }
 
   if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
@@ -164,8 +157,8 @@ void Joint::Load(XMLConfigNode *node)
     this->line1 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
     this->line2 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
-    this->line1->setMaterial("Gazebo/BlueEmissive");
-    this->line2->setMaterial("Gazebo/BlueEmissive");
+    this->line1->setMaterial("Gazebo/BlueGlow");
+    this->line2->setMaterial("Gazebo/BlueGlow");
 
     this->visual->AttachObject(this->line1);
     this->visual->AttachObject(this->line2);
@@ -187,29 +180,7 @@ void Joint::Load(XMLConfigNode *node)
 /// Save a joint to a stream in XML format
 void Joint::Save(std::string &prefix, std::ostream &stream)
 {
-  std::string typeName;
-
-  switch (this->type)
-  {
-    case SLIDER: 
-      typeName="slider"; 
-      break;
-    case HINGE: 
-      typeName = "hinge"; 
-      break;
-    case HINGE2: 
-      typeName = "hinge2"; 
-      break;
-    case BALL: 
-      typeName = "ball"; 
-      break;
-    case UNIVERSAL: 
-      typeName = "universal"; 
-      break;
-    default:
-      gzthrow("Unable to save joint of type[" << this->type << "]\n");
-      break;
-  }
+  std::string typeName = this->type.back();
 
   stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
   stream << prefix << "  " << *(this->body1NameP) << "\n";

@@ -24,28 +24,30 @@ set (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this
 
 SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
 
-set (FLTK_LIBRARIES "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
-set (FLTK_INCLUDE_DIR "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
+set (GTK2_LIBRARIES "" CACHE STRING "WX GTK2 include paths. Use this to override automatic detection.")
+set (GTK2_INCLUDE_DIRS "" CACHE STRING "WX GTK2 include paths. Use this to override automatic detection.")
 
 include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
+include (FindwxWidgets)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
-
-set(FLTK_SKIP_FLUID TRUE)
-include (FindFLTK)
-if (FLTK_LIBRARIES AND FLTK_INCLUDE_DIR)
-  set (FLTK_FOUND ON BOOL FORCE)
-endif (FLTK_LIBRARIES AND FLTK_INCLUDE_DIR)
-if (NOT FLTK_FOUND)
-  BUILD_ERROR("FLTK libraries and development files not found. See the following website for installation instructions: http://fltk.org")
-endif (NOT FLTK_FOUND)
+include (FindOpenGL)
+if (NOT OPENGL_FOUND)
+  BUILD_ERROR ("OpenGL and development files not found.")
+else ()
+ APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                       ${gazeboserver_include_dirs_desc} 
+                       ${OPENGL_INCLUDE_DIR})
+ APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                       ${gazeboserver_link_libs_desc} 
+                       ${OPENGL_LIBRARIES})
+endif ()
 
 
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
-
 
   #################################################
   # Find ODE
@@ -124,6 +126,33 @@ if (PKG_CONFIG_FOUND)
   APPEND_TO_CACHED_LIST(gazeboserver_cflags 
                         ${gazeboserver_cflags_desc} 
                         ${ogre_cflags})
+
+  #################################################
+  # Find GTK
+  pkg_check_modules(GTK2 gtk+-2.0)
+  IF (NOT GTK2_FOUND)
+    BUILD_ERROR("gtk+-2.0 and development files not found. See the following website: http://www.gtk.org")
+  ELSE (NOT GTK2_FOUND)
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
+                          ${GTK2_INCLUDE_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
+                          ${GTK2_LIBRARY_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${GTK2_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${GTK2_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
+                          ${gazeboserver_ldflags_desc} 
+                          ${GTK2_LDFLAGS})
+    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
+                          ${gazeboserver_cflags_desc} 
+                          ${GTK2_CFLAGS})
+  ENDIF (NOT GTK2_FOUND)
+
 
   #################################################
   # Find XML
@@ -270,11 +299,18 @@ if (PKG_CONFIG_FOUND)
          "Websim libraries")
   endif (NOT WEBSIM_FOUND)
 
-
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   message (FATAL_ERROR "\nError: pkg-config not found")
 endif (PKG_CONFIG_FOUND)
+
+
+########################################
+# Find wxWidgets
+find_package(wxWidgets)
+if (NOT wxWidgets_FOUND)
+    BUILD_ERROR ("wxWidgets not found. See the following website: http://www.wxwidgets.org")
+endif (NOT wxWidgets_FOUND)
 
 
 ########################################
@@ -289,7 +325,7 @@ IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
   INCLUDE (FindBoost)
 
-  FIND_PACKAGE( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex)
+  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex)
 
   IF (NOT Boost_FOUND)
     SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)

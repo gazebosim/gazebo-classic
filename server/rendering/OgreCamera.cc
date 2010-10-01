@@ -42,6 +42,7 @@
 #include "Model.hh"
 #include "Body.hh"
 
+#include "Scene.hh"
 #include "OgreAdaptor.hh"
 #include "CameraManager.hh"
 #include "OgreCamera.hh"
@@ -52,10 +53,10 @@ unsigned int OgreCamera::cameraCounter = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreCamera::OgreCamera(const std::string &namePrefix)
+OgreCamera::OgreCamera(const std::string &namePrefix, unsigned int sceneIndex)
 {
-  this->name = "DefaultCameraName";
-  this->lastRenderTime = Simulator::Instance()->GetSimTime();
+  this->scene = OgreAdaptor::Instance()->GetScene(sceneIndex);
+  this->lastUpdate = Simulator::Instance()->GetSimTime();
 
   this->animState = NULL;
   this->textureWidth = this->textureHeight = 0;
@@ -68,14 +69,14 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   std::ostringstream stream;
   stream << namePrefix << "(" << this->myCount << ")";
-  this->cameraName = stream.str();
+  this->name = stream.str();
 
   this->renderTarget = NULL;
   this->userMovable = true;
 
   Param::Begin(&this->camParameters);
-  this->nearClipP = new ParamT<double>("nearClip",0.1,0);
-  this->farClipP = new ParamT<double>("farClip",50,0);
+  this->nearClipP = new ParamT<double>("nearClip",1,0);
+  this->farClipP = new ParamT<double>("farClip",100,0);
   this->saveFramesP = new ParamT<bool>("saveFrames",false,0);
   this->savePathnameP = new ParamT<std::string>("saveFramePath","",0);
   this->imageSizeP = new ParamT< Vector2<int> >("imageSize", Vector2<int>(320, 240),0);
@@ -88,6 +89,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->captureData = false;
 
   this->camera = NULL;
+  this->viewport = NULL;
 
   if (**this->updateRateP == 0)
     this->renderPeriod = Time(0.0);
@@ -127,20 +129,20 @@ OgreCamera::~OgreCamera()
 
   if (this->pitchNode)
   {
-    this->sceneNode->removeAndDestroyChild( this->cameraName + "PitchNode");
+    this->sceneNode->removeAndDestroyChild( this->name + "PitchNode");
     this->pitchNode = NULL;
   }
   if (this->camera)
   {
-    OgreCreator::DeleteCamera(this->camera);
+    this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;
   }
-  OgreAdaptor::Instance()->UnregisterCamera(this);
+  this->scene->UnregisterCamera(this);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
-void OgreCamera::LoadCam( XMLConfigNode *node )
+void OgreCamera::Load( XMLConfigNode *node )
 {
   // This should be last in the constructor
   CameraManager::Instance()->AddCamera(this);
@@ -172,6 +174,10 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
       this->imageFormat = Ogre::PF_R8G8B8;
     else if (this->imageFormatP->GetValue() == "B8G8R8")
       this->imageFormat = Ogre::PF_B8G8R8;
+    else if (this->imageFormatP->GetValue() == "FLOAT32")
+      this->imageFormat = Ogre::PF_FLOAT32_R;
+    else if (this->imageFormatP->GetValue() == "FLOAT16")
+      this->imageFormat = Ogre::PF_FLOAT16_R;
     else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
               (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
               (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
@@ -207,13 +213,11 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
     gzthrow("near clipping plane (min depth) <= zero");
   }
 
-  this->lastUpdate = Simulator::Instance()->GetSimTime();
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save camera info in xml format
-void OgreCamera::SaveCam(std::string &prefix, std::ostream &stream)
+void OgreCamera::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << (*this->nearClipP) << "\n";
   stream << prefix << (*this->farClipP) << "\n";
@@ -227,37 +231,40 @@ void OgreCamera::SaveCam(std::string &prefix, std::ostream &stream)
  
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
-void OgreCamera::InitCam()
+void OgreCamera::Init()
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  this->camera = OgreCreator::CreateCamera(this->cameraName, 
-      **this->nearClipP, **this->farClipP, *(**this->hfovP), 
-      this->renderTarget );
+  this->CreateOgreCamera();
 
   // Create a scene node to control pitch motion
-  this->pitchNode = this->sceneNode->createChildSceneNode( this->cameraName + "PitchNode");
+  this->pitchNode = this->sceneNode->createChildSceneNode( this->name + "PitchNode");
   this->pitchNode->pitch(Ogre::Degree(0));
   this->pitchNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
   this->saveCount = 0;
 
-  OgreAdaptor::Instance()->RegisterCamera(this);
-
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
+
+  Ogre::Real left, right ,top, bottom;
+
+  //Ogre::Frustum *frustum = this->camera->getFrustum();
+  //this->camera->getFrustumExtents(left, right, top, bottom);
+  //this->camera->setFrustumExtents(-100, 100, 100, -100);
+  //printf("F Extents[%f %f %f %f]\n", left, right ,top ,bottom);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Finalize the camera
-void OgreCamera::FiniCam()
+void OgreCamera::Fini()
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void OgreCamera::UpdateCam()
+void OgreCamera::Update()
 {
   this->viewController->Update();
 
@@ -268,8 +275,8 @@ void OgreCamera::UpdateCam()
     {
       this->animState = NULL;
 
-      OgreAdaptor::Instance()->sceneMgr->destroyAnimation("cameratrack");
-      OgreAdaptor::Instance()->sceneMgr->destroyAnimationState("cameratrack");
+      this->scene->GetManager()->destroyAnimation("cameratrack");
+      this->scene->GetManager()->destroyAnimationState("cameratrack");
     }
   }
 
@@ -326,61 +333,79 @@ void OgreCamera::Render()
   if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
     {
-      //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
-      this->lastRenderTime = Simulator::Instance()->GetSimTime();
-      this->renderTarget->update();
+      this->lastUpdate = Simulator::Instance()->GetSimTime();
+      this->newData = true;
+      this->renderTarget->update(false);
     }
+  }
+}
 
-    if (this->captureData)
+void OgreCamera::PostRender()
+{
+  if (this->newData && this->captureData)
+  {
+    boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
+
+    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+    Ogre::RenderTexture *rTexture;
+    Ogre::Viewport* renderViewport;
+
+    size_t size;
+
+    // Get access to the buffer and make an image and write it to file
+    pixelBuffer = this->renderTexture->getBuffer();
+    rTexture = pixelBuffer->getRenderTarget();
+
+    Ogre::PixelFormat format = pixelBuffer->getFormat();
+    renderViewport = rTexture->getViewport(0);
+
+    size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
+        (**this->imageSizeP).y, 
+        1, 
+        format);
+
+    // Allocate buffer
+    if (!this->saveFrameBuffer)
+      this->saveFrameBuffer = new unsigned char[size];
+
+    memset(this->saveFrameBuffer,128,size);
+
+    Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
+        1, this->imageFormat, this->saveFrameBuffer);
+
+    pixelBuffer->blitToMemory( box );
+
+    if (this->saveFramesP->GetValue())
     {
-      boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
-
-      Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-      Ogre::RenderTexture *rTexture;
-      Ogre::Viewport* renderViewport;
-
-      size_t size;
-
-      // Get access to the buffer and make an image and write it to file
-      pixelBuffer = this->renderTexture->getBuffer();
-      rTexture = pixelBuffer->getRenderTarget();
-
-      Ogre::PixelFormat format = pixelBuffer->getFormat();
-      renderViewport = rTexture->getViewport(0);
-
-      size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
-          (**this->imageSizeP).y, 
-          1, 
-          format);
-
-      // Allocate buffer
-      if (!this->saveFrameBuffer)
-        this->saveFrameBuffer = new unsigned char[size];
-
-      memset(this->saveFrameBuffer,128,size);
-
-      Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
-          1, this->imageFormat, this->saveFrameBuffer);
-
-      pixelBuffer->blitToMemory( box );
-
-      if (this->saveFramesP->GetValue())
-      {
-        this->SaveFrame();
-      }
+      this->SaveFrame();
     }
-
-    this->lastUpdate = Simulator::Instance()->GetSimTime();
   }
 
+  this->newData = false;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the global pose of the camera
-Pose3d OgreCamera::GetCameraWorldPose() const
+Pose3d OgreCamera::GetWorldPose() const
 {
+  Ogre::Vector3 camPos = this->camera->getRealPosition();
+  Ogre::Quaternion camOrient = this->camera->getRealOrientation();
+
+  Pose3d pose;
+  pose.pos.x = camPos.x;
+  pose.pos.y = camPos.y;
+  pose.pos.z = camPos.z;
+
   return this->pose;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the camera position in the world
+Vector3 OgreCamera::GetWorldPosition() const
+{
+  Ogre::Vector3 camPos = this->camera->getRealPosition();
+  return Vector3(camPos.x,camPos.y,camPos.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -398,33 +423,29 @@ void OgreCamera::SetWorldPose(const Pose3d &pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world position
-void OgreCamera::SetPosition(const Vector3 &pos)
+void OgreCamera::SetWorldPosition(const Vector3 &pos)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
-
 
   this->pose.pos = pos;
   this->pose.Correct();
   
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the world orientation
+void OgreCamera::SetWorldRotation(const Quatern &quant)
+{
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  this->pose.rot = quant;
+  this->pose.Correct();
  
-////////////////////////////////////////////////////////////////////////////////
-/// Set the clip distances
-void OgreCamera::SetClipDist(float near, float far)
-{
-  this->nearClipP->SetValue(near);
-  this->farClipP->SetValue(far);
+  this->pitchNode->setOrientation( this->pose.rot.u, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the camera FOV (horizontal)  
-void OgreCamera::SetFOV( float radians )
-{
-  this->hfovP->SetValue(radians);
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Translate the camera
@@ -449,6 +470,29 @@ void OgreCamera::RotatePitch( float angle )
 {
   this->pitchNode->yaw(Ogre::Radian(angle));
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the clip distances
+void OgreCamera::SetClipDist(float near, float far)
+{
+  this->nearClipP->SetValue(near);
+  this->farClipP->SetValue(far);
+
+  if (camera)
+  {
+    this->camera->setNearClipDistance(.001);
+    this->camera->setFarClipDistance(1000);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the camera FOV (horizontal)  
+void OgreCamera::SetFOV( float radians )
+{
+  this->hfovP->SetValue(radians);
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the horizontal field of view of the camera
@@ -511,14 +555,14 @@ std::string OgreCamera::GetImageFormat() const
 /// Get the width of the texture
 unsigned int OgreCamera::GetTextureWidth() const
 {
-  return this->textureWidth;
+  return this->renderTexture->getBuffer(0,0)->getWidth();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// \brief Get the height of the texture
 unsigned int OgreCamera::GetTextureHeight() const
 {
-  return this->textureHeight;
+  return this->renderTexture->getBuffer(0,0)->getHeight();
 }
 
 
@@ -616,9 +660,7 @@ void OgreCamera::SetAspectRatio( float ratio )
 /// Get the viewport up vector
 Vector3 OgreCamera::GetUp()
 {
-  //std::cout << "ogre cam position " <<  this->camera->getRealPosition() << std::endl;
   Ogre::Vector3 up = this->camera->getRealUp();
-  //std::cout << "ogre up " <<  up << std::endl;
   return Vector3(up.x,up.y,up.z);
 }
 
@@ -627,17 +669,10 @@ Vector3 OgreCamera::GetUp()
 Vector3 OgreCamera::GetRight()
 {
   Ogre::Vector3 right = this->camera->getRealRight();
-  //std::cout << "ogre right " <<  right << std::endl;
   return Vector3(right.x,right.y,right.z);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the camera position in the world
-Vector3 OgreCamera::GetCameraPosition()
-{
-  Ogre::Vector3 camPos = this->camera->getRealPosition();
-  return Vector3(camPos.x,camPos.y,camPos.z);
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the user can move the camera via the GUI
@@ -654,17 +689,17 @@ bool OgreCamera::GetUserMovable() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the name of the camera
-std::string OgreCamera::GetCameraName()
-{
-  return this->cameraName;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the camera's scene node
-void OgreCamera::SetCameraSceneNode( Ogre::SceneNode *node )
+void OgreCamera::SetSceneNode( Ogre::SceneNode *node )
 {
   this->sceneNode = node;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Get the camera's scene node
+Ogre::SceneNode *OgreCamera::GetSceneNode() const
+{
+  return this->pitchNode;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -694,18 +729,10 @@ const unsigned char *OgreCamera::GetImageData(unsigned int i)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the camera's name
-std::string OgreCamera::GetCamName()
+std::string OgreCamera::GetName() const
 {
   return this->name;
 }
-
-//////////////////////////////////////////////////////////////////////////////
-/// Set the camera's name
-void OgreCamera::SetCamName( const std::string &_name )
-{
-  this->name = _name;
-}
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Save the current frame to disk
@@ -752,11 +779,11 @@ void OgreCamera::SaveFrame()
     int sec = (int)(simTime - min*60);
     int msec = (int)(simTime*1000 - min*60000 - sec*1000);
 
-    sprintf(tmp, "%s/%s-%04d-%03dm_%02ds_%03dms.jpg", this->savePathnameP->GetValue().c_str(), this->GetCamName().c_str(), this->saveCount, min, sec, msec);
+    sprintf(tmp, "%s/%s-%04d-%03dm_%02ds_%03dms.jpg", this->savePathnameP->GetValue().c_str(), this->GetName().c_str(), this->saveCount, min, sec, msec);
   }
   else
   {
-    sprintf(tmp, "%s-%04d.jpg", this->GetCamName().c_str(), this->saveCount);
+    sprintf(tmp, "%s-%04d.jpg", this->GetName().c_str(), this->saveCount);
   }
 
   // Get codec
@@ -784,19 +811,19 @@ void OgreCamera::MoveToEntity(Entity *entity)
   if (!entity)
     return;
 
-  if (OgreAdaptor::Instance()->sceneMgr->hasAnimation("cameratrack"))
+  if (this->scene->GetManager()->hasAnimation("cameratrack"))
   {
-    OgreAdaptor::Instance()->sceneMgr->destroyAnimation("cameratrack");
-    OgreAdaptor::Instance()->sceneMgr->destroyAnimationState("cameratrack");
+    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->GetManager()->destroyAnimationState("cameratrack");
   }
 
-  Ogre::Animation *anim = OgreAdaptor::Instance()->sceneMgr->createAnimation("cameratrack",.5);
+  Ogre::Animation *anim = this->scene->GetManager()->createAnimation("cameratrack",.5);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
   Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
 
-  Vector3 start = this->GetCameraWorldPose().pos;
+  Vector3 start = this->GetWorldPose().pos;
   start.Correct();
   Vector3 end = entity->GetWorldPose().pos;
   end.Correct();
@@ -844,7 +871,7 @@ void OgreCamera::MoveToEntity(Entity *entity)
   key = ptrack->createNodeKeyFrame(.5);
   key->setRotation(pitchFinal);
 
-  this->animState = OgreAdaptor::Instance()->sceneMgr->createAnimationState("cameratrack");
+  this->animState = this->scene->GetManager()->createAnimationState("cameratrack");
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
 }
@@ -1048,7 +1075,94 @@ void OgreCamera::HandleMouseEvent(const MouseEvent &evt)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the time of the last render update
-gazebo::Time OgreCamera::GetLastRenderTime() const
+gazebo::Time OgreCamera::GetLastUpdateTime() const
 {
-  return this->lastRenderTime;
+  return this->lastUpdate;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Set view controller
+void OgreCamera::SetViewController( const std::string type )
+{
+  delete this->viewController;
+  this->viewController = NULL;
+
+  if (type == OrbitViewController::GetTypeString())
+    this->viewController = new OrbitViewController(this);
+  else if (type == FPSViewController::GetTypeString())
+    this->viewController = new FPSViewController(this);
+  else
+    gzthrow("Invalid view controller type: " + type );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to capture data
+void OgreCamera::SetCaptureData( bool value )
+{
+  this->captureData = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the render target
+void OgreCamera::CreateRenderTexture( const std::string &textureName )
+{
+  // Create the render texture
+  this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
+      textureName,
+      "General",
+      Ogre::TEX_TYPE_2D,
+      this->GetImageWidth(), 
+      this->GetImageHeight(),
+      0,
+      this->imageFormat,
+      Ogre::TU_RENDERTARGET);
+
+  this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return this scene
+Scene *OgreCamera::GetScene() const
+{
+  return this->scene;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create the ogre camera
+void OgreCamera::CreateOgreCamera()
+{
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+
+  Ogre::Viewport *cviewport;
+
+  this->camera = this->scene->GetManager()->createCamera(this->name);
+
+  // Use X/Y as horizon, Z up
+  this->camera->pitch(Ogre::Degree(90));
+
+  // Don't yaw along variable axis, causes leaning
+  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+
+  this->camera->setDirection(1,0,0);
+
+  this->camera->setNearClipDistance(.001);//**this->nearClipP);
+  this->camera->setFarClipDistance(1000);//**this->farClipP);
+
+  if (this->renderTarget)
+  {
+    // Setup the viewport to use the texture
+    this->viewport = this->renderTarget->addViewport(this->camera);
+    this->viewport->setClearEveryFrame(true);
+    this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
+
+    double ratio = (double)this->viewport->getActualWidth() / 
+                   (double)this->viewport->getActualHeight();
+    double vfov = 2.0 * atan(tan( (**this->hfovP).GetAsRadian() / 2.0) / ratio);
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+  }
+
+  this->scene->RegisterCamera(this);
 }

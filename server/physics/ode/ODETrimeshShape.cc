@@ -50,7 +50,7 @@ ODETrimeshShape::~ODETrimeshShape()
 /// Update function.
 void ODETrimeshShape::Update()
 {
-  ODEGeom *ogeom = ((ODEGeom*)this->parent);
+  ODEGeom *ogeom = ((ODEGeom*)this->geomParent);
 
   /// FIXME: use below to update trimesh geometry for collision without using above Ogre codes
   // tell the tri-tri collider the current transform of the trimesh --
@@ -91,12 +91,12 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
 {
   dMass odeMass;
   Mass mass;
-  ODEGeom *pgeom = (ODEGeom*)this->parent;
+  ODEGeom *pgeom = (ODEGeom*)this->geomParent;
   PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
 
   TrimeshShape::Load(node);
 
-  mass = this->parent->GetMass();
+  mass = this->geomParent->GetMass();
 
   unsigned int i =0;
 
@@ -141,7 +141,7 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
     dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
 
   physics->ConvertMass(&mass, &odeMass);
-  this->parent->SetMass(mass);
+  this->geomParent->SetMass(mass);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));
   this->last_matrix_index = 0;

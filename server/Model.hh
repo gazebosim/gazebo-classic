@@ -286,6 +286,8 @@ namespace gazebo
     private: ParamT<float> *laserRetroP;
     private: ParamT<std::string> *collideP;
 
+    private: Body *canonicalBody;
+
 
     // Name of a light (if the model is renderable:light)
     private: Light *light;

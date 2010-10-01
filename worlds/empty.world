@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-
+<?xml version="1.0"?> 
 <gazebo:world 
   xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
@@ -15,7 +14,7 @@
   <verbosity>4</verbosity>
 
   <physics:ode>
-    <stepTime>0.1</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>0.0000000001</cfm>
     <erp>0.2</erp>
@@ -57,18 +56,21 @@
       </geom:plane>
     </body:plane>
   </model:physical>
-
+ 
   <!-- White Point light -->
   <model:renderable name="point_white">
-    <xyz>0.0 5.0 10</xyz>
+    <xyz>0.0 0 10</xyz>
+    <rpy>0 0 0</rpy>
     <static>true</static>
     <light>
-      <type>point</type>
-      <diffuseColor>0.4 0.4 0.4</diffuseColor>
-      <specularColor>.1 .1 .1</specularColor>
-      <attenuation>0.2 0.01 0.001</attenuation>
-      <range>30</range>
+      <type>spot</type>
+      <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>
+      <specularColor>1 1 1 1.0</specularColor>
+      <attenuation>.1 0.2 0.001</attenuation>
+      <range>50</range>
+      <direction>0 0 -1.0</direction>
       <castShadows>true</castShadows>
     </light>
   </model:renderable>
+
 </gazebo:world>

@@ -24,7 +24,7 @@ ODEMultiRayShape::ODEMultiRayShape(Geom *parent)
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
 
-  ODEBody *pBody = (ODEBody*)(this->parent->GetBody());
+  ODEBody *pBody = (ODEBody*)(this->geomParent->GetBody());
   pBody->SetSpaceId( this->raySpaceId );
   ((ODEGeom*)parent)->SetSpaceId(this->raySpaceId);
 }
@@ -143,7 +143,7 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 void ODEMultiRayShape::AddRay(const Vector3 &start, const Vector3 &end )
 {
   MultiRayShape::AddRay(start,end);
-  ODEGeom *odeGeom = new ODEGeom(parent->GetBody());
+  ODEGeom *odeGeom = new ODEGeom(this->geomParent->GetBody());
   odeGeom->SetName("ODE Ray Geom");
 
   ODERayShape *ray = new ODERayShape(odeGeom, **this->displayTypeP == "lines" );

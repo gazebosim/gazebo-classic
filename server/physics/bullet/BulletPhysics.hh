@@ -122,10 +122,10 @@ class BulletPhysics : public PhysicsEngine
   public: virtual Body *CreateBody(Entity *parent);
 
   /// \brief Create a new geom
-  public: virtual Geom *CreateGeom(Shape::Type type, Body *body);
+  public: virtual Geom *CreateGeom(std::string type, Body *body);
 
   /// \brief Create a new joint
-  public: virtual Joint *CreateJoint(Joint::Type type);
+  public: virtual Joint *CreateJoint(std::string type);
 
   /// \brief Create a physics based ray sensor
   //public: virtual PhysicsRaySensor *CreateRaySensor(Body *body);
@@ -145,6 +145,9 @@ class BulletPhysics : public PhysicsEngine
   /// \brief Register a joint with the dynamics world
   public: btDynamicsWorld *GetDynamicsWorld() const
           {return this->dynamicsWorld;}
+
+  /// \brief Set the gavity vector
+  public: virtual void SetGravity(const gazebo::Vector3 &gravity);
 
   //private: btAxisSweep3 *broadPhase;
   private: btBroadphaseInterface *broadPhase;

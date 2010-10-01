@@ -16,22 +16,22 @@ namespace gazebo
             {
               CylinderShape::SetSize(size);
               PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
-              ODEGeom *oParent = (ODEGeom*)(this->parent);
+              ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
               dMass odeMass;
               Pose3d rpose;
     
-              Mass mass = this->parent->GetMass();
+              Mass mass = this->geomParent->GetMass();
   
               // Initialize mass matrix
               dMassSetCylinderTotal(&odeMass, mass.GetAsDouble(), 3, 
                                     size.x, size.y);
-              rpose = this->parent->GetRelativePose();
+              rpose = this->geomParent->GetRelativePose();
               dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
  
               physics->ConvertMass(&mass, &odeMass);
   
-              this->parent->SetMass(mass);
+              this->geomParent->SetMass(mass);
 
               oParent->SetGeom( dCreateCylinder( 0, size.x, size.y ), true );
             }

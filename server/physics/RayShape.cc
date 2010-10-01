@@ -32,7 +32,7 @@ using namespace gazebo;
 /// Constructor
 RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
 {
-  this->type = Shape::RAY;
+  this->type.push_back("ray");
   this->SetName("Ray");
 
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
@@ -44,9 +44,9 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
     this->line->AddPoint(Vector3(0,0,0));
     this->line->AddPoint(Vector3(0,0,0));
 
-    this->parent->GetVisualNode()->AttachObject(this->line);
+    this->geomParent->GetVisualNode()->AttachObject(this->line);
 
-    this->line->setMaterial("Gazebo/BlueEmissive");
+    this->line->setMaterial("Gazebo/BlueGlow");
     this->line->setVisibilityFlags(GZ_LASER_CAMERA);
   }
 
@@ -54,7 +54,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 
-  this->parent->SetSaveable(false);
+  this->geomParent->SetSaveable(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,9 +75,9 @@ void RayShape::SetDisplayType( bool displayRays )
   if (Simulator::Instance()->GetRenderEngineEnabled() )
   {
     if (!displayRays)
-      this->parent->GetVisualNode()->DetachObjects();
+      this->geomParent->GetVisualNode()->DetachObjects();
     else
-      this->parent->GetVisualNode()->AttachObject(this->line);
+      this->geomParent->GetVisualNode()->AttachObject(this->line);
   }
 }
  
@@ -90,9 +90,9 @@ void RayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   this->relativeStartPos = posStart;
   this->relativeEndPos = posEnd;
 
-  this->globalStartPos = this->parent->GetWorldPose().CoordPositionAdd(
+  this->globalStartPos = this->geomParent->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
-  this->globalEndPos = this->parent->GetWorldPose().CoordPositionAdd(
+  this->globalEndPos = this->geomParent->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
   // Compute the direction of the ray

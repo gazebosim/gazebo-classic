@@ -26,6 +26,10 @@
 
 #include "GazeboError.hh"
 #include "Param.hh"
+#include "Quatern.hh"
+#include "Pose3d.hh"
+#include "Vector3.hh"
+#include "Vector4.hh"
 
 using namespace gazebo;
 
@@ -77,4 +81,56 @@ std::string Param::GetKey() const
 std::string Param::GetTypename() const
 {
   return this->typeName;
+}
+
+bool Param::IsBool() const
+{
+  return this->GetTypename() == typeid(bool).name();
+}
+
+bool Param::IsInt() const
+{
+  return this->GetTypename() == typeid(int).name();
+}
+
+bool Param::IsUInt() const
+{
+  return this->GetTypename() == typeid(unsigned int).name();
+}
+
+bool Param::IsFloat() const
+{
+  return this->GetTypename() == typeid(float).name();
+}
+
+bool Param::IsDouble() const
+{
+  return this->GetTypename() == typeid(double).name();
+}
+
+bool Param::IsChar() const
+{
+  return this->GetTypename() == typeid(char).name();
+}
+
+bool Param::IsStr() const
+{
+  return this->GetTypename() == typeid(std::string).name();
+}
+
+bool Param::IsVector3() const
+{
+  return this->GetTypename() == typeid(Vector3).name();
+}
+bool Param::IsVector4() const
+{
+  return this->GetTypename() == typeid(Vector4).name();
+}
+bool Param::IsQuatern() const
+{
+  return this->GetTypename() == typeid(Quatern).name();
+}
+bool Param::IsPose3d() const
+{
+  return this->GetTypename() == typeid(Pose3d).name();
 }

@@ -16,23 +16,23 @@ namespace gazebo
             {
               BoxShape::SetSize(size);
               PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
-              ODEGeom *oParent = (ODEGeom*)(this->parent);
+              ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
               Pose3d rpose;
 
               dMass odeMass;
 
-              Mass mass = this->parent->GetMass();
+              Mass mass = this->geomParent->GetMass();
   
               // Initialize box mass matrix
               dMassSetBoxTotal(&odeMass, mass.GetAsDouble(), 
                                size.x, size.y, size.z);
-              rpose = this->parent->GetRelativePose();
+              rpose = this->geomParent->GetRelativePose();
               dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
  
               physics->ConvertMass(&mass, &odeMass);
 
-              this->parent->SetMass(mass);
+              this->geomParent->SetMass(mass);
   
               // Create a box geometry with box mass matrix
               oParent->SetGeom( dCreateBox( 0, size.x, size.y, size.z), true );

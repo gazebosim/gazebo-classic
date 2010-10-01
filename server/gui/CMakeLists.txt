@@ -2,7 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories( ${FLTK_INCLUDE_DIR} )
 
-LINK_DIRECTORIES(  
+link_directories(  
  ${CMAKE_BINARY_DIR}/libgazebo 
  ${CMAKE_BINARY_DIR}/server/gui 
  ${boost_library_dirs} 

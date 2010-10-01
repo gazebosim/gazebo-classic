@@ -97,7 +97,7 @@ class UniversalJoint : public T
   /// \brief Constructor
   public: UniversalJoint() : T()
           {
-            this->type = Joint::UNIVERSAL;
+            this->type.push_back("universal");
 
             Param::Begin(&this->parameters);
             this->axis1P = new ParamT<Vector3>("axis1",Vector3(0,0,1),0);

@@ -55,9 +55,13 @@ using namespace gazebo;
 Body::Body(Entity *parent)
     : Entity(parent)
 {
-  this->type = Entity::BODY;
+  this->type.push_back("body");
+  this->GetVisualNode()->SetShowInGui(false);
+
   this->comEntity = new Entity(this);
   this->comEntity->SetName("COM_Entity");
+  this->comEntity->SetShowInGui(false);
+  this->comEntity->GetVisualNode()->SetShowInGui(false);
 
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
@@ -393,7 +397,7 @@ void Body::Init()
       for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
       {
         OgreDynamicLines *line = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
-        line->setMaterial("Gazebo/GreenEmissive");
+        line->setMaterial("Gazebo/GreenGlow");
         this->cgVisual->AttachObject(line);
         line->AddPoint(Vector3(0,0,0));
         line->AddPoint(giter->second->GetRelativePose().pos);

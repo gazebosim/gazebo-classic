@@ -84,7 +84,7 @@ dReal ODEHeightmapShape::GetHeightCallback(void *data, int x, int y)
 void ODEHeightmapShape::Load(XMLConfigNode *node)
 {
   HeightmapShape::Load(node);
-  ODEGeom *oParent = (ODEGeom*)(this->parent);
+  ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
   // sampling size along image width and height
   this->odeVertSize = this->img.GetWidth() * 4;
