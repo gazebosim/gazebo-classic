@@ -77,20 +77,30 @@ IF (NOT CMAKE_BUILD_TYPE)
 ENDIF (NOT CMAKE_BUILD_TYPE)
 STRING(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
-SET (build_errors "" CACHE INTERNAL "build errors" FORCE)
+set (build_errors "" CACHE INTERNAL "build errors" FORCE)
+set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 MESSAGE (STATUS "\n\n====== Finding 3rd Party Packages ======")
 INCLUDE (${gazebo_cmake_dir}/SearchForStuff.cmake)
 MESSAGE (STATUS "----------------------------------------\n")
 
+if ( build_warnings )
+  message(STATUS "BUILD WARNINGS")
+  foreach (msg ${build_warnings})
+    message(STATUS ${msg})
+  endforeach (msg ${build_warnings})
+  message(STATUS "END BUILD WARNINGS\n")
+endif (build_warnings)
+
 if ( build_errors )
-  message(STATUS "!!! BUILD ERRORS !!!")
-  message(STATUS "These errors must be resolved before compiling")
+  message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
     message(STATUS ${msg})
   endforeach (msg ${build_errors})
-  message(STATUS "!!! END BUILD ERRORS !!!\n")
+  message(STATUS "END BUILD ERRORS\n")
 else (build_errors)
+
+
   ########################################
   # Write the config.h file
   configure_file (${PROJECT_SOURCE_DIR}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
