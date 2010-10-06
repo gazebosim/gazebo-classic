@@ -64,6 +64,7 @@ Gui::Gui (int x, int y, int width, int height, const std::string &t)
   Param::Begin(&this->parameters);
   this->sizeP = new ParamT<Vector2<int> >("size", Vector2<int>(800, 600), 0);
   this->posP = new ParamT<Vector2<int> >("pos",Vector2<int>(0,0),0);
+  this->updateRateP = new ParamT<double>("updateRate",15,0);
   Param::End();
 
   width = std::max(800, this->w());
@@ -125,6 +126,7 @@ Gui::~Gui()
 
   delete this->sizeP;
   delete this->posP;
+  delete this->updateRateP;
 
   //delete this->statusbar;
 }
@@ -135,6 +137,8 @@ void Gui::Load( XMLConfigNode *node )
 {
   this->sizeP->Load(node);
   this->posP->Load(node);
+  this->updateRateP->Load(node);
+  this->updateRate = this->updateRateP->GetValue();
 
   if (node)
     this->frameMgr->Load( node->GetChild("frames") );
@@ -150,10 +154,12 @@ void Gui::Save(std::string &prefix, std::ostream &stream)
 
   this->sizeP->SetValue(Vector2<int>(this->GetWidth(), this->GetHeight()));
   this->posP->SetValue(Vector2<int>(this->x(), this->y()));
+  this->updateRateP->SetValue(this->updateRate);
 
   stream << prefix <<  "<rendering:gui>\n";
   stream << prefix <<  "  " << *(this->sizeP) << "\n";
   stream << prefix <<  "  " << *(this->posP) << "\n";
+  stream << prefix <<  "  " << *(this->updateRateP) << "\n";
   this->frameMgr->Save(p, stream);
   stream << prefix << "</rendering:gui>\n";
 }

@@ -85,6 +85,7 @@ namespace gazebo
 
     /// \brief Get the average FPS
     public: float GetAvgFPS() const;
+    public: double GetUpdateRate() {return this->updateRate;};
 
     /// \brief Time slider cb
     private: static void TimeSliderCB( Fl_Widget * w, void *data);
@@ -98,6 +99,8 @@ namespace gazebo
 
     private: ParamT<Vector2<int> > *sizeP;
     private: ParamT<Vector2<int> > *posP;
+    private: ParamT<double> *updateRateP;
+    private: double updateRate;
     private: std::vector<Param*> parameters;
 
     private: Fl_Slider *timeSlider;

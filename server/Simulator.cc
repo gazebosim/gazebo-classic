@@ -408,8 +408,9 @@ void Simulator::MainLoop()
   //DIAGNOSTICTIMER(timer("--------------------------- START Simulator::MainLoop() --------------------------",6));
   Time currTime = 0;
   Time lastTime = 0;
+  Time lastGuiTime = 0;
   struct timespec timeSpec;
-  double freq = 80.0; //FIXME: HARDCODED
+  double freq = 80.0; //FIXME: HARDCODED Rendering Loop Rate
 
   this->physicsThread = new boost::thread( 
                          boost::bind(&Simulator::PhysicsLoop, this));
@@ -424,8 +425,9 @@ void Simulator::MainLoop()
     {
       lastTime = this->GetWallTime();
 
-      if (this->gui)
+      if (this->gui && (currTime - lastGuiTime > 1.0/this->gui->GetUpdateRate()))
       {
+        lastGuiTime = this->GetWallTime();
         DIAGNOSTICTIMER(timer1("GUI update",6));
         this->gui->Update();
       }
@@ -461,6 +463,7 @@ void Simulator::MainLoop()
 
         nanosleep(&timeSpec, NULL);
       }
+
     }
     else
     {
