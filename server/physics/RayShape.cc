@@ -37,14 +37,12 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
 
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
   {
-    this->line = OgreCreator::Instance()->CreateDynamicLine(
+    this->line = this->geomParent->GetVisualNode()->AddDynamicLine(
         OgreDynamicRenderable::OT_LINE_LIST);
 
     // Add two points
     this->line->AddPoint(Vector3(0,0,0));
     this->line->AddPoint(Vector3(0,0,0));
-
-    this->geomParent->GetVisualNode()->AttachObject(this->line);
 
     this->line->setMaterial("Gazebo/BlueGlow");
     this->line->setVisibilityFlags(GZ_LASER_CAMERA);
@@ -61,11 +59,6 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
 /// Destructor
 RayShape::~RayShape()
 {
-  if (this->line)
-  {
-    delete this->line;
-    this->line = NULL;
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -52,7 +52,7 @@
         <uvTile>100 100</uvTile>
         <mu1>109999.0</mu1>
         <mu2>1000.0</mu2>
-        <material>Gazebo/GrayGrid</material>
+        <material>Gazebo/Red</material>
       </geom:plane>
     </body:plane>
   </model:physical>
@@ -63,11 +63,11 @@
     <rpy>0 0 0</rpy>
     <static>true</static>
     <light>
-      <type>spot</type>
+      <type>point</type>
       <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>
-      <specularColor>1 1 1 1.0</specularColor>
-      <attenuation>.1 0.2 0.001</attenuation>
-      <range>50</range>
+      <specularColor>.1 .1 .1 1.0</specularColor>
+      <attenuation>.2 0.1 0.0</attenuation>
+      <range>20</range>
       <direction>0 0 -1.0</direction>
       <castShadows>true</castShadows>
     </light>

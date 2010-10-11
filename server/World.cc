@@ -59,13 +59,6 @@ World::World()
 {
   this->server = NULL;
   this->simIface = NULL;
-  this->showBoundingBoxes = false;
-  this->showJoints = false;
-  this->showContacts = false;
-  this->showLights = false;
-  this->showCameras = false;
-  this->wireframe = false;
-  this->showPhysics = false;
   this->physicsEngine = NULL;
   this->server = NULL;
   this->graphics = NULL;
@@ -170,7 +163,7 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 {
   Simulator::Instance()->ConnectPauseSignal( 
       boost::bind(&World::PauseSlot, this, _1) );
-  
+ 
   // Create the server object (needs to be done before models initialize)
   if (this->server == NULL)
   {
@@ -339,7 +332,7 @@ void World::GraphicsUpdate()
 // Update the world
 void World::Update()
 {
-  this->worldUpdateStartSignal();
+  Events::worldUpdateStartSignal();
 
   if (this->simPauseTime > 0)
   {
@@ -374,7 +367,6 @@ void World::Update()
 #ifdef USE_THREADPOOL
   this->threadPool->wait();
 #endif
-
   }
 
   if (!Simulator::Instance()->IsPaused() &&
@@ -385,22 +377,21 @@ void World::Update()
       this->physicsEngine->UpdatePhysics();
     }
 
-    /*if (this->saveStateTimer.GetElapsed() > **this->saveStateTimeoutP)
-    {
-      this->SaveState();
-      this->saveStateTimer.Start();
-    }*/
+    //if (this->saveStateTimer.GetElapsed() > **this->saveStateTimeoutP)
+    //{
+    //  this->SaveState();
+    //  this->saveStateTimer.Start();
+    //}
   }
 
   /// Update all the sensors
   SensorManager::Instance()->Update();
 
-
   this->factory->Update();
 
   Logger::Instance()->Update();
 
-  this->worldUpdateEndSignal();
+  Events::worldUpdateEndSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -688,111 +679,6 @@ void World::Reset()
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// True if the bounding boxes of the models are being shown
-bool World::GetShowBoundingBoxes()
-{
-  return this->showBoundingBoxes;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set if the bounding boxes are shown or no
-void World::SetShowBoundingBoxes(bool show)
-{
-  this->showBoundingBoxes = show;
-  this->showBoundingBoxesSignal(this->showBoundingBoxes);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get wheter to show the joints
-bool World::GetShowJoints()
-{
-  return this->showJoints;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether to show the joints
-void World::SetShowJoints(bool show)
-{
-  this->showJoints = show;
-  this->showJointsSignal(show);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether to show the joints
-void World::SetShowContacts(bool show)
-{
-  this->showContacts = show;
-  this->showContactsSignal(this->showContacts);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get whether to show the joints
-bool World::GetShowContacts() const
-{
-  return this->showContacts;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether to show the light source visuals
-void World::SetShowLights(bool show)
-{
-  this->showLights = show;
-  this->showLightsSignal(this->showLights);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get whether to show the light source visuals
-bool World::GetShowLights() const
-{
-  return this->showLights;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether to show the camera visuals
-void World::SetShowCameras(bool show)
-{
-  this->showCameras = show;
-  this->showCamerasSignal(this->showCameras);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get whether to show the camera visuals
-bool World::GetShowCameras() const
-{
-  return this->showCameras;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set to view as wireframe
-void World::SetWireframe( bool wire )
-{
-  this->wireframe = wire;
-  this->wireframeSignal(this->wireframe);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get whether to view as wireframe
-bool World::GetWireframe()
-{
-  return this->wireframe;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get wheter to show the joints
-bool World::GetShowPhysics()
-{
-  return this->showPhysics;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set whether to show the joints
-void World::SetShowPhysics(bool show)
-{
-  this->showPhysics = show;
-  this->showPhysicsSignal(this->showPhysics);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the simulation interface
@@ -1826,7 +1712,7 @@ void World::SetSelectedEntityCB( const std::string &name )
   else
     this->selectedEntity = NULL;
 
-  this->entitySelectedSignal(this->selectedEntity);
+  Events::entitySelectedSignal(this->selectedEntity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

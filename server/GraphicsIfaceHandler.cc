@@ -202,7 +202,7 @@ void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDraw
     attached = true;
   }
   else
-    line = OgreCreator::Instance()->CreateDynamicLine(opType);
+    line = vis->AddDynamicLine(opType);
 
   line->setMaterial(OgreCreator::CreateMaterial( data->color.r,
                                                  data->color.g,
@@ -219,9 +219,6 @@ void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDraw
     else
       line->AddPoint(pos);
   }
-
-  if (!attached)
-    vis->AttachObject(line);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

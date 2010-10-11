@@ -30,6 +30,7 @@
 #include <Ogre.h>
 #include <string>
 
+#include "OgreDynamicRenderable.hh"
 #include "Pose3d.hh"
 #include "Quatern.hh"
 #include "Vector3.hh"
@@ -48,6 +49,7 @@ namespace gazebo
   class Entity;
   class SelectionObj;
   class Scene;
+  class OgreDynamicLines;
 
   /// \brief Ogre Visual Object
   class OgreVisual : public Common, public Ogre::Any
@@ -66,6 +68,9 @@ namespace gazebo
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
+
+    /// \brief Update the visual.
+    public: void Update();
 
     /// \brief Attach a manipulation visual
     public: void AttachManipulation();
@@ -102,6 +107,9 @@ namespace gazebo
     /// \brief Set the transparency
     public: void SetTransparency( float trans );
 
+    /// \brief Get the transparency
+    public: float GetTransparency();
+
     /// \brief Set highlighted or no
     public: void SetHighlight( bool highlight);
 
@@ -112,6 +120,9 @@ namespace gazebo
     /// \param visible set this node visible
     /// \param cascade setting this parameter in children too
     public: void SetVisible(bool visible, bool cascade=true);
+
+    /// \brief Toggle whether this visual is visible
+    public: void ToggleVisible();
 
     /// \brief Get whether the visual is visible
     public: bool GetVisible() const;
@@ -191,6 +202,19 @@ namespace gazebo
     /// \brief Get the size of the bounding box
     public: Vector3 GetBoundingBoxSize() const;
 
+    /// \brief Set whether to use the RT Shader system
+    public: void SetUseRTShader(bool value);
+
+    /// \brief Get whether to user the RT shader system
+    public: bool GetUseRTShader() const;
+
+    /// \brief Add a line to the visual
+    public: OgreDynamicLines *AddDynamicLine(
+                 OgreDynamicRenderable::OperationType opType);
+
+    /// \brief Delete a dynamic line
+    public: void DeleteDynamicLine(OgreDynamicLines *line);
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: std::string myMaterialName;
@@ -233,6 +257,11 @@ namespace gazebo
     private: Ogre::RibbonTrail *ribbonTrail;
 
     private: Scene *scene;
+    private: bool useRTShader;
+
+    // List of all the lines created
+    private: std::list<OgreDynamicLines*> lines;
+    private: Time updateTime;
   };
 }
 

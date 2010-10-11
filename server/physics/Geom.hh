@@ -101,15 +101,18 @@ namespace gazebo
   
     /// \brief Get the laser retro reflectiveness 
     public: float GetLaserRetro() const;
- 
+
+    /// \brief Toggle bounding box visibility
+    public: void ToggleShowBoundingBox();
+
     /// \brief Set the visibility of the bounding box
     public: void ShowBoundingBox(bool show);
 
-    /// \brief Set the visibility of the joints
-    public: void ShowJoints(bool show);
+    /// \brief Toggle transparency
+    public: void ToggleTransparent();
 
-    /// \brief Set the visibility of the physical entity of this geom
-    public: void ShowPhysics(bool);
+    /// \brief Set the transparency
+    public: void SetTransparent(bool show);
 
     /// \brief Set the mass
     public: void SetMass(const double &mass);

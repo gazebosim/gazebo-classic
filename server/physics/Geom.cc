@@ -26,6 +26,8 @@
 
 #include <sstream>
 
+#include "RenderState.hh"
+#include "Events.hh"
 #include "Shape.hh"
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
@@ -83,10 +85,9 @@ Geom::Geom( Body *body )
   
   Param::End();
 
-  World::Instance()->ConnectShowPhysicsSignal( boost::bind(&Geom::ShowPhysics, this, _1) );
-  World::Instance()->ConnectShowJointsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
-  World::Instance()->ConnectShowPhysicsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
-  World::Instance()->ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) );
+  Events::ConnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
+  Events::ConnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
+  Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ToggleShowBoundingBox, this) );
 
   this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) );
 }
@@ -130,14 +131,12 @@ void Geom::Fini()
 {
   this->body->DisconnectEnabledSignal(boost::bind(&Geom::EnabledCB, this, _1));
 
-  World::Instance()->DisconnectShowPhysicsSignal( 
-      boost::bind(&Geom::ShowPhysics, this, _1) );
+  Events::DisconnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
 
-  World::Instance()->DisconnectShowJointsSignal( 
-      boost::bind(&Geom::ShowJoints, this, _1) );
+  Events::DisconnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
 
-  World::Instance()->DisconnectShowBoundingBoxesSignal( 
-      boost::bind(&Geom::ShowBoundingBox, this, _1) );
+  Events::DisconnectShowBoundingBoxesSignal( 
+      boost::bind(&Geom::ToggleShowBoundingBox, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +198,7 @@ void Geom::Load(XMLConfigNode *node)
 
   if (this->GetShapeType() != "plane" && this->GetShapeType() != "heightmap")
   {
-    this->ShowPhysics(false);
+    this->SetTransparent(false);
   }
 }
 
@@ -225,7 +224,7 @@ void Geom::CreateBoundingBox()
     {
       this->bbVisual->SetCastShadows(false);
       this->bbVisual->AttachBoundingBox(min,max);
-      this->bbVisual->SetVisible( World::Instance()->GetShowBoundingBoxes() );
+      this->bbVisual->SetVisible( RenderState::GetShowBoundingBoxes() );
     }
   }
 }
@@ -331,6 +330,14 @@ float Geom::GetLaserRetro() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Toggle bounding box visibility
+void Geom::ToggleShowBoundingBox()
+{
+  if (this->bbVisual)
+    this->bbVisual->ToggleVisible();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set the visibility of the Bounding box of this geometry
 void Geom::ShowBoundingBox(bool show)
 {
@@ -339,8 +346,27 @@ void Geom::ShowBoundingBox(bool show)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the visibility of the joints of this geometry
-void Geom::ShowJoints(bool show)
+// Toggle transparency
+void Geom::ToggleTransparent()
+{
+  std::vector<OgreVisual*>::iterator iter;
+
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    if (*iter)
+    {
+      (*iter)->ToggleVisible();
+      if ((*iter)->GetTransparency() == 0.0)
+        (*iter)->SetTransparency(0.6);
+      else
+        (*iter)->SetTransparency(0.0);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the transparency
+void Geom::SetTransparent(bool show)
 {
   std::vector<OgreVisual*>::iterator iter;
 
@@ -366,13 +392,6 @@ void Geom::ShowJoints(bool show)
       }
     }
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the visibility of the physical entity of this geom
-void Geom::ShowPhysics(bool show)
-{
-  this->body->ShowPhysics(show);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

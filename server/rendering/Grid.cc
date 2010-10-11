@@ -55,12 +55,14 @@ Grid::Grid( Scene *scene,  unsigned int cell_count, float cell_length,
   this->cellLengthP = new ParamT<float>("cellLength",1,0);
   this->lineWidthP = new ParamT<float>("lineWidth",0.03,0);
   this->colorP = new ParamT<Color>("color",Color(1,1,1,1),0);
+  this->h_offsetP = new ParamT<float>("height_offset",0,0);
   Param::End();
 
   this->cellCountP->SetValue(cell_count);
   this->cellLengthP->SetValue(cell_length);
   this->lineWidthP->SetValue(line_width);
   this->colorP->SetValue(color);
+  this->h_offsetP->SetValue(0.005);
 
   static uint32_t gridCount = 0;
   std::stringstream ss;
@@ -107,6 +109,9 @@ void Grid::SetLineWidth(float width)
 void Grid::SetColor(const Color& color)
 {
   this->colorP->SetValue( color );
+
+  this->material->setDiffuse( color.R(), color.G(), color.B(), color.A() );
+  this->material->setAmbient( color.R(), color.G(), color.B() );
 
   if ( (**this->colorP).A() < 0.9998 )
   {
@@ -160,12 +165,13 @@ void Grid::Create()
 
   float extent = (**this->cellLengthP*((double)**this->cellCountP))/2;
 
+  this->manualObject->setCastShadows(false);
   this->manualObject->estimateVertexCount( **this->cellCountP * 4 * this->height + ((**this->cellCountP + 1) * (**this->cellCountP + 1)));
   this->manualObject->begin( this->material->getName(), Ogre::RenderOperation::OT_LINE_LIST );
 
   for (uint32_t h = 0; h <= this->height; ++h)
   {
-    float h_real = (this->height / 2.0f - (float)h) * **this->cellLengthP;
+    float h_real = **this->h_offsetP + (this->height / 2.0f - (float)h) * **this->cellLengthP;
     for( uint32_t i = 0; i <= **this->cellCountP; i++ )
     {
       float inc = extent - ( i * **this->cellLengthP );

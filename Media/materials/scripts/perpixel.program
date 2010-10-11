@@ -25,7 +25,7 @@ fragment_program perpixel_fp_glsl glsl
 
   default_params
   {
-    param_named_auto derived_light_diffuse_color derived_light_diffuse_colour 0
+    param_named_auto derived_light_diffuse_color light_diffuse_colour 0
     param_named_auto derived_light_specular_color derived_light_specular_colour 0
     param_named_auto surface_shininess surface_shininess
 

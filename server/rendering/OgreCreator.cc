@@ -281,45 +281,12 @@ std::string OgreCreator::CreateMaterialFromTexFile(const std::string &filename)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Create a dynamic line
-OgreDynamicLines *OgreCreator::CreateDynamicLine(OgreDynamicRenderable::OperationType opType)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return NULL;
-
-  OgreDynamicLines *line = new OgreDynamicLines(opType);
-
-  this->lines.push_back( line );
-
-  return line;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Create a dynamic line
-void OgreCreator::DeleteDynamicLine(OgreDynamicLines* line)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  // delete instance from lines vector
-  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();iter!=this->lines.end();iter++)
-  {
-    if (*iter == line)
-    {
-      this->lines.erase(iter);
-      break;
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Update all the entities
 void OgreCreator::Update()
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  std::list<OgreDynamicLines*>::iterator iter;
   std::list<OgreMovableText*>::iterator titer;
   std::list<Ogre::RenderWindow*>::iterator witer;
   std::list<OgreVisual*>::iterator viter;
@@ -327,10 +294,6 @@ void OgreCreator::Update()
   // Update the text
   for (titer = this->text.begin(); titer != this->text.end(); titer++)
     (*titer)->Update();
-
-  // Update the lines
-  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
-    (*iter)->Update();
 
   // We only need this loop because we are using threads. The physics engine
   // can't reliably set the pose of the visuals when it's running in a 

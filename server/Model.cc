@@ -31,6 +31,7 @@
 #include <float.h>
 
 #include "Events.hh"
+#include "RenderState.hh"
 #include "OgreVisual.hh"
 #include "Light.hh"
 #include "GraphicsIfaceHandler.hh"
@@ -474,7 +475,7 @@ void Model::Update()
   }
 
 
-  if (World::Instance()->GetShowJoints())
+  if (RenderState::GetShowJoints())
   {
     //DiagnosticTimer timer("Model[" + this->GetName() + "] Joints Update ");
     for (jointIter = this->joints.begin(); 
@@ -1200,6 +1201,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
   char lightNumBuf[8];
   sprintf(lightNumBuf, "%d", lightNumber++);
   body->SetName(this->GetName() + "_RenderableBody_" + lightNumBuf);
+  body->SetEnabled( false );
 
   if (Simulator::Instance()->GetRenderEngineEnabled() && 
       (childNode = node->GetChild("light")))

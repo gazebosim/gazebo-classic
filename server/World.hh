@@ -182,53 +182,6 @@ class World : public SingletonT<World>
   /// \brief Register a body 
   public: void RegisterBody(Body *body);
 
-  // User control of how the world is viewed 
-  // If this section grows it may become a model-view structure ...
-  /// \brief Return true if the bounding boxes should be shown
-  public: bool GetShowBoundingBoxes();
-
-  /// \brief Set if the bounding boxes should be shown
-  public: void SetShowBoundingBoxes(bool show);
-
-  /// \brief Get wheter to show the joints
-  public: bool GetShowJoints();
-
-  /// \brief Set whether to show the joints
-  public: void SetShowJoints(bool show);
-
-  /// \brief Get whether to show the joints
-  public: bool GetShowJoints() const;
-
-  /// \brief Set whether to show the contacts
-  public: void SetShowContacts(bool show);
-
-  /// \brief Get whether to show the contacts
-  public: bool GetShowContacts() const;
-
-  /// \brief Set whether to show the light source visuals
-  public: void SetShowLights(bool show);
-
-  /// \brief Get whether to show the light source visuals
-  public: bool GetShowLights() const;
-
-  /// \brief Set whether to show the camera visuals
-  public: void SetShowCameras(bool show);
-
-  /// \brief Get whether to show the camera visuals
-  public: bool GetShowCameras() const;
-
-  /// \brief Set to view as wireframe
-  public: void SetWireframe( bool wire );
-
-  /// \brief Get whether to view as wireframe
-  public: bool GetWireframe();
-
-  /// \brief Set to view as wireframe
-  public: void SetShowPhysics( bool show );
-
-  /// \brief Get whether to view as wireframe
-  public: bool GetShowPhysics();
-
   /// \brief Goto a position in time
   public: void GotoTime(double pos);
 
@@ -250,22 +203,6 @@ class World : public SingletonT<World>
   /// \brief Pause callback
   private: void PauseSlot(bool p);
 
-  /// Set to true to show bounding boxes
-  private: bool showBoundingBoxes;
-
-  /// Set to true to show joints
-  private: bool showJoints;
-
-  private: bool showContacts;
-
-  private: bool showLights;
-
-  private: bool showCameras;
-
-  private: bool showPhysics;
-
-  private: bool wireframe;
-
 
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
@@ -276,93 +213,6 @@ class World : public SingletonT<World>
 
   /// \brief Update the simulation iface
   public: void UpdateSimulationIface();
-
-  /// \brief Connect a boost::slot the the show light source signal
-  public: template<typename T>
-          boost::signals::connection ConnectShowLightsSignal( T subscriber )
-          { return showLightsSignal.connect(subscriber); }
-
-  public: template<typename T>
-          void DisconnectShowLightsSignal( T subscriber )
-          { showLightsSignal.disconnect(subscriber); }
-
-  /// \brief Connect a boost::slot the the show camera source signal
-  public: template<typename T>
-          boost::signals::connection ConnectShowCamerasSignal( T subscriber )
-          { return showCamerasSignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectShowCamerasSignal( T subscriber )
-          { showCamerasSignal.disconnect(subscriber); }
-
-  /// \brief Connect a boost::slot the the show contacts signal
-  public: template<typename T>
-          boost::signals::connection ConnectShowContactsSignal( T subscriber )
-          { return showContactsSignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectShowContactsSignal( T subscriber )
-          { showContactsSignal.disconnect(subscriber); }
-
-
-  /// \brief Connect a boost::slot the the show wireframe signal
-  public: template<typename T>
-          boost::signals::connection ConnectShowWireframeSignal( T subscriber )
-          { return wireframeSignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectShowWireframeSignal( T subscriber )
-          { wireframeSignal.disconnect(subscriber); }
-
-
-  /// \brief Connect a boost::slot the the show physics signal
-  public: template<typename T>
-          boost::signals::connection ConnectShowPhysicsSignal( T subscriber )
-          { return showPhysicsSignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectShowPhysicsSignal( T subscriber )
-          { showPhysicsSignal.disconnect(subscriber); }
-
-
-  /// \brief Connect a boost::slot the the show joints signal
-  public: template<typename T>
-          boost::signals::connection ConnectShowJointsSignal( T subscriber )
-          { return showJointsSignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectShowJointsSignal( T subscriber )
-          { showJointsSignal.disconnect(subscriber); }
-
-  /// \brief Connect a boost::slot the the show bounding boxes signal
-  public: template<typename T>
-          boost::signals::connection ConnectShowBoundingBoxesSignal( T subscriber )
-          { return showBoundingBoxesSignal.connect(subscriber); }
-  public: template<typename T>
-          void DisconnectShowBoundingBoxesSignal( T subscriber )
-          { showBoundingBoxesSignal.disconnect(subscriber); }
-
-  /// \brief Connect a boost::slot the the world update start signal
-  public: template<typename T>
-          boost::signals::connection ConnectWorldUpdateStartSignal(T subscriber)
-          { return worldUpdateStartSignal.connect(subscriber); }
-  /// \brief Disconnect a boost::slot the the world update start signal
-  public: template<typename T>
-          void DisconnectWorldUpdateStartSignal( T subscriber )
-          { worldUpdateStartSignal.disconnect(subscriber); }
-
-  /// \brief Connect a boost::slot the the world update end signal
-  public: template<typename T>
-          boost::signals::connection ConnectWorldUpdateEndSignal(T subscriber)
-          { return worldUpdateEndSignal.connect(subscriber); }
-  /// \brief Disconnect a boost::slot the the world update end signal
-  public: template<typename T>
-          void DisconnectWorldUpdateEndSignal( T subscriber )
-          { worldUpdateEndSignal.disconnect(subscriber); }
-
-  /// \brief Connect a boost::slot the the entity selected signal
-  public: template<typename T>
-          boost::signals::connection ConnectEntitySelectedSignal(T subscriber)
-          { return entitySelectedSignal.connect(subscriber); }
-  /// \brief Disconnect a boost::slot the the entity selected signal
-  public: template<typename T>
-          void DisconnectEntitySelectedSignal( T subscriber )
-          { entitySelectedSignal.disconnect(subscriber); }
 
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete
@@ -414,18 +264,6 @@ class World : public SingletonT<World>
 
   /// The entity currently selected by the user
   private: Entity *selectedEntity;
-
-  private: boost::signal<void (bool)> showLightsSignal;
-  private: boost::signal<void (bool)> showCamerasSignal;
-  private: boost::signal<void (bool)> showContactsSignal;
-  private: boost::signal<void (bool)> wireframeSignal;
-  private: boost::signal<void (bool)> showPhysicsSignal;
-  private: boost::signal<void (bool)> showJointsSignal;
-  private: boost::signal<void (bool)> showBoundingBoxesSignal;
-  private: boost::signal<void (Entity*)> entitySelectedSignal;
-
-  private: boost::signal<void ()> worldUpdateStartSignal;
-  private: boost::signal<void ()> worldUpdateEndSignal;
 
   private: std::deque<WorldState> worldStates;
   private: std::deque<WorldState>::iterator worldStatesInsertIter;

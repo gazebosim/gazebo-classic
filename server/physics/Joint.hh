@@ -67,6 +67,9 @@ namespace gazebo
     /// \brief Update the joint
     public: void Update();
 
+    /// \brief Toggle the joint visuals visibility
+    public: void ToggleShowJoints();
+
     /// \brief Set the joint to show visuals
     public: void ShowJoints(bool s);
 

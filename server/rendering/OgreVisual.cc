@@ -26,6 +26,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Events.hh"
+#include "OgreDynamicLines.hh"
 #include "Scene.hh"
 #include "SelectionObj.hh"
 #include "RTShaderSystem.hh"
@@ -51,10 +53,12 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
   : Common(_owner)
 {
   this->type.push_back("visual");
+  this->transparency = 0.0;
 
   bool isStatic = false;
   Ogre::SceneNode *pnode = NULL;
   this->owner = _owner;
+  this->useRTShader = true;
 
   if (scene == NULL)
     this->scene = OgreAdaptor::Instance()->GetScene(0);
@@ -88,6 +92,8 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
   this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
 
   RTShaderSystem::Instance()->AttachEntity(this);
+
+  this->updateTime = Simulator::Instance()->GetRealTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,6 +185,12 @@ OgreVisual::~OgreVisual()
   delete this->meshTileP;
   delete this->materialNameP;
   delete this->castShadowsP;
+
+  // delete instance from lines vector
+  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();
+       iter!=this->lines.end();iter++)
+    delete *iter;
+  this->lines.clear();
 
   RTShaderSystem::Instance()->DetachEntity(this);
 
@@ -338,6 +350,26 @@ void OgreVisual::Load(XMLConfigNode *node)
   this->SetCastShadows((**this->castShadowsP));
 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Update the visual.
+void OgreVisual::Update()
+{
+  if (!this->visible)
+    return;
+
+  if (Simulator::Instance()->GetRealTime() - this->updateTime <= Time(0.2))
+    return;
+
+  std::list<OgreDynamicLines*>::iterator iter;
+
+  // Update the lines
+  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
+    (*iter)->Update();
+
+  this->updateTime = Simulator::Instance()->GetRealTime();
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -628,7 +660,7 @@ void OgreVisual::SetTransparency( float trans )
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  double transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
+  this->transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
   for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
@@ -661,7 +693,7 @@ void OgreVisual::SetTransparency( float trans )
           pass = technique->getPass(passCount);
           sc = pass->getDiffuse();
 
-          if (transparency > 0.0)
+          if (this->transparency > 0.0)
             pass->setDepthWriteEnabled(false);
           else
             pass->setDepthWriteEnabled(true);
@@ -670,16 +702,16 @@ void OgreVisual::SetTransparency( float trans )
           {
             case Ogre::SBT_ADD:
               dc = sc;
-              dc.r -= sc.r * transparency;
-              dc.g -= sc.g  * transparency;
-              dc.b -= sc.b * transparency;
+              dc.r -= sc.r * this->transparency;
+              dc.g -= sc.g  * this->transparency;
+              dc.b -= sc.b * this->transparency;
               pass->setAmbient(Ogre::ColourValue::Black);
               break;
 
             case Ogre::SBT_TRANSPARENT_ALPHA:
             default:
               dc = sc;
-              dc.a =  (1.0f - transparency);
+              dc.a =  (1.0f - this->transparency);
               pass->setAmbient(pass->getAmbient());
               break;
           }
@@ -689,6 +721,13 @@ void OgreVisual::SetTransparency( float trans )
     }
   }
 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the transparency
+float OgreVisual::GetTransparency()
+{
+  return this->transparency;
 }
 
 void OgreVisual::SetHighlight(bool highlight)
@@ -733,6 +772,13 @@ void OgreVisual::SetVisible(bool visible, bool cascade)
 
   this->sceneNode->setVisible( visible, cascade );
   this->visible = visible;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Toggle whether this visual is visible
+void OgreVisual::ToggleVisible()
+{
+  this->SetVisible( !this->GetVisible() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1104,4 +1150,48 @@ Vector3 OgreVisual::GetBoundingBoxSize() const
   Ogre::AxisAlignedBox box = this->sceneNode->_getWorldAABB();
   Ogre::Vector3 size = box.getSize();
   return Vector3(size.x, size.y, size.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to use the RT Shader system
+void OgreVisual::SetUseRTShader(bool value)
+{
+  this->useRTShader = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether to user the RT shader system
+bool OgreVisual::GetUseRTShader() const
+{
+  return this->useRTShader;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a line to the visual
+OgreDynamicLines *OgreVisual::AddDynamicLine(OgreDynamicRenderable::OperationType opType)
+{
+  Events::ConnectRenderStartSignal( boost::bind(&OgreVisual::Update, this) );
+
+  OgreDynamicLines *line = new OgreDynamicLines(opType);
+  this->lines.push_back(line);
+  this->AttachObject(line);
+  return line;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Delete a dynamic line
+void OgreVisual::DeleteDynamicLine(OgreDynamicLines *line)
+{
+  // delete instance from lines vector
+  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();iter!=this->lines.end();iter++)
+  {
+    if (*iter == line)
+    {
+      this->lines.erase(iter);
+      break;
+    }
+  }
+
+  if (this->lines.size() == 0)
+    Events::DisconnectRenderStartSignal( boost::bind(&OgreVisual::Update, this) );
 }

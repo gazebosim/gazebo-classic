@@ -30,6 +30,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "RenderState.hh"
 #include "gazebo_config.h"
 #include "Plugin.hh"
 #include "Timer.hh"
@@ -72,8 +73,8 @@ std::string Simulator::defaultWorld =
     <pos>0 0</pos>\
   </rendering:gui>\
   <rendering:ogre>\
-    <ambient>1 1 1 1</ambient>\
-    <shadowTechnique>stencilModulative</shadowTechnique>\
+    <ambient>.1 .1 .1 1</ambient>\
+    <shadows>true</shadows>\
     <grid>false</grid>\
   </rendering:ogre>\
    <model:physical name=\"plane1_model\">\
@@ -84,7 +85,7 @@ std::string Simulator::defaultWorld =
       <geom:plane name=\"plane1_geom\">\
         <normal>0 0 1</normal>\
         <size>100 100</size>\
-        <segments>10 10</segments>\
+        <segments>1 1</segments>\
         <uvTile>100 100</uvTile>\
         <material>Gazebo/GrayGrid</material>\
         <mu1>109999.0</mu1>\
@@ -92,6 +93,19 @@ std::string Simulator::defaultWorld =
       </geom:plane>\
     </body:plane>\
   </model:physical>\
+  <model:renderable name='directional_light'>\
+    <xyz>0.0 0 10</xyz>\
+    <static>true</static>\
+    <light>\
+      <type>directional</type>\
+      <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>\
+      <specularColor>.1 .1 .1 1.0</specularColor>\
+      <attenuation>.2 0.1 0.0</attenuation>\
+      <range>100</range>\
+      <direction>-.4 0 -0.6</direction>\
+      <castShadows>true</castShadows>\
+    </light>\
+  </model:renderable>\
 </gazebo:world>";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,8 +280,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     }
   }
 
-
-
   // Initialize the GUI
   if (this->gui)
   {
@@ -300,6 +312,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 void Simulator::Init()
 {
   this->state = INIT;
+
+  RenderState::Init();
 
   //Initialize the world
   try

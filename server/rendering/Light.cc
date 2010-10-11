@@ -1,6 +1,32 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
+/* Desc: A Light
+ * Author: Nate Koenig
+ * Date: 15 July 2003
+ */
+
 #include <Ogre.h>
 #include <boost/bind.hpp>
 
+#include "Events.hh"
 #include "Scene.hh"
 #include "RTShaderSystem.hh"
 #include "World.hh"
@@ -68,8 +94,7 @@ Light::Light(Entity *parent, unsigned int sceneIndex)
   this->castShadowsP->Callback(&Light::SetCastShadows, this);
   Param::End();
 
-
-  World::Instance()->ConnectShowLightsSignal( boost::bind(&Light::ShowVisual, this, _1) );
+  Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
 
   try
   {
@@ -94,7 +119,6 @@ Light::~Light()
     this->scene->GetManager()->destroyLight(this->GetName());
   }
 
-  delete this->line;
   delete this->lightTypeP;
   delete this->diffuseP;
   delete this->specularP;
@@ -183,7 +207,7 @@ void Light::CreateVisual()
     return;
 
   // The lines draw a visualization of the camera
-  this->line = OgreCreator::Instance()->CreateDynamicLine(
+  this->line = this->visualNode->AddDynamicLine(
       OgreDynamicRenderable::OT_LINE_LIST);
 
   if ( **this->lightTypeP == "point" )
@@ -270,8 +294,6 @@ void Light::CreateVisual()
   this->line->setMaterial("Gazebo/WhiteGlow");
   this->line->setVisibilityFlags(GZ_LASER_CAMERA);
 
-  this->visualNode->AttachObject(line);
-
   // turn off light source box visuals by default
   this->visualNode->SetVisible(true);
 }
@@ -291,6 +313,13 @@ bool Light::SetSelected( bool s )
   }
 
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Toggle light visual visibility
+void Light::ToggleShowVisual()
+{
+  this->visualNode->ToggleVisible();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -463,18 +492,19 @@ void Light::SetupShadows()
     Ogre::PSSMShadowCameraSetup::SplitPointList splitPointList = pssmSetup->getSplitPoints();
 
     // These were hand tuned by me (Nate)...hopefully they work for all cases.
-    splitPointList[0] = 0.01;
-    splitPointList[1] = 3.5;
-    splitPointList[2] = 5.0;
+    splitPointList[0] = 0.1;
+    splitPointList[1] = 10.5;
+    splitPointList[2] = 20.0;
 
     pssmSetup->setSplitPoints(splitPointList);
-    pssmSetup->setSplitPadding(1.0);
+    pssmSetup->setSplitPadding(5.2);
     pssmSetup->setUseSimpleOptimalAdjust(true);
 
     // set the LISPM adjustment factor (see API documentation for these)
-    pssmSetup->setOptimalAdjustFactor(0, 5.1);
-    pssmSetup->setOptimalAdjustFactor(1, 3.5);
-    pssmSetup->setOptimalAdjustFactor(2, 0.1);
+    /*pssmSetup->setOptimalAdjustFactor(0, 5.0);
+    pssmSetup->setOptimalAdjustFactor(1, 3.0);
+    pssmSetup->setOptimalAdjustFactor(2, 1.0);
+    */
 
     this->light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
     //this->manager->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));

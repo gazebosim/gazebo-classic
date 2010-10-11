@@ -295,11 +295,8 @@ void RenderControl::Init()
 
   Pose3d pose;
 
-  pose.pos.Set(0, 0, 2.0);
-  pose.rot.SetFromEuler( Vector3(DTOR(0.0),DTOR(90.0), DTOR(0.0)) ); 
-
-  //pose.pos.Set(-2.24, -0.36, 1.57);
-  //pose.rot.SetFromEuler( Vector3(DTOR(-0.000001),DTOR(37.19999995), DTOR(11.699998)) ); 
+  pose.pos.Set(-4, 0.0, 2);
+  pose.rot.SetFromEuler( Vector3(DTOR(0.0),DTOR(15.0), DTOR(0.0)) ); 
   this->userCamera->Init();
   this->userCamera->SetWorldPose(pose);
 }

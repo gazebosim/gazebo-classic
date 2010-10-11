@@ -27,6 +27,7 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "Events.hh"
 #include "Scene.hh"
 #include "Simulator.hh"
 #include "RTShaderSystem.hh"
@@ -61,7 +62,7 @@ UserCamera::UserCamera(RenderControl *parentWindow, unsigned int sceneIndex )
 
   this->viewport = NULL;
 
-  World::Instance()->ConnectShowCamerasSignal( boost::bind(&UserCamera::ShowVisual, this, _1) );
+  Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,10 +95,8 @@ void UserCamera::Init()
   OgreCamera::Init();
 
   this->visual = new OgreVisual(this->pitchNode);
-
   // The lines draw a visualization of the camera
-  OgreDynamicLines *line = OgreCreator::Instance()->CreateDynamicLine(
-      OgreDynamicRenderable::OT_LINE_LIST);
+  OgreDynamicLines *line = this->visual->AddDynamicLine( OgreDynamicRenderable::OT_LINE_LIST );
 
   float f = 0.2;
 
@@ -147,7 +146,6 @@ void UserCamera::Init()
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_LASER_CAMERA);
 
-  this->visual->AttachObject(line);
   this->visual->SetVisible(false);
 
   this->window->removeAllViewports();
@@ -258,6 +256,13 @@ unsigned int UserCamera::GetTriangleCount()
 Ogre::RenderWindow *UserCamera::GetWindow()
 {
   return this->window;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Toggle whether to show the visual
+void UserCamera::ToggleShowVisual()
+{
+  this->visual->ToggleVisible();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

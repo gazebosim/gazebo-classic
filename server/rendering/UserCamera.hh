@@ -79,6 +79,9 @@ namespace gazebo
     /// \brief Get the ogre window
     public: Ogre::RenderWindow *GetWindow();
 
+    /// \brief Toggle whether to show the visual
+    private: void ToggleShowVisual();
+
     /// \brief Set whether to show the visual
     private: void ShowVisual(bool s);
 

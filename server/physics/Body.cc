@@ -27,6 +27,7 @@
 #include <sstream>
 #include <float.h>
 
+#include "Events.hh"
 #include "SensorManager.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
@@ -222,6 +223,7 @@ void Body::Load(XMLConfigNode *node)
 
   this->SetKinematic(**this->kinematicP);
 
+  Events::ConnectShowPhysicsSignal( boost::bind(&Body::ToggleShowPhysics, this) );
   //this->GetModel()->ConnectUpdateSignal( boost::bind(&Body::Update, this) );
 }
 
@@ -396,9 +398,8 @@ void Body::Init()
       // Create a line to each geom
       for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
       {
-        OgreDynamicLines *line = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+        OgreDynamicLines *line = this->cgVisual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
         line->setMaterial("Gazebo/GreenGlow");
-        this->cgVisual->AttachObject(line);
         line->AddPoint(Vector3(0,0,0));
         line->AddPoint(giter->second->GetRelativePose().pos);
       }
@@ -705,6 +706,14 @@ void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
     max.y = std::max(bbmax.y, max.y);
     max.z = std::max(bbmax.z, max.z);
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Toggle show the physics visualizations
+void Body::ToggleShowPhysics()
+{
+  if (this->cgVisual)
+    this->cgVisual->ToggleVisible();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -79,9 +79,6 @@ namespace gazebo
                 const Vector2<double> &uvTile, const std::string &material, 
                 bool castShadows, OgreVisual *parent, const std::string &name);
 
-    /// \brief Delete a line visual from lines vector
-    public: void DeleteDynamicLine(OgreDynamicLines* line);
-
     /// \brief Create a new window
     public: Ogre::RenderWindow *CreateWindow(RenderControl *window, 
                                              unsigned int width, 
@@ -109,8 +106,6 @@ namespace gazebo
 
     /// \brief Create a material from a texture file
     public: static std::string CreateMaterialFromTexFile(const std::string &filename);
-
-    public: OgreDynamicLines *CreateDynamicLine(OgreDynamicRenderable::OperationType opType);
 
     /// \brief Create a new ogre visual 
     /// \param name Unique name for the new visual. Leave empty to generate
@@ -156,9 +151,6 @@ namespace gazebo
     public: static void GetSceneNodeBounds(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box);
 
     private: static unsigned int windowCounter;
-
-    // List of all the lines created
-    private: std::list<OgreDynamicLines*> lines;
 
     // List of all the movable text
     private: std::list<OgreMovableText*> text;

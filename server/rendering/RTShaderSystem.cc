@@ -37,7 +37,7 @@
 #include "RTShaderSystem.hh"
 #include "gz.h"
 
-#define MINOR_VERSION 70
+#define MINOR_VERSION 7
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ void RTShaderSystem::UpdateShaders()
 /// Generate shaders for an entity
 void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 {
-  if (!this->initialized)
+  if (!this->initialized || !vis->GetUseRTShader())
     return;
 
   for (unsigned int k=0; k < vis->sceneNode->numAttachedObjects(); k++)

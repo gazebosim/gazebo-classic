@@ -26,6 +26,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "RenderState.hh"
+#include "Events.hh"
 #include "World.hh"
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
@@ -54,6 +56,8 @@ PhysicsEngine::PhysicsEngine()
   {
     this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
     this->visual->SetVisible(false);
+    this->visual->SetCastShadows(false);
+    this->visual->SetUseRTShader(false);
     this->contactLines.resize(5000);
 
     Material *mat = new Material();
@@ -69,7 +73,7 @@ PhysicsEngine::PhysicsEngine()
          this->contactLinesIter != this->contactLines.end(); 
          this->contactLinesIter++, i++)
     {
-      (*this->contactLinesIter) = OgreCreator::Instance()->CreateDynamicLine(
+      (*this->contactLinesIter) = this->visual->AddDynamicLine(
           OgreDynamicRenderable::OT_LINE_LIST);
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
@@ -88,21 +92,21 @@ PhysicsEngine::PhysicsEngine()
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->setMaterial(matName);
-      this->visual->AttachObject(*this->contactLinesIter);
     }
 
-    World::Instance()->ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
+    Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
 
     this->contactLinesIter = this->contactLines.begin();
     delete mat;
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
-  World::Instance()->DisconnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
+  Events::DisconnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
 
   if (this->visual)
   {
@@ -177,7 +181,7 @@ void PhysicsEngine::UnlockMutex()
 /// Add a contact visual
 void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 {
-  if (!World::Instance()->GetShowContacts())
+  if (!RenderState::GetShowContacts())
     return;
 
   Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
@@ -185,10 +189,13 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 
   (*this->contactLinesIter)->SetPoint( 0, pos);
   (*this->contactLinesIter)->SetPoint( 1, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
+
   (*this->contactLinesIter)->SetPoint( 2, pos);
   (*this->contactLinesIter)->SetPoint( 3, pos+(norm*0.2)+(e1*0.05)-(e2*0.05));
+
   (*this->contactLinesIter)->SetPoint( 4, pos);
   (*this->contactLinesIter)->SetPoint( 5, pos+(norm*0.2)-(e1*0.05)+(e2*0.05));
+
   (*this->contactLinesIter)->SetPoint( 6, pos);
   (*this->contactLinesIter)->SetPoint( 7, pos+(norm*0.2)-(e1*0.05)-(e2*0.05));
 
@@ -208,6 +215,16 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 
   if (this->contactLinesIter == this->contactLines.end())
     this->contactLinesIter = this->contactLines.begin();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Toggle whether to show contacts
+void PhysicsEngine::ToggleShowVisual()
+{
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+  this->visual->ToggleVisible();
+  this->contactLinesIter = this->contactLines.begin();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -18,32 +18,6 @@
 
 using namespace gazebo;
 
-/*struct ShadowListener : public Ogre::SceneManager::Listener
-{
-     // this is a callback we'll be using to set up our shadow camera
-    void shadowTextureCasterPreViewProj(Ogre::Light *light, 
-                                        Ogre::Camera *cam, size_t)
-    {
-        // basically, here we do some forceful camera near/far clip attenuation
-        // yeah.  simplistic, but it works nicely.
-        // about you ignoring above in the Mgr declaration.
-        float range = light->getAttenuationRange();
-        cam->setNearClipDistance(0.01);
-        cam->setFarClipDistance(range);
-
-        std::cout << "Range[" << range << "]\n";
-    }
-
-    // these are pure virtual but we don't need them...  so just make them empty
-    // otherwise we get "cannot declare of type Mgr due to missing abstract
-    // functions" and so on
-    void shadowTexturesUpdated(size_t) {}
-    void shadowTextureReceiverPreViewProj(Ogre::Light*, Ogre::Frustum*) {}
-    void preFindVisibleObjects(Ogre::SceneManager*, Ogre::SceneManager::IlluminationRenderStage, Ogre::Viewport*) {}
-    void postFindVisibleObjects(Ogre::SceneManager*, Ogre::SceneManager::IlluminationRenderStage, Ogre::Viewport*) {}
-} shadowCameraUpdater;
-*/
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Scene::Scene(const std::string &name)
@@ -53,7 +27,7 @@ Scene::Scene(const std::string &name)
   this->raySceneQuery = NULL;
   this->type = GENERIC;
 
-  Grid *grid = new Grid(this, 1, 1, .03, Color(1,1,0,1));
+  Grid *grid = new Grid(this, 1, 1, 10, Color(1,1,0,1));
   this->grids.push_back(grid);
 
 
@@ -130,20 +104,6 @@ void Scene::Init(Ogre::Root *root)
   for (unsigned int i=0; i < this->grids.size(); i++)
     this->grids[i]->Init();
 
-  // Not sure if this does something useful.
-  /*if (**(this->shadowsP))
-  {
-    this->manager->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
-    this->manager->setShadowTextureSettings(512,2);
-    this->manager->setShadowColour(Ogre::ColourValue(0.5,0.5,0.5));
-
-    this->manager->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
-    this->manager->setShadowTextureSelfShadow(true);
-    this->manager->setShadowCasterRenderBackFaces(false);
-
-    this->manager->setShadowFarDistance(20);
-  }*/
-
   // Ambient lighting
   this->manager->setAmbientLight( (**this->ambientP).GetOgreColor() );
 
@@ -189,40 +149,6 @@ void Scene::Init(Ogre::Root *root)
   RTShaderSystem::Instance()->AddScene(this);
 
   this->ApplyShadows();
-
-  /*
-  std::ostringstream newModelStr;
-
-  newModelStr << "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >";
-
-  newModelStr << "<sensor:camera name=\"test_cam_sensor\">\
-    <imageSize>512 512</imageSize>\
-    <hfov>60</hfov>\
-    <nearClip>0.1</nearClip>\
-    <farClip>50</farClip>\
-    <saveFrames>false</saveFrames>\
-    <imageFormat>FLOAT32</imageFormat>\
-    </sensor:camera></gazebo:world>";
-
-  XMLConfig xml;
-  xml.LoadString(newModelStr.str()); 
-  OgreCamera *camera = new OgreCamera("test",0);
-  camera->SetCaptureData(true);
-  camera->Load(xml.GetRootNode()->GetChild("camera"));
-  camera->SetSceneNode(this->manager->getRootSceneNode()->createChildSceneNode("camera_test") );
-  camera->CreateRenderTexture("test_texture");
-  Pose3d pose;
-  pose.pos.Set(-2.24, -0.36, 1.57);
-  pose.rot.SetFromEuler( Vector3(DTOR(-0.000001),DTOR(37.19999995), DTOR(11.699998)) ); 
-  //pose.pos.Set(0, 0, 10);
-  //pose.rot.SetFromEuler( Vector3(DTOR(0.0),DTOR(-90.0), DTOR(0.0)) ); 
-  camera->Init();
-  camera->SetWorldPose(pose);
-  this->cameras.push_back(camera);
-  */
-
-
-  //this->manager->addListener(&shadowCameraUpdater);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

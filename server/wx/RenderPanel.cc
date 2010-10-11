@@ -118,41 +118,41 @@ void RenderPanel::Update()
 
   if (this->xUpdate)
   {
-    str.Printf(wxT("%f"), pose.pos.x);
+    str.Printf(wxT("%6.2f"), pose.pos.x);
     this->xPosCtrl->ChangeValue(str);
   }
 
   if (this->yUpdate)
   {
-    str.Printf(wxT("%f"), pose.pos.y);
+    str.Printf(wxT("%6.2f"), pose.pos.y);
     this->yPosCtrl->SetValue(str);
   }
 
   if (this->zUpdate)
   {
-    str.Printf(wxT("%f"), pose.pos.z);
+    str.Printf(wxT("%6.2f"), pose.pos.z);
     this->zPosCtrl->SetValue(str);
   }
 
   if (this->rollUpdate)
   {
-    str.Printf(wxT("%f"), RTOD(pose.rot.GetAsEuler().x));
+    str.Printf(wxT("%6.2f"), RTOD(pose.rot.GetAsEuler().x));
     this->rollCtrl->SetValue(str);
   }
 
   if (this->pitchUpdate)
   {
-    str.Printf(wxT("%f"), RTOD(pose.rot.GetAsEuler().y));
+    str.Printf(wxT("%6.2f"), RTOD(pose.rot.GetAsEuler().y));
     this->pitchCtrl->SetValue(str);
   }
 
   if (this->yawUpdate)
   {
-    str.Printf(wxT("%f"), RTOD(pose.rot.GetAsEuler().z));
+    str.Printf(wxT("%6.2f"), RTOD(pose.rot.GetAsEuler().z));
     this->yawCtrl->SetValue(str);
   }
 
-  str.Printf(wxT("%f"), fps);
+  str.Printf(wxT("%6.2f"), fps);
   this->fpsCtrl->SetValue(str);
 }
 

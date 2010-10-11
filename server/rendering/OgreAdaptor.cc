@@ -37,6 +37,7 @@
 
 #include "gazebo_config.h"
 
+#include "Events.hh"
 #include "Scene.hh"
 #include "Grid.hh"
 #include "OgreVisual.hh"
@@ -394,6 +395,8 @@ unsigned int OgreAdaptor::GetSceneCount() const
 /// Update all the scenes 
 void OgreAdaptor::UpdateScenes()
 {
+  Events::renderStartSignal();
+
   this->root->_fireFrameStarted();
 
   OgreCreator::Instance()->Update();
@@ -418,15 +421,14 @@ bool OgreAdaptor::HasGLSL()
   capabilities = this->root->getRenderSystem()->getCapabilities();
   profiles = capabilities->getSupportedShaderProfiles();
 
-  iter = std::find(profiles.begin(), profiles.end(), "glsl2");
+  iter = std::find(profiles.begin(), profiles.end(), "glsl");
 
   // Print all the shader profiles
   /*std::cout << "Shader profiles:\n";
   for (iter = profiles.begin(); iter != profiles.end(); iter++)
   {
     std::cout << *iter << "\n";
-  }
-  */
+  }*/
 
   return iter != profiles.end();
 }

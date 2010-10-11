@@ -340,43 +340,43 @@ void SimulationFrame::OnReset(wxCommandEvent & WXUNUSED(event))
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnWireframe(wxCommandEvent &event)
 {
-  World::Instance()->SetWireframe( !World::Instance()->GetWireframe() );
+  Events::wireframeSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowPhysics(wxCommandEvent &event)
 {
-  World::Instance()->SetShowPhysics( !World::Instance()->GetShowPhysics() );
+  Events::showPhysicsSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowBoundingBoxes(wxCommandEvent &event)
 {
-  World::Instance()->SetShowBoundingBoxes( !World::Instance()->GetShowBoundingBoxes() );
+  Events::showBoundingBoxesSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowJoints(wxCommandEvent &event)
 {
-  World::Instance()->SetShowJoints( !World::Instance()->GetShowJoints() );
+  Events::showJointsSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowContacts(wxCommandEvent &event)
 {
-  World::Instance()->SetShowContacts( !World::Instance()->GetShowContacts() );
+  Events::showContactsSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowLights(wxCommandEvent &event)
 {
-  World::Instance()->SetShowLights( !World::Instance()->GetShowLights() );
+  Events::showLightsSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowCameras(wxCommandEvent &event)
 {
-  World::Instance()->SetShowCameras( !World::Instance()->GetShowCameras() );
+  Events::showCamerasSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -442,7 +442,6 @@ void SimulationFrame::OnToolClicked( wxCommandEvent &event )
   }
   else if (id == CURSOR)
   {
-    std::cout << "Now here\n";
     this->renderPanel->SetCursor(*wxSTANDARD_CURSOR);
     Events::createEntitySignal("");
   }

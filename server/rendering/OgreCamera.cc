@@ -29,6 +29,7 @@
 #include <Ogre.h>
 #include <dirent.h>
 
+#include "Events.hh"
 #include "FPSViewController.hh"
 #include "OrbitViewController.hh"
 #include "PhysicsEngine.hh"
@@ -98,7 +99,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix, unsigned int sceneIndex)
 
   this->renderingEnabled = true;
 
-  World::Instance()->ConnectShowWireframeSignal( boost::bind(&OgreCamera::ShowWireframe, this, _1) );
+  Events::ConnectShowWireframeSignal( boost::bind(&OgreCamera::ToggleShowWireframe, this) );
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
@@ -895,6 +896,19 @@ void OgreCamera::TrackModel( Model *model )
     this->camera->setPosition(Ogre::Vector3(0,0,0));
     this->camera->setOrientation(Ogre::Quaternion(-.5,-.5,.5,.5));
   }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Toggle whether to view the world in wireframe
+void OgreCamera::ToggleShowWireframe()
+{
+   if (this->camera)
+  {
+    if (this->camera->getPolygonMode() == Ogre::PM_WIREFRAME)
+      this->camera->setPolygonMode(Ogre::PM_SOLID);
+    else
+      this->camera->setPolygonMode(Ogre::PM_WIREFRAME);
+  } 
 }
 
 //////////////////////////////////////////////////////////////////////////////

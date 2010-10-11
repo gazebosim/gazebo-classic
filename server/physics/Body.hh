@@ -217,6 +217,9 @@ namespace gazebo
     /// \brief Set the angular damping factor
     public: virtual void SetAngularDamping(double damping) = 0;
 
+    /// \brief Toggle show the physics visualizations
+    public: void ToggleShowPhysics();
+
     /// \brief Set to true to show the physics visualizations
     public: void ShowPhysics(bool show);
 

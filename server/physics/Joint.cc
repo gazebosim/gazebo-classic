@@ -24,6 +24,7 @@
  * CVS: $Id$
  */
 
+#include "Events.hh"
 #include "PhysicsEngine.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
@@ -65,8 +66,7 @@ Joint::Joint()
 
   this->physics = World::Instance()->GetPhysicsEngine();
 
-  World::Instance()->ConnectShowJointsSignal( 
-      boost::bind(&Joint::ShowJoints, this, _1) );
+  Events::ConnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this) );
 }
 
 
@@ -74,8 +74,7 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
-  World::Instance()->DisconnectShowJointsSignal( 
-      boost::bind(&Joint::ShowJoints, this, _1) );
+  Events::DisconnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this));
 
   if (this->visual)
   {
@@ -154,14 +153,11 @@ void Joint::Load(XMLConfigNode *node)
     this->visual->SetMaterial("Gazebo/JointAnchor");
     this->visual->SetVisible(false);
 
-    this->line1 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
-    this->line2 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+    this->line1 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+    this->line2 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
     this->line1->setMaterial("Gazebo/BlueGlow");
     this->line2->setMaterial("Gazebo/BlueGlow");
-
-    this->visual->AttachObject(this->line1);
-    this->visual->AttachObject(this->line2);
 
     this->line1->AddPoint(Vector3(0,0,0));
     this->line1->AddPoint(Vector3(0,0,0));
@@ -221,6 +217,14 @@ void Joint::Update()
     if (this->body2)
       this->line2->SetPoint(1, this->body2->GetWorldPose().pos - this->anchorPos);
   }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Toggle joint visibility
+void Joint::ToggleShowJoints()
+{
+  if (this->visual)
+    this->visual->ToggleVisible();
 }
 
 //////////////////////////////////////////////////////////////////////////////

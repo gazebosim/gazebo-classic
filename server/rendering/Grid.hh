@@ -111,6 +111,7 @@ namespace gazebo
     private: ParamT<float> *cellLengthP;
     private: ParamT<float> *lineWidthP;
     private: ParamT<Color> *colorP;
+    private: ParamT<float> *h_offsetP;
     private: std::vector<Param*> parameters;
 
     private: std::string name;

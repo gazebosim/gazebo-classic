@@ -65,7 +65,6 @@ GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 ODEPhysics::ODEPhysics()
     : PhysicsEngine()
 {
-
   // Collision detection init
   dInitODE2(0);
 
@@ -99,7 +98,6 @@ ODEPhysics::ODEPhysics()
   this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
   this->maxContactsP = new ParamT<int>("maxContacts",1000,0); // enforced for trimesh-trimesh contacts
   Param::End();
-
 }
 
 
@@ -221,85 +219,6 @@ void ODEPhysics::UpdateCollision()
 {
   std::vector<ContactFeedback>::iterator iter;
   std::vector<dJointFeedback>::iterator jiter;
-
-  /*ODEBody *leftBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::left_wheel");
-  ODEBody *rightBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::right_wheel");
-  ODEBody *castorBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::castor_body");
-  ODEBody *planeBody = (ODEBody*)World::Instance()->GetEntityByName("plane1_model::plane1_body");
-
-  if (leftBody && rightBody && planeBody && castorBody)
-  {
-    ODEGeom *leftGeom = (ODEGeom*)leftBody->GetGeom("left_wheel_geom");
-    ODEGeom *rightGeom = (ODEGeom*)rightBody->GetGeom("right_wheel_geom");
-    ODEGeom *castorGeom = (ODEGeom*)castorBody->GetGeom("castor_geom");
-    ODEGeom *planeGeom = (ODEGeom*)planeBody->GetGeom("plane1_geom");
-
-    dContactGeom geomLeft, geomRight, geomCastor;
-    geomLeft.pos[0] = leftBody->GetWorldPose().pos.x;
-    geomLeft.pos[1] = leftBody->GetWorldPose().pos.y;
-    geomLeft.pos[2] = 0;
-    geomLeft.normal[0] = 0;
-    geomLeft.normal[1] = 0;
-    geomLeft.normal[2] = 1;
-    geomLeft.depth = 0;
-    geomLeft.g1 = leftGeom->GetGeomId();
-    geomLeft.g2 = planeGeom->GetGeomId();
-
-    geomRight.pos[0] = rightBody->GetWorldPose().pos.x;
-    geomRight.pos[1] = rightBody->GetWorldPose().pos.y;
-    geomRight.pos[2] = 0;
-    geomRight.normal[0] = 0;
-    geomRight.normal[1] = 0;
-    geomRight.normal[2] = 1;
-    geomRight.depth = 0;
-    geomRight.g1 = rightGeom->GetGeomId();
-    geomRight.g2 = planeGeom->GetGeomId();
-
-    geomCastor.pos[0] = castorBody->GetWorldPose().pos.x;
-    geomCastor.pos[1] = castorBody->GetWorldPose().pos.y;
-    geomCastor.pos[2] = 0;
-    geomCastor.normal[0] = 0;
-    geomCastor.normal[1] = 0;
-    geomCastor.normal[2] = 1;
-    geomCastor.depth =0;
-    geomCastor.g1 = castorGeom->GetGeomId();
-    geomCastor.g2 = planeGeom->GetGeomId();
-
-    dContact contact;
-    contact.geom = geomLeft;
-    contact.surface.mode = dContactSoftERP | dContactSoftCFM; 
-    contact.surface.mu = 0; 
-    contact.surface.mu2 = 0;
-    contact.surface.slip1 = 0.1;
-    contact.surface.slip2 = 0.1;
-    contact.surface.bounce =  0;
-    dJointID c = dJointCreateContact(this->worldId, this->contactGroup, &contact);
-    dJointAttach (c, leftBody->GetODEId(), planeBody->GetODEId());
-
-    dContact contact2;
-    contact2.geom = geomRight;
-    contact2.surface.mode = dContactSoftERP | dContactSoftCFM; 
-    contact2.surface.mu = 0; 
-    contact2.surface.mu2 = 0;
-    contact2.surface.slip1 = 0.1;
-    contact2.surface.slip2 = 0.1;
-    contact2.surface.bounce =  0;
-    dJointID c2 = dJointCreateContact(this->worldId, this->contactGroup, &contact2);
-    dJointAttach (c2, rightBody->GetODEId(), planeBody->GetODEId());
-
-    dContact contact3;
-    contact3.geom = geomCastor;
-    contact3.surface.mode = dContactSoftERP | dContactSoftCFM; 
-    contact3.surface.mu = 0; 
-    contact3.surface.mu2 = 0;
-    contact3.surface.slip1 = 0.1;
-    contact3.surface.slip2 = 0.1;
-    contact3.surface.bounce =  0;
-    dJointID c3 = dJointCreateContact(this->worldId, this->contactGroup, &contact3);
-    dJointAttach (c3, castorBody->GetODEId(), planeBody->GetODEId());
-  }
-*/
-
 
   // Do collision detection; this will add contacts to the contact group
   this->LockMutex(); 
@@ -760,7 +679,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         Vector3 contactNorm(contact.geom.normal[0], contact.geom.normal[1], 
                             contact.geom.normal[2]);
 
-        self->AddContactVisual(contactPos, contactNorm);
+        self->AddContactVisual( contactPos, contactNorm );
 
         // Store the contact info 
         if (geom1->GetContactsEnabled() ||
