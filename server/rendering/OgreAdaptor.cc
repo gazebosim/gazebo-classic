@@ -215,15 +215,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
           (**this->backgroundColorP).y,
           (**this->backgroundColorP).z));
 
+  // Ambient lighting
+  this->sceneMgr->setAmbientLight(ambient);
+
   // Not sure if this does something useful.
   if (**(this->shadowsP))
   {
     this->sceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_STENCIL_MODULATIVE );
     this->sceneMgr->setShadowTextureSettings(512,2);
     this->sceneMgr->setShadowColour(Ogre::ColourValue(0.5,0.5,0.5));
-
-     // Ambient lighting
-     this->sceneMgr->setAmbientLight(ambient);
 
     this->sceneMgr->setShadowTexturePixelFormat(Ogre::PF_FLOAT16_R);
     this->sceneMgr->setShadowTextureSelfShadow(true);
