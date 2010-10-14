@@ -631,30 +631,15 @@ void OgreVisual::SetTransparency( float trans )
         for (passCount=0; passCount < technique->getNumPasses(); passCount++)
         {
           pass = technique->getPass(passCount);
-          sc = pass->getDiffuse();
+          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
 
-          if (transparency > 0.0)
+          if (this->transparency > 0.0)
             pass->setDepthWriteEnabled(false);
           else
             pass->setDepthWriteEnabled(true);
 
-          switch (this->sceneBlendType)
-          {
-            case Ogre::SBT_ADD:
-              dc = sc;
-              dc.r -= sc.r * transparency;
-              dc.g -= sc.g  * transparency;
-              dc.b -= sc.b * transparency;
-              pass->setAmbient(Ogre::ColourValue::Black);
-              break;
-
-            case Ogre::SBT_TRANSPARENT_ALPHA:
-            default:
-              dc = sc;
-              dc.a =  (1.0f - transparency);
-              pass->setAmbient(pass->getAmbient());
-              break;
-          }
+          dc = pass->getDiffuse();
+          dc.a = (1.0f - this->transparency);
           pass->setDiffuse(dc);
         }
       }

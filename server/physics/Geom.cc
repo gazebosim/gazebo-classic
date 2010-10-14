@@ -196,11 +196,6 @@ void Geom::Load(XMLConfigNode *node)
 
     childNode = childNode->GetNext("visual");
   }
-
-  if (this->GetShapeType() != Shape::PLANE && this->GetShapeType() != Shape::HEIGHTMAP)
-  {
-    this->ShowPhysics(false);
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
