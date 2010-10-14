@@ -52,7 +52,7 @@
         <uvTile>100 100</uvTile>
         <mu1>109999.0</mu1>
         <mu2>1000.0</mu2>
-        <material>Gazebo/Red</material>
+        <material>Gazebo/GrayGrid</material>
       </geom:plane>
     </body:plane>
   </model:physical>
