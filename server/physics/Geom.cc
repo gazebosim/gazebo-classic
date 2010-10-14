@@ -195,11 +195,6 @@ void Geom::Load(XMLConfigNode *node)
 
     childNode = childNode->GetNext("visual");
   }
-
-  if (this->GetShapeType() != "plane" && this->GetShapeType() != "heightmap")
-  {
-    this->SetTransparent(false);
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -355,7 +350,6 @@ void Geom::ToggleTransparent()
   {
     if (*iter)
     {
-      (*iter)->ToggleVisible();
       if ((*iter)->GetTransparency() == 0.0)
         (*iter)->SetTransparency(0.6);
       else

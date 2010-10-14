@@ -668,7 +668,7 @@ void OgreVisual::SetTransparency( float trans )
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
     entity = dynamic_cast<Ogre::Entity*>(obj);
-    //simple = dynamic_cast<Ogre::SimpleRenderable*>(obj);
+
     if (!entity)
       continue;
 
@@ -681,7 +681,7 @@ void OgreVisual::SetTransparency( float trans )
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
-      Ogre::ColourValue sc, dc;
+      Ogre::ColourValue dc;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
            techniqueCount++)
@@ -691,30 +691,15 @@ void OgreVisual::SetTransparency( float trans )
         for (passCount=0; passCount < technique->getNumPasses(); passCount++)
         {
           pass = technique->getPass(passCount);
-          sc = pass->getDiffuse();
+          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
 
           if (this->transparency > 0.0)
             pass->setDepthWriteEnabled(false);
           else
             pass->setDepthWriteEnabled(true);
 
-          switch (this->sceneBlendType)
-          {
-            case Ogre::SBT_ADD:
-              dc = sc;
-              dc.r -= sc.r * this->transparency;
-              dc.g -= sc.g  * this->transparency;
-              dc.b -= sc.b * this->transparency;
-              pass->setAmbient(Ogre::ColourValue::Black);
-              break;
-
-            case Ogre::SBT_TRANSPARENT_ALPHA:
-            default:
-              dc = sc;
-              dc.a =  (1.0f - this->transparency);
-              pass->setAmbient(pass->getAmbient());
-              break;
-          }
+          dc = pass->getDiffuse();
+          dc.a = (1.0f - this->transparency);
           pass->setDiffuse(dc);
         }
       }
