@@ -137,8 +137,6 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
 
   // Initialize the root node, and don't create a window
   this->root->initialise(false);
-
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +263,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
   if (this->HasGLSL())
+  {
     RTShaderSystem::Instance()->Init();
+    RTShaderSystem::Instance()->UpdateShaders();
+  }
 }
 
 

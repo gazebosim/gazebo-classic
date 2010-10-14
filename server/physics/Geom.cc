@@ -345,7 +345,7 @@ void Geom::ShowJoints(bool show)
     {
       if (*iter)
       {
-        (*iter)->SetVisible(true, false);
+        //(*iter)->SetVisible(true, false);
         (*iter)->SetTransparency(0.6);
       }
     }
@@ -356,7 +356,7 @@ void Geom::ShowJoints(bool show)
     {
       if (*iter)
       {
-        (*iter)->SetVisible(true, true);
+        //(*iter)->SetVisible(true, true);
         (*iter)->SetTransparency(0.0);
       }
     }

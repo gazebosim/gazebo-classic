@@ -51,10 +51,15 @@ void GazeboConfig::Load()
 {
   std::ifstream cfgFile;
 
-  std::string rcFilename = getenv("GAZEBORC");
-  if (rcFilename.empty())
+  std::string rcFilename;
+
+  if (getenv("GAZEBORC") != NULL)
   {
-    std::string rcFilename = getenv("HOME");
+    rcFilename = getenv("GAZEBORC");
+  }
+  else
+  {
+    rcFilename = getenv("HOME");
     rcFilename += "/.gazeborc";
   }
 

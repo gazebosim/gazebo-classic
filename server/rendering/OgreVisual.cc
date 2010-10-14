@@ -509,7 +509,7 @@ void OgreVisual::SetMaterial(const std::string &materialName)
   else
     this->myMaterial = this->origMaterial->clone(myMaterialName);
 
-  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
+  /*Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
 
   while (techniqueIt.hasMoreElements ())
   {
@@ -521,7 +521,7 @@ void OgreVisual::SetMaterial(const std::string &materialName)
       passIt.peekNext ()->setSceneBlending (this->sceneBlendType);
       passIt.moveNext ();
     }
-  }
+  }*/
 
   try
   {
@@ -600,7 +600,7 @@ void OgreVisual::SetTransparency( float trans )
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  double transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
+  this->transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
   for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
     Ogre::Entity *entity = NULL;
