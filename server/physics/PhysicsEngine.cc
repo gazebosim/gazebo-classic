@@ -237,3 +237,66 @@ void PhysicsEngine::ShowVisual(bool show)
   if (show)
     this->contactLinesIter = this->contactLines.begin();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the count of the parameters
+unsigned int PhysicsEngine::GetParamCount() const
+{
+  return this->parameters.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a param by index
+Param *PhysicsEngine::GetParam(unsigned int index) const
+{
+  if (index < this->parameters.size())
+    return this->parameters[index];
+  else
+    gzerr(0) << "Invalid index[" << index << "]\n";
+  return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a parameter by name
+Param *PhysicsEngine::GetParam(const std::string &key) const
+{
+  std::vector<Param*>::const_iterator iter;
+  Param *result = NULL;
+
+  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
+  {
+    if ((*iter)->GetKey() == key)
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  if (result == NULL)
+    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+
+  return result;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set a parameter by name
+void PhysicsEngine::SetParam(const std::string &key, const std::string &value)
+{
+  std::vector<Param*>::const_iterator iter;
+  Param *result = NULL;
+
+  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
+  {
+    if ((*iter)->GetKey() == key)
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  if (result == NULL)
+    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+  else
+    result->SetFromString( value, true );
+}

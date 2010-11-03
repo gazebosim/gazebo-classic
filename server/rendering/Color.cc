@@ -277,7 +277,7 @@ float Color::A() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the equivalent ogre color
-Ogre::ColourValue Color::GetOgreColor()
+Ogre::ColourValue Color::GetOgreColor() const
 {
   return Ogre::ColourValue(this->r, this->g, this->b, this->a);
 }

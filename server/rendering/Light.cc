@@ -492,12 +492,12 @@ void Light::SetupShadows()
     Ogre::PSSMShadowCameraSetup::SplitPointList splitPointList = pssmSetup->getSplitPoints();
 
     // These were hand tuned by me (Nate)...hopefully they work for all cases.
-    splitPointList[0] = 0.1;
-    splitPointList[1] = 10.5;
+    splitPointList[0] = 0.5;
+    splitPointList[1] = 5.5;
     splitPointList[2] = 20.0;
 
     pssmSetup->setSplitPoints(splitPointList);
-    pssmSetup->setSplitPadding(5.2);
+    pssmSetup->setSplitPadding(5.0);
     pssmSetup->setUseSimpleOptimalAdjust(true);
 
     // set the LISPM adjustment factor (see API documentation for these)
@@ -507,7 +507,6 @@ void Light::SetupShadows()
     */
 
     this->light->setCustomShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
-    //this->manager->setShadowCameraSetup(Ogre::ShadowCameraSetupPtr(pssmSetup));
 
     Ogre::Vector4 splitPoints;
     for (int i = 0; i < numShadowTextures; ++i)

@@ -122,6 +122,7 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
 
   Scene *scene = new Scene("primary_scene");
   scene->Load(rootNode->GetChild("ogre", "rendering"));
+  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scenes.push_back( scene );  
 
   scene = new Scene("viewer_scene");

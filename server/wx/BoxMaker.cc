@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "OgreVisual.hh"
@@ -47,6 +48,7 @@ void BoxMaker::Stop()
     OgreCreator::Instance()->DeleteVisual(this->visualName);
 
   this->state = 0;
+  Events::moveModeSignal(true);
 }
 
 bool BoxMaker::IsActive() const
@@ -72,7 +74,7 @@ void BoxMaker::MouseReleaseCB(const MouseEvent &event)
   if (this->state == 3)
   {
     this->CreateTheEntity();
-    this->Start();
+    this->Stop();
   }
 }
 
@@ -85,7 +87,10 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
   Vector3 p1, p2;
 
   p1 = this->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = this->GetSnappedPoint( p1 );
+
   p2 = this->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = this->GetSnappedPoint( p2 );
 
   OgreVisual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))

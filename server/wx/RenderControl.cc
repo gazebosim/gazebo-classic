@@ -134,7 +134,6 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
   SetFocus();
   this->mouseEvent.pos.Set( event.GetX(), event.GetY() );
 
-
   if (event.LeftDown() || event.MiddleDown() || event.RightDown())
     this->mouseEvent.pressPos = this->mouseEvent.pos;
 
@@ -164,11 +163,13 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
     if (event.LeftDown())
       this->currMaker->MousePushCB(this->mouseEvent);
     else if (event.LeftUp())
+    {
       this->currMaker->MouseReleaseCB(this->mouseEvent);
+    }
     else if (event.Dragging())
       this->currMaker->MouseDragCB(this->mouseEvent);
 
-    if (this->currMaker->IsActive())
+    if (!this->currMaker || this->currMaker->IsActive())
       return;
   }
   else if (this->GetCursorState() == "manip")
@@ -373,7 +374,10 @@ void RenderControl::SetCursorState(const std::string &state)
 void RenderControl::MoveModeCB(bool mode)
 {
   if (mode)
+  {
     this->SetCursorState("default");
+    this->currMaker = NULL;
+  }
 }
 
 void RenderControl::ManipModeCB(bool mode)

@@ -93,6 +93,25 @@ void Vector3::Normalize()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Round to near whole number 
+Vector3 Vector3::Round()
+{
+  this->x = nearbyint(this->x);
+  this->y = nearbyint(this->y);
+  this->z = nearbyint(this->z);
+  return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a rounded version of this vector
+Vector3 Vector3::GetRounded() const
+{
+  Vector3 result = *this;
+  result.Round();
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Set the contents of the vector
 void Vector3::Set(double x, double y, double z)
 {

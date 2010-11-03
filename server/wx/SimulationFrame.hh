@@ -16,7 +16,7 @@ namespace gazebo
   class SimulationFrame : public wxFrame
   {
     enum ToolbarButtons {PLAY, PAUSE, STEP, BOX, SPHERE, CYLINDER, DIRECTIONAL, POINT, SPOT, CURSOR};
-    enum MenuIds {ID_OPEN, ID_LOAD_MESH, ID_SAVE, ID_RESET, ID_WIREFRAME, ID_PHYSICS, ID_BOUNDING, ID_JOINTS, ID_CONTACTS, ID_LIGHTS, ID_CAMERAS};
+    enum MenuIds {ID_OPEN, ID_LOAD_MESH, ID_SAVE, ID_RESET, ID_WIREFRAME, ID_PHYSICS, ID_BOUNDING, ID_JOINTS, ID_CONTACTS, ID_LIGHTS, ID_CAMERAS, ID_SNAPTOGRID, ID_EDITGRID};
 
     public: SimulationFrame(wxWindow *parent);
 
@@ -36,6 +36,9 @@ namespace gazebo
     private: void OnSave(wxCommandEvent &event);
     private: void OnReset(wxCommandEvent &event);
     private: void OnLoadMesh(wxCommandEvent & WXUNUSED(event));
+
+    private: void OnSnapToGrid(wxCommandEvent &event);
+    private: void OnEditGrid(wxCommandEvent &event);
 
     private: void OnWireframe(wxCommandEvent &event);
     private: void OnShowPhysics(wxCommandEvent &event);
@@ -69,6 +72,8 @@ namespace gazebo
     private: void DeleteEntityCB(const std::string &name);
 
     private: void SetSelectedEntityCB(const std::string &name);
+
+    private: void MoveModeCB(const bool &mode);
 
     /// \brief Find an item in a tree
     private: wxTreeItemId FindTreeItem(const std::string &name);

@@ -15,6 +15,12 @@ set (sources SimulationApp.cc
              SpotLightMaker.cc
              DirectionalLightMaker.cc
              MeshBrowser.cc
+             GridPage.cc
+             ParamsNotebook.cc
+             FogPage.cc
+             PhysicsPage.cc
+             RenderingPage.cc
+             Properties.cc
              propgrid/advprops.cpp
              propgrid/editors.cpp
              propgrid/extras.cpp
@@ -39,6 +45,12 @@ set (headers SimulationApp.hh
              SpotLightMaker.hh
              DirectionalLightMaker.hh
              MeshBrowser.hh
+             GridPage.hh
+             ParamsNotebook.hh
+             FogPage.hh
+             PhysicsPage.hh
+             RenderingPage.hh
+             Properties.hh
 )
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")

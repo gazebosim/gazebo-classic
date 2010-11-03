@@ -124,21 +124,8 @@ void Scene::Init(Ogre::Root *root)
   }
 
   // Create Fog
-  if ( !(**this->fogTypeP).empty() &&
-        (**this->fogTypeP) != "none" )
-  {
-    Ogre::FogMode fogType = Ogre::FOG_NONE;
-
-    if (**this->fogTypeP == "linear")
-      fogType = Ogre::FOG_LINEAR;
-    else if (**this->fogTypeP == "exp")
-      fogType = Ogre::FOG_EXP;
-    else if (**this->fogTypeP == "exp2")
-      fogType = Ogre::FOG_EXP2;
-
-    this->manager->setFog(fogType, (**this->fogColorP).GetOgreColor(), 
-        (**this->fogDensityP), (**this->fogStartP), (**this->fogEndP));
-  }
+  this->SetFog(**this->fogTypeP, **this->fogColorP, **this->fogDensityP, 
+               **this->fogStartP, **this->fogEndP);
 
   // Create ray scene query
   this->raySceneQuery = this->manager->createRayQuery( Ogre::Ray() );
@@ -150,6 +137,8 @@ void Scene::Init(Ogre::Root *root)
 
   this->ApplyShadows();
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the scene
@@ -243,6 +232,21 @@ void Scene::CreateGrid(uint32_t cell_count, float cell_length,
 
   this->grids.push_back(grid);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the grid
+Grid *Scene::GetGrid(unsigned int index)
+{
+  if (index >= this->grids.size())
+  {
+    std::cerr << "Scene::GetGrid() Invalid index\n";
+    return NULL;
+  }
+
+  return this->grids[index];
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the user cameras
@@ -501,6 +505,31 @@ void Scene::DrawLine(const Vector3 &start, const Vector3 &end,
 
   if (!attached)
     node->attachObject(obj);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set fog for this scene
+void Scene::SetFog( std::string type, const Color &color, double density, 
+                    double start, double end )
+{
+  Ogre::FogMode fogType = Ogre::FOG_NONE;
+
+  if (type == "linear")
+    fogType = Ogre::FOG_LINEAR;
+  else if (type == "exp")
+    fogType = Ogre::FOG_EXP;
+  else if (type == "exp2")
+    fogType = Ogre::FOG_EXP2;
+  else
+    type = "none";
+
+  this->manager->setFog( fogType, color.GetOgreColor(), density, start, end );
+
+  this->fogTypeP->SetValue(type);
+  this->fogColorP->SetValue(color);
+  this->fogDensityP->SetValue(density);
+  this->fogStartP->SetValue(start);
+  this->fogEndP->SetValue(end);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

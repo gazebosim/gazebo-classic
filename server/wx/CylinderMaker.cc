@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "OgreVisual.hh"
@@ -45,6 +46,7 @@ void CylinderMaker::Stop()
     OgreCreator::Instance()->DeleteVisual(this->visualName);
 
   this->state = 0;
+  Events::moveModeSignal(true);
 }
 
 bool CylinderMaker::IsActive() const
@@ -70,7 +72,7 @@ void CylinderMaker::MouseReleaseCB(const MouseEvent &event)
   if (this->state == 3)
   {
     this->CreateTheEntity();
-    this->Start();
+    this->Stop();
   }
 }
 
@@ -88,7 +90,10 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
     norm.Set(1,0,0);
 
   p1 = this->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = this->GetSnappedPoint( p1 );
+
   p2 = this->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = this->GetSnappedPoint( p2 );
 
   OgreVisual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))

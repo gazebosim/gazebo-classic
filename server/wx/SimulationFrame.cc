@@ -1,15 +1,19 @@
 #include <wx/aui/aui.h>
 #include <stack>
 
+#include "propgrid/propgrid.h"
+
+#include "ParamsNotebook.hh"
+
 #include "MeshBrowser.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "XMLConfig.hh"
-#include "propgrid/propgrid.h"
 #include "OgreCamera.hh"
 #include "CameraManager.hh"
 #include "World.hh"
 #include "Entity.hh"
+#include "EntityMaker.hh"
 #include "Model.hh"
 #include "Body.hh"
 #include "Geom.hh"
@@ -37,6 +41,7 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
 
   wxMenuBar *menuBar = new wxMenuBar;
   wxMenu *fileMenu = new wxMenu;
+  wxMenu *editMenu = new wxMenu;
   wxMenu *viewMenu = new wxMenu;
 
   wxMenuItem *openItem = fileMenu->Append(ID_OPEN, wxT("&Open\tCtrl-O") );
@@ -56,6 +61,12 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
   Connect(quitItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnQuit), NULL, this);
 
 
+  wxMenuItem *snapToGridItem = editMenu->AppendCheckItem( ID_SNAPTOGRID, wxT("Snap To Grid"));
+  snapToGridItem->Check();
+  Connect(snapToGridItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnSnapToGrid), NULL, this);
+
+  wxMenuItem *editGridItem = editMenu->Append( ID_EDITGRID, wxT("Edit Grid"));
+  Connect(editGridItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnEditGrid), NULL, this);
 
 
   wxMenuItem *wireItem = viewMenu->AppendCheckItem(ID_WIREFRAME, wxT("Wireframe"));
@@ -81,6 +92,7 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
 
 
   menuBar->Append( fileMenu, _("&File") );
+  menuBar->Append( editMenu, _("&Edit") );
   menuBar->Append( viewMenu, _("&View") );
   SetMenuBar( menuBar );
 
@@ -121,6 +133,9 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
 
   Events::ConnectSetSelectedEntitySignal(
      boost::bind(&SimulationFrame::SetSelectedEntityCB, this, _1) );
+
+  Events::ConnectMoveModeSignal( 
+      boost::bind(&SimulationFrame::MoveModeCB, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,6 +353,22 @@ void SimulationFrame::OnReset(wxCommandEvent & WXUNUSED(event))
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void SimulationFrame::OnSnapToGrid(wxCommandEvent &event)
+{
+  EntityMaker::SetSnapToGrid( event.IsChecked() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void SimulationFrame::OnEditGrid(wxCommandEvent &event)
+{
+  ParamsNotebook notebook(this);
+  if (notebook.ShowModal() == wxID_OK)
+    printf("Good\n");
+  else
+    printf("Bad\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnWireframe(wxCommandEvent &event)
 {
   Events::wireframeSignal();
@@ -445,8 +476,8 @@ void SimulationFrame::OnToolClicked( wxCommandEvent &event )
     this->renderPanel->SetCursor(*wxSTANDARD_CURSOR);
     Events::createEntitySignal("");
   }
-
 }
+
 
 void SimulationFrame::OnPaneClosed(wxAuiManagerEvent &event)
 {
@@ -578,7 +609,6 @@ void SimulationFrame::OnPropertyChanged(wxPropertyGridEvent &event)
   if (param)
   {
     std::string value = std::string(prop->GetValueAsString().ToAscii());
-    std::cout << "Setting Param[" << param->GetKey() << "] = " << value << "\n";
     param->SetFromString( value, true );
   }
 }
@@ -648,4 +678,19 @@ void SimulationFrame::SetSelectedEntityCB(const std::string &name)
 {
   if (!name.empty())
     this->toolbar->ToggleTool(CURSOR, true);
+}
+
+void SimulationFrame::MoveModeCB(const bool &mode)
+{
+  if (mode)
+  {
+    this->toolbar->ToggleTool(CURSOR, true);
+    this->toolbar->ToggleTool(BOX, false);
+    this->toolbar->ToggleTool(SPHERE, false);
+    this->toolbar->ToggleTool(CYLINDER, false);
+    this->toolbar->ToggleTool(SPOT, false);
+    this->toolbar->ToggleTool(POINT, false);
+    this->toolbar->ToggleTool(DIRECTIONAL, false);
+  }
+
 }

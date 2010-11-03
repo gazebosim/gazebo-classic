@@ -202,6 +202,18 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: virtual double GetMaxContacts() {return 0;}
 
+    /// \brief Get the count of the parameters
+    public: unsigned int GetParamCount() const;
+
+    /// \brief Get a param by index
+    public: Param *GetParam(unsigned int index) const;
+
+    /// \brief Get a parameter by name
+    public: Param *GetParam(const std::string &key) const;
+
+     /// \brief Set a parameter by name
+    public: void SetParam(const std::string &key, const std::string &value);
+ 
     /// \brief Add a contact visual
     protected: void AddContactVisual(Vector3 pos, Vector3 norm);
 

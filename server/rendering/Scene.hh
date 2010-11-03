@@ -63,6 +63,9 @@ namespace gazebo
     public: void CreateGrid(uint32_t cell_count, float cell_length, 
                             float line_width, const Color &color );
 
+    /// \brief Get the grid
+    public: Grid *GetGrid(unsigned int index);
+
     /// \brief Update all the cameras 
     public: void UpdateCameras();
 
@@ -89,6 +92,9 @@ namespace gazebo
     /// \brief Draw a named line
     public: void DrawLine(const Vector3 &start, const Vector3 &end, 
                           const std::string &name);
+
+    public: void SetFog( std::string type, const Color &color, double density, 
+                         double start, double end );
 
     /// \brief Print scene graph
     private: void PrintSceneGraphHelper(std::string prefix, 
@@ -119,10 +125,6 @@ namespace gazebo
 
     private: std::vector<Grid *> grids;
 
-    // OLD STUFF
-    //private: Vector3 terrainSize;
-    //private: unsigned int terrainVertSize;
-    //private: std::string terrainImage;
   };
 };
 #endif 

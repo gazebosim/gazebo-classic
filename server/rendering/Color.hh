@@ -86,7 +86,7 @@ namespace gazebo
     public: float A() const;
 
     /// \brief Return the equivalent ogre color
-    public: Ogre::ColourValue GetOgreColor();
+    public: Ogre::ColourValue GetOgreColor() const;
   
     // Addition operators
     public: Color operator+( const Color &pt ) const;
