@@ -17,7 +17,6 @@ namespace gazebo
 
     public: virtual void Apply();
 
-    /// \brief On property changed event callback
     private: void OnPropertyChanged(wxPropertyGridEvent &event);
 
     private: wxPropertyGrid *propGrid;

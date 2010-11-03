@@ -50,9 +50,9 @@ Property *PropertyFactory::CreateProperty(Param *p, wxPropertyGrid *g)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-PropertyManager::PropertyManager()
+PropertyManager::PropertyManager(wxPropertyGrid *g)
+  : grid(g)
 {
-  this->grid->Connect( wxEVT_PG_CHANGED, wxPropertyGridEventHandler( PropertyManager::OnPropertyChanged), NULL, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,23 +70,8 @@ PropertyManager::~PropertyManager()
 // Add a property
 void PropertyManager::AddProperty(Param *p)
 {
-  Property *prop = PropertyFactory::CreateProperty( param, this->grid );
+  Property *prop = PropertyFactory::CreateProperty( p, this->grid );
   this->properties.push_back( prop );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// On property changed event callback
-void PropertyManager::OnPropertyChanged(wxPropertyGridEvent &event)
-{
-  wxPGProperty *wxprop = event.GetProperty();
-
-  if (!wxprop)
-    return;
-
-  Property *prop = (Property*)(wxprop->GetClientData());
-
-  if (prop)
-    prop->Changed();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -282,7 +267,7 @@ QuaternProperty::QuaternProperty(Param *p, wxPropertyGrid *grid)
   this->property->SetValueFromString( 
       wxString::FromAscii(param->GetAsString().c_str()) );
 
-  Param<Quatern> *pv = (ParamT<Quatern>*)pv;
+  ParamT<Quatern> *pv = (ParamT<Quatern>*)this->param;
   Vector3 rpy = (**pv).GetAsEuler();
 
   this->roll = this->grid->AppendIn( this->property, new wxFloatProperty( wxT("Roll"), wxT("Roll"), rpy.x) ); 

@@ -23,6 +23,8 @@ PhysicsPage::PhysicsPage(wxWindow *parent)
 
   this->propGrid = new wxPropertyGrid( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE|wxPG_SPLITTER_AUTO_CENTER);
 
+  this->propGrid->Connect( wxEVT_PG_CHANGED, wxPropertyGridEventHandler( PhysicsPage::OnPropertyChanged), NULL, this);
+
   this->propManager = new PropertyManager(this->propGrid);
 
   unsigned int paramCount = engine->GetParamCount();
@@ -42,10 +44,25 @@ PhysicsPage::PhysicsPage(wxWindow *parent)
 PhysicsPage::~PhysicsPage()
 {
   delete this->propManager;
-  this->grid->Destroy();
+  this->propGrid->Destroy();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void PhysicsPage::Apply()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// On property changed event callback
+void PhysicsPage::OnPropertyChanged(wxPropertyGridEvent &event)
+{
+  wxPGProperty *wxprop = event.GetProperty();
+
+  if (!wxprop)
+    return;
+
+  Property *prop = (Property*)(wxprop->GetClientData());
+
+  if (prop)
+    prop->Changed();
 }

@@ -1,6 +1,8 @@
 #ifndef PROPERTIES_HH
 #define PROPERTIES_HH
 
+#include <wx/wx.h>
+
 #include "Param.hh"
 #include "StaticPluginRegister.hh"
 
@@ -27,8 +29,11 @@ namespace gazebo
 
   class PropertyManager
   {
-    public: PropertyManager();
+    public: PropertyManager(wxPropertyGrid *g);
     public: virtual ~PropertyManager();
+
+    public: void AddProperty(Param *p);
+
 
     private: wxPropertyGrid *grid;
     private: std::list<Property*> properties;
@@ -128,7 +133,7 @@ namespace gazebo
     public: virtual ~TimeProperty();
 
     private: wxPGProperty *sec;
-    private: wxPGProperty *ms;
+    private: wxPGProperty *msec;
   };
 
   class ColorProperty : public Property
