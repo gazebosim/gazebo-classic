@@ -8,6 +8,8 @@ class wxPropertyGridEvent;
 
 namespace gazebo
 {
+  class PropertyManager;
+
   class PhysicsPage : public ParamPage
   {
     public: PhysicsPage(wxWindow *parent);
@@ -19,6 +21,7 @@ namespace gazebo
     private: void OnPropertyChanged(wxPropertyGridEvent &event);
 
     private: wxPropertyGrid *propGrid;
+    private: PropertyManager *propManager;
   };
 }
 

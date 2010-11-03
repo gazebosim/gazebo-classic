@@ -48,6 +48,46 @@ Property *PropertyFactory::CreateProperty(Param *p, wxPropertyGrid *g)
   return NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
+PropertyManager::PropertyManager()
+{
+  this->grid->Connect( wxEVT_PG_CHANGED, wxPropertyGridEventHandler( PropertyManager::OnPropertyChanged), NULL, this);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
+PropertyManager::~PropertyManager()
+{
+  std::list<Property*>::iterator iter;
+
+  for (iter = this->properties.begin(); iter != this->properties.end(); iter++)
+    delete *iter;
+  this->properties.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a property
+void PropertyManager::AddProperty(Param *p)
+{
+  Property *prop = PropertyFactory::CreateProperty( param, this->grid );
+  this->properties.push_back( prop );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// On property changed event callback
+void PropertyManager::OnPropertyChanged(wxPropertyGridEvent &event)
+{
+  wxPGProperty *wxprop = event.GetProperty();
+
+  if (!wxprop)
+    return;
+
+  Property *prop = (Property*)(wxprop->GetClientData());
+
+  if (prop)
+    prop->Changed();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -241,6 +281,15 @@ QuaternProperty::QuaternProperty(Param *p, wxPropertyGrid *grid)
 
   this->property->SetValueFromString( 
       wxString::FromAscii(param->GetAsString().c_str()) );
+
+  Param<Quatern> *pv = (ParamT<Quatern>*)pv;
+  Vector3 rpy = (**pv).GetAsEuler();
+
+  this->roll = this->grid->AppendIn( this->property, new wxFloatProperty( wxT("Roll"), wxT("Roll"), rpy.x) ); 
+  this->pitch = this->grid->AppendIn( this->property, new wxFloatProperty( wxT("Pitch"), wxT("Pitch"), rpy.y ) ); 
+  this->yaw = this->grid->AppendIn( this->property, new wxFloatProperty( wxT("Yaw"), wxT("Yaw"), rpy.z) ); 
+
+  this->grid->Collapse( this->property );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,10 +310,35 @@ TimeProperty::TimeProperty(Param *p, wxPropertyGrid *grid)
 
   this->property->SetValueFromString( 
       wxString::FromAscii(param->GetAsString().c_str()) );
+
+  this->sec = this->grid->AppendIn( this->property, new wxIntProperty( wxT("Seconds"), wxT("Sec"), 0.0) ); 
+  this->msec = this->grid->AppendIn( this->property, new wxIntProperty( wxT("Miliseconds"), wxT("Millisec"), 0.0) ); 
+
+  this->grid->Collapse( this->property );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // TIME destructor
 TimeProperty::~TimeProperty()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// COLOR constructor
+ColorProperty::ColorProperty(Param *p, wxPropertyGrid *grid)
+  : Property(p,grid)
+{
+  this->property = this->grid->Append(
+      new wxStringProperty( wxString::FromAscii(param->GetKey().c_str()), 
+                           wxPG_LABEL ));
+  this->property->SetClientData(this);
+
+  this->property->SetValueFromString( 
+      wxString::FromAscii(param->GetAsString().c_str()) );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// COLOR destructor
+ColorProperty::~ColorProperty()
 {
 }

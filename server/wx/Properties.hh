@@ -25,6 +25,15 @@ namespace gazebo
     protected: wxPGProperty *property;
   };
 
+  class PropertyManager
+  {
+    public: PropertyManager();
+    public: virtual ~PropertyManager();
+
+    private: wxPropertyGrid *grid;
+    private: std::list<Property*> properties;
+  };
+
 
   typedef Property* (*PropertyFactoryFn) (Param *, wxPropertyGrid *grid);
 
@@ -107,14 +116,26 @@ namespace gazebo
   {
     public: QuaternProperty(Param *p, wxPropertyGrid *grid);
     public: virtual ~QuaternProperty();
+
+    private: wxPGProperty *roll;
+    private: wxPGProperty *pitch;
+    private: wxPGProperty *yaw;
   };
 
   class TimeProperty : public Property
   {
     public: TimeProperty(Param *p, wxPropertyGrid *grid);
     public: virtual ~TimeProperty();
+
+    private: wxPGProperty *sec;
+    private: wxPGProperty *ms;
   };
 
+  class ColorProperty : public Property
+  {
+    public: ColorProperty(Param *p, wxPropertyGrid *grid);
+    public: virtual ~ColorProperty();
+  };
 
 
 }
