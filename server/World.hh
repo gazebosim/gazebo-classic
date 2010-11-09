@@ -38,11 +38,6 @@
 
 #include "Global.hh"
 
-#ifdef USE_THREADPOOL
-#include "boost/threadpool.hpp"
-#include "boost/thread/mutex.hpp"
-#endif
-
 #include "SingletonT.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
@@ -246,10 +241,6 @@ class World : public SingletonT<World>
   protected: std::vector<Param*> parameters;
 
   private: ParamT<int>* threadsP;
-
-#ifdef USE_THREADPOOL
-  public: boost::threadpool::pool* threadPool;
-#endif
 
   private: friend class DestroyerT<World>;
   private: friend class SingletonT<World>;

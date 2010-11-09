@@ -20,8 +20,6 @@ set (bullet_library_dirs "" CACHE STRING "Bullet library paths. Use this to over
 set (bullet_lflags "" CACHE STRING "Bullet lflags Use this to override automatic detection.")
 set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
 
-set (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
-
 SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
 
 set (GTK2_LIBRARIES "" CACHE STRING "WX GTK2 include paths. Use this to override automatic detection.")
@@ -374,10 +372,6 @@ STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")
 #STRING(STRIP ${boost_library_dirs} boost_library_dirs)
 #STRING(STRIP ${boost_libraries} boost_libraries)
 STRING(REGEX REPLACE " " ";" boost_libraries "${boost_libraries}")
-
-########################################
-# For Threadpool
-message (STATUS "Threadpool Include Path: ${threadpool_include_dirs}")
 
 ########################################
 # Find avformat and avcodec
