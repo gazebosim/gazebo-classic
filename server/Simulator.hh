@@ -153,7 +153,8 @@ namespace gazebo
     public: void SetRenderEngineEnabled( bool enabled );
 
     /// \brief Return true if the gui is enabled
-    public: bool GetRenderEngineEnabled() const;
+    public: inline bool GetRenderEngineEnabled() const
+            { return this->renderEngineEnabled; }
 
     /// \brief Set the length of time the simulation should run.
     public: void SetTimeout(double time);
@@ -162,7 +163,8 @@ namespace gazebo
     public: void SetPhysicsEnabled(bool enabled);
 
     /// \brief Get the physics enabled/disabled
-    public: bool GetPhysicsEnabled() const;
+    public: inline bool GetPhysicsEnabled() const 
+            {return this->physicsEnabled;}
 
     /// \brief Get the model that contains the entity
     public: Model *GetParentModel( Entity *entity ) const;

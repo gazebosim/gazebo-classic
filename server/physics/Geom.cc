@@ -28,6 +28,7 @@
 
 #include "RenderState.hh"
 #include "Events.hh"
+#include "Model.hh"
 #include "Shape.hh"
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
@@ -48,7 +49,7 @@ using namespace gazebo;
 Geom::Geom( Body *body )
     : Entity(body->GetCoMEntity())
 {
-  this->type.push_back("geom");
+  this->AddType(GEOM);
 
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
@@ -202,7 +203,7 @@ void Geom::Load(XMLConfigNode *node)
 void Geom::CreateBoundingBox()
 {
   // Create the bounding box
-  if (this->GetShapeType() != "plane" && this->GetShapeType() != "map")
+  if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
   {
     Vector3 min;
     Vector3 max;
@@ -280,13 +281,6 @@ void Geom::SetGeom(bool placeable)
   }
 
   this->physicsEngine->UnlockMutex();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Update
-void Geom::Update()
-{
-  this->ClearContacts();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -467,7 +461,7 @@ const Mass &Geom::GetMass() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the shape type
-std::string Geom::GetShapeType()
+EntityType Geom::GetShapeType()
 {
   return this->shape->GetLeafType();
 }
@@ -501,43 +495,28 @@ bool Geom::GetContactsEnabled() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Add an occurance of a contact to this geom
-void Geom::AddContact(const Contact &contact)
-{
-  if (!this->contactsEnabled)
-    return;
-
-  if (this->GetShapeType() == "ray" || this->GetShapeType() == "plane")
-    return;
-
-  this->contacts.push_back( contact.Clone() );
-  this->contactSignal( contact );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Clear all contact info
-void Geom::ClearContacts()
-{
-  this->contacts.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the number of contacts
 unsigned int Geom::GetContactCount() const
 {
-  return this->contacts.size();
+  return this->GetParentModel()->GetContactCount(this);
 }
-            
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add an occurance of a contact to this geom
+void Geom::AddContact(const Contact &contact)
+{
+  if (!this->GetContactsEnabled() || this->GetShapeType() == RAY_SHAPE || this->GetShapeType() == PLANE_SHAPE)
+    return;
+
+  this->GetParentModel()->StoreContact(this, contact);
+  this->contactSignal( contact );
+}           
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific contact
 Contact Geom::GetContact(unsigned int i) const
 {
-  if (i < this->contacts.size())
-    return this->contacts[i];
-  else
-    gzerr(0) << "Invalid contact index\n";
-
-  return Contact();
+  return this->GetParentModel()->RetrieveContact(this, i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

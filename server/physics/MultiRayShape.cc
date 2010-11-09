@@ -7,7 +7,7 @@ using namespace gazebo;
 /// Constructor
 MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
 {
-  this->type.push_back("multiray");
+  this->AddType(MULTIRAY_SHAPE);
 
   this->rayFan = this->geomParent->GetVisualNode()->AddDynamicLine(
       OgreDynamicRenderable::OT_TRIANGLE_FAN);

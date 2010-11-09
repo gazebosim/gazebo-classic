@@ -65,9 +65,6 @@ namespace gazebo
     /// \brief Load the geom
     public: virtual void Save(std::string &prefix, std::ostream &stream);
 
-    /// \brief Update function for geoms
-    public: virtual void Update();
-
     /// \brief Set the encapsulated geometry object
     public: void SetGeom(dGeomID geomId, bool placeable);
   

@@ -27,6 +27,8 @@
 #ifndef GZGLOBAL_HH
 #define GZGLOBAL_HH
 
+#include <string>
+
 /////////////////////////////////////////////////////////////////////////////
 // Defines
 /////////////////////////////////////////////////////////////////////////////
@@ -81,6 +83,8 @@
 
 #define ROUND(x) ( (int)( floor((x)+0.5) ) )
 
-#undef USE_THREADPOOL
+enum EntityType{COMMON, ENTITY, MODEL, BODY, GEOM, BALL_JOINT, BOX_SHAPE, CYLINDER_SHAPE, HEIGHTMAP_SHAPE, HINGE2_JOINT, HINGE_JOINT, JOINT, MAP_SHAPE, MULTIRAY_SHAPE, RAY_SHAPE, PLANE_SHAPE, SHAPE, SLIDER_JOINT, SPHERE_SHAPE, TRIMESH_SHAPE, UNIVERSAL_JOINT, LIGHT, VISUAL};
+
+static std::string EntityTypename[] = { "common", "entity", "model", "body", "geom", "ball", "box", "cylinder", "heightmap", "hinge2", "hinge", "joint", "map", "multiray", "ray", "plane", "shape", "slider", "sphere", "trimesh", "universal", "light","visual" };
 
 #endif

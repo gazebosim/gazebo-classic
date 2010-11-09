@@ -63,6 +63,8 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
+target_link_libraries(gazebo_physics profiler)
+
 install ( TARGETS gazebo_physics DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 #APPEND_TO_SERVER_SOURCES(${sources})
 APPEND_TO_SERVER_HEADERS(${headers})

@@ -87,6 +87,7 @@ SET (sources Common.cc
              Angle.cc
              Param.cc
              GraphicsIfaceHandler.cc
+             SimulationIfaceHandler.cc
              Simulator.cc
              Rand.cc
              Factory.cc
@@ -122,6 +123,7 @@ SET (headers Common.hh
              Angle.hh
              Param.hh
              GraphicsIfaceHandler.hh
+             SimulationIfaceHandler.hh
              Simulator.hh
              Rand.hh
              Factory.hh
@@ -163,8 +165,8 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
   set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+  else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+    set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 
@@ -181,13 +183,15 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    gazeboshm 
                                    assimp
                                    pthread
+                                   profiler
 )
+
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
                       -lassimp -lgazebo_physics -lgazebo_av -lgazebo_wx -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics )
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics profiler)
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )

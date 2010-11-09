@@ -26,6 +26,9 @@
 
 //#include <boost/python.hpp>
 
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
+
 #include <sstream>
 #include <iostream>
 #include <float.h>
@@ -54,12 +57,34 @@ using namespace gazebo;
 
 uint Model::lightNumber = 0;
 
+class BodyUpdate_TBB
+{
+  public: BodyUpdate_TBB(std::vector<Body*> *bodies) : bodies(bodies) {}
+
+  public: void operator() (const tbb::blocked_range<size_t> &r) const
+  {
+    for (size_t i=r.begin(); i != r.end(); i++)
+    {
+      (*this->bodies)[i]->Update();
+      /*Common *common = (*this->children)[i];
+      if ( common->HasType(BODY) )
+      {
+        ((Body*)common)->Update();
+      }
+      */
+    }
+  }
+
+  private: std::vector<Body*> *bodies;
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Model::Model(Model *parent)
     : Entity(parent)
 {
-  this->type.push_back("model");
+  this->AddType(MODEL);
   this->GetVisualNode()->SetShowInGui(false);
 
   this->modelType = "";
@@ -105,7 +130,7 @@ Model::~Model()
 {
   /*std::vector<Common*>::iterator eiter;
   for (eiter =this->children.begin(); eiter != this->children.end();)
-    if (*eiter && (*eiter)->HasType("body"))
+    if (*eiter && (*eiter)->HasType(BODY))
     {
       delete (*eiter);
       *eiter = NULL;
@@ -257,7 +282,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     ///        seems like there should be a warning for users
     for (unsigned int i=0; i < this->children.size(); i++)
     {
-      if (this->children[i]->HasType("body"))
+      if (this->children[i]->HasType(BODY))
       {
         this->canonicalBodyNameP->SetValue( this->children[i]->GetName() );
         break;
@@ -339,7 +364,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
     {
       stream << "\n";
       Entity *entity = (Entity*)*bodyIter;
-      if (entity && entity->HasType("body"))
+      if (entity && entity->HasType(BODY))
       {
         Body *body = (Body*)(entity);
         body->Save(p, stream);
@@ -378,7 +403,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   std::vector< Common* >::iterator eiter;
   for (eiter = this->children.begin(); eiter != this->children.end(); eiter++)
   {
-    if (*eiter && (*eiter)->HasType("model"))
+    if (*eiter && (*eiter)->HasType(MODEL))
     {
       Model *cmodel = (Model*)*eiter;
       cmodel->Save(p, stream);
@@ -401,9 +426,9 @@ void Model::Init()
   {
     if (*biter)
     {
-      if ((*biter)->HasType("body"))
+      if ((*biter)->HasType(BODY))
         ((Body*)*biter)->Init();
-      else if ((*biter)->HasType("model"))
+      else if ((*biter)->HasType(MODEL))
         ((Model*)*biter)->Init();
     }
   }
@@ -431,69 +456,34 @@ void Model::Update()
   if (this->controllers.size() == 0 && this->IsStatic())
     return;
 
-  //DiagnosticTimer timer("Model[" + this->GetName() + "] Update ");
-
-  std::vector<Common*>::iterator bodyIter;
   std::map<std::string, Controller* >::iterator contIter;
-  JointContainer::iterator jointIter;
 
-  this->updateSignal();
+  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->bodies.size(), 10),
+      BodyUpdate_TBB(&this->bodies) );
 
+  this->contacts.clear();
+
+  for (contIter=this->controllers.begin();
+      contIter!=this->controllers.end(); contIter++)
   {
-    //DiagnosticTimer timer("Model[" + this->GetName() + "] Bodies Update ");
-
-    for (bodyIter=this->children.begin(); 
-         bodyIter!=this->children.end(); bodyIter++)
+    if (contIter->second)
     {
-      if (*bodyIter && (*bodyIter)->HasType("body"))
-      {
-        Body *body = (Body*)(*bodyIter);
-#ifdef USE_THREADPOOL
-        World::Instance()->threadPool->schedule(
-            boost::bind(&Body::Update,body));
-#else
-        body->Update();
-#endif
-      }
-    }
-  }
-
-  {
-    //DiagnosticTimer timer("Model[" + this->GetName() + "] Controllers Update ");
-    for (contIter=this->controllers.begin();
-        contIter!=this->controllers.end(); contIter++)
-    {
-      if (contIter->second)
-      {
-#ifdef USE_THREADPOOL
-        World::Instance()->threadPool->schedule(boost::bind(&Controller::Update,(contIter->second)));
-#else
-        contIter->second->Update();
-#endif
-      }
+      contIter->second->Update();
     }
   }
 
 
   if (RenderState::GetShowJoints())
   {
-    //DiagnosticTimer timer("Model[" + this->GetName() + "] Joints Update ");
+    JointContainer::iterator jointIter;
     for (jointIter = this->joints.begin(); 
          jointIter != this->joints.end(); jointIter++)
     {
-#ifdef USE_THREADPOOL
-      World::Instance()->threadPool->schedule(
-          boost::bind(&Joint::Update,*jointIter));
-#else
       (*jointIter)->Update();
-#endif
     }
   }
 
-  {
-    //DiagnosticTimer timer("Model[" + this->GetName() + "] Children Update ");
-    this->UpdateChild();
-  }
+  this->UpdateChild();
 }
 
 void Model::OnPoseChange()
@@ -511,7 +501,7 @@ void Model::RemoveChild(Entity *child)
 {
   JointContainer::iterator jiter;
 
-  if (child->HasType("body"))
+  if (child->HasType(BODY))
   {
     bool done = false;
 
@@ -545,7 +535,7 @@ void Model::RemoveChild(Entity *child)
 
   std::vector<Common*>::iterator iter;
   for (iter =this->children.begin(); iter != this->children.end(); iter++)
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
       ((Body*)*iter)->SetEnabled(true);
 
 }
@@ -576,7 +566,7 @@ void Model::Fini()
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if (*biter && (*biter)->HasType("body"))
+    if (*biter && (*biter)->HasType(BODY))
     {
       Body *body = (Body*)*biter;
       body->Fini();
@@ -592,7 +582,7 @@ void Model::Fini()
   std::vector< Common* >::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("model"))
+    if (*iter && (*iter)->HasType(MODEL))
     {
       Model *m = (Model*)*iter;
       m->Fini();
@@ -625,7 +615,7 @@ void Model::Reset()
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if (*biter && (*biter)->HasType("body"))
+    if (*biter && (*biter)->HasType(BODY))
     {
       Body *body = (Body*)*biter;
       body->SetLinearVel(v);
@@ -667,7 +657,7 @@ void Model::SetLinearVel( const Vector3 &vel )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetEnabled(true);
@@ -685,7 +675,7 @@ void Model::SetAngularVel( const Vector3 &vel )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetEnabled(true);
@@ -703,7 +693,7 @@ void Model::SetLinearAccel( const Vector3 &accel )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetEnabled(true);
@@ -721,7 +711,7 @@ void Model::SetAngularAccel( const Vector3 &accel )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetEnabled(true);
@@ -831,7 +821,7 @@ void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       Body *body = (Body*)*iter;
       body->GetBoundingBox(bbmin, bbmax);
@@ -850,8 +840,11 @@ void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
 // Create and return a new body
 Body *Model::CreateBody()
 {
+  Body *body = World::Instance()->GetPhysicsEngine()->CreateBody(this);
+  this->bodies.push_back(body);
+
   // Create a new body
-  return World::Instance()->GetPhysicsEngine()->CreateBody(this);
+  return body;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -986,7 +979,7 @@ Sensor *Model::GetSensor(const std::string &name) const
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if ( *biter && (*biter)->HasType("body"))
+    if ( *biter && (*biter)->HasType(BODY))
     {
       Body *body = (Body*)*biter;
       if ((sensor = body->GetSensor(name)) != NULL)
@@ -1006,7 +999,7 @@ Geom *Model::GetGeom(const std::string &name) const
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if (*biter && (*biter)->HasType("body"))
+    if (*biter && (*biter)->HasType(BODY))
     {
       Body *body = (Body*)*biter;
       if ((geom = body->GetGeom(name)) != NULL)
@@ -1062,7 +1055,7 @@ void Model::Attach(XMLConfigNode *node)
     this->myBodyNameP->Load(node);
   }
 
-  if (this->parent->HasType("model"))
+  if (this->parent->HasType(MODEL))
     parentModel = (Model*)this->parent;
 
   if (parentModel == NULL)
@@ -1103,7 +1096,7 @@ void Model::SetGravityMode( const bool &v )
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
 
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetGravityMode( v );
@@ -1120,7 +1113,7 @@ void Model::SetFrictionMode( const bool &v )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if ((*iter) && (*iter)->HasType("body"))
+    if ((*iter) && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetFrictionMode( v );
@@ -1137,7 +1130,7 @@ void Model::SetCollideMode( const std::string &m )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetCollideMode( m );
@@ -1154,7 +1147,7 @@ void Model::SetLaserFiducialId( const int &id )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)(*iter);
       body->SetLaserFiducialId( id );
@@ -1181,7 +1174,7 @@ void Model::SetLaserRetro( const float &retro )
 
   for (iter=this->children.begin(); iter!=this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("body"))
+    if (*iter && (*iter)->HasType(BODY))
     {
       body = (Body*)*iter;
       body->SetLaserRetro( retro );
@@ -1272,7 +1265,7 @@ void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if (*biter && (*biter)->HasType("body"))
+    if (*biter && (*biter)->HasType(BODY))
     {
       const Body *body = (Body*)*biter;
       body->GetInterfaceNames(list);
@@ -1292,4 +1285,41 @@ Pose3d Model::GetWorldPose()
     return cb->GetWorldPose();
   else 
     return Pose3d();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add an occurance of a contact to this geom
+void Model::StoreContact(const Geom *geom, const Contact &contact)
+{
+  this->contacts[geom->GetName()].push_back( contact.Clone() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the number of contacts for a geom
+unsigned int Model::GetContactCount(const Geom *geom) const
+{
+  std::map<std::string, std::vector<Contact> >::const_iterator iter;
+  iter = this->contacts.find( geom->GetName() );
+
+  if (iter != this->contacts.end())
+    return iter->second.size();
+  else
+    gzerr(0) << "Invalid contact index\n";
+
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Retreive a contact
+Contact Model::RetrieveContact(const Geom *geom, unsigned int i) const
+{
+  std::map<std::string, std::vector<Contact> >::const_iterator iter;
+  iter = this->contacts.find( geom->GetName() );
+
+  if (iter != this->contacts.end() && i < iter->second.size())
+    return iter->second[i];
+  else
+    gzerr(0) << "Invalid contact index\n";
+
+  return Contact();
 }

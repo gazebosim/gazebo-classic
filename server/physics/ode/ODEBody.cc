@@ -110,14 +110,11 @@ void ODEBody::MoveCallback(dBodyID id)
   pose.pos.Set(p[0], p[1], p[2]);
   pose.rot.Set(r[0], r[1], r[2], r[3] );
 
-  Pose3d pp = self->comEntity->GetRelativePose().GetInverse() + pose;
+  self->newPose = self->comEntity->GetRelativePose().GetInverse() + pose;
+  self->newPose.Correct();
+  self->poseDirty = true;
 
-  pp.Correct();
-
-  if ( isnan(pp.pos.x) || isnan(pp.pos.y) || isnan(pp.pos.z) )
-    printf("NAN!!!\n");
-
-  self->SetWorldPose(pp, false);
+  //self->SetWorldPose(pp, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -389,11 +386,9 @@ Vector3 ODEBody::GetWorldAngularVel() const
 /// \brief Set the force applied to the body
 void ODEBody::SetForce(const Vector3 &force)
 {
-  if (this->bodyId)
+  if (this->bodyId && this->physicsEngine->Locked())
   {
-    this->physicsEngine->LockMutex();
     dBodyAddForce(this->bodyId, force.x, force.y, force.z);
-    this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -424,12 +419,10 @@ Vector3 ODEBody::GetWorldForce() const
 /// \brief Set the torque applied to the body
 void ODEBody::SetTorque(const Vector3 &torque)
 {
-  if (this->bodyId)
+  if (this->bodyId && this->physicsEngine->Locked())
   {
     this->SetEnabled(true);
-    this->physicsEngine->LockMutex();
     dBodyAddRelTorque(this->bodyId, torque.x, torque.y, torque.z);
-    this->physicsEngine->UnlockMutex();
   }
 }
 

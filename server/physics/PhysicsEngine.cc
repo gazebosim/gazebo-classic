@@ -52,6 +52,8 @@ PhysicsEngine::PhysicsEngine()
   Param::End();
 
   this->mutex = new boost::recursive_mutex();
+  this->locked = false;
+
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
     this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
@@ -168,6 +170,7 @@ void PhysicsEngine::SetStepTime(Time time)
 void PhysicsEngine::LockMutex()
 {
   this->mutex->lock();
+  this->locked = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +178,7 @@ void PhysicsEngine::LockMutex()
 void PhysicsEngine::UnlockMutex()
 {
   this->mutex->unlock();
+  this->locked = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

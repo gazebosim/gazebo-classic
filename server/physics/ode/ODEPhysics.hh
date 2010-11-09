@@ -29,6 +29,9 @@
 
 #include <ode/ode.h>
 
+#include <tbb/spin_mutex.h>
+#include <tbb/concurrent_vector.h>
+
 #include "Param.hh"
 #include "PhysicsEngine.hh"
 #include "Shape.hh"
@@ -40,6 +43,14 @@ namespace gazebo
 {
   class Entity;
   class XMLConfigNode;
+  class ODEGeom;
+
+  class ContactFeedback
+  {
+    public: Contact contact;
+    public: std::vector<dJointFeedback> feedbacks;
+  };
+
 
 /// \addtogroup gazebo_physics_engine
 /// \{
@@ -98,7 +109,7 @@ class ODEPhysics : public PhysicsEngine
   /// \brief Initialize the ODE engine
   public: virtual void Init();
 
-  /// \brief Initialize for separate thread
+  /// \brief Init the engine for threads. 
   public: virtual void InitForThread();
 
   /// \brief Update the ODE collision
@@ -180,8 +191,13 @@ class ODEPhysics : public PhysicsEngine
   /// \brief access functions to set ODE parameters
   public: double GetMaxContacts();
 
+  public: void CreateContact(ODEGeom *geom1, ODEGeom *geom2);
+
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
+
+  /// \brief Collide two geoms
+  public: void Collide(ODEGeom *geom1, ODEGeom *geom2);
 
   /// \brief Top-level world for all bodies
   private: dWorldID worldId;
@@ -203,19 +219,16 @@ class ODEPhysics : public PhysicsEngine
   private: ParamT<int> *contactFeedbacksP;
   private: ParamT<int> *maxContactsP;
 
-  private: class ContactFeedback
-           {
-             public: Contact contact;
-             public: std::vector<dJointFeedback> feedbacks;
-           };
-
-  private: std::vector<ContactFeedback> contactFeedbacks;
-  private: std::vector<ContactFeedback>::iterator contactFeedbackIter;
+  private: tbb::concurrent_vector<ContactFeedback> contactFeedbacks;
 
   private: std::map<std::string, dSpaceID> spaces;
 
-  private: std::vector<dContactGeom> contactGeoms;
+  private: std::vector< std::pair<ODEGeom*, ODEGeom*> > colliders;
+  private: std::vector< std::pair<ODEGeom*, ODEGeom*> > trimeshColliders;
+
+  private: tbb::spin_mutex collideMutex;
 };
+
 
 /** \}*/
 /// \}

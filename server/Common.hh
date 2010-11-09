@@ -31,6 +31,7 @@
 #include <vector>
 #include <string>
 
+#include "Global.hh"
 #include "Param.hh"
 
 namespace gazebo
@@ -112,17 +113,20 @@ namespace gazebo
     /// \brief Get a child by name
     public: Common *GetChild(const std::string &name );
 
+    /// \brief Add a type specifier
+    public: void AddType( EntityType type );
+
     /// \brief Get the type
-    public: bool HasType(const std::string &t) const;
+    public: bool HasType(const EntityType &t) const;
 
     /// \brief Get the number of types
     public: unsigned int GetTypeCount() const;
 
     /// \brief Get a type by index
-    public: std::string GetType(unsigned int index) const;
+    public: EntityType GetType(unsigned int index) const;
 
     /// \brief Get the leaf type (last type set)
-    public: std::string GetLeafType() const;
+    public: EntityType GetLeafType() const;
 
     /// \brief Get the parent model, if one exists
     /// \return Pointer to a model, or NULL if no parent model exists
@@ -175,7 +179,7 @@ namespace gazebo
     /// \brief Children of this entity
     protected: std::vector< Common* > children;
  
-    protected: std::vector<std::string> type;
+    private: std::vector< EntityType > type;
 
     private: static Common *root;
 

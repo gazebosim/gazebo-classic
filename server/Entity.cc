@@ -44,7 +44,7 @@ using namespace gazebo;
 Entity::Entity(Common *parent)
 : Common(parent), visualNode(0)
 {
-  this->type.push_back("entity");
+  this->AddType(ENTITY);
 
   Param::Begin(&this->parameters);
   this->staticP = new ParamT<bool>("static",false,0);
@@ -54,7 +54,7 @@ Entity::Entity(Common *parent)
   std::ostringstream visname;
   visname << "Entity_" << this->GetId() << "_VISUAL";
 
-  if (this->parent && this->parent->HasType("entity"))
+  if (this->parent && this->parent->HasType(ENTITY))
   {
     Entity *ep = (Entity*)(this->parent);
     if (Simulator::Instance()->GetRenderEngineEnabled())
@@ -100,13 +100,13 @@ Entity::~Entity()
 
   /*for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (*iter && (*iter)->HasType("entity"))
+    if (*iter && (*iter)->HasType(ENTITY))
     {
       Entity *child = (Entity*)(*iter);
       child->SetParent(NULL);
       World::Instance()->GetPhysicsEngine()->RemoveEntity(child);
 
-      if (child->HasType("model"))
+      if (child->HasType(MODEL))
       {
         Model *m = (Model*)child;
         m->Detach();
@@ -151,7 +151,7 @@ void Entity::SetStatic(const bool &s)
 
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
-    if (! (*iter)->HasType("entity"))
+    if (! (*iter)->HasType(ENTITY))
       continue;
 
     Entity *ent = (Entity*)(*iter);
@@ -159,7 +159,7 @@ void Entity::SetStatic(const bool &s)
       continue;
 
     ent->SetStatic(s);
-    if (ent->HasType("body"))
+    if (ent->HasType(BODY))
     {
       body = (Body*)ent;
       body->SetEnabled(!s);
@@ -179,7 +179,7 @@ bool Entity::IsStatic() const
 /// Get the absolute pose of the entity
 Pose3d Entity::GetWorldPose() const
 {
-  if (this->parent && this->parent->HasType("entity"))
+  if (this->parent && this->parent->HasType(ENTITY))
   {
     Entity *ent = (Entity*)this->parent;
     return this->GetRelativePose() + ent->GetWorldPose();
@@ -208,7 +208,7 @@ void Entity::SetRelativePose(const Pose3d &pose, bool notify)
 /// Get the pose relative to the model this entity belongs to
 Pose3d Entity::GetModelRelativePose() const
 {
-  if (this->HasType("model") || !this->parent)
+  if (this->HasType(MODEL) || !this->parent)
     return Pose3d();
 
   return this->GetRelativePose() + 
@@ -219,12 +219,12 @@ Pose3d Entity::GetModelRelativePose() const
 // Set the abs pose of the entity
 void Entity::SetWorldPose(const Pose3d &pose, bool notify)
 {
-  if (this->parent && this->parent->HasType("entity"))
+  if (this->parent && this->parent->HasType(ENTITY))
   {
     // if this is the canonical body of a model, then
     // we want to SetWorldPose of the parent model
     // by doing some backwards transform
-    if (this->parent->HasType("model") && 
+    if (this->parent->HasType(MODEL) && 
         ((Model*)this->parent)->GetCanonicalBody() == (Body*)this)
     {
       // abs pose of the model + relative pose of cb = abs pose of cb 
@@ -261,7 +261,7 @@ void Entity::SetWorldPose(const Pose3d &pose, bool notify)
       this->SetRelativePose(relative_pose, notify);
     }
   }
-  else if (this->HasType("model"))
+  else if (this->HasType(MODEL))
   {
     // race condition with MoveCallback from canonical body calling SetWorldPose
     // we need to stop canonicalBody from calling SetWorldPose in MoveCallback
@@ -315,7 +315,7 @@ void Entity::PoseChange(bool notify)
     std::vector<Common*>::iterator iter;
     for  (iter = this->children.begin(); iter != this->children.end(); iter++)
     {
-      if ((*iter)->HasType("entity"))
+      if ((*iter)->HasType(ENTITY))
         ((Entity*)*iter)->OnPoseChange();
     }
   }

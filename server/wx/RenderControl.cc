@@ -441,7 +441,7 @@ void RenderControl::EntityRotate(Entity *entity)
   if ( planeNorm.GetDotProd(planeNorm2) > 0)
     angle *= -1;
 
-  if (entity->HasType("model")) 
+  if (entity->HasType(MODEL)) 
   {
     Quatern delta; 
     delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
@@ -499,12 +499,12 @@ void RenderControl::EntityTranslate(Entity *entity)
 
   moveVector *= p1 - p2;
 
-  if (entity->HasType("model"))
+  if (entity->HasType(MODEL))
   {
     pose.pos += moveVector;
     entity->SetRelativePose(pose);
   }
-  else if (entity->HasType("body"))
+  else if (entity->HasType(BODY))
   {
     // TODO: make the forceMultiplier  user controllable 
     double forceMultiplier = 1.0;

@@ -14,11 +14,12 @@ SimulationApp::SimulationApp()
 /// Load the simulation app
 void SimulationApp::Load()
 {
-  char **local_argv = new char*[argc];
-  for (int i=0; i < argc; i++)
+  int local_argc = 0;
+  char **local_argv = new char*[local_argc];
+  for (int i=0; i < local_argc; i++)
     local_argv[i] = strdup(wxString(argv[i]).mb_str());
 
-  wxEntryStart(argc, local_argv);
+  wxEntryStart(local_argc, local_argv);
   wxTheApp->OnInit();
 }
 

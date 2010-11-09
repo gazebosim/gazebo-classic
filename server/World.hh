@@ -51,7 +51,6 @@
 
 namespace libgazebo
 {
-  class SimulationIface;
   class Server;
 }
 
@@ -73,6 +72,7 @@ namespace gazebo
   class Timer;
   class Time;
   class GraphicsIfaceHandler;
+  class SimulationIfaceHandler;
    
 /// \brief The World
 /*
@@ -221,9 +221,6 @@ class World : public SingletonT<World>
   /// \brief Set the selected entity
   private: void SetSelectedEntityCB( const std::string &name );
 
-  /// \brief Get the names of interfaces defined in the tree of a model
-  private: void GetInterfaceNames(Common *c, std::vector<std::string>& list);
-
   /// Pointer the physics engine
   private: PhysicsEngine *physicsEngine;
 
@@ -238,15 +235,10 @@ class World : public SingletonT<World>
   /// Simulator control interface
   private: libgazebo::Server *server;
 
-  /// Simulation interface
-  private: libgazebo::SimulationIface *simIface;
-
   private: Factory *factory;
 
   private: GraphicsIfaceHandler *graphics;
-
-  /// Length of time to run before receiving a "go" command
-  private: Time simPauseTime;
+  private: SimulationIfaceHandler *simIfaceHandler;
 
   private: OpenAL *openAL;
 

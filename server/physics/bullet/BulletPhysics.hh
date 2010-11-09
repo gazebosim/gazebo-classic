@@ -100,9 +100,9 @@ class BulletPhysics : public PhysicsEngine
   /// \brief Initialize the Bullet engine
   public: virtual void Init();
 
-  /// \brief Initialize for separate thread
+  /// \brief Init the engine for threads. 
   public: virtual void InitForThread();
- 
+
   /// \brief Update the Bullet collision
   public: virtual void UpdateCollision();
 

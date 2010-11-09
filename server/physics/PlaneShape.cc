@@ -28,7 +28,7 @@ using namespace gazebo;
 /// Constructor
 PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
 {
-  this->type.push_back("plane");
+  this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
 
   Param::Begin(&this->parameters);

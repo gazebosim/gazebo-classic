@@ -44,7 +44,7 @@ using namespace gazebo;
 Joint::Joint()
   : Common(NULL)
 {
-  this->type.push_back("joint");
+  this->AddType(JOINT);
   this->visual = NULL;
   this->model = NULL;
 
@@ -176,7 +176,7 @@ void Joint::Load(XMLConfigNode *node)
 /// Save a joint to a stream in XML format
 void Joint::Save(std::string &prefix, std::ostream &stream)
 {
-  std::string typeName = this->type.back();
+  std::string typeName = EntityTypename[ (int)this->GetLeafType() ];
 
   stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
   stream << prefix << "  " << *(this->body1NameP) << "\n";

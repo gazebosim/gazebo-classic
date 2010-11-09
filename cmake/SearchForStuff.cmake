@@ -50,6 +50,31 @@ endif ()
 if (PKG_CONFIG_FOUND)
 
   #################################################
+  # Find TBB
+  pkg_check_modules(TBB tbb)
+  IF (NOT TBB_FOUND)
+    BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
+  ELSE (NOT TBB_FOUND)
+    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+                          ${gazeboserver_include_dirs_desc} 
+                          ${TBB_INCLUDE_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+                          ${gazeboserver_link_dirs_desc} 
+                          ${TBB_LIBRARY_DIRS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${TBB_LINK_LIBS})
+    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+                          ${gazeboserver_link_libs_desc} 
+                          ${TBB_LIBRARIES})
+    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
+                          ${gazeboserver_ldflags_desc} 
+                          ${TBB_LDFLAGS})
+  ENDIF (NOT TBB_FOUND)
+
+
+
+  #################################################
   # Find ODE
   pkg_check_modules(ODE ode>=${ODE_VERSION})
   IF (NOT ODE_FOUND)

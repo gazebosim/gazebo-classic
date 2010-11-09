@@ -52,7 +52,7 @@ unsigned int OgreVisual::visualCounter = 0;
 OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
   : Common(_owner)
 {
-  this->type.push_back("visual");
+  this->AddType(VISUAL);
   this->transparency = 0.0;
 
   bool isStatic = false;

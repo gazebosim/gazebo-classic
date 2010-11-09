@@ -32,7 +32,7 @@ using namespace gazebo;
 /// Constructor
 RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
 {
-  this->type.push_back("ray");
+  this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )

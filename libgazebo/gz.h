@@ -432,7 +432,6 @@ class SimulationRequestData
                       SET_LINEAR_ACCEL,
                       SET_ANGULAR_VEL,
                       SET_ANGULAR_ACCEL,
-                      GO,
                       GET_ENTITY_TYPE,
                       GET_ENTITY_PARAM_COUNT,
                       GET_ENTITY_PARAM_KEY,
@@ -537,28 +536,6 @@ class SimulationIface : public Iface
   /// \param client Pointer to the client
   /// \param id String name of the client
   public: virtual void Open(Client *client, std::string id);
-
-  /// \brief Tell gazebo to execute for a specified amount of time
-  /// \param ms Number of milliseconds to run
-  public: template<typename T>
-          void Go(unsigned int us,T subscriber)
-          {
-            // Send the go command to Gazebo
-            this->Lock(1);
-            SimulationRequestData *request = &(this->data->requests[this->data->requestCount++]);
-            request->type = SimulationRequestData::GO;
-            request->runTime = us;
-            this->Unlock();
-
-            {
-              if (this->currentConnection.connected())
-                this->currentConnection.disconnect();
-
-              // Connect the callback. This is signaled when the thread
-              // (below) finishes waiting 
-              this->currentConnection = this->goAckSignal.connect( subscriber );
-            }
-          }
 
   /// \brief Pause the simulation
   public: void Pause();

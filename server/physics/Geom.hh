@@ -145,7 +145,7 @@ namespace gazebo
     public: const Mass &GetMass() const;
 
     /// \brief Get the shape type
-    public: std::string GetShapeType();
+    public: EntityType GetShapeType();
 
     /// \brief Set the shape for this geom
     public: void SetShape(Shape *shape);
@@ -212,8 +212,6 @@ namespace gazebo
     ///  Contact parameters
     public: SurfaceParams *surface; 
 
-    public: std::vector<Contact> contacts;
- 
     /// The body this geom belongs to
     protected: Body *body;
   

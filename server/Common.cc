@@ -42,7 +42,7 @@ Common *Common::root = new Common(NULL);
 Common::Common(Common *parent)
  : parent(parent)
 {
-  this->type.push_back("common");
+  this->AddType(COMMON);
 
   if (this->parent == NULL)
     this->parent = this->root;
@@ -240,6 +240,13 @@ unsigned int Common::GetChildCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Add a type specifier
+void Common::AddType( EntityType t )
+{
+  this->type.push_back(t);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get a child by index
 Common *Common::GetChild(unsigned int i) const
 {
@@ -291,7 +298,7 @@ std::string Common::GetScopedName() const
 
   while (p)
   {
-    if (p && p->HasType("model"))
+    if (p && p->HasType(MODEL))
     {
       Model *m = (Model*)p;
       scopedName.insert(0, m->GetName()+"::");
@@ -321,13 +328,16 @@ std::string Common::GetCompleteScopedName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the type
-bool Common::HasType(const std::string &t) const
+bool Common::HasType(const EntityType &t) const
 {
-  for (unsigned int i=0; i < this->type.size(); i++)
+  return std::binary_search(this->type.begin(), this->type.end(), t);
+
+  /*for (unsigned int i=0; i < this->type.size(); i++)
     if (this->type[i] == t)
       return true;
 
   return false;
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -339,18 +349,18 @@ unsigned int Common::GetTypeCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a type by index
-std::string Common::GetType(unsigned int index) const
+EntityType Common::GetType(unsigned int index) const
 {
   if (index < this->type.size())
     return this->type[index];
 
   gzthrow("Invalid type index");
-  return std::string();
+  return COMMON;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the leaf type (last type set)
-std::string Common::GetLeafType() const
+EntityType Common::GetLeafType() const
 {
   return this->type.back();
 }
@@ -408,7 +418,7 @@ Model *Common::GetParentModel() const
 {
   Common *p = this->parent;
 
-  while (p && p->HasType("model"))
+  while (p && p->HasType(MODEL))
     p = p->GetParent();
 
   return (Model*)p;

@@ -9,7 +9,7 @@ using namespace gazebo;
 Shape::Shape(Geom *p)
   : Common(p) 
 {
-  this->type.push_back("shape");
+  this->AddType(SHAPE);
   this->geomParent = p;
   this->geomParent->SetShape(this);
   this->physicsEngine = World::Instance()->GetPhysicsEngine();

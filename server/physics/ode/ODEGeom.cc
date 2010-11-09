@@ -21,7 +21,6 @@
 /* Desc: ODEGeom class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id:$
  */
 
 #include <sstream>
@@ -138,17 +137,10 @@ void ODEGeom::OnPoseChange()
 // Save the body based on our XMLConfig node
 void ODEGeom::Save(std::string &prefix, std::ostream &stream)
 {
-  if (this->GetShapeType() == "ray")
+  if (this->GetShapeType() == RAY_SHAPE)
     return;
 
   Geom::Save(prefix, stream);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Update
-void ODEGeom::Update()
-{
-  Geom::Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

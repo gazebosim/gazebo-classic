@@ -574,7 +574,7 @@ void SimulationFrame::OnTreePopupClick( wxCommandEvent &event )
 
   Common *common = Common::GetByName(data->name);
 
-  if (common && common->HasType("entity"))
+  if (common && common->HasType(ENTITY))
   {
     Entity *ent = dynamic_cast<Entity*>(common);
 

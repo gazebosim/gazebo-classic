@@ -32,7 +32,7 @@ using namespace gazebo;
 /// Constructor
 SphereShape::SphereShape(Geom *parent) : Shape(parent)
 {
-  this->type.push_back("sphere");
+  this->AddType(SPHERE_SHAPE);
 
   Param::Begin(&this->parameters);
   this->radiusP = new ParamT<double>("size",1.0,0);

@@ -643,13 +643,6 @@ void Simulator::SetRenderEngineEnabled( bool enabled )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Return true if the gui is enabled
-bool Simulator::GetRenderEngineEnabled() const
-{
-  return this->renderEngineEnabled;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the length of time the simulation should run.
 void Simulator::SetTimeout(double time)
 {
@@ -664,13 +657,6 @@ void Simulator::SetPhysicsEnabled( bool enabled )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the physics enabled/disabled
-bool Simulator::GetPhysicsEnabled() const
-{
-  return this->physicsEnabled;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the model that contains the entity
 Model *Simulator::GetParentModel( Entity *entity ) const
 {
@@ -681,7 +667,7 @@ Model *Simulator::GetParentModel( Entity *entity ) const
 
   do 
   {
-    if (entity && entity->HasType("model"))
+    if (entity && entity->HasType(MODEL))
       model = (Model*)entity;
 
     entity = dynamic_cast<Entity*>(entity->GetParent());
@@ -701,7 +687,7 @@ Body *Simulator::GetParentBody( Entity *entity ) const
 
   do 
   {
-    if (entity && entity->HasType("body"))
+    if (entity && entity->HasType(BODY))
       body = (Body*)(entity);
     entity = dynamic_cast<Entity*>(entity->GetParent());
   } while (body == NULL);
@@ -729,8 +715,6 @@ void Simulator::PhysicsLoop()
 
   while (!this->physicsQuit)
   {
-    //DiagnosticTimer timer("PhysicsLoop Timer ");
-
     {
       boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
       boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
@@ -779,7 +763,7 @@ void Simulator::PhysicsLoop()
       req.tv_nsec = diffTime.nsec;
     }
 
-    nanosleep(&req, &rem);
+    //nanosleep(&req, &rem);
 
     {
       //DiagnosticTimer timer("PhysicsLoop UpdateSimIfaces ");

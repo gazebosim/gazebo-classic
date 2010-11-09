@@ -128,12 +128,11 @@ void BulletPhysics::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Initialize for separate thread
+/// Init the engine for threads. 
 void BulletPhysics::InitForThread()
 {
-  return;
 }
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Update the Bullet collisions, create joints
 void BulletPhysics::UpdateCollision()

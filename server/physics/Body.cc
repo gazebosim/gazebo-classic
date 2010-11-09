@@ -56,7 +56,7 @@ using namespace gazebo;
 Body::Body(Entity *parent)
     : Entity(parent)
 {
-  this->type.push_back("body");
+  this->AddType(BODY);
   this->GetVisualNode()->SetShowInGui(false);
 
   this->comEntity = new Entity(this);
@@ -353,6 +353,8 @@ void Body::SetLaserRetro(float retro)
 // Initialize the body
 void Body::Init()
 {
+  this->poseDirty = false;
+
   // If no geoms are attached, then don't let gravity affect the body.
   if (this->geoms.size()==0 || **this->turnGravityOffP)
     this->SetGravityMode(false);
@@ -415,11 +417,11 @@ void Body::Init()
 // Update the body
 void Body::Update()
 {
-  //DiagnosticTimer timer("Body[" + this->GetName() +"] Update");
-  
-  std::map< std::string, Geom* >::iterator geomIter;
-  Vector3 vel;
-  Vector3 avel;
+  if (this->poseDirty)
+  {
+    this->poseDirty = false;
+    this->SetWorldPose(this->newPose, false);
+  }
 
   // Apply our linear accel
   this->SetForce(this->linearAccel);
@@ -433,20 +435,6 @@ void Body::Update()
   //   this->enabled = this->GetEnabled();
   //   this->enabledSignal(this->enabled);
   // }
- 
-  {
-    //DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
-
-    for (geomIter=this->geoms.begin();
-        geomIter!=this->geoms.end(); geomIter++)
-    {
-#ifdef USE_THREADPOOL
-      World::Instance()->threadPool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
-#else
-      geomIter->second->Update();
-#endif
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -50,7 +50,7 @@ unsigned int Light::lightCounter = 0;
 Light::Light(Entity *parent, unsigned int sceneIndex)
   : Entity(parent)
 {
-  this->type.push_back("light");
+  this->AddType(LIGHT);
   this->scene = OgreAdaptor::Instance()->GetScene(sceneIndex);
 
   std::ostringstream stream;
@@ -339,7 +339,7 @@ void Light::SetLightType(const std::string &type)
   else if (type == "directional")
   {
     this->light->setType(Ogre::Light::LT_DIRECTIONAL);
-    if (this->parent && this->parent->HasType("model"))
+    if (this->parent && this->parent->HasType(MODEL))
       this->parent->GetParentModel()->SetStatic(true);
   }
   else if (type == "spot")

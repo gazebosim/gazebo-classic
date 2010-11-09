@@ -95,10 +95,10 @@ namespace gazebo
   
     /// \brief Initialize the physics engine
     public: virtual void Init() = 0;
-
-    /// \brief Initialize for separate thread
+ 
+    /// \brief Init the engine for threads. 
     public: virtual void InitForThread() = 0;
-  
+
     /// \brief Update the physics engine collision
     public: virtual void UpdateCollision() = 0;
 
@@ -152,6 +152,8 @@ namespace gazebo
 
     /// \brief Lock the physics engine mutex
     public: void LockMutex();
+
+    public: inline bool Locked() const {return this->locked;}
 
     /// \brief Unlock the physics engine mutex
     public: void UnlockMutex();
@@ -231,6 +233,7 @@ namespace gazebo
     protected: std::vector<Param*> parameters;
 
     private: boost::recursive_mutex *mutex;
+    private: bool locked;
 
     protected: OgreVisual *visual;
 

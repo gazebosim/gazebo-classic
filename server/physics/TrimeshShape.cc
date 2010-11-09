@@ -39,7 +39,7 @@ using namespace gazebo;
 // Constructor
 TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
 {
-  this->type.push_back("trimesh");
+  this->AddType(TRIMESH_SHAPE);
 
   Param::Begin(&this->parameters);
   this->meshNameP = new ParamT<std::string>("mesh","",1);

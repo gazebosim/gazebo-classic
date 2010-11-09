@@ -296,6 +296,9 @@ namespace gazebo
 
     /// This flag is used to trigger the enabledSignal
     private: bool enabled;
+
+    protected: Pose3d newPose;
+    protected: bool poseDirty;
   };
 
   /// \}

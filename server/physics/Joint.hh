@@ -30,6 +30,7 @@
 #include "Common.hh"
 #include "Param.hh"
 #include "Vector3.hh"
+#include "Global.hh"
 #include <boost/signal.hpp>
 
 namespace gazebo
