@@ -173,7 +173,7 @@ class Server
   public: virtual ~Server();
 
   /// \brief Initialize the server
-  public: void Init(int serverId, int force);
+  public: void Init(const std::string &serverName, int force);
 
   /// \brief Finalize the server
   public: void Fini();
@@ -185,8 +185,11 @@ class Server
   private: void SemFini();
   private: void SemPost();
 
+  public: std::string serverName;
+
   /// The server id
-  public: int serverId;
+  private: int serverId;
+  private: static int serverIdCounter;
 
   /// The directory containing mmap files
   public: std::string filename;

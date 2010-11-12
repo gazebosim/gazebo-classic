@@ -44,6 +44,8 @@
 
 using namespace libgazebo;
 
+int Server::serverIdCounter = 0;
+
 union semun
 {
   int val;
@@ -66,14 +68,15 @@ Server::~Server()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the server
-void Server::Init(int serverId, int force)
+void Server::Init(const std::string &serverName, int force)
 {
   char *tmpdir;
   char *user;
   std::ostringstream stream;
   std::ostringstream errStream;
 
-  this->serverId = serverId;
+  this->serverId = serverIdCounter++;
+  this->serverName = serverName;
 
   // Initialize semaphores.  Do this first to make sure we dont have
   // another server running with the same id.
@@ -89,7 +92,7 @@ void Server::Init(int serverId, int force)
   if (!user)
     user = (char*)"nobody";
 
-  stream << tmpdir << "/gazebo-" << user << "-" << this->serverId;
+  stream << tmpdir << "/gazebo-" << user << "-" << this->serverName;
   this->filename = stream.str();
 
   // check to see if there is already a directory created.
@@ -174,8 +177,6 @@ void Server::Init(int serverId, int force)
 void Server::Fini()
 {
   char cmd[1024];
-
-  //std::cout << "deleting " << this->filename << "\n";
 
   // unlink the pid file
   std::string pidfn = this->filename + "/gazebo.pid";

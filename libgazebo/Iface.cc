@@ -120,7 +120,7 @@ std::string Iface::Filename(std::string id)
 
 //////////////////////////////////////////////////////////////////////////////
 // Create an interface (server)
-void Iface::Create(Server *server, std::string id)
+void Iface::Create(Server *server, std::string id )
 {
   std::ostringstream stream;
 
