@@ -25,6 +25,7 @@
  * SVN info: $Id:$
  */
 
+#include "World.hh"
 #include "PhysicsEngine.hh"
 #include "PhysicsFactory.hh"
 #include "gazebo_config.h"
@@ -64,11 +65,11 @@ void PhysicsFactory::RegisterPhysicsEngine(std::string classname,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new instance of a physics engine.
-PhysicsEngine *PhysicsFactory::NewPhysicsEngine(const std::string &classname)
+PhysicsEngine *PhysicsFactory::NewPhysicsEngine(const std::string &classname, World *world)
 {
   if (engines[classname])
   {
-    return (engines[classname]) ();
+    return (engines[classname]) (world);
   }
 
   return NULL;

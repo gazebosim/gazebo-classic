@@ -27,7 +27,7 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 
 #TARGET_LINK_LIBRARIES(gazebo_av ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES})
-target_link_libraries(gazebo_av-shared ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES} profiler)
+target_link_libraries(gazebo_av-shared ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 
 #SET_TARGET_PROPERTIES(gazebo_av PROPERTIES OUTPUT_NAME "gazebo_av")
 set_target_properties(gazebo_av-shared PROPERTIES OUTPUT_NAME "gazebo_av" VERSION ${GAZEBO_VERSION})

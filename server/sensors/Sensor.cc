@@ -48,8 +48,7 @@ Sensor::Sensor(Body *body)
   this->controller = NULL;
   this->active = true;
 
-  this->world = World::Instance();
-  this->simulator = Simulator::Instance();
+  this->lastUpdate = this->GetWorld()->GetSimTime();
 
   Param::Begin(&this->parameters);
   this->updateRateP = new ParamT<double>("updateRate", 0, 0);
@@ -86,7 +85,7 @@ void Sensor::Load(XMLConfigNode *node)
     this->updatePeriod = 0.0; // no throttling if updateRate is 0
   else
     this->updatePeriod = 1.0 / updateRate;
-  this->lastUpdate = Simulator::Instance()->GetSimTime();
+  this->lastUpdate = this->GetWorld()->GetSimTime();
 
 }
 
@@ -115,7 +114,7 @@ void Sensor::Init()
   if (this->controller)
     this->controller->Init();
 
-  this->lastUpdate = Simulator::Instance()->GetSimTime();
+  this->lastUpdate = this->GetWorld()->GetSimTime();
 
   this->InitChild();
 }
@@ -126,12 +125,12 @@ void Sensor::Update()
 {
   //DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
 
-  Time physics_dt = this->world->GetPhysicsEngine()->GetStepTime();
+  Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();
 
-  if (((this->simulator->GetSimTime() - this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
+  if (((this->GetWorld()->GetSimTime() - this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
   {
     this->UpdateChild();
-    this->lastUpdate = this->simulator->GetSimTime();
+    this->lastUpdate = this->GetWorld()->GetSimTime();
   }
 
   // update any controllers that are children of sensors, e.g. ros_bumper
@@ -182,7 +181,7 @@ void Sensor::LoadController(XMLConfigNode *node)
     iface = IfaceFactory::NewIface(ifaceType);
 
     // Create the iface
-    iface->Create(World::Instance()->GetGzServer(), ifaceName);
+    iface->Create(this->GetWorld()->GetGzServer(), ifaceName);
 
   }
   else
@@ -223,9 +222,19 @@ Pose3d Sensor::GetPose() const
 {
   return this->body->GetWorldPose();
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Get the name of the interfaces define in the sensor controller
 void Sensor::GetInterfaceNames(std::vector<std::string>& list) const
 {
   controller->GetInterfaceNames(list);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+/// Get the time of the last update
+Time Sensor::GetLastUpdate()
+{
+  return this->lastUpdate;
+}
+
+

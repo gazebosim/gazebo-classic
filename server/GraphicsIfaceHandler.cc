@@ -43,7 +43,8 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-GraphicsIfaceHandler::GraphicsIfaceHandler()
+GraphicsIfaceHandler::GraphicsIfaceHandler(World *world)
+  : world(world)
 {
   this->threeDIface = NULL;
 }
@@ -71,7 +72,7 @@ void GraphicsIfaceHandler::Load(const std::string &_name, Entity *_parent)
   {
     this->threeDIface = (libgazebo::Graphics3dIface*)libgazebo::IfaceFactory::NewIface("graphics3d");
 
-    this->threeDIface->Create(World::Instance()->GetGzServer(), _name);
+    this->threeDIface->Create(this->world->GetGzServer(), _name);
     this->threeDIface->data->cmdCount = 0;
   }
   catch (std::string err)

@@ -35,6 +35,12 @@ MeshManager::MeshManager()
   this->CreateCylinder("axis_cylinder",0.005,0.5,1,32);
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
+
+  this->fileExtensions.push_back("mesh");
+  this->fileExtensions.push_back("stl");
+  this->fileExtensions.push_back("dae");
+  this->fileExtensions.push_back("3ds");
+  this->fileExtensions.push_back("xml");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,6 +56,12 @@ MeshManager::~MeshManager()
 // Load a mesh from a file
 const Mesh *MeshManager::Load(const std::string &filename)
 {
+  if (!this->IsValidFilename(filename))
+  {
+    gzerr(0) << "Invalid mesh filename extension[" << filename << "]\n";
+    return NULL;
+  }
+
   struct stat st;
   std::string fullname;
   bool found = false;
@@ -139,6 +151,22 @@ const Mesh *MeshManager::Load(const std::string &filename)
   //mesh->RecalculateNormals();
   return mesh;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if the file extension is loadable
+bool MeshManager::IsValidFilename(const std::string &filename)
+{
+  std::string extension;
+
+  extension = filename.substr(filename.rfind(".")+1, filename.size());
+  if (extension.empty())
+    return false;
+  std::transform(extension.begin(),extension.end(),extension.begin(),::tolower);
+
+  return std::find(this->fileExtensions.begin(), this->fileExtensions.end(), 
+                   extension) != this->fileExtensions.end();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// modify mesh setting its center to aabb center

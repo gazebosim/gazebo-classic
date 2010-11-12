@@ -45,7 +45,6 @@ namespace gazebo
   class SurfaceParams;
   class XMLConfigNode;
   class OgreVisual;
-  class PhysicsEngine;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
@@ -240,8 +239,6 @@ namespace gazebo
     private: XMLConfigNode *xmlNode;
 
     private: std::string typeName;
-
-    protected: PhysicsEngine *physicsEngine;
 
     protected: Shape *shape;
 

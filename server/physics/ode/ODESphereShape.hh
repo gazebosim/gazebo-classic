@@ -15,7 +15,7 @@ namespace gazebo
     public: void SetSize(const double &radius)
             {
               SphereShape::SetSize(radius);
-              PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
+              PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
               ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
               dMass odeMass;

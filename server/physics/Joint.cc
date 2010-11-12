@@ -64,8 +64,6 @@ Joint::Joint()
   this->body1 = NULL;
   this->body2 = NULL;
 
-  this->physics = World::Instance()->GetPhysicsEngine();
-
   Events::ConnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this) );
 }
 

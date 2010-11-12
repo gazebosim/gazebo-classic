@@ -21,7 +21,7 @@ namespace gazebo
   
     private: virtual void CreateTheEntity();
     private: int state;
-    private: Vector2<int> mousePushPos;
+    private: Vector3 createPos;
     private: std::string lightName;
     private: int index;
   };

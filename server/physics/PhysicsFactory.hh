@@ -36,9 +36,10 @@ namespace gazebo
   
   // Forward declarations
   class PhysicsEngine;
+  class World;
   
   // Prototype for sensor factory functions
-  typedef PhysicsEngine* (*PhysicsFactoryFn) ();
+  typedef PhysicsEngine* (*PhysicsFactoryFn) (World *world);
   
   /// \addtogroup gazebo_physics
   /// \brief The physics factory
@@ -55,7 +56,7 @@ namespace gazebo
                                         PhysicsFactoryFn factoryfn);
   
     /// \brief Create a new instance of a physics engine.  
-    public: static PhysicsEngine *NewPhysicsEngine(const std::string &classname);
+    public: static PhysicsEngine *NewPhysicsEngine(const std::string &classname, World *world);
   
     /// \brief A list of registered physics classes
     private: static std::map<std::string, PhysicsFactoryFn> engines;
@@ -68,9 +69,9 @@ namespace gazebo
   /// @param name Physics type name, as it appears in the world file.
   /// @param classname C++ class name for the sensor.
 #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
-PhysicsEngine *New##classname() \
+PhysicsEngine *New##classname(World *world) \
 { \
-  return new classname(); \
+  return new classname(world); \
 } \
 void Register##classname() \
 {\

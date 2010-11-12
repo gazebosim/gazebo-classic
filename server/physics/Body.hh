@@ -41,7 +41,6 @@ namespace gazebo
   class Geom;
   class Sensor;
   class XMLConfigNode;
-  class PhysicsEngine;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class
@@ -266,8 +265,6 @@ namespace gazebo
     protected: ParamT<Quatern> *rpyP;
 
     protected: ParamT<double> *dampingFactorP;
-
-    protected: PhysicsEngine *physicsEngine;
 
     protected: ParamT<bool> *turnGravityOffP;
     protected: ParamT<bool> *selfCollideP;

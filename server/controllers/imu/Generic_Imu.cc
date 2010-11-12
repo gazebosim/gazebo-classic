@@ -113,7 +113,7 @@ void Generic_Imu::PutImuData()
   if (this->imuIface->Lock(1))
   {
     // Data timestamp
-    //this->imuIface->data->head.time = Simulator::Instance()->GetSimTime();
+    //this->imuIface->data->head.time = this->myParent->GetWorld()->GetSimTime();
     
     this->imuIface->data->velocity.pos.x = velocity.pos.x;
     this->imuIface->data->velocity.pos.y = velocity.pos.y;

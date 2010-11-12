@@ -51,7 +51,6 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
-#include "OgreFrameListener.hh"
 #include "OgreCreator.hh"
 #include "RTShaderSystem.hh"
 #include "OgreAdaptor.hh"
@@ -125,13 +124,46 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scenes.push_back( scene );  
 
-  scene = new Scene("viewer_scene");
+  /*scene = new Scene("viewer_scene");
   scene->SetType(Scene::GENERIC);
   scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
   scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
   scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
 
   this->scenes.push_back( scene );  
+  */
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a scene
+Scene *OgreAdaptor::CreateScene(const std::string &name)
+{
+  Scene *scene = new Scene(name);
+  scene->SetType(Scene::GENERIC);
+  scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
+  scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
+  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
+  scene->Init(this->root);
+
+  this->scenes.push_back(scene);
+  return scene;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Remove a scene
+void OgreAdaptor::RemoveScene(const std::string &name)
+{
+  std::vector<Scene*>::iterator iter;
+
+  for (iter = this->scenes.begin(); iter != this->scenes.end(); iter++)
+    if ((*iter)->GetName() == name)
+      break;
+
+  if (iter != this->scenes.end())
+  {
+    this->scenes.erase(iter);
+    delete *iter;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,11 +217,16 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   if (this->HasGLSL())
     RTShaderSystem::Instance()->Init();
 
-  for (unsigned int i=0; i < 1; i++)
+  for (unsigned int i=0; i < this->scenes.size(); i++)
+  {
     this->scenes[i]->Init(this->root);
+    if (i==0)
+      this->scenes[i]->InitShadows();
+  }
 
   if (this->HasGLSL())
     RTShaderSystem::Instance()->UpdateShaders();
+
 }
 
 
@@ -396,18 +433,23 @@ unsigned int OgreAdaptor::GetSceneCount() const
 /// Update all the scenes 
 void OgreAdaptor::UpdateScenes()
 {
-  Events::renderStartSignal();
+  Events::preRenderSignal();
 
   this->root->_fireFrameStarted();
 
   OgreCreator::Instance()->Update();
 
-  for (unsigned int i=0; i < this->scenes.size(); i++)
+  Events::renderSignal();
+
+  /*for (unsigned int i=0; i < this->scenes.size(); i++)
     this->scenes[i]->UpdateCameras();
+    */
 
   this->root->_fireFrameRenderingQueued();
 
   this->root->_fireFrameEnded();
+
+  Events::postRenderSignal();
 }
 
 

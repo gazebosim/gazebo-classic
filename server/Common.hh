@@ -37,6 +37,7 @@
 namespace gazebo
 {
   class Model;
+  class World;
 
   class Common
   {
@@ -132,6 +133,13 @@ namespace gazebo
     /// \return Pointer to a model, or NULL if no parent model exists
     public: Model *GetParentModel() const;
 
+    /// \brief Set the world this object belongs to. This will also 
+    ///        set the world for all children
+    public: void SetWorld(World *newWorld);
+
+    /// \brief Get the world this object is in
+    public: World *GetWorld() const;
+
     /// \brief Return the name of this entity with the model scope
     ///        model1::...::modelN::entityName
     public: std::string GetScopedName() const;
@@ -182,6 +190,8 @@ namespace gazebo
     private: std::vector< EntityType > type;
 
     private: static Common *root;
+
+    private: World *world;
 
     private: bool selected;
 

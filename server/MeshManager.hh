@@ -26,6 +26,9 @@ namespace gazebo
     /// \brief Load a mesh from a file
     public: const Mesh *Load(const std::string &filename);
 
+    /// \brief Return true if the file extension is loadable
+    public: bool IsValidFilename(const std::string &filename);
+
     /// \bridf set mesh center to be aabb center
     public: void SetMeshCenter(const Mesh *mesh,Vector3 center);
 
@@ -75,6 +78,8 @@ namespace gazebo
     private: STLLoader *stlLoader;
 
     private: std::map<std::string, Mesh*> meshes;
+
+    private: std::vector<std::string> fileExtensions;
 
     //Singleton implementation
     private: friend class DestroyerT<MeshManager>;

@@ -88,7 +88,7 @@ void Controller::Load(XMLConfigNode *node)
     this->updatePeriod = 0.0; // no throttling if updateRate is 0
   else
     this->updatePeriod = 1.0 / updateRate;
-  this->lastUpdate = Simulator::Instance()->GetSimTime();
+  this->lastUpdate = this->parent->GetWorld()->GetSimTime();
 
   childNode = node->GetChildByNSPrefix("interface");
   
@@ -128,7 +128,7 @@ void Controller::Load(XMLConfigNode *node)
     // Create the iface
     try
     {
-      iface->Create(World::Instance()->GetGzServer(), ifaceName);
+      iface->Create(this->parent->GetWorld()->GetGzServer(), ifaceName);
     }
     catch (std::string e)
     {
@@ -190,15 +190,15 @@ void Controller::Update()
     //DiagnosticTimer timer("Controller[" + this->GetName() +"] Update Timer");
 
     // round time difference to this->physicsEngine->GetStepTime()
-    Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
+    Time physics_dt = this->parent->GetWorld()->GetPhysicsEngine()->GetStepTime();
 
     //timer.Start();
 
-    Time simTime = Simulator::Instance()->GetSimTime();
+    Time simTime = this->parent->GetWorld()->GetSimTime();
     if ((simTime-lastUpdate-updatePeriod)/physics_dt >= 0)
     {
       this->UpdateChild();
-      lastUpdate = Simulator::Instance()->GetSimTime();
+      lastUpdate = this->parent->GetWorld()->GetSimTime();
       //timer.Report("Update() dt");
     }
   }

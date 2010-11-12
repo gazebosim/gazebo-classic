@@ -26,6 +26,7 @@
  */
 
 #include "Global.hh"
+#include "World.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Joint.hh"
@@ -116,7 +117,7 @@ void Generic_Actarray::UpdateChild()
   float actual_speed;
 
   this->myIface->Lock(1);
-  this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
+  this->myIface->data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   this->myIface->data->actuators_count = n_joints;
 

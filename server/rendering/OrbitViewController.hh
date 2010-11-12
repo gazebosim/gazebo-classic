@@ -11,7 +11,7 @@ namespace gazebo
   class OrbitViewController : public ViewController
   {
     /// \brief Constructor
-    public: OrbitViewController(OgreCamera *camera);
+    public: OrbitViewController(UserCamera *camera);
 
     /// \brief Destructor
     public: virtual ~OrbitViewController();

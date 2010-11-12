@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <assert.h>
 
+#include "World.hh"
 #include "Sensor.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
@@ -120,7 +121,7 @@ void Generic_Camera::PutCameraData()
   this->cameraIface->Lock(1);
 
   // Data timestamp
-  data->head.time = Simulator::Instance()->GetSimTime().Double();
+  data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   data->width = this->myParent->GetCamera()->GetImageWidth();
   data->height = this->myParent->GetCamera()->GetImageHeight();
@@ -146,7 +147,8 @@ void Generic_Camera::PutCameraData()
   src = this->myParent->GetCamera()->GetImageData(0);
   dst = data->image;
 
-  boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
+  // NATY
+  //boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
   memcpy(dst, src, data->image_size);
 
   this->myParent->GetCamera()->EnableSaveFrame( data->saveFrames );
@@ -155,7 +157,5 @@ void Generic_Camera::PutCameraData()
 
   // New data is available
   this->cameraIface->Post();
-
-
 }
 

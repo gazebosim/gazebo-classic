@@ -1,6 +1,7 @@
 #include <wx/sizer.h>
 #include <wx/evtloop.h>
 
+#include "World.hh"
 #include "Simulator.hh"
 #include "TimePanel.hh"
 
@@ -75,13 +76,10 @@ TimePanel::~TimePanel()
 // Update the time panel
 void TimePanel::Update()
 {
-  //while (wxEventLoop::GetActive()->Pending())
-    //wxEventLoop::GetActive()->Dispatch();
-
-  if (Simulator::Instance()->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
+  if (Simulator::Instance()->GetWorld(0)->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
   {
-    Time simTime = Simulator::Instance()->GetSimTime();
-    Time realTime = Simulator::Instance()->GetRealTime();
+    Time simTime = Simulator::Instance()->GetWorld(0)->GetSimTime();
+    Time realTime = Simulator::Instance()->GetWorld(0)->GetRealTime();
     Time percent;
     
     if (realTime < this->statusUpdatePeriod )
@@ -134,10 +132,10 @@ void TimePanel::Update()
     this->simTimeCtrl->SetValue(simSuffix);
     this->realTimeCtrl->SetValue(realSuffix);
 
-    str.Printf(wxT("%f sec"), Simulator::Instance()->GetPauseTime().Double());
+    str.Printf(wxT("%f sec"), Simulator::Instance()->GetWorld(0)->GetPauseTime().Double());
     this->pauseTimeCtrl->SetValue(str);
 
-    this->lastUpdateTime = Simulator::Instance()->GetRealTime();
+    this->lastUpdateTime = Simulator::Instance()->GetWorld(0)->GetRealTime();
   }
 
 }

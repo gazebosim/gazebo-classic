@@ -35,7 +35,7 @@
 #include <RTShaderSystem/OgreRTShaderSystem.h>
 #endif
 
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "SingletonT.hh"
 
 namespace gazebo
@@ -78,7 +78,7 @@ namespace gazebo
     public: void DetachEntity(OgreVisual *vis);
 
     /// \brief Set a viewport to use shaders
-    public: static void AttachViewport(OgreCamera *camera);
+    public: static void AttachViewport(Camera *camera);
 
     /// Set the lighting model to per pixel or per vertex
     public: void SetPerPixelLighting( bool s);

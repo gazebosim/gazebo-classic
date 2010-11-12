@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "Camera.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "OgreVisual.hh"
@@ -53,7 +54,10 @@ void DirectionalLightMaker::MousePushCB(const MouseEvent &event)
   if (this->state == 0)
     return;
 
-  this->mousePushPos = event.pressPos;
+  Vector3 norm;
+  norm.Set(0,0,1);
+
+  this->createPos = event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0);
 }
 
 void DirectionalLightMaker::MouseReleaseCB(const MouseEvent &event)
@@ -73,21 +77,12 @@ void DirectionalLightMaker::MouseDragCB(const MouseEvent & /*event*/)
 
 void DirectionalLightMaker::CreateTheEntity()
 {
-  boost::recursive_mutex::scoped_lock lock( *Simulator::Instance()->GetMRMutex());
-
   std::ostringstream newModelStr;
-
-  Vector3 norm;
-  Vector3 p1, p2;
-
-  norm.Set(0,0,1);
-
-  p1 = this->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
 
   newModelStr << "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >";
 
   newModelStr << "<model:renderable name=\"" << this->lightName << "\">\
-    <xyz>" << p1.x << " " << p1.y << " " << 0.1 << "</xyz>\
+    <xyz>" << this->createPos.x << " " << this->createPos.y << " " << 0.1 << "</xyz>\
     <static>true</static>\
     <light>\
       <type>directional</type>\
@@ -101,5 +96,5 @@ void DirectionalLightMaker::CreateTheEntity()
 
   newModelStr <<  "</gazebo:world>";
 
-  World::Instance()->InsertEntity(newModelStr.str());
+  Simulator::Instance()->GetWorld(0)->InsertEntity(newModelStr.str());
 }

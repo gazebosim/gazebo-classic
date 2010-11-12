@@ -35,7 +35,7 @@
 #include "Events.hh"
 #include "OgreVisual.hh"
 #include "Body.hh"
-#include "Factory.hh"
+#include "FactoryIfaceHandler.hh"
 #include "GraphicsIfaceHandler.hh"
 #include "SimulationIfaceHandler.hh"
 #include "Global.hh"
@@ -83,15 +83,16 @@ World::World()
   this->openAL = NULL;
   this->selectedEntity = NULL;
 
-  PhysicsFactory::RegisterAll();
-  this->factory = NULL;
+  this->factoryIfaceHandler = NULL;
+  this->pause = false;
 
   Param::Begin(&this->parameters);
-  this->threadsP = new ParamT<int>("threads",2,0);
+  this->nameP = new ParamT<std::string>("name","default",1);
   this->saveStateTimeoutP = new ParamT<Time>("saveStateResolution",0.1,0);
   this->saveStateBufferSizeP = new ParamT<unsigned int>("saveStateBufferSize",1000,0);
   Param::End();
 
+  Events::ConnectPauseSignal( boost::bind(&World::PauseSlot, this, _1) );
   Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
   Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
 }
@@ -100,81 +101,27 @@ World::World()
 // Private destructor
 World::~World()
 {
-  this->Close();
-}
+  delete this->nameP;
+  delete this->saveStateTimeoutP;
+  delete this->saveStateBufferSizeP;
 
-////////////////////////////////////////////////////////////////////////////////
-// Closes the world, free resources and interfaces
-void World::Close()
-{
-  // Clear out the entity tree
-  std::vector<Model*>::iterator iter;
-  for (iter = this->models.begin(); iter != this->models.end(); iter++)
-  {
-    if (*iter)
-    {
-      (*iter)->Fini();
-      delete *iter;
-      (*iter) = NULL;
-    }
-  }
-  this->models.clear();
+  Events::DisconnectPauseSignal( boost::bind(&World::PauseSlot, this, _1) );
+  Events::DisconnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
+  Events::DisconnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
 
-  if (this->physicsEngine)
-  {
-    delete this->physicsEngine;
-    this->physicsEngine = NULL;
-  }
-
-  try
-  {
-    if (this->simIfaceHandler)
-    {
-      delete this->simIfaceHandler;
-      this->simIfaceHandler = NULL;
-    }
-
-    if (this->graphics)
-      delete this->graphics;
-    this->graphics = NULL;
-
-    if (this->factory)
-      delete this->factory;
-    this->factory = NULL;
-  }
-  catch (std::string e)
-  {
-    gzthrow(e);
-  }
-
-  if (this->server)
-  {
-    delete this->server;
-    this->server =NULL;
-  }
-
-  /*
-  if (this->saveStateTimeoutP)
-    delete this->saveStateTimeoutP;
-  this->saveStateTimeoutP = NULL;
-
-  if (this->saveStateBufferSizeP)
-    delete this->saveStateBufferSizeP;
-  this->saveStateBufferSizeP = NULL;
-
-  if (this->threadsP)
-    delete this->threadsP;
-  this->threadsP = NULL;
-  */
+  this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
-void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
+void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
 {
-  Simulator::Instance()->ConnectPauseSignal( 
-      boost::bind(&World::PauseSlot, this, _1) );
- 
+
+  this->nameP->Load(rootNode);
+  this->saveStateTimeoutP->Load(rootNode);
+  this->saveStateBufferSizeP->Load(rootNode);
+
+
   // Create the server object (needs to be done before models initialize)
   if (this->server == NULL)
   {
@@ -182,9 +129,9 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
 
     try
     {
-      this->server->Init(serverId, true );
+      this->server->Init(**this->nameP, true );
     }
-    catch ( std::string err)
+    catch (std::string err)
     {
       gzthrow (err);
     }
@@ -195,7 +142,7 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   {
     if (!this->simIfaceHandler)
     {
-      this->simIfaceHandler = new SimulationIfaceHandler();
+      this->simIfaceHandler = new SimulationIfaceHandler(this);
     }
   }
   catch (std::string err)
@@ -204,13 +151,13 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   }
 
   // Create the default factory
-  if (!this->factory)
-    this->factory = new Factory();
+  if (!this->factoryIfaceHandler)
+    this->factoryIfaceHandler = new FactoryIfaceHandler(this);
 
   // Create the graphics iface handler
   if (!this->graphics && Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->graphics = new GraphicsIfaceHandler();
+    this->graphics = new GraphicsIfaceHandler(this);
     this->graphics->Load("default");
   }
 
@@ -233,12 +180,12 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
       this->physicsEngine = NULL;
     }
 
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( physicsNode->GetName());
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( physicsNode->GetName(), this);
     if (this->physicsEngine == NULL)
       gzthrow("Unable to create physics engine\n");
   }
   else
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode");
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode", this);
 
   // This should come before loading of entities
   this->physicsEngine->Load(rootNode);
@@ -246,10 +193,6 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   // last bool is initModel, init model is not needed as Init()
   // is called separately from main.cc
   this->LoadEntities(rootNode, NULL, false, false);
-
-  this->threadsP->Load(rootNode);
-  this->saveStateTimeoutP->Load(rootNode);
-  this->saveStateBufferSizeP->Load(rootNode);
 
   this->worldStates.resize(**this->saveStateBufferSizeP);
   this->worldStatesInsertIter = this->worldStates.begin();
@@ -263,9 +206,13 @@ void World::Save(std::string &prefix, std::ostream &stream)
 {
   std::vector< Model* >::iterator miter;
 
-  std::cout << prefix << "  " << *(this->threadsP);
-  std::cout << prefix << "  " << *(this->saveStateTimeoutP);
-  std::cout << prefix << "  " << *(this->saveStateBufferSizeP);
+  stream << "<world>\n";
+
+  stream << prefix << "  " << *(this->nameP);
+  stream << prefix << "  " << *(this->saveStateTimeoutP);
+  stream << prefix << "  " << *(this->saveStateBufferSizeP);
+
+  this->physicsEngine->Save(prefix, stream);
 
   for (miter = this->models.begin(); miter != this->models.end(); miter++)
   {
@@ -275,6 +222,8 @@ void World::Save(std::string &prefix, std::ostream &stream)
       stream << "\n";
     }
   }
+
+  stream << "</world>\n";
 }
 
 
@@ -304,8 +253,8 @@ void World::Init()
   if (Simulator::Instance()->GetRenderEngineEnabled())
     this->graphics->Init();
 
-  this->factory->Init();
-  this->saveStateTimer.Start();
+  this->factoryIfaceHandler->Init();
+  //this->saveStateTimer.Start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,6 +275,105 @@ void World::GraphicsUpdate()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Run the world in a thread
+void World::Start()
+{
+  this->stop = false;
+  this->thread = new boost::thread( 
+      boost::bind(&World::RunLoop, this));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Stop the world
+void World::Stop()
+{
+  this->stop = true;
+  if (this->thread)
+  {
+    this->thread->join();
+    delete this->thread;
+    this->thread = NULL;
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Function to run physics. Used by physicsThread
+void World::RunLoop()
+{
+  this->physicsEngine->InitForThread();
+
+  Time step = this->physicsEngine->GetStepTime();
+  double physicsUpdateRate = this->physicsEngine->GetUpdateRate();
+  Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+
+  //bool userStepped;
+  Time diffTime;
+  Time currTime;
+  Time lastTime = this->GetRealTime();
+  struct timespec req, rem;
+
+  this->startTime = Time::GetWallTime();
+
+  this->stop = false;
+  while (!this->stop)
+  {
+    lastTime = this->GetRealTime();
+    if (this->IsPaused())
+      this->pauseTime += step;
+    else
+    {
+      this->simTime += step;
+      this->Update();
+    }
+
+    currTime = this->GetRealTime();
+
+    // Set a default sleep time
+    req.tv_sec  = 0;
+    req.tv_nsec = 10000;
+
+    // If the physicsUpdateRate < 0, then we should try to match the
+    // update rate to real time
+    if ( physicsUpdateRate < 0 &&
+        (this->GetSimTime() + this->GetPauseTime()) > 
+        this->GetRealTime()) 
+    {
+      diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
+                  this->GetRealTime();
+      req.tv_sec  = diffTime.sec;
+      req.tv_nsec = diffTime.nsec;
+    }
+    // Otherwise try to match the update rate to the one specified in
+    // the xml file
+    else if (physicsUpdateRate > 0 && 
+        currTime - lastTime < physicsUpdatePeriod)
+    {
+      diffTime = physicsUpdatePeriod - (currTime - lastTime);
+
+      req.tv_sec  = diffTime.sec;
+      req.tv_nsec = diffTime.nsec;
+    }
+
+    nanosleep(&req, &rem);
+
+    // TODO: Fix timeout:  this belongs in simulator.cc
+    /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
+    {
+      this->stop = true;
+      break;
+    }*/
+
+    // TODO: Fix stepping
+    /*if (userStepped)
+    {
+      this->SetStepInc(false);
+      this->SetPaused(true);
+    }*/
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Update the world
 void World::Update()
 {
@@ -334,16 +382,16 @@ void World::Update()
   tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
       ModelUpdate_TBB(&this->models) );
 
-  if (!Simulator::Instance()->IsPaused() &&
-       Simulator::Instance()->GetPhysicsEnabled())
-  {
+  if (this->physicsEngine)
     this->physicsEngine->UpdatePhysics();
-  }
 
   /// Update all the sensors
   SensorManager::Instance()->Update();
 
-  this->factory->Update();
+  this->factoryIfaceHandler->Update();
+
+  // Process all incoming messages from simiface
+  this->simIfaceHandler->Update();
 
   Logger::Instance()->Update();
 
@@ -354,44 +402,42 @@ void World::Update()
 // Finilize the world
 void World::Fini()
 {
-  std::vector< Model* >::iterator miter;
+  // Clear out the entity tree
+  std::vector<Model*>::iterator iter;
+  for (iter = this->models.begin(); iter != this->models.end(); iter++)
+  {
+    if (*iter)
+    {
+      (*iter)->Fini();
+      delete *iter;
+      (*iter) = NULL;
+    }
+  }
+  this->models.clear();
 
-  if (Simulator::Instance()->GetRenderEngineEnabled() && this->graphics)
+  if (this->graphics)
   {
     delete this->graphics;
     this->graphics = NULL;
   }
 
-  // Finalize the models
-  for (miter=this->models.begin(); miter!=this->models.end(); miter++)
+  if (this->simIfaceHandler)
   {
-    (*miter)->Fini();
+    delete this->simIfaceHandler;
+    this->simIfaceHandler = NULL;
+  }
+
+  if (this->factoryIfaceHandler)
+  {
+    delete this->factoryIfaceHandler;
+    this->factoryIfaceHandler = NULL;
   }
 
   if (this->physicsEngine)
+  {
     this->physicsEngine->Fini();
-
-  // Done with the external interface
-  try
-  {
-    if (this->simIfaceHandler)
-      this->simIfaceHandler->Fini();
-  }
-  catch (std::string e)
-  { 
-    gzmsg(-1) << "Problem destroying simIface[" << e << "]\n";
-  }
-  try
-  {
-    if (this->factory)
-    {
-      delete this->factory;
-      this->factory = NULL;
-    }
-  }
-  catch (std::string e)
-  { 
-    gzmsg(-1) << "Problem destroying factory[" << e << "]\n";
+    delete this->physicsEngine;
+    this->physicsEngine = NULL;
   }
 
   try
@@ -420,6 +466,13 @@ void World::Clear()
   for (iter = this->models.begin(); iter != this->models.end(); iter++)
     Events::deleteEntitySignal((*iter)->GetCompleteScopedName());
   this->ProcessEntitiesToDelete();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the name of the world
+std::string World::GetName() const
+{
+  return **this->nameP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -493,9 +546,10 @@ void World::ProcessEntitiesToLoad()
 
   if (!this->toLoadEntities.empty())
   {
+    // NATY
     // maybe try try_lock here instead
-    boost::recursive_mutex::scoped_lock lock(
-        *Simulator::Instance()->GetMRMutex());
+    //boost::recursive_mutex::scoped_lock lock(
+        //*Simulator::Instance()->GetMRMutex());
 
     std::vector< std::string >::iterator iter;
 
@@ -530,8 +584,9 @@ void World::ProcessEntitiesToDelete()
 {
   if (!this->toDeleteEntities.empty())
   {
+    // NATY
     // maybe try try_lock here instead
-    boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
+    //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
 
     // Remove and delete all models that are marked for deletion
     std::vector< std::string>::iterator miter;
@@ -610,12 +665,6 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent,
   return model;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// Update the simulation iface
-void World::UpdateSimulationIface()
-{
-  this->simIfaceHandler->Update();
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Get the number of models
@@ -701,7 +750,7 @@ void World::SetState(std::deque<WorldState>::iterator iter)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Goto a position in time
-void World::GotoTime(double pos)
+/*void World::GotoTime(double pos)
 {
   Simulator::Instance()->SetPaused(true);
 
@@ -724,7 +773,7 @@ void World::GotoTime(double pos)
   }
 
   this->SetState(this->worldStatesCurrentIter);
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pause callback
@@ -781,8 +830,54 @@ void World::PrintEntityTree()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the server id
-int World::GetServerId() const
+// Get the simulation time
+gazebo::Time World::GetSimTime() const
 {
-  return this->server->serverId;
+  return this->simTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the sim time
+void World::SetSimTime(Time t)
+{
+  this->simTime = t;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the pause time
+gazebo::Time World::GetPauseTime() const
+{
+  return this->pauseTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the start time
+gazebo::Time World::GetStartTime() const
+{
+  return this->startTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the real time (elapsed time)
+gazebo::Time World::GetRealTime() const
+{
+  return Time::GetWallTime() - this->startTime;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return when this simulator is paused
+bool World::IsPaused() const
+{
+  return this->pause;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether the simulation is paused
+void World::SetPaused(bool p)
+{
+  if (this->pause == p)
+    return;
+
+  Events::pauseSignal(p);
+  this->pause = p;
 }

@@ -28,7 +28,7 @@
 #include <Ogre.h>
 
 #include "World.hh"
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "OgreAdaptor.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -108,7 +108,7 @@ void OgreHUD::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the camera pose text box
-void OgreHUD::SetCamera(const OgreCamera *camera)
+void OgreHUD::SetCamera(const Camera *camera)
 {
   /*
   if (!camera)

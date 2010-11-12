@@ -80,7 +80,7 @@ namespace gazebo
   class PhysicsEngine
   {
     /// \brief Default constructor
-    public: PhysicsEngine();
+    public: PhysicsEngine(World *world);
   
     /// \brief Destructor
     public: virtual ~PhysicsEngine();
@@ -218,6 +218,8 @@ namespace gazebo
  
     /// \brief Add a contact visual
     protected: void AddContactVisual(Vector3 pos, Vector3 norm);
+
+    protected: World *world;
 
     /// The gravity vector
     protected: ParamT<Vector3> *gravityP;

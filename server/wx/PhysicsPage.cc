@@ -5,6 +5,7 @@
 #include "PhysicsEngine.hh"
 #include "Param.hh"
 #include "World.hh"
+#include "Simulator.hh"
 #include "PhysicsPage.hh"
 
 using namespace gazebo;
@@ -15,7 +16,7 @@ PhysicsPage::PhysicsPage(wxWindow *parent)
 {
   this->SetName(wxT("physics"));
 
-  PhysicsEngine *engine = World::Instance()->GetPhysicsEngine();
+  PhysicsEngine *engine = Simulator::Instance()->GetWorld(0)->GetPhysicsEngine();
 
   wxBoxSizer *boxSizer = new wxBoxSizer(wxVERTICAL);
 

@@ -2,6 +2,8 @@
 
 using namespace gazebo;
 
+boost::signal<void (bool)> Events::pauseSignal;
+boost::signal<void (bool)> Events::stepSignal;
 boost::signal<void (bool)> Events::moveModeSignal;
 boost::signal<void (bool)> Events::manipModeSignal;
 
@@ -20,6 +22,9 @@ boost::signal<void (Entity*)> Events::entitySelectedSignal;
 
 boost::signal<void ()> Events::worldUpdateStartSignal;
 boost::signal<void ()> Events::worldUpdateEndSignal;
-boost::signal<void ()> Events::renderStartSignal;
+
+boost::signal<void ()> Events::preRenderSignal;
+boost::signal<void ()> Events::renderSignal;
+boost::signal<void ()> Events::postRenderSignal;
 
 

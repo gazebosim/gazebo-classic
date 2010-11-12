@@ -24,6 +24,7 @@
  * Date: 09 Setp. 2008
  */
 
+#include "World.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "ContactSensor.hh"
@@ -75,7 +76,7 @@ void Generic_Bumper::UpdateChild()
 
   this->myIface->data->bumper_count = this->myParent->GetGeomCount();
 
-  this->myIface->data->head.time =Simulator::Instance()->GetRealTime().Double();
+  this->myIface->data->head.time = this->myParent->GetWorld()->GetRealTime().Double();
 
   for (unsigned int i=0; i < this->myParent->GetGeomCount(); i++)
   {

@@ -24,6 +24,7 @@
  * SVN: $Id$
  */
 
+#include "World.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "Body.hh"
@@ -52,10 +53,9 @@ ODEJoint::~ODEJoint()
 /// Load a joint
 void ODEJoint::Load(XMLConfigNode *node)
 {
-
   Joint::Load(node);
 
-  double h = this->physics->GetStepTime().Double();
+  double h = this->GetWorld()->GetPhysicsEngine()->GetStepTime().Double();
   double stopErp = h * (**this->stopKpP) / (h * (**this->stopKpP) + (**this->stopKdP));
   double stopCfm = 1.0 / (h * (**this->stopKpP) + (**this->stopKdP));
 

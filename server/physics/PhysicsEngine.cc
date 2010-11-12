@@ -26,6 +26,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "RenderState.hh"
 #include "Events.hh"
 #include "World.hh"
@@ -41,7 +43,8 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-PhysicsEngine::PhysicsEngine()
+PhysicsEngine::PhysicsEngine(World *world)
+  : world(world)
 {
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);

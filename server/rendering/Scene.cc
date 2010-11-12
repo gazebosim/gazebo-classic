@@ -3,7 +3,7 @@
 #include <OGRE/OgreRoot.h>
 
 #include "Global.hh"
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "UserCamera.hh"
@@ -12,7 +12,7 @@
 #include "GazeboMessage.hh"
 #include "Entity.hh"
 #include "Grid.hh"
-#include "OgreCamera.hh"
+#include "Camera.hh"
 
 #include "Scene.hh"
 
@@ -33,7 +33,7 @@ Scene::Scene(const std::string &name)
 
   Param::Begin(&this->parameters);
   this->ambientP = new ParamT<Color>("ambient",Color(.1,.1,.1,.1),0);
-  this->shadowsP = new ParamT<bool>("shadows", true, 0);
+  this->shadowsP = new ParamT<bool>("shadows", false, 0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
   this->backgroundColorP = new ParamT<Color>("backgroundColor",Color(0.5,0.5,0.5), 0);
 
@@ -134,8 +134,6 @@ void Scene::Init(Ogre::Root *root)
 
   // Register this scene the the real time shaders system
   RTShaderSystem::Instance()->AddScene(this);
-
-  this->ApplyShadows();
 }
 
 
@@ -247,14 +245,14 @@ Grid *Scene::GetGrid(unsigned int index)
 }
 
 
-
+// NATY
 ////////////////////////////////////////////////////////////////////////////////
 // Update the user cameras
-void Scene::UpdateCameras()
+/*void Scene::UpdateCameras()
 {
   UserCamera *userCam;
 
-  std::vector<OgreCamera*>::iterator iter;
+  std::vector<Camera*>::iterator iter;
 
   // Draw all the non-user cameras
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
@@ -262,73 +260,14 @@ void Scene::UpdateCameras()
 
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     (*iter)->PostRender();
-
-  Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
-  Ogre::RenderTexture *rTexture;
-  Ogre::Viewport* renderViewport;
-
-  // Get access to the buffer and make an image and write it to file
-  if (false && this->manager && !this->manager->getShadowTexture(0).isNull())
-  {
-    pixelBuffer = this->manager->getShadowTexture(0)->getBuffer();
-    rTexture = pixelBuffer->getRenderTarget();
-
-    Ogre::PixelFormat format = pixelBuffer->getFormat();
-    renderViewport = rTexture->getViewport(0);
-
-    int imgsize = 512;
-    size_t size = Ogre::PixelUtil::getMemorySize(imgsize, imgsize, 1, format);
-
-    //// Allocate buffer
-    float *saveFrameBuffer = new float[imgsize*imgsize*3];
-
-    memset(saveFrameBuffer, 0, size);
-
-    Ogre::PixelBox box(imgsize, imgsize, 1, format, saveFrameBuffer);
-
-    //std::cout << "Depth[" << this->manager->getShadowTexture(0)->getDepth() << "]\n";
-    pixelBuffer->blitToMemory( box );
-
-    //std::cout << "SIZE[" << size << "] [" << imgsize * imgsize * (4*3) << "]\n";
-
-    float max = 0.0;
-    float min = 1000.0;
-    double sum = 0.0;
-    FILE *file = fopen("/tmp/nate.data","w");
-    for (unsigned int y = 0; y < imgsize; y+=4)
-    {
-      for (unsigned int x=0;x<imgsize;x+=4)
-      {
-        float d = saveFrameBuffer[ y*(imgsize*3) + x*3 + 0];
-        float dd = saveFrameBuffer[ y*(imgsize*3)+ x*3 + 1];
-        sum += d;
-        if (d < min)
-          min = d;
-        if (d > max)
-          max = d;
-
-        fprintf(file, "%d %d %f\n",x,y,d);
-      }
-      fprintf(file,"\n\n");
-    }
-
-    printf("Min[%f] Max[%f] Avg[%f]\n", min, max, sum / (imgsize*imgsize));
-
-    fclose(file);
-
-    //exit(1);
-    delete [] saveFrameBuffer;
-  }
-
-  //this->manager->_handleLodEvents();
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Entity *Scene::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std::string &mod) 
+Entity *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &mod) 
 {
   Entity *entity = NULL;
-  Ogre::Camera *ogreCam = camera->GetOgreCamera();
+  Ogre::Camera *ogreCam = camera->GetCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
 
   Ogre::Real closest_distance = -1.0f;
@@ -412,9 +351,9 @@ Entity *Scene::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std::strin
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world pos of a the first contact at a pixel location
-Vector3 Scene::GetFirstContact(OgreCamera *camera, Vector2<int> mousePos)
+Vector3 Scene::GetFirstContact(Camera *camera, Vector2<int> mousePos)
 {
-  Ogre::Camera *ogreCam = camera->GetOgreCamera();
+  Ogre::Camera *ogreCam = camera->GetCamera();
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
       (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
@@ -431,18 +370,20 @@ Vector3 Scene::GetFirstContact(OgreCamera *camera, Vector2<int> mousePos)
   return Vector3(pt.x, pt.y, pt.z);
 }
 
+// NATY
+/*
 ////////////////////////////////////////////////////////////////////////////////
 // Register a camera
-void Scene::RegisterCamera( OgreCamera *cam )
+void Scene::RegisterCamera( Camera *cam )
 {
   this->cameras.push_back(cam);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Unregister a user camera
-void Scene::UnregisterCamera( OgreCamera *cam )
+void Scene::UnregisterCamera( Camera *cam )
 {
-  std::vector<OgreCamera*>::iterator iter;
+  std::vector<Camera*>::iterator iter;
   for(iter=this->cameras.begin();iter != this->cameras.end();iter++)
   {
     if ((*iter) == cam)
@@ -452,6 +393,7 @@ void Scene::UnregisterCamera( OgreCamera *cam )
     }
   }
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Print scene graph
@@ -544,7 +486,7 @@ void Scene::SetVisible(const std::string &name, bool visible)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scene::ApplyShadows()
+void Scene::InitShadows()
 {
   // Allow a total of 4 shadow casters per scene
   const int numShadowTextures = 3;

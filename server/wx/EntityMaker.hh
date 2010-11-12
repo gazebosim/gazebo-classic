@@ -29,9 +29,6 @@ namespace gazebo
     // \brief Get a point snapped to a grid
     protected: Vector3 GetSnappedPoint(Vector3 p);
 
-    public: Vector3 GetWorldPointOnPlane(int x, int y, 
-                                         Vector3 planeNorm, double d);
-
     protected: virtual void CreateTheEntity() = 0;
 
     private: static bool snapToGrid;

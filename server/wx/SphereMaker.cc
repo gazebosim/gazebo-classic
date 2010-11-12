@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "Camera.hh"
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
@@ -86,10 +87,10 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
 
   norm.Set(0,0,1);
 
-  p1 = this->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
-  p2 = this->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
   OgreVisual *vis = NULL;
@@ -113,7 +114,6 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
 
 void SphereMaker::CreateTheEntity()
 {
-  boost::recursive_mutex::scoped_lock lock( *Simulator::Instance()->GetMRMutex());
   std::ostringstream newModelStr;
 
   OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
@@ -141,7 +141,7 @@ void SphereMaker::CreateTheEntity()
 
   newModelStr <<  "</gazebo:world>";
 
-  World::Instance()->InsertEntity(newModelStr.str());
+  Simulator::Instance()->GetWorld(0)->InsertEntity(newModelStr.str());
 
   OgreCreator::Instance()->DeleteVisual(this->visualName);
 }

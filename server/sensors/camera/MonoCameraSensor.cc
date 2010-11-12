@@ -27,6 +27,7 @@
 #include <sstream>
 #include <OgreImageCodec.h>
 
+#include "Events.hh"
 #include "Controller.hh"
 #include "Global.hh"
 #include "World.hh"
@@ -34,11 +35,9 @@
 #include "Body.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
-#include "OgreFrameListener.hh"
 #include "Simulator.hh"
 
 #include "SensorFactory.hh"
-#include "CameraManager.hh"
 #include "MonoCameraSensor.hh"
 
 #include "Simulator.hh"
@@ -52,9 +51,11 @@ GZ_REGISTER_STATIC_SENSOR("camera", MonoCameraSensor);
 MonoCameraSensor::MonoCameraSensor(Body *body)
     : Sensor(body)
 {
-  this->camera = new OgreCamera("Mono",0);
+  this->camera = new Camera("Mono",0);
   this->typeName = "monocamera";
   this->camera->SetCaptureData(true);
+
+  Events::ConnectRenderSignal( boost::bind(&MonoCameraSensor::Render, this) );
 }
 
 
@@ -68,7 +69,7 @@ MonoCameraSensor::~MonoCameraSensor()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the camera
-OgreCamera *MonoCameraSensor::GetCamera()
+Camera *MonoCameraSensor::GetCamera()
 {
   return this->camera;
 }
@@ -131,12 +132,25 @@ void MonoCameraSensor::SetActive(bool value)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Update the drawing
-void MonoCameraSensor::UpdateChild()
+// Render new data
+void MonoCameraSensor::Render()
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
+  if (this->active || **this->alwaysActiveP)
+  {
+    this->lastUpdate = this->GetWorld()->GetSimTime();
+    this->camera->Render();
+    this->camera->PostRender();
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Update the drawing
+void MonoCameraSensor::UpdateChild()
+{
+  // NATY
   //if (this->active || **this->alwaysActiveP)
     //this->camera->Update();
 

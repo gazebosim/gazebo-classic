@@ -38,6 +38,7 @@
 #include "Global.hh"
 #include "Body.hh"
 #include "Geom.hh"
+#include "World.hh"
 #include "MapShape.hh"
 
 using namespace gazebo;
@@ -151,7 +152,7 @@ void MapShape::CreateBoxes(QuadNode *node)
     std::ostringstream stream;
 
     // Create the box geometry
-    Geom *geom = this->physicsEngine->CreateGeom("box", this->geomParent->GetBody());
+    Geom *geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetBody());
     geom->SetSaveable(false);
 
     XMLConfig *boxConfig = new XMLConfig();

@@ -16,6 +16,7 @@ namespace gazebo
 {
   class UserCamera;
   class Entity;
+  class Scene;
 
   class RenderControl : public wxControl
   {
@@ -43,7 +44,7 @@ namespace gazebo
     public: void Init();
 
     /// \brief Create the camera
-    public: void CreateCamera(unsigned int scene);
+    public: void CreateCamera(Scene *scene);
 
     /// \brief Get the camera
     public: UserCamera *GetCamera();
@@ -68,9 +69,6 @@ namespace gazebo
 
     /// \brief Translate an entity, or apply force
     private: void EntityTranslate(Entity *entity);
-
-    public: Vector3 GetWorldPointOnPlane(int x, int y, 
-                Vector3 planeNorm, double d);
 
     private: UserCamera *userCamera;
 

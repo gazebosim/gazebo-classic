@@ -1,6 +1,7 @@
 #include <iostream>
 #include <FL/Fl.H>
 
+#include "Camera.hh"
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
@@ -89,10 +90,10 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   else if (this->state == 2)
     norm.Set(1,0,0);
 
-  p1 = this->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
-  p2 = this->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
   OgreVisual *vis = NULL;
@@ -129,8 +130,6 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
 
 void CylinderMaker::CreateTheEntity()
 {
-  boost::recursive_mutex::scoped_lock lock( *Simulator::Instance()->GetMRMutex());
-
   std::ostringstream newModelStr;
 
   OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
@@ -159,6 +158,6 @@ void CylinderMaker::CreateTheEntity()
   newModelStr <<  "</gazebo:world>";
 
   OgreCreator::Instance()->DeleteVisual(this->visualName);
-  World::Instance()->InsertEntity(newModelStr.str());
+  Simulator::Instance()->GetWorld(0)->InsertEntity(newModelStr.str());
 }
 

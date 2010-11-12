@@ -57,7 +57,7 @@ Differential_Position2d::Differential_Position2d(Entity *parent )
   this->wheelSpeed[RIGHT] = 0;
   this->wheelSpeed[LEFT] = 0;
 
-  this->prevUpdateTime = Simulator::Instance()->GetSimTime();
+  this->prevUpdateTime = this->myParent->GetWorld()->GetSimTime();
 
   Param::Begin(&this->parameters);
   this->leftJointNameP = new ParamT<std::string>("leftJoint", "", 1);
@@ -162,9 +162,8 @@ void Differential_Position2d::UpdateChild()
   ws = **(this->wheelSepP);
 
 
-  //stepTime = World::Instance()->GetPhysicsEngine()->GetStepTime();
-  stepTime = Simulator::Instance()->GetSimTime() - this->prevUpdateTime;
-  this->prevUpdateTime = Simulator::Instance()->GetSimTime();
+  stepTime = this->myParent->GetWorld()->GetSimTime() - this->prevUpdateTime;
+  this->prevUpdateTime = this->myParent->GetWorld()->GetSimTime();
 
   // Distance travelled by front wheels
   d1 = stepTime.Double() * wd / 2 * this->joints[LEFT]->GetVelocity(0);
@@ -228,7 +227,7 @@ void Differential_Position2d::GetPositionCmd()
 void Differential_Position2d::PutPositionData()
 {
   // TODO: Data timestamp
-  this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
+  this->myIface->data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   this->myIface->data->pose.pos.x = this->odomPose[0];
   this->myIface->data->pose.pos.y = this->odomPose[1];

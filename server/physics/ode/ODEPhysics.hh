@@ -95,7 +95,7 @@ The \c param:physics tag is used to specify certain parameters for the ODE phyic
 class ODEPhysics : public PhysicsEngine
 {
   /// \brief Constructor
-  public: ODEPhysics();
+  public: ODEPhysics(World *world);
 
   /// \brief Destructor
   public: virtual ~ODEPhysics();

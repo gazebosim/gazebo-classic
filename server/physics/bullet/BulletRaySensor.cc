@@ -40,7 +40,6 @@ BulletRaySensor::BulletRaySensor(Body *_body)
   : PhysicsRaySensor(_body)
 {
   this->body = dynamic_cast<BulletBody*>(_body);
-  this->physicsEngine = dynamic_cast<BulletPhysics*>(World::Instance()->GetPhysicsEngine());
 
   if (this->body == NULL)
     gzthrow("BulletRaySensor requires an BulletBody");
@@ -66,7 +65,7 @@ void BulletRaySensor::AddRay(Vector3 start, Vector3 end, double minRange,
 {
   BulletRayGeom *rayGeom;
   
-  rayGeom = (BulletRayGeom*)this->physicsEngine->CreateGeom("ray", this->body );
+  rayGeom = (BulletRayGeom*)this->GetWorld()->CreateGeom("ray", this->body );
   rayGeom->SetDisplayRays(display);
   rayGeom->SetMinLength(minRange);
   rayGeom->SetMaxLength(maxRange);

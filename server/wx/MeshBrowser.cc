@@ -1,6 +1,7 @@
 #include "OgreAdaptor.hh"
 #include "Global.hh"
 #include "Light.hh"
+#include "Scene.hh"
 #include "GazeboConfig.hh"
 #include "UserCamera.hh"
 #include "MeshManager.hh"
@@ -29,8 +30,17 @@ MeshBrowser::MeshBrowser(wxWindow *parent)
   this->treeCtrl->Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MeshBrowser::OnTreeClick), NULL, this);
   boxSizer1->Add(this->treeCtrl,1, wxALL | wxEXPAND| wxALIGN_CENTER_VERTICAL, 5); 
 
+  this->scene = OgreAdaptor::Instance()->CreateScene("viewer_scene");
+  this->dirLight = new Light(NULL, scene);
+  this->dirLight->Load(NULL);
+  this->dirLight->SetLightType("directional");
+  this->dirLight->SetDiffuseColor( Color(1.0, 1.0, 1.0) );
+  this->dirLight->SetSpecularColor( Color(0.1, 0.1, 0.1) );
+  this->dirLight->SetDirection( Vector3(0, 0, -1) );
+
+
   this->renderControl = new RenderControl(this);
-  this->renderControl->CreateCamera(1);
+  this->renderControl->CreateCamera(this->scene);
   this->renderControl->Init();
   UserCamera *cam = this->renderControl->GetCamera();
   cam->SetClipDist(0.01, 1000);
@@ -69,16 +79,18 @@ MeshBrowser::MeshBrowser(wxWindow *parent)
 
 MeshBrowser::~MeshBrowser()
 {
+  delete this->renderControl;
+  delete this->dirLight;
+  OgreAdaptor::Instance()->RemoveScene(this->scene->GetName());
 }
 
-void MeshBrowser::ParseDir(const std::string &path, wxTreeItemId &parentId)
+int MeshBrowser::ParseDir(const std::string &path, wxTreeItemId &parentId)
 {
-  std::cout << "ParseDir[" << path << "]\n";
-
+  int itemCount = 0;
   struct dirent *dir_entry;
   DIR *dir = opendir(path.c_str()); 
   if (dir == NULL)
-    return;
+    return 0;
 
   while ( (dir_entry = readdir(dir)) != NULL )
   {
@@ -91,10 +103,14 @@ void MeshBrowser::ParseDir(const std::string &path, wxTreeItemId &parentId)
     if (dir_entry->d_type == DT_DIR)
     {
       wxTreeItemId itemId = this->treeCtrl->AppendItem(parentId, wxString::FromAscii(filename.c_str()), -1, -1, NULL);
-      this->ParseDir( path + "/" + filename, itemId );
+      itemCount += this->ParseDir( path + "/" + filename, itemId );
+
+      if (itemCount == 0)
+        this->treeCtrl->Delete(itemId);
     }
-    else
+    else if (MeshManager::Instance()->IsValidFilename( filename ) )
     {
+      itemCount++;
       MeshNameTreeItemData *data = new MeshNameTreeItemData;
       data->filename =  path + "/" + filename.c_str();
 
@@ -103,6 +119,7 @@ void MeshBrowser::ParseDir(const std::string &path, wxTreeItemId &parentId)
   }
 
   closedir(dir);
+  return itemCount;
 }
 
 void MeshBrowser::OnTreeClick(wxTreeEvent &event)
@@ -118,9 +135,22 @@ void MeshBrowser::OnTreeClick(wxTreeEvent &event)
   if (this->visual)
     OgreCreator::Instance()->DeleteVisual(this->visual);
 
-  this->visual = OgreCreator::Instance()->CreateVisual(data->filename + "_VISUAL", NULL, NULL, OgreAdaptor::Instance()->GetScene(1));
+  this->visual = OgreCreator::Instance()->CreateVisual(data->filename + "_VISUAL", NULL, NULL, this->scene);
 
+  try
+  {
   this->visual->AttachMesh( data->filename );
+  } 
+  catch (...)
+  {
+    printf("Unable to load mesh\n");
+  }
+
+  this->visual->SetCastShadows(false);
+  this->visual->SetUseRTShader(false);
+
+  if ( !this->visual->HasMaterial() )
+    this->visual->SetMaterial("Gazebo/Viewer");
 
   Vector3 size = this->visual->GetBoundingBoxSize();
   if (size.x > 2.0 || size.y > 2.0 || size.z > 2.0)

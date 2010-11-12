@@ -33,7 +33,6 @@
 
 namespace gazebo
 {
-  class BulletPhysics;
   class BulletRayGeom;
   class BulletBody;
 
@@ -70,8 +69,6 @@ namespace gazebo
 
     /// All the rays
     private: std::vector<BulletRayGeom*> rays;
-
-    private: BulletPhysics *physicsEngine;
 
     private: BulletBody *body;
   };

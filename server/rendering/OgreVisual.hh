@@ -215,6 +215,12 @@ namespace gazebo
     /// \brief Delete a dynamic line
     public: void DeleteDynamicLine(OgreDynamicLines *line);
 
+    /// \brief Get the name of the material
+    public: std::string GetMaterialName() const;
+
+    /// \brief Return true if a material is set for this visual
+    public: bool HasMaterial() const;
+
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: std::string myMaterialName;
@@ -261,7 +267,8 @@ namespace gazebo
 
     // List of all the lines created
     private: std::list<OgreDynamicLines*> lines;
-    private: Time updateTime;
+
+    private: bool hasMaterial;
   };
 }
 

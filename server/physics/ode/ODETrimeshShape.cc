@@ -26,6 +26,7 @@
 
 #include "Mesh.hh"
 #include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "World.hh"
 #include "ODEGeom.hh"
 #include "ODEPhysics.hh"
@@ -92,7 +93,7 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
   dMass odeMass;
   Mass mass;
   ODEGeom *pgeom = (ODEGeom*)this->geomParent;
-  PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
+  PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
 
   TrimeshShape::Load(node);
 

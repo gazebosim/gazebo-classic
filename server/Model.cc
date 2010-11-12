@@ -34,6 +34,7 @@
 #include <float.h>
 
 #include "Events.hh"
+#include "OgreAdaptor.hh"
 #include "RenderState.hh"
 #include "OgreVisual.hh"
 #include "Light.hh"
@@ -305,7 +306,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     this->SetLaserRetro(**this->laserRetroP);
 
   // Create the graphics iface handler
-  this->graphicsHandler = new GraphicsIfaceHandler();
+  this->graphicsHandler = new GraphicsIfaceHandler(this->GetWorld());
   this->graphicsHandler->Load(this->GetScopedName(), this);
 
   // Get the name of the python module
@@ -840,7 +841,7 @@ void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
 // Create and return a new body
 Body *Model::CreateBody()
 {
-  Body *body = World::Instance()->GetPhysicsEngine()->CreateBody(this);
+  Body *body = this->GetWorld()->GetPhysicsEngine()->CreateBody(this);
   this->bodies.push_back(body);
 
   // Create a new body
@@ -901,7 +902,7 @@ void Model::LoadJoint(XMLConfigNode *node)
 
   Joint *joint;
 
-  joint = World::Instance()->GetPhysicsEngine()->CreateJoint(node->GetName());
+  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(node->GetName());
 
   joint->SetModel(this);
 
@@ -1061,7 +1062,7 @@ void Model::Attach(XMLConfigNode *node)
   if (parentModel == NULL)
     gzthrow("Parent cannot be NULL when attaching two models");
 
-  this->joint =World::Instance()->GetPhysicsEngine()->CreateJoint("hinge");
+  this->joint =this->GetWorld()->GetPhysicsEngine()->CreateJoint("hinge");
 
   Body *myBody = this->GetBody(**(this->myBodyNameP));
   Body *pBody = parentModel->GetBody(**(this->parentBodyNameP));
@@ -1199,7 +1200,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
   if (Simulator::Instance()->GetRenderEngineEnabled() && 
       (childNode = node->GetChild("light")))
   {
-    this->light = new Light(body, 0);
+    this->light = new Light(body, OgreAdaptor::Instance()->GetScene(0));
     this->light->Load(childNode);
   }
 

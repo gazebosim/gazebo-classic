@@ -247,7 +247,7 @@ void Holonome3Sw_Position2d::PutPositionData()
   if (this->myIface->Lock(1))
   {
     // TODO: Data timestamp
-    this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
+    this->myIface->data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
     this->myIface->data->pose.pos.x = this->Xi[0];
     this->myIface->data->pose.pos.y = this->Xi[1];

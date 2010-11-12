@@ -115,8 +115,6 @@ home directory, or to the log file specified with the -l command line option.
 // Command line options
 std::string worldFileName = "";
 const char *optLogFileName = NULL;
-unsigned int optServerId = 0;
-bool optServerForce = true;
 bool optGuiEnabled = true;
 bool optRenderEngineEnabled = true;
 double optTimeout = -1;
@@ -134,8 +132,6 @@ void PrintUsage()
 {
   fprintf(stderr, "Usage: gazebo [-hv] <worldfile>\n");
   fprintf(stderr, "  -h            : Print this message.\n");
-  fprintf(stderr, "  -s <id>       : Use server id <id> (an integer); default is 0.\n");
-  fprintf(stderr, "  -f            : Force usage of the server id (use with caution)\n");
   fprintf(stderr, "  -d <-1:9>      : Verbose mode: -1 = none, 0 = critical (default), 9 = all)\n");
   fprintf(stderr, "  -t <sec>      : Timeout and quit after <sec> seconds\n");
   fprintf(stderr, "  -g            : Run without a GUI\n");
@@ -169,7 +165,7 @@ int ParseArgs(int argc, char **argv)
   FILE *tmpFile;
   int ch;
 
-  char *flags = (char*)("l:hd:s:fgxt:nqperu");
+  char *flags = (char*)("l:hd:gxt:nqperu");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
@@ -185,19 +181,8 @@ int ParseArgs(int argc, char **argv)
         optMsgLevel = atoi(optarg);
         break;
 
-      case 'f':
-        // Force server id
-        optServerForce = true;
-        break;
-
       case 'l':
         optLogFileName = optarg;
-        break;
-
-      case 's':
-        // Server id
-        optServerId = atoi(optarg);
-        optServerForce = false;
         break;
 
       case 't':
@@ -251,13 +236,6 @@ void SignalHandler( int /*dummy*/ )
 // Main function
 int main(int argc, char **argv)
 {
-  // force a cpu affinity for CPU 0, this slow down sim by about 4X
-  // cpu_set_t cpuSet;
-  // CPU_ZERO(&cpuSet);
-  // CPU_SET(0, &cpuSet);
-  // sched_setaffinity( 0, sizeof(cpuSet), &cpuSet);
-
-
   //Application Setup
   if (ParseArgs(argc, argv) != 0)
     return -1;
@@ -276,9 +254,11 @@ int main(int argc, char **argv)
   //Load the simulator
   try
   {
-    gazebo::Simulator::Instance()->Load(worldFileName, optServerId);
+    gazebo::Simulator::Instance()->Load(worldFileName);
     gazebo::Simulator::Instance()->SetTimeout(optTimeout);
     gazebo::Simulator::Instance()->SetPhysicsEnabled(optPhysicsEnabled);
+
+    gazebo::Simulator::Instance()->CreateWorld(worldFileName);
   }
   catch (gazebo::GazeboError e)
   {

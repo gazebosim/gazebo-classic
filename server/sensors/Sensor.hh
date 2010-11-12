@@ -84,6 +84,9 @@ namespace gazebo
     public: virtual void SetActive(bool value);
     public: bool IsActive();
 
+    /// \brief Get the time of the last update
+    public: Time GetLastUpdate();
+
     /// \brief  Load the child sensor
     protected: virtual void LoadChild(XMLConfigNode * /*node*/) {};
   

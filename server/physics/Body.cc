@@ -64,8 +64,6 @@ Body::Body(Entity *parent)
   this->comEntity->SetShowInGui(false);
   this->comEntity->GetVisualNode()->SetShowInGui(false);
 
-  this->physicsEngine = World::Instance()->GetPhysicsEngine();
-
   this->cgVisual = NULL;
 
   Param::Begin(&this->parameters);
@@ -500,7 +498,7 @@ void Body::LoadGeom(XMLConfigNode *node)
   if (node->GetName() == "heightmap" || node->GetName() == "map")
     this->SetStatic(true);
 
-  geom = this->physicsEngine->CreateGeom(node->GetName(), this);
+  geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(node->GetName(), this);
 
   if (!geom)
     gzthrow("Unknown Geometry Type["+

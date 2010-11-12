@@ -132,8 +132,8 @@ class Colliders_TBB
  
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ODEPhysics::ODEPhysics()
-    : PhysicsEngine()
+ODEPhysics::ODEPhysics(World *world)
+    : PhysicsEngine(world)
 {
   // Collision detection init
   dInitODE2(0);
@@ -764,7 +764,7 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
         contactFeedback.contact.positions.push_back(contactPos);
         contactFeedback.contact.normals.push_back(contactNorm);
         contactFeedback.contact.time = 
-          Simulator::Instance()->GetSimTime();
+          this->world->GetSimTime();
         dJointSetFeedback(c, &(contactFeedback.feedbacks[j]));
       }
 

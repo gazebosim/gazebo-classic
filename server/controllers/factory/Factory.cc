@@ -99,7 +99,7 @@ void Factory::UpdateChild()
     xmlString = this->xmlPrefix + xmlMiddle + this->xmlSuffix;
 
     // Add the new models into the World
-    World::Instance()->InsertEntity( xmlString);
+    this->GetWorld()->InsertEntity( xmlString);
 
     strcpy((char*)this->factoryIface->data->newModel,"");
   }
@@ -107,7 +107,7 @@ void Factory::UpdateChild()
   // Attempt to delete a model by name, if the string is present
   /*if (strcmp((const char*)this->factoryIface->data->deleteModel,"")!=0)
   {
-    World::Instance()->DeleteEntity((const char*)this->factoryIface->data->deleteModel);
+    this->GetWorld()->DeleteEntity((const char*)this->factoryIface->data->deleteModel);
 
     strcpy((char*)this->factoryIface->data->deleteModel,"");
   }*/

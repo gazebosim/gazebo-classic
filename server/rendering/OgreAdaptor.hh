@@ -69,7 +69,7 @@ namespace gazebo
   class OgreFrameListener;
   class Entity;
   class UserCamera;
-  class OgreCamera;
+  class Camera;
   class OgreVisual;
   class Scene;
   
@@ -100,6 +100,12 @@ namespace gazebo
   
     /// \brief Get the desired update rate
     public: double GetUpdateRate();
+
+    /// \brief Create a scene
+    public: Scene *CreateScene(const std::string &name);
+
+    /// \brief Remove a scene
+    public: void RemoveScene(const std::string &name);
 
     /// \brief Get a scene manager
     public: Scene *GetScene(unsigned int index);

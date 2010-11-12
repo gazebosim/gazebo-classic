@@ -58,8 +58,8 @@ GZ_REGISTER_PHYSICS_ENGINE("bullet", BulletPhysics);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-BulletPhysics::BulletPhysics()
-    : PhysicsEngine()
+BulletPhysics::BulletPhysics(World *world)
+    : PhysicsEngine(world)
 {
   this->collisionConfig = new btDefaultCollisionConfiguration();
 

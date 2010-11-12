@@ -1,5 +1,6 @@
 #include <boost/lexical_cast.hpp>
 
+#include "Scene.hh"
 #include "RenderControl.hh"
 #include "UserCamera.hh"
 #include "Pose3d.hh"
@@ -98,9 +99,9 @@ void RenderPanel::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a camera
-void RenderPanel::CreateCamera(unsigned int sceneMgr)
+void RenderPanel::CreateCamera(Scene *scene)
 {
-  this->renderControl->CreateCamera(sceneMgr);
+  this->renderControl->CreateCamera(scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,6 +156,14 @@ void RenderPanel::Update()
   str.Printf(wxT("%6.2f"), fps);
   this->fpsCtrl->SetValue(str);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the camera
+UserCamera *RenderPanel::GetCamera()
+{
+  return this->renderControl->GetCamera();
+}
+
 
 void RenderPanel::OnXPosSetFocus(wxFocusEvent &event)
 {

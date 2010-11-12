@@ -28,6 +28,7 @@
 #include "World.hh"
 #include "Common.hh"
 #include "Model.hh"
+#include "World.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 
@@ -42,10 +43,14 @@ Common *Common::root = new Common(NULL);
 Common::Common(Common *parent)
  : parent(parent)
 {
+  this->world = NULL;
+
   this->AddType(COMMON);
 
   if (this->parent == NULL)
     this->parent = this->root;
+  else
+    this->world = this->parent->GetWorld();
 
   this->id = ++idCounter;
 
@@ -422,6 +427,24 @@ Model *Common::GetParentModel() const
     p = p->GetParent();
 
   return (Model*)p;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the world this object belongs to. This will also set the world for all 
+/// children
+void Common::SetWorld(World *newWorld)
+{
+  this->world = newWorld;
+
+  for (unsigned int i=0; i < this->children.size(); i++)
+    this->children[i]->SetWorld(this->world);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the world this object is in
+World *Common::GetWorld() const
+{
+  return this->world;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

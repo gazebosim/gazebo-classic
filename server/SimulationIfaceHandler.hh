@@ -9,10 +9,12 @@ namespace libgazebo
 
 namespace gazebo
 {
+  class World;
+
   class SimulationIfaceHandler
   {
     /// \brief Constructor
-    public: SimulationIfaceHandler();
+    public: SimulationIfaceHandler(World *world);
 
     /// \brief Destructor
     public: virtual ~SimulationIfaceHandler();
@@ -26,9 +28,11 @@ namespace gazebo
     /// \brief Get the names of interfaces defined in the tree of a model
     private: void GetInterfaceNames(Common *c, std::vector<std::string>& list);
 
+    private: World *world;
 
     /// Simulation interface
     private: libgazebo::SimulationIface *iface;
+
   };
 }
 

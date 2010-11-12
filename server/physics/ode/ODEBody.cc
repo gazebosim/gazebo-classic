@@ -31,6 +31,7 @@
 #include "GazeboMessage.hh"
 #include "OgreVisual.hh"
 
+#include "World.hh"
 #include "Geom.hh"
 #include "ODEGeom.hh"
 #include "Quatern.hh"
@@ -47,7 +48,7 @@ using namespace gazebo;
 ODEBody::ODEBody(Entity *parent)
     : Body(parent)
 {
-  this->odePhysics = dynamic_cast<ODEPhysics*>(this->physicsEngine);
+  this->odePhysics = dynamic_cast<ODEPhysics*>(this->GetWorld()->GetPhysicsEngine());
 
   if (this->odePhysics == NULL)
     gzthrow("Not using the ode physics engine");
@@ -137,9 +138,11 @@ void ODEBody::SetGravityMode(bool mode)
 {
   if (this->bodyId)
   {
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dBodySetGravityMode(this->bodyId, mode ? 1: 0);
-    this->physicsEngine->UnlockMutex();
+    // NATY
+    //this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -150,9 +153,11 @@ bool ODEBody::GetGravityMode()
   int mode = 0;
   if (this->bodyId)
   {
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     mode = dBodyGetGravityMode(this->bodyId);
-    this->physicsEngine->UnlockMutex();
+    // NATY
+    //this->physicsEngine->UnlockMutex();
   }
 
   return mode;
@@ -178,9 +183,11 @@ void ODEBody::AttachGeom( Geom *geom )
   {
     if (odeGeom->GetGeomId())
     {
-      this->physicsEngine->LockMutex();
+      // NATY
+      //this->physicsEngine->LockMutex();
       dGeomSetBody(odeGeom->GetGeomId(), this->bodyId);
-      this->physicsEngine->UnlockMutex();
+      // NATY
+      //this->physicsEngine->UnlockMutex();
     }
   }
 }
@@ -196,7 +203,9 @@ void ODEBody::OnPoseChange()
   this->SetEnabled(true);
 
   Pose3d pose = this->comEntity->GetWorldPose();
-  this->physicsEngine->LockMutex();
+
+  // NATY
+  //this->physicsEngine->LockMutex();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 
@@ -209,7 +218,8 @@ void ODEBody::OnPoseChange()
   // Set the rotation of the ODE body
   dBodySetQuaternion(this->bodyId, q);
 
-  this->physicsEngine->UnlockMutex();
+  // NATY
+  //this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,14 +237,16 @@ void ODEBody::SetEnabled(bool enable) const
   if (!this->bodyId)
     return;
 
-  this->physicsEngine->LockMutex();
+  // NATY
+  //this->physicsEngine->LockMutex();
 
   if (enable)
     dBodyEnable(this->bodyId);
   else
     dBodyDisable(this->bodyId);
 
-  this->physicsEngine->UnlockMutex();
+  // NATY
+  //this->physicsEngine->UnlockMutex();
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -276,7 +288,8 @@ void ODEBody::UpdateCoM()
 
   if (**this->customMassMatrixP)
   {
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dMass odeMass;
     dMassSetZero(&odeMass);
 
@@ -295,13 +308,14 @@ void ODEBody::UpdateCoM()
     else
       gzthrow("Setting custom body " + this->GetName()+"mass to zero!");
 
-    this->physicsEngine->ConvertMass(&this->customMass, &odeMass);
-    this->physicsEngine->UnlockMutex();
+    this->GetWorld()->GetPhysicsEngine()->ConvertMass(&this->customMass, &odeMass);
+    // NATY
+    //this->physicsEngine->UnlockMutex();
   }
   else
   { 
     dMass odeMass;
-    this->physicsEngine->ConvertMass(&odeMass, this->mass);
+    this->GetWorld()->GetPhysicsEngine()->ConvertMass(&odeMass, this->mass);
 
     // Center of Gravity must be at (0,0,0) in the body frame
     odeMass.c[0] = 0.0;
@@ -320,9 +334,11 @@ void ODEBody::SetLinearVel(const Vector3 &vel)
   if (this->bodyId)
   {
     this->SetEnabled(true);
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
-    this->physicsEngine->UnlockMutex();
+    // NATY
+    //this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -336,9 +352,11 @@ Vector3 ODEBody::GetWorldLinearVel() const
   {
     const dReal *dvel;
 
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dvel = dBodyGetLinearVel(this->bodyId);
-    this->physicsEngine->UnlockMutex();
+    // NATY
+    //this->physicsEngine->UnlockMutex();
 
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
@@ -353,9 +371,11 @@ void ODEBody::SetAngularVel(const Vector3 &vel)
   if (this->bodyId)
   {
     this->SetEnabled(true);
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
-    this->physicsEngine->UnlockMutex();
+    // NATY
+    //this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -372,9 +392,11 @@ Vector3 ODEBody::GetWorldAngularVel() const
     const dReal *dvel;
     dReal result[3];
 
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dvel = dBodyGetAngularVel(this->bodyId);
-    this->physicsEngine->UnlockMutex();
+    // NATY
+    //this->physicsEngine->UnlockMutex();
 
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
@@ -386,7 +408,9 @@ Vector3 ODEBody::GetWorldAngularVel() const
 /// \brief Set the force applied to the body
 void ODEBody::SetForce(const Vector3 &force)
 {
-  if (this->bodyId && this->physicsEngine->Locked())
+  // NATY
+  //if (this->bodyId && this->physicsEngine->Locked())
+  if (this->bodyId)
   {
     dBodyAddForce(this->bodyId, force.x, force.y, force.z);
   }
@@ -403,9 +427,11 @@ Vector3 ODEBody::GetWorldForce() const
   {
     const dReal *dforce;
 
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dforce = dBodyGetForce(this->bodyId);
-    this->physicsEngine->UnlockMutex();
+    // NATY
+    //this->physicsEngine->UnlockMutex();
 
     force.x = dforce[0];
     force.y = dforce[1];
@@ -419,7 +445,9 @@ Vector3 ODEBody::GetWorldForce() const
 /// \brief Set the torque applied to the body
 void ODEBody::SetTorque(const Vector3 &torque)
 {
-  if (this->bodyId && this->physicsEngine->Locked())
+  // NATY
+  //if (this->bodyId && this->physicsEngine->Locked())
+  if (this->bodyId)
   {
     this->SetEnabled(true);
     dBodyAddRelTorque(this->bodyId, torque.x, torque.y, torque.z);
@@ -437,9 +465,12 @@ Vector3 ODEBody::GetWorldTorque() const
   {
     const dReal *dtorque;
 
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     dtorque = dBodyGetTorque(this->bodyId);
-    this->physicsEngine->UnlockMutex();
+    
+    // NATY
+    //this->physicsEngine->UnlockMutex();
 
     torque.x = dtorque[0];
     torque.y = dtorque[1];

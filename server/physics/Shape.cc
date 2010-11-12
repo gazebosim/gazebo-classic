@@ -12,7 +12,6 @@ Shape::Shape(Geom *p)
   this->AddType(SHAPE);
   this->geomParent = p;
   this->geomParent->SetShape(this);
-  this->physicsEngine = World::Instance()->GetPhysicsEngine();
   this->SetName("shape");
 }
 

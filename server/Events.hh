@@ -11,6 +11,27 @@ namespace gazebo
   {
 
     ////////////////////////////////////////////////////////////////////////////
+    /// \brief Connect a boost::slot the the pause signal
+    public: template<typename T>
+            static boost::signals::connection ConnectPauseSignal( T subscriber )
+            { return pauseSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectPauseSignal( T subscriber)
+            { pauseSignal.disconnect(subscriber); }
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief Connect a boost::slot the the step signal
+    public: template<typename T>
+            static boost::signals::connection ConnectStepSignal( T subscriber )
+            { return stepSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectStepSignal( T subscriber)
+            { stepSignal.disconnect(subscriber); }
+
+
+    ////////////////////////////////////////////////////////////////////////////
     /// \brief Connect a boost::slot the the add entity signal
     public: template<typename T>
             static boost::signals::connection ConnectCreateEntitySignal( T subscriber )
@@ -171,13 +192,37 @@ namespace gazebo
     ////////////////////////////////////////////////////////////////////////////
     /// \brief Render start signal
     public: template<typename T>
-            static boost::signals::connection ConnectRenderStartSignal(T subscriber)
-            { return renderStartSignal.connect(subscriber); }
+            static boost::signals::connection ConnectPreRenderSignal(T subscriber)
+            { return preRenderSignal.connect(subscriber); }
+
     /// \brief Disconnect a render start signal
     public: template<typename T>
-            static void DisconnectRenderStartSignal( T subscriber )
-            { renderStartSignal.disconnect(subscriber); }
+            static void DisconnectPreRenderSignal( T subscriber )
+            { preRenderSignal.disconnect(subscriber); }
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief Connect a boost::slot the render update signal
+    public: template<typename T>
+            static boost::signals::connection ConnectRenderSignal( T subscriber )
+            { return renderSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectRenderSignal( T subscriber)
+            { renderSignal.disconnect(subscriber); }
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief Connect a boost::slot the post render update signal
+    public: template<typename T>
+            static boost::signals::connection ConnectPostRenderSignal( T subscriber )
+            { return postRenderSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectPostRenderSignal( T subscriber)
+            { postRenderSignal.disconnect(subscriber); }
+
+
+    public: static boost::signal<void (bool)> pauseSignal;
+    public: static boost::signal<void ()> stepSignal;
 
     public: static boost::signal<void (bool)>  moveModeSignal;
     public: static boost::signal<void (bool)>  manipModeSignal;
@@ -199,8 +244,10 @@ namespace gazebo
 
     public: static boost::signal<void ()> worldUpdateStartSignal;
     public: static boost::signal<void ()> worldUpdateEndSignal;
-    public: static boost::signal<void ()> renderStartSignal;
 
+    public: static boost::signal<void ()> preRenderSignal;
+    public: static boost::signal<void ()> renderSignal;
+    public: static boost::signal<void ()> postRenderSignal;
   };
 
 }

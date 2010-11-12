@@ -37,7 +37,7 @@
 #include "RTShaderSystem.hh"
 #include "gz.h"
 
-#define MINOR_VERSION 7
+#define MINOR_VERSION 700
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,10 +145,10 @@ void RTShaderSystem::DetachEntity(OgreVisual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a viewport to use shaders
-void RTShaderSystem::AttachViewport(OgreCamera *camera)
+void RTShaderSystem::AttachViewport(Camera *camera)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  camera->GetOgreCamera()->getViewport()->setMaterialScheme(
+  camera->GetCamera()->getViewport()->setMaterialScheme(
       camera->GetScene()->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 

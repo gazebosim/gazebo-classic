@@ -6,8 +6,7 @@
 #include "Simulator.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
-#include "CameraManager.hh"
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "World.hh"
 #include "BoxMaker.hh"
 
@@ -86,10 +85,10 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
   Vector3 norm(0,0,1);
   Vector3 p1, p2;
 
-  p1 = this->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
+  p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
-  p2 = this->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
+  p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
   OgreVisual *vis = NULL;
@@ -126,8 +125,6 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
 
 void BoxMaker::CreateTheEntity()
 {
-  boost::recursive_mutex::scoped_lock lock( *Simulator::Instance()->GetMRMutex());
-
   std::ostringstream newModelStr;
 
   OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
@@ -157,6 +154,6 @@ void BoxMaker::CreateTheEntity()
 
   OgreCreator::Instance()->DeleteVisual(this->visualName);
 
-  World::Instance()->InsertEntity(newModelStr.str());
+  Simulator::Instance()->GetWorld(0)->InsertEntity(newModelStr.str());
 }
 

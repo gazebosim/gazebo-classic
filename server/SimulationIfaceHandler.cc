@@ -23,6 +23,7 @@
  * Date: 8 Nov 2010
  */
 
+#include "GazeboMessage.hh"
 #include "Simulator.hh"
 #include "Common.hh"
 #include "Entity.hh"
@@ -42,10 +43,12 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Constructor
-SimulationIfaceHandler::SimulationIfaceHandler()
+SimulationIfaceHandler::SimulationIfaceHandler(World *world)
+  : world(world)
 {
   this->iface = new libgazebo::SimulationIface();
-  this->iface->Create( World::Instance()->GetGzServer(), "default" );
+  libgazebo::Server *server = this->world->GetGzServer();
+  this->iface->Create( server, server->serverName );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,11 +77,11 @@ void SimulationIfaceHandler::Update()
 
   response = this->iface->data->responses;
 
-  this->iface->data->simTime = Simulator::Instance()->GetSimTime().Double();
-  this->iface->data->pauseTime = Simulator::Instance()->GetPauseTime().Double();
-  this->iface->data->realTime = Simulator::Instance()->GetRealTime().Double();
-  this->iface->data->stepTime = World::Instance()->GetPhysicsEngine()->GetStepTime().Double();
-  this->iface->data->state = !Simulator::Instance()->IsPaused();
+  this->iface->data->simTime =   this->world->GetSimTime().Double();
+  this->iface->data->pauseTime = this->world->GetPauseTime().Double();
+  this->iface->data->realTime =  this->world->GetRealTime().Double();
+  this->iface->data->stepTime = this->world->GetPhysicsEngine()->GetStepTime().Double();
+  this->iface->data->state = !this->world->IsPaused();
 
   unsigned int requestCount = this->iface->data->requestCount;
 
@@ -98,19 +101,20 @@ void SimulationIfaceHandler::Update()
     switch (req->type)
     {
       case libgazebo::SimulationRequestData::UNPAUSE: 
-        Simulator::Instance()->SetPaused(false);
+        this->world->SetPaused(false);
         break;
       case libgazebo::SimulationRequestData::PAUSE: 
-        Simulator::Instance()->SetPaused(
-            !Simulator::Instance()->IsPaused());
+        this->world->SetPaused(
+            !this->world->IsPaused());
         break;
 
       case libgazebo::SimulationRequestData::STEP: 
-        Simulator::Instance()->SetStepInc(true);
+        // NATY
+        //this->world->SetStepInc(true);
         break;
 
       case libgazebo::SimulationRequestData::RESET:
-        World::Instance()->Reset();
+        this->world->Reset();
         break;
 
       case libgazebo::SimulationRequestData::SAVE:
@@ -352,7 +356,7 @@ void SimulationIfaceHandler::Update()
       case libgazebo::SimulationRequestData::GET_NUM_MODELS:
         {
           response->type= req->type;
-          response->uintValue = World::Instance()->GetModelCount();
+          response->uintValue = this->world->GetModelCount();
           response++;
           this->iface->data->responseCount += 1;
           break;
@@ -442,9 +446,9 @@ void SimulationIfaceHandler::Update()
         {
           unsigned int index = req->uintValue;
 
-          if (index < World::Instance()->GetModelCount())
+          if (index < this->world->GetModelCount())
           {
-            Model *model = World::Instance()->GetModel(index);
+            Model *model = this->world->GetModel(index);
             memset(response->name, 0, 512);
 
             strncpy(response->name, model->GetCompleteScopedName().c_str(), 512);
@@ -666,8 +670,8 @@ void SimulationIfaceHandler::Update()
           response->type = req->type;
           strcpy( response->name, req->name);
 
-          for (unsigned int i = 0; i < World::Instance()->GetModelCount(); i++)
-            GetInterfaceNames(World::Instance()->GetModel(i), list);
+          for (unsigned int i = 0; i < this->world->GetModelCount(); i++)
+            GetInterfaceNames(this->world->GetModel(i), list);
 
           std::string mname = req->name;		
           unsigned int i=mname.find(".");        
@@ -731,8 +735,8 @@ void SimulationIfaceHandler::Update()
           std::vector<Model*>::iterator mmiter;
 
 
-          for (unsigned int i=0; i < World::Instance()->GetModelCount(); i++)
-            this->GetInterfaceNames(World::Instance()->GetModel(i), list);
+          for (unsigned int i=0; i < this->world->GetModelCount(); i++)
+            this->GetInterfaceNames(this->world->GetModel(i), list);
 
 
           // removing the ">>type" from the end of each interface names 
@@ -854,26 +858,26 @@ void SimulationIfaceHandler::Update()
 
      case libgazebo::SimulationRequestData::SET_STEP_TIME:
         {
-          World::Instance()->GetPhysicsEngine()->SetStepTime(Time(req->dblValue));
+          this->world->GetPhysicsEngine()->SetStepTime(Time(req->dblValue));
           break;
         }
 
      case libgazebo::SimulationRequestData::SET_STEP_ITERS:
         {
-          World::Instance()->GetPhysicsEngine()->SetSORPGSIters(req->uintValue);
+          this->world->GetPhysicsEngine()->SetSORPGSIters(req->uintValue);
           break;
         }
 
      case libgazebo::SimulationRequestData::SET_STEP_TYPE:
         {
-          World::Instance()->GetPhysicsEngine()->SetStepType(req->strValue);
+          this->world->GetPhysicsEngine()->SetStepType(req->strValue);
           break;
         }
 
      case libgazebo::SimulationRequestData::GET_STEP_TYPE:
         {
           memset(response->strValue, 0, 512);
-          strncpy(response->strValue, World::Instance()->GetPhysicsEngine()->GetStepType().c_str(), 512);
+          strncpy(response->strValue, this->world->GetPhysicsEngine()->GetStepType().c_str(), 512);
           response->strValue[511] = '\0';
           response++;
           this->iface->data->responseCount += 1;

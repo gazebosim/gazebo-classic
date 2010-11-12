@@ -15,7 +15,7 @@ namespace gazebo
     public: virtual void SetSize( const Vector3 &size )
             {
               BoxShape::SetSize(size);
-              PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
+              PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
               ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
               Pose3d rpose;

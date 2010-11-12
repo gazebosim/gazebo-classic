@@ -1,5 +1,4 @@
-#include "CameraManager.hh"
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "EntityMaker.hh"
 
 using namespace gazebo;
@@ -57,21 +56,4 @@ Vector3 EntityMaker::GetSnappedPoint(Vector3 p)
   }
 
   return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get point on a plane
-Vector3 EntityMaker::GetWorldPointOnPlane(int x, int y, Vector3 planeNorm, double d)
-{
-  Vector3 origin, dir;
-  double dist;
-
-  // Cast two rays from the camera into the world
-  CameraManager::Instance()->GetActiveCamera()->GetCameraToViewportRay(x, y, origin, dir);
-
-  dist = origin.GetDistToPlane(dir, planeNorm, d);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  return origin + dir * dist; 
 }

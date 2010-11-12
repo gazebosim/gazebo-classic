@@ -47,11 +47,11 @@ unsigned int Light::lightCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Light::Light(Entity *parent, unsigned int sceneIndex)
+Light::Light(Entity *parent, Scene *scene)
   : Entity(parent)
 {
   this->AddType(LIGHT);
-  this->scene = OgreAdaptor::Instance()->GetScene(sceneIndex);
+  this->scene = scene;
 
   std::ostringstream stream;
 

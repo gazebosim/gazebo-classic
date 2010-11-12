@@ -15,7 +15,7 @@ namespace gazebo
     public: void SetSize(const Vector2<double> &size)
             {
               CylinderShape::SetSize(size);
-              PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
+              PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
               ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
               dMass odeMass;

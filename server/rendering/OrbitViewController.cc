@@ -1,7 +1,7 @@
 #include "Global.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
-#include "OgreCamera.hh"
+#include "UserCamera.hh"
 #include "Vector2.hh"
 #include "MouseEvent.hh"
 #include "OrbitViewController.hh"
@@ -13,7 +13,7 @@ static const float PITCH_LIMIT_HIGH = M_PI - 0.001;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-OrbitViewController::OrbitViewController(OgreCamera *camera)
+OrbitViewController::OrbitViewController(UserCamera *camera)
   : ViewController(camera), distance(5.0f)
 {
   Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();

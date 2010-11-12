@@ -79,7 +79,6 @@ SET (sources Common.cc
              XMLConfig.cc
              GazeboConfig.cc
              Time.cc
-             Timer.cc
              Entity.cc
              GazeboError.cc
              GazeboMessage.cc
@@ -90,7 +89,7 @@ SET (sources Common.cc
              SimulationIfaceHandler.cc
              Simulator.cc
              Rand.cc
-             Factory.cc
+             FactoryIfaceHandler.cc
              Mesh.cc
              MeshManager.cc
              MeshLoader.cc
@@ -113,7 +112,6 @@ SET (headers Common.hh
              SingletonT.hh
              StaticPluginRegister.hh
              Time.hh
-             Timer.hh
              Vector2.hh
              Vector3.hh
              Vector4.hh
@@ -126,7 +124,7 @@ SET (headers Common.hh
              SimulationIfaceHandler.hh
              Simulator.hh
              Rand.hh
-             Factory.hh
+             FactoryIfaceHandler.hh
              Mesh.hh
              MeshManager.hh
              MeshLoader.hh
@@ -165,7 +163,7 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
   set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-  else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
@@ -183,7 +181,7 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    gazeboshm 
                                    assimp
                                    pthread
-                                   profiler
+                                   ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}}
 )
 
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
@@ -191,7 +189,7 @@ APPEND_TO_CACHED_LIST(gazeboserver_ldflags
                       -lassimp -lgazebo_physics -lgazebo_av -lgazebo_wx -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics profiler)
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )

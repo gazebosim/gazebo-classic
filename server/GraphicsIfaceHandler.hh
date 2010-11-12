@@ -40,7 +40,7 @@ namespace gazebo
   class GraphicsIfaceHandler
   {
     /// \brief Constructor
-    public: GraphicsIfaceHandler();
+    public: GraphicsIfaceHandler(World *world);
   
     /// \brief Destructor
     public: virtual ~GraphicsIfaceHandler();
@@ -66,6 +66,7 @@ namespace gazebo
     /// \brief Helper function used to draw a progress bar
     private: void DrawMeterBar(OgreVisual *vis, libgazebo::Graphics3dDrawData *data );
 
+    private: World *world;
     private: std::string name;
     private: std::map<std::string, OgreVisual* > visuals;
     private: libgazebo::Graphics3dIface *threeDIface;

@@ -1,7 +1,7 @@
 #include "Simulator.hh"
 #include "Global.hh"
-#include "OgreCamera.hh"
 #include "Vector2.hh"
+#include "UserCamera.hh"
 #include "MouseEvent.hh"
 #include "FPSViewController.hh"
 
@@ -9,7 +9,7 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-FPSViewController::FPSViewController(OgreCamera *camera)
+FPSViewController::FPSViewController(UserCamera *camera)
   : ViewController(camera)
 {
 }

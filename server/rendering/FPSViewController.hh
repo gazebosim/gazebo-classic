@@ -8,7 +8,7 @@ namespace gazebo
   class FPSViewController : public ViewController
   {
     /// \brief Constructor
-    public: FPSViewController(OgreCamera *camera);
+    public: FPSViewController(UserCamera *camera);
 
     /// \brief Destructor
     public: virtual ~FPSViewController();

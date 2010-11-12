@@ -29,6 +29,7 @@
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Joint.hh"
+#include "World.hh"
 #include "Simulator.hh"
 #include "GazeboError.hh"
 #include "ControllerFactory.hh"
@@ -129,7 +130,7 @@ void Bandit_Actarray::UpdateChild()
   Angle angle;
 
   this->myIface->Lock(1);
-  this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
+  this->myIface->data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   this->myIface->data->actuators_count = JOINTCNT;
 

@@ -1,11 +1,11 @@
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "ViewController.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ViewController::ViewController(OgreCamera *cam)
+ViewController::ViewController(UserCamera *cam)
   : camera(cam)
 {
 }

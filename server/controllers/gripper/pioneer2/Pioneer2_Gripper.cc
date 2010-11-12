@@ -33,6 +33,7 @@
 #include "RaySensor.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
+#include "World.hh"
 #include "Model.hh"
 #include "Joint.hh"
 #include "World.hh"
@@ -191,7 +192,7 @@ void Pioneer2_Gripper::LoadChild(XMLConfigNode *node)
   if (!this->paddles[RIGHT])
     gzthrow("Couldn't get the right paddle geom");
 
-  this->holdJoint = World::Instance()->GetPhysicsEngine()->CreateJoint("slider");
+  this->holdJoint = this->myParent->GetWorld()->GetPhysicsEngine()->CreateJoint("slider");
   this->holdJoint->SetName(this->GetName() + "_Hold_Joint");
 
   this->paddles[LEFT]->ConnectContactCallback(
@@ -353,7 +354,7 @@ void Pioneer2_Gripper::UpdateChild()
 
   this->actIface->data->actuators_count = 1;
 
-  this->gripIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
+  this->gripIface->data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
   this->gripIface->Post();
   this->gripIface->Unlock();
 

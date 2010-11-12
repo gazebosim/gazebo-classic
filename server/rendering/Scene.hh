@@ -16,7 +16,7 @@ namespace Ogre
 namespace gazebo
 {
   class Grid;
-  class OgreCamera;
+  class Camera;
   class Entity;
 
   class Scene
@@ -66,23 +66,25 @@ namespace gazebo
     /// \brief Get the grid
     public: Grid *GetGrid(unsigned int index);
 
+            // NATY
     /// \brief Update all the cameras 
-    public: void UpdateCameras();
+    //public: void UpdateCameras();
 
     /// \brief Get an entity at a pixel location using a camera. Used for
     ///        mouse picking. 
     /// \param camera The ogre camera, used to do mouse picking
     /// \param mousePos The position of the mouse in screen coordinates
     /// \return The selected entity, or NULL
-    public: Entity *GetEntityAt(OgreCamera *camera, 
+    public: Entity *GetEntityAt(Camera *camera, 
                                 Vector2<int> mousePos, std::string &mod);
 
     /// \brief Get the world pos of a the first contact at a pixel location
-    public: Vector3 GetFirstContact(OgreCamera *camera, Vector2<int> mousePos);
+    public: Vector3 GetFirstContact(Camera *camera, Vector2<int> mousePos);
 
+            // NATY
     /// \brief Register a user camera
-    public: void RegisterCamera( OgreCamera *cam );
-    public: void UnregisterCamera( OgreCamera *cam );
+    //public: void RegisterCamera( Camera *cam );
+    //public: void UnregisterCamera( Camera *cam );
 
     public: void PrintSceneGraph();
 
@@ -100,7 +102,7 @@ namespace gazebo
     private: void PrintSceneGraphHelper(std::string prefix, 
                                         Ogre::Node *node);
 
-    private: void ApplyShadows();
+    public: void InitShadows();
 
     private: std::string name;
     private: ParamT<Color> *ambientP;
@@ -118,7 +120,7 @@ namespace gazebo
     //bsp attributes saved to write XML file back
     private: SceneType type;
 
-    private: std::vector<OgreCamera*> cameras;
+    //private: std::vector<Camera*> cameras;
 
     private: Ogre::SceneManager *manager;
     private: Ogre::RaySceneQuery *raySceneQuery;

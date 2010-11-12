@@ -29,6 +29,7 @@
 #include "Mesh.hh"
 #include "Mass.hh"
 #include "Geom.hh"
+#include "World.hh"
 #include "TrimeshShape.hh"
 #include "GazeboError.hh"
 #include "OgreAdaptor.hh"
@@ -137,8 +138,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
       XMLConfig *config = new XMLConfig();
       config->LoadString( stream.str() );
 
-      Geom *newGeom = this->physicsEngine->CreateGeom( "trimesh", 
-          this->geomParent->GetBody() );
+      Geom *newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( "trimesh", this->geomParent->GetBody() );
 
       newGeom->SetSaveable(false);
       newGeom->Load( config->GetRootNode()->GetChild() );

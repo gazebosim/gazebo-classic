@@ -6,6 +6,7 @@
 
 namespace gazebo
 {
+
   class CylinderMaker : public EntityMaker
   {
     public: CylinderMaker();

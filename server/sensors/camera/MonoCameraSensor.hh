@@ -27,7 +27,7 @@
 #ifndef MONOCAMERASENSOR_HH
 #define MONOCAMERASENSOR_HH
 
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "Sensor.hh"
 
 namespace gazebo
@@ -54,7 +54,7 @@ class MonoCameraSensor : public Sensor
   public: virtual ~MonoCameraSensor();
 
   /// \brief Get the camera
-  public: OgreCamera *GetCamera();
+  public: Camera *GetCamera();
 
   /// \brief Load the camera using parameter from an XMLConfig node
   /// \param node The XMLConfig node
@@ -77,7 +77,9 @@ class MonoCameraSensor : public Sensor
 
   public: virtual std::string GetName() const { return Sensor::GetName(); }
 
-  private: OgreCamera *camera;
+  private: void Render();
+
+  private: Camera *camera;
 
   protected: std::string ogreTextureName;
 };

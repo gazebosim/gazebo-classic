@@ -39,6 +39,7 @@ namespace gazebo
 
     private: void OnSnapToGrid(wxCommandEvent &event);
     private: void OnEditGrid(wxCommandEvent &event);
+    private: void OnCreateModel(wxCommandEvent &event);
 
     private: void OnWireframe(wxCommandEvent &event);
     private: void OnShowPhysics(wxCommandEvent &event);

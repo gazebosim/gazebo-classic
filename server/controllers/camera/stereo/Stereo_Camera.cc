@@ -166,7 +166,7 @@ void Stereo_Camera::PutStereoData()
   float *disp_dst;
 
   // Data timestamp
-  stereo_data->head.time = Simulator::Instance()->GetSimTime().Double();
+  stereo_data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   stereo_data->width = this->myParent->GetImageWidth();
   stereo_data->height = this->myParent->GetImageHeight();
@@ -203,7 +203,7 @@ void Stereo_Camera::PutCameraData(libgazebo::CameraData *camera_data, unsigned i
   unsigned char *rgb_dst = NULL;
   Pose3d cameraPose;
 
-  camera_data->head.time = Simulator::Instance()->GetSimTime().Double();
+  camera_data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   camera_data->width = this->myParent->GetImageWidth();
   camera_data->height = this->myParent->GetImageHeight();

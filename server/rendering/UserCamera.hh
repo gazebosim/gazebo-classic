@@ -28,11 +28,12 @@
 #define USERCAMERA_HH
 
 #include "XMLConfig.hh"
-#include "OgreCamera.hh"
+#include "Camera.hh"
 
 namespace Ogre
 {
   class RenderWindow;
+  class AnimationState;
 }
 
 namespace gazebo
@@ -41,10 +42,10 @@ namespace gazebo
   class XMLConfigNode;
   class OgreVisual;
 
-  class UserCamera : public OgreCamera
+  class UserCamera : public Camera
   {
     /// \brief Constructor
-    public: UserCamera( RenderControl *parentWindow, unsigned int sceneIndex);
+    public: UserCamera( RenderControl *parentWindow, Scene *scene);
 
     /// \brief Destructor
     public: virtual ~UserCamera();
@@ -63,7 +64,13 @@ namespace gazebo
 
     /// \brief Finialize
     public: void Fini();
-  
+
+    /// \brief Hande a mouse event
+    public: void HandleMouseEvent(const MouseEvent &evt);
+
+    /// \brief Set view controller
+    public: void SetViewController( const std::string type );
+
     /// \brief Resize the camera
     public: void Resize(unsigned int w, unsigned int h);
 
@@ -79,6 +86,12 @@ namespace gazebo
     /// \brief Get the ogre window
     public: Ogre::RenderWindow *GetWindow();
 
+    /// \brief Move the camera to focus on an entity
+    public: void MoveToEntity(Entity *entity);
+
+    /// \brief Set the camera to track an entity
+    public: void TrackModel( Model *model );
+ 
     /// \brief Toggle whether to show the visual
     private: void ToggleShowVisual();
 
@@ -93,6 +106,10 @@ namespace gazebo
     private: static int count;
 
     private: OgreVisual *visual;
+
+    private: ViewController *viewController;
+
+    private: Ogre::AnimationState *animState;
   };
 }
 

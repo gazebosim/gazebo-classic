@@ -54,6 +54,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
 {
   this->AddType(VISUAL);
   this->transparency = 0.0;
+  this->hasMaterial = false;
 
   bool isStatic = false;
   Ogre::SceneNode *pnode = NULL;
@@ -92,8 +93,6 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
   this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
 
   RTShaderSystem::Instance()->AttachEntity(this);
-
-  this->updateTime = Simulator::Instance()->GetRealTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -358,16 +357,11 @@ void OgreVisual::Update()
   if (!this->visible)
     return;
 
-  if (Simulator::Instance()->GetRealTime() - this->updateTime <= Time(0.2))
-    return;
-
   std::list<OgreDynamicLines*>::iterator iter;
 
   // Update the lines
   for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
     (*iter)->Update();
-
-  this->updateTime = Simulator::Instance()->GetRealTime();
 }
 
 
@@ -483,7 +477,14 @@ void OgreVisual::AttachMesh( const std::string &meshName )
   if (!this->sceneNode->getCreator()->hasEntity(meshName) &&
       MeshManager::Instance()->HasMesh(meshName))
   {
-    OgreCreator::InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
+    const Mesh *mesh = MeshManager::Instance()->GetMesh(meshName);
+
+    if ( mesh->GetMaterialCount() > 0 )
+      this->hasMaterial = true;
+    else
+      this->hasMaterial = false;
+
+    OgreCreator::InsertMesh( mesh );
   }
 
   obj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
@@ -601,6 +602,8 @@ void OgreVisual::SetMaterial(const std::string &materialName)
     gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
   }
+
+  this->hasMaterial = true;
 }
 
 
@@ -1155,7 +1158,7 @@ bool OgreVisual::GetUseRTShader() const
 // Add a line to the visual
 OgreDynamicLines *OgreVisual::AddDynamicLine(OgreDynamicRenderable::OperationType opType)
 {
-  Events::ConnectRenderStartSignal( boost::bind(&OgreVisual::Update, this) );
+  Events::ConnectPreRenderSignal( boost::bind(&OgreVisual::Update, this) );
 
   OgreDynamicLines *line = new OgreDynamicLines(opType);
   this->lines.push_back(line);
@@ -1178,5 +1181,21 @@ void OgreVisual::DeleteDynamicLine(OgreDynamicLines *line)
   }
 
   if (this->lines.size() == 0)
-    Events::DisconnectRenderStartSignal( boost::bind(&OgreVisual::Update, this) );
+    Events::DisconnectPreRenderSignal( boost::bind(&OgreVisual::Update, this) );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the name of the material
+std::string OgreVisual::GetMaterialName() const
+{
+  return this->myMaterialName;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if a material is set for this visual
+bool OgreVisual::HasMaterial() const
+{
+  return this->hasMaterial;
+}
+
+

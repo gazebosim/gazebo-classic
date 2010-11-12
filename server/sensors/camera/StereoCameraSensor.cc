@@ -40,7 +40,6 @@
 #include "OgreFrameListener.hh"
 
 #include "SensorFactory.hh"
-#include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
 
 #define PF_FLOAT Ogre::PF_FLOAT32_R
@@ -53,7 +52,7 @@ GZ_REGISTER_STATIC_SENSOR("stereocamera", StereoCameraSensor);
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 StereoCameraSensor::StereoCameraSensor(Body *body)
-    : Sensor(body), OgreCamera("Stereo",0)
+    : Sensor(body), Camera("Stereo",0)
 {
   this->depthBuffer[0] = NULL;
   this->depthBuffer[1] = NULL;
@@ -142,7 +141,7 @@ void StereoCameraSensor::InitChild()
     if (i != D_LEFT )
     {
       // Setup the viewport to use the texture
-      cviewport = this->renderTargets[i]->addViewport(this->GetOgreCamera());
+      cviewport = this->renderTargets[i]->addViewport(this->GetCamera());
       cviewport->setClearEveryFrame(true);
       cviewport->setOverlaysEnabled(false);
       cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
@@ -245,7 +244,7 @@ void StereoCameraSensor::UpdateChild()
     // OgreSceneManager::_render function automatically sets farClip to 0.
     // Which normally equates to infinite distance. We don't want this. So
     // we have to set the distance every time.
-    this->GetOgreCamera()->setFarClipDistance( this->farClipP->GetValue() );
+    this->GetCamera()->setFarClipDistance( this->farClipP->GetValue() );
 
     Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -258,7 +257,7 @@ void StereoCameraSensor::UpdateChild()
     autoParamDataSource.setCurrentViewport(vp);
     autoParamDataSource.setCurrentRenderTarget(this->renderTargets[i]);
     autoParamDataSource.setCurrentSceneManager(sceneMgr);
-    autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
+    autoParamDataSource.setCurrentCamera(this->GetCamera(), true);
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     pass->_updateAutoParamsNoLights(&autoParamDataSource);
@@ -270,8 +269,8 @@ void StereoCameraSensor::UpdateChild()
     renderSys->_setFog(Ogre::FOG_NONE);
     
     // These two lines don't seem to do anything useful
-    renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS()); 
-    renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
+    renderSys->_setProjectionMatrix(this->GetCamera()->getProjectionMatrixRS()); 
+    renderSys->_setViewMatrix(this->GetCamera()->getViewMatrix(true));
 
     // NOTE: We MUST bind parameters AFTER updating the autos
     if (pass->hasVertexProgram())
@@ -512,7 +511,7 @@ double StereoCameraSensor::GetBaseline() const
     StereoCameraSensor *cam, Ogre::RenderTarget *target, bool isLeft)
 {
   this->sensor = cam;
-  this->camera = this->sensor->GetOgreCamera();
+  this->camera = this->sensor->GetCamera();
   this->renderTargets = target;
   this->isLeftCamera = isLeft;
 }

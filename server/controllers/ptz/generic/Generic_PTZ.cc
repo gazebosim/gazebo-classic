@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <assert.h>
 
+#include "World.hh"
 #include "Model.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
@@ -204,7 +205,7 @@ void Generic_PTZ::PutPTZData()
   this->ptzIface->Lock(1);
 
   // Data timestamp
-  data->head.time = Simulator::Instance()->GetSimTime().Double();
+  data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   data->pan = this->panJoint->GetAngle(0).GetAsRadian();
   data->tilt = this->tiltJoint->GetAngle(0).GetAsRadian();

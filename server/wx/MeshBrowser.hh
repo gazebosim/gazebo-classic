@@ -8,6 +8,8 @@ namespace gazebo
 {
   class RenderControl;
   class OgreVisual;
+  class Scene;
+  class Light;
 
   class MeshBrowser : public wxFrame
   {
@@ -15,7 +17,7 @@ namespace gazebo
 
     public: virtual ~MeshBrowser();
 
-    private: void ParseDir(const std::string &path, wxTreeItemId &parentId);
+    private: int ParseDir(const std::string &path, wxTreeItemId &parentId);
     private: void OnTreeClick(wxTreeEvent &event);
 
     private: wxTreeCtrl *treeCtrl;
@@ -23,6 +25,8 @@ namespace gazebo
     private: RenderControl *renderControl;
 
     private: OgreVisual *visual;
+    private: Scene *scene;
+    private: Light *dirLight;
   };
 }
 

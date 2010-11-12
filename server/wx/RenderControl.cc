@@ -9,12 +9,14 @@
 #include <GL/glx.h>
 #endif
 
+#include "Simulator.hh"
+#include "World.hh"
+#include "Scene.hh"
 #include "Body.hh"
 #include "OgreAdaptor.hh"
 #include "Scene.hh"
 #include "OgreCreator.hh"
 #include "GazeboError.hh"
-#include "World.hh"
 #include "Events.hh"
 #include "UserCamera.hh"
 #include "OrbitViewController.hh"
@@ -133,6 +135,7 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
 {
   SetFocus();
   this->mouseEvent.pos.Set( event.GetX(), event.GetY() );
+  this->mouseEvent.camera = this->userCamera;
 
   if (event.LeftDown() || event.MiddleDown() || event.RightDown())
     this->mouseEvent.pressPos = this->mouseEvent.pos;
@@ -174,7 +177,7 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
   }
   else if (this->GetCursorState() == "manip")
   {
-    Entity *entity = World::Instance()->GetSelectedEntity();
+    Entity *entity = Simulator::Instance()->GetWorld(0)->GetSelectedEntity();
 
     if (entity)
     {
@@ -275,9 +278,9 @@ wxSize RenderControl::DoGetBestSize () const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create the camera
-void RenderControl::CreateCamera(unsigned int scene)
+void RenderControl::CreateCamera(Scene *scene)
 {
-  this->userCamera = new UserCamera( this, scene);
+  this->userCamera = new UserCamera( this, scene );
   this->userCamera->Load(NULL);
 }
 
@@ -411,10 +414,10 @@ void RenderControl::EntityRotate(Entity *entity)
   planeNorm = modelPose.rot.RotateVector(ray);
   double d = -modelPose.pos.GetDotProd(planeNorm);
 
-  p1 = this->GetWorldPointOnPlane( this->mouseEvent.pos.x, 
+  p1 = this->userCamera->GetWorldPointOnPlane( this->mouseEvent.pos.x, 
       this->mouseEvent.pos.y, planeNorm, d);
 
-  p2 = this->GetWorldPointOnPlane( this->mouseEvent.prevPos.x, 
+  p2 = this->userCamera->GetWorldPointOnPlane( this->mouseEvent.prevPos.x, 
       this->mouseEvent.prevPos.y, planeNorm, d);
 
   this->userCamera->GetScene()->DrawLine(entity->GetWorldPose().pos,p1, "guiline");
@@ -513,24 +516,6 @@ void RenderControl::EntityTranslate(Entity *entity)
     moveVector *= forceMultiplier;
     body->SetForce(moveVector);
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get point on a plane
-Vector3 RenderControl::GetWorldPointOnPlane(int x, int y, Vector3 planeNorm, double d)
-{
-  Vector3 origin, dir;
-  double dist;
-
-  // Cast two rays from the camera into the world
-  //CameraManager::Instance()->GetActiveCamera()->GetCameraToViewportRay(x, y, origin, dir);
-  this->userCamera->GetCameraToViewportRay(x, y, origin, dir);
-
-  dist = origin.GetDistToPlane(dir, planeNorm, d);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  return origin + dir * dist; 
 }
 
 void RenderControl::SetSelectedEntityCB(const std::string &name)

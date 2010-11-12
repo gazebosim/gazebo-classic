@@ -39,7 +39,6 @@ namespace gazebo
   /// \brief Base class for all joints
   /// \{
 
-  class PhysicsEngine;  
   class Body;
   class XMLConfigNode;
   class Model;
@@ -189,7 +188,6 @@ namespace gazebo
 
     protected: OgreDynamicLines *line1;
     protected: OgreDynamicLines *line2;
-    protected: PhysicsEngine *physics;
     protected: Vector3 anchorPos;
     protected: Body *anchorBody;
 

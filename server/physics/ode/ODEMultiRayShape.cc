@@ -40,7 +40,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 void ODEMultiRayShape::UpdateRays()
 {
   ODEPhysics *ode = dynamic_cast<ODEPhysics*>(
-      World::Instance()->GetPhysicsEngine());
+      this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)
     gzthrow( "Invalid physics engine. Must use ODE." );

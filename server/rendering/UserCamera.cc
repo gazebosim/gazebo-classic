@@ -27,13 +27,18 @@
 #include <Ogre.h>
 #include <sstream>
 
+#include "FPSViewController.hh"
+#include "OrbitViewController.hh"
+
+#include "GazeboError.hh"
+#include "Model.hh"
+#include "Body.hh"
 #include "Events.hh"
 #include "Scene.hh"
-#include "Simulator.hh"
 #include "RTShaderSystem.hh"
 #include "Global.hh"
 #include "RenderControl.hh"
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "OgreAdaptor.hh"
 #include "OgreCreator.hh"
 #include "OgreVisual.hh"
@@ -47,8 +52,8 @@ int UserCamera::count = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-UserCamera::UserCamera(RenderControl *parentWindow, unsigned int sceneIndex )
-  : OgreCamera("UserCamera", sceneIndex)
+UserCamera::UserCamera(RenderControl *parentWindow, Scene *scene)
+  : Camera("UserCamera", scene)
 {
   std::stringstream stream;
 
@@ -63,6 +68,12 @@ UserCamera::UserCamera(RenderControl *parentWindow, unsigned int sceneIndex )
   this->viewport = NULL;
 
   Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) );
+  Events::ConnectRenderSignal( boost::bind(&UserCamera::Render, this) );
+  Events::ConnectPostRenderSignal( boost::bind(&UserCamera::PostRender, this) );
+
+  this->animState = NULL;
+
+  this->viewController = new FPSViewController(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,13 +85,15 @@ UserCamera::~UserCamera()
     delete this->visual;
     this->visual = NULL;
   }
+
+  delete this->viewController;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load child
 void UserCamera::Load(XMLConfigNode *node)
 {
-  OgreCamera::Load(node);
+  Camera::Load(node);
 
   this->SetFOV( DTOR(60) );
   this->SetClipDist(0.01, 50);
@@ -90,9 +103,18 @@ void UserCamera::Load(XMLConfigNode *node)
 /// Initialize
 void UserCamera::Init()
 {
+  if (!this->scene)
+    printf("SCENE IS BAD!\n");
+
+  if (!this->scene->GetManager())
+    printf("NO MANAGER!\n");
+
+  if (!this->scene->GetManager()->getRootSceneNode())
+    printf("No root scene node\n");
+
   this->SetSceneNode( this->scene->GetManager()->getRootSceneNode()->createChildSceneNode( this->GetName() + "_SceneNode") );
 
-  OgreCamera::Init();
+  Camera::Init();
 
   this->visual = new OgreVisual(this->pitchNode);
   // The lines draw a visualization of the camera
@@ -149,16 +171,14 @@ void UserCamera::Init()
   this->visual->SetVisible(false);
 
   this->window->removeAllViewports();
-  this->viewport = this->window->addViewport(this->GetOgreCamera());
+  this->viewport = this->window->addViewport(this->GetCamera());
 
   this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
 
-  this->lastUpdate = Simulator::Instance()->GetRealTime();
-
   double ratio = (double)this->viewport->getActualWidth() / (double)this->viewport->getActualHeight();
   double vfov = fabs(2.0 * atan(tan(this->GetHFOV().GetAsRadian() / 2.0) / ratio));
-  this->GetOgreCamera()->setAspectRatio(ratio);
-  this->GetOgreCamera()->setFOVy(Ogre::Radian(vfov));
+  this->GetCamera()->setAspectRatio(ratio);
+  this->GetCamera()->setFOVy(Ogre::Radian(vfov));
 
   this->viewport->setClearEveryFrame(true);
   this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
@@ -171,24 +191,32 @@ void UserCamera::Init()
 /// Update
 void UserCamera::Render()
 {
-  if (Simulator::Instance()->GetRealTime() - this->lastUpdate < 
-      this->renderPeriod)
-    return;
+  this->viewController->Update();
 
+  Camera::Update();
+
+  if (this->animState)
   {
-    boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
-    OgreCamera::Update();
-    this->lastUpdate = Simulator::Instance()->GetRealTime();
-    this->newData = true;
-    this->window->update(false);
+    this->animState->addTime(0.01);
+    if (this->animState->hasEnded())
+    {
+      this->animState = NULL;
+
+      this->scene->GetManager()->destroyAnimation("cameratrack");
+      this->scene->GetManager()->destroyAnimationState("cameratrack");
+    }
   }
+
+  this->window->update(false);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Post Render
 void UserCamera::PostRender()
 {
   this->window->swapBuffers();
 
-  if (this->newData && this->saveFramesP->GetValue())
+  if (**this->saveFramesP)
   {
     char tmp[1024];
     if (!this->savePathnameP->GetValue().empty())
@@ -205,7 +233,6 @@ void UserCamera::PostRender()
 
     this->saveCount++;
   }
-  this->newData = false;
 }
 
 
@@ -213,7 +240,29 @@ void UserCamera::PostRender()
 // Finalize
 void UserCamera::Fini()
 {
-  OgreCamera::Fini();
+  Camera::Fini();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Handle a mouse event
+void UserCamera::HandleMouseEvent(const MouseEvent &evt)
+{
+  this->viewController->HandleMouseEvent(evt);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set view controller
+void UserCamera::SetViewController( const std::string type )
+{
+  delete this->viewController;
+  this->viewController = NULL;
+
+  if (type == OrbitViewController::GetTypeString())
+    this->viewController = new OrbitViewController(this);
+  else if (type == FPSViewController::GetTypeString())
+    this->viewController = new FPSViewController(this);
+  else
+    gzthrow("Invalid view controller type: " + type );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,4 +319,97 @@ void UserCamera::ToggleShowVisual()
 void UserCamera::ShowVisual(bool s)
 {
   this->visual->SetVisible(s);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Move the camera to focus on an entity
+void UserCamera::MoveToEntity(Entity *entity)
+{
+  if (!entity)
+    return;
+
+  if (this->scene->GetManager()->hasAnimation("cameratrack"))
+  {
+    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->GetManager()->destroyAnimationState("cameratrack");
+  }
+
+  Ogre::Animation *anim = this->scene->GetManager()->createAnimation("cameratrack",.5);
+  anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+  Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
+  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
+
+  Vector3 start = this->GetWorldPose().pos;
+  start.Correct();
+  Vector3 end = entity->GetWorldPose().pos;
+  end.Correct();
+  Vector3 dir = end - start;
+  dir.Correct();
+
+  double yawAngle = atan2(dir.y,dir.x);
+  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
+  Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0,0,1));
+  Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0,1,0));
+
+  Ogre::TransformKeyFrame *key;
+
+  key = strack->createNodeKeyFrame(0);
+  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setRotation(this->sceneNode->getOrientation());
+
+  key = ptrack->createNodeKeyFrame(0);
+  key->setRotation(this->pitchNode->getOrientation());
+
+  Vector3 min, max, size;
+  OgreVisual *vis = entity->GetVisualNode();
+  OgreCreator::GetVisualBounds(vis, min,max);
+  size = max-min;
+
+  double scale = std::max(std::max(size.x, size.y), size.z);
+  scale += 0.5;
+
+  dir.Normalize();
+  double dist = start.Distance(end);
+
+  Vector3 mid = start + dir*(dist*.5 - scale);
+  key = strack->createNodeKeyFrame(.2);
+  key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
+  key->setRotation(yawFinal);
+
+  key = ptrack->createNodeKeyFrame(.2);
+  key->setRotation(pitchFinal);
+
+  end = start + dir*(dist - scale);
+  key = strack->createNodeKeyFrame(.5);
+  key->setTranslate( Ogre::Vector3(end.x, end.y, end.z));
+  key->setRotation(yawFinal);
+
+  key = ptrack->createNodeKeyFrame(.5);
+  key->setRotation(pitchFinal);
+
+  this->animState = this->scene->GetManager()->createAnimationState("cameratrack");
+  this->animState->setEnabled(true);
+  this->animState->setLoop(false);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the camera to track an entity
+void UserCamera::TrackModel( Model *model )
+{
+  this->sceneNode->getParent()->removeChild(this->sceneNode);
+
+  if (model)
+  {
+    Body *b = model->GetCanonicalBody();
+    b->GetVisualNode()->GetSceneNode()->addChild(this->sceneNode);
+    this->camera->setAutoTracking(true, b->GetVisualNode()->GetSceneNode() );
+  }
+  else
+  {
+    this->origParentNode->addChild(this->sceneNode);
+    this->camera->setAutoTracking(false, NULL);
+    this->camera->setPosition(Ogre::Vector3(0,0,0));
+    this->camera->setOrientation(Ogre::Quaternion(-.5,-.5,.5,.5));
+  }
 }

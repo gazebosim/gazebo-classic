@@ -8,13 +8,11 @@ include_directories (
 set (sources OgreMovableText.cc
              OgreCreator.cc
              OgreAdaptor.cc
-             OgreFrameListener.cc
              OgreDynamicRenderable.cc
              OgreDynamicLines.cc
              OgreHUD.cc
              OgreVisual.cc
-             OgreCamera.cc
-             CameraManager.cc
+             Camera.cc
              UserCamera.cc
              Image.cc
              OgreHeightmap.cc
@@ -34,13 +32,11 @@ set (sources OgreMovableText.cc
 set (headers OgreMovableText.hh
              OgreCreator.hh
              OgreAdaptor.hh
-             OgreFrameListener.hh
              OgreDynamicRenderable.hh
              OgreDynamicLines.hh
              OgreHUD.hh
              OgreVisual.hh
-             OgreCamera.hh
-             CameraManager.hh
+             Camera.hh
              UserCamera.hh
              Image.hh
              OgreHeightmap.hh
@@ -66,6 +62,6 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11 profiler)
+target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11 ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 APPEND_TO_SERVER_HEADERS(${headers})

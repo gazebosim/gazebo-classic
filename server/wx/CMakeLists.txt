@@ -15,6 +15,7 @@ set (sources SimulationApp.cc
              SpotLightMaker.cc
              DirectionalLightMaker.cc
              MeshBrowser.cc
+             ModelBuilder.cc
              GridPage.cc
              ParamsNotebook.cc
              FogPage.cc
@@ -45,6 +46,7 @@ set (headers SimulationApp.hh
              SpotLightMaker.hh
              DirectionalLightMaker.hh
              MeshBrowser.hh
+             ModelBuilder.hh
              GridPage.hh
              ParamsNotebook.hh
              FogPage.hh
@@ -59,7 +61,7 @@ set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS
 
 add_library(gazebo_wx SHARED ${sources})
 
-target_link_libraries(gazebo_wx ${wxWidgets_LIBRARIES} Xpm profiler)
+target_link_libraries(gazebo_wx ${wxWidgets_LIBRARIES} Xpm ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 

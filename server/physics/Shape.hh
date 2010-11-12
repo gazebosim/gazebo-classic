@@ -10,7 +10,6 @@
 namespace gazebo
 {
   class Geom;
-  class PhysicsEngine;
 
   /// \brief Base class for all shapes
   class Shape : public Common
@@ -28,7 +27,6 @@ namespace gazebo
     public: virtual void Save(std::string &prefix, std::ostream &stream) = 0;
 
     protected: Geom *geomParent;
-    protected: PhysicsEngine *physicsEngine;
   };
 }
 

@@ -152,7 +152,8 @@ void ODEGeom::SetGeom(dGeomID geomId, bool placeable)
 
   Geom::SetGeom(placeable);
 
-  this->physicsEngine->LockMutex();
+  // NATY
+  //this->GetWorld()->GetPhysicsEngine()->LockMutex();
 
   if ( dGeomGetSpace(this->geomId) == 0 )
   {
@@ -162,7 +163,8 @@ void ODEGeom::SetGeom(dGeomID geomId, bool placeable)
 
   dGeomSetData(this->geomId, this);
 
-  this->physicsEngine->UnlockMutex();
+  // NATY
+  //this->GetWorld()->GetPhysicsEngine()->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,9 +182,12 @@ int ODEGeom::GetGeomClass() const
 
   if (this->geomId)
   {
-    this->physicsEngine->LockMutex();
+    // NATY
+    //this->physicsEngine->LockMutex();
     result = dGeomGetClass( this->geomId );
-    this->physicsEngine->UnlockMutex();
+
+    // NATY
+    //this->physicsEngine->UnlockMutex();
   }
 
   return result;
@@ -193,28 +198,32 @@ int ODEGeom::GetGeomClass() const
 /// Set the category bits, used during collision detection
 void ODEGeom::SetCategoryBits(unsigned int bits)
 {
-  this->physicsEngine->LockMutex();
+  // NATY
+  //this->physicsEngine->LockMutex();
 
   if (this->geomId)
     dGeomSetCategoryBits(this->geomId, bits);
   if (this->spaceId)
     dGeomSetCategoryBits((dGeomID)this->spaceId, bits);
 
-  this->physicsEngine->UnlockMutex();
+  // NATY
+  //this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the collide bits, used during collision detection
 void ODEGeom::SetCollideBits(unsigned int bits)
 {
-  this->physicsEngine->LockMutex();
+  // NATY
+  //this->physicsEngine->LockMutex();
 
   if (this->geomId)
     dGeomSetCollideBits(this->geomId, bits);
   if (this->spaceId)
     dGeomSetCollideBits((dGeomID)this->spaceId, bits);
 
-  this->physicsEngine->UnlockMutex();
+  // NATY
+  //this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +244,8 @@ Mass ODEGeom::GetBodyMassMatrix()
   principals = this->mass.GetPrincipalMoments();
   products = this->mass.GetProductsofInertia();
 
-  this->physicsEngine->LockMutex();
+  // NATY
+  //this->physicsEngine->LockMutex();
   pose = this->GetWorldPose(); // get pose of the geometry
 
   q[0] = pose.rot.u;
@@ -257,9 +267,10 @@ Mass ODEGeom::GetBodyMassMatrix()
     dMassTranslate( &bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
   }
 
-  this->physicsEngine->ConvertMass(&result, &bodyMass);
+  this->GetWorld()->GetPhysicsEngine()->ConvertMass(&result, &bodyMass);
 
-  this->physicsEngine->UnlockMutex();
+  // NATY
+  //this->physicsEngine->UnlockMutex();
 
   return result;
 }

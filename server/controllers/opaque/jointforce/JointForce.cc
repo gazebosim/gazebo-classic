@@ -86,7 +86,7 @@ void JointForce::InitChild()
 void JointForce::UpdateChild()
 {
   this->myIface->Lock(1);
-  this->myIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
+  this->myIface->data->head.time = this->myParent->GetWorld()->GetSimTime().Double();
 
   // Let me explain this number: each joint reports 4 vectors: Force and torque
   // on each jointed object, respectively. These vectors have 3 elements: x,y,z.

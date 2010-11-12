@@ -31,7 +31,7 @@
 #include <OgreTexture.h>
 #include <OgreMaterial.h>
 
-#include "OgreCamera.hh"
+#include "Camera.hh"
 #include "Sensor.hh"
 
 // Forward Declarations
@@ -56,7 +56,7 @@ namespace gazebo
   /// \brief Stereo camera sensor
   ///
   /// This sensor is used for simulating a stereo camera.
-  class StereoCameraSensor : public Sensor, public OgreCamera
+  class StereoCameraSensor : public Sensor, public Camera
   {
     enum Sides {LEFT, RIGHT, D_LEFT, D_RIGHT};
   

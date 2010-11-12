@@ -96,7 +96,7 @@ Entity::~Entity()
 
   std::vector<Common*>::iterator iter;
 
-  World::Instance()->GetPhysicsEngine()->RemoveEntity(this);
+  this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
   /*for (iter = this->children.begin(); iter != this->children.end(); iter++)
   {
@@ -104,7 +104,7 @@ Entity::~Entity()
     {
       Entity *child = (Entity*)(*iter);
       child->SetParent(NULL);
-      World::Instance()->GetPhysicsEngine()->RemoveEntity(child);
+      this->GetWorld()->GetPhysicsEngine()->RemoveEntity(child);
 
       if (child->HasType(MODEL))
       {
@@ -301,10 +301,12 @@ void Entity::PoseChange(bool notify)
 {
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    if (Simulator::Instance()->GetState() == Simulator::RUN &&
+    // NATY:: Not sure the reason for GetState
+    /*if (Simulator::Instance()->GetState() == Simulator::RUN &&
         !this->IsStatic())
       this->visualNode->SetDirty(true, this->GetRelativePose());
     else
+    */
       this->visualNode->SetPose(this->GetRelativePose());
   }
 

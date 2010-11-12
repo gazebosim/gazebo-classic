@@ -50,7 +50,7 @@ namespace gazebo
   class Light : public Entity
   {
     /// \brief Constructor
-    public: Light(Entity *parent, unsigned int sceneIndex);
+    public: Light(Entity *parent, Scene *scene);
 
     /// \brief Destructor
     public: virtual ~Light();

@@ -51,8 +51,6 @@ Geom::Geom( Body *body )
 {
   this->AddType(GEOM);
 
-  this->physicsEngine = World::Instance()->GetPhysicsEngine();
-
   this->typeName = "unknown";
 
   this->body = body;
@@ -264,7 +262,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
 // Set the encapsulated geometry object
 void Geom::SetGeom(bool placeable)
 {
-  this->physicsEngine->LockMutex();
+  this->GetWorld()->GetPhysicsEngine()->LockMutex();
 
   this->placeable = placeable;
 
@@ -280,7 +278,7 @@ void Geom::SetGeom(bool placeable)
     this->SetCollideBits(GZ_ALL_COLLIDE);
   }
 
-  this->physicsEngine->UnlockMutex();
+  this->GetWorld()->GetPhysicsEngine()->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

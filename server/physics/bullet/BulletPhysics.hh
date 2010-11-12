@@ -86,7 +86,7 @@ The \c param:physics tag is used to specify certain parameters for the Bullet ph
 class BulletPhysics : public PhysicsEngine
 {
   /// \brief Constructor
-  public: BulletPhysics();
+  public: BulletPhysics(World *world);
 
   /// \brief Destructor
   public: virtual ~BulletPhysics();

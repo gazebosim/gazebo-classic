@@ -33,16 +33,14 @@
 #include <map>
 #include <string>
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/signal.hpp>
+#include <boost/thread.hpp>
 
 #include "Global.hh"
 
-#include "SingletonT.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
 #include "Entity.hh"
-#include "Timer.hh"
+//#include "Timer.hh"
 
 namespace libgazebo
 {
@@ -62,10 +60,9 @@ namespace gazebo
   class PhysicsEngine;
   class XMLConfigNode;
   class OpenAL;
-  class Factory;
   class WorldState;
-  class Timer;
   class Time;
+  class FactoryIfaceHandler;
   class GraphicsIfaceHandler;
   class SimulationIfaceHandler;
    
@@ -74,7 +71,7 @@ namespace gazebo
  * The world class keps a list of all models, handles loading and saving,
  * object dynamics and collision detection for contact joints
  */
-class World : public SingletonT<World>
+class World 
 {
   /// Private constructor
   private: World();
@@ -82,23 +79,28 @@ class World : public SingletonT<World>
   /// Private destructor
   private: ~World();
 
-  ///Closes the present world, frees the resources and closes the interfaces   
-  public: void Close();
-
   /// Load the world
   /// \param node XMLConfig node point
-  /// \param serverId Id of the gazebo server
-  public: void Load(XMLConfigNode *rootNode, unsigned int serverId);
+  public: void Load(XMLConfigNode *rootNode);//, unsigned int serverId);
 
   /// Save the world
   /// \param stream Output stream
   public: void Save(std::string &prefix, std::ostream &stream);
 
-  /// Initialize the world
+  /// \brief Initialize the world
   public: void Init();
 
-  /// Update the world
-  public: void Update();
+  /// \briefRun the world in a thread
+  public: void Start();
+
+  /// \brief Stop the world
+  public: void Stop();
+
+  /// \brief Function to run physics. Used by physicsThread
+  private: void RunLoop();
+
+  /// \brief Update the world
+  private: void Update();
 
   /// \brief Primarily used to update the graphics interfaces
   public: void GraphicsUpdate();
@@ -108,6 +110,9 @@ class World : public SingletonT<World>
 
   /// \brief Remove all entities from the world
   public: void Clear();
+
+  /// \brief Get the name of the world
+  public: std::string GetName() const;
 
   /// \brief Get the number of parameters
   public: unsigned int GetParamCount() const;
@@ -122,26 +127,6 @@ class World : public SingletonT<World>
   /// Return the physics engine
   /// \return Pointer to the physics engine
   public: PhysicsEngine *GetPhysicsEngine() const;
-
-  /// Get the simulation time
-  /// \return The simulation time
-  public: double GetSimTime() const;
-
-  /// Get the pause time
-  /// \return The pause time
-  public: double GetPauseTime() const;
-
-  /// Get the start time
-  /// \return The start time
-  public: double GetStartTime() const;
-
-  /// Get the real time (elapsed time)
-  /// \return The real time
-  public: double GetRealTime() const;
-
-  /// \brief Get the wall clock time
-  /// \return The wall clock time
-  public: double GetWallTime() const;
 
   /// \brief Load all entities
   /// \param node XMLConfg node pointer
@@ -178,7 +163,7 @@ class World : public SingletonT<World>
   public: void RegisterBody(Body *body);
 
   /// \brief Goto a position in time
-  public: void GotoTime(double pos);
+  //public: void GotoTime(double pos);
 
   /// \brief Get the selected entity
   public: Entity *GetSelectedEntity() const;
@@ -186,8 +171,30 @@ class World : public SingletonT<World>
   /// \brief Print entity tree
   public: void PrintEntityTree();
 
-  /// \brief Get the server id
-  public: int GetServerId() const;
+  /// Get the simulation time
+  /// \return The simulation time
+  public: Time GetSimTime() const;
+
+  /// \brief Set the sim time
+  public: void SetSimTime(Time t);
+
+  /// Get the pause time
+  /// \return The pause time
+  public: Time GetPauseTime() const;
+
+  /// Get the start time
+  /// \return The start time
+  public: Time GetStartTime() const;
+
+  /// Get the real time (elapsed time)
+  /// \return The real time
+  public: Time GetRealTime() const;
+
+  /// \brief Returns the state of the simulation true if paused
+  public: bool IsPaused() const;
+
+  /// \brief Set whether the simulation is paused
+  public: void SetPaused(bool p);
 
   /// \brief Save the state of the world
   private: void SaveState();
@@ -198,16 +205,12 @@ class World : public SingletonT<World>
   /// \brief Pause callback
   private: void PauseSlot(bool p);
 
-
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
   /// \param parent The parent model
   /// \param removeDuplicate Remove existing model of same name
   /// \return The model that was created
   private: Model *LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate,bool initModel);
-
-  /// \brief Update the simulation iface
-  public: void UpdateSimulationIface();
 
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete
@@ -230,8 +233,13 @@ class World : public SingletonT<World>
   /// Simulator control interface
   private: libgazebo::Server *server;
 
-  private: Factory *factory;
+  /// thread in which the world is updated
+  private: boost::thread *thread;
 
+  private: bool stop;
+
+  /// Interface handlers
+  private: FactoryIfaceHandler *factoryIfaceHandler;
   private: GraphicsIfaceHandler *graphics;
   private: SimulationIfaceHandler *simIfaceHandler;
 
@@ -239,11 +247,6 @@ class World : public SingletonT<World>
 
   /// List of all the parameters
   protected: std::vector<Param*> parameters;
-
-  private: ParamT<int>* threadsP;
-
-  private: friend class DestroyerT<World>;
-  private: friend class SingletonT<World>;
 
   /// The entity currently selected by the user
   private: Entity *selectedEntity;
@@ -253,9 +256,15 @@ class World : public SingletonT<World>
   private: std::deque<WorldState>::iterator worldStatesEndIter;
   private: std::deque<WorldState>::iterator worldStatesCurrentIter;
 
-  private: Timer saveStateTimer;
+  //private: Timer saveStateTimer;
+  
+  private: ParamT<std::string> *nameP;
   private: ParamT<Time> *saveStateTimeoutP;
   private: ParamT<unsigned int> *saveStateBufferSizeP;
+
+  /// Current simulation time
+  private: Time simTime, pauseTime, startTime;
+  private: bool pause;
 };
 
 class WorldState

@@ -300,7 +300,8 @@ void OgreCreator::Update()
   // separate thread.
   if (!this->visuals.empty())
   {
-    boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+    // NATY: removed
+    //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
     // Update the visuals
     for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
     {

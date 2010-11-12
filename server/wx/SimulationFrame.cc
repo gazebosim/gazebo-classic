@@ -4,13 +4,14 @@
 #include "propgrid/propgrid.h"
 
 #include "ParamsNotebook.hh"
+#include "ModelBuilder.hh"
 
+#include "OgreAdaptor.hh"
 #include "MeshBrowser.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "XMLConfig.hh"
-#include "OgreCamera.hh"
-#include "CameraManager.hh"
+#include "UserCamera.hh"
 #include "World.hh"
 #include "Entity.hh"
 #include "EntityMaker.hh"
@@ -68,6 +69,9 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
   wxMenuItem *editGridItem = editMenu->Append( ID_EDITGRID, wxT("Edit Grid"));
   Connect(editGridItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnEditGrid), NULL, this);
 
+  wxMenuItem *createModelItem = editMenu->Append( ID_EDITGRID, wxT("Create Model"));
+  Connect(createModelItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnCreateModel), NULL, this);
+
 
   wxMenuItem *wireItem = viewMenu->AppendCheckItem(ID_WIREFRAME, wxT("Wireframe"));
   Connect(wireItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnWireframe), NULL, this);
@@ -122,7 +126,7 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
   Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(SimulationFrame::OnPaneClosed), NULL, this);
 
 
-  Simulator::Instance()->ConnectPauseSignal( 
+  Events::ConnectPauseSignal( 
       boost::bind(&SimulationFrame::OnPause, this, _1) );
 
   Events::ConnectAddEntitySignal( 
@@ -151,14 +155,14 @@ SimulationFrame::~SimulationFrame()
 // Create the cameras
 void SimulationFrame::CreateCameras()
 {
-  this->renderPanel->CreateCamera(0);
+  this->renderPanel->CreateCamera(OgreAdaptor::Instance()->GetScene(0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::Init()
 {
   this->renderPanel->Init();
-  this->OnPause(Simulator::Instance()->IsPaused());
+  this->OnPause(Simulator::Instance()->GetWorld(0)->IsPaused());
 
   EntityTreeItemData *data;
 
@@ -298,14 +302,10 @@ void SimulationFrame::OnOpen(wxCommandEvent & WXUNUSED(event))
       gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
     }
 
-    //XMLConfigNode *rootNode(xmlFile->GetRootNode());
     //Create the world
     try
     {
-      Simulator::Instance()->StopPhysics();
-      //World::Instance()->Clear();
-      Simulator::Instance()->Load( doc, World::Instance()->GetServerId() );
-      Simulator::Instance()->StartPhysics();
+      Simulator::Instance()->Load(doc);
     }
     catch (GazeboError e)
     {
@@ -323,8 +323,6 @@ void SimulationFrame::OnLoadMesh(wxCommandEvent & WXUNUSED(event))
 {
   MeshBrowser *browser = new MeshBrowser(this);
   browser->Show();
-
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -347,9 +345,10 @@ void SimulationFrame::OnSave(wxCommandEvent & WXUNUSED(event))
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnReset(wxCommandEvent & WXUNUSED(event))
 {
+  // NATY
   // stop simulation when this is happening
-  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
-  World::Instance()->Reset();
+  //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+  Simulator::Instance()->GetWorld(0)->Reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -366,6 +365,13 @@ void SimulationFrame::OnEditGrid(wxCommandEvent &event)
     printf("Good\n");
   else
     printf("Bad\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void SimulationFrame::OnCreateModel(wxCommandEvent &event)
+{
+  ModelBuilder builder(this);
+  builder.ShowModal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -427,19 +433,20 @@ void SimulationFrame::OnToolClicked( wxCommandEvent &event )
   {
     this->toolbar->ToggleTool(PAUSE, false);
     this->toolbar->ToggleTool(STEP, false);
-    Simulator::Instance()->SetPaused(false);
+    Simulator::Instance()->GetWorld(0)->SetPaused(false);
   }
   else if (id == PAUSE)
   {
     this->toolbar->ToggleTool(PLAY, false);
     this->toolbar->ToggleTool(STEP, false);
-    Simulator::Instance()->SetPaused(true);
+    Simulator::Instance()->GetWorld(0)->SetPaused(true);
   }
   else if (id == STEP)
   {
     this->toolbar->ToggleTool(PLAY, false);
     this->toolbar->ToggleTool(STEP, false);
-    Simulator::Instance()->SetStepInc( true );
+    // NATY : put back in 
+    //Simulator::Instance()->GetWorld(0)->SetStepInc( true );
   }
   else if (id == BOX)
   {
@@ -501,7 +508,7 @@ void SimulationFrame::OnTreeClick(wxTreeEvent &event)
     Common *common = NULL;
 
     if (data->name == "World")
-      paramCount = World::Instance()->GetParamCount();
+      paramCount = Simulator::Instance()->GetWorld(0)->GetParamCount();
     else 
     {
       common = Common::GetByName( data->name );
@@ -513,7 +520,7 @@ void SimulationFrame::OnTreeClick(wxTreeEvent &event)
       Param *param = NULL;
 
       if (data->name == "World")
-        param = World::Instance()->GetParam(i);
+        param = Simulator::Instance()->GetWorld(0)->GetParam(i);
       else
         param = common->GetParam(i);
 
@@ -580,7 +587,7 @@ void SimulationFrame::OnTreePopupClick( wxCommandEvent &event )
 
     if (event.GetId() == 0)
     {
-      OgreCamera *cam = CameraManager::Instance()->GetActiveCamera();
+      UserCamera *cam = this->renderPanel->GetCamera();
       if (cam)
         cam->MoveToEntity(ent);
 
