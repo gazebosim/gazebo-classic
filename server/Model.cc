@@ -297,8 +297,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
   std::string typeName;
-  //std::map<std::string, Body* >::iterator bodyIter;
-  std::vector<Entity* >::iterator bodyIter;
+  std::vector<Entity* >::iterator entityIter;
   std::map<std::string, Controller* >::iterator contIter;
   JointContainer::iterator jointIter;
 
@@ -322,13 +321,12 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   {
     stream << prefix << "  " << *(this->staticP) << "\n";
 
-    for (bodyIter=this->children.begin(); bodyIter!=this->children.end(); bodyIter++)
+    for (entityIter=this->children.begin(); entityIter!=this->children.end(); entityIter++)
     {
       stream << "\n";
-      Entity *entity = *bodyIter;
-      if (entity && entity->GetType() == Entity::BODY)
+      if ((*entityIter) && (*entityIter)->GetType() == Entity::BODY)
       {
-        Body *body = (Body*)(entity);
+        Body *body = (Body*)(*entityIter);
         body->Save(p, stream);
       }
     }
@@ -420,7 +418,7 @@ void Model::Update()
 
   //DiagnosticTimer timer("Model[" + this->GetName() + "] Update ");
 
-  std::vector<Entity*>::iterator bodyIter;
+  std::vector<Entity*>::iterator entityIter;
   std::map<std::string, Controller* >::iterator contIter;
   JointContainer::iterator jointIter;
 
@@ -429,18 +427,30 @@ void Model::Update()
   {
     //DiagnosticTimer timer("Model[" + this->GetName() + "] Bodies Update ");
 
-    for (bodyIter=this->children.begin(); 
-         bodyIter!=this->children.end(); bodyIter++)
+    for (entityIter=this->children.begin(); 
+         entityIter!=this->children.end(); entityIter++)
     {
-      if (*bodyIter && (*bodyIter)->GetType() == Entity::BODY)
+      if (*entityIter)
       {
-        Body *body = (Body*)(*bodyIter);
+        if ((*entityIter)->GetType() == Entity::BODY)
+        {
+          Body *body = (Body*)(*entityIter);
 #ifdef USE_THREADPOOL
-        World::Instance()->threadPool->schedule(
-            boost::bind(&Body::Update,body));
+          World::Instance()->threadPool->schedule(boost::bind(&Body::Update,body));
 #else
-        body->Update();
+          body->Update();
 #endif
+        }
+        else if ((*entityIter)->GetType() == Entity::MODEL)
+        {
+          // for nested Models
+          Model *model = (Model*)(*entityIter);
+#ifdef USE_THREADPOOL
+          World::Instance()->threadPool->schedule(boost::bind(&Model::Update,model));
+#else
+          model->Update();
+#endif
+        }
       }
     }
   }
