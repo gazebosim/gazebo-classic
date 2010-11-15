@@ -1,5 +1,4 @@
 #include <iostream>
-#include <FL/Fl.H>
 
 #include "Camera.hh"
 #include "Events.hh"
@@ -141,7 +140,7 @@ void SphereMaker::CreateTheEntity()
 
   newModelStr <<  "</gazebo:world>";
 
-  Simulator::Instance()->GetWorld(0)->InsertEntity(newModelStr.str());
+  Simulator::Instance()->GetActiveWorld()->InsertEntity(newModelStr.str());
 
   OgreCreator::Instance()->DeleteVisual(this->visualName);
 }

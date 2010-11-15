@@ -44,6 +44,7 @@ using namespace gazebo;
 Controller::Controller(Entity *entity )
 {
   Param::Begin(&this->parameters);
+  this->typeP = new ParamT<std::string>("type","",1);
   this->nameP = new ParamT<std::string>("name","",1);
   this->alwaysOnP = new ParamT<bool>("alwaysOn", false, 0);
   this->updatePeriodP = new ParamT<double>("updateRate", 10, 0);
@@ -61,6 +62,7 @@ Controller::Controller(Entity *entity )
 /// Destructor
 Controller::~Controller()
 {
+  delete this->typeP;
   delete this->nameP;
   delete this->alwaysOnP;
   delete this->updatePeriodP;
@@ -75,22 +77,16 @@ void Controller::Load(XMLConfigNode *node)
   if (!this->parent)
     gzthrow("Parent entity has not been set");
 
-  this->typeName = node->GetName();
-
+  this->typeP->Load(node);
   this->nameP->Load(node);
 
   this->alwaysOnP->Load(node);
 
   this->updatePeriodP->Load(node);
 
-  double updateRate  = this->updatePeriodP->GetValue();
-  if (updateRate == 0)
-    this->updatePeriod = 0.0; // no throttling if updateRate is 0
-  else
-    this->updatePeriod = 1.0 / updateRate;
   this->lastUpdate = this->parent->GetWorld()->GetSimTime();
 
-  childNode = node->GetChildByNSPrefix("interface");
+  childNode = node->GetChild("interface");
   
   // Create the interfaces
   while (childNode)
@@ -98,7 +94,7 @@ void Controller::Load(XMLConfigNode *node)
     libgazebo::Iface *iface=0;
 
     // Get the type of the interface (eg: laser)
-    std::string ifaceType = childNode->GetName();
+    std::string ifaceType = childNode->GetString("type","",1);
 
     // Get the name of the iface
     std::string ifaceName = childNode->GetString("name","",1);
@@ -121,7 +117,7 @@ void Controller::Load(XMLConfigNode *node)
     catch (...) //TODO: Show the exception text here (subclass exception?)
     {
       gzmsg(1) << "No libgazebo Iface for the interface[" << ifaceType << "] found. Disabled.\n";
-      childNode = childNode->GetNextByNSPrefix("interface");
+      childNode = childNode->GetNext("interface");
       continue;
     }
     
@@ -137,7 +133,7 @@ void Controller::Load(XMLConfigNode *node)
     
     this->ifaces.push_back(iface);
 
-    childNode = childNode->GetNextByNSPrefix("interface");
+    childNode = childNode->GetNext("interface");
   }
 
   this->LoadChild(node);
@@ -157,21 +153,21 @@ void Controller::Save(std::string &prefix, std::ostream &stream)
 {
   std::vector<libgazebo::Iface*>::iterator iter;
 
-  stream << prefix << "<controller:" << this->typeName << " name=\"" << this->nameP->GetValue() << "\">\n";
+  stream << prefix << "<controller type=\"" << **this->typeP << "\" name=\"" << **this->nameP << "\">\n";
 
   stream << prefix << "  " << *(this->updatePeriodP) << "\n";
 
   // Ouptut the interfaces
   for (iter = this->ifaces.begin(); iter != this->ifaces.end(); iter++)
   {
-    stream << prefix << "  <interface:" << (*iter)->GetType() << " name=\"" << (*iter)->GetId() << "\"/>\n";
+    stream << prefix << "  <interface type=\"" << (*iter)->GetType() << "\" name=\"" << (*iter)->GetId() << "\"/>\n";
   }
 
   std::string p = prefix + "  ";
 
   this->SaveChild(p, stream);
 
-  stream << prefix << "</controller:" << this->typeName << ">\n";
+  stream << prefix << "</controller>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +191,7 @@ void Controller::Update()
     //timer.Start();
 
     Time simTime = this->parent->GetWorld()->GetSimTime();
-    if ((simTime-lastUpdate-updatePeriod)/physics_dt >= 0)
+    if ((simTime-lastUpdate - **this->updatePeriodP)/physics_dt >= 0)
     {
       this->UpdateChild();
       lastUpdate = this->parent->GetWorld()->GetSimTime();

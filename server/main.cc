@@ -255,7 +255,8 @@ int main(int argc, char **argv)
   try
   {
     gazebo::Simulator::Instance()->Load(worldFileName);
-    gazebo::Simulator::Instance()->SetTimeout(optTimeout);
+    // NATY: Put back in
+    //gazebo::Simulator::Instance()->SetTimeout(optTimeout);
     gazebo::Simulator::Instance()->SetPhysicsEnabled(optPhysicsEnabled);
 
     gazebo::Simulator::Instance()->CreateWorld(worldFileName);
@@ -271,7 +272,8 @@ int main(int argc, char **argv)
   // Initialize the simulator
   try
   {
-    gazebo::Simulator::Instance()->SetPaused(optPaused);
+    // NATY: put back in
+    //gazebo::Simulator::Instance()->SetPaused(optPaused);
     gazebo::Simulator::Instance()->Init();
   }
   catch (gazebo::GazeboError e)

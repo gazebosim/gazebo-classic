@@ -17,9 +17,6 @@ namespace gazebo
 
     public: bool OnInit();
 
-    /// \brief Update the gui
-    public: void Update();
-
     /// \brief Run the gui
     public: void Run();
 

@@ -28,7 +28,7 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 
-target_link_libraries( gazeboshm ${boost_libraries} profiler)
+target_link_libraries( gazeboshm ${boost_libraries})
 
 install (TARGETS gazeboshm DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo)

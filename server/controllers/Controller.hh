@@ -111,7 +111,10 @@ class Controller
   /// \param number If several ifaces of the same type present, which one
   /// \return Iface, or exception if not found. 
   protected: libgazebo::Iface* GetIface(std::string type, bool mandatory=true, int number=0);
-  
+ 
+  /// The type of the controller
+  protected: ParamT<std::string> *typeP;
+
   /// \brief The controller's name
   protected: ParamT<std::string> *nameP;
 
@@ -122,10 +125,7 @@ class Controller
   protected: ParamT<bool> *alwaysOnP;
 
   /// \brief Update period 
-  protected: double updatePeriod;
   protected: ParamT<double> *updatePeriodP;
-
-  private: std::string typeName;
 
   /// \brief Last update time
   protected: Time lastUpdate;

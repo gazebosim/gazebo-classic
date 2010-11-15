@@ -121,7 +121,6 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
 
   if (this->toolbar)
     this->auiManager->AddPane(this->toolbar, wxAuiPaneInfo().ToolbarPane().RightDockable(false).LeftDockable(false).MinSize(100,30).Top().Name(wxT("Tools")).Caption(wxT("Tools")));
-  this->auiManager->Update();
 
   Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(SimulationFrame::OnPaneClosed), NULL, this);
 
@@ -162,7 +161,8 @@ void SimulationFrame::CreateCameras()
 void SimulationFrame::Init()
 {
   this->renderPanel->Init();
-  this->OnPause(Simulator::Instance()->GetWorld(0)->IsPaused());
+  // NATY: put back in
+  //this->OnPause(Simulator::Instance()->GetActiveWorld()->IsPaused());
 
   EntityTreeItemData *data;
 
@@ -267,6 +267,7 @@ void SimulationFrame::OnPause(bool pause)
 // Update the frame
 void SimulationFrame::Update()
 {
+  this->auiManager->Update();
   this->timePanel->Update();
   this->renderPanel->Update();
 }
@@ -348,7 +349,7 @@ void SimulationFrame::OnReset(wxCommandEvent & WXUNUSED(event))
   // NATY
   // stop simulation when this is happening
   //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
-  Simulator::Instance()->GetWorld(0)->Reset();
+  Simulator::Instance()->GetActiveWorld()->Reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -433,20 +434,20 @@ void SimulationFrame::OnToolClicked( wxCommandEvent &event )
   {
     this->toolbar->ToggleTool(PAUSE, false);
     this->toolbar->ToggleTool(STEP, false);
-    Simulator::Instance()->GetWorld(0)->SetPaused(false);
+    Simulator::Instance()->GetActiveWorld()->SetPaused(false);
   }
   else if (id == PAUSE)
   {
     this->toolbar->ToggleTool(PLAY, false);
     this->toolbar->ToggleTool(STEP, false);
-    Simulator::Instance()->GetWorld(0)->SetPaused(true);
+    Simulator::Instance()->GetActiveWorld()->SetPaused(true);
   }
   else if (id == STEP)
   {
     this->toolbar->ToggleTool(PLAY, false);
     this->toolbar->ToggleTool(STEP, false);
     // NATY : put back in 
-    //Simulator::Instance()->GetWorld(0)->SetStepInc( true );
+    //Simulator::Instance()->GetActiveWorld()->SetStepInc( true );
   }
   else if (id == BOX)
   {
@@ -508,7 +509,7 @@ void SimulationFrame::OnTreeClick(wxTreeEvent &event)
     Common *common = NULL;
 
     if (data->name == "World")
-      paramCount = Simulator::Instance()->GetWorld(0)->GetParamCount();
+      paramCount = Simulator::Instance()->GetActiveWorld()->GetParamCount();
     else 
     {
       common = Common::GetByName( data->name );
@@ -520,7 +521,7 @@ void SimulationFrame::OnTreeClick(wxTreeEvent &event)
       Param *param = NULL;
 
       if (data->name == "World")
-        param = Simulator::Instance()->GetWorld(0)->GetParam(i);
+        param = Simulator::Instance()->GetActiveWorld()->GetParam(i);
       else
         param = common->GetParam(i);
 

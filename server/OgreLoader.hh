@@ -33,6 +33,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <stdint.h>
 
 #include "MeshLoader.hh"
 #include "GazeboError.hh"

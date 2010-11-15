@@ -3,7 +3,7 @@
 using namespace gazebo;
 
 boost::signal<void (bool)> Events::pauseSignal;
-boost::signal<void (bool)> Events::stepSignal;
+boost::signal<void ()> Events::stepSignal;
 boost::signal<void (bool)> Events::moveModeSignal;
 boost::signal<void (bool)> Events::manipModeSignal;
 

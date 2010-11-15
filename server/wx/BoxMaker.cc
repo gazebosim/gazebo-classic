@@ -1,5 +1,4 @@
 #include <iostream>
-#include <FL/Fl.H>
 
 #include "Events.hh"
 #include "MouseEvent.hh"
@@ -154,6 +153,6 @@ void BoxMaker::CreateTheEntity()
 
   OgreCreator::Instance()->DeleteVisual(this->visualName);
 
-  Simulator::Instance()->GetWorld(0)->InsertEntity(newModelStr.str());
+  Simulator::Instance()->GetActiveWorld()->InsertEntity(newModelStr.str());
 }
 

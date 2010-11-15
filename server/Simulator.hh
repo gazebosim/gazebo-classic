@@ -97,6 +97,15 @@ namespace gazebo
       /// \brief Get a world by number
       public: World *GetWorld(unsigned int i) const;
 
+      /// \brief Set the active world
+      public: void SetActiveWorld(unsigned int i);
+
+      /// \brief Set the active world
+      public: void SetActiveWorld(World *world);
+
+      /// \brief Get the currently active world
+      public: World *GetActiveWorld() const;
+
       /// \brief Main simulation loop, when this loop ends the simulation finish
       public: void Run();
   
@@ -186,6 +195,7 @@ namespace gazebo
   
       private: static std::string defaultWorldXML;
       private: std::vector< World* > worlds;
+      private: unsigned int activeWorldIndex;
   
       private: std::vector<Plugin*> plugins;
   

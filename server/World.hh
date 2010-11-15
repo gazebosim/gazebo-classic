@@ -74,10 +74,10 @@ namespace gazebo
 class World 
 {
   /// Private constructor
-  private: World();
+  public: World();
 
   /// Private destructor
-  private: ~World();
+  public: ~World();
 
   /// Load the world
   /// \param node XMLConfig node point

@@ -122,12 +122,13 @@ Simulator::Simulator()
   physicsQuit(false),
   guiEnabled(true),
   renderEngineEnabled(true),
-  physicsEnabled(true),
+  physicsEnabled(true)
 {
   PhysicsFactory::RegisterAll();
+  this->activeWorldIndex = 0;
 
-  this->render_mutex = new boost::recursive_mutex();
-  this->model_delete_mutex = new boost::recursive_mutex();
+  //this->render_mutex = new boost::recursive_mutex();
+  //this->model_delete_mutex = new boost::recursive_mutex();
   this->gazeboConfig=new gazebo::GazeboConfig();
 }
 
@@ -135,12 +136,14 @@ Simulator::Simulator()
 // Destructor
 Simulator::~Simulator()
 {
+  this->Fini();
   if (this->gazeboConfig)
   {
     delete this->gazeboConfig;
     this->gazeboConfig = NULL;
   }
 
+  /* NATY
   if (this->render_mutex)
   {
     delete this->render_mutex;
@@ -152,10 +155,7 @@ Simulator::~Simulator()
     delete this->model_delete_mutex;
     this->model_delete_mutex = NULL;
   }
-
-  for (unsigned int i=0; i < this->worlds.size(); i++)
-    delete this->worlds[i];
-  this->worlds[i].clear();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,9 +171,6 @@ void Simulator::Fini()
     delete this->worlds[i];
   }
   this->worlds.clear();
-
-  if (this->renderEngineEnabled)
-    gazebo::OgreAdaptor::Instance()->Close();
 
   if (this->gui)
   {
@@ -210,7 +207,7 @@ void Simulator::Load(const std::string &fileName)
   }
 
   XMLConfigNode *rootNode(xmlFile->GetRootNode());
-  XMLConfigNode *confgNode = rootNode->GetChild("config");
+  XMLConfigNode *configNode = rootNode->GetChild("config");
 
   // Load the messaging system
   gazebo::GazeboMessage::Instance()->Load(configNode);
@@ -323,6 +320,7 @@ World *Simulator::CreateWorld(const std::string &fileName)
       pluginNode = pluginNode->GetNext("plugin");
     }
 
+    this->worlds.push_back(world);
     worldNode = worldNode->GetNext("world");
   }
 
@@ -362,7 +360,39 @@ World *Simulator::GetWorld(unsigned int i) const
   else
     return NULL;
 }
- 
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the active world
+void Simulator::SetActiveWorld(unsigned int i)
+{
+  if (i < this->worlds.size())
+    this->activeWorldIndex = i;
+  else
+    gzerr(0) << "Invalid world index[" << i << "]\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the active world
+void Simulator::SetActiveWorld(World *world)
+{
+  unsigned int i=0;
+  for (; i < this->worlds.size(); i++)
+    if (this->worlds[i]->GetName() == world->GetName())
+      break;
+
+  if (i < this->worlds.size())
+    this->activeWorldIndex = i;
+  else
+    gzerr(0) << "Invalid world [" << world->GetName() << "]\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the currently active world
+World *Simulator::GetActiveWorld() const
+{
+  return this->worlds[this->activeWorldIndex];
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Initialize the simulation
 void Simulator::Init()
@@ -439,13 +469,12 @@ void Simulator::Run()
   {
     while (!this->userQuit)
     {
-      currTime = this->GetWallTime();
+      currTime = Time::GetWallTime();
       if ( currTime - lastTime > 1.0/freq)
       {
-        lastTime = this->GetWallTime();
-
+        lastTime = Time::GetWallTime();
         this->GraphicsUpdate();
-        currTime = this->GetWallTime();
+        currTime = Time::GetWallTime();
         if (currTime - lastTime < 1/freq)
         {
           Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
@@ -471,17 +500,19 @@ void Simulator::Run()
 
 void Simulator::GraphicsUpdate()
 {
-  if (this->gui)
-    this->gui->Update();
-
   if (this->renderEngineEnabled)
   {
     OgreAdaptor::Instance()->UpdateScenes();
-    World::Instance()->GraphicsUpdate();
+    for (unsigned int i=0; i < this->worlds.size(); i++)
+      this->worlds[i]->GraphicsUpdate();
   }
 
-  World::Instance()->ProcessEntitiesToLoad();
-  World::Instance()->ProcessEntitiesToDelete();
+  for (unsigned int i=0; i < this->worlds.size(); i++)
+  {
+    this->worlds[i]->ProcessEntitiesToLoad();
+    this->worlds[i]->ProcessEntitiesToDelete();
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

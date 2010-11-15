@@ -51,8 +51,6 @@ Geom::Geom( Body *body )
 {
   this->AddType(GEOM);
 
-  this->typeName = "unknown";
-
   this->body = body;
 
   // Create the contact parameters
@@ -67,6 +65,8 @@ Geom::Geom( Body *body )
   this->contactsEnabled = false;
 
   Param::Begin(&this->parameters);
+  this->typeP = new ParamT<std::string>("type","unknown",1);
+
   this->massP = new ParamT<double>("mass",0.001,0);
   this->massP->Callback( &Geom::SetMass, this);
 
@@ -111,6 +111,7 @@ Geom::~Geom()
     this->bbVisual = NULL;
   }
 
+  delete this->typeP;
   delete this->massP;
   delete this->xyzP;
   delete this->rpyP;
@@ -144,10 +145,7 @@ void Geom::Load(XMLConfigNode *node)
 {
   XMLConfigNode *childNode = NULL;
 
-  this->xmlNode=node;
-
-  this->typeName = node->GetName();
-
+  this->typeP->Load(node);
   this->nameP->Load(node);
   this->SetName(this->nameP->GetValue());
   this->massP->Load(node);
@@ -236,7 +234,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
 
-  stream << prefix << "<geom:" << this->typeName << " name=\"" 
+  stream << prefix << "<geom:" << **this->typeP << " name=\"" 
          << this->nameP->GetValue() << "\">\n";
 
   stream << prefix << "  " << *(this->xyzP) << "\n";
@@ -255,7 +253,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
       (*iter)->Save(p, stream);
   }
 
-  stream << prefix << "</geom:" << this->typeName << ">\n";
+  stream << prefix << "</geom>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

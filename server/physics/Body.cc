@@ -199,24 +199,24 @@ void Body::Load(XMLConfigNode *node)
   //   this body's pose - this body's offsetFromModelFrame
   this->initModelOffset = this->GetRelativePose().CoordPoseSolve(Pose3d());
 
-  childNode = node->GetChildByNSPrefix("geom");
+  childNode = node->GetChild("geom");
 
   // Load the geometries
   while (childNode)
   {
     // Create and Load a geom, which will belong to this body.
     this->LoadGeom(childNode);
-    childNode = childNode->GetNextByNSPrefix("geom");
+    childNode = childNode->GetNext("geom");
   }
 
-  childNode = node->GetChildByNSPrefix("sensor");
+  childNode = node->GetChild("sensor");
 
   // Load the sensors
   while (childNode)
   {
     // Create and Load a sensor, which will belong to this body.
     this->LoadSensor(childNode);
-    childNode = childNode->GetNextByNSPrefix("sensor");
+    childNode = childNode->GetNext("sensor");
   }
 
   this->SetKinematic(**this->kinematicP);
@@ -494,11 +494,12 @@ void Body::UpdateCoM()
 void Body::LoadGeom(XMLConfigNode *node)
 {
   Geom *geom = NULL;
+  std::string type = node->GetString("type","",1);
 
-  if (node->GetName() == "heightmap" || node->GetName() == "map")
+  if (type == "heightmap" || type == "map")
     this->SetStatic(true);
 
-  geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(node->GetName(), this);
+  geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(type, this);
 
   if (!geom)
     gzthrow("Unknown Geometry Type["+
@@ -518,7 +519,9 @@ void Body::LoadSensor(XMLConfigNode *node)
     gzthrow("Null node pointer. Invalid sensor in the world file.");
   }
 
-  sensor = SensorFactory::NewSensor(node->GetName(), this);
+  std::string type = node->GetString("type","",1);
+
+  sensor = SensorFactory::NewSensor(type, this);
 
   if (sensor)
   {

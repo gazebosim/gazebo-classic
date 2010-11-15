@@ -257,9 +257,6 @@ namespace gazebo
     /// \brief Type of the model (such as Pioneer2DX, or SimpleSolid)
     private: std::string modelType;
   
-    /// \brief The node this model was loaded from
-    private: XMLConfigNode *xmlNode;
-  
     /// \brief Initial pose of the model
     private: Pose3d initPose;
  

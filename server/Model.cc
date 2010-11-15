@@ -24,8 +24,6 @@
  * SVN: $Id$
  */
 
-//#include <boost/python.hpp>
-
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -225,8 +223,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->laserFiducialP->Load(node);
   this->laserRetroP->Load(node);
 
-  this->xmlNode = node;
-  this->modelType=node->GetName();
+  this->modelType = node->GetString("type", "physical", 1);
 
   this->SetStatic( **(this->staticP) );
 
@@ -255,11 +252,11 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->SetInitPose(pose);
 
   // Load controllers
-  childNode = node->GetChildByNSPrefix("controller");
+  childNode = node->GetChild("controller");
   while (childNode)
   {
     this->LoadController(childNode);
-    childNode = childNode->GetNextByNSPrefix("controller");
+    childNode = childNode->GetNext("controller");
   }
 
   // Create a default body if one does not exist in the XML file
@@ -308,26 +305,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   // Create the graphics iface handler
   this->graphicsHandler = new GraphicsIfaceHandler(this->GetWorld());
   this->graphicsHandler->Load(this->GetScopedName(), this);
-
-  // Get the name of the python module
-  /*this->pName.reset(PyString_FromString(node->GetString("python","",0).c_str()));
-  //this->pName.reset(PyString_FromString("pioneer2dx"));
-
-  // Import the python module
-  if (this->pName)
-  {
-  this->pModule.reset(PyImport_Import(this->pName));
-  Py_DECREF(this->pName);
-  }
-
-  // Get the Update function from the module
-  if (this->pModule)
-  {
-  this->pFuncUpdate.reset(PyObject_GetAttrString(this->pModule, "Update"));
-  if (this->pFuncUpdate && !PyCallable_Check(this->pFuncUpdate))
-  this->pFuncUpdate = NULL;
-  }
-   */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

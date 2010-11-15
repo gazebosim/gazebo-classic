@@ -218,6 +218,7 @@ namespace gazebo
 
     protected: Mass mass;
 
+    private: ParamT<std::string> *typeP;
     private: ParamT<int> *laserFiducialIdP;
     private: ParamT<float> *laserRetroP;
 
@@ -234,11 +235,6 @@ namespace gazebo
 
     /// All the visual apparence 
     private: std::vector<OgreVisual*> visuals;
-
-    ///our XML DATA
-    private: XMLConfigNode *xmlNode;
-
-    private: std::string typeName;
 
     protected: Shape *shape;
 

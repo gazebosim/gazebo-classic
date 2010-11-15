@@ -49,7 +49,9 @@
 #include "Simulator.hh"
 #include "gz.h"
 #include "World.hh"
-#include "Logger.hh"
+
+// NATY: put back in
+//#include "Logger.hh"
 
 #include "OpenAL.hh"
 
@@ -116,11 +118,9 @@ World::~World()
 // Load the world
 void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
 {
-
   this->nameP->Load(rootNode);
   this->saveStateTimeoutP->Load(rootNode);
   this->saveStateBufferSizeP->Load(rootNode);
-
 
   // Create the server object (needs to be done before models initialize)
   if (this->server == NULL)
@@ -162,15 +162,15 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
   }
 
   // Load OpenAL audio 
-  if (rootNode && rootNode->GetChild("openal","audio"))
+  if (rootNode && rootNode->GetChild("audio"))
   {
     this->openAL = OpenAL::Instance();
-    this->openAL->Load(rootNode->GetChild("openal", "audio"));
+    this->openAL->Load(rootNode->GetChild("audio"));
   }
 
   XMLConfigNode *physicsNode = NULL;
   if (rootNode )
-    physicsNode = rootNode->GetChildByNSPrefix("physics");
+    physicsNode = rootNode->GetChild("physics");
 
   if (Simulator::Instance()->GetPhysicsEnabled() && physicsNode)
   {
@@ -179,8 +179,9 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
       delete this->physicsEngine;
       this->physicsEngine = NULL;
     }
+    std::string type = physicsNode->GetString("type","ode",1);
 
-    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( physicsNode->GetName(), this);
+    this->physicsEngine = PhysicsFactory::NewPhysicsEngine( type, this);
     if (this->physicsEngine == NULL)
       gzthrow("Unable to create physics engine\n");
   }
@@ -188,7 +189,7 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
     this->physicsEngine = PhysicsFactory::NewPhysicsEngine("ode", this);
 
   // This should come before loading of entities
-  this->physicsEngine->Load(rootNode);
+  this->physicsEngine->Load(physicsNode);
   
   // last bool is initModel, init model is not needed as Init()
   // is called separately from main.cc
@@ -393,7 +394,8 @@ void World::Update()
   // Process all incoming messages from simiface
   this->simIfaceHandler->Update();
 
-  Logger::Instance()->Update();
+  // NATY: put back in
+  //Logger::Instance()->Update();
 
   Events::worldUpdateEndSignal();
 }
@@ -516,10 +518,10 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
   XMLConfigNode *cnode;
   Model *model = NULL;
 
-  if (node && node->GetNSPrefix() != "")
+  if (node)
   {
     // Check for model nodes
-    if (node->GetNSPrefix() == "model")
+    if (node->GetName() == "model")
     {
       model = this->LoadModel(node, parent, removeDuplicate, initModel);
       Events::addEntitySignal(model->GetCompleteScopedName());
@@ -642,6 +644,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent,
 {
   Pose3d pose;
   Model *model = new Model(parent);
+  model->SetWorld(this);
 
   // Load the model
   model->Load( node, removeDuplicate );

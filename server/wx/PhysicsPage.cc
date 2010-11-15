@@ -16,7 +16,7 @@ PhysicsPage::PhysicsPage(wxWindow *parent)
 {
   this->SetName(wxT("physics"));
 
-  PhysicsEngine *engine = Simulator::Instance()->GetWorld(0)->GetPhysicsEngine();
+  PhysicsEngine *engine = Simulator::Instance()->GetActiveWorld()->GetPhysicsEngine();
 
   wxBoxSizer *boxSizer = new wxBoxSizer(wxVERTICAL);
 

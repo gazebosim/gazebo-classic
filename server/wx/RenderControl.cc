@@ -177,7 +177,7 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
   }
   else if (this->GetCursorState() == "manip")
   {
-    Entity *entity = Simulator::Instance()->GetWorld(0)->GetSelectedEntity();
+    Entity *entity = Simulator::Instance()->GetActiveWorld()->GetSelectedEntity();
 
     if (entity)
     {

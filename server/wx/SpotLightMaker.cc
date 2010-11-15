@@ -1,5 +1,4 @@
 #include <iostream>
-#include <FL/Fl.H>
 
 #include "Camera.hh"
 #include "MouseEvent.hh"
@@ -99,5 +98,5 @@ void SpotLightMaker::CreateTheEntity()
   newModelStr <<  "</gazebo:world>";
 
   std::cout << "Make spot light[" << newModelStr << "]\n"; 
-  Simulator::Instance()->GetWorld(0)->InsertEntity(newModelStr.str());
+  Simulator::Instance()->GetActiveWorld()->InsertEntity(newModelStr.str());
 }

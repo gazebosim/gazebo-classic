@@ -51,7 +51,7 @@ FactoryIfaceHandler::FactoryIfaceHandler(World *world)
   // Create the iface
   try
   {
-    this->factoryIface->Create(this->world->GetGzServer(), this->world->GetGzServer());
+    this->factoryIface->Create(this->world->GetGzServer(), this->world->GetGzServer()->serverName);
     this->factoryIface->Lock(1); // lock it right away to clear up data
     strcpy((char*)this->factoryIface->data->newModel,"");
     this->factoryIface->Unlock();

@@ -96,7 +96,6 @@ SET (sources Common.cc
              OgreLoader.cc
              AssimpLoader.cc
              STLLoader.cc
-             Logger.cc
              Plugin.cc
              Events.cc
 )
@@ -131,7 +130,6 @@ SET (headers Common.hh
              OgreLoader.hh
              AssimpLoader.hh
              STLLoader.hh
-             Logger.hh
              Events.hh
              Plugin.hh
 )

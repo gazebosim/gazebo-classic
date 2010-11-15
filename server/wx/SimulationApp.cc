@@ -55,15 +55,10 @@ bool SimulationApp::OnInit()
 
 void SimulationApp::OnIdle(wxTimerEvent &evt)
 {
+  this->frame->Update();
   Simulator::Instance()->GraphicsUpdate();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Initalize the gui
-void SimulationApp::Update()
-{
-  this->frame->Update();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save the gui params in xml format

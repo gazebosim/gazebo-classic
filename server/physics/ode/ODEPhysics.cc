@@ -202,50 +202,45 @@ ODEPhysics::~ODEPhysics()
 // Load the ODE engine
 void ODEPhysics::Load(XMLConfigNode *node)
 {
-  XMLConfigNode *cnode = NULL;
-
-  if (node)
-    cnode = node->GetChild("ode", "physics");
-
-  this->gravityP->Load(cnode);
-  this->stepTimeP->Load(cnode);
-  this->updateRateP->Load(cnode);
-  this->globalCFMP->Load(cnode);
-  this->globalERPP->Load(cnode);
-  this->stepTypeP->Load(cnode);
-  this->stepItersP->Load(cnode);
-  this->stepWP->Load(cnode);
-  this->contactMaxCorrectingVelP->Load(cnode);
-  this->contactSurfaceLayerP->Load(cnode);
-  this->autoDisableBodyP->Load(cnode);
-  this->contactFeedbacksP->Load(cnode);
-  this->maxContactsP->Load(cnode);
+  this->gravityP->Load(node);
+  this->stepTimeP->Load(node);
+  this->updateRateP->Load(node);
+  this->globalCFMP->Load(node);
+  this->globalERPP->Load(node);
+  this->stepTypeP->Load(node);
+  this->stepItersP->Load(node);
+  this->stepWP->Load(node);
+  this->contactMaxCorrectingVelP->Load(node);
+  this->contactSurfaceLayerP->Load(node);
+  this->autoDisableBodyP->Load(node);
+  this->contactFeedbacksP->Load(node);
+  this->maxContactsP->Load(node);
 
   // Help prevent "popping of deeply embedded object
-  dWorldSetContactMaxCorrectingVel(this->worldId, contactMaxCorrectingVelP->GetValue());
+  dWorldSetContactMaxCorrectingVel(this->worldId, **contactMaxCorrectingVelP);
 
   // This helps prevent jittering problems.
-  dWorldSetContactSurfaceLayer(this->worldId, contactSurfaceLayerP->GetValue());
+  dWorldSetContactSurfaceLayer(this->worldId, **contactSurfaceLayerP);
 
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
+  dWorldSetAutoDisableFlag(this->worldId, **this->autoDisableBodyP);
   dWorldSetAutoDisableTime(this->worldId, 2.0);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 50);
 
-  this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());
+  this->contactFeedbacks.resize(**this->contactFeedbacksP);
 
   // Reset the contact pointer
   //this->contactFeedbackIter = this->contactFeedbacks.begin();
 
-  Vector3 g = this->gravityP->GetValue();
+  Vector3 g = **this->gravityP;
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
 
-  dWorldSetCFM(this->worldId, this->globalCFMP->GetValue());
-  dWorldSetERP(this->worldId, this->globalERPP->GetValue());
+  dWorldSetCFM(this->worldId, **this->globalCFMP);
+  dWorldSetERP(this->worldId, **this->globalERPP);
 
   dWorldSetQuickStepNumIterations(this->worldId, **this->stepItersP );
   dWorldSetQuickStepW(this->worldId, **this->stepWP );
@@ -255,7 +250,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
 // Save the ODE engine
 void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
 {
-  stream << prefix << "<physics:ode>\n";
+  stream << prefix << "<physics type=\"ode\">\n";
   stream << prefix << "  " << *(this->stepTimeP) << "\n";
   stream << prefix << "  " << *(this->gravityP) << "\n";
   stream << prefix << "  " << *(this->updateRateP) << "\n";
@@ -266,7 +261,7 @@ void ODEPhysics::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->stepWP) << "\n";
   stream << prefix << "  " << *(this->contactMaxCorrectingVelP) << "\n";
   stream << prefix << "  " << *(this->contactSurfaceLayerP) << "\n";
-  stream << prefix << "</physics:ode>\n";
+  stream << prefix << "</physics>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

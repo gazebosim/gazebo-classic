@@ -34,7 +34,8 @@
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Joint.hh"
-#include "Logger.hh"
+// NATY: put back in
+//#include "Logger.hh"
 #include "gz.h"
 
 #include "SimulationIfaceHandler.hh"
@@ -846,13 +847,15 @@ void SimulationIfaceHandler::Update()
 
      case libgazebo::SimulationRequestData::START_LOG:
         {
-          Logger::Instance()->AddLog(req->name, req->strValue);
+          // NATY: put back in
+          //Logger::Instance()->AddLog(req->name, req->strValue);
           break;
         }
 
      case libgazebo::SimulationRequestData::STOP_LOG:
         {
-          Logger::Instance()->RemoveLog(req->name);
+          // NATY: Put back in
+          // Logger::Instance()->RemoveLog(req->name);
           break;
         }
 

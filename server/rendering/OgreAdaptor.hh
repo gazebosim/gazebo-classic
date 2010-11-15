@@ -83,9 +83,6 @@ namespace gazebo
     /// \brief Destructor
     private: virtual ~OgreAdaptor();
   
-    /// \brief Closes the present simulation, frees the resources 
-    public: void Close();
-
     /// \brief Load the parameters for Ogre
     public: void Load(XMLConfigNode *rootNode);
 

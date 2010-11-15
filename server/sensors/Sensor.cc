@@ -77,7 +77,7 @@ void Sensor::Load(XMLConfigNode *node)
   else
     this->updatePeriod = 1.0 / **(updateRateP);
 
-  this->LoadController( node->GetChildByNSPrefix("controller") );
+  this->LoadController( node->GetChild("controller") );
   this->LoadChild(node);
 
   double updateRate  = node->GetDouble("updateRate", 0, 0);
@@ -86,7 +86,6 @@ void Sensor::Load(XMLConfigNode *node)
   else
     this->updatePeriod = 1.0 / updateRate;
   this->lastUpdate = this->GetWorld()->GetSimTime();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

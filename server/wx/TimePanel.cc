@@ -76,10 +76,12 @@ TimePanel::~TimePanel()
 // Update the time panel
 void TimePanel::Update()
 {
-  if (Simulator::Instance()->GetWorld(0)->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
+  World *world = Simulator::Instance()->GetActiveWorld();
+
+  if (world->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
   {
-    Time simTime = Simulator::Instance()->GetWorld(0)->GetSimTime();
-    Time realTime = Simulator::Instance()->GetWorld(0)->GetRealTime();
+    Time simTime = Simulator::Instance()->GetActiveWorld()->GetSimTime();
+    Time realTime = Simulator::Instance()->GetActiveWorld()->GetRealTime();
     Time percent;
     
     if (realTime < this->statusUpdatePeriod )
@@ -132,10 +134,10 @@ void TimePanel::Update()
     this->simTimeCtrl->SetValue(simSuffix);
     this->realTimeCtrl->SetValue(realSuffix);
 
-    str.Printf(wxT("%f sec"), Simulator::Instance()->GetWorld(0)->GetPauseTime().Double());
+    str.Printf(wxT("%f sec"), Simulator::Instance()->GetActiveWorld()->GetPauseTime().Double());
     this->pauseTimeCtrl->SetValue(str);
 
-    this->lastUpdateTime = Simulator::Instance()->GetWorld(0)->GetRealTime();
+    this->lastUpdateTime = Simulator::Instance()->GetActiveWorld()->GetRealTime();
   }
 
 }

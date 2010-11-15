@@ -25,6 +25,7 @@
  */
 
 #include "Global.hh"
+#include "World.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
 #include "Simulator.hh"

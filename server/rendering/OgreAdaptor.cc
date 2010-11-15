@@ -84,13 +84,6 @@ OgreAdaptor::~OgreAdaptor()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Closes and free
-void OgreAdaptor::Close()
-{
-  this->Fini();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Load the parameters for Ogre
 void OgreAdaptor::Load(XMLConfigNode *rootNode)
 {
@@ -120,7 +113,7 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   this->SetupResources();
 
   Scene *scene = new Scene("primary_scene");
-  scene->Load(rootNode->GetChild("ogre", "rendering"));
+  scene->Load(rootNode->GetChild("rendering"));
   scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scenes.push_back( scene );  
 
@@ -226,7 +219,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   if (this->HasGLSL())
     RTShaderSystem::Instance()->UpdateShaders();
-
 }
 
 
