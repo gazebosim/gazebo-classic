@@ -34,7 +34,7 @@ namespace gazebo
 {
 
   class Entity;
-  class OgreVisual;
+  class Visual;
   
   /// \brief Used to handle message from the graphics3d libgazebo iface
   class GraphicsIfaceHandler
@@ -55,20 +55,20 @@ namespace gazebo
     public: void Update();
 
     /// \brief Helper funciton used to draw simple primitives
-    private: void DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDrawData *data);
+    private: void DrawSimple(Visual *vis, libgazebo::Graphics3dDrawData *data);
 
     /// \brief Helper funciton used to draw shapes
-    private: void DrawShape(OgreVisual *vis, libgazebo::Graphics3dDrawData *data);
+    private: void DrawShape(Visual *vis, libgazebo::Graphics3dDrawData *data);
 
     /// \brief Helper funciton used to draw text
-    private: void DrawText(OgreVisual *vis, libgazebo::Graphics3dDrawData *data);
+    private: void DrawText(Visual *vis, libgazebo::Graphics3dDrawData *data);
 
     /// \brief Helper function used to draw a progress bar
-    private: void DrawMeterBar(OgreVisual *vis, libgazebo::Graphics3dDrawData *data );
+    private: void DrawMeterBar(Visual *vis, libgazebo::Graphics3dDrawData *data );
 
     private: World *world;
     private: std::string name;
-    private: std::map<std::string, OgreVisual* > visuals;
+    private: std::map<std::string, Visual* > visuals;
     private: libgazebo::Graphics3dIface *threeDIface;
     private: Entity *parent;
   };

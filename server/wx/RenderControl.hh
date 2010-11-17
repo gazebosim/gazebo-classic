@@ -14,9 +14,9 @@
 
 namespace gazebo
 {
+  class Scene;
   class UserCamera;
   class Entity;
-  class Scene;
 
   class RenderControl : public wxControl
   {
@@ -36,6 +36,9 @@ namespace gazebo
 
     public: wxSize DoGetBestSize () const;
 
+    public: int GetWidth();
+    public: int GetHeight();
+
     public: void OnMouseEvent( wxMouseEvent &event);
 
     public: void OnKeyUp( wxKeyEvent &event);
@@ -44,7 +47,8 @@ namespace gazebo
     public: void Init();
 
     /// \brief Create the camera
-    public: void CreateCamera(Scene *scene);
+    //public: void CreateCamera(Scene *scene);
+    public: void ViewScene(Scene *scene);
 
     /// \brief Get the camera
     public: UserCamera *GetCamera();
@@ -71,6 +75,8 @@ namespace gazebo
     private: void EntityTranslate(Entity *entity);
 
     private: UserCamera *userCamera;
+
+    private: int windowId;
 
     private: MouseEvent mouseEvent;
 

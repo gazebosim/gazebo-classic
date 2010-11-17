@@ -40,12 +40,12 @@ namespace gazebo
 {
   class RenderControl;
   class XMLConfigNode;
-  class OgreVisual;
+  class Visual;
 
   class UserCamera : public Camera
   {
     /// \brief Constructor
-    public: UserCamera( RenderControl *parentWindow, Scene *scene);
+    public: UserCamera( const std::string &name, Scene *scene);
 
     /// \brief Destructor
     public: virtual ~UserCamera();
@@ -105,7 +105,7 @@ namespace gazebo
     private: static unsigned int cameraCount;
     private: static int count;
 
-    private: OgreVisual *visual;
+    private: Visual *visual;
 
     private: ViewController *viewController;
 

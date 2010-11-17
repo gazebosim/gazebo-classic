@@ -50,7 +50,7 @@ namespace gazebo
   class RenderControl;
   class XMLConfigNode;
   class Entity;
-  class OgreVisual;
+  class Visual;
   class OgreMovableText;
   class OgreDynamicLines;
   class Light;
@@ -77,18 +77,7 @@ namespace gazebo
     public: static std::string CreatePlane(const Vector3 &normal, 
                 const Vector2<double> &size, const Vector2<double> &segments, 
                 const Vector2<double> &uvTile, const std::string &material, 
-                bool castShadows, OgreVisual *parent, const std::string &name);
-
-    /// \brief Create a new window
-    public: Ogre::RenderWindow *CreateWindow(RenderControl *window, 
-                                             unsigned int width, 
-                                             unsigned int height);
-
-
-    /// \brief Create a window for Ogre
-    public: Ogre::RenderWindow *CreateWindow(std::string ogreHandle, 
-                                             unsigned int width, 
-                                             unsigned int height);
+                bool castShadows, Visual *parent, const std::string &name);
 
     /// \brief Insert a mesh into Ogre 
     public: static void InsertMesh( const Mesh *mesh);
@@ -106,25 +95,6 @@ namespace gazebo
 
     /// \brief Create a material from a texture file
     public: static std::string CreateMaterialFromTexFile(const std::string &filename);
-
-    /// \brief Create a new ogre visual 
-    /// \param name Unique name for the new visual. Leave empty to generate
-    //              a unique name
-    /// \param parent Parent visual
-    /// \param owner The entity that owns the visual
-    /// \return The new ogre visual
-    public: OgreVisual *CreateVisual( const std::string &name,
-                                      OgreVisual *parent=NULL, 
-                                      Entity *owner = NULL,
-                                      Scene *scene = NULL );
-    /// \brief Get a visual
-    public: OgreVisual *GetVisual( const std::string &name );
-
-    /// \brief Delete a visual
-    public: void DeleteVisual( OgreVisual *visual );
-
-    /// \brief Delete a visual
-    public: void DeleteVisual( const std::string &visname );
 
     /// \brief Create a movable text object
     /// \return A new movable text object
@@ -145,21 +115,14 @@ namespace gazebo
                                 const Ogre::Vector3 &scale);
 
     /// \brief Get the world bounding box for a visual
-    public: static void GetVisualBounds(OgreVisual *vis, Vector3 &min, 
+    public: static void GetVisualBounds(Visual *vis, Vector3 &min, 
                                         Vector3 &max);
 
     public: static void GetSceneNodeBounds(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box);
 
-    private: static unsigned int windowCounter;
 
     // List of all the movable text
     private: std::list<OgreMovableText*> text;
-
-    // All the visuals 
-    private: std::list<OgreVisual*> visuals;
-
-    // All the windows
-    private: std::list<Ogre::RenderWindow *> windows;
 
     private: friend class DestroyerT<OgreCreator>;
     private: friend class SingletonT<OgreCreator>;

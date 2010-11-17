@@ -29,7 +29,7 @@
 
 #include "XMLConfig.hh"
 #include "GazeboMessage.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 
 #include "World.hh"
 #include "Geom.hh"

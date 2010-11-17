@@ -37,7 +37,7 @@
 #include "BulletPhysics.hh"
 #include "PhysicsEngine.hh"
 #include "Mass.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 
 #include "BulletBody.hh"
 

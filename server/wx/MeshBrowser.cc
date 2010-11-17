@@ -9,7 +9,7 @@
 #include "OrbitViewController.hh"
 #include "FPSViewController.hh"
 #include "OgreCreator.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Simulator.hh"
 #include "MeshBrowser.hh"
 
@@ -30,7 +30,13 @@ MeshBrowser::MeshBrowser(wxWindow *parent)
   this->treeCtrl->Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MeshBrowser::OnTreeClick), NULL, this);
   boxSizer1->Add(this->treeCtrl,1, wxALL | wxEXPAND| wxALIGN_CENTER_VERTICAL, 5); 
 
-  this->scene = OgreAdaptor::Instance()->CreateScene("viewer_scene");
+  this->scene = new Scene("viewer_scene");
+  this->scene->SetType(Scene::GENERIC);
+  this->scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
+  this->scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
+  this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
+  this->scene->Init();
+
   this->dirLight = new Light(NULL, scene);
   this->dirLight->Load(NULL);
   this->dirLight->SetLightType("directional");
@@ -40,7 +46,7 @@ MeshBrowser::MeshBrowser(wxWindow *parent)
 
 
   this->renderControl = new RenderControl(this);
-  this->renderControl->CreateCamera(this->scene);
+  this->renderControl->ViewScene(this->scene);
   this->renderControl->Init();
   UserCamera *cam = this->renderControl->GetCamera();
   cam->SetClipDist(0.01, 1000);
@@ -81,7 +87,7 @@ MeshBrowser::~MeshBrowser()
 {
   delete this->renderControl;
   delete this->dirLight;
-  OgreAdaptor::Instance()->RemoveScene(this->scene->GetName());
+  delete this->scene;
 }
 
 int MeshBrowser::ParseDir(const std::string &path, wxTreeItemId &parentId)

@@ -7,7 +7,7 @@
 namespace gazebo
 {
   class RenderControl;
-  class OgreVisual;
+  class Visual;
   class Scene;
   class Light;
 
@@ -24,7 +24,7 @@ namespace gazebo
 
     private: RenderControl *renderControl;
 
-    private: OgreVisual *visual;
+    private: Visual *visual;
     private: Scene *scene;
     private: Light *dirLight;
   };

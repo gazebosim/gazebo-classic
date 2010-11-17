@@ -31,7 +31,7 @@
 
 namespace gazebo
 {
-  class OgreVisual;
+  class Visual;
 
   /// \addtogroup gazebo_physics_geom
   /// \{

@@ -28,6 +28,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "World.hh"
+#include "Scene.hh"
 #include "Image.hh"
 #include "Global.hh"
 #include "OgreHeightmap.hh"
@@ -52,7 +54,7 @@ HeightmapShape::HeightmapShape(Geom *parent)
   this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
   Param::End();
 
-  this->ogreHeightmap = new OgreHeightmap(0);
+  this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
 
 

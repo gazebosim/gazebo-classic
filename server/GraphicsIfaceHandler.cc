@@ -32,7 +32,7 @@
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "IfaceFactory.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
 #include "OgreMovableText.hh"
@@ -94,8 +94,8 @@ void GraphicsIfaceHandler::Init()
 /// Update the graphics handler
 void GraphicsIfaceHandler::Update()
 {
-  OgreVisual *vis = NULL;
-  std::map<std::string, OgreVisual* >::iterator iter;
+  Visual *vis = NULL;
+  std::map<std::string, Visual* >::iterator iter;
 
   this->threeDIface->Lock(1);
   for (unsigned int i=0; i < this->threeDIface->data->cmdCount; i++)
@@ -163,7 +163,7 @@ void GraphicsIfaceHandler::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Helper funciton used to draw simple elements
-void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDrawData *data)
+void GraphicsIfaceHandler::DrawSimple(Visual *vis, libgazebo::Graphics3dDrawData *data)
 {
   Vector3 pos;
   bool attached = false;
@@ -224,7 +224,7 @@ void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDraw
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Helper funciton used to draw shapes
-void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, libgazebo::Graphics3dDrawData *data)
+void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData *data)
 {
   switch(data->drawMode)
   {
@@ -312,7 +312,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, libgazebo::Graphics3dDrawD
           std::ostringstream bname;
 
           bname << "BILLBOARD_" << this->name;
-          bset = OgreAdaptor::Instance()->GetScene(0)->GetManager()->createBillboardSet(
+          bset = this->world->GetScene()->GetManager()->createBillboardSet(
               bname.str().c_str());
         }
 
@@ -347,7 +347,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, libgazebo::Graphics3dDrawD
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Helper funciton used to draw text
-void GraphicsIfaceHandler::DrawText(OgreVisual *vis, libgazebo::Graphics3dDrawData *data)
+void GraphicsIfaceHandler::DrawText(Visual *vis, libgazebo::Graphics3dDrawData *data)
 {
   bool attached = false;
   OgreMovableText* msg = NULL;
@@ -384,7 +384,7 @@ void GraphicsIfaceHandler::DrawText(OgreVisual *vis, libgazebo::Graphics3dDrawDa
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper function used to draw a progress bar
-void GraphicsIfaceHandler::DrawMeterBar(OgreVisual *vis, 
+void GraphicsIfaceHandler::DrawMeterBar(Visual *vis, 
                                         libgazebo::Graphics3dDrawData *data )
 {
   bool attached = false;
@@ -411,7 +411,7 @@ void GraphicsIfaceHandler::DrawMeterBar(OgreVisual *vis,
   }
   else
   {
-    bset = OgreAdaptor::Instance()->GetScene(0)->GetManager()->createBillboardSet(
+    bset = this->world->GetScene()->GetManager()->createBillboardSet(
         bname.str().c_str());
 
     // Create the texture

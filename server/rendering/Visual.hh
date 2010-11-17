@@ -52,19 +52,19 @@ namespace gazebo
   class OgreDynamicLines;
 
   /// \brief Ogre Visual Object
-  class OgreVisual : public Common, public Ogre::Any
+  class Visual : public Common, public Ogre::Any
   {
     /// \brief Constructor
-    public: OgreVisual (OgreVisual *node, Entity *owner = NULL, Scene *scene = NULL);
+    public: Visual (const std::string &name, Scene *scene, Visual *parent=NULL, Entity *owner = NULL);
 
     /// \brief Constructor
-    public: OgreVisual (Ogre::SceneNode *node, bool isStatic=false);
+    public: Visual (Ogre::SceneNode *node, bool isStatic=false);
 
     /// \brief Helper for the contructor
     private: void ConstructorHelper(Ogre::SceneNode *node, bool isStatic=false);
 
     /// \brief Destructor
-    public: virtual ~OgreVisual();
+    public: virtual ~Visual();
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
@@ -179,7 +179,7 @@ namespace gazebo
     public: bool IsStatic() const;
 
     /// \brief Set one visual to track/follow another
-    public: void EnableTrackVisual( OgreVisual *vis );
+    public: void EnableTrackVisual( Visual *vis );
 
     /// \brief Disable tracking of a visual
     public: void DisableTrackVisual();
@@ -262,7 +262,6 @@ namespace gazebo
 
     private: Ogre::RibbonTrail *ribbonTrail;
 
-    private: Scene *scene;
     private: bool useRTShader;
 
     // List of all the lines created

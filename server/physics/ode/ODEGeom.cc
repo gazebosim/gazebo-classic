@@ -28,7 +28,7 @@
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
 #include "ODEPhysics.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"

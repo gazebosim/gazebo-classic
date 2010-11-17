@@ -3,7 +3,7 @@
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "Camera.hh"
 #include "World.hh"
@@ -41,7 +41,7 @@ void BoxMaker::Start()
 
 void BoxMaker::Stop()
 {
-  OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
+  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
   if (vis)
     OgreCreator::Instance()->DeleteVisual(this->visualName);
 
@@ -90,7 +90,7 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  OgreVisual *vis = NULL;
+  Visual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))
     vis = OgreCreator::Instance()->GetVisual(this->visualName);
   else
@@ -126,7 +126,7 @@ void BoxMaker::CreateTheEntity()
 {
   std::ostringstream newModelStr;
 
-  OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
+  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
   if (!vis)
     return;
 

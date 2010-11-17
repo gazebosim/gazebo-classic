@@ -2,6 +2,7 @@
 
 namespace gazebo
 {
+  class Scene;
   class SimulationFrame;
 
   class SimulationApp : public wxApp
@@ -21,6 +22,9 @@ namespace gazebo
     public: void Run();
 
     public: void OnIdle(wxTimerEvent &evt);
+
+    /// \brief View a specific scene
+    public: void ViewScene( Scene *scene );
 
     /// \brief Save the gui params in xml format
     public: void Save(std::string &prefix, std::ostream &stream);

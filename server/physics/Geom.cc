@@ -32,8 +32,7 @@
 #include "Shape.hh"
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
-#include "OgreVisual.hh"
-#include "OgreCreator.hh"
+#include "Visual.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "SurfaceParams.hh"
@@ -95,19 +94,15 @@ Geom::Geom( Body *body )
 // Destructor
 Geom::~Geom()
 {
-  for (std::vector<OgreVisual*>::iterator iter = this->visuals.begin(); 
+  for (std::vector<Visual*>::iterator iter = this->visuals.begin(); 
        iter != this->visuals.end(); iter++)
-  {
     if (*iter)
-    {
-      OgreCreator::Instance()->DeleteVisual( (*iter) );
-      (*iter) = NULL;
-    }
-  }
+      delete *iter;
+  this->visuals.clear();
 
   if (this->bbVisual)
   {
-    OgreCreator::Instance()->DeleteVisual( this->bbVisual );
+    delete this->bbVisual;
     this->bbVisual = NULL;
   }
 
@@ -174,21 +169,15 @@ void Geom::Load(XMLConfigNode *node)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "_VISUAL_" << this->visuals.size();
+    Visual *visual = new Visual(this->visualNode);
+    visual->Load(childNode);
+    visual->SetName(visname);
+    visual->SetIgnorePoseUpdates(true);
+    visual->SetOwner(this);
+    visual->Init();
+    visual->SetCastShadows(true);
 
-    OgreVisual *visual = OgreCreator::Instance()->CreateVisual(
-        visname.str(), this->visualNode, this);
-
-    if (visual)
-    {
-      visual->Load(childNode);
-      visual->SetIgnorePoseUpdates(true);
-
-      this->visuals.push_back(visual);
-      visual->SetCastShadows(true);
-
-      //if (this->IsStatic())
-        //visual->MakeStatic();
-    }
+    this->visuals.push_back(visual);
 
     childNode = childNode->GetNext("visual");
   }
@@ -209,15 +198,13 @@ void Geom::CreateBoundingBox()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "_BBVISUAL" ;
 
-    this->bbVisual = OgreCreator::Instance()->CreateVisual(
-        visname.str(), this->visualNode);
-
-    if (this->bbVisual)
-    {
-      this->bbVisual->SetCastShadows(false);
-      this->bbVisual->AttachBoundingBox(min,max);
-      this->bbVisual->SetVisible( RenderState::GetShowBoundingBoxes() );
-    }
+    this->bbVisual = new Visual(this->visualNode);
+    this->bbVisual->SetName(visname.str());
+    this->bbVisual->Init();
+    this->bbVisual->SetCastShadows(false);
+    this->bbVisual->AttachBoundingBox(min,max);
+    this->bbVisual->SetVisible( RenderState::GetShowBoundingBoxes() );
+    this->bbVisual->SetOwner(this);
   }
 }
 
@@ -229,7 +216,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
     return;
 
   std::string p = prefix + "  ";
-  std::vector<OgreVisual*>::iterator iter;
+  std::vector<Visual*>::iterator iter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
@@ -334,7 +321,7 @@ void Geom::ShowBoundingBox(bool show)
 // Toggle transparency
 void Geom::ToggleTransparent()
 {
-  std::vector<OgreVisual*>::iterator iter;
+  std::vector<Visual*>::iterator iter;
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
@@ -352,7 +339,7 @@ void Geom::ToggleTransparent()
 /// Set the transparency
 void Geom::SetTransparent(bool show)
 {
-  std::vector<OgreVisual*>::iterator iter;
+  std::vector<Visual*>::iterator iter;
 
   if (show)
   {
@@ -403,7 +390,7 @@ unsigned int Geom::GetVisualCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a visual
-OgreVisual *Geom::GetVisual(unsigned int index) const
+Visual *Geom::GetVisual(unsigned int index) const
 {
   if (index < this->visuals.size())
     return this->visuals[index];
@@ -413,9 +400,9 @@ OgreVisual *Geom::GetVisual(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a visual
-OgreVisual *Geom::GetVisualById(int id) const
+Visual *Geom::GetVisualById(int id) const
 {
-  std::vector<OgreVisual*>::const_iterator iter;
+  std::vector<Visual*>::const_iterator iter;
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {

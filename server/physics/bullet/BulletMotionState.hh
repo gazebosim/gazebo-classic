@@ -32,7 +32,7 @@
 
 namespace gazebo
 {
-  class OgreVisual;
+  class Visual;
   class Body;
 
   class BulletMotionState : public btMotionState
@@ -47,7 +47,7 @@ namespace gazebo
     public: virtual ~BulletMotionState();
 
     /// \brief Set the visual
-    public: void SetVisual(OgreVisual *vis);
+    public: void SetVisual(Visual *vis);
 
     /// \brief Get the pose
     public: Pose3d GetWorldPose() const;
@@ -72,7 +72,7 @@ namespace gazebo
     /// \brief Set the world transform
     public: virtual void setWorldTransform(const btTransform &worldTrans);
 
-    private: OgreVisual *visual;
+    private: Visual *visual;
     private: Pose3d worldPose;
     private: Pose3d comOffset;
     private: Body *body;

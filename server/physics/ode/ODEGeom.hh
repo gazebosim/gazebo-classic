@@ -41,7 +41,7 @@ namespace gazebo
   class Body;
   class ContactParams;
   class XMLConfigNode;
-  class OgreVisual;
+  class Visual;
   class PhysicsEngine;
 
   /// \addtogroup gazebo_physics_ode

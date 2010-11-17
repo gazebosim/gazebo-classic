@@ -29,7 +29,7 @@
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
 #include "BulletPhysics.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"

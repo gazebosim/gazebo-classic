@@ -1,27 +1,33 @@
+#include <boost/lexical_cast.hpp>
 #include <OGRE/OgreSceneManager.h>
 #include <OGRE/OgreSceneQuery.h>
 #include <OGRE/OgreRoot.h>
 
 #include "Global.hh"
-#include "Camera.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
+#include "OgreAdaptor.hh"
 #include "UserCamera.hh"
+#include "Camera.hh"
 #include "RTShaderSystem.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "Entity.hh"
 #include "Grid.hh"
-#include "Camera.hh"
 
 #include "Scene.hh"
 
 using namespace gazebo;
 
+unsigned int Scene::idCounter = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Scene::Scene(const std::string &name)
 {
+  this->id = idCounter++;
+  this->idString = boost::lexical_cast<std::string>(this->id);
+
   this->name = name;
   this->manager = NULL;
   this->raySceneQuery = NULL;
@@ -49,6 +55,9 @@ Scene::Scene(const std::string &name)
 /// Destructor
 Scene::~Scene()
 {
+  // Remove a scene
+  RTShaderSystem::Instance()->RemoveScene( this );
+
   delete this->ambientP;
   delete this->shadowsP;
   delete this->backgroundColorP;
@@ -63,6 +72,14 @@ Scene::~Scene()
   for (unsigned int i=0; i < this->grids.size(); i++)
     delete this->grids[i];
   this->grids.clear();
+
+  for (unsigned int i=0; i < this->cameras.size(); i++)
+    delete this->cameras[i];
+  this->cameras.clear();
+
+  for (unsigned int i=0; i < this->userCameras.size(); i++)
+    delete this->userCameras[i];
+  this->userCameras.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,8 +108,10 @@ void Scene::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize the scene
-void Scene::Init(Ogre::Root *root)
+void Scene::Init()
 {
+  Ogre::Root *root = OgreAdaptor::Instance()->root;
+
   if (this->manager)
     root->destroySceneManager(this->manager);
 
@@ -233,7 +252,7 @@ void Scene::CreateGrid(uint32_t cell_count, float cell_length,
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the grid
-Grid *Scene::GetGrid(unsigned int index)
+Grid *Scene::GetGrid(unsigned int index) const
 {
   if (index >= this->grids.size())
   {
@@ -244,23 +263,61 @@ Grid *Scene::GetGrid(unsigned int index)
   return this->grids[index];
 }
 
-
-// NATY
 ////////////////////////////////////////////////////////////////////////////////
-// Update the user cameras
-/*void Scene::UpdateCameras()
+//Create a camera
+Camera *Scene::CreateCamera(const std::string &name)
 {
-  UserCamera *userCam;
+  Camera *camera = new Camera(this->name + "::" + name, this);
+  this->cameras.push_back(camera);
 
-  std::vector<Camera*>::iterator iter;
+  return camera;
+}
 
-  // Draw all the non-user cameras
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-    (*iter)->Render();
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of cameras in this scene
+unsigned int Scene::GetCameraCount() const
+{
+  return this->cameras.size();
+}
 
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-    (*iter)->PostRender();
-}*/
+////////////////////////////////////////////////////////////////////////////////
+/// Get a specific camera by index
+Camera *Scene::GetCamera(unsigned int index) const
+{
+  if (index < this->cameras.size())
+    return this->cameras[index];
+
+  return NULL;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Create a user camera
+UserCamera *Scene::CreateUserCamera(const std::string &name)
+{
+  UserCamera *camera = new UserCamera(this->name + "::" + name, this);
+  this->userCameras.push_back(camera);
+
+  return camera;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of user cameras in this scene
+unsigned int Scene::GetUserCameraCount() const
+{
+  return this->userCameras.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a specific user camera by index
+UserCamera *Scene::GetUserCamera(unsigned int index) const
+{
+  if (index < this->userCameras.size())
+    return this->userCameras[index];
+
+  return NULL;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
@@ -337,7 +394,7 @@ Entity *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &m
     if (closestEntity->getUserAny().getType() == typeid(std::string))
       mod = Ogre::any_cast<std::string>(closestEntity->getUserAny());
 
-    OgreVisual* const* vis = Ogre::any_cast<OgreVisual*>(&closestEntity->getUserAny());
+    Visual* const* vis = Ogre::any_cast<Visual*>(&closestEntity->getUserAny());
 
     if (vis && (*vis)->GetOwner())
     {
@@ -562,3 +619,19 @@ void Scene::InitShadows()
    */
  
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the scene ID
+unsigned int Scene::GetId() const
+{
+  return this->id;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the scene Id as a string
+std::string Scene::GetIdString() const
+{
+  return this->idString;
+}
+
+

@@ -29,7 +29,7 @@
 #include <iostream>
 
 #include "Scene.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "World.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -119,12 +119,30 @@ void RTShaderSystem::AddScene(Scene *scene)
   // Set the scene manager
   this->shaderGenerator->addSceneManager( scene->GetManager() );
   this->shaderGenerator->createScheme( scene->GetName() +Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME  );
+  this->scenes.push_back(scene);
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Remove a scene
+void RTShaderSystem::RemoveScene( Scene *scene )
+{
+  std::vector<Scene*>::iterator iter;
+  for (iter = this->scenes.begin(); iter != scenes.end(); iter++)
+    if ( (*iter) == scene )
+      break;
+
+  if (iter != this->scenes.end())
+  {
+    delete *iter;
+    this->scenes.erase(iter);
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Set an Ogre::Entity to use RT shaders
-void RTShaderSystem::AttachEntity(OgreVisual *vis)
+void RTShaderSystem::AttachEntity(Visual *vis)
 {
   if (!this->initialized)
     return;
@@ -135,7 +153,7 @@ void RTShaderSystem::AttachEntity(OgreVisual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Remove and entity
-void RTShaderSystem::DetachEntity(OgreVisual *vis)
+void RTShaderSystem::DetachEntity(Visual *vis)
 {
   if (!this->initialized)
     return;
@@ -145,11 +163,10 @@ void RTShaderSystem::DetachEntity(OgreVisual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a viewport to use shaders
-void RTShaderSystem::AttachViewport(Camera *camera)
+void RTShaderSystem::AttachViewport(Ogre::Viewport *viewport, Scene *scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  camera->GetCamera()->getViewport()->setMaterialScheme(
-      camera->GetScene()->GetName() +
+  viewport->setMaterialScheme( scene->GetName() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 #endif
@@ -163,7 +180,7 @@ void RTShaderSystem::UpdateShaders()
   if (!this->initialized)
     return;
 
-  std::list<OgreVisual*>::iterator iter;
+  std::list<Visual*>::iterator iter;
 
   // Update all the shaders
   for (iter = this->entities.begin(); iter != this->entities.end(); iter++)
@@ -172,7 +189,7 @@ void RTShaderSystem::UpdateShaders()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Generate shaders for an entity
-void RTShaderSystem::GenerateShaders(OgreVisual *vis)
+void RTShaderSystem::GenerateShaders(Visual *vis)
 {
   if (!this->initialized || !vis->GetUseRTShader())
     return;
@@ -190,14 +207,14 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
       const Ogre::String& curMaterialName = curSubEntity->getMaterialName();
       bool success;
 
-      for (unsigned int s=0; s < OgreAdaptor::Instance()->GetSceneCount(); s++)
+      for (unsigned int s=0; s < this->scenes.size(); s++)
       {
 
         // Create the shader based technique of this material.
         success = this->shaderGenerator->createShaderBasedTechnique(
             curMaterialName,
             Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-            OgreAdaptor::Instance()->GetScene(s)->GetName() + 
+            this->scenes[s]->GetIdString() + 
             Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 
@@ -214,7 +231,7 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
           // each one of them as desired.
           Ogre::RTShader::RenderState* renderState = 
             this->shaderGenerator->getRenderState(
-                OgreAdaptor::Instance()->GetScene(s)->GetName() + 
+                this->scenes[s]->GetIdString() + 
                 Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, 
                 curMaterialName, 0);
 
@@ -263,7 +280,7 @@ void RTShaderSystem::GenerateShaders(OgreVisual *vis)
 
       // Invalidate this material in order to re-generate its shaders.
       this->shaderGenerator->invalidateMaterial(
-          OgreAdaptor::Instance()->GetScene(s)->GetName() + 
+          this->scenes[s]->GetIdString() + 
           Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, curMaterialName); 
       }
     }
@@ -355,7 +372,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
 }
 
 
-void RTShaderSystem::ApplyShadows()
+void RTShaderSystem::ApplyShadows(Scene *scene)
 {
   Ogre::SceneManager *sceneMgr;
   Ogre::RTShader::RenderState* schemeRenderState;
@@ -363,7 +380,7 @@ void RTShaderSystem::ApplyShadows()
   sceneMgr = this->shaderGenerator->getActiveSceneManager();
 
 	schemeRenderState = this->shaderGenerator->getRenderState(
-      OgreAdaptor::Instance()->GetScene(0)->GetName() + 
+      scene->GetIdString() + 
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
   sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
@@ -434,7 +451,7 @@ void RTShaderSystem::ApplyShadows()
   }
 
   this->shaderGenerator->invalidateScheme(
-      OgreAdaptor::Instance()->GetScene(0)->GetName() + 
+      scene->GetIdString() + 
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 }

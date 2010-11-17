@@ -1,3 +1,4 @@
+#include "Scene.hh"
 #include "SimulationFrame.hh"
 #include "SimulationApp.hh"
 #include "Simulator.hh"
@@ -49,7 +50,7 @@ bool SimulationApp::OnInit()
   Connect( this->timer.GetId(), wxEVT_TIMER, wxTimerEventHandler(SimulationApp::OnIdle), NULL, this );
   this->timer.Start(33);
 
-  this->frame->CreateCameras();
+  //this->frame->CreateCameras();
   return true;
 }
 
@@ -64,4 +65,11 @@ void SimulationApp::OnIdle(wxTimerEvent &evt)
 /// Save the gui params in xml format
 void SimulationApp::Save(std::string &prefix, std::ostream &stream)
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// View a specific world
+void SimulationApp::ViewScene( Scene *scene )
+{
+  this->frame->ViewScene(scene);
 }

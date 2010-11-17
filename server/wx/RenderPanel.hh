@@ -9,7 +9,6 @@
 namespace gazebo
 {
   class RenderControl;
-  class Scene;
 
   class RenderPanel : public wxPanel
   {
@@ -46,7 +45,7 @@ namespace gazebo
     private: void OnYawSetFocus(wxFocusEvent &event);
     private: void OnYawKillFocus(wxFocusEvent &event);
 
-    public: void CreateCamera(Scene *scene);
+    public: void ViewScene(Scene *scene);
 
     private: RenderControl *renderControl;
     private: wxTextCtrl *fpsCtrl;

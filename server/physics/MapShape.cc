@@ -30,7 +30,7 @@
 
 #include "PhysicsEngine.hh"
 #include "GazeboConfig.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Image.hh"
 #include "BoxShape.hh"
 #include "GazeboError.hh"

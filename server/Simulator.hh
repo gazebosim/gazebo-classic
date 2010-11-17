@@ -194,6 +194,7 @@ namespace gazebo
       private: bool physicsEnabled;
   
       private: static std::string defaultWorldXML;
+      private: static std::string defaultConfigXML;
       private: std::vector< World* > worlds;
       private: unsigned int activeWorldIndex;
   

@@ -4,7 +4,6 @@
     <verbosity>4</verbosity>
 
     <gui>
-      <type>fltk</type>
       <size>800 600</size>
       <pos>0 0</pos>
     </gui>
@@ -14,11 +13,9 @@
       <shadows>true</shadows>
       <grid>false</grid>
     </rendering>
-
   </config>
 
   <world name="default">
-
     <physics type="ode">
       <stepTime>0.001</stepTime>
       <gravity>0 0 -9.8</gravity>

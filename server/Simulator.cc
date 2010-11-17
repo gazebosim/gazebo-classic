@@ -39,7 +39,7 @@
 #include "Geom.hh"
 #include "Model.hh"
 #include "Entity.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "World.hh"
 #include "XMLConfig.hh"
 #include "SimulationApp.hh"
@@ -55,59 +55,72 @@
 
 using namespace gazebo;
 
-std::string Simulator::defaultWorldXML = 
-"<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >\
-  <physics:ode>\
-    <stepTime>0.001</stepTime>\
-    <gravity>0 0 -9.8</gravity>\
-    <cfm>0.0000000001</cfm>\
-    <erp>0.2</erp>\
-    <stepType>quick</stepType>\
-    <stepIters>10</stepIters>\
-    <stepW>1.3</stepW>\
-    <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>\
-    <contactSurfaceLayer>0.001</contactSurfaceLayer>\
-  </physics:ode>\
-  <rendering:gui>\
-    <type>fltk</type>\
-    <size>800 600</size>\
-    <pos>0 0</pos>\
-  </rendering:gui>\
-  <rendering:ogre>\
-    <ambient>.1 .1 .1 1</ambient>\
-    <shadows>true</shadows>\
-    <grid>false</grid>\
-  </rendering:ogre>\
-   <model:physical name=\"plane1_model\">\
-    <xyz>0 0 0</xyz>\
-    <rpy>0 0 0</rpy>\
-    <static>true</static>\
-    <body:plane name=\"plane1_body\">\
-      <geom:plane name=\"plane1_geom\">\
-        <normal>0 0 1</normal>\
-        <size>100 100</size>\
-        <segments>1 1</segments>\
-        <uvTile>100 100</uvTile>\
-        <material>Gazebo/GrayGrid</material>\
-        <mu1>109999.0</mu1>\
-        <mu2>1000.0</mu2>\
-      </geom:plane>\
-    </body:plane>\
-  </model:physical>\
-  <model:renderable name='directional_light'>\
-    <xyz>0.0 0 10</xyz>\
-    <static>true</static>\
-    <light>\
-      <type>directional</type>\
-      <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>\
-      <specularColor>.1 .1 .1 1.0</specularColor>\
-      <attenuation>.2 0.1 0.0</attenuation>\
-      <range>100</range>\
-      <direction>-.4 0 -0.6</direction>\
-      <castShadows>true</castShadows>\
-    </light>\
-  </model:renderable>\
-</gazebo:world>";
+std::string Simulator::defaultConfigXML =
+"<?xml version='1.0'?>\
+<gazebo>\
+  <config>\
+    <verbosity>4</verbosity>\
+    <gui>\
+      <size>800 600</size>\
+      <pos>0 0</pos>\
+    </gui>\
+    <rendering>\
+      <ambient>.2 .2 .2 1</ambient>\
+      <shadows>true</shadows>\
+      <grid>false</grid>\
+    </rendering>\
+  </config>\
+</gazebo>";
+
+std::string Simulator::defaultWorldXML =
+"<?xml version='1.0'?>\
+<gazebo>\
+  <world name='default'>\
+    <physics type='ode'>\
+      <stepTime>0.001</stepTime>\
+      <gravity>0 0 -9.8</gravity>\
+      <cfm>0.0000000001</cfm>\
+      <erp>0.2</erp>\
+      <stepType>quick</stepType>\
+      <stepIters>10</stepIters>\
+      <stepW>1.3</stepW>\
+      <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>\
+      <contactSurfaceLayer>0.0</contactSurfaceLayer>\
+    </physics>\
+    <!-- Ground Plane -->\
+    <model type='physical' name='plane1_model'>\
+      <xyz>0 0 0</xyz>\
+      <rpy>0 0 0</rpy>\
+      <static>true</static>\
+      <body name='plane1_body'>\
+        <geom type='plane' name='plane1_geom'>\
+          <normal>0 0 1</normal>\
+          <size>100 100</size>\
+          <segments>1  1</segments>\
+          <uvTile>100 100</uvTile>\
+          <mu1>109999.0</mu1>\
+          <mu2>1000.0</mu2>\
+          <material>Gazebo/GrayGrid</material>\
+        </geom>\
+      </body>\
+    </model>\
+    <!-- White Point light -->\
+    <model type='renderable' name='point_white'>\
+      <xyz>0.0 0 10</xyz>\
+      <rpy>0 0 0</rpy>\
+      <static>true</static>\
+      <light>\
+        <type>point</type>\
+        <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>\
+        <specularColor>.1 .1 .1 1.0</specularColor>\
+        <attenuation>.2 0.1 0.0</attenuation>\
+        <range>20</range>\
+        <direction>0 0 -1.0</direction>\
+        <castShadows>true</castShadows>\
+      </light>\
+    </model>\
+  </world>\
+</gazebo>";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -199,7 +212,10 @@ void Simulator::Load(const std::string &fileName)
 
   try
   {
-    xmlFile->Load(fileName);
+    if (!fileName.empty())
+      xmlFile->Load(fileName);
+    else
+      xmlFile->LoadString(defaultConfigXML);
   }
   catch (GazeboError e)
   {
@@ -287,7 +303,10 @@ World *Simulator::CreateWorld(const std::string &fileName)
 
   try
   {
-    xmlFile->Load(fileName);
+    if (!fileName.empty())
+      xmlFile->Load(fileName);
+    else
+      xmlFile->LoadString(defaultWorldXML);
   }
   catch (GazeboError e)
   {
@@ -323,6 +342,9 @@ World *Simulator::CreateWorld(const std::string &fileName)
     this->worlds.push_back(world);
     worldNode = worldNode->GetNext("world");
   }
+
+  if (this->gui)
+    this->gui->ViewScene(world->GetScene());
 
   return world;
 }
@@ -498,6 +520,7 @@ void Simulator::Run()
     this->worlds[i]->Stop();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Simulator::GraphicsUpdate()
 {
   if (this->renderEngineEnabled)

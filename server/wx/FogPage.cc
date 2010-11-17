@@ -2,6 +2,8 @@
 #include <wx/stattext.h>
 
 #include "OgreAdaptor.hh"
+#include "Simulator.hh"
+#include "World.hh"
 #include "Scene.hh"
 #include "FogPage.hh"
 
@@ -113,6 +115,6 @@ void FogPage::Apply()
   wxColour clr = this->colorCtrl->GetColour();
   Color color(clr.Red(), clr.Green(), clr.Blue());
 
-  OgreAdaptor::Instance()->GetScene(0)->SetFog( type, color, density, 
-                                                start, end);
+  Simulator::Instance()->GetActiveWorld()->GetScene()->SetFog( type, color,
+      density, start, end);
 }

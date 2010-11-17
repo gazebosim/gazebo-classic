@@ -8,7 +8,7 @@ class wxAuiManager;
 namespace gazebo
 {
   class RenderControl;
-  class Scene;
+  class World;
   class Light;
   class Model;
 
@@ -26,7 +26,7 @@ namespace gazebo
     private: wxToolBar *toolbar;
 
     private: RenderControl *renderControl;
-    private: Scene *scene;
+    private: World *world;
     private: Light *dirLight;
     private: Model *model;
 

@@ -41,7 +41,7 @@ namespace Ogre
 
 namespace gazebo
 {
-  class OgreVisual;
+  class Visual;
   class XMLConfigNode;
   class OgreDynamicLines;
   class Scene;
@@ -112,7 +112,7 @@ namespace gazebo
     private: Ogre::Light *light;
 
     /// Parent of the light
-    private: OgreVisual *visual;
+    private: Visual *visual;
     private: OgreDynamicLines *line;
 
     private: ParamT<std::string> *lightTypeP;

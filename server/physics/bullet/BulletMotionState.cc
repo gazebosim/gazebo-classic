@@ -25,7 +25,7 @@
 
 #include "Simulator.hh"
 #include "BulletPhysics.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Body.hh"
 #include "BulletMotionState.hh"
 
@@ -48,7 +48,7 @@ BulletMotionState::~BulletMotionState()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the visual node
-void BulletMotionState::SetVisual(OgreVisual *vis) 
+void BulletMotionState::SetVisual(Visual *vis) 
 {
   this->visual = vis;
 }

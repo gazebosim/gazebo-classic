@@ -152,9 +152,9 @@ SimulationFrame::~SimulationFrame()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create the cameras
-void SimulationFrame::CreateCameras()
+void SimulationFrame::ViewScene( Scene *scene )
 {
-  this->renderPanel->CreateCamera(OgreAdaptor::Instance()->GetScene(0));
+  this->renderPanel->ViewScene(scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -11,7 +11,7 @@ set (sources OgreMovableText.cc
              OgreDynamicRenderable.cc
              OgreDynamicLines.cc
              OgreHUD.cc
-             OgreVisual.cc
+             Visual.cc
              Camera.cc
              UserCamera.cc
              Image.cc
@@ -27,6 +27,7 @@ set (sources OgreMovableText.cc
              Grid.cc
              Scene.cc
              RenderState.cc
+             WindowManager.cc
 )
 
 set (headers OgreMovableText.hh
@@ -35,7 +36,7 @@ set (headers OgreMovableText.hh
              OgreDynamicRenderable.hh
              OgreDynamicLines.hh
              OgreHUD.hh
-             OgreVisual.hh
+             Visual.hh
              Camera.hh
              UserCamera.hh
              Image.hh
@@ -51,6 +52,7 @@ set (headers OgreMovableText.hh
              Grid.hh
              Scene.hh
              RenderState.hh
+             WindowManager.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})

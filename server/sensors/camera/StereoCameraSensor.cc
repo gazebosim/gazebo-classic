@@ -34,7 +34,7 @@
 #include "World.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "OgreAdaptor.hh"
 #include "OgreFrameListener.hh"

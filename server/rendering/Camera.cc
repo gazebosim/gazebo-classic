@@ -21,7 +21,6 @@
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id: Camera.cc 8937 2010-10-11 16:59:55Z natepak $
  */
 
 #include <sstream>
@@ -34,7 +33,7 @@
 #include "PhysicsEngine.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
@@ -252,6 +251,14 @@ void Camera::Init()
 void Camera::Fini()
 {
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Set the scene this camera is viewing
+void Camera::SetScene( Scene *scene )
+{
+  this->scene = scene;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
@@ -1012,3 +1019,12 @@ Vector3 Camera::GetWorldPointOnPlane(int x, int y, Vector3 planeNorm, double d)
   // mouse position, the second is the previous mouse position
   return origin + dir * dist; 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the visibility mask
+unsigned int Camera::GetVisibilityMask() const
+{
+  return this->visibilityMask;
+}
+
+

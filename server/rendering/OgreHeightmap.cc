@@ -40,11 +40,10 @@ using namespace gazebo;
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreHeightmap::OgreHeightmap(unsigned int sceneIndex)
+OgreHeightmap::OgreHeightmap(Scene *scene)
 {
-  this->scene = OgreAdaptor::Instance()->GetScene(sceneIndex);
+  this->scene = scene;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor

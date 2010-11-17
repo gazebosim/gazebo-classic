@@ -9,12 +9,13 @@
 #include <GL/glx.h>
 #endif
 
+#include "WindowManager.hh"
 #include "Simulator.hh"
 #include "World.hh"
 #include "Scene.hh"
 #include "Body.hh"
 #include "OgreAdaptor.hh"
-#include "Scene.hh"
+#include "World.hh"
 #include "OgreCreator.hh"
 #include "GazeboError.hh"
 #include "Events.hh"
@@ -41,6 +42,8 @@ RenderControl::RenderControl(wxWindow *parent)
 
   SetFocus();
 
+  this->windowId = WindowManager::Instance()->CreateWindow(this);
+
   Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( RenderControl::OnMouseEvent ), NULL, this );
   Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( RenderControl::OnMouseEvent ), NULL, this );
   Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( RenderControl::OnMouseEvent ), NULL, this );
@@ -54,6 +57,7 @@ RenderControl::RenderControl(wxWindow *parent)
   Connect( wxEVT_KEY_UP, wxKeyEventHandler(RenderControl::OnKeyUp), NULL, this);
   Connect( wxEVT_KEY_DOWN, wxKeyEventHandler(RenderControl::OnKeyDown), NULL, this);
 
+
   Events::ConnectCreateEntitySignal( boost::bind(&RenderControl::CreateEntity, this, _1) );
   Events::ConnectMoveModeSignal( boost::bind(&RenderControl::MoveModeCB, this, _1) );
   Events::ConnectManipModeSignal( boost::bind(&RenderControl::ManipModeCB, this, _1) );
@@ -65,8 +69,9 @@ RenderControl::RenderControl(wxWindow *parent)
 // Destructor
 RenderControl::~RenderControl()
 {
-  if (this->userCamera)
+  /*if (this->userCamera)
     delete this->userCamera;
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,11 +282,46 @@ wxSize RenderControl::DoGetBestSize () const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Create the camera
-void RenderControl::CreateCamera(Scene *scene)
+// Get width in pixels
+int RenderControl::GetWidth()
 {
-  this->userCamera = new UserCamera( this, scene );
-  this->userCamera->Load(NULL);
+  int w,h;
+
+  this->GetSize(&w, &h);
+
+  return w;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get height in pixels
+int RenderControl::GetHeight()
+{
+  int w,h;
+
+  this->GetSize(&w, &h);
+
+  return h;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Create the camera
+void RenderControl::ViewScene(Scene *scene)
+{
+  if (scene->GetUserCameraCount() == 0)
+    this->userCamera = scene->CreateUserCamera("rc_camera");
+  else
+    this->userCamera = scene->GetUserCamera(0);
+
+  WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
+
+  /*if (this->userCamera == NULL)
+  {
+    this->userCamera = new UserCamera( this, world->GetScene() );
+    this->userCamera->Load(NULL);
+  }
+  else
+    this->userCamera->SetScene( world->GetScene() );
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -294,15 +334,16 @@ UserCamera *RenderControl::GetCamera()
 ////////////////////////////////////////////////////////////////////////////////
 void RenderControl::Init()
 {
-  if (this->userCamera == NULL)
-    gzthrow("Invalid user camera\n");
+  //if (this->userCamera == NULL)
+    //gzthrow("Invalid user camera\n");
 
-  Pose3d pose;
+  /*Pose3d pose;
 
   pose.pos.Set(-4, 0.0, 2);
   pose.rot.SetFromEuler( Vector3(DTOR(0.0),DTOR(15.0), DTOR(0.0)) ); 
   this->userCamera->Init();
   this->userCamera->SetWorldPose(pose);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

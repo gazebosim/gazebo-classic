@@ -30,8 +30,7 @@
 #include "Body.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
-#include "OgreVisual.hh"
-#include "OgreCreator.hh"
+#include "Visual.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Entity.hh"
@@ -58,20 +57,18 @@ Entity::Entity(Common *parent)
   {
     Entity *ep = (Entity*)(this->parent);
     if (Simulator::Instance()->GetRenderEngineEnabled())
-    {
-      this->visualNode = OgreCreator::Instance()->CreateVisual(
-          visname.str(), ep->GetVisualNode(), this);
-    }
+      this->visualNode = new Visual(ep);
     this->SetStatic(ep->IsStatic());
   }
   else
   {
     if (Simulator::Instance()->GetRenderEngineEnabled())
-    {
-      this->visualNode = OgreCreator::Instance()->CreateVisual( 
-          visname.str(), NULL, this );
-    }
+      this->visualNode = new Visual(this);
   }
+
+  this->visualNode->SetOwner(this);
+  this->visualNode->SetName(visname.str());
+  this->visualNode->Init();
 }
 
 void Entity::SetName(const std::string &name)
@@ -119,7 +116,8 @@ Entity::~Entity()
   {
     if (this->visualNode)
     {
-      OgreCreator::Instance()->DeleteVisual(this->visualNode);
+      delete this->visualNode;
+      this->visualNode = NULL;
     }
   }
 
@@ -128,14 +126,14 @@ Entity::~Entity()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Return this entitie's sceneNode
-OgreVisual *Entity::GetVisualNode() const
+Visual *Entity::GetVisualNode() const
 {
   return this->visualNode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the scene node
-void Entity::SetVisualNode(OgreVisual *visualNode)
+void Entity::SetVisualNode(Visual *visualNode)
 {
   this->visualNode = visualNode;
 }

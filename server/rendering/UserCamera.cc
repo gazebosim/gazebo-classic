@@ -41,7 +41,7 @@
 #include "Camera.hh"
 #include "OgreAdaptor.hh"
 #include "OgreCreator.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "World.hh"
 #include "UserCamera.hh"   
@@ -52,15 +52,14 @@ int UserCamera::count = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-UserCamera::UserCamera(RenderControl *parentWindow, Scene *scene)
-  : Camera("UserCamera", scene)
+UserCamera::UserCamera(const std::string &name, Scene *scene)
+  : Camera(name, scene)
 {
   std::stringstream stream;
 
-  int w, h;
-  parentWindow->GetSize(&w, &h);
-
-  this->window = OgreCreator::Instance()->CreateWindow(parentWindow, w, h);
+  //int w, h;
+  //parentWindow->GetSize(&w, &h);
+  //this->window = OgreCreator::Instance()->CreateWindow(parentWindow, w, h);
 
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
@@ -103,20 +102,11 @@ void UserCamera::Load(XMLConfigNode *node)
 /// Initialize
 void UserCamera::Init()
 {
-  if (!this->scene)
-    printf("SCENE IS BAD!\n");
-
-  if (!this->scene->GetManager())
-    printf("NO MANAGER!\n");
-
-  if (!this->scene->GetManager()->getRootSceneNode())
-    printf("No root scene node\n");
-
   this->SetSceneNode( this->scene->GetManager()->getRootSceneNode()->createChildSceneNode( this->GetName() + "_SceneNode") );
 
   Camera::Init();
 
-  this->visual = new OgreVisual(this->pitchNode);
+  this->visual = new Visual(this->pitchNode);
   // The lines draw a visualization of the camera
   OgreDynamicLines *line = this->visual->AddDynamicLine( OgreDynamicRenderable::OT_LINE_LIST );
 
@@ -170,21 +160,21 @@ void UserCamera::Init()
 
   this->visual->SetVisible(false);
 
-  this->window->removeAllViewports();
-  this->viewport = this->window->addViewport(this->GetCamera());
+  //this->window->removeAllViewports();
+  //this->viewport = this->window->addViewport(this->GetCamera());
 
-  this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
+  //this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
 
-  double ratio = (double)this->viewport->getActualWidth() / (double)this->viewport->getActualHeight();
-  double vfov = fabs(2.0 * atan(tan(this->GetHFOV().GetAsRadian() / 2.0) / ratio));
-  this->GetCamera()->setAspectRatio(ratio);
-  this->GetCamera()->setFOVy(Ogre::Radian(vfov));
+ // double ratio = (double)this->viewport->getActualWidth() / (double)this->viewport->getActualHeight();
+  //double vfov = fabs(2.0 * atan(tan(this->GetHFOV().GetAsRadian() / 2.0) / ratio));
+  //this->GetCamera()->setAspectRatio(ratio);
+  //this->GetCamera()->setFOVy(Ogre::Radian(vfov));
 
-  this->viewport->setClearEveryFrame(true);
-  this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
-  this->viewport->setVisibilityMask(this->visibilityMask);
+  //this->viewport->setClearEveryFrame(true);
+  //this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
+  //this->viewport->setVisibilityMask(this->visibilityMask);
 
-  RTShaderSystem::AttachViewport(this);
+  //RTShaderSystem::AttachViewport(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -362,7 +352,7 @@ void UserCamera::MoveToEntity(Entity *entity)
   key->setRotation(this->pitchNode->getOrientation());
 
   Vector3 min, max, size;
-  OgreVisual *vis = entity->GetVisualNode();
+  Visual *vis = entity->GetVisualNode();
   OgreCreator::GetVisualBounds(vis, min,max);
   size = max-min;
 

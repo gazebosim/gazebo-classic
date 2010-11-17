@@ -70,7 +70,7 @@ namespace gazebo
   class Entity;
   class UserCamera;
   class Camera;
-  class OgreVisual;
+  class Visual;
   class Scene;
   
   /// \brief Adptor to Ogre3d
@@ -99,16 +99,16 @@ namespace gazebo
     public: double GetUpdateRate();
 
     /// \brief Create a scene
-    public: Scene *CreateScene(const std::string &name);
+    //public: Scene *CreateScene(const std::string &name);
 
     /// \brief Remove a scene
-    public: void RemoveScene(const std::string &name);
+    //public: void RemoveScene(const std::string &name);
 
     /// \brief Get a scene manager
-    public: Scene *GetScene(unsigned int index);
+    //public: Scene *GetScene(unsigned int index);
 
     /// \brief Get the number of scene managers
-    public: unsigned int GetSceneCount() const;
+    //public: unsigned int GetSceneCount() const;
 
     /// \brief Update all the scenes 
     public: void UpdateScenes();
@@ -124,7 +124,7 @@ namespace gazebo
     public: Ogre::Root *root;
   
     /// Pointer to the scene manager
-    private: std::vector<Scene *> scenes;
+    //private: std::vector<Scene *> scenes;
   
     /// Pointer to the rendering system
     public: Ogre::RenderSystem *renderSys;

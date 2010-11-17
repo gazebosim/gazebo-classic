@@ -17,6 +17,7 @@ namespace gazebo
 {
   class Grid;
   class Camera;
+  class UserCamera;
   class Entity;
 
   class Scene
@@ -33,7 +34,7 @@ namespace gazebo
     public: void Load(XMLConfigNode *node);
 
     /// \brief Init
-    public: void Init(Ogre::Root *root);
+    public: void Init();
 
     /// \brief Save the scene
     public: void Save(std::string &prefix, std::ostream &stream);
@@ -46,6 +47,7 @@ namespace gazebo
 
     /// \brief Set the ambient color
     public: void SetAmbientColor(const Color &color);
+
     /// \brief Get the ambient color
     public: Color GetAmbientColor() const;
 
@@ -56,6 +58,7 @@ namespace gazebo
 
     /// \brief Set the scene type
     public: void SetType(SceneType type);
+
     /// \brief Get the scene type
     public: SceneType GetType() const;
 
@@ -64,11 +67,26 @@ namespace gazebo
                             float line_width, const Color &color );
 
     /// \brief Get the grid
-    public: Grid *GetGrid(unsigned int index);
+    public: Grid *GetGrid(unsigned int index) const;
 
-            // NATY
-    /// \brief Update all the cameras 
-    //public: void UpdateCameras();
+    /// \brief Create a camera
+    public: Camera *CreateCamera(const std::string &name);
+
+    /// \brief Get the number of cameras in this scene
+    public: unsigned int GetCameraCount() const;
+
+    /// \brief Get a camera
+    public: Camera *GetCamera(unsigned int index) const;
+
+    /// \brief Create a user camera
+    public: UserCamera *CreateUserCamera(const std::string &name);
+
+    /// \brief Get the number of user cameras in this scene
+    public: unsigned int GetUserCameraCount() const;
+
+    /// \brief Get a user camera
+    public: UserCamera *GetUserCamera(unsigned int index) const;
+
 
     /// \brief Get an entity at a pixel location using a camera. Used for
     ///        mouse picking. 
@@ -98,6 +116,12 @@ namespace gazebo
     public: void SetFog( std::string type, const Color &color, double density, 
                          double start, double end );
 
+    // Get the scene ID
+    public: unsigned int GetId() const;
+
+    // Get the scene Id as a string
+    public: std::string GetIdString() const;
+
     /// \brief Print scene graph
     private: void PrintSceneGraphHelper(std::string prefix, 
                                         Ogre::Node *node);
@@ -120,13 +144,17 @@ namespace gazebo
     //bsp attributes saved to write XML file back
     private: SceneType type;
 
-    //private: std::vector<Camera*> cameras;
+    private: std::vector<Camera*> cameras;
+    private: std::vector<UserCamera*> userCameras;
 
     private: Ogre::SceneManager *manager;
     private: Ogre::RaySceneQuery *raySceneQuery;
 
     private: std::vector<Grid *> grids;
 
+    private: static unsigned int idCounter;
+    private: unsigned int id;
+    private: std::string idString;
   };
 };
 #endif 

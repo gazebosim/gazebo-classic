@@ -32,7 +32,7 @@
 #include "World.hh"
 #include "Model.hh"
 #include "OgreDynamicLines.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "OgreAdaptor.hh"
 #include "XMLConfig.hh"

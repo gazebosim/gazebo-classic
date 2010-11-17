@@ -68,10 +68,10 @@ namespace gazebo
   class Camera 
   {
     /// \brief Constructor
-    public: Camera(const std::string &namePrefix, Scene *scene);
+    protected: Camera(const std::string &namePrefix, Scene *scene);
   
     /// \brief Destructor
-    public: virtual ~Camera();
+    protected: virtual ~Camera();
   
     /// \brief Load the camera using parameter from an XMLConfig node
     /// \param node The XMLConfig node
@@ -95,6 +95,9 @@ namespace gazebo
   
     /// Finalize the camera
     public: void Fini();
+
+    /// \brief Set the scene this camera is viewing
+    public: void SetScene( Scene *scene );
 
     /// \brief Set to true to enable rendering
     public: void SetRenderingEnabled(bool value);
@@ -253,6 +256,9 @@ namespace gazebo
     /// \brief Get point on a plane
     public: Vector3 GetWorldPointOnPlane(int x, int y, Vector3 planeNorm, double d);
 
+    /// \brief Get the visibility mask
+    public: unsigned int GetVisibilityMask() const;
+
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
 
@@ -311,6 +317,8 @@ namespace gazebo
     protected: Time lastUpdate;
 
     protected: Scene *scene;
+
+    private: friend class Scene;
   };
   
   /// \}

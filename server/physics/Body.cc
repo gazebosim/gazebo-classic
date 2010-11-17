@@ -34,8 +34,7 @@
 #include "GazeboMessage.hh"
 #include "Geom.hh"
 #include "Timer.hh"
-#include "OgreVisual.hh"
-#include "OgreCreator.hh"
+#include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "Global.hh"
 #include "Vector2.hh"
@@ -112,7 +111,7 @@ Body::~Body()
 
   if (this->cgVisual)
   {
-    OgreCreator::Instance()->DeleteVisual( this->cgVisual );
+    delete this->cgVisual;
     this->cgVisual = NULL;
   }
 
@@ -380,8 +379,9 @@ void Body::Init()
 
     if (this->cgVisual == NULL)
     {
-      this->cgVisual = OgreCreator::Instance()->CreateVisual(visname.str(),
-          this->comEntity->GetVisualNode());
+      this->cgVisual = new Visual(this->comEntity->GetVisualNode());
+      this->cgVisual->SetName(visname.str());
+      this->cvVisual->Init();
     }
     else
       this->cgVisual->DetachObjects();

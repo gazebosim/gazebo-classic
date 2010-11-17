@@ -62,6 +62,7 @@ namespace gazebo
   class OpenAL;
   class WorldState;
   class Time;
+  class Scene;
   class FactoryIfaceHandler;
   class GraphicsIfaceHandler;
   class SimulationIfaceHandler;
@@ -196,6 +197,9 @@ class World
   /// \brief Set whether the simulation is paused
   public: void SetPaused(bool p);
 
+  /// \brief Get the scene 
+  public: Scene *GetScene() const;
+
   /// \brief Save the state of the world
   private: void SaveState();
 
@@ -265,6 +269,9 @@ class World
   /// Current simulation time
   private: Time simTime, pauseTime, startTime;
   private: bool pause;
+
+  // Scene graph for the world
+  private: Scene *scene;
 };
 
 class WorldState

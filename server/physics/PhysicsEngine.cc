@@ -31,7 +31,7 @@
 #include "RenderState.hh"
 #include "Events.hh"
 #include "World.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "OgreCreator.hh"
 #include "Material.hh"
@@ -59,7 +59,8 @@ PhysicsEngine::PhysicsEngine(World *world)
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
+    this->visual = new Visual(NULL);
+    this->visual->SetName("Physics_Engine_Visual"), this->world->GetScene());
     this->visual->SetVisible(false);
     this->visual->SetCastShadows(false);
     this->visual->SetUseRTShader(false);

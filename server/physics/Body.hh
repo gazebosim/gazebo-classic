@@ -269,7 +269,7 @@ namespace gazebo
     protected: ParamT<bool> *turnGravityOffP;
     protected: ParamT<bool> *selfCollideP;
 
-    protected: OgreVisual *cgVisual;
+    protected: Visual *cgVisual;
 
     protected: Vector3 linearAccel;
     protected: Vector3 angularAccel;

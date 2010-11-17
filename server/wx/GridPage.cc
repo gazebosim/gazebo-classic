@@ -4,6 +4,8 @@
 #include <wx/button.h>
 #include <wx/colordlg.h>
 
+#include "Simulator.hh"
+#include "World.hh"
 #include "OgreAdaptor.hh"
 #include "Scene.hh"
 #include "Grid.hh"
@@ -19,7 +21,7 @@ GridPage::GridPage(wxWindow *parent)
   this->SetName(wxT("grid"));
   wxString str;
 
-  Grid *grid = OgreAdaptor::Instance()->GetScene(0)->GetGrid(1);
+  Grid *grid = Simulator::Instance()->GetActiveWorld()->GetScene()->GetGrid(1);
   double size = grid->GetCellLength() * grid->GetCellCount();
   double spacing = size / grid->GetCellCount();
 
@@ -74,7 +76,7 @@ GridPage::~GridPage()
 void GridPage::Apply()
 {
   std::string str;
-  Grid *grid = OgreAdaptor::Instance()->GetScene(0)->GetGrid(1);
+  Grid *grid = Simulator::Instance()->GetActiveWorld()->GetScene()->GetGrid(1);
 
   str = std::string(this->gridSizeCtrl->GetValue().mb_str());
   boost::trim(str);

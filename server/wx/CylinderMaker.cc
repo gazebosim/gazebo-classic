@@ -4,7 +4,7 @@
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "World.hh"
 #include "CylinderMaker.hh"
@@ -41,7 +41,7 @@ void CylinderMaker::Start()
 
 void CylinderMaker::Stop()
 {
-  OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
+  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
   if (vis)
     OgreCreator::Instance()->DeleteVisual(this->visualName);
 
@@ -95,7 +95,7 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  OgreVisual *vis = NULL;
+  Visual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))
     vis = OgreCreator::Instance()->GetVisual(this->visualName);
   else
@@ -131,7 +131,7 @@ void CylinderMaker::CreateTheEntity()
 {
   std::ostringstream newModelStr;
 
-  OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
+  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
   if (!vis)
     return;
 

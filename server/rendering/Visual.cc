@@ -21,11 +21,11 @@
 /* Desc: Ogre Visual Class
  * Author: Nate Koenig
  * Date: 14 Dec 2007
- * SVN: $Id$
  */
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "World.hh"
 #include "Events.hh"
 #include "OgreDynamicLines.hh"
 #include "Scene.hh"
@@ -40,73 +40,36 @@
 #include "OgreAdaptor.hh"
 #include "OgreCreator.hh"
 #include "Global.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 
 using namespace gazebo;
 
-SelectionObj *OgreVisual::selectionObj = 0;
-unsigned int OgreVisual::visualCounter = 0;
+SelectionObj *Visual::selectionObj = 0;
+unsigned int Visual::visualCounter = 0;
+
+ FIXING OGRE VISUAL!!
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
-  : Common(_owner)
+Visual::Visual(Common *parent)//const std::string &name, Scene *scene, Visual *node)
+  : Common(parent)
 {
   this->AddType(VISUAL);
   this->transparency = 0.0;
   this->hasMaterial = false;
 
   bool isStatic = false;
-  Ogre::SceneNode *pnode = NULL;
-  this->owner = _owner;
   this->useRTShader = true;
 
-  if (scene == NULL)
-    this->scene = OgreAdaptor::Instance()->GetScene(0);
-  else
-    this->scene = scene;
-
-  if (Simulator::Instance()->GetRenderEngineEnabled())
-  {
-    if (!node)
-      pnode = this->scene->GetManager()->getRootSceneNode();
-    else
-      pnode = node->GetSceneNode();
-  }
-
-  if (this->owner)
-  {
-    this->SetName(this->owner->GetName() + "_visual");
-    isStatic = this->owner->IsStatic();
-  }
-
   this->visible = true;
-  this->ConstructorHelper(pnode, isStatic);
-
-  this->ribbonTrail = (Ogre::RibbonTrail*)this->scene->GetManager()->createMovableObject("RibbonTrail");
-  this->ribbonTrail->setMaterialName("Gazebo/Red");
-  this->ribbonTrail->setTrailLength(200);
-  this->ribbonTrail->setMaxChainElements(1000);
-  this->ribbonTrail->setNumberOfChains(1);
-  this->ribbonTrail->setVisible(false);
-  this->ribbonTrail->setInitialWidth(0,0.05);
-  this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
-
-  RTShaderSystem::Instance()->AttachEntity(this);
+  this->ribbonTrail = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-OgreVisual::OgreVisual (Ogre::SceneNode *node, bool isStatic)
-  : Common(NULL)
-{
-  this->owner = NULL;
-  this->ConstructorHelper(node, isStatic);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper for the contructor
-void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
+void Visual::Init()
 {
   std::ostringstream stream;
   this->mutex = new boost::recursive_mutex();
@@ -115,10 +78,10 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
-  this->xyzP->Callback( &OgreVisual::SetPosition, this );
+  this->xyzP->Callback( &Visual::SetPosition, this );
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
-  this->rpyP->Callback( &OgreVisual::SetRotation, this );
+  this->rpyP->Callback( &Visual::SetRotation, this );
 
   this->meshNameP = new ParamT<std::string>("mesh","",1);
   this->meshTileP = new ParamT< Vector2<double> >("uvTile", 
@@ -127,20 +90,20 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
   //default to Gazebo/White
   this->materialNameP = new ParamT<std::string>("material",
                                                 std::string("none"),0);
-  this->materialNameP->Callback( &OgreVisual::SetMaterial, this );
+  this->materialNameP->Callback( &Visual::SetMaterial, this );
 
   this->castShadowsP = new ParamT<bool>("castShadows",true,0);
-  this->castShadowsP->Callback( &OgreVisual::SetCastShadows, this );
+  this->castShadowsP->Callback( &Visual::SetCastShadows, this );
 
   this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
   this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
 
   this->normalMapNameP = new ParamT<std::string>("normalMap",
                                                 std::string("none"),0);
-  this->normalMapNameP->Callback( &OgreVisual::SetNormalMap, this );
+  this->normalMapNameP->Callback( &Visual::SetNormalMap, this );
 
   this->shaderP = new ParamT<std::string>("shader", std::string("pixel"),0);
-  this->shaderP->Callback( &OgreVisual::SetShader, this );
+  this->shaderP->Callback( &Visual::SetShader, this );
   Param::End();
 
   this->boundingBoxNode = NULL;
@@ -149,32 +112,33 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->parentNode = node;
     this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
 
     // Create a unique name for the scene node
     //FIXME: what if we add the capability to delete and add new children?
-    stream << this->parentNode->getName() << "_VISUAL_" << visualCounter++;
+    stream << this->GetParent()->GetName() << "_VISUAL_" << visualCounter++;
+
+    Ogre::SceneNode *pnode = NULL;
+    if (!this->GetParent())
+      pnode = this->GetWorld()->GetScene()->GetManager()->getRootSceneNode();
+    else if ( this->GetParent()->HasType(VISUAL))
+      pnode = this->GetParent()->GetSceneNode();
+    else if (this->GetParent()->HasType(ENTITY))
+      pnode = this->GetParent()->GetVisualNode()->GetSceneNode();
 
     // Create the scene node
-    this->sceneNode = this->parentNode->createChildSceneNode( stream.str() );
+    this->sceneNode = pnode->createChildSceneNode( stream.str() );
   }
 
-  this->isStatic = isStatic;
-
-  /*if (this->isStatic)
-    this->staticGeom = this->sceneNode->getCreator()->createStaticGeometry(
-        this->GetName() + "_staticgeom");
-  else
-    this->staticGeom = NULL;
-    */
   this->staticGeom = NULL;
+
+  RTShaderSystem::Instance()->AttachEntity(this);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
-OgreVisual::~OgreVisual()
+Visual::~Visual()
 {
 
   delete this->mutex;
@@ -241,7 +205,7 @@ OgreVisual::~OgreVisual()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the visual
-void OgreVisual::Load(XMLConfigNode *node)
+void Visual::Load(XMLConfigNode *node)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -352,7 +316,7 @@ void OgreVisual::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the visual.
-void OgreVisual::Update()
+void Visual::Update()
 {
   if (!this->visible)
     return;
@@ -368,7 +332,7 @@ void OgreVisual::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the visual in XML format
-void OgreVisual::Save(std::string &prefix, std::ostream &stream)
+void Visual::Save(std::string &prefix, std::ostream &stream)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   stream << prefix << "<visual>\n";
@@ -383,7 +347,7 @@ void OgreVisual::Save(std::string &prefix, std::ostream &stream)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a renerable object to the visual
-void OgreVisual::AttachObject( Ogre::MovableObject *obj)
+void Visual::AttachObject( Ogre::MovableObject *obj)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -399,7 +363,7 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Detach all objects
-void OgreVisual::DetachObjects()
+void Visual::DetachObjects()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -412,7 +376,7 @@ void OgreVisual::DetachObjects()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of attached objects
-unsigned short OgreVisual::GetNumAttached()
+unsigned short Visual::GetNumAttached()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -425,7 +389,7 @@ unsigned short OgreVisual::GetNumAttached()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an attached object
-Ogre::MovableObject *OgreVisual::GetAttached(unsigned short num)
+Ogre::MovableObject *Visual::GetAttached(unsigned short num)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -438,9 +402,9 @@ Ogre::MovableObject *OgreVisual::GetAttached(unsigned short num)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach a static object
-void OgreVisual::MakeStatic()
+void Visual::MakeStatic()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  /*boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -457,11 +421,12 @@ void OgreVisual::MakeStatic()
 
   // Prevent double rendering
   this->sceneNode->setVisible(false);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a mesh to this visual by name
-void OgreVisual::AttachMesh( const std::string &meshName )
+void Visual::AttachMesh( const std::string &meshName )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -494,7 +459,7 @@ void OgreVisual::AttachMesh( const std::string &meshName )
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Set the scale
-void OgreVisual::SetScale(const Vector3 &scale )
+void Visual::SetScale(const Vector3 &scale )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -512,7 +477,7 @@ void OgreVisual::SetScale(const Vector3 &scale )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the scale
-Vector3 OgreVisual::GetScale()
+Vector3 Visual::GetScale()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -528,7 +493,7 @@ Vector3 OgreVisual::GetScale()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the material
-void OgreVisual::SetMaterial(const std::string &materialName)
+void Visual::SetMaterial(const std::string &materialName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -607,7 +572,7 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 }
 
 
-void OgreVisual::AttachAxes()
+void Visual::AttachAxes()
 {
   std::ostringstream nodeName;
 
@@ -655,7 +620,7 @@ void OgreVisual::AttachAxes()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the transparency
-void OgreVisual::SetTransparency( float trans )
+void Visual::SetTransparency( float trans )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -713,12 +678,12 @@ void OgreVisual::SetTransparency( float trans )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the transparency
-float OgreVisual::GetTransparency()
+float Visual::GetTransparency()
 {
   return this->transparency;
 }
 
-void OgreVisual::SetHighlight(bool highlight)
+void Visual::SetHighlight(bool highlight)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -730,7 +695,7 @@ void OgreVisual::SetHighlight(bool highlight)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual should cast shadows
-void OgreVisual::SetCastShadows(const bool &shadows)
+void Visual::SetCastShadows(const bool &shadows)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -750,7 +715,7 @@ void OgreVisual::SetCastShadows(const bool &shadows)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether the visual is visible
-void OgreVisual::SetVisible(bool visible, bool cascade)
+void Visual::SetVisible(bool visible, bool cascade)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -764,21 +729,21 @@ void OgreVisual::SetVisible(bool visible, bool cascade)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Toggle whether this visual is visible
-void OgreVisual::ToggleVisible()
+void Visual::ToggleVisible()
 {
   this->SetVisible( !this->GetVisible() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get whether the visual is visible
-bool OgreVisual::GetVisible() const
+bool Visual::GetVisible() const
 {
   return this->visible;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-void OgreVisual::SetPosition( const Vector3 &pos)
+void Visual::SetPosition( const Vector3 &pos)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -806,7 +771,7 @@ void OgreVisual::SetPosition( const Vector3 &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
-void OgreVisual::SetRotation( const Quatern &rot)
+void Visual::SetRotation( const Quatern &rot)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -822,7 +787,7 @@ void OgreVisual::SetRotation( const Quatern &rot)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the visual
-void OgreVisual::SetPose( const Pose3d &pose)
+void Visual::SetPose( const Pose3d &pose)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -840,7 +805,7 @@ void OgreVisual::SetPose( const Pose3d &pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-Vector3 OgreVisual::GetPosition() const
+Vector3 Visual::GetPosition() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -859,7 +824,7 @@ Vector3 OgreVisual::GetPosition() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the rotation of the visual
-Quatern OgreVisual::GetRotation( ) const
+Quatern Visual::GetRotation( ) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -879,7 +844,7 @@ Quatern OgreVisual::GetRotation( ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the visual
-Pose3d OgreVisual::GetPose() const
+Pose3d Visual::GetPose() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -895,7 +860,7 @@ Pose3d OgreVisual::GetPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global pose of the node
-Pose3d OgreVisual::GetWorldPose() const
+Pose3d Visual::GetWorldPose() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -926,7 +891,7 @@ Pose3d OgreVisual::GetWorldPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get this visual Ogre node
-Ogre::SceneNode * OgreVisual::GetSceneNode()
+Ogre::SceneNode * Visual::GetSceneNode()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -940,7 +905,7 @@ Ogre::SceneNode * OgreVisual::GetSceneNode()
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Create a bounding box for this visual
-void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
+void Visual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -993,7 +958,7 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the material of the bounding box
-void OgreVisual::SetBoundingBoxMaterial(const std::string &materialName )
+void Visual::SetBoundingBoxMaterial(const std::string &materialName )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -1023,16 +988,8 @@ void OgreVisual::SetBoundingBoxMaterial(const std::string &materialName )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the entity that manages this visual
-Entity *OgreVisual::GetOwner() const
-{
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return this->owner;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set to true to show a white bounding box, used to indicate user selection
-void OgreVisual::ShowSelectionBox( bool value )
+void Visual::ShowSelectionBox( bool value )
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -1055,14 +1012,14 @@ void OgreVisual::ShowSelectionBox( bool value )
 ////////////////////////////////////////////////////////////////////////////////
 /// Set to true to discard all calls to "SetPose". This is useful for the 
 /// visual node children that are part of a Geom
-void OgreVisual::SetIgnorePoseUpdates( bool value )
+void Visual::SetIgnorePoseUpdates( bool value )
 {
   this->ignorePoseUpdates = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if the  visual is a static geometry
-bool OgreVisual::IsStatic() const
+bool Visual::IsStatic() const
 {
   return this->isStatic;
 }
@@ -1070,28 +1027,28 @@ bool OgreVisual::IsStatic() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set one visual to track/follow another
-void OgreVisual::EnableTrackVisual( OgreVisual *vis )
+void Visual::EnableTrackVisual( Visual *vis )
 {
   this->sceneNode->setAutoTracking(true, vis->GetSceneNode() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Disable tracking of a visual
-void OgreVisual::DisableTrackVisual()
+void Visual::DisableTrackVisual()
 {
   this->sceneNode->setAutoTracking(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the normal map
-std::string OgreVisual::GetNormalMap() const
+std::string Visual::GetNormalMap() const
 {
   return (**this->normalMapNameP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the normal map
-void OgreVisual::SetNormalMap(const std::string &nmap)
+void Visual::SetNormalMap(const std::string &nmap)
 {
   this->normalMapNameP->SetValue(nmap);
   RTShaderSystem::Instance()->UpdateShaders();
@@ -1099,22 +1056,36 @@ void OgreVisual::SetNormalMap(const std::string &nmap)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the shader
-std::string OgreVisual::GetShader() const
+std::string Visual::GetShader() const
 {
   return (**this->shaderP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the shader
-void OgreVisual::SetShader(const std::string &shader)
+void Visual::SetShader(const std::string &shader)
 {
   this->shaderP->SetValue(shader);
   RTShaderSystem::Instance()->UpdateShaders();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OgreVisual::SetRibbonTrail(bool value)
+void Visual::SetRibbonTrail(bool value)
 {
+  if (this->ribbonTrail == NULL)
+  {
+    this->ribbonTrail = (Ogre::RibbonTrail*)this->GetWorld()->GetScene()->GetManager()->createMovableObject("RibbonTrail");
+    this->ribbonTrail->setMaterialName("Gazebo/Red");
+    this->ribbonTrail->setTrailLength(200);
+    this->ribbonTrail->setMaxChainElements(1000);
+    this->ribbonTrail->setNumberOfChains(1);
+    this->ribbonTrail->setVisible(false);
+    this->ribbonTrail->setInitialWidth(0,0.05);
+    this->sceneNode->attachObject(this->ribbonTrail);
+    //this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
+  }
+
+
   if (value)
   {
     try
@@ -1132,7 +1103,7 @@ void OgreVisual::SetRibbonTrail(bool value)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the bounding box
-Vector3 OgreVisual::GetBoundingBoxSize() const
+Vector3 Visual::GetBoundingBoxSize() const
 {
   this->sceneNode->_updateBounds();
   Ogre::AxisAlignedBox box = this->sceneNode->_getWorldAABB();
@@ -1142,23 +1113,23 @@ Vector3 OgreVisual::GetBoundingBoxSize() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether to use the RT Shader system
-void OgreVisual::SetUseRTShader(bool value)
+void Visual::SetUseRTShader(bool value)
 {
   this->useRTShader = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get whether to user the RT shader system
-bool OgreVisual::GetUseRTShader() const
+bool Visual::GetUseRTShader() const
 {
   return this->useRTShader;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the visual
-OgreDynamicLines *OgreVisual::AddDynamicLine(OgreDynamicRenderable::OperationType opType)
+OgreDynamicLines *Visual::AddDynamicLine(OgreDynamicRenderable::OperationType opType)
 {
-  Events::ConnectPreRenderSignal( boost::bind(&OgreVisual::Update, this) );
+  Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 
   OgreDynamicLines *line = new OgreDynamicLines(opType);
   this->lines.push_back(line);
@@ -1168,7 +1139,7 @@ OgreDynamicLines *OgreVisual::AddDynamicLine(OgreDynamicRenderable::OperationTyp
 
 ////////////////////////////////////////////////////////////////////////////////
 // Delete a dynamic line
-void OgreVisual::DeleteDynamicLine(OgreDynamicLines *line)
+void Visual::DeleteDynamicLine(OgreDynamicLines *line)
 {
   // delete instance from lines vector
   for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();iter!=this->lines.end();iter++)
@@ -1181,19 +1152,19 @@ void OgreVisual::DeleteDynamicLine(OgreDynamicLines *line)
   }
 
   if (this->lines.size() == 0)
-    Events::DisconnectPreRenderSignal( boost::bind(&OgreVisual::Update, this) );
+    Events::DisconnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the name of the material
-std::string OgreVisual::GetMaterialName() const
+std::string Visual::GetMaterialName() const
 {
   return this->myMaterialName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if a material is set for this visual
-bool OgreVisual::HasMaterial() const
+bool Visual::HasMaterial() const
 {
   return this->hasMaterial;
 }

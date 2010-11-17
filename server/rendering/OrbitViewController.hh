@@ -6,7 +6,7 @@
 
 namespace gazebo
 {
-  class OgreVisual;
+  class Visual;
 
   class OrbitViewController : public ViewController
   {
@@ -38,7 +38,7 @@ namespace gazebo
     private: float distance;
     private: Vector3 focalPoint;
 
-    private: OgreVisual *refVisual;
+    private: Visual *refVisual;
   };
 }
 

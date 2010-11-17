@@ -34,7 +34,7 @@
 #include "Events.hh"
 #include "OgreAdaptor.hh"
 #include "RenderState.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Light.hh"
 #include "GraphicsIfaceHandler.hh"
 #include "Global.hh"
@@ -1177,7 +1177,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
   if (Simulator::Instance()->GetRenderEngineEnabled() && 
       (childNode = node->GetChild("light")))
   {
-    this->light = new Light(body, OgreAdaptor::Instance()->GetScene(0));
+    this->light = new Light(body, this->GetWorld()->GetScene());
     this->light->Load(childNode);
   }
 

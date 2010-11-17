@@ -26,8 +26,7 @@
 
 #include "Events.hh"
 #include "PhysicsEngine.hh"
-#include "OgreVisual.hh"
-#include "OgreCreator.hh"
+#include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -76,7 +75,7 @@ Joint::~Joint()
 
   if (this->visual)
   {
-    OgreCreator::Instance()->DeleteVisual( this->visual );
+    delete this->visual;
     this->visual = NULL;
   }
 
@@ -140,28 +139,25 @@ void Joint::Load(XMLConfigNode *node)
   this->Attach(this->body1, this->body2);
 
   /// Add a renderable for the joint
-  this->visual = OgreCreator::Instance()->CreateVisual(
-      visname.str(), NULL);
+  this->visual = new Visual(this);
+  this->visual->SetName(visname.str());
+  this->visual->Init();
+  this->visual->SetPosition(this->anchorPos);
+  this->visual->SetCastShadows(false);
+  this->visual->AttachMesh("joint_anchor");
+  this->visual->SetMaterial("Gazebo/JointAnchor");
+  this->visual->SetVisible(false);
 
-  if (this->visual)
-  {
-    this->visual->SetPosition(this->anchorPos);
-    this->visual->SetCastShadows(false);
-    this->visual->AttachMesh("joint_anchor");
-    this->visual->SetMaterial("Gazebo/JointAnchor");
-    this->visual->SetVisible(false);
+  this->line1 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+  this->line2 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
-    this->line1 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
-    this->line2 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+  this->line1->setMaterial("Gazebo/BlueGlow");
+  this->line2->setMaterial("Gazebo/BlueGlow");
 
-    this->line1->setMaterial("Gazebo/BlueGlow");
-    this->line2->setMaterial("Gazebo/BlueGlow");
-
-    this->line1->AddPoint(Vector3(0,0,0));
-    this->line1->AddPoint(Vector3(0,0,0));
-    this->line2->AddPoint(Vector3(0,0,0));
-    this->line2->AddPoint(Vector3(0,0,0));
-  }
+  this->line1->AddPoint(Vector3(0,0,0));
+  this->line1->AddPoint(Vector3(0,0,0));
+  this->line2->AddPoint(Vector3(0,0,0));
+  this->line2->AddPoint(Vector3(0,0,0));
 
   // Set the anchor vector
   if (this->anchorBody)

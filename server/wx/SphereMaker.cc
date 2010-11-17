@@ -4,7 +4,7 @@
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "World.hh"
 #include "SphereMaker.hh"
@@ -41,7 +41,7 @@ void SphereMaker::Start()
 
 void SphereMaker::Stop()
 {
-  OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
+  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
   if (vis)
     OgreCreator::Instance()->DeleteVisual(this->visualName);
 
@@ -92,7 +92,7 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  OgreVisual *vis = NULL;
+  Visual *vis = NULL;
   if (OgreCreator::Instance()->GetVisual(this->visualName))
     vis = OgreCreator::Instance()->GetVisual(this->visualName);
   else
@@ -115,7 +115,7 @@ void SphereMaker::CreateTheEntity()
 {
   std::ostringstream newModelStr;
 
-  OgreVisual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
+  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
   if (!vis)
     return;
 

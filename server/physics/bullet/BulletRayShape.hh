@@ -33,7 +33,7 @@
 namespace gazebo
 {
   class OgreDynamicLines;
-  class OgreVisual;
+  class Visual;
 
   /// \addtogroup gazebo_physics_geom
   /// \{

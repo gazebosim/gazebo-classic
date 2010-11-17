@@ -33,7 +33,7 @@
 #include <tbb/blocked_range.h>
 
 #include "Events.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Body.hh"
 #include "FactoryIfaceHandler.hh"
 #include "GraphicsIfaceHandler.hh"
@@ -48,6 +48,7 @@
 #include "SensorManager.hh"
 #include "Simulator.hh"
 #include "gz.h"
+#include "Scene.hh"
 #include "World.hh"
 
 // NATY: put back in
@@ -93,6 +94,13 @@ World::World()
   this->saveStateTimeoutP = new ParamT<Time>("saveStateResolution",0.1,0);
   this->saveStateBufferSizeP = new ParamT<unsigned int>("saveStateBufferSize",1000,0);
   Param::End();
+
+  this->scene = new Scene("scene");
+  this->scene->SetType(Scene::GENERIC);
+  this->scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
+  this->scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
+  this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
+  this->scene->Init();
 
   Events::ConnectPauseSignal( boost::bind(&World::PauseSlot, this, _1) );
   Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
@@ -356,7 +364,7 @@ void World::RunLoop()
       req.tv_nsec = diffTime.nsec;
     }
 
-    nanosleep(&req, &rem);
+    //nanosleep(&req, &rem);
 
     // TODO: Fix timeout:  this belongs in simulator.cc
     /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
@@ -883,4 +891,11 @@ void World::SetPaused(bool p)
 
   Events::pauseSignal(p);
   this->pause = p;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the scene 
+Scene *World::GetScene() const
+{
+  return this->scene;
 }

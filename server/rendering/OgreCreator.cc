@@ -44,13 +44,11 @@
 #include "GazeboMessage.hh"
 #include "OgreMovableText.hh"
 #include "OgreAdaptor.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "OgreCreator.hh"
 
 using namespace gazebo;
-
-unsigned int OgreCreator::windowCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -69,7 +67,7 @@ OgreCreator::~OgreCreator()
 std::string OgreCreator::CreatePlane(const Vector3 &normal, 
     const Vector2<double> &size, const Vector2<double> &segments, 
     const Vector2<double> &uvTile, const std::string &material, 
-    bool castShadows, OgreVisual *parent, const std::string &name)
+    bool castShadows, Visual *parent, const std::string &name)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return std::string();
@@ -129,7 +127,7 @@ void OgreCreator::RemoveMesh(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window for Ogre
-Ogre::RenderWindow *OgreCreator::CreateWindow(RenderControl *wxWindow, unsigned int width, unsigned int height)
+/*Ogre::RenderWindow *OgreCreator::CreateWindow(RenderControl *wxWindow, unsigned int width, unsigned int height)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
@@ -192,7 +190,7 @@ Ogre::RenderWindow *OgreCreator::CreateWindow( const std::string ogreHandle,
   this->windows.push_back(window);
 
   return window;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a material from a color definition
@@ -289,7 +287,7 @@ void OgreCreator::Update()
 
   std::list<OgreMovableText*>::iterator titer;
   std::list<Ogre::RenderWindow*>::iterator witer;
-  std::list<OgreVisual*>::iterator viter;
+  std::list<Visual*>::iterator viter;
 
   // Update the text
   for (titer = this->text.begin(); titer != this->text.end(); titer++)
@@ -298,7 +296,7 @@ void OgreCreator::Update()
   // We only need this loop because we are using threads. The physics engine
   // can't reliably set the pose of the visuals when it's running in a 
   // separate thread.
-  if (!this->visuals.empty())
+  /*if (!this->visuals.empty())
   {
     // NATY: removed
     //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
@@ -312,71 +310,7 @@ void OgreCreator::Update()
         (*viter)->SetToDirtyPose();
       }
     }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Create a new ogre visual 
-OgreVisual *OgreCreator::CreateVisual( const std::string &name,
-    OgreVisual *parent, Entity *owner, Scene *scene)
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return NULL;
-
-  OgreVisual *newVis = NULL;
-  std::list<OgreVisual*>::iterator iter;
-
-  std::string vis_name;
-  if (name.empty())
-  {
-    unsigned int index = 0;
-    std::stringstream stream;
-    do 
-    {
-      stream.str("");
-      stream << "generic_visual_" << index++;
-    } while (this->GetVisual(stream.str()) != NULL);
-    vis_name = stream.str();
-  }
-  else
-    vis_name = name;
-
-  newVis = new OgreVisual(parent, owner, scene);
-  newVis->SetName(vis_name);
-
-  this->visuals.push_back( newVis );
-
-  return newVis;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get a visual
-OgreVisual *OgreCreator::GetVisual( const std::string &name )
-{
-  std::list<OgreVisual*>::iterator iter;
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-    if ( (*iter)->GetName() == name)
-      return (*iter);
-
-  return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Delete a visual
-void OgreCreator::DeleteVisual( OgreVisual *visual )
-{
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  this->visuals.remove(visual);
-  delete visual;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Delete a visual
-void OgreCreator::DeleteVisual( const std::string &visname )
-{
-  this->DeleteVisual( this->GetVisual(visname) );
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -673,7 +607,7 @@ void OgreCreator::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world bounding box for a visual
-void OgreCreator::GetVisualBounds(OgreVisual *vis, Vector3 &min, Vector3 &max)
+void OgreCreator::GetVisualBounds(Visual *vis, Vector3 &min, Vector3 &max)
 {
   Ogre::AxisAlignedBox box;
 

@@ -1,6 +1,5 @@
 #include <boost/lexical_cast.hpp>
 
-#include "Scene.hh"
 #include "RenderControl.hh"
 #include "UserCamera.hh"
 #include "Pose3d.hh"
@@ -99,9 +98,9 @@ void RenderPanel::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a camera
-void RenderPanel::CreateCamera(Scene *scene)
+void RenderPanel::ViewScene(Scene *scene)
 {
-  this->renderControl->CreateCamera(scene);
+  this->renderControl->ViewScene(scene);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -40,7 +40,7 @@
 
 namespace gazebo
 {
-  class OgreVisual;
+  class Visual;
   class Scene;
 
   class RTShaderSystem : public SingletonT<RTShaderSystem>
@@ -68,35 +68,40 @@ namespace gazebo
     /// \brief Add a scene manager
     public: void AddScene(Scene *scene);
 
+    /// \brief Remove a scene
+    public: void RemoveScene( Scene *scene );
+
     /// \brief Update the shaders
     public: void UpdateShaders();
 
     /// \brief Set an Ogre::Entity to use RT shaders
-    public: void AttachEntity(OgreVisual *vis);
+    public: void AttachEntity(Visual *vis);
 
     /// \brief Remove and entity
-    public: void DetachEntity(OgreVisual *vis);
+    public: void DetachEntity(Visual *vis);
 
     /// \brief Set a viewport to use shaders
-    public: static void AttachViewport(Camera *camera);
+    public: static void AttachViewport(Ogre::Viewport *viewport, Scene *scene);
 
     /// Set the lighting model to per pixel or per vertex
     public: void SetPerPixelLighting( bool s);
 
     /// \brief Generate shaders for an entity
-    public: void GenerateShaders(OgreVisual *vis);
+    public: void GenerateShaders(Visual *vis);
 
-    public: void ApplyShadows();
+    public: void ApplyShadows(Scene *scene);
 
     /// \brief Get paths for the shader system
     private: bool GetPaths(std::string &coreLibsPath, std::string &cachePath);
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
     private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
-    private: std::list<OgreVisual*> entities;
+    private: std::list<Visual*> entities;
 #endif
 
     private: bool initialized;
+
+    private: std::vector< Scene * > scenes;
 
     private: friend class DestroyerT<RTShaderSystem>;
     private: friend class SingletonT<RTShaderSystem>;

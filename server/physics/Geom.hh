@@ -44,7 +44,7 @@ namespace gazebo
   class Body;
   class SurfaceParams;
   class XMLConfigNode;
-  class OgreVisual;
+  class Visual;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
@@ -123,10 +123,10 @@ namespace gazebo
     public: unsigned int GetVisualCount() const;
 
     /// \brief Get a visual
-    public: OgreVisual *GetVisual(unsigned int index) const; 
+    public: Visual *GetVisual(unsigned int index) const; 
 
     /// \brief Get a visual by id
-    public: OgreVisual *GetVisualById( int id ) const;
+    public: Visual *GetVisualById( int id ) const;
 
     /// \brief Get the body this geom belongs to
     public: Body *GetBody() const;
@@ -229,12 +229,12 @@ namespace gazebo
     protected: ParamT<bool> *enableContactsP;
 
     /// Special bounding box visual
-    private: OgreVisual *bbVisual;
+    private: Visual *bbVisual;
 
     private: float transparency;
 
     /// All the visual apparence 
-    private: std::vector<OgreVisual*> visuals;
+    private: std::vector<Visual*> visuals;
 
     protected: Shape *shape;
 

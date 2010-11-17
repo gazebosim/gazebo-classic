@@ -25,7 +25,7 @@
  */
 
 #include "BulletPhysics.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Body.hh"
 #include "GazeboError.hh"
 #include "Simulator.hh"

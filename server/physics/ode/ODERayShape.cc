@@ -27,7 +27,7 @@
 #include "ODEBody.hh"
 #include "ODEGeom.hh"
 #include "ODEPhysics.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "ODERayShape.hh"
 

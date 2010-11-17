@@ -37,7 +37,7 @@
 namespace gazebo
 {
 
-  class OgreVisual;
+  class Visual;
   /// \addtogroup gazebo_server
   /// \{
   
@@ -59,11 +59,11 @@ namespace gazebo
  
     /// \brief Return this entity's sceneNode
     /// \return Ogre scene node
-    public: OgreVisual *GetVisualNode() const;
+    public: Visual *GetVisualNode() const;
   
     /// \brief Set the scene node
     /// \param sceneNode Ogre scene node
-    public: void SetVisualNode(OgreVisual *visualNode);
+    public: void SetVisualNode(Visual *visualNode);
  
     /// \brief Set whether this entity is static: immovable
     /// \param s Bool, true = static
@@ -142,7 +142,7 @@ namespace gazebo
     protected: ParamT<bool> *staticP;
   
     /// \brief Visual stuff
-    protected: OgreVisual *visualNode;
+    protected: Visual *visualNode;
   
 
     private: Pose3d relativePose;

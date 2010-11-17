@@ -148,7 +148,7 @@ namespace gazebo
 
     private: bool merged;
     private: static unsigned int geomCounter;
-    private: OgreVisual *visualNode;
+    private: Visual *visualNode;
   };
 
 

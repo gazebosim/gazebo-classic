@@ -1,5 +1,6 @@
 #include <wx/aui/aui.h>
 
+#include "World.hh"
 #include "Model.hh"
 #include "Body.hh"
 #include "Image.hh"
@@ -14,7 +15,7 @@
 #include "OrbitViewController.hh"
 #include "FPSViewController.hh"
 #include "OgreCreator.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Simulator.hh"
 #include "ModelBuilder.hh"
 
@@ -23,16 +24,19 @@ using namespace gazebo;
 ModelBuilder::ModelBuilder( wxWindow *parent )
   : wxDialog(parent,wxID_ANY, wxT("Model Builder"), wxDefaultPosition, wxSize(600, 600), wxDEFAULT_FRAME_STYLE)
 {
-  this->scene = OgreAdaptor::Instance()->CreateScene("viewer_scene");
+/*  this->scene = OgreAdaptor::Instance()->CreateScene("viewer_scene");
   this->dirLight = new Light(NULL, scene);
   this->dirLight->Load(NULL);
   this->dirLight->SetLightType("directional");
   this->dirLight->SetDiffuseColor( Color(1.0, 1.0, 1.0) );
   this->dirLight->SetSpecularColor( Color(0.1, 0.1, 0.1) );
   this->dirLight->SetDirection( Vector3(0, 0, -1) );
+  */
+
+  this->world = Simulator::Instance()->CreateWorld("gazebo_model_builder_world");
 
   this->renderControl = new RenderControl(this);
-  this->renderControl->CreateCamera(this->scene);
+  this->renderControl->ViewScene(this->world->GetScene());
   this->renderControl->Init();
   UserCamera *cam = this->renderControl->GetCamera();
   cam->SetClipDist(0.01, 1000);
@@ -54,7 +58,7 @@ ModelBuilder::~ModelBuilder()
 {
   delete this->renderControl;
   delete this->dirLight;
-  OgreAdaptor::Instance()->RemoveScene(this->scene->GetName());
+  Simulator::Instance()->RemoveWorld(this->world->GetName());
 
   this->auiManager->UnInit();
   delete this->auiManager;

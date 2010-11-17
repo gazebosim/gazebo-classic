@@ -37,10 +37,11 @@
 
 #include "gazebo_config.h"
 
+#include "WindowManager.hh"
 #include "Events.hh"
 #include "Scene.hh"
 #include "Grid.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "UserCamera.hh"
 #include "OgreMovableText.hh"
 #include "OgreHUD.hh"
@@ -112,10 +113,11 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   // Setup the available resources
   this->SetupResources();
 
-  Scene *scene = new Scene("primary_scene");
+  /*Scene *scene = new Scene("primary_scene");
   scene->Load(rootNode->GetChild("rendering"));
   scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scenes.push_back( scene );  
+  */
 
   /*scene = new Scene("viewer_scene");
   scene->SetType(Scene::GENERIC);
@@ -129,7 +131,7 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a scene
-Scene *OgreAdaptor::CreateScene(const std::string &name)
+/*Scene *OgreAdaptor::CreateScene(const std::string &name)
 {
   Scene *scene = new Scene(name);
   scene->SetType(Scene::GENERIC);
@@ -157,6 +159,46 @@ void OgreAdaptor::RemoveScene(const std::string &name)
     this->scenes.erase(iter);
     delete *iter;
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a scene 
+Scene *OgreAdaptor::GetScene(unsigned int index)
+{
+  if (index < this->scenes.size())
+    return this->scenes[index];
+  else
+  {
+    std::cerr << "Invalid Scene Index[" << index << "]\n";
+    return NULL;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of scene 
+unsigned int OgreAdaptor::GetSceneCount() const
+{
+  return this->scenes.size();
+}
+*/
+
+////////////////////////////////////////////////////////////////////////////////
+/// Update all the scenes 
+void OgreAdaptor::UpdateScenes()
+{
+  Events::preRenderSignal();
+
+  this->root->_fireFrameStarted();
+
+  OgreCreator::Instance()->Update();
+
+  Events::renderSignal();
+
+  this->root->_fireFrameRenderingQueued();
+
+  this->root->_fireFrameEnded();
+
+  Events::postRenderSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +238,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
     std::stringstream stream;
     stream << (int32_t)this->dummyWindowId;
-    OgreCreator::Instance()->CreateWindow( stream.str(), 1,1);
+
+    WindowManager::Instance()->CreateWindow( stream.str(), 1, 1 );
   }
 
   // Set default mipmap level (NB some APIs ignore this)
@@ -210,12 +253,12 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   if (this->HasGLSL())
     RTShaderSystem::Instance()->Init();
 
-  for (unsigned int i=0; i < this->scenes.size(); i++)
+  /*for (unsigned int i=0; i < this->scenes.size(); i++)
   {
     this->scenes[i]->Init(this->root);
     if (i==0)
       this->scenes[i]->InitShadows();
-  }
+  }*/
 
   if (this->HasGLSL())
     RTShaderSystem::Instance()->UpdateShaders();
@@ -235,7 +278,7 @@ void OgreAdaptor::Fini()
 void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<rendering:ogre>\n";
-  this->scenes[0]->Save(prefix,stream);
+  //this->scenes[0]->Save(prefix,stream);
   stream << prefix << "</rendering:ogre>\n";
 }
 
@@ -401,48 +444,9 @@ void OgreAdaptor::SetupRenderSystem()
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get a scene 
-Scene *OgreAdaptor::GetScene(unsigned int index)
-{
-  if (index < this->scenes.size())
-    return this->scenes[index];
-  else
-  {
-    std::cerr << "Invalid Scene Index[" << index << "]\n";
-    return NULL;
-  }
-}
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the number of scene 
-unsigned int OgreAdaptor::GetSceneCount() const
-{
-  return this->scenes.size();
-}
 
-////////////////////////////////////////////////////////////////////////////////
-/// Update all the scenes 
-void OgreAdaptor::UpdateScenes()
-{
-  Events::preRenderSignal();
 
-  this->root->_fireFrameStarted();
-
-  OgreCreator::Instance()->Update();
-
-  Events::renderSignal();
-
-  /*for (unsigned int i=0; i < this->scenes.size(); i++)
-    this->scenes[i]->UpdateCameras();
-    */
-
-  this->root->_fireFrameRenderingQueued();
-
-  this->root->_fireFrameEnded();
-
-  Events::postRenderSignal();
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////

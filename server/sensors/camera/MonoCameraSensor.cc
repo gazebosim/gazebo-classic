@@ -33,13 +33,13 @@
 #include "World.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "OgreCreator.hh"
 #include "Simulator.hh"
 
 #include "SensorFactory.hh"
 #include "MonoCameraSensor.hh"
-
+#include "Scene.hh"
 #include "Simulator.hh"
 
 using namespace gazebo;
@@ -51,7 +51,8 @@ GZ_REGISTER_STATIC_SENSOR("camera", MonoCameraSensor);
 MonoCameraSensor::MonoCameraSensor(Body *body)
     : Sensor(body)
 {
-  this->camera = new Camera("Mono",0);
+  this->camera = this->GetWorld()->GetScene()->CreateCamera("Mono");
+
   this->typeName = "monocamera";
   this->camera->SetCaptureData(true);
 
@@ -63,8 +64,6 @@ MonoCameraSensor::MonoCameraSensor(Body *body)
 // Destructor
 MonoCameraSensor::~MonoCameraSensor()
 {
-  delete this->camera;
-  this->camera = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////

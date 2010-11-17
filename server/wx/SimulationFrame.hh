@@ -23,7 +23,7 @@ namespace gazebo
     public: virtual ~SimulationFrame();
 
     /// \brief Create the cameras
-    public: void CreateCameras();
+    public: void ViewScene(Scene *scene);
 
     public: void Init();
 

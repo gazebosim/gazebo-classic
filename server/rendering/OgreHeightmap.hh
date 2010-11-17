@@ -40,7 +40,7 @@ namespace gazebo
   class OgreHeightmap : public Ogre::RaySceneQueryListener
   {
     /// \brief Constructor
-    public: OgreHeightmap(unsigned int sceneIndex);
+    public: OgreHeightmap(Scene *scene);
 
     /// \brief Destructor
     public: virtual ~OgreHeightmap();

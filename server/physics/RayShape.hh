@@ -33,7 +33,7 @@
 #include "Simulator.hh"
 #include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
-#include "OgreVisual.hh"
+#include "Visual.hh"
 #include "Geom.hh"
 
 namespace gazebo
