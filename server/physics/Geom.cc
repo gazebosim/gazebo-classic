@@ -171,7 +171,7 @@ void Geom::Load(XMLConfigNode *node)
     visname << this->GetCompleteScopedName() << "_VISUAL_" << this->visuals.size();
     Visual *visual = new Visual(this->visualNode);
     visual->Load(childNode);
-    visual->SetName(visname);
+    visual->SetName(visname.str());
     visual->SetIgnorePoseUpdates(true);
     visual->SetOwner(this);
     visual->Init();

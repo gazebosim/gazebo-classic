@@ -379,9 +379,9 @@ void Body::Init()
 
     if (this->cgVisual == NULL)
     {
-      this->cgVisual = new Visual(this->comEntity->GetVisualNode());
+      this->cgVisual = new Visual(this->comEntity);
       this->cgVisual->SetName(visname.str());
-      this->cvVisual->Init();
+      this->cgVisual->Init();
     }
     else
       this->cgVisual->DetachObjects();

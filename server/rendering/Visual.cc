@@ -47,12 +47,9 @@ using namespace gazebo;
 SelectionObj *Visual::selectionObj = 0;
 unsigned int Visual::visualCounter = 0;
 
- FIXING OGRE VISUAL!!
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Visual::Visual(Common *parent)//const std::string &name, Scene *scene, Visual *node)
+Visual::Visual(Common *parent)
   : Common(parent)
 {
   this->AddType(VISUAL);
@@ -328,7 +325,19 @@ void Visual::Update()
     (*iter)->Update();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set the owner
+void Visual::SetOwner(Common *common)
+{
+  this->owner = common;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+// Get the owner
+Common *Visual::GetOwner() const
+{
+  return this->owner;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the visual in XML format

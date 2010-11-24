@@ -55,22 +55,25 @@ namespace gazebo
   class Visual : public Common, public Ogre::Any
   {
     /// \brief Constructor
-    public: Visual (const std::string &name, Scene *scene, Visual *parent=NULL, Entity *owner = NULL);
-
-    /// \brief Constructor
-    public: Visual (Ogre::SceneNode *node, bool isStatic=false);
-
-    /// \brief Helper for the contructor
-    private: void ConstructorHelper(Ogre::SceneNode *node, bool isStatic=false);
+    public: Visual (Common *parent = NULL);
 
     /// \brief Destructor
     public: virtual ~Visual();
+
+    /// \brief Helper for the contructor
+    public: void Init();
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
 
     /// \brief Update the visual.
     public: void Update();
+
+    /// \brief Set the owner
+    public: void SetOwner(Common *common);
+
+    /// \brief Get the owner
+    public: Common *GetOwner() const;
 
     /// \brief Attach a manipulation visual
     public: void AttachManipulation();
@@ -160,9 +163,6 @@ namespace gazebo
     /// \brief Make the visual objects static renderables
     public: void MakeStatic();
 
-    /// \brief Get the entity that manages this visual
-    public: Entity *GetOwner() const;
-
     /// \brief Set to true to show a white bounding box, used to indicate 
     //         user selection
     public: void ShowSelectionBox( bool value );
@@ -235,7 +235,7 @@ namespace gazebo
 
     private: static unsigned int visualCounter;
 
-    private: Entity *owner;
+    private: Common *owner;
 
     private: ParamT<Vector3> *xyzP;
     private: ParamT<Quatern> *rpyP;

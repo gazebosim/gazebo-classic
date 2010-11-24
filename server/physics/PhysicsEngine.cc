@@ -59,8 +59,8 @@ PhysicsEngine::PhysicsEngine(World *world)
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->visual = new Visual(NULL);
-    this->visual->SetName("Physics_Engine_Visual"), this->world->GetScene());
+    this->visual = new Visual(NULL); //this->world->GetScene();
+    this->visual->SetName("Physics_Engine_Visual");
     this->visual->SetVisible(false);
     this->visual->SetCastShadows(false);
     this->visual->SetUseRTShader(false);
@@ -116,7 +116,7 @@ PhysicsEngine::~PhysicsEngine()
 
   if (this->visual)
   {
-    OgreCreator::Instance()->DeleteVisual( this->visual );
+    delete this->visual;
     this->visual = NULL;
   }
 
