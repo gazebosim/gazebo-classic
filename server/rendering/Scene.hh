@@ -19,6 +19,7 @@ namespace gazebo
   class Camera;
   class UserCamera;
   class Entity;
+  class Common;
 
   class Scene
   {
@@ -93,7 +94,7 @@ namespace gazebo
     /// \param camera The ogre camera, used to do mouse picking
     /// \param mousePos The position of the mouse in screen coordinates
     /// \return The selected entity, or NULL
-    public: Entity *GetEntityAt(Camera *camera, 
+    public: Common *GetEntityAt(Camera *camera, 
                                 Vector2<int> mousePos, std::string &mod);
 
     /// \brief Get the world pos of a the first contact at a pixel location

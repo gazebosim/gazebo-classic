@@ -46,27 +46,27 @@ void OgreDynamicRenderable::SetOperationType(OperationType opType)
 {
   switch (opType)
   {
-    case OT_POINT_LIST:
+    case RENDERING_POINT_LIST:
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_POINT_LIST;
       break;
 
-    case OT_LINE_LIST:
+    case RENDERING_LINE_LIST:
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_LINE_LIST;
       break;
 
-    case OT_LINE_STRIP:
+    case RENDERING_LINE_STRIP:
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_LINE_STRIP;
       break;
 
-    case OT_TRIANGLE_LIST:
+    case RENDERING_TRIANGLE_LIST:
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
       break;
 
-    case OT_TRIANGLE_STRIP:
+    case RENDERING_TRIANGLE_STRIP:
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
       break;
 
-    case OT_TRIANGLE_FAN:
+    case RENDERING_TRIANGLE_FAN:
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
       break;
   }
@@ -74,29 +74,37 @@ void OgreDynamicRenderable::SetOperationType(OperationType opType)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the render operation type
-OgreDynamicRenderable::OperationType OgreDynamicRenderable::GetOperationType() const
+OperationType OgreDynamicRenderable::GetOperationType() const
 {
-  OperationType type = OT_POINT_LIST;
+  OperationType type;
   switch (this->mRenderOp.operationType)
   {
-    case Ogre::RenderOperation::OT_POINT_LIST:
-      type = OT_POINT_LIST;
-
     case Ogre::RenderOperation::OT_LINE_LIST:
-      type = OT_LINE_LIST;
+      type = RENDERING_LINE_LIST;
+      break;
 
     case Ogre::RenderOperation::OT_LINE_STRIP:
-      type = OT_LINE_STRIP;
+      type = RENDERING_LINE_STRIP;
+      break;
 
     case Ogre::RenderOperation::OT_TRIANGLE_LIST:
-      type = OT_TRIANGLE_LIST;
+      type = RENDERING_TRIANGLE_LIST;
+      break;
 
     case Ogre::RenderOperation::OT_TRIANGLE_STRIP:
-      type = OT_TRIANGLE_STRIP;
+      type = RENDERING_TRIANGLE_STRIP;
+      break;
 
     case Ogre::RenderOperation::OT_TRIANGLE_FAN:
-      type = OT_TRIANGLE_FAN;
+      type = RENDERING_TRIANGLE_FAN;
+      break;
+
+    default:
+    case Ogre::RenderOperation::OT_POINT_LIST:
+      type = RENDERING_POINT_LIST;
+      break;
   }
+
   return type;
 }
 

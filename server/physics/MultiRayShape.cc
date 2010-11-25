@@ -1,3 +1,4 @@
+#include "RenderTypes.hh"
 #include "XMLConfig.hh"
 #include "MultiRayShape.hh"
 
@@ -10,10 +11,10 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
   this->AddType(MULTIRAY_SHAPE);
 
   this->rayFan = this->geomParent->GetVisualNode()->AddDynamicLine(
-      OgreDynamicRenderable::OT_TRIANGLE_FAN);
+      RENDERING_TRIANGLE_FAN);
 
   this->rayFanOutline = this->geomParent->GetVisualNode()->AddDynamicLine(
-      OgreDynamicRenderable::OT_LINE_STRIP);
+      RENDERING_LINE_STRIP);
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFanOutline->setMaterial("Gazebo/BlueGlow");

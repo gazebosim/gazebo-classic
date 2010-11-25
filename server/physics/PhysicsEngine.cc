@@ -26,6 +26,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "RenderTypes.hh"
+
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "RenderState.hh"
@@ -59,8 +61,7 @@ PhysicsEngine::PhysicsEngine(World *world)
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->visual = new Visual(NULL); //this->world->GetScene();
-    this->visual->SetName("Physics_Engine_Visual");
+    this->visual = new Visual("Physics_Engine_Visual", this->world->GetScene());
     this->visual->SetVisible(false);
     this->visual->SetCastShadows(false);
     this->visual->SetUseRTShader(false);
@@ -79,8 +80,7 @@ PhysicsEngine::PhysicsEngine(World *world)
          this->contactLinesIter != this->contactLines.end(); 
          this->contactLinesIter++, i++)
     {
-      (*this->contactLinesIter) = this->visual->AddDynamicLine(
-          OgreDynamicRenderable::OT_LINE_LIST);
+      (*this->contactLinesIter) = this->visual->AddDynamicLine(RENDERING_LINE_LIST);
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));

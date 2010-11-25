@@ -57,18 +57,16 @@ Entity::Entity(Common *parent)
   {
     Entity *ep = (Entity*)(this->parent);
     if (Simulator::Instance()->GetRenderEngineEnabled())
-      this->visualNode = new Visual(ep);
+      this->visualNode = new Visual(visname.str(), ep);
     this->SetStatic(ep->IsStatic());
   }
   else
   {
     if (Simulator::Instance()->GetRenderEngineEnabled())
-      this->visualNode = new Visual(this);
+      this->visualNode = new Visual(visname.str(), this);
   }
 
   this->visualNode->SetOwner(this);
-  this->visualNode->SetName(visname.str());
-  this->visualNode->Init();
 }
 
 void Entity::SetName(const std::string &name)

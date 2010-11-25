@@ -11,12 +11,13 @@
 
 using namespace gazebo;
 
+unsigned int SphereMaker::counter = 0;
+
 SphereMaker::SphereMaker() 
 : EntityMaker()
 {
   this->state = 0;
   this->visualName = "";
-  this->index = 0;
 }
 
 SphereMaker::~SphereMaker()
@@ -26,15 +27,7 @@ SphereMaker::~SphereMaker()
 void SphereMaker::Start()
 {
   std::ostringstream stream;
-  std::string name = "user_sphere";
-
-  do
-  {
-    stream.str("");
-    stream << name << index;
-    this->index++;
-  } while (OgreCreator::Instance()->GetVisual(stream.str()));
-
+  stream << "user_sphere_" << counter++;
   this->visualName = stream.str();
   this->state = 1;
 }

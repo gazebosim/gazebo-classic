@@ -10,13 +10,13 @@
 #include "CylinderMaker.hh"
 
 using namespace gazebo;
+unsigned int CylinderMaker::counter = 0;
 
 CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
   this->state = 0;
   this->visualName = "";
-  this->index = 0;
 }
 
 CylinderMaker::~CylinderMaker()
@@ -26,15 +26,7 @@ CylinderMaker::~CylinderMaker()
 void CylinderMaker::Start()
 {
   std::ostringstream stream;
-  std::string name = "user_cylinder";
-
-  do
-  {
-    stream.str("");
-    stream << name << index;
-    this->index++;
-  } while (OgreCreator::Instance()->GetVisual(stream.str()));
-
+  stream <<  "user_cylinder_" << counter++;
   this->visualName = stream.str();
   this->state = 1;
 }

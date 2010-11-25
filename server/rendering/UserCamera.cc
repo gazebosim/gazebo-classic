@@ -30,6 +30,7 @@
 #include "FPSViewController.hh"
 #include "OrbitViewController.hh"
 
+#include "RenderTypes.hh"
 #include "GazeboError.hh"
 #include "Model.hh"
 #include "Body.hh"
@@ -106,9 +107,10 @@ void UserCamera::Init()
 
   Camera::Init();
 
-  this->visual = new Visual(this->pitchNode);
+  this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
+
   // The lines draw a visualization of the camera
-  OgreDynamicLines *line = this->visual->AddDynamicLine( OgreDynamicRenderable::OT_LINE_LIST );
+  OgreDynamicLines *line = this->visual->AddDynamicLine( RENDERING_LINE_LIST );
 
   float f = 0.2;
 

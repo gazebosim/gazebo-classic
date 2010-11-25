@@ -11,12 +11,13 @@
 
 using namespace gazebo;
 
+unsigned int BoxMaker::counter = 0;
+
 BoxMaker::BoxMaker() 
 : EntityMaker()
 {
   this->state = 0;
   this->visualName = "";
-  this->index = 0;
 }
 
 BoxMaker::~BoxMaker()
@@ -26,15 +27,7 @@ BoxMaker::~BoxMaker()
 void BoxMaker::Start()
 {
   std::ostringstream stream;
-  std::string boxName = "user_box";
-
-  do
-  {
-    stream.str("");
-    stream << boxName << index;
-    this->index++;
-  } while (OgreCreator::Instance()->GetVisual(stream.str()));
-
+  stream << "user_box_" << counter++;
   this->visualName = stream.str();
   this->state = 1;
 }

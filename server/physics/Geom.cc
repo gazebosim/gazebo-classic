@@ -169,12 +169,10 @@ void Geom::Load(XMLConfigNode *node)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "_VISUAL_" << this->visuals.size();
-    Visual *visual = new Visual(this->visualNode);
+    Visual *visual = new Visual(visname.str(), this->visualNode);
     visual->Load(childNode);
-    visual->SetName(visname.str());
     visual->SetIgnorePoseUpdates(true);
     visual->SetOwner(this);
-    visual->Init();
     visual->SetCastShadows(true);
 
     this->visuals.push_back(visual);
@@ -198,9 +196,7 @@ void Geom::CreateBoundingBox()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "_BBVISUAL" ;
 
-    this->bbVisual = new Visual(this->visualNode);
-    this->bbVisual->SetName(visname.str());
-    this->bbVisual->Init();
+    this->bbVisual = new Visual(visname.str(), this->visualNode);
     this->bbVisual->SetCastShadows(false);
     this->bbVisual->AttachBoundingBox(min,max);
     this->bbVisual->SetVisible( RenderState::GetShowBoundingBoxes() );

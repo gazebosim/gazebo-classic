@@ -22,7 +22,7 @@ OrbitViewController::OrbitViewController(UserCamera *camera)
 
   this->focalPoint.Set(0,0,0);
   this->distance = this->camera->GetWorldPosition().Distance(this->focalPoint);
-  this->refVisual = new Visual(this->camera->GetScene());
+  this->refVisual = new Visual("OrbitViewController", this->camera->GetSceneNode());
   this->refVisual->Init();
   this->refVisual->AttachMesh("unit_sphere");
   this->refVisual->SetScale(Vector3(0.2,0.2,0.1));

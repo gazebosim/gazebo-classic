@@ -10,12 +10,13 @@
 
 using namespace gazebo;
 
+unsigned int PointLightMaker::counter = 0;
+
 PointLightMaker::PointLightMaker()
   : EntityMaker()
 {
   this->state = 0;
   this->lightName = "";
-  this->index = 0;
 }
 
 PointLightMaker::~PointLightMaker()
@@ -25,15 +26,7 @@ PointLightMaker::~PointLightMaker()
 void PointLightMaker::Start()
 {
   std::ostringstream stream;
-  std::string name = "user_light";
-
-  do
-  {
-    stream.str("");
-    stream << name << index;
-    this->index++;
-  } while (Common::GetByName(stream.str()));
-
+  stream << "user_light_" << counter++;
   this->lightName = stream.str();
   this->state = 1;
 }

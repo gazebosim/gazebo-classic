@@ -321,9 +321,9 @@ UserCamera *Scene::GetUserCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Entity *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &mod) 
+Common *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &mod) 
 {
-  Entity *entity = NULL;
+  Common *entity = NULL;
   Ogre::Camera *ogreCam = camera->GetCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
 

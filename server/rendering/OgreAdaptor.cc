@@ -23,17 +23,21 @@
  * Date: 13 Feb 2006
  * CVS: $Id$
  */
+
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <GL/glx.h>
+
 #include <stdint.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <iostream>
+#include <string.h>
 
 #include <Ogre.h>
 #include <OgreDataStream.h>
 #include <OgreLogManager.h>
 #include <OgreWindowEventUtilities.h>
-
-#include <sys/types.h>
-#include <dirent.h>
-#include <iostream>
-#include <string.h>
 
 #include "gazebo_config.h"
 
@@ -78,9 +82,10 @@ OgreAdaptor::~OgreAdaptor()
 {
   if (this->dummyDisplay)
   {
-    glXDestroyContext(this->dummyDisplay, this->dummyContext);
-    XDestroyWindow(this->dummyDisplay, this->dummyWindowId);
-    XCloseDisplay(this->dummyDisplay);
+    glXDestroyContext((Display*)this->dummyDisplay, 
+                      (GLXContext)this->dummyContext);
+    XDestroyWindow((Display*)this->dummyDisplay, this->dummyWindowId);
+    XCloseDisplay((Display*)this->dummyDisplay);
   }
 }
 
@@ -225,16 +230,17 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     int attribList[] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 16, 
                         GLX_STENCIL_SIZE, 8, None };
 
-    this->dummyVisual = glXChooseVisual(this->dummyDisplay, screen, 
-                                        (int *)attribList);
+    XVisualInfo *dummyVisual = glXChooseVisual((Display*)this->dummyDisplay, 
+                                               screen, (int *)attribList);
 
-    this->dummyWindowId = XCreateSimpleWindow(this->dummyDisplay, 
-        RootWindow(this->dummyDisplay, screen), 0, 0, 1, 1, 0, 0, 0);
+    this->dummyWindowId = XCreateSimpleWindow((Display*)this->dummyDisplay, 
+        RootWindow((Display*)this->dummyDisplay, screen), 0, 0, 1, 1, 0, 0, 0);
 
-    this->dummyContext = glXCreateContext(this->dummyDisplay, 
-                                          this->dummyVisual, NULL, 1);
+    this->dummyContext = glXCreateContext((Display*)this->dummyDisplay, 
+                                          dummyVisual, NULL, 1);
 
-    glXMakeCurrent(this->dummyDisplay, this->dummyWindowId, this->dummyContext);
+    glXMakeCurrent((Display*)this->dummyDisplay, 
+                   this->dummyWindowId, (GLXContext)this->dummyContext);
 
     std::stringstream stream;
     stream << (int32_t)this->dummyWindowId;

@@ -194,9 +194,9 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
   if (!this->initialized || !vis->GetUseRTShader())
     return;
 
-  for (unsigned int k=0; k < vis->sceneNode->numAttachedObjects(); k++)
+  for (unsigned int k=0; k < vis->GetSceneNode()->numAttachedObjects(); k++)
   {
-    Ogre::MovableObject *obj = vis->sceneNode->getAttachedObject(k);
+    Ogre::MovableObject *obj = vis->GetSceneNode()->getAttachedObject(k);
     Ogre::Entity *entity = dynamic_cast<Ogre::Entity*>(obj);
     if (!entity)
       continue;

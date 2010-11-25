@@ -24,6 +24,7 @@
  * SVN: $Id:$
  */
 
+#include "RenderTypes.hh"
 #include "RayShape.hh"
 
 using namespace gazebo;
@@ -37,8 +38,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
 
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
   {
-    this->line = this->geomParent->GetVisualNode()->AddDynamicLine(
-        OgreDynamicRenderable::OT_LINE_LIST);
+    this->line = this->geomParent->GetVisualNode()->AddDynamicLine(RENDERING_LINE_LIST);
 
     // Add two points
     this->line->AddPoint(Vector3(0,0,0));

@@ -23,6 +23,7 @@
  * Date: 14 Dec 2007
  */
 
+#include <Ogre.h>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "World.hh"
@@ -49,18 +50,61 @@ unsigned int Visual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Visual::Visual(Common *parent)
+Visual::Visual(const std::string &name, Common *parent)
   : Common(parent)
 {
+  this->SetName(name);
   this->AddType(VISUAL);
-  this->transparency = 0.0;
-  this->hasMaterial = false;
+  this->sceneNode = NULL;
 
-  bool isStatic = false;
-  this->useRTShader = true;
+  std::ostringstream stream;
+  stream << this->GetName() << "_VISUAL_" << visualCounter++;
 
-  this->visible = true;
-  this->ribbonTrail = NULL;
+  Ogre::SceneNode *pnode = NULL;
+  if (this->GetParent()->HasType(ENTITY))
+     pnode = ((Entity*)this->GetParent())->GetVisualNode()->GetSceneNode();
+  else if ( this->GetParent()->HasType(VISUAL))
+    pnode = ((Visual*)this->GetParent())->GetSceneNode();
+  else
+    gzerr(0) << "Create a visual, invalid parent!!!\n";
+
+  this->sceneNode = pnode->createChildSceneNode( stream.str() );
+
+  this->Init();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Constructor
+Visual::Visual (const std::string &name, Ogre::SceneNode *parent)
+  : Common(NULL)
+{
+  this->SetName(name);
+  this->AddType(VISUAL);
+  this->sceneNode = NULL;
+
+  std::ostringstream stream;
+  stream << this->GetName() << "_VISUAL_" << visualCounter++;
+
+  this->sceneNode = parent->createChildSceneNode( stream.str() );
+
+  this->Init();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Constructor
+Visual::Visual (const std::string &name, Scene *scene)
+  : Common(NULL)
+{
+  this->SetName(name);
+  this->AddType(VISUAL);
+  this->sceneNode = NULL;
+
+  std::ostringstream stream;
+  stream << this->GetName() << "_VISUAL_" << visualCounter++;
+
+  this->sceneNode = scene->GetManager()->getRootSceneNode()->createChildSceneNode(stream.str());
+
+  this->Init();
 }
 
 
@@ -68,10 +112,18 @@ Visual::Visual(Common *parent)
 // Helper for the contructor
 void Visual::Init()
 {
-  std::ostringstream stream;
   this->mutex = new boost::recursive_mutex();
 
   this->dirty = false;
+  this->transparency = 0.0;
+  this->hasMaterial = false;
+  this->isStatic = false;
+  this->useRTShader = true;
+  this->visible = true;
+  this->ribbonTrail = NULL;
+  this->boundingBoxNode = NULL;
+  this->ignorePoseUpdates = false;
+  this->staticGeom = NULL;
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
@@ -82,7 +134,7 @@ void Visual::Init()
 
   this->meshNameP = new ParamT<std::string>("mesh","",1);
   this->meshTileP = new ParamT< Vector2<double> >("uvTile", 
-      Vector2<double>(1.0, 1.0), 0 );
+                                Vector2<double>(1.0, 1.0), 0 );
  
   //default to Gazebo/White
   this->materialNameP = new ParamT<std::string>("material",
@@ -103,31 +155,24 @@ void Visual::Init()
   this->shaderP->Callback( &Visual::SetShader, this );
   Param::End();
 
-  this->boundingBoxNode = NULL;
-
-  this->ignorePoseUpdates = false;
-
-  if (Simulator::Instance()->GetRenderEngineEnabled())
+  /*if (this->sceneNode == NULL)
   {
-    this->sceneBlendType = Ogre::SBT_TRANSPARENT_ALPHA;
+    std::ostringstream stream;
 
     // Create a unique name for the scene node
-    //FIXME: what if we add the capability to delete and add new children?
     stream << this->GetParent()->GetName() << "_VISUAL_" << visualCounter++;
 
     Ogre::SceneNode *pnode = NULL;
     if (!this->GetParent())
       pnode = this->GetWorld()->GetScene()->GetManager()->getRootSceneNode();
     else if ( this->GetParent()->HasType(VISUAL))
-      pnode = this->GetParent()->GetSceneNode();
+      pnode = ((Visual*)this->GetParent())->GetSceneNode();
     else if (this->GetParent()->HasType(ENTITY))
-      pnode = this->GetParent()->GetVisualNode()->GetSceneNode();
+      pnode = ((Entity*)this->GetParent())->GetVisualNode()->GetSceneNode();
 
     // Create the scene node
     this->sceneNode = pnode->createChildSceneNode( stream.str() );
-  }
-
-  this->staticGeom = NULL;
+  }*/
 
   RTShaderSystem::Instance()->AttachEntity(this);
 }
@@ -513,11 +558,13 @@ void Visual::SetMaterial(const std::string &materialName)
   if (materialName.empty())
     return;
 
+  Ogre::MaterialPtr origMaterial;
+
   try
   {
     this->origMaterialName = materialName;
     // Get the original material
-    this->origMaterial= Ogre::MaterialManager::getSingleton().getByName (materialName);;
+    origMaterial= Ogre::MaterialManager::getSingleton().getByName (materialName);;
   }
   catch (Ogre::Exception e)
   {
@@ -526,7 +573,7 @@ void Visual::SetMaterial(const std::string &materialName)
     return;
   }
 
-  if (this->origMaterial.isNull())
+  if (origMaterial.isNull())
   {
     gzmsg(0) << "Unable to get Material[" << materialName << "] for Geometry["
     << this->sceneNode->getName() << ". Object will appear white\n";
@@ -537,14 +584,16 @@ void Visual::SetMaterial(const std::string &materialName)
   // Create a custom material name
   this->myMaterialName = this->sceneNode->getName() + "_MATERIAL_" + materialName;
 
+  Ogre::MaterialPtr myMaterial;
+
   // Clone the material. This will allow us to change the look of each geom
   // individually.
   if (Ogre::MaterialManager::getSingleton().resourceExists(this->myMaterialName))
-    this->myMaterial = (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(this->myMaterialName));
+    myMaterial = (Ogre::MaterialPtr)(Ogre::MaterialManager::getSingleton().getByName(this->myMaterialName));
   else
-    this->myMaterial = this->origMaterial->clone(myMaterialName);
+    myMaterial = origMaterial->clone(this->myMaterialName);
 
-  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
+  Ogre::Material::TechniqueIterator techniqueIt = myMaterial->getTechniqueIterator ();
 
   /*while (techniqueIt.hasMoreElements ())
   {
@@ -1136,11 +1185,11 @@ bool Visual::GetUseRTShader() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the visual
-OgreDynamicLines *Visual::AddDynamicLine(OgreDynamicRenderable::OperationType opType)
+OgreDynamicLines *Visual::AddDynamicLine(OperationType type)
 {
   Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 
-  OgreDynamicLines *line = new OgreDynamicLines(opType);
+  OgreDynamicLines *line = new OgreDynamicLines(type);
   this->lines.push_back(line);
   this->AttachObject(line);
   return line;

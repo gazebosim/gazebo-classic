@@ -27,15 +27,22 @@
 #ifndef OGREVISUAL_HH
 #define OGREVISUAL_HH
 
-#include <Ogre.h>
 #include <string>
 
-#include "OgreDynamicRenderable.hh"
+#include "RenderTypes.hh"
 #include "Pose3d.hh"
 #include "Quatern.hh"
 #include "Vector3.hh"
 #include "Common.hh"
 #include "Param.hh"
+
+namespace Ogre
+{
+  class MovableObject;
+  class SceneNode;
+  class StaticGeometry;
+  class RibbonTrail;
+}
 
 namespace boost
 {
@@ -52,10 +59,16 @@ namespace gazebo
   class OgreDynamicLines;
 
   /// \brief Ogre Visual Object
-  class Visual : public Common, public Ogre::Any
+  class Visual : public Common //, public Ogre::Any
   {
     /// \brief Constructor
-    public: Visual (Common *parent = NULL);
+    public: Visual (const std::string &name, Common *parent);
+
+    /// \brief Constructor
+    public: Visual (const std::string &name, Ogre::SceneNode *parent);
+
+    /// \brief Constructor
+    public: Visual (const std::string &name, Scene *scene);
 
     /// \brief Destructor
     public: virtual ~Visual();
@@ -209,8 +222,7 @@ namespace gazebo
     public: bool GetUseRTShader() const;
 
     /// \brief Add a line to the visual
-    public: OgreDynamicLines *AddDynamicLine(
-                 OgreDynamicRenderable::OperationType opType);
+    public: OgreDynamicLines *AddDynamicLine(OperationType type);
 
     /// \brief Delete a dynamic line
     public: void DeleteDynamicLine(OgreDynamicLines *line);
@@ -221,14 +233,11 @@ namespace gazebo
     /// \brief Return true if a material is set for this visual
     public: bool HasMaterial() const;
 
-    private: Ogre::MaterialPtr origMaterial;
-    private: Ogre::MaterialPtr myMaterial;
     private: std::string myMaterialName;
     private: std::string origMaterialName;
-    private: Ogre::SceneBlendType sceneBlendType;
 
     private: Ogre::SceneNode *parentNode;
-    public: Ogre::SceneNode *sceneNode;
+    private: Ogre::SceneNode *sceneNode;
     private: Ogre::SceneNode *boundingBoxNode;
 
     private: float transparency;

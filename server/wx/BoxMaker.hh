@@ -24,7 +24,8 @@ namespace gazebo
     private: bool leftMousePressed;
     private: Vector2<int> mousePushPos;
     private: std::string visualName;
-    private: int index;
+
+    private: static unsigned int counter;
   };
 }
 

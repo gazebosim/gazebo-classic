@@ -53,6 +53,7 @@ set (headers OgreMovableText.hh
              Scene.hh
              RenderState.hh
              WindowManager.hh
+             RenderTypes.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})

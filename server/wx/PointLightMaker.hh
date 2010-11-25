@@ -23,7 +23,7 @@ namespace gazebo
     private: int state;
     private: Vector3 createPos;
     private: std::string lightName;
-    private: int index;
+    private: unsigned int counter;
   };
 }
 

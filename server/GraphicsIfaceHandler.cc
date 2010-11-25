@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 
+#include "RenderTypes.hh"
 #include "Scene.hh"
 #include "World.hh"
 #include "Entity.hh"
@@ -59,6 +60,11 @@ GraphicsIfaceHandler::~GraphicsIfaceHandler()
     delete this->threeDIface;
     this->threeDIface = NULL;
   }
+
+  std::map<std::string, Visual* >::iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+    delete iter->second;
+  this->visuals.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,11 +117,7 @@ void GraphicsIfaceHandler::Update()
       nodeName << "GraphicsIfaceHandler_" << this->name << ": " 
                << this->visuals.size();
 
-      if (this->parent)
-        vis = OgreCreator::Instance()->CreateVisual(nodeName.str(), 
-            this->parent->GetVisualNode());
-      else
-        vis = OgreCreator::Instance()->CreateVisual(nodeName.str());
+      vis = new Visual(nodeName.str(), this->parent);
 
       this->visuals[visName] = vis;
     }
@@ -167,28 +169,28 @@ void GraphicsIfaceHandler::DrawSimple(Visual *vis, libgazebo::Graphics3dDrawData
 {
   Vector3 pos;
   bool attached = false;
-  OgreDynamicRenderable::OperationType opType;
+  OperationType opType;
   OgreDynamicLines *line;
 
   switch(data->drawMode)
   {
     case libgazebo::Graphics3dDrawData::POINTS:
-      opType = OgreDynamicRenderable::OT_POINT_LIST;
+      opType = RENDERING_POINT_LIST;
       break;
     case libgazebo::Graphics3dDrawData::LINES:
-      opType = OgreDynamicRenderable::OT_LINE_LIST;
+      opType = RENDERING_LINE_LIST;
       break;
     case libgazebo::Graphics3dDrawData::LINE_STRIP:
-      opType = OgreDynamicRenderable::OT_LINE_STRIP;
+      opType = RENDERING_LINE_STRIP;
       break;
     case libgazebo::Graphics3dDrawData::TRIANGLES:
-      opType = OgreDynamicRenderable::OT_TRIANGLE_LIST;
+      opType = RENDERING_TRIANGLE_LIST;
       break;
     case libgazebo::Graphics3dDrawData::TRIANGLE_STRIP:
-      opType = OgreDynamicRenderable::OT_TRIANGLE_STRIP;
+      opType = RENDERING_TRIANGLE_STRIP;
       break;
     case libgazebo::Graphics3dDrawData::TRIANGLE_FAN:
-      opType = OgreDynamicRenderable::OT_TRIANGLE_FAN;
+      opType = RENDERING_TRIANGLE_FAN;
       break;
     default:
       gzerr(0) << "Unknown draw operation mode[" 
@@ -203,7 +205,9 @@ void GraphicsIfaceHandler::DrawSimple(Visual *vis, libgazebo::Graphics3dDrawData
     attached = true;
   }
   else
+  {
     line = vis->AddDynamicLine(opType);
+  }
 
   line->setMaterial(OgreCreator::CreateMaterial( data->color.r,
                                                  data->color.g,

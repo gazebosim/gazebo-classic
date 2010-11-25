@@ -27,6 +27,7 @@
 #include <sstream>
 #include <float.h>
 
+#include "RenderTypes.hh"
 #include "Events.hh"
 #include "SensorManager.hh"
 #include "XMLConfig.hh"
@@ -379,9 +380,7 @@ void Body::Init()
 
     if (this->cgVisual == NULL)
     {
-      this->cgVisual = new Visual(this->comEntity);
-      this->cgVisual->SetName(visname.str());
-      this->cgVisual->Init();
+      this->cgVisual = new Visual(visname.str(), this->comEntity);
     }
     else
       this->cgVisual->DetachObjects();
@@ -398,7 +397,7 @@ void Body::Init()
       // Create a line to each geom
       for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
       {
-        OgreDynamicLines *line = this->cgVisual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+        OgreDynamicLines *line = this->cgVisual->AddDynamicLine(RENDERING_LINE_LIST);
         line->setMaterial("Gazebo/GreenGlow");
         line->AddPoint(Vector3(0,0,0));
         line->AddPoint(giter->second->GetRelativePose().pos);

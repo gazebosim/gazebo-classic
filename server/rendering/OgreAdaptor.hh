@@ -21,19 +21,11 @@
 /* Desc: Middleman between OGRE and Gazebo
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id$
  */
 
 #ifndef OGREADAPTOR
 #define OGREADAPTOR
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glx.h>
-
-#include "Vector4.hh"
-#include "Param.hh"
-#include "Vector2.hh"
 #include "SingletonT.hh"
 
 namespace Ogre
@@ -132,16 +124,13 @@ namespace gazebo
     private: Ogre::LogManager *logManager;
  
     /// ID for a dummy window. Used for gui-less operation
-    protected: Window dummyWindowId;
-
-    /// Pointer to the dummy Xvisual.Used for gui-less operation
-    protected: XVisualInfo *dummyVisual;
+    protected: unsigned long dummyWindowId;
 
     /// Pointer to the dummy display.Used for gui-less operation
-    protected: Display *dummyDisplay;
+    protected: void *dummyDisplay;
     
     /// GLX context used to render the scenes.Used for gui-less operation
-    protected: GLXContext dummyContext;
+    protected: void* dummyContext;
 
     private: friend class DestroyerT<OgreAdaptor>;
     private: friend class SingletonT<OgreAdaptor>;

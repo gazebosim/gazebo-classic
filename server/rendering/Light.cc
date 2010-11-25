@@ -207,8 +207,7 @@ void Light::CreateVisual()
     return;
 
   // The lines draw a visualization of the camera
-  this->line = this->visualNode->AddDynamicLine(
-      OgreDynamicRenderable::OT_LINE_LIST);
+  this->line = this->visualNode->AddDynamicLine( RENDERING_LINE_LIST );
 
   if ( **this->lightTypeP == "point" )
   {
