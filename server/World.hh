@@ -133,7 +133,7 @@ class World
   /// \param node XMLConfg node pointer
   /// \param parent Parent of the model to load
   /// \param removeDuplicate Remove existing model of same name
-  public: void LoadEntities(XMLConfigNode *node, Model *parent, 
+  public: void LoadEntities(XMLConfigNode *node, Common *parent, 
                             bool removeDuplicate,bool initModel);
 
   /// \brief Insert an entity into the world. This function pushes the model
@@ -200,6 +200,9 @@ class World
   /// \brief Get the scene 
   public: Scene *GetScene() const;
 
+  /// \brief Get an element by name
+  public: Common *GetByName(const std::string &name);
+
   /// \brief Save the state of the world
   private: void SaveState();
 
@@ -214,7 +217,7 @@ class World
   /// \param parent The parent model
   /// \param removeDuplicate Remove existing model of same name
   /// \return The model that was created
-  private: Model *LoadModel(XMLConfigNode *node, Model *parent, bool removeDuplicate,bool initModel);
+  private: Model *LoadModel(XMLConfigNode *node, Common *parent, bool removeDuplicate,bool initModel);
 
   /// \brief Delete an entity by name
   /// \param name The name of the entity to delete
@@ -225,6 +228,8 @@ class World
 
   /// Pointer the physics engine
   private: PhysicsEngine *physicsEngine;
+
+  private: Common *rootElement;
 
   /// An abstract entity that is the root of the Entity Tree
   private: std::vector<Model*> models;

@@ -139,9 +139,10 @@ void MeshBrowser::OnTreeClick(wxTreeEvent &event)
   OgreCreator::Instance()->InsertMesh(mesh);
 
   if (this->visual)
-    OgreCreator::Instance()->DeleteVisual(this->visual);
+    delete this->visual;
+  this->visual = NULL;
 
-  this->visual = OgreCreator::Instance()->CreateVisual(data->filename + "_VISUAL", NULL, NULL, this->scene);
+  this->visual = new Visual(data->filename + "_VISUAL", this->scene);
 
   try
   {

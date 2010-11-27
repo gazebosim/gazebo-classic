@@ -10,30 +10,23 @@
 
 using namespace gazebo;
 
+unsigned int DirectionalLightMaker::counter = 0;
+
 DirectionalLightMaker::DirectionalLightMaker()
   : EntityMaker()
 {
   this->state = 0;
   this->lightName = "";
-  this->index = 0;
 }
 
 DirectionalLightMaker::~DirectionalLightMaker()
 {
 }
 
-void DirectionalLightMaker::Start()
+void DirectionalLightMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
-  std::string name = "user_light";
-
-  do
-  {
-    stream.str("");
-    stream << name << index;
-    this->index++;
-  } while (Common::GetByName(stream.str()));
-
+  stream << "user_directional_light_" << counter++;
   this->lightName = stream.str();
   this->state = 1;
 }
@@ -67,7 +60,7 @@ void DirectionalLightMaker::MouseReleaseCB(const MouseEvent &event)
   this->state++;
 
   this->CreateTheEntity();
-  this->Start();
+  this->Stop();
 }
 
 void DirectionalLightMaker::MouseDragCB(const MouseEvent & /*event*/)

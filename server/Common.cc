@@ -36,8 +36,6 @@ using namespace gazebo;
 
 unsigned int Common::idCounter = 0;
 
-Common *Common::root = new Common(NULL);
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Common::Common(Common *parent)
@@ -47,9 +45,7 @@ Common::Common(Common *parent)
 
   this->AddType(COMMON);
 
-  if (this->parent == NULL)
-    this->parent = this->root;
-  else
+  if (this->parent)
     this->world = this->parent->GetWorld();
 
   this->id = ++idCounter;
@@ -266,29 +262,22 @@ Common *Common::GetChild(unsigned int i) const
 Common *Common::GetChild(const std::string &name )
 {
   std::string fullName = this->GetCompleteScopedName() + "::" + name;
-  return this->GetByNameHelper(fullName, this);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get an element by name
-Common *Common::GetByName(const std::string &name)
-{
-  return root->GetByNameHelper(name, root);
+  return this->GetByName(fullName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get by name helper
-Common *Common::GetByNameHelper(const std::string &name, Common *parent)
+Common *Common::GetByName(const std::string &name)
 {
-  if (parent->GetCompleteScopedName() == name)
-    return parent;
+  if (this->GetCompleteScopedName() == name)
+    return this;
 
   Common *result = NULL;
   std::vector<Common*>::const_iterator iter;
 
-  for (iter = parent->children.begin(); 
-       iter != parent->children.end() && result ==NULL; iter++)
-    result = GetByNameHelper(name, *iter);
+  for (iter =  this->children.begin(); 
+       iter != this->children.end() && result ==NULL; iter++)
+    result = (*iter)->GetByName(name);
 
   return result;
 }

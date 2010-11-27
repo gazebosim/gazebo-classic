@@ -86,6 +86,9 @@ World::World()
   this->openAL = NULL;
   this->selectedEntity = NULL;
 
+  this->rootElement = new Common(NULL);
+  this->rootElement->SetWorld(this);
+
   this->factoryIfaceHandler = NULL;
   this->pause = false;
 
@@ -201,7 +204,7 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
   
   // last bool is initModel, init model is not needed as Init()
   // is called separately from main.cc
-  this->LoadEntities(rootNode, NULL, false, false);
+  this->LoadEntities(rootNode, this->rootElement, false, false);
 
   this->worldStates.resize(**this->saveStateBufferSizeP);
   this->worldStatesInsertIter = this->worldStates.begin();
@@ -521,7 +524,7 @@ PhysicsEngine *World::GetPhysicsEngine() const
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicate, bool initModel)
+void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplicate, bool initModel)
 {
   XMLConfigNode *cnode;
   Model *model = NULL;
@@ -533,13 +536,13 @@ void World::LoadEntities(XMLConfigNode *node, Model *parent, bool removeDuplicat
     {
       model = this->LoadModel(node, parent, removeDuplicate, initModel);
       Events::addEntitySignal(model->GetCompleteScopedName());
+      parent = model;
     }
-  }
 
-  // Load children
-  if (node)
+    // Load children
     for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
-      this->LoadEntities( cnode, model, removeDuplicate, initModel);
+      this->LoadEntities( cnode, parent, removeDuplicate, initModel);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -603,7 +606,7 @@ void World::ProcessEntitiesToDelete()
     for (miter=this->toDeleteEntities.begin();
         miter!=this->toDeleteEntities.end(); miter++)
     {
-      Common *common = Common::GetByName(*miter);
+      Common *common = this->GetByName(*miter);
 
       if (common)
       {
@@ -636,7 +639,7 @@ void World::DeleteEntityCB(const std::string &name)
 {
   std::vector< Model* >::iterator miter;
 
-  Common *common = Common::GetByName(name);
+  Common *common = this->GetByName(name);
 
   if (!common)
     return;
@@ -644,15 +647,23 @@ void World::DeleteEntityCB(const std::string &name)
   this->toDeleteEntities.push_back(name);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Get an element by name
+Common *World::GetByName(const std::string &name)
+{
+  return this->rootElement->GetByName(name);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a model
-Model *World::LoadModel(XMLConfigNode *node, Model *parent, 
+Model *World::LoadModel(XMLConfigNode *node, Common *parent, 
                         bool removeDuplicate, bool initModel)
 {
   Pose3d pose;
+  if (parent == NULL)
+    gzthrow("Parent can't be null");
+
   Model *model = new Model(parent);
-  model->SetWorld(this);
 
   // Load the model
   model->Load( node, removeDuplicate );
@@ -667,7 +678,7 @@ Model *World::LoadModel(XMLConfigNode *node, Model *parent,
   if (initModel) 
     model->Init();
 
-  if (parent != NULL)
+  if (parent != NULL && parent->HasType(MODEL))
     model->Attach(node->GetChild("attach"));
   else
     // Add the model to our list
@@ -798,7 +809,7 @@ void World::PauseSlot(bool p)
 /// Set the selected entity
 void World::SetSelectedEntityCB( const std::string &name )
 {
-  Common *common = Common::GetByName(name);
+  Common *common = this->GetByName(name);
   Entity *ent = dynamic_cast<Entity*>(common);
 
   // unselect selectedEntity

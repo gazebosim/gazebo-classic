@@ -80,7 +80,7 @@ class BodyUpdate_TBB
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Model::Model(Model *parent)
+Model::Model(Common *parent)
     : Entity(parent)
 {
   this->AddType(MODEL);

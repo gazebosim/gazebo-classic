@@ -259,14 +259,13 @@ void UserCamera::SetViewController( const std::string type )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Resize the camera
+/* NATY: probably can remove if window resize workd
 void UserCamera::Resize(unsigned int w, unsigned int h)
 {
-  this->window->resize(w, h);
-  this->window->windowMovedOrResized();
-
   if (this->viewport)
     this->viewport->setDimensions(0,0,1,1);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the dimensions of the viewport

@@ -376,7 +376,7 @@ void RenderControl::CreateEntity(std::string name)
   }
 
   if (this->currMaker)
-    this->currMaker->Start();
+    this->currMaker->Start(this->userCamera->GetScene());
 }
 
 void RenderControl::OnSize( wxSizeEvent &evt )
@@ -387,8 +387,7 @@ void RenderControl::OnSize( wxSizeEvent &evt )
   width = size.GetWidth ();
   height = size.GetHeight ();
 
-  if (this->userCamera)
-    this->userCamera->Resize(width,height);
+  WindowManager::Instance()->Resize(this->windowId, width, height);
 
   evt.Skip();
 }

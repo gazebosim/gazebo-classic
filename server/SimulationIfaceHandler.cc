@@ -124,7 +124,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::SET_ENTITY_PARAM_VALUE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common)
             common->SetParam( req->strValue, req->strValue1 );
@@ -136,7 +136,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::APPLY_FORCE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(BODY))
           {
@@ -157,7 +157,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::APPLY_TORQUE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(BODY))
           {
@@ -177,7 +177,7 @@ void SimulationIfaceHandler::Update()
         }
       case libgazebo::SimulationRequestData::SET_LINEAR_VEL:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {
@@ -200,7 +200,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::SET_ANGULAR_VEL:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && (common->HasType(MODEL) || 
               common->HasType(BODY)))
@@ -228,7 +228,7 @@ void SimulationIfaceHandler::Update()
  
       case libgazebo::SimulationRequestData::SET_LINEAR_ACCEL:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {
@@ -251,7 +251,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::SET_ANGULAR_ACCEL:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {
@@ -273,7 +273,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::SET_STATE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {
@@ -331,7 +331,7 @@ void SimulationIfaceHandler::Update()
       case libgazebo::SimulationRequestData::SET_POSE3D:
         {
           Pose3d pose;
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {
@@ -365,7 +365,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_NUM_CHILDREN:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common)
           {
@@ -381,7 +381,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_ENTITY_PARAM_KEY:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
           if (common)
           {
             Param *param = common->GetParam(req->uintValue);
@@ -404,7 +404,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_ENTITY_PARAM_VALUE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
           if (common)
           {
             Param *param = common->GetParam(req->uintValue);
@@ -428,7 +428,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_ENTITY_PARAM_COUNT:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
           if (common)
           {
             unsigned int count = common->GetParamCount();
@@ -466,7 +466,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_CHILD_NAME:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common)
           {
@@ -497,7 +497,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_MODEL_FIDUCIAL_ID:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {
@@ -511,7 +511,7 @@ void SimulationIfaceHandler::Update()
         }
       case libgazebo::SimulationRequestData::GET_ENTITY_TYPE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
           if (common)
           {
             response->type = req->type;
@@ -534,7 +534,7 @@ void SimulationIfaceHandler::Update()
         }
       case libgazebo::SimulationRequestData::GET_MODEL_TYPE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {
@@ -555,7 +555,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_MODEL_EXTENT:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
           if (common && common->HasType(MODEL))
           {
             Model *model = (Model*)common;
@@ -579,7 +579,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::GET_STATE:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
           if (common && common->HasType(ENTITY))
           {
             Entity *ent = (Entity*)(common);
@@ -634,7 +634,7 @@ void SimulationIfaceHandler::Update()
       case libgazebo::SimulationRequestData::GET_POSE2D:
       case libgazebo::SimulationRequestData::GET_POSE3D:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
           if (common && common->HasType(MODEL))
           {
             Model *model = (Model*)common;
@@ -921,7 +921,7 @@ void SimulationIfaceHandler::Update()
 
       case libgazebo::SimulationRequestData::SET_POSE2D:
         {
-          Common *common = Common::GetByName((char*)req->name);
+          Common *common = this->world->GetByName((char*)req->name);
 
           if (common && common->HasType(MODEL))
           {

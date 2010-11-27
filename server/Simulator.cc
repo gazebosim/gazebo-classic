@@ -320,6 +320,7 @@ World *Simulator::CreateWorld(const std::string &fileName)
   while(worldNode)
   {
     world = new World();
+    this->worlds.push_back(world);
 
     //Create the world
     try
@@ -339,7 +340,6 @@ World *Simulator::CreateWorld(const std::string &fileName)
       pluginNode = pluginNode->GetNext("plugin");
     }
 
-    this->worlds.push_back(world);
     worldNode = worldNode->GetNext("world");
   }
 

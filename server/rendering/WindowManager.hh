@@ -30,6 +30,8 @@ namespace gazebo
     /// \brief Attach a camera to a window
     public: void SetCamera( int windowId, Camera *camera);
 
+    /// \brief Resize a window
+    public: void Resize(unsigned int id, int width, int height);
 
     private: std::vector<Ogre::RenderWindow *> windows;
 

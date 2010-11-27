@@ -11,7 +11,7 @@ namespace gazebo
     public: PointLightMaker();
     public: virtual ~PointLightMaker();
   
-    public: virtual void Start();
+    public: virtual void Start(Scene *scene);
     public: virtual void Stop();
     public: virtual bool IsActive() const;
 
@@ -23,7 +23,7 @@ namespace gazebo
     private: int state;
     private: Vector3 createPos;
     private: std::string lightName;
-    private: unsigned int counter;
+    private: static unsigned int counter;
   };
 }
 

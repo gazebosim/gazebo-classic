@@ -5,6 +5,7 @@
 
 namespace gazebo
 {
+  class Scene;
   class MouseEvent;
 
   class EntityMaker
@@ -18,7 +19,7 @@ namespace gazebo
     /// \brief Set whether to snap to grid
     public: static void SetSnapToGrid(bool snap);
 
-    public: virtual void Start() = 0;
+    public: virtual void Start(Scene *scene) = 0;
     public: virtual void Stop() = 0;
     public: virtual bool IsActive() const = 0;
 

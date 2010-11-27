@@ -56,14 +56,14 @@ Entity::Entity(Common *parent)
   if (this->parent && this->parent->HasType(ENTITY))
   {
     Entity *ep = (Entity*)(this->parent);
-    if (Simulator::Instance()->GetRenderEngineEnabled())
-      this->visualNode = new Visual(visname.str(), ep);
+    //if (Simulator::Instance()->GetRenderEngineEnabled())
+    this->visualNode = new Visual(visname.str(), ep);
     this->SetStatic(ep->IsStatic());
   }
   else
   {
-    if (Simulator::Instance()->GetRenderEngineEnabled())
-      this->visualNode = new Visual(visname.str(), this);
+    //if (Simulator::Instance()->GetRenderEngineEnabled())
+    this->visualNode = new Visual(visname.str(), this->GetWorld()->GetScene());
   }
 
   this->visualNode->SetOwner(this);

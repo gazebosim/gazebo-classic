@@ -24,7 +24,9 @@
  */
 
 #include <Ogre.h>
-#include <boost/thread/recursive_mutex.hpp>
+
+// NATY
+//#include <boost/thread/recursive_mutex.hpp>
 
 #include "World.hh"
 #include "Events.hh"
@@ -112,7 +114,8 @@ Visual::Visual (const std::string &name, Scene *scene)
 // Helper for the contructor
 void Visual::Init()
 {
-  this->mutex = new boost::recursive_mutex();
+  // NATY
+  //this->mutex = new boost::recursive_mutex();
 
   this->dirty = false;
   this->transparency = 0.0;
@@ -249,7 +252,8 @@ Visual::~Visual()
 // Load the visual
 void Visual::Load(XMLConfigNode *node)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   std::ostringstream stream;
   Pose3d pose;
@@ -388,7 +392,8 @@ Common *Visual::GetOwner() const
 // Save the visual in XML format
 void Visual::Save(std::string &prefix, std::ostream &stream)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
   stream << prefix << "<visual>\n";
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
@@ -403,7 +408,8 @@ void Visual::Save(std::string &prefix, std::ostream &stream)
 /// Attach a renerable object to the visual
 void Visual::AttachObject( Ogre::MovableObject *obj)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -419,7 +425,8 @@ void Visual::AttachObject( Ogre::MovableObject *obj)
 /// Detach all objects
 void Visual::DetachObjects()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -432,7 +439,8 @@ void Visual::DetachObjects()
 /// Get the number of attached objects
 unsigned short Visual::GetNumAttached()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -445,7 +453,8 @@ unsigned short Visual::GetNumAttached()
 /// Get an attached object
 Ogre::MovableObject *Visual::GetAttached(unsigned short num)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -482,7 +491,8 @@ void Visual::MakeStatic()
 /// Attach a mesh to this visual by name
 void Visual::AttachMesh( const std::string &meshName )
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -515,7 +525,8 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const Vector3 &scale )
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -533,7 +544,8 @@ void Visual::SetScale(const Vector3 &scale )
 /// Get the scale
 Vector3 Visual::GetScale()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -549,7 +561,8 @@ Vector3 Visual::GetScale()
 // Set the material
 void Visual::SetMaterial(const std::string &materialName)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -680,7 +693,8 @@ void Visual::AttachAxes()
 /// Set the transparency
 void Visual::SetTransparency( float trans )
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -741,9 +755,11 @@ float Visual::GetTransparency()
   return this->transparency;
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Visual::SetHighlight(bool highlight)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -755,7 +771,8 @@ void Visual::SetHighlight(bool highlight)
 /// Set whether the visual should cast shadows
 void Visual::SetCastShadows(const bool &shadows)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -775,7 +792,8 @@ void Visual::SetCastShadows(const bool &shadows)
 /// Set whether the visual is visible
 void Visual::SetVisible(bool visible, bool cascade)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -803,7 +821,8 @@ bool Visual::GetVisible() const
 // Set the position of the visual
 void Visual::SetPosition( const Vector3 &pos)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -831,7 +850,8 @@ void Visual::SetPosition( const Vector3 &pos)
 // Set the rotation of the visual
 void Visual::SetRotation( const Quatern &rot)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -847,7 +867,8 @@ void Visual::SetRotation( const Quatern &rot)
 // Set the pose of the visual
 void Visual::SetPose( const Pose3d &pose)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
 
   // Stop here if the rendering engine has been disabled
@@ -865,7 +886,8 @@ void Visual::SetPose( const Pose3d &pose)
 // Set the position of the visual
 Vector3 Visual::GetPosition() const
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -884,7 +906,8 @@ Vector3 Visual::GetPosition() const
 // Get the rotation of the visual
 Quatern Visual::GetRotation( ) const
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -904,7 +927,8 @@ Quatern Visual::GetRotation( ) const
 // Get the pose of the visual
 Pose3d Visual::GetPose() const
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -920,7 +944,8 @@ Pose3d Visual::GetPose() const
 /// Get the global pose of the node
 Pose3d Visual::GetWorldPose() const
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -951,11 +976,12 @@ Pose3d Visual::GetWorldPose() const
 // Get this visual Ogre node
 Ogre::SceneNode * Visual::GetSceneNode()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return NULL;
+  //if (!Simulator::Instance()->GetRenderEngineEnabled())
+    //return NULL;
 
   return this->sceneNode;
 }
@@ -965,7 +991,8 @@ Ogre::SceneNode * Visual::GetSceneNode()
 ///  Create a bounding box for this visual
 void Visual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -1018,7 +1045,8 @@ void Visual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 // Set the material of the bounding box
 void Visual::SetBoundingBoxMaterial(const std::string &materialName )
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -1049,7 +1077,8 @@ void Visual::SetBoundingBoxMaterial(const std::string &materialName )
 /// Set to true to show a white bounding box, used to indicate user selection
 void Visual::ShowSelectionBox( bool value )
 {
-  boost::recursive_mutex::scoped_lock lock(*this->mutex);
+  // NATY
+  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())

@@ -123,9 +123,9 @@ void Joint::Load(XMLConfigNode *node)
   else
   {
     visname << this->GetName() << "_VISUAL";
-    this->body1 = dynamic_cast<Body*>(Common::GetByName( **(this->body1NameP) ));
-    this->body2 = dynamic_cast<Body*>(Common::GetByName( **(this->body2NameP) ));
-    this->anchorBody = dynamic_cast<Body*>(Common::GetByName( **(this->anchorBodyNameP) ));
+    this->body1 = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->body1NameP) ));
+    this->body2 = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->body2NameP) ));
+    this->anchorBody = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->anchorBodyNameP) ));
   }
 
   if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))

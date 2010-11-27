@@ -103,3 +103,16 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
 
   return this->windows.size()-1;
 }
+
+void WindowManager::Resize(unsigned int id, int width, int height)
+{
+  if (id >= this->windows.size())
+  {
+    gzerr(0) << "Invalid window id[" << id << "]\n";
+  }
+  else
+  {
+    this->windows[id]->resize(width, height);
+    this->windows[id]->windowMovedOrResized();
+  }
+} 

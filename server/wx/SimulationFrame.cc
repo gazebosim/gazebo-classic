@@ -182,7 +182,8 @@ void SimulationFrame::AddEntityCB(const std::string &name)
 
   wxTreeItemId item = this->treeCtrl->AppendItem(this->treeCtrl->GetRootItem(), wxString::FromAscii(entity->GetName().c_str()), -1, -1, data);
   */
-  Entity *entity = dynamic_cast<Entity*>(Common::GetByName(name));
+
+  Entity *entity = dynamic_cast<Entity*>(Simulator::Instance()->GetActiveWorld()->GetByName(name));
   this->AddEntityHelper(entity, this->treeCtrl->GetRootItem());
 }
 
@@ -512,7 +513,7 @@ void SimulationFrame::OnTreeClick(wxTreeEvent &event)
       paramCount = Simulator::Instance()->GetActiveWorld()->GetParamCount();
     else 
     {
-      common = Common::GetByName( data->name );
+      common = Simulator::Instance()->GetActiveWorld()->GetByName( data->name );
       paramCount = common->GetParamCount();
     }
 
@@ -580,7 +581,7 @@ void SimulationFrame::OnTreePopupClick( wxCommandEvent &event )
 {
   EntityTreeItemData *data = (EntityTreeItemData*)this->treeCtrl->GetItemData(this->treeCtrl->GetSelection());
 
-  Common *common = Common::GetByName(data->name);
+  Common *common = Simulator::Instance()->GetActiveWorld()->GetByName(data->name);
 
   if (common && common->HasType(ENTITY))
   {

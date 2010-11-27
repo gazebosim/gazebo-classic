@@ -4,8 +4,9 @@
 #include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "Camera.hh"
+#include "Scene.hh"
+#include "Visual.hh"
 #include "World.hh"
 #include "BoxMaker.hh"
 
@@ -17,27 +18,28 @@ BoxMaker::BoxMaker()
 : EntityMaker()
 {
   this->state = 0;
-  this->visualName = "";
+  this->visual = NULL;
 }
 
 BoxMaker::~BoxMaker()
 {
 }
 
-void BoxMaker::Start()
+void BoxMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream << "user_box_" << counter++;
-  this->visualName = stream.str();
+  this->visual = new Visual(stream.str(), scene );
+  this->visual->AttachMesh("unit_box_U1V1");
+
   this->state = 1;
 }
 
 void BoxMaker::Stop()
 {
-  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
-  if (vis)
-    OgreCreator::Instance()->DeleteVisual(this->visualName);
-
+  if (this->visual)
+    delete this->visual;
+  this->visual = NULL;
   this->state = 0;
   Events::moveModeSignal(true);
 }
@@ -83,18 +85,10 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  Visual *vis = NULL;
-  if (OgreCreator::Instance()->GetVisual(this->visualName))
-    vis = OgreCreator::Instance()->GetVisual(this->visualName);
-  else
-  {
-    vis = OgreCreator::Instance()->CreateVisual(this->visualName);
-    vis->AttachMesh("unit_box_U1V1");
-    vis->SetPosition(p1);
-  }
+  this->visual->SetPosition(p1);
 
   Vector3 scale = p1-p2;
-  Vector3 p = vis->GetPosition();
+  Vector3 p = this->visual->GetPosition();
 
   if (this->state == 1)
   {
@@ -104,37 +98,35 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
   }
   else
   {
-    scale = vis->GetScale();
+    scale = this->visual->GetScale();
     scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
-  vis->SetPosition(p);
+  this->visual->SetPosition(p);
 
-  vis->SetScale(scale);
-
+  this->visual->SetScale(scale);
 }
 
 void BoxMaker::CreateTheEntity()
 {
   std::ostringstream newModelStr;
 
-  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
-  if (!vis)
+  if (!this->visual)
     return;
 
   newModelStr << "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >";
 
 
-  newModelStr << "<model:physical name=\"" << this->visualName << "\">\
-    <xyz>" << vis->GetPosition() << "</xyz>\
+  newModelStr << "<model:physical name=\"" << this->visual->GetName() << "\">\
+    <xyz>" << this->visual->GetPosition() << "</xyz>\
     <body:box name=\"body\">\
     <geom:box name=\"geom\">\
-    <size>" << vis->GetScale() << "</size>\
+    <size>" << this->visual->GetScale() << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_box_U1V1</mesh>\
-    <size>" << vis->GetScale() << "</size>\
+    <size>" << this->visual->GetScale() << "</size>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\
@@ -144,8 +136,8 @@ void BoxMaker::CreateTheEntity()
 
   newModelStr <<  "</gazebo:world>";
 
-  OgreCreator::Instance()->DeleteVisual(this->visualName);
+  delete this->visual;
+  this->visual = NULL;
 
   Simulator::Instance()->GetActiveWorld()->InsertEntity(newModelStr.str());
 }
-

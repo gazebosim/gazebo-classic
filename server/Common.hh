@@ -102,11 +102,8 @@ namespace gazebo
     /// \brief Get the number of children
     public: unsigned int GetChildCount() const;
 
-    /// \brief Get an element by name
-    public: static Common *GetByName(const std::string &name);
-
-    /// \brief Get by name helper
-    private: Common *GetByNameHelper(const std::string &name, Common *parent);
+    /// \brief Get by name 
+    public: Common *GetByName(const std::string &name);
 
     /// \brief Get a child by index
     public: Common *GetChild(unsigned int i) const;
@@ -188,8 +185,6 @@ namespace gazebo
     protected: std::vector< Common* > children;
  
     private: std::vector< EntityType > type;
-
-    private: static Common *root;
 
     private: World *world;
 

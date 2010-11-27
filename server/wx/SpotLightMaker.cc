@@ -10,30 +10,23 @@
 
 using namespace gazebo;
 
+unsigned int SpotLightMaker::counter = 0;
+
 SpotLightMaker::SpotLightMaker()
   : EntityMaker()
 {
   this->state = 0;
   this->lightName = "";
-  this->index = 0;
 }
 
 SpotLightMaker::~SpotLightMaker()
 {
 }
 
-void SpotLightMaker::Start()
+void SpotLightMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
-  std::string name = "user_light";
-
-  do
-  {
-    stream.str("");
-    stream << name << index;
-    this->index++;
-  } while (Common::GetByName(stream.str()));
-
+  stream << "user_spot_light_" << counter++;
   this->lightName = stream.str();
   this->state = 1;
 }
@@ -67,7 +60,7 @@ void SpotLightMaker::MouseReleaseCB(const MouseEvent &event)
   this->state++;
 
   this->CreateTheEntity();
-  this->Start();
+  this->Stop();
 }
 
 void SpotLightMaker::MouseDragCB(const MouseEvent & /*event*/)

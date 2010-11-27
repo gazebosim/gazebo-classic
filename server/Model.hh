@@ -57,6 +57,7 @@ namespace gazebo
   class Sensor;
   class Geom;
   class Light;
+  class Common;
 
   /// \addtogroup gazebo_server
   /// \brief A model
@@ -68,7 +69,7 @@ namespace gazebo
     public: typedef std::vector<Joint*> JointContainer;
 
     /// \brief Constructor
-    public: Model(Model *parent);
+    public: Model(Common *parent);
   
     /// \brief Destructor
     public: virtual ~Model();

@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "Camera.hh"
+#include "Scene.hh"
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "World.hh"
 #include "SphereMaker.hh"
 
@@ -17,26 +17,27 @@ SphereMaker::SphereMaker()
 : EntityMaker()
 {
   this->state = 0;
-  this->visualName = "";
+  this->visual = NULL;
 }
 
 SphereMaker::~SphereMaker()
 {
 }
 
-void SphereMaker::Start()
+void SphereMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream << "user_sphere_" << counter++;
-  this->visualName = stream.str();
+  this->visual = new Visual(stream.str(), scene);
+  this->visual->AttachMesh("unit_sphere");
   this->state = 1;
 }
 
 void SphereMaker::Stop()
 {
-  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
-  if (vis)
-    OgreCreator::Instance()->DeleteVisual(this->visualName);
+  if (this->visual)
+    delete this->visual;
+  this->visual = NULL;
 
   Events::moveModeSignal(true);
   this->state = 0;
@@ -85,45 +86,36 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  Visual *vis = NULL;
-  if (OgreCreator::Instance()->GetVisual(this->visualName))
-    vis = OgreCreator::Instance()->GetVisual(this->visualName);
-  else
-  {
-    vis = OgreCreator::Instance()->CreateVisual(this->visualName);
-    vis->AttachMesh("unit_sphere");
-    vis->SetPosition(p1);
-  }
+  this->visual->SetPosition(p1);
 
   double scale = p1.Distance(p2);
-  Vector3 p = vis->GetPosition();
+  Vector3 p = this->visual->GetPosition();
 
   p.z = scale;
 
-  vis->SetPosition(p);
-  vis->SetScale(Vector3(scale,scale,scale));
+  this->visual->SetPosition(p);
+  this->visual->SetScale(Vector3(scale,scale,scale));
 }
 
 void SphereMaker::CreateTheEntity()
 {
   std::ostringstream newModelStr;
 
-  Visual *vis = OgreCreator::Instance()->GetVisual(this->visualName);
-  if (!vis)
+  if (!this->visual)
     return;
 
   newModelStr << "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >";
 
 
-  newModelStr << "<model:physical name=\"" << this->visualName << "\">\
-    <xyz>" << vis->GetPosition() << "</xyz>\
+  newModelStr << "<model:physical name=\"" << this->visual->GetName() << "\">\
+    <xyz>" << this->visual->GetPosition() << "</xyz>\
     <body:sphere name=\"body\">\
     <geom:sphere name=\"geom\">\
-    <size>" << vis->GetScale().x << "</size>\
+    <size>" << this->visual->GetScale().x << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_sphere</mesh>\
-    <size>" << vis->GetScale()*2 << "</size>\
+    <size>" << this->visual->GetScale()*2 << "</size>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\
@@ -135,5 +127,6 @@ void SphereMaker::CreateTheEntity()
 
   Simulator::Instance()->GetActiveWorld()->InsertEntity(newModelStr.str());
 
-  OgreCreator::Instance()->DeleteVisual(this->visualName);
+  delete this->visual;
+  this->visual = NULL;
 }

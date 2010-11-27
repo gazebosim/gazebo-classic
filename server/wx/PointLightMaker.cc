@@ -23,10 +23,10 @@ PointLightMaker::~PointLightMaker()
 {
 }
 
-void PointLightMaker::Start()
+void PointLightMaker::Start( Scene *scene )
 {
   std::ostringstream stream;
-  stream << "user_light_" << counter++;
+  stream << "user_point_light_" << counter++;
   this->lightName = stream.str();
   this->state = 1;
 }
@@ -60,7 +60,7 @@ void PointLightMaker::MouseReleaseCB(const MouseEvent &event)
   this->state++;
 
   this->CreateTheEntity();
-  this->Start();
+  this->Stop();
 }
 
 void PointLightMaker::MouseDragCB(const MouseEvent & /*event*/)

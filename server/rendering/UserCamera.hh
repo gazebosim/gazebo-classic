@@ -72,7 +72,7 @@ namespace gazebo
     public: void SetViewController( const std::string type );
 
     /// \brief Resize the camera
-    public: void Resize(unsigned int w, unsigned int h);
+    //public: void Resize(unsigned int w, unsigned int h);
 
     /// \brief Set the dimensions of the viewport
     public: void SetViewportDimensions(float x, float y, float w, float h);

@@ -296,6 +296,8 @@ Camera *Scene::GetCamera(unsigned int index) const
 UserCamera *Scene::CreateUserCamera(const std::string &name)
 {
   UserCamera *camera = new UserCamera(this->name + "::" + name, this);
+  camera->Load(NULL);
+  camera->Init();
   this->userCameras.push_back(camera);
 
   return camera;

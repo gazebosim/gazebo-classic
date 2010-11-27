@@ -26,6 +26,8 @@
 #ifndef OGREADAPTOR
 #define OGREADAPTOR
 
+#include <iostream>
+
 #include "SingletonT.hh"
 
 namespace Ogre
