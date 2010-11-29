@@ -100,7 +100,7 @@ class Quatern
   public: static Quatern EulerToQuatern( const Vector3 &vec );
 
   /// \brief Convert euler angles to quatern.
-  public: Quatern EulerToQuatern( double x, double y, double z);
+  public: static Quatern EulerToQuatern( double x, double y, double z);
 
   /// \brief Get the Euler roll angle in radians
   public: double GetRoll();

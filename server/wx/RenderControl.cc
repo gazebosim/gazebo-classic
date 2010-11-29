@@ -313,7 +313,7 @@ void RenderControl::ViewScene(Scene *scene)
     this->userCamera = scene->GetUserCamera(0);
 
   this->userCamera->SetWorldPosition( Vector3(0,0,3) );
-  this->userCamera->SetWorldRotation( Quatern::EulerToQuatern(0,0,3) );
+  this->userCamera->SetWorldRotation( Quatern::EulerToQuatern(0, DTOR(15), 0) );
 
   WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
 
@@ -382,20 +382,15 @@ void RenderControl::CreateEntity(std::string name)
     this->currMaker->Start(this->userCamera->GetScene());
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// On resize event
 void RenderControl::OnSize( wxSizeEvent &evt )
 {
-  int width;
-  int height;
   wxSize size = evt.GetSize ();
-  width = size.GetWidth ();
-  height = size.GetHeight ();
 
-  std::cout << "On Size[" << width << ":" << height << "]\n";
-
-  WindowManager::Instance()->Resize(this->windowId, width, height);
-
-  evt.StopPropagation();
-  //evt.Skip(false);
+  WindowManager::Instance()->Resize(this->windowId, size.GetWidth(), 
+                                    size.GetHeight());
+  evt.Skip();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

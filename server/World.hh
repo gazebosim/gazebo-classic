@@ -37,6 +37,7 @@
 
 #include "Global.hh"
 
+#include "Messages.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
 #include "Entity.hh"
@@ -203,6 +204,12 @@ class World
   /// \brief Get an element by name
   public: Common *GetByName(const std::string &name);
 
+  /// \brief Receive a message
+  public: void ReceiveMessage( const Message &msg );
+
+  /// \brief Process all messages
+  private: void ProcessMessages();
+
   /// \brief Save the state of the world
   private: void SaveState();
 
@@ -267,6 +274,9 @@ class World
 
   //private: Timer saveStateTimer;
   
+  private: boost::mutex mutex;
+  private: std::vector<Message*> messages;
+
   private: ParamT<std::string> *nameP;
   private: ParamT<Time> *saveStateTimeoutP;
   private: ParamT<unsigned int> *saveStateBufferSizeP;

@@ -234,7 +234,7 @@ namespace gazebo
     private: float transparency;
 
     /// All the visual apparence 
-    private: std::vector<Visual*> visuals;
+    private: std::vector<std::string> visualNames;
 
     protected: Shape *shape;
 

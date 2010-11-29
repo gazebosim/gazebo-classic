@@ -185,8 +185,9 @@ void Visual::Init()
 /// Destructor
 Visual::~Visual()
 {
+  // NATY
+  //delete this->mutex;
 
-  delete this->mutex;
   delete this->xyzP;
   delete this->rpyP;
   delete this->meshNameP;

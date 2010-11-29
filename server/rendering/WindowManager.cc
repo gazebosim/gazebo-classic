@@ -111,7 +111,7 @@ void WindowManager::Resize(unsigned int id, int width, int height)
 {
   if (id >= this->windows.size())
   {
-    gzerr(0) << "Invalid window id[" << id << "]\n";
+    gzerr(5) << "Invalid window id[" << id << "]\n";
   }
   else
   {
@@ -124,7 +124,7 @@ void WindowManager::Render()
 {
   for (unsigned int i=0; i < this->windows.size(); i++)
   {
-    this->windows[i]->update();
-    //this->windows[i]->swapBuffers();
+    this->windows[i]->update(false);
+    this->windows[i]->swapBuffers();
   }
 }

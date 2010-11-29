@@ -271,6 +271,25 @@ material Gazebo/TurquoiseGlow : Gazebo/Turquoise
 	}
 }
 
+material Gazebo/TurquoiseGlowOutline : Gazebo/Turquoise
+{
+	technique
+	{
+    pass ambient
+    {
+      ambient 0 1 1
+      polygon_mode wireframe
+    }
+
+		pass light
+		{
+			emissive 0 1 1
+      diffuse 0 1 1
+      polygon_mode wireframe
+		}
+	}
+}
+
 material Gazebo/RedTransparent
 {
 	technique

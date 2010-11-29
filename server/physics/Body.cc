@@ -35,7 +35,6 @@
 #include "GazeboMessage.hh"
 #include "Geom.hh"
 #include "Timer.hh"
-#include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "Global.hh"
 #include "Vector2.hh"
@@ -57,14 +56,16 @@ Body::Body(Entity *parent)
     : Entity(parent)
 {
   this->AddType(BODY);
-  this->GetVisualNode()->SetShowInGui(false);
+
+  // NATY: put back in functionality
+  // this->GetVisualNode()->SetShowInGui(false);
 
   this->comEntity = new Entity(this);
   this->comEntity->SetName("COM_Entity");
   this->comEntity->SetShowInGui(false);
-  this->comEntity->GetVisualNode()->SetShowInGui(false);
 
-  this->cgVisual = NULL;
+  // NATY: put back in functionality
+  //this->comEntity->GetVisualNode()->SetShowInGui(false);
 
   Param::Begin(&this->parameters);
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
@@ -110,11 +111,9 @@ Body::~Body()
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
 
-  if (this->cgVisual)
-  {
-    delete this->cgVisual;
-    this->cgVisual = NULL;
-  }
+  DeleteVisualMsg msg;
+  msg.id = this->cgVisualId;
+  Simulator::Instance()->SendMessage(msg);
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
     if (giter->second)
@@ -378,32 +377,35 @@ void Body::Init()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
-    if (this->cgVisual == NULL)
+    this->cgVisualId = visname.str();
+
+    InsertVisualMsg msg;
+    msg.parentId = this->comEntity->GetName();
+    msg.id = this->cgVisualId;
+    msg.type = MESH_RESOURCE;
+    msg.mesh = "body_cg";
+    msg.material = "Gazebo/Red";
+    msg.castShadows = false;
+    msg.attachAxes = true;
+    msg.visible = false;
+    Simulator::Instance()->SendMessage(msg);
+
+    msg.parentId = this->cgVisualId;
+    msg.type = LINE_LIST;
+    msg.attachAxes = false;
+    msg.material = "Gazebo/GreenGlow";
+
+    // Create a line to each geom
+    for (std::map< std::string, Geom* >::iterator giter = this->geoms.begin(); 
+         giter != this->geoms.end(); giter++)
     {
-      this->cgVisual = new Visual(visname.str(), this->comEntity);
-    }
-    else
-      this->cgVisual->DetachObjects();
+      msg.points.clear();
 
-    if (this->cgVisual)
-    {
-      this->cgVisual->AttachMesh("body_cg");
-      this->cgVisual->SetMaterial("Gazebo/Red");
-      this->cgVisual->SetCastShadows(false);
-      this->cgVisual->AttachAxes();
+      msg.id = visname.str() + "_lineto_" + giter->first->GetName();
+      msg.points.push_back( Vector3(0,0,0) );
+      msg.points.push_back(giter->second->GetRelativePose().pos);
 
-      std::map< std::string, Geom* >::iterator giter;
-
-      // Create a line to each geom
-      for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-      {
-        OgreDynamicLines *line = this->cgVisual->AddDynamicLine(RENDERING_LINE_LIST);
-        line->setMaterial("Gazebo/GreenGlow");
-        line->AddPoint(Vector3(0,0,0));
-        line->AddPoint(giter->second->GetRelativePose().pos);
-      }
-
-      this->cgVisual->SetVisible(false);
+      Simulator::Instance()->SendMessage(msg);
     }
   }
 

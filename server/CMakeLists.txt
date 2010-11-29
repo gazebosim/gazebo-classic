@@ -132,6 +132,7 @@ SET (headers Common.hh
              STLLoader.hh
              Events.hh
              Plugin.hh
+             Messages.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})

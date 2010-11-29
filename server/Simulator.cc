@@ -30,6 +30,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Messages.hh"
 #include "RenderState.hh"
 #include "PhysicsFactory.hh"
 #include "gazebo_config.h"
@@ -633,4 +634,12 @@ void Simulator::RemovePlugin(const std::string &name)
       break;
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Send a message
+void Simulator::SendMessage( const Message &message )
+{
+  for (unsigned int i=0; i < this->worlds.size(); i++)
+    this->worlds[i]->ReceiveMessage( message );
 }

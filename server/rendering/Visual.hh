@@ -257,7 +257,8 @@ namespace gazebo
     private: ParamT<Vector3> *scaleP;
     private: ParamT<Vector2<double> > *meshTileP;
 
-    private: boost::recursive_mutex *mutex;
+    // NATY
+    //private: boost::recursive_mutex *mutex;
 
     private: bool ignorePoseUpdates;
     private: bool dirty;

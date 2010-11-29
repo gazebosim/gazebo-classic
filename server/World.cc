@@ -324,7 +324,7 @@ void World::RunLoop()
   Time diffTime;
   Time currTime;
   Time lastTime = this->GetRealTime();
-  struct timespec req, rem;
+  struct timespec req;//, rem;
 
   this->startTime = Time::GetWallTime();
 
@@ -405,6 +405,9 @@ void World::Update()
 
   // Process all incoming messages from simiface
   this->simIfaceHandler->Update();
+
+  /// Process all internal messages
+  this->ProcessMessages();
 
   // NATY: put back in
   //Logger::Instance()->Update();
@@ -532,6 +535,8 @@ void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplica
 
   if (node)
   {
+    std::cout << "Loading an entity\n";
+
     // Check for model nodes
     if (node->GetName() == "model")
     {
@@ -585,7 +590,7 @@ void World::ProcessEntitiesToLoad()
       }
 
       // last bool is initModel, yes, init model after loading it
-      this->LoadEntities( xmlConfig->GetRootNode(), NULL, true, true); 
+      this->LoadEntities( xmlConfig->GetRootNode(), this->rootElement, true, true); 
       delete xmlConfig;
     }
     this->toLoadEntities.clear();
@@ -653,6 +658,49 @@ void World::DeleteEntityCB(const std::string &name)
 Common *World::GetByName(const std::string &name)
 {
   return this->rootElement->GetByName(name);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Receive a message
+void World::ReceiveMessage( const Message &msg )
+{
+  boost::mutex::scoped_lock lock( this->mutex );
+  this->messages.push_back( msg.Clone() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Process all messages
+void World::ProcessMessages()
+{
+  boost::mutex::scoped_lock lock( this->mutex );
+
+  for ( unsigned int i=0; i < this->messages.size(); i++)
+  {
+    Message *msg = this->messages[i];
+
+    if (msg->type == INSERT_MODEL)
+    {
+      // Create the world file
+      XMLConfig *xmlConfig = new XMLConfig();
+
+      // Load the XML tree from the given string
+      try
+      {
+        xmlConfig->LoadString( ((InsertModelMsg*)msg)->xmlStr );
+      }
+      catch (gazebo::GazeboError e)
+      {
+        gzerr(0) << "The world could not load the XML data [" << e << "]\n";
+        continue;
+      }
+
+      // last bool is initModel, yes, init model after loading it
+      this->LoadEntities( xmlConfig->GetRootNode(), this->rootElement, true, true); 
+      delete xmlConfig;
+    }
+  }
+
+  this->messages.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

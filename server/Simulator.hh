@@ -56,6 +56,7 @@ namespace gazebo
   class Model;
   class World;
   class Plugin;
+  class Message;
 
   /// \brief The World
   /*
@@ -155,6 +156,9 @@ namespace gazebo
   
       /// \brief Remove a plugin
       public: void RemovePlugin(const std::string &plugin);
+
+      /// \brief Send a message
+      public: void SendMessage( const Message &message );
   
       /// \brief Function to run gui. Used by guiThread
       private: void PhysicsLoop();
@@ -199,7 +203,7 @@ namespace gazebo
       private: unsigned int activeWorldIndex;
   
       private: std::vector<Plugin*> plugins;
-  
+
       //Singleton implementation
       private: friend class DestroyerT<Simulator>;
       private: friend class SingletonT<Simulator>;

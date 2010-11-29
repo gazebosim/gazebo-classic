@@ -32,7 +32,6 @@
 #include "Shape.hh"
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
-#include "Visual.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "SurfaceParams.hh"
@@ -54,8 +53,6 @@ Geom::Geom( Body *body )
 
   // Create the contact parameters
   this->surface = new SurfaceParams();
-
-  this->bbVisual = NULL;
 
   this->transparency = 0;
 
@@ -168,15 +165,25 @@ void Geom::Load(XMLConfigNode *node)
   while (childNode)
   {
     std::ostringstream visname;
-    visname << this->GetCompleteScopedName() << "_VISUAL_" << this->visuals.size();
-    Visual *visual = new Visual(visname.str(), this->visualNode);
-    visual->Load(childNode);
-    visual->SetIgnorePoseUpdates(true);
-    visual->SetOwner(this);
-    visual->SetCastShadows(true);
+    visname << this->GetCompleteScopedName() << "_VISUAL_" << 
+               this->visuals.size();
 
-    this->visuals.push_back(visual);
 
+    InsertVisualMsg msg;
+    msg.parentId = this->GetName();
+    msg.id = visname.str();
+    msg.Load(childNode);
+    msg.castShadows = false;
+    Simulator::Instance()->SendMessage( msg );
+
+    this->visualNames.push_back(visname.str());
+
+    // NATY: get rid of this
+    //visual->SetOwner(this);
+    //visual->SetCastShadows(true);
+    //this->visuals.push_back(visual);
+    //visual->SetIgnorePoseUpdates(true);
+    
     childNode = childNode->GetNext("visual");
   }
 }
@@ -230,11 +237,12 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->laserFiducialIdP) << "\n";
   stream << prefix << "  " << *(this->laserRetroP) << "\n";
 
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  // NATY: put back in functionality
+  /*for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
     if (*iter)
       (*iter)->Save(p, stream);
-  }
+  }*/
 
   stream << prefix << "</geom>\n";
 }
