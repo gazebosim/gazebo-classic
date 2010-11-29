@@ -79,6 +79,7 @@ class ModelUpdate_TBB
 // Private constructor
 World::World()
 {
+  std::cout << "New World\n";
   this->server = NULL;
   this->physicsEngine = NULL;
   this->graphics = NULL;

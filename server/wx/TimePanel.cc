@@ -74,7 +74,7 @@ TimePanel::~TimePanel()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the time panel
-void TimePanel::Update()
+void TimePanel::MyUpdate()
 {
   World *world = Simulator::Instance()->GetActiveWorld();
 

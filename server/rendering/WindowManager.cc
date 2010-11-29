@@ -1,6 +1,7 @@
 #include <Ogre.h>
 #include <math.h>
 
+#include "Events.hh"
 #include "OgreAdaptor.hh"
 #include "RTShaderSystem.hh"
 #include "Color.hh"
@@ -18,6 +19,7 @@ unsigned int WindowManager::windowCounter = 0;
 // Constructor
 WindowManager::WindowManager()
 {
+  Events::ConnectRenderSignal( boost::bind(&WindowManager::Render, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +46,8 @@ int WindowManager::CreateWindow( RenderControl *control )
 void WindowManager::SetCamera( int windowId, Camera *camera)
 {
   Ogre::Viewport *viewport = NULL;
- 
+
+  this->windows[windowId]->removeAllViewports(); 
   viewport = this->windows[windowId]->addViewport(camera->GetCamera());
 
   double ratio = (double)viewport->getActualWidth() / (double)viewport->getActualHeight();
@@ -97,7 +100,7 @@ int WindowManager::CreateWindow( const std::string ogreHandle,
 
   window->setActive(true);
   //window->setVisible(true);
-  window->setAutoUpdated(false);
+  window->setAutoUpdated(true);
 
   this->windows.push_back(window);
 
@@ -116,3 +119,12 @@ void WindowManager::Resize(unsigned int id, int width, int height)
     this->windows[id]->windowMovedOrResized();
   }
 } 
+
+void WindowManager::Render()
+{
+  for (unsigned int i=0; i < this->windows.size(); i++)
+  {
+    this->windows[i]->update();
+    //this->windows[i]->swapBuffers();
+  }
+}

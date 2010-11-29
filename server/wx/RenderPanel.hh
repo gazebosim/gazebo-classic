@@ -22,7 +22,7 @@ namespace gazebo
     public: void Init();
 
     /// \brief Update
-    public: void Update();
+    public: void MyUpdate();
 
     /// \brief Get the camera
     public: UserCamera *GetCamera();

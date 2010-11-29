@@ -232,6 +232,22 @@ Vector3 Quatern::GetAsEuler()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Convert euler angles to quatern.
+Quatern Quatern::EulerToQuatern( const Vector3 &vec )
+{
+  Quatern result;
+  result.SetFromEuler(vec);
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Convert euler angles to quatern.
+Quatern Quatern::EulerToQuatern( double x, double y, double z)
+{
+  return EulerToQuatern( Vector3(x,y,z) );
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the Euler roll angle in radians
 double Quatern::GetRoll()
 {

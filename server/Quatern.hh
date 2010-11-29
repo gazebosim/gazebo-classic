@@ -96,6 +96,12 @@ class Quatern
   /// \return This quaternion as an Euler vector
   public: Vector3 GetAsEuler();
 
+  /// \brief Convert euler angles to quatern.
+  public: static Quatern EulerToQuatern( const Vector3 &vec );
+
+  /// \brief Convert euler angles to quatern.
+  public: Quatern EulerToQuatern( double x, double y, double z);
+
   /// \brief Get the Euler roll angle in radians
   public: double GetRoll();
 

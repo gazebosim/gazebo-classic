@@ -33,6 +33,8 @@ namespace gazebo
     /// \brief Resize a window
     public: void Resize(unsigned int id, int width, int height);
 
+    public: void Render();
+
     private: std::vector<Ogre::RenderWindow *> windows;
 
     private: static unsigned int windowCounter;

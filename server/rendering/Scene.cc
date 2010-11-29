@@ -25,6 +25,7 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
+  std::cout << "New Scene\n";
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 

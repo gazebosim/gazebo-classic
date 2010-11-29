@@ -13,7 +13,7 @@ namespace gazebo
     public: TimePanel( wxWindow *parent );
     public: virtual ~TimePanel();
 
-    public: void Update();
+    public: void MyUpdate();
 
     private: wxStaticText *percentRealTimeText;
     private: wxTextCtrl *percentRealTimeCtrl;

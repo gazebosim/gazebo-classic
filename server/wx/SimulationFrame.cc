@@ -139,6 +139,8 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
 
   Events::ConnectMoveModeSignal( 
       boost::bind(&SimulationFrame::MoveModeCB, this, _1) );
+
+  this->auiManager->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -268,9 +270,9 @@ void SimulationFrame::OnPause(bool pause)
 // Update the frame
 void SimulationFrame::Update()
 {
-  this->auiManager->Update();
-  this->timePanel->Update();
-  this->renderPanel->Update();
+  //this->auiManager->Update();
+  this->timePanel->MyUpdate();
+  this->renderPanel->MyUpdate();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

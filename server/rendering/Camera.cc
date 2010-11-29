@@ -52,6 +52,7 @@ unsigned int Camera::cameraCounter = 0;
 // Constructor
 Camera::Camera(const std::string &namePrefix, Scene *scene)
 {
+  std::cout << "New Camera\n";
   this->scene = scene;
 
   this->textureWidth = this->textureHeight = 0;
@@ -972,6 +973,8 @@ void Camera::CreateCamera()
     return;
 
   Ogre::Viewport *cviewport;
+
+  std::cout << "Creating a camera\n";
 
   this->camera = this->scene->GetManager()->createCamera(this->name);
 

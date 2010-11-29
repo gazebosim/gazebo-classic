@@ -35,14 +35,14 @@ END_EVENT_TABLE()
 RenderControl::RenderControl(wxWindow *parent)
   : wxControl(parent, wxID_ANY, wxDefaultPosition, wxSize(320,240), wxSUNKEN_BORDER, wxDefaultValidator)
 {
+  this->windowId = WindowManager::Instance()->CreateWindow(this);
+
   this->userCamera = NULL;
   this->cursorState = "default";
   this->mouseModifier = "rotx";
   this->currMaker = NULL;
 
   SetFocus();
-
-  this->windowId = WindowManager::Instance()->CreateWindow(this);
 
   Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( RenderControl::OnMouseEvent ), NULL, this );
   Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( RenderControl::OnMouseEvent ), NULL, this );
@@ -312,6 +312,9 @@ void RenderControl::ViewScene(Scene *scene)
   else
     this->userCamera = scene->GetUserCamera(0);
 
+  this->userCamera->SetWorldPosition( Vector3(0,0,3) );
+  this->userCamera->SetWorldRotation( Quatern::EulerToQuatern(0,0,3) );
+
   WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
 
   /*if (this->userCamera == NULL)
@@ -387,9 +390,12 @@ void RenderControl::OnSize( wxSizeEvent &evt )
   width = size.GetWidth ();
   height = size.GetHeight ();
 
+  std::cout << "On Size[" << width << ":" << height << "]\n";
+
   WindowManager::Instance()->Resize(this->windowId, width, height);
 
-  evt.Skip();
+  evt.StopPropagation();
+  //evt.Skip(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
