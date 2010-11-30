@@ -379,7 +379,7 @@ void Body::Init()
 
     this->cgVisualId = visname.str();
 
-    InsertVisualMsg msg;
+    VisualMsg msg;
     msg.parentId = this->comEntity->GetName();
     msg.id = this->cgVisualId;
     msg.type = MESH_RESOURCE;

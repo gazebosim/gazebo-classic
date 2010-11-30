@@ -29,8 +29,10 @@ namespace gazebo
     public: std::string xmlStr;
   };
 
-  class InsertVisualMsg : public Message
+  class VisualMsg : public Message
   {
+    public: enum ActionType {UPDATE, DELETE};
+
     public: InsertVisualMsg() : Message(INSERT_VISUAL) {}
     public: InsertVisualMsg(const InsertVisualMsg &m) : Message(m), 
             xmlStr(m.xmlStr) {}
@@ -39,11 +41,14 @@ namespace gazebo
 
     public: std::string parentId;
     public: std::string id;
+    public: VisualMsgActionType action;
     public: std::string mesh;
     public: std::string material;
     public: bool castShadows;
     public: bool attachAxes;
     public: bool visible;
+    public: Vector3 boundingbox_min;
+    public: Vector3 boundingbox_max;
   };
 
   class UpdatePoseMsg : public Message

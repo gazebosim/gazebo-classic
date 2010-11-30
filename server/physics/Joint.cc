@@ -27,8 +27,6 @@
 #include "RenderTypes.hh"
 #include "Events.hh"
 #include "PhysicsEngine.hh"
-#include "Visual.hh"
-#include "OgreDynamicLines.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "Global.hh"
@@ -140,12 +138,15 @@ void Joint::Load(XMLConfigNode *node)
   this->Attach(this->body1, this->body2);
 
   /// Add a renderable for the joint
-  this->visual = new Visual(visname.str(), this);
-  this->visual->SetPosition(this->anchorPos);
-  this->visual->SetCastShadows(false);
-  this->visual->AttachMesh("joint_anchor");
-  this->visual->SetMaterial("Gazebo/JointAnchor");
-  this->visual->SetVisible(false);
+  this->visualMsg = new VisualMsg();
+  this->visualMsg->parentId = this->GetName();
+  this->visualMsg->id = visname.str();
+  this->visualMsg->type = VisualMsg::MESH_RESOURCE;
+  this->visualMsg->pose.pos = this->achorPos;
+  this->visualMsg->castShadows = false;
+  this->visualMsg->mesh = "joint_anchor";
+  this->visualMsg->material = "Gazebo/JointAnchor";
+  this->visualMsg->visible = false;
 
   this->line1 = this->visual->AddDynamicLine(RENDERING_LINE_LIST);
   this->line2 = this->visual->AddDynamicLine(RENDERING_LINE_LIST);

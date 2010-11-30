@@ -44,7 +44,6 @@ namespace gazebo
   class Body;
   class SurfaceParams;
   class XMLConfigNode;
-  class Visual;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
@@ -118,15 +117,6 @@ namespace gazebo
 
     /// \brief Set the mass
     public: void SetMass(const Mass &mass);
-
-    /// \brief Get the number of visuals
-    public: unsigned int GetVisualCount() const;
-
-    /// \brief Get a visual
-    public: Visual *GetVisual(unsigned int index) const; 
-
-    /// \brief Get a visual by id
-    public: Visual *GetVisualById( int id ) const;
 
     /// \brief Get the body this geom belongs to
     public: Body *GetBody() const;
@@ -234,7 +224,8 @@ namespace gazebo
     private: float transparency;
 
     /// All the visual apparence 
-    private: std::vector<std::string> visualNames;
+    private: std::vector<VisualMsg> visualMsgs;
+    private: VisualMsg *bbVisualMsg;
 
     protected: Shape *shape;
 

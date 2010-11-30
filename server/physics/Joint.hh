@@ -43,7 +43,6 @@ namespace gazebo
   class XMLConfigNode;
   class Model;
   class OgreDynamicLines;
-  class Visual; 
 
   /// \brief Base class for all joints
   class Joint : public Common
@@ -182,7 +181,7 @@ namespace gazebo
     protected: ParamT<bool> *provideFeedbackP;
     protected: ParamT<double> *fudgeFactorP;
 
-    protected: Visual *visual;
+    protected: VisualMsg *visualMsg;
 
     protected: Model *model;
 
