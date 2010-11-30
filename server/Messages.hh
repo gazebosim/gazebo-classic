@@ -1,12 +1,16 @@
 #ifndef MESSAGES_HH
 #define MESSAGES_HH
 
+#include <vector>
+
+#include "Vector3.hh"
 #include "Time.hh"
 #include "Pose3d.hh"
 
+
 namespace gazebo
 {
-  enum MessageType{ INSERT_MODEL };
+  enum MessageType{ INSERT_MODEL, VISUAL, POSE };
 
   class Message
   {
@@ -32,16 +36,17 @@ namespace gazebo
   class VisualMsg : public Message
   {
     public: enum ActionType {UPDATE, DELETE};
+    public: enum RenderType {MESH_RESOURCE, POINTS, LINE_LIST};
 
-    public: InsertVisualMsg() : Message(INSERT_VISUAL) {}
-    public: InsertVisualMsg(const InsertVisualMsg &m) : Message(m), 
-            xmlStr(m.xmlStr) {}
+    public: VisualMsg() : Message(VISUAL) {}
+    public: VisualMsg(const VisualMsg &m) : Message(m) {}
     public: virtual Message *Clone() const 
-            { InsertVisualMsg *msg = new InsertVisualMsg(*this); return msg; }
+            { VisualMsg *msg = new VisualMsg(*this); return msg; }
 
     public: std::string parentId;
     public: std::string id;
-    public: VisualMsgActionType action;
+    public: ActionType action;
+    public: RenderType render;
     public: std::string mesh;
     public: std::string material;
     public: bool castShadows;
@@ -49,9 +54,10 @@ namespace gazebo
     public: bool visible;
     public: Vector3 boundingbox_min;
     public: Vector3 boundingbox_max;
+    public: std::vector<Vector3> points;
   };
 
-  class UpdatePoseMsg : public Message
+  /*class UpdatePoseMsg : public Message
   {
     public: UpdatePoseMsg() : Message(UPDATE_POSE), id(0) {}
     public: UpdatePoseMsg(const UpdatePoseMsg &m) : Message(m), 
@@ -61,7 +67,7 @@ namespace gazebo
 
     public: std::string id;
     public: Pose3d pose;
-  };
+  };*/
 }
 
 #endif

@@ -44,7 +44,7 @@ namespace gazebo
   class Entity;
   class Body;
   class XMLConfigNode;
-  class Visual;
+  class VisualMsg;
   
   /// \addtogroup gazebo_physics_engine
   /** \{
@@ -237,7 +237,7 @@ namespace gazebo
     private: boost::recursive_mutex *mutex;
     private: bool locked;
 
-    protected: Visual *visual;
+    protected: VisualMsg *visualMsg;
 
     private: std::vector<OgreDynamicLines*> contactLines;
     private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;

@@ -31,6 +31,8 @@
 
 #ifdef HAVE_FFMPEG
 
+#include <inttypes.h>
+
 extern "C" {
 
 #include <avformat.h>

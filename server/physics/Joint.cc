@@ -43,7 +43,9 @@ Joint::Joint()
   : Common(NULL)
 {
   this->AddType(JOINT);
-  this->visual = NULL;
+  this->visualMsg = NULL;
+  this->line1Msg = NULL;
+  this->line2Msg = NULL;
   this->model = NULL;
 
   Param::Begin(&this->parameters);
@@ -72,10 +74,28 @@ Joint::~Joint()
 {
   Events::DisconnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this));
 
-  if (this->visual)
+  if (this->visualMsg)
   {
-    delete this->visual;
-    this->visual = NULL;
+    this->visualMsg->action = VisualMsg::DELETE;
+    Simulator::Instance()->SendMessage(*this->visualMsg);
+    delete this->visualMsg;
+    this->visualMsg = NULL;
+  }
+
+  if (this->line1Msg)
+  {
+    this->line1Msg->action = VisualMsg::DELETE;
+    Simulator::Instance()->SendMessage(*this->line1Msg);
+    delete this->line1Msg;
+    this->line1Msg = NULL;
+  }
+
+  if (this->line2Msg)
+  {
+    this->line2Msg->action = VisualMsg::DELETE;
+    Simulator::Instance()->SendMessage(*this->line2Msg);
+    delete this->line2Msg;
+    this->line2Msg = NULL;
   }
 
   delete this->erpP;
@@ -147,17 +167,22 @@ void Joint::Load(XMLConfigNode *node)
   this->visualMsg->mesh = "joint_anchor";
   this->visualMsg->material = "Gazebo/JointAnchor";
   this->visualMsg->visible = false;
+  
+  this->line1Msg = new VisualMsg();
+  this->line1Msg->parentId = this->visualMsg->id;
+  this->line1Msg->id = "line1";
+  this->line1Msg->type = VisualMsg::LINE_LIST;
+  this->line1Msg->material = "Gazebo/BlueGlow";
+  this->line1Msg->points.push_back(Vector3(0,0,0));
+  this->line1Msg->points.push_back(Vector3(0,0,0));
 
-  this->line1 = this->visual->AddDynamicLine(RENDERING_LINE_LIST);
-  this->line2 = this->visual->AddDynamicLine(RENDERING_LINE_LIST);
-
-  this->line1->setMaterial("Gazebo/BlueGlow");
-  this->line2->setMaterial("Gazebo/BlueGlow");
-
-  this->line1->AddPoint(Vector3(0,0,0));
-  this->line1->AddPoint(Vector3(0,0,0));
-  this->line2->AddPoint(Vector3(0,0,0));
-  this->line2->AddPoint(Vector3(0,0,0));
+  this->line2Msg = new VisualMsg();
+  this->line2Msg->parentId = this->visualMsg->id;
+  this->line2Msg->id = "line2";
+  this->line2Msg->type = VisualMsg::LINE_LIST;
+  this->line2Msg->material = "Gazebo/BlueGlow";
+  this->line2Msg->points.push_back(Vector3(0,0,0));
+  this->line2Msg->points.push_back(Vector3(0,0,0));
 
   // Set the anchor vector
   if (this->anchorBody)
@@ -196,20 +221,24 @@ void Joint::Update()
   this->jointUpdateSignal();
 
   //TODO: Evaluate impact of this code on performance
-  if (this->visual && this->visual->GetVisible())
+  if (this->visualMsg && this->visualMsg->visible)
   {
     if (this->GetName() == "left_paddle_joint")
       std::cout << "Joint[" << this->GetName() << "] Angle[" << this->GetAngle(0) << "]\n";
     this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + 
         this->anchorBody->GetWorldPose()).pos;
 
-    this->visual->SetPosition(this->anchorPos);
+    this->visualMsg->pose.pos = this->anchorPos;
 
     if (this->body1) 
-      this->line1->SetPoint(1, this->body1->GetWorldPose().pos - this->anchorPos);
+      this->line1Msg->points[1] = this->body1->GetWorldPose().pos - this->anchorPos;
 
     if (this->body2)
-      this->line2->SetPoint(1, this->body2->GetWorldPose().pos - this->anchorPos);
+      this->line2Msg->poinst[1] = this->body2->GetWorldPose().pos - this->anchorPos;
+
+    Simulator::Instance()->SendMessage( *this->visualMsg );
+    Simulator::Instance()->SendMessage( *this->line1Msg );
+    Simulator::Instance()->SendMessage( *this->line2Msg );
   }
 }
 
@@ -217,8 +246,11 @@ void Joint::Update()
 // Toggle joint visibility
 void Joint::ToggleShowJoints()
 {
-  if (this->visual)
-    this->visual->ToggleVisible();
+  if (this->visualMsg)
+  {
+    this->visualMsg->visible = !this->visualMsg->visible;
+    Simulator::Instance()->SendMessage( *this->visualMsg );
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -226,7 +258,10 @@ void Joint::ToggleShowJoints()
 void Joint::ShowJoints(bool s)
 {
   if (this->visual)
-    this->visual->SetVisible(s);
+  {
+    this->visualMsg->visible = s;
+    Simulator::Instance()->SendMessage( *this->visualMsg );
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////

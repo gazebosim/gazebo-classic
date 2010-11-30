@@ -43,6 +43,7 @@ namespace gazebo
   class XMLConfigNode;
   class Model;
   class OgreDynamicLines;
+  class VisualMsg;
 
   /// \brief Base class for all joints
   class Joint : public Common

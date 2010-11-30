@@ -111,9 +111,10 @@ Body::~Body()
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
 
-  DeleteVisualMsg msg;
-  msg.id = this->cgVisualId;
-  Simulator::Instance()->SendMessage(msg);
+  this->cgVisualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage(*this->cgVisualMsg);
+  delete this->cgVisualMsg;
+  this->cgVisualMsg = NULL;
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
     if (giter->second)
@@ -377,21 +378,20 @@ void Body::Init()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
-    this->cgVisualId = visname.str();
+    this->cgVisualMsg = new VisualMsg();
+    this->cgVisualMsg->parentId = this->comEntity->GetName();
+    this->cgVisualMsg->id = visname.str();
+    this->cgVisualMsg->render = VisualMsg::MESH_RESOURCE;
+    this->cgVisualMsg->mesh = "body_cg";
+    this->cgVisualMsg->material = "Gazebo/Red";
+    this->cgVisualMsg->castShadows = false;
+    this->cgVisualMsg->attachAxes = true;
+    this->cgVisualMsg->visible = false;
+    Simulator::Instance()->SendMessage(*this->cgVisualMsg);
 
     VisualMsg msg;
-    msg.parentId = this->comEntity->GetName();
-    msg.id = this->cgVisualId;
-    msg.type = MESH_RESOURCE;
-    msg.mesh = "body_cg";
-    msg.material = "Gazebo/Red";
-    msg.castShadows = false;
-    msg.attachAxes = true;
-    msg.visible = false;
-    Simulator::Instance()->SendMessage(msg);
-
-    msg.parentId = this->cgVisualId;
-    msg.type = LINE_LIST;
+    msg.parentId = this->cgVisualMsg->id;
+    msg.render = VisualMsg::LINE_LIST;
     msg.attachAxes = false;
     msg.material = "Gazebo/GreenGlow";
 
@@ -702,16 +702,16 @@ void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
 /// Toggle show the physics visualizations
 void Body::ToggleShowPhysics()
 {
-  if (this->cgVisual)
-    this->cgVisual->ToggleVisible();
+  this->cgVisualMsg->visible = !this->cgVisualMsg->visible;
+  Simulator::Instance()->SendMessage(*this->cgVisualMsg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set to true to show the physics visualizations
 void Body::ShowPhysics(bool show)
 {
-  if (this->cgVisual)
-    this->cgVisual->SetVisible(show);
+  this->cgVisualMsg->visible = show;
+  Simulator::Instance()->SendMessage(*this->cgVisualMsg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

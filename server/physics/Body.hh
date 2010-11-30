@@ -41,6 +41,7 @@ namespace gazebo
   class Geom;
   class Sensor;
   class XMLConfigNode;
+  class VisualMsg;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class
@@ -269,7 +270,7 @@ namespace gazebo
     protected: ParamT<bool> *turnGravityOffP;
     protected: ParamT<bool> *selfCollideP;
 
-    protected: Visual *cgVisual;
+    protected: VisualMsg *cgVisualMsg;
 
     protected: Vector3 linearAccel;
     protected: Vector3 angularAccel;

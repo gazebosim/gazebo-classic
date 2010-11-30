@@ -44,6 +44,7 @@ namespace gazebo
   class Body;
   class SurfaceParams;
   class XMLConfigNode;
+  class VisualMsg;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
