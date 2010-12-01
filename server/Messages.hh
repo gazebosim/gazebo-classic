@@ -10,7 +10,7 @@
 
 namespace gazebo
 {
-  enum MessageType{ INSERT_MODEL, VISUAL, POSE };
+  enum MessageType{ INSERT_MODEL_MSG, VISUAL_MSG, POSE_MSG };
 
   class Message
   {
@@ -25,7 +25,7 @@ namespace gazebo
 
   class InsertModelMsg : public Message
   {
-    public: InsertModelMsg() : Message(INSERT_MODEL) {}
+    public: InsertModelMsg() : Message(INSERT_MODEL_MSG) {}
     public: InsertModelMsg(const InsertModelMsg &m) : Message(m), 
             xmlStr(m.xmlStr) {}
     public: virtual Message *Clone() const 
@@ -38,7 +38,7 @@ namespace gazebo
     public: enum ActionType {UPDATE, DELETE};
     public: enum RenderType {MESH_RESOURCE, POINTS, LINE_LIST};
 
-    public: VisualMsg() : Message(VISUAL) {}
+    public: VisualMsg() : Message(VISUAL_MSG) {}
     public: VisualMsg(const VisualMsg &m) : Message(m) {}
     public: virtual Message *Clone() const 
             { VisualMsg *msg = new VisualMsg(*this); return msg; }
@@ -57,9 +57,9 @@ namespace gazebo
     public: std::vector<Vector3> points;
   };
 
-  /*class UpdatePoseMsg : public Message
+  class UpdatePoseMsg : public Message
   {
-    public: UpdatePoseMsg() : Message(UPDATE_POSE), id(0) {}
+    public: UpdatePoseMsg() : Message(POSE_MSG), id(0) {}
     public: UpdatePoseMsg(const UpdatePoseMsg &m) : Message(m), 
             id(m.id), pose(m.pose) {}
     public: virtual Message *Clone() const 
@@ -67,7 +67,7 @@ namespace gazebo
 
     public: std::string id;
     public: Pose3d pose;
-  };*/
+  };
 }
 
 #endif

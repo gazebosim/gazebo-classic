@@ -52,7 +52,7 @@ unsigned int Visual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Visual::Visual(const std::string &name, Common *parent)
+Visual::Visual(const std::string &name, Visual *parent)
   : Common(parent)
 {
   this->SetName(name);
@@ -63,10 +63,8 @@ Visual::Visual(const std::string &name, Common *parent)
   stream << this->GetName() << "_VISUAL_" << visualCounter++;
 
   Ogre::SceneNode *pnode = NULL;
-  if (this->GetParent()->HasType(ENTITY))
-     pnode = ((Entity*)this->GetParent())->GetVisualNode()->GetSceneNode();
-  else if ( this->GetParent()->HasType(VISUAL))
-    pnode = ((Visual*)this->GetParent())->GetSceneNode();
+  if (parent)
+    pnode = parent->GetSceneNode();
   else
     gzerr(0) << "Create a visual, invalid parent!!!\n";
 

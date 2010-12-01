@@ -401,7 +401,7 @@ void Body::Init()
     {
       msg.points.clear();
 
-      msg.id = visname.str() + "_lineto_" + giter->first->GetName();
+      msg.id = visname.str() + "_lineto_" + giter->first;
       msg.points.push_back( Vector3(0,0,0) );
       msg.points.push_back(giter->second->GetRelativePose().pos);
 

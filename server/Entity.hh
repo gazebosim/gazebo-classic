@@ -30,6 +30,7 @@
 #include <vector>
 #include <string>
 
+#include "Box.hh"
 #include "Common.hh"
 #include "Pose3d.hh"
 #include "Param.hh"
@@ -57,14 +58,6 @@ namespace gazebo
  
     public: void SetName(const std::string &name);
  
-    /// \brief Return this entity's sceneNode
-    /// \return Ogre scene node
-    public: Visual *GetVisualNode() const;
-  
-    /// \brief Set the scene node
-    /// \param sceneNode Ogre scene node
-    public: void SetVisualNode(Visual *visualNode);
- 
     /// \brief Set whether this entity is static: immovable
     /// \param s Bool, true = static
     public: void SetStatic(const bool &s);
@@ -72,7 +65,10 @@ namespace gazebo
     /// \brief Return whether this entity is static
     /// \return bool True = static
     public: bool IsStatic() const;
-  
+
+    /// \brief Return the bounding box for the entity 
+    public: Box GetBoundingBox() const;
+
     /// \brief Get the absolute pose of the entity
     public: virtual Pose3d GetWorldPose() const;
 

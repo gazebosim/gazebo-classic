@@ -359,9 +359,8 @@ void UserCamera::MoveToEntity(Entity *entity)
   key->setRotation(this->pitchNode->getOrientation());
 
   Vector3 min, max, size;
-  Visual *vis = entity->GetVisualNode();
-  OgreCreator::GetVisualBounds(vis, min,max);
-  size = max-min;
+  Box box = entity->GetBoundingBox();
+  size = box.max-box.min;
 
   double scale = std::max(std::max(size.x, size.y), size.z);
   scale += 0.5;

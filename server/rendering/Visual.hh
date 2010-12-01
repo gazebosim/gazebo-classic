@@ -62,7 +62,7 @@ namespace gazebo
   class Visual : public Common //, public Ogre::Any
   {
     /// \brief Constructor
-    public: Visual (const std::string &name, Common *parent);
+    public: Visual (const std::string &name, Visual *parent);
 
     /// \brief Constructor
     public: Visual (const std::string &name, Ogre::SceneNode *parent);

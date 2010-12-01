@@ -25,6 +25,7 @@
  * SVN: $Id$
  */
 
+#include "Messages.hh"
 #include "Geom.hh"
 #include "Model.hh"
 #include "Body.hh"
@@ -53,20 +54,24 @@ Entity::Entity(Common *parent)
   std::ostringstream visname;
   visname << "Entity_" << this->GetId() << "_VISUAL";
 
+  this->visualMsg = new VisualMsg();
+  this->visualMsg->id = visname.str();
+
   if (this->parent && this->parent->HasType(ENTITY))
   {
     Entity *ep = (Entity*)(this->parent);
-    //if (Simulator::Instance()->GetRenderEngineEnabled())
-    this->visualNode = new Visual(visname.str(), ep);
+    this->visualMsg->parentId = ep->GetName();
     this->SetStatic(ep->IsStatic());
   }
   else
   {
-    //if (Simulator::Instance()->GetRenderEngineEnabled())
-    this->visualNode = new Visual(visname.str(), this->GetWorld()->GetScene());
+    this->visualMsg = new VisualMsg();
   }
 
-  this->visualNode->SetOwner(this);
+  Simulator::Instance()->SendMessage( *this->visualMsg );
+
+  // NATY: put functionality back in
+  //this->visualNode->SetOwner(this);
 }
 
 void Entity::SetName(const std::string &name)
@@ -74,7 +79,8 @@ void Entity::SetName(const std::string &name)
   Common::SetName(name);
   std::ostringstream visname;
   visname << name << "_VISUAL";
-  this->visualNode->SetName(visname.str());
+  this->visualMsg->id = visname.str();
+  Simulator::Instance()->SendMessage( *this->visualMsg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,31 +116,12 @@ Entity::~Entity()
     }
   }*/
 
-  if (Simulator::Instance()->GetRenderEngineEnabled())
-  {
-    if (this->visualNode)
-    {
-      delete this->visualNode;
-      this->visualNode = NULL;
-    }
-  }
-
-  this->visualNode = NULL;
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
+  delete this->visualMsg;
+  this->visualMsg = NULL;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Return this entitie's sceneNode
-Visual *Entity::GetVisualNode() const
-{
-  return this->visualNode;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the scene node
-void Entity::SetVisualNode(Visual *visualNode)
-{
-  this->visualNode = visualNode;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether this entity is static: immovable
@@ -169,6 +156,13 @@ void Entity::SetStatic(const bool &s)
 bool Entity::IsStatic() const
 {
   return this->staticP->GetValue();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return the bounding box for the entity 
+Box Entity::GetBoundingBox() const
+{
+  return Box(Vector3(0,0,0), Vector3(1,1,1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -295,16 +289,7 @@ void Entity::SetRelativeRotation(const Quatern &rot)
 // Handle a change of pose
 void Entity::PoseChange(bool notify)
 {
-  if (Simulator::Instance()->GetRenderEngineEnabled())
-  {
-    // NATY:: Not sure the reason for GetState
-    /*if (Simulator::Instance()->GetState() == Simulator::RUN &&
-        !this->IsStatic())
-      this->visualNode->SetDirty(true, this->GetRelativePose());
-    else
-    */
-      this->visualNode->SetPose(this->GetRelativePose());
-  }
+  Simulator::Instance()->SendMessage( msg );
 
   if (notify)
   {

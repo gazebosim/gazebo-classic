@@ -62,7 +62,7 @@ PhysicsEngine::PhysicsEngine(World *world)
     this->visualMsg->parentId.clear();
     this->visualMsg->id = "physics_engine_visual";
     this->visualMsg->visible = false;
-    this->visualMsg->rtShader = false;
+    //this->visualMsg->rtShader = false;
     this->visualMsg->castShadows = false;
     this->visualMsg->action = VisualMsg::UPDATE;
 
@@ -197,7 +197,8 @@ void PhysicsEngine::UnlockMutex()
 /// Add a contact visual
 void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 {
-  if (!RenderState::GetShowContacts())
+  // NATY: put back in
+ /* if (!RenderState::GetShowContacts())
     return;
 
   Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
@@ -231,6 +232,7 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 
   if (this->contactLinesIter == this->contactLines.end())
     this->contactLinesIter = this->contactLines.begin();
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

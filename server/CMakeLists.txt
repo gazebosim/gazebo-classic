@@ -98,6 +98,7 @@ SET (sources Common.cc
              STLLoader.cc
              Plugin.cc
              Events.cc
+             Box.cc
 )
 
 SET (headers Common.hh
@@ -133,6 +134,7 @@ SET (headers Common.hh
              Events.hh
              Plugin.hh
              Messages.hh
+             Box.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})
