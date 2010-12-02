@@ -651,30 +651,33 @@ set( CMAKE_REQUIRED_INCLUDES ${parallel_quickstep_include_dirs_split} )
 set( CMAKE_REQUIRED_LIBRARIES ${parallel_quickstep_library} )
 set( CMAKE_REQUIRED_FLAGS  ${parallel_quickstep_lflags} )
  
-#STRING(REPLACE " " "/parallel_quickstep " parallel_quickstep_include_dirs_tmp "${parallel_quickstep_include_dirs}")
-find_path(parallel_quickstep_include_found parallel_quickstep/parallel_quickstep.h '${parallel_quickstep_include_dirs}')
+STRING(REPLACE " " ";" parallel_quickstep_include_dirs_search_path ${parallel_quickstep_include_dirs})
+find_path( parallel_quickstep_include_found
+    NAMES parallel_quickstep.h parallel_quickstep/parallel_quickstep.h
+    PATHS ${parallel_quickstep_include_dirs_search_path}
+    DOC "parallel_quickstep includes location"
+    NO_DEFAULT_PATH
+    )
 if (NOT parallel_quickstep_include_found)
-  message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs} - not found")
+  message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs_search_path} - not found ${parallel_quickstep_include_found}")
   BUILD_WARNING ("parallel_quickstep.h not found, plugins will not be supported.")
 else (NOT parallel_quickstep_include_found)
   message (STATUS "Looking for parallel_quickstep.h - found")
 endif (NOT parallel_quickstep_include_found)
 
-find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs})
+
+STRING(REPLACE " " ";" parallel_quickstep_library_dirs_search_path ${parallel_quickstep_library_dirs})
+find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs_search_path} )
 if (NOT parallel_quickstep_library_found)
-  message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs} - not found")
+  message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs_search_path} - not found")
   BUILD_WARNING ("libparallel_quickstep.so not found, parallel_quickstep will not be supported.")
 else (NOT parallel_quickstep_library_found)
   message (STATUS "Looking for libparallel_quickstep.so - found")
 endif (NOT parallel_quickstep_library_found)
 
 if (parallel_quickstep_library_found AND parallel_quickstep_include_found)
-
   SET (PARALLEL_QUICKSTEP ON CACHE BOOL "Build gazebo with parallel_quickstep support" FORCE)
-
 else (parallel_quickstep_library_found AND parallel_quickstep_include_found)
-
   SET (PARALLEL_QUICKSTEP OFF CACHE BOOL "Build gazebo without parallel_quickstep support" FORCE)
-
 endif (parallel_quickstep_library_found AND parallel_quickstep_include_found)
 
