@@ -135,6 +135,7 @@ Simulator::Simulator()
   this->startTime = this->GetWallTime();
   this->gazeboConfig=new gazebo::GazeboConfig();
   this->pause = false;
+  this->physicsThread = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
