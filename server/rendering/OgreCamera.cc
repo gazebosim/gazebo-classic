@@ -102,6 +102,8 @@ OgreCamera::OgreCamera(const std::string &namePrefix, unsigned int sceneIndex)
   this->origParentNode = NULL;
 
   this->viewController = new FPSViewController(this);
+
+  this->lastRenderTime = Simulator::Instance()->GetSimTime();
 }
 
 //////////////////////////////////////////////////////////////////////////////
