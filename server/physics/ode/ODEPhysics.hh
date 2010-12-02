@@ -28,7 +28,6 @@
 #define ODEPHYSICS_HH
 
 #include <ode/ode.h>
-#include <parallel_quickstep/parallel_quickstep.h>
 
 #include "gazebo_config.h"
 
@@ -41,6 +40,10 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+
+#ifdef PARALLEL_QUICKSTEP
+#include <parallel_quickstep/parallel_quickstep.h>
+#endif
 
 namespace gazebo
 {

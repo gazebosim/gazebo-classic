@@ -69,7 +69,7 @@ set (headers BallJoint.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})
-target_link_libraries(gazebo_physics parallel_quickstep ${LINK_LIBS} )
+target_link_libraries(gazebo_physics ${parallel_quickstep_library} ${LINK_LIBS} )
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})

@@ -19,6 +19,7 @@ set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRI
 
 set (parallel_quickstep_include_dirs "" CACHE STRING "parallel_quickstep CUDA include paths. Use this to override automatic detection.")
 set (parallel_quickstep_library_dirs "" CACHE STRING "parallel_quickstep CUDA library paths. Use this to override automatic detection.")
+set (parallel_quickstep_library "" CACHE STRING "parallel_quickstep CUDA library names. Use this to override automatic detection.")
 set (parallel_quickstep_lflags "" CACHE STRING "parallel_quickstep CUDA lflags Use this to override automatic detection.")
 set (parallel_quickstep_cflags "" CACHE STRING "parallel_quickstep CUDA cflags Use this to override automatic detection.")
 
@@ -639,9 +640,38 @@ int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
   endif (NOT BULLET_DOUBLE_PRECISION)
 endif (INCLUDE_BULLET)
 
+########################################
+# Find parallel_quickstep
 STRING(REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
 STRING(REPLACE " " ";" parallel_quickstep_library_dirs_split "${parallel_quickstep_library_dirs}")
 set( CMAKE_REQUIRED_INCLUDES ${parallel_quickstep_include_dirs_split} )
-set( CMAKE_REQUIRED_LIBRARIES parallel_quickstep )
+set( CMAKE_REQUIRED_LIBRARIES ${parallel_quickstep_library} )
 set( CMAKE_REQUIRED_FLAGS  ${parallel_quickstep_lflags} )
  
+#STRING(REPLACE " " "/parallel_quickstep " parallel_quickstep_include_dirs_tmp "${parallel_quickstep_include_dirs}")
+find_path(parallel_quickstep_include_found parallel_quickstep/parallel_quickstep.h '${parallel_quickstep_include_dirs}')
+if (NOT parallel_quickstep_include_found)
+  message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs} - not found")
+  BUILD_WARNING ("parallel_quickstep.h not found, plugins will not be supported.")
+else (NOT parallel_quickstep_include_found)
+  message (STATUS "Looking for parallel_quickstep.h - found")
+endif (NOT parallel_quickstep_include_found)
+
+find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs})
+if (NOT parallel_quickstep_library_found)
+  message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs} - not found")
+  BUILD_WARNING ("libparallel_quickstep.so not found, parallel_quickstep will not be supported.")
+else (NOT parallel_quickstep_library_found)
+  message (STATUS "Looking for libparallel_quickstep.so - found")
+endif (NOT parallel_quickstep_library_found)
+
+if (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+
+  SET (PARALLEL_QUICKSTEP ON CACHE BOOL "Build gazebo with parallel_quickstep support" FORCE)
+
+else (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+
+  SET (PARALLEL_QUICKSTEP OFF CACHE BOOL "Build gazebo without parallel_quickstep support" FORCE)
+
+endif (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+

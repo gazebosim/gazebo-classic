@@ -56,6 +56,8 @@
 #include "ODEHeightmapShape.hh"
 #include "MapShape.hh"
 
+#include "gazebo_config.h"
+
 #include "ODEPhysics.hh"
 
 using namespace gazebo;
@@ -415,8 +417,10 @@ void ODEPhysics::UpdatePhysics()
       dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
     else if (**this->stepTypeP == "world")
       dWorldStep( this->worldId, (**this->stepTimeP).Double() );
+#ifdef PARALLEL_QUICKSTEP
     else if (**this->stepTypeP == "parallel_quick")
       dWorldParallelQuickStep(this->worldId, (**this->stepTimeP).Double());  
+#endif
     else
       gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
 
