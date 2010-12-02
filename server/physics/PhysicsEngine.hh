@@ -239,8 +239,8 @@ namespace gazebo
 
     protected: VisualMsg *visualMsg;
 
-    private: std::vector<OgreDynamicLines*> contactLines;
-    private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;
+    //private: std::vector<OgreDynamicLines*> contactLines;
+    //private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;
   };
   
   /** \}*/

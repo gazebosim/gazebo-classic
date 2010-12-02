@@ -42,7 +42,6 @@ namespace gazebo
   class Body;
   class XMLConfigNode;
   class Model;
-  class OgreDynamicLines;
   class VisualMsg;
 
   /// \brief Base class for all joints
@@ -183,11 +182,11 @@ namespace gazebo
     protected: ParamT<double> *fudgeFactorP;
 
     protected: VisualMsg *visualMsg;
+    protected: VisualMsg *line1Msg;
+    protected: VisualMsg *line2Msg;
 
     protected: Model *model;
 
-    protected: OgreDynamicLines *line1;
-    protected: OgreDynamicLines *line2;
     protected: Vector3 anchorPos;
     protected: Body *anchorBody;
 

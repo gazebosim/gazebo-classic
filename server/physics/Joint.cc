@@ -24,6 +24,7 @@
  * CVS: $Id$
  */
 
+#include "Simulator.hh"
 #include "RenderTypes.hh"
 #include "Events.hh"
 #include "PhysicsEngine.hh"
@@ -161,8 +162,8 @@ void Joint::Load(XMLConfigNode *node)
   this->visualMsg = new VisualMsg();
   this->visualMsg->parentId = this->GetName();
   this->visualMsg->id = visname.str();
-  this->visualMsg->type = VisualMsg::MESH_RESOURCE;
-  this->visualMsg->pose.pos = this->achorPos;
+  this->visualMsg->render = VisualMsg::MESH_RESOURCE;
+  this->visualMsg->pose.pos = this->anchorPos;
   this->visualMsg->castShadows = false;
   this->visualMsg->mesh = "joint_anchor";
   this->visualMsg->material = "Gazebo/JointAnchor";
@@ -171,7 +172,7 @@ void Joint::Load(XMLConfigNode *node)
   this->line1Msg = new VisualMsg();
   this->line1Msg->parentId = this->visualMsg->id;
   this->line1Msg->id = "line1";
-  this->line1Msg->type = VisualMsg::LINE_LIST;
+  this->line1Msg->render = VisualMsg::LINE_LIST;
   this->line1Msg->material = "Gazebo/BlueGlow";
   this->line1Msg->points.push_back(Vector3(0,0,0));
   this->line1Msg->points.push_back(Vector3(0,0,0));
@@ -179,7 +180,7 @@ void Joint::Load(XMLConfigNode *node)
   this->line2Msg = new VisualMsg();
   this->line2Msg->parentId = this->visualMsg->id;
   this->line2Msg->id = "line2";
-  this->line2Msg->type = VisualMsg::LINE_LIST;
+  this->line2Msg->render = VisualMsg::LINE_LIST;
   this->line2Msg->material = "Gazebo/BlueGlow";
   this->line2Msg->points.push_back(Vector3(0,0,0));
   this->line2Msg->points.push_back(Vector3(0,0,0));
@@ -234,7 +235,7 @@ void Joint::Update()
       this->line1Msg->points[1] = this->body1->GetWorldPose().pos - this->anchorPos;
 
     if (this->body2)
-      this->line2Msg->poinst[1] = this->body2->GetWorldPose().pos - this->anchorPos;
+      this->line2Msg->points[1] = this->body2->GetWorldPose().pos - this->anchorPos;
 
     Simulator::Instance()->SendMessage( *this->visualMsg );
     Simulator::Instance()->SendMessage( *this->line1Msg );
@@ -257,7 +258,7 @@ void Joint::ToggleShowJoints()
 // Set the joint to show visuals
 void Joint::ShowJoints(bool s)
 {
-  if (this->visual)
+  if (this->visualMsg)
   {
     this->visualMsg->visible = s;
     Simulator::Instance()->SendMessage( *this->visualMsg );

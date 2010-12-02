@@ -250,7 +250,7 @@ void PhysicsEngine::ToggleShowVisual()
 // Set whether to show contacts
 void PhysicsEngine::ShowVisual(bool show)
 {
-  this->visualMsg->visual = show;
+  this->visualMsg->visible = show;
   Simulator::Instance()->SendMessage(*this->visualMsg);
 
   /* NATY put back in

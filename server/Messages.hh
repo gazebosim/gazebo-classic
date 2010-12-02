@@ -55,6 +55,7 @@ namespace gazebo
     public: Vector3 boundingbox_min;
     public: Vector3 boundingbox_max;
     public: std::vector<Vector3> points;
+    public: Pose3d pose;
   };
 
   class UpdatePoseMsg : public Message
