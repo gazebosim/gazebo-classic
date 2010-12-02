@@ -1,5 +1,8 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+STRING (REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
+STRING (REPLACE " " ";" parallel_quickstep_library_dirs_split "${parallel_quickstep_library_dirs}")
+
 include_directories(
   ${parallel_quickstep_include_dirs_split}
 )

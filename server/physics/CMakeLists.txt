@@ -1,6 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-
 STRING (REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
 STRING (REPLACE " " ";" parallel_quickstep_library_dirs_split "${parallel_quickstep_library_dirs}")
 
@@ -69,7 +68,7 @@ set (headers BallJoint.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})
-target_link_libraries(gazebo_physics ${parallel_quickstep_library} ${LINK_LIBS} )
+target_link_libraries(gazebo_physics ${parallel_quickstep_lflags} ${LINK_LIBS} )
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
