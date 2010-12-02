@@ -100,7 +100,7 @@ class Hinge2Joint : public T
   /// \brief Constructor
   public: Hinge2Joint() : T()
           {
-            this->type = Joint::HINGE2;
+            this->AddType(HINGE2_JOINT);
 
             Param::Begin(&this->parameters);
             this->axis1P = new ParamT<Vector3>("axis1",Vector3(0,0,1), 0);

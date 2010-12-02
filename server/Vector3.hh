@@ -63,6 +63,12 @@ class Vector3
   /// \brief Normalize the vector length
   public: void Normalize();
 
+  /// \brief Round to near whole number, return the result.
+  public: Vector3 Round();
+
+  /// \brief Get a rounded version of this vector
+  public: Vector3 GetRounded() const;
+
   /// \brief Set the contents of the vector
   public: void Set(double x = 0, double y =0 , double z = 0);
 

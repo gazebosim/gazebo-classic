@@ -37,6 +37,9 @@
 
 #include "gazebo_config.h"
 
+#include "Events.hh"
+#include "Scene.hh"
+#include "Grid.hh"
 #include "OgreVisual.hh"
 #include "UserCamera.hh"
 #include "OgreMovableText.hh"
@@ -57,8 +60,6 @@
 
 using namespace gazebo;
 
-enum SceneTypes{SCENE_BSP, SCENE_EXT};
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 OgreAdaptor::OgreAdaptor()
@@ -67,22 +68,11 @@ OgreAdaptor::OgreAdaptor()
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
 
-  this->backgroundColor=NULL;
   this->logManager=NULL;
-  this->sceneMgr=NULL;
   this->root=NULL;
-
-  this->frameListener = NULL;
+  //this->frameListener = NULL;
 
   this->dummyDisplay = false;
-
-  Param::Begin(&this->parameters);
-  this->ambientP = new ParamT<Vector4>("ambient",Vector4(.1,.1,.1,.1),0);
-  this->shadowsP = new ParamT<bool>("shadows", true, 0);
-  this->skyMaterialP = new ParamT<std::string>("material","",1);
-  this->backgroundColorP = new ParamT<Vector3>("backgroundColor",Vector3(0.5,0.5,0.5), 0);
-
-  Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,27 +85,22 @@ OgreAdaptor::~OgreAdaptor()
     XDestroyWindow(this->dummyDisplay, this->dummyWindowId);
     XCloseDisplay(this->dummyDisplay);
   }
-
-  delete this->ambientP;
-  delete this->shadowsP;
-  delete this->backgroundColorP;
-  delete this->skyMaterialP;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Closes and free
 void OgreAdaptor::Close()
 {
-  if (this->frameListener)
-    delete this->frameListener;
-  this->frameListener = NULL;
+  this->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the parameters for Ogre
 void OgreAdaptor::Load(XMLConfigNode *rootNode)
 {
+  if (this->root)
+    return;
+
   // Make the root
   try
   {
@@ -129,14 +114,27 @@ void OgreAdaptor::Load(XMLConfigNode *rootNode)
   // Load all the plugins
   this->LoadPlugins();
 
-  // Setup the available resources
-  this->SetupResources();
-
   // Setup the rendering system, and create the context
   this->SetupRenderSystem();
 
   // Initialize the root node, and don't create a window
   this->root->initialise(false);
+
+  // Setup the available resources
+  this->SetupResources();
+
+  Scene *scene = new Scene("primary_scene");
+  scene->Load(rootNode->GetChild("ogre", "rendering"));
+  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
+  this->scenes.push_back( scene );  
+
+  scene = new Scene("viewer_scene");
+  scene->SetType(Scene::GENERIC);
+  scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
+  scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
+  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
+
+  this->scenes.push_back( scene );  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,45 +172,26 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
     glXMakeCurrent(this->dummyDisplay, this->dummyWindowId, this->dummyContext);
 
-    OgreCreator::Instance()->CreateWindow(this->dummyDisplay, screen, 
-                                          (int32_t)this->dummyWindowId,1,1);
+    std::stringstream stream;
+    stream << (int32_t)this->dummyWindowId;
+    OgreCreator::Instance()->CreateWindow( stream.str(), 1,1);
   }
 
   // Set default mipmap level (NB some APIs ignore this)
   Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
-
-  // Get the SceneManager, in this case a generic one
-  if (node && node->GetChild("bsp"))
-  {
-    this->sceneType= SCENE_BSP;
-    this->sceneMgr = this->root->createSceneManager("BspSceneManager");
-  }
-  else
-  {
-    this->sceneType= SCENE_EXT;
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
-  }
-
-  // Load Resources
+  
+  // init the resources
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-  this->ambientP->Load(node);
-  this->shadowsP->Load(node);
-  this->backgroundColorP->Load(node);
+  Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
 
-  ambient.r = (**(this->ambientP)).x;
-  ambient.g = (**(this->ambientP)).y;
-  ambient.b = (**(this->ambientP)).z;
-  ambient.a = (**(this->ambientP)).w;
+  if (this->HasGLSL())
+    RTShaderSystem::Instance()->Init();
 
-  // Default background color
-  this->backgroundColor = new Ogre::ColourValue(Ogre::ColourValue(
-          (**this->backgroundColorP).x,
-          (**this->backgroundColorP).y,
-          (**this->backgroundColorP).z));
+  for (unsigned int i=0; i < 1; i++)
+    this->scenes[i]->Init(this->root);
 
+/*
   // Ambient lighting
   this->sceneMgr->setAmbientLight(ambient);
 
@@ -261,14 +240,14 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   this->raySceneQuery = this->sceneMgr->createRayQuery( Ogre::Ray() );
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
+*/
 
   if (this->HasGLSL())
   {
-    RTShaderSystem::Instance()->Init();
+    //RTShaderSystem::Instance()->Init();
     RTShaderSystem::Instance()->UpdateShaders();
   }
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -284,20 +263,9 @@ void OgreAdaptor::Fini()
 void OgreAdaptor::Save(std::string &prefix, std::ostream &stream)
 {
   stream << prefix << "<rendering:ogre>\n";
-  stream << prefix << "  " << *(this->ambientP) << "\n";
-
-  if ((**this->skyMaterialP).size())
-  {
-    stream << prefix << "  <sky>\n";
-    stream << prefix << "    " << *(this->skyMaterialP) << "\n";
-    stream << prefix << "  </sky>\n";
-  }
-
-  OgreCreator::SaveFog(prefix, stream);
-  stream << prefix << "  " << *(this->shadowsP) << "\n";
+  this->scenes[0]->Save(prefix,stream);
   stream << prefix << "</rendering:ogre>\n";
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load plugins
@@ -325,6 +293,7 @@ void OgreAdaptor::LoadPlugins()
     plugins.push_back(path+"/Plugin_ParticleFX.so");
     plugins.push_back(path+"/Plugin_BSPSceneManager.so");
     plugins.push_back(path+"/Plugin_OctreeSceneManager.so");
+    plugins.push_back(path+"/Plugin_CgProgramManager.so");
 
     for (piter=plugins.begin(); piter!=plugins.end(); piter++)
     {
@@ -335,10 +304,10 @@ void OgreAdaptor::LoadPlugins()
       }
       catch (Ogre::Exception e)
       {
-        std::string description("Unable to load Ogre Plugins on directory ");
-        description.append(path);
-        description.append("\n Make sure the plugins path in the gazebo configuration file are set correctly.\n");
-        gzthrow( description + e.getDescription() );
+        std::string description("Unable to load Ogre Plugin[");
+        description.append(*piter);
+        description.append("]...Skipping.");
+        gzerr(0) << description << "\n";
       }
     }
   }
@@ -374,7 +343,6 @@ void OgreAdaptor::SetupResources()
     archNames.push_back((*iter)+"/Media/sets");
     archNames.push_back((*iter)+"/Media/maps");
 
-
     //we want to add all the material files of the sets
     if ((dir=opendir(((*iter)+"/Media/sets").c_str()))!= NULL)
     {
@@ -400,6 +368,7 @@ void OgreAdaptor::SetupResources()
       }
     }
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -460,20 +429,15 @@ void OgreAdaptor::SetupRenderSystem()
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-// Update the user cameras
-void OgreAdaptor::UpdateCameras()
+/// Get a scene 
+Scene *OgreAdaptor::GetScene(unsigned int index)
 {
-  UserCamera *userCam;
-
-  std::vector<OgreCamera*>::iterator iter;
-
-  OgreCreator::Instance()->Update();
-  this->root->_fireFrameStarted();
-
-  // Draw all the non-user cameras within the same sim time step
+  if (index < this->scenes.size())
+    return this->scenes[index];
+  else
   {
+/*
     DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
     boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
     boost::recursive_mutex::scoped_lock model_delete_lock(*Simulator::Instance()->GetMDMutex());
@@ -482,8 +446,11 @@ void OgreAdaptor::UpdateCameras()
       if (dynamic_cast<UserCamera*>((*iter)) == NULL)
         (*iter)->Render();
     }
+*/
+    std::cerr << "Invalid Scene Index[" << index << "]\n";
+    return NULL;
   }
-
+/*
   // Must update the user camera's last.
   {
     DIAGNOSTICTIMER(timer("UpdateCameras: UserCamera update",6));
@@ -499,12 +466,14 @@ void OgreAdaptor::UpdateCameras()
     DIAGNOSTICTIMER(timer("UpdateCameras: _fireFrameEnded",6));
     this->root->_fireFrameEnded();
   }
+*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std::string &mod) 
+/// Get the number of scene 
+unsigned int OgreAdaptor::GetSceneCount() const
 {
+/*
   Entity *entity = NULL;
   Ogre::Camera *ogreCam = camera->GetOgreCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
@@ -597,71 +566,28 @@ Entity *OgreAdaptor::GetEntityAt(OgreCamera *camera, Vector2<int> mousePos, std:
   }
 
   return NULL;
+*/
+  return this->scenes.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the world pos of a the first contact at a pixel location
-Vector3 OgreAdaptor::GetFirstContact(OgreCamera *camera, Vector2<int> mousePos)
+/// Update all the scenes 
+void OgreAdaptor::UpdateScenes()
 {
-  Ogre::Camera *ogreCam = camera->GetOgreCamera();
-  Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      (float)mousePos.x / ogreCam->getViewport()->getActualWidth(), 
-      (float)mousePos.y / ogreCam->getViewport()->getActualHeight() );
+  Events::renderStartSignal();
 
-  this->raySceneQuery->setRay( mouseRay );
+  this->root->_fireFrameStarted();
 
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
+  OgreCreator::Instance()->Update();
 
-  Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
+  for (unsigned int i=0; i < this->scenes.size(); i++)
+    this->scenes[i]->UpdateCameras();
 
-  return Vector3(pt.x, pt.y, pt.z);
+  this->root->_fireFrameRenderingQueued();
+
+  this->root->_fireFrameEnded();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Register a user camera
-void OgreAdaptor::RegisterCamera( OgreCamera *cam )
-{
-  this->cameras.push_back( cam );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Unregister a user camera
-void OgreAdaptor::UnregisterCamera( OgreCamera *cam )
-{
-  std::vector<OgreCamera*>::iterator iter;
-  for(iter=this->cameras.begin();iter != this->cameras.end();iter++)
-  {
-    if ((*iter) == cam)
-    {
-      this->cameras.erase(iter);
-      break;
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Print scene graph
-void OgreAdaptor::PrintSceneGraph()
-{
-  this->PrintSceneGraphHelper("", this->sceneMgr->getRootSceneNode());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Print scene graph
-void OgreAdaptor::PrintSceneGraphHelper(std::string prefix, 
-                                         Ogre::Node *node)
-{
-  std::cout << prefix << node->getName() << std::endl;
-
-  prefix += "  ";
-  for (unsigned int i=0; i < node->numChildren(); i++)
-  {
-    this->PrintSceneGraphHelper( prefix, node->getChild(i) );
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Returns true if the graphics card support GLSL
@@ -674,15 +600,14 @@ bool OgreAdaptor::HasGLSL()
   capabilities = this->root->getRenderSystem()->getCapabilities();
   profiles = capabilities->getSupportedShaderProfiles();
 
-  iter = std::find(profiles.begin(), profiles.end(), "glsl2");
+  iter = std::find(profiles.begin(), profiles.end(), "glsl");
 
   // Print all the shader profiles
   /*std::cout << "Shader profiles:\n";
   for (iter = profiles.begin(); iter != profiles.end(); iter++)
   {
     std::cout << *iter << "\n";
-  }
-  */
+  }*/
 
   return iter != profiles.end();
 }

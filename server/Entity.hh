@@ -36,15 +36,10 @@
 
 namespace gazebo
 {
- 
-  class Geom; 
-  class Body;
-  class Model;
 
   class OgreVisual;
   /// \addtogroup gazebo_server
   /// \{
-  
   
   /// Base class for all objects in Gazebo
   /*
@@ -52,48 +47,16 @@ namespace gazebo
    */
   class Entity : public Common
   {
-    public: enum Type{DEFAULT, MODEL, BODY, GEOM, LIGHT};
 
     /// \brief Constructor
     /// \param parent Parent of the entity.
-    public: Entity(Entity *parent = NULL);
+    public: Entity(Common *parent = NULL);
   
     /// \brief Destructor
     public: virtual ~Entity();
-
-    /// \brief Return the ID of the parent
-    /// \return Integer ID
-    public: int GetParentId() const;
-  
-    /// \brief Set the parent
-    /// \param parent Parent entity
-    public: void SetParent(Entity *parent);
-  
-    /// \brief Get the parent
-    /// \return Pointer to the parent entity
-    public: Entity *GetParent() const;
-
-    /// \brief Add a child to this entity
-    /// \param child Child entity
-    public: void AddChild(Entity *child);
-
-    /// \brief Remove a child from this entity
-    /// \param child Child to remove
-    public: virtual void RemoveChild(Entity *child);
-  
-    /// \brief Get all children
-    /// \return Vector of children entities
-    public: const std::vector< Entity* >  &GetChildren() const;
-
-    /// \brief Get the number of children
-    public: unsigned int GetChildCount() const;
-
-    /// \brief Get a child by index
-    public: Entity *GetChild(unsigned int i);
-
-    /// \brief Get a child by name
-    public: Entity *GetChild(const std::string &name );
-  
+ 
+    public: void SetName(const std::string &name);
+ 
     /// \brief Return this entity's sceneNode
     /// \return Ogre scene node
     public: OgreVisual *GetVisualNode() const;
@@ -110,13 +73,6 @@ namespace gazebo
     /// \return bool True = static
     public: bool IsStatic() const;
   
-    /// \brief Set whether this entity has been selected by the user through 
-    //         the gui
-    public: virtual bool SetSelected( bool s );
-  
-    /// \brief True if the entity is selected by the user
-    public: bool IsSelected() const;
-
     /// \brief Get the absolute pose of the entity
     public: virtual Pose3d GetWorldPose() const;
 
@@ -179,52 +135,17 @@ namespace gazebo
     ///        pose of the parent has changed
     protected: virtual void OnPoseChange() {}
 
-    public: void Print(std::string prefix);
-
-    /// \brief Returns true if the entities are the same. Checks only the name
-    public: bool operator==(const Entity &ent) const;
-
-    /// \brief Get the parent model, if one exists
-    /// \return Pointer to a model, or NULL if no parent model exists
-    public: Model *GetParentModel() const;
-
-    /// \brief Return the name of this entity with the model scope
-    ///        model1::...::modelN::entityName
-    public: std::string GetScopedName() const;
-
-    /// \brief Return the name of this entity with the model+body+geom scope
-    ///        model1::...::modelN::bodyN::entityName
-    public: std::string GetCompleteScopedName() const;
-
-    /// \brief Set the type of this entity
-    public: void SetType(Type type);
-
-    /// \brief Get the type of this entity
-    public: Type GetType() const;
-
-    /// \brief Get the type as a string
-    public: std::string GetTypeString() const;
-
     /// \brief Handle a change of pose
     private: void PoseChange(bool notify = true);
 
-    /// \brief Parent of this entity
-    protected: Entity *parent;
-  
-    /// \brief Children of this entity
-    protected: std::vector< Entity* > children;
-  
     // is this an static entity
     protected: ParamT<bool> *staticP;
   
     /// \brief Visual stuff
     protected: OgreVisual *visualNode;
   
-    private: bool selected;
 
     private: Pose3d relativePose;
-
-    protected: Type type;
   };
   
   /// \}

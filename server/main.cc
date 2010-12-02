@@ -111,6 +111,7 @@ home directory, or to the log file specified with the -l command line option.
 #include "GazeboError.hh"
 #include "Global.hh"
 
+
 // Command line options
 std::string worldFileName = "";
 const char *optLogFileName = NULL;
@@ -123,6 +124,9 @@ unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
 bool optPhysicsEnabled  = true;
 bool optPaused = false;
+
+int global_argc;
+char **global_argv;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -247,8 +251,6 @@ void SignalHandler( int /*dummy*/ )
 // Main function
 int main(int argc, char **argv)
 {
-
-
   // force a cpu affinity for CPU 0, this slow down sim by about 4X
   // cpu_set_t cpuSet;
   // CPU_ZERO(&cpuSet);
@@ -289,8 +291,8 @@ int main(int argc, char **argv)
   // Initialize the simulator
   try
   {
-    gazebo::Simulator::Instance()->Init();
     gazebo::Simulator::Instance()->SetPaused(optPaused);
+    gazebo::Simulator::Instance()->Init();
   }
   catch (gazebo::GazeboError e)
   {
@@ -303,7 +305,7 @@ int main(int argc, char **argv)
   // Main loop of the simulator
   try
   {
-    gazebo::Simulator::Instance()->MainLoop();
+    gazebo::Simulator::Instance()->Run();
   }
   catch (gazebo::GazeboError e)
   {
@@ -326,5 +328,7 @@ int main(int argc, char **argv)
   }
 
   printf("Gazebo done.\n");
+
+  delete [] global_argv;
   return 0;
 }

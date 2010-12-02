@@ -1,5 +1,14 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+include_directories(
+  ${parallel_quickstep_include_dirs_split}
+)
+
+link_directories(
+ ${parallel_quickstep_library_dirs_split} 
+)
+
+
 SET (sources ODEPhysics.cc
              ODEGeom.cc
              ODEBody.cc
@@ -41,6 +50,7 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 LIST_TO_STRING(MY_ODE_CFLAGS "${ODE_CFLAGS}")
 
-set_target_properties(gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC ${MY_ODE_CFLAGS}")
-target_link_libraries( gazebo_physics_ode ${ODE_LIBRARIES})
+add_definitions(${parallel_quickstep_cflags})
+set_target_properties( gazebo_physics_ode PROPERTIES COMPILE_FLAGS "-fPIC ${MY_ODE_CFLAGS}" )
+target_link_libraries( gazebo_physics_ode ${ODE_LIBRARIES} ${parallel_quickstep_lflags} )
 install ( TARGETS gazebo_physics_ode DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )

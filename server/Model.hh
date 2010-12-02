@@ -35,6 +35,7 @@
 #include <vector>
 
 #include "Param.hh"
+#include "Contact.hh"
 #include "Pose3d.hh"
 #include "Joint.hh"
 #include "Entity.hh"
@@ -226,12 +227,14 @@ namespace gazebo
     /// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
     public: void GetModelInterfaceNames(std::vector<std::string>& list) const;
 
-    /// \brief Connect a boost::slot the the model's update  signal
-    public: template<typename T>
-            void ConnectUpdateSignal( T subscriber )
-            {
-              updateSignal.connect(subscriber);
-            }
+    /// \brief Add an occurance of a contact to this geom
+    public: void StoreContact(const Geom *geom, const Contact &contact);
+
+    /// \brief Get the number of contacts for a geom
+    public: unsigned int GetContactCount(const Geom *geom) const;
+
+    /// \brief Retreive a contact
+    public: Contact RetrieveContact(const Geom *geom, unsigned int i) const;
 
     /// \brief Load a body helper function
     /// \param node XML Configuration node
@@ -286,13 +289,16 @@ namespace gazebo
     private: ParamT<float> *laserRetroP;
     private: ParamT<std::string> *collideP;
 
+    private: Body *canonicalBody;
+    private: std::vector<Body*> bodies;
+
+    /// All the contacts for every geom
+    public: std::map< std::string, std::vector<Contact> > contacts;
 
     // Name of a light (if the model is renderable:light)
     private: Light *light;
 
     private: GraphicsIfaceHandler *graphicsHandler;
-
-    private: boost::signal<void ()> updateSignal;
 
   /*  private: PyObject *pName;
       private: PyObject *pModule;

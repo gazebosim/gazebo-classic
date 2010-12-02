@@ -24,7 +24,9 @@
  * SVN: $Id$
  */
 
-#include <assert.h>
+#include <tbb/parallel_for.h>
+#include <tbb/blocked_range.h>
+
 
 #include "Timer.hh"
 #include "PhysicsFactory.hh"
@@ -60,12 +62,79 @@ using namespace gazebo;
 
 GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 
+class ContactUpdate_TBB
+{
+  public: ContactUpdate_TBB(tbb::concurrent_vector<ContactFeedback> *contacts) 
+          : contacts(contacts) {}
+
+  public: void operator() (const tbb::blocked_range<size_t> &r) const
+  {
+    std::vector<dJointFeedback>::iterator jiter;
+
+    for (size_t i=r.begin(); i != r.end(); i++)
+    {
+      ContactFeedback *feedback = &(*this->contacts)[i];
+
+      if (feedback->contact.geom1 == NULL)
+        gzerr(0) << "collision update Geom1 is null\n";
+
+      if (feedback->contact.geom2 == NULL)
+        gzerr(0) << "Collision update Geom2 is null\n";
+
+      feedback->contact.forces.clear();
+
+      // Copy all the joint forces to the contact
+      for (jiter = feedback->feedbacks.begin(); 
+          jiter != feedback->feedbacks.end(); jiter++)
+      {
+        JointFeedback joint;
+        joint.body1Force.Set( (*jiter).f1[0], (*jiter).f1[1], (*jiter).f1[2] );
+        joint.body2Force.Set( (*jiter).f2[0], (*jiter).f2[1], (*jiter).f2[2] );
+
+        joint.body1Torque.Set((*jiter).t1[0], (*jiter).t1[1], (*jiter).t1[2]);
+        joint.body2Torque.Set((*jiter).t2[0], (*jiter).t2[1], (*jiter).t2[2]);
+
+        feedback->contact.forces.push_back(joint);
+      }
+
+      // Add the contact to each geom
+      feedback->contact.geom1->AddContact( feedback->contact );
+      feedback->contact.geom2->AddContact( feedback->contact );
+    }
+  }
+
+  tbb::concurrent_vector<ContactFeedback> *contacts;
+};
+
+class Colliders_TBB
+{
+  public: Colliders_TBB(
+              std::vector< std::pair<ODEGeom*, ODEGeom*> > *colliders, 
+              ODEPhysics*engine) : 
+    colliders(colliders), engine(engine)
+  { 
+    dAllocateODEDataForThread(dAllocateMaskAll);
+  }
+
+  public: void operator() (const tbb::blocked_range<size_t> &r) const
+  {
+    for (size_t i=r.begin(); i != r.end(); i++)
+    {
+      ODEGeom *geom1 = (*this->colliders)[i].first;
+      ODEGeom *geom2 = (*this->colliders)[i].second;
+      this->engine->Collide(geom1, geom2);
+    }
+  }
+
+  private: std::vector< std::pair<ODEGeom*, ODEGeom*> > *colliders;
+  private: ODEPhysics*engine;
+};
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 ODEPhysics::ODEPhysics()
     : PhysicsEngine()
 {
-
   // Collision detection init
   dInitODE2(0);
 
@@ -116,7 +185,6 @@ ODEPhysics::ODEPhysics()
   this->quickStepWP     = new ParamT<double>("quickStepW", -1.0, 0, true, "replace quickStepW with stepW");
 
   Param::End();
-
 }
 
 
@@ -220,11 +288,10 @@ void ODEPhysics::Load(XMLConfigNode *node)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 50);
 
-  this->contactGeoms.resize(this->maxContactsP->GetValue());
   this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());
 
   // Reset the contact pointer
-  this->contactFeedbackIter = this->contactFeedbacks.begin();
+  //this->contactFeedbackIter = this->contactFeedbacks.begin();
 
   Vector3 g = this->gravityP->GetValue();
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
@@ -283,7 +350,7 @@ void ODEPhysics::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Initialize for separate thread
+// Init the engine for threads
 void ODEPhysics::InitForThread()
 {
   dAllocateODEDataForThread(dAllocateMaskAll);
@@ -293,138 +360,41 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
-  std::vector<ContactFeedback>::iterator iter;
-  std::vector<dJointFeedback>::iterator jiter;
-
-  /*ODEBody *leftBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::left_wheel");
-  ODEBody *rightBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::right_wheel");
-  ODEBody *castorBody = (ODEBody*)World::Instance()->GetEntityByName("pioneer::castor_body");
-  ODEBody *planeBody = (ODEBody*)World::Instance()->GetEntityByName("plane1_model::plane1_body");
-
-  if (leftBody && rightBody && planeBody && castorBody)
-  {
-    ODEGeom *leftGeom = (ODEGeom*)leftBody->GetGeom("left_wheel_geom");
-    ODEGeom *rightGeom = (ODEGeom*)rightBody->GetGeom("right_wheel_geom");
-    ODEGeom *castorGeom = (ODEGeom*)castorBody->GetGeom("castor_geom");
-    ODEGeom *planeGeom = (ODEGeom*)planeBody->GetGeom("plane1_geom");
-
-    dContactGeom geomLeft, geomRight, geomCastor;
-    geomLeft.pos[0] = leftBody->GetWorldPose().pos.x;
-    geomLeft.pos[1] = leftBody->GetWorldPose().pos.y;
-    geomLeft.pos[2] = 0;
-    geomLeft.normal[0] = 0;
-    geomLeft.normal[1] = 0;
-    geomLeft.normal[2] = 1;
-    geomLeft.depth = 0;
-    geomLeft.g1 = leftGeom->GetGeomId();
-    geomLeft.g2 = planeGeom->GetGeomId();
-
-    geomRight.pos[0] = rightBody->GetWorldPose().pos.x;
-    geomRight.pos[1] = rightBody->GetWorldPose().pos.y;
-    geomRight.pos[2] = 0;
-    geomRight.normal[0] = 0;
-    geomRight.normal[1] = 0;
-    geomRight.normal[2] = 1;
-    geomRight.depth = 0;
-    geomRight.g1 = rightGeom->GetGeomId();
-    geomRight.g2 = planeGeom->GetGeomId();
-
-    geomCastor.pos[0] = castorBody->GetWorldPose().pos.x;
-    geomCastor.pos[1] = castorBody->GetWorldPose().pos.y;
-    geomCastor.pos[2] = 0;
-    geomCastor.normal[0] = 0;
-    geomCastor.normal[1] = 0;
-    geomCastor.normal[2] = 1;
-    geomCastor.depth =0;
-    geomCastor.g1 = castorGeom->GetGeomId();
-    geomCastor.g2 = planeGeom->GetGeomId();
-
-    dContact contact;
-    contact.geom = geomLeft;
-    contact.surface.mode = dContactSoftERP | dContactSoftCFM; 
-    contact.surface.mu = 0; 
-    contact.surface.mu2 = 0;
-    contact.surface.slip1 = 0.1;
-    contact.surface.slip2 = 0.1;
-    contact.surface.bounce =  0;
-    dJointID c = dJointCreateContact(this->worldId, this->contactGroup, &contact);
-    dJointAttach (c, leftBody->GetODEId(), planeBody->GetODEId());
-
-    dContact contact2;
-    contact2.geom = geomRight;
-    contact2.surface.mode = dContactSoftERP | dContactSoftCFM; 
-    contact2.surface.mu = 0; 
-    contact2.surface.mu2 = 0;
-    contact2.surface.slip1 = 0.1;
-    contact2.surface.slip2 = 0.1;
-    contact2.surface.bounce =  0;
-    dJointID c2 = dJointCreateContact(this->worldId, this->contactGroup, &contact2);
-    dJointAttach (c2, rightBody->GetODEId(), planeBody->GetODEId());
-
-    dContact contact3;
-    contact3.geom = geomCastor;
-    contact3.surface.mode = dContactSoftERP | dContactSoftCFM; 
-    contact3.surface.mu = 0; 
-    contact3.surface.mu2 = 0;
-    contact3.surface.slip1 = 0.1;
-    contact3.surface.slip2 = 0.1;
-    contact3.surface.bounce =  0;
-    dJointID c3 = dJointCreateContact(this->worldId, this->contactGroup, &contact3);
-    dJointAttach (c3, castorBody->GetODEId(), planeBody->GetODEId());
-  }
-*/
-
+  this->colliders.clear();
+  this->trimeshColliders.clear();
 
   // Do collision detection; this will add contacts to the contact group
-  this->LockMutex(); 
+  //this->LockMutex(); 
+  dSpaceCollide( this->spaceId, this, CollisionCallback );
+  //this->UnlockMutex(); 
+
+  this->contactFeedbacks.clear();
+
+  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->colliders.size(), 10),
+      Colliders_TBB(&this->colliders, this) );
+
+  // Trimesh collision must happen in this thread sequentially
+  for (int i=0; i<this->trimeshColliders.size(); i++)
   {
     DIAGNOSTICTIMER(timer("ODEPhysics Collision dSpaceCollide",6));
-    dSpaceCollide( this->spaceId, this, CollisionCallback );
+    //dSpaceCollide( this->spaceId, this, CollisionCallback );
+
+    ODEGeom *geom1 = this->trimeshColliders[i].first;
+    ODEGeom *geom2 = this->trimeshColliders[i].second;
+    this->Collide(geom1, geom2);
   }
-  this->UnlockMutex(); 
 
   // Process all the contacts, get the feedback info, and call the geom
   // callbacks
-  for (iter = this->contactFeedbacks.begin(); 
-       iter != this->contactFeedbackIter; iter++)
-  {
-    if ((*iter).contact.geom1 == NULL)
-      gzerr(0) << "collision update Geom1 is null\n";
-
-    if ((*iter).contact.geom2 == NULL)
-      gzerr(0) << "Collision update Geom2 is null\n";
-
-    (*iter).contact.forces.clear();
-
-    // Copy all the joint forces to the contact
-    for (jiter = (*iter).feedbacks.begin(); jiter != (*iter).feedbacks.end();
-        jiter++)
-    {
-      JointFeedback feedback;
-      feedback.body1Force.Set( (*jiter).f1[0], (*jiter).f1[1], (*jiter).f1[2] );
-      feedback.body2Force.Set( (*jiter).f2[0], (*jiter).f2[1], (*jiter).f2[2] );
-
-      feedback.body1Torque.Set((*jiter).t1[0], (*jiter).t1[1], (*jiter).t1[2]);
-      feedback.body2Torque.Set((*jiter).t2[0], (*jiter).t2[1], (*jiter).t2[2]);
-
-      (*iter).contact.forces.push_back(feedback);
-    }
-
-    // Add the contact to each geom
-    (*iter).contact.geom1->AddContact( (*iter).contact );
-    (*iter).contact.geom2->AddContact( (*iter).contact );
-  }
-
-  // Reset the contact pointer
-  this->contactFeedbackIter = this->contactFeedbacks.begin();
+  tbb::parallel_for( tbb::blocked_range<size_t>(0, 
+        this->contactFeedbacks.size(), 10), 
+        ContactUpdate_TBB(&this->contactFeedbacks) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
-  PhysicsEngine::UpdatePhysics();
-
   {
     DIAGNOSTICTIMER(timer("ODEPhysics: UpdateCollision",6));
     this->UpdateCollision();
@@ -432,7 +402,7 @@ void ODEPhysics::UpdatePhysics()
 
   {
     DIAGNOSTICTIMER(timer("ODEPhysics: LockMutex",6));
-    this->LockMutex(); 
+    //this->LockMutex(); 
   }
 
   // Update the dynamical model
@@ -445,6 +415,8 @@ void ODEPhysics::UpdatePhysics()
       dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
     else if (**this->stepTypeP == "world")
       dWorldStep( this->worldId, (**this->stepTimeP).Double() );
+    else if (**this->stepTypeP == "parallel_quick")
+      dWorldParallelQuickStep(this->worldId, (**this->stepTimeP).Double());  
     else
       gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
 
@@ -452,7 +424,7 @@ void ODEPhysics::UpdatePhysics()
     dJointGroupEmpty( this->contactGroup );
   }
 
-  this->UnlockMutex(); 
+  //this->UnlockMutex(); 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -495,40 +467,29 @@ Body *ODEPhysics::CreateBody(Entity *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new geom
-Geom *ODEPhysics::CreateGeom(Shape::Type type, Body *body)
+Geom *ODEPhysics::CreateGeom(std::string type, Body *body)
 {
   ODEGeom *geom = new ODEGeom(body);
   Shape *shape = NULL;
 
-  switch (type)
-  {
-    case Shape::SPHERE:
-      shape = new ODESphereShape(geom);
-      break;
-    case Shape::PLANE:
-      shape = new ODEPlaneShape(geom);
-      break;
-    case Shape::BOX:
-      shape = new ODEBoxShape(geom);
-      break;
-    case Shape::CYLINDER:
-      shape = new ODECylinderShape(geom);
-      break;
-    case Shape::MULTIRAY:
-      shape = new ODEMultiRayShape(geom);
-      break;
-    case Shape::TRIMESH:
-      shape = new ODETrimeshShape(geom);
-      break;
-    case Shape::HEIGHTMAP:
-      shape = new ODEHeightmapShape(geom);
-      break;
-    case Shape::MAP:
-      shape = new MapShape(geom);
-      break;
-    default:
-      gzerr(0) << "Unable to create geom of type["<<type<<"]\n";
-  }
+  if ( type == "sphere")
+    shape = new ODESphereShape(geom);
+  else if ( type == "plane")
+    shape = new ODEPlaneShape(geom);
+  else if ( type == "box")
+    shape = new ODEBoxShape(geom);
+  else if ( type == "cylinder")
+    shape = new ODECylinderShape(geom);
+  else if ( type == "multiray")
+    shape = new ODEMultiRayShape(geom);
+  else if ( type == "trimesh")
+    shape = new ODETrimeshShape(geom);
+  else if ( type == "heightmap")
+    shape = new ODEHeightmapShape(geom);
+  else if ( type == "map")
+    shape = new MapShape(geom);
+  else
+    gzerr(0) << "Unable to create geom of type["<<type<<"]\n";
 
   return geom;
 }
@@ -606,9 +567,6 @@ void ODEPhysics::SetContactSurfaceLayer(double layer_depth)
 void ODEPhysics::SetMaxContacts(double max_contacts)
 {
   this->maxContactsP->SetValue(max_contacts);
-  // @todo: FIXME: resizes contactGeoms, but can we do this on the fly?
-  //               this might need to be done on a new time step
-  this->contactGeoms.resize(this->maxContactsP->GetValue());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -681,23 +639,20 @@ void ODEPhysics::ConvertMass(void *engineMass, const Mass &mass)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a new joint
-Joint *ODEPhysics::CreateJoint(Joint::Type type)
+Joint *ODEPhysics::CreateJoint(std::string type)
 {
-  switch (type)
-  {
-    case Joint::SLIDER:
-      return new ODESliderJoint(this->worldId);
-    case Joint::HINGE:
-      return new ODEHingeJoint(this->worldId);
-    case Joint::HINGE2:
-      return new ODEHinge2Joint(this->worldId);
-    case Joint::BALL:
-      return new ODEBallJoint(this->worldId);
-    case Joint::UNIVERSAL:
-      return new ODEUniversalJoint(this->worldId);
-    default:
-      return NULL;
-  }
+  if (type == "slider")
+    return new ODESliderJoint(this->worldId);
+  if (type == "hinge")
+    return new ODEHingeJoint(this->worldId);
+  if (type == "hinge2")
+    return new ODEHinge2Joint(this->worldId);
+  if (type == "ball")
+    return new ODEBallJoint(this->worldId);
+  if (type == "universal")
+    return new ODEUniversalJoint(this->worldId);
+  else
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -727,6 +682,14 @@ void ODEPhysics::SetStepType(const std::string type)
   /// \brief @todo: for backwards compatibility, should tick tock
   ///        deprecation as we switch to nested tags
   this->quickStepP->SetValue(false); // use new tags
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the gavity vector
+void ODEPhysics::SetGravity(const gazebo::Vector3 &gravity)
+{
+  this->gravityP->SetValue(gravity);
+  dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -779,105 +742,141 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
-
-    int maxContacts = self->maxContactsP->GetValue();
-    int numContacts = 100;
-    int i;
-    int numc = 0;
-    dContact contact;
-
-    // for now, only use maxContacts if both geometries are trimeshes
-    // other types of geometries do not need too many contacts
-    if (geom1->GetShapeType() == Shape::TRIMESH && 
-        geom2->GetShapeType()==Shape::TRIMESH)
-    {
-      numContacts = maxContacts;
-    }
-
-    numc = dCollide(o1,o2,numContacts, &self->contactGeoms[0], 
-                    sizeof(self->contactGeoms[0]));
-
-    if (numc != 0)
-    {
-      (*self->contactFeedbackIter).contact.Reset();
-      (*self->contactFeedbackIter).contact.geom1 = geom1;
-      (*self->contactFeedbackIter).contact.geom2 = geom2;
-      (*self->contactFeedbackIter).feedbacks.resize(numc);
-
-      double h, kp, kd;
-      for (i=0; i<numc; i++)
-      {
-        // skip negative depth contacts
-        if(self->contactGeoms[i].depth < 0)
-          continue;
-
-        contact.geom = self->contactGeoms[i];
-        contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
-
-        // Compute the CFM and ERP by assuming the two bodies form a
-        // spring-damper system.
-        h = (**self->stepTimeP).Double();
-        kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
-        kd = geom1->surface->kd + geom2->surface->kd;
-        contact.surface.soft_erp = h * kp / (h * kp + kd);
-        contact.surface.soft_cfm = 1.0 / (h * kp + kd);
-
-        if (geom1->surface->enableFriction && geom2->surface->enableFriction)
-        {
-          contact.surface.mu = std::min(geom1->surface->mu1, 
-              geom2->surface->mu1);
-          contact.surface.mu2 = std::min(geom1->surface->mu2, 
-              geom2->surface->mu2);
-          contact.surface.slip1 = std::min(geom1->surface->slip1, 
-              geom2->surface->slip1);
-          contact.surface.slip2 = std::min(geom1->surface->slip2, 
-              geom2->surface->slip2);
-        }
-        else
-        {
-          contact.surface.mu = 0; 
-          contact.surface.mu2 = 0;
-          contact.surface.slip1 = 0.1;
-          contact.surface.slip2 = 0.1;
-        }
-
-        contact.surface.bounce = std::min(geom1->surface->bounce, 
-                                     geom2->surface->bounce);
-        contact.surface.bounce_vel = std::min(geom1->surface->bounceVel, 
-                                         geom2->surface->bounceVel);
-        dJointID c = dJointCreateContact (self->worldId,
-                                          self->contactGroup, &contact);
-
-        Vector3 contactPos(contact.geom.pos[0], contact.geom.pos[1], 
-                           contact.geom.pos[2]);
-        Vector3 contactNorm(contact.geom.normal[0], contact.geom.normal[1], 
-                            contact.geom.normal[2]);
-
-        self->AddContactVisual(contactPos, contactNorm);
-
-        // Store the contact info 
-        if (geom1->GetContactsEnabled() ||
-            geom2->GetContactsEnabled())
-        {
-          (*self->contactFeedbackIter).contact.depths.push_back(
-              contact.geom.depth);
-          (*self->contactFeedbackIter).contact.positions.push_back(contactPos);
-          (*self->contactFeedbackIter).contact.normals.push_back(contactNorm);
-          (*self->contactFeedbackIter).contact.time = 
-            Simulator::Instance()->GetSimTime();
-          dJointSetFeedback(c, &((*self->contactFeedbackIter).feedbacks[i]));
-        }
-
-        dJointAttach (c, b1, b2);
-      }
-
-      if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
-      {
-        self->contactFeedbackIter++;
-        if (self->contactFeedbackIter == self->contactFeedbacks.end())
-          self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
-      }
-    }
+    if (geom1->GetShapeType() == TRIMESH_SHAPE ||
+        geom2->GetShapeType() == TRIMESH_SHAPE )
+      self->trimeshColliders.push_back( std::make_pair(geom1, geom2) );
+    else
+      self->colliders.push_back( std::make_pair(geom1, geom2) );
+    return;
   }
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Collide two geoms
+void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
+{
+  int numContacts = 100;
+  int j;
+  int numc = 0;
+  dContact contact;
+
+  dContactGeom contactGeoms[**this->maxContactsP];
+
+  // for now, only use maxContacts if both geometries are trimeshes
+  // other types of geometries do not need too many contacts
+  if (geom1->GetShapeType() == TRIMESH_SHAPE && 
+      geom2->GetShapeType() == TRIMESH_SHAPE)
+  {
+    numContacts = **this->maxContactsP;
+  }
+
+  {
+    tbb::spin_mutex::scoped_lock lock(this->collideMutex);
+    numc = dCollide(geom1->GetGeomId(), geom2->GetGeomId(), 
+        numContacts, contactGeoms, sizeof(contactGeoms[0]) );
+  }
+
+  if (numc != 0)
+  {
+    ContactFeedback contactFeedback;
+
+    contactFeedback.contact.Reset();
+    contactFeedback.contact.geom1 = geom1;
+    contactFeedback.contact.geom2 = geom2;
+    contactFeedback.feedbacks.resize(numc);
+
+    double h, kp, kd;
+    for (j=0; j<numc; j++)
+    {
+      // skip negative depth contacts
+      if(contactGeoms[j].depth < 0)
+        continue;
+
+      contact.geom = contactGeoms[j];
+      //contact.geom = self->contactGeoms[i];
+
+      contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
+
+      //contact.surface.mode = dContactSlip1 | dContactSlip2 | 
+      //  dContactSoftERP | dContactSoftCFM |  
+      //  dContactBounce | dContactMu2 | dContactApprox1;
+
+      //contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1 | dContactSlip1 | dContactSlip2;
+      // with dContactSoftERP | dContactSoftCFM the test_pr2_collision overshoots the cup
+
+      // Compute the CFM and ERP by assuming the two bodies form a
+      // spring-damper system.
+      h = (**this->stepTimeP).Double();
+      kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
+      kd = geom1->surface->kd + geom2->surface->kd;
+      contact.surface.soft_erp = h * kp / (h * kp + kd);
+      contact.surface.soft_cfm = 1.0 / (h * kp + kd);
+
+      if (geom1->surface->enableFriction && geom2->surface->enableFriction)
+      {
+        contact.surface.mu = std::min(geom1->surface->mu1, 
+            geom2->surface->mu1);
+        contact.surface.mu2 = std::min(geom1->surface->mu2, 
+            geom2->surface->mu2);
+        contact.surface.slip1 = std::min(geom1->surface->slip1, 
+            geom2->surface->slip1);
+        contact.surface.slip2 = std::min(geom1->surface->slip2, 
+            geom2->surface->slip2);
+      }
+      else
+      {
+        contact.surface.mu = 0; 
+        contact.surface.mu2 = 0;
+        contact.surface.slip1 = 0.1;
+        contact.surface.slip2 = 0.1;
+      }
+
+      contact.surface.bounce = std::min(geom1->surface->bounce, 
+          geom2->surface->bounce);
+      contact.surface.bounce_vel = std::min(geom1->surface->bounceVel, 
+          geom2->surface->bounceVel);
+
+      dJointID c;
+
+      Vector3 contactPos;
+      Vector3 contactNorm;
+
+      {
+        tbb::spin_mutex::scoped_lock lock(this->collideMutex);
+        c = dJointCreateContact (this->worldId, this->contactGroup, &contact);
+
+        contactPos.Set(contact.geom.pos[0], contact.geom.pos[1], 
+            contact.geom.pos[2]);
+        contactNorm.Set(contact.geom.normal[0], contact.geom.normal[1], 
+            contact.geom.normal[2]);
+
+        this->AddContactVisual( contactPos, contactNorm );
+      }
+
+
+      // Store the contact info 
+      if (geom1->GetContactsEnabled() ||
+          geom2->GetContactsEnabled())
+      {
+        contactFeedback.contact.depths.push_back(
+            contact.geom.depth);
+        contactFeedback.contact.positions.push_back(contactPos);
+        contactFeedback.contact.normals.push_back(contactNorm);
+        contactFeedback.contact.time = 
+          Simulator::Instance()->GetSimTime();
+        dJointSetFeedback(c, &(contactFeedback.feedbacks[j]));
+      }
+
+      dBodyID b1 = dGeomGetBody(geom1->GetGeomId());
+      dBodyID b2 = dGeomGetBody(geom2->GetGeomId());
+
+      dJointAttach (c, b1, b2);
+    }
+
+    if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
+    {
+      this->contactFeedbacks.push_back( contactFeedback );
+    }
+  }
+}

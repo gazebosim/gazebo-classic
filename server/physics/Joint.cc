@@ -24,10 +24,13 @@
  * CVS: $Id$
  */
 
+#include "Events.hh"
 #include "PhysicsEngine.hh"
 #include "OgreVisual.hh"
 #include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
+#include "GazeboError.hh"
+#include "GazeboMessage.hh"
 #include "Global.hh"
 #include "Body.hh"
 #include "Model.hh"
@@ -36,13 +39,12 @@
 
 using namespace gazebo;
 
-std::string Joint::TypeNames[Joint::TYPE_COUNT] = {"slider", "hinge", "hinge2", "ball", "universal"};
-
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
 Joint::Joint()
-  : Common()
+  : Common(NULL)
 {
+  this->AddType(JOINT);
   this->visual = NULL;
   this->model = NULL;
 
@@ -64,8 +66,7 @@ Joint::Joint()
 
   this->physics = World::Instance()->GetPhysicsEngine();
 
-  World::Instance()->ConnectShowJointsSignal( 
-      boost::bind(&Joint::ShowJoints, this, _1) );
+  Events::ConnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this) );
 }
 
 
@@ -73,8 +74,7 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
-  World::Instance()->DisconnectShowJointsSignal( 
-      boost::bind(&Joint::ShowJoints, this, _1) );
+  Events::DisconnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this));
 
   if (this->visual)
   {
@@ -92,14 +92,6 @@ Joint::~Joint()
   delete this->anchorOffsetP;
   delete this->provideFeedbackP;
   delete this->fudgeFactorP;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Get the type of the joint
-Joint::Type Joint::GetType() const
-{
-  return this->type;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -133,9 +125,9 @@ void Joint::Load(XMLConfigNode *node)
   else
   {
     visname << this->GetName() << "_VISUAL";
-    this->body1 = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->body1NameP) ));
-    this->body2 = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->body2NameP) ));
-    this->anchorBody = dynamic_cast<Body*>(World::Instance()->GetEntityByName( **(this->anchorBodyNameP) ));
+    this->body1 = dynamic_cast<Body*>(Common::GetByName( **(this->body1NameP) ));
+    this->body2 = dynamic_cast<Body*>(Common::GetByName( **(this->body2NameP) ));
+    this->anchorBody = dynamic_cast<Body*>(Common::GetByName( **(this->anchorBodyNameP) ));
   }
 
   if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
@@ -161,14 +153,11 @@ void Joint::Load(XMLConfigNode *node)
     this->visual->SetMaterial("Gazebo/JointAnchor");
     this->visual->SetVisible(false);
 
-    this->line1 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
-    this->line2 = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+    this->line1 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+    this->line2 = this->visual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
 
-    this->line1->setMaterial("Gazebo/BlueEmissive");
-    this->line2->setMaterial("Gazebo/BlueEmissive");
-
-    this->visual->AttachObject(this->line1);
-    this->visual->AttachObject(this->line2);
+    this->line1->setMaterial("Gazebo/BlueGlow");
+    this->line2->setMaterial("Gazebo/BlueGlow");
 
     this->line1->AddPoint(Vector3(0,0,0));
     this->line1->AddPoint(Vector3(0,0,0));
@@ -187,29 +176,7 @@ void Joint::Load(XMLConfigNode *node)
 /// Save a joint to a stream in XML format
 void Joint::Save(std::string &prefix, std::ostream &stream)
 {
-  std::string typeName;
-
-  switch (this->type)
-  {
-    case SLIDER: 
-      typeName="slider"; 
-      break;
-    case HINGE: 
-      typeName = "hinge"; 
-      break;
-    case HINGE2: 
-      typeName = "hinge2"; 
-      break;
-    case BALL: 
-      typeName = "ball"; 
-      break;
-    case UNIVERSAL: 
-      typeName = "universal"; 
-      break;
-    default:
-      gzthrow("Unable to save joint of type[" << this->type << "]\n");
-      break;
-  }
+  std::string typeName = EntityTypename[ (int)this->GetLeafType() ];
 
   stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
   stream << prefix << "  " << *(this->body1NameP) << "\n";
@@ -250,6 +217,14 @@ void Joint::Update()
     if (this->body2)
       this->line2->SetPoint(1, this->body2->GetWorldPose().pos - this->anchorPos);
   }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Toggle joint visibility
+void Joint::ToggleShowJoints()
+{
+  if (this->visual)
+    this->visual->ToggleVisible();
 }
 
 //////////////////////////////////////////////////////////////////////////////

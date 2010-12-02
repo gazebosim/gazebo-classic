@@ -7,7 +7,6 @@
 #include "XMLConfig.hh"
 #include "Common.hh"
 
-
 namespace gazebo
 {
   class Geom;
@@ -16,12 +15,6 @@ namespace gazebo
   /// \brief Base class for all shapes
   class Shape : public Common
   {
-    public: enum Type {BOX, CYLINDER, HEIGHTMAP, MAP, SPHERE, PLANE, RAY, 
-                       TRIMESH, MULTIRAY, TYPE_COUNT};
-
-    // These names should be all lower-caser versions of the Type enum.
-    public: static std::string TypeNames[TYPE_COUNT]; 
-
     /// \brief Constructor
     public: Shape(Geom *p);
 
@@ -34,10 +27,7 @@ namespace gazebo
     /// \brief Save the shape
     public: virtual void Save(std::string &prefix, std::ostream &stream) = 0;
 
-    public: Shape::Type GetType() const;
-
-    protected: Geom *parent;
-    protected: Type type;
+    protected: Geom *geomParent;
     protected: PhysicsEngine *physicsEngine;
   };
 }

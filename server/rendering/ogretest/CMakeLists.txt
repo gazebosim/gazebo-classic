@@ -12,12 +12,14 @@ include (FindFLTK)
 
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(OGRE OGRE)
+  pkg_check_modules(OIS OIS)
 endif (PKG_CONFIG_FOUND)
 
 include_directories(${OGRE_INCLUDE_DIRS})
+include_directories(${OIS_INCLUDE_DIRS})
 
 set (sources main.cc)
 
 add_executable(ogretest ${sources})
 
-target_link_libraries(ogretest ${OGRE_LIBRARIES} ${FLTK_LIBRARIES})
+target_link_libraries(ogretest ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${FLTK_LIBRARIES})

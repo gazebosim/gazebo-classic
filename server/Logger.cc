@@ -77,7 +77,7 @@ Logger::LogObj::LogObj(const std::string &entityName, const std::string &filenam
   this->logFile.open(filename.c_str(), std::fstream::out);
   this->startRealTime = Simulator::Instance()->GetRealTime();
   this->startSimTime = Simulator::Instance()->GetSimTime();
-  this->entity = World::Instance()->GetEntityByName(entityName);
+  this->entity = dynamic_cast<Entity*>(Common::GetByName(entityName));
 
   if (!this->logFile.is_open())
   {

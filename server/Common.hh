@@ -31,21 +31,24 @@
 #include <vector>
 #include <string>
 
+#include "Global.hh"
 #include "Param.hh"
 
 namespace gazebo
 {
+  class Model;
+
   class Common
   {
     /// \brief Constructor
-    public: Common();
+    public: Common(Common *parent);
 
     /// \brief Destructor
     public: virtual ~Common();
 
     /// \brief Set the name of the entity
     /// \param name Body name
-    public: void SetName(const std::string &name);
+    public: virtual void SetName(const std::string &name);
   
     /// \brief Return the name of the entity
     /// \return Name of the entity
@@ -74,7 +77,90 @@ namespace gazebo
     /// \brief Get whether the object should be "saved", when the user
     ///        selects to save the world to xml
     public: bool GetSaveable() const;
-   
+
+    /// \brief Return the ID of the parent
+    /// \return Integer ID
+    public: int GetParentId() const;
+  
+    /// \brief Set the parent
+    /// \param parent Parent entity
+    public: void SetParent(Common *parent);
+  
+    /// \brief Get the parent
+    /// \return Pointer to the parent entity
+    public: Common *GetParent() const;
+
+    /// \brief Add a child to this entity
+    /// \param child Child entity
+    public: void AddChild(Common *child);
+
+    /// \brief Remove a child from this entity
+    /// \param child Child to remove
+    public: virtual void RemoveChild(Common *child);
+ 
+    /// \brief Get the number of children
+    public: unsigned int GetChildCount() const;
+
+    /// \brief Get an element by name
+    public: static Common *GetByName(const std::string &name);
+
+    /// \brief Get by name helper
+    private: Common *GetByNameHelper(const std::string &name, Common *parent);
+
+    /// \brief Get a child by index
+    public: Common *GetChild(unsigned int i) const;
+
+    /// \brief Get a child by name
+    public: Common *GetChild(const std::string &name );
+
+    /// \brief Add a type specifier
+    public: void AddType( EntityType type );
+
+    /// \brief Get the type
+    public: bool HasType(const EntityType &t) const;
+
+    /// \brief Get the number of types
+    public: unsigned int GetTypeCount() const;
+
+    /// \brief Get a type by index
+    public: EntityType GetType(unsigned int index) const;
+
+    /// \brief Get the leaf type (last type set)
+    public: EntityType GetLeafType() const;
+
+    /// \brief Get the parent model, if one exists
+    /// \return Pointer to a model, or NULL if no parent model exists
+    public: Model *GetParentModel() const;
+
+    /// \brief Return the name of this entity with the model scope
+    ///        model1::...::modelN::entityName
+    public: std::string GetScopedName() const;
+
+    /// \brief Return the name of this entity with the model+body+geom scope
+    ///        model1::...::modelN::bodyN::entityName
+    public: std::string GetCompleteScopedName() const;
+
+    public: void Print(std::string prefix);
+
+    /// \brief True == show parameters in the gui
+    public: bool GetShowInGui() const;
+
+    /// \brief True == show parameters in the gui
+    public: void SetShowInGui(bool v);
+
+    /// \brief Set whether this entity has been selected by the user through 
+    //         the gui
+    public: virtual bool SetSelected( bool s );
+  
+    /// \brief True if the entity is selected by the user
+    public: bool IsSelected() const;
+
+    /// \brief Returns true if the entities are the same. Checks only the name
+    public: bool operator==(const Common &ent) const;
+
+    /// \brief Parent of this entity
+    protected: Common *parent;
+
     /// \brief This entities ID
     private: unsigned int id;
   
@@ -89,6 +175,17 @@ namespace gazebo
 
     /// \brief Set to true if the object should be saved.
     protected: bool saveable;
+ 
+    /// \brief Children of this entity
+    protected: std::vector< Common* > children;
+ 
+    private: std::vector< EntityType > type;
+
+    private: static Common *root;
+
+    private: bool selected;
+
+    private: bool showInGui;
   };
 }
 

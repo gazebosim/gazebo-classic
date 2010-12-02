@@ -91,7 +91,7 @@ namespace gazebo
     /// \brief Constructor
     public: HingeJoint() : T()
             {
-              this->type = Joint::HINGE;
+              this->AddType(HINGE_JOINT);
 
               Param::Begin(&this->parameters);
               this->axisP = new ParamT<Vector3>("axis",Vector3(0,1,0), 1);

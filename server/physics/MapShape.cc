@@ -49,7 +49,7 @@ unsigned int MapShape::geomCounter = 0;
 MapShape::MapShape(Geom *parent)
     : Shape(parent)
 {
-  this->type = Shape::MAP;
+  this->AddType(MAP_SHAPE);
 
   this->root = new QuadNode(NULL);
 
@@ -151,7 +151,7 @@ void MapShape::CreateBoxes(QuadNode *node)
     std::ostringstream stream;
 
     // Create the box geometry
-    Geom *geom = this->physicsEngine->CreateGeom("box",this->parent->GetBody());
+    Geom *geom = this->physicsEngine->CreateGeom("box", this->geomParent->GetBody());
     geom->SetSaveable(false);
 
     XMLConfig *boxConfig = new XMLConfig();

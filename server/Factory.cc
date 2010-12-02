@@ -25,6 +25,7 @@
  * SVN info: $Id: Factory.cc 7748 2009-05-30 09:46:23Z robotos $
  */
 
+#include "Events.hh"
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
@@ -112,7 +113,7 @@ void Factory::Update()
   if (strcmp((const char*)this->factoryIface->data->deleteEntity,"")!=0)
   {
     const std::string e = (const char*)this->factoryIface->data->deleteEntity;
-    World::Instance()->DeleteEntity(e);
+    Events::deleteEntitySignal(e);
 
     strcpy((char*)this->factoryIface->data->deleteEntity,"");
   }

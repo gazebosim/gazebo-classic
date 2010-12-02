@@ -26,6 +26,9 @@
 
 #include <sstream>
 
+#include "RenderState.hh"
+#include "Events.hh"
+#include "Model.hh"
 #include "Shape.hh"
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
@@ -46,7 +49,8 @@ using namespace gazebo;
 Geom::Geom( Body *body )
     : Entity(body->GetCoMEntity())
 {
-  this->type = Entity::GEOM;
+  this->AddType(GEOM);
+
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
   this->typeName = "unknown";
@@ -82,10 +86,9 @@ Geom::Geom( Body *body )
   
   Param::End();
 
-  World::Instance()->ConnectShowPhysicsSignal( boost::bind(&Geom::ShowPhysics, this, _1) );
-  World::Instance()->ConnectShowJointsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
-  World::Instance()->ConnectShowPhysicsSignal( boost::bind(&Geom::ShowJoints, this, _1) );
-  World::Instance()->ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) );
+  Events::ConnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
+  Events::ConnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
+  Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ToggleShowBoundingBox, this) );
 
   this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) );
 }
@@ -129,14 +132,12 @@ void Geom::Fini()
 {
   this->body->DisconnectEnabledSignal(boost::bind(&Geom::EnabledCB, this, _1));
 
-  World::Instance()->DisconnectShowPhysicsSignal( 
-      boost::bind(&Geom::ShowPhysics, this, _1) );
+  Events::DisconnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
 
-  World::Instance()->DisconnectShowJointsSignal( 
-      boost::bind(&Geom::ShowJoints, this, _1) );
+  Events::DisconnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
 
-  World::Instance()->DisconnectShowBoundingBoxesSignal( 
-      boost::bind(&Geom::ShowBoundingBox, this, _1) );
+  Events::DisconnectShowBoundingBoxesSignal( 
+      boost::bind(&Geom::ToggleShowBoundingBox, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,7 +152,6 @@ void Geom::Load(XMLConfigNode *node)
 
   this->nameP->Load(node);
   this->SetName(this->nameP->GetValue());
-  this->nameP->Load(node);
   this->massP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
@@ -203,7 +203,7 @@ void Geom::Load(XMLConfigNode *node)
 void Geom::CreateBoundingBox()
 {
   // Create the bounding box
-  if (this->GetShapeType() != Shape::PLANE && this->GetShapeType() != Shape::MAP)
+  if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
   {
     Vector3 min;
     Vector3 max;
@@ -220,7 +220,7 @@ void Geom::CreateBoundingBox()
     {
       this->bbVisual->SetCastShadows(false);
       this->bbVisual->AttachBoundingBox(min,max);
-      this->bbVisual->SetVisible( World::Instance()->GetShowBoundingBoxes() );
+      this->bbVisual->SetVisible( RenderState::GetShowBoundingBoxes() );
     }
   }
 }
@@ -287,7 +287,6 @@ void Geom::SetGeom(bool placeable)
 // Update
 void Geom::Update()
 {
-  this->ClearContacts();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,6 +325,14 @@ float Geom::GetLaserRetro() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Toggle bounding box visibility
+void Geom::ToggleShowBoundingBox()
+{
+  if (this->bbVisual)
+    this->bbVisual->ToggleVisible();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Set the visibility of the Bounding box of this geometry
 void Geom::ShowBoundingBox(bool show)
 {
@@ -334,8 +341,26 @@ void Geom::ShowBoundingBox(bool show)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the visibility of the joints of this geometry
-void Geom::ShowJoints(bool show)
+// Toggle transparency
+void Geom::ToggleTransparent()
+{
+  std::vector<OgreVisual*>::iterator iter;
+
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    if (*iter)
+    {
+      if ((*iter)->GetTransparency() == 0.0)
+        (*iter)->SetTransparency(0.6);
+      else
+        (*iter)->SetTransparency(0.0);
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the transparency
+void Geom::SetTransparent(bool show)
 {
   std::vector<OgreVisual*>::iterator iter;
 
@@ -361,13 +386,6 @@ void Geom::ShowJoints(bool show)
       }
     }
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the visibility of the physical entity of this geom
-void Geom::ShowPhysics(bool show)
-{
-  this->body->ShowPhysics(show);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -449,9 +467,9 @@ const Mass &Geom::GetMass() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the shape type
-Shape::Type Geom::GetShapeType()
+EntityType Geom::GetShapeType()
 {
-  return this->shape->GetType();
+  return this->shape->GetLeafType();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -483,43 +501,28 @@ bool Geom::GetContactsEnabled() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Add an occurance of a contact to this geom
-void Geom::AddContact(const Contact &contact)
-{
-  if (!this->contactsEnabled)
-    return;
-
-  if (this->GetShapeType() == Shape::RAY || this->GetShapeType() == Shape::PLANE)
-    return;
-
-  this->contacts.push_back( contact.Clone() );
-  this->contactSignal( contact );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Clear all contact info
-void Geom::ClearContacts()
-{
-  this->contacts.clear();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the number of contacts
 unsigned int Geom::GetContactCount() const
 {
-  return this->contacts.size();
+  return this->GetParentModel()->GetContactCount(this);
 }
-            
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add an occurance of a contact to this geom
+void Geom::AddContact(const Contact &contact)
+{
+  if (!this->GetContactsEnabled() || this->GetShapeType() == RAY_SHAPE || this->GetShapeType() == PLANE_SHAPE)
+    return;
+
+  this->GetParentModel()->StoreContact(this, contact);
+  this->contactSignal( contact );
+}           
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a specific contact
 Contact Geom::GetContact(unsigned int i) const
 {
-  if (i < this->contacts.size())
-    return this->contacts[i];
-  else
-    gzerr(0) << "Invalid contact index\n";
-
-  return Contact();
+  return this->GetParentModel()->RetrieveContact(this, i);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -103,26 +103,25 @@ int Image::Load(const std::string &filename)
       {
         closedir(dir);
 
-        std::string fullName = (((*piter)+"/")+filename);
-        //std::cout << "searching file[" << fullName << "]\n";
+        this->fullName = (((*piter)+"/")+filename);
         // if file exist
-        if (stat(fullName.c_str(), &st) == 0)
+        if (stat(this->fullName.c_str(), &st) == 0)
         {
-          FREE_IMAGE_FORMAT fifmt = FreeImage_GetFIFFromFilename(fullName.c_str());
+          FREE_IMAGE_FORMAT fifmt = FreeImage_GetFIFFromFilename(this->fullName.c_str());
 
           if (this->bitmap)
             FreeImage_Unload(this->bitmap);
           this->bitmap = NULL;
 
           if (fifmt == FIF_PNG)
-            this->bitmap = FreeImage_Load(fifmt, fullName.c_str(), PNG_DEFAULT);
+            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), PNG_DEFAULT);
           else if (fifmt == FIF_JPEG)
-            this->bitmap = FreeImage_Load(fifmt, fullName.c_str(), JPEG_DEFAULT);
+            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), JPEG_DEFAULT);
           else if (fifmt == FIF_BMP)
-            this->bitmap = FreeImage_Load(fifmt, fullName.c_str(), BMP_DEFAULT);
+            this->bitmap = FreeImage_Load(fifmt, this->fullName.c_str(), BMP_DEFAULT);
           else
           {
-            gzerr(5) << "Unknown image format[" << fullName << "]\n";
+            gzerr(5) << "Unknown image format[" << this->fullName << "]\n";
             return -1;
           }
 
@@ -395,3 +394,12 @@ bool Image::Valid() const
 {
   return this->bitmap != NULL;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the full filename of the image
+std::string Image::GetFilename() const
+{
+  return this->fullName;
+}
+
+

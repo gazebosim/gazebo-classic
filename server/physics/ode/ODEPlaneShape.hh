@@ -17,7 +17,7 @@ namespace gazebo
     public: void CreatePlane()
             {
               PlaneShape::CreatePlane();
-              ODEGeom *odeParent = (ODEGeom*)(this->parent);
+              ODEGeom *odeParent = (ODEGeom*)(this->geomParent);
   
               double altitude = 0;
 
@@ -30,7 +30,7 @@ namespace gazebo
     public: void SetAltitude(const Vector3 &pos)
             {
               PlaneShape::SetAltitude(pos);
-              ODEGeom *odeParent = (ODEGeom*)(this->parent);
+              ODEGeom *odeParent = (ODEGeom*)(this->geomParent);
 
               dVector4 vec4;
   

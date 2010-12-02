@@ -86,10 +86,15 @@ namespace gazebo
     /// \brief Returns whether this is a valid image
     public: bool Valid() const;
 
+    /// \brief Get the full filename of the image
+    public: std::string GetFilename() const;
+
     /// Count the number of images created. Used for initialising free image
     private: static int count;
 
     private: FIBITMAP *bitmap;
+
+    private: std::string fullName;
   };
 }
 

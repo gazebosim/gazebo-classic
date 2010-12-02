@@ -278,7 +278,9 @@ int main()
   for (iter = step_types.begin(); iter != step_types.end(); iter++)
   {
     std::string path = std::string("/home/nate/work/simpar/data/pioneer_circle/") + *iter + "/";
-    system((std::string("mkdir -p ")+path).c_str());
+    if (system((std::string("mkdir -p ")+path).c_str()) == -1)
+      std::cerr << "Error\n";
+
 
 
     FILE *out = fopen(std::string(path+"index.txt").c_str(), "w");
@@ -303,7 +305,8 @@ int main()
         RunSim(step);
 
         std::string mv_cmd = std::string("mv /tmp/pioneer.log ") + path + "pioneer_circle_benchmark_" + *iter + "_" + boost::lexical_cast<std::string>(i) + ".data";
-        system(mv_cmd.c_str());
+        if (system(mv_cmd.c_str()) == -1)
+          std::cerr << "Error\n";
       }
     }
 

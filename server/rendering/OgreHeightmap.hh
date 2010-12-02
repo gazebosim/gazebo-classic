@@ -34,12 +34,13 @@
 
 namespace gazebo
 {
+  class Scene;
 
   /// \brief Height map geom
   class OgreHeightmap : public Ogre::RaySceneQueryListener
   {
     /// \brief Constructor
-    public: OgreHeightmap();
+    public: OgreHeightmap(unsigned int sceneIndex);
 
     /// \brief Destructor
     public: virtual ~OgreHeightmap();
@@ -65,6 +66,7 @@ namespace gazebo
     private: Ogre::RaySceneQuery *rayQuery;
 
     private: double distToTerrain;
+    private: Scene *scene;
   };
 }
 

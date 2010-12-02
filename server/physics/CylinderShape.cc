@@ -6,7 +6,7 @@ using namespace gazebo;
 /// Constructor
 CylinderShape::CylinderShape(Geom *parent) : Shape(parent)
 {
-  this->type = Shape::CYLINDER;
+  this->AddType(CYLINDER_SHAPE);
 
   Param::Begin(&this->parameters);
   this->sizeP = new ParamT<Vector2<double> >("size", 

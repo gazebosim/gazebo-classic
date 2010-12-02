@@ -16,21 +16,21 @@ namespace gazebo
             {
               SphereShape::SetSize(radius);
               PhysicsEngine *physics = World::Instance()->GetPhysicsEngine();
-              ODEGeom *oParent = (ODEGeom*)(this->parent);
+              ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
               dMass odeMass;
               Pose3d rpose;
   
-              Mass mass = this->parent->GetMass();
+              Mass mass = this->geomParent->GetMass();
   
               // Initialize box mass matrix
               dMassSetSphereTotal(&odeMass, mass.GetAsDouble(), radius);
-              rpose = this->parent->GetRelativePose();
+              rpose = this->geomParent->GetRelativePose();
               dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
   
               physics->ConvertMass(&mass, &odeMass);
               
-              this->parent->SetMass(mass);
+              this->geomParent->SetMass(mass);
   
               // Create the sphere geometry
               oParent->SetGeom( dCreateSphere(0, radius), true);

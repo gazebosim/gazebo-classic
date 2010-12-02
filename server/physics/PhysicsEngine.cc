@@ -26,6 +26,8 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "RenderState.hh"
+#include "Events.hh"
 #include "World.hh"
 #include "OgreVisual.hh"
 #include "OgreDynamicLines.hh"
@@ -43,15 +45,21 @@ PhysicsEngine::PhysicsEngine()
 {
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
+  this->gravityP->Callback(&PhysicsEngine::SetGravity, this);
+
   this->updateRateP = new ParamT<double>("updateRate", 0.0, 0);
   this->stepTimeP = new ParamT<Time>("stepTime",0.025,0);
   Param::End();
 
   this->mutex = new boost::recursive_mutex();
+  this->locked = false;
+
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
     this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
     this->visual->SetVisible(false);
+    this->visual->SetCastShadows(false);
+    this->visual->SetUseRTShader(false);
     this->contactLines.resize(5000);
 
     Material *mat = new Material();
@@ -67,7 +75,7 @@ PhysicsEngine::PhysicsEngine()
          this->contactLinesIter != this->contactLines.end(); 
          this->contactLinesIter++, i++)
     {
-      (*this->contactLinesIter) = OgreCreator::Instance()->CreateDynamicLine(
+      (*this->contactLinesIter) = this->visual->AddDynamicLine(
           OgreDynamicRenderable::OT_LINE_LIST);
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
@@ -86,21 +94,21 @@ PhysicsEngine::PhysicsEngine()
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
       (*this->contactLinesIter)->setMaterial(matName);
-      this->visual->AttachObject(*this->contactLinesIter);
     }
 
-    World::Instance()->ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
+    Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
 
     this->contactLinesIter = this->contactLines.begin();
     delete mat;
   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
-  World::Instance()->DisconnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
+  Events::DisconnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
 
   if (this->visual)
   {
@@ -127,13 +135,6 @@ void PhysicsEngine::UpdatePhysics()
 Vector3 PhysicsEngine::GetGravity() const
 {
   return this->gravityP->GetValue();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the gavity vector
-void PhysicsEngine::SetGravity(Vector3 gravity) const
-{
-  this->gravityP->SetValue(gravity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +170,7 @@ void PhysicsEngine::SetStepTime(Time time)
 void PhysicsEngine::LockMutex()
 {
   this->mutex->lock();
+  this->locked = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,24 +178,14 @@ void PhysicsEngine::LockMutex()
 void PhysicsEngine::UnlockMutex()
 {
   this->mutex->unlock();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Create a geom
-Geom *PhysicsEngine::CreateGeom(std::string typeName, Body *body)
-{
-  for (unsigned int i = 0; i < Shape::TYPE_COUNT; i++)
-    if (typeName == Shape::TypeNames[i])
-      return this->CreateGeom( (Shape::Type)i, body );
-
-  return NULL; 
+  this->locked = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a contact visual
 void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 {
-  if (!World::Instance()->GetShowContacts())
+  if (!RenderState::GetShowContacts())
     return;
 
   double cm_size = World::Instance()->contactMarkerSize;
@@ -203,10 +195,13 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 
   (*this->contactLinesIter)->SetPoint( 0, pos);
   (*this->contactLinesIter)->SetPoint( 1, pos+(norm*cm_size)+(e1*cm_size*0.25)+(e2*cm_size*0.25));
+
   (*this->contactLinesIter)->SetPoint( 2, pos);
   (*this->contactLinesIter)->SetPoint( 3, pos+(norm*cm_size)+(e1*cm_size*0.25)-(e2*cm_size*0.25));
+
   (*this->contactLinesIter)->SetPoint( 4, pos);
   (*this->contactLinesIter)->SetPoint( 5, pos+(norm*cm_size)-(e1*cm_size*0.25)+(e2*cm_size*0.25));
+
   (*this->contactLinesIter)->SetPoint( 6, pos);
   (*this->contactLinesIter)->SetPoint( 7, pos+(norm*cm_size)-(e1*cm_size*0.25)-(e2*cm_size*0.25));
 
@@ -229,6 +224,16 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Toggle whether to show contacts
+void PhysicsEngine::ToggleShowVisual()
+{
+  if (!Simulator::Instance()->GetRenderEngineEnabled())
+    return;
+  this->visual->ToggleVisible();
+  this->contactLinesIter = this->contactLines.begin();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Set whether to show contacts
 void PhysicsEngine::ShowVisual(bool show)
 {
@@ -237,4 +242,67 @@ void PhysicsEngine::ShowVisual(bool show)
   this->visual->SetVisible(show);
   if (show)
     this->contactLinesIter = this->contactLines.begin();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the count of the parameters
+unsigned int PhysicsEngine::GetParamCount() const
+{
+  return this->parameters.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a param by index
+Param *PhysicsEngine::GetParam(unsigned int index) const
+{
+  if (index < this->parameters.size())
+    return this->parameters[index];
+  else
+    gzerr(0) << "Invalid index[" << index << "]\n";
+  return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a parameter by name
+Param *PhysicsEngine::GetParam(const std::string &key) const
+{
+  std::vector<Param*>::const_iterator iter;
+  Param *result = NULL;
+
+  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
+  {
+    if ((*iter)->GetKey() == key)
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  if (result == NULL)
+    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+
+  return result;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set a parameter by name
+void PhysicsEngine::SetParam(const std::string &key, const std::string &value)
+{
+  std::vector<Param*>::const_iterator iter;
+  Param *result = NULL;
+
+  for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
+  {
+    if ((*iter)->GetKey() == key)
+    {
+      result = *iter;
+      break;
+    }
+  }
+
+  if (result == NULL)
+    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+  else
+    result->SetFromString( value, true );
 }

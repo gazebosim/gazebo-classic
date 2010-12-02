@@ -26,6 +26,7 @@
 
 #include "Model.hh"
 #include "GazeboMessage.hh"
+#include "GazeboError.hh"
 #include "World.hh"
 #include "BulletBody.hh"
 #include "BulletPhysics.hh"

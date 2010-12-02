@@ -35,12 +35,13 @@
 #include <RTShaderSystem/OgreRTShaderSystem.h>
 #endif
 
+#include "OgreCamera.hh"
 #include "SingletonT.hh"
 
 namespace gazebo
 {
-  class ShaderGeneratorTechniqueResolverListener;
   class OgreVisual;
+  class Scene;
 
   class RTShaderSystem : public SingletonT<RTShaderSystem>
   {
@@ -64,6 +65,9 @@ namespace gazebo
     /// \brief Finalize the shader system
     public: void Fini();
 
+    /// \brief Add a scene manager
+    public: void AddScene(Scene *scene);
+
     /// \brief Update the shaders
     public: void UpdateShaders();
 
@@ -74,19 +78,18 @@ namespace gazebo
     public: void DetachEntity(OgreVisual *vis);
 
     /// \brief Set a viewport to use shaders
-    public: static void AttachViewport(Ogre::Viewport *vp)
-            {
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-              vp->setMaterialScheme(
-                  Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-#endif
-            }
+    public: static void AttachViewport(OgreCamera *camera);
 
     /// Set the lighting model to per pixel or per vertex
     public: void SetPerPixelLighting( bool s);
 
     /// \brief Generate shaders for an entity
-    private: void GenerateShaders(OgreVisual *vis);
+    public: void GenerateShaders(OgreVisual *vis);
+
+    /// \brief Get paths for the shader system
+    //private: bool GetPaths(std::string &coreLibsPath, std::string &cachePath);
+
+    public: void ApplyShadows();
 
     /// \brief Get paths for the shader system
     private: bool GetPaths(std::string &coreLibsPath, std::string &cachePath);
@@ -101,6 +104,7 @@ namespace gazebo
     private: friend class DestroyerT<RTShaderSystem>;
     private: friend class SingletonT<RTShaderSystem>;
   };
+
 }
 
 #endif

@@ -50,7 +50,6 @@ void SensorManager::Update()
   std::list<Sensor*>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Update();
-    
 }
 
 ////////////////////////////////////////////////////////////////////////////////

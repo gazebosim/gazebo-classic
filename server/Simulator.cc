@@ -30,6 +30,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "RenderState.hh"
 #include "gazebo_config.h"
 #include "Plugin.hh"
 #include "Timer.hh"
@@ -40,12 +41,13 @@
 #include "OgreVisual.hh"
 #include "World.hh"
 #include "XMLConfig.hh"
-#include "Gui.hh"
+#include "SimulationApp.hh"
 #include "GazeboConfig.hh"
 #include "gz.h"
 #include "PhysicsEngine.hh"
 #include "OgreAdaptor.hh"
 #include "GazeboMessage.hh"
+#include "GazeboError.hh"
 #include "Global.hh"
 
 #include "Simulator.hh"
@@ -71,8 +73,8 @@ std::string Simulator::defaultWorld =
     <pos>0 0</pos>\
   </rendering:gui>\
   <rendering:ogre>\
-    <ambient>1 1 1 1</ambient>\
-    <shadowTechnique>stencilModulative</shadowTechnique>\
+    <ambient>.1 .1 .1 1</ambient>\
+    <shadows>true</shadows>\
     <grid>false</grid>\
   </rendering:ogre>\
    <model:physical name=\"plane1_model\">\
@@ -83,7 +85,7 @@ std::string Simulator::defaultWorld =
       <geom:plane name=\"plane1_geom\">\
         <normal>0 0 1</normal>\
         <size>100 100</size>\
-        <segments>10 10</segments>\
+        <segments>1 1</segments>\
         <uvTile>100 100</uvTile>\
         <material>Gazebo/GrayGrid</material>\
         <mu1>109999.0</mu1>\
@@ -91,13 +93,25 @@ std::string Simulator::defaultWorld =
       </geom:plane>\
     </body:plane>\
   </model:physical>\
+  <model:renderable name='directional_light'>\
+    <xyz>0.0 0 10</xyz>\
+    <static>true</static>\
+    <light>\
+      <type>directional</type>\
+      <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>\
+      <specularColor>.1 .1 .1 1.0</specularColor>\
+      <attenuation>.2 0.1 0.0</attenuation>\
+      <range>100</range>\
+      <direction>-.4 0 -0.6</direction>\
+      <castShadows>true</castShadows>\
+    </light>\
+  </model:renderable>\
 </gazebo:world>";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Simulator::Simulator()
-: xmlFile(NULL),
-  gui(NULL),
+: gui(NULL),
   renderEngine(NULL),
   gazeboConfig(NULL),
   loaded(false),
@@ -110,6 +124,7 @@ Simulator::Simulator()
   renderUpdates(0),
   stepInc(false),
   userQuit(false),
+  physicsQuit(false),
   guiEnabled(true),
   renderEngineEnabled(true),
   physicsEnabled(true),
@@ -130,12 +145,6 @@ Simulator::~Simulator()
   {
     delete this->gazeboConfig;
     this->gazeboConfig = NULL;
-  }
-
-  if (this->xmlFile)
-  {
-    delete this->xmlFile;
-    this->xmlFile = NULL;
   }
 
   if (this->render_mutex)
@@ -165,13 +174,6 @@ void Simulator::Close()
   if (!this->loaded)
     return;
 
-  if (this->gui)
-  {
-    delete this->gui;
-    this->gui = NULL;
-  }
-
-
   gazebo::World::Instance()->Close();
 
   if (this->renderEngineEnabled)
@@ -192,14 +194,14 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   // Load the world file
-  this->xmlFile=new gazebo::XMLConfig();
+  XMLConfig *xmlFile=new gazebo::XMLConfig();
 
   try
   {
     if (worldFileName.size())
-      this->xmlFile->Load(worldFileName);
+      xmlFile->Load(worldFileName);
     else
-      this->xmlFile->LoadString(defaultWorld);
+      xmlFile->LoadString(defaultWorld);
   }
   catch (GazeboError e)
   {
@@ -248,12 +250,10 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
       }
 
         // Create the GUI
-      if (childNode || !rootNode)
+      if (!this->gui && (childNode || !rootNode))
       {
-        this->gui = new Gui(x, y, width, height, "Gazebo");
-
-        this->gui->Load(childNode);
-        this->gui->CreateCameras();
+        this->gui = new SimulationApp();
+        this->gui->Load();
       }
     }
     catch (GazeboError e)
@@ -305,8 +305,6 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   }
 
   this->loaded=true;
-
-  //OgreAdaptor::Instance()->PrintSceneGraph();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -314,6 +312,8 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
 void Simulator::Init()
 {
   this->state = INIT;
+
+  RenderState::Init();
 
   //Initialize the world
   try
@@ -400,8 +400,33 @@ void Simulator::Fini( )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Stop the physics engine
+void Simulator::StopPhysics()
+{
+  this->physicsQuit = true;
+  if (this->physicsThread)
+  {
+    this->physicsThread->join();
+    delete this->physicsThread;
+    this->physicsThread = NULL;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Start the physics engine
+void Simulator::StartPhysics()
+{
+  if (this->physicsThread)
+    this->StopPhysics();
+
+  this->physicsQuit = false;
+  this->physicsThread = new boost::thread( 
+      boost::bind(&Simulator::PhysicsLoop, this));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Main simulation loop, when this loop ends the simulation finish
-void Simulator::MainLoop()
+void Simulator::Run()
 {
   this->state = RUN;
 
@@ -412,39 +437,63 @@ void Simulator::MainLoop()
   struct timespec timeSpec;
   double freq = 80.0; //FIXME: HARDCODED Rendering Loop Rate
 
-  this->physicsThread = new boost::thread( 
-                         boost::bind(&Simulator::PhysicsLoop, this));
+  this->StartPhysics();
 
-  // Update the gui
-  while (!this->userQuit)
+  if (this->gui)
+    this->gui->Run();
+  else
   {
-    DIAGNOSTICTIMER(timer("GUI LOOP",6));
-
-    currTime = this->GetWallTime();
-    if ( currTime - lastTime > 1.0/freq)
+    while (!this->userQuit)
     {
-      lastTime = this->GetWallTime();
-
-      if (this->gui && (currTime - lastGuiTime > 1.0/this->gui->GetUpdateRate()))
+      currTime = this->GetWallTime();
+      if ( currTime - lastTime > 1.0/freq)
       {
-        lastGuiTime = this->GetWallTime();
-        DIAGNOSTICTIMER(timer1("GUI update",6));
-        this->gui->Update();
+        lastTime = this->GetWallTime();
+
+        this->GraphicsUpdate();
+        currTime = this->GetWallTime();
+        if (currTime - lastTime < 1/freq)
+        {
+          Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+          timeSpec.tv_sec = sleepTime.sec;
+          timeSpec.tv_nsec = sleepTime.nsec;
+
+          nanosleep(&timeSpec, NULL);
+        }
       }
+      else
+      {
+        Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
+        timeSpec.tv_sec = sleepTime.sec;
+        timeSpec.tv_nsec = sleepTime.nsec;
+        nanosleep(&timeSpec, NULL);
+      }
+    }
+  }
+
+  this->StopPhysics();
+}
+
+void Simulator::GraphicsUpdate()
+{
+  // Update the gui
+  //while (!this->userQuit)
+  //{
+    //currTime = this->GetWallTime();
+    //if ( currTime - lastTime > 1.0/freq)
+    //{
+      //lastTime = this->GetWallTime();
+
+      if (this->gui)
+        this->gui->Update();
 
       if (this->renderEngineEnabled)
       {
-        {
-          DIAGNOSTICTIMER(timer1("GUI Camera update",6));
-          OgreAdaptor::Instance()->UpdateCameras();
-        }
-        {
-          DIAGNOSTICTIMER(timer1("GUI Graphics update",6));
-          World::Instance()->GraphicsUpdate();
-        }
+        OgreAdaptor::Instance()->UpdateScenes();
+        World::Instance()->GraphicsUpdate();
       }
 
-      currTime = this->GetWallTime();
+      //currTime = this->GetWallTime();
 
       {
         DIAGNOSTICTIMER(timer1("GUI Process Entities to Load",6));
@@ -455,7 +504,7 @@ void Simulator::MainLoop()
         World::Instance()->ProcessEntitiesToDelete();
       }
 
-      if (currTime - lastTime < 1/freq)
+      /*if (currTime - lastTime < 1/freq)
       {
         Time sleepTime = ( Time(1.0/freq) - (currTime - lastTime));
         timeSpec.tv_sec = sleepTime.sec;
@@ -463,7 +512,6 @@ void Simulator::MainLoop()
 
         nanosleep(&timeSpec, NULL);
       }
-
     }
     else
     {
@@ -472,9 +520,9 @@ void Simulator::MainLoop()
       timeSpec.tv_nsec = sleepTime.nsec;
       nanosleep(&timeSpec, NULL);
     }
-  }
+    */
+  //}
 
-  this->physicsThread->join();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -602,13 +650,6 @@ void Simulator::SetRenderEngineEnabled( bool enabled )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Return true if the gui is enabled
-bool Simulator::GetRenderEngineEnabled() const
-{
-  return this->renderEngineEnabled;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set the length of time the simulation should run.
 void Simulator::SetTimeout(double time)
 {
@@ -623,13 +664,6 @@ void Simulator::SetPhysicsEnabled( bool enabled )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the physics enabled/disabled
-bool Simulator::GetPhysicsEnabled() const
-{
-  return this->physicsEnabled;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Get the model that contains the entity
 Model *Simulator::GetParentModel( Entity *entity ) const
 {
@@ -640,10 +674,10 @@ Model *Simulator::GetParentModel( Entity *entity ) const
 
   do 
   {
-    if (entity && entity->GetType() == Entity::MODEL)
+    if (entity && entity->HasType(MODEL))
       model = (Model*)entity;
 
-    entity = entity->GetParent();
+    entity = dynamic_cast<Entity*>(entity->GetParent());
   } while (model == NULL);
 
   return model;
@@ -660,9 +694,9 @@ Body *Simulator::GetParentBody( Entity *entity ) const
 
   do 
   {
-    if (entity && entity->GetType() == Entity::BODY)
+    if (entity && entity->HasType(BODY))
       body = (Body*)(entity);
-    entity = entity->GetParent();
+    entity = dynamic_cast<Entity*>(entity->GetParent());
   } while (body == NULL);
 
   return body;
@@ -685,10 +719,9 @@ void Simulator::PhysicsLoop()
   // hack for ROS, since ROS uses t=0 for special purpose
   this->simTime = world->GetPhysicsEngine()->GetStepTime();
 
-  while (!this->userQuit)
+  while (!this->physicsQuit)
   {
     DIAGNOSTICTIMER(timer("PHYSICS LOOP ",6));
-
     {
       DIAGNOSTICTIMER(timer1("PHYSICS MR MD Mutex and world->Update() ",6));
       boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
@@ -742,7 +775,7 @@ void Simulator::PhysicsLoop()
       req.tv_nsec = diffTime.nsec;
     }
 
-    nanosleep(&req, &rem);
+    //nanosleep(&req, &rem);
 
     {
       DIAGNOSTICTIMER(timer1("PHYSICS UpdateSimIfaces ",6));

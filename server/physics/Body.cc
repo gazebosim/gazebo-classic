@@ -27,6 +27,7 @@
 #include <sstream>
 #include <float.h>
 
+#include "Events.hh"
 #include "SensorManager.hh"
 #include "XMLConfig.hh"
 #include "Model.hh"
@@ -55,9 +56,13 @@ using namespace gazebo;
 Body::Body(Entity *parent)
     : Entity(parent)
 {
-  this->type = Entity::BODY;
+  this->AddType(BODY);
+  this->GetVisualNode()->SetShowInGui(false);
+
   this->comEntity = new Entity(this);
   this->comEntity->SetName("COM_Entity");
+  this->comEntity->SetShowInGui(false);
+  this->comEntity->GetVisualNode()->SetShowInGui(false);
 
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
 
@@ -218,6 +223,7 @@ void Body::Load(XMLConfigNode *node)
 
   this->SetKinematic(**this->kinematicP);
 
+  Events::ConnectShowPhysicsSignal( boost::bind(&Body::ToggleShowPhysics, this) );
   //this->GetModel()->ConnectUpdateSignal( boost::bind(&Body::Update, this) );
 }
 
@@ -347,6 +353,8 @@ void Body::SetLaserRetro(float retro)
 // Initialize the body
 void Body::Init()
 {
+  this->poseDirty = false;
+
   // If no geoms are attached, then don't let gravity affect the body.
   if (this->geoms.size()==0 || **this->turnGravityOffP)
     this->SetGravityMode(false);
@@ -392,9 +400,8 @@ void Body::Init()
       // Create a line to each geom
       for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
       {
-        OgreDynamicLines *line = OgreCreator::Instance()->CreateDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
-        line->setMaterial("Gazebo/GreenEmissive");
-        this->cgVisual->AttachObject(line);
+        OgreDynamicLines *line = this->cgVisual->AddDynamicLine(OgreDynamicRenderable::OT_LINE_LIST);
+        line->setMaterial("Gazebo/GreenGlow");
         line->AddPoint(Vector3(0,0,0));
         line->AddPoint(giter->second->GetRelativePose().pos);
       }
@@ -410,11 +417,11 @@ void Body::Init()
 // Update the body
 void Body::Update()
 {
-  //DiagnosticTimer timer("Body[" + this->GetName() +"] Update");
-  
-  std::map< std::string, Geom* >::iterator geomIter;
-  Vector3 vel;
-  Vector3 avel;
+  if (this->poseDirty)
+  {
+    this->poseDirty = false;
+    this->SetWorldPose(this->newPose, false);
+  }
 
   // Apply our linear accel
   this->SetForce(this->linearAccel);
@@ -428,20 +435,6 @@ void Body::Update()
   //   this->enabled = this->GetEnabled();
   //   this->enabledSignal(this->enabled);
   // }
- 
-  {
-    //DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
-
-    for (geomIter=this->geoms.begin();
-        geomIter!=this->geoms.end(); geomIter++)
-    {
-#ifdef USE_THREADPOOL
-      World::Instance()->threadPool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
-#else
-      geomIter->second->Update();
-#endif
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -701,6 +694,14 @@ void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
     max.y = std::max(bbmax.y, max.y);
     max.z = std::max(bbmax.z, max.z);
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Toggle show the physics visualizations
+void Body::ToggleShowPhysics()
+{
+  if (this->cgVisual)
+    this->cgVisual->ToggleVisible();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@
 
   <rendering:ogre>
     <ambient>.2 .2 .2 1</ambient>
-    <shadows>false</shadows>
+    <shadows>true</shadows>
     <grid>false</grid>
   </rendering:ogre>
 

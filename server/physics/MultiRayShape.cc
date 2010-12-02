@@ -7,22 +7,16 @@ using namespace gazebo;
 /// Constructor
 MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
 {
-  this->type = Shape::MULTIRAY;
+  this->AddType(MULTIRAY_SHAPE);
 
-  this->rayFan = OgreCreator::Instance()->CreateDynamicLine(
+  this->rayFan = this->geomParent->GetVisualNode()->AddDynamicLine(
       OgreDynamicRenderable::OT_TRIANGLE_FAN);
 
-  this->rayFanOutline = OgreCreator::Instance()->CreateDynamicLine(
+  this->rayFanOutline = this->geomParent->GetVisualNode()->AddDynamicLine(
       OgreDynamicRenderable::OT_LINE_STRIP);
 
-  if (this->rayFan && this->rayFanOutline)
-  {
-    this->parent->GetVisualNode()->AttachObject(this->rayFan);
-    this->parent->GetVisualNode()->AttachObject(this->rayFanOutline);
-
-    this->rayFan->setMaterial("Gazebo/BlueLaser");
-    this->rayFanOutline->setMaterial("Gazebo/BlueEmissive");
-  }
+  this->rayFan->setMaterial("Gazebo/BlueLaser");
+  this->rayFanOutline->setMaterial("Gazebo/BlueGlow");
 
   Param::Begin(&this->parameters);
   this->rayCountP = new ParamT<int>("rayCount",0,1);
@@ -47,12 +41,6 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
 /// Destructor
 MultiRayShape::~MultiRayShape()
 {
-  if (this->rayFan)
-    delete this->rayFan;
-
-  if (this->rayFanOutline)
-    delete this->rayFanOutline;
-
   std::vector< RayShape* >::iterator iter;
 
   for (iter=this->rays.begin(); iter!=this->rays.end(); iter++)

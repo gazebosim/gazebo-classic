@@ -26,6 +26,9 @@ set (sources OgreMovableText.cc
              ViewController.cc
              FPSViewController.cc
              OrbitViewController.cc
+             Grid.cc
+             Scene.cc
+             RenderState.cc
 )
 
 set (headers OgreMovableText.hh
@@ -49,6 +52,9 @@ set (headers OgreMovableText.hh
              ViewController.hh
              FPSViewController.hh
              OrbitViewController.hh
+             Grid.hh
+             Scene.hh
+             RenderState.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})
@@ -60,6 +66,6 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11)
+target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11 glut profiler)
 install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 APPEND_TO_SERVER_HEADERS(${headers})

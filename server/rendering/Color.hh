@@ -30,6 +30,8 @@
 #include <iostream>
 #include "Vector3.hh"
 
+#include <OGRE/OgreColourValue.h>
+
 namespace gazebo
 {
 
@@ -72,16 +74,19 @@ namespace gazebo
     public: float operator[](unsigned int index);
 
     /// \brief Get the red color
-    public: float R();
+    public: float R() const;
 
     /// \brief Get the green color
-    public: float G();
+    public: float G() const;
 
     /// \brief Get the blue color
-    public: float B();
+    public: float B() const;
 
     /// \brief Get the alpha color
-    public: float A();
+    public: float A() const;
+
+    /// \brief Return the equivalent ogre color
+    public: Ogre::ColourValue GetOgreColor() const;
   
     // Addition operators
     public: Color operator+( const Color &pt ) const;
@@ -110,11 +115,19 @@ namespace gazebo
     /// Clamp the color values
     private: void Clamp();
 
- 
     // Ostream operator
-    public: friend std::ostream &operator<< (std::ostream &out, const Color &pt) {
+    public: friend std::ostream &operator<< (std::ostream &out, const Color &pt)    {
       out << pt.r << " " << pt.g << " " << pt.b << " " << pt.a;
       return out; 
+    }
+
+    // Istream operator
+    public: friend std::istream &operator>> (std::istream &in, Color &pt)
+    { 
+      // Skip white spaces
+      in.setf( std::ios_base::skipws );
+      in >> pt.r >> pt.g >> pt.b >> pt.a;
+      return in; 
     }
 
     // The values

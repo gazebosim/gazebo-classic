@@ -5,8 +5,8 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-ViewController::ViewController(OgreCamera *camera)
-  : camera(camera)
+ViewController::ViewController(OgreCamera *cam)
+  : camera(cam)
 {
 }
 
@@ -14,4 +14,5 @@ ViewController::ViewController(OgreCamera *camera)
 /// Destructor
 ViewController::~ViewController()
 {
+  this->camera = NULL;
 }

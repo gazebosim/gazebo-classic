@@ -204,7 +204,20 @@ class Time
   public: int32_t nsec;
 
   /// Correct the time
-  private: void Correct();
+  private: inline void Correct()
+           {
+             // Make any corrections
+             if (this->nsec > 1e9)
+             {
+               this->sec++;
+               this->nsec = (int32_t)(this->nsec - 1e9);
+             }
+             else if (this->nsec < 0)
+             {
+               this->sec--;
+               this->nsec = (int32_t)(this->nsec + 1e9);
+             }
+           }
 };
 /// \}
 

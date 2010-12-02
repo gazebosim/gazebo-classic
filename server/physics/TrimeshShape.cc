@@ -39,7 +39,7 @@ using namespace gazebo;
 // Constructor
 TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
 {
-  this->type = Shape::TRIMESH;
+  this->AddType(TRIMESH_SHAPE);
 
   Param::Begin(&this->parameters);
   this->meshNameP = new ParamT<std::string>("mesh","",1);
@@ -96,7 +96,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
     meshManager->GenSphericalTexCoord(this->mesh,center);
   }
 
-  Mass mass = this->parent->GetMass();
+  Mass mass = this->geomParent->GetMass();
 
   if (this->mesh->GetSubMeshCount() > 1)
   {
@@ -138,7 +138,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
       config->LoadString( stream.str() );
 
       Geom *newGeom = this->physicsEngine->CreateGeom( "trimesh", 
-          this->parent->GetBody() );
+          this->geomParent->GetBody() );
 
       newGeom->SetSaveable(false);
       newGeom->Load( config->GetRootNode()->GetChild() );

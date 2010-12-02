@@ -337,19 +337,3 @@ bool Time::operator>=( int time ) const
 {
   return *this >= Time((double)time);
 }
-
-
-void Time::Correct()
-{
-  // Make any corrections
-  if (this->nsec > 1e9)
-  {
-    this->sec++;
-    this->nsec = (int32_t)(this->nsec - 1e9);
-  }
-  else if (this->nsec < 0)
-  {
-    this->sec--;
-    this->nsec = (int32_t)(this->nsec + 1e9);
-  }
-}

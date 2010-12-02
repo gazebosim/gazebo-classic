@@ -25,17 +25,28 @@
  * SVN: $Id$
  */
 
+#include "World.hh"
 #include "Common.hh"
+#include "Model.hh"
 #include "GazeboMessage.hh"
+#include "GazeboError.hh"
 
 using namespace gazebo;
 
 unsigned int Common::idCounter = 0;
 
+Common *Common::root = new Common(NULL);
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Common::Common()
+Common::Common(Common *parent)
+ : parent(parent)
 {
+  this->AddType(COMMON);
+
+  if (this->parent == NULL)
+    this->parent = this->root;
+
   this->id = ++idCounter;
 
   Param::Begin(&this->parameters);
@@ -43,12 +54,35 @@ Common::Common()
   Param::End();
 
   this->saveable = true;
+
+  if (this->parent)
+    this->parent->AddChild(this);
+
+  this->showInGui = true;
+  this->selected = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Common::~Common()
 {
+  // remove self as a child of the parent
+  if (this->parent)
+    this->parent->RemoveChild(this);
+
+  this->SetParent(NULL);
+
+  std::vector<Common*>::iterator iter;
+
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if (*iter)
+    {
+      (*iter)->SetParent(NULL);
+      delete *iter;
+    }
+  }
+
   delete this->nameP;
 }
 
@@ -149,4 +183,250 @@ void Common::SetSaveable(bool v)
 bool Common::GetSaveable() const
 {
   return this->saveable;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Return the ID of the parent
+int Common::GetParentId() const
+{
+  return this->parent == NULL ? 0 : this->parent->GetId();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the parent
+void Common::SetParent(Common *parent)
+{
+  this->parent = parent;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the parent
+Common *Common::GetParent() const
+{
+  return this->parent;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a child to this entity
+void Common::AddChild(Common *child)
+{
+  if (child == NULL)
+    gzthrow("Cannot add a null child to an entity");
+
+  // Add this child to our list
+  this->children.push_back(child);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Remove a child from this entity
+void Common::RemoveChild(Common *child)
+{
+  std::vector<Common*>::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+  {
+    if ((*iter)->GetName() == child->GetName())
+    {
+      this->children.erase(iter);
+      break;
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+///  Get the number of children
+unsigned int Common::GetChildCount() const
+{
+  return this->children.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add a type specifier
+void Common::AddType( EntityType t )
+{
+  this->type.push_back(t);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a child by index
+Common *Common::GetChild(unsigned int i) const
+{
+  if (i < this->children.size())
+    return this->children[i];
+  
+  return NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a child by name
+Common *Common::GetChild(const std::string &name )
+{
+  std::string fullName = this->GetCompleteScopedName() + "::" + name;
+  return this->GetByNameHelper(fullName, this);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get an element by name
+Common *Common::GetByName(const std::string &name)
+{
+  return root->GetByNameHelper(name, root);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get by name helper
+Common *Common::GetByNameHelper(const std::string &name, Common *parent)
+{
+  if (parent->GetCompleteScopedName() == name)
+    return parent;
+
+  Common *result = NULL;
+  std::vector<Common*>::const_iterator iter;
+
+  for (iter = parent->children.begin(); 
+       iter != parent->children.end() && result ==NULL; iter++)
+    result = GetByNameHelper(name, *iter);
+
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return the name of this entity with the model scope
+/// model1::...::modelN::entityName
+std::string Common::GetScopedName() const
+{
+  Common *p = this->parent;
+  std::string scopedName = this->GetName();
+
+  while (p)
+  {
+    if (p && p->HasType(MODEL))
+    {
+      Model *m = (Model*)p;
+      scopedName.insert(0, m->GetName()+"::");
+    }
+    p = p->GetParent();
+  }
+
+  return scopedName;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return the name of this entity with the model scope
+/// model1::...::modelN::entityName
+std::string Common::GetCompleteScopedName() const
+{
+  Common *p = this->parent;
+  std::string scopedName = this->GetName();
+
+  while (p)
+  {
+    scopedName.insert(0, p->GetName()+"::");
+    p = p->GetParent();
+  }
+
+  return scopedName;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the type
+bool Common::HasType(const EntityType &t) const
+{
+  return std::binary_search(this->type.begin(), this->type.end(), t);
+
+  /*for (unsigned int i=0; i < this->type.size(); i++)
+    if (this->type[i] == t)
+      return true;
+
+  return false;
+  */
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of types
+unsigned int Common::GetTypeCount() const
+{
+  return this->type.size();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a type by index
+EntityType Common::GetType(unsigned int index) const
+{
+  if (index < this->type.size())
+    return this->type[index];
+
+  gzthrow("Invalid type index");
+  return COMMON;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the leaf type (last type set)
+EntityType Common::GetLeafType() const
+{
+  return this->type.back();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Common::Print(std::string prefix)
+{
+  std::vector<Common*>::iterator iter;
+  std::cout << prefix << this->GetName() << "\n";
+
+  prefix += "  ";
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+    (*iter)->Print(prefix);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// True == show parameters in the gui
+bool Common::GetShowInGui() const
+{
+  return this->showInGui;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// True == show parameters in the gui
+void Common::SetShowInGui(bool v)
+{
+  this->showInGui = v;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether this entity has been selected by the user through the gui
+bool Common::SetSelected( bool s )
+{
+  std::vector< Common *>::iterator iter;
+
+  this->selected = s;
+
+  for (iter = this->children.begin(); iter != this->children.end(); iter++)
+    (*iter)->SetSelected(s);
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// True if the entity is selected by the user
+bool Common::IsSelected() const
+{
+  return this->selected;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the parent model, if one exists
+Model *Common::GetParentModel() const
+{
+  Common *p = this->parent;
+
+  while (p && p->HasType(MODEL))
+    p = p->GetParent();
+
+  return (Model*)p;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Returns true if the entities are the same. Checks only the name
+bool Common::operator==(const Common &ent) const 
+{
+  return ent.GetName() == this->GetName();
 }

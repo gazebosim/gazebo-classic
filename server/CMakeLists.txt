@@ -5,16 +5,21 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 string (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
 string (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
 string (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
+string (REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
 string (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
 string (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
 string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
 string (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
+string (REPLACE " " ";" parallel_quickstep_library_dirs_split "${parallel_quickstep_library_dirs}")
 
+include_directories( ${wxWidgets_INCLUDE_DIRS} )
+link_directories( ${wxWidgets_LIBRARY_DIRS} )
+include (${wxWidgets_USE_FILE})
 
 include_directories(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
-  gui 
+  wx 
   physics 
   physics/ode
   physics/bullet
@@ -35,17 +40,19 @@ include_directories(
   ${assimp_include_dirs_split}
   ${freeimage_include_dir}
   ${bullet_include_dirs_split}
+  ${parallel_quickstep_include_dirs_split}
   ${threadpool_include_dirs_split}
-  ${FLTK_INCLUDE_DIR}
+  ${GTK2_INCLUDE_DIRS}
 )
 
 link_directories(  
  ${CMAKE_BINARY_DIR}/libgazebo 
- ${CMAKE_BINARY_DIR}/server/gui 
+ ${CMAKE_BINARY_DIR}/server/wx 
  ${CMAKE_BINARY_DIR}/server/physics/bullet 
  ${boost_library_dirs_split} 
  ${assimp_library_dirs_split} 
  ${bullet_library_dirs_split} 
+ ${parallel_quickstep_library_dirs_split} 
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
 )
@@ -61,7 +68,7 @@ endif (use_internal_assimp)
 add_subdirectory(rendering)
 add_subdirectory(physics)
 add_subdirectory(sensors)
-add_subdirectory(gui)
+add_subdirectory(wx)
 add_subdirectory(controllers)
 add_subdirectory(audio_video)
 
@@ -84,6 +91,7 @@ SET (sources Common.cc
              Angle.cc
              Param.cc
              GraphicsIfaceHandler.cc
+             SimulationIfaceHandler.cc
              Simulator.cc
              Rand.cc
              Factory.cc
@@ -95,6 +103,7 @@ SET (sources Common.cc
              STLLoader.cc
              Logger.cc
              Plugin.cc
+             Events.cc
 )
 
 SET (headers Common.hh
@@ -118,6 +127,7 @@ SET (headers Common.hh
              Angle.hh
              Param.hh
              GraphicsIfaceHandler.hh
+             SimulationIfaceHandler.hh
              Simulator.hh
              Rand.hh
              Factory.hh
@@ -128,7 +138,7 @@ SET (headers Common.hh
              AssimpLoader.hh
              STLLoader.hh
              Logger.hh
-             Event.hh
+             Events.hh
              Plugin.hh
 )
 
@@ -159,8 +169,8 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
   set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+  else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+    set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 
@@ -172,19 +182,20 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    gazebo_server
                                    gazebo_rendering
                                    gazebo_av-shared
-                                   gazebo_gui
+                                   gazebo_wx
                                    gazebo_physics
                                    gazeboshm 
                                    assimp
                                    pthread
+                                   profiler
 )
+
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
-                      -lassimp -lgazebo_physics -lgazebo_av -lgazebo_gui 
-                      -lgazebo_rendering)
+                      -lassimp -lgazebo_physics -lgazebo_av -lgazebo_wx -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics )
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics profiler)
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
@@ -196,8 +207,8 @@ if (INCLUDE_BULLET)
 endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
-  target_link_libraries(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
-  target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo_server ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo-exec ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})
   APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
                       -lgazebo_physics_ode)

@@ -101,15 +101,18 @@ namespace gazebo
   
     /// \brief Get the laser retro reflectiveness 
     public: float GetLaserRetro() const;
- 
+
+    /// \brief Toggle bounding box visibility
+    public: void ToggleShowBoundingBox();
+
     /// \brief Set the visibility of the bounding box
     public: void ShowBoundingBox(bool show);
 
-    /// \brief Set the visibility of the joints
-    public: void ShowJoints(bool show);
+    /// \brief Toggle transparency
+    public: void ToggleTransparent();
 
-    /// \brief Set the visibility of the physical entity of this geom
-    public: void ShowPhysics(bool);
+    /// \brief Set the transparency
+    public: void SetTransparent(bool show);
 
     /// \brief Set the mass
     public: void SetMass(const double &mass);
@@ -142,7 +145,7 @@ namespace gazebo
     public: const Mass &GetMass() const;
 
     /// \brief Get the shape type
-    public: Shape::Type GetShapeType();
+    public: EntityType GetShapeType();
 
     /// \brief Set the shape for this geom
     public: void SetShape(Shape *shape);
@@ -191,7 +194,7 @@ namespace gazebo
 
     /// \brief Get the angular acceleration of the geom in the world frame
     public: virtual Vector3 GetWorldAngularAccel() const;
- 
+
     public: template< typename T>
             boost::signals::connection ConnectContactCallback( T subscriber )
             { return contactSignal.connect(subscriber); }
@@ -209,8 +212,6 @@ namespace gazebo
     ///  Contact parameters
     public: SurfaceParams *surface; 
 
-    public: std::vector<Contact> contacts;
- 
     /// The body this geom belongs to
     protected: Body *body;
   

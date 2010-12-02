@@ -33,6 +33,7 @@
 #include "Param.hh"
 #include "Angle.hh"
 #include "Pose3d.hh"
+#include "Time.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -52,6 +53,7 @@ namespace gazebo
   class Entity;
   class MouseEvent;
   class ViewController;
+  class Scene;
 
   /// \addtogroup gazebo_rendering
   /// \brief Basic camera 
@@ -67,45 +69,57 @@ namespace gazebo
   class OgreCamera 
   {
     /// \brief Constructor
-    public: OgreCamera(const std::string &namePrefix);
+    public: OgreCamera(const std::string &namePrefix, unsigned int sceneIndex);
   
     /// \brief Destructor
     public: virtual ~OgreCamera();
   
     /// \brief Load the camera using parameter from an XMLConfig node
     /// \param node The XMLConfig node
-    public: void LoadCam( XMLConfigNode *node );
+    public: void Load( XMLConfigNode *node );
 
     /// \brief Save camera info in xml format
     /// \param stream Output stream
-    public: void SaveCam(std::string &prefix, std::ostream &stream);
+    public: void Save(std::string &prefix, std::ostream &stream);
   
     /// \brief Initialize the camera
-    public: void InitCam();
+    public: void Init();
 
     /// \brief Render the camera
-    public: void Render();
+    public: virtual void Render();
+
+    /// \brief Post render
+    public: virtual void PostRender();
 
     /// \brief Update the sensor information
-    public: void UpdateCam();
+    public: void Update();
   
     /// Finalize the camera
-    public: void FiniCam();
+    public: void Fini();
 
     /// \brief Set to true to enable rendering
     public: void SetRenderingEnabled(bool value);
 
     /// \brief Get whether the rendering is enabled
     public: bool GetRenderingEnabled() const;
-  
+
+
     /// \brief Get the global pose of the camera
-    public: Pose3d GetCameraWorldPose() const;
+    public: Pose3d GetWorldPose() const;
+
+    /// \brief Get the camera position in the world
+    public: Vector3 GetWorldPosition() const;
+
 
     /// \brief Set the global pose of the camera
     public: void SetWorldPose(const Pose3d &pose);
 
     /// \brief Set the world position
-    public: void SetPosition(const Vector3 &pos);
+    public: void SetWorldPosition(const Vector3 &pos);
+
+    /// \brief Set the world orientation
+    public: void SetWorldRotation(const Quatern &quant);
+
   
     /// \brief Translate the camera
     public: void Translate( const Vector3 &direction );
@@ -115,6 +129,8 @@ namespace gazebo
   
     /// \brief Rotate the camera around the pitch axis
     public: void RotatePitch( float angle );
+
+
 
     /// \brief Set the clip distances
     public: void SetClipDist(float near, float far);
@@ -186,9 +202,6 @@ namespace gazebo
     /// \brief Get the viewport right vector
     public: Vector3 GetRight();
 
-    /// \brief Get the camera position in the world
-    public: Vector3 GetCameraPosition();
-
     /// \brief Get the average FPS
     public: virtual float GetAvgFPS() { return 0;}
 
@@ -204,26 +217,29 @@ namespace gazebo
     /// \brief Get whether the user can move the camera via the GUI
     public: bool GetUserMovable() const;
 
-    /// \brief Get the name of the camera
-    public: std::string GetCameraName();
-
     /// \brief Set the camera's scene node
-    public: void SetCameraSceneNode( Ogre::SceneNode *node );
+    public: void SetSceneNode( Ogre::SceneNode *node );
+
+    /// \brief Get the camera's scene node
+    public: Ogre::SceneNode *GetSceneNode() const;
 
     /// \brief Get a pointer to the image data
     public: virtual const unsigned char *GetImageData(unsigned int i=0);
 
     /// \brief Get the camera's name
-    public: std::string GetCamName();
+    public: std::string GetName() const;
 
     /// \brief Set the camera's name
-    public: void SetCamName( const std::string &name );
+    public: void SetName( const std::string &name );
 
     /// \brief Move the camera to focus on an entity
     public: void MoveToEntity(Entity *entity);
 
     /// \brief Set the camera to track an entity
     public: void TrackModel( Model *model );
+            
+    /// \brief Toggle whether to view the world in wireframe
+    public: void ToggleShowWireframe();
 
     /// \brief Set whether to view the world in wireframe
     public: void ShowWireframe(bool s);
@@ -245,17 +261,31 @@ namespace gazebo
     public: void HandleMouseEvent(const MouseEvent &evt);
 
     /// \brief Get the time of the last render update
-    public: gazebo::Time GetLastRenderTime() const; 
+    public: gazebo::Time GetLastUpdateTime() const; 
+
+    /// \brief Set view controller
+    public: void SetViewController( const std::string type );
+
+    /// \brief Set whether to capture data
+    public: void SetCaptureData( bool value );
+
+    /// \brief Set the render target
+    public: void CreateRenderTexture( const std::string &textureName );
+
+    /// \brief Get the scene this camera is in
+    public: Scene *GetScene() const;
 
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
-
 
     // Save the camera frame
     protected: virtual void SaveFrame();
 
     /// \brief set update rate (render rate) of the OgreCamera
     public: void SetUpdateRate(const double &rate);
+
+    // Create the ogre camera
+    private: void CreateOgreCamera();
 
     private: std::string name;
 
@@ -265,9 +295,10 @@ namespace gazebo
     protected: unsigned int textureWidth, textureHeight;
   
     protected: Ogre::Camera *camera;
+    protected: Ogre::Viewport *viewport;
     protected: Ogre::SceneNode *origParentNode;
     protected: Ogre::SceneNode *sceneNode;
-    public: Ogre::SceneNode *pitchNode;
+    protected: Ogre::SceneNode *pitchNode;
   
     private: Pose3d pose;
   
@@ -283,17 +314,14 @@ namespace gazebo
     protected: Ogre::PixelFormat imageFormat;
     protected: unsigned int visibilityMask;
 
-    public: Ogre::RenderTarget *renderTarget;
+    protected: Ogre::RenderTarget *renderTarget;
 
     protected: Ogre::TexturePtr renderTexture;
-
-    protected: std::string ogreTextureName;
-    protected: std::string ogreMaterialName;
 
     private: static unsigned int cameraCounter;
     private: unsigned int myCount;
 
-    protected: std::string cameraName;
+    protected: std::string uniqueName;
 
     protected: bool captureData;
 
@@ -302,6 +330,8 @@ namespace gazebo
 
     protected: bool renderingEnabled;
 
+    protected: bool newData;
+
     protected: Time renderPeriod;
     protected: Time lastUpdate;
     private: Ogre::AnimationState *animState;
@@ -309,7 +339,7 @@ namespace gazebo
     private: ViewController *viewController;
 
     protected: Time lastRenderTime;
-
+    protected: Scene *scene;
   };
   
   /// \}

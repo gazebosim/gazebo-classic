@@ -33,6 +33,7 @@
 #include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/signal.hpp>
+#include <boost/algorithm/string.hpp>
 #include <typeinfo>
 #include <string>
 
@@ -40,6 +41,8 @@
 
 namespace gazebo
 {
+
+
   class Param
   {
     /// \brief Constructor
@@ -72,6 +75,18 @@ namespace gazebo
     /// \brief Get the help string
     public: std::string GetHelp() const {return this->help;}
 
+    public: bool IsBool() const;
+    public: bool IsInt() const;
+    public: bool IsUInt() const;
+    public: bool IsFloat() const;
+    public: bool IsDouble() const;
+    public: bool IsChar() const;
+    public: bool IsStr() const;
+    public: bool IsVector3() const;
+    public: bool IsVector4() const;
+    public: bool IsQuatern() const;
+    public: bool IsPose3d() const;
+
     /// List of created parameters
     private: static std::vector<Param*> *params;
 
@@ -103,7 +118,7 @@ namespace gazebo
     public: T GetValue() const;
 
     /// \brief Set the value of the parameter
-    public: void SetValue(const T &value);
+    public: void SetValue(const T &value, bool callback=false);
 
     public: inline T operator*() const {return value;}
 
@@ -183,11 +198,13 @@ namespace gazebo
   void ParamT<T>::SetFromString(const std::string &str, bool callback)
   {
     std::string tmp = str;
+    std::string lower_tmp = str;
+    boost::to_lower(lower_tmp);
 
     // "true" and "false" doesn't work properly
-    if (tmp == "true")
+    if (lower_tmp == "true")
       tmp = "1";
-    else if (str == "false")
+    else if (lower_tmp == "false")
       tmp = "0";
 
     try
@@ -222,9 +239,12 @@ namespace gazebo
   //////////////////////////////////////////////////////////////////////////////
   /// Set the value of the parameter
   template<typename T>
-  void ParamT<T>::SetValue(const T &v)
+  void ParamT<T>::SetValue(const T &v, bool callback)
   {
     this->value = v;
+
+    if (callback)
+      this->changeSignal(this->value);
   }
 
 }

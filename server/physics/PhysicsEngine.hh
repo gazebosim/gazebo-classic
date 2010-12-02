@@ -95,10 +95,10 @@ namespace gazebo
   
     /// \brief Initialize the physics engine
     public: virtual void Init() = 0;
-
-    /// \brief Initialize for separate thread
+ 
+    /// \brief Init the engine for threads. 
     public: virtual void InitForThread() = 0;
-  
+
     /// \brief Update the physics engine collision
     public: virtual void UpdateCollision() = 0;
 
@@ -118,20 +118,17 @@ namespace gazebo
     public: virtual Body *CreateBody(Entity *parent) = 0;
 
     /// \brief Create a geom
-    public: virtual Geom *CreateGeom(Shape::Type type, Body *body) = 0;
+    public: virtual Geom *CreateGeom(std::string shapeTypename, Body *body) = 0;
 
-    /// \brief Create a geom
-    public: Geom *CreateGeom(std::string typeName, Body *body);
-  
     /// \brief Create a new joint
-    public: virtual Joint *CreateJoint(Joint::Type type) = 0;
+    public: virtual Joint *CreateJoint(std::string type) = 0;
   
     /// \brief Return the gavity vector
     /// \return The gavity vector
     public: Vector3 GetGravity() const;
 
     /// \brief Set the gavity vector
-    public: void SetGravity(Vector3 gravity) const;
+    public: virtual void SetGravity(const gazebo::Vector3 &gravity) = 0;
 
     /// \brief Get the time between each update cycle
     /// \return seconds between updates 
@@ -156,6 +153,8 @@ namespace gazebo
     /// \brief Lock the physics engine mutex
     public: void LockMutex();
 
+    public: inline bool Locked() const {return this->locked;}
+
     /// \brief Unlock the physics engine mutex
     public: void UnlockMutex();
 
@@ -164,6 +163,9 @@ namespace gazebo
 
     /// \brief Convert a Gazebo mass to an engine specific mass
     public: virtual void ConvertMass(void *engineMass, const Mass &mass) = 0;
+
+    /// \brief Toggle whether to show contacts
+    public: void ToggleShowVisual();
 
     /// \brief Set whether to show contacts
     public: void ShowVisual(bool show);
@@ -202,6 +204,18 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: virtual double GetMaxContacts() {return 0;}
 
+    /// \brief Get the count of the parameters
+    public: unsigned int GetParamCount() const;
+
+    /// \brief Get a param by index
+    public: Param *GetParam(unsigned int index) const;
+
+    /// \brief Get a parameter by name
+    public: Param *GetParam(const std::string &key) const;
+
+     /// \brief Set a parameter by name
+    public: void SetParam(const std::string &key, const std::string &value);
+ 
     /// \brief Add a contact visual
     protected: void AddContactVisual(Vector3 pos, Vector3 norm);
 
@@ -219,6 +233,7 @@ namespace gazebo
     protected: std::vector<Param*> parameters;
 
     private: boost::recursive_mutex *mutex;
+    private: bool locked;
 
     protected: OgreVisual *visual;
 

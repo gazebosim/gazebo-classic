@@ -92,7 +92,7 @@ OgreCamera *CameraManager::GetCamera(const std::string &cameraName) const
 
   for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {
-    if ((*iter)->GetCameraName() == cameraName)
+    if ((*iter)->GetName() == cameraName)
       return (*iter);
   }
 

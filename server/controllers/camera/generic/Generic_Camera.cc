@@ -122,13 +122,13 @@ void Generic_Camera::PutCameraData()
   // Data timestamp
   data->head.time = Simulator::Instance()->GetSimTime().Double();
 
-  data->width = this->myParent->GetImageWidth();
-  data->height = this->myParent->GetImageHeight();
-  data->image_size = data->width * data->height * this->myParent->GetImageDepth();
+  data->width = this->myParent->GetCamera()->GetImageWidth();
+  data->height = this->myParent->GetCamera()->GetImageHeight();
+  data->image_size = data->width * data->height * this->myParent->GetCamera()->GetImageDepth();
 
   // GetFOV() returns radians
-  data->hfov = *(this->myParent->GetHFOV());
-  data->vfov = *(this->myParent->GetVFOV());
+  data->hfov = *(this->myParent->GetCamera()->GetHFOV());
+  data->vfov = *(this->myParent->GetCamera()->GetVFOV());
 
   // Set the pose of the camera
   cameraPose = this->myParent->GetWorldPose();
@@ -143,13 +143,13 @@ void Generic_Camera::PutCameraData()
   assert (data->image_size <= sizeof(data->image));
 
   // Copy the pixel data to the interface
-  src = this->myParent->GetImageData(0);
+  src = this->myParent->GetCamera()->GetImageData(0);
   dst = data->image;
 
   boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
   memcpy(dst, src, data->image_size);
 
-  this->myParent->EnableSaveFrame( data->saveFrames );
+  this->myParent->GetCamera()->EnableSaveFrame( data->saveFrames );
 
   this->cameraIface->Unlock();
 

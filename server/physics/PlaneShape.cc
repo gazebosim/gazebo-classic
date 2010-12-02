@@ -28,7 +28,8 @@ using namespace gazebo;
 /// Constructor
 PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
 {
-  this->type = Shape::PLANE;
+  this->AddType(PLANE_SHAPE);
+  this->SetName("plane_shape");
 
   Param::Begin(&this->parameters);
   this->normalP = new ParamT<Vector3>("normal",Vector3(0,0,1),0);
@@ -100,7 +101,7 @@ void PlaneShape::CreatePlane()
   this->meshName = OgreCreator::CreatePlane(**(this->normalP), 
       **(this->sizeP), **(this->segmentsP), **(this->uvTileP), 
       **(this->materialP), **(this->castShadowsP), 
-      this->parent->GetVisualNode(), this->meshName);
+      this->geomParent->GetVisualNode(), this->meshName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

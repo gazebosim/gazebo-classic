@@ -3,25 +3,18 @@
 ///////////////////////////////////////
 
 GUI
-- Hand of god
-  - Select models and get info
-  - Move models
-  -Implement in CameraSensor class.
-- Allow person to display and change XML parameters through the GUI.
-- Better fonts
-- Better camera movement. Translate is too slow over long distances
+-Set pose of object numerically
+-Model importer
+-Set joints
+-Set physics params, and other global params
+-Set Object parameters
+  - Apply materials, set friction, set visual & collision models, numerically set forces and torques
+- Orbit camera movement
 
 Rendering
-- FSAA: See OgreCreator::CreateWindow
-- Shadows draw on multiple surfaces(seem to pass through walls).
-- Removing the sky results in a black screen
 - Paging heightmaps. 
   - Positioning the current heightmap is a big hack
 - BSP loader and worlds
-- Fog
-- Anti Aliasing
-- Better lights
-  - GLSL per pixel lighting. Make this user selectable.
 - Dynamic textures
 
 

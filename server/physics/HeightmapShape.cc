@@ -42,7 +42,7 @@ using namespace gazebo;
 HeightmapShape::HeightmapShape(Geom *parent)
     : Shape(parent)
 {
-  this->type = Shape::HEIGHTMAP;
+  this->AddType(HEIGHTMAP_SHAPE);
 
   Param::Begin(&this->parameters);
   this->imageFilenameP = new ParamT<std::string>("image","",1);
@@ -52,7 +52,7 @@ HeightmapShape::HeightmapShape(Geom *parent)
   this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
   Param::End();
 
-  this->ogreHeightmap = new OgreHeightmap();
+  this->ogreHeightmap = new OgreHeightmap(0);
 }
 
 

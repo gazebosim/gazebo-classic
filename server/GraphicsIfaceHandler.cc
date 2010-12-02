@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 
+#include "Scene.hh"
 #include "World.hh"
 #include "Entity.hh"
 #include "GazeboError.hh"
@@ -201,7 +202,7 @@ void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDraw
     attached = true;
   }
   else
-    line = OgreCreator::Instance()->CreateDynamicLine(opType);
+    line = vis->AddDynamicLine(opType);
 
   line->setMaterial(OgreCreator::CreateMaterial( data->color.r,
                                                  data->color.g,
@@ -218,9 +219,6 @@ void GraphicsIfaceHandler::DrawSimple(OgreVisual *vis, libgazebo::Graphics3dDraw
     else
       line->AddPoint(pos);
   }
-
-  if (!attached)
-    vis->AttachObject(line);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -313,7 +311,7 @@ void GraphicsIfaceHandler::DrawShape(OgreVisual *vis, libgazebo::Graphics3dDrawD
           std::ostringstream bname;
 
           bname << "BILLBOARD_" << this->name;
-          bset = OgreAdaptor::Instance()->sceneMgr->createBillboardSet(
+          bset = OgreAdaptor::Instance()->GetScene(0)->GetManager()->createBillboardSet(
               bname.str().c_str());
         }
 
@@ -412,7 +410,7 @@ void GraphicsIfaceHandler::DrawMeterBar(OgreVisual *vis,
   }
   else
   {
-    bset = OgreAdaptor::Instance()->sceneMgr->createBillboardSet(
+    bset = OgreAdaptor::Instance()->GetScene(0)->GetManager()->createBillboardSet(
         bname.str().c_str());
 
     // Create the texture

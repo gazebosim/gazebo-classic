@@ -26,6 +26,9 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Events.hh"
+#include "OgreDynamicLines.hh"
+#include "Scene.hh"
 #include "SelectionObj.hh"
 #include "RTShaderSystem.hh"
 #include "MeshManager.hh"
@@ -46,17 +49,26 @@ unsigned int OgreVisual::visualCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
-  : Common()
+OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner, Scene *scene)
+  : Common(_owner)
 {
+  this->AddType(VISUAL);
+  this->transparency = 0.0;
+
   bool isStatic = false;
   Ogre::SceneNode *pnode = NULL;
   this->owner = _owner;
+  this->useRTShader = true;
+
+  if (scene == NULL)
+    this->scene = OgreAdaptor::Instance()->GetScene(0);
+  else
+    this->scene = scene;
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
     if (!node)
-      pnode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
+      pnode = this->scene->GetManager()->getRootSceneNode();
     else
       pnode = node->GetSceneNode();
   }
@@ -70,21 +82,24 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   this->visible = true;
   this->ConstructorHelper(pnode, isStatic);
 
-  this->ribbonTrail = (Ogre::RibbonTrail*)OgreAdaptor::Instance()->sceneMgr->createMovableObject("RibbonTrail");
+  this->ribbonTrail = (Ogre::RibbonTrail*)this->scene->GetManager()->createMovableObject("RibbonTrail");
   this->ribbonTrail->setMaterialName("Gazebo/Red");
   this->ribbonTrail->setTrailLength(200);
   this->ribbonTrail->setMaxChainElements(1000);
   this->ribbonTrail->setNumberOfChains(1);
   this->ribbonTrail->setVisible(false);
   this->ribbonTrail->setInitialWidth(0,0.05);
-  OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->attachObject(this->ribbonTrail);
+  this->scene->GetManager()->getRootSceneNode()->attachObject(this->ribbonTrail);
 
   RTShaderSystem::Instance()->AttachEntity(this);
+
+  this->updateTime = Simulator::Instance()->GetRealTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 OgreVisual::OgreVisual (Ogre::SceneNode *node, bool isStatic)
+  : Common(NULL)
 {
   this->owner = NULL;
   this->ConstructorHelper(node, isStatic);
@@ -171,12 +186,37 @@ OgreVisual::~OgreVisual()
   delete this->materialNameP;
   delete this->castShadowsP;
 
+  // delete instance from lines vector
+  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();
+       iter!=this->lines.end();iter++)
+    delete *iter;
+  this->lines.clear();
+
   RTShaderSystem::Instance()->DetachEntity(this);
 
+  if (this->sceneNode != NULL)
+  {
+    if (this->boundingBoxNode != NULL)
+      this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
+
+    // loop through sceneNode an delete attached objects
+    for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
+    {
+      Ogre::MovableObject* obj = this->sceneNode->getAttachedObject(i);
+      if (obj) delete obj;
+      obj = NULL;
+    }
+    this->sceneNode->detachAllObjects();
+
+    // delete works, but removeAndDestroyChild segfaults
+    delete this->sceneNode;
+    this->sceneNode = NULL;
+    //this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
+  }
 
   // Having this chunk of code causes a segfault when closing the
   // application.
-  if (this->parentNode != NULL)
+  /*if (this->parentNode != NULL)
   {
     if (this->sceneNode != NULL)
     {
@@ -197,7 +237,7 @@ OgreVisual::~OgreVisual()
       this->sceneNode = NULL;
       //this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
     }
-  }
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,6 +351,26 @@ void OgreVisual::Load(XMLConfigNode *node)
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Update the visual.
+void OgreVisual::Update()
+{
+  if (!this->visible)
+    return;
+
+  if (Simulator::Instance()->GetRealTime() - this->updateTime <= Time(0.2))
+    return;
+
+  std::list<OgreDynamicLines*>::iterator iter;
+
+  // Update the lines
+  for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
+    (*iter)->Update();
+
+  this->updateTime = Simulator::Instance()->GetRealTime();
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the visual in XML format
@@ -393,7 +453,7 @@ void OgreVisual::MakeStatic()
     return;
 
   if (!this->staticGeom)
-    this->staticGeom = OgreAdaptor::Instance()->sceneMgr->createStaticGeometry(this->sceneNode->getName() + "_Static");
+    this->staticGeom = this->scene->GetManager()->createStaticGeometry(this->sceneNode->getName() + "_Static");
 
   // Add the scene node to the static geometry
   this->staticGeom->addSceneNode(this->sceneNode);
@@ -511,7 +571,7 @@ void OgreVisual::SetMaterial(const std::string &materialName)
 
   /*Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator ();
 
-  while (techniqueIt.hasMoreElements ())
+  /*while (techniqueIt.hasMoreElements ())
   {
     Ogre::Technique *t = techniqueIt.getNext ();
     Ogre::Technique::PassIterator passIt = t->getPassIterator ();
@@ -608,7 +668,7 @@ void OgreVisual::SetTransparency( float trans )
     Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
     entity = dynamic_cast<Ogre::Entity*>(obj);
-    //simple = dynamic_cast<Ogre::SimpleRenderable*>(obj);
+
     if (!entity)
       continue;
 
@@ -621,7 +681,7 @@ void OgreVisual::SetTransparency( float trans )
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
-      Ogre::ColourValue sc, dc;
+      Ogre::ColourValue dc;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques(); 
            techniqueCount++)
@@ -648,6 +708,13 @@ void OgreVisual::SetTransparency( float trans )
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the transparency
+float OgreVisual::GetTransparency()
+{
+  return this->transparency;
+}
+
 void OgreVisual::SetHighlight(bool highlight)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -655,42 +722,6 @@ void OgreVisual::SetHighlight(bool highlight)
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
-
-  /*
-  #include <OgreParticleSystem.h>
-  #include <iostream>
-  Ogre::ParticleSystem *effect =OgreAdaptor::Instance()->sceneMgr->createParticleSystem(this->parentNode->getName(), "Gazebo/Aureola");
-  OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(effect);
-  //this->sceneNode->createChildSceneNode()->attachObject(effect);
-  Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);
-  std::cout << this->parentNode->getName() << std::endl;
-  */
-
-//FIXME:  Modifying selfIllumination is invasive to the material definition of the user
-// Choose other effect.
-/*
-  Ogre::Technique *t;
-  Ogre::Material::TechniqueIterator techniqueIt = this->myMaterial->getTechniqueIterator();
-  while ( techniqueIt.hasMoreElements() )
-  {
-    t = techniqueIt.getNext ();
-    Ogre::Technique::PassIterator passIt = t->getPassIterator ();
-
-    while (passIt.hasMoreElements ())
-    {
-      if (highlight)
-      {
-        passIt.peekNext ()->setSelfIllumination (1,1,1);
-      }
-      else
-      {
-        passIt.peekNext ()->setSelfIllumination (0,0,0);
-      }
-      passIt.moveNext ();
-    }
-  }
-  */
-
 }
 
 
@@ -726,6 +757,13 @@ void OgreVisual::SetVisible(bool visible, bool cascade)
 
   this->sceneNode->setVisible( visible, cascade );
   this->visible = visible;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Toggle whether this visual is visible
+void OgreVisual::ToggleVisible()
+{
+  this->SetVisible( !this->GetVisible() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -784,6 +822,7 @@ void OgreVisual::SetRotation( const Quatern &rot)
 void OgreVisual::SetPose( const Pose3d &pose)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
+
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -1070,6 +1109,7 @@ void OgreVisual::SetShader(const std::string &shader)
   RTShaderSystem::Instance()->UpdateShaders();
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void OgreVisual::SetRibbonTrail(bool value)
 {
   if (value)
@@ -1085,4 +1125,58 @@ void OgreVisual::SetRibbonTrail(bool value)
     this->ribbonTrail->clearChain(0);
   }
   this->ribbonTrail->setVisible(value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the size of the bounding box
+Vector3 OgreVisual::GetBoundingBoxSize() const
+{
+  this->sceneNode->_updateBounds();
+  Ogre::AxisAlignedBox box = this->sceneNode->_getWorldAABB();
+  Ogre::Vector3 size = box.getSize();
+  return Vector3(size.x, size.y, size.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether to use the RT Shader system
+void OgreVisual::SetUseRTShader(bool value)
+{
+  this->useRTShader = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get whether to user the RT shader system
+bool OgreVisual::GetUseRTShader() const
+{
+  return this->useRTShader;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a line to the visual
+OgreDynamicLines *OgreVisual::AddDynamicLine(OgreDynamicRenderable::OperationType opType)
+{
+  Events::ConnectRenderStartSignal( boost::bind(&OgreVisual::Update, this) );
+
+  OgreDynamicLines *line = new OgreDynamicLines(opType);
+  this->lines.push_back(line);
+  this->AttachObject(line);
+  return line;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Delete a dynamic line
+void OgreVisual::DeleteDynamicLine(OgreDynamicLines *line)
+{
+  // delete instance from lines vector
+  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();iter!=this->lines.end();iter++)
+  {
+    if (*iter == line)
+    {
+      this->lines.erase(iter);
+      break;
+    }
+  }
+
+  if (this->lines.size() == 0)
+    Events::DisconnectRenderStartSignal( boost::bind(&OgreVisual::Update, this) );
 }

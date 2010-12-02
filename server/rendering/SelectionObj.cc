@@ -1,5 +1,6 @@
 #include <Ogre.h>
 #include <boost/lexical_cast.hpp>
+#include "Scene.hh"
 #include "OgreCreator.hh"
 #include "MeshManager.hh"
 #include "Simulator.hh"
@@ -20,14 +21,14 @@ SelectionObj::SelectionObj()
 SelectionObj::~SelectionObj()
 {
   if (this->node != NULL)
-    OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->removeAndDestroyChild( this->node->getName() );
+    OgreAdaptor::Instance()->GetScene(0)->GetManager()->getRootSceneNode()->removeAndDestroyChild( this->node->getName() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
 void SelectionObj::Load()
 {
-  Ogre::SceneNode *pnode = OgreAdaptor::Instance()->sceneMgr->getRootSceneNode();
+  Ogre::SceneNode *pnode = OgreAdaptor::Instance()->GetScene(0)->GetManager()->getRootSceneNode();
   this->node = pnode->createChildSceneNode("selection_node");
 
   Ogre::SceneNode *rotNode = this->node->createChildSceneNode("rot_node");

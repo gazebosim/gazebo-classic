@@ -100,7 +100,7 @@ void Controller::Load(XMLConfigNode *node)
     std::string ifaceName = childNode->GetString("name","",1);
 
     // Constructor the heirarchical name for the iface
-    Entity *p = parent;
+    Common *p = parent;
     while (p != NULL)
     {
       Model *m = dynamic_cast<Model*>(p);

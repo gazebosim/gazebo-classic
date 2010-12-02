@@ -4,28 +4,22 @@
 
 using namespace gazebo;
 
-std::string Shape::TypeNames[Shape::TYPE_COUNT] = {"box", "cylinder", "heightmap", "map", "sphere", "plane", "ray", "trimesh", "multiray"};
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Shape::Shape(Geom *p)
-  : parent(p) 
+  : Common(p) 
 {
-  this->parent->SetShape(this);
+  this->AddType(SHAPE);
+  this->geomParent = p;
+  this->geomParent->SetShape(this);
   this->physicsEngine = World::Instance()->GetPhysicsEngine();
+  this->SetName("shape");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Shape::~Shape()
 {
-  if (this->parent)
-    this->parent->SetShape(NULL);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the type
-Shape::Type Shape::GetType() const
-{
-  return this->type;
+  if (this->geomParent)
+    this->geomParent->SetShape(NULL);
 }

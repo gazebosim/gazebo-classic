@@ -1,15 +1,42 @@
+/*
+ *  Gazebo - Outdoor Multi-Robot Simulator
+ *  Copyright (C) 2003
+ *     Nate Koenig & Andrew Howard
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
+/* Desc: A Light
+ * Author: Nate Koenig
+ * Date: 15 July 2003
+ */
+
 #ifndef LIGHT_HH
 #define LIGHT_HH
 
 #include <string>
 #include <iostream>
 
+#include "Color.hh"
 #include "Param.hh"
 #include "Entity.hh"
 
 namespace Ogre
 {
   class Light;
+  class SceneManager;
 }
 
 namespace gazebo
@@ -17,15 +44,16 @@ namespace gazebo
   class OgreVisual;
   class XMLConfigNode;
   class OgreDynamicLines;
+  class Scene;
 
   /// \brief Wrapper around an ogre light source
   class Light : public Entity
   {
     /// \brief Constructor
-    private: Light(Entity *parent);
+    public: Light(Entity *parent, unsigned int sceneIndex);
 
     /// \brief Destructor
-    private: virtual ~Light();
+    public: virtual ~Light();
 
     /// \brief Load the light
     public: void Load(XMLConfigNode *node);
@@ -37,6 +65,9 @@ namespace gazebo
     ///        the gui
     public: virtual bool SetSelected( bool s );
 
+    // \brief Toggle light visual visibility
+    public: void ToggleShowVisual();
+
     /// \brief Set whether to show the visual
     public: void ShowVisual(bool s);
 
@@ -44,10 +75,10 @@ namespace gazebo
     public: void SetLightType(const std::string &type);
 
     /// \brief Set the diffuse
-    public: void SetDiffuseColor(const Vector3 &color);
+    public: void SetDiffuseColor(const Color &color);
 
     /// \brief Set the specular color
-    public: void SetSpecularColor(const Vector3 &color);
+    public: void SetSpecularColor(const Color &color);
 
     /// \brief Set the direction
     public: void SetDirection(const Vector3 &dir);
@@ -73,6 +104,10 @@ namespace gazebo
     /// \private Helper node to create a visual representation of the light
     private: void CreateVisual();
 
+    private: void SetupShadows();
+
+    protected: virtual void OnPoseChange() {}
+
     /// The OGRE light source
     private: Ogre::Light *light;
 
@@ -81,8 +116,8 @@ namespace gazebo
     private: OgreDynamicLines *line;
 
     private: ParamT<std::string> *lightTypeP;
-    private: ParamT<Vector3> *diffuseP;
-    private: ParamT<Vector3> *specularP;
+    private: ParamT<Color> *diffuseP;
+    private: ParamT<Color> *specularP;
     private: ParamT<Vector3> *directionP;
     private: ParamT<Vector3> *attenuationP;
     private: ParamT<double> *rangeP;
@@ -92,8 +127,7 @@ namespace gazebo
     private: ParamT<double> *spotFalloffP;
 
     private: static unsigned int lightCounter;
-
-    private: friend class OgreCreator;
+    private: Scene *scene;
   };
 }
 #endif
