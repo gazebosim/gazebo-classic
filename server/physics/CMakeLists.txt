@@ -75,7 +75,11 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_target_properties(gazebo_physics PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} ${parallel_quickstep_lflags})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-target_link_libraries(gazebo_physics profiler)
+IF (USE_PROFILER)
+  target_link_libraries(gazebo_physics profiler)
+ELSE (USE_PROFILER)
+  target_link_libraries(gazebo_physics)
+ENDIF (USE_PROFILER)
 
 install ( TARGETS gazebo_physics DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 #APPEND_TO_SERVER_SOURCES(${sources})

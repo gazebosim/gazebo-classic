@@ -443,6 +443,9 @@ FIND_LIBRARY(PROFILER "profiler")
 IF (PROFILER)
   SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
        CACHE INTERNAL "Link flags for profile" FORCE)
+  SET (USE_PROFILER ON CACHE BOOL "Found profiler" FORCE)
+ELSE (PROFILER)
+  SET (USE_PROFILER OFF CACHE BOOL "Did not found profiler" FORCE)
 ENDIF (PROFILER)
 
 ########################################
