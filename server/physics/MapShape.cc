@@ -30,7 +30,6 @@
 
 #include "PhysicsEngine.hh"
 #include "GazeboConfig.hh"
-#include "Visual.hh"
 #include "Image.hh"
 #include "BoxShape.hh"
 #include "GazeboError.hh"
@@ -63,7 +62,6 @@ MapShape::MapShape(Geom *parent)
   this->granularityP = new ParamT<int>("granularity", 5, 0);
   Param::End();
 
-  this->visualNode = parent->GetVisualNode();
 }
 
 
@@ -133,10 +131,6 @@ void MapShape::Load(XMLConfigNode *node)
   }
 
   this->CreateBoxes(this->root);
-
-  /*if (this->visualNode)
-    this->visualNode->MakeStatic();
-    */
 }
 
 

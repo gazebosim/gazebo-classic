@@ -274,17 +274,20 @@ void World::Init()
 // Primarily used to update the graphics interfaces
 void World::GraphicsUpdate()
 {
+  this->scene->ProcessMessages();
+
   this->graphics->Update();
 
+  // NATY: This shouldn't be needed anymore
   // Update all the models
-  std::vector< Model* >::const_iterator miter;
+  /*std::vector< Model* >::const_iterator miter;
   for (miter=this->models.begin(); miter!=this->models.end(); miter++)
   {
     if (*miter)
     {
       (*miter)->GraphicsUpdate();
     }
-  }
+  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -535,8 +538,6 @@ void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplica
 
   if (node)
   {
-    std::cout << "Loading an entity\n";
-
     // Check for model nodes
     if (node->GetName() == "model")
     {
@@ -665,7 +666,10 @@ Common *World::GetByName(const std::string &name)
 void World::ReceiveMessage( const Message &msg )
 {
   boost::mutex::scoped_lock lock( this->mutex );
-  this->messages.push_back( msg.Clone() );
+  if (msg.type == VISUAL_MSG)
+    this->scene->ReceiveMessage(msg);
+  else
+    this->messages.push_back( msg.Clone() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -678,7 +682,7 @@ void World::ProcessMessages()
   {
     Message *msg = this->messages[i];
 
-    if (msg->type == INSERT_MODEL)
+    if (msg->type == INSERT_MODEL_MSG)
     {
       // Create the world file
       XMLConfig *xmlConfig = new XMLConfig();
@@ -858,6 +862,7 @@ void World::PauseSlot(bool p)
 /// Set the selected entity
 void World::SetSelectedEntityCB( const std::string &name )
 {
+  /* NATY: put back in
   Common *common = this->GetByName(name);
   Entity *ent = dynamic_cast<Entity*>(common);
 
@@ -880,6 +885,7 @@ void World::SetSelectedEntityCB( const std::string &name )
     this->selectedEntity = NULL;
 
   Events::entitySelectedSignal(this->selectedEntity);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

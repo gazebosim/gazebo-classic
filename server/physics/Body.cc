@@ -35,7 +35,6 @@
 #include "GazeboMessage.hh"
 #include "Geom.hh"
 #include "Timer.hh"
-#include "OgreDynamicLines.hh"
 #include "Global.hh"
 #include "Vector2.hh"
 #include "Quatern.hh"
@@ -59,6 +58,8 @@ Body::Body(Entity *parent)
 
   // NATY: put back in functionality
   // this->GetVisualNode()->SetShowInGui(false);
+
+  this->cgVisualMsg = NULL;
 
   this->comEntity = new Entity(this);
   this->comEntity->SetName("COM_Entity");
@@ -111,10 +112,13 @@ Body::~Body()
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
 
-  this->cgVisualMsg->action = VisualMsg::DELETE;
-  Simulator::Instance()->SendMessage(*this->cgVisualMsg);
-  delete this->cgVisualMsg;
-  this->cgVisualMsg = NULL;
+  if (this->cgVisualMsg)
+  {
+    this->cgVisualMsg->action = VisualMsg::DELETE;
+    Simulator::Instance()->SendMessage(*this->cgVisualMsg);
+    delete this->cgVisualMsg;
+    this->cgVisualMsg = NULL;
+  }
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
     if (giter->second)

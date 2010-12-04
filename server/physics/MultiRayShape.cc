@@ -1,4 +1,4 @@
-#include "RenderTypes.hh"
+#include "Messages.hh"
 #include "XMLConfig.hh"
 #include "MultiRayShape.hh"
 
@@ -9,15 +9,19 @@ using namespace gazebo;
 MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
 {
   this->AddType(MULTIRAY_SHAPE);
+  this->SetName("multiray");
 
-  this->rayFan = this->geomParent->GetVisualNode()->AddDynamicLine(
-      RENDERING_TRIANGLE_FAN);
+  this->rayFanMsg = new VisualMsg();
+  this->rayFanMsg->id = this->GetName()+"_fan";
+  this->rayFanMsg->parentId = this->geomParent->GetName();
+  this->rayFanMsg->render = VisualMsg::TRIANGLE_FAN;
+  this->rayFanMsg->material = "Gazebo/BlueLaser";
 
-  this->rayFanOutline = this->geomParent->GetVisualNode()->AddDynamicLine(
-      RENDERING_LINE_STRIP);
-
-  this->rayFan->setMaterial("Gazebo/BlueLaser");
-  this->rayFanOutline->setMaterial("Gazebo/BlueGlow");
+  this->rayFanOutlineMsg = new VisualMsg();
+  this->rayFanOutlineMsg->id = this->GetName()+"_fanoutline";
+  this->rayFanOutlineMsg->parentId = this->geomParent->GetName();
+  this->rayFanOutlineMsg->render = VisualMsg::LINE_STRIP;
+  this->rayFanOutlineMsg->material = "Gazebo/BlueGlow";
 
   Param::Begin(&this->parameters);
   this->rayCountP = new ParamT<int>("rayCount",0,1);
@@ -127,13 +131,10 @@ void MultiRayShape::Load(XMLConfigNode *node)
     }
   }
 
-  if (this->rayFan && this->rayFanOutline)
+  if (**this->displayTypeP == "fan")
   {
-    if (**this->displayTypeP == "fan")
-    {
-      this->rayFan->AddPoint(this->rayFan->GetPoint(0));
-      this->rayFanOutline->AddPoint(this->rayFanOutline->GetPoint(0));
-    }
+    this->rayFanMsg->points.push_back(this->rayFanMsg->points[0]);
+    this->rayFanOutlineMsg->points.push_back(this->rayFanOutlineMsg->points[0]);
   }
 }
 
@@ -225,21 +226,18 @@ void MultiRayShape::Update()
 
   this->UpdateRays();
 
-  if (this->rayFan && this->rayFanOutline)
-  {
-    if (**this->displayTypeP == "fan")
-    { 
-      i = 1;
-      for (iter = this->rays.begin(); 
-          iter != this->rays.end(); iter++, i++)
-      {
-        (*iter)->Update();
+  if (**this->displayTypeP == "fan")
+  { 
+    i = 1;
+    for (iter = this->rays.begin(); 
+        iter != this->rays.end(); iter++, i++)
+    {
+      (*iter)->Update();
 
-        (*iter)->GetRelativePoints(a,b);
+      (*iter)->GetRelativePoints(a,b);
 
-        this->rayFan->SetPoint(i,b);
-        this->rayFanOutline->SetPoint(i,b);
-      }
+      this->rayFanMsg->points[i] = b;
+      this->rayFanOutlineMsg->points[i] = b;
     }
   }
 }
@@ -249,19 +247,16 @@ void MultiRayShape::Update()
 void MultiRayShape::AddRay(const Vector3 &start, const Vector3 &end )
 {
   // Add to the renderable
-  if (this->rayFan && this->rayFanOutline)
+  if (**this->displayTypeP == "fan")
   {
-    if (**this->displayTypeP == "fan")
+    if (this->rayFanMsg->points.size() == 0)
     {
-      if (this->rayFan->GetNumPoints() == 0)
-      {
-        this->rayFan->AddPoint(start);
-        this->rayFanOutline->AddPoint(start);
-      }
-
-      this->rayFan->AddPoint(end);
-      this->rayFanOutline->AddPoint(end);
+      this->rayFanMsg->points.push_back(start);
+      this->rayFanOutlineMsg->points.push_back(start);
     }
+
+    this->rayFanMsg->points.push_back(end);
+    this->rayFanOutlineMsg->points.push_back(end);
   }
 }
 

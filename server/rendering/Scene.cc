@@ -3,6 +3,7 @@
 #include <OGRE/OgreSceneQuery.h>
 #include <OGRE/OgreRoot.h>
 
+#include "Messages.hh"
 #include "Global.hh"
 #include "Visual.hh"
 #include "OgreCreator.hh"
@@ -25,7 +26,6 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
-  std::cout << "New Scene\n";
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
@@ -56,6 +56,11 @@ Scene::Scene(const std::string &name)
 /// Destructor
 Scene::~Scene()
 {
+  std::map<std::string, Visual*>::iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+    delete iter->second;
+  this->visuals.clear();
+
   // Remove a scene
   RTShaderSystem::Instance()->RemoveScene( this );
 
@@ -637,4 +642,42 @@ std::string Scene::GetIdString() const
   return this->idString;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Receive a message
+void Scene::ReceiveMessage( const Message &msg )
+{
+  boost::mutex::scoped_lock lock( this->mutex );
+  this->messages.push_back( msg.Clone() );
+}
 
+////////////////////////////////////////////////////////////////////////////////
+// Process all messages
+void Scene::ProcessMessages()
+{
+  boost::mutex::scoped_lock lock( this->mutex );
+
+  for ( unsigned int i=0; i < this->messages.size(); i++)
+  {
+    if (this->messages[i]->type == VISUAL_MSG)
+    {
+      VisualMsg *msg = (VisualMsg*)this->messages[i];
+      std::cout << "Parent:" << msg->parentId << " ID:" << msg->id << "\n";
+      std::map<std::string, Visual*>::iterator iter;
+      iter = this->visuals.find(msg->id);
+      if (iter != this->visuals.end())
+      {
+        std::cout << "Update a visual\n";
+      }
+      else
+      {
+        std::cout << "New visual\n";
+        Visual *visual = new Visual(msg->id, this);
+        visual->LoadFromMsg(msg);
+        this->visuals[msg->id] = visual;
+      }
+
+    }
+  }
+
+  this->messages.clear();
+}

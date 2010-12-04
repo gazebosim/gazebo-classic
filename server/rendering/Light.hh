@@ -29,9 +29,10 @@
 #include <string>
 #include <iostream>
 
+#include "Pose3d.hh"
 #include "Color.hh"
 #include "Param.hh"
-#include "Entity.hh"
+#include "Common.hh"
 
 namespace Ogre
 {
@@ -47,10 +48,10 @@ namespace gazebo
   class Scene;
 
   /// \brief Wrapper around an ogre light source
-  class Light : public Entity
+  class Light : public Common
   {
     /// \brief Constructor
-    public: Light(Entity *parent, Scene *scene);
+    public: Light(Scene *scene);
 
     /// \brief Destructor
     public: virtual ~Light();
@@ -111,9 +112,11 @@ namespace gazebo
     /// The OGRE light source
     private: Ogre::Light *light;
 
-    /// Parent of the light
     private: Visual *visual;
     private: OgreDynamicLines *line;
+
+    private: std::string name;
+    private: Pose3d pose;
 
     private: ParamT<std::string> *lightTypeP;
     private: ParamT<Color> *diffuseP;

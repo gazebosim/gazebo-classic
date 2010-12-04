@@ -99,6 +99,10 @@ SET (sources Common.cc
              Plugin.cc
              Events.cc
              Box.cc
+             Plane.cc
+             Messages.cc
+             Matrix3.cc
+             Matrix4.cc
 )
 
 SET (headers Common.hh
@@ -135,6 +139,9 @@ SET (headers Common.hh
              Plugin.hh
              Messages.hh
              Box.hh
+             Plane.hh
+             Matrix3.hh
+             Matrix4.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})

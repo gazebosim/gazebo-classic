@@ -84,7 +84,6 @@ Model::Model(Common *parent)
     : Entity(parent)
 {
   this->AddType(MODEL);
-  this->GetVisualNode()->SetShowInGui(false);
 
   this->modelType = "";
   this->joint = NULL;
@@ -1164,6 +1163,7 @@ void Model::SetLaserRetro( const float &retro )
 // Load a renderable model (like a light source).
 void Model::LoadRenderable(XMLConfigNode *node)
 {
+  /* NATY: fix this!!!
   XMLConfigNode *childNode = NULL;
 
   // We still need a canonical body so that this model can be attached to
@@ -1180,6 +1180,7 @@ void Model::LoadRenderable(XMLConfigNode *node)
     this->light = new Light(body, this->GetWorld()->GetScene());
     this->light->Load(childNode);
   }
+  */
 
 }
 

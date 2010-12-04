@@ -148,7 +148,6 @@ namespace gazebo
 
     private: bool merged;
     private: static unsigned int geomCounter;
-    private: Visual *visualNode;
   };
 
 

@@ -48,7 +48,6 @@
 #include "Visual.hh"
 #include "UserCamera.hh"
 #include "OgreMovableText.hh"
-#include "OgreHUD.hh"
 #include "Entity.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"

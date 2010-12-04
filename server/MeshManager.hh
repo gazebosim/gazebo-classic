@@ -14,6 +14,7 @@ namespace gazebo
   class AssimpLoader;
   class STLLoader;
   class Mesh;
+  class Plane;
   
   class MeshManager : public SingletonT<MeshManager>
   {
@@ -69,6 +70,15 @@ namespace gazebo
     public: void CreateTube(const std::string &name, float innerRadius, 
                             float outterRadius, float height, int rings, 
                             int segments);
+
+    public: void CreatePlane(const std::string &name, const Plane &plane,
+                             const Vector2<double> &segments, 
+                             const Vector2<double> uvTile);
+
+    public: void CreatePlane(const std::string &name, const Vector3 &normal, 
+                             double d, const Vector2<double> &size, 
+                             const Vector2<double> &segments,
+                             const Vector2<double> uvTile);
 
     /// \brief Create a Camera mesh
     public: void CreateCamera(const std::string &name, float scale);

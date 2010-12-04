@@ -31,13 +31,12 @@
 
 #include "Global.hh"
 #include "Simulator.hh"
-#include "OgreCreator.hh"
-#include "OgreDynamicLines.hh"
-#include "Visual.hh"
 #include "Geom.hh"
 
 namespace gazebo
 {
+  class VisualMsg;
+
   /// \addtogroup gazebo_physics_geom
   /// \{
   /** \defgroup gazebo_ray_geom Ray geom
@@ -116,7 +115,7 @@ namespace gazebo
     protected: double contactRetro;
     protected: int contactFiducial;
   
-    protected: OgreDynamicLines *line;
+    protected: VisualMsg *lineMsg;
   
     /// Start and end positions of the ray, relative to the body
     protected: Vector3 relativeStartPos;

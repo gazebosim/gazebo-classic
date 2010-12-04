@@ -10,11 +10,11 @@
 #include "Geom.hh"
 #include "Shape.hh"
 #include "RayShape.hh"
-#include "OgreDynamicLines.hh"
 
 namespace gazebo
 {
   class XMLConfigNode;
+  class VisualMsg;
 
   /// \brief Laser geom contains a set of ray-geoms, structured to simulate
   ///        a laser range scanner
@@ -93,8 +93,8 @@ namespace gazebo
     /// \brief Add a ray to the geom
     protected: virtual void AddRay(const Vector3 &start, const Vector3 &end );
   
-    protected: OgreDynamicLines *rayFan;
-    protected: OgreDynamicLines *rayFanOutline;
+    protected: VisualMsg *rayFanMsg;
+    protected: VisualMsg *rayFanOutlineMsg;
   
     /// Ray data
     protected: std::vector< RayShape* > rays;

@@ -28,6 +28,7 @@
 // NATY
 //#include <boost/thread/recursive_mutex.hpp>
 
+#include "Messages.hh"
 #include "World.hh"
 #include "Events.hh"
 #include "OgreDynamicLines.hh"
@@ -107,78 +108,6 @@ Visual::Visual (const std::string &name, Scene *scene)
   this->Init();
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Helper for the contructor
-void Visual::Init()
-{
-  // NATY
-  //this->mutex = new boost::recursive_mutex();
-
-  this->dirty = false;
-  this->transparency = 0.0;
-  this->hasMaterial = false;
-  this->isStatic = false;
-  this->useRTShader = true;
-  this->visible = true;
-  this->ribbonTrail = NULL;
-  this->boundingBoxNode = NULL;
-  this->ignorePoseUpdates = false;
-  this->staticGeom = NULL;
-
-  Param::Begin(&this->parameters);
-  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
-  this->xyzP->Callback( &Visual::SetPosition, this );
-
-  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
-  this->rpyP->Callback( &Visual::SetRotation, this );
-
-  this->meshNameP = new ParamT<std::string>("mesh","",1);
-  this->meshTileP = new ParamT< Vector2<double> >("uvTile", 
-                                Vector2<double>(1.0, 1.0), 0 );
- 
-  //default to Gazebo/White
-  this->materialNameP = new ParamT<std::string>("material",
-                                                std::string("none"),0);
-  this->materialNameP->Callback( &Visual::SetMaterial, this );
-
-  this->castShadowsP = new ParamT<bool>("castShadows",true,0);
-  this->castShadowsP->Callback( &Visual::SetCastShadows, this );
-
-  this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
-  this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
-
-  this->normalMapNameP = new ParamT<std::string>("normalMap",
-                                                std::string("none"),0);
-  this->normalMapNameP->Callback( &Visual::SetNormalMap, this );
-
-  this->shaderP = new ParamT<std::string>("shader", std::string("pixel"),0);
-  this->shaderP->Callback( &Visual::SetShader, this );
-  Param::End();
-
-  /*if (this->sceneNode == NULL)
-  {
-    std::ostringstream stream;
-
-    // Create a unique name for the scene node
-    stream << this->GetParent()->GetName() << "_VISUAL_" << visualCounter++;
-
-    Ogre::SceneNode *pnode = NULL;
-    if (!this->GetParent())
-      pnode = this->GetWorld()->GetScene()->GetManager()->getRootSceneNode();
-    else if ( this->GetParent()->HasType(VISUAL))
-      pnode = ((Visual*)this->GetParent())->GetSceneNode();
-    else if (this->GetParent()->HasType(ENTITY))
-      pnode = ((Entity*)this->GetParent())->GetVisualNode()->GetSceneNode();
-
-    // Create the scene node
-    this->sceneNode = pnode->createChildSceneNode( stream.str() );
-  }*/
-
-  RTShaderSystem::Instance()->AttachEntity(this);
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Visual::~Visual()
@@ -248,26 +177,93 @@ Visual::~Visual()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Helper for the contructor
+void Visual::Init()
+{
+  this->transparency = 0.0;
+  this->isStatic = false;
+  this->useRTShader = true;
+  this->visible = true;
+  this->ribbonTrail = NULL;
+  this->boundingBoxNode = NULL;
+  this->staticGeom = NULL;
+
+  Param::Begin(&this->parameters);
+  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->xyzP->Callback( &Visual::SetPosition, this );
+
+  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  this->rpyP->Callback( &Visual::SetRotation, this );
+
+  this->meshNameP = new ParamT<std::string>("mesh","",1);
+  this->meshTileP = new ParamT< Vector2<double> >("uvTile", 
+                                Vector2<double>(1.0, 1.0), 0 );
+ 
+  //default to Gazebo/White
+  this->materialNameP = new ParamT<std::string>("material",
+                                                std::string("none"),0);
+  this->materialNameP->Callback( &Visual::SetMaterial, this );
+
+  this->castShadowsP = new ParamT<bool>("castShadows",true,0);
+  this->castShadowsP->Callback( &Visual::SetCastShadows, this );
+
+  this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
+  this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
+
+  this->normalMapNameP = new ParamT<std::string>("normalMap",
+                                                std::string("none"),0);
+  this->normalMapNameP->Callback( &Visual::SetNormalMap, this );
+
+  this->shaderP = new ParamT<std::string>("shader", std::string("pixel"),0);
+  this->shaderP->Callback( &Visual::SetShader, this );
+  Param::End();
+
+  RTShaderSystem::Instance()->AttachEntity(this);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void Visual::LoadFromMsg(VisualMsg *msg)
+{
+  if (msg->plane.normal != Vector3(0,0,0))
+  {
+    MeshManager::Instance()->CreatePlane(msg->id, msg->plane,
+        Vector2<double>(10,10), Vector2<double>(msg->uvTile_x, msg->uvTile_y) );
+
+    // NATY: Fix
+    //msg->mesh = OgreCreator::CreatePlane( msg->plane.normal, msg->plane.size, Vector2<double>(10,10), Vector2<double>(msg->uvTile_x, msg->uvTile_y), msg->material, msg->castShadows, this, msg->id);
+  }
+
+  this->meshNameP->SetValue(msg->mesh);
+  this->xyzP->SetValue(msg->pose.pos);
+  this->rpyP->SetValue(msg->pose.rot);
+  this->meshTileP->Load(NULL);
+  this->materialNameP->SetValue(msg->material);
+  this->castShadowsP->SetValue(msg->castShadows);
+
+  this->Load(NULL);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Load the visual
 void Visual::Load(XMLConfigNode *node)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   std::ostringstream stream;
   Pose3d pose;
   Vector3 size(0,0,0);
   Ogre::Vector3 meshSize(0,0,0);
   Ogre::MovableObject *obj = NULL;
 
-  this->xyzP->Load(node);
-  this->rpyP->Load(node);
-  this->meshNameP->Load(node);
-  this->meshTileP->Load(node);
-  this->materialNameP->Load(node);
-  this->castShadowsP->Load(node);
-  this->shaderP->Load(node);
-  this->normalMapNameP->Load(node);
+  if (node)
+  {
+    this->xyzP->Load(node);
+    this->rpyP->Load(node);
+    this->meshNameP->Load(node);
+    this->meshTileP->Load(node);
+    this->materialNameP->Load(node);
+    this->castShadowsP->Load(node);
+    this->shaderP->Load(node);
+    this->normalMapNameP->Load(node);
+  }
 
   // Read the desired position and rotation of the mesh
   pose.pos = this->xyzP->GetValue();
@@ -279,31 +275,37 @@ void Visual::Load(XMLConfigNode *node)
 
   try
   {
-    // Create the entity
-    stream << "ENTITY_" << this->sceneNode->getName();
+    // Create the visual
+    stream << "VISUAL_" << this->sceneNode->getName();
     std::string meshName = (**this->meshNameP);
-
-    if ( meshName == "unit_box")
+    if (!meshName.empty())
     {
-      meshName += "_U" + 
-        boost::lexical_cast<std::string>(this->meshTileP->GetValue().x) + "V" +
-        boost::lexical_cast<std::string>(this->meshTileP->GetValue().y);
-
-      if (!MeshManager::Instance()->HasMesh(meshName));
+      if ( meshName == "unit_box")
       {
-        MeshManager::Instance()->CreateBox(meshName, Vector3(1,1,1), 
-                                           **this->meshTileP);
+        meshName += "_U" + 
+          boost::lexical_cast<std::string>(this->meshTileP->GetValue().x) + "V" +
+          boost::lexical_cast<std::string>(this->meshTileP->GetValue().y);
+
+        if (!MeshManager::Instance()->HasMesh(meshName));
+        {
+          MeshManager::Instance()->CreateBox(meshName, Vector3(1,1,1), 
+              **this->meshTileP);
+        }
       }
+
+      if (!MeshManager::Instance()->HasMesh(meshName))
+      {
+        MeshManager::Instance()->Load(meshName);
+      }
+
+      std::cout << "Mesh Name[" << meshName << "]\n";
+
+      // Add the mesh into OGRE
+      OgreCreator::InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
+
+      obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
+          stream.str(), meshName);
     }
-
-    if (!MeshManager::Instance()->HasMesh(meshName))
-      MeshManager::Instance()->Load(meshName);
-
-    // Add the mesh into OGRE
-    OgreCreator::InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
-
-    obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
-            stream.str(), meshName);
   }
   catch (Ogre::Exception e)
   {
@@ -313,9 +315,10 @@ void Visual::Load(XMLConfigNode *node)
 
   // Attach the entity to the node
   if (obj)
+  {
     this->AttachObject(obj);
-
-  obj->setVisibilityFlags(GZ_ALL_CAMERA);
+    obj->setVisibilityFlags(GZ_ALL_CAMERA);
+  }
 
   // Set the pose of the scene node
   this->SetPose(pose);
@@ -325,7 +328,7 @@ void Visual::Load(XMLConfigNode *node)
     meshSize = obj->getBoundingBox().getSize();
 
   // Get the desired size of the mesh
-  if (node->GetChild("size") != NULL)
+  if (node && node->GetChild("size") != NULL)
   {
     this->sizeP->Load(node);
   }
@@ -333,7 +336,7 @@ void Visual::Load(XMLConfigNode *node)
     this->sizeP->SetValue( Vector3(meshSize.x, meshSize.y, meshSize.z) );
 
   // Get and set teh desired scale of the mesh
-  if (node->GetChild("scale") != NULL)
+  if (node && node->GetChild("scale") != NULL)
   {
     this->scaleP->Load(node);
     Vector3 scale = this->scaleP->GetValue();
@@ -345,8 +348,10 @@ void Visual::Load(XMLConfigNode *node)
     scale.x /= meshSize.x;
     scale.y /= meshSize.y;
     scale.z /= meshSize.z;
+    scale.Correct();
 
     this->scaleP->SetValue( scale );
+
     this->sceneNode->setScale(scale.x, scale.y, scale.z);
   }
 
@@ -356,7 +361,6 @@ void Visual::Load(XMLConfigNode *node)
 
   // Allow the mesh to cast shadows
   this->SetCastShadows((**this->castShadowsP));
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -507,11 +511,6 @@ void Visual::AttachMesh( const std::string &meshName )
   {
     const Mesh *mesh = MeshManager::Instance()->GetMesh(meshName);
 
-    if ( mesh->GetMaterialCount() > 0 )
-      this->hasMaterial = true;
-    else
-      this->hasMaterial = false;
-
     OgreCreator::InsertMesh( mesh );
   }
 
@@ -637,8 +636,6 @@ void Visual::SetMaterial(const std::string &materialName)
     gzmsg(0) << "Unable to set Material[" << myMaterialName << "] to Geometry["
     << this->sceneNode->getName() << ". Object will appear white.\n";
   }
-
-  this->hasMaterial = true;
 }
 
 
@@ -827,9 +824,6 @@ void Visual::SetPosition( const Vector3 &pos)
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  if (this->ignorePoseUpdates)
-    return;
-
   /*if (this->IsStatic() && this->staticGeom)
   {
     this->staticGeom->reset();
@@ -856,9 +850,6 @@ void Visual::SetRotation( const Quatern &rot)
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  if (this->ignorePoseUpdates)
-    return;
-
   this->sceneNode->setOrientation(rot.u, rot.x, rot.y, rot.z);
 }
 
@@ -872,9 +863,6 @@ void Visual::SetPose( const Pose3d &pose)
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  if (this->ignorePoseUpdates)
     return;
 
   this->SetPosition( pose.pos );
@@ -1095,13 +1083,6 @@ void Visual::ShowSelectionBox( bool value )
     selectionObj->Attach(NULL);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Set to true to discard all calls to "SetPose". This is useful for the 
-/// visual node children that are part of a Geom
-void Visual::SetIgnorePoseUpdates( bool value )
-{
-  this->ignorePoseUpdates = value;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return true if the  visual is a static geometry
@@ -1247,12 +1228,3 @@ std::string Visual::GetMaterialName() const
 {
   return this->myMaterialName;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if a material is set for this visual
-bool Visual::HasMaterial() const
-{
-  return this->hasMaterial;
-}
-
-

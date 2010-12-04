@@ -18,8 +18,9 @@
  *
  */
 
+#include "Simulator.hh"
+#include "Messages.hh"
 #include "Geom.hh"
-#include "OgreCreator.hh"
 #include "PlaneShape.hh"
 
 using namespace gazebo;
@@ -30,6 +31,10 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
 {
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
+
+  this->visualMsg = new VisualMsg();
+  this->visualMsg->parentId = this->geomParent->GetName();
+  this->visualMsg->id = this->GetName();
 
   Param::Begin(&this->parameters);
   this->normalP = new ParamT<Vector3>("normal",Vector3(0,0,1),0);
@@ -59,6 +64,10 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
 /// Destructor
 PlaneShape::~PlaneShape()
 {
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
+  delete this->visualMsg;
+
   delete this->normalP;
   delete this->sizeP;
   delete this->segmentsP;
@@ -98,10 +107,17 @@ void PlaneShape::Save(std::string &prefix, std::ostream &stream)
 /// Create the plane
 void PlaneShape::CreatePlane()
 {
-  this->meshName = OgreCreator::CreatePlane(**(this->normalP), 
-      **(this->sizeP), **(this->segmentsP), **(this->uvTileP), 
-      **(this->materialP), **(this->castShadowsP), 
-      this->geomParent->GetVisualNode(), this->meshName);
+  this->visualMsg->plane.Set( **(this->normalP), 
+      **(this->sizeP), 0);//**(this->segmentsP));
+
+  // NATY: segmentsP is not in the message
+  this->visualMsg->action = VisualMsg::UPDATE;
+  this->visualMsg->uvTile_x = (**(this->uvTileP)).x;
+  this->visualMsg->uvTile_y = (**(this->uvTileP)).y;
+  this->visualMsg->material = **(this->materialP);
+  this->visualMsg->castShadows = **(this->castShadowsP);
+
+  Simulator::Instance()->SendMessage( *this->visualMsg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,8 +130,6 @@ void PlaneShape::SetAltitude(const Vector3 &pos)
 /// Set the normal
 void PlaneShape::SetNormal( const Vector3 &norm )
 {
-  OgreCreator::RemoveMesh(this->meshName);
-
   this->normalP->SetValue( norm );
   this->CreatePlane();
 }
@@ -124,7 +138,6 @@ void PlaneShape::SetNormal( const Vector3 &norm )
 /// Set the size
 void PlaneShape::SetSize( const Vector2<double> &size )
 {
-  OgreCreator::RemoveMesh(this->meshName);
   this->sizeP->SetValue( size );
   this->CreatePlane();
 }
@@ -133,7 +146,6 @@ void PlaneShape::SetSize( const Vector2<double> &size )
 /// Set the number of segments
 void PlaneShape::SetSegments(const Vector2<double> &seg)
 {
-  OgreCreator::RemoveMesh(this->meshName);
   this->segmentsP->SetValue( seg );
   this->CreatePlane();
 }
@@ -142,7 +154,6 @@ void PlaneShape::SetSegments(const Vector2<double> &seg)
 /// Set the uvtile
 void PlaneShape::SetUVTile(const Vector2<double> &uv)
 {
-  OgreCreator::RemoveMesh(this->meshName);
   this->uvTileP->SetValue( uv );
   this->CreatePlane();
 }
@@ -151,7 +162,6 @@ void PlaneShape::SetUVTile(const Vector2<double> &uv)
 /// Set the material
 void PlaneShape::SetMaterial(const std::string &mat)
 {
-  OgreCreator::RemoveMesh(this->meshName);
   this->materialP->SetValue( mat );
   this->CreatePlane();
 }
@@ -160,7 +170,6 @@ void PlaneShape::SetMaterial(const std::string &mat)
 /// Set cast shadows
 void PlaneShape::SetCastShadows(const bool &cast)
 {
-  OgreCreator::RemoveMesh(this->meshName);
   this->castShadowsP->SetValue( cast );
   this->CreatePlane();
 }

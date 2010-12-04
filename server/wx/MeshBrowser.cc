@@ -37,7 +37,7 @@ MeshBrowser::MeshBrowser(wxWindow *parent)
   this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scene->Init();
 
-  this->dirLight = new Light(NULL, scene);
+  this->dirLight = new Light(scene);
   this->dirLight->Load(NULL);
   this->dirLight->SetLightType("directional");
   this->dirLight->SetDiffuseColor( Color(1.0, 1.0, 1.0) );
@@ -156,8 +156,10 @@ void MeshBrowser::OnTreeClick(wxTreeEvent &event)
   this->visual->SetCastShadows(false);
   this->visual->SetUseRTShader(false);
 
-  if ( !this->visual->HasMaterial() )
+  // NATY: not sure what this does...
+  /*if ( !this->visual->HasMaterial() )
     this->visual->SetMaterial("Gazebo/Viewer");
+    */
 
   Vector3 size = this->visual->GetBoundingBoxSize();
   if (size.x > 2.0 || size.y > 2.0 || size.z > 2.0)

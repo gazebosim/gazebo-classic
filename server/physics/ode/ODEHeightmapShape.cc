@@ -27,7 +27,6 @@
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "ODEGeom.hh"
-#include "OgreHeightmap.hh"
 #include "ODEHeightmapShape.hh"
 
 using namespace gazebo;
@@ -61,7 +60,7 @@ void ODEHeightmapShape::FillHeightMap()
     for (x=0; x<this->odeVertSize; x++)
     {
       // Find the height at a vertex
-      h = this->ogreHeightmap->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
+      //NATY: h = this->ogreHeightmap->GetHeightAt(Vector2<float>(x*this->odeScale.x, y*this->odeScale.y));
 
       // Store the height for future use
       this->heights[y*this->odeVertSize + x] = h;
@@ -97,8 +96,7 @@ void ODEHeightmapShape::Load(XMLConfigNode *node)
   */
 
   // Step 1: Create the Ogre height map: Performs a ray scene query
-  this->ogreHeightmap->Load( (**this->imageFilenameP), (**this->worldTextureP),
-                             (**this->detailTextureP), this->terrainSize );
+  //NATY this->ogreHeightmap->Load( (**this->imageFilenameP), (**this->worldTextureP), (**this->detailTextureP), this->terrainSize );
 
   // Step 2: Construct the heightmap lookup table, using the ogre ray scene
   // query functionality

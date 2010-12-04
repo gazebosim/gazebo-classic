@@ -31,9 +31,10 @@
 #include "Image.hh"
 #include "Geom.hh"
 
+
 namespace gazebo
 {
-  class OgreHeightmap;
+// NATY:  class OgreHeightmap;
 
   /// \addtogroup gazebo_physics_geom
   /// \{
@@ -103,7 +104,7 @@ namespace gazebo
     protected: ParamT<Vector3> *sizeP;
     protected: ParamT<Vector3> *offsetP;
 
-    protected: OgreHeightmap *ogreHeightmap;
+    // NATY: protected: OgreHeightmap *ogreHeightmap;
   };
 
   /// \}

@@ -32,7 +32,6 @@
 #include "Scene.hh"
 #include "Image.hh"
 #include "Global.hh"
-#include "OgreHeightmap.hh"
 #include "GazeboError.hh"
 #include "Body.hh"
 #include "HeightmapShape.hh"
@@ -54,7 +53,7 @@ HeightmapShape::HeightmapShape(Geom *parent)
   this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
   Param::End();
 
-  this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
+  // NATY: this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
 
 
@@ -68,7 +67,7 @@ HeightmapShape::~HeightmapShape()
   delete this->sizeP;
   delete this->offsetP;
 
-  delete this->ogreHeightmap;
+  // NATY: delete this->ogreHeightmap;
 }
 
 //////////////////////////////////////////////////////////////////////////////

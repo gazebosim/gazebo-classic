@@ -10,7 +10,6 @@ set (sources OgreMovableText.cc
              OgreAdaptor.cc
              OgreDynamicRenderable.cc
              OgreDynamicLines.cc
-             OgreHUD.cc
              Visual.cc
              Camera.cc
              UserCamera.cc
@@ -35,7 +34,6 @@ set (headers OgreMovableText.hh
              OgreAdaptor.hh
              OgreDynamicRenderable.hh
              OgreDynamicLines.hh
-             OgreHUD.hh
              Visual.hh
              Camera.hh
              UserCamera.hh

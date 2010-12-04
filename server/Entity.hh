@@ -38,7 +38,7 @@
 namespace gazebo
 {
 
-  class Visual;
+  class VisualMsg;
   /// \addtogroup gazebo_server
   /// \{
   
@@ -138,7 +138,7 @@ namespace gazebo
     protected: ParamT<bool> *staticP;
   
     /// \brief Visual stuff
-    protected: Visual *visualNode;
+    protected: VisualMsg *visualMsg;
   
 
     private: Pose3d relativePose;

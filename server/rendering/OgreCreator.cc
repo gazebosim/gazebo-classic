@@ -64,10 +64,9 @@ OgreCreator::~OgreCreator()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
-std::string OgreCreator::CreatePlane(const Vector3 &normal, 
+/*std::string OgreCreator::CreatePlane(const Vector3 &normal, 
     const Vector2<double> &size, const Vector2<double> &segments, 
-    const Vector2<double> &uvTile, const std::string &material, 
-    bool castShadows, Visual *parent, const std::string &name)
+    const Vector2<double> &uvTile, const std::string &name)
 {
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return std::string();
@@ -80,14 +79,7 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
 
   Ogre::Plane plane(Ogre::Vector3(n.x, n.y, n.z), 0);
 
-//FIXME: only one plane per parent
-//TODO:names and parents
-
-  if (name.empty())
-    resultName = parent->GetName() + "_PLANE";
-  else
-    resultName = name;
-
+  resultName = name;
   while (!Ogre::MeshManager::getSingleton().getByName(resultName).isNull())
     resultName += "A";
 
@@ -100,11 +92,6 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
         true,1,
         uvTile.x, uvTile.y,
         Ogre::Vector3(perp.x, perp.y, perp.z));
-
-    parent->AttachMesh(resultName);
-    parent->SetMaterial(material);
-
-    parent->SetCastShadows(true);
   }
   catch (Ogre::ItemIdentityException e)
   {
@@ -112,7 +99,7 @@ std::string OgreCreator::CreatePlane(const Vector3 &normal,
   }
 
   return resultName;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Remove a mesh by name

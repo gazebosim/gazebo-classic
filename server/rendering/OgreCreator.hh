@@ -74,10 +74,11 @@ namespace gazebo
     /// It adds itself to the Visual node parent, it will those change parent
     /// properties if needed, to avoid this create a child visual node for the 
     /// plane
-    public: static std::string CreatePlane(const Vector3 &normal, 
+    /*public: static std::string CreatePlane(const Vector3 &normal, 
                 const Vector2<double> &size, const Vector2<double> &segments, 
                 const Vector2<double> &uvTile, const std::string &material, 
                 bool castShadows, Visual *parent, const std::string &name);
+                */
 
     /// \brief Insert a mesh into Ogre 
     public: static void InsertMesh( const Mesh *mesh);

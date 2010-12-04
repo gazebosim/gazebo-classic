@@ -57,6 +57,8 @@ namespace gazebo
   class SelectionObj;
   class Scene;
   class OgreDynamicLines;
+  class VisualMsg;
+
 
   /// \brief Ogre Visual Object
   class Visual : public Common //, public Ogre::Any
@@ -75,6 +77,9 @@ namespace gazebo
 
     /// \brief Helper for the contructor
     public: void Init();
+
+    /// \brief Load from a message
+    public: void LoadFromMsg(VisualMsg *msg);
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
@@ -180,14 +185,6 @@ namespace gazebo
     //         user selection
     public: void ShowSelectionBox( bool value );
 
-    /// \brief Set to true to discard all calls to "SetPose"
-    /// This is useful for the visual node children that are part of a Geom
-    public: void SetIgnorePoseUpdates( bool value );
-
-    public: void SetDirty(bool d, Pose3d pose) {dirty =d; dirtyPose = pose;}
-    public: bool IsDirty() const {return dirty;}
-    public: void SetToDirtyPose() {SetPose(dirtyPose); dirty=false;}
-
     /// \brief Return true if the  visual is a static geometry
     public: bool IsStatic() const;
 
@@ -230,9 +227,6 @@ namespace gazebo
     /// \brief Get the name of the material
     public: std::string GetMaterialName() const;
 
-    /// \brief Return true if a material is set for this visual
-    public: bool HasMaterial() const;
-
     private: std::string myMaterialName;
     private: std::string origMaterialName;
 
@@ -260,10 +254,6 @@ namespace gazebo
     // NATY
     //private: boost::recursive_mutex *mutex;
 
-    private: bool ignorePoseUpdates;
-    private: bool dirty;
-    private: Pose3d dirtyPose;
-
     private: bool isStatic;
     private: Ogre::StaticGeometry *staticGeom;
     private: bool visible;
@@ -276,8 +266,6 @@ namespace gazebo
 
     // List of all the lines created
     private: std::list<OgreDynamicLines*> lines;
-
-    private: bool hasMaterial;
   };
 }
 

@@ -109,7 +109,8 @@ void MonoCameraSensor::InitChild()
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->camera->SetSceneNode( this->GetVisualNode()->GetSceneNode() );
+    // NATY: Put this back in!!
+    // this->camera->SetSceneNode( this->GetVisualNode()->GetSceneNode() );
     this->camera->Init();
   }
   

@@ -31,7 +31,6 @@
 #include "Body.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
-#include "Visual.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Entity.hh"
@@ -42,7 +41,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Entity::Entity(Common *parent)
-: Common(parent), visualNode(0)
+: Common(parent)
 {
   this->AddType(ENTITY);
 
@@ -289,6 +288,9 @@ void Entity::SetRelativeRotation(const Quatern &rot)
 // Handle a change of pose
 void Entity::PoseChange(bool notify)
 {
+
+  // NATY: make this pose update thing work.
+  UpdatePoseMsg msg;
   Simulator::Instance()->SendMessage( msg );
 
   if (notify)

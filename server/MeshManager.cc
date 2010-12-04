@@ -1,6 +1,9 @@
 #include <sys/stat.h>
 #include <string>
 
+#include "Plane.hh"
+#include "Matrix3.hh"
+#include "Matrix4.hh"
 #include "Simulator.hh"
 #include "GazeboConfig.hh"
 #include "GazeboError.hh"
@@ -219,6 +222,9 @@ const Mesh *MeshManager::GetMesh(const std::string &name) const
 /// Return true if the mesh exists
 bool MeshManager::HasMesh(const std::string &name) const
 {
+  if (name.empty())
+    return false;
+
   std::map<std::string, Mesh*>::const_iterator iter;
   iter = this->meshes.find(name);
 
@@ -289,6 +295,76 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   mesh->RecalculateNormals();
 }
 
+void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
+    const Vector2<double> &segments, const Vector2<double> uvTile)
+{
+  this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
+}
+
+void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal, 
+    double d, const Vector2<double> &size, const Vector2<double> &segments,
+    const Vector2<double> uvTile)
+{
+  if (this->HasMesh(name))
+  {
+    return;
+  }
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(name);
+  this->meshes.insert( std::make_pair(name, mesh) );
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  Vector3 zAxis, yAxis, xAxis;
+  zAxis = normal;
+  zAxis.Normalize();
+  yAxis = zAxis.GetPerpendicular();
+  xAxis = yAxis.GetCrossProd(zAxis);
+
+  Matrix4 xlate, xform, rot;
+  xlate = rot = Matrix4::IDENTITY;
+
+  std::cout << xlate << "\n";
+
+  Matrix3 rot3;
+  rot3.SetFromAxes(xAxis, yAxis, zAxis);
+
+  rot = rot3;
+  
+  xlate.SetTrans( normal * -d );
+  xform = xlate * rot;
+
+  Vector3 vec;
+  Vector3 norm(0,0,1);
+  double xSpace = size.x / segments.x;
+  double ySpace = size.y / segments.y;
+  double halfWidth = size.x / 2.0;
+  double halfHeight = size.y / 2.0;
+  double xTex = uvTile.x / segments.x;
+  double yTex = uvTile.y / segments.y;
+
+  for (int y = 0; y < segments.y; y++)
+  {
+    for (int x = 0; x < segments.x; x++)
+    {
+      // Compute the position of the vertex
+      vec.x = (x * xSpace) - halfWidth;
+      vec.y = (y * ySpace) - halfHeight;
+      vec.z = 0.0;
+      vec = xform.TransformAffine(vec);
+      subMesh->AddVertex(vec);
+
+      // Compute the normal
+      vec = xform.TransformAffine(norm);
+      subMesh->AddNormal(vec);
+
+      // Compute the texture coordinate
+      subMesh->AddTexCoord(x * xTex, 1 - (y * yTex));
+    }
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a Box mesh

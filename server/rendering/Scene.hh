@@ -15,6 +15,8 @@ namespace Ogre
 
 namespace gazebo
 {
+  class Visual;
+  class Message;
   class Grid;
   class Camera;
   class UserCamera;
@@ -129,6 +131,12 @@ namespace gazebo
 
     public: void InitShadows();
 
+    /// \brief Receive a message
+    public: void ReceiveMessage( const Message &msg );
+
+    /// Process all messages
+    public: void ProcessMessages();
+
     private: std::string name;
     private: ParamT<Color> *ambientP;
     private: ParamT<Color> *backgroundColorP;
@@ -156,6 +164,12 @@ namespace gazebo
     private: static unsigned int idCounter;
     private: unsigned int id;
     private: std::string idString;
+
+    private: boost::mutex mutex;
+    private: std::vector<Message*> messages;
+
+    private: std::map<std::string, Visual*> visuals;
+
   };
 };
 #endif 

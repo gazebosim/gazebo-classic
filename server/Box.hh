@@ -7,6 +7,9 @@ namespace gazebo
 {
   class Box
   {
+    /// \brief Default constructor
+    public: Box();
+
     /// \brief Constructor
     public: Box (const Vector3 min, const Vector3 max);
 
@@ -21,6 +24,9 @@ namespace gazebo
 
     /// \brief Get the length along the z dimension
     public: double GetZLength();
+
+    /// \brief Equal operator
+    public: const Box &operator=( const Box &b );
 
     public: Vector3 min, max;
   };

@@ -100,6 +100,7 @@ void GraphicsIfaceHandler::Init()
 /// Update the graphics handler
 void GraphicsIfaceHandler::Update()
 {
+  /* NATY: fix this
   Visual *vis = NULL;
   std::map<std::string, Visual* >::iterator iter;
 
@@ -161,6 +162,7 @@ void GraphicsIfaceHandler::Update()
 
   this->threeDIface->data->cmdCount = 0;
   this->threeDIface->Unlock();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

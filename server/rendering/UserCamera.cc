@@ -393,6 +393,7 @@ void UserCamera::MoveToEntity(Entity *entity)
 /// Set the camera to track an entity
 void UserCamera::TrackModel( Model *model )
 {
+  /* NATY: Put back in
   this->sceneNode->getParent()->removeChild(this->sceneNode);
 
   if (model)
@@ -408,4 +409,5 @@ void UserCamera::TrackModel( Model *model )
     this->camera->setPosition(Ogre::Vector3(0,0,0));
     this->camera->setOrientation(Ogre::Quaternion(-.5,-.5,.5,.5));
   }
+  */
 }

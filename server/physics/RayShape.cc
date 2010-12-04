@@ -24,28 +24,34 @@
  * SVN: $Id:$
  */
 
-#include "RenderTypes.hh"
+#include "Messages.hh"
+#include "Simulator.hh"
 #include "RayShape.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
+RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
 {
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
   {
-    this->line = this->geomParent->GetVisualNode()->AddDynamicLine(RENDERING_LINE_LIST);
+    this->lineMsg = new VisualMsg();
+    this->lineMsg->id = this->GetName();
+    this->lineMsg->parentId = this->geomParent->GetName();
+    this->lineMsg->render = VisualMsg::LINE_LIST;
 
     // Add two points
-    this->line->AddPoint(Vector3(0,0,0));
-    this->line->AddPoint(Vector3(0,0,0));
+    this->lineMsg->points.push_back(Vector3(0,0,0));
+    this->lineMsg->points.push_back(Vector3(0,0,0));
 
-    this->line->setMaterial("Gazebo/BlueGlow");
-    this->line->setVisibilityFlags(GZ_LASER_CAMERA);
+    this->lineMsg->material = "Gazebo/BlueGlow";
+
+    // NATY: put back in
+    //this->lineMsg->visibility = GZ_LASER_CAMERA;
   }
 
   this->contactLen = DBL_MAX;
@@ -65,6 +71,7 @@ RayShape::~RayShape()
 /// Set to true in order to view individual rays
 void RayShape::SetDisplayType( bool displayRays )
 {
+  /* NATY: do we need this?
   if (Simulator::Instance()->GetRenderEngineEnabled() )
   {
     if (!displayRays)
@@ -72,6 +79,7 @@ void RayShape::SetDisplayType( bool displayRays )
     else
       this->geomParent->GetVisualNode()->AttachObject(this->line);
   }
+  */
 }
  
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,12 +100,10 @@ void RayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (this->line)
-  {
-    // Set the line's position relative to it's parent scene node
-    this->line->SetPoint(0, this->relativeStartPos);
-    this->line->SetPoint(1, this->relativeEndPos);
-  }
+  // Set the line's position relative to it's parent scene node
+  this->lineMsg->points[0] = this->relativeStartPos;
+  this->lineMsg->points[1] = this->relativeEndPos;
+  Simulator::Instance()->SendMessage( *this->lineMsg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,10 +133,8 @@ void RayShape::SetLength( double len )
 
   this->relativeEndPos = dir * len + this->relativeStartPos;
 
-  if (this->line)
-  {
-    this->line->SetPoint(1,  this->relativeEndPos);
-  }
+  this->lineMsg->points[1] = this->relativeEndPos;
+  Simulator::Instance()->SendMessage( *this->lineMsg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -219,13 +219,10 @@ namespace gazebo
     protected: ParamT<Quatern> *rpyP;
     protected: ParamT<bool> *enableContactsP;
 
-    /// Special bounding box visual
-    private: Visual *bbVisual;
-
     private: float transparency;
 
     /// All the visual apparence 
-    private: std::vector<VisualMsg> visualMsgs;
+    private: std::vector<VisualMsg*> visualMsgs;
     private: VisualMsg *bbVisualMsg;
 
     protected: Shape *shape;

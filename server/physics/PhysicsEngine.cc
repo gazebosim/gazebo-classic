@@ -66,7 +66,7 @@ PhysicsEngine::PhysicsEngine(World *world)
     this->visualMsg->castShadows = false;
     this->visualMsg->action = VisualMsg::UPDATE;
 
-    Simulator::Instance()->SendMessage( *this->visualMsg );
+    //Simulator::Instance()->SendMessage( *this->visualMsg );
 
     /* NATY: put this back in
     this->contactLines.resize(5000);

@@ -47,18 +47,16 @@ unsigned int Light::lightCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Light::Light(Entity *parent, Scene *scene)
-  : Entity(parent)
+Light::Light(Scene *scene)
+  : Common(NULL)
 {
-  this->AddType(LIGHT);
   this->scene = scene;
 
   std::ostringstream stream;
-
-  if (parent)
-    stream << parent->GetName() << "_";
   stream << "LIGHT" << this->lightCounter;
-  this->SetName(stream.str());
+  this->name = stream.str();
+
+  this->visual = new Visual(this->name+"_VISUAL", this->scene);
 
   this->lightCounter++;
 
@@ -119,6 +117,7 @@ Light::~Light()
     this->scene->GetManager()->destroyLight(this->GetName());
   }
 
+  delete this->visual;
   delete this->lightTypeP;
   delete this->diffuseP;
   delete this->specularP;
@@ -174,7 +173,7 @@ void Light::Load(XMLConfigNode *node)
                                    Ogre::Degree(vec.y), vec.z);
   }*/
 
-  this->visualNode->AttachObject(light);
+  this->visual->AttachObject(this->light);
 
   this->CreateVisual();
   this->SetupShadows();
@@ -207,7 +206,7 @@ void Light::CreateVisual()
     return;
 
   // The lines draw a visualization of the camera
-  this->line = this->visualNode->AddDynamicLine( RENDERING_LINE_LIST );
+  this->line = this->visual->AddDynamicLine( RENDERING_LINE_LIST );
 
   if ( **this->lightTypeP == "point" )
   {
@@ -294,14 +293,15 @@ void Light::CreateVisual()
   this->line->setVisibilityFlags(GZ_LASER_CAMERA);
 
   // turn off light source box visuals by default
-  this->visualNode->SetVisible(true);
+  this->visual->SetVisible(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set whether this entity has been selected by the user through the gui
 bool Light::SetSelected( bool s )
 {
-  Entity::SetSelected(s);
+  // NATY: FIX 
+  // Entity::SetSelected(s);
 
   if (this->light->getType() != Ogre::Light::LT_DIRECTIONAL)
   {
@@ -318,14 +318,14 @@ bool Light::SetSelected( bool s )
 // Toggle light visual visibility
 void Light::ToggleShowVisual()
 {
-  this->visualNode->ToggleVisible();
+  this->visual->ToggleVisible();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set whether to show the visual
 void Light::ShowVisual(bool s)
 {
-  this->visualNode->SetVisible(s);
+  this->visual->SetVisible(s);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,8 +338,6 @@ void Light::SetLightType(const std::string &type)
   else if (type == "directional")
   {
     this->light->setType(Ogre::Light::LT_DIRECTIONAL);
-    if (this->parent && this->parent->HasType(MODEL))
-      this->parent->GetParentModel()->SetStatic(true);
   }
   else if (type == "spot")
     this->light->setType(Ogre::Light::LT_SPOTLIGHT);

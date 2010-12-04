@@ -32,7 +32,6 @@
 #include "World.hh"
 #include "TrimeshShape.hh"
 #include "GazeboError.hh"
-#include "OgreAdaptor.hh"
 
 using namespace gazebo;
 

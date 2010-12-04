@@ -1,6 +1,14 @@
+#include <math.h>
 #include "Box.hh"
 
 using namespace gazebo;
+
+////////////////////////////////////////////////////////////////////////////////
+/// Default constructor
+Box::Box()
+{
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -34,4 +42,14 @@ double Box::GetYLength()
 double Box::GetZLength()
 {
   return fabs(max.z - min.z);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Equal operator
+const Box &Box::operator=( const Box &b )
+{
+  this->max = b.max;
+  this->min = b.min;
+
+  return *this;
 }
