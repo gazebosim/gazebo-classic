@@ -39,6 +39,8 @@ namespace gazebo
               }
               out << "\n";
             }
+
+            return out;
           }
 
     public: static const Matrix4 IDENTITY;

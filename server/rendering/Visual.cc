@@ -227,10 +227,8 @@ void Visual::LoadFromMsg(VisualMsg *msg)
   if (msg->plane.normal != Vector3(0,0,0))
   {
     MeshManager::Instance()->CreatePlane(msg->id, msg->plane,
-        Vector2<double>(10,10), Vector2<double>(msg->uvTile_x, msg->uvTile_y) );
-
-    // NATY: Fix
-    //msg->mesh = OgreCreator::CreatePlane( msg->plane.normal, msg->plane.size, Vector2<double>(10,10), Vector2<double>(msg->uvTile_x, msg->uvTile_y), msg->material, msg->castShadows, this, msg->id);
+        Vector2<double>(2,2), Vector2<double>(msg->uvTile_x, msg->uvTile_y) );
+    msg->mesh = msg->id;
   }
 
   this->meshNameP->SetValue(msg->mesh);

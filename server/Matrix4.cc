@@ -6,16 +6,16 @@
 using namespace gazebo;
 
 const Matrix4 Matrix4::IDENTITY(
-       1, 0, 0, 0,
-       0, 1, 0, 0,
-       0, 0, 1, 0,
-       0, 0, 0, 1 );
+       1.0, 0.0, 0.0, 0.0,
+       0.0, 1.0, 0.0, 0.0,
+       0.0, 0.0, 1.0, 0.0,
+       0.0, 0.0, 0.0, 1.0 );
 
 const Matrix4 Matrix4::ZERO(
-       0, 0, 0, 0,
-       0, 0, 0, 0,
-       0, 0, 0, 0,
-       0, 0, 0, 0 );
+       0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0,
+       0.0, 0.0, 0.0, 0.0 );
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,6 +53,11 @@ Matrix4::Matrix4(double v00, double v01, double v02, double v03,
   this->m[2][1] = v21;
   this->m[2][2] = v22;
   this->m[2][3] = v23;
+
+  this->m[3][0] = v30;
+  this->m[3][1] = v31;
+  this->m[3][2] = v32;
+  this->m[3][3] = v33;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +142,10 @@ bool Matrix4::IsAffine() const
 Vector3 Matrix4::TransformAffine( const Vector3 &v ) const
 {
   if (!this->IsAffine())
+  {
+    std::cout << "****\n" << *this << "***\n";
     gzthrow("Not and affine matrix");
+  }
 
   return Vector3(
       this->m[0][0]*v.x + this->m[0][1]*v.y + this->m[0][2]*v.z + this->m[0][3],

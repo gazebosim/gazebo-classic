@@ -15,6 +15,7 @@ namespace gazebo
   class STLLoader;
   class Mesh;
   class Plane;
+  class SubMesh;
   
   class MeshManager : public SingletonT<MeshManager>
   {
@@ -79,6 +80,9 @@ namespace gazebo
                              double d, const Vector2<double> &size, 
                              const Vector2<double> &segments,
                              const Vector2<double> uvTile);
+
+    private: void Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
+                                  bool doubleSided);
 
     /// \brief Create a Camera mesh
     public: void CreateCamera(const std::string &name, float scale);

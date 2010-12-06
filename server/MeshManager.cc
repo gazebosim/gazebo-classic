@@ -314,6 +314,8 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
   mesh->SetName(name);
   this->meshes.insert( std::make_pair(name, mesh) );
 
+  std::cout << "Plane Name[" << name << "]\n";
+
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
@@ -326,13 +328,11 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
   Matrix4 xlate, xform, rot;
   xlate = rot = Matrix4::IDENTITY;
 
-  std::cout << xlate << "\n";
-
   Matrix3 rot3;
   rot3.SetFromAxes(xAxis, yAxis, zAxis);
 
   rot = rot3;
-  
+ 
   xlate.SetTrans( normal * -d );
   xform = xlate * rot;
 
@@ -345,9 +345,9 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
   double xTex = uvTile.x / segments.x;
   double yTex = uvTile.y / segments.y;
 
-  for (int y = 0; y < segments.y; y++)
+  for (int y = 0; y <= segments.y; y++)
   {
-    for (int x = 0; x < segments.x; x++)
+    for (int x = 0; x <= segments.x; x++)
     {
       // Compute the position of the vertex
       vec.x = (x * xSpace) - halfWidth;
@@ -355,6 +355,8 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
       vec.z = 0.0;
       vec = xform.TransformAffine(vec);
       subMesh->AddVertex(vec);
+
+      std::cout << "Vec[" << vec << "]\n";
 
       // Compute the normal
       vec = xform.TransformAffine(norm);
@@ -364,6 +366,8 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
       subMesh->AddTexCoord(x * xTex, 1 - (y * yTex));
     }
   }
+
+  this->Tesselate2DMesh( subMesh, segments.x + 1, segments.y + 1, false  );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -903,5 +907,72 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   }
 
   mesh->RecalculateNormals();
+}
+
+void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight, 
+                                  bool doubleSided)
+{
+  int vInc, uInc, v, u, iterations;
+  int vCount, uCount;
+
+  if (doubleSided)
+  {
+    iterations = 2;
+    vInc = 1;
+    v = 0; // Start with the front
+  }
+  else
+  {
+    iterations = 1;
+    vInc = 1;
+    v = 0;
+  }
+
+  int v1, v2, v3;
+
+  while (iterations--)
+  {
+    // Make tris in a zigzag pattern (compatible with strips)
+    u = 0;
+    uInc = 1; // Start with moving +u
+
+    vCount = meshHeight - 1;
+    while (vCount--)
+    {
+      uCount = meshWidth - 1;
+      while (uCount--)
+      {
+        // First tri in cell
+        v1 = ((v + vInc) * meshWidth) + u;
+        v2 = (v * meshWidth) + u;
+        v3 = ((v + vInc) * meshWidth) + (u + uInc);
+        // Output indexes
+        sm->AddIndex(v1);
+        sm->AddIndex(v2);
+        sm->AddIndex(v3);
+        std::cout << v1 <<" " << v2 <<" " << v3 << "\n";
+        // Second Tri in cell
+        v1 = ((v + vInc) * meshWidth) + (u + uInc);
+        v2 = (v * meshWidth) + u;
+        v3 = (v * meshWidth) + (u + uInc);
+        std::cout << v1 <<" " << v2 <<" " << v3 << "\n";
+        // Output indexes
+        sm->AddIndex(v1);
+        sm->AddIndex(v2);
+        sm->AddIndex(v3);
+
+        // Next column
+        u += uInc;
+      }
+
+      // Next row
+      v += vInc;
+      u = 0;
+    }
+
+    // Reverse vInc for double sided
+    v = meshHeight - 1;
+    vInc = -vInc;
+  }
 }
 
