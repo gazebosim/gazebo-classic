@@ -107,6 +107,7 @@ namespace gazebo
       /// \brief Get the currently active world
       public: World *GetActiveWorld() const;
 
+
       /// \brief Main simulation loop, when this loop ends the simulation finish
       public: void Run();
   

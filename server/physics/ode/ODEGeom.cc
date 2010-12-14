@@ -29,7 +29,6 @@
 #include "PhysicsEngine.hh"
 #include "ODEPhysics.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "SurfaceParams.hh"

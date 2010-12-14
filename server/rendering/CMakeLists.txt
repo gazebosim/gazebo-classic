@@ -6,7 +6,6 @@ include_directories (
 )
 
 set (sources OgreMovableText.cc
-             OgreCreator.cc
              OgreAdaptor.cc
              OgreDynamicRenderable.cc
              OgreDynamicLines.cc
@@ -30,7 +29,6 @@ set (sources OgreMovableText.cc
 )
 
 set (headers OgreMovableText.hh
-             OgreCreator.hh
              OgreAdaptor.hh
              OgreDynamicRenderable.hh
              OgreDynamicLines.hh

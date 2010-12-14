@@ -8,7 +8,6 @@
 #include "RenderControl.hh"
 #include "OrbitViewController.hh"
 #include "FPSViewController.hh"
-#include "OgreCreator.hh"
 #include "Visual.hh"
 #include "Simulator.hh"
 #include "MeshBrowser.hh"
@@ -136,7 +135,9 @@ void MeshBrowser::OnTreeClick(wxTreeEvent &event)
     return;
 
   const Mesh *mesh = MeshManager::Instance()->Load(data->filename);
-  OgreCreator::Instance()->InsertMesh(mesh);
+
+  // NATY: Fix this to use messages!!
+  Visual::InsertMesh(mesh);
 
   if (this->visual)
     delete this->visual;

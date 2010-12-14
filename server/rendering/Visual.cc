@@ -42,8 +42,9 @@
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
 #include "OgreAdaptor.hh"
-#include "OgreCreator.hh"
 #include "Global.hh"
+#include "Mesh.hh"
+#include "Material.hh"
 #include "Visual.hh"
 
 using namespace gazebo;
@@ -112,9 +113,6 @@ Visual::Visual (const std::string &name, Scene *scene)
 /// Destructor
 Visual::~Visual()
 {
-  // NATY
-  //delete this->mutex;
-
   delete this->xyzP;
   delete this->rpyP;
   delete this->meshNameP;
@@ -299,7 +297,7 @@ void Visual::Load(XMLConfigNode *node)
       std::cout << "Mesh Name[" << meshName << "]\n";
 
       // Add the mesh into OGRE
-      OgreCreator::InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
+      this->InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
 
       obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
           stream.str(), meshName);
@@ -406,6 +404,22 @@ void Visual::Save(std::string &prefix, std::ostream &stream)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// Attach a visual
+void Visual::AttachVisual(Visual *vis)
+{
+  this->sceneNode->addChild( vis->GetSceneNode() );
+  vis->SetParent(this);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Detach a visual 
+void Visual::DetachVisual(Visual *vis)
+{
+  this->sceneNode->removeChild(vis->GetSceneNode());
+  vis->SetParent(NULL);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Attach a renerable object to the visual
 void Visual::AttachObject( Ogre::MovableObject *obj)
 {
@@ -509,7 +523,7 @@ void Visual::AttachMesh( const std::string &meshName )
   {
     const Mesh *mesh = MeshManager::Instance()->GetMesh(meshName);
 
-    OgreCreator::InsertMesh( mesh );
+    this->InsertMesh( mesh );
   }
 
   obj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
@@ -644,7 +658,7 @@ void Visual::AttachAxes()
   nodeName << this->sceneNode->getName()<<"_AXES_NODE";
  
   if (!this->sceneNode->getCreator()->hasEntity("axis_cylinder"))
-    OgreCreator::InsertMesh(MeshManager::Instance()->GetMesh("axis_cylinder"));
+    this->InsertMesh(MeshManager::Instance()->GetMesh("axis_cylinder"));
 
   Ogre::SceneNode *node = this->sceneNode->createChildSceneNode(nodeName.str());
   Ogre::SceneNode *x, *y, *z;
@@ -959,7 +973,7 @@ Pose3d Visual::GetWorldPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get this visual Ogre node
-Ogre::SceneNode * Visual::GetSceneNode()
+Ogre::SceneNode * Visual::GetSceneNode() const
 {
   // NATY
   //boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -1000,7 +1014,7 @@ void Visual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
   if (!this->sceneNode->getCreator()->hasEntity("unit_box_U1V1"))
   {
     // Add the mesh into OGRE
-    OgreCreator::InsertMesh(MeshManager::Instance()->GetMesh("unit_box_U1V1"));
+    this->InsertMesh(MeshManager::Instance()->GetMesh("unit_box_U1V1"));
   }
 
   Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box_U1V1"));
@@ -1076,7 +1090,7 @@ void Visual::ShowSelectionBox( bool value )
   }
 
   if (value)
-    selectionObj->Attach(this->sceneNode);
+    selectionObj->Attach(this);
   else
     selectionObj->Attach(NULL);
 }
@@ -1225,4 +1239,207 @@ void Visual::DeleteDynamicLine(OgreDynamicLines *line)
 std::string Visual::GetMaterialName() const
 {
   return this->myMaterialName;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the bounds
+Box Visual::GetBounds() const
+{
+  Box result;
+  Ogre::AxisAlignedBox box;
+  this->GetBoundsHelper(this->GetSceneNode(), box);
+
+  result.min.x = box.getMinimum().x;
+  result.min.y = box.getMinimum().y;
+  result.min.z = box.getMinimum().z;
+
+  result.max.x = box.getMaximum().x;
+  result.max.y = box.getMaximum().y;
+  result.max.z = box.getMaximum().z;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the bounding box for a scene node
+void Visual::GetBoundsHelper(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box) const
+{
+  node->_updateBounds();
+
+  //box.merge(node->_getWorldAABB());
+  Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
+
+  for (int i=0; i < node->numAttachedObjects(); i++)
+  {
+    Ogre::MovableObject *obj = node->getAttachedObject(i);
+    if (obj->isVisible() && obj->getMovableType() != "gazebo::ogredynamiclines")
+    {
+      Ogre::Any any = obj->getUserAny();
+      if (any.getType() == typeid(std::string))
+      {
+        std::string str = Ogre::any_cast<std::string>(any);
+        if (str.substr(0,3) == "rot" || str.substr(0,5) == "trans")
+          continue;
+      }
+      box.merge(obj->getWorldBoundingBox());
+    }
+  }
+
+  while(it.hasMoreElements())
+  {
+    Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
+    this->GetBoundsHelper( next, box);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Insert a mesh into Ogre 
+void Visual::InsertMesh( const Mesh *mesh)
+{
+  Ogre::MeshPtr ogreMesh;
+
+  if (mesh->GetSubMeshCount() == 0)
+    return;
+
+  try
+  {
+    // Create a new mesh specifically for manual definition.
+    ogreMesh = Ogre::MeshManager::getSingleton().createManual(mesh->GetName(),
+        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+    for (unsigned int i=0; i < mesh->GetSubMeshCount(); i++)
+    {
+      Ogre::SubMesh *ogreSubMesh;
+      Ogre::VertexData *vertexData;
+      Ogre::VertexDeclaration* vertexDecl;
+      Ogre::HardwareVertexBufferSharedPtr vBuf;
+      Ogre::HardwareIndexBufferSharedPtr iBuf;
+      float *vertices;
+      unsigned short *indices;
+
+
+      size_t currOffset = 0;
+
+      const SubMesh *subMesh = mesh->GetSubMesh(i);
+
+      ogreSubMesh = ogreMesh->createSubMesh();
+      ogreSubMesh->useSharedVertices = false;
+      ogreSubMesh->vertexData = new Ogre::VertexData();
+      vertexData = ogreSubMesh->vertexData;
+      vertexDecl = vertexData->vertexDeclaration;
+
+      // The vertexDecl should contain positions, blending weights, normals,
+      // diffiuse colors, specular colors, tex coords. In that order.
+      vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, 
+                             Ogre::VES_POSITION);
+      currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+
+      // TODO: blending weights
+      
+      // normals
+      if (subMesh->GetNormalCount() > 0 )
+      {
+        vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT3, 
+                               Ogre::VES_NORMAL);
+        currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+      }
+
+      // TODO: diffuse colors
+
+      // TODO: specular colors
+
+      // two dimensional texture coordinates
+      if (subMesh->GetTexCoordCount() > 0)
+      {
+        vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
+            Ogre::VES_TEXTURE_COORDINATES, 0);
+        currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
+      }
+
+      // allocate the vertex buffer
+      vertexData->vertexCount = subMesh->GetVertexCount();
+
+      vBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+                 vertexDecl->getVertexSize(0),
+                 vertexData->vertexCount,
+                 Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+                 false);
+
+      vertexData->vertexBufferBinding->setBinding(0, vBuf);
+      vertices = static_cast<float*>(vBuf->lock(
+                      Ogre::HardwareBuffer::HBL_DISCARD));
+
+      // allocate index buffer
+      ogreSubMesh->indexData->indexCount = subMesh->GetIndexCount();
+
+      ogreSubMesh->indexData->indexBuffer =
+        Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+            Ogre::HardwareIndexBuffer::IT_16BIT,
+            ogreSubMesh->indexData->indexCount,
+            Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            false);
+
+      iBuf = ogreSubMesh->indexData->indexBuffer;
+      indices = static_cast<unsigned short*>(
+          iBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+
+      unsigned int j;
+
+      // Add all the vertices
+      for (j =0; j < subMesh->GetVertexCount(); j++)
+      {
+        *vertices++ = subMesh->GetVertex(j).x;
+        *vertices++ = subMesh->GetVertex(j).y;
+        *vertices++ = subMesh->GetVertex(j).z;
+
+        if (subMesh->GetNormalCount() > 0)
+        {
+          *vertices++ = subMesh->GetNormal(j).x;
+          *vertices++ = subMesh->GetNormal(j).y;
+          *vertices++ = subMesh->GetNormal(j).z;
+        }
+
+        if (subMesh->GetTexCoordCount() > 0)
+        {
+          *vertices++ = subMesh->GetTexCoord(j).x;
+          *vertices++ = subMesh->GetTexCoord(j).y;
+        }
+      }
+
+      // Add all the indices
+      for (j =0; j < subMesh->GetIndexCount(); j++)
+        *indices++ = subMesh->GetIndex(j);
+
+      const Material *material;
+      material = mesh->GetMaterial( subMesh->GetMaterialIndex() );
+      if (material)
+      {
+        ogreSubMesh->setMaterialName( material->GetName() );
+      }
+
+      // Unlock
+      vBuf->unlock();
+      iBuf->unlock();
+    }
+
+    Vector3 max = mesh->GetMax();
+    Vector3 min = mesh->GetMin();
+
+    if (!max.IsFinite())
+      gzthrow("Max bounding box is not finite[" << max << "]\n");
+
+    if (!min.IsFinite())
+      gzthrow("Min bounding box is not finite[" << min << "]\n");
+
+
+    ogreMesh->_setBounds( Ogre::AxisAlignedBox(
+          Ogre::Vector3(min.x, min.y, min.z),
+          Ogre::Vector3(max.x, max.y, max.z)), 
+          false );
+
+    // this line makes clear the mesh is loaded (avoids memory leaks)
+    ogreMesh->load();
+  }
+  catch (Ogre::Exception e)
+  {
+    gzerr(0) << "Unable to create a basic Unit cylinder object" << std::endl;
+  }
 }

@@ -179,16 +179,13 @@ void Geom::Load(XMLConfigNode *node)
     msg->render = VisualMsg::MESH_RESOURCE;
     msg->Load(childNode);
     msg->castShadows = false;
+    msg->pose = this->GetWorldPose();
+    std::cout << "Geom[" << this->GetName() << "] Create a Visual Message with Pose[" << msg->pose << "]\n";
+
     Simulator::Instance()->SendMessage( *msg );
 
     this->visualMsgs.push_back(msg);
-
-    // NATY: get rid of this
-    //visual->SetOwner(this);
-    //visual->SetCastShadows(true);
-    //this->visuals.push_back(visual);
-    //visual->SetIgnorePoseUpdates(true);
-    
+   
     childNode = childNode->GetNext("visual");
   }
 }

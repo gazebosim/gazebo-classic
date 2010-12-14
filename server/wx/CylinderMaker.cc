@@ -5,7 +5,6 @@
 #include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "World.hh"
 #include "CylinderMaker.hh"
 

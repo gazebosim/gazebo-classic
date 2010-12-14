@@ -34,7 +34,6 @@
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
 #include "Model.hh"

@@ -47,7 +47,22 @@
         </geom>
       </body>
     </model>
-   
+
+    <model type="physical" name="box_model">
+      <xyz>0 0 1.5</xyz>
+      <body name="body">
+        <geom type="box" name="geom">
+          <size>1 1 1</size>
+          <mass>1.0</mass>
+          <visual>
+            <size>1 1 1</size>
+            <mesh>unit_box</mesh>
+            <material>Gazebo/Red</material>
+          </visual>
+        </geom>
+      </body>
+    </model>
+
     <!-- White Point light -->
     <model type="renderable" name="point_white">
       <xyz>0.0 0 10</xyz>

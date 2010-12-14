@@ -449,6 +449,7 @@ void SimulationFrame::OnToolClicked( wxCommandEvent &event )
   {
     this->toolbar->ToggleTool(PLAY, false);
     this->toolbar->ToggleTool(STEP, false);
+    Events::stepSignal();
     // NATY : put back in 
     //Simulator::Instance()->GetActiveWorld()->SetStepInc( true );
   }

@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 
+#include "Material.hh"
 #include "RenderTypes.hh"
 #include "Scene.hh"
 #include "World.hh"
@@ -34,7 +35,6 @@
 #include "GazeboMessage.hh"
 #include "IfaceFactory.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "OgreDynamicLines.hh"
 #include "OgreMovableText.hh"
 #include "GraphicsIfaceHandler.hh"
@@ -211,10 +211,10 @@ void GraphicsIfaceHandler::DrawSimple(Visual *vis, libgazebo::Graphics3dDrawData
     line = vis->AddDynamicLine(opType);
   }
 
-  line->setMaterial(OgreCreator::CreateMaterial( data->color.r,
-                                                 data->color.g,
-                                                 data->color.b,
-                                                 data->color.a ));
+  Material material( Color(data->color.r, data->color.g, data->color.b,
+                           data->color.a) );
+
+  line->setMaterial( material.GetName() );
 
   // Set the line vertices
   for (unsigned int i=0; i < data->pointCount; i++)
@@ -239,10 +239,10 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_box_U1V1");
 
-        vis->SetMaterial( OgreCreator::CreateMaterial( data->color.r,
-                                                 data->color.g,
-                                                 data->color.b,
-                                                 data->color.a ));
+        Material material( Color( data->color.r, data->color.g,
+                                  data->color.b, data->color.a ) );
+
+        vis->SetMaterial( material.GetName() );
         vis->SetScale(Vector3(data->size.x, data->size.y, data->size.z) );
         vis->SetPosition(Vector3(data->pose.pos.x, 
                                  data->pose.pos.y, 
@@ -255,11 +255,10 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_cylinder");
 
-        vis->SetMaterial( OgreCreator::CreateMaterial( data->color.r,
-                                                 data->color.g,
-                                                 data->color.b,
-                                                 data->color.a ));
+        Material material( Color(data->color.r, data->color.g,
+                                 data->color.b, data->color.a) );
 
+        vis->SetMaterial( material.GetName() );
 
         vis->SetScale(Vector3(data->size.x, data->size.y, data->size.z) );
         vis->SetPosition(Vector3(data->pose.pos.x, 
@@ -273,10 +272,10 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_cone");
 
-        vis->SetMaterial( OgreCreator::CreateMaterial( data->color.r,
-                                                 data->color.g,
-                                                 data->color.b,
-                                                 data->color.a ));
+        Material material( Color(data->color.r, data->color.g,
+                                 data->color.b, data->color.a) );
+
+        vis->SetMaterial( material.GetName() );
 
         vis->SetScale(Vector3(data->size.x, data->size.y, data->size.z) );
         vis->SetPosition(Vector3(data->pose.pos.x, 
@@ -290,10 +289,10 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
         if (vis->GetNumAttached() <= 0)
           vis->AttachMesh("unit_sphere");
 
-        vis->SetMaterial( OgreCreator::CreateMaterial( data->color.r,
-                                                 data->color.g,
-                                                 data->color.b,
-                                                 data->color.a ));
+        Material material( Color(data->color.r, data->color.g,
+                                 data->color.b, data->color.a) );
+
+        vis->SetMaterial( material.GetName() );
 
         vis->SetScale(Vector3(data->size.x, data->size.y, data->size.z) );
         vis->SetPosition(Vector3(data->pose.pos.x, 
@@ -334,8 +333,11 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
         if (textureName.find(".") != std::string::npos)
           bset->setMaterialName( textureName );
         else 
-          bset->setMaterialName( 
-              OgreCreator::CreateMaterialFromTexFile( textureName ));
+        {
+          Material mat;
+          mat.SetTextureImage( textureName );
+          bset->setMaterialName( mat.GetName() );
+        }
 
         if (!attached)
           vis->AttachObject(bset);
@@ -355,6 +357,7 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
 /// Helper funciton used to draw text
 void GraphicsIfaceHandler::DrawText(Visual *vis, libgazebo::Graphics3dDrawData *data)
 {
+  /* NATY: put back in
   bool attached = false;
   OgreMovableText* msg = NULL;
 
@@ -385,6 +388,7 @@ void GraphicsIfaceHandler::DrawText(Visual *vis, libgazebo::Graphics3dDrawData *
 
   if (!attached)
     vis->AttachObject( msg );
+    */
 }
 
 

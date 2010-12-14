@@ -217,7 +217,10 @@ class World
   private: void SetState(std::deque<WorldState>::iterator iter);
 
   /// \brief Pause callback
-  private: void PauseSlot(bool p);
+  private: void PauseCB(bool p);
+
+  /// \brief Step callback
+  private: void StepCB();
 
   /// \brief Load a model
   /// \param node Pointer to the XMLConfig node
@@ -284,6 +287,7 @@ class World
   /// Current simulation time
   private: Time simTime, pauseTime, startTime;
   private: bool pause;
+  private: bool stepInc;
 
   // Scene graph for the world
   private: Scene *scene;

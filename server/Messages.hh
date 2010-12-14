@@ -67,10 +67,10 @@ namespace gazebo
     public: float uvTile_y;
   };
 
-  class UpdatePoseMsg : public Message
+  class PoseMsg : public Message
   {
-    public: UpdatePoseMsg() : Message(POSE_MSG) {}
-    public: UpdatePoseMsg(const UpdatePoseMsg &m) : Message(m), 
+    public: PoseMsg() : Message(POSE_MSG) {}
+    public: PoseMsg(const PoseMsg &m) : Message(m), 
             id(m.id), pose(m.pose) {}
     public: virtual Message *Clone() const 
             { UpdatePoseMsg *msg = new UpdatePoseMsg(*this); return msg; }

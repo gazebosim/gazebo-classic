@@ -43,7 +43,6 @@
 #include "XMLConfig.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "OgreCreator.hh"
 #include "Body.hh"
 #include "HingeJoint.hh"
 #include "PhysicsEngine.hh"
@@ -231,8 +230,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   pose.pos = **this->xyzP;
   pose.rot = **this->rpyP;
 
-  if (this->IsStatic())
-    this->SetRelativePose( pose );
+  this->SetRelativePose( pose );
 
   if (this->modelType == "physical")
     this->LoadPhysical(node);
@@ -240,12 +238,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     this->LoadRenderable(node);
   else if (this->modelType != "empty")
     gzthrow("Invalid model type[" + this->modelType + "]\n");
-
-  // Set the relative pose of the model
-  if (!this->IsStatic())
-  {
-    this->SetRelativePose( pose );
-  }
 
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);

@@ -34,7 +34,6 @@
 #include "GazeboError.hh"
 #include "Body.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "Simulator.hh"
 
 #include "SensorFactory.hh"

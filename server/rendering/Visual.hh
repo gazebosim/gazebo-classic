@@ -29,6 +29,7 @@
 
 #include <string>
 
+#include "Box.hh"
 #include "RenderTypes.hh"
 #include "Pose3d.hh"
 #include "Quatern.hh"
@@ -42,6 +43,7 @@ namespace Ogre
   class SceneNode;
   class StaticGeometry;
   class RibbonTrail;
+  class AxisAlignedBox;
 }
 
 namespace boost
@@ -58,6 +60,7 @@ namespace gazebo
   class Scene;
   class OgreDynamicLines;
   class VisualMsg;
+  class Mesh;
 
 
   /// \brief Ogre Visual Object
@@ -93,8 +96,11 @@ namespace gazebo
     /// \brief Get the owner
     public: Common *GetOwner() const;
 
-    /// \brief Attach a manipulation visual
-    public: void AttachManipulation();
+    /// \brief Attach a visual
+    public: void AttachVisual(Visual *vis);
+           
+    /// \brief Detach a visual 
+    public: void DetachVisual(Visual *vis);
 
     /// \brief Attach a renerable object to the visual
     public: void AttachObject( Ogre::MovableObject *obj);
@@ -170,7 +176,7 @@ namespace gazebo
     public: Pose3d GetWorldPose() const;
 
     /// \brief Return the scene Node of this visual entity
-    public: Ogre::SceneNode * GetSceneNode();
+    public: Ogre::SceneNode *GetSceneNode() const;
 
     /// \brief Create a bounding box for this visual
     public: void AttachBoundingBox(const Vector3 &min, const Vector3 &max);
@@ -226,6 +232,14 @@ namespace gazebo
 
     /// \brief Get the name of the material
     public: std::string GetMaterialName() const;
+
+    /// \brief Get the bounding box for the visual
+    public: Box GetBounds() const;
+
+    /// \brief Insert a mesh into Ogre 
+    public: static void InsertMesh( const Mesh *mesh);
+
+    private: void GetBoundsHelper(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box) const;
 
     private: std::string myMaterialName;
     private: std::string origMaterialName;

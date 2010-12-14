@@ -108,6 +108,7 @@ home directory, or to the log file specified with the -l command line option.
 
 #include "gazebo_config.h"
 #include "Simulator.hh"
+#include "World.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
 
@@ -272,8 +273,7 @@ int main(int argc, char **argv)
   // Initialize the simulator
   try
   {
-    // NATY: put back in
-    //gazebo::Simulator::Instance()->SetPaused(optPaused);
+    gazebo::Simulator::Instance()->GetActiveWorld()->SetPaused(optPaused);
     gazebo::Simulator::Instance()->Init();
   }
   catch (gazebo::GazeboError e)

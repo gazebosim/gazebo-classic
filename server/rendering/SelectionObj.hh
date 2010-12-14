@@ -3,13 +3,12 @@
 
 #include "Vector3.hh"
 
-namespace Ogre
-{
-  class SceneNode;
-}
 
 namespace gazebo
 {
+  class Visual;
+  class Scene;
+
   class SelectionObj
   {
     /// \brief Constructor
@@ -21,9 +20,10 @@ namespace gazebo
     public: void Load();
 
     /// \brief Set the position of the node
-    public: void Attach( Ogre::SceneNode *node );
+    public: void Attach( Visual *visual );
 
-    private: Ogre::SceneNode *node;
+    private: Visual *node;
+    private: Scene *scene;
   };
 }
 

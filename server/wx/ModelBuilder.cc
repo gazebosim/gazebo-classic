@@ -14,7 +14,6 @@
 #include "RenderControl.hh"
 #include "OrbitViewController.hh"
 #include "FPSViewController.hh"
-#include "OgreCreator.hh"
 #include "Visual.hh"
 #include "Simulator.hh"
 #include "ModelBuilder.hh"

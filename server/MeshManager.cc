@@ -295,12 +295,17 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   mesh->RecalculateNormals();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Create a plane
 void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
     const Vector2<double> &segments, const Vector2<double> uvTile)
 {
   this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// This function was taken from OGRE:
+// Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal, 
     double d, const Vector2<double> &size, const Vector2<double> &segments,
     const Vector2<double> uvTile)
@@ -313,8 +318,6 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
   Mesh *mesh = new Mesh();
   mesh->SetName(name);
   this->meshes.insert( std::make_pair(name, mesh) );
-
-  std::cout << "Plane Name[" << name << "]\n";
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -355,8 +358,6 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
       vec.z = 0.0;
       vec = xform.TransformAffine(vec);
       subMesh->AddVertex(vec);
-
-      std::cout << "Vec[" << vec << "]\n";
 
       // Compute the normal
       vec = xform.TransformAffine(norm);
@@ -909,6 +910,9 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   mesh->RecalculateNormals();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// This function was taken from OGRE:
+// Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight, 
                                   bool doubleSided)
 {
@@ -950,12 +954,10 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
         sm->AddIndex(v1);
         sm->AddIndex(v2);
         sm->AddIndex(v3);
-        std::cout << v1 <<" " << v2 <<" " << v3 << "\n";
         // Second Tri in cell
         v1 = ((v + vInc) * meshWidth) + (u + uInc);
         v2 = (v * meshWidth) + u;
         v3 = (v * meshWidth) + (u + uInc);
-        std::cout << v1 <<" " << v2 <<" " << v3 << "\n";
         // Output indexes
         sm->AddIndex(v1);
         sm->AddIndex(v2);

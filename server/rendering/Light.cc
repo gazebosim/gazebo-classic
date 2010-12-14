@@ -33,7 +33,6 @@
 #include "Model.hh"
 #include "OgreDynamicLines.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "OgreAdaptor.hh"
 #include "XMLConfig.hh"
 #include "GazeboError.hh"

@@ -41,7 +41,6 @@
 #include "RenderControl.hh"
 #include "Camera.hh"
 #include "OgreAdaptor.hh"
-#include "OgreCreator.hh"
 #include "Visual.hh"
 #include "OgreDynamicLines.hh"
 #include "World.hh"

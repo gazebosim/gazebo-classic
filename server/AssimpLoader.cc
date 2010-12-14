@@ -74,10 +74,12 @@ Mesh *AssimpLoader::Load(const std::string &filename)
       }
       else if (propKey == "?mat.name")
       {
+        /* NATY: remove??
         aiString matName;
         amat->Get(AI_MATKEY_NAME, matName);
         std::string uniqueMatName = filename + matName.data;
         mat->SetName(uniqueMatName);
+        */
       }
       else if (propKey == "$clr.diffuse")
       {

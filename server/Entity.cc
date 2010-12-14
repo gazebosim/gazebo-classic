@@ -288,9 +288,9 @@ void Entity::SetRelativeRotation(const Quatern &rot)
 // Handle a change of pose
 void Entity::PoseChange(bool notify)
 {
-
-  // NATY: make this pose update thing work.
-  UpdatePoseMsg msg;
+  PoseMsg msg;
+  msg->id = this->name;
+  msg->pose = this->GetRelativePose();
   Simulator::Instance()->SendMessage( msg );
 
   if (notify)

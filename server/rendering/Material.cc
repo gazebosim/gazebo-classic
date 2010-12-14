@@ -1,8 +1,11 @@
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include "Material.hh"
 #include <Ogre.h>
 
 using namespace gazebo;
+
+unsigned int Material::counter = 0;
 
 std::string Material::ShadeModeStr[SHADE_COUNT] = {"FLAT", "GOURAUD", "PHONG"};
 
@@ -12,26 +15,35 @@ std::string Material::BlendModeStr[BLEND_COUNT] = {"ADD", "MODULATE", "REPLACE"}
 /// Constructor
 Material::Material()
 {
-  this->name = "noname";
+  this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
   this->blendMode = REPLACE;
   this->shadeMode= GOURAUD;
   this->transparency = 0;
   this->shininess = 0;
   this->ambient.Set(1,1,1,1);
   this->diffuse.Set(1,1,1,1);
+
+  this->Update();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Create a material with a default color 
+Material::Material(const Color &clr)
+{
+  this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
+  this->blendMode = REPLACE;
+  this->shadeMode= GOURAUD;
+  this->transparency = 0;
+  this->shininess = 0;
+  this->ambient = clr;
+  this->diffuse = clr;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Destructor
 Material::~Material()
 {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the name of the material
-void Material::SetName(const std::string &name)
-{
-  this->name = name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +58,7 @@ std::string Material::GetName() const
 void Material::SetTextureImage(const std::string tex)
 {
   this->texImage = tex;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +67,8 @@ void Material::SetTextureImage(const std::string tex,const std::string resource_
 {
   Ogre::ResourceGroupManager::getSingleton().addResourceLocation( resource_path, "FileSystem", "General");
   this->texImage = tex;
+
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,6 +84,7 @@ std::string Material::GetTextureImage() const
 void Material::SetAmbient(const Color &clr)
 {
   this->ambient = clr;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +99,7 @@ Color Material::GetAmbient() const
 void Material::SetDiffuse(const Color &clr)
 {
   this->diffuse = clr;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +114,7 @@ Color Material::GetDiffuse() const
 void Material::SetSpecular(const Color &clr)
 {
   this->specular = clr;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +129,7 @@ Color Material::GetSpecular() const
 void Material::SetEmissive(const Color &clr)
 {
   this->emissive = clr;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +145,7 @@ void Material::SetTransparency(float t)
 {
   this->transparency = std::min(t, (float)1.0);
   this->transparency = std::max(this->transparency, (float)0.0);
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +160,7 @@ float Material::SetTransparency() const
 void Material::SetShininess(float s)
 {
   this->shininess = s;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,6 +182,7 @@ float Material::GetTransparency() const
 void Material::SetBlendMode(BlendMode b)
 {
   this->blendMode = b;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +197,7 @@ Material::BlendMode Material::GetBlendMode() const
 void Material::SetShadeMode(ShadeMode s)
 {
   this->shadeMode = s;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +212,7 @@ Material::ShadeMode Material::GetShadeMode() const
 void Material::SetPointSize(double size)
 {
   this->pointSize = size;
+  this->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,3 +221,39 @@ double Material::GetPointSize() const
 {
   return this->pointSize;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+void Material::Update()
+{
+  Ogre::MaterialPtr matPtr;
+
+  if (Ogre::MaterialManager::getSingleton().resourceExists(this->GetName()))
+    matPtr = Ogre::MaterialManager::getSingleton().getByName(
+        this->GetName(), "General");
+  else
+   matPtr = Ogre::MaterialManager::getSingleton().create(
+                  this->GetName(),"General");
+
+  Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
+
+  Color ambient =  this->GetAmbient();
+  Color diffuse =  this->GetDiffuse();
+  Color specular = this->GetSpecular();
+  Color emissive = this->GetEmissive();
+
+  matPtr->getTechnique(0)->setLightingEnabled(true);
+  pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
+  pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
+  pass->setPointSize(this->GetPointSize());
+
+  pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
+  pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
+  pass->setShininess(this->GetShininess());
+
+  if (!this->GetTextureImage().empty())
+  {
+    Ogre::TextureUnitState *texState = pass->createTextureUnitState();
+    texState->setTextureName( this->GetTextureImage() );
+  }
+}
+

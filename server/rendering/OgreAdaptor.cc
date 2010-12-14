@@ -55,7 +55,6 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
-#include "OgreCreator.hh"
 #include "RTShaderSystem.hh"
 #include "OgreAdaptor.hh"
 
@@ -193,8 +192,6 @@ void OgreAdaptor::UpdateScenes()
   Events::preRenderSignal();
 
   this->root->_fireFrameStarted();
-
-  OgreCreator::Instance()->Update();
 
   Events::renderSignal();
 

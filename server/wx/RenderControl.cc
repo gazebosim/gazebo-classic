@@ -16,7 +16,6 @@
 #include "Body.hh"
 #include "OgreAdaptor.hh"
 #include "World.hh"
-#include "OgreCreator.hh"
 #include "GazeboError.hh"
 #include "Events.hh"
 #include "UserCamera.hh"

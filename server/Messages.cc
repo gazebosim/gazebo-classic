@@ -26,4 +26,11 @@ VisualMsg::VisualMsg(const VisualMsg &m)
 
 void VisualMsg::Load(XMLConfigNode *node)
 {
+  this->mesh = node->GetString("mesh","",0);
+  this->material = node->GetString("material","",0);
+  this->castShadows = node->GetBool("castShadows",true,0);
+  this->visible = node->GetBool("visible",true,0);
+  this->transparency = node->GetDouble("transparency",0.0,0);
+
+  std::cout << "Loading a Visual Message\n\n";
 }

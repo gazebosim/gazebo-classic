@@ -30,7 +30,6 @@
 #include "PhysicsEngine.hh"
 #include "BulletPhysics.hh"
 #include "Visual.hh"
-#include "OgreCreator.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
 #include "World.hh"

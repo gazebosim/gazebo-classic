@@ -79,13 +79,13 @@ class ModelUpdate_TBB
 // Private constructor
 World::World()
 {
-  std::cout << "New World\n";
   this->server = NULL;
   this->physicsEngine = NULL;
   this->graphics = NULL;
   this->simIfaceHandler = NULL;
   this->openAL = NULL;
   this->selectedEntity = NULL;
+  this->stepInc = false;
 
   this->rootElement = new Common(NULL);
   this->rootElement->SetWorld(this);
@@ -106,7 +106,8 @@ World::World()
   this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scene->Init();
 
-  Events::ConnectPauseSignal( boost::bind(&World::PauseSlot, this, _1) );
+  Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) );
+  Events::ConnectStepSignal( boost::bind(&World::StepCB, this) );
   Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
   Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
 }
@@ -119,7 +120,8 @@ World::~World()
   delete this->saveStateTimeoutP;
   delete this->saveStateBufferSizeP;
 
-  Events::DisconnectPauseSignal( boost::bind(&World::PauseSlot, this, _1) );
+  Events::DisconnectPauseSignal( boost::bind(&World::PauseCB, this, _1) );
+  Events::DisconnectStepSignal( boost::bind(&World::StepCB, this) );
   Events::DisconnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
   Events::DisconnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
 
@@ -335,7 +337,7 @@ void World::RunLoop()
   while (!this->stop)
   {
     lastTime = this->GetRealTime();
-    if (this->IsPaused())
+    if (this->IsPaused() && !this->stepInc)
       this->pauseTime += step;
     else
     {
@@ -379,6 +381,9 @@ void World::RunLoop()
       this->stop = true;
       break;
     }*/
+
+    if (this->IsPaused() && this->stepInc)
+      this->stepInc = false;
 
     // TODO: Fix stepping
     /*if (userStepped)
@@ -852,10 +857,17 @@ void World::SetState(std::deque<WorldState>::iterator iter)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pause callback
-void World::PauseSlot(bool p)
+void World::PauseCB(bool p)
 {
   if (!p)
     this->worldStatesInsertIter = this->worldStatesCurrentIter;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Step callback
+void World::StepCB()
+{
+  this->stepInc = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -17,13 +17,13 @@ namespace gazebo
   
     /// \brief Constructor
     public: Material();
-  
+
     /// \brief Destructor
     public: virtual ~Material();
-  
-    /// \brief Set the name of the material
-    public: void SetName(const std::string &name);
-  
+
+    /// \brief Create a material with a default color 
+    public: Material(const Color &clr);
+
     /// \brief Get the name of the material
     public: std::string GetName() const;
 
@@ -112,6 +112,7 @@ namespace gazebo
               return out;
             }
 
+    private: void Update();
 
     private: std::string name;
     private: std::string texImage;
@@ -125,6 +126,8 @@ namespace gazebo
 
     private: BlendMode blendMode;
     private: ShadeMode shadeMode;
+
+    private: static unsigned int counter;
   };
 }
 
