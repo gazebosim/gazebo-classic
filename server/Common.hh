@@ -47,6 +47,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~Common();
 
+    /// \brief Load 
+    public: virtual void Load(XMLConfigNode *node);
+
     /// \brief Set the name of the entity
     /// \param name Body name
     public: virtual void SetName(const std::string &name);

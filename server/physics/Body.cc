@@ -157,6 +157,9 @@ Body::~Body()
 // Load the body based on an XMLConfig node
 void Body::Load(XMLConfigNode *node)
 {
+  Entity::Load(node);
+  this->comEntity->RegisterVisual();
+
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->selfCollideP->Load(node);
@@ -185,7 +188,6 @@ void Body::Load(XMLConfigNode *node)
      
   XMLConfigNode *childNode;
 
-  this->nameP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
   this->dampingFactorP->Load(node);
@@ -355,8 +357,6 @@ void Body::SetLaserRetro(float retro)
 // Initialize the body
 void Body::Init()
 {
-  this->poseDirty = false;
-
   // If no geoms are attached, then don't let gravity affect the body.
   if (this->geoms.size()==0 || **this->turnGravityOffP)
     this->SetGravityMode(false);
@@ -375,15 +375,16 @@ void Body::Init()
   this->linearAccel.Set(0,0,0);
   this->angularAccel.Set(0,0,0);
 
+  // NATY: put back in
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
-  if (this->mass.GetAsDouble() > 0.0)
+  /*if (this->mass.GetAsDouble() > 0.0)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
     this->cgVisualMsg = new VisualMsg();
-    this->cgVisualMsg->parentId = this->comEntity->GetName();
+    this->cgVisualMsg->parentId = this->comEntity->GetId();
     this->cgVisualMsg->id = visname.str();
     this->cgVisualMsg->render = VisualMsg::MESH_RESOURCE;
     this->cgVisualMsg->mesh = "body_cg";
@@ -411,7 +412,7 @@ void Body::Init()
 
       Simulator::Instance()->SendMessage(msg);
     }
-  }
+  }*/
 
   this->enabled = true;
 }
@@ -420,12 +421,6 @@ void Body::Init()
 // Update the body
 void Body::Update()
 {
-  if (this->poseDirty)
-  {
-    this->poseDirty = false;
-    this->SetWorldPose(this->newPose, false);
-  }
-
   // Apply our linear accel
   this->SetForce(this->linearAccel);
 

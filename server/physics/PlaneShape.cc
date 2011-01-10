@@ -116,6 +116,9 @@ void PlaneShape::CreatePlane()
   this->visualMsg->uvTile_y = (**(this->uvTileP)).y;
   this->visualMsg->material = **(this->materialP);
   this->visualMsg->castShadows = **(this->castShadowsP);
+  this->visualMsg->size.x = (**(this->sizeP)).x;
+  this->visualMsg->size.y = (**(this->sizeP)).y;
+  this->visualMsg->size.z = 0.0;
 
   Simulator::Instance()->SendMessage( *this->visualMsg );
 }

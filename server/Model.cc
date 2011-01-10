@@ -64,12 +64,6 @@ class BodyUpdate_TBB
     for (size_t i=r.begin(); i != r.end(); i++)
     {
       (*this->bodies)[i]->Update();
-      /*Common *common = (*this->children)[i];
-      if ( common->HasType(BODY) )
-      {
-        ((Body*)common)->Update();
-      }
-      */
     }
   }
 
@@ -184,12 +178,14 @@ Model::~Model()
 // Load the model
 void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 {
+  Entity::Load(node);
+
   XMLConfigNode *childNode;
   std::string scopedName;
   Pose3d pose;
   Common* dup;
 
-  this->nameP->Load(node);
+  this->staticP->Load(node);
 
   scopedName = this->GetScopedName();
 
@@ -209,8 +205,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
       Events::deleteEntitySignal(scopedName.c_str());
     }
   }
-
-  this->staticP->Load(node);
 
   this->canonicalBodyNameP->Load(node);
   this->xyzP->Load(node);
@@ -1181,6 +1175,8 @@ void Model::LoadRenderable(XMLConfigNode *node)
 void Model::LoadPhysical(XMLConfigNode *node)
 {
   XMLConfigNode *childNode = NULL;
+
+  std::cout << "LoadPhysical[" << this->GetName() << "]\n";
 
   // Load the bodies
   if (node->GetChildByNSPrefix("body"))

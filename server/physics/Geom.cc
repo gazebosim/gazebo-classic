@@ -138,10 +138,11 @@ void Geom::Fini()
 // First step in the loading process
 void Geom::Load(XMLConfigNode *node)
 {
+  Entity::Load(node);
+
   XMLConfigNode *childNode = NULL;
 
   this->typeP->Load(node);
-  this->nameP->Load(node);
   this->SetName(this->nameP->GetValue());
   this->massP->Load(node);
   this->xyzP->Load(node);
@@ -168,19 +169,18 @@ void Geom::Load(XMLConfigNode *node)
   while (childNode)
   {
     std::ostringstream visname;
-    visname << this->GetCompleteScopedName() << "_VISUAL_" << 
+    visname << this->GetCompleteScopedName() << "::VISUAL_" << 
                this->visualMsgs.size();
 
 
     VisualMsg *msg = new VisualMsg();
 
-    msg->parentId = this->GetName();
+    msg->parentId = this->GetCompleteScopedName();
     msg->id = visname.str();
     msg->render = VisualMsg::MESH_RESOURCE;
     msg->Load(childNode);
     msg->castShadows = false;
-    msg->pose = this->GetWorldPose();
-    std::cout << "Geom[" << this->GetName() << "] Create a Visual Message with Pose[" << msg->pose << "]\n";
+    msg->pose = this->GetRelativePose();
 
     Simulator::Instance()->SendMessage( *msg );
 
@@ -203,13 +203,13 @@ void Geom::CreateBoundingBox()
     this->GetBoundingBox(min,max);
 
     std::ostringstream visname;
-    visname << this->GetCompleteScopedName() << "_BBVISUAL" ;
+    visname << this->GetCompleteScopedName() << "::BBVISUAL" ;
 
     this->bbVisualMsg = new VisualMsg();
 
     this->bbVisualMsg->render = VisualMsg::MESH_RESOURCE;
-    this->bbVisualMsg->parentId = this->GetName();
-    this->bbVisualMsg->id = this->GetName() + "_BBVISUAL";
+    this->bbVisualMsg->parentId = this->GetCompleteScopedName();
+    this->bbVisualMsg->id = this->GetCompleteScopedName() + "_BBVISUAL";
     this->bbVisualMsg->castShadows = false;
     this->bbVisualMsg->visible = RenderState::GetShowBoundingBoxes();
     this->bbVisualMsg->boundingbox.min = min;

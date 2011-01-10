@@ -61,16 +61,13 @@ Visual::Visual(const std::string &name, Visual *parent)
   this->AddType(VISUAL);
   this->sceneNode = NULL;
 
-  std::ostringstream stream;
-  stream << this->GetName() << "_VISUAL_" << visualCounter++;
-
   Ogre::SceneNode *pnode = NULL;
   if (parent)
     pnode = parent->GetSceneNode();
   else
     gzerr(0) << "Create a visual, invalid parent!!!\n";
 
-  this->sceneNode = pnode->createChildSceneNode( stream.str() );
+    this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
   this->Init();
 }
@@ -84,10 +81,7 @@ Visual::Visual (const std::string &name, Ogre::SceneNode *parent)
   this->AddType(VISUAL);
   this->sceneNode = NULL;
 
-  std::ostringstream stream;
-  stream << this->GetName() << "_VISUAL_" << visualCounter++;
-
-  this->sceneNode = parent->createChildSceneNode( stream.str() );
+  this->sceneNode = parent->createChildSceneNode( this->GetName() );
 
   this->Init();
 }
@@ -101,10 +95,7 @@ Visual::Visual (const std::string &name, Scene *scene)
   this->AddType(VISUAL);
   this->sceneNode = NULL;
 
-  std::ostringstream stream;
-  stream << this->GetName() << "_VISUAL_" << visualCounter++;
-
-  this->sceneNode = scene->GetManager()->getRootSceneNode()->createChildSceneNode(stream.str());
+  this->sceneNode = scene->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
 
   this->Init();
 }
@@ -235,6 +226,7 @@ void Visual::LoadFromMsg(VisualMsg *msg)
   this->meshTileP->Load(NULL);
   this->materialNameP->SetValue(msg->material);
   this->castShadowsP->SetValue(msg->castShadows);
+  this->sizeP->SetValue(msg->size);
 
   this->Load(NULL);
 }
@@ -246,7 +238,7 @@ void Visual::Load(XMLConfigNode *node)
   std::ostringstream stream;
   Pose3d pose;
   Vector3 size(0,0,0);
-  Ogre::Vector3 meshSize(0,0,0);
+  Ogre::Vector3 meshSize(1,1,1);
   Ogre::MovableObject *obj = NULL;
 
   if (node)
@@ -294,8 +286,6 @@ void Visual::Load(XMLConfigNode *node)
         MeshManager::Instance()->Load(meshName);
       }
 
-      std::cout << "Mesh Name[" << meshName << "]\n";
-
       // Add the mesh into OGRE
       this->InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
 
@@ -321,18 +311,22 @@ void Visual::Load(XMLConfigNode *node)
 
   // Get the size of the mesh
   if (obj)
+  {
     meshSize = obj->getBoundingBox().getSize();
+    //this->sizeP->SetValue( Vector3(meshSize.x, meshSize.y, meshSize.z) );
+  }
 
   // Get the desired size of the mesh
   if (node && node->GetChild("size") != NULL)
   {
     this->sizeP->Load(node);
   }
-  else
+  /*else
     this->sizeP->SetValue( Vector3(meshSize.x, meshSize.y, meshSize.z) );
+    */
 
   // Get and set teh desired scale of the mesh
-  if (node && node->GetChild("scale") != NULL)
+  /*if (node && node->GetChild("scale") != NULL)
   {
     this->scaleP->Load(node);
     Vector3 scale = this->scaleP->GetValue();
@@ -340,6 +334,7 @@ void Visual::Load(XMLConfigNode *node)
   }
   else
   {
+  */
     Vector3 scale = this->sizeP->GetValue();
     scale.x /= meshSize.x;
     scale.y /= meshSize.y;
@@ -347,9 +342,9 @@ void Visual::Load(XMLConfigNode *node)
     scale.Correct();
 
     this->scaleP->SetValue( scale );
-
     this->sceneNode->setScale(scale.x, scale.y, scale.z);
-  }
+  //}
+  
 
   // Set the material of the mesh
   if (**this->materialNameP != "none")
@@ -844,6 +839,7 @@ void Visual::SetPosition( const Vector3 &pos)
     //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
   }*/
 
+  //std::cout << "SetPos[" << pos << "][" << this->GetName() << "]\n";
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 
   /*if (this->IsStatic())

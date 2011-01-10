@@ -42,7 +42,7 @@ namespace gazebo
     public: enum ActionType {UPDATE, DELETE};
     public: enum RenderType {MESH_RESOURCE, POINTS, LINE_LIST, LINE_STRIP, TRIANGLE_FAN};
 
-    public: VisualMsg() : Message(VISUAL_MSG) {}
+    public: VisualMsg();
     public: VisualMsg(const VisualMsg &m);
     public: virtual Message *Clone() const 
             { VisualMsg *msg = new VisualMsg(*this); return msg; }
@@ -63,6 +63,7 @@ namespace gazebo
     public: std::vector<Vector3> points;
     public: Pose3d pose;
     public: Plane plane;
+    public: Vector3 size;
     public: float uvTile_x;
     public: float uvTile_y;
   };
@@ -70,13 +71,12 @@ namespace gazebo
   class PoseMsg : public Message
   {
     public: PoseMsg() : Message(POSE_MSG) {}
-    public: PoseMsg(const PoseMsg &m) : Message(m), 
-            id(m.id), pose(m.pose) {}
+    public: PoseMsg(const PoseMsg &m) : Message(m), pose(m.pose), id(m.id) {}
     public: virtual Message *Clone() const 
-            { UpdatePoseMsg *msg = new UpdatePoseMsg(*this); return msg; }
+            { PoseMsg *msg = new PoseMsg(*this); return msg; }
 
-    public: std::string id;
     public: Pose3d pose;
+    public: std::string id;
   };
 }
 

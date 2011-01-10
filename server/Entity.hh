@@ -55,6 +55,9 @@ namespace gazebo
   
     /// \brief Destructor
     public: virtual ~Entity();
+
+    /// \brief Load
+    public: virtual void Load(XMLConfigNode *node);
  
     public: void SetName(const std::string &name);
  
@@ -126,6 +129,8 @@ namespace gazebo
     public: virtual Vector3 GetWorldAngularAccel() const
             {return Vector3();}
 
+    /// Register a visual
+    public: void RegisterVisual();
 
     /// \brief This function is called when the entity's (or one of its parents)
     ///        pose of the parent has changed

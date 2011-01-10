@@ -144,7 +144,7 @@ void Grid::Init()
 
   Ogre::SceneNode *parent_node = this->scene->GetManager()->getRootSceneNode();
 
-  this->sceneNode = parent_node->createChildSceneNode();
+  this->sceneNode = parent_node->createChildSceneNode(this->name);
   this->sceneNode->attachObject( this->manualObject );
 
   std::stringstream ss;

@@ -296,7 +296,6 @@ namespace gazebo
     private: bool enabled;
 
     protected: Pose3d newPose;
-    protected: bool poseDirty;
   };
 
   /// \}

@@ -88,6 +88,7 @@ World::World()
   this->stepInc = false;
 
   this->rootElement = new Common(NULL);
+  this->rootElement->SetName("root");
   this->rootElement->SetWorld(this);
 
   this->factoryIfaceHandler = NULL;
@@ -670,8 +671,9 @@ Common *World::GetByName(const std::string &name)
 /// Receive a message
 void World::ReceiveMessage( const Message &msg )
 {
+  //std::cout << "Received message\n";
   boost::mutex::scoped_lock lock( this->mutex );
-  if (msg.type == VISUAL_MSG)
+  if (msg.type == VISUAL_MSG || msg.type == POSE_MSG)
     this->scene->ReceiveMessage(msg);
   else
     this->messages.push_back( msg.Clone() );

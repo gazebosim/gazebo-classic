@@ -50,36 +50,42 @@ Entity::Entity(Common *parent)
   this->staticP->Callback( &Entity::SetStatic, this );
   Param::End();
  
-  std::ostringstream visname;
-  visname << "Entity_" << this->GetId() << "_VISUAL";
-
   this->visualMsg = new VisualMsg();
-  this->visualMsg->id = visname.str();
+  //this->visualMsg->id = this->GetName();
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
     Entity *ep = (Entity*)(this->parent);
-    this->visualMsg->parentId = ep->GetName();
     this->SetStatic(ep->IsStatic());
   }
-  else
+  /*else
   {
     this->visualMsg = new VisualMsg();
   }
 
   Simulator::Instance()->SendMessage( *this->visualMsg );
+  */
 
   // NATY: put functionality back in
   //this->visualNode->SetOwner(this);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Load
+void Entity::Load(XMLConfigNode *node)
+{
+  Common::Load(node);
+  this->RegisterVisual();
+}
+ 
+
 void Entity::SetName(const std::string &name)
 {
+  // TODO: if an entitie's name is changed, then the old visual is never
+  // removed. Should add in functionality to modify/update the visual
   Common::SetName(name);
-  std::ostringstream visname;
-  visname << name << "_VISUAL";
-  this->visualMsg->id = visname.str();
-  Simulator::Instance()->SendMessage( *this->visualMsg );
+  //this->visualMsg->id = this->GetCompleteScopedName();
+  //Simulator::Instance()->SendMessage( *this->visualMsg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,8 +295,9 @@ void Entity::SetRelativeRotation(const Quatern &rot)
 void Entity::PoseChange(bool notify)
 {
   PoseMsg msg;
-  msg->id = this->name;
-  msg->pose = this->GetRelativePose();
+  msg.id = this->GetCompleteScopedName();
+  //std::cout << "Pose[" << msg.id << "]\n";
+  msg.pose = this->GetRelativePose();
   Simulator::Instance()->SendMessage( msg );
 
   if (notify)
@@ -304,4 +311,14 @@ void Entity::PoseChange(bool notify)
         ((Entity*)*iter)->OnPoseChange();
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Register a visual
+void Entity::RegisterVisual()
+{
+  this->visualMsg->id = this->GetCompleteScopedName();
+  if (this->parent)
+    this->visualMsg->parentId = this->parent->GetCompleteScopedName();
+  Simulator::Instance()->SendMessage( *this->visualMsg );
 }

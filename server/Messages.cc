@@ -3,6 +3,15 @@
 
 using namespace gazebo;
 
+VisualMsg::VisualMsg() : Message(VISUAL_MSG) 
+{
+  this->castShadows = true;
+  this->attachAxes = true;
+  this->visible = true;
+  this->transparency = 0.0;
+  this->size.Set(1,1,1);
+}
+
 VisualMsg::VisualMsg(const VisualMsg &m)
   : Message(m)
 {
@@ -22,6 +31,7 @@ VisualMsg::VisualMsg(const VisualMsg &m)
   this->plane = m.plane;
   this->uvTile_x = m.uvTile_x;
   this->uvTile_y = m.uvTile_y;
+  this->size = m.size;
 }
 
 void VisualMsg::Load(XMLConfigNode *node)
@@ -31,6 +41,5 @@ void VisualMsg::Load(XMLConfigNode *node)
   this->castShadows = node->GetBool("castShadows",true,0);
   this->visible = node->GetBool("visible",true,0);
   this->transparency = node->GetDouble("transparency",0.0,0);
-
-  std::cout << "Loading a Visual Message\n\n";
+  this->size = node->GetVector3("size", Vector3(1,1,1));
 }

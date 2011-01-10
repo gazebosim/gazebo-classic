@@ -25,6 +25,8 @@ namespace gazebo
 
   class Scene
   {
+    typedef std::map<std::string, Visual*> VisualMap;
+
     public: enum SceneType {BSP, GENERIC};
 
     /// \brief Constructor
@@ -179,8 +181,7 @@ namespace gazebo
     private: boost::mutex mutex;
     private: std::vector<Message*> messages;
 
-    private: std::map<std::string, Visual*> visuals;
-
+    private: VisualMap visuals;
   };
 };
 #endif 

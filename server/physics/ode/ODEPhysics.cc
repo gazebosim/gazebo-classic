@@ -148,14 +148,6 @@ ODEPhysics::ODEPhysics(World *world)
 
   this->contactGroup = dJointGroupCreate(0);
 
-  // If auto-disable is active, then user interaction with the joints 
-  // doesn't behave properly
-  dWorldSetAutoDisableFlag(this->worldId, 0);
-  dWorldSetAutoDisableTime(this->worldId, 2.0);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableSteps(this->worldId, 50);
-
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
@@ -164,7 +156,7 @@ ODEPhysics::ODEPhysics(World *world)
   this->stepWP = new ParamT<double>("stepW", 1.3, 0);  /// over_relaxation value for SOR
   this->contactMaxCorrectingVelP = new ParamT<double>("contactMaxCorrectingVel", 10.0, 0);
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
-  this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", false, 0);
+  this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", true, 0);
   this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
   this->maxContactsP = new ParamT<int>("maxContacts",1000,0); // enforced for trimesh-trimesh contacts
   Param::End();
@@ -226,13 +218,14 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // doesn't behave properly
   // disable autodisable by default
   dWorldSetAutoDisableFlag(this->worldId, **this->autoDisableBodyP);
-  dWorldSetAutoDisableTime(this->worldId, 2.0);
+  dWorldSetAutoDisableTime(this->worldId, 0);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableSteps(this->worldId, 50);
+  dWorldSetAutoDisableSteps(this->worldId, 0);
 
   this->contactFeedbacks.resize(**this->contactFeedbacksP);
 
+  // NATY: not sure if I can remove this...check
   // Reset the contact pointer
   //this->contactFeedbackIter = this->contactFeedbacks.begin();
 
@@ -315,8 +308,6 @@ void ODEPhysics::UpdatePhysics()
 {
   this->UpdateCollision();
 
-  //this->LockMutex(); 
-
   // Update the dynamical model
   if (**this->stepTypeP == "quick")
     dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
@@ -327,8 +318,6 @@ void ODEPhysics::UpdatePhysics()
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
-
-  //this->UnlockMutex(); 
 }
 
 
@@ -593,6 +582,7 @@ void ODEPhysics::SetGravity(const gazebo::Vector3 &gravity)
 // Handle a collision
 void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 {
+
   dBodyID b1 = dGeomGetBody(o1);
   dBodyID b2 = dGeomGetBody(o2);
 

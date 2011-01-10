@@ -55,7 +55,7 @@ Scene::Scene(const std::string &name)
 /// Destructor
 Scene::~Scene()
 {
-  std::map<std::string, Visual*>::iterator iter;
+  VisualMap::iterator iter;
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     delete iter->second;
   this->visuals.clear();
@@ -470,8 +470,27 @@ void Scene::PrintSceneGraph()
 /// Print scene graph
 void Scene::PrintSceneGraphHelper(std::string prefix, Ogre::Node *node)
 {
-  std::cout << prefix << node->getName() << std::endl;
+  Ogre::SceneNode *snode = dynamic_cast<Ogre::SceneNode*>(node);
 
+  std::string nodeName = node->getName();
+  int numAttachedObjs = 0;
+  bool isInSceneGraph = false;
+  if (snode)
+  {
+    numAttachedObjs = snode->numAttachedObjects();
+    isInSceneGraph = snode->isInSceneGraph();
+  }
+  int numChildren = node->numChildren();
+  Ogre::Vector3 pos = node->getPosition();
+  Ogre::Vector3 scale = node->getScale();
+
+  std::cout << prefix << nodeName << "\n";
+  std::cout << prefix << "  Num Objs[" << numAttachedObjs << "]\n";
+  std::cout << prefix << "  Num Children[" << numChildren << "]\n";
+  std::cout << prefix << "  IsInGraph[" << isInSceneGraph << "]\n";
+  std::cout << prefix << "  Pos[" << pos.x << " " << pos.y << " " << pos.z << "]\n";
+  std::cout << prefix << "  Scale[" << scale.x << " " << scale.y << " " << scale.z << "]\n";
+  
   prefix += "  ";
   for (unsigned int i=0; i < node->numChildren(); i++)
   {
@@ -660,7 +679,7 @@ void Scene::ProcessMessages()
     if (this->messages[i]->type == VISUAL_MSG)
     {
       VisualMsg *msg = (VisualMsg*)this->messages[i];
-      std::map<std::string, Visual*>::iterator iter;
+      VisualMap::iterator iter;
       iter = this->visuals.find(msg->id);
       if (iter != this->visuals.end())
       {
@@ -668,7 +687,14 @@ void Scene::ProcessMessages()
       }
       else
       {
-        Visual *visual = new Visual(msg->id, this);
+        Visual *visual = NULL;
+        VisualMap::iterator iter;
+        iter = this->visuals.find(msg->parentId);
+
+        if (iter != this->visuals.end())
+          visual = new Visual(msg->id, iter->second);
+        else 
+          visual = new Visual(msg->id, this);
         visual->LoadFromMsg(msg);
         this->visuals[msg->id] = visual;
       }
@@ -676,7 +702,7 @@ void Scene::ProcessMessages()
     else if (this->messages[i]->type == POSE_MSG)
     {
       PoseMsg *msg = (PoseMsg*)this->messages[i];
-      std::map<std::string, Visual*>::iterator iter;
+      VisualMap::iterator iter;
       iter = this->visuals.find(msg->id);
       if (iter != this->visuals.end())
       {
