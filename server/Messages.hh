@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "Color.hh"
 #include "Vector3.hh"
 #include "Time.hh"
 #include "Pose3d.hh"
@@ -14,7 +15,7 @@ namespace gazebo
 {
   class XMLConfigNode;
 
-  enum MessageType{ INSERT_MODEL_MSG, VISUAL_MSG, POSE_MSG };
+  enum MessageType{ INSERT_MODEL_MSG, VISUAL_MSG, LIGHT_MSG, POSE_MSG, SELECTION_MSG };
 
   class Message
   {
@@ -35,6 +36,31 @@ namespace gazebo
     public: virtual Message *Clone() const 
             { InsertModelMsg *msg = new InsertModelMsg(*this); return msg; }
     public: std::string xmlStr;
+  };
+
+  class LightMsg : public Message
+  {
+    public: enum ActionType {UPDATE, DELETE};
+    public: enum LightType {POINT, SPOT, DIRECTIONAL};
+    public: LightMsg();
+    public: LightMsg(const LightMsg &m);
+    public: virtual Message *Clone() const
+            { LightMsg *msg = new LightMsg(*this); return msg; }
+    public: void Load(XMLConfigNode *node);
+
+    public: std::string id;
+    public: ActionType action;
+    public: LightType type;
+    public: Pose3d pose;
+    public: Color diffuse;
+    public: Color specular;
+    public: Vector3 attenuation;
+    public: Vector3 direction;
+    public: float range;
+    public: bool castShadows;
+    public: float spotInnerAngle;
+    public: float spotOuterAngle;
+    public: float spotFalloff;
   };
 
   class VisualMsg : public Message
@@ -66,6 +92,17 @@ namespace gazebo
     public: Vector3 size;
     public: float uvTile_x;
     public: float uvTile_y;
+  };
+
+  class SelectionMsg : public Message
+  {
+    public: SelectionMsg() : Message(SELECTION_MSG) {}
+    public: SelectionMsg(const SelectionMsg &m) : Message(m), id(m.id), selected(m.selected) {}
+    public: virtual Message *Clone() const 
+            { SelectionMsg *msg = new SelectionMsg(*this); return msg; }
+
+    public: std::string id;
+    public: bool selected;
   };
 
   class PoseMsg : public Message

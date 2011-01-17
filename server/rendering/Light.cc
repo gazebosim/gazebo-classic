@@ -28,7 +28,6 @@
 
 #include "Events.hh"
 #include "Scene.hh"
-#include "RTShaderSystem.hh"
 #include "World.hh"
 #include "Model.hh"
 #include "OgreDynamicLines.hh"
@@ -52,10 +51,8 @@ Light::Light(Scene *scene)
   this->scene = scene;
 
   std::ostringstream stream;
-  stream << "LIGHT" << this->lightCounter;
-  this->name = stream.str();
-
-  this->visual = new Visual(this->name+"_VISUAL", this->scene);
+  stream << "LIGHT" << this->lightCounter << "_VISUAL";
+  this->visual = new Visual(stream.str(), this->scene);
 
   this->lightCounter++;
 
@@ -78,8 +75,8 @@ Light::Light(Scene *scene)
   this->spotInnerAngleP = new ParamT<double>("innerAngle", 10, 0);
   this->spotInnerAngleP->Callback(&Light::SetSpotInnerAngle, this);
 
-  this->spotOutterAngleP = new ParamT<double>("outerAngle", 20, 0);
-  this->spotOutterAngleP->Callback(&Light::SetSpotOutterAngle, this);
+  this->spotOuterAngleP = new ParamT<double>("outerAngle", 20, 0);
+  this->spotOuterAngleP->Callback(&Light::SetSpotOuterAngle, this);
 
   this->spotFalloffP = new ParamT<double>("falloff", 1, 0);
   this->spotFalloffP->Callback(&Light::SetSpotFalloff, this);
@@ -93,18 +90,6 @@ Light::Light(Scene *scene)
 
   Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
 
-  try
-  {
-    this->light = this->scene->GetManager()->createLight(this->GetName());
-  }
-  catch (Ogre::Exception e)
-  {
-
-    gzthrow("Ogre Error:" << e.getFullDescription() << "\n" << \
-        "Unable to create a light");
-  }
-
-  RTShaderSystem::Instance()->UpdateShaders();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +110,7 @@ Light::~Light()
   delete this->rangeP;
   delete this->castShadowsP;
   delete this->spotInnerAngleP;
-  delete this->spotOutterAngleP;
+  delete this->spotOuterAngleP;
   delete this->spotFalloffP;
 
 }
@@ -137,16 +122,29 @@ void Light::Load(XMLConfigNode *node)
   Vector3 vec;
   double range,constant,linear,quad;
 
-  this->lightTypeP->Load(node);
-  this->diffuseP->Load(node);
-  this->specularP->Load(node);
-  this->directionP->Load(node);
-  this->attenuationP->Load(node);
-  this->rangeP->Load(node);
-  this->castShadowsP->Load(node);
-  this->spotInnerAngleP->Load(node);
-  this->spotOutterAngleP->Load(node);
-  this->spotFalloffP->Load(node);
+  if (node)
+  {
+    this->lightTypeP->Load(node);
+    this->diffuseP->Load(node);
+    this->specularP->Load(node);
+    this->directionP->Load(node);
+    this->attenuationP->Load(node);
+    this->rangeP->Load(node);
+    this->castShadowsP->Load(node);
+    this->spotInnerAngleP->Load(node);
+    this->spotOuterAngleP->Load(node);
+    this->spotFalloffP->Load(node);
+  }
+
+  try
+  {
+    this->light = this->scene->GetManager()->createLight(this->GetName());
+  }
+  catch (Ogre::Exception e)
+  {
+    gzthrow("Ogre Error:" << e.getFullDescription() << "\n" << \
+        "Unable to create a light");
+  }
 
   this->SetLightType( **this->lightTypeP );
   this->SetDiffuseColor(**this->diffuseP);
@@ -156,26 +154,40 @@ void Light::Load(XMLConfigNode *node)
   this->SetRange(**this->rangeP);
   this->SetCastShadows(**this->castShadowsP);
   this->SetSpotInnerAngle(**this->spotInnerAngleP);
-  this->SetSpotOutterAngle(**this->spotOutterAngleP);
+  this->SetSpotOuterAngle(**this->spotOuterAngleP);
   this->SetSpotFalloff(**this->spotFalloffP);
-
-  //this->light->setSpotlightRange(Ogre::Radian(20), Ogre::Radian(40),32.0), 
-  //this->light->setSpotlightInnerAngle( Ogre::Radian(Ogre::Degree(20)) );
-  //this->light->setSpotlightOuterAngle( Ogre::Radian(Ogre::Degree(40)) ); 
-
-  // TODO: More options for Spot lights, etc.
-  //  options for spotlights
-  /*if ((**this->lightTypeP) == "spot")
-  {
-    vec = node->GetVector3("spotCone", Vector3(30.0, 65.0, 1.0));
-    this->light->setSpotlightRange(Ogre::Degree(vec.x), 
-                                   Ogre::Degree(vec.y), vec.z);
-  }*/
 
   this->visual->AttachObject(this->light);
 
   this->CreateVisual();
   this->SetupShadows();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load from a light message
+void Light::LoadFromMsg(const LightMsg *msg)
+{
+  this->nameP->SetValue(msg->id);
+
+  if (msg->type == LightMsg::POINT)
+    this->lightTypeP->SetValue("point");
+  else if (msg->type == LightMsg::SPOT)
+    this->lightTypeP->SetValue("spot");
+  else
+    this->lightTypeP->SetValue("directional");
+
+  this->diffuseP->SetValue(msg->diffuse);
+  this->specularP->SetValue(msg->specular);
+  this->directionP->SetValue(msg->direction);
+  this->attenuationP->SetValue(msg->attenuation);
+  this->rangeP->SetValue(msg->range);
+  this->castShadowsP->SetValue(msg->castShadows);
+  this->spotInnerAngleP->SetValue(msg->spotInnerAngle);
+  this->spotOuterAngleP->SetValue(msg->spotOuterAngle);
+  this->spotFalloffP->SetValue(msg->spotFalloff);
+
+  this->Load(NULL);
+  this->SetPosition(msg->pose.pos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,7 +202,7 @@ void Light::Save(const std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->rangeP) << "\n";
   stream << prefix << "  " << *(this->attenuationP) << "\n";
   stream << prefix << "  " << *(this->spotInnerAngleP) << "\n";
-  stream << prefix << "  " << *(this->spotOutterAngleP) << "\n";
+  stream << prefix << "  " << *(this->spotOuterAngleP) << "\n";
   stream << prefix << "  " << *(this->spotFalloffP) << "\n";
   stream << prefix << "  " << *(this->castShadowsP) << "\n";
   stream << prefix << "</light>\n";
@@ -201,12 +213,27 @@ void Light::Save(const std::string &prefix, std::ostream &stream)
 // Helper node to create a visual representation of the light
 void Light::CreateVisual()
 {
-  if (this->light->getType() == Ogre::Light::LT_DIRECTIONAL)
-    return;
-
   // The lines draw a visualization of the camera
   this->line = this->visual->AddDynamicLine( RENDERING_LINE_LIST );
 
+  if ( **this->lightTypeP == "directional")
+  {
+    float s=.5;
+    this->line->AddPoint( Vector3(-s, -s, 0) );
+    this->line->AddPoint( Vector3(-s, s, 0) );
+
+    this->line->AddPoint( Vector3(-s, s, 0) );
+    this->line->AddPoint( Vector3(s, s, 0) );
+
+    this->line->AddPoint( Vector3(s, s, 0) );
+    this->line->AddPoint( Vector3(s, -s, 0) );
+
+    this->line->AddPoint( Vector3(s, -s, 0) );
+    this->line->AddPoint( Vector3(-s, -s, 0) );
+
+    this->line->AddPoint( Vector3(0, 0, 0) );
+    this->line->AddPoint( Vector3(0, 0, -s) );
+  }
   if ( **this->lightTypeP == "point" )
   {
     float s=0.1;
@@ -248,7 +275,6 @@ void Light::CreateVisual()
 
     this->line->AddPoint(Vector3(s,-s,0));
     this->line->AddPoint(Vector3(0,0,-s));
-
   }
   else if ( this->light->getType() == Ogre::Light::LT_SPOTLIGHT )
   {
@@ -259,6 +285,11 @@ void Light::CreateVisual()
     double range = 0.2;
     angles[0] = range * tan(outerAngle);
     angles[1] = range * tan(innerAngle);
+
+    unsigned int i = 0;
+    this->line->AddPoint(Vector3(0,0,0));
+    this->line->AddPoint(Vector3(angles[i],angles[i], -range));
+ 
     for (unsigned int i=0; i < 2; i++)
     {
       this->line->AddPoint(Vector3(0,0,0));
@@ -285,14 +316,20 @@ void Light::CreateVisual()
       this->line->AddPoint(Vector3(angles[i],-angles[i], -range));
       this->line->AddPoint(Vector3(angles[i],angles[i], -range));
     }
-    
   }
 
-  this->line->setMaterial("Gazebo/WhiteGlow");
+  this->line->setMaterial("Gazebo/LightOn");
   this->line->setVisibilityFlags(GZ_LASER_CAMERA);
 
   // turn off light source box visuals by default
   this->visual->SetVisible(true);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set the position of the light
+void Light::SetPosition(const Vector3 &p)
+{
+  this->visual->SetPosition(p);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,7 +344,7 @@ bool Light::SetSelected( bool s )
     if (s)
       this->line->setMaterial("Gazebo/PurpleGlow");
     else
-      this->line->setMaterial("Gazebo/WhiteGlow");
+      this->line->setMaterial("Gazebo/LightOn");
   }
 
   return true;
@@ -441,21 +478,21 @@ void Light::SetSpotInnerAngle(const double &angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
     this->light->setSpotlightRange(
         Ogre::Degree(**this->spotInnerAngleP), 
-        Ogre::Degree(**this->spotOutterAngleP), 
+        Ogre::Degree(**this->spotOuterAngleP), 
         **this->spotFalloffP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the spot light outter angle
-void Light::SetSpotOutterAngle(const double &angle)
+void Light::SetSpotOuterAngle(const double &angle)
 {
-  if (**this->spotOutterAngleP != angle)
-    this->spotOutterAngleP->SetValue( angle );
+  if (**this->spotOuterAngleP != angle)
+    this->spotOuterAngleP->SetValue( angle );
 
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
     this->light->setSpotlightRange(
         Ogre::Degree(**this->spotInnerAngleP), 
-        Ogre::Degree(**this->spotOutterAngleP), 
+        Ogre::Degree(**this->spotOuterAngleP), 
         **this->spotFalloffP);
 }
 
@@ -469,7 +506,7 @@ void Light::SetSpotFalloff(const double &angle)
   if (this->light->getType() == Ogre::Light::LT_SPOTLIGHT)
     this->light->setSpotlightRange(
         Ogre::Degree(**this->spotInnerAngleP), 
-        Ogre::Degree(**this->spotOutterAngleP), 
+        Ogre::Degree(**this->spotOuterAngleP), 
         **this->spotFalloffP);
 
 }

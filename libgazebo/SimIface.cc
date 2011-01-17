@@ -595,32 +595,6 @@ bool SimulationIface::GetEntityType(const std::string &name, std::string &type)
   return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Get the type of this model
-bool SimulationIface::GetModelType(const std::string &name, 
-                                   std::string &type)
-{
-  this->Lock(1);
-  this->data->responseCount = 0;
-
-  SimulationRequestData *request;
- 
-  request = &(this->data->requests[this->data->requestCount++]);
-  request->type = SimulationRequestData::GET_MODEL_TYPE;
-  memset(request->name, 0, 512);
-  strncpy(request->name, name.c_str(), 512);
-  request->name[511] = '\0';
-
-  this->Unlock();
-  if (!this->WaitForResponse())
-    return false;
-
-  assert(this->data->responseCount == 1);
-  type = data->responses[0].strValue;
-
-  return true;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of models 

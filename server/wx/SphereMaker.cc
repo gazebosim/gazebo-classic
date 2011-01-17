@@ -1,11 +1,11 @@
 #include <iostream>
 
+#include "Messages.hh"
 #include "Camera.hh"
 #include "Scene.hh"
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
-#include "Visual.hh"
 #include "World.hh"
 #include "SphereMaker.hh"
 
@@ -17,27 +17,31 @@ SphereMaker::SphereMaker()
 : EntityMaker()
 {
   this->state = 0;
-  this->visual = NULL;
+  this->visualMsg = new VisualMsg();
+  this->visualMsg->render = VisualMsg::MESH_RESOURCE;
+  this->visualMsg->mesh = "unit_sphere";
+  this->visualMsg->material = "Gazebo/TurquoiseGlowOutline";
 }
 
 SphereMaker::~SphereMaker()
 {
+  delete this->visualMsg;
 }
 
 void SphereMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream << "user_sphere_" << counter++;
-  this->visual = new Visual(stream.str(), scene);
-  this->visual->AttachMesh("unit_sphere");
+  this->visualMsg->id = stream.str();
+
   this->state = 1;
 }
 
 void SphereMaker::Stop()
 {
-  if (this->visual)
-    delete this->visual;
-  this->visual = NULL;
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visualMsg->action = VisualMsg::UPDATE;
 
   Events::moveModeSignal(true);
   this->state = 0;
@@ -86,47 +90,45 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  this->visual->SetPosition(p1);
+  this->visualMsg->pose.pos = p1;
 
   double scale = p1.Distance(p2);
-  Vector3 p = this->visual->GetPosition();
+  Vector3 p = this->visualMsg->pose.pos;
 
   p.z = scale;
 
-  this->visual->SetPosition(p);
-  this->visual->SetScale(Vector3(scale,scale,scale));
+  this->visualMsg->pose.pos = p;
+  this->visualMsg->size.Set(scale,scale,scale);
+  Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
 void SphereMaker::CreateTheEntity()
 {
+  InsertModelMsg msg;
   std::ostringstream newModelStr;
 
-  if (!this->visual)
-    return;
+  newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >";
-
-
-  newModelStr << "<model:physical name=\"" << this->visual->GetName() << "\">\
-    <xyz>" << this->visual->GetPosition() << "</xyz>\
-    <body:sphere name=\"body\">\
-    <geom:sphere name=\"geom\">\
-    <size>" << this->visual->GetScale().x << "</size>\
+  newModelStr << "<model type='physical' name='" << this->visualMsg->id << "'>\
+    <xyz>" << this->visualMsg->pose.pos << "</xyz>\
+    <body name='body'>\
+    <geom type='sphere' name='geom'>\
+    <size>" << this->visualMsg->size.x << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_sphere</mesh>\
-    <size>" << this->visual->GetScale()*2 << "</size>\
+    <size>" << this->visualMsg->size*2 << "</size>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\
-    </geom:sphere>\
-    </body:sphere>\
-    </model:physical>";
+    </geom>\
+    </body>\
+    </model>";
 
-  newModelStr <<  "</gazebo:world>";
+  msg.xmlStr = newModelStr.str();
 
-  Simulator::Instance()->GetActiveWorld()->InsertEntity(newModelStr.str());
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
 
-  delete this->visual;
-  this->visual = NULL;
+  Simulator::Instance()->SendMessage( msg );
 }

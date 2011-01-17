@@ -1,10 +1,10 @@
 #include <iostream>
 
+#include "Messages.hh"
 #include "Camera.hh"
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
-#include "Visual.hh"
 #include "World.hh"
 #include "CylinderMaker.hh"
 
@@ -15,27 +15,30 @@ CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
   this->state = 0;
-  this->visual = NULL;
+  this->visualMsg = new VisualMsg();
+  this->visualMsg->render = VisualMsg::MESH_RESOURCE;
+  this->visualMsg->mesh = "unit_cylinder";
+  this->visualMsg->material = "Gazebo/TurquoiseGlowOutline";
 }
 
 CylinderMaker::~CylinderMaker()
 {
+  delete this->visualMsg;
 }
 
 void CylinderMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream <<  "user_cylinder_" << counter++;
-  this->visual = new Visual(stream.str(), scene);
-  this->visual->AttachMesh("unit_cylinder");
+  this->visualMsg->id =  stream.str();
   this->state = 1;
 }
 
 void CylinderMaker::Stop()
 {
-  if (this->visual)
-    delete this->visual;
-  this->visual = NULL;
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visualMsg->action = VisualMsg::UPDATE;
 
   this->state = 0;
   Events::moveModeSignal(true);
@@ -87,9 +90,10 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  this->visual->SetPosition(p1);
+  if (this->state == 1)
+    this->visualMsg->pose.pos = p1;
 
-  Vector3 p = this->visual->GetPosition();
+  Vector3 p = this->visualMsg->pose.pos;
   Vector3 scale;
 
   if (this->state == 1)
@@ -101,47 +105,44 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   }
   else
   {
-    scale = this->visual->GetScale();
-   // scale.z = p2.z - p1.z;
+    scale = this->visualMsg->size;
     scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
-  this->visual->SetPosition(p);
-  this->visual->SetScale(scale);
+  this->visualMsg->pose.pos = p;
+  this->visualMsg->size = scale;
+  Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
 void CylinderMaker::CreateTheEntity()
 {
+  InsertModelMsg msg;
   std::ostringstream newModelStr;
 
-  if (!this->visual)
-    return;
+  newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<?xml version='1.0'?> <gazebo:world xmlns:xi='http://www.w3.org/2001/XInclude' xmlns:gazebo='http://playerstage.sourceforge.net/gazebo/xmlschema/#gz' xmlns:model='http://playerstage.sourceforge.net/gazebo/xmlschema/#model' xmlns:sensor='http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor' xmlns:body='http://playerstage.sourceforge.net/gazebo/xmlschema/#body' xmlns:geom='http://playerstage.sourceforge.net/gazebo/xmlschema/#geom' xmlns:joint='http://playerstage.sourceforge.net/gazebo/xmlschema/#joint' xmlns:interface='http://playerstage.sourceforge.net/gazebo/xmlschema/#interface' xmlns:rendering='http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering' xmlns:renderable='http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable' xmlns:controller='http://playerstage.sourceforge.net/gazebo/xmlschema/#controller' xmlns:physics='http://playerstage.sourceforge.net/gazebo/xmlschema/#physics' >";
-
-
-  newModelStr << "<model:physical name=\"" << this->visual->GetName() << "\">\
-    <xyz>" << this->visual->GetPosition() << "</xyz>\
-    <body:cylinder name=\"body\">\
-    <geom:cylinder name=\"geom\">\
-    <size>" << this->visual->GetScale().x*.5 << " " << this->visual->GetScale().z << "</size>\
+  newModelStr << "<model type='physical' name='" << this->visualMsg->id << "'>\
+    <xyz>" << this->visualMsg->pose.pos << "</xyz>\
+    <body name='body'>\
+    <geom type='cylinder' name='geom'>\
+    <size>" << this->visualMsg->size.x*.5 << " " << this->visualMsg->size.z << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_cylinder</mesh>\
-    <size>" << this->visual->GetScale() << "</size>\
+    <size>" << this->visualMsg->size << "</size>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\
-    </geom:cylinder>\
-    </body:cylinder>\
-    </model:physical>";
+    </geom>\
+    </body>\
+    </model>";
 
-  newModelStr <<  "</gazebo:world>";
+  msg.xmlStr = newModelStr.str();
 
-  delete this->visual;
-  this->visual = NULL;
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
 
-  Simulator::Instance()->GetActiveWorld()->InsertEntity(newModelStr.str());
+  Simulator::Instance()->SendMessage( msg );
 }
 

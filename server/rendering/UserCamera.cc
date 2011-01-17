@@ -57,12 +57,6 @@ UserCamera::UserCamera(const std::string &name, Scene *scene)
 {
   std::stringstream stream;
 
-  std::cout << "New User Camera\n";
-
-  //int w, h;
-  //parentWindow->GetSize(&w, &h);
-  //this->window = OgreCreator::Instance()->CreateWindow(parentWindow, w, h);
-
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
 

@@ -19,7 +19,7 @@
  *
  */
 /* Desc: The Simulator; Top level managing object
- * Author: Jordi Polo
+ * Author: Nate Koenig, Jordi Polo
  * Date: 3 Jan 2008
  */
 
@@ -30,6 +30,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "Events.hh"
 #include "Messages.hh"
 #include "RenderState.hh"
 #include "PhysicsFactory.hh"
@@ -66,7 +67,7 @@ std::string Simulator::defaultConfigXML =
       <pos>0 0</pos>\
     </gui>\
     <rendering>\
-      <ambient>.2 .2 .2 1</ambient>\
+      <ambient>.1 .1 .1 1</ambient>\
       <shadows>true</shadows>\
       <grid>false</grid>\
     </rendering>\
@@ -89,7 +90,7 @@ std::string Simulator::defaultWorldXML =
       <contactSurfaceLayer>0.0</contactSurfaceLayer>\
     </physics>\
     <!-- Ground Plane -->\
-    <model type='physical' name='plane1_model'>\
+    <model name='plane1_model'>\
       <xyz>0 0 0</xyz>\
       <rpy>0 0 0</rpy>\
       <static>true</static>\
@@ -101,25 +102,22 @@ std::string Simulator::defaultWorldXML =
           <uvTile>100 100</uvTile>\
           <mu1>109999.0</mu1>\
           <mu2>1000.0</mu2>\
-          <material>Gazebo/GrayGrid</material>\
+          <material>Gazebo/Grey</material>\
         </geom>\
       </body>\
     </model>\
     <!-- White Point light -->\
-    <model type='renderable' name='point_white'>\
-      <xyz>0.0 0 10</xyz>\
+    <light name='point_white'>\
+      <xyz>0.0 0 1</xyz>\
       <rpy>0 0 0</rpy>\
-      <static>true</static>\
-      <light>\
-        <type>point</type>\
-        <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>\
-        <specularColor>.1 .1 .1 1.0</specularColor>\
-        <attenuation>.2 0.1 0.0</attenuation>\
-        <range>20</range>\
-        <direction>0 0 -1.0</direction>\
-        <castShadows>true</castShadows>\
-      </light>\
-    </model>\
+      <type>point</type>\
+      <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>\
+      <specularColor>.1 .1 .1 1.0</specularColor>\
+      <attenuation>.2 0.1 0.0</attenuation>\
+      <range>20</range>\
+      <direction>0 0 -1.0</direction>\
+      <castShadows>true</castShadows>\
+    </light>\
   </world>\
 </gazebo>";
 
@@ -144,6 +142,8 @@ Simulator::Simulator()
   //this->render_mutex = new boost::recursive_mutex();
   //this->model_delete_mutex = new boost::recursive_mutex();
   this->gazeboConfig=new gazebo::GazeboConfig();
+
+  Events::ConnectQuitSignal( boost::bind(&Simulator::SetUserQuit, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +199,7 @@ void Simulator::Fini()
 void Simulator::Load(const std::string &fileName)
 {
   // Load the world file
-  XMLConfig *xmlFile=new gazebo::XMLConfig();
+  XMLConfig *xmlFile = new gazebo::XMLConfig();
 
   // load the configuration options 
   try
@@ -432,10 +432,6 @@ void Simulator::Init()
   {
     gzthrow("Failed to Initialize the World\n"  << e);
   }
-
-  // This is not a debug line. This is useful for external programs that 
-  // launch Gazebo and wait till it is ready   
-  std::cout << "Gazebo successfully initialized" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -109,9 +109,6 @@ namespace gazebo
     /// \brief Finilaize thie child model
     protected: virtual void FiniChild() {}
     
-    /// \brief Get the type of the model
-    public: const std::string &GetModelType() const;
-
     /// \brief Set the initial pose
     public: void SetInitPose(const Pose3d &pose);
   
@@ -251,12 +248,6 @@ namespace gazebo
   
     /// \brief Load a physical model
     private: void LoadPhysical(XMLConfigNode *node);
-  
-    /// \brief Load a renderable model (like a light source).
-    private: void LoadRenderable(XMLConfigNode *node);
-  
-    /// \brief Type of the model (such as Pioneer2DX, or SimpleSolid)
-    private: std::string modelType;
   
     /// \brief Initial pose of the model
     private: Pose3d initPose;

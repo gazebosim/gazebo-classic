@@ -78,8 +78,6 @@ class ModelTool : public Toolbase
         libgazebo::Vec3 linearVel, linearAccel, angularVel, angularAccel;
         unsigned int paramCount;
 
-        if (!this->simIface->GetModelType(name, type))
-          std::cerr << "Unable to get model[" << name << "] type\n";
         if (!this->simIface->GetEntityParamCount(name, paramCount))
           std::cerr << "Unable to get model[" << name << "] param count\n";
 

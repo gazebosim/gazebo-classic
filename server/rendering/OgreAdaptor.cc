@@ -55,7 +55,6 @@
 #include "Global.hh"
 #include "XMLConfig.hh"
 #include "Simulator.hh"
-#include "RTShaderSystem.hh"
 #include "OgreAdaptor.hh"
 
 using namespace gazebo;
@@ -252,18 +251,15 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 
   Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_ANISOTROPIC);
 
+  /*
   if (this->HasGLSL())
     RTShaderSystem::Instance()->Init();
+    */
 
-  /*for (unsigned int i=0; i < this->scenes.size(); i++)
-  {
-    this->scenes[i]->Init(this->root);
-    if (i==0)
-      this->scenes[i]->InitShadows();
-  }*/
-
+  /*
   if (this->HasGLSL())
     RTShaderSystem::Instance()->UpdateShaders();
+    */
 }
 
 
@@ -271,8 +267,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
 /// Finalize
 void OgreAdaptor::Fini()
 {
-  if (this->HasGLSL())
-    RTShaderSystem::Instance()->Fini();
 }
  
 ////////////////////////////////////////////////////////////////////////////////

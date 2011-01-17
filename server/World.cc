@@ -28,6 +28,7 @@
 #include <sstream>
 #include <fstream>
 #include <sys/time.h> //gettimeofday
+#include <boost/thread/recursive_mutex.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -551,6 +552,13 @@ void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplica
       Events::addEntitySignal(model->GetCompleteScopedName());
       parent = model;
     }
+    else if (node->GetName() == "light")
+    {
+      LightMsg msg;
+      msg.Load(node);
+      msg.id = "light";
+      Simulator::Instance()->SendMessage( msg );
+    }
 
     // Load children
     for (cnode = node->GetChild(); cnode != NULL; cnode = cnode->GetNext())
@@ -671,9 +679,9 @@ Common *World::GetByName(const std::string &name)
 /// Receive a message
 void World::ReceiveMessage( const Message &msg )
 {
-  //std::cout << "Received message\n";
-  boost::mutex::scoped_lock lock( this->mutex );
-  if (msg.type == VISUAL_MSG || msg.type == POSE_MSG)
+  boost::recursive_mutex::scoped_lock lock( this->mutex );
+  if (msg.type == VISUAL_MSG || msg.type == LIGHT_MSG || msg.type == POSE_MSG
+      || msg.type == SELECTION_MSG)
     this->scene->ReceiveMessage(msg);
   else
     this->messages.push_back( msg.Clone() );
@@ -683,9 +691,10 @@ void World::ReceiveMessage( const Message &msg )
 // Process all messages
 void World::ProcessMessages()
 {
-  boost::mutex::scoped_lock lock( this->mutex );
+  boost::recursive_mutex::scoped_lock lock( this->mutex );
 
-  for ( unsigned int i=0; i < this->messages.size(); i++)
+  unsigned int count = this->messages.size();
+  for ( unsigned int i=0; i < count; i++)
   {
     Message *msg = this->messages[i];
 
@@ -711,7 +720,7 @@ void World::ProcessMessages()
     }
   }
 
-  this->messages.clear();
+  this->messages.erase(this->messages.begin(), this->messages.begin()+count);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -876,14 +885,18 @@ void World::StepCB()
 /// Set the selected entity
 void World::SetSelectedEntityCB( const std::string &name )
 {
-  /* NATY: put back in
+  SelectionMsg msg;
   Common *common = this->GetByName(name);
   Entity *ent = dynamic_cast<Entity*>(common);
 
   // unselect selectedEntity
   if (this->selectedEntity)
   {
-    this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
+    msg.id = this->selectedEntity->GetCompleteScopedName();
+    msg.selected = false;
+    Simulator::Instance()->SendMessage( msg );
+
+    //this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
     this->selectedEntity->SetSelected(false);
   }
 
@@ -892,14 +905,17 @@ void World::SetSelectedEntityCB( const std::string &name )
   {
     // set selected entity to ent
     this->selectedEntity = ent;
-    this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
+    //this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
     this->selectedEntity->SetSelected(true);
+
+    msg.id = this->selectedEntity->GetCompleteScopedName();
+    msg.selected = true;
+    Simulator::Instance()->SendMessage( msg );
   }
   else
     this->selectedEntity = NULL;
 
   Events::entitySelectedSignal(this->selectedEntity);
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

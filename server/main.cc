@@ -106,6 +106,7 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include <iostream>
 
+#include "Events.hh"
 #include "gazebo_config.h"
 #include "Simulator.hh"
 #include "World.hh"
@@ -228,8 +229,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ )
 {
-  //TODO: use a boost::signal
-  gazebo::Simulator::Instance()->SetUserQuit();
+  gazebo::Events::quitSignal();
   return;
 }
 

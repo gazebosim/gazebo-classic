@@ -82,7 +82,7 @@ namespace gazebo
     public: void Init();
 
     /// \brief Load from a message
-    public: void LoadFromMsg(VisualMsg *msg);
+    public: void LoadFromMsg(const VisualMsg *msg);
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
@@ -239,7 +239,10 @@ namespace gazebo
     /// \brief Insert a mesh into Ogre 
     public: static void InsertMesh( const Mesh *mesh);
 
-    private: void GetBoundsHelper(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box) const;
+    /// \brief Update a visual based on a message
+    public: void UpdateFromMsg(const VisualMsg *msg);
+
+    private: void GetBoundsHelper(Ogre::SceneNode *node, Box &box) const;
 
     private: std::string myMaterialName;
     private: std::string origMaterialName;

@@ -78,7 +78,6 @@ Model::Model(Common *parent)
 {
   this->AddType(MODEL);
 
-  this->modelType = "";
   this->joint = NULL;
 
   Param::Begin(&this->parameters);
@@ -215,8 +214,6 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   this->laserFiducialP->Load(node);
   this->laserRetroP->Load(node);
 
-  this->modelType = node->GetString("type", "physical", 1);
-
   this->SetStatic( **(this->staticP) );
 
   // Get the position and orientation of the model (relative to parent)
@@ -226,12 +223,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   this->SetRelativePose( pose );
 
-  if (this->modelType == "physical")
-    this->LoadPhysical(node);
-  else if (this->modelType == "renderable")
-    this->LoadRenderable(node);
-  else if (this->modelType != "empty")
-    gzthrow("Invalid model type[" + this->modelType + "]\n");
+  this->LoadPhysical(node);
 
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);
@@ -306,12 +298,8 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
 
-  if (this->modelType=="renderable")
-    typeName = "renderable";
-  else if (this->modelType=="physical")
-    typeName = "physical";
 
-  stream << prefix << "<model:" << typeName;
+  stream << prefix << "<model";
   stream << " name=\"" << this->nameP->GetValue() << "\">\n"; 
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
@@ -319,39 +307,31 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->enableFrictionP) << "\n";
   stream << prefix << "  " << *(this->collideP) << "\n";
 
-  if (this->modelType == "physical")
+  stream << prefix << "  " << *(this->staticP) << "\n";
+
+  for (bodyIter=this->children.begin(); bodyIter!=this->children.end(); bodyIter++)
   {
-    stream << prefix << "  " << *(this->staticP) << "\n";
-
-    for (bodyIter=this->children.begin(); bodyIter!=this->children.end(); bodyIter++)
+    stream << "\n";
+    Entity *entity = (Entity*)*bodyIter;
+    if (entity && entity->HasType(BODY))
     {
-      stream << "\n";
-      Entity *entity = (Entity*)*bodyIter;
-      if (entity && entity->HasType(BODY))
-      {
-        Body *body = (Body*)(entity);
-        body->Save(p, stream);
-      }
-    }
-
-    // Save all the joints
-    for (jointIter = this->joints.begin(); jointIter != this->joints.end(); 
-        jointIter++)
-      if (*jointIter)
-        (*jointIter)->Save(p, stream);
-
-    // Save all the controllers
-    for (contIter=this->controllers.begin();
-        contIter!=this->controllers.end(); contIter++)
-    {
-      if (contIter->second)
-        contIter->second->Save(p, stream);
+      Body *body = (Body*)(entity);
+      body->Save(p, stream);
     }
   }
-  else
+
+  // Save all the joints
+  for (jointIter = this->joints.begin(); jointIter != this->joints.end(); 
+      jointIter++)
+    if (*jointIter)
+      (*jointIter)->Save(p, stream);
+
+  // Save all the controllers
+  for (contIter=this->controllers.begin();
+      contIter!=this->controllers.end(); contIter++)
   {
-    if (this->light)
-      this->light->Save(p, stream);
+    if (contIter->second)
+      contIter->second->Save(p, stream);
   }
 
   if (this->parentBodyNameP && this->myBodyNameP)
@@ -589,14 +569,6 @@ void Model::Reset()
   }
 }
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Get the name of the model
-const std::string &Model::GetModelType() const
-{
-  return this->modelType;
-}
 ////////////////////////////////////////////////////////////////////////////////
 // Set the initial pose
 void Model::SetInitPose(const Pose3d &pose)
@@ -1146,37 +1118,10 @@ void Model::SetLaserRetro( const float &retro )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load a renderable model (like a light source).
-void Model::LoadRenderable(XMLConfigNode *node)
-{
-  /* NATY: fix this!!!
-  XMLConfigNode *childNode = NULL;
-
-  // We still need a canonical body so that this model can be attached to
-  // others
-  Body *body = this->CreateBody();
-  char lightNumBuf[8];
-  sprintf(lightNumBuf, "%d", lightNumber++);
-  body->SetName(this->GetName() + "_RenderableBody_" + lightNumBuf);
-  body->SetEnabled( false );
-
-  if (Simulator::Instance()->GetRenderEngineEnabled() && 
-      (childNode = node->GetChild("light")))
-  {
-    this->light = new Light(body, this->GetWorld()->GetScene());
-    this->light->Load(childNode);
-  }
-  */
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Load a physical model
 void Model::LoadPhysical(XMLConfigNode *node)
 {
   XMLConfigNode *childNode = NULL;
-
-  std::cout << "LoadPhysical[" << this->GetName() << "]\n";
 
   // Load the bodies
   if (node->GetChildByNSPrefix("body"))

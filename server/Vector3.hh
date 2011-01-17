@@ -92,6 +92,14 @@ class Vector3
   ///        vector as a ray
   public: double GetDistToPlane(Vector3 dir, Vector3 planeNormal, double d) const;
 
+  /// \brief Set this vector's components to the maximum of itself and the 
+  ///        passed in vector
+  public: void SetToMax(const Vector3 & v);
+
+  /// \brief Set this vector's components to the minimum of itself and the 
+  ///        passed in vector
+  public: void SetToMin(const Vector3 & v);
+
   /// \brief Equal operator
   public: const Vector3 &operator=( const Vector3 &pt );
 

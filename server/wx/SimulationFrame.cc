@@ -125,6 +125,8 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
   Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(SimulationFrame::OnPaneClosed), NULL, this);
 
 
+  Events::ConnectQuitSignal( boost::bind(&SimulationFrame::Quit, this) );
+
   Events::ConnectPauseSignal( 
       boost::bind(&SimulationFrame::OnPause, this, _1) );
 
@@ -177,14 +179,6 @@ void SimulationFrame::Init()
 // Add entity CB
 void SimulationFrame::AddEntityCB(const std::string &name)
 {
-  /*EntityTreeItemData *data;
-
-  data = new EntityTreeItemData;
-  data->name = entity->GetCompleteScopedName();
-
-  wxTreeItemId item = this->treeCtrl->AppendItem(this->treeCtrl->GetRootItem(), wxString::FromAscii(entity->GetName().c_str()), -1, -1, data);
-  */
-
   Entity *entity = dynamic_cast<Entity*>(Simulator::Instance()->GetActiveWorld()->GetByName(name));
   this->AddEntityHelper(entity, this->treeCtrl->GetRootItem());
 }
@@ -277,6 +271,10 @@ void SimulationFrame::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnQuit(wxCommandEvent &event)
+{
+  this->Quit();
+}
+void SimulationFrame::Quit()
 {
   Simulator::Instance()->SetUserQuit();
   Close(true);
@@ -428,8 +426,8 @@ void SimulationFrame::OnToolClicked( wxCommandEvent &event )
   this->toolbar->ToggleTool(BOX, false);
   this->toolbar->ToggleTool(SPHERE, false);
   this->toolbar->ToggleTool(CYLINDER, false);
-  this->toolbar->ToggleTool(SPOT, false);
   this->toolbar->ToggleTool(POINT, false);
+  this->toolbar->ToggleTool(SPOT, false);
   this->toolbar->ToggleTool(DIRECTIONAL, false);
 
 
@@ -450,7 +448,7 @@ void SimulationFrame::OnToolClicked( wxCommandEvent &event )
     this->toolbar->ToggleTool(PLAY, false);
     this->toolbar->ToggleTool(STEP, false);
     Events::stepSignal();
-    // NATY : put back in 
+    // NATY : put back in ... or delete
     //Simulator::Instance()->GetActiveWorld()->SetStepInc( true );
   }
   else if (id == BOX)
@@ -600,7 +598,10 @@ void SimulationFrame::OnTreePopupClick( wxCommandEvent &event )
       this->toolbar->ToggleTool(CURSOR, true);
     }
     else if (event.GetId() == 1)
+    {
+      std::cout << "Set Selected[" << data->name << "]\n";
       Events::setSelectedEntitySignal(data->name);
+    }
     else if (event.GetId() == 2)
     {
       Events::setSelectedEntitySignal("");

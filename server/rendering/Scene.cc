@@ -3,6 +3,7 @@
 #include <OGRE/OgreSceneQuery.h>
 #include <OGRE/OgreRoot.h>
 
+#include "Light.hh"
 #include "Messages.hh"
 #include "Global.hh"
 #include "Visual.hh"
@@ -60,8 +61,13 @@ Scene::~Scene()
     delete iter->second;
   this->visuals.clear();
 
+  LightMap::iterator lightIter;
+  for (lightIter = this->lights.begin(); lightIter != this->lights.end(); lightIter++)
+    delete lightIter->second;
+  this->lights.clear();
+
   // Remove a scene
-  RTShaderSystem::Instance()->RemoveScene( this );
+  //RTShaderSystem::Instance()->RemoveScene( this );
 
   delete this->ambientP;
   delete this->shadowsP;
@@ -156,10 +162,10 @@ void Scene::Init()
   this->raySceneQuery->setSortByDistance(true);
   this->raySceneQuery->setQueryMask(Ogre::SceneManager::ENTITY_TYPE_MASK);
 
-  // Register this scene the the real time shaders system
-  RTShaderSystem::Instance()->AddScene(this);
-}
 
+  // Register this scene the the real time shaders system
+  //RTShaderSystem::Instance()->AddScene(this);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -642,8 +648,7 @@ void Scene::InitShadows()
     overlay->add2D(debugPanel);
     overlay->show();
   }
-   */
- 
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -677,28 +682,11 @@ void Scene::ProcessMessages()
   for ( unsigned int i=0; i < this->messages.size(); i++)
   {
     if (this->messages[i]->type == VISUAL_MSG)
-    {
-      VisualMsg *msg = (VisualMsg*)this->messages[i];
-      VisualMap::iterator iter;
-      iter = this->visuals.find(msg->id);
-      if (iter != this->visuals.end())
-      {
-        std::cout << "Update a visual\n";
-      }
-      else
-      {
-        Visual *visual = NULL;
-        VisualMap::iterator iter;
-        iter = this->visuals.find(msg->parentId);
-
-        if (iter != this->visuals.end())
-          visual = new Visual(msg->id, iter->second);
-        else 
-          visual = new Visual(msg->id, this);
-        visual->LoadFromMsg(msg);
-        this->visuals[msg->id] = visual;
-      }
-    }
+      this->HandleVisualMsg((VisualMsg*)this->messages[i]);
+    else if (this->messages[i]->type == LIGHT_MSG)
+      this->HandleLightMsg((LightMsg*)this->messages[i]);
+    else if (this->messages[i]->type == SELECTION_MSG)
+      this->HandleSelectionMsg((SelectionMsg*)this->messages[i]);
     else if (this->messages[i]->type == POSE_MSG)
     {
       PoseMsg *msg = (PoseMsg*)this->messages[i];
@@ -840,4 +828,66 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
     ibuf->unlock();
     current_offset = next_offset;
   }
+}
+
+void Scene::HandleVisualMsg(const VisualMsg *msg)
+{
+  VisualMap::iterator iter;
+  iter = this->visuals.find(msg->id);
+
+  if (msg->action == VisualMsg::DELETE)
+  {
+    if (iter != this->visuals.end() )
+    {
+      delete iter->second;
+      iter->second = NULL;
+      this->visuals.erase(iter);
+    }
+  }
+  else if (iter != this->visuals.end())
+  {
+    iter->second->UpdateFromMsg(msg);
+  }
+  else
+  {
+    Visual *visual = NULL;
+    VisualMap::iterator iter;
+    iter = this->visuals.find(msg->parentId);
+
+    if (iter != this->visuals.end())
+      visual = new Visual(msg->id, iter->second);
+    else 
+      visual = new Visual(msg->id, this);
+    visual->LoadFromMsg(msg);
+    this->visuals[msg->id] = visual;
+  }
+}
+
+void Scene::HandleLightMsg(const LightMsg *msg)
+{
+  LightMap::iterator iter;
+  iter = this->lights.find(msg->id);
+
+  if (msg->action == LightMsg::DELETE)
+  {
+    printf("DELETE  A LIGHT!!\n");
+  }
+  else if (iter != this->lights.end())
+  {
+    printf(" UPDATE A LIGHT\n");
+  }
+  else
+  {
+    Light *light = new Light(this);
+    light->LoadFromMsg(msg);
+    this->lights[msg->id] = light;
+  }
+}
+
+void Scene::HandleSelectionMsg(const SelectionMsg *msg)
+{
+  VisualMap::iterator viter;
+  viter = this->visuals.find(msg->id);
+  if (viter != this->visuals.end())
+    viter->second->ShowSelectionBox(msg->selected);
 }

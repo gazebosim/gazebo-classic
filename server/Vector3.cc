@@ -33,7 +33,7 @@ using namespace gazebo;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Vector3::Vector3()
-    : x(0), y(0), z(0)
+    : x(0.0), y(0.0), z(0.0)
 {
 }
 
@@ -192,6 +192,26 @@ double Vector3::GetDistToPlane(Vector3 dir, Vector3 planeNormal, double d) const
     double t = -(nom/denom);
     return t;
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set this vector's components to the maximum of itself and the passed in 
+/// vector
+void Vector3::SetToMax(const Vector3 & v)
+{
+  if (v.x > this->x) this->x = v.x;
+  if (v.y > this->y) this->y = v.y;
+  if (v.z > this->z) this->z = v.z;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set this vector's components to the minimum of itself and the passed in 
+/// vector
+void Vector3::SetToMin(const Vector3 & v)
+{
+  if (v.x < this->x) this->x = v.x;
+  if (v.y < this->y) this->y = v.y;
+  if (v.z < this->z) this->z = v.z;
 }
 
 

@@ -30,6 +30,15 @@ namespace gazebo
             static void DisconnectStepSignal( T subscriber)
             { stepSignal.disconnect(subscriber); }
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief Connect a boost::slot the the quit signal
+    public: template<typename T>
+            static boost::signals::connection ConnectQuitSignal( T subscriber )
+            { return quitSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectQuitSignal( T subscriber)
+            { quitSignal.disconnect(subscriber); }
 
     ////////////////////////////////////////////////////////////////////////////
     /// \brief Connect a boost::slot the the add entity signal
@@ -223,6 +232,7 @@ namespace gazebo
 
     public: static boost::signal<void (bool)> pauseSignal;
     public: static boost::signal<void ()> stepSignal;
+    public: static boost::signal<void ()> quitSignal;
 
     public: static boost::signal<void (bool)>  moveModeSignal;
     public: static boost::signal<void (bool)>  manipModeSignal;

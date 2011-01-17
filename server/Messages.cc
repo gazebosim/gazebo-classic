@@ -1,7 +1,53 @@
 #include "XMLConfig.hh"
+#include "GazeboError.hh"
 #include "Messages.hh"
 
 using namespace gazebo;
+
+LightMsg::LightMsg() : Message(LIGHT_MSG)
+{
+  this->action = LightMsg::UPDATE;
+  this->type = LightMsg::POINT;
+  this->castShadows = false;
+}
+
+LightMsg::LightMsg( const LightMsg &m ) : Message(LIGHT_MSG)
+{
+  this->id = m.id;
+  this->action = m.action;
+  this->type = m.type;
+  this->pose = m.pose;
+  this->diffuse = m.diffuse;
+  this->specular = m.specular;
+  this->attenuation = m.attenuation;
+  this->direction = m.direction;
+  this->range = m.range;
+  this->castShadows = m.castShadows;
+  this->spotInnerAngle = m.spotInnerAngle;
+  this->spotOuterAngle = m.spotOuterAngle;
+  this->spotFalloff = m.spotFalloff;
+}
+
+void LightMsg::Load(XMLConfigNode *node)
+{
+  std::string l_type = node->GetString("type","point",1);
+  if (l_type == "point")
+    this->type = POINT;
+  else if (l_type == "spot")
+    this->type = SPOT;
+  else if (l_type == "directional")
+    this->type = DIRECTIONAL;
+  else
+    gzthrow("Invalid light type");
+
+  this->pose.pos = node->GetVector3("xyz",Vector3(0,0,0));  
+  this->diffuse = node->GetColor("diffuse", Color(1,1,1,1));
+  this->specular = node->GetColor("specular", Color(0,0,0,1));
+  this->attenuation = node->GetVector3("attenuation",Vector3(.2, 0.1, 0.0));
+  this->direction = node->GetVector3("direction",Vector3(0, 0, -1));
+  this->range = node->GetDouble("range",20,1);
+  this->castShadows = node->GetBool("castShadows",false,0);
+}
 
 VisualMsg::VisualMsg() : Message(VISUAL_MSG) 
 {

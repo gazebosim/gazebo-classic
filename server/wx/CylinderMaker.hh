@@ -6,7 +6,7 @@
 
 namespace gazebo
 {
-  class Visual;
+  class VisualMsg;
 
   class CylinderMaker : public EntityMaker
   {
@@ -25,7 +25,7 @@ namespace gazebo
     private: int state;
     private: bool leftMousePressed;
     private: Vector2<int> mousePushPos;
-    private: Visual *visual;
+    private: VisualMsg *visualMsg;
 
     private: static unsigned int counter;
   };

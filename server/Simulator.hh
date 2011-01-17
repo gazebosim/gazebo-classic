@@ -19,7 +19,7 @@
  *
  */
 /* Desc: The Simulator; Top level managing object
- * Author: Jordi Polo
+ * Author: Nate Koenig, Jordi Polo
  * Date: 3 Jan 2008
  */
 

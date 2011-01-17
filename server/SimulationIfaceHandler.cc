@@ -532,26 +532,6 @@ void SimulationIfaceHandler::Update()
 
           break;
         }
-      case libgazebo::SimulationRequestData::GET_MODEL_TYPE:
-        {
-          Common *common = this->world->GetByName((char*)req->name);
-
-          if (common && common->HasType(MODEL))
-          {
-            Model *model = (Model*)common;
-
-            response->type = req->type;
-            memset(response->strValue, 0, 512);
-            strncpy(response->strValue, model->GetModelType().c_str(), 512);
-            response->strValue[511] = '\0';
-
-            response++;
-            this->iface->data->responseCount += 1;
-          }
-          else
-            gzerr(0) << "Invalid model name[" << req->name << "] in simulation interface Get Model Type.\n";
-          break;
-        }
 
       case libgazebo::SimulationRequestData::GET_MODEL_EXTENT:
         {

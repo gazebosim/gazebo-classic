@@ -2,7 +2,7 @@
 import * from "shadow_receiver.program"
 import * from "perpixel.program"
 
-material Gazebo/GrayGrid : shadow_receiver_template
+material Gazebo/GreyGrid : shadow_receiver_template
 {
   set_texture_alias ambient_tex grayGrid.png
   set_texture_alias diffuse_tex grayGrid.png
@@ -216,10 +216,17 @@ material Gazebo/RedGlow : Gazebo/Red
 	}
 }
 
+
+
 material Gazebo/GreenGlow : Gazebo/Green
 {
   technique
   {
+    pass ambient
+    {
+      emissive 0 1 0
+    }
+
     pass light
     {
       emissive 0 1 0
@@ -278,15 +285,31 @@ material Gazebo/TurquoiseGlowOutline : Gazebo/Turquoise
     pass ambient
     {
       ambient 0 1 1
+    }
+
+    pass ambient2
+    {
+      ambient 0 1 1
       polygon_mode wireframe
     }
 
 		pass light
 		{
+      diffuse 0 1 1
+		}
+
+		pass light2
+		{
 			emissive 0 1 1
       diffuse 0 1 1
       polygon_mode wireframe
 		}
+
+
+    pass decal
+    {
+      polygon_mode wireframe
+    }
 	}
 }
 
@@ -391,6 +414,31 @@ material Gazebo/YellowTransparent
   }
 }
 
+material Gazebo/LightOn
+{
+  technique
+  {
+    pass ambient
+    {
+      diffuse 0 1 0
+      ambient 0 1 0
+      emissive 0 1 0
+    }
+  }
+}
+
+material Gazebo/LightOff
+{
+  technique
+  {
+    pass ambient
+    {
+      diffuse 1 0 0
+      ambient 1 0 0
+      emissive 1 0 0
+    }
+  }
+}
 
 
 

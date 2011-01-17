@@ -31,6 +31,7 @@
 #include <libxml/xpath.h>
 #include <string>
 
+#include "Color.hh"
 #include "Vector3.hh"
 #include "Vector2.hh"
 #include "Quatern.hh"
@@ -164,6 +165,9 @@ namespace gazebo
   
     /// \brief Get a position
     public: Vector3 GetVector3( const std::string &key, Vector3 def ) const;
+
+    /// \brief Get a color
+    public: Color GetColor( const std::string &ket, Color def ) const;
   
     /// \brief Get a two dimensional double vector
     public: Vector2<double> GetVector2d( const std::string &key, Vector2<double> def ) const;

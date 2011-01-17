@@ -1,13 +1,11 @@
 #include <iostream>
 
 #include "Messages.hh"
+#include "Camera.hh"
 #include "Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
-#include "Visual.hh"
-#include "Camera.hh"
 #include "Scene.hh"
-#include "Visual.hh"
 #include "World.hh"
 #include "BoxMaker.hh"
 
@@ -19,29 +17,32 @@ BoxMaker::BoxMaker()
 : EntityMaker()
 {
   this->state = 0;
-  this->visual = NULL;
+  this->visualMsg = new VisualMsg();
+  this->visualMsg->render = VisualMsg::MESH_RESOURCE;
+  this->visualMsg->mesh = "unit_box_U1V1";
+  this->visualMsg->material = "Gazebo/TurquoiseGlowOutline";
 }
 
 BoxMaker::~BoxMaker()
 {
+  delete this->visualMsg;
 }
 
 void BoxMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream << "user_box_" << counter++;
-  this->visual = new Visual(stream.str(), scene );
-  this->visual->AttachMesh("unit_box_U1V1");
-  this->visual->SetMaterial("Gazebo/TurquoiseGlowOutline");
+  this->visualMsg->id = stream.str();
 
   this->state = 1;
 }
 
 void BoxMaker::Stop()
 {
-  if (this->visual)
-    delete this->visual;
-  this->visual = NULL;
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->visualMsg->action = VisualMsg::UPDATE;
+
   this->state = 0;
   Events::moveModeSignal(true);
 }
@@ -88,10 +89,10 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
   p2 = this->GetSnappedPoint( p2 );
 
   if (this->state == 1)
-    this->visual->SetPosition(p1);
+    this->visualMsg->pose.pos = p1;
 
   Vector3 scale = p1-p2;
-  Vector3 p = this->visual->GetPosition();
+  Vector3 p = this->visualMsg->pose.pos;
 
   if (this->state == 1)
   {
@@ -101,14 +102,15 @@ void BoxMaker::MouseDragCB(const MouseEvent &event)
   }
   else
   {
-    scale = this->visual->GetScale();
+    scale = this->visualMsg->size;
     scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
-  this->visual->SetPosition(p);
+  this->visualMsg->pose.pos = p;
+  this->visualMsg->size = scale;
 
-  this->visual->SetScale(scale);
+  Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
 void BoxMaker::CreateTheEntity()
@@ -117,20 +119,17 @@ void BoxMaker::CreateTheEntity()
 
   std::ostringstream newModelStr;
 
-  if (!this->visual)
-    return;
-
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model type='physical' name='" << this->visual->GetName() << "'>\
-    <xyz>" << this->visual->GetPosition() << "</xyz>\
+  newModelStr << "<model type='physical' name='" << this->visualMsg->id << "'>\
+    <xyz>" << this->visualMsg->pose.pos << "</xyz>\
     <body name='body'>\
     <geom type='box' name='geom'>\
-    <size>" << this->visual->GetScale() << "</size>\
+    <size>" << this->visualMsg->size << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_box_U1V1</mesh>\
-    <size>" << this->visual->GetScale() << "</size>\
+    <size>" << this->visualMsg->size << "</size>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\
@@ -138,11 +137,10 @@ void BoxMaker::CreateTheEntity()
     </body>\
     </model>";
 
-  delete this->visual;
-  this->visual = NULL;
-
   msg.xmlStr = newModelStr.str();
-  Simulator::Instance()->SendMessage( msg );
 
-  //Simulator::Instance()->GetActiveWorld()->InsertEntity();
+  this->visualMsg->action = VisualMsg::DELETE;
+  Simulator::Instance()->SendMessage( *this->visualMsg );
+
+  Simulator::Instance()->SendMessage( msg );
 }

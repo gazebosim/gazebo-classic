@@ -16,9 +16,7 @@ RenderPanel::RenderPanel(wxWindow *parent)
   wxBoxSizer *boxSizer1 = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer *boxSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
-  std::cout << "Creating a render control\n";
   this->renderControl = new RenderControl(this);
-  std::cout << "Done creating a render control\n";
   boxSizer1->Add(this->renderControl, 2, wxALL | wxEXPAND );
 
   wxStaticText *xyzPosText = new wxStaticText( this, wxID_ANY, wxT("XYZ:"), wxDefaultPosition, wxDefaultSize, 0);
@@ -102,7 +100,6 @@ void RenderPanel::Init()
 // Create a camera
 void RenderPanel::ViewScene(Scene *scene)
 {
-  printf("View Scene\n");
   this->renderControl->ViewScene(scene);
 }
 
@@ -202,7 +199,6 @@ void RenderPanel::OnYawSetFocus(wxFocusEvent &event)
 
 void RenderPanel::OnXPosKillFocus(wxFocusEvent &event)
 {
-  printf("RenderPanel:OnXPosKillFocus\n");
   UserCamera *cam = this->renderControl->GetCamera();
   Vector3 pos = cam->GetWorldPosition();
 
@@ -218,7 +214,6 @@ void RenderPanel::OnXPosKillFocus(wxFocusEvent &event)
 
 void RenderPanel::OnYPosKillFocus(wxFocusEvent &event)
 {
-  printf("RenderPanel:OnYPosKillFocus\n");
   UserCamera *cam = this->renderControl->GetCamera();
   Vector3 pos = cam->GetWorldPosition();
 
@@ -234,7 +229,6 @@ void RenderPanel::OnYPosKillFocus(wxFocusEvent &event)
 
 void RenderPanel::OnZPosKillFocus(wxFocusEvent &event)
 {
-  printf("RenderPanel:OnZPosKillFocus\n");
   UserCamera *cam = this->renderControl->GetCamera();
   Vector3 pos = cam->GetWorldPosition();
 

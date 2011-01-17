@@ -85,6 +85,18 @@ namespace gazebo
     /// \brief Get the alpha color
     public: float A() const;
 
+    /// \brief Set the red color
+    public: void R(float r);
+
+    /// \brief Set the green color
+    public: void G(float g);
+
+    /// \brief Set the blue color
+    public: void B(float b);
+
+    /// \brief Set the alpha color
+    public: void A(float a);
+
     /// \brief Return the equivalent ogre color
     public: Ogre::ColourValue GetOgreColor() const;
   

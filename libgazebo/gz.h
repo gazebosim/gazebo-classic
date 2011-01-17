@@ -439,7 +439,6 @@ class SimulationRequestData
                       GET_ENTITY_PARAM_COUNT,
                       GET_ENTITY_PARAM_KEY,
                       GET_ENTITY_PARAM_VALUE,
-                      GET_MODEL_TYPE,
                       GET_NUM_MODELS,
                       GET_NUM_CHILDREN,
                       GET_CHILD_NAME,
@@ -607,9 +606,6 @@ class SimulationIface : public Iface
 
   /// \brief return the type of the entity (model, body, geom)
   public: bool GetEntityType(const std::string &name, std::string &type);
-
-  /// \brief Get the type of this model
-  public: bool GetModelType(const std::string &modelName, std::string &type);
 
   /// \brief Get the number of models 
   public: bool GetNumModels(unsigned int &num);

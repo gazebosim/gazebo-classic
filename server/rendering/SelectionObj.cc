@@ -155,7 +155,7 @@ void SelectionObj::Attach( Visual *visual )
 
   if (visual)
   {
-    Box box = visual->GetBounds();
+    gazebo::Box box = visual->GetBounds();
     Vector3 scale = box.max - box.min;
 
     double max = std::max(scale.x, scale.y);

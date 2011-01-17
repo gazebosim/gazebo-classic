@@ -691,6 +691,24 @@ Vector3 XMLConfigNode::GetVector3( const std::string &key, Vector3 def ) const
 }
 
 ////////////////////////////////////////////////////////////////////////////
+// Get a color
+Color XMLConfigNode::GetColor( const std::string &key, Color def ) const
+{
+  Color c;
+
+  if (this->GetTupleString(key, 0, "") == "")
+    return def;
+
+  c.R( this->GetTupleDouble(key, 0, 1.0) );
+  c.G( this->GetTupleDouble(key, 1, 1.0) );
+  c.B( this->GetTupleDouble(key, 2, 1.0) );
+  c.A( this->GetTupleDouble(key, 3, 1.0) );
+
+  return c;
+}
+
+
+////////////////////////////////////////////////////////////////////////////
 // Get a two dimensional double vector
 Vector2<double> XMLConfigNode::GetVector2d( const std::string &key, Vector2<double> def ) const
 {

@@ -15,6 +15,10 @@ namespace Ogre
 
 namespace gazebo
 {
+  class LightMsg;
+  class VisualMsg;
+  class SelectionMsg;
+  class Light;
   class Visual;
   class Message;
   class Grid;
@@ -26,6 +30,7 @@ namespace gazebo
   class Scene
   {
     typedef std::map<std::string, Visual*> VisualMap;
+    typedef std::map<std::string, Light*> LightMap;
 
     public: enum SceneType {BSP, GENERIC};
 
@@ -150,6 +155,10 @@ namespace gazebo
                                      const Ogre::Quaternion &orient,
                                      const Ogre::Vector3 &scale);
 
+    private: void HandleVisualMsg(const VisualMsg *msg);
+    private: void HandleLightMsg(const LightMsg *msg);
+    private: void HandleSelectionMsg(const SelectionMsg *msg);
+
     private: std::string name;
     private: ParamT<Color> *ambientP;
     private: ParamT<Color> *backgroundColorP;
@@ -182,6 +191,7 @@ namespace gazebo
     private: std::vector<Message*> messages;
 
     private: VisualMap visuals;
+    private: LightMap lights;
   };
 };
 #endif 

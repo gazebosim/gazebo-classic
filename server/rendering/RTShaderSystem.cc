@@ -453,5 +453,4 @@ void RTShaderSystem::ApplyShadows(Scene *scene)
   this->shaderGenerator->invalidateScheme(
       scene->GetIdString() + 
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
 }

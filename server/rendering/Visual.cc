@@ -121,48 +121,12 @@ Visual::~Visual()
 
   if (this->sceneNode != NULL)
   {
-    if (this->boundingBoxNode != NULL)
-      this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
-
-    // loop through sceneNode an delete attached objects
-    for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
-    {
-      Ogre::MovableObject* obj = this->sceneNode->getAttachedObject(i);
-      if (obj) delete obj;
-      obj = NULL;
-    }
+    this->sceneNode->removeAndDestroyAllChildren();
     this->sceneNode->detachAllObjects();
 
-    // delete works, but removeAndDestroyChild segfaults
-    delete this->sceneNode;
+    this->sceneNode->getParentSceneNode()->removeAndDestroyChild( this->sceneNode->getName() );
     this->sceneNode = NULL;
-    //this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
   }
-
-  // Having this chunk of code causes a segfault when closing the
-  // application.
-  /*if (this->parentNode != NULL)
-  {
-    if (this->sceneNode != NULL)
-    {
-      if (this->boundingBoxNode != NULL)
-        this->sceneNode->removeAndDestroyChild( this->boundingBoxNode->getName() );
-
-      // loop through sceneNode an delete attached objects
-      for (int i = 0; i < this->sceneNode->numAttachedObjects(); i++)
-      {
-        Ogre::MovableObject* obj = this->sceneNode->getAttachedObject(i);
-        if (obj) delete obj;
-        obj = NULL;
-      }
-      this->sceneNode->detachAllObjects();
-
-      // delete works, but removeAndDestroyChild segfaults
-      delete this->sceneNode;
-      this->sceneNode = NULL;
-      //this->parentNode->removeAndDestroyChild( this->sceneNode->getName() );
-    }
-  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,16 +175,18 @@ void Visual::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Visual::LoadFromMsg(VisualMsg *msg)
+void Visual::LoadFromMsg(const VisualMsg *msg)
 {
+  std::string mesh = msg->mesh;
+
   if (msg->plane.normal != Vector3(0,0,0))
   {
     MeshManager::Instance()->CreatePlane(msg->id, msg->plane,
         Vector2<double>(2,2), Vector2<double>(msg->uvTile_x, msg->uvTile_y) );
-    msg->mesh = msg->id;
+    mesh = msg->id;
   }
 
-  this->meshNameP->SetValue(msg->mesh);
+  this->meshNameP->SetValue(mesh);
   this->xyzP->SetValue(msg->pose.pos);
   this->rpyP->SetValue(msg->pose.rot);
   this->meshTileP->Load(NULL);
@@ -289,8 +255,11 @@ void Visual::Load(XMLConfigNode *node)
       // Add the mesh into OGRE
       this->InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
 
-      obj = (Ogre::MovableObject*)this->sceneNode->getCreator()->createEntity(
-          stream.str(), meshName);
+      Ogre::SceneManager *mgr = this->sceneNode->getCreator();
+      if (mgr->hasEntity(stream.str()))
+        obj = (Ogre::MovableObject*)mgr->getEntity(stream.str());
+      else
+        obj = (Ogre::MovableObject*)mgr->createEntity( stream.str(), meshName);
     }
   }
   catch (Ogre::Exception e)
@@ -402,6 +371,7 @@ void Visual::Save(std::string &prefix, std::ostream &stream)
 /// Attach a visual
 void Visual::AttachVisual(Visual *vis)
 {
+  vis->GetSceneNode()->getParentSceneNode()->removeChild(vis->GetSceneNode());
   this->sceneNode->addChild( vis->GetSceneNode() );
   vis->SetParent(this);
 }
@@ -549,13 +519,6 @@ void Visual::SetScale(const Vector3 &scale )
 /// Get the scale
 Vector3 Visual::GetScale()
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return Vector3(0,0,0);
-
   Ogre::Vector3 vscale;
   vscale=this->sceneNode->getScale();
   return Vector3(vscale.x, vscale.y, vscale.z);
@@ -696,9 +659,6 @@ void Visual::AttachAxes()
 /// Set the transparency
 void Visual::SetTransparency( float trans )
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
@@ -715,6 +675,7 @@ void Visual::SetTransparency( float trans )
     if (!entity)
       continue;
 
+    // For each ogre::entity
     for (unsigned int j=0; j < entity->getNumSubEntities(); j++)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
@@ -734,7 +695,10 @@ void Visual::SetTransparency( float trans )
         for (passCount=0; passCount < technique->getNumPasses(); passCount++)
         {
           pass = technique->getPass(passCount);
-          pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+          // Need to fix transparency
+          /*if (pass->getPolygonMode() == Ogre::PM_SOLID)
+            pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+            */
 
           if (this->transparency > 0.0)
             pass->setDepthWriteEnabled(false);
@@ -839,7 +803,6 @@ void Visual::SetPosition( const Vector3 &pos)
     //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
   }*/
 
-  //std::cout << "SetPos[" << pos << "][" << this->GetName() << "]\n";
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 
   /*if (this->IsStatic())
@@ -1072,12 +1035,7 @@ void Visual::SetBoundingBoxMaterial(const std::string &materialName )
 /// Set to true to show a white bounding box, used to indicate user selection
 void Visual::ShowSelectionBox( bool value )
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
+  std::cout << "Show Selection for[" << this->GetName() << "]\n";
 
   if (!selectionObj)
   {
@@ -1089,6 +1047,7 @@ void Visual::ShowSelectionBox( bool value )
     selectionObj->Attach(this);
   else
     selectionObj->Attach(NULL);
+    
 }
 
 
@@ -1241,26 +1200,17 @@ std::string Visual::GetMaterialName() const
 // Get the bounds
 Box Visual::GetBounds() const
 {
-  Box result;
-  Ogre::AxisAlignedBox box;
+  Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
-
-  result.min.x = box.getMinimum().x;
-  result.min.y = box.getMinimum().y;
-  result.min.z = box.getMinimum().z;
-
-  result.max.x = box.getMaximum().x;
-  result.max.y = box.getMaximum().y;
-  result.max.z = box.getMaximum().z;
+  return box;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the bounding box for a scene node
-void Visual::GetBoundsHelper(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box) const
+void Visual::GetBoundsHelper(Ogre::SceneNode *node, Box &box) const
 {
   node->_updateBounds();
 
-  //box.merge(node->_getWorldAABB());
   Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
 
   for (int i=0; i < node->numAttachedObjects(); i++)
@@ -1275,7 +1225,11 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, Ogre::AxisAlignedBox &box) c
         if (str.substr(0,3) == "rot" || str.substr(0,5) == "trans")
           continue;
       }
-      box.merge(obj->getWorldBoundingBox());
+
+      Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
+      Ogre::Vector3 min = bb.getMinimum();
+      Ogre::Vector3 max = bb.getMaximum();
+      box.Merge(Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z)));
     }
   }
 
@@ -1439,3 +1393,14 @@ void Visual::InsertMesh( const Mesh *mesh)
     gzerr(0) << "Unable to create a basic Unit cylinder object" << std::endl;
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Update a visual based on a message
+void Visual::UpdateFromMsg(const VisualMsg *msg)
+{
+  this->SetPose(msg->pose);
+  this->SetTransparency(msg->transparency);
+  this->SetScale(msg->size);
+}
+
+

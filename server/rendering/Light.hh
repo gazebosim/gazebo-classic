@@ -43,6 +43,7 @@ namespace Ogre
 namespace gazebo
 {
   class Visual;
+  class LightMsg;
   class XMLConfigNode;
   class OgreDynamicLines;
   class Scene;
@@ -59,8 +60,14 @@ namespace gazebo
     /// \brief Load the light
     public: void Load(XMLConfigNode *node);
 
+    /// \brief Load from a light message
+    public: void LoadFromMsg(const LightMsg *msg);
+
     /// \brief Save a light
     public: void Save(const std::string &prefix, std::ostream &stream);
+
+    /// \brief Set the position of the light
+    public: void SetPosition(const Vector3 &p);
 
     /// \brief Set whether this entity has been selected by the user through  
     ///        the gui
@@ -91,7 +98,7 @@ namespace gazebo
     public: void SetSpotInnerAngle(const double &angle);
 
     /// \brief Set the spot light outter angle
-    public: void SetSpotOutterAngle(const double &angle);
+    public: void SetSpotOuterAngle(const double &angle);
 
     /// \brief Set the spot light falloff
     public: void SetSpotFalloff(const double &angle);
@@ -115,9 +122,6 @@ namespace gazebo
     private: Visual *visual;
     private: OgreDynamicLines *line;
 
-    private: std::string name;
-    private: Pose3d pose;
-
     private: ParamT<std::string> *lightTypeP;
     private: ParamT<Color> *diffuseP;
     private: ParamT<Color> *specularP;
@@ -126,7 +130,7 @@ namespace gazebo
     private: ParamT<double> *rangeP;
     private: ParamT<bool> *castShadowsP;
     private: ParamT<double> *spotInnerAngleP;
-    private: ParamT<double> *spotOutterAngleP;
+    private: ParamT<double> *spotOuterAngleP;
     private: ParamT<double> *spotFalloffP;
 
     private: static unsigned int lightCounter;

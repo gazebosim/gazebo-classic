@@ -32,6 +32,7 @@ namespace gazebo
     private: void OnPause(bool pause);
 
     private: void OnQuit(wxCommandEvent &event);
+    private: void Quit();
     private: void OnOpen(wxCommandEvent &event);
     private: void OnSave(wxCommandEvent &event);
     private: void OnReset(wxCommandEvent &event);

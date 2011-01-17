@@ -311,19 +311,10 @@ void RenderControl::ViewScene(Scene *scene)
   else
     this->userCamera = scene->GetUserCamera(0);
 
-  this->userCamera->SetWorldPosition( Vector3(0,0,3) );
+  this->userCamera->SetWorldPosition( Vector3(-5,0,5) );
   this->userCamera->SetWorldRotation( Quatern::EulerToQuatern(0, DTOR(15), 0) );
 
   WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
-
-  /*if (this->userCamera == NULL)
-  {
-    this->userCamera = new UserCamera( this, world->GetScene() );
-    this->userCamera->Load(NULL);
-  }
-  else
-    this->userCamera->SetScene( world->GetScene() );
-    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

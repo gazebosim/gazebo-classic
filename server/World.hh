@@ -43,6 +43,11 @@
 #include "Entity.hh"
 //#include "Timer.hh"
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace libgazebo
 {
   class Server;
@@ -277,7 +282,7 @@ class World
 
   //private: Timer saveStateTimer;
   
-  private: boost::mutex mutex;
+  private: boost::recursive_mutex mutex;
   private: std::vector<Message*> messages;
 
   private: ParamT<std::string> *nameP;

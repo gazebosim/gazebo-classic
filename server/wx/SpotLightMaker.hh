@@ -1,6 +1,7 @@
 #ifndef SPOTLIGHTMAKER_HH
 #define SPOTLIGHTMAKER_HH
 
+#include "Messages.hh"
 #include "Vector2.hh"
 #include "EntityMaker.hh"
 
@@ -21,8 +22,7 @@ namespace gazebo
   
     private: virtual void CreateTheEntity();
     private: int state;
-    private: Vector3 createPos;
-    private: std::string lightName;
+    private: LightMsg msg;
     private: static unsigned int counter;
   };
 }
