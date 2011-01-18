@@ -375,16 +375,15 @@ void Body::Init()
   this->linearAccel.Set(0,0,0);
   this->angularAccel.Set(0,0,0);
 
-  // NATY: put back in
   /// Attach mesh for CG visualization
   /// Add a renderable visual for CG, make visible in Update()
-  /*if (this->mass.GetAsDouble() > 0.0)
+  if (this->mass.GetAsDouble() > 0.0)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
     this->cgVisualMsg = new VisualMsg();
-    this->cgVisualMsg->parentId = this->comEntity->GetId();
+    this->cgVisualMsg->parentId = this->comEntity->GetCompleteScopedName();
     this->cgVisualMsg->id = visname.str();
     this->cgVisualMsg->render = VisualMsg::MESH_RESOURCE;
     this->cgVisualMsg->mesh = "body_cg";
@@ -392,9 +391,11 @@ void Body::Init()
     this->cgVisualMsg->castShadows = false;
     this->cgVisualMsg->attachAxes = true;
     this->cgVisualMsg->visible = false;
+    this->cgVisualMsg->size.Set(0.1, 0.1, 0.1);
     Simulator::Instance()->SendMessage(*this->cgVisualMsg);
+    this->cgVisualMsg->size.Set(100, 100, 100);
 
-    VisualMsg msg;
+    /*VisualMsg msg;
     msg.parentId = this->cgVisualMsg->id;
     msg.render = VisualMsg::LINE_LIST;
     msg.attachAxes = false;
@@ -412,7 +413,8 @@ void Body::Init()
 
       Simulator::Instance()->SendMessage(msg);
     }
-  }*/
+    */
+  }
 
   this->enabled = true;
 }

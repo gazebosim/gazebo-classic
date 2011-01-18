@@ -195,6 +195,7 @@ void Visual::LoadFromMsg(const VisualMsg *msg)
   this->sizeP->SetValue(msg->size);
 
   this->Load(NULL);
+  this->SetVisible(msg->visible);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -500,13 +501,6 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const Vector3 &scale )
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
   Ogre::Vector3 vscale;
   vscale.x=scale.x;
   vscale.y=scale.y;
@@ -759,13 +753,7 @@ void Visual::SetCastShadows(const bool &shadows)
 /// Set whether the visual is visible
 void Visual::SetVisible(bool visible, bool cascade)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
+  std::cout << "VIs[" << this->GetName() << "]=" << visible << "\n";
   this->sceneNode->setVisible( visible, cascade );
   this->visible = visible;
 }
@@ -788,13 +776,6 @@ bool Visual::GetVisible() const
 // Set the position of the visual
 void Visual::SetPosition( const Vector3 &pos)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
   /*if (this->IsStatic() && this->staticGeom)
   {
     this->staticGeom->reset();
@@ -1401,6 +1382,9 @@ void Visual::UpdateFromMsg(const VisualMsg *msg)
   this->SetPose(msg->pose);
   this->SetTransparency(msg->transparency);
   this->SetScale(msg->size);
+  std::cout << "Scale[" << msg->size << "]\n";
+  
+  this->SetVisible(msg->visible, 1);
 }
 
 
