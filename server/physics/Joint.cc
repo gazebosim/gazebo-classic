@@ -162,7 +162,7 @@ void Joint::Load(XMLConfigNode *node)
   this->visualMsg = new VisualMsg();
   this->visualMsg->parentId = this->GetName();
   this->visualMsg->id = visname.str();
-  this->visualMsg->render = VisualMsg::MESH_RESOURCE;
+  this->visualMsg->render = RENDERING_MESH_RESOURCE;
   this->visualMsg->pose.pos = this->anchorPos;
   this->visualMsg->castShadows = false;
   this->visualMsg->mesh = "joint_anchor";
@@ -172,7 +172,7 @@ void Joint::Load(XMLConfigNode *node)
   this->line1Msg = new VisualMsg();
   this->line1Msg->parentId = this->visualMsg->id;
   this->line1Msg->id = "line1";
-  this->line1Msg->render = VisualMsg::LINE_LIST;
+  this->line1Msg->render = RENDERING_LINE_LIST;
   this->line1Msg->material = "Gazebo/BlueGlow";
   this->line1Msg->points.push_back(Vector3(0,0,0));
   this->line1Msg->points.push_back(Vector3(0,0,0));
@@ -180,7 +180,7 @@ void Joint::Load(XMLConfigNode *node)
   this->line2Msg = new VisualMsg();
   this->line2Msg->parentId = this->visualMsg->id;
   this->line2Msg->id = "line2";
-  this->line2Msg->render = VisualMsg::LINE_LIST;
+  this->line2Msg->render = RENDERING_LINE_LIST;
   this->line2Msg->material = "Gazebo/BlueGlow";
   this->line2Msg->points.push_back(Vector3(0,0,0));
   this->line2Msg->points.push_back(Vector3(0,0,0));

@@ -195,7 +195,7 @@ void Visual::LoadFromMsg(const VisualMsg *msg)
   this->sizeP->SetValue(msg->size);
 
   this->Load(NULL);
-  this->SetVisible(msg->visible);
+  this->UpdateFromMsg(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +283,6 @@ void Visual::Load(XMLConfigNode *node)
   if (obj)
   {
     meshSize = obj->getBoundingBox().getSize();
-    //this->sizeP->SetValue( Vector3(meshSize.x, meshSize.y, meshSize.z) );
   }
 
   // Get the desired size of the mesh
@@ -291,30 +290,15 @@ void Visual::Load(XMLConfigNode *node)
   {
     this->sizeP->Load(node);
   }
-  /*else
-    this->sizeP->SetValue( Vector3(meshSize.x, meshSize.y, meshSize.z) );
-    */
 
-  // Get and set teh desired scale of the mesh
-  /*if (node && node->GetChild("scale") != NULL)
-  {
-    this->scaleP->Load(node);
-    Vector3 scale = this->scaleP->GetValue();
-    this->sceneNode->setScale(scale.x, scale.y, scale.z);
-  }
-  else
-  {
-  */
-    Vector3 scale = this->sizeP->GetValue();
-    scale.x /= meshSize.x;
-    scale.y /= meshSize.y;
-    scale.z /= meshSize.z;
-    scale.Correct();
+  Vector3 scale = this->sizeP->GetValue();
+  scale.x /= meshSize.x;
+  scale.y /= meshSize.y;
+  scale.z /= meshSize.z;
+  scale.Correct();
 
-    this->scaleP->SetValue( scale );
-    this->sceneNode->setScale(scale.x, scale.y, scale.z);
-  //}
-  
+  this->scaleP->SetValue( scale );
+  this->sceneNode->setScale(scale.x, scale.y, scale.z);
 
   // Set the material of the mesh
   if (**this->materialNameP != "none")
@@ -501,12 +485,7 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const Vector3 &scale )
 {
-  Ogre::Vector3 vscale;
-  vscale.x=scale.x;
-  vscale.y=scale.y;
-  vscale.z=scale.z;
-
-  this->sceneNode->setScale(vscale);
+  this->sceneNode->setScale(Ogre::Vector3(scale.x, scale.y, scale.z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -753,7 +732,6 @@ void Visual::SetCastShadows(const bool &shadows)
 /// Set whether the visual is visible
 void Visual::SetVisible(bool visible, bool cascade)
 {
-  std::cout << "VIs[" << this->GetName() << "]=" << visible << "\n";
   this->sceneNode->setVisible( visible, cascade );
   this->visible = visible;
 }
@@ -1142,7 +1120,7 @@ bool Visual::GetUseRTShader() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the visual
-OgreDynamicLines *Visual::AddDynamicLine(OperationType type)
+OgreDynamicLines *Visual::AddDynamicLine(RenderOpType type)
 {
   Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 
@@ -1382,9 +1360,14 @@ void Visual::UpdateFromMsg(const VisualMsg *msg)
   this->SetPose(msg->pose);
   this->SetTransparency(msg->transparency);
   this->SetScale(msg->size);
-  std::cout << "Scale[" << msg->size << "]\n";
-  
-  this->SetVisible(msg->visible, 1);
+  this->SetVisible(msg->visible);
+
+  if (msg->points.size() > 0)
+  {
+    OgreDynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);
+    for (unsigned int i=0; i < msg->points.size(); i++)
+      lines->AddPoint( msg->points[i] );
+  }
 }
 
 

@@ -215,6 +215,7 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
   this->worldStatesInsertIter = this->worldStates.begin();
   this->worldStatesEndIter = this->worldStates.begin();
   this->worldStatesCurrentIter = this->worldStatesInsertIter;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

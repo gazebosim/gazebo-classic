@@ -59,8 +59,6 @@ Body::Body(Entity *parent)
   // NATY: put back in functionality
   // this->GetVisualNode()->SetShowInGui(false);
 
-  this->cgVisualMsg = NULL;
-
   this->comEntity = new Entity(this);
   this->comEntity->SetName("COM_Entity");
   this->comEntity->SetShowInGui(false);
@@ -112,12 +110,15 @@ Body::~Body()
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
 
-  if (this->cgVisualMsg)
+  if (this->cgVisualMsgs.size() > 0)
   {
-    this->cgVisualMsg->action = VisualMsg::DELETE;
-    Simulator::Instance()->SendMessage(*this->cgVisualMsg);
-    delete this->cgVisualMsg;
-    this->cgVisualMsg = NULL;
+    for (unsigned int i=0; i < this->cgVisualMsgs.size(); i++)
+    {
+      this->cgVisualMsgs[i]->action = VisualMsg::DELETE;
+      Simulator::Instance()->SendMessage(*this->cgVisualMsgs[i]);
+      delete this->cgVisualMsgs[i];
+    }
+    this->cgVisualMsgs.clear();
   }
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
@@ -382,38 +383,39 @@ void Body::Init()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
-    this->cgVisualMsg = new VisualMsg();
-    this->cgVisualMsg->parentId = this->comEntity->GetCompleteScopedName();
-    this->cgVisualMsg->id = visname.str();
-    this->cgVisualMsg->render = VisualMsg::MESH_RESOURCE;
-    this->cgVisualMsg->mesh = "body_cg";
-    this->cgVisualMsg->material = "Gazebo/Red";
-    this->cgVisualMsg->castShadows = false;
-    this->cgVisualMsg->attachAxes = true;
-    this->cgVisualMsg->visible = false;
-    this->cgVisualMsg->size.Set(0.1, 0.1, 0.1);
-    Simulator::Instance()->SendMessage(*this->cgVisualMsg);
-    this->cgVisualMsg->size.Set(100, 100, 100);
+    VisualMsg *msg;
+    msg = new VisualMsg();
+    msg->parentId = this->comEntity->GetCompleteScopedName();
+    msg->id = visname.str();
+    msg->render = RENDERING_MESH_RESOURCE;
+    msg->mesh = "unit_box";
+    msg->material = "Gazebo/Red";
+    msg->castShadows = false;
+    msg->attachAxes = true;
+    msg->visible = false;
+    msg->size.Set(0.1, 0.1, 0.1);
+    Simulator::Instance()->SendMessage(*msg);
+    this->cgVisualMsgs.push_back( msg );
 
-    /*VisualMsg msg;
-    msg.parentId = this->cgVisualMsg->id;
-    msg.render = VisualMsg::LINE_LIST;
-    msg.attachAxes = false;
-    msg.material = "Gazebo/GreenGlow";
-
-    // Create a line to each geom
-    for (std::map< std::string, Geom* >::iterator giter = this->geoms.begin(); 
-         giter != this->geoms.end(); giter++)
+    if (this->geoms.size() > 1)
     {
-      msg.points.clear();
+      msg = new VisualMsg();
+      msg->parentId = this->comEntity->GetCompleteScopedName();
+      msg->id = visname.str() + "_connectors";
+      msg->render = RENDERING_LINE_LIST;
+      msg->attachAxes = false;
+      msg->material = "Gazebo/GreenGlow";
+      msg->visible = false;
 
-      msg.id = visname.str() + "_lineto_" + giter->first;
-      msg.points.push_back( Vector3(0,0,0) );
-      msg.points.push_back(giter->second->GetRelativePose().pos);
-
-      Simulator::Instance()->SendMessage(msg);
+      // Create a line to each geom
+      for (std::map< std::string, Geom* >::iterator giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
+      {
+        msg->points.push_back( Vector3(0,0,0) );
+        msg->points.push_back(giter->second->GetRelativePose().pos);
+      }
+      Simulator::Instance()->SendMessage(*msg);
+      this->cgVisualMsgs.push_back( msg );
     }
-    */
   }
 
   this->enabled = true;
@@ -703,16 +705,22 @@ void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
 /// Toggle show the physics visualizations
 void Body::ToggleShowPhysics()
 {
-  this->cgVisualMsg->visible = !this->cgVisualMsg->visible;
-  Simulator::Instance()->SendMessage(*this->cgVisualMsg);
+  for (unsigned int i=0; i < this->cgVisualMsgs.size(); i++)
+  {
+    this->cgVisualMsgs[i]->visible = !this->cgVisualMsgs[i]->visible;
+    Simulator::Instance()->SendMessage(*this->cgVisualMsgs[i]);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set to true to show the physics visualizations
 void Body::ShowPhysics(bool show)
 {
-  this->cgVisualMsg->visible = show;
-  Simulator::Instance()->SendMessage(*this->cgVisualMsg);
+  for (unsigned int i=0; i < this->cgVisualMsgs.size(); i++)
+  {
+    this->cgVisualMsgs[i]->visible = show;
+    Simulator::Instance()->SendMessage(*this->cgVisualMsgs[i]);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,13 +27,13 @@ class OgreDynamicRenderable : public Ogre::SimpleRenderable
   /// \param operationType The type of render operation to perform.
   /// \param useIndices Specifies whether to use indices to determine the
   /// vertices to use as input.
-  public: void Init(OperationType operationType, bool useIndices=false);
+  public: void Init(RenderOpType operationType, bool useIndices=false);
 
   /// \brief Set the render operation type
-  public: void SetOperationType(OperationType opType);
+  public: void SetOperationType(RenderOpType opType);
 
   /// \brief Get the render operation type
-  public: OperationType GetOperationType() const;
+  public: RenderOpType GetOperationType() const;
 
   /// \brief Implementation of Ogre::SimpleRenderable
   public: virtual Ogre::Real getBoundingRadius(void) const;

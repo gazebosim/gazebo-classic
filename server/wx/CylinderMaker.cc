@@ -16,7 +16,7 @@ CylinderMaker::CylinderMaker()
 {
   this->state = 0;
   this->visualMsg = new VisualMsg();
-  this->visualMsg->render = VisualMsg::MESH_RESOURCE;
+  this->visualMsg->render = RENDERING_MESH_RESOURCE;
   this->visualMsg->mesh = "unit_cylinder";
   this->visualMsg->material = "Gazebo/TurquoiseGlowOutline";
 }

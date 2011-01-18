@@ -42,7 +42,7 @@ namespace gazebo
 class OgreDynamicLines : public OgreDynamicRenderable
 {
   /// Constructor
-  public: OgreDynamicLines(OperationType opType=RENDERING_LINE_STRIP);
+  public: OgreDynamicLines(RenderOpType opType=RENDERING_LINE_STRIP);
 
   /// Destructor
   public: virtual ~OgreDynamicLines();

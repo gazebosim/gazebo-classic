@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "RenderTypes.hh"
 #include "Color.hh"
 #include "Vector3.hh"
 #include "Time.hh"
@@ -66,7 +67,6 @@ namespace gazebo
   class VisualMsg : public Message
   {
     public: enum ActionType {UPDATE, DELETE};
-    public: enum RenderType {MESH_RESOURCE, POINTS, LINE_LIST, LINE_STRIP, TRIANGLE_FAN};
 
     public: VisualMsg();
     public: VisualMsg(const VisualMsg &m);
@@ -78,7 +78,7 @@ namespace gazebo
     public: std::string parentId;
     public: std::string id;
     public: ActionType action;
-    public: RenderType render;
+    public: RenderOpType render;
     public: std::string mesh;
     public: std::string material;
     public: bool castShadows;

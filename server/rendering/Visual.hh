@@ -225,7 +225,7 @@ namespace gazebo
     public: bool GetUseRTShader() const;
 
     /// \brief Add a line to the visual
-    public: OgreDynamicLines *AddDynamicLine(OperationType type);
+    public: OgreDynamicLines *AddDynamicLine(RenderOpType type);
 
     /// \brief Delete a dynamic line
     public: void DeleteDynamicLine(OgreDynamicLines *line);

@@ -26,6 +26,7 @@
 
 #include <sstream>
 
+#include "RenderTypes.hh"
 #include "RenderState.hh"
 #include "Events.hh"
 #include "Model.hh"
@@ -177,10 +178,9 @@ void Geom::Load(XMLConfigNode *node)
 
     msg->parentId = this->GetCompleteScopedName();
     msg->id = visname.str();
-    msg->render = VisualMsg::MESH_RESOURCE;
+    msg->render = RENDERING_MESH_RESOURCE;
     msg->Load(childNode);
     msg->castShadows = false;
-    msg->pose = this->GetRelativePose();
 
     Simulator::Instance()->SendMessage( *msg );
 
@@ -207,7 +207,7 @@ void Geom::CreateBoundingBox()
 
     this->bbVisualMsg = new VisualMsg();
 
-    this->bbVisualMsg->render = VisualMsg::MESH_RESOURCE;
+    this->bbVisualMsg->render = RENDERING_MESH_RESOURCE;
     this->bbVisualMsg->parentId = this->GetCompleteScopedName();
     this->bbVisualMsg->id = this->GetCompleteScopedName() + "_BBVISUAL";
     this->bbVisualMsg->castShadows = false;

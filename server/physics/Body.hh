@@ -270,7 +270,7 @@ namespace gazebo
     protected: ParamT<bool> *turnGravityOffP;
     protected: ParamT<bool> *selfCollideP;
 
-    protected: VisualMsg *cgVisualMsg;
+    protected: std::vector<VisualMsg *> cgVisualMsgs;
 
     protected: Vector3 linearAccel;
     protected: Vector3 angularAccel;

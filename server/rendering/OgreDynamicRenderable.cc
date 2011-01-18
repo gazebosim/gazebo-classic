@@ -21,7 +21,7 @@ OgreDynamicRenderable::~OgreDynamicRenderable()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initializes the dynamic renderable.
-void OgreDynamicRenderable::Init(OperationType operationType, bool useIndices)
+void OgreDynamicRenderable::Init(RenderOpType operationType, bool useIndices)
 {
   this->SetOperationType(operationType);
 
@@ -42,7 +42,7 @@ void OgreDynamicRenderable::Init(OperationType operationType, bool useIndices)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the render operation type
-void OgreDynamicRenderable::SetOperationType(OperationType opType)
+void OgreDynamicRenderable::SetOperationType(RenderOpType opType)
 {
   switch (opType)
   {
@@ -74,9 +74,9 @@ void OgreDynamicRenderable::SetOperationType(OperationType opType)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the render operation type
-OperationType OgreDynamicRenderable::GetOperationType() const
+RenderOpType OgreDynamicRenderable::GetOperationType() const
 {
-  OperationType type;
+  RenderOpType type;
   switch (this->mRenderOp.operationType)
   {
     case Ogre::RenderOperation::OT_LINE_LIST:

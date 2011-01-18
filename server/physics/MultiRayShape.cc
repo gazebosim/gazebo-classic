@@ -14,13 +14,13 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
   this->rayFanMsg = new VisualMsg();
   this->rayFanMsg->id = this->GetName()+"_fan";
   this->rayFanMsg->parentId = this->geomParent->GetName();
-  this->rayFanMsg->render = VisualMsg::TRIANGLE_FAN;
+  this->rayFanMsg->render = RENDERING_TRIANGLE_FAN;
   this->rayFanMsg->material = "Gazebo/BlueLaser";
 
   this->rayFanOutlineMsg = new VisualMsg();
   this->rayFanOutlineMsg->id = this->GetName()+"_fanoutline";
   this->rayFanOutlineMsg->parentId = this->geomParent->GetName();
-  this->rayFanOutlineMsg->render = VisualMsg::LINE_STRIP;
+  this->rayFanOutlineMsg->render = RENDERING_LINE_STRIP;
   this->rayFanOutlineMsg->material = "Gazebo/BlueGlow";
 
   Param::Begin(&this->parameters);

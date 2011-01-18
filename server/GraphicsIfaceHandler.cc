@@ -171,7 +171,7 @@ void GraphicsIfaceHandler::DrawSimple(Visual *vis, libgazebo::Graphics3dDrawData
 {
   Vector3 pos;
   bool attached = false;
-  OperationType opType;
+  RenderOpType opType;
   OgreDynamicLines *line;
 
   switch(data->drawMode)

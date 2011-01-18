@@ -42,7 +42,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
     this->lineMsg = new VisualMsg();
     this->lineMsg->id = this->GetName();
     this->lineMsg->parentId = this->geomParent->GetName();
-    this->lineMsg->render = VisualMsg::LINE_LIST;
+    this->lineMsg->render = RENDERING_LINE_LIST;
 
     // Add two points
     this->lineMsg->points.push_back(Vector3(0,0,0));

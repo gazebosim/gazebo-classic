@@ -1,7 +1,7 @@
 #ifndef RENDERING_HH
 #define RENDERING_HH
 
-enum OperationType 
+enum RenderOpType 
 {
   /// A list of points, 1 vertex per point
   RENDERING_POINT_LIST = 0,//Ogre::RenderOperation::OT_POINT_LIST,
@@ -20,6 +20,8 @@ enum OperationType
 
   /// A fan of triangles, 3 vertices for the first triangle, and 1 per triangle after that
   RENDERING_TRIANGLE_FAN = 5,//Ogre::RenderOperation::OT_TRIANGLE_FAN 
+
+  RENDERING_MESH_RESOURCE = 6
 };
 
 #endif
