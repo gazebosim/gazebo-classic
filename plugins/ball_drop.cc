@@ -43,7 +43,7 @@ namespace gazebo
       if (LOG)
         fclose(this->indexFile);
 
-      World::Instance()->DisconnectWorldUpdateStartSignal(
+      Events::DisconnectWorldUpdateStartSignal(
           boost::bind(&BallDrop::UpdateCB, this));
 
       /*for (unsigned int i=0; i < this->sphere->GetChildCount(); i++)
@@ -106,7 +106,7 @@ namespace gazebo
       this->physics->SetStepTime( *this->stepTimesIter );
       this->physics->SetSORPGSIters( *this->stepItersIter );
 
-      World::Instance()->ConnectWorldUpdateStartSignal(
+      Events::ConnectWorldUpdateStartSignal(
             boost::bind(&BallDrop::UpdateCB, this));
     }
 

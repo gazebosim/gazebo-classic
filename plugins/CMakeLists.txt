@@ -26,7 +26,7 @@ set (plugins pioneer_line
 
 
 foreach (src ${plugins})
-  set_source_files_properties(${src}.cc PROPERTIES COMPILE_FLAGS ${GAZEBO_CFLAGS})
+  #set_source_files_properties(${src}.cc PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS}")
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} gazebo ${GAZEBO_LINK_LIBS} )
   set_target_properties(${src} PROPERTIES SKIP_BUILD_RPATH TRUE)
