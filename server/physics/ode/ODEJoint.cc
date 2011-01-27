@@ -45,14 +45,14 @@ ODEJoint::ODEJoint()
 /// Destructor
 ODEJoint::~ODEJoint()
 {
-  dJointDestroy( this->jointId );
+  if (this->jointId)
+    dJointDestroy( this->jointId );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a joint
 void ODEJoint::Load(XMLConfigNode *node)
 {
-
   Joint::Load(node);
 
   double h = this->physics->GetStepTime().Double();

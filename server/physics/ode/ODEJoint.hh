@@ -36,10 +36,10 @@ namespace gazebo
   class ODEJoint : public Joint
   {
     /// \brief Constructor
-    public: ODEJoint();
+    protected: ODEJoint();
   
     /// \brief Destructor
-    public: virtual ~ODEJoint();
+    protected: virtual ~ODEJoint();
 
     /// \brief Load a joint
     public: virtual void Load(XMLConfigNode *node);
@@ -107,7 +107,6 @@ namespace gazebo
   
     /// Feedback data for this joint
     private: dJointFeedback *feedback;
-  
   };
 }
 #endif
