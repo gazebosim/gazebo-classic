@@ -58,36 +58,14 @@
           <visual>
             <size>1 1 1</size>
             <mesh>unit_box</mesh>
-            <material>Gazebo/Red</material>
+            <material>Gazebo/WoodPallet</material>
           </visual>
         </geom>
-        <geom type="box" name="geom1">
-          <xyz>0 1.0 1.0</xyz>
-          <size>.5 .5 .5</size>
-          <mass>1.0</mass>
-          <visual>
-            <size>.5 .5 .5</size>
-            <mesh>unit_box</mesh>
-            <material>Gazebo/Red</material>
-          </visual>
-        </geom>
-
-        <geom type="box" name="geom2">
-          <xyz>0 -1.0 1.0</xyz>
-          <size>.5 .5 .5</size>
-          <mass>1.0</mass>
-          <visual>
-            <size>.5 .5 .5</size>
-            <mesh>unit_box</mesh>
-            <material>Gazebo/Red</material>
-          </visual>
-        </geom>
-
       </body>
     </model>
 
     <model type="physical" name="sphere_model">
-      <xyz>0 2.0 1.5</xyz>
+      <xyz>2 0.0 1.5</xyz>
       <static>false</static>
       <body name="body">
         <geom type="sphere" name="geom">
@@ -96,11 +74,12 @@
           <visual>
             <size>.1 .1 .1</size>
             <mesh>unit_sphere</mesh>
-            <material>Gazebo/Blue</material>
+            <material>Gazebo/WoodPallet</material>
           </visual>
         </geom>
       </body>
     </model>
+    <!--
 
     <model type="physical" name="cylinder_model">
       <xyz>0 -2 1.5</xyz>
@@ -117,6 +96,7 @@
         </geom>
       </body>
     </model>
+    -->
  
     <!-- White Point light -->
     <light name="point_white">

@@ -26,7 +26,7 @@
 #include "OgreAdaptor.hh"
 #include "UserCamera.hh"
 #include "Camera.hh"
-#include "RTShaderSystem.hh"
+//#include "RTShaderSystem.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "Entity.hh"

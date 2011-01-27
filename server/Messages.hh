@@ -101,7 +101,6 @@ namespace gazebo
     public: bool attachAxes;
     public: bool visible;
     public: float transparency;
-    public: Box boundingbox;
     public: std::vector<Vector3> points;
     public: Pose3d pose;
     public: Plane plane;

@@ -87,7 +87,6 @@ VisualMsg::VisualMsg(const VisualMsg &m)
   this->attachAxes = m.attachAxes;
   this->visible = m.visible;
   this->transparency = m.transparency;
-  this->boundingbox = m.boundingbox;
   this->points = m.points;
   this->pose = m.pose;
   this->plane = m.plane;

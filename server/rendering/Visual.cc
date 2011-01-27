@@ -21,9 +21,6 @@
 
 #include <Ogre.h>
 
-// NATY
-//#include <boost/thread/recursive_mutex.hpp>
-
 #include "Messages.hh"
 #include "World.hh"
 #include "Events.hh"
@@ -336,8 +333,6 @@ Common *Visual::GetOwner() const
 // Save the visual in XML format
 void Visual::Save(std::string &prefix, std::ostream &stream)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
   stream << prefix << "<visual>\n";
   stream << prefix << "  " << *(this->xyzP) << "\n";
   stream << prefix << "  " << *(this->rpyP) << "\n";
@@ -369,9 +364,6 @@ void Visual::DetachVisual(Visual *vis)
 /// Attach a renerable object to the visual
 void Visual::AttachObject( Ogre::MovableObject *obj)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
@@ -386,9 +378,6 @@ void Visual::AttachObject( Ogre::MovableObject *obj)
 /// Detach all objects
 void Visual::DetachObjects()
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
@@ -400,9 +389,6 @@ void Visual::DetachObjects()
 /// Get the number of attached objects
 unsigned short Visual::GetNumAttached()
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return 0;
@@ -414,9 +400,6 @@ unsigned short Visual::GetNumAttached()
 /// Get an attached object
 Ogre::MovableObject *Visual::GetAttached(unsigned short num)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return NULL;
@@ -452,8 +435,6 @@ void Visual::MakeStatic()
 /// Attach a mesh to this visual by name
 void Visual::AttachMesh( const std::string &meshName )
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -498,9 +479,6 @@ Vector3 Visual::GetScale()
 // Set the material
 void Visual::SetMaterial(const std::string &materialName)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
@@ -694,9 +672,6 @@ float Visual::GetTransparency()
 ////////////////////////////////////////////////////////////////////////////////
 void Visual::SetHighlight(bool highlight)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
@@ -707,8 +682,6 @@ void Visual::SetHighlight(bool highlight)
 /// Set whether the visual should cast shadows
 void Visual::SetCastShadows(const bool &shadows)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -769,8 +742,6 @@ void Visual::SetPosition( const Vector3 &pos)
 // Set the rotation of the visual
 void Visual::SetRotation( const Quatern &rot)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -783,9 +754,6 @@ void Visual::SetRotation( const Quatern &rot)
 // Set the pose of the visual
 void Visual::SetPose( const Pose3d &pose)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
 
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -799,9 +767,6 @@ void Visual::SetPose( const Pose3d &pose)
 // Set the position of the visual
 Vector3 Visual::GetPosition() const
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return Vector3();
@@ -819,9 +784,6 @@ Vector3 Visual::GetPosition() const
 // Get the rotation of the visual
 Quatern Visual::GetRotation( ) const
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return Quatern();
@@ -840,9 +802,6 @@ Quatern Visual::GetRotation( ) const
 // Get the pose of the visual
 Pose3d Visual::GetPose() const
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return Pose3d();
@@ -857,9 +816,6 @@ Pose3d Visual::GetPose() const
 /// Get the global pose of the node
 Pose3d Visual::GetWorldPose() const
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return Pose3d();
@@ -889,13 +845,6 @@ Pose3d Visual::GetWorldPose() const
 // Get this visual Ogre node
 Ogre::SceneNode * Visual::GetSceneNode() const
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  // Stop here if the rendering engine has been disabled
-  //if (!Simulator::Instance()->GetRenderEngineEnabled())
-    //return NULL;
-
   return this->sceneNode;
 }
 
@@ -904,16 +853,10 @@ Ogre::SceneNode * Visual::GetSceneNode() const
 ///  Create a bounding box for this visual
 void Visual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
   std::ostringstream nodeName;
 
   nodeName << this->sceneNode->getName()<<"_AABB_NODE";
+  std::cout << "BB Node name:" << nodeName.str() <<"|" << min << ":" << max << "\n";
 
   int i=0;
   while (this->sceneNode->getCreator()->hasSceneNode(nodeName.str()))
@@ -958,9 +901,6 @@ void Visual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 // Set the material of the bounding box
 void Visual::SetBoundingBoxMaterial(const std::string &materialName )
 {
-  // NATY
-  //boost::recursive_mutex::scoped_lock lock(*this->mutex);
-
   // Stop here if the rendering engine has been disabled
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
@@ -1357,6 +1297,8 @@ void Visual::UpdateFromMsg(const VisualMsg *msg)
   this->SetTransparency(msg->transparency);
   this->SetScale(msg->size);
   this->SetVisible(msg->visible);
+
+  std::cout << "Visible[" << msg->visible << "]\n";
 
   if (msg->points.size() > 0)
   {

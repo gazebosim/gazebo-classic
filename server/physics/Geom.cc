@@ -184,6 +184,7 @@ void Geom::Load(XMLConfigNode *node)
    
     childNode = childNode->GetNext("visual");
   }
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,9 +208,14 @@ void Geom::CreateBoundingBox()
     this->bbVisualMsg->parentId = this->GetCompleteScopedName();
     this->bbVisualMsg->id = this->GetCompleteScopedName() + "_BBVISUAL";
     this->bbVisualMsg->castShadows = false;
-    this->bbVisualMsg->visible = RenderState::GetShowBoundingBoxes();
-    this->bbVisualMsg->boundingbox.min = min;
-    this->bbVisualMsg->boundingbox.max = max;
+    this->bbVisualMsg->visible = true;//RenderState::GetShowBoundingBoxes();
+    this->bbVisualMsg->mesh = "unit_box";
+    this->bbVisualMsg->material = "Gazebo/RedTransparent";
+    this->bbVisualMsg->size.Set(1.1, 1.1, 1.1);
+    this->bbVisualMsg->pose.pos.Set(0,0,-0.5);
+    //this->bbVisualMsg->size = max-min;
+
+    std::cout << "Bounding box[" << min << ":" << max << "]\n";
 
     Simulator::Instance()->SendMessage( *this->bbVisualMsg );
   }
@@ -315,6 +321,7 @@ void Geom::ToggleShowBoundingBox()
 {
   if (this->bbVisualMsg)
   {
+    std::cout << "Geom::ToggleShowBoundingBox[" << bbVisualMsg->id << "]\n";
     this->bbVisualMsg->visible = !this->bbVisualMsg->visible;
     this->bbVisualMsg->action = VisualMsg::UPDATE;
     Simulator::Instance()->SendMessage( *this->bbVisualMsg );

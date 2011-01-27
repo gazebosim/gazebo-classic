@@ -37,6 +37,7 @@
 
 #include "gazebo_config.h"
 
+//#include "RTShaderSystem.hh"
 #include "WindowManager.hh"
 #include "Events.hh"
 #include "Scene.hh"
@@ -250,9 +251,7 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   /*
   if (this->HasGLSL())
     RTShaderSystem::Instance()->Init();
-    */
 
-  /*
   if (this->HasGLSL())
     RTShaderSystem::Instance()->UpdateShaders();
     */
