@@ -66,6 +66,6 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11 profiler)
+target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11)
 install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 APPEND_TO_SERVER_HEADERS(${headers})

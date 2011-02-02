@@ -323,12 +323,13 @@ void ODEPhysics::UpdatePhysics()
   //this->LockMutex(); 
 
   // Update the dynamical model
-  if (**this->stepTypeP == "quick")
+  /*if (**this->stepTypeP == "quick")
     dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
   else if (**this->stepTypeP == "world")
     dWorldStep( this->worldId, (**this->stepTimeP).Double() );
   else
     gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
+    */
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );

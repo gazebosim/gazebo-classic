@@ -423,11 +423,11 @@ ENDIF (NOT LIBEVENT_PATH)
 
 ########################################
 # Find profiler library, optional
-FIND_LIBRARY(PROFILER "profiler")
-IF (PROFILER)
-  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
-       CACHE INTERNAL "Link flags for profile" FORCE)
-ENDIF (PROFILER)
+#FIND_LIBRARY(PROFILER "profiler")
+#IF (PROFILER)
+#  SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
+#       CACHE INTERNAL "Link flags for profile" FORCE)
+#ENDIF (PROFILER)
 
 ########################################
 # Find tcmalloc library, optional

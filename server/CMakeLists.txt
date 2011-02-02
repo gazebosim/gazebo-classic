@@ -183,7 +183,6 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    gazeboshm 
                                    assimp
                                    pthread
-                                   profiler
 )
 
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
@@ -191,7 +190,7 @@ APPEND_TO_CACHED_LIST(gazeboserver_ldflags
                       -lassimp -lgazebo_physics -lgazebo_av -lgazebo_wx -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics profiler)
+target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics)
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )

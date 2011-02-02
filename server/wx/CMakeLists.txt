@@ -59,7 +59,7 @@ set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS
 
 add_library(gazebo_wx SHARED ${sources})
 
-target_link_libraries(gazebo_wx ${wxWidgets_LIBRARIES} Xpm profiler)
+target_link_libraries(gazebo_wx ${wxWidgets_LIBRARIES} Xpm)
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
