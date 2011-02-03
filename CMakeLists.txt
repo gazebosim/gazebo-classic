@@ -133,10 +133,6 @@ else (build_errors)
       add_subdirectory(player_cfgs)
     endif (INCLUDE_PLAYER)
     
-    if (INCLUDE_WEBGAZEBO)
-      add_subdirectory(webgazebo)
-    endif (INCLUDE_WEBGAZEBO)
-    
     message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
     message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
   endif (BUILD_GAZEBO)

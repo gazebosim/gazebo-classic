@@ -26,9 +26,8 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-Timer::Timer(Type t)
+Timer::Timer()
 {
-  this->type = t;
 }
         
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,29 +40,16 @@ Timer::~Timer()
 /// Start the timer
 void Timer::Start()
 {
-  if (this->type == SIM_TIMER)
-    this->start = Simulator::Instance()->GetSimTime();
-  else
-    this->start = Simulator::Instance()->GetWallTime();
+  this->start = Time::GetWallTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the elapsed itme
+/// Get the elapsed time
 Time Timer::GetElapsed() const
 {
   Time currentTime;
 
-  if (this->type == SIM_TIMER)
-    currentTime = Simulator::Instance()->GetSimTime();
-  else
-    currentTime = Simulator::Instance()->GetWallTime();
+  currentTime = Time::GetWallTime();
 
   return currentTime - this->start;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the type of timer
-Timer::Type Timer::GetType()
-{
-  return this->type;
 }

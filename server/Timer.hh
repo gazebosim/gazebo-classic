@@ -30,12 +30,8 @@ namespace gazebo
   /// \brief A timer class
   class Timer
   {
-    public: enum Type {SIM_TIMER, REAL_TIMER};
-
     /// \brief Constructor
-    /// \param t The type of timer (based on either the simulation or real
-    ///          time)
-    public: Timer(Type t=Timer::REAL_TIMER);
+    public: Timer();
             
     /// \brief Destructor
     public: virtual ~Timer();
@@ -46,9 +42,6 @@ namespace gazebo
     /// \brief Get the elapsed itme
     public: Time GetElapsed() const;
 
-    /// \brief Get the type of timer
-    public: Type GetType();
-
     public: friend std::ostream &operator<<(std::ostream &out, 
                                             const gazebo::Timer &t)
             {
@@ -57,38 +50,8 @@ namespace gazebo
             }
 
     private: Time start;
-    private: Type type;
   };
 
-  /// \brief A timer designed for diagnostics
-  class DiagnosticTimer : public Timer
-  {
-    /// \brief Constructor
-    public: DiagnosticTimer(const std::string &name, int level = 6, 
-                            Type t=Timer::REAL_TIMER) : Timer(t) 
-            {
-              this->name = name; 
-              this->msgLevel = level; 
-              this->Report("Start @ ");
-            }
-
-    /// \brief Destructor
-    public: virtual ~DiagnosticTimer() 
-            { 
-              this->Report("Complete @ "); 
-            }
-
-    /// \brief Report a time
-    public: void Report(const std::string msg)
-            {
-              gzmsg(this->msgLevel) << this->name << "["
-                << msg << *this << "]\n";
-            }
-
-    private: int msgLevel;
-    private: std::string name;
-
-  };
 }
 
 #endif

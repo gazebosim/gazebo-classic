@@ -45,4 +45,6 @@ boost::signal<void ()> Events::preRenderSignal;
 boost::signal<void ()> Events::renderSignal;
 boost::signal<void ()> Events::postRenderSignal;
 
+boost::signal<void (std::string)> Events::diagTimerStartSignal;
+boost::signal<void (std::string)> Events::diagTimerStopSignal;
 

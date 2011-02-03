@@ -29,6 +29,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include "Diagnostics.hh"
 #include "Events.hh"
 #include "Visual.hh"
 #include "Body.hh"
@@ -398,6 +399,7 @@ void World::RunLoop()
 void World::Update()
 {
   Events::worldUpdateStartSignal();
+  DiagnosticTimer timer("World::Update");
 
   tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
       ModelUpdate_TBB(&this->models) );

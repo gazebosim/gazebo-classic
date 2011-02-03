@@ -22,6 +22,8 @@ set (sources SimulationApp.cc
              PhysicsPage.cc
              RenderingPage.cc
              Properties.cc
+             DiagnosticsDialog.cc
+             PlotPanel.cc
              propgrid/advprops.cpp
              propgrid/editors.cpp
              propgrid/extras.cpp
@@ -53,6 +55,8 @@ set (headers SimulationApp.hh
              PhysicsPage.hh
              RenderingPage.hh
              Properties.hh
+             DiagnosticsDialog.hh
+             PlotPanel.hh
 )
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")

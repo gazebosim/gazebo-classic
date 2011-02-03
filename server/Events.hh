@@ -245,6 +245,26 @@ namespace gazebo
             static void DisconnectPostRenderSignal( T subscriber)
             { postRenderSignal.disconnect(subscriber); }
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief Connect a boost::slot the diagnostic timer start signal
+    public: template<typename T>
+            static boost::signals::connection ConnectDiagTimerStartSignal( T subscriber )
+            { return diagTimerStartSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectDiagTimerStartSignal( T subscriber)
+            { diagTimerStartSignal.disconnect(subscriber); }
+
+    ////////////////////////////////////////////////////////////////////////////
+    /// \brief Connect a boost::slot the diagnostic timer stop signal
+    public: template<typename T>
+            static boost::signals::connection ConnectDiagTimerStopSignal( T subscriber )
+            { return diagTimerStopSignal.connect(subscriber); }
+
+    public: template<typename T>
+            static void DisconnectDiagTimerStopSignal( T subscriber)
+            { diagTimerStopSignal.disconnect(subscriber); }
+
 
     public: static boost::signal<void (bool)> pauseSignal;
     public: static boost::signal<void ()> stepSignal;
@@ -274,6 +294,9 @@ namespace gazebo
     public: static boost::signal<void ()> preRenderSignal;
     public: static boost::signal<void ()> renderSignal;
     public: static boost::signal<void ()> postRenderSignal;
+
+    public: static boost::signal<void (std::string)> diagTimerStartSignal;
+    public: static boost::signal<void (std::string)> diagTimerStopSignal;
   };
 
 }

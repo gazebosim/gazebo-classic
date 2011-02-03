@@ -28,6 +28,7 @@ namespace gazebo
   class TimePanel;
   class Entity;
   class Common;
+  class DiagnosticsDialog;
 
   class SimulationFrame : public wxFrame
   {
@@ -65,6 +66,7 @@ namespace gazebo
     private: void OnShowContacts(wxCommandEvent &event);
     private: void OnShowLights(wxCommandEvent &event);
     private: void OnShowCameras(wxCommandEvent &event);
+    private: void OnDiagnostics(wxCommandEvent &event);
 
     private: void OnToolClicked( wxCommandEvent &event );
 
@@ -106,5 +108,7 @@ namespace gazebo
 
     private: wxTreeCtrl *treeCtrl;
     private: wxPropertyGrid *propGrid;
+
+    private: DiagnosticsDialog *diagnostics;
   };
 }

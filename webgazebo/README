@@ -1,3 +1,0 @@
-webgazebo is an HTTP interface to Gazebo.  It uses libgazebo to talk to
-a Gazebo simulation, and libevent to provide an HTTP socket to the outside
-world.

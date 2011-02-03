@@ -18,6 +18,7 @@
 #include <OGRE/OgreSceneManager.h>
 #include <OGRE/OgreSceneQuery.h>
 #include <OGRE/OgreRoot.h>
+#include <OGRE/Ogre.h>
 
 #include "Light.hh"
 #include "Messages.hh"
@@ -352,6 +353,7 @@ UserCamera *Scene::GetUserCamera(unsigned int index) const
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
 Common *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &mod) 
 {
+  /* NATY: put back in
   Common *entity = NULL;
   Ogre::Camera *ogreCam = camera->GetCamera();
   Ogre::Vector3 camPos = ogreCam->getPosition();
@@ -432,6 +434,7 @@ Common *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &m
     }
   }
 
+*/
   return NULL;
 }
 

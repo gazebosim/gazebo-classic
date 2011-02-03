@@ -22,6 +22,7 @@
 #include "ParamsNotebook.hh"
 #include "ModelBuilder.hh"
 
+#include "DiagnosticsDialog.hh"
 #include "OgreAdaptor.hh"
 #include "MeshBrowser.hh"
 #include "GazeboError.hh"
@@ -60,6 +61,7 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
   wxMenu *fileMenu = new wxMenu;
   wxMenu *editMenu = new wxMenu;
   wxMenu *viewMenu = new wxMenu;
+  wxMenu *toolsMenu = new wxMenu;
 
   wxMenuItem *openItem = fileMenu->Append(ID_OPEN, wxT("&Open\tCtrl-O") );
   Connect(openItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnOpen), NULL, this);
@@ -110,10 +112,13 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
   wxMenuItem *showCamerasItem= viewMenu->AppendCheckItem(ID_CAMERAS, wxT("Show Cameras"));
   Connect(showCamerasItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnShowCameras), NULL, this);
 
+  wxMenuItem *diagnosticsItem = toolsMenu->Append( ID_EDITGRID, wxT("Diagnostics"));
+  Connect(diagnosticsItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(SimulationFrame::OnDiagnostics), NULL, this);
 
   menuBar->Append( fileMenu, _("&File") );
   menuBar->Append( editMenu, _("&Edit") );
   menuBar->Append( viewMenu, _("&View") );
+  menuBar->Append( toolsMenu, _("&Tools") );
   SetMenuBar( menuBar );
 
   this->toolbar = NULL;
@@ -159,6 +164,8 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
       boost::bind(&SimulationFrame::MoveModeCB, this, _1) );
 
   this->auiManager->Update();
+
+  this->diagnostics = NULL;//new DiagnosticsDialog(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -283,6 +290,9 @@ void SimulationFrame::Update()
   //this->auiManager->Update();
   this->timePanel->MyUpdate();
   this->renderPanel->MyUpdate();
+
+  if (this->diagnostics)
+    this->diagnostics->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -432,6 +442,15 @@ void SimulationFrame::OnShowLights(wxCommandEvent &event)
 void SimulationFrame::OnShowCameras(wxCommandEvent &event)
 {
   Events::showCamerasSignal();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+void SimulationFrame::OnDiagnostics(wxCommandEvent &event)
+{
+  if (this->diagnostics == NULL)
+    this->diagnostics = new DiagnosticsDialog(this);
+
+  this->diagnostics->Show();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

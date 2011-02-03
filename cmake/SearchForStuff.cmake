@@ -4,7 +4,6 @@ include (CheckCXXSourceCompiles)
 # John - ode version with joint damping
 SET(ODE_JOINT_DAMPING_VERSION 0.11.1.1 CACHE INTERNAL "ODE version with joint damping" FORCE)
 
-set (INCLUDE_WEBGAZEBO ON CACHE BOOL "Build webgazebo" FORCE)
 set (OGRE_LIBRARY_PATH "/usr/local/lib" CACHE INTERNAL "Ogre library path")
 
 set (assimp_include_dirs "" CACHE STRING "Assimp include paths. Use this to override automatic detection.")
@@ -307,21 +306,6 @@ if (PKG_CONFIG_FOUND)
          "Player libraries")
   endif (NOT PLAYER_FOUND)
 
-  ########################################
-  # Find Websim
-  pkg_check_modules(WEBSIM websim)
-  if (NOT WEBSIM_FOUND)
-    set (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Build webgazebo" FORCE)
-    BUILD_WARNING ("Websim not found. Webgazebo will not be built")
-  else (NOT WEBSIM_FOUND)
-    set (WEBSIM_INCLUDE_DIRS ${WEBSIM_INCLUDE_DIRS} CACHE INTERNAL
-         "Websim include directory")
-    set (WEBSIM_LINK_DIRS ${WEBSIM_LINK_DIRS} CACHE INTERNAL 
-         "Websim link directory")
-    set (WEBSIM_LINK_LIBS ${WEBSIM_LIBRARIES} CACHE INTERNAL
-         "Websim libraries")
-  endif (NOT WEBSIM_FOUND)
-
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   message (FATAL_ERROR "\nError: pkg-config not found")
@@ -408,18 +392,6 @@ ELSE (HAVE_FFMPEG)
   SET (LIBAVFORMAT_PATH /usr/include)
   SET (LIBAVCODEC_PATH /usr/include)
 ENDIF (HAVE_FFMPEG)
-
-########################################
-# Find libevent
-SET (libevent_search_path /usr/include /usr/local/include)
-FIND_PATH(LIBEVENT_PATH event.h ${libevent_search_path})
-IF (NOT LIBEVENT_PATH)
-  MESSAGE (STATUS "Looking for event.h - not found")
-  BUILD_WARNING ("event.h not found. webgazebo will not be built")
-  SET (INCLUDE_WEBGAZEBO OFF CACHE BOOL "Found libevent" FORCE)
-ELSE (NOT LIBEVENT_PATH)
-  MESSAGE (STATUS "Looking for event.h - found")
-ENDIF (NOT LIBEVENT_PATH)
 
 ########################################
 # Find profiler library, optional

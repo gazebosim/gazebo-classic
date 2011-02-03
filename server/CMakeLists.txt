@@ -103,6 +103,8 @@ SET (sources Common.cc
              Messages.cc
              Matrix3.cc
              Matrix4.cc
+             Timer.cc
+             Diagnostics.cc
 )
 
 SET (headers Common.hh
@@ -142,6 +144,8 @@ SET (headers Common.hh
              Plane.hh
              Matrix3.hh
              Matrix4.hh
+             Timer.hh
+             Diagnostics.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})
