@@ -40,6 +40,8 @@ namespace gazebo
 
     private: void TimerStopCB(std::string timer);
 
+    private: void OnTreeClick(wxTreeEvent &event);
+
     private: wxTreeCtrl *treeCtrl;
 
     private: wxTextCtrl *timerNameCtrl;

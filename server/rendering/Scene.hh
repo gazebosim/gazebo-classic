@@ -18,7 +18,9 @@
 #define SCENE_HH
 
 #include <vector>
+#include <map>
 
+#include "Messages.hh"
 #include "Param.hh"
 #include "Color.hh"
 #include "Vector2.hh"
@@ -204,7 +206,7 @@ namespace gazebo
     private: std::string idString;
 
     private: boost::mutex mutex;
-    private: std::vector<Message*> messages;
+    private: std::map<MessageType, std::vector<Message*> > messages;
 
     private: VisualMap visuals;
     private: LightMap lights;

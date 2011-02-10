@@ -167,7 +167,7 @@ void Joint::Load(XMLConfigNode *node)
   
   this->line1Msg = new VisualMsg();
   this->line1Msg->parentId = this->visualMsg->id;
-  this->line1Msg->id = "line1";
+  this->line1Msg->id = this->visualMsg->id + "/line1";
   this->line1Msg->render = RENDERING_LINE_LIST;
   this->line1Msg->material = "Gazebo/BlueGlow";
   this->line1Msg->points.push_back(Vector3(0,0,0));
@@ -175,7 +175,7 @@ void Joint::Load(XMLConfigNode *node)
 
   this->line2Msg = new VisualMsg();
   this->line2Msg->parentId = this->visualMsg->id;
-  this->line2Msg->id = "line2";
+  this->line2Msg->id = this->visualMsg->id + "line2";
   this->line2Msg->render = RENDERING_LINE_LIST;
   this->line2Msg->material = "Gazebo/BlueGlow";
   this->line2Msg->points.push_back(Vector3(0,0,0));
@@ -220,11 +220,6 @@ void Joint::Update()
   //TODO: Evaluate impact of this code on performance
   if (this->visualMsg && this->visualMsg->visible)
   {
-    if (this->GetName() == "left_paddle_joint")
-      std::cout << "Joint[" << this->GetName() << "] Angle[" << this->GetAngle(0) << "]\n";
-    this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + 
-        this->anchorBody->GetWorldPose()).pos;
-
     this->visualMsg->pose.pos = this->anchorPos;
 
     if (this->body1) 
@@ -284,4 +279,5 @@ void Joint::Attach( Body *one, Body *two )
 void Joint::SetModel(Model *model)
 {
   this->model = model;
+  this->SetWorld(this->model->GetWorld());
 }

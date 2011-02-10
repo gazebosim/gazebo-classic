@@ -212,10 +212,13 @@ void Entity::SetWorldPose(const Pose3d &pose, bool notify)
 {
   if (this->parent && this->parent->HasType(ENTITY))
   {
+    // NATY: I took out the first if clause because it would cause other
+    // bodies in a model to penetrate the ground since they were not the 
+    // canonical body
     // if this is the canonical body of a model, then
     // we want to SetWorldPose of the parent model
     // by doing some backwards transform
-    if (this->parent->HasType(MODEL) && 
+    /*if (this->parent->HasType(MODEL) && 
         ((Model*)this->parent)->GetCanonicalBody() == (Body*)this)
     {
       // abs pose of the model + relative pose of cb = abs pose of cb 
@@ -239,6 +242,8 @@ void Entity::SetWorldPose(const Pose3d &pose, bool notify)
       // should not change
     }
     else
+      */
+
     {
       // this is not a canonical Body of a model
       // simply update it's own RelativePose
@@ -292,7 +297,7 @@ void Entity::PoseChange(bool notify)
 {
   PoseMsg msg;
   msg.id = this->GetCompleteScopedName();
-  //std::cout << "Pose[" << msg.id << "]\n";
+  std::cout << "Entity::Pose[" << msg.id << "] to [" << msg.pose << "]\n";
   msg.pose = this->GetRelativePose();
   Simulator::Instance()->SendMessage( msg );
 

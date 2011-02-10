@@ -208,16 +208,16 @@ void Geom::CreateBoundingBox()
     this->bbVisualMsg->parentId = this->GetCompleteScopedName();
     this->bbVisualMsg->id = this->GetCompleteScopedName() + "_BBVISUAL";
     this->bbVisualMsg->castShadows = false;
-    this->bbVisualMsg->visible = true;//RenderState::GetShowBoundingBoxes();
+    this->bbVisualMsg->visible = RenderState::GetShowBoundingBoxes();
     this->bbVisualMsg->mesh = "unit_box";
     this->bbVisualMsg->material = "Gazebo/RedTransparent";
     this->bbVisualMsg->size.Set(1.1, 1.1, 1.1);
-    this->bbVisualMsg->pose.pos.Set(0,0,-0.5);
+    this->bbVisualMsg->pose.pos.Set(0,0,0.0);
     //this->bbVisualMsg->size = max-min;
 
-    std::cout << "Bounding box[" << min << ":" << max << "]\n";
+    //std::cout << "Bounding box[" << min << ":" << max << "]\n";
 
-    Simulator::Instance()->SendMessage( *this->bbVisualMsg );
+    //Simulator::Instance()->SendMessage( *this->bbVisualMsg );
   }
 }
 

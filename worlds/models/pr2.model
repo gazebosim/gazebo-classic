@@ -1,7 +1,7 @@
-<model:physical xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" name="pr2">
+<model type="physical" name="pr2">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
-    <body:box name="base_footprint">
+    <body name="base_footprint">
         <massMatrix>true</massMatrix>
         <mass>1</mass>
         <ixx>0.01</ixx>
@@ -15,7 +15,7 @@
         <cz>0</cz>
         <xyz>0 0 0</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="base_footprint_geom">
+        <geom type="box" name="base_footprint_geom">
             <xyz>0 0 0.071</xyz>
             <rpy>0 -0 0</rpy>
             <size>0.001 0.001 0.001</size>
@@ -26,8 +26,8 @@
                 <mesh>unit_box</mesh>
             </visual>
         </geom:box>
-    </body:box>
-    <body:trimesh name="base_link">
+    </body>
+    <body name="base_link">
         <massMatrix>true</massMatrix>
         <mass>116</mass>
         <ixx>5.65223</ixx>
@@ -41,7 +41,7 @@
         <cz>0.293</cz>
         <xyz>0 0 0.051</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:trimesh name="base_link_geom">
+        <geom type="trimesh" name="base_link_geom">
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
@@ -54,11 +54,11 @@
                 <shader>vertex</shader>
                 <mesh>pr2/base_v0/base.dae</mesh>
             </visual>
-        </geom:trimesh>
+        </geom>
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>true</selfCollide>
-    </body:trimesh>
-    <joint:hinge name="base_footprint_joint">
+    </body>
+    <joint type="hinge" name="base_footprint_joint">
         <body1>base_link</body1>
         <body2>base_footprint</body2>
         <anchor>base_link</anchor>
@@ -66,8 +66,8 @@
         <highStop>0</highStop>
         <axis>0 0 1</axis>
         <damping>0</damping>
-    </joint:hinge>
-    <body:box name="base_laser_link">
+    </joint>
+    <body name="base_laser_link">
         <massMatrix>true</massMatrix>
         <mass>0.001</mass>
         <ixx>0.0001</ixx>
@@ -81,7 +81,7 @@
         <cz>0</cz>
         <xyz>0.275 0 0.303</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="base_laser_link_geom">
+        <geom type="box" name="base_laser_link_geom">
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <size>0.001 0.001 0.001</size>
@@ -92,7 +92,7 @@
                 <scale>0.001 0.001 0.001</scale>
                 <mesh>unit_box</mesh>
             </visual>
-        </geom:box>
+        </geom>
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
     </body:box>

@@ -29,12 +29,6 @@ using namespace gazebo;
 Quatern::Quatern()
     : u(1), x(0), y(0), z(0)
 {
-  if ( u == 0 && x == 0 && y == 0 && z == 0 )
-  {
-    /// @todo: give user warning
-    this->SetToIdentity();
-  }
-  this->Normalize();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

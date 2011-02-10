@@ -19,10 +19,22 @@
 #define PLOTPANEL_HH
 
 #include <wx/wx.h>
-#include <vector>
+#include <deque>
+#include <map>
+
+#include "Color.hh"
 
 namespace gazebo
 {
+  class PlotData
+  {
+    public: PlotData() {}
+    public: virtual ~PlotData() {}
+
+    public: Color color;
+    public: std::deque<std::pair<float, float> > data;
+  };
+
   class PlotPanel : public wxPanel
   {
     DECLARE_CLASS(PlotPanel)
@@ -31,13 +43,37 @@ namespace gazebo
     public: PlotPanel( wxWindow *parent  );
     public: virtual ~PlotPanel();
 
-    public: void PushData(float x, float y);
+    public: void AddPlot(const std::string &timer);
+
+    /// \brief Set the x-axis label
+    public: void SetLabelX(const std::string lbl);
+
+    /// \brief Set the dimensions of the xaxis
+    public: void SetAxisX(float width);
+
+    /// \brief Set the y-axis label
+    public: void SetLabelY(const std::string lbl);
+
+    public: void PushData(float x, float y, const std::string &timer);
 
     public: virtual void OnPaint(wxPaintEvent &evt);
 
     private: void Render(wxDC &dc);
 
-    private: std::vector< std::pair<float, float> > points;
+    private: void Plot(wxDC &dc, PlotData *plot, float ymin, float ymax,
+                       float xmin, float xmax, float xscale, float yscale, 
+                       float yfactor);
+
+    private: void GetBounds( PlotData *plot, float &ymin, float &ymax, float &xmin, float &xmax);
+
+    private: std::map<std::string, PlotData*> plots;
+    private: int headIndex, tailIndex;
+
+    private: wxString xLabel, yLabel;
+    private: float xWidth;
+    private: float w,h;
+    private: float xmargin_left, xmargin_right;
+    private: float ymargin_top, ymargin_bottom;
   };
 }
 

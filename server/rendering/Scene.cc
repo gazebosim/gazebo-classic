@@ -21,7 +21,6 @@
 #include <OGRE/Ogre.h>
 
 #include "Light.hh"
-#include "Messages.hh"
 #include "Global.hh"
 #include "Visual.hh"
 #include "OgreAdaptor.hh"
@@ -689,7 +688,21 @@ std::string Scene::GetIdString() const
 void Scene::ReceiveMessage( const Message &msg )
 {
   boost::mutex::scoped_lock lock( this->mutex );
-  this->messages.push_back( msg.Clone() );
+  bool find = false;
+
+  for (unsigned int i=0; i < this->messages[msg.type].size(); i++)
+  {
+    if (this->messages[msg.type][i]->id == msg.id)
+    {
+      delete this->messages[msg.type][i];
+      this->messages[msg.type][i] = msg.Clone();
+      find = true;
+      break;
+    }
+  }
+     
+  if (!find) 
+    this->messages[msg.type].push_back( msg.Clone() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -697,24 +710,36 @@ void Scene::ReceiveMessage( const Message &msg )
 void Scene::ProcessMessages()
 {
   boost::mutex::scoped_lock lock( this->mutex );
+  std::vector<Message*>::iterator iter;
 
-  for ( unsigned int i=0; i < this->messages.size(); i++)
+  for (iter =  this->messages[VISUAL_MSG].begin(); 
+       iter != this->messages[VISUAL_MSG].end(); iter++)
   {
-    if (this->messages[i]->type == VISUAL_MSG)
-      this->HandleVisualMsg((VisualMsg*)this->messages[i]);
-    else if (this->messages[i]->type == LIGHT_MSG)
-      this->HandleLightMsg((LightMsg*)this->messages[i]);
-    else if (this->messages[i]->type == SELECTION_MSG)
-      this->HandleSelectionMsg((SelectionMsg*)this->messages[i]);
-    else if (this->messages[i]->type == POSE_MSG)
+    this->HandleVisualMsg((VisualMsg*)*iter);
+  }
+
+  for (iter =  this->messages[LIGHT_MSG].begin(); 
+       iter != this->messages[LIGHT_MSG].end(); iter++)
+  {
+    this->HandleLightMsg((LightMsg*)*iter);
+  }
+
+  for (iter =  this->messages[SELECTION_MSG].begin(); 
+       iter != this->messages[SELECTION_MSG].end(); iter++)
+  {
+    this->HandleSelectionMsg((SelectionMsg*)*iter);
+  }
+
+  for (iter =  this->messages[POSE_MSG].begin(); 
+       iter != this->messages[POSE_MSG].end(); iter++)
+  {
+    PoseMsg *pmsg = (PoseMsg*)*iter;
+    VisualMap::iterator iter2;
+    iter2 = this->visuals.find(pmsg->id);
+
+    if (iter2 != this->visuals.end())
     {
-      PoseMsg *msg = (PoseMsg*)this->messages[i];
-      VisualMap::iterator iter;
-      iter = this->visuals.find(msg->id);
-      if (iter != this->visuals.end())
-      {
-        iter->second->SetPose( msg->pose );
-      }
+      iter2->second->SetPose( pmsg->pose );
     }
   }
 
@@ -865,10 +890,19 @@ void Scene::HandleVisualMsg(const VisualMsg *msg)
   }
   else if (iter != this->visuals.end())
   {
+    /*if (msg->id == "line1")
+      printf("Updating a line1msg\n");
+      */
     iter->second->UpdateFromMsg(msg);
+    /*if (msg->id == "line1")
+      printf("Done Updating a line1msg\n");
+      */
   }
   else
   {
+    if (msg->id == "line1")
+      printf("Creating a line1msg\n");
+
     Visual *visual = NULL;
     VisualMap::iterator iter;
     iter = this->visuals.find(msg->parentId);
@@ -878,7 +912,11 @@ void Scene::HandleVisualMsg(const VisualMsg *msg)
     else 
       visual = new Visual(msg->id, this);
     visual->LoadFromMsg(msg);
+    std::cout << "Creating visual[" << msg->id << "]\n";
     this->visuals[msg->id] = visual;
+
+    if (msg->id == "line1")
+      printf("Done Creating\n");
   }
 }
 

@@ -29,7 +29,6 @@ LightMsg::LightMsg() : Message(LIGHT_MSG)
 
 LightMsg::LightMsg( const LightMsg &m ) : Message(LIGHT_MSG)
 {
-  this->id = m.id;
   this->action = m.action;
   this->type = m.type;
   this->pose = m.pose;
@@ -57,6 +56,7 @@ void LightMsg::Load(XMLConfigNode *node)
     gzthrow("Invalid light type");
 
   this->pose.pos = node->GetVector3("xyz",Vector3(0,0,0));  
+  this->pose.rot = node->GetRotation("rpy", Quatern() );
   this->diffuse = node->GetColor("diffuse", Color(1,1,1,1));
   this->specular = node->GetColor("specular", Color(0,0,0,1));
   this->attenuation = node->GetVector3("attenuation",Vector3(.2, 0.1, 0.0));
@@ -78,7 +78,6 @@ VisualMsg::VisualMsg(const VisualMsg &m)
   : Message(m)
 {
   this->parentId = m.parentId;
-  this->id = m.id;
   this->action = m.action;
   this->render = m.render;
   this->mesh = m.mesh;
@@ -97,6 +96,9 @@ VisualMsg::VisualMsg(const VisualMsg &m)
 
 void VisualMsg::Load(XMLConfigNode *node)
 {
+  this->pose.pos = node->GetVector3("xyz",Vector3(0,0,0));  
+  this->pose.rot = node->GetRotation("rpy", Quatern() );
+
   this->mesh = node->GetString("mesh","",0);
   this->material = node->GetString("material","",0);
   this->castShadows = node->GetBool("castShadows",true,0);

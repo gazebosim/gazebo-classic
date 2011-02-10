@@ -398,25 +398,35 @@ void World::RunLoop()
 // Update the world
 void World::Update()
 {
-  Events::worldUpdateStartSignal();
   DiagnosticTimer timer("World::Update");
 
-  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
-      ModelUpdate_TBB(&this->models) );
+  Events::worldUpdateStartSignal();
+
+  {
+    DiagnosticTimer timer("Update Models");
+    tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
+        ModelUpdate_TBB(&this->models) );
+  }
 
   if (this->physicsEngine)
     this->physicsEngine->UpdatePhysics();
 
   /// Update all the sensors
-  SensorManager::Instance()->Update();
+  {
+    DiagnosticTimer timer("Update Sensors");
+    SensorManager::Instance()->Update();
+  }
 
-  this->factoryIfaceHandler->Update();
+  {
+    DiagnosticTimer timer("Update handlers");
+    this->factoryIfaceHandler->Update();
 
-  // Process all incoming messages from simiface
-  this->simIfaceHandler->Update();
+    // Process all incoming messages from simiface
+    this->simIfaceHandler->Update();
 
-  /// Process all internal messages
-  this->ProcessMessages();
+    /// Process all internal messages
+    this->ProcessMessages();
+  }
 
   // NATY: put back in
   //Logger::Instance()->Update();
@@ -732,6 +742,7 @@ Model *World::LoadModel(XMLConfigNode *node, Common *parent,
     gzthrow("Parent can't be null");
 
   Model *model = new Model(parent);
+  model->SetWorld(this);
 
   // Load the model
   model->Load( node, removeDuplicate );

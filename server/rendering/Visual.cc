@@ -1298,8 +1298,6 @@ void Visual::UpdateFromMsg(const VisualMsg *msg)
   this->SetScale(msg->size);
   this->SetVisible(msg->visible);
 
-  std::cout << "Visible[" << msg->visible << "]\n";
-
   if (msg->points.size() > 0)
   {
     OgreDynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);

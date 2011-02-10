@@ -832,7 +832,10 @@ void Model::LoadJoint(XMLConfigNode *node)
 
   Joint *joint;
 
-  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(node->GetName());
+  std::string type = node->GetString("type","hinge",1);
+  std::cout << "Load Joint[" << type << "]\n";
+
+  joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint( type );
 
   joint->SetModel(this);
 
@@ -1120,8 +1123,8 @@ void Model::LoadPhysical(XMLConfigNode *node)
   XMLConfigNode *childNode = NULL;
 
   // Load the bodies
-  if (node->GetChildByNSPrefix("body"))
-    childNode = node->GetChildByNSPrefix("body");
+  if (node->GetChild("body"))
+    childNode = node->GetChild("body");
   else
     childNode = node->GetChild("body");
 
@@ -1129,14 +1132,14 @@ void Model::LoadPhysical(XMLConfigNode *node)
   {
     this->LoadBody(childNode);
 
-    if (childNode->GetNextByNSPrefix("body"))
-      childNode = childNode->GetNextByNSPrefix("body");
+    if (childNode->GetNext("body"))
+      childNode = childNode->GetNext("body");
     else
       childNode = childNode->GetNext("body");
   }
 
   // Load the joints
-  childNode = node->GetChildByNSPrefix("joint");
+  childNode = node->GetChild("joint");
 
   while (childNode)
   {
@@ -1148,10 +1151,10 @@ void Model::LoadPhysical(XMLConfigNode *node)
     {
       gzerr(0) << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
       gzerr(0) <<  e << std::endl;
-      childNode = childNode->GetNextByNSPrefix("joint");
+      childNode = childNode->GetNext("joint");
       continue;
     }
-    childNode = childNode->GetNextByNSPrefix("joint");
+    childNode = childNode->GetNext("joint");
   }
 }
 

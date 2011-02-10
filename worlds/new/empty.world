@@ -50,12 +50,13 @@
 
     <model type="physical" name="box_model">
       <xyz>0 0 0.5</xyz>
-      <static>false</static>
+      <static>true</static>
       <body name="body">
         <geom type="box" name="geom">
           <size>1 1 1</size>
           <mass>1.0</mass>
           <visual>
+            <rpy>90 0 0</rpy>
             <size>1 1 1</size>
             <mesh>unit_box</mesh>
             <material>Gazebo/WoodPallet</material>
@@ -64,39 +65,7 @@
       </body>
     </model>
 
-    <model type="physical" name="sphere_model">
-      <xyz>2 0.0 1.5</xyz>
-      <static>false</static>
-      <body name="body">
-        <geom type="sphere" name="geom">
-          <size>0.1</size>
-          <mass>1.0</mass>
-          <visual>
-            <size>.1 .1 .1</size>
-            <mesh>unit_sphere</mesh>
-            <material>Gazebo/WoodPallet</material>
-          </visual>
-        </geom>
-      </body>
-    </model>
-    <!--
 
-    <model type="physical" name="cylinder_model">
-      <xyz>0 -2 1.5</xyz>
-      <static>false</static>
-      <body name="body">
-        <geom type="cylinder" name="geom">
-          <size>0.5 1.0</size>
-          <mass>1.0</mass>
-          <visual>
-            <size>0.5 0.5 1</size>
-            <mesh>unit_cylinder</mesh>
-            <material>Gazebo/Green</material>
-          </visual>
-        </geom>
-      </body>
-    </model>
-    -->
  
     <!-- White Point light -->
     <light name="point_white">

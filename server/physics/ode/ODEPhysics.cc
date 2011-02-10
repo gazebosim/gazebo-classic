@@ -24,7 +24,7 @@
 #include <tbb/blocked_range.h>
 
 
-#include "Timer.hh"
+#include "Diagnostics.hh"
 #include "PhysicsFactory.hh"
 #include "Global.hh"
 #include "GazeboMessage.hh"
@@ -270,12 +270,16 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
+
   this->colliders.clear();
   this->trimeshColliders.clear();
 
   // Do collision detection; this will add contacts to the contact group
   //this->LockMutex(); 
-  dSpaceCollide( this->spaceId, this, CollisionCallback );
+  {
+    DiagnosticTimer timer("dSpaceCollide");
+    dSpaceCollide( this->spaceId, this, CollisionCallback );
+  }
   //this->UnlockMutex(); 
 
   this->contactFeedbacks.clear();
@@ -303,6 +307,8 @@ void ODEPhysics::UpdateCollision()
 void ODEPhysics::UpdatePhysics()
 {
   this->UpdateCollision();
+
+  DiagnosticTimer timer("ODEPhysics::UpdatePhysics");
 
   // Update the dynamical model
   if (**this->stepTypeP == "quick")
