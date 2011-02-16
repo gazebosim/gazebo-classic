@@ -211,7 +211,7 @@ void Geom::CreateBoundingBox()
     this->bbVisualMsg->visible = RenderState::GetShowBoundingBoxes();
     this->bbVisualMsg->mesh = "unit_box";
     this->bbVisualMsg->material = "Gazebo/RedTransparent";
-    this->bbVisualMsg->size.Set(1.1, 1.1, 1.1);
+    this->bbVisualMsg->scale.Set(1.1, 1.1, 1.1);
     this->bbVisualMsg->pose.pos.Set(0,0,0.0);
     //this->bbVisualMsg->size = max-min;
 

@@ -154,7 +154,6 @@ void Visual::Init()
   this->castShadowsP->Callback( &Visual::SetCastShadows, this );
 
   this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
-  this->sizeP = new ParamT<Vector3>("size", Vector3(1,1,1), 0);
 
   this->normalMapNameP = new ParamT<std::string>("normalMap",
                                                 std::string("none"),0);
@@ -185,7 +184,7 @@ void Visual::LoadFromMsg(const VisualMsg *msg)
   this->meshTileP->Load(NULL);
   this->materialNameP->SetValue(msg->material);
   this->castShadowsP->SetValue(msg->castShadows);
-  this->sizeP->SetValue(msg->size);
+  this->scaleP->SetValue(msg->scale);
 
   this->Load(NULL);
   this->UpdateFromMsg(msg);
@@ -211,6 +210,7 @@ void Visual::Load(XMLConfigNode *node)
     this->castShadowsP->Load(node);
     this->shaderP->Load(node);
     this->normalMapNameP->Load(node);
+    this->scaleP->Load(node);
   }
 
   // Read the desired position and rotation of the mesh
@@ -278,20 +278,7 @@ void Visual::Load(XMLConfigNode *node)
     meshSize = obj->getBoundingBox().getSize();
   }
 
-  // Get the desired size of the mesh
-  if (node && node->GetChild("size") != NULL)
-  {
-    this->sizeP->Load(node);
-  }
-
-  Vector3 scale = this->sizeP->GetValue();
-  scale.x /= meshSize.x;
-  scale.y /= meshSize.y;
-  scale.z /= meshSize.z;
-  scale.Correct();
-
-  this->scaleP->SetValue( scale );
-  this->sceneNode->setScale(scale.x, scale.y, scale.z);
+  this->sceneNode->setScale((**this->scaleP).x,(**this->scaleP).y, (**this->scaleP).z );
 
   // Set the material of the mesh
   if (**this->materialNameP != "none")
@@ -462,6 +449,7 @@ void Visual::AttachMesh( const std::string &meshName )
 ///  Set the scale
 void Visual::SetScale(const Vector3 &scale )
 {
+  this->scaleP->SetValue(scale);
   this->sceneNode->setScale(Ogre::Vector3(scale.x, scale.y, scale.z));
 }
 
@@ -1295,7 +1283,7 @@ void Visual::UpdateFromMsg(const VisualMsg *msg)
 {
   this->SetPose(msg->pose);
   this->SetTransparency(msg->transparency);
-  this->SetScale(msg->size);
+  this->SetScale(msg->scale);
   this->SetVisible(msg->visible);
 
   if (msg->points.size() > 0)

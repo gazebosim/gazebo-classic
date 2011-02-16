@@ -46,6 +46,8 @@ PlotPanel::PlotPanel( wxWindow *parent  )
   this->yLabel = wxT("undefined");
 
   this->xWidth = 60.0;
+
+  Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( PlotPanel::OnMouseEvent ), NULL, this );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,6 +235,7 @@ void PlotPanel::Render(wxDC &dc)
     this->Plot( dc, iter->second, ymin, ymax, xmin, xmax,
        xscale, yscale, yfactor );
   }
+
 }
 
 void PlotPanel::GetBounds( PlotData *plot, float &ymin, float &ymax, float &xmin, float &xmax)
@@ -249,12 +252,13 @@ void PlotPanel::GetBounds( PlotData *plot, float &ymin, float &ymax, float &xmin
       ymax = plot->data[i].second;
     if (plot->data[i].second < ymin)
       ymin = plot->data[i].second;
+
     if (plot->data[i].first > xmax)
       xmax = plot->data[i].first;
     if (plot->data[i].first < xmin)
       xmin = plot->data[i].first;
   }
-  ymax += (ymax-ymin) * 0.25;
+  //ymax += (ymax-ymin) * 0.25;
 }
 
 void PlotPanel::Plot(wxDC &dc, PlotData *plot, float ymin, float ymax,
@@ -281,4 +285,34 @@ void PlotPanel::Plot(wxDC &dc, PlotData *plot, float ymin, float ymax,
       dc.DrawLine( x1, y1, x2, y2);
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// On mouse event callback
+void PlotPanel::OnMouseEvent( wxMouseEvent &event)
+{
+  /*this->mouseEvent.pos.Set( event.GetX(), event.GetY() );
+
+  if (event.LeftDown() || event.MiddleDown() || event.RightDown())
+    this->mouseEvent.pressPos = this->mouseEvent.pos;
+
+  this->mouseEvent.left = event.LeftIsDown() ? MouseEvent::DOWN : MouseEvent::UP;
+  this->mouseEvent.right = event.RightIsDown() ? MouseEvent::DOWN : MouseEvent::UP;
+  this->mouseEvent.middle = event.MiddleIsDown() ? MouseEvent::DOWN : MouseEvent::UP;
+  */
+
+  if (event.GetWheelRotation() < 0) 
+  {
+    this->xWidth += 1.0;
+    //this->mouseEvent.scroll.y = 1;
+    //this->mouseEvent.middle = MouseEvent::SCROLL;
+  }
+  else if (event.GetWheelRotation() > 0)
+  {
+    this->xWidth -= 1.0;
+    //this->mouseEvent.scroll.y = -1;
+    //this->mouseEvent.middle = MouseEvent::SCROLL;
+  }
+
+  //this->mouseEvent.dragging = event.Dragging();
 }

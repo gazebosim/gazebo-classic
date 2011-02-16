@@ -66,6 +66,9 @@ namespace gazebo
 
     private: void GetBounds( PlotData *plot, float &ymin, float &ymax, float &xmin, float &xmax);
 
+    // On mouse event callback
+    private: void OnMouseEvent( wxMouseEvent &event);
+
     private: std::map<std::string, PlotData*> plots;
     private: int headIndex, tailIndex;
 

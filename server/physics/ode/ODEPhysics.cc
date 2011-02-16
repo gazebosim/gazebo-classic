@@ -154,7 +154,7 @@ ODEPhysics::ODEPhysics(World *world)
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", true, 0);
   this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
-  this->maxContactsP = new ParamT<int>("maxContacts",1000,0); // enforced for trimesh-trimesh contacts
+  this->maxContactsP = new ParamT<int>("maxContacts",100,0); // enforced for trimesh-trimesh contacts
   Param::End();
 }
 
@@ -213,11 +213,12 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId, **this->autoDisableBodyP);
+  /*dWorldSetAutoDisableFlag(this->worldId, **this->autoDisableBodyP);
   dWorldSetAutoDisableTime(this->worldId, 0);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 0);
+  */
 
   this->contactFeedbacks.resize(**this->contactFeedbacksP);
 
@@ -270,7 +271,6 @@ void ODEPhysics::InitForThread()
 // Update the ODE collisions, create joints
 void ODEPhysics::UpdateCollision()
 {
-
   this->colliders.clear();
   this->trimeshColliders.clear();
 
@@ -604,13 +604,6 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
   {
     ODEGeom *geom1 = NULL;
     ODEGeom *geom2 = NULL;
-    /*if (b1 && b2)
-    {
-      ODEBody *odeBody1 = (ODEBody*)dBodyGetData(b1);
-      ODEBody *odeBody2 = (ODEBody*)dBodyGetData(b1);
-      if (odeBody1->IsStatic() && odeBody2->IsStatic())
-        return;
-    }*/
 
     // Exit if both bodies are not enabled
     if ( (b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) || 
@@ -636,6 +629,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       self->trimeshColliders.push_back( std::make_pair(geom1, geom2) );
     else
       self->colliders.push_back( std::make_pair(geom1, geom2) );
+
     return;
   }
 }
@@ -645,7 +639,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 // Collide two geoms
 void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
 {
-  int numContacts = 100;
+  int numContacts = 10;
   int j;
   int numc = 0;
   dContact contact;
@@ -683,7 +677,6 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
         continue;
 
       contact.geom = contactGeoms[j];
-
 
       contact.surface.mode = dContactSlip1 | dContactSlip2 | 
         dContactSoftERP | dContactSoftCFM |  

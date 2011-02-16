@@ -121,13 +121,13 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   }
   else
   {
-    scale = this->visualMsg->size;
+    scale = this->visualMsg->scale;
     scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
   this->visualMsg->pose.pos = p;
-  this->visualMsg->size = scale;
+  this->visualMsg->scale = scale;
   Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
@@ -142,11 +142,11 @@ void CylinderMaker::CreateTheEntity()
     <xyz>" << this->visualMsg->pose.pos << "</xyz>\
     <body name='body'>\
     <geom type='cylinder' name='geom'>\
-    <size>" << this->visualMsg->size.x*.5 << " " << this->visualMsg->size.z << "</size>\
+    <size>" << this->visualMsg->scale.x*.5 << " " << this->visualMsg->scale.z << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_cylinder</mesh>\
-    <size>" << this->visualMsg->size << "</size>\
+    <scale>" << this->visualMsg->scale << "</scale>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\

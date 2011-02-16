@@ -24,6 +24,7 @@ set (files column.mesh
            hanoi_red_disk.dae
            hanoi_green_disk.dae
            hanoi_blue_disk.dae
+           cup.mesh
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/Media/models)

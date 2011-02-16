@@ -389,7 +389,7 @@ void Body::Init()
     msg->castShadows = false;
     msg->attachAxes = true;
     msg->visible = false;
-    msg->size.Set(0.1, 0.1, 0.1);
+    msg->scale.Set(0.1, 0.1, 0.1);
     Simulator::Instance()->SendMessage(*msg);
     this->cgVisualMsgs.push_back( msg );
 

@@ -114,7 +114,7 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
   p.z = scale;
 
   this->visualMsg->pose.pos = p;
-  this->visualMsg->size.Set(scale,scale,scale);
+  this->visualMsg->scale.Set(scale,scale,scale);
   Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
@@ -129,11 +129,11 @@ void SphereMaker::CreateTheEntity()
     <xyz>" << this->visualMsg->pose.pos << "</xyz>\
     <body name='body'>\
     <geom type='sphere' name='geom'>\
-    <size>" << this->visualMsg->size.x << "</size>\
+    <size>" << this->visualMsg->scale.x << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_sphere</mesh>\
-    <size>" << this->visualMsg->size*2 << "</size>\
+    <scale>" << this->visualMsg->scale*2 << "</scale>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\

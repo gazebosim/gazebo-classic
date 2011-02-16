@@ -103,7 +103,7 @@ namespace gazebo
     public: std::vector<Vector3> points;
     public: Pose3d pose;
     public: Plane plane;
-    public: Vector3 size;
+    public: Vector3 scale;
     public: float uvTile_x;
     public: float uvTile_y;
   };

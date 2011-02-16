@@ -297,7 +297,6 @@ void Entity::PoseChange(bool notify)
 {
   PoseMsg msg;
   msg.id = this->GetCompleteScopedName();
-  std::cout << "Entity::Pose[" << msg.id << "] to [" << msg.pose << "]\n";
   msg.pose = this->GetRelativePose();
   Simulator::Instance()->SendMessage( msg );
 
