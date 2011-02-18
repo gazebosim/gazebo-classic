@@ -91,6 +91,8 @@ Model::Model(Model *parent)
   this->joint = NULL;
 
   Param::Begin(&this->parameters);
+  this->autoDisableP = new ParamT<bool>("autoDisable", true, 0);
+
   this->canonicalBodyNameP = new ParamT<std::string>("canonicalBody",
                                                    std::string(),0);
 
@@ -215,6 +217,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   this->staticP->Load(node);
 
+  this->autoDisableP->Load(node);
   this->canonicalBodyNameP->Load(node);
   this->xyzP->Load(node);
   this->rpyP->Load(node);
@@ -1350,4 +1353,11 @@ Contact Model::RetrieveContact(const Geom *geom, unsigned int i) const
     gzerr(0) << "Invalid contact index\n";
 
   return Contact();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if this model (and all bodies) are set to auto disable
+bool Model::GetAutoDisable() const
+{
+  return **this->autoDisableP;
 }

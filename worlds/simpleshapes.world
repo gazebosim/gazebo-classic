@@ -49,7 +49,7 @@
   <model:physical name="sphere1_model">
     <xyz>0 0 0.2</xyz>
     <rpy>0 0.0 0.0</rpy>
-    <static>true</static>
+    <static>false</static>
 
     <body:sphere name="sphere1_body">
       <geom:sphere name="sphere1_geom">
@@ -60,7 +60,7 @@
 
         <visual>
           <size>0.4 0.4 0.4</size>
-          <mesh>unit_box</mesh>
+          <mesh>unit_sphere</mesh>
           <shader>pixel</shader>
           <material>Gazebo/Rocky</material>
         </visual>
