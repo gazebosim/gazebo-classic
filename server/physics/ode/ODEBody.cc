@@ -57,6 +57,7 @@ ODEBody::ODEBody(Entity *parent)
     this->bodyId = dBodyCreate(this->odePhysics->GetWorldId());
     dBodySetData(this->bodyId, this);
     dBodySetAutoDisableDefaults(this->bodyId);
+    dBodySetAutoDisableFlag(this->bodyId, this->GetModel()->GetAutoDisable());
   }
   else
     this->bodyId = NULL;
@@ -196,7 +197,7 @@ void ODEBody::OnPoseChange()
   if (this->bodyId == NULL)
     return;
 
-  this->SetEnabled(true);
+  //this->SetEnabled(true);
 
   Pose3d pose = this->comEntity->GetWorldPose();
   this->physicsEngine->LockMutex();
@@ -322,7 +323,7 @@ void ODEBody::SetLinearVel(const Vector3 &vel)
 {
   if (this->bodyId)
   {
-    this->SetEnabled(true);
+    //this->SetEnabled(true);
     this->physicsEngine->LockMutex();
     dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
     this->physicsEngine->UnlockMutex();
@@ -355,7 +356,7 @@ void ODEBody::SetAngularVel(const Vector3 &vel)
 {
   if (this->bodyId)
   {
-    this->SetEnabled(true);
+    //this->SetEnabled(true);
     this->physicsEngine->LockMutex();
     dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
     this->physicsEngine->UnlockMutex();
@@ -426,7 +427,7 @@ void ODEBody::SetTorque(const Vector3 &torque)
 {
   if (this->bodyId)
   {
-    this->SetEnabled(true);
+    //this->SetEnabled(true);
     this->physicsEngine->LockMutex();
     dBodyAddRelTorque(this->bodyId, torque.x, torque.y, torque.z);
     this->physicsEngine->UnlockMutex();

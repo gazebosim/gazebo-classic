@@ -931,7 +931,9 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
 
   this->boundingBoxNode->attachObject(odeObj);
   Vector3 diff = max-min;
+  Vector3 cntr = (max+min)*0.5;
 
+  this->boundingBoxNode->setPosition(cntr.x, cntr.y, cntr.z);
   this->boundingBoxNode->setScale(diff.x, diff.y, diff.z);
 
   Ogre::Entity *ent = NULL;

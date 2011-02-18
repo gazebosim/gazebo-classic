@@ -233,6 +233,10 @@ namespace gazebo
               updateSignal.connect(subscriber);
             }
 
+    /// \brief Return true if this model (and all bodies) are set to 
+    //         auto disable
+    public: bool GetAutoDisable() const;
+
     /// \brief Load a body helper function
     /// \param node XML Configuration node
     private: void LoadBody(XMLConfigNode *node);
@@ -275,6 +279,7 @@ namespace gazebo
 
     public: Pose3d GetWorldPose();
 
+    private: ParamT<bool> *autoDisableP;
     private: ParamT<std::string> *canonicalBodyNameP;
     private: ParamT<Vector3> *xyzP;
     private: ParamT<Quatern> *rpyP;

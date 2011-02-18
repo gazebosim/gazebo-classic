@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -107,34 +108,47 @@ void Server::Init(int serverId, int force)
       int result = fscanf(fp, "%d", &pid);
       fclose(fp);
       
-      if (pid != 0)
+      if (pid > 0 && pid < 65536)
       {
-        if(kill(pid, 0) == 0) 
-        {
-          // a gazebo process is still alive.
-          errStream << "directory [" <<  this->filename
-            <<  "] already exists (previous crash?)\n"
-            << "gazebo (pid=" << pid << ") is still running.\n" 
-            << "re-launch gazebo with a different server id or kill the previous instance" ;
-          throw(errStream.str());
-        } 
-        else 
-        {
-          // the gazebo process is not alive.
-          // remove directory.
-          std::cout << "directory [" <<  this->filename
-            <<  "] already exists (previous crash?)\n"
-            << "but the owner gazebo server (pid=" << pid << ") is not running.\n" 
-            << "deleting the old information of the directory [" <<  this-> filename << "]\n"; 
+        char filename[255];
+        snprintf(filename, sizeof(filename), "/proc/%d/cmdline", pid);
 
-          // remove the existing directory.
-          std::string cmd = "rm -rf '" + this->filename + "'";
-          if(system(cmd.c_str()) != 0) {
-            errStream << "couldn't remove directory [" <<  this->filename << "]";
-            throw(errStream.str());
-          }
+        if (open(filename, O_RDONLY) >= 0)
+        {
+          if(kill(pid, SIGTERM) == -1) 
+          {
+            // process still running, escalate to sigkill
+            if(kill(pid, SIGKILL) == -1) 
+            {
+              // kill unsuccessful
+              errStream << "directory [" <<  this->filename
+                <<  "] already exists (previous crash?)\n"
+                << "gazebo (pid=" << pid << ") is still running and cannot be killed.\n" 
+                << "re-launch gazebo with a different server id or kill the previous instance" ;
+              throw(errStream.str());
+            }
+          } 
+        } 
+      }
+
+
+      {
+        // the gazebo process is not alive.
+        // remove directory.
+        std::cout << "directory [" <<  this->filename
+          <<  "] already exists (previous crash?)\n"
+          << "the owner gazebo server (pid=" << pid << ") is not running.\n" 
+          << "deleting the old information of the directory [" <<  this-> filename << "]\n"; 
+
+        // remove the existing directory.
+        std::string cmd = "rm -rf '" + this->filename + "'";
+        if(system(cmd.c_str()) != 0) {
+          errStream << "couldn't remove directory [" <<  this->filename << "]";
+          throw(errStream.str());
         }
       }
+
+
     }
   }
 

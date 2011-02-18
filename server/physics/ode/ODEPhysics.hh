@@ -38,6 +38,10 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
+#ifdef PARALLEL_QUICKSTEP
+#include <parallel_quickstep/parallel_quickstep.h>
+#endif
+
 namespace gazebo
 {
   class Entity;
@@ -201,6 +205,7 @@ class ODEPhysics : public PhysicsEngine
   private: ParamT<bool> *autoDisableBodyP;
   private: ParamT<int> *contactFeedbacksP;
   private: ParamT<int> *maxContactsP;
+  private: int defaultContactCount;
 
   /// \brief @todo: for backwards compatibility, should tick tock
   ///        deprecation as we switch to nested tags

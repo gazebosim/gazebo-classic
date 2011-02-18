@@ -17,6 +17,12 @@ set (bullet_library_dirs "" CACHE STRING "Bullet library paths. Use this to over
 set (bullet_lflags "" CACHE STRING "Bullet lflags Use this to override automatic detection.")
 set (bullet_cflags "-DBT_USE_DOUBLE_PRECISION -DBT_EULER_DEFAULT_ZYX" CACHE STRING "Bullet Dynamics C compile flags exported by rospack.")
 
+set (parallel_quickstep_include_dirs "" CACHE STRING "parallel_quickstep include paths. Use this to override automatic detection.")
+set (parallel_quickstep_library_dirs "" CACHE STRING "parallel_quickstep library paths. Use this to override automatic detection.")
+set (parallel_quickstep_library "" CACHE STRING "parallel_quickstep CUDA library names. Use this to override automatic detection.")
+set (parallel_quickstep_lflags "" CACHE STRING "parallel_quickstep lflags Use this to override automatic detection.")
+set (parallel_quickstep_cflags "" CACHE STRING "parallel_quickstep cflags Use this to override automatic detection.")
+
 set (threadpool_include_dirs "" CACHE STRING "Threadpool include paths. Use this to override automatic detection.")
 
 SET (gazebo_lflags "" CACHE STRING "Linker flags such as rpath for gazebo executable.")
@@ -380,6 +386,9 @@ FIND_LIBRARY(PROFILER "profiler")
 IF (PROFILER)
   SET (CMAKE_LINK_FLAGS_PROFILE "${CMAKE_LINK_FLAGS_PROFILE} -lprofiler" 
        CACHE INTERNAL "Link flags for profile" FORCE)
+  SET (USE_PROFILER ON CACHE BOOL "Found profiler" FORCE)
+ELSE (PROFILER)
+  SET (USE_PROFILER OFF CACHE BOOL "Did not found profiler" FORCE)
 ENDIF (PROFILER)
 
 ########################################
@@ -579,4 +588,46 @@ int main() { btRigidBody body(0,NULL, NULL, btVector3(0,0,0)); return 0; }")
   endif (NOT BULLET_DOUBLE_PRECISION)
 endif (INCLUDE_BULLET)
 
+########################################
+# Find parallel_quickstep
+STRING(REPLACE " " ";" parallel_quickstep_include_dirs_search_path ${parallel_quickstep_include_dirs})
+find_path( parallel_quickstep_include_found
+    NAMES parallel_quickstep.h parallel_quickstep/parallel_quickstep.h
+    PATHS ${parallel_quickstep_include_dirs_search_path}
+    DOC "parallel_quickstep includes location"
+    NO_DEFAULT_PATH
+    )
+if (NOT parallel_quickstep_include_found)
+  message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs_search_path} - not found ${parallel_quickstep_include_found}")
+else (NOT parallel_quickstep_include_found)
+  message (STATUS "Looking for parallel_quickstep.h - found")
+endif (NOT parallel_quickstep_include_found)
 
+
+STRING(REPLACE " " ";" parallel_quickstep_library_dirs_search_path ${parallel_quickstep_library_dirs})
+find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs_search_path} )
+if (NOT parallel_quickstep_library_found)
+  message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs_search_path} - not found")
+else (NOT parallel_quickstep_library_found)
+  message (STATUS "Looking for libparallel_quickstep.so - found")
+endif (NOT parallel_quickstep_library_found)
+
+if (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+  message (STATUS "building gazebo with parallel_quickstep support")
+  SET (PARALLEL_QUICKSTEP ON CACHE BOOL "Build gazebo with parallel_quickstep support" FORCE)
+else (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+  message (STATUS "building gazebo without parallel_quickstep support")
+  SET (PARALLEL_QUICKSTEP OFF CACHE BOOL "Build gazebo without parallel_quickstep support" FORCE)
+  # clear out parallel_quickstep flags if not library or includes found
+  set (parallel_quickstep_include_dirs "" )
+  set (parallel_quickstep_library_dirs "" )
+  set (parallel_quickstep_library "" )
+  set (parallel_quickstep_lflags "" )
+  set (parallel_quickstep_cflags "" )
+endif (parallel_quickstep_library_found AND parallel_quickstep_include_found)
+
+STRING(REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
+set( CMAKE_REQUIRED_INCLUDES ${parallel_quickstep_include_dirs_split} )
+set( CMAKE_REQUIRED_LIBRARIES ${parallel_quickstep_library} )
+set( CMAKE_REQUIRED_FLAGS  ${parallel_quickstep_lflags} )
+ 

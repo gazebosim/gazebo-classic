@@ -54,6 +54,8 @@
 #include "ODEHeightmapShape.hh"
 #include "MapShape.hh"
 
+#include "gazebo_config.h"
+
 #include "ODEPhysics.hh"
 
 using namespace gazebo;
@@ -65,6 +67,7 @@ GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 ODEPhysics::ODEPhysics()
     : PhysicsEngine()
 {
+  this->defaultContactCount = 10;
 
   // Collision detection init
   dInitODE2(0);
@@ -214,13 +217,14 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
+  /*dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
   dWorldSetAutoDisableTime(this->worldId, 2.0);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 50);
+*/
 
-  this->contactGeoms.resize(this->maxContactsP->GetValue());
+  this->contactGeoms.resize(std::max(**this->maxContactsP,this->defaultContactCount));
   this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());
 
   // Reset the contact pointer
@@ -445,6 +449,10 @@ void ODEPhysics::UpdatePhysics()
       dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
     else if (**this->stepTypeP == "world")
       dWorldStep( this->worldId, (**this->stepTimeP).Double() );
+#ifdef PARALLEL_QUICKSTEP
+    else if (**this->stepTypeP == "parallel_quick")
+      dWorldParallelQuickStep(this->worldId, (**this->stepTimeP).Double());  
+#endif
     else
       gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
 
@@ -608,7 +616,7 @@ void ODEPhysics::SetMaxContacts(double max_contacts)
   this->maxContactsP->SetValue(max_contacts);
   // @todo: FIXME: resizes contactGeoms, but can we do this on the fly?
   //               this might need to be done on a new time step
-  this->contactGeoms.resize(this->maxContactsP->GetValue());
+  this->contactGeoms.resize(std::max(**this->maxContactsP,this->defaultContactCount));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -781,7 +789,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
 
     int maxContacts = self->maxContactsP->GetValue();
-    int numContacts = 100;
+    int numContacts = self->defaultContactCount;
     int i;
     int numc = 0;
     dContact contact;

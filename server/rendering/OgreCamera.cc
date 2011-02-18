@@ -99,6 +99,8 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   this->origParentNode = NULL;
 
   this->viewController = new FPSViewController(this);
+
+  this->lastRenderTime = Simulator::Instance()->GetSimTime();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -438,6 +440,9 @@ void OgreCamera::SetClipDist(float near, float far)
 void OgreCamera::SetFOV( float radians )
 {
   this->hfovP->SetValue(radians);
+
+  float vfov = radians * this->imageSizeP->GetValue().y / this->imageSizeP->GetValue().x;
+  if (this->camera) this->camera->setFOVy(Ogre::Radian(vfov));
 }
 
 

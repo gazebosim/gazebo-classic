@@ -5,10 +5,12 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 string (REPLACE " " ";" boost_include_dirs_split "${boost_include_dirs}")
 string (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
 string (REPLACE " " ";" bullet_include_dirs_split "${bullet_include_dirs}")
+string (REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
 string (REPLACE " " ";" threadpool_include_dirs_split "${threadpool_include_dirs}")
 string (REPLACE " " ";" boost_library_dirs_split "${boost_library_dirs}")
 string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
 string (REPLACE " " ";" bullet_library_dirs_split "${bullet_library_dirs}")
+string (REPLACE " " ";" parallel_quickstep_library_dirs_split "${parallel_quickstep_library_dirs}")
 
 
 include_directories(
@@ -35,6 +37,7 @@ include_directories(
   ${assimp_include_dirs_split}
   ${freeimage_include_dir}
   ${bullet_include_dirs_split}
+  ${parallel_quickstep_include_dirs_split}
   ${threadpool_include_dirs_split}
   ${FLTK_INCLUDE_DIR}
 )
@@ -46,6 +49,7 @@ link_directories(
  ${boost_library_dirs_split} 
  ${assimp_library_dirs_split} 
  ${bullet_library_dirs_split} 
+ ${parallel_quickstep_library_dirs_split} 
  ${freeimage_library_dir}
  ${gazeboserver_link_dirs} 
 )
@@ -196,8 +200,8 @@ if (INCLUDE_BULLET)
 endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
-  target_link_libraries(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
-  target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo_server ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})
+  target_link_libraries(gazebo-exec ${parallel_quickstep_lflags} gazebo_physics_ode ${ODE_LIBRARIES})
   APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
                       -lgazebo_physics_ode)

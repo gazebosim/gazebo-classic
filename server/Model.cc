@@ -62,6 +62,8 @@ Model::Model(Model *parent)
   this->joint = NULL;
 
   Param::Begin(&this->parameters);
+  this->autoDisableP = new ParamT<bool>("autoDisable", true, 0);
+
   this->canonicalBodyNameP = new ParamT<std::string>("canonicalBody",
                                                    std::string(),0);
 
@@ -1321,4 +1323,11 @@ Pose3d Model::GetWorldPose()
     return cb->GetWorldPose();
   else 
     return Pose3d();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if this model (and all bodies) are set to auto disable
+bool Model::GetAutoDisable() const
+{
+  return **this->autoDisableP;
 }

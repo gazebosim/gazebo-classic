@@ -308,6 +308,7 @@ namespace gazebo
 
     private: ViewController *viewController;
 
+    public: Time GetLastRenderTime() {return this->lastRenderTime;};
     protected: Time lastRenderTime;
 
   };

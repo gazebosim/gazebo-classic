@@ -423,11 +423,11 @@ void Body::Update()
   this->SetTorque(this->angularAccel);
 
   // FIXME: FIXME: @todo: @todo: race condition on factory-based model loading!!!!!
-  // if (this->GetEnabled() != this->enabled)
-  // {
-  //   this->enabled = this->GetEnabled();
-  //   this->enabledSignal(this->enabled);
-  // }
+  if (this->GetEnabled() != this->enabled)
+  {
+    this->enabled = this->GetEnabled();
+    this->enabledSignal(this->enabled);
+  }
  
   {
     //DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
@@ -546,7 +546,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 /// Set the linear acceleration of the body
 void Body::SetLinearAccel(const Vector3 &accel)
 {
-  this->SetEnabled(true);
+  //this->SetEnabled(true);
   this->linearAccel = accel;// * this->GetMass();
 }
 
@@ -556,7 +556,7 @@ void Body::SetLinearAccel(const Vector3 &accel)
 /// Set the angular acceleration of the body
 void Body::SetAngularAccel(const Vector3 &accel)
 {
-  this->SetEnabled(true);
+  //this->SetEnabled(true);
   this->angularAccel = accel * this->mass.GetAsDouble();
 }
 

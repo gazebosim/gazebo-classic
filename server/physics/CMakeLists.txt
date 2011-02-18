@@ -1,5 +1,18 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+STRING (REPLACE " " ";" parallel_quickstep_include_dirs_split "${parallel_quickstep_include_dirs}")
+STRING (REPLACE " " ";" parallel_quickstep_library_dirs_split "${parallel_quickstep_library_dirs}")
+
+INCLUDE_DIRECTORIES(
+  ${CMAKE_SOURCE_DIR}/libgazebo 
+  ${parallel_quickstep_include_dirs_split}
+)
+
+LINK_DIRECTORIES(  
+ ${CMAKE_BINARY_DIR}/libgazebo 
+ ${parallel_quickstep_library_dirs_split} 
+)
+
 if (INCLUDE_ODE)
   add_subdirectory(ode)
 endif (INCLUDE_ODE)
@@ -55,12 +68,11 @@ set (headers BallJoint.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})
+target_link_libraries(gazebo_physics ${LINK_LIBS} )
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties(gazebo_physics PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_target_properties(gazebo_physics PROPERTIES LINK_FLAGS ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} ${parallel_quickstep_lflags})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 install ( TARGETS gazebo_physics DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
