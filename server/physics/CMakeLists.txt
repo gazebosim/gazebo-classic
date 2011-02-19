@@ -39,6 +39,7 @@ set (sources Body.cc
              MapShape.cc
              HeightmapShape.cc
              Contact.cc
+             FixedJoint.cc
 ) 
 
 set (headers BallJoint.hh
@@ -65,6 +66,7 @@ set (headers BallJoint.hh
              HeightmapShape.hh
              Contact.hh
              JointFeedback.hh
+             FixedJoint.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})

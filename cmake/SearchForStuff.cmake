@@ -590,27 +590,31 @@ endif (INCLUDE_BULLET)
 
 ########################################
 # Find parallel_quickstep
-STRING(REPLACE " " ";" parallel_quickstep_include_dirs_search_path ${parallel_quickstep_include_dirs})
-find_path( parallel_quickstep_include_found
-    NAMES parallel_quickstep.h parallel_quickstep/parallel_quickstep.h
-    PATHS ${parallel_quickstep_include_dirs_search_path}
-    DOC "parallel_quickstep includes location"
-    NO_DEFAULT_PATH
-    )
-if (NOT parallel_quickstep_include_found)
-  message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs_search_path} - not found ${parallel_quickstep_include_found}")
-else (NOT parallel_quickstep_include_found)
-  message (STATUS "Looking for parallel_quickstep.h - found")
-endif (NOT parallel_quickstep_include_found)
+if (${parallel_quickstep_library_dirs})
+  STRING(REPLACE " " ";" parallel_quickstep_include_dirs_search_path ${parallel_quickstep_include_dirs})
+  find_path( parallel_quickstep_include_found
+      NAMES parallel_quickstep.h parallel_quickstep/parallel_quickstep.h
+      PATHS ${parallel_quickstep_include_dirs_search_path}
+      DOC "parallel_quickstep includes location"
+      NO_DEFAULT_PATH
+      )
+  if (NOT parallel_quickstep_include_found)
+    message (STATUS "Looking for parallel_quickstep.h in ${parallel_quickstep_include_dirs_search_path} - not found ${parallel_quickstep_include_found}")
+  else (NOT parallel_quickstep_include_found)
+    message (STATUS "Looking for parallel_quickstep.h - found")
+  endif (NOT parallel_quickstep_include_found)
+endif()
 
 
-STRING(REPLACE " " ";" parallel_quickstep_library_dirs_search_path ${parallel_quickstep_library_dirs})
-find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs_search_path} )
-if (NOT parallel_quickstep_library_found)
-  message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs_search_path} - not found")
-else (NOT parallel_quickstep_library_found)
-  message (STATUS "Looking for libparallel_quickstep.so - found")
-endif (NOT parallel_quickstep_library_found)
+if (${parallel_quickstep_library_dirs})
+  STRING(REPLACE " " ";" parallel_quickstep_library_dirs_search_path ${parallel_quickstep_library_dirs})
+  find_library(parallel_quickstep_library_found parallel_quickstep ${parallel_quickstep_library_dirs_search_path} )
+  if (NOT parallel_quickstep_library_found)
+    message (STATUS "Looking for libparallel_quickstep.so in ${parallel_quickstep_library_dirs_search_path} - not found")
+  else (NOT parallel_quickstep_library_found)
+    message (STATUS "Looking for libparallel_quickstep.so - found")
+  endif (NOT parallel_quickstep_library_found)
+endif (${parallel_quickstep_library_dirs})
 
 if (parallel_quickstep_library_found AND parallel_quickstep_include_found)
   message (STATUS "building gazebo with parallel_quickstep support")

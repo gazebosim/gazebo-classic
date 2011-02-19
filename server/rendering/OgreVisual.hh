@@ -193,7 +193,7 @@ namespace gazebo
     private: std::string origMaterialName;
     private: Ogre::SceneBlendType sceneBlendType;
 
-    private: Ogre::SceneNode *parentNode;
+    public: Ogre::SceneNode *parentNode;
     public: Ogre::SceneNode *sceneNode;
     private: Ogre::SceneNode *boundingBoxNode;
 

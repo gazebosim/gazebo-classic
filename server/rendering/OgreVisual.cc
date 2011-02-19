@@ -162,7 +162,6 @@ void OgreVisual::ConstructorHelper(Ogre::SceneNode *node, bool isStatic)
 /// Destructor
 OgreVisual::~OgreVisual()
 {
-
   delete this->mutex;
   delete this->xyzP;
   delete this->rpyP;
@@ -189,8 +188,8 @@ OgreVisual::~OgreVisual()
         Ogre::MovableObject* obj = this->sceneNode->getAttachedObject(i);
         if (obj) delete obj;
         obj = NULL;
-      }
       this->sceneNode->detachAllObjects();
+      }
 
       // delete works, but removeAndDestroyChild segfaults
       delete this->sceneNode;

@@ -61,7 +61,8 @@ Joint::Joint()
 
   this->body1 = NULL;
   this->body2 = NULL;
-
+  this->anchorBody = NULL;
+ 
   this->physics = World::Instance()->GetPhysicsEngine();
 
   World::Instance()->ConnectShowJointsSignal( 
@@ -128,7 +129,10 @@ void Joint::Load(XMLConfigNode *node)
 
     this->body1 = this->model->GetBody( **(this->body1NameP));
     this->body2 = this->model->GetBody(**(this->body2NameP));
-    this->anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
+    if ( !(**this->anchorBodyNameP).empty() )
+      this->anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
+    else
+      gzmsg(0) << "Warning: Joint[" << this->GetName() << "], anchorBody is not set\n";
   }
   else
   {
@@ -145,7 +149,8 @@ void Joint::Load(XMLConfigNode *node)
     gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
 
   // setting anchor relative to gazebo body frame origin
-  this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + this->anchorBody->GetWorldPose()).pos ;
+  if (this->anchorBody)
+      this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + this->anchorBody->GetWorldPose()).pos;
 
   this->Attach(this->body1, this->body2);
 
