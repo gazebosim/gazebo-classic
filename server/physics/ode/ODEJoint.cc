@@ -195,6 +195,10 @@ double ODEJoint::GetCFM()
 dJointFeedback *ODEJoint::GetFeedback()
 {
   return dJointGetFeedback(this->jointId);
+  if (**this->provideFeedbackP)
+    return dJointGetFeedback(this->jointId);
+  else
+    return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -265,6 +269,9 @@ Angle ODEJoint::GetLowStop(int index)
 /// Get the force the joint applies to the first body
 Vector3 ODEJoint::GetBodyForce(unsigned int index) const
 {
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+  if (!**this->provideFeedbackP) return Vector3(nan,nan,nan);
+
   Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
@@ -280,6 +287,9 @@ Vector3 ODEJoint::GetBodyForce(unsigned int index) const
 /// Get the torque the joint applies to the first body
 Vector3 ODEJoint::GetBodyTorque(unsigned int index) const
 {
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+  if (!**this->provideFeedbackP) return Vector3(nan,nan,nan);
+
   Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
