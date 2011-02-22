@@ -130,6 +130,10 @@ namespace gazebo
     /// \brief Get whether this body is in the kinematic state
     public: virtual bool GetKinematic() const;
 
+    /// \brief Set the auto disable flag.
+    public: virtual void SetAutoDisable(const bool &value);
+
+
     protected: Pose3d pose;
 
     /// ODE body handle

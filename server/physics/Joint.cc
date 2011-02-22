@@ -61,7 +61,7 @@ Joint::Joint()
   this->body1 = NULL;
   this->body2 = NULL;
 
-  Events::ConnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this) );
+  this->showJointsConnection = Events::ConnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this) );
 }
 
 
@@ -69,8 +69,6 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
-  Events::DisconnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this));
-
   if (this->visualMsg)
   {
     this->visualMsg->action = VisualMsg::DELETE;

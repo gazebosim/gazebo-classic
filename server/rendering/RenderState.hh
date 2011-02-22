@@ -22,6 +22,8 @@
 #ifndef RENDERSTATE_HH
 #define RENDERSTATE_HH
 
+#include "Event.hh"
+
 namespace gazebo
 {
   class RenderState 
@@ -55,6 +57,7 @@ namespace gazebo
     private: static bool showBoundingBoxes;
 
     private: static RenderState *self;
+    private: std::vector<ConnectionPtr> connections;
   };
 }
 #endif

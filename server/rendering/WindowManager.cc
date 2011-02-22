@@ -35,7 +35,7 @@ unsigned int WindowManager::windowCounter = 0;
 // Constructor
 WindowManager::WindowManager()
 {
-  Events::ConnectRenderSignal( boost::bind(&WindowManager::Render, this) );
+  this->renderConnection = Events::ConnectRenderSignal( boost::bind(&WindowManager::Render, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

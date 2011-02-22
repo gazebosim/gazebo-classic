@@ -23,9 +23,9 @@
 #ifndef GEOM_HH
 #define GEOM_HH
 
-#include <boost/signal.hpp>
 #include <boost/bind.hpp>
 
+#include "Event.hh"
 #include "Contact.hh"
 #include "Shape.hh"
 #include "Param.hh"
@@ -182,12 +182,10 @@ namespace gazebo
     public: virtual Vector3 GetWorldAngularAccel() const;
 
     public: template< typename T>
-            boost::signals::connection ConnectContactCallback( T subscriber )
-            { return contactSignal.connect(subscriber); }
-    public: template< typename T>
-            void DisconnectContactCallback( T subscriber )
-            { contactSignal.disconnect(subscriber); }
-
+            ConnectionPtr ConnectContactCallback( T subscriber )
+            { return contactSignal.Connect(subscriber); }
+    public: void DisconnectContactCallback( ConnectionPtr &c )
+            { contactSignal.Disconnect(c); }
 
     /// \brief Enable callback: Called when the body changes
     private: void EnabledCB(bool enabled);
@@ -225,7 +223,9 @@ namespace gazebo
 
     private: bool contactsEnabled;
 
-    public: boost::signal< void (const Contact &)> contactSignal;
+    public: EventT< void (const Contact &)> contactSignal;
+    private: std::vector<ConnectionPtr> connections;
+          
   };
 
   /// \}

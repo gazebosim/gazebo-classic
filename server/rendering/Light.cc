@@ -85,7 +85,7 @@ Light::Light(Scene *scene)
   this->castShadowsP->Callback(&Light::SetCastShadows, this);
   Param::End();
 
-  Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
+  this->showLightsConnection = Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
 
 }
 

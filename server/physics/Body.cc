@@ -63,6 +63,9 @@ Body::Body(Entity *parent)
   //this->comEntity->GetVisualNode()->SetShowInGui(false);
 
   Param::Begin(&this->parameters);
+  this->autoDisableP = new ParamT<bool>("autoDisable", true, 0);
+  this->autoDisableP->Callback( &Body::SetAutoDisable, this );
+
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this );
 
@@ -224,8 +227,7 @@ void Body::Load(XMLConfigNode *node)
 
   this->SetKinematic(**this->kinematicP);
 
-  Events::ConnectShowPhysicsSignal( boost::bind(&Body::ToggleShowPhysics, this) );
-  //this->GetModel()->ConnectUpdateSignal( boost::bind(&Body::Update, this) );
+  this->showPhysicsConnection = Events::ConnectShowPhysicsSignal( boost::bind(&Body::ToggleShowPhysics, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -428,11 +430,11 @@ void Body::Update()
   this->SetTorque(this->angularAccel);
 
   // FIXME: FIXME: @todo: @todo: race condition on factory-based model loading!!!!!
-  // if (this->GetEnabled() != this->enabled)
-  // {
-  //   this->enabled = this->GetEnabled();
-  //   this->enabledSignal(this->enabled);
-  // }
+   if (this->GetEnabled() != this->enabled)
+   {
+     this->enabled = this->GetEnabled();
+     this->enabledSignal(this->enabled);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -540,7 +542,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 /// Set the linear acceleration of the body
 void Body::SetLinearAccel(const Vector3 &accel)
 {
-  this->SetEnabled(true);
+  //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->linearAccel = accel;// * this->GetMass();
 }
 
@@ -550,7 +552,7 @@ void Body::SetLinearAccel(const Vector3 &accel)
 /// Set the angular acceleration of the body
 void Body::SetAngularAccel(const Vector3 &accel)
 {
-  this->SetEnabled(true);
+  //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->angularAccel = accel * this->mass.GetAsDouble();
 }
 
@@ -738,4 +740,16 @@ void Body::SetMass(Mass mass)
   this->customMass = mass;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if auto disable is enabled
+bool Body::GetAutoDisable() const
+{
+  return **this->autoDisableP;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set the auto disable flag.
+void Body::SetAutoDisable(const bool &value)
+{
+  this->autoDisableP->SetValue(value);
+}

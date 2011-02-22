@@ -27,7 +27,11 @@
 
 namespace gazebo
 {
+
+#define DIAG_TIMER(name) DiagnosticManager::Instance()->CreateTimer(name);
+
   class DiagnosticTimer;
+  typedef boost::shared_ptr< DiagnosticTimer > DiagnosticTimerPtr;
 
   /// \brief A diagnostic manager class
   class DiagnosticManager : public SingletonT<DiagnosticManager>
@@ -37,6 +41,8 @@ namespace gazebo
 
     /// \brief Destructor
     private: virtual ~DiagnosticManager();
+
+    public: DiagnosticTimerPtr CreateTimer(const std::string &name);
 
     /// \brief A diagnostic timer has started
     public: void TimerStart(DiagnosticTimer *timer);
@@ -56,6 +62,12 @@ namespace gazebo
     /// \brief Get a label for a timer
     public: std::string GetLabel(int index) const;
 
+    public: void SetEnabled(bool e) {this->enabled = e;}
+
+    public: inline bool GetEnabled() const {return this->enabled;}
+
+    private: bool enabled;
+
     private: std::map<std::string, Time> timers;
 
     //Singleton implementation
@@ -71,20 +83,22 @@ namespace gazebo
             {
               this->Start();
               this->name = name; 
-              DiagnosticManager::Instance()->TimerStart(this);
+              this->diagManager->TimerStart(this);
             }
 
     /// \brief Destructor
     public: virtual ~DiagnosticTimer() 
             { 
-              DiagnosticManager::Instance()->TimerStop(this);
+              this->diagManager->TimerStop(this);
             }
 
-    public: std::string GetName() const 
+    public: inline const std::string GetName() const 
             { return this->name; }
 
     private: std::string name;
+    private: static DiagnosticManager *diagManager;
   };
+
 }
  
 #endif

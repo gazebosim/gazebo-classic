@@ -73,20 +73,18 @@ RenderControl::RenderControl(wxWindow *parent)
   Connect( wxEVT_KEY_DOWN, wxKeyEventHandler(RenderControl::OnKeyDown), NULL, this);
 
 
-  Events::ConnectCreateEntitySignal( boost::bind(&RenderControl::CreateEntity, this, _1) );
-  Events::ConnectMoveModeSignal( boost::bind(&RenderControl::MoveModeCB, this, _1) );
-  Events::ConnectManipModeSignal( boost::bind(&RenderControl::ManipModeCB, this, _1) );
-  Events::ConnectSetSelectedEntitySignal(
-     boost::bind(&RenderControl::SetSelectedEntityCB, this, _1) );
+  this->connections.push_back( Events::ConnectCreateEntitySignal( boost::bind(&RenderControl::CreateEntity, this, _1) ) );
+  this->connections.push_back( Events::ConnectMoveModeSignal( boost::bind(&RenderControl::MoveModeCB, this, _1) ) );
+  this->connections.push_back( Events::ConnectManipModeSignal( boost::bind(&RenderControl::ManipModeCB, this, _1) ) );
+  this->connections.push_back( Events::ConnectSetSelectedEntitySignal(
+     boost::bind(&RenderControl::SetSelectedEntityCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 RenderControl::~RenderControl()
 {
-  /*if (this->userCamera)
-    delete this->userCamera;
-    */
+  this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

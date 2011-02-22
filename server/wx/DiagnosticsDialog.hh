@@ -25,6 +25,7 @@
 #include <map>
 #include <vector>
 
+#include "Event.hh"
 #include "Time.hh"
 
 namespace gazebo
@@ -42,6 +43,8 @@ namespace gazebo
 
     private: void OnTreeClick(wxTreeEvent &event);
 
+    private: void OnInit(wxInitDialogEvent &event);
+
     private: wxTreeCtrl *treeCtrl;
 
     private: wxTextCtrl *timerNameCtrl;
@@ -49,6 +52,7 @@ namespace gazebo
     private: PlotPanel *plot;
 
     private: std::map< std::string, std::vector< std::pair<Time,Time> > > times;
+    private: ConnectionPtr timerStopConnection;
   };
 }
 

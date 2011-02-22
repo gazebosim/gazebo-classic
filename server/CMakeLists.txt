@@ -98,6 +98,7 @@ SET (sources Common.cc
              STLLoader.cc
              Plugin.cc
              Events.cc
+             Event.cc
              Box.cc
              Plane.cc
              Messages.cc

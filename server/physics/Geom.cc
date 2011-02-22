@@ -78,11 +78,11 @@ Geom::Geom( Body *body )
   
   Param::End();
 
-  Events::ConnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-  Events::ConnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-  Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ToggleShowBoundingBox, this) );
 
-  this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) );
+  this->connections.push_back( Events::ConnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) ) );
+  this->connections.push_back( Events::ConnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) ) );
+  this->connections.push_back( Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ToggleShowBoundingBox, this) ) );
+  this->connections.push_back( this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,14 +121,7 @@ Geom::~Geom()
 /// Finalize the geom
 void Geom::Fini()
 {
-  this->body->DisconnectEnabledSignal(boost::bind(&Geom::EnabledCB, this, _1));
-
-  Events::DisconnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-
-  Events::DisconnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-
-  Events::DisconnectShowBoundingBoxesSignal( 
-      boost::bind(&Geom::ToggleShowBoundingBox, this) );
+  this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,14 +203,19 @@ void Geom::CreateBoundingBox()
     this->bbVisualMsg->castShadows = false;
     this->bbVisualMsg->visible = RenderState::GetShowBoundingBoxes();
     this->bbVisualMsg->mesh = "unit_box";
-    this->bbVisualMsg->material = "Gazebo/RedTransparent";
+    if (this->IsStatic() )
+      this->bbVisualMsg->material = "Gazebo/YellowTransparent";
+    else
+      this->bbVisualMsg->material = "Gazebo/GreenTransparent";
+
     this->bbVisualMsg->scale.Set(1.1, 1.1, 1.1);
     this->bbVisualMsg->pose.pos.Set(0,0,0.0);
+    this->bbVisualMsg->transparency = .5;
     //this->bbVisualMsg->size = max-min;
 
     //std::cout << "Bounding box[" << min << ":" << max << "]\n";
 
-    //Simulator::Instance()->SendMessage( *this->bbVisualMsg );
+    Simulator::Instance()->SendMessage( *this->bbVisualMsg );
   }
 }
 
@@ -321,7 +319,6 @@ void Geom::ToggleShowBoundingBox()
 {
   if (this->bbVisualMsg)
   {
-    std::cout << "Geom::ToggleShowBoundingBox[" << bbVisualMsg->id << "]\n";
     this->bbVisualMsg->visible = !this->bbVisualMsg->visible;
     this->bbVisualMsg->action = VisualMsg::UPDATE;
     Simulator::Instance()->SendMessage( *this->bbVisualMsg );

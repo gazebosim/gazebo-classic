@@ -25,6 +25,7 @@
 
 #include <string>
 
+#include "Event.hh"
 #include "Box.hh"
 #include "RenderTypes.hh"
 #include "Pose3d.hh"
@@ -275,6 +276,7 @@ namespace gazebo
     private: Ogre::RibbonTrail *ribbonTrail;
 
     private: bool useRTShader;
+    private: ConnectionPtr preRenderConnection;
 
     // List of all the lines created
     private: std::list<OgreDynamicLines*> lines;

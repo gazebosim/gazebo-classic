@@ -89,7 +89,7 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
 
   this->renderingEnabled = true;
 
-  Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) );
+  this->showWireframeConnection = Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) );
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;

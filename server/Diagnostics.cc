@@ -24,9 +24,12 @@
 
 using namespace gazebo;
 
+DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 DiagnosticManager::DiagnosticManager()
+  : enabled(false)
 {
 }
 
@@ -36,6 +39,13 @@ DiagnosticManager::~DiagnosticManager()
 {
 }
 
+DiagnosticTimerPtr DiagnosticManager::CreateTimer(const std::string &name)
+{
+  if (this->GetEnabled())
+    return DiagnosticTimerPtr( new DiagnosticTimer(name) );
+  else
+    return DiagnosticTimerPtr();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// A diagnostic timer has started

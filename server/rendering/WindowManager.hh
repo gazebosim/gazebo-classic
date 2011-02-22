@@ -18,6 +18,7 @@
 #define WINDOWMANAGER_HH
 
 #include "SingletonT.hh"
+#include "Event.hh"
 #include <string>
 #include <vector>
 
@@ -54,7 +55,9 @@ namespace gazebo
     private: std::vector<Ogre::RenderWindow *> windows;
 
     private: static unsigned int windowCounter;
-    
+
+    private: ConnectionPtr renderConnection;
+
     private: friend class DestroyerT<WindowManager>;
     private: friend class SingletonT<WindowManager>;
   };

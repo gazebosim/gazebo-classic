@@ -42,7 +42,7 @@
 
           <size>100 100</size>
           <mesh>unit_plane</mesh>
-          <material>Gazebo/GreyGrid</material>
+          <material>Gazebo/WoodFloor</material>
           <uvTile>100 100</uvTile>
         </geom>
       </body>
@@ -71,13 +71,13 @@
     <light name="point_white">
       <xyz>0.0 0 10</xyz>
       <rpy>0 0 0</rpy>
-      <type>point</type>
+      <type>directional</type>
       <diffuseColor>0.4 0.4 0.4 1.0</diffuseColor>
       <specularColor>.1 .1 .1 1.0</specularColor>
       <attenuation>.2 0.1 0.0</attenuation>
       <range>20</range>
       <direction>0 0 -1.0</direction>
-      <castShadows>true</castShadows>
+      <castShadows>false</castShadows>
     </light>
 
   </world>

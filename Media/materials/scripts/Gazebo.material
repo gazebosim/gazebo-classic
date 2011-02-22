@@ -321,14 +321,12 @@ material Gazebo/RedTransparent
     {
       scene_blend alpha_blend
       depth_write off
-
-      ambient 1.0 0.0 0.0 1
-      diffuse 1.0 0.0 0.0 1
+      lighting off
 
       texture_unit
       {
-        colour_op_ex source1 src_current src_current 1 0 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        colour_op_ex source1 src_manual src_current 1 0 0
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
 	}
@@ -641,6 +639,7 @@ material Gazebo/WoodPallet
 			ambient 0.5 0.5 0.5 1.0
 			diffuse 1.0 1.0 1.0 1.0
 			specular 0.0 0.0 0.0 1.0 12.5
+      depth_write on
 
 			texture_unit
 			{

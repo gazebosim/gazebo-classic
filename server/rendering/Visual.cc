@@ -594,10 +594,6 @@ void Visual::AttachAxes()
 /// Set the transparency
 void Visual::SetTransparency( float trans )
 {
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
   this->transparency = std::min(std::max(trans, (float)0.0), (float)1.0);
   for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
   {
@@ -631,9 +627,8 @@ void Visual::SetTransparency( float trans )
         {
           pass = technique->getPass(passCount);
           // Need to fix transparency
-          /*if (pass->getPolygonMode() == Ogre::PM_SOLID)
-            pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-            */
+          //if (pass->getPolygonMode() == Ogre::PM_SOLID)
+            //pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
 
           if (this->transparency > 0.0)
             pass->setDepthWriteEnabled(false);
@@ -647,7 +642,6 @@ void Visual::SetTransparency( float trans )
       }
     }
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1046,7 +1040,7 @@ bool Visual::GetUseRTShader() const
 // Add a line to the visual
 OgreDynamicLines *Visual::AddDynamicLine(RenderOpType type)
 {
-  Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
+  this->preRenderConnection = Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 
   OgreDynamicLines *line = new OgreDynamicLines(type);
   this->lines.push_back(line);
@@ -1067,9 +1061,6 @@ void Visual::DeleteDynamicLine(OgreDynamicLines *line)
       break;
     }
   }
-
-  if (this->lines.size() == 0)
-    Events::DisconnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1285,6 +1276,7 @@ void Visual::UpdateFromMsg(const VisualMsg *msg)
   this->SetTransparency(msg->transparency);
   this->SetScale(msg->scale);
   this->SetVisible(msg->visible);
+  this->SetMaterial(msg->material);
 
   if (msg->points.size() > 0)
   {

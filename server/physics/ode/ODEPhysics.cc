@@ -213,13 +213,12 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  /*dWorldSetAutoDisableFlag(this->worldId, **this->autoDisableBodyP);
-  dWorldSetAutoDisableTime(this->worldId, 0);
-  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
-  dWorldSetAutoDisableSteps(this->worldId, 0);
+  dWorldSetAutoDisableFlag(this->worldId,1);// **this->autoDisableBodyP);
+  /*dWorldSetAutoDisableTime(this->worldId, 1);
+  dWorldSetAutoDisableLinearThreshold(this->worldId, 0.01);
+  dWorldSetAutoDisableAngularThreshold(this->worldId, 0.01);
+  dWorldSetAutoDisableSteps(this->worldId, 10);
   */
-
   this->contactFeedbacks.resize(**this->contactFeedbacksP);
 
   // NATY: not sure if I can remove this...check
@@ -306,7 +305,7 @@ void ODEPhysics::UpdateCollision()
 // Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
-  this->UpdateCollision();
+  //this->UpdateCollision();
 
   DiagnosticTimer timer("ODEPhysics::UpdatePhysics");
 

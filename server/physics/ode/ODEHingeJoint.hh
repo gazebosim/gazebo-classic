@@ -23,6 +23,7 @@
 #ifndef ODEHINGEJOINT_HH
 #define ODEHINGEJOINT_HH
 
+#include "Event.hh"
 #include "Angle.hh"
 #include "Vector3.hh"
 #include "Param.hh"
@@ -130,6 +131,8 @@ namespace gazebo
   
     /// Set the parameter to value
     public: virtual void SetParam( int parameter, double value);
+
+    private: ConnectionPtr jointUpdateConnection;
   };
 
   /// \}

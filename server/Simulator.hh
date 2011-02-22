@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "Event.hh"
 #include "Time.hh"
 #include "SingletonT.hh"
 
@@ -200,6 +201,8 @@ namespace gazebo
       private: unsigned int activeWorldIndex;
   
       private: std::vector<Plugin*> plugins;
+
+      private: ConnectionPtr quitConnection;
 
       //Singleton implementation
       private: friend class DestroyerT<Simulator>;

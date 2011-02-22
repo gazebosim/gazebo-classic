@@ -23,6 +23,7 @@
 #ifndef JOINT_HH
 #define JOINT_HH
 
+#include "Event.hh"
 #include "Common.hh"
 #include "Param.hh"
 #include "Vector3.hh"
@@ -94,12 +95,11 @@ namespace gazebo
 
     /// \brief Connect a boost::slot the the joint update signal
     public: template<typename T>
-            boost::signals::connection ConnectJointUpdateSignal(T subscriber)
-            { return jointUpdateSignal.connect(subscriber); }
+            ConnectionPtr ConnectJointUpdateSignal(T subscriber)
+            { return jointUpdateSignal.Connect(subscriber); }
     /// \brief Disconnect a boost::slot the the joint update signal
-    public: template<typename T>
-            void DisconnectJointUpdateSignal( T subscriber )
-            { jointUpdateSignal.disconnect(subscriber); }
+    public: void DisconnectJointUpdateSignal( ConnectionPtr &c )
+            { jointUpdateSignal.Disconnect(c); }
 
     /// \brief Get the axis of rotation
     public: virtual Vector3 GetAxis(int index) const = 0;
@@ -186,7 +186,8 @@ namespace gazebo
     protected: Vector3 anchorPos;
     protected: Body *anchorBody;
 
-    private: boost::signal<void ()> jointUpdateSignal;
+    private: EventT<void ()> jointUpdateSignal;
+    private: ConnectionPtr showJointsConnection;
 
     // joint damping_coefficient
     protected: double damping_coefficient;

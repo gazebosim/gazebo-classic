@@ -101,7 +101,7 @@ PhysicsEngine::PhysicsEngine(World *world)
     }
     */
 
-    Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
+    this->showContactConnection = Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
 
     // NATY: put this back in
     //this->contactLinesIter = this->contactLines.begin();
@@ -114,8 +114,6 @@ PhysicsEngine::PhysicsEngine(World *world)
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
-  Events::DisconnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
-
   if (this->visualMsg)
   {
     this->visualMsg->action = VisualMsg::DELETE;

@@ -24,6 +24,7 @@
 #include <sstream>
 #include <fstream>
 #include <sys/time.h> //gettimeofday
+#include <boost/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include <tbb/parallel_for.h>
@@ -105,10 +106,10 @@ World::World()
   this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scene->Init();
 
-  Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) );
-  Events::ConnectStepSignal( boost::bind(&World::StepCB, this) );
-  Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
-  Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
+  this->connections.push_back( Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) ) );
+  this->connections.push_back( Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
+  this->connections.push_back( Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
+  this->connections.push_back( Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,11 +120,7 @@ World::~World()
   delete this->saveStateTimeoutP;
   delete this->saveStateBufferSizeP;
 
-  Events::DisconnectPauseSignal( boost::bind(&World::PauseCB, this, _1) );
-  Events::DisconnectStepSignal( boost::bind(&World::StepCB, this) );
-  Events::DisconnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
-  Events::DisconnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
-
+  this->connections.clear();
   this->Fini();
 }
 
@@ -398,12 +395,12 @@ void World::RunLoop()
 // Update the world
 void World::Update()
 {
-  DiagnosticTimer timer("World::Update");
+  DIAG_TIMER("World::Update")
 
   Events::worldUpdateStartSignal();
 
   {
-    DiagnosticTimer timer("Update Models");
+    DIAG_TIMER("Update Models");
     tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
         ModelUpdate_TBB(&this->models) );
   }
@@ -413,12 +410,12 @@ void World::Update()
 
   /// Update all the sensors
   {
-    DiagnosticTimer timer("Update Sensors");
+    DIAG_TIMER("Update Sensors");
     SensorManager::Instance()->Update();
   }
 
   {
-    DiagnosticTimer timer("Update handlers");
+    DIAG_TIMER("Update handlers");
     this->factoryIfaceHandler->Update();
 
     // Process all incoming messages from simiface

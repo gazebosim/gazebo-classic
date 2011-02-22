@@ -39,45 +39,29 @@ RenderState *RenderState::self = NULL;
 ////////////////////////////////////////////////////////////////////////////////
 RenderState::RenderState()
 {
-  Events::ConnectShowLightsSignal(
-      boost::bind(&RenderState::ShowLightsCB,this) );
+  this->connections.push_back( Events::ConnectShowLightsSignal(
+      boost::bind(&RenderState::ShowLightsCB,this) ) );
 
-  Events::ConnectShowJointsSignal(
-      boost::bind(&RenderState::ShowJointsCB,this) );
+  this->connections.push_back( Events::ConnectShowJointsSignal(
+      boost::bind(&RenderState::ShowJointsCB,this) ) );
 
-  Events::ConnectShowCamerasSignal(
-      boost::bind(&RenderState::ShowCamerasCB,this) );
+  this->connections.push_back( Events::ConnectShowCamerasSignal(
+      boost::bind(&RenderState::ShowCamerasCB,this) ) );
 
-  Events::ConnectShowContactsSignal(
-      boost::bind(&RenderState::ShowContactsCB,this) );
+  this->connections.push_back( Events::ConnectShowContactsSignal(
+      boost::bind(&RenderState::ShowContactsCB,this) ) );
 
-  Events::ConnectShowWireframeSignal(
-      boost::bind(&RenderState::ShowWireframeCB,this) );
+  this->connections.push_back( Events::ConnectShowWireframeSignal(
+      boost::bind(&RenderState::ShowWireframeCB,this) ) );
 
-  Events::ConnectShowBoundingBoxesSignal(
-      boost::bind(&RenderState::ShowBoundingBoxesCB,this) );
+  this->connections.push_back( Events::ConnectShowBoundingBoxesSignal(
+      boost::bind(&RenderState::ShowBoundingBoxesCB,this) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 RenderState::~RenderState()
 {
-  Events::DisconnectShowLightsSignal(
-      boost::bind(&RenderState::ShowLightsCB,this) );
-
-  Events::DisconnectShowJointsSignal(
-      boost::bind(&RenderState::ShowJointsCB,this) );
-
-  Events::DisconnectShowCamerasSignal(
-      boost::bind(&RenderState::ShowCamerasCB,this) );
-
-  Events::DisconnectShowContactsSignal(
-      boost::bind(&RenderState::ShowContactsCB,this) );
-
-  Events::DisconnectShowWireframeSignal(
-      boost::bind(&RenderState::ShowWireframeCB,this) );
-
-  Events::DisconnectShowBoundingBoxesSignal(
-      boost::bind(&RenderState::ShowBoundingBoxesCB,this) );
+  this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

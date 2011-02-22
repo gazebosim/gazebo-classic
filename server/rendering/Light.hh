@@ -26,6 +26,7 @@
 #include <string>
 #include <iostream>
 
+#include "Event.hh"
 #include "Pose3d.hh"
 #include "Color.hh"
 #include "Param.hh"
@@ -130,6 +131,7 @@ namespace gazebo
     private: ParamT<double> *spotOuterAngleP;
     private: ParamT<double> *spotFalloffP;
 
+    private: ConnectionPtr showLightsConnection;
     private: static unsigned int lightCounter;
     private: Scene *scene;
   };

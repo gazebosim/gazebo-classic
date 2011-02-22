@@ -25,6 +25,7 @@
 
 #include <iostream>
 
+#include "Event.hh"
 #include "Joint.hh"
 #include "Param.hh"
 #include "Geom.hh"
@@ -234,6 +235,7 @@ namespace gazebo
     private: bool locked;
 
     protected: VisualMsg *visualMsg;
+    private: ConnectionPtr showContactConnection; 
 
     //private: std::vector<OgreDynamicLines*> contactLines;
     //private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;

@@ -54,6 +54,7 @@ ODEBody::ODEBody(Entity *parent)
     this->bodyId = dBodyCreate(this->odePhysics->GetWorldId());
     dBodySetData(this->bodyId, this);
     dBodySetAutoDisableDefaults(this->bodyId);
+    dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());
   }
   else
     this->bodyId = NULL;
@@ -194,12 +195,9 @@ void ODEBody::OnPoseChange()
   if (this->bodyId == NULL)
     return;
 
-  this->SetEnabled(true);
+  //this->SetEnabled(true);
 
   Pose3d pose = this->comEntity->GetWorldPose();
-
-  // NATY
-  //this->physicsEngine->LockMutex();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 
@@ -211,9 +209,6 @@ void ODEBody::OnPoseChange()
 
   // Set the rotation of the ODE body
   dBodySetQuaternion(this->bodyId, q);
-
-  // NATY
-  //this->physicsEngine->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,16 +226,11 @@ void ODEBody::SetEnabled(bool enable) const
   if (!this->bodyId)
     return;
 
-  // NATY
-  //this->physicsEngine->LockMutex();
-
-  if (enable)
+/*  if (enable)
     dBodyEnable(this->bodyId);
   else
     dBodyDisable(this->bodyId);
-
-  // NATY
-  //this->physicsEngine->UnlockMutex();
+    */
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -327,12 +317,7 @@ void ODEBody::SetLinearVel(const Vector3 &vel)
 {
   if (this->bodyId)
   {
-    this->SetEnabled(true);
-    // NATY
-    //this->physicsEngine->LockMutex();
     dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -345,13 +330,7 @@ Vector3 ODEBody::GetWorldLinearVel() const
   if (this->bodyId)
   {
     const dReal *dvel;
-
-    // NATY
-    //this->physicsEngine->LockMutex();
     dvel = dBodyGetLinearVel(this->bodyId);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
-
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
 
@@ -364,12 +343,7 @@ void ODEBody::SetAngularVel(const Vector3 &vel)
 {
   if (this->bodyId)
   {
-    this->SetEnabled(true);
-    // NATY
-    //this->physicsEngine->LockMutex();
     dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -402,8 +376,6 @@ Vector3 ODEBody::GetWorldAngularVel() const
 /// \brief Set the force applied to the body
 void ODEBody::SetForce(const Vector3 &force)
 {
-  // NATY
-  //if (this->bodyId && this->physicsEngine->Locked())
   if (this->bodyId)
   {
     dBodyAddForce(this->bodyId, force.x, force.y, force.z);
@@ -421,11 +393,7 @@ Vector3 ODEBody::GetWorldForce() const
   {
     const dReal *dforce;
 
-    // NATY
-    //this->physicsEngine->LockMutex();
     dforce = dBodyGetForce(this->bodyId);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
 
     force.x = dforce[0];
     force.y = dforce[1];
@@ -439,11 +407,8 @@ Vector3 ODEBody::GetWorldForce() const
 /// \brief Set the torque applied to the body
 void ODEBody::SetTorque(const Vector3 &torque)
 {
-  // NATY
-  //if (this->bodyId && this->physicsEngine->Locked())
   if (this->bodyId)
   {
-    this->SetEnabled(true);
     dBodyAddRelTorque(this->bodyId, torque.x, torque.y, torque.z);
   }
 }
@@ -459,13 +424,8 @@ Vector3 ODEBody::GetWorldTorque() const
   {
     const dReal *dtorque;
 
-    // NATY
-    //this->physicsEngine->LockMutex();
     dtorque = dBodyGetTorque(this->bodyId);
     
-    // NATY
-    //this->physicsEngine->UnlockMutex();
-
     torque.x = dtorque[0];
     torque.y = dtorque[1];
     torque.z = dtorque[2];
@@ -527,4 +487,12 @@ bool ODEBody::GetKinematic() const
     result = dBodyIsKinematic(this->bodyId);
 
   return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the auto disable flag.
+void ODEBody::SetAutoDisable(const bool &value)
+{
+  Body::SetAutoDisable(value);
+  dBodySetAutoDisableFlag(this->bodyId, this->GetAutoDisable());
 }

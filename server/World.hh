@@ -29,19 +29,18 @@
 #include <map>
 #include <string>
 
-#include <boost/thread.hpp>
 
 #include "Global.hh"
-
+#include "Event.hh"
 #include "Messages.hh"
 #include "Vector3.hh"
 #include "Pose3d.hh"
 #include "Entity.hh"
-//#include "Timer.hh"
 
 namespace boost
 {
   class recursive_mutex;
+  class thread;
 }
 
 namespace libgazebo
@@ -276,8 +275,6 @@ class World
   private: std::deque<WorldState>::iterator worldStatesEndIter;
   private: std::deque<WorldState>::iterator worldStatesCurrentIter;
 
-  //private: Timer saveStateTimer;
-  
   private: boost::recursive_mutex mutex;
   private: std::vector<Message*> messages;
 
@@ -292,6 +289,8 @@ class World
 
   // Scene graph for the world
   private: Scene *scene;
+
+  private: std::vector<ConnectionPtr> connections;
 };
 
 class WorldState

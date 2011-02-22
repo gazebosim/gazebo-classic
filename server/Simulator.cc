@@ -139,7 +139,7 @@ Simulator::Simulator()
   //this->model_delete_mutex = new boost::recursive_mutex();
   this->gazeboConfig=new gazebo::GazeboConfig();
 
-  Events::ConnectQuitSignal( boost::bind(&Simulator::SetUserQuit, this) );
+  this->quitConnection = Events::ConnectQuitSignal( boost::bind(&Simulator::SetUserQuit, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

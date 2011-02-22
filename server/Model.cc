@@ -395,13 +395,15 @@ void Model::Update()
   if (this->controllers.size() == 0 && this->IsStatic())
     return;
 
-  std::map<std::string, Controller* >::iterator contIter;
-
-  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->bodies.size(), 10),
-      BodyUpdate_TBB(&this->bodies) );
+  if (!this->IsStatic())
+  {
+    tbb::parallel_for( tbb::blocked_range<size_t>(0, this->bodies.size(), 10),
+        BodyUpdate_TBB(&this->bodies) );
+  }
 
   this->contacts.clear();
 
+  std::map<std::string, Controller* >::iterator contIter;
   for (contIter=this->controllers.begin();
       contIter!=this->controllers.end(); contIter++)
   {
