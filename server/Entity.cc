@@ -137,9 +137,21 @@ int Entity::GetParentId() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the parent
-void Entity::SetParent(Entity *parent)
+void Entity::SetParent(Entity *_parent)
 {
-  this->parent = parent;
+  if (this->parent)
+  {
+    this->parent->visualNode->sceneNode->removeChild(this->visualNode->sceneNode);
+    this->visualNode->parentNode = NULL;
+  }
+
+  if (_parent)
+  {
+    _parent->visualNode->sceneNode->addChild(this->visualNode->sceneNode);
+    this->visualNode->parentNode = _parent->visualNode->sceneNode;
+  }
+
+  this->parent = _parent;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

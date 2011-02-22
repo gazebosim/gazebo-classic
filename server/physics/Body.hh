@@ -76,6 +76,9 @@ namespace gazebo
     /// \param geom Geometery to attach to this body
     public: virtual void AttachGeom( Geom *geom );
 
+    /// \brief Dettach a geom to this body
+    public: virtual void DettachGeom(Geom *geom);
+
     /// \brief Set whether this body is enabled
     public: virtual void SetEnabled(bool enable) const = 0;
 
@@ -166,9 +169,11 @@ namespace gazebo
     public: virtual Vector3 GetWorldTorque() const = 0;
 
 
+    /// \brief Get the number of geoms
+    public: unsigned int GetGeomCount() const;
 
-    /// \brief Get the vector of all geoms
-    public: const std::map<std::string, Geom*> *GetGeoms() const;
+    /// \brief Get a geoms
+    public: Geom *GetGeom(unsigned int index) const;
 
     /// \brief Get a geom by name
     public: Geom *GetGeom(const std::string &name) const;
@@ -187,6 +192,9 @@ namespace gazebo
 
     /// \brief Get a sensor by name
     public: Sensor *GetSensor( const std::string &name ) const;
+
+    /// \brief Remove this body from the physics engine
+    public: virtual void RemoveFromPhysics() = 0;
 
     /// Load a new geom helper function
     /// \param node XMLConfigNode used to load the geom

@@ -169,6 +169,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
 
   scopedName = this->GetScopedName();
 
+  std::cout << "ScopedName[" << scopedName << "]\n";
   dup = World::Instance()->GetEntityByName(scopedName);
 
   // Look for existing models by the same name
@@ -920,6 +921,8 @@ void Model::LoadJoint(XMLConfigNode *node)
     jtype = Joint::HINGE2;
   else if (node->GetName() == "universal")
     jtype = Joint::UNIVERSAL;
+  else if (node->GetName() == "fixed")
+    jtype = Joint::FIXED;
   else
   {
     gzthrow("Uknown joint[" + node->GetName() + "]\n");

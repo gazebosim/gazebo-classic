@@ -68,6 +68,13 @@ ODEBody::ODEBody(Entity *parent)
 // Destructor
 ODEBody::~ODEBody()
 {
+  this->RemoveFromPhysics();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Remove this body from the physics engine
+void ODEBody::RemoveFromPhysics()
+{
   if (this->bodyId)
     dBodyDestroy(this->bodyId);
   this->bodyId = NULL;
@@ -188,6 +195,24 @@ void ODEBody::AttachGeom( Geom *geom )
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Dettach a geom to this body
+void ODEBody::DettachGeom(Geom *geom)
+{
+  Body::DettachGeom(geom);
+
+  ODEGeom *odeGeom = (ODEGeom*)(geom);
+
+  if (this->bodyId && odeGeom->GetGeomId())
+  {
+    this->physicsEngine->LockMutex();
+    dGeomSetBody(odeGeom->GetGeomId(), 0);
+    this->physicsEngine->UnlockMutex();
+  }
+}
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

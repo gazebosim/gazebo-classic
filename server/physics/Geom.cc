@@ -65,7 +65,7 @@ Geom::Geom( Body *body )
   this->contactsEnabled = false;
 
   Param::Begin(&this->parameters);
-  this->massP = new ParamT<double>("mass",0.001,0);
+  this->massP = new ParamT<double>("mass",0.0,0);
   this->massP->Callback( &Geom::SetMass, this);
 
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);

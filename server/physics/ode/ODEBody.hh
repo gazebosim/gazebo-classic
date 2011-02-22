@@ -64,6 +64,9 @@ namespace gazebo
     /// \param geom Geometery to attach to this body
     public: virtual void AttachGeom( Geom *geom );
 
+    /// \brief Dettach a geom to this body
+    public: virtual void DettachGeom(Geom *geom);
+
     /// \brief Called when the pose of the entity (or one of its parents) has
     /// changed
     public: virtual void OnPoseChange();
@@ -133,6 +136,9 @@ namespace gazebo
 
     /// \brief Get whether this body is in the kinematic state
     public: virtual bool GetKinematic() const;
+
+    // \brief Remove this body from the physics engine
+    public: virtual void RemoveFromPhysics();
 
     protected: Pose3d pose;
 

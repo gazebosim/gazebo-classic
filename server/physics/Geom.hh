@@ -64,6 +64,9 @@ namespace gazebo
     /// \brief Finalize the geom
     public: void Fini();
 
+    /// \brief Set the body this geom belongs to
+    public: void SetBody(Body *body);
+
     /// \brief Load the geom
     public: virtual void Load(XMLConfigNode *node);
 

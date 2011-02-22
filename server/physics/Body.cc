@@ -82,7 +82,7 @@ Body::Body(Entity *parent)
   this->cxP = new ParamT<double>("cx",0.0,0);
   this->cyP = new ParamT<double>("cy",0.0,0);
   this->czP = new ParamT<double>("cz",0.0,0);
-  this->bodyMassP = new ParamT<double>("mass",0.001,0);
+  this->bodyMassP = new ParamT<double>("mass",0.0,0);
   this->ixxP = new ParamT<double>("ixx",1e-6,0);
   this->iyyP = new ParamT<double>("iyy",1e-6,0);
   this->izzP = new ParamT<double>("izz",1e-6,0);
@@ -103,6 +103,7 @@ Body::Body(Entity *parent)
 // Destructor
 Body::~Body()
 {
+
   std::map< std::string, Geom* >::iterator giter;
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
@@ -467,6 +468,22 @@ void Body::AttachGeom( Geom *geom )
 
 }
 
+void Body::DettachGeom(Geom *geom)
+{
+  std::map<std::string, Geom*>::iterator iter;
+  iter = this->geoms.find(geom->GetName());
+
+  std::cout << "Detach GEOM[" << geom->GetName() << "] Count[" << this->geoms.size() << "]\n";
+  if (iter != this->geoms.end())
+  {
+    std::cout << "erasing\n";
+    this->geoms.erase(iter);
+  }
+  std::cout << "Post Count[" << this->geoms.size() << "]\n";
+  this->comEntity->RemoveChild(geom);
+  std::cout << "Done with detach\n";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the center of mass
 void Body::UpdateCoM()
@@ -617,11 +634,29 @@ Vector3 Body::GetRelativeTorque() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the vector of all geoms
-const std::map<std::string, Geom*> *Body::GetGeoms() const
+/// Get the number of geoms
+unsigned int Body::GetGeomCount() const
 {
-  return &(this->geoms);
+  return this->geoms.size();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get a geoms
+Geom *Body::GetGeom(unsigned int index) const
+{
+  std::map< std::string, Geom* >::const_iterator iter;
+  iter = this->geoms.begin();
+
+  if (index < this->geoms.size())
+  {
+    std::advance(iter,index);
+  }
+  else
+    gzerr(0) << "Invalid index\n";
+
+  return iter->second;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the model that this body belongs to

@@ -39,6 +39,7 @@
 #include "XMLConfig.hh"
 #include "SurfaceParams.hh"
 
+#include "FixedJoint.hh"
 #include "ODEHingeJoint.hh"
 #include "ODEHinge2Joint.hh"
 #include "ODESliderJoint.hh"
@@ -693,6 +694,8 @@ Joint *ODEPhysics::CreateJoint(Joint::Type type)
 {
   switch (type)
   {
+    case Joint::FIXED:
+      return new FixedJoint();
     case Joint::SLIDER:
       return new ODESliderJoint(this->worldId);
     case Joint::HINGE:
