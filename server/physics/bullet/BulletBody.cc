@@ -68,6 +68,14 @@ BulletBody::~BulletBody()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Remove this body from the physics engine
+void BulletBody::RemoveFromPhysics()
+{
+  // needs to be implemented
+  gzthrow("RemoveFromPhysics not implemented in BulletBody yet!");
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Load the body based on an XMLConfig node
 void BulletBody::Load(XMLConfigNode *node)
 {

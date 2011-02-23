@@ -124,6 +124,9 @@ namespace gazebo
     /// \brief Set the relative pose of a child geom.
     public: void SetGeomRelativePose(BulletGeom *geom, const Pose3d &newPose);
 
+    // \brief Remove this body from the physics engine
+    public: virtual void RemoveFromPhysics();
+
     private: btCompoundShape *compoundShape;
     private: BulletMotionState *motionState;
     private: btRigidBody *rigidBody;
