@@ -398,43 +398,43 @@ void SimulationFrame::OnCreateModel(wxCommandEvent &event)
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnWireframe(wxCommandEvent &event)
 {
-  Events::wireframeSignal();
+  Events::wireframeSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowPhysics(wxCommandEvent &event)
 {
-  Events::showPhysicsSignal();
+  Events::showPhysicsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowBoundingBoxes(wxCommandEvent &event)
 {
-  Events::showBoundingBoxesSignal();
+  Events::showBoundingBoxesSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowJoints(wxCommandEvent &event)
 {
-  Events::showJointsSignal();
+  Events::showJointsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowContacts(wxCommandEvent &event)
 {
-  Events::showContactsSignal();
+  Events::showContactsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowLights(wxCommandEvent &event)
 {
-  Events::showLightsSignal();
+  Events::showLightsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowCameras(wxCommandEvent &event)
 {
-  Events::showCamerasSignal();
+  Events::showCamerasSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

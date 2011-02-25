@@ -33,16 +33,16 @@ SpotLightMaker::SpotLightMaker()
 {
   this->state = 0;
 
-  this->msg.type = LightMsg::SPOT;
-  this->msg.diffuse.Set(0.5, 0.5, 0.5, 1);
-  this->msg.specular.Set(0.1, 0.1, 0.1, 1);
-  this->msg.attenuation.Set(0.5, 0.01, 0.0);
-  this->msg.direction.Set(0,0,-1);
-  this->msg.range = 20;
-  this->msg.castShadows = false;
-  this->msg.spotInnerAngle = 20;
-  this->msg.spotOuterAngle = 40;
-  this->msg.spotFalloff = 1.0;
+  this->msg.set_type( msgs::Light::SPOT );
+  Message::Set(this->msg.mutable_diffuse(), Color(0.5, 0.5, 0.5, 1));
+  Message::Set(this->msg.mutable_specular(), Color(0.1, 0.1, 0.1, 1));
+  Message::Set(this->msg.mutable_attenuation(), Vector3(0.5, 0.01, 0.0));
+  Message::Set(this->msg.mutable_direction(), Vector3(0,0,-1));
+  this->msg.set_range( 20 );
+  this->msg.set_cast_shadows( false );
+  this->msg.set_spot_inner_angle( 20 );
+  this->msg.set_spot_outer_angle( 40 );
+  this->msg.set_spot_falloff( 1.0 );
 }
 
 SpotLightMaker::~SpotLightMaker()
@@ -53,7 +53,7 @@ void SpotLightMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream << "user_spot_light_" << counter++;
-  this->msg.id = stream.str();
+  this->msg.mutable_header()->set_str_id( stream.str() );
   this->state = 1;
 }
 
@@ -76,8 +76,8 @@ void SpotLightMaker::MousePushCB(const MouseEvent &event)
   Vector3 norm;
   norm.Set(0,0,1);
 
-  this->msg.pose.pos = event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0);
-  this->msg.pose.pos.z = 1.0;
+  Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0) );
+  this->msg.mutable_pose()->mutable_position()->set_z( 1.0 );
 }
 
 void SpotLightMaker::MouseReleaseCB(const MouseEvent &event)
@@ -97,5 +97,6 @@ void SpotLightMaker::MouseDragCB(const MouseEvent & /*event*/)
 
 void SpotLightMaker::CreateTheEntity()
 {
+  Message::Stamp(this->msg);
   Simulator::Instance()->SendMessage(this->msg);
 }

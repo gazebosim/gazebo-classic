@@ -147,14 +147,14 @@ ODEPhysics::ODEPhysics(World *world)
   Param::Begin(&this->parameters);
   this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
   this->globalERPP = new ParamT<double>("erp", 0.2, 0);
-  this->stepTypeP = new ParamT<std::string>("stepType", "quick", 0);
-  this->stepItersP = new ParamT<unsigned int>("stepIters", 100, 0);
+  this->stepTypeP = new ParamT<std::string>("step_type", "quick", 0);
+  this->stepItersP = new ParamT<unsigned int>("step_iters", 100, 0);
   this->stepWP = new ParamT<double>("stepW", 1.3, 0);  /// over_relaxation value for SOR
-  this->contactMaxCorrectingVelP = new ParamT<double>("contactMaxCorrectingVel", 10.0, 0);
-  this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
-  this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", true, 0);
-  this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
-  this->maxContactsP = new ParamT<int>("maxContacts",100,0); // enforced for trimesh-trimesh contacts
+  this->contactMaxCorrectingVelP = new ParamT<double>("contact_max_correcting_vel", 10.0, 0);
+  this->contactSurfaceLayerP = new ParamT<double>("contact_surface_layer", 0.01, 0);
+  this->autoDisableBodyP = new ParamT<bool>("auto_disable_body", true, 0);
+  this->contactFeedbacksP = new ParamT<int>("contact_feedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
+  this->maxContactsP = new ParamT<int>("max_contacts",100,0); // enforced for trimesh-trimesh contacts
   Param::End();
 }
 
@@ -305,7 +305,7 @@ void ODEPhysics::UpdateCollision()
 // Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
-  //this->UpdateCollision();
+  this->UpdateCollision();
 
   DiagnosticTimer timer("ODEPhysics::UpdatePhysics");
 

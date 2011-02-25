@@ -1,0 +1,8 @@
+package gazebo.msgs;
+import "header.proto";
+
+message Selection
+{
+  required Header header = 1;
+  optional bool selected = 2 [default = false];
+}

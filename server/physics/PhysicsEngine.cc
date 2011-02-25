@@ -45,8 +45,8 @@ PhysicsEngine::PhysicsEngine(World *world)
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
   this->gravityP->Callback(&PhysicsEngine::SetGravity, this);
 
-  this->updateRateP = new ParamT<double>("updateRate", 0.0, 0);
-  this->stepTimeP = new ParamT<Time>("stepTime",0.025,0);
+  this->updateRateP = new ParamT<double>("update_rate", 0.0, 0);
+  this->stepTimeP = new ParamT<Time>("step_time",0.025,0);
   Param::End();
 
   this->mutex = new boost::recursive_mutex();
@@ -54,13 +54,14 @@ PhysicsEngine::PhysicsEngine(World *world)
 
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
-    this->visualMsg = new VisualMsg();
+    /*this->visualMsg = new VisualMsg();
     this->visualMsg->parentId.clear();
     this->visualMsg->id = "physics_engine_visual";
     this->visualMsg->visible = false;
     //this->visualMsg->rtShader = false;
     this->visualMsg->castShadows = false;
     this->visualMsg->action = VisualMsg::UPDATE;
+    */
 
     //Simulator::Instance()->SendMessage( *this->visualMsg );
 
@@ -101,7 +102,7 @@ PhysicsEngine::PhysicsEngine(World *world)
     }
     */
 
-    this->showContactConnection = Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ToggleShowVisual, this) );
+    this->showContactConnection = Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowContacts, this, _1) );
 
     // NATY: put this back in
     //this->contactLinesIter = this->contactLines.begin();
@@ -114,12 +115,12 @@ PhysicsEngine::PhysicsEngine(World *world)
 // Destructor
 PhysicsEngine::~PhysicsEngine()
 {
-  if (this->visualMsg)
+  if (!this->visual.empty())
   {
-    this->visualMsg->action = VisualMsg::DELETE;
-    Simulator::Instance()->SendMessage( *this->visualMsg );
-    delete this->visualMsg;
-    this->visualMsg = NULL;
+    msgs::Visual msg;
+    Message::Init(msg, this->visual);
+    msg.set_action( msgs::Visual::DELETE );
+    Simulator::Instance()->SendMessage( msg );
   }
 
   delete this->gravityP;
@@ -230,22 +231,13 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Toggle whether to show contacts
-void PhysicsEngine::ToggleShowVisual()
-{
-  this->visualMsg->visible = !this->visualMsg->visible;
-  Simulator::Instance()->SendMessage(*this->visualMsg);
-
-  // NATY: put back in
-  //this->contactLinesIter = this->contactLines.begin();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Set whether to show contacts
-void PhysicsEngine::ShowVisual(bool show)
+void PhysicsEngine::ShowContacts(const bool &show)
 {
-  this->visualMsg->visible = show;
-  Simulator::Instance()->SendMessage(*this->visualMsg);
+  msgs::Visual msg;
+  Message::Init(msg, this->visual);
+  msg.set_visible( show );
+  Simulator::Instance()->SendMessage(msg);
 
   /* NATY put back in
   if (show)

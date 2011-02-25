@@ -21,7 +21,7 @@ include_directories(
   physics 
   physics/ode
   physics/bullet
-  audio_video
+  #audio_video
   controllers 
   rendering 
   sensors 
@@ -66,7 +66,7 @@ add_subdirectory(physics)
 add_subdirectory(sensors)
 add_subdirectory(wx)
 add_subdirectory(controllers)
-add_subdirectory(audio_video)
+#add_subdirectory(audio_video)
 
 ########################################
 # Process all the subdirectories
@@ -157,8 +157,7 @@ foreach (header ${gazeboserver_headers_nopath})
   set (server_includes "${server_includes} #include <gazebo/${header}>\n" CACHE STRING "server includes auto generated" FORCE)
 endforeach (header ${gazeboserver_headers_nopath})
 
-
-add_library(gazebo_server SHARED ${gazeboserver_sources})
+add_library(gazebo_server SHARED ${gazeboserver_sources} )
 set_target_properties(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
 
 add_executable(gazebo-exec main.cc)
@@ -188,21 +187,30 @@ target_link_libraries( gazebo-exec ${libtool_library}
                                    ${freeimage_library} 
                                    gazebo_server
                                    gazebo_rendering
-                                   gazebo_av-shared
+                                   #gazebo_av-shared
                                    gazebo_wx
                                    gazebo_physics
+                                   gazebo_msgs
                                    gazeboshm 
                                    assimp
                                    pthread
+                                   ${PROTOBUF_LIBRARY}
                                    ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}}
 )
 
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
-                      -lassimp -lgazebo_physics -lgazebo_av -lgazebo_wx -lgazebo_rendering)
+                      -lassimp -lgazebo_physics -lgazebo_av 
+                      -lgazebo_wx -lgazebo_rendering)
 
 
-target_link_libraries( gazebo_server ${libtool_library} ${freeimage_library} gazeboshm gazebo_rendering gazebo_physics ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
+target_link_libraries( gazebo_server ${libtool_library} 
+                                     ${freeimage_library} 
+                                     ${PROTOBUF_LIBRARY}
+                                     gazeboshm 
+                                     gazebo_rendering 
+                                     gazebo_physics 
+                                     ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
@@ -229,7 +237,6 @@ install(FILES ${PROJECT_BINARY_DIR}/gazeboserver.hh DESTINATION ${CMAKE_INSTALL_
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/gazeboserver_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
-
 
 
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

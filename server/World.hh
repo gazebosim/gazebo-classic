@@ -60,7 +60,7 @@ namespace gazebo
   class Geom;
   class PhysicsEngine;
   class XMLConfigNode;
-  class OpenAL;
+  //class OpenAL;
   class WorldState;
   class Time;
   class Scene;
@@ -205,7 +205,7 @@ class World
   public: Common *GetByName(const std::string &name);
 
   /// \brief Receive a message
-  public: void ReceiveMessage( const Message &msg );
+  public: void ReceiveMessage( const google::protobuf::Message &message );
 
   /// \brief Process all messages
   private: void ProcessMessages();
@@ -262,7 +262,7 @@ class World
   private: GraphicsIfaceHandler *graphics;
   private: SimulationIfaceHandler *simIfaceHandler;
 
-  private: OpenAL *openAL;
+  //private: OpenAL *openAL;
 
   /// List of all the parameters
   protected: std::vector<Param*> parameters;
@@ -276,7 +276,7 @@ class World
   private: std::deque<WorldState>::iterator worldStatesCurrentIter;
 
   private: boost::recursive_mutex mutex;
-  private: std::vector<Message*> messages;
+  private: std::vector<google::protobuf::Message> messages;
 
   private: ParamT<std::string> *nameP;
   private: ParamT<Time> *saveStateTimeoutP;

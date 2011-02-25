@@ -202,7 +202,7 @@ void ODEBody::OnPoseChange()
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 
   dQuaternion q;
-  q[0] = pose.rot.u;
+  q[0] = pose.rot.w;
   q[1] = pose.rot.x;
   q[2] = pose.rot.y;
   q[3] = pose.rot.z;

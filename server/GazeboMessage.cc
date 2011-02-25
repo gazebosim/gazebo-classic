@@ -42,7 +42,7 @@ GazeboMessage::GazeboMessage()
   this->level = 0;
   Param::Begin(&this->parameters);
   this->verbosityP = new ParamT<int>("verbosity",0,0);
-  this->logDataP = new ParamT<bool>("logData",false,0);
+  this->logDataP = new ParamT<bool>("log_data",false,0);
   Param::End();
 }
 

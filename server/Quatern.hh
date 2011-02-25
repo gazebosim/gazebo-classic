@@ -166,7 +166,7 @@ class Quatern
   public: Vector3 GetZAxis() const;
 
   /// \brief Attributes of the quaternion 
-  public: double u;
+  public: double w;
 
   /// \brief Attributes of the quaternion 
   public: double x;

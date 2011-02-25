@@ -63,7 +63,7 @@ Body::Body(Entity *parent)
   //this->comEntity->GetVisualNode()->SetShowInGui(false);
 
   Param::Begin(&this->parameters);
-  this->autoDisableP = new ParamT<bool>("autoDisable", true, 0);
+  this->autoDisableP = new ParamT<bool>("auto_disable", true, 0);
   this->autoDisableP->Callback( &Body::SetAutoDisable, this );
 
   this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
@@ -71,16 +71,16 @@ Body::Body(Entity *parent)
 
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this );
-  this->dampingFactorP = new ParamT<double>("dampingFactor", 0.0, 0);
+  this->dampingFactorP = new ParamT<double>("damping_factor", 0.0, 0);
 
   // option to turn gravity off for individual body
-  this->turnGravityOffP = new ParamT<bool>("turnGravityOff", false, 0);
+  this->turnGravityOffP = new ParamT<bool>("turn_gravity_off", false, 0);
 
   // option to make body collide with bodies of the same parent
-  this->selfCollideP = new ParamT<bool>("selfCollide", false, 0);
+  this->selfCollideP = new ParamT<bool>("self_collide", false, 0);
 
   // User can specify mass/inertia property for the body
-  this->customMassMatrixP = new ParamT<bool>("massMatrix",false,0);
+  this->customMassMatrixP = new ParamT<bool>("mass_matrix",false,0);
   this->cxP = new ParamT<double>("cx",0.0,0);
   this->cyP = new ParamT<double>("cy",0.0,0);
   this->czP = new ParamT<double>("cz",0.0,0);
@@ -97,7 +97,6 @@ Body::Body(Entity *parent)
   this->kinematicP->Callback( &Body::SetKinematic, this );
 
   Param::End();
-
 }
 
 
@@ -109,15 +108,16 @@ Body::~Body()
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
 
-  if (this->cgVisualMsgs.size() > 0)
+  if (this->cgVisuals.size() > 0)
   {
-    for (unsigned int i=0; i < this->cgVisualMsgs.size(); i++)
+    for (unsigned int i=0; i < this->cgVisuals.size(); i++)
     {
-      this->cgVisualMsgs[i]->action = VisualMsg::DELETE;
-      Simulator::Instance()->SendMessage(*this->cgVisualMsgs[i]);
-      delete this->cgVisualMsgs[i];
+      msgs::Visual msg;
+      Message::Init(msg, this->cgVisuals[i]);
+      msg.set_action( msgs::Visual::DELETE );
+      Simulator::Instance()->SendMessage( msg );
     }
-    this->cgVisualMsgs.clear();
+    this->cgVisuals.clear();
   }
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
@@ -227,7 +227,7 @@ void Body::Load(XMLConfigNode *node)
 
   this->SetKinematic(**this->kinematicP);
 
-  this->showPhysicsConnection = Events::ConnectShowPhysicsSignal( boost::bind(&Body::ToggleShowPhysics, this) );
+  this->showPhysicsConnection = Events::ConnectShowPhysicsSignal( boost::bind(&Body::ShowPhysics, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -381,38 +381,46 @@ void Body::Init()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
-    VisualMsg *msg;
-    msg = new VisualMsg();
-    msg->parentId = this->comEntity->GetCompleteScopedName();
-    msg->id = visname.str();
-    msg->render = RENDERING_MESH_RESOURCE;
-    msg->mesh = "unit_box";
-    msg->material = "Gazebo/Red";
-    msg->castShadows = false;
-    msg->attachAxes = true;
-    msg->visible = false;
-    msg->scale.Set(0.1, 0.1, 0.1);
-    Simulator::Instance()->SendMessage(*msg);
-    this->cgVisualMsgs.push_back( msg );
+    msgs::Visual msg;
+    Message::Init(msg, visname.str());
+    msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
+    msg.set_render_type( msgs::Visual::MESH_RESOURCE );
+    msg.set_mesh( "unit_box" );
+    msg.set_material( "Gazebo/RedGlow" );
+    msg.set_cast_shadows( false );
+    msg.set_attach_axes( true );
+    msg.set_visible( false );
+    Message::Set(msg.mutable_scale(), Vector3(0.1, 0.1, 0.1));
+    Simulator::Instance()->SendMessage(msg);
+    this->cgVisuals.push_back( msg.header().str_id() );
 
     if (this->geoms.size() > 1)
     {
-      msg = new VisualMsg();
-      msg->parentId = this->comEntity->GetCompleteScopedName();
-      msg->id = visname.str() + "_connectors";
-      msg->render = RENDERING_LINE_LIST;
-      msg->attachAxes = false;
-      msg->material = "Gazebo/GreenGlow";
-      msg->visible = false;
+      msgs::Visual g_msg;
+      Message::Init(g_msg, visname.str() + "_connectors");
+
+      g_msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
+      g_msg.set_render_type( msgs::Visual::LINE_LIST );
+      g_msg.set_attach_axes( false );
+      g_msg.set_material( "Gazebo/GreenGlow" );
+      g_msg.set_visible( false );
 
       // Create a line to each geom
       for (std::map< std::string, Geom* >::iterator giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
       {
-        msg->points.push_back( Vector3(0,0,0) );
-        msg->points.push_back(giter->second->GetRelativePose().pos);
+        msgs::Point *pt;
+        pt = g_msg.add_points();
+        pt->set_x(0);
+        pt->set_y(0);
+        pt->set_z(0);
+
+        pt = g_msg.add_points();
+        pt->set_x(giter->second->GetRelativePose().pos.x);
+        pt->set_y(giter->second->GetRelativePose().pos.y);
+        pt->set_z(giter->second->GetRelativePose().pos.z);
       }
-      Simulator::Instance()->SendMessage(*msg);
-      this->cgVisualMsgs.push_back( msg );
+      Simulator::Instance()->SendMessage(msg);
+      this->cgVisuals.push_back( g_msg.header().str_id() );
     }
   }
 
@@ -700,24 +708,15 @@ void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Toggle show the physics visualizations
-void Body::ToggleShowPhysics()
-{
-  for (unsigned int i=0; i < this->cgVisualMsgs.size(); i++)
-  {
-    this->cgVisualMsgs[i]->visible = !this->cgVisualMsgs[i]->visible;
-    Simulator::Instance()->SendMessage(*this->cgVisualMsgs[i]);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Set to true to show the physics visualizations
-void Body::ShowPhysics(bool show)
+void Body::ShowPhysics(const bool &show)
 {
-  for (unsigned int i=0; i < this->cgVisualMsgs.size(); i++)
+  for (unsigned int i=0; i < this->cgVisuals.size(); i++)
   {
-    this->cgVisualMsgs[i]->visible = show;
-    Simulator::Instance()->SendMessage(*this->cgVisualMsgs[i]);
+    msgs::Visual msg;
+    Message::Init(msg, this->cgVisuals[i] );
+    msg.set_visible( show );
+    Simulator::Instance()->SendMessage(msg);
   }
 }
 

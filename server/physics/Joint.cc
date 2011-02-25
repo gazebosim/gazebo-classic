@@ -40,28 +40,26 @@ Joint::Joint()
   : Common(NULL)
 {
   this->AddType(JOINT);
-  this->visualMsg = NULL;
-  this->line1Msg = NULL;
-  this->line2Msg = NULL;
   this->model = NULL;
+  this->showJoints = false;
 
   Param::Begin(&this->parameters);
   this->erpP = new ParamT<double>("erp",0.4,0);
   this->cfmP = new ParamT<double>("cfm",10e-3,0);
-  this->stopKpP = new ParamT<double>("stopKp",1000000.0,0);
-  this->stopKdP = new ParamT<double>("stopKd",1.0,0);
+  this->stopKpP = new ParamT<double>("stop_kp",1000000.0,0);
+  this->stopKdP = new ParamT<double>("stop_kd",1.0,0);
   this->body1NameP = new ParamT<std::string>("body1",std::string(),1);
   this->body2NameP = new ParamT<std::string>("body2",std::string(),1);
   this->anchorBodyNameP = new ParamT<std::string>("anchor",std::string(),0);
-  this->anchorOffsetP = new ParamT<Vector3>("anchorOffset",Vector3(0,0,0), 0);
-  this->provideFeedbackP = new ParamT<bool>("provideFeedback", false, 0);
-  this->fudgeFactorP = new ParamT<double>( "fudgeFactor", 1.0, 0 );
+  this->anchorOffsetP = new ParamT<Vector3>("anchor_offset",Vector3(0,0,0), 0);
+  this->provideFeedbackP = new ParamT<bool>("provide_feedback", false, 0);
+  this->fudgeFactorP = new ParamT<double>( "fudge_factor", 1.0, 0 );
   Param::End();
 
   this->body1 = NULL;
   this->body2 = NULL;
 
-  this->showJointsConnection = Events::ConnectShowJointsSignal(boost::bind(&Joint::ToggleShowJoints, this) );
+  this->showJointsConnection = Events::ConnectShowJointsSignal(boost::bind(&Joint::ShowJoints, this, _1) );
 }
 
 
@@ -69,28 +67,28 @@ Joint::Joint()
 // Desctructor
 Joint::~Joint()
 {
-  if (this->visualMsg)
+  if (!this->visual.empty())
   {
-    this->visualMsg->action = VisualMsg::DELETE;
-    Simulator::Instance()->SendMessage(*this->visualMsg);
-    delete this->visualMsg;
-    this->visualMsg = NULL;
+    msgs::Visual msg;
+    Message::Init(msg, this->visual);
+    msg.set_action( msgs::Visual::DELETE );
+    Simulator::Instance()->SendMessage(msg);
   }
 
-  if (this->line1Msg)
+  if (!this->line1.empty())
   {
-    this->line1Msg->action = VisualMsg::DELETE;
-    Simulator::Instance()->SendMessage(*this->line1Msg);
-    delete this->line1Msg;
-    this->line1Msg = NULL;
+    msgs::Visual msg;
+    Message::Init(msg, this->line1);
+    msg.set_action( msgs::Visual::DELETE );
+    Simulator::Instance()->SendMessage(msg);
   }
 
-  if (this->line2Msg)
+  if (!this->line2.empty())
   {
-    this->line2Msg->action = VisualMsg::DELETE;
-    Simulator::Instance()->SendMessage(*this->line2Msg);
-    delete this->line2Msg;
-    this->line2Msg = NULL;
+    msgs::Visual msg;
+    Message::Init(msg, this->line2);
+    msg.set_action( msgs::Visual::DELETE );
+    Simulator::Instance()->SendMessage(msg);
   }
 
   delete this->erpP;
@@ -153,31 +151,32 @@ void Joint::Load(XMLConfigNode *node)
   this->Attach(this->body1, this->body2);
 
   /// Add a renderable for the joint
-  this->visualMsg = new VisualMsg();
-  this->visualMsg->parentId = this->GetName();
-  this->visualMsg->id = visname.str();
-  this->visualMsg->render = RENDERING_MESH_RESOURCE;
-  this->visualMsg->pose.pos = this->anchorPos;
-  this->visualMsg->castShadows = false;
-  this->visualMsg->mesh = "joint_anchor";
-  this->visualMsg->material = "Gazebo/JointAnchor";
-  this->visualMsg->visible = false;
-  
-  this->line1Msg = new VisualMsg();
-  this->line1Msg->parentId = this->visualMsg->id;
-  this->line1Msg->id = this->visualMsg->id + "/line1";
-  this->line1Msg->render = RENDERING_LINE_LIST;
-  this->line1Msg->material = "Gazebo/BlueGlow";
-  this->line1Msg->points.push_back(Vector3(0,0,0));
-  this->line1Msg->points.push_back(Vector3(0,0,0));
+  msgs::Visual msg;
+  Message::Init(msg, visname.str());
+  msg.set_parent_id( this->GetName() );
+  msg.set_render_type( msgs::Visual::MESH_RESOURCE );
+  Message::Set(msg.mutable_pose()->mutable_position(), this->anchorPos );
+  msg.set_cast_shadows( false );
+  msg.set_mesh( "joint_anchor" );
+  msg.set_material( "Gazebo/JointAnchor" );
+  msg.set_visible( false );
+  Simulator::Instance()->SendMessage(msg);
+  this->visual = msg.header().str_id();
+ 
+  Message::Init(msg, visname.str() + "/line1"); 
+  msg.set_parent_id( visname.str() );
+  msg.set_render_type( msgs::Visual::LINE_LIST );
+  msg.set_material( "Gazebo/BlueGlow" );
+  Simulator::Instance()->SendMessage(msg);
+  this->line1 = msg.header().str_id();
 
-  this->line2Msg = new VisualMsg();
-  this->line2Msg->parentId = this->visualMsg->id;
-  this->line2Msg->id = this->visualMsg->id + "line2";
-  this->line2Msg->render = RENDERING_LINE_LIST;
-  this->line2Msg->material = "Gazebo/BlueGlow";
-  this->line2Msg->points.push_back(Vector3(0,0,0));
-  this->line2Msg->points.push_back(Vector3(0,0,0));
+  Message::Init(msg, visname.str() + "/line2"); 
+  msg.set_parent_id( visname.str() );
+  msg.set_render_type( msgs::Visual::LINE_LIST );
+  msg.set_material( "Gazebo/BlueGlow" );
+  Simulator::Instance()->SendMessage(msg);
+  this->line2 = msg.header().str_id();
+
 
   // Set the anchor vector
   if (this->anchorBody)
@@ -216,42 +215,56 @@ void Joint::Update()
   this->jointUpdateSignal();
 
   //TODO: Evaluate impact of this code on performance
-  if (this->visualMsg && this->visualMsg->visible)
+  if (this->showJoints)
   {
-    this->visualMsg->pose.pos = this->anchorPos;
+    msgs::Visual msg;
+    Message::Init(msg, this->visual);
+    Message::Set(msg.mutable_pose()->mutable_position(), this->anchorPos);
+    Simulator::Instance()->SendMessage( msg );
 
     if (this->body1) 
-      this->line1Msg->points[1] = this->body1->GetWorldPose().pos - this->anchorPos;
+    {
+      Message::Init(msg, this->line1);
+      msgs::Point *pt;
+
+      pt = msg.add_points();
+      pt->set_x(0);
+      pt->set_y(0);
+      pt->set_z(0);
+
+      pt = msg.add_points();
+      Message::Set(pt, this->body1->GetWorldPose().pos - this->anchorPos );
+
+      Simulator::Instance()->SendMessage( msg );
+    }
 
     if (this->body2)
-      this->line2Msg->points[1] = this->body2->GetWorldPose().pos - this->anchorPos;
+    {
+      Message::Init(msg, this->line2);
+      msgs::Point *pt;
 
-    Simulator::Instance()->SendMessage( *this->visualMsg );
-    Simulator::Instance()->SendMessage( *this->line1Msg );
-    Simulator::Instance()->SendMessage( *this->line2Msg );
+      pt = msg.add_points();
+      pt->set_x(0);
+      pt->set_y(0);
+      pt->set_z(0);
+
+      pt = msg.add_points();
+      Message::Set(pt, this->body2->GetWorldPose().pos - this->anchorPos);
+      Simulator::Instance()->SendMessage( msg );
+    }
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Toggle joint visibility
-void Joint::ToggleShowJoints()
-{
-  if (this->visualMsg)
-  {
-    this->visualMsg->visible = !this->visualMsg->visible;
-    Simulator::Instance()->SendMessage( *this->visualMsg );
-  }
-}
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joint to show visuals
-void Joint::ShowJoints(bool s)
+void Joint::ShowJoints(const bool &s)
 {
-  if (this->visualMsg)
-  {
-    this->visualMsg->visible = s;
-    Simulator::Instance()->SendMessage( *this->visualMsg );
-  }
+  msgs::Visual msg;
+  Message::Init(msg, this->visual);
+  msg.set_visible(s);
+  Simulator::Instance()->SendMessage( msg );
+  this->showJoints = s;
 }
 
 //////////////////////////////////////////////////////////////////////////////

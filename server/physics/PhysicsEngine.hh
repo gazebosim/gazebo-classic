@@ -41,7 +41,6 @@ namespace gazebo
   class Entity;
   class Body;
   class XMLConfigNode;
-  class VisualMsg;
   
   /// \addtogroup gazebo_physics_engine
   /** \{
@@ -161,11 +160,8 @@ namespace gazebo
     /// \brief Convert a Gazebo mass to an engine specific mass
     public: virtual void ConvertMass(void *engineMass, const Mass &mass) = 0;
 
-    /// \brief Toggle whether to show contacts
-    public: void ToggleShowVisual();
-
     /// \brief Set whether to show contacts
-    public: void ShowVisual(bool show);
+    public: void ShowContacts(const bool &show);
 
     /// \brief access functions to set ODE parameters
     public: virtual void SetWorldCFM(double cfm) {}
@@ -234,7 +230,7 @@ namespace gazebo
     private: boost::recursive_mutex *mutex;
     private: bool locked;
 
-    protected: VisualMsg *visualMsg;
+    protected: std::string visual;
     private: ConnectionPtr showContactConnection; 
 
     //private: std::vector<OgreDynamicLines*> contactLines;

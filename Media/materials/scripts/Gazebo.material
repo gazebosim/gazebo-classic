@@ -313,6 +313,8 @@ material Gazebo/TurquoiseGlowOutline : Gazebo/Turquoise
 	}
 }
 
+
+
 material Gazebo/RedTransparent
 {
 	technique
@@ -631,7 +633,6 @@ material Gazebo/CloudySky
 
 material Gazebo/WoodPallet
 {
-	receive_shadows on
 	technique
 	{
 		pass
@@ -639,7 +640,6 @@ material Gazebo/WoodPallet
 			ambient 0.5 0.5 0.5 1.0
 			diffuse 1.0 1.0 1.0 1.0
 			specular 0.0 0.0 0.0 1.0 12.5
-      depth_write on
 
 			texture_unit
 			{

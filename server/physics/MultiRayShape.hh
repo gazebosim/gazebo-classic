@@ -29,8 +29,12 @@
 
 namespace gazebo
 {
+  namespace msgs
+  {
+    class Visual;
+  }
+
   class XMLConfigNode;
-  class VisualMsg;
 
   /// \brief Laser geom contains a set of ray-geoms, structured to simulate
   ///        a laser range scanner
@@ -109,8 +113,8 @@ namespace gazebo
     /// \brief Add a ray to the geom
     protected: virtual void AddRay(const Vector3 &start, const Vector3 &end );
   
-    protected: VisualMsg *rayFanMsg;
-    protected: VisualMsg *rayFanOutlineMsg;
+    protected: msgs::Visual *rayFanMsg;
+    protected: msgs::Visual *rayFanOutlineMsg;
   
     /// Ray data
     protected: std::vector< RayShape* > rays;

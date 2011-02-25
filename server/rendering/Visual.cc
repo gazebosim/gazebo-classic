@@ -150,12 +150,12 @@ void Visual::Init()
                                                 std::string("none"),0);
   this->materialNameP->Callback( &Visual::SetMaterial, this );
 
-  this->castShadowsP = new ParamT<bool>("castShadows",true,0);
+  this->castShadowsP = new ParamT<bool>("cast_shadows",true,0);
   this->castShadowsP->Callback( &Visual::SetCastShadows, this );
 
   this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
 
-  this->normalMapNameP = new ParamT<std::string>("normalMap",
+  this->normalMapNameP = new ParamT<std::string>("normal_map",
                                                 std::string("none"),0);
   this->normalMapNameP->Callback( &Visual::SetNormalMap, this );
 
@@ -167,7 +167,7 @@ void Visual::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Visual::LoadFromMsg(const VisualMsg *msg)
+/*void Visual::LoadFromMsg(const VisualMsg *msg)
 {
   std::string mesh = msg->mesh;
 
@@ -188,7 +188,7 @@ void Visual::LoadFromMsg(const VisualMsg *msg)
 
   this->Load(NULL);
   this->UpdateFromMsg(msg);
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the visual
@@ -627,8 +627,11 @@ void Visual::SetTransparency( float trans )
         {
           pass = technique->getPass(passCount);
           // Need to fix transparency
-          //if (pass->getPolygonMode() == Ogre::PM_SOLID)
-            //pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+          if (!pass->isProgrammable() &&
+              pass->getPolygonMode() == Ogre::PM_SOLID)
+          {
+            pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+          }
 
           if (this->transparency > 0.0)
             pass->setDepthWriteEnabled(false);
@@ -729,7 +732,7 @@ void Visual::SetRotation( const Quatern &rot)
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  this->sceneNode->setOrientation(rot.u, rot.x, rot.y, rot.z);
+  this->sceneNode->setOrientation(rot.w, rot.x, rot.y, rot.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -773,10 +776,10 @@ Quatern Visual::GetRotation( ) const
   Ogre::Quaternion vquatern;
   Quatern quatern;
   vquatern=this->sceneNode->getOrientation();
-  quatern.u =vquatern.w;
-  quatern.x=vquatern.x;
-  quatern.y=vquatern.y;
-  quatern.z=vquatern.z;
+  quatern.w = vquatern.w;
+  quatern.x = vquatern.x;
+  quatern.y = vquatern.y;
+  quatern.z = vquatern.z;
   return quatern;
 }
 
@@ -813,10 +816,10 @@ Pose3d Visual::GetWorldPose() const
   pose.pos.z=vpos.z;
 
   vquatern=this->sceneNode->getOrientation();
-  pose.rot.u =vquatern.w;
-  pose.rot.x=vquatern.x;
-  pose.rot.y=vquatern.y;
-  pose.rot.z=vquatern.z;
+  pose.rot.w = vquatern.w;
+  pose.rot.x = vquatern.x;
+  pose.rot.y = vquatern.y;
+  pose.rot.z = vquatern.z;
 
 
   return pose;
@@ -828,84 +831,6 @@ Pose3d Visual::GetWorldPose() const
 Ogre::SceneNode * Visual::GetSceneNode() const
 {
   return this->sceneNode;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-///  Create a bounding box for this visual
-void Visual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
-{
-  std::ostringstream nodeName;
-
-  nodeName << this->sceneNode->getName()<<"_AABB_NODE";
-  std::cout << "BB Node name:" << nodeName.str() <<"|" << min << ":" << max << "\n";
-
-  int i=0;
-  while (this->sceneNode->getCreator()->hasSceneNode(nodeName.str()))
-  {
-    nodeName << "_" << i;
-    i++;
-  }
-
-  this->boundingBoxNode = this->sceneNode->createChildSceneNode(nodeName.str());
-  this->boundingBoxNode->setInheritScale(false);
-
-  if (!this->sceneNode->getCreator()->hasEntity("unit_box_U1V1"))
-  {
-    // Add the mesh into OGRE
-    this->InsertMesh(MeshManager::Instance()->GetMesh("unit_box_U1V1"));
-  }
-
-  Ogre::MovableObject *odeObj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(nodeName.str()+"_OBJ", "unit_box_U1V1"));
-  odeObj->setQueryFlags(0);
-
-  this->boundingBoxNode->attachObject(odeObj);
-  Vector3 diff = max-min;
-
-  this->boundingBoxNode->setScale(diff.x, diff.y, diff.z);
-
-  Ogre::Entity *ent = NULL;
-  Ogre::SimpleRenderable *simple = NULL;
-
-  ent = dynamic_cast<Ogre::Entity*>(odeObj);
-  simple = dynamic_cast<Ogre::SimpleRenderable*>(odeObj);
-
-  if (ent)
-    ent->setMaterialName("Gazebo/GreenTransparent");
-  else if (simple)
-    simple->setMaterial("Gazebo/GreenTransparent");
-
-  this->boundingBoxNode->setVisible(false);
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Set the material of the bounding box
-void Visual::SetBoundingBoxMaterial(const std::string &materialName )
-{
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
-  if (materialName.empty())
-    return;
-
-  try
-  {
-    for (int i=0; i < this->boundingBoxNode->numAttachedObjects(); i++)
-    {
-      Ogre::MovableObject *obj = this->boundingBoxNode->getAttachedObject(i);
-
-      if (dynamic_cast<Ogre::Entity*>(obj))
-        ((Ogre::Entity*)obj)->setMaterialName(materialName);
-      else
-        ((Ogre::SimpleRenderable*)obj)->setMaterial(materialName);
-    }
-  }
-  catch (Ogre::Exception e)
-  {
-    gzmsg(0) << "Unable to set BoundingBoxMaterial[" << materialName << "][" << e.getFullDescription() << "]\n";
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1270,12 +1195,12 @@ void Visual::InsertMesh( const Mesh *mesh)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update a visual based on a message
-void Visual::UpdateFromMsg(const VisualMsg *msg)
+/*void Visual::UpdateFromMsg(const VisualMsg *msg)
 {
   this->SetPose(msg->pose);
-  this->SetTransparency(msg->transparency);
   this->SetScale(msg->scale);
   this->SetVisible(msg->visible);
+  this->SetTransparency(msg->transparency);
   this->SetMaterial(msg->material);
 
   if (msg->points.size() > 0)
@@ -1284,6 +1209,6 @@ void Visual::UpdateFromMsg(const VisualMsg *msg)
     for (unsigned int i=0; i < msg->points.size(); i++)
       lines->AddPoint( msg->points[i] );
   }
-}
+}*/
 
 

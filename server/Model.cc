@@ -86,21 +86,20 @@ Model::Model(Common *parent)
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
-  this->enableGravityP = new ParamT<bool>("enableGravity", true, 0);
+  this->enableGravityP = new ParamT<bool>("enable_gravity", true, 0);
   this->enableGravityP->Callback( &Model::SetGravityMode, this );
 
-  this->enableFrictionP = new ParamT<bool>("enableFriction", true, 0);
+  this->enableFrictionP = new ParamT<bool>("enable_friction", true, 0);
   this->enableFrictionP->Callback( &Model::SetFrictionMode, this );
 
   this->collideP = new ParamT<std::string>("collide", "all", 0);
   this->collideP->Callback( &Model::SetCollideMode, this );
 
-  this->laserFiducialP = new ParamT<int>("laserFiducialId", -1, 0);
+  this->laserFiducialP = new ParamT<int>("laser_fiducial_id", -1, 0);
   this->laserFiducialP->Callback( &Model::SetLaserFiducialId, this );
 
-  this->laserRetroP = new ParamT<float>("laserRetro", -1, 0);
+  this->laserRetroP = new ParamT<float>("laser_retro", -1, 0);
   this->laserRetroP->Callback( &Model::SetLaserRetro, this );
-
   Param::End();
 
   this->graphicsHandler = NULL;

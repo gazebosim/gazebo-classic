@@ -40,8 +40,8 @@ TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
   Param::Begin(&this->parameters);
   this->meshNameP = new ParamT<std::string>("mesh","",1);
   this->scaleP = new ParamT<Vector3>("scale",Vector3(1,1,1),0);
-  this->centerMeshP = new ParamT<std::string>("centerMesh","none",0);
-  this->genTexCoordP = new ParamT<bool>("genTexCoord",false,0);
+  this->centerMeshP = new ParamT<std::string>("center_mesh","none",0);
+  this->genTexCoordP = new ParamT<bool>("gen_tex_coord",false,0);
   Param::End();
 }
 

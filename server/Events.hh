@@ -252,13 +252,13 @@ namespace gazebo
     public: static EventT<void (std::string)> addEntitySignal;
     public: static EventT<void (std::string)> deleteEntitySignal;
 
-    public: static EventT<void ()> showLightsSignal;
-    public: static EventT<void ()> showJointsSignal;
-    public: static EventT<void ()> showCamerasSignal;
-    public: static EventT<void ()> showContactsSignal;
-    public: static EventT<void ()> wireframeSignal;
-    public: static EventT<void ()> showPhysicsSignal;
-    public: static EventT<void ()> showBoundingBoxesSignal;
+    public: static EventT<void (bool)> showLightsSignal;
+    public: static EventT<void (bool)> showJointsSignal;
+    public: static EventT<void (bool)> showCamerasSignal;
+    public: static EventT<void (bool)> showContactsSignal;
+    public: static EventT<void (bool)> wireframeSignal;
+    public: static EventT<void (bool)> showPhysicsSignal;
+    public: static EventT<void (bool)> showBoundingBoxesSignal;
 
     public: static EventT<void (Entity*)> entitySelectedSignal;
 

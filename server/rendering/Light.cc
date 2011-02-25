@@ -57,10 +57,10 @@ Light::Light(Scene *scene)
   this->lightTypeP = new ParamT<std::string>("type", std::string("point"), 1);
   this->lightTypeP->Callback(&Light::SetLightType, this);
 
-  this->diffuseP  = new ParamT<Color>("diffuseColor", Color(.5, .5, .5, 1), 0);
+  this->diffuseP  = new ParamT<Color>("diffuse_color", Color(.5, .5, .5, 1), 0);
   this->diffuseP->Callback(&Light::SetDiffuseColor, this);
 
-  this->specularP = new ParamT<Color>("specularColor", Color(.1, .1, .1), 0);
+  this->specularP = new ParamT<Color>("specular_color", Color(.1, .1, .1), 0);
   this->specularP->Callback(&Light::SetSpecularColor, this);
 
   this->directionP  = new ParamT<Vector3>("direction", Vector3(0, 0, -1), 0);
@@ -69,24 +69,23 @@ Light::Light(Scene *scene)
   this->attenuationP  = new ParamT<Vector3>("attenuation", Vector3(.1, 0.01, .001), 1);
   this->attenuationP->Callback(&Light::SetAttenuation, this);
 
-  this->spotInnerAngleP = new ParamT<double>("innerAngle", 10, 0);
+  this->spotInnerAngleP = new ParamT<double>("spot_inner_angle", 10, 0);
   this->spotInnerAngleP->Callback(&Light::SetSpotInnerAngle, this);
 
-  this->spotOuterAngleP = new ParamT<double>("outerAngle", 20, 0);
+  this->spotOuterAngleP = new ParamT<double>("spot_outer_angle", 20, 0);
   this->spotOuterAngleP->Callback(&Light::SetSpotOuterAngle, this);
 
-  this->spotFalloffP = new ParamT<double>("falloff", 1, 0);
+  this->spotFalloffP = new ParamT<double>("spot_falloff", 1, 0);
   this->spotFalloffP->Callback(&Light::SetSpotFalloff, this);
 
   this->rangeP  = new ParamT<double>("range",10,1);
   this->rangeP->Callback(&Light::SetRange, this);
 
-  this->castShadowsP = new ParamT<bool>("castShadows",true,0);
+  this->castShadowsP = new ParamT<bool>("cast_shadows",true,0);
   this->castShadowsP->Callback(&Light::SetCastShadows, this);
   Param::End();
 
   this->showLightsConnection = Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +161,7 @@ void Light::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load from a light message
-void Light::LoadFromMsg(const LightMsg *msg)
+/*void Light::LoadFromMsg(const LightMsg *msg)
 {
   this->nameP->SetValue(msg->id);
 
@@ -185,7 +184,7 @@ void Light::LoadFromMsg(const LightMsg *msg)
 
   this->Load(NULL);
   this->SetPosition(msg->pose.pos);
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save a light

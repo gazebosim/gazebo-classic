@@ -17,7 +17,6 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
 
 #ifndef POSE3D_HH
@@ -27,7 +26,6 @@
 
 #include "Vector3.hh"
 #include "Quatern.hh"
-
 
 namespace gazebo
 {

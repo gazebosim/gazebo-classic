@@ -33,10 +33,10 @@ SphereMaker::SphereMaker()
 : EntityMaker()
 {
   this->state = 0;
-  this->visualMsg = new VisualMsg();
-  this->visualMsg->render = RENDERING_MESH_RESOURCE;
-  this->visualMsg->mesh = "unit_sphere";
-  this->visualMsg->material = "Gazebo/TurquoiseGlowOutline";
+  this->visualMsg = new msgs::Visual();
+  this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
+  this->visualMsg->set_mesh( "unit_sphere" );
+  this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
 }
 
 SphereMaker::~SphereMaker()
@@ -48,16 +48,16 @@ void SphereMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream << "user_sphere_" << counter++;
-  this->visualMsg->id = stream.str();
+  this->visualMsg->mutable_header()->set_str_id( stream.str() );
 
   this->state = 1;
 }
 
 void SphereMaker::Stop()
 {
-  this->visualMsg->action = VisualMsg::DELETE;
+  this->visualMsg->set_action( msgs::Visual::DELETE );
   Simulator::Instance()->SendMessage( *this->visualMsg );
-  this->visualMsg->action = VisualMsg::UPDATE;
+  this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   Events::moveModeSignal(true);
   this->state = 0;
@@ -106,34 +106,43 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  this->visualMsg->pose.pos = p1;
+  Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
-  Vector3 p = this->visualMsg->pose.pos;
+  Vector3 p( this->visualMsg->pose().position().x(),
+             this->visualMsg->pose().position().y(),
+             this->visualMsg->pose().position().z() );
 
   p.z = scale;
 
-  this->visualMsg->pose.pos = p;
-  this->visualMsg->scale.Set(scale,scale,scale);
+  Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  Message::Set(this->visualMsg->mutable_scale(),Vector3(scale,scale,scale));
   Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
 void SphereMaker::CreateTheEntity()
 {
-  InsertModelMsg msg;
+  msgs::InsertModel msg;
+  Message::Init(msg, "new_sphere");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model type='physical' name='" << this->visualMsg->id << "'>\
-    <xyz>" << this->visualMsg->pose.pos << "</xyz>\
+  newModelStr << "<model type='physical' name='" << this->visualMsg->header().str_id() << "'>\
+    <xyz>" << this->visualMsg->pose().position().x() << " "
+           << this->visualMsg->pose().position().y() << " "
+           << this->visualMsg->pose().position().z() << "</xyz>\
     <body name='body'>\
     <geom type='sphere' name='geom'>\
-    <size>" << this->visualMsg->scale.x << "</size>\
+    <size>" << this->visualMsg->scale().x() << " "
+            << this->visualMsg->scale().y() << " "
+            << this->visualMsg->scale().z() << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_sphere</mesh>\
-    <scale>" << this->visualMsg->scale*2 << "</scale>\
+    <scale>" << this->visualMsg->scale().x() << " "
+             << this->visualMsg->scale().y() << " "
+             << this->visualMsg->scale().z() << "</scale>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\
@@ -141,9 +150,9 @@ void SphereMaker::CreateTheEntity()
     </body>\
     </model>";
 
-  msg.xmlStr = newModelStr.str();
+  msg.set_xml( newModelStr.str() );
 
-  this->visualMsg->action = VisualMsg::DELETE;
+  this->visualMsg->set_action( msgs::Visual::DELETE );
   Simulator::Instance()->SendMessage( *this->visualMsg );
 
   Simulator::Instance()->SendMessage( msg );

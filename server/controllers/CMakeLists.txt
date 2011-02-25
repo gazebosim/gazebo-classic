@@ -1,16 +1,16 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-ADD_SUBDIRECTORY(actarray)
-ADD_SUBDIRECTORY(bumper)
-ADD_SUBDIRECTORY(camera)
-ADD_SUBDIRECTORY(gripper)
-ADD_SUBDIRECTORY(imu)
-ADD_SUBDIRECTORY(irarray)
-ADD_SUBDIRECTORY(laser)
-ADD_SUBDIRECTORY(opaque)
-ADD_SUBDIRECTORY(position2d)
-ADD_SUBDIRECTORY(ptz)
-ADD_SUBDIRECTORY(audio)
+add_subdirectory(actarray)
+add_subdirectory(bumper)
+add_subdirectory(camera)
+add_subdirectory(gripper)
+add_subdirectory(imu)
+add_subdirectory(irarray)
+add_subdirectory(laser)
+add_subdirectory(opaque)
+add_subdirectory(position2d)
+add_subdirectory(ptz)
+#add_subdirectory(audio)
 
 SET (sources Controller.cc 
              ControllerFactory.cc

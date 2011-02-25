@@ -134,7 +134,7 @@ Vector3 Pose3d::CoordPositionAdd(const Vector3 &pos) const
   Vector3 result;
 
   // result = pose.rot + pose.rot * this->pos * pose.rot!
-  tmp.u = 0.0;
+  tmp.w = 0.0;
   tmp.x = pos.x;
   tmp.y = pos.y;
   tmp.z = pos.z;
@@ -155,7 +155,7 @@ Vector3 Pose3d::CoordPositionAdd(const Pose3d &pose) const
   Vector3 result;
 
   // result = pose.rot + pose.rot * this->pos * pose.rot!
-  tmp.u = 0.0;
+  tmp.w = 0.0;
   tmp.x = this->pos.x;
   tmp.y = this->pos.y;
   tmp.z = this->pos.z;
@@ -181,7 +181,7 @@ Vector3 Pose3d::CoordPositionSub(const Pose3d &pose) const
   tmp.x = (this->pos - pose.pos).x;
   tmp.y = (this->pos - pose.pos).y;
   tmp.z = (this->pos - pose.pos).z;
-  tmp.u = 0.0;
+  tmp.w = 0.0;
 
   tmp = pose.rot.GetInverse() * (tmp * pose.rot);
 
@@ -240,13 +240,13 @@ Pose3d Pose3d::RotatePositionAboutOrigin(const Quatern &rot) const
 {
   Pose3d a = *this;
   a.pos.x =  (1.0 - 2.0*rot.y*rot.y - 2.0*rot.z*rot.z) * this->pos.x
-            +(2.0*(rot.x*rot.y+rot.u*rot.z)          ) * this->pos.y
-            +(2.0*(rot.x*rot.z-rot.u*rot.y)          ) * this->pos.z;
-  a.pos.y =  (2.0*(rot.x*rot.y-rot.u*rot.z)          ) * this->pos.x
+            +(2.0*(rot.x*rot.y+rot.w*rot.z)          ) * this->pos.y
+            +(2.0*(rot.x*rot.z-rot.w*rot.y)          ) * this->pos.z;
+  a.pos.y =  (2.0*(rot.x*rot.y-rot.w*rot.z)          ) * this->pos.x
             +(1.0 - 2.0*rot.x*rot.x - 2.0*rot.z*rot.z) * this->pos.y
-            +(2.0*(rot.y*rot.z+rot.u*rot.x)          ) * this->pos.z;
-  a.pos.z =  (2.0*(rot.x*rot.z+rot.u*rot.y)          ) * this->pos.x
-            +(2.0*(rot.y*rot.z-rot.u*rot.x)          ) * this->pos.y
+            +(2.0*(rot.y*rot.z+rot.w*rot.x)          ) * this->pos.z;
+  a.pos.z =  (2.0*(rot.x*rot.z+rot.w*rot.y)          ) * this->pos.x
+            +(2.0*(rot.y*rot.z-rot.w*rot.x)          ) * this->pos.y
             +(1.0 - 2.0*rot.x*rot.x - 2.0*rot.y*rot.y) * this->pos.z;
   return a;
 }

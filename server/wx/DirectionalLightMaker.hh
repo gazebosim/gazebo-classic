@@ -38,7 +38,7 @@ namespace gazebo
   
     private: virtual void CreateTheEntity();
     private: int state;
-    private: LightMsg msg;
+    private: msgs::Light msg;
     private: static unsigned int counter;
   };
 }

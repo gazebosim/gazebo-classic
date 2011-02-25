@@ -38,7 +38,6 @@ namespace gazebo
   class Geom;
   class Sensor;
   class XMLConfigNode;
-  class VisualMsg;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class
@@ -214,11 +213,8 @@ namespace gazebo
     /// \brief Set the angular damping factor
     public: virtual void SetAngularDamping(double damping) = 0;
 
-    /// \brief Toggle show the physics visualizations
-    public: void ToggleShowPhysics();
-
     /// \brief Set to true to show the physics visualizations
-    public: void ShowPhysics(bool show);
+    public: void ShowPhysics(const bool &show);
 
     public: Entity *GetCoMEntity() { return this->comEntity; }
 
@@ -272,7 +268,7 @@ namespace gazebo
     protected: ParamT<bool> *turnGravityOffP;
     protected: ParamT<bool> *selfCollideP;
 
-    protected: std::vector<VisualMsg *> cgVisualMsgs;
+    protected: std::vector< std::string > cgVisuals;
 
     protected: Vector3 linearAccel;
     protected: Vector3 angularAccel;

@@ -43,8 +43,8 @@ HeightmapShape::HeightmapShape(Geom *parent)
 
   Param::Begin(&this->parameters);
   this->imageFilenameP = new ParamT<std::string>("image","",1);
-  this->worldTextureP = new ParamT<std::string>("worldTexture","",0);
-  this->detailTextureP = new ParamT<std::string>("detailTexture","",0);
+  this->worldTextureP = new ParamT<std::string>("world_texture","",0);
+  this->detailTextureP = new ParamT<std::string>("detail_texture","",0);
   this->sizeP = new ParamT<Vector3>("size",Vector3(10,10,10), 0);
   this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
   Param::End();

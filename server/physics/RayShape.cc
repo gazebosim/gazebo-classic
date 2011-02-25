@@ -35,16 +35,13 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
 
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
   {
-    this->lineMsg = new VisualMsg();
-    this->lineMsg->id = this->GetName();
-    this->lineMsg->parentId = this->geomParent->GetName();
-    this->lineMsg->render = RENDERING_LINE_LIST;
+    msgs::Visual msg;
+    Message::Init(msg, this->GetName());
+    msg.set_parent_id( this->geomParent->GetName() );
+    msg.set_render_type( msgs::Visual::LINE_LIST );
 
-    // Add two points
-    this->lineMsg->points.push_back(Vector3(0,0,0));
-    this->lineMsg->points.push_back(Vector3(0,0,0));
-
-    this->lineMsg->material = "Gazebo/BlueGlow";
+    msg.set_material( "Gazebo/BlueGlow" );
+    Simulator::Instance()->SendMessage( msg );
 
     // NATY: put back in
     //this->lineMsg->visibility = GZ_LASER_CAMERA;
@@ -96,10 +93,15 @@ void RayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  // Set the line's position relative to it's parent scene node
-  this->lineMsg->points[0] = this->relativeStartPos;
-  this->lineMsg->points[1] = this->relativeEndPos;
-  Simulator::Instance()->SendMessage( *this->lineMsg );
+  msgs::Visual msg;
+  Message::Init(msg, this->GetName());
+
+  msgs::Point *pt = msg.add_points(); 
+  Message::Set( pt,  this->relativeStartPos );
+  pt = msg.add_points();
+  Message::Set(pt, this->relativeEndPos );
+
+  Simulator::Instance()->SendMessage( msg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,8 +131,15 @@ void RayShape::SetLength( double len )
 
   this->relativeEndPos = dir * len + this->relativeStartPos;
 
-  this->lineMsg->points[1] = this->relativeEndPos;
-  Simulator::Instance()->SendMessage( *this->lineMsg );
+
+  msgs::Visual msg;
+  Message::Init(msg, this->GetName());
+
+  msgs::Point *pt = msg.add_points(); 
+  Message::Set(pt, this->relativeStartPos );
+  pt = msg.add_points();
+  Message::Set(pt,  this->relativeEndPos );
+  Simulator::Instance()->SendMessage( msg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

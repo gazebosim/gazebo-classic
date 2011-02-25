@@ -33,12 +33,12 @@ PointLightMaker::PointLightMaker()
 {
   this->state = 0;
 
-  this->msg.type = LightMsg::POINT;
-  this->msg.diffuse.Set(0.5, 0.5, 0.5, 1);
-  this->msg.specular.Set(0.1, 0.1, 0.1, 1);
-  this->msg.attenuation.Set(0.5, 0.01, 0.001);
-  this->msg.range = 20;
-  this->msg.castShadows = false;
+  this->msg.set_type( msgs::Light::POINT );
+  Message::Set(this->msg.mutable_diffuse(), Color(0.5, 0.5, 0.5, 1));
+  Message::Set(this->msg.mutable_specular(), Color(0.1, 0.1, 0.1, 1));
+  Message::Set(this->msg.mutable_attenuation(), Vector3(0.5, 0.01, 0.001));
+  this->msg.set_range( 20 );
+  this->msg.set_cast_shadows( false );
 }
 
 PointLightMaker::~PointLightMaker()
@@ -49,7 +49,7 @@ void PointLightMaker::Start( Scene *scene )
 {
   std::ostringstream stream;
   stream << "user_point_light_" << counter++;
-  this->msg.id = stream.str();
+  this->msg.mutable_header()->set_str_id( stream.str() );
   this->state = 1;
 }
 
@@ -72,8 +72,10 @@ void PointLightMaker::MousePushCB(const MouseEvent &event)
   Vector3 norm;
   norm.Set(0,0,1);
 
-  this->msg.pose.pos = event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0);
-  this->msg.pose.pos.z = 1;
+  Message::Set(this->msg.mutable_pose()->mutable_position(), 
+      event.camera->GetWorldPointOnPlane(event.pressPos.x, 
+                                         event.pressPos.y, norm, 0));
+  this->msg.mutable_pose()->mutable_position()->set_z(1);
 }
 
 void PointLightMaker::MouseReleaseCB(const MouseEvent &event)
@@ -93,5 +95,6 @@ void PointLightMaker::MouseDragCB(const MouseEvent & /*event*/)
 
 void PointLightMaker::CreateTheEntity()
 {
+  Message::Stamp(this->msg);
   Simulator::Instance()->SendMessage(this->msg);
 }

@@ -59,7 +59,7 @@ namespace gazebo
     public: void Load(XMLConfigNode *node);
 
     /// \brief Load from a light message
-    public: void LoadFromMsg(const LightMsg *msg);
+    //public: void LoadFromMsg(const LightMsg *msg);
 
     /// \brief Save a light
     public: void Save(const std::string &prefix, std::ostream &stream);

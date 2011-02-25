@@ -58,13 +58,13 @@ Scene::Scene(const std::string &name)
   this->ambientP = new ParamT<Color>("ambient",Color(.1,.1,.1,.1),0);
   this->shadowsP = new ParamT<bool>("shadows", false, 0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
-  this->backgroundColorP = new ParamT<Color>("backgroundColor",Color(0.5,0.5,0.5), 0);
+  this->backgroundColorP = new ParamT<Color>("background_color",Color(0.5,0.5,0.5), 0);
 
   this->fogTypeP = new ParamT<std::string>("type","",0);
   this->fogColorP = new ParamT<Color>("color",Color(1,1,1,1),0);
   this->fogDensityP = new ParamT<double>("density",0,0);
-  this->fogStartP = new ParamT<double>("linearStart",0,0);
-  this->fogEndP = new ParamT<double>("linearEnd",1.0,0);
+  this->fogStartP = new ParamT<double>("linear_start",0,0);
+  this->fogEndP = new ParamT<double>("linear_end",1.0,0);
   Param::End();
 }
 
@@ -685,9 +685,9 @@ std::string Scene::GetIdString() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Receive a message
-void Scene::ReceiveMessage( const Message &msg )
+void Scene::ReceiveMessage( const google::protobuf::Message &message)
 {
-  boost::mutex::scoped_lock lock( this->mutex );
+  /*boost::mutex::scoped_lock lock( this->mutex );
   bool find = false;
 
   for (unsigned int i=0; i < this->messages[msg.type].size(); i++)
@@ -703,13 +703,14 @@ void Scene::ReceiveMessage( const Message &msg )
      
   if (!find) 
     this->messages[msg.type].push_back( msg.Clone() );
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Process all messages
 void Scene::ProcessMessages()
 {
-  boost::mutex::scoped_lock lock( this->mutex );
+  /*boost::mutex::scoped_lock lock( this->mutex );
   std::vector<Message*>::iterator iter;
 
   for (iter =  this->messages[VISUAL_MSG].begin(); 
@@ -744,6 +745,7 @@ void Scene::ProcessMessages()
   }
 
   this->messages.clear();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -874,8 +876,9 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
   }
 }
 
-void Scene::HandleVisualMsg(const VisualMsg *msg)
+void Scene::HandleVisualMsg(const msgs::Visual &msg)
 {
+  /*
   VisualMap::iterator iter;
   iter = this->visuals.find(msg->id);
 
@@ -890,13 +893,11 @@ void Scene::HandleVisualMsg(const VisualMsg *msg)
   }
   else if (iter != this->visuals.end())
   {
-    /*if (msg->id == "line1")
-      printf("Updating a line1msg\n");
-      */
+    //if (msg->id == "line1")
+      //printf("Updating a line1msg\n");
     iter->second->UpdateFromMsg(msg);
-    /*if (msg->id == "line1")
-      printf("Done Updating a line1msg\n");
-      */
+    //if (msg->id == "line1")
+     // printf("Done Updating a line1msg\n");
   }
   else
   {
@@ -918,10 +919,12 @@ void Scene::HandleVisualMsg(const VisualMsg *msg)
     if (msg->id == "line1")
       printf("Done Creating\n");
   }
+  */
 }
 
-void Scene::HandleLightMsg(const LightMsg *msg)
+void Scene::HandleLightMsg(const msgs::Light &msg)
 {
+  /*
   LightMap::iterator iter;
   iter = this->lights.find(msg->id);
 
@@ -939,12 +942,14 @@ void Scene::HandleLightMsg(const LightMsg *msg)
     light->LoadFromMsg(msg);
     this->lights[msg->id] = light;
   }
+  */
 }
 
-void Scene::HandleSelectionMsg(const SelectionMsg *msg)
+void Scene::HandleSelectionMsg(const msgs::Selection &msg)
 {
-  VisualMap::iterator viter;
+  /*VisualMap::iterator viter;
   viter = this->visuals.find(msg->id);
   if (viter != this->visuals.end())
     viter->second->ShowSelectionBox(msg->selected);
+    */
 }
