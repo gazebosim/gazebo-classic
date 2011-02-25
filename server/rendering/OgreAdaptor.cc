@@ -495,6 +495,12 @@ void OgreAdaptor::UpdateCameras()
     }
   }
 
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  {
+    if (dynamic_cast<UserCamera*>((*iter)) == NULL)
+      (*iter)->CaptureData();
+  }
+
   {
     DIAGNOSTICTIMER(timer("UpdateCameras: _fireFrameEnded",6));
     this->root->_fireFrameEnded();

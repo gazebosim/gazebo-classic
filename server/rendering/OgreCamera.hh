@@ -86,6 +86,8 @@ namespace gazebo
     /// \brief Render the camera
     public: void Render();
 
+    public: void CaptureData();
+
     /// \brief Update the sensor information
     public: void UpdateCam();
   
