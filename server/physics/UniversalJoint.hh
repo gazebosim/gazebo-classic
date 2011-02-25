@@ -131,7 +131,7 @@ class UniversalJoint : public T
                T::Load(node);
 
                this->SetAxis(0,**(this->axis1P));
-               this->SetAxis(1,**(this->axis1P));
+               this->SetAxis(1,**(this->axis2P));
 
                // Perform this three step ordering to ensure the parameters 
                // are set properly. This is taken from the ODE wiki.

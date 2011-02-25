@@ -46,11 +46,7 @@ ODEUniversalJoint::~ODEUniversalJoint()
 Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
-  // NATY
-  // this->physics->LockMutex();
   dJointGetUniversalAnchor( this->jointId, result );
-  // NATY
-  // this->physics->UnlockMutex();
 
   return Vector3( result[0], result[1], result[2] );
 }
@@ -59,14 +55,10 @@ Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void ODEUniversalJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
-  // NATY
-  // this->physics->LockMutex();
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
 
   dJointSetUniversalAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
-  // NATY
-  // this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -75,14 +67,10 @@ Vector3 ODEUniversalJoint::GetAxis(int index ) const
 {
   dVector3 result;
 
-  // NATY
-  // this->physics->LockMutex();
   if (index == 0)
     dJointGetUniversalAxis1( this->jointId, result );
   else
     dJointGetUniversalAxis2( this->jointId, result );
-  // NATY
-  // this->physics->UnlockMutex();
 
   return Vector3( result[0], result[1], result[2] );
 }
@@ -91,8 +79,6 @@ Vector3 ODEUniversalJoint::GetAxis(int index ) const
 // Set the first axis of rotation
 void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
 {
-  // NATY
-  // this->physics->LockMutex();
 
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
@@ -101,8 +87,6 @@ void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
     dJointSetUniversalAxis1( this->jointId, axis.x, axis.y, axis.z );
   else
     dJointSetUniversalAxis2( this->jointId, axis.x, axis.y, axis.z );
-  // NATY
-  // this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -110,12 +94,8 @@ void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
 void ODEUniversalJoint::SetDamping( int /*index*/, const double damping )
 {
 #ifdef INCLUDE_ODE_JOINT_DAMPING
-  // NATY
-  // this->physics->LockMutex();
   // ode does not yet support Universal joint damping
   dJointSetDamping( this->jointId, damping);
-  // NATY
-  // this->physics->UnlockMutex();
 #else
   // alternaitvely, apply explicit damping
   gzerr(0) << "joint damping not implemented in ODE ball joint\n";
@@ -128,14 +108,10 @@ Angle ODEUniversalJoint::GetAngle(int index) const
 {
   Angle result;
 
-  // NATY
-  // this->physics->LockMutex();
   if (index == 0)
     result = dJointGetUniversalAngle1( this->jointId );
   else
     result = dJointGetUniversalAngle2( this->jointId );
-  // NATY
-  // this->physics->UnlockMutex();
 
   return result;
 }
@@ -146,14 +122,10 @@ double ODEUniversalJoint::GetVelocity(int index) const
 {
   double result;
 
-  // NATY
-  // this->physics->LockMutex();
   if (index == 0)
     result = dJointGetUniversalAngle1Rate( this->jointId );
   else 
     result = dJointGetUniversalAngle2Rate( this->jointId );
-  // NATY
-  // this->physics->UnlockMutex();
 }
  
 //////////////////////////////////////////////////////////////////////////////
@@ -170,16 +142,12 @@ void ODEUniversalJoint::SetVelocity(int index,double angle)
 // Set the torque of this joint
 void ODEUniversalJoint::SetForce(int index, double torque)
 {
-  // NATY
-  // this->physics->LockMutex();
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
   if (index == 0)
     dJointAddUniversalTorques( this->jointId, torque, 0);
   else
     dJointAddUniversalTorques( this->jointId, 0, torque);
-  // NATY
-  // this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -206,12 +174,8 @@ double ODEUniversalJoint::GetMaxForce(int index)
 // Set the parameter to value
 void ODEUniversalJoint::SetParam( int parameter, double value)
 {
-  // NATY
-  // this->physics->LockMutex();
   ODEJoint::SetParam(parameter, value);
   dJointSetUniversalParam( this->jointId, parameter, value );
-  // NATY
-  // this->physics->UnlockMutex();
 }
 
 
