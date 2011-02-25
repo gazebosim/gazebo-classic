@@ -19,6 +19,7 @@
 
 #include <wx/wx.h>
 
+#include "Event.hh"
 #include "SphereMaker.hh"
 #include "BoxMaker.hh"
 #include "CylinderMaker.hh"
@@ -106,6 +107,8 @@ namespace gazebo
     private: PointLightMaker pointLightMaker;
     private: SpotLightMaker spotLightMaker;
     private: DirectionalLightMaker directionalLightMaker;
+
+    private: std::vector<ConnectionPtr> connections;
   };
 
 }

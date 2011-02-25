@@ -67,9 +67,9 @@ Grid::Grid( Scene *scene,  unsigned int cell_count, float cell_length,
   this->height = 0;
 
   Param::Begin(&this->parameters);
-  this->cellCountP = new ParamT<unsigned int>("cellCount",0,0);
-  this->cellLengthP = new ParamT<float>("cellLength",1,0);
-  this->lineWidthP = new ParamT<float>("lineWidth",0.03,0);
+  this->cellCountP = new ParamT<unsigned int>("cell_count",0,0);
+  this->cellLengthP = new ParamT<float>("cell_length",1,0);
+  this->lineWidthP = new ParamT<float>("line_width",0.03,0);
   this->colorP = new ParamT<Color>("color",Color(1,1,1,1),0);
   this->h_offsetP = new ParamT<float>("height_offset",0,0);
   Param::End();

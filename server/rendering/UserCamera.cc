@@ -56,9 +56,9 @@ UserCamera::UserCamera(const std::string &name, Scene *scene)
   stream << "UserCamera_" << this->count++;
   this->name = stream.str(); 
 
-  Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) );
-  Events::ConnectRenderSignal( boost::bind(&UserCamera::Render, this) );
-  Events::ConnectPostRenderSignal( boost::bind(&UserCamera::PostRender, this) );
+  this->connections.push_back( Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) ) );
+  this->connections.push_back( Events::ConnectRenderSignal( boost::bind(&UserCamera::Render, this) ) );
+  this->connections.push_back( Events::ConnectPostRenderSignal( boost::bind(&UserCamera::PostRender, this) ) );
 
   this->animState = NULL;
 
@@ -76,6 +76,7 @@ UserCamera::~UserCamera()
   }
 
   delete this->viewController;
+  this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

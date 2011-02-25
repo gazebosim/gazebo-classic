@@ -26,6 +26,7 @@
 #include <OgrePrerequisites.h>
 #include <OgreTexture.h>
 
+#include "Event.hh"
 #include "Param.hh"
 #include "Angle.hh"
 #include "Pose3d.hh"
@@ -313,6 +314,7 @@ namespace gazebo
     protected: Time lastUpdate;
 
     protected: Scene *scene;
+    private: ConnectionPtr showWireframeConnection;
 
     private: friend class Scene;
   };

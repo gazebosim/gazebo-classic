@@ -44,7 +44,6 @@ using namespace gazebo;
 Geom::Geom( Body *body )
     : Entity(body->GetCoMEntity())
 {
-  this->bbVisualMsg = NULL;
   this->AddType(GEOM);
 
   this->body = body;
@@ -70,38 +69,40 @@ Geom::Geom( Body *body )
   this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
-  this->laserFiducialIdP = new ParamT<int>("laserFiducialId",-1,0);
-  this->laserRetroP = new ParamT<float>("laserRetro",-1,0);
+  this->laserFiducialIdP = new ParamT<int>("laser_fiducial_id",-1,0);
+  this->laserRetroP = new ParamT<float>("laser_retro",-1,0);
 
-  this->enableContactsP = new ParamT<bool>("enableContacts", false, 0);
+  this->enableContactsP = new ParamT<bool>("enable_contacts", false, 0);
   //this->enableContactsP->Callback( &Geom::SetContactsEnabled, this );
   
   Param::End();
 
-  Events::ConnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-  Events::ConnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-  Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ToggleShowBoundingBox, this) );
 
-  this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) );
+  this->connections.push_back( Events::ConnectShowJointsSignal( boost::bind(&Geom::SetTransparent, this, _1) ) );
+  this->connections.push_back( Events::ConnectShowPhysicsSignal( boost::bind(&Geom::SetTransparent, this, _1) ) );
+  this->connections.push_back( Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
+  this->connections.push_back( this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 Geom::~Geom()
 {
-  for (unsigned int i=0; i < this->visualMsgs.size(); i++)
+  for (unsigned int i=0; i < this->visuals.size(); i++)
   {
-    this->visualMsgs[i]->action = VisualMsg::DELETE;
-    Simulator::Instance()->SendMessage( *this->visualMsgs[i] );
-    delete this->visualMsgs[i];
+    msgs::Visual msg;
+    Message::Init(msg, this->visuals[i]);
+    msg.set_action( msgs::Visual::DELETE );
+    Simulator::Instance()->SendMessage( msg );
   }
-  this->visualMsgs.clear();
+  this->visuals.clear();
 
-  if (this->bbVisualMsg)
+  if (!this->bbVisual.empty())
   {
-    this->bbVisualMsg->action = VisualMsg::DELETE;
-    Simulator::Instance()->SendMessage( *this->bbVisualMsg );
-    delete this->bbVisualMsg;
+    msgs::Visual msg;
+    Message::Init(msg, this->bbVisual);
+    msg.set_action( msgs::Visual::DELETE);
+    Simulator::Instance()->SendMessage( msg );
   }
 
   delete this->typeP;
@@ -121,14 +122,7 @@ Geom::~Geom()
 /// Finalize the geom
 void Geom::Fini()
 {
-  this->body->DisconnectEnabledSignal(boost::bind(&Geom::EnabledCB, this, _1));
-
-  Events::DisconnectShowPhysicsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-
-  Events::DisconnectShowJointsSignal( boost::bind(&Geom::ToggleTransparent, this) );
-
-  Events::DisconnectShowBoundingBoxesSignal( 
-      boost::bind(&Geom::ToggleShowBoundingBox, this) );
+  this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,20 +161,17 @@ void Geom::Load(XMLConfigNode *node)
   {
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "::VISUAL_" << 
-               this->visualMsgs.size();
+               this->visuals.size();
 
 
-    VisualMsg *msg = new VisualMsg();
+    msgs::Visual msg = Message::VisualFromXML(childNode);
+    Message::Init(msg, visname.str());
+    msg.set_parent_id( this->GetCompleteScopedName() );
+    msg.set_render_type( msgs::Visual::MESH_RESOURCE );
+    msg.set_cast_shadows( false );
 
-    msg->parentId = this->GetCompleteScopedName();
-    msg->id = visname.str();
-    msg->render = RENDERING_MESH_RESOURCE;
-    msg->Load(childNode);
-    msg->castShadows = false;
-
-    Simulator::Instance()->SendMessage( *msg );
-
-    this->visualMsgs.push_back(msg);
+    Simulator::Instance()->SendMessage( msg );
+    this->visuals.push_back(msg.header().str_id());
    
     childNode = childNode->GetNext("visual");
   }
@@ -202,22 +193,23 @@ void Geom::CreateBoundingBox()
     std::ostringstream visname;
     visname << this->GetCompleteScopedName() << "::BBVISUAL" ;
 
-    this->bbVisualMsg = new VisualMsg();
+    msgs::Visual msg;
+    msg.set_render_type( msgs::Visual::MESH_RESOURCE );
+    msg.set_parent_id( this->GetCompleteScopedName() );
+    msg.mutable_header()->set_str_id( this->GetCompleteScopedName() + "_BBVISUAL" );
+    msg.set_cast_shadows(false);
+    msg.set_visible( RenderState::GetShowBoundingBoxes() );
+    msg.set_mesh( "unit_box" );
+    if (this->IsStatic() )
+      msg.set_material( "Gazebo/YellowTransparent" );
+    else
+      msg.set_material( "Gazebo/GreenTransparent" );
 
-    this->bbVisualMsg->render = RENDERING_MESH_RESOURCE;
-    this->bbVisualMsg->parentId = this->GetCompleteScopedName();
-    this->bbVisualMsg->id = this->GetCompleteScopedName() + "_BBVISUAL";
-    this->bbVisualMsg->castShadows = false;
-    this->bbVisualMsg->visible = RenderState::GetShowBoundingBoxes();
-    this->bbVisualMsg->mesh = "unit_box";
-    this->bbVisualMsg->material = "Gazebo/RedTransparent";
-    this->bbVisualMsg->scale.Set(1.1, 1.1, 1.1);
-    this->bbVisualMsg->pose.pos.Set(0,0,0.0);
-    //this->bbVisualMsg->size = max-min;
+    Message::Set(msg.mutable_scale(), (max - min) * 1.01);
+    Message::Set(msg.mutable_pose()->mutable_position(), Vector3(0,0,0.0));
+    msg.set_transparency( .5 );
 
-    //std::cout << "Bounding box[" << min << ":" << max << "]\n";
-
-    //Simulator::Instance()->SendMessage( *this->bbVisualMsg );
+    Simulator::Instance()->SendMessage( msg );
   }
 }
 
@@ -315,58 +307,35 @@ float Geom::GetLaserRetro() const
   return this->laserRetroP->GetValue();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Toggle bounding box visibility
-void Geom::ToggleShowBoundingBox()
-{
-  if (this->bbVisualMsg)
-  {
-    std::cout << "Geom::ToggleShowBoundingBox[" << bbVisualMsg->id << "]\n";
-    this->bbVisualMsg->visible = !this->bbVisualMsg->visible;
-    this->bbVisualMsg->action = VisualMsg::UPDATE;
-    Simulator::Instance()->SendMessage( *this->bbVisualMsg );
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the visibility of the Bounding box of this geometry
-void Geom::ShowBoundingBox(bool show)
+void Geom::ShowBoundingBox(const bool &show)
 {
-  if (this->bbVisualMsg)
+  if (!this->bbVisual.empty())
   {
-    this->bbVisualMsg->visible = show;
-    this->bbVisualMsg->action = VisualMsg::UPDATE;
-    Simulator::Instance()->SendMessage( *this->bbVisualMsg );
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Toggle transparency
-void Geom::ToggleTransparent()
-{
-  for (unsigned int i = 0; i < this->visualMsgs.size(); i++)
-  {
-    this->visualMsgs[i]->action = VisualMsg::UPDATE;
-    if (this->visualMsgs[i]->transparency == 0.0)
-      this->visualMsgs[i]->transparency = 0.6;
-    else
-      this->visualMsgs[i]->transparency = 0.0;
-    Simulator::Instance()->SendMessage( *this->visualMsgs[i] );
+    msgs::Visual msg;
+    Message::Init(msg, this->bbVisual);
+    msg.set_visible( show );
+    msg.set_action( msgs::Visual::UPDATE );
+    Simulator::Instance()->SendMessage( msg );
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the transparency
-void Geom::SetTransparent(bool show)
+void Geom::SetTransparent(const bool &show)
 {
-for (unsigned int i = 0; i < this->visualMsgs.size(); i++)
+  for (unsigned int i = 0; i < this->visuals.size(); i++)
   {
-    this->visualMsgs[i]->action = VisualMsg::UPDATE;
+    msgs::Visual msg;
+    Message::Init(msg, this->visuals[i]);
+    msg.set_action( msgs::Visual::UPDATE );
     if (show)
-      this->visualMsgs[i]->transparency = 0.6;
+      msg.set_transparency( 0.6 );
     else
-      this->visualMsgs[i]->transparency = 0.0;
-    Simulator::Instance()->SendMessage( *this->visualMsgs[i] );
+      msg.set_transparency( 0.0 );
+    Simulator::Instance()->SendMessage( msg );
   }
 }
 
@@ -479,12 +448,15 @@ Contact Geom::GetContact(unsigned int i) const
 /// Enable callback: Called when the body changes
 void Geom::EnabledCB(bool enabled)
 {
-  if (enabled)
-    this->bbVisualMsg->material = "Gazebo/GreenTransparent";
-  else
-    this->bbVisualMsg->material = "Gazebo/RedTransparent";
+  msgs::Visual msg;
+  Message::Init(msg, this->bbVisual);
 
-  Simulator::Instance()->SendMessage( *this->bbVisualMsg );
+  if (enabled)
+    msg.set_material( "Gazebo/GreenTransparent" );
+  else
+    msg.set_material( "Gazebo/RedTransparent" );
+
+  Simulator::Instance()->SendMessage( msg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -31,6 +31,8 @@ DiagnosticsDialog::DiagnosticsDialog( wxWindow *parent )
 {
   wxBoxSizer *boxSizer = new wxBoxSizer(wxHORIZONTAL);
 
+  Connect(this->GetId(), wxEVT_INIT_DIALOG, wxInitDialogEventHandler(DiagnosticsDialog::OnInit), NULL, this);
+
   this->treeCtrl = new wxTreeCtrl(this, wxID_ANY, wxDefaultPosition, wxSize(200,100));
   this->treeCtrl->AddRoot( wxT("Timers"), -1, -1, NULL );
   Connect(this->treeCtrl->GetId(), wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(DiagnosticsDialog::OnTreeClick), NULL, this); 
@@ -69,7 +71,7 @@ DiagnosticsDialog::DiagnosticsDialog( wxWindow *parent )
   this->SetSizer( boxSizer );
   this->Layout();
 
-  Events::ConnectDiagTimerStopSignal( boost::bind(&DiagnosticsDialog::TimerStopCB, this, _1) );
+  this->timerStopConnection = Events::ConnectDiagTimerStopSignal( boost::bind(&DiagnosticsDialog::TimerStopCB, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +113,8 @@ void DiagnosticsDialog::TimerStopCB(std::string timer)
 ////////////////////////////////////////////////////////////////////////////////
 void DiagnosticsDialog::Update()
 {
+  DiagnosticManager::Instance()->SetEnabled(true);
+
   wxTreeItemId selected = this->treeCtrl->GetSelection();
 
   this->plot->Refresh();
@@ -124,4 +128,9 @@ void DiagnosticsDialog::OnTreeClick(wxTreeEvent &event)
     wxString selectedName = this->treeCtrl->GetItemText( selected );
     this->plot->AddPlot( std::string( selectedName.mb_str() ) );
   }
+}
+
+void DiagnosticsDialog::OnInit(wxInitDialogEvent &event)
+{
+  DiagnosticManager::Instance()->SetEnabled(true);
 }

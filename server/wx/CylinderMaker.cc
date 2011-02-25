@@ -31,10 +31,10 @@ CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
   this->state = 0;
-  this->visualMsg = new VisualMsg();
-  this->visualMsg->render = RENDERING_MESH_RESOURCE;
-  this->visualMsg->mesh = "unit_cylinder";
-  this->visualMsg->material = "Gazebo/TurquoiseGlowOutline";
+  this->visualMsg = new msgs::Visual();
+  this->visualMsg->set_render_type( msgs::Visual::MESH_RESOURCE );
+  this->visualMsg->set_mesh( "unit_cylinder" );
+  this->visualMsg->set_material( "Gazebo/TurquoiseGlowOutline" );
 }
 
 CylinderMaker::~CylinderMaker()
@@ -46,15 +46,15 @@ void CylinderMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream <<  "user_cylinder_" << counter++;
-  this->visualMsg->id =  stream.str();
+  this->visualMsg->mutable_header()->set_str_id( stream.str() );
   this->state = 1;
 }
 
 void CylinderMaker::Stop()
 {
-  this->visualMsg->action = VisualMsg::DELETE;
+  this->visualMsg->set_action( msgs::Visual::DELETE );
   Simulator::Instance()->SendMessage( *this->visualMsg );
-  this->visualMsg->action = VisualMsg::UPDATE;
+  this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   this->state = 0;
   Events::moveModeSignal(true);
@@ -107,9 +107,12 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   p2 = this->GetSnappedPoint( p2 );
 
   if (this->state == 1)
-    this->visualMsg->pose.pos = p1;
+    Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
 
-  Vector3 p = this->visualMsg->pose.pos;
+  Vector3 p( this->visualMsg->pose().position().x(),
+             this->visualMsg->pose().position().y(),
+             this->visualMsg->pose().position().z() );
+
   Vector3 scale;
 
   if (this->state == 1)
@@ -121,32 +124,40 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   }
   else
   {
-    scale = this->visualMsg->scale;
+    scale.Set( this->visualMsg->scale().x(),
+               this->visualMsg->scale().y(),
+               this->visualMsg->scale().z() );
     scale.z = (this->mousePushPos.y - event.pos.y)*0.01;
     p.z = scale.z/2.0;
   }
 
-  this->visualMsg->pose.pos = p;
-  this->visualMsg->scale = scale;
+  Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
+  Message::Set(this->visualMsg->mutable_scale(), scale );
   Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
 void CylinderMaker::CreateTheEntity()
 {
-  InsertModelMsg msg;
+  msgs::InsertModel msg;
+  Message::Init(msg,"new cylinder");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
 
-  newModelStr << "<model type='physical' name='" << this->visualMsg->id << "'>\
-    <xyz>" << this->visualMsg->pose.pos << "</xyz>\
+  newModelStr << "<model type='physical' name='" << this->visualMsg->header().str_id() << "'>\
+    <xyz>" << this->visualMsg->pose().position().x() << " " 
+           << this->visualMsg->pose().position().y() << " " 
+           << this->visualMsg->pose().position().z() << "</xyz>\
     <body name='body'>\
     <geom type='cylinder' name='geom'>\
-    <size>" << this->visualMsg->scale.x*.5 << " " << this->visualMsg->scale.z << "</size>\
+    <size>" << this->visualMsg->scale().x()*.5 << " " 
+            << this->visualMsg->scale().z() << "</size>\
     <mass>0.5</mass>\
     <visual>\
     <mesh>unit_cylinder</mesh>\
-    <scale>" << this->visualMsg->scale << "</scale>\
+    <scale>" << this->visualMsg->scale().x() << " "
+             << this->visualMsg->scale().y() << " "
+             << this->visualMsg->scale().z() << "</scale>\
     <material>Gazebo/Grey</material>\
     <shader>pixel</shader>\
     </visual>\
@@ -154,11 +165,10 @@ void CylinderMaker::CreateTheEntity()
     </body>\
     </model>";
 
-  msg.xmlStr = newModelStr.str();
+  msg.set_xml( newModelStr.str() );
 
-  this->visualMsg->action = VisualMsg::DELETE;
+  this->visualMsg->set_action( msgs::Visual::DELETE );
   Simulator::Instance()->SendMessage( *this->visualMsg );
-
   Simulator::Instance()->SendMessage( msg );
 }
 

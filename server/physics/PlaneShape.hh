@@ -29,7 +29,6 @@
 namespace gazebo
 {
   class XMLConfig;
-  class VisualMsg;
 
   /// \addtogroup gazebo_physics_geom
   /// \{
@@ -122,7 +121,6 @@ namespace gazebo
     protected: ParamT<Vector2<double> > *uvTileP;
     protected: ParamT<std::string> *materialP;
     protected: ParamT<bool> *castShadowsP;
-    protected: VisualMsg *visualMsg;
   };
   
   /// \}

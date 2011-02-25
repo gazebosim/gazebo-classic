@@ -116,6 +116,7 @@ class Pioneer2_Gripper : public Controller
   private: ParamT<float> *forcesP[3];
   private: ParamT<std::string> *breakBeamNamesP[2];
   private: ParamT<std::string> *paddleNamesP[2];
+  private: ConnectionPtr leftConnection, rightConnection;
 };
 
 /** \} */

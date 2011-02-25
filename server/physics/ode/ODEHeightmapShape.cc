@@ -132,7 +132,7 @@ void ODEHeightmapShape::Load(XMLConfigNode *node)
   //this->body->SetPose(pose);
 
   dQuaternion q;
-  q[0] = pose.rot.u;
+  q[0] = pose.rot.w;
   q[1] = pose.rot.x;
   q[2] = pose.rot.y;
   q[3] = pose.rot.z;

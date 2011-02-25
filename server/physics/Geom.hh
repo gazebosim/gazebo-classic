@@ -23,9 +23,9 @@
 #ifndef GEOM_HH
 #define GEOM_HH
 
-#include <boost/signal.hpp>
 #include <boost/bind.hpp>
 
+#include "Event.hh"
 #include "Contact.hh"
 #include "Shape.hh"
 #include "Param.hh"
@@ -40,7 +40,6 @@ namespace gazebo
   class Body;
   class SurfaceParams;
   class XMLConfigNode;
-  class VisualMsg;
 
   /// \addtogroup gazebo_physics
   /// \brief Base class for all geoms
@@ -97,17 +96,11 @@ namespace gazebo
     /// \brief Get the laser retro reflectiveness 
     public: float GetLaserRetro() const;
 
-    /// \brief Toggle bounding box visibility
-    public: void ToggleShowBoundingBox();
-
     /// \brief Set the visibility of the bounding box
-    public: void ShowBoundingBox(bool show);
-
-    /// \brief Toggle transparency
-    public: void ToggleTransparent();
+    public: void ShowBoundingBox(const bool &show);
 
     /// \brief Set the transparency
-    public: void SetTransparent(bool show);
+    public: void SetTransparent(const bool &show);
 
     /// \brief Set the mass
     public: void SetMass(const double &mass);
@@ -182,12 +175,10 @@ namespace gazebo
     public: virtual Vector3 GetWorldAngularAccel() const;
 
     public: template< typename T>
-            boost::signals::connection ConnectContactCallback( T subscriber )
-            { return contactSignal.connect(subscriber); }
-    public: template< typename T>
-            void DisconnectContactCallback( T subscriber )
-            { contactSignal.disconnect(subscriber); }
-
+            ConnectionPtr ConnectContactCallback( T subscriber )
+            { return contactSignal.Connect(subscriber); }
+    public: void DisconnectContactCallback( ConnectionPtr &c )
+            { contactSignal.Disconnect(c); }
 
     /// \brief Enable callback: Called when the body changes
     private: void EnabledCB(bool enabled);
@@ -218,14 +209,16 @@ namespace gazebo
     private: float transparency;
 
     /// All the visual apparence 
-    private: std::vector<VisualMsg*> visualMsgs;
-    private: VisualMsg *bbVisualMsg;
+    private: std::vector<std::string> visuals;
+    private: std::string bbVisual;
 
     protected: Shape *shape;
 
     private: bool contactsEnabled;
 
-    public: boost::signal< void (const Contact &)> contactSignal;
+    public: EventT< void (const Contact &)> contactSignal;
+    private: std::vector<ConnectionPtr> connections;
+          
   };
 
   /// \}

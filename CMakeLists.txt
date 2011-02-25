@@ -121,6 +121,7 @@ else (build_errors)
   if (BUILD_GAZEBO)
     include (libgazebo)
 
+    add_subdirectory(msgs)
     add_subdirectory(libgazebo)
     add_subdirectory(server)
     add_subdirectory(worlds)

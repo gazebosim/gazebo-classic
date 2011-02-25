@@ -101,7 +101,7 @@ void ODEGeom::OnPoseChange()
     // Transform into global pose since a static geom does not have a body 
     localPose = this->GetWorldPose();
 
-    q[0] = localPose.rot.u;
+    q[0] = localPose.rot.w;
     q[1] = localPose.rot.x;
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
@@ -115,7 +115,7 @@ void ODEGeom::OnPoseChange()
     // Transform into CoM relative Pose
     localPose = this->GetRelativePose();
 
-    q[0] = localPose.rot.u;
+    q[0] = localPose.rot.w;
     q[1] = localPose.rot.x;
     q[2] = localPose.rot.y;
     q[3] = localPose.rot.z;
@@ -239,11 +239,9 @@ Mass ODEGeom::GetBodyMassMatrix()
   principals = this->mass.GetPrincipalMoments();
   products = this->mass.GetProductsofInertia();
 
-  // NATY
-  //this->physicsEngine->LockMutex();
   pose = this->GetWorldPose(); // get pose of the geometry
 
-  q[0] = pose.rot.u;
+  q[0] = pose.rot.w;
   q[1] = pose.rot.x;
   q[2] = pose.rot.y;
   q[3] = pose.rot.z;
@@ -263,9 +261,6 @@ Mass ODEGeom::GetBodyMassMatrix()
   }
 
   this->GetWorld()->GetPhysicsEngine()->ConvertMass(&result, &bodyMass);
-
-  // NATY
-  //this->physicsEngine->UnlockMutex();
 
   return result;
 }

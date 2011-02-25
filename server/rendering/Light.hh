@@ -26,6 +26,7 @@
 #include <string>
 #include <iostream>
 
+#include "Event.hh"
 #include "Pose3d.hh"
 #include "Color.hh"
 #include "Param.hh"
@@ -58,7 +59,7 @@ namespace gazebo
     public: void Load(XMLConfigNode *node);
 
     /// \brief Load from a light message
-    public: void LoadFromMsg(const LightMsg *msg);
+    //public: void LoadFromMsg(const LightMsg *msg);
 
     /// \brief Save a light
     public: void Save(const std::string &prefix, std::ostream &stream);
@@ -130,6 +131,7 @@ namespace gazebo
     private: ParamT<double> *spotOuterAngleP;
     private: ParamT<double> *spotFalloffP;
 
+    private: ConnectionPtr showLightsConnection;
     private: static unsigned int lightCounter;
     private: Scene *scene;
   };

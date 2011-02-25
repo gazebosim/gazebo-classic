@@ -29,6 +29,12 @@ include (FindPkgConfig)
 include (FindwxWidgets)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
+# The Google Protobuf library for message generation + serialization
+find_package(Protobuf REQUIRED)
+if (NOT PROTOBUF_FOUND)
+  BUILD_ERROR ("Missing: Google Protobuf")
+endif()
+
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
@@ -227,24 +233,24 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find OpenAL
-  pkg_check_modules(OAL openal)
-  if (NOT OAL_FOUND)
-    BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
-  else (NOT OAL_FOUND)
-    set (HAVE_OPENAL TRUE)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${OAL_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${OAL_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OAL_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${OAL_LIBRARIES})
-  endif (NOT OAL_FOUND)
+  #pkg_check_modules(OAL openal)
+  #if (NOT OAL_FOUND)
+  #  BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
+  #else (NOT OAL_FOUND)
+  #  set (HAVE_OPENAL TRUE)
+  #  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
+  #                        ${gazeboserver_include_dirs_desc} 
+  #                        ${OAL_INCLUDE_DIRS})
+  #  APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
+  #                        ${gazeboserver_link_dirs_desc} 
+  #                        ${OAL_LIBRARY_DIRS})
+  #  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+  #                        ${gazeboserver_link_libs_desc} 
+  #                        ${OAL_LINK_LIBS})
+  #  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
+  #                        ${gazeboserver_link_libs_desc} 
+  #                        ${OAL_LIBRARIES})
+  #endif (NOT OAL_FOUND)
 
   ########################################
   # Find AV format

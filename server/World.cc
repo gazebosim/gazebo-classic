@@ -24,6 +24,7 @@
 #include <sstream>
 #include <fstream>
 #include <sys/time.h> //gettimeofday
+#include <boost/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
 #include <tbb/parallel_for.h>
@@ -52,7 +53,7 @@
 // NATY: put back in
 //#include "Logger.hh"
 
-#include "OpenAL.hh"
+//#include "OpenAL.hh"
 
 #include "Geom.hh"
 
@@ -81,7 +82,7 @@ World::World()
   this->physicsEngine = NULL;
   this->graphics = NULL;
   this->simIfaceHandler = NULL;
-  this->openAL = NULL;
+  //this->openAL = NULL;
   this->selectedEntity = NULL;
   this->stepInc = false;
 
@@ -94,8 +95,8 @@ World::World()
 
   Param::Begin(&this->parameters);
   this->nameP = new ParamT<std::string>("name","default",1);
-  this->saveStateTimeoutP = new ParamT<Time>("saveStateResolution",0.1,0);
-  this->saveStateBufferSizeP = new ParamT<unsigned int>("saveStateBufferSize",1000,0);
+  this->saveStateTimeoutP = new ParamT<Time>("save_state_resolution",0.1,0);
+  this->saveStateBufferSizeP = new ParamT<unsigned int>("save_state_buffer_size",1000,0);
   Param::End();
 
   this->scene = new Scene("scene");
@@ -105,10 +106,10 @@ World::World()
   this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
   this->scene->Init();
 
-  Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) );
-  Events::ConnectStepSignal( boost::bind(&World::StepCB, this) );
-  Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
-  Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
+  this->connections.push_back( Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) ) );
+  this->connections.push_back( Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
+  this->connections.push_back( Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
+  this->connections.push_back( Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,11 +120,7 @@ World::~World()
   delete this->saveStateTimeoutP;
   delete this->saveStateBufferSizeP;
 
-  Events::DisconnectPauseSignal( boost::bind(&World::PauseCB, this, _1) );
-  Events::DisconnectStepSignal( boost::bind(&World::StepCB, this) );
-  Events::DisconnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) );
-  Events::DisconnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) );
-
+  this->connections.clear();
   this->Fini();
 }
 
@@ -175,11 +172,11 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
   }
 
   // Load OpenAL audio 
-  if (rootNode && rootNode->GetChild("audio"))
+  /*if (rootNode && rootNode->GetChild("audio"))
   {
     this->openAL = OpenAL::Instance();
     this->openAL->Load(rootNode->GetChild("audio"));
-  }
+  }*/
 
   XMLConfigNode *physicsNode = NULL;
   if (rootNode )
@@ -259,8 +256,9 @@ void World::Init()
   this->physicsEngine->Init();
 
   // Initialize openal
-  if (this->openAL)
+  /*if (this->openAL)
     this->openAL->Init();
+    */
 
   this->toDeleteEntities.clear();
   this->toLoadEntities.clear();
@@ -279,17 +277,6 @@ void World::GraphicsUpdate()
   this->scene->ProcessMessages();
 
   this->graphics->Update();
-
-  // NATY: This shouldn't be needed anymore
-  // Update all the models
-  /*std::vector< Model* >::const_iterator miter;
-  for (miter=this->models.begin(); miter!=this->models.end(); miter++)
-  {
-    if (*miter)
-    {
-      (*miter)->GraphicsUpdate();
-    }
-  }*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -398,12 +385,12 @@ void World::RunLoop()
 // Update the world
 void World::Update()
 {
-  DiagnosticTimer timer("World::Update");
+  DIAG_TIMER("World::Update")
 
   Events::worldUpdateStartSignal();
 
   {
-    DiagnosticTimer timer("Update Models");
+    DIAG_TIMER("Update Models");
     tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
         ModelUpdate_TBB(&this->models) );
   }
@@ -413,12 +400,12 @@ void World::Update()
 
   /// Update all the sensors
   {
-    DiagnosticTimer timer("Update Sensors");
+    DIAG_TIMER("Update Sensors");
     SensorManager::Instance()->Update();
   }
 
   {
-    DiagnosticTimer timer("Update handlers");
+    DIAG_TIMER("Update handlers");
     this->factoryIfaceHandler->Update();
 
     // Process all incoming messages from simiface
@@ -490,8 +477,9 @@ void World::Fini()
   }
 
   // Close the openal server
-  if (this->openAL)
+  /*if (this->openAL)
     this->openAL->Fini();
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -563,9 +551,8 @@ void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplica
     }
     else if (node->GetName() == "light")
     {
-      LightMsg msg;
-      msg.Load(node);
-      msg.id = "light";
+      msgs::Light msg = Message::LightFromXML(node);
+      msg.mutable_header()->set_str_id( "light" );
       Simulator::Instance()->SendMessage( msg );
     }
 
@@ -589,11 +576,6 @@ void World::ProcessEntitiesToLoad()
 
   if (!this->toLoadEntities.empty())
   {
-    // NATY
-    // maybe try try_lock here instead
-    //boost::recursive_mutex::scoped_lock lock(
-        //*Simulator::Instance()->GetMRMutex());
-
     std::vector< std::string >::iterator iter;
 
     for (iter = this->toLoadEntities.begin(); 
@@ -627,10 +609,6 @@ void World::ProcessEntitiesToDelete()
 {
   if (!this->toDeleteEntities.empty())
   {
-    // NATY
-    // maybe try try_lock here instead
-    //boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMDMutex());
-
     // Remove and delete all models that are marked for deletion
     std::vector< std::string>::iterator miter;
     for (miter=this->toDeleteEntities.begin();
@@ -686,7 +664,7 @@ Common *World::GetByName(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Receive a message
-void World::ReceiveMessage( const Message &msg )
+void World::ReceiveMessage( const google::protobuf::Message &message )
 {
   boost::recursive_mutex::scoped_lock lock( this->mutex );
   if (msg.type == VISUAL_MSG || msg.type == LIGHT_MSG || msg.type == POSE_MSG
@@ -700,6 +678,7 @@ void World::ReceiveMessage( const Message &msg )
 // Process all messages
 void World::ProcessMessages()
 {
+  /*
   boost::recursive_mutex::scoped_lock lock( this->mutex );
 
   unsigned int count = this->messages.size();
@@ -730,6 +709,7 @@ void World::ProcessMessages()
   }
 
   this->messages.erase(this->messages.begin(), this->messages.begin()+count);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -895,15 +875,15 @@ void World::StepCB()
 /// Set the selected entity
 void World::SetSelectedEntityCB( const std::string &name )
 {
-  SelectionMsg msg;
+  msgs::Selection msg;
   Common *common = this->GetByName(name);
   Entity *ent = dynamic_cast<Entity*>(common);
 
   // unselect selectedEntity
   if (this->selectedEntity)
   {
-    msg.id = this->selectedEntity->GetCompleteScopedName();
-    msg.selected = false;
+    msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
+    msg.set_selected( false );
     Simulator::Instance()->SendMessage( msg );
 
     //this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
@@ -918,8 +898,8 @@ void World::SetSelectedEntityCB( const std::string &name )
     //this->selectedEntity->GetVisualNode()->ShowSelectionBox(true);
     this->selectedEntity->SetSelected(true);
 
-    msg.id = this->selectedEntity->GetCompleteScopedName();
-    msg.selected = true;
+    msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
+    msg.set_selected( true );
     Simulator::Instance()->SendMessage( msg );
   }
   else

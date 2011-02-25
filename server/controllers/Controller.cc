@@ -42,8 +42,8 @@ Controller::Controller(Entity *entity )
   Param::Begin(&this->parameters);
   this->typeP = new ParamT<std::string>("type","",1);
   this->nameP = new ParamT<std::string>("name","",1);
-  this->alwaysOnP = new ParamT<bool>("alwaysOn", false, 0);
-  this->updatePeriodP = new ParamT<double>("updateRate", 10, 0);
+  this->alwaysOnP = new ParamT<bool>("always_on", false, 0);
+  this->updatePeriodP = new ParamT<double>("update_rate", 10, 0);
   Param::End();
 
   if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))

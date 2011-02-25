@@ -33,9 +33,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  class LightMsg;
-  class VisualMsg;
-  class SelectionMsg;
   class Light;
   class Visual;
   class Message;
@@ -157,7 +154,7 @@ namespace gazebo
     public: void InitShadows();
 
     /// \brief Receive a message
-    public: void ReceiveMessage( const Message &msg );
+    public: void ReceiveMessage( const google::protobuf::Message &message );
 
     /// Process all messages
     public: void ProcessMessages();
@@ -173,9 +170,9 @@ namespace gazebo
                                      const Ogre::Quaternion &orient,
                                      const Ogre::Vector3 &scale);
 
-    private: void HandleVisualMsg(const VisualMsg *msg);
-    private: void HandleLightMsg(const LightMsg *msg);
-    private: void HandleSelectionMsg(const SelectionMsg *msg);
+    private: void HandleVisualMsg(const msgs::Visual &msg);
+    private: void HandleLightMsg(const msgs::Light &msg);
+    private: void HandleSelectionMsg(const msgs::Selection &msg);
 
     private: std::string name;
     private: ParamT<Color> *ambientP;
@@ -206,7 +203,7 @@ namespace gazebo
     private: std::string idString;
 
     private: boost::mutex mutex;
-    private: std::map<MessageType, std::vector<Message*> > messages;
+    //private: std::map<MessageType, std::vector<google::protobuf::Message> > messages;
 
     private: VisualMap visuals;
     private: LightMap lights;

@@ -46,21 +46,13 @@ Entity::Entity(Common *parent)
   this->staticP->Callback( &Entity::SetStatic, this );
   Param::End();
  
-  this->visualMsg = new VisualMsg();
-  //this->visualMsg->id = this->GetName();
+  this->visualMsg = new msgs::Visual();
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
     Entity *ep = (Entity*)(this->parent);
     this->SetStatic(ep->IsStatic());
   }
-  /*else
-  {
-    this->visualMsg = new VisualMsg();
-  }
-
-  Simulator::Instance()->SendMessage( *this->visualMsg );
-  */
 
   // NATY: put functionality back in
   //this->visualNode->SetOwner(this);
@@ -117,7 +109,7 @@ Entity::~Entity()
     }
   }*/
 
-  this->visualMsg->action = VisualMsg::DELETE;
+  this->visualMsg->set_action( msgs::Visual::DELETE );
   Simulator::Instance()->SendMessage( *this->visualMsg );
   delete this->visualMsg;
   this->visualMsg = NULL;
@@ -210,6 +202,8 @@ Pose3d Entity::GetModelRelativePose() const
 // Set the abs pose of the entity
 void Entity::SetWorldPose(const Pose3d &pose, bool notify)
 {
+  std::cout << "Entity[" << this->GetName() << "] SetWorldPose[" << pose << "]\n";
+
   if (this->parent && this->parent->HasType(ENTITY))
   {
     // NATY: I took out the first if clause because it would cause other
@@ -295,9 +289,9 @@ void Entity::SetRelativeRotation(const Quatern &rot)
 // Handle a change of pose
 void Entity::PoseChange(bool notify)
 {
-  PoseMsg msg;
-  msg.id = this->GetCompleteScopedName();
-  msg.pose = this->GetRelativePose();
+  msgs::Pose msg;
+  Message::Init(msg, this->GetCompleteScopedName() );
+  Message::Set( &msg, this->GetRelativePose());
   Simulator::Instance()->SendMessage( msg );
 
   if (notify)
@@ -317,8 +311,10 @@ void Entity::PoseChange(bool notify)
 // Register a visual
 void Entity::RegisterVisual()
 {
-  this->visualMsg->id = this->GetCompleteScopedName();
+  this->visualMsg->mutable_header()->set_str_id(this->GetCompleteScopedName());
+
   if (this->parent)
-    this->visualMsg->parentId = this->parent->GetCompleteScopedName();
+    this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
+
   Simulator::Instance()->SendMessage( *this->visualMsg );
 }

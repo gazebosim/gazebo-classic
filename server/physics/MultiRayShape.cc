@@ -27,34 +27,34 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
   this->AddType(MULTIRAY_SHAPE);
   this->SetName("multiray");
 
-  this->rayFanMsg = new VisualMsg();
-  this->rayFanMsg->id = this->GetName()+"_fan";
-  this->rayFanMsg->parentId = this->geomParent->GetName();
-  this->rayFanMsg->render = RENDERING_TRIANGLE_FAN;
-  this->rayFanMsg->material = "Gazebo/BlueLaser";
+  this->rayFanMsg = new msgs::Visual();
+  this->rayFanMsg->mutable_header()->set_str_id( this->GetName()+"_fan" );
+  this->rayFanMsg->set_parent_id( this->geomParent->GetName() );
+  this->rayFanMsg->set_render_type( msgs::Visual::TRIANGLE_FAN );
+  this->rayFanMsg->set_material( "Gazebo/BlueLaser" );
 
-  this->rayFanOutlineMsg = new VisualMsg();
-  this->rayFanOutlineMsg->id = this->GetName()+"_fanoutline";
-  this->rayFanOutlineMsg->parentId = this->geomParent->GetName();
-  this->rayFanOutlineMsg->render = RENDERING_LINE_STRIP;
-  this->rayFanOutlineMsg->material = "Gazebo/BlueGlow";
+  this->rayFanOutlineMsg = new msgs::Visual();
+  this->rayFanOutlineMsg->mutable_header()->set_str_id( this->GetName()+"_fanoutline" );
+  this->rayFanOutlineMsg->set_parent_id( this->geomParent->GetName() );
+  this->rayFanOutlineMsg->set_render_type( msgs::Visual::LINE_STRIP );
+  this->rayFanOutlineMsg->set_material( "Gazebo/BlueGlow" );
 
   Param::Begin(&this->parameters);
-  this->rayCountP = new ParamT<int>("rayCount",0,1);
-  this->rangeCountP = new ParamT<int>("rangeCount",0,1);
-  this->minAngleP = new ParamT<Angle>("minAngle",DTOR(-90),1);
-  this->maxAngleP = new ParamT<Angle>("maxAngle",DTOR(-90),1);
-  this->minRangeP = new ParamT<double>("minRange",0,1);
-  this->maxRangeP = new ParamT<double>("maxRange",0,1);
-  this->resRangeP = new ParamT<double>("resRange",0.1,1);
+  this->rayCountP = new ParamT<int>("ray_count",0,1);
+  this->rangeCountP = new ParamT<int>("range_count",0,1);
+  this->minAngleP = new ParamT<Angle>("min_angle",DTOR(-90),1);
+  this->maxAngleP = new ParamT<Angle>("max_angle",DTOR(-90),1);
+  this->minRangeP = new ParamT<double>("min_range",0,1);
+  this->maxRangeP = new ParamT<double>("max_range",0,1);
+  this->resRangeP = new ParamT<double>("res_range",0.1,1);
   this->originP = new ParamT<Vector3>("origin", Vector3(0,0,0), 0);
-  this->displayTypeP = new ParamT<std::string>("displayRays", "off", 0);
+  this->displayTypeP = new ParamT<std::string>("display_rays", "off", 0);
 
   // for block rays, vertical setting
-  this->verticalRayCountP = new ParamT<int>("verticalRayCount", 1, 0);
-  this->verticalRangeCountP = new ParamT<int>("verticalRangeCount", 1, 0);
-  this->verticalMinAngleP = new ParamT<Angle>("verticalMinAngle", DTOR(0), 0);
-  this->verticalMaxAngleP = new ParamT<Angle>("verticalMaxAngle", DTOR(0), 0);
+  this->verticalRayCountP = new ParamT<int>("vertical_ray_count", 1, 0);
+  this->verticalRangeCountP = new ParamT<int>("vertical_range_count", 1, 0);
+  this->verticalMinAngleP = new ParamT<Angle>("vertical_min_angle", DTOR(0), 0);
+  this->verticalMaxAngleP = new ParamT<Angle>("vertical_max_angle", DTOR(0), 0);
   Param::End();
 }
 
@@ -149,8 +149,11 @@ void MultiRayShape::Load(XMLConfigNode *node)
 
   if (**this->displayTypeP == "fan")
   {
-    this->rayFanMsg->points.push_back(this->rayFanMsg->points[0]);
-    this->rayFanOutlineMsg->points.push_back(this->rayFanOutlineMsg->points[0]);
+    msgs::Point *pt = this->rayFanMsg->add_points();
+    (*pt) = this->rayFanMsg->points(0);
+
+    pt = this->rayFanOutlineMsg->add_points();
+    (*pt) = this->rayFanOutlineMsg->points(0);
   }
 }
 
@@ -252,8 +255,8 @@ void MultiRayShape::Update()
 
       (*iter)->GetRelativePoints(a,b);
 
-      this->rayFanMsg->points[i] = b;
-      this->rayFanOutlineMsg->points[i] = b;
+      Message::Set(this->rayFanMsg->mutable_points(i), b );
+      Message::Set(this->rayFanOutlineMsg->mutable_points(i), b );
     }
   }
 }
@@ -262,17 +265,25 @@ void MultiRayShape::Update()
 /// Add a ray to the geom
 void MultiRayShape::AddRay(const Vector3 &start, const Vector3 &end )
 {
+  msgs::Point *pt = NULL;
+
   // Add to the renderable
   if (**this->displayTypeP == "fan")
   {
-    if (this->rayFanMsg->points.size() == 0)
+    if (this->rayFanMsg->points_size() == 0)
     {
-      this->rayFanMsg->points.push_back(start);
-      this->rayFanOutlineMsg->points.push_back(start);
+      pt = this->rayFanMsg->add_points();
+      Message::Set(pt, start );
+
+      pt = this->rayFanOutlineMsg->add_points();
+      Message::Set(pt, start);
     }
 
-    this->rayFanMsg->points.push_back(end);
-    this->rayFanOutlineMsg->points.push_back(end);
+    pt = this->rayFanMsg->add_points();
+    Message::Set(pt, end);
+
+    pt = this->rayFanOutlineMsg->add_points();
+    Message::Set(pt, end);
   }
 }
 

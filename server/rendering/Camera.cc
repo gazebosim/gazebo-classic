@@ -66,15 +66,15 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
   this->userMovable = true;
 
   Param::Begin(&this->camParameters);
-  this->nearClipP = new ParamT<double>("nearClip",1,0);
-  this->farClipP = new ParamT<double>("farClip",100,0);
-  this->saveFramesP = new ParamT<bool>("saveFrames",false,0);
-  this->savePathnameP = new ParamT<std::string>("saveFramePath","",0);
-  this->imageSizeP = new ParamT< Vector2<int> >("imageSize", Vector2<int>(320, 240),0);
+  this->nearClipP = new ParamT<double>("near_clip",1,0);
+  this->farClipP = new ParamT<double>("far_clip",100,0);
+  this->saveFramesP = new ParamT<bool>("save_frames",false,0);
+  this->savePathnameP = new ParamT<std::string>("save_frame_path","",0);
+  this->imageSizeP = new ParamT< Vector2<int> >("image_size", Vector2<int>(320, 240),0);
   this->visMaskP = new ParamT<std::string>("mask","none",0);
   this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
-  this->imageFormatP = new ParamT<std::string>("imageFormat", "R8G8B8", 0);
-  this->updateRateP = new ParamT<double>("updateRate",32,0);
+  this->imageFormatP = new ParamT<std::string>("image_format", "R8G8B8", 0);
+  this->updateRateP = new ParamT<double>("update_rate",32,0);
   Param::End();
 
   this->captureData = false;
@@ -89,7 +89,7 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
 
   this->renderingEnabled = true;
 
-  Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) );
+  this->showWireframeConnection = Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) );
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
@@ -275,7 +275,7 @@ void Camera::Update()
   {
     Ogre::Quaternion q = this->pitchNode->_getDerivedOrientation();
 
-    this->pose.rot.u = q.w;
+    this->pose.rot.w = q.w;
     this->pose.rot.x = q.x;
     this->pose.rot.y = q.y;
     this->pose.rot.z = q.z;
@@ -391,7 +391,7 @@ void Camera::SetWorldPose(const Pose3d &pose)
   this->pose = pose;
   this->pose.Correct();
   this->sceneNode->setPosition( this->pose.pos.x, this->pose.pos.y, this->pose.pos.z);
-  this->pitchNode->setOrientation( this->pose.rot.u, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
+  this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -417,7 +417,7 @@ void Camera::SetWorldRotation(const Quatern &quant)
   this->pose.rot = quant;
   this->pose.Correct();
  
-  this->pitchNode->setOrientation( this->pose.rot.u, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
+  this->pitchNode->setOrientation( this->pose.rot.w, this->pose.rot.x, this->pose.rot.y, this->pose.rot.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

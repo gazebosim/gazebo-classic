@@ -26,6 +26,7 @@
 #include <map>
 #include <vector>
 
+#include "Event.hh"
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Param.hh"
@@ -37,7 +38,6 @@ namespace gazebo
   class Geom;
   class Sensor;
   class XMLConfigNode;
-  class VisualMsg;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class
@@ -213,11 +213,8 @@ namespace gazebo
     /// \brief Set the angular damping factor
     public: virtual void SetAngularDamping(double damping) = 0;
 
-    /// \brief Toggle show the physics visualizations
-    public: void ToggleShowPhysics();
-
     /// \brief Set to true to show the physics visualizations
-    public: void ShowPhysics(bool show);
+    public: void ShowPhysics(const bool &show);
 
     public: Entity *GetCoMEntity() { return this->comEntity; }
 
@@ -227,14 +224,19 @@ namespace gazebo
     /// \brief Get whether this body is in the kinematic state
     public: virtual bool GetKinematic() const {return false;}
 
-    /// \brief Connect a boost::slot the the add entity signal
-    public: template<typename T>
-            boost::signals::connection ConnectEnabledSignal( T subscriber )
-            { return enabledSignal.connect(subscriber); }
+    /// \brief Return true if auto disable is enabled
+    public: bool GetAutoDisable() const;
 
+    /// \brief Set the auto disable flag.
+    public: virtual void SetAutoDisable(const bool &value);
+
+    /// \brief Connect a to the add entity signal
     public: template<typename T>
-            void DisconnectEnabledSignal( T subscriber )
-            { enabledSignal.disconnect(subscriber); }
+            ConnectionPtr ConnectEnabledSignal( T subscriber )
+            { return enabledSignal.Connect(subscriber); }
+
+    public: void DisconnectEnabledSignal( ConnectionPtr &c )
+            { enabledSignal.Disconnect(c); }
 
     /// List of geometries attached to this body
     protected: std::map< std::string, Geom* > geoms;
@@ -266,12 +268,13 @@ namespace gazebo
     protected: ParamT<bool> *turnGravityOffP;
     protected: ParamT<bool> *selfCollideP;
 
-    protected: std::vector<VisualMsg *> cgVisualMsgs;
+    protected: std::vector< std::string > cgVisuals;
 
     protected: Vector3 linearAccel;
     protected: Vector3 angularAccel;
 
     ///  User specified Mass Matrix
+    protected: ParamT<bool> *autoDisableP;
     protected: ParamT<bool> *customMassMatrixP;
     protected: ParamT<double> *cxP ;
     protected: ParamT<double> *cyP ;
@@ -286,7 +289,8 @@ namespace gazebo
     protected: ParamT<bool> *kinematicP;
     protected: Mass customMass;
 
-    private: boost::signal<void (bool)> enabledSignal;
+    private: EventT<void (bool)> enabledSignal;
+    private: ConnectionPtr showPhysicsConnection; 
 
     /// This flag is used to trigger the enabledSignal
     private: bool enabled;

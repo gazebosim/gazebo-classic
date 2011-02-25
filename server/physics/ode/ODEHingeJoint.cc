@@ -64,11 +64,7 @@ Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
 
-  // NATY
-  //this->physics->LockMutex();
   dJointGetHingeAnchor( this->jointId, result );
-  // NATY
-  //this->physics->UnlockMutex();
 
   return Vector3(result[0], result[1], result[2]);
 }
@@ -77,14 +73,10 @@ Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 // Set the anchor point
 void ODEHingeJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 {
-  // NATY
-  //this->physics->LockMutex();
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
 
   dJointSetHingeAnchor( this->jointId, anchor.x, anchor.y, anchor.z );
-  // NATY
-  //this->physics->UnlockMutex();
 }
 
 
@@ -94,11 +86,7 @@ Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 {
   dVector3 result;
 
-  // NATY
-  //this->physics->LockMutex();
   dJointGetHingeAxis( this->jointId, result );
-  // NATY
-  //this->physics->UnlockMutex();
 
   return Vector3(result[0], result[1], result[2]);
 }
@@ -107,14 +95,10 @@ Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 // Set the axis of rotation
 void ODEHingeJoint::SetAxis( int /*index*/, const Vector3 &axis )
 {
-  // NATY
-  //this->physics->LockMutex();
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
 
   dJointSetHingeAxis( this->jointId, axis.x, axis.y, axis.z );
-  // NATY
-  //this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -123,14 +107,10 @@ void ODEHingeJoint::SetDamping( int /*index*/, const double damping )
 {
   this->damping_coefficient = damping;
 #ifdef INCLUDE_ODE_JOINT_DAMPING
-  // NATY
-  //this->physics->LockMutex();
   dJointSetDamping( this->jointId, this->damping_coefficient);
-  // NATY
-  //this->physics->UnlockMutex();
 #else
   // alternaitvely, apply explicit damping
-  this->ConnectJointUpdateSignal(boost::bind(&ODEHingeJoint::ApplyDamping,this));
+  this->jointUpdateConnection = this->ConnectJointUpdateSignal(boost::bind(&ODEHingeJoint::ApplyDamping,this));
 #endif
 }
 
@@ -146,11 +126,7 @@ void ODEHingeJoint::ApplyDamping()
 // Get the angle of rotation
 Angle ODEHingeJoint::GetAngle(int /*index*/) const
 {
-  // NATY
-  //this->physics->LockMutex();
   Angle result = dJointGetHingeAngle( this->jointId );
-  // NATY
-  //this->physics->UnlockMutex();
 
   return result;
 }
@@ -159,11 +135,7 @@ Angle ODEHingeJoint::GetAngle(int /*index*/) const
 // Get the rotation rate
 double ODEHingeJoint::GetVelocity(int /*index*/) const
 {
-  // NATY
-  //this->physics->LockMutex();
   double result = dJointGetHingeAngleRate( this->jointId );
-  // NATY
-  //this->physics->UnlockMutex();
 
   return result;
 } 
@@ -193,24 +165,16 @@ double ODEHingeJoint::GetMaxForce(int /*index*/)
 // Set the torque of this joint
 void ODEHingeJoint::SetForce(int /*index*/, double torque)
 {
-  // NATY
-  //this->physics->LockMutex();
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
   dJointAddHingeTorque( this->jointId, torque );
-  // NATY
-  //this->physics->UnlockMutex();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the specified parameter
 double ODEHingeJoint::GetParam( int parameter ) const
 {
-  // NATY
-  //this->physics->LockMutex();
   double result = dJointGetHingeParam( this->jointId, parameter );
-  // NATY
-  //this->physics->UnlockMutex();
 
   return result; 
 }
@@ -219,11 +183,7 @@ double ODEHingeJoint::GetParam( int parameter ) const
 // Set the _parameter to _value
 void ODEHingeJoint::SetParam( int parameter, double value)
 {
-  // NATY
-  //this->physics->LockMutex();
   ODEJoint::SetParam(parameter, value);
 
   dJointSetHingeParam( this->jointId, parameter, value );
-  // NATY
-  //this->physics->UnlockMutex();
 }

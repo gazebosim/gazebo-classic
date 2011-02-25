@@ -1,0 +1,8 @@
+package gazebo.msgs;
+import "time.proto";
+
+message Header
+{
+  optional string str_id = 1;
+  optional Time time = 2;
+} 

@@ -22,7 +22,10 @@
 
 namespace gazebo
 {
-  class VisualMsg;
+  namespace msgs
+  {
+    class Visual;
+  }
 
   class SphereMaker : public EntityMaker
   {
@@ -42,7 +45,7 @@ namespace gazebo
     private: int state;
     private: bool leftMousePressed;
     private: Vector2<int> mousePushPos;
-    private: VisualMsg *visualMsg;
+    private: msgs::Visual *visualMsg;
 
     private: static unsigned int counter;
   };

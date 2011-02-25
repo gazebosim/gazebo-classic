@@ -1,0 +1,11 @@
+package gazebo.msgs;
+import "header.proto";
+
+message Color
+{
+  optional Header header = 1;
+  required float r = 2;
+  required float g = 3;
+  required float b = 4;
+  required float a = 5;
+}

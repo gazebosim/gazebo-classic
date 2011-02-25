@@ -145,23 +145,16 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
 
   Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(SimulationFrame::OnPaneClosed), NULL, this);
 
+  this->connections.push_back( Events::ConnectQuitSignal( boost::bind(&SimulationFrame::Quit, this) ) );
 
-  Events::ConnectQuitSignal( boost::bind(&SimulationFrame::Quit, this) );
+  this->connections.push_back( Events::ConnectPauseSignal( boost::bind(&SimulationFrame::OnPause, this, _1) ) );
 
-  Events::ConnectPauseSignal( 
-      boost::bind(&SimulationFrame::OnPause, this, _1) );
+  this->connections.push_back( Events::ConnectAddEntitySignal( boost::bind(&SimulationFrame::AddEntityCB, this, _1) ) ); 
+  this->connections.push_back( Events::ConnectDeleteEntitySignal( boost::bind(&SimulationFrame::DeleteEntityCB, this, _1) ) );
 
-  Events::ConnectAddEntitySignal( 
-      boost::bind(&SimulationFrame::AddEntityCB, this, _1) );
+  this->connections.push_back( Events::ConnectSetSelectedEntitySignal( boost::bind(&SimulationFrame::SetSelectedEntityCB, this, _1) ) );
 
-  Events::ConnectDeleteEntitySignal( 
-      boost::bind(&SimulationFrame::DeleteEntityCB, this, _1) );
-
-  Events::ConnectSetSelectedEntitySignal(
-     boost::bind(&SimulationFrame::SetSelectedEntityCB, this, _1) );
-
-  Events::ConnectMoveModeSignal( 
-      boost::bind(&SimulationFrame::MoveModeCB, this, _1) );
+  this->connections.push_back( Events::ConnectMoveModeSignal( boost::bind(&SimulationFrame::MoveModeCB, this, _1) ) );
 
   this->auiManager->Update();
 
@@ -405,43 +398,43 @@ void SimulationFrame::OnCreateModel(wxCommandEvent &event)
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnWireframe(wxCommandEvent &event)
 {
-  Events::wireframeSignal();
+  Events::wireframeSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowPhysics(wxCommandEvent &event)
 {
-  Events::showPhysicsSignal();
+  Events::showPhysicsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowBoundingBoxes(wxCommandEvent &event)
 {
-  Events::showBoundingBoxesSignal();
+  Events::showBoundingBoxesSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowJoints(wxCommandEvent &event)
 {
-  Events::showJointsSignal();
+  Events::showJointsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowContacts(wxCommandEvent &event)
 {
-  Events::showContactsSignal();
+  Events::showContactsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowLights(wxCommandEvent &event)
 {
-  Events::showLightsSignal();
+  Events::showLightsSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SimulationFrame::OnShowCameras(wxCommandEvent &event)
 {
-  Events::showCamerasSignal();
+  Events::showCamerasSignal(event.IsChecked());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

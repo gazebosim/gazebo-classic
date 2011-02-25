@@ -33,13 +33,13 @@ DirectionalLightMaker::DirectionalLightMaker()
 {
   this->state = 0;
 
-  this->msg.type = LightMsg::DIRECTIONAL;
-  this->msg.diffuse.Set(0.2, 0.2, 0.2, 1);
-  this->msg.specular.Set(0.01, 0.01, 0.01, 1);
-  this->msg.attenuation.Set(0.5, 0.01, 0.001);
-  this->msg.direction.Set( .1, .1, -0.9);
-  this->msg.range = 20;
-  this->msg.castShadows = true;
+  this->msg.set_type( msgs::Light::DIRECTIONAL );
+  Message::Set( this->msg.mutable_diffuse(),Color(0.2, 0.2, 0.2, 1));
+  Message::Set( this->msg.mutable_specular(), Color(0.01, 0.01, 0.01, 1));
+  Message::Set( this->msg.mutable_attenuation(), Vector3(0.5, 0.01, 0.001));
+  Message::Set( this->msg.mutable_direction(), Vector3(.1, .1, -0.9));
+  this->msg.set_range( 20 );
+  this->msg.set_cast_shadows( true );
 }
 
 DirectionalLightMaker::~DirectionalLightMaker()
@@ -50,7 +50,7 @@ void DirectionalLightMaker::Start(Scene *scene)
 {
   std::ostringstream stream;
   stream << "user_directional_light_" << counter++;
-  this->msg.id = stream.str();
+  this->msg.mutable_header()->set_str_id( stream.str() );
   this->state = 1;
 }
 
@@ -73,8 +73,8 @@ void DirectionalLightMaker::MousePushCB(const MouseEvent &event)
   Vector3 norm;
   norm.Set(0,0,1);
 
-  this->msg.pose.pos = event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0);
-  this->msg.pose.pos.z = 5;
+  Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0));
+  this->msg.mutable_pose()->mutable_position()->set_z(5);
 }
 
 void DirectionalLightMaker::MouseReleaseCB(const MouseEvent &event)
@@ -94,5 +94,6 @@ void DirectionalLightMaker::MouseDragCB(const MouseEvent & /*event*/)
 
 void DirectionalLightMaker::CreateTheEntity()
 {
+  Message::Stamp(this->msg);
   Simulator::Instance()->SendMessage(this->msg);
 }

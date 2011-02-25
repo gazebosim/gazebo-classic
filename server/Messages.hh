@@ -17,9 +17,19 @@
 #ifndef MESSAGES_HH
 #define MESSAGES_HH
 
-#include <vector>
+#include "msgs/visual.pb.h"
+#include "msgs/insert_model.pb.h"
+#include "msgs/selection.pb.h"
+#include "msgs/color.pb.h"
+#include "msgs/pose.pb.h"
+#include "msgs/point.pb.h"
+#include "msgs/header.pb.h"
+#include "msgs/light.pb.h"
+#include "msgs/plane.pb.h"
+#include "msgs/quaternion.pb.h"
+#include "msgs/time.pb.h"
 
-#include "RenderTypes.hh"
+#include "XMLConfig.hh"
 #include "Color.hh"
 #include "Vector3.hh"
 #include "Time.hh"
@@ -27,105 +37,31 @@
 #include "Plane.hh"
 #include "Box.hh"
 
-
 namespace gazebo
 {
-  class XMLConfigNode;
-
-  enum MessageType{ INSERT_MODEL_MSG, VISUAL_MSG, LIGHT_MSG, POSE_MSG, SELECTION_MSG };
-
   class Message
   {
-    public: Message(MessageType t) : type(t), stamp(Time::GetWallTime()) {}
-    public: Message(const Message &m) : type(m.type), stamp(m.stamp), id(m.id) {}
+    public:
+      static void Init(google::protobuf::Message &message, 
+          const std::string &id);
+      static void Stamp(google::protobuf::Message &message);
 
-    public: virtual Message *Clone() const { return new Message(*this); }
+      static msgs::Point Convert(const Vector3 &v);
+      static msgs::Quaternion Convert(const Quatern &q);
+      static msgs::Pose       Convert(const Pose3d &p);
+      static msgs::Color      Convert(const Color &c);
+      static msgs::Time       Convert(const Time &t);
+      static msgs::Plane      Convert(const Plane &p);
 
-    public: MessageType type;
-    public: Time stamp;
-    public: std::string id;
-  };
+      static void Set(msgs::Point *pt, const Vector3 &v);
+      static void Set(msgs::Quaternion *q, const Quatern &v);
+      static void Set(msgs::Pose *p, const Pose3d &v);
+      static void Set(msgs::Color *c, const Color &v);
+      static void Set(msgs::Time *t, const Time &v);
+      static void Set(msgs::Plane *p, const Plane &v);
 
-  class InsertModelMsg : public Message
-  {
-    public: InsertModelMsg() : Message(INSERT_MODEL_MSG) {}
-    public: InsertModelMsg(const InsertModelMsg &m) : Message(m), 
-            xmlStr(m.xmlStr) {}
-    public: virtual Message *Clone() const 
-            { InsertModelMsg *msg = new InsertModelMsg(*this); return msg; }
-    public: std::string xmlStr;
-  };
-
-  class LightMsg : public Message
-  {
-    public: enum ActionType {UPDATE, DELETE};
-    public: enum LightType {POINT, SPOT, DIRECTIONAL};
-    public: LightMsg();
-    public: LightMsg(const LightMsg &m);
-    public: virtual Message *Clone() const
-            { LightMsg *msg = new LightMsg(*this); return msg; }
-    public: void Load(XMLConfigNode *node);
-
-    public: ActionType action;
-    public: LightType type;
-    public: Pose3d pose;
-    public: Color diffuse;
-    public: Color specular;
-    public: Vector3 attenuation;
-    public: Vector3 direction;
-    public: float range;
-    public: bool castShadows;
-    public: float spotInnerAngle;
-    public: float spotOuterAngle;
-    public: float spotFalloff;
-  };
-
-  class VisualMsg : public Message
-  {
-    public: enum ActionType {UPDATE, DELETE};
-
-    public: VisualMsg();
-    public: VisualMsg(const VisualMsg &m);
-    public: virtual Message *Clone() const 
-            { VisualMsg *msg = new VisualMsg(*this); return msg; }
-
-    public: void Load(XMLConfigNode *node);
-
-    public: std::string parentId;
-    public: ActionType action;
-    public: RenderOpType render;
-    public: std::string mesh;
-    public: std::string material;
-    public: bool castShadows;
-    public: bool attachAxes;
-    public: bool visible;
-    public: float transparency;
-    public: std::vector<Vector3> points;
-    public: Pose3d pose;
-    public: Plane plane;
-    public: Vector3 scale;
-    public: float uvTile_x;
-    public: float uvTile_y;
-  };
-
-  class SelectionMsg : public Message
-  {
-    public: SelectionMsg() : Message(SELECTION_MSG) {}
-    public: SelectionMsg(const SelectionMsg &m) : Message(m), selected(m.selected) {}
-    public: virtual Message *Clone() const 
-            { SelectionMsg *msg = new SelectionMsg(*this); return msg; }
-
-    public: bool selected;
-  };
-
-  class PoseMsg : public Message
-  {
-    public: PoseMsg() : Message(POSE_MSG) {}
-    public: PoseMsg(const PoseMsg &m) : Message(m), pose(m.pose) {}
-    public: virtual Message *Clone() const 
-            { PoseMsg *msg = new PoseMsg(*this); return msg; }
-
-    public: Pose3d pose;
+      static msgs::Light      LightFromXML(XMLConfigNode *node);
+      static msgs::Visual     VisualFromXML(XMLConfigNode *node);
   };
 }
 

@@ -48,8 +48,8 @@ Sensor::Sensor(Body *body)
   this->lastUpdate = this->GetWorld()->GetSimTime();
 
   Param::Begin(&this->parameters);
-  this->updateRateP = new ParamT<double>("updateRate", 0, 0);
-  this->alwaysActiveP = new ParamT<bool>("alwaysActive", false, 0);
+  this->updateRateP = new ParamT<double>("update_rate", 0, 0);
+  this->alwaysActiveP = new ParamT<bool>("always_active", false, 0);
   Param::End();
 }
 

@@ -105,6 +105,7 @@ namespace gazebo
 
     private: ViewController *viewController;
 
+    private: std::vector<ConnectionPtr> connections;
     private: Ogre::AnimationState *animState;
   };
 }

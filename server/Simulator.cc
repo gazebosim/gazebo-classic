@@ -75,15 +75,15 @@ std::string Simulator::defaultWorldXML =
 <gazebo>\
   <world name='default'>\
     <physics type='ode'>\
-      <stepTime>0.001</stepTime>\
+      <step_time>0.001</step_time>\
       <gravity>0 0 -9.8</gravity>\
       <cfm>0.0000000001</cfm>\
       <erp>0.2</erp>\
-      <stepType>quick</stepType>\
-      <stepIters>10</stepIters>\
+      <step_type>quick</step_type>\
+      <step_iters>10</step_iters>\
       <stepW>1.3</stepW>\
-      <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>\
-      <contactSurfaceLayer>0.0</contactSurfaceLayer>\
+      <contact_max_correcting_vel>100.0</contact_max_correcting_vel>\
+      <contact_surface_layer>0.0</contact_surface_layer>\
     </physics>\
     <!-- Ground Plane -->\
     <model name='plane1_model'>\
@@ -95,7 +95,7 @@ std::string Simulator::defaultWorldXML =
           <normal>0 0 1</normal>\
           <size>100 100</size>\
           <segments>1  1</segments>\
-          <uvTile>100 100</uvTile>\
+          <uv_tile>100 100</uv_ttile>\
           <mu1>109999.0</mu1>\
           <mu2>1000.0</mu2>\
           <material>Gazebo/Grey</material>\
@@ -107,12 +107,12 @@ std::string Simulator::defaultWorldXML =
       <xyz>0.0 0 1</xyz>\
       <rpy>0 0 0</rpy>\
       <type>point</type>\
-      <diffuseColor>0.6 0.6 0.6 1.0</diffuseColor>\
-      <specularColor>.1 .1 .1 1.0</specularColor>\
+      <diffuse_color>0.6 0.6 0.6 1.0</diffuse_color>\
+      <specular_color>.1 .1 .1 1.0</specular_color>\
       <attenuation>.2 0.1 0.0</attenuation>\
       <range>20</range>\
       <direction>0 0 -1.0</direction>\
-      <castShadows>true</castShadows>\
+      <cast_shadows>true</cast_shadows>\
     </light>\
   </world>\
 </gazebo>";
@@ -139,7 +139,7 @@ Simulator::Simulator()
   //this->model_delete_mutex = new boost::recursive_mutex();
   this->gazeboConfig=new gazebo::GazeboConfig();
 
-  Events::ConnectQuitSignal( boost::bind(&Simulator::SetUserQuit, this) );
+  this->quitConnection = Events::ConnectQuitSignal( boost::bind(&Simulator::SetUserQuit, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -630,7 +630,7 @@ void Simulator::RemovePlugin(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Send a message
-void Simulator::SendMessage( const Message &message )
+void Simulator::SendMessage( const google::protobuf::Message &message )
 {
   for (unsigned int i=0; i < this->worlds.size(); i++)
     this->worlds[i]->ReceiveMessage( message );

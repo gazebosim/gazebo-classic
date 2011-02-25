@@ -17,6 +17,8 @@
 #include <wx/wx.h>
 #include <wx/treectrl.h>
 
+#include "Event.hh"
+
 class wxAuiManager;
 class wxAuiManagerEvent;
 class wxPropertyGrid;
@@ -110,5 +112,6 @@ namespace gazebo
     private: wxPropertyGrid *propGrid;
 
     private: DiagnosticsDialog *diagnostics;
+    private: std::vector<ConnectionPtr> connections;
   };
 }

@@ -31,8 +31,6 @@
 
 namespace gazebo
 {
-  class VisualMsg;
-
   /// \addtogroup gazebo_physics_geom
   /// \{
   /** \defgroup gazebo_ray_geom Ray geom
@@ -110,8 +108,6 @@ namespace gazebo
     protected: double contactLen;
     protected: double contactRetro;
     protected: int contactFiducial;
-  
-    protected: VisualMsg *lineMsg;
   
     /// Start and end positions of the ray, relative to the body
     protected: Vector3 relativeStartPos;

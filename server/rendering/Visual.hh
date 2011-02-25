@@ -25,6 +25,7 @@
 
 #include <string>
 
+#include "Event.hh"
 #include "Box.hh"
 #include "RenderTypes.hh"
 #include "Pose3d.hh"
@@ -55,7 +56,6 @@ namespace gazebo
   class SelectionObj;
   class Scene;
   class OgreDynamicLines;
-  class VisualMsg;
   class Mesh;
 
 
@@ -78,7 +78,7 @@ namespace gazebo
     public: void Init();
 
     /// \brief Load from a message
-    public: void LoadFromMsg(const VisualMsg *msg);
+    //public: void LoadFromMsg(const VisualMsg *msg);
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
@@ -174,12 +174,6 @@ namespace gazebo
     /// \brief Return the scene Node of this visual entity
     public: Ogre::SceneNode *GetSceneNode() const;
 
-    /// \brief Create a bounding box for this visual
-    public: void AttachBoundingBox(const Vector3 &min, const Vector3 &max);
-
-    /// \brief Set the material of the bounding box
-    public: void SetBoundingBoxMaterial(const std::string &materialName );
-
     /// \brief Make the visual objects static renderables
     public: void MakeStatic();
 
@@ -236,7 +230,7 @@ namespace gazebo
     public: static void InsertMesh( const Mesh *mesh);
 
     /// \brief Update a visual based on a message
-    public: void UpdateFromMsg(const VisualMsg *msg);
+    //public: void UpdateFromMsg(const VisualMsg *msg);
 
     private: void GetBoundsHelper(Ogre::SceneNode *node, Box &box) const;
 
@@ -275,6 +269,7 @@ namespace gazebo
     private: Ogre::RibbonTrail *ribbonTrail;
 
     private: bool useRTShader;
+    private: ConnectionPtr preRenderConnection;
 
     // List of all the lines created
     private: std::list<OgreDynamicLines*> lines;

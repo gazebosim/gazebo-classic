@@ -1,0 +1,43 @@
+package gazebo.msgs;
+import "header.proto";
+import "pose.proto";
+import "point.proto";
+import "plane.proto";
+
+message Visual
+{
+  required Header header = 1;
+
+  enum ActionType
+  {
+    UPDATE = 1;
+    DELETE = 2;
+  }
+  required ActionType action = 2;
+
+  enum RenderType
+  {
+    POINT_LIST     = 1;
+    LINE_LIST      = 2;
+    LINE_STRIP     = 3;
+    TRIANGLE_LIST  = 4;
+    TRIANGLE_STRIP = 5;
+    TRIANGLE_FAN   = 6; 
+    MESH_RESOURCE  = 7;
+  }
+  optional RenderType render_type = 3;
+
+  optional string parent_id   = 4;
+  optional string mesh        = 5;
+  optional string material    = 6;
+  optional bool cast_shadows  = 7;
+  optional bool attach_axes   = 8;
+  optional bool visible       = 9;
+  optional float transparency = 10;
+  optional Pose pose          = 11;
+  optional Point scale        = 12;
+  optional float uv_tile_x    = 13;
+  optional float uv_tile_y    = 14;
+  repeated Point points       = 15;
+  optional Plane plane        = 16;
+}

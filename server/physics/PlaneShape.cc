@@ -29,9 +29,9 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
 
-  this->visualMsg = new VisualMsg();
-  this->visualMsg->parentId = this->geomParent->GetName();
-  this->visualMsg->id = this->GetName();
+  msgs::Visual msg;
+  Message::Init(msg, this->GetName() );
+  msg.set_parent_id( this->geomParent->GetName() );
 
   Param::Begin(&this->parameters);
   this->normalP = new ParamT<Vector3>("normal",Vector3(0,0,1),0);
@@ -45,14 +45,14 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
       Vector2<double>(10, 10), 0);
   this->segmentsP->Callback( &PlaneShape::SetSegments, this );
 
-  this->uvTileP = new ParamT<Vector2<double> >("uvTile",
+  this->uvTileP = new ParamT<Vector2<double> >("uv_tile",
       Vector2<double>(1, 1), 0);
   this->uvTileP->Callback( &PlaneShape::SetUVTile, this );
 
   this->materialP = new ParamT<std::string>("material","",1);
   this->materialP->Callback( &PlaneShape::SetMaterial, this );
 
-  this->castShadowsP = new ParamT<bool>("castShadows", false, 0);
+  this->castShadowsP = new ParamT<bool>("cast_shadows", false, 0);
   this->castShadowsP->Callback( &PlaneShape::SetCastShadows, this );
   Param::End();
 }
@@ -61,9 +61,10 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
 /// Destructor
 PlaneShape::~PlaneShape()
 {
-  this->visualMsg->action = VisualMsg::DELETE;
-  Simulator::Instance()->SendMessage( *this->visualMsg );
-  delete this->visualMsg;
+  msgs::Visual msg;
+  Message::Init(msg, this->GetName());
+  msg.set_action( msgs::Visual::DELETE );
+  Simulator::Instance()->SendMessage( msg );
 
   delete this->normalP;
   delete this->sizeP;
@@ -104,20 +105,23 @@ void PlaneShape::Save(std::string &prefix, std::ostream &stream)
 /// Create the plane
 void PlaneShape::CreatePlane()
 {
-  this->visualMsg->plane.Set( **(this->normalP), 
-      **(this->sizeP), 0);//**(this->segmentsP));
+  msgs::Visual msg;
+  Message::Init(msg, this->GetName());
+  Message::Set(msg.mutable_plane()->mutable_normal(), **this->normalP);
+  msg.mutable_plane()->set_size_x( (**this->sizeP).x );
+  msg.mutable_plane()->set_size_y( (**this->sizeP).y );
 
   // NATY: segmentsP is not in the message
-  this->visualMsg->action = VisualMsg::UPDATE;
-  this->visualMsg->uvTile_x = (**(this->uvTileP)).x;
-  this->visualMsg->uvTile_y = (**(this->uvTileP)).y;
-  this->visualMsg->material = **(this->materialP);
-  this->visualMsg->castShadows = **(this->castShadowsP);
-  this->visualMsg->scale.x = (**(this->sizeP)).x;
-  this->visualMsg->scale.y = (**(this->sizeP)).y;
-  this->visualMsg->scale.z = 0.0;
+  msg.set_action( msgs::Visual::UPDATE );
+  msg.set_uv_tile_x( (**this->uvTileP).x );
+  msg.set_uv_tile_y( (**this->uvTileP).y );
+  msg.set_material( **(this->materialP) );
+  msg.set_cast_shadows( **(this->castShadowsP) );
+  msg.mutable_scale()->set_x( (**(this->sizeP)).x );
+  msg.mutable_scale()->set_y( (**(this->sizeP)).y );
+  msg.mutable_scale()->set_z( 0.0 );
 
-  Simulator::Instance()->SendMessage( *this->visualMsg );
+  Simulator::Instance()->SendMessage( msg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
