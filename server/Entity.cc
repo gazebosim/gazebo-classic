@@ -39,6 +39,7 @@ using namespace gazebo;
 Entity::Entity(Common *parent)
 : Common(parent)
 {
+  this->pose_pub = Simulator::Instance()->Advertise<msgs::Pose>("/gazebo/pose");
   this->AddType(ENTITY);
 
   Param::Begin(&this->parameters);
@@ -292,7 +293,7 @@ void Entity::PoseChange(bool notify)
   msgs::Pose msg;
   Message::Init(msg, this->GetCompleteScopedName() );
   Message::Set( &msg, this->GetRelativePose());
-  Simulator::Instance()->SendMessage( msg );
+  this->pose_pub->Publish(msg);
 
   if (notify)
   {

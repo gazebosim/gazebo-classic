@@ -167,7 +167,7 @@ void BoxMaker::CreateTheEntity()
   msg.set_xml( newModelStr.str() );
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  Message::Stamp(*this->visualMsg);
+  Message::CreationStamp(*this->visualMsg);
   Simulator::Instance()->SendMessage( *this->visualMsg );
 
   Simulator::Instance()->SendMessage( msg );

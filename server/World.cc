@@ -666,12 +666,14 @@ Common *World::GetByName(const std::string &name)
 /// Receive a message
 void World::ReceiveMessage( const google::protobuf::Message &message )
 {
-  boost::recursive_mutex::scoped_lock lock( this->mutex );
+/*  boost::recursive_mutex::scoped_lock lock( this->mutex );
+
   if (msg.type == VISUAL_MSG || msg.type == LIGHT_MSG || msg.type == POSE_MSG
       || msg.type == SELECTION_MSG)
     this->scene->ReceiveMessage(msg);
   else
     this->messages.push_back( msg.Clone() );
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

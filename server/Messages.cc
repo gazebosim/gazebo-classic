@@ -25,18 +25,44 @@ void Message::Init(google::protobuf::Message &message, const std::string &id)
 {
   message.Clear();
 
-  if ( message.GetDescriptor()->FindFieldByName("str_id") )
+  const google::protobuf::Descriptor *header = message.GetDescriptor()->FindNestedTypeByName("header");
+
+  if ( header )
   {
-    //message.mutable_header()->set_str_id( id );
-    Stamp(message);
+    const google::protobuf::FieldDescriptor *fd;
+    fd = header->FindFieldByName("str_id");
+    message.GetReflection()->SetString(&message, fd, id);
+    CreationStamp(message);
   }
 }
 
-void Message::Stamp(google::protobuf::Message &message)
+void Message::CreationStamp(google::protobuf::Message &message)
 {
-  if ( message.GetDescriptor()->FindFieldByName("header") )
+  Message::Stamp(message, "stamp");
+}
+
+void Message::SendStamp(google::protobuf::Message &message)
+{
+  Message::Stamp(message, "send");
+}
+
+void Message::Stamp(google::protobuf::Message &message, const std::string &type)
+{
+  const google::protobuf::Descriptor *header = message.GetDescriptor()->FindNestedTypeByName("header");
+
+  if ( header )
   {
-    //message.mutable_header()->time( Convert(Time::GetWallTime()) );
+    const google::protobuf::Descriptor *stamp;
+    const google::protobuf::FieldDescriptor *sec; 
+    const google::protobuf::FieldDescriptor *nsec;
+
+    stamp = header->FindNestedTypeByName(type);
+    sec = stamp->FindFieldByName("sec");
+    nsec = stamp->FindFieldByName("nsec");
+
+    Time tm = Time::GetWallTime();
+    message.GetReflection()->SetInt32(&message, sec, tm.sec);
+    message.GetReflection()->SetInt32(&message, nsec, tm.nsec);
   }
 }
 

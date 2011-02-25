@@ -632,6 +632,10 @@ void Simulator::RemovePlugin(const std::string &name)
 /// Send a message
 void Simulator::SendMessage( const google::protobuf::Message &message )
 {
+  // Stamp the message with the transport time
+  /*Message::SendStamp(message);
+
   for (unsigned int i=0; i < this->worlds.size(); i++)
     this->worlds[i]->ReceiveMessage( message );
+    */
 }

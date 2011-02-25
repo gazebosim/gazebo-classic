@@ -168,6 +168,7 @@ void CylinderMaker::CreateTheEntity()
   msg.set_xml( newModelStr.str() );
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
+  Message::CreationStamp(*this->visualMsg);
   Simulator::Instance()->SendMessage( *this->visualMsg );
   Simulator::Instance()->SendMessage( msg );
 }

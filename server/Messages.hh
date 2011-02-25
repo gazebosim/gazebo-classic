@@ -43,8 +43,11 @@ namespace gazebo
   {
     public:
       static void Init(google::protobuf::Message &message, 
-          const std::string &id);
-      static void Stamp(google::protobuf::Message &message);
+                       const std::string &id);
+
+      static void CreationStamp(google::protobuf::Message &message);
+
+      static void SendStamp(google::protobuf::Message &message);
 
       static msgs::Point Convert(const Vector3 &v);
       static msgs::Quaternion Convert(const Quatern &q);
@@ -62,6 +65,9 @@ namespace gazebo
 
       static msgs::Light      LightFromXML(XMLConfigNode *node);
       static msgs::Visual     VisualFromXML(XMLConfigNode *node);
+
+    private:
+      static void Stamp(google::protobuf::Message &, const std::string &type);
   };
 }
 

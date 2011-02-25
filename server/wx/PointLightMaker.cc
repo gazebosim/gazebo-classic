@@ -95,6 +95,6 @@ void PointLightMaker::MouseDragCB(const MouseEvent & /*event*/)
 
 void PointLightMaker::CreateTheEntity()
 {
-  Message::Stamp(this->msg);
+  Message::CreationStamp(this->msg);
   Simulator::Instance()->SendMessage(this->msg);
 }

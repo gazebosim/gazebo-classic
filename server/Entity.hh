@@ -27,6 +27,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
+#include "Publisher.hh"
 #include "Box.hh"
 #include "Common.hh"
 #include "Pose3d.hh"
@@ -146,6 +147,7 @@ namespace gazebo
     protected: msgs::Visual *visualMsg;
 
     private: Pose3d relativePose;
+    private: Publisher pose_pub;
   };
   
   /// \}
