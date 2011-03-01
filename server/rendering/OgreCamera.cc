@@ -327,6 +327,48 @@ void OgreCamera::SetUpdateRate(const double &rate)
   this->updateRateP->SetValue(rate); // need this when called externally
 }
 
+void OgreCamera::CaptureData()
+{
+  if (this->captureData)
+  {
+    //boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
+
+    Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
+    Ogre::RenderTexture *rTexture;
+    Ogre::Viewport* renderViewport;
+
+    size_t size;
+
+    // Get access to the buffer and make an image and write it to file
+    pixelBuffer = this->renderTexture->getBuffer();
+    rTexture = pixelBuffer->getRenderTarget();
+
+    Ogre::PixelFormat format = pixelBuffer->getFormat();
+    renderViewport = rTexture->getViewport(0);
+
+    size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
+        (**this->imageSizeP).y, 
+        1, 
+        format);
+
+    // Allocate buffer
+    if (!this->saveFrameBuffer)
+      this->saveFrameBuffer = new unsigned char[size];
+
+    memset(this->saveFrameBuffer,128,size);
+
+    Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
+        1, this->imageFormat, this->saveFrameBuffer);
+
+    pixelBuffer->blitToMemory( box );
+
+    if (this->saveFramesP->GetValue())
+    {
+      this->SaveFrame();
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Render the camera
 void OgreCamera::Render()
