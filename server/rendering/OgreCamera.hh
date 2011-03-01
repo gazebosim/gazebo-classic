@@ -254,6 +254,9 @@ namespace gazebo
     // Save the camera frame
     protected: virtual void SaveFrame();
 
+    // Render Depth Data
+    protected: virtual void RenderDepthData();
+
     /// \brief set update rate (render rate) of the OgreCamera
     public: void SetUpdateRate(const double &rate);
 
@@ -296,6 +299,7 @@ namespace gazebo
     protected: std::string cameraName;
 
     protected: bool captureData;
+    protected: bool simulateDepthData;
 
     private: bool userMovable;
     protected: std::vector<Param*> camParameters;
