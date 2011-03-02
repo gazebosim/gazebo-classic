@@ -53,7 +53,7 @@ namespace gazebo
     public: void Load(XMLConfigNode *node);
 
     /// \brief Update the joint
-    public: void Update();
+    public: void Update() {}
 
     /// \brief Reset the joint
     public: void Reset() {}
