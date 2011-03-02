@@ -87,6 +87,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   Param::End();
 
   this->captureData = false;
+  this->simulateDepthData = false;
 
   this->camera = NULL;
 
@@ -389,6 +390,9 @@ void OgreCamera::Render()
       this->lastRenderTime = Simulator::Instance()->GetSimTime();
       this->renderTarget->update();
     }
+
+    // produce depth data for the camera
+    if (this->simulateDepthData) this->RenderDepthData();
 
     this->lastUpdate = Simulator::Instance()->GetSimTime();
   }
@@ -729,6 +733,12 @@ void OgreCamera::SetCamName( const std::string &_name )
   this->name = _name;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Simulate Depth Data
+void OgreCamera::RenderDepthData()
+{
+
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Save the current frame to disk

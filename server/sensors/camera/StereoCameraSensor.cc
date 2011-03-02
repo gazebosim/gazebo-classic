@@ -119,22 +119,25 @@ void StereoCameraSensor::InitChild()
   // Create the render textures for the color textures
   for (i = 0; i<2; i++)
   {
-    this->renderTexture[i] = this->CreateRTT(this->textureName[i], false);
-    this->renderTargets[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
+    this->renderTextures[i] = this->CreateRTT(this->textureName[i], false);
+    this->renderTargets[i] = this->renderTextures[i]->getBuffer()->getRenderTarget();
     this->renderTargets[i]->setAutoUpdated(false);
   }
 
   // Create the render texture for the depth textures
   for (i = 2; i<4; i++)
   {
-    this->renderTexture[i] = this->CreateRTT(this->textureName[i], true);
-    this->renderTargets[i] = this->renderTexture[i]->getBuffer()->getRenderTarget();
+    this->renderTextures[i] = this->CreateRTT(this->textureName[i], true);
+    this->renderTargets[i] = this->renderTextures[i]->getBuffer()->getRenderTarget();
     this->renderTargets[i]->setAutoUpdated(false);
   }
 
-    this->renderTarget = this->renderTargets[D_LEFT];
-
+  this->renderTarget = this->renderTargets[D_LEFT];
+  this->renderTexture = this->renderTextures[D_LEFT];
   this->InitCam();
+
+  // tell OgreCamera::Render() to RenderDepthData() in the rendering thread
+  this->simulateDepthData = true;
 
   // Hack to make the camera use the right render target too.
   for (i=0; i<4; i++)
@@ -156,17 +159,21 @@ void StereoCameraSensor::InitChild()
     matPtr->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
     matPtr->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
     matPtr->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-    
+
 
     matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
         this->textureName[i] );
   }
 
   // Get pointer to the depth map material
-  this->depthMaterial = Ogre::MaterialManager::getSingleton().load("Gazebo/DepthMap", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  //this->depthMaterial = Ogre::MaterialManager::getSingleton().load("Gazebo/DepthMap", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap");
+  this->depthMaterial->load();
 
 
-  mBuffer = this->renderTexture[D_LEFT]->getBuffer(0,0);
+
+
+  mBuffer = this->renderTextures[D_LEFT]->getBuffer(0,0);
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
 
@@ -205,6 +212,12 @@ void StereoCameraSensor::FiniChild()
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
 void StereoCameraSensor::UpdateChild()
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Render Depth Data
+void StereoCameraSensor::RenderDepthData()
 {
   OgreAdaptor *adapt = OgreAdaptor::Instance();
   Ogre::RenderSystem *renderSys = adapt->root->getRenderSystem();
@@ -251,9 +264,11 @@ void StereoCameraSensor::UpdateChild()
 
     vp = this->renderTargets[i]->getViewport(0);
 
+    Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "Gazebo/DepthMap", true);
+
     // Need this line to render the ground plane. No idea why it's necessary.
     renderSys->_setViewport(vp);
-    sceneMgr->_setPass(pass, true, false); 
+    sceneMgr->_setPass(pass, true, false);
     autoParamDataSource.setCurrentPass(pass);
     autoParamDataSource.setCurrentViewport(vp);
     autoParamDataSource.setCurrentRenderTarget(this->renderTargets[i]);
@@ -265,18 +280,18 @@ void StereoCameraSensor::UpdateChild()
 #else
     pass->_updateAutoParams(&autoParamDataSource,1);
 #endif
-    
+
     renderSys->setLightingEnabled(false);
     renderSys->_setFog(Ogre::FOG_NONE);
-    
+
     // These two lines don't seem to do anything useful
-    renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS()); 
+    renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS());
     renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
 
     // NOTE: We MUST bind parameters AFTER updating the autos
     if (pass->hasVertexProgram())
     {
-      renderSys->bindGpuProgram( 
+      renderSys->bindGpuProgram(
           pass->getVertexProgram()->_getBindingDelegate() );
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
@@ -289,23 +304,23 @@ void StereoCameraSensor::UpdateChild()
     }
 
     if (pass->hasFragmentProgram())
-    {   
-      renderSys->bindGpuProgram( 
+    {
+      renderSys->bindGpuProgram(
           pass->getFragmentProgram()->_getBindingDelegate() );
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
-      renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
+      renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
             pass->getFragmentProgramParameters());
 #else
-        renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, 
+        renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
             pass->getFragmentProgramParameters(), 1);
 #endif
     }
-   
+
     this->renderTargets[i]->update();
   }
 
-  sceneMgr->_suppressRenderStateChanges(false); 
+  sceneMgr->_suppressRenderStateChanges(false);
 
   // Render the image texture
   for (i=0; i<2; i++)
@@ -318,7 +333,7 @@ void StereoCameraSensor::UpdateChild()
 
   this->FillBuffers();
 
-  if (this->saveFramesP->GetValue())
+  //if (this->saveFramesP->GetValue())
     this->SaveFrame();
 }
 
@@ -361,7 +376,7 @@ void StereoCameraSensor::FillBuffers()
   for (i=0; i<4; i++)
   {
     // Get access to the buffer and make an image and write it to file
-    hardwareBuffer = this->renderTexture[i]->getBuffer(0, 0);
+    hardwareBuffer = this->renderTextures[i]->getBuffer(0, 0);
 
     hardwareBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
 
@@ -444,7 +459,7 @@ void StereoCameraSensor::SaveFrame()
     this->GetImageData(i);
 
     // Get access to the buffer and make an image and write it to file
-    mBuffer = this->renderTexture[i]->getBuffer(0, 0);
+    mBuffer = this->renderTextures[i]->getBuffer(0, 0);
 
     // Create image data structure
     imgData  = new Ogre::ImageCodec::ImageData();
@@ -564,7 +579,7 @@ Ogre::TexturePtr StereoCameraSensor::CreateRTT(const std::string &name, bool dep
 
   // Create the left render texture
   return Ogre::TextureManager::getSingleton().createManual(
-      name, 
+      name,
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
       this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y, 0,
