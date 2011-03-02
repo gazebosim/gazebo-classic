@@ -330,6 +330,22 @@ std::string Entity::GetCompleteScopedName() const
   return scopedName;
 }
 
+// TODO: THIS IS A HACK AND SHOULD BE REMOVED
+std::string Entity::GetCompleteScopedAltName() const
+{
+  Entity *p = this->parent;
+  std::string scopedName = this->GetAltName();
+
+  while (p)
+  {
+    scopedName.insert(0, p->GetName()+"::");
+    p = p->GetParent();
+  }
+
+  return scopedName;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the absolute pose of the entity
 Pose3d Entity::GetWorldPose() const

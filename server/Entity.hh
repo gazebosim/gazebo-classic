@@ -196,6 +196,9 @@ namespace gazebo
     ///        model1::...::modelN::bodyN::entityName
     public: std::string GetCompleteScopedName() const;
 
+    // TODO: THIS IS A HACK AND SHOULD BE REMOVED
+    public: std::string GetCompleteScopedAltName() const;
+
     /// \brief Set the type of this entity
     public: void SetType(Type type);
 

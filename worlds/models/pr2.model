@@ -940,6 +940,18 @@
         </geom:box>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <sensor:camera name="narrow_stereo_gazebo_l_stereo_camera_sensor">
+          <alwaysActive>false</alwaysActive>
+          <updateRate>25</updateRate>
+          <nearClip>0.1</nearClip>
+          <farClip>100</farClip>
+          <saveFrames>false</saveFrames>
+          <saveFramePath></saveFramePath>
+          <imageSize>640 480</imageSize>
+          <imageFormat>L8</imageFormat>
+          <mask>none</mask>
+          <hfov>45</hfov>
+        </sensor:camera>
     </body:box>
     <joint:hinge name="narrow_stereo_gazebo_l_stereo_camera_frame_joint">
         <body1>narrow_stereo_gazebo_l_stereo_camera_frame</body1>
@@ -977,6 +989,20 @@
                 <material>PR2/Blue</material>
             </visual>
         </geom:box>
+
+        <sensor:camera name="narrow_stereo_gazebo_r_stereo_camera_sensor">
+          <alwaysActive>false</alwaysActive>
+          <updateRate>25</updateRate>
+          <nearClip>0.1</nearClip>
+          <farClip>100</farClip>
+          <saveFrames>0</saveFrames>
+          <saveFramePath></saveFramePath>
+          <imageSize>640 480</imageSize>
+          <imageFormat>L8</imageFormat>
+          <mask>none</mask>
+          <hfov>45</hfov>
+        </sensor:camera>
+
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
     </body:box>
@@ -1055,6 +1081,19 @@
                 <material>PR2/Blue</material>
             </visual>
         </geom:box>
+        <sensor:camera name="wide_stereo_gazebo_l_stereo_camera_sensor">
+          <alwaysActive>false</alwaysActive>
+          <updateRate>25</updateRate>
+          <nearClip>0.1</nearClip>
+          <farClip>100</farClip>
+          <saveFrames>0</saveFrames>
+          <saveFramePath></saveFramePath>
+          <imageSize>640 480</imageSize>
+          <imageFormat>BAYER_BGGR8</imageFormat>
+          <mask>none</mask>
+          <hfov>90</hfov>
+        </sensor:camera>
+
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
     </body:box>
@@ -1094,6 +1133,19 @@
                 <material>PR2/Blue</material>
             </visual>
         </geom:box>
+        <sensor:camera name="wide_stereo_gazebo_r_stereo_camera_sensor">
+          <alwaysActive>false</alwaysActive>
+          <updateRate>25</updateRate>
+          <nearClip>0.1</nearClip>
+          <farClip>100</farClip>
+          <saveFrames>0</saveFrames>
+          <saveFramePath></saveFramePath>
+          <imageSize>640 480</imageSize>
+          <imageFormat>BAYER_BGGR8</imageFormat>
+          <mask>none</mask>
+          <hfov>90</hfov>
+        </sensor:camera>
+
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
     </body:box>
@@ -1133,6 +1185,19 @@
                 <material>Gazebo/Black</material>
             </visual>
         </geom:box>
+        <sensor:camera name="high_def_sensor">
+          <alwaysActive>false</alwaysActive>
+          <updateRate>20</updateRate>
+          <nearClip>0.1</nearClip>
+          <farClip>100</farClip>
+          <saveFrames>0</saveFrames>
+          <saveFramePath></saveFramePath>
+          <imageSize>2448 2050</imageSize>
+          <imageFormat>R8G8B8</imageFormat>
+          <mask>none</mask>
+          <hfov>45</hfov>
+        </sensor:camera>
+
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
     </body:box>
@@ -1492,6 +1557,20 @@
                 <material>PR2/Blue</material>
             </visual>
         </geom:box>
+
+        <sensor:camera name="l_forearm_cam_sensor">
+          <alwaysActive>false</alwaysActive>
+          <updateRate>25</updateRate>
+          <nearClip>0.1</nearClip>
+          <farClip>100</farClip>
+          <saveFrames>0</saveFrames>
+          <saveFramePath></saveFramePath>
+          <imageSize>640 480</imageSize>
+          <imageFormat>L8</imageFormat>
+          <mask>none</mask>
+          <hfov>90</hfov>
+        </sensor:camera>
+
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
     </body:box>
@@ -2241,6 +2320,21 @@
                 <material>PR2/Blue</material>
             </visual>
         </geom:box>
+
+        <sensor:camera name="r_forearm_cam_sensor">
+          <alwaysActive>false</alwaysActive>
+          <updateRate>25</updateRate>
+          <nearClip>0.1</nearClip>
+          <farClip>100</farClip>
+          <saveFrames>0</saveFrames>
+          <saveFramePath></saveFramePath>
+          <imageSize>640 480</imageSize>
+          <imageFormat>L8</imageFormat>
+          <mask>none</mask>
+          <hfov>90</hfov>
+          <alwaysActive>false</alwaysActive>
+        </sensor:camera>
+
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
     </body:box>

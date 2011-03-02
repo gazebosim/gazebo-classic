@@ -69,7 +69,7 @@ namespace gazebo
     protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream) {}
 
     /// \brief Update the joint
-    public: void Update();
+    public: virtual void Update();
 
     /// \brief Set the joint to show visuals
     public: void ShowJoints(bool s);
@@ -199,7 +199,7 @@ namespace gazebo
     protected: Vector3 anchorPos;
     protected: Body *anchorBody;
 
-    private: boost::signal<void ()> jointUpdateSignal;
+    protected: boost::signal<void ()> jointUpdateSignal;
 
     // joint damping_coefficient
     protected: double damping_coefficient;
