@@ -629,7 +629,8 @@ Entity *World::GetEntityByNameHelper(const std::string &name, Entity *parent) co
   if (!parent)
     return NULL;
 
-  if (parent->GetCompleteScopedName() == name)
+  if (parent->GetCompleteScopedName() == name ||
+      parent->GetCompleteScopedAltName() == name)
     return parent;
 
   const std::vector<Entity*> children = parent->GetChildren();

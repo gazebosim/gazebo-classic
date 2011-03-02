@@ -51,6 +51,12 @@ namespace gazebo
     /// \return Name of the entity
     public: std::string GetName() const;
 
+    
+    // TODO: THIS IS A HACK AND SHOULD BE REMOVED
+    public: void SetAltName(const std::string &str);
+    // TODO: THIS IS A HACK AND SHOULD BE REMOVED
+    public: std::string GetAltName() const;
+
     /// \brief Get the count of the parameters
     public: unsigned int GetParamCount() const;
 
@@ -83,6 +89,7 @@ namespace gazebo
  
     ///  Name of the entity
     protected: ParamT<std::string> *nameP;
+    protected: std::string altName;
 
     /// List of all the parameters
     protected: std::vector<Param*> parameters;

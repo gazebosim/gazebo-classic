@@ -103,7 +103,6 @@ Body::Body(Entity *parent)
 // Destructor
 Body::~Body()
 {
-
   std::map< std::string, Geom* >::iterator giter;
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
@@ -125,7 +124,6 @@ Body::~Body()
   if (this->comEntity)
     delete this->comEntity;
   this->comEntity = NULL;
-
 
   delete this->xyzP;
   delete this->rpyP;
@@ -473,15 +471,11 @@ void Body::DettachGeom(Geom *geom)
   std::map<std::string, Geom*>::iterator iter;
   iter = this->geoms.find(geom->GetName());
 
-  std::cout << "Detach GEOM[" << geom->GetName() << "] Count[" << this->geoms.size() << "]\n";
   if (iter != this->geoms.end())
   {
-    std::cout << "erasing\n";
     this->geoms.erase(iter);
   }
-  std::cout << "Post Count[" << this->geoms.size() << "]\n";
   this->comEntity->RemoveChild(geom);
-  std::cout << "Done with detach\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -690,10 +684,10 @@ Geom *Body::GetGeom(const std::string &name) const
 {
   std::map<std::string, Geom*>::const_iterator iter = this->geoms.find(name);
 
-  if (iter != this->geoms.end())
-    return iter->second;
-  else
-    return NULL;
+  for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+    if (iter->second->GetName() == name)
+      return iter->second;
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
