@@ -28,20 +28,19 @@ void FixedJoint::Load(XMLConfigNode *node)
   Joint::Load(node);
   Body *delBody = NULL;
   Body *keepBody = NULL;
+
   if (this->body1->GetMass().GetAsDouble() == 0)
   {
     delBody = this->body1;
     keepBody = this->body2;
     this->body1 = NULL;
   }
-  else if (this->body2->GetMass().GetAsDouble() == 0)
+  else
   {
     delBody = this->body2;
     keepBody = this->body1;
     this->body2 = NULL;
   }
-  else
-    gzerr(0) << "FixedJoint must have one body that has zero mass\n";
 
   this->subsumedOffset = delBody->GetRelativePose() - keepBody->GetRelativePose();
 
