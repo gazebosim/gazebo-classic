@@ -294,7 +294,7 @@ void OgreCreator::CreateSky(std::string material)
       Ogre::Quaternion orientation;
       orientation.FromAngleAxis( Ogre::Degree(90), Ogre::Vector3(1,0,0));
       //OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,5,8, 4000, true, orientation);
-      OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,10,8, 4, true, orientation);
+      OgreAdaptor::Instance()->sceneMgr->setSkyDome(true,material,10,8, 1000, true, orientation); // quick hack, 1/4 smaller than user cam far clip for now (cube diagonal)
       //}
 
     }

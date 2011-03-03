@@ -178,7 +178,7 @@ void StereoCameraSensor::InitChild()
   this->textureHeight = mBuffer->getHeight();
 
 
-  this->rgbBufferSize = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * 3;
+  this->rgbBufferSize = this->imageSizeP->GetValue().x * this->imageSizeP->GetValue().y * this->GetImageDepth();
   this->depthBufferSize = this->imageSizeP->GetValue().x*this->imageSizeP->GetValue().y;
 
   // Allocate buffers
@@ -264,6 +264,9 @@ void StereoCameraSensor::RenderDepthData()
 
     vp = this->renderTargets[i]->getViewport(0);
 
+    // return 0 in case no renderable object is inside frustrum
+    vp->setBackgroundColour( Ogre::ColourValue(Ogre::ColourValue(0,0,0)) );
+
     Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "Gazebo/DepthMap", true);
 
     // Need this line to render the ground plane. No idea why it's necessary.
@@ -333,7 +336,7 @@ void StereoCameraSensor::RenderDepthData()
 
   this->FillBuffers();
 
-  //if (this->saveFramesP->GetValue())
+  if (this->saveFramesP->GetValue())
     this->SaveFrame();
 }
 
