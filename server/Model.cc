@@ -535,6 +535,9 @@ void Model::RemoveChild(Entity *child)
               jbody0->GetName() == jbody1->GetName())
           {
             Joint *joint = *jiter;
+            std::cout << "\n\nDeleting Joint[" << joint->GetName() << "]\n\n\n";
+            std::cout << "Body0[" << jbody0->GetName() << "]\n";
+            std::cout << "Body1[" << jbody1->GetName() << "]\n";
             this->joints.erase( jiter );
             done = false;
             delete joint;
@@ -1052,7 +1055,7 @@ Body *Model::GetBody(const std::string &name)
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if ((*biter)->GetName() == name || (*biter)->GetAltName() == name)
+    if ((*biter)->GetName() == name || (*biter)->HasAltName(name))
       return (Body*)*biter;
   }
  
@@ -1273,7 +1276,6 @@ void Model::LoadPhysical(XMLConfigNode *node)
 
   // Load the joints
   childNode = node->GetChildByNSPrefix("joint");
-
   while (childNode)
   {
     try
@@ -1284,11 +1286,14 @@ void Model::LoadPhysical(XMLConfigNode *node)
     {
       gzerr(0) << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
       gzerr(0) <<  e << std::endl;
+      this->Print("");
+      throw("Error loading model\n");
       childNode = childNode->GetNextByNSPrefix("joint");
       continue;
     }
     childNode = childNode->GetNextByNSPrefix("joint");
   }
+
 }
 
 

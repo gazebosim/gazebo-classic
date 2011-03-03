@@ -246,7 +246,7 @@ namespace gazebo
             { enabledSignal.disconnect(subscriber); }
 
     /// List of geometries attached to this body
-    protected: std::map< std::string, Geom* > geoms;
+    protected: std::vector< Geom* > geoms;
 
     /// List of attached sensors
     protected: std::vector< Sensor* > sensors;

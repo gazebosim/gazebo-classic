@@ -147,6 +147,8 @@ namespace gazebo
     /// \brief Get the axis of rotation
     public: virtual Vector3 GetAxis(int index) const {return Vector3();}
 
+    private: Joint* IsConnected(Body *b);
+
     private: Pose3d subsumedOffset;
   };
   /// \}

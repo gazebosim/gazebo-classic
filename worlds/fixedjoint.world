@@ -139,12 +139,12 @@
 
 
     <joint:fixed name="fixed1">
-      <body1>body1</body1>
-      <body2>body2</body2>
-      <anchor>body1</anchor>
+      <body1>body2</body1>
+      <body2>body1</body2>
+      <anchor>body2</anchor>
     </joint:fixed>
 
-    <joint:hinge name="hinge1">
+    <!--<joint:hinge name="hinge1">
       <body1>body2</body1>
       <body2>body3</body2>
       <anchor>body2</anchor>
@@ -153,13 +153,21 @@
       <highStop>30</highStop>
       <damping>0</damping>
     </joint:hinge>
-
+    -->
     <joint:fixed name="fixed2">
+      <body1>body3</body1>
+      <body2>body2</body2>
+      <anchor>body3</anchor>
+    </joint:fixed>
+    <!--
+    <joint:fixed name="fixed3">
       <body1>body3</body1>
       <body2>body4</body2>
       <anchor>body3</anchor>
     </joint:fixed>
+    -->
 
+    <!--
     <joint:hinge name="hinge2">
       <body1>body4</body1>
       <body2>body5</body2>
@@ -169,6 +177,7 @@
       <highStop>30</highStop>
       <damping>0</damping>
     </joint:hinge>
+-->
 
   </model:physical>
 

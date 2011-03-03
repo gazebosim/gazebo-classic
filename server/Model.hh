@@ -182,9 +182,6 @@ namespace gazebo
     /// \return Pointer to the body
     public: Body *GetBody(const std::string &name);
 
-    /// \brief Get a map of all the bodies
-    //public: const std::map<std::string, Body*> *GetBodies() const;
-
     /// \brief Get a sensor by name
     public: Sensor *GetSensor(const std::string &name) const;
 

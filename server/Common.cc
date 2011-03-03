@@ -67,15 +67,24 @@ std::string Common::GetName() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Common::SetAltName(const std::string &str)
+void Common::AddAltName(const std::string &str)
 {
-  this->altName = str;
+  this->altNames.push_back(str);
+}
+////////////////////////////////////////////////////////////////////////////////
+void Common::MergeAltNames(Common *common)
+{
+  for (unsigned int i=0; i < common->altNames.size(); i++)
+    this->altNames.push_back(common->altNames[i]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Common::GetAltName() const
+bool Common::HasAltName(const std::string &n) const
 {
-  return this->altName;
+  for (unsigned int i=0; i < this->altNames.size(); i++)
+    if (this->altNames[i] == n)
+      return true;
+  return false; 
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -179,7 +179,7 @@ namespace gazebo
     ///        pose of the parent has changed
     protected: virtual void OnPoseChange() {}
 
-    public: void Print(std::string prefix);
+    public: virtual void Print(std::string prefix);
 
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;

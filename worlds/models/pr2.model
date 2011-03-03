@@ -45,23 +45,61 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/base_v0/base_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/base_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <shader>vertex</shader>
-                <mesh>pr2/base_v0/base.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/base.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>false</turnGravityOff>
-        <selfCollide>true</selfCollide>
+        <selfCollide>false</selfCollide>
     </body:trimesh>
     <joint:hinge name="base_footprint_joint">
         <body1>base_link</body1>
         <body2>base_footprint</body2>
         <anchor>base_link</anchor>
+        <lowStop>0</lowStop>
+        <highStop>0</highStop>
+        <axis>0 0 1</axis>
+        <damping>0</damping>
+    </joint:hinge>
+    <body:box name="base_bellow_link">
+        <massMatrix>true</massMatrix>
+        <mass>1</mass>
+        <ixx>0.01</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.01</iyy>
+        <iyz>0</iyz>
+        <izz>0.01</izz>
+        <cx>0</cx>
+        <cy>0</cy>
+        <cz>0</cz>
+        <xyz>-0.29 0 0.851</xyz>
+        <rpy>0 -0 0</rpy>
+        <geom:box name="base_bellow_link_geom">
+            <xyz>0 0 0</xyz>
+            <rpy>0 -0 0</rpy>
+            <size>0.05 0.37 0.3</size>
+            <genTexCoord>true</genTexCoord>
+            <visual>
+                <xyz>0 0 0</xyz>
+                <rpy>0 -0 0</rpy>
+                <scale>0.05 0.37 0.3</scale>
+                <mesh>unit_box</mesh>
+                <material>PR2/Black</material>
+            </visual>
+        </geom:box>
+        <turnGravityOff>false</turnGravityOff>
+        <selfCollide>false</selfCollide>
+    </body:box>
+    <joint:hinge name="base_bellow_joint">
+        <body1>base_bellow_link</body1>
+        <body2>base_link</body2>
+        <anchor>base_bellow_link</anchor>
         <lowStop>0</lowStop>
         <highStop>0</highStop>
         <axis>0 0 1</axis>
@@ -123,13 +161,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/base_v0/caster_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/caster.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
                 <material>PR2/caster_texture</material>
             </visual>
         </geom:trimesh>
@@ -165,13 +203,12 @@
             <mu2>100</mu2>
             <kp>1e+06</kp>
             <kd>1</kd>
-            <genTexCoord>true</genTexCoord>
+            <genTexCoord>false</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <shader>vertex</shader>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -206,13 +243,12 @@
             <mu2>100</mu2>
             <kp>1e+06</kp>
             <kd>1</kd>
-            <genTexCoord>false</genTexCoord>
+            <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <shader>vertex</shader>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -243,13 +279,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/base_v0/caster_L.stl</mesh>
-            <genTexCoord>true</genTexCoord>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
+            <genTexCoord>false</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/caster.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
                 <material>PR2/caster_texture</material>
             </visual>
         </geom:trimesh>
@@ -290,8 +326,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <shader>vertex</shader>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -331,8 +366,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <shader>vertex</shader>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -363,13 +397,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/base_v0/caster_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/caster.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
                 <material>PR2/caster_texture</material>
             </visual>
         </geom:trimesh>
@@ -410,7 +444,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -450,7 +484,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -481,13 +515,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/base_v0/caster_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/caster.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/caster.stl</mesh>
                 <material>PR2/caster_texture</material>
             </visual>
         </geom:trimesh>
@@ -528,7 +562,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -568,7 +602,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>-90 0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/base_v0/wheel.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/base_v0/wheel.dae</mesh>
             </visual>
         </geom:cylinder>
         <turnGravityOff>false</turnGravityOff>
@@ -599,14 +633,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/torso_v0/torso_lift_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/torso_v0/torso_lift_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <shader>vertex</shader>
-                <mesh>pr2/torso_v0/torso_lift.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/torso_v0/torso_lift.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>false</turnGravityOff>
@@ -623,28 +656,28 @@
     </joint:slider>
     <body:trimesh name="head_pan_link">
         <massMatrix>true</massMatrix>
-        <mass>1.61112</mass>
-        <ixx>0.00482611</ixx>
-        <ixy>-0.000144684</ixy>
-        <ixz>0.000110076</ixz>
-        <iyy>0.00521899</iyy>
-        <iyz>-0.00031424</iyz>
-        <izz>0.00861878</izz>
-        <cx>-0.005717</cx>
-        <cy>0.010312</cy>
-        <cz>-0.029649</cz>
+        <mass>6.339</mass>
+        <ixx>0.0324976</ixx>
+        <ixy>0.000636041</ixy>
+        <ixz>0.00258515</ixz>
+        <iyy>0.0465456</iyy>
+        <iyz>-0.00245343</iyz>
+        <izz>0.0576527</izz>
+        <cx>0.010907</cx>
+        <cy>0.031693</cy>
+        <cz>0.090507</cz>
         <xyz>-0.06707 0 1.17213</xyz>
         <rpy>0 -0 0</rpy>
         <geom:trimesh name="head_pan_link_geom">
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/head_v0/head_pan_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/head_v0/head_pan_L.stl</mesh>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/head_v0/head_pan.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/head_v0/head_pan.dae</mesh>
             </visual>
         </geom:trimesh>
     </body:trimesh>
@@ -659,28 +692,28 @@
     </joint:hinge>
     <body:trimesh name="head_tilt_link">
         <massMatrix>true</massMatrix>
-        <mass>1.74973</mass>
-        <ixx>0.0106023</ixx>
-        <ixy>-0.000408814</ixy>
-        <ixz>0.00198304</ixz>
-        <iyy>0.0118744</iyy>
-        <iyz>0.000197909</iyz>
-        <izz>0.00551679</izz>
-        <cx>0.041935</cx>
-        <cy>0.003569</cy>
-        <cz>0.028143</cz>
+        <mass>4.479</mass>
+        <ixx>0.0242232</ixx>
+        <ixy>0.000620635</ixy>
+        <ixz>-9.69097e-05</ixz>
+        <iyy>0.0547231</iyy>
+        <iyz>0.00279702</iyz>
+        <izz>0.0673064</izz>
+        <cx>0.001716</cx>
+        <cy>-0.019556</cy>
+        <cz>0.055002</cz>
         <xyz>0.00093 0 1.17213</xyz>
         <rpy>0 -0 0</rpy>
         <geom:trimesh name="head_tilt_link_geom">
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/head_v0/head_tilt_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/head_v0/head_tilt_L.stl</mesh>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/head_v0/head_tilt.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/head_v0/head_tilt.dae</mesh>
             </visual>
         </geom:trimesh>
     </body:trimesh>
@@ -715,9 +748,9 @@
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
-                <scale>0.01 0.01 0.01</scale>
+                <scale>0.1 0.01 0.01</scale>
                 <mesh>unit_box</mesh>
-                <material>Gazebo/Grey</material>
+                <material>Gazebo/Blue</material>
             </visual>
         </geom:box>
         <turnGravityOff>false</turnGravityOff>
@@ -732,6 +765,10 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
+
+
+
+
     <body:box name="projector_wg6802418_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
@@ -837,7 +874,7 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
-    <body:box name="double_stereo_link">
+    <body:empty name="double_stereo_link">
         <massMatrix>true</massMatrix>
         <mass>0.1</mass>
         <ixx>0.001</ixx>
@@ -851,18 +888,7 @@
         <cz>0</cz>
         <xyz>0.02413 0 1.23962</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="double_stereo_link_geom">
-            <xyz>-0.01 0 0.025</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.02 0.12 0.05</size>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.02 0.12 0.05</scale>
-                <mesh>unit_box</mesh>
-            </visual>
-        </geom:box>
-    </body:box>
+    </body:empty>
     <joint:hinge name="double_stereo_frame_joint">
         <body1>double_stereo_link</body1>
         <body2>sensor_mount_link</body2>
@@ -911,7 +937,7 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
-    <body:box name="narrow_stereo_gazebo_l_stereo_camera_frame">
+    <body:empty name="narrow_stereo_gazebo_l_stereo_camera_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -925,34 +951,9 @@
         <cz>0</cz>
         <xyz>0.02413 0.06 1.27012</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="narrow_stereo_gazebo_l_stereo_camera_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <genTexCoord>true</genTexCoord>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.01 0.01 0.01</scale>
-                <mesh>unit_box</mesh>
-                <material>PR2/Blue</material>
-            </visual>
-        </geom:box>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-        <sensor:camera name="narrow_stereo_gazebo_l_stereo_camera_sensor">
-          <alwaysActive>false</alwaysActive>
-          <updateRate>25</updateRate>
-          <nearClip>0.1</nearClip>
-          <farClip>100</farClip>
-          <saveFrames>false</saveFrames>
-          <saveFramePath></saveFramePath>
-          <imageSize>640 480</imageSize>
-          <imageFormat>L8</imageFormat>
-          <mask>none</mask>
-          <hfov>45</hfov>
-        </sensor:camera>
-    </body:box>
+    </body:empty>
     <joint:hinge name="narrow_stereo_gazebo_l_stereo_camera_frame_joint">
         <body1>narrow_stereo_gazebo_l_stereo_camera_frame</body1>
         <body2>narrow_stereo_link</body2>
@@ -962,7 +963,7 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
-    <body:box name="narrow_stereo_gazebo_r_stereo_camera_frame">
+    <body:empty name="narrow_stereo_gazebo_r_stereo_camera_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -976,36 +977,9 @@
         <cz>0</cz>
         <xyz>0.02413 -0.03 1.27012</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="narrow_stereo_gazebo_r_stereo_camera_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <genTexCoord>true</genTexCoord>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.01 0.01 0.01</scale>
-                <mesh>unit_box</mesh>
-                <material>PR2/Blue</material>
-            </visual>
-        </geom:box>
-
-        <sensor:camera name="narrow_stereo_gazebo_r_stereo_camera_sensor">
-          <alwaysActive>false</alwaysActive>
-          <updateRate>25</updateRate>
-          <nearClip>0.1</nearClip>
-          <farClip>100</farClip>
-          <saveFrames>0</saveFrames>
-          <saveFramePath></saveFramePath>
-          <imageSize>640 480</imageSize>
-          <imageFormat>L8</imageFormat>
-          <mask>none</mask>
-          <hfov>45</hfov>
-        </sensor:camera>
-
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-    </body:box>
+    </body:empty>
     <joint:hinge name="narrow_stereo_gazebo_r_stereo_camera_frame_joint">
         <body1>narrow_stereo_gazebo_r_stereo_camera_frame</body1>
         <body2>narrow_stereo_gazebo_l_stereo_camera_frame</body2>
@@ -1054,7 +1028,7 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
-    <body:box name="wide_stereo_gazebo_l_stereo_camera_frame">
+    <body:empty name="wide_stereo_gazebo_l_stereo_camera_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -1068,35 +1042,9 @@
         <cz>0</cz>
         <xyz>0.02413 0.03 1.27012</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="wide_stereo_gazebo_l_stereo_camera_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <genTexCoord>true</genTexCoord>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.01 0.01 0.01</scale>
-                <mesh>unit_box</mesh>
-                <material>PR2/Blue</material>
-            </visual>
-        </geom:box>
-        <sensor:camera name="wide_stereo_gazebo_l_stereo_camera_sensor">
-          <alwaysActive>false</alwaysActive>
-          <updateRate>25</updateRate>
-          <nearClip>0.1</nearClip>
-          <farClip>100</farClip>
-          <saveFrames>0</saveFrames>
-          <saveFramePath></saveFramePath>
-          <imageSize>640 480</imageSize>
-          <imageFormat>BAYER_BGGR8</imageFormat>
-          <mask>none</mask>
-          <hfov>90</hfov>
-        </sensor:camera>
-
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-    </body:box>
+    </body:empty>
     <joint:hinge name="wide_stereo_gazebo_l_stereo_camera_frame_joint">
         <body1>wide_stereo_gazebo_l_stereo_camera_frame</body1>
         <body2>wide_stereo_link</body2>
@@ -1106,7 +1054,7 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
-    <body:box name="wide_stereo_gazebo_r_stereo_camera_frame">
+    <body:empty name="wide_stereo_gazebo_r_stereo_camera_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -1120,35 +1068,9 @@
         <cz>0</cz>
         <xyz>0.02413 -0.06 1.27012</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="wide_stereo_gazebo_r_stereo_camera_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <genTexCoord>true</genTexCoord>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.01 0.01 0.01</scale>
-                <mesh>unit_box</mesh>
-                <material>PR2/Blue</material>
-            </visual>
-        </geom:box>
-        <sensor:camera name="wide_stereo_gazebo_r_stereo_camera_sensor">
-          <alwaysActive>false</alwaysActive>
-          <updateRate>25</updateRate>
-          <nearClip>0.1</nearClip>
-          <farClip>100</farClip>
-          <saveFrames>0</saveFrames>
-          <saveFramePath></saveFramePath>
-          <imageSize>640 480</imageSize>
-          <imageFormat>BAYER_BGGR8</imageFormat>
-          <mask>none</mask>
-          <hfov>90</hfov>
-        </sensor:camera>
-
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-    </body:box>
+    </body:empty>
     <joint:hinge name="wide_stereo_gazebo_r_stereo_camera_frame_joint">
         <body1>wide_stereo_gazebo_r_stereo_camera_frame</body1>
         <body2>wide_stereo_gazebo_l_stereo_camera_frame</body2>
@@ -1158,7 +1080,7 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
-    <body:box name="high_def_frame">
+    <body:empty name="high_def_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -1172,35 +1094,9 @@
         <cz>0</cz>
         <xyz>0.02413 -0.109 1.27163</xyz>
         <rpy>0 -0 0</rpy>
-        <geom:box name="high_def_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <genTexCoord>true</genTexCoord>
-            <visual>
-                <xyz>-0.02 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.04 0.04 0.04</scale>
-                <mesh>unit_box</mesh>
-                <material>Gazebo/Black</material>
-            </visual>
-        </geom:box>
-        <sensor:camera name="high_def_sensor">
-          <alwaysActive>false</alwaysActive>
-          <updateRate>20</updateRate>
-          <nearClip>0.1</nearClip>
-          <farClip>100</farClip>
-          <saveFrames>0</saveFrames>
-          <saveFramePath></saveFramePath>
-          <imageSize>2448 2050</imageSize>
-          <imageFormat>R8G8B8</imageFormat>
-          <mask>none</mask>
-          <hfov>45</hfov>
-        </sensor:camera>
-
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
-    </body:box>
+    </body:empty>
     <joint:hinge name="high_def_frame_joint">
         <body1>high_def_frame</body1>
         <body2>sensor_mount_link</body2>
@@ -1210,7 +1106,7 @@
         <axis>0 0 1</axis>
         <damping>0</damping>
     </joint:hinge>
-    <body:box name="high_def_optical_frame">
+    <body:empty name="high_def_optical_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -1224,18 +1120,7 @@
         <cz>0</cz>
         <xyz>0.02413 -0.109 1.27163</xyz>
         <rpy>-90 -0 -90</rpy>
-        <geom:box name="high_def_optical_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 90</rpy>
-                <scale>0.04 0.04 0.05</scale>
-                <mesh>unit_cylinder</mesh>
-            </visual>
-        </geom:box>
-    </body:box>
+    </body:empty>
     <joint:hinge name="high_def_optical_frame_joint">
         <body1>high_def_optical_frame</body1>
         <body2>high_def_frame</body2>
@@ -1298,13 +1183,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/shoulder_v0/shoulder_pan.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/shoulder_v0/shoulder_pan.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1340,13 +1225,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/shoulder_v0/shoulder_lift.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/shoulder_v0/shoulder_lift.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1382,13 +1267,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/shoulder_v0/upper_arm_roll_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/shoulder_v0/upper_arm_roll.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll.stl</mesh>
                 <material>PR2/RollLinks</material>
             </visual>
         </geom:trimesh>
@@ -1426,13 +1311,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/upper_arm_v0/upper_arm.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/upper_arm_v0/upper_arm.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1465,13 +1350,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/upper_arm_v0/elbow_flex.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/upper_arm_v0/elbow_flex.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1508,13 +1393,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/upper_arm_v0/forearm_roll_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/upper_arm_v0/forearm_roll.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll.stl</mesh>
                 <material>PR2/RollLinks</material>
             </visual>
         </geom:trimesh>
@@ -1530,7 +1415,7 @@
         <fudgeFactor>0.5</fudgeFactor>
         <provideFeedback>false</provideFeedback>
     </joint:hinge>
-    <body:box name="l_forearm_cam_frame">
+    <body:empty name="l_forearm_cam_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -1544,36 +1429,9 @@
         <cz>0</cz>
         <xyz>0.585 0.188 0.834675</xyz>
         <rpy>-90 -32.25 0</rpy>
-        <geom:box name="l_forearm_cam_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <genTexCoord>true</genTexCoord>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.01 0.01 0.01</scale>
-                <mesh>unit_box</mesh>
-                <material>PR2/Blue</material>
-            </visual>
-        </geom:box>
-
-        <sensor:camera name="l_forearm_cam_sensor">
-          <alwaysActive>false</alwaysActive>
-          <updateRate>25</updateRate>
-          <nearClip>0.1</nearClip>
-          <farClip>100</farClip>
-          <saveFrames>0</saveFrames>
-          <saveFramePath></saveFramePath>
-          <imageSize>640 480</imageSize>
-          <imageFormat>L8</imageFormat>
-          <mask>none</mask>
-          <hfov>90</hfov>
-        </sensor:camera>
-
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-    </body:box>
+    </body:empty>
     <joint:hinge name="l_forearm_cam_frame_joint">
         <body1>l_forearm_cam_frame</body1>
         <body2>l_forearm_roll_link</body2>
@@ -1601,13 +1459,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/forearm_v0/forearm.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/forearm.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/forearm_v0/forearm.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/forearm.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1640,13 +1498,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/forearm_v0/wrist_flex.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/forearm_v0/wrist_flex.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1658,7 +1516,7 @@
         <anchor>l_wrist_flex_link</anchor>
         <axis>0 1 0</axis>
         <damping>0.1</damping>
-        <lowStop>-119.977</lowStop>
+        <lowStop>-124.905</lowStop>
         <highStop>0</highStop>
         <stopKp>1e+06</stopKp>
         <stopKd>1</stopKd>
@@ -1682,13 +1540,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/forearm_v0/wrist_roll_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/forearm_v0/wrist_roll.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll.stl</mesh>
                 <material>PR2/RollLinks</material>
             </visual>
         </geom:trimesh>
@@ -1722,13 +1580,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/gripper_palm.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/gripper_palm.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1761,7 +1619,7 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+06</kp>
@@ -1771,12 +1629,12 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-            </body:trimesh>
+    </body:trimesh>
     <joint:hinge name="l_gripper_l_finger_joint">
         <body1>l_gripper_l_finger_link</body1>
         <body2>l_gripper_palm_link</body2>
@@ -1808,7 +1666,7 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+07</kp>
@@ -1818,7 +1676,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1890,7 +1748,7 @@
             <xyz>0 0 0</xyz>
             <rpy>-180 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+06</kp>
@@ -1900,7 +1758,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1937,7 +1795,7 @@
             <xyz>0 0 0</xyz>
             <rpy>-180 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+07</kp>
@@ -1947,7 +1805,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -1965,6 +1823,30 @@
         <stopKd>1</stopKd>
         <fudgeFactor>1</fudgeFactor>
         <provideFeedback>true</provideFeedback>
+    </joint:hinge>
+    <body:empty name="l_torso_lift_side_plate_link">
+        <massMatrix>true</massMatrix>
+        <mass>0.1</mass>
+        <ixx>0.001</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.001</iyy>
+        <iyz>0</iyz>
+        <izz>0.001</izz>
+        <cx>-0.0625</cx>
+        <cy>0</cy>
+        <cz>0.05</cz>
+        <xyz>0.0035 -0.209285 0.9673</xyz>
+        <rpy>0 -0 0</rpy>
+    </body:empty>
+    <joint:hinge name="l_torso_lift_side_plate_joint">
+        <body1>l_torso_lift_side_plate_link</body1>
+        <body2>torso_lift_link</body2>
+        <anchor>l_torso_lift_side_plate_link</anchor>
+        <lowStop>0</lowStop>
+        <highStop>0</highStop>
+        <axis>0 0 1</axis>
+        <damping>0</damping>
     </joint:hinge>
     <body:trimesh name="laser_tilt_mount_link">
         <massMatrix>true</massMatrix>
@@ -1984,13 +1866,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/tilting_laser_v0/tilting_hokuyo_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/tilting_laser_v0/tilting_hokuyo_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/tilting_laser_v0/tilting_hokuyo.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/tilting_laser_v0/tilting_hokuyo.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>false</turnGravityOff>
@@ -2033,7 +1915,7 @@
         </geom:box>
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
-            </body:box>
+    </body:box>
     <joint:hinge name="laser_tilt_joint">
         <body1>laser_tilt_link</body1>
         <body2>laser_tilt_mount_link</body2>
@@ -2061,13 +1943,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/shoulder_v0/shoulder_pan.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/shoulder_v0/shoulder_pan.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_pan.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2103,13 +1985,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/shoulder_v0/shoulder_lift.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/shoulder_v0/shoulder_lift.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/shoulder_lift.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2145,13 +2027,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/shoulder_v0/upper_arm_roll_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/shoulder_v0/upper_arm_roll.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/shoulder_v0/upper_arm_roll.stl</mesh>
                 <material>PR2/RollLinks</material>
             </visual>
         </geom:trimesh>
@@ -2189,13 +2071,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/upper_arm_v0/upper_arm.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/upper_arm_v0/upper_arm.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/upper_arm.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2228,13 +2110,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/upper_arm_v0/elbow_flex.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/upper_arm_v0/elbow_flex.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/elbow_flex.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2271,13 +2153,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/upper_arm_v0/forearm_roll_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/upper_arm_v0/forearm_roll.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/upper_arm_v0/forearm_roll.stl</mesh>
                 <material>PR2/RollLinks</material>
             </visual>
         </geom:trimesh>
@@ -2293,7 +2175,7 @@
         <fudgeFactor>0.5</fudgeFactor>
         <provideFeedback>false</provideFeedback>
     </joint:hinge>
-    <body:box name="r_forearm_cam_frame">
+    <body:empty name="r_forearm_cam_frame">
         <massMatrix>true</massMatrix>
         <mass>0.01</mass>
         <ixx>0.001</ixx>
@@ -2307,37 +2189,9 @@
         <cz>0</cz>
         <xyz>0.585 -0.188 0.834675</xyz>
         <rpy>90 -32.25 0</rpy>
-        <geom:box name="r_forearm_cam_frame_geom">
-            <xyz>0 0 0</xyz>
-            <rpy>0 -0 0</rpy>
-            <size>0.01 0.01 0.01</size>
-            <genTexCoord>true</genTexCoord>
-            <visual>
-                <xyz>0 0 0</xyz>
-                <rpy>0 -0 0</rpy>
-                <scale>0.01 0.01 0.01</scale>
-                <mesh>unit_box</mesh>
-                <material>PR2/Blue</material>
-            </visual>
-        </geom:box>
-
-        <sensor:camera name="r_forearm_cam_sensor">
-          <alwaysActive>false</alwaysActive>
-          <updateRate>25</updateRate>
-          <nearClip>0.1</nearClip>
-          <farClip>100</farClip>
-          <saveFrames>0</saveFrames>
-          <saveFramePath></saveFramePath>
-          <imageSize>640 480</imageSize>
-          <imageFormat>L8</imageFormat>
-          <mask>none</mask>
-          <hfov>90</hfov>
-          <alwaysActive>false</alwaysActive>
-        </sensor:camera>
-
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-    </body:box>
+    </body:empty>
     <joint:hinge name="r_forearm_cam_frame_joint">
         <body1>r_forearm_cam_frame</body1>
         <body2>r_forearm_roll_link</body2>
@@ -2365,13 +2219,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/forearm_v0/forearm.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/forearm.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/forearm_v0/forearm.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/forearm.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2404,13 +2258,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/forearm_v0/wrist_flex.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/forearm_v0/wrist_flex.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_flex.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2422,7 +2276,7 @@
         <anchor>r_wrist_flex_link</anchor>
         <axis>0 1 0</axis>
         <damping>0.1</damping>
-        <lowStop>-119.977</lowStop>
+        <lowStop>-124.905</lowStop>
         <highStop>0</highStop>
         <stopKp>1e+06</stopKp>
         <stopKd>1</stopKd>
@@ -2446,13 +2300,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/forearm_v0/wrist_roll_L.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll_L.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/forearm_v0/wrist_roll.stl</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/forearm_v0/wrist_roll.stl</mesh>
                 <material>PR2/RollLinks</material>
             </visual>
         </geom:trimesh>
@@ -2486,13 +2340,13 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/gripper_palm.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.stl</mesh>
             <genTexCoord>true</genTexCoord>
             <visual>
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/gripper_palm.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/gripper_palm.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2525,7 +2379,7 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+06</kp>
@@ -2535,12 +2389,12 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-            </body:trimesh>
+    </body:trimesh>
     <joint:hinge name="r_gripper_l_finger_joint">
         <body1>r_gripper_l_finger_link</body1>
         <body2>r_gripper_palm_link</body2>
@@ -2572,7 +2426,7 @@
             <xyz>0 0 0</xyz>
             <rpy>0 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+07</kp>
@@ -2582,12 +2436,12 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
-            </body:trimesh>
+    </body:trimesh>
     <joint:hinge name="r_gripper_l_finger_tip_joint">
         <body1>r_gripper_l_finger_tip_link</body1>
         <body2>r_gripper_l_finger_link</body2>
@@ -2654,7 +2508,7 @@
             <xyz>0 0 0</xyz>
             <rpy>-180 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+06</kp>
@@ -2664,7 +2518,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2701,7 +2555,7 @@
             <xyz>0 0 0</xyz>
             <rpy>-180 -0 0</rpy>
             <scale>1 1 1</scale>
-            <mesh>pr2/gripper_v0/l_finger_tip.stl</mesh>
+            <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.stl</mesh>
             <mu1>500</mu1>
             <mu2>500</mu2>
             <kp>1e+07</kp>
@@ -2711,7 +2565,7 @@
                 <xyz>0 0 0</xyz>
                 <rpy>0 -0 0</rpy>
                 <scale>1 1 1</scale>
-                <mesh>pr2/gripper_v0/l_finger_tip.dae</mesh>
+                <mesh>/u/nkoenig/ros/pr2_common/pr2_description/meshes/gripper_v0/l_finger_tip.dae</mesh>
             </visual>
         </geom:trimesh>
         <turnGravityOff>true</turnGravityOff>
@@ -2729,6 +2583,30 @@
         <stopKd>1</stopKd>
         <fudgeFactor>1</fudgeFactor>
         <provideFeedback>true</provideFeedback>
+    </joint:hinge>
+    <body:empty name="r_torso_lift_side_plate_link">
+        <massMatrix>true</massMatrix>
+        <mass>0.1</mass>
+        <ixx>0.001</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.001</iyy>
+        <iyz>0</iyz>
+        <izz>0.001</izz>
+        <cx>-0.0625</cx>
+        <cy>0</cy>
+        <cz>0.05</cz>
+        <xyz>0.0035 0.209285 0.9673</xyz>
+        <rpy>0 -0 0</rpy>
+    </body:empty>
+    <joint:hinge name="r_torso_lift_side_plate_joint">
+        <body1>r_torso_lift_side_plate_link</body1>
+        <body2>torso_lift_link</body2>
+        <anchor>r_torso_lift_side_plate_link</anchor>
+        <lowStop>0</lowStop>
+        <highStop>0</highStop>
+        <axis>0 0 1</axis>
+        <damping>0</damping>
     </joint:hinge>
     <static>false</static>
     <canonicalBody>base_footprint</canonicalBody>

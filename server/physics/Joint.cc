@@ -251,8 +251,9 @@ void Joint::Update()
   //TODO: Evaluate impact of this code on performance
   if (this->visual && this->visual->GetVisible())
   {
+    Body *a = this->model->GetBody( **this->anchorBodyNameP );
     this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + 
-        this->anchorBody->GetWorldPose()).pos;
+        a->GetWorldPose()).pos;
     Pose3d off;
     if (this->model->GetGeom(**(this->anchorBodyNameP)))
     {

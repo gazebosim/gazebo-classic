@@ -167,10 +167,10 @@ namespace gazebo
     protected: Type type;
 
     /// The first body this joint connects to
-    protected: Body *body1;
+    public: Body *body1;
 
     /// The second body this joint connects to
-    protected: Body *body2;
+    public: Body *body2;
 
     /// Name of this joint
     protected: ParamT<double> *erpP;
@@ -184,7 +184,7 @@ namespace gazebo
 
     protected: ParamT<std::string> *body1NameP;
     protected: ParamT<std::string> *body2NameP;
-    protected: ParamT<std::string> *anchorBodyNameP;
+    public: ParamT<std::string> *anchorBodyNameP;
     protected: ParamT<Vector3> *anchorOffsetP;
     protected: ParamT<bool> *provideFeedbackP;
     protected: ParamT<double> *fudgeFactorP;
@@ -196,8 +196,8 @@ namespace gazebo
     protected: OgreDynamicLines *line1;
     protected: OgreDynamicLines *line2;
     protected: PhysicsEngine *physics;
-    protected: Vector3 anchorPos;
-    protected: Body *anchorBody;
+    public: Vector3 anchorPos;
+    public: Body *anchorBody;
 
     protected: boost::signal<void ()> jointUpdateSignal;
 

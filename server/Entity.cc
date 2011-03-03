@@ -333,7 +333,8 @@ std::string Entity::GetCompleteScopedName() const
 // TODO: THIS IS A HACK AND SHOULD BE REMOVED
 std::string Entity::GetCompleteScopedAltName() const
 {
-  Entity *p = this->parent;
+  gzthrow("This is bad\n");
+  /*Entity *p = this->parent;
   std::string scopedName = this->GetAltName();
 
   while (p)
@@ -343,6 +344,8 @@ std::string Entity::GetCompleteScopedAltName() const
   }
 
   return scopedName;
+  */
+  return std::string();
 }
 
 
@@ -533,7 +536,10 @@ std::string Entity::GetTypeString() const
 void Entity::Print(std::string prefix)
 {
   std::vector<Entity*>::iterator iter;
-  std::cout << prefix << this->GetName() << "\n";
+  std::cout << prefix << "Name[" << this->GetName() << "] Alt[";
+  for (unsigned int i=0; i < this->altNames.size(); i++)
+    std::cout << this->altNames[i] << ", ";
+  std::cout << "]\n";
 
   prefix += "  ";
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
