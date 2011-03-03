@@ -417,7 +417,7 @@ void BulletBody::SetAngularDamping(double damping)
 /// Set the relative pose of a child geom.
 void BulletBody::SetGeomRelativePose(BulletGeom *geom, const Pose3d &newPose)
 {
-  std::map<std::string, Geom*>::iterator iter;
+  /*std::map<std::string, Geom*>::iterator iter;
   unsigned int i;
 
   for (iter=this->geoms.begin(), i=0; iter != this->geoms.end(); iter++, i++)
@@ -432,4 +432,5 @@ void BulletBody::SetGeomRelativePose(BulletGeom *geom, const Pose3d &newPose)
     this->compoundShape->updateChildTransform(i, 
         BulletPhysics::ConvertPose(newPose));
   }
+  */
 }
