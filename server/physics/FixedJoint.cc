@@ -1,3 +1,4 @@
+#include "Sensor.hh"
 #include "Model.hh"
 #include "Body.hh"
 #include "OgreVisual.hh"
@@ -70,6 +71,10 @@ void FixedJoint::Load(XMLConfigNode *node)
   for (iter = sensors.begin(); iter != sensors.end(); iter++)
   {
     keepBody->AddSensor(*iter);
+    (*iter)->SetBody(keepBody);
+    (*iter)->SetParent(keepBody);
+    keepBody->AddChild(*iter);
+    delBody->RemoveChild(*iter);
   }
   delBody->ClearSensors();
 
@@ -77,7 +82,6 @@ void FixedJoint::Load(XMLConfigNode *node)
 
   Pose3d origCoM = keepBody->GetCoMEntity()->GetRelativePose();
   delBody->RemoveFromPhysics();
-
 
   while (delBody->GetGeomCount() > 0)
   {
@@ -92,7 +96,7 @@ void FixedJoint::Load(XMLConfigNode *node)
 
     delBody->GetCoMEntity()->RemoveChild(g);
     
-    g->SetName(delBody->GetName());
+    g->AddAltName(delBody->GetName());
     keepBody->GetCoMEntity()->AddChild(g);
 
     g->SetParent(keepBody->GetCoMEntity());

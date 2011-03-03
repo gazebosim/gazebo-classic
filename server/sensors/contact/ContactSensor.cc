@@ -99,6 +99,15 @@ void ContactSensor::InitChild()
   {
     // Get the geom from the body
     Geom *geom = this->body->GetGeom( **(*iter) );
+    if (!geom)
+    {
+      std::cerr << "Unable to find geom[" << **(*iter) << "] inbody[" 
+                << this->body->GetName() << "]\n";
+      for (unsigned int i=0; i < this->body->GetGeomCount(); i++)
+      {
+        std::cerr << "Geom[" << this->body->GetGeom(i)->GetName() << "]\n";
+      }
+    }
     geom->SetContactsEnabled(true);
     this->geoms.push_back(geom);
   }

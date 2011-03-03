@@ -64,12 +64,13 @@
     </include>
   </model:physical>
 
-  <model:physical name="pr2-B">
+  <!--  <model:physical name="pr2-B">
     <xyz>0 1 0</xyz>
     <include embedded="true">
       <xi:include href="models/pr2.model"/>
     </include>
   </model:physical>
+  -->
  
   <!-- White Point light -->
   <model:renderable name="point_white">

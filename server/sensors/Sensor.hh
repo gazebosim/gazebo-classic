@@ -56,6 +56,8 @@ namespace gazebo
     /// \param node XMLConfigNode pointer
     public: virtual void Load(XMLConfigNode *node);
 
+    public: void SetBody( Body *b );
+
     /// \brief Save the sensor info in XML format
     public: void Save(std::string &prefix, std::ostream &stream);
 
