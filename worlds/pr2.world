@@ -60,7 +60,7 @@
 
   <model:physical name="pr2">
     <include embedded="true">
-      <xi:include href="models/pr2_fixed_nosensors.model"/>
+      <xi:include href="models/pr2_fixed.model"/>
     </include>
   </model:physical>
 

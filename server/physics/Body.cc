@@ -756,3 +756,12 @@ void Body::SetMass(Mass mass)
 }
 
 
+void Body::AddSensor( Sensor *sensor )
+{
+  this->sensors.push_back(sensor);
+}
+
+void Body::ClearSensors( )
+{
+  this->sensors.clear();
+}
