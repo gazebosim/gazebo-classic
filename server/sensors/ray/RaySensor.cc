@@ -201,3 +201,11 @@ void RaySensor::UpdateChild()
   if (this->active || (**this->alwaysActiveP))
     this->laserShape->Update();
 }
+
+void RaySensor::SetBody( Body *b )
+{
+  Sensor::SetBody(b);
+  this->laserGeom->GetParent()->RemoveChild(this->laserGeom);
+  this->laserGeom->SetParent(b);
+  this->laserShape->SetBody(b);
+}

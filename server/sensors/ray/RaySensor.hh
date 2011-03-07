@@ -131,6 +131,8 @@ namespace gazebo
     /// \brief Get detected fiducial value for a ray.
     public: int GetFiducial(int index);   
   
+    public: virtual void SetBody( Body *b );
+
     private: Pose3d prevPose;
     private: Geom *laserGeom;
     private: MultiRayShape *laserShape;

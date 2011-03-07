@@ -138,6 +138,8 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
   }
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the geom
 void ODEMultiRayShape::AddRay(const Vector3 &start, const Vector3 &end )

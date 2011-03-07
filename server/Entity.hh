@@ -68,7 +68,10 @@ namespace gazebo
     /// \brief Set the parent
     /// \param parent Parent entity
     public: void SetParent(Entity *parent);
-  
+
+    // Get all children
+    public: const std::vector< Entity* > &GetChildren() const;
+
     /// \brief Get the parent
     /// \return Pointer to the parent entity
     public: Entity *GetParent() const;
@@ -83,7 +86,7 @@ namespace gazebo
   
     /// \brief Get all children
     /// \return Vector of children entities
-    public: const std::vector< Entity* >  &GetChildren() const;
+
 
     /// \brief Get the number of children
     public: unsigned int GetChildCount() const;

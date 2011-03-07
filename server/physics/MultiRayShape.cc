@@ -1,3 +1,4 @@
+#include "Body.hh"
 #include "XMLConfig.hh"
 #include "MultiRayShape.hh"
 
@@ -82,6 +83,7 @@ MultiRayShape::~MultiRayShape()
 // Load a multi-ray shape from xml file
 void MultiRayShape::Load(XMLConfigNode *node)
 {
+  this->rays.clear();
   this->rayCountP->Load(node);
   this->rangeCountP->Load(node);
   this->minAngleP->Load(node);
@@ -353,3 +355,12 @@ Angle MultiRayShape::GetVerticalMaxAngle() const
   return **this->verticalMaxAngleP;
 }
 
+void MultiRayShape::SetBody(Body *b)
+{
+  for (unsigned int i=0; i < this->rays.size(); i++)
+  {
+    this->rays[i]->parent->GetParent()->RemoveChild( this->rays[i]->parent );
+    this->rays[i]->parent->SetParent(b);
+    this->rays[i]->parent->SetBody(b);
+  }
+}

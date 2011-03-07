@@ -36,7 +36,7 @@ namespace gazebo
 
     public: Shape::Type GetType() const;
 
-    protected: Geom *parent;
+    public: Geom *parent;
     protected: Type type;
     protected: PhysicsEngine *physicsEngine;
   };

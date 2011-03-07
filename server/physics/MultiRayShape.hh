@@ -87,6 +87,8 @@ namespace gazebo
     /// \brief Update the geom
     public: void Update();
   
+    public: void SetBody( Body *b );
+
      /// \brief Physics engine specific method for updating the rays
     protected: virtual void UpdateRays() = 0;
   

@@ -60,8 +60,7 @@ void ODERayShape::Update()
 
   Vector3 dir;
 
-  this->globalStartPos = this->parent->GetBody()->GetWorldPose().CoordPositionAdd(
-      this->relativeStartPos);
+  this->globalStartPos = this->parent->GetBody()->GetWorldPose().CoordPositionAdd( this->relativeStartPos);
   this->globalEndPos = this->parent->GetBody()->GetWorldPose().CoordPositionAdd(
       this->relativeEndPos);
 
