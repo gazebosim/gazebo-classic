@@ -179,7 +179,10 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   }
 
   // Set default mipmap level (NB some APIs ignore this)
-  Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
+  if (Ogre::TextureManager::getSingletonPtr())
+    Ogre::TextureManager::getSingleton().setDefaultNumMipmaps( 5 );
+  else
+    gzthrow("Ogre TextureManager initialization failed.  Please double check your world file or glx support from your gpu / gpu driver, thank you.\n");
 
   // Get the SceneManager, in this case a generic one
   if (node && node->GetChild("bsp"))
