@@ -1032,12 +1032,9 @@ Geom *Model::GetGeom(const std::string &name) const
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    //if (*biter && (*biter)->GetType() == Entity::BODY)
-    //{
-      Body *body = (Body*)*biter;
-      if ((geom = body->GetGeom(name)) != NULL)
-        break;
-    //}
+    Body *body = (Body*)*biter;
+    if ((geom = body->GetGeom(name)) != NULL)
+      break;
   }
 
   return geom;

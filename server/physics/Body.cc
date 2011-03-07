@@ -681,7 +681,7 @@ Geom *Body::GetGeom(const std::string &name) const
   std::vector<Geom*>::const_iterator iter;
 
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
-    if ((*iter)->GetName() == name)
+    if ((*iter)->GetName() == name || (*iter)->HasAltName(name))
       return (*iter);
   return NULL;
 }

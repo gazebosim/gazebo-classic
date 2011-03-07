@@ -66,13 +66,29 @@ void FixedJoint::Load(XMLConfigNode *node)
     this->body2 = NULL;
   }
 
+
+  bool test = false;
+  if (delBody->GetName() == "narrow_stereo_gazebo_l_stereo_camera_frame")
+  {
+    std::cerr << "\n\n DEL Narrow Stereo \n\n";
+    test = true;
+  }
+
   std::vector<Sensor*>::iterator iter;
   std::vector<Sensor*> sensors = delBody->GetSensors();
   for (iter = sensors.begin(); iter != sensors.end(); iter++)
   {
+    Pose3d p = delBody->GetRelativePose() - keepBody->GetRelativePose();
+
+    if (test)
+    {
+      std::cout << "Sensor Pose[" << (*iter)->GetRelativePose() << "] Parent[" << (*iter)->GetParent()->GetName() << "] DelBody[" << delBody->GetName() << "] Pose[" << p << "]";
+    }
+
     keepBody->AddSensor(*iter);
     (*iter)->SetBody(keepBody);
     (*iter)->SetParent(keepBody);
+    (*iter)->SetRelativePose(p);
     keepBody->AddChild(*iter);
     delBody->RemoveChild(*iter);
   }
@@ -82,7 +98,6 @@ void FixedJoint::Load(XMLConfigNode *node)
 
   Pose3d origCoM = keepBody->GetCoMEntity()->GetRelativePose();
   delBody->RemoveFromPhysics();
-
   while (delBody->GetGeomCount() > 0)
   {
     Geom *g = delBody->GetGeom(0);
@@ -99,6 +114,7 @@ void FixedJoint::Load(XMLConfigNode *node)
     g->AddAltName(delBody->GetName());
     keepBody->GetCoMEntity()->AddChild(g);
 
+    std::cerr << "Geom[" << g->GetName() << "] Pose[" << geom_pose << "]\n";
     g->SetParent(keepBody->GetCoMEntity());
     g->SetRelativePose( geom_pose );
     g->SetBody(keepBody);
