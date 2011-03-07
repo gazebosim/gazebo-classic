@@ -67,6 +67,27 @@ std::string Common::GetName() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void Common::AddAltName(const std::string &str)
+{
+  this->altNames.push_back(str);
+}
+////////////////////////////////////////////////////////////////////////////////
+void Common::MergeAltNames(Common *common)
+{
+  for (unsigned int i=0; i < common->altNames.size(); i++)
+    this->altNames.push_back(common->altNames[i]);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool Common::HasAltName(const std::string &n) const
+{
+  for (unsigned int i=0; i < this->altNames.size(); i++)
+    if (this->altNames[i] == n)
+      return true;
+  return false; 
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// Get the count of the parameters
 unsigned int Common::GetParamCount() const
 {

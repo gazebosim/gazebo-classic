@@ -363,6 +363,11 @@ void Geom::ShowJoints(bool show)
   }
 }
 
+void Geom::SetBody(Body *b)
+{
+  this->body = b;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the visibility of the physical entity of this geom
 void Geom::ShowPhysics(bool show)

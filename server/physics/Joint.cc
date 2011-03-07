@@ -143,14 +143,23 @@ void Joint::Load(XMLConfigNode *node)
   }
 
   if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
-    gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
+    gzthrow("Couldn't Find Body:" + node->GetString("body1","",1));
 
   if (!this->body2 && this->body2NameP->GetValue() != std::string("world"))
-    gzthrow("Couldn't Find Body[" + node->GetString("body2","",1));
+    gzthrow("Couldn't Find Body:" + node->GetString("body2","",1));
 
   // setting anchor relative to gazebo body frame origin
   if (this->anchorBody)
-      this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + this->anchorBody->GetWorldPose()).pos;
+  {
+    this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + 
+        this->anchorBody->GetWorldPose()).pos;
+
+    if (this->model->GetGeom(**(this->anchorBodyNameP)))
+    {
+      Pose3d off = this->model->GetGeom(**(this->anchorBodyNameP))->GetRelativePose();
+      this->anchorPos += off.pos;
+    }
+  }
 
   this->Attach(this->body1, this->body2);
 
@@ -242,15 +251,22 @@ void Joint::Update()
   //TODO: Evaluate impact of this code on performance
   if (this->visual && this->visual->GetVisible())
   {
-    if (this->GetName() == "left_paddle_joint")
-      std::cout << "Joint[" << this->GetName() << "] Angle[" << this->GetAngle(0) << "]\n";
+    Body *a = this->model->GetBody( **this->anchorBodyNameP );
     this->anchorPos = (Pose3d(**(this->anchorOffsetP),Quatern()) + 
-        this->anchorBody->GetWorldPose()).pos;
+        a->GetWorldPose()).pos;
+    Pose3d off;
+    if (this->model->GetGeom(**(this->anchorBodyNameP)))
+    {
+      Body *b = this->model->GetBody(**(this->anchorBodyNameP));
+      off = this->model->GetGeom(**(this->anchorBodyNameP))->GetRelativePose();
+      off.pos = b->GetWorldPose().rot.RotateVector(off.pos);
+      this->anchorPos += off.pos;
+    }
 
     this->visual->SetPosition(this->anchorPos);
 
     if (this->body1) 
-      this->line1->SetPoint(1, this->body1->GetWorldPose().pos - this->anchorPos);
+      this->line1->SetPoint(1, this->body1->GetWorldPose().pos + off.pos - this->anchorPos);
 
     if (this->body2)
       this->line2->SetPoint(1, this->body2->GetWorldPose().pos - this->anchorPos);

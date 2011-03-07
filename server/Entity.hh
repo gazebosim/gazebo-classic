@@ -179,7 +179,7 @@ namespace gazebo
     ///        pose of the parent has changed
     protected: virtual void OnPoseChange() {}
 
-    public: void Print(std::string prefix);
+    public: virtual void Print(std::string prefix);
 
     /// \brief Returns true if the entities are the same. Checks only the name
     public: bool operator==(const Entity &ent) const;
@@ -195,6 +195,9 @@ namespace gazebo
     /// \brief Return the name of this entity with the model+body+geom scope
     ///        model1::...::modelN::bodyN::entityName
     public: std::string GetCompleteScopedName() const;
+
+    // TODO: THIS IS A HACK AND SHOULD BE REMOVED
+    public: std::string GetCompleteScopedAltName() const;
 
     /// \brief Set the type of this entity
     public: void SetType(Type type);

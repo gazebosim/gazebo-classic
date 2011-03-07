@@ -103,8 +103,7 @@ Body::Body(Entity *parent)
 // Destructor
 Body::~Body()
 {
-
-  std::map< std::string, Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
 
@@ -115,8 +114,7 @@ Body::~Body()
   }
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    if (giter->second)
-      delete giter->second;
+    delete (*giter);
   this->geoms.clear();
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
@@ -125,7 +123,6 @@ Body::~Body()
   if (this->comEntity)
     delete this->comEntity;
   this->comEntity = NULL;
-
 
   delete this->xyzP;
   delete this->rpyP;
@@ -226,7 +223,7 @@ void Body::Load(XMLConfigNode *node)
 // Save the body based on our XMLConfig node
 void Body::Save(std::string &prefix, std::ostream &stream)
 {
-  std::map<std::string, Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
   std::vector< Sensor* >::iterator siter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
@@ -241,7 +238,7 @@ void Body::Save(std::string &prefix, std::ostream &stream)
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
     stream << "\n";
-    giter->second->Save(p, stream);
+    (*giter)->Save(p, stream);
   }
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
@@ -259,24 +256,24 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 void Body::Fini()
 {
   std::vector< Sensor* >::iterator siter;
-  std::map< std::string, Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     (*siter)->Fini();
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
-    giter->second->Fini();
+    (*giter)->Fini();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the friction mode of the body
 void Body::SetFrictionMode( const bool &v )
 {
-  std::map< std::string, Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    giter->second->SetFrictionMode( v );
+    (*giter)->SetFrictionMode( v );
   }
 }
 
@@ -284,7 +281,7 @@ void Body::SetFrictionMode( const bool &v )
 /// Set the collide mode of the body
 void Body::SetCollideMode( const std::string &m )
 {
-  std::map< std::string, Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
 
   unsigned int collideBits;
 
@@ -304,8 +301,8 @@ void Body::SetCollideMode( const std::string &m )
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    giter->second->SetCategoryBits(collideBits);
-    giter->second->SetCollideBits(collideBits);
+    (*giter)->SetCategoryBits(collideBits);
+    (*giter)->SetCollideBits(collideBits);
   }
 }
 
@@ -320,11 +317,11 @@ bool Body::GetSelfCollide()
 /// Set the laser fiducial integer id of this body
 void Body::SetLaserFiducialId(int id)
 {
-  std::map< std::string, Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    giter->second->SetLaserFiducialId( id );
+    (*giter)->SetLaserFiducialId( id );
   }
 
 }
@@ -334,11 +331,11 @@ void Body::SetLaserFiducialId(int id)
 /// Set the laser retro reflectiveness of this body
 void Body::SetLaserRetro(float retro)
 {
-  std::map< std::string, Geom* >::iterator giter;
+  std::vector< Geom* >::iterator giter;
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
   {
-    giter->second->SetLaserRetro( retro );
+    (*giter)->SetLaserRetro( retro );
   }
 
 }
@@ -388,7 +385,7 @@ void Body::Init()
       this->cgVisual->SetCastShadows(false);
       this->cgVisual->AttachAxes();
 
-      std::map< std::string, Geom* >::iterator giter;
+      std::vector< Geom* >::iterator giter;
 
       // Create a line to each geom
       for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
@@ -397,7 +394,7 @@ void Body::Init()
         line->setMaterial("Gazebo/GreenEmissive");
         this->cgVisual->AttachObject(line);
         line->AddPoint(Vector3(0,0,0));
-        line->AddPoint(giter->second->GetRelativePose().pos);
+        line->AddPoint((*giter)->GetRelativePose().pos);
       }
 
       this->cgVisual->SetVisible(false);
@@ -413,7 +410,7 @@ void Body::Update()
 {
   //DiagnosticTimer timer("Body[" + this->GetName() +"] Update");
   
-  std::map< std::string, Geom* >::iterator geomIter;
+  std::vector< Geom* >::iterator geomIter;
   Vector3 vel;
   Vector3 avel;
 
@@ -434,12 +431,12 @@ void Body::Update()
     //DiagnosticTimer timer("Body[" + this->GetName() +"] Update Geoms");
 
     for (geomIter=this->geoms.begin();
-        geomIter!=this->geoms.end(); geomIter++)
+         geomIter!=this->geoms.end(); geomIter++)
     {
 #ifdef USE_THREADPOOL
-      World::Instance()->threadPool->schedule(boost::bind(&Geom::Update, (geomIter->second)));
+      World::Instance()->threadPool->schedule(boost::bind(&Geom::Update, (*geomIter)));
 #else
-      geomIter->second->Update();
+      (*geomIter)->Update();
 #endif
     }
   }
@@ -449,39 +446,37 @@ void Body::Update()
 // Attach a geom to this body
 void Body::AttachGeom( Geom *geom )
 {
-  std::map<std::string, Geom*>::iterator iter;
-  iter = this->geoms.find(geom->GetName());
+  Geom *g = this->GetGeom(geom->GetName());
 
-  if (iter == this->geoms.end())
+  if (g)
+    gzthrow("Attempting to add two geoms with the same name[" << geom->GetName() << "] to body[" << this->GetName() << "].");
+
+  this->geoms.push_back(geom);
+
+  if (!**this->customMassMatrixP)
   {
-    this->geoms[geom->GetName()] = geom;
-
-    if (!**this->customMassMatrixP)
-    {
-      Mass tmpMass = geom->GetMass();
-      //tmpMass.Rotate( this->GetRelativePose().rot );
-      this->mass += tmpMass;
-    }
+    Mass tmpMass = geom->GetMass();
+    //tmpMass.Rotate( this->GetRelativePose().rot );
+    this->mass += tmpMass;
   }
-  else
-    gzerr(0) << "Attempting to add two geoms with the same name[" << geom->GetName() << "] to body[" << this->GetName() << "].\n";
-
 }
 
 void Body::DettachGeom(Geom *geom)
 {
-  std::map<std::string, Geom*>::iterator iter;
-  iter = this->geoms.find(geom->GetName());
+  Geom *g = this->GetGeom(geom->GetName());
+  if (!g)
+    gzthrow("Attemping to remove a geom that doesn't belong to this body\n");
 
-  std::cout << "Detach GEOM[" << geom->GetName() << "] Count[" << this->geoms.size() << "]\n";
-  if (iter != this->geoms.end())
+  std::vector<Geom*>::iterator iter;
+  for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
-    std::cout << "erasing\n";
-    this->geoms.erase(iter);
+    if ((*iter)->GetName() == geom->GetName())
+    {
+      this->geoms.erase(iter);
+      this->comEntity->RemoveChild(geom);
+      break;
+    }
   }
-  std::cout << "Post Count[" << this->geoms.size() << "]\n";
-  this->comEntity->RemoveChild(geom);
-  std::cout << "Done with detach\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -490,8 +485,9 @@ void Body::UpdateCoM()
 {
   Pose3d bodyPose;
   Pose3d origPose, newPose;
-  std::map<std::string, Geom*>::iterator iter;
+  std::vector<Geom*>::iterator iter;
 
+  std::cout << "UpdateCOM for Body[" << this->GetName() << "]\n";
   bodyPose = this->GetRelativePose();
 
   if (**this->customMassMatrixP)
@@ -503,11 +499,12 @@ void Body::UpdateCoM()
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
     Vector3 offset;
-    origPose = iter->second->GetRelativePose();
+    origPose = (*iter)->GetRelativePose() + this->comEntity->GetRelativePose();
     newPose = origPose;
 
     newPose.pos -= this->mass.GetCoG();
-    iter->second->SetRelativePose(newPose, true);
+    std::cout << "  Move Geom[" << (*iter)->GetName() << "] Old[" << origPose.pos << "] to [" << newPose.pos << "]\n";
+    (*iter)->SetRelativePose(newPose, true);
   }
 
   this->comEntity->SetRelativePose(Pose3d(this->mass.GetCoG(),Quatern()),true);
@@ -644,17 +641,10 @@ unsigned int Body::GetGeomCount() const
 /// Get a geoms
 Geom *Body::GetGeom(unsigned int index) const
 {
-  std::map< std::string, Geom* >::const_iterator iter;
-  iter = this->geoms.begin();
-
   if (index < this->geoms.size())
-  {
-    std::advance(iter,index);
-  }
+    return this->geoms[index];
   else
     gzerr(0) << "Invalid index\n";
-
-  return iter->second;
 }
 
 
@@ -688,12 +678,12 @@ Sensor *Body::GetSensor( const std::string &name ) const
 /// Get a geom by name
 Geom *Body::GetGeom(const std::string &name) const
 {
-  std::map<std::string, Geom*>::const_iterator iter = this->geoms.find(name);
+  std::vector<Geom*>::const_iterator iter;
 
-  if (iter != this->geoms.end())
-    return iter->second;
-  else
-    return NULL;
+  for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
+    if ((*iter)->GetName() == name || (*iter)->HasAltName(name))
+      return (*iter);
+  return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -720,14 +710,14 @@ void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
 {
   Vector3 bbmin;
   Vector3 bbmax;
-  std::map<std::string, Geom*>::const_iterator iter;
+  std::vector<Geom*>::const_iterator iter;
 
   min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   max.Set(0,0,0);
 
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
-    iter->second->GetBoundingBox(bbmin, bbmax);
+    (*iter)->GetBoundingBox(bbmin, bbmax);
     min.x = std::min(bbmin.x, min.x);
     min.y = std::min(bbmin.y, min.y);
     min.z = std::min(bbmin.z, min.z);
@@ -766,3 +756,12 @@ void Body::SetMass(Mass mass)
 }
 
 
+void Body::AddSensor( Sensor *sensor )
+{
+  this->sensors.push_back(sensor);
+}
+
+void Body::ClearSensors( )
+{
+  this->sensors.clear();
+}

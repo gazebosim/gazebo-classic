@@ -69,7 +69,7 @@ namespace gazebo
     protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream) {}
 
     /// \brief Update the joint
-    public: void Update();
+    public: virtual void Update();
 
     /// \brief Set the joint to show visuals
     public: void ShowJoints(bool s);
@@ -167,10 +167,10 @@ namespace gazebo
     protected: Type type;
 
     /// The first body this joint connects to
-    protected: Body *body1;
+    public: Body *body1;
 
     /// The second body this joint connects to
-    protected: Body *body2;
+    public: Body *body2;
 
     /// Name of this joint
     protected: ParamT<double> *erpP;
@@ -184,7 +184,7 @@ namespace gazebo
 
     protected: ParamT<std::string> *body1NameP;
     protected: ParamT<std::string> *body2NameP;
-    protected: ParamT<std::string> *anchorBodyNameP;
+    public: ParamT<std::string> *anchorBodyNameP;
     protected: ParamT<Vector3> *anchorOffsetP;
     protected: ParamT<bool> *provideFeedbackP;
     protected: ParamT<double> *fudgeFactorP;
@@ -196,10 +196,10 @@ namespace gazebo
     protected: OgreDynamicLines *line1;
     protected: OgreDynamicLines *line2;
     protected: PhysicsEngine *physics;
-    protected: Vector3 anchorPos;
-    protected: Body *anchorBody;
+    public: Vector3 anchorPos;
+    public: Body *anchorBody;
 
-    private: boost::signal<void ()> jointUpdateSignal;
+    protected: boost::signal<void ()> jointUpdateSignal;
 
     // joint damping_coefficient
     protected: double damping_coefficient;

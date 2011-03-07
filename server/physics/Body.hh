@@ -193,6 +193,10 @@ namespace gazebo
     /// \brief Get a sensor by name
     public: Sensor *GetSensor( const std::string &name ) const;
 
+    public: void AddSensor( Sensor *sensor );
+
+    public: void ClearSensors( );
+
     /// \brief Remove this body from the physics engine
     public: virtual void RemoveFromPhysics() = 0;
 
@@ -246,7 +250,7 @@ namespace gazebo
             { enabledSignal.disconnect(subscriber); }
 
     /// List of geometries attached to this body
-    protected: std::map< std::string, Geom* > geoms;
+    protected: std::vector< Geom* > geoms;
 
     /// List of attached sensors
     protected: std::vector< Sensor* > sensors;

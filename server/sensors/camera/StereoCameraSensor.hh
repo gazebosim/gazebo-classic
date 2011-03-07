@@ -99,6 +99,9 @@ namespace gazebo
     // Save the camera frame
     protected: virtual void SaveFrame();
   
+    // Render Depth Data
+    protected: virtual void RenderDepthData();
+  
     /// \brief Fill all the image buffers
     private: void FillBuffers();
   
@@ -106,7 +109,7 @@ namespace gazebo
   
     //private: void UpdateAllDependentRenderTargets();
   
-    private: Ogre::TexturePtr renderTexture[4];
+    private: Ogre::TexturePtr renderTextures[4];
     private: Ogre::RenderTarget *renderTargets[4];
     private: Ogre::MaterialPtr depthMaterial;
   

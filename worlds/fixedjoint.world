@@ -92,11 +92,92 @@
       </geom:box>
     </body:box>
 
-    <joint:fixed name="test_fixed">
-      <body1>body1</body1>
-      <body2>body2</body2>
-      <!--<anchorBody>body1</anchorBody>-->
+    <body:box name="body3">
+      <xyz>1.0 1.0 -1.0</xyz>
+      <geom:box name="geom3">
+        <size>0.1 0.1 0.1</size>
+        <mass>0.1</mass>
+
+        <visual>
+          <size>0.1 0.1 0.1</size>
+          <mesh>unit_box</mesh>
+          <shader>pixel</shader>
+          <material>Gazebo/Blue</material>
+        </visual>
+      </geom:box>
+    </body:box>
+
+    <body:box name="body4">
+      <xyz>1.0 1.0 1.0</xyz>
+      <geom:box name="geom4">
+        <size>0.1 0.1 0.1</size>
+        <mass>0.0</mass>
+
+        <visual>
+          <size>0.1 0.1 0.1</size>
+          <mesh>unit_box</mesh>
+          <shader>pixel</shader>
+          <material>Gazebo/Green</material>
+        </visual>
+      </geom:box>
+    </body:box>
+
+    <body:box name="body5">
+      <xyz>2.0 2.0 1.0</xyz>
+      <geom:box name="geom5">
+        <size>0.1 0.1 0.1</size>
+        <mass>0.2</mass>
+
+        <visual>
+          <size>0.1 0.1 0.1</size>
+          <mesh>unit_box</mesh>
+          <shader>pixel</shader>
+          <material>Gazebo/Green</material>
+        </visual>
+      </geom:box>
+    </body:box>
+
+
+    <joint:fixed name="fixed1">
+      <body1>body2</body1>
+      <body2>body1</body2>
+      <anchor>body2</anchor>
     </joint:fixed>
+
+    <!--<joint:hinge name="hinge1">
+      <body1>body2</body1>
+      <body2>body3</body2>
+      <anchor>body2</anchor>
+      <axis>0 0 1</axis>
+      <lowStop>-30</lowStop>
+      <highStop>30</highStop>
+      <damping>0</damping>
+    </joint:hinge>
+    -->
+    <joint:fixed name="fixed2">
+      <body1>body3</body1>
+      <body2>body2</body2>
+      <anchor>body3</anchor>
+    </joint:fixed>
+    <!--
+    <joint:fixed name="fixed3">
+      <body1>body3</body1>
+      <body2>body4</body2>
+      <anchor>body3</anchor>
+    </joint:fixed>
+    -->
+
+    <!--
+    <joint:hinge name="hinge2">
+      <body1>body4</body1>
+      <body2>body5</body2>
+      <anchor>body4</anchor>
+      <axis>0 1 0</axis>
+      <lowStop>-30</lowStop>
+      <highStop>30</highStop>
+      <damping>0</damping>
+    </joint:hinge>
+-->
 
   </model:physical>
 

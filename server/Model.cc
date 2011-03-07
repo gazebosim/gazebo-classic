@@ -511,6 +511,7 @@ void Model::RemoveChild(Entity *child)
 {
   JointContainer::iterator jiter;
 
+  std::cout << "Remove Child[" << child->GetName() << "]\n";
   if (child->GetType() == Entity::BODY)
   {
     bool done = false;
@@ -527,15 +528,21 @@ void Model::RemoveChild(Entity *child)
         Body *jbody0 = (*jiter)->GetJointBody(0);
         Body *jbody1 = (*jiter)->GetJointBody(1);
 
-        if (!jbody0 || !jbody1 || jbody0->GetName() == child->GetName() ||
-            jbody1->GetName() == child->GetName() ||
-            jbody0->GetName() == jbody1->GetName())
+        if ( jbody0 && jbody1 )
         {
-          Joint *joint = *jiter;
-          this->joints.erase( jiter );
-          done = false;
-          delete joint;
-          break;
+          if (jbody0->GetName() == child->GetName() ||
+              jbody1->GetName() == child->GetName() ||
+              jbody0->GetName() == jbody1->GetName())
+          {
+            Joint *joint = *jiter;
+            std::cout << "\n\nDeleting Joint[" << joint->GetName() << "]\n\n\n";
+            std::cout << "Body0[" << jbody0->GetName() << "]\n";
+            std::cout << "Body1[" << jbody1->GetName() << "]\n";
+            this->joints.erase( jiter );
+            done = false;
+            delete joint;
+            break;
+          }
         }
       }
     }
@@ -547,7 +554,6 @@ void Model::RemoveChild(Entity *child)
   for (iter =this->children.begin(); iter != this->children.end(); iter++)
     if (*iter && (*iter)->GetType() == Entity::BODY)
       ((Body*)*iter)->SetEnabled(true);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1026,12 +1032,9 @@ Geom *Model::GetGeom(const std::string &name) const
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if (*biter && (*biter)->GetType() == Entity::BODY)
-    {
-      Body *body = (Body*)*biter;
-      if ((geom = body->GetGeom(name)) != NULL)
-        break;
-    }
+    Body *body = (Body*)*biter;
+    if ((geom = body->GetGeom(name)) != NULL)
+      break;
   }
 
   return geom;
@@ -1049,7 +1052,7 @@ Body *Model::GetBody(const std::string &name)
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
   {
-    if ((*biter)->GetName() == name)
+    if ((*biter)->GetName() == name || (*biter)->HasAltName(name))
       return (Body*)*biter;
   }
  
@@ -1270,7 +1273,6 @@ void Model::LoadPhysical(XMLConfigNode *node)
 
   // Load the joints
   childNode = node->GetChildByNSPrefix("joint");
-
   while (childNode)
   {
     try
@@ -1281,11 +1283,14 @@ void Model::LoadPhysical(XMLConfigNode *node)
     {
       gzerr(0) << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
       gzerr(0) <<  e << std::endl;
+      this->Print("");
+      throw("Error loading model\n");
       childNode = childNode->GetNextByNSPrefix("joint");
       continue;
     }
     childNode = childNode->GetNextByNSPrefix("joint");
   }
+
 }
 
 

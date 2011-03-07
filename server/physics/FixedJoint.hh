@@ -77,7 +77,10 @@ namespace gazebo
 
     /// \brief Load joint
     protected: virtual void Load(XMLConfigNode *node);
- 
+               
+    /// \brief Update the joint
+    public: virtual void Update();
+
     /// \brief Save a joint to a stream in XML format
     protected: virtual void SaveJoint(std::string &prefix,std::ostream &stream);
 
@@ -144,6 +147,9 @@ namespace gazebo
     /// \brief Get the axis of rotation
     public: virtual Vector3 GetAxis(int index) const {return Vector3();}
 
+    private: Joint* IsConnected(Body *b);
+
+    private: Pose3d subsumedOffset;
   };
   /// \}
 }
