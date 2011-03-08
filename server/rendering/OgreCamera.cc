@@ -173,9 +173,9 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
     if (this->imageFormatP->GetValue() == "L8")
       this->imageFormat = Ogre::PF_L8;
     else if (this->imageFormatP->GetValue() == "R8G8B8")
-      this->imageFormat = Ogre::PF_B8G8R8;
+      this->imageFormat = Ogre::PF_BYTE_RGB;
     else if (this->imageFormatP->GetValue() == "B8G8R8")
-      this->imageFormat = Ogre::PF_R8G8B8;
+      this->imageFormat = Ogre::PF_BYTE_BGR;
     else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
               (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
               (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
@@ -183,12 +183,12 @@ void OgreCamera::LoadCam( XMLConfigNode *node )
     {
       // let ogre generate rgb8 images for all bayer format requests
       // then post process to produce actual bayer images
-      this->imageFormat = Ogre::PF_R8G8B8;
+      this->imageFormat = Ogre::PF_BYTE_RGB;
     }
     else
     {
-      std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
-      this->imageFormat = Ogre::PF_R8G8B8;
+      std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_BYTE_RGB\n";
+      this->imageFormat = Ogre::PF_BYTE_RGB;
     }
   }
 
@@ -331,8 +331,6 @@ void OgreCamera::CaptureData()
 {
   if (this->captureData)
   {
-    //boost::recursive_mutex::scoped_lock mr_lock(*Simulator::Instance()->GetMRMutex());
-
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
     Ogre::RenderTexture *rTexture;
     Ogre::Viewport* renderViewport;
@@ -349,7 +347,7 @@ void OgreCamera::CaptureData()
     size = Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
         (**this->imageSizeP).y, 
         1, 
-        format);
+        this->imageFormat);
 
     // Allocate buffer
     if (!this->saveFrameBuffer)
@@ -357,10 +355,12 @@ void OgreCamera::CaptureData()
 
     memset(this->saveFrameBuffer,128,size);
 
-    Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
+    Ogre::Box src_box(0,0,(**this->imageSizeP).x, (**this->imageSizeP).y);
+
+    Ogre::PixelBox dst_box((**this->imageSizeP).x, (**this->imageSizeP).y,
         1, this->imageFormat, this->saveFrameBuffer);
 
-    pixelBuffer->blitToMemory( box );
+    pixelBuffer->blitToMemory( src_box, dst_box );
 
     if (this->saveFramesP->GetValue())
     {
@@ -522,7 +522,7 @@ int OgreCamera::GetImageDepth() const
     return 1;
   else
   {
-    std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
+    std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_BYTE_RGB\n";
     return 3;
   }
 }

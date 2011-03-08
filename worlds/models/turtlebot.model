@@ -1,0 +1,220 @@
+<model:physical xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" name="turtlebot">
+
+    <rpy>0 0.0 0.0</rpy>
+    <static>false</static>
+
+    <body:cylinder name="chassis">
+      <xyz>0 0 0.0462516</xyz>
+      <geom:cylinder name="base">
+        <size>0.164973 0.0611632</size>
+        <mass>1.0</mass>
+
+        <mu1>109999.0</mu1>
+        <visual>
+          <!--<scale>0.0254 0.0254 0.0254</scale>-->
+          <mesh>create/create.dae</mesh>
+          <shader>pixel</shader>
+        </visual>
+      </geom:cylinder>
+
+      <geom:box name="plate_0">
+        <xyz>-0.04334 0 0.034</xyz>
+        <mass>0.01</mass>
+        <size>0.233502 0.314845 0.006401</size>
+        <visual>
+          <mesh>turtlebot/plate_0.dae</mesh>
+        </visual>
+      </geom:box>
+
+      <geom:box name="plate_1">
+        <xyz>-0.003 0 0.0722018</xyz>
+        <mass>0.01</mass>
+        <size>0.314856 0.314856 0.006401</size>
+        <visual>
+          <mesh>turtlebot/plate_1.dae</mesh>
+        </visual>
+      </geom:box>
+
+      <geom:box name="plate_1a">
+        <xyz>-0.003 0 0.1358036</xyz>
+        <mass>0.01</mass>
+        <size>0.314856 0.314856 0.006401</size>
+        <visual>
+          <mesh>turtlebot/plate_1.dae</mesh>
+        </visual>
+      </geom:box>
+
+     <geom:box name="plate_2">
+        <xyz>-0.01 0 0.3485542</xyz>
+        <mass>0.01</mass>
+        <size>0.288 0.315 0.006401</size>
+        <visual>
+          <mesh>turtlebot/plate_2.dae</mesh>
+        </visual>
+      </geom:box>
+
+      <geom:cylinder name="standoff_1">
+        <xyz>-0.003 0.112 0.17</xyz>
+        <mass>0.0001</mass>
+        <size>0.01 0.35</size>
+        <visual>
+        <size>0.01 0.01 0.35</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Grey</material>
+        </visual>
+      </geom:cylinder>
+      
+      <geom:cylinder name="standoff_2">
+        <xyz>-0.073 0.112 0.17</xyz>
+        <mass>0.0001</mass>
+        <size>0.01 0.35</size>
+        <visual>
+        <size>0.01 0.01 0.35</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Grey</material>
+        </visual>
+      </geom:cylinder>
+
+      <geom:cylinder name="standoff_3">
+        <xyz>-0.003 -0.112 0.17</xyz>
+        <mass>0.0001</mass>
+        <size>0.01 0.35</size>
+        <visual>
+        <size>0.01 0.01 0.35</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Grey</material>
+        </visual>
+      </geom:cylinder>
+      
+      <geom:cylinder name="standoff_4">
+        <xyz>-0.073 -0.112 0.17</xyz>
+        <mass>0.0001</mass>
+        <size>0.01 0.35</size>
+        <visual>
+        <size>0.01 0.01 0.35</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Grey</material>
+        </visual>
+      </geom:cylinder>
+
+      <geom:box name="kinect">
+        <xyz>-0.0844 0 0.19</xyz>
+        <mass>0.0001</mass>
+        <size>0.0730 .2760 0.0720</size>
+        <visual>
+          <size>0.0730 .2760 0.0720</size>
+          <mesh>kinect/kinect.dae</mesh>
+        </visual>
+      </geom:box>
+    </body:cylinder>
+
+    <body:cylinder name="left_wheel">
+      <rpy>0 90 90</rpy>
+      <xyz>0 0.130 0.033</xyz>
+      <geom:cylinder name="geom">
+        <mass>0.1</mass>
+        <size>0.033 0.023</size>
+        <visual>
+          <size>0.066 0.066 0.023</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+
+      <sensor:stereocamera name="kinect">
+        <xyz>0 0 5</xyz>
+        <imageSize>640 480</imageSize>
+        <updateRate>10</updateRate>
+        <nearClip>0.5</nearClip>
+        <farClip>8</farClip>
+        <baseline>0.2</baseline>
+        <saveFrames>true</saveFrames>
+        <saveFramePath>/tmp/create</saveFramePath>
+      </sensor:stereocamera>
+    </body:cylinder>
+
+    <body:cylinder name="right_wheel">
+      <rpy>0 90 90</rpy>
+      <xyz>0 -0.130 0.033</xyz>
+      <geom:cylinder name="geom">
+        <mass>0.1</mass>
+        <size>0.033 0.023</size>
+        <visual>
+          <size>0.066 0.066 0.023</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:sphere name="front_castor">
+      <xyz>0.130 0 0.02</xyz>
+      <geom:sphere name="sphere">
+        <mass>0.0001</mass>
+        <size>0.02</size>
+        <visual>
+          <size>0.04 0.04 0.04</size>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:sphere>
+    </body:sphere>
+
+    <body:cylinder name="rear_castor">
+      <xyz>-0.130 0 0.01</xyz>
+      <rpy>0 90 90</rpy>
+      <geom:cylinder name="cylinder">
+        <mass>0.0001</mass>
+        <size>0.01 0.02</size>
+        <visual>
+          <size>0.02 0.02 0.02</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <joint:hinge name="left_wheel_hinge">
+      <body1>left_wheel</body1>
+      <body2>chassis</body2>
+      <anchor>left_wheel</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+    <joint:hinge name="right_wheel_hinge">
+      <body1>right_wheel</body1>
+      <body2>chassis</body2>
+      <anchor>right_wheel</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+    <joint:ball name="front_castor_joint">
+      <body1>front_castor</body1>
+      <body2>chassis</body2>
+      <anchor>front_castor</anchor>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:ball>
+
+    <joint:hinge name="rear_castor_joint">
+      <body1>rear_castor</body1>
+      <body2>chassis</body2>
+      <anchor>rear_castor</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+    <controller:differential_position2d name="controller1">
+      <leftJoint>left_wheel_hinge</leftJoint>
+      <rightJoint>right_wheel_hinge</rightJoint>
+      <wheelSeparation>0.260</wheelSeparation>
+      <wheelDiameter>0.066</wheelDiameter>
+      <torque>1</torque>
+      <interface:position name="position_iface_0"/>
+    </controller:differential_position2d>
+</model:physical>

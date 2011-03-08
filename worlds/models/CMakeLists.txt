@@ -12,6 +12,8 @@ SET (files athene.model
            simplecar.model
            sonyvid30.model
            wizbot.model
+           create.model
+           turtlebot.model
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/worlds/models)

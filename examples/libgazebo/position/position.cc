@@ -3,9 +3,9 @@
 
 int main()
 {
-  libgazebo::Client *client = new gazebo::Client();
-  libgazebo::SimulationIface *simIface = new gazebo::SimulationIface();
-  libgazebo::PositionIface *posIface = new gazebo::PositionIface();
+  libgazebo::Client *client = new libgazebo::Client();
+  libgazebo::SimulationIface *simIface = new libgazebo::SimulationIface();
+  libgazebo::PositionIface *posIface = new libgazebo::PositionIface();
 
   int serverId = 0;
 
@@ -34,7 +34,7 @@ int main()
   /// Open the Position interface
   try
   {
-    posIface->Open(client, "position_iface_0");
+    posIface->Open(client, "turtlebot::position_iface_0");
   }
   catch (std::string e)
   {

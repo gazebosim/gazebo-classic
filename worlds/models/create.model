@@ -1,0 +1,110 @@
+<model:physical xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller" xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" name="create">
+
+    <rpy>0 0.0 0.0</rpy>
+    <static>false</static>
+
+    <body:cylinder name="chassis">
+      <xyz>0 0 0.0462516</xyz>
+      <geom:cylinder name="base">
+        <size>0.164973 0.0611632</size>
+        <mass>1.0</mass>
+
+        <mu1>109999.0</mu1>
+        <visual>
+          <mesh>create/create.dae</mesh>
+          <shader>pixel</shader>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:cylinder name="left_wheel">
+      <rpy>0 90 90</rpy>
+      <xyz>0 0.130 0.033</xyz>
+      <geom:cylinder name="geom">
+        <mass>0.1</mass>
+        <size>0.033 0.023</size>
+        <visual>
+          <size>0.066 0.066 0.023</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:cylinder name="right_wheel">
+      <rpy>0 90 90</rpy>
+      <xyz>0 -0.130 0.033</xyz>
+      <geom:cylinder name="geom">
+        <mass>0.1</mass>
+        <size>0.033 0.023</size>
+        <visual>
+          <size>0.066 0.066 0.023</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:sphere name="front_castor">
+      <xyz>0.130 0 0.02</xyz>
+      <geom:sphere name="sphere">
+        <mass>0.0001</mass>
+        <size>0.02</size>
+        <visual>
+          <size>0.04 0.04 0.04</size>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:sphere>
+    </body:sphere>
+
+    <body:cylinder name="rear_castor">
+      <xyz>-0.130 0 0.01</xyz>
+      <rpy>0 90 90</rpy>
+      <geom:cylinder name="cylinder">
+        <mass>0.0001</mass>
+        <size>0.01 0.02</size>
+        <visual>
+          <size>0.02 0.02 0.02</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <joint:hinge name="left_wheel_hinge">
+      <body1>left_wheel</body1>
+      <body2>chassis</body2>
+      <anchor>left_wheel</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+    <joint:hinge name="right_wheel_hinge">
+      <body1>right_wheel</body1>
+      <body2>chassis</body2>
+      <anchor>right_wheel</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+    <joint:ball name="front_castor_joint">
+      <body1>front_castor</body1>
+      <body2>chassis</body2>
+      <anchor>front_castor</anchor>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:ball>
+
+    <joint:hinge name="rear_castor_joint">
+      <body1>rear_castor</body1>
+      <body2>chassis</body2>
+      <anchor>rear_castor</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+</model:physical>
