@@ -28,6 +28,7 @@
 #include "Param.hh"
 #include "Vector3.hh"
 #include "Global.hh"
+#include "Publisher.hh"
 #include <boost/signal.hpp>
 
 namespace gazebo
@@ -188,6 +189,7 @@ namespace gazebo
 
     // joint damping_coefficient
     protected: double damping_coefficient;
+    protected: PublisherPtr vis_pub;
   };
 
   /// \}

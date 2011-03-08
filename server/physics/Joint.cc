@@ -39,6 +39,7 @@ using namespace gazebo;
 Joint::Joint()
   : Common(NULL)
 {
+  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(JOINT);
   this->model = NULL;
   this->showJoints = false;
@@ -72,7 +73,7 @@ Joint::~Joint()
     msgs::Visual msg;
     Message::Init(msg, this->visual);
     msg.set_action( msgs::Visual::DELETE );
-    Simulator::Instance()->SendMessage(msg);
+    this->vis_pub->Publish(msg);
   }
 
   if (!this->line1.empty())
@@ -80,7 +81,7 @@ Joint::~Joint()
     msgs::Visual msg;
     Message::Init(msg, this->line1);
     msg.set_action( msgs::Visual::DELETE );
-    Simulator::Instance()->SendMessage(msg);
+    this->vis_pub->Publish(msg);
   }
 
   if (!this->line2.empty())
@@ -88,7 +89,7 @@ Joint::~Joint()
     msgs::Visual msg;
     Message::Init(msg, this->line2);
     msg.set_action( msgs::Visual::DELETE );
-    Simulator::Instance()->SendMessage(msg);
+    this->vis_pub->Publish(msg);
   }
 
   delete this->erpP;
@@ -160,21 +161,21 @@ void Joint::Load(XMLConfigNode *node)
   msg.set_mesh( "joint_anchor" );
   msg.set_material( "Gazebo/JointAnchor" );
   msg.set_visible( false );
-  Simulator::Instance()->SendMessage(msg);
+  this->vis_pub->Publish(msg);
   this->visual = msg.header().str_id();
  
   Message::Init(msg, visname.str() + "/line1"); 
   msg.set_parent_id( visname.str() );
   msg.set_render_type( msgs::Visual::LINE_LIST );
   msg.set_material( "Gazebo/BlueGlow" );
-  Simulator::Instance()->SendMessage(msg);
+  this->vis_pub->Publish(msg);
   this->line1 = msg.header().str_id();
 
   Message::Init(msg, visname.str() + "/line2"); 
   msg.set_parent_id( visname.str() );
   msg.set_render_type( msgs::Visual::LINE_LIST );
   msg.set_material( "Gazebo/BlueGlow" );
-  Simulator::Instance()->SendMessage(msg);
+  this->vis_pub->Publish(msg);
   this->line2 = msg.header().str_id();
 
 
@@ -220,7 +221,7 @@ void Joint::Update()
     msgs::Visual msg;
     Message::Init(msg, this->visual);
     Message::Set(msg.mutable_pose()->mutable_position(), this->anchorPos);
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
 
     if (this->body1) 
     {
@@ -235,7 +236,7 @@ void Joint::Update()
       pt = msg.add_points();
       Message::Set(pt, this->body1->GetWorldPose().pos - this->anchorPos );
 
-      Simulator::Instance()->SendMessage( msg );
+      this->vis_pub->Publish(msg);
     }
 
     if (this->body2)
@@ -250,7 +251,7 @@ void Joint::Update()
 
       pt = msg.add_points();
       Message::Set(pt, this->body2->GetWorldPose().pos - this->anchorPos);
-      Simulator::Instance()->SendMessage( msg );
+      this->vis_pub->Publish(msg);
     }
   }
 }
@@ -263,7 +264,7 @@ void Joint::ShowJoints(const bool &s)
   msgs::Visual msg;
   Message::Init(msg, this->visual);
   msg.set_visible(s);
-  Simulator::Instance()->SendMessage( msg );
+  this->vis_pub->Publish(msg);
   this->showJoints = s;
 }
 

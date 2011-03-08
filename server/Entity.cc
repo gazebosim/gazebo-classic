@@ -40,6 +40,7 @@ Entity::Entity(Common *parent)
 : Common(parent)
 {
   this->pose_pub = Simulator::Instance()->Advertise<msgs::Pose>("/gazebo/pose");
+  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(ENTITY);
 
   Param::Begin(&this->parameters);
@@ -73,8 +74,6 @@ void Entity::SetName(const std::string &name)
   // TODO: if an entitie's name is changed, then the old visual is never
   // removed. Should add in functionality to modify/update the visual
   Common::SetName(name);
-  //this->visualMsg->id = this->GetCompleteScopedName();
-  //Simulator::Instance()->SendMessage( *this->visualMsg );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +110,7 @@ Entity::~Entity()
   }*/
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->vis_pub->Publish(*this->visualMsg);
   delete this->visualMsg;
   this->visualMsg = NULL;
 }
@@ -317,5 +316,5 @@ void Entity::RegisterVisual()
   if (this->parent)
     this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
 
-  Simulator::Instance()->SendMessage( *this->visualMsg );
+  this->vis_pub->Publish(*this->visualMsg);
 }

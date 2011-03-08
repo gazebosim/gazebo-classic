@@ -115,7 +115,7 @@ Body::~Body()
       msgs::Visual msg;
       Message::Init(msg, this->cgVisuals[i]);
       msg.set_action( msgs::Visual::DELETE );
-      Simulator::Instance()->SendMessage( msg );
+      this->vis_pub->Publish(msg);
     }
     this->cgVisuals.clear();
   }
@@ -391,7 +391,7 @@ void Body::Init()
     msg.set_attach_axes( true );
     msg.set_visible( false );
     Message::Set(msg.mutable_scale(), Vector3(0.1, 0.1, 0.1));
-    Simulator::Instance()->SendMessage(msg);
+    this->vis_pub->Publish(msg);
     this->cgVisuals.push_back( msg.header().str_id() );
 
     if (this->geoms.size() > 1)
@@ -419,7 +419,7 @@ void Body::Init()
         pt->set_y(giter->second->GetRelativePose().pos.y);
         pt->set_z(giter->second->GetRelativePose().pos.z);
       }
-      Simulator::Instance()->SendMessage(msg);
+      this->vis_pub->Publish(msg);
       this->cgVisuals.push_back( g_msg.header().str_id() );
     }
   }
@@ -716,7 +716,7 @@ void Body::ShowPhysics(const bool &show)
     msgs::Visual msg;
     Message::Init(msg, this->cgVisuals[i] );
     msg.set_visible( show );
-    Simulator::Instance()->SendMessage(msg);
+    this->vis_pub->Publish(msg);
   }
 }
 

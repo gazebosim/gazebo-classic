@@ -29,7 +29,7 @@
 #include <map>
 #include <string>
 
-
+#include "Publisher.hh"
 #include "Global.hh"
 #include "Event.hh"
 #include "Messages.hh"
@@ -291,6 +291,8 @@ class World
   private: Scene *scene;
 
   private: std::vector<ConnectionPtr> connections;
+
+  private: PublisherPtr vis_pub, selection_pub, light_pub;
 };
 
 class WorldState

@@ -147,7 +147,8 @@ namespace gazebo
     protected: msgs::Visual *visualMsg;
 
     private: Pose3d relativePose;
-    private: Publisher pose_pub;
+    private: PublisherPtr pose_pub;
+    protected: PublisherPtr vis_pub;
   };
   
   /// \}

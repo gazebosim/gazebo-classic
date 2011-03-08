@@ -95,5 +95,5 @@ void DirectionalLightMaker::MouseDragCB(const MouseEvent & /*event*/)
 void DirectionalLightMaker::CreateTheEntity()
 {
   Message::CreationStamp(this->msg);
-  Simulator::Instance()->SendMessage(this->msg);
+  //Simulator::Instance()->SendMessage(this->msg);
 }

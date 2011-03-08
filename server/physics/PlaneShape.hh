@@ -25,6 +25,7 @@
 
 #include "Param.hh"
 #include "Shape.hh"
+#include "Publisher.hh"
 
 namespace gazebo
 {
@@ -121,6 +122,7 @@ namespace gazebo
     protected: ParamT<Vector2<double> > *uvTileP;
     protected: ParamT<std::string> *materialP;
     protected: ParamT<bool> *castShadowsP;
+    protected: PublisherPtr vis_pub;
   };
   
   /// \}

@@ -56,7 +56,7 @@ void SphereMaker::Start(Scene *scene)
 void SphereMaker::Stop()
 {
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  Simulator::Instance()->SendMessage( *this->visualMsg );
+  //Simulator::Instance()->SendMessage( *this->visualMsg );
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   Events::moveModeSignal(true);
@@ -117,7 +117,7 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
 
   Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   Message::Set(this->visualMsg->mutable_scale(),Vector3(scale,scale,scale));
-  Simulator::Instance()->SendMessage(*this->visualMsg);
+  //Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
 void SphereMaker::CreateTheEntity()
@@ -154,7 +154,7 @@ void SphereMaker::CreateTheEntity()
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
   Message::CreationStamp(*this->visualMsg);
-  Simulator::Instance()->SendMessage( *this->visualMsg );
+  //Simulator::Instance()->SendMessage( *this->visualMsg );
 
-  Simulator::Instance()->SendMessage( msg );
+  //Simulator::Instance()->SendMessage( msg );
 }

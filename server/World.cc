@@ -78,6 +78,10 @@ class ModelUpdate_TBB
 // Private constructor
 World::World()
 {
+  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->selection_pub = Simulator::Instance()->Advertise<msgs::Selection>("/gazebo/selection");
+  this->light_pub = Simulator::Instance()->Advertise<msgs::Light>("/gazebo/selection");
+
   this->server = NULL;
   this->physicsEngine = NULL;
   this->graphics = NULL;
@@ -553,7 +557,7 @@ void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplica
     {
       msgs::Light msg = Message::LightFromXML(node);
       msg.mutable_header()->set_str_id( "light" );
-      Simulator::Instance()->SendMessage( msg );
+      this->light_pub->Publish(msg);
     }
 
     // Load children
@@ -886,7 +890,7 @@ void World::SetSelectedEntityCB( const std::string &name )
   {
     msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
     msg.set_selected( false );
-    Simulator::Instance()->SendMessage( msg );
+    this->selection_pub->Publish(msg);
 
     //this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
     this->selectedEntity->SetSelected(false);
@@ -902,7 +906,7 @@ void World::SetSelectedEntityCB( const std::string &name )
 
     msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
     msg.set_selected( true );
-    Simulator::Instance()->SendMessage( msg );
+    this->selection_pub->Publish(msg);
   }
   else
     this->selectedEntity = NULL;

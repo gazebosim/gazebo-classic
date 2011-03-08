@@ -159,7 +159,7 @@ namespace gazebo
       public: void RemovePlugin(const std::string &plugin);
 
       public: template<typename M>
-              Publisher Advertise(const std::string topic)
+              PublisherPtr Advertise(const std::string topic)
               {
                 google::protobuf::Message *msg = NULL;
                 M msgtype;
@@ -167,7 +167,7 @@ namespace gazebo
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
                 this->topics[topic]++;
-                return Publisher(topic, msg->GetTypeName());
+                return PublisherPtr(new Publisher(topic, msg->GetTypeName()));
               }
 
       public: void Unadvertise(const std::string &topic)
@@ -176,7 +176,9 @@ namespace gazebo
               }
 
       /// \brief Send a message
-      public: void SendMessage( const google::protobuf::Message &message );
+      public: void SendMessage( const std::string &topic, 
+                                const std::string &msg_type, 
+                                const google::protobuf::Message &message );
   
       /// \brief Function to run gui. Used by guiThread
       private: void PhysicsLoop();

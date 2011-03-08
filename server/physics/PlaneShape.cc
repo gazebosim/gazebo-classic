@@ -29,6 +29,8 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
 
+  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+
   msgs::Visual msg;
   Message::Init(msg, this->GetName() );
   msg.set_parent_id( this->geomParent->GetName() );
@@ -64,7 +66,7 @@ PlaneShape::~PlaneShape()
   msgs::Visual msg;
   Message::Init(msg, this->GetName());
   msg.set_action( msgs::Visual::DELETE );
-  Simulator::Instance()->SendMessage( msg );
+  this->vis_pub->Publish(msg);
 
   delete this->normalP;
   delete this->sizeP;
@@ -121,7 +123,7 @@ void PlaneShape::CreatePlane()
   msg.mutable_scale()->set_y( (**(this->sizeP)).y );
   msg.mutable_scale()->set_z( 0.0 );
 
-  Simulator::Instance()->SendMessage( msg );
+  this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

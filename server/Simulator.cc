@@ -630,7 +630,9 @@ void Simulator::RemovePlugin(const std::string &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Send a message
-void Simulator::SendMessage( const google::protobuf::Message &message )
+void Simulator::SendMessage( const std::string &topic, 
+                             const std::string &msg_type, 
+                             const google::protobuf::Message &message )
 {
   // Stamp the message with the transport time
   /*Message::SendStamp(message);

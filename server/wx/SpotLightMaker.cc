@@ -98,5 +98,5 @@ void SpotLightMaker::MouseDragCB(const MouseEvent & /*event*/)
 void SpotLightMaker::CreateTheEntity()
 {
   Message::CreationStamp(this->msg);
-  Simulator::Instance()->SendMessage(this->msg);
+  //Simulator::Instance()->SendMessage(this->msg);
 }

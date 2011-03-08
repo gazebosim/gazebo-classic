@@ -28,6 +28,7 @@
 #include "Global.hh"
 #include "Simulator.hh"
 #include "Geom.hh"
+#include "Publisher.hh"
 
 namespace gazebo
 {
@@ -116,7 +117,7 @@ namespace gazebo
     /// Start and end positions of the ray in global cs
     protected: Vector3 globalStartPos;
     protected: Vector3 globalEndPos;
-
+    protected: PublisherPtr vis_pub;
   };
   
   /// \}

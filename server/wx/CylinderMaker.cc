@@ -53,7 +53,7 @@ void CylinderMaker::Start(Scene *scene)
 void CylinderMaker::Stop()
 {
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  Simulator::Instance()->SendMessage( *this->visualMsg );
+  //Simulator::Instance()->SendMessage( *this->visualMsg );
   this->visualMsg->set_action( msgs::Visual::UPDATE );
 
   this->state = 0;
@@ -133,7 +133,7 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
 
   Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
   Message::Set(this->visualMsg->mutable_scale(), scale );
-  Simulator::Instance()->SendMessage(*this->visualMsg);
+  //Simulator::Instance()->SendMessage(*this->visualMsg);
 }
 
 void CylinderMaker::CreateTheEntity()
@@ -169,7 +169,7 @@ void CylinderMaker::CreateTheEntity()
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
   Message::CreationStamp(*this->visualMsg);
-  Simulator::Instance()->SendMessage( *this->visualMsg );
-  Simulator::Instance()->SendMessage( msg );
+  //Simulator::Instance()->SendMessage( *this->visualMsg );
+  //Simulator::Instance()->SendMessage( msg );
 }
 

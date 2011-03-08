@@ -93,7 +93,7 @@ Geom::~Geom()
     msgs::Visual msg;
     Message::Init(msg, this->visuals[i]);
     msg.set_action( msgs::Visual::DELETE );
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
   }
   this->visuals.clear();
 
@@ -102,7 +102,7 @@ Geom::~Geom()
     msgs::Visual msg;
     Message::Init(msg, this->bbVisual);
     msg.set_action( msgs::Visual::DELETE);
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
   }
 
   delete this->typeP;
@@ -170,7 +170,7 @@ void Geom::Load(XMLConfigNode *node)
     msg.set_render_type( msgs::Visual::MESH_RESOURCE );
     msg.set_cast_shadows( false );
 
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
     this->visuals.push_back(msg.header().str_id());
    
     childNode = childNode->GetNext("visual");
@@ -209,7 +209,7 @@ void Geom::CreateBoundingBox()
     Message::Set(msg.mutable_pose()->mutable_position(), Vector3(0,0,0.0));
     msg.set_transparency( .5 );
 
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
   }
 }
 
@@ -318,7 +318,7 @@ void Geom::ShowBoundingBox(const bool &show)
     Message::Init(msg, this->bbVisual);
     msg.set_visible( show );
     msg.set_action( msgs::Visual::UPDATE );
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
   }
 }
 
@@ -335,7 +335,7 @@ void Geom::SetTransparent(const bool &show)
       msg.set_transparency( 0.6 );
     else
       msg.set_transparency( 0.0 );
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
   }
 }
 
@@ -456,7 +456,7 @@ void Geom::EnabledCB(bool enabled)
   else
     msg.set_material( "Gazebo/RedTransparent" );
 
-  Simulator::Instance()->SendMessage( msg );
+  this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

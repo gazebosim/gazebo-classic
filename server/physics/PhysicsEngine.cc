@@ -41,6 +41,8 @@ using namespace gazebo;
 PhysicsEngine::PhysicsEngine(World *world)
   : world(world)
 {
+  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
   this->gravityP->Callback(&PhysicsEngine::SetGravity, this);
@@ -120,7 +122,7 @@ PhysicsEngine::~PhysicsEngine()
     msgs::Visual msg;
     Message::Init(msg, this->visual);
     msg.set_action( msgs::Visual::DELETE );
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
   }
 
   delete this->gravityP;
@@ -237,7 +239,7 @@ void PhysicsEngine::ShowContacts(const bool &show)
   msgs::Visual msg;
   Message::Init(msg, this->visual);
   msg.set_visible( show );
-  Simulator::Instance()->SendMessage(msg);
+  this->vis_pub->Publish(msg);
 
   /* NATY put back in
   if (show)

@@ -33,6 +33,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
+  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
   {
     msgs::Visual msg;
@@ -41,7 +42,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
     msg.set_render_type( msgs::Visual::LINE_LIST );
 
     msg.set_material( "Gazebo/BlueGlow" );
-    Simulator::Instance()->SendMessage( msg );
+    this->vis_pub->Publish(msg);
 
     // NATY: put back in
     //this->lineMsg->visibility = GZ_LASER_CAMERA;
@@ -101,7 +102,7 @@ void RayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   pt = msg.add_points();
   Message::Set(pt, this->relativeEndPos );
 
-  Simulator::Instance()->SendMessage( msg );
+  this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +140,7 @@ void RayShape::SetLength( double len )
   Message::Set(pt, this->relativeStartPos );
   pt = msg.add_points();
   Message::Set(pt,  this->relativeEndPos );
-  Simulator::Instance()->SendMessage( msg );
+  this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
