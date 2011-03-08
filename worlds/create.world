@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+
+<gazebo:world 
+  xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
+  xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
+  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
+  xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body" 
+  xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom" 
+  xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint" 
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface" 
+  xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering" 
+  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+  xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics" >
+
+  <verbosity>5</verbosity>
+
+  <physics:ode>
+    <stepTime>0.003</stepTime>
+    <gravity>0 0 -9.8</gravity>
+    <cfm>10e-10</cfm>
+    <erp>0.2</erp>
+    <stepType>quick</stepType>
+    <stepIters>50</stepIters>
+    <stepW>1.3</stepW>
+    <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>
+    <contactSurfaceLayer>0.001</contactSurfaceLayer>
+
+    <!-- updateRate: <0 == throttle simTime to match realTime.
+                      0 == No throttling
+                     >0 == Frequency at which to throttle the sim --> 
+    <updateRate>0</updateRate>
+  </physics:ode>
+
+  <rendering:gui>
+    <type>fltk</type>
+    <size>800 600</size>
+    <pos>0 0</pos>
+  </rendering:gui>
+
+  <rendering:ogre>
+    <ambient>.8 .8 .8 1</ambient>
+    <sky>
+      <material>Gazebo/CloudySky</material>
+    </sky>
+    <grid>false</grid>
+    <shadows>false</shadows>
+  </rendering:ogre>
+
+  <model:physical name="create">
+    <rpy>0 0.0 0.0</rpy>
+    <static>false</static>
+
+    <body:cylinder name="chassis">
+      <xyz>0 0 0.0462516</xyz>
+      <geom:cylinder name="base">
+        <size>0.164973 0.0611632</size>
+        <mass>1.0</mass>
+
+        <mu1>109999.0</mu1>
+        <visual>
+          <scale>0.0254 0.0254 0.0254</scale>
+          <mesh>irobot_create.dae</mesh>
+          <shader>pixel</shader>
+        </visual>
+      </geom:cylinder>
+
+      <!--
+      <geom:box name="plate_0">
+        <xyz>0 0 0.017</xyz>
+        <mass>0.1</mass>
+        <size>0.233402 0.314845 0.006401</size>
+        <visual>
+          <size>0.233402 0.314845 0.006401</size>
+          <mesh>plate_0.dae</mesh>
+        </visual>
+      </geom:box>
+      -->
+    </body:cylinder>
+
+    <body:cylinder name="left_wheel">
+      <rpy>0 90 90</rpy>
+      <xyz>0 0.130 0.033</xyz>
+      <geom:cylinder name="geom">
+        <mass>0.1</mass>
+        <size>0.033 0.023</size>
+        <visual>
+          <size>0.066 0.066 0.023</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:cylinder name="right_wheel">
+      <rpy>0 90 90</rpy>
+      <xyz>0 -0.130 0.033</xyz>
+      <geom:cylinder name="geom">
+        <mass>0.1</mass>
+        <size>0.033 0.023</size>
+        <visual>
+          <size>0.066 0.066 0.023</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+    <body:sphere name="front_castor">
+      <xyz>0.130 0 0.02</xyz>
+      <geom:sphere name="sphere">
+        <mass>0.0001</mass>
+        <size>0.02</size>
+        <visual>
+          <size>0.04 0.04 0.04</size>
+          <mesh>unit_sphere</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:sphere>
+    </body:sphere>
+
+    <body:cylinder name="rear_castor">
+      <xyz>-0.130 0 0.01</xyz>
+      <rpy>0 90 90</rpy>
+      <geom:cylinder name="cylinder">
+        <mass>0.0001</mass>
+        <size>0.01 0.02</size>
+        <visual>
+          <size>0.02 0.02 0.02</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+    </body:cylinder>
+
+
+    <joint:hinge name="left_wheel_hinge">
+      <body1>left_wheel</body1>
+      <body2>chassis</body2>
+      <anchor>left_wheel</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+    <joint:hinge name="right_wheel_hinge">
+      <body1>right_wheel</body1>
+      <body2>chassis</body2>
+      <anchor>right_wheel</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+    <joint:ball name="front_castor_joint">
+      <body1>front_castor</body1>
+      <body2>chassis</body2>
+      <anchor>front_castor</anchor>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:ball>
+
+    <joint:hinge name="rear_castor_joint">
+      <body1>rear_castor</body1>
+      <body2>chassis</body2>
+      <anchor>rear_castor</anchor>
+      <axis>0 1 0</axis>
+      <erp>0.8</erp>
+      <cfm>10e-5</cfm>
+    </joint:hinge>
+
+
+  </model:physical>
+
+   <!-- Ground Plane -->
+   <model:physical name="plane1_model">
+    <xyz>0 0 0</xyz>
+    <rpy>0 0 0</rpy>
+    <static>true</static>
+
+    <body:plane name="plane1_body">
+      <geom:plane name="plane1_geom">
+        <normal>0 0 1</normal>
+        <size>100 100</size>
+        <segments>10 10</segments>
+        <uvTile>100 100</uvTile>
+        <material>Gazebo/GrayGrid</material>
+        <mu1>109999.0</mu1>
+        <mu2>1000.0</mu2>
+      </geom:plane>
+    </body:plane>
+  </model:physical>
+
+  <!-- White Point light -->
+  <model:renderable name="point_white">
+    <xyz>0 0 1</xyz>
+    <static>false</static>
+
+    <light>
+      <type>point</type>
+      <diffuseColor>0.4 0.4 0.4</diffuseColor>
+      <specularColor>.1 .1 .1</specularColor>
+      <range>20</range>
+
+      <attenuation>0.1 0.01 0.01</attenuation>
+    </light>
+  </model:renderable>
+ 
+</gazebo:world>
