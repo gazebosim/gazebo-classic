@@ -55,6 +55,8 @@ Sensor::Sensor(Body *body)
   this->updateRateP = new ParamT<double>("updateRate", 0, 0);
   this->updateRateP->Callback(&Sensor::SetUpdateRate, this);
   this->alwaysActiveP = new ParamT<bool>("alwaysActive", false, 0);
+  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
   Param::End();
 }
 
@@ -70,6 +72,9 @@ Sensor::~Sensor()
 // Load the sensor
 void Sensor::Load(XMLConfigNode *node)
 {
+  this->xyzP->Load(node);
+  this->rpyP->Load(node);
+
   this->nameP->Load(node);
   this->updateRateP->Load(node);
   this->SetUpdateRate(this->updateRateP->GetValue());
@@ -81,7 +86,6 @@ void Sensor::Load(XMLConfigNode *node)
   this->LoadChild(node);
 
   this->lastUpdate = Simulator::Instance()->GetSimTime();
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////

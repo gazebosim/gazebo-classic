@@ -118,6 +118,9 @@ namespace gazebo
 
     protected: ParamT<double> *updateRateP;
     protected: ParamT<bool> *alwaysActiveP;
+    protected: ParamT<Vector3> *xyzP;
+    protected: ParamT<Quatern> *rpyP;
+
     protected: Time updatePeriod;
     protected: Time lastUpdate;
     protected: std::string typeName;

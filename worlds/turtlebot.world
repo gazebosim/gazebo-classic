@@ -47,9 +47,9 @@
     <shadows>false</shadows>
   </rendering:ogre>
 
-  <model:physical name="create">
+  <model:physical name="turtlebot1">
     <include embedded="true">
-      <xi:include href="models/create.model"/>
+      <xi:include href="models/turtlebot.model"/>
     </include>
   </model:physical>
 

@@ -34,7 +34,7 @@ int main()
   /// Open the Position interface
   try
   {
-    posIface->Open(client, "turtlebot::position_iface_0");
+    posIface->Open(client, "turtlebot1::position_iface_0");
   }
   catch (std::string e)
   {

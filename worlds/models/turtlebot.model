@@ -106,6 +106,19 @@
           <mesh>kinect/kinect.dae</mesh>
         </visual>
       </geom:box>
+
+      <sensor:stereocamera name="kinect_camera">
+        <xyz>0 0 .220</xyz>
+        <rpy>0 0 0</rpy>
+        <imageSize>640 480</imageSize>
+        <updateRate>10</updateRate>
+        <nearClip>0.1</nearClip>
+        <farClip>20</farClip>
+        <baseline>0.2</baseline>
+        <saveFrames>true</saveFrames>
+        <saveFramePath>/tmp/create</saveFramePath>
+        <alwaysActive>true</alwaysActive>
+      </sensor:stereocamera>
     </body:cylinder>
 
     <body:cylinder name="left_wheel">
@@ -121,16 +134,6 @@
         </visual>
       </geom:cylinder>
 
-      <sensor:stereocamera name="kinect">
-        <xyz>0 0 5</xyz>
-        <imageSize>640 480</imageSize>
-        <updateRate>10</updateRate>
-        <nearClip>0.5</nearClip>
-        <farClip>8</farClip>
-        <baseline>0.2</baseline>
-        <saveFrames>true</saveFrames>
-        <saveFramePath>/tmp/create</saveFramePath>
-      </sensor:stereocamera>
     </body:cylinder>
 
     <body:cylinder name="right_wheel">

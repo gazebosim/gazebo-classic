@@ -135,6 +135,7 @@ void StereoCameraSensor::InitChild()
   this->renderTarget = this->renderTargets[D_LEFT];
   this->renderTexture = this->renderTextures[D_LEFT];
   this->InitCam();
+  this->SetRelativePose(Pose3d(**this->xyzP, **this->rpyP));
 
   // tell OgreCamera::Render() to RenderDepthData() in the rendering thread
   this->simulateDepthData = true;

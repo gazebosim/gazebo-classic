@@ -110,12 +110,14 @@ void MonoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 // Initialize the camera
 void MonoCameraSensor::InitChild()
 {
-
   if (Simulator::Instance()->GetRenderEngineEnabled())
   {
     this->SetCameraSceneNode( this->GetVisualNode()->GetSceneNode() );
     this->InitCam();
+
     this->SetCamName(this->GetName());
+
+    this->SetRelativePose(Pose3d(**this->xyzP, **this->rpyP));
 
     /*Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().create(
                               this->ogreMaterialName,
