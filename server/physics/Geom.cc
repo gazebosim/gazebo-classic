@@ -77,9 +77,6 @@ Geom::Geom( Body *body )
   
   Param::End();
 
-
-  this->connections.push_back( Events::ConnectShowJointsSignal( boost::bind(&Geom::SetTransparent, this, _1) ) );
-  this->connections.push_back( Events::ConnectShowPhysicsSignal( boost::bind(&Geom::SetTransparent, this, _1) ) );
   this->connections.push_back( Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
   this->connections.push_back( this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
 }
@@ -88,15 +85,6 @@ Geom::Geom( Body *body )
 // Destructor
 Geom::~Geom()
 {
-  for (unsigned int i=0; i < this->visuals.size(); i++)
-  {
-    msgs::Visual msg;
-    Message::Init(msg, this->visuals[i]);
-    msg.set_action( msgs::Visual::DELETE );
-    this->vis_pub->Publish(msg);
-  }
-  this->visuals.clear();
-
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
@@ -131,8 +119,6 @@ void Geom::Load(XMLConfigNode *node)
 {
   Entity::Load(node);
 
-  XMLConfigNode *childNode = NULL;
-
   this->typeP->Load(node);
   this->SetName(this->nameP->GetValue());
   this->massP->Load(node);
@@ -156,25 +142,7 @@ void Geom::Load(XMLConfigNode *node)
 
   this->body->AttachGeom(this);
 
-  childNode = node->GetChild("visual");
-  while (childNode)
-  {
-    std::ostringstream visname;
-    visname << this->GetCompleteScopedName() << "::VISUAL_" << 
-               this->visuals.size();
 
-
-    msgs::Visual msg = Message::VisualFromXML(childNode);
-    Message::Init(msg, visname.str());
-    msg.set_parent_id( this->GetCompleteScopedName() );
-    msg.set_render_type( msgs::Visual::MESH_RESOURCE );
-    msg.set_cast_shadows( false );
-
-    this->vis_pub->Publish(msg);
-    this->visuals.push_back(msg.header().str_id());
-   
-    childNode = childNode->GetNext("visual");
-  }
   
 }
 
@@ -237,14 +205,6 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
 
   stream << prefix << "  " << *(this->laserFiducialIdP) << "\n";
   stream << prefix << "  " << *(this->laserRetroP) << "\n";
-
-  // NATY: put back in functionality
-  /*std::vector<Visual*>::iterator iter;
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
-  {
-    if (*iter)
-      (*iter)->Save(p, stream);
-  }*/
 
   stream << prefix << "</geom>\n";
 }
@@ -318,23 +278,6 @@ void Geom::ShowBoundingBox(const bool &show)
     Message::Init(msg, this->bbVisual);
     msg.set_visible( show );
     msg.set_action( msgs::Visual::UPDATE );
-    this->vis_pub->Publish(msg);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the transparency
-void Geom::SetTransparent(const bool &show)
-{
-  for (unsigned int i = 0; i < this->visuals.size(); i++)
-  {
-    msgs::Visual msg;
-    Message::Init(msg, this->visuals[i]);
-    msg.set_action( msgs::Visual::UPDATE );
-    if (show)
-      msg.set_transparency( 0.6 );
-    else
-      msg.set_transparency( 0.0 );
     this->vis_pub->Publish(msg);
   }
 }

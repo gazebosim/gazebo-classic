@@ -199,7 +199,7 @@ namespace gazebo
     //protected: void UpdatePose();
 
     /// \brief Set transparency for all child geometries
-    public: void SetTransparency(float t);
+    public: void SetTransparent(const bool &show);
 
     /// \brief Returns list of sensors
     public:  std::vector< Sensor* > &GetSensors();
@@ -289,6 +289,8 @@ namespace gazebo
     protected: ParamT<bool> *kinematicP;
     protected: Mass customMass;
 
+    protected: std::vector<std::string> visuals;
+
     private: EventT<void (bool)> enabledSignal;
     private: ConnectionPtr showPhysicsConnection; 
 
@@ -296,6 +298,8 @@ namespace gazebo
     private: bool enabled;
 
     protected: Pose3d newPose;
+
+    private: std::vector<ConnectionPtr> connections;
   };
 
   /// \}

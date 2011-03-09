@@ -95,7 +95,7 @@ std::string Simulator::defaultWorldXML =
           <normal>0 0 1</normal>\
           <size>100 100</size>\
           <segments>1  1</segments>\
-          <uv_tile>100 100</uv_ttile>\
+          <uv_tile>100 100</uv_tile>\
           <mu1>109999.0</mu1>\
           <mu2>1000.0</mu2>\
           <material>Gazebo/Grey</material>\

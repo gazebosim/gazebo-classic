@@ -99,9 +99,6 @@ namespace gazebo
     /// \brief Set the visibility of the bounding box
     public: void ShowBoundingBox(const bool &show);
 
-    /// \brief Set the transparency
-    public: void SetTransparent(const bool &show);
-
     /// \brief Set the mass
     public: void SetMass(const double &mass);
 
@@ -209,7 +206,6 @@ namespace gazebo
     private: float transparency;
 
     /// All the visual apparence 
-    private: std::vector<std::string> visuals;
     private: std::string bbVisual;
 
     protected: Shape *shape;
