@@ -194,8 +194,8 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
   {
     this->sceneType= SCENE_EXT;
     //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
-    this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
+    //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+    this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
   }
 
   // Load Resources
