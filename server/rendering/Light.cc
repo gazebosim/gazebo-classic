@@ -200,6 +200,7 @@ void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
     this->spotFalloffP->SetValue(msg->spot_falloff());
 
   this->Load(NULL);
+
   if (msg->has_pose())
     this->SetPosition(Message::Convert(msg->pose().position()));
 }

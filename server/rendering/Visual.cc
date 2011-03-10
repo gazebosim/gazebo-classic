@@ -169,11 +169,12 @@ void Visual::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 {
-  std::cout << "Load Visual from message\n";
+  std::cout << "Visual::LoadFromMsg \n";
   std::string mesh = msg->mesh();
 
   if (msg->has_plane())
   {
+    std::cout << "Is a plane\n";
     Plane plane = Message::Convert(msg->plane());
     MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
         Vector2<double>(2,2), 
@@ -231,9 +232,7 @@ void Visual::Load(XMLConfigNode *node)
   pose.pos = this->xyzP->GetValue();
   pose.rot = this->rpyP->GetValue();
 
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
+  std::cout << "In Load MaterialP[" << **this->materialNameP << "]\n";
 
   try
   {
@@ -481,9 +480,7 @@ Vector3 Visual::GetScale()
 // Set the material
 void Visual::SetMaterial(const std::string &materialName)
 {
-  // Stop here if the rendering engine has been disabled
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
+  std::cout << "SetMaterial[" << materialName << "]\n";
 
   if (materialName.empty())
     return;
@@ -543,6 +540,7 @@ void Visual::SetMaterial(const std::string &materialName)
     {
       Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
+      std::cout << "Actually setting a material[" << this->myMaterialName << "]!!!\n";
       if (dynamic_cast<Ogre::Entity*>(obj))
         ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
       else
@@ -1211,6 +1209,7 @@ void Visual::InsertMesh( const Mesh *mesh)
 /// Update a visual based on a message
 void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
 {
+  std::cout << "Visual::UpdateFromMsg\n";
   if (msg->has_pose())
     this->SetPose( Message::Convert(msg->pose()) );
 
@@ -1223,9 +1222,9 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
   if (msg->has_transparency())
     this->SetTransparency(msg->transparency());
 
-  /*if (msg->has_material())
+  if (msg->has_material())
     this->SetMaterial(msg->material());
-    */
+
   /*if (msg->points.size() > 0)
   {
     OgreDynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);

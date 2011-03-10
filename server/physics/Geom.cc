@@ -138,12 +138,9 @@ void Geom::Load(XMLConfigNode *node)
 
   this->shape->Load(node);
 
-  this->CreateBoundingBox();
+  //this->CreateBoundingBox();
 
   this->body->AttachGeom(this);
-
-
-  
 }
 
 ////////////////////////////////////////////////////////////////////////////////

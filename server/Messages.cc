@@ -244,6 +244,7 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
 
   result.mutable_pose()->mutable_position()->CopyFrom( Convert(node->GetVector3("xyz",Vector3(0,0,0))) );  
   result.mutable_pose()->mutable_orientation()->CopyFrom( Convert(node->GetRotation("rpy", Quatern() )) );
+
   result.mutable_diffuse()->CopyFrom( Convert( node->GetColor("diffuse", Color(1,1,1,1)) ) );
   result.mutable_specular()->CopyFrom( Convert( node->GetColor("specular", Color(0,0,0,1)) ) );
   result.mutable_attenuation()->CopyFrom( Convert( 
@@ -272,6 +273,21 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
   result.set_visible( node->GetBool("visible",true,0) );
   result.set_transparency( node->GetDouble("transparency",0.0,0) );
   result.mutable_scale()->CopyFrom( Convert( node->GetVector3("scale", Vector3(1,1,1)) ) );
+
+  if (node->GetChild("uv_tile"))
+  {
+    result.set_uv_tile_x( node->GetTupleDouble("uv_tile",0,1) );
+    result.set_uv_tile_y( node->GetTupleDouble("uv_tile",1,1) );
+  }
+
+  if (node->GetChild("normal"))
+  {
+    result.mutable_plane()->mutable_normal()->CopyFrom( 
+        Message::Convert( node->GetVector3( "normal",Vector3(0,0,1) ) )  );
+    result.mutable_plane()->set_d( node->GetDouble("offset", 0, 0) );
+    result.mutable_plane()->set_size_x( node->GetTupleDouble("size", 0, 1) );
+    result.mutable_plane()->set_size_y( node->GetTupleDouble("size", 1, 1) );
+  }
 
   return result;
 }

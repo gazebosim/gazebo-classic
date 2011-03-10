@@ -31,20 +31,21 @@
   
     <!-- Ground Plane -->
     <model type="physical" name="plane1_model">
-      <xyz>0 0 0</xyz>
-      <rpy>0 0 0</rpy>
       <static>true</static>
-      <body name="plane1_body">
-        <geom type="plane" name="plane1_geom">
+      <body name="body">
+        <collision type="plane" name="collision">
           <normal>0 0 1</normal>
           <mu1>109999.0</mu1>
           <mu2>1000.0</mu2>
+        </collision>
 
-          <size>100 100</size>
+        <visual>
           <mesh>unit_plane</mesh>
+          <size>100 100 0</size>
+          <normal>0 0 1</normal>
           <material>Gazebo/GreyGrid</material>
-          <uvTile>100 100</uvTile>
-        </geom>
+          <uv_tile>100 100</uv_tile>
+        </visual>
       </body>
     </model>
 
@@ -62,12 +63,12 @@
       <xyz>10.0 0 20</xyz>
       <rpy>0 0 0</rpy>
       <type>point</type>
-      <diffuseColor>0.4 0.4 0.4 1.0</diffuseColor>
-      <specularColor>.1 .1 .1 1.0</specularColor>
+      <diffuse>0.4 0.4 0.4 1.0</diffuse>
+      <specular>.1 .1 .1 1.0</specular>
       <attenuation>.2 0.1 0.0</attenuation>
       <range>80</range>
       <direction>0 0 -1.0</direction>
-      <castShadows>true</castShadows>
+      <cast_shadows>true</cast_shadows>
     </light>
 
   </world>

@@ -61,10 +61,12 @@ abstract material perpixel_template
       fragment_program_ref perpixel_fp_glsl {}
     }
 
+    /*
     pass decal
     {
       lighting off
-      scene_blend dest_colour zero
+      scene_blend add //dest_colour one
     }
+    */
   }
 }

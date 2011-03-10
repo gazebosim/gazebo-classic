@@ -218,14 +218,14 @@ void Body::Load(XMLConfigNode *node)
   //   this body's pose - this body's offsetFromModelFrame
   this->initModelOffset = this->GetRelativePose().CoordPoseSolve(Pose3d());
 
-  childNode = node->GetChild("geom");
+  childNode = node->GetChild("collision");
 
   // Load the geometries
   while (childNode)
   {
     // Create and Load a geom, which will belong to this body.
     this->LoadGeom(childNode);
-    childNode = childNode->GetNext("geom");
+    childNode = childNode->GetNext("collision");
   }
 
   childNode = node->GetChild("sensor");
@@ -249,6 +249,8 @@ void Body::Load(XMLConfigNode *node)
     visname << this->GetCompleteScopedName() << "::VISUAL_" << 
                this->visuals.size();
 
+
+    std::cout << "Body[" << this->GetName() << "] Load Visual[" << visname.str() << "]\n";
 
     msgs::Visual msg = Message::VisualFromXML(childNode);
     Message::Init(msg, visname.str());
