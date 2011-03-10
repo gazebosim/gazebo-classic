@@ -127,8 +127,17 @@ void FixedJoint::Load(XMLConfigNode *node)
 
   if (prevJoint)
   {
-    Pose3d diff = keepBody->GetCoMEntity()->GetRelativePose() - origCoM;
-    prevJoint->SetAnchor(0,prevJoint->anchorPos + diff.pos);
+    for (unsigned int i=0; i < this->model->GetJointCount(); i++)
+    {
+      Joint *j = this->model->GetJoint(i);
+      if (j->GetType() == Joint::FIXED)
+        continue;
+      if (j->body1 == keepBody || j->body2 == keepBody)
+      {
+        Pose3d diff = keepBody->GetCoMEntity()->GetRelativePose() - origCoM;
+        j->SetAnchor(0, j->anchorPos + diff.pos);
+      }
+    }
   }
   
   keepBody->AddAltName(delBody->GetName());
