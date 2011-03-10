@@ -8,8 +8,8 @@
 			<copyright></copyright>
 			<source_data>file:///u/nkoenig/create.blend</source_data>
 		</contributor>
-		<created>2011-03-08T13:00:39.716298</created>
-		<modified>2011-03-08T13:00:39.716313</modified>
+		<created>2011-03-08T19:33:03.749128</created>
+		<modified>2011-03-08T19:33:03.749150</modified>
 		<unit meter="0.01" name="centimeter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
@@ -65,7 +65,7 @@
 	</library_effects>
 	<library_images>
 		<image id="create_Mesh_tga-img" name="create_Mesh_tga-img">
-			<init_from>create.tga</init_from>
+			<init_from>create_mesh.tga</init_from>
 		</image>
 	</library_images>
 	<library_materials>

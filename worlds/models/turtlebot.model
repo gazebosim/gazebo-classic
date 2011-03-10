@@ -18,7 +18,7 @@
       </geom:cylinder>
 
       <geom:box name="plate_0">
-        <xyz>-0.04334 0 0.034</xyz>
+        <xyz>-0.04334 0 0.0385054</xyz>
         <mass>0.01</mass>
         <size>0.233502 0.314845 0.006401</size>
         <visual>
@@ -27,7 +27,7 @@
       </geom:box>
 
       <geom:box name="plate_1">
-        <xyz>-0.003 0 0.0722018</xyz>
+        <xyz>-0.00266 0 0.0703064</xyz>
         <mass>0.01</mass>
         <size>0.314856 0.314856 0.006401</size>
         <visual>
@@ -36,7 +36,7 @@
       </geom:box>
 
       <geom:box name="plate_1a">
-        <xyz>-0.003 0 0.1358036</xyz>
+        <xyz>-0.00266 0 0.1275074</xyz>
         <mass>0.01</mass>
         <size>0.314856 0.314856 0.006401</size>
         <visual>
@@ -45,7 +45,7 @@
       </geom:box>
 
      <geom:box name="plate_2">
-        <xyz>-0.01 0 0.3485542</xyz>
+        <xyz>-0.01582 0 0.3338564</xyz>
         <mass>0.01</mass>
         <size>0.288 0.315 0.006401</size>
         <visual>
@@ -53,52 +53,52 @@
         </visual>
       </geom:box>
 
-      <geom:cylinder name="standoff_1">
-        <xyz>-0.003 0.112 0.17</xyz>
+      <geom:cylinder name="standoff_0">
+        <xyz>-0.00254 0.11468 0.1805816</xyz>
         <mass>0.0001</mass>
-        <size>0.01 0.35</size>
+        <size>0.01 0.3</size>
         <visual>
-        <size>0.01 0.01 0.35</size>
+        <size>0.01 0.01 0.30</size>
           <mesh>unit_cylinder</mesh>
           <material>Gazebo/Grey</material>
         </visual>
       </geom:cylinder>
       
-      <geom:cylinder name="standoff_2">
-        <xyz>-0.073 0.112 0.17</xyz>
+      <geom:cylinder name="standoff_1">
+        <xyz>-0.00254 -0.11468 0.1805816</xyz>
         <mass>0.0001</mass>
-        <size>0.01 0.35</size>
+        <size>0.01 0.3</size>
         <visual>
-        <size>0.01 0.01 0.35</size>
+        <size>0.01 0.01 0.3</size>
           <mesh>unit_cylinder</mesh>
           <material>Gazebo/Grey</material>
         </visual>
       </geom:cylinder>
 
-      <geom:cylinder name="standoff_3">
-        <xyz>-0.003 -0.112 0.17</xyz>
+      <geom:cylinder name="standoff_2">
+        <xyz>-0.07239 0.111468 0.1805816</xyz>
         <mass>0.0001</mass>
-        <size>0.01 0.35</size>
+        <size>0.01 0.3</size>
         <visual>
-        <size>0.01 0.01 0.35</size>
+        <size>0.01 0.01 0.3</size>
           <mesh>unit_cylinder</mesh>
           <material>Gazebo/Grey</material>
         </visual>
       </geom:cylinder>
       
-      <geom:cylinder name="standoff_4">
-        <xyz>-0.073 -0.112 0.17</xyz>
+      <geom:cylinder name="standoff_3">
+        <xyz>-0.07239 -0.111468 0.1805816</xyz>
         <mass>0.0001</mass>
-        <size>0.01 0.35</size>
+        <size>0.01 0.3</size>
         <visual>
-        <size>0.01 0.01 0.35</size>
+        <size>0.01 0.01 0.3</size>
           <mesh>unit_cylinder</mesh>
           <material>Gazebo/Grey</material>
         </visual>
       </geom:cylinder>
 
       <geom:box name="kinect">
-        <xyz>-0.0844 0 0.19</xyz>
+        <xyz>-0.0870982 0 0.2322564</xyz>
         <mass>0.0001</mass>
         <size>0.0730 .2760 0.0720</size>
         <visual>
@@ -106,6 +106,30 @@
           <mesh>kinect/kinect.dae</mesh>
         </visual>
       </geom:box>
+
+      <geom:cylinder name="kinect_standoff_1">
+        <xyz>-0.105098 0.098 0.1783974</xyz>
+        <mass>0.0001</mass>
+        <size>0.01 0.09538</size>
+        <visual>
+        <size>0.01 0.01 0.09538</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+
+      <geom:cylinder name="kinect_standoff_2">
+        <xyz>-0.105098 -0.098 0.1783974</xyz>
+        <mass>0.0001</mass>
+        <size>0.01 0.09538</size>
+        <visual>
+        <size>0.01 0.01 0.09538</size>
+          <mesh>unit_cylinder</mesh>
+          <material>Gazebo/Black</material>
+        </visual>
+      </geom:cylinder>
+
+
 
       <sensor:stereocamera name="kinect_camera">
         <xyz>0 0 .220</xyz>
