@@ -97,6 +97,10 @@ Body::Body(Entity *parent)
   this->kinematicP->Callback( &Body::SetKinematic, this );
 
   Param::End();
+
+  this->connections.push_back( Events::ConnectShowJointsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
+  this->connections.push_back( Events::ConnectShowPhysicsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
+
 }
 
 
@@ -107,6 +111,15 @@ Body::~Body()
   std::map< std::string, Geom* >::iterator giter;
   std::vector<Entity*>::iterator iter;
   std::vector< Sensor* >::iterator siter;
+
+  for (unsigned int i=0; i < this->visuals.size(); i++)
+  {
+    msgs::Visual msg;
+    Message::Init(msg, this->visuals[i]);
+    msg.set_action( msgs::Visual::DELETE );
+    this->vis_pub->Publish(msg);
+  }
+  this->visuals.clear();
 
   if (this->cgVisuals.size() > 0)
   {
@@ -228,6 +241,26 @@ void Body::Load(XMLConfigNode *node)
   this->SetKinematic(**this->kinematicP);
 
   this->showPhysicsConnection = Events::ConnectShowPhysicsSignal( boost::bind(&Body::ShowPhysics, this, _1) );
+
+  childNode = node->GetChild("visual");
+  while (childNode)
+  {
+    std::ostringstream visname;
+    visname << this->GetCompleteScopedName() << "::VISUAL_" << 
+               this->visuals.size();
+
+
+    msgs::Visual msg = Message::VisualFromXML(childNode);
+    Message::Init(msg, visname.str());
+    msg.set_parent_id( this->GetCompleteScopedName() );
+    msg.set_render_type( msgs::Visual::MESH_RESOURCE );
+    msg.set_cast_shadows( false );
+
+    this->vis_pub->Publish(msg);
+    this->visuals.push_back(msg.header().str_id());
+   
+    childNode = childNode->GetNext("visual");
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -258,6 +291,15 @@ void Body::Save(std::string &prefix, std::ostream &stream)
     (*siter)->Save(p, stream);
   }
 
+  // NATY: put back in functionality
+  /*std::vector<Visual*>::iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
+  {
+    if (*iter)
+      (*iter)->Save(p, stream);
+  }*/
+
+
   stream << prefix << "</body>\n";
 }
 
@@ -268,6 +310,8 @@ void Body::Fini()
 {
   std::vector< Sensor* >::iterator siter;
   std::map< std::string, Geom* >::iterator giter;
+
+  this->connections.clear();
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     (*siter)->Fini();
@@ -751,4 +795,21 @@ bool Body::GetAutoDisable() const
 void Body::SetAutoDisable(const bool &value)
 {
   this->autoDisableP->SetValue(value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the transparency
+void Body::SetTransparent(const bool &show)
+{
+  for (unsigned int i = 0; i < this->visuals.size(); i++)
+  {
+    msgs::Visual msg;
+    Message::Init(msg, this->visuals[i]);
+    msg.set_action( msgs::Visual::UPDATE );
+    if (show)
+      msg.set_transparency( 0.6 );
+    else
+      msg.set_transparency( 0.0 );
+    this->vis_pub->Publish(msg);
+  }
 }
