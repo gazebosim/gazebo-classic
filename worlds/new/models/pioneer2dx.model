@@ -118,7 +118,7 @@
   </visual>
 </body>
 
-
+<!--
 <joint type="hinge" name="left_wheel_hinge">
   <body1>left_wheel</body1>
   <body2>chassis_body</body2>
@@ -146,6 +146,7 @@
   <erp>0.8</erp>
   <cfm>10e-5</cfm>
 </joint>
+-->
 
 <!--
 <controller type="differential_position2d" name="controller1">
