@@ -41,7 +41,9 @@ void TopicManager::SendMessage( const std::string &topic,
   Message::SendStamp(message);
 
   if (!message.IsInitialized())
-    gzthrow("Simulator::SendMessage Message is not initialized");
+  {
+    gzthrow("Simulator::SendMessage Message is not initialized[" + message.InitializationErrorString() + "]");
+  }
 
   if (!message.SerializeToString(&out))
     gzthrow("Simulator::SendMessage Failed to serialized message");

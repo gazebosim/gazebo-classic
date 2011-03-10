@@ -154,11 +154,6 @@ namespace gazebo
 
     public: void InitShadows();
 
-    /// \brief Receive a new message
-    public: void HandleVisualMessage(const boost::shared_ptr<msgs::Visual const> &msg);
-    /// \brief Process all messages
-    public: void ProcessMessages();
-
     // \brief Get the mesh information for the given mesh.
     // Code found in Wiki: www.ogre3d.org/wiki/index.php/RetrieveVertexData
     private: void GetMeshInformation(const Ogre::MeshPtr mesh,
@@ -170,9 +165,10 @@ namespace gazebo
                                      const Ogre::Quaternion &orient,
                                      const Ogre::Vector3 &scale);
 
-    private: void HandleVisualMsg(boost::shared_ptr<msgs::Visual const> &msg);
+    private: void HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
     private: void HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
-    private: void HandleSelectionMsg(const msgs::Selection &msg);
+    private: void HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg);
+    private: void HandlePoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
 
     private: std::string name;
     private: ParamT<Color> *ambientP;
@@ -210,6 +206,8 @@ namespace gazebo
 
     private: SubscriberPtr vis_sub;
     private: SubscriberPtr light_sub;
+    private: SubscriberPtr pose_sub;
+    private: SubscriberPtr selection_sub;
   };
 };
 #endif 

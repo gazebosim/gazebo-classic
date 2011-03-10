@@ -48,29 +48,27 @@
       </body>
     </model>
 
-    <!--
     <model type="physical" name="box_model">
-      <xyz>0 0 1.0</xyz>
-      <static>false</static>
+      <xyz>0 0 2.0</xyz>
+      <static>true</static>
       <body name="body">
         <geom type="box" name="geom">
           <size>1 1 1</size>
           <mass>1.0</mass>
-          <visual>
-            <rpy>90 0 0</rpy>
-            <scale>1 1 1</scale>
-            <mesh>unit_box</mesh>
-            <material>Gazebo/Grey</material>
-          </visual>
         </geom>
+
+        <visual>
+          <scale>1 1 1</scale>
+          <mesh>unit_box</mesh>
+          <material>Gazebo/Red</material>
+        </visual>
       </body>
     </model>
-    -->
 
  
     <!-- White Point light -->
     <light name="point_white">
-      <xyz>0.0 0 10</xyz>
+      <xyz>1.0 0 10</xyz>
       <rpy>0 0 0</rpy>
       <type>point</type>
       <diffuseColor>0.4 0.4 0.4 1.0</diffuseColor>

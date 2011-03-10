@@ -175,6 +175,7 @@ void Geom::CreateBoundingBox()
 
     Message::Set(msg.mutable_scale(), (max - min) * 1.01);
     Message::Set(msg.mutable_pose()->mutable_position(), Vector3(0,0,0.0));
+    Message::Set(msg.mutable_pose()->mutable_orientation(), Quatern(1,0,0,0));
     msg.set_transparency( .5 );
 
     this->vis_pub->Publish(msg);

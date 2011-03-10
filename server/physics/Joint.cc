@@ -158,6 +158,7 @@ void Joint::Load(XMLConfigNode *node)
   msg.set_parent_id( this->GetName() );
   msg.set_render_type( msgs::Visual::MESH_RESOURCE );
   Message::Set(msg.mutable_pose()->mutable_position(), this->anchorPos );
+  Message::Set(msg.mutable_pose()->mutable_orientation(), Quatern(1,0,0,0) );
   msg.set_cast_shadows( false );
   msg.set_mesh( "joint_anchor" );
   msg.set_material( "Gazebo/JointAnchor" );
@@ -222,6 +223,7 @@ void Joint::Update()
     msgs::Visual msg;
     Message::Init(msg, this->visual);
     Message::Set(msg.mutable_pose()->mutable_position(), this->anchorPos);
+    Message::Set(msg.mutable_pose()->mutable_orientation(), Quatern(1,0,0,0) );
     this->vis_pub->Publish(msg);
 
     if (this->body1) 

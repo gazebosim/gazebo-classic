@@ -9,7 +9,6 @@ set (msgs color.proto
           time.proto
           visual.proto
           selection.proto
-          int.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

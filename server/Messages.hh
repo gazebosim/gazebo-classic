@@ -28,7 +28,6 @@
 #include "msgs/plane.pb.h"
 #include "msgs/quaternion.pb.h"
 #include "msgs/time.pb.h"
-#include "msgs/int.pb.h"
 
 #include "XMLConfig.hh"
 #include "Color.hh"

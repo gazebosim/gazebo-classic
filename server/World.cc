@@ -277,8 +277,6 @@ void World::Init()
 // Primarily used to update the graphics interfaces
 void World::GraphicsUpdate()
 {
-  this->scene->ProcessMessages();
-
   this->graphics->Update();
 }
 

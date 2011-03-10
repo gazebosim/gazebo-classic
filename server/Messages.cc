@@ -46,7 +46,6 @@ msgs::Header *Message::GetHeader(google::protobuf::Message &message)
 
 void Message::Init(google::protobuf::Message &message, const std::string &id)
 {
-  message.Clear();
   msgs::Header *header = Message::GetHeader(message);
 
   if ( header )

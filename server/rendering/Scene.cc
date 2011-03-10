@@ -43,8 +43,10 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
-  this->vis_sub = TopicManager::Instance()->Subscribe("/gazebo/visual", &Scene::HandleVisualMessage, this);
+  this->vis_sub = TopicManager::Instance()->Subscribe("/gazebo/visual", &Scene::HandleVisualMsg, this);
   this->light_sub = TopicManager::Instance()->Subscribe("/gazebo/light", &Scene::HandleLightMsg, this);
+  this->pose_sub = TopicManager::Instance()->Subscribe("/gazebo/pose", &Scene::HandlePoseMsg, this);
+  this->selection_sub = TopicManager::Instance()->Subscribe("/gazebo/selection", &Scene::HandleSelectionMsg, this);
 
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
@@ -687,63 +689,6 @@ std::string Scene::GetIdString() const
   return this->idString;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Receive a message
-void Scene::HandleVisualMessage(const boost::shared_ptr<msgs::Visual const> &msg)
-{
-  boost::mutex::scoped_lock lock( this->mutex );
-  this->visualMessages.push_back(msg);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Process all messages
-void Scene::ProcessMessages()
-{
-  boost::mutex::scoped_lock lock( this->mutex );
-
-  std::list<boost::shared_ptr< msgs::Visual const> >::iterator iter;
-  for (iter = this->visualMessages.begin();
-       iter != this->visualMessages.end(); iter++)
-  {
-    this->HandleVisualMsg(*iter);
-  }
-  this->visualMessages.clear();
-
-/*
-  for (iter =  this->messages[VISUAL_MSG].begin(); 
-       iter != this->messages[VISUAL_MSG].end(); iter++)
-  {
-    this->HandleVisualMsg((VisualMsg*)*iter);
-  }
-
-  for (iter =  this->messages[LIGHT_MSG].begin(); 
-       iter != this->messages[LIGHT_MSG].end(); iter++)
-  {
-    this->HandleLightMsg((LightMsg*)*iter);
-  }
-
-  for (iter =  this->messages[SELECTION_MSG].begin(); 
-       iter != this->messages[SELECTION_MSG].end(); iter++)
-  {
-    this->HandleSelectionMsg((SelectionMsg*)*iter);
-  }
-
-  for (iter =  this->messages[POSE_MSG].begin(); 
-       iter != this->messages[POSE_MSG].end(); iter++)
-  {
-    PoseMsg *pmsg = (PoseMsg*)*iter;
-    VisualMap::iterator iter2;
-    iter2 = this->visuals.find(pmsg->id);
-
-    if (iter2 != this->visuals.end())
-    {
-      iter2->second->SetPose( pmsg->pose );
-    }
-  }
-
-  this->messages.clear();
-  */
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the mesh information for the given mesh.
@@ -873,7 +818,7 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
   }
 }
 
-void Scene::HandleVisualMsg(boost::shared_ptr<msgs::Visual const> &msg)
+void Scene::HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
   VisualMap::iterator iter;
   iter = this->visuals.find( msg->header().str_id() );
@@ -907,6 +852,18 @@ void Scene::HandleVisualMsg(boost::shared_ptr<msgs::Visual const> &msg)
   }
 }
 
+void Scene::HandlePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg)
+{
+  VisualMap::iterator iter;
+  iter = this->visuals.find(msg->header().str_id());
+
+  std::cout << "Pose Message\n";
+  if (iter != this->visuals.end())
+  {
+    iter->second->SetPose( Message::Convert(*msg) );
+  }
+}
+
 void Scene::HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
 {
   LightMap::iterator iter;
@@ -928,11 +885,10 @@ void Scene::HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
   }
 }
 
-void Scene::HandleSelectionMsg(const msgs::Selection &msg)
+void Scene::HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg)
 {
-  /*VisualMap::iterator viter;
-  viter = this->visuals.find(msg->id);
+  VisualMap::iterator viter;
+  viter = this->visuals.find(msg->header().str_id());
   if (viter != this->visuals.end())
-    viter->second->ShowSelectionBox(msg->selected);
-    */
+    viter->second->ShowSelectionBox(msg->selected());
 }

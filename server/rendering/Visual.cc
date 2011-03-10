@@ -167,16 +167,14 @@ void Visual::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Visual::LoadFromMsg(boost::shared_ptr< msgs::Visual const> &msg)
+void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 {
   std::cout << "Load Visual from message\n";
   std::string mesh = msg->mesh();
 
   if (msg->has_plane())
   {
-    std::cout << "Create a plane[" << msg->header().str_id() << "]\n";
     Plane plane = Message::Convert(msg->plane());
-    std::cout << "Plane[" << plane.normal<< " " << plane.size << " " << plane.d << "]\n";
     MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
         Vector2<double>(2,2), 
         Vector2<double>(msg->uv_tile_x(), msg->uv_tile_y()) );
@@ -1211,7 +1209,7 @@ void Visual::InsertMesh( const Mesh *mesh)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update a visual based on a message
-void Visual::UpdateFromMsg( boost::shared_ptr< msgs::Visual const> &msg )
+void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
 {
   if (msg->has_pose())
     this->SetPose( Message::Convert(msg->pose()) );
@@ -1225,9 +1223,9 @@ void Visual::UpdateFromMsg( boost::shared_ptr< msgs::Visual const> &msg )
   if (msg->has_transparency())
     this->SetTransparency(msg->transparency());
 
-  if (msg->has_material())
+  /*if (msg->has_material())
     this->SetMaterial(msg->material());
-
+    */
   /*if (msg->points.size() > 0)
   {
     OgreDynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);

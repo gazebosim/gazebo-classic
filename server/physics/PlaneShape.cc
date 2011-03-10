@@ -109,9 +109,7 @@ void PlaneShape::Save(std::string &prefix, std::ostream &stream)
 void PlaneShape::CreatePlane()
 {
   msgs::Visual msg;
-  std::cout << "PlaneShape::CreatePlane\n";
   Message::Init(msg, this->GetName());
-  std::cout << "PlaneShape::CreatePlane Done\n";
   Message::Set(msg.mutable_plane()->mutable_normal(), **this->normalP);
   msg.mutable_plane()->set_size_x( (**this->sizeP).x );
   msg.mutable_plane()->set_size_y( (**this->sizeP).y );
