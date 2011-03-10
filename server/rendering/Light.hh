@@ -31,6 +31,7 @@
 #include "Color.hh"
 #include "Param.hh"
 #include "Common.hh"
+#include "Messages.hh"
 
 namespace Ogre
 {
@@ -59,7 +60,7 @@ namespace gazebo
     public: void Load(XMLConfigNode *node);
 
     /// \brief Load from a light message
-    //public: void LoadFromMsg(const LightMsg *msg);
+    public: void LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg);
 
     /// \brief Save a light
     public: void Save(const std::string &prefix, std::ostream &stream);

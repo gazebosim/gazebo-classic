@@ -107,6 +107,8 @@ SET (sources Common.cc
              Timer.cc
              Diagnostics.cc
              Publisher.cc
+             Subscriber.cc
+             TopicManager.cc
 )
 
 SET (headers Common.hh
@@ -149,6 +151,9 @@ SET (headers Common.hh
              Timer.hh
              Diagnostics.hh
              Publisher.hh
+             Subscriber.hh
+             Subscription.hh
+             TopicManager.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})
@@ -161,6 +166,7 @@ endforeach (header ${gazeboserver_headers_nopath})
 
 add_library(gazebo_server SHARED ${gazeboserver_sources} )
 set_target_properties(gazebo_server PROPERTIES VERSION ${GAZEBO_VERSION})
+
 
 add_executable(gazebo-exec main.cc)
 set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")

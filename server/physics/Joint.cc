@@ -30,6 +30,7 @@
 #include "Body.hh"
 #include "Model.hh"
 #include "World.hh"
+#include "TopicManager.hh"
 #include "Joint.hh"
 
 using namespace gazebo;
@@ -39,7 +40,7 @@ using namespace gazebo;
 Joint::Joint()
   : Common(NULL)
 {
-  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(JOINT);
   this->model = NULL;
   this->showJoints = false;

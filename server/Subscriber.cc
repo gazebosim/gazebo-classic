@@ -14,37 +14,39 @@
  * limitations under the License.
  *
 */
-/* Desc: Handles pushing messages out on a named topic
+/* Desc: Handles a subscription to a topic
  * Author: Nate Koenig
  */
 
-#include "GazeboError.hh"
 #include "TopicManager.hh"
-#include "Publisher.hh"
+#include "Subscriber.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Publisher::Publisher(const std::string &topic, const std::string &msg_type)
-  : topic(topic), msg_type(msg_type)
+Subscriber::Subscriber(const std::string &t, SubscriptionPtr sub)
+  : topic(t), subscription(sub)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Publisher::~Publisher()
+Subscriber::~Subscriber()
 {
-  if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
+  this->Unsubscribe();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Publish a message
-void Publisher::Publish(google::protobuf::Message &message )
+/// Get the topic name
+std::string Subscriber::GetTopic() const
 {
-  if (message.GetTypeName() != this->msg_type)
-    gzthrow("Invalid message type\n");
+  return this->topic;
+}
 
-  TopicManager::Instance()->SendMessage(this->topic, message);
+////////////////////////////////////////////////////////////////////////////////
+/// Unsubscribe from the topic
+void Subscriber::Unsubscribe() const
+{
+  TopicManager::Instance()->Unsubscribe(this->topic, this->subscription );
 }

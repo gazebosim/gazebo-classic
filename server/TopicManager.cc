@@ -14,37 +14,49 @@
  * limitations under the License.
  *
 */
-/* Desc: Handles pushing messages out on a named topic
- * Author: Nate Koenig
- */
-
-#include "GazeboError.hh"
 #include "TopicManager.hh"
-#include "Publisher.hh"
 
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Publisher::Publisher(const std::string &topic, const std::string &msg_type)
-  : topic(topic), msg_type(msg_type)
+TopicManager::TopicManager()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Publisher::~Publisher()
+TopicManager::~TopicManager()
 {
-  if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Publish a message
-void Publisher::Publish(google::protobuf::Message &message )
+/// Send a message
+void TopicManager::SendMessage( const std::string &topic, 
+                                google::protobuf::Message &message )
 {
-  if (message.GetTypeName() != this->msg_type)
-    gzthrow("Invalid message type\n");
+  std::string out;
 
-  TopicManager::Instance()->SendMessage(this->topic, message);
+  // Stamp the message with the transport time
+  Message::SendStamp(message);
+
+  if (!message.IsInitialized())
+    gzthrow("Simulator::SendMessage Message is not initialized");
+
+  if (!message.SerializeToString(&out))
+    gzthrow("Simulator::SendMessage Failed to serialized message");
+
+  std::list<SubscriptionPtr>::iterator iter;
+  for (iter = this->subscribed_topics[topic].begin(); 
+       iter != this->subscribed_topics[topic].end(); iter++)
+  {
+    (*iter)->HandleMessage(out);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Unsubscribe from a topic
+void TopicManager::Unsubscribe( const std::string &topic, SubscriptionPtr sub)
+{
+  this->subscribed_topics[topic].remove(sub);
 }

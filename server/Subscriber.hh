@@ -14,39 +14,38 @@
  * limitations under the License.
  *
 */
-/* Desc: Handles pushing messages out on a named topic
+/* Desc: Handles a subscription to a topic
  * Author: Nate Koenig
  */
 
-#ifndef PUBLISHER_HH
-#define PUBLISHER_HH
+#ifndef SUBSCRIBER_HH
+#define SUBSCRIBER_HH
 
-#include <google/protobuf/message.h>
+#include <string>
 #include <boost/shared_ptr.hpp>
+
+#include "Subscription.hh"
 
 namespace gazebo
 {
-  /// \brief A publisher of messages on a topic
-  class Publisher
+  class Subscriber
   {
-    /// \brief Default Constructor
-    public: Publisher() {}
-
-    /// \brief Use this constructor
-    /// \param topic Name of topic
-    /// \param msg_type Type of the message which is to be published
-    public: Publisher(const std::string &topic, const std::string &msg_type);
+    /// \brief Constructor
+    public: Subscriber(const std::string &topic, SubscriptionPtr sub);
 
     /// \brief Destructor
-    public: virtual ~Publisher();
+    public: virtual ~Subscriber();
 
-    /// \brief Publish a message on the topic
-    public: void Publish( google::protobuf::Message &message );
+    /// \brief Get the topic name
+    public: std::string GetTopic() const;
+
+    /// \brief Unsubscribe from the topic
+    public: void Unsubscribe() const;
 
     private: std::string topic;
-    private: std::string msg_type;
+    private: SubscriptionPtr subscription;
   };
-  typedef boost::shared_ptr<Publisher> PublisherPtr;
+  typedef boost::shared_ptr<Subscriber> SubscriberPtr;
 }
 
 #endif

@@ -167,28 +167,44 @@ void Visual::Init()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*void Visual::LoadFromMsg(const VisualMsg *msg)
+void Visual::LoadFromMsg(boost::shared_ptr< msgs::Visual const> &msg)
 {
-  std::string mesh = msg->mesh;
+  std::cout << "Load Visual from message\n";
+  std::string mesh = msg->mesh();
 
-  if (msg->plane.normal != Vector3(0,0,0))
+  if (msg->has_plane())
   {
-    MeshManager::Instance()->CreatePlane(msg->id, msg->plane,
-        Vector2<double>(2,2), Vector2<double>(msg->uvTile_x, msg->uvTile_y) );
-    mesh = msg->id;
+    std::cout << "Create a plane[" << msg->header().str_id() << "]\n";
+    Plane plane = Message::Convert(msg->plane());
+    std::cout << "Plane[" << plane.normal<< " " << plane.size << " " << plane.d << "]\n";
+    MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
+        Vector2<double>(2,2), 
+        Vector2<double>(msg->uv_tile_x(), msg->uv_tile_y()) );
+    mesh = msg->header().str_id();
   }
 
   this->meshNameP->SetValue(mesh);
-  this->xyzP->SetValue(msg->pose.pos);
-  this->rpyP->SetValue(msg->pose.rot);
   this->meshTileP->Load(NULL);
-  this->materialNameP->SetValue(msg->material);
-  this->castShadowsP->SetValue(msg->castShadows);
-  this->scaleP->SetValue(msg->scale);
+
+  if (msg->has_pose())
+  {
+    this->xyzP->SetValue(Message::Convert(msg->pose().position()));
+    this->rpyP->SetValue(Message::Convert(msg->pose().orientation()));
+  }
+
+  if (msg->has_material())
+    this->materialNameP->SetValue(msg->material());
+  std::cout << "MaterialP[" << **this->materialNameP << "]\n";
+
+  if (msg->has_cast_shadows())
+  this->castShadowsP->SetValue(msg->cast_shadows());
+
+  if (msg->has_scale())
+    this->scaleP->SetValue(Message::Convert(msg->scale()));
 
   this->Load(NULL);
   this->UpdateFromMsg(msg);
-}*/
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the visual
@@ -1195,20 +1211,31 @@ void Visual::InsertMesh( const Mesh *mesh)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update a visual based on a message
-/*void Visual::UpdateFromMsg(const VisualMsg *msg)
+void Visual::UpdateFromMsg( boost::shared_ptr< msgs::Visual const> &msg )
 {
-  this->SetPose(msg->pose);
-  this->SetScale(msg->scale);
-  this->SetVisible(msg->visible);
-  this->SetTransparency(msg->transparency);
-  this->SetMaterial(msg->material);
+  if (msg->has_pose())
+    this->SetPose( Message::Convert(msg->pose()) );
 
-  if (msg->points.size() > 0)
+  if (msg->has_scale())
+    this->SetScale( Message::Convert(msg->scale()) );
+
+  if (msg->has_visible())
+    this->SetVisible(msg->visible());
+
+  if (msg->has_transparency())
+    this->SetTransparency(msg->transparency());
+
+  if (msg->has_material())
+    this->SetMaterial(msg->material());
+
+  /*if (msg->points.size() > 0)
   {
     OgreDynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);
     for (unsigned int i=0; i < msg->points.size(); i++)
       lines->AddPoint( msg->points[i] );
   }
-}*/
+  */
+  
+}
 
 

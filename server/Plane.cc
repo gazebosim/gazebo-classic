@@ -23,6 +23,11 @@ Plane::Plane()
   this->d = 0.0;
 }
 
+Plane::Plane(Vector3 normal, Vector2<double> size, double offset)
+{
+  this->Set(normal, size, offset);
+}
+
 Plane::~Plane()
 {
 }

@@ -25,10 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "Publisher.hh"
 #include "GazeboError.hh"
 #include "Event.hh"
-#include "Messages.hh"
 #include "Time.hh"
 #include "SingletonT.hh"
 
@@ -158,28 +156,7 @@ namespace gazebo
       /// \brief Remove a plugin
       public: void RemovePlugin(const std::string &plugin);
 
-      public: template<typename M>
-              PublisherPtr Advertise(const std::string topic)
-              {
-                google::protobuf::Message *msg = NULL;
-                M msgtype;
-                msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
-                if (!msg)
-                  gzthrow("Advertise requires a google protobuf type");
-                this->topics[topic]++;
-                return PublisherPtr(new Publisher(topic, msg->GetTypeName()));
-              }
-
-      public: void Unadvertise(const std::string &topic)
-              {
-                this->topics[topic]--;
-              }
-
-      /// \brief Send a message
-      public: void SendMessage( const std::string &topic, 
-                                const std::string &msg_type, 
-                                const google::protobuf::Message &message );
-  
+ 
       /// \brief Function to run gui. Used by guiThread
       private: void PhysicsLoop();
   
@@ -225,8 +202,6 @@ namespace gazebo
       private: std::vector<Plugin*> plugins;
 
       private: ConnectionPtr quitConnection;
-
-      private: std::map<std::string, int> topics;
 
       //Singleton implementation
       private: friend class DestroyerT<Simulator>;

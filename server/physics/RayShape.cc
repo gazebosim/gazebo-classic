@@ -22,6 +22,7 @@
 
 #include "Messages.hh"
 #include "Simulator.hh"
+#include "TopicManager.hh"
 #include "RayShape.hh"
 
 using namespace gazebo;
@@ -33,7 +34,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
   {
     msgs::Visual msg;

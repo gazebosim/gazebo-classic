@@ -16,8 +16,6 @@
 */
 /* Desc: The world; all models are collected here
  * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- * SVN: $Id$
  */
 
 #include <assert.h>
@@ -30,6 +28,7 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include "TopicManager.hh"
 #include "Diagnostics.hh"
 #include "Events.hh"
 #include "Visual.hh"
@@ -78,9 +77,9 @@ class ModelUpdate_TBB
 // Private constructor
 World::World()
 {
-  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
-  this->selection_pub = Simulator::Instance()->Advertise<msgs::Selection>("/gazebo/selection");
-  this->light_pub = Simulator::Instance()->Advertise<msgs::Light>("/gazebo/selection");
+  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->selection_pub = TopicManager::Instance()->Advertise<msgs::Selection>("/gazebo/selection");
+  this->light_pub = TopicManager::Instance()->Advertise<msgs::Light>("/gazebo/light");
 
   this->server = NULL;
   this->physicsEngine = NULL;
@@ -557,6 +556,7 @@ void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplica
     {
       msgs::Light msg = Message::LightFromXML(node);
       msg.mutable_header()->set_str_id( "light" );
+      msg.set_action(msgs::Light::UPDATE);
       this->light_pub->Publish(msg);
     }
 

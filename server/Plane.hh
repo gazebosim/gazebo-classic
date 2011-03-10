@@ -25,6 +25,7 @@ namespace gazebo
   class Plane
   {
     public: Plane();
+    public: Plane(Vector3 normal, Vector2<double> size, double offset);
     public: virtual ~Plane();
 
     public: void Set(Vector3 normal, Vector2<double> size, double offset);

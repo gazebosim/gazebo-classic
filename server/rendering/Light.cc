@@ -161,30 +161,48 @@ void Light::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load from a light message
-/*void Light::LoadFromMsg(const LightMsg *msg)
+void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
 {
-  this->nameP->SetValue(msg->id);
+  this->nameP->SetValue(msg->header().str_id());
 
-  if (msg->type == LightMsg::POINT)
+  if (msg->has_type() && msg->type() == msgs::Light::POINT)
     this->lightTypeP->SetValue("point");
-  else if (msg->type == LightMsg::SPOT)
+  else if (msg->has_type() && msg->type() == msgs::Light::SPOT)
     this->lightTypeP->SetValue("spot");
   else
     this->lightTypeP->SetValue("directional");
 
-  this->diffuseP->SetValue(msg->diffuse);
-  this->specularP->SetValue(msg->specular);
-  this->directionP->SetValue(msg->direction);
-  this->attenuationP->SetValue(msg->attenuation);
-  this->rangeP->SetValue(msg->range);
-  this->castShadowsP->SetValue(msg->castShadows);
-  this->spotInnerAngleP->SetValue(msg->spotInnerAngle);
-  this->spotOuterAngleP->SetValue(msg->spotOuterAngle);
-  this->spotFalloffP->SetValue(msg->spotFalloff);
+  if (msg->has_diffuse())
+    this->diffuseP->SetValue(Message::Convert(msg->diffuse()));
+
+  if (msg->has_specular())
+    this->specularP->SetValue(Message::Convert(msg->specular()));
+
+  if (msg->has_direction())
+    this->directionP->SetValue(Message::Convert(msg->direction()));
+
+  if (msg->has_attenuation())
+    this->attenuationP->SetValue(Message::Convert(msg->attenuation()));
+
+  if (msg->has_range())
+    this->rangeP->SetValue(msg->range());
+
+  if (msg->has_cast_shadows())
+    this->castShadowsP->SetValue(msg->cast_shadows());
+
+  if (msg->has_spot_inner_angle())
+    this->spotInnerAngleP->SetValue(msg->spot_inner_angle());
+
+  if (msg->has_spot_outer_angle())
+    this->spotOuterAngleP->SetValue(msg->spot_outer_angle());
+
+  if (msg->has_spot_falloff())
+    this->spotFalloffP->SetValue(msg->spot_falloff());
 
   this->Load(NULL);
-  this->SetPosition(msg->pose.pos);
-}*/
+  if (msg->has_pose())
+    this->SetPosition(Message::Convert(msg->pose().position()));
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Save a light

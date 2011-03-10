@@ -21,48 +21,76 @@
 
 using namespace gazebo;
 
+const google::protobuf::FieldDescriptor *Message::GetFD(google::protobuf::Message &message, const std::string &name)
+{
+  return message.GetDescriptor()->FindFieldByName(name);
+}
+
+msgs::Header *Message::GetHeader(google::protobuf::Message &message)
+{
+  google::protobuf::Message *msg = NULL;
+ 
+  if (Message::GetFD(message, "str_id"))
+    msg = &message;
+  else 
+  {
+    const google::protobuf::FieldDescriptor *fd;
+    fd = Message::GetFD(message, "header");
+
+    if (fd)
+      msg = message.GetReflection()->MutableMessage(&message, fd);
+  }
+
+  return (msgs::Header*)msg;
+}
+
 void Message::Init(google::protobuf::Message &message, const std::string &id)
 {
   message.Clear();
-
-  const google::protobuf::Descriptor *header = message.GetDescriptor()->FindNestedTypeByName("header");
+  msgs::Header *header = Message::GetHeader(message);
 
   if ( header )
   {
-    const google::protobuf::FieldDescriptor *fd;
-    fd = header->FindFieldByName("str_id");
-    message.GetReflection()->SetString(&message, fd, id);
-    CreationStamp(message);
+    header->set_str_id(id);
+    Message::CreationStamp(*header);
   }
+  else
+    std::cout << "Header is non-existant\n";
 }
 
 void Message::CreationStamp(google::protobuf::Message &message)
 {
-  Message::Stamp(message, "stamp");
+  CreationStamp( *Message::GetHeader(message) );
+}
+
+void Message::CreationStamp(msgs::Header &message)
+{
+  Message::Stamp(message, "creation");
 }
 
 void Message::SendStamp(google::protobuf::Message &message)
 {
+  SendStamp( *Message::GetHeader(message) );
+}
+
+void Message::SendStamp(msgs::Header &message)
+{
   Message::Stamp(message, "send");
 }
 
-void Message::Stamp(google::protobuf::Message &message, const std::string &type)
+void Message::Stamp(msgs::Header &header, const std::string &type)
 {
-  const google::protobuf::Descriptor *header = message.GetDescriptor()->FindNestedTypeByName("header");
+  Time tm = Time::GetWallTime();
 
-  if ( header )
+  if (type == "creation")
   {
-    const google::protobuf::Descriptor *stamp;
-    const google::protobuf::FieldDescriptor *sec; 
-    const google::protobuf::FieldDescriptor *nsec;
-
-    stamp = header->FindNestedTypeByName(type);
-    sec = stamp->FindFieldByName("sec");
-    nsec = stamp->FindFieldByName("nsec");
-
-    Time tm = Time::GetWallTime();
-    message.GetReflection()->SetInt32(&message, sec, tm.sec);
-    message.GetReflection()->SetInt32(&message, nsec, tm.nsec);
+    header.mutable_creation()->set_sec(tm.sec);
+    header.mutable_creation()->set_nsec(tm.nsec);
+  }
+  else
+  {
+    header.mutable_send()->set_sec(tm.sec);
+    header.mutable_send()->set_nsec(tm.nsec);
   }
 }
 
@@ -163,6 +191,43 @@ msgs::Plane Message::Convert(const Plane &p)
   result.set_d( p.d );
   return result;
 }
+
+Vector3 Message::Convert(const msgs::Point &v)
+{
+  return Vector3(v.x(), v.y(), v.z());
+}
+
+Quatern Message::Convert(const msgs::Quaternion &q)
+{
+  return Quatern(q.w(), q.x(), q.y(), q.z());
+}
+
+Pose3d Message::Convert(const msgs::Pose &p)
+{
+  return Pose3d( Message::Convert(p.position()), 
+                 Message::Convert(p.orientation()) );
+}
+
+Color Message::Convert(const msgs::Color &c)
+{
+  return Color( c.r(), c.g(), c.b(), c.a() );
+}
+
+Time Message::Convert(const msgs::Time &t)
+{
+  return Time(t.sec(), t.nsec());
+}
+
+Plane Message::Convert(const msgs::Plane &p)
+{
+  return Plane(Message::Convert(p.normal()), 
+               Vector2<double>(p.size_x(), p.size_y()),
+               p.d() );
+}
+
+
+
+
 
 msgs::Light Message::LightFromXML(XMLConfigNode *node)
 {

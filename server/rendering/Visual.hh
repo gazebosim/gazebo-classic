@@ -33,6 +33,7 @@
 #include "Vector3.hh"
 #include "Common.hh"
 #include "Param.hh"
+#include "Messages.hh"
 
 namespace Ogre
 {
@@ -78,7 +79,7 @@ namespace gazebo
     public: void Init();
 
     /// \brief Load from a message
-    //public: void LoadFromMsg(const VisualMsg *msg);
+    public: void LoadFromMsg(boost::shared_ptr< msgs::Visual const> &msg);
 
     /// \brief Load the visual
     public: void Load(XMLConfigNode *node);
@@ -230,7 +231,7 @@ namespace gazebo
     public: static void InsertMesh( const Mesh *mesh);
 
     /// \brief Update a visual based on a message
-    //public: void UpdateFromMsg(const VisualMsg *msg);
+    public: void UpdateFromMsg(boost::shared_ptr< msgs::Visual const> &msg);
 
     private: void GetBoundsHelper(Ogre::SceneNode *node, Box &box) const;
 

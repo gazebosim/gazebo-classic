@@ -20,6 +20,7 @@
 #include <vector>
 #include <map>
 
+#include "Subscriber.hh"
 #include "Messages.hh"
 #include "Param.hh"
 #include "Color.hh"
@@ -153,10 +154,9 @@ namespace gazebo
 
     public: void InitShadows();
 
-    /// \brief Receive a message
-    public: void ReceiveMessage( const google::protobuf::Message &message );
-
-    /// Process all messages
+    /// \brief Receive a new message
+    public: void HandleVisualMessage(const boost::shared_ptr<msgs::Visual const> &msg);
+    /// \brief Process all messages
     public: void ProcessMessages();
 
     // \brief Get the mesh information for the given mesh.
@@ -170,8 +170,8 @@ namespace gazebo
                                      const Ogre::Quaternion &orient,
                                      const Ogre::Vector3 &scale);
 
-    private: void HandleVisualMsg(const msgs::Visual &msg);
-    private: void HandleLightMsg(const msgs::Light &msg);
+    private: void HandleVisualMsg(boost::shared_ptr<msgs::Visual const> &msg);
+    private: void HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
     private: void HandleSelectionMsg(const msgs::Selection &msg);
 
     private: std::string name;
@@ -203,10 +203,13 @@ namespace gazebo
     private: std::string idString;
 
     private: boost::mutex mutex;
-    //private: std::map<MessageType, std::vector<google::protobuf::Message> > messages;
+    private: std::list<boost::shared_ptr<msgs::Visual const> > visualMessages;
 
     private: VisualMap visuals;
     private: LightMap lights;
+
+    private: SubscriberPtr vis_sub;
+    private: SubscriberPtr light_sub;
   };
 };
 #endif 

@@ -18,6 +18,7 @@
 #include "Simulator.hh"
 #include "Messages.hh"
 #include "Geom.hh"
+#include "TopicManager.hh"
 #include "PlaneShape.hh"
 
 using namespace gazebo;
@@ -29,7 +30,7 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
 
-  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
 
   msgs::Visual msg;
   Message::Init(msg, this->GetName() );
@@ -108,7 +109,9 @@ void PlaneShape::Save(std::string &prefix, std::ostream &stream)
 void PlaneShape::CreatePlane()
 {
   msgs::Visual msg;
+  std::cout << "PlaneShape::CreatePlane\n";
   Message::Init(msg, this->GetName());
+  std::cout << "PlaneShape::CreatePlane Done\n";
   Message::Set(msg.mutable_plane()->mutable_normal(), **this->normalP);
   msg.mutable_plane()->set_size_x( (**this->sizeP).x );
   msg.mutable_plane()->set_size_y( (**this->sizeP).y );

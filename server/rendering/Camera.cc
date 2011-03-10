@@ -157,9 +157,9 @@ void Camera::Load( XMLConfigNode *node )
     if (this->imageFormatP->GetValue() == "L8")
       this->imageFormat = Ogre::PF_L8;
     else if (this->imageFormatP->GetValue() == "R8G8B8")
-      this->imageFormat = Ogre::PF_R8G8B8;
+      this->imageFormat = Ogre::PF_BYTE_RGB;
     else if (this->imageFormatP->GetValue() == "B8G8R8")
-      this->imageFormat = Ogre::PF_B8G8R8;
+      this->imageFormat = Ogre::PF_BYTE_BGR;
     else if (this->imageFormatP->GetValue() == "FLOAT32")
       this->imageFormat = Ogre::PF_FLOAT32_R;
     else if (this->imageFormatP->GetValue() == "FLOAT16")
@@ -171,7 +171,7 @@ void Camera::Load( XMLConfigNode *node )
     {
       // let ogre generate rgb8 images for all bayer format requests
       // then post process to produce actual bayer images
-      this->imageFormat = Ogre::PF_R8G8B8;
+      this->imageFormat = Ogre::PF_BYTE_RGB;
     }
     else
     {

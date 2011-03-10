@@ -32,7 +32,8 @@
 #include "World.hh"
 #include "Shape.hh"
 #include "PhysicsEngine.hh"
-#include "Simulator.hh"  // disable X
+#include "Simulator.hh"
+#include "TopicManager.hh"
 
 using namespace gazebo;
 
@@ -41,7 +42,7 @@ using namespace gazebo;
 PhysicsEngine::PhysicsEngine(World *world)
   : world(world)
 {
-  this->vis_pub = Simulator::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
 
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);

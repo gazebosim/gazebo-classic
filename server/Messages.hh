@@ -28,6 +28,7 @@
 #include "msgs/plane.pb.h"
 #include "msgs/quaternion.pb.h"
 #include "msgs/time.pb.h"
+#include "msgs/int.pb.h"
 
 #include "XMLConfig.hh"
 #include "Color.hh"
@@ -46,15 +47,24 @@ namespace gazebo
                        const std::string &id);
 
       static void CreationStamp(google::protobuf::Message &message);
+      static void CreationStamp(msgs::Header &header);
 
       static void SendStamp(google::protobuf::Message &message);
+      static void SendStamp(msgs::Header &header);
 
-      static msgs::Point Convert(const Vector3 &v);
+      static msgs::Point      Convert(const Vector3 &v);
       static msgs::Quaternion Convert(const Quatern &q);
       static msgs::Pose       Convert(const Pose3d &p);
       static msgs::Color      Convert(const Color &c);
       static msgs::Time       Convert(const Time &t);
       static msgs::Plane      Convert(const Plane &p);
+
+      static Vector3          Convert(const msgs::Point &v);
+      static Quatern          Convert(const msgs::Quaternion &q);
+      static Pose3d           Convert(const msgs::Pose &p);
+      static Color            Convert(const msgs::Color &c);
+      static Time             Convert(const msgs::Time &t);
+      static Plane            Convert(const msgs::Plane &p);
 
       static void Set(msgs::Point *pt, const Vector3 &v);
       static void Set(msgs::Quaternion *q, const Quatern &v);
@@ -67,7 +77,11 @@ namespace gazebo
       static msgs::Visual     VisualFromXML(XMLConfigNode *node);
 
     private:
-      static void Stamp(google::protobuf::Message &, const std::string &type);
+      static void Stamp(msgs::Header &, const std::string &type);
+
+      static const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name);
+
+      static msgs::Header *GetHeader(google::protobuf::Message &message);
   };
 }
 

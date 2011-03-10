@@ -30,6 +30,7 @@
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
 #include "Entity.hh"
+#include "TopicManager.hh"
 #include "Grid.hh"
 
 #include "Scene.hh"
@@ -42,6 +43,9 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
+  this->vis_sub = TopicManager::Instance()->Subscribe("/gazebo/visual", &Scene::HandleVisualMessage, this);
+  this->light_sub = TopicManager::Instance()->Subscribe("/gazebo/light", &Scene::HandleLightMsg, this);
+
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
 
@@ -55,7 +59,7 @@ Scene::Scene(const std::string &name)
 
 
   Param::Begin(&this->parameters);
-  this->ambientP = new ParamT<Color>("ambient",Color(.1,.1,.1,.1),0);
+  this->ambientP = new ParamT<Color>("ambient",Color(.1,.1,.1,1),0);
   this->shadowsP = new ParamT<bool>("shadows", false, 0);
   this->skyMaterialP = new ParamT<std::string>("material","",1);
   this->backgroundColorP = new ParamT<Color>("background_color",Color(0.5,0.5,0.5), 0);
@@ -685,34 +689,27 @@ std::string Scene::GetIdString() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Receive a message
-void Scene::ReceiveMessage( const google::protobuf::Message &message)
+void Scene::HandleVisualMessage(const boost::shared_ptr<msgs::Visual const> &msg)
 {
-  /*boost::mutex::scoped_lock lock( this->mutex );
-  bool find = false;
-
-  for (unsigned int i=0; i < this->messages[msg.type].size(); i++)
-  {
-    if (this->messages[msg.type][i]->id == msg.id)
-    {
-      delete this->messages[msg.type][i];
-      this->messages[msg.type][i] = msg.Clone();
-      find = true;
-      break;
-    }
-  }
-     
-  if (!find) 
-    this->messages[msg.type].push_back( msg.Clone() );
-    */
+  boost::mutex::scoped_lock lock( this->mutex );
+  this->visualMessages.push_back(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Process all messages
 void Scene::ProcessMessages()
 {
-  /*boost::mutex::scoped_lock lock( this->mutex );
-  std::vector<Message*>::iterator iter;
+  boost::mutex::scoped_lock lock( this->mutex );
 
+  std::list<boost::shared_ptr< msgs::Visual const> >::iterator iter;
+  for (iter = this->visualMessages.begin();
+       iter != this->visualMessages.end(); iter++)
+  {
+    this->HandleVisualMsg(*iter);
+  }
+  this->visualMessages.clear();
+
+/*
   for (iter =  this->messages[VISUAL_MSG].begin(); 
        iter != this->messages[VISUAL_MSG].end(); iter++)
   {
@@ -876,13 +873,12 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
   }
 }
 
-void Scene::HandleVisualMsg(const msgs::Visual &msg)
+void Scene::HandleVisualMsg(boost::shared_ptr<msgs::Visual const> &msg)
 {
-  /*
   VisualMap::iterator iter;
-  iter = this->visuals.find(msg->id);
+  iter = this->visuals.find( msg->header().str_id() );
 
-  if (msg->action == VisualMsg::DELETE)
+  if (msg->has_action() && msg->action() == msgs::Visual::DELETE)
   {
     if (iter != this->visuals.end() )
     {
@@ -893,42 +889,30 @@ void Scene::HandleVisualMsg(const msgs::Visual &msg)
   }
   else if (iter != this->visuals.end())
   {
-    //if (msg->id == "line1")
-      //printf("Updating a line1msg\n");
     iter->second->UpdateFromMsg(msg);
-    //if (msg->id == "line1")
-     // printf("Done Updating a line1msg\n");
   }
   else
   {
-    if (msg->id == "line1")
-      printf("Creating a line1msg\n");
-
     Visual *visual = NULL;
     VisualMap::iterator iter;
-    iter = this->visuals.find(msg->parentId);
+    iter = this->visuals.find(msg->parent_id());
 
     if (iter != this->visuals.end())
-      visual = new Visual(msg->id, iter->second);
+      visual = new Visual(msg->header().str_id(), iter->second);
     else 
-      visual = new Visual(msg->id, this);
-    visual->LoadFromMsg(msg);
-    std::cout << "Creating visual[" << msg->id << "]\n";
-    this->visuals[msg->id] = visual;
+      visual = new Visual(msg->header().str_id(), this);
 
-    if (msg->id == "line1")
-      printf("Done Creating\n");
+    visual->LoadFromMsg(msg);
+    this->visuals[msg->header().str_id()] = visual;
   }
-  */
 }
 
-void Scene::HandleLightMsg(const msgs::Light &msg)
+void Scene::HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
 {
-  /*
   LightMap::iterator iter;
-  iter = this->lights.find(msg->id);
+  iter = this->lights.find(msg->header().str_id());
 
-  if (msg->action == LightMsg::DELETE)
+  if (msg->action() == msgs::Light::DELETE)
   {
     printf("DELETE  A LIGHT!!\n");
   }
@@ -940,9 +924,8 @@ void Scene::HandleLightMsg(const msgs::Light &msg)
   {
     Light *light = new Light(this);
     light->LoadFromMsg(msg);
-    this->lights[msg->id] = light;
+    this->lights[msg->header().str_id()] = light;
   }
-  */
 }
 
 void Scene::HandleSelectionMsg(const msgs::Selection &msg)
