@@ -55,11 +55,11 @@ unsigned int OgreCamera::cameraCounter = 0;
 OgreCamera::OgreCamera(const std::string &namePrefix)
 {
   this->name = "DefaultCameraName";
-  this->lastRenderTime = Simulator::Instance()->GetSimTime();
 
   this->animState = NULL;
   this->textureWidth = this->textureHeight = 0;
 
+  this->saveDepthBuffer = NULL;
   this->saveFrameBuffer = NULL;
   this->saveCount = 0;
   this->bayerFrameBuffer = NULL;
@@ -70,6 +70,7 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
   stream << namePrefix << "(" << this->myCount << ")";
   this->cameraName = stream.str();
 
+  this->depthTarget = NULL;
   this->renderTarget = NULL;
   this->userMovable = true;
 
@@ -253,6 +254,58 @@ void OgreCamera::InitCam()
   this->origParentNode = (Ogre::SceneNode*)this->sceneNode->getParent();
 
   this->lastUpdate = Simulator::Instance()->GetSimTime();
+
+
+  depthTextureName = this->GetCameraName() + "_RttTex_Stereo_Depth";
+
+  depthMaterialName = this->GetCameraName()+ "_RttMat_Stereo_Depth";
+
+  depthTexture = this->CreateRTT(depthTextureName, true);
+  depthTarget = depthTexture->getBuffer()->getRenderTarget();
+  depthTarget->setAutoUpdated(false);
+  //
+  // Setup the viewport to use the texture
+  Ogre::Viewport *cviewport;
+  Ogre::MaterialPtr matPtr;
+  cviewport = this->depthTarget->addViewport(this->camera);
+  cviewport->setClearEveryFrame(true);
+  cviewport->setOverlaysEnabled(false);
+  cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+  cviewport->setVisibilityMask(this->visibilityMask);
+
+
+// Create materials for all the render textures.
+  matPtr = Ogre::MaterialManager::getSingleton().create(
+		  depthMaterialName,
+  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+  matPtr->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
+  matPtr->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
+  matPtr->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+
+  matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
+		  depthTextureName );
+
+  this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap");
+  this->depthMaterial->load();
+}
+
+Ogre::TexturePtr OgreCamera::CreateRTT(const std::string &name, bool depth)
+{
+  Ogre::PixelFormat pf;
+
+  if (depth)
+    pf = Ogre::PF_FLOAT32_R;
+  else
+    pf = Ogre::PF_BYTE_RGB;
+
+  // Create the left render texture
+  return Ogre::TextureManager::getSingleton().createManual(
+      name,
+      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+      Ogre::TEX_TYPE_2D,
+      this->imageSizeP->GetValue().x, this->imageSizeP->GetValue().y, 0,
+      pf,
+      Ogre::TU_RENDERTARGET);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -353,14 +406,25 @@ void OgreCamera::CaptureData()
     if (!this->saveFrameBuffer)
       this->saveFrameBuffer = new unsigned char[size];
 
-    memset(this->saveFrameBuffer,128,size);
+    if (this->simulateDepthData && !this->saveDepthBuffer)
+    	this->saveDepthBuffer = new float[size];
 
     Ogre::Box src_box(0,0,(**this->imageSizeP).x, (**this->imageSizeP).y);
 
+    // This blit isn't working for some reason ....
     Ogre::PixelBox dst_box((**this->imageSizeP).x, (**this->imageSizeP).y,
         1, this->imageFormat, this->saveFrameBuffer);
 
     pixelBuffer->blitToMemory( src_box, dst_box );
+
+    // Blit the depth buffer if needed
+    if (this->simulateDepthData)
+    {
+    	Ogre::PixelBox dpt_box((**this->imageSizeP).x, (**this->imageSizeP).y,
+            1, Ogre::PF_FLOAT32_R, this->saveDepthBuffer);
+
+    	pixelBuffer->blitToMemory(src_box, dpt_box);
+    }
 
     if (this->saveFramesP->GetValue())
     {
@@ -388,11 +452,14 @@ void OgreCamera::Render()
       DIAGNOSTICTIMER(timer("OgreCamera::Render(): renderTarget update",6));
       //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
       this->lastRenderTime = Simulator::Instance()->GetSimTime();
-      this->renderTarget->update();
-    }
 
-    // produce depth data for the camera
-    if (this->simulateDepthData) this->RenderDepthData();
+      //for (int i = 0; i < 20; ++i)
+      this->renderTarget->update();
+
+      // produce depth data for the camera
+      if (this->simulateDepthData)
+    	  this->RenderDepthData();
+    }
 
     this->lastUpdate = Simulator::Instance()->GetSimTime();
   }
@@ -720,6 +787,16 @@ const unsigned char *OgreCamera::GetImageData(unsigned int i)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+/// Get a pointer to the image data
+const float *OgreCamera::GetDepthData(unsigned int i)
+{
+  if (i!=0)
+    gzerr(0) << "Camera index must be zero for mono cam";
+
+  return this->saveDepthBuffer;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 /// Get the camera's name
 std::string OgreCamera::GetCamName()
 {
@@ -737,7 +814,103 @@ void OgreCamera::SetCamName( const std::string &_name )
 // Simulate Depth Data
 void OgreCamera::RenderDepthData()
 {
+	OgreAdaptor *adapt = OgreAdaptor::Instance();
+	Ogre::RenderSystem *renderSys = adapt->root->getRenderSystem();
+	Ogre::Viewport *vp = NULL;
+	Ogre::SceneManager *sceneMgr = adapt->sceneMgr;
+	Ogre::Pass *pass;
+	Ogre::SceneNode *gridNode = NULL;
+	int i;
 
+	try
+	{
+		gridNode = sceneMgr->getSceneNode("__OGRE_GRID_NODE__");
+	}
+	catch (...)
+	{
+		gridNode = NULL;
+	}
+
+	sceneMgr->_suppressRenderStateChanges(true);
+
+	// Get pointer to the material pass
+	pass = this->depthMaterial->getBestTechnique()->getPass(0);
+
+	if (gridNode)
+		gridNode->setVisible(false);
+
+	// Render the depth texture
+	// OgreSceneManager::_render function automatically sets farClip to 0.
+	// Which normally equates to infinite distance. We don't want this. So
+	// we have to set the distance every time.
+	this->GetOgreCamera()->setFarClipDistance( this->farClipP->GetValue() );
+
+	Ogre::AutoParamDataSource autoParamDataSource;
+
+	vp = this->depthTarget->getViewport(0);
+
+	// return 0 in case no renderable object is inside frustrum
+	vp->setBackgroundColour( Ogre::ColourValue(Ogre::ColourValue(0,0,0)) );
+
+	Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "Gazebo/DepthMap", true);
+
+	// Need this line to render the ground plane. No idea why it's necessary.
+	renderSys->_setViewport(vp);
+	sceneMgr->_setPass(pass, true, false);
+	autoParamDataSource.setCurrentPass(pass);
+	autoParamDataSource.setCurrentViewport(vp);
+	autoParamDataSource.setCurrentRenderTarget(this->depthTarget);
+	autoParamDataSource.setCurrentSceneManager(sceneMgr);
+	autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+	pass->_updateAutoParamsNoLights(&autoParamDataSource);
+#else
+	pass->_updateAutoParams(&autoParamDataSource,1);
+#endif
+
+	renderSys->setLightingEnabled(false);
+	renderSys->_setFog(Ogre::FOG_NONE);
+
+	// These two lines don't seem to do anything useful
+	renderSys->_setProjectionMatrix(this->GetOgreCamera()->getProjectionMatrixRS());
+	renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
+
+	// NOTE: We MUST bind parameters AFTER updating the autos
+	if (pass->hasVertexProgram())
+	{
+		renderSys->bindGpuProgram(
+		pass->getVertexProgram()->_getBindingDelegate() );
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+		renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
+		pass->getVertexProgramParameters());
+#else
+		renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
+	    pass->getVertexProgramParameters(), 1);
+#endif
+	}
+
+	if (pass->hasFragmentProgram())
+	{
+		renderSys->bindGpuProgram(
+		pass->getFragmentProgram()->_getBindingDelegate() );
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+		renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
+		pass->getFragmentProgramParameters());
+#else
+	    renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
+	    pass->getFragmentProgramParameters(), 1);
+#endif
+	}
+
+	this->depthTarget->update();
+
+	sceneMgr->_suppressRenderStateChanges(false);
+
+	if (gridNode)
+		gridNode->setVisible(true);
 }
 
 //////////////////////////////////////////////////////////////////////////////

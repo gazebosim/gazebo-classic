@@ -151,6 +151,11 @@ void MonoCameraSensor::SetActive(bool value)
   this->SetRenderingEnabled(value);
 }
 
+void MonoCameraSensor::SimulateDepthData(bool value)
+{
+	this->simulateDepthData = value;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
 void MonoCameraSensor::UpdateChild()

@@ -29,6 +29,7 @@
 
 #include <OgrePrerequisites.h>
 #include <OgreTexture.h>
+#include <OgreMaterial.h>
 
 #include "Param.hh"
 #include "Angle.hh"
@@ -209,11 +210,15 @@ namespace gazebo
     /// \brief Get the name of the camera
     public: std::string GetCameraName();
 
+    protected: Ogre::TexturePtr CreateRTT(const std::string &name, bool depth);
+
     /// \brief Set the camera's scene node
     public: void SetCameraSceneNode( Ogre::SceneNode *node );
 
     /// \brief Get a pointer to the image data
     public: virtual const unsigned char *GetImageData(unsigned int i=0);
+
+    public: virtual const float *GetDepthData(unsigned int i=0);
 
     /// \brief Get the camera's name
     public: std::string GetCamName();
@@ -247,7 +252,7 @@ namespace gazebo
     public: void HandleMouseEvent(const MouseEvent &evt);
 
     /// \brief Get the time of the last render update
-    public: gazebo::Time GetLastRenderTime() const; 
+    public: Time GetLastRenderTime() const;
 
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
     private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
@@ -277,7 +282,9 @@ namespace gazebo
     private: Pose3d pose;
   
     // Info for saving images
+
     protected: unsigned char *saveFrameBuffer;
+    protected: float *saveDepthBuffer;
     protected: unsigned char *bayerFrameBuffer;
     protected: unsigned int saveCount;
     protected: ParamT<bool> *saveFramesP;
@@ -289,11 +296,17 @@ namespace gazebo
     protected: unsigned int visibilityMask;
 
     public: Ogre::RenderTarget *renderTarget;
+    public: Ogre::RenderTarget *depthTarget;
 
     protected: Ogre::TexturePtr renderTexture;
+    protected: Ogre::TexturePtr depthTexture;
+    private: Ogre::MaterialPtr depthMaterial;
 
     protected: std::string ogreTextureName;
     protected: std::string ogreMaterialName;
+
+    protected: std::string depthTextureName;
+    protected: std::string depthMaterialName;
 
     private: static unsigned int cameraCounter;
     private: unsigned int myCount;
@@ -314,7 +327,6 @@ namespace gazebo
 
     private: ViewController *viewController;
 
-    public: Time GetLastRenderTime() {return this->lastRenderTime;};
     protected: Time lastRenderTime;
 
   };
