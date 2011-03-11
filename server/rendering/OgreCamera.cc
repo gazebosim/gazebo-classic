@@ -394,6 +394,9 @@ void OgreCamera::CaptureData()
     pixelBuffer = this->renderTexture->getBuffer();
     rTexture = pixelBuffer->getRenderTarget();
 
+    // Not sure if we need to lock it
+    pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+
     Ogre::PixelFormat format = pixelBuffer->getFormat();
     renderViewport = rTexture->getViewport(0);
 
@@ -411,7 +414,6 @@ void OgreCamera::CaptureData()
 
     Ogre::Box src_box(0,0,(**this->imageSizeP).x, (**this->imageSizeP).y);
 
-    // This blit isn't working for some reason ....
     Ogre::PixelBox dst_box((**this->imageSizeP).x, (**this->imageSizeP).y,
         1, this->imageFormat, this->saveFrameBuffer);
 
@@ -425,6 +427,8 @@ void OgreCamera::CaptureData()
 
     	pixelBuffer->blitToMemory(src_box, dpt_box);
     }
+
+    pixelBuffer->unlock();
 
     if (this->saveFramesP->GetValue())
     {
