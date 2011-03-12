@@ -72,6 +72,9 @@ class MonoCameraSensor : public Sensor, public OgreCamera
   /// \brief Set whether the sensor is active or not
   public: virtual void SetActive(bool value);
 
+  /// \brief Simulate depth data. This only works when active
+  public: virtual void SimulateDepthData(bool value);
+
   /// \brief Return the material the camera renders to
   public: virtual std::string GetMaterialName() const;
 
