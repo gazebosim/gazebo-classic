@@ -26,6 +26,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "IOManager.hh"
 #include "Events.hh"
 #include "RenderState.hh"
 #include "PhysicsFactory.hh"
@@ -186,6 +187,9 @@ void Simulator::Fini()
     delete this->gui;
     this->gui = NULL;
   }
+
+  google::protobuf::ShutdownProtobufLibrary();
+  IOManager::Instance()->Stop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -415,6 +419,9 @@ World *Simulator::GetActiveWorld() const
 /// Initialize the simulation
 void Simulator::Init()
 {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+  IOManager::Instance()->Start();
+
   RenderState::Init();
 
   //Initialize the world

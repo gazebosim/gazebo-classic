@@ -28,9 +28,9 @@ namespace gazebo
   {
     public: ODECylinderShape(Geom *parent) : CylinderShape(parent) {}
     public: virtual ~ODECylinderShape() {}
-    public: void SetSize(const Vector2<double> &size)
+    public: void SetSize(const double &radius, const double &length)
             {
-              CylinderShape::SetSize(size);
+              CylinderShape::SetSize(radius, length);
               PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
               ODEGeom *oParent = (ODEGeom*)(this->geomParent);
 
@@ -41,7 +41,7 @@ namespace gazebo
   
               // Initialize mass matrix
               dMassSetCylinderTotal(&odeMass, mass.GetAsDouble(), 3, 
-                                    size.x, size.y);
+                                    radius, length);
               rpose = this->geomParent->GetRelativePose();
               dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
  
@@ -49,7 +49,7 @@ namespace gazebo
   
               this->geomParent->SetMass(mass);
 
-              oParent->SetGeom( dCreateCylinder( 0, size.x, size.y ), true );
+              oParent->SetGeom( dCreateCylinder( 0, radius, length ), true );
             }
   };
 }

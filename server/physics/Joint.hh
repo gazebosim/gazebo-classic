@@ -169,7 +169,6 @@ namespace gazebo
 
     protected: ParamT<std::string> *body1NameP;
     protected: ParamT<std::string> *body2NameP;
-    protected: ParamT<std::string> *anchorBodyNameP;
     protected: ParamT<Vector3> *anchorOffsetP;
     protected: ParamT<bool> *provideFeedbackP;
     protected: ParamT<double> *fudgeFactorP;

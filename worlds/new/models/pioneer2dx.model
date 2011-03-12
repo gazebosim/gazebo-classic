@@ -2,151 +2,161 @@
 
 <!-- Generic Pioneer2dx Model -->
 <model type="physical" name="default_pioneer_model">
-<canonicalBody>chassis_body</canonicalBody>
-
-<body name="chassis_body">
-  <xyz>0.0 0.0 0.16</xyz>
-
-  <collision type="box" name="chassis_geom">
-    <size>0.445 0.277 0.17</size>
-    <mass>1.0</mass>
-    <mu1>1</mu1>
-  </collision>
-
-  <visual>
-    <xyz>0 0 0.04</xyz>
-    <rpy>0 180 0</rpy>
-    <mesh>Pioneer2dx/chassis.mesh</mesh>
-    <material>Gazebo/Pioneer2Body</material>
-  </visual>
-
-  <visual>
-    <xyz>0.015 0 0.095</xyz>
-    <rpy>0 0 0</rpy>
-    <mesh>Pioneer2dx/chassis_top.mesh</mesh>
-    <material>Gazebo/Black</material>
-  </visual>
-
-  <visual>
-    <xyz>0.21 0.0 0.068</xyz>
-    <rpy>0 0 0</rpy>
-    <mesh>Pioneer2dx/sonarbank.mesh</mesh>
-    <material>Gazebo/Gold</material>
-  </visual>
-
-  <visual>
-    <xyz>-0.178 0.0 0.068</xyz>
-    <rpy>0 0 180</rpy>
-    <mesh>Pioneer2dx/sonarbank.mesh</mesh>
-    <material>Gazebo/Gold</material>
-  </visual>
-
-</body>
-
-<body name="left_wheel">
-  <xyz>0.1 -.17 0.11</xyz>
-  <rpy>0 90 90</rpy>
-
-  <collision type="cylinder" name="left_wheel_geom">
-    <size>0.11 0.05</size>
-    <mass>0.1</mass>
-  </collision>
-
-  <visual>
-    <mesh>Pioneer2dx/tire.mesh</mesh>
-    <material>Gazebo/Black</material>
-  </visual>
-
-  <visual>
-    <xyz>0.0 0 0</xyz>
-    <mesh>Pioneer2dx/wheel.mesh</mesh>
-    <material>Gazebo/Gold</material>
-  </visual>
-
-  <visual>
-    <rpy>0 0 0</rpy>
-    <xyz>0 0 0.015</xyz>
-    <size>0.04 0.04 0.08 </size>
-    <mesh>unit_cylinder</mesh>
-    <material>Gazebo/Black</material>
-  </visual>
-</body>
-
-<body name="right_wheel">
-  <xyz>0.1 .17 0.11</xyz>
-  <rpy>0 90 90</rpy>
-
-  <collision type="cylinder" name="right_wheel_geom">
-    <size>0.11 0.05</size>
-    <mass>0.1</mass>
-  </collision>
-
-  <visual>
-    <rpy>0 0 0</rpy>
-    <mesh>Pioneer2dx/tire.mesh</mesh>
-    <material>Gazebo/Black</material>
-  </visual>
-
-  <visual>
-    <rpy>0 0 0</rpy>
-    <mesh>Pioneer2dx/wheel.mesh</mesh>
-    <material>Gazebo/Gold</material>
-  </visual>
-
-  <visual>
-    <rpy>0 0 0</rpy>
-    <xyz>0 0 -0.015</xyz>
-    <size>0.04 0.04 0.08</size>
-    <mesh>unit_cylinder</mesh>
-    <material>Gazebo/Black</material>
-  </visual>
-</body>
-
-<body name="castor_body">
-  <xyz>-0.200 0 0.04</xyz>
-  <rpy>0 0 0</rpy>
-
-  <collision type="sphere" name="castor_geom">
-    <size>0.04</size>
-    <mass>0.1</mass>
-  </collision>
-
-  <visual>
-    <size>0.04 0.04 0.04</size>
-    <mesh>unit_sphere</mesh>
-    <material>Gazebo/Black</material>
-  </visual>
-</body>
-
-<!--
-<joint type="hinge" name="left_wheel_hinge">
-  <body1>left_wheel</body1>
-  <body2>chassis_body</body2>
-  <anchor>left_wheel</anchor>
-  <anchorOffset>0 0 0.04</anchorOffset>
-  <axis>0 1 0</axis>
-  <erp>0.8</erp>
-  <cfm>10e-5</cfm>
-</joint>
-
-<joint type="hinge" name="right_wheel_hinge">
-  <body1>right_wheel</body1>
-  <body2>chassis_body</body2>
-  <anchor>right_wheel</anchor>
-  <anchorOffset>0 0 -0.04</anchorOffset>
-  <axis>0 1 0</axis>
-  <erp>0.8</erp>
-  <cfm>10e-5</cfm>
-</joint>
-
-<joint type="ball" name="ball_joint">
-  <body1>castor_body</body1>
-  <body2>chassis_body</body2>
-  <anchor>castor_body</anchor>
-  <erp>0.8</erp>
-  <cfm>10e-5</cfm>
-</joint>
--->
+  <canonicalBody>chassis_body</canonicalBody>
+  
+  <link name="chassis_body">
+    <origin xyz="0.0 0.0 0.16" />
+  
+    <collision name="chassis_geom">
+      <geometry>
+        <box size="0.445 0.277 0.17"/>
+      </geometry>
+      <contact_coefficients mu="1"/>
+      <mass>1.0</mass>
+    </collision>
+  
+    <visual>
+      <origin xyz="0 0 0.04" rpy="0 180 0"/>
+      <geometry>
+        <mesh filename="Pioneer2dx/chassis.mesh"/>
+      </geometry>
+      <material name="Gazebo/Pioneer2Body"/>
+    </visual>
+  
+    <visual>
+      <origin xyz="0.015 0 0.095"/>
+      <geometry>
+        <mesh filename="Pioneer2dx/chassis_top.mesh"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  
+    <visual>
+      <origin xyz="0.21 0.0 0.068"/>
+      <geometry>
+        <mesh filename="Pioneer2dx/sonarbank.mesh"/>
+      </geometry>
+      <material name="Gazebo/Gold"/>
+    </visual>
+  
+    <visual>
+      <origin xyz="-0.178 0.0 0.068" rpy="0 0 180"/>
+      <geometry>
+        <mesh filename="Pioneer2dx/sonarbank.mesh"/>
+      </geometry>
+      <material name="Gazebo/Gold"/>
+    </visual>
+  
+  </link>
+  
+  <link name="left_wheel">
+    <origin xyz="0.1 -.17 0.11" rpy="0 90 90"/>
+  
+    <collision name="left_wheel_geom">
+      <geometry>
+        <cylinder radius="0.11" length="0.05"/>
+      </geometry>
+      <mass>0.1</mass>
+    </collision>
+  
+    <visual>
+      <geometry>
+        <mesh filename="Pioneer2dx/tire.mesh"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  
+    <visual>
+      <geometry>
+        <mesh filename="Pioneer2dx/wheel.mesh"/>
+      </geometry>
+      <material name="Gazebo/Gold"/>
+    </visual>
+  
+    <visual>
+      <origin xyz="0 0 0.015"/>
+      <geometry>
+        <cylinder radius="0.04" length="0.08"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  </link>
+  
+  <link name="right_wheel">
+    <origin xyz="0.1 .17 0.11" rpy="0 90 90"/>
+  
+    <collision name="right_wheel_geom">
+      <geometry>
+        <cylinder radius="0.11" length="0.05"/>
+      </geometry>
+      <mass>0.1</mass>
+    </collision>
+  
+    <visual>
+      <geometry>
+        <mesh filename="Pioneer2dx/tire.mesh"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  
+    <visual>
+      <geometry>
+        <mesh filename="Pioneer2dx/wheel.mesh"/>
+      </geometry>
+      <material name="Gazebo/Gold"/>
+    </visual>
+  
+    <visual>
+      <origin xyz="0 0 -0.015"/>
+      <geometry>
+        <cylinder radius="0.04" length="0.08"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  </link>
+  
+  <link name="castor_body">
+    <origin xyz="-0.200 0 0.04" rpy="0 0 0"/>
+  
+    <collision name="castor_geom">
+      <geometry>
+        <sphere radius="0.04"/>
+      </geometry>
+      <mass>0.1</mass>
+    </collision>
+  
+    <visual>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+      <material name="Gazebo/Black"/>
+    </visual>
+  </link>
+  
+  <joint type="hinge" name="left_wheel_hinge">
+    <child link="left_wheel"/>
+    <parent link="chassis_body"/>
+    <anchorOffset>0 0 0.04</anchorOffset>
+    <axis>0 1 0</axis>
+    <erp>0.8</erp>
+    <cfm>10e-5</cfm>
+  </joint>
+  
+  <joint type="hinge" name="right_wheel_hinge">
+    <child link="right_wheel"/>
+    <parent link="chassis_body"/>
+    <anchorOffset>0 0 -0.04</anchorOffset>
+    <axis>0 1 0</axis>
+    <erp>0.8</erp>
+    <cfm>10e-5</cfm>
+  </joint>
+  
+  <joint type="ball" name="ball_joint">
+    <child link="castor_body"/>
+    <parent link="chassis_body"/>
+    <erp>0.8</erp>
+    <cfm>10e-5</cfm>
+  </joint>
 
 <!--
 <controller type="differential_position2d" name="controller1">

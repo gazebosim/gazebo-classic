@@ -41,7 +41,7 @@ BoxShape::~BoxShape()
 /// Load the box
 void BoxShape::Load(XMLConfigNode *node)
 {
-  this->sizeP->Load(node);
+  this->sizeP->Load(node->GetChild("box"));
   this->SetSize( **this->sizeP );
 }
 

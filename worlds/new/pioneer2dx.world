@@ -32,26 +32,24 @@
     <!-- Ground Plane -->
     <model type="physical" name="plane1_model">
       <static>true</static>
-      <body name="body">
-        <collision type="plane" name="collision">
-          <normal>0 0 1</normal>
-          <mu1>109999.0</mu1>
-          <mu2>1000.0</mu2>
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <contact_coefficients mu1="109999.0" mu2="1000.0"/>
         </collision>
 
         <visual>
-          <mesh>unit_plane</mesh>
-          <size>100 100 0</size>
-          <normal>0 0 1</normal>
-          <material>Gazebo/GreyGrid</material>
-          <uv_tile>100 100</uv_tile>
+          <geometry>
+            <plane normal="0 0 1" size="100 100" offset="0"/>
+          </geometry>
+          <material name="Gazebo/GreyGrid" uv_tile="100 100"/>
         </visual>
-      </body>
+      </link>
     </model>
 
     <model type="physical" name="pioneer2dx">
-      <xyz> 0 0 0.0</xyz>
-      <static>false</static>
       <include embedded="true">
         <xi:include href="models/pioneer2dx.model"/>
       </include>

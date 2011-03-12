@@ -25,7 +25,6 @@
 
 #include "Param.hh"
 #include "Shape.hh"
-#include "Publisher.hh"
 
 namespace gazebo
 {
@@ -101,28 +100,7 @@ namespace gazebo
     /// \brief Set the normal
     public: void SetNormal( const Vector3 &norm );
 
-    /// \brief Set the size
-    public: void SetSize( const Vector2<double> &size );
-
-    /// \brief Set the number of segments
-    public: void SetSegments(const Vector2<double> &seg);
-
-    /// \brief Set the uvtile
-    public: void SetUVTile(const Vector2<double> &uv);
-
-    /// \brief Set the material
-    public: void SetMaterial(const std::string &mat);
-
-    /// \brief Set cast shadows
-    public: void SetCastShadows(const bool &cast);
-
     protected: ParamT<Vector3> *normalP;
-    protected: ParamT<Vector2<double> > *sizeP;
-    protected: ParamT<Vector2<double> > *segmentsP;
-    protected: ParamT<Vector2<double> > *uvTileP;
-    protected: ParamT<std::string> *materialP;
-    protected: ParamT<bool> *castShadowsP;
-    protected: PublisherPtr vis_pub;
   };
   
   /// \}

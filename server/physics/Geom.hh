@@ -193,7 +193,6 @@ namespace gazebo
 
     protected: Mass mass;
 
-    private: ParamT<std::string> *typeP;
     private: ParamT<int> *laserFiducialIdP;
     private: ParamT<float> *laserRetroP;
 

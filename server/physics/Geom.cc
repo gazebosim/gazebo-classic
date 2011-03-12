@@ -58,7 +58,6 @@ Geom::Geom( Body *body )
   this->contactsEnabled = false;
 
   Param::Begin(&this->parameters);
-  this->typeP = new ParamT<std::string>("type","unknown",1);
 
   this->massP = new ParamT<double>("mass",0.001,0);
   this->massP->Callback( &Geom::SetMass, this);
@@ -93,7 +92,6 @@ Geom::~Geom()
     this->vis_pub->Publish(msg);
   }
 
-  delete this->typeP;
   delete this->massP;
   delete this->xyzP;
   delete this->rpyP;
@@ -119,11 +117,16 @@ void Geom::Load(XMLConfigNode *node)
 {
   Entity::Load(node);
 
-  this->typeP->Load(node);
   this->SetName(this->nameP->GetValue());
   this->massP->Load(node);
-  this->xyzP->Load(node);
-  this->rpyP->Load(node);
+
+  XMLConfigNode *childNode;
+  if ( (childNode = node->GetChild("origin")) != NULL)
+  {
+    this->xyzP->Load(childNode);
+    this->rpyP->Load(childNode);
+  }
+
   this->laserFiducialIdP->Load(node);
   this->laserRetroP->Load(node);
   this->enableContactsP->Load(node);
@@ -136,9 +139,9 @@ void Geom::Load(XMLConfigNode *node)
 
   this->surface->Load(node);
 
-  this->shape->Load(node);
+  this->shape->Load(node->GetChild("geometry"));
 
-  //this->CreateBoundingBox();
+  this->CreateBoundingBox();
 
   this->body->AttachGeom(this);
 }
@@ -191,7 +194,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
 
-  stream << prefix << "<geom:" << **this->typeP << " name=\"" 
+  stream << prefix << "<geom name=\"" 
          << this->nameP->GetValue() << "\">\n";
 
   stream << prefix << "  " << *(this->xyzP) << "\n";

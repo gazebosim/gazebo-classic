@@ -203,7 +203,6 @@ Pose3d Entity::GetModelRelativePose() const
 // Set the abs pose of the entity
 void Entity::SetWorldPose(const Pose3d &pose, bool notify)
 {
-  std::cout << "Entity[" << this->GetName() << "] SetWorldPose[" << pose << "]\n";
 
   if (this->parent && this->parent->HasType(ENTITY))
   {

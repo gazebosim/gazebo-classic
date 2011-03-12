@@ -50,9 +50,8 @@ Joint::Joint()
   this->cfmP = new ParamT<double>("cfm",10e-3,0);
   this->stopKpP = new ParamT<double>("stop_kp",1000000.0,0);
   this->stopKdP = new ParamT<double>("stop_kd",1.0,0);
-  this->body1NameP = new ParamT<std::string>("body1",std::string(),1);
-  this->body2NameP = new ParamT<std::string>("body2",std::string(),1);
-  this->anchorBodyNameP = new ParamT<std::string>("anchor",std::string(),0);
+  this->body1NameP = new ParamT<std::string>("link",std::string(),1);
+  this->body2NameP = new ParamT<std::string>("link",std::string(),1);
   this->anchorOffsetP = new ParamT<Vector3>("anchor_offset",Vector3(0,0,0), 0);
   this->provideFeedbackP = new ParamT<bool>("provide_feedback", false, 0);
   this->fudgeFactorP = new ParamT<double>( "fudge_factor", 1.0, 0 );
@@ -99,7 +98,6 @@ Joint::~Joint()
   delete this->stopKdP;
   delete this->body1NameP;
   delete this->body2NameP;
-  delete this->anchorBodyNameP;
   delete this->anchorOffsetP;
   delete this->provideFeedbackP;
   delete this->fudgeFactorP;
@@ -112,9 +110,8 @@ void Joint::Load(XMLConfigNode *node)
   // Name the joint
   this->nameP->Load(node);
 
-  this->body1NameP->Load(node);
-  this->body2NameP->Load(node);
-  this->anchorBodyNameP->Load(node);
+  this->body1NameP->Load(node->GetChild("child"));
+  this->body2NameP->Load(node->GetChild("parent"));
   this->anchorOffsetP->Load(node);
   this->erpP->Load(node);
   this->cfmP->Load(node);
@@ -131,15 +128,15 @@ void Joint::Load(XMLConfigNode *node)
 
     this->body1 = this->model->GetBody( **(this->body1NameP));
     this->body2 = this->model->GetBody(**(this->body2NameP));
-    this->anchorBody = this->model->GetBody(**(this->anchorBodyNameP));
   }
   else
   {
     visname << this->GetName() << "_VISUAL";
     this->body1 = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->body1NameP) ));
     this->body2 = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->body2NameP) ));
-    this->anchorBody = dynamic_cast<Body*>(this->GetWorld()->GetByName( **(this->anchorBodyNameP) ));
   }
+
+  this->anchorBody = this->body1;
 
   if (!this->body1 && this->body1NameP->GetValue() != std::string("world"))
     gzthrow("Couldn't Find Body[" + node->GetString("body1","",1));
@@ -197,7 +194,6 @@ void Joint::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
   stream << prefix << "  " << *(this->body1NameP) << "\n";
   stream << prefix << "  " << *(this->body2NameP) << "\n";
-  stream << prefix << "  " << *(this->anchorBodyNameP) << "\n";
   stream << prefix << "  " << *(this->anchorOffsetP) << "\n";
 
   stream << prefix << "  " << *(this->erpP) << "\n";

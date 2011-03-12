@@ -31,7 +31,7 @@ SphereShape::SphereShape(Geom *parent) : Shape(parent)
   this->AddType(SPHERE_SHAPE);
 
   Param::Begin(&this->parameters);
-  this->radiusP = new ParamT<double>("size",1.0,0);
+  this->radiusP = new ParamT<double>("radius",1.0,0);
   this->radiusP->Callback( &SphereShape::SetSize, this );
   Param::End();
 }
@@ -47,7 +47,7 @@ SphereShape::~SphereShape()
 /// Load the sphere
 void SphereShape::Load(XMLConfigNode *node)
 {
-  this->radiusP->Load(node);
+  this->radiusP->Load( node->GetChild("sphere") );
   this->SetSize( **this->radiusP );
 }
 

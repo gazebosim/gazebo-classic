@@ -79,10 +79,18 @@ namespace gazebo
     /// \brief Save child parameters
     public: virtual void Save(std::string &prefix, std::ostream &stream);
 
-    /// \brief Set the size of the cylinder
-    public: virtual void SetSize( const Vector2<double> &size );
+    /// \brief Set radius
+    public: void SetRadius(const double &radius);
 
-    private: ParamT<Vector2<double> > *sizeP;
+    /// \brief Set length
+    public: void SetLength(const double &length);
+
+
+    /// \brief Set the size of the cylinder
+    public: virtual void SetSize( const double &radius, const double &length  );
+
+    private: ParamT<double> *radiusP;
+    private: ParamT<double> *lengthP;
   };
 
   /// \}

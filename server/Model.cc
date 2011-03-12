@@ -201,8 +201,14 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   }
 
   this->canonicalBodyNameP->Load(node);
-  this->xyzP->Load(node);
-  this->rpyP->Load(node);
+
+  if ( (childNode = node->GetChild("origin")) != NULL)
+  {
+    this->xyzP->Load(childNode);
+    this->rpyP->Load(childNode);
+  }
+
+
   this->enableGravityP->Load(node);
   this->enableFrictionP->Load(node);
   this->collideP->Load(node);
@@ -1124,19 +1130,19 @@ void Model::LoadPhysical(XMLConfigNode *node)
   XMLConfigNode *childNode = NULL;
 
   // Load the bodies
-  if (node->GetChild("body"))
-    childNode = node->GetChild("body");
+  if (node->GetChild("link"))
+    childNode = node->GetChild("link");
   else
-    childNode = node->GetChild("body");
+    childNode = node->GetChild("link");
 
   while (childNode)
   {
     this->LoadBody(childNode);
 
-    if (childNode->GetNext("body"))
-      childNode = childNode->GetNext("body");
+    if (childNode->GetNext("link"))
+      childNode = childNode->GetNext("link");
     else
-      childNode = childNode->GetNext("body");
+      childNode = childNode->GetNext("link");
   }
 
   // Load the joints

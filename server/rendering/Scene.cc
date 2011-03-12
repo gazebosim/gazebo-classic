@@ -823,8 +823,6 @@ void Scene::HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
   VisualMap::iterator iter;
   iter = this->visuals.find( msg->header().str_id() );
 
-  std::cout << "Scene::HandleVisualMsg\n";
-
   if (msg->has_action() && msg->action() == msgs::Visual::DELETE)
   {
     if (iter != this->visuals.end() )
@@ -836,12 +834,10 @@ void Scene::HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
   }
   else if (iter != this->visuals.end())
   {
-    std::cout << "Scene::HandleVisualMsg UpdateFromMsg\n";
     iter->second->UpdateFromMsg(msg);
   }
   else
   {
-    std::cout << "Scene::HandleVisualMsg New Visual\n";
     Visual *visual = NULL;
     VisualMap::iterator iter;
     iter = this->visuals.find(msg->parent_id());

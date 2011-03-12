@@ -25,9 +25,11 @@ CylinderShape::CylinderShape(Geom *parent) : Shape(parent)
   this->AddType(CYLINDER_SHAPE);
 
   Param::Begin(&this->parameters);
-  this->sizeP = new ParamT<Vector2<double> >("size", 
-      Vector2<double>(1.0,1.0), 1);
-  this->sizeP->Callback( &CylinderShape::SetSize, this);
+  this->radiusP = new ParamT<double>("radius",1,1);
+  this->radiusP->Callback( &CylinderShape::SetRadius, this);
+
+  this->lengthP = new ParamT<double>("length",1,1);
+  this->lengthP->Callback( &CylinderShape::SetLength, this);
   Param::End();
 }
 
@@ -35,29 +37,46 @@ CylinderShape::CylinderShape(Geom *parent) : Shape(parent)
 /// Destructor
 CylinderShape::~CylinderShape()
 {
-  delete this->sizeP;
+  delete this->radiusP;
+  delete this->lengthP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the cylinder
 void CylinderShape::Load(XMLConfigNode *node)
 {
-  this->sizeP->Load(node);
-  this->SetSize( this->sizeP->GetValue() );
+  this->radiusP->Load(node->GetChild("cylinder"));
+  this->lengthP->Load(node->GetChild("cylinder"));
+
+  this->SetSize( **this->radiusP, **this->lengthP );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Save child parameters
 void CylinderShape::Save(std::string &prefix, std::ostream &stream)
 {
-  stream << prefix << *(this->sizeP) << "\n";
+  stream << prefix << *(this->radiusP) << " " << *(this->lengthP) << "\n";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set radius
+void CylinderShape::SetRadius(const double &radius)
+{
+  this->SetSize(radius, **this->lengthP);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Set length
+void CylinderShape::SetLength(const double &length)
+{
+  this->SetSize(**this->radiusP, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size of the cylinder
-void CylinderShape::SetSize( const Vector2<double> &size )
+void CylinderShape::SetSize( const double &radius, const double &length )
 {
-  this->sizeP->SetValue( size );
+  this->radiusP->SetValue(radius);
+  this->lengthP->SetValue(length);
 }
-
 

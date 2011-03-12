@@ -31,42 +31,42 @@
 
 
     <!-- Ground Plane -->
-    <model type="physical" name="plane1_model">
-      <xyz>0 0 0</xyz>
-      <rpy>0 0 0</rpy>
+    <model name="plane1_model">
       <static>true</static>
-      <body name="plane1_body">
-        <collision type="plane" name="plane1_geom">
-          <normal>0 0 1</normal>
-          <mu1>109999.0</mu1>
-          <mu2>1000.0</mu2>
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <plane normal="0 0 1"/>
+          </geometry>
+          <contact_coefficients mu1="109999.0" mu2="1000.0"/>
         </collision>
 
         <visual>
-          <mesh>unit_plane</mesh>
-          <size>100 100</size>
-          <normal>0 0 1</normal>
-          <material>Gazebo/GreyGrid</material>
-          <uv_tile>100 100</uv_tile>
+          <geometry>
+            <plane normal="0 0 1" size="100 100" offset="0"/>
+          </geometry>
+          <material name="Gazebo/GreyGrid" uv_tile="100 100"/>
         </visual>
-      </body>
+      </link>
     </model>
 
-    <model type="physical" name="box_model">
-      <xyz>0 0 1.5</xyz>
-      <static>false</static>
-      <body name="body">
-        <collision type="box" name="geom">
-          <size>1 1 1</size>
+    <model name="box_model">
+      <origin xyz="0 0 1.5"/>
+      <link name="body">
+        <collision name="geom">
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
           <mass>1.0</mass>
         </collision>
 
         <visual>
-          <scale>1 1 1</scale>
-          <mesh>unit_box</mesh>
-          <material>Gazebo/Red</material>
+          <geometry>
+            <box size="1 1 1"/>
+          </geometry>
+          <material name="Gazebo/Red"/>
         </visual>
-      </body>
+      </link>
     </model>
  
     <!-- White Point light -->

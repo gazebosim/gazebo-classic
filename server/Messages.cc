@@ -265,29 +265,84 @@ msgs::Light Message::LightFromXML(XMLConfigNode *node)
 
 msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
 {
+  XMLConfigNode *cnode = NULL;
   msgs::Visual result;
 
-  result.set_mesh( node-> GetString("mesh","",0) );
-  result.set_material( node->GetString("material","",0) );
-  result.set_cast_shadows( node->GetBool("castShadows",true,0) );
+  result.set_cast_shadows( node->GetBool("cast_shadows",true,0) );
   result.set_visible( node->GetBool("visible",true,0) );
   result.set_transparency( node->GetDouble("transparency",0.0,0) );
-  result.mutable_scale()->CopyFrom( Convert( node->GetVector3("scale", Vector3(1,1,1)) ) );
 
-  if (node->GetChild("uv_tile"))
+  // Load the geometry
+  if ( (cnode = node->GetChild("geometry")) != NULL )
   {
-    result.set_uv_tile_x( node->GetTupleDouble("uv_tile",0,1) );
-    result.set_uv_tile_y( node->GetTupleDouble("uv_tile",1,1) );
+    XMLConfigNode *ccnode = NULL;
+
+    ccnode = cnode->GetChild("mesh");
+    if (ccnode)
+    {
+      result.set_mesh( ccnode->GetString("filename","",0) );
+      result.mutable_scale()->CopyFrom( 
+          Convert( ccnode->GetVector3("scale", Vector3(1,1,1)) ) );
+    }
+
+    ccnode = cnode->GetChild("cylinder");
+    if (ccnode)
+    {
+      result.set_mesh("unit_cylinder");
+      double radius = ccnode->GetDouble("radius",1,1);
+      double length = ccnode->GetDouble("length",1,1);
+      result.mutable_scale()->set_x(radius*2);
+      result.mutable_scale()->set_y(radius*2);
+      result.mutable_scale()->set_z(length);
+    }
+
+    ccnode = cnode->GetChild("sphere");
+    if (ccnode)
+    {
+      result.set_mesh("unit_sphere");
+      double radius = ccnode->GetDouble("radius",1,1);
+      result.mutable_scale()->set_x(radius*2);
+      result.mutable_scale()->set_y(radius*2);
+      result.mutable_scale()->set_z(radius*2);
+    }
+
+    ccnode = cnode->GetChild("box");
+    if (ccnode)
+    {
+      result.set_mesh("unit_box");
+      result.mutable_scale()->CopyFrom( 
+          Convert( ccnode->GetVector3("size", Vector3(1,1,1)) ) );
+    }
+
+    ccnode = cnode->GetChild("plane");
+    if ( ccnode )
+    {
+      result.mutable_plane()->mutable_normal()->CopyFrom( 
+          Message::Convert( ccnode->GetVector3("normal",Vector3(0,0,1))) );
+      result.mutable_plane()->set_d( ccnode->GetDouble("offset", 0, 0) );
+      result.mutable_plane()->set_size_x(ccnode->GetTupleDouble("size", 0, 1));
+      result.mutable_plane()->set_size_y(ccnode->GetTupleDouble("size", 1, 1));
+    }
   }
 
-  if (node->GetChild("normal"))
+  /// Load the material
+  if ( (cnode = node->GetChild("material")) != NULL)
   {
-    result.mutable_plane()->mutable_normal()->CopyFrom( 
-        Message::Convert( node->GetVector3( "normal",Vector3(0,0,1) ) )  );
-    result.mutable_plane()->set_d( node->GetDouble("offset", 0, 0) );
-    result.mutable_plane()->set_size_x( node->GetTupleDouble("size", 0, 1) );
-    result.mutable_plane()->set_size_y( node->GetTupleDouble("size", 1, 1) );
+    result.set_material( cnode->GetString("name","",1) );
+    result.set_uv_tile_x( cnode->GetTupleDouble("uv_tile",0,1) );
+    result.set_uv_tile_y( cnode->GetTupleDouble("uv_tile",1,1) );
   }
+
+  // Set the origin of the visual
+  if (node->GetChild("origin"))
+  {
+    result.mutable_pose()->mutable_position()->CopyFrom( 
+        Convert(node->GetChild("origin")->GetVector3("xyz",Vector3(0,0,0))));
+
+    result.mutable_pose()->mutable_orientation()->CopyFrom( 
+        Convert(node->GetChild("origin")->GetRotation("rpy",Quatern(1,0,0,0))));
+  }
+
 
   return result;
 }

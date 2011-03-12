@@ -540,7 +540,6 @@ void Visual::SetMaterial(const std::string &materialName)
     {
       Ogre::MovableObject *obj = this->sceneNode->getAttachedObject(i);
 
-      std::cout << "Actually setting a material[" << this->myMaterialName << "]!!!\n";
       if (dynamic_cast<Ogre::Entity*>(obj))
         ((Ogre::Entity*)obj)->setMaterialName(this->myMaterialName);
       else
@@ -849,8 +848,6 @@ Ogre::SceneNode * Visual::GetSceneNode() const
 /// Set to true to show a white bounding box, used to indicate user selection
 void Visual::ShowSelectionBox( bool value )
 {
-  std::cout << "Show Selection for[" << this->GetName() << "]\n";
-
   if (!selectionObj)
   {
     selectionObj = new SelectionObj();
@@ -1209,7 +1206,6 @@ void Visual::InsertMesh( const Mesh *mesh)
 /// Update a visual based on a message
 void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
 {
-  std::cout << "Visual::UpdateFromMsg\n";
   if (msg->has_pose())
     this->SetPose( Message::Convert(msg->pose()) );
 
@@ -1232,7 +1228,4 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
       lines->AddPoint( msg->points[i] );
   }
   */
-  
 }
-
-

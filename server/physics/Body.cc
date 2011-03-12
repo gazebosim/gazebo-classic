@@ -201,8 +201,12 @@ void Body::Load(XMLConfigNode *node)
      
   XMLConfigNode *childNode;
 
-  this->xyzP->Load(node);
-  this->rpyP->Load(node);
+  if ( (childNode = node->GetChild("origin")) != NULL)
+  {
+    this->xyzP->Load(childNode);
+    this->rpyP->Load(childNode);
+  }
+
   this->dampingFactorP->Load(node);
   this->turnGravityOffP->Load(node);
 
@@ -550,10 +554,15 @@ void Body::UpdateCoM()
 void Body::LoadGeom(XMLConfigNode *node)
 {
   Geom *geom = NULL;
-  std::string type = node->GetString("type","",1);
+  if (!node->GetChild("geometry"))
+    gzthrow("Collision needs a geometry");
 
-  if (type == "heightmap" || type == "map")
+  std::string type = node->GetChild("geometry")->GetChild()->GetName();
+
+  std::cout << "GEOM Type[" << type << "]\n";
+  /*if (type == "heightmap" || type == "map")
     this->SetStatic(true);
+    */
 
   geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom(type, this);
 
