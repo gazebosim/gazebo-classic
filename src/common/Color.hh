@@ -17,7 +17,6 @@
 /* Desc: Color class
  * Author: Nate Koenig
  * Date: 08 May 2009
- * CVS: $Id$
  */
 
 #ifndef COLOR_HH
@@ -25,8 +24,6 @@
 
 #include <iostream>
 #include "common/Vector3.hh"
-
-#include <OGRE/OgreColourValue.h>
 
 namespace gazebo
 {
@@ -93,10 +90,7 @@ namespace gazebo
 
       /// \brief Set the alpha color
       public: void A(float a);
-
-      /// \brief Return the equivalent ogre color
-      public: Ogre::ColourValue GetOgreColor() const;
-    
+   
       // Addition operators
       public: Color operator+( const Color &pt ) const;
       public: Color operator+( const float &v ) const;

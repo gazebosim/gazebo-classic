@@ -24,18 +24,18 @@
 #include <sstream>
 #include <OgreImageCodec.h>
 
-#include "Events.hh"
+#include "common/Events.hh"
 #include "Controller.hh"
-#include "Global.hh"
+#include "common/Global.hh"
 #include "World.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "Body.hh"
-#include "Visual.hh"
+#include "rendering/Visual.hh"
 #include "Simulator.hh"
 
 #include "SensorFactory.hh"
 #include "MonoCameraSensor.hh"
-#include "Scene.hh"
+#include "rendering/Scene.hh"
 #include "Simulator.hh"
 
 using namespace gazebo;

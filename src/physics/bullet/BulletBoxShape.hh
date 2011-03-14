@@ -23,7 +23,7 @@
 #ifndef BULLETBOXSHAPE_HH
 #define BULLETBOXSHAPE_HH
 
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "BulletGeom.hh"
 #include "BulletPhysics.hh"
 #include "BoxShape.hh"

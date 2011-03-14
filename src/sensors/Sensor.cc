@@ -20,19 +20,19 @@
  * SVN: $Id$
  */
 
-#include "Timer.hh"
+#include "common/Timer.hh"
 #include "Controller.hh"
-#include "GazeboMessage.hh"
-#include "GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/GazeboError.hh"
 #include "Body.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "World.hh"
 #include "ControllerFactory.hh"
 #include "Simulator.hh"
 #include "Sensor.hh"
 #include "Simulator.hh"
 #include "PhysicsEngine.hh"
-#include "Global.hh"
+#include "common/Global.hh"
 
 using namespace gazebo;
 

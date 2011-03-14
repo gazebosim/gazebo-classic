@@ -21,7 +21,7 @@
  */
 
 #include <ctime>
-#include "Rand.hh"
+#include "common/Rand.hh"
 
 using namespace gazebo;
 using namespace common;

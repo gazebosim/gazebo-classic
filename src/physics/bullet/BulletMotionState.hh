@@ -24,7 +24,7 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include "Pose3d.hh"
+#include "common/Pose3d.hh"
 
 namespace gazebo
 {

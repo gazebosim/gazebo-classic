@@ -21,9 +21,9 @@
  */
 
 #include "gazebo_config.h"
-#include "GazeboMessage.hh"
+#include "common/GazeboMessage.hh"
 #include "Body.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "ODESliderJoint.hh"
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>

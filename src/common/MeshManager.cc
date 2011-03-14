@@ -17,18 +17,18 @@
 #include <sys/stat.h>
 #include <string>
 
-#include "Plane.hh"
-#include "Matrix3.hh"
-#include "Matrix4.hh"
-#include "GazeboConfig.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "Mesh.hh"
-#include "OgreLoader.hh"
-#include "AssimpLoader.hh"
-#include "STLLoader.hh"
+#include "common/Plane.hh"
+#include "common/Matrix3.hh"
+#include "common/Matrix4.hh"
+#include "common/GazeboConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Mesh.hh"
+#include "common/OgreLoader.hh"
+#include "common/AssimpLoader.hh"
+#include "common/STLLoader.hh"
 
-#include "MeshManager.hh"
+#include "common/MeshManager.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -158,7 +158,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
         mesh = this->meshes[filename];
       }
     } 
-    catch (gazebo::GazeboError e)
+    catch (gazebo::common::GazeboError e)
     {
       gzerr(0) << "Error loading mesh[" << fullname << "]\n";
       gzerr(0) << e << "\n";

@@ -17,7 +17,6 @@
 /* Desc: Wrapper around the OGRE RTShader system
  * Author: Nate Koenig
  * Date: 27 Jan 2010
- * SVN: $Id:$
  */
 
 #ifndef RTSHADERSYSTEM_HH
@@ -29,11 +28,10 @@
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <RTShaderSystem/OgreRTShaderSystem.h>
-}
 #endif
 
-#include "Camera.hh"
-#include "SingletonT.hh"
+#include "rendering/Camera.hh"
+#include "common/SingletonT.hh"
 
 namespace gazebo
 {
@@ -96,7 +94,6 @@ namespace gazebo
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
     private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
     private: std::list<Visual*> entities;
-}
 #endif
 
     private: bool initialized;

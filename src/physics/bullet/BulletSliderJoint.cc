@@ -21,10 +21,10 @@
  */
 
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "BulletBody.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "BulletSliderJoint.hh"
 
 using namespace gazebo;

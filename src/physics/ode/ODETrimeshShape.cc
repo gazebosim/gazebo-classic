@@ -20,9 +20,9 @@
  * SVN: $Id$
  */
 
-#include "Mesh.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/Mesh.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "World.hh"
 #include "ODEGeom.hh"
 #include "ODEPhysics.hh"

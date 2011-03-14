@@ -17,7 +17,7 @@
 #ifndef DIRECTIONALLIGHTMAKER_HH
 #define DIRECTIONALLIGHTMAKER_HH
 
-#include "Messages.hh"
+#include "common/Messages.hh"
 #include "Vector2.hh"
 #include "EntityMaker.hh"
 

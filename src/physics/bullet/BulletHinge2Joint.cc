@@ -20,11 +20,11 @@
  * CVS: $Id: BulletHinge2Joint.cc 7129 2008-11-12 19:38:15Z natepak $
  */
 
-#include "Global.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "BulletBody.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "BulletPhysics.hh"
 #include "BulletHinge2Joint.hh"
 

@@ -26,10 +26,10 @@
 
 #include "World.hh"
 #include "Sensor.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "Simulator.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "MonoCameraSensor.hh"
 #include "Generic_Camera.hh"

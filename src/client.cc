@@ -4,10 +4,10 @@
 #include <errno.h>
 #include <iostream>
 
-#include "RenderEngine.hh"
-#include "RenderState.hh"
+#include "rendering/RenderEngine.hh"
+#include "rendering/RenderState.hh"
 #include "gazebo_config.h"
-#include "IOManager.hh"
+#include "transport/IOManager.hh"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Print the version/licence string

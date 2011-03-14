@@ -17,14 +17,10 @@
 #ifndef EVENTS_HH
 #define EVENTS_HH
 
-#include "Event.hh"
+#include "common/Event.hh"
 
 namespace gazebo
 {
-	namespace common
-{
-  class Entity;
-
   namespace event
   {
     class Events
@@ -264,7 +260,7 @@ namespace gazebo
       public: static EventT<void (bool)> showPhysicsSignal;
       public: static EventT<void (bool)> showBoundingBoxesSignal;
 
-      public: static EventT<void (Entity*)> entitySelectedSignal;
+      public: static EventT<void (std::string)> entitySelectedSignal;
 
       public: static EventT<void ()> worldUpdateStartSignal;
       public: static EventT<void ()> worldUpdateEndSignal;
@@ -277,9 +273,5 @@ namespace gazebo
       public: static EventT<void (std::string)> diagTimerStopSignal;
     };
   }
-
-}
-
-
 }
 #endif

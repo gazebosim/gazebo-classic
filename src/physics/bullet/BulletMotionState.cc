@@ -20,7 +20,7 @@
  */
 
 #include "BulletPhysics.hh"
-#include "Visual.hh"
+#include "rendering/Visual.hh"
 #include "Body.hh"
 #include "BulletMotionState.hh"
 

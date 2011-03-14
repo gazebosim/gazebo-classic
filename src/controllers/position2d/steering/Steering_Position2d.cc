@@ -20,12 +20,12 @@
  * Date: 23 Dec 2007
  */
 
-#include "Global.hh"
+#include "common/Global.hh"
 #include "World.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "Simulator.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Steering_Position2d.hh"
 #include "Wheel.hh"

@@ -23,9 +23,9 @@
 #ifndef BulletGEOM_HH
 #define BulletGEOM_HH
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Entity.hh"
-#include "Pose3d.hh"
+#include "common/Pose3d.hh"
 #include "common/Vector3.hh"
 #include "Geom.hh"
 

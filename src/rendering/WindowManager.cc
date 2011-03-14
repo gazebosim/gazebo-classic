@@ -17,15 +17,16 @@
 #include <Ogre.h>
 #include <math.h>
 
-#include "Events.hh"
-#include "RenderEngine.hh"
-//#include "RTShaderSystem.hh"
-#include "Color.hh"
-#include "GazeboMessage.hh"
-#include "GazeboError.hh"
-#include "Camera.hh"
-#include "RenderControl.hh"
-#include "WindowManager.hh"
+#include "common/Events.hh"
+#include "common/Color.hh"
+#include "common/GazeboMessage.hh"
+#include "common/GazeboError.hh"
+
+#include "rendering/RenderEngine.hh"
+//#include "rendering/RTShaderSystem.hh"
+#include "rendering/Camera.hh"
+#include "rendering/Conversions.hh"
+#include "rendering/WindowManager.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -46,20 +47,6 @@ WindowManager::~WindowManager()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int WindowManager::CreateWindow( RenderControl *control )
-{
-  int result = -1;
-
-  if (control)
-    result = this->CreateWindow( control->GetOgreHandle(), 
-                                 control->GetWidth(), control->GetHeight());
-  else
-    gzerr(0) << "Invalid RenderControl\n";
-
-  return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 /// Attach a camera to a window
 void WindowManager::SetCamera( int windowId, Camera *camera)
 {
@@ -75,7 +62,7 @@ void WindowManager::SetCamera( int windowId, Camera *camera)
   camera->GetCamera()->setFOVy(Ogre::Radian(vfov));
 
   viewport->setClearEveryFrame(true);
-  viewport->setBackgroundColour( Color(0,0,0).GetOgreColor() );
+  viewport->setBackgroundColour( Conversions::Color(common::Color(0,0,0)) );
   viewport->setVisibilityMask(camera->GetVisibilityMask());
 
   //RTShaderSystem::AttachViewport(viewport, camera->GetScene());

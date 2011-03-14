@@ -57,14 +57,14 @@ Vector2d::~Vector2d()
 // Calc distance to the given point
 double Vector2d::Distance(const Vector2d &pt ) const
 {
-  return (T)sqrt((this->x-pt.x)*(this->x-pt.x) + (this->y-pt.y)*(this->y-pt.y));
+  return sqrt((this->x-pt.x)*(this->x-pt.x) + (this->y-pt.y)*(this->y-pt.y));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Normalize the vector length
 void Vector2d::Normalize()
 {
-  double d = (T)sqrt(this->x * this->x + this->y * this->y);
+  double d = sqrt(this->x * this->x + this->y * this->y);
 
   this->x /= d;
   this->y /= d;

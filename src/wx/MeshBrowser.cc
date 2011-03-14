@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#include "Global.hh"
-#include "Light.hh"
-#include "Scene.hh"
-#include "GazeboConfig.hh"
-#include "UserCamera.hh"
-#include "MeshManager.hh"
+#include "common/Global.hh"
+#include "rendering/Light.hh"
+#include "rendering/Scene.hh"
+#include "common/GazeboConfig.hh"
+#include "rendering/UserCamera.hh"
+#include "common/MeshManager.hh"
 #include "RenderControl.hh"
-#include "OrbitViewController.hh"
-#include "FPSViewController.hh"
-#include "Visual.hh"
+#include "rendering/OrbitViewController.hh"
+#include "rendering/FPSViewController.hh"
+#include "rendering/Visual.hh"
 #include "Simulator.hh"
 #include "MeshBrowser.hh"
 

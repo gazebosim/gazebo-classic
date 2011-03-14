@@ -22,8 +22,8 @@
 #ifndef TIMER_HH
 #define TIMER_HH
 
-#include "GazeboMessage.hh"
-#include "Time.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Time.hh"
 
 namespace gazebo
 {
@@ -45,7 +45,7 @@ namespace gazebo
     public: Time GetElapsed() const;
 
     public: friend std::ostream &operator<<(std::ostream &out, 
-                                            const gazebo::Timer &t)
+                                            const gazebo::common::Timer &t)
             {
               out << t.GetElapsed();
               return out;

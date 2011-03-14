@@ -20,20 +20,23 @@
 #include <OGRE/OgreRoot.h>
 #include <OGRE/Ogre.h>
 
-#include "Light.hh"
-#include "Global.hh"
-#include "Visual.hh"
-#include "RenderEngine.hh"
-#include "UserCamera.hh"
-#include "Camera.hh"
-//#include "RTShaderSystem.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "Entity.hh"
-#include "TopicManager.hh"
-#include "Grid.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/XMLConfig.hh"
 
-#include "Scene.hh"
+#include "rendering/Conversions.hh"
+#include "rendering/Light.hh"
+#include "rendering/Visual.hh"
+#include "rendering/RenderEngine.hh"
+#include "rendering/UserCamera.hh"
+#include "rendering/Camera.hh"
+#include "rendering/Grid.hh"
+
+//#include "rendering/RTShaderSystem.hh"
+#include "transport/TopicManager.hh"
+
+#include "rendering/Scene.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -58,25 +61,25 @@ Scene::Scene(const std::string &name)
   this->raySceneQuery = NULL;
   this->type = GENERIC;
 
-  Grid *grid = new Grid(this, 1, 1, 10, Color(1,1,0,1));
+  Grid *grid = new Grid(this, 1, 1, 10, common::Color(1,1,0,1));
   this->grids.push_back(grid);
 
 
-  Param::Begin(&this->parameters);
-  this->ambientP = new ParamT<Color>("ambient", Color(.5,.5,.5,1), 0);
-  this->shadowEnabledP = new ParamT<bool>("enabled", false, 0);
-  this->shadowColorP = new ParamT<Color>("color", Color(0.2, 0.2, 0.2, 1), 0);
-  this->shadowTypeP = new ParamT<std::string>("type", "stencil_additive", 0);
+  common::Param::Begin(&this->parameters);
+  this->ambientP = new common::ParamT<common::Color>("ambient", common::Color(.5,.5,.5,1), 0);
+  this->shadowEnabledP = new common::ParamT<bool>("enabled", false, 0);
+  this->shadowColorP = new common::ParamT<common::Color>("color", common::Color(0.2, 0.2, 0.2, 1), 0);
+  this->shadowTypeP = new common::ParamT<std::string>("type", "stencil_additive", 0);
 
-  this->skyMaterialP = new ParamT<std::string>("material","",1);
-  this->backgroundColorP = new ParamT<Color>("background_color",Color(0.5,0.5,0.5), 0);
+  this->skyMaterialP = new common::ParamT<std::string>("material","",1);
+  this->backgroundColorP = new common::ParamT<common::Color>("background_color",common::Color(0.5,0.5,0.5), 0);
 
-  this->fogTypeP = new ParamT<std::string>("type","",0);
-  this->fogColorP = new ParamT<Color>("color",Color(1,1,1,1),0);
-  this->fogDensityP = new ParamT<double>("density",0,0);
-  this->fogStartP = new ParamT<double>("linear_start",0,0);
-  this->fogEndP = new ParamT<double>("linear_end",1.0,0);
-  Param::End();
+  this->fogTypeP = new common::ParamT<std::string>("type","",0);
+  this->fogColorP = new common::ParamT<common::Color>("color",common::Color(1,1,1,1),0);
+  this->fogDensityP = new common::ParamT<double>("density",0,0);
+  this->fogStartP = new common::ParamT<double>("linear_start",0,0);
+  this->fogEndP = new common::ParamT<double>("linear_end",1.0,0);
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,9 +127,9 @@ Scene::~Scene()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load
-void Scene::Load(XMLConfigNode *node)
+void Scene::Load(common::XMLConfigNode *node)
 {
-  XMLConfigNode *cnode = NULL;
+  common::XMLConfigNode *cnode = NULL;
   this->ambientP->Load(node);
 
   cnode = node->GetChild("shadows");
@@ -170,7 +173,7 @@ void Scene::Init()
     this->grids[i]->Init();
 
   // Ambient lighting
-  this->manager->setAmbientLight( (**this->ambientP).GetOgreColor() );
+  this->manager->setAmbientLight( Conversions::Color(**this->ambientP) );
 
   // Create the sky
   if ( !(**this->skyMaterialP).empty() )
@@ -218,7 +221,7 @@ void Scene::Init()
       this->manager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
       */
 
-    this->manager->setShadowColour( (**this->shadowColorP).GetOgreColor() );
+    this->manager->setShadowColour( Conversions::Color(**this->shadowColorP) );
   }
 
   //this->InitShadows();
@@ -268,28 +271,28 @@ std::string Scene::GetName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the ambient color
-void Scene::SetAmbientColor(const Color &color)
+void Scene::SetAmbientColor(const common::Color &color)
 {
   this->ambientP->SetValue(color);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the ambient color
-Color Scene::GetAmbientColor() const
+common::Color Scene::GetAmbientColor() const
 {
   return **this->ambientP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the background color
-void Scene::SetBackgroundColor(const Color &color)
+void Scene::SetBackgroundColor(const common::Color &color)
 {
   this->backgroundColorP->SetValue(color);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the background color
-Color Scene::GetBackgroundColor() const
+common::Color Scene::GetBackgroundColor() const
 {
   return **this->backgroundColorP;
 }
@@ -311,7 +314,7 @@ Scene::SceneType Scene::GetType() const
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a grid
 void Scene::CreateGrid(uint32_t cell_count, float cell_length, 
-                       float line_width, const Color &color )
+                       float line_width, const common::Color &color )
 {
   Grid *grid = new Grid(this, cell_count, cell_length, line_width, color);
 
@@ -394,8 +397,8 @@ UserCamera *Scene::GetUserCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Common *Scene::GetEntityAt(Camera *camera, Vector2i mousePos, std::string &mod) 
-{
+//common::Common *Scene::GetEntityAt(Camera *camera, Vector2i mousePos, std::string &mod) 
+//{
   /* NATY: put back in
   Common *entity = NULL;
   Ogre::Camera *ogreCam = camera->GetCamera();
@@ -478,12 +481,13 @@ Common *Scene::GetEntityAt(Camera *camera, Vector2i mousePos, std::string &mod)
   }
 
 */
-  return NULL;
-}
+ // return NULL;
+//}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world pos of a the first contact at a pixel location
-Vector3 Scene::GetFirstContact(Camera *camera, Vector2i mousePos)
+common::Vector3 Scene::GetFirstContact(Camera *camera, 
+                                       common::Vector2i mousePos)
 {
   Ogre::Camera *ogreCam = camera->GetCamera();
   Ogre::Real closest_distance = -1.0f;
@@ -499,7 +503,7 @@ Vector3 Scene::GetFirstContact(Camera *camera, Vector2i mousePos)
 
   Ogre::Vector3 pt = mouseRay.getPoint(iter->distance);
 
-  return Vector3(pt.x, pt.y, pt.z);
+  return common::Vector3(pt.x, pt.y, pt.z);
 }
 
 // NATY
@@ -568,7 +572,7 @@ void Scene::PrintSceneGraphHelper(std::string prefix, Ogre::Node *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Draw a named line
-void Scene::DrawLine(const Vector3 &start, const Vector3 &end, 
+void Scene::DrawLine(const common::Vector3 &start, const common::Vector3 &end, 
                      const std::string &name)
 {
   Ogre::SceneNode *node = NULL;
@@ -602,7 +606,7 @@ void Scene::DrawLine(const Vector3 &start, const Vector3 &end,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set fog for this scene
-void Scene::SetFog( std::string type, const Color &color, double density, 
+void Scene::SetFog( std::string type, const common::Color &color, double density, 
                     double start, double end )
 {
   Ogre::FogMode fogType = Ogre::FOG_NONE;
@@ -616,7 +620,7 @@ void Scene::SetFog( std::string type, const Color &color, double density,
   else
     type = "none";
 
-  this->manager->setFog( fogType, color.GetOgreColor(), density, start, end );
+  this->manager->setFog( fogType, Conversions::Color(color), density, start, end );
 
   this->fogTypeP->SetValue(type);
   this->fogColorP->SetValue(color);
@@ -897,7 +901,7 @@ void Scene::HandlePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg)
 
   if (iter != this->visuals.end())
   {
-    iter->second->SetPose( Message::Convert(*msg) );
+    iter->second->SetPose( common::Message::Convert(*msg) );
   }
 }
 

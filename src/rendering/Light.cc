@@ -23,27 +23,26 @@
 #include <Ogre.h>
 #include <boost/bind.hpp>
 
-#include "Events.hh"
-#include "Scene.hh"
-#include "Model.hh"
-#include "OgreDynamicLines.hh"
-#include "Visual.hh"
-#include "XMLConfig.hh"
-#include "GazeboError.hh"
-#include "Global.hh"
-#include "GazeboMessage.hh"
-#include "Light.hh"
+#include "common/Messages.hh"
+#include "common/Events.hh"
+#include "common/XMLConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/Global.hh"
+#include "common/GazeboMessage.hh"
+
+#include "rendering/Scene.hh"
+#include "rendering/DynamicLines.hh"
+#include "rendering/Visual.hh"
+#include "rendering/Light.hh"
 
 using namespace gazebo;
 using namespace rendering;
-
 
 unsigned int Light::lightCounter = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Light::Light(Scene *scene)
-  : Common(NULL)
 {
   this->scene = scene;
 
@@ -53,37 +52,39 @@ Light::Light(Scene *scene)
 
   this->lightCounter++;
 
-  Param::Begin(&this->parameters);
-  this->lightTypeP = new ParamT<std::string>("type", std::string("point"), 1);
+  common::Param::Begin(&this->parameters);
+  this->nameP = new common::ParamT<std::string>("name","light",1);
+
+  this->lightTypeP = new common::ParamT<std::string>("type", std::string("point"), 1);
   this->lightTypeP->Callback(&Light::SetLightType, this);
 
-  this->diffuseP  = new ParamT<Color>("diffuse_color", Color(.5, .5, .5, 1), 0);
+  this->diffuseP  = new common::ParamT<common::Color>("diffuse_color", common::Color(.5, .5, .5, 1), 0);
   this->diffuseP->Callback(&Light::SetDiffuseColor, this);
 
-  this->specularP = new ParamT<Color>("specular_color", Color(.1, .1, .1), 0);
+  this->specularP = new common::ParamT<common::Color>("specular_color", common::Color(.1, .1, .1), 0);
   this->specularP->Callback(&Light::SetSpecularColor, this);
 
-  this->directionP  = new ParamT<Vector3>("direction", Vector3(0, 0, -1), 0);
+  this->directionP  = new common::ParamT<common::Vector3>("direction", common::Vector3(0, 0, -1), 0);
   this->directionP->Callback(&Light::SetDirection, this);
 
-  this->attenuationP  = new ParamT<Vector3>("attenuation", Vector3(.1, 0.01, .001), 1);
+  this->attenuationP  = new common::ParamT<common::Vector3>("attenuation", common::Vector3(.1, 0.01, .001), 1);
   this->attenuationP->Callback(&Light::SetAttenuation, this);
 
-  this->spotInnerAngleP = new ParamT<double>("spot_inner_angle", 10, 0);
+  this->spotInnerAngleP = new common::ParamT<double>("spot_inner_angle", 10, 0);
   this->spotInnerAngleP->Callback(&Light::SetSpotInnerAngle, this);
 
-  this->spotOuterAngleP = new ParamT<double>("spot_outer_angle", 20, 0);
+  this->spotOuterAngleP = new common::ParamT<double>("spot_outer_angle", 20, 0);
   this->spotOuterAngleP->Callback(&Light::SetSpotOuterAngle, this);
 
-  this->spotFalloffP = new ParamT<double>("spot_falloff", 1, 0);
+  this->spotFalloffP = new common::ParamT<double>("spot_falloff", 1, 0);
   this->spotFalloffP->Callback(&Light::SetSpotFalloff, this);
 
-  this->rangeP  = new ParamT<double>("range",10,1);
+  this->rangeP  = new common::ParamT<double>("range",10,1);
   this->rangeP->Callback(&Light::SetRange, this);
 
-  this->castShadowsP = new ParamT<bool>("cast_shadows",true,0);
+  this->castShadowsP = new common::ParamT<bool>("cast_shadows",true,0);
   this->castShadowsP->Callback(&Light::SetCastShadows, this);
-  Param::End();
+  common::Param::End();
 
   this->showLightsConnection = event::Events::ConnectShowLightsSignal(boost::bind(&Light::ToggleShowVisual, this));
 }
@@ -113,9 +114,9 @@ Light::~Light()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the light
-void Light::Load(XMLConfigNode *node)
+void Light::Load(common::XMLConfigNode *node)
 {
-  Vector3 vec;
+  common::Vector3 vec;
   double range,constant,linear,quad;
 
   if (node)
@@ -173,16 +174,16 @@ void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
     this->lightTypeP->SetValue("directional");
 
   if (msg->has_diffuse())
-    this->diffuseP->SetValue(Message::Convert(msg->diffuse()));
+    this->diffuseP->SetValue(common::Message::Convert(msg->diffuse()));
 
   if (msg->has_specular())
-    this->specularP->SetValue(Message::Convert(msg->specular()));
+    this->specularP->SetValue(common::Message::Convert(msg->specular()));
 
   if (msg->has_direction())
-    this->directionP->SetValue(Message::Convert(msg->direction()));
+    this->directionP->SetValue(common::Message::Convert(msg->direction()));
 
   if (msg->has_attenuation())
-    this->attenuationP->SetValue(Message::Convert(msg->attenuation()));
+    this->attenuationP->SetValue(common::Message::Convert(msg->attenuation()));
 
   if (msg->has_range())
     this->rangeP->SetValue(msg->range());
@@ -202,7 +203,7 @@ void Light::LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg)
   this->Load(NULL);
 
   if (msg->has_pose())
-    this->SetPosition(Message::Convert(msg->pose().position()));
+    this->SetPosition(common::Message::Convert(msg->pose().position()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +224,19 @@ void Light::Save(const std::string &prefix, std::ostream &stream)
   stream << prefix << "</light>\n";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Set the name of the visual
+void Light::SetName( const std::string &name )
+{
+  this->nameP->SetValue(name);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the name of the visual
+std::string Light::GetName() const
+{
+  return **this->nameP;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper node to create a visual representation of the light
@@ -234,62 +248,62 @@ void Light::CreateVisual()
   if ( **this->lightTypeP == "directional")
   {
     float s=.5;
-    this->line->AddPoint( Vector3(-s, -s, 0) );
-    this->line->AddPoint( Vector3(-s, s, 0) );
+    this->line->AddPoint( common::Vector3(-s, -s, 0) );
+    this->line->AddPoint( common::Vector3(-s, s, 0) );
 
-    this->line->AddPoint( Vector3(-s, s, 0) );
-    this->line->AddPoint( Vector3(s, s, 0) );
+    this->line->AddPoint( common::Vector3(-s, s, 0) );
+    this->line->AddPoint( common::Vector3(s, s, 0) );
 
-    this->line->AddPoint( Vector3(s, s, 0) );
-    this->line->AddPoint( Vector3(s, -s, 0) );
+    this->line->AddPoint( common::Vector3(s, s, 0) );
+    this->line->AddPoint( common::Vector3(s, -s, 0) );
 
-    this->line->AddPoint( Vector3(s, -s, 0) );
-    this->line->AddPoint( Vector3(-s, -s, 0) );
+    this->line->AddPoint( common::Vector3(s, -s, 0) );
+    this->line->AddPoint( common::Vector3(-s, -s, 0) );
 
-    this->line->AddPoint( Vector3(0, 0, 0) );
-    this->line->AddPoint( Vector3(0, 0, -s) );
+    this->line->AddPoint( common::Vector3(0, 0, 0) );
+    this->line->AddPoint( common::Vector3(0, 0, -s) );
   }
   if ( **this->lightTypeP == "point" )
   {
     float s=0.1;
-    this->line->AddPoint(Vector3(-s,-s,0));
-    this->line->AddPoint(Vector3(-s,s,0));
+    this->line->AddPoint(common::Vector3(-s,-s,0));
+    this->line->AddPoint(common::Vector3(-s,s,0));
 
-    this->line->AddPoint(Vector3(-s,s,0));
-    this->line->AddPoint(Vector3(s,s,0));
+    this->line->AddPoint(common::Vector3(-s,s,0));
+    this->line->AddPoint(common::Vector3(s,s,0));
 
-    this->line->AddPoint(Vector3(s,s,0));
-    this->line->AddPoint(Vector3(s,-s,0));
+    this->line->AddPoint(common::Vector3(s,s,0));
+    this->line->AddPoint(common::Vector3(s,-s,0));
 
-    this->line->AddPoint(Vector3(s,-s,0));
-    this->line->AddPoint(Vector3(-s,-s,0));
-
-
-    this->line->AddPoint(Vector3(-s,-s,0));
-    this->line->AddPoint(Vector3(0,0,s));
-
-    this->line->AddPoint(Vector3(-s,s,0));
-    this->line->AddPoint(Vector3(0,0,s));
-
-    this->line->AddPoint(Vector3(s,s,0));
-    this->line->AddPoint(Vector3(0,0,s));
-
-    this->line->AddPoint(Vector3(s,-s,0));
-    this->line->AddPoint(Vector3(0,0,s));
+    this->line->AddPoint(common::Vector3(s,-s,0));
+    this->line->AddPoint(common::Vector3(-s,-s,0));
 
 
+    this->line->AddPoint(common::Vector3(-s,-s,0));
+    this->line->AddPoint(common::Vector3(0,0,s));
 
-    this->line->AddPoint(Vector3(-s,-s,0));
-    this->line->AddPoint(Vector3(0,0,-s));
+    this->line->AddPoint(common::Vector3(-s,s,0));
+    this->line->AddPoint(common::Vector3(0,0,s));
 
-    this->line->AddPoint(Vector3(-s,s,0));
-    this->line->AddPoint(Vector3(0,0,-s));
+    this->line->AddPoint(common::Vector3(s,s,0));
+    this->line->AddPoint(common::Vector3(0,0,s));
 
-    this->line->AddPoint(Vector3(s,s,0));
-    this->line->AddPoint(Vector3(0,0,-s));
+    this->line->AddPoint(common::Vector3(s,-s,0));
+    this->line->AddPoint(common::Vector3(0,0,s));
 
-    this->line->AddPoint(Vector3(s,-s,0));
-    this->line->AddPoint(Vector3(0,0,-s));
+
+
+    this->line->AddPoint(common::Vector3(-s,-s,0));
+    this->line->AddPoint(common::Vector3(0,0,-s));
+
+    this->line->AddPoint(common::Vector3(-s,s,0));
+    this->line->AddPoint(common::Vector3(0,0,-s));
+
+    this->line->AddPoint(common::Vector3(s,s,0));
+    this->line->AddPoint(common::Vector3(0,0,-s));
+
+    this->line->AddPoint(common::Vector3(s,-s,0));
+    this->line->AddPoint(common::Vector3(0,0,-s));
   }
   else if ( this->light->getType() == Ogre::Light::LT_SPOTLIGHT )
   {
@@ -302,34 +316,34 @@ void Light::CreateVisual()
     angles[1] = range * tan(innerAngle);
 
     unsigned int i = 0;
-    this->line->AddPoint(Vector3(0,0,0));
-    this->line->AddPoint(Vector3(angles[i],angles[i], -range));
+    this->line->AddPoint(common::Vector3(0,0,0));
+    this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
  
     for (unsigned int i=0; i < 2; i++)
     {
-      this->line->AddPoint(Vector3(0,0,0));
-      this->line->AddPoint(Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(common::Vector3(0,0,0));
+      this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
 
-      this->line->AddPoint(Vector3(0,0,0));
-      this->line->AddPoint(Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(common::Vector3(0,0,0));
+      this->line->AddPoint(common::Vector3(-angles[i],-angles[i], -range));
 
-      this->line->AddPoint(Vector3(0,0,0));
-      this->line->AddPoint(Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(common::Vector3(0,0,0));
+      this->line->AddPoint(common::Vector3(angles[i],-angles[i], -range));
 
-      this->line->AddPoint(Vector3(0,0,0));
-      this->line->AddPoint(Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(common::Vector3(0,0,0));
+      this->line->AddPoint(common::Vector3(-angles[i],angles[i], -range));
 
-      this->line->AddPoint(Vector3(angles[i],angles[i], -range));
-      this->line->AddPoint(Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(common::Vector3(-angles[i],angles[i], -range));
 
-      this->line->AddPoint(Vector3(-angles[i],angles[i], -range));
-      this->line->AddPoint(Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(common::Vector3(-angles[i],angles[i], -range));
+      this->line->AddPoint(common::Vector3(-angles[i],-angles[i], -range));
 
-      this->line->AddPoint(Vector3(-angles[i],-angles[i], -range));
-      this->line->AddPoint(Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(common::Vector3(-angles[i],-angles[i], -range));
+      this->line->AddPoint(common::Vector3(angles[i],-angles[i], -range));
 
-      this->line->AddPoint(Vector3(angles[i],-angles[i], -range));
-      this->line->AddPoint(Vector3(angles[i],angles[i], -range));
+      this->line->AddPoint(common::Vector3(angles[i],-angles[i], -range));
+      this->line->AddPoint(common::Vector3(angles[i],angles[i], -range));
     }
   }
 
@@ -342,7 +356,7 @@ void Light::CreateVisual()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the light
-void Light::SetPosition(const Vector3 &p)
+void Light::SetPosition(const common::Vector3 &p)
 {
   this->visual->SetPosition(p);
 }
@@ -399,7 +413,7 @@ void Light::SetLightType(const std::string &type)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the diffuse
-void Light::SetDiffuseColor(const Color &color)
+void Light::SetDiffuseColor(const common::Color &color)
 {
   if (**this->diffuseP != color)
     this->diffuseP->SetValue( color );
@@ -409,7 +423,7 @@ void Light::SetDiffuseColor(const Color &color)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the specular color
-void Light::SetSpecularColor(const Color &color)
+void Light::SetSpecularColor(const common::Color &color)
 {
   if (**this->specularP != color)
     this->specularP->SetValue( color );
@@ -419,10 +433,10 @@ void Light::SetSpecularColor(const Color &color)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the direction
-void Light::SetDirection(const Vector3 &dir)
+void Light::SetDirection(const common::Vector3 &dir)
 {
   // Set the direction which the light points
-  Vector3 vec = dir;
+  common::Vector3 vec = dir;
   vec.Normalize();
 
   if (**this->directionP != vec)
@@ -433,9 +447,9 @@ void Light::SetDirection(const Vector3 &dir)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the attenuation
-void Light::SetAttenuation(const Vector3 &att)
+void Light::SetAttenuation(const common::Vector3 &att)
 {
-  Vector3 vec = att;
+  common::Vector3 vec = att;
 
   // Constant factor. 1.0 means never attenuate, 0.0 is complete attenuation
   if (vec.x < 0)

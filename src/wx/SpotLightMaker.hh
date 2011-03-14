@@ -17,7 +17,7 @@
 #ifndef SPOTLIGHTMAKER_HH
 #define SPOTLIGHTMAKER_HH
 
-#include "Messages.hh"
+#include "common/Messages.hh"
 #include "Vector2.hh"
 #include "EntityMaker.hh"
 

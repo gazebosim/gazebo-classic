@@ -22,7 +22,7 @@
 
 #include <sys/time.h>
 #include <math.h>
-#include "Time.hh"
+#include "common/Time.hh"
 
 using namespace gazebo;
 using namespace common;

@@ -23,13 +23,13 @@
 #ifndef HINGEJOINT_HH
 #define HINGEJOINT_HH
 
-#include "Angle.hh"
+#include "common/Angle.hh"
 #include "common/Vector3.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Joint.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "World.hh"
-#include "Global.hh"
+#include "common/Global.hh"
 
 namespace gazebo
 {

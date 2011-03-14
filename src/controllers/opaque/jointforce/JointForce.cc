@@ -20,11 +20,11 @@
  * Date: 13 March 2008
  */
 
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "World.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Simulator.hh"
 #include "JointForce.hh"

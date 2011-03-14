@@ -43,7 +43,6 @@ set (headers SimulationApp.hh
              BoxMaker.hh
              SphereMaker.hh
              CylinderMaker.hh
-             MouseEvent.hh
              PointLightMaker.hh
              SpotLightMaker.hh
              DirectionalLightMaker.hh

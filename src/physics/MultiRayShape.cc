@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "Messages.hh"
-#include "XMLConfig.hh"
+#include "common/Messages.hh"
+#include "common/XMLConfig.hh"
 #include "MultiRayShape.hh"
 
 using namespace gazebo;

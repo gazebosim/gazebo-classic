@@ -18,8 +18,8 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "Mesh.hh"
-#include "STLLoader.hh"
+#include "common/Mesh.hh"
+#include "common/STLLoader.hh"
 
 using namespace gazebo;
 using namespace common;

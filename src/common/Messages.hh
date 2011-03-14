@@ -18,65 +18,65 @@
 #define MESSAGES_HH
 
 #include "MessageTypes.hh"
-#include "XMLConfig.hh"
-#include "Color.hh"
+#include "common/XMLConfig.hh"
+#include "common/Color.hh"
 #include "common/Vector3.hh"
-#include "Time.hh"
-#include "Pose3d.hh"
-#include "Plane.hh"
-#include "Box.hh"
+#include "common/Time.hh"
+#include "common/Pose3d.hh"
+#include "common/Plane.hh"
+#include "common/Box.hh"
 
 namespace gazebo
 {
 	namespace common
-{
-  class Message
   {
-    public:
-      static void Init(google::protobuf::Message &message, 
-                       const std::string &id);
-
-      static void CreationStamp(google::protobuf::Message &message);
-      static void CreationStamp(msgs::Header &header);
-
-      static void SendStamp(google::protobuf::Message &message);
-      static void SendStamp(msgs::Header &header);
-
-      static msgs::Point      Convert(const Vector3 &v);
-      static msgs::Quaternion Convert(const Quatern &q);
-      static msgs::Pose       Convert(const Pose3d &p);
-      static msgs::Color      Convert(const Color &c);
-      static msgs::Time       Convert(const Time &t);
-      static msgs::Plane      Convert(const Plane &p);
-
-      static Vector3          Convert(const msgs::Point &v);
-      static Quatern          Convert(const msgs::Quaternion &q);
-      static Pose3d           Convert(const msgs::Pose &p);
-      static Color            Convert(const msgs::Color &c);
-      static Time             Convert(const msgs::Time &t);
-      static Plane            Convert(const msgs::Plane &p);
-
-      static void Set(msgs::Point *pt, const Vector3 &v);
-      static void Set(msgs::Quaternion *q, const Quatern &v);
-      static void Set(msgs::Pose *p, const Pose3d &v);
-      static void Set(msgs::Color *c, const Color &v);
-      static void Set(msgs::Time *t, const Time &v);
-      static void Set(msgs::Plane *p, const Plane &v);
-
-      static msgs::Light      LightFromXML(XMLConfigNode *node);
-      static msgs::Visual     VisualFromXML(XMLConfigNode *node);
-      static msgs::Shadows    ShadowsFromXML(XMLConfigNode *node);
-      static msgs::Fog     FogFromXML(XMLConfigNode *node);
-      static msgs::Scene     SceneFromXML(XMLConfigNode *node);
-
-    private:
-      static void Stamp(msgs::Header &, const std::string &type);
-
-      static const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name);
-
-      static msgs::Header *GetHeader(google::protobuf::Message &message);
-  };
-}
+    class Message
+    {
+      public:
+        static void Init(google::protobuf::Message &message, 
+                         const std::string &id);
+  
+        static void CreationStamp(google::protobuf::Message &message);
+        static void CreationStamp(msgs::Header &header);
+  
+        static void SendStamp(google::protobuf::Message &message);
+        static void SendStamp(msgs::Header &header);
+  
+        static msgs::Point      Convert(const Vector3 &v);
+        static msgs::Quaternion Convert(const Quatern &q);
+        static msgs::Pose       Convert(const Pose3d &p);
+        static msgs::Color      Convert(const Color &c);
+        static msgs::Time       Convert(const Time &t);
+        static msgs::Plane      Convert(const Plane &p);
+  
+        static Vector3          Convert(const msgs::Point &v);
+        static Quatern          Convert(const msgs::Quaternion &q);
+        static Pose3d           Convert(const msgs::Pose &p);
+        static Color            Convert(const msgs::Color &c);
+        static Time             Convert(const msgs::Time &t);
+        static Plane            Convert(const msgs::Plane &p);
+  
+        static void Set(msgs::Point *pt, const Vector3 &v);
+        static void Set(msgs::Quaternion *q, const Quatern &v);
+        static void Set(msgs::Pose *p, const Pose3d &v);
+        static void Set(msgs::Color *c, const Color &v);
+        static void Set(msgs::Time *t, const Time &v);
+        static void Set(msgs::Plane *p, const Plane &v);
+  
+        static msgs::Light      LightFromXML(XMLConfigNode *node);
+        static msgs::Visual     VisualFromXML(XMLConfigNode *node);
+        static msgs::Shadows    ShadowsFromXML(XMLConfigNode *node);
+        static msgs::Fog     FogFromXML(XMLConfigNode *node);
+        static msgs::Scene     SceneFromXML(XMLConfigNode *node);
+  
+      private:
+        static void Stamp(msgs::Header &, const std::string &type);
+  
+        static const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name);
+  
+        static msgs::Header *GetHeader(google::protobuf::Message &message);
+    };
+  }
 
 }
 #endif

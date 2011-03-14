@@ -22,8 +22,8 @@
 #ifndef DIAGNOSTICMANAGER_HH
 #define DIAGNOSTICMANAGER_HH
 
-#include "SingletonT.hh"
-#include "Timer.hh"
+#include "common/SingletonT.hh"
+#include "common/Timer.hh"
 
 namespace gazebo
 {

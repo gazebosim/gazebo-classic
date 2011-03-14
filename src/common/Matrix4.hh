@@ -20,7 +20,7 @@
 #include <iostream>
 
 #include "common/Vector3.hh"
-#include "Matrix3.hh"
+#include "common/Matrix3.hh"
 
 namespace gazebo
 {
@@ -47,7 +47,7 @@ namespace gazebo
 
     public: Matrix4 operator*(const Matrix4 &mat);
 
-  public: friend std::ostream &operator<<( std::ostream &out, const gazebo::Matrix4 &m )
+    public: friend std::ostream &operator<<( std::ostream &out, const gazebo::common::Matrix4 &m )
           {
             for (int i=0; i < 4; i++)
             {

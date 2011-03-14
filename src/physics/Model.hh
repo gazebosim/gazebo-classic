@@ -30,9 +30,9 @@
 #include <string>
 #include <vector>
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Contact.hh"
-#include "Pose3d.hh"
+#include "common/Pose3d.hh"
 #include "Joint.hh"
 #include "Entity.hh"
 #include "gz.h"

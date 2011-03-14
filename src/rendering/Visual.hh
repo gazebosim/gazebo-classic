@@ -17,7 +17,6 @@
 /* Desc: Ogre Visual Class
  * Author: Nate Koenig
  * Date: 14 Dec 2007
- * SVN: $Id$
  */
 
 #ifndef OGREVISUAL_HH
@@ -25,15 +24,16 @@
 
 #include <string>
 
-#include "Event.hh"
-#include "Box.hh"
-#include "RenderTypes.hh"
-#include "Pose3d.hh"
-#include "Quatern.hh"
+#include "common/Event.hh"
+#include "common/Box.hh"
+#include "common/Pose3d.hh"
+#include "common/Quatern.hh"
 #include "common/Vector3.hh"
-#include "Common.hh"
-#include "Param.hh"
-#include "Messages.hh"
+#include "common/Vector2d.hh"
+#include "common/Param.hh"
+#include "common/Messages.hh"
+
+#include "rendering/RenderTypes.hh"
 
 namespace Ogre
 {
@@ -51,233 +51,235 @@ namespace boost
 
 namespace gazebo
 {
-	namespace rendering
-{ 
-
-  class XMLConfigNode;
-  class Entity;
-  class SelectionObj;
-  class Scene;
-  class OgreDynamicLines;
-  class Mesh;
-
-
-  /// \brief Ogre Visual Object
-  class Visual : public Common
+  namespace common
   {
-    /// \brief Constructor
-    public: Visual (const std::string &name, Visual *parent);
-
-    /// \brief Constructor
-    public: Visual (const std::string &name, Ogre::SceneNode *parent);
-
-    /// \brief Constructor
-    public: Visual (const std::string &name, Scene *scene);
-
-    /// \brief Destructor
-    public: virtual ~Visual();
-
-    /// \brief Helper for the contructor
-    public: void Init();
-
-    /// \brief Load from a message
-    public: void LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
-
-    /// \brief Load the visual
-    public: void Load(XMLConfigNode *node);
-
-    /// \brief Update the visual.
-    public: void Update();
-
-    /// \brief Set the owner
-    public: void SetOwner(Common *common);
-
-    /// \brief Get the owner
-    public: Common *GetOwner() const;
-
-    /// \brief Attach a visual
-    public: void AttachVisual(Visual *vis);
-           
-    /// \brief Detach a visual 
-    public: void DetachVisual(Visual *vis);
-
-    /// \brief Attach a renerable object to the visual
-    public: void AttachObject( Ogre::MovableObject *obj);
-
-    /// \brief Detach all objects
-    public: void DetachObjects();
-
-    /// \brief Get the number of attached objects
-    public: unsigned short GetNumAttached();
-
-    /// \brief Get an attached object
-    public: Ogre::MovableObject *GetAttached(unsigned short num);
-
-    /// \brief Attach a mesh to this visual by name
-    public: void AttachMesh( const std::string &meshName );
-
-    /// \brief Save the visual
-    public: void Save(std::string &prefix, std::ostream &stream);
-    
-    /// \brief Set the scale
-    public: void SetScale( const Vector3 &scale );
-
-    /// \brief Get the scale
-    public: Vector3 GetScale();
-
-    /// \brief Set the material
-    public: void SetMaterial(const std::string &materialName);
-
-    public: void AttachAxes();
-
-    /// \brief Set the transparency
-    public: void SetTransparency( float trans );
-
-    /// \brief Get the transparency
-    public: float GetTransparency();
-
-    /// \brief Set highlighted or no
-    public: void SetHighlight( bool highlight);
-
-    /// \brief Set whether the visual should cast shadows
-    public: void SetCastShadows(const bool &shadows);
-
-    /// \brief Set whether the visual is visible
-    /// \param visible set this node visible
-    /// \param cascade setting this parameter in children too
-    public: void SetVisible(bool visible, bool cascade=true);
-
-    /// \brief Toggle whether this visual is visible
-    public: void ToggleVisible();
-
-    /// \brief Get whether the visual is visible
-    public: bool GetVisible() const;
-
-    /// \brief Set the position of the visual
-    public: void SetPosition( const Vector3 &pos);
-
-    /// \brief Set the rotation of the visual
-    public: void SetRotation( const Quatern &rot);
-
-    /// \brief Set the pose of the visual
-    public: void SetPose( const Pose3d &pose);
-
-    /// \brief Get the position of the visual
-    public: Vector3 GetPosition() const;
-
-    /// \brief Get the rotation of the visual
-    public: Quatern GetRotation() const;
-
-    /// \brief Get the pose of the visual
-    public: Pose3d GetPose() const;
-
-    /// \brief Get the global pose of the node
-    public: Pose3d GetWorldPose() const;
-
-    /// \brief Return the scene Node of this visual entity
-    public: Ogre::SceneNode *GetSceneNode() const;
-
-    /// \brief Make the visual objects static renderables
-    public: void MakeStatic();
-
-    /// \brief Set to true to show a white bounding box, used to indicate 
-    //         user selection
-    public: void ShowSelectionBox( bool value );
-
-    /// \brief Return true if the  visual is a static geometry
-    public: bool IsStatic() const;
-
-    /// \brief Set one visual to track/follow another
-    public: void EnableTrackVisual( Visual *vis );
-
-    /// \brief Disable tracking of a visual
-    public: void DisableTrackVisual();
-
-    /// \brief Get the normal map
-    public: std::string GetNormalMap() const;
-
-    /// \brief Set the normal map
-    public: void SetNormalMap(const std::string &nmap);
-
-    /// \brief Get the shader
-    public: std::string GetShader() const;
-
-    /// \brief Set the shader
-    public: void SetShader(const std::string &shader);
-
-    /// \brief True on or off a ribbon trail
-    public: void SetRibbonTrail(bool value);
-
-    /// \brief Get the size of the bounding box
-    public: Vector3 GetBoundingBoxSize() const;
-
-    /// \brief Set whether to use the RT Shader system
-    public: void SetUseRTShader(bool value);
-
-    /// \brief Get whether to user the RT shader system
-    public: bool GetUseRTShader() const;
-
-    /// \brief Add a line to the visual
-    public: OgreDynamicLines *AddDynamicLine(RenderOpType type);
-
-    /// \brief Delete a dynamic line
-    public: void DeleteDynamicLine(OgreDynamicLines *line);
-
-    /// \brief Get the name of the material
-    public: std::string GetMaterialName() const;
-
-    /// \brief Get the bounding box for the visual
-    public: Box GetBounds() const;
-
-    /// \brief Insert a mesh into Ogre 
-    public: static void InsertMesh( const Mesh *mesh);
-
-    /// \brief Update a visual based on a message
-    public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
-
-    private: void GetBoundsHelper(Ogre::SceneNode *node, Box &box) const;
-
-    private: std::string myMaterialName;
-    private: std::string origMaterialName;
-
-    private: Ogre::SceneNode *parentNode;
-    private: Ogre::SceneNode *sceneNode;
-    private: Ogre::SceneNode *boundingBoxNode;
-
-    private: float transparency;
-
-    private: static unsigned int visualCounter;
-
-    private: Common *owner;
-
-    private: ParamT<Vector3> *xyzP;
-    private: ParamT<Quatern> *rpyP;
-    private: ParamT<std::string> *meshNameP;
-    private: ParamT<std::string> *materialNameP;
-    private: ParamT<std::string> *normalMapNameP;
-    private: ParamT<std::string> *shaderP;
-    private: ParamT<bool> *castShadowsP;
-    private: ParamT<Vector3> *scaleP;
-    private: ParamT<Vector2d > *meshTileP;
-
-    // NATY
-    //private: boost::recursive_mutex *mutex;
-
-    private: bool isStatic;
-    private: Ogre::StaticGeometry *staticGeom;
-    private: bool visible;
-
-    private: static SelectionObj *selectionObj;
-
-    private: Ogre::RibbonTrail *ribbonTrail;
-
-    private: bool useRTShader;
-    private: event::ConnectionPtr preRenderConnection;
-
-    // List of all the lines created
-    private: std::list<OgreDynamicLines*> lines;
-  };
-}
+    class XMLConfigNode;
+    class Mesh;
+  }
+
+	namespace rendering
+  { 
+    class SelectionObj;
+    class Scene;
+    class DynamicLines;
+  
+    /// \brief Ogre Visual Object
+    class Visual 
+    {
+      /// \brief Constructor
+      public: Visual (const std::string &name, Visual *parent);
+  
+      /// \brief Constructor
+      public: Visual (const std::string &name, Ogre::SceneNode *parent);
+  
+      /// \brief Constructor
+      public: Visual (const std::string &name, Scene *scene);
+  
+      /// \brief Destructor
+      public: virtual ~Visual();
+  
+      /// \brief Helper for the contructor
+      public: void Init();
+  
+      /// \brief Load from a message
+      public: void LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
+  
+      /// \brief Load the visual
+      public: void Load(common::XMLConfigNode *node);
+  
+      /// \brief Update the visual.
+      public: void Update();
+
+      /// \brief Set the name of the visual
+      public: void SetName( const std::string &name );
+
+      /// \brief Get the name of the visual
+      public: std::string GetName() const;
+  
+      /// \brief Attach a visual
+      public: void AttachVisual(Visual *vis);
+             
+      /// \brief Detach a visual 
+      public: void DetachVisual(Visual *vis);
+  
+      /// \brief Attach a renerable object to the visual
+      public: void AttachObject( Ogre::MovableObject *obj);
+  
+      /// \brief Detach all objects
+      public: void DetachObjects();
+  
+      /// \brief Get the number of attached objects
+      public: unsigned short GetNumAttached();
+  
+      /// \brief Get an attached object
+      public: Ogre::MovableObject *GetAttached(unsigned short num);
+  
+      /// \brief Attach a mesh to this visual by name
+      public: void AttachMesh( const std::string &meshName );
+  
+      /// \brief Save the visual
+      public: void Save(std::string &prefix, std::ostream &stream);
+      
+      /// \brief Set the scale
+      public: void SetScale( const common::Vector3 &scale );
+  
+      /// \brief Get the scale
+      public: common::Vector3 GetScale();
+  
+      /// \brief Set the material
+      public: void SetMaterial(const std::string &materialName);
+  
+      public: void AttachAxes();
+  
+      /// \brief Set the transparency
+      public: void SetTransparency( float trans );
+  
+      /// \brief Get the transparency
+      public: float GetTransparency();
+  
+      /// \brief Set highlighted or no
+      public: void SetHighlight( bool highlight);
+  
+      /// \brief Set whether the visual should cast shadows
+      public: void SetCastShadows(const bool &shadows);
+  
+      /// \brief Set whether the visual is visible
+      /// \param visible set this node visible
+      /// \param cascade setting this parameter in children too
+      public: void SetVisible(bool visible, bool cascade=true);
+  
+      /// \brief Toggle whether this visual is visible
+      public: void ToggleVisible();
+  
+      /// \brief Get whether the visual is visible
+      public: bool GetVisible() const;
+  
+      /// \brief Set the position of the visual
+      public: void SetPosition( const common::Vector3 &pos);
+  
+      /// \brief Set the rotation of the visual
+      public: void SetRotation( const common::Quatern &rot);
+  
+      /// \brief Set the pose of the visual
+      public: void SetPose( const common::Pose3d &pose);
+  
+      /// \brief Get the position of the visual
+      public: common::Vector3 GetPosition() const;
+  
+      /// \brief Get the rotation of the visual
+      public: common::Quatern GetRotation() const;
+  
+      /// \brief Get the pose of the visual
+      public: common::Pose3d GetPose() const;
+  
+      /// \brief Get the global pose of the node
+      public: common::Pose3d GetWorldPose() const;
+  
+      /// \brief Return the scene Node of this visual entity
+      public: Ogre::SceneNode *GetSceneNode() const;
+  
+      /// \brief Make the visual objects static renderables
+      public: void MakeStatic();
+  
+      /// \brief Set to true to show a white bounding box, used to indicate 
+      //         user selection
+      public: void ShowSelectionBox( bool value );
+  
+      /// \brief Return true if the  visual is a static geometry
+      public: bool IsStatic() const;
+  
+      /// \brief Set one visual to track/follow another
+      public: void EnableTrackVisual( Visual *vis );
+  
+      /// \brief Disable tracking of a visual
+      public: void DisableTrackVisual();
+  
+      /// \brief Get the normal map
+      public: std::string GetNormalMap() const;
+  
+      /// \brief Set the normal map
+      public: void SetNormalMap(const std::string &nmap);
+  
+      /// \brief Get the shader
+      public: std::string GetShader() const;
+  
+      /// \brief Set the shader
+      public: void SetShader(const std::string &shader);
+  
+      /// \brief True on or off a ribbon trail
+      public: void SetRibbonTrail(bool value);
+  
+      /// \brief Get the size of the bounding box
+      public: common::Vector3 GetBoundingBoxSize() const;
+  
+      /// \brief Set whether to use the RT Shader system
+      public: void SetUseRTShader(bool value);
+  
+      /// \brief Get whether to user the RT shader system
+      public: bool GetUseRTShader() const;
+  
+      /// \brief Add a line to the visual
+      public: DynamicLines *AddDynamicLine(RenderOpType type);
+  
+      /// \brief Delete a dynamic line
+      public: void DeleteDynamicLine(DynamicLines *line);
+  
+      /// \brief Get the name of the material
+      public: std::string GetMaterialName() const;
+  
+      /// \brief Get the bounding box for the visual
+      public: common::Box GetBounds() const;
+  
+      /// \brief Insert a mesh into Ogre 
+      public: static void InsertMesh( const common::Mesh *mesh);
+  
+      /// \brief Update a visual based on a message
+      public: void UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &msg);
+  
+      private: void GetBoundsHelper(Ogre::SceneNode *node, common::Box &box) const;
+  
+      private: std::string myMaterialName;
+      private: std::string origMaterialName;
+  
+      private: Ogre::SceneNode *sceneNode;
+  
+      private: float transparency;
+  
+      private: static unsigned int visualCounter;
+  
+      private: common::ParamT<common::Vector3> *xyzP;
+      private: common::ParamT<common::Quatern> *rpyP;
+      private: common::ParamT<std::string> *meshNameP;
+      private: common::ParamT<std::string> *materialNameP;
+      private: common::ParamT<std::string> *normalMapNameP;
+      private: common::ParamT<std::string> *shaderP;
+      private: common::ParamT<bool> *castShadowsP;
+      private: common::ParamT<common::Vector3> *scaleP;
+      private: common::ParamT<common::Vector2d > *meshTileP;
+  
+      // NATY
+      //private: boost::recursive_mutex *mutex;
+  
+      private: bool isStatic;
+      private: Ogre::StaticGeometry *staticGeom;
+      private: bool visible;
+  
+      private: static SelectionObj *selectionObj;
+  
+      private: Ogre::RibbonTrail *ribbonTrail;
+  
+      private: bool useRTShader;
+      private: event::ConnectionPtr preRenderConnection;
+  
+      // List of all the lines created
+      private: std::list<DynamicLines*> lines;
+
+      private: std::string name;
+
+      /// List of all the parameters
+      protected: std::vector<common::Param*> parameters;
+    };
+  }
 
 }
 #endif

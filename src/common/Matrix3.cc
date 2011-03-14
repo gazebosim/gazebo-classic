@@ -16,8 +16,8 @@
 */
 #include <string.h>
 
-#include "GazeboError.hh"
-#include "Matrix3.hh"
+#include "common/GazeboError.hh"
+#include "common/Matrix3.hh"
 
 using namespace gazebo;
 using namespace common;

@@ -36,14 +36,14 @@
 
 #include "PhysicsFactory.hh"
 #include "Mass.hh"
-#include "Global.hh"
-#include "GazeboMessage.hh"
-#include "GazeboError.hh"
+#include "common/Global.hh"
+#include "common/GazeboMessage.hh"
+#include "common/GazeboError.hh"
 #include "World.hh"
 #include "common/Vector3.hh"
 #include "Entity.hh"
 
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 
 #include "BulletPhysics.hh"
 

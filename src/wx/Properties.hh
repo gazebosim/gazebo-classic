@@ -19,8 +19,8 @@
 
 #include <wx/wx.h>
 
-#include "Param.hh"
-#include "StaticPluginRegister.hh"
+#include "common/Param.hh"
+#include "common/StaticPluginRegister.hh"
 
 class wxPropertyGrid;
 class wxProperty;

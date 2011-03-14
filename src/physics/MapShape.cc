@@ -25,11 +25,11 @@
 #include <math.h>
 
 #include "PhysicsEngine.hh"
-#include "GazeboConfig.hh"
-#include "Image.hh"
+#include "common/GazeboConfig.hh"
+#include "common/Image.hh"
 #include "BoxShape.hh"
-#include "GazeboError.hh"
-#include "Global.hh"
+#include "common/GazeboError.hh"
+#include "common/Global.hh"
 #include "Body.hh"
 #include "Geom.hh"
 #include "World.hh"

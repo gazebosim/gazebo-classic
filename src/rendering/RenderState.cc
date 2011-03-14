@@ -21,8 +21,8 @@
 
 #include <boost/bind.hpp>
 
-#include "Events.hh"
-#include "RenderState.hh"
+#include "common/Events.hh"
+#include "rendering/RenderState.hh"
 
 using namespace gazebo;
 using namespace rendering;

@@ -25,9 +25,9 @@
 
 #include <btBulletDynamicsCommon.h>
 
-#include "GazeboMessage.hh"
+#include "common/GazeboMessage.hh"
 #include "Joint.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "common/Vector3.hh"
 
 namespace gazebo

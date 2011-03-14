@@ -17,9 +17,9 @@
 #include <boost/lexical_cast.hpp>
 
 #include "RenderControl.hh"
-#include "UserCamera.hh"
-#include "Pose3d.hh"
-#include "Global.hh"
+#include "rendering/UserCamera.hh"
+#include "common/Pose3d.hh"
+#include "common/Global.hh"
 #include "RenderPanel.hh"
 
 using namespace gazebo;

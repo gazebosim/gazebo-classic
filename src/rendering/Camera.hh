@@ -26,11 +26,11 @@
 #include <OgrePrerequisites.h>
 #include <OgreTexture.h>
 
-#include "Event.hh"
-#include "Param.hh"
-#include "Angle.hh"
-#include "Pose3d.hh"
-#include "Time.hh"
+#include "common/Event.hh"
+#include "common/Param.hh"
+#include "common/Angle.hh"
+#include "common/Pose3d.hh"
+#include "common/Time.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -44,11 +44,13 @@ namespace Ogre
 
 namespace gazebo
 {
-	namespace rendering
+  namespace common
   {
     class XMLConfigNode;
-    class Model;
-    class Entity;
+  }
+
+	namespace rendering
+  {
     class MouseEvent;
     class ViewController;
     class Scene;
@@ -74,7 +76,7 @@ namespace gazebo
     
       /// \brief Load the camera using parameter from an XMLConfig node
       /// \param node The XMLConfig node
-      public: void Load( XMLConfigNode *node );
+      public: void Load( common::XMLConfigNode *node );
   
       /// \brief Save camera info in xml format
       /// \param stream Output stream
@@ -106,24 +108,23 @@ namespace gazebo
   
   
       /// \brief Get the global pose of the camera
-      public: Pose3d GetWorldPose() const;
+      public: common::Pose3d GetWorldPose();
   
       /// \brief Get the camera position in the world
-      public: Vector3 GetWorldPosition() const;
-  
+      public: common::Vector3 GetWorldPosition() const;
   
       /// \brief Set the global pose of the camera
-      public: void SetWorldPose(const Pose3d &pose);
+      public: void SetWorldPose(const common::Pose3d &pose);
   
       /// \brief Set the world position
-      public: void SetWorldPosition(const Vector3 &pos);
+      public: void SetWorldPosition(const common::Vector3 &pos);
   
       /// \brief Set the world orientation
-      public: void SetWorldRotation(const Quatern &quant);
+      public: void SetWorldRotation(const common::Quatern &quant);
   
     
       /// \brief Translate the camera
-      public: void Translate( const Vector3 &direction );
+      public: void Translate( const common::Vector3 &direction );
     
       /// \brief Rotate the camera around the yaw axis
       public: void RotateYaw( float angle );
@@ -140,10 +141,10 @@ namespace gazebo
       public: void SetFOV( float radians );
   
       /// \brief Get the camera FOV (horizontal)  
-      public: Angle GetHFOV() const;
+      public: common::Angle GetHFOV() const;
   
       /// \brief Get the camera FOV (vertical)  
-      public: Angle GetVFOV() const;
+      public: common::Angle GetVFOV() const;
     
       /// \brief Get the width of the image
       public: unsigned int GetImageWidth() const;
@@ -198,10 +199,10 @@ namespace gazebo
       public: unsigned int GetViewportHeight() const;
   
       /// \brief Get the viewport up vector
-      public: Vector3 GetUp();
+      public: common::Vector3 GetUp();
   
       /// \brief Get the viewport right vector
-      public: Vector3 GetRight();
+      public: common::Vector3 GetRight();
   
       /// \brief Get the average FPS
       public: virtual float GetAvgFPS() { return 0;}
@@ -241,7 +242,7 @@ namespace gazebo
   
       /// \brief Get a world space ray as cast from the camer through the viewport
       public: void GetCameraToViewportRay(int screenx, int screeny,
-                                          Vector3 &origin, Vector3 &dir);
+                                          common::Vector3 &origin, common::Vector3 &dir);
   
           /// \brief Set whether to capture data
       public: void SetCaptureData( bool value );
@@ -253,7 +254,7 @@ namespace gazebo
       public: Scene *GetScene() const;
   
       /// \brief Get point on a plane
-      public: Vector3 GetWorldPointOnPlane(int x, int y, Vector3 planeNorm, double d);
+      public: common::Vector3 GetWorldPointOnPlane(int x, int y, common::Vector3 planeNorm, double d);
   
       /// \brief Get the visibility mask
       public: unsigned int GetVisibilityMask() const;
@@ -269,9 +270,9 @@ namespace gazebo
   
       private: std::string name;
   
-      protected: ParamT<Angle> *hfovP;
-      protected: ParamT<double> *nearClipP, *farClipP, *updateRateP;
-      protected: ParamT< Vector2i > *imageSizeP;
+      protected: common::ParamT<common::Angle> *hfovP;
+      protected: common::ParamT<double> *nearClipP, *farClipP, *updateRateP;
+      protected: common::ParamT< common::Vector2i > *imageSizeP;
       protected: unsigned int textureWidth, textureHeight;
     
       protected: Ogre::Camera *camera;
@@ -280,17 +281,17 @@ namespace gazebo
       protected: Ogre::SceneNode *sceneNode;
       protected: Ogre::SceneNode *pitchNode;
     
-      private: Pose3d pose;
+      private: common::Pose3d pose;
     
       // Info for saving images
       protected: unsigned char *saveFrameBuffer;
       protected: unsigned char *bayerFrameBuffer;
       protected: unsigned int saveCount;
-      protected: ParamT<bool> *saveFramesP;
-      protected: ParamT<std::string> *savePathnameP;
-      protected: ParamT<std::string> *imageFormatP;
+      protected: common::ParamT<bool> *saveFramesP;
+      protected: common::ParamT<std::string> *savePathnameP;
+      protected: common::ParamT<std::string> *imageFormatP;
    
-      protected: ParamT<std::string> *visMaskP;
+      protected: common::ParamT<std::string> *visMaskP;
       protected: Ogre::PixelFormat imageFormat;
       protected: unsigned int visibilityMask;
   
@@ -306,14 +307,14 @@ namespace gazebo
       protected: bool captureData;
   
       private: bool userMovable;
-      protected: std::vector<Param*> camParameters;
+      protected: std::vector<common::Param*> camParameters;
   
       protected: bool renderingEnabled;
   
       private: bool newData;
   
-      protected: Time renderPeriod;
-      protected: Time lastUpdate;
+      protected: common::Time renderPeriod;
+      protected: common::Time lastUpdate;
   
       protected: Scene *scene;
       private: event::ConnectionPtr showWireframeConnection;

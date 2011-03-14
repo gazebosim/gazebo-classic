@@ -16,10 +16,10 @@
 */
 #include <iostream>
 
-#include "Messages.hh"
-#include "Camera.hh"
-#include "Scene.hh"
-#include "Events.hh"
+#include "common/Messages.hh"
+#include "rendering/Camera.hh"
+#include "rendering/Scene.hh"
+#include "common/Events.hh"
 #include "MouseEvent.hh"
 #include "World.hh"
 #include "SphereMaker.hh"

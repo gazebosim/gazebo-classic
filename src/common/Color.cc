@@ -23,8 +23,8 @@
 #include <algorithm>
 #include <math.h>
 
-#include "GazeboMessage.hh"
-#include "Color.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Color.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -301,13 +301,6 @@ void Color::A(float v)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Return the equivalent ogre color
-Ogre::ColourValue Color::GetOgreColor() const
-{
-  return Ogre::ColourValue(this->r, this->g, this->b, this->a);
-}
- 
-////////////////////////////////////////////////////////////////////////////////
 // Equals operator
 const Color &Color::operator=( const Color &pt )
 {
@@ -318,7 +311,6 @@ const Color &Color::operator=( const Color &pt )
 
   return *this;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Addition operator

@@ -26,7 +26,7 @@
 
 #include <string>
 #include <map>
-#include "StaticPluginRegister.hh"
+#include "common/StaticPluginRegister.hh"
 
 namespace gazebo
 {

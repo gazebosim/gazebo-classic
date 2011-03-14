@@ -17,9 +17,14 @@
 #ifndef TOPICMANAGER_HH
 #define TOPICMANAGER_HH
 
+#include <map>
+#include <list>
+#include <boost/bind.hpp>
+
 #include "common/GazeboError.hh"
 #include "common/Messages.hh"
 #include "common/SingletonT.hh"
+
 #include "transport/Publisher.hh"
 #include "transport/Subscriber.hh"
 #include "transport/Subscription.hh"

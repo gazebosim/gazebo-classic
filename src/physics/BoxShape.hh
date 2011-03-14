@@ -23,7 +23,7 @@
 #ifndef BOXSHAPE_HH
 #define BOXSHAPE_HH
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Shape.hh"
 
 namespace gazebo

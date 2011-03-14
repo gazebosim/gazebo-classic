@@ -20,8 +20,8 @@
  * SVN: $Id:$
  */
 
-#include "Global.hh"
-#include "GazeboError.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
 #include "ODEGeom.hh"
 #include "ODEHeightmapShape.hh"
 

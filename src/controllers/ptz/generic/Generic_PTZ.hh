@@ -24,7 +24,7 @@
 #ifndef GENERIC_PTZ_HH
 #define GENERIC_PTZ_HH
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Controller.hh"
 
 namespace gazebo

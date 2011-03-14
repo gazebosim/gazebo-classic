@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "Scene.hh"
+#include "rendering/Scene.hh"
 #include "SimulationFrame.hh"
 #include "SimulationApp.hh"
 #include "Simulator.hh"

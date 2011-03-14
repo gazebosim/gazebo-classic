@@ -23,9 +23,9 @@
 #ifndef BULLETHINGEJOINT_HH
 #define BULLETHINGEJOINT_HH
 
-#include "Angle.hh"
+#include "common/Angle.hh"
 #include "common/Vector3.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "BulletJoint.hh"
 #include "HingeJoint.hh"
 #include "BulletPhysics.hh"

@@ -22,7 +22,7 @@
 #ifndef RENDERSTATE_HH
 #define RENDERSTATE_HH
 
-#include "Event.hh"
+#include "common/Event.hh"
 
 namespace gazebo
 {

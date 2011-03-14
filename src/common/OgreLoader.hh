@@ -31,8 +31,8 @@
 #include <vector>
 #include <stdint.h>
 
-#include "MeshLoader.hh"
-#include "GazeboError.hh"
+#include "common/MeshLoader.hh"
+#include "common/GazeboError.hh"
 #include "common/Vector3.hh"
 
 #define M_MESH 0x3000

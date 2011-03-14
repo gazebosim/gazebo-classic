@@ -25,12 +25,12 @@
 
 #include <boost/bind.hpp>
 
-#include "Event.hh"
+#include "common/Event.hh"
 #include "Contact.hh"
 #include "Shape.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Entity.hh"
-#include "Pose3d.hh"
+#include "common/Pose3d.hh"
 #include "common/Vector3.hh"
 #include "Mass.hh"
 

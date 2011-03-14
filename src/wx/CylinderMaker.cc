@@ -16,9 +16,9 @@
 */
 #include <iostream>
 
-#include "Messages.hh"
-#include "Camera.hh"
-#include "Events.hh"
+#include "common/Messages.hh"
+#include "rendering/Camera.hh"
+#include "common/Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
 #include "World.hh"

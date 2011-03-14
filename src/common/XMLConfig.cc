@@ -665,9 +665,9 @@ double XMLConfigNode::GetLength( const std::string &key, double def, int require
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a time
-gazebo::Time XMLConfigNode::GetTime( const std::string &key, double def, int require ) const
+Time XMLConfigNode::GetTime( const std::string &key, double def, int require ) const
 {
-  gazebo::Time time(this->GetDouble(key, def, require));
+  Time time(this->GetDouble(key, def, require));
   return time;
 }
 

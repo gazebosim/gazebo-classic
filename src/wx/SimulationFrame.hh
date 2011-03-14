@@ -17,7 +17,7 @@
 #include <wx/wx.h>
 #include <wx/treectrl.h>
 
-#include "Event.hh"
+#include "common/Event.hh"
 
 class wxAuiManager;
 class wxAuiManagerEvent;

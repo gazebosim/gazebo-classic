@@ -102,12 +102,12 @@ home directory, or to the log file specified with the -l command line option.
 #include <errno.h>
 #include <iostream>
 
-#include "Events.hh"
+#include "common/Events.hh"
 #include "gazebo_config.h"
 #include "Simulator.hh"
 #include "World.hh"
-#include "GazeboError.hh"
-#include "Global.hh"
+#include "common/GazeboError.hh"
+#include "common/Global.hh"
 
 
 // Command line options

@@ -25,15 +25,17 @@
 #include <Ogre.h>
 #include <dirent.h>
 
-#include "Events.hh"
-#include "GazeboMessage.hh"
-#include "Global.hh"
-#include "GazeboError.hh"
-#include "Visual.hh"
-#include "XMLConfig.hh"
+#include "common/Events.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
+#include "common/XMLConfig.hh"
+#include "common/Pose3d.hh"
 
-#include "Scene.hh"
-#include "Camera.hh"
+#include "rendering/Visual.hh"
+#include "rendering/Conversions.hh"
+#include "rendering/Scene.hh"
+#include "rendering/Camera.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -62,17 +64,17 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
   this->renderTarget = NULL;
   this->userMovable = true;
 
-  Param::Begin(&this->camParameters);
-  this->nearClipP = new ParamT<double>("near_clip",1,0);
-  this->farClipP = new ParamT<double>("far_clip",100,0);
-  this->saveFramesP = new ParamT<bool>("save_frames",false,0);
-  this->savePathnameP = new ParamT<std::string>("save_frame_path","",0);
-  this->imageSizeP = new ParamT< Vector2i >("image_size", Vector2i(320, 240),0);
-  this->visMaskP = new ParamT<std::string>("mask","none",0);
-  this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
-  this->imageFormatP = new ParamT<std::string>("image_format", "R8G8B8", 0);
-  this->updateRateP = new ParamT<double>("update_rate",32,0);
-  Param::End();
+  common::Param::Begin(&this->camParameters);
+  this->nearClipP = new common::ParamT<double>("near_clip",1,0);
+  this->farClipP = new common::ParamT<double>("far_clip",100,0);
+  this->saveFramesP = new common::ParamT<bool>("save_frames",false,0);
+  this->savePathnameP = new common::ParamT<std::string>("save_frame_path","",0);
+  this->imageSizeP = new common::ParamT< common::Vector2i >("image_size", common::Vector2i(320, 240),0);
+  this->visMaskP = new common::ParamT<std::string>("mask","none",0);
+  this->hfovP = new common::ParamT<common::Angle>("hfov", common::Angle(DTOR(60)),0);
+  this->imageFormatP = new common::ParamT<std::string>("image_format", "R8G8B8", 0);
+  this->updateRateP = new common::ParamT<double>("update_rate",32,0);
+  common::Param::End();
 
   this->captureData = false;
 
@@ -80,9 +82,9 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
   this->viewport = NULL;
 
   if (**this->updateRateP == 0)
-    this->renderPeriod = Time(0.0);
+    this->renderPeriod = common::Time(0.0);
   else
-    this->renderPeriod = Time(1.0/(**this->updateRateP));
+    this->renderPeriod = common::Time(1.0/(**this->updateRateP));
 
   this->renderingEnabled = true;
 
@@ -128,7 +130,7 @@ Camera::~Camera()
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
-void Camera::Load( XMLConfigNode *node )
+void Camera::Load( common::XMLConfigNode *node )
 {
   this->visibilityMask = GZ_ALL_CAMERA; 
 
@@ -183,8 +185,8 @@ void Camera::Load( XMLConfigNode *node )
       std::cerr << "Error making directory\n";
   }
 
-  if (this->hfovP->GetValue() < Angle(0.01) || 
-      this->hfovP->GetValue() > Angle(M_PI))
+  if (this->hfovP->GetValue() < common::Angle(0.01) || 
+      this->hfovP->GetValue() > common::Angle(M_PI))
   {
     gzthrow("Camera horizontal field of veiw invalid.");
   }
@@ -341,30 +343,24 @@ void Camera::PostRender()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the global pose of the camera
-Pose3d Camera::GetWorldPose() const
+common::Pose3d Camera::GetWorldPose()
 {
-  Ogre::Vector3 camPos = this->camera->getRealPosition();
-  Ogre::Quaternion camOrient = this->camera->getRealOrientation();
-
-  Pose3d pose;
-  pose.pos.x = camPos.x;
-  pose.pos.y = camPos.y;
-  pose.pos.z = camPos.z;
-
+  this->pose.pos = Conversions::Vector3(this->camera->getRealPosition());
+  this->pose.rot = Conversions::Quaternion(this->camera->getRealOrientation());
   return this->pose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the camera position in the world
-Vector3 Camera::GetWorldPosition() const
+common::Vector3 Camera::GetWorldPosition() const
 {
   Ogre::Vector3 camPos = this->camera->getRealPosition();
-  return Vector3(camPos.x,camPos.y,camPos.z);
+  return common::Vector3(camPos.x,camPos.y,camPos.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the global pose of the camera
-void Camera::SetWorldPose(const Pose3d &pose)
+void Camera::SetWorldPose(const common::Pose3d &pose)
 {
   this->pose = pose;
   this->pose.Correct();
@@ -374,7 +370,7 @@ void Camera::SetWorldPose(const Pose3d &pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world position
-void Camera::SetWorldPosition(const Vector3 &pos)
+void Camera::SetWorldPosition(const common::Vector3 &pos)
 {
   this->pose.pos = pos;
   this->pose.Correct();
@@ -384,7 +380,7 @@ void Camera::SetWorldPosition(const Vector3 &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the world orientation
-void Camera::SetWorldRotation(const Quatern &quant)
+void Camera::SetWorldRotation(const common::Quatern &quant)
 {
   this->pose.rot = quant;
   this->pose.Correct();
@@ -394,7 +390,7 @@ void Camera::SetWorldRotation(const Quatern &quant)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Translate the camera
-void Camera::Translate( const Vector3 &direction )
+void Camera::Translate( const common::Vector3 &direction )
 {
   Ogre::Vector3 vec(direction.x, direction.y, direction.z);
 
@@ -442,16 +438,16 @@ void Camera::SetFOV( float radians )
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the horizontal field of view of the camera
-Angle Camera::GetHFOV() const
+common::Angle Camera::GetHFOV() const
 {
   return this->hfovP->GetValue();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical field of view of the camera
-Angle Camera::GetVFOV() const
+common::Angle Camera::GetVFOV() const
 {
-  return Angle(this->camera->getFOVy().valueRadians());
+  return common::Angle(this->camera->getFOVy().valueRadians());
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -604,18 +600,18 @@ void Camera::SetAspectRatio( float ratio )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the viewport up vector
-Vector3 Camera::GetUp()
+common::Vector3 Camera::GetUp()
 {
   Ogre::Vector3 up = this->camera->getRealUp();
-  return Vector3(up.x,up.y,up.z);
+  return common::Vector3(up.x,up.y,up.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the viewport right vector
-Vector3 Camera::GetRight()
+common::Vector3 Camera::GetRight()
 {
   Ogre::Vector3 right = this->camera->getRealRight();
-  return Vector3(right.x,right.y,right.z);
+  return common::Vector3(right.x,right.y,right.z);
 }
 
 
@@ -720,7 +716,7 @@ void Camera::SaveFrame()
   char tmp[1024];
   if (!this->savePathnameP->GetValue().empty())
   {
-    double wallTime = Time::GetWallTime().Double();
+    double wallTime = common::Time::GetWallTime().Double();
     int min = (int)(wallTime / 60.0);
     int sec = (int)(wallTime - min*60);
     int msec = (int)(wallTime*1000 - min*60000 - sec*1000);
@@ -783,7 +779,7 @@ void Camera::ShowWireframe(bool s)
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a world space ray as cast from the camer through the viewport
 void Camera::GetCameraToViewportRay(int screenx, int screeny,
-                                        Vector3 &origin, Vector3 &dir)
+                                        common::Vector3 &origin, common::Vector3 &dir)
 {
   Ogre::Ray ray = this->camera->getCameraToViewportRay(
       (float)screenx / this->GetViewportWidth(),
@@ -955,7 +951,7 @@ void Camera::CreateCamera()
     // Setup the viewport to use the texture
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
-    this->viewport->setBackgroundColour( this->scene->GetBackgroundColor().GetOgreColor() );
+    this->viewport->setBackgroundColour( Conversions::Color( this->scene->GetBackgroundColor() ) );
 
     double ratio = (double)this->viewport->getActualWidth() / 
                    (double)this->viewport->getActualHeight();
@@ -969,9 +965,9 @@ void Camera::CreateCamera()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get point on a plane
-Vector3 Camera::GetWorldPointOnPlane(int x, int y, Vector3 planeNorm, double d)
+common::Vector3 Camera::GetWorldPointOnPlane(int x, int y, common::Vector3 planeNorm, double d)
 {
-  Vector3 origin, dir;
+  common::Vector3 origin, dir;
   double dist;
 
   // Cast two rays from the camera into the world

@@ -20,12 +20,12 @@
  * Date: 01 Feb 2007
  */
 
-#include "Events.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Events.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "World.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "gz.h"
 #include "FactoryIfaceHandler.hh"
 

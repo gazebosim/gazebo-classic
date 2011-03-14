@@ -23,7 +23,7 @@
 #ifndef BULLETSLIDERJOINT_HH
 #define BULLETSLIDERJOINT_HH
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "SliderJoint.hh"
 #include "BulletJoint.hh"
 

@@ -23,7 +23,7 @@
 #ifndef BANDIT_ACTARRAY_HH
 #define BANDIT_ACTARRAY_HH
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Controller.hh"
 #include "Entity.hh"
 

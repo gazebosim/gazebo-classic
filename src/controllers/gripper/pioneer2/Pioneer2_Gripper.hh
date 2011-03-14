@@ -24,7 +24,7 @@
 #define PIONEER2_GRIPPER_HH
 
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Controller.hh"
 #include "Entity.hh"
 

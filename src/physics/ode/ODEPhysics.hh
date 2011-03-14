@@ -28,7 +28,7 @@
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "PhysicsEngine.hh"
 #include "Shape.hh"
 

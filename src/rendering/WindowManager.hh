@@ -17,8 +17,8 @@
 #ifndef WINDOWMANAGER_HH
 #define WINDOWMANAGER_HH
 
-#include "SingletonT.hh"
-#include "Event.hh"
+#include "common/SingletonT.hh"
+#include "common/Event.hh"
 #include <string>
 #include <vector>
 
@@ -30,39 +30,36 @@ namespace Ogre
 namespace gazebo
 {
 	namespace rendering
-{
-  class RenderControl;
-  class Camera;
-
-  class WindowManager : public SingletonT<WindowManager>
   {
-    public: WindowManager();
-    public: virtual ~WindowManager();
-
-    public: int CreateWindow( RenderControl *control );
-
-    public: int CreateWindow( std::string ogreHandle, 
-                              unsigned int width, 
-                              unsigned int height );
-
-
-    /// \brief Attach a camera to a window
-    public: void SetCamera( int windowId, Camera *camera);
-
-    /// \brief Resize a window
-    public: void Resize(unsigned int id, int width, int height);
-
-    public: void Render();
-
-    private: std::vector<Ogre::RenderWindow *> windows;
-
-    private: static unsigned int windowCounter;
-
-    private: event::ConnectionPtr renderConnection;
-
-    private: friend class DestroyerT<WindowManager>;
-    private: friend class SingletonT<WindowManager>;
-  };
-}
+    class Camera;
+  
+    class WindowManager : public SingletonT<WindowManager>
+    {
+      public: WindowManager();
+      public: virtual ~WindowManager();
+  
+      public: int CreateWindow( std::string ogreHandle, 
+                                unsigned int width, 
+                                unsigned int height );
+  
+  
+      /// \brief Attach a camera to a window
+      public: void SetCamera( int windowId, Camera *camera);
+  
+      /// \brief Resize a window
+      public: void Resize(unsigned int id, int width, int height);
+  
+      public: void Render();
+  
+      private: std::vector<Ogre::RenderWindow *> windows;
+  
+      private: static unsigned int windowCounter;
+  
+      private: event::ConnectionPtr renderConnection;
+  
+      private: friend class DestroyerT<WindowManager>;
+      private: friend class SingletonT<WindowManager>;
+    };
+  }
 }
 #endif

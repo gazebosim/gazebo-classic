@@ -22,16 +22,16 @@
 
 #include <stdint.h>
 
-#include "Material.hh"
-#include "Scene.hh"
+#include "rendering/Material.hh"
+#include "rendering/Scene.hh"
 #include "World.hh"
 #include "Entity.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "IfaceFactory.hh"
-#include "Visual.hh"
-#include "OgreDynamicLines.hh"
-#include "OgreMovableText.hh"
+#include "rendering/Visual.hh"
+#include "rendering/OgreDynamicLines.hh"
+#include "rendering/OgreMovableText.hh"
 #include "GraphicsIfaceHandler.hh"
 
 using namespace gazebo;

@@ -26,10 +26,10 @@
 #include <map>
 #include <vector>
 
-#include "Event.hh"
+#include "common/Event.hh"
 #include "Entity.hh"
-#include "Pose3d.hh"
-#include "Param.hh"
+#include "common/Pose3d.hh"
+#include "common/Param.hh"
 #include "Mass.hh"
 
 namespace gazebo

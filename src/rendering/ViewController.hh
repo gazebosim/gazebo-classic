@@ -19,26 +19,30 @@
 
 namespace gazebo
 {
-	namespace rendering
-{
-  class UserCamera;
-  class MouseEvent;
-
-  class ViewController
+  namespace common
   {
-    /// \brief Constructor
-    public: ViewController(UserCamera *camera);
+    class MouseEvent;
+  }
 
-    /// \brief Destructor
-    public: virtual ~ViewController();
-
-    public: virtual void Update() = 0;
-
-    /// \brief Handle a mouse event
-    public: virtual void HandleMouseEvent(const MouseEvent &event) = 0;
-
-    protected: UserCamera *camera; 
-  };
-}
+	namespace rendering
+  {
+    class UserCamera;
+  
+    class ViewController
+    {
+      /// \brief Constructor
+      public: ViewController(UserCamera *camera);
+  
+      /// \brief Destructor
+      public: virtual ~ViewController();
+  
+      public: virtual void Update() = 0;
+  
+      /// \brief Handle a mouse event
+      public: virtual void HandleMouseEvent(const common::MouseEvent &event)=0;
+  
+      protected: UserCamera *camera; 
+    };
+  }
 }
 #endif

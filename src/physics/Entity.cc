@@ -21,16 +21,16 @@
  * SVN: $Id$
  */
 
-#include "Messages.hh"
+#include "common/Messages.hh"
 #include "Geom.hh"
 #include "Model.hh"
 #include "Body.hh"
-#include "GazeboError.hh"
-#include "Global.hh"
+#include "common/GazeboError.hh"
+#include "common/Global.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Entity.hh"
-#include "TopicManager.hh"
+#include "transport/TopicManager.hh"
 
 using namespace gazebo;
 using namespace physics;

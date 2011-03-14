@@ -30,9 +30,9 @@
 //#include <GL/gl.h>
 
 #include "common/Vector3.hh"
-#include "GazeboMessage.hh"
-#include "Image.hh"
-#include "GazeboConfig.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Image.hh"
+#include "common/GazeboConfig.hh"
 
 using namespace gazebo;
 using namespace common;

@@ -17,7 +17,6 @@
 /* Desc: Middleman between OGRE and Gazebo
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * CVS: $Id$
  */
 
 #include <X11/Xlib.h>
@@ -37,20 +36,21 @@
 
 #include "gazebo_config.h"
 
-//#include "RTShaderSystem.hh"
-#include "WindowManager.hh"
-#include "Events.hh"
-#include "Scene.hh"
-#include "Grid.hh"
-#include "Visual.hh"
-#include "UserCamera.hh"
-#include "OgreMovableText.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "GazeboConfig.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
-#include "RenderEngine.hh"
+#include "common/Events.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/GazeboConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
+
+//#include "rendering/RTShaderSystem.hh"
+#include "rendering/WindowManager.hh"
+#include "rendering/Scene.hh"
+#include "rendering/Grid.hh"
+#include "rendering/Visual.hh"
+#include "rendering/UserCamera.hh"
+#include "rendering/MovableText.hh"
+#include "rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -87,7 +87,7 @@ RenderEngine::~RenderEngine()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the parameters for Ogre
-void RenderEngine::Load(XMLConfigNode *rootNode)
+void RenderEngine::Load(common::XMLConfigNode *rootNode)
 {
   if (this->root)
     return;
@@ -202,9 +202,9 @@ void RenderEngine::UpdateScenes()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize ogre
-void RenderEngine::Init(XMLConfigNode *rootNode)
+void RenderEngine::Init(common::XMLConfigNode *rootNode)
 {
-  XMLConfigNode *node = NULL;
+  common::XMLConfigNode *node = NULL;
   Ogre::ColourValue ambient;
 
   if (rootNode)
@@ -280,7 +280,7 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;
-  std::list<std::string> ogrePaths=GazeboConfig::Instance()->GetOgrePaths();
+  std::list<std::string> ogrePaths=common::GazeboConfig::Instance()->GetOgrePaths();
  
   for (iter=ogrePaths.begin(); 
        iter!=ogrePaths.end(); ++iter)
@@ -330,8 +330,8 @@ void RenderEngine::SetupResources()
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::iterator iter;
 
-  for (iter=GazeboConfig::Instance()->GetGazeboPaths().begin();
-       iter!=GazeboConfig::Instance()->GetGazeboPaths().end(); iter++)
+  for (iter= common::GazeboConfig::Instance()->GetGazeboPaths().begin();
+       iter!=common::GazeboConfig::Instance()->GetGazeboPaths().end(); iter++)
   {
     DIR *dir;
     if ((dir=opendir((*iter).c_str())) == NULL)

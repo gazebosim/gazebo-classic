@@ -29,7 +29,7 @@
 #include <string>
 #include <sstream>
 
-#include "Param.hh"
+#include "common/Param.hh"
 
 namespace gazebo
 {

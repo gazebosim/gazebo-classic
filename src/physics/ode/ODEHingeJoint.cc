@@ -21,12 +21,12 @@
  */
 
 #include "gazebo_config.h"
-#include "GazeboMessage.hh"
+#include "common/GazeboMessage.hh"
 #include "Model.hh"
 #include "Body.hh"
 #include "World.hh"
-#include "XMLConfig.hh"
-#include "Global.hh"
+#include "common/XMLConfig.hh"
+#include "common/Global.hh"
 #include "ODEHingeJoint.hh"
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>

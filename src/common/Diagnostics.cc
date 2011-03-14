@@ -19,8 +19,8 @@
  * Date: 2 Feb 2011
  */
 
-#include "Events.hh"
-#include "Diagnostics.hh"
+#include "common/Events.hh"
+#include "common/Diagnostics.hh"
 
 using namespace gazebo;
 using namespace common;

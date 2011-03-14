@@ -21,9 +21,9 @@
 #include <stdint.h>
 #include <list>
 
-#include "Mesh.hh"
-#include "GazeboMessage.hh"
-#include "OgreLoader.hh"
+#include "common/Mesh.hh"
+#include "common/GazeboMessage.hh"
+#include "common/OgreLoader.hh"
 
 using namespace gazebo;
 using namespace common;

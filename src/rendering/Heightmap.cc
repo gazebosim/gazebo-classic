@@ -25,32 +25,32 @@
 #include <string.h>
 #include <math.h>
 
-#include "Scene.hh"
-#include "Image.hh"
-#include "GazeboError.hh"
-#include "OgreHeightmap.hh"
+#include "common/Image.hh"
+#include "common/GazeboError.hh"
+
+#include "rendering/Scene.hh"
+#include "rendering/Heightmap.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
-
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-OgreHeightmap::OgreHeightmap(Scene *scene)
+Heightmap::Heightmap(Scene *scene)
 {
   this->scene = scene;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-OgreHeightmap::~OgreHeightmap()
+Heightmap::~Heightmap()
 {
   this->scene->GetManager()->destroyQuery(this->rayQuery);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// get height at a point
-float OgreHeightmap::GetHeightAt(const Vector2<float> &pos)
+float Heightmap::GetHeightAt(const common::Vector2d &pos)
 {
   Ogre::Vector3 pos3(pos.x, this->terrainSize.z,pos.y);
 
@@ -64,14 +64,14 @@ float OgreHeightmap::GetHeightAt(const Vector2<float> &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Overloaded Ogre function for Ray Scene Queries
-bool OgreHeightmap::queryResult(Ogre::MovableObject *obj, Ogre::Real dist)
+bool Heightmap::queryResult(Ogre::MovableObject *obj, Ogre::Real dist)
 {
   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Overloaded Ogre function for Ray Scene Queries
-bool OgreHeightmap::queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist)
+bool Heightmap::queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Real dist)
 {
   this->distToTerrain = dist;
   return false;
@@ -79,15 +79,15 @@ bool OgreHeightmap::queryResult(Ogre::SceneQuery::WorldFragment *frag, Ogre::Rea
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the heightmap
-void OgreHeightmap::Load( std::string imageFilename, 
+void Heightmap::Load( std::string imageFilename, 
                           std::string worldTexture, 
                           std::string detailTexture,
-                          Vector3 _terrainSize)
+                          common::Vector3 _terrainSize)
 {
   std::ostringstream stream;
   unsigned int terrainVertSize;
   int tileSize;
-  Image img;
+  common::Image img;
 
   this->terrainSize = _terrainSize;
 

@@ -21,11 +21,11 @@
  */
 
 #include "World.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "ContactSensor.hh"
 #include "World.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Simulator.hh"
 #include "Generic_Bumper.hh"

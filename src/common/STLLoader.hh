@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 
-#include "MeshLoader.hh"
+#include "common/MeshLoader.hh"
 
 #define LINE_MAX_LEN 256
 #define COR3_MAX 200000

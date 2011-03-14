@@ -27,7 +27,7 @@
 #include <OgreTexture.h>
 #include <OgreMaterial.h>
 
-#include "Camera.hh"
+#include "rendering/Camera.hh"
 #include "Sensor.hh"
 
 // Forward Declarations

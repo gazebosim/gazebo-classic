@@ -27,11 +27,11 @@
 #include <Ogre.h>
 
 #include "Controller.hh"
-#include "Global.hh"
+#include "common/Global.hh"
 #include "World.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "Body.hh"
-#include "Visual.hh"
+#include "rendering/Visual.hh"
 
 #include "SensorFactory.hh"
 #include "StereoCameraSensor.hh"

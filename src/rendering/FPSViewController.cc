@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#include "Global.hh"
-#include "Vector2.hh"
-#include "UserCamera.hh"
-#include "MouseEvent.hh"
-#include "FPSViewController.hh"
+#include "common/Global.hh"
+#include "common/Vector2i.hh"
+#include "common/MouseEvent.hh"
+
+#include "rendering/UserCamera.hh"
+#include "rendering/FPSViewController.hh"
 
 using namespace gazebo;
 using namespace rendering;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -45,34 +45,34 @@ void FPSViewController::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a mouse event
-void FPSViewController::HandleMouseEvent(const MouseEvent &event)
+void FPSViewController::HandleMouseEvent(const common::MouseEvent &event)
 {
   if (!this->camera->GetUserMovable())
     return;
 
-  Vector2i drag = event.pos - event.prevPos;
+  common::Vector2i drag = event.pos - event.prevPos;
 
-  Vector3 directionVec(0,0,0);
+  common::Vector3 directionVec(0,0,0);
 
-  if (event.left == MouseEvent::DOWN)
+  if (event.left == common::MouseEvent::DOWN)
   {
     this->camera->RotateYaw(DTOR(drag.x * 0.1));
     this->camera->RotatePitch(DTOR(-drag.y * 0.1));
   }
-  else if (event.right == MouseEvent::DOWN)
+  else if (event.right == common::MouseEvent::DOWN)
   {
     // interactively pan view
     directionVec.x = 0;
     directionVec.y =  drag.x * event.moveScale;
     directionVec.z =  drag.y * event.moveScale;
   }
-  else if (event.middle == MouseEvent::DOWN)
+  else if (event.middle == common::MouseEvent::DOWN)
   {
     directionVec.x =  drag.y * event.moveScale;
     directionVec.y =  0;
     directionVec.z =  0;
   }
-  else if (event.middle == MouseEvent::SCROLL)
+  else if (event.middle == common::MouseEvent::SCROLL)
   {
     directionVec.x -=  50.0 * event.scroll.y * event.moveScale;
     directionVec.y =  0;

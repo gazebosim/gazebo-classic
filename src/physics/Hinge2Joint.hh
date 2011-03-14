@@ -23,8 +23,8 @@
 #ifndef HINGE2JOINT_HH
 #define HINGE2JOINT_HH
 
-#include "Param.hh"
-#include "Angle.hh"
+#include "common/Param.hh"
+#include "common/Angle.hh"
 #include "common/Vector3.hh"
 #include "Joint.hh"
 

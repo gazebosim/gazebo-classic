@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "Plane.hh"
+#include "common/Plane.hh"
 
 using namespace gazebo;
 using namespace common;

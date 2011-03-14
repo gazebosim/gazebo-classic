@@ -23,7 +23,7 @@
 #ifndef BULLETSPHERESHAPE_HH
 #define BULLETSPHERESHAPE_HH
 
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "BulletPhysics.hh"
 #include "SphereShape.hh"
 

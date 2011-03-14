@@ -15,7 +15,7 @@
  *
 */
 #include <math.h>
-#include "Box.hh"
+#include "common/Box.hh"
 
 using namespace gazebo;
 using namespace common;

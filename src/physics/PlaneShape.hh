@@ -23,7 +23,7 @@
 #ifndef PLANESHAPE_HH
 #define PLANESHAPE_HH
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Shape.hh"
 
 namespace gazebo

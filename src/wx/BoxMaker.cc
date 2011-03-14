@@ -16,12 +16,12 @@
 */
 #include <iostream>
 
-#include "Messages.hh"
-#include "Camera.hh"
-#include "Events.hh"
+#include "common/Messages.hh"
+#include "rendering/Camera.hh"
+#include "common/Events.hh"
 #include "MouseEvent.hh"
 #include "Simulator.hh"
-#include "Scene.hh"
+#include "rendering/Scene.hh"
 #include "World.hh"
 #include "BoxMaker.hh"
 

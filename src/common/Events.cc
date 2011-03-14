@@ -14,11 +14,9 @@
  * limitations under the License.
  *
 */
-#include "Events.hh"
+#include "common/Events.hh"
 
 using namespace gazebo;
-using namespace common;
-
 using namespace event;
 
 EventT<void (bool)> Events::pauseSignal;
@@ -39,7 +37,7 @@ EventT<void (bool)> Events::wireframeSignal;
 EventT<void (bool)> Events::showPhysicsSignal;
 EventT<void (bool)> Events::showJointsSignal;
 EventT<void (bool)> Events::showBoundingBoxesSignal;
-EventT<void (Entity*)> Events::entitySelectedSignal;
+EventT<void (std::string)> Events::entitySelectedSignal;
 
 EventT<void ()> Events::worldUpdateStartSignal;
 EventT<void ()> Events::worldUpdateEndSignal;

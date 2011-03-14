@@ -23,7 +23,7 @@
 #ifndef ODESLIDERJOINT_HH
 #define ODESLIDERJOINT_HH
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "SliderJoint.hh"
 #include "ODEJoint.hh"
 

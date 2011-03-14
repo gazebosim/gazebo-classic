@@ -24,7 +24,7 @@
 #define SLIDERJOINT_HH
 
 #include <float.h>
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Joint.hh"
 
 namespace gazebo

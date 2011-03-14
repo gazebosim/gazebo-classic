@@ -16,10 +16,10 @@
 */
 #include <iostream>
 
-#include "Events.hh"
-#include "Camera.hh"
+#include "common/Events.hh"
+#include "rendering/Camera.hh"
 #include "MouseEvent.hh"
-#include "Visual.hh"
+#include "rendering/Visual.hh"
 #include "World.hh"
 #include "SpotLightMaker.hh"
 

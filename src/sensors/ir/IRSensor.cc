@@ -25,15 +25,15 @@
 #include <sstream>
 
 #include "SensorFactory.hh"
-#include "XMLConfig.hh"
-#include "Global.hh"
+#include "common/XMLConfig.hh"
+#include "common/Global.hh"
 #include "RayShape.hh"
 #include "MultiRayShape.hh"
 #include "RaySensor.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
-#include "GazeboError.hh"
-#include "XMLConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/XMLConfig.hh"
 
 #include "IRSensor.hh"
 

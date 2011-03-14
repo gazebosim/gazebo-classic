@@ -24,7 +24,7 @@
 #define HEIGHTMAPSHAPE_HH
 
 #include "Vector2.hh"
-#include "Image.hh"
+#include "common/Image.hh"
 #include "Geom.hh"
 
 

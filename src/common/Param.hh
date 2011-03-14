@@ -33,7 +33,7 @@
 #include <typeinfo>
 #include <string>
 
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 
 namespace gazebo
 {

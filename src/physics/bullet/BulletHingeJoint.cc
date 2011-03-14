@@ -21,13 +21,13 @@
  */
 
 #include "Model.hh"
-#include "GazeboMessage.hh"
-#include "GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/GazeboError.hh"
 #include "World.hh"
 #include "BulletBody.hh"
 #include "BulletPhysics.hh"
-#include "XMLConfig.hh"
-#include "Global.hh"
+#include "common/XMLConfig.hh"
+#include "common/Global.hh"
 #include "BulletHingeJoint.hh"
 
 using namespace gazebo;

@@ -17,10 +17,10 @@
 
 #include "Simulator.hh"
 #include "World.hh"
-#include "Events.hh"
+#include "common/Events.hh"
 #include "PlotPanel.hh"
 #include "DiagnosticsDialog.hh"
-#include "Diagnostics.hh"
+#include "common/Diagnostics.hh"
 
 using namespace gazebo;
 

@@ -23,8 +23,8 @@
 #ifndef SENSOR_HH
 #define SENSOR_HH
 
-#include "Param.hh"
-#include "Pose3d.hh"
+#include "common/Param.hh"
+#include "common/Pose3d.hh"
 #include "Entity.hh"
 
 namespace gazebo

@@ -24,8 +24,8 @@
 
 #include <OGRE/OgreMaterial.h>
 
-#include "Param.hh"
-#include "Color.hh"
+#include "common/Param.hh"
+#include "common/Color.hh"
 
 namespace Ogre
 {
@@ -60,7 +60,7 @@ namespace gazebo
       /// \param g Green color component, in the range [0, 1]
       /// \param b Blue color component, in the range [0, 1]
       public: Grid( Scene *scene, uint32_t cell_count, float cell_length, 
-                    float line_width, const Color &color );
+                    float line_width, const common::Color &color );
   
       /// \brief Destructor
       public: ~Grid();
@@ -75,8 +75,8 @@ namespace gazebo
       /// \brief Sets user data on all ogre objects we own
       public: void SetUserData( const Ogre::Any& data );
       
-      public: void SetColor(const Color& color);
-      public: Color GetColor() { return **this->colorP; }
+      public: void SetColor(const common::Color& color);
+      public: common::Color GetColor() { return **this->colorP; }
   
       public: void SetCellCount(uint32_t count);
       public: float GetCellCount() { return **this->cellCountP; }
@@ -97,12 +97,12 @@ namespace gazebo
       
       private: Ogre::MaterialPtr material;
   
-      private: ParamT<unsigned int> *cellCountP;
-      private: ParamT<float> *cellLengthP;
-      private: ParamT<float> *lineWidthP;
-      private: ParamT<Color> *colorP;
-      private: ParamT<float> *h_offsetP;
-      private: std::vector<Param*> parameters;
+      private: common::ParamT<unsigned int> *cellCountP;
+      private: common::ParamT<float> *cellLengthP;
+      private: common::ParamT<float> *lineWidthP;
+      private: common::ParamT<common::Color> *colorP;
+      private: common::ParamT<float> *h_offsetP;
+      private: std::vector<common::Param*> parameters;
   
       private: std::string name;
       private: unsigned int height;

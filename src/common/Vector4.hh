@@ -134,7 +134,7 @@ class Vector4
   /// \param out Ostream
   /// \param pt Vector4 to output
   /// \return The Ostream
-  public: friend std::ostream &operator<<( std::ostream &out, const gazebo::Vector4 &pt )
+  public: friend std::ostream &operator<<( std::ostream &out, const gazebo::common::Vector4 &pt )
   {
     out << pt.x << " " << pt.y << " " << pt.z << " " << pt.w;
 
@@ -145,7 +145,7 @@ class Vector4
   /// \param in Ostream
   /// \param pt Vector4 to read values into
   /// \return The istream
-  public: friend std::istream &operator>>( std::istream &in, gazebo::Vector4 &pt )
+  public: friend std::istream &operator>>( std::istream &in, gazebo::common::Vector4 &pt )
   {
     // Skip white spaces
     in.setf( std::ios_base::skipws );

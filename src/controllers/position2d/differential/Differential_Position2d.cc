@@ -21,13 +21,13 @@
  * SVN info: $Id$
  */
 
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
-#include "Global.hh"
+#include "common/Global.hh"
 #include "Joint.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "PhysicsEngine.hh"
 #include "ControllerFactory.hh"
 #include "Differential_Position2d.hh"

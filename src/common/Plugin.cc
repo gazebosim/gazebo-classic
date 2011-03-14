@@ -21,9 +21,9 @@
 #include <unistd.h>
 #include <list>
 
-#include "GazeboConfig.hh"
-#include "GazeboError.hh"
-#include "Plugin.hh"
+#include "common/GazeboConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/Plugin.hh"
 
 #ifdef HAVE_DL
 #include <dlfcn.h>

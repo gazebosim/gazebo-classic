@@ -25,7 +25,7 @@
 
 #include <map>
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Controller.hh"
 
 namespace gazebo

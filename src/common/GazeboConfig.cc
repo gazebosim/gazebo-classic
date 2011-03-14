@@ -24,9 +24,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "XMLConfig.hh"
-#include "GazeboConfig.hh"
-#include "GazeboMessage.hh"
+#include "common/XMLConfig.hh"
+#include "common/GazeboConfig.hh"
+#include "common/GazeboMessage.hh"
 
 using namespace gazebo;
 using namespace common;

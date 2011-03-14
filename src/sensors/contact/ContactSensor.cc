@@ -24,10 +24,10 @@
 #include <float.h>
 #include <sstream>
 
-#include "Global.hh"
+#include "common/Global.hh"
 
-#include "GazeboError.hh"
-#include "XMLConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/XMLConfig.hh"
 #include "Simulator.hh"
 #include "SensorFactory.hh"
 #include "Geom.hh"

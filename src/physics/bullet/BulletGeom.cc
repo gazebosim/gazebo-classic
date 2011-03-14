@@ -25,9 +25,9 @@
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
 #include "BulletPhysics.hh"
-#include "Visual.hh"
-#include "Global.hh"
-#include "GazeboMessage.hh"
+#include "rendering/Visual.hh"
+#include "common/Global.hh"
+#include "common/GazeboMessage.hh"
 #include "World.hh"
 #include "BulletBody.hh"
 

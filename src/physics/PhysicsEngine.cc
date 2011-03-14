@@ -22,14 +22,14 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "Messages.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "Events.hh"
+#include "common/Messages.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Events.hh"
 #include "World.hh"
 #include "Shape.hh"
 #include "PhysicsEngine.hh"
-#include "TopicManager.hh"
+#include "transport/TopicManager.hh"
 
 using namespace gazebo;
 using namespace physics;

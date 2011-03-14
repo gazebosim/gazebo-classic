@@ -23,15 +23,15 @@
 #include <sstream>
 #include <math.h>
 
-#include "XMLConfig.hh"
-#include "GazeboMessage.hh"
-#include "Visual.hh"
+#include "common/XMLConfig.hh"
+#include "common/GazeboMessage.hh"
+#include "rendering/Visual.hh"
 
 #include "World.hh"
 #include "Geom.hh"
 #include "ODEGeom.hh"
-#include "Quatern.hh"
-#include "GazeboError.hh"
+#include "common/Quatern.hh"
+#include "common/GazeboError.hh"
 #include "PhysicsEngine.hh"
 #include "Mass.hh"
 #include "Model.hh"

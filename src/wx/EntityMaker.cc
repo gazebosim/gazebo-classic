@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "Camera.hh"
+#include "rendering/Camera.hh"
 #include "EntityMaker.hh"
 
 using namespace gazebo;

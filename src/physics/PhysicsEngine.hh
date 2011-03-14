@@ -25,9 +25,9 @@
 
 #include <iostream>
 
-#include "Event.hh"
+#include "common/Event.hh"
 #include "Joint.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Geom.hh"
 
 namespace boost

@@ -23,12 +23,12 @@
 #ifndef JOINT_HH
 #define JOINT_HH
 
-#include "Event.hh"
-#include "Common.hh"
-#include "Param.hh"
+#include "common/Event.hh"
+#include "common/Common.hh"
+#include "common/Param.hh"
 #include "common/Vector3.hh"
-#include "Global.hh"
-#include "Publisher.hh"
+#include "common/Global.hh"
+#include "transport/Publisher.hh"
 #include <boost/signal.hpp>
 
 namespace gazebo

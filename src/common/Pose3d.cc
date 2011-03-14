@@ -20,7 +20,7 @@
  * SVN: $Id$
  */
 
-#include "Pose3d.hh"
+#include "common/Pose3d.hh"
 
 using namespace gazebo;
 using namespace common;

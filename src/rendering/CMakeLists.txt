@@ -2,22 +2,20 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories (
   .
-  ${PROJECT_SOURCE_DIR}/src/common
-  ${PROJECT_SOURCE_DIR}/src/common/transport
+  ${PROJECT_SOURCE_DIR}/src
   ${CMAKE_BINARY_DIR}/src/msgs
   ${ogre_include_dirs}
   ${XML_INCLUDE_DIRS}
 )
 
-set (sources OgreMovableText.cc
+set (sources MovableText.cc
              RenderEngine.cc
-             OgreDynamicRenderable.cc
-             OgreDynamicLines.cc
+             DynamicRenderable.cc
+             DynamicLines.cc
              Visual.cc
              Camera.cc
              UserCamera.cc
-             OgreHeightmap.cc
-             Material.cc
+             Heightmap.cc
              Light.cc
              RTShaderSystem.cc
              SelectionObj.cc
@@ -28,17 +26,17 @@ set (sources OgreMovableText.cc
              Scene.cc
              RenderState.cc
              WindowManager.cc
+             Conversions.cc
 )
 
-set (headers OgreMovableText.hh
+set (headers MovableText.hh
              RenderEngine.hh
-             OgreDynamicRenderable.hh
-             OgreDynamicLines.hh
+             DynamicRenderable.hh
+             DynamicLines.hh
              Visual.hh
              Camera.hh
              UserCamera.hh
-             OgreHeightmap.hh
-             Material.hh
+             Heightmap.hh
              Light.hh
              RTShaderSystem.hh
              SelectionObj.hh
@@ -50,6 +48,7 @@ set (headers OgreMovableText.hh
              RenderState.hh
              WindowManager.hh
              RenderTypes.hh
+             Conversions.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})
@@ -63,3 +62,4 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11 ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/rendering COMPONENT headers)

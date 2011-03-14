@@ -27,11 +27,11 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "Publisher.hh"
-#include "Box.hh"
-#include "Common.hh"
-#include "Pose3d.hh"
-#include "Param.hh"
+#include "transport/Publisher.hh"
+#include "common/Box.hh"
+#include "common/Common.hh"
+#include "common/Pose3d.hh"
+#include "common/Param.hh"
 
 namespace gazebo
 {

@@ -20,8 +20,8 @@
  * SVN: $Id:$
  */
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "BulletBody.hh"
 #include "BulletUniversalJoint.hh"
 

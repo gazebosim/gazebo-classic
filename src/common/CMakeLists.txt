@@ -78,6 +78,7 @@ set ( headers Messages.hh
               Image.hh 
               Material.hh
               Common.hh
+              MouseEvent.hh
 )
 
 add_library(gazebo_common SHARED ${sources})

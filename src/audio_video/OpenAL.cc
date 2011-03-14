@@ -32,11 +32,11 @@
 #include <AL/alext.h>
 #endif
 
-#include "XMLConfig.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/XMLConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "AudioDecoder.hh"
-#include "GazeboConfig.hh"
+#include "common/GazeboConfig.hh"
 #include "Simulator.hh"
 #include "OpenAL.hh"
 

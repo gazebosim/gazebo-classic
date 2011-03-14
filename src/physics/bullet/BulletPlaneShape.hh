@@ -23,7 +23,7 @@
 #ifndef BULLETPLANESHAPE_HH
 #define BULLETPLANESHAPE_HH
 
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "BulletGeom.hh"
 #include "BulletPhysics.hh"
 #include "PlaneShape.hh"

@@ -27,14 +27,14 @@
 #include <iostream>
 #include <float.h>
 
-#include "Events.hh"
-#include "Visual.hh"
-#include "Light.hh"
+#include "common/Events.hh"
+#include "rendering/Visual.hh"
+#include "rendering/Light.hh"
 #include "GraphicsIfaceHandler.hh"
-#include "Global.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/XMLConfig.hh"
 #include "World.hh"
 #include "Body.hh"
 #include "HingeJoint.hh"

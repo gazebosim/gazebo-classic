@@ -21,7 +21,7 @@
  * SVN info: $Id$
  */
 
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 
 using namespace gazebo;
 using namespace common;

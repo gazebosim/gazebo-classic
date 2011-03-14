@@ -20,8 +20,8 @@
 #include <string>
 #include <iostream>
 
-#include "XMLConfig.hh"
-#include "Common.hh"
+#include "common/XMLConfig.hh"
+#include "common/Common.hh"
 
 namespace gazebo
 {

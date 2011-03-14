@@ -22,7 +22,7 @@
 #include <deque>
 #include <map>
 
-#include "Color.hh"
+#include "common/Color.hh"
 
 namespace gazebo
 {

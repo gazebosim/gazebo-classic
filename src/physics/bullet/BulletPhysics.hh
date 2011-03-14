@@ -29,7 +29,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "PhysicsEngine.hh"
 #include "Geom.hh"
 #include "Shape.hh"

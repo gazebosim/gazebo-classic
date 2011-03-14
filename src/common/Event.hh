@@ -25,8 +25,6 @@
 
 namespace gazebo
 {
-	namespace common
-{
   namespace event
   {
     class Connection;
@@ -206,7 +204,5 @@ namespace gazebo
       }
     }
   }
-
-}
 }
 #endif

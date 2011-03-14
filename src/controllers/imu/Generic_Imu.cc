@@ -24,10 +24,10 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "World.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Generic_Imu.hh"
 #include "ImuSensor.hh"

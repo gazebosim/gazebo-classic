@@ -16,7 +16,7 @@
 */
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
-#include "Material.hh"
+#include "common/Material.hh"
 
 using namespace gazebo;
 using namespace common;

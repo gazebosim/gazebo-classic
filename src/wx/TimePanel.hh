@@ -21,7 +21,7 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 
-#include "Time.hh"
+#include "common/Time.hh"
 namespace gazebo
 {
   class TimePanel : public wxPanel

@@ -22,18 +22,18 @@
 
 #include <sstream>
 
-#include "XMLConfig.hh"
-#include "GazeboMessage.hh"
+#include "common/XMLConfig.hh"
+#include "common/GazeboMessage.hh"
 
 #include "Geom.hh"
 #include "BulletGeom.hh"
 #include "BulletMotionState.hh"
-#include "Quatern.hh"
-#include "GazeboError.hh"
+#include "common/Quatern.hh"
+#include "common/GazeboError.hh"
 #include "BulletPhysics.hh"
 #include "PhysicsEngine.hh"
 #include "Mass.hh"
-#include "Visual.hh"
+#include "rendering/Visual.hh"
 
 #include "BulletBody.hh"
 

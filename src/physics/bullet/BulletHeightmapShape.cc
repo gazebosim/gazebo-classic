@@ -26,10 +26,10 @@
 
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
-#include "Image.hh"
-#include "Global.hh"
-#include "OgreHeightmap.hh"
-#include "GazeboError.hh"
+#include "common/Image.hh"
+#include "common/Global.hh"
+#include "rendering/OgreHeightmap.hh"
+#include "common/GazeboError.hh"
 #include "Body.hh"
 #include "BulletHeightmapGeom.hh"
 

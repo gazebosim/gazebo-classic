@@ -17,7 +17,7 @@
 #include <OgreCamera.h>
 #include <OgreHardwareBufferManager.h>
 
-#include "OgreDynamicRenderable.hh"
+#include "rendering/DynamicRenderable.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -25,13 +25,13 @@ using namespace rendering;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
-OgreDynamicRenderable::OgreDynamicRenderable()
+DynamicRenderable::DynamicRenderable()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-OgreDynamicRenderable::~OgreDynamicRenderable()
+DynamicRenderable::~DynamicRenderable()
 {
   delete this->mRenderOp.vertexData;
   delete this->mRenderOp.indexData;
@@ -39,7 +39,7 @@ OgreDynamicRenderable::~OgreDynamicRenderable()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Initializes the dynamic renderable.
-void OgreDynamicRenderable::Init(RenderOpType operationType, bool useIndices)
+void DynamicRenderable::Init(RenderOpType operationType, bool useIndices)
 {
   this->SetOperationType(operationType);
 
@@ -60,7 +60,7 @@ void OgreDynamicRenderable::Init(RenderOpType operationType, bool useIndices)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the render operation type
-void OgreDynamicRenderable::SetOperationType(RenderOpType opType)
+void DynamicRenderable::SetOperationType(RenderOpType opType)
 {
   switch (opType)
   {
@@ -92,7 +92,7 @@ void OgreDynamicRenderable::SetOperationType(RenderOpType opType)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the render operation type
-RenderOpType OgreDynamicRenderable::GetOperationType() const
+RenderOpType DynamicRenderable::GetOperationType() const
 {
   RenderOpType type;
   switch (this->mRenderOp.operationType)
@@ -128,7 +128,7 @@ RenderOpType OgreDynamicRenderable::GetOperationType() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Prepares the hardware buffers for the requested vertex and index counts.
-void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexCount)
+void DynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t indexCount)
 {
   // Prepare vertex buffer
   size_t newVertCapacity = this->vertexBufferCapacity;
@@ -222,7 +222,7 @@ void OgreDynamicRenderable::PrepareHardwareBuffers(size_t vertexCount, size_t in
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Implementation of Ogre::SimpleRenderable
-Ogre::Real OgreDynamicRenderable::getBoundingRadius() const
+Ogre::Real DynamicRenderable::getBoundingRadius() const
 {
   return Ogre::Math::Sqrt(std::max(mBox.getMaximum().squaredLength(),
                                    mBox.getMinimum().squaredLength()));
@@ -230,7 +230,7 @@ Ogre::Real OgreDynamicRenderable::getBoundingRadius() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Implementation of Ogre::SimpleRenderable
-Ogre::Real OgreDynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
+Ogre::Real DynamicRenderable::getSquaredViewDepth(const Ogre::Camera* cam) const
 {
   Ogre::Vector3 vMin, vMax, vMid, vDist;
   vMin = mBox.getMinimum();

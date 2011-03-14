@@ -30,7 +30,6 @@
 /////////////////////////////////////////////////////////////////////////////
 #ifndef NULL
 #define NULL 0
-}
 #endif
 
 #ifndef GZ_COLLIDE_BITS
@@ -41,7 +40,6 @@
 #define GZ_SENSOR_COLLIDE 0x00000002
 #define GZ_GHOST_COLLIDE 0x10000000
 
-}
 #endif
 
 #ifndef GZ_CAMERA_BITS
@@ -49,7 +47,6 @@
 #define GZ_ALL_CAMERA 0xFFFFFFFF
 #define GZ_LASER_CAMERA 0x00000001
 
-}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -65,7 +62,6 @@
 #else
 #define GAZEBO_DEPRECATED
 #define GAZEBO_FORCEINLINE
-}
 #endif
 
 // Convert radians to degrees
@@ -87,5 +83,4 @@ enum EntityType{COMMON, ENTITY, MODEL, BODY, GEOM, BALL_JOINT, BOX_SHAPE, CYLIND
 
 static std::string EntityTypename[] = { "common", "entity", "model", "body", "geom", "ball", "box", "cylinder", "heightmap", "hinge2", "hinge", "joint", "map", "multiray", "ray", "plane", "shape", "slider", "sphere", "trimesh", "universal", "light","visual" };
 
-}
 #endif

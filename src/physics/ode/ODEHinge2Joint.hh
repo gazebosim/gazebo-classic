@@ -23,8 +23,8 @@
 #ifndef ODEHINGE2JOINT_HH
 #define ODEHINGE2JOINT_HH
 
-#include "Param.hh"
-#include "Angle.hh"
+#include "common/Param.hh"
+#include "common/Angle.hh"
 #include "common/Vector3.hh"
 #include "Hinge2Joint.hh"
 #include "ODEJoint.hh"

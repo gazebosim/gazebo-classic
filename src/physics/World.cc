@@ -28,27 +28,27 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-#include "TopicManager.hh"
-#include "Diagnostics.hh"
-#include "Events.hh"
-#include "Visual.hh"
+#include "transport/TopicManager.hh"
+#include "common/Diagnostics.hh"
+#include "common/Events.hh"
+#include "rendering/Visual.hh"
 #include "Body.hh"
 #include "FactoryIfaceHandler.hh"
 #include "GraphicsIfaceHandler.hh"
 #include "SimulationIfaceHandler.hh"
-#include "Global.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "PhysicsEngine.hh"
 #include "PhysicsFactory.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "SensorManager.hh"
 #include "gz.h"
 #include "World.hh"
 
 // NATY: put back in
-//#include "Logger.hh"
+//#include "common/Logger.hh"
 
 //#include "OpenAL.hh"
 

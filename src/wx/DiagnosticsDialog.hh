@@ -25,8 +25,8 @@
 #include <map>
 #include <vector>
 
-#include "Event.hh"
-#include "Time.hh"
+#include "common/Event.hh"
+#include "common/Time.hh"
 
 namespace gazebo
 {

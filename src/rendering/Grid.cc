@@ -24,8 +24,9 @@
 
 #include <sstream>
 
-#include "Scene.hh"
-#include "Grid.hh"
+#include "rendering/Conversions.hh"
+#include "rendering/Scene.hh"
+#include "rendering/Grid.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -34,18 +35,18 @@ using namespace rendering;
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Grid::Grid( Scene *scene,  unsigned int cell_count, float cell_length, 
-            float line_width, const Color& color )
+            float line_width, const common::Color& color )
 : scene( scene )
 {
   this->height = 0;
 
-  Param::Begin(&this->parameters);
-  this->cellCountP = new ParamT<unsigned int>("cell_count",0,0);
-  this->cellLengthP = new ParamT<float>("cell_length",1,0);
-  this->lineWidthP = new ParamT<float>("line_width",0.03,0);
-  this->colorP = new ParamT<Color>("color",Color(1,1,1,1),0);
-  this->h_offsetP = new ParamT<float>("height_offset",0,0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->cellCountP = new common::ParamT<unsigned int>("cell_count",0,0);
+  this->cellLengthP = new common::ParamT<float>("cell_length",1,0);
+  this->lineWidthP = new common::ParamT<float>("line_width",0.03,0);
+  this->colorP = new common::ParamT<common::Color>("color",common::Color(1,1,1,1),0);
+  this->h_offsetP = new common::ParamT<float>("height_offset",0,0);
+  common::Param::End();
 
   this->cellCountP->SetValue(cell_count);
   this->cellLengthP->SetValue(cell_length);
@@ -95,7 +96,7 @@ void Grid::SetLineWidth(float width)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Grid::SetColor(const Color& color)
+void Grid::SetColor(const common::Color& color)
 {
   this->colorP->SetValue( color );
 
@@ -171,14 +172,14 @@ void Grid::Create()
       Ogre::Vector3 p4(extent, inc, h_real );
 
       this->manualObject->position(p1);
-      this->manualObject->colour( (**this->colorP).GetOgreColor() );
+      this->manualObject->colour( Conversions::Color(**this->colorP) );
       this->manualObject->position(p2);
-      this->manualObject->colour( (**this->colorP).GetOgreColor() );
+      this->manualObject->colour( Conversions::Color(**this->colorP) );
 
       this->manualObject->position(p3);
-      this->manualObject->colour( (**this->colorP).GetOgreColor() );
+      this->manualObject->colour( Conversions::Color(**this->colorP) );
       this->manualObject->position(p4);
-      this->manualObject->colour( (**this->colorP).GetOgreColor() );
+      this->manualObject->colour( Conversions::Color(**this->colorP) );
     }
   }
 
@@ -195,9 +196,9 @@ void Grid::Create()
         float z_bottom = -z_top;
 
         this->manualObject->position( x_real, y_real, z_bottom );
-        this->manualObject->colour( (**this->colorP).GetOgreColor() );
+        this->manualObject->colour( Conversions::Color(**this->colorP) );
         this->manualObject->position(x_real, y_real, z_bottom);
-        this->manualObject->colour( (**this->colorP).GetOgreColor() );
+        this->manualObject->colour( Conversions::Color(**this->colorP) );
       }
     }
   }

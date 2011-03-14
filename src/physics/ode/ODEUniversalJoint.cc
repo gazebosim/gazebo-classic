@@ -21,7 +21,7 @@
  */
 
 #include "gazebo_config.h"
-#include "GazeboMessage.hh"
+#include "common/GazeboMessage.hh"
 #include "Body.hh"
 #include "ODEUniversalJoint.hh"
 

@@ -20,8 +20,8 @@
  * CVS: $Id: BulletBallJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "BulletBody.hh"
 #include "BulletBallJoint.hh"
 

@@ -20,8 +20,8 @@
  * SVN: $Id:$
  */
 
-#include "Messages.hh"
-#include "TopicManager.hh"
+#include "common/Messages.hh"
+#include "transport/TopicManager.hh"
 #include "RayShape.hh"
 
 using namespace gazebo;

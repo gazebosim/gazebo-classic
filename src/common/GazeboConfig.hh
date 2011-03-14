@@ -26,7 +26,7 @@
 #include <string>
 #include <list>
 
-#include "SingletonT.hh"
+#include "common/SingletonT.hh"
 
 namespace gazebo
 {

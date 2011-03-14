@@ -21,10 +21,10 @@
  */
 
 #include "gazebo_config.h"
-#include "GazeboMessage.hh"
+#include "common/GazeboMessage.hh"
 #include "Body.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "ODEHinge2Joint.hh"
 
 using namespace gazebo;

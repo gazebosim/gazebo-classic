@@ -23,7 +23,7 @@
 #ifndef MONOCAMERASENSOR_HH
 #define MONOCAMERASENSOR_HH
 
-#include "Camera.hh"
+#include "rendering/Camera.hh"
 #include "Sensor.hh"
 
 namespace gazebo

@@ -21,12 +21,12 @@
  * SVN info: $Id$
  */
 
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "World.hh"
 #include "gazebo.h"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "ControllerStub.hh"
 

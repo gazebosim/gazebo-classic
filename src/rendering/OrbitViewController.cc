@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#include "Global.hh"
-#include "Visual.hh"
-#include "UserCamera.hh"
-#include "Vector2.hh"
-#include "MouseEvent.hh"
-#include "OrbitViewController.hh"
+#include "common/Global.hh"
+#include "common/MouseEvent.hh"
+#include "common/Vector2i.hh"
+
+#include "rendering/Visual.hh"
+#include "rendering/UserCamera.hh"
+#include "rendering/OrbitViewController.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -33,7 +34,7 @@ static const float PITCH_LIMIT_HIGH = M_PI - 0.001;
 OrbitViewController::OrbitViewController(UserCamera *camera)
   : ViewController(camera), distance(5.0f)
 {
-  Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
+  common::Vector3 rpy = this->camera->GetWorldPose().rot.GetAsEuler();
 
   this->yaw = rpy.z;
   this->pitch = rpy.y;
@@ -43,7 +44,7 @@ OrbitViewController::OrbitViewController(UserCamera *camera)
   this->refVisual = new Visual("OrbitViewController", this->camera->GetSceneNode());
   this->refVisual->Init();
   this->refVisual->AttachMesh("unit_sphere");
-  this->refVisual->SetScale(Vector3(0.2,0.2,0.1));
+  this->refVisual->SetScale(common::Vector3(0.2,0.2,0.1));
   this->refVisual->SetCastShadows(false);
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
@@ -61,7 +62,7 @@ OrbitViewController::~OrbitViewController()
 // Update
 void OrbitViewController::Update()
 {
-  Vector3 pos;
+  common::Vector3 pos;
   pos.x = this->distance * cos( this->yaw ) * sin( this->pitch );
   pos.z = this->distance * cos( this->pitch );
   pos.y = this->distance * sin( this->yaw ) * sin( this->pitch );
@@ -70,23 +71,23 @@ void OrbitViewController::Update()
 
   this->camera->SetWorldPosition(pos);
 
-  Quatern rot;
-  rot.SetFromEuler( Vector3(0, M_PI*0.5 - this->pitch, this->yaw - M_PI) );
+  common::Quatern rot;
+  rot.SetFromEuler( common::Vector3(0, M_PI*0.5 - this->pitch, this->yaw - M_PI) );
   this->camera->SetWorldRotation(rot);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a mouse event
-void OrbitViewController::HandleMouseEvent(const MouseEvent &event)
+void OrbitViewController::HandleMouseEvent(const common::MouseEvent &event)
 {
   if (!this->camera->GetUserMovable())
     return;
 
-  Vector2i drag = event.pos - event.prevPos;
+  common::Vector2i drag = event.pos - event.prevPos;
 
-  Vector3 directionVec(0,0,0);
+  common::Vector3 directionVec(0,0,0);
 
-  if (event.left == MouseEvent::DOWN)
+  if (event.left == common::MouseEvent::DOWN)
   {
     this->refVisual->SetVisible(true);
     this->yaw += drag.x * event.moveScale * -0.1;
@@ -95,20 +96,20 @@ void OrbitViewController::HandleMouseEvent(const MouseEvent &event)
     this->NormalizeYaw(this->yaw);
     this->NormalizePitch(this->pitch);
   }
-  else if (event.middle == MouseEvent::SCROLL)
+  else if (event.middle == common::MouseEvent::SCROLL)
   {
     this->refVisual->SetVisible(true);
     distance +=  50.0 * event.scroll.y * event.moveScale;
   }
-  else if (event.right == MouseEvent::DOWN)
+  else if (event.right == common::MouseEvent::DOWN)
   {
     this->refVisual->SetVisible(true);
-    this->Translate(Vector3(0, drag.x * event.moveScale, drag.y * event.moveScale));
+    this->Translate(common::Vector3(0, drag.x * event.moveScale, drag.y * event.moveScale));
   }
-  else if (event.middle == MouseEvent::DOWN)
+  else if (event.middle == common::MouseEvent::DOWN)
   {
     this->refVisual->SetVisible(true);
-    this->Translate(Vector3(drag.y * event.moveScale,0,0));
+    this->Translate(common::Vector3(drag.y * event.moveScale,0,0));
   }
   else
     this->refVisual->SetVisible(false);
@@ -116,7 +117,7 @@ void OrbitViewController::HandleMouseEvent(const MouseEvent &event)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Translate the focal point
-void OrbitViewController::Translate(Vector3 vec)
+void OrbitViewController::Translate(common::Vector3 vec)
 {
   this->focalPoint += this->camera->GetWorldPose().rot * vec;
   this->refVisual->SetPosition(this->focalPoint);

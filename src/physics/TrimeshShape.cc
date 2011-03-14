@@ -21,13 +21,13 @@
  */
 
 #include "PhysicsEngine.hh"
-#include "MeshManager.hh"
-#include "Mesh.hh"
+#include "common/MeshManager.hh"
+#include "common/Mesh.hh"
 #include "Mass.hh"
 #include "Geom.hh"
 #include "World.hh"
 #include "TrimeshShape.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 
 using namespace gazebo;
 using namespace physics;

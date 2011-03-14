@@ -27,7 +27,7 @@
 #include <map>
 
 #include "Stereo_Camera.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Controller.hh"
 
 namespace libgazebo

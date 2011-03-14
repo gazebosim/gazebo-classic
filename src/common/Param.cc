@@ -20,12 +20,12 @@
  * SVN: $Id$
  */
 
-#include "GazeboError.hh"
-#include "Param.hh"
-#include "Quatern.hh"
-#include "Pose3d.hh"
+#include "common/GazeboError.hh"
+#include "common/Param.hh"
+#include "common/Quatern.hh"
+#include "common/Pose3d.hh"
 #include "common/Vector3.hh"
-#include "Vector4.hh"
+#include "common/Vector4.hh"
 
 using namespace gazebo;
 using namespace common;

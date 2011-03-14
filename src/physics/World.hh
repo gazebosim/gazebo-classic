@@ -29,12 +29,12 @@
 #include <map>
 #include <string>
 
-#include "Publisher.hh"
-#include "Global.hh"
-#include "Event.hh"
-#include "Messages.hh"
+#include "transport/Publisher.hh"
+#include "common/Global.hh"
+#include "common/Event.hh"
+#include "common/Messages.hh"
 #include "common/Vector3.hh"
-#include "Pose3d.hh"
+#include "common/Pose3d.hh"
 #include "Entity.hh"
 
 namespace boost

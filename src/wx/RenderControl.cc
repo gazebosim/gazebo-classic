@@ -25,16 +25,16 @@
 #include <GL/glx.h>
 #endif
 
-#include "WindowManager.hh"
+#include "rendering/WindowManager.hh"
 #include "Simulator.hh"
 #include "World.hh"
-#include "Scene.hh"
+#include "rendering/Scene.hh"
 #include "Body.hh"
 #include "World.hh"
-#include "GazeboError.hh"
-#include "Events.hh"
-#include "UserCamera.hh"
-#include "OrbitViewController.hh"
+#include "common/GazeboError.hh"
+#include "common/Events.hh"
+#include "rendering/UserCamera.hh"
+#include "rendering/OrbitViewController.hh"
 #include "RenderControl.hh"
 
 using namespace gazebo;
@@ -49,7 +49,8 @@ END_EVENT_TABLE()
 RenderControl::RenderControl(wxWindow *parent)
   : wxControl(parent, wxID_ANY, wxDefaultPosition, wxSize(320,240), wxSUNKEN_BORDER, wxDefaultValidator)
 {
-  this->windowId = WindowManager::Instance()->CreateWindow(this);
+  this->windowId = rendering::WindowManager::Instance()->CreateWindow(
+      this->GetOgreHandle(), this->GetWidth(), this->GetHeight());
 
   this->userCamera = NULL;
   this->cursorState = "default";

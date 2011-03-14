@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "Param.hh"
+#include "common/Param.hh"
 #include "gz.h"
 
 namespace libgazebo

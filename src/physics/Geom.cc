@@ -22,13 +22,13 @@
 
 #include <sstream>
 
-#include "Events.hh"
+#include "common/Events.hh"
 #include "Model.hh"
 #include "Shape.hh"
 #include "Mass.hh"
 #include "PhysicsEngine.hh"
-#include "Global.hh"
-#include "GazeboMessage.hh"
+#include "common/Global.hh"
+#include "common/GazeboMessage.hh"
 #include "SurfaceParams.hh"
 #include "World.hh"
 #include "Body.hh"

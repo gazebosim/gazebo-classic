@@ -24,12 +24,11 @@
 #include <sys/stat.h>
 #include <iostream>
 
-#include "Scene.hh"
-#include "Visual.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "RTShaderSystem.hh"
-#include "gz.h"
+#include "rendering/Scene.hh"
+#include "rendering/Visual.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "rendering/RTShaderSystem.hh"
 
 #define MINOR_VERSION 700
 using namespace gazebo;

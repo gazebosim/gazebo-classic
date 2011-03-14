@@ -21,13 +21,13 @@
  * SVN info: $Id$
  */
 
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "Joint.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Bandit_Actarray.hh"
 

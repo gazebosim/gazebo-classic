@@ -24,7 +24,7 @@
 #define CYLINDERSHAPE_HH
 
 #include "Shape.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 
 namespace gazebo
 {

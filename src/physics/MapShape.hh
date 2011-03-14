@@ -26,7 +26,7 @@
 #include <deque>
 
 #include "Vector2.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "Geom.hh"
 
 namespace gazebo

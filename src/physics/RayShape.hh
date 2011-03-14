@@ -25,10 +25,10 @@
 
 #include <float.h>
 
-#include "Global.hh"
+#include "common/Global.hh"
 #include "Simulator.hh"
 #include "Geom.hh"
-#include "Publisher.hh"
+#include "transport/Publisher.hh"
 
 namespace gazebo
 {

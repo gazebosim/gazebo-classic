@@ -19,13 +19,14 @@
 
 #include <wx/wx.h>
 
-#include "Event.hh"
-#include "SphereMaker.hh"
-#include "BoxMaker.hh"
-#include "CylinderMaker.hh"
-#include "PointLightMaker.hh"
-#include "SpotLightMaker.hh"
-#include "DirectionalLightMaker.hh"
+#include "common/Event.hh"
+
+#include "wx/SphereMaker.hh"
+#include "wx/BoxMaker.hh"
+#include "wx/CylinderMaker.hh"
+#include "wx/PointLightMaker.hh"
+#include "wx/SpotLightMaker.hh"
+#include "wx/DirectionalLightMaker.hh"
 
 #include "MouseEvent.hh"
 

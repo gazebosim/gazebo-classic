@@ -26,7 +26,7 @@
 #include <string>
 #include <FreeImage.h>
 
-#include "Color.hh"
+#include "common/Color.hh"
 
 namespace gazebo
 {

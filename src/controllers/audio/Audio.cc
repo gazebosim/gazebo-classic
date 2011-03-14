@@ -20,13 +20,13 @@
  * Date: 23 Jan 2009
  */
 
-#include "Global.hh"
+#include "common/Global.hh"
 #include "World.hh"
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "Model.hh"
 #include "Simulator.hh"
 #include "gz.h"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "OpenAL.hh"
 #include "Audio.hh"

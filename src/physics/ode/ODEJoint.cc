@@ -21,8 +21,8 @@
  */
 
 #include "World.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "Body.hh"
 #include "ODEBody.hh"
 #include "PhysicsEngine.hh"

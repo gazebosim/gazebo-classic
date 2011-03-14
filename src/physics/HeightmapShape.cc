@@ -25,10 +25,10 @@
 #include <math.h>
 
 #include "World.hh"
-#include "Scene.hh"
-#include "Image.hh"
-#include "Global.hh"
-#include "GazeboError.hh"
+#include "rendering/Scene.hh"
+#include "common/Image.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
 #include "Body.hh"
 #include "HeightmapShape.hh"
 

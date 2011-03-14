@@ -20,7 +20,7 @@
  * SVN: $Id:$
  */
 
-#include "Global.hh"
+#include "common/Global.hh"
 #include "World.hh"
 
 #include "BulletRayGeom.hh"

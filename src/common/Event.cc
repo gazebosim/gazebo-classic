@@ -16,11 +16,9 @@
 */
 
 #include <iostream>
-#include "Event.hh"
+#include "common/Event.hh"
 
 using namespace gazebo;
-using namespace common;
-
 using namespace event;
 
 ////////////////////////////////////////////////////////////////////////////////

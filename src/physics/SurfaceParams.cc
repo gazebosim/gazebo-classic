@@ -21,7 +21,7 @@
  */
 
 #include <float.h>
-#include "XMLConfig.hh"
+#include "common/XMLConfig.hh"
 #include "SurfaceParams.hh"
 
 using namespace gazebo;

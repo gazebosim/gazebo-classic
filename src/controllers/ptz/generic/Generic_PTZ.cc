@@ -26,10 +26,10 @@
 
 #include "World.hh"
 #include "Model.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "Simulator.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "Joint.hh"
 #include "Generic_PTZ.hh"

@@ -17,9 +17,9 @@
 #include <algorithm>
 #include <float.h>
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "Mesh.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Mesh.hh"
 
 using namespace gazebo;
 using namespace common;

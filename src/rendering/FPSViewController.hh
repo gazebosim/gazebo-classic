@@ -17,7 +17,7 @@
 #ifndef FPSVIEWCONTROLLER_HH
 #define FPSVIEWCONTROLLER_HH
 
-#include "ViewController.hh"
+#include "rendering/ViewController.hh"
 
 namespace gazebo
 {
@@ -38,7 +38,7 @@ namespace gazebo
       public: static std::string GetTypeString() {return "FPSViewController";}
   
       /// \brief Handle a mouse event
-      public: virtual void HandleMouseEvent(const MouseEvent &event);
+      public: virtual void HandleMouseEvent(const common::MouseEvent &event);
   
     };
   }

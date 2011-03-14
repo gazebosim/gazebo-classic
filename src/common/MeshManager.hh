@@ -21,8 +21,7 @@
 #include <string>
 
 #include "common/Vector3.hh"
-#include "Vector2.hh"
-#include "SingletonT.hh"
+#include "common/SingletonT.hh"
 
 namespace gazebo
 {

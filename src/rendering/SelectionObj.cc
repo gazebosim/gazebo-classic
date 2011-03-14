@@ -16,10 +16,10 @@
 */
 #include <Ogre.h>
 #include <boost/lexical_cast.hpp>
-#include "Visual.hh"
-#include "Scene.hh"
-#include "MeshManager.hh"
-#include "SelectionObj.hh"
+#include "rendering/Visual.hh"
+#include "rendering/Scene.hh"
+#include "common/MeshManager.hh"
+#include "rendering/SelectionObj.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -34,8 +34,8 @@ SelectionObj::SelectionObj()
   //this->scene = Simulator::Instance()->GetActiveWorld()->GetScene();
   this->node = new Visual("selection_obj_visual", this->scene );
 
-  Visual::InsertMesh(MeshManager::Instance()->GetMesh("selection_tube"));
-  Visual::InsertMesh(MeshManager::Instance()->GetMesh("unit_box_U1V1"));
+  Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("selection_tube"));
+  Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("unit_box_U1V1"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,20 +165,20 @@ void SelectionObj::Load()
 // Attach to a scene node
 void SelectionObj::Attach( Visual *visual )
 {
-  if (this->node->GetParent() && this->node->GetParent()->HasType(VISUAL))
-    ((Visual*)this->node->GetParent())->DetachVisual(this->node);
+  if (this->node->GetSceneNode()->getParentSceneNode())
+    this->node->GetSceneNode()->getParentSceneNode()->removeChild( this->node->GetSceneNode());
 
   this->node->SetVisible(false);
 
   if (visual)
   {
-    gazebo::Box box = visual->GetBounds();
-    Vector3 scale = box.max - box.min;
+    common::Box box = visual->GetBounds();
+    common::Vector3 scale = box.max - box.min;
 
     double max = std::max(scale.x, scale.y);
     max = std::max(max, scale.z);
     visual->AttachVisual(this->node);
-    this->node->SetScale( Vector3(max, max, max) );
+    this->node->SetScale( common::Vector3(max, max, max) );
     this->node->SetVisible(true);
   }
 }

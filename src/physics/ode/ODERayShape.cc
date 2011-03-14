@@ -23,8 +23,8 @@
 #include "ODEBody.hh"
 #include "ODEGeom.hh"
 #include "ODEPhysics.hh"
-#include "Visual.hh"
-#include "OgreDynamicLines.hh"
+#include "rendering/Visual.hh"
+#include "rendering/OgreDynamicLines.hh"
 #include "ODERayShape.hh"
 
 using namespace gazebo;

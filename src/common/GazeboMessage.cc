@@ -24,9 +24,9 @@
 #include <time.h>
 #include <string.h>
 
-#include "XMLConfig.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/XMLConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 
 using namespace gazebo;
 using namespace common;

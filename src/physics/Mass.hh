@@ -23,7 +23,7 @@
 #ifndef MASS_HH
 #define MASS_HH
 
-#include "Quatern.hh"
+#include "common/Quatern.hh"
 #include "common/Vector3.hh"
 
 namespace gazebo

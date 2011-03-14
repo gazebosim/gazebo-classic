@@ -17,36 +17,34 @@
 #ifndef MOUSEEVENT_HH
 #define MOUSEEVENT_HH
 
-#include "Vector2.hh"
+#include "common/Vector2i.hh"
 
 namespace gazebo
 {
-  class Camera;
-
-  class MouseEvent
+  namespace common
   {
-    public: enum ButtonState {DOWN, UP, SCROLL};
+    class MouseEvent
+    {
+      public: enum ButtonState {DOWN, UP, SCROLL};
 
-    public: MouseEvent()
-            : pos(0,0), prevPos(0,0), pressPos(0,0), scroll(0,0),
-              moveScale(0.01),dragging(false), left(UP), right(UP), middle(UP),
-              camera(NULL)
-            {}
+      public: MouseEvent()
+              : pos(0,0), prevPos(0,0), pressPos(0,0), scroll(0,0),
+                moveScale(0.01),dragging(false), left(UP), right(UP), middle(UP)
+              {}
 
-    public: Vector2i pos; 
-    public: Vector2i prevPos;
-    public: Vector2i pressPos; 
-    public: Vector2i scroll; 
+      public: Vector2i pos; 
+      public: Vector2i prevPos;
+      public: Vector2i pressPos; 
+      public: Vector2i scroll; 
 
-    public: float moveScale;
+      public: float moveScale;
 
-    public: bool dragging;
+      public: bool dragging;
 
-    public: ButtonState left;
-    public: ButtonState right;
-    public: ButtonState middle;
-
-    public: Camera *camera;
-  };
-};
+      public: ButtonState left;
+      public: ButtonState right;
+      public: ButtonState middle;
+    };
+  }
+}
 #endif

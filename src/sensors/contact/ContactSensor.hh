@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 
-#include "Angle.hh"
+#include "common/Angle.hh"
 #include "Sensor.hh"
 #include "Body.hh"
 #include "Contact.hh"

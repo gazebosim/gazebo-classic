@@ -22,7 +22,7 @@
 
 #include <math.h>
 
-#include "Vector4.hh"
+#include "common/Vector4.hh"
 
 using namespace gazebo;
 using namespace common;

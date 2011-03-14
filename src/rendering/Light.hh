@@ -26,12 +26,11 @@
 #include <string>
 #include <iostream>
 
-#include "Event.hh"
-#include "Pose3d.hh"
-#include "Color.hh"
-#include "Param.hh"
-#include "Common.hh"
-#include "Messages.hh"
+#include "common/Event.hh"
+#include "common/Pose3d.hh"
+#include "common/Color.hh"
+#include "common/Param.hh"
+#include "common/Messages.hh"
 
 namespace Ogre
 {
@@ -41,16 +40,19 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace common
+  {
+    class XMLConfigNode;
+  }
+
 	namespace rendering
   {
     class Visual;
-    class LightMsg;
-    class XMLConfigNode;
-    class OgreDynamicLines;
     class Scene;
+    class DynamicLines;
   
     /// \brief Wrapper around an ogre light source
-    class Light : public Common
+    class Light
     {
       /// \brief Constructor
       public: Light(Scene *scene);
@@ -59,16 +61,22 @@ namespace gazebo
       public: virtual ~Light();
   
       /// \brief Load the light
-      public: void Load(XMLConfigNode *node);
+      public: void Load( common::XMLConfigNode *node);
   
       /// \brief Load from a light message
       public: void LoadFromMsg(const boost::shared_ptr<msgs::Light const> &msg);
   
       /// \brief Save a light
       public: void Save(const std::string &prefix, std::ostream &stream);
-  
+
+        /// \brief Set the name of the visual
+      public: void SetName( const std::string &name );
+
+      /// \brief Get the name of the visual
+      public: std::string GetName() const;
+ 
       /// \brief Set the position of the light
-      public: void SetPosition(const Vector3 &p);
+      public: void SetPosition(const common::Vector3 &p);
   
       /// \brief Set whether this entity has been selected by the user through  
       ///        the gui
@@ -84,16 +92,16 @@ namespace gazebo
       public: void SetLightType(const std::string &type);
   
       /// \brief Set the diffuse
-      public: void SetDiffuseColor(const Color &color);
+      public: void SetDiffuseColor(const common::Color &color);
   
       /// \brief Set the specular color
-      public: void SetSpecularColor(const Color &color);
+      public: void SetSpecularColor(const common::Color &color);
   
       /// \brief Set the direction
-      public: void SetDirection(const Vector3 &dir);
+      public: void SetDirection(const common::Vector3 &dir);
   
       /// \brief Set the attenuation
-      public: void SetAttenuation(const Vector3 &att);
+      public: void SetAttenuation(const common::Vector3 &att);
   
       /// \brief Set the spot light inner angle
       public: void SetSpotInnerAngle(const double &angle);
@@ -116,24 +124,28 @@ namespace gazebo
       private: void SetupShadows();
   
       protected: virtual void OnPoseChange() {}
-  
+ 
       /// The OGRE light source
       private: Ogre::Light *light;
   
       private: Visual *visual;
-      private: OgreDynamicLines *line;
+      private: DynamicLines *line;
   
-      private: ParamT<std::string> *lightTypeP;
-      private: ParamT<Color> *diffuseP;
-      private: ParamT<Color> *specularP;
-      private: ParamT<Vector3> *directionP;
-      private: ParamT<Vector3> *attenuationP;
-      private: ParamT<double> *rangeP;
-      private: ParamT<bool> *castShadowsP;
-      private: ParamT<double> *spotInnerAngleP;
-      private: ParamT<double> *spotOuterAngleP;
-      private: ParamT<double> *spotFalloffP;
-  
+      private: common::ParamT<std::string> *nameP;
+      private: common::ParamT<std::string> *lightTypeP;
+      private: common::ParamT<common::Color> *diffuseP;
+      private: common::ParamT<common::Color> *specularP;
+      private: common::ParamT<common::Vector3> *directionP;
+      private: common::ParamT<common::Vector3> *attenuationP;
+      private: common::ParamT<double> *rangeP;
+      private: common::ParamT<bool> *castShadowsP;
+      private: common::ParamT<double> *spotInnerAngleP;
+      private: common::ParamT<double> *spotOuterAngleP;
+      private: common::ParamT<double> *spotFalloffP;
+
+      /// List of all the parameters
+      protected: std::vector<common::Param*> parameters;
+
       private: event::ConnectionPtr showLightsConnection;
       private: static unsigned int lightCounter;
       private: Scene *scene;

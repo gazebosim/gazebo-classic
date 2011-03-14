@@ -19,7 +19,7 @@
  * Date: 22 Nov 2009
  */
 
-#include "Timer.hh"
+#include "common/Timer.hh"
 
 using namespace gazebo;
 using namespace common;

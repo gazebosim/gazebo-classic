@@ -15,11 +15,11 @@
  *
 */
 #include <iomanip>
-#include "Time.hh"
+#include "common/Time.hh"
 #include "Entity.hh"
 #include "Simulator.hh"
-#include "GazeboMessage.hh"
-#include "Logger.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Logger.hh"
 
 using namespace gazebo;
 using namespace common;

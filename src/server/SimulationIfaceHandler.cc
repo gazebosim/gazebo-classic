@@ -19,19 +19,19 @@
  * Date: 8 Nov 2010
  */
 
-#include "GazeboMessage.hh"
+#include "common/GazeboMessage.hh"
 #include "Simulator.hh"
-#include "Common.hh"
+#include "common/Common.hh"
 #include "Entity.hh"
 #include "Model.hh"
 #include "Body.hh"
-#include "Pose3d.hh"
+#include "common/Pose3d.hh"
 #include "common/Vector3.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Joint.hh"
 // NATY: put back in
-//#include "Logger.hh"
+//#include "common/Logger.hh"
 #include "gz.h"
 
 #include "SimulationIfaceHandler.hh"

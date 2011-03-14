@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MATERIAL_HH
-#define MATERIAL_HH
+#ifndef RENDERING_MATERIAL_HH
+#define RENDERING_MATERIAL_HH
 
 #include "common/Material.hh"
 

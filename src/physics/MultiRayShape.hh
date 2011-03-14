@@ -19,10 +19,10 @@
 
 #include <vector>
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
 #include "common/Vector3.hh"
-#include "Angle.hh"
+#include "common/Angle.hh"
 #include "Geom.hh"
 #include "Shape.hh"
 #include "RayShape.hh"

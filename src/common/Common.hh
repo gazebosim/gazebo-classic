@@ -27,8 +27,8 @@
 #include <vector>
 #include <string>
 
-#include "Global.hh"
-#include "Param.hh"
+#include "common/Global.hh"
+#include "common/Param.hh"
 
 namespace gazebo
 {

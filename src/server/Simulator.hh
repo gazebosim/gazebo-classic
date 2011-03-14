@@ -25,10 +25,10 @@
 #include <string>
 #include <vector>
 
-#include "GazeboError.hh"
-#include "Event.hh"
-#include "Time.hh"
-#include "SingletonT.hh"
+#include "common/GazeboError.hh"
+#include "common/Event.hh"
+#include "common/Time.hh"
+#include "common/SingletonT.hh"
 
 namespace boost
 {

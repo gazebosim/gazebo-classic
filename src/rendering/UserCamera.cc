@@ -23,19 +23,20 @@
 #include <Ogre.h>
 #include <sstream>
 
-#include "FPSViewController.hh"
-#include "OrbitViewController.hh"
+#include "common/Global.hh"
+#include "common/GazeboError.hh"
+#include "common/Events.hh"
 
-#include "RenderTypes.hh"
-#include "GazeboError.hh"
-#include "Events.hh"
-#include "Scene.hh"
-#include "RTShaderSystem.hh"
-#include "Global.hh"
-#include "Camera.hh"
-#include "Visual.hh"
-#include "OgreDynamicLines.hh"
-#include "UserCamera.hh"   
+
+#include "rendering/FPSViewController.hh"
+#include "rendering/OrbitViewController.hh"
+#include "rendering/RenderTypes.hh"
+#include "rendering/Scene.hh"
+//#include "rendering/RTShaderSystem.hh"
+#include "rendering/Camera.hh"
+#include "rendering/Visual.hh"
+#include "rendering/DynamicLines.hh"
+#include "rendering/UserCamera.hh"   
 
 using namespace gazebo;
 using namespace rendering;
@@ -78,7 +79,7 @@ UserCamera::~UserCamera()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load child
-void UserCamera::Load(XMLConfigNode *node)
+void UserCamera::Load(common::XMLConfigNode *node)
 {
   Camera::Load(node);
 
@@ -97,52 +98,52 @@ void UserCamera::Init()
   this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
 
   // The lines draw a visualization of the camera
-  OgreDynamicLines *line = this->visual->AddDynamicLine( RENDERING_LINE_LIST );
+  DynamicLines *line = this->visual->AddDynamicLine( RENDERING_LINE_LIST );
 
   float f = 0.2;
 
   // Create the front face
-  line->AddPoint(Vector3(0, -f, -f)); 
-  line->AddPoint(Vector3(0, -f, +f)); 
+  line->AddPoint(common::Vector3(0, -f, -f)); 
+  line->AddPoint(common::Vector3(0, -f, +f)); 
 
-  line->AddPoint(Vector3(0, -f, +f)); 
-  line->AddPoint(Vector3(0, +f, +f)); 
+  line->AddPoint(common::Vector3(0, -f, +f)); 
+  line->AddPoint(common::Vector3(0, +f, +f)); 
 
-  line->AddPoint(Vector3(0, +f, +f)); 
-  line->AddPoint(Vector3(0, +f, -f)); 
+  line->AddPoint(common::Vector3(0, +f, +f)); 
+  line->AddPoint(common::Vector3(0, +f, -f)); 
 
-  line->AddPoint(Vector3(0, +f, -f)); 
-  line->AddPoint(Vector3(0, -f, -f)); 
+  line->AddPoint(common::Vector3(0, +f, -f)); 
+  line->AddPoint(common::Vector3(0, -f, -f)); 
 
 
   // Create the connecting lines
-  line->AddPoint(Vector3(-0.4, 0, 0)); 
-  line->AddPoint(Vector3(+0.0, -f, -f)); 
+  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(common::Vector3(+0.0, -f, -f)); 
 
-  line->AddPoint(Vector3(-0.4, 0, 0)); 
-  line->AddPoint(Vector3(+0.0, -f, +f)); 
+  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(common::Vector3(+0.0, -f, +f)); 
 
-  line->AddPoint(Vector3(-0.4, 0, 0)); 
-  line->AddPoint(Vector3(+0.0, +f, +f)); 
+  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(common::Vector3(+0.0, +f, +f)); 
 
-  line->AddPoint(Vector3(-0.4, 0, 0)); 
-  line->AddPoint(Vector3(+0.0, +f, -f)); 
+  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(common::Vector3(+0.0, +f, -f)); 
 
-  line->AddPoint(Vector3(-0.4, 0, 0)); 
-  line->AddPoint(Vector3(+0.0, -f, -f)); 
+  line->AddPoint(common::Vector3(-0.4, 0, 0)); 
+  line->AddPoint(common::Vector3(+0.0, -f, -f)); 
 
   // Draw up arrow
-  line->AddPoint(Vector3(0, 0, +f)); 
-  line->AddPoint(Vector3(0, 0, +f+0.1)); 
+  line->AddPoint(common::Vector3(0, 0, +f)); 
+  line->AddPoint(common::Vector3(0, 0, +f+0.1)); 
 
-  line->AddPoint(Vector3(0.0, -0.02, +f+0.1)); 
-  line->AddPoint(Vector3(0.0, +0.02, +f+0.1)); 
+  line->AddPoint(common::Vector3(0.0, -0.02, +f+0.1)); 
+  line->AddPoint(common::Vector3(0.0, +0.02, +f+0.1)); 
 
-  line->AddPoint(Vector3(0.0, +0.02, +f+0.1)); 
-  line->AddPoint(Vector3(0.0, +0.00, +f+0.15)); 
+  line->AddPoint(common::Vector3(0.0, +0.02, +f+0.1)); 
+  line->AddPoint(common::Vector3(0.0, +0.00, +f+0.15)); 
 
-  line->AddPoint(Vector3(0.0, +0.00, +f+0.15)); 
-  line->AddPoint(Vector3(0.0, -0.02, +f+0.1)); 
+  line->AddPoint(common::Vector3(0.0, +0.00, +f+0.15)); 
+  line->AddPoint(common::Vector3(0.0, -0.02, +f+0.1)); 
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_LASER_CAMERA);
@@ -227,7 +228,7 @@ void UserCamera::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Handle a mouse event
-void UserCamera::HandleMouseEvent(const MouseEvent &evt)
+void UserCamera::HandleMouseEvent(const common::MouseEvent &evt)
 {
   this->viewController->HandleMouseEvent(evt);
 }
@@ -306,10 +307,10 @@ void UserCamera::ShowVisual(bool s)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// Move the camera to focus on an entity
-void UserCamera::MoveToEntity(Common *entity)
+// Move the camera to focus on an scene node
+void UserCamera::MoveToVisual( Visual *visual)
 {
-  if (!entity)
+  if (!visual)
     return;
 
   if (this->scene->GetManager()->hasAnimation("cameratrack"))
@@ -324,11 +325,11 @@ void UserCamera::MoveToEntity(Common *entity)
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0,this->sceneNode);
   Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1,this->pitchNode);
 
-  Vector3 start = this->GetWorldPose().pos;
+  common::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
-  Vector3 end = entity->GetWorldPose().pos;
+  common::Vector3 end = visual->GetWorldPose().pos;
   end.Correct();
-  Vector3 dir = end - start;
+  common::Vector3 dir = end - start;
   dir.Correct();
 
   double yawAngle = atan2(dir.y,dir.x);
@@ -345,9 +346,7 @@ void UserCamera::MoveToEntity(Common *entity)
   key = ptrack->createNodeKeyFrame(0);
   key->setRotation(this->pitchNode->getOrientation());
 
-  Vector3 min, max, size;
-  Box box = entity->GetBoundingBox();
-  size = box.max-box.min;
+  common::Vector3 size = visual->GetBoundingBoxSize();
 
   double scale = std::max(std::max(size.x, size.y), size.z);
   scale += 0.5;
@@ -355,7 +354,7 @@ void UserCamera::MoveToEntity(Common *entity)
   dir.Normalize();
   double dist = start.Distance(end);
 
-  Vector3 mid = start + dir*(dist*.5 - scale);
+  common::Vector3 mid = start + dir*(dist*.5 - scale);
   key = strack->createNodeKeyFrame(.2);
   key->setTranslate( Ogre::Vector3(mid.x, mid.y, mid.z));
   key->setRotation(yawFinal);
@@ -377,8 +376,8 @@ void UserCamera::MoveToEntity(Common *entity)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-/// Set the camera to track an entity
-void UserCamera::TrackModel( Common *model )
+/// Set the camera to track a scene node
+void UserCamera::TrackVisual( Visual *visual )
 {
   /* NATY: Put back in
   this->sceneNode->getParent()->removeChild(this->sceneNode);

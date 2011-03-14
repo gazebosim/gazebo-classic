@@ -19,7 +19,7 @@
 
 #include "Properties.hh"
 #include "PhysicsEngine.hh"
-#include "Param.hh"
+#include "common/Param.hh"
 #include "World.hh"
 #include "Simulator.hh"
 #include "PhysicsPage.hh"

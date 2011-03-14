@@ -25,12 +25,12 @@
 #include <assert.h>
 
 #include "Sensor.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 #include "HingeJoint.hh"
 #include "World.hh"
 #include "Simulator.hh"
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 #include "ControllerFactory.hh"
 #include "RaySensor.hh"
 #include "SickLMS200_Laser.hh"

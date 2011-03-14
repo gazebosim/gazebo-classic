@@ -21,20 +21,23 @@
 
 #include <Ogre.h>
 
-#include "Messages.hh"
-#include "Events.hh"
-#include "OgreDynamicLines.hh"
-#include "Scene.hh"
-#include "SelectionObj.hh"
-//#include "RTShaderSystem.hh"
-#include "MeshManager.hh"
-#include "GazeboMessage.hh"
-#include "GazeboError.hh"
-#include "XMLConfig.hh"
-#include "Global.hh"
-#include "Mesh.hh"
-#include "Material.hh"
-#include "Visual.hh"
+#include "common/Messages.hh"
+#include "common/Events.hh"
+#include "common/XMLConfig.hh"
+
+#include "rendering/Conversions.hh"
+#include "rendering/DynamicLines.hh"
+#include "rendering/Scene.hh"
+#include "rendering/SelectionObj.hh"
+//#include "rendering/RTShaderSystem.hh"
+#include "common/MeshManager.hh"
+#include "common/GazeboMessage.hh"
+#include "common/GazeboError.hh"
+#include "common/XMLConfig.hh"
+#include "common/Global.hh"
+#include "common/Mesh.hh"
+#include "rendering/Material.hh"
+#include "rendering/Visual.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -46,10 +49,8 @@ unsigned int Visual::visualCounter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Visual::Visual(const std::string &name, Visual *parent)
-  : Common(parent)
 {
   this->SetName(name);
-  this->AddType(VISUAL);
   this->sceneNode = NULL;
 
   Ogre::SceneNode *pnode = NULL;
@@ -58,7 +59,7 @@ Visual::Visual(const std::string &name, Visual *parent)
   else
     gzerr(0) << "Create a visual, invalid parent!!!\n";
 
-    this->sceneNode = pnode->createChildSceneNode( this->GetName() );
+  this->sceneNode = pnode->createChildSceneNode( this->GetName() );
 
   this->Init();
 }
@@ -66,10 +67,8 @@ Visual::Visual(const std::string &name, Visual *parent)
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Visual::Visual (const std::string &name, Ogre::SceneNode *parent)
-  : Common(NULL)
 {
   this->SetName(name);
-  this->AddType(VISUAL);
   this->sceneNode = NULL;
 
   this->sceneNode = parent->createChildSceneNode( this->GetName() );
@@ -80,10 +79,8 @@ Visual::Visual (const std::string &name, Ogre::SceneNode *parent)
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 Visual::Visual (const std::string &name, Scene *scene)
-  : Common(NULL)
 {
   this->SetName(name);
-  this->AddType(VISUAL);
   this->sceneNode = NULL;
 
   this->sceneNode = scene->GetManager()->getRootSceneNode()->createChildSceneNode(this->GetName());
@@ -103,7 +100,7 @@ Visual::~Visual()
   delete this->castShadowsP;
 
   // delete instance from lines vector
-  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();
+  for (std::list<DynamicLines*>::iterator iter=this->lines.begin();
        iter!=this->lines.end();iter++)
     delete *iter;
   this->lines.clear();
@@ -129,37 +126,36 @@ void Visual::Init()
   this->useRTShader = true;
   this->visible = true;
   this->ribbonTrail = NULL;
-  this->boundingBoxNode = NULL;
   this->staticGeom = NULL;
 
-  Param::Begin(&this->parameters);
-  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  common::Param::Begin(&this->parameters);
+  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(0,0,0), 0);
   this->xyzP->Callback( &Visual::SetPosition, this );
 
-  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(1,0,0,0), 0);
   this->rpyP->Callback( &Visual::SetRotation, this );
 
-  this->meshNameP = new ParamT<std::string>("mesh","",1);
-  this->meshTileP = new ParamT< Vector2d >("uvTile", 
-                                Vector2d(1.0, 1.0), 0 );
+  this->meshNameP = new common::ParamT<std::string>("mesh","",1);
+  this->meshTileP = new common::ParamT< common::Vector2d >("uvTile", 
+                                common::Vector2d(1.0, 1.0), 0 );
  
   //default to Gazebo/White
-  this->materialNameP = new ParamT<std::string>("material",
+  this->materialNameP = new common::ParamT<std::string>("material",
                                                 std::string("none"),0);
   this->materialNameP->Callback( &Visual::SetMaterial, this );
 
-  this->castShadowsP = new ParamT<bool>("cast_shadows",true,0);
+  this->castShadowsP = new common::ParamT<bool>("cast_shadows",true,0);
   this->castShadowsP->Callback( &Visual::SetCastShadows, this );
 
-  this->scaleP = new ParamT<Vector3>("scale", Vector3(1,1,1), 0);
+  this->scaleP = new common::ParamT<common::Vector3>("scale", common::Vector3(1,1,1), 0);
 
-  this->normalMapNameP = new ParamT<std::string>("normal_map",
+  this->normalMapNameP = new common::ParamT<std::string>("normal_map",
                                                 std::string("none"),0);
   this->normalMapNameP->Callback( &Visual::SetNormalMap, this );
 
-  this->shaderP = new ParamT<std::string>("shader", std::string("pixel"),0);
+  this->shaderP = new common::ParamT<std::string>("shader", std::string("pixel"),0);
   this->shaderP->Callback( &Visual::SetShader, this );
-  Param::End();
+  common::Param::End();
 
   //RTShaderSystem::Instance()->AttachEntity(this);
 }
@@ -171,10 +167,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 
   if (msg->has_plane())
   {
-    Plane plane = Message::Convert(msg->plane());
-    MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
-        Vector2d(2,2), 
-        Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
+    common::Plane plane = common::Message::Convert(msg->plane());
+    common::MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
+        common::Vector2d(2,2), 
+        common::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
     mesh = msg->header().str_id();
   }
 
@@ -183,8 +179,8 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 
   if (msg->has_pose())
   {
-    this->xyzP->SetValue(Message::Convert(msg->pose().position()));
-    this->rpyP->SetValue(Message::Convert(msg->pose().orientation()));
+    this->xyzP->SetValue(common::Message::Convert(msg->pose().position()));
+    this->rpyP->SetValue(common::Message::Convert(msg->pose().orientation()));
   }
 
   if (msg->has_material())
@@ -194,7 +190,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
     this->castShadowsP->SetValue(msg->cast_shadows());
 
   if (msg->has_scale())
-    this->scaleP->SetValue(Message::Convert(msg->scale()));
+    this->scaleP->SetValue(common::Message::Convert(msg->scale()));
 
   this->Load(NULL);
   this->UpdateFromMsg(msg);
@@ -202,11 +198,11 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the visual
-void Visual::Load(XMLConfigNode *node)
+void Visual::Load(common::XMLConfigNode *node)
 {
   std::ostringstream stream;
-  Pose3d pose;
-  Vector3 size(0,0,0);
+  common::Pose3d pose;
+  common::Vector3 size(0,0,0);
   Ogre::Vector3 meshSize(1,1,1);
   Ogre::MovableObject *obj = NULL;
 
@@ -240,20 +236,19 @@ void Visual::Load(XMLConfigNode *node)
           boost::lexical_cast<std::string>(this->meshTileP->GetValue().x) + "V" +
           boost::lexical_cast<std::string>(this->meshTileP->GetValue().y);
 
-        if (!MeshManager::Instance()->HasMesh(meshName));
+        if (!common::MeshManager::Instance()->HasMesh(meshName));
         {
-          MeshManager::Instance()->CreateBox(meshName, Vector3(1,1,1), 
-              **this->meshTileP);
+          common::MeshManager::Instance()->CreateBox(meshName, common::Vector3(1,1,1), **this->meshTileP);
         }
       }
 
-      if (!MeshManager::Instance()->HasMesh(meshName))
+      if (!common::MeshManager::Instance()->HasMesh(meshName))
       {
-        MeshManager::Instance()->Load(meshName);
+        common::MeshManager::Instance()->Load(meshName);
       }
 
       // Add the mesh into OGRE
-      this->InsertMesh( MeshManager::Instance()->GetMesh(meshName) );
+      this->InsertMesh( common::MeshManager::Instance()->GetMesh(meshName) );
 
       Ogre::SceneManager *mgr = this->sceneNode->getCreator();
       if (mgr->hasEntity(stream.str()))
@@ -301,7 +296,7 @@ void Visual::Update()
   if (!this->visible)
     return;
 
-  std::list<OgreDynamicLines*>::iterator iter;
+  std::list<DynamicLines*>::iterator iter;
 
   // Update the lines
   for (iter = this->lines.begin(); iter != this->lines.end(); iter++)
@@ -309,19 +304,19 @@ void Visual::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Set the owner
-void Visual::SetOwner(Common *common)
+/// Set the name of the visual
+void Visual::SetName( const std::string &name )
 {
-  this->owner = common;
+  this->name = name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get the owner
-Common *Visual::GetOwner() const
+/// Get the name of the visual
+std::string Visual::GetName() const
 {
-  return this->owner;
+  return this->name;
 }
-
+ 
 ////////////////////////////////////////////////////////////////////////////////
 // Save the visual in XML format
 void Visual::Save(std::string &prefix, std::ostream &stream)
@@ -342,7 +337,6 @@ void Visual::AttachVisual(Visual *vis)
 {
   vis->GetSceneNode()->getParentSceneNode()->removeChild(vis->GetSceneNode());
   this->sceneNode->addChild( vis->GetSceneNode() );
-  vis->SetParent(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -350,7 +344,6 @@ void Visual::AttachVisual(Visual *vis)
 void Visual::DetachVisual(Visual *vis)
 {
   this->sceneNode->removeChild(vis->GetSceneNode());
-  vis->SetParent(NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -415,9 +408,9 @@ void Visual::AttachMesh( const std::string &meshName )
 
   // Add the mesh into OGRE
   if (!this->sceneNode->getCreator()->hasEntity(meshName) &&
-      MeshManager::Instance()->HasMesh(meshName))
+      common::MeshManager::Instance()->HasMesh(meshName))
   {
-    const Mesh *mesh = MeshManager::Instance()->GetMesh(meshName);
+    const common::Mesh *mesh = common::MeshManager::Instance()->GetMesh(meshName);
 
     this->InsertMesh( mesh );
   }
@@ -429,19 +422,17 @@ void Visual::AttachMesh( const std::string &meshName )
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  Set the scale
-void Visual::SetScale(const Vector3 &scale )
+void Visual::SetScale(const common::Vector3 &scale )
 {
   this->scaleP->SetValue(scale);
-  this->sceneNode->setScale(Ogre::Vector3(scale.x, scale.y, scale.z));
+  this->sceneNode->setScale(Conversions::Vector3(scale));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the scale
-Vector3 Visual::GetScale()
+common::Vector3 Visual::GetScale()
 {
-  Ogre::Vector3 vscale;
-  vscale=this->sceneNode->getScale();
-  return Vector3(vscale.x, vscale.y, vscale.z);
+  return Conversions::Vector3(this->sceneNode->getScale());
 }
 
 
@@ -529,7 +520,7 @@ void Visual::AttachAxes()
   nodeName << this->sceneNode->getName()<<"_AXES_NODE";
  
   if (!this->sceneNode->getCreator()->hasEntity("axis_cylinder"))
-    this->InsertMesh(MeshManager::Instance()->GetMesh("axis_cylinder"));
+    this->InsertMesh(common::MeshManager::Instance()->GetMesh("axis_cylinder"));
 
   Ogre::SceneNode *node = this->sceneNode->createChildSceneNode(nodeName.str());
   Ogre::SceneNode *x, *y, *z;
@@ -676,7 +667,7 @@ bool Visual::GetVisible() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-void Visual::SetPosition( const Vector3 &pos)
+void Visual::SetPosition( const common::Vector3 &pos)
 {
   /*if (this->IsStatic() && this->staticGeom)
   {
@@ -692,14 +683,14 @@ void Visual::SetPosition( const Vector3 &pos)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the rotation of the visual
-void Visual::SetRotation( const Quatern &rot)
+void Visual::SetRotation( const common::Quatern &rot)
 {
   this->sceneNode->setOrientation(rot.w, rot.x, rot.y, rot.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the pose of the visual
-void Visual::SetPose( const Pose3d &pose)
+void Visual::SetPose( const common::Pose3d &pose)
 {
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
@@ -707,36 +698,23 @@ void Visual::SetPose( const Pose3d &pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the position of the visual
-Vector3 Visual::GetPosition() const
+common::Vector3 Visual::GetPosition() const
 {
-  Ogre::Vector3 vpos;
-  Vector3 pos;
-  vpos=this->sceneNode->getPosition();
-  pos.x=vpos.x;
-  pos.y=vpos.y;
-  pos.z=vpos.z;
-  return pos;
+  return Conversions::Vector3(this->sceneNode->getPosition());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the rotation of the visual
-Quatern Visual::GetRotation( ) const
+common::Quatern Visual::GetRotation( ) const
 {
-  Ogre::Quaternion vquatern;
-  Quatern quatern;
-  vquatern=this->sceneNode->getOrientation();
-  quatern.w = vquatern.w;
-  quatern.x = vquatern.x;
-  quatern.y = vquatern.y;
-  quatern.z = vquatern.z;
-  return quatern;
+  return Conversions::Quaternion(this->sceneNode->getOrientation());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the visual
-Pose3d Visual::GetPose() const
+common::Pose3d Visual::GetPose() const
 {
-  Pose3d pos;
+  common::Pose3d pos;
   pos.pos=this->GetPosition();
   pos.rot=this->GetRotation();
   return pos;
@@ -744,9 +722,9 @@ Pose3d Visual::GetPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global pose of the node
-Pose3d Visual::GetWorldPose() const
+common::Pose3d Visual::GetWorldPose() const
 {
-  Pose3d pose;
+  common::Pose3d pose;
 
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
@@ -878,12 +856,12 @@ void Visual::SetRibbonTrail(bool value)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the bounding box
-Vector3 Visual::GetBoundingBoxSize() const
+common::Vector3 Visual::GetBoundingBoxSize() const
 {
   this->sceneNode->_updateBounds();
   Ogre::AxisAlignedBox box = this->sceneNode->_getWorldAABB();
   Ogre::Vector3 size = box.getSize();
-  return Vector3(size.x, size.y, size.z);
+  return common::Vector3(size.x, size.y, size.z);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -902,11 +880,11 @@ bool Visual::GetUseRTShader() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Add a line to the visual
-OgreDynamicLines *Visual::AddDynamicLine(RenderOpType type)
+DynamicLines *Visual::AddDynamicLine(RenderOpType type)
 {
   this->preRenderConnection = event::Events::ConnectPreRenderSignal( boost::bind(&Visual::Update, this) );
 
-  OgreDynamicLines *line = new OgreDynamicLines(type);
+  DynamicLines *line = new DynamicLines(type);
   this->lines.push_back(line);
   this->AttachObject(line);
   return line;
@@ -914,10 +892,10 @@ OgreDynamicLines *Visual::AddDynamicLine(RenderOpType type)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Delete a dynamic line
-void Visual::DeleteDynamicLine(OgreDynamicLines *line)
+void Visual::DeleteDynamicLine(DynamicLines *line)
 {
   // delete instance from lines vector
-  for (std::list<OgreDynamicLines*>::iterator iter=this->lines.begin();iter!=this->lines.end();iter++)
+  for (std::list<DynamicLines*>::iterator iter=this->lines.begin();iter!=this->lines.end();iter++)
   {
     if (*iter == line)
     {
@@ -936,16 +914,16 @@ std::string Visual::GetMaterialName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the bounds
-Box Visual::GetBounds() const
+common::Box Visual::GetBounds() const
 {
-  Box box;
+  common::Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
   return box;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the bounding box for a scene node
-void Visual::GetBoundsHelper(Ogre::SceneNode *node, Box &box) const
+void Visual::GetBoundsHelper(Ogre::SceneNode *node, common::Box &box) const
 {
   node->_updateBounds();
 
@@ -967,7 +945,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, Box &box) const
       Ogre::AxisAlignedBox bb = obj->getWorldBoundingBox();
       Ogre::Vector3 min = bb.getMinimum();
       Ogre::Vector3 max = bb.getMaximum();
-      box.Merge(Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z)));
+      box.Merge(common::Box(common::Vector3(min.x, min.y, min.z), common::Vector3(max.x, max.y, max.z)));
     }
   }
 
@@ -980,7 +958,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, Box &box) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Insert a mesh into Ogre 
-void Visual::InsertMesh( const Mesh *mesh)
+void Visual::InsertMesh( const common::Mesh *mesh)
 {
   Ogre::MeshPtr ogreMesh;
 
@@ -1006,7 +984,7 @@ void Visual::InsertMesh( const Mesh *mesh)
 
       size_t currOffset = 0;
 
-      const SubMesh *subMesh = mesh->GetSubMesh(i);
+      const common::SubMesh *subMesh = mesh->GetSubMesh(i);
 
       ogreSubMesh = ogreMesh->createSubMesh();
       ogreSubMesh->useSharedVertices = false;
@@ -1096,7 +1074,7 @@ void Visual::InsertMesh( const Mesh *mesh)
       for (j =0; j < subMesh->GetIndexCount(); j++)
         *indices++ = subMesh->GetIndex(j);
 
-      const Material *material;
+      const common::Material *material;
       material = mesh->GetMaterial( subMesh->GetMaterialIndex() );
       if (material)
       {
@@ -1108,8 +1086,8 @@ void Visual::InsertMesh( const Mesh *mesh)
       iBuf->unlock();
     }
 
-    Vector3 max = mesh->GetMax();
-    Vector3 min = mesh->GetMin();
+    common::Vector3 max = mesh->GetMax();
+    common::Vector3 min = mesh->GetMin();
 
     if (!max.IsFinite())
       gzthrow("Max bounding box is not finite[" << max << "]\n");
@@ -1140,10 +1118,10 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
     this->MakeStatic();
 
   if (msg->has_pose())
-    this->SetPose( Message::Convert(msg->pose()) );
+    this->SetPose( common::Message::Convert(msg->pose()) );
 
   if (msg->has_scale())
-    this->SetScale( Message::Convert(msg->scale()) );
+    this->SetScale( common::Message::Convert(msg->scale()) );
 
   if (msg->has_visible())
     this->SetVisible(msg->visible());
@@ -1156,7 +1134,7 @@ void Visual::UpdateFromMsg( const boost::shared_ptr< msgs::Visual const> &msg )
 
   /*if (msg->points.size() > 0)
   {
-    OgreDynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);
+    DynamicLines *lines = this->AddDynamicLine(RENDERING_LINE_LIST);
     for (unsigned int i=0; i < msg->points.size(); i++)
       lines->AddPoint( msg->points[i] );
   }

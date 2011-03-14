@@ -20,15 +20,15 @@
  * CVS: $Id$
  */
 
-#include "Events.hh"
+#include "common/Events.hh"
 #include "PhysicsEngine.hh"
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "Global.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Global.hh"
 #include "Body.hh"
 #include "Model.hh"
 #include "World.hh"
-#include "TopicManager.hh"
+#include "transport/TopicManager.hh"
 #include "Joint.hh"
 
 using namespace gazebo;
