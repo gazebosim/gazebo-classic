@@ -33,7 +33,7 @@
 
 #include "MeshLoader.hh"
 #include "GazeboError.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 #define M_MESH 0x3000
 #define M_SUBMESH 0x4000
@@ -56,6 +56,8 @@
 #define M_GEOMETRY_VERTEX_BUFFER_DATA  0x5210
 
 namespace gazebo
+{
+	namespace common
 {
   class Mesh;
 
@@ -164,4 +166,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

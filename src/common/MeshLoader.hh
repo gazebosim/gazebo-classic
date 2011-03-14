@@ -21,6 +21,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   class Mesh;
 
   class MeshLoader
@@ -36,4 +38,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

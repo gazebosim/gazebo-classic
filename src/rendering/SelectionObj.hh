@@ -17,10 +17,12 @@
 #ifndef SELECTION_OBJ
 #define SELECTION_OBJ
 
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 
 namespace gazebo
+{
+	namespace rendering
 {
   class Visual;
   class Scene;
@@ -43,4 +45,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

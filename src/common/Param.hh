@@ -37,6 +37,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
 
 
   class Param
@@ -242,5 +244,6 @@ namespace gazebo
       this->changeSignal(this->value);
   }
 
+}
 }
 #endif

@@ -23,7 +23,7 @@
 #include <assimp/aiScene.h>
 #include <assimp/aiPostProcess.h>
 
-#include "MeshLoader.hh"
+#include "common/MeshLoader.hh"
 
 namespace gazebo
 {

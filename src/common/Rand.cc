@@ -24,6 +24,8 @@
 #include "Rand.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 GeneratorType *Rand::randGenerator = new GeneratorType(std::time(0));
 

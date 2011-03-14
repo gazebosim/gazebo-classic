@@ -28,6 +28,8 @@
 #include "WindowManager.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 unsigned int WindowManager::windowCounter = 0;
 

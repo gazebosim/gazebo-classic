@@ -18,9 +18,11 @@
 #define ORBITVIEWCONTROLLER_HH
 
 #include "ViewController.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 namespace gazebo
+{
+	namespace rendering
 {
   class Visual;
 
@@ -58,4 +60,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

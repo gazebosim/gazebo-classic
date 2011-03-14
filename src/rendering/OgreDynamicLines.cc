@@ -30,6 +30,8 @@
 #include "OgreDynamicLines.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 enum { POSITION_BINDING, TEXCOORD_BINDING };
 

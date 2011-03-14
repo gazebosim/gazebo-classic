@@ -19,6 +19,8 @@
 #include "Material.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 unsigned int Material::counter = 0;
 

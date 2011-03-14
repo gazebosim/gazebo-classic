@@ -51,6 +51,8 @@ namespace Ogre
 
 namespace gazebo
 {
+	namespace rendering
+{
   /// \addtogroup gazebo_rendering
   /// \{
   
@@ -146,5 +148,6 @@ namespace gazebo
  
   /// \}
 
+}
 }
 #endif

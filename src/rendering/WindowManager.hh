@@ -29,6 +29,8 @@ namespace Ogre
 
 namespace gazebo
 {
+	namespace rendering
+{
   class RenderControl;
   class Camera;
 
@@ -61,5 +63,6 @@ namespace gazebo
     private: friend class DestroyerT<WindowManager>;
     private: friend class SingletonT<WindowManager>;
   };
+}
 }
 #endif

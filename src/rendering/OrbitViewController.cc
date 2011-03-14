@@ -22,6 +22,8 @@
 #include "OrbitViewController.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 static const float PITCH_LIMIT_LOW = 0.001;
 static const float PITCH_LIMIT_HIGH = M_PI - 0.001;
@@ -80,7 +82,7 @@ void OrbitViewController::HandleMouseEvent(const MouseEvent &event)
   if (!this->camera->GetUserMovable())
     return;
 
-  Vector2<int> drag = event.pos - event.prevPos;
+  Vector2i drag = event.pos - event.prevPos;
 
   Vector3 directionVec(0,0,0);
 

@@ -34,6 +34,8 @@ namespace Ogre
 
 namespace gazebo
 {
+	namespace rendering
+{
   class Light;
   class Visual;
   class Message;
@@ -120,10 +122,10 @@ namespace gazebo
     /// \param mousePos The position of the mouse in screen coordinates
     /// \return The selected entity, or NULL
     public: Common *GetEntityAt(Camera *camera, 
-                                Vector2<int> mousePos, std::string &mod);
+                                Vector2i mousePos, std::string &mod);
 
     /// \brief Get the world pos of a the first contact at a pixel location
-    public: Vector3 GetFirstContact(Camera *camera, Vector2<int> mousePos);
+    public: Vector3 GetFirstContact(Camera *camera, Vector2i mousePos);
 
             // NATY
     /// \brief Register a user camera
@@ -212,4 +214,5 @@ namespace gazebo
     private: transport::SubscriberPtr selection_sub;
   };
 };
+}
 #endif 

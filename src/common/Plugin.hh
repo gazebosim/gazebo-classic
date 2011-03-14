@@ -22,6 +22,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   class Event;
 
   class Plugin : public boost::signals::trackable
@@ -48,5 +50,6 @@ extern "C" gazebo::Plugin *RegisterPlugin(); \
 gazebo::Plugin *RegisterPlugin() \
 {\
   return new classname();\
+}
 }
 #endif

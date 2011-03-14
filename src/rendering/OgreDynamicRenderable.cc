@@ -20,6 +20,8 @@
 #include "OgreDynamicRenderable.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor

@@ -35,6 +35,8 @@
 #include "Light.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 unsigned int Light::lightCounter = 0;
 

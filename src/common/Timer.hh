@@ -27,6 +27,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   /// \brief A timer class
   class Timer
   {
@@ -54,4 +56,5 @@ namespace gazebo
 
 }
 
+}
 #endif

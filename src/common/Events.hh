@@ -21,6 +21,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   class Entity;
 
   namespace event
@@ -279,4 +281,5 @@ namespace gazebo
 }
 
 
+}
 #endif

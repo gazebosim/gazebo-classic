@@ -26,7 +26,7 @@
 #include "Model.hh"
 #include "Body.hh"
 #include "Pose3d.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Joint.hh"

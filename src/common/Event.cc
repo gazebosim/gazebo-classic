@@ -19,6 +19,8 @@
 #include "Event.hh"
 
 using namespace gazebo;
+using namespace common;
+
 using namespace event;
 
 ////////////////////////////////////////////////////////////////////////////////

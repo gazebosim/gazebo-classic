@@ -23,6 +23,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   class Material
   {
     public: enum ShadeMode{FLAT, GOURAUD, PHONG, SHADE_COUNT};
@@ -147,4 +149,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

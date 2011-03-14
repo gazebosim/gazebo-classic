@@ -18,7 +18,7 @@
 #define BOX_HH
 
 #include <iostream>
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 namespace gazebo
 {
@@ -53,7 +53,7 @@ namespace gazebo
       /// \brief Equal operator
       public: const Box &operator=( const Box &b );
 
-      public: friend std::ostream &operator<<( std::ostream &out, const gazebo::Box &b )
+      public: friend std::ostream &operator<<( std::ostream &out, const gazebo::common::Box &b )
       {
         out << "Min[" << b.min << "] Max[" << b.max << "]";
 

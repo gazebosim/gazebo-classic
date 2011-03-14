@@ -44,7 +44,7 @@ namespace gazebo
     private: virtual void CreateTheEntity();
     private: int state;
     private: bool leftMousePressed;
-    private: Vector2<int> mousePushPos;
+    private: Vector2i mousePushPos;
     private: msgs::Visual *visualMsg;
 
     private: static unsigned int counter;

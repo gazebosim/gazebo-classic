@@ -34,6 +34,8 @@ namespace Ogre
 
 namespace gazebo
 {
+	namespace rendering
+{
   class RenderControl;
   class XMLConfigNode;
   class Visual;
@@ -110,4 +112,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

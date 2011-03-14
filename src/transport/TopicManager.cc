@@ -39,7 +39,7 @@ void TopicManager::SendMessage( const std::string &topic,
   std::string out;
 
   // Stamp the message with the transport time
-  Message::SendStamp(message);
+  common::Message::SendStamp(message);
 
   if (!message.IsInitialized())
   {

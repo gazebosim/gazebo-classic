@@ -36,6 +36,8 @@
 #include "Camera.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 unsigned int Camera::cameraCounter = 0;
 
@@ -65,7 +67,7 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
   this->farClipP = new ParamT<double>("far_clip",100,0);
   this->saveFramesP = new ParamT<bool>("save_frames",false,0);
   this->savePathnameP = new ParamT<std::string>("save_frame_path","",0);
-  this->imageSizeP = new ParamT< Vector2<int> >("image_size", Vector2<int>(320, 240),0);
+  this->imageSizeP = new ParamT< Vector2i >("image_size", Vector2i(320, 240),0);
   this->visMaskP = new ParamT<std::string>("mask","none",0);
   this->hfovP = new ParamT<Angle>("hfov", Angle(DTOR(60)),0);
   this->imageFormatP = new ParamT<std::string>("image_format", "R8G8B8", 0);

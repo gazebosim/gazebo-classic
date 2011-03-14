@@ -31,6 +31,8 @@ set ( sources Messages.cc
               STLLoader.cc
               Time.cc
               Timer.cc
+              Vector2d.cc
+              Vector2i.cc
               Vector3.cc
               Vector4.cc
               XMLConfig.cc
@@ -68,7 +70,8 @@ set ( headers Messages.hh
               STLLoader.hh
               Time.hh
               Timer.hh
-              Vector2.hh
+              Vector2d.hh
+              Vector2i.hh
               Vector3.hh
               Vector4.hh
               XMLConfig.hh

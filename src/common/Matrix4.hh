@@ -19,10 +19,12 @@
 
 #include <iostream>
 
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "Matrix3.hh"
 
 namespace gazebo
+{
+	namespace common
 {
   class Matrix4
   {
@@ -65,5 +67,6 @@ namespace gazebo
 
     protected: double m[4][4];
   };
+}
 }
 #endif

@@ -22,6 +22,8 @@
 #include "Mesh.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -348,7 +350,7 @@ void SubMesh::AddNormal(double x, double y, double z )
 /// Add a texture coord to the mesh
 void SubMesh::AddTexCoord(double u, double v )
 {
-  this->texCoords.push_back( Vector2<double>(u,v) );
+  this->texCoords.push_back( Vector2d(u,v) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -393,7 +395,7 @@ void SubMesh::SetNormal(unsigned int i, const Vector3 &n)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a tex coord
-Vector2<double> SubMesh::GetTexCoord(unsigned int i) const
+Vector2d SubMesh::GetTexCoord(unsigned int i) const
 {
   if (i >= this->texCoords.size())
     gzthrow("Index too large");
@@ -403,7 +405,7 @@ Vector2<double> SubMesh::GetTexCoord(unsigned int i) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set a tex coord
-void SubMesh::SetTexCoord(unsigned int i, const Vector2<double> &t)
+void SubMesh::SetTexCoord(unsigned int i, const Vector2d &t)
 {
   if (i >= this->texCoords.size())
     gzthrow("Index too large");

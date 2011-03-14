@@ -33,6 +33,8 @@
 
 
 using namespace gazebo;
+using namespace common;
+
 
 Plugin::Plugin() {}
 Plugin::~Plugin() {}

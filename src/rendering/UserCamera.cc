@@ -38,6 +38,8 @@
 #include "UserCamera.hh"   
 
 using namespace gazebo;
+using namespace rendering;
+
 
 int UserCamera::count = 0;
 

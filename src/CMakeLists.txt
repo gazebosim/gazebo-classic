@@ -1,6 +1,6 @@
 add_subdirectory(msgs)
 add_subdirectory(transport)
-add_subdirectory(common)
+#add_subdirectory(common)
 #add_subdirectory(libgazebo)
 #add_subdirectory(rendering)
 #add_subdirectory(server)

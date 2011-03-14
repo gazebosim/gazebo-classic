@@ -20,7 +20,6 @@
  * SVN: $Id$
  */
 
-#include <assert.h>
 #include <float.h>
 #include <math.h>
 #include <string.h>
@@ -34,12 +33,14 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "Global.hh"
-#include "XMLConfig.hh"
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Global.hh"
+#include "common/XMLConfig.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 ////////////////////////////////////////////////////////////////////////////
 // Standard constructor
@@ -706,9 +707,9 @@ Color XMLConfigNode::GetColor( const std::string &key, Color def ) const
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a two dimensional double vector
-Vector2<double> XMLConfigNode::GetVector2d( const std::string &key, Vector2<double> def ) const
+Vector2d XMLConfigNode::GetVector2d( const std::string &key, Vector2d def ) const
 {
-  Vector2<double> v;
+  Vector2d v;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;
@@ -721,9 +722,9 @@ Vector2<double> XMLConfigNode::GetVector2d( const std::string &key, Vector2<doub
 
 ////////////////////////////////////////////////////////////////////////////
 // Get a two dimensional int vector
-Vector2<int> XMLConfigNode::GetVector2i( const std::string &key, Vector2<int> def ) const
+Vector2i XMLConfigNode::GetVector2i( const std::string &key, Vector2i def ) const
 {
-  Vector2<int> v;
+  Vector2i v;
 
   if (this->GetTupleString(key, 0, "") == "")
     return def;

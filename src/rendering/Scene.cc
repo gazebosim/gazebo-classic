@@ -36,6 +36,8 @@
 #include "Scene.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 unsigned int Scene::idCounter = 0;
 
@@ -392,7 +394,7 @@ UserCamera *Scene::GetUserCamera(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get an entity at a pixel location using a camera. Used for mouse picking. 
-Common *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &mod) 
+Common *Scene::GetEntityAt(Camera *camera, Vector2i mousePos, std::string &mod) 
 {
   /* NATY: put back in
   Common *entity = NULL;
@@ -481,7 +483,7 @@ Common *Scene::GetEntityAt(Camera *camera, Vector2<int> mousePos, std::string &m
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the world pos of a the first contact at a pixel location
-Vector3 Scene::GetFirstContact(Camera *camera, Vector2<int> mousePos)
+Vector3 Scene::GetFirstContact(Camera *camera, Vector2i mousePos)
 {
   Ogre::Camera *ogreCam = camera->GetCamera();
   Ogre::Real closest_distance = -1.0f;

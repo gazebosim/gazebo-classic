@@ -30,6 +30,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
 
 /// \addtogroup gazebo_server
 /// \brief Local configuration on this computer about how gazebo server should work 
@@ -86,4 +88,5 @@ namespace gazebo
 /// \}
 }
 
+}
 #endif

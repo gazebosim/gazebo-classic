@@ -23,6 +23,8 @@
 #include "Diagnostics.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 DiagnosticManager *DiagnosticTimer::diagManager = DiagnosticManager::Instance();
 

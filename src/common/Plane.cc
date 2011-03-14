@@ -17,13 +17,15 @@
 #include "Plane.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 Plane::Plane()
 {
   this->d = 0.0;
 }
 
-Plane::Plane(Vector3 normal, Vector2<double> size, double offset)
+Plane::Plane(Vector3 normal, Vector2d size, double offset)
 {
   this->Set(normal, size, offset);
 }
@@ -32,7 +34,7 @@ Plane::~Plane()
 {
 }
 
-void Plane::Set(Vector3 n, Vector2<double> s, double offset)
+void Plane::Set(Vector3 n, Vector2d s, double offset)
 {
   this->normal = n;
   this->size = s;

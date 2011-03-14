@@ -29,6 +29,8 @@
 #include "GazeboMessage.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 GazeboMessage *GazeboMessage::myself = NULL;
 

@@ -21,6 +21,8 @@
 #include "FPSViewController.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -48,7 +50,7 @@ void FPSViewController::HandleMouseEvent(const MouseEvent &event)
   if (!this->camera->GetUserMovable())
     return;
 
-  Vector2<int> drag = event.pos - event.prevPos;
+  Vector2i drag = event.pos - event.prevPos;
 
   Vector3 directionVec(0,0,0);
 

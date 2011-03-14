@@ -20,13 +20,15 @@
 #include "MessageTypes.hh"
 #include "XMLConfig.hh"
 #include "Color.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "Time.hh"
 #include "Pose3d.hh"
 #include "Plane.hh"
 #include "Box.hh"
 
 namespace gazebo
+{
+	namespace common
 {
   class Message
   {
@@ -76,4 +78,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

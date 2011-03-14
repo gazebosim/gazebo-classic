@@ -27,6 +27,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
 
   typedef boost::mt19937 GeneratorType;
   typedef boost::uniform_real<double> UniformRealDist;
@@ -72,4 +74,5 @@ namespace gazebo
   
 }
 
+}
 #endif

@@ -34,6 +34,8 @@
 #define COLOUR_BINDING     1
 
 using namespace gazebo;
+using namespace rendering;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor

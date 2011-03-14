@@ -40,4 +40,5 @@ enum RenderOpType
   RENDERING_MESH_RESOURCE = 6
 };
 
+}
 #endif

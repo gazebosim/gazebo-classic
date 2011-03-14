@@ -17,6 +17,8 @@
 #include "Events.hh"
 
 using namespace gazebo;
+using namespace common;
+
 using namespace event;
 
 EventT<void (bool)> Events::pauseSignal;

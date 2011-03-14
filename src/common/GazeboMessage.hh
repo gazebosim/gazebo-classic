@@ -33,18 +33,20 @@
 
 namespace gazebo
 {
+	namespace common
+{
 
   /// \addtogroup gazebo_server
   /// \brief Gazebo message class
   /// \{
 
   /// Output a message
-  #define gzmsg(level) (gazebo::GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
+  #define gzmsg(level) (gazebo::common::GazeboMessage::Instance()->Msg(level) << "[" << __FILE__ << ":" << __LINE__ << "]\n  ")
 
-  #define gzerr(level) (gazebo::GazeboMessage::Instance()->Err(level) << "\033[1;31m" << "Error: [" << __FILE__ << ":" << __LINE__ << "]" << "\033[0m" <<"\n")
+  #define gzerr(level) (gazebo::common::GazeboMessage::Instance()->Err(level) << "\033[1;31m" << "Error: [" << __FILE__ << ":" << __LINE__ << "]" << "\033[0m" <<"\n")
  
   /// Log a message
-  #define gzlog() (gazebo::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
+  #define gzlog() (gazebo::common::GazeboMessage::Instance()->Log() << "[" << __FILE__ << ":" << __LINE__ << "] ")
   
     class XMLConfigNode;
  
@@ -120,4 +122,5 @@ namespace gazebo
   /// \}
 }
 
+}
 #endif

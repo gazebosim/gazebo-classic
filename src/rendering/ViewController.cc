@@ -18,6 +18,8 @@
 #include "ViewController.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor

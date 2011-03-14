@@ -21,7 +21,7 @@
  */
 
 #include <math.h>
-#include "Angle.hh"
+#include "common/Angle.hh"
 
 using namespace gazebo;
 using namespace common;

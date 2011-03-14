@@ -26,9 +26,11 @@
 #include <Ogre.h>
 
 #include "Vector2.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 namespace gazebo
+{
+	namespace rendering
 {
   class Scene;
 
@@ -66,4 +68,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

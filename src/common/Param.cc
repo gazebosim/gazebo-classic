@@ -24,10 +24,12 @@
 #include "Param.hh"
 #include "Quatern.hh"
 #include "Pose3d.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "Vector4.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 std::vector<Param*> *Param::params = NULL;
 

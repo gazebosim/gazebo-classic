@@ -19,6 +19,8 @@
 
 namespace gazebo
 {
+	namespace rendering
+{
   class UserCamera;
   class MouseEvent;
 
@@ -37,5 +39,6 @@ namespace gazebo
 
     protected: UserCamera *camera; 
   };
+}
 }
 #endif

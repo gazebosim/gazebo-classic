@@ -21,23 +21,26 @@
 
 namespace gazebo
 {
-  class FPSViewController : public ViewController
+	namespace rendering
   {
-    /// \brief Constructor
-    public: FPSViewController(UserCamera *camera);
-
-    /// \brief Destructor
-    public: virtual ~FPSViewController();
-
-    /// \brief Update
-    public: virtual void Update();
-
-    /// \brief Get the type name of this view controller
-    public: static std::string GetTypeString() {return "FPSViewController";}
-
-    /// \brief Handle a mouse event
-    public: virtual void HandleMouseEvent(const MouseEvent &event);
-
-  };
+    class FPSViewController : public ViewController
+    {
+      /// \brief Constructor
+      public: FPSViewController(UserCamera *camera);
+  
+      /// \brief Destructor
+      public: virtual ~FPSViewController();
+  
+      /// \brief Update
+      public: virtual void Update();
+  
+      /// \brief Get the type name of this view controller
+      public: static std::string GetTypeString() {return "FPSViewController";}
+  
+      /// \brief Handle a mouse event
+      public: virtual void HandleMouseEvent(const MouseEvent &event);
+  
+    };
+  }
 }
 #endif

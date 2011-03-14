@@ -25,6 +25,8 @@
 #include "RenderState.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 bool RenderState::showLights = false;
 bool RenderState::showJoints = false;

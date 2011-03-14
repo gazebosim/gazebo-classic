@@ -20,6 +20,8 @@
 #include "Messages.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 const google::protobuf::FieldDescriptor *Message::GetFD(google::protobuf::Message &message, const std::string &name)
 {
@@ -220,7 +222,7 @@ Time Message::Convert(const msgs::Time &t)
 Plane Message::Convert(const msgs::Plane &p)
 {
   return Plane(Message::Convert(p.normal()), 
-               Vector2<double>(p.size_x(), p.size_y()),
+               Vector2d(p.size_x(), p.size_y()),
                p.d() );
 }
 

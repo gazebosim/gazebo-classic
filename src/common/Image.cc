@@ -29,12 +29,14 @@
 
 //#include <GL/gl.h>
 
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "GazeboMessage.hh"
 #include "Image.hh"
 #include "GazeboConfig.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 int Image::count = 0;
 

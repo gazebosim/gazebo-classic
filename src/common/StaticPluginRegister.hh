@@ -34,4 +34,5 @@ struct StaticPluginRegister
     (*initFunc)();
   }
 };
+}
 #endif 

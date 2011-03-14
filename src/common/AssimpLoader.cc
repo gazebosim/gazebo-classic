@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#include "GazeboError.hh"
-#include "GazeboMessage.hh"
-#include "Mesh.hh"
-#include "Material.hh"
-#include "AssimpLoader.hh"
 #include <sys/stat.h>
+
+#include "common/GazeboError.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Mesh.hh"
+#include "common/Material.hh"
+#include "common/AssimpLoader.hh"
 
 using namespace gazebo;
 using namespace common;

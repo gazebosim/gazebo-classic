@@ -27,6 +27,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
 
 #define DIAG_TIMER(name) DiagnosticManager::Instance()->CreateTimer(name);
 
@@ -101,4 +103,5 @@ namespace gazebo
 
 }
  
+}
 #endif

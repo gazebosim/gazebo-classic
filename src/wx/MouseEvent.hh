@@ -33,10 +33,10 @@ namespace gazebo
               camera(NULL)
             {}
 
-    public: Vector2<int> pos; 
-    public: Vector2<int> prevPos;
-    public: Vector2<int> pressPos; 
-    public: Vector2<int> scroll; 
+    public: Vector2i pos; 
+    public: Vector2i prevPos;
+    public: Vector2i pressPos; 
+    public: Vector2i scroll; 
 
     public: float moveScale;
 

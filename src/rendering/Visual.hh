@@ -30,7 +30,7 @@
 #include "RenderTypes.hh"
 #include "Pose3d.hh"
 #include "Quatern.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "Common.hh"
 #include "Param.hh"
 #include "Messages.hh"
@@ -50,6 +50,8 @@ namespace boost
 }
 
 namespace gazebo
+{
+	namespace rendering
 { 
 
   class XMLConfigNode;
@@ -256,7 +258,7 @@ namespace gazebo
     private: ParamT<std::string> *shaderP;
     private: ParamT<bool> *castShadowsP;
     private: ParamT<Vector3> *scaleP;
-    private: ParamT<Vector2<double> > *meshTileP;
+    private: ParamT<Vector2d > *meshTileP;
 
     // NATY
     //private: boost::recursive_mutex *mutex;
@@ -277,4 +279,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

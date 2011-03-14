@@ -31,6 +31,8 @@
 #include "MeshManager.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -44,9 +46,9 @@ MeshManager::MeshManager()
   this->CreateSphere("unit_sphere",1.0, 32, 32);
   this->CreateSphere("joint_anchor",0.01, 32, 32);
   this->CreateBox("body_cg", Vector3(0.014,0.014,0.014), 
-                             Vector2<double>(0.014,0.014));
+                             Vector2d(0.014,0.014));
   this->CreateBox("unit_box_U1V1", Vector3(1,1,1), 
-                             Vector2<double>(1,1));
+                             Vector2d(1,1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
@@ -313,7 +315,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 ////////////////////////////////////////////////////////////////////////////////
 // Create a plane
 void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
-    const Vector2<double> &segments, const Vector2<double> uvTile)
+    const Vector2d &segments, const Vector2d uvTile)
 {
   this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
 }
@@ -322,8 +324,8 @@ void MeshManager::CreatePlane(const std::string &name, const Plane &plane,
 // This function was taken from OGRE:
 // Copyright (c) 2000-2009 Torus Knot Software Ltd
 void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal, 
-    double d, const Vector2<double> &size, const Vector2<double> &segments,
-    const Vector2<double> uvTile)
+    double d, const Vector2d &size, const Vector2d &segments,
+    const Vector2d uvTile)
 {
   if (this->HasMesh(name))
   {
@@ -389,7 +391,7 @@ void MeshManager::CreatePlane(const std::string &name, const Vector3 &normal,
 ////////////////////////////////////////////////////////////////////////////////
 /// Create a Box mesh
 void MeshManager::CreateBox(const std::string &name, const Vector3 &sides,
-                            const Vector2<double> &uvCoords)
+                            const Vector2d &uvCoords)
 {
   int i,k;
 

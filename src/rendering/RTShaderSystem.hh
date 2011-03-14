@@ -29,12 +29,15 @@
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
 #include <RTShaderSystem/OgreRTShaderSystem.h>
+}
 #endif
 
 #include "Camera.hh"
 #include "SingletonT.hh"
 
 namespace gazebo
+{
+	namespace rendering
 {
   class Visual;
   class Scene;
@@ -93,6 +96,7 @@ namespace gazebo
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
     private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
     private: std::list<Visual*> entities;
+}
 #endif
 
     private: bool initialized;
@@ -105,4 +109,5 @@ namespace gazebo
 
 }
 
+}
 #endif

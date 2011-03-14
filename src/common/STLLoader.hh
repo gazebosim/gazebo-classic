@@ -29,6 +29,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   /// \brief Class used to load STL mesh files
   class STLLoader : public MeshLoader
   {
@@ -65,4 +67,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

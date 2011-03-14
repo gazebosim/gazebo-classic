@@ -30,6 +30,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   class Logger : public SingletonT<Logger>
   {
     /// \brief Constructor
@@ -67,5 +69,6 @@ namespace gazebo
     private: friend class DestroyerT<Logger>;
     private: friend class SingletonT<Logger>;
   };
+}
 }
 #endif

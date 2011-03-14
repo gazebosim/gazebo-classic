@@ -31,6 +31,8 @@
 #include "OgreHeightmap.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor

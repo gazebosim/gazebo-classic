@@ -20,6 +20,8 @@
 #include "Matrix4.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 const Matrix4 Matrix4::IDENTITY(
        1.0, 0.0, 0.0, 0.0,

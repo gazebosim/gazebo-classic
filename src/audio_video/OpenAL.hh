@@ -27,7 +27,7 @@
 #include <string>
 
 #include "gazebo_config.h"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 #ifdef HAVE_OPENAL
 struct ALCcontext_struct;

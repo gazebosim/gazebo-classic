@@ -30,6 +30,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   class Image
   {
     /// \brief Constructor
@@ -94,4 +96,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

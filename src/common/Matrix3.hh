@@ -17,9 +17,11 @@
 #ifndef MATRIX3_HH
 #define MATRIX3_HH
 
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 namespace gazebo
+{
+	namespace common
 {
   class Matrix3
   {
@@ -40,5 +42,6 @@ namespace gazebo
     protected: double m[3][3];
     friend class Matrix4;
   };
+}
 }
 #endif

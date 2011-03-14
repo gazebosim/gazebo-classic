@@ -25,6 +25,8 @@
 #include "Time.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 // Constructors
 Time::Time()

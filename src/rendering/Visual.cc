@@ -37,6 +37,8 @@
 #include "Visual.hh"
 
 using namespace gazebo;
+using namespace rendering;
+
 
 SelectionObj *Visual::selectionObj = 0;
 unsigned int Visual::visualCounter = 0;
@@ -138,8 +140,8 @@ void Visual::Init()
   this->rpyP->Callback( &Visual::SetRotation, this );
 
   this->meshNameP = new ParamT<std::string>("mesh","",1);
-  this->meshTileP = new ParamT< Vector2<double> >("uvTile", 
-                                Vector2<double>(1.0, 1.0), 0 );
+  this->meshTileP = new ParamT< Vector2d >("uvTile", 
+                                Vector2d(1.0, 1.0), 0 );
  
   //default to Gazebo/White
   this->materialNameP = new ParamT<std::string>("material",
@@ -171,8 +173,8 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
   {
     Plane plane = Message::Convert(msg->plane());
     MeshManager::Instance()->CreatePlane(msg->header().str_id(), plane,
-        Vector2<double>(2,2), 
-        Vector2<double>(msg->uv_tile_x(), msg->uv_tile_y()) );
+        Vector2d(2,2), 
+        Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
     mesh = msg->header().str_id();
   }
 

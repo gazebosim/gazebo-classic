@@ -26,6 +26,8 @@
 
 namespace gazebo
 {
+	namespace rendering
+{
   class RenderState 
   {
     private: RenderState();
@@ -59,5 +61,6 @@ namespace gazebo
     private: static RenderState *self;
     private: std::vector<event::ConnectionPtr> connections;
   };
+}
 }
 #endif

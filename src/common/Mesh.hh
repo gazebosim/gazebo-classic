@@ -20,9 +20,11 @@
 #include <vector>
 
 #include "Vector2.hh"
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 namespace gazebo
+{
+	namespace common
 {
   class Material;
   class SubMesh;
@@ -137,10 +139,10 @@ namespace gazebo
     public: void SetNormal(unsigned int i, const Vector3 &n);
 
     /// \brief Get a tex coord
-    public: Vector2<double> GetTexCoord(unsigned int i) const;
+    public: Vector2d GetTexCoord(unsigned int i) const;
 
     /// \brief Set a tex coord
-    public: void SetTexCoord(unsigned int i, const Vector2<double> &t);
+    public: void SetTexCoord(unsigned int i, const Vector2d &t);
 
     /// \brief Get an index
     public: unsigned int GetIndex(unsigned int i) const;
@@ -192,7 +194,7 @@ namespace gazebo
 
     private: std::vector< Vector3 > vertices;
     private: std::vector< Vector3 > normals;
-    private: std::vector< Vector2<double> > texCoords;
+    private: std::vector< Vector2d > texCoords;
     private: std::vector<unsigned int> indices;
 
 
@@ -200,4 +202,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

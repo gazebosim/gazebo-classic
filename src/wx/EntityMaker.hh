@@ -17,7 +17,7 @@
 #ifndef ENTITYMAKER_HH
 #define ENTITYMAKER_HH
 
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 namespace gazebo
 {

@@ -26,6 +26,8 @@
 #include "GazeboError.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 unsigned int Common::idCounter = 0;
 

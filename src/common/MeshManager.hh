@@ -20,11 +20,13 @@
 #include <map>
 #include <string>
 
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "Vector2.hh"
 #include "SingletonT.hh"
 
 namespace gazebo
+{
+	namespace common
 {
   class OgreLoader;
   class AssimpLoader;
@@ -73,7 +75,7 @@ namespace gazebo
   
     /// \brief Create a Box mesh
     public: void CreateBox(const std::string &name, const Vector3 &sides,
-                           const Vector2<double> &uvCoords);
+                           const Vector2d &uvCoords);
   
     /// \brief Create a cylinder mesh
     public: void CreateCylinder(const std::string &name, float radius, 
@@ -89,13 +91,13 @@ namespace gazebo
                             int segments);
 
     public: void CreatePlane(const std::string &name, const Plane &plane,
-                             const Vector2<double> &segments, 
-                             const Vector2<double> uvTile);
+                             const Vector2d &segments, 
+                             const Vector2d uvTile);
 
     public: void CreatePlane(const std::string &name, const Vector3 &normal, 
-                             double d, const Vector2<double> &size, 
-                             const Vector2<double> &segments,
-                             const Vector2<double> uvTile);
+                             double d, const Vector2d &size, 
+                             const Vector2d &segments,
+                             const Vector2d uvTile);
 
     private: void Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
                                   bool doubleSided);
@@ -115,5 +117,6 @@ namespace gazebo
     private: friend class DestroyerT<MeshManager>;
     private: friend class SingletonT<MeshManager>;
   };
+}
 }
 #endif

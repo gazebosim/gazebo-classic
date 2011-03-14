@@ -23,12 +23,14 @@
 #ifndef OGREDYNAMICLINES_HH
 #define OGREDYNAMICLINES_HH
 
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 #include "OgreDynamicRenderable.hh"
 
 #include <vector>
 
 namespace gazebo
+{
+	namespace rendering
 {
 
 /// \addtogroup gazebo_rendering
@@ -81,5 +83,6 @@ class OgreDynamicLines : public OgreDynamicRenderable
 };
 
 /// \}
+}
 }
 #endif

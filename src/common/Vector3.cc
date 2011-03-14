@@ -21,10 +21,11 @@
  */
 
 #include <math.h>
-
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor

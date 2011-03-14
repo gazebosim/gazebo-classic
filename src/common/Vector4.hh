@@ -28,6 +28,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
 /// \addtogroup gazebo_server
 /// \brief Generic x,y,z,w vector 
 /// \{
@@ -156,4 +158,5 @@ class Vector4
 /// \}
 }
 
+}
 #endif

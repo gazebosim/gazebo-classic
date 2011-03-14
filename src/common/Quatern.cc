@@ -17,12 +17,13 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
 #include <math.h>
-#include "Quatern.hh"
+#include "common/Quatern.hh"
 
 using namespace gazebo;
+using namespace common;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Default Constructor

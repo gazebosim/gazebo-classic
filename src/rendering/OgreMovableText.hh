@@ -35,6 +35,8 @@ namespace boost
 
 namespace gazebo
 {
+	namespace rendering
+{
   /// \brief Movable text
   class OgreMovableText : public Ogre::MovableObject, public Ogre::Renderable
   {
@@ -179,4 +181,5 @@ namespace gazebo
   };
 }
 
+}
 #endif

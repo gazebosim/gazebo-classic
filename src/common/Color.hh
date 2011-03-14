@@ -24,7 +24,7 @@
 #define COLOR_HH
 
 #include <iostream>
-#include "Vector3.hh"
+#include "common/Vector3.hh"
 
 #include <OGRE/OgreColourValue.h>
 
@@ -144,5 +144,4 @@ namespace gazebo
     };
   }
 }
-
 #endif

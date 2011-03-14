@@ -32,6 +32,8 @@
 
 namespace gazebo
 {
+	namespace common
+{
   class Common
   {
     /// \brief Constructor
@@ -177,5 +179,5 @@ namespace gazebo
   };
 }
 
+}
 #endif
-

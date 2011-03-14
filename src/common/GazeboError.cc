@@ -24,6 +24,8 @@
 #include "GazeboError.hh"
 
 using namespace gazebo;
+using namespace common;
+
 using namespace std;
 
 

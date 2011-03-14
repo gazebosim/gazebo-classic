@@ -17,26 +17,28 @@
 #ifndef PLANE_HH
 #define PLANE_HH
 
-#include "Vector3.hh"
-#include "Vector2.hh"
+#include "common/Vector3.hh"
+#include "common/Vector2d.hh"
 
 namespace gazebo
 {
-  class Plane
+	namespace common
   {
-    public: Plane();
-    public: Plane(Vector3 normal, Vector2<double> size, double offset);
-    public: virtual ~Plane();
-
-    public: void Set(Vector3 normal, Vector2<double> size, double offset);
-
-    /// \brief Equal operator
-    public: const Plane &operator=(const Plane & p);
-
-    public: Vector3 normal;
-    public: Vector2<double> size;
-    public: double d;
-  };
+    class Plane
+    {
+      public: Plane();
+      public: Plane(Vector3 normal, Vector2d size, double offset);
+      public: virtual ~Plane();
+  
+      public: void Set(Vector3 normal, Vector2d size, double offset);
+  
+      /// \brief Equal operator
+      public: const Plane &operator=(const Plane & p);
+  
+      public: Vector3 normal;
+      public: Vector2d size;
+      public: double d;
+    };
+  }
 }
-
 #endif

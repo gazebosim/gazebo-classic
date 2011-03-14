@@ -23,6 +23,8 @@
 
 namespace gazebo
 {
+	namespace rendering
+{
 
 /// \addtogroup gazebo_rendering
 /// \{
@@ -94,5 +96,6 @@ class OgreDynamicRenderable : public Ogre::SimpleRenderable
 };
 
 /// \}
+}
 }
 #endif
