@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include "Material.hh"
-#include <Ogre.h>
 
 using namespace gazebo;
 
@@ -81,7 +80,7 @@ void Material::SetTextureImage(const std::string tex)
 // Set a texture image with resource_path
 void Material::SetTextureImage(const std::string tex,const std::string resource_path)
 {
-  Ogre::ResourceGroupManager::getSingleton().addResourceLocation( resource_path, "FileSystem", "General");
+  //Ogre::ResourceGroupManager::getSingleton().addResourceLocation( resource_path, "FileSystem", "General");
   this->texImage = tex;
 
   this->Update();
@@ -241,7 +240,7 @@ double Material::GetPointSize() const
 ////////////////////////////////////////////////////////////////////////////////
 void Material::Update()
 {
-  Ogre::MaterialPtr matPtr;
+  /*Ogre::MaterialPtr matPtr;
 
   if (Ogre::MaterialManager::getSingleton().resourceExists(this->GetName()))
     matPtr = Ogre::MaterialManager::getSingleton().getByName(
@@ -271,5 +270,6 @@ void Material::Update()
     Ogre::TextureUnitState *texState = pass->createTextureUnitState();
     texState->setTextureName( this->GetTextureImage() );
   }
+  */
 }
 

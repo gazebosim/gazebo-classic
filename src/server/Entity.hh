@@ -35,6 +35,9 @@
 
 namespace gazebo
 {
+  class World;
+  class Model;
+
   namespace msgs
   {
     class Visual;
@@ -133,6 +136,17 @@ namespace gazebo
     /// Register a visual
     public: void RegisterVisual();
 
+    /// \brief Set the world this object belongs to. This will also 
+    ///        set the world for all children
+    public: void SetWorld(World *newWorld);
+
+    /// \brief Get the world this object is in
+    public: World *GetWorld() const;
+
+    /// \brief Get the parent model, if one exists
+    /// \return Pointer to a model, or NULL if no parent model exists
+    public: Model *GetParentModel() const;
+
     /// \brief This function is called when the entity's (or one of its parents)
     ///        pose of the parent has changed
     protected: virtual void OnPoseChange() {}
@@ -149,6 +163,8 @@ namespace gazebo
     private: Pose3d relativePose;
     private: transport::PublisherPtr pose_pub;
     protected: transport::PublisherPtr vis_pub;
+
+    private: World *world;
   };
   
   /// \}

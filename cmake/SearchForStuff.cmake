@@ -57,25 +57,7 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(TBB tbb)
   IF (NOT TBB_FOUND)
     BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
-  ELSE (NOT TBB_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${TBB_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${TBB_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${TBB_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${TBB_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                          ${gazeboserver_ldflags_desc} 
-                          ${TBB_LDFLAGS})
   ENDIF (NOT TBB_FOUND)
-
-
 
   #################################################
   # Find ODE
@@ -85,22 +67,6 @@ if (PKG_CONFIG_FOUND)
     SET (INCLUDE_ODE FALSE CACHE BOOL "Include support for ODE")
   ELSE (NOT ODE_FOUND)
     SET (INCLUDE_ODE TRUE CACHE BOOL "Include support for ODE")
-  
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${ODE_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${ODE_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${ODE_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                          ${gazeboserver_ldflags_desc} 
-                          ${ODE_LDFLAGS})
   ENDIF (NOT ODE_FOUND)
 
   #################################################
@@ -133,81 +99,22 @@ if (PKG_CONFIG_FOUND)
       
   endif (OGRE-RTShaderSystem_FOUND)
 
-
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
-
-  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                        ${gazeboserver_include_dirs_desc} 
-                        ${ogre_include_dirs})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                        ${gazeboserver_link_dirs_desc} 
-                        ${ogre_library_dirs})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
-                        ${ogre_link_libs})
-  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                        ${gazeboserver_link_libs_desc} 
-                        ${ogre_libraries})
-  APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
-                        ${gazeboserver_ldflags_desc} 
-                        ${ogre_ldflags})
-  APPEND_TO_CACHED_LIST(gazeboserver_cflags 
-                        ${gazeboserver_cflags_desc} 
-                        ${ogre_cflags})
 
   #################################################
   # Find GTK
   pkg_check_modules(GTK2 gtk+-2.0)
-  IF (NOT GTK2_FOUND)
+  if (NOT GTK2_FOUND)
     BUILD_ERROR("Missing: gtk+-2.0")
-  ELSE (NOT GTK2_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${GTK2_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${GTK2_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${GTK2_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${GTK2_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
-                          ${gazeboserver_ldflags_desc} 
-                          ${GTK2_LDFLAGS})
-    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
-                          ${gazeboserver_cflags_desc} 
-                          ${GTK2_CFLAGS})
-  ENDIF (NOT GTK2_FOUND)
+  endif (NOT GTK2_FOUND)
 
 
   #################################################
   # Find XML
   pkg_check_modules(XML libxml-2.0)
-  IF (NOT XML_FOUND)
+  if (NOT XML_FOUND)
     BUILD_ERROR("Missing: libxml2(http://www.xmlsoft.org)")
-  ELSE (NOT XML_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${XML_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${XML_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XML_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XML_LIBRARIES})
-    APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
-                          ${gazeboserver_ldflags_desc} 
-                          ${XML_LDFLAGS})
-    APPEND_TO_CACHED_LIST(gazeboserver_cflags 
-                          ${gazeboserver_cflags_desc} 
-                          ${XML_CFLAGS})
-
-  ENDIF (NOT XML_FOUND)
+  endif (NOT XML_FOUND)
 
 
   ########################################
@@ -215,61 +122,23 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(XPM xpm)
   if (NOT XPM_FOUND)
     BUILD_ERROR("Missing: libXpm(http://cgit.freedesktop.org/xorg/lib/libXpm)")
-  else (NOT XPM_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${XPM_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${XPM_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XPM_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${XPM_LIBRARIES})
   endif (NOT XPM_FOUND)
 
 
   ########################################
   # Find OpenAL
-  #pkg_check_modules(OAL openal)
-  #if (NOT OAL_FOUND)
-  #  BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
-  #else (NOT OAL_FOUND)
-  #  set (HAVE_OPENAL TRUE)
-  #  APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-  #                        ${gazeboserver_include_dirs_desc} 
-  #                        ${OAL_INCLUDE_DIRS})
-  #  APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-  #                        ${gazeboserver_link_dirs_desc} 
-  #                        ${OAL_LIBRARY_DIRS})
-  #  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-  #                        ${gazeboserver_link_libs_desc} 
-  #                        ${OAL_LINK_LIBS})
-  #  APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-  #                        ${gazeboserver_link_libs_desc} 
-  #                        ${OAL_LIBRARIES})
-  #endif (NOT OAL_FOUND)
+  pkg_check_modules(OAL openal)
+  if (NOT OAL_FOUND)
+    BUILD_WARNING ("Openal not found. Audio capabilities will be disabled.")
+  else (NOT OAL_FOUND)
+    set (HAVE_OPENAL TRUE)
+  endif (NOT OAL_FOUND)
 
   ########################################
   # Find AV format
   pkg_check_modules(AVF libavformat)
   if (NOT AVF_FOUND)
     BUILD_WARNING ("libavformat not found. Audio capabilities will be disabled.")
-  else (NOT AVF_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${AVF_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${AVF_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVF_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVF_LIBRARIES})
   endif (NOT AVF_FOUND)
 
   ########################################
@@ -277,24 +146,11 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(AVC libavcodec)
   if (NOT AVC_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio capabilities will be disabled.")
-  else (NOT AVC_FOUND)
-    APPEND_TO_CACHED_LIST(gazeboserver_include_dirs 
-                          ${gazeboserver_include_dirs_desc} 
-                          ${AVC_INCLUDE_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_dirs 
-                          ${gazeboserver_link_dirs_desc} 
-                          ${AVC_LIBRARY_DIRS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVC_LINK_LIBS})
-    APPEND_TO_CACHED_LIST(gazeboserver_link_libs 
-                          ${gazeboserver_link_libs_desc} 
-                          ${AVC_LIBRARIES})
   endif (NOT AVC_FOUND)
 
-  IF (AVF_FOUND AND AVC_FOUND)
-    SET (HAVE_FFMPEG TRUE)
-  ENDIF (AVF_FOUND AND AVC_FOUND)
+  if (AVF_FOUND AND AVC_FOUND)
+    set (HAVE_FFMPEG TRUE)
+  endif (AVF_FOUND AND AVC_FOUND)
 
   ########################################
   # Find Player
@@ -564,10 +420,6 @@ if (NOT bullet_include_dirs AND NOT bullet_library_dirs AND NOT bullet_lflags )
     message (STATUS "Looking for libBulletSoftBody - found")
     APPEND_TO_CACHED_List(bullet_lflags "bullet libraries Use this to override automatic detection." -lBulletSoftBody)
   endif (NOT bullet_softbody_library)
-
-  APPEND_TO_CACHED_LIST(gazeboserver_ldflags
-                        ${gazeboserver_ldflags_desc} 
-                        ${bullet_lflags})
 
   if (NOT bullet_include_dir OR NOT bullet_dynamics_library)
     set (INCLUDE_BULLET OFF CACHE BOOL "Include Bullet" FORCE)

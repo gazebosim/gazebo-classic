@@ -21,7 +21,6 @@
 #include <unistd.h>
 #include <list>
 
-#include "Simulator.hh"
 #include "GazeboConfig.hh"
 #include "GazeboError.hh"
 #include "Plugin.hh"
@@ -59,7 +58,7 @@ Plugin *Plugin::Create(const std::string &filename, const std::string &shortname
   bool found = false;
   std::string fullname;
   std::list<std::string>::iterator iter;
-  std::list<std::string> pluginPaths= Simulator::Instance()->GetGazeboConfig()->GetPluginPaths();
+  std::list<std::string> pluginPaths= GazeboConfig::Instance()->GetPluginPaths();
 
   for (iter=pluginPaths.begin(); iter!=pluginPaths.end(); ++iter)
   {

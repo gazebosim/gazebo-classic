@@ -1,22 +1,16 @@
-INCLUDE_DIRECTORIES(
-  ${OAL_INCLUDE_DIRS}
-)
+include_directories( ${OAL_INCLUDE_DIRS} )
 
-LINK_DIRECTORIES(
-  ${OAL_LIBRARY_DIRS}
-)
+link_directories( ${OAL_LIBRARY_DIRS} )
 
-SET (sources AudioDecoder.cc
+set (sources AudioDecoder.cc
              OpenAL.cc
 )
 
-SET (headers AudioDecoder.hh
+set (headers AudioDecoder.hh
              OpenAL.hh
 )
 
-#ADD_LIBRARY(gazebo_av STATIC ${sources})
-ADD_LIBRARY(gazebo_av-shared SHARED ${sources})
-
+add_library(gazebo_av SHARED ${sources})
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
@@ -25,11 +19,8 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
+target_link_libraries(gazebo_av ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 
-#TARGET_LINK_LIBRARIES(gazebo_av ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES})
-target_link_libraries(gazebo_av-shared ${OAL_LIBRARIES} ${AVC_LIBRARIES} ${AVF_LIBRARIES} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
+set_target_properties(gazebo_av PROPERTIES OUTPUT_NAME "gazebo_av" VERSION ${GAZEBO_VERSION})
 
-#SET_TARGET_PROPERTIES(gazebo_av PROPERTIES OUTPUT_NAME "gazebo_av")
-set_target_properties(gazebo_av-shared PROPERTIES OUTPUT_NAME "gazebo_av" VERSION ${GAZEBO_VERSION})
-
-INSTALL (TARGETS gazebo_av-shared DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install (TARGETS gazebo_av DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

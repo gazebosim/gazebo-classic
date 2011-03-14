@@ -17,17 +17,20 @@
 #ifndef MESSAGES_HH
 #define MESSAGES_HH
 
-#include "msgs/visual.pb.h"
-#include "msgs/insert_model.pb.h"
-#include "msgs/selection.pb.h"
-#include "msgs/color.pb.h"
-#include "msgs/pose.pb.h"
-#include "msgs/point.pb.h"
-#include "msgs/header.pb.h"
-#include "msgs/light.pb.h"
-#include "msgs/plane.pb.h"
-#include "msgs/quaternion.pb.h"
-#include "msgs/time.pb.h"
+#include "visual.pb.h"
+#include "insert_model.pb.h"
+#include "selection.pb.h"
+#include "color.pb.h"
+#include "pose.pb.h"
+#include "point.pb.h"
+#include "header.pb.h"
+#include "light.pb.h"
+#include "plane.pb.h"
+#include "quaternion.pb.h"
+#include "time.pb.h"
+#include "shadows.pb.h"
+#include "fog.pb.h"
+#include "scene.pb.h"
 
 #include "XMLConfig.hh"
 #include "Color.hh"
@@ -75,8 +78,8 @@ namespace gazebo
       static msgs::Light      LightFromXML(XMLConfigNode *node);
       static msgs::Visual     VisualFromXML(XMLConfigNode *node);
       static msgs::Shadows    ShadowsFromXML(XMLConfigNode *node);
-      static msgs::Visual     FogFromXML(XMLConfigNode *node);
-      static msgs::Visual     SceneFromXML(XMLConfigNode *node);
+      static msgs::Fog     FogFromXML(XMLConfigNode *node);
+      static msgs::Scene     SceneFromXML(XMLConfigNode *node);
 
     private:
       static void Stamp(msgs::Header &, const std::string &type);

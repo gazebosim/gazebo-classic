@@ -21,10 +21,7 @@
  * SVN: $Id$
  */
 
-#include "World.hh"
 #include "Common.hh"
-#include "Model.hh"
-#include "World.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 
@@ -37,12 +34,7 @@ unsigned int Common::idCounter = 0;
 Common::Common(Common *parent)
  : parent(parent)
 {
-  this->world = NULL;
-
   this->AddType(COMMON);
-
-  if (this->parent)
-    this->world = this->parent->GetWorld();
 
   this->id = ++idCounter;
 
@@ -295,11 +287,7 @@ std::string Common::GetScopedName() const
 
   while (p)
   {
-    if (p && p->HasType(MODEL))
-    {
-      Model *m = (Model*)p;
-      scopedName.insert(0, m->GetName()+"::");
-    }
+    scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
 
@@ -406,37 +394,6 @@ bool Common::SetSelected( bool s )
 bool Common::IsSelected() const
 {
   return this->selected;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the parent model, if one exists
-Model *Common::GetParentModel() const
-{
-  Common *p = this->parent;
-
-  while (p && p->HasType(MODEL))
-    p = p->GetParent();
-
-  return (Model*)p;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the world this object belongs to. This will also set the world for all 
-/// children
-void Common::SetWorld(World *newWorld)
-{
-  this->world = newWorld;
-
-  for (unsigned int i=0; i < this->children.size(); i++)
-    this->children[i]->SetWorld(this->world);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the world this object is in
-World *Common::GetWorld() const
-{
-  return this->world;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -28,13 +28,10 @@
 
 #include "RenderTypes.hh"
 #include "GazeboError.hh"
-#include "Model.hh"
-#include "Body.hh"
 #include "Events.hh"
 #include "Scene.hh"
 #include "RTShaderSystem.hh"
 #include "Global.hh"
-#include "RenderControl.hh"
 #include "Camera.hh"
 #include "Visual.hh"
 #include "OgreDynamicLines.hh"
@@ -308,7 +305,7 @@ void UserCamera::ShowVisual(bool s)
 
 //////////////////////////////////////////////////////////////////////////////
 // Move the camera to focus on an entity
-void UserCamera::MoveToEntity(Entity *entity)
+void UserCamera::MoveToEntity(Common *entity)
 {
   if (!entity)
     return;
@@ -379,7 +376,7 @@ void UserCamera::MoveToEntity(Entity *entity)
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set the camera to track an entity
-void UserCamera::TrackModel( Model *model )
+void UserCamera::TrackModel( Common *model )
 {
   /* NATY: Put back in
   this->sceneNode->getParent()->removeChild(this->sceneNode);

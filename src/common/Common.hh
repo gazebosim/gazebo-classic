@@ -32,9 +32,6 @@
 
 namespace gazebo
 {
-  class Model;
-  class World;
-
   class Common
   {
     /// \brief Constructor
@@ -125,17 +122,6 @@ namespace gazebo
     /// \brief Get the leaf type (last type set)
     public: EntityType GetLeafType() const;
 
-    /// \brief Get the parent model, if one exists
-    /// \return Pointer to a model, or NULL if no parent model exists
-    public: Model *GetParentModel() const;
-
-    /// \brief Set the world this object belongs to. This will also 
-    ///        set the world for all children
-    public: void SetWorld(World *newWorld);
-
-    /// \brief Get the world this object is in
-    public: World *GetWorld() const;
-
     /// \brief Return the name of this entity with the model scope
     ///        model1::...::modelN::entityName
     public: std::string GetScopedName() const;
@@ -184,8 +170,6 @@ namespace gazebo
     protected: std::vector< Common* > children;
  
     private: std::vector< EntityType > type;
-
-    private: World *world;
 
     private: bool selected;
 

@@ -19,7 +19,6 @@
  * Date: 22 Nov 2009
  */
 
-#include "Simulator.hh"
 #include "Timer.hh"
 
 using namespace gazebo;

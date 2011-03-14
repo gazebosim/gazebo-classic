@@ -2,7 +2,11 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories (
   .
-  ${OGRE_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/src/common
+  ${PROJECT_SOURCE_DIR}/src/common/transport
+  ${CMAKE_BINARY_DIR}/src/msgs
+  ${ogre_include_dirs}
+  ${XML_INCLUDE_DIRS}
 )
 
 set (sources OgreMovableText.cc
@@ -12,7 +16,6 @@ set (sources OgreMovableText.cc
              Visual.cc
              Camera.cc
              UserCamera.cc
-             Image.cc
              OgreHeightmap.cc
              Material.cc
              Light.cc
@@ -34,7 +37,6 @@ set (headers OgreMovableText.hh
              Visual.hh
              Camera.hh
              UserCamera.hh
-             Image.hh
              OgreHeightmap.hh
              Material.hh
              Light.hh
@@ -61,4 +63,3 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 target_link_libraries( gazebo_rendering ${OGRE_LIBRARIES} X11 ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 install ( TARGETS gazebo_rendering DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
-APPEND_TO_SERVER_HEADERS(${headers})

@@ -44,6 +44,10 @@ Entity::Entity(Common *parent)
   this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(ENTITY);
 
+  this->world = NULL;
+  if (this->parent)
+    this->world = this->parent->GetWorld();
+
   Param::Begin(&this->parameters);
   this->staticP = new ParamT<bool>("static",false,0);
   this->staticP->Callback( &Entity::SetStatic, this );
@@ -317,4 +321,38 @@ void Entity::RegisterVisual()
     this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
 
   this->vis_pub->Publish(*this->visualMsg);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the world this object belongs to. This will also set the world for all 
+/// children
+void Common::SetWorld(World *newWorld)
+{
+  this->world = newWorld;
+
+  for (unsigned int i=0; i < this->children.size(); i++)
+  {
+    Entity *child = dynamic_cast<Entity*>(this->children[i]);
+    if (child)
+      child->SetWorld(this->world);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the world this object is in
+World *Common::GetWorld() const
+{
+  return this->world;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the parent model, if one exists
+Model *Entity::GetParentModel() const
+{
+  Common *p = this->parent;
+
+  while (p && p->HasType(MODEL))
+    p = p->GetParent();
+
+  return (Model*)p;
 }

@@ -346,7 +346,7 @@ msgs::Visual Message::VisualFromXML(XMLConfigNode *node)
   return result;
 }
 
-msgs::Shadows Messages::ShadowsFromXML(XMLConfigNode *node)
+msgs::Shadows Message::ShadowsFromXML(XMLConfigNode *node)
 {
   msgs::Shadows result;
 
@@ -361,12 +361,12 @@ msgs::Shadows Messages::ShadowsFromXML(XMLConfigNode *node)
     result.set_type( msgs::Shadows::TEXTURE_MODULATIVE);
 
   result.mutable_color()->CopyFrom( 
-      Messages::Convert(node->GetColor("color",Color(1,1,1,1))) );
+      Message::Convert(node->GetColor("color",Color(1,1,1,1))) );
 
   return result;
 }
 
-msgs::Fog Messages::FogFromXML(XMLConfigNode *node)
+msgs::Fog Message::FogFromXML(XMLConfigNode *node)
 {
   msgs::Fog result;
 
@@ -381,7 +381,7 @@ msgs::Fog Messages::FogFromXML(XMLConfigNode *node)
     std::cerr << "Unknown fog type[" << type << "]\n";
 
   result.mutable_color()->CopyFrom( 
-      Messages::Convert(node->GetColor("color",Color(1,1,1,1))) );
+      Message::Convert(node->GetColor("color",Color(1,1,1,1))) );
   result.set_density(node->GetFloat("density",1,1));
   result.set_start(node->GetFloat("start",0,1));
   result.set_end(node->GetFloat("end",1,1));
@@ -389,24 +389,24 @@ msgs::Fog Messages::FogFromXML(XMLConfigNode *node)
   return result;
 }
 
-msgs::Scene Messages::SceneFromXML(XMLConfigNode *node)
+msgs::Scene Message::SceneFromXML(XMLConfigNode *node)
 {
   msgs::Scene result;
   XMLConfigNode *cnode = NULL;
 
   result.mutable_ambient()->CopyFrom( 
-      Messages::Convert(node->GetColor("ambient",Color(1,1,1,1))) );
+      Message::Convert(node->GetColor("ambient",Color(1,1,1,1))) );
 
   result.mutable_background()->CopyFrom( 
-      Messages::Convert(node->GetColor("background_color",Color(1,1,1,1))) );
+      Message::Convert(node->GetColor("background_color",Color(1,1,1,1))) );
 
-  if (node->GetString("sky_material"))
+  if (!node->GetString("sky_material","",0).empty())
     result.set_sky_material( node->GetString("sky_material","",1) );
 
   if ( (cnode = node->GetChild("fog")) != NULL)
     result.mutable_fog()->CopyFrom( Message::FogFromXML(cnode) );
 
-  if ( (cnode = node->GetChild("shadows")) != NULL && cnode->GetBool("enabled"))
+  if ( (cnode = node->GetChild("shadows")) != NULL && cnode->GetBool("enabled",true,0))
     result.mutable_shadows()->CopyFrom( Message::ShadowsFromXML(cnode) );
 
   return result;

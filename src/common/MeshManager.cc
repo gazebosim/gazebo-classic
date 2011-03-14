@@ -20,7 +20,6 @@
 #include "Plane.hh"
 #include "Matrix3.hh"
 #include "Matrix4.hh"
-#include "Simulator.hh"
 #include "GazeboConfig.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
@@ -118,7 +117,7 @@ const Mesh *MeshManager::Load(const std::string &filename)
   else
   {
     std::list<std::string> gazeboPaths;
-    gazeboPaths = Simulator::Instance()->GetGazeboConfig()->GetGazeboPaths();
+    gazeboPaths = GazeboConfig::Instance()->GetGazeboPaths();
     for (std::list<std::string>::iterator iter=gazeboPaths.begin(); 
         iter!=gazeboPaths.end(); ++iter)
     {

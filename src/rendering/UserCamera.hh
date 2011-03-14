@@ -83,10 +83,10 @@ namespace gazebo
     public: Ogre::RenderWindow *GetWindow();
 
     /// \brief Move the camera to focus on an entity
-    public: void MoveToEntity(Entity *entity);
+    public: void MoveToEntity(Common *entity);
 
     /// \brief Set the camera to track an entity
-    public: void TrackModel( Model *model );
+    public: void TrackModel( Common *model );
  
     /// \brief Toggle whether to show the visual
     private: void ToggleShowVisual();

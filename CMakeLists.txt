@@ -1,8 +1,8 @@
 cmake_minimum_required( VERSION 2.4.6 FATAL_ERROR )
 
 if(COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(set CMP0003 NEW)
-  CMAKE_POLICY(set CMP0004 NEW)
+  CMAKE_POLICY(SET CMP0003 NEW)
+  CMAKE_POLICY(SET CMP0004 NEW)
 endif(COMMAND CMAKE_POLICY)
 
 project (Gazebo)
@@ -21,27 +21,27 @@ set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
-set (gazeboserver_sources_desc "List of server sources" 
-     CACHE INTERNAL "Gazebo server sources list description" FORCE)
-set (gazeboserver_headers_desc "List of server headers" 
-     CACHE INTERNAL "Gazebo server headers list description" FORCE)
-set (gazeboserver_include_dirs_desc "List of server include directories" 
-     CACHE INTERNAL "Include dirs description")
-set (gazeboserver_link_dirs_desc "List of server link directories" 
-     CACHE INTERNAL "Link dirs description" FORCE)
-set (gazeboserver_link_libs_desc "List of server link libraries" 
-     CACHE INTERNAL "Link libs description" FORCE)
-set (gazeboserver_ldflags_desc "List of server ldflags" 
-     CACHE INTERNAL "LDFlags description" FORCE)
-set (gazeboserver_cflags_desc "List of server cflags" 
-     CACHE INTERNAL "Server cflags description" FORCE)
-set (gazebosensor_sources_desc "List of sensor sources" 
-     CACHE INTERNAL "Gazebo sensor sources list description" FORCE)
-set (gazebocontroller_sources_desc "List of controller sources" 
-     CACHE INTERNAL "Gazebo controller sources list description" FORCE)
-
-set (bullet_link_libs_desc "List of bullet link libraries" 
-     CACHE INTERNAL "Bullet link libs description" FORCE)
+#set (gazeboserver_sources_desc "List of server sources" 
+#     CACHE INTERNAL "Gazebo server sources list description" FORCE)
+#set (gazeboserver_headers_desc "List of server headers" 
+#     CACHE INTERNAL "Gazebo server headers list description" FORCE)
+#set (gazeboserver_include_dirs_desc "List of server include directories" 
+#     CACHE INTERNAL "Include dirs description")
+#set (gazeboserver_link_dirs_desc "List of server link directories" 
+#     CACHE INTERNAL "Link dirs description" FORCE)
+#set (gazeboserver_link_libs_desc "List of server link libraries" 
+#     CACHE INTERNAL "Link libs description" FORCE)
+#set (gazeboserver_ldflags_desc "List of server ldflags" 
+#     CACHE INTERNAL "LDFlags description" FORCE)
+#set (gazeboserver_cflags_desc "List of server cflags" 
+#     CACHE INTERNAL "Server cflags description" FORCE)
+#set (gazebosensor_sources_desc "List of sensor sources" 
+#     CACHE INTERNAL "Gazebo sensor sources list description" FORCE)
+#set (gazebocontroller_sources_desc "List of controller sources" 
+#     CACHE INTERNAL "Gazebo controller sources list description" FORCE)
+#
+#set (bullet_link_libs_desc "List of bullet link libraries" 
+#     CACHE INTERNAL "Bullet link libs description" FORCE)
 
 set (MIN_OGRE_VERSION 1.6.3 CACHE INTERNAL "Ogre version requirement" FORCE)
 
@@ -51,7 +51,7 @@ set (FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}.0 C
 set (ODE_VERSION 0.10.1 CACHE INTERNAL "ODE version requirement" FORCE)
 set (MIN_BOOST_VERSION 1.35.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
-set (ENABLE_BINDINGS OFF CACHE BOOL "Enable libgazebo bindings")
+#set (ENABLE_BINDINGS OFF CACHE BOOL "Enable libgazebo bindings")
 
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")
@@ -121,14 +121,14 @@ else (build_errors)
   if (BUILD_GAZEBO)
     add_subdirectory(src)
     add_subdirectory(worlds)
-    add_subdirectory(tools)
-    add_subdirectory(benchmarks)
+    #add_subdirectory(tools)
+    #add_subdirectory(benchmarks)
     add_subdirectory(Media)
     
-    if (INCLUDE_PLAYER)
-      add_subdirectory(player)
-      add_subdirectory(player_cfgs)
-    endif (INCLUDE_PLAYER)
+    #if (INCLUDE_PLAYER)
+    #  add_subdirectory(player)
+    #  add_subdirectory(player_cfgs)
+    #endif (INCLUDE_PLAYER)
     
     message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
     message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")

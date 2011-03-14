@@ -28,7 +28,6 @@
 #include "SelectionObj.hh"
 //#include "RTShaderSystem.hh"
 #include "MeshManager.hh"
-#include "Entity.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "XMLConfig.hh"
@@ -848,7 +847,7 @@ void Visual::SetRibbonTrail(bool value)
 {
   if (this->ribbonTrail == NULL)
   {
-    this->ribbonTrail = (Ogre::RibbonTrail*)this->GetWorld()->GetScene()->GetManager()->createMovableObject("RibbonTrail");
+    this->ribbonTrail = (Ogre::RibbonTrail*)this->sceneNode->getCreator()->createMovableObject("RibbonTrail");
     this->ribbonTrail->setMaterialName("Gazebo/Red");
     this->ribbonTrail->setTrailLength(200);
     this->ribbonTrail->setMaxChainElements(1000);

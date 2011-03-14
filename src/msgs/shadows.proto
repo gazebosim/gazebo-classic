@@ -1,4 +1,5 @@
 package gazebo.msgs;
+import "color.proto";
 
 message Shadows
 {

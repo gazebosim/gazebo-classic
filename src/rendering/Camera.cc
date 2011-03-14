@@ -27,13 +27,10 @@
 
 #include "Events.hh"
 #include "GazeboMessage.hh"
-#include "PhysicsEngine.hh"
 #include "Global.hh"
 #include "GazeboError.hh"
 #include "Visual.hh"
 #include "XMLConfig.hh"
-#include "Model.hh"
-#include "Body.hh"
 
 #include "Scene.hh"
 #include "Camera.hh"

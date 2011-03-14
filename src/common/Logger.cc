@@ -16,9 +16,7 @@
 */
 #include <iomanip>
 #include "Time.hh"
-#include "World.hh"
 #include "Entity.hh"
-#include "Geom.hh"
 #include "Simulator.hh"
 #include "GazeboMessage.hh"
 #include "Logger.hh"

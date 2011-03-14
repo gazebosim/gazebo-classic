@@ -9,6 +9,9 @@ set (msgs color.proto
           time.proto
           visual.proto
           selection.proto
+          shadows.proto
+          scene.proto
+          fog.proto
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

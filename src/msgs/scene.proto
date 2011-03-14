@@ -1,6 +1,8 @@
 package gazebo.msgs;
 import "header.proto";
 import "color.proto";
+import "fog.proto";
+import "shadows.proto";
 
 message Scene
 {
