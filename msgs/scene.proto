@@ -1,0 +1,13 @@
+package gazebo.msgs;
+import "header.proto";
+import "color.proto";
+
+message Scene
+{
+  required Header header = 1;
+  optional Color ambient = 2;
+  optional Color background = 3;
+  optional string sky_material = 4;
+  optional Shadows shadows = 5;
+  optional Fog fog = 6;
+}

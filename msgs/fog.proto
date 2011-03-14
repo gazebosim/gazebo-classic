@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+message Fog
+{
+  enum FogType
+  {
+    LINEAR       = 1;
+    EXPONENTIAL  = 2;
+    EXPONENTIAL2 = 3;
+  }
+  optional FogType type = 1 [default = LINEAR];
+  optional Color color = 2;
+  optional float density = 3;
+  optional float start = 4;
+  optional float end = 5;
+}
