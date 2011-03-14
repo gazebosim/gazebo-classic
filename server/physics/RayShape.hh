@@ -117,7 +117,7 @@ namespace gazebo
     /// Start and end positions of the ray in global cs
     protected: Vector3 globalStartPos;
     protected: Vector3 globalEndPos;
-    protected: PublisherPtr vis_pub;
+    protected: transport::PublisherPtr vis_pub;
   };
   
   /// \}

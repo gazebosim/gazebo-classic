@@ -25,7 +25,6 @@
 #include "Body.hh"
 #include "GazeboError.hh"
 #include "Simulator.hh"
-#include "OgreAdaptor.hh"
 
 #include "BulletTrimeshShape.hh"
 

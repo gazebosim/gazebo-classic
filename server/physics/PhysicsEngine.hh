@@ -231,8 +231,8 @@ namespace gazebo
     private: bool locked;
 
     protected: std::string visual;
-    protected: PublisherPtr vis_pub;
-    private: ConnectionPtr showContactConnection; 
+    protected: transport::PublisherPtr vis_pub;
+    private: event::ConnectionPtr showContactConnection; 
 
     //private: std::vector<OgreDynamicLines*> contactLines;
     //private: std::vector<OgreDynamicLines*>::iterator contactLinesIter;

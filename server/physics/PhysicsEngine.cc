@@ -22,12 +22,9 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "RenderTypes.hh"
-
 #include "Messages.hh"
 #include "GazeboError.hh"
 #include "GazeboMessage.hh"
-#include "RenderState.hh"
 #include "Events.hh"
 #include "World.hh"
 #include "Shape.hh"
@@ -42,7 +39,7 @@ using namespace gazebo;
 PhysicsEngine::PhysicsEngine(World *world)
   : world(world)
 {
-  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
 
   Param::Begin(&this->parameters);
   this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
@@ -55,7 +52,6 @@ PhysicsEngine::PhysicsEngine(World *world)
   this->mutex = new boost::recursive_mutex();
   this->locked = false;
 
-  if (Simulator::Instance()->GetRenderEngineEnabled())
   {
     /*this->visualMsg = new VisualMsg();
     this->visualMsg->parentId.clear();
@@ -105,7 +101,7 @@ PhysicsEngine::PhysicsEngine(World *world)
     }
     */
 
-    this->showContactConnection = Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowContacts, this, _1) );
+    this->showContactConnection = event::Events::ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowContacts, this, _1) );
 
     // NATY: put this back in
     //this->contactLinesIter = this->contactLines.begin();

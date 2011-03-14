@@ -52,7 +52,7 @@ MonoCameraSensor::MonoCameraSensor(Body *body)
   this->typeName = "monocamera";
   this->camera->SetCaptureData(true);
 
-  Events::ConnectRenderSignal( boost::bind(&MonoCameraSensor::Render, this) );
+  event::Events::ConnectRenderSignal( boost::bind(&MonoCameraSensor::Render, this) );
 }
 
 
@@ -82,12 +82,9 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
     gzthrow("image has zero size");
   }
 
-  if (Simulator::Instance()->GetRenderEngineEnabled())
-  {
-    this->ogreTextureName = this->GetName() + "_RttTex";
+  this->ogreTextureName = this->GetName() + "_RttTex";
 
-    this->camera->CreateRenderTexture(this->ogreTextureName);
-  }
+  this->camera->CreateRenderTexture(this->ogreTextureName);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -102,14 +99,9 @@ void MonoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 // Initialize the camera
 void MonoCameraSensor::InitChild()
 {
-
-  if (Simulator::Instance()->GetRenderEngineEnabled())
-  {
-    // NATY: Put this back in!!
-    // this->camera->SetSceneNode( this->GetVisualNode()->GetSceneNode() );
-    this->camera->Init();
-  }
-  
+  // NATY: Put this back in!!
+  // this->camera->SetSceneNode( this->GetVisualNode()->GetSceneNode() );
+  this->camera->Init();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -131,9 +123,6 @@ void MonoCameraSensor::SetActive(bool value)
 // Render new data
 void MonoCameraSensor::Render()
 {
-  if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
-
   if (this->active || **this->alwaysActiveP)
   {
     this->lastUpdate = this->GetWorld()->GetSimTime();

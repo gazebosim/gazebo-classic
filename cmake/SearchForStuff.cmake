@@ -328,34 +328,34 @@ endif (NOT wxWidgets_FOUND)
 
 ########################################
 # Find Boost, if not specified manually
-IF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
+if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
 
   # Clear some variables to ensure that the checks for boost are 
   # always run
-  SET (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
-  SET (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
+  set (Boost_THREAD_FOUND OFF CACHE INTERNAL "" FORCE)
+  set (Boost_SIGNALS_FOUND OFF CACHE INTERNAL "" FORCE)
 
-  SET(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
-  INCLUDE (FindBoost)
+  set(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
+  include (FindBoost)
 
-  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex)
+  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex system)
 
-  IF (NOT Boost_FOUND)
-    SET (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-    MESSAGE (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
-  ENDIF (NOT Boost_FOUND)
+  if (NOT Boost_FOUND)
+    set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
+    message (FATAL_ERROR "Boost thread and signals not found. Please install Boost threads and signals version ${MIN_BOOST_VERSION} or higher.")
+  endif (NOT Boost_FOUND)
 
-  SET (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
+  set (boost_include_dirs ${Boost_INCLUDE_DIRS} CACHE STRING 
     "Boost include paths. Use this to override automatic detection." FORCE)
 
-  SET (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
+  set (boost_library_dirs ${Boost_LIBRARY_DIRS} CACHE STRING
     "Boost link dirs. Use this to override automatic detection." FORCE)
 
   LIST_TO_STRING(tmp "${Boost_LIBRARIES}")
-  SET (boost_libraries ${tmp} CACHE STRING 
+  set (boost_libraries ${tmp} CACHE STRING 
     "Boost libraries. Use this to override automatic detection." FORCE )
 
-ENDIF (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries ) 
+endif (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries ) 
 
 STRING(REGEX REPLACE "(^| )-L" " " boost_library_dirs "${boost_library_dirs}")
 STRING(REGEX REPLACE "(^| )-l" " " boost_libraries "${boost_libraries}")

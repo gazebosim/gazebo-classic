@@ -17,6 +17,7 @@ include (${wxWidgets_USE_FILE})
 include_directories(
   .
   ${CMAKE_SOURCE_DIR}/libgazebo 
+  transport
   wx 
   physics 
   physics/ode
@@ -66,6 +67,7 @@ add_subdirectory(physics)
 add_subdirectory(sensors)
 add_subdirectory(wx)
 add_subdirectory(controllers)
+add_subdirectory(transport)
 #add_subdirectory(audio_video)
 
 ########################################
@@ -87,7 +89,6 @@ SET (sources Common.cc
              Param.cc
              GraphicsIfaceHandler.cc
              SimulationIfaceHandler.cc
-             Simulator.cc
              Rand.cc
              FactoryIfaceHandler.cc
              Mesh.cc
@@ -106,11 +107,7 @@ SET (sources Common.cc
              Matrix4.cc
              Timer.cc
              Diagnostics.cc
-             Publisher.cc
-             Subscriber.cc
-             TopicManager.cc
-             IOManager.cc
-             Connection.cc
+             Color.cc
 )
 
 SET (headers Common.hh
@@ -152,12 +149,7 @@ SET (headers Common.hh
              Matrix4.hh
              Timer.hh
              Diagnostics.hh
-             Publisher.hh
-             Subscriber.hh
-             Subscription.hh
-             TopicManager.hh
-             Connection.hh
-             IOManager.hh
+             Color.hh
 )
 
 APPEND_TO_SERVER_HEADERS(${headers})
@@ -171,17 +163,17 @@ endforeach (header ${gazeboserver_headers_nopath})
 add_library(gazebo_server_library SHARED ${gazeboserver_sources} )
 set_target_properties(gazebo_server_library PROPERTIES VERSION ${GAZEBO_VERSION})
 
-add_executable(gazebo_server server.cc)
+add_executable(gazebo_server Simulator.cc server.cc)
 set_target_properties(gazebo_server PROPERTIES SKIP_BUILD_RPATH TRUE)
 add_executable(gazebo_client client.cc)
 set_target_properties(gazebo_client PROPERTIES SKIP_BUILD_RPATH TRUE)
 
-add_executable(gazebo-exec main.cc)
-set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
+# add_executable(gazebo-exec main.cc)
+# set_target_properties(gazebo-exec PROPERTIES OUTPUT_NAME "gazebo")
 
 # Removes colon separated rpath. This breaks Ubuntu-intrepid 
 # (possibly gcc-4.3.2).
-set_target_properties(gazebo-exec PROPERTIES SKIP_BUILD_RPATH TRUE)
+#set_target_properties(gazebo-exec PROPERTIES SKIP_BUILD_RPATH TRUE)
 
 LIST_TO_STRING(GAZEBO_CFLAGS "${gazeboserver_cflags}")
 
@@ -190,42 +182,41 @@ set_source_files_properties(${gazeboserver_sources} PROPERTIES COMPILE_FLAGS "${
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${gazeboserver_sources} PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
+  #set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
   set_target_properties( gazebo_server PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
   set_target_properties( gazebo_client PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
 else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-    set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
+  #set_target_properties( gazebo-exec PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
     set_target_properties( gazebo_server PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
     set_target_properties( gazebo_client PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 
-target_link_libraries( gazebo-exec ${libtool_library}
-                                   ${gazeboserver_link_libs} 
-                                   ${boost_libraries} 
-                                   ${assimp_libraries} 
-                                   ${freeimage_library} 
-                                   gazebo_server_library
-                                   gazebo_rendering
-                                   #gazebo_av-shared
-                                   gazebo_wx
-                                   gazebo_physics
-                                   gazebo_msgs
-                                   gazeboshm 
-                                   assimp
-                                   pthread
-                                   ${PROTOBUF_LIBRARY}
-                                   ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}}
-)
+#target_link_libraries( gazebo-exec ${libtool_library}
+#                                   ${gazeboserver_link_libs} 
+#                                   ${boost_libraries} 
+#                                   ${assimp_libraries} 
+#                                   ${freeimage_library} 
+#                                   gazebo_transport
+#                                   gazebo_server_library
+#                                   gazebo_rendering
+#                                   #gazebo_av-shared
+#                                   gazebo_wx
+#                                   gazebo_physics
+#                                   gazebo_msgs
+#                                   gazeboshm 
+#                                   assimp
+#                                   pthread
+#                                   ${PROTOBUF_LIBRARY}
+#                                   ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}}
+#)
 
 target_link_libraries( gazebo_server ${libtool_library}
                                    ${gazeboserver_link_libs} 
                                    ${boost_libraries} 
                                    ${assimp_libraries} 
-                                   ${freeimage_library} 
+                                   gazebo_transport
                                    gazebo_server_library
-                                   gazebo_rendering
-                                   #gazebo_av-shared
                                    gazebo_physics
                                    gazebo_msgs
                                    gazeboshm 
@@ -236,19 +227,20 @@ target_link_libraries( gazebo_server ${libtool_library}
 )
 
 target_link_libraries( gazebo_client ${libtool_library}
-                                   ${gazeboserver_link_libs} 
-                                   ${boost_libraries} 
-                                   ${assimp_libraries} 
-                                   ${freeimage_library} 
-                                   gazebo_server_library
-                                   gazebo_rendering
-                                   gazebo_wx
-                                   gazebo_msgs
-                                   gazeboshm 
-                                   assimp
-                                   pthread
-                                   ${PROTOBUF_LIBRARY}
-                                   ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}}
+                                     ${gazeboserver_link_libs} 
+                                     ${boost_libraries} 
+                                     ${assimp_libraries} 
+                                     ${freeimage_library} 
+                                     gazebo_transport
+                                     gazebo_server_library
+                                     gazebo_rendering
+                                     gazebo_wx
+                                     gazebo_msgs
+                                     gazeboshm 
+                                     assimp
+                                     pthread
+                                     ${PROTOBUF_LIBRARY}
+                                     ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}}
 )
 
 APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
@@ -267,7 +259,7 @@ target_link_libraries( gazebo_server_library ${libtool_library}
 
 if (INCLUDE_BULLET)
   target_link_libraries(gazebo_server_library ${bullet_lflags} gazebo_physics_bullet )
-  target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
+  #target_link_libraries(gazebo-exec ${bullet_lflags} gazebo_physics_bullet )
   target_link_libraries(gazebo_server ${bullet_lflags} gazebo_physics_bullet )
 
   APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
@@ -277,7 +269,7 @@ endif (INCLUDE_BULLET)
 
 if (INCLUDE_ODE)
   target_link_libraries(gazebo_server_library gazebo_physics_ode ${ODE_LIBRARIES})
-  target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
+  #target_link_libraries(gazebo-exec gazebo_physics_ode ${ODE_LIBRARIES})
   target_link_libraries(gazebo_server gazebo_physics_ode ${ODE_LIBRARIES})
   APPEND_TO_CACHED_LIST(gazeboserver_ldflags 
                       ${gazeboserver_ldflags_desc} 
@@ -295,7 +287,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gazeboserver.pc DESTINATION ${CMAKE_IN
 
 
 install (TARGETS gazebo_server_library DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+#install (TARGETS gazebo-exec DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_client DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo COMPONENT headers)

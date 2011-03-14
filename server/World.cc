@@ -46,7 +46,6 @@
 #include "SensorManager.hh"
 #include "Simulator.hh"
 #include "gz.h"
-#include "Scene.hh"
 #include "World.hh"
 
 // NATY: put back in
@@ -77,9 +76,10 @@ class ModelUpdate_TBB
 // Private constructor
 World::World()
 {
-  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
-  this->selection_pub = TopicManager::Instance()->Advertise<msgs::Selection>("/gazebo/selection");
-  this->light_pub = TopicManager::Instance()->Advertise<msgs::Light>("/gazebo/light");
+  this->scene_pub = transport::TopicManager::Instance()->Advertise<msgs::Scene>("/gazebo/scene");
+  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->selection_pub = transport::TopicManager::Instance()->Advertise<msgs::Selection>("/gazebo/selection");
+  this->light_pub = transport::TopicManager::Instance()->Advertise<msgs::Light>("/gazebo/light");
 
   this->server = NULL;
   this->physicsEngine = NULL;
@@ -102,17 +102,10 @@ World::World()
   this->saveStateBufferSizeP = new ParamT<unsigned int>("save_state_buffer_size",1000,0);
   Param::End();
 
-  this->scene = new Scene("scene");
-  this->scene->SetType(Scene::GENERIC);
-  this->scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
-  this->scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
-  this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
-  this->scene->Init();
-
-  this->connections.push_back( Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) ) );
-  this->connections.push_back( Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
-  this->connections.push_back( Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
-  this->connections.push_back( Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
+  this->connections.push_back( event::Events::ConnectSetSelectedEntitySignal( boost::bind(&World::SetSelectedEntityCB, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectDeleteEntitySignal( boost::bind(&World::DeleteEntityCB, this, _1) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,6 +124,9 @@ World::~World()
 // Load the world
 void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
 {
+  msgs::Scene scene = Messages::SceneFromXML( rootNode->GetChild("scene") );
+  this->scene_pub.Publish( scene );
+
   this->nameP->Load(rootNode);
   this->saveStateTimeoutP->Load(rootNode);
   this->saveStateBufferSizeP->Load(rootNode);
@@ -168,11 +164,12 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
     this->factoryIfaceHandler = new FactoryIfaceHandler(this);
 
   // Create the graphics iface handler
-  if (!this->graphics && Simulator::Instance()->GetRenderEngineEnabled())
+  if (!this->graphics)
   {
     this->graphics = new GraphicsIfaceHandler(this);
     this->graphics->Load("default");
   }
+
 
   // Load OpenAL audio 
   /*if (rootNode && rootNode->GetChild("audio"))
@@ -266,8 +263,7 @@ void World::Init()
   this->toDeleteEntities.clear();
   this->toLoadEntities.clear();
 
-  if (Simulator::Instance()->GetRenderEngineEnabled())
-    this->graphics->Init();
+  this->graphics->Init();
 
   this->factoryIfaceHandler->Init();
   //this->saveStateTimer.Start();
@@ -388,7 +384,7 @@ void World::Update()
 {
   DIAG_TIMER("World::Update")
 
-  Events::worldUpdateStartSignal();
+  event::Events::worldUpdateStartSignal();
 
   {
     DIAG_TIMER("Update Models");
@@ -419,7 +415,7 @@ void World::Update()
   // NATY: put back in
   //Logger::Instance()->Update();
 
-  Events::worldUpdateEndSignal();
+  event::Events::worldUpdateEndSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -489,7 +485,7 @@ void World::Clear()
 {
   std::vector<Model*>::iterator iter;
   for (iter = this->models.begin(); iter != this->models.end(); iter++)
-    Events::deleteEntitySignal((*iter)->GetCompleteScopedName());
+    event::Events::deleteEntitySignal((*iter)->GetCompleteScopedName());
   this->ProcessEntitiesToDelete();
 }
 
@@ -547,7 +543,7 @@ void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplica
     if (node->GetName() == "model")
     {
       model = this->LoadModel(node, parent, removeDuplicate, initModel);
-      Events::addEntitySignal(model->GetCompleteScopedName());
+      event::Events::addEntitySignal(model->GetCompleteScopedName());
       parent = model;
     }
     else if (node->GetName() == "light")
@@ -668,14 +664,8 @@ Common *World::GetByName(const std::string &name)
 /// Receive a message
 void World::ReceiveMessage( const google::protobuf::Message &message )
 {
-/*  boost::recursive_mutex::scoped_lock lock( this->mutex );
-
-  if (msg.type == VISUAL_MSG || msg.type == LIGHT_MSG || msg.type == POSE_MSG
-      || msg.type == SELECTION_MSG)
-    this->scene->ReceiveMessage(msg);
-  else
-    this->messages.push_back( msg.Clone() );
-    */
+//  boost::recursive_mutex::scoped_lock lock( this->mutex );
+//  this->messages.push_back( msg.Clone() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -909,7 +899,7 @@ void World::SetSelectedEntityCB( const std::string &name )
   else
     this->selectedEntity = NULL;
 
-  Events::entitySelectedSignal(this->selectedEntity);
+  event::Events::entitySelectedSignal(this->selectedEntity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -979,13 +969,6 @@ void World::SetPaused(bool p)
   if (this->pause == p)
     return;
 
-  Events::pauseSignal(p);
+  event::Events::pauseSignal(p);
   this->pause = p;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the scene 
-Scene *World::GetScene() const
-{
-  return this->scene;
 }

@@ -7,15 +7,16 @@
       <size>800 600</size>
       <pos>0 0</pos>
     </gui>
-
-    <rendering>
-      <ambient>0.1 0.1 0.1 1</ambient>
-      <shadows>true</shadows>
-      <grid>false</grid>
-    </rendering>
   </config>
 
   <world name="default">
+    <scene>
+      <ambient>0.1 0.1 0.1 1</ambient>
+      <background_color>.1 .1 .1 1.0</background_color>
+      <shadows enabled="false" color="0.2 0.2 0.2 1.0" type="texture_modulative"/>
+      <grid>false</grid>
+    </scene>
+
     <physics type="ode">
       <stepTime>0.001</stepTime>
       <gravity>0 0 -9.8</gravity>
@@ -46,11 +47,13 @@
             <plane normal="0 0 1" size="100 100" offset="0"/>
           </geometry>
           <material name="Gazebo/GreyGrid" uv_tile="100 100"/>
+          <cast_shadows>false</cast_shadows>
         </visual>
       </link>
     </model>
 
     <model name="box_model">
+      <static>true</static>
       <origin xyz="0 0 1.5"/>
       <link name="body">
         <collision name="geom">
@@ -64,21 +67,22 @@
           <geometry>
             <box size="1 1 1"/>
           </geometry>
-          <material name="Gazebo/Red"/>
+          <material name="Gazebo/WoodPallet"/>
+          <cast_shadows>true</cast_shadows>
         </visual>
       </link>
     </model>
  
     <!-- White Point light -->
     <light name="point_white">
-      <xyz>1.0 1.0 10</xyz>
+      <xyz>0.0 0 10</xyz>
       <rpy>0 0 0</rpy>
-      <type>point</type>
-      <diffuse>0.5 0.5 0.5 1.0</diffuse>
-      <specular>.001 .001 .001 1.0</specular>
-      <attenuation>.2 0.1 0.001</attenuation>
-      <range>20</range>
-      <direction>0 0.1 -0.9</direction>
+      <type>directional</type>
+      <diffuse>1.0 1.0 1.0 1.0</diffuse>
+      <specular>.1 .1 .1 1.0</specular>
+      <attenuation>.2 0.01 0.0</attenuation>
+      <range>40</range>
+      <direction>0 0.0 -1.0</direction>
       <cast_shadows>true</cast_shadows>
     </light>
   </world>

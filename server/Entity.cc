@@ -40,8 +40,8 @@ using namespace gazebo;
 Entity::Entity(Common *parent)
 : Common(parent)
 {
-  this->pose_pub = TopicManager::Instance()->Advertise<msgs::Pose>("/gazebo/pose");
-  this->vis_pub =  TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->pose_pub = transport::TopicManager::Instance()->Advertise<msgs::Pose>("/gazebo/pose");
+  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(ENTITY);
 
   Param::Begin(&this->parameters);

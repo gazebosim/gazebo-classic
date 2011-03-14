@@ -232,10 +232,10 @@ namespace gazebo
 
     /// \brief Connect a to the add entity signal
     public: template<typename T>
-            ConnectionPtr ConnectEnabledSignal( T subscriber )
+            event::ConnectionPtr ConnectEnabledSignal( T subscriber )
             { return enabledSignal.Connect(subscriber); }
 
-    public: void DisconnectEnabledSignal( ConnectionPtr &c )
+    public: void DisconnectEnabledSignal( event::ConnectionPtr &c )
             { enabledSignal.Disconnect(c); }
 
     /// List of geometries attached to this body
@@ -291,15 +291,15 @@ namespace gazebo
 
     protected: std::vector<std::string> visuals;
 
-    private: EventT<void (bool)> enabledSignal;
-    private: ConnectionPtr showPhysicsConnection; 
+    private: event::EventT<void (bool)> enabledSignal;
+    private: event::ConnectionPtr showPhysicsConnection; 
 
     /// This flag is used to trigger the enabledSignal
     private: bool enabled;
 
     protected: Pose3d newPose;
 
-    private: std::vector<ConnectionPtr> connections;
+    private: std::vector<event::ConnectionPtr> connections;
   };
 
   /// \}

@@ -23,7 +23,6 @@
 #include <stdint.h>
 
 #include "Material.hh"
-#include "RenderTypes.hh"
 #include "Scene.hh"
 #include "World.hh"
 #include "Entity.hh"
@@ -34,7 +33,6 @@
 #include "OgreDynamicLines.hh"
 #include "OgreMovableText.hh"
 #include "GraphicsIfaceHandler.hh"
-#include "OgreAdaptor.hh"
 
 using namespace gazebo;
 
@@ -313,8 +311,8 @@ void GraphicsIfaceHandler::DrawShape(Visual *vis, libgazebo::Graphics3dDrawData 
           std::ostringstream bname;
 
           bname << "BILLBOARD_" << this->name;
-          bset = this->world->GetScene()->GetManager()->createBillboardSet(
-              bname.str().c_str());
+          // NATY: FIX this. Removed "GetScene" from the World
+          //bset = this->world->GetScene()->GetManager()->createBillboardSet( bname.str().c_str());
         }
 
         Ogre::Billboard *billboard = bset->createBillboard(
@@ -417,8 +415,8 @@ void GraphicsIfaceHandler::DrawMeterBar(Visual *vis,
   }
   else
   {
-    bset = this->world->GetScene()->GetManager()->createBillboardSet(
-        bname.str().c_str());
+    // NATY: FIX this. Removed "GetScene" from the World
+    //bset = this->world->GetScene()->GetManager()->createBillboardSet( bname.str().c_str());
 
     // Create the texture
     texture = Ogre::TextureManager::getSingleton().createManual(

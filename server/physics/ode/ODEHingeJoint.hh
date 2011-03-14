@@ -132,7 +132,7 @@ namespace gazebo
     /// Set the parameter to value
     public: virtual void SetParam( int parameter, double value);
 
-    private: ConnectionPtr jointUpdateConnection;
+    private: event::ConnectionPtr jointUpdateConnection;
   };
 
   /// \}

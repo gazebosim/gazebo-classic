@@ -47,7 +47,6 @@ namespace gazebo
   class XMLConfig;
   class XMLConfigNode;
   class GazeboConfig;
-  class OgreAdaptor;
   class Entity;
   class Common;
   class Body;
@@ -114,25 +113,9 @@ namespace gazebo
       /// \brief Gets the local configuration for this computer
       public: GazeboConfig *GetGazeboConfig() const;
   
-      /// \brief Gets our current GUI interface
-      public: OgreAdaptor *GetRenderEngine() const;
-  
       //User Iteractions
       /// \brief Simulator finished by the user
       public: void SetUserQuit();
-  
-      /// \brief True if the gui is to be used
-      public: void SetGuiEnabled( bool enabled );
-  
-      /// \brief Return true if the gui is enabled
-      public: bool GetGuiEnabled() const;
-  
-      /// \brief True if the gui is to be used
-      public: void SetRenderEngineEnabled( bool enabled );
-  
-      /// \brief Return true if the gui is enabled
-      public: inline bool GetRenderEngineEnabled() const
-              { return this->renderEngineEnabled; }
   
       /// \brief Set the length of time the simulation should run.
       public: void SetTimeout(double time);
@@ -166,8 +149,6 @@ namespace gazebo
       /// Pointer to the selected Gui 
       private: SimulationApp *gui;
   
-      private: OgreAdaptor *renderEngine;
-  
       private: GazeboConfig *gazeboConfig;
   
       //upper limits on updating
@@ -185,12 +166,6 @@ namespace gazebo
       private: bool userQuit;
       private: bool physicsQuit;
   
-      /// True if the GUI is enabled
-      private: bool guiEnabled;
-  
-      /// True if the Rendering Engine is enabled
-      private: bool renderEngineEnabled;
-  
       /// True if physics is enabled
       private: bool physicsEnabled;
   
@@ -201,7 +176,7 @@ namespace gazebo
   
       private: std::vector<Plugin*> plugins;
 
-      private: ConnectionPtr quitConnection;
+      private: event::ConnectionPtr quitConnection;
 
       //Singleton implementation
       private: friend class DestroyerT<Simulator>;

@@ -172,9 +172,9 @@ namespace gazebo
     public: virtual Vector3 GetWorldAngularAccel() const;
 
     public: template< typename T>
-            ConnectionPtr ConnectContactCallback( T subscriber )
+            event::ConnectionPtr ConnectContactCallback( T subscriber )
             { return contactSignal.Connect(subscriber); }
-    public: void DisconnectContactCallback( ConnectionPtr &c )
+    public: void DisconnectContactCallback( event::ConnectionPtr &c )
             { contactSignal.Disconnect(c); }
 
     /// \brief Enable callback: Called when the body changes
@@ -211,8 +211,8 @@ namespace gazebo
 
     private: bool contactsEnabled;
 
-    public: EventT< void (const Contact &)> contactSignal;
-    private: std::vector<ConnectionPtr> connections;
+    public: event::EventT< void (const Contact &)> contactSignal;
+    private: std::vector<event::ConnectionPtr> connections;
           
   };
 

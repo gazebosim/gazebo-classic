@@ -34,8 +34,8 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
-  if (displayRays && Simulator::Instance()->GetRenderEngineEnabled() )
+  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  if (displayRays)
   {
     msgs::Visual msg;
     Message::Init(msg, this->GetName());

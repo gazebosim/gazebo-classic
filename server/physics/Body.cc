@@ -23,7 +23,6 @@
 #include <sstream>
 #include <float.h>
 
-#include "RenderTypes.hh"
 #include "Events.hh"
 #include "SensorManager.hh"
 #include "XMLConfig.hh"
@@ -98,8 +97,8 @@ Body::Body(Entity *parent)
 
   Param::End();
 
-  this->connections.push_back( Events::ConnectShowJointsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
-  this->connections.push_back( Events::ConnectShowPhysicsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectShowJointsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectShowPhysicsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
 
 }
 
@@ -244,7 +243,7 @@ void Body::Load(XMLConfigNode *node)
 
   this->SetKinematic(**this->kinematicP);
 
-  this->showPhysicsConnection = Events::ConnectShowPhysicsSignal( boost::bind(&Body::ShowPhysics, this, _1) );
+  this->showPhysicsConnection = event::Events::ConnectShowPhysicsSignal( boost::bind(&Body::ShowPhysics, this, _1) );
 
   childNode = node->GetChild("visual");
   while (childNode)
@@ -253,14 +252,10 @@ void Body::Load(XMLConfigNode *node)
     visname << this->GetCompleteScopedName() << "::VISUAL_" << 
                this->visuals.size();
 
-
-    std::cout << "Body[" << this->GetName() << "] Load Visual[" << visname.str() << "]\n";
-
     msgs::Visual msg = Message::VisualFromXML(childNode);
     Message::Init(msg, visname.str());
     msg.set_parent_id( this->GetCompleteScopedName() );
-    msg.set_render_type( msgs::Visual::MESH_RESOURCE );
-    msg.set_cast_shadows( false );
+    msg.set_is_static( this->IsStatic() );
 
     this->vis_pub->Publish(msg);
     this->visuals.push_back(msg.header().str_id());

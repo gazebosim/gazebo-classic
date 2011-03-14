@@ -22,8 +22,6 @@
 
 #include <sstream>
 
-#include "RenderTypes.hh"
-#include "RenderState.hh"
 #include "Events.hh"
 #include "Model.hh"
 #include "Shape.hh"
@@ -76,7 +74,7 @@ Geom::Geom( Body *body )
   
   Param::End();
 
-  this->connections.push_back( Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
+  this->connections.push_back( event::Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
   this->connections.push_back( this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
 }
 
@@ -166,7 +164,10 @@ void Geom::CreateBoundingBox()
     msg.set_parent_id( this->GetCompleteScopedName() );
     msg.mutable_header()->set_str_id( this->GetCompleteScopedName() + "_BBVISUAL" );
     msg.set_cast_shadows(false);
-    msg.set_visible( RenderState::GetShowBoundingBoxes() );
+    // NATY: Set it so bounding boxes are visible upon creation if a flag is
+    // set. The flag should exist only on the rendering side. May need to
+    // put something in the message to indicate that this is a bounding box
+    //msg.set_visible( RenderState::GetShowBoundingBoxes() );
     msg.set_mesh( "unit_box" );
     if (this->IsStatic() )
       msg.set_material( "Gazebo/YellowTransparent" );

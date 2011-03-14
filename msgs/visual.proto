@@ -40,4 +40,5 @@ message Visual
   optional float uv_tile_y    = 14;
   repeated Point points       = 15;
   optional Plane plane        = 16;
+  optional bool is_static     = 17;
 }

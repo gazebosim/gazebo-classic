@@ -109,7 +109,7 @@ void FactoryIfaceHandler::Update()
   if (strcmp((const char*)this->factoryIface->data->deleteEntity,"")!=0)
   {
     const std::string e = (const char*)this->factoryIface->data->deleteEntity;
-    Events::deleteEntitySignal(e);
+    event::Events::deleteEntitySignal(e);
 
     strcpy((char*)this->factoryIface->data->deleteEntity,"");
   }

@@ -225,7 +225,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ )
 {
-  gazebo::Events::quitSignal();
+  gazebo::event::Events::quitSignal();
   return;
 }
 

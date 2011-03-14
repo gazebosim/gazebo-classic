@@ -32,8 +32,6 @@
 #include "GazeboError.hh"
 #include "Body.hh"
 #include "Visual.hh"
-#include "OgreAdaptor.hh"
-#include "OgreFrameListener.hh"
 
 #include "SensorFactory.hh"
 #include "StereoCameraSensor.hh"
@@ -140,7 +138,8 @@ void StereoCameraSensor::InitChild()
       cviewport = this->renderTargets[i]->addViewport(this->GetCamera());
       cviewport->setClearEveryFrame(true);
       cviewport->setOverlaysEnabled(false);
-      cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
+      // NATY: Fix
+      //cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
       cviewport->setVisibilityMask(this->visibilityMask);
     }
 
@@ -201,6 +200,7 @@ void StereoCameraSensor::FiniChild()
 // Update the drawing
 void StereoCameraSensor::UpdateChild()
 {
+  /* NATY: Fix
   OgreAdaptor *adapt = OgreAdaptor::Instance();
   Ogre::RenderSystem *renderSys = adapt->root->getRenderSystem();
   Ogre::Viewport *vp = NULL;
@@ -315,6 +315,7 @@ void StereoCameraSensor::UpdateChild()
 
   if (this->saveFramesP->GetValue())
     this->SaveFrame();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

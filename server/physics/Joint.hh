@@ -92,10 +92,10 @@ namespace gazebo
 
     /// \brief Connect a boost::slot the the joint update signal
     public: template<typename T>
-            ConnectionPtr ConnectJointUpdateSignal(T subscriber)
+            event::ConnectionPtr ConnectJointUpdateSignal(T subscriber)
             { return jointUpdateSignal.Connect(subscriber); }
     /// \brief Disconnect a boost::slot the the joint update signal
-    public: void DisconnectJointUpdateSignal( ConnectionPtr &c )
+    public: void DisconnectJointUpdateSignal( event::ConnectionPtr &c )
             { jointUpdateSignal.Disconnect(c); }
 
     /// \brief Get the axis of rotation
@@ -183,12 +183,12 @@ namespace gazebo
     protected: Vector3 anchorPos;
     protected: Body *anchorBody;
 
-    private: EventT<void ()> jointUpdateSignal;
-    private: ConnectionPtr showJointsConnection;
+    private: event::EventT<void ()> jointUpdateSignal;
+    private: event::ConnectionPtr showJointsConnection;
 
     // joint damping_coefficient
     protected: double damping_coefficient;
-    protected: PublisherPtr vis_pub;
+    protected: transport::PublisherPtr vis_pub;
   };
 
   /// \}

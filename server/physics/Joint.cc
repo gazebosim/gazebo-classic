@@ -21,7 +21,6 @@
  */
 
 #include "Simulator.hh"
-#include "RenderTypes.hh"
 #include "Events.hh"
 #include "PhysicsEngine.hh"
 #include "GazeboError.hh"
@@ -40,7 +39,7 @@ using namespace gazebo;
 Joint::Joint()
   : Common(NULL)
 {
-  this->vis_pub = TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(JOINT);
   this->model = NULL;
   this->showJoints = false;
@@ -60,7 +59,7 @@ Joint::Joint()
   this->body1 = NULL;
   this->body2 = NULL;
 
-  this->showJointsConnection = Events::ConnectShowJointsSignal(boost::bind(&Joint::ShowJoints, this, _1) );
+  this->showJointsConnection = event::Events::ConnectShowJointsSignal(boost::bind(&Joint::ShowJoints, this, _1) );
 }
 
 

@@ -28,7 +28,6 @@
 
 #include "IOManager.hh"
 #include "Events.hh"
-#include "RenderState.hh"
 #include "PhysicsFactory.hh"
 #include "gazebo_config.h"
 #include "Plugin.hh"
@@ -44,7 +43,6 @@
 #include "GazeboConfig.hh"
 #include "gz.h"
 #include "PhysicsEngine.hh"
-#include "OgreAdaptor.hh"
 #include "GazeboMessage.hh"
 #include "GazeboError.hh"
 #include "Global.hh"
@@ -139,7 +137,7 @@ Simulator::Simulator()
   //this->model_delete_mutex = new boost::recursive_mutex();
   this->gazeboConfig=new gazebo::GazeboConfig();
 
-  this->quitConnection = Events::ConnectQuitSignal( boost::bind(&Simulator::SetUserQuit, this) );
+  this->quitConnection = event::Events::ConnectQuitSignal( boost::bind(&Simulator::SetUserQuit, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,9 +170,6 @@ Simulator::~Simulator()
 /// Finishes the Simulator and frees everything
 void Simulator::Fini()
 {
-  if (this->renderEngineEnabled)
-    gazebo::OgreAdaptor::Instance()->Fini();
-
   for (unsigned int i=0; i < this->worlds.size(); i++)
   {
     this->worlds[i]->Fini();
@@ -189,7 +184,7 @@ void Simulator::Fini()
   }
 
   google::protobuf::ShutdownProtobufLibrary();
-  IOManager::Instance()->Stop();
+  transport::IOManager::Instance()->Stop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,69 +222,6 @@ void Simulator::Load(const std::string &fileName)
 
   // Load the messaging system
   gazebo::GazeboMessage::Instance()->Load(configNode);
-
-  // Load the Ogre rendering system
-  if (this->renderEngineEnabled)
-    OgreAdaptor::Instance()->Load(configNode);
-
-  // Create and initialize the Gui
-  if (this->renderEngineEnabled && this->guiEnabled)
-  {
-    try
-    {
-      XMLConfigNode *childNode = NULL;
-      if (rootNode)
-       childNode = configNode->GetChild("gui");
-
-      int width=0;
-      int height=0;
-      int x = 0;
-      int y = 0;
-
-      if (childNode)
-      {
-        width = childNode->GetTupleInt("size", 0, 800);
-        height = childNode->GetTupleInt("size", 1, 600);
-        x = childNode->GetTupleInt("pos",0,0);
-        y = childNode->GetTupleInt("pos",1,0);
-      }
-
-      // Create the GUI
-      if (!this->gui && (childNode || !rootNode))
-      {
-        this->gui = new SimulationApp();
-        this->gui->Load();
-      }
-    }
-    catch (GazeboError e)
-    {
-      gzthrow( "Error loading the GUI\n" << e);
-    }
-  }
-  else
-  {
-    this->gui = NULL;
-  }
-
-  //Initialize RenderEngine
-  if (this->renderEngineEnabled)
-  {
-    try
-    {
-      OgreAdaptor::Instance()->Init(configNode);
-      this->renderEngine = OgreAdaptor::Instance();
-    }
-    catch (gazebo::GazeboError e)
-    {
-      gzthrow("Failed to Initialize the Rendering engine subsystem\n" << e );
-    }
-  }
-
-  // Initialize the GUI
-  if (this->gui)
-  {
-    this->gui->Init();
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -420,9 +352,8 @@ World *Simulator::GetActiveWorld() const
 void Simulator::Init()
 {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
-  IOManager::Instance()->Start();
+  transport::IOManager::Instance()->Start();
 
-  RenderState::Init();
 
   //Initialize the world
   try
@@ -460,7 +391,6 @@ void Simulator::Save(const std::string& filename)
   GazeboMessage::Instance()->Save(prefix, output);
   output << "\n";
 
-  this->GetRenderEngine()->Save(prefix, output);
   output << "\n";
 
   this->gui->Save(prefix, output);
@@ -522,19 +452,12 @@ void Simulator::Run()
 ////////////////////////////////////////////////////////////////////////////////
 void Simulator::GraphicsUpdate()
 {
-  if (this->renderEngineEnabled)
-  {
-    OgreAdaptor::Instance()->UpdateScenes();
-    for (unsigned int i=0; i < this->worlds.size(); i++)
-      this->worlds[i]->GraphicsUpdate();
-  }
-
   for (unsigned int i=0; i < this->worlds.size(); i++)
   {
+    this->worlds[i]->GraphicsUpdate();
     this->worlds[i]->ProcessEntitiesToLoad();
     this->worlds[i]->ProcessEntitiesToDelete();
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -545,41 +468,13 @@ GazeboConfig *Simulator::GetGazeboConfig() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OgreAdaptor *Simulator::GetRenderEngine() const
-{
-  if (this->renderEngineEnabled)
-    return this->renderEngine;
-  else
-    return NULL;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Set the user quit flag
 void Simulator::SetUserQuit()
 {
   this->userQuit = true;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// True if the gui is to be used
-void Simulator::SetGuiEnabled( bool enabled )
-{
-  this->guiEnabled = enabled;
-}
 
-////////////////////////////////////////////////////////////////////////////////
-/// Return true if the gui is enabled
-bool Simulator::GetGuiEnabled() const
-{
-  return this->guiEnabled;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// True if the gui is to be used
-void Simulator::SetRenderEngineEnabled( bool enabled )
-{
-  this->renderEngineEnabled = enabled;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the physics enabled/disabled

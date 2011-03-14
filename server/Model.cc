@@ -28,8 +28,6 @@
 #include <float.h>
 
 #include "Events.hh"
-#include "OgreAdaptor.hh"
-#include "RenderState.hh"
 #include "Visual.hh"
 #include "Light.hh"
 #include "GraphicsIfaceHandler.hh"
@@ -196,7 +194,7 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
     {
       // Delete the existing one (this should only be reached when called
       // via the factory interface).
-      Events::deleteEntitySignal(scopedName.c_str());
+      event::Events::deleteEntitySignal(scopedName.c_str());
     }
   }
 
@@ -418,8 +416,8 @@ void Model::Update()
     }
   }
 
-
-  if (RenderState::GetShowJoints())
+  // NATY: Make this work without renderstate
+  /*if (RenderState::GetShowJoints())
   {
     JointContainer::iterator jointIter;
     for (jointIter = this->joints.begin(); 
@@ -427,7 +425,7 @@ void Model::Update()
     {
       (*jointIter)->Update();
     }
-  }
+  }*/
 
   this->UpdateChild();
 }
