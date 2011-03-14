@@ -17,12 +17,12 @@
 #ifndef TOPICMANAGER_HH
 #define TOPICMANAGER_HH
 
-#include "GazeboError.hh"
-#include "Messages.hh"
-#include "SingletonT.hh"
-#include "Publisher.hh"
-#include "Subscriber.hh"
-#include "Subscription.hh"
+#include "common/GazeboError.hh"
+#include "common/Messages.hh"
+#include "common/SingletonT.hh"
+#include "transport/Publisher.hh"
+#include "transport/Subscriber.hh"
+#include "transport/Subscription.hh"
 
 namespace gazebo
 {

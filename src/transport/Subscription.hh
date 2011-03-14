@@ -23,7 +23,7 @@
 
 #include <google/protobuf/message.h>
 #include <boost/function.hpp>
-#include "GazeboError.hh"
+#include "common/GazeboError.hh"
 
 namespace gazebo
 {

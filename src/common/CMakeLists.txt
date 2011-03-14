@@ -1,12 +1,9 @@
 
-include_directories(
-  .
-  transport
-  ${XML_INCLUDE_DIRS}
-  ${CMAKE_BINARY_DIR}/src/msgs
+include_directories( 
+  ${XML_INCLUDE_DIRS} 
+  ${PROJECT_BINARY_DIR}/src/msgs
+  ${PROJECT_SOURCE_DIR}/src 
 )
-
-add_subdirectory(transport)
 
 set ( sources Messages.cc
               Angle.cc
@@ -42,7 +39,8 @@ set ( sources Messages.cc
               Common.cc
 )
 
-set ( headers Angle.hh
+set ( headers Messages.hh
+              Angle.hh
               AssimpLoader.hh
               Box.hh
               Color.hh
@@ -58,7 +56,6 @@ set ( headers Angle.hh
               Mesh.hh
               MeshLoader.hh
               MeshManager.hh
-              Messages.hh
               OgreLoader.hh
               Param.hh
               Plane.hh
@@ -91,3 +88,4 @@ endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 target_link_libraries( gazebo_common ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
 install ( TARGETS gazebo_common DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/common COMPONENT headers)

@@ -27,23 +27,26 @@
 
 namespace gazebo
 {
-  /// \brief Wrapper around the Assimp asset loader
-  class AssimpLoader : public MeshLoader
+  namespace common
   {
-    /// \brief Constructor
-    public: AssimpLoader();
+    /// \brief Wrapper around the Assimp asset loader
+    class AssimpLoader : public MeshLoader
+    {
+      /// \brief Constructor
+      public: AssimpLoader();
 
-    /// \brief Destructor
-    public: virtual ~AssimpLoader();
-  
-    /// \brief Load a mesh
-    public: virtual Mesh *Load( const std::string &filename );
-  
-    /// \brief Construct the mesh
-    private: void BuildMesh(aiNode *node, Mesh *mesh);
-  
-    private: Assimp::Importer importer;
-  };
+      /// \brief Destructor
+      public: virtual ~AssimpLoader();
+    
+      /// \brief Load a mesh
+      public: virtual Mesh *Load( const std::string &filename );
+    
+      /// \brief Construct the mesh
+      private: void BuildMesh(aiNode *node, Mesh *mesh);
+    
+      private: Assimp::Importer importer;
+    };
+  }
 }
 
 #endif

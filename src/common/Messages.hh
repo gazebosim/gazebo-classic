@@ -17,21 +17,7 @@
 #ifndef MESSAGES_HH
 #define MESSAGES_HH
 
-#include "visual.pb.h"
-#include "insert_model.pb.h"
-#include "selection.pb.h"
-#include "color.pb.h"
-#include "pose.pb.h"
-#include "point.pb.h"
-#include "header.pb.h"
-#include "light.pb.h"
-#include "plane.pb.h"
-#include "quaternion.pb.h"
-#include "time.pb.h"
-#include "shadows.pb.h"
-#include "fog.pb.h"
-#include "scene.pb.h"
-
+#include "MessageTypes.hh"
 #include "XMLConfig.hh"
 #include "Color.hh"
 #include "Vector3.hh"

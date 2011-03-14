@@ -28,12 +28,14 @@
 
 namespace gazebo
 {
+  namespace common
+  {
 
-/// \addtogroup gazebo_server
-/// \brief Angle class
-/// \{
-
-/// \brief Angle class
+  /// \addtogroup gazebo_server
+  /// \brief Angle class
+  /// \{
+  
+  /// \brief Angle class
   class Angle
   {
     /// \brief Constructor
@@ -126,8 +128,9 @@ namespace gazebo
     /// The angle in radians
     private: double value;
   };
-  
-/// \}
+    
+  /// \}
+  }
 }
 
 #endif

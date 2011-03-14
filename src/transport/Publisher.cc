@@ -18,9 +18,9 @@
  * Author: Nate Koenig
  */
 
-#include "GazeboError.hh"
-#include "TopicManager.hh"
-#include "Publisher.hh"
+#include "common/GazeboError.hh"
+#include "transport/TopicManager.hh"
+#include "transport/Publisher.hh"
 
 using namespace gazebo;
 using namespace transport;

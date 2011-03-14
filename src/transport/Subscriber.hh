@@ -24,7 +24,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "Subscription.hh"
+#include "transport/Subscription.hh"
 
 namespace gazebo
 {

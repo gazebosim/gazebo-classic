@@ -14,40 +14,52 @@
  * limitations under the License.
  *
 */
-/* Desc: Handles a subscription to a topic
- * Author: Nate Koenig
- */
-
-#include "TopicManager.hh"
-#include "Subscriber.hh"
+#include "transport/TopicManager.hh"
 
 using namespace gazebo;
 using namespace transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Subscriber::Subscriber(const std::string &t, SubscriptionPtr sub)
-  : topic(t), subscription(sub)
+TopicManager::TopicManager()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
-Subscriber::~Subscriber()
+TopicManager::~TopicManager()
 {
-  this->Unsubscribe();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the topic name
-std::string Subscriber::GetTopic() const
+/// Send a message
+void TopicManager::SendMessage( const std::string &topic, 
+                                google::protobuf::Message &message )
 {
-  return this->topic;
+  std::string out;
+
+  // Stamp the message with the transport time
+  Message::SendStamp(message);
+
+  if (!message.IsInitialized())
+  {
+    gzthrow("Simulator::SendMessage Message is not initialized[" + message.InitializationErrorString() + "]");
+  }
+
+  if (!message.SerializeToString(&out))
+    gzthrow("Simulator::SendMessage Failed to serialized message");
+
+  std::list<SubscriptionPtr>::iterator iter;
+  for (iter = this->subscribed_topics[topic].begin(); 
+       iter != this->subscribed_topics[topic].end(); iter++)
+  {
+    (*iter)->HandleMessage(out);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Unsubscribe from the topic
-void Subscriber::Unsubscribe() const
+// Unsubscribe from a topic
+void TopicManager::Unsubscribe( const std::string &topic, SubscriptionPtr sub)
 {
-  TopicManager::Instance()->Unsubscribe(this->topic, this->subscription );
+  this->subscribed_topics[topic].remove(sub);
 }
