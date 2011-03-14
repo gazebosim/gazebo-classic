@@ -1,13 +1,14 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.4.6 FATAL_ERROR )
+cmake_minimum_required( VERSION 2.4.6 FATAL_ERROR )
 
-IF(COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(SET CMP0003 NEW)
-  CMAKE_POLICY(SET CMP0004 NEW)
-ENDIF(COMMAND CMAKE_POLICY)
+if(COMMAND CMAKE_POLICY)
+  CMAKE_POLICY(set CMP0003 NEW)
+  CMAKE_POLICY(set CMP0004 NEW)
+endif(COMMAND CMAKE_POLICY)
 
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
+set (GAZEBO_VERSION_NAME "hydrogen")
 set (GAZEBO_MAJOR_VERSION 1)
 set (GAZEBO_MINOR_VERSION 0)
 set (GAZEBO_PATCH_VERSION 0)
@@ -55,27 +56,27 @@ set (ENABLE_BINDINGS OFF CACHE BOOL "Enable libgazebo bindings")
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH 
      "Location of CMake scripts")
 
-INCLUDE (${gazebo_cmake_dir}/DissectVersion.cmake)
+include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
 # Build type cflags
-SET (CMAKE_C_FLAGS_RELEASE " -O2 -DNDEBUG -Wall -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
-SET (CMAKE_C_FLAGS_DEBUG " -ggdb  -Wall -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
-SET (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -Wall -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
+set (CMAKE_C_FLAGS_RELEASE " -O2 -DNDEBUG -Wall -fPIC " CACHE INTERNAL "C Flags for release" FORCE)
+set (CMAKE_C_FLAGS_DEBUG " -ggdb  -Wall -fPIC " CACHE INTERNAL "C Flags for debug" FORCE)
+set (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -Wall -fPIC " CACHE INTERNAL "C Flags for profile" FORCE)
 
 #####################################
 # Build type link flags
-SET (CMAKE_LINK_FLAGS_RELEASE "" CACHE INTERNAL "Link flags fro release" FORCE)
-SET (CMAKE_LINK_FLAGS_DEBUG "" CACHE INTERNAL "Link flags for debug" FORCE)
-SET (CMAKE_LINK_FLAGS_PROFILE "" CACHE INTERNAL "Link flags for profile" FORCE)
+set (CMAKE_LINK_FLAGS_RELEASE "" CACHE INTERNAL "Link flags fro release" FORCE)
+set (CMAKE_LINK_FLAGS_DEBUG "" CACHE INTERNAL "Link flags for debug" FORCE)
+set (CMAKE_LINK_FLAGS_PROFILE "" CACHE INTERNAL "Link flags for profile" FORCE)
 
 #####################################
 # Set the default build type
-IF (NOT CMAKE_BUILD_TYPE)
-  SET (CMAKE_BUILD_TYPE "release" CACHE STRING 
+if (NOT CMAKE_BUILD_TYPE)
+  set (CMAKE_BUILD_TYPE "release" CACHE STRING 
     "Choose the type of build, options are: debug release profile" FORCE)
-ENDIF (NOT CMAKE_BUILD_TYPE)
-STRING(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+endif (NOT CMAKE_BUILD_TYPE)
+string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
 
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
@@ -100,7 +101,6 @@ if ( build_errors )
   message(STATUS "END BUILD ERRORS\n")
 else (build_errors)
 
-
   ########################################
   # Write the config.h file
   configure_file (${PROJECT_SOURCE_DIR}/gazebo_config.h.in ${PROJECT_BINARY_DIR}/gazebo_config.h)
@@ -119,11 +119,7 @@ else (build_errors)
   message (STATUS "Cmake C Flags:${CMAKE_C_FLAGS}")
   
   if (BUILD_GAZEBO)
-    include (libgazebo)
-
-    add_subdirectory(msgs)
-    add_subdirectory(libgazebo)
-    add_subdirectory(server)
+    add_subdirectory(src)
     add_subdirectory(worlds)
     add_subdirectory(tools)
     add_subdirectory(benchmarks)
