@@ -17,6 +17,8 @@
 
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
+
+#include "common/XMLConfig.hh"
 #include "common/Messages.hh"
 
 using namespace gazebo;

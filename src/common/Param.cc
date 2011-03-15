@@ -20,6 +20,7 @@
  * SVN: $Id$
  */
 
+#include "common/XMLConfig.hh"
 #include "common/GazeboError.hh"
 #include "common/Param.hh"
 #include "common/Quatern.hh"
@@ -132,3 +133,20 @@ bool Param::IsPose3d() const
 {
   return this->GetTypename() == typeid(Pose3d).name();
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/// Load the param from an XML config file
+void Param::Load(XMLConfigNode *node)
+{
+  std::ostringstream stream;
+  stream << this->GetDefaultAsString();
+
+  std::string input;
+  if (node)
+    input = node->GetString(this->GetKey(), stream.str(), this->required);
+  else
+    input = stream.str();
+
+  this->SetFromString( input );
+}
+

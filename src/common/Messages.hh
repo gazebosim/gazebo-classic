@@ -18,7 +18,6 @@
 #define MESSAGES_HH
 
 #include "MessageTypes.hh"
-#include "common/XMLConfig.hh"
 #include "common/Color.hh"
 #include "common/Vector3.hh"
 #include "common/Time.hh"
@@ -30,6 +29,8 @@ namespace gazebo
 {
 	namespace common
   {
+    class XMLConfigNode;
+
     class Message
     {
       public:

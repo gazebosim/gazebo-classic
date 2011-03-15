@@ -27,6 +27,7 @@
 #include <fstream>
 #include <sstream>
 
+#include <libxml/xpath.h>
 #include <libxml/xinclude.h>
 #include <libxml/xpointer.h>
 
@@ -131,8 +132,8 @@ void XMLConfig::FillDocumentNodes()
   }
 
   // Create xpath evaluation context
-  this->xpathContex = xmlXPathNewContext(this->xmlDoc);
-  if (this->xpathContex == NULL)
+  xmlXPathContextPtr xpathContex = xmlXPathNewContext(this->xmlDoc);
+  if (xpathContex == NULL)
   {
     gzthrow("Unable to create new XPath context");
   }

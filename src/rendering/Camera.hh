@@ -17,7 +17,6 @@
 /* Desc: A persepective OGRE Camera
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id: Camera.hh 8937 2010-10-11 16:59:55Z natepak $
  */
 
 #ifndef CAMERASENSOR_HH
@@ -31,6 +30,7 @@
 #include "common/Angle.hh"
 #include "common/Pose3d.hh"
 #include "common/Time.hh"
+#include "common/Vector2i.hh"
 
 // Forward Declarations
 namespace Ogre

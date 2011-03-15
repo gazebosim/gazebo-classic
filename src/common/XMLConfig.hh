@@ -24,7 +24,6 @@
 #define XMLCONFIG_HH
 
 #include <libxml/parser.h>
-#include <libxml/xpath.h>
 #include <string>
 
 #include "common/Color.hh"
@@ -81,8 +80,6 @@ namespace gazebo
     
       /// \brief The root of the tree
       private: XMLConfigNode *root;
-    
-      private: xmlXPathContextPtr xpathContex;
     };
     
     

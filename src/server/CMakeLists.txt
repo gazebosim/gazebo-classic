@@ -296,7 +296,6 @@ install (FILES ${gazeboserver_headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/inclu
 #${TBB_INCLUDE_DIRS}
 #${ODE_INCLUDE_DIRS}
 #${ogre_include_dirs}
-#${GTK2_INCLUDE_DIRS}
 #${XML_INCLUDE_DIRS}
 #${XPM_INCLUDE_DIRS}
 #${OAL_INCLUDE_DIRS}
