@@ -19,8 +19,10 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "common/Vector3.hh"
+#include "common/Vector2d.hh"
 #include "common/SingletonT.hh"
 
 namespace gazebo

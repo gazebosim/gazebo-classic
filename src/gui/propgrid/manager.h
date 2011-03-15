@@ -28,7 +28,7 @@
 #ifndef _WX_PROPGRID_MANAGER_H_
 #define _WX_PROPGRID_MANAGER_H_
 
-#include <wx/propgrid/propgrid.h>
+#include <gui/propgrid/propgrid.h>
 
 #if wxPG_INCLUDE_MANAGER || defined(DOXYGEN)
 
@@ -73,7 +73,7 @@ extern WXDLLIMPEXP_PG const wxChar *wxPropertyGridManagerNameStr;
 
     <h4>Include files</h4>
 
-    <wx/propgrid/manager.h>
+    <gui/propgrid/manager.h>
 
     <h4>Event handling</h4>
 
@@ -222,7 +222,7 @@ private:
 
     <h4>Include files</h4>
 
-    <wx/propgrid/manager.h>
+    <gui/propgrid/manager.h>
 
     <h4>Window styles</h4>
 

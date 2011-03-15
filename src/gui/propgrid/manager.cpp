@@ -47,11 +47,11 @@
 // This define is necessary to prevent macro clearing
 #define __wxPG_SOURCE_FILE__
 
-#include <wx/propgrid/propgrid.h>
+#include <gui/propgrid/propgrid.h>
 
 #if wxPG_INCLUDE_MANAGER
 
-#include <wx/propgrid/manager.h>
+#include <gui/propgrid/manager.h>
 
 
 #define wxPG_MAN_ALTERNATE_BASE_ID          11249 // Needed for wxID_ANY madnesss

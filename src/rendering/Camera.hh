@@ -22,9 +22,6 @@
 #ifndef CAMERASENSOR_HH
 #define CAMERASENSOR_HH
 
-#include <OgrePrerequisites.h>
-#include <OgreTexture.h>
-
 #include "common/Event.hh"
 #include "common/Param.hh"
 #include "common/Angle.hh"
@@ -35,7 +32,7 @@
 // Forward Declarations
 namespace Ogre
 {
-  class TexturePtr;
+  class Texture;
   class RenderTarget;
   class Camera;
   class Viewport;
@@ -292,12 +289,12 @@ namespace gazebo
       protected: common::ParamT<std::string> *imageFormatP;
    
       protected: common::ParamT<std::string> *visMaskP;
-      protected: Ogre::PixelFormat imageFormat;
+      protected: int imageFormat;
       protected: unsigned int visibilityMask;
   
       protected: Ogre::RenderTarget *renderTarget;
   
-      protected: Ogre::TexturePtr renderTexture;
+      protected: Ogre::Texture *renderTexture;
   
       private: static unsigned int cameraCounter;
       private: unsigned int myCount;

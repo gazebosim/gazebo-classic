@@ -27,7 +27,7 @@
 #include "gui/PointLightMaker.hh"
 #include "gui/SpotLightMaker.hh"
 #include "gui/DirectionalLightMaker.hh"
-#include "gui/MouseEvent.hh"
+#include "common/MouseEvent.hh"
 
 namespace gazebo
 {
@@ -69,11 +69,11 @@ namespace gazebo
       public: void Init();
   
       /// \brief Create the camera
-      //public: void CreateCamera(Scene *scene);
-      public: void ViewScene(Scene *scene);
+      //public: void CreateCamera(rendering::Scene *scene);
+      public: void ViewScene(rendering::Scene *scene);
   
       /// \brief Get the camera
-      public: UserCamera *GetCamera();
+      public: rendering::UserCamera *GetCamera();
   
       /// \brief Get the cursor state
       public: std::string GetCursorState() const;
@@ -96,7 +96,7 @@ namespace gazebo
       /// \brief Translate an entity, or apply force
       //private: void EntityTranslate(Entity *entity);
   
-      private: UserCamera *userCamera;
+      private: rendering::UserCamera *userCamera;
   
       private: int windowId;
   

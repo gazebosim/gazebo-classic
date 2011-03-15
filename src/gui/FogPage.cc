@@ -17,6 +17,10 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include "common/Color.hh"
 #include "gui/FogPage.hh"
 
 using namespace gazebo;
@@ -126,7 +130,7 @@ void FogPage::Apply()
   double density = boost::lexical_cast<double>(str);
 
   wxColour clr = this->colorCtrl->GetColour();
-  Color color(clr.Red(), clr.Green(), clr.Blue());
+  common::Color color(clr.Red(), clr.Green(), clr.Blue());
 
   // NATY: Fix this
   //Simulator::Instance()->GetActiveWorld()->GetScene()->SetFog( type, color,

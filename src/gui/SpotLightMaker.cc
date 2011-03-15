@@ -15,6 +15,7 @@
  *
 */
 #include <iostream>
+#include <sstream>
 
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
@@ -33,10 +34,10 @@ SpotLightMaker::SpotLightMaker()
   this->state = 0;
 
   this->msg.set_type( msgs::Light::SPOT );
-  Message::Set(this->msg.mutable_diffuse(), Color(0.5, 0.5, 0.5, 1));
-  Message::Set(this->msg.mutable_specular(), Color(0.1, 0.1, 0.1, 1));
-  Message::Set(this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.0));
-  Message::Set(this->msg.mutable_direction(), common::Vector3(0,0,-1));
+  common::Message::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
+  common::Message::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
+  common::Message::Set(this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.0));
+  common::Message::Set(this->msg.mutable_direction(), common::Vector3(0,0,-1));
   this->msg.set_range( 20 );
   this->msg.set_cast_shadows( false );
   this->msg.set_spot_inner_angle( 20 );
@@ -67,7 +68,7 @@ bool SpotLightMaker::IsActive() const
   return this->state > 0;
 }
 
-void SpotLightMaker::MousePushCB(const MouseEvent &event)
+void SpotLightMaker::MousePushCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -75,11 +76,13 @@ void SpotLightMaker::MousePushCB(const MouseEvent &event)
   common::Vector3 norm;
   norm.Set(0,0,1);
 
-  Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0) );
+  /* NATY: Fix camera issue
+  common::Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0) );
   this->msg.mutable_pose()->mutable_position()->set_z( 1.0 );
+  */
 }
 
-void SpotLightMaker::MouseReleaseCB(const MouseEvent &event)
+void SpotLightMaker::MouseReleaseCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -90,12 +93,12 @@ void SpotLightMaker::MouseReleaseCB(const MouseEvent &event)
   this->Stop();
 }
 
-void SpotLightMaker::MouseDragCB(const MouseEvent & /*event*/)
+void SpotLightMaker::MouseDragCB(const common::MouseEvent & /*event*/)
 {
 }
 
 void SpotLightMaker::CreateTheEntity()
 {
-  Message::CreationStamp(this->msg);
+  common::Message::CreationStamp(this->msg);
   //Simulator::Instance()->SendMessage(this->msg);
 }

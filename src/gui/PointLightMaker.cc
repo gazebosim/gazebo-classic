@@ -15,6 +15,7 @@
  *
 */
 #include <iostream>
+#include <sstream>
 
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
@@ -33,9 +34,9 @@ PointLightMaker::PointLightMaker()
   this->state = 0;
 
   this->msg.set_type( msgs::Light::POINT );
-  Message::Set(this->msg.mutable_diffuse(), Color(0.5, 0.5, 0.5, 1));
-  Message::Set(this->msg.mutable_specular(), Color(0.1, 0.1, 0.1, 1));
-  Message::Set(this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.001));
+  common::Message::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
+  common::Message::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
+  common::Message::Set(this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.001));
   this->msg.set_range( 20 );
   this->msg.set_cast_shadows( false );
 }
@@ -44,7 +45,7 @@ PointLightMaker::~PointLightMaker()
 {
 }
 
-void PointLightMaker::Start( Scene *scene )
+void PointLightMaker::Start( )
 {
   std::ostringstream stream;
   stream << "user_point_light_" << counter++;
@@ -63,7 +64,7 @@ bool PointLightMaker::IsActive() const
   return this->state > 0;
 }
 
-void PointLightMaker::MousePushCB(const MouseEvent &event)
+void PointLightMaker::MousePushCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -71,13 +72,15 @@ void PointLightMaker::MousePushCB(const MouseEvent &event)
   common::Vector3 norm;
   norm.Set(0,0,1);
 
-  Message::Set(this->msg.mutable_pose()->mutable_position(), 
+  /* NATY: Fix the camera issue
+  common::Message::Set(this->msg.mutable_pose()->mutable_position(), 
       event.camera->GetWorldPointOnPlane(event.pressPos.x, 
                                          event.pressPos.y, norm, 0));
   this->msg.mutable_pose()->mutable_position()->set_z(1);
+  */
 }
 
-void PointLightMaker::MouseReleaseCB(const MouseEvent &event)
+void PointLightMaker::MouseReleaseCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -88,12 +91,12 @@ void PointLightMaker::MouseReleaseCB(const MouseEvent &event)
   this->Stop();
 }
 
-void PointLightMaker::MouseDragCB(const MouseEvent & /*event*/)
+void PointLightMaker::MouseDragCB(const common::MouseEvent & /*event*/)
 {
 }
 
 void PointLightMaker::CreateTheEntity()
 {
-  Message::CreationStamp(this->msg);
+  common::Message::CreationStamp(this->msg);
   //Simulator::Instance()->SendMessage(this->msg);
 }

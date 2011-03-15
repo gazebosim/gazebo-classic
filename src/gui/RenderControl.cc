@@ -26,6 +26,7 @@
 #endif
 
 #include "common/GazeboError.hh"
+#include "common/Global.hh"
 #include "common/Events.hh"
 
 #include "rendering/WindowManager.hh"
@@ -153,7 +154,7 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
 {
   SetFocus();
   this->mouseEvent.pos.Set( event.GetX(), event.GetY() );
-  this->mouseEvent.camera = this->userCamera;
+  //this->mouseEvent.camera = this->userCamera;
 
   if (event.LeftDown() || event.MiddleDown() || event.RightDown())
     this->mouseEvent.pressPos = this->mouseEvent.pos;
@@ -161,19 +162,19 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
   if (event.LeftUp() || event.MiddleUp() || event.RightUp())
     this->userCamera->GetScene()->SetVisible("guiline", false);
 
-  this->mouseEvent.left = event.LeftIsDown() ? MouseEvent::DOWN : MouseEvent::UP;
-  this->mouseEvent.right = event.RightIsDown() ? MouseEvent::DOWN : MouseEvent::UP;
-  this->mouseEvent.middle = event.MiddleIsDown() ? MouseEvent::DOWN : MouseEvent::UP;
+  this->mouseEvent.left = event.LeftIsDown() ? common::MouseEvent::DOWN : common::MouseEvent::UP;
+  this->mouseEvent.right = event.RightIsDown() ? common::MouseEvent::DOWN : common::MouseEvent::UP;
+  this->mouseEvent.middle = event.MiddleIsDown() ? common::MouseEvent::DOWN : common::MouseEvent::UP;
  
   if (event.GetWheelRotation() < 0) 
   {
     this->mouseEvent.scroll.y = 1;
-    this->mouseEvent.middle = MouseEvent::SCROLL;
+    this->mouseEvent.middle = common::MouseEvent::SCROLL;
   }
   else if (event.GetWheelRotation() > 0)
   {
     this->mouseEvent.scroll.y = -1;
-    this->mouseEvent.middle = MouseEvent::SCROLL;
+    this->mouseEvent.middle = common::MouseEvent::SCROLL;
   }
 
   this->mouseEvent.dragging = event.Dragging();
@@ -196,7 +197,7 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
   else if (this->GetCursorState() == "manip")
   {
     // NATY: Remove this dependency
-    //Entity *entity = Simulator::Instance()->GetActiveWorld()->GetSelectedEntity();
+    /*Entity *entity = Simulator::Instance()->GetActiveWorld()->GetSelectedEntity();
 
     if (entity)
     {
@@ -214,6 +215,7 @@ void RenderControl::OnMouseEvent( wxMouseEvent &event)
           this->EntityTranslate(entity);
       }
     }
+    */
   }
   else
     this->userCamera->HandleMouseEvent(this->mouseEvent);
@@ -327,14 +329,14 @@ void RenderControl::ViewScene(rendering::Scene *scene)
     this->userCamera = scene->GetUserCamera(0);
 
   this->userCamera->SetWorldPosition( common::Vector3(-5,0,5) );
-  this->userCamera->SetWorldRotation( Quatern::EulerToQuatern(0, DTOR(15), 0) );
+  this->userCamera->SetWorldRotation( common::Quatern::EulerToQuatern(0, DTOR(15), 0) );
 
-  WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
+  rendering::WindowManager::Instance()->SetCamera(this->windowId, this->userCamera);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the user camera
-UserCamera *RenderControl::GetCamera()
+rendering::UserCamera *RenderControl::GetCamera()
 {
   return this->userCamera;
 }
@@ -384,7 +386,7 @@ void RenderControl::CreateEntity(std::string name)
   }
 
   if (this->currMaker)
-    this->currMaker->Start(this->userCamera->GetScene());
+    this->currMaker->Start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -393,8 +395,8 @@ void RenderControl::OnSize( wxSizeEvent &evt )
 {
   wxSize size = evt.GetSize ();
 
-  WindowManager::Instance()->Resize(this->windowId, size.GetWidth(), 
-                                    size.GetHeight());
+  rendering::WindowManager::Instance()->Resize(this->windowId, size.GetWidth(), 
+                                               size.GetHeight());
   evt.Skip();
 }
 
@@ -439,7 +441,7 @@ void RenderControl::ManipModeCB(bool mode)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Rotate and entity, or apply torque
-void RenderControl::EntityRotate(Entity *entity)
+/*void RenderControl::EntityRotate(Entity *entity)
 {
   common::Vector3 planeNorm, planeNorm2;
   common::Vector3 p1, p2;
@@ -492,7 +494,7 @@ void RenderControl::EntityRotate(Entity *entity)
 
   if (entity->HasType(MODEL)) 
   {
-    Quatern delta; 
+    common::Quatern delta; 
     delta.SetFromAxis( ray.x, ray.y, ray.z,angle);
     
     modelPose.rot = modelPose.rot * delta;
@@ -507,10 +509,11 @@ void RenderControl::EntityRotate(Entity *entity)
     //((Body*)entity)->SetTorque(planeNorm * angle * forceMultiplier);
   }
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Translate an entity, or apply force
-void RenderControl::EntityTranslate(Entity *entity)
+/*void RenderControl::EntityTranslate(Entity *entity)
 {
   Pose3d pose = entity->GetWorldPose();
 
@@ -564,7 +567,7 @@ void RenderControl::EntityTranslate(Entity *entity)
     moveVector *= forceMultiplier;
     body->SetForce(moveVector);
   }
-}
+}*/
 
 void RenderControl::SetSelectedEntityCB(const std::string &name)
 {

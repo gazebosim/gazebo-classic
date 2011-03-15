@@ -1,6 +1,7 @@
 include ( ${wxWidgets_USE_FILE} )
 
 include_directories( 
+  ${XML_INCLUDE_DIRS} 
   ${PROJECT_BINARY_DIR}/src/msgs
   ${PROJECT_SOURCE_DIR}/src 
   ${wxWidgets_INCLUDE_DIRS}

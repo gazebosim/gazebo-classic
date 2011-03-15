@@ -44,17 +44,17 @@ void EntityMaker::SetSnapToGrid(bool snap)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void EntityMaker::MousePushCB(const MouseEvent &event)
+void EntityMaker::MousePushCB(const common::MouseEvent &event)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void EntityMaker::MouseReleaseCB(const MouseEvent &event)
+void EntityMaker::MouseReleaseCB(const common::MouseEvent &event)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void EntityMaker::MouseDragCB(const MouseEvent &event)
+void EntityMaker::MouseDragCB(const common::MouseEvent &event)
 {
 }
 

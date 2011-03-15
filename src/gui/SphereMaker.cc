@@ -15,6 +15,7 @@
  *
 */
 #include <iostream>
+#include <sstream>
 
 #include "common/Messages.hh"
 #include "common/Events.hh"
@@ -66,7 +67,7 @@ bool SphereMaker::IsActive() const
   return this->state > 0;
 }
 
-void SphereMaker::MousePushCB(const MouseEvent &event)
+void SphereMaker::MousePushCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -74,7 +75,7 @@ void SphereMaker::MousePushCB(const MouseEvent &event)
   this->mousePushPos = event.pressPos;
 }
 
-void SphereMaker::MouseReleaseCB(const MouseEvent &event)
+void SphereMaker::MouseReleaseCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -88,7 +89,7 @@ void SphereMaker::MouseReleaseCB(const MouseEvent &event)
   }
 }
 
-void SphereMaker::MouseDragCB(const MouseEvent &event)
+void SphereMaker::MouseDragCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -98,13 +99,14 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
 
   norm.Set(0,0,1);
 
+  /* NATY: Fix camera issue
   p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
   p2 = event.camera->GetWorldPointOnPlane(event.pos.x, event.pos.y ,norm, 0);
   p2 = this->GetSnappedPoint( p2 );
 
-  Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
   common::Vector3 p( this->visualMsg->pose().position().x(),
@@ -113,14 +115,15 @@ void SphereMaker::MouseDragCB(const MouseEvent &event)
 
   p.z = scale;
 
-  Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
-  Message::Set(this->visualMsg->mutable_scale(),common::Vector3(scale,scale,scale));
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
+  common::Message::Set(this->visualMsg->mutable_scale(),common::Vector3(scale,scale,scale));
+  */
 }
 
 void SphereMaker::CreateTheEntity()
 {
   msgs::InsertModel msg;
-  Message::Init(msg, "new_sphere");
+  common::Message::Init(msg, "new_sphere");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
@@ -150,5 +153,5 @@ void SphereMaker::CreateTheEntity()
   msg.set_xml( newModelStr.str() );
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  Message::CreationStamp(*this->visualMsg);
+  common::Message::CreationStamp(*this->visualMsg);
 }

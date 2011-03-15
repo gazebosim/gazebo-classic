@@ -15,6 +15,7 @@
  *
 */
 #include <iostream>
+#include <sstream>
 
 #include "common/Events.hh"
 #include "common/MouseEvent.hh"
@@ -33,10 +34,10 @@ DirectionalLightMaker::DirectionalLightMaker()
   this->state = 0;
 
   this->msg.set_type( msgs::Light::DIRECTIONAL );
-  Message::Set( this->msg.mutable_diffuse(),Color(0.2, 0.2, 0.2, 1));
-  Message::Set( this->msg.mutable_specular(), Color(0.01, 0.01, 0.01, 1));
-  Message::Set( this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.001));
-  Message::Set( this->msg.mutable_direction(), common::Vector3(.1, .1, -0.9));
+  common::Message::Set( this->msg.mutable_diffuse(),common::Color(0.2, 0.2, 0.2, 1));
+  common::Message::Set( this->msg.mutable_specular(), common::Color(0.01, 0.01, 0.01, 1));
+  common::Message::Set( this->msg.mutable_attenuation(), common::Vector3(0.5, 0.01, 0.001));
+  common::Message::Set( this->msg.mutable_direction(), common::Vector3(.1, .1, -0.9));
   this->msg.set_range( 20 );
   this->msg.set_cast_shadows( true );
 }
@@ -45,7 +46,7 @@ DirectionalLightMaker::~DirectionalLightMaker()
 {
 }
 
-void DirectionalLightMaker::Start(Scene *scene)
+void DirectionalLightMaker::Start()
 {
   std::ostringstream stream;
   stream << "user_directional_light_" << counter++;
@@ -64,7 +65,7 @@ bool DirectionalLightMaker::IsActive() const
   return this->state > 0;
 }
 
-void DirectionalLightMaker::MousePushCB(const MouseEvent &event)
+void DirectionalLightMaker::MousePushCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -72,11 +73,13 @@ void DirectionalLightMaker::MousePushCB(const MouseEvent &event)
   common::Vector3 norm;
   norm.Set(0,0,1);
 
-  Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0));
+  /* NATY: Fixe camera issue
+  common::Message::Set(this->msg.mutable_pose()->mutable_position(), event.camera->GetWorldPointOnPlane(event.pressPos.x, event.pressPos.y, norm, 0));
   this->msg.mutable_pose()->mutable_position()->set_z(5);
+  */
 }
 
-void DirectionalLightMaker::MouseReleaseCB(const MouseEvent &event)
+void DirectionalLightMaker::MouseReleaseCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -87,12 +90,12 @@ void DirectionalLightMaker::MouseReleaseCB(const MouseEvent &event)
   this->Stop();
 }
 
-void DirectionalLightMaker::MouseDragCB(const MouseEvent & /*event*/)
+void DirectionalLightMaker::MouseDragCB(const common::MouseEvent & /*event*/)
 {
 }
 
 void DirectionalLightMaker::CreateTheEntity()
 {
-  Message::CreationStamp(this->msg);
+  common::Message::CreationStamp(this->msg);
   //Simulator::Instance()->SendMessage(this->msg);
 }

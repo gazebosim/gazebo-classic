@@ -49,13 +49,13 @@
 
 #define __wxPG_SOURCE_FILE__
 
-#include <wx/propgrid/propgrid.h>
+#include <gui/propgrid/propgrid.h>
 
 #if wxPG_INCLUDE_ADVPROPS
 
-#include <wx/propgrid/propdev.h>
+#include <gui/propgrid/propdev.h>
 
-#include <wx/propgrid/advprops.h>
+#include <gui/propgrid/advprops.h>
 
 #ifdef __WXMSW__
     #include <wx/msw/private.h>
@@ -67,7 +67,7 @@
 #if wxPG_USING_WXOWNERDRAWNCOMBOBOX
     #include <wx/odcombo.h>
 #else
-    #include <wx/propgrid/odcombo.h>
+    #include <gui/propgrid/odcombo.h>
 #endif
 
 // -----------------------------------------------------------------------

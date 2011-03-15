@@ -151,15 +151,15 @@ void Camera::Load( common::XMLConfigNode *node )
     }
 
     if (this->imageFormatP->GetValue() == "L8")
-      this->imageFormat = Ogre::PF_L8;
+      this->imageFormat = (int)Ogre::PF_L8;
     else if (this->imageFormatP->GetValue() == "R8G8B8")
-      this->imageFormat = Ogre::PF_BYTE_RGB;
+      this->imageFormat = (int)Ogre::PF_BYTE_RGB;
     else if (this->imageFormatP->GetValue() == "B8G8R8")
-      this->imageFormat = Ogre::PF_BYTE_BGR;
+      this->imageFormat = (int)Ogre::PF_BYTE_BGR;
     else if (this->imageFormatP->GetValue() == "FLOAT32")
-      this->imageFormat = Ogre::PF_FLOAT32_R;
+      this->imageFormat = (int)Ogre::PF_FLOAT32_R;
     else if (this->imageFormatP->GetValue() == "FLOAT16")
-      this->imageFormat = Ogre::PF_FLOAT16_R;
+      this->imageFormat = (int)Ogre::PF_FLOAT16_R;
     else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
               (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
               (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
@@ -167,12 +167,12 @@ void Camera::Load( common::XMLConfigNode *node )
     {
       // let ogre generate rgb8 images for all bayer format requests
       // then post process to produce actual bayer images
-      this->imageFormat = Ogre::PF_BYTE_RGB;
+      this->imageFormat = (int)Ogre::PF_BYTE_RGB;
     }
     else
     {
       std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
-      this->imageFormat = Ogre::PF_R8G8B8;
+      this->imageFormat = (int)Ogre::PF_R8G8B8;
     }
   }
 
@@ -327,7 +327,7 @@ void Camera::PostRender()
     memset(this->saveFrameBuffer,128,size);
 
     Ogre::PixelBox box((**this->imageSizeP).x, (**this->imageSizeP).y,
-        1, this->imageFormat, this->saveFrameBuffer);
+        1, (Ogre::PixelFormat)this->imageFormat, this->saveFrameBuffer);
 
     pixelBuffer->blitToMemory( box );
 
@@ -516,7 +516,7 @@ size_t Camera::GetImageByteSize() const
   return Ogre::PixelUtil::getMemorySize((**this->imageSizeP).x,
                                         (**this->imageSizeP).y, 
                                         1, 
-                                        this->imageFormat);
+                                        (Ogre::PixelFormat)this->imageFormat);
 }
 
 
@@ -707,7 +707,7 @@ void Camera::SaveFrame()
   imgData->width = this->imageSizeP->GetValue().x;
   imgData->height = this->imageSizeP->GetValue().y;
   imgData->depth = this->GetImageDepth();
-  imgData->format = this->imageFormat;
+  imgData->format = (Ogre::PixelFormat)this->imageFormat;
   size = this->GetImageByteSize();
 
   // Wrap buffer in a chunk
@@ -908,15 +908,15 @@ void Camera::SetCaptureData( bool value )
 void Camera::CreateRenderTexture( const std::string &textureName )
 {
   // Create the render texture
-  this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
+  this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       textureName,
       "General",
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(), 
       this->GetImageHeight(),
       0,
-      this->imageFormat,
-      Ogre::TU_RENDERTARGET);
+      (Ogre::PixelFormat)this->imageFormat,
+      Ogre::TU_RENDERTARGET)).getPointer();
 
   this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
 }

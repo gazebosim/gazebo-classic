@@ -29,13 +29,13 @@ namespace gazebo
       public: DirectionalLightMaker();
       public: virtual ~DirectionalLightMaker();
     
-      public: virtual void Start(Scene *scene);
+      public: virtual void Start();
       public: virtual void Stop();
       public: virtual bool IsActive() const;
   
-      public: virtual void MousePushCB(const MouseEvent &event);
-      public: virtual void MouseReleaseCB(const MouseEvent &event);
-      public: virtual void MouseDragCB(const MouseEvent &event);
+      public: virtual void MousePushCB(const common::MouseEvent &event);
+      public: virtual void MouseReleaseCB(const common::MouseEvent &event);
+      public: virtual void MouseDragCB(const common::MouseEvent &event);
     
       private: virtual void CreateTheEntity();
       private: int state;

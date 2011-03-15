@@ -166,7 +166,7 @@ SimulationFrame::~SimulationFrame()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create the cameras
-void SimulationFrame::ViewScene( Scene *scene )
+void SimulationFrame::ViewScene( rendering::Scene *scene )
 {
   this->renderPanel->ViewScene(scene);
 }
@@ -196,13 +196,13 @@ void SimulationFrame::AddEntityCB(const std::string &name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimulationFrame::AddEntityHelper(const Common *entity, wxTreeItemId parent)
+/*void SimulationFrame::AddEntityHelper(const std::string &entity, wxTreeItemId parent)
 {
   EntityTreeItemData *data;
   wxTreeItemId item;
 
   data = new EntityTreeItemData;
-  data->name = entity->GetCompleteScopedName();
+  data->name = entity;//entity->GetCompleteScopedName();
 
   //if (entity->GetName() != "COM_Entity")
   if (entity->GetShowInGui())
@@ -218,7 +218,7 @@ void SimulationFrame::AddEntityHelper(const Common *entity, wxTreeItemId parent)
       this->AddEntityHelper(childEntity, item);
     }
   }
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Delete entity callback
@@ -309,13 +309,13 @@ void SimulationFrame::OnOpen(wxCommandEvent & WXUNUSED(event))
     std::string doc( openDialog->GetPath().mb_str() );
 
     // Load the world file
-    XMLConfig *xmlFile = new gazebo::XMLConfig();
+    common::XMLConfig *xmlFile = new common::XMLConfig();
 
     try
     {
       xmlFile->Load(doc);
     }
-    catch (GazeboError e)
+    catch (common::GazeboError e)
     {
       gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
     }
@@ -326,7 +326,7 @@ void SimulationFrame::OnOpen(wxCommandEvent & WXUNUSED(event))
       // NATY Put back in
       //Simulator::Instance()->Load(doc);
     }
-    catch (GazeboError e)
+    catch (common::GazeboError e)
     {
       gzthrow("Failed to load the World\n"  << e);
     }
@@ -536,11 +536,11 @@ void SimulationFrame::OnTreeClick(wxTreeEvent &event)
   {
     this->propGrid->Clear();
 
-    unsigned int paramCount = 0;
-    Common *common = NULL;
-
     // NATY: Put back in
-    /*if (data->name == "World")
+    //unsigned int paramCount = 0;
+    /*common::Common *common = NULL;
+
+    if (data->name == "World")
       paramCount = Simulator::Instance()->GetActiveWorld()->GetParamCount();
     else 
     {
@@ -611,9 +611,9 @@ void SimulationFrame::OnTreeRightClick(wxTreeEvent &event)
 // When a popup menu item has been click in the tree widget
 void SimulationFrame::OnTreePopupClick( wxCommandEvent &event )
 {
-  EntityTreeItemData *data = (EntityTreeItemData*)this->treeCtrl->GetItemData(this->treeCtrl->GetSelection());
-
   // NATY: Put back in
+  //EntityTreeItemData *data = (EntityTreeItemData*)this->treeCtrl->GetItemData(this->treeCtrl->GetSelection());
+
   //Common *common = Simulator::Instance()->GetActiveWorld()->GetByName(data->name);
 /* NATY: Put this back in
   if (common && common->HasType(ENTITY))
@@ -651,7 +651,7 @@ void SimulationFrame::OnPropertyChanged(wxPropertyGridEvent &event)
   if (!prop)
     return;
 
-  Param *param = (Param*)(prop->GetClientData());
+  common::Param *param = (common::Param*)(prop->GetClientData());
   if (param)
   {
     std::string value = std::string(prop->GetValueAsString().ToAscii());
@@ -664,7 +664,7 @@ void SimulationFrame::OnPropertyChanged(wxPropertyGridEvent &event)
 void SimulationFrame::MakeToolbar()
 {
 #if !defined(__WXMAC__)
-  Image image;
+  common::Image image;
 
   image.Load("control_play_blue.png");
   wxBitmap play_bitmap(wxString::FromAscii(image.GetFilename().c_str()), wxBITMAP_TYPE_PNG);

@@ -50,9 +50,9 @@
 
 #include <wx/filename.h>
 
-#include <wx/propgrid/propgrid.h>
+#include <gui/propgrid/propgrid.h>
 
-#include <wx/propgrid/propdev.h>
+#include <gui/propgrid/propdev.h>
 
 
 #define wxPG_CUSTOM_IMAGE_WIDTH     20 // for wxColourProperty etc.

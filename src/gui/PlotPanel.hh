@@ -33,7 +33,7 @@ namespace gazebo
       public: PlotData() {}
       public: virtual ~PlotData() {}
   
-      public: Color color;
+      public: common::Color color;
       public: std::deque<std::pair<float, float> > data;
     };
   

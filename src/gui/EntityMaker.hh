@@ -21,11 +21,13 @@
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
 	namespace gui
   {
-    class Scene;
-    class MouseEvent;
-  
     class EntityMaker
     {
       /// \brief Constructor
@@ -37,13 +39,13 @@ namespace gazebo
       /// \brief Set whether to snap to grid
       public: static void SetSnapToGrid(bool snap);
   
-      public: virtual void Start(Scene *scene) = 0;
+      public: virtual void Start() = 0;
       public: virtual void Stop() = 0;
       public: virtual bool IsActive() const = 0;
   
-      public: virtual void MousePushCB(const MouseEvent &event);
-      public: virtual void MouseReleaseCB(const MouseEvent &event);
-      public: virtual void MouseDragCB(const MouseEvent &event);
+      public: virtual void MousePushCB(const common::MouseEvent &event);
+      public: virtual void MouseReleaseCB(const common::MouseEvent &event);
+      public: virtual void MouseDragCB(const common::MouseEvent &event);
   
       // \brief Get a point snapped to a grid
       protected: common::Vector3 GetSnappedPoint(common::Vector3 p);

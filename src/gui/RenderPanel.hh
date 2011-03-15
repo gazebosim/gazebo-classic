@@ -26,6 +26,7 @@ namespace gazebo
   namespace rendering
   {
     class UserCamera;
+    class Scene;
   }
 
 	namespace gui
@@ -67,7 +68,7 @@ namespace gazebo
       private: void OnYawSetFocus(wxFocusEvent &event);
       private: void OnYawKillFocus(wxFocusEvent &event);
   
-      public: void ViewScene(Scene *scene);
+      public: void ViewScene(rendering::Scene *scene);
   
       private: RenderControl *renderControl;
       private: wxTextCtrl *fpsCtrl;

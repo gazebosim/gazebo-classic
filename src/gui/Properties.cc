@@ -16,6 +16,9 @@
 */
 #include "propgrid/propgrid.h"
 
+#include "common/Vector3.hh"
+#include "common/Quatern.hh"
+#include "common/Time.hh"
 #include "gui/Properties.hh"
 
 using namespace gazebo;
@@ -28,9 +31,9 @@ GZ_REGISTER_WX_PROPERTY(typeid(int).name(),          IntProperty);
 GZ_REGISTER_WX_PROPERTY(typeid(unsigned int).name(), UIntProperty);
 GZ_REGISTER_WX_PROPERTY(typeid(bool).name(),         BoolProperty);
 GZ_REGISTER_WX_PROPERTY(typeid(std::string).name(),  StringProperty);
-GZ_REGISTER_WX_PROPERTY(typeid(common::Vector3).name(),      common::Vector3Property);
-GZ_REGISTER_WX_PROPERTY(typeid(Quatern).name(),      QuaternProperty);
-GZ_REGISTER_WX_PROPERTY(typeid(Time).name(),         TimeProperty);
+GZ_REGISTER_WX_PROPERTY(typeid(common::Vector3).name(), Vector3Property);
+GZ_REGISTER_WX_PROPERTY(typeid(common::Quatern).name(),      QuaternProperty);
+GZ_REGISTER_WX_PROPERTY(typeid(common::Time).name(),         TimeProperty);
 
 std::map<std::string, PropertyFactoryFn> PropertyFactory::properties; 
 
@@ -42,7 +45,7 @@ void PropertyFactory::RegisterAll()
   RegisterUIntProperty();
   RegisterBoolProperty();
   RegisterStringProperty();
-  Registercommon::Vector3Property();
+  RegisterVector3Property();
   RegisterQuaternProperty();
   RegisterTimeProperty();
 }
@@ -246,7 +249,7 @@ StringProperty::~StringProperty()
 
 ////////////////////////////////////////////////////////////////////////////////
 // VECTOR3 constructor
-common::Vector3Property::common::Vector3Property(common::Param *p, wxPropertyGrid *grid)
+Vector3Property::Vector3Property(common::Param *p, wxPropertyGrid *grid)
   : Property(p,grid)
 {
   this->property = this->grid->Append(
@@ -268,7 +271,7 @@ common::Vector3Property::common::Vector3Property(common::Param *p, wxPropertyGri
 
 ////////////////////////////////////////////////////////////////////////////////
 // VECTOR3 destructor
-common::Vector3Property::~common::Vector3Property()
+Vector3Property::~Vector3Property()
 {
 }
 
@@ -285,7 +288,7 @@ QuaternProperty::QuaternProperty(common::Param *p, wxPropertyGrid *grid)
   this->property->SetValueFromString( 
       wxString::FromAscii(param->GetAsString().c_str()) );
 
-  common::ParamT<Quatern> *pv = (common::ParamT<Quatern>*)this->param;
+  common::ParamT<common::Quatern> *pv = (common::ParamT<common::Quatern>*)this->param;
   common::Vector3 rpy = (**pv).GetAsEuler();
 
   this->roll = this->grid->AppendIn( this->property, new wxFloatProperty( wxT("Roll"), wxT("Roll"), rpy.x) ); 

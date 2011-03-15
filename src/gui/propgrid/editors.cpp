@@ -57,14 +57,14 @@
 // This define is necessary to prevent macro clearing
 #define __wxPG_SOURCE_FILE__
 
-#include <wx/propgrid/propgrid.h>
-#include <wx/propgrid/propdev.h>
-#include <wx/propgrid/editors.h>
-#include <wx/propgrid/props.h>
+#include <gui/propgrid/propgrid.h>
+#include <gui/propgrid/propdev.h>
+#include <gui/propgrid/editors.h>
+#include <gui/propgrid/props.h>
 
 #ifdef __WXPYTHON__
-    #include <wx/propgrid/advprops.h>
-    #include <wx/propgrid/extras.h>
+    #include <gui/propgrid/advprops.h>
+    #include <gui/propgrid/extras.h>
 #endif
 
 #if wxPG_USE_RENDERER_NATIVE
@@ -84,7 +84,7 @@
 #if wxPG_USING_WXOWNERDRAWNCOMBOBOX
     #include <wx/odcombo.h>
 #else
-    #include <wx/propgrid/odcombo.h>
+    #include <gui/propgrid/odcombo.h>
 #endif
 
 #ifdef __WXMSW__

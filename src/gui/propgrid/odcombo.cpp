@@ -46,11 +46,11 @@
     #include "wx/msw/uxtheme.h"
 #endif
 
-#include <wx/propgrid/propgrid.h>
+#include <gui/propgrid/propgrid.h>
 
 #if !wxPG_USING_WXOWNERDRAWNCOMBOBOX
 
-#include "wx/propgrid/odcombo.h"
+#include "gui/propgrid/odcombo.h"
 
 //
 // THESE GO TO BASE FILE

@@ -47,10 +47,10 @@
       wxPropertyGridEvent\n
 
     Header files:\n
-      <b>wx/propgrid/propgrid.h:</b> Mandatory when using wxPropertyGrid.\n
-      <b>wx/propgrid/advprops.h:</b> For less often used property classes.\n
-      <b>wx/propgrid/manager.h:</b> Mandatory when using wxPropertyGridManager.\n
-      <b>wx/propgrid/propdev.h:</b> Mandatory when implementing custom property classes.\n
+      <b>gui/propgrid/propgrid.h:</b> Mandatory when using wxPropertyGrid.\n
+      <b>gui/propgrid/advprops.h:</b> For less often used property classes.\n
+      <b>gui/propgrid/manager.h:</b> Mandatory when using wxPropertyGridManager.\n
+      <b>gui/propgrid/propdev.h:</b> Mandatory when implementing custom property classes.\n
 
     @ref whatsnew\n
     @ref basics\n
@@ -90,7 +90,7 @@
     @code
 
     // Necessary header file
-    #include <wx/propgrid/propgrid.h>
+    #include <gui/propgrid/propgrid.h>
 
     ...
 
@@ -501,12 +501,12 @@
     @section advprops Specialized Properties
 
       This section describes the use of less often needed property classes.
-    To use them, you have to include <wx/propgrid/advprops.h>.
+    To use them, you have to include <gui/propgrid/advprops.h>.
 
     @code
 
     // Necessary extra header file
-    #include <wx/propgrid/advprops.h>
+    #include <gui/propgrid/advprops.h>
 
     ...
 
@@ -1391,13 +1391,13 @@
 
     Easiest solution for creating an arbitrary property is to subclass an existing,
     property class that most resembles the intended end result. You may need to include
-    header file wx/propgrid/propdev.h.
+    header file gui/propgrid/propdev.h.
 
     For instance:
 
     @code
 
-    #include <wx/propgrid/propdev.h>
+    #include <gui/propgrid/propdev.h>
 
     //
     // wxLongStringProperty has wxString as value type and TextCtrlAndButton as editor.
@@ -1652,7 +1652,7 @@
 
     In header:
         @code
-        #include <wx/propgrid/advprops.h>
+        #include <gui/propgrid/advprops.h>
         WX_PG_DECLARE_CUSTOM_COLOUR_PROPERTY_USES_WXCOLOUR(wxMyColourProperty)
         @endcode
 

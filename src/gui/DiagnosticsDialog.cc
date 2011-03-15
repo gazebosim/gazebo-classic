@@ -83,6 +83,7 @@ DiagnosticsDialog::~DiagnosticsDialog()
 ////////////////////////////////////////////////////////////////////////////////
 void DiagnosticsDialog::TimerStopCB(std::string timer)
 {
+  /* NATY: Put back in
   std::map< std::string, std::vector< std::pair<common::Time,common::Time> > >::iterator iter;
 
   iter = this->times.find(timer);
@@ -108,12 +109,13 @@ void DiagnosticsDialog::TimerStopCB(std::string timer)
       this->plot->PushData(currTime.Double(), tm.Double(), timer);
     }
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void DiagnosticsDialog::Update()
 {
-  DiagnosticManager::Instance()->SetEnabled(true);
+  common::DiagnosticManager::Instance()->SetEnabled(true);
 
   wxTreeItemId selected = this->treeCtrl->GetSelection();
 
@@ -132,5 +134,5 @@ void DiagnosticsDialog::OnTreeClick(wxTreeEvent &event)
 
 void DiagnosticsDialog::OnInit(wxInitDialogEvent &event)
 {
-  DiagnosticManager::Instance()->SetEnabled(true);
+  common::DiagnosticManager::Instance()->SetEnabled(true);
 }

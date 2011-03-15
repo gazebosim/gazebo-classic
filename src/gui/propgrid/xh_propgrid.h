@@ -39,8 +39,8 @@
 
 #include "wx/xrc/xmlres.h"
 
-#include "wx/propgrid/propgrid.h"
-#include "wx/propgrid/manager.h"
+#include "gui/propgrid/propgrid.h"
+#include "gui/propgrid/manager.h"
 
 #if wxUSE_XRC && wxCHECK_VERSION(2,8,0)
 

@@ -20,6 +20,9 @@
 #include <wx/button.h>
 #include <wx/colordlg.h>
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "gui/GridPage.hh"
 
 using namespace gazebo;
@@ -34,7 +37,7 @@ GridPage::GridPage(wxWindow *parent)
   wxString str;
 
   // NATY: Fix this
-  //Grid *grid = Simulator::Instance()->GetActiveWorld()->GetScene()->GetGrid(1);
+  /*Grid *grid = Simulator::Instance()->GetActiveWorld()->GetScene()->GetGrid(1);
   double size = grid->GetCellLength() * grid->GetCellCount();
   double spacing = size / grid->GetCellCount();
 
@@ -76,6 +79,7 @@ GridPage::GridPage(wxWindow *parent)
 
   this->SetSizer( boxSizer1 );
   this->Layout();
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +94,7 @@ void GridPage::Apply()
 {
   std::string str;
   // NATY: Fix this
-  //Grid *grid = Simulator::Instance()->GetActiveWorld()->GetScene()->GetGrid(1);
+  /*Grid *grid = Simulator::Instance()->GetActiveWorld()->GetScene()->GetGrid(1);
 
   str = std::string(this->gridSizeCtrl->GetValue().mb_str());
   boost::trim(str);
@@ -107,6 +111,7 @@ void GridPage::Apply()
 
   grid->SetCellLength( spacing );
   grid->SetCellCount( count );
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

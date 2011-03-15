@@ -15,6 +15,7 @@
  *
 */
 #include <iostream>
+#include <sstream>
 
 #include "common/Messages.hh"
 #include "common/Events.hh"
@@ -65,7 +66,7 @@ bool CylinderMaker::IsActive() const
   return this->state > 0;
 }
 
-void CylinderMaker::MousePushCB(const MouseEvent &event)
+void CylinderMaker::MousePushCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -73,7 +74,7 @@ void CylinderMaker::MousePushCB(const MouseEvent &event)
   this->mousePushPos = event.pressPos;
 }
 
-void CylinderMaker::MouseReleaseCB(const MouseEvent &event)
+void CylinderMaker::MouseReleaseCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -87,7 +88,7 @@ void CylinderMaker::MouseReleaseCB(const MouseEvent &event)
   }
 }
 
-void CylinderMaker::MouseDragCB(const MouseEvent &event)
+void CylinderMaker::MouseDragCB(const common::MouseEvent &event)
 {
   if (this->state == 0)
     return;
@@ -100,6 +101,7 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   else if (this->state == 2)
     norm.Set(1,0,0);
 
+  /* NATY: Fix camera issue
   p1 = event.camera->GetWorldPointOnPlane(this->mousePushPos.x, this->mousePushPos.y, norm, 0);
   p1 = this->GetSnappedPoint( p1 );
 
@@ -107,7 +109,7 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
   p2 = this->GetSnappedPoint( p2 );
 
   if (this->state == 1)
-    Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
+    common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p1 );
 
   common::Vector3 p( this->visualMsg->pose().position().x(),
              this->visualMsg->pose().position().y(),
@@ -131,15 +133,16 @@ void CylinderMaker::MouseDragCB(const MouseEvent &event)
     p.z = scale.z/2.0;
   }
 
-  Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
-  Message::Set(this->visualMsg->mutable_scale(), scale );
+  common::Message::Set(this->visualMsg->mutable_pose()->mutable_position(), p );
+  common::Message::Set(this->visualMsg->mutable_scale(), scale );
   //Simulator::Instance()->SendMessage(*this->visualMsg);
+*/
 }
 
 void CylinderMaker::CreateTheEntity()
 {
   msgs::InsertModel msg;
-  Message::Init(msg,"new cylinder");
+  common::Message::Init(msg,"new cylinder");
   std::ostringstream newModelStr;
 
   newModelStr << "<?xml version='1.0'?>";
@@ -168,7 +171,7 @@ void CylinderMaker::CreateTheEntity()
   msg.set_xml( newModelStr.str() );
 
   this->visualMsg->set_action( msgs::Visual::DELETE );
-  Message::CreationStamp(*this->visualMsg);
+  common::Message::CreationStamp(*this->visualMsg);
   //Simulator::Instance()->SendMessage( *this->visualMsg );
   //Simulator::Instance()->SendMessage( msg );
 }

@@ -472,7 +472,7 @@ private:
 
     @code
 
-    #include <wx/propgrid/editors.h>
+    #include <gui/propgrid/editors.h>
 
     class wxMultiButtonTextCtrlEditor : public wxPGTextCtrlEditor
     {

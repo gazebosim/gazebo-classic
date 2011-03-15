@@ -29,6 +29,11 @@ class wxPropertyGridEvent;
 
 namespace gazebo
 {
+  namespace rendering
+  {
+    class Scene;
+  }
+
   namespace common
   {
     class Common;
@@ -108,7 +113,7 @@ namespace gazebo
       /// \brief Find an item in a tree
       private: wxTreeItemId FindTreeItem(const std::string &name);
   
-      private: void AddEntityHelper(const common::Common *entity, wxTreeItemId parent);
+      //private: void AddEntityHelper(const std::string &entity, wxTreeItemId parent);
   
       private: RenderPanel *renderPanel;
       private: TimePanel *timePanel;

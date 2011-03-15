@@ -39,7 +39,7 @@ namespace gazebo
   
       public: virtual void Changed();
   
-      protected: comon::Param *param;
+      protected: common::Param *param;
   
       protected: wxPropertyGrid *grid;
       protected: wxPGProperty *property;
@@ -125,10 +125,10 @@ namespace gazebo
       public: virtual ~StringProperty();
     };
   
-    class common::Vector3Property : public Property
+    class Vector3Property : public Property
     {
-      public: common::Vector3Property(common::Param *p, wxPropertyGrid *grid);
-      public: virtual ~common::Vector3Property();
+      public: Vector3Property(common::Param *p, wxPropertyGrid *grid);
+      public: virtual ~Vector3Property();
   
       private: wxPGProperty *x;
       private: wxPGProperty *y;
