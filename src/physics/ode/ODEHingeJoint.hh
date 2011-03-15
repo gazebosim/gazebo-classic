@@ -17,18 +17,16 @@
 /* Desc: A body that has a box shape
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * SVN: $Id: HingeJoint.hh 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #ifndef ODEHINGEJOINT_HH
 #define ODEHINGEJOINT_HH
 
-#include "common/Event.hh"
 #include "common/Angle.hh"
 #include "common/Vector3.hh"
-#include "common/Param.hh"
-#include "ODEJoint.hh"
-#include "HingeJoint.hh"
+
+#include "physics/HingeJoint.hh"
+#include "physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
@@ -90,19 +88,19 @@ namespace gazebo
       public: virtual ~ODEHingeJoint();
     
       /// \brief Load joint
-      protected: virtual void Load(XMLConfigNode *node);
+      protected: virtual void Load(common::XMLConfigNode *node);
   
       /// Get the anchor point
-      public: virtual Vector3 GetAnchor(int index) const;
+      public: virtual common::Vector3 GetAnchor(int index) const;
   
       /// Set the anchor point
-      public: virtual void SetAnchor(int index, const Vector3 &anchor);
+      public: virtual void SetAnchor(int index, const common::Vector3 &anchor);
   
       /// Get the axis of rotation
-      public: virtual Vector3 GetAxis(int index) const;
+      public: virtual common::Vector3 GetAxis(int index) const;
   
       /// Set the axis of rotation
-      public: virtual void SetAxis(int index, const Vector3 &axis);
+      public: virtual void SetAxis(int index, const common::Vector3 &axis);
    
       /// \brief Set the joint damping
       public: virtual void SetDamping( int index, const double damping );
@@ -111,7 +109,7 @@ namespace gazebo
       public: void ApplyDamping();
   
       /// Get the angle of rotation
-      public: virtual Angle GetAngle(int index) const;
+      public: virtual common::Angle GetAngle(int index) const;
    
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(int index, double angle);

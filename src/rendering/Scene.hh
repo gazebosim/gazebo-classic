@@ -40,7 +40,6 @@ namespace gazebo
   namespace common
   {
     class XMLConfigNode;
-    class Common;
     class Message;
   }
 

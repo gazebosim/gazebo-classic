@@ -18,16 +18,15 @@
 /* Desc: Base class shared by all classes in Gazebo.
  * Author: Nate Koenig
  * Date: 09 Sept. 2008
- * SVN: $Id$
  */
 
-#include "common/Common.hh"
 #include "common/GazeboMessage.hh"
 #include "common/GazeboError.hh"
+#include "physics/World.hh"
+#include "physics/Common.hh"
 
 using namespace gazebo;
-using namespace common;
-
+using namespace physics;
 
 unsigned int Common::idCounter = 0;
 
@@ -36,13 +35,17 @@ unsigned int Common::idCounter = 0;
 Common::Common(Common *parent)
  : parent(parent)
 {
+  this->world = NULL;
+  if (this->parent)
+    this->world = this->parent->GetWorld();
+
   this->AddType(COMMON);
 
   this->id = ++idCounter;
 
-  Param::Begin(&this->parameters);
-  this->nameP = new ParamT<std::string>("name","noname",1);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->nameP = new common::ParamT<std::string>("name","noname",1);
+  common::Param::End();
 
   this->saveable = true;
 
@@ -79,7 +82,7 @@ Common::~Common()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load 
-void Common::Load(XMLConfigNode *node)
+void Common::Load(common::XMLConfigNode *node)
 {
   this->nameP->Load(node);
 }
@@ -107,7 +110,7 @@ unsigned int Common::GetParamCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a param by index
-Param *Common::GetParam(unsigned int index) const
+common::Param *Common::GetParam(unsigned int index) const
 {
   if (index < this->parameters.size())
     return this->parameters[index];
@@ -118,10 +121,10 @@ Param *Common::GetParam(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a parameter by name
-Param *Common::GetParam(const std::string &key) const
+common::Param *Common::GetParam(const std::string &key) const
 {
-  std::vector<Param*>::const_iterator iter;
-  Param *result = NULL;
+  std::vector<common::Param*>::const_iterator iter;
+  common::Param *result = NULL;
 
   for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
   {
@@ -142,8 +145,8 @@ Param *Common::GetParam(const std::string &key) const
 /// Set a parameter by name
 void Common::SetParam(const std::string &key, const std::string &value)
 {
-  std::vector<Param*>::const_iterator iter;
-  Param *result = NULL;
+  std::vector<common::Param*>::const_iterator iter;
+  common::Param *result = NULL;
 
   for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
   {
@@ -403,4 +406,26 @@ bool Common::IsSelected() const
 bool Common::operator==(const Common &ent) const 
 {
   return ent.GetName() == this->GetName();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the world this object belongs to. This will also set the world for all 
+/// children
+void Common::SetWorld(World *newWorld)
+{
+  this->world = newWorld;
+
+  for (unsigned int i=0; i < this->children.size(); i++)
+  {
+    Entity *child = dynamic_cast<Entity*>(this->children[i]);
+    if (child)
+      child->SetWorld(this->world);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the world this object is in
+World *Common::GetWorld() const
+{
+  return this->world;
 }

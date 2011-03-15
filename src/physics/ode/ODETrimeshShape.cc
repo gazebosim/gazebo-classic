@@ -23,10 +23,10 @@
 #include "common/Mesh.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboMessage.hh"
-#include "World.hh"
-#include "ODEGeom.hh"
-#include "ODEPhysics.hh"
-#include "ODETrimeshShape.hh"
+
+#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODEPhysics.hh"
+#include "physics/ode/ODETrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -86,12 +86,11 @@ void ODETrimeshShape::Update()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the trimesh
-void ODETrimeshShape::Load(XMLConfigNode *node)
+void ODETrimeshShape::Load(common::XMLConfigNode *node)
 {
   dMass odeMass;
   Mass mass;
   ODEGeom *pgeom = (ODEGeom*)this->geomParent;
-  PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
 
   TrimeshShape::Load(node);
 
@@ -101,7 +100,7 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
 
   dTriMeshDataID odeData;
 
-  const SubMesh *subMesh = mesh->GetSubMesh(i);
+  const common::SubMesh *subMesh = mesh->GetSubMesh(i);
   if (subMesh->GetVertexCount() < 3)
   {
     gzerr(0) << "ODETrimesh invalid mesh\n";
@@ -139,7 +138,7 @@ void ODETrimeshShape::Load(XMLConfigNode *node)
   if (!pgeom->IsStatic())
     dMassSetTrimeshTotal(&odeMass, mass.GetAsDouble(), pgeom->GetGeomId());
 
-  physics->ConvertMass(&mass, &odeMass);
+  ODEPhysics::ConvertMass(&mass, &odeMass);
   this->geomParent->SetMass(mass);
 
   memset(this->matrix_dblbuff,0,32*sizeof(dReal));

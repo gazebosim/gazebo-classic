@@ -61,7 +61,7 @@ namespace gazebo
     ///        the body
     /// \param posStart Start position, relative the body
     /// \param posEnd End position, relative to the body
-    public: void SetPoints(const Vector3 &posStart, const Vector3 &posEnd);
+    public: void SetPoints(const common::Vector3 &posStart, const common::Vector3 &posEnd);
   
     /// \brief Update the tay geom
     public: void Update();

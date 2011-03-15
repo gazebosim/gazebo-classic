@@ -103,7 +103,7 @@ namespace gazebo
     public: virtual ~BulletHinge2Joint(); 
   
     /// \brief Load the joint
-    protected: virtual void Load(XMLConfigNode *node);
+    protected: virtual void Load(common::XMLConfigNode *node);
   
     /// \brief Save a joint to a stream in XML format
     protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream);
@@ -112,22 +112,22 @@ namespace gazebo
     public: virtual void Attach( Body *one, Body *two );
 
     /// \brief Set the anchor point
-    public: virtual void SetAnchor( int index, const Vector3 &anchor );
+    public: virtual void SetAnchor( int index, const common::Vector3 &anchor );
   
     /// \brief Get anchor point
-    public: virtual Vector3 GetAnchor(int index) const;
+    public: virtual common::Vector3 GetAnchor(int index) const;
 
     /// \brief Set the first axis of rotation
-    public: virtual void SetAxis( int index, const Vector3 &axis );
+    public: virtual void SetAxis( int index, const common::Vector3 &axis );
  
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
 
     /// \brief Get first axis of rotation
-    public: virtual Vector3 GetAxis(int index) const;
+    public: virtual common::Vector3 GetAxis(int index) const;
   
     /// \brief Get angle of rotation about first axis
-    public: Angle GetAngle(int index) const;
+    public: common::Angle GetAngle(int index) const;
   
     /// \brief Get rate of rotation about first axis
     public: double GetVelocity(int index) const;
@@ -145,16 +145,16 @@ namespace gazebo
     public: virtual double GetMaxForce(int index);
 
     /// \brief Set the high stop of an axis(index).
-    public: virtual void SetHighStop(int index, Angle angle);
+    public: virtual void SetHighStop(int index, common::Angle angle);
 
     /// \brief Set the low stop of an axis(index).
-    public: virtual void SetLowStop(int index, Angle angle);
+    public: virtual void SetLowStop(int index, common::Angle angle);
  
     /// \brief Get the high stop of an axis(index).
-    public: virtual Angle GetHighStop(int index);
+    public: virtual common::Angle GetHighStop(int index);
 
     /// \brief Get the low stop of an axis(index).
-    public: virtual Angle GetLowStop(int index);
+    public: virtual common::Angle GetLowStop(int index);
   };
   
 /// \}

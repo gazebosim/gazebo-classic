@@ -20,7 +20,7 @@
  * SVN: $Id:$
  */
 
-#include "SphereShape.hh"
+#include "physics/SphereShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -32,10 +32,10 @@ SphereShape::SphereShape(Geom *parent) : Shape(parent)
 {
   this->AddType(SPHERE_SHAPE);
 
-  Param::Begin(&this->parameters);
-  this->radiusP = new ParamT<double>("radius",1.0,0);
+  common::Param::Begin(&this->parameters);
+  this->radiusP = new common::ParamT<double>("radius",1.0,0);
   this->radiusP->Callback( &SphereShape::SetSize, this );
-  Param::End();
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ SphereShape::~SphereShape()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the sphere
-void SphereShape::Load(XMLConfigNode *node)
+void SphereShape::Load(common::XMLConfigNode *node)
 {
   this->radiusP->Load( node->GetChild("sphere") );
   this->SetSize( **this->radiusP );

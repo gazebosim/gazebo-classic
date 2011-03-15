@@ -78,7 +78,7 @@ namespace gazebo
     public: void Update();
 
     /// \brief Load the trimesh
-    public: virtual void Load(XMLConfigNode *node);
+    public: virtual void Load(common::XMLConfigNode *node);
   };
 
   /// \}

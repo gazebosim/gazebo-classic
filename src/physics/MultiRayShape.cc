@@ -16,7 +16,7 @@
 */
 #include "common/Messages.hh"
 #include "common/XMLConfig.hh"
-#include "MultiRayShape.hh"
+#include "physics/MultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -41,23 +41,23 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
   this->rayFanOutlineMsg->set_render_type( msgs::Visual::LINE_STRIP );
   this->rayFanOutlineMsg->set_material( "Gazebo/BlueGlow" );
 
-  Param::Begin(&this->parameters);
-  this->rayCountP = new ParamT<int>("ray_count",0,1);
-  this->rangeCountP = new ParamT<int>("range_count",0,1);
-  this->minAngleP = new ParamT<Angle>("min_angle",DTOR(-90),1);
-  this->maxAngleP = new ParamT<Angle>("max_angle",DTOR(-90),1);
-  this->minRangeP = new ParamT<double>("min_range",0,1);
-  this->maxRangeP = new ParamT<double>("max_range",0,1);
-  this->resRangeP = new ParamT<double>("res_range",0.1,1);
-  this->originP = new ParamT<Vector3>("origin", Vector3(0,0,0), 0);
-  this->displayTypeP = new ParamT<std::string>("display_rays", "off", 0);
+  common::Param::Begin(&this->parameters);
+  this->rayCountP = new common::ParamT<int>("ray_count",0,1);
+  this->rangeCountP = new common::ParamT<int>("range_count",0,1);
+  this->minAngleP = new common::ParamT<common::Angle>("min_angle",DTOR(-90),1);
+  this->maxAngleP = new common::ParamT<common::Angle>("max_angle",DTOR(-90),1);
+  this->minRangeP = new common::ParamT<double>("min_range",0,1);
+  this->maxRangeP = new common::ParamT<double>("max_range",0,1);
+  this->resRangeP = new common::ParamT<double>("res_range",0.1,1);
+  this->originP = new common::ParamT<common::Vector3>("origin", common::Vector3(0,0,0), 0);
+  this->displayTypeP = new common::ParamT<std::string>("display_rays", "off", 0);
 
   // for block rays, vertical setting
-  this->verticalRayCountP = new ParamT<int>("vertical_ray_count", 1, 0);
-  this->verticalRangeCountP = new ParamT<int>("vertical_range_count", 1, 0);
-  this->verticalMinAngleP = new ParamT<Angle>("vertical_min_angle", DTOR(0), 0);
-  this->verticalMaxAngleP = new ParamT<Angle>("vertical_max_angle", DTOR(0), 0);
-  Param::End();
+  this->verticalRayCountP = new common::ParamT<int>("vertical_ray_count", 1, 0);
+  this->verticalRangeCountP = new common::ParamT<int>("vertical_range_count", 1, 0);
+  this->verticalMinAngleP = new common::ParamT<common::Angle>("vertical_min_angle", DTOR(0), 0);
+  this->verticalMaxAngleP = new common::ParamT<common::Angle>("vertical_max_angle", DTOR(0), 0);
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ MultiRayShape::~MultiRayShape()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a multi-ray shape from xml file
-void MultiRayShape::Load(XMLConfigNode *node)
+void MultiRayShape::Load(common::XMLConfigNode *node)
 {
   this->rayCountP->Load(node);
   this->rangeCountP->Load(node);
@@ -110,16 +110,16 @@ void MultiRayShape::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /*void MultiRayShape::Load(unsigned int vertRayCount, unsigned int rayCount,
-            Vector3 origin, double minRange, double maxRange,
-            Angle minVertAngle, Angle maxVertAngle,
-            Angle minAngle, Angle maxAngle )
+            common::Vector3 origin, double minRange, double maxRange,
+            common::Angle minVertAngle, common::Angle maxVertAngle,
+            common::Angle minAngle, common::Angle maxcommon::Angle )
 {
 */
-  Vector3 start, end, axis;
+  common::Vector3 start, end, axis;
 
-  Angle yawAngle, pitchAngle; 
-  Angle pDiff = **this->verticalMaxAngleP - **this->verticalMinAngleP;
-  Angle yDiff = **this->maxAngleP - **this->minAngleP;
+  common::Angle yawAngle, pitchAngle; 
+  common::Angle pDiff = **this->verticalMaxAngleP - **this->verticalMinAngleP;
+  common::Angle yDiff = **this->maxAngleP - **this->minAngleP;
 
   //this->maxRange = maxRange;
 
@@ -229,7 +229,7 @@ int MultiRayShape::GetFiducial(int index)
 void MultiRayShape::Update()
 {
   std::vector<RayShape*>::iterator iter;
-  Vector3 a, b;
+  common::Vector3 a, b;
   int i = 1;
 
   // Reset the ray lengths and mark the geoms as dirty (so they get
@@ -257,15 +257,15 @@ void MultiRayShape::Update()
 
       (*iter)->GetRelativePoints(a,b);
 
-      Message::Set(this->rayFanMsg->mutable_points(i), b );
-      Message::Set(this->rayFanOutlineMsg->mutable_points(i), b );
+      common::Message::Set(this->rayFanMsg->mutable_points(i), b );
+      common::Message::Set(this->rayFanOutlineMsg->mutable_points(i), b );
     }
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the geom
-void MultiRayShape::AddRay(const Vector3 &start, const Vector3 &end )
+void MultiRayShape::AddRay(const common::Vector3 &start, const common::Vector3 &end )
 {
   msgs::Point *pt = NULL;
 
@@ -275,30 +275,30 @@ void MultiRayShape::AddRay(const Vector3 &start, const Vector3 &end )
     if (this->rayFanMsg->points_size() == 0)
     {
       pt = this->rayFanMsg->add_points();
-      Message::Set(pt, start );
+      common::Message::Set(pt, start );
 
       pt = this->rayFanOutlineMsg->add_points();
-      Message::Set(pt, start);
+      common::Message::Set(pt, start);
     }
 
     pt = this->rayFanMsg->add_points();
-    Message::Set(pt, end);
+    common::Message::Set(pt, end);
 
     pt = this->rayFanOutlineMsg->add_points();
-    Message::Set(pt, end);
+    common::Message::Set(pt, end);
   }
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the minimum angle
-Angle MultiRayShape::GetMinAngle() const
+common::Angle MultiRayShape::GetMinAngle() const
 {
   return **this->minAngleP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the maximum angle
-Angle MultiRayShape::GetMaxAngle() const
+common::Angle MultiRayShape::GetMaxAngle() const
 {
   return **this->maxAngleP;
 }
@@ -354,14 +354,14 @@ int MultiRayShape::GetVerticalRangeCount() const
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical min angle
-Angle MultiRayShape::GetVerticalMinAngle() const
+common::Angle MultiRayShape::GetVerticalMinAngle() const
 {
   return **this->verticalMinAngleP;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Get the vertical max angle
-Angle MultiRayShape::GetVerticalMaxAngle() const
+common::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
   return **this->verticalMaxAngleP;
 }

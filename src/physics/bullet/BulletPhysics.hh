@@ -31,7 +31,7 @@
 
 #include "common/Param.hh"
 #include "PhysicsEngine.hh"
-#include "Geom.hh"
+#include "physics/Geom.hh"
 #include "Shape.hh"
 
 namespace gazebo
@@ -61,7 +61,7 @@ The \c param:physics tag is used to specify certain parameters for the Bullet ph
   - Default: 0.2
   - Range: 0 to 1.0
   - Recommended Range: 0.1 to 0.8
-- stepTime (float)
+- stepcommon::Time (float)
   - Time, in seconds, that elapse for each iteration of the physics engine
   - Default: 0.025
 -gravity (float float float)
@@ -90,7 +90,7 @@ class BulletPhysics : public PhysicsEngine
   public: virtual ~BulletPhysics();
 
   /// \brief Load the Bullet engine
-  public: virtual void Load(XMLConfigNode *node);
+  public: virtual void Load(common::XMLConfigNode *node);
 
   /// \brief Saves to XMLFile
   public: void Save(std::string &prefix, std::ostream &stream);
@@ -135,17 +135,17 @@ class BulletPhysics : public PhysicsEngine
   public: virtual void ConvertMass(void *engineMass, const Mass &mass);
 
   /// \brief Convert a bullet transform to a gazebo pose
-  public: static Pose3d ConvertPose(btTransform bt);
+  public: static common::Pose3d ConvertPose(btTransform bt);
 
   /// \brief Convert a gazebo pose to a bullet transform
-  public: static btTransform ConvertPose(const Pose3d pose);
+  public: static btTransform ConvertPose(const common::Pose3d pose);
 
   /// \brief Register a joint with the dynamics world
   public: btDynamicsWorld *GetDynamicsWorld() const
           {return this->dynamicsWorld;}
 
   /// \brief Set the gavity vector
-  public: virtual void SetGravity(const gazebo::Vector3 &gravity);
+  public: virtual void SetGravity(const gazebo::common::Vector3 &gravity);
 
   //private: btAxisSweep3 *broadPhase;
   private: btBroadphaseInterface *broadPhase;
@@ -154,7 +154,7 @@ class BulletPhysics : public PhysicsEngine
   private: btSequentialImpulseConstraintSolver *solver;
   private: btDiscreteDynamicsWorld *dynamicsWorld;
 
-  private: Time lastUpdateTime;
+  private: common::Time lastUpdateTime;
 };
 
 /** \}*/

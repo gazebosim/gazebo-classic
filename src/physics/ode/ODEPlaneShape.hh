@@ -17,10 +17,9 @@
 #ifndef ODEPLANESHAPE_HH
 #define ODEPLANESHAPE_HH
 
-#include "Body.hh"
-#include "Mass.hh"
-#include "ODEPhysics.hh"
-#include "PlaneShape.hh"
+#include "physics/Mass.hh"
+#include "physics/PlaneShape.hh"
+#include "physics/ode/ODEPhysics.hh"
 
 namespace gazebo
 {
@@ -45,7 +44,7 @@ namespace gazebo
       }
     
       /// Set the altitude of the plane
-      public: void SetAltitude(const Vector3 &pos)
+      public: void SetAltitude(const common::Vector3 &pos)
       {
         PlaneShape::SetAltitude(pos);
         ODEGeom *odeParent = (ODEGeom*)(this->geomParent);

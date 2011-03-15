@@ -20,13 +20,14 @@
  * SVN: $Id$
  */
 
-#include "World.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboMessage.hh"
-#include "Body.hh"
-#include "ODEBody.hh"
-#include "PhysicsEngine.hh"
-#include "ODEJoint.hh"
+
+#include "physics/World.hh"
+#include "physics/Body.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/ode/ODEBody.hh"
+#include "physics/ode/ODEJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -49,7 +50,7 @@ ODEJoint::~ODEJoint()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a joint
-void ODEJoint::Load(XMLConfigNode *node)
+void ODEJoint::Load(common::XMLConfigNode *node)
 {
   Joint::Load(node);
 
@@ -197,7 +198,7 @@ dJointFeedback *ODEJoint::GetFeedback()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the high stop of an axis(index)
-void ODEJoint::SetHighStop(int index, Angle angle)
+void ODEJoint::SetHighStop(int index, common::Angle angle)
 {
   switch (index)
   {
@@ -212,7 +213,7 @@ void ODEJoint::SetHighStop(int index, Angle angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the low stop of an axis(index)
-void ODEJoint::SetLowStop(int index, Angle angle)
+void ODEJoint::SetLowStop(int index, common::Angle angle)
 {
   switch (index)
   {
@@ -227,7 +228,7 @@ void ODEJoint::SetLowStop(int index, Angle angle)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the high stop of an axis(index).
-Angle ODEJoint::GetHighStop(int index)
+common::Angle ODEJoint::GetHighStop(int index)
 {
   switch (index)
   {
@@ -244,7 +245,7 @@ Angle ODEJoint::GetHighStop(int index)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the low stop of an axis(index).
-Angle ODEJoint::GetLowStop(int index)
+common::Angle ODEJoint::GetLowStop(int index)
 {
   switch (index)
   {
@@ -261,9 +262,9 @@ Angle ODEJoint::GetLowStop(int index)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the force the joint applies to the first body
-Vector3 ODEJoint::GetBodyForce(unsigned int index) const
+common::Vector3 ODEJoint::GetBodyForce(unsigned int index) const
 {
-  Vector3 result;
+  common::Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
   if (index == 0)
@@ -276,9 +277,9 @@ Vector3 ODEJoint::GetBodyForce(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the torque the joint applies to the first body
-Vector3 ODEJoint::GetBodyTorque(unsigned int index) const
+common::Vector3 ODEJoint::GetBodyTorque(unsigned int index) const
 {
-  Vector3 result;
+  common::Vector3 result;
   dJointFeedback *feedback = dJointGetFeedback(this->jointId);
 
   if (index == 0)

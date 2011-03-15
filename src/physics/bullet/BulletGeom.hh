@@ -27,7 +27,7 @@
 #include "Entity.hh"
 #include "common/Pose3d.hh"
 #include "common/Vector3.hh"
-#include "Geom.hh"
+#include "physics/Geom.hh"
 
 class btCollisionShape;
 
@@ -55,7 +55,7 @@ namespace gazebo
     public: virtual ~BulletGeom();
 
     /// \brief Load the geom
-    public: virtual void Load(XMLConfigNode *node);
+    public: virtual void Load(common::XMLConfigNode *node);
 
     /// \brief Load the geom
     public: virtual void Save(std::string &prefix, std::ostream &stream);
@@ -78,7 +78,7 @@ namespace gazebo
     public: Mass GetBodyMassMatrix();
   
     /// \brief Get the bounding box, defined by the physics engine
-    public: virtual void GetBoundingBox( Vector3 &min, Vector3 &max ) const;
+    public: virtual void GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const;
 
     /// \brief Set the collision shape
     public: void SetCollisionShape( btCollisionShape *shape );

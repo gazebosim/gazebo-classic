@@ -48,7 +48,7 @@ namespace gazebo
     public: virtual ~BulletJoint();
 
     /// \brief Load a joint
-    public: void Load(XMLConfigNode *node);
+    public: void Load(common::XMLConfigNode *node);
 
     /// \brief Update the joint
     public: void Update();
@@ -67,7 +67,7 @@ namespace gazebo
 
     /// \brief Set the anchor point
     public: virtual void SetAnchor( int /*index*/, 
-                                    const gazebo::Vector3 & /*anchor*/ ) 
+                                    const gazebo::common::Vector3 & /*anchor*/ ) 
             {gzerr(0) << "Not implement in Bullet\n";}
 
     /// \brief Set the joint damping
@@ -76,18 +76,18 @@ namespace gazebo
             {gzerr(0) << "Not implement in Bullet\n";}
 
     /// \brief Get the anchor point
-    public: virtual gazebo::Vector3 GetAnchor(int index) const
-            {gzerr(0) << "Not implement in Bullet\n"; return Vector3();}
+    public: virtual gazebo::common::Vector3 GetAnchor(int index) const
+            {gzerr(0) << "Not implement in Bullet\n"; return common::Vector3();}
 
     /// \brief Get the force the joint applies to the first body
     /// \param index The index of the body( 0 or 1 )
-    public: virtual Vector3 GetBodyForce(unsigned int index) const
-            {gzerr(0) << "Not implement in Bullet\n"; return Vector3();}
+    public: virtual common::Vector3 GetBodyForce(unsigned int index) const
+            {gzerr(0) << "Not implement in Bullet\n"; return common::Vector3();}
 
     /// \brief Get the torque the joint applies to the first body
     /// \param index The index of the body( 0 or 1 )
-    public: virtual Vector3 GetBodyTorque(unsigned int index) const
-            {gzerr(0) << "Not implement in Bullet\n"; return Vector3();}
+    public: virtual common::Vector3 GetBodyTorque(unsigned int index) const
+            {gzerr(0) << "Not implement in Bullet\n"; return common::Vector3();}
 
     /// \brief Set a parameter for the joint
     public: virtual void SetAttribute( Attribute, int index, double value)

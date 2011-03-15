@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Parameters for contact joints
+/* Desc: common::Parameters for contact joints
  * Author: Nate Koenig
  * Date: 30 July 2003
  * SVN: $Id$
@@ -25,52 +25,51 @@
 
 namespace gazebo
 {
-	namespace physics
-{
-  class Geom;
-
-  class XMLConfigNode;
-
-  /// \brief Surface params
-  class SurfaceParams
+  namespace common
   {
-    /// Constructor
-    public: SurfaceParams();
-  
-    /// \brief Load the contact params
-    public: void Load(XMLConfigNode *node);
- 
-    /// Spring constant
-    public: double kp;   
-  
-    /// Damping constant
-    public: double kd;
-  
-    /// 0..1, 0=no bounciness
-    public: double bounce;
+    class XMLConfigNode;
+  }
+
+	namespace physics
+  {
+    /// \brief Surface params
+    class SurfaceParams
+    {
+      /// Constructor
+      public: SurfaceParams();
     
-    /// first coefficient of friction 
-    public: double mu1;
+      /// \brief Load the contact params
+      public: void Load(common::XMLConfigNode *node);
+   
+      /// Spring constant
+      public: double kp;   
+    
+      /// Damping constant
+      public: double kd;
+    
+      /// 0..1, 0=no bounciness
+      public: double bounce;
+      
+      /// first coefficient of friction 
+      public: double mu1;
+    
+      /// second coefficient of friction 
+      public: double mu2;
+    
+      /// Force-dependent-slip direction 1
+      public: double slip1;
+    
+      /// Force-dependent-slip direction 2
+      public: double slip2;   
+    
+      /// \brief bounce vel
+      public: double bounceVel;
+    
+      /// \brief soft constraint force mixing
+      public: double softCfm;
   
-    /// second coefficient of friction 
-    public: double mu2;
-  
-    /// Force-dependent-slip direction 1
-    public: double slip1;
-  
-    /// Force-dependent-slip direction 2
-    public: double slip2;   
-  
-    /// \brief bounce vel
-    public: double bounceVel;
-  
-    /// \brief soft constraint force mixing
-    public: double softCfm;
-
-    public: bool enableFriction;
-
-  };
-}
-
+      public: bool enableFriction;
+    };
+  }
 }
 #endif

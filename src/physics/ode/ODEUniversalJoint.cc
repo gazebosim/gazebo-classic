@@ -22,8 +22,9 @@
 
 #include "gazebo_config.h"
 #include "common/GazeboMessage.hh"
-#include "Body.hh"
-#include "ODEUniversalJoint.hh"
+
+#include "physics/Body.hh"
+#include "physics/ode/ODEUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -45,17 +46,17 @@ ODEUniversalJoint::~ODEUniversalJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the anchor point
-Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
+common::Vector3 ODEUniversalJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
   dJointGetUniversalAnchor( this->jointId, result );
 
-  return Vector3( result[0], result[1], result[2] );
+  return common::Vector3( result[0], result[1], result[2] );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
-void ODEUniversalJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
+void ODEUniversalJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
 {
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
@@ -65,7 +66,7 @@ void ODEUniversalJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the first axis of rotation
-Vector3 ODEUniversalJoint::GetAxis(int index ) const
+common::Vector3 ODEUniversalJoint::GetAxis(int index ) const
 {
   dVector3 result;
 
@@ -74,12 +75,12 @@ Vector3 ODEUniversalJoint::GetAxis(int index ) const
   else
     dJointGetUniversalAxis2( this->jointId, result );
 
-  return Vector3( result[0], result[1], result[2] );
+  return common::Vector3( result[0], result[1], result[2] );
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
-void ODEUniversalJoint::SetAxis( int index, const Vector3 &axis )
+void ODEUniversalJoint::SetAxis( int index, const common::Vector3 &axis )
 {
 
   if (this->body1) this->body1->SetEnabled(true);
@@ -106,9 +107,9 @@ void ODEUniversalJoint::SetDamping( int /*index*/, const double damping )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of an axis
-Angle ODEUniversalJoint::GetAngle(int index) const
+common::Angle ODEUniversalJoint::GetAngle(int index) const
 {
-  Angle result;
+  common::Angle result;
 
   if (index == 0)
     result = dJointGetUniversalAngle1( this->jointId );

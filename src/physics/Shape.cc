@@ -15,7 +15,7 @@
  *
 */
 #include "World.hh"
-#include "Geom.hh"
+#include "physics/Geom.hh"
 #include "Shape.hh"
 
 using namespace gazebo;

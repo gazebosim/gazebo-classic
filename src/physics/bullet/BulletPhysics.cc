@@ -75,8 +75,8 @@ BulletPhysics::BulletPhysics(World *world)
   this->dynamicsWorld = new btDiscreteDynamicsWorld(this->dispatcher,
       this->broadPhase, this->solver, this->collisionConfig);
 
-  Param::Begin(&this->parameters);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,9 +100,9 @@ BulletPhysics::~BulletPhysics()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the Bullet engine
-void BulletPhysics::Load(XMLConfigNode *node)
+void BulletPhysics::Load(common::XMLConfigNode *node)
 {
-  XMLConfigNode *cnode = node->GetChild("bullet", "physics");
+  common::XMLConfigNode *cnode = node->GetChild("bullet", "physics");
   if (cnode == NULL)
     gzthrow("Must define a <physics:ode> node in the XML file");
 
@@ -124,8 +124,8 @@ void BulletPhysics::Save(std::string &prefix, std::ostream &stream)
 // Initialize the Bullet engine
 void BulletPhysics::Init()
 {
-  Vector3 g = this->gravityP->GetValue();
-  this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
+  common::Vector3 g = this->gravityP->GetValue();
+  this->dynamicsWorld->setGravity(btcommon::Vector3(g.x, g.y, g.z));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ void BulletPhysics::UpdateCollision()
 // Update the Bullet engine
 void BulletPhysics::UpdatePhysics()
 {
-  /*Time time = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
+  /*common::Time time = Simulator::Instance()->GetRealTime() - this->lastUpdateTime;
   int steps = (int) round( (time / **this->stepTimeP).Double() );
 
   steps = std::max(steps,1);
@@ -154,7 +154,7 @@ void BulletPhysics::UpdatePhysics()
   //this->dynamicsWorld->stepSimulation(time,  steps, (**this->stepTimeP));
   this->dynamicsWorld->stepSimulation((**this->stepTimeP).Double());
 
-  this->lastUpdateTime = Simulator::Instance()->GetRealTime();
+  this->lastUpdatecommon::Time = Simulator::Instance()->GetRealTime();
   */
 }
 
@@ -264,9 +264,9 @@ void BulletPhysics::ConvertMass(void *engineMass, const Mass &mass)
 }*/
 
 ////////////////////////////////////////////////////////////////////////////////
-Pose3d BulletPhysics::ConvertPose(btTransform bt)
+common::Pose3d BulletPhysics::ConvertPose(btTransform bt)
 {
-  Pose3d pose;
+  common::Pose3d pose;
   pose.pos.x = bt.getOrigin().getX();
   pose.pos.y = bt.getOrigin().getY();
   pose.pos.z = bt.getOrigin().getZ();
@@ -281,11 +281,11 @@ Pose3d BulletPhysics::ConvertPose(btTransform bt)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Convert a gazebo pose to a bullet transform
-btTransform BulletPhysics::ConvertPose(const Pose3d pose)
+btTransform BulletPhysics::ConvertPose(const common::Pose3d pose)
 {
   btTransform trans;
 
-  trans.setOrigin( btVector3( pose.pos.x, pose.pos.y, pose.pos.z) );
+  trans.setOrigin( btcommon::Vector3( pose.pos.x, pose.pos.y, pose.pos.z) );
   trans.setRotation( btQuaternion( pose.rot.x, pose.rot.y, 
                                    pose.rot.z, pose.rot.u) );
   return trans;
@@ -293,8 +293,8 @@ btTransform BulletPhysics::ConvertPose(const Pose3d pose)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the gavity vector
-void BulletPhysics::SetGravity(const gazebo::Vector3 &gravity)
+void BulletPhysics::SetGravity(const gazebo::common::Vector3 &gravity)
 {
   this->gravityP->SetValue(gravity);
-  this->dynamicsWorld->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
+  this->dynamicsWorld->setGravity(btcommon::Vector3(gravity.x, gravity.y, gravity.z));
 }

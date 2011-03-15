@@ -17,10 +17,11 @@
 #ifndef ODEBOXSHAPE_HH
 #define ODEBOXSHAPE_HH
 
-#include "ODEPhysics.hh"
-#include "Mass.hh"
 #include "common/Vector3.hh"
-#include "BoxShape.hh"
+
+#include "physics/ode/ODEPhysics.hh"
+#include "physics/Mass.hh"
+#include "physics/BoxShape.hh"
 
 namespace gazebo
 {
@@ -30,13 +31,11 @@ namespace gazebo
     {
       public: ODEBoxShape(Geom *parent) : BoxShape(parent) {}
       public: virtual ~ODEBoxShape() {}
-      public: virtual void SetSize( const Vector3 &size )
+      public: virtual void SetSize( const common::Vector3 &size )
       {
         BoxShape::SetSize(size);
-        PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
         ODEGeom *oParent = (ODEGeom*)(this->geomParent);
-  
-        Pose3d rpose;
+        common::Pose3d rpose;
   
         dMass odeMass;
   
@@ -48,7 +47,7 @@ namespace gazebo
         rpose = this->geomParent->GetRelativePose();
         dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
    
-        physics->ConvertMass(&mass, &odeMass);
+        ODEPhysics::ConvertMass(&mass, &odeMass);
   
         this->geomParent->SetMass(mass);
     

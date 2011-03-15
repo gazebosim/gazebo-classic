@@ -17,7 +17,6 @@
 /* Desc: Mass class
  * Author: Nate Koenig
  * Date: 18 May 2009
- * SVN: $Id:$
  */
 
 #ifndef MASS_HH
@@ -29,72 +28,72 @@
 namespace gazebo
 {
 	namespace physics
-{
-  /// \addtogroup gazebo_physics
-  /// \brief Mass class
-  class Mass
   {
-    /// \brief Default Constructor
-    public: Mass();
-
-    /// \brief Constructor
-    public: Mass(double mass);
-
-    /// \brief Copy constructor
-    public: Mass(const Mass &mass);
-
-    /// \brief Destructor
-    public: virtual ~Mass();
-
-    /// \brief Reset all the mass properties
-    public: void Reset();
-
-    /// \brief Set the mass
-    public: void SetMass(double m);
-
-    /// \brief Get the mass value
-    public: double GetAsDouble() const;
-
-    /// \brief Set the mass matrix
-    public: void SetInertiaMatrix( double ixx, double iyy, double izz,
-                                   double ixy, double ixz, double iyz);
-
-    /// \brief Set the center of gravity
-    public: void SetCoG(double cx, double cy, double cz);
-
-    /// \brief Set the center of gravity
-    public: void SetCoG(const Vector3 &c);
-
-    /// \brief Get the center of gravity
-    public: Vector3 GetCoG() const;
-
-    /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
-    public: Vector3 GetPrincipalMoments() const;
-
-    /// \brief Get the products of inertia (Ixy, Ixy, Iyz)
-    public: Vector3 GetProductsofInertia() const;
-
-    /// \brief Rotate this mass
-    public: void Rotate(const Quatern &rot);
-
-    /// \brief Equal operator
-    public: void operator=(const Mass &mass);
-
-    public: Mass operator+(const Mass &_mass ) const;
-    public: const Mass &operator+=(const Mass &_mass );
-
-    public: friend std::ostream &operator<<(std::ostream &out, 
-                                            const gazebo::Mass &mass)
-            {
-              out << "Mass[" << mass.mass << "] CoG[" << mass.cog << "]";
-              return out;
-            }
-
-    private: double mass;
-    private: Vector3 cog;
-    private: Vector3 principals;
-    private: Vector3 products;
-  };
-}
+    /// \addtogroup gazebo_physics
+    /// \brief Mass class
+    class Mass
+    {
+      /// \brief Default Constructor
+      public: Mass();
+  
+      /// \brief Constructor
+      public: Mass(double mass);
+  
+      /// \brief Copy constructor
+      public: Mass(const Mass &mass);
+  
+      /// \brief Destructor
+      public: virtual ~Mass();
+  
+      /// \brief Reset all the mass properties
+      public: void Reset();
+  
+      /// \brief Set the mass
+      public: void SetMass(double m);
+  
+      /// \brief Get the mass value
+      public: double GetAsDouble() const;
+  
+      /// \brief Set the mass matrix
+      public: void SetInertiaMatrix( double ixx, double iyy, double izz,
+                                     double ixy, double ixz, double iyz);
+  
+      /// \brief Set the center of gravity
+      public: void SetCoG(double cx, double cy, double cz);
+  
+      /// \brief Set the center of gravity
+      public: void SetCoG(const common::Vector3 &c);
+  
+      /// \brief Get the center of gravity
+      public: common::Vector3 GetCoG() const;
+  
+      /// \brief Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
+      public: common::Vector3 GetPrincipalMoments() const;
+  
+      /// \brief Get the products of inertia (Ixy, Ixy, Iyz)
+      public: common::Vector3 GetProductsofInertia() const;
+  
+      /// \brief Rotate this mass
+      public: void Rotate(const common::Quatern &rot);
+  
+      /// \brief Equal operator
+      public: void operator=(const Mass &mass);
+  
+      public: Mass operator+(const Mass &_mass ) const;
+      public: const Mass &operator+=(const Mass &_mass );
+  
+      public: friend std::ostream &operator<<(std::ostream &out, 
+                                              const gazebo::physics::Mass &mass)
+              {
+                out << "Mass[" << mass.mass << "] CoG[" << mass.cog << "]";
+                return out;
+              }
+  
+      private: double mass;
+      private: common::Vector3 cog;
+      private: common::Vector3 principals;
+      private: common::Vector3 products;
+    };
+  }
 }
 #endif

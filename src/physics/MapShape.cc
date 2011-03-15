@@ -17,23 +17,22 @@
 /* Desc: Map shape
  * Author: Nate Koenig
  * Date: 14 July 2008
- * SVN: $Id$
  */
 
 #include <iostream>
 #include <string.h>
 #include <math.h>
 
-#include "PhysicsEngine.hh"
 #include "common/GazeboConfig.hh"
 #include "common/Image.hh"
-#include "BoxShape.hh"
 #include "common/GazeboError.hh"
 #include "common/Global.hh"
-#include "Body.hh"
-#include "Geom.hh"
-#include "World.hh"
-#include "MapShape.hh"
+
+#include "physics/World.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/BoxShape.hh"
+#include "physics/Geom.hh"
+#include "physics/MapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -50,14 +49,14 @@ MapShape::MapShape(Geom *parent)
 
   this->root = new QuadNode(NULL);
 
-  Param::Begin(&this->parameters);
-  this->negativeP = new ParamT<int>("negative", 0, 0);
-  this->thresholdP = new ParamT<double>( "threshold", 200.0, 0);
-  this->wallHeightP = new ParamT<double>( "height", 1.0, 0 );
-  this->scaleP = new ParamT<double>("scale",1.0,0);
-  this->materialP = new ParamT<std::string>("material", "", 0);
-  this->granularityP = new ParamT<int>("granularity", 5, 0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->negativeP = new common::ParamT<int>("negative", 0, 0);
+  this->thresholdP = new common::ParamT<double>( "threshold", 200.0, 0);
+  this->wallHeightP = new common::ParamT<double>( "height", 1.0, 0 );
+  this->scaleP = new common::ParamT<double>("scale",1.0,0);
+  this->materialP = new common::ParamT<std::string>("material", "", 0);
+  this->granularityP = new common::ParamT<int>("granularity", 5, 0);
+  common::Param::End();
 
 }
 
@@ -89,7 +88,7 @@ void MapShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void MapShape::Load(XMLConfigNode *node)
+void MapShape::Load(common::XMLConfigNode *node)
 {
   std::string imageFilename = node->GetString("image","",1);
 
@@ -106,7 +105,7 @@ void MapShape::Load(XMLConfigNode *node)
   if (this->wallHeightP->GetValue() <= 0) this->wallHeightP->SetValue( 1.0 );
 
   // Load the image 
-  this->mapImage = new Image();
+  this->mapImage = new common::Image();
   this->mapImage->Load(imageFilename);
 
   if (!this->mapImage->Valid())
@@ -146,7 +145,7 @@ void MapShape::CreateBoxes(QuadNode *node)
     Geom *geom = this->GetWorld()->GetPhysicsEngine()->CreateGeom("box", this->geomParent->GetBody());
     geom->SetSaveable(false);
 
-    XMLConfig *boxConfig = new XMLConfig();
+    common::XMLConfig *boxConfig = new common::XMLConfig();
 
     stream << "<gazebo:world xmlns:gazebo=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:geom=\"http://playerstage.sourceforge.net/gazebo/xmlschema/#geom\">"; 
 
@@ -381,7 +380,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
                                  unsigned int &freePixels, 
                                  unsigned int &occPixels )
 {
-  Color pixColor;
+  common::Color pixColor;
   unsigned char v;
   unsigned int x,y;
 

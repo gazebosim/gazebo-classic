@@ -23,8 +23,8 @@
 #ifndef ODEJOINT_HH
 #define ODEJOINT_HH
 
-#include "ODEPhysics.hh"
-#include "Joint.hh"
+#include "physics/ode/ODEPhysics.hh"
+#include "physics/Joint.hh"
 
 namespace gazebo
 {
@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~ODEJoint();
   
       /// \brief Load a joint
-      public: virtual void Load(XMLConfigNode *node);
+      public: virtual void Load(common::XMLConfigNode *node);
   
       /// \brief Get the body to which the joint is attached according the _index
       public: virtual Body *GetJointBody( int index ) const;
@@ -78,24 +78,24 @@ namespace gazebo
       public: dJointFeedback *GetFeedback();
   
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(int index, Angle angle);
+      public: virtual void SetHighStop(int index, common::Angle angle);
   
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(int index, Angle angle);
+      public: virtual void SetLowStop(int index, common::Angle angle);
    
       /// \brief Get the high stop of an axis(index).
-      public: virtual Angle GetHighStop(int index);
+      public: virtual common::Angle GetHighStop(int index);
   
       /// \brief Get the low stop of an axis(index).
-      public: virtual Angle GetLowStop(int index);
+      public: virtual common::Angle GetLowStop(int index);
   
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body( 0 or 1 )
-      public: virtual Vector3 GetBodyForce(unsigned int index) const;
+      public: virtual common::Vector3 GetBodyForce(unsigned int index) const;
   
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body( 0 or 1 )
-      public: virtual Vector3 GetBodyTorque(unsigned int index) const;
+      public: virtual common::Vector3 GetBodyTorque(unsigned int index) const;
   
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute( Attribute, int index, double value);

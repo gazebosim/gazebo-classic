@@ -28,19 +28,24 @@
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
 
-#include "common/Param.hh"
-#include "PhysicsEngine.hh"
-#include "Shape.hh"
-
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include "common/Param.hh"
+
+#include "physics/PhysicsEngine.hh"
+#include "physics/Shape.hh"
+
 namespace gazebo
 {
+  namespace common
+  {
+    class XMLConfigNode;
+  }
+
 	namespace physics
   {
     class Entity;
-    class XMLConfigNode;
     class ODEGeom;
   
     class ContactFeedback
@@ -69,7 +74,7 @@ namespace gazebo
     - Default: 0.2
     - Range: 0 to 1.0
     - Recommended Range: 0.1 to 0.8
-  - stepTime (float)
+  - stepcommon::Time (float)
     - Time, in seconds, that elapse for each iteration of the physics engine
     - Default: 0.025
   -gravity (float float float)
@@ -99,7 +104,7 @@ namespace gazebo
     public: virtual ~ODEPhysics();
   
     /// \brief Load the ODE engine
-    public: virtual void Load(XMLConfigNode *node);
+    public: virtual void Load(common::XMLConfigNode *node);
   
     /// \brief Saves to XMLFile
     public: void Save(std::string &prefix, std::ostream &stream);
@@ -141,10 +146,10 @@ namespace gazebo
     public: dWorldID GetWorldId();
   
     /// \brief Convert an odeMass to Mass
-    public: virtual void ConvertMass(Mass *mass, void *odeMass);
+    public: static void ConvertMass(Mass *mass, void *odeMass);
   
     /// \brief Convert an odeMass to Mass
-    public: virtual void ConvertMass(void *odeMass, const Mass &mass);
+    public: static void ConvertMass(void *odeMass, const Mass &mass);
   
     /// \brief Get the step type
     public: virtual std::string GetStepType() const;
@@ -153,7 +158,7 @@ namespace gazebo
     public: virtual void SetStepType(const std::string type);
   
     /// \brief Set the gavity vector
-    public: virtual void SetGravity(const gazebo::Vector3 &gravity);
+    public: virtual void SetGravity(const gazebo::common::Vector3 &gravity);
   
     /// \brief access functions to set ODE parameters
     public: void SetWorldCFM(double cfm);
@@ -206,16 +211,16 @@ namespace gazebo
     /// \brief Collision attributes
     private: dJointGroupID contactGroup;
   
-    private: ParamT<double> *globalCFMP; 
-    private: ParamT<double> *globalERPP; 
-    private: ParamT<std::string> *stepTypeP; 
-    private: ParamT<unsigned int> *stepItersP; 
-    private: ParamT<double> *stepWP; 
-    private: ParamT<double> *contactMaxCorrectingVelP;
-    private: ParamT<double> *contactSurfaceLayerP;
-    private: ParamT<bool> *autoDisableBodyP;
-    private: ParamT<int> *contactFeedbacksP;
-    private: ParamT<int> *maxContactsP;
+    private: common::ParamT<double> *globalCFMP; 
+    private: common::ParamT<double> *globalERPP; 
+    private: common::ParamT<std::string> *stepTypeP; 
+    private: common::ParamT<unsigned int> *stepItersP; 
+    private: common::ParamT<double> *stepWP; 
+    private: common::ParamT<double> *contactMaxCorrectingVelP;
+    private: common::ParamT<double> *contactSurfaceLayerP;
+    private: common::ParamT<bool> *autoDisableBodyP;
+    private: common::ParamT<int> *contactFeedbacksP;
+    private: common::ParamT<int> *maxContactsP;
   
     private: tbb::concurrent_vector<ContactFeedback> contactFeedbacks;
   

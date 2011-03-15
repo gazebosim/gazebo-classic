@@ -73,10 +73,10 @@ namespace gazebo
     public: virtual ~BulletBallJoint();
   
     /// \brief Get joint's anchor point
-    public: Vector3 GetAnchor(int index) const;
+    public: common::Vector3 GetAnchor(int index) const;
   
     /// \brief Set joint's anchor point
-    public: void SetAnchor( int index, const Vector3 &anchor );
+    public: void SetAnchor( int index, const common::Vector3 &anchor );
   
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
@@ -85,7 +85,7 @@ namespace gazebo
     public: void Attach( Body *one, Body *two );
 
     /// \brief Get the axis of rotation
-    public: virtual Vector3 GetAxis(int index) const {}
+    public: virtual common::Vector3 GetAxis(int index) const {}
 
     /// \brief Set the velocity of an axis(index).
     public: virtual void SetVelocity(int index, double angle) {}
@@ -100,7 +100,7 @@ namespace gazebo
     public: virtual void SetMaxForce(int index, double t) {}
 
     /// \brief Get the angle of rotation of an axis(index)
-    public: virtual Angle GetAngle(int index) const {}
+    public: virtual common::Angle GetAngle(int index) const {}
 
   };
   

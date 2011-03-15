@@ -17,24 +17,20 @@
 /* Desc: A ODEHingeJoint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: ODEHingeJoint.cc 7640 2009-05-13 02:06:08Z natepak $
  */
+
+#include <boost/bind.hpp>
 
 #include "gazebo_config.h"
 #include "common/GazeboMessage.hh"
-#include "Model.hh"
-#include "Body.hh"
-#include "World.hh"
 #include "common/XMLConfig.hh"
 #include "common/Global.hh"
-#include "ODEHingeJoint.hh"
-#include <boost/signal.hpp>
-#include <boost/bind.hpp>
 
+#include "physics/Body.hh"
+#include "physics/ode/ODEHingeJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -52,7 +48,7 @@ ODEHingeJoint::~ODEHingeJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load a hinge joint
-void ODEHingeJoint::Load(XMLConfigNode *node)
+void ODEHingeJoint::Load(common::XMLConfigNode *node)
 {
   HingeJoint<ODEJoint>::Load(node);
 
@@ -62,18 +58,18 @@ void ODEHingeJoint::Load(XMLConfigNode *node)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the anchor point
-Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
+common::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 {
   dVector3 result;
 
   dJointGetHingeAnchor( this->jointId, result );
 
-  return Vector3(result[0], result[1], result[2]);
+  return common::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
-void ODEHingeJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
+void ODEHingeJoint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
 {
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
@@ -84,18 +80,18 @@ void ODEHingeJoint::SetAnchor( int /*index*/, const Vector3 &anchor )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
+common::Vector3 ODEHingeJoint::GetAxis(int /*index*/) const
 {
   dVector3 result;
 
   dJointGetHingeAxis( this->jointId, result );
 
-  return Vector3(result[0], result[1], result[2]);
+  return common::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the axis of rotation
-void ODEHingeJoint::SetAxis( int /*index*/, const Vector3 &axis )
+void ODEHingeJoint::SetAxis( int /*index*/, const common::Vector3 &axis )
 {
   if (this->body1) this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
@@ -126,9 +122,9 @@ void ODEHingeJoint::ApplyDamping()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the angle of rotation
-Angle ODEHingeJoint::GetAngle(int /*index*/) const
+common::Angle ODEHingeJoint::GetAngle(int /*index*/) const
 {
-  Angle result = dJointGetHingeAngle( this->jointId );
+  common::Angle result = dJointGetHingeAngle( this->jointId );
 
   return result;
 }

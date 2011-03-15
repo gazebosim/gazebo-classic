@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Parameters for contact joints
+/* Desc: common::Parameters for contact joints
  * Author: Nate Koenig
  * Date: 30 July 2003
  * CVS: $Id$
@@ -22,11 +22,10 @@
 
 #include <float.h>
 #include "common/XMLConfig.hh"
-#include "SurfaceParams.hh"
+#include "physics/SurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Default constructor
@@ -58,7 +57,7 @@ SurfaceParams::SurfaceParams()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the contact params
-void SurfaceParams::Load(XMLConfigNode *node)
+void SurfaceParams::Load(common::XMLConfigNode *node)
 {
   this->kp = node->GetDouble("kp",this->kp);
   this->kd = node->GetDouble("kd",this->kd);

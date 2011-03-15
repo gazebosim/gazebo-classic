@@ -25,17 +25,13 @@
 
 #include "common/XMLConfig.hh"
 #include "common/GazeboMessage.hh"
-#include "rendering/Visual.hh"
-
-#include "World.hh"
-#include "Geom.hh"
-#include "ODEGeom.hh"
-#include "common/Quatern.hh"
 #include "common/GazeboError.hh"
-#include "PhysicsEngine.hh"
-#include "Mass.hh"
-#include "Model.hh"
-#include "ODEBody.hh"
+
+#include "physics/Geom.hh"
+#include "physics/World.hh"
+#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODEPhysics.hh"
+#include "physics/ode/ODEBody.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -72,8 +68,8 @@ ODEBody::~ODEBody()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load the body based on an XMLConfig node
-void ODEBody::Load(XMLConfigNode *node)
+// Load the body based on an common::XMLConfig node
+void ODEBody::Load(common::XMLConfigNode *node)
 {
   Body::Load(node);
 
@@ -98,7 +94,7 @@ void ODEBody::Init()
 // Move callback. Use this to move the visuals
 void ODEBody::MoveCallback(dBodyID id)
 {
-  Pose3d pose;
+  common::Pose3d pose;
   const dReal *p;
   const dReal *r;
   ODEBody *self = (ODEBody*)(dBodyGetData(id));
@@ -198,7 +194,7 @@ void ODEBody::OnPoseChange()
 
   //this->SetEnabled(true);
 
-  Pose3d pose = this->comEntity->GetWorldPose();
+  common::Pose3d pose = this->comEntity->GetWorldPose();
 
   dBodySetPosition(this->bodyId, pose.pos.x, pose.pos.y, pose.pos.z);
 
@@ -279,10 +275,10 @@ void ODEBody::UpdateCoM()
     dMassSetZero(&odeMass);
 
     // The CoG must always be (0,0,0)
-    Vector3 cog;
+    common::Vector3 cog;
 
-    Vector3 principals = this->customMass.GetPrincipalMoments();
-    Vector3 products = this->customMass.GetProductsofInertia();
+    common::Vector3 principals = this->customMass.GetPrincipalMoments();
+    common::Vector3 products = this->customMass.GetProductsofInertia();
 
     dMassSetParameters(&odeMass, this->customMass.GetAsDouble(),
                        cog.x, cog.y, cog.z,
@@ -293,14 +289,14 @@ void ODEBody::UpdateCoM()
     else
       gzthrow("Setting custom body " + this->GetName()+"mass to zero!");
 
-    this->GetWorld()->GetPhysicsEngine()->ConvertMass(&this->customMass, &odeMass);
+    ODEPhysics::ConvertMass(&this->customMass, &odeMass);
     // NATY
     //this->physicsEngine->UnlockMutex();
   }
   else
   { 
     dMass odeMass;
-    this->GetWorld()->GetPhysicsEngine()->ConvertMass(&odeMass, this->mass);
+    ODEPhysics::ConvertMass(&odeMass, this->mass);
 
     // Center of Gravity must be at (0,0,0) in the body frame
     odeMass.c[0] = 0.0;
@@ -314,7 +310,7 @@ void ODEBody::UpdateCoM()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void ODEBody::SetLinearVel(const Vector3 &vel)
+void ODEBody::SetLinearVel(const common::Vector3 &vel)
 {
   if (this->bodyId)
   {
@@ -324,9 +320,9 @@ void ODEBody::SetLinearVel(const Vector3 &vel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the velocity of the body in the world frame
-Vector3 ODEBody::GetWorldLinearVel() const
+common::Vector3 ODEBody::GetWorldLinearVel() const
 {
-  Vector3 vel;
+  common::Vector3 vel;
 
   if (this->bodyId)
   {
@@ -340,7 +336,7 @@ Vector3 ODEBody::GetWorldLinearVel() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the velocity of the body
-void ODEBody::SetAngularVel(const Vector3 &vel)
+void ODEBody::SetAngularVel(const common::Vector3 &vel)
 {
   if (this->bodyId)
   {
@@ -352,9 +348,9 @@ void ODEBody::SetAngularVel(const Vector3 &vel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the body in the world frame
-Vector3 ODEBody::GetWorldAngularVel() const
+common::Vector3 ODEBody::GetWorldAngularVel() const
 {
-  Vector3 vel;
+  common::Vector3 vel;
 
   if (this->bodyId)
   {
@@ -375,7 +371,7 @@ Vector3 ODEBody::GetWorldAngularVel() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Set the force applied to the body
-void ODEBody::SetForce(const Vector3 &force)
+void ODEBody::SetForce(const common::Vector3 &force)
 {
   if (this->bodyId)
   {
@@ -386,9 +382,9 @@ void ODEBody::SetForce(const Vector3 &force)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Get the force applied to the body in the world frame
-Vector3 ODEBody::GetWorldForce() const
+common::Vector3 ODEBody::GetWorldForce() const
 {
-  Vector3 force;
+  common::Vector3 force;
 
   if (this->bodyId)
   {
@@ -406,7 +402,7 @@ Vector3 ODEBody::GetWorldForce() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Set the torque applied to the body
-void ODEBody::SetTorque(const Vector3 &torque)
+void ODEBody::SetTorque(const common::Vector3 &torque)
 {
   if (this->bodyId)
   {
@@ -417,9 +413,9 @@ void ODEBody::SetTorque(const Vector3 &torque)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the torque applied to the body in the world frame
-Vector3 ODEBody::GetWorldTorque() const
+common::Vector3 ODEBody::GetWorldTorque() const
 {
-  Vector3 torque;
+  common::Vector3 torque;
 
   if (this->bodyId)
   {

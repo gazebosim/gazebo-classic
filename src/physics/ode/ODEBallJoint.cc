@@ -22,7 +22,7 @@
 
 #include "gazebo_config.h"
 #include "common/GazeboMessage.hh"
-#include "ODEBallJoint.hh"
+#include "physics/ode/ODEBallJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -43,7 +43,7 @@ ODEBallJoint::~ODEBallJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the joints anchor point
-Vector3 ODEBallJoint::GetAnchor(int index) const
+common::Vector3 ODEBallJoint::GetAnchor(int index) const
 {
   dVector3 result;
   // NATY
@@ -52,13 +52,13 @@ Vector3 ODEBallJoint::GetAnchor(int index) const
   // NATY
   // this->physics->UnlockMutex();
 
-  return Vector3(result[0], result[1], result[2]);
+  return common::Vector3(result[0], result[1], result[2]);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joints anchor point
-void ODEBallJoint::SetAnchor(int index, const Vector3 &anchor)
+void ODEBallJoint::SetAnchor(int index, const common::Vector3 &anchor)
 {
   // NATY
   // this->physics->LockMutex();

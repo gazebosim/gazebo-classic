@@ -1,32 +1,38 @@
+include_directories( 
+  ${XML_INCLUDE_DIRS} 
+  ${PROJECT_BINARY_DIR}/src/msgs
+  ${PROJECT_SOURCE_DIR}/src 
+)
+
 if (INCLUDE_ODE)
-  set (sources ODEPhysics.cc
-               ODEGeom.cc
-               ODEBody.cc
-               ODEJoint.cc
-               ODESliderJoint.cc
-               ODEHingeJoint.cc
-               ODEHinge2Joint.cc
-               ODEUniversalJoint.cc
-               ODEBallJoint.cc
-               ODETrimeshShape.cc
-               ODERayShape.cc
-               ODEMultiRayShape.cc
-               ODEHeightmapShape.cc
+  set (sources ode/ODEPhysics.cc
+               ode/ODEGeom.cc
+               ode/ODEBody.cc
+               ode/ODEJoint.cc
+               ode/ODESliderJoint.cc
+               ode/ODEHingeJoint.cc
+               ode/ODEHinge2Joint.cc
+               ode/ODEUniversalJoint.cc
+               ode/ODEBallJoint.cc
+               ode/ODETrimeshShape.cc
+               ode/ODERayShape.cc
+               ode/ODEMultiRayShape.cc
+               ode/ODEHeightmapShape.cc
                )
 
-  set (headers ODEPhysics.hh
-               ODEGeom.hh
-               ODEBody.hh
-               ODEJoint.hh
-               ODESliderJoint.hh
-               ODEHingeJoint.hh
-               ODEHinge2Joint.hh
-               ODEUniversalJoint.hh
-               ODEBallJoint.hh
-               ODETrimeshShape.hh
-               ODERayShape.hh
-               ODEMultiRayShape.hh
-               ODEHeightmapShape.hh
+  set (headers ode/ODEPhysics.hh
+               ode/ODEGeom.hh
+               ode/ODEBody.hh
+               ode/ODEJoint.hh
+               ode/ODESliderJoint.hh
+               ode/ODEHingeJoint.hh
+               ode/ODEHinge2Joint.hh
+               ode/ODEUniversalJoint.hh
+               ode/ODEBallJoint.hh
+               ode/ODETrimeshShape.hh
+               ode/ODERayShape.hh
+               ode/ODEMultiRayShape.hh
+               ode/ODEHeightmapShape.hh
                )
   LIST_TO_STRING(MY_PHYSICS_CFLAGS "${ODE_CFLAGS}")
 endif (INCLUDE_ODE)

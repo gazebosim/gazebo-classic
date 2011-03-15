@@ -32,7 +32,7 @@
 #include "SurfaceParams.hh"
 #include "World.hh"
 #include "Body.hh"
-#include "Geom.hh"
+#include "physics/Geom.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -56,24 +56,24 @@ Geom::Geom( Body *body )
 
   this->contactsEnabled = false;
 
-  Param::Begin(&this->parameters);
+  common::Param::Begin(&this->parameters);
 
-  this->massP = new ParamT<double>("mass",0.001,0);
+  this->massP = new common::ParamT<double>("mass",0.001,0);
   this->massP->Callback( &Geom::SetMass, this);
 
-  this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
+  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this);
 
-  this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
+  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
-  this->laserFiducialIdP = new ParamT<int>("laser_fiducial_id",-1,0);
-  this->laserRetroP = new ParamT<float>("laser_retro",-1,0);
+  this->laserFiducialIdP = new common::ParamT<int>("laser_fiducial_id",-1,0);
+  this->laserRetroP = new common::ParamT<float>("laser_retro",-1,0);
 
-  this->enableContactsP = new ParamT<bool>("enable_contacts", false, 0);
+  this->enableContactsP = new common::ParamT<bool>("enable_contacts", false, 0);
   //this->enableContactsP->Callback( &Geom::SetContactsEnabled, this );
   
-  Param::End();
+  common::Param::End();
 
   this->connections.push_back( event::Events::ConnectShowBoundingBoxesSignal( boost::bind(&Geom::ShowBoundingBox, this, _1) ) );
   this->connections.push_back( this->body->ConnectEnabledSignal( boost::bind(&Geom::EnabledCB, this, _1) ) );
@@ -86,7 +86,7 @@ Geom::~Geom()
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    Message::Init(msg, this->bbVisual);
+    common::Message::Init(msg, this->bbVisual);
     msg.set_action( msgs::Visual::DELETE);
     this->vis_pub->Publish(msg);
   }
@@ -112,14 +112,14 @@ void Geom::Fini()
 
 ////////////////////////////////////////////////////////////////////////////////
 // First step in the loading process
-void Geom::Load(XMLConfigNode *node)
+void Geom::Load(common::XMLConfigNode *node)
 {
   Entity::Load(node);
 
   this->SetName(this->nameP->GetValue());
   this->massP->Load(node);
 
-  XMLConfigNode *childNode;
+  common::XMLConfigNode *childNode;
   if ( (childNode = node->GetChild("origin")) != NULL)
   {
     this->xyzP->Load(childNode);
@@ -132,7 +132,7 @@ void Geom::Load(XMLConfigNode *node)
 
   this->SetContactsEnabled(**this->enableContactsP);
 
-  this->SetRelativePose( Pose3d( **this->xyzP, **this->rpyP ) );
+  this->SetRelativePose( common::Pose3d( **this->xyzP, **this->rpyP ) );
 
   this->mass.SetMass( **this->massP );
 
@@ -152,8 +152,8 @@ void Geom::CreateBoundingBox()
   // Create the bounding box
   if (this->GetShapeType() != PLANE_SHAPE && this->GetShapeType() != MAP_SHAPE)
   {
-    Vector3 min;
-    Vector3 max;
+    common::Vector3 min;
+    common::Vector3 max;
 
     this->GetBoundingBox(min,max);
 
@@ -175,9 +175,9 @@ void Geom::CreateBoundingBox()
     else
       msg.set_material( "Gazebo/GreenTransparent" );
 
-    Message::Set(msg.mutable_scale(), (max - min) * 1.01);
-    Message::Set(msg.mutable_pose()->mutable_position(), Vector3(0,0,0.0));
-    Message::Set(msg.mutable_pose()->mutable_orientation(), Quatern(1,0,0,0));
+    common::Message::Set(msg.mutable_scale(), (max - min) * 1.01);
+    common::Message::Set(msg.mutable_pose()->mutable_position(), common::Vector3(0,0,0.0));
+    common::Message::Set(msg.mutable_pose()->mutable_orientation(), common::Quatern(1,0,0,0));
     msg.set_transparency( .5 );
 
     this->vis_pub->Publish(msg);
@@ -185,7 +185,7 @@ void Geom::CreateBoundingBox()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our XMLConfig node
+// Save the body based on our common::XMLConfig node
 void Geom::Save(std::string &prefix, std::ostream &stream)
 {
   if (!this->GetSaveable())
@@ -278,7 +278,7 @@ void Geom::ShowBoundingBox(const bool &show)
   if (!this->bbVisual.empty())
   {
     msgs::Visual msg;
-    Message::Init(msg, this->bbVisual);
+    common::Message::Init(msg, this->bbVisual);
     msg.set_visible( show );
     msg.set_action( msgs::Visual::UPDATE );
     this->vis_pub->Publish(msg);
@@ -395,7 +395,7 @@ Contact Geom::GetContact(unsigned int i) const
 void Geom::EnabledCB(bool enabled)
 {
   msgs::Visual msg;
-  Message::Init(msg, this->bbVisual);
+  common::Message::Init(msg, this->bbVisual);
 
   if (enabled)
     msg.set_material( "Gazebo/GreenTransparent" );
@@ -407,80 +407,80 @@ void Geom::EnabledCB(bool enabled)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the geom
-Vector3 Geom::GetRelativeLinearVel() const
+common::Vector3 Geom::GetRelativeLinearVel() const
 {
   if (this->body)
     return this->body->GetRelativeLinearVel();
   else
-    return Vector3();
+    return common::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the geom in the world frame
-Vector3 Geom::GetWorldLinearVel() const
+common::Vector3 Geom::GetWorldLinearVel() const
 {
   if (this->body)
     return this->body->GetWorldLinearVel();
   else
-    return Vector3();
+    return common::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the geom
-Vector3 Geom::GetRelativeAngularVel() const
+common::Vector3 Geom::GetRelativeAngularVel() const
 {
   if (this->body)
     return this->body->GetRelativeAngularVel();
   else
-    return Vector3();
+    return common::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the geom in the world frame
-Vector3 Geom::GetWorldAngularVel() const
+common::Vector3 Geom::GetWorldAngularVel() const
 {
   if (this->body)
     return this->body->GetWorldAngularVel();
   else
-    return Vector3();
+    return common::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the geom
-Vector3 Geom::GetRelativeLinearAccel() const
+common::Vector3 Geom::GetRelativeLinearAccel() const
 {
   if (this->body)
     return this->body->GetRelativeLinearAccel();
   else
-    return Vector3();
+    return common::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the geom in the world frame
-Vector3 Geom::GetWorldLinearAccel() const
+common::Vector3 Geom::GetWorldLinearAccel() const
 {
   if (this->body)
     return this->body->GetWorldLinearAccel();
   else
-    return Vector3();
+    return common::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the geom
-Vector3 Geom::GetRelativeAngularAccel() const
+common::Vector3 Geom::GetRelativeAngularAccel() const
 {
   if (this->body)
     return this->body->GetRelativeAngularAccel();
   else
-    return Vector3();
+    return common::Vector3();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the geom in the world frame
-Vector3 Geom::GetWorldAngularAccel() const
+common::Vector3 Geom::GetWorldAngularAccel() const
 {
   if (this->body)
     return this->body->GetWorldAngularAccel();
   else
-    return Vector3();
+    return common::Vector3();
 }

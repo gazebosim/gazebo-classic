@@ -22,10 +22,11 @@
 
 #include "gazebo_config.h"
 #include "common/GazeboMessage.hh"
-#include "Body.hh"
 #include "common/Global.hh"
 #include "common/XMLConfig.hh"
-#include "ODEHinge2Joint.hh"
+
+#include "physics/Body.hh"
+#include "physics/ode/ODEHinge2Joint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -38,9 +39,9 @@ ODEHinge2Joint::ODEHinge2Joint( dWorldID worldId )
 {
   this->jointId = dJointCreateHinge2( worldId, NULL );
 
-  Param::Begin(&this->parameters);
-  this->suspensionCfmP = new ParamT<double>("suspensionCfm",0.0,0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->suspensionCfmP = new common::ParamT<double>("suspensionCfm",0.0,0);
+  common::Param::End();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -52,7 +53,7 @@ ODEHinge2Joint::~ODEHinge2Joint()
 
 //////////////////////////////////////////////////////////////////////////////
 ///  Load the joint
-void ODEHinge2Joint::Load(XMLConfigNode *node)
+void ODEHinge2Joint::Load(common::XMLConfigNode *node)
 {
   Hinge2Joint<ODEJoint>::Load(node);
 
@@ -72,7 +73,7 @@ void ODEHinge2Joint::SaveJoint(std::string &prefix, std::ostream &stream)
 
 //////////////////////////////////////////////////////////////////////////////
 // Get anchor point
-Vector3 ODEHinge2Joint::GetAnchor(int index) const
+common::Vector3 ODEHinge2Joint::GetAnchor(int index) const
 {
   dVector3 result;
 
@@ -85,12 +86,12 @@ Vector3 ODEHinge2Joint::GetAnchor(int index) const
   // NATY
   //this->physics->UnlockMutex();
 
-  return Vector3(result[0], result[1], result[2]);
+  return common::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the anchor point
-void ODEHinge2Joint::SetAnchor( int /*index*/, const Vector3 &anchor )
+void ODEHinge2Joint::SetAnchor( int /*index*/, const common::Vector3 &anchor )
 {
   // NATY
   //this->physics->LockMutex();
@@ -103,7 +104,7 @@ void ODEHinge2Joint::SetAnchor( int /*index*/, const Vector3 &anchor )
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the first axis of rotation
-void ODEHinge2Joint::SetAxis( int index, const Vector3 &axis )
+void ODEHinge2Joint::SetAxis( int index, const common::Vector3 &axis )
 {
   // NATY
   // this->physics->LockMutex();
@@ -136,7 +137,7 @@ void ODEHinge2Joint::SetDamping( int /*index*/, const double damping )
 
 //////////////////////////////////////////////////////////////////////////////
 // Get first axis of rotation
-Vector3 ODEHinge2Joint::GetAxis(int index) const
+common::Vector3 ODEHinge2Joint::GetAxis(int index) const
 {
   dVector3 result;
 
@@ -149,12 +150,12 @@ Vector3 ODEHinge2Joint::GetAxis(int index) const
   // NATY
   // this->physics->UnlockMutex();
 
-  return Vector3(result[0], result[1], result[2]);
+  return common::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get angle of rotation about first axis
-Angle ODEHinge2Joint::GetAngle(int index) const
+common::Angle ODEHinge2Joint::GetAngle(int index) const
 {
   // NATY
   // this->physics->LockMutex();
@@ -165,7 +166,7 @@ Angle ODEHinge2Joint::GetAngle(int index) const
   // NATY 
   // this->physics->UnlockMutex();
 
-  return Angle(0);
+  return common::Angle(0);
 }
 
 //////////////////////////////////////////////////////////////////////////////

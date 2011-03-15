@@ -17,7 +17,6 @@
 /* Desc: Specification of a contact
  * Author: Nate Koenig
  * Date: 10 Nov 2009
- * SVN: $Id$
  */
 
 #ifndef JOINTFEEDBACK_HH
@@ -28,27 +27,27 @@
 namespace gazebo
 {
 	namespace physics
-{
-  class JointFeedback
   {
-    /// \brief Operator =
-    public: const JointFeedback &operator=(const JointFeedback &f)
-            {
-              this->body1Force = f.body1Force;
-              this->body2Force = f.body2Force;
-
-              this->body1Torque = f.body1Torque;
-              this->body2Torque = f.body2Torque;
-              return *this;
-            }
-
-    public: Vector3 body1Force;
-    public: Vector3 body2Force;
+    class JointFeedback
+    {
+      /// \brief Operator =
+      public: const JointFeedback &operator=(const JointFeedback &f)
+              {
+                this->body1Force = f.body1Force;
+                this->body2Force = f.body2Force;
   
-    public: Vector3 body1Torque;
-    public: Vector3 body2Torque;
-  };
-}
+                this->body1Torque = f.body1Torque;
+                this->body2Torque = f.body2Torque;
+                return *this;
+              }
+  
+      public: common::Vector3 body1Force;
+      public: common::Vector3 body2Force;
+    
+      public: common::Vector3 body1Torque;
+      public: common::Vector3 body2Torque;
+    };
+  }
 
 }
 #endif

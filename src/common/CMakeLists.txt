@@ -38,7 +38,6 @@ set ( sources Messages.cc
               XMLConfig.cc
               Image.cc
               Material.cc
-              Common.cc
 )
 
 set ( headers Messages.hh
@@ -77,7 +76,6 @@ set ( headers Messages.hh
               XMLConfig.hh
               Image.hh 
               Material.hh
-              Common.hh
               MouseEvent.hh
 )
 

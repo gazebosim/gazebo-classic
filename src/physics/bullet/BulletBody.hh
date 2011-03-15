@@ -47,9 +47,9 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~BulletBody();
 
-    /// \brief Load the body based on an XMLConfig node
-    /// \param node XMLConfigNode pointer
-    public: virtual void Load(XMLConfigNode *node);
+    /// \brief Load the body based on an common::XMLConfig node
+    /// \param node common::XMLConfigNode pointer
+    public: virtual void Load(common::XMLConfigNode *node);
 
     /// \brief Initialize the body
     public: virtual void Init();
@@ -78,28 +78,28 @@ namespace gazebo
     public: virtual void UpdateCoM();
 
     /// \brief Set the linear velocity of the body
-    public: virtual void SetLinearVel(const Vector3 &vel);
+    public: virtual void SetLinearVel(const common::Vector3 &vel);
 
     /// \brief Set the angular velocity of the body
-    public: virtual void SetAngularVel(const Vector3 &vel);
+    public: virtual void SetAngularVel(const common::Vector3 &vel);
 
     /// \brief Set the force applied to the body
-    public: virtual void SetForce(const Vector3 &force);
+    public: virtual void SetForce(const common::Vector3 &force);
 
     /// \brief Set the torque applied to the body
-    public: virtual void SetTorque(const Vector3 &force);
+    public: virtual void SetTorque(const common::Vector3 &force);
 
     /// \brief Get the linear velocity of the body in the world frame
-    public: virtual Vector3 GetWorldLinearVel() const;
+    public: virtual common::Vector3 GetWorldLinearVel() const;
 
     /// \brief Get the angular velocity of the body in the world frame
-    public: virtual Vector3 GetWorldAngularVel() const;
+    public: virtual common::Vector3 GetWorldAngularVel() const;
 
     /// \brief Get the force applied to the body in the world frame
-    public: virtual Vector3 GetWorldForce() const;
+    public: virtual common::Vector3 GetWorldForce() const;
 
     /// \brief Get the torque applied to the body in the world frame
-    public: virtual Vector3 GetWorldTorque() const;
+    public: virtual common::Vector3 GetWorldTorque() const;
 
     /// \brief Set whether gravity affects this body
     public: virtual void SetGravityMode(bool mode);
@@ -120,14 +120,14 @@ namespace gazebo
     public: virtual void SetAngularDamping(double damping);
 
     /// \brief Set the relative pose of a child geom.
-    public: void SetGeomRelativePose(BulletGeom *geom, const Pose3d &newPose);
+    public: void SetGeomRelativePose(BulletGeom *geom, const common::Pose3d &newPose);
 
     private: btCompoundShape *compoundShape;
     private: BulletMotionState *motionState;
     private: btRigidBody *rigidBody;
     private: BulletPhysics *bulletPhysics;
 
-    protected: Pose3d pose;
+    protected: common::Pose3d pose;
   };
 
   /// \}

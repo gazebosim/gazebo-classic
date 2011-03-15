@@ -56,35 +56,35 @@ void BulletMotionState::SetVisual(Visual *vis)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the pose
-Pose3d BulletMotionState::GetWorldPose() const
+common::Pose3d BulletMotionState::GetWorldPose() const
 {
   return this->worldPose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the position of the body
-void BulletMotionState::SetWorldPosition(const Vector3 &pos)
+void BulletMotionState::SetWorldPosition(const common::Vector3 &pos)
 {
   this->worldPose.pos = pos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the rotation of the body
-void BulletMotionState::SetWorldRotation(const Quatern &rot)
+void BulletMotionState::SetWorldRotation(const common::Quatern &rot)
 {
   this->worldPose.rot = rot;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the pose
-void BulletMotionState::SetWorldPose(const Pose3d &pose)
+void BulletMotionState::SetWorldPose(const common::Pose3d &pose)
 {
   this->worldPose = pose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the center of mass offset
-void BulletMotionState::SetCoMOffset( const Pose3d &com )
+void BulletMotionState::SetCoMOffset( const common::Pose3d &com )
 {
   this->comOffset = com;
 }
@@ -93,7 +93,7 @@ void BulletMotionState::SetCoMOffset( const Pose3d &com )
 // Get the world transform
 void BulletMotionState::getWorldTransform(btTransform &worldTrans) const 
 {
-  Pose3d result = this->worldPose;
+  common::Pose3d result = this->worldPose;
   result.pos += this->comOffset.pos;
 
   worldTrans = BulletPhysics::ConvertPose(result);

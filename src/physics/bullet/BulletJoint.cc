@@ -51,7 +51,7 @@ BulletJoint::~BulletJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 // Load a joint
-void BulletJoint::Load(XMLConfigNode *node)
+void BulletJoint::Load(common::XMLConfigNode *node)
 {
   Joint::Load(node);
 

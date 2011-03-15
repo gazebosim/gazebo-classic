@@ -20,18 +20,18 @@
  * SVN: $Id$
  */
 
-#include "PhysicsEngine.hh"
 #include "common/MeshManager.hh"
 #include "common/Mesh.hh"
-#include "Mass.hh"
-#include "Geom.hh"
-#include "World.hh"
-#include "TrimeshShape.hh"
 #include "common/GazeboError.hh"
+
+#include "physics/World.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/Mass.hh"
+#include "physics/Geom.hh"
+#include "physics/TrimeshShape.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -39,12 +39,12 @@ TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
 {
   this->AddType(TRIMESH_SHAPE);
 
-  Param::Begin(&this->parameters);
-  this->meshNameP = new ParamT<std::string>("mesh","",1);
-  this->scaleP = new ParamT<Vector3>("scale",Vector3(1,1,1),0);
-  this->centerMeshP = new ParamT<std::string>("center_mesh","none",0);
-  this->genTexCoordP = new ParamT<bool>("gen_tex_coord",false,0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->meshNameP = new common::ParamT<std::string>("mesh","",1);
+  this->scaleP = new common::ParamT<common::Vector3>("scale",common::Vector3(1,1,1),0);
+  this->centerMeshP = new common::ParamT<std::string>("center_mesh","none",0);
+  this->genTexCoordP = new common::ParamT<bool>("gen_tex_coord",false,0);
+  common::Param::End();
 }
 
 
@@ -60,9 +60,9 @@ TrimeshShape::~TrimeshShape()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the trimesh
-void TrimeshShape::Load(XMLConfigNode *node)
+void TrimeshShape::Load(common::XMLConfigNode *node)
 {
-  MeshManager *meshManager = MeshManager::Instance();
+  common::MeshManager *meshManager = common::MeshManager::Instance();
 
   this->meshNameP->Load(node);
   this->scaleP->Load(node);
@@ -74,22 +74,22 @@ void TrimeshShape::Load(XMLConfigNode *node)
   
   if (this->centerMeshP->GetValue() == std::string("aabb_center"))
   {
-    Vector3 center,min_xyz,max_xyz;
+    common::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
     meshManager->SetMeshCenter(this->mesh,center);
     //std::cout << " aabb center " << std::endl;
   }
   else if (this->centerMeshP->GetValue() == std::string("aabb_bottom"))
   {
-    Vector3 center,min_xyz,max_xyz;
+    common::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
-    meshManager->SetMeshCenter(this->mesh,Vector3(center.x,center.y,min_xyz.z));
+    meshManager->SetMeshCenter(this->mesh,common::Vector3(center.x,center.y,min_xyz.z));
     //std::cout << " aabb bottom " << std::endl;
   }
 
   if (this->genTexCoordP->GetValue())
   {
-    Vector3 center,min_xyz,max_xyz;
+    common::Vector3 center,min_xyz,max_xyz;
     meshManager->GetMeshAABB(this->mesh,center,min_xyz,max_xyz);
     meshManager->GenSphericalTexCoord(this->mesh,center);
   }
@@ -101,7 +101,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
     // Create a mesh for each of the submeshes.
     for (unsigned int i=1; i < this->mesh->GetSubMeshCount(); i++)
     {
-      SubMesh *subMesh = const_cast<SubMesh*>(mesh->GetSubMesh(i));
+      common::SubMesh *subMesh = const_cast<common::SubMesh*>(mesh->GetSubMesh(i));
 
       if (subMesh->GetVertexCount() < 3)
         continue;
@@ -109,7 +109,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
       std::ostringstream newName;
       newName << this->mesh->GetName() << "_" << i;
 
-      Mesh *newMesh = new Mesh();
+      common::Mesh *newMesh = new common::Mesh();
       newMesh->SetName( newName.str() );
       newMesh->AddSubMesh( subMesh );
      
@@ -132,7 +132,7 @@ void TrimeshShape::Load(XMLConfigNode *node)
       stream << "</geom:trimesh>";
       stream << "</gazebo:world>";
 
-      XMLConfig *config = new XMLConfig();
+      common::XMLConfig *config = new common::XMLConfig();
       config->LoadString( stream.str() );
 
       Geom *newGeom = this->GetWorld()->GetPhysicsEngine()->CreateGeom( "trimesh", this->geomParent->GetBody() );

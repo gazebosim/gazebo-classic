@@ -44,14 +44,14 @@ namespace gazebo
     public: virtual ~BulletRaySensor();
 
     /// \brief Add a ray to the sensor
-    public: void AddRay(Vector3 start, Vector3 end, double minRange, 
+    public: void AddRay(common::Vector3 start, common::Vector3 end, double minRange, 
                         double maxRange, bool display);
 
     /// \brief Get the number of rays
     public: int GetCount() const;
 
     /// \brief Get the relative starting and ending points of a ray
-    public: void GetRelativePoints(int index, Vector3 &a, Vector3 &b);
+    public: void GetRelativePoints(int index, common::Vector3 &a, common::Vector3 &b);
 
     /// \brief Get the range of a ray
     public: double GetRange(int index) const;

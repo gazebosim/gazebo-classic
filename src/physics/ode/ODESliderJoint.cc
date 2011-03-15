@@ -17,16 +17,15 @@
 /* Desc: A slider or primastic joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: ODESliderJoint.cc 7039 2008-09-24 18:06:29Z natepak $
  */
+#include <boost/bind.hpp>
 
 #include "gazebo_config.h"
 #include "common/GazeboMessage.hh"
-#include "Body.hh"
 #include "common/XMLConfig.hh"
-#include "ODESliderJoint.hh"
-#include <boost/signal.hpp>
-#include <boost/bind.hpp>
+
+#include "physics/Body.hh"
+#include "physics/ode/ODESliderJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -48,14 +47,14 @@ ODESliderJoint::~ODESliderJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the joint
-void ODESliderJoint::Load(XMLConfigNode *node)
+void ODESliderJoint::Load(common::XMLConfigNode *node)
 {
   SliderJoint<ODEJoint>::Load(node);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the axis of rotation
-Vector3 ODESliderJoint::GetAxis(int /*index*/) const
+common::Vector3 ODESliderJoint::GetAxis(int /*index*/) const
 {
   dVector3 result;
 
@@ -67,17 +66,17 @@ Vector3 ODESliderJoint::GetAxis(int /*index*/) const
   // NATY
   //this->physics->UnlockMutex();
 
-  return Vector3(result[0], result[1], result[2]);
+  return common::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the position of the joint
-Angle ODESliderJoint::GetAngle(int index) const
+common::Angle ODESliderJoint::GetAngle(int index) const
 {
   // NATY
   //this->physics->LockMutex();
   
-  Angle result = dJointGetSliderPosition( this->jointId );
+  common::Angle result = dJointGetSliderPosition( this->jointId );
 
   // NATY
   //this->physics->UnlockMutex();
@@ -107,11 +106,12 @@ void ODESliderJoint::SetVelocity(int /*index*/, double angle)
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the axis of motion
-void ODESliderJoint::SetAxis( int /*index*/, const Vector3 &axis )
+void ODESliderJoint::SetAxis( int /*index*/, const common::Vector3 &axis )
 {
   // NATY
   //this->physics->LockMutex();
-  if (this->body1) this->body1->SetEnabled(true);
+  if (this->body1) 
+    this->body1->SetEnabled(true);
   if (this->body2) this->body2->SetEnabled(true);
 
   dJointSetSliderAxis( this->jointId, axis.x, axis.y, axis.z );

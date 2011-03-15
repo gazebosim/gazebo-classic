@@ -15,8 +15,8 @@
  *
 */
 
-#include "Geom.hh"
-#include "PlaneShape.hh"
+#include "physics/Geom.hh"
+#include "physics/PlaneShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -29,10 +29,10 @@ PlaneShape::PlaneShape(Geom *parent) : Shape(parent)
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");
 
-  Param::Begin(&this->parameters);
-  this->normalP = new ParamT<Vector3>("normal",Vector3(0,0,1),0);
+  common::Param::Begin(&this->parameters);
+  this->normalP = new common::ParamT<common::Vector3>("normal",common::Vector3(0,0,1),0);
   this->normalP->Callback( &PlaneShape::SetNormal, this );
-  Param::End();
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ PlaneShape::~PlaneShape()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the plane
-void PlaneShape::Load(XMLConfigNode *node)
+void PlaneShape::Load(common::XMLConfigNode *node)
 {
   this->normalP->Load(node->GetChild("plane"));
   this->CreatePlane();
@@ -65,13 +65,13 @@ void PlaneShape::CreatePlane()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the altitude of the plane
-void PlaneShape::SetAltitude(const Vector3 &pos) 
+void PlaneShape::SetAltitude(const common::Vector3 &pos) 
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the normal
-void PlaneShape::SetNormal( const Vector3 &norm )
+void PlaneShape::SetNormal( const common::Vector3 &norm )
 {
   this->normalP->SetValue(norm);
   this->CreatePlane();

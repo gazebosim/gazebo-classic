@@ -17,8 +17,7 @@
 #ifndef ODEMULTIRAYSHAPE_HH
 #define ODEMULTIRAYSHAPE_HH
 
-#include "ODEPhysics.hh"
-#include "MultiRayShape.hh"
+#include "physics/MultiRayShape.hh"
 
 namespace gazebo
 {
@@ -40,7 +39,7 @@ namespace gazebo
       private: static void UpdateCallback( void *data, dGeomID o1, dGeomID o2 );
   
       /// \brief Add a ray to the geom
-      protected: void AddRay(const Vector3 &start, const Vector3 &end );
+      protected: void AddRay(const common::Vector3 &start, const common::Vector3 &end );
   
       /// Ray space for collision detector
       private: dSpaceID superSpaceId;

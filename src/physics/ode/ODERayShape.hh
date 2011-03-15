@@ -23,8 +23,8 @@
 #ifndef ODERAYSHAPE_HH
 #define ODERAYSHAPE_HH
 
-#include "RayShape.hh"
-#include "Shape.hh"
+#include "physics/RayShape.hh"
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
@@ -59,8 +59,8 @@ namespace gazebo
       ///        body
       /// \param posStart Start position, relative the body
       /// \param posEnd End position, relative to the body
-      public: virtual void SetPoints(const Vector3 &posStart, 
-                                     const Vector3 &posEnd);
+      public: virtual void SetPoints(const common::Vector3 &posStart, 
+                                     const common::Vector3 &posEnd);
     };
     
     /// \}

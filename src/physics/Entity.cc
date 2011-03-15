@@ -22,12 +22,11 @@
  */
 
 #include "common/Messages.hh"
-#include "Geom.hh"
+#include "physics/Geom.hh"
 #include "Model.hh"
 #include "Body.hh"
 #include "common/GazeboError.hh"
 #include "common/Global.hh"
-#include "World.hh"
 #include "PhysicsEngine.hh"
 #include "Entity.hh"
 #include "transport/TopicManager.hh"
@@ -45,14 +44,10 @@ Entity::Entity(Common *parent)
   this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(ENTITY);
 
-  this->world = NULL;
-  if (this->parent)
-    this->world = this->parent->GetWorld();
-
-  Param::Begin(&this->parameters);
-  this->staticP = new ParamT<bool>("static",false,0);
+  common::Param::Begin(&this->parameters);
+  this->staticP = new common::ParamT<bool>("static",false,0);
   this->staticP->Callback( &Entity::SetStatic, this );
-  Param::End();
+  common::Param::End();
  
   this->visualMsg = new msgs::Visual();
 
@@ -68,7 +63,7 @@ Entity::Entity(Common *parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load
-void Entity::Load(XMLConfigNode *node)
+void Entity::Load(common::XMLConfigNode *node)
 {
   Common::Load(node);
   this->RegisterVisual();
@@ -161,12 +156,12 @@ bool Entity::IsStatic() const
 /// Return the bounding box for the entity 
 Box Entity::GetBoundingBox() const
 {
-  return Box(Vector3(0,0,0), Vector3(1,1,1));
+  return Box(common::Vector3(0,0,0), common::Vector3(1,1,1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the absolute pose of the entity
-Pose3d Entity::GetWorldPose() const
+common::Pose3d Entity::GetWorldPose() const
 {
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -179,14 +174,14 @@ Pose3d Entity::GetWorldPose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pose of the entity relative to its parent
-Pose3d Entity::GetRelativePose() const
+common::Pose3d Entity::GetRelativePose() const
 {
   return this->relativePose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the pose of the entity relative to its parent
-void Entity::SetRelativePose(const Pose3d &pose, bool notify)
+void Entity::SetRelativePose(const common::Pose3d &pose, bool notify)
 {
   this->relativePose = pose;
   this->relativePose.Correct();
@@ -195,10 +190,10 @@ void Entity::SetRelativePose(const Pose3d &pose, bool notify)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the pose relative to the model this entity belongs to
-Pose3d Entity::GetModelRelativePose() const
+common::Pose3d Entity::GetModelRelativePose() const
 {
   if (this->HasType(MODEL) || !this->parent)
-    return Pose3d();
+    return common::Pose3d();
 
   return this->GetRelativePose() + 
          ((Entity*)this->parent)->GetModelRelativePose();
@@ -206,7 +201,7 @@ Pose3d Entity::GetModelRelativePose() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the abs pose of the entity
-void Entity::SetWorldPose(const Pose3d &pose, bool notify)
+void Entity::SetWorldPose(const common::Pose3d &pose, bool notify)
 {
 
   if (this->parent && this->parent->HasType(ENTITY))
@@ -224,12 +219,12 @@ void Entity::SetWorldPose(const Pose3d &pose, bool notify)
       // so to get abs pose of the model, we need
       // start with abs pose of cb, inverse rotate by relative pose of cb
       //  then, inverse translate by relative pose of cb
-      Pose3d model_abs_pose;
-      Pose3d cb_rel_pose = this->GetRelativePose();
+      common::Pose3d model_abs_pose;
+      common::Pose3d cb_rel_pose = this->GetRelativePose();
       // anti-rotate cb-abs by cb-rel = model-abs
       model_abs_pose.rot = pose.rot * this->GetRelativePose().rot.GetInverse();
       // rotate cb-rel pos by cb-rel rot to get pos offset
-      //Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
+      //common::Vector3 pos_offset = cb->GetRelativePose().rot.GetInverse() * cb->GetRelativePose().pos;
       // finally, model-abs pos is cb-abs pos - pos_offset
       //model_abs_pose.pos = cb->GetWorldPose().pos - pos_offset;
       model_abs_pose.pos = pose.pos - model_abs_pose.rot * this->GetRelativePose().pos;
@@ -246,7 +241,7 @@ void Entity::SetWorldPose(const Pose3d &pose, bool notify)
     {
       // this is not a canonical Body of a model
       // simply update it's own RelativePose
-      Pose3d relative_pose = pose - ((Entity*)this->parent)->GetWorldPose();
+      common::Pose3d relative_pose = pose - ((Entity*)this->parent)->GetWorldPose();
       // relative pose is the pose relative to the parent
       // if this is called from MoveCallback, notify is false
       // FIXME: if this is called by user, and notify is true
@@ -278,16 +273,16 @@ void Entity::SetWorldPose(const Pose3d &pose, bool notify)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the position of the entity relative to its parent
-void Entity::SetRelativePosition(const Vector3 &pos)
+void Entity::SetRelativePosition(const common::Vector3 &pos)
 {
-  this->SetRelativePose( Pose3d( pos, this->GetRelativePose().rot), true );
+  this->SetRelativePose( common::Pose3d( pos, this->GetRelativePose().rot), true );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the rotation of the entity relative to its parent
-void Entity::SetRelativeRotation(const Quatern &rot)
+void Entity::SetRelativeRotation(const common::Quatern &rot)
 {
-  this->SetRelativePose( Pose3d( this->GetRelativePose().pos, rot), true );
+  this->SetRelativePose( common::Pose3d( this->GetRelativePose().pos, rot), true );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -322,28 +317,6 @@ void Entity::RegisterVisual()
     this->visualMsg->set_parent_id( this->parent->GetCompleteScopedName() );
 
   this->vis_pub->Publish(*this->visualMsg);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Set the world this object belongs to. This will also set the world for all 
-/// children
-void Common::SetWorld(World *newWorld)
-{
-  this->world = newWorld;
-
-  for (unsigned int i=0; i < this->children.size(); i++)
-  {
-    Entity *child = dynamic_cast<Entity*>(this->children[i]);
-    if (child)
-      child->SetWorld(this->world);
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the world this object is in
-World *Common::GetWorld() const
-{
-  return this->world;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

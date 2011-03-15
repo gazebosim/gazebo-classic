@@ -24,13 +24,11 @@
 #include <string.h>
 #include <math.h>
 
-#include "World.hh"
-#include "rendering/Scene.hh"
 #include "common/Image.hh"
 #include "common/Global.hh"
 #include "common/GazeboError.hh"
-#include "Body.hh"
-#include "HeightmapShape.hh"
+
+#include "physics/HeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -43,13 +41,13 @@ HeightmapShape::HeightmapShape(Geom *parent)
 {
   this->AddType(HEIGHTMAP_SHAPE);
 
-  Param::Begin(&this->parameters);
-  this->imageFilenameP = new ParamT<std::string>("image","",1);
-  this->worldTextureP = new ParamT<std::string>("world_texture","",0);
-  this->detailTextureP = new ParamT<std::string>("detail_texture","",0);
-  this->sizeP = new ParamT<Vector3>("size",Vector3(10,10,10), 0);
-  this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->imageFilenameP = new common::ParamT<std::string>("image","",1);
+  this->worldTextureP = new common::ParamT<std::string>("world_texture","",0);
+  this->detailTextureP = new common::ParamT<std::string>("detail_texture","",0);
+  this->sizeP = new common::ParamT<common::Vector3>("size",common::Vector3(10,10,10), 0);
+  this->offsetP = new common::ParamT<common::Vector3>("offset",common::Vector3(0,0,0), 0);
+  common::Param::End();
 
   // NATY: this->ogreHeightmap = new OgreHeightmap(this->GetWorld()->GetScene());
 }
@@ -76,7 +74,7 @@ void HeightmapShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void HeightmapShape::Load(XMLConfigNode *node)
+void HeightmapShape::Load(common::XMLConfigNode *node)
 {
   this->imageFilenameP->Load(node);
   this->worldTextureP->Load(node);

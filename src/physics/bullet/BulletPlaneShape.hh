@@ -45,7 +45,7 @@ namespace gazebo
     public: virtual ~BulletPlaneShape() {}
   
     /// \brief Set the altitude of the plane
-    public: void SetAltitude(const Vector3 &pos)
+    public: void SetAltitude(const common::Vector3 &pos)
             {
               PlaneShape::SetAltitude(pos);
             }
@@ -56,7 +56,7 @@ namespace gazebo
               BulletGeom *bParent = (BulletGeom*)(this->parent);
               PlaneShape::CreatePlane();
 
-              btVector3 vec( (**normalP).x, (**normalP).y, (**normalP).z);
+              btcommon::Vector3 vec( (**normalP).x, (**normalP).y, (**normalP).z);
 
               btCollisionShape *btshape = new btStaticPlaneShape(vec, 0.0);
 

@@ -17,15 +17,14 @@
 /* Desc: A slider or primastic joint
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id: SliderJoint.hh 7039 2008-09-24 18:06:29Z natepak $
  */
 
 #ifndef ODESLIDERJOINT_HH
 #define ODESLIDERJOINT_HH
 
 #include "common/Param.hh"
-#include "SliderJoint.hh"
-#include "ODEJoint.hh"
+#include "physics/SliderJoint.hh"
+#include "physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
@@ -90,13 +89,13 @@ namespace gazebo
       public: virtual ~ODESliderJoint();
     
       /// \brief Load the joint
-      protected: virtual void Load(XMLConfigNode *node);
+      protected: virtual void Load(common::XMLConfigNode *node);
   
       /// \brief Get the axis of rotation
-      public: virtual Vector3 GetAxis(int index) const;
+      public: virtual common::Vector3 GetAxis(int index) const;
   
       /// \brief Set the axis of motion
-      public: virtual void SetAxis( int index, const Vector3 &axis );
+      public: virtual void SetAxis( int index, const common::Vector3 &axis );
     
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
@@ -105,7 +104,7 @@ namespace gazebo
       public: void ApplyDamping();
   
       /// \brief Get the position of the joint
-      public: virtual Angle GetAngle(int index) const;
+      public: virtual common::Angle GetAngle(int index) const;
   
       /// \brief Get the rate of change
       public: virtual double GetVelocity(int index) const;

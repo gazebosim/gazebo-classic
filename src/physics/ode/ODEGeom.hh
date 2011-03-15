@@ -23,24 +23,23 @@
 #ifndef ODEGEOM_HH
 #define ODEGEOM_HH
 
-#include "ODEPhysics.hh"
-#include "common/Param.hh"
-#include "Entity.hh"
-#include "common/Pose3d.hh"
+#include <ode/ode.h>
+
 #include "common/Vector3.hh"
-#include "Geom.hh"
+#include "physics/Geom.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class XMLConfigNode;
+  }
+
 	namespace physics
   {
-  
     class Model;
     class Body;
     class ContactParams;
-    class XMLConfigNode;
-    class Visual;
-    class PhysicsEngine;
   
     /// \addtogroup gazebo_physics_ode
     /// \brief Base class for all ODE geoms
@@ -58,7 +57,7 @@ namespace gazebo
       public: virtual ~ODEGeom();
   
       /// \brief Load the geom
-      public: virtual void Load(XMLConfigNode *node);
+      public: virtual void Load(common::XMLConfigNode *node);
   
       /// \brief Load the geom
       public: virtual void Save(std::string &prefix, std::ostream &stream);
@@ -87,7 +86,7 @@ namespace gazebo
       public: Mass GetBodyMassMatrix();
     
       /// \brief Get the bounding box, defined by the physics engine
-      public: virtual void GetBoundingBox( Vector3 &min, Vector3 &max ) const;
+      public: virtual void GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const;
   
       /// \brief Get the geom's space ID
       public: dSpaceID GetSpaceId() const;

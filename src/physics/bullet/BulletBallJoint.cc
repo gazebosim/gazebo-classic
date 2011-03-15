@@ -49,14 +49,14 @@ BulletBallJoint::~BulletBallJoint()
 
 //////////////////////////////////////////////////////////////////////////////
 // Get the joints anchor point
-Vector3 BulletBallJoint::GetAnchor(int index) const
+common::Vector3 BulletBallJoint::GetAnchor(int index) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the joints anchor point
-void BulletBallJoint::SetAnchor(int index, const Vector3 &anchor)
+void BulletBallJoint::SetAnchor(int index, const common::Vector3 &anchor)
 {
   gzerr(0) << "Not implemented\n";
 }
@@ -82,15 +82,15 @@ void BulletBallJoint::Attach( Body *one, Body *two )
   btRigidBody *rigidBody1 = bulletBody1->GetBulletBody();
   btRigidBody *rigidBody2 = bulletBody2->GetBulletBody();
 
-  Vector3 pivotA, pivotB;
+  common::Vector3 pivotA, pivotB;
 
   // Compute the pivot point, based on the anchorPos
   pivotA = this->anchorPos - this->body1->GetWorldPose().pos;
   pivotB = this->anchorPos - this->body2->GetWorldPose().pos;
 
   this->constraint = new btPoint2PointConstraint( *rigidBody1, *rigidBody2,
-      btVector3(pivotA.x, pivotA.y, pivotA.z),
-      btVector3(pivotB.x, pivotB.y, pivotB.z)); 
+      btcommon::Vector3(pivotA.x, pivotA.y, pivotA.z),
+      btcommon::Vector3(pivotB.x, pivotB.y, pivotB.z)); 
 
   // Add the joint to the world
   this->world->addConstraint(this->constraint);

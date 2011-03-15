@@ -22,8 +22,8 @@
 #ifndef ODEUNIVERSALJOINT_HH
 #define ODEUNIVERSALJOINT_HH
 
-#include "UniversalJoint.hh"
-#include "ODEJoint.hh"
+#include "physics/UniversalJoint.hh"
+#include "physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
@@ -98,22 +98,22 @@ namespace gazebo
       public: virtual ~ODEUniversalJoint();
     
       /// \brief Get the anchor point
-      public: virtual Vector3 GetAnchor(int index) const;
+      public: virtual common::Vector3 GetAnchor(int index) const;
   
       /// \brief Set the anchor point
-      public: virtual void SetAnchor( int index, const Vector3 &anchor );
+      public: virtual void SetAnchor( int index, const common::Vector3 &anchor );
    
       /// \brief Set joint damping, not yet implemented
       public: virtual void SetDamping(int index, const double damping);
   
       /// \brief Get the first axis of rotation
-      public: virtual Vector3 GetAxis(int index ) const;
+      public: virtual common::Vector3 GetAxis(int index ) const;
   
       /// \brief Set the first axis of rotation
-      public: virtual void SetAxis( int index, const Vector3 &axis );
+      public: virtual void SetAxis( int index, const common::Vector3 &axis );
     
       /// \brief Get the angle of axis 
-      public: virtual Angle GetAngle(int index) const;
+      public: virtual common::Angle GetAngle(int index) const;
   
       /// \brief Get the angular rate of an axis
       public: virtual double GetVelocity(int index) const;

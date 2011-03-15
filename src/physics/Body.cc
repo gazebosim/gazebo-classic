@@ -23,27 +23,26 @@
 #include <sstream>
 #include <float.h>
 
+#include "common/Messages.hh"
 #include "common/Events.hh"
-#include "SensorManager.hh"
-#include "common/XMLConfig.hh"
-#include "Model.hh"
-#include "common/GazeboMessage.hh"
-#include "Geom.hh"
-#include "common/Timer.hh"
-#include "common/Global.hh"
-#include "Vector2.hh"
 #include "common/Quatern.hh"
+#include "common/XMLConfig.hh"
+#include "common/GazeboMessage.hh"
+#include "common/Global.hh"
 #include "common/GazeboError.hh"
-#include "SensorFactory.hh"
-#include "Sensor.hh"
-#include "World.hh"
-#include "PhysicsEngine.hh"
 
-#include "Body.hh"
+#include "sensors/SensorFactory.hh"
+#include "sensors/SensorManager.hh"
+#include "sensors/Sensor.hh"
+
+#include "physics/Model.hh"
+#include "physics/World.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/Geom.hh"
+#include "physics/Body.hh"
 
 using namespace gazebo;
 using namespace physics;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -62,41 +61,41 @@ Body::Body(Entity *parent)
   // NATY: put back in functionality
   //this->comEntity->GetVisualNode()->SetShowInGui(false);
 
-  Param::Begin(&this->parameters);
-  this->autoDisableP = new ParamT<bool>("auto_disable", true, 0);
+  common::Param::Begin(&this->parameters);
+  this->autoDisableP = new common::ParamT<bool>("auto_disable", true, 0);
   this->autoDisableP->Callback( &Body::SetAutoDisable, this );
 
-  this->xyzP = new ParamT<Vector3>("xyz", Vector3(), 0);
+  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(), 0);
   this->xyzP->Callback( &Entity::SetRelativePosition, (Entity*)this );
 
-  this->rpyP = new ParamT<Quatern>("rpy", Quatern(), 0);
+  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this );
-  this->dampingFactorP = new ParamT<double>("damping_factor", 0.0, 0);
+  this->dampingFactorP = new common::ParamT<double>("damping_factor", 0.0, 0);
 
   // option to turn gravity off for individual body
-  this->turnGravityOffP = new ParamT<bool>("turn_gravity_off", false, 0);
+  this->turnGravityOffP = new common::ParamT<bool>("turn_gravity_off", false, 0);
 
   // option to make body collide with bodies of the same parent
-  this->selfCollideP = new ParamT<bool>("self_collide", false, 0);
+  this->selfCollideP = new common::ParamT<bool>("self_collide", false, 0);
 
   // User can specify mass/inertia property for the body
-  this->customMassMatrixP = new ParamT<bool>("mass_matrix",false,0);
-  this->cxP = new ParamT<double>("cx",0.0,0);
-  this->cyP = new ParamT<double>("cy",0.0,0);
-  this->czP = new ParamT<double>("cz",0.0,0);
-  this->bodyMassP = new ParamT<double>("mass",0.001,0);
-  this->ixxP = new ParamT<double>("ixx",1e-6,0);
-  this->iyyP = new ParamT<double>("iyy",1e-6,0);
-  this->izzP = new ParamT<double>("izz",1e-6,0);
-  this->ixyP = new ParamT<double>("ixy",0.0,0);
-  this->ixzP = new ParamT<double>("ixz",0.0,0);
-  this->iyzP = new ParamT<double>("iyz",0.0,0);
+  this->customMassMatrixP = new common::ParamT<bool>("mass_matrix",false,0);
+  this->cxP = new common::ParamT<double>("cx",0.0,0);
+  this->cyP = new common::ParamT<double>("cy",0.0,0);
+  this->czP = new common::ParamT<double>("cz",0.0,0);
+  this->bodyMassP = new common::ParamT<double>("mass",0.001,0);
+  this->ixxP = new common::ParamT<double>("ixx",1e-6,0);
+  this->iyyP = new common::ParamT<double>("iyy",1e-6,0);
+  this->izzP = new common::ParamT<double>("izz",1e-6,0);
+  this->ixyP = new common::ParamT<double>("ixy",0.0,0);
+  this->ixzP = new common::ParamT<double>("ixz",0.0,0);
+  this->iyzP = new common::ParamT<double>("iyz",0.0,0);
 
-  this->kinematicP = new ParamT<bool>("kinematic",true,0);
+  this->kinematicP = new common::ParamT<bool>("kinematic",true,0);
   this->kinematicP->SetHelp("true = kinematic state only, false = dynamic body");
   this->kinematicP->Callback( &Body::SetKinematic, this );
 
-  Param::End();
+  common::Param::End();
 
   this->connections.push_back( event::Events::ConnectShowJointsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
   this->connections.push_back( event::Events::ConnectShowPhysicsSignal( boost::bind(&Body::SetTransparent, this, _1) ) );
@@ -110,12 +109,12 @@ Body::~Body()
 {
   std::map< std::string, Geom* >::iterator giter;
   std::vector<Entity*>::iterator iter;
-  std::vector< Sensor* >::iterator siter;
+  std::vector< sensors::Sensor* >::iterator siter;
 
   for (unsigned int i=0; i < this->visuals.size(); i++)
   {
     msgs::Visual msg;
-    Message::Init(msg, this->visuals[i]);
+    common::Message::Init(msg, this->visuals[i]);
     msg.set_action( msgs::Visual::DELETE );
     this->vis_pub->Publish(msg);
   }
@@ -126,7 +125,7 @@ Body::~Body()
     for (unsigned int i=0; i < this->cgVisuals.size(); i++)
     {
       msgs::Visual msg;
-      Message::Init(msg, this->cgVisuals[i]);
+      common::Message::Init(msg, this->cgVisuals[i]);
       msg.set_action( msgs::Visual::DELETE );
       this->vis_pub->Publish(msg);
     }
@@ -139,7 +138,7 @@ Body::~Body()
   this->geoms.clear();
 
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
-    SensorManager::Instance()->RemoveSensor(*siter);
+    sensors::SensorManager::Instance()->RemoveSensor(*siter);
 
   if (this->comEntity)
     delete this->comEntity;
@@ -167,8 +166,8 @@ Body::~Body()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Load the body based on an XMLConfig node
-void Body::Load(XMLConfigNode *node)
+// Load the body based on an common::XMLConfig node
+void Body::Load(common::XMLConfigNode *node)
 {
   Entity::Load(node);
   this->comEntity->RegisterVisual();
@@ -199,7 +198,7 @@ void Body::Load(XMLConfigNode *node)
 
   this->mass = this->customMass;
      
-  XMLConfigNode *childNode;
+  common::XMLConfigNode *childNode;
 
   if ( (childNode = node->GetChild("origin")) != NULL)
   {
@@ -210,7 +209,7 @@ void Body::Load(XMLConfigNode *node)
   this->dampingFactorP->Load(node);
   this->turnGravityOffP->Load(node);
 
-  this->SetRelativePose(Pose3d(**this->xyzP, **this->rpyP));
+  this->SetRelativePose(common::Pose3d(**this->xyzP, **this->rpyP));
   
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
@@ -220,7 +219,7 @@ void Body::Load(XMLConfigNode *node)
   // this is only used in setting Model pose from canonicalBody
   // the true model pose given a canonical body is
   //   this body's pose - this body's offsetFromModelFrame
-  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(Pose3d());
+  this->initModelOffset = this->GetRelativePose().CoordPoseSolve(common::Pose3d());
 
   childNode = node->GetChild("collision");
 
@@ -253,8 +252,8 @@ void Body::Load(XMLConfigNode *node)
     visname << this->GetCompleteScopedName() << "::VISUAL_" << 
                this->visuals.size();
 
-    msgs::Visual msg = Message::VisualFromXML(childNode);
-    Message::Init(msg, visname.str());
+    msgs::Visual msg = common::Message::VisualFromXML(childNode);
+    common::Message::Init(msg, visname.str());
     msg.set_parent_id( this->GetCompleteScopedName() );
     msg.set_is_static( this->IsStatic() );
 
@@ -266,11 +265,11 @@ void Body::Load(XMLConfigNode *node)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our XMLConfig node
+// Save the body based on our common::XMLConfig node
 void Body::Save(std::string &prefix, std::ostream &stream)
 {
   std::map<std::string, Geom* >::iterator giter;
-  std::vector< Sensor* >::iterator siter;
+  std::vector< sensors::Sensor* >::iterator siter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
@@ -310,7 +309,7 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 // Finalize the body
 void Body::Fini()
 {
-  std::vector< Sensor* >::iterator siter;
+  std::vector< sensors::Sensor* >::iterator siter;
   std::map< std::string, Geom* >::iterator giter;
 
   this->connections.clear();
@@ -413,7 +412,7 @@ void Body::Init()
     this->SetAngularDamping(**this->dampingFactorP);
   }
 
-  std::vector< Sensor* >::iterator siter;
+  std::vector< sensors::Sensor* >::iterator siter;
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     (*siter)->Init();
 
@@ -428,7 +427,7 @@ void Body::Init()
     visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
 
     msgs::Visual msg;
-    Message::Init(msg, visname.str());
+    common::Message::Init(msg, visname.str());
     msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
     msg.set_render_type( msgs::Visual::MESH_RESOURCE );
     msg.set_mesh( "unit_box" );
@@ -436,14 +435,14 @@ void Body::Init()
     msg.set_cast_shadows( false );
     msg.set_attach_axes( true );
     msg.set_visible( false );
-    Message::Set(msg.mutable_scale(), Vector3(0.1, 0.1, 0.1));
+    common::Message::Set(msg.mutable_scale(), common::Vector3(0.1, 0.1, 0.1));
     this->vis_pub->Publish(msg);
     this->cgVisuals.push_back( msg.header().str_id() );
 
     if (this->geoms.size() > 1)
     {
       msgs::Visual g_msg;
-      Message::Init(g_msg, visname.str() + "_connectors");
+      common::Message::Init(g_msg, visname.str() + "_connectors");
 
       g_msg.set_parent_id( this->comEntity->GetCompleteScopedName() );
       g_msg.set_render_type( msgs::Visual::LINE_LIST );
@@ -518,8 +517,8 @@ void Body::AttachGeom( Geom *geom )
 /// Update the center of mass
 void Body::UpdateCoM()
 {
-  Pose3d bodyPose;
-  Pose3d origPose, newPose;
+  common::Pose3d bodyPose;
+  common::Pose3d origPose, newPose;
   std::map<std::string, Geom*>::iterator iter;
 
   bodyPose = this->GetRelativePose();
@@ -532,7 +531,7 @@ void Body::UpdateCoM()
   // Translate all the geoms so that the CoG is at (0,0,0) in the body frame
   for (iter = this->geoms.begin(); iter != this->geoms.end(); iter++)
   {
-    Vector3 offset;
+    common::Vector3 offset;
     origPose = iter->second->GetRelativePose();
     newPose = origPose;
 
@@ -540,14 +539,14 @@ void Body::UpdateCoM()
     iter->second->SetRelativePose(newPose, true);
   }
 
-  this->comEntity->SetRelativePose(Pose3d(this->mass.GetCoG(),Quatern()),true);
+  this->comEntity->SetRelativePose(common::Pose3d(this->mass.GetCoG(),common::Quatern()),true);
   this->OnPoseChange();
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new geom helper function
-void Body::LoadGeom(XMLConfigNode *node)
+void Body::LoadGeom(common::XMLConfigNode *node)
 {
   Geom *geom = NULL;
   if (!node->GetChild("geometry"))
@@ -571,9 +570,9 @@ void Body::LoadGeom(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a sensor
-void Body::LoadSensor(XMLConfigNode *node)
+void Body::LoadSensor(common::XMLConfigNode *node)
 {
-  Sensor *sensor = NULL;
+  sensors::Sensor *sensor = NULL;
 
   if (node==NULL)
   {
@@ -582,7 +581,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 
   std::string type = node->GetString("type","",1);
 
-  sensor = SensorFactory::NewSensor(type, this);
+  sensor = sensors::SensorFactory::NewSensor(type);
 
   if (sensor)
   {
@@ -599,7 +598,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear acceleration of the body
-void Body::SetLinearAccel(const Vector3 &accel)
+void Body::SetLinearAccel(const common::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->linearAccel = accel;// * this->GetMass();
@@ -609,7 +608,7 @@ void Body::SetLinearAccel(const Vector3 &accel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular acceleration of the body
-void Body::SetAngularAccel(const Vector3 &accel)
+void Body::SetAngularAccel(const common::Vector3 &accel)
 {
   //this->SetEnabled(true); Disabled this line to make autoDisable work
   this->angularAccel = accel * this->mass.GetAsDouble();
@@ -617,56 +616,56 @@ void Body::SetAngularAccel(const Vector3 &accel)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the body
-Vector3 Body::GetRelativeLinearVel() const
+common::Vector3 Body::GetRelativeLinearVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldLinearVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the body
-Vector3 Body::GetRelativeAngularVel() const
+common::Vector3 Body::GetRelativeAngularVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldAngularVel());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the body
-Vector3 Body::GetRelativeLinearAccel() const
+common::Vector3 Body::GetRelativeLinearAccel() const
 {
   return this->GetRelativeForce() / this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-Vector3 Body::GetWorldLinearAccel() const
+common::Vector3 Body::GetWorldLinearAccel() const
 {
   return this->GetWorldForce() / this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-Vector3 Body::GetRelativeAngularAccel() const
+common::Vector3 Body::GetRelativeAngularAccel() const
 {
   return this->GetRelativeTorque() /  this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the body
-Vector3 Body::GetWorldAngularAccel() const
+common::Vector3 Body::GetWorldAngularAccel() const
 {
   return this->GetWorldTorque() /  this->mass.GetAsDouble();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the force applied to the body
-Vector3 Body::GetRelativeForce() const
+common::Vector3 Body::GetRelativeForce() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldForce());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the torque applied to the body
-Vector3 Body::GetRelativeTorque() const
+common::Vector3 Body::GetRelativeTorque() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldTorque());
 }
@@ -687,10 +686,10 @@ Model *Body::GetModel() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a sensor by name
-Sensor *Body::GetSensor( const std::string &name ) const
+/*sensors::Sensor *Body::GetSensor( const std::string &name ) const
 {
-  Sensor *sensor = NULL;
-  std::vector< Sensor* >::const_iterator iter;
+  sensors::Sensor *sensor = NULL;
+  std::vector< sensors::Sensor* >::const_iterator iter;
 
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
   {
@@ -700,9 +699,8 @@ Sensor *Body::GetSensor( const std::string &name ) const
       break;
     }
   }
-
   return sensor;
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a geom by name
@@ -718,7 +716,7 @@ Geom *Body::GetGeom(const std::string &name) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get all children
-std::vector< Sensor* > &Body::GetSensors() 
+std::vector< sensors::Sensor* > &Body::GetSensors() 
 {
   return this->sensors;
 }
@@ -728,7 +726,7 @@ std::vector< Sensor* > &Body::GetSensors()
 /// "pioneer2dx_model1::laser::laser_iface0->laser"
 void Body::GetInterfaceNames(std::vector<std::string>& list) const
 {
-  std::vector< Sensor* >::const_iterator iter;
+  std::vector< sensors::Sensor* >::const_iterator iter;
 
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->GetInterfaceNames(list);
@@ -736,10 +734,10 @@ void Body::GetInterfaceNames(std::vector<std::string>& list) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the body
-void Body::GetBoundingBox(Vector3 &min, Vector3 &max ) const
+void Body::GetBoundingBox(common::Vector3 &min, common::Vector3 &max ) const
 {
-  Vector3 bbmin;
-  Vector3 bbmax;
+  common::Vector3 bbmin;
+  common::Vector3 bbmax;
   std::map<std::string, Geom*>::const_iterator iter;
 
   min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -765,7 +763,7 @@ void Body::ShowPhysics(const bool &show)
   for (unsigned int i=0; i < this->cgVisuals.size(); i++)
   {
     msgs::Visual msg;
-    Message::Init(msg, this->cgVisuals[i] );
+    common::Message::Init(msg, this->cgVisuals[i] );
     msg.set_visible( show );
     this->vis_pub->Publish(msg);
   }
@@ -811,7 +809,7 @@ void Body::SetTransparent(const bool &show)
   for (unsigned int i = 0; i < this->visuals.size(); i++)
   {
     msgs::Visual msg;
-    Message::Init(msg, this->visuals[i]);
+    common::Message::Init(msg, this->visuals[i]);
     msg.set_action( msgs::Visual::UPDATE );
     if (show)
       msg.set_transparency( 0.6 );

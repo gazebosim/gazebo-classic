@@ -56,6 +56,6 @@ void BulletTrimeshShape::Update()
 
 //////////////////////////////////////////////////////////////////////////////
 /// Load the trimesh
-void BulletTrimeshShape::Load(XMLConfigNode *node)
+void BulletTrimeshShape::Load(common::XMLConfigNode *node)
 {
 }

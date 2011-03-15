@@ -17,10 +17,9 @@
 #ifndef ODECYLINDERSHAPE_HH
 #define ODECYLINDERSHAPE_HH
 
-#include "Mass.hh"
-#include "Vector2.hh"
-#include "ODEPhysics.hh"
-#include "CylinderShape.hh"
+#include "physics/Mass.hh"
+#include "physics/CylinderShape.hh"
+#include "physics/ode/ODEPhysics.hh"
 
 namespace gazebo
 {
@@ -33,11 +32,10 @@ namespace gazebo
       public: void SetSize(const double &radius, const double &length)
       {
         CylinderShape::SetSize(radius, length);
-        PhysicsEngine *physics = this->GetWorld()->GetPhysicsEngine();
         ODEGeom *oParent = (ODEGeom*)(this->geomParent);
   
         dMass odeMass;
-        Pose3d rpose;
+        common::Pose3d rpose;
       
         Mass mass = this->geomParent->GetMass();
     
@@ -47,7 +45,7 @@ namespace gazebo
         rpose = this->geomParent->GetRelativePose();
         dMassTranslate(&odeMass, rpose.pos.x, rpose.pos.y, rpose.pos.z);
    
-        physics->ConvertMass(&mass, &odeMass);
+        ODEPhysics::ConvertMass(&mass, &odeMass);
     
         this->geomParent->SetMass(mass);
   

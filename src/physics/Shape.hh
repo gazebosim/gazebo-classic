@@ -21,32 +21,32 @@
 #include <iostream>
 
 #include "common/XMLConfig.hh"
-#include "common/Common.hh"
+#include "physics/Common.hh"
 
 namespace gazebo
 {
 	namespace physics
-{
-  class Geom;
-
-  /// \brief Base class for all shapes
-  class Shape : public Common
   {
-    /// \brief Constructor
-    public: Shape(Geom *p);
-
-    /// \brief Destructor
-    public: virtual ~Shape();
+    class Geom;
   
-    /// \brief Load the shape
-    public: virtual void Load(XMLConfigNode *node) = 0;
+    /// \brief Base class for all shapes
+    class Shape : public Common
+    {
+      /// \brief Constructor
+      public: Shape(Geom *p);
   
-    /// \brief Save the shape
-    public: virtual void Save(std::string &prefix, std::ostream &stream) = 0;
-
-    protected: Geom *geomParent;
-  };
-}
+      /// \brief Destructor
+      public: virtual ~Shape();
+    
+      /// \brief Load the shape
+      public: virtual void Load(common::XMLConfigNode *node) = 0;
+    
+      /// \brief Save the shape
+      public: virtual void Save(std::string &prefix, std::ostream &stream) = 0;
+  
+      protected: Geom *geomParent;
+    };
+  }
 
 }
 #endif

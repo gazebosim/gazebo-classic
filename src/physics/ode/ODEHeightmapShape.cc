@@ -22,8 +22,8 @@
 
 #include "common/Global.hh"
 #include "common/GazeboError.hh"
-#include "ODEGeom.hh"
-#include "ODEHeightmapShape.hh"
+#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODEHeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -78,7 +78,7 @@ dReal ODEHeightmapShape::GetHeightCallback(void *data, int x, int y)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void ODEHeightmapShape::Load(XMLConfigNode *node)
+void ODEHeightmapShape::Load(common::XMLConfigNode *node)
 {
   HeightmapShape::Load(node);
   ODEGeom *oParent = (ODEGeom*)(this->geomParent);
@@ -125,10 +125,10 @@ void ODEHeightmapShape::Load(XMLConfigNode *node)
   oParent->SetStatic(true);
 
   //Rotate so Z is up, not Y (which is the default orientation)
-  Quatern quat;
-  Pose3d pose = oParent->GetWorldPose();
+  common::Quatern quat;
+  common::Pose3d pose = oParent->GetWorldPose();
 
-  quat.SetFromEuler(Vector3(DTOR(90),0,0));
+  quat.SetFromEuler(common::Vector3(DTOR(90),0,0));
 
   pose.rot = pose.rot * quat;
   //this->body->SetPose(pose);

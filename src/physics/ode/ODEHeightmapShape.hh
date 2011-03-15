@@ -23,10 +23,9 @@
 #ifndef ODEHEIGHTMAPSHAPE_HH
 #define ODEHEIGHTMAPSHAPE_HH
 
-#include "HeightmapShape.hh"
-#include "Vector2.hh"
-#include "ODEPhysics.hh"
-#include "Geom.hh"
+#include "physics/HeightmapShape.hh"
+#include "physics/ode/ODEPhysics.hh"
+#include "physics/Geom.hh"
 
 namespace gazebo
 {
@@ -45,7 +44,7 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the heightmap
-      protected: virtual void Load(XMLConfigNode *node);
+      protected: virtual void Load(common::XMLConfigNode *node);
   
       /// Create a lookup table of the terrain's height
       private: void FillHeightMap();
@@ -56,7 +55,7 @@ namespace gazebo
       private: dHeightfieldDataID odeData;
   
       private: unsigned int odeVertSize;
-      private: Vector3 odeScale;
+      private: common::Vector3 odeScale;
   
       private: std::vector<double> heights;
     };

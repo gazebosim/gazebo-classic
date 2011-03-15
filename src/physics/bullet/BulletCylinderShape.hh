@@ -48,7 +48,7 @@ namespace gazebo
               BulletGeom *bParent = (BulletGeom*)(this->parent);
   
               bParent->SetCollisionShape( new btCylinderShapeZ(
-                  btVector3(size.x * 0.5, size.x*0.5, size.y*0.5)) );
+                  btcommon::Vector3(size.x * 0.5, size.x*0.5, size.y*0.5)) );
             }
   };
 

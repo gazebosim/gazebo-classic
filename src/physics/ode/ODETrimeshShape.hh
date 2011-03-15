@@ -23,7 +23,7 @@
 #ifndef ODETRIMESHSHAPE_HH
 #define ODETRIMESHSHAPE_HH
 
-#include "TrimeshShape.hh"
+#include "physics/TrimeshShape.hh"
 
 namespace gazebo
 {
@@ -76,7 +76,7 @@ namespace gazebo
       public: void Update();
   
       /// \brief Load the trimesh
-      protected: virtual void Load(XMLConfigNode *node);
+      protected: virtual void Load(common::XMLConfigNode *node);
   
       private: dReal matrix_dblbuff[16*2];
       private: int last_matrix_index;

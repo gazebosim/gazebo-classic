@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#include "ODEBody.hh"
-#include "ODEGeom.hh"
-#include "World.hh"
-#include "ODEPhysics.hh"
-#include "ODERayShape.hh"
-#include "ODEMultiRayShape.hh"
+#include "physics/World.hh"
+#include "physics/ode/ODEBody.hh"
+#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODEPhysics.hh"
+#include "physics/ode/ODERayShape.hh"
+#include "physics/ode/ODEMultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -158,7 +158,7 @@ void ODEMultiRayShape::UpdateCallback( void *data, dGeomID o1, dGeomID o2 )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a ray to the geom
-void ODEMultiRayShape::AddRay(const Vector3 &start, const Vector3 &end )
+void ODEMultiRayShape::AddRay(const common::Vector3 &start, const common::Vector3 &end )
 {
   MultiRayShape::AddRay(start,end);
   ODEGeom *odeGeom = new ODEGeom(this->geomParent->GetBody());

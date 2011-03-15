@@ -17,15 +17,11 @@
 /* Desc: A ray
  * Author: Nate Koenig
  * Date: 14 Oct 2009
- * SVN: $Id:$
  */
 
-#include "ODEBody.hh"
-#include "ODEGeom.hh"
-#include "ODEPhysics.hh"
-#include "rendering/Visual.hh"
-#include "rendering/OgreDynamicLines.hh"
-#include "ODERayShape.hh"
+#include "physics/Body.hh"
+#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODERayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -56,7 +52,7 @@ void ODERayShape::Update()
 {
   ODEGeom *geom = (ODEGeom*)this->geomParent;
 
-  Vector3 dir;
+  common::Vector3 dir;
 
   this->globalStartPos = this->geomParent->GetBody()->GetWorldPose().CoordPositionAdd(
       this->relativeStartPos);
@@ -79,9 +75,9 @@ void ODERayShape::Update()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the starting point and direction
-void ODERayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
+void ODERayShape::SetPoints(const common::Vector3 &posStart, const common::Vector3 &posEnd)
 {
-  Vector3 dir;
+  common::Vector3 dir;
   ODEGeom *geom = (ODEGeom*)this->geomParent;
 
   RayShape::SetPoints(posStart, posEnd);

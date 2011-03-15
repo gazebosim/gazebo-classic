@@ -24,72 +24,70 @@
 #define SPHERESHAPE_HH
 
 #include "common/Param.hh"
-#include "Shape.hh"
+#include "physics/Shape.hh"
 
 namespace gazebo
 {
 	namespace physics
-{
-
-  /// \addtogroup gazebo_physics_geom
-  /// \{
-  /** \defgroup gazebo_sphere_geom Sphere geom
-      \brief Sphere geom
-
-      \par Attributes
-      The following attributes are supported.
-
-      \htmlinclude default_geom_attr_include.html
-
-      - size (float, meters)
-        - Radius of the sphere
-        - Default: 0
-
-      \par Example
-      \verbatim
-      <geom:sphere name="geom_name">
-        <xyz>1 2 3</xyz>
-        <rpy>0 0 30</rpy>
-        <size>0.1</size>
-        <mass>0.5</mass>
-        <laserFiducialId>1</laserFiducialId>
-        <laserRetro>0.5</laserRetro>
-
-        <visual>
-          <mesh>default</mesh>
-          <size>0.1 0.1 0.1</size>
-          <material>Gazebo/Red</material>
-        </visual>
-      </geom:sphere>
-      \endverbatim
-    */
-  /// \}
-  /// \addtogroup gazebo_sphere_geom 
-  /// \{
-
-  /// \brief Sphere geom
-  class SphereShape : public Shape
   {
-    /// \brief Constructor
-    public: SphereShape(Geom *parent);
-
-    /// \brief Destructor
-    public: virtual ~SphereShape();
-
-    /// \brief Load the sphere
-    public: virtual void Load(XMLConfigNode *node);
-
-    /// \brief Save shape parameters
-    public: virtual void Save(std::string &prefix, std::ostream &stream);
-
-    /// \brief Set the size
-    public: virtual void SetSize(const double &radius);
-
-    private: ParamT<double> *radiusP;
-  };
-
-  /// \}
-}
-
+    /// \addtogroup gazebo_physics_geom
+    /// \{
+    /** \defgroup gazebo_sphere_geom Sphere geom
+        \brief Sphere geom
+  
+        \par Attributes
+        The following attributes are supported.
+  
+        \htmlinclude default_geom_attr_include.html
+  
+        - size (float, meters)
+          - Radius of the sphere
+          - Default: 0
+  
+        \par Example
+        \verbatim
+        <geom:sphere name="geom_name">
+          <xyz>1 2 3</xyz>
+          <rpy>0 0 30</rpy>
+          <size>0.1</size>
+          <mass>0.5</mass>
+          <laserFiducialId>1</laserFiducialId>
+          <laserRetro>0.5</laserRetro>
+  
+          <visual>
+            <mesh>default</mesh>
+            <size>0.1 0.1 0.1</size>
+            <material>Gazebo/Red</material>
+          </visual>
+        </geom:sphere>
+        \endverbatim
+      */
+    /// \}
+    /// \addtogroup gazebo_sphere_geom 
+    /// \{
+  
+    /// \brief Sphere geom
+    class SphereShape : public Shape
+    {
+      /// \brief Constructor
+      public: SphereShape(Geom *parent);
+  
+      /// \brief Destructor
+      public: virtual ~SphereShape();
+  
+      /// \brief Load the sphere
+      public: virtual void Load(common::XMLConfigNode *node);
+  
+      /// \brief Save shape parameters
+      public: virtual void Save(std::string &prefix, std::ostream &stream);
+  
+      /// \brief Set the size
+      public: virtual void SetSize(const double &radius);
+  
+      private: common::ParamT<double> *radiusP;
+    };
+  
+    /// \}
+  }
 }
 #endif

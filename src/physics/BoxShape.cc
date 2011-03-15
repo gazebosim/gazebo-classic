@@ -26,10 +26,10 @@ BoxShape::BoxShape(Geom *parent) : Shape(parent)
 {
   this->AddType(BOX_SHAPE);
 
-  Param::Begin(&this->parameters);
-  this->sizeP = new ParamT<Vector3>("size",Vector3(1,1,1),1);
+  common::Param::Begin(&this->parameters);
+  this->sizeP = new common::ParamT<common::Vector3>("size",common::Vector3(1,1,1),1);
   this->sizeP->Callback( &BoxShape::SetSize, this );
-  Param::End();
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ BoxShape::~BoxShape()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the box
-void BoxShape::Load(XMLConfigNode *node)
+void BoxShape::Load(common::XMLConfigNode *node)
 {
   this->sizeP->Load(node->GetChild("box"));
   this->SetSize( **this->sizeP );
@@ -56,7 +56,7 @@ void BoxShape::Save(std::string &prefix, std::ostream &stream)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the size of the box
-void BoxShape::SetSize( const Vector3 &size )
+void BoxShape::SetSize( const common::Vector3 &size )
 {
   this->sizeP->SetValue( size );
 }

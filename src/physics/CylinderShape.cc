@@ -26,13 +26,13 @@ CylinderShape::CylinderShape(Geom *parent) : Shape(parent)
 {
   this->AddType(CYLINDER_SHAPE);
 
-  Param::Begin(&this->parameters);
-  this->radiusP = new ParamT<double>("radius",1,1);
+  common::Param::Begin(&this->parameters);
+  this->radiusP = new common::ParamT<double>("radius",1,1);
   this->radiusP->Callback( &CylinderShape::SetRadius, this);
 
-  this->lengthP = new ParamT<double>("length",1,1);
+  this->lengthP = new common::ParamT<double>("length",1,1);
   this->lengthP->Callback( &CylinderShape::SetLength, this);
-  Param::End();
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,7 @@ CylinderShape::~CylinderShape()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the cylinder
-void CylinderShape::Load(XMLConfigNode *node)
+void CylinderShape::Load(common::XMLConfigNode *node)
 {
   this->radiusP->Load(node->GetChild("cylinder"));
   this->lengthP->Load(node->GetChild("cylinder"));

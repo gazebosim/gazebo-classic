@@ -17,7 +17,6 @@
 /* Desc: Trimesh geometry
  * Author: Nate Keonig, Andrew Howard
  * Date: 8 May 2003
- * CVS: $Id$
  */
 
 #ifndef TRIMESHSHAPE_HH
@@ -27,90 +26,93 @@
 
 namespace gazebo
 {
-	namespace physics
-{
-  class Mesh;
-
-  /// \addtogroup gazebo_physics_geom
-  /// \{
-  /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
-      \brief Trimesh geom
-
-    \par Attributes
-    The following attributes are supported.
-
-    \htmlinclude default_geom_attr_include.html
-
-    - scale (float tuple, meters)
-      - Scale of the trimesh
-      - Default: 1 1 1
-    - centerMesh (re-center trimesh about AABB center or bottom most point)
-      - aabb_center
-      - aabb_bottom
-      - none (default)
-
-    - genTexCoord (generate spherical projected texture coordinates)
-      - true or false, default to false
-
-    \par Example
-    \verbatim
-      <geom:trimesh name="pallet_geom">
-        <mesh>WoodPallet.mesh</mesh>
-        <scale>.2 .2 .2</scale>
-        <centerMesh>AABBCenter</centerMesh>
-        <genTexCoord>True</genTexCoord>
-        <mass>0.1</mass>
-
-        <visual>
-          <scale>.2 .2 .2</scale>
-          <material>Gazebo/WoodPallet</material>
-          <mesh>WoodPallet.mesh</mesh>
-        </visual>
-      </geom:trimesh>
-    \endverbatim
-  */
-  /// \}
-  /// \addtogroup gazebo_trimesh_geom 
-  /// \{
-
-
-  /// \brief Triangle mesh geom
-  class TrimeshShape : public Shape
+  namespace common
   {
-    /// \brief Constructor
-    public: TrimeshShape(Geom *parent);
+    class Mesh;
+  }
 
-    /// \brief Destructor
-    public: virtual ~TrimeshShape();
-
-    /// \brief Update function 
-    public: void Update();
-
-    /// \brief Load the trimesh
-    protected: virtual void Load(XMLConfigNode *node);
-
-    /// \brief Save child parameters
-    protected: virtual void Save(std::string &prefix, std::ostream &stream);
- 
-    ///  name of the mesh
-    protected: ParamT<std::string> *meshNameP;
-
-    protected: ParamT<Vector3> *scaleP;
-    protected: ParamT<std::string> *centerMeshP;
-    protected: ParamT<bool> *genTexCoordP;
-
-/*
-    protected: unsigned int numVertices;
-    protected: unsigned int numIndices;
-    protected: float *vertices;
-    protected: unsigned int *indices;
+	namespace physics
+  {
+    /// \addtogroup gazebo_physics_geom
+    /// \{
+    /** \defgroup gazebo_trimesh_geom Triangle Mesh geom
+        \brief Trimesh geom
+  
+      \par Attributes
+      The following attributes are supported.
+  
+      \htmlinclude default_geom_attr_include.html
+  
+      - scale (float tuple, meters)
+        - Scale of the trimesh
+        - Default: 1 1 1
+      - centerMesh (re-center trimesh about AABB center or bottom most point)
+        - aabb_center
+        - aabb_bottom
+        - none (default)
+  
+      - genTexCoord (generate spherical projected texture coordinates)
+        - true or false, default to false
+  
+      \par Example
+      \verbatim
+        <geom:trimesh name="pallet_geom">
+          <mesh>WoodPallet.mesh</mesh>
+          <scale>.2 .2 .2</scale>
+          <centerMesh>AABBCenter</centerMesh>
+          <genTexCoord>True</genTexCoord>
+          <mass>0.1</mass>
+  
+          <visual>
+            <scale>.2 .2 .2</scale>
+            <material>Gazebo/WoodPallet</material>
+            <mesh>WoodPallet.mesh</mesh>
+          </visual>
+        </geom:trimesh>
+      \endverbatim
     */
-
-    protected: const Mesh *mesh;
-  };
-
-  /// \}
-}
+    /// \}
+    /// \addtogroup gazebo_trimesh_geom 
+    /// \{
+  
+  
+    /// \brief Triangle mesh geom
+    class TrimeshShape : public Shape
+    {
+      /// \brief Constructor
+      public: TrimeshShape(Geom *parent);
+  
+      /// \brief Destructor
+      public: virtual ~TrimeshShape();
+  
+      /// \brief Update function 
+      public: void Update();
+  
+      /// \brief Load the trimesh
+      protected: virtual void Load(common::XMLConfigNode *node);
+  
+      /// \brief Save child parameters
+      protected: virtual void Save(std::string &prefix, std::ostream &stream);
+   
+      ///  name of the mesh
+      protected: common::ParamT<std::string> *meshNameP;
+  
+      protected: common::ParamT<common::Vector3> *scaleP;
+      protected: common::ParamT<std::string> *centerMeshP;
+      protected: common::ParamT<bool> *genTexCoordP;
+  
+  /*
+      protected: unsigned int numVertices;
+      protected: unsigned int numIndices;
+      protected: float *vertices;
+      protected: unsigned int *indices;
+      */
+  
+      protected: const common::Mesh *mesh;
+    };
+  
+    /// \}
+  }
 
 }
 #endif

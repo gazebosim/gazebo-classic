@@ -34,11 +34,6 @@ namespace gazebo
     class Scene;
   }
 
-  namespace common
-  {
-    class Common;
-  }
-
 	namespace gui
   {
     class RenderPanel;

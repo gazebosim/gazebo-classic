@@ -53,7 +53,7 @@ void BulletRayGeom::Update()
 
 //////////////////////////////////////////////////////////////////////////////
 // Set the starting point and direction
-void BulletRayGeom::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
+void BulletRayGeom::SetPoints(const common::Vector3 &posStart, const common::Vector3 &posEnd)
 {
   RayGeom<BulletGeom>::SetPoints(posStart, posEnd);
 }

@@ -88,7 +88,7 @@ namespace gazebo
     public: void Update();
 
     /// \brief Load the heightmap
-    public: virtual void Load(XMLConfigNode *node);
+    public: virtual void Load(common::XMLConfigNode *node);
 
     /// \brief Save child parameters
     public: void Save(std::string &prefix, std::ostream &stream);
@@ -96,13 +96,13 @@ namespace gazebo
     /// Create a lookup table of the terrain's height
     private: void FillHeightMap();
 
-    private: Vector3 terrainSize;
+    private: common::Vector3 terrainSize;
 
-    private: ParamT<std::string> *imageFilenameP;
-    private: ParamT<std::string> *worldTextureP;
-    private: ParamT<std::string> *detailTextureP;
-    private: ParamT<Vector3> *sizeP;
-    private: ParamT<Vector3> *offsetP;
+    private: common::ParamT<std::string> *imageFilenameP;
+    private: common::ParamT<std::string> *worldTextureP;
+    private: common::ParamT<std::string> *detailTextureP;
+    private: common::ParamT<common::Vector3> *sizeP;
+    private: common::ParamT<common::Vector3> *offsetP;
 
     private: OgreHeightmap *ogreHeightmap;
 

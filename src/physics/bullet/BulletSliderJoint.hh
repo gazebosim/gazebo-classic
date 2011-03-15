@@ -92,34 +92,34 @@ namespace gazebo
     public: virtual ~BulletSliderJoint();
   
     /// \brief Load the joint
-    protected: virtual void Load(XMLConfigNode *node);
+    protected: virtual void Load(common::XMLConfigNode *node);
 
     /// \brief Attach the two bodies with this joint
     public: void Attach( Body *one, Body *two );
  
     /// \brief Get the axis of rotation
-    public: virtual Vector3 GetAxis(int index) const;
+    public: virtual common::Vector3 GetAxis(int index) const;
 
     /// \brief Set the axis of motion
-    public: void SetAxis( int index, const Vector3 &axis );
+    public: void SetAxis( int index, const common::Vector3 &axis );
   
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
 
     /// \brief Set the high stop of an axis(index).
-    public: virtual void SetHighStop(int index, Angle angle);
+    public: virtual void SetHighStop(int index, common::Angle angle);
 
     /// \brief Set the low stop of an axis(index).
-    public: virtual void SetLowStop(int index, Angle angle);
+    public: virtual void SetLowStop(int index, common::Angle angle);
  
     /// \brief Get the high stop of an axis(index).
-    public: virtual Angle GetHighStop(int index);
+    public: virtual common::Angle GetHighStop(int index);
 
     /// \brief Get the low stop of an axis(index).
-    public: virtual Angle GetLowStop(int index);
+    public: virtual common::Angle GetLowStop(int index);
 
     /// \brief Get the position of the joint
-    public: virtual Angle GetAngle(int index) const;
+    public: virtual common::Angle GetAngle(int index) const;
   
     /// \brief Get the rate of change
     public: virtual double GetVelocity(int index) const;

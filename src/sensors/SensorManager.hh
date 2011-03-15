@@ -30,37 +30,39 @@
 
 namespace gazebo
 {
-  class Sensor;
-
-  /// \brief Class to manage and update all sensors
-  class SensorManager : public SingletonT<SensorManager>
+  namespace sensors
   {
-    /// \brief Constructor
-    public: SensorManager();
+    class Sensor;
 
-    /// \brief Destructor
-    public: virtual ~SensorManager();
+    /// \brief Class to manage and update all sensors
+    class SensorManager : public SingletonT<SensorManager>
+    {
+      /// \brief Constructor
+      public: SensorManager();
 
-    /// \brief Update all the sensors
-    public: void Update();
+              /// \brief Destructor
+      public: virtual ~SensorManager();
 
-    /// \brief Init all the sensors
-    public: void Init();
+              /// \brief Update all the sensors
+      public: void Update();
 
-    /// \brief Finalize all the sensors
-    public: void Fini();
+              /// \brief Init all the sensors
+      public: void Init();
 
-    /// \brief Add a sensor
-    public: void AddSensor(Sensor *sensor);
+              /// \brief Finalize all the sensors
+      public: void Fini();
 
-    /// \brief Remove a sensor
-    public: void RemoveSensor(Sensor *sensor);
+              /// \brief Add a sensor
+      public: void AddSensor(Sensor *sensor);
 
-    private: std::list<Sensor *> sensors;
+              /// \brief Remove a sensor
+      public: void RemoveSensor(Sensor *sensor);
 
-    private: friend class DestroyerT<SensorManager>;
-    private: friend class SingletonT<SensorManager>;
-  };
+      private: std::list<Sensor *> sensors;
+
+      private: friend class DestroyerT<SensorManager>;
+      private: friend class SingletonT<SensorManager>;
+    };
+  }
 }
-
 #endif

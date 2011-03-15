@@ -26,200 +26,204 @@
 #include <boost/bind.hpp>
 
 #include "common/Event.hh"
-#include "Contact.hh"
-#include "Shape.hh"
 #include "common/Param.hh"
-#include "Entity.hh"
-#include "common/Pose3d.hh"
 #include "common/Vector3.hh"
-#include "Mass.hh"
+
+#include "physics/Contact.hh"
+#include "physics/Shape.hh"
+#include "physics/Entity.hh"
+#include "physics/Mass.hh"
 
 namespace gazebo
 {
-	namespace physics
-{
-  class Model;
-  class Body;
-  class SurfaceParams;
-  class XMLConfigNode;
-
-  /// \addtogroup gazebo_physics
-  /// \brief Base class for all geoms
-  /// \{
-
-  /// \brief Base class for all geoms
-  class Geom : public Entity
+  namespace common
   {
-    /// \brief Constructor
-    //public: Geom(Body *body, const std::string &name);
-    public: Geom(Body *body);
+    class XMLConfigNode;
+  }
+
+	namespace physics
+  {
+    class Model;
+    class Body;
+    class SurfaceParams;
   
-    /// \brief Destructor
-    public: virtual ~Geom();
-
-    /// \brief Finalize the geom
-    public: void Fini();
-
-    /// \brief Load the geom
-    public: virtual void Load(XMLConfigNode *node);
-
-    /// \brief Load the geom
-    public: void Save(std::string &prefix, std::ostream &stream);
- 
-    /// \brief Set the encapsulated geometry object
-    public: void SetGeom(bool placeable);
+    /// \addtogroup gazebo_physics
+    /// \brief Base class for all geoms
+    /// \{
   
-    /// \brief Update function for geoms
-    public: void Update();
- 
-    /// \brief Return whether this geom is placeable
-    public: bool IsPlaceable() const;
+    /// \brief Base class for all geoms
+    class Geom : public Entity
+    {
+      /// \brief Constructor
+      //public: Geom(Body *body, const std::string &name);
+      public: Geom(Body *body);
     
-    /// \brief Set the category bits, used during collision detection
-    /// \param bits The bits
-    public: virtual void SetCategoryBits(unsigned int bits) = 0;
+      /// \brief Destructor
+      public: virtual ~Geom();
   
-    /// \brief Set the collide bits, used during collision detection
-    /// \param bits The bits
-    public: virtual void SetCollideBits(unsigned int bits) = 0;
+      /// \brief Finalize the geom
+      public: void Fini();
   
-    /// \brief Get the mass of the geom
-    public: virtual Mass GetBodyMassMatrix() = 0;
+      /// \brief Load the geom
+      public: virtual void Load(common::XMLConfigNode *node);
   
-    /// \brief Set the laser fiducial integer id
-    public: void SetLaserFiducialId(int id);
+      /// \brief Load the geom
+      public: void Save(std::string &prefix, std::ostream &stream);
+   
+      /// \brief Set the encapsulated geometry object
+      public: void SetGeom(bool placeable);
+    
+      /// \brief Update function for geoms
+      public: void Update();
+   
+      /// \brief Return whether this geom is placeable
+      public: bool IsPlaceable() const;
+      
+      /// \brief Set the category bits, used during collision detection
+      /// \param bits The bits
+      public: virtual void SetCategoryBits(unsigned int bits) = 0;
+    
+      /// \brief Set the collide bits, used during collision detection
+      /// \param bits The bits
+      public: virtual void SetCollideBits(unsigned int bits) = 0;
+    
+      /// \brief Get the mass of the geom
+      public: virtual Mass GetBodyMassMatrix() = 0;
+    
+      /// \brief Set the laser fiducial integer id
+      public: void SetLaserFiducialId(int id);
+    
+      /// \brief Get the laser fiducial integer id
+      public: int GetLaserFiducialId() const;
+    
+      /// \brief Set the laser retro reflectiveness 
+      public: void SetLaserRetro(float retro);
+    
+      /// \brief Get the laser retro reflectiveness 
+      public: float GetLaserRetro() const;
   
-    /// \brief Get the laser fiducial integer id
-    public: int GetLaserFiducialId() const;
+      /// \brief Set the visibility of the bounding box
+      public: void ShowBoundingBox(const bool &show);
   
-    /// \brief Set the laser retro reflectiveness 
-    public: void SetLaserRetro(float retro);
+      /// \brief Set the mass
+      public: void SetMass(const double &mass);
   
-    /// \brief Get the laser retro reflectiveness 
-    public: float GetLaserRetro() const;
-
-    /// \brief Set the visibility of the bounding box
-    public: void ShowBoundingBox(const bool &show);
-
-    /// \brief Set the mass
-    public: void SetMass(const double &mass);
-
-    /// \brief Set the mass
-    public: void SetMass(const Mass &mass);
-
-    /// \brief Get the body this geom belongs to
-    public: Body *GetBody() const;
-
-    /// \brief Get the model this geom belongs to
-    public: Model *GetModel() const;
-
-    /// \brief Set the friction mode of the geom
-    public: void SetFrictionMode( const bool &v );
-
-    /// \brief Get the bounding box for this geom
-    public: virtual void GetBoundingBox(Vector3 &min, Vector3 &max) const = 0;
-
-    /// \brief Get a pointer to the mass
-    public: const Mass &GetMass() const;
-
-    /// \brief Get the shape type
-    public: EntityType GetShapeType();
-
-    /// \brief Set the shape for this geom
-    public: void SetShape(Shape *shape);
+      /// \brief Set the mass
+      public: void SetMass(const Mass &mass);
+  
+      /// \brief Get the body this geom belongs to
+      public: Body *GetBody() const;
+  
+      /// \brief Get the model this geom belongs to
+      public: Model *GetModel() const;
+  
+      /// \brief Set the friction mode of the geom
+      public: void SetFrictionMode( const bool &v );
+  
+      /// \brief Get the bounding box for this geom
+      public: virtual void GetBoundingBox(common::Vector3 &min, common::Vector3 &max) const = 0;
+  
+      /// \brief Get a pointer to the mass
+      public: const Mass &GetMass() const;
+  
+      /// \brief Get the shape type
+      public: EntityType GetShapeType();
+  
+      /// \brief Set the shape for this geom
+      public: void SetShape(Shape *shape);
+              
+      /// \brief Get the attached shape
+      public: Shape *GetShape() const;
+  
+      /// \brief Turn contact recording on or off
+      public: void SetContactsEnabled(const bool &enable);
+  
+      /// \brief Return true of contact recording is on
+      public: bool GetContactsEnabled() const;
+  
+      /// \brief Add an occurance of a contact to this geom
+      public: void AddContact(const Contact &contact);
+  
+      /// \brief Clear all contact info
+      public: void ClearContacts();
+  
+      /// \brief Get the number of contacts
+      public: unsigned int GetContactCount() const;
+              
+      /// \brief Get a specific contact
+      public: Contact GetContact(unsigned int i) const;
+  
+      /// \brief Get the linear velocity of the geom
+      public: virtual common::Vector3 GetRelativeLinearVel() const;
+  
+      /// \brief Get the linear velocity of the geom in the world frame
+      public: virtual common::Vector3 GetWorldLinearVel() const;
+  
+      /// \brief Get the angular velocity of the geom
+      public: virtual common::Vector3 GetRelativeAngularVel() const;
+  
+      /// \brief Get the angular velocity of the geom in the world frame
+      public: virtual common::Vector3 GetWorldAngularVel() const;
+  
+      /// \brief Get the linear acceleration of the geom
+      public: virtual common::Vector3 GetRelativeLinearAccel() const;
+              
+      /// \brief Get the linear acceleration of the geom in the world frame
+      public: virtual common::Vector3 GetWorldLinearAccel() const;
+  
+      /// \brief Get the angular acceleration of the geom
+      public: virtual common::Vector3 GetRelativeAngularAccel() const;
+  
+      /// \brief Get the angular acceleration of the geom in the world frame
+      public: virtual common::Vector3 GetWorldAngularAccel() const;
+  
+      public: template< typename T>
+              event::ConnectionPtr ConnectContactCallback( T subscriber )
+              { return contactSignal.Connect(subscriber); }
+      public: void DisconnectContactCallback( event::ConnectionPtr &c )
+              { contactSignal.Disconnect(c); }
+  
+      /// \brief Enable callback: Called when the body changes
+      private: void EnabledCB(bool enabled);
+  
+      /// \brief Create the bounding box for the geom
+      private: void CreateBoundingBox();
+  
+      ///  Contact parameters
+      public: SurfaceParams *surface; 
+  
+      /// The body this geom belongs to
+      protected: Body *body;
+    
+      protected: bool placeable;
+  
+      protected: Mass mass;
+  
+      private: common::ParamT<int> *laserFiducialIdP;
+      private: common::ParamT<float> *laserRetroP;
+  
+      ///  Mass as a double
+      private: common::ParamT<double> *massP;
+      protected: common::ParamT<common::Vector3> *xyzP;
+      protected: common::ParamT<common::Quatern> *rpyP;
+      protected: common::ParamT<bool> *enableContactsP;
+  
+      private: float transparency;
+  
+      /// All the visual apparence 
+      private: std::string bbVisual;
+  
+      protected: Shape *shape;
+  
+      private: bool contactsEnabled;
+  
+      public: event::EventT< void (const Contact &)> contactSignal;
+      private: std::vector<event::ConnectionPtr> connections;
             
-    /// \brief Get the attached shape
-    public: Shape *GetShape() const;
-
-    /// \brief Turn contact recording on or off
-    public: void SetContactsEnabled(const bool &enable);
-
-    /// \brief Return true of contact recording is on
-    public: bool GetContactsEnabled() const;
-
-    /// \brief Add an occurance of a contact to this geom
-    public: void AddContact(const Contact &contact);
-
-    /// \brief Clear all contact info
-    public: void ClearContacts();
-
-    /// \brief Get the number of contacts
-    public: unsigned int GetContactCount() const;
-            
-    /// \brief Get a specific contact
-    public: Contact GetContact(unsigned int i) const;
-
-    /// \brief Get the linear velocity of the geom
-    public: virtual Vector3 GetRelativeLinearVel() const;
-
-    /// \brief Get the linear velocity of the geom in the world frame
-    public: virtual Vector3 GetWorldLinearVel() const;
-
-    /// \brief Get the angular velocity of the geom
-    public: virtual Vector3 GetRelativeAngularVel() const;
-
-    /// \brief Get the angular velocity of the geom in the world frame
-    public: virtual Vector3 GetWorldAngularVel() const;
-
-    /// \brief Get the linear acceleration of the geom
-    public: virtual Vector3 GetRelativeLinearAccel() const;
-            
-    /// \brief Get the linear acceleration of the geom in the world frame
-    public: virtual Vector3 GetWorldLinearAccel() const;
-
-    /// \brief Get the angular acceleration of the geom
-    public: virtual Vector3 GetRelativeAngularAccel() const;
-
-    /// \brief Get the angular acceleration of the geom in the world frame
-    public: virtual Vector3 GetWorldAngularAccel() const;
-
-    public: template< typename T>
-            event::ConnectionPtr ConnectContactCallback( T subscriber )
-            { return contactSignal.Connect(subscriber); }
-    public: void DisconnectContactCallback( event::ConnectionPtr &c )
-            { contactSignal.Disconnect(c); }
-
-    /// \brief Enable callback: Called when the body changes
-    private: void EnabledCB(bool enabled);
-
-    /// \brief Create the bounding box for the geom
-    private: void CreateBoundingBox();
-
-    ///  Contact parameters
-    public: SurfaceParams *surface; 
-
-    /// The body this geom belongs to
-    protected: Body *body;
+    };
   
-    protected: bool placeable;
-
-    protected: Mass mass;
-
-    private: ParamT<int> *laserFiducialIdP;
-    private: ParamT<float> *laserRetroP;
-
-    ///  Mass as a double
-    private: ParamT<double> *massP;
-    protected: ParamT<Vector3> *xyzP;
-    protected: ParamT<Quatern> *rpyP;
-    protected: ParamT<bool> *enableContactsP;
-
-    private: float transparency;
-
-    /// All the visual apparence 
-    private: std::string bbVisual;
-
-    protected: Shape *shape;
-
-    private: bool contactsEnabled;
-
-    public: event::EventT< void (const Contact &)> contactSignal;
-    private: std::vector<event::ConnectionPtr> connections;
-          
-  };
-
-  /// \}
-
-}
+    /// \}
+  
+  }
 }
 #endif

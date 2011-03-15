@@ -22,7 +22,7 @@
 
 #include "common/Messages.hh"
 #include "transport/TopicManager.hh"
-#include "RayShape.hh"
+#include "physics/RayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -39,7 +39,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
   if (displayRays)
   {
     msgs::Visual msg;
-    Message::Init(msg, this->GetName());
+    common::Message::Init(msg, this->GetName());
     msg.set_parent_id( this->geomParent->GetName() );
     msg.set_render_type( msgs::Visual::LINE_LIST );
 
@@ -80,9 +80,9 @@ void RayShape::SetDisplayType( bool displayRays )
  
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the ray based on starting and ending points relative to the body
-void RayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
+void RayShape::SetPoints(const common::Vector3 &posStart, const common::Vector3 &posEnd)
 {
-  Vector3 dir;
+  common::Vector3 dir;
 
   this->relativeStartPos = posStart;
   this->relativeEndPos = posEnd;
@@ -97,19 +97,19 @@ void RayShape::SetPoints(const Vector3 &posStart, const Vector3 &posEnd)
   dir.Normalize();
 
   msgs::Visual msg;
-  Message::Init(msg, this->GetName());
+  common::Message::Init(msg, this->GetName());
 
   msgs::Point *pt = msg.add_points(); 
-  Message::Set( pt,  this->relativeStartPos );
+  common::Message::Set( pt,  this->relativeStartPos );
   pt = msg.add_points();
-  Message::Set(pt, this->relativeEndPos );
+  common::Message::Set(pt, this->relativeEndPos );
 
   this->vis_pub->Publish(msg);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the relative starting and ending points
-void RayShape::GetRelativePoints(Vector3 &posA, Vector3 &posB)
+void RayShape::GetRelativePoints(common::Vector3 &posA, common::Vector3 &posB)
 {
   posA = this->relativeStartPos;
   posB = this->relativeEndPos;
@@ -117,7 +117,7 @@ void RayShape::GetRelativePoints(Vector3 &posA, Vector3 &posB)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the global starting and ending points
-void RayShape::GetGlobalPoints(Vector3 &posA, Vector3 &posB)
+void RayShape::GetGlobalPoints(common::Vector3 &posA, common::Vector3 &posB)
 {
   posA = this->globalStartPos;
   posB = this->globalEndPos;
@@ -129,19 +129,19 @@ void RayShape::SetLength( double len )
 {
   this->contactLen=len;
 
-  Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  common::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
 
   this->relativeEndPos = dir * len + this->relativeStartPos;
 
 
   msgs::Visual msg;
-  Message::Init(msg, this->GetName());
+  common::Message::Init(msg, this->GetName());
 
   msgs::Point *pt = msg.add_points(); 
-  Message::Set(pt, this->relativeStartPos );
+  common::Message::Set(pt, this->relativeStartPos );
   pt = msg.add_points();
-  Message::Set(pt,  this->relativeEndPos );
+  common::Message::Set(pt,  this->relativeEndPos );
   this->vis_pub->Publish(msg);
 }
 
@@ -182,7 +182,7 @@ int RayShape::GetFiducial() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load thte ray
-void RayShape::Load(XMLConfigNode *node) 
+void RayShape::Load(common::XMLConfigNode *node) 
 {
 }
 

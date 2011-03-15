@@ -21,17 +21,14 @@
 
 #include <sstream>
 
-#include "Mass.hh"
-#include "PhysicsEngine.hh"
-#include "ODEPhysics.hh"
-#include "rendering/Visual.hh"
 #include "common/Global.hh"
 #include "common/GazeboMessage.hh"
-#include "SurfaceParams.hh"
-#include "World.hh"
-#include "ODEBody.hh"
 
-#include "ODEGeom.hh"
+#include "physics/Mass.hh"
+#include "physics/SurfaceParams.hh"
+#include "physics/ode/ODEPhysics.hh"
+#include "physics/ode/ODEBody.hh"
+#include "physics/ode/ODEGeom.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -57,13 +54,13 @@ ODEGeom::~ODEGeom()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the geom
-void ODEGeom::Load(XMLConfigNode *node)
+void ODEGeom::Load(common::XMLConfigNode *node)
 {
   Geom::Load(node);
 
   /*if (this->geomId && this->placeable)
   {
-    Pose3d localPose;
+    common::Pose3d localPose;
     dQuaternion q;
 
     // Transform into CoM relative Pose
@@ -93,7 +90,7 @@ void ODEGeom::Load(XMLConfigNode *node)
 // Pose change callback
 void ODEGeom::OnPoseChange()
 {
-  Pose3d localPose;
+  common::Pose3d localPose;
   dQuaternion q;
 
   if (this->IsStatic() && this->geomId && this->placeable)
@@ -129,7 +126,7 @@ void ODEGeom::OnPoseChange()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our XMLConfig node
+// Save the body based on our common::XMLConfig node
 void ODEGeom::Save(std::string &prefix, std::ostream &stream)
 {
   if (this->GetShapeType() == RAY_SHAPE)
@@ -226,8 +223,8 @@ void ODEGeom::SetCollideBits(unsigned int bits)
 Mass ODEGeom::GetBodyMassMatrix()
 {
   Mass result;
-  Pose3d pose;
-  Vector3 cog, principals, products;
+  common::Pose3d pose;
+  common::Vector3 cog, principals, products;
   dMass bodyMass;
   dQuaternion q;
   dMatrix3 r;
@@ -260,14 +257,14 @@ Mass ODEGeom::GetBodyMassMatrix()
     dMassTranslate( &bodyMass, pose.pos.x, pose.pos.y, pose.pos.z);
   }
 
-  this->GetWorld()->GetPhysicsEngine()->ConvertMass(&result, &bodyMass);
+  ODEPhysics::ConvertMass(&result, &bodyMass);
 
   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-void ODEGeom::GetBoundingBox( Vector3 &min, Vector3 &max ) const
+void ODEGeom::GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const
 {
   dReal aabb[6];
 

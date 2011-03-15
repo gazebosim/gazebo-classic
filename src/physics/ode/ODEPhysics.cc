@@ -17,42 +17,42 @@
 /* Desc: The ODE physics engine wrapper
  * Author: Nate Koenig
  * Date: 11 June 2007
- * SVN: $Id$
  */
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-
 #include "common/Diagnostics.hh"
-#include "PhysicsFactory.hh"
 #include "common/Global.hh"
 #include "common/GazeboMessage.hh"
 #include "common/GazeboError.hh"
-#include "World.hh"
 #include "common/Vector3.hh"
-#include "ODEGeom.hh"
-#include "ODEBody.hh"
-#include "Entity.hh"
 #include "common/XMLConfig.hh"
-#include "SurfaceParams.hh"
+#include "common/Time.hh"
 
-#include "ODEHingeJoint.hh"
-#include "ODEHinge2Joint.hh"
-#include "ODESliderJoint.hh"
-#include "ODEBallJoint.hh"
-#include "ODEUniversalJoint.hh"
+#include "physics/PhysicsFactory.hh"
+#include "physics/World.hh"
+#include "physics/Entity.hh"
+#include "physics/SurfaceParams.hh"
+#include "physics/MapShape.hh"
 
-#include "ODEBoxShape.hh"
-#include "ODESphereShape.hh"
-#include "ODECylinderShape.hh"
-#include "ODEPlaneShape.hh"
-#include "ODETrimeshShape.hh"
-#include "ODEMultiRayShape.hh"
-#include "ODEHeightmapShape.hh"
-#include "MapShape.hh"
+#include "physics/ode/ODEGeom.hh"
+#include "physics/ode/ODEBody.hh"
+#include "physics/ode/ODEHingeJoint.hh"
+#include "physics/ode/ODEHinge2Joint.hh"
+#include "physics/ode/ODESliderJoint.hh"
+#include "physics/ode/ODEBallJoint.hh"
+#include "physics/ode/ODEUniversalJoint.hh"
 
-#include "ODEPhysics.hh"
+#include "physics/ode/ODEBoxShape.hh"
+#include "physics/ode/ODESphereShape.hh"
+#include "physics/ode/ODECylinderShape.hh"
+#include "physics/ode/ODEPlaneShape.hh"
+#include "physics/ode/ODETrimeshShape.hh"
+#include "physics/ode/ODEMultiRayShape.hh"
+#include "physics/ode/ODEHeightmapShape.hh"
+
+#include "physics/ode/ODEPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -146,18 +146,18 @@ ODEPhysics::ODEPhysics(World *world)
 
   this->contactGroup = dJointGroupCreate(0);
 
-  Param::Begin(&this->parameters);
-  this->globalCFMP = new ParamT<double>("cfm", 10e-5, 0);
-  this->globalERPP = new ParamT<double>("erp", 0.2, 0);
-  this->stepTypeP = new ParamT<std::string>("step_type", "quick", 0);
-  this->stepItersP = new ParamT<unsigned int>("step_iters", 100, 0);
-  this->stepWP = new ParamT<double>("stepW", 1.3, 0);  /// over_relaxation value for SOR
-  this->contactMaxCorrectingVelP = new ParamT<double>("contact_max_correcting_vel", 10.0, 0);
-  this->contactSurfaceLayerP = new ParamT<double>("contact_surface_layer", 0.01, 0);
-  this->autoDisableBodyP = new ParamT<bool>("auto_disable_body", true, 0);
-  this->contactFeedbacksP = new ParamT<int>("contact_feedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
-  this->maxContactsP = new ParamT<int>("max_contacts",100,0); // enforced for trimesh-trimesh contacts
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->globalCFMP = new common::ParamT<double>("cfm", 10e-5, 0);
+  this->globalERPP = new common::ParamT<double>("erp", 0.2, 0);
+  this->stepTypeP = new common::ParamT<std::string>("step_type", "quick", 0);
+  this->stepItersP = new common::ParamT<unsigned int>("step_iters", 100, 0);
+  this->stepWP = new common::ParamT<double>("stepW", 1.3, 0);  /// over_relaxation value for SOR
+  this->contactMaxCorrectingVelP = new common::ParamT<double>("contact_max_correcting_vel", 10.0, 0);
+  this->contactSurfaceLayerP = new common::ParamT<double>("contact_surface_layer", 0.01, 0);
+  this->autoDisableBodyP = new common::ParamT<bool>("auto_disable_body", true, 0);
+  this->contactFeedbacksP = new common::ParamT<int>("contact_feedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
+  this->maxContactsP = new common::ParamT<int>("max_contacts",100,0); // enforced for trimesh-trimesh contacts
+  common::Param::End();
 }
 
 
@@ -190,7 +190,7 @@ ODEPhysics::~ODEPhysics()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the ODE engine
-void ODEPhysics::Load(XMLConfigNode *node)
+void ODEPhysics::Load(common::XMLConfigNode *node)
 {
   this->gravityP->Load(node);
   this->stepTimeP->Load(node);
@@ -227,7 +227,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // Reset the contact pointer
   //this->contactFeedbackIter = this->contactFeedbacks.begin();
 
-  Vector3 g = **this->gravityP;
+  common::Vector3 g = **this->gravityP;
   dWorldSetGravity(this->worldId, g.x, g.y, g.z);
 
   dWorldSetCFM(this->worldId, **this->globalCFMP);
@@ -278,7 +278,7 @@ void ODEPhysics::UpdateCollision()
   // Do collision detection; this will add contacts to the contact group
   //this->LockMutex(); 
   {
-    DiagnosticTimer timer("dSpaceCollide");
+    common::DiagnosticTimer timer("dSpaceCollide");
     dSpaceCollide( this->spaceId, this, CollisionCallback );
   }
   //this->UnlockMutex(); 
@@ -309,7 +309,7 @@ void ODEPhysics::UpdatePhysics()
 {
   this->UpdateCollision();
 
-  DiagnosticTimer timer("ODEPhysics::UpdatePhysics");
+  common::DiagnosticTimer timer("ODEPhysics::UpdatePhysics");
 
   // Update the dynamical model
   if (**this->stepTypeP == "quick")
@@ -575,7 +575,7 @@ void ODEPhysics::SetStepType(const std::string type)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the gavity vector
-void ODEPhysics::SetGravity(const gazebo::Vector3 &gravity)
+void ODEPhysics::SetGravity(const gazebo::common::Vector3 &gravity)
 {
   this->gravityP->SetValue(gravity);
   dWorldSetGravity(this->worldId, gravity.x, gravity.y, gravity.z);
@@ -720,8 +720,8 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
 
       dJointID c;
 
-      Vector3 contactPos;
-      Vector3 contactNorm;
+      common::Vector3 contactPos;
+      common::Vector3 contactNorm;
 
       {
         tbb::spin_mutex::scoped_lock lock(this->collideMutex);

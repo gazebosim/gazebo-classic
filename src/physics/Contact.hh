@@ -62,12 +62,12 @@ namespace gazebo
  
     public: std::vector<JointFeedback> forces;
 
-    public: std::vector<Vector3> positions;
-    public: std::vector<Vector3> normals;
+    public: std::vector<common::Vector3> positions;
+    public: std::vector<common::Vector3> normals;
   
     public: std::vector<double> depths;
 
-    public: Time time;
+    public: common::Time time;
   };
 }
 

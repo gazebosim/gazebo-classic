@@ -20,7 +20,7 @@
  * SVN: $Id:$
  */
 
-#include "Mass.hh"
+#include "physics/Mass.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -91,14 +91,14 @@ void Mass::SetCoG(double cx, double cy, double cz)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the center of gravity
-void Mass::SetCoG(const Vector3 &c)
+void Mass::SetCoG(const common::Vector3 &c)
 {
   this->cog = c;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the center of gravity
-Vector3 Mass::GetCoG() const
+common::Vector3 Mass::GetCoG() const
 {
   return this->cog;
 }
@@ -115,21 +115,21 @@ void Mass::SetInertiaMatrix(double ixx, double iyy, double izz,
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the prinicpal moments of inertia (Ixx, Iyy, Izz)
-Vector3 Mass::GetPrincipalMoments() const
+common::Vector3 Mass::GetPrincipalMoments() const
 {
   return this->principals;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the products of inertia (Ixy, Ixy, Iyz)
-Vector3 Mass::GetProductsofInertia() const
+common::Vector3 Mass::GetProductsofInertia() const
 {
   return this->products;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Rotate this mass
-void Mass::Rotate(const Quatern &rot)
+void Mass::Rotate(const common::Quatern &rot)
 {
   this->cog = rot.RotateVector(this->cog);
 }

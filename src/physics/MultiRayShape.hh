@@ -23,123 +23,127 @@
 #include "common/GazeboMessage.hh"
 #include "common/Vector3.hh"
 #include "common/Angle.hh"
-#include "Geom.hh"
-#include "Shape.hh"
-#include "RayShape.hh"
+
+#include "physics/Geom.hh"
+#include "physics/Shape.hh"
+#include "physics/RayShape.hh"
 
 namespace gazebo
-{
-	namespace physics
 {
   namespace msgs
   {
     class Visual;
   }
 
-  class XMLConfigNode;
-
-  /// \brief Laser geom contains a set of ray-geoms, structured to simulate
-  ///        a laser range scanner
-  class MultiRayShape : public Shape
+  namespace common
   {
-    /// \brief Constructor
-    public: MultiRayShape(Geom *parent);
+    class XMLConfigNode;
+  }
+
+	namespace physics
+  {
+    /// \brief Laser geom contains a set of ray-geoms, structured to simulate
+    ///        a laser range scanner
+    class MultiRayShape : public Shape
+    {
+      /// \brief Constructor
+      public: MultiRayShape(Geom *parent);
+    
+      /// \brief Destructor
+      public: virtual ~MultiRayShape();
   
-    /// \brief Destructor
-    public: virtual ~MultiRayShape();
-
-    /// \brief Load a multi-ray shape from xml file
-    public: void Load(XMLConfigNode *node);
-
-    /// \brief Save child parameters
-    public: virtual void Save(std::string &prefix, std::ostream &stream);
-
-    /*public: void Load(unsigned int vertRayCount, unsigned int rayCount,
-                      Vector3 origin, double minRange, double maxRange,
-                      Angle minVertAngle, Angle maxVertAngle,
-                      Angle minAngle, Angle maxAngle );
-                      */
-            
-
-    public: void SetDisplayType(const std::string &type);
+      /// \brief Load a multi-ray shape from xml file
+      public: void Load(common::XMLConfigNode *node);
   
-    /// \brief Get detected range for a ray.
-    /// \returns Returns DBL_MAX for no detection.
-    public: double GetRange(int index);
+      /// \brief Save child parameters
+      public: virtual void Save(std::string &prefix, std::ostream &stream);
   
-    /// \brief Get detected retro (intensity) value for a ray.
-    public: double GetRetro(int index);
+      /*public: void Load(unsigned int vertRayCount, unsigned int rayCount,
+                        common::Vector3 origin, double minRange, double maxRange,
+                        common::Angle minVertAngle, common::Angle maxVertAngle,
+                        common::Angle minAngle, common::Angle maxcommon::Angle );
+                        */
+              
   
-    /// \brief Get detected fiducial value for a ray.
-    public: int GetFiducial(int index);
-
-    /// \brief Get the minimum angle
-    public: Angle GetMinAngle() const;
-            
-    /// \brief Get the maximum angle
-    public: Angle GetMaxAngle() const;
-
-    /// \brief Get the minimum range
-    public: double GetMinRange() const;
-
-    /// \brief Get the maximum range
-    public: double GetMaxRange() const;
-
-    /// \brief Get the range resolution
-    public: double GetResRange() const;
-
-    /// \brief Get the ray count
-    public: int GetRayCount() const;
-
-    /// \brief Get the range count
-    public: int GetRangeCount() const;
-
-    /// \brief Get the vertical scan line count
-    public: int GetVerticalRayCount() const;
-
-    /// \brief Get the vertical scan line count
-    public: int GetVerticalRangeCount() const;
-
-    /// \brief Get the vertical min angle
-    public: Angle GetVerticalMinAngle() const;
-
-    /// \brief Get the vertical max angle
-    public: Angle GetVerticalMaxAngle() const;
-
-    /// \brief Update the geom
-    public: void Update();
+      public: void SetDisplayType(const std::string &type);
+    
+      /// \brief Get detected range for a ray.
+      /// \returns Returns DBL_MAX for no detection.
+      public: double GetRange(int index);
+    
+      /// \brief Get detected retro (intensity) value for a ray.
+      public: double GetRetro(int index);
+    
+      /// \brief Get detected fiducial value for a ray.
+      public: int GetFiducial(int index);
   
-     /// \brief Physics engine specific method for updating the rays
-    protected: virtual void UpdateRays() = 0;
+      /// \brief Get the minimum angle
+      public: common::Angle GetMinAngle() const;
+              
+      /// \brief Get the maximum angle
+      public: common::Angle GetMaxAngle() const;
   
-    /// \brief Add a ray to the geom
-    protected: virtual void AddRay(const Vector3 &start, const Vector3 &end );
+      /// \brief Get the minimum range
+      public: double GetMinRange() const;
   
-    protected: msgs::Visual *rayFanMsg;
-    protected: msgs::Visual *rayFanOutlineMsg;
+      /// \brief Get the maximum range
+      public: double GetMaxRange() const;
   
-    /// Ray data
-    protected: std::vector< RayShape* > rays;
-
-    protected: double maxRange;
-
-    protected: ParamT<Angle> *minAngleP, *maxAngleP;
-    protected: ParamT<double> *minRangeP, *maxRangeP, *resRangeP;
-    protected: ParamT<Vector3> *originP;
-    protected: ParamT<int> *rayCountP;
-    protected: ParamT<int> *rangeCountP;
-
-     /// Display rays when rendering images
-    protected: ParamT<std::string> *displayTypeP;
+      /// \brief Get the range resolution
+      public: double GetResRange() const;
   
-    // For ray blocks such as Velodyne
-    protected: ParamT<int> *verticalRayCountP;
-    protected: ParamT<int> *verticalRangeCountP;
-    protected: ParamT<Angle> *verticalMinAngleP;
-    protected: ParamT<Angle> *verticalMaxAngleP;
-  };
-
-}
+      /// \brief Get the ray count
+      public: int GetRayCount() const;
+  
+      /// \brief Get the range count
+      public: int GetRangeCount() const;
+  
+      /// \brief Get the vertical scan line count
+      public: int GetVerticalRayCount() const;
+  
+      /// \brief Get the vertical scan line count
+      public: int GetVerticalRangeCount() const;
+  
+      /// \brief Get the vertical min angle
+      public: common::Angle GetVerticalMinAngle() const;
+  
+      /// \brief Get the vertical max angle
+      public: common::Angle GetVerticalMaxAngle() const;
+  
+      /// \brief Update the geom
+      public: void Update();
+    
+       /// \brief Physics engine specific method for updating the rays
+      protected: virtual void UpdateRays() = 0;
+    
+      /// \brief Add a ray to the geom
+      protected: virtual void AddRay(const common::Vector3 &start, const common::Vector3 &end );
+    
+      protected: msgs::Visual *rayFanMsg;
+      protected: msgs::Visual *rayFanOutlineMsg;
+    
+      /// Ray data
+      protected: std::vector< RayShape* > rays;
+  
+      protected: double maxRange;
+  
+      protected: common::ParamT<common::Angle> *minAngleP, *maxAngleP;
+      protected: common::ParamT<double> *minRangeP, *maxRangeP, *resRangeP;
+      protected: common::ParamT<common::Vector3> *originP;
+      protected: common::ParamT<int> *rayCountP;
+      protected: common::ParamT<int> *rangeCountP;
+  
+       /// Display rays when rendering images
+      protected: common::ParamT<std::string> *displayTypeP;
+    
+      // For ray blocks such as Velodyne
+      protected: common::ParamT<int> *verticalRayCountP;
+      protected: common::ParamT<int> *verticalRangeCountP;
+      protected: common::ParamT<common::Angle> *verticalMinAngleP;
+      protected: common::ParamT<common::Angle> *verticalMaxAngleP;
+    };
+  
+  }
 
 }
 #endif

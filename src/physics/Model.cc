@@ -28,21 +28,13 @@
 #include <float.h>
 
 #include "common/Events.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Light.hh"
-#include "GraphicsIfaceHandler.hh"
 #include "common/Global.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboMessage.hh"
 #include "common/XMLConfig.hh"
-#include "World.hh"
-#include "Body.hh"
-#include "HingeJoint.hh"
-#include "PhysicsEngine.hh"
-#include "Controller.hh"
-#include "ControllerFactory.hh"
-#include "IfaceFactory.hh"
-#include "Model.hh"
+
+#include "physics/Body.hh"
+#include "physics/Model.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -75,31 +67,31 @@ Model::Model(Common *parent)
 
   this->joint = NULL;
 
-  Param::Begin(&this->parameters);
-  this->canonicalBodyNameP = new ParamT<std::string>("canonicalBody",
+  common::Param::Begin(&this->parameters);
+  this->canonicalBodyNameP = new common::ParamT<std::string>("canonicalBody",
                                                    std::string(),0);
 
-  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->xyzP = new common::ParamT<common::Vector3>("xyz", common::Vector3(0,0,0), 0);
   this->xyzP->Callback(&Entity::SetRelativePosition, (Entity*)this);
 
-  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
+  this->rpyP = new common::ParamT<common::Quatern>("rpy", common::Quatern(1,0,0,0), 0);
   this->rpyP->Callback( &Entity::SetRelativeRotation, (Entity*)this);
 
-  this->enableGravityP = new ParamT<bool>("enable_gravity", true, 0);
+  this->enableGravityP = new common::ParamT<bool>("enable_gravity", true, 0);
   this->enableGravityP->Callback( &Model::SetGravityMode, this );
 
-  this->enableFrictionP = new ParamT<bool>("enable_friction", true, 0);
+  this->enableFrictionP = new common::ParamT<bool>("enable_friction", true, 0);
   this->enableFrictionP->Callback( &Model::SetFrictionMode, this );
 
-  this->collideP = new ParamT<std::string>("collide", "all", 0);
+  this->collideP = new common::ParamT<std::string>("collide", "all", 0);
   this->collideP->Callback( &Model::SetCollideMode, this );
 
-  this->laserFiducialP = new ParamT<int>("laser_fiducial_id", -1, 0);
+  this->laserFiducialP = new common::ParamT<int>("laser_fiducial_id", -1, 0);
   this->laserFiducialP->Callback( &Model::SetLaserFiducialId, this );
 
-  this->laserRetroP = new ParamT<float>("laser_retro", -1, 0);
+  this->laserRetroP = new common::ParamT<float>("laser_retro", -1, 0);
   this->laserRetroP->Callback( &Model::SetLaserRetro, this );
-  Param::End();
+  common::Param::End();
 
   this->graphicsHandler = NULL;
   this->parentBodyNameP = NULL;
@@ -124,13 +116,9 @@ Model::~Model()
       eiter++;
       */
 
+  /* NATY: Put this back in 
   JointContainer::iterator jiter;
   std::map< std::string, Controller* >::iterator citer;
-
-  if (this->light)
-  {
-    delete this->light;
-  }
 
   if (this->graphicsHandler)
   {
@@ -165,17 +153,18 @@ Model::~Model()
     delete this->myBodyNameP;
     this->myBodyNameP = NULL;
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the model
-void Model::Load(XMLConfigNode *node, bool removeDuplicate)
+void Model::Load(common::XMLConfigNode *node, bool removeDuplicate)
 {
   Entity::Load(node);
 
-  XMLConfigNode *childNode;
+  common::XMLConfigNode *childNode;
   std::string scopedName;
-  Pose3d pose;
+  common::Pose3d pose;
   Common* dup;
 
   this->staticP->Load(node);
@@ -228,13 +217,14 @@ void Model::Load(XMLConfigNode *node, bool removeDuplicate)
   // Record the model's initial pose (for reseting)
   this->SetInitPose(pose);
 
+  // NATY: Put this back in
   // Load controllers
-  childNode = node->GetChild("controller");
+  /*childNode = node->GetChild("controller");
   while (childNode)
   {
     this->LoadController(childNode);
     childNode = childNode->GetNext("controller");
-  }
+  }*/
 
   // Create a default body if one does not exist in the XML file
   if (this->children.size() <= 0)
@@ -292,7 +282,7 @@ void Model::Save(std::string &prefix, std::ostream &stream)
   std::string typeName;
   //std::map<std::string, Body* >::iterator bodyIter;
   std::vector<Common* >::iterator bodyIter;
-  std::map<std::string, Controller* >::iterator contIter;
+  //std::map<std::string, Controller* >::iterator contIter;
   JointContainer::iterator jointIter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
@@ -327,12 +317,13 @@ void Model::Save(std::string &prefix, std::ostream &stream)
       (*jointIter)->Save(p, stream);
 
   // Save all the controllers
-  for (contIter=this->controllers.begin();
+  /*for (contIter=this->controllers.begin();
       contIter!=this->controllers.end(); contIter++)
   {
     if (contIter->second)
       contIter->second->Save(p, stream);
   }
+  */
 
   if (this->parentBodyNameP && this->myBodyNameP)
   {
@@ -361,9 +352,9 @@ void Model::Save(std::string &prefix, std::ostream &stream)
 void Model::Init()
 {
   std::vector<Common* >::iterator biter;
-  std::map<std::string, Controller* >::iterator contIter;
+  //std::map<std::string, Controller* >::iterator contIter;
 
-  this->graphicsHandler->Init();
+  //this->graphicsHandler->Init();
 
   for (biter = this->children.begin(); biter!=this->children.end(); biter++)
   {
@@ -376,11 +367,13 @@ void Model::Init()
     }
   }
 
+  /*
   for (contIter=this->controllers.begin();
        contIter!=this->controllers.end(); contIter++)
   {
     contIter->second->Init();
   }
+  */
 
   this->InitChild();
 
@@ -396,6 +389,9 @@ void Model::Init()
 // Update the model
 void Model::Update()
 {
+
+  // NATY: Make this work without renderstate
+  /*
   if (this->controllers.size() == 0 && this->IsStatic())
     return;
 
@@ -417,8 +413,7 @@ void Model::Update()
     }
   }
 
-  // NATY: Make this work without renderstate
-  /*if (RenderState::GetShowJoints())
+  if (RenderState::GetShowJoints())
   {
     JointContainer::iterator jointIter;
     for (jointIter = this->joints.begin(); 
@@ -500,6 +495,7 @@ void Model::GraphicsUpdate()
 // Finalize the model
 void Model::Fini()
 {
+  /* NATY: Put back in
   std::vector<Common* >::iterator biter;
   std::map<std::string, Controller* >::iterator contIter;
 
@@ -534,6 +530,7 @@ void Model::Fini()
     }
   }
 
+  */
   this->FiniChild();
 }
 
@@ -541,10 +538,11 @@ void Model::Fini()
 // Reset the model
 void Model::Reset()
 {
+  /* NATY: Put back in
   JointContainer::iterator jiter;
   std::vector< Common* >::iterator biter;
   std::map<std::string, Controller* >::iterator citer;
-  Vector3 v(0,0,0);
+  common::Vector3 v(0,0,0);
 
   this->SetRelativePose(this->initPose);  // this has to be relative for nested models to work
 
@@ -569,25 +567,26 @@ void Model::Reset()
       body->SetTorque(v);
     }
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set the initial pose
-void Model::SetInitPose(const Pose3d &pose)
+void Model::SetInitPose(const common::Pose3d &pose)
 {
   this->initPose = pose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the initial pose
-const Pose3d &Model::GetInitPose() const
+const common::Pose3d &Model::GetInitPose() const
 {
   return this->initPose;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear velocity of the model
-void Model::SetLinearVel( const Vector3 &vel )
+void Model::SetLinearVel( const common::Vector3 &vel )
 {
   Body *body;
   std::vector<Common* >::iterator iter;
@@ -605,7 +604,7 @@ void Model::SetLinearVel( const Vector3 &vel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular velocity of the model
-void Model::SetAngularVel( const Vector3 &vel )
+void Model::SetAngularVel( const common::Vector3 &vel )
 {
   Body *body;
   std::vector<Common* >::iterator iter;
@@ -623,7 +622,7 @@ void Model::SetAngularVel( const Vector3 &vel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the linear acceleration of the model
-void Model::SetLinearAccel( const Vector3 &accel )
+void Model::SetLinearAccel( const common::Vector3 &accel )
 {
   Body *body;
   std::vector<Common* >::iterator iter;
@@ -641,7 +640,7 @@ void Model::SetLinearAccel( const Vector3 &accel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular acceleration of the model
-void Model::SetAngularAccel( const Vector3 &accel )
+void Model::SetAngularAccel( const common::Vector3 &accel )
 {
   Body *body;
   std::vector<Common* >::iterator iter;
@@ -659,98 +658,98 @@ void Model::SetAngularAccel( const Vector3 &accel )
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the model
-Vector3 Model::GetRelativeLinearVel() const
+common::Vector3 Model::GetRelativeLinearVel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetRelativeLinearVel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear velocity of the entity in the world frame
-Vector3 Model::GetWorldLinearVel() const
+common::Vector3 Model::GetWorldLinearVel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetWorldLinearVel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the model
-Vector3 Model::GetRelativeAngularVel() const
+common::Vector3 Model::GetRelativeAngularVel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetRelativeAngularVel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular velocity of the model in the world frame
-Vector3 Model::GetWorldAngularVel() const
+common::Vector3 Model::GetWorldAngularVel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetWorldAngularVel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the model
-Vector3 Model::GetRelativeLinearAccel() const
+common::Vector3 Model::GetRelativeLinearAccel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetRelativeLinearAccel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the linear acceleration of the model in the world frame
-Vector3 Model::GetWorldLinearAccel() const
+common::Vector3 Model::GetWorldLinearAccel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetWorldLinearAccel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the model
-Vector3 Model::GetRelativeAngularAccel() const
+common::Vector3 Model::GetRelativeAngularAccel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetRelativeAngularAccel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the angular acceleration of the model in the world frame
-Vector3 Model::GetWorldAngularAccel() const
+common::Vector3 Model::GetWorldAngularAccel() const
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetWorldAngularAccel();
   else // return 0 vector if model has no body
-    return Vector3(0,0,0);
+    return common::Vector3(0,0,0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the size of the bounding box
-void Model::GetBoundingBox(Vector3 &min, Vector3 &max) const
+void Model::GetBoundingBox(common::Vector3 &min, common::Vector3 &max) const
 {
-  Vector3 bbmin, bbmax;
+  common::Vector3 bbmin, bbmax;
   std::vector<Common* >::const_iterator iter;
 
   min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -816,7 +815,7 @@ Joint *Model::GetJoint(std::string name)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new body helper function
-void Model::LoadBody(XMLConfigNode *node)
+void Model::LoadBody(common::XMLConfigNode *node)
 {
   if (!node)
     gzthrow("Trying to load a body with NULL XML information");
@@ -831,7 +830,7 @@ void Model::LoadBody(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a new joint helper function
-void Model::LoadJoint(XMLConfigNode *node)
+void Model::LoadJoint(common::XMLConfigNode *node)
 {
   if (!node)
     gzthrow("Trying to load a joint with NULL XML information");
@@ -856,8 +855,9 @@ void Model::LoadJoint(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load a controller helper function
-void Model::LoadController(XMLConfigNode *node)
+void Model::LoadController(common::XMLConfigNode *node)
 {
+  /* NATY: PUt back in
   if (!node)
     gzthrow( "node parameter is NULL" );
 
@@ -901,6 +901,7 @@ void Model::LoadController(XMLConfigNode *node)
   {
     gzmsg(0) << "Unknown controller[" << controllerType << "]\n";
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -912,9 +913,9 @@ Body *Model::GetBody()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a sensor by name
-Sensor *Model::GetSensor(const std::string &name) const
+/*sensors::Sensor *Model::GetSensor(const std::string &name) const
 {
-  Sensor *sensor = NULL;
+  sensors::Sensor *sensor = NULL;
   std::vector< Common* >::const_iterator biter;
 
   for (biter=this->children.begin(); biter != this->children.end(); biter++)
@@ -928,7 +929,7 @@ Sensor *Model::GetSensor(const std::string &name) const
   }
 
   return sensor;
-}
+}*/
  
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a geom by name
@@ -980,14 +981,14 @@ void Model::Detach()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Attach this model to its parent
-void Model::Attach(XMLConfigNode *node)
+void Model::Attach(common::XMLConfigNode *node)
 {
   Model *parentModel = NULL;
 
-  Param::Begin(&this->parameters);
-  this->parentBodyNameP = new ParamT<std::string>("parentBody","canonical",1);
-  this->myBodyNameP = new ParamT<std::string>("myBody",this->canonicalBodyNameP->GetValue(),1);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->parentBodyNameP = new common::ParamT<std::string>("parentBody","canonical",1);
+  this->myBodyNameP = new common::ParamT<std::string>("myBody",this->canonicalBodyNameP->GetValue(),1);
+  common::Param::End();
 
   if (node)
   {
@@ -1014,9 +1015,9 @@ void Model::Attach(XMLConfigNode *node)
 
   this->joint->Attach(myBody, pBody);
   this->joint->SetAnchor(0, myBody->GetWorldPose().pos );
-  this->joint->SetAxis(0, Vector3(0,1,0) );
-  this->joint->SetHighStop(0,Angle(0));
-  this->joint->SetLowStop(0,Angle(0));
+  this->joint->SetAxis(0, common::Vector3(0,1,0) );
+  this->joint->SetHighStop(0,common::Angle(0));
+  this->joint->SetLowStop(0,common::Angle(0));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1124,9 +1125,9 @@ void Model::SetLaserRetro( const float &retro )
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a physical model
-void Model::LoadPhysical(XMLConfigNode *node)
+void Model::LoadPhysical(common::XMLConfigNode *node)
 {
-  XMLConfigNode *childNode = NULL;
+  common::XMLConfigNode *childNode = NULL;
 
   // Load the bodies
   if (node->GetChild("link"))
@@ -1170,6 +1171,7 @@ void Model::LoadPhysical(XMLConfigNode *node)
 /// e.g "pioneer2dx_model1::laser::laser_iface0->laser"
 void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 {
+  /* NATY: Put back in
   std::vector< Common* >::const_iterator biter;
   std::map<std::string, Controller* >::const_iterator contIter;
 
@@ -1188,6 +1190,7 @@ void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
       body->GetInterfaceNames(list);
     }
   }
+  */
 }
 
 
@@ -1195,13 +1198,13 @@ void Model::GetModelInterfaceNames(std::vector<std::string>& list) const
 /// Return Model Absolute Pose
 /// this is redundant as long as Model's relativePose is maintained
 /// which is done in Model::OnPoseChange and during Model initialization
-Pose3d Model::GetWorldPose()
+common::Pose3d Model::GetWorldPose()
 {
   Body* cb = this->GetCanonicalBody();
   if (cb != NULL)
     return cb->GetWorldPose();
   else 
-    return Pose3d();
+    return common::Pose3d();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

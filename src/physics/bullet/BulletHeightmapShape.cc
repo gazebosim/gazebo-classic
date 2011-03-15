@@ -46,13 +46,13 @@ using namespace physics;
 BulletHeightmapGeom::BulletHeightmapGeom(Body *body)
     : BulletGeom(body)
 {
-  Param::Begin(&this->parameters);
-  this->imageFilenameP = new ParamT<std::string>("image","",1);
-  this->worldTextureP = new ParamT<std::string>("worldTexture","",0);
-  this->detailTextureP = new ParamT<std::string>("detailTexture","",0);
-  this->sizeP = new ParamT<Vector3>("size",Vector3(10,10,10), 0);
-  this->offsetP = new ParamT<Vector3>("offset",Vector3(0,0,0), 0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->imageFilenameP = new common::ParamT<std::string>("image","",1);
+  this->worldTextureP = new common::ParamT<std::string>("worldTexture","",0);
+  this->detailTextureP = new common::ParamT<std::string>("detailTexture","",0);
+  this->sizeP = new common::ParamT<common::Vector3>("size",common::Vector3(10,10,10), 0);
+  this->offsetP = new common::ParamT<common::Vector3>("offset",common::Vector3(0,0,0), 0);
+  common::Param::End();
 
   this->ogreHeightmap = new OgreHeightmap();
 }
@@ -86,7 +86,7 @@ void BulletHeightmapGeom::FillHeightMap()
   float *heights = new float[this->width * this->height];
   float maxHeight = -FLT_MAX;
 
-  Vector3 scale = this->terrainSize / this->width;
+  common::Vector3 scale = this->terrainSize / this->width;
 
   // Iterate over all the verices
   for (y=0; y<this->height; y++)
@@ -110,7 +110,7 @@ void BulletHeightmapGeom::FillHeightMap()
   int forwardIndex = 1;
   int rightIndex = 0;
 
-  btVector3 localScaling(this->terrainSize.x, this->terrainSize.y, 
+  btcommon::Vector3 localScaling(this->terrainSize.x, this->terrainSize.y, 
                          this->terrainSize.z );
 
   this->heightFieldShape  = new btHeightfieldTerrainShape( this->width, 
@@ -124,7 +124,7 @@ void BulletHeightmapGeom::FillHeightMap()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the heightmap
-void BulletHeightmapGeom::Load(XMLConfigNode *node)
+void BulletHeightmapGeom::Load(common::XMLConfigNode *node)
 {
 
   Image tmpImage;

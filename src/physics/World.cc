@@ -23,36 +23,35 @@
 #include <fstream>
 #include <sys/time.h> //gettimeofday
 #include <boost/thread.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
+#include "gz.h"
+
 #include "transport/TopicManager.hh"
+
 #include "common/Diagnostics.hh"
 #include "common/Events.hh"
-#include "rendering/Visual.hh"
-#include "Body.hh"
-#include "FactoryIfaceHandler.hh"
-#include "GraphicsIfaceHandler.hh"
-#include "SimulationIfaceHandler.hh"
 #include "common/Global.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboMessage.hh"
-#include "PhysicsEngine.hh"
-#include "PhysicsFactory.hh"
 #include "common/XMLConfig.hh"
-#include "Model.hh"
-#include "SensorManager.hh"
-#include "gz.h"
-#include "World.hh"
+
+#include "sensor/SensorManager.hh"
+
+#include "physics/Body.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/PhysicsFactory.hh"
+#include "physics/Model.hh"
+#include "physics/World.hh"
 
 // NATY: put back in
 //#include "common/Logger.hh"
 
 //#include "OpenAL.hh"
 
-#include "Geom.hh"
+#include "physics/Geom.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -97,11 +96,11 @@ World::World()
   this->factoryIfaceHandler = NULL;
   this->pause = false;
 
-  Param::Begin(&this->parameters);
-  this->nameP = new ParamT<std::string>("name","default",1);
-  this->saveStateTimeoutP = new ParamT<Time>("save_state_resolution",0.1,0);
-  this->saveStateBufferSizeP = new ParamT<unsigned int>("save_state_buffer_size",1000,0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->nameP = new common::ParamT<std::string>("name","default",1);
+  this->saveStateTimeoutP = new common::ParamT<Time>("save_state_resolution",0.1,0);
+  this->saveStateBufferSizeP = new common::ParamT<unsigned int>("save_state_buffer_size",1000,0);
+  common::Param::End();
 
   this->connections.push_back( event::Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) ) );
   this->connections.push_back( event::Events::ConnectStepSignal( boost::bind(&World::StepCB, this) ) );
@@ -123,7 +122,7 @@ World::~World()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
-void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
+void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 {
   msgs::Scene scene = Messages::SceneFromXML( rootNode->GetChild("scene") );
   this->scene_pub.Publish( scene );
@@ -179,7 +178,7 @@ void World::Load(XMLConfigNode *rootNode)//, unsigned int serverId)
     this->openAL->Load(rootNode->GetChild("audio"));
   }*/
 
-  XMLConfigNode *physicsNode = NULL;
+  common::XMLConfigNode *physicsNode = NULL;
   if (rootNode )
     physicsNode = rootNode->GetChild("physics");
 
@@ -306,31 +305,31 @@ void World::RunLoop()
 {
   this->physicsEngine->InitForThread();
 
-  Time step = this->physicsEngine->GetStepTime();
+  common::Time step = this->physicsEngine->GetStepTime();
   double physicsUpdateRate = this->physicsEngine->GetUpdateRate();
-  Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+  common::Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
 
   //bool userStepped;
-  Time diffTime;
-  Time currTime;
-  Time lastTime = this->GetRealTime();
+  common::Time diffTime;
+  common::Time currTime;
+  common::Time lastcommon::Time = this->GetRealTime();
   struct timespec req;//, rem;
 
-  this->startTime = Time::GetWallTime();
+  this->startcommon::Time = Time::GetWallTime();
 
   this->stop = false;
   while (!this->stop)
   {
-    lastTime = this->GetRealTime();
+    lastcommon::Time = this->GetRealTime();
     if (this->IsPaused() && !this->stepInc)
-      this->pauseTime += step;
+      this->pausecommon::Time += step;
     else
     {
-      this->simTime += step;
+      this->simcommon::Time += step;
       this->Update();
     }
 
-    currTime = this->GetRealTime();
+    currcommon::Time = this->GetRealTime();
 
     // Set a default sleep time
     req.tv_sec  = 0;
@@ -342,7 +341,7 @@ void World::RunLoop()
         (this->GetSimTime() + this->GetPauseTime()) > 
         this->GetRealTime()) 
     {
-      diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
+      diffcommon::Time = (this->GetSimTime() + this->GetPauseTime()) - 
                   this->GetRealTime();
       req.tv_sec  = diffTime.sec;
       req.tv_nsec = diffTime.nsec;
@@ -350,9 +349,9 @@ void World::RunLoop()
     // Otherwise try to match the update rate to the one specified in
     // the xml file
     else if (physicsUpdateRate > 0 && 
-        currTime - lastTime < physicsUpdatePeriod)
+        currcommon::Time - lastcommon::Time < physicsUpdatePeriod)
     {
-      diffTime = physicsUpdatePeriod - (currTime - lastTime);
+      diffcommon::Time = physicsUpdatePeriod - (currcommon::Time - lastTime);
 
       req.tv_sec  = diffTime.sec;
       req.tv_nsec = diffTime.nsec;
@@ -506,7 +505,7 @@ unsigned int World::GetParamCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a param
-Param *World::GetParam(unsigned int index) const
+common::Param *World::GetParam(unsigned int index) const
 {
   if (index < this->parameters.size())
     return this->parameters[index];
@@ -533,9 +532,9 @@ PhysicsEngine *World::GetPhysicsEngine() const
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load a model
-void World::LoadEntities(XMLConfigNode *node, Common *parent, bool removeDuplicate, bool initModel)
+void World::LoadEntities(common::XMLConfigNode *node, Common *parent, bool removeDuplicate, bool initModel)
 {
-  XMLConfigNode *cnode;
+  common::XMLConfigNode *cnode;
   Model *model = NULL;
 
   if (node)
@@ -581,7 +580,7 @@ void World::ProcessEntitiesToLoad()
         iter != this->toLoadEntities.end(); iter++)
     {
       // Create the world file
-      XMLConfig *xmlConfig = new XMLConfig();
+      common::XMLConfig *xmlConfig = new common::XMLConfig();
 
       // Load the XML tree from the given string
       try
@@ -665,7 +664,6 @@ Common *World::GetByName(const std::string &name)
 /// Receive a message
 void World::ReceiveMessage( const google::protobuf::Message &message )
 {
-//  boost::recursive_mutex::scoped_lock lock( this->mutex );
 //  this->messages.push_back( msg.Clone() );
 }
 
@@ -674,7 +672,6 @@ void World::ReceiveMessage( const google::protobuf::Message &message )
 void World::ProcessMessages()
 {
   /*
-  boost::recursive_mutex::scoped_lock lock( this->mutex );
 
   unsigned int count = this->messages.size();
   for ( unsigned int i=0; i < count; i++)
@@ -684,7 +681,7 @@ void World::ProcessMessages()
     if (msg->type == INSERT_MODEL_MSG)
     {
       // Create the world file
-      XMLConfig *xmlConfig = new XMLConfig();
+      common::XMLConfig *xmlConfig = new common::XMLConfig();
 
       // Load the XML tree from the given string
       try
@@ -709,10 +706,10 @@ void World::ProcessMessages()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load a model
-Model *World::LoadModel(XMLConfigNode *node, Common *parent, 
+Model *World::LoadModel(common::XMLConfigNode *node, Common *parent, 
                         bool removeDuplicate, bool initModel)
 {
-  Pose3d pose;
+  common::Pose3d pose;
   if (parent == NULL)
     gzthrow("Parent can't be null");
 
@@ -923,35 +920,35 @@ void World::PrintEntityTree()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the simulation time
-gazebo::Time World::GetSimTime() const
+gazebo::common::Time World::GetSimTime() const
 {
   return this->simTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the sim time
-void World::SetSimTime(Time t)
+void World::SetSimTime(common::Time t)
 {
-  this->simTime = t;
+  this->simcommon::Time = t;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the pause time
-gazebo::Time World::GetPauseTime() const
+gazebo::common::Time World::GetPauseTime() const
 {
   return this->pauseTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the start time
-gazebo::Time World::GetStartTime() const
+gazebo::common::Time World::GetStartTime() const
 {
   return this->startTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the real time (elapsed time)
-gazebo::Time World::GetRealTime() const
+gazebo::common::Time World::GetRealTime() const
 {
   return Time::GetWallTime() - this->startTime;
 }

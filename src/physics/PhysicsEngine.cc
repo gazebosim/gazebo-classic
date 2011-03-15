@@ -26,10 +26,11 @@
 #include "common/GazeboError.hh"
 #include "common/GazeboMessage.hh"
 #include "common/Events.hh"
-#include "World.hh"
-#include "Shape.hh"
-#include "PhysicsEngine.hh"
+
 #include "transport/TopicManager.hh"
+
+#include "physics/World.hh"
+#include "physics/PhysicsEngine.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -42,13 +43,13 @@ PhysicsEngine::PhysicsEngine(World *world)
 {
   this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
 
-  Param::Begin(&this->parameters);
-  this->gravityP = new ParamT<Vector3>("gravity",Vector3(0.0, -9.80665, 0.0), 0);
+  common::Param::Begin(&this->parameters);
+  this->gravityP = new common::ParamT<common::Vector3>("gravity",common::Vector3(0.0, -9.80665, 0.0), 0);
   this->gravityP->Callback(&PhysicsEngine::SetGravity, this);
 
-  this->updateRateP = new ParamT<double>("update_rate", 0.0, 0);
-  this->stepTimeP = new ParamT<Time>("step_time",0.025,0);
-  Param::End();
+  this->updateRateP = new common::ParamT<double>("update_rate", 0.0, 0);
+  this->stepTimeP = new common::ParamT<common::Time>("step_time",0.025,0);
+  common::Param::End();
 
   this->mutex = new boost::recursive_mutex();
   this->locked = false;
@@ -82,22 +83,22 @@ PhysicsEngine::PhysicsEngine(World *world)
          this->contactLinesIter++, i++)
     {
       (*this->contactLinesIter) = this->visual->AddDynamicLine(RENDERING_LINE_LIST);
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
+      (*this->contactLinesIter)->AddPoint(common::Vector3(0,0,0));
       (*this->contactLinesIter)->setMaterial(matName);
     }
     */
@@ -118,7 +119,7 @@ PhysicsEngine::~PhysicsEngine()
   if (!this->visual.empty())
   {
     msgs::Visual msg;
-    Message::Init(msg, this->visual);
+    common::Message::Init(msg, this->visual);
     msg.set_action( msgs::Visual::DELETE );
     this->vis_pub->Publish(msg);
   }
@@ -139,7 +140,7 @@ void PhysicsEngine::UpdatePhysics()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the gavity vector
-Vector3 PhysicsEngine::GetGravity() const
+common::Vector3 PhysicsEngine::GetGravity() const
 {
   return this->gravityP->GetValue();
 }
@@ -160,14 +161,14 @@ void PhysicsEngine::SetUpdateRate(double rate) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the time between each update cycle
-Time PhysicsEngine::GetStepTime() const
+common::Time PhysicsEngine::GetStepTime() const
 {
   return **this->stepTimeP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the time between each update cycle
-void PhysicsEngine::SetStepTime(Time time)
+void PhysicsEngine::SetStepTime(common::Time time)
 {
   this->stepTimeP->SetValue(time);
 }
@@ -190,14 +191,14 @@ void PhysicsEngine::UnlockMutex()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a contact visual
-void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
+void PhysicsEngine::AddContactVisual(common::Vector3 pos, common::Vector3 norm)
 {
   // NATY: put back in
  /* if (!RenderState::GetShowContacts())
     return;
 
-  Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
-  Vector3 e2 = norm.GetCrossProd(e1); e2.Normalize();
+  common::Vector3 e1 = norm.GetPerpendicular(); e1.Normalize();
+  common::Vector3 e2 = norm.GetCrossProd(e1); e2.Normalize();
 
   (*this->contactLinesIter)->SetPoint( 0, pos);
   (*this->contactLinesIter)->SetPoint( 1, pos+(norm*0.2)+(e1*0.05)+(e2*0.05));
@@ -235,7 +236,7 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 void PhysicsEngine::ShowContacts(const bool &show)
 {
   msgs::Visual msg;
-  Message::Init(msg, this->visual);
+  common::Message::Init(msg, this->visual);
   msg.set_visible( show );
   this->vis_pub->Publish(msg);
 
@@ -254,7 +255,7 @@ unsigned int PhysicsEngine::GetParamCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a param by index
-Param *PhysicsEngine::GetParam(unsigned int index) const
+common::Param *PhysicsEngine::GetParam(unsigned int index) const
 {
   if (index < this->parameters.size())
     return this->parameters[index];
@@ -265,10 +266,10 @@ Param *PhysicsEngine::GetParam(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a parameter by name
-Param *PhysicsEngine::GetParam(const std::string &key) const
+common::Param *PhysicsEngine::GetParam(const std::string &key) const
 {
-  std::vector<Param*>::const_iterator iter;
-  Param *result = NULL;
+  std::vector<common::Param*>::const_iterator iter;
+  common::Param *result = NULL;
 
   for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
   {
@@ -280,7 +281,7 @@ Param *PhysicsEngine::GetParam(const std::string &key) const
   }
 
   if (result == NULL)
-    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+    gzerr(0) << "Unable to find common::Param using key[" << key << "]\n";
 
   return result;
 
@@ -290,8 +291,8 @@ Param *PhysicsEngine::GetParam(const std::string &key) const
 /// Set a parameter by name
 void PhysicsEngine::SetParam(const std::string &key, const std::string &value)
 {
-  std::vector<Param*>::const_iterator iter;
-  Param *result = NULL;
+  std::vector<common::Param*>::const_iterator iter;
+  common::Param *result = NULL;
 
   for (iter = this->parameters.begin(); iter != this->parameters.end(); iter++)
   {
@@ -303,7 +304,7 @@ void PhysicsEngine::SetParam(const std::string &key, const std::string &value)
   }
 
   if (result == NULL)
-    gzerr(0) << "Unable to find Param using key[" << key << "]\n";
+    gzerr(0) << "Unable to find common::Param using key[" << key << "]\n";
   else
     result->SetFromString( value, true );
 }

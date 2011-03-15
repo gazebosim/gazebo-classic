@@ -39,7 +39,7 @@ namespace gazebo
     public: BulletMotionState(Body *body);
 
     /// \brief Constructor
-    //public: BulletMotionState(const Pose3d &initPose);
+    //public: BulletMotionState(const common::Pose3d &initPose);
 
     /// \brief Destructor
     public: virtual ~BulletMotionState();
@@ -48,21 +48,21 @@ namespace gazebo
     public: void SetVisual(Visual *vis);
 
     /// \brief Get the pose
-    public: Pose3d GetWorldPose() const;
+    public: common::Pose3d GetWorldPose() const;
 
     /// \brief Set the position of the body
     /// \param pos Vector position
-    public: virtual void SetWorldPosition(const Vector3 &pos);
+    public: virtual void SetWorldPosition(const common::Vector3 &pos);
 
     /// \brief Set the rotation of the body
     /// \param rot Quaternion rotation
-    public: virtual void SetWorldRotation(const Quatern &rot);
+    public: virtual void SetWorldRotation(const common::Quatern &rot);
 
     /// \brief Set the pose
-    public: void SetWorldPose(const Pose3d &pose);
+    public: void SetWorldPose(const common::Pose3d &pose);
 
     /// \brief Set the center of mass offset
-    public: void SetCoMOffset( const Pose3d &com );
+    public: void SetCoMOffset( const common::Pose3d &com );
 
     /// \brief Get the world transform
     public: virtual void getWorldTransform(btTransform &worldTrans) const;
@@ -71,8 +71,8 @@ namespace gazebo
     public: virtual void setWorldTransform(const btTransform &worldTrans);
 
     private: Visual *visual;
-    private: Pose3d worldPose;
-    private: Pose3d comOffset;
+    private: common::Pose3d worldPose;
+    private: common::Pose3d comOffset;
     private: Body *body;
   };
 }

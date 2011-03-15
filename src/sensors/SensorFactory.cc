@@ -23,7 +23,6 @@
 
 #include "Sensor.hh"
 #include "SensorManager.hh"
-#include "Body.hh"
 #include "SensorFactory.hh"
 
 using namespace gazebo;
@@ -41,11 +40,11 @@ void SensorFactory::RegisterSensor(std::string type, std::string classname,
 
 // Create a new instance of a model.  Used by the world when reading
 // the world file.
-Sensor *SensorFactory::NewSensor(const std::string &classname, Body *body)
+Sensor *SensorFactory::NewSensor(const std::string &classname)
 {
   if (sensors[classname])
   {
-    Sensor *sensor = (sensors[classname]) (body);
+    Sensor *sensor = (sensors[classname]) ();
     SensorManager::Instance()->AddSensor(sensor);
     return sensor;
   }

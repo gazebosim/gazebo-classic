@@ -26,8 +26,9 @@
 #include "common/Param.hh"
 #include "common/Angle.hh"
 #include "common/Vector3.hh"
-#include "Hinge2Joint.hh"
-#include "ODEJoint.hh"
+
+#include "physics/Hinge2Joint.hh"
+#include "physics/ode/ODEJoint.hh"
 
 namespace gazebo
 {
@@ -102,28 +103,28 @@ namespace gazebo
     public: virtual ~ODEHinge2Joint(); 
   
     /// \brief Load the joint
-    protected: virtual void Load(XMLConfigNode *node);
+    protected: virtual void Load(common::XMLConfigNode *node);
   
     /// \brief Save a joint to a stream in XML format
     protected: virtual void SaveJoint(std::string &prefix, std::ostream &stream);
    
     /// \brief Set the anchor point
-    public: virtual void SetAnchor( int index, const Vector3 &anchor );
+    public: virtual void SetAnchor( int index, const common::Vector3 &anchor );
   
     /// \brief Set the first axis of rotation
-    public: virtual void SetAxis( int index, const Vector3 &axis );
+    public: virtual void SetAxis( int index, const common::Vector3 &axis );
   
     /// \brief Set joint damping, not yet implemented
     public: virtual void SetDamping(int index, const double damping);
   
     /// \brief Get anchor point
-    public: virtual Vector3 GetAnchor(int index) const;
+    public: virtual common::Vector3 GetAnchor(int index) const;
   
     /// \brief Get first axis of rotation
-    public: virtual Vector3 GetAxis(int index) const;
+    public: virtual common::Vector3 GetAxis(int index) const;
   
     /// \brief Get angle of rotation about first axis
-    public: virtual Angle GetAngle(int index) const;
+    public: virtual common::Angle GetAngle(int index) const;
   
     /// \brief Get rate of rotation about first axis
     public: virtual double GetVelocity(int index) const;
@@ -146,7 +147,7 @@ namespace gazebo
     /// \brief Set _parameter with _value
     public: virtual void SetParam( int parameter, double value );
   
-    private: ParamT<double> *suspensionCfmP;
+    private: common::ParamT<double> *suspensionCfmP;
   };
   
   /// \}

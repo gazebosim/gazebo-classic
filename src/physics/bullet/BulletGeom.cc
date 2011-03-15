@@ -62,14 +62,14 @@ BulletGeom::~BulletGeom()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Load the geom
-void BulletGeom::Load(XMLConfigNode *node)
+void BulletGeom::Load(common::XMLConfigNode *node)
 {
   Geom::Load(node);
 //  this->visualNode->SetPose( this->GetRelativePose() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Save the body based on our XMLConfig node
+// Save the body based on our common::XMLConfig node
 void BulletGeom::Save(std::string &prefix, std::ostream &stream)
 {
   Geom::Save(prefix, stream);
@@ -86,7 +86,7 @@ void BulletGeom::Update()
 // On pose change
 void BulletGeom::OnPoseChange()
 {
-  Pose3d pose = this->GetRelativePose();
+  common::Pose3d pose = this->GetRelativePose();
   BulletBody *bbody = (BulletBody*)(this->body);
 
   bbody->SetGeomRelativePose(this, pose);
@@ -114,11 +114,11 @@ Mass BulletGeom::GetBodyMassMatrix()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the bounding box, defined by the physics engine
-void BulletGeom::GetBoundingBox( Vector3 &min, Vector3 &max ) const
+void BulletGeom::GetBoundingBox( common::Vector3 &min, common::Vector3 &max ) const
 {
   if (this->collisionShape)
   {
-    btVector3 btMin, btMax;
+    btcommon::Vector3 btMin, btMax;
     this->collisionShape->getAabb( btTransform::getIdentity(), btMin, btMax );
 
     min.Set(btMin.x(), btMin.y(), btMin.z());
@@ -132,7 +132,7 @@ void BulletGeom::SetCollisionShape( btCollisionShape *shape )
 {
   this->collisionShape = shape;
 
-  /*btVector3 vec;
+  /*btcommon::Vector3 vec;
   this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
   */
 
