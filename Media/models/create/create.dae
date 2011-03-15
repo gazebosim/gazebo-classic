@@ -65,7 +65,7 @@
 	</library_effects>
 	<library_images>
 		<image id="create_Mesh_tga-img" name="create_Mesh_tga-img">
-			<init_from>create_mesh.tga</init_from>
+			<init_from>create.tga</init_from>
 		</image>
 	</library_images>
 	<library_materials>
