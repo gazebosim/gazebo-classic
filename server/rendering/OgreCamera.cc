@@ -255,10 +255,10 @@ void OgreCamera::InitCam()
 
   this->lastUpdate = Simulator::Instance()->GetSimTime();
 
-
+  // Create the depth buffer
   depthTextureName = this->GetCameraName() + "_RttTex_Stereo_Depth";
 
-  depthMaterialName = this->GetCameraName()+ "_RttMat_Stereo_Depth";
+  depthMaterialName = this->GetCameraName() + "_RttMat_Stereo_Depth";
 
   depthTexture = this->CreateRTT(depthTextureName, true);
   depthTarget = depthTexture->getBuffer()->getRenderTarget();
@@ -268,7 +268,7 @@ void OgreCamera::InitCam()
   Ogre::Viewport *cviewport;
   Ogre::MaterialPtr matPtr;
   cviewport = this->depthTarget->addViewport(this->camera);
-  cviewport->setClearEveryFrame(true);
+  //cviewport->setClearEveryFrame(true);
   cviewport->setOverlaysEnabled(false);
   cviewport->setBackgroundColour( *OgreAdaptor::Instance()->backgroundColor );
   cviewport->setVisibilityMask(this->visibilityMask);
@@ -285,6 +285,7 @@ void OgreCamera::InitCam()
   matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
 		  depthTextureName );
 
+  //this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName(depthMaterialName);
   this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap");
   this->depthMaterial->load();
 }
@@ -298,7 +299,7 @@ Ogre::TexturePtr OgreCamera::CreateRTT(const std::string &name, bool depth)
   else
     pf = Ogre::PF_BYTE_RGB;
 
-  // Create the left render texture
+  // Create the depth render texture
   return Ogre::TextureManager::getSingleton().createManual(
       name,
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -417,18 +418,23 @@ void OgreCamera::CaptureData()
     Ogre::PixelBox dst_box((**this->imageSizeP).x, (**this->imageSizeP).y,
         1, this->imageFormat, this->saveFrameBuffer);
 
+
     pixelBuffer->blitToMemory( src_box, dst_box );
+
+    pixelBuffer->unlock();
 
     // Blit the depth buffer if needed
     if (this->simulateDepthData)
     {
+        pixelBuffer = this->depthTexture->getBuffer(0, 0);
+        pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
     	Ogre::PixelBox dpt_box((**this->imageSizeP).x, (**this->imageSizeP).y,
             1, Ogre::PF_FLOAT32_R, this->saveDepthBuffer);
 
     	pixelBuffer->blitToMemory(src_box, dpt_box);
+        pixelBuffer->unlock();
     }
 
-    pixelBuffer->unlock();
 
     if (this->saveFramesP->GetValue())
     {
@@ -909,6 +915,7 @@ void OgreCamera::RenderDepthData()
 #endif
 	}
 
+	// Does actual rendering
 	this->depthTarget->update();
 
 	sceneMgr->_suppressRenderStateChanges(false);

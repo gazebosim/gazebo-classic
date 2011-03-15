@@ -171,9 +171,6 @@ void StereoCameraSensor::InitChild()
   this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap");
   this->depthMaterial->load();
 
-
-
-
   mBuffer = this->renderTextures[D_LEFT]->getBuffer(0,0);
   this->textureWidth = mBuffer->getWidth();
   this->textureHeight = mBuffer->getHeight();
