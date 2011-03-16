@@ -34,6 +34,8 @@
 #include "common/XMLConfig.hh"
 
 #include "physics/Body.hh"
+#include "physics/World.hh"
+#include "physics/PhysicsEngine.hh"
 #include "physics/Model.hh"
 
 using namespace gazebo;
@@ -93,11 +95,9 @@ Model::Model(Common *parent)
   this->laserRetroP->Callback( &Model::SetLaserRetro, this );
   common::Param::End();
 
-  this->graphicsHandler = NULL;
+  //this->graphicsHandler = NULL;
   this->parentBodyNameP = NULL;
   this->myBodyNameP = NULL;
-
-  this->light = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -270,8 +270,8 @@ void Model::Load(common::XMLConfigNode *node, bool removeDuplicate)
     this->SetLaserRetro(**this->laserRetroP);
 
   // Create the graphics iface handler
-  this->graphicsHandler = new GraphicsIfaceHandler(this->GetWorld());
-  this->graphicsHandler->Load(this->GetScopedName(), this);
+  //this->graphicsHandler = new GraphicsIfaceHandler(this->GetWorld());
+  //this->graphicsHandler->Load(this->GetScopedName(), this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -484,10 +484,11 @@ void Model::RemoveChild(Entity *child)
 /// Primarily used to update the graphics interfaces
 void Model::GraphicsUpdate()
 {
-  if (this->graphicsHandler)
+  /*if (this->graphicsHandler)
   {
     this->graphicsHandler->Update();
   }
+  */
 }
 
 
@@ -1154,7 +1155,7 @@ void Model::LoadPhysical(common::XMLConfigNode *node)
     {
       this->LoadJoint(childNode);
     }
-    catch (GazeboError e)
+    catch (common::GazeboError e)
     {
       gzerr(0) << "Error Loading Joint[" << childNode->GetString("name", std::string(), 0) << "]\n";
       gzerr(0) <<  e << std::endl;

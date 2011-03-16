@@ -31,9 +31,10 @@
 #include "common/Global.hh"
 #include "common/GazeboError.hh"
 
-#include "sensors/SensorFactory.hh"
+/*#include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"
 #include "sensors/Sensor.hh"
+*/
 
 #include "physics/Model.hh"
 #include "physics/World.hh"
@@ -109,7 +110,7 @@ Body::~Body()
 {
   std::map< std::string, Geom* >::iterator giter;
   std::vector<Entity*>::iterator iter;
-  std::vector< sensors::Sensor* >::iterator siter;
+  //std::vector< sensors::Sensor* >::iterator siter;
 
   for (unsigned int i=0; i < this->visuals.size(); i++)
   {
@@ -137,8 +138,9 @@ Body::~Body()
       delete giter->second;
   this->geoms.clear();
 
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  /*for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     sensors::SensorManager::Instance()->RemoveSensor(*siter);
+    */
 
   if (this->comEntity)
     delete this->comEntity;
@@ -231,7 +233,7 @@ void Body::Load(common::XMLConfigNode *node)
     childNode = childNode->GetNext("collision");
   }
 
-  childNode = node->GetChild("sensor");
+  /*childNode = node->GetChild("sensor");
 
   // Load the sensors
   while (childNode)
@@ -239,7 +241,7 @@ void Body::Load(common::XMLConfigNode *node)
     // Create and Load a sensor, which will belong to this body.
     this->LoadSensor(childNode);
     childNode = childNode->GetNext("sensor");
-  }
+  }*/
 
   this->SetKinematic(**this->kinematicP);
 
@@ -269,7 +271,7 @@ void Body::Load(common::XMLConfigNode *node)
 void Body::Save(std::string &prefix, std::ostream &stream)
 {
   std::map<std::string, Geom* >::iterator giter;
-  std::vector< sensors::Sensor* >::iterator siter;
+  //std::vector< sensors::Sensor* >::iterator siter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
@@ -286,11 +288,11 @@ void Body::Save(std::string &prefix, std::ostream &stream)
     giter->second->Save(p, stream);
   }
 
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  /*for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
   {
     stream << "\n";
     (*siter)->Save(p, stream);
-  }
+  }*/
 
   // NATY: put back in functionality
   /*std::vector<Visual*>::iterator iter;
@@ -309,13 +311,14 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 // Finalize the body
 void Body::Fini()
 {
-  std::vector< sensors::Sensor* >::iterator siter;
+  //std::vector< sensors::Sensor* >::iterator siter;
   std::map< std::string, Geom* >::iterator giter;
 
   this->connections.clear();
 
-  for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
+  /*for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     (*siter)->Fini();
+    */
 
   for (giter = this->geoms.begin(); giter != this->geoms.end(); giter++)
     giter->second->Fini();
@@ -412,9 +415,10 @@ void Body::Init()
     this->SetAngularDamping(**this->dampingFactorP);
   }
 
-  std::vector< sensors::Sensor* >::iterator siter;
+  /*std::vector< sensors::Sensor* >::iterator siter;
   for (siter = this->sensors.begin(); siter != this->sensors.end(); siter++)
     (*siter)->Init();
+    */
 
   this->linearAccel.Set(0,0,0);
   this->angularAccel.Set(0,0,0);
@@ -572,7 +576,7 @@ void Body::LoadGeom(common::XMLConfigNode *node)
 // Load a sensor
 void Body::LoadSensor(common::XMLConfigNode *node)
 {
-  sensors::Sensor *sensor = NULL;
+  //sensors::Sensor *sensor = NULL;
 
   if (node==NULL)
   {
@@ -581,12 +585,12 @@ void Body::LoadSensor(common::XMLConfigNode *node)
 
   std::string type = node->GetString("type","",1);
 
-  sensor = sensors::SensorFactory::NewSensor(type);
+  //sensor = sensors::SensorFactory::NewSensor(type);
 
-  if (sensor)
+  /*if (sensor)
   {
     sensor->Load(node);
-    this->sensors.push_back(sensor);
+    //this->sensors.push_back(sensor);
   }
   else
   {
@@ -594,6 +598,7 @@ void Body::LoadSensor(common::XMLConfigNode *node)
     stream << "Null sensor. Invalid sensor name[" << node->GetString("name",std::string(), 0) << "]";
     gzthrow(stream.str());
   }
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -716,20 +721,22 @@ Geom *Body::GetGeom(const std::string &name) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get all children
-std::vector< sensors::Sensor* > &Body::GetSensors() 
+/*std::vector< sensors::Sensor* > &Body::GetSensors() 
 {
   return this->sensors;
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the list of interfaces e.g 
 /// "pioneer2dx_model1::laser::laser_iface0->laser"
 void Body::GetInterfaceNames(std::vector<std::string>& list) const
 {
-  std::vector< sensors::Sensor* >::const_iterator iter;
+  /*std::vector< sensors::Sensor* >::const_iterator iter;
 
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->GetInterfaceNames(list);
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

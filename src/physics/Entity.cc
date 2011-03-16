@@ -22,14 +22,17 @@
  */
 
 #include "common/Messages.hh"
-#include "physics/Geom.hh"
-#include "Model.hh"
-#include "Body.hh"
 #include "common/GazeboError.hh"
 #include "common/Global.hh"
-#include "PhysicsEngine.hh"
-#include "Entity.hh"
+
 #include "transport/TopicManager.hh"
+
+#include "physics/Geom.hh"
+#include "physics/Model.hh"
+#include "physics/World.hh"
+#include "physics/Body.hh"
+#include "physics/PhysicsEngine.hh"
+#include "physics/Entity.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -154,9 +157,9 @@ bool Entity::IsStatic() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Return the bounding box for the entity 
-Box Entity::GetBoundingBox() const
+common::Box Entity::GetBoundingBox() const
 {
-  return Box(common::Vector3(0,0,0), common::Vector3(1,1,1));
+  return common::Box(common::Vector3(0,0,0), common::Vector3(1,1,1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -290,8 +293,8 @@ void Entity::SetRelativeRotation(const common::Quatern &rot)
 void Entity::PoseChange(bool notify)
 {
   msgs::Pose msg;
-  Message::Init(msg, this->GetCompleteScopedName() );
-  Message::Set( &msg, this->GetRelativePose());
+  common::Message::Init(msg, this->GetCompleteScopedName() );
+  common::Message::Set( &msg, this->GetRelativePose());
   this->pose_pub->Publish(msg);
 
   if (notify)

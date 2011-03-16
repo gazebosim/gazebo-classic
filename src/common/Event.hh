@@ -18,6 +18,7 @@
 #ifndef EVENT_HH
 #define EVENT_HH
 
+#include <iostream>
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
@@ -67,7 +68,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i]();
+                  (*this->connections[i])();
                 }
               }
 
@@ -80,7 +81,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p);
+                  (*this->connections[i])(p);
                 }
               }
 
@@ -89,7 +90,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2);
+                  (*this->connections[i])(p1, p2);
                 }
               }
 
@@ -98,7 +99,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3);
+                  (*this->connections[i])(p1, p2, p3);
                 }
               }
 
@@ -107,7 +108,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3, p4);
+                  (*this->connections[i])(p1, p2, p3, p4);
                 }
               }
 
@@ -118,7 +119,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3, p4, p5);
+                  (*this->connections[i])(p1, p2, p3, p4, p5);
                 }
               }
 
@@ -130,7 +131,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3, p4, p5, p6);
+                  (*this->connections[i])(p1, p2, p3, p4, p5, p6);
                 }
               }
 
@@ -141,7 +142,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3, p4, p5, p6, p7);
+                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7);
                 }
               }
 
@@ -152,7 +153,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3, p4, p5, p6, p7, p8);
+                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7, p8);
                 }
               }
 
@@ -165,7 +166,7 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3, p4, p5, p6, p7, p8, p9);
+                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7, p8, p9);
                 }
               }
 
@@ -178,18 +179,17 @@ namespace gazebo
               {
                 for (unsigned int i=0; i < connections.size(); i++)
                 {
-                  this->connections[i](p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+                  (*this->connections[i])(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
                 }
               }
 
-      private: std::vector< boost::function<T> > connections;
-
+      private: std::vector< boost::function<T> *> connections;
     };
 
     template<typename T>
     ConnectionPtr EventT<T>::Connect(const boost::function<T> &subscriber)
     {
-      this->connections.push_back(subscriber);
+      this->connections.push_back(new boost::function<T>(subscriber) );
       return ConnectionPtr( new Connection(this, this->connections.size()-1) );
     }
     
@@ -198,9 +198,9 @@ namespace gazebo
     {
       if (c->Id() >=0 && c->Id() < (int)this->connections.size())
       {
-        c->id = -1;
+        this->connections.erase(this->connections.begin()+c->Id());
         c->event = NULL;
-        this->connections.erase( this->connections.begin() + c->Id() );
+        c->id = -1;
       }
     }
   }

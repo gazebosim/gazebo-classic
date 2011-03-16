@@ -39,10 +39,10 @@ namespace gazebo
     class XMLConfigNode;
   }
 
-  namespace sensors
+  /*namespace sensors
   {
     class Sensor;
-  }
+  }*/
 
 	namespace physics
   {
@@ -212,7 +212,7 @@ namespace gazebo
       public: void SetTransparent(const bool &show);
   
       /// \brief Returns list of sensors
-      public:  std::vector< sensors::Sensor* > &GetSensors();
+      //public:  std::vector< sensors::Sensor* > &GetSensors();
   
       /// \brief  Get the size of the body
       public: void GetBoundingBox(common::Vector3 &min, common::Vector3 &max) const;
@@ -252,7 +252,7 @@ namespace gazebo
       protected: std::map< std::string, Geom* > geoms;
   
       /// List of attached sensors
-      protected: std::vector< sensors::Sensor* > sensors;
+      //protected: std::vector< sensors::Sensor* > sensors;
   
       /// Mass properties of the object
       protected: Mass mass;

@@ -27,10 +27,9 @@
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-#include "gz.h"
-
 #include "transport/TopicManager.hh"
 
+#include "common/Messages.hh"
 #include "common/Diagnostics.hh"
 #include "common/Events.hh"
 #include "common/Global.hh"
@@ -38,7 +37,7 @@
 #include "common/GazeboMessage.hh"
 #include "common/XMLConfig.hh"
 
-#include "sensor/SensorManager.hh"
+//#include "sensor/SensorManager.hh"
 
 #include "physics/Body.hh"
 #include "physics/PhysicsEngine.hh"
@@ -81,10 +80,10 @@ World::World()
   this->selection_pub = transport::TopicManager::Instance()->Advertise<msgs::Selection>("/gazebo/selection");
   this->light_pub = transport::TopicManager::Instance()->Advertise<msgs::Light>("/gazebo/light");
 
-  this->server = NULL;
+  //this->server = NULL;
   this->physicsEngine = NULL;
-  this->graphics = NULL;
-  this->simIfaceHandler = NULL;
+  //this->graphics = NULL;
+  //this->simIfaceHandler = NULL;
   //this->openAL = NULL;
   this->selectedEntity = NULL;
   this->stepInc = false;
@@ -93,13 +92,13 @@ World::World()
   this->rootElement->SetName("root");
   this->rootElement->SetWorld(this);
 
-  this->factoryIfaceHandler = NULL;
+  //this->factoryIfaceHandler = NULL;
   this->pause = false;
 
   common::Param::Begin(&this->parameters);
   this->nameP = new common::ParamT<std::string>("name","default",1);
-  this->saveStateTimeoutP = new common::ParamT<Time>("save_state_resolution",0.1,0);
-  this->saveStateBufferSizeP = new common::ParamT<unsigned int>("save_state_buffer_size",1000,0);
+  //this->saveStateTimeoutP = new common::ParamT<Time>("save_state_resolution",0.1,0);
+  //this->saveStateBufferSizeP = new common::ParamT<unsigned int>("save_state_buffer_size",1000,0);
   common::Param::End();
 
   this->connections.push_back( event::Events::ConnectPauseSignal( boost::bind(&World::PauseCB, this, _1) ) );
@@ -113,8 +112,8 @@ World::World()
 World::~World()
 {
   delete this->nameP;
-  delete this->saveStateTimeoutP;
-  delete this->saveStateBufferSizeP;
+  //delete this->saveStateTimeoutP;
+  //delete this->saveStateBufferSizeP;
 
   this->connections.clear();
   this->Fini();
@@ -124,15 +123,15 @@ World::~World()
 // Load the world
 void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 {
-  msgs::Scene scene = Messages::SceneFromXML( rootNode->GetChild("scene") );
-  this->scene_pub.Publish( scene );
+  msgs::Scene scene = common::Message::SceneFromXML( rootNode->GetChild("scene") );
+  this->scene_pub->Publish( scene );
 
   this->nameP->Load(rootNode);
-  this->saveStateTimeoutP->Load(rootNode);
-  this->saveStateBufferSizeP->Load(rootNode);
+  //this->saveStateTimeoutP->Load(rootNode);
+  //this->saveStateBufferSizeP->Load(rootNode);
 
   // Create the server object (needs to be done before models initialize)
-  if (this->server == NULL)
+  /*if (this->server == NULL)
   {
     this->server = new libgazebo::Server();
 
@@ -144,10 +143,10 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
     {
       gzthrow (err);
     }
-  }
+  }*/
 
   // Create the simulator interface
-  try
+  /*try
   {
     if (!this->simIfaceHandler)
     {
@@ -158,17 +157,20 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   {
     gzthrow(err);
   }
+  */
 
   // Create the default factory
-  if (!this->factoryIfaceHandler)
+  /*if (!this->factoryIfaceHandler)
     this->factoryIfaceHandler = new FactoryIfaceHandler(this);
 
+    */
   // Create the graphics iface handler
-  if (!this->graphics)
+  /*if (!this->graphics)
   {
     this->graphics = new GraphicsIfaceHandler(this);
     this->graphics->Load("default");
   }
+  */
 
 
   // Load OpenAL audio 
@@ -205,10 +207,11 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   // is called separately from main.cc
   this->LoadEntities(rootNode, this->rootElement, false, false);
 
-  this->worldStates.resize(**this->saveStateBufferSizeP);
+  /*this->worldStates.resize(**this->saveStateBufferSizeP);
   this->worldStatesInsertIter = this->worldStates.begin();
   this->worldStatesEndIter = this->worldStates.begin();
   this->worldStatesCurrentIter = this->worldStatesInsertIter;
+  */
 
 }
 
@@ -221,8 +224,8 @@ void World::Save(std::string &prefix, std::ostream &stream)
   stream << "<world>\n";
 
   stream << prefix << "  " << *(this->nameP);
-  stream << prefix << "  " << *(this->saveStateTimeoutP);
-  stream << prefix << "  " << *(this->saveStateBufferSizeP);
+  //stream << prefix << "  " << *(this->saveStateTimeoutP);
+  //stream << prefix << "  " << *(this->saveStateBufferSizeP);
 
   this->physicsEngine->Save(prefix, stream);
 
@@ -263,9 +266,9 @@ void World::Init()
   this->toDeleteEntities.clear();
   this->toLoadEntities.clear();
 
-  this->graphics->Init();
+  //this->graphics->Init();
 
-  this->factoryIfaceHandler->Init();
+  //this->factoryIfaceHandler->Init();
   //this->saveStateTimer.Start();
 }
 
@@ -273,7 +276,7 @@ void World::Init()
 // Primarily used to update the graphics interfaces
 void World::GraphicsUpdate()
 {
-  this->graphics->Update();
+  //this->graphics->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -312,24 +315,24 @@ void World::RunLoop()
   //bool userStepped;
   common::Time diffTime;
   common::Time currTime;
-  common::Time lastcommon::Time = this->GetRealTime();
+  common::Time lastTime = this->GetRealTime();
   struct timespec req;//, rem;
 
-  this->startcommon::Time = Time::GetWallTime();
+  this->startTime = common::Time::GetWallTime();
 
   this->stop = false;
   while (!this->stop)
   {
-    lastcommon::Time = this->GetRealTime();
+    lastTime = this->GetRealTime();
     if (this->IsPaused() && !this->stepInc)
-      this->pausecommon::Time += step;
+      this->pauseTime += step;
     else
     {
-      this->simcommon::Time += step;
+      this->simTime += step;
       this->Update();
     }
 
-    currcommon::Time = this->GetRealTime();
+    currTime = this->GetRealTime();
 
     // Set a default sleep time
     req.tv_sec  = 0;
@@ -341,7 +344,7 @@ void World::RunLoop()
         (this->GetSimTime() + this->GetPauseTime()) > 
         this->GetRealTime()) 
     {
-      diffcommon::Time = (this->GetSimTime() + this->GetPauseTime()) - 
+      diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
                   this->GetRealTime();
       req.tv_sec  = diffTime.sec;
       req.tv_nsec = diffTime.nsec;
@@ -349,9 +352,9 @@ void World::RunLoop()
     // Otherwise try to match the update rate to the one specified in
     // the xml file
     else if (physicsUpdateRate > 0 && 
-        currcommon::Time - lastcommon::Time < physicsUpdatePeriod)
+        currTime - lastTime < physicsUpdatePeriod)
     {
-      diffcommon::Time = physicsUpdatePeriod - (currcommon::Time - lastTime);
+      diffTime = physicsUpdatePeriod - (currTime - lastTime);
 
       req.tv_sec  = diffTime.sec;
       req.tv_nsec = diffTime.nsec;
@@ -382,12 +385,12 @@ void World::RunLoop()
 // Update the world
 void World::Update()
 {
-  DIAG_TIMER("World::Update")
+  //DIAG_TIMER("World::Update")
 
   event::Events::worldUpdateStartSignal();
 
   {
-    DIAG_TIMER("Update Models");
+    //DIAG_TIMER("Update Models");
     tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
         ModelUpdate_TBB(&this->models) );
   }
@@ -397,16 +400,16 @@ void World::Update()
 
   /// Update all the sensors
   {
-    DIAG_TIMER("Update Sensors");
-    SensorManager::Instance()->Update();
+    //DIAG_TIMER("Update Sensors");
+    //SensorManager::Instance()->Update();
   }
 
   {
-    DIAG_TIMER("Update handlers");
-    this->factoryIfaceHandler->Update();
+    //DIAG_TIMER("Update handlers");
+    //this->factoryIfaceHandler->Update();
 
     // Process all incoming messages from simiface
-    this->simIfaceHandler->Update();
+    //this->simIfaceHandler->Update();
 
     /// Process all internal messages
     this->ProcessMessages();
@@ -435,7 +438,7 @@ void World::Fini()
   }
   this->models.clear();
 
-  if (this->graphics)
+  /*if (this->graphics)
   {
     delete this->graphics;
     this->graphics = NULL;
@@ -452,6 +455,7 @@ void World::Fini()
     delete this->factoryIfaceHandler;
     this->factoryIfaceHandler = NULL;
   }
+  */
 
   if (this->physicsEngine)
   {
@@ -460,7 +464,7 @@ void World::Fini()
     this->physicsEngine = NULL;
   }
 
-  try
+  /*try
   {
     if (this->server)
     {
@@ -472,6 +476,7 @@ void World::Fini()
   {
     gzthrow(e);
   }
+  */
 
   // Close the openal server
   /*if (this->openAL)
@@ -517,10 +522,11 @@ common::Param *World::GetParam(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Retun the libgazebo server
-libgazebo::Server *World::GetGzServer() const
+/*libgazebo::Server *World::GetGzServer() const
 {
   return this->server;
 }
+*/
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -548,7 +554,7 @@ void World::LoadEntities(common::XMLConfigNode *node, Common *parent, bool remov
     }
     else if (node->GetName() == "light")
     {
-      msgs::Light msg = Message::LightFromXML(node);
+      msgs::Light msg = common::Message::LightFromXML(node);
       msg.mutable_header()->set_str_id( "light" );
       msg.set_action(msgs::Light::UPDATE);
       this->light_pub->Publish(msg);
@@ -587,7 +593,7 @@ void World::ProcessEntitiesToLoad()
       {
         xmlConfig->LoadString( *iter );
       }
-      catch (gazebo::GazeboError e)
+      catch (common::GazeboError e)
       {
         gzerr(0) << "The world could not load the XML data [" << e << "]\n";
         continue;
@@ -897,7 +903,7 @@ void World::SetSelectedEntityCB( const std::string &name )
   else
     this->selectedEntity = NULL;
 
-  event::Events::entitySelectedSignal(this->selectedEntity);
+  //event::Events::entitySelectedSignal(this->selectedEntity);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -929,7 +935,7 @@ gazebo::common::Time World::GetSimTime() const
 /// Set the sim time
 void World::SetSimTime(common::Time t)
 {
-  this->simcommon::Time = t;
+  this->simTime = t;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -948,9 +954,9 @@ gazebo::common::Time World::GetStartTime() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the real time (elapsed time)
-gazebo::common::Time World::GetRealTime() const
+common::Time World::GetRealTime() const
 {
-  return Time::GetWallTime() - this->startTime;
+  return common::Time::GetWallTime() - this->startTime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

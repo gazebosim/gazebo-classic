@@ -49,12 +49,23 @@ void TopicManager::SendMessage( const std::string &topic,
   if (!message.SerializeToString(&out))
     gzthrow("Simulator::SendMessage Failed to serialized message");
 
-  std::list<SubscriptionPtr>::iterator iter;
+  this->server->Write(out);
+
+  /*std::list<SubscriptionPtr>::iterator iter;
   for (iter = this->subscribed_topics[topic].begin(); 
        iter != this->subscribed_topics[topic].end(); iter++)
   {
     (*iter)->HandleMessage(out);
   }
+  */
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Handle an incoming message
+void TopicManager::HandleIncoming()
+{
+  //implement this
+  // Read a header in the message the indicates the topic
 }
 
 ////////////////////////////////////////////////////////////////////////////////

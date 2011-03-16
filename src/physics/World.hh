@@ -125,7 +125,7 @@ namespace gazebo
   
     /// Retun the libgazebo server
     /// \return Pointer the the libgazebo server
-    public: libgazebo::Server *GetGzServer() const;
+    //public: libgazebo::Server *GetGzServer() const;
   
     /// Return the physics engine
     /// \return Pointer to the physics engine
@@ -242,7 +242,7 @@ namespace gazebo
     private: std::vector< std::string > toLoadEntities;
   
     /// Simulator control interface
-    private: libgazebo::Server *server;
+    //private: libgazebo::Server *server;
   
     /// thread in which the world is updated
     private: boost::thread *thread;
@@ -250,9 +250,10 @@ namespace gazebo
     private: bool stop;
   
     /// Interface handlers
-    private: FactoryIfaceHandler *factoryIfaceHandler;
+    /*private: FactoryIfaceHandler *factoryIfaceHandler;
     private: GraphicsIfaceHandler *graphics;
     private: SimulationIfaceHandler *simIfaceHandler;
+    */
   
     //private: OpenAL *openAL;
   
@@ -270,8 +271,8 @@ namespace gazebo
     private: std::vector<google::protobuf::Message> messages;
   
     private: common::ParamT<std::string> *nameP;
-    private: common::ParamT<common::Time> *saveStateTimeoutP;
-    private: common::ParamT<unsigned int> *saveStateBufferSizeP;
+    //private: common::ParamT<common::Time> *saveStateTimeoutP;
+    //private: common::ParamT<unsigned int> *saveStateBufferSizeP;
   
     /// Current simulation time
     private: common::Time simTime, pauseTime, startTime;

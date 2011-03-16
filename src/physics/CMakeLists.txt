@@ -60,6 +60,10 @@ set (sources ${sources}
              MapShape.cc
              HeightmapShape.cc
              Contact.cc
+             Common.cc
+             Entity.cc
+             World.cc
+             Model.cc
 ) 
 
 set (headers ${headers}
@@ -87,6 +91,10 @@ set (headers ${headers}
              HeightmapShape.hh
              Contact.hh
              JointFeedback.hh
+             Common.hh
+             Entity.hh
+             World.hh
+             Model.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})

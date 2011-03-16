@@ -14,13 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- * SVN: $Id$
- */
-
 /** @page gazebo_server Console-mode server (gazebo)
 
 The basic gazebo server is a console-mode application: it creates no
@@ -94,24 +87,17 @@ messages are appended by default to a file called @c .gazebo located in your
 home directory, or to the log file specified with the -l command line option.
 */
 
-//#include <python2.4/Python.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
 #include <iostream>
 
-#include "common/Events.hh"
 #include "gazebo_config.h"
-#include "Simulator.hh"
-#include "World.hh"
-#include "common/GazeboError.hh"
-#include "common/Global.hh"
-
+#include "Server.hh"
 
 // Command line options
-std::string worldFileName = "";
+std::string config_filename = "";
 const char *optLogFileName = NULL;
 bool optGuiEnabled = true;
 bool optRenderEngineEnabled = true;
@@ -120,9 +106,6 @@ unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
 bool optPhysicsEnabled  = true;
 bool optPaused = false;
-
-int global_argc;
-char **global_argv;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -216,7 +199,7 @@ int ParseArgs(int argc, char **argv)
 
   // Get the world file name
   if (argc >= 1)
-    worldFileName = argv[0];
+    config_filename = argv[0];
 
   return 0;
 }
@@ -225,7 +208,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ )
 {
-  gazebo::event::Events::quitSignal();
+  //gazebo::event::Events::quitSignal();
   return;
 }
 
@@ -245,68 +228,13 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  gazebo::Simulator::Instance()->SetGuiEnabled( false );
-  gazebo::Simulator::Instance()->SetRenderEngineEnabled( false );
+  gazebo::Server *server = new gazebo::Server();
+  server->Load(config_filename);
+  server->Init();
+  server->Run();
+  
+  delete server;
+  server = NULL;
 
-  //Load the simulator
-  try
-  {
-    gazebo::Simulator::Instance()->Load(worldFileName);
-    // NATY: Put back in
-    //gazebo::Simulator::Instance()->SetTimeout(optTimeout);
-    gazebo::Simulator::Instance()->SetPhysicsEnabled(optPhysicsEnabled);
-
-    gazebo::Simulator::Instance()->CreateWorld(worldFileName);
-  }
-  catch (gazebo::GazeboError e)
-  {
-    std::cerr << "Error Loading Gazebo" << std::endl;
-    std::cerr << e << std::endl;
-    gazebo::Simulator::Instance()->Fini();
-    return -1;
-  }
-
-  // Initialize the simulator
-  try
-  {
-    gazebo::Simulator::Instance()->GetActiveWorld()->SetPaused(optPaused);
-    gazebo::Simulator::Instance()->Init();
-  }
-  catch (gazebo::GazeboError e)
-  {
-    std::cerr << "Initialization failed" << std::endl;
-    std::cerr << e << std::endl;
-    gazebo::Simulator::Instance()->Fini();
-    return -1;
-  }
-
-  // Main loop of the simulator
-  try
-  {
-    gazebo::Simulator::Instance()->Run();
-  }
-  catch (gazebo::GazeboError e)
-  {
-    std::cerr << "Main simulation loop failed" << std::endl;
-    std::cerr << e << std::endl;
-    gazebo::Simulator::Instance()->Fini();
-    return -1;
-  }
-
-  // Finalization and clean up
-  try
-  {
-    gazebo::Simulator::Instance()->Fini();
-  }
-  catch (gazebo::GazeboError e)
-  {
-    std::cerr << "Finalization failed" << std::endl;
-    std::cerr << e << std::endl;
-    return -1;
-  }
-
-  printf("Gazebo done.\n");
-
-  delete [] global_argv;
   return 0;
 }

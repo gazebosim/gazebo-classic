@@ -130,23 +130,22 @@ Scene::~Scene()
 void Scene::Load(common::XMLConfigNode *node)
 {
   common::XMLConfigNode *cnode = NULL;
-  this->ambientP->Load(node);
 
-  cnode = node->GetChild("shadows");
+  if (node)
+    cnode = node->GetChild("shadows");
   this->shadowEnabledP->Load(cnode);
   this->shadowTypeP->Load(cnode);
   this->shadowColorP->Load(cnode);
 
+  this->ambientP->Load(node);
   this->backgroundColorP->Load(node);
-
-  this->skyMaterialP->Load(node->GetChild("sky"));
-
-  this->fogColorP->Load(node->GetChild("fog"));
-  this->fogDensityP->Load(node->GetChild("fog"));
-  this->fogTypeP->Load(node->GetChild("fog"));
-  this->fogDensityP->Load(node->GetChild("fog"));
-  this->fogStartP->Load(node->GetChild("fog"));
-  this->fogEndP->Load(node->GetChild("fog"));
+  this->skyMaterialP->Load(node ? node->GetChild("sky") : NULL);
+  this->fogColorP->Load(node ? node->GetChild("fog") : NULL);
+  this->fogDensityP->Load(node ? node->GetChild("fog") : NULL);
+  this->fogTypeP->Load(node ? node->GetChild("fog") : NULL);
+  this->fogDensityP->Load(node ? node->GetChild("fog") : NULL);
+  this->fogStartP->Load(node ? node->GetChild("fog") : NULL);
+  this->fogEndP->Load(node ? node->GetChild("fog") : NULL);
 
   // Get the SceneManager, in this case a generic one
   if (node && node->GetChild("bsp"))

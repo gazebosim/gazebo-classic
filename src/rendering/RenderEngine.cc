@@ -280,7 +280,7 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 void RenderEngine::LoadPlugins()
 {
   std::list<std::string>::iterator iter;
-  std::list<std::string> ogrePaths=common::GazeboConfig::Instance()->GetOgrePaths();
+  std::list<std::string> ogrePaths = common::GazeboConfig::Instance()->GetOgrePaths();
  
   for (iter=ogrePaths.begin(); 
        iter!=ogrePaths.end(); ++iter)

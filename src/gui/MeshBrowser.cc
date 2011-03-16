@@ -107,8 +107,8 @@ MeshBrowser::~MeshBrowser()
 
 int MeshBrowser::ParseDir(const std::string &path, wxTreeItemId &parentId)
 {
-/*  int itemCount = 0;
-  struct dirent *dir_entry;
+  int itemCount = 0;
+/*  struct dirent *dir_entry;
   DIR *dir = opendir(path.c_str()); 
   if (dir == NULL)
     return 0;
@@ -140,8 +140,8 @@ int MeshBrowser::ParseDir(const std::string &path, wxTreeItemId &parentId)
   }
 
   closedir(dir);
-  return itemCount;
   */
+  return itemCount;
 }
 
 void MeshBrowser::OnTreeClick(wxTreeEvent &event)

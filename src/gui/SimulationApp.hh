@@ -34,7 +34,10 @@ namespace gazebo
     {
       /// \brief Constructor
       public: SimulationApp();
-  
+ 
+      /// \brief Destructor 
+      public: virtual ~SimulationApp();
+
       /// \brief Load the simulation app
       public: void Load();
   

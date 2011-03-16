@@ -106,7 +106,7 @@ FogPage::~FogPage()
 /// Apply the current parameters
 void FogPage::Apply()
 {
-
+/*
   std::string str, type;
   str = std::string(this->typeBox->GetValue().mb_str());
   boost::trim(str);
@@ -135,4 +135,5 @@ void FogPage::Apply()
   // NATY: Fix this
   //Simulator::Instance()->GetActiveWorld()->GetScene()->SetFog( type, color,
       //density, start, end);
+      */
 }

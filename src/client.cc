@@ -4,10 +4,9 @@
 #include <errno.h>
 #include <iostream>
 
-#include "rendering/RenderEngine.hh"
-#include "rendering/RenderState.hh"
-#include "gazebo_config.h"
-#include "transport/IOManager.hh"
+#include "Client.hh"
+
+std::string config_file = "";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Print the version/licence string
@@ -45,7 +44,6 @@ void PrintUsage()
 // Parse the argument list.  Options are placed in static variables.
 int ParseArgs(int argc, char **argv)
 {
-  FILE *tmpFile;
   int ch;
 
   char *flags = (char*)("l:hd:gxt:nqperu");
@@ -65,6 +63,10 @@ int ParseArgs(int argc, char **argv)
   argc -= optind;
   argv += optind;
 
+  // Get the world file name
+  if (argc >= 1)
+    config_file = argv[0];
+
   return 0;
 }
 
@@ -76,71 +78,7 @@ void SignalHandler( int /*dummy*/ )
   return;
 }
 
-void Load()
-{
-
-  // Load the Ogre rendering system
-  RenderEngine::Instance()->Load(configNode);
-
-  // Create and initialize the Gui
-  if (this->renderEngineEnabled && this->guiEnabled)
-  {
-    try
-    {
-      XMLConfigNode *childNode = NULL;
-      if (rootNode)
-        childNode = configNode->GetChild("gui");
-
-      int width=0;
-      int height=0;
-      int x = 0;
-      int y = 0;
-
-      if (childNode)
-      {
-        width = childNode->GetTupleInt("size", 0, 800);
-        height = childNode->GetTupleInt("size", 1, 600);
-        x = childNode->GetTupleInt("pos",0,0);
-        y = childNode->GetTupleInt("pos",1,0);
-      }
-
-      // Create the GUI
-      if (!this->gui && (childNode || !rootNode))
-      {
-        this->gui = new SimulationApp();
-        this->gui->Load();
-      }
-    }
-    catch (GazeboError e)
-    {
-      gzthrow( "Error loading the GUI\n" << e);
-    }
-  }
-  else
-  {
-    this->gui = NULL;
-  }
-
-//Initialize RenderEngine
-  if (this->renderEngineEnabled)
-  {
-    try
-    {
-      RenderEngine::Instance()->Init(configNode);
-    }
-    catch (gazebo::GazeboError e)
-    {
-      gzthrow("Failed to Initialize the Rendering engine subsystem\n" << e );
-    }
-  }
-
-  // Initialize the GUI
-  if (this->gui)
-  {
-    this->gui->Init();
-  }
-}
-
+/*
 void Init()
 {
   RenderState::Init();
@@ -161,6 +99,7 @@ void Update()
 {
   RenderEngine::Instance()->UpdateScenes();
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main function
@@ -178,8 +117,12 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  Scene *scene = new Scene("scene");
-  this->scene->SetType(Scene::GENERIC);
-  //this->scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
-  //this->scene->Init();
+  gazebo::Client *client = new gazebo::Client();
+  client->Load(config_file);
+  client->Run();
+
+  delete client;
+  client = NULL;
+
+  return 0;
 }
