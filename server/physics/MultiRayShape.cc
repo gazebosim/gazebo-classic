@@ -33,7 +33,8 @@ MultiRayShape::MultiRayShape(Geom *parent) : Shape(parent)
   this->minRangeP = new ParamT<double>("minRange",0,1);
   this->maxRangeP = new ParamT<double>("maxRange",0,1);
   this->resRangeP = new ParamT<double>("resRange",0.1,1);
-  this->originP = new ParamT<Vector3>("origin", Vector3(0,0,0), 0);
+  this->xyzP = new ParamT<Vector3>("xyz", Vector3(0,0,0), 0);
+  this->rpyP = new ParamT<Quatern>("rpy", Quatern(1,0,0,0), 0);
   this->displayTypeP = new ParamT<std::string>("displayRays", "off", 0);
 
   // for block rays, vertical setting
@@ -69,7 +70,8 @@ MultiRayShape::~MultiRayShape()
   delete this->minRangeP;
   delete this->maxRangeP;
   delete this->resRangeP;
-  delete this->originP;
+  delete this->xyzP;
+  delete this->rpyP;
   delete this->displayTypeP;
 
   delete this->verticalRayCountP;
@@ -91,7 +93,8 @@ void MultiRayShape::Load(XMLConfigNode *node)
   this->minRangeP->Load(node);
   this->maxRangeP->Load(node);
   this->resRangeP->Load(node);
-  this->originP->Load(node);
+  this->xyzP->Load(node);
+  this->rpyP->Load(node);
   this->displayTypeP->Load(node);
   this->verticalRayCountP->Load(node);
   this->verticalRangeCountP->Load(node);
@@ -101,7 +104,7 @@ void MultiRayShape::Load(XMLConfigNode *node)
 
 ////////////////////////////////////////////////////////////////////////////////
 /*void MultiRayShape::Load(unsigned int vertRayCount, unsigned int rayCount,
-            Vector3 origin, double minRange, double maxRange,
+            Vector3 xyz, Quatern rpy, double minRange, double maxRange,
             Angle minVertAngle, Angle maxVertAngle,
             Angle minAngle, Angle maxAngle )
 {
@@ -133,8 +136,9 @@ void MultiRayShape::Load(XMLConfigNode *node)
           sin(pitchAngle.GetAsRadian())*
           cos(yawAngle.GetAsRadian()));
 
-      start = (axis * **this->minRangeP) + **this->originP;
-      end = (axis * **this->maxRangeP) + **this->originP;
+      axis = (**this->rpyP).RotateVector(axis);
+      start = (axis * **this->minRangeP) + **this->xyzP;
+      end = (axis * **this->maxRangeP) + **this->xyzP;
 
       this->AddRay(start,end);
     }
@@ -159,7 +163,8 @@ void MultiRayShape::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "  " << *(this->minRangeP) << "\n";
   stream << prefix << "  " << *(this->maxRangeP) << "\n";
   stream << prefix << "  " << *(this->resRangeP) << "\n";
-  stream << prefix << "  " << *(this->originP) << "\n";
+  stream << prefix << "  " << *(this->xyzP) << "\n";
+  stream << prefix << "  " << *(this->rpyP) << "\n";
   stream << prefix << "  " << *(this->rayCountP) << "\n";
   stream << prefix << "  " << *(this->rangeCountP) << "\n";
   stream << prefix << "  " << *(this->displayTypeP) << "\n";

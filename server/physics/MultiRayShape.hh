@@ -33,7 +33,7 @@ namespace gazebo
     public: virtual void Save(std::string &prefix, std::ostream &stream);
 
     /*public: void Load(unsigned int vertRayCount, unsigned int rayCount,
-                      Vector3 origin, double minRange, double maxRange,
+                      Vector3 xyz, Quatern rpy, double minRange, double maxRange,
                       Angle minVertAngle, Angle maxVertAngle,
                       Angle minAngle, Angle maxAngle );
                       */
@@ -105,7 +105,8 @@ namespace gazebo
 
     protected: ParamT<Angle> *minAngleP, *maxAngleP;
     protected: ParamT<double> *minRangeP, *maxRangeP, *resRangeP;
-    protected: ParamT<Vector3> *originP;
+    protected: ParamT<Vector3> *xyzP;
+    protected: ParamT<Quatern> *rpyP;
     protected: ParamT<int> *rayCountP;
     protected: ParamT<int> *rangeCountP;
 
