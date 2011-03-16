@@ -26,6 +26,7 @@
  */
 
 #include "Timer.hh"
+#include "Body.hh"
 #include "Model.hh"
 #include "Sensor.hh"
 #include "GazeboError.hh"
@@ -50,9 +51,9 @@ Controller::Controller(Entity *entity )
   this->updateRateP->Callback(&Controller::SetUpdateRate, this);
   Param::End();
 
-  if (!dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
+  if (!dynamic_cast<Body*>(entity) && !dynamic_cast<Model*>(entity) && !dynamic_cast<Sensor*>(entity))
   {
-    gzthrow("The parent of a controller must be a Model or a Sensor");
+    gzthrow("The parent of a controller must be a Body, Model or a Sensor");
   }
 
   this->parent = entity;

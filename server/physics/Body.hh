@@ -42,6 +42,7 @@ namespace gazebo
   class Sensor;
   class XMLConfigNode;
   class PhysicsEngine;
+  class Controller;
 
   /// \addtogroup gazebo_physics
   /// \brief The body class
@@ -211,6 +212,10 @@ namespace gazebo
     /// \brief Load a renderable
     private: void LoadVisual(XMLConfigNode *node);
 
+    /// \brief Load a controller helper function
+    /// \param node XML Configuration node
+    private: void LoadController(XMLConfigNode *node);
+  
     /// \brief Update the pose of the body
     //protected: void UpdatePose();
 
@@ -286,6 +291,9 @@ namespace gazebo
     protected: Vector3 linearAccel;
     protected: Vector3 angularAccel;
 
+    /// \brief Map of the controllers
+    protected: std::map<std::string, Controller* > controllers;
+  
     ///  User specified Mass Matrix
     protected: ParamT<bool> *customMassMatrixP;
     protected: ParamT<double> *cxP ;

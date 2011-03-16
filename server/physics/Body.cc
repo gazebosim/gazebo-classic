@@ -44,6 +44,8 @@
 #include "Sensor.hh"
 #include "Simulator.hh"
 #include "World.hh"
+#include "Controller.hh"
+#include "ControllerFactory.hh"
 #include "PhysicsEngine.hh"
 
 #include "Body.hh"
@@ -124,6 +126,17 @@ Body::~Body()
     delete this->comEntity;
   this->comEntity = NULL;
 
+  std::map< std::string, Controller* >::iterator citer;
+  for (citer = this->controllers.begin();
+       citer != this->controllers.end(); citer++)
+  {
+    if (citer->second)
+    {
+      delete citer->second;
+      citer->second = NULL;
+    }
+  }
+
   delete this->xyzP;
   delete this->rpyP;
   delete this->dampingFactorP;
@@ -184,6 +197,14 @@ void Body::Load(XMLConfigNode *node)
 
   this->SetRelativePose(Pose3d(**this->xyzP, **this->rpyP));
   
+  // Load controllers
+  childNode = node->GetChildByNSPrefix("controller");
+  while (childNode)
+  {
+    this->LoadController(childNode);
+    childNode = childNode->GetNextByNSPrefix("controller");
+  }
+
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
   this->SetSelfCollide( **this->selfCollideP );
@@ -225,6 +246,7 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 {
   std::vector< Geom* >::iterator giter;
   std::vector< Sensor* >::iterator siter;
+  std::map<std::string, Controller* >::iterator contIter;
 
   this->xyzP->SetValue( this->GetRelativePose().pos );
   this->rpyP->SetValue( this->GetRelativePose().rot );
@@ -247,6 +269,14 @@ void Body::Save(std::string &prefix, std::ostream &stream)
     (*siter)->Save(p, stream);
   }
 
+  // Save all the controllers
+  for (contIter=this->controllers.begin();
+      contIter!=this->controllers.end(); contIter++)
+  {
+    if (contIter->second)
+      contIter->second->Save(p, stream);
+  }
+
   stream << prefix << "</body>\n";
 }
 
@@ -255,6 +285,13 @@ void Body::Save(std::string &prefix, std::ostream &stream)
 // Finalize the body
 void Body::Fini()
 {
+  std::map<std::string, Controller* >::iterator contIter;
+  for (contIter = this->controllers.begin();
+       contIter != this->controllers.end(); contIter++)
+  {
+    contIter->second->Fini();
+  }
+
   std::vector< Sensor* >::iterator siter;
   std::vector< Geom* >::iterator giter;
 
@@ -401,6 +438,13 @@ void Body::Init()
     }
   }
 
+  std::map<std::string, Controller* >::iterator contIter;
+  for (contIter=this->controllers.begin();
+       contIter!=this->controllers.end(); contIter++)
+  {
+    contIter->second->Init();
+  }
+
   this->enabled = true;
 }
 
@@ -438,6 +482,23 @@ void Body::Update()
 #else
       (*geomIter)->Update();
 #endif
+    }
+  }
+
+  std::map<std::string, Controller* >::iterator contIter;
+  {
+    //DiagnosticTimer timer("Model[" + this->GetName() + "] Controllers Update ");
+    for (contIter=this->controllers.begin();
+        contIter!=this->controllers.end(); contIter++)
+    {
+      if (contIter->second)
+      {
+#ifdef USE_THREADPOOL
+        World::Instance()->threadPool->schedule(boost::bind(&Controller::Update,(contIter->second)));
+#else
+        contIter->second->Update();
+#endif
+      }
     }
   }
 }
@@ -764,4 +825,53 @@ void Body::AddSensor( Sensor *sensor )
 void Body::ClearSensors( )
 {
   this->sensors.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load a controller helper function
+void Body::LoadController(XMLConfigNode *node)
+{
+  if (!node)
+    gzthrow( "node parameter is NULL" );
+
+  Controller *controller=0;
+  std::ostringstream stream;
+
+  // Get the controller's type
+  std::string controllerType = node->GetName();
+
+  // Get the unique name of the controller
+  std::string controllerName = node->GetString("name",std::string(),1);
+  
+  // See if the controller is in a plugin
+  std::string pluginName = node->GetString("plugin","",0);
+  if (pluginName != "")
+	  ControllerFactory::LoadPlugin(pluginName, controllerType);
+
+  // Create the controller based on it's type
+  controller = ControllerFactory::NewController(controllerType, this);
+
+  if (controller)
+  {
+    // Load the controller
+    try
+    {
+      controller->Load(node);
+    }
+    catch (GazeboError e)
+    {
+      gzerr(0) << "Error Loading Controller[" <<  controllerName
+      << "]\n" << e << std::endl;
+      delete controller;
+      controller = NULL;
+      return;
+    }
+
+    // Store the controller
+    this->controllers[controllerName] = controller;
+  }
+  else
+  {
+    gzmsg(0) << "Unknown controller[" << controllerType << "]\n";
+  }
 }
