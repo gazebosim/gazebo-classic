@@ -27,9 +27,12 @@
 #define TIME_HH
 
 #include <stdlib.h>
-
+#include <sys/time.h>
 #include <time.h>
+
 #include <iostream>
+
+#define HAS_CLOCK_GETTIME (_POSIX_C_SOURCE >= 199309L)
 
 namespace gazebo
 {
@@ -66,7 +69,25 @@ class Time
   public: virtual ~Time();
 
   /// \brief Get the wall time
-  public: static Time GetWallTime();
+  public: static inline Time GetWallTime()
+          {
+            int32_t sec, nsec;
+#if HAS_CLOCK_GETTIME
+            struct timespec start;
+            clock_gettime(CLOCK_REALTIME, &start);
+            sec  = start.tv_sec;
+            nsec = start.tv_nsec;
+#else
+            struct timeval timeofday;
+            gettimeofday(&timeofday,NULL);
+            sec  = timeofday.tv_sec;
+            nsec = timeofday.tv_usec * 1000;
+#endif
+            return Time(sec, nsec);
+
+            //gettimeofday(&my_tv,NULL);
+            //return Time(my_tv);
+          }
 
   /// \brief Set the time to the wall time
   public: void SetToWallTime();

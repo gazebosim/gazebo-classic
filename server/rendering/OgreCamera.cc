@@ -459,16 +459,16 @@ void OgreCamera::Render()
   if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
     {
-      DIAGNOSTICTIMER(timer("OgreCamera::Render(): renderTarget update",6));
+      //DIAGNOSTICTIMER(timer("OgreCamera::Render(): renderTarget update",6));
       //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
       this->lastRenderTime = Simulator::Instance()->GetSimTime();
 
-      //for (int i = 0; i < 20; ++i)
       this->renderTarget->update();
 
       // produce depth data for the camera
-      if (this->simulateDepthData)
+      /*if (this->simulateDepthData)
     	  this->RenderDepthData();
+        */
     }
 
     this->lastUpdate = Simulator::Instance()->GetSimTime();

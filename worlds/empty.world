@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <gazebo:world 
+  xmlns:xi="http://www.w3.org/2001/XInclude"
   xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz" 
   xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model" 
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor" 
@@ -15,7 +16,7 @@
   <verbosity>4</verbosity>
 
   <physics:ode>
-    <stepTime>0.1</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>0.0000000001</cfm>
     <erp>0.2</erp>
@@ -57,6 +58,37 @@
       </geom:plane>
     </body:plane>
   </model:physical>
+
+  <model:physical name="camera">
+    <xyz>0 0 0.2</xyz>
+    <body:box name="body">
+      <geom:box name="geom">
+        <size>0.1 0.1 0.1</size>
+        <visual>
+          <size>0.1 0.1 0.1</size>
+          <mesh>unit_box</mesh>
+          <material>Gazebo/Red</material>
+        </visual>
+      </geom:box>
+
+      <sensor:camera name="sensor">
+        <imageSize>320 240</imageSize>
+        <hfov>60</hfov>
+        <nearClip>0.1</nearClip>
+        <farClip>50</farClip>
+        <saveFrames>false</saveFrames>
+        <saveFramePath>frames</saveFramePath>
+        <alwaysActive>true</alwaysActive>
+
+        <!--<controller:generic_camera name="sonyvid30_camera_controller">
+          <interface:camera name="camera_iface_0"/>
+        </controller:generic_camera>
+        -->
+      </sensor:camera>
+    </body:box>
+  </model:physical>
+
+
 
   <!-- White Point light -->
   <model:renderable name="point_white">

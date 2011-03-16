@@ -176,6 +176,8 @@ namespace gazebo
 
     private: std::vector<OgreCamera*> cameras;
 
+    private: int renderCount;
+
     private: friend class DestroyerT<OgreAdaptor>;
     private: friend class SingletonT<OgreAdaptor>;
   };

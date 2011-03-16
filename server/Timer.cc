@@ -49,7 +49,7 @@ void Timer::Start()
   if (this->type == SIM_TIMER)
     this->start = Simulator::Instance()->GetSimTime();
   else
-    this->start = Simulator::Instance()->GetWallTime();
+    this->start = Time::GetWallTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ Time Timer::GetElapsed() const
   if (this->type == SIM_TIMER)
     currentTime = Simulator::Instance()->GetSimTime();
   else
-    currentTime = Simulator::Instance()->GetWallTime();
+    currentTime = Time::GetWallTime();
 
   return currentTime - this->start;
 }

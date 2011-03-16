@@ -318,7 +318,7 @@ void World::GraphicsUpdate()
 // Update the world
 void World::Update()
 {
-  this->worldUpdateStartSignal();
+  /*this->worldUpdateStartSignal();
 
   if (this->simPauseTime > 0)
   {
@@ -335,9 +335,10 @@ void World::Update()
       Simulator::Instance()->SetPaused(false);
     }
   }
+  */
 
   {
-    DIAGNOSTICTIMER(timer("World::Update Models",6));
+    //DIAGNOSTICTIMER(timer("World::Update Models",6));
 
     // Update all the models
     std::vector< Model* >::iterator miter;
@@ -374,12 +375,11 @@ void World::Update()
   /// Update all the sensors
   SensorManager::Instance()->Update();
 
-
   this->factory->Update();
 
-  Logger::Instance()->Update();
+  //Logger::Instance()->Update();
 
-  this->worldUpdateEndSignal();
+  //this->worldUpdateEndSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
