@@ -33,6 +33,9 @@ namespace gazebo
 {
   namespace transport
   {
+    class Server;
+    class Client;
+
     /// \brief Manages topics and their subscriptions
     class TopicManager : public SingletonT<TopicManager>
     {
@@ -91,6 +94,9 @@ namespace gazebo
       public: void SendMessage( const std::string &topic, 
                                 google::protobuf::Message &message );
 
+
+      private: Server *server;
+      private: Client *client;
 
       private: std::map<std::string, int> advertised_topics;
       private: std::map<std::string, std::list<SubscriptionPtr> > subscribed_topics; 

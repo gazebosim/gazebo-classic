@@ -4,7 +4,6 @@
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
-#include "Stock.hh"
 #include "Connection.hh"
 #include "Publisher.hh"
 #include "Message.hh"

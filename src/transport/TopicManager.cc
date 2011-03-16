@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include "transport/Server.hh"
+#include "transport/Client.hh"
 #include "transport/TopicManager.hh"
 
 using namespace gazebo;
@@ -23,6 +25,8 @@ using namespace transport;
 // Constructor
 TopicManager::TopicManager()
 {
+  this->server = new Server(12345);
+  this->client = new Client("localhost", "12346");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

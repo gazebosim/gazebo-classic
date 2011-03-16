@@ -3,9 +3,9 @@
 
 #include <boost/asio.hpp>
 
-#include "Message.hh"
+#include "common/Message.hh"
 #include "CallbackHelper.hh"
-#include "Connection.hh"
+#include "transport/Connection.hh"
 
 namespace gazebo
 {
