@@ -170,6 +170,7 @@ namespace gazebo
 
     private: ParamT<Vector4> *ambientP;
     private: ParamT<bool> *shadowsP;
+    private: ParamT<std::string> *shadowsTechniqueP;
     private: ParamT<Vector3> *backgroundColorP;
     private: ParamT<std::string> *skyMaterialP;
     private: std::vector<Param*> parameters;
