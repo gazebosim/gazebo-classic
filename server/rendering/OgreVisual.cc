@@ -402,6 +402,8 @@ void OgreVisual::MakeStatic()
 
   // Prevent double rendering
   this->sceneNode->setVisible(false);
+  if (this->sceneNode->getParent())
+    this->sceneNode->getParent()->removeChild(this->sceneNode);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

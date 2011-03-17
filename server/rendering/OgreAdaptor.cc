@@ -63,6 +63,7 @@ enum SceneTypes{SCENE_BSP, SCENE_EXT};
 /// Constructor
 OgreAdaptor::OgreAdaptor()
 {
+  this->renderCount = 0;
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
   this->logManager->createLog("Ogre.log", true, false, false);
@@ -497,9 +498,9 @@ void OgreAdaptor::UpdateCameras()
 
   // Draw all the non-user cameras within the same sim time step
   {
-    DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
-    boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
-    boost::recursive_mutex::scoped_lock model_delete_lock(*Simulator::Instance()->GetMDMutex());
+    //DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
+    //boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
+    //boost::recursive_mutex::scoped_lock model_delete_lock(*Simulator::Instance()->GetMDMutex());
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       if (dynamic_cast<UserCamera*>((*iter)) == NULL)
@@ -509,7 +510,7 @@ void OgreAdaptor::UpdateCameras()
 
   // Must update the user camera's last.
   {
-    DIAGNOSTICTIMER(timer("UpdateCameras: UserCamera update",6));
+    //DIAGNOSTICTIMER(timer("UpdateCameras: UserCamera update",6));
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       userCam = dynamic_cast<UserCamera*>((*iter));
@@ -525,9 +526,16 @@ void OgreAdaptor::UpdateCameras()
   }
 
   {
-    DIAGNOSTICTIMER(timer("UpdateCameras: _fireFrameEnded",6));
+    //DIAGNOSTICTIMER(timer("UpdateCameras: _fireFrameEnded",6));
     this->root->_fireFrameEnded();
   }
+
+  //this->renderCount++;
+  //std::cout << "Render Count[" << this->renderCount << "]\n";
+
+/*  if (this->renderCount == 100)
+    Simulator::Instance()->SetUserQuit();
+    */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -119,11 +119,10 @@ namespace gazebo
 
     /// Get the real time (elapsed time)
     /// \return The real time
-    public: Time GetRealTime() const;
-
-    /// \brief Get the wall clock time
-    /// \return The wall clock time
-    public: Time GetWallTime() const;
+    public: inline Time GetRealTime() const
+            {
+              return Time::GetWallTime() - this->startTime;
+            }
 
     //User Iteractions
     /// \brief Simulator finished by the user

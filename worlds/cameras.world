@@ -15,7 +15,7 @@
   <verbosity>4</verbosity>
 
   <physics:ode>
-    <stepTime>0.1</stepTime>
+    <stepTime>0.001</stepTime>
     <gravity>0 0 -9.8</gravity>
     <cfm>0.0000000001</cfm>
     <erp>0.2</erp>
@@ -35,7 +35,7 @@
 
   <rendering:ogre>
     <ambient>.2 .2 .2 1</ambient>
-    <shadows>true</shadows>
+    <shadows>false</shadows>
     <grid>false</grid>
   </rendering:ogre>
 
@@ -57,6 +57,24 @@
       </geom:plane>
     </body:plane>
   </model:physical>
+
+  <model:physical name="wg_model">
+    <xyz>-8 -4 0</xyz>
+    <static>true</static>
+
+    <body:box name="wg_body">
+      <xyz>0 0 0</xyz>
+      <geom:box name="wg_geom">
+        <size>1 1 1</size>
+        <mass>0</mass>
+        <visual>
+          <mesh>willowgarage.dae</mesh>
+          <scale>0.0254 0.0254 0.0254</scale>
+        </visual>
+      </geom:box>
+    </body:box>
+  </model:physical>
+
 
   <model:physical name="camera">
     <xyz> 0 0 5 </xyz>

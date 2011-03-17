@@ -24,7 +24,6 @@
  * SVN: $Id$
  */
 
-#include <sys/time.h>
 #include <math.h>
 #include "Time.hh"
 
@@ -63,13 +62,6 @@ Time::Time( double time)
 // Destructor
 Time::~Time()
 {
-}
-
-Time Time::GetWallTime()
-{
-  struct timeval tv;
-  gettimeofday(&tv,NULL);
-  return Time(tv);
 }
 
 void Time::SetToWallTime()

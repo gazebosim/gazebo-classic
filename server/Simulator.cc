@@ -117,7 +117,7 @@ Simulator::Simulator()
 {
   this->render_mutex = new boost::recursive_mutex();
   this->model_delete_mutex = new boost::recursive_mutex();
-  this->startTime = this->GetWallTime();
+  this->startTime = Time::GetWallTime();
   this->gazeboConfig=new gazebo::GazeboConfig();
   this->pause = false;
   this->physicsThread = NULL;
@@ -421,14 +421,14 @@ void Simulator::MainLoop()
   {
     DIAGNOSTICTIMER(timer("GUI LOOP",6));
 
-    currTime = this->GetWallTime();
+    currTime = Time::GetWallTime();
     if ( currTime - lastTime > 1.0/freq)
     {
-      lastTime = this->GetWallTime();
+      lastTime = Time::GetWallTime();
 
       if (this->gui && (currTime - lastGuiTime > 1.0/this->gui->GetUpdateRate()))
       {
-        lastGuiTime = this->GetWallTime();
+        lastGuiTime = Time::GetWallTime();
         DIAGNOSTICTIMER(timer1("GUI update",6));
         this->gui->Update();
       }
@@ -445,7 +445,7 @@ void Simulator::MainLoop()
         }
       }
 
-      currTime = this->GetWallTime();
+      currTime = Time::GetWallTime();
 
       {
         DIAGNOSTICTIMER(timer1("GUI Process Entities to Load",6));
@@ -539,22 +539,6 @@ gazebo::Time Simulator::GetPauseTime() const
 gazebo::Time Simulator::GetStartTime() const
 {
   return this->startTime;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the real time (elapsed time)
-gazebo::Time Simulator::GetRealTime() const
-{
-  return this->GetWallTime() - this->startTime;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the wall clock time
-gazebo::Time Simulator::GetWallTime() const
-{
-  Time t;
-  t.SetToWallTime();
-  return t;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -683,18 +667,22 @@ void Simulator::PhysicsLoop()
   Time lastTime = this->GetRealTime();
   struct timespec req, rem;
 
+  double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
+  Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
+
   // hack for ROS, since ROS uses t=0 for special purpose
   this->simTime = world->GetPhysicsEngine()->GetStepTime();
 
+  Time step = world->GetPhysicsEngine()->GetStepTime();
+
   while (!this->userQuit)
   {
-    DIAGNOSTICTIMER(timer("PHYSICS LOOP ",6));
+    //DIAGNOSTICTIMER(timer("PHYSICS LOOP ",6));
 
     {
-      DIAGNOSTICTIMER(timer1("PHYSICS MR MD Mutex and world->Update() ",6));
-      boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
-      boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
-
+      //DIAGNOSTICTIMER(timer1("PHYSICS MR MD Mutex and world->Update() ",6));
+      //boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
+      //boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
       currTime = this->GetRealTime();
 
       // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
@@ -712,15 +700,13 @@ void Simulator::PhysicsLoop()
 
       world->Update();
     }
-
+  
     currTime = this->GetRealTime();
 
     // Set a default sleep time
     req.tv_sec  = 0;
-    req.tv_nsec = 10000;
+    req.tv_nsec = 0;
 
-    double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
-    Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
     // If the physicsUpdateRate < 0, then we should try to match the
     // update rate to real time
     if ( physicsUpdateRate < 0 &&
@@ -744,13 +730,12 @@ void Simulator::PhysicsLoop()
     }
 
     nanosleep(&req, &rem);
-
-    {
+    
+    /*{
       DIAGNOSTICTIMER(timer1("PHYSICS UpdateSimIfaces ",6));
-
       // Process all incoming messages from simiface
       world->UpdateSimulationIface();
-    }
+    }*/
 
     if (this->timeout > 0 && this->GetRealTime() > this->timeout)
     {
