@@ -17,8 +17,8 @@ add_subdirectory(rendering)
 add_subdirectory(gui)
 add_subdirectory(physics)
 
-add_executable(gazebo_server server.cc Server.cc)
-add_executable(gazebo_client client.cc Client.cc)
+add_executable(gazebo_server server.cc PhysicsServer.cc)
+add_executable(gazebo_client client.cc GuiClient.cc)
 
 #set_source_files_properties(server.cc client.cc PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
 

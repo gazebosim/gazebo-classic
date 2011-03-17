@@ -22,6 +22,7 @@ set (headers TopicManager.hh
              Connection.hh
              Client.hh
              Server.hh
+             CallbackHelper.hh
 )
 
 add_library(gazebo_transport SHARED ${sources})

@@ -4,9 +4,10 @@
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
-#include "Connection.hh"
-#include "Publisher.hh"
-#include "Message.hh"
+#include "common/Messages.hh"
+
+#include "transport/Connection.hh"
+#include "transport/Publisher.hh"
 
 namespace gazebo
 {
@@ -18,18 +19,18 @@ namespace gazebo
       public: void OnAccept(const boost::system::error_code &e, ConnectionPtr conn);
       public: void OnWrite(const boost::system::error_code &e, ConnectionPtr conn);
 
-      public: template<typename M>
+      /*public: template<typename M>
               PublisherPtr Advertise(const std::string &topic_name)
               {
-                MessageType type = M::GetType();
+                common::MessageType type = M::GetType();
 
                 PublisherPtr pub( new Publisher(topic_name, type) );
                 this->publishers.insert( std::make_pair(topic_name, pub) );
 
                 return pub;
-              }
+              }*/
 
-      //public: void Publish(const StringMessage &msg);
+      public: void Write(const std::string &msg);
 
       private: boost::asio::ip::tcp::acceptor acceptor;
 

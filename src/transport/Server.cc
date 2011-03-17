@@ -25,7 +25,8 @@ Server::Server(unsigned short port)
 
 void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
 {
-  if (!e)
+  std::cout << "Server::OnAccept\n";
+  /*if (!e)
   {
     this->connections.push_back(conn);
     IntMapMessage msg;
@@ -54,6 +55,12 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
     // An error occurred. Log it and return.
     std::cerr << e.message() << std::endl;
   }
+  */
+}
+
+void Server::Write(const std::string &msg)
+{
+  std::cout << "Server::Write\n";
 }
 
 /*void Server::Publish(const StringMessage &msg)

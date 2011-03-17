@@ -1,9 +1,13 @@
 #include "common/GazeboConfig.hh"
 #include "common/XMLConfig.hh"
 #include "common/GazeboError.hh"
+
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
-#include "Server.hh"
+
+#include "transport/Server.hh"
+
+#include "PhysicsServer.hh"
 
 using namespace gazebo;
 
@@ -49,7 +53,7 @@ const std::string default_config =
   </world>\
 </gazebo>";
 
-Server::Server()
+PhysicsServer::PhysicsServer()
 {
   // load the configuration options 
   try
@@ -62,13 +66,15 @@ Server::Server()
   }
 
   physics::PhysicsFactory::RegisterAll();
+
+  this->server = new transport::Server(1234);
 }
 
-Server::~Server()
+PhysicsServer::~PhysicsServer()
 {
 }
 
-void Server::Load( const std::string &filename )
+void PhysicsServer::Load( const std::string &filename )
 {
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
@@ -119,10 +125,16 @@ void Server::Load( const std::string &filename )
   }
 }
 
-void Server::Init()
+void PhysicsServer::Init()
 {
 }
 
-void Server::Run()
+void PhysicsServer::Run()
 {
+  while (true)
+  {
+    //for (int i=0; i < this->worlds.size(); i++)
+      //this->worlds[i]->Update();
+    usleep(10000);
+  }
 }

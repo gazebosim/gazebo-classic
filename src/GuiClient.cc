@@ -3,13 +3,15 @@
 #include "common/GazeboConfig.hh"
 
 #include "gui/SimulationApp.hh"
+
 #include "rendering/RenderEngine.hh"
 #include "rendering/RenderState.hh"
 #include "rendering/Scene.hh"
 
+#include "transport/Client.hh"
 #include "transport/IOManager.hh"
 
-#include "Client.hh"
+#include "GuiClient.hh"
 
 using namespace gazebo;
 
@@ -27,7 +29,7 @@ const std::string default_config =
 ";
 
 
-Client::Client()
+GuiClient::GuiClient()
   : renderEngineEnabled(true), guiEnabled(true)
 {
   this->gui = NULL;
@@ -41,15 +43,17 @@ Client::Client()
   {
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
+
+  this->client = new transport::Client("localhost","1234");
 }
 
-Client::~Client()
+GuiClient::~GuiClient()
 {
   if (this->gui)
     delete this->gui;
 }
 
-void Client::Load(const std::string &filename)
+void GuiClient::Load(const std::string &filename)
 {
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
@@ -140,7 +144,7 @@ void Client::Load(const std::string &filename)
   delete xmlFile;
 }
 
-void Client::Run()
+void GuiClient::Run()
 {
   rendering::Scene *scene = new rendering::Scene("default");
   scene->Load(NULL);

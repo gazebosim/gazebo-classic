@@ -94,7 +94,7 @@ home directory, or to the log file specified with the -l command line option.
 #include <iostream>
 
 #include "gazebo_config.h"
-#include "Server.hh"
+#include "PhysicsServer.hh"
 
 // Command line options
 std::string config_filename = "";
@@ -228,7 +228,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  gazebo::Server *server = new gazebo::Server();
+  gazebo::PhysicsServer *server = new gazebo::PhysicsServer();
   server->Load(config_filename);
   server->Init();
   server->Run();

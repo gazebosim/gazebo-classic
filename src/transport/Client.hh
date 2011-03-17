@@ -3,8 +3,9 @@
 
 #include <boost/asio.hpp>
 
-#include "common/Message.hh"
-#include "CallbackHelper.hh"
+#include "common/Messages.hh"
+#include "transport/IOManager.hh"
+#include "transport/CallbackHelper.hh"
 #include "transport/Connection.hh"
 
 namespace gazebo
@@ -16,9 +17,11 @@ namespace gazebo
       public: Client( const std::string &host, const std::string &service);
 
       public: template<class M, class T>
-              void Subscribe( const std::string &topic, void(T::*fp)(const M&), T *obj )
+              void Subscribe( const std::string &topic, 
+                              void(T::*fp)(const M&), T *obj )
               {
-                this->connection.reset( new Connection(IOManager::Instance()->GetIO()) );
+                this->connection.reset( 
+                    new Connection(IOManager::Instance()->GetIO()) );
                 this->connection->Connect(this->host, this->service);
 
                 //this->callback.reset( 
@@ -36,7 +39,10 @@ namespace gazebo
 
       private: ConnectionPtr connection;
       private: CallbackHelperPtr callback;
-      private: std::map<std::string, MessageType > topics;
+      private: std::string host;
+      private: std::string service;
+
+      //private: std::map<std::string, MessageType > topics;
     };
   }
 }

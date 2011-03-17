@@ -25,7 +25,7 @@ using namespace transport;
 // Constructor
 TopicManager::TopicManager()
 {
-  this->server = new Server(12345);
+  //this->server = new Server(12345);
   this->client = new Client("localhost", "12346");
 }
 
@@ -68,6 +68,7 @@ void TopicManager::SendMessage( const std::string &topic,
 // Handle an incoming message
 void TopicManager::HandleIncoming()
 {
+  std::cout << "TopManager::HandleIncoming\n";
   //implement this
   // Read a header in the message the indicates the topic
 }

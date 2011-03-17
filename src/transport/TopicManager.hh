@@ -94,6 +94,7 @@ namespace gazebo
       public: void SendMessage( const std::string &topic, 
                                 google::protobuf::Message &message );
 
+      private: void HandleIncoming();
 
       private: Server *server;
       private: Client *client;

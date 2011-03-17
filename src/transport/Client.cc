@@ -1,6 +1,6 @@
 #include <boost/bind.hpp>
 
-#include "common/Message.hh"
+#include "common/Messages.hh"
 #include "transport/IOManager.hh"
 #include "transport/Client.hh"
 
@@ -10,6 +10,7 @@ using namespace transport;
 Client::Client( const std::string &host, const std::string &service)
 //: connection(IOManager::Instance()->GetIO())
 {
+  std::cout << "Client::Constructor\n";
   this->host = host;
   this->service = service;
 
@@ -29,7 +30,8 @@ Client::Client( const std::string &host, const std::string &service)
 void Client::OnConnect(const boost::system::error_code &error,
     boost::asio::ip::tcp::resolver::iterator endpoint_iter)
 {
-  if (!error)
+  std::cout << "Client::OnConnect\n";
+  /*if (!error)
   {
     // Successful connection. Get the list of topics
     this->connection.async_read( boost::bind(&Client::OnReadInit, this, _1) );
@@ -50,11 +52,13 @@ void Client::OnConnect(const boost::system::error_code &error,
     // An error occurred
     std::cerr << error.message() << std::endl;
   }
+  */
 }
 
 void Client::OnReadInit(const std::vector<char> &data)
 {
-  IntMapMessage msg;
+  std::cout << "Client::OnReadInit\n";
+  /*IntMapMessage msg;
   Message::fillFromBuffer(msg, data);
 
   this->topics.clear();
@@ -65,11 +69,12 @@ void Client::OnReadInit(const std::vector<char> &data)
     std::cout << "Topic[" << iter->first << "] Type[" << iter->second << "]\n";
     this->topics[iter->first] = Message::ValidType(iter->second); 
   }
+  */
 }
 
 void Client::OnRead(const std::vector<char> &data)
 {
   std::cout << "Client::OnRead\n";
-  this->connection.async_read( boost::bind(&Client::OnRead, this, _1) );
-  this->callback->OnRead(data);
+  //this->connection.async_read( boost::bind(&Client::OnRead, this, _1) );
+  //this->callback->OnRead(data);
 }

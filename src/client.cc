@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <iostream>
 
-#include "Client.hh"
+#include "GuiClient.hh"
 
 std::string config_file = "";
 
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  gazebo::Client *client = new gazebo::Client();
+  gazebo::GuiClient *client = new gazebo::GuiClient();
   client->Load(config_file);
   client->Run();
 
