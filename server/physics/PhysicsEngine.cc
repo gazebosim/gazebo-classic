@@ -52,7 +52,7 @@ PhysicsEngine::PhysicsEngine()
   {
     this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
     this->visual->SetVisible(false);
-    this->contactLines.resize(5000);
+    this->contactLines.resize(1); // CREATES LINES IN SCENE MANAGER
 
     Material *mat = new Material();
     mat->SetName("ContactPointsMaterial");
