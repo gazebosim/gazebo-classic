@@ -26,7 +26,7 @@ using namespace transport;
 TopicManager::TopicManager()
 {
   //this->server = new Server(12345);
-  this->client = new Client("localhost", "12346");
+  //this->client = new Client("localhost", "12346");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

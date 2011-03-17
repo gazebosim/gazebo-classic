@@ -20,9 +20,6 @@ namespace gazebo
               void Subscribe( const std::string &topic, 
                               void(T::*fp)(const M&), T *obj )
               {
-                this->connection.reset( 
-                    new Connection(IOManager::Instance()->GetIO()) );
-                this->connection->Connect(this->host, this->service);
 
                 //this->callback.reset( 
                     //new CallbackHelperT<M>(boost::bind(fp, obj, _1)));

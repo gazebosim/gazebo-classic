@@ -8,11 +8,15 @@ using namespace gazebo;
 using namespace transport;
 
 Client::Client( const std::string &host, const std::string &service)
-//: connection(IOManager::Instance()->GetIO())
+  //: connection(IOManager::Instance()->GetIO())
 {
-  std::cout << "Client::Constructor\n";
+  std::cout << "transport::Client::Constructor\n";
   this->host = host;
   this->service = service;
+
+  this->connection.reset( new Connection(IOManager::Instance()->GetIO()) );
+
+  this->connection->Connect(this->host, this->service);
 
   // Resolve the host name into an IP address
   /*boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());

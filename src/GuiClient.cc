@@ -44,11 +44,15 @@ GuiClient::GuiClient()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
+  transport::IOManager::Instance()->Start();
+
   this->client = new transport::Client("localhost","1234");
 }
 
 GuiClient::~GuiClient()
 {
+  transport::IOManager::Instance()->Stop();
+
   if (this->gui)
     delete this->gui;
 }

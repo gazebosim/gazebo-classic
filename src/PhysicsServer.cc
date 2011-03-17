@@ -6,6 +6,7 @@
 #include "physics/PhysicsFactory.hh"
 
 #include "transport/Server.hh"
+#include "transport/IOManager.hh"
 
 #include "PhysicsServer.hh"
 
@@ -67,11 +68,14 @@ PhysicsServer::PhysicsServer()
 
   physics::PhysicsFactory::RegisterAll();
 
+  transport::IOManager::Instance()->Start();
+
   this->server = new transport::Server(1234);
 }
 
 PhysicsServer::~PhysicsServer()
 {
+  transport::IOManager::Instance()->Stop();
 }
 
 void PhysicsServer::Load( const std::string &filename )
