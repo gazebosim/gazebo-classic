@@ -67,7 +67,7 @@ PhysicsEngine::PhysicsEngine(World *world)
     //Simulator::Instance()->SendMessage( *this->visualMsg );
 
     /* NATY: put this back in
-    this->contactLines.resize(5000);
+    this->contactLines.resize(1);
 
     Material *mat = new Material();
     mat->SetName("ContactPointsMaterial");
