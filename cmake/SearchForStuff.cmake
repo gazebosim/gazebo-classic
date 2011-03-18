@@ -93,6 +93,7 @@ if (PKG_CONFIG_FOUND)
   endif (OGRE-RTShaderSystem_FOUND)
 
   set (OGRE_LIBRARY_PATH ${ogre_library_dirs} CACHE INTERNAL "Ogre library path")
+  set (OGRE_INCLUDE_DIRS ${ogre_include_dirs} CACHE INTERNAL "Ogre include path")
 
   #################################################
   # Find GTK
@@ -187,7 +188,7 @@ if (NOT boost_include_dirs AND NOT boost_library_dirs AND NOT boost_libraries )
   set(Boost_ADDITIONAL_VERSIONS "1.35" "1.35.0" "1.36" "1.36.1" "1.37.0" "1.39.0" CACHE INTERNAL "Boost Additional versions" FORCE)
   include (FindBoost)
 
-  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex system)
+  find_package( Boost ${MIN_BOOST_VERSION} REQUIRED thread signals regex system filesystem)
 
   if (NOT Boost_FOUND)
     set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)

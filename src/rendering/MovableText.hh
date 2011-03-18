@@ -23,9 +23,9 @@
 #ifndef MOVABLETEXT_HH
 #define MOVABLETEXT_HH
 
-#include <Ogre.h>
-#include <OgreMovableObject.h>
-#include <OgreRenderable.h>
+#include <OGRE/Ogre.h>
+#include <OGRE/OgreMovableObject.h>
+#include <OGRE/OgreRenderable.h>
 #include <string>
 
 namespace boost
