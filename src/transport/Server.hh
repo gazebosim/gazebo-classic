@@ -19,6 +19,8 @@ namespace gazebo
       public: void OnAccept(const boost::system::error_code &e, ConnectionPtr conn);
       public: void OnWrite(const boost::system::error_code &e, ConnectionPtr conn);
 
+      public: int GetConnectionCount() const;
+
       /*public: template<typename M>
               PublisherPtr Advertise(const std::string &topic_name)
               {

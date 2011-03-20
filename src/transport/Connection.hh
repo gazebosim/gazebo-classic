@@ -39,7 +39,7 @@ namespace gazebo
       public: void Connect(const std::string &host, const std::string &service);
 
       public: template<typename Handler>
-              void write(const std::string buffer, Handler handler)
+              void Write(const std::string buffer, Handler handler)
               {
                 std::ostringstream header_stream;
                 header_stream << std::setw(HEADER_LENGTH) 
@@ -64,7 +64,7 @@ namespace gazebo
               }
 
       public: template<typename Handler>
-              void read(Handler handler)
+              void Read(Handler handler)
               {
                 void (Connection::*f)(const boost::system::error_code &,
                     boost::tuple<Handler>) = &Connection::OnReadHeader<Handler>;

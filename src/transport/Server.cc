@@ -25,11 +25,20 @@ Server::Server(unsigned short port)
 
 void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
 {
-  std::cout << "Server::OnAccept\n";
-  /*if (!e)
+  if (!e)
   {
+    std::string out;
+
     this->connections.push_back(conn);
-    IntMapMessage msg;
+
+    msgs::Int portMsg;
+    portMsg.set_data( 9876 );
+    portMsg.SerializeToString(&out);
+
+    conn->Write( out, boost::bind(&Server::OnWrite, this,
+          boost::asio::placeholders::error, conn) );
+
+    /*IntMapMessage msg;
 
     std::map<std::string, PublisherPtr>::iterator iter;
     for (iter = this->publishers.begin(); 
@@ -41,7 +50,8 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
     // Send topic info
     conn->write( msg, boost::bind(&Server::OnWrite, this,
           boost::asio::placeholders::error, conn) );
-          
+          */
+
     std::cout << "Connection Count[" << this->connections.size() << "]\n";
 
     // Start an accept operation for a new connection
@@ -55,7 +65,6 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
     // An error occurred. Log it and return.
     std::cerr << e.message() << std::endl;
   }
-  */
 }
 
 void Server::Write(const std::string &msg)
@@ -78,4 +87,9 @@ void Server::OnWrite(const boost::system::error_code &e, ConnectionPtr conn)
 {
   // Nothing to do. The socket will be closed automatically when the last
   // reference to the connection object goes away
+}
+
+int Server::GetConnectionCount() const
+{
+  return this->connections.size();
 }

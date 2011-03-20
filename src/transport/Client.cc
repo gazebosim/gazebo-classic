@@ -35,6 +35,12 @@ void Client::OnConnect(const boost::system::error_code &error,
     boost::asio::ip::tcp::resolver::iterator endpoint_iter)
 {
   std::cout << "Client::OnConnect\n";
+  if (!error)
+  {
+    // Successful connection. Get the list of topics
+    this->connection->Read( boost::bind(&Client::OnReadInit, this, _1) );
+  }
+
   /*if (!error)
   {
     // Successful connection. Get the list of topics

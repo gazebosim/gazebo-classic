@@ -137,6 +137,8 @@ void PhysicsServer::Run()
 {
   while (true)
   {
+    std::cout << "Connections[" << this->server->GetConnectionCount() << "]\n";
+
     //for (int i=0; i < this->worlds.size(); i++)
       //this->worlds[i]->Update();
     usleep(10000);
