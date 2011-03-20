@@ -7,6 +7,15 @@ include_directories(
   ${XML_INCLUDE_DIRS} 
   ${PROJECT_BINARY_DIR}/src/msgs
   ${PROJECT_SOURCE_DIR}/src 
+  ${OGRE_INCLUDE_DIRS}
+  ${BOOST_INCLUDE_DIRS}
+)
+
+link_directories(  
+  ${OGRE_LIBRARY_PATH}
+  ${BOOST_LIBRARY_DIRS} 
+  ${assimp_library_dirs} 
+  ${ODE_LIBRARY_DIRS}
 )
 
 add_subdirectory(msgs)
@@ -16,6 +25,8 @@ add_subdirectory(libgazebo)
 add_subdirectory(rendering)
 add_subdirectory(gui)
 add_subdirectory(physics)
+
+add_dependencies( gazebo_rendering gazebo_msgs )
 
 add_executable(gazebo_server server.cc PhysicsServer.cc)
 add_executable(gazebo_client client.cc GuiClient.cc)

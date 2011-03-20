@@ -1,12 +1,19 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 include ( ${wxWidgets_USE_FILE} )
 
 include_directories( 
   ${XML_INCLUDE_DIRS} 
   ${PROJECT_BINARY_DIR}/src/msgs
   ${PROJECT_SOURCE_DIR}/src 
+  ${OGRE_INCLUDE_DIRS}
   ${wxWidgets_INCLUDE_DIRS}
   ${GTK2_INCLUDE_DIRS}
   propgrid 
+  ${BOOST_INCLUDE_DIRS}
+)
+
+link_directories(  
+  ${BOOST_LIBRARY_DIRS} 
 )
 
 set (sources SimulationApp.cc
@@ -69,7 +76,7 @@ set_source_files_properties(${sources} PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS
 
 add_library(gazebo_gui SHARED ${sources})
 
-target_link_libraries(gazebo_gui Xpm  ${wxWidgets_LIBRARIES} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
+target_link_libraries(gazebo_gui Xpm  ${wxWidgets_LIBRARIES} ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}} ${boost_libraries})
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 

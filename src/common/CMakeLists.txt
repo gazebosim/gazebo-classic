@@ -1,7 +1,19 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
+########################################
+# Include all the search paths for headers
+string (REPLACE " " ";" assimp_include_dirs_split "${assimp_include_dirs}")
+string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
+
 include_directories( 
   ${XML_INCLUDE_DIRS} 
   ${PROJECT_BINARY_DIR}/src/msgs
   ${PROJECT_SOURCE_DIR}/src 
+  ${assimp_include_dirs_split}
+)
+
+link_directories(  
+ ${assimp_library_dirs_split} 
 )
 
 set ( sources Messages.cc
