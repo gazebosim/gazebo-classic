@@ -15,6 +15,7 @@ set (msgs color.proto
           scene.proto
           fog.proto
           int.proto
+          string.proto
 )
 
 

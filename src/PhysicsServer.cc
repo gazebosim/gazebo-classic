@@ -56,6 +56,8 @@ const std::string default_config =
 
 PhysicsServer::PhysicsServer()
 {
+  this->quit = false;
+
   // load the configuration options 
   try
   {
@@ -70,7 +72,14 @@ PhysicsServer::PhysicsServer()
 
   transport::IOManager::Instance()->Start();
 
+  try
+  {
   this->server = new transport::Server(1234);
+  }
+  catch (std::exception &e)
+  {
+    gzthrow( "Unable to start server[" << e.what() << "]\n");
+  }
 }
 
 PhysicsServer::~PhysicsServer()
@@ -135,12 +144,17 @@ void PhysicsServer::Init()
 
 void PhysicsServer::Run()
 {
-  while (true)
+  while (!this->quit)
   {
-    std::cout << "Connections[" << this->server->GetConnectionCount() << "]\n";
+    //std::cout << "Connections[" << this->server->GetConnectionCount() << "]\n";
 
     //for (int i=0; i < this->worlds.size(); i++)
       //this->worlds[i]->Update();
     usleep(10000);
   }
+}
+
+void PhysicsServer::Quit()
+{
+  this->quit = true;
 }

@@ -3,6 +3,7 @@
 
 #include "transport/IOManager.hh"
 #include "transport/Server.hh"
+#include "gazebo_config.h"
 
 using namespace gazebo;
 using namespace transport;
@@ -27,16 +28,16 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
 {
   if (!e)
   {
-    std::string out;
-
     this->connections.push_back(conn);
 
-    msgs::Int portMsg;
-    portMsg.set_data( 9876 );
-    portMsg.SerializeToString(&out);
+    msgs::String stringMsg;
+    stringMsg.set_data( std::string("gazebo ") + GAZEBO_VERSION );
 
-    conn->Write( out, boost::bind(&Server::OnWrite, this,
-          boost::asio::placeholders::error, conn) );
+    std::cout << "Server::OnAccept write\n";
+    conn->Write( stringMsg, boost::bind(&Server::OnWrite, this,
+                 boost::asio::placeholders::error, conn) );
+
+    conn->Read( boost::bind(&Server::OnReadClientPort, this, _1) );
 
     /*IntMapMessage msg;
 
@@ -65,6 +66,13 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
     // An error occurred. Log it and return.
     std::cerr << e.message() << std::endl;
   }
+}
+
+void Server::OnReadClientPort(const std::string &data)
+{
+  msgs::String port;
+  port.ParseFromString(data);
+  std::cout << "Server read client port[" << port.data() << "]\n";
 }
 
 void Server::Write(const std::string &msg)

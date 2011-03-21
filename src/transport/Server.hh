@@ -32,6 +32,7 @@ namespace gazebo
                 return pub;
               }*/
 
+      private: void OnReadClientPort(const std::string &data);
       public: void Write(const std::string &msg);
 
       private: boost::asio::ip::tcp::acceptor acceptor;

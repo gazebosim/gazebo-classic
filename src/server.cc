@@ -107,6 +107,8 @@ int optTimeControl = 1;
 bool optPhysicsEnabled  = true;
 bool optPaused = false;
 
+gazebo::PhysicsServer *server = NULL;
+
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
 void PrintUsage()
@@ -208,6 +210,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ )
 {
+  server->Quit();
   //gazebo::event::Events::quitSignal();
   return;
 }
@@ -228,7 +231,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  gazebo::PhysicsServer *server = new gazebo::PhysicsServer();
+  server = new gazebo::PhysicsServer();
   server->Load(config_filename);
   server->Init();
   server->Run();

@@ -28,11 +28,10 @@ namespace gazebo
                     */
               }
 
-      private: void OnConnect(const boost::system::error_code &error,
-                   boost::asio::ip::tcp::resolver::iterator endpoint_iter);
+      private: void OnRead(const std::string &data);
+      private: void OnReadInit(const std::string &data);
 
-      private: void OnRead(const std::vector<char> &data);
-      private: void OnReadInit(const std::vector<char> &data);
+      private: void OnWrite(const boost::system::error_code &e, ConnectionPtr conn);
 
       private: ConnectionPtr connection;
       private: CallbackHelperPtr callback;

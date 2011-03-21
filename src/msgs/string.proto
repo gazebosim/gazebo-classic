@@ -1,0 +1,6 @@
+package gazebo.msgs;
+
+message String
+{
+  required string data = 1;
+}

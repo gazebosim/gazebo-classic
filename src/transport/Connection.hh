@@ -23,6 +23,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <google/protobuf/message.h>
+
 #define HEADER_LENGTH 8
 
 namespace gazebo
@@ -39,6 +41,14 @@ namespace gazebo
       public: void Connect(const std::string &host, const std::string &service);
 
       public: template<typename Handler>
+              void Write(const google::protobuf::Message &msg, Handler handler)
+              {
+                std::string out;
+                msg.SerializeToString(&out);
+                this->Write(out, handler);
+              }
+
+      public: template<typename Handler>
               void Write(const std::string buffer, Handler handler)
               {
                 std::ostringstream header_stream;
@@ -53,6 +63,7 @@ namespace gazebo
                 }
 
                 this->outbound_header = header_stream.str();
+                this->outbound_data = buffer;
 
                 // Write the serialized data to the socket. We use
                 // "gather-write" to send both the head and the data in
@@ -110,6 +121,7 @@ namespace gazebo
                   void (Connection::*f)(const boost::system::error_code &e,
                      boost::tuple<Handler>) = &Connection::OnReadData<Handler>;
 
+                  std::cout << "Async read stuff\n";
                   boost::asio::async_read( this->socket, 
                       boost::asio::buffer(this->inbound_data), 
                       boost::bind(f, this, boost::asio::placeholders::error, 
@@ -149,8 +161,11 @@ namespace gazebo
                    */
 
                    //helper->OnRead(this->inbound_data);
+                   
                    // Inform caller that data has been received
-                   boost::get<0>(handler)(this->inbound_data);
+                   std::string data(&this->inbound_data[0], 
+                                    this->inbound_data.size());
+                   boost::get<0>(handler)(data);
                  }
                }
 

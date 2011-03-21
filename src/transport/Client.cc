@@ -1,8 +1,11 @@
 #include <boost/bind.hpp>
 
+#include "common/GazeboError.hh"
 #include "common/Messages.hh"
 #include "transport/IOManager.hh"
 #include "transport/Client.hh"
+
+#include "gazebo_config.h"
 
 using namespace gazebo;
 using namespace transport;
@@ -16,75 +19,44 @@ Client::Client( const std::string &host, const std::string &service)
 
   this->connection.reset( new Connection(IOManager::Instance()->GetIO()) );
 
-  this->connection->Connect(this->host, this->service);
+  try
+  {
+    this->connection->Connect(this->host, this->service);
+  }
+  catch (boost::system::system_error e)
+  {
+    std::cerr << "Unable to connect to server[" << e.what() << "]\n";
+  }
 
-  // Resolve the host name into an IP address
-  /*boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());
-  boost::asio::ip::tcp::resolver::query query(host, service);
-  boost::asio::ip::tcp::resolver::iterator endpoint_iter = resolver.resolve(query);
-  boost::asio::ip::tcp::endpoint endpoint = *endpoint_iter;
+  // Read the version info
+  this->connection->Read( boost::bind(&Client::OnReadInit, this, _1) );
 
-  // Start an asynchronous connect operation
-  this->connection.GetSocket().async_connect( endpoint,
-      boost::bind(&Client::OnConnect, this,
-        boost::asio::placeholders::error, ++endpoint_iter) );
-        */
+  std::cout << "transport::Client::Constructor done\n";
 }
 
-void Client::OnConnect(const boost::system::error_code &error,
-    boost::asio::ip::tcp::resolver::iterator endpoint_iter)
+void Client::OnReadInit(const std::string &data)
 {
-  std::cout << "Client::OnConnect\n";
-  if (!error)
+  msgs::String gazeboVersion;
+  gazeboVersion.ParseFromString(data);
+
+  if (gazeboVersion.data() != (std::string("gazebo ") + GAZEBO_VERSION))
   {
-    // Successful connection. Get the list of topics
-    this->connection->Read( boost::bind(&Client::OnReadInit, this, _1) );
+    gzthrow(std::string("Version mismatch. My version[") + GAZEBO_VERSION + "] Remote version[" + gazeboVersion.data() + "]\n");
   }
 
-  /*if (!error)
-  {
-    // Successful connection. Get the list of topics
-    this->connection.async_read( boost::bind(&Client::OnReadInit, this, _1) );
-  }
-  else if (endpoint_iter != boost::asio::ip::tcp::resolver::iterator())
-  {
-    // try the next endpoint
-    this->connection.GetSocket().close();
-    boost::asio::ip::tcp::endpoint endpoint = *endpoint_iter;
+  msgs::String myConnectionInfo;
+  myConnectionInfo.set_data( "9876" );
 
-    // Start an asynchronous connect operation
-    this->connection.GetSocket().async_connect( endpoint,
-        boost::bind(&Client::OnConnect, this,
-          boost::asio::placeholders::error, ++endpoint_iter) );
-  }
-  else
-  {
-    // An error occurred
-    std::cerr << error.message() << std::endl;
-  }
-  */
+  this->connection->Write( myConnectionInfo, boost::bind(&Client::OnWrite, this, boost::asio::placeholders::error, this->connection) );
 }
 
-void Client::OnReadInit(const std::vector<char> &data)
+void Client::OnWrite(const boost::system::error_code &e, ConnectionPtr conn)
 {
-  std::cout << "Client::OnReadInit\n";
-  /*IntMapMessage msg;
-  Message::fillFromBuffer(msg, data);
-
-  this->topics.clear();
-
-  std::map<std::string, int>::iterator iter;
-  for (iter = msg.data.begin(); iter != msg.data.end(); iter++)
-  {
-    std::cout << "Topic[" << iter->first << "] Type[" << iter->second << "]\n";
-    this->topics[iter->first] = Message::ValidType(iter->second); 
-  }
-  */
 }
 
-void Client::OnRead(const std::vector<char> &data)
+void Client::OnRead(const std::string &data)
 {
-  std::cout << "Client::OnRead\n";
+  std::cout << "Client::OnRead[" << data << "]\n";
   //this->connection.async_read( boost::bind(&Client::OnRead, this, _1) );
   //this->callback->OnRead(data);
 }
