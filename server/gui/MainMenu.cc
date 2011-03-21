@@ -165,7 +165,7 @@ void MainMenu::ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/)
   if (World::Instance()->GetShowContacts())
     World::Instance()->GetPhysicsEngine()->SetContactVisual(5000);
   else
-    World::Instance()->GetPhysicsEngine()->SetContactVisual(0);
+    World::Instance()->GetPhysicsEngine()->SetContactVisual(1);
 
 }
 
