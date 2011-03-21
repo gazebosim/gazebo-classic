@@ -85,12 +85,12 @@ ODEPhysics::ODEPhysics()
   this->contactGroup = dJointGroupCreate(0);
 
   // If auto-disable is active, then user interaction with the joints 
-  // doesn't behave properly
-  dWorldSetAutoDisableFlag(this->worldId, 0);
+  // do not behave properly
   dWorldSetAutoDisableTime(this->worldId, 2.0);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 50);
+  dWorldSetAutoDisableFlag(this->worldId, 0);
 
   Param::Begin(&this->parameters);
 
@@ -865,7 +865,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         Vector3 contactNorm(contact.geom.normal[0], contact.geom.normal[1], 
                             contact.geom.normal[2]);
 
-        self->AddContactVisual(contactPos, contactNorm);
+        if (World::Instance()->GetShowContacts())
+          self->AddContactVisual(contactPos, contactNorm);
 
         // Store the contact info 
         if (geom1->GetContactsEnabled() ||

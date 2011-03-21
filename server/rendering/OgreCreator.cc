@@ -581,6 +581,9 @@ void OgreCreator::Update()
   std::list<Ogre::RenderWindow*>::iterator witer;
   std::map<std::string, OgreVisual*>::iterator viter;
 
+  // need to lock visual, text and lines update
+  boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
+
   // Update the text
   for (titer = this->text.begin(); titer != this->text.end(); titer++)
     (*titer)->Update();
@@ -594,7 +597,6 @@ void OgreCreator::Update()
   // separate thread.
   if (!this->visuals.empty())
   {
-    boost::recursive_mutex::scoped_lock lock(*Simulator::Instance()->GetMRMutex());
     // Update the visuals
     for (viter = this->visuals.begin(); viter != this->visuals.end(); viter++)
     {

@@ -669,13 +669,8 @@ void Simulator::PhysicsLoop()
   Time lastTime = this->GetRealTime();
   struct timespec req, rem;
 
-  double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
-  Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
-
   // hack for ROS, since ROS uses t=0 for special purpose
   this->simTime = world->GetPhysicsEngine()->GetStepTime();
-
-  Time step = world->GetPhysicsEngine()->GetStepTime();
 
   while (!this->userQuit)
   {
@@ -683,6 +678,12 @@ void Simulator::PhysicsLoop()
 
     {
       //DIAGNOSTICTIMER(timer1("PHYSICS MR MD Mutex and world->Update() ",6));
+
+      // these locks are needed to avoid race conditions on load, do not remove
+      // unless an alternative dead-lock prevention strategy has been implemented
+      boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
+      boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
+
       currTime = this->GetRealTime();
 
       // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
@@ -698,9 +699,6 @@ void Simulator::PhysicsLoop()
 
       lastTime = this->GetRealTime();
 
-      //boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
-      //boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
-
       world->Update();
     }
   
@@ -710,6 +708,10 @@ void Simulator::PhysicsLoop()
     req.tv_sec  = 0;
     req.tv_nsec = 1000;
 
+    // compute update rate and update period within the update loop 
+    // is less efficient, but allows changing update rate dynamically
+    double physicsUpdateRate = world->GetPhysicsEngine()->GetUpdateRate();
+    Time physicsUpdatePeriod = 1.0 / physicsUpdateRate;
     // If the physicsUpdateRate < 0, then we should try to match the
     // update rate to real time
     if ( physicsUpdateRate < 0 &&

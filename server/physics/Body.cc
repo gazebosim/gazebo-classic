@@ -620,6 +620,7 @@ void Body::LoadSensor(XMLConfigNode *node)
 /// Set the linear acceleration of the body
 void Body::SetLinearAccel(const Vector3 &accel)
 {
+  this->SetEnabled(true);
   this->linearAccel = accel;// * this->GetMass();
 }
 
@@ -629,6 +630,7 @@ void Body::SetLinearAccel(const Vector3 &accel)
 /// Set the angular acceleration of the body
 void Body::SetAngularAccel(const Vector3 &accel)
 {
+  this->SetEnabled(true);
   this->angularAccel = accel * this->mass.GetAsDouble();
 }
 

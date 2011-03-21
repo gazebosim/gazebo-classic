@@ -124,6 +124,14 @@ namespace gazebo
               return Time::GetWallTime() - this->startTime;
             }
 
+    /// Get the real time (elapsed time)
+    /// \return The real time
+    public: inline Time GetWallTime() const
+            {
+              std::cout << "gazebo::Simulator::GetWallTime() is deprecated, please use GetRealTime() instead\n";
+              return this->GetRealTime();
+            }
+
     //User Iteractions
     /// \brief Simulator finished by the user
     public: void SetUserQuit();

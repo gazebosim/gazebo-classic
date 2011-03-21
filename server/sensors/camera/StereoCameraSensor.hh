@@ -109,8 +109,6 @@ namespace gazebo
   
     //private: void UpdateAllDependentRenderTargets();
   
-    private: Ogre::TexturePtr renderTextures[4];
-    private: Ogre::RenderTarget *renderTargets[4];
     private: Ogre::MaterialPtr depthMaterial;
   
     private: std::string textureName[4];

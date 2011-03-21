@@ -52,48 +52,9 @@ PhysicsEngine::PhysicsEngine()
   {
     this->visual = OgreCreator::Instance()->CreateVisual("Physics_Engine_Visual");
     this->visual->SetVisible(false);
-    this->contactLines.resize(1); // CREATES LINES IN SCENE MANAGER
-
-    Material *mat = new Material();
-    mat->SetName("ContactPointsMaterial");
-    mat->SetPointSize(10);
-    mat->SetAmbient(Color(1,0,0,1));
-    mat->SetDiffuse(Color(1,0,0,1));
-    mat->SetEmissive(Color(1,0,0,1));
-    std::string matName = OgreCreator::CreateMaterial(mat);
-
-    unsigned int i=0;
-    for (this->contactLinesIter = this->contactLines.begin();
-         this->contactLinesIter != this->contactLines.end(); 
-         this->contactLinesIter++, i++)
-    {
-      (*this->contactLinesIter) = OgreCreator::Instance()->CreateDynamicLine(
-          OgreDynamicRenderable::OT_LINE_LIST);
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
-      (*this->contactLinesIter)->setMaterial(matName);
-      this->visual->AttachObject(*this->contactLinesIter);
-    }
-    this->contactLinesIter = this->contactLines.begin();
-
-    World::Instance()->ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
-
-    delete mat;
+    this->SetContactVisual(1);
   }
+  World::Instance()->ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,9 +152,75 @@ Geom *PhysicsEngine::CreateGeom(std::string typeName, Body *body)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a contact visual
+void PhysicsEngine::SetContactVisual(int num_contacts)
+{
+  if (!World::Instance()->GetShowContacts())
+    return;
+
+  // lock rendering loop before modifications on the visual
+  boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
+
+  // reset contact visuals
+  if (!this->contactLines.empty())
+  {
+    // clear contact visuals
+    this->visual->DetachObjects();
+    for (this->contactLinesIter = this->contactLines.begin();
+         this->contactLinesIter != this->contactLines.end(); 
+         this->contactLinesIter++)
+    {
+      OgreCreator::Instance()->DeleteDynamicLine(*this->contactLinesIter);
+    }
+    this->contactLines.clear();
+  }
+
+
+  // setup default empty contacts with 0 points
+  this->contactLines.resize(num_contacts);
+  this->contactLinesIter == this->contactLines.begin();
+
+  Material *mat = new Material();
+  mat->SetName("ContactPointsMaterial");
+  mat->SetPointSize(10);
+  mat->SetAmbient(Color(1,0,0,1));
+  mat->SetDiffuse(Color(1,0,0,1));
+  mat->SetEmissive(Color(1,0,0,1));
+  std::string matName = OgreCreator::CreateMaterial(mat);
+
+  for (this->contactLinesIter = this->contactLines.begin();
+       this->contactLinesIter != this->contactLines.end(); 
+       this->contactLinesIter++)
+  {
+    (*this->contactLinesIter) = OgreCreator::Instance()->CreateDynamicLine(
+        OgreDynamicRenderable::OT_LINE_LIST);
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->AddPoint(Vector3(0,0,0));
+    (*this->contactLinesIter)->setMaterial(matName);
+    this->visual->AttachObject(*this->contactLinesIter);
+  }
+  this->contactLinesIter = this->contactLines.begin();
+
+  delete mat;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Add a contact visual
 void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 {
-  return;
   if (!World::Instance()->GetShowContacts())
     return;
 
@@ -233,8 +260,6 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 // Set whether to show contacts
 void PhysicsEngine::ShowVisual(bool show)
 {
-  return;
-
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
   this->visual->SetVisible(show);

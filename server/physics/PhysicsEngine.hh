@@ -202,6 +202,9 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: virtual double GetMaxContacts() {return 0;}
 
+    /// \brief Setup contact visuals
+    public: void SetContactVisual(int num_contacts);
+
     /// \brief Add a contact visual
     protected: void AddContactVisual(Vector3 pos, Vector3 norm);
 

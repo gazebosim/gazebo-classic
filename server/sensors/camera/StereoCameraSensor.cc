@@ -42,6 +42,7 @@
 #include "SensorFactory.hh"
 #include "CameraManager.hh"
 #include "StereoCameraSensor.hh"
+#include "Simulator.hh"
 
 #define PF_FLOAT Ogre::PF_FLOAT32_R
 #define PF_RGB Ogre::PF_BYTE_RGB
@@ -85,6 +86,35 @@ void StereoCameraSensor::LoadChild( XMLConfigNode *node )
   this->LoadCam(node);
 
   this->baseline = node->GetDouble("baseline",0,1);
+
+  if (Simulator::Instance()->GetRenderEngineEnabled())
+  {
+    this->ogreTextureName = this->GetName() + "_RttTex";
+    this->ogreMaterialName = this->GetName() + "_RttMat";
+
+    this->renderTargets.resize(4);
+    this->renderTextures.resize(4);
+
+    for (int i=0; i < 4; i++)
+    {
+      // Create the render texture
+      this->renderTextures[i] = Ogre::TextureManager::getSingleton().createManual(
+          this->ogreTextureName + boost::lexical_cast<std::string>(i),
+          "General",
+          Ogre::TEX_TYPE_2D,
+          this->imageSizeP->GetValue().x, 
+          this->imageSizeP->GetValue().y,
+          0,
+          this->imageFormat,
+          Ogre::TU_RENDERTARGET);
+
+      this->renderTargets[i] = this->renderTextures[i]->getBuffer()->getRenderTarget();
+    }
+    this->renderTexture = this->renderTextures[0];
+    this->renderTarget = this->renderTargets[0];
+
+  }
+
 }
 
 //////////////////////////////////////////////////////////////////////////////

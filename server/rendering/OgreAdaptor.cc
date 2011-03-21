@@ -514,8 +514,12 @@ void OgreAdaptor::UpdateCameras()
     timer.Start();
 
     //DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
-    //boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
-    //boost::recursive_mutex::scoped_lock model_delete_lock(*Simulator::Instance()->GetMDMutex());
+
+    // these locks are needed to avoid race conditions on load, do not remove
+    // unless an alternative dead-lock prevention strategy has been implemented
+    boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
+    boost::recursive_mutex::scoped_lock model_delete_lock(*Simulator::Instance()->GetMDMutex());
+
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       if (dynamic_cast<UserCamera*>((*iter)) == NULL)
@@ -527,7 +531,10 @@ void OgreAdaptor::UpdateCameras()
 
   // Must update the user camera's last.
   {
-    //DIAGNOSTICTIMER(timer("UpdateCameras: UserCamera update",6));
+    // this lock is needed if visuals are manipulated in physics loop during updates, do not remove unless
+    // alternate check is in place
+    boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
+
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       userCam = dynamic_cast<UserCamera*>((*iter));
@@ -572,11 +579,14 @@ void OgreAdaptor::UpdateCameras()
     this->rrobin = 0;
 
   this->renderCount++;
+/* debugging test code
   if (this->renderCount == 2000)
   {
     std::cout << "Count[" << this->renderCount << "] RTime[" << this->sumRenderTime.Double() / this->renderTimeCount << "] CTime[" << this->sumCaptureTime.Double() / this->captureTimeCount << "]\n";
     Simulator::Instance()->SetUserQuit();
   }
+*/
+
 }
 
 

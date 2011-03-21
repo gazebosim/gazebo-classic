@@ -34,6 +34,7 @@
 #include "OgreCamera.hh"
 #include "OgreAdaptor.hh"
 #include "MainMenu.hh"
+#include "PhysicsEngine.hh"
 
 #include <boost/thread.hpp>
 
@@ -160,6 +161,12 @@ void MainMenu::WireframeCB(Fl_Widget * /*w*/, void * /*data*/)
 void MainMenu::ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   World::Instance()->SetShowContacts( !World::Instance()->GetShowContacts() );
+
+  if (World::Instance()->GetShowContacts())
+    World::Instance()->GetPhysicsEngine()->SetContactVisual(5000);
+  else
+    World::Instance()->GetPhysicsEngine()->SetContactVisual(0);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
