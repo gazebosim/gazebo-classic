@@ -1,0 +1,6 @@
+package gazebo.msgs;
+
+message Int
+{
+  required int32 data = 1;
+}
