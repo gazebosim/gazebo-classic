@@ -218,12 +218,11 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // If auto-disable is active, then user interaction with the joints 
   // doesn't behave properly
   // disable autodisable by default
-  /*dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
+  dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
   dWorldSetAutoDisableTime(this->worldId, 2.0);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 50);
-*/
 
   this->contactGeoms.resize(std::max(**this->maxContactsP,this->defaultContactCount));
   this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());

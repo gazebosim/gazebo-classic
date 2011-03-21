@@ -777,8 +777,9 @@ void OgreVisual::SetPosition( const Vector3 &pos)
 
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 
-  if (this->IsStatic())
+  /*if (this->IsStatic())
     this->MakeStatic();
+    */
     
 }
 
