@@ -68,7 +68,8 @@ GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 ODEPhysics::ODEPhysics()
     : PhysicsEngine()
 {
-  this->defaultContactCount = 10;
+  // Most simulation scenarios (e.g. cup on a table) require minimum of 50 to 100 contacts.
+  this->defaultContactCount = 100;
 
   // Collision detection init
   dInitODE2(0);
@@ -215,9 +216,10 @@ void ODEPhysics::Load(XMLConfigNode *node)
   // This helps prevent jittering problems.
   dWorldSetContactSurfaceLayer(this->worldId, contactSurfaceLayerP->GetValue());
 
-  // If auto-disable is active, then user interaction with the joints 
-  // doesn't behave properly
-  // disable autodisable by default
+  // If auto-disable is active, then user interaction with the joints doesn't behave properly
+  // unless the thresholds are very very carefully tuned for every simulation scenario,
+  // as a funciton of step size, contact margin, kp, kd (cfm, erp).
+  // So disable autodisable by default.  Use at your own discretion.
   dWorldSetAutoDisableFlag(this->worldId, this->autoDisableBodyP->GetValue());
   dWorldSetAutoDisableTime(this->worldId, 2.0);
   dWorldSetAutoDisableLinearThreshold(this->worldId, 0.001);
