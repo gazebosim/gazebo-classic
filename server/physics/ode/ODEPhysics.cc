@@ -428,7 +428,7 @@ void ODEPhysics::UpdateCollision()
 // Update the ODE engine
 void ODEPhysics::UpdatePhysics()
 {
-  PhysicsEngine::UpdatePhysics();
+  /*PhysicsEngine::UpdatePhysics();
 
   {
     DIAGNOSTICTIMER(timer("ODEPhysics: UpdateCollision",6));
@@ -463,6 +463,7 @@ void ODEPhysics::UpdatePhysics()
 
   this->UnlockMutex(); 
   
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////

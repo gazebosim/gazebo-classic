@@ -123,6 +123,7 @@ unsigned int optMsgLevel = 1;
 int optTimeControl = 1;
 bool optPhysicsEnabled  = true;
 bool optPaused = false;
+bool optOgreLog = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: Implement these options
@@ -140,6 +141,7 @@ void PrintUsage()
   fprintf(stderr, "  -n            : Do not do any time control\n");
   fprintf(stderr, "  -p            : Run without physics engine\n");
   fprintf(stderr, "  -u            : Start the simulation paused\n");
+  fprintf(stderr, "  -o            : Create an Ogre.log file\n");
   fprintf(stderr, "  --add_plugin  : Add a plugin to the running gazebo\n");
   fprintf(stderr, "  --remove_plugin  : Remove a plugin from the running gazebo\n");
   fprintf(stderr, "  <worldfile>   : load the the indicated world file\n");
@@ -165,13 +167,17 @@ int ParseArgs(int argc, char **argv)
   FILE *tmpFile;
   int ch;
 
-  char *flags = (char*)("l:hd:s:fgxt:nqperu");
+  char *flags = (char*)("l:hd:s:fgxt:nqperuo");
 
   // Get letter options
   while ((ch = getopt(argc, argv, flags)) != -1)
   {
     switch (ch)
     {
+      case 'o':
+        optOgreLog = true;
+        break;
+
       case 'u':
         optPaused = true;
         break;
@@ -268,6 +274,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  gazebo::Simulator::Instance()->SetCreateOgreLog( optOgreLog );
   gazebo::Simulator::Instance()->SetGuiEnabled( optGuiEnabled );
   gazebo::Simulator::Instance()->SetRenderEngineEnabled( optRenderEngineEnabled );
 

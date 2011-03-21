@@ -121,6 +121,7 @@ Simulator::Simulator()
   this->gazeboConfig=new gazebo::GazeboConfig();
   this->pause = false;
   this->physicsThread = NULL;
+  this->ogreLog = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -422,6 +423,7 @@ void Simulator::MainLoop()
     DIAGNOSTICTIMER(timer("GUI LOOP",6));
 
     currTime = Time::GetWallTime();
+
     if ( currTime - lastTime > 1.0/freq)
     {
       lastTime = Time::GetWallTime();
@@ -560,7 +562,7 @@ void Simulator::SetStepInc(bool step)
 {
   boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
   this->stepInc = step;
-  this->stepSignal(step);
+  //this->stepSignal(step);
 
   this->SetPaused(!step);
 }
@@ -681,8 +683,6 @@ void Simulator::PhysicsLoop()
 
     {
       //DIAGNOSTICTIMER(timer1("PHYSICS MR MD Mutex and world->Update() ",6));
-      //boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
-      //boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
       currTime = this->GetRealTime();
 
       // performance wise, this is not ideal, move this outside of while loop and use signals and slots.
@@ -698,6 +698,9 @@ void Simulator::PhysicsLoop()
 
       lastTime = this->GetRealTime();
 
+      //boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
+      //boost::recursive_mutex::scoped_lock model_delete_lock(*this->GetMDMutex());
+
       world->Update();
     }
   
@@ -705,7 +708,7 @@ void Simulator::PhysicsLoop()
 
     // Set a default sleep time
     req.tv_sec  = 0;
-    req.tv_nsec = 0;
+    req.tv_nsec = 1000;
 
     // If the physicsUpdateRate < 0, then we should try to match the
     // update rate to real time
@@ -816,4 +819,18 @@ void Simulator::RemovePlugin(const std::string &name)
       break;
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set whether a Ogre.log file should be created
+void Simulator::SetCreateOgreLog(bool v) 
+{
+  this->ogreLog = v;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Return true if a Ogre.log file should be created
+bool Simulator::GetCreateOgreLog() const
+{
+  return this->ogreLog;
 }

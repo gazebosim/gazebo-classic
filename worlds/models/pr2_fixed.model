@@ -131,6 +131,7 @@
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
         <sensor:ray name="base_laser">
+            <alwaysActive>true</alwaysActive>
             <rayCount>640</rayCount>
             <rangeCount>640</rangeCount>
             <laserCount>1</laserCount>
@@ -935,7 +936,9 @@
         <rpy>0 -0 0</rpy>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:camera name="narrow_stereo_gazebo_l_stereo_camera_sensor">
+            <alwaysActive>true</alwaysActive>
             <imageSize>640 480</imageSize>
             <imageFormat>L8</imageFormat>
             <hfov>45</hfov>
@@ -943,6 +946,7 @@
             <farClip>100</farClip>
             <updateRate>25.0</updateRate>
         </sensor:camera>
+        -->
     </body:empty>
     <joint:fixed name="narrow_stereo_gazebo_l_stereo_camera_frame_joint">
         <body1>narrow_stereo_gazebo_l_stereo_camera_frame</body1>
@@ -965,7 +969,9 @@
         <rpy>0 -0 0</rpy>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:camera name="narrow_stereo_gazebo_r_stereo_camera_sensor">
+            <alwaysActive>true</alwaysActive>
             <imageSize>640 480</imageSize>
             <imageFormat>L8</imageFormat>
             <hfov>45</hfov>
@@ -973,6 +979,7 @@
             <farClip>100</farClip>
             <updateRate>25.0</updateRate>
         </sensor:camera>
+        -->
     </body:empty>
     <joint:fixed name="narrow_stereo_gazebo_r_stereo_camera_frame_joint">
         <body1>narrow_stereo_gazebo_r_stereo_camera_frame</body1>
@@ -1030,7 +1037,9 @@
         <rpy>0 -0 0</rpy>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:camera name="wide_stereo_gazebo_l_stereo_camera_sensor">
+            <alwaysActive>true</alwaysActive>
             <imageSize>640 480</imageSize>
             <imageFormat>BAYER_BGGR8</imageFormat>
             <hfov>90</hfov>
@@ -1038,6 +1047,7 @@
             <farClip>100</farClip>
             <updateRate>25.0</updateRate>
         </sensor:camera>
+        -->
     </body:empty>
     <joint:fixed name="wide_stereo_gazebo_l_stereo_camera_frame_joint">
         <body1>wide_stereo_gazebo_l_stereo_camera_frame</body1>
@@ -1060,7 +1070,9 @@
         <rpy>0 -0 0</rpy>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:camera name="wide_stereo_gazebo_r_stereo_camera_sensor">
+            <alwaysActive>true</alwaysActive>
             <imageSize>640 480</imageSize>
             <imageFormat>BAYER_BGGR8</imageFormat>
             <hfov>90</hfov>
@@ -1068,6 +1080,7 @@
             <farClip>100</farClip>
             <updateRate>25.0</updateRate>
         </sensor:camera>
+        -->
     </body:empty>
     <joint:fixed name="wide_stereo_gazebo_r_stereo_camera_frame_joint">
         <body1>wide_stereo_gazebo_r_stereo_camera_frame</body1>
@@ -1090,7 +1103,9 @@
         <rpy>0 -0 0</rpy>
         <turnGravityOff>false</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:camera name="high_def_sensor">
+            <alwaysActive>true</alwaysActive>
             <imageFormat>R8G8B8</imageFormat>
             <imageSize>2448 2050</imageSize>
             <hfov>45</hfov>
@@ -1098,6 +1113,7 @@
             <farClip>100</farClip>
             <updateRate>20.0</updateRate>
         </sensor:camera>
+        -->
     </body:empty>
     <joint:fixed name="high_def_frame_joint">
         <body1>high_def_frame</body1>
@@ -1417,7 +1433,9 @@
         <rpy>-90 -32.25 0</rpy>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:camera name="l_forearm_cam_sensor">
+            <alwaysActive>true</alwaysActive>
             <imageSize>640 480</imageSize>
             <imageFormat>L8</imageFormat>
             <hfov>90</hfov>
@@ -1425,6 +1443,7 @@
             <farClip>100</farClip>
             <updateRate>25.0</updateRate>
         </sensor:camera>
+        -->
     </body:empty>
     <joint:fixed name="l_forearm_cam_frame_joint">
         <body1>l_forearm_cam_frame</body1>
@@ -2191,7 +2210,9 @@
         <rpy>90 -32.25 0</rpy>
         <turnGravityOff>true</turnGravityOff>
         <selfCollide>false</selfCollide>
+        <!--
         <sensor:camera name="r_forearm_cam_sensor">
+            <alwaysActive>true</alwaysActive>
             <imageSize>640 480</imageSize>
             <imageFormat>L8</imageFormat>
             <hfov>90</hfov>
@@ -2199,6 +2220,7 @@
             <farClip>100</farClip>
             <updateRate>25.0</updateRate>
         </sensor:camera>
+        -->
     </body:empty>
     <joint:fixed name="r_forearm_cam_frame_joint">
         <body1>r_forearm_cam_frame</body1>

@@ -178,6 +178,16 @@ namespace gazebo
     private: std::vector<OgreCamera*> cameras;
 
     private: int renderCount;
+    private: int robin;
+    private: int rrobin;
+    private: bool startBlitting;
+
+    private: Time sumCaptureTime;
+    private: int captureTimeCount;
+
+    private: Time sumRenderTime;
+    private: int renderTimeCount;
+
 
     private: friend class DestroyerT<OgreAdaptor>;
     private: friend class SingletonT<OgreAdaptor>;

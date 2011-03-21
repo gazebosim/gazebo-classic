@@ -179,6 +179,12 @@ namespace gazebo
     /// \brief Add a plugin
     public: void AddPlugin(const std::string &plugin, const std::string &handle);
 
+    /// \brief Set whether a Ogre.log file should be created
+    public: void SetCreateOgreLog(bool v);
+
+    /// \brief Return true if a Ogre.log file should be created
+    public: bool GetCreateOgreLog() const;
+
     /// \brief Remove a plugin
     public: void RemovePlugin(const std::string &plugin);
 
@@ -243,6 +249,8 @@ namespace gazebo
 
     /// True if physics is enabled
     private: bool physicsEnabled;
+
+    private: bool ogreLog;
 
     /// Length of time the simulation should run
     private: double timeout;

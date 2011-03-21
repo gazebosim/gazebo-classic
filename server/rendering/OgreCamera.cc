@@ -237,15 +237,31 @@ void OgreCamera::InitCam()
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
 
-  this->camera = OgreCreator::CreateCamera(this->cameraName, 
-      **this->nearClipP, **this->farClipP, *(**this->hfovP), 
-      this->renderTarget );
+
+  if (this->renderTargets.size() > 0)
+  {
+    this->camera = OgreCreator::CreateCamera(this->cameraName, 
+        **this->nearClipP, **this->farClipP, *(**this->hfovP), 
+        this->renderTargets[0] );
+    for (int i=1; i < this->renderTargets.size(); i++)
+    {
+      Ogre::Viewport *cviewport = this->renderTargets[i]->addViewport(camera);
+      cviewport->setClearEveryFrame(true);
+      cviewport->setBackgroundColour( 
+          *OgreAdaptor::Instance()->backgroundColor );
+    }
+
+  }
+  else
+    this->camera = OgreCreator::CreateCamera(this->cameraName, 
+        **this->nearClipP, **this->farClipP, *(**this->hfovP), 
+        this->renderTarget );
 
   // Create a scene node to control pitch motion
   this->pitchNode = this->sceneNode->createChildSceneNode( this->cameraName + "PitchNode");
   this->pitchNode->pitch(Ogre::Degree(0));
   this->pitchNode->attachObject(this->camera);
-  this->camera->setAutoAspectRatio(true);
+  //this->camera->setAutoAspectRatio(true);
 
   this->saveCount = 0;
 
@@ -260,7 +276,7 @@ void OgreCamera::InitCam()
 
   depthMaterialName = this->GetCameraName() + "_RttMat_Stereo_Depth";
 
-  depthTexture = this->CreateRTT(depthTextureName, true);
+  /*depthTexture = this->CreateRTT(depthTextureName, true);
   depthTarget = depthTexture->getBuffer()->getRenderTarget();
   depthTarget->setAutoUpdated(false);
   //
@@ -285,6 +301,7 @@ void OgreCamera::InitCam()
   matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
 		  depthTextureName );
 
+  */
   //this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName(depthMaterialName);
   this->depthMaterial = Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap");
   this->depthMaterial->load();
@@ -381,10 +398,10 @@ void OgreCamera::SetUpdateRate(const double &rate)
   this->updateRateP->SetValue(rate); // need this when called externally
 }
 
-void OgreCamera::CaptureData()
+void OgreCamera::CaptureData(int index)
 {
-  if (this->captureData)
-  {
+  //if (this->captureData)
+  //{
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
     Ogre::RenderTexture *rTexture;
     Ogre::Viewport* renderViewport;
@@ -392,11 +409,11 @@ void OgreCamera::CaptureData()
     size_t size;
 
     // Get access to the buffer and make an image and write it to file
-    pixelBuffer = this->renderTexture->getBuffer();
+    pixelBuffer = this->renderTextures[index]->getBuffer();
     rTexture = pixelBuffer->getRenderTarget();
 
     // Not sure if we need to lock it
-    pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+    //pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
 
     Ogre::PixelFormat format = pixelBuffer->getFormat();
     renderViewport = rTexture->getViewport(0);
@@ -421,18 +438,18 @@ void OgreCamera::CaptureData()
 
     pixelBuffer->blitToMemory( src_box, dst_box );
 
-    pixelBuffer->unlock();
+    //pixelBuffer->unlock();
 
     // Blit the depth buffer if needed
     if (this->simulateDepthData)
     {
         pixelBuffer = this->depthTexture->getBuffer(0, 0);
-        pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
+        //pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
     	Ogre::PixelBox dpt_box((**this->imageSizeP).x, (**this->imageSizeP).y,
             1, Ogre::PF_FLOAT32_R, this->saveDepthBuffer);
 
     	pixelBuffer->blitToMemory(src_box, dpt_box);
-        pixelBuffer->unlock();
+        //pixelBuffer->unlock();
     }
 
 
@@ -440,12 +457,12 @@ void OgreCamera::CaptureData()
     {
       this->SaveFrame();
     }
-  }
+  //}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Render the camera
-void OgreCamera::Render()
+void OgreCamera::Render(int index)
 {
   // disable rendering if "-r" option is given
   if (!Simulator::Instance()->GetRenderEngineEnabled())
@@ -463,7 +480,7 @@ void OgreCamera::Render()
       //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
       this->lastRenderTime = Simulator::Instance()->GetSimTime();
 
-      this->renderTarget->update();
+      this->renderTargets[index]->update();
 
       // produce depth data for the camera
       /*if (this->simulateDepthData)

@@ -47,7 +47,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent), line(NULL)
     this->parent->GetVisualNode()->AttachObject(this->line);
 
     this->line->setMaterial("Gazebo/BlueEmissive");
-    this->line->setVisibilityFlags(GZ_LASER_CAMERA);
+    //this->line->setVisibilityFlags(GZ_LASER_CAMERA);
   }
 
   this->contactLen = DBL_MAX;

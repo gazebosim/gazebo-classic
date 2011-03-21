@@ -88,10 +88,10 @@ PhysicsEngine::PhysicsEngine()
       (*this->contactLinesIter)->setMaterial(matName);
       this->visual->AttachObject(*this->contactLinesIter);
     }
+    this->contactLinesIter = this->contactLines.begin();
 
     World::Instance()->ConnectShowContactsSignal( boost::bind(&PhysicsEngine::ShowVisual, this, _1) );
 
-    this->contactLinesIter = this->contactLines.begin();
     delete mat;
   }
 }
@@ -193,6 +193,7 @@ Geom *PhysicsEngine::CreateGeom(std::string typeName, Body *body)
 /// Add a contact visual
 void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 {
+  return;
   if (!World::Instance()->GetShowContacts())
     return;
 
@@ -232,6 +233,8 @@ void PhysicsEngine::AddContactVisual(Vector3 pos, Vector3 norm)
 // Set whether to show contacts
 void PhysicsEngine::ShowVisual(bool show)
 {
+  return;
+
   if (!Simulator::Instance()->GetRenderEngineEnabled())
     return;
   this->visual->SetVisible(show);

@@ -58,6 +58,26 @@
     </body:plane>
   </model:physical>
 
+  <model:physical name="wg_model">
+    <xyz>-8 -4 0</xyz>
+    <static>true</static>
+
+    <body:box name="wg_body">
+      <xyz>0 0 0</xyz>
+      <geom:trimesh name="wg_geom">
+        <size>1 1 1</size>
+        <mesh>willowgarage.dae</mesh>
+        <scale>0.0254 0.0254 0.0254</scale>
+        <mass>0</mass>
+        <visual>
+          <mesh>willowgarage.dae</mesh>
+          <scale>0.0254 0.0254 0.0254</scale>
+        </visual>
+      </geom:trimesh>
+    </body:box>
+  </model:physical>
+
+
   <model:physical name="pr2">
     <include embedded="true">
       <xi:include href="models/pr2_fixed.model"/>

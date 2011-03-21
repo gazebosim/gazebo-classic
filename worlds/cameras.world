@@ -29,7 +29,7 @@
 
   <rendering:gui>
     <type>fltk</type>
-    <size>800 600</size>
+    <size>200 200</size>
     <pos>0 0</pos>
   </rendering:gui>
 
@@ -75,7 +75,6 @@
     </body:box>
   </model:physical>
 
-
   <model:physical name="camera">
     <xyz> 0 0 5 </xyz>
     <static>true</static>
@@ -89,80 +88,64 @@
         </visual>
       </geom:box>
 
-    <sensor:camera name="narrow_left">
+    <sensor:camera name="big_texture">
       <alwaysActive>true</alwaysActive>
-      <imageSize>640 480</imageSize>
+      <imageSize>320 240</imageSize>
       <updateRate>25</updateRate>
-      <hfov>45</hfov>
-      <nearClip>0.1</nearClip>
-      <farClip>100</farClip>
-      <imageFormat>L8</imageFormat>
-      <saveFrames>true</saveFrames>
-      <saveFramePath>/tmp/frames</saveFramePath>
-    </sensor:camera>
-
-    <sensor:camera name="narrow_right">
-      <alwaysActive>true</alwaysActive>
-      <imageSize>640 480</imageSize>
-      <updateRate>25</updateRate>
-      <hfov>45</hfov>
-      <nearClip>0.1</nearClip>
-      <farClip>100</farClip>
-      <imageFormat>L8</imageFormat>
-      <saveFrames>true</saveFrames>
-      <saveFramePath>/tmp/frames</saveFramePath>
-    </sensor:camera>
-
-    <sensor:camera name="arm_left">
-      <alwaysActive>true</alwaysActive>
-      <imageSize>640 480</imageSize>
-      <updateRate>25</updateRate>
-      <hfov>90</hfov>
-      <imageFormat>L8</imageFormat>
-      <nearClip>0.1</nearClip>
-      <farClip>100</farClip>
-      <saveFrames>true</saveFrames>
-      <saveFramePath>/tmp/frames</saveFramePath>
-    </sensor:camera>
-
-    <sensor:camera name="arm_right">
-      <alwaysActive>true</alwaysActive>
-      <imageSize>640 480</imageSize>
-      <updateRate>25</updateRate>
-      <hfov>90</hfov>
-      <imageFormat>L8</imageFormat>
-      <nearClip>0.1</nearClip>
-      <farClip>100</farClip>
-      <saveFrames>true</saveFrames>
-      <saveFramePath>/tmp/frames</saveFramePath>
-    </sensor:camera>
-
-    <sensor:camera name="wide_left">
-      <alwaysActive>true</alwaysActive>
-      <imageSize>640 480</imageSize>
-      <updateRate>25</updateRate>
-      <imageFormat>BAYER_BGGR8</imageFormat>
+      <imageFormat>R8G8B8</imageFormat>
       <hfov>90</hfov>
       <nearClip>0.1</nearClip>
-      <farClip>100</farClip>
-      <saveFrames>true</saveFrames>
+      <farClip>10</farClip>
+      <saveFrames>false</saveFrames>
       <saveFramePath>/tmp/frames</saveFramePath>
     </sensor:camera>
 
-    <sensor:camera name="wide_right">
+    <sensor:camera name="big_texture2">
       <alwaysActive>true</alwaysActive>
-      <imageSize>640 480</imageSize>
+      <imageSize>320 240</imageSize>
       <updateRate>25</updateRate>
-      <imageFormat>BAYER_BGGR8</imageFormat>
+      <imageFormat>R8G8B8</imageFormat>
       <hfov>90</hfov>
       <nearClip>0.1</nearClip>
-      <farClip>100</farClip>
-      <saveFrames>true</saveFrames>
+      <farClip>10</farClip>
+      <saveFrames>false</saveFrames>
       <saveFramePath>/tmp/frames</saveFramePath>
     </sensor:camera>
 
+    <sensor:camera name="big_texture3">
+      <alwaysActive>true</alwaysActive>
+      <imageSize>320 240</imageSize>
+      <updateRate>25</updateRate>
+      <imageFormat>R8G8B8</imageFormat>
+      <hfov>90</hfov>
+      <nearClip>0.1</nearClip>
+      <farClip>10</farClip>
+      <saveFrames>false</saveFrames>
+      <saveFramePath>/tmp/frames</saveFramePath>
+    </sensor:camera>
+
+    <sensor:camera name="big_texture4">
+      <alwaysActive>true</alwaysActive>
+      <imageSize>320 240</imageSize>
+      <updateRate>25</updateRate>
+      <imageFormat>R8G8B8</imageFormat>
+      <hfov>90</hfov>
+      <nearClip>0.1</nearClip>
+      <farClip>10</farClip>
+      <saveFrames>false</saveFrames>
+      <saveFramePath>/tmp/frames</saveFramePath>
+    </sensor:camera>
     </body:box>
   </model:physical>
+  
+<!--
+  <model:physical name="pr2">
+    <include embedded="true">
+      <xi:include href="models/pr2_fixed.model"/>
+    </include>
+  </model:physical>
+  -->
+
 
   <!-- White Point light -->
   <model:renderable name="point_white">

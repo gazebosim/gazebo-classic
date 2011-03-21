@@ -83,18 +83,27 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
     this->ogreTextureName = this->GetName() + "_RttTex";
     this->ogreMaterialName = this->GetName() + "_RttMat";
 
-    // Create the render texture
-    this->renderTexture = Ogre::TextureManager::getSingleton().createManual(
-                          this->ogreTextureName,
-                          "General",
-                          Ogre::TEX_TYPE_2D,
-                          this->imageSizeP->GetValue().x, 
-                          this->imageSizeP->GetValue().y,
-                          0,
-                          this->imageFormat,
-                          Ogre::TU_RENDERTARGET);
+    this->renderTargets.resize(4);
+    this->renderTextures.resize(4);
 
-    this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
+    for (int i=0; i < 4; i++)
+    {
+      // Create the render texture
+      this->renderTextures[i] = Ogre::TextureManager::getSingleton().createManual(
+          this->ogreTextureName + boost::lexical_cast<std::string>(i),
+          "General",
+          Ogre::TEX_TYPE_2D,
+          this->imageSizeP->GetValue().x, 
+          this->imageSizeP->GetValue().y,
+          0,
+          this->imageFormat,
+          Ogre::TU_RENDERTARGET);
+
+      this->renderTargets[i] = this->renderTextures[i]->getBuffer()->getRenderTarget();
+    }
+    this->renderTexture = this->renderTextures[0];
+    this->renderTarget = this->renderTargets[0];
+
   }
 }
 
