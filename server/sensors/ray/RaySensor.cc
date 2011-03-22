@@ -198,7 +198,7 @@ int RaySensor::GetFiducial(int index)
 // Update the sensor information
 void RaySensor::UpdateChild()
 {
-  //if (this->active || (**this->alwaysActiveP))
+  if (this->active || (**this->alwaysActiveP))
     this->laserShape->Update();
 }
 

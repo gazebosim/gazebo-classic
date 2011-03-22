@@ -63,21 +63,9 @@ enum SceneTypes{SCENE_BSP, SCENE_EXT};
 /// Constructor
 OgreAdaptor::OgreAdaptor()
 {
-  this->renderCount = 0;
-  this->robin = 0;
-  this->rrobin = 0;
-  this->startBlitting = 0;
-  this->captureTimeCount = 0;
-  this->sumCaptureTime.Set(0,0);
-
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
-
-  // log_file_name, default_log, debugger output, suppress_file_output 
-  if (Simulator::Instance()->GetCreateOgreLog())
-    this->logManager->createLog("Ogre.log", true, true, false);
-  else
-    this->logManager->createLog("Ogre.log", true, false, true);
+  this->logManager->createLog("Ogre.log", true, false, false);
 
   this->backgroundColor=NULL;
   this->logManager=NULL;
@@ -210,7 +198,6 @@ void OgreAdaptor::Init(XMLConfigNode *rootNode)
     //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_FAR);
     //this->sceneMgr = this->root->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
     this->sceneMgr = this->root->createSceneManager(Ogre::ST_GENERIC);
-    this->sceneMgr->setVisibilityMask(0xffff);
   }
 
   // Load Resources
@@ -506,13 +493,10 @@ void OgreAdaptor::UpdateCameras()
   std::vector<OgreCamera*>::iterator iter;
 
   OgreCreator::Instance()->Update();
-  //this->root->_fireFrameStarted();
+  this->root->_fireFrameStarted();
 
   // Draw all the non-user cameras within the same sim time step
   {
-    Timer timer(Timer::REAL_TIMER);
-    timer.Start();
-
     //DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
 
     // these locks are needed to avoid race conditions on load, do not remove
@@ -523,10 +507,8 @@ void OgreAdaptor::UpdateCameras()
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       if (dynamic_cast<UserCamera*>((*iter)) == NULL)
-        (*iter)->Render(this->robin);
+        (*iter)->Render();
     }
-    this->sumRenderTime += timer.GetElapsed();
-    this->renderTimeCount++;
   }
 
   // Must update the user camera's last.
@@ -543,49 +525,17 @@ void OgreAdaptor::UpdateCameras()
     }
   }
 
-  if (this->robin == 3 & !this->startBlitting)
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
   {
-    this->startBlitting = true;
-    this->rrobin = 0;
+    if (dynamic_cast<UserCamera*>((*iter)) == NULL)
+      (*iter)->CaptureData();
   }
 
 
-  //if (this->startBlitting)
-  { 
-    Timer timer(Timer::REAL_TIMER);
-    timer.Start();
-    for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-    {
-      if (dynamic_cast<UserCamera*>((*iter)) == NULL)
-      {
-        (*iter)->CaptureData(this->rrobin);
-      }
-    }
-    this->sumCaptureTime += timer.GetElapsed();
-    this->captureTimeCount++;
-  }
   {
     //DIAGNOSTICTIMER(timer("UpdateCameras: _fireFrameEnded",6));
-    //this->root->_fireFrameEnded();
+    this->root->_fireFrameEnded();
   }
-
-  this->robin += 1;
-  this->rrobin += 1;
-
-  if (robin >= 4)
-    this->robin = 0;
-
-  if (rrobin >= 4)
-    this->rrobin = 0;
-
-  this->renderCount++;
-/* debugging test code
-  if (this->renderCount == 2000)
-  {
-    std::cout << "Count[" << this->renderCount << "] RTime[" << this->sumRenderTime.Double() / this->renderTimeCount << "] CTime[" << this->sumCaptureTime.Double() / this->captureTimeCount << "]\n";
-    Simulator::Instance()->SetUserQuit();
-  }
-*/
 
 }
 

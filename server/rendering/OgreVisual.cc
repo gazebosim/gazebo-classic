@@ -70,7 +70,7 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   this->visible = true;
   this->ConstructorHelper(pnode, isStatic);
 
-  /*this->ribbonTrail = (Ogre::RibbonTrail*)OgreAdaptor::Instance()->sceneMgr->createMovableObject("RibbonTrail");
+  this->ribbonTrail = (Ogre::RibbonTrail*)OgreAdaptor::Instance()->sceneMgr->createMovableObject("RibbonTrail");
   this->ribbonTrail->setMaterialName("Gazebo/Red");
   this->ribbonTrail->setTrailLength(200);
   this->ribbonTrail->setMaxChainElements(1000);
@@ -78,10 +78,8 @@ OgreVisual::OgreVisual(OgreVisual *node, Entity *_owner)
   this->ribbonTrail->setVisible(false);
   this->ribbonTrail->setInitialWidth(0,0.05);
   OgreAdaptor::Instance()->sceneMgr->getRootSceneNode()->attachObject(this->ribbonTrail);
-  
 
   RTShaderSystem::Instance()->AttachEntity(this);
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -328,15 +326,6 @@ void OgreVisual::Save(std::string &prefix, std::ostream &stream)
   stream << prefix << "</visual>\n";
 }
 
-void OgreVisual::Add()
-{
-  RenderableVisitor visitor;
-  for (unsigned int i=0; i < this->sceneNode->numAttachedObjects(); i++)
-  {
-    this->sceneNode->getAttachedObject(i)->visitRenderables(&visitor);
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a renerable object to the visual
 void OgreVisual::AttachObject( Ogre::MovableObject *obj)
@@ -348,12 +337,6 @@ void OgreVisual::AttachObject( Ogre::MovableObject *obj)
     return;
 
   this->sceneNode->attachObject(obj);
-
-  RenderableVisitor visitor;
-  obj->visitRenderables(&visitor);
-
-  //obj->setVisibilityFlags(0xffff);
-
   RTShaderSystem::Instance()->UpdateShaders();
 
   obj->setUserAny( Ogre::Any(this) );
@@ -445,7 +428,6 @@ void OgreVisual::AttachMesh( const std::string &meshName )
   }
 
   obj = (Ogre::MovableObject*)(this->sceneNode->getCreator()->createEntity(stream.str(), meshName));
-  obj->setVisibilityFlags(0xffff);
 
   this->AttachObject( obj );
 }
@@ -767,6 +749,7 @@ void OgreVisual::SetPosition( const Vector3 &pos)
   if (this->ignorePoseUpdates)
     return;
 
+  // FIXME: this was debug code, is this necessary?
   if (this->IsStatic() && this->staticGeom)
   {
     this->staticGeom->reset();
@@ -777,9 +760,8 @@ void OgreVisual::SetPosition( const Vector3 &pos)
 
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
 
-  /*if (this->IsStatic())
+  if (this->IsStatic())
     this->MakeStatic();
-    */
     
 }
 
@@ -1108,11 +1090,3 @@ void OgreVisual::SetRibbonTrail(bool value)
   }
   this->ribbonTrail->setVisible(value);
 }
-
-
-void RenderableVisitor::visit( Ogre::Renderable *rend, ushort lodIndex, bool isDebug, Ogre::Any *pany)
-{
-  gazebo::OgreAdaptor::Instance()->sceneMgr->getRenderQueue()->addRenderable(rend);
-}
-
-

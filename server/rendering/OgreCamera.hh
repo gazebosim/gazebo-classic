@@ -85,9 +85,9 @@ namespace gazebo
     public: void InitCam();
 
     /// \brief Render the camera
-    public: void Render(int index = 0);
+    public: void Render();
 
-    public: void CaptureData(int index = 0);
+    public: void CaptureData();
 
     /// \brief Update the sensor information
     public: void UpdateCam();
@@ -294,9 +294,6 @@ namespace gazebo
     protected: ParamT<std::string> *visMaskP;
     protected: Ogre::PixelFormat imageFormat;
     protected: unsigned int visibilityMask;
-
-    public: std::vector<Ogre::RenderTarget*> renderTargets;
-    public: std::vector<Ogre::TexturePtr> renderTextures;
 
     public: Ogre::RenderTarget *renderTarget;
     public: Ogre::RenderTarget *depthTarget;

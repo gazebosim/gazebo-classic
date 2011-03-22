@@ -566,7 +566,7 @@ void Simulator::SetStepInc(bool step)
 {
   boost::recursive_mutex::scoped_lock model_render_lock(*this->GetMRMutex());
   this->stepInc = step;
-  //this->stepSignal(step);
+  this->stepSignal(step);
 
   this->SetPaused(!step);
 }
@@ -710,7 +710,7 @@ void Simulator::PhysicsLoop()
 
     // Set a default sleep time
     req.tv_sec  = 0;
-    req.tv_nsec = 1000;
+    req.tv_nsec = 0;
 
     // compute update rate and update period within the update loop 
     // is less efficient, but allows changing update rate dynamically

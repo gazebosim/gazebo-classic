@@ -122,6 +122,9 @@ namespace gazebo
   
     private: Ogre::Camera *depthCamera;
 
+    private: std::vector<Ogre::RenderTarget*> renderTargets;
+    private: std::vector<Ogre::TexturePtr> renderTextures;
+
     /*private: 
              class StereoCameraListener : public Ogre::RenderTargetListener
              {
