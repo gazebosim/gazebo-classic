@@ -179,12 +179,14 @@ void Body::Load(XMLConfigNode *node)
   this->iyzP->Load(node);
   this->kinematicP->Load(node);
 
-  this->customMass.SetCoG(**this->cxP, **this->cyP,** this->czP);
-  this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
-                                     **this->ixyP, **this->ixzP, **this->iyzP);
-  this->customMass.SetMass(**this->bodyMassP);
-
-  this->mass = this->customMass;
+  if (**this->customMassMatrixP)
+  {
+    this->customMass.SetCoG(**this->cxP, **this->cyP,** this->czP);
+    this->customMass.SetInertiaMatrix( **this->ixxP, **this->iyyP, **this->izzP,
+                                       **this->ixyP, **this->ixzP, **this->iyzP);
+    this->customMass.SetMass(**this->bodyMassP);
+    this->mass = this->customMass;
+  }
      
   XMLConfigNode *childNode;
 
@@ -547,7 +549,7 @@ void Body::UpdateCoM()
   Pose3d origPose, newPose;
   std::vector<Geom*>::iterator iter;
 
-  std::cout << "UpdateCOM for Body[" << this->GetName() << "]\n";
+  //std::cout << "UpdateCOM for Body[" << this->GetName() << "]\n";
   bodyPose = this->GetRelativePose();
 
   if (**this->customMassMatrixP)
@@ -562,8 +564,9 @@ void Body::UpdateCoM()
     origPose = (*iter)->GetRelativePose() + this->comEntity->GetRelativePose();
     newPose = origPose;
 
-    newPose.pos -= this->mass.GetCoG();
-    std::cout << "  Move Geom[" << (*iter)->GetName() << "] Old[" << origPose.pos << "] to [" << newPose.pos << "]\n";
+    if (this->mass.GetAsDouble() > 0.0)
+      newPose.pos -= this->mass.GetCoG();
+    //std::cout << "  Move Geom[" << (*iter)->GetName() << "] Old[" << origPose.pos << "] to [" << newPose.pos << "]\n";
     (*iter)->SetRelativePose(newPose, true);
   }
 
