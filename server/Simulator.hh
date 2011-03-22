@@ -248,6 +248,7 @@ namespace gazebo
 
     //The user has somewhat signaled the end of the program
     private: bool userQuit;
+    private: bool renderQuit;
 
     /// True if the GUI is enabled
     private: bool guiEnabled;

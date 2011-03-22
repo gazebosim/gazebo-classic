@@ -110,6 +110,7 @@ Simulator::Simulator()
   renderUpdates(0),
   stepInc(false),
   userQuit(false),
+  renderQuit(false),
   guiEnabled(true),
   renderEngineEnabled(true),
   physicsEnabled(true),
@@ -476,8 +477,11 @@ void Simulator::MainLoop()
       nanosleep(&timeSpec, NULL);
     }
   }
+  // signal physics to quit after render completes
+  this->renderQuit = true;
 
   this->physicsThread->join();
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -672,7 +676,7 @@ void Simulator::PhysicsLoop()
   // hack for ROS, since ROS uses t=0 for special purpose
   this->simTime = world->GetPhysicsEngine()->GetStepTime();
 
-  while (!this->userQuit)
+  while (!this->userQuit || !this->renderQuit)
   {
     //DIAGNOSTICTIMER(timer("PHYSICS LOOP ",6));
 
