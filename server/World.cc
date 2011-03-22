@@ -318,24 +318,7 @@ void World::GraphicsUpdate()
 // Update the world
 void World::Update()
 {
-  /*this->worldUpdateStartSignal();
-
-  if (this->simPauseTime > 0)
-  {
-    if (Simulator::Instance()->GetSimTime() >= this->simPauseTime)
-    {
-      this->simPauseTime = 0;
-      Simulator::Instance()->SetPaused(true);
-
-      // Tell the simiface that it's okay to trigger the go ack
-      this->simIface->GoAckPost();
-    }
-    else
-    {
-      Simulator::Instance()->SetPaused(false);
-    }
-  }
-  */
+  this->worldUpdateStartSignal();
 
   {
     //DIAGNOSTICTIMER(timer("World::Update Models",6));
@@ -379,7 +362,7 @@ void World::Update()
 
   //Logger::Instance()->Update();
 
-  //this->worldUpdateEndSignal();
+  this->worldUpdateEndSignal();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
