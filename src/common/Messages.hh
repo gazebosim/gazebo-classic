@@ -36,13 +36,9 @@ namespace gazebo
       public:
         static void Init(google::protobuf::Message &message, 
                          const std::string &id);
-  
-        static void CreationStamp(google::protobuf::Message &message);
-        static void CreationStamp(msgs::Header &header);
-  
-        static void SendStamp(google::protobuf::Message &message);
-        static void SendStamp(msgs::Header &header);
-  
+
+        static void Stamp(msgs::Header &);
+
         static msgs::Point      Convert(const Vector3 &v);
         static msgs::Quaternion Convert(const Quatern &q);
         static msgs::Pose       Convert(const Pose3d &p);
@@ -71,7 +67,6 @@ namespace gazebo
         static msgs::Scene     SceneFromXML(XMLConfigNode *node);
   
       private:
-        static void Stamp(msgs::Header &, const std::string &type);
   
         static const google::protobuf::FieldDescriptor *GetFD(google::protobuf::Message &message, const std::string &name);
   

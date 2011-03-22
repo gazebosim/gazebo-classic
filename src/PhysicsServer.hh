@@ -10,10 +10,6 @@ namespace gazebo
   {
     class World;
   }
-  namespace transport
-  {
-    class Server;
-  }
 
   class PhysicsServer
   {
@@ -26,7 +22,6 @@ namespace gazebo
     public: void Quit();
 
     private: std::vector< physics::World* > worlds;
-    private: transport::Server *server;
     private: bool quit;
   };
 }

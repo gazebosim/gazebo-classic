@@ -25,6 +25,8 @@
 
 #include <google/protobuf/message.h>
 
+#include "common/GazeboError.hh"
+
 #define HEADER_LENGTH 8
 
 namespace gazebo
@@ -40,15 +42,26 @@ namespace gazebo
 
       public: void Connect(const std::string &host, const std::string &service);
 
-      public: template<typename Handler>
-              void Write(const google::protobuf::Message &msg, Handler handler)
+      public: void StartReadThread();
+
+      /// \brief Get the remote address
+      public: std::string GetRemoteAddress() const;
+
+      /// \brief Get the remote port number
+      public: unsigned short GetRemotePort() const;
+
+      public: void Write(const google::protobuf::Message &msg)
               {
                 std::string out;
-                msg.SerializeToString(&out);
-                this->Write(out, handler);
+                if (!msg.SerializeToString(&out))
+                  gzthrow("Failed to serialized message");
+
+                this->Write(out, boost::bind(&Connection::OnWrite, this,
+                      boost::asio::placeholders::error));
               }
 
-      public: template<typename Handler>
+
+      private: template<typename Handler>
               void Write(const std::string buffer, Handler handler)
               {
                 std::ostringstream header_stream;
@@ -93,35 +106,30 @@ namespace gazebo
               void OnReadHeader(const boost::system::error_code &e,
                                 boost::tuple<Handler> handler)
               {
-                std::cout << "OnReadHeader\n";
                 if (e)
                 {
-                  std::cout << "An error occrured here\n";
+                  std::cout << "An error occrured reading a header\n";
                   // Pass the error to the handler
                   //boost::get<0>(handler)(e);
                 }
                 else
                 {
-                  // Determine the length of the serialized data
-                  std::istringstream is(std::string(this->inbound_header, HEADER_LENGTH));
                   std::size_t inbound_data_size = 0;
-                  if (!(is >> std::hex >> inbound_data_size))
+                  try
                   {
-                    // Header doesn't seem to be valid. Inform the caller
-                    boost::system::error_code error(boost::asio::error::invalid_argument);
-                    std::cerr << "New Error:" << error.message() << "\n";
-                    //boost::get<0>(handler)(error);
+                    inbound_data_size = this->ParseHeader(this->inbound_header);
+                  }
+                  catch (gazebo::common::GazeboError &e)
+                  {
+                    std::cerr << "Error[" << e << "]\n";
                   }
 
-
-                  std::cout << "Inbound size[" << inbound_data_size << "]\n";
                   // Start the asynchronous call to receive data
                   this->inbound_data.resize(inbound_data_size);
 
                   void (Connection::*f)(const boost::system::error_code &e,
                      boost::tuple<Handler>) = &Connection::OnReadData<Handler>;
 
-                  std::cout << "Async read stuff\n";
                   boost::asio::async_read( this->socket, 
                       boost::asio::buffer(this->inbound_data), 
                       boost::bind(f, this, boost::asio::placeholders::error, 
@@ -133,35 +141,12 @@ namespace gazebo
               void OnReadData(const boost::system::error_code &e,
                               boost::tuple<Handler> handler)
                {
-                 std::cout << "OnReadData\n";
                  if (e)
                  {
                    std::cerr << "Error:" << e.message() << std::endl;
-
-                   // TODO: Pass error to handler
-                   //boost::get<0>(handler)(e);
                  }
                  else
                  {
-                   // Extract the data structure from the data
-                   /*try
-                   {
-                     std::string archive_data(&this->inbound_data[0], this->inbound_data.size());
-                     std::istringstream archive_stream(archive_data);
-                     boost::archive::text_iarchive archive(archive_stream);
-                     archive >> t;
-                   }
-                   catch (std::exception &e)
-                   {
-                     // Unable to decode data
-                     boost::system::error_code error(boost::asio::error::invalid_argument);
-                     std::cerr << "Error as well\n";
-                     return;
-                   }
-                   */
-
-                   //helper->OnRead(this->inbound_data);
-                   
                    // Inform caller that data has been received
                    std::string data(&this->inbound_data[0], 
                                     this->inbound_data.size());
@@ -169,6 +154,9 @@ namespace gazebo
                  }
                }
 
+     private: void ReadLoop();
+     private: std::size_t ParseHeader( const std::string header );
+     private: void OnWrite(const boost::system::error_code &e);
 
       private: boost::asio::ip::tcp::socket socket;
       private: std::string outbound_header;
@@ -176,6 +164,9 @@ namespace gazebo
 
       private: char inbound_header[HEADER_LENGTH];
       private: std::vector<char> inbound_data;
+
+      private: boost::thread *readThread;
+      private: bool readQuit;
     };
 
     typedef boost::shared_ptr<Connection> ConnectionPtr;

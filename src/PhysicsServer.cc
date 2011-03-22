@@ -5,8 +5,9 @@
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
 
-#include "transport/Server.hh"
+#include "transport/Publisher.hh"
 #include "transport/IOManager.hh"
+#include "transport/TopicManager.hh"
 
 #include "PhysicsServer.hh"
 
@@ -71,15 +72,7 @@ PhysicsServer::PhysicsServer()
   physics::PhysicsFactory::RegisterAll();
 
   transport::IOManager::Instance()->Start();
-
-  try
-  {
-  this->server = new transport::Server(1234);
-  }
-  catch (std::exception &e)
-  {
-    gzthrow( "Unable to start server[" << e.what() << "]\n");
-  }
+  transport::TopicManager::Instance()->Init(1234);
 }
 
 PhysicsServer::~PhysicsServer()
@@ -144,10 +137,14 @@ void PhysicsServer::Init()
 
 void PhysicsServer::Run()
 {
+  msgs::String msg;
+  msg.set_data("Hello");
+
+  transport::PublisherPtr pub = transport::TopicManager::Instance()->Advertise<msgs::String>("/gazebo/test");
+
   while (!this->quit)
   {
-    //std::cout << "Connections[" << this->server->GetConnectionCount() << "]\n";
-
+    pub->Publish(msg);
     //for (int i=0; i < this->worlds.size(); i++)
       //this->worlds[i]->Update();
     usleep(10000);

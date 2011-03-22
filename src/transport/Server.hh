@@ -3,6 +3,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
+#include <google/protobuf/message.h>
 
 #include "common/Messages.hh"
 
@@ -16,8 +17,8 @@ namespace gazebo
     class Server
     {
       public: Server(unsigned short port);
-      public: void OnAccept(const boost::system::error_code &e, ConnectionPtr conn);
-      public: void OnWrite(const boost::system::error_code &e, ConnectionPtr conn);
+
+      public: void Write(const google::protobuf::Message &msg);
 
       public: int GetConnectionCount() const;
 
@@ -32,11 +33,9 @@ namespace gazebo
                 return pub;
               }*/
 
-      private: void OnReadClientPort(const std::string &data);
-      public: void Write(const std::string &msg);
+      private: void OnAccept(const boost::system::error_code &e, ConnectionPtr conn);
 
       private: boost::asio::ip::tcp::acceptor acceptor;
-
       private: std::map<std::string, PublisherPtr> publishers;
       private: std::vector<ConnectionPtr> connections;
       private: std::string hostname;

@@ -33,27 +33,8 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
     msgs::String stringMsg;
     stringMsg.set_data( std::string("gazebo ") + GAZEBO_VERSION );
 
-    std::cout << "Server::OnAccept write\n";
-    conn->Write( stringMsg, boost::bind(&Server::OnWrite, this,
-                 boost::asio::placeholders::error, conn) );
-
-    conn->Read( boost::bind(&Server::OnReadClientPort, this, _1) );
-
-    /*IntMapMessage msg;
-
-    std::map<std::string, PublisherPtr>::iterator iter;
-    for (iter = this->publishers.begin(); 
-         iter != this->publishers.end(); iter++)
-    {
-      msg.data[iter->first] = iter->second->GetMsgType();
-    }
-
-    // Send topic info
-    conn->write( msg, boost::bind(&Server::OnWrite, this,
-          boost::asio::placeholders::error, conn) );
-          */
-
-    std::cout << "Connection Count[" << this->connections.size() << "]\n";
+    std::cout << "Server::OnAccept RemoteAddress[" << conn->GetRemoteAddress() << ":" << conn->GetRemotePort() << "]\n";
+    conn->Write( stringMsg );
 
     // Start an accept operation for a new connection
     ConnectionPtr new_conn(new Connection(this->acceptor.io_service()));
@@ -68,16 +49,12 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
   }
 }
 
-void Server::OnReadClientPort(const std::string &data)
+void Server::Write(const google::protobuf::Message &msg)
 {
-  msgs::String port;
-  port.ParseFromString(data);
-  std::cout << "Server read client port[" << port.data() << "]\n";
-}
-
-void Server::Write(const std::string &msg)
-{
-  std::cout << "Server::Write\n";
+  for (unsigned int i=0; i < this->connections.size(); i++)
+  {
+    this->connections[i]->Write(msg);
+  }
 }
 
 /*void Server::Publish(const StringMessage &msg)
@@ -90,12 +67,6 @@ void Server::Write(const std::string &msg)
                           boost::asio::placeholders::error, (*iter)));
   }
 }*/
-
-void Server::OnWrite(const boost::system::error_code &e, ConnectionPtr conn)
-{
-  // Nothing to do. The socket will be closed automatically when the last
-  // reference to the connection object goes away
-}
 
 int Server::GetConnectionCount() const
 {

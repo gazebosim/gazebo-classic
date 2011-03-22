@@ -11,9 +11,7 @@ using namespace gazebo;
 using namespace transport;
 
 Client::Client( const std::string &host, const std::string &service)
-  //: connection(IOManager::Instance()->GetIO())
 {
-  std::cout << "transport::Client::Constructor\n";
   this->host = host;
   this->service = service;
 
@@ -28,10 +26,10 @@ Client::Client( const std::string &host, const std::string &service)
     std::cerr << "Unable to connect to server[" << e.what() << "]\n";
   }
 
+  std::cout << "Client connected to server[" << this->connection->GetRemoteAddress() << ":" << this->connection->GetRemotePort() << "]\n";
+
   // Read the version info
   this->connection->Read( boost::bind(&Client::OnReadInit, this, _1) );
-
-  std::cout << "transport::Client::Constructor done\n";
 }
 
 void Client::OnReadInit(const std::string &data)
@@ -44,15 +42,9 @@ void Client::OnReadInit(const std::string &data)
     gzthrow(std::string("Version mismatch. My version[") + GAZEBO_VERSION + "] Remote version[" + gazeboVersion.data() + "]\n");
   }
 
-  msgs::String myConnectionInfo;
-  myConnectionInfo.set_data( "9876" );
-
-  this->connection->Write( myConnectionInfo, boost::bind(&Client::OnWrite, this, boost::asio::placeholders::error, this->connection) );
+  this->connection->StartReadThread();
 }
 
-void Client::OnWrite(const boost::system::error_code &e, ConnectionPtr conn)
-{
-}
 
 void Client::OnRead(const std::string &data)
 {

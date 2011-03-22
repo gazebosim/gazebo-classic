@@ -24,9 +24,8 @@ using namespace transport;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 TopicManager::TopicManager()
+  : server(NULL), client(NULL)
 {
-  //this->server = new Server(12345);
-  //this->client = new Client("localhost", "12346");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,33 +34,42 @@ TopicManager::~TopicManager()
 {
 }
 
+void TopicManager::Init(unsigned short port)
+{
+  try
+  {
+    this->server = new Server(port);
+  }
+  catch (std::exception &e)
+  {
+    gzthrow( "Unable to start server[" << e.what() << "]\n");
+  }
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Send a message
 void TopicManager::SendMessage( const std::string &topic, 
                                 google::protobuf::Message &message )
 {
-  std::string out;
-
-  // Stamp the message with the transport time
-  common::Message::SendStamp(message);
-
   if (!message.IsInitialized())
   {
     gzthrow("Simulator::SendMessage Message is not initialized[" + message.InitializationErrorString() + "]");
   }
 
-  if (!message.SerializeToString(&out))
-    gzthrow("Simulator::SendMessage Failed to serialized message");
+  msgs::Packet packet;
 
-  this->server->Write(out);
+  common::Time tm = common::Time::GetWallTime();
+  packet.mutable_stamp()->set_sec(tm.sec);
+  packet.mutable_stamp()->set_nsec(tm.nsec);
+  packet.set_topic(topic);
 
-  /*std::list<SubscriptionPtr>::iterator iter;
-  for (iter = this->subscribed_topics[topic].begin(); 
-       iter != this->subscribed_topics[topic].end(); iter++)
-  {
-    (*iter)->HandleMessage(out);
-  }
-  */
+  std::string *serialized_data = packet.mutable_serialized_data();
+  if (!message.SerializeToString(serialized_data))
+    gzthrow("Failed to serialized message");
+
+  std::cout << "TopicManager Sending a message\n";
+  this->server->Write(packet);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -55,46 +55,18 @@ void Message::Init(google::protobuf::Message &message, const std::string &id)
   if ( header )
   {
     header->set_str_id(id);
-    Message::CreationStamp(*header);
+    Message::Stamp(*header);
   }
   else
     std::cout << "Header is non-existant\n";
 }
 
-void Message::CreationStamp(google::protobuf::Message &message)
-{
-  CreationStamp( *Message::GetHeader(message) );
-}
-
-void Message::CreationStamp(msgs::Header &message)
-{
-  Message::Stamp(message, "creation");
-}
-
-void Message::SendStamp(google::protobuf::Message &message)
-{
-  SendStamp( *Message::GetHeader(message) );
-}
-
-void Message::SendStamp(msgs::Header &message)
-{
-  Message::Stamp(message, "send");
-}
-
-void Message::Stamp(msgs::Header &header, const std::string &type)
+void Message::Stamp(msgs::Header &header)
 {
   Time tm = Time::GetWallTime();
 
-  if (type == "creation")
-  {
-    header.mutable_creation()->set_sec(tm.sec);
-    header.mutable_creation()->set_nsec(tm.nsec);
-  }
-  else
-  {
-    header.mutable_send()->set_sec(tm.sec);
-    header.mutable_send()->set_nsec(tm.nsec);
-  }
+  header.mutable_stamp()->set_sec(tm.sec);
+  header.mutable_stamp()->set_nsec(tm.nsec);
 }
 
 void Message::Set(msgs::Point *pt, const Vector3 &v)
@@ -396,6 +368,7 @@ msgs::Fog Message::FogFromXML(XMLConfigNode *node)
 msgs::Scene Message::SceneFromXML(XMLConfigNode *node)
 {
   msgs::Scene result;
+  Message::Init(result,"scene");
   XMLConfigNode *cnode = NULL;
 
   result.mutable_ambient()->CopyFrom( 

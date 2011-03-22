@@ -42,6 +42,8 @@ namespace gazebo
       private: TopicManager();
       private: virtual ~TopicManager();
 
+      public: void Init(unsigned short port);
+
       /// \brief Subscribe to a topic
       public: template<class M, class T>
               SubscriberPtr Subscribe(const std::string &topic, void(T::*fp)(const boost::shared_ptr<M const> &), T *obj)

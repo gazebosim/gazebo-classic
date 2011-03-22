@@ -16,6 +16,7 @@ set (msgs color.proto
           fog.proto
           int.proto
           string.proto
+          packet.proto
 )
 
 

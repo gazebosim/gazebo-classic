@@ -4,6 +4,5 @@ import "time.proto";
 message Header
 {
   optional string str_id = 1;
-  optional Time creation = 2;
-  optional Time send = 3;
+  optional Time stamp = 2;
 } 

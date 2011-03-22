@@ -31,8 +31,6 @@ namespace gazebo
       private: void OnRead(const std::string &data);
       private: void OnReadInit(const std::string &data);
 
-      private: void OnWrite(const boost::system::error_code &e, ConnectionPtr conn);
-
       private: ConnectionPtr connection;
       private: CallbackHelperPtr callback;
       private: std::string host;
