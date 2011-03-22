@@ -68,9 +68,6 @@ GZ_REGISTER_PHYSICS_ENGINE("ode", ODEPhysics);
 ODEPhysics::ODEPhysics()
     : PhysicsEngine()
 {
-  // Most simulation scenarios (e.g. cup on a table) require minimum of 50 to 100 contacts.
-  this->defaultContactCount = 100;
-
   // Collision detection init
   dInitODE2(0);
 
@@ -112,7 +109,7 @@ ODEPhysics::ODEPhysics()
   this->contactSurfaceLayerP = new ParamT<double>("contactSurfaceLayer", 0.01, 0);
   this->autoDisableBodyP = new ParamT<bool>("autoDisableBody", false, 0);
   this->contactFeedbacksP = new ParamT<int>("contactFeedbacks", 100, 0); // just an initial value, appears to get resized if limit is breached
-  this->maxContactsP = new ParamT<int>("maxContacts",1000,0); // enforced for trimesh-trimesh contacts
+  this->defaultMaxContactsP = new ParamT<int>("maxContacts",100,0); // global default, over-written by Geom settings
 
   /// \brief @todo: for backwards compatibility, should tick tock
   ///        deprecation as we switch to nested tags
@@ -158,7 +155,7 @@ ODEPhysics::~ODEPhysics()
   delete this->contactSurfaceLayerP;
   delete this->autoDisableBodyP;
   delete this->contactFeedbacksP;
-  delete this->maxContactsP;
+  delete this->defaultMaxContactsP;
 
   /// \brief @todo: for backwards compatibility, should tick tock
   ///        deprecation as we switch to nested tags
@@ -202,7 +199,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
   this->contactSurfaceLayerP->Load(cnode);
   this->autoDisableBodyP->Load(cnode);
   this->contactFeedbacksP->Load(cnode);
-  this->maxContactsP->Load(cnode);
+  this->defaultMaxContactsP->Load(cnode);
 
   /// \brief @todo: for backwards compatibility, should tick tock
   ///        deprecation as we switch to nested tags
@@ -226,7 +223,7 @@ void ODEPhysics::Load(XMLConfigNode *node)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.001);
   dWorldSetAutoDisableSteps(this->worldId, 50);
 
-  this->contactGeoms.resize(std::max(**this->maxContactsP,this->defaultContactCount));
+  this->contactGeoms.resize(**this->defaultMaxContactsP);
   this->contactFeedbacks.resize(this->contactFeedbacksP->GetValue());
 
   // Reset the contact pointer
@@ -613,12 +610,12 @@ void ODEPhysics::SetContactSurfaceLayer(double layer_depth)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ODEPhysics::SetMaxContacts(double max_contacts)
+void ODEPhysics::SetMaxContacts(int max_contacts)
 {
-  this->maxContactsP->SetValue(max_contacts);
+  this->defaultMaxContactsP->SetValue(max_contacts);
   // @todo: FIXME: resizes contactGeoms, but can we do this on the fly?
   //               this might need to be done on a new time step
-  this->contactGeoms.resize(std::max(**this->maxContactsP,this->defaultContactCount));
+  this->contactGeoms.resize(**this->defaultMaxContactsP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -664,9 +661,9 @@ double ODEPhysics::GetContactSurfaceLayer()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-double ODEPhysics::GetMaxContacts()
+int ODEPhysics::GetMaxContacts()
 {
-  return this->maxContactsP->GetValue();
+  return this->defaultMaxContactsP->GetValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -792,37 +789,35 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
 
-    int maxContacts = self->maxContactsP->GetValue();
-    int numContacts = self->defaultContactCount;
-    int i;
-    int numc = 0;
-    dContact contact;
+    // determine an upper bound to number of contacts to be generated between this pair of geoms
+    // set to global maxContacts unless specified per Geom.
+    // (note that geom1 and geom2 defaults to defaultMaxContacts if none specified per Geom.)
+    int max_contacts = self->GetMaxContacts();
+    if (geom1->GetMaxContacts() != self->GetMaxContacts() || 
+        geom2->GetMaxContacts() != self->GetMaxContacts() )
+      max_contacts = std::max( geom1->GetMaxContacts(), geom2->GetMaxContacts() );
+    // if dCollide is not threaded out in parallel, this is ok, otherwise
+    //   create local contactGeoms buffer for each CallBack instance
+    self->contactGeoms.resize(max_contacts);
 
-    // for now, only use maxContacts if both geometries are trimeshes
-    // other types of geometries do not need too many contacts
-    if (geom1->GetShapeType() == Shape::TRIMESH && 
-        geom2->GetShapeType()==Shape::TRIMESH)
-    {
-      numContacts = maxContacts;
-    }
+    int num_contacts = dCollide(o1,o2,max_contacts, &self->contactGeoms[0],
+                                sizeof(self->contactGeoms[0]));
 
-    numc = dCollide(o1,o2,numContacts, &self->contactGeoms[0], 
-                    sizeof(self->contactGeoms[0]));
-
-    if (numc != 0)
+    if (num_contacts != 0)
     {
       (*self->contactFeedbackIter).contact.Reset();
       (*self->contactFeedbackIter).contact.geom1 = geom1;
       (*self->contactFeedbackIter).contact.geom2 = geom2;
-      (*self->contactFeedbackIter).feedbacks.resize(numc);
+      (*self->contactFeedbackIter).feedbacks.resize(num_contacts);
 
       double h, kp, kd;
-      for (i=0; i<numc; i++)
+      for (int i = 0; i < num_contacts; i++)
       {
         // skip negative depth contacts
         if(self->contactGeoms[i].depth < 0)
           continue;
 
+        dContact contact;
         contact.geom = self->contactGeoms[i];
         contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1;
 
@@ -869,8 +864,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
           self->AddContactVisual(contactPos, contactNorm);
 
         // Store the contact info 
-        if (geom1->GetContactsEnabled() ||
-            geom2->GetContactsEnabled())
+        if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
         {
           (*self->contactFeedbackIter).contact.depths.push_back(
               contact.geom.depth);
@@ -884,6 +878,7 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
         dJointAttach (c, b1, b2);
       }
 
+      // increase contact feedback buffer size if needed
       if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
       {
         self->contactFeedbackIter++;

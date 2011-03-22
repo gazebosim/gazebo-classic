@@ -162,6 +162,9 @@ void MainMenu::ShowContactsCB(Fl_Widget * /*w*/, void * /*data*/)
 {
   World::Instance()->SetShowContacts( !World::Instance()->GetShowContacts() );
 
+  // hardocde contact visualization circular buffer to 5000 elements when viewed
+  // the reason for having 1 element when not viewed is because
+  // this way we don't have to deal with locks for potential race conditions
   if (World::Instance()->GetShowContacts())
     World::Instance()->GetPhysicsEngine()->SetContactVisual(5000);
   else

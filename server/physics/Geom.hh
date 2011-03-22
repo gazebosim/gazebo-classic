@@ -105,6 +105,12 @@ namespace gazebo
     /// \brief Get the laser retro reflectiveness 
     public: float GetLaserRetro() const;
  
+    /// \brief Get max contact settings
+    public: int GetMaxContacts() const;
+ 
+    /// \brief Set max contact settings
+    public: void SetMaxContacts(int max_contacts) const;
+ 
     /// \brief Set the visibility of the bounding box
     public: void ShowBoundingBox(bool show);
 
@@ -223,6 +229,7 @@ namespace gazebo
 
     private: ParamT<int> *laserFiducialIdP;
     private: ParamT<float> *laserRetroP;
+    private: ParamT<int> *maxContactsP;
 
     ///  Mass as a double
     private: ParamT<double> *massP;

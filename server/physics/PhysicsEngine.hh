@@ -183,7 +183,7 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: virtual void SetContactSurfaceLayer(double layer_depth) {}
     /// \brief access functions to set ODE parameters
-    public: virtual void SetMaxContacts(double max_contacts) {}
+    public: virtual void SetMaxContacts(int max_contacts) {}
 
     /// \brief access functions to set ODE parameters
     public: virtual double GetWorldCFM() {return 0;}
@@ -200,7 +200,7 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: virtual double GetContactSurfaceLayer() {return 0;}
     /// \brief access functions to set ODE parameters
-    public: virtual double GetMaxContacts() {return 0;}
+    public: virtual int GetMaxContacts() {return 0;}
 
     /// \brief Setup contact visuals
     public: void SetContactVisual(int num_contacts);

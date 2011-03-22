@@ -164,7 +164,7 @@ class ODEPhysics : public PhysicsEngine
   /// \brief access functions to set ODE parameters
   public: void SetContactSurfaceLayer(double layer_depth);
   /// \brief access functions to set ODE parameters
-  public: void SetMaxContacts(double max_contacts);
+  public: void SetMaxContacts(int max_contacts);
 
   /// \brief access functions to set ODE parameters
   public: double GetWorldCFM();
@@ -181,7 +181,7 @@ class ODEPhysics : public PhysicsEngine
   /// \brief access functions to set ODE parameters
   public: double GetContactSurfaceLayer();
   /// \brief access functions to set ODE parameters
-  public: double GetMaxContacts();
+  public: int GetMaxContacts();
 
   /// \brief Do collision detection
   private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
@@ -204,8 +204,7 @@ class ODEPhysics : public PhysicsEngine
   private: ParamT<double> *contactSurfaceLayerP;
   private: ParamT<bool> *autoDisableBodyP;
   private: ParamT<int> *contactFeedbacksP;
-  private: ParamT<int> *maxContactsP;
-  private: int defaultContactCount;
+  private: ParamT<int> *defaultMaxContactsP;
 
   /// \brief @todo: for backwards compatibility, should tick tock
   ///        deprecation as we switch to nested tags

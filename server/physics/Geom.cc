@@ -79,6 +79,9 @@ Geom::Geom( Body *body )
 
   this->enableContactsP = new ParamT<bool>("enableContacts", false, 0);
   //this->enableContactsP->Callback( &Geom::SetContactsEnabled, this );
+
+  // defaults to global max contacts limit
+  this->maxContactsP = new ParamT<int>("maxContacts",this->physicsEngine->GetMaxContacts(),0);
   
   Param::End();
 
@@ -116,6 +119,7 @@ Geom::~Geom()
   delete this->laserFiducialIdP;
   delete this->laserRetroP;
   delete this->enableContactsP;
+  delete this->maxContactsP;
 
   if (this->shape)
     delete this->shape;
@@ -158,6 +162,7 @@ void Geom::Load(XMLConfigNode *node)
   this->laserFiducialIdP->Load(node);
   this->laserRetroP->Load(node);
   this->enableContactsP->Load(node);
+  this->maxContactsP->Load(node);
 
   this->SetContactsEnabled(**this->enableContactsP);
 
@@ -250,6 +255,7 @@ void Geom::Save(std::string &prefix, std::ostream &stream)
 
   stream << prefix << "  " << *(this->laserFiducialIdP) << "\n";
   stream << prefix << "  " << *(this->laserRetroP) << "\n";
+  stream << prefix << "  " << *(this->maxContactsP) << "\n";
 
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
   {
@@ -485,6 +491,20 @@ void Geom::SetContactsEnabled(const bool &enable)
 bool Geom::GetContactsEnabled() const
 {
   return this->contactsEnabled;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get max contacts setting
+int Geom::GetMaxContacts() const
+{
+  return **this->maxContactsP;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set max contacts
+void Geom::SetMaxContacts(int max_contacts) const
+{
+  this->maxContactsP->SetValue(max_contacts);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
