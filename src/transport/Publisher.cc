@@ -28,7 +28,7 @@ using namespace transport;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Publisher::Publisher(const std::string &topic, const std::string &msg_type)
-  : topic(topic), msg_type(msg_type)
+  : topic(topic), msgType(msg_type)
 {
 }
 
@@ -44,8 +44,23 @@ Publisher::~Publisher()
 // Publish a message
 void Publisher::Publish(google::protobuf::Message &message )
 {
-  if (message.GetTypeName() != this->msg_type)
+  if (message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  TopicManager::Instance()->SendMessage(this->topic, message);
+  //TopicManager::Instance()->SendMessage(this->topic, message);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the topic name
+std::string Publisher::GetTopic() const
+{
+  return this->topic;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the message type
+std::string Publisher::GetMsgType() const
+{
+  return this->msgType;
+}
+

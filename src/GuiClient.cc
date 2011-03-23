@@ -1,3 +1,4 @@
+#include "common/Node.hh"
 #include "common/XMLConfig.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboConfig.hh"
@@ -30,8 +31,9 @@ const std::string default_config =
 
 
 GuiClient::GuiClient()
-  : renderEngineEnabled(true), guiEnabled(true)
+  : node(new common::Node()), renderEngineEnabled(true), guiEnabled(true)
 {
+  this->quit = false;
   this->gui = NULL;
 
   // load the configuration options 
@@ -44,15 +46,11 @@ GuiClient::GuiClient()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-  transport::IOManager::Instance()->Start();
-
-  this->client = new transport::Client("localhost","1234");
+  this->node->Init("localhost", 11345);
 }
 
 GuiClient::~GuiClient()
 {
-  transport::IOManager::Instance()->Stop();
-
   if (this->gui)
     delete this->gui;
 }
@@ -60,7 +58,7 @@ GuiClient::~GuiClient()
 void GuiClient::Load(const std::string &filename)
 {
   // Load the world file
-  gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
+  /*gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
 
   try
   {
@@ -146,15 +144,33 @@ void GuiClient::Load(const std::string &filename)
   }
 
   delete xmlFile;
+  */
 }
 
 void GuiClient::Run()
 {
-  rendering::Scene *scene = new rendering::Scene("default");
+  /*rendering::Scene *scene = new rendering::Scene("default");
   scene->Load(NULL);
   scene->Init();
 
   this->gui->ViewScene(scene);
 
   this->gui->Run();
+  */
+  this->node->Subscribe("/gazebo/test", &GuiClient::Test, this);
+
+  while (!this->quit)
+  {
+    usleep(100000);
+  }
+}
+
+void GuiClient::Quit()
+{
+  this->quit = true;
+}
+
+void GuiClient::Test(const boost::shared_ptr<msgs::String const> &msg )
+{
+  std::cout << "Gui::Test[" << msg->data() << "]\n";
 }

@@ -26,10 +26,13 @@ using namespace transport;
 Connection::Connection(boost::asio::io_service &io_service)
   : socket(io_service)
 {
+  this->readBufferMutex = new boost::mutex();
 }
 
 Connection::~Connection()
 {
+  delete this->readBufferMutex;
+  this->readBufferMutex = NULL;
 }
 
 boost::asio::ip::tcp::socket &Connection::GetSocket()
@@ -55,6 +58,22 @@ void Connection::Connect(const std::string &host, const std::string &service)
     throw boost::system::system_error(error);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the address of this connection
+std::string Connection::GetLocalAddress() const
+{
+  return this->socket.local_endpoint().address().to_string();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the port of this connection
+unsigned short Connection::GetLocalPort() const
+{
+  return this->socket.local_endpoint().port();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the remote address
 std::string Connection::GetRemoteAddress() const
 {
   return this->socket.remote_endpoint().address().to_string();
@@ -69,7 +88,8 @@ unsigned short Connection::GetRemotePort() const
 
 void Connection::StartReadThread()
 {
-  this->readThread = new boost::thread( boost::bind(&Connection::ReadLoop, this ) );
+  this->readThread = new boost::thread( 
+      boost::bind( &Connection::ReadLoop, this) );
 }
 
 void Connection::ReadLoop()
@@ -86,9 +106,14 @@ void Connection::ReadLoop()
     this->socket.read_some( boost::asio::buffer(header), error );
 
     data_size = this->ParseHeader( header );
+    std::cout << "Got a header Size[" << data_size << "]\n";
     data.resize( data_size );
 
     this->socket.read_some( boost::asio::buffer(data), error );
+
+    this->readBufferMutex->lock();
+    this->readBuffer.push_back( std::string(&data[0], data.size()) );
+    this->readBufferMutex->unlock();
 
     if (error == boost::asio::error::eof)
     {
@@ -122,4 +147,26 @@ void Connection::OnWrite(const boost::system::error_code &e)
   if (e)
     throw boost::system::system_error(e);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the number of messages in the read buffer
+unsigned int Connection::GetReadBufferSize()
+{
+  this->readBufferMutex->lock();
+  unsigned int size = this->readBuffer.size();
+  this->readBufferMutex->unlock();
+
+  return size;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Pop one message off the read buffer, and return the serialized data in msg
+void Connection::PopReadBuffer(std::string &msg)
+{
+  this->readBufferMutex->lock();
+  msg = this->readBuffer.front();
+  this->readBuffer.pop_front();
+  this->readBufferMutex->unlock();
+}
+
 

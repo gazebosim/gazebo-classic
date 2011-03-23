@@ -16,7 +16,6 @@ set (sources TopicManager.cc
 
 set (headers TopicManager.hh
              Subscriber.hh
-             Subscription.hh
              Publisher.hh
              IOManager.hh
              Connection.hh

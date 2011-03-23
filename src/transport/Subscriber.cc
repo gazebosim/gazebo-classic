@@ -26,7 +26,7 @@ using namespace transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Subscriber::Subscriber(const std::string &t, SubscriptionPtr sub)
+Subscriber::Subscriber(const std::string &t, CallbackHelperPtr sub)
   : topic(t), subscription(sub)
 {
 }
@@ -43,6 +43,13 @@ Subscriber::~Subscriber()
 std::string Subscriber::GetTopic() const
 {
   return this->topic;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the message type
+std::string Subscriber::GetMsgType() const
+{
+  return this->subscription->GetMsgType();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

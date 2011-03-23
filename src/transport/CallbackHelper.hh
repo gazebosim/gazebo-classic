@@ -5,50 +5,57 @@
 
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
+#include <google/protobuf/message.h>
+
+#include "common/GazeboError.hh"
 
 namespace gazebo
 {
   namespace transport
   {
-
     class CallbackHelper
     {
       public: CallbackHelper() {}
-      public: virtual void OnRead(const std::vector<char> &newdata) = 0;
+
+      /// \brief Get the typename of the message that is handled
+      public: virtual std::string GetMsgType() const = 0;
+
+      public: virtual void HandleMessage(const std::string &newdata) = 0;
     };
+    typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
+
 
     template<class M>
     class CallbackHelperT : public CallbackHelper
     {
-      public: CallbackHelperT(const boost::function<void (const M &)> &callback) : CallbackHelper(), callback(callback) {}
-
-      public: virtual void OnRead(const std::vector<char> &newdata)
+      public: CallbackHelperT( const boost::function<void (const boost::shared_ptr<M const> &)> &cb) : callback(cb) 
               {
-                std::cout << "CallbackHelper::OnRead\n";
-                // Extract the data structure from the data
-                /*try
-                {
-                  std::string archive_data(&newdata[0], newdata.size());
-                  std::istringstream archive_stream(archive_data);
-                  boost::archive::text_iarchive archive(archive_stream);
-                  archive >> this->data;
-                }
-                catch (std::exception &e)
-                {
-                  // Unable to decode data
-                  boost::system::error_code error(boost::asio::error::invalid_argument);
-                  std::cerr << "!Error:" << e.what() << std::endl;
-                  return;
-                }
-                */
-                //Message::fillFromBuffer(this->data, newdata);
-                //this->callback( this->data );
+                // Just some code to make sure we have a google protobuf.
+                M test;
+                google::protobuf::Message *m;
+                if ( (m=dynamic_cast<google::protobuf::Message*>(&test)) ==NULL)
+                  gzthrow( "Message type must be a google::protobuf type\n" );
               }
 
-      public: boost::function<void (const M &)> callback;
-      public: M data;
-    };
+      /// \brief Get the typename of the message that is handled
+      public: std::string GetMsgType() const
+              {
+                M test;
+                google::protobuf::Message *m;
+                if ((m=dynamic_cast<google::protobuf::Message*>(&test)) ==NULL)
+                  gzthrow( "Message type must be a google::protobuf type\n" );
+                return m->GetTypeName();
+              }
 
+      public: virtual void HandleMessage(const std::string &newdata)
+              {
+                boost::shared_ptr<M> m( new M );
+                m->ParseFromString( newdata );
+                this->callback( m );
+              }
+
+      private: boost::function<void (const boost::shared_ptr<M const> &)> callback;
+    };
     typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
   }
 }

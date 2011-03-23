@@ -38,6 +38,10 @@ namespace gazebo
                          const std::string &id);
 
         static void Stamp(msgs::Header &);
+        static void Stamp(msgs::Time &);
+
+        static msgs::Packet Package(const std::string topic, 
+                                     const google::protobuf::Message &message);
 
         static msgs::Point      Convert(const Vector3 &v);
         static msgs::Quaternion Convert(const Quatern &q);

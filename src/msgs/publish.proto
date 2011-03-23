@@ -1,0 +1,9 @@
+package gazebo.msgs;
+
+message Publish
+{
+  required string topic    = 1;
+  required string msg_type = 2;
+  required string host     = 3;
+  required uint32 port     = 4;
+}

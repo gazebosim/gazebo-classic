@@ -31,6 +31,7 @@ add_dependencies( gazebo_rendering gazebo_msgs )
 
 add_executable(gazebo_server server.cc PhysicsServer.cc)
 add_executable(gazebo_client client.cc GuiClient.cc)
+add_executable(gazebo_master master.cc Master.cc)
 
 #set_source_files_properties(server.cc client.cc PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
 
@@ -43,6 +44,15 @@ add_executable(gazebo_client client.cc GuiClient.cc)
 #endif ()
 
 set_target_properties( gazebo_client PROPERTIES LINK_FLAGS "${ogre_ldflags}")
+
+target_link_libraries( gazebo_master gazebo_common
+                                     gazebo_transport
+                                     gazebo_msgs
+                                     ${XML_LIBRARIES}
+                                     ${boost_libraries}
+                                     ${freeimage_library}
+                                     ${assimp_libraries}
+                                     ${PROTOBUF_LIBRARY})
 
 target_link_libraries( gazebo_server gazebo_common
                                      gazebo_transport
@@ -72,5 +82,6 @@ target_link_libraries( gazebo_client gazebo_common
                                      ${ogre_link_libs}
                                      ${PROTOBUF_LIBRARY})
 
+install (TARGETS gazebo_master DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_client DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

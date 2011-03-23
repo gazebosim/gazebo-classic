@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#include "transport/Server.hh"
 #include "transport/Client.hh"
+#include "transport/Server.hh"
 #include "transport/TopicManager.hh"
 
 using namespace gazebo;
@@ -83,7 +83,7 @@ void TopicManager::HandleIncoming()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unsubscribe from a topic
-void TopicManager::Unsubscribe( const std::string &topic, SubscriptionPtr sub)
+void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
 {
   this->subscribed_topics[topic].remove(sub);
 }

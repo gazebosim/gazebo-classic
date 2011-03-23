@@ -1,4 +1,5 @@
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "common/GazeboError.hh"
 #include "common/Messages.hh"
@@ -10,16 +11,13 @@
 using namespace gazebo;
 using namespace transport;
 
-Client::Client( const std::string &host, const std::string &service)
+Client::Client( const std::string &host, unsigned short port)
 {
-  this->host = host;
-  this->service = service;
-
   this->connection.reset( new Connection(IOManager::Instance()->GetIO()) );
 
   try
   {
-    this->connection->Connect(this->host, this->service);
+    this->connection->Connect(host, boost::lexical_cast<std::string>(port));
   }
   catch (boost::system::system_error e)
   {
@@ -51,4 +49,14 @@ void Client::OnRead(const std::string &data)
   std::cout << "Client::OnRead[" << data << "]\n";
   //this->connection.async_read( boost::bind(&Client::OnRead, this, _1) );
   //this->callback->OnRead(data);
+}
+
+const ConnectionPtr &Client::GetConnection() const
+{
+  return this->connection;
+}
+
+void Client::Write(const google::protobuf::Message &msg)
+{
+  this->connection->Write(msg);
 }

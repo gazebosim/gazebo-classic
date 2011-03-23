@@ -44,6 +44,19 @@ namespace gazebo
 
       public: void StartReadThread();
 
+      /// \brief Get the number of messages in the read buffer
+      public: unsigned int GetReadBufferSize();
+
+      /// \brief Pop one message off the read buffer, and return the
+      ///        serialized data in msg
+      public: void PopReadBuffer(std::string &msg);
+
+      /// \brief Get the address of this connection
+      public: std::string GetLocalAddress() const;
+
+      /// \brief Get the port of this connection
+      public: unsigned short GetLocalPort() const;
+
       /// \brief Get the remote address
       public: std::string GetRemoteAddress() const;
 
@@ -154,6 +167,7 @@ namespace gazebo
                  }
                }
 
+
      private: void ReadLoop();
      private: std::size_t ParseHeader( const std::string header );
      private: void OnWrite(const boost::system::error_code &e);
@@ -166,6 +180,8 @@ namespace gazebo
       private: std::vector<char> inbound_data;
 
       private: boost::thread *readThread;
+      private: boost::mutex *readBufferMutex;
+      private: std::list< std::string > readBuffer;
       private: bool readQuit;
     };
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "common/Node.hh"
+
 namespace gazebo
 {
   namespace physics
@@ -21,6 +23,7 @@ namespace gazebo
     public: void Run();
     public: void Quit();
 
+    private: common::NodePtr node;
     private: std::vector< physics::World* > worlds;
     private: bool quit;
   };

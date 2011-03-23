@@ -56,6 +56,7 @@ const std::string default_config =
 </gazebo>";
 
 PhysicsServer::PhysicsServer()
+  : node(new common::Node())
 {
   this->quit = false;
 
@@ -69,19 +70,18 @@ PhysicsServer::PhysicsServer()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-  physics::PhysicsFactory::RegisterAll();
+  this->node->Init("localhost", 11345);
 
-  transport::IOManager::Instance()->Start();
-  transport::TopicManager::Instance()->Init(1234);
+  physics::PhysicsFactory::RegisterAll();
 }
 
 PhysicsServer::~PhysicsServer()
 {
-  transport::IOManager::Instance()->Stop();
 }
 
 void PhysicsServer::Load( const std::string &filename )
 {
+  /*
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
 
@@ -118,17 +118,17 @@ void PhysicsServer::Load( const std::string &filename )
       gzthrow("Failed to load the World\n"  << e);
     }
 
-    /*common::XMLConfigNode *pluginNode = worldNode->GetChild("plugin");
-    while (pluginNode != NULL)
-    {
-      this->AddPlugin( pluginNode->GetString("filename","",1), 
-          pluginNode->GetString("handle","",1) );
-      pluginNode = pluginNode->GetNext("plugin");
-    }
-    */
+    //common::XMLConfigNode *pluginNode = worldNode->GetChild("plugin");
+    //while (pluginNode != NULL)
+    //{
+    //  this->AddPlugin( pluginNode->GetString("filename","",1), 
+    //      pluginNode->GetString("handle","",1) );
+    //  pluginNode = pluginNode->GetNext("plugin");
+    //}
 
     worldNode = worldNode->GetNext("world");
   }
+*/
 }
 
 void PhysicsServer::Init()
@@ -140,14 +140,16 @@ void PhysicsServer::Run()
   msgs::String msg;
   msg.set_data("Hello");
 
-  transport::PublisherPtr pub = transport::TopicManager::Instance()->Advertise<msgs::String>("/gazebo/test");
+  transport::PublisherPtr pub = this->node->Advertise<msgs::String>("/gazebo/test");
+
+  //transport::PublisherPtr pub = transport::TopicManager::Instance()->Advertise<msgs::String>("/gazebo/test");
 
   while (!this->quit)
   {
-    pub->Publish(msg);
+    //pub->Publish(msg);
     //for (int i=0; i < this->worlds.size(); i++)
       //this->worlds[i]->Update();
-    usleep(10000);
+    usleep(100000);
   }
 }
 

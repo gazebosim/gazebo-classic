@@ -24,11 +24,44 @@ Server::Server(unsigned short port)
                   boost::asio::placeholders::error, new_conn));
 }
 
+void Server::ProcessIncoming()
+{
+  unsigned int i,j,k;
+  std::string msgData, topic;
+  msgs::Packet packet;
+
+  // Process each connection
+  for (i=0; i < this->connections.size(); i++)
+  {
+    unsigned int msgCount = this->connections[i]->GetReadBufferSize();
+
+    // Process each buffered incoming message on the connection
+    for (j=0; j < msgCount; j++)
+    {
+      // Get the next message on the connection
+      this->connections[i]->PopReadBuffer(msgData);
+      packet.ParseFromString( msgData );
+
+      topic = packet.topic();
+
+      // Send the message to all subscribers
+      for (k=0; k < this->subscriptions[topic].size(); k++)
+      {
+        this->subscriptions[topic][k]->HandleMessage(packet.serialized_data());
+      }
+    }
+  }
+}
+
 void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
 {
+  std::cout << "Server on accept\n";
   if (!e)
   {
     this->connections.push_back(conn);
+
+    // Spin up a thread that reads incoming data on the connection
+    conn->StartReadThread();
 
     msgs::String stringMsg;
     stringMsg.set_data( std::string("gazebo ") + GAZEBO_VERSION );
@@ -56,17 +89,6 @@ void Server::Write(const google::protobuf::Message &msg)
     this->connections[i]->Write(msg);
   }
 }
-
-/*void Server::Publish(const StringMessage &msg)
-{
-  std::vector<ConnectionPtr>::iterator iter;
-  for (iter = this->connections.begin(); iter != this->connections.end(); iter++)
-  {
-    printf("Writing to..\n");
-     (*iter)->write(msg, boost::bind(&Server::OnWrite, this,
-                          boost::asio::placeholders::error, (*iter)));
-  }
-}*/
 
 int Server::GetConnectionCount() const
 {

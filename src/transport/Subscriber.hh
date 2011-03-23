@@ -24,7 +24,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/Subscription.hh"
+#include "transport/CallbackHelper.hh"
 
 namespace gazebo
 {
@@ -33,7 +33,7 @@ namespace gazebo
     class Subscriber
     {
       /// \brief Constructor
-      public: Subscriber(const std::string &topic, SubscriptionPtr sub);
+      public: Subscriber(const std::string &topic, CallbackHelperPtr sub);
 
       /// \brief Destructor
       public: virtual ~Subscriber();
@@ -41,11 +41,14 @@ namespace gazebo
       /// \brief Get the topic name
       public: std::string GetTopic() const;
 
+      /// \brief Get the message type
+      public: std::string GetMsgType() const;
+
       /// \brief Unsubscribe from the topic
       public: void Unsubscribe() const;
 
       private: std::string topic;
-      private: SubscriptionPtr subscription;
+      private: CallbackHelperPtr subscription;
     };
     typedef boost::shared_ptr<Subscriber> SubscriberPtr;
   }

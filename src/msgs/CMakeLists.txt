@@ -17,6 +17,8 @@ set (msgs color.proto
           int.proto
           string.proto
           packet.proto
+          publish.proto
+          subscribe.proto
 )
 
 

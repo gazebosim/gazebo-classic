@@ -18,6 +18,7 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
+#include "common/GazeboError.hh"
 #include "common/XMLConfig.hh"
 #include "common/Messages.hh"
 
@@ -55,18 +56,37 @@ void Message::Init(google::protobuf::Message &message, const std::string &id)
   if ( header )
   {
     header->set_str_id(id);
-    Message::Stamp(*header);
+    Message::Stamp(*(header->mutable_stamp()));
   }
   else
     std::cout << "Header is non-existant\n";
 }
 
-void Message::Stamp(msgs::Header &header)
+void Message::Stamp(msgs::Header &hdr)
+{
+  Message::Stamp(*hdr.mutable_stamp());
+}
+
+void Message::Stamp(msgs::Time &time)
 {
   Time tm = Time::GetWallTime();
 
-  header.mutable_stamp()->set_sec(tm.sec);
-  header.mutable_stamp()->set_nsec(tm.nsec);
+  time.set_sec(tm.sec);
+  time.set_nsec(tm.nsec);
+}
+
+msgs::Packet Message::Package(const std::string topic, 
+                              const google::protobuf::Message &message)
+{
+  msgs::Packet pkg;
+  Message::Stamp( *pkg.mutable_stamp() );
+  pkg.set_topic(topic);
+
+  std::string *serialized_data = pkg.mutable_serialized_data();
+  if (!message.SerializeToString(serialized_data))
+    gzthrow("Failed to serialized message");
+
+  return pkg;
 }
 
 void Message::Set(msgs::Point *pt, const Vector3 &v)

@@ -7,6 +7,7 @@
 #include "GuiClient.hh"
 
 std::string config_file = "";
+gazebo::GuiClient *client = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Print the version/licence string
@@ -74,7 +75,7 @@ int ParseArgs(int argc, char **argv)
 // sighandler to shut everything down properly
 void SignalHandler( int /*dummy*/ )
 {
-  //gazebo::event::Events::quitSignal();
+  client->Quit();
   return;
 }
 
@@ -117,7 +118,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  gazebo::GuiClient *client = new gazebo::GuiClient();
+  client = new gazebo::GuiClient();
   client->Load(config_file);
   client->Run();
 

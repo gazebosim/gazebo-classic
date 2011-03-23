@@ -2,6 +2,7 @@
 #define CLIENT_HH
 
 #include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "common/Messages.hh"
 #include "transport/IOManager.hh"
@@ -14,30 +15,20 @@ namespace gazebo
   {
     class Client
     {
-      public: Client( const std::string &host, const std::string &service);
+      public: Client( const std::string &host, unsigned short port);
 
-      public: template<class M, class T>
-              void Subscribe( const std::string &topic, 
-                              void(T::*fp)(const M&), T *obj )
-              {
+      public: const ConnectionPtr &GetConnection() const;
 
-                //this->callback.reset( 
-                    //new CallbackHelperT<M>(boost::bind(fp, obj, _1)));
-                /*this->connection.async_read( 
-                    boost::bind(&Client::OnRead, this, _1) );
-                    */
-              }
+      public: void Write(const google::protobuf::Message &msg);
 
       private: void OnRead(const std::string &data);
       private: void OnReadInit(const std::string &data);
 
       private: ConnectionPtr connection;
       private: CallbackHelperPtr callback;
-      private: std::string host;
-      private: std::string service;
 
-      //private: std::map<std::string, MessageType > topics;
     };
+    typedef boost::shared_ptr<Client> ClientPtr;
   }
 }
 

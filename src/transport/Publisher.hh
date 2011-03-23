@@ -45,8 +45,14 @@ namespace gazebo
       /// \brief Publish a message on the topic
       public: void Publish( google::protobuf::Message &message );
 
+      /// \brief Get the topic name
+      public: std::string GetTopic() const;
+
+      /// \brief Get the message type
+      public: std::string GetMsgType() const;
+
       private: std::string topic;
-      private: std::string msg_type;
+      private: std::string msgType;
     };
     typedef boost::shared_ptr<Publisher> PublisherPtr;
   }

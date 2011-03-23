@@ -27,7 +27,6 @@
 
 #include "transport/Publisher.hh"
 #include "transport/Subscriber.hh"
-#include "transport/Subscription.hh"
 
 namespace gazebo
 {
@@ -48,8 +47,14 @@ namespace gazebo
       public: template<class M, class T>
               SubscriberPtr Subscribe(const std::string &topic, void(T::*fp)(const boost::shared_ptr<M const> &), T *obj)
               {
+                google::protobuf::Message *msg = NULL;
+                M msgtype;
+                msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
+                if (!msg)
+                  gzthrow("Subscribe requires a google protobuf type");
 
-                SubscriptionPtr subscription( new SubscriptionT<M, void (const boost::shared_ptr<M const> &)>( boost::bind(fp, obj, _1) ) );
+                CallbackHelperPtr subscription( 
+                    new CallbackHelperT<M>( boost::bind(fp, obj, _1) ) );
 
                 SubscriberPtr sub( new Subscriber(topic, subscription) );
 
@@ -66,7 +71,7 @@ namespace gazebo
 
       /// \brief Unsubscribe from a topic. Use a Subscriber rather than
       ///        calling this function directly
-      public: void Unsubscribe(const std::string &topic, SubscriptionPtr sub);
+      public: void Unsubscribe(const std::string &topic, CallbackHelperPtr sub);
 
       /// \brief Advertise on a topic
       /// \param topic The name of the topic
@@ -102,7 +107,7 @@ namespace gazebo
       private: Client *client;
 
       private: std::map<std::string, int> advertised_topics;
-      private: std::map<std::string, std::list<SubscriptionPtr> > subscribed_topics; 
+      private: std::map<std::string, std::list<CallbackHelperPtr> > subscribed_topics; 
 
       //Singleton implementation
       private: friend class DestroyerT<TopicManager>;

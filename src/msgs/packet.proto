@@ -1,0 +1,9 @@
+package gazebo.msgs;
+import "time.proto";
+
+message Packet
+{
+  required string topic    = 1;
+  required Time stamp      = 2;
+  required bytes serialized_data = 3;
+}

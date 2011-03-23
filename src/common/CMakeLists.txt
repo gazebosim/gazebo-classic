@@ -49,6 +49,7 @@ set ( sources Messages.cc
               XMLConfig.cc
               Image.cc
               Material.cc
+              Node.cc
 )
 
 set ( headers Messages.hh
@@ -88,6 +89,7 @@ set ( headers Messages.hh
               Image.hh 
               Material.hh
               MouseEvent.hh
+              Node.hh
 )
 
 add_library(gazebo_common SHARED ${sources})
