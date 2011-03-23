@@ -181,10 +181,39 @@ void Simulator::Close()
     gazebo::OgreAdaptor::Instance()->Close();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// Load the world configuration file
-/// Any error that reach this level must make the simulator exit
-void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
+void Simulator::LoadWorldFile(const std::string &worldFileName, unsigned int serverId)
+{
+	gazebo::XMLConfig *worldConfig = new gazebo::XMLConfig();
+
+	try
+	{
+		worldConfig->Load(worldFileName);
+	}
+	catch (GazeboError e)
+	{
+		gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e);
+	}
+
+	this->Load(worldConfig, serverId);
+}
+
+void Simulator::LoadWorldString(const std::string &worldString, unsigned int serverId)
+{
+	gazebo::XMLConfig *worldConfig = new gazebo::XMLConfig();
+
+	try
+	{
+		worldConfig->LoadString(worldString);
+	}
+	catch (GazeboError e)
+	{
+		gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e);
+	}
+
+	this->Load(worldConfig, serverId);
+}
+
+void Simulator::Load(gazebo::XMLConfig *worldConfig, unsigned int serverId )
 {
   this->state = LOAD;
 
@@ -194,20 +223,7 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
     loaded=false;
   }
 
-  // Load the world file
-  this->xmlFile=new gazebo::XMLConfig();
-
-  try
-  {
-    if (worldFileName.size())
-      this->xmlFile->Load(worldFileName);
-    else
-      this->xmlFile->LoadString(defaultWorld);
-  }
-  catch (GazeboError e)
-  {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
-  }
+  this->xmlFile = worldConfig;
 
   XMLConfigNode *rootNode(xmlFile->GetRootNode());
 
@@ -310,6 +326,15 @@ void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
   this->loaded=true;
 
   //OgreAdaptor::Instance()->PrintSceneGraph();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load the world configuration file
+/// Any error that reach this level must make the simulator exit
+/// DEPRECATED
+void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
+{
+	this->LoadWorldFile(worldFileName, serverId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
