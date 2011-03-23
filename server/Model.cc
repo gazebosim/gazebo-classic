@@ -560,6 +560,17 @@ void Model::RemoveChild(Entity *child)
 /// Primarily used to update the graphics interfaces
 void Model::GraphicsUpdate()
 {
+  if (this->modelType == "renderable")
+  {
+    std::map<std::string, Controller* >::iterator contIter;    
+    this->updateSignal();    
+    for (contIter=this->controllers.begin(); contIter!=this->controllers.end(); contIter++)
+    {
+      if (contIter->second)
+        contIter->second->Update();
+    }
+    this->UpdateChild();
+  }
   if (this->graphicsHandler)
   {
     this->graphicsHandler->Update();
