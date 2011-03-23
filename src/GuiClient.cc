@@ -157,6 +157,7 @@ void GuiClient::Run()
 
   this->gui->Run();
   */
+
   this->node->Subscribe("/gazebo/test", &GuiClient::Test, this);
 
   while (!this->quit)

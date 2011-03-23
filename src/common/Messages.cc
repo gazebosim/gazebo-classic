@@ -75,12 +75,12 @@ void Message::Stamp(msgs::Time &time)
   time.set_nsec(tm.nsec);
 }
 
-msgs::Packet Message::Package(const std::string topic, 
+msgs::Packet Message::Package(const std::string type, 
                               const google::protobuf::Message &message)
 {
   msgs::Packet pkg;
   Message::Stamp( *pkg.mutable_stamp() );
-  pkg.set_topic(topic);
+  pkg.set_type(type);
 
   std::string *serialized_data = pkg.mutable_serialized_data();
   if (!message.SerializeToString(serialized_data))

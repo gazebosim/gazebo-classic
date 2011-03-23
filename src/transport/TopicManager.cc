@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "common/Messages.hh"
 #include "transport/Client.hh"
 #include "transport/Server.hh"
 #include "transport/TopicManager.hh"
@@ -57,19 +58,8 @@ void TopicManager::SendMessage( const std::string &topic,
     gzthrow("Simulator::SendMessage Message is not initialized[" + message.InitializationErrorString() + "]");
   }
 
-  msgs::Packet packet;
-
-  common::Time tm = common::Time::GetWallTime();
-  packet.mutable_stamp()->set_sec(tm.sec);
-  packet.mutable_stamp()->set_nsec(tm.nsec);
-  packet.set_topic(topic);
-
-  std::string *serialized_data = packet.mutable_serialized_data();
-  if (!message.SerializeToString(serialized_data))
-    gzthrow("Failed to serialized message");
-
   std::cout << "TopicManager Sending a message\n";
-  this->server->Write(packet);
+  this->server->Write( common::Message::Package(topic, message) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

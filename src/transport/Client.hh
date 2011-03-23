@@ -22,6 +22,7 @@ namespace gazebo
       public: void Write(const google::protobuf::Message &msg);
 
       private: void OnRead(const std::string &data);
+
       private: void OnReadInit(const std::string &data);
 
       private: ConnectionPtr connection;

@@ -38,14 +38,23 @@ Master::~Master()
 
 void Master::HandlePublish(const boost::shared_ptr<msgs::Publish const> &msg)
 {
-  std::cout << "Handle Publish\n";
   this->publishers.push_back( *msg );
 }
 
 void Master::HandleSubscribe(const boost::shared_ptr<msgs::Subscribe const> &msg)
 {
   std::cout << "Handle Suscribe\n";
+  std::list<msgs::Publish>::iterator iter;
   this->subscribers.push_back( *msg );
+
+  // Find all publishers of the topic
+  for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
+  {
+    if ((*iter).topic() == msg->topic())
+    {
+      this->server->Write( (*iter), msg->host(), msg->port() );
+    }
+  }
 }
 
 void Master::Init(unsigned short port)
@@ -59,8 +68,8 @@ void Master::Init(unsigned short port)
     gzthrow( "Unable to start server[" << e.what() << "]\n");
   }
 
-  this->server->Subscribe("/gazebo/publish", &Master::HandlePublish, this);
-  this->server->Subscribe("/gazebo/subscribe", &Master::HandleSubscribe, this);
+  this->server->Subscribe("publish", &Master::HandlePublish, this);
+  this->server->Subscribe("subscribe", &Master::HandleSubscribe, this);
 }
 
 void Master::Run()

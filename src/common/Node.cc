@@ -22,6 +22,5 @@ Node::~Node()
 
 void Node::Init(const std::string &master_host, unsigned short master_port)
 {
-  std::cout << "Node init\n";
   this->client = new transport::Client(master_host, master_port);
 }

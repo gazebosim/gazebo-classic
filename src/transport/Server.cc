@@ -1,6 +1,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "common/Messages.hh"
 #include "transport/IOManager.hh"
 #include "transport/Server.hh"
 #include "gazebo_config.h"
@@ -27,7 +28,7 @@ Server::Server(unsigned short port)
 void Server::ProcessIncoming()
 {
   unsigned int i,j,k;
-  std::string msgData, topic;
+  std::string msgData, type;
   msgs::Packet packet;
 
   // Process each connection
@@ -42,12 +43,14 @@ void Server::ProcessIncoming()
       this->connections[i]->PopReadBuffer(msgData);
       packet.ParseFromString( msgData );
 
-      topic = packet.topic();
+      type = packet.type();
+
+      std::cout << "Server got type[" << type << "]\n";
 
       // Send the message to all subscribers
-      for (k=0; k < this->subscriptions[topic].size(); k++)
+      for (k=0; k < this->subscriptions[type].size(); k++)
       {
-        this->subscriptions[topic][k]->HandleMessage(packet.serialized_data());
+        this->subscriptions[type][k]->HandleMessage(packet.serialized_data());
       }
     }
   }
@@ -90,7 +93,21 @@ void Server::Write(const google::protobuf::Message &msg)
   }
 }
 
-int Server::GetConnectionCount() const
+void Server::Write(const google::protobuf::Message &msg,
+                   std::string connection_address, unsigned short port)
+{
+  for (unsigned int i=0; i < this->connections.size(); i++)
+  {
+    if (this->connections[i]->GetRemoteAddress() == connection_address &&
+        this->connections[i]->GetRemotePort() == port)
+    {
+      std::cout << "Server write message[" << msg.DebugString() << "]\n";
+      this->connections[i]->Write( common::Message::Package("pub_link", msg) );
+    }
+  }
+}
+
+unsigned int Server::GetConnectionCount() const
 {
   return this->connections.size();
 }

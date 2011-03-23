@@ -34,7 +34,10 @@ namespace gazebo
 
       public: void Write(const google::protobuf::Message &msg);
 
-      public: int GetConnectionCount() const;
+      public: void Write(const google::protobuf::Message &msg,
+                         std::string connection_address, unsigned short port);
+
+      public: unsigned int GetConnectionCount() const;
 
       private: void OnAccept(const boost::system::error_code &e, ConnectionPtr conn);
 

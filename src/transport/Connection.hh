@@ -38,9 +38,11 @@ namespace gazebo
       public: Connection(boost::asio::io_service &io_service);
       public: virtual ~Connection();
 
-      public: boost::asio::ip::tcp::socket &GetSocket();
-
+      /// \brief Connect to a remote host
       public: void Connect(const std::string &host, const std::string &service);
+
+      /// \brief Start a server that listens on a port
+      public: void Listen(unsigned short port, const AcceptCallback &accept_cb);
 
       public: void StartReadThread();
 

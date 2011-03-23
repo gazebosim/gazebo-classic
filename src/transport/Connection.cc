@@ -23,8 +23,8 @@
 using namespace gazebo;
 using namespace transport;
 
-Connection::Connection(boost::asio::io_service &io_service)
-  : socket(io_service)
+Connection::Connection()
+  : socket( IOManager::Instance()->GetIO() )
 {
   this->readBufferMutex = new boost::mutex();
 }
@@ -35,10 +35,6 @@ Connection::~Connection()
   this->readBufferMutex = NULL;
 }
 
-boost::asio::ip::tcp::socket &Connection::GetSocket()
-{
-  return this->socket;
-}
 
 void Connection::Connect(const std::string &host, const std::string &service)
 {
@@ -51,11 +47,25 @@ void Connection::Connect(const std::string &host, const std::string &service)
   boost::system::error_code error = boost::asio::error::host_not_found;
   while (error && endpoint_iter != end)
   {
-    socket.close();
-    socket.connect(*endpoint_iter++, error);
+    this->socket.close();
+    this->socket.connect(*endpoint_iter++, error);
   }
   if (error)
     throw boost::system::system_error(error);
+}
+
+void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
+{
+  this->acceptor = new boost::asio::ip::tcp::acceptor(
+      IOManager::Instance()->GetIO(), 
+      boost::asio::ip::tcp::endpoint( boost::asio::ip::tcp::v4(), port ));
+
+  this->acceptor.async_accept(this->socket, boost::bind(&Connection::OnAccept, this, boost::asio::placeholders::error));
+}
+
+void Connection::OnAccept(const boost::system::error_code &e)
+{
+  this->accept_cb();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +137,6 @@ void Connection::ReadLoop()
 
 std::size_t Connection::ParseHeader( const std::string header )
 {
-  std::cout << "Parse Header[" << header << "]\n";
   std::size_t data_size = 0;
 
   std::istringstream is(header);

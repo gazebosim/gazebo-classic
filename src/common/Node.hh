@@ -33,7 +33,7 @@ namespace gazebo
                 msg.set_host( this->client->GetConnection()->GetLocalAddress() );
                 msg.set_port( this->client->GetConnection()->GetLocalPort() );
 
-                this->client->Write(Message::Package("/gazebo/subscribe", msg));
+                this->client->Write(Message::Package("subscribe", msg));
 
                 return sub;
               }
@@ -50,7 +50,7 @@ namespace gazebo
                 msg.set_host( this->client->GetConnection()->GetLocalAddress() );
                 msg.set_port( this->client->GetConnection()->GetLocalPort() );
 
-                this->client->Write(Message::Package("/gazebo/publish", msg));
+                this->client->Write(Message::Package("publish", msg));
 
                 return pub;
               }
