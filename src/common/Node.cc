@@ -20,4 +20,18 @@ Node::~Node()
 void Node::Init(const std::string &master_host, unsigned short master_port)
 {
   this->connection->Connect(master_host, master_port);
+  this->connection->StartRead( boost::bind( &Node::OnRead, this, _1, _2 ) );
+}
+
+void Node::OnRead(const transport::ConnectionPtr &conn,const std::string &data)
+{
+  msgs::Packet packet;
+  packet.ParseFromString(data);
+
+  if (packet.type() == "publisher")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString( packet.serialized_data() );
+    transport::TopicManager::Instance()->ConnectSubscriber( pub );
+  }
 }

@@ -32,6 +32,7 @@ Connection::Connection()
 
 Connection::~Connection()
 {
+  std::cout << "Connection Destructor\n";
   //delete this->readBufferMutex;
   //this->readBufferMutex = NULL;
 }
@@ -93,6 +94,14 @@ void Connection::OnAccept(const boost::system::error_code &e,
   }
   else
     std::cerr << e.message() << std::endl;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Start a thread that reads from the connection, and passes
+/// new message to the ReadCallback
+void Connection::StartRead(const ReadCallback &cb)
+{
+  this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, this, cb ) ); 
 }
 
 void Connection::Write(const google::protobuf::Message &msg)
@@ -215,28 +224,18 @@ std::size_t Connection::ParseHeader( const std::string &header )
   return data_size;
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the number of messages in the read buffer
-/*unsigned int Connection::GetReadBufferSize()
+/// the read thread
+void Connection::ReadLoop(const ReadCallback &cb)
 {
-  this->readBufferMutex->lock();
-  unsigned int size = this->readBuffer.size();
-  this->readBufferMutex->unlock();
+  ConnectionPtr conn(this);
 
-  return size;
+  std::string data;
+  while (!this->readQuit)
+  {
+    this->Read(data);
+    (cb)( conn, data);
+  }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Pop one message off the read buffer, and return the serialized data in msg
-void Connection::PopReadBuffer(std::string &msg)
-{
-  this->readBufferMutex->lock();
-  msg = this->readBuffer.front();
-  this->readBuffer.pop_front();
-  this->readBufferMutex->unlock();
-}
-*/
 
 

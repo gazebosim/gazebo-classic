@@ -75,3 +75,18 @@ void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
 {
   this->subscribed_topics[topic].remove(sub);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Tells the topic manager about a publisher
+void TopicManager::ConnectSubscriber( const msgs::Publish &pub )
+{
+  std::map<std::string, std::list<CallbackHelperPtr> >::iterator iter;
+  iter = this->subscribed_topics.find(pub.topic());
+
+  if (iter != this->subscribed_topics.end())
+  {
+    std::cout << "TopicManager::ConnectSubscriber subscribers found\n";
+  }
+}
+
+

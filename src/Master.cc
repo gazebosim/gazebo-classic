@@ -26,36 +26,12 @@ Master::Master()
   : connection( new transport::Connection() )
 {
   transport::IOManager::Instance()->Start();
-  //this->server = NULL;
   this->quit = false;
 }
 
 Master::~Master()
 {
-//  if (this->server)
-    //delete this->server;
   transport::IOManager::Instance()->Stop();
-}
-
-void Master::HandlePublish(const boost::shared_ptr<msgs::Publish const> &msg)
-{
-  this->publishers.push_back( *msg );
-}
-
-void Master::HandleSubscribe(const boost::shared_ptr<msgs::Subscribe const> &msg)
-{
-  std::cout << "Handle Suscribe\n";
-  std::list<msgs::Publish>::iterator iter;
-  this->subscribers.push_back( *msg );
-
-  // Find all publishers of the topic
-  for (iter = this->publishers.begin(); iter != this->publishers.end(); iter++)
-  {
-    if ((*iter).topic() == msg->topic())
-    {
-      //this->server->Write( (*iter), msg->host(), msg->port() );
-    }
-  }
 }
 
 void Master::Init(unsigned short port)
@@ -68,33 +44,62 @@ void Master::Init(unsigned short port)
   {
     gzthrow( "Unable to start server[" << e.what() << "]\n");
   }
-
-  //this->server->Subscribe("publish", &Master::HandlePublish, this);
-  //this->server->Subscribe("subscribe", &Master::HandleSubscribe, this);
 }
 
 void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 {
   std::cout << "Master new connection\n";
   this->connections.push_back(new_connection);
-  new_connection->AsyncRead( boost::bind(&Master::OnRead, this, _1) );
+
+  new_connection->StartRead(
+      boost::bind(&Master::OnRead, this, _1, _2));
 }
 
-void Master::OnRead(const std::string &data)
+void Master::OnRead(const transport::ConnectionPtr &conn, 
+                    const std::string &data)
 {
   msgs::Packet packet;
   packet.ParseFromString(data);
 
-  std::cout << "Master::onRead\n";
-  std::cout << packet.DebugString();
+  if (packet.type() == "publish")
+  {
+    msgs::Publish pub;
+    pub.ParseFromString( packet.serialized_data() );
 
+    this->publishers.push_back( pub );
+
+    std::cout << "new publish message\n";
+  }
+  else if (packet.type() == "subscribe")
+  {
+    msgs::Subscribe sub;
+    sub.ParseFromString( packet.serialized_data() );
+
+    this->subscribers.push_back( sub );
+
+    std::list<msgs::Publish>::iterator iter;
+    std::cout << "new subscribe message\n";
+
+    // Find all publishers of the topic
+    for (iter = this->publishers.begin(); 
+         iter != this->publishers.end(); iter++)
+    {
+      if ((*iter).topic() == sub.topic())
+      {
+        std::cout << "Found a publisher\n";
+        std::cout << (*iter).DebugString();
+        conn->Write( common::Message::Package("publisher", *iter) );
+      }
+    }
+  }
+  else
+    std::cerr << "Master Unknown message type\n";
 }
 
 void Master::Run()
 {
   while (!this->quit)
   {
-    //this->server->ProcessIncoming();
     usleep(1000000);
   }
 }

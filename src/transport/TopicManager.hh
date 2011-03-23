@@ -98,6 +98,10 @@ namespace gazebo
       public: void SendMessage( const std::string &topic, 
                                 google::protobuf::Message &message );
 
+
+      /// \brief Tells the topic manager about a publisher
+      public: void ConnectSubscriber( const msgs::Publish &pub );
+
       private: void HandleIncoming();
 
       private: std::map<std::string, int> advertised_topics;

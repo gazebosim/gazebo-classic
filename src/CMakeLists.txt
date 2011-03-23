@@ -26,6 +26,7 @@ add_subdirectory(rendering)
 add_subdirectory(gui)
 add_subdirectory(physics)
 
+add_dependencies( gazebo_common gazebo_msgs )
 add_dependencies( gazebo_gui gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )
 

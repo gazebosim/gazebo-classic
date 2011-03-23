@@ -55,6 +55,9 @@ namespace gazebo
                 return pub;
               }
 
+      private: void OnRead(const transport::ConnectionPtr &conn,
+                           const std::string &data);
+
       private: transport::ConnectionPtr connection;
     };
     typedef boost::shared_ptr<Node> NodePtr;

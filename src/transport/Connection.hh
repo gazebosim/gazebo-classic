@@ -20,7 +20,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-//#include <boost/thread.hpp>
+#include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <iostream>
 #include <iomanip>
@@ -40,7 +40,10 @@ namespace gazebo
 
     class Connection
     {
+      /// \brief Constructor
       public: Connection();
+
+      /// \brief Destructor
       public: virtual ~Connection();
 
       /// \brief Connect to a remote host
@@ -51,13 +54,10 @@ namespace gazebo
       /// \brief Start a server that listens on a port
       public: void Listen(unsigned short port, const AcceptCallback &accept_cb);
 
-
-      /// \brief Get the number of messages in the read buffer
-      //public: unsigned int GetReadBufferSize();
-
-      /// \brief Pop one message off the read buffer, and return the
-      ///        serialized data in msg
-      //public: void PopReadBuffer(std::string &msg);
+      typedef boost::function<void(const ConnectionPtr&, const std::string &data)> ReadCallback;
+      /// \brief Start a thread that reads from the connection, and passes
+      ///        new message to the ReadCallback
+      public: void StartRead(const ReadCallback &cb);
 
       /// \brief Read data from the socket
       public: void Read(std::string &data);
@@ -67,7 +67,6 @@ namespace gazebo
 
       /// \brief Write data to the socket
       public: void Write(const std::string &buffer);
-
 
       /// \brief Get the address of this connection
       public: std::string GetLocalAddress() const;
@@ -81,7 +80,7 @@ namespace gazebo
       /// \brief Get the remote port number
       public: unsigned short GetRemotePort() const;
 
-
+      /// \brief Peform and asyncronous read
       public: template<typename Handler>
               void AsyncRead(Handler handler)
               {
@@ -103,7 +102,8 @@ namespace gazebo
               {
                 if (e)
                 {
-                  std::cout << "An error occrured reading a header\n";
+                  std::cerr << "An error occrured reading a header[" 
+                            << e.message() << "]\n";
                   // Pass the error to the handler
                   //boost::get<0>(handler)(e);
                 }
@@ -153,13 +153,15 @@ namespace gazebo
       /// \brief Handle on write callbacks
      private: void OnWrite(const boost::system::error_code &e);
 
+     /// \brief Handle new connections, if this is a server
      private: void OnAccept(const boost::system::error_code &e,
                             ConnectionPtr newConnection);
 
      /// \brief Parse a header to get the size of a packet
      private: std::size_t ParseHeader( const std::string &header );
 
-     //private: void ReadLoop();
+     /// \brief the read thread
+     private: void ReadLoop(const ReadCallback &cb);
 
       private: boost::asio::ip::tcp::socket socket;
       private: boost::asio::ip::tcp::acceptor *acceptor;
@@ -173,11 +175,11 @@ namespace gazebo
       private: char inbound_header[HEADER_LENGTH];
       private: std::vector<char> inbound_data;
 
-      /*private: boost::thread *readThread;
-      private: boost::mutex *readBufferMutex;
-      private: std::list< std::string > readBuffer;
+      private: boost::thread *readThread;
+      //private: boost::mutex *readBufferMutex;
+      //private: std::list< std::string > readBuffer;
       private: bool readQuit;
-      */
+      
     };
 
   }

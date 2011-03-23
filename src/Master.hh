@@ -20,11 +20,8 @@ namespace gazebo
     public: void Run();
     public: void Quit();
 
-    private: void OnRead(const std::string &data);
-
-    private: void HandlePublish(const boost::shared_ptr<msgs::Publish const> &msg);
-
-    private: void HandleSubscribe(const boost::shared_ptr<msgs::Subscribe const> &msg);
+    private: void OnRead(const transport::ConnectionPtr &new_connection,
+                         const std::string &data);
 
     private: void OnAccept(const transport::ConnectionPtr &new_connection);
 
