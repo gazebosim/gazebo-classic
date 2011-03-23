@@ -749,20 +749,7 @@ void OgreVisual::SetPosition( const Vector3 &pos)
   if (this->ignorePoseUpdates)
     return;
 
-  // FIXME: this was debug code, is this necessary?
-  if (this->IsStatic() && this->staticGeom)
-  {
-    this->staticGeom->reset();
-    delete this->staticGeom;
-    this->staticGeom = NULL;
-    //this->staticGeom->setOrigin( Ogre::Vector3(pos.x, pos.y, pos.z) );
-  }
-
   this->sceneNode->setPosition(pos.x, pos.y, pos.z);
-
-  if (this->IsStatic())
-    this->MakeStatic();
-    
 }
 
 ////////////////////////////////////////////////////////////////////////////////

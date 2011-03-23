@@ -40,7 +40,7 @@
   </rendering:ogre>
 
   <!-- Ground Plane -->
-  <model:physical name="plane1_model">
+  <!--<model:physical name="plane1_model">
     <xyz>0 0 0</xyz>
     <rpy>0 0 0</rpy>
     <static>true</static>
@@ -57,16 +57,15 @@
       </geom:plane>
     </body:plane>
   </model:physical>
+  -->
 
   <model:physical name="wg_model">
     <xyz>-8 -4 0</xyz>
     <static>true</static>
 
     <body:box name="wg_body">
-      <xyz>0 0 0</xyz>
       <geom:box name="wg_geom">
         <size>1 1 1</size>
-        <mass>0</mass>
         <visual>
           <mesh>willowgarage.dae</mesh>
           <scale>0.0254 0.0254 0.0254</scale>
@@ -75,6 +74,7 @@
     </body:box>
   </model:physical>
 
+  <!--
   <model:physical name="camera">
     <xyz> 0 0 5 </xyz>
     <static>true</static>
@@ -137,6 +137,7 @@
     </sensor:camera>
     </body:box>
   </model:physical>
+  -->
   
 <!--
   <model:physical name="pr2">

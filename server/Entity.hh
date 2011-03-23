@@ -214,6 +214,10 @@ namespace gazebo
     /// \brief Handle a change of pose
     private: void PoseChange(bool notify = true);
 
+    /// \brief A helper routine to make objects static. This is called at
+    //         the very end of initialize at the model level
+    protected: void MakeStatic();
+
     /// \brief Parent of this entity
     protected: Entity *parent;
   

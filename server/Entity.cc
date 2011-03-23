@@ -545,3 +545,10 @@ void Entity::Print(std::string prefix)
   for (iter = this->children.begin(); iter != this->children.end(); iter++)
     (*iter)->Print(prefix);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// A helper routine to make objects static. This is called at the very end of initialize at the model level
+void Entity::MakeStatic()
+{
+  this->visualNode->MakeStatic();
+}

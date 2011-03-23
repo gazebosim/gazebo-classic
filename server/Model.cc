@@ -410,6 +410,9 @@ void Model::Init()
   //Body* cb = this->GetCanonicalBody();
   //if (cb != NULL)
     //cb->SetCanonicalModel(this);
+
+  if (this->IsStatic() && this->modelType == "physical")
+    this->MakeStatic();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
