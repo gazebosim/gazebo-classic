@@ -15,8 +15,6 @@
  *
 */
 #include "common/Messages.hh"
-#include "transport/Client.hh"
-#include "transport/Server.hh"
 #include "transport/TopicManager.hh"
 
 using namespace gazebo;
@@ -25,7 +23,6 @@ using namespace transport;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 TopicManager::TopicManager()
-  : server(NULL), client(NULL)
 {
 }
 
@@ -37,7 +34,7 @@ TopicManager::~TopicManager()
 
 void TopicManager::Init(unsigned short port)
 {
-  try
+  /*try
   {
     this->server = new Server(port);
   }
@@ -45,6 +42,7 @@ void TopicManager::Init(unsigned short port)
   {
     gzthrow( "Unable to start server[" << e.what() << "]\n");
   }
+  */
 }
 
 
@@ -59,7 +57,7 @@ void TopicManager::SendMessage( const std::string &topic,
   }
 
   std::cout << "TopicManager Sending a message\n";
-  this->server->Write( common::Message::Package(topic, message) );
+  //this->server->Write( common::Message::Package(topic, message) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

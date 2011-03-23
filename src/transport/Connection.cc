@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#include <boost/thread.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "common/Messages.hh"
+
 #include "transport/IOManager.hh"
 #include "transport/Connection.hh"
 
@@ -26,18 +27,21 @@ using namespace transport;
 Connection::Connection()
   : socket( IOManager::Instance()->GetIO() )
 {
-  this->readBufferMutex = new boost::mutex();
+  //this->readBufferMutex = new boost::mutex();
 }
 
 Connection::~Connection()
 {
-  delete this->readBufferMutex;
-  this->readBufferMutex = NULL;
+  //delete this->readBufferMutex;
+  //this->readBufferMutex = NULL;
 }
 
-
-void Connection::Connect(const std::string &host, const std::string &service)
+////////////////////////////////////////////////////////////////////////////////
+// Connect to a remote host
+void Connection::Connect(const std::string &host, unsigned short port)
 {
+  std::string service = boost::lexical_cast<std::string>(port);
+
   // Resolve the host name into an IP address
   boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());
   boost::asio::ip::tcp::resolver::query query(host, service);
@@ -45,6 +49,7 @@ void Connection::Connect(const std::string &host, const std::string &service)
   boost::asio::ip::tcp::resolver::iterator end;
 
   boost::system::error_code error = boost::asio::error::host_not_found;
+
   while (error && endpoint_iter != end)
   {
     this->socket.close();
@@ -54,18 +59,112 @@ void Connection::Connect(const std::string &host, const std::string &service)
     throw boost::system::system_error(error);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Start a server that listens on a port
 void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
 {
+  this->acceptCB = accept_cb;
+
+  std::cout << "Connection::Listen\n";
   this->acceptor = new boost::asio::ip::tcp::acceptor(
       IOManager::Instance()->GetIO(), 
       boost::asio::ip::tcp::endpoint( boost::asio::ip::tcp::v4(), port ));
 
-  this->acceptor.async_accept(this->socket, boost::bind(&Connection::OnAccept, this, boost::asio::placeholders::error));
+  ConnectionPtr newConnection(new Connection());
+
+  this->acceptor->async_accept(newConnection->socket,
+      boost::bind(&Connection::OnAccept, this, 
+                  boost::asio::placeholders::error, newConnection));
 }
 
-void Connection::OnAccept(const boost::system::error_code &e)
+////////////////////////////////////////////////////////////////////////////////
+// Accept a new connection to this server, and start a new acceptor
+void Connection::OnAccept(const boost::system::error_code &e, 
+                          ConnectionPtr newConnection)
 {
-  this->accept_cb();
+  if (!e)
+  {
+    this->acceptCB( newConnection );
+
+    newConnection.reset(new Connection());
+    this->acceptor->async_accept(newConnection->socket, 
+        boost::bind(&Connection::OnAccept, this, 
+                    boost::asio::placeholders::error, newConnection));
+  }
+  else
+    std::cerr << e.message() << std::endl;
+}
+
+void Connection::Write(const google::protobuf::Message &msg)
+{
+  std::string out;
+
+  if (!msg.SerializeToString(&out))
+    gzthrow("Failed to serialized message");
+
+  this->Write(out);
+}
+
+void Connection::Write(const std::string &buffer)
+{
+  std::ostringstream header_stream;
+  header_stream << std::setw(HEADER_LENGTH) << std::hex << buffer.size();
+
+  if (!header_stream || header_stream.str().size() != HEADER_LENGTH)
+  {
+    //Something went wrong, inform the caller
+    boost::system::error_code error(boost::asio::error::invalid_argument);
+    std::cerr << "Connection::Write error[" << error.message() << "]\n";
+    return;
+  }
+
+  // Keep a copy of the data valid during the write operation
+  this->outbound_header = header_stream.str();
+  this->outbound_data = buffer;
+
+  // Write the serialized data to the socket. We use
+  // "gather-write" to send both the head and the data in
+  // a single write operation
+  std::vector<boost::asio::const_buffer> buffers;
+  buffers.push_back(boost::asio::buffer(this->outbound_header));
+  buffers.push_back(boost::asio::buffer(this->outbound_data));
+  boost::asio::async_write( this->socket, buffers, boost::bind(&Connection::OnWrite, this, boost::asio::placeholders::error));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Handle on write callbacks
+void Connection::OnWrite(const boost::system::error_code &e)
+{
+  if (e)
+    throw boost::system::system_error(e);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Read data from the socket
+void Connection::Read(std::string &data)
+{
+  char header[HEADER_LENGTH];
+  std::vector<char> incoming;
+
+  std::size_t incoming_size;
+  boost::system::error_code error;
+
+  // First read the header
+  this->socket.read_some( boost::asio::buffer(header), error );
+  if (error)
+    throw boost::system::system_error(error);
+
+  // Parse the header to get the size of the incoming data packet
+  incoming_size = this->ParseHeader( header );
+  std::cout << "Got a header Size[" << incoming_size << "]\n";
+  incoming.resize( incoming_size );
+
+  // Read in the actual data
+  this->socket.read_some( boost::asio::buffer(incoming), error );
+  if (error)
+    throw boost::system::system_error(error);
+
+  data = std::string(&incoming[0], incoming.size());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,46 +195,11 @@ unsigned short Connection::GetRemotePort() const
   return this->socket.remote_endpoint().port();
 }
 
-void Connection::StartReadThread()
-{
-  this->readThread = new boost::thread( 
-      boost::bind( &Connection::ReadLoop, this) );
-}
 
-void Connection::ReadLoop()
-{
-  char header[HEADER_LENGTH];
-  std::size_t data_size;
-  std::vector<char> data;
 
-  while (!this->readQuit)
-  {
-    std::size_t data_size;
-    boost::system::error_code error;
-
-    this->socket.read_some( boost::asio::buffer(header), error );
-
-    data_size = this->ParseHeader( header );
-    std::cout << "Got a header Size[" << data_size << "]\n";
-    data.resize( data_size );
-
-    this->socket.read_some( boost::asio::buffer(data), error );
-
-    this->readBufferMutex->lock();
-    this->readBuffer.push_back( std::string(&data[0], data.size()) );
-    this->readBufferMutex->unlock();
-
-    if (error == boost::asio::error::eof)
-    {
-      std::cout << "Server closed connection. Stopping read\n";
-      break;
-    }
-    else if (error)
-      throw boost::system::system_error(error);
-  }
-}
-
-std::size_t Connection::ParseHeader( const std::string header )
+////////////////////////////////////////////////////////////////////////////////
+// Parse a header to get the size of a packet
+std::size_t Connection::ParseHeader( const std::string &header )
 {
   std::size_t data_size = 0;
 
@@ -151,15 +215,11 @@ std::size_t Connection::ParseHeader( const std::string header )
   return data_size;
 }
 
-void Connection::OnWrite(const boost::system::error_code &e)
-{
-  if (e)
-    throw boost::system::system_error(e);
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the number of messages in the read buffer
-unsigned int Connection::GetReadBufferSize()
+/*unsigned int Connection::GetReadBufferSize()
 {
   this->readBufferMutex->lock();
   unsigned int size = this->readBuffer.size();
@@ -177,5 +237,6 @@ void Connection::PopReadBuffer(std::string &msg)
   this->readBuffer.pop_front();
   this->readBufferMutex->unlock();
 }
+*/
 
 

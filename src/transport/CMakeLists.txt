@@ -9,8 +9,6 @@ set (sources TopicManager.cc
              Publisher.cc
              IOManager.cc
              Connection.cc
-             Client.cc
-             Server.cc
 
 ) 
 
@@ -19,8 +17,6 @@ set (headers TopicManager.hh
              Publisher.hh
              IOManager.hh
              Connection.hh
-             Client.hh
-             Server.hh
              CallbackHelper.hh
 )
 

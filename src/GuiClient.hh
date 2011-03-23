@@ -9,11 +9,6 @@
 
 namespace gazebo
 {
-  namespace transport
-  {
-    class Client;
-  }
-
   namespace gui
   {
     class SimulationApp;
@@ -34,7 +29,6 @@ namespace gazebo
     private: common::NodePtr node;
     private: bool renderEngineEnabled, guiEnabled;
     private: gui::SimulationApp *gui;
-    private: transport::Client *client;
 
     private: bool quit;
   };

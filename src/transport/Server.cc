@@ -19,10 +19,11 @@ Server::Server(unsigned short port)
   std::cout << "Server started[" << this->hostname << ":" << this->port<<"]\n";
 
   // Create a connection on which to accept incomming connections
-  ConnectionPtr new_conn(new Connection(this->acceptor.io_service()));
-  this->acceptor.async_accept(new_conn->GetSocket(),
+  ConnectionPtr new_conn(new Connection());
+  /*this->acceptor.async_accept(new_conn->GetSocket(),
       boost::bind(&Server::OnAccept, this, 
                   boost::asio::placeholders::error, new_conn));
+                  */
 }
 
 void Server::ProcessIncoming()
@@ -73,10 +74,11 @@ void Server::OnAccept(const boost::system::error_code &e, ConnectionPtr conn)
     conn->Write( stringMsg );
 
     // Start an accept operation for a new connection
-    ConnectionPtr new_conn(new Connection(this->acceptor.io_service()));
-    this->acceptor.async_accept(new_conn->GetSocket(),
+    ConnectionPtr new_conn(new Connection());
+    /*this->acceptor.async_accept(new_conn->GetSocket(),
         boost::bind(&Server::OnAccept, this, 
                     boost::asio::placeholders::error, new_conn));
+                    */
   }
   else
   {

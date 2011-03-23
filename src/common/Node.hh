@@ -5,9 +5,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "transport/Publisher.hh"
-#include "transport/Client.hh"
+#include "transport/Connection.hh"
 #include "transport/TopicManager.hh"
-
 
 namespace gazebo
 {
@@ -30,10 +29,10 @@ namespace gazebo
                 msgs::Subscribe msg;
                 msg.set_topic( sub->GetTopic() );
                 msg.set_msg_type( sub->GetMsgType() );
-                msg.set_host( this->client->GetConnection()->GetLocalAddress() );
-                msg.set_port( this->client->GetConnection()->GetLocalPort() );
+                msg.set_host( this->connection->GetLocalAddress() );
+                msg.set_port( this->connection->GetLocalPort() );
 
-                this->client->Write(Message::Package("subscribe", msg));
+                this->connection->Write(Message::Package("subscribe", msg));
 
                 return sub;
               }
@@ -47,15 +46,16 @@ namespace gazebo
                 msgs::Publish msg;
                 msg.set_topic( pub->GetTopic() );
                 msg.set_msg_type( pub->GetMsgType() );
-                msg.set_host( this->client->GetConnection()->GetLocalAddress() );
-                msg.set_port( this->client->GetConnection()->GetLocalPort() );
+                msg.set_host( this->connection->GetLocalAddress() );
+                msg.set_port( this->connection->GetLocalPort() );
 
-                this->client->Write(Message::Package("publish", msg));
+                std::cout << "Node::Advertise\n";
+                this->connection->Write(Message::Package("publish", msg));
 
                 return pub;
               }
 
-      private: transport::Client *client;
+      private: transport::ConnectionPtr connection;
     };
     typedef boost::shared_ptr<Node> NodePtr;
   }

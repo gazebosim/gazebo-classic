@@ -23,16 +23,17 @@
 using namespace gazebo;
 
 Master::Master()
+  : connection( new transport::Connection() )
 {
   transport::IOManager::Instance()->Start();
-  this->server = NULL;
+  //this->server = NULL;
   this->quit = false;
 }
 
 Master::~Master()
 {
-  if (this->server)
-    delete this->server;
+//  if (this->server)
+    //delete this->server;
   transport::IOManager::Instance()->Stop();
 }
 
@@ -52,7 +53,7 @@ void Master::HandleSubscribe(const boost::shared_ptr<msgs::Subscribe const> &msg
   {
     if ((*iter).topic() == msg->topic())
     {
-      this->server->Write( (*iter), msg->host(), msg->port() );
+      //this->server->Write( (*iter), msg->host(), msg->port() );
     }
   }
 }
@@ -61,22 +62,39 @@ void Master::Init(unsigned short port)
 {
   try
   {
-    this->server = new transport::Server(port);
+    this->connection->Listen(port, boost::bind(&Master::OnAccept, this, _1));
   }
   catch (std::exception &e)
   {
     gzthrow( "Unable to start server[" << e.what() << "]\n");
   }
 
-  this->server->Subscribe("publish", &Master::HandlePublish, this);
-  this->server->Subscribe("subscribe", &Master::HandleSubscribe, this);
+  //this->server->Subscribe("publish", &Master::HandlePublish, this);
+  //this->server->Subscribe("subscribe", &Master::HandleSubscribe, this);
+}
+
+void Master::OnAccept(const transport::ConnectionPtr &new_connection)
+{
+  std::cout << "Master new connection\n";
+  this->connections.push_back(new_connection);
+  new_connection->AsyncRead( boost::bind(&Master::OnRead, this, _1) );
+}
+
+void Master::OnRead(const std::string &data)
+{
+  msgs::Packet packet;
+  packet.ParseFromString(data);
+
+  std::cout << "Master::onRead\n";
+  std::cout << packet.DebugString();
+
 }
 
 void Master::Run()
 {
   while (!this->quit)
   {
-    this->server->ProcessIncoming();
+    //this->server->ProcessIncoming();
     usleep(1000000);
   }
 }

@@ -9,9 +9,6 @@
 #include "rendering/RenderState.hh"
 #include "rendering/Scene.hh"
 
-#include "transport/Client.hh"
-#include "transport/IOManager.hh"
-
 #include "GuiClient.hh"
 
 using namespace gazebo;

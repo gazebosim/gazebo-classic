@@ -13,7 +13,7 @@ using namespace transport;
 
 Client::Client( const std::string &host, unsigned short port)
 {
-  this->connection.reset( new Connection(IOManager::Instance()->GetIO()) );
+  this->connection.reset( new Connection() );
 
   try
   {

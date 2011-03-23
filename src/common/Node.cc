@@ -7,20 +7,17 @@ using namespace gazebo;
 using namespace common;
 
 Node::Node()
+  : connection( new transport::Connection() )
 {
   transport::IOManager::Instance()->Start();
-  this->client = NULL;
 }
 
 Node::~Node()
 {
-  if (this->client)
-    delete this->client;
-  this->client = NULL;
   transport::IOManager::Instance()->Stop();
 }
 
 void Node::Init(const std::string &master_host, unsigned short master_port)
 {
-  this->client = new transport::Client(master_host, master_port);
+  this->connection->Connect(master_host, master_port);
 }
