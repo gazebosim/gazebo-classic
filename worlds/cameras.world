@@ -63,13 +63,14 @@
     <static>true</static>
 
     <body:box name="wg_body">
-      <geom:box name="wg_geom">
-        <size>1 1 1</size>
+      <geom:trimesh name="wg_geom">
+        <scale>0.0254 0.0254 0.0254</scale>
+        <mesh>willowgarage.dae</mesh>
         <visual>
           <mesh>willowgarage.dae</mesh>
           <scale>0.0254 0.0254 0.0254</scale>
         </visual>
-      </geom:box>
+      </geom:trimesh>
     </body:box>
   </model:physical>
 

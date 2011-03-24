@@ -127,10 +127,6 @@ void TrimeshShape::Load(XMLConfigNode *node)
       stream << "  <xyz>0 0 0</xyz>";
       stream << "  <scale>" << **this->scaleP << "</scale>";
       stream << "  <mesh>" << newName.str() << "</mesh>";
-      stream << "  <visual>";
-      stream << "    <mesh>" << newName.str() << "</mesh>";
-      stream << "    <scale>" << **this->scaleP << "</scale>";
-      stream << "  </visual>";
       stream << "</geom:trimesh>";
       stream << "</gazebo:world>";
 

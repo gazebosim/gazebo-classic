@@ -937,7 +937,6 @@ void OgreVisual::AttachBoundingBox(const Vector3 &min, const Vector3 &max)
     simple->setMaterial("Gazebo/GreenTransparent");
 
   this->boundingBoxNode->setVisible(false);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
