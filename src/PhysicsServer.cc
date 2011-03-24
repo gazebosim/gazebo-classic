@@ -81,7 +81,6 @@ PhysicsServer::~PhysicsServer()
 
 void PhysicsServer::Load( const std::string &filename )
 {
-  /*
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
 
@@ -128,7 +127,6 @@ void PhysicsServer::Load( const std::string &filename )
 
     worldNode = worldNode->GetNext("world");
   }
-*/
 }
 
 void PhysicsServer::Init()
@@ -137,17 +135,17 @@ void PhysicsServer::Init()
 
 void PhysicsServer::Run()
 {
-  msgs::String msg;
-  msg.set_data("Hello");
+  //msgs::String msg;
+  //msg.set_data("Hello");
 
-  transport::PublisherPtr pub = this->node->Advertise<msgs::String>("/gazebo/test");
+  //transport::PublisherPtr pub = this->node->Advertise<msgs::String>("/gazebo/test");
 
   while (!this->quit)
   {
-    pub->Publish(msg);
+    //pub->Publish(msg);
     //for (int i=0; i < this->worlds.size(); i++)
       //this->worlds[i]->Update();
-    usleep(1000);
+    usleep(1000000);
   }
 }
 

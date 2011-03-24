@@ -81,18 +81,17 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
 ////////////////////////////////////////////////////////////////////////////////
 // Accept a new connection to this server, and start a new acceptor
 void Connection::OnAccept(const boost::system::error_code &e, 
-                          ConnectionPtr newConnection)
+                          ConnectionPtr conn)
 {
-  if (!e)
-  {
-    std::cout << "Accepted a new Connection\n";
-    this->acceptCB( newConnection );
+  // First start a new acceptor
+  ConnectionPtr newConnection(new Connection());
+  this->acceptor->async_accept(newConnection->socket, 
+      boost::bind(&Connection::OnAccept, this, 
+        boost::asio::placeholders::error, newConnection));
 
-    newConnection.reset(new Connection());
-    this->acceptor->async_accept(newConnection->socket, 
-        boost::bind(&Connection::OnAccept, this, 
-                    boost::asio::placeholders::error, newConnection));
-  }
+  // Call the accept callback if there isn't an error
+  if (!e)
+    this->acceptCB( conn );
   else
     std::cerr << e.message() << std::endl;
 }

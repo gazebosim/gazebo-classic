@@ -5,8 +5,8 @@ using namespace transport;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Publication::Publication( const std::string &topic )
-  : topic(topic)
+Publication::Publication( const std::string &topic, const std::string &msgType )
+  : topic(topic), msgType(msgType)
 {
 }
 
@@ -42,3 +42,9 @@ void Publication::Publish(const std::string &data)
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/// Get the type of message
+std::string Publication::GetMsgType() const
+{
+  return this->msgType;
+}

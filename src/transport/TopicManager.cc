@@ -144,10 +144,22 @@ void TopicManager::ConnectSubToPub( const msgs::Publish &pub,
     std::cerr << "Shouldn't get here\n";//TODO: Properly handle this error
 }
 
-
-void TopicManager::UpdatePublishers( const msgs::Publish &pubmsg )
+////////////////////////////////////////////////////////////////////////////////
+// Add a new publication to the list of advertised publication
+void TopicManager::UpdatePublications( const std::string &topic, const std::string &msgType )
 {
-  PublicationPtr pub( new Publication(pubmsg.topic()) );
+  // Find a current publication on this topic
+  PublicationPtr pub = this->FindPublication(topic);
 
-  this->advertisedTopics.push_back( pub );
+  if (pub)
+  {
+    // TODO: Handle this error properly
+    if (msgType != pub->GetMsgType())
+      std::cerr << "Attempting to advertise on an existing topic with a conflicting message type\n";
+  }
+  else
+  {
+    pub = PublicationPtr( new Publication(topic, msgType) );
+    this->advertisedTopics.push_back( pub );
+  }
 }

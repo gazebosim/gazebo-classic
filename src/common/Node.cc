@@ -1,4 +1,3 @@
-#include "transport/Client.hh"
 #include "transport/IOManager.hh"
 
 #include "gazebo_config.h"
@@ -21,17 +20,15 @@ Node::~Node()
 
 void Node::Init(const std::string &master_host, unsigned short master_port)
 {
-  this->masterConn->Connect(master_host, master_port);
-  this->masterConn->StartRead( boost::bind(&Node::OnMasterRead, this, _1) );
-
   // Create a new TCP server on a free port
   this->serverConn->Listen(0, boost::bind(&Node::OnAccept, this, _1) );
-}
 
-void Node::OnMasterRead( const std::string &data)
-{
+  this->masterConn->Connect(master_host, master_port);
+
+  std::string initData;
+  this->masterConn->Read(initData);
   msgs::Packet packet;
-  packet.ParseFromString(data);
+  packet.ParseFromString(initData);
 
   if (packet.type() == "init")
   {
@@ -48,7 +45,18 @@ void Node::OnMasterRead( const std::string &data)
       std::cerr << "Conflicting gazebo versions\n";
     }
   }
-  else if (packet.type() == "publisher_update")
+  else
+    std::cerr << "Didn't receive an init from the master\n";
+
+  this->masterConn->StartRead( boost::bind(&Node::OnMasterRead, this, _1) );
+}
+
+void Node::OnMasterRead( const std::string &data)
+{
+  msgs::Packet packet;
+  packet.ParseFromString(data);
+
+  if (packet.type() == "publisher_update")
   {
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
@@ -60,7 +68,7 @@ void Node::OnMasterRead( const std::string &data)
     transport::ConnectionPtr connection(new transport::Connection());
     connection->Connect(remoteHost,remotePort);
 
-    transport::TopicManager::Instance()->UpdatePublishers(pub);
+    transport::TopicManager::Instance()->UpdatePublications(pub.topic(), pub.msg_type());
 
     transport::TopicManager::Instance()->ConnectSubToPub( pub, connection );
 
@@ -70,13 +78,14 @@ void Node::OnMasterRead( const std::string &data)
     subscribeMsg.set_host( this->serverConn->GetLocalAddress() );
     subscribeMsg.set_port( this->serverConn->GetLocalPort() );
 
-
     // Tell the remote publisher we are subscribing
     connection->Write( Message::Package("sub", subscribeMsg) );
 
     // Save this connection
     this->subConnections.push_back(connection);
   }
+  else
+    std::cerr << "Node::OnMasterRead unknown type[" << packet.type() << "]\n";
 }
 
 void Node::OnAccept(const transport::ConnectionPtr &new_connection)

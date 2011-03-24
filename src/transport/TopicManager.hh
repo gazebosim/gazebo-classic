@@ -86,10 +86,9 @@ namespace gazebo
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
 
-                PublicationPtr pub( new Publication(topic) );
-                this->advertisedTopics.push_back( pub );
+                this->UpdatePublications(topic, msg->GetTypeName());
 
-                return PublisherPtr(new Publisher(topic, msg->GetTypeName()));
+                return PublisherPtr( new Publisher(topic, msg->GetTypeName()) );
               }
 
       /// \brief Stop advertising on a topic
@@ -113,7 +112,8 @@ namespace gazebo
       public: void ConnectSubToPub( const msgs::Publish &pub,
                                     const ConnectionPtr &connection );
 
-      public: void UpdatePublishers( const msgs::Publish &pub );
+      public: void UpdatePublications( const std::string &topic, 
+                                       const std::string &msgType );
 
       private: void HandleIncoming();
 

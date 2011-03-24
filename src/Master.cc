@@ -16,7 +16,6 @@
 */
 
 #include "transport/IOManager.hh"
-#include "transport/Server.hh"
 
 #include "Master.hh"
 
@@ -50,7 +49,6 @@ void Master::Init(unsigned short port)
 
 void Master::OnAccept(const transport::ConnectionPtr &new_connection)
 {
-  std::cout << "Master new connection\n";
   this->connections.push_back(new_connection);
 
   msgs::String msg;
@@ -73,7 +71,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
 
     this->publishers.push_back( pub );
 
-    std::cout << "new publish message\n";
+    std::cout << "new publish message[" << pub.DebugString();
   }
   else if (packet.type() == "subscribe")
   {
@@ -83,7 +81,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
     this->subscribers.push_back( sub );
 
     std::list<msgs::Publish>::iterator iter;
-    std::cout << "new subscribe message\n";
+    std::cout << "new subscribe message[" << sub.DebugString();
 
     // Find all publishers of the topic
     for (iter = this->publishers.begin(); 

@@ -32,6 +32,7 @@ namespace gazebo
                 msg.set_host( this->serverConn->GetLocalAddress() );
                 msg.set_port( this->serverConn->GetLocalPort() );
 
+                std::cout << "Node::Subscribe\n";
                 this->masterConn->Write(Message::Package("subscribe", msg));
 
                 return sub;
