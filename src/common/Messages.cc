@@ -75,9 +75,10 @@ void Message::Stamp(msgs::Time &time)
   time.set_nsec(tm.nsec);
 }
 
-msgs::Packet Message::Package(const std::string type, 
-                              const google::protobuf::Message &message)
+std::string Message::Package(const std::string type, 
+                      const google::protobuf::Message &message)
 {
+  std::string data;
   msgs::Packet pkg;
   Message::Stamp( *pkg.mutable_stamp() );
   pkg.set_type(type);
@@ -86,7 +87,10 @@ msgs::Packet Message::Package(const std::string type,
   if (!message.SerializeToString(serialized_data))
     gzthrow("Failed to serialized message");
 
-  return pkg;
+  if (!pkg.SerializeToString(&data))
+    gzthrow("Failed to serialized message");
+
+  return data;
 }
 
 void Message::Set(msgs::Point *pt, const Vector3 &v)

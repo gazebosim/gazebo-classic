@@ -9,7 +9,8 @@ set (sources TopicManager.cc
              Publisher.cc
              IOManager.cc
              Connection.cc
-
+             Publication.cc
+             PublicationTransport.cc
 ) 
 
 set (headers TopicManager.hh
@@ -18,6 +19,8 @@ set (headers TopicManager.hh
              IOManager.hh
              Connection.hh
              CallbackHelper.hh
+             Publication.hh
+             PublicationTransport.hh
 )
 
 add_library(gazebo_transport SHARED ${sources})

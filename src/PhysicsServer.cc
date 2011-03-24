@@ -142,14 +142,12 @@ void PhysicsServer::Run()
 
   transport::PublisherPtr pub = this->node->Advertise<msgs::String>("/gazebo/test");
 
-  //transport::PublisherPtr pub = transport::TopicManager::Instance()->Advertise<msgs::String>("/gazebo/test");
-
   while (!this->quit)
   {
-    //pub->Publish(msg);
+    pub->Publish(msg);
     //for (int i=0; i < this->worlds.size(); i++)
       //this->worlds[i]->Update();
-    usleep(100000);
+    usleep(1000);
   }
 }
 

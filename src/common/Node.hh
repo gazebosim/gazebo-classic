@@ -29,10 +29,10 @@ namespace gazebo
                 msgs::Subscribe msg;
                 msg.set_topic( sub->GetTopic() );
                 msg.set_msg_type( sub->GetMsgType() );
-                msg.set_host( this->connection->GetLocalAddress() );
-                msg.set_port( this->connection->GetLocalPort() );
+                msg.set_host( this->serverConn->GetLocalAddress() );
+                msg.set_port( this->serverConn->GetLocalPort() );
 
-                this->connection->Write(Message::Package("subscribe", msg));
+                this->masterConn->Write(Message::Package("subscribe", msg));
 
                 return sub;
               }
@@ -40,26 +40,35 @@ namespace gazebo
       public: template<typename M>
               transport::PublisherPtr Advertise(const std::string topic)
               {
+                std::cout << "Node::Advertise\n";
+
                 transport::PublisherPtr pub;
                 pub = transport::TopicManager::Instance()->Advertise<M>(topic);
 
                 msgs::Publish msg;
                 msg.set_topic( pub->GetTopic() );
                 msg.set_msg_type( pub->GetMsgType() );
-                msg.set_host( this->connection->GetLocalAddress() );
-                msg.set_port( this->connection->GetLocalPort() );
+                msg.set_host( this->serverConn->GetLocalAddress() );
+                msg.set_port( this->serverConn->GetLocalPort() );
 
-                std::cout << "Node::Advertise\n";
-                this->connection->Write(Message::Package("publish", msg));
+                this->masterConn->Write(Message::Package("advertise", msg));
 
                 return pub;
               }
 
-      private: void OnRead(const transport::ConnectionPtr &conn,
-                           const std::string &data);
+      private: void OnMasterRead( const std::string &data );
 
-      private: transport::ConnectionPtr connection;
+      private: void OnAccept(const transport::ConnectionPtr &new_connection);
+
+      private: void OnReadHeader(const transport::ConnectionPtr &new_connection,
+                                 const std::string &data );
+
+      private: transport::ConnectionPtr masterConn;
+      private: transport::ConnectionPtr serverConn;
+
+      private: std::list<transport::ConnectionPtr> subConnections;
     };
+
     typedef boost::shared_ptr<Node> NodePtr;
   }
 }

@@ -85,6 +85,7 @@ void Connection::OnAccept(const boost::system::error_code &e,
 {
   if (!e)
   {
+    std::cout << "Accepted a new Connection\n";
     this->acceptCB( newConnection );
 
     newConnection.reset(new Connection());
@@ -180,28 +181,40 @@ void Connection::Read(std::string &data)
 /// Get the address of this connection
 std::string Connection::GetLocalAddress() const
 {
-  return this->socket.local_endpoint().address().to_string();
+  if (this->socket.is_open())
+    return this->socket.local_endpoint().address().to_string();
+  else if (this->acceptor && this->acceptor->is_open())
+    return this->acceptor->local_endpoint().address().to_string();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the port of this connection
 unsigned short Connection::GetLocalPort() const
 {
-  return this->socket.local_endpoint().port();
+  if (this->socket.is_open())
+    return this->socket.local_endpoint().port();
+  else if (this->acceptor && this->acceptor->is_open())
+    return this->acceptor->local_endpoint().port();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the remote address
 std::string Connection::GetRemoteAddress() const
 {
-  return this->socket.remote_endpoint().address().to_string();
+  if (this->socket.is_open())
+    return this->socket.remote_endpoint().address().to_string();
+  else
+    return "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the remote port number
 unsigned short Connection::GetRemotePort() const
 {
-  return this->socket.remote_endpoint().port();
+  if (this->socket.is_open())
+    return this->socket.remote_endpoint().port();
+  else
+    return 0;
 }
 
 
@@ -228,13 +241,11 @@ std::size_t Connection::ParseHeader( const std::string &header )
 /// the read thread
 void Connection::ReadLoop(const ReadCallback &cb)
 {
-  ConnectionPtr conn(this);
-
   std::string data;
   while (!this->readQuit)
   {
     this->Read(data);
-    (cb)( conn, data);
+    (cb)(data);
   }
 }
 

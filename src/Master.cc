@@ -20,6 +20,8 @@
 
 #include "Master.hh"
 
+#include "gazebo_config.h"
+
 using namespace gazebo;
 
 Master::Master()
@@ -51,8 +53,11 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   std::cout << "Master new connection\n";
   this->connections.push_back(new_connection);
 
-  new_connection->StartRead(
-      boost::bind(&Master::OnRead, this, _1, _2));
+  msgs::String msg;
+  msg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
+  new_connection->Write( common::Message::Package("init", msg) );
+
+  new_connection->StartRead( boost::bind(&Master::OnRead, this, new_connection, _1));
 }
 
 void Master::OnRead(const transport::ConnectionPtr &conn, 
@@ -61,7 +66,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
   msgs::Packet packet;
   packet.ParseFromString(data);
 
-  if (packet.type() == "publish")
+  if (packet.type() == "advertise")
   {
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
@@ -88,7 +93,7 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
       {
         std::cout << "Found a publisher\n";
         std::cout << (*iter).DebugString();
-        conn->Write( common::Message::Package("publisher", *iter) );
+        conn->Write( common::Message::Package("publisher_update", *iter) );
       }
     }
   }

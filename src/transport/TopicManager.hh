@@ -25,7 +25,9 @@
 #include "common/Messages.hh"
 #include "common/SingletonT.hh"
 
+#include "transport/Connection.hh"
 #include "transport/Publisher.hh"
+#include "transport/Publication.hh"
 #include "transport/Subscriber.hh"
 
 namespace gazebo
@@ -39,6 +41,8 @@ namespace gazebo
       private: virtual ~TopicManager();
 
       public: void Init(unsigned short port);
+
+      public: PublicationPtr FindPublication(const std::string &topic);
 
       /// \brief Subscribe to a topic
       public: template<class M, class T>
@@ -55,6 +59,7 @@ namespace gazebo
 
                 SubscriberPtr sub( new Subscriber(topic, subscription) );
 
+                std::cout << "TopicManager::Subscribe to topic[" << topic << "]\n";
                 this->subscribed_topics[topic].push_back(subscription);
 
                 return sub;
@@ -81,31 +86,44 @@ namespace gazebo
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
 
-                this->advertised_topics[topic]++;
+                PublicationPtr pub( new Publication(topic) );
+                this->advertisedTopics.push_back( pub );
+
                 return PublisherPtr(new Publisher(topic, msg->GetTypeName()));
               }
 
       /// \brief Stop advertising on a topic
       public: void Unadvertise(const std::string &topic)
               {
-                this->advertised_topics[topic]--;
+                // TODO: Implement this
               }
 
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.
       /// \param topic Name of the topic
       /// \param message The message to send.
-      public: void SendMessage( const std::string &topic, 
-                                google::protobuf::Message &message );
+      public: void Publish( const std::string &topic, 
+                            google::protobuf::Message &message );
 
+      /// \brief Connection a local Publisher to a remote Subscriber
+      public: void ConnectPubToSub( const msgs::Subscribe &sub,
+                                    const ConnectionPtr &connection );
 
-      /// \brief Tells the topic manager about a publisher
-      public: void ConnectSubscriber( const msgs::Publish &pub );
+      /// \brief Connect a local Subscriber to a remote Publisher
+      public: void ConnectSubToPub( const msgs::Publish &pub,
+                                    const ConnectionPtr &connection );
+
+      public: void UpdatePublishers( const msgs::Publish &pub );
 
       private: void HandleIncoming();
 
-      private: std::map<std::string, int> advertised_topics;
+      private: std::list<PublicationPtr> advertisedTopics;
+      //private: std::list<Subscription> subscriptions;
+
+      //private: std::map<std::string, int> advertised_topics;
       private: std::map<std::string, std::list<CallbackHelperPtr> > subscribed_topics; 
+
+      //private: std::map<std::string, ConnectionPtr> subscribedConnections;
 
       //Singleton implementation
       private: friend class DestroyerT<TopicManager>;

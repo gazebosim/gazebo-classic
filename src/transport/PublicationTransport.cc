@@ -1,0 +1,37 @@
+#include "PublicationTransport.hh"
+
+using namespace gazebo;
+using namespace transport;
+
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
+PublicationTransport::PublicationTransport()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
+PublicationTransport::~PublicationTransport()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Initialize the publication link 
+void PublicationTransport::Init( const ConnectionPtr &conn )
+{
+  this->connection = conn;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the typename of the message that is handled
+std::string PublicationTransport::GetMsgType() const
+{
+  return "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Output a message to a connection
+void PublicationTransport::HandleMessage(const std::string &newdata)
+{
+  this->connection->Write( newdata );
+}

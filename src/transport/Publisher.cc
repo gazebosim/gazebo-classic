@@ -47,7 +47,7 @@ void Publisher::Publish(google::protobuf::Message &message )
   if (message.GetTypeName() != this->msgType)
     gzthrow("Invalid message type\n");
 
-  TopicManager::Instance()->SendMessage(this->topic, message);
+  TopicManager::Instance()->Publish(this->topic, message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

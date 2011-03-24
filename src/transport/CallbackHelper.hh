@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <google/protobuf/message.h>
 
+#include "common/Messages.hh"
 #include "common/GazeboError.hh"
 
 namespace gazebo
@@ -49,8 +50,14 @@ namespace gazebo
 
       public: virtual void HandleMessage(const std::string &newdata)
               {
+                msgs::Packet packet;
+                packet.ParseFromString(newdata);
+
+                // TODO: Handle this error properly
+                if (packet.type() != "data")
+                  std::cerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
                 boost::shared_ptr<M> m( new M );
-                m->ParseFromString( newdata );
+                m->ParseFromString( packet.serialized_data() );
                 this->callback( m );
               }
 

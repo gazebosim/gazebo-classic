@@ -155,7 +155,7 @@ void GuiClient::Run()
   this->gui->Run();
   */
 
-  this->node->Subscribe("/gazebo/test", &GuiClient::Test, this);
+  transport::SubscriberPtr sub = this->node->Subscribe("/gazebo/test", &GuiClient::Test, this);
 
   while (!this->quit)
   {

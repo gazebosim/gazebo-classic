@@ -54,7 +54,7 @@ namespace gazebo
       /// \brief Start a server that listens on a port
       public: void Listen(unsigned short port, const AcceptCallback &accept_cb);
 
-      typedef boost::function<void(const ConnectionPtr&, const std::string &data)> ReadCallback;
+      typedef boost::function<void(const std::string &data)> ReadCallback;
       /// \brief Start a thread that reads from the connection, and passes
       ///        new message to the ReadCallback
       public: void StartRead(const ReadCallback &cb);
