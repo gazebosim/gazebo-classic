@@ -29,7 +29,6 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include <Ogre.h>
 
 #include "Mesh.hh"
 #include "OgreDynamicRenderable.hh"
@@ -208,11 +207,6 @@ namespace gazebo
 
 /// \}
 
-  };
-
-  class MyFrustum : public Ogre::Frustum
-  {
-    public: virtual bool isVisible(const Ogre::AxisAlignedBox &bound, Ogre::FrustumPlane *culledBy=0) const;
   };
 }
 #endif

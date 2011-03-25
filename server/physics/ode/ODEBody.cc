@@ -122,9 +122,6 @@ void ODEBody::MoveCallback(dBodyID id)
 
   pp.Correct();
 
-  if ( isnan(pp.pos.x) || isnan(pp.pos.y) || isnan(pp.pos.z) )
-    printf("NAN!!!\n");
-
   self->SetWorldPose(pp, false);
 }
 

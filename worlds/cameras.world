@@ -63,18 +63,18 @@
     <static>true</static>
 
     <body:box name="wg_body">
-      <xyz>0 0 0</xyz>
-      <geom:box name="wg_geom">
-        <size>1 1 1</size>
-        <mass>0</mass>
+      <geom:trimesh name="wg_geom">
+        <scale>0.0254 0.0254 0.0254</scale>
+        <mesh>willowgarage.dae</mesh>
         <visual>
           <mesh>willowgarage.dae</mesh>
           <scale>0.0254 0.0254 0.0254</scale>
         </visual>
-      </geom:box>
+      </geom:trimesh>
     </body:box>
   </model:physical>
 
+  <!--
   <model:physical name="camera">
     <xyz> 0 0 5 </xyz>
     <static>true</static>
@@ -137,6 +137,7 @@
     </sensor:camera>
     </body:box>
   </model:physical>
+  -->
   
 <!--
   <model:physical name="pr2">

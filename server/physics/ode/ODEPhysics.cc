@@ -883,7 +883,13 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
       {
         self->contactFeedbackIter++;
         if (self->contactFeedbackIter == self->contactFeedbacks.end())
+        {
+          // extend vector by 100 elements, but
+          //  remember last index, since resize might re-allocate the vector
+          unsigned int index = self->contactFeedbackIter - self->contactFeedbacks.begin();
           self->contactFeedbacks.resize( self->contactFeedbacks.size() + 100);
+          self->contactFeedbackIter = self->contactFeedbacks.begin() + index;
+        }
       }
     }
   }

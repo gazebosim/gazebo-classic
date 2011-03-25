@@ -187,8 +187,6 @@ namespace gazebo
     /// \brief True on or off a ribbon trail
     public: void SetRibbonTrail(bool value);
 
-    public: void Add();
-
     private: Ogre::MaterialPtr origMaterial;
     private: Ogre::MaterialPtr myMaterial;
     private: std::string myMaterialName;
@@ -229,12 +227,6 @@ namespace gazebo
     private: static SelectionObj *selectionObj;
 
     private: Ogre::RibbonTrail *ribbonTrail;
-  };
-
-  class RenderableVisitor : public Ogre::Renderable::Visitor
-  {
-    public: void visit( Ogre::Renderable *rend, ushort lodIndex, bool isDebug,
-                Ogre::Any *pany = 0);
   };
 }
 

@@ -159,7 +159,6 @@ Ogre::Camera *OgreCreator::CreateCamera(const std::string &name,
   Ogre::Viewport *cviewport;
 
   camera = OgreAdaptor::Instance()->sceneMgr->createCamera(name);
-  //camera->setCullingFrustum(new MyFrustum());
 
   // Use X/Y as horizon, Z up
   camera->pitch(Ogre::Degree(90));
@@ -1021,11 +1020,4 @@ void OgreCreator::GetSceneNodeBounds(Ogre::SceneNode *node, Ogre::AxisAlignedBox
     Ogre::SceneNode *next = dynamic_cast<Ogre::SceneNode*>(it.getNext());
     GetSceneNodeBounds( next, box);
   }
-}
-
-
-bool MyFrustum::isVisible(const Ogre::AxisAlignedBox &bound, Ogre::FrustumPlane *culledBy) const 
-{
-  printf("HERE\n");
-  return true;
 }
