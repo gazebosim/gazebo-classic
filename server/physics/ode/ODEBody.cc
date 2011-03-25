@@ -347,6 +347,7 @@ void ODEBody::SetLinearVel(const Vector3 &vel)
   if (this->bodyId)
   {
     this->physicsEngine->LockMutex();
+    this->SetEnabled(true);
     dBodySetLinearVel(this->bodyId, vel.x, vel.y, vel.z);
     this->physicsEngine->UnlockMutex();
   }
@@ -379,6 +380,7 @@ void ODEBody::SetAngularVel(const Vector3 &vel)
   if (this->bodyId)
   {
     this->physicsEngine->LockMutex();
+    this->SetEnabled(true);
     dBodySetAngularVel(this->bodyId, vel.x, vel.y, vel.z);
     this->physicsEngine->UnlockMutex();
   }
@@ -414,6 +416,7 @@ void ODEBody::SetForce(const Vector3 &force)
   if (this->bodyId)
   {
     this->physicsEngine->LockMutex();
+    this->SetEnabled(true);
     dBodyAddForce(this->bodyId, force.x, force.y, force.z);
     this->physicsEngine->UnlockMutex();
   }
@@ -449,6 +452,7 @@ void ODEBody::SetTorque(const Vector3 &torque)
   if (this->bodyId)
   {
     this->physicsEngine->LockMutex();
+    this->SetEnabled(true);
     dBodyAddRelTorque(this->bodyId, torque.x, torque.y, torque.z);
     this->physicsEngine->UnlockMutex();
   }
