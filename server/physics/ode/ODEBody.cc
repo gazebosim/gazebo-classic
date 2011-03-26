@@ -414,7 +414,7 @@ void ODEBody::SetForce(const Vector3 &force)
   {
     this->physicsEngine->LockMutex();
     this->SetEnabled(true);
-    dBodyAddForce(this->bodyId, force.x, force.y, force.z);
+    dBodyAddRelForce(this->bodyId, force.x, force.y, force.z);
     this->physicsEngine->UnlockMutex();
   }
 }
