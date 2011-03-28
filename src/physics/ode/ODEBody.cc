@@ -17,7 +17,6 @@
 /* Desc: Body class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id: Body.cc 7640 2009-05-13 02:06:08Z natepak $
  */
 
 #include <sstream>
@@ -130,11 +129,7 @@ void ODEBody::SetGravityMode(bool mode)
 {
   if (this->bodyId)
   {
-    // NATY
-    //this->physicsEngine->LockMutex();
     dBodySetGravityMode(this->bodyId, mode ? 1: 0);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
   }
 }
 
@@ -145,11 +140,7 @@ bool ODEBody::GetGravityMode()
   int mode = 0;
   if (this->bodyId)
   {
-    // NATY
-    //this->physicsEngine->LockMutex();
     mode = dBodyGetGravityMode(this->bodyId);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
   }
 
   return mode;
@@ -175,11 +166,7 @@ void ODEBody::AttachGeom( Geom *geom )
   {
     if (odeGeom->GetGeomId())
     {
-      // NATY
-      //this->physicsEngine->LockMutex();
       dGeomSetBody(odeGeom->GetGeomId(), this->bodyId);
-      // NATY
-      //this->physicsEngine->UnlockMutex();
     }
   }
 }
@@ -269,8 +256,6 @@ void ODEBody::UpdateCoM()
 
   if (**this->customMassMatrixP)
   {
-    // NATY
-    //this->physicsEngine->LockMutex();
     dMass odeMass;
     dMassSetZero(&odeMass);
 
@@ -290,8 +275,6 @@ void ODEBody::UpdateCoM()
       gzthrow("Setting custom body " + this->GetName()+"mass to zero!");
 
     ODEPhysics::ConvertMass(&this->customMass, &odeMass);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
   }
   else
   { 
@@ -357,11 +340,7 @@ common::Vector3 ODEBody::GetWorldAngularVel() const
     const dReal *dvel;
     dReal result[3];
 
-    // NATY
-    //this->physicsEngine->LockMutex();
     dvel = dBodyGetAngularVel(this->bodyId);
-    // NATY
-    //this->physicsEngine->UnlockMutex();
 
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }

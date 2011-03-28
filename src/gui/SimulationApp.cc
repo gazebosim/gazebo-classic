@@ -17,6 +17,8 @@
 
 #include "rendering/Scene.hh"
 
+#include "common/Events.hh"
+
 #include "gui/SimulationFrame.hh"
 #include "gui/SimulationApp.hh"
 
@@ -84,8 +86,12 @@ void SimulationApp::OnIdle(wxTimerEvent &evt)
 {
   this->frame->Update();
 
-  // NATY: REmoved this put back in
-  //Simulator::Instance()->GraphicsUpdate();
+  event::Events::preRenderSignal();
+
+  // Tell all the cameras to render
+  event::Events::renderSignal();
+
+  event::Events::postRenderSignal();
 }
 
 

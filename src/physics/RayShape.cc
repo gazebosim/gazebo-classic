@@ -17,11 +17,11 @@
 /* Desc: A ray shape
  * Author: Nate Keonig
  * Date: 14 Oct 2009
- * SVN: $Id:$
  */
 
+#include "transport/Transport.hh"
+
 #include "common/Messages.hh"
-#include "transport/TopicManager.hh"
 #include "physics/RayShape.hh"
 
 using namespace gazebo;
@@ -35,7 +35,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
   if (displayRays)
   {
     msgs::Visual msg;

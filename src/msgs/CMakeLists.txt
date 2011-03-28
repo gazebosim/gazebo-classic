@@ -19,12 +19,16 @@ set (msgs color.proto
           packet.proto
           publish.proto
           subscribe.proto
+          publishers.proto
+          request.proto
+          topic_info.proto
 )
 
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
 add_library(gazebo_msgs ${PROTO_SRCS})
+target_link_libraries( gazebo_msgs ${PROTOBUF_LIBRARY})
 
 set (message_headers "" CACHE INTERNAL "Include dirs description")
 

@@ -47,6 +47,9 @@ namespace gazebo
       /// \brief Unsubscribe from the topic
       public: void Unsubscribe() const;
 
+      /// \brief Get the subscription 
+      public: CallbackHelperPtr GetSubscription() const;
+
       private: std::string topic;
       private: CallbackHelperPtr subscription;
     };

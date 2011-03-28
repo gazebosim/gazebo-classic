@@ -7,8 +7,7 @@ string (REPLACE " " ";" assimp_library_dirs_split "${assimp_library_dirs}")
 
 include_directories( 
   ${XML_INCLUDE_DIRS} 
-  ${PROJECT_BINARY_DIR}/src/msgs
-  ${PROJECT_SOURCE_DIR}/src 
+  ${PROJECT_BINARY_DIR}/src 
   ${assimp_include_dirs_split}
 )
 
@@ -49,7 +48,6 @@ set ( sources Messages.cc
               XMLConfig.cc
               Image.cc
               Material.cc
-              Node.cc
 )
 
 set ( headers Messages.hh
@@ -89,7 +87,6 @@ set ( headers Messages.hh
               Image.hh 
               Material.hh
               MouseEvent.hh
-              Node.hh
 )
 
 add_library(gazebo_common SHARED ${sources})
@@ -97,10 +94,16 @@ add_library(gazebo_common SHARED ${sources})
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
-  set_target_properties(gazebo_common PROPERTIES LINK_FLAGS 
+  set_target_properties(gazebo_common PROPERTIES LINK_FLAGS
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-target_link_libraries( gazebo_common ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
+#target_link_libraries( gazebo_common ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
+target_link_libraries( gazebo_common gazebo_msgs
+                                     ${boost_libraries}
+                                     ${XML_LIBRARIES}
+                                     ${assimp_libraries}
+                                     ${freeimage_library})
+
 install ( TARGETS gazebo_common DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/common COMPONENT headers)

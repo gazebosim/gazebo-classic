@@ -17,7 +17,6 @@
 /* Desc: Body class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id$
  */
 
 #include <sstream>
@@ -202,16 +201,26 @@ void Body::Load(common::XMLConfigNode *node)
      
   common::XMLConfigNode *childNode;
 
-  if ( (childNode = node->GetChild("origin")) != NULL)
+  childNode = node->GetChild("visual");
+  while (childNode)
   {
-    this->xyzP->Load(childNode);
-    this->rpyP->Load(childNode);
+    std::ostringstream visname;
+    visname << this->GetCompleteScopedName() << "::VISUAL_" << 
+               this->visuals.size();
+
+    msgs::Visual msg = common::Message::VisualFromXML(childNode);
+    common::Message::Init(msg, visname.str());
+    msg.set_parent_id( this->GetCompleteScopedName() );
+    msg.set_is_static( this->IsStatic() );
+
+    this->vis_pub->Publish(msg);
+    this->visuals.push_back(msg.header().str_id());
+   
+    childNode = childNode->GetNext("visual");
   }
 
-  this->dampingFactorP->Load(node);
+   this->dampingFactorP->Load(node);
   this->turnGravityOffP->Load(node);
-
-  this->SetRelativePose(common::Pose3d(**this->xyzP, **this->rpyP));
   
   // before loading child geometry, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
@@ -247,23 +256,16 @@ void Body::Load(common::XMLConfigNode *node)
 
   this->showPhysicsConnection = event::Events::ConnectShowPhysicsSignal( boost::bind(&Body::ShowPhysics, this, _1) );
 
-  childNode = node->GetChild("visual");
-  while (childNode)
+
+ if ( (childNode = node->GetChild("origin")) != NULL)
   {
-    std::ostringstream visname;
-    visname << this->GetCompleteScopedName() << "::VISUAL_" << 
-               this->visuals.size();
-
-    msgs::Visual msg = common::Message::VisualFromXML(childNode);
-    common::Message::Init(msg, visname.str());
-    msg.set_parent_id( this->GetCompleteScopedName() );
-    msg.set_is_static( this->IsStatic() );
-
-    this->vis_pub->Publish(msg);
-    this->visuals.push_back(msg.header().str_id());
-   
-    childNode = childNode->GetNext("visual");
+    this->xyzP->Load(childNode);
+    this->rpyP->Load(childNode);
   }
+
+
+  // DO THIS LAST!
+  this->SetRelativePose(common::Pose3d(**this->xyzP, **this->rpyP));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -558,7 +560,6 @@ void Body::LoadGeom(common::XMLConfigNode *node)
 
   std::string type = node->GetChild("geometry")->GetChild()->GetName();
 
-  std::cout << "GEOM Type[" << type << "]\n";
   /*if (type == "heightmap" || type == "map")
     this->SetStatic(true);
     */

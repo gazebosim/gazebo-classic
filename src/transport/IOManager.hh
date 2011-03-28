@@ -19,25 +19,18 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>
+#include "common/SingletonT.hh"
 
 namespace gazebo
 {
   namespace transport
   {
-    class IOManager;
-    typedef boost::shared_ptr<IOManager> IOManagerPtr;
-
-    class IOManager
+    class IOManager : public SingletonT<IOManager>
     {
-      public: static const IOManagerPtr &Instance();
-
-      public: void Start();
-      public: void Stop();
-
       public: boost::asio::io_service &GetIO();
 
       private: IOManager();
-      public: ~IOManager();
+      private: ~IOManager();
 
       private: boost::asio::io_service io_service;
 
@@ -46,7 +39,9 @@ namespace gazebo
 
       private: boost::thread thread;
 
-      private: static IOManagerPtr self;
+      //Singleton implementation
+      private: friend class DestroyerT<IOManager>;
+      private: friend class SingletonT<IOManager>;
     };
   }
 }

@@ -144,9 +144,6 @@ void ODEGeom::SetGeom(dGeomID geomId, bool placeable)
 
   Geom::SetGeom(placeable);
 
-  // NATY
-  //this->GetWorld()->GetPhysicsEngine()->LockMutex();
-
   if ( dGeomGetSpace(this->geomId) == 0 )
   {
     dSpaceAdd(this->spaceId, this->geomId);
@@ -154,9 +151,6 @@ void ODEGeom::SetGeom(dGeomID geomId, bool placeable)
   }
 
   dGeomSetData(this->geomId, this);
-
-  // NATY
-  //this->GetWorld()->GetPhysicsEngine()->UnlockMutex();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

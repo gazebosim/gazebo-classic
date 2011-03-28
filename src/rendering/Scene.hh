@@ -23,6 +23,7 @@
 #include <OGRE/OgreMesh.h>
 
 #include "transport/Subscriber.hh"
+#include "common/Events.hh"
 #include "common/Messages.hh"
 #include "common/Param.hh"
 #include "common/Color.hh"
@@ -53,8 +54,6 @@ namespace gazebo
   
     class Scene
     {
-      typedef std::map<std::string, Visual*> VisualMap;
-      typedef std::map<std::string, Light*> LightMap;
   
       public: enum SceneType {BSP, GENERIC};
   
@@ -69,10 +68,13 @@ namespace gazebo
   
       /// \brief Init
       public: void Init();
-  
+
       /// \brief Save the scene
       public: void Save(std::string &prefix, std::ostream &stream);
-  
+ 
+      /// \brief Process all received messages 
+      public: void PreRender();
+
       /// \brief Get the OGRE scene manager
       public: Ogre::SceneManager *GetManager() const;
   
@@ -179,10 +181,15 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
   
-      private: void HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
-      private: void HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
+      private: void ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
+      private: void ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
+
+      private: void ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
+      private: void ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg);
+
       private: void HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg);
-      private: void HandlePoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
+               
+      private: void ReceivePoseMsg(const boost::shared_ptr<msgs::Pose const> &msg);
   
       private: std::string name;
       private: common::ParamT<common::Color> *ambientP;
@@ -214,15 +221,29 @@ namespace gazebo
       private: unsigned int id;
       private: std::string idString;
   
-      private: std::list<boost::shared_ptr<msgs::Visual const> > visualMessages;
+      typedef std::list<boost::shared_ptr<msgs::Visual const> > VisualMsgs_L;
+      private: VisualMsgs_L visualMsgs;
+
+      typedef std::list<boost::shared_ptr<msgs::Light const> > LightMsgs_L;
+      private: LightMsgs_L lightMsgs;
+
+      typedef std::list<boost::shared_ptr<msgs::Pose const> > PoseMsgs_L;
+      private: PoseMsgs_L poseMsgs;
   
-      private: VisualMap visuals;
-      private: LightMap lights;
+      typedef std::map<std::string, Visual*> Visual_M;
+      private: Visual_M visuals;
+
+      typedef std::map<std::string, Light*> Light_M;
+      private: Light_M lights;
+
+      private: boost::mutex *receiveMutex;
   
       private: transport::SubscriberPtr vis_sub;
       private: transport::SubscriberPtr light_sub;
       private: transport::SubscriberPtr pose_sub;
       private: transport::SubscriberPtr selection_sub;
+
+      private: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

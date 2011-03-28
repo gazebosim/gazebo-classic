@@ -17,7 +17,6 @@
 /* Desc: Geom class
  * Author: Nate Koenig
  * Date: 13 Feb 2006
- * SVN: $Id$
  */
 
 #include <sstream>
@@ -138,7 +137,12 @@ void Geom::Load(common::XMLConfigNode *node)
 
   this->surface->Load(node);
 
-  this->shape->Load(node->GetChild("geometry"));
+  if (this->shape)
+  {
+    this->shape->Load(node->GetChild("geometry"));
+  }
+  else
+    std::cerr << "No shape has been specified. Error!!!\n";
 
   this->CreateBoundingBox();
 

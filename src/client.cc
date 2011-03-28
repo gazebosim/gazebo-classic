@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "GuiClient.hh"
+#include "gazebo_config.h"
 
 std::string config_file = "";
 gazebo::GuiClient *client = NULL;

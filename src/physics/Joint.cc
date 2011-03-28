@@ -20,15 +20,17 @@
  * CVS: $Id$
  */
 
+#include "transport/Transport.hh"
+
 #include "common/Events.hh"
 #include "PhysicsEngine.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboMessage.hh"
 #include "common/Global.hh"
+
 #include "Body.hh"
 #include "Model.hh"
 #include "World.hh"
-#include "transport/TopicManager.hh"
 #include "Joint.hh"
 
 using namespace gazebo;
@@ -40,7 +42,7 @@ using namespace physics;
 Joint::Joint()
   : Common(NULL)
 {
-  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(JOINT);
   this->model = NULL;
   this->showJoints = false;

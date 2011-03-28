@@ -172,6 +172,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
         common::Vector2d(2,2), 
         common::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
     mesh = msg->header().str_id();
+    std::cout << "Has Plane MeshName[" << mesh << "]\n";
   }
 
   this->meshNameP->SetValue(mesh);
@@ -228,6 +229,8 @@ void Visual::Load(common::XMLConfigNode *node)
     // Create the visual
     stream << "VISUAL_" << this->sceneNode->getName();
     std::string meshName = (**this->meshNameP);
+    std::cout << "Visual::Load InsertMesh[" << meshName << "]\n";
+
     if (!meshName.empty())
     {
       if ( meshName == "unit_box")
@@ -963,7 +966,10 @@ void Visual::InsertMesh( const common::Mesh *mesh)
   Ogre::MeshPtr ogreMesh;
 
   if (mesh->GetSubMeshCount() == 0)
+  {
+    std::cerr << "Visual::InsertMesh no submeshes, this is an invalid mesh\n";
     return;
+  }
 
   try
   {

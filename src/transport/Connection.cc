@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <iostream>
 #include <boost/lexical_cast.hpp>
 
 #include "common/Messages.hh"
@@ -24,17 +25,20 @@
 using namespace gazebo;
 using namespace transport;
 
+// Make sure the IO Manager starts
+IOManager *Connection::iomanager = IOManager::Instance();
+
+////////////////////////////////////////////////////////////////////////////////
+// Constructor
 Connection::Connection()
   : socket( IOManager::Instance()->GetIO() )
 {
-  //this->readBufferMutex = new boost::mutex();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Destructor
 Connection::~Connection()
 {
-  std::cout << "Connection Destructor\n";
-  //delete this->readBufferMutex;
-  //this->readBufferMutex = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,10 +70,14 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
 {
   this->acceptCB = accept_cb;
 
-  std::cout << "Connection::Listen\n";
-  this->acceptor = new boost::asio::ip::tcp::acceptor(
-      IOManager::Instance()->GetIO(), 
-      boost::asio::ip::tcp::endpoint( boost::asio::ip::tcp::v4(), port ));
+  this->acceptor = new boost::asio::ip::tcp::acceptor(IOManager::Instance()->GetIO());
+  boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
+  this->acceptor->open(endpoint.protocol());
+  this->acceptor->set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+  this->acceptor->bind(endpoint);
+  this->acceptor->listen();
+
+  std::cout << "Creating a server[" << this->GetLocalAddress() << ":" << this->GetLocalPort() << "]\n";
 
   ConnectionPtr newConnection(new Connection());
 
@@ -104,16 +112,18 @@ void Connection::StartRead(const ReadCallback &cb)
   this->readThread = new boost::thread( boost::bind( &Connection::ReadLoop, this, cb ) ); 
 }
 
-void Connection::Write(const google::protobuf::Message &msg)
+////////////////////////////////////////////////////////////////////////////////
+/// Stop the read loop 
+void Connection::StopRead()
 {
-  std::string out;
-
-  if (!msg.SerializeToString(&out))
-    gzthrow("Failed to serialized message");
-
-  this->Write(out);
+  if (this->readThread)
+    this->readThread->interrupt();
+  delete this->readThread;
+  this->readThread = NULL;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Write data out
 void Connection::Write(const std::string &buffer)
 {
   std::ostringstream header_stream;
@@ -148,6 +158,15 @@ void Connection::OnWrite(const boost::system::error_code &e)
     throw boost::system::system_error(e);
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Cancel all async operations on an open socket
+void Connection::Cancel()
+{
+  if (this->socket.is_open())
+    this->socket.cancel();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Read data from the socket
 void Connection::Read(std::string &data)
@@ -165,7 +184,7 @@ void Connection::Read(std::string &data)
 
   // Parse the header to get the size of the incoming data packet
   incoming_size = this->ParseHeader( header );
-  std::cout << "Got a header Size[" << incoming_size << "]\n";
+
   incoming.resize( incoming_size );
 
   // Read in the actual data
@@ -180,10 +199,7 @@ void Connection::Read(std::string &data)
 /// Get the address of this connection
 std::string Connection::GetLocalAddress() const
 {
-  if (this->socket.is_open())
-    return this->socket.local_endpoint().address().to_string();
-  else if (this->acceptor && this->acceptor->is_open())
-    return this->acceptor->local_endpoint().address().to_string();
+  return this->GetLocalEndpoint().address().to_string();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,8 +208,12 @@ unsigned short Connection::GetLocalPort() const
 {
   if (this->socket.is_open())
     return this->socket.local_endpoint().port();
-  else if (this->acceptor && this->acceptor->is_open())
+  else if (this->acceptor)
     return this->acceptor->local_endpoint().port();
+  else
+    std::cerr << "No socket is open, unable to get port information.\n";
+
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +250,9 @@ std::size_t Connection::ParseHeader( const std::string &header )
   {
     // Header doesn't seem to be valid. Inform the caller
     boost::system::error_code error(boost::asio::error::invalid_argument);
-    gzthrow("Invalid header[" + error.message() + "]");
+    std::ostringstream stream;
+    stream << "Invalid header[" << error.message() << "] Data Size[" << data_size << "]";
+    gzthrow(stream.str());
   }
 
   return data_size;
@@ -243,9 +265,73 @@ void Connection::ReadLoop(const ReadCallback &cb)
   std::string data;
   while (!this->readQuit)
   {
-    this->Read(data);
+    try
+    {
+      this->Read(data);
+    }
+    catch (std::exception &e)
+    {
+      // The connection closed
+      break;
+    }
     (cb)(data);
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Get the local endpoint
+boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
+{
+  boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());
+  boost::asio::ip::tcp::resolver::query query(boost::asio::ip::host_name(), "");
+  boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
+  boost::asio::ip::tcp::resolver::iterator end; // End marker.
+  boost::asio::ip::tcp::endpoint ep;
+
+  std::cout << "LocalEndpoint[" << boost::asio::ip::host_name() << "]\n";
+
+  while (iter != end)
+    ep = *iter++;
+
+  return ep;
+}
+
+boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
+{
+  //if (this->socket.is_open())
+    return this->socket.remote_endpoint();
+}
+
+std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep) const
+{
+  boost::asio::ip::tcp::resolver resolver(IOManager::Instance()->GetIO());
+  boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(ep);
+  boost::asio::ip::tcp::resolver::iterator end;
+
+  std::string name;
+
+  while (iter != end)
+  {
+    name = (*iter).host_name();
+    std::cerr << (*iter).host_name() << std::endl;
+    ++iter;
+  } 
+
+  return name;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the remote hostname
+std::string Connection::GetRemoteHostname() const
+{
+  return this->GetHostname( this->GetRemoteEndpoint() );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the local hostname
+std::string Connection::GetLocalHostname() const
+{
+  return this->GetHostname( this->GetLocalEndpoint() );
 }
 
 

@@ -15,7 +15,6 @@
  *
 */
 #include "common/Messages.hh"
-#include "transport/PublicationTransport.hh"
 #include "transport/Publication.hh"
 #include "transport/TopicManager.hh"
 
@@ -36,15 +35,6 @@ TopicManager::~TopicManager()
 
 void TopicManager::Init(unsigned short port)
 {
-  /*try
-  {
-    this->server = new Server(port);
-  }
-  catch (std::exception &e)
-  {
-    gzthrow( "Unable to start server[" << e.what() << "]\n");
-  }
-  */
 }
 
 
@@ -60,14 +50,13 @@ void TopicManager::Publish( const std::string &topic,
 
   PublicationPtr pub = this->FindPublication(topic);
 
-  std::cout << "TopicManager::Publish \n";
   pub->Publish( common::Message::Package("data", message) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 PublicationPtr TopicManager::FindPublication(const std::string &topic)
 {
-  std::list<PublicationPtr>::iterator iter;
+  std::vector<PublicationPtr>::iterator iter;
   PublicationPtr pub;
 
   // Find the publication
@@ -85,10 +74,54 @@ PublicationPtr TopicManager::FindPublication(const std::string &topic)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Subscribe to a topic give some options
+SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
+{
+  std::string topic = ops.GetTopic();
+  CallbackHelperPtr subscription = ops.GetSubscription();
+
+  // Make sure we are getting a google::protobuf message
+  /*google::protobuf::Message *msg = NULL;
+  M msgtype;
+  msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
+  if (!msg)
+    gzthrow("Subscribe requires a google protobuf type");
+    */
+
+  // Create a subscription (essentially a callback that gets 
+  // fired every time a Publish occurs on the corresponding
+  // topic
+  //CallbackHelperPtr subscription( new CallbackHelperT<M>( callback ) );
+  //this->subscribed_topics[topic].push_back(subscription);
+  
+  this->subscribed_topics[topic].push_back(subscription);
+
+  // The object that gets returned to the caller of this
+  // function
+  SubscriberPtr sub( new Subscriber(topic, subscription) );
+
+  // Find a current publication
+  PublicationPtr pub = this->FindPublication(topic);
+
+  // If the publication exits, just add the subscription to it 
+  if (pub)
+  {
+    pub->AddSubscription( subscription );
+  }
+  else
+  {
+    // Otherwise subscribe to the remote topic
+    ConnectionManager::Instance()->Subscribe(topic, ops.GetMsgType());
+  }
+
+  return sub;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Handle an incoming message
 void TopicManager::HandleIncoming()
 {
-  std::cout << "TopManager::HandleIncoming\n";
   //implement this
   // Read a header in the message the indicates the topic
 }
@@ -97,57 +130,64 @@ void TopicManager::HandleIncoming()
 // Unsubscribe from a topic
 void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
 {
-  std::cout << "Topicmanager::Unsubscribe[" << topic << "]\n";
   this->subscribed_topics[topic].remove(sub);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Connection a local Publisher to a remote Subscriber
-void TopicManager::ConnectPubToSub( const msgs::Subscribe &sub,
-                                    const ConnectionPtr &connection )
+// Connect a local Publisher to a remote Subscriber
+void TopicManager::ConnectPubToSub( const std::string &topic,
+                                    const SubscriptionTransportPtr &sublink )
 {
-  std::cout << "TopicManager::ConnectPubToSub\n";
-  PublicationPtr publication = this->FindPublication( sub.topic() );
-  PublicationTransportPtr pubLink( new PublicationTransport() );
-  pubLink->Init( connection );
-
-  publication->AddSubscription( pubLink );
+  PublicationPtr publication = this->FindPublication( topic );
+  publication->AddSubscription( sublink );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Tells the topic manager about a publisher
-void TopicManager::ConnectSubToPub( const msgs::Publish &pub,
-                                    const ConnectionPtr &connection )
+// Connect all subscribers on a topic to known publishers
+void TopicManager::ConnectSubscibers(const std::string &topic)
 {
-  std::cout << "TopicManager::ConnectPubToSub Topic[" << pub.topic() << "]\n";
-  std::map<std::string, std::list<CallbackHelperPtr> >::iterator iter;
-  iter = this->subscribed_topics.find(pub.topic());
+  SubMap::iterator iter = this->subscribed_topics.find(topic);
 
   if (iter != this->subscribed_topics.end())
   {
-    PublicationPtr publication = this->FindPublication(pub.topic());
-
-    std::cout << "TopicManager::ConnectSubscriber subscribers found\n";
+    PublicationPtr publication = this->FindPublication(topic);
 
     // Add all of our subscriptions to the publication
     std::list<CallbackHelperPtr>::iterator cbIter;
     for (cbIter = iter->second.begin(); cbIter != iter->second.end(); cbIter++)
     {
-      std::cout << "Adding subscription\n";
       publication->AddSubscription( *cbIter );
     }
-
-    // Start reading messages from the remote publisher
-    connection->StartRead(boost::bind(&Publication::Publish, publication, _1));
   }
   else
     std::cerr << "Shouldn't get here\n";//TODO: Properly handle this error
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Add a new publication to the list of advertised publication
-void TopicManager::UpdatePublications( const std::string &topic, const std::string &msgType )
+/// Connect a local subscriber to a remote publisher
+void TopicManager::ConnectSubToPub( const std::string &topic,
+                                    const PublicationTransportPtr &publink )
 {
+  // Add the publication transport mechanism to the publication.
+  if (publink)
+  {
+    PublicationPtr publication = this->FindPublication(topic);
+    if (publication)
+      publication->AddTransport( publink );
+    else
+      std::cerr << "Attempting to connect a remote publisher...but we don't have a publication. This shouldn't happen\n";
+  }
+
+  this->ConnectSubscibers(topic);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Add a new publication to the list of advertised publication
+bool TopicManager::UpdatePublications( const std::string &topic, 
+                                       const std::string &msgType )
+{
+  bool inserted = false;
+
   // Find a current publication on this topic
   PublicationPtr pub = this->FindPublication(topic);
 
@@ -159,7 +199,10 @@ void TopicManager::UpdatePublications( const std::string &topic, const std::stri
   }
   else
   {
+    inserted = true;
     pub = PublicationPtr( new Publication(topic, msgType) );
     this->advertisedTopics.push_back( pub );
   }
+
+  return inserted;
 }

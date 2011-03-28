@@ -34,7 +34,7 @@
 #include "rendering/Grid.hh"
 
 //#include "rendering/RTShaderSystem.hh"
-#include "transport/TopicManager.hh"
+#include "transport/Transport.hh"
 
 #include "rendering/Scene.hh"
 
@@ -48,10 +48,14 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
-  this->vis_sub = transport::TopicManager::Instance()->Subscribe("/gazebo/visual", &Scene::HandleVisualMsg, this);
-  this->light_sub = transport::TopicManager::Instance()->Subscribe("/gazebo/light", &Scene::HandleLightMsg, this);
-  this->pose_sub = transport::TopicManager::Instance()->Subscribe("/gazebo/pose", &Scene::HandlePoseMsg, this);
-  this->selection_sub = transport::TopicManager::Instance()->Subscribe("/gazebo/selection", &Scene::HandleSelectionMsg, this);
+  this->receiveMutex = new boost::mutex();
+
+  this->vis_sub = transport::subscribe("/gazebo/visual", &Scene::ReceiveVisualMsg, this);
+  this->light_sub = transport::subscribe("/gazebo/light", &Scene::ReceiveLightMsg, this);
+  this->pose_sub = transport::subscribe("/gazebo/pose", &Scene::ReceivePoseMsg, this);
+  this->selection_sub = transport::subscribe("/gazebo/selection", &Scene::HandleSelectionMsg, this);
+
+  this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&Scene::PreRender, this) ) );
 
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
@@ -86,12 +90,12 @@ Scene::Scene(const std::string &name)
 /// Destructor
 Scene::~Scene()
 {
-  VisualMap::iterator iter;
+  Visual_M::iterator iter;
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     delete iter->second;
   this->visuals.clear();
 
-  LightMap::iterator lightIter;
+  Light_M::iterator lightIter;
   for (lightIter = this->lights.begin(); lightIter != this->lights.end(); lightIter++)
     delete lightIter->second;
   this->lights.clear();
@@ -859,10 +863,64 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
   }
 }
 
-void Scene::HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
+void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
-  VisualMap::iterator iter;
-  iter = this->visuals.find( msg->header().str_id() );
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->visualMsgs.push_back(msg);
+}
+
+
+void Scene::PreRender()
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+
+  VisualMsgs_L::iterator vIter;
+  LightMsgs_L::iterator lIter;
+  PoseMsgs_L::iterator pIter;
+
+  // Process the visual messages
+  for (vIter = this->visualMsgs.begin(); 
+       vIter != this->visualMsgs.end(); vIter++)
+  {
+    this->ProcessVisualMsg(*vIter);
+  }
+  this->visualMsgs.clear();
+
+  // Process the light messages
+  for (lIter =  this->lightMsgs.begin(); 
+       lIter != this->lightMsgs.end(); lIter++)
+  {
+    this->ProcessLightMsg( *lIter );
+  }
+  this->lightMsgs.clear();
+
+
+  // Process all the Pose messages last. Remove pose message from the list
+  // only when a corresponding visual exits. We may receive pose updates
+  // over the wire before  we recieve the visual
+  pIter = this->poseMsgs.begin(); 
+  while (pIter != this->poseMsgs.end())
+  {
+    Visual_M::iterator iter = this->visuals.find((*pIter)->header().str_id());
+    if (iter != this->visuals.end())
+    {
+      iter->second->SetPose( common::Message::Convert(*(*pIter)) );
+      PoseMsgs_L::iterator prev = pIter++;
+      this->poseMsgs.erase( prev );
+    }
+    else
+      ++pIter;
+  }
+
+}
+
+
+void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
+{
+  Visual_M::iterator iter;
+  iter = this->visuals.find(msg->header().str_id());
+
+  std::cout << "Handle Visual[" << msg->DebugString() << "]\n";
 
   if (msg->has_action() && msg->action() == msgs::Visual::DELETE)
   {
@@ -880,7 +938,7 @@ void Scene::HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
   else
   {
     Visual *visual = NULL;
-    VisualMap::iterator iter;
+    Visual_M::iterator iter;
     iter = this->visuals.find(msg->parent_id());
 
     if (iter != this->visuals.end())
@@ -893,20 +951,34 @@ void Scene::HandleVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
   }
 }
 
-void Scene::HandlePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg)
+void Scene::ReceivePoseMsg( const boost::shared_ptr<msgs::Pose const> &msg)
 {
-  VisualMap::iterator iter;
-  iter = this->visuals.find(msg->header().str_id());
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  PoseMsgs_L::iterator iter;
 
-  if (iter != this->visuals.end())
+  // Find an old pose message, and remove them
+  for (iter = this->poseMsgs.begin(); iter != this->poseMsgs.end(); iter++)
   {
-    iter->second->SetPose( common::Message::Convert(*msg) );
+    if ( (*iter)->header().str_id() == msg->header().str_id() )
+    {
+      this->poseMsgs.erase(iter);
+      break;
+    }
   }
+
+  this->poseMsgs.push_back( msg );
 }
 
-void Scene::HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
+void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
 {
-  LightMap::iterator iter;
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->lightMsgs.push_back(msg);
+}
+
+void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
+{
+  std::cout << "Handle Light Msg\n";
+  Light_M::iterator iter;
   iter = this->lights.find(msg->header().str_id());
 
   if (msg->action() == msgs::Light::DELETE)
@@ -927,7 +999,7 @@ void Scene::HandleLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
 
 void Scene::HandleSelectionMsg(const boost::shared_ptr<msgs::Selection const> &msg)
 {
-  VisualMap::iterator viter;
+  Visual_M::iterator viter;
   viter = this->visuals.find(msg->header().str_id());
   if (viter != this->visuals.end())
     viter->second->ShowSelectionBox(msg->selected());

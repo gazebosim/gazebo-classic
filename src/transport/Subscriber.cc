@@ -59,3 +59,12 @@ void Subscriber::Unsubscribe() const
 {
   TopicManager::Instance()->Unsubscribe(this->topic, this->subscription );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the subscription 
+CallbackHelperPtr Subscriber::GetSubscription() const
+{
+  return this->subscription;
+}
+
+

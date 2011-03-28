@@ -35,6 +35,7 @@ namespace gazebo
 {
   namespace transport
   {
+    class IOManager;
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
@@ -58,12 +59,15 @@ namespace gazebo
       /// \brief Start a thread that reads from the connection, and passes
       ///        new message to the ReadCallback
       public: void StartRead(const ReadCallback &cb);
+             
+      /// \brief Stop the read loop 
+      public: void StopRead();
+
+      /// \brief Cancel all async operations on an open socket
+      public: void Cancel();
 
       /// \brief Read data from the socket
       public: void Read(std::string &data);
-
-      /// \brief Write out a message
-      public: void Write(const google::protobuf::Message &msg);
 
       /// \brief Write data to the socket
       public: void Write(const std::string &buffer);
@@ -79,6 +83,12 @@ namespace gazebo
 
       /// \brief Get the remote port number
       public: unsigned short GetRemotePort() const;
+
+      /// \brief Get the remote hostname
+      public: std::string GetRemoteHostname() const;
+
+      /// \brief Get the local hostname
+      public: std::string GetLocalHostname() const;
 
       /// \brief Peform and asyncronous read
       public: template<typename Handler>
@@ -163,6 +173,14 @@ namespace gazebo
      /// \brief the read thread
      private: void ReadLoop(const ReadCallback &cb);
 
+     /// \brief Get the local endpoint
+     private: boost::asio::ip::tcp::endpoint GetLocalEndpoint() const;
+
+     /// \brief Get the remote endpoint
+     private: boost::asio::ip::tcp::endpoint GetRemoteEndpoint() const;
+
+     private: std::string GetHostname(boost::asio::ip::tcp::endpoint ep) const;
+
       private: boost::asio::ip::tcp::socket socket;
       private: boost::asio::ip::tcp::acceptor *acceptor;
 
@@ -176,10 +194,10 @@ namespace gazebo
       private: std::vector<char> inbound_data;
 
       private: boost::thread *readThread;
-      //private: boost::mutex *readBufferMutex;
-      //private: std::list< std::string > readBuffer;
       private: bool readQuit;
-      
+
+      // Used to make sure the IO Manager starts
+      private: static IOManager *iomanager;
     };
 
   }

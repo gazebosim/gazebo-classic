@@ -21,13 +21,12 @@
 #include <assert.h>
 #include <sstream>
 #include <fstream>
-#include <sys/time.h> //gettimeofday
 #include <boost/thread.hpp>
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
-#include "transport/TopicManager.hh"
+#include "transport/Transport.hh"
 
 #include "common/Messages.hh"
 #include "common/Diagnostics.hh"
@@ -75,10 +74,10 @@ class ModelUpdate_TBB
 // Private constructor
 World::World()
 {
-  this->scene_pub = transport::TopicManager::Instance()->Advertise<msgs::Scene>("/gazebo/scene");
-  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
-  this->selection_pub = transport::TopicManager::Instance()->Advertise<msgs::Selection>("/gazebo/selection");
-  this->light_pub = transport::TopicManager::Instance()->Advertise<msgs::Light>("/gazebo/light");
+  this->scene_pub = transport::advertise<msgs::Scene>("/gazebo/scene");
+  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
+  this->selection_pub = transport::advertise<msgs::Selection>("/gazebo/selection");
+  this->light_pub = transport::advertise<msgs::Light>("/gazebo/light");
 
   //this->server = NULL;
   this->physicsEngine = NULL;

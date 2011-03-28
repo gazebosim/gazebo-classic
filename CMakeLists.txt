@@ -21,28 +21,20 @@ set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
 
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 
-#set (gazeboserver_sources_desc "List of server sources" 
-#     CACHE INTERNAL "Gazebo server sources list description" FORCE)
-#set (gazeboserver_headers_desc "List of server headers" 
-#     CACHE INTERNAL "Gazebo server headers list description" FORCE)
-#set (gazeboserver_include_dirs_desc "List of server include directories" 
-#     CACHE INTERNAL "Include dirs description")
-#set (gazeboserver_link_dirs_desc "List of server link directories" 
-#     CACHE INTERNAL "Link dirs description" FORCE)
-#set (gazeboserver_link_libs_desc "List of server link libraries" 
-#     CACHE INTERNAL "Link libs description" FORCE)
-#set (gazeboserver_ldflags_desc "List of server ldflags" 
-#     CACHE INTERNAL "LDFlags description" FORCE)
-#set (gazeboserver_cflags_desc "List of server cflags" 
-#     CACHE INTERNAL "Server cflags description" FORCE)
-#set (gazebosensor_sources_desc "List of sensor sources" 
-#     CACHE INTERNAL "Gazebo sensor sources list description" FORCE)
-#set (gazebocontroller_sources_desc "List of controller sources" 
-#     CACHE INTERNAL "Gazebo controller sources list description" FORCE)
-#
-#set (bullet_link_libs_desc "List of bullet link libraries" 
-#     CACHE INTERNAL "Bullet link libs description" FORCE)
 
+# with -fPIC
+if(UNIX AND NOT WIN32)
+ find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
+ if(CMAKE_UNAME)
+   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
+   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
+     "processor type (i386 and x86_64)")
+   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+     ADD_DEFINITIONS(-fPIC)
+   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+ endif(CMAKE_UNAME)
+endif(UNIX AND NOT WIN32)
+                             
 set (MIN_OGRE_VERSION 1.6.3 CACHE INTERNAL "Ogre version requirement" FORCE)
 
 set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
@@ -66,9 +58,9 @@ set (CMAKE_C_FLAGS_PROFILE " -ggdb -pg -Wall -fPIC " CACHE INTERNAL "C Flags for
 
 #####################################
 # Build type link flags
-set (CMAKE_LINK_FLAGS_RELEASE "" CACHE INTERNAL "Link flags fro release" FORCE)
-set (CMAKE_LINK_FLAGS_DEBUG "" CACHE INTERNAL "Link flags for debug" FORCE)
-set (CMAKE_LINK_FLAGS_PROFILE "" CACHE INTERNAL "Link flags for profile" FORCE)
+set (CMAKE_LINK_FLAGS_RELEASE " -fPIC" CACHE INTERNAL "Link flags fro release" FORCE)
+set (CMAKE_LINK_FLAGS_DEBUG " -fPIC" CACHE INTERNAL "Link flags for debug" FORCE)
+set (CMAKE_LINK_FLAGS_PROFILE " -fPIC" CACHE INTERNAL "Link flags for profile" FORCE)
 
 #####################################
 # Set the default build type
@@ -133,7 +125,12 @@ else (build_errors)
     message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
     message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
   endif (BUILD_GAZEBO)
-  
+
+  ########################################
+  # Make the package config files
+  configure_file(${CMAKE_SOURCE_DIR}/cmake/gazebo_transport_pkgconfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/gazebo_transport.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig COMPONENT pkgconfig)
+
   # Cpack stuff
   include (InstallRequiredSystemLibraries)
   set (CPACK_PACKAGE_NAME "${PROJECT_NAME}")
@@ -152,5 +149,6 @@ else (build_errors)
   message(STATUS "Configuration successful. Type make to compile gazebo")
 
 endif(build_errors)
+
 
 GAZEBOSERVER_RESET_LISTS()

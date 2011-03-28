@@ -1,5 +1,5 @@
-#ifndef PUBLICATIONLINK_HH
-#define PUBLICATIONLINK_HH
+#ifndef SUBSCRIPTIONTRANSPORT_HH
+#define SUBSCRIPTIONTRANSPORT_HH
 
 #include <boost/shared_ptr.hpp>
 
@@ -10,13 +10,13 @@ namespace gazebo
 {
   namespace transport
   {
-    class PublicationTransport : public CallbackHelper
+    class SubscriptionTransport : public CallbackHelper
     {
       /// \brief Constructor
-      public: PublicationTransport();
+      public: SubscriptionTransport();
 
       /// \brief Destructor
-      public: virtual ~PublicationTransport();
+      public: virtual ~SubscriptionTransport();
 
       /// \brief Initialize the publication link 
       public: void Init( const ConnectionPtr &conn );
@@ -29,7 +29,7 @@ namespace gazebo
 
       private: ConnectionPtr connection;
     };
-    typedef boost::shared_ptr<PublicationTransport> PublicationTransportPtr;
+    typedef boost::shared_ptr<SubscriptionTransport> SubscriptionTransportPtr;
   }
 }
 

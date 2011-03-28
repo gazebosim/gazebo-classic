@@ -34,7 +34,11 @@ namespace gazebo
       public: virtual void SetSize( const common::Vector3 &size )
       {
         BoxShape::SetSize(size);
-        ODEGeom *oParent = (ODEGeom*)(this->geomParent);
+
+        ODEGeom *oParent = dynamic_cast<ODEGeom*>(this->geomParent);
+        if (!oParent)
+          std::cerr << "\n\nNot and ODEGeom!!\n\n";
+
         common::Pose3d rpose;
   
         dMass odeMass;

@@ -47,6 +47,7 @@ unsigned int Camera::cameraCounter = 0;
 // Constructor
 Camera::Camera(const std::string &namePrefix, Scene *scene)
 {
+  std::cout << "Camera constructor\n";
   this->scene = scene;
 
   this->textureWidth = this->textureHeight = 0;
@@ -290,10 +291,6 @@ bool Camera::GetRenderingEnabled() const
 // Render the camera
 void Camera::Render()
 {
-  // disable rendering if sensor not set to active
-  if (!this->renderingEnabled)
-    return;
-
   this->newData = true;
   this->renderTarget->update(false);
 }

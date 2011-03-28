@@ -1,5 +1,18 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+set (sources ODEPhysics.cc
+             ODEGeom.cc
+             ODEBody.cc
+             ODEJoint.cc
+             ODESliderJoint.cc
+             ODEHingeJoint.cc
+             ODEHinge2Joint.cc
+             ODEUniversalJoint.cc
+             ODEBallJoint.cc
+             ODETrimeshShape.cc
+             ODERayShape.cc
+             ODEMultiRayShape.cc
+             ODEHeightmapShape.cc
 )
 
 SET (headers ODEPhysics.hh

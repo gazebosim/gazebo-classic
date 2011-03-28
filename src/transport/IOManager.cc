@@ -20,41 +20,22 @@
 using namespace gazebo;
 using namespace transport;
 
-IOManagerPtr IOManager::self;
-
 IOManager::IOManager()
   : work(this->io_service)
 {
+  std::cout << "Run IO Service\n";
+  this->thread = boost::thread( boost::bind(&boost::asio::io_service::run, 
+                                            &this->io_service) );
 }
 
 IOManager::~IOManager()
 {
-  this->Stop();
-}
-
-const IOManagerPtr &IOManager::Instance()
-{
-  if (!self)
-  {
-    self.reset(new IOManager);
-  }
-
-  return self;
+  std::cout << "STop IO Service\n";
+  this->thread.interrupt();
+  this->io_service.stop();
 }
 
 boost::asio::io_service &IOManager::GetIO()
 {
   return this->io_service;
-}
-
-void IOManager::Start()
-{
-  this->thread = boost::thread( boost::bind(&boost::asio::io_service::run, 
-                                            &this->io_service) );
-}
-
-void IOManager::Stop()
-{
-  this->thread.interrupt();
-  this->io_service.stop();
 }

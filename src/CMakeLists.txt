@@ -1,12 +1,12 @@
 include ( ${wxWidgets_USE_FILE} )
 
 include_directories( 
+  ${PROJECT_SOURCE_DIR}/src 
+  ${PROJECT_BINARY_DIR}/src 
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${wxWidgets_INCLUDE_DIRS}
   ${XML_INCLUDE_DIRS} 
-  ${PROJECT_BINARY_DIR}/src/msgs
-  ${PROJECT_SOURCE_DIR}/src 
   ${OGRE_INCLUDE_DIRS}
   ${BOOST_INCLUDE_DIRS}
 )
@@ -60,28 +60,14 @@ target_link_libraries( gazebo_server gazebo_common
                                      gazebo_physics
                                      gazebo_msgs
                                      assimp
-                                     pthread
-                                     ${XML_LIBRARIES}
-                                     ${libtool_library}
-                                     ${TBB_LIBRARIES}
-                                     ${ODE_LIBRARIES}
-                                     ${boost_libraries}
-                                     ${freeimage_library}
-                                     ${PROTOBUF_LIBRARY})
+                                     pthread)
 
 target_link_libraries( gazebo_client gazebo_common
                                      gazebo_transport
                                      gazebo_gui
                                      gazebo_rendering
                                      gazebo_msgs
-                                     pthread
-                                     ${assimp_libraries}
-                                     ${OPENGL_LIBRARIES}
-                                     ${XML_LIBRARIES}
-                                     ${boost_libraries}
-                                     ${ogre_libraries}
-                                     ${ogre_link_libs}
-                                     ${PROTOBUF_LIBRARY})
+                                     pthread)
 
 install (TARGETS gazebo_master DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

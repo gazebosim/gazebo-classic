@@ -28,6 +28,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "transport/Publisher.hh"
+
 #include "common/Box.hh"
 #include "common/Pose3d.hh"
 #include "common/Param.hh"

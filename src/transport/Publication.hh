@@ -5,6 +5,7 @@
 #include <list>
 
 #include "CallbackHelper.hh"
+#include "PublicationTransport.hh"
 
 namespace gazebo
 {
@@ -30,9 +31,13 @@ namespace gazebo
       /// \brief Publish data
       public: void Publish(const std::string &data);
 
+      public: void AddTransport( const PublicationTransportPtr &publink );
+
       private: std::string topic;
       private: std::string msgType;
       private: std::list< CallbackHelperPtr > callbacks;
+
+      private: std::list<PublicationTransportPtr> transports;
     };
     typedef boost::shared_ptr<Publication> PublicationPtr;
   }

@@ -25,9 +25,17 @@ namespace gazebo
 
     private: void OnAccept(const transport::ConnectionPtr &new_connection);
 
+    private: msgs::Publish GetPublisher( const std::string &topic );
+
+    private: transport::ConnectionPtr FindConnection(const std::string &host, unsigned short port);
+
     private: std::list<transport::ConnectionPtr> connections;
-    private: std::list<msgs::Publish> publishers;
-    private: std::list<msgs::Subscribe> subscribers;
+
+    typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> > PubList;
+    typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> > SubList;
+    private: PubList publishers;
+    private: SubList subscribers;
+
     private: transport::ConnectionPtr connection;
     private: bool quit;
   };

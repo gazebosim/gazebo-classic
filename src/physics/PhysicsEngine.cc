@@ -27,7 +27,7 @@
 #include "common/GazeboMessage.hh"
 #include "common/Events.hh"
 
-#include "transport/TopicManager.hh"
+#include "transport/Transport.hh"
 
 #include "physics/World.hh"
 #include "physics/PhysicsEngine.hh"
@@ -41,7 +41,7 @@ using namespace physics;
 PhysicsEngine::PhysicsEngine(World *world)
   : world(world)
 {
-  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
 
   common::Param::Begin(&this->parameters);
   this->gravityP = new common::ParamT<common::Vector3>("gravity",common::Vector3(0.0, -9.80665, 0.0), 0);

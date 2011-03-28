@@ -1,4 +1,19 @@
-#include "common/Node.hh"
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include "common/XMLConfig.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboConfig.hh"
@@ -8,6 +23,8 @@
 #include "rendering/RenderEngine.hh"
 #include "rendering/RenderState.hh"
 #include "rendering/Scene.hh"
+
+#include "transport/Transport.hh"
 
 #include "GuiClient.hh"
 
@@ -28,7 +45,7 @@ const std::string default_config =
 
 
 GuiClient::GuiClient()
-  : node(new common::Node()), renderEngineEnabled(true), guiEnabled(true)
+  : renderEngineEnabled(true), guiEnabled(true)
 {
   this->quit = false;
   this->gui = NULL;
@@ -43,7 +60,7 @@ GuiClient::GuiClient()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-  this->node->Init("localhost", 11345);
+  transport::init("localhost", 11345);
 }
 
 GuiClient::~GuiClient()
@@ -55,7 +72,7 @@ GuiClient::~GuiClient()
 void GuiClient::Load(const std::string &filename)
 {
   // Load the world file
-  /*gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
+  gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
 
   try
   {
@@ -141,26 +158,17 @@ void GuiClient::Load(const std::string &filename)
   }
 
   delete xmlFile;
-  */
 }
 
 void GuiClient::Run()
 {
-  /*rendering::Scene *scene = new rendering::Scene("default");
+  rendering::Scene *scene = new rendering::Scene("default");
   scene->Load(NULL);
   scene->Init();
 
   this->gui->ViewScene(scene);
 
   this->gui->Run();
-  */
-
-  transport::SubscriberPtr sub = this->node->Subscribe("/gazebo/test", &GuiClient::Test, this);
-
-  while (!this->quit)
-  {
-    usleep(100000);
-  }
 }
 
 void GuiClient::Quit()
@@ -168,7 +176,3 @@ void GuiClient::Quit()
   this->quit = true;
 }
 
-void GuiClient::Test(const boost::shared_ptr<msgs::String const> &msg )
-{
-  std::cout << "Gui::Test[" << msg->data() << "]\n";
-}

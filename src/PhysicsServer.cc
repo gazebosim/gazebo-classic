@@ -1,3 +1,20 @@
+/*
+ * Copyright 2011 Nate Koenig & Andrew Howard
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #include "common/GazeboConfig.hh"
 #include "common/XMLConfig.hh"
 #include "common/GazeboError.hh"
@@ -5,9 +22,7 @@
 #include "physics/World.hh"
 #include "physics/PhysicsFactory.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/IOManager.hh"
-#include "transport/TopicManager.hh"
+#include "transport/Transport.hh"
 
 #include "PhysicsServer.hh"
 
@@ -24,16 +39,33 @@ const std::string default_config =
       <grid>false</grid>\
     </scene>\
     <physics type='ode'>\
-      <stepTime>0.001</stepTime>\
+      <step_time>0.001</step_time>\
       <gravity>0 0 -9.8</gravity>\
       <cfm>0.0000000001</cfm>\
       <erp>0.2</erp>\
-      <stepType>quick</stepType>\
-      <stepIters>10</stepIters>\
+      <step_type>quick</step_type>\
+      <step_iters>10</step_iters>\
       <stepW>1.3</stepW>\
-      <contactMaxCorrectingVel>100.0</contactMaxCorrectingVel>\
-      <contactSurfaceLayer>0.0</contactSurfaceLayer>\
+      <contact_max_correcting_vel>100.0</contact_max_correcting_vel>\
+      <contact_surface_layer>0.0</contact_surface_layer>\
     </physics>\
+    <model name='ball'>\
+      <origin xyz='0 0 10'/>\
+      <link name='body'>\
+        <collision name='geom'>\
+          <geometry>\
+            <box size='1.0 1.0 1.0'/>\
+          </geometry>\
+          <mass>1.0</mass>\
+        </collision>\
+        <visual>\
+          <geometry>\
+            <box size='1.0 1.0 1.0'/>\
+          </geometry>\
+          <mesh filename='unit_box'/>\
+        </visual>\
+      </link>\
+    </model>\
     <model name='plane1_model'>\
       <static>true</static>\
       <link name='body'>\
@@ -56,7 +88,6 @@ const std::string default_config =
 </gazebo>";
 
 PhysicsServer::PhysicsServer()
-  : node(new common::Node())
 {
   this->quit = false;
 
@@ -70,8 +101,7 @@ PhysicsServer::PhysicsServer()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-  this->node->Init("localhost", 11345);
-
+  transport::init("localhost", 11345);
   physics::PhysicsFactory::RegisterAll();
 }
 
@@ -131,20 +161,20 @@ void PhysicsServer::Load( const std::string &filename )
 
 void PhysicsServer::Init()
 {
+  for (int i=0; i < this->worlds.size(); i++)
+    this->worlds[i]->Init();
 }
 
 void PhysicsServer::Run()
 {
-  //msgs::String msg;
-  //msg.set_data("Hello");
-
-  //transport::PublisherPtr pub = this->node->Advertise<msgs::String>("/gazebo/test");
+  for (int i=0; i < this->worlds.size(); i++)
+    this->worlds[i]->Start();
 
   while (!this->quit)
   {
-    //pub->Publish(msg);
-    //for (int i=0; i < this->worlds.size(); i++)
-      //this->worlds[i]->Update();
+    /*for (int i=0; i < this->worlds.size(); i++)
+      this->worlds[i]->Update();
+      */
     usleep(1000000);
   }
 }

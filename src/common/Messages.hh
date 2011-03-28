@@ -17,7 +17,7 @@
 #ifndef MESSAGES_HH
 #define MESSAGES_HH
 
-#include "MessageTypes.hh"
+#include "msgs/MessageTypes.hh"
 #include "common/Color.hh"
 #include "common/Vector3.hh"
 #include "common/Time.hh"

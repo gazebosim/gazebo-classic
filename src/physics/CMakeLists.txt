@@ -4,38 +4,9 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src 
 )
 
-if (INCLUDE_ODE)
-  set (sources ode/ODEPhysics.cc
-               ode/ODEGeom.cc
-               ode/ODEBody.cc
-               ode/ODEJoint.cc
-               ode/ODESliderJoint.cc
-               ode/ODEHingeJoint.cc
-               ode/ODEHinge2Joint.cc
-               ode/ODEUniversalJoint.cc
-               ode/ODEBallJoint.cc
-               ode/ODETrimeshShape.cc
-               ode/ODERayShape.cc
-               ode/ODEMultiRayShape.cc
-               ode/ODEHeightmapShape.cc
-               )
-
-  set (headers ode/ODEPhysics.hh
-               ode/ODEGeom.hh
-               ode/ODEBody.hh
-               ode/ODEJoint.hh
-               ode/ODESliderJoint.hh
-               ode/ODEHingeJoint.hh
-               ode/ODEHinge2Joint.hh
-               ode/ODEUniversalJoint.hh
-               ode/ODEBallJoint.hh
-               ode/ODETrimeshShape.hh
-               ode/ODERayShape.hh
-               ode/ODEMultiRayShape.hh
-               ode/ODEHeightmapShape.hh
-               )
-  LIST_TO_STRING(MY_PHYSICS_CFLAGS "${ODE_CFLAGS}")
-endif (INCLUDE_ODE)
+if (INCLUDE_ODE) 
+  add_subdirectory(ode)
+endif()
 
 #if (INCLUDE_BULLET) 
 #  add_subdirectory(bullet)
@@ -106,9 +77,14 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
-set_target_properties(gazebo_physics PROPERTIES COMPILE_FLAGS "-fPIC ${MY_PHYSICS_CFLAGS}")
+target_link_libraries(gazebo_physics gazebo_common 
+                                     ${TBB_LIBRARIES} 
+                                     ${libtool_library} 
+                                     ${boost_libraries})
 
-target_link_libraries(gazebo_physics ${CMAKE_LINK_LIBS_${CMAKE_BUILD_TYPE}})
+if (INCLUDE_ODE) 
+  target_link_libraries(gazebo_physics gazebo_physics_ode)
+endif()
 
 install ( TARGETS gazebo_physics DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/physics COMPONENT headers)

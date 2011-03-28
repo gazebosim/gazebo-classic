@@ -32,10 +32,11 @@ namespace gazebo
       public: CallbackHelperT( const boost::function<void (const boost::shared_ptr<M const> &)> &cb) : callback(cb) 
               {
                 // Just some code to make sure we have a google protobuf.
-                M test;
+                /*M test;
                 google::protobuf::Message *m;
                 if ( (m=dynamic_cast<google::protobuf::Message*>(&test)) ==NULL)
                   gzthrow( "Message type must be a google::protobuf type\n" );
+                  */
               }
 
       /// \brief Get the typename of the message that is handled
@@ -63,7 +64,35 @@ namespace gazebo
 
       private: boost::function<void (const boost::shared_ptr<M const> &)> callback;
     };
-    typedef boost::shared_ptr<CallbackHelper> CallbackHelperPtr;
+
+    class DebugCallbackHelper : public CallbackHelper
+    {
+      public: DebugCallbackHelper( const boost::function<void (const boost::shared_ptr<msgs::String const> &)> &cb) : callback(cb) 
+              {
+              }
+
+      /// \brief Get the typename of the message that is handled
+      public: std::string GetMsgType() const
+              {
+                msgs::String m;
+                return m.GetTypeName();
+              }
+
+      public: virtual void HandleMessage(const std::string &newdata)
+              {
+                msgs::Packet packet;
+                packet.ParseFromString(newdata);
+
+                // TODO: Handle this error properly
+                if (packet.type() != "data")
+                  std::cerr << "CallbackHelperT::HandleMessage Invalid message!!!\n";
+                boost::shared_ptr<msgs::String> m( new msgs::String );
+                m->ParseFromString( packet.serialized_data() );
+                this->callback( m );
+              }
+
+      private: boost::function<void (const boost::shared_ptr<msgs::String const> &)> callback;
+    };
   }
 }
 

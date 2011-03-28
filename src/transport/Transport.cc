@@ -14,31 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef PHYSICSSERVER_HH
-#define PHYSICSSERVER_HH
+#include <list>
 
-#include <string>
-#include <vector>
+#include "transport/ConnectionManager.hh"
+#include "Transport.hh"
 
-namespace gazebo
+using namespace gazebo;
+
+void transport::init(const std::string &master_host, unsigned short master_port)
 {
-  namespace physics
-  {
-    class World;
-  }
-
-  class PhysicsServer
-  {
-    public: PhysicsServer();
-    public: virtual ~PhysicsServer();
-
-    public: void Load( const std::string &filename );
-    public: void Init();
-    public: void Run();
-    public: void Quit();
-
-    private: std::vector< physics::World* > worlds;
-    private: bool quit;
-  };
+  transport::ConnectionManager::Instance()->Init( master_host, master_port );
 }
-#endif
+
+/// Get a list of all the publishers
+void transport::get_publishers( std::list<msgs::Publish> &publishers )
+{
+  transport::ConnectionManager::Instance()->GetAllPublishers(publishers);
+}
+

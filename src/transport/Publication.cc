@@ -35,7 +35,6 @@ void Publication::AddSubscription(const CallbackHelperPtr &callback)
 void Publication::Publish(const std::string &data)
 {
   std::list< CallbackHelperPtr >::iterator iter;
-  std::cout << "publication publish[" << this->callbacks.size() << "]\n";
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
     (*iter)->HandleMessage(data);
@@ -48,3 +47,10 @@ std::string Publication::GetMsgType() const
 {
   return this->msgType;
 }
+
+void Publication::AddTransport( const PublicationTransportPtr &publink)
+{
+  publink->AddCallback( boost::bind(&Publication::Publish, this, _1) );
+  this->transports.push_back( publink );
+}
+

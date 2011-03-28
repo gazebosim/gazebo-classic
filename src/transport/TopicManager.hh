@@ -25,7 +25,11 @@
 #include "common/Messages.hh"
 #include "common/SingletonT.hh"
 
-#include "transport/Connection.hh"
+#include "transport/SubscribeOptions.hh"
+#include "transport/SubscriptionTransport.hh"
+#include "transport/PublicationTransport.hh"
+#include "transport/ConnectionManager.hh"
+//#include "transport/Connection.hh"
 #include "transport/Publisher.hh"
 #include "transport/Publication.hh"
 #include "transport/Subscriber.hh"
@@ -45,31 +49,11 @@ namespace gazebo
       public: PublicationPtr FindPublication(const std::string &topic);
 
       /// \brief Subscribe to a topic
-      public: template<class M, class T>
-              SubscriberPtr Subscribe(const std::string &topic, void(T::*fp)(const boost::shared_ptr<M const> &), T *obj)
-              {
-                google::protobuf::Message *msg = NULL;
-                M msgtype;
-                msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
-                if (!msg)
-                  gzthrow("Subscribe requires a google protobuf type");
-
-                CallbackHelperPtr subscription( 
-                    new CallbackHelperT<M>( boost::bind(fp, obj, _1) ) );
-
-                SubscriberPtr sub( new Subscriber(topic, subscription) );
-
-                std::cout << "TopicManager::Subscribe to topic[" << topic << "]\n";
-                this->subscribed_topics[topic].push_back(subscription);
-
-                return sub;
-              }
-
-        /*public: template<class M>
-                Subscriber Subscribe(const std::string &topic, const boost::function<void (const boost::shared_ptr<M const>&)> &callback)
-                {
-                }
-                */
+      //public: template<class M>
+      public: SubscriberPtr Subscribe(const SubscribeOptions &options);
+                  //const boost::function<void (const boost::shared_ptr<M const> &)> &callback)
+                  //void(T::*fp)(const boost::shared_ptr<M const> &), T *obj)
+              
 
       /// \brief Unsubscribe from a topic. Use a Subscriber rather than
       ///        calling this function directly
@@ -86,7 +70,28 @@ namespace gazebo
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
 
-                this->UpdatePublications(topic, msg->GetTypeName());
+                if (this->UpdatePublications(topic, msg->GetTypeName()))
+                {
+                  ConnectionManager::Instance()->Advertise(topic,
+                                                           msg->GetTypeName());
+                }
+
+                // Connect all local subscription to the publisher
+                PublicationPtr publication = this->FindPublication( topic );
+                SubMap::iterator iter;
+                for (iter = this->subscribed_topics.begin(); 
+                     iter != this->subscribed_topics.end(); iter++)
+                {
+                  if ( iter->first == topic )
+                  {
+                    std::list<CallbackHelperPtr>::iterator liter;
+                    for (liter = iter->second.begin(); 
+                         liter != iter->second.end(); liter++)
+                    {
+                      publication->AddSubscription( *liter );
+                    }
+                  }
+                }
 
                 return PublisherPtr( new Publisher(topic, msg->GetTypeName()) );
               }
@@ -105,25 +110,29 @@ namespace gazebo
                             google::protobuf::Message &message );
 
       /// \brief Connection a local Publisher to a remote Subscriber
-      public: void ConnectPubToSub( const msgs::Subscribe &sub,
-                                    const ConnectionPtr &connection );
+      public: void ConnectPubToSub( const std::string &topic,
+                                    const SubscriptionTransportPtr &sublink );
 
       /// \brief Connect a local Subscriber to a remote Publisher
-      public: void ConnectSubToPub( const msgs::Publish &pub,
-                                    const ConnectionPtr &connection );
+      public: void ConnectSubToPub( const std::string &topic,
+                                    const PublicationTransportPtr &publink );
 
-      public: void UpdatePublications( const std::string &topic, 
+      /// \brief Connect all subscribers on a topic to known publishers
+      public: void ConnectSubscibers(const std::string &topic);
+
+      /// \brief Update our list of advertised topics
+      /// \return True if the provided params define a new publisher.
+      public: bool UpdatePublications( const std::string &topic, 
                                        const std::string &msgType );
 
       private: void HandleIncoming();
 
-      private: std::list<PublicationPtr> advertisedTopics;
-      //private: std::list<Subscription> subscriptions;
+      /// \brief A map <subscribed_topic_name, subscription_callbacks> of 
+      ///        subscribers to topics
+      typedef std::map<std::string, std::list<CallbackHelperPtr> > SubMap;
 
-      //private: std::map<std::string, int> advertised_topics;
-      private: std::map<std::string, std::list<CallbackHelperPtr> > subscribed_topics; 
-
-      //private: std::map<std::string, ConnectionPtr> subscribedConnections;
+      private: std::vector<PublicationPtr> advertisedTopics;
+      private: SubMap subscribed_topics; 
 
       //Singleton implementation
       private: friend class DestroyerT<TopicManager>;
@@ -131,5 +140,6 @@ namespace gazebo
     };
   }
 }
+
 #endif
 

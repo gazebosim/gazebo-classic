@@ -80,7 +80,7 @@ target_link_libraries(gazebo_gui Xpm  ${wxWidgets_LIBRARIES} ${CMAKE_LINK_LIBS_$
 
 if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
   set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
-    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
   set_target_properties(gazebo_gui PROPERTIES LINK_FLAGS 
     ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})

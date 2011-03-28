@@ -25,7 +25,7 @@
 #include "common/GazeboError.hh"
 #include "common/Global.hh"
 
-#include "transport/TopicManager.hh"
+#include "transport/Transport.hh"
 
 #include "physics/Geom.hh"
 #include "physics/Model.hh"
@@ -43,8 +43,8 @@ using namespace physics;
 Entity::Entity(Common *parent)
 : Common(parent)
 {
-  this->pose_pub = transport::TopicManager::Instance()->Advertise<msgs::Pose>("/gazebo/pose");
-  this->vis_pub = transport::TopicManager::Instance()->Advertise<msgs::Visual>("/gazebo/visual");
+  this->pose_pub = transport::advertise<msgs::Pose>("/gazebo/pose");
+  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
   this->AddType(ENTITY);
 
   common::Param::Begin(&this->parameters);
