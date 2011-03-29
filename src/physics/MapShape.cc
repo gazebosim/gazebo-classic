@@ -45,7 +45,7 @@ unsigned int MapShape::geomCounter = 0;
 MapShape::MapShape(Geom *parent)
     : Shape(parent)
 {
-  this->AddType(MAP_SHAPE);
+  this->AddType(Common::MAP_SHAPE);
 
   this->root = new QuadNode(NULL);
 

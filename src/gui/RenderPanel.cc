@@ -17,7 +17,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "common/Pose3d.hh"
-#include "common/Global.hh"
+#include "common/Angle.hh"
 
 
 #include "rendering/UserCamera.hh"

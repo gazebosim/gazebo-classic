@@ -3,6 +3,7 @@ import "header.proto";
 import "color.proto";
 import "fog.proto";
 import "shadows.proto";
+import "visual.proto";
 
 message Scene
 {
@@ -12,4 +13,6 @@ message Scene
   optional string sky_material = 4;
   optional Shadows shadows = 5;
   optional Fog fog = 6;
+
+  repeated Visual visual = 7;
 }

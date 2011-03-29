@@ -18,7 +18,6 @@
 /* Desc: Base class shared by all classes in Gazebo.
  * Author: Nate Koenig
  * Date: 09 Sept. 2008
- * SVN: $Id$
  */
 
 #ifndef COMMON_HH
@@ -39,10 +38,23 @@ namespace gazebo
 
 	namespace physics
   {
+    static std::string EntityTypename[] = { 
+      "common", "entity", "model", "body", "geom", "ball", "box", "cylinder", 
+      "heightmap", "hinge2", "hinge", "joint", "map", "multiray", "ray", 
+      "plane", "shape", "slider", "sphere", "trimesh", "universal", "light",
+      "visual" };
+
     class World;
 
     class Common
     {
+      public: enum EntityType{COMMON, ENTITY, MODEL, BODY, GEOM, BALL_JOINT, 
+                              BOX_SHAPE, CYLINDER_SHAPE, HEIGHTMAP_SHAPE, 
+                              HINGE2_JOINT, HINGE_JOINT, JOINT, MAP_SHAPE, 
+                              MULTIRAY_SHAPE, RAY_SHAPE, PLANE_SHAPE, SHAPE, 
+                              SLIDER_JOINT, SPHERE_SHAPE, TRIMESH_SHAPE, 
+                              UNIVERSAL_JOINT, LIGHT, VISUAL};
+
       /// \brief Constructor
       public: Common(Common *parent);
   

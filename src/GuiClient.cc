@@ -166,6 +166,11 @@ void GuiClient::Run()
   scene->Load(NULL);
   scene->Init();
 
+  transport::PublisherPtr pub = transport::advertise<msgs::Request>("/gazebo/default/publish_scene");
+  msgs::Request req;
+  req.set_request("publish");
+  pub->Publish(req);
+
   this->gui->ViewScene(scene);
 
   this->gui->Run();

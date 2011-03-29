@@ -181,6 +181,8 @@ namespace gazebo
                                        const Ogre::Quaternion &orient,
                                        const Ogre::Vector3 &scale);
   
+      private: void ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg);
+
       private: void ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
       private: void ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg);
 
@@ -238,10 +240,11 @@ namespace gazebo
 
       private: boost::mutex *receiveMutex;
   
-      private: transport::SubscriberPtr vis_sub;
-      private: transport::SubscriberPtr light_sub;
-      private: transport::SubscriberPtr pose_sub;
-      private: transport::SubscriberPtr selection_sub;
+      private: transport::SubscriberPtr sceneSub;
+      private: transport::SubscriberPtr visSub;
+      private: transport::SubscriberPtr lightSub;
+      private: transport::SubscriberPtr poseSub;
+      private: transport::SubscriberPtr selectionSub;
 
       private: std::vector<event::ConnectionPtr> connections;
     };

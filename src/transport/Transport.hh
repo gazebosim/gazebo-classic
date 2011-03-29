@@ -31,6 +31,9 @@ namespace gazebo
     /// \brief Initialize the transport system
     void init(const std::string &master_host, unsigned short master_port);
 
+    /// \brief Set the global topic namespace
+    void set_topic_namespace(const std::string &space);
+
     /// \brief Adverise a topic
     template<typename M>
     transport::PublisherPtr advertise(const std::string &topic)
@@ -58,9 +61,6 @@ namespace gazebo
       return transport::TopicManager::Instance()->Subscribe(ops);
     }
 
-
-    /// \brief Get a list of all the publishers
-    void get_publishers( std::list<msgs::Publish> &publishers );
   }
 }
 

@@ -42,7 +42,7 @@ using namespace physics;
 Geom::Geom( Body *body )
     : Entity(body->GetCoMEntity())
 {
-  this->AddType(GEOM);
+  this->AddType(Common::GEOM);
 
   this->body = body;
 
@@ -336,7 +336,7 @@ const Mass &Geom::GetMass() const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Get the shape type
-EntityType Geom::GetShapeType()
+Common::EntityType Geom::GetShapeType()
 {
   return this->shape->GetLeafType();
 }

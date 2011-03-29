@@ -17,7 +17,6 @@
 /* Desc: Base class for all physical entities
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
 
 #ifndef ENTITY_HH
@@ -139,6 +138,9 @@ namespace gazebo
       /// \brief Get the parent model, if one exists
       /// \return Pointer to a model, or NULL if no parent model exists
       public: Model *GetParentModel() const;
+
+      /// \brief Get the visual message
+      public: const boost::shared_ptr<msgs::Visual> GetVisualMsg() const;
   
       /// \brief This function is called when the entity's (or one of its parents)
       ///        pose of the parent has changed

@@ -86,6 +86,7 @@ void ConnectionManager::OnMasterRead( const std::string &data)
   // requested topic
   if (packet.type() == "publisher_update")
   {
+    std::cout << "\n PUBLISHER UPDATE\n";
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
 
@@ -95,6 +96,7 @@ void ConnectionManager::OnMasterRead( const std::string &data)
     if (pub.host() != this->serverConn->GetLocalAddress() ||
         pub.port() != this->serverConn->GetLocalPort())
     {
+      std::cout << "Publisher update[" << pub.topic() << "]\n";
       // Connect to the remote publisher
       ConnectionPtr conn = this->ConnectToRemoteHost(pub.host(), pub.port());
 
@@ -106,6 +108,10 @@ void ConnectionManager::OnMasterRead( const std::string &data)
 
       // Connect local subscribers to the publication transport link
       TopicManager::Instance()->ConnectSubToPub(pub.topic(), publink);
+    }
+    else
+    {
+      std::cerr << "We are the publisher, so bug off\n";
     }
 
   }

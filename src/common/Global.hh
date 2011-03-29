@@ -17,7 +17,6 @@
 /* Desc: Generic Typedefs, macros, functions, etc
  * Author: Nate Koenig
  * Date: 16 June 2003
- * CVS: $Id$
  */
 
 #ifndef GZGLOBAL_HH
@@ -63,24 +62,5 @@
 #define GAZEBO_DEPRECATED
 #define GAZEBO_FORCEINLINE
 #endif
-
-// Convert radians to degrees
-#define RTOD(r) ((r) * 180 / M_PI)
-
-// Convert degrees to radians
-#define DTOR(d) ((d) * M_PI / 180)
-
-// Normalize an angle in the range -Pi to Pi
-#define NORMALIZE(a) (atan2(sin(a), cos(a)))
-
-// Odd and even macros
-#define ISEVEN(x) ( ((x) % 2) == 0)
-#define ISODD(x) ( ((x) % 2) != 0)
-
-#define ROUND(x) ( (int)( floor((x)+0.5) ) )
-
-enum EntityType{COMMON, ENTITY, MODEL, BODY, GEOM, BALL_JOINT, BOX_SHAPE, CYLINDER_SHAPE, HEIGHTMAP_SHAPE, HINGE2_JOINT, HINGE_JOINT, JOINT, MAP_SHAPE, MULTIRAY_SHAPE, RAY_SHAPE, PLANE_SHAPE, SHAPE, SLIDER_JOINT, SPHERE_SHAPE, TRIMESH_SHAPE, UNIVERSAL_JOINT, LIGHT, VISUAL};
-
-static std::string EntityTypename[] = { "common", "entity", "model", "body", "geom", "ball", "box", "cylinder", "heightmap", "hinge2", "hinge", "joint", "map", "multiray", "ray", "plane", "shape", "slider", "sphere", "trimesh", "universal", "light","visual" };
 
 #endif

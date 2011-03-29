@@ -24,7 +24,7 @@ using namespace physics;
 /// Constructor
 BoxShape::BoxShape(Geom *parent) : Shape(parent)
 {
-  this->AddType(BOX_SHAPE);
+  this->AddType(Common::BOX_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->sizeP = new common::ParamT<common::Vector3>("size",common::Vector3(1,1,1),1);

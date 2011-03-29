@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <boost/algorithm/string.hpp>
+
 #include "common/Messages.hh"
 #include "transport/Publication.hh"
 #include "transport/TopicManager.hh"
@@ -25,6 +28,7 @@ using namespace transport;
 // Constructor
 TopicManager::TopicManager()
 {
+  this->topicNamespace = "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,16 +81,9 @@ PublicationPtr TopicManager::FindPublication(const std::string &topic)
 // Subscribe to a topic give some options
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
 {
-  std::string topic = ops.GetTopic();
+  std::string topic = this->DecodeTopicName( ops.GetTopic() );
+  std::cout << "Subscribe to topic[" << topic << "]\n";
   CallbackHelperPtr subscription = ops.GetSubscription();
-
-  // Make sure we are getting a google::protobuf message
-  /*google::protobuf::Message *msg = NULL;
-  M msgtype;
-  msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
-  if (!msg)
-    gzthrow("Subscribe requires a google protobuf type");
-    */
 
   // Create a subscription (essentially a callback that gets 
   // fired every time a Publish occurs on the corresponding
@@ -205,4 +202,26 @@ bool TopicManager::UpdatePublications( const std::string &topic,
   }
 
   return inserted;
+}
+
+std::string TopicManager::DecodeTopicName(const std::string &topic)
+{
+  std::string result = topic;
+  boost::replace_first(result, "~", "/gazebo/" + this->topicNamespace);
+  boost::replace_first(result, "//", "/");
+  return result;
+}
+
+std::string TopicManager::EncodeTopicName(const std::string &topic)
+{
+  std::string result = topic;
+  boost::replace_first(result, "/gazebo/" + this->topicNamespace, "~");
+  boost::replace_first(result, "//", "/");
+
+  return result;
+}
+
+void TopicManager::SetTopicNamespace(const std::string &space)
+{
+  this->topicNamespace = space;
 }

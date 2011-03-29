@@ -26,9 +26,8 @@ void transport::init(const std::string &master_host, unsigned short master_port)
   transport::ConnectionManager::Instance()->Init( master_host, master_port );
 }
 
-/// Get a list of all the publishers
-void transport::get_publishers( std::list<msgs::Publish> &publishers )
+/// Set the global topic namespace
+void transport::set_topic_namespace(const std::string &space)
 {
-  transport::ConnectionManager::Instance()->GetAllPublishers(publishers);
+  transport::TopicManager::Instance()->SetTopicNamespace( space );
 }
-

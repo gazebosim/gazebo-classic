@@ -39,7 +39,7 @@ using namespace physics;
 HeightmapShape::HeightmapShape(Geom *parent)
     : Shape(parent)
 {
-  this->AddType(HEIGHTMAP_SHAPE);
+  this->AddType(Common::HEIGHTMAP_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->imageFilenameP = new common::ParamT<std::string>("image","",1);

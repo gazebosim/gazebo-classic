@@ -27,7 +27,7 @@ using namespace physics;
 Shape::Shape(Geom *p)
   : Common(p) 
 {
-  this->AddType(SHAPE);
+  this->AddType(Common::SHAPE);
   this->geomParent = p;
   this->geomParent->SetShape(this);
   this->SetName("shape");

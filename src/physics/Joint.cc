@@ -17,7 +17,6 @@
 /* Desc: The base joint class
  * Author: Nate Keonig, Andrew Howard
  * Date: 21 May 2003
- * CVS: $Id$
  */
 
 #include "transport/Transport.hh"
@@ -42,7 +41,7 @@ using namespace physics;
 Joint::Joint()
   : Common(NULL)
 {
-  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
   this->AddType(JOINT);
   this->model = NULL;
   this->showJoints = false;
@@ -191,7 +190,7 @@ void Joint::Load(common::XMLConfigNode *node)
 /// Save a joint to a stream in XML format
 void Joint::Save(std::string &prefix, std::ostream &stream)
 {
-  std::string typeName = EntityTypename[ (int)this->GetLeafType() ];
+  std::string typeName;// =Common::EntityTypename[ (int)this->GetLeafType() ];
 
   stream << prefix << "<joint:" << typeName << " name=\"" << **(this->nameP) << "\">\n";
   stream << prefix << "  " << *(this->body1NameP) << "\n";

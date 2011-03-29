@@ -625,8 +625,8 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
     else
       geom2 = (ODEGeom*) dGeomGetData(o2);
 
-    if (geom1->GetShapeType() == TRIMESH_SHAPE ||
-        geom2->GetShapeType() == TRIMESH_SHAPE )
+    if (geom1->GetShapeType() == Common::TRIMESH_SHAPE ||
+        geom2->GetShapeType() == Common::TRIMESH_SHAPE )
       self->trimeshColliders.push_back( std::make_pair(geom1, geom2) );
     else
       self->colliders.push_back( std::make_pair(geom1, geom2) );
@@ -649,8 +649,8 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
 
   // for now, only use maxContacts if both geometries are trimeshes
   // other types of geometries do not need too many contacts
-  if (geom1->GetShapeType() == TRIMESH_SHAPE && 
-      geom2->GetShapeType() == TRIMESH_SHAPE)
+  if (geom1->GetShapeType() == Common::TRIMESH_SHAPE && 
+      geom2->GetShapeType() == Common::TRIMESH_SHAPE)
   {
     numContacts = **this->maxContactsP;
   }

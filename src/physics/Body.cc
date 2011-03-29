@@ -49,7 +49,7 @@ using namespace physics;
 Body::Body(Entity *parent)
     : Entity(parent)
 {
-  this->AddType(BODY);
+  this->AddType(Common::BODY);
 
   // NATY: put back in functionality
   // this->GetVisualNode()->SetShowInGui(false);

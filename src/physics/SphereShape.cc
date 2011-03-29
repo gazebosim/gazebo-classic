@@ -30,7 +30,7 @@ using namespace physics;
 /// Constructor
 SphereShape::SphereShape(Geom *parent) : Shape(parent)
 {
-  this->AddType(SPHERE_SHAPE);
+  this->AddType(Common::SPHERE_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->radiusP = new common::ParamT<double>("radius",1.0,0);

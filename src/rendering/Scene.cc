@@ -48,12 +48,16 @@ unsigned int Scene::idCounter = 0;
 /// Constructor
 Scene::Scene(const std::string &name)
 {
+  // Set the global topic namespace
+  transport::set_topic_namespace(name);
+
   this->receiveMutex = new boost::mutex();
 
-  this->vis_sub = transport::subscribe("/gazebo/visual", &Scene::ReceiveVisualMsg, this);
-  this->light_sub = transport::subscribe("/gazebo/light", &Scene::ReceiveLightMsg, this);
-  this->pose_sub = transport::subscribe("/gazebo/pose", &Scene::ReceivePoseMsg, this);
-  this->selection_sub = transport::subscribe("/gazebo/selection", &Scene::HandleSelectionMsg, this);
+  this->sceneSub = transport::subscribe("~/scene", &Scene::ReceiveSceneMsg, this);
+  this->visSub = transport::subscribe("~/visual", &Scene::ReceiveVisualMsg, this);
+  this->lightSub = transport::subscribe("~/light", &Scene::ReceiveLightMsg, this);
+  this->poseSub = transport::subscribe("~/pose", &Scene::ReceivePoseMsg, this);
+  this->selectionSub = transport::subscribe("~/selection", &Scene::HandleSelectionMsg, this);
 
   this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&Scene::PreRender, this) ) );
 
@@ -860,6 +864,17 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
     ibuf->unlock();
     current_offset = next_offset;
+  }
+}
+
+void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
+{
+  std::cout << "Got a scene. VIsuals[" << msg->visual_size() << "]\n";
+  for (int i=0; i < msg->visual_size(); i++)
+  {
+    boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(msg->visual(i)) );
+    this->visualMsgs.push_back( vm );
+    //this->ReceiveVisualMsg( vm );
   }
 }
 

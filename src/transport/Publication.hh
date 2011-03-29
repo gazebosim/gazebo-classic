@@ -38,6 +38,8 @@ namespace gazebo
       private: std::list< CallbackHelperPtr > callbacks;
 
       private: std::list<PublicationTransportPtr> transports;
+
+      private: std::string prevMessage;
     };
     typedef boost::shared_ptr<Publication> PublicationPtr;
   }

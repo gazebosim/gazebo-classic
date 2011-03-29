@@ -242,7 +242,7 @@ unsigned int Common::GetChildCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a type specifier
-void Common::AddType( EntityType t )
+void Common::AddType( Common::EntityType t )
 {
   this->type.push_back(t);
 }
@@ -318,7 +318,7 @@ std::string Common::GetCompleteScopedName() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the type
-bool Common::HasType(const EntityType &t) const
+bool Common::HasType(const Common::EntityType &t) const
 {
   return std::binary_search(this->type.begin(), this->type.end(), t);
 
@@ -339,7 +339,7 @@ unsigned int Common::GetTypeCount() const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a type by index
-EntityType Common::GetType(unsigned int index) const
+Common::EntityType Common::GetType(unsigned int index) const
 {
   if (index < this->type.size())
     return this->type[index];
@@ -350,7 +350,7 @@ EntityType Common::GetType(unsigned int index) const
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the leaf type (last type set)
-EntityType Common::GetLeafType() const
+Common::EntityType Common::GetLeafType() const
 {
   return this->type.back();
 }

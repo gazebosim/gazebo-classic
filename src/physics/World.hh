@@ -27,8 +27,11 @@
 #include <deque>
 #include <map>
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 #include "transport/Publisher.hh"
+#include "transport/Subscriber.hh"
+
 #include "common/Global.hh"
 #include "common/Event.hh"
 #include "common/Messages.hh"
@@ -228,6 +231,11 @@ namespace gazebo
     /// \brief Set the selected entity
     private: void SetSelectedEntityCB( const std::string &name );
   
+    private: void PublishScene( const boost::shared_ptr<msgs::Request const> &data );
+
+    /// \brief Construct a scene message from the known world state
+    private: void BuildSceneMsg(msgs::Scene &scene, Common *entity);
+
     /// Pointer the physics engine
     private: PhysicsEngine *physicsEngine;
   
@@ -281,7 +289,8 @@ namespace gazebo
   
     private: std::vector<event::ConnectionPtr> connections;
   
-    private: transport::PublisherPtr vis_pub, selection_pub, light_pub, scene_pub;
+    private: transport::PublisherPtr visPub, selectionPub, lightPub, scenePub;
+    private: transport::SubscriberPtr sceneSub;
   };
   
   class WorldState

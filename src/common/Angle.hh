@@ -17,7 +17,6 @@
 /* Desc: Angle class
  * Author: Nate Koenig
  * Date: 18 Aug 2008
- * SVN: $Id$
  */
 
 #ifndef ANGLE_HH
@@ -25,6 +24,15 @@
 
 #include <iostream>
 #include <math.h>
+
+// Convert radians to degrees
+#define RTOD(r) ((r) * 180 / M_PI)
+
+// Convert degrees to radians
+#define DTOR(d) ((d) * M_PI / 180)
+
+// Normalize an angle in the range -Pi to Pi
+#define NORMALIZE(a) (atan2(sin(a), cos(a)))
 
 namespace gazebo
 {

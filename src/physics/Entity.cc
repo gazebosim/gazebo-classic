@@ -18,7 +18,6 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
 
 #include "common/Messages.hh"
@@ -37,14 +36,13 @@
 using namespace gazebo;
 using namespace physics;
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Entity::Entity(Common *parent)
 : Common(parent)
 {
-  this->pose_pub = transport::advertise<msgs::Pose>("/gazebo/pose");
-  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
+  this->pose_pub = transport::advertise<msgs::Pose>("~/pose");
+  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
   this->AddType(ENTITY);
 
   common::Param::Begin(&this->parameters);
@@ -332,4 +330,11 @@ Model *Entity::GetParentModel() const
     p = p->GetParent();
 
   return (Model*)p;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the visual message
+const boost::shared_ptr<msgs::Visual> Entity::GetVisualMsg() const
+{
+  return boost::shared_ptr<msgs::Visual>(this->visualMsg);
 }

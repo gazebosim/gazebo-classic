@@ -17,7 +17,6 @@
 /* Desc: The base class for all physics engines
  * Author: Nate Koenig
  * Date: 11 June 2007
- * SVN: $Id$
  */
 
 #include <boost/thread/recursive_mutex.hpp>
@@ -41,7 +40,7 @@ using namespace physics;
 PhysicsEngine::PhysicsEngine(World *world)
   : world(world)
 {
-  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
 
   common::Param::Begin(&this->parameters);
   this->gravityP = new common::ParamT<common::Vector3>("gravity",common::Vector3(0.0, -9.80665, 0.0), 0);

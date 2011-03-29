@@ -35,7 +35,7 @@ RayShape::RayShape( Geom *parent, bool displayRays ) : Shape(parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
+  this->vis_pub = transport::advertise<msgs::Visual>("~/visual");
   if (displayRays)
   {
     msgs::Visual msg;

@@ -37,7 +37,7 @@ using namespace physics;
 // Constructor
 TrimeshShape::TrimeshShape(Geom *parent) : Shape(parent)
 {
-  this->AddType(TRIMESH_SHAPE);
+  this->AddType(Common::TRIMESH_SHAPE);
 
   common::Param::Begin(&this->parameters);
   this->meshNameP = new common::ParamT<std::string>("mesh","",1);

@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Constructor
       public: BallJoint() : T()
               {
-                this->AddType(BALL_JOINT);
+                this->AddType(Common::BALL_JOINT);
               }
     
       /// \brief Destructor

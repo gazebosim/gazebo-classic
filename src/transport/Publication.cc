@@ -8,6 +8,7 @@ using namespace transport;
 Publication::Publication( const std::string &topic, const std::string &msgType )
   : topic(topic), msgType(msgType)
 {
+  this->prevMessage = "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +29,10 @@ std::string Publication::GetTopic() const
 void Publication::AddSubscription(const CallbackHelperPtr &callback)
 {
   this->callbacks.push_back(callback);
+
+  // Send the previous message once a connection happens.
+  if (!this->prevMessage.empty())
+    callback->HandleMessage(this->prevMessage);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +44,7 @@ void Publication::Publish(const std::string &data)
   {
     (*iter)->HandleMessage(data);
   }
+  this->prevMessage = data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

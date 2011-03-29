@@ -127,7 +127,7 @@ namespace gazebo
       public: const Mass &GetMass() const;
   
       /// \brief Get the shape type
-      public: EntityType GetShapeType();
+      public: Common::EntityType GetShapeType();
   
       /// \brief Set the shape for this geom
       public: void SetShape(Shape *shape);

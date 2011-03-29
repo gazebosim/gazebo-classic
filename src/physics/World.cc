@@ -74,11 +74,6 @@ class ModelUpdate_TBB
 // Private constructor
 World::World()
 {
-  this->scene_pub = transport::advertise<msgs::Scene>("/gazebo/scene");
-  this->vis_pub = transport::advertise<msgs::Visual>("/gazebo/visual");
-  this->selection_pub = transport::advertise<msgs::Selection>("/gazebo/selection");
-  this->light_pub = transport::advertise<msgs::Light>("/gazebo/light");
-
   //this->server = NULL;
   this->physicsEngine = NULL;
   //this->graphics = NULL;
@@ -122,10 +117,21 @@ World::~World()
 // Load the world
 void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 {
-  msgs::Scene scene = common::Message::SceneFromXML( rootNode->GetChild("scene") );
-  this->scene_pub->Publish( scene );
-
+  // DO THIS FIRST
   this->nameP->Load(rootNode);
+
+  // Set the global topic namespace
+  transport::set_topic_namespace(**this->nameP);
+
+  this->sceneSub = transport::subscribe("/gazebo/default/publish_scene", &World::PublishScene, this);
+  this->scenePub = transport::advertise<msgs::Scene>("~/scene");
+  this->visPub = transport::advertise<msgs::Visual>("~/visual");
+  this->selectionPub = transport::advertise<msgs::Selection>("~/selection");
+  this->lightPub = transport::advertise<msgs::Light>("~/light");
+
+  msgs::Scene scene = common::Message::SceneFromXML( rootNode->GetChild("scene") );
+  this->scenePub->Publish( scene );
+
   //this->saveStateTimeoutP->Load(rootNode);
   //this->saveStateBufferSizeP->Load(rootNode);
 
@@ -315,7 +321,7 @@ void World::RunLoop()
   common::Time diffTime;
   common::Time currTime;
   common::Time lastTime = this->GetRealTime();
-  struct timespec req;//, rem;
+  struct timespec req, rem;
 
   this->startTime = common::Time::GetWallTime();
 
@@ -359,7 +365,7 @@ void World::RunLoop()
       req.tv_nsec = diffTime.nsec;
     }
 
-    //nanosleep(&req, &rem);
+    nanosleep(&req, &rem);
 
     // TODO: Fix timeout:  this belongs in simulator.cc
     /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
@@ -556,7 +562,7 @@ void World::LoadEntities(common::XMLConfigNode *node, Common *parent, bool remov
       msgs::Light msg = common::Message::LightFromXML(node);
       msg.mutable_header()->set_str_id( "light" );
       msg.set_action(msgs::Light::UPDATE);
-      this->light_pub->Publish(msg);
+      this->lightPub->Publish(msg);
     }
 
     // Load children
@@ -621,7 +627,7 @@ void World::ProcessEntitiesToDelete()
 
       if (common)
       {
-        if (common->HasType(MODEL))
+        if (common->HasType(Common::MODEL))
         {
           Model *model = (Model*)common;
 
@@ -633,7 +639,7 @@ void World::ProcessEntitiesToDelete()
           if (newiter != this->models.end())
             this->models.erase( newiter );
         }
-        else if (common->HasType(BODY))
+        else if (common->HasType(Common::BODY))
           ((Body*)common)->Fini();
 
         delete (common);
@@ -734,7 +740,7 @@ Model *World::LoadModel(common::XMLConfigNode *node, Common *parent,
   if (initModel) 
     model->Init();
 
-  if (parent != NULL && parent->HasType(MODEL))
+  if (parent != NULL && parent->HasType(Common::MODEL))
     model->Attach(node->GetChild("attach"));
   else
     // Add the model to our list
@@ -881,7 +887,7 @@ void World::SetSelectedEntityCB( const std::string &name )
   {
     msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
     msg.set_selected( false );
-    this->selection_pub->Publish(msg);
+    this->selectionPub->Publish(msg);
 
     //this->selectedEntity->GetVisualNode()->ShowSelectionBox(false);
     this->selectedEntity->SetSelected(false);
@@ -897,7 +903,7 @@ void World::SetSelectedEntityCB( const std::string &name )
 
     msg.mutable_header()->set_str_id( this->selectedEntity->GetCompleteScopedName() );
     msg.set_selected( true );
-    this->selection_pub->Publish(msg);
+    this->selectionPub->Publish(msg);
   }
   else
     this->selectedEntity = NULL;
@@ -974,4 +980,30 @@ void World::SetPaused(bool p)
 
   event::Events::pauseSignal(p);
   this->pause = p;
+}
+
+void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
+{
+  std::cout << "publish scene\n";
+  msgs::Scene scene;
+  common::Message::Init(scene,"scene");
+
+  this->BuildSceneMsg(scene, this->rootElement);
+  this->scenePub->Publish( scene );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Construct a scene message
+void World::BuildSceneMsg(msgs::Scene &scene, Common *entity)
+{
+  if (entity->HasType(Entity::ENTITY))
+  {
+    msgs::Visual *visMsg = scene.add_visual();
+    visMsg->CopyFrom( *( ((Entity*)entity)->GetVisualMsg()) );
+  }
+
+  for (unsigned int i=0; i < entity->GetChildCount(); i++)
+  {
+    this->BuildSceneMsg( scene, entity->GetChild(i) );
+  }
 }
