@@ -57,7 +57,6 @@ namespace gazebo
   
       private: event::ConnectionPtr renderConnection;
   
-      private: friend class DestroyerT<WindowManager>;
       private: friend class SingletonT<WindowManager>;
     };
   }

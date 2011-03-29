@@ -195,9 +195,6 @@ namespace gazebo
 
       private: boost::thread *readThread;
       private: bool readQuit;
-
-      // Used to make sure the IO Manager starts
-      private: static IOManager *iomanager;
     };
 
   }

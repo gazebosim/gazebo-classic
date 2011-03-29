@@ -73,7 +73,6 @@ namespace gazebo
     private: std::map<std::string, Time> timers;
 
     //Singleton implementation
-    private: friend class DestroyerT<DiagnosticManager>;
     private: friend class SingletonT<DiagnosticManager>;
   };
 

@@ -145,7 +145,6 @@ namespace gazebo
       /// True if the GUI is enabled
       private: bool headless;
    
-      private: friend class DestroyerT<RenderEngine>;
       private: friend class SingletonT<RenderEngine>;
     };
     

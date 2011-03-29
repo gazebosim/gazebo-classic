@@ -172,7 +172,6 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &msg)
         common::Vector2d(2,2), 
         common::Vector2d(msg->uv_tile_x(), msg->uv_tile_y()) );
     mesh = msg->header().str_id();
-    std::cout << "Has Plane MeshName[" << mesh << "]\n";
   }
 
   this->meshNameP->SetValue(mesh);
@@ -229,7 +228,6 @@ void Visual::Load(common::XMLConfigNode *node)
     // Create the visual
     stream << "VISUAL_" << this->sceneNode->getName();
     std::string meshName = (**this->meshNameP);
-    std::cout << "Visual::Load InsertMesh[" << meshName << "]\n";
 
     if (!meshName.empty())
     {
@@ -695,6 +693,7 @@ void Visual::SetRotation( const common::Quatern &rot)
 // Set the pose of the visual
 void Visual::SetPose( const common::Pose3d &pose)
 {
+  std::cout << "Visual Set Pose[" << pose << "]\n";
   this->SetPosition( pose.pos );
   this->SetRotation( pose.rot);
 }

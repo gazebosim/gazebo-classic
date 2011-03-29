@@ -82,7 +82,6 @@ PublicationPtr TopicManager::FindPublication(const std::string &topic)
 SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
 {
   std::string topic = this->DecodeTopicName( ops.GetTopic() );
-  std::cout << "Subscribe to topic[" << topic << "]\n";
   CallbackHelperPtr subscription = ops.GetSubscription();
 
   // Create a subscription (essentially a callback that gets 
@@ -198,6 +197,7 @@ bool TopicManager::UpdatePublications( const std::string &topic,
   {
     inserted = true;
     pub = PublicationPtr( new Publication(topic, msgType) );
+    std::cout << "Adding a publication: Topic[" << topic << " MsgTyp[" << msgType << "]\n";
     this->advertisedTopics.push_back( pub );
   }
 

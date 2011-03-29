@@ -17,14 +17,10 @@
 /* Desc: Singleton base class
  * Author: Nate Koenig
  * Date: 2 Sept 2007
- * SVN: $Id$
  */
 
 #ifndef SINGLETONT_HH
 #define SINGLETONT_HH
-
-template < class DOOMED >
-class DestroyerT;
 
 /// \brief Singleton class
 template <class T>
@@ -33,13 +29,7 @@ class SingletonT
   /// \brief Get an instance of the singleton
   public: static T *Instance()
           {
-            if (!myself)
-            {
-              myself = new T();
-              destroyer.SetDoomed(myself);
-            }
-
-            return myself;
+            return &GetInstance();
           }
 
   /// \brief Constructor
@@ -48,57 +38,16 @@ class SingletonT
   /// \brief Destructor
   protected: virtual ~SingletonT() {}
 
-  private: static DestroyerT< T > destroyer;
-  private: static T *myself;
+  private: static T &GetInstance()
+           {
+             static T t;
+             return static_cast<T &>(t);
+           }
+
+  private: static T &myself;
 };
 
 template <class T>
-DestroyerT<T> SingletonT< T >::destroyer;
-
-template <class T>
-T *SingletonT<T>::myself = 0;
-
-
-
-/// \brief Destroyer
-template < class DOOMED >
-class DestroyerT 
-{
-
-  /// \brief Constructor
-  public: DestroyerT(DOOMED* = 0);
-
-  /// \brief Destructor
-  public: ~DestroyerT();
-
-  /// \brief Sets the class to be cleaned
-  public: void SetDoomed(DOOMED*);
-
-  /// \brief Prevent users from making copies of a
-  ///        Destroyer to avoid double deletion:
-  private: DestroyerT(const DestroyerT<DOOMED>&);
-
-  /// \brief Equal operator
-  private: DestroyerT<DOOMED>& operator=(const DestroyerT<DOOMED>&);
-
-  private: DOOMED* doomed;
-};
-
-template <class DOOMED>
-DestroyerT<DOOMED>::DestroyerT( DOOMED* d ) 
-{
-  doomed = d;
-}
-
-template <class DOOMED>
-DestroyerT<DOOMED>::~DestroyerT() {
-  delete doomed;
-}
-
-template <class DOOMED>
-void DestroyerT<DOOMED>::SetDoomed( DOOMED* d )
-{
-  doomed = d;
-}
+T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 
 #endif

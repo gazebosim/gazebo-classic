@@ -17,7 +17,6 @@
 /* Desc: Gazebo configuration on this computer 
  * Author: Jordi Polo
  * Date: 3 May 2008
- * SVN: $Id$
  */
 
 #ifndef GAZEBOCONFIG_HH
@@ -80,7 +79,6 @@ namespace gazebo
     private: std::list<std::string> pluginPaths;
 
     //Singleton implementation
-    private: friend class DestroyerT<GazeboConfig>;
     private: friend class SingletonT<GazeboConfig>;
   };
 

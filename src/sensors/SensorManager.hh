@@ -60,7 +60,6 @@ namespace gazebo
 
       private: std::list<Sensor *> sensors;
 
-      private: friend class DestroyerT<SensorManager>;
       private: friend class SingletonT<SensorManager>;
     };
   }

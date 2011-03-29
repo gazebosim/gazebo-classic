@@ -100,7 +100,6 @@ namespace gazebo
 
     private: std::vector< Scene * > scenes;
 
-    private: friend class DestroyerT<RTShaderSystem>;
     private: friend class SingletonT<RTShaderSystem>;
   };
 

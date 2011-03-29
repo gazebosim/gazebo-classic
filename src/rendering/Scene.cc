@@ -869,6 +869,7 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 {
+  std::cout << "RECEIVE SCENE Visuals[" << msg->visual_size() << "] Poses[" << msg->pose_size() << "]\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   for (int i=0; i < msg->visual_size(); i++)
   {
@@ -885,11 +886,13 @@ void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 
 void Scene::ReceiveVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
 {
+  std::cout << "Receive Visual\n" << msg->DebugString() << "\n-----------\n";
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   this->visualMsgs.push_back(msg);
 }
 
-
+////////////////////////////////////////////////////////////////////////////////
+// Process all incoming messages before rendering
 void Scene::PreRender()
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -905,6 +908,7 @@ void Scene::PreRender()
     this->ProcessVisualMsg(*vIter);
   }
   this->visualMsgs.clear();
+
 
   // Process the light messages
   for (lIter =  this->lightMsgs.begin(); 
@@ -940,7 +944,7 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
   Visual_M::iterator iter;
   iter = this->visuals.find(msg->header().str_id());
 
-  std::cout << "Process Visual" << msg->DebugString() << "\n----------\n";
+  //std::cout << "Process Visual\n" << msg->DebugString() << "\n----------\n";
 
   if (msg->has_action() && msg->action() == msgs::Visual::DELETE)
   {
@@ -997,7 +1001,6 @@ void Scene::ReceiveLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
 
 void Scene::ProcessLightMsg(const boost::shared_ptr<msgs::Light const> &msg)
 {
-  std::cout << "Handle Light Msg\n";
   Light_M::iterator iter;
   iter = this->lights.find(msg->header().str_id());
 

@@ -130,6 +130,9 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   this->selectionPub = transport::advertise<msgs::Selection>("~/selection");
   this->lightPub = transport::advertise<msgs::Light>("~/light");
 
+  // TODO: remove this
+  usleep(1000000);
+
   msgs::Scene scene = common::Message::SceneFromXML( rootNode->GetChild("scene") );
   this->scenePub->Publish( scene );
 
@@ -1009,6 +1012,7 @@ void World::BuildSceneMsg(msgs::Scene &scene, Common *entity)
     msgs::Pose *poseMsg = scene.add_pose();
     common::Pose3d pose = ((Entity*)entity)->GetRelativePose();
     poseMsg->CopyFrom( common::Message::Convert(pose) );
+    common::Message::Init(*poseMsg, entity->GetCompleteScopedName() );
   }
 
   for (unsigned int i=0; i < entity->GetChildCount(); i++)

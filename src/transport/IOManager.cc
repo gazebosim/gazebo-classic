@@ -23,14 +23,12 @@ using namespace transport;
 IOManager::IOManager()
   : work(this->io_service)
 {
-  std::cout << "Run IO Service\n";
   this->thread = boost::thread( boost::bind(&boost::asio::io_service::run, 
                                             &this->io_service) );
 }
 
 IOManager::~IOManager()
 {
-  std::cout << "STop IO Service\n";
   this->thread.interrupt();
   this->io_service.stop();
 }

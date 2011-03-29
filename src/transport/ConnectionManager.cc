@@ -86,7 +86,6 @@ void ConnectionManager::OnMasterRead( const std::string &data)
   // requested topic
   if (packet.type() == "publisher_update")
   {
-    std::cout << "\n PUBLISHER UPDATE\n";
     msgs::Publish pub;
     pub.ParseFromString( packet.serialized_data() );
 

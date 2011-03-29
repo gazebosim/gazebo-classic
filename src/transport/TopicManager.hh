@@ -149,7 +149,6 @@ namespace gazebo
       private: std::string topicNamespace;
 
       //Singleton implementation
-      private: friend class DestroyerT<TopicManager>;
       private: friend class SingletonT<TopicManager>;
     };
   }

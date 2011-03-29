@@ -35,6 +35,7 @@ Master::~Master()
 
 void Master::Init(unsigned short port)
 {
+  std::cout << "Master Init\n";
   try
   {
     this->connection->Listen(port, boost::bind(&Master::OnAccept, this, _1));

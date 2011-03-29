@@ -39,7 +39,7 @@ const std::string default_config =
       <grid>false</grid>\
     </scene>\
     <physics type='ode'>\
-      <step_time>0.00001</step_time>\
+      <step_time>0.001</step_time>\
       <gravity>0 0 -9.8</gravity>\
       <cfm>0.0000000001</cfm>\
       <erp>0.2</erp>\

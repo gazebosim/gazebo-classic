@@ -71,7 +71,6 @@ namespace gazebo
       private: std::list<ConnectionPtr> connections;
 
       //Singleton implementation
-      private: friend class DestroyerT<ConnectionManager>;
       private: friend class SingletonT<ConnectionManager>;
     };
   }

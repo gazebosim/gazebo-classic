@@ -179,7 +179,6 @@ namespace gazebo
       private: event::ConnectionPtr quitConnection;
 
       //Singleton implementation
-      private: friend class DestroyerT<Simulator>;
       private: friend class SingletonT<Simulator>;
   };
   

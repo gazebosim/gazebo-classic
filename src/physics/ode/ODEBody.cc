@@ -106,6 +106,7 @@ void ODEBody::MoveCallback(dBodyID id)
 
   pose = self->comEntity->GetRelativePose().GetInverse() + pose;
   pose.Correct();
+
   self->SetWorldPose(pose);
 }
 

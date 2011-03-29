@@ -25,9 +25,6 @@
 using namespace gazebo;
 using namespace transport;
 
-// Make sure the IO Manager starts
-IOManager *Connection::iomanager = IOManager::Instance();
-
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
 Connection::Connection()
@@ -287,8 +284,6 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint() const
   boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
   boost::asio::ip::tcp::resolver::iterator end; // End marker.
   boost::asio::ip::tcp::endpoint ep;
-
-  std::cout << "LocalEndpoint[" << boost::asio::ip::host_name() << "]\n";
 
   while (iter != end)
     ep = *iter++;

@@ -40,7 +40,6 @@ namespace gazebo
       private: boost::thread thread;
 
       //Singleton implementation
-      private: friend class DestroyerT<IOManager>;
       private: friend class SingletonT<IOManager>;
     };
   }

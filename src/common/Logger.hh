@@ -66,7 +66,6 @@ namespace gazebo
 
     private: std::vector<LogObj*> logObjects;
 
-    private: friend class DestroyerT<Logger>;
     private: friend class SingletonT<Logger>;
   };
 }

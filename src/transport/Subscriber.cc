@@ -35,7 +35,6 @@ Subscriber::Subscriber(const std::string &t, CallbackHelperPtr sub)
 // Destructor
 Subscriber::~Subscriber()
 {
-  std::cout << "subscriber destructor\n";
   this->Unsubscribe();
 }
 

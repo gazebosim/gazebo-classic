@@ -115,7 +115,6 @@ namespace gazebo
     private: std::vector<std::string> fileExtensions;
 
     //Singleton implementation
-    private: friend class DestroyerT<MeshManager>;
     private: friend class SingletonT<MeshManager>;
   };
 }
