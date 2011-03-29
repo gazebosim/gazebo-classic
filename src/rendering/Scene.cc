@@ -869,12 +869,17 @@ void Scene::GetMeshInformation(const Ogre::MeshPtr mesh,
 
 void Scene::ReceiveSceneMsg(const boost::shared_ptr<msgs::Scene const> &msg)
 {
-  std::cout << "Got a scene. VIsuals[" << msg->visual_size() << "]\n";
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
   for (int i=0; i < msg->visual_size(); i++)
   {
     boost::shared_ptr<msgs::Visual> vm( new msgs::Visual(msg->visual(i)) );
     this->visualMsgs.push_back( vm );
-    //this->ReceiveVisualMsg( vm );
+  }
+
+  for (int i=0; i < msg->pose_size(); i++)
+  {
+    boost::shared_ptr<msgs::Pose> pm( new msgs::Pose(msg->pose(i)) );
+    this->poseMsgs.push_back( pm );
   }
 }
 
@@ -935,7 +940,7 @@ void Scene::ProcessVisualMsg(const boost::shared_ptr<msgs::Visual const> &msg)
   Visual_M::iterator iter;
   iter = this->visuals.find(msg->header().str_id());
 
-  std::cout << "Handle Visual[" << msg->DebugString() << "]\n";
+  std::cout << "Process Visual" << msg->DebugString() << "\n----------\n";
 
   if (msg->has_action() && msg->action() == msgs::Visual::DELETE)
   {

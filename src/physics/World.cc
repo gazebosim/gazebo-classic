@@ -126,6 +126,7 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   this->sceneSub = transport::subscribe("/gazebo/default/publish_scene", &World::PublishScene, this);
   this->scenePub = transport::advertise<msgs::Scene>("~/scene");
   this->visPub = transport::advertise<msgs::Visual>("~/visual");
+  this->visSub = transport::subscribe("~/visual", &World::VisualLog, this);
   this->selectionPub = transport::advertise<msgs::Selection>("~/selection");
   this->lightPub = transport::advertise<msgs::Light>("~/light");
 
@@ -988,6 +989,13 @@ void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
   msgs::Scene scene;
   common::Message::Init(scene,"scene");
 
+  std::list< boost::shared_ptr<msgs::Visual const> >::iterator iter;
+  for (iter = this->visualMsgs.begin(); iter != this->visualMsgs.end(); iter++)
+  {
+    msgs::Visual *visMsg = scene.add_visual();
+    visMsg->CopyFrom( *(*iter) );
+  }
+
   this->BuildSceneMsg(scene, this->rootElement);
   this->scenePub->Publish( scene );
 }
@@ -998,12 +1006,36 @@ void World::BuildSceneMsg(msgs::Scene &scene, Common *entity)
 {
   if (entity->HasType(Entity::ENTITY))
   {
-    msgs::Visual *visMsg = scene.add_visual();
-    visMsg->CopyFrom( *( ((Entity*)entity)->GetVisualMsg()) );
+    msgs::Pose *poseMsg = scene.add_pose();
+    common::Pose3d pose = ((Entity*)entity)->GetRelativePose();
+    poseMsg->CopyFrom( common::Message::Convert(pose) );
   }
 
   for (unsigned int i=0; i < entity->GetChildCount(); i++)
   {
     this->BuildSceneMsg( scene, entity->GetChild(i) );
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Log the visuals, which allows the world to maintain the current state of
+// the scene. This in turns allows a gui to query the latest state.
+void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
+{
+  std::list< boost::shared_ptr<msgs::Visual const> >::iterator iter;
+  std::list< boost::shared_ptr<msgs::Visual const> >::iterator prev;
+
+  iter = this->visualMsgs.begin();
+  while (iter != this->visualMsgs.end())
+  {
+    if ( (*iter)->header().str_id() == msg->header().str_id() )
+    {
+      prev = iter++;
+      this->visualMsgs.erase(prev);
+    }
+    else
+      iter++;
+  }
+
+  this->visualMsgs.push_back( msg );
 }

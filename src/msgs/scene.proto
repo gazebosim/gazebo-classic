@@ -4,6 +4,7 @@ import "color.proto";
 import "fog.proto";
 import "shadows.proto";
 import "visual.proto";
+import "pose.proto";
 
 message Scene
 {
@@ -15,4 +16,5 @@ message Scene
   optional Fog fog = 6;
 
   repeated Visual visual = 7;
+  repeated Pose pose = 8;
 }

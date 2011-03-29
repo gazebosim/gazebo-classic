@@ -236,6 +236,8 @@ namespace gazebo
     /// \brief Construct a scene message from the known world state
     private: void BuildSceneMsg(msgs::Scene &scene, Common *entity);
 
+    private: void VisualLog(const boost::shared_ptr<msgs::Visual const> &msg);
+
     /// Pointer the physics engine
     private: PhysicsEngine *physicsEngine;
   
@@ -290,7 +292,9 @@ namespace gazebo
     private: std::vector<event::ConnectionPtr> connections;
   
     private: transport::PublisherPtr visPub, selectionPub, lightPub, scenePub;
-    private: transport::SubscriberPtr sceneSub;
+    private: transport::SubscriberPtr visSub, sceneSub;
+
+    private: std::list< boost::shared_ptr<msgs::Visual const> > visualMsgs;
   };
   
   class WorldState
