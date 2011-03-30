@@ -111,6 +111,7 @@ void World::Close()
     this->physicsEngine = NULL;
   }
 
+  // is shared memory iface is disabled, return
   if (this->server)
   {
     delete this->server;
@@ -163,27 +164,31 @@ void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
   Simulator::Instance()->ConnectPauseSignal( 
       boost::bind(&World::PauseSlot, this, _1) );
   
-  // Create the server object (needs to be done before models initialize)
-  this->server = new libgazebo::Server();
+  // disable shared memory server and simIface if the serverId is less than 0 (negative)
+  if (serverId >= 0)
+  {
+    // Create the server object (needs to be done before models initialize)
+    this->server = new libgazebo::Server();
 
-  try
-  {
-    this->server->Init(serverId, true );
-  }
-  catch ( std::string err)
-  {
-    gzthrow (err);
-  }
+    try
+    {
+      this->server->Init(serverId, true );
+    }
+    catch ( std::string err)
+    {
+      gzthrow (err);
+    }
 
-  // Create the simulator interface
-  try
-  {
-    this->simIface = new libgazebo::SimulationIface();
-    this->simIface->Create(this->server, "default" );
-  }
-  catch (std::string err)
-  {
-    gzthrow(err);
+    // Create the simulator interface
+    try
+    {
+      this->simIface = new libgazebo::SimulationIface();
+      this->simIface->Create(this->server, "default" );
+    }
+    catch (std::string err)
+    {
+      gzthrow(err);
+    }
   }
 
   // Create the default factory
@@ -393,6 +398,7 @@ void World::Fini()
   { 
     gzmsg(-1) << "Problem destroying simIface[" << e << "]\n";
   }
+
   try
   {
     if (this->factory)
@@ -755,6 +761,9 @@ void World::SetShowPhysics(bool show)
 // Update the simulation interface
 void World::UpdateSimulationIface()
 {
+  // is shared memory iface is disabled or failed to instantiate, return
+  if (this->simIface) return;
+
   libgazebo::SimulationRequestData *response = NULL;
 
   //TODO: Move this method to simulator? Hard because of the models
