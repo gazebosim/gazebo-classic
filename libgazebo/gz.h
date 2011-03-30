@@ -1075,6 +1075,7 @@ class ImuData
 {
   public: GazeboData head;
   public: Pose velocity;
+  public: Vec3 eulerAngles;
 };
 
 class ImuIface : public Iface

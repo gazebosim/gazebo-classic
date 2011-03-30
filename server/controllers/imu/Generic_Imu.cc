@@ -35,6 +35,7 @@
 #include "ControllerFactory.hh"
 #include "Generic_Imu.hh"
 #include "ImuSensor.hh"
+#include "Simulator.hh"
 
 using namespace gazebo;
 
@@ -108,13 +109,19 @@ void Generic_Imu::PutImuData()
 {
 
   Pose3d velocity;
+  Vector3 eulerAngles;
   velocity = this->myParent->GetVelocity();
+  eulerAngles = this->myParent->GetEulerAngles();
 
   if (this->imuIface->Lock(1))
   {
     // Data timestamp
-    //this->imuIface->data->head.time = Simulator::Instance()->GetSimTime();
+    this->imuIface->data->head.time = Simulator::Instance()->GetSimTime().Double();
     
+    this->imuIface->data->eulerAngles.x = eulerAngles[0];
+    this->imuIface->data->eulerAngles.y = eulerAngles[1];
+    this->imuIface->data->eulerAngles.z = eulerAngles[2];
+
     this->imuIface->data->velocity.pos.x = velocity.pos.x;
     this->imuIface->data->velocity.pos.y = velocity.pos.y;
     this->imuIface->data->velocity.pos.z = velocity.pos.z;

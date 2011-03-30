@@ -56,9 +56,11 @@ namespace gazebo
     protected: virtual void FiniChild();
   
     public: Pose3d GetVelocity();
+    public: Vector3 GetEulerAngles();
   
     private: Pose3d prevPose;
     private: Pose3d imuVel;
+    private: Vector3 eulerAngles;
   
   };
 }
