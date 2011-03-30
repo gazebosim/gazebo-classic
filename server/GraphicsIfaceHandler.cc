@@ -66,17 +66,20 @@ void GraphicsIfaceHandler::Load(const std::string &_name, Entity *_parent)
   this->name = _name;
 
   // Create the graphics3d interface
-  try
+  if (World::Instance()->GetGzServer())
   {
-    this->threeDIface = (libgazebo::Graphics3dIface*)libgazebo::IfaceFactory::NewIface("graphics3d");
+    try
+    {
+      this->threeDIface = (libgazebo::Graphics3dIface*)libgazebo::IfaceFactory::NewIface("graphics3d");
 
-    this->threeDIface->Create(World::Instance()->GetGzServer(), _name);
-    this->threeDIface->data->cmdCount = 0;
-  }
-  catch (std::string err)
-  {
-    gzerr(0) << "Error: Unable to make graphics3d interface[" << _name << "]\n";
-    gzthrow(err);
+      this->threeDIface->Create(World::Instance()->GetGzServer(), _name);
+      this->threeDIface->data->cmdCount = 0;
+    }
+    catch (std::string err)
+    {
+      gzerr(0) << "Error: Unable to make graphics3d interface[" << _name << "]\n";
+      gzthrow(err);
+    }
   }
 
   this->parent = _parent;
@@ -92,6 +95,8 @@ void GraphicsIfaceHandler::Init()
 /// Update the graphics handler
 void GraphicsIfaceHandler::Update()
 {
+  if (World::Instance()->GetGzServer() == NULL) return;
+
   OgreVisual *vis = NULL;
   std::map<std::string, OgreVisual* >::iterator iter;
 

@@ -122,14 +122,17 @@ void Controller::Load(XMLConfigNode *node)
       continue;
     }
     
-    // Create the iface
-    try
+    if (World::Instance()->GetGzServer())
     {
-      iface->Create(World::Instance()->GetGzServer(), ifaceName);
-    }
-    catch (std::string e)
-    {
-      gzthrow(e);
+      // Create the iface
+      try
+      {
+        iface->Create(World::Instance()->GetGzServer(), ifaceName);
+      }
+      catch (std::string e)
+      {
+        gzthrow(e);
+      }
     }
     
     this->ifaces.push_back(iface);

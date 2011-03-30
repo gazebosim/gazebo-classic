@@ -77,14 +77,14 @@ namespace gazebo
 
     /// \brief Load the world configuration file 
     // DEPRECATED
-    public: void Load(const std::string &worldFileName, unsigned int serverId ) __attribute__ ((deprecated));
+    public: void Load(const std::string &worldFileName, int serverId ) __attribute__ ((deprecated));
 
-    public: void LoadWorldFile(const std::string &worldFileName, unsigned int serverId);
+    public: void LoadWorldFile(const std::string &worldFileName, int serverId);
 
-    public: void LoadWorldString(const std::string &worldString, unsigned int serverId);
+    public: void LoadWorldString(const std::string &worldString, int serverId);
 
     /// \brief Load the world configuration file
-    public: void Load(gazebo::XMLConfig* worldConfig, unsigned int serverId);
+    public: void Load(gazebo::XMLConfig* worldConfig, int serverId);
 
     /// \brief Save the world configuration file
     public: void Save(const std::string& filename=std::string());

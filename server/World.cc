@@ -159,7 +159,7 @@ void World::Close()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the world
-void World::Load(XMLConfigNode *rootNode, unsigned int serverId)
+void World::Load(XMLConfigNode *rootNode, int serverId)
 {
   Simulator::Instance()->ConnectPauseSignal( 
       boost::bind(&World::PauseSlot, this, _1) );

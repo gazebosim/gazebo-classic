@@ -48,16 +48,19 @@ Factory::Factory()
   this->factoryIface = (libgazebo::FactoryIface*)libgazebo::IfaceFactory::NewIface("factory");
 
   // Create the iface
-  try
+  if (World::Instance()->GetGzServer())
   {
-    this->factoryIface->Create(World::Instance()->GetGzServer(), "default");
-    this->factoryIface->Lock(1); // lock it right away to clear up data
-    strcpy((char*)this->factoryIface->data->newModel,"");
-    this->factoryIface->Unlock();
-  }
-  catch (std::string e)
-  {
-    gzthrow(e);
+    try
+    {
+      this->factoryIface->Create(World::Instance()->GetGzServer(), "default");
+      this->factoryIface->Lock(1); // lock it right away to clear up data
+      strcpy((char*)this->factoryIface->data->newModel,"");
+      this->factoryIface->Unlock();
+    }
+    catch (std::string e)
+    {
+      gzthrow(e);
+    }
   }
 
 }
@@ -85,6 +88,8 @@ void Factory::Init()
 // Update the controller
 void Factory::Update()
 {
+  if (World::Instance()->GetGzServer() == NULL) return;
+
   // If there is a string, then add the contents to the world
   this->factoryIface->Lock(1);
 

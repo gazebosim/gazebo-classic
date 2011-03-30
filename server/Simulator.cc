@@ -181,7 +181,7 @@ void Simulator::Close()
     gazebo::OgreAdaptor::Instance()->Close();
 }
 
-void Simulator::LoadWorldFile(const std::string &worldFileName, unsigned int serverId)
+void Simulator::LoadWorldFile(const std::string &worldFileName, int serverId)
 {
 	gazebo::XMLConfig *worldConfig = new gazebo::XMLConfig();
 
@@ -197,7 +197,7 @@ void Simulator::LoadWorldFile(const std::string &worldFileName, unsigned int ser
 	this->Load(worldConfig, serverId);
 }
 
-void Simulator::LoadWorldString(const std::string &worldString, unsigned int serverId)
+void Simulator::LoadWorldString(const std::string &worldString, int serverId)
 {
 	gazebo::XMLConfig *worldConfig = new gazebo::XMLConfig();
 
@@ -213,7 +213,7 @@ void Simulator::LoadWorldString(const std::string &worldString, unsigned int ser
 	this->Load(worldConfig, serverId);
 }
 
-void Simulator::Load(gazebo::XMLConfig *worldConfig, unsigned int serverId )
+void Simulator::Load(gazebo::XMLConfig *worldConfig, int serverId )
 {
   this->state = LOAD;
 
@@ -332,7 +332,7 @@ void Simulator::Load(gazebo::XMLConfig *worldConfig, unsigned int serverId )
 /// Load the world configuration file
 /// Any error that reach this level must make the simulator exit
 /// DEPRECATED
-void Simulator::Load(const std::string &worldFileName, unsigned int serverId )
+void Simulator::Load(const std::string &worldFileName, int serverId )
 {
 	this->LoadWorldFile(worldFileName, serverId);
 }
