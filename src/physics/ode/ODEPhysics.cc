@@ -116,11 +116,12 @@ class Colliders_TBB
 
   public: void operator() (const tbb::blocked_range<size_t> &r) const
   {
+    dContactGeom contactGeoms[engine->GetMaxContacts()];
     for (size_t i=r.begin(); i != r.end(); i++)
     {
       ODEGeom *geom1 = (*this->colliders)[i].first;
       ODEGeom *geom2 = (*this->colliders)[i].second;
-      this->engine->Collide(geom1, geom2);
+      this->engine->Collide(geom1, geom2, contactGeoms);
     }
   }
 
@@ -206,6 +207,8 @@ void ODEPhysics::Load(common::XMLConfigNode *node)
   this->contactFeedbacksP->Load(node);
   this->maxContactsP->Load(node);
 
+  this->stepTimeDouble = (**this->stepTimeP).Double();
+
   // Help prevent "popping of deeply embedded object
   dWorldSetContactMaxCorrectingVel(this->worldId, **contactMaxCorrectingVelP);
 
@@ -235,6 +238,14 @@ void ODEPhysics::Load(common::XMLConfigNode *node)
 
   dWorldSetQuickStepNumIterations(this->worldId, **this->stepItersP );
   dWorldSetQuickStepW(this->worldId, **this->stepWP );
+
+  // Set the physics update function
+  if (**this->stepTypeP == "quick")
+    this->physicsStepFunc = &dWorldQuickStep;
+  else if (**this->stepTypeP == "world")
+    this->physicsStepFunc = &dWorldStep;
+  else
+    gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -276,30 +287,26 @@ void ODEPhysics::UpdateCollision()
   this->trimeshColliders.clear();
 
   // Do collision detection; this will add contacts to the contact group
-  //this->LockMutex(); 
-  {
-    common::DiagnosticTimer timer("dSpaceCollide");
-    dSpaceCollide( this->spaceId, this, CollisionCallback );
-  }
-  //this->UnlockMutex(); 
+  dSpaceCollide( this->spaceId, this, CollisionCallback );
 
   this->contactFeedbacks.clear();
 
   tbb::parallel_for( tbb::blocked_range<size_t>(0, this->colliders.size(), 10),
       Colliders_TBB(&this->colliders, this) );
 
+  dContactGeom contactGeoms[this->GetMaxContacts()];
   // Trimesh collision must happen in this thread sequentially
   for (int i=0; i<this->trimeshColliders.size(); i++)
   {
     ODEGeom *geom1 = this->trimeshColliders[i].first;
     ODEGeom *geom2 = this->trimeshColliders[i].second;
-    this->Collide(geom1, geom2);
+    this->Collide(geom1, geom2, contactGeoms);
   }
 
   // Process all the contacts, get the feedback info, and call the geom
   // callbacks
   tbb::parallel_for( tbb::blocked_range<size_t>(0, 
-        this->contactFeedbacks.size(), 10), 
+        this->contactFeedbacks.size(), 50), 
         ContactUpdate_TBB(&this->contactFeedbacks) );
 }
 
@@ -308,16 +315,9 @@ void ODEPhysics::UpdateCollision()
 void ODEPhysics::UpdatePhysics()
 {
   this->UpdateCollision();
-
-  common::DiagnosticTimer timer("ODEPhysics::UpdatePhysics");
-
+  
   // Update the dynamical model
-  if (**this->stepTypeP == "quick")
-    dWorldQuickStep(this->worldId, (**this->stepTimeP).Double());
-  else if (**this->stepTypeP == "world")
-    dWorldStep( this->worldId, (**this->stepTimeP).Double() );
-  else
-    gzthrow(std::string("Invalid step type[") + **this->stepTypeP);
+  (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );
@@ -509,7 +509,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-double ODEPhysics::GetMaxContacts()
+int ODEPhysics::GetMaxContacts()
 {
   return this->maxContactsP->GetValue();
 }
@@ -638,14 +638,15 @@ void ODEPhysics::CollisionCallback( void *data, dGeomID o1, dGeomID o2)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Collide two geoms
-void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
+void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2, 
+                         dContactGeom contactGeoms[])
 {
   int numContacts = 10;
   int j;
   int numc = 0;
   dContact contact;
 
-  dContactGeom contactGeoms[**this->maxContactsP];
+  //dContactGeom contactGeoms[**this->maxContactsP];
 
   // for now, only use maxContacts if both geometries are trimeshes
   // other types of geometries do not need too many contacts
@@ -663,12 +664,14 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
 
   if (numc != 0)
   {
+    /* NATY: Put this functionality back in, but needs to be faster.
     ContactFeedback contactFeedback;
 
     contactFeedback.contact.Reset();
     contactFeedback.contact.geom1 = geom1;
     contactFeedback.contact.geom2 = geom2;
     contactFeedback.feedbacks.resize(numc);
+    */
 
     double h, kp, kd;
     for (j=0; j<numc; j++)
@@ -680,15 +683,12 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
       contact.geom = contactGeoms[j];
 
       contact.surface.mode = dContactSlip1 | dContactSlip2 | 
-        dContactSoftERP | dContactSoftCFM |  
-        dContactBounce | dContactMu2 | dContactApprox1;
-
-      //contact.surface.mode = dContactSoftERP | dContactSoftCFM | dContactApprox1 | dContactSlip1 | dContactSlip2;
-      // with dContactSoftERP | dContactSoftCFM the test_pr2_collision overshoots the cup
+                             dContactSoftERP | dContactSoftCFM |  
+                             dContactBounce | dContactMu2 | dContactApprox1;
 
       // Compute the CFM and ERP by assuming the two bodies form a
       // spring-damper system.
-      h = (**this->stepTimeP).Double();
+      h = this->stepTimeDouble;
       kp = 1.0 / (1.0 / geom1->surface->kp + 1.0 / geom2->surface->kp);
       kd = geom1->surface->kd + geom2->surface->kd;
       contact.surface.soft_erp = h * kp / (h * kp + kd);
@@ -697,13 +697,13 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
       if (geom1->surface->enableFriction && geom2->surface->enableFriction)
       {
         contact.surface.mu = std::min(geom1->surface->mu1, 
-            geom2->surface->mu1);
+                                      geom2->surface->mu1);
         contact.surface.mu2 = std::min(geom1->surface->mu2, 
-            geom2->surface->mu2);
+                                       geom2->surface->mu2);
         contact.surface.slip1 = std::min(geom1->surface->slip1, 
-            geom2->surface->slip1);
+                                         geom2->surface->slip1);
         contact.surface.slip2 = std::min(geom1->surface->slip2, 
-            geom2->surface->slip2);
+                                         geom2->surface->slip2);
       }
       else
       {
@@ -714,28 +714,33 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
       }
 
       contact.surface.bounce = std::min(geom1->surface->bounce, 
-          geom2->surface->bounce);
+                                        geom2->surface->bounce);
       contact.surface.bounce_vel = std::min(geom1->surface->bounceVel, 
-          geom2->surface->bounceVel);
+                                            geom2->surface->bounceVel);
 
       dJointID c;
 
-      common::Vector3 contactPos;
+      // NATY: Put this functionality back in, but needs to be faster.
+      /*common::Vector3 contactPos;
       common::Vector3 contactNorm;
+      */
 
       {
         tbb::spin_mutex::scoped_lock lock(this->collideMutex);
         c = dJointCreateContact (this->worldId, this->contactGroup, &contact);
 
+        /* NATY: Put back in, but improve performance
         contactPos.Set(contact.geom.pos[0], contact.geom.pos[1], 
             contact.geom.pos[2]);
         contactNorm.Set(contact.geom.normal[0], contact.geom.normal[1], 
             contact.geom.normal[2]);
 
         this->AddContactVisual( contactPos, contactNorm );
+        */
       }
 
 
+      /* NATY: Put back in, but improve performance
       // Store the contact info 
       if (geom1->GetContactsEnabled() ||
           geom2->GetContactsEnabled())
@@ -748,6 +753,7 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
           this->world->GetSimTime();
         dJointSetFeedback(c, &(contactFeedback.feedbacks[j]));
       }
+      */
 
       dBodyID b1 = dGeomGetBody(geom1->GetGeomId());
       dBodyID b2 = dGeomGetBody(geom2->GetGeomId());
@@ -755,9 +761,11 @@ void ODEPhysics::Collide(ODEGeom *geom1, ODEGeom *geom2)
       dJointAttach (c, b1, b2);
     }
 
+    /* NATY: Put back in, but improve performance
     if (geom1->GetContactsEnabled() || geom2->GetContactsEnabled())
     {
       this->contactFeedbacks.push_back( contactFeedback );
     }
+    */
   }
 }

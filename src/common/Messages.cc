@@ -56,23 +56,23 @@ void Message::Init(google::protobuf::Message &message, const std::string &id)
   if ( header )
   {
     header->set_str_id(id);
-    Message::Stamp(*(header->mutable_stamp()));
+    Message::Stamp(header->mutable_stamp());
   }
   else
     std::cout << "Header is non-existant\n";
 }
 
-void Message::Stamp(msgs::Header &hdr)
+void Message::Stamp(msgs::Header *hdr)
 {
-  Message::Stamp(*hdr.mutable_stamp());
+  Message::Stamp(hdr->mutable_stamp());
 }
 
-void Message::Stamp(msgs::Time &time)
+void Message::Stamp(msgs::Time *time)
 {
   Time tm = Time::GetWallTime();
 
-  time.set_sec(tm.sec);
-  time.set_nsec(tm.nsec);
+  time->set_sec(tm.sec);
+  time->set_nsec(tm.nsec);
 }
 
 std::string Message::Package(const std::string type, 
@@ -80,7 +80,7 @@ std::string Message::Package(const std::string type,
 {
   std::string data;
   msgs::Packet pkg;
-  Message::Stamp( *pkg.mutable_stamp() );
+  Message::Stamp( pkg.mutable_stamp() );
   pkg.set_type(type);
 
   std::string *serialized_data = pkg.mutable_serialized_data();

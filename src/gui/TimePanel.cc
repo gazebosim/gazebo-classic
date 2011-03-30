@@ -17,6 +17,8 @@
 #include <wx/sizer.h>
 #include <wx/evtloop.h>
 
+#include "common/Messages.hh"
+
 #include "gui/TimePanel.hh"
 
 using namespace gazebo;
@@ -78,8 +80,16 @@ TimePanel::TimePanel( wxWindow *parent )
 
   this->lastUpdateTime = 0;
   this->statusUpdatePeriod = 0.5;
+
+  this->statsSub = transport::subscribe("/gazebo/default/world_stats", &TimePanel::OnStats, this);
 }
 
+void TimePanel::OnStats( const boost::shared_ptr<msgs::WorldStats const> &msg)
+{
+  this->simTime  = common::Message::Convert( msg->sim_time() );
+  this->realTime = common::Message::Convert( msg->real_time() );
+  this->pauseTime = common::Message::Convert( msg->pause_time() );
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
@@ -89,72 +99,47 @@ TimePanel::~TimePanel()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update the time panel
-void TimePanel::MyUpdate()
+void TimePanel::MyUpdate( )
 {
-  // NATY: Fix
-  /*World *world = Simulator::Instance()->GetActiveWorld();
+  common::Time percent;
 
-  if (world->GetRealTime() - this->lastUpdateTime > this->statusUpdatePeriod)
-  {
-    Time simTime = Simulator::Instance()->GetActiveWorld()->GetSimTime();
-    Time realTime = Simulator::Instance()->GetActiveWorld()->GetRealTime();
-    Time percent;
-    
-    if (realTime < this->statusUpdatePeriod )
-    {
-      percent = ( simTime / realTime);
-      this->percentLastRealTime =0;
-      this->percentLastSimTime = 0;
-    }
-    else
-    {
-      percent = ((simTime - this->percentLastSimTime) / 
-                 (realTime - this->percentLastRealTime)).Double();
+  percent = ( this->simTime / this->realTime);
 
-      this->percentLastRealTime = realTime;
-      this->percentLastSimTime = simTime;
-    }
+  wxString simSuffix;
+  wxString realSuffix;
 
-    wxString simSuffix;
-    wxString realSuffix;
+  double simDbl = this->simTime.Double();
+  if (simDbl > 31536000)
+    simSuffix << simDbl/31536000 << wxT("\tdys");
+  else if (simDbl > 86400)
+    simSuffix << simDbl / 86400 << wxT("\tdys");
+  else if (simDbl > 3600)
+    simSuffix << simDbl/3600 << wxT("\thrs");
+  else if (simDbl > 999)
+    simSuffix << simDbl/60 << wxT("\tmin");
+  else
+    simSuffix << simDbl << wxT("\tsec");
 
-    double simDbl = simTime.Double();
-    if (simDbl > 31536000)
-      simSuffix << simDbl/31536000 << wxT("\tdys");
-    else if (simDbl > 86400)
-      simSuffix << simDbl / 86400 << wxT("\tdys");
-    else if (simDbl > 3600)
-      simSuffix << simDbl/3600 << wxT("\thrs");
-    else if (simDbl > 999)
-      simSuffix << simDbl/60 << wxT("\tmin");
-    else
-      simSuffix << simDbl << wxT("\tsec");
+  double realDbl = this->realTime.Double();
+  if (realDbl > 31536000)
+    realSuffix << realDbl/31536000 << wxT("\tdys");
+  else if (realDbl > 86400)
+    realSuffix << realDbl/86400 << wxT("\tdys");
+  else if (realDbl > 3600)
+    realSuffix << realDbl/3600 << wxT("\thrs");
+  else if (realDbl > 999)
+    realSuffix << realDbl/60 << wxT("\tmin");
+  else
+    realSuffix << realDbl << wxT("\tsec");
 
-    double realDbl = realTime.Double();
-    if (realDbl > 31536000)
-      realSuffix << realDbl/31536000 << wxT("\tdys");
-    else if (realDbl > 86400)
-      realSuffix << realDbl/86400 << wxT("\tdys");
-    else if (realDbl > 3600)
-      realSuffix << realDbl/3600 << wxT("\thrs");
-    else if (realDbl > 999)
-      realSuffix << realDbl/60 << wxT("\tmin");
-    else
-      realSuffix << realDbl << wxT("\tsec");
+  wxString str;
 
-    wxString str;
+  str.Printf(wxT("%f"), percent.Double());
+  this->percentRealTimeCtrl->SetValue( str );
 
-    str.Printf(wxT("%f"), percent.Double());
-    this->percentRealTimeCtrl->SetValue( str );
+  this->simTimeCtrl->SetValue(simSuffix);
+  this->realTimeCtrl->SetValue(realSuffix);
 
-    this->simTimeCtrl->SetValue(simSuffix);
-    this->realTimeCtrl->SetValue(realSuffix);
-
-    str.Printf(wxT("%f sec"), Simulator::Instance()->GetActiveWorld()->GetPauseTime().Double());
-    this->pauseTimeCtrl->SetValue(str);
-
-    this->lastUpdateTime = Simulator::Instance()->GetActiveWorld()->GetRealTime();
-  }
-
-  */
+  str.Printf(wxT("%f sec"), this->pauseTime.Double());
+  this->pauseTimeCtrl->SetValue(str);
 }

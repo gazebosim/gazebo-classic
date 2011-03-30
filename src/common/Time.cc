@@ -17,7 +17,6 @@
 /* Desc: Time class
  * Author: Nate Koenig
  * Date: 3 Apr 2007
- * SVN: $Id$
  */
 
 #include <sys/time.h>
@@ -27,6 +26,8 @@
 using namespace gazebo;
 using namespace common;
 
+
+Time Time::wallTime;
 
 // Constructors
 Time::Time()
@@ -38,7 +39,6 @@ Time::Time()
 Time::Time( const Time &time )
     : sec(time.sec), nsec(time.nsec)
 {
-  this->Correct();
 }
 
 Time::Time( const struct timeval &tv )
@@ -63,11 +63,12 @@ Time::~Time()
 {
 }
 
-Time Time::GetWallTime()
+const Time &Time::GetWallTime()
 {
   struct timeval tv;
   gettimeofday(&tv,NULL);
-  return Time(tv);
+  wallTime = tv;
+  return wallTime;
 }
 
 void Time::SetToWallTime()

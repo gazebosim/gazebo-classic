@@ -51,6 +51,7 @@ Entity::Entity(Common *parent)
   common::Param::End();
  
   this->visualMsg = new msgs::Visual();
+  this->poseMsg = new msgs::Pose();
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -68,6 +69,7 @@ void Entity::Load(common::XMLConfigNode *node)
 {
   Common::Load(node);
   this->RegisterVisual();
+  common::Message::Init( *this->poseMsg, this->GetCompleteScopedName() );
 }
  
 
@@ -115,6 +117,9 @@ Entity::~Entity()
   this->vis_pub->Publish(*this->visualMsg);
   delete this->visualMsg;
   this->visualMsg = NULL;
+
+  delete this->poseMsg;
+  this->poseMsg = NULL;
 }
 
 
@@ -291,9 +296,8 @@ void Entity::SetRelativeRotation(const common::Quatern &rot)
 void Entity::PoseChange(bool notify)
 {
   msgs::Pose msg;
-  common::Message::Init(msg, this->GetCompleteScopedName() );
-  common::Message::Set( &msg, this->GetRelativePose());
-  this->pose_pub->Publish(msg);
+  common::Message::Set( this->poseMsg, this->GetRelativePose());
+  this->pose_pub->Publish( *this->poseMsg);
 
   if (notify)
   {
@@ -330,11 +334,4 @@ Model *Entity::GetParentModel() const
     p = p->GetParent();
 
   return (Model*)p;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the visual message
-const boost::shared_ptr<msgs::Visual> Entity::GetVisualMsg() const
-{
-  return boost::shared_ptr<msgs::Visual>(this->visualMsg);
 }

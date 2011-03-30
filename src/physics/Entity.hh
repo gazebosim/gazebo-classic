@@ -39,6 +39,7 @@ namespace gazebo
   namespace msgs
   {
     class Visual;
+    class Pose;
   }
 
 	namespace physics
@@ -139,9 +140,6 @@ namespace gazebo
       /// \return Pointer to a model, or NULL if no parent model exists
       public: Model *GetParentModel() const;
 
-      /// \brief Get the visual message
-      public: const boost::shared_ptr<msgs::Visual> GetVisualMsg() const;
-  
       /// \brief This function is called when the entity's (or one of its parents)
       ///        pose of the parent has changed
       protected: virtual void OnPoseChange() {}
@@ -154,6 +152,7 @@ namespace gazebo
     
       /// \brief Visual stuff
       protected: msgs::Visual *visualMsg;
+      protected: msgs::Pose *poseMsg;
   
       private: common::Pose3d relativePose;
       private: transport::PublisherPtr pose_pub;

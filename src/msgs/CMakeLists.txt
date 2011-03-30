@@ -22,6 +22,7 @@ set (msgs color.proto
           publishers.proto
           request.proto
           topic_info.proto
+          world_stats.proto
 )
 
 

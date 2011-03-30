@@ -65,7 +65,6 @@ namespace gazebo
               PublisherPtr Advertise(const std::string &topic)
               {
                 std::string decodedTopic = this->DecodeTopicName(topic);
-                std::cout << "Advertise[" << decodedTopic << "]\n";
 
                 google::protobuf::Message *msg = NULL;
                 M msgtype;

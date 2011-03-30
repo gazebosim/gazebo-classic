@@ -238,13 +238,21 @@ namespace gazebo
 
     private: void VisualLog(const boost::shared_ptr<msgs::Visual const> &msg);
 
+
+    /// \brief TBB version of model updating
+    private: void ModelUpdateTBB();
+
+    /// \brief Single loop verison of model updating
+    private: void ModelUpdateSingleLoop();
+
     /// Pointer the physics engine
     private: PhysicsEngine *physicsEngine;
   
     private: Common *rootElement;
-  
+ 
+    typedef std::vector<Model*> Model_V;
     /// An abstract entity that is the root of the Entity Tree
-    private: std::vector<Model*> models;
+    private: Model_V  models;
   
     /// List of models to delete from the world
     private: std::vector< std::string > toDeleteEntities;
@@ -292,9 +300,18 @@ namespace gazebo
     private: std::vector<event::ConnectionPtr> connections;
   
     private: transport::PublisherPtr visPub, selectionPub, lightPub, scenePub;
+    private: transport::PublisherPtr statPub;
+
     private: transport::SubscriberPtr visSub, sceneSub;
 
+    private: msgs::WorldStats worldStatsMsg;
+
     private: std::list< boost::shared_ptr<msgs::Visual const> > visualMsgs;
+
+    private: void (World::*modelUpdateFunc)();
+
+    private: common::Time statPeriod;
+    private: common::Time prevStatTime;
   };
   
   class WorldState

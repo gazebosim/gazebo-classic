@@ -22,6 +22,7 @@
 #include <wx/textctrl.h>
 
 #include "common/Time.hh"
+#include "transport/Transport.hh"
 
 namespace gazebo
 {
@@ -31,8 +32,10 @@ namespace gazebo
     {
       public: TimePanel( wxWindow *parent );
       public: virtual ~TimePanel();
+
+      public: void MyUpdate( );
   
-      public: void MyUpdate();
+      private: void OnStats( const boost::shared_ptr<msgs::WorldStats const> &msg);
   
       private: wxStaticText *percentRealTimeText;
       private: wxTextCtrl *percentRealTimeCtrl;
@@ -47,7 +50,8 @@ namespace gazebo
       private: wxTextCtrl *pauseTimeCtrl;
   
       private: common::Time lastUpdateTime,statusUpdatePeriod;
-      private: common::Time percentLastRealTime, percentLastSimTime;
+      private: common::Time simTime, realTime, pauseTime;
+      private: transport::SubscriberPtr statsSub;
     };
   }
 }

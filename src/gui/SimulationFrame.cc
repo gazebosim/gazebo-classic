@@ -277,8 +277,8 @@ void SimulationFrame::OnPause(bool pause)
 void SimulationFrame::Update()
 {
   //this->auiManager->Update();
-  this->timePanel->MyUpdate();
   this->renderPanel->MyUpdate();
+  this->timePanel->MyUpdate();
 
   if (this->diagnostics)
     this->diagnostics->Update();

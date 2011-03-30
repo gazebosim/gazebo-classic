@@ -18,7 +18,6 @@
  * Desc: Factory for creating sensors
  * Author: Andrew Howard
  * Date: 18 May 2003
- * SVN info: $Id$
  */
 
 #ifndef SENSORFACTORY_HH

@@ -17,7 +17,6 @@
 /* Desc: The ODE physics engine wrapper
  * Author: Nate Koenig
  * Date: 11 June 2007
- * SVN: $Id$
  */
 
 #ifndef ODEPHYSICS_HH
@@ -192,7 +191,7 @@ namespace gazebo
     /// \brief access functions to set ODE parameters
     public: double GetContactSurfaceLayer();
     /// \brief access functions to set ODE parameters
-    public: double GetMaxContacts();
+    public: int GetMaxContacts();
   
     public: void CreateContact(ODEGeom *geom1, ODEGeom *geom2);
   
@@ -200,7 +199,8 @@ namespace gazebo
     private: static void CollisionCallback( void *data, dGeomID o1, dGeomID o2);
   
     /// \brief Collide two geoms
-    public: void Collide(ODEGeom *geom1, ODEGeom *geom2);
+    public: void Collide(ODEGeom *geom1, ODEGeom *geom2, 
+                         dContactGeom contactGeoms[]);
   
     /// \brief Top-level world for all bodies
     private: dWorldID worldId;
@@ -221,7 +221,11 @@ namespace gazebo
     private: common::ParamT<bool> *autoDisableBodyP;
     private: common::ParamT<int> *contactFeedbacksP;
     private: common::ParamT<int> *maxContactsP;
-  
+ 
+    /// Store the value of the stepTime parameter in doubl form. To improve
+    /// efficiency
+    private: double stepTimeDouble; 
+
     private: tbb::concurrent_vector<ContactFeedback> contactFeedbacks;
   
     private: std::map<std::string, dSpaceID> spaces;
@@ -230,6 +234,8 @@ namespace gazebo
     private: std::vector< std::pair<ODEGeom*, ODEGeom*> > trimeshColliders;
   
     private: tbb::spin_mutex collideMutex;
+
+    private: void (*physicsStepFunc)(dxWorld*, dReal);
   };
   
   

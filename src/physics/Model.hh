@@ -103,9 +103,6 @@ namespace gazebo
       /// \brief Initialize the child model
       protected: virtual void InitChild() {}
     
-      /// \brief Update the child model
-      protected: virtual void UpdateChild() {}
-    
       /// \brief Finilaize thie child model
       protected: virtual void FiniChild() {}
       

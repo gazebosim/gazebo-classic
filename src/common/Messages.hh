@@ -37,8 +37,8 @@ namespace gazebo
         static void Init(google::protobuf::Message &message, 
                          const std::string &id);
 
-        static void Stamp(msgs::Header &);
-        static void Stamp(msgs::Time &);
+        static void Stamp(msgs::Header *);
+        static void Stamp(msgs::Time *);
 
         static std::string Package(const std::string type, 
                                    const google::protobuf::Message &message);

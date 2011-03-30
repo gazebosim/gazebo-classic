@@ -17,7 +17,6 @@
 /* Desc: The base class for all physics engines
  * Author: Nate Koenig
  * Date: 11 June 2007
- * SVN: $Id$
  */
 
 #ifndef PHYSICSENGINE_HH
@@ -105,7 +104,7 @@ namespace gazebo
       public: virtual void UpdateCollision() = 0;
   
       /// \brief Update the physics engine
-      public: virtual void UpdatePhysics();
+      public: virtual void UpdatePhysics() {}
     
       /// \brief Finilize the physics engine
       public: virtual void Fini() = 0;
@@ -195,7 +194,7 @@ namespace gazebo
       /// \brief access functions to set ODE parameters
       public: virtual double GetContactSurfaceLayer() {return 0;}
       /// \brief access functions to set ODE parameters
-      public: virtual double GetMaxContacts() {return 0;}
+      public: virtual int GetMaxContacts() {return 0;}
   
       /// \brief Get the count of the parameters
       public: unsigned int GetParamCount() const;

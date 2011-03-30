@@ -28,7 +28,6 @@
 
 #include "transport/Transport.hh"
 
-#include "common/Messages.hh"
 #include "common/Diagnostics.hh"
 #include "common/Events.hh"
 #include "common/Global.hh"
@@ -120,18 +119,21 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   // DO THIS FIRST
   this->nameP->Load(rootNode);
 
+  // The period at which statistics about the world are published
+  this->statPeriod = common::Time(0,200000000);
+
   // Set the global topic namespace
   transport::set_topic_namespace(**this->nameP);
 
+  common::Message::Init( this->worldStatsMsg, "statistics" );
+
   this->sceneSub = transport::subscribe("/gazebo/default/publish_scene", &World::PublishScene, this);
+  this->statPub = transport::advertise<msgs::WorldStats>("~/world_stats");
   this->scenePub = transport::advertise<msgs::Scene>("~/scene");
   this->visPub = transport::advertise<msgs::Visual>("~/visual");
   this->visSub = transport::subscribe("~/visual", &World::VisualLog, this);
   this->selectionPub = transport::advertise<msgs::Selection>("~/selection");
   this->lightPub = transport::advertise<msgs::Light>("~/light");
-
-  // TODO: remove this
-  usleep(1000000);
 
   msgs::Scene scene = common::Message::SceneFromXML( rootNode->GetChild("scene") );
   this->scenePub->Publish( scene );
@@ -222,6 +224,13 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
   this->worldStatesCurrentIter = this->worldStatesInsertIter;
   */
 
+
+  // Choose threaded or unthreaded model updating depending on the number of
+  // models in the scene
+  if (this->models.size() < 20)
+    this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
+  else
+    this->modelUpdateFunc = &World::ModelUpdateTBB;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,9 +339,13 @@ void World::RunLoop()
   this->startTime = common::Time::GetWallTime();
 
   this->stop = false;
+
+  // Set a default sleep time
+  req.tv_sec  = 0;
+  req.tv_nsec = 10000;
+
   while (!this->stop)
   {
-    lastTime = this->GetRealTime();
     if (this->IsPaused() && !this->stepInc)
       this->pauseTime += step;
     else
@@ -341,35 +354,7 @@ void World::RunLoop()
       this->Update();
     }
 
-    currTime = this->GetRealTime();
-
-    // Set a default sleep time
-    req.tv_sec  = 0;
-    req.tv_nsec = 10000;
-
-    // If the physicsUpdateRate < 0, then we should try to match the
-    // update rate to real time
-    if ( physicsUpdateRate < 0 &&
-        (this->GetSimTime() + this->GetPauseTime()) > 
-        this->GetRealTime()) 
-    {
-      diffTime = (this->GetSimTime() + this->GetPauseTime()) - 
-                  this->GetRealTime();
-      req.tv_sec  = diffTime.sec;
-      req.tv_nsec = diffTime.nsec;
-    }
-    // Otherwise try to match the update rate to the one specified in
-    // the xml file
-    else if (physicsUpdateRate > 0 && 
-        currTime - lastTime < physicsUpdatePeriod)
-    {
-      diffTime = physicsUpdatePeriod - (currTime - lastTime);
-
-      req.tv_sec  = diffTime.sec;
-      req.tv_nsec = diffTime.nsec;
-    }
-
-    nanosleep(&req, &rem);
+    //nanosleep(&req, &rem);
 
     // TODO: Fix timeout:  this belongs in simulator.cc
     /*if (this->timeout > 0 && this->GetRealTime() > this->timeout)
@@ -394,35 +379,40 @@ void World::RunLoop()
 // Update the world
 void World::Update()
 {
-  //DIAG_TIMER("World::Update")
-
   event::Events::worldUpdateStartSignal();
 
+  /// Send statistics about the world simulation
+  if (common::Time::GetWallTime() - this->prevStatTime > this->statPeriod)
   {
-    //DIAG_TIMER("Update Models");
-    tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
-        ModelUpdate_TBB(&this->models) );
+    common::Message::Stamp( this->worldStatsMsg.mutable_header() );
+    common::Message::Set( this->worldStatsMsg.mutable_sim_time(), 
+        this->GetSimTime());
+    common::Message::Set( this->worldStatsMsg.mutable_real_time(),
+        this->GetRealTime() );
+    common::Message::Set( this->worldStatsMsg.mutable_pause_time(),
+        this->GetPauseTime());
+
+    this->statPub->Publish( this->worldStatsMsg );
+    this->prevStatTime = common::Time::GetWallTime();
   }
 
+  // Update all the models
+  (*this.*modelUpdateFunc)();
+
+  // Update the physics engine
   if (this->physicsEngine)
     this->physicsEngine->UpdatePhysics();
 
   /// Update all the sensors
-  {
-    //DIAG_TIMER("Update Sensors");
-    //SensorManager::Instance()->Update();
-  }
+  //SensorManager::Instance()->Update();
 
-  {
-    //DIAG_TIMER("Update handlers");
-    //this->factoryIfaceHandler->Update();
+  //this->factoryIfaceHandler->Update();
 
-    // Process all incoming messages from simiface
-    //this->simIfaceHandler->Update();
+  // Process all incoming messages from simiface
+  //this->simIfaceHandler->Update();
 
-    /// Process all internal messages
-    this->ProcessMessages();
-  }
+  /// Process all internal messages
+  this->ProcessMessages();
 
   // NATY: put back in
   //Logger::Instance()->Update();
@@ -988,7 +978,6 @@ void World::SetPaused(bool p)
 
 void World::PublishScene( const boost::shared_ptr<msgs::Request const> &data )
 {
-  std::cout << "publish scene\n";
   msgs::Scene scene;
   common::Message::Init(scene,"scene");
 
@@ -1042,4 +1031,23 @@ void World::VisualLog(const boost::shared_ptr<msgs::Visual const> &msg)
   }
 
   this->visualMsgs.push_back( msg );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// TBB version of model updating
+void World::ModelUpdateTBB()
+{
+  tbb::parallel_for( tbb::blocked_range<size_t>(0, this->models.size(), 10),
+      ModelUpdate_TBB(&this->models) );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Single loop verison of model updating
+void World::ModelUpdateSingleLoop()
+{
+  for (Model_V::iterator iter = this->models.begin(); 
+       iter != this->models.end(); iter++)
+  {
+    (*iter)->Update();
+  }
 }

@@ -17,8 +17,8 @@
 /* Desc: External interfaces for Gazebo
  * Author: Nate Koenig
  * Date: 03 Apr 2007
- * SVN: $Id$
  */
+
 #ifndef TIME_HH
 #define TIME_HH
 
@@ -63,7 +63,7 @@ namespace gazebo
       public: virtual ~Time();
     
       /// \brief Get the wall time
-      public: static Time GetWallTime();
+      public: static const Time &GetWallTime();
     
       /// \brief Set the time to the wall time
       public: void SetToWallTime();
@@ -192,7 +192,9 @@ namespace gazebo
     
       /// Microseconds
       public: int32_t nsec;
-    
+
+      private: static Time wallTime;
+
       /// Correct the time
       private: inline void Correct()
                {

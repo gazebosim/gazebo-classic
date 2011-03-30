@@ -389,7 +389,6 @@ void Model::Init()
 // Update the model
 void Model::Update()
 {
-
   // NATY: Make this work without renderstate
   /*
   if (this->controllers.size() == 0 && this->IsStatic())
@@ -422,8 +421,6 @@ void Model::Update()
       (*jointIter)->Update();
     }
   }*/
-
-  this->UpdateChild();
 }
 
 void Model::OnPoseChange()
