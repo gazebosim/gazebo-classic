@@ -393,6 +393,7 @@ void World::Fini()
   {
     if (this->simIface)
       this->simIface->Destroy();
+    this->simIface = NULL;
   }
   catch (std::string e)
   { 
@@ -762,7 +763,7 @@ void World::SetShowPhysics(bool show)
 void World::UpdateSimulationIface()
 {
   // is shared memory iface is disabled or failed to instantiate, return
-  if (this->simIface) return;
+  if (!this->simIface) return;
 
   libgazebo::SimulationRequestData *response = NULL;
 
