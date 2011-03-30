@@ -50,7 +50,13 @@ namespace gazebo
       public: void Resize(unsigned int id, int width, int height);
   
       public: void Render();
+
+      /// \brief Get the average FPS
+      public: float GetAvgFPS(unsigned int windowId);
   
+      /// \brief Get the triangle count
+      public: unsigned int GetTriangleCount(unsigned int windotId);
+ 
       private: std::vector<Ogre::RenderWindow *> windows;
   
       private: static unsigned int windowCounter;

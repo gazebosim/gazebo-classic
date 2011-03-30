@@ -35,7 +35,6 @@ Master::~Master()
 
 void Master::Init(unsigned short port)
 {
-  std::cout << "Master Init\n";
   try
   {
     this->connection->Listen(port, boost::bind(&Master::OnAccept, this, _1));
@@ -44,6 +43,8 @@ void Master::Init(unsigned short port)
   {
     gzthrow( "Unable to start server[" << e.what() << "]\n");
   }
+  std::cout << "master started\n";
+  std::cout << "GAZEBO_MASTER_URI=" << this->connection->GetLocalURI() << "\n";
 }
 
 void Master::OnAccept(const transport::ConnectionPtr &new_connection)
@@ -51,8 +52,6 @@ void Master::OnAccept(const transport::ConnectionPtr &new_connection)
   msgs::String msg;
   msg.set_data(std::string("gazebo ") + GAZEBO_VERSION);
   new_connection->Write( common::Message::Package("init", msg) );
-
-  std::cout << "Accepted Connection[" << new_connection->GetRemoteAddress() << ":" << new_connection->GetRemotePort() << "]\n";
 
   new_connection->StartRead( boost::bind(&Master::OnRead, this, new_connection, _1));
   this->connections.push_back(new_connection);
@@ -80,7 +79,6 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
     {
       if (iter->first.topic() == pub.topic())
       {
-        std::cout << "Telling the client\n";
         iter->second->Write(common::Message::Package("publisher_update", pub));
       }
     }
@@ -89,8 +87,6 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
   {
     msgs::Subscribe sub;
     sub.ParseFromString( packet.serialized_data() );
-
-    std::cout << "Subscribe[" << conn->GetRemoteAddress() << ":" << conn->GetRemotePort() << "]\n";
 
     this->subscribers.push_back( std::make_pair(sub, conn) );
 
@@ -113,7 +109,6 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
 
     if (req.request() == "get_publishers")
     {
-      std::cout << "get publishers\n";
       msgs::Publishers msg;
       PubList::iterator iter;
       for (iter = this->publishers.begin(); 
@@ -122,14 +117,11 @@ void Master::OnRead(const transport::ConnectionPtr &conn,
         msgs::Publish *pub = msg.add_publisher();
         pub->CopyFrom( iter->first );
       }
-      std::cout << "package and write\n";
       conn->Write( common::Message::Package("publisher_list", msg) );
     }
     else if (req.request() == "topic_info")
     {
       msgs::Publish pub = this->GetPublisher( req.str_data() );
-      std::cout << "Topic Type[" << pub.msg_type() << "]\n";
-      std::cout << "Full[" << pub.GetDescriptor()->full_name() << "]\n";
       msgs::TopicInfo ti;
       ti.set_msg_type( pub.msg_type() );
 
@@ -204,11 +196,9 @@ transport::ConnectionPtr Master::FindConnection(const std::string &host, unsigne
   std::list<transport::ConnectionPtr>::iterator iter;
 
 
-  std::cout << "Find a connection for host[" << host << ":" << port << "]\n";
   for (iter = this->connections.begin(); 
        iter != this->connections.end(); iter++)
   {
-    std::cout << "  Remote host[" << (*iter)->GetRemoteAddress() << ":"  << (*iter)->GetRemotePort() << "\n";
     if ((*iter)->GetRemoteAddress() == host && (*iter)->GetRemotePort() == port)
     {
       conn = (*iter);

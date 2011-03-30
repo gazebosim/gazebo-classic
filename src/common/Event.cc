@@ -21,10 +21,12 @@
 using namespace gazebo;
 using namespace event;
 
+int Connection::counter = 0;
 ////////////////////////////////////////////////////////////////////////////////
 Connection::Connection(Event *e, int i) 
   : event(e), id(i) 
 {
+  this->uniqueId = counter++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,6 +36,7 @@ Connection::~Connection()
   {
     ConnectionPtr self(this);
     this->event->Disconnect( self ); 
+    this->event = NULL;
   }
 }
 

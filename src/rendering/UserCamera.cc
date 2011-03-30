@@ -27,6 +27,7 @@
 #include "common/Events.hh"
 
 
+#include "rendering/WindowManager.hh"
 #include "rendering/FPSViewController.hh"
 #include "rendering/OrbitViewController.hh"
 #include "rendering/RenderTypes.hh"
@@ -149,9 +150,6 @@ void UserCamera::Init()
 
   this->visual->SetVisible(false);
 
-  //this->window->removeAllViewports();
-  //this->viewport = this->window->addViewport(this->GetCamera());
-
   //this->SetAspectRatio( Ogre::Real(this->viewport->getActualWidth()) / Ogre::Real(this->viewport->getActualHeight()) );
 
  // double ratio = (double)this->viewport->getActualWidth() / (double)this->viewport->getActualHeight();
@@ -185,18 +183,12 @@ void UserCamera::Render()
       this->scene->GetManager()->destroyAnimationState("cameratrack");
     }
   }
-
-  // NATY
-  //this->window->update(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Post Render
 void UserCamera::PostRender()
 {
-  // NATY
-  //this->window->swapBuffers();
-
   if (**this->saveFramesP)
   {
     char tmp[1024];
@@ -210,7 +202,7 @@ void UserCamera::PostRender()
       sprintf(tmp, "%s-%04d.jpg", this->name.c_str(), this->saveCount);
     }
 
-    // NATY
+    // NATY: Use the window manager instead.
     //this->window->writeContentsToFile(tmp);
 
     this->saveCount++;
@@ -265,31 +257,18 @@ void UserCamera::SetViewportDimensions(float x, float y, float w, float h)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the average FPS
-float UserCamera::GetAvgFPS()
+/// Get the average frames per second
+float UserCamera::GetAvgFPS() const
 {
-  float lastFPS, avgFPS, bestFPS, worstFPS;
-  // NATY: Put back in
-  //this->window->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-
-  return avgFPS;
+  return WindowManager::Instance()->GetAvgFPS(this->windowId);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get the triangle count
-unsigned int UserCamera::GetTriangleCount()
+/// Get the triangle count 
+float UserCamera::GetTriangleCount() const
 {
-  //NATY: put back in
-  //return this->window->getTriangleCount();
-  return 0;
+  return WindowManager::Instance()->GetTriangleCount(this->windowId);
 }
-
-////////////////////////////////////////////////////////////////////////////////
-/// Get the ogre window
-/*Ogre::RenderWindow *UserCamera::GetWindow()
-{
-  return this->window;
-}*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Toggle whether to show the visual

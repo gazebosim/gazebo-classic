@@ -133,12 +133,7 @@ void PrintUsage()
 // Print the version/licence string
 void PrintVersion()
 {
-  fprintf(stderr, "Gazebo multi-robot simulator, version %s\n\n", GAZEBO_VERSION);
-  fprintf(stderr, "Part of the Player/Stage Project "
-          "[http://playerstage.sourceforge.net].\n");
-  fprintf(stderr, "Copyright (C) 2003 Nate Koenig, Andrew Howard, and contributors.\n");
-  fprintf(stderr, "Released under the GNU General Public License.\n\n");
-  return;
+  fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -208,11 +203,9 @@ int ParseArgs(int argc, char **argv)
 
 ////////////////////////////////////////////////////////////////////////////////
 // sighandler to shut everything down properly
-void SignalHandler( int /*dummy*/ )
+void SignalHandler( int )
 {
   server->Quit();
-  //gazebo::event::Events::quitSignal();
-  return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -72,6 +72,12 @@ namespace gazebo
       /// \brief Write data to the socket
       public: void Write(const std::string &buffer);
 
+      /// \brief Get the local URI
+      public: std::string GetLocalURI() const;
+              
+      /// \brief Get the remote URI
+      public: std::string GetRemoteURI() const;
+
       /// \brief Get the address of this connection
       public: std::string GetLocalAddress() const;
 

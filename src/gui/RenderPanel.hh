@@ -72,6 +72,7 @@ namespace gazebo
   
       private: RenderControl *renderControl;
       private: wxTextCtrl *fpsCtrl;
+      private: wxTextCtrl *triangleCountCtrl;
       private: wxTextCtrl *xPosCtrl;
       private: wxTextCtrl *yPosCtrl;
       private: wxTextCtrl *zPosCtrl;

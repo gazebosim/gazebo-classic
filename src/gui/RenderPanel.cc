@@ -36,6 +36,8 @@ RenderPanel::RenderPanel(wxWindow *parent)
   wxBoxSizer *boxSizer1 = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer *boxSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
+  wxSize poseCtrlSize (65,25);
+
   this->renderControl = new RenderControl(this);
   boxSizer1->Add(this->renderControl, 2, wxALL | wxEXPAND );
 
@@ -43,17 +45,17 @@ RenderPanel::RenderPanel(wxWindow *parent)
   xyzPosText->Wrap(-1);
   boxSizer2->Add(xyzPosText, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 5);
 
-  this->xPosCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+  this->xPosCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, poseCtrlSize, 0, wxTextValidator(wxFILTER_NUMERIC));
   this->xPosCtrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(RenderPanel::OnXPosSetFocus), NULL, this);
   this->xPosCtrl->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(RenderPanel::OnXPosKillFocus), NULL, this);
   boxSizer2->Add(this->xPosCtrl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 1);
 
-  this->yPosCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,0, wxTextValidator(wxFILTER_NUMERIC));
+  this->yPosCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, poseCtrlSize,0, wxTextValidator(wxFILTER_NUMERIC));
   this->yPosCtrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(RenderPanel::OnYPosSetFocus), NULL, this);
   this->yPosCtrl->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(RenderPanel::OnYPosKillFocus), NULL, this);
   boxSizer2->Add(this->yPosCtrl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 1);
 
-  this->zPosCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,0, wxTextValidator(wxFILTER_NUMERIC));
+  this->zPosCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, poseCtrlSize,0, wxTextValidator(wxFILTER_NUMERIC));
   this->zPosCtrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(RenderPanel::OnZPosSetFocus), NULL, this);
   this->zPosCtrl->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(RenderPanel::OnZPosKillFocus), NULL, this);
   boxSizer2->Add(this->zPosCtrl, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
@@ -64,17 +66,17 @@ RenderPanel::RenderPanel(wxWindow *parent)
   rpyText->Wrap(-1);
   boxSizer2->Add(rpyText, 0, wxALL | wxALIGN_CENTER_VERTICAL, 1);
 
-  this->rollCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
+  this->rollCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, poseCtrlSize, 0, wxTextValidator(wxFILTER_NUMERIC));
   this->rollCtrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(RenderPanel::OnRollSetFocus), NULL, this);
   this->rollCtrl->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(RenderPanel::OnRollKillFocus), NULL, this);
   boxSizer2->Add(this->rollCtrl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 1);
 
-  this->pitchCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,0, wxTextValidator(wxFILTER_NUMERIC) );
+  this->pitchCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, poseCtrlSize,0, wxTextValidator(wxFILTER_NUMERIC) );
   this->pitchCtrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(RenderPanel::OnPitchSetFocus), NULL, this);
   this->pitchCtrl->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(RenderPanel::OnPitchKillFocus), NULL, this);
   boxSizer2->Add(this->pitchCtrl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 1);
 
-  this->yawCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,0, wxTextValidator(wxFILTER_NUMERIC));
+  this->yawCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, poseCtrlSize,0, wxTextValidator(wxFILTER_NUMERIC));
   this->yawCtrl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(RenderPanel::OnYawSetFocus), NULL, this);
   this->yawCtrl->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(RenderPanel::OnYawKillFocus), NULL, this);
   boxSizer2->Add(this->yawCtrl, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
@@ -87,6 +89,15 @@ RenderPanel::RenderPanel(wxWindow *parent)
 
   this->fpsCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
   boxSizer2->Add(this->fpsCtrl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 1);
+
+
+
+  wxStaticText *triangleCountText = new wxStaticText( this, wxID_ANY, wxT("Triangles:"), wxDefaultPosition, wxDefaultSize, 0);
+  triangleCountText->Wrap(-1);
+  boxSizer2->Add(triangleCountText, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+
+  this->triangleCountCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+  boxSizer2->Add(this->triangleCountCtrl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 1);
 
 
   boxSizer1->Add(boxSizer2,0,wxEXPAND,5);
@@ -132,6 +143,7 @@ void RenderPanel::MyUpdate()
     return;
 
   float fps = cam->GetAvgFPS();
+  int triangleCount = cam->GetTriangleCount();
   common::Pose3d pose = cam->GetWorldPose();
 
   wxString str;
@@ -174,6 +186,9 @@ void RenderPanel::MyUpdate()
 
   str.Printf(wxT("%6.2f"), fps);
   this->fpsCtrl->SetValue(str);
+
+  str.Printf(wxT("%d"), triangleCount);
+  this->triangleCountCtrl->SetValue( str );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

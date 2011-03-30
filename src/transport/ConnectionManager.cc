@@ -59,7 +59,7 @@ void ConnectionManager::Init(const std::string &master_host,
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
-      std::cout << "INITIALIZED...I should do something with this info\n";
+      std::cout << "Connected to gazebo master @ " << this->masterConn->GetRemoteURI() << "\n";
     }
     else
     {

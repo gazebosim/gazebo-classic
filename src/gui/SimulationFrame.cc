@@ -139,7 +139,7 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
 
   Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(SimulationFrame::OnPaneClosed), NULL, this);
 
-  this->connections.push_back( event::Events::ConnectQuitSignal( boost::bind(&SimulationFrame::Quit, this) ) );
+  /*this->connections.push_back( event::Events::ConnectQuitSignal( boost::bind(&SimulationFrame::Quit, this) ) );
 
   this->connections.push_back( event::Events::ConnectPauseSignal( boost::bind(&SimulationFrame::OnPause, this, _1) ) );
 
@@ -149,6 +149,7 @@ SimulationFrame::SimulationFrame(wxWindow *parent)
   this->connections.push_back( event::Events::ConnectSetSelectedEntitySignal( boost::bind(&SimulationFrame::SetSelectedEntityCB, this, _1) ) );
 
   this->connections.push_back( event::Events::ConnectMoveModeSignal( boost::bind(&SimulationFrame::MoveModeCB, this, _1) ) );
+  */
 
   this->auiManager->Update();
 

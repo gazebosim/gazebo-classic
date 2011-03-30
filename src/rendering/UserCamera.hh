@@ -79,15 +79,13 @@ namespace gazebo
       /// \brief Set the dimensions of the viewport
       public: void SetViewportDimensions(float x, float y, float w, float h);
   
-      /// \brief Get the average FPS
-      public: virtual float GetAvgFPS();
-  
-      /// \brief Get the triangle count
-      public: unsigned int GetTriangleCount();
-  
-      /// \brief Get the ogre window
-      public: Ogre::RenderWindow *GetWindow();
-  
+      /// \brief Get the average frames per second
+      public: float GetAvgFPS() const;
+
+      /// \brief Get the triangle count 
+      public: float GetTriangleCount() const;
+
+
       /// \brief Move the camera to focus on a scene node
       public: void MoveToVisual(Visual *visual);
   
@@ -100,11 +98,7 @@ namespace gazebo
       /// \brief Set whether to show the visual
       private: void ShowVisual(bool s);
   
-      /// Pointer to the render window
-      private: Ogre::RenderWindow *window;
-  
       private: std::string name;
-      private: static unsigned int cameraCount;
       private: static int count;
   
       private: Visual *visual;

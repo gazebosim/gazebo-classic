@@ -93,7 +93,13 @@ namespace gazebo
     
       /// Finalize the camera
       public: void Fini();
-  
+
+      /// \brief Set the ID of the window this camera is rendering into.
+      public: void SetWindowId( unsigned int windowId );
+
+      /// \brief Get the ID of the window this camera is rendering into.
+      public: unsigned int GetWindowId() const;
+
       /// \brief Set the scene this camera is viewing
       public: void SetScene( Scene *scene );
   
@@ -266,6 +272,7 @@ namespace gazebo
       private: void CreateCamera();
   
       private: std::string name;
+      protected: unsigned int windowId;
   
       protected: common::ParamT<common::Angle> *hfovP;
       protected: common::ParamT<double> *nearClipP, *farClipP, *updateRateP;

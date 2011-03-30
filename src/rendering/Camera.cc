@@ -47,7 +47,7 @@ unsigned int Camera::cameraCounter = 0;
 // Constructor
 Camera::Camera(const std::string &namePrefix, Scene *scene)
 {
-  std::cout << "Camera constructor\n";
+  this->windowId = 0;
   this->scene = scene;
 
   this->textureWidth = this->textureHeight = 0;
@@ -239,6 +239,20 @@ void Camera::Init()
 // Finalize the camera
 void Camera::Fini()
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Set the ID of the window this camera is rendering into.
+void Camera::SetWindowId( unsigned int windowId )
+{
+  this->windowId = windowId;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the ID of the window this camera is rendering into.
+unsigned int Camera::GetWindowId() const
+{
+  return this->windowId;
 }
 
 //////////////////////////////////////////////////////////////////////////////

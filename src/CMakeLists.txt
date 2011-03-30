@@ -30,9 +30,9 @@ add_dependencies( gazebo_common gazebo_msgs )
 add_dependencies( gazebo_gui gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )
 
-add_executable(gazebo_server server.cc PhysicsServer.cc)
-add_executable(gazebo_client client.cc GuiClient.cc)
-add_executable(gazebo_master master.cc Master.cc)
+add_executable(gzserver physics_server.cc PhysicsServer.cc)
+add_executable(gzclient gui_client.cc GuiClient.cc)
+add_executable(gzmaster master.cc Master.cc)
 
 #set_source_files_properties(server.cc client.cc PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
 
@@ -44,9 +44,9 @@ add_executable(gazebo_master master.cc Master.cc)
 #    set_target_properties( gazebo_client PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
 #endif ()
 
-set_target_properties( gazebo_client PROPERTIES LINK_FLAGS "${ogre_ldflags}")
+set_target_properties( gzclient PROPERTIES LINK_FLAGS "${ogre_ldflags}")
 
-target_link_libraries( gazebo_master gazebo_common
+target_link_libraries( gzmaster gazebo_common
                                      gazebo_transport
                                      gazebo_msgs
                                      ${XML_LIBRARIES}
@@ -55,20 +55,20 @@ target_link_libraries( gazebo_master gazebo_common
                                      ${assimp_libraries}
                                      ${PROTOBUF_LIBRARY})
 
-target_link_libraries( gazebo_server gazebo_common
+target_link_libraries( gzserver gazebo_common
                                      gazebo_transport
                                      gazebo_physics
                                      gazebo_msgs
                                      assimp
                                      pthread)
 
-target_link_libraries( gazebo_client gazebo_common
+target_link_libraries( gzclient gazebo_common
                                      gazebo_transport
                                      gazebo_gui
                                      gazebo_rendering
                                      gazebo_msgs
                                      pthread)
 
-install (TARGETS gazebo_master DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install (TARGETS gazebo_server DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install (TARGETS gazebo_client DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install (TARGETS gzmaster DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install (TARGETS gzserver DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install (TARGETS gzclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

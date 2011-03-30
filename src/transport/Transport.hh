@@ -28,8 +28,20 @@ namespace gazebo
 {
   namespace transport
   {
+
+    /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
+    /// environment variable
+    /// \param master_host The hostname of the master is set to this param
+    /// \param master_port The port of the master is set to this param
+    /// \return False if the GAZEBO_MASTER_URI was not found
+    bool get_master_uri(std::string &master_host, unsigned short &master_port);
+
     /// \brief Initialize the transport system
-    void init(const std::string &master_host, unsigned short master_port);
+    /// \param master_host The hostname or IP of the master. Leave empty to
+    ///                    use pull address from the GAZEBO_MASTER_URI env var.
+    /// \param master_port The port  of the master. Leave empty to
+    ///                    use pull address from the GAZEBO_MASTER_URI env var.
+    void init(const std::string &master_host="", unsigned short master_port=0);
 
     /// \brief Set the global topic namespace
     void set_topic_namespace(const std::string &space);

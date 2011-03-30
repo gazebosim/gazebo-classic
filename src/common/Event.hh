@@ -46,6 +46,10 @@ namespace gazebo
       public: int Id() const;
       private: Event *event;
       private: int id;
+
+      private: static int counter;
+      private: int uniqueId;
+
       public: template<typename T> friend class EventT;
     };
     

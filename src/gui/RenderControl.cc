@@ -74,18 +74,19 @@ RenderControl::RenderControl(wxWindow *parent)
   Connect( wxEVT_KEY_DOWN, wxKeyEventHandler(RenderControl::OnKeyDown), NULL, this);
 
 
-  this->connections.push_back( event::Events::ConnectCreateEntitySignal( boost::bind(&RenderControl::CreateEntity, this, _1) ) );
+  /*this->connections.push_back( event::Events::ConnectCreateEntitySignal( boost::bind(&RenderControl::CreateEntity, this, _1) ) );
   this->connections.push_back( event::Events::ConnectMoveModeSignal( boost::bind(&RenderControl::MoveModeCB, this, _1) ) );
   this->connections.push_back( event::Events::ConnectManipModeSignal( boost::bind(&RenderControl::ManipModeCB, this, _1) ) );
   this->connections.push_back( event::Events::ConnectSetSelectedEntitySignal(
      boost::bind(&RenderControl::SetSelectedEntityCB, this, _1) ) );
+     */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Destructor
 RenderControl::~RenderControl()
 {
-  this->connections.clear();
+  //this->connections.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

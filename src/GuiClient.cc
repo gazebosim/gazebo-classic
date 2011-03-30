@@ -60,7 +60,8 @@ GuiClient::GuiClient()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-  transport::init("localhost", 11345);
+  // Start the transport system by connecting to the master.
+  transport::init();
 }
 
 GuiClient::~GuiClient()

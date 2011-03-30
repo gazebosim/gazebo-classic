@@ -61,6 +61,7 @@ void WindowManager::SetCamera( int windowId, Camera *camera)
 
   camera->SetAspectRatio( ratio );
   camera->GetCamera()->setFOVy(Ogre::Radian(vfov));
+  camera->SetWindowId( windowId );
 
   viewport->setClearEveryFrame(true);
   viewport->setBackgroundColour( Conversions::Color(common::Color(0,0,0)) );
@@ -133,4 +134,26 @@ void WindowManager::Render()
     this->windows[i]->update(false);
     this->windows[i]->swapBuffers();
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the average FPS
+float WindowManager::GetAvgFPS(unsigned int windowId)
+{
+  float lastFPS, avgFPS, bestFPS, worstFPS = 0;
+
+  if (windowId < this->windows.size())
+    this->windows[windowId]->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
+
+  return avgFPS;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the triangle count
+unsigned int WindowManager::GetTriangleCount(unsigned int windowId)
+{
+  if (windowId < this->windows.size())
+    return this->windows[windowId]->getTriangleCount();
+  else
+    return 0;
 }

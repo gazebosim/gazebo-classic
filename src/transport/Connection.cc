@@ -74,8 +74,6 @@ void Connection::Listen(unsigned short port, const AcceptCallback &accept_cb)
   this->acceptor->bind(endpoint);
   this->acceptor->listen();
 
-  std::cout << "Creating a server[" << this->GetLocalAddress() << ":" << this->GetLocalPort() << "]\n";
-
   ConnectionPtr newConnection(new Connection());
 
   this->acceptor->async_accept(newConnection->socket,
@@ -146,6 +144,21 @@ void Connection::Write(const std::string &buffer)
   buffers.push_back(boost::asio::buffer(this->outbound_data));
   boost::asio::async_write( this->socket, buffers, boost::bind(&Connection::OnWrite, this, boost::asio::placeholders::error));
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// Get the local URI
+std::string Connection::GetLocalURI() const
+{
+  return "http://" + this->GetLocalHostname() + ":" + boost::lexical_cast<std::string>(this->GetLocalPort()); 
+}
+              
+////////////////////////////////////////////////////////////////////////////////
+/// Get the remote URI
+std::string Connection::GetRemoteURI() const
+{
+  return "http://" + this->GetRemoteHostname() + ":" + boost::lexical_cast<std::string>(this->GetRemotePort()); 
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handle on write callbacks
@@ -308,7 +321,6 @@ std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint ep) const
   while (iter != end)
   {
     name = (*iter).host_name();
-    std::cerr << (*iter).host_name() << std::endl;
     ++iter;
   } 
 
