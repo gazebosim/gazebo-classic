@@ -13,8 +13,8 @@ message Scene
   optional Color background = 3;
   optional string sky_material = 4;
   optional Shadows shadows = 5;
-  optional Fog fog = 6;
+  optional Fog fog       = 6;
 
   repeated Visual visual = 7;
-  repeated Pose pose = 8;
+  repeated Pose pose     = 8;
 }

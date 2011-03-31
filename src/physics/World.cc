@@ -127,11 +127,13 @@ void World::Load(common::XMLConfigNode *rootNode)//, unsigned int serverId)
 
   common::Message::Init( this->worldStatsMsg, "statistics" );
 
-  this->sceneSub = transport::subscribe("/gazebo/default/publish_scene", &World::PublishScene, this);
-  this->statPub = transport::advertise<msgs::WorldStats>("~/world_stats");
+  this->sceneSub = transport::subscribe("~/publish_scene", &World::PublishScene, this);
   this->scenePub = transport::advertise<msgs::Scene>("~/scene");
+
+  this->statPub = transport::advertise<msgs::WorldStats>("~/world_stats");
   this->visPub = transport::advertise<msgs::Visual>("~/visual");
   this->visSub = transport::subscribe("~/visual", &World::VisualLog, this);
+
   this->selectionPub = transport::advertise<msgs::Selection>("~/selection");
   this->lightPub = transport::advertise<msgs::Light>("~/light");
 
