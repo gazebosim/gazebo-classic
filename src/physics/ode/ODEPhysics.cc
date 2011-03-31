@@ -317,8 +317,7 @@ void ODEPhysics::UpdatePhysics()
   this->UpdateCollision();
   
   // Update the dynamical model
-  if ( !(*physicsStepFunc)(this->worldId, this->stepTimeDouble) )
-    std::cerr << "ODE Physics Step failed\n";
+  (*physicsStepFunc)(this->worldId, this->stepTimeDouble);
 
   // Very important to clear out the contact group
   dJointGroupEmpty( this->contactGroup );

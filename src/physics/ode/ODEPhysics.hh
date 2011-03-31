@@ -235,7 +235,7 @@ namespace gazebo
   
     private: tbb::spin_mutex collideMutex;
 
-    private: int (*physicsStepFunc)(dxWorld*, dReal);
+    private: void (*physicsStepFunc)(dxWorld*, dReal);
   };
   
   
