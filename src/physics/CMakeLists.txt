@@ -1,16 +1,12 @@
-include_directories( 
-  ${XML_INCLUDE_DIRS} 
-  ${PROJECT_BINARY_DIR}/src/msgs
-  ${PROJECT_SOURCE_DIR}/src 
-)
+#include_directories( 
+#  ${XML_INCLUDE_DIRS} 
+#  ${PROJECT_BINARY_DIR}/src/msgs
+#  ${PROJECT_SOURCE_DIR}/src 
+#)
 
 if (INCLUDE_ODE) 
   add_subdirectory(ode)
 endif()
-
-#if (INCLUDE_BULLET) 
-#  add_subdirectory(bullet)
-#endif (INCLUDE_BULLET)
 
 set (sources ${sources}
              Body.cc

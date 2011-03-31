@@ -26,11 +26,20 @@ using namespace gazebo;
 
 /// Get the hostname and port of the master from the GAZEBO_MASTER_URI
 /// environment variable
-bool transport::get_master_uri(std::string &master_host, unsigned short &master_port)
+bool transport::get_master_uri(std::string &master_host, 
+                               unsigned short &master_port)
 {
-  std::string master_uri = getenv("GAZEBO_MASTER_URI");
-  if (master_uri.empty())
+  char *char_uri = getenv("GAZEBO_MASTER_URI");
+
+  // Set to default host and port
+  if (!char_uri)
+  {
+    master_host = "localhost";
+    master_port = 11345;
     return false;
+  }
+
+  std::string master_uri = char_uri;
 
   boost::replace_first(master_uri, "http://", "");
   int last_colon = master_uri.find_last_of(":");

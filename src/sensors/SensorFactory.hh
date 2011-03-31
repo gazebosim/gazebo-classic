@@ -25,6 +25,7 @@
 
 #include <string>
 #include <map>
+
 #include "common/StaticPluginRegister.hh"
 
 namespace gazebo
@@ -70,7 +71,7 @@ namespace gazebo
   #define GZ_REGISTER_STATIC_SENSOR(name, classname) \
   Sensor *New##classname() \
   { \
-    return new classname(body); \
+    return new gazebo::sensors::classname(); \
   } \
   void Register##classname() \
   {\

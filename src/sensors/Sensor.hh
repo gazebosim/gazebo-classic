@@ -17,12 +17,12 @@
 /* Desc: Base class for all sensors
  * Author: Nathan Koenig
  * Date: 25 May 2007
- * SVN: $Id$
  */
 
 #ifndef SENSOR_HH
 #define SENSOR_HH
 
+#include "common/Time.hh"
 #include "common/Param.hh"
 #include "common/Pose3d.hh"
 
@@ -33,11 +33,8 @@ namespace gazebo
     class XMLConfigNode;
   }
 
-  //class Controller;
-
   namespace sensors
   {
-  
     /// \addtogroup gazebo_sensor
     /// \brief Base class for sensors
     /// \{
@@ -65,35 +62,27 @@ namespace gazebo
       public: void Init();
     
       /// \brief  Update the sensor
-      public: void Update();
+      public: virtual void Update();
     
       /// \brief  Finalize the sensor
       public: void Fini();
-  
+
+      /// \brief Get name 
+      public: std::string GetName() const;
+
       /// \brief Get the type of the sensor
       public: std::string GetSensorType(){return typeName;}
   
       /// \brief Get the current pose
       public: virtual common::Pose3d GetPose() const;
   
-      /// \brief Get the name of the interfaces define in the sensor controller
-      public: void GetInterfaceNames(std::vector<std::string>& list) const;
-   
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);
+
       public: bool IsActive();
   
-      /// \brief Get the time of the last update
-      public: common::Time GetLastUpdate();
-  
-      /// \brief  Load the child sensor
-      protected: virtual void LoadChild(common::XMLConfigNode * /*node*/) {};
-    
       /// \brief  Initialize the child
       protected: virtual void InitChild() {};
-    
-      /// \brief  Update the child
-      protected: virtual void UpdateChild() {};
     
       /// \brief Finalize the child
       protected: virtual void FiniChild() {};
@@ -108,11 +97,15 @@ namespace gazebo
   
       /// \brief True if active
       protected: bool active;
+
+      protected: common::Pose3d pose;
   
+      protected: common::ParamT<std::string> *nameP;
       protected: common::ParamT<double> *updateRateP;
       protected: common::ParamT<bool> *alwaysActiveP;
+      protected: std::vector<common::Param*> parameters;
+
       protected: common::Time updatePeriod;
-      protected: common::Time lastUpdate;
       protected: std::string typeName;
     };
     /// \}

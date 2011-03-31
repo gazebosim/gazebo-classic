@@ -1,4 +1,5 @@
 #include <boost/lexical_cast.hpp>
+#include "transport/Transport.hh"
 #include "Master.hh"
 #include "gazebo_config.h"
 
@@ -29,12 +30,13 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  std::string master_uri = getenv("GAZEBO_MASTER_URI");
-  int last_colon = master_uri.find_last_of(":") + 1;
-  std::string port = master_uri.substr(last_colon, master_uri.size() - last_colon);
+  std::string host = "";
+  unsigned short port = 0;
+
+  if ( !gazebo::transport::get_master_uri(host,port) )
 
   master = new gazebo::Master();
-  master->Init(boost::lexical_cast<int>(port));
+  master->Init(port);
   master->Run();
 
   return 1;

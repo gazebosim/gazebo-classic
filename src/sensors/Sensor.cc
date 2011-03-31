@@ -17,40 +17,28 @@
 /* Desc: Base class for all sensors
  * Author: Nathan Koenig
  * Date: 25 May 2007
- * SVN: $Id$
  */
 
 #include "common/Timer.hh"
-#include "Controller.hh"
 #include "common/GazeboMessage.hh"
 #include "common/GazeboError.hh"
-#include "Body.hh"
 #include "common/XMLConfig.hh"
-#include "World.hh"
-#include "ControllerFactory.hh"
-#include "Simulator.hh"
-#include "Sensor.hh"
-#include "Simulator.hh"
-#include "PhysicsEngine.hh"
-#include "common/Global.hh"
+
+#include "sensors/Sensor.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor
-Sensor::Sensor(Body *body)
-    : Entity(body)
+Sensor::Sensor()
 {
-  this->body = body;
-  this->controller = NULL;
   this->active = true;
 
-  this->lastUpdate = this->GetWorld()->GetSimTime();
-
-  Param::Begin(&this->parameters);
-  this->updateRateP = new ParamT<double>("update_rate", 0, 0);
-  this->alwaysActiveP = new ParamT<bool>("always_active", false, 0);
-  Param::End();
+  common::Param::Begin(&this->parameters);
+  this->updateRateP = new common::ParamT<double>("update_rate", 0, 0);
+  this->alwaysActiveP = new common::ParamT<bool>("always_active", false, 0);
+  common::Param::End();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +51,7 @@ Sensor::~Sensor()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Load the sensor
-void Sensor::Load(XMLConfigNode *node)
+void Sensor::Load(common::XMLConfigNode *node)
 {
   this->nameP->Load(node);
   this->updateRateP->Load(node);
@@ -75,14 +63,12 @@ void Sensor::Load(XMLConfigNode *node)
     this->updatePeriod = 1.0 / **(updateRateP);
 
   this->LoadController( node->GetChild("controller") );
-  this->LoadChild(node);
 
   double updateRate  = node->GetDouble("updateRate", 0, 0);
   if (updateRate == 0)
     this->updatePeriod = 0.0; // no throttling if updateRate is 0
   else
     this->updatePeriod = 1.0 / updateRate;
-  this->lastUpdate = this->GetWorld()->GetSimTime();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,9 +83,6 @@ void Sensor::Save(std::string &prefix, std::ostream &stream)
 
   this->SaveChild(prefix, stream);
 
-  if (this->controller)
-    this->controller->Save(p, stream);
-
   stream << prefix << "</sensor:" << this->typeName << ">\n";
 }
  
@@ -107,11 +90,6 @@ void Sensor::Save(std::string &prefix, std::ostream &stream)
 /// Initialize the sensor
 void Sensor::Init()
 {
-  if (this->controller)
-    this->controller->Init();
-
-  this->lastUpdate = this->GetWorld()->GetSimTime();
-
   this->InitChild();
 }
 
@@ -121,32 +99,39 @@ void Sensor::Update()
 {
   //DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
 
-  Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();
+  //Time physics_dt = this->GetWorld()->GetPhysicsEngine()->GetStepTime();
 
-  if (((this->GetWorld()->GetSimTime() - this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
+  //if (((this->GetWorld()->GetSimTime() - this->lastUpdate - this->updatePeriod)/physics_dt) >= 0)
   {
-    this->UpdateChild();
-    this->lastUpdate = this->GetWorld()->GetSimTime();
+    //this->lastUpdate = this->GetWorld()->GetSimTime();
   }
 
   // update any controllers that are children of sensors, e.g. ros_bumper
-  if (this->controller)
-    this->controller->Update();
+  //if (this->controller)
+    //this->controller->Update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Finalize the sensor
 void Sensor::Fini()
 {
-  if (this->controller)
-    this->controller->Fini();
+  //if (this->controller)
+    //this->controller->Fini();
   this->FiniChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Load a controller helper function
-void Sensor::LoadController(XMLConfigNode *node)
+/// Get name 
+std::string Sensor::GetName() const
 {
+  return **this->nameP;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// Load a controller helper function
+void Sensor::LoadController(common::XMLConfigNode *node)
+{
+  /*
   if (!node)
   {
     gzmsg(0) << this->GetName() << " sensor has no controller.\n";
@@ -165,26 +150,26 @@ void Sensor::LoadController(XMLConfigNode *node)
   std::string controllerName = node->GetString("name","",1);
 
   // Create the interface
-  /*if ( (childNode = node->GetChildByNSPrefix("interface")) )
-  {
-    // Get the type of the interface (eg: laser)
-    std::string ifaceType = childNode->GetName();
+  //if ( (childNode = node->GetChildByNSPrefix("interface")) )
+  //{
+  //  // Get the type of the interface (eg: laser)
+  //  std::string ifaceType = childNode->GetName();
 
-    // Get the name of the iface
-    std::string ifaceName = childNode->GetString("name","",1);
+  //  // Get the name of the iface
+  //  std::string ifaceName = childNode->GetString("name","",1);
 
-    // Use the factory to get a new iface based on the type
-    iface = IfaceFactory::NewIface(ifaceType);
+  //  // Use the factory to get a new iface based on the type
+  //  iface = IfaceFactory::NewIface(ifaceType);
 
-    // Create the iface
-    iface->Create(this->GetWorld()->GetGzServer(), ifaceName);
+  //  // Create the iface
+  //  iface->Create(this->GetWorld()->GetGzServer(), ifaceName);
 
-  }
-  else
-  {
-    stream << "No interface defined for " << controllerName << "controller";
-    gzthrow(stream.str());
-  }*/
+  //}
+  //else
+  //{
+  //  stream << "No interface defined for " << controllerName << "controller";
+  //  gzthrow(stream.str());
+  //}
   
   // See if the controller is in a plugin
   std::string pluginName = node->GetString("plugin","",0);
@@ -196,6 +181,7 @@ void Sensor::LoadController(XMLConfigNode *node)
 
   // Load the controller if it's available
   if (this->controller) this->controller->Load(node);
+  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -214,23 +200,7 @@ bool Sensor::IsActive()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the current pose
-Pose3d Sensor::GetPose() const
+common::Pose3d Sensor::GetPose() const
 {
-  return this->body->GetWorldPose();
+  return this->pose;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-/// Get the name of the interfaces define in the sensor controller
-void Sensor::GetInterfaceNames(std::vector<std::string>& list) const
-{
-  controller->GetInterfaceNames(list);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-/// Get the time of the last update
-Time Sensor::GetLastUpdate()
-{
-  return this->lastUpdate;
-}
-
-

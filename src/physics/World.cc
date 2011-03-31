@@ -35,8 +35,6 @@
 #include "common/GazeboMessage.hh"
 #include "common/XMLConfig.hh"
 
-//#include "sensor/SensorManager.hh"
-
 #include "physics/Body.hh"
 #include "physics/PhysicsEngine.hh"
 #include "physics/PhysicsFactory.hh"
@@ -404,9 +402,6 @@ void World::Update()
   // Update the physics engine
   if (this->physicsEngine)
     this->physicsEngine->UpdatePhysics();
-
-  /// Update all the sensors
-  //SensorManager::Instance()->Update();
 
   //this->factoryIfaceHandler->Update();
 

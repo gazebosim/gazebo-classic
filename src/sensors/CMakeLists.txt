@@ -1,21 +1,29 @@
-include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include_directories( . )
 
-ADD_SUBDIRECTORY(camera)
-ADD_SUBDIRECTORY(contact)
-ADD_SUBDIRECTORY(imu)
-ADD_SUBDIRECTORY(ray)
-ADD_SUBDIRECTORY(ir)
-
-SET (sources Sensor.cc
+set (sources Sensor.cc
              SensorFactory.cc
              SensorManager.cc
+             CameraSensor.cc
 ) 
 
-SET (headers Sensor.hh
+set (headers Sensor.hh
              SensorFactory.hh
              SensorManager.hh
+             CameraSensor.hh
 )
 
-#ADD_LIBRARY(gazebo_sensors STATIC ${gazebosensor_sources} ${sources})
-APPEND_TO_SERVER_SOURCES(${sources})
-APPEND_TO_SERVER_HEADERS(${headers})
+add_library(gazebo_sensors SHARED ${sources})
+
+if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+  set_source_files_properties(${sources} PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+  set_target_properties(gazebo_sensors PROPERTIES LINK_FLAGS 
+    ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}})
+endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
+
+target_link_libraries(gazebo_sensors gazebo_common 
+                                     ${libtool_library} 
+                                     ${boost_libraries})
+
+install ( TARGETS gazebo_sensors DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
+install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/sensors COMPONENT headers)

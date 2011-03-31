@@ -25,6 +25,7 @@ add_subdirectory(libgazebo)
 add_subdirectory(rendering)
 add_subdirectory(gui)
 add_subdirectory(physics)
+add_subdirectory(sensors)
 
 add_dependencies( gazebo_common gazebo_msgs )
 add_dependencies( gazebo_gui gazebo_msgs )
@@ -34,40 +35,31 @@ add_executable(gzserver physics_server.cc PhysicsServer.cc)
 add_executable(gzclient gui_client.cc GuiClient.cc)
 add_executable(gzmaster master.cc Master.cc)
 
-#set_source_files_properties(server.cc client.cc PROPERTIES COMPILE_FLAGS "${GAZEBO_CFLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
+#set_target_properties( gzclient PROPERTIES LINK_FLAGS "${ogre_ldflags}")
 
-#if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-#  set_target_properties( gazebo_server PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-#  set_target_properties( gazebo_client PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-#else (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
-#    set_target_properties( gazebo_server PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
-#    set_target_properties( gazebo_client PROPERTIES LINK_FLAGS "${LINK_FLAGS} ${gazebo_lflags}")
-#endif ()
-
-set_target_properties( gzclient PROPERTIES LINK_FLAGS "${ogre_ldflags}")
 
 target_link_libraries( gzmaster gazebo_common
-                                     gazebo_transport
-                                     gazebo_msgs
-                                     ${XML_LIBRARIES}
-                                     ${boost_libraries}
-                                     ${freeimage_library}
-                                     ${assimp_libraries}
-                                     ${PROTOBUF_LIBRARY})
+                                gazebo_transport
+                                gazebo_msgs
+                                ${XML_LIBRARIES}
+                                ${boost_libraries}
+                                ${freeimage_library}
+                                ${assimp_libraries}
+                                ${PROTOBUF_LIBRARY})
 
 target_link_libraries( gzserver gazebo_common
-                                     gazebo_transport
-                                     gazebo_physics
-                                     gazebo_msgs
-                                     assimp
-                                     pthread)
+                                gazebo_transport
+                                gazebo_physics
+                                gazebo_msgs
+                                assimp
+                                pthread)
 
 target_link_libraries( gzclient gazebo_common
-                                     gazebo_transport
-                                     gazebo_gui
-                                     gazebo_rendering
-                                     gazebo_msgs
-                                     pthread)
+                                gazebo_transport
+                                gazebo_gui
+                                gazebo_rendering
+                                gazebo_msgs
+                                pthread)
 
 install (TARGETS gzmaster DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gzserver DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

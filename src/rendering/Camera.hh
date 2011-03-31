@@ -19,8 +19,8 @@
  * Date: 15 July 2003
  */
 
-#ifndef CAMERASENSOR_HH
-#define CAMERASENSOR_HH
+#ifndef RENDERING_CAMERA_HH
+#define RENDERING_CAMERA_HH
 
 #include "common/Event.hh"
 #include "common/Param.hh"

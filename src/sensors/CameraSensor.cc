@@ -14,65 +14,53 @@
  * limitations under the License.
  *
 */
-
 /* Desc: A camera sensor using OpenGL
  * Author: Nate Koenig
  * Date: 15 July 2003
- * CVS: $Id$
  */
 
 #include <sstream>
-#include <OgreImageCodec.h>
 
 #include "common/Events.hh"
-#include "Controller.hh"
 #include "common/Global.hh"
-#include "World.hh"
 #include "common/GazeboError.hh"
-#include "Body.hh"
-#include "rendering/Visual.hh"
-#include "Simulator.hh"
 
-#include "SensorFactory.hh"
-#include "MonoCameraSensor.hh"
-#include "rendering/Scene.hh"
-#include "Simulator.hh"
+#include "rendering/Camera.hh"
+
+#include "sensors/SensorFactory.hh"
+#include "sensors/CameraSensor.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
-GZ_REGISTER_STATIC_SENSOR("camera", MonoCameraSensor);
-
+GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor);
+ 
 //////////////////////////////////////////////////////////////////////////////
 // Constructor
-MonoCameraSensor::MonoCameraSensor(Body *body)
-    : Sensor(body)
+CameraSensor::CameraSensor()
+    : Sensor()
 {
-  this->camera = this->GetWorld()->GetScene()->CreateCamera("Mono");
+  //this->camera = this->GetWorld()->GetScene()->CreateCamera("Mono");
 
   this->typeName = "monocamera";
   this->camera->SetCaptureData(true);
 
-  event::Events::ConnectRenderSignal( boost::bind(&MonoCameraSensor::Render, this) );
+  event::Events::ConnectRenderSignal( boost::bind(&CameraSensor::Render, this) );
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 // Destructor
-MonoCameraSensor::~MonoCameraSensor()
+CameraSensor::~CameraSensor()
 {
-}
-
-//////////////////////////////////////////////////////////////////////////////
-/// Get the camera
-Camera *MonoCameraSensor::GetCamera()
-{
-  return this->camera;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Load the camera
-void MonoCameraSensor::LoadChild( XMLConfigNode *node )
+void CameraSensor::Load( common::XMLConfigNode *node )
 {
+  Sensor::Load(node);
+
   this->camera->Load( node );
 
   // Do some sanity checks
@@ -89,7 +77,7 @@ void MonoCameraSensor::LoadChild( XMLConfigNode *node )
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save the sensor info in XML format
-void MonoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
+void CameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 {
   std::string p = prefix + "  ";
   this->camera->Save(p, stream);
@@ -97,7 +85,7 @@ void MonoCameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
 
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
-void MonoCameraSensor::InitChild()
+void CameraSensor::InitChild()
 {
   // NATY: Put this back in!!
   // this->camera->SetSceneNode( this->GetVisualNode()->GetSceneNode() );
@@ -106,14 +94,14 @@ void MonoCameraSensor::InitChild()
 
 //////////////////////////////////////////////////////////////////////////////
 // Finalize the camera
-void MonoCameraSensor::FiniChild()
+void CameraSensor::FiniChild()
 {
   this->camera->Fini();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Set whether the sensor is active or not
-void MonoCameraSensor::SetActive(bool value)
+void CameraSensor::SetActive(bool value)
 {
   Sensor::SetActive(value);
   this->camera->SetRenderingEnabled(value);
@@ -121,20 +109,24 @@ void MonoCameraSensor::SetActive(bool value)
 
 //////////////////////////////////////////////////////////////////////////////
 // Render new data
-void MonoCameraSensor::Render()
+void CameraSensor::Render()
 {
+  /*
   if (this->active || **this->alwaysActiveP)
   {
     this->lastUpdate = this->GetWorld()->GetSimTime();
     this->camera->Render();
     this->camera->PostRender();
   }
+  */
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void MonoCameraSensor::UpdateChild()
+void CameraSensor::Update()
 {
+  Sensor::Update();
+
   // NATY
   //if (this->active || **this->alwaysActiveP)
     //this->camera->Update();

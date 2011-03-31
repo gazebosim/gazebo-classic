@@ -18,13 +18,13 @@
  * Desc: Class to manager all sensors
  * Author: Nate Koenig
  * Date: 18 Dec 2009
- * SVN info: $Id$
  */
 
 #include "Sensor.hh"
 #include "SensorManager.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Constructor

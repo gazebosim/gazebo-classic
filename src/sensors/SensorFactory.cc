@@ -18,7 +18,6 @@
  * Desc: Factory for creating sensor
  * Author: Andrew Howard
  * Date: 18 May 2003
- * SVN info: $Id$
  */
 
 #include "Sensor.hh"
@@ -26,6 +25,7 @@
 #include "SensorFactory.hh"
 
 using namespace gazebo;
+using namespace sensors;
 
 std::map<std::string, SensorFactoryFn> SensorFactory::sensors;
 

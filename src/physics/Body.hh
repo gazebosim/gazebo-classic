@@ -39,11 +39,6 @@ namespace gazebo
     class XMLConfigNode;
   }
 
-  /*namespace sensors
-  {
-    class Sensor;
-  }*/
-
 	namespace physics
   {
     class Model;
@@ -188,19 +183,9 @@ namespace gazebo
       /// \brief Set the mass of the body
       public: void SetMass(Mass mass);
   
-      /// \brief Get the list of interfaces e.g "pioneer2dx_model1::laser::laser_iface0->laser"
-      public: void GetInterfaceNames(std::vector<std::string>& list) const;
-  
-      /// \brief Get a sensor by name
-      //public: sensors::Sensor *GetSensor( const std::string &name ) const;
-  
       /// Load a new geom helper function
       /// \param node common::XMLConfigNode used to load the geom
       private: void LoadGeom(common::XMLConfigNode *node);
-  
-      /// Load a new sensor
-      /// \param node common::XMLConfigNode used to load the geom
-      private: void LoadSensor(common::XMLConfigNode *node);
   
       /// \brief Load a renderable
       private: void LoadVisual(common::XMLConfigNode *node);
@@ -210,9 +195,6 @@ namespace gazebo
   
       /// \brief Set transparency for all child geometries
       public: void SetTransparent(const bool &show);
-  
-      /// \brief Returns list of sensors
-      //public:  std::vector< sensors::Sensor* > &GetSensors();
   
       /// \brief  Get the size of the body
       public: void GetBoundingBox(common::Vector3 &min, common::Vector3 &max) const;
@@ -250,9 +232,6 @@ namespace gazebo
   
       /// List of geometries attached to this body
       protected: std::map< std::string, Geom* > geoms;
-  
-      /// List of attached sensors
-      //protected: std::vector< sensors::Sensor* > sensors;
   
       /// Mass properties of the object
       protected: Mass mass;

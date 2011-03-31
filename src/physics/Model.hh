@@ -48,11 +48,6 @@ namespace gazebo
     class Common;
   }
 
-  namespace sensor
-  {
-    class Sensor;
-  }
-
 	namespace physics
   {
     class Body;
@@ -177,12 +172,6 @@ namespace gazebo
       /// \brief Get a body by name
       /// \return Pointer to the body
       public: Body *GetBody(const std::string &name);
-  
-      /// \brief Get a map of all the bodies
-      //public: const std::map<std::string, Body*> *GetBodies() const;
-  
-      /// \brief Get a sensor by name
-      //public: sensors::Sensor *GetSensor(const std::string &name) const;
   
       /// \brief Get a geom by name
       public: Geom *GetGeom(const std::string &name) const;

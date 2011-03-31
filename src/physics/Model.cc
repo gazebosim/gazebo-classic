@@ -910,26 +910,6 @@ Body *Model::GetBody()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// Get a sensor by name
-/*sensors::Sensor *Model::GetSensor(const std::string &name) const
-{
-  sensors::Sensor *sensor = NULL;
-  std::vector< Common* >::const_iterator biter;
-
-  for (biter=this->children.begin(); biter != this->children.end(); biter++)
-  {
-    if ( *biter && (*biter)->HasType(BODY))
-    {
-      Body *body = (Body*)*biter;
-      if ((sensor = body->GetSensor(name)) != NULL)
-        break;
-    }
-  }
-
-  return sensor;
-}*/
- 
-////////////////////////////////////////////////////////////////////////////////
 /// Get a geom by name
 Geom *Model::GetGeom(const std::string &name) const
 {
