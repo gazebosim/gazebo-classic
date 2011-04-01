@@ -96,6 +96,11 @@ Pose3d ImuSensor::GetVelocity()
   return this->imuVel;
 }
 
+Vector3 ImuSensor::GetEulerAngles()
+{
+  return this->eulerAngles;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Update the sensor information
 void ImuSensor::UpdateChild()
@@ -138,5 +143,6 @@ void ImuSensor::UpdateChild()
     this->imuVel.rot.y = velocity.y;
     this->imuVel.rot.z = velocity.z;
 
+    this->eulerAngles = rot;
   }
 }
