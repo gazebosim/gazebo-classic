@@ -102,11 +102,14 @@ void ContactSensor::InitChild()
     if (!geom)
     {
       std::cerr << "Unable to find geom[" << **(*iter) << "] inbody[" 
-                << this->body->GetName() << "]\n";
+                << this->body->GetName() << "]" << std::endl;
+      std::cerr << "Body geoms: " << std::endl;
       for (unsigned int i=0; i < this->body->GetGeomCount(); i++)
       {
-        std::cerr << "Geom[" << this->body->GetGeom(i)->GetName() << "]\n";
+        std::cerr << "\tGeom[" << this->body->GetGeom(i)->GetName() << "]" << std::endl;
       }
+
+      continue;
     }
     geom->SetContactsEnabled(true);
     this->geoms.push_back(geom);
@@ -120,7 +123,7 @@ void ContactSensor::SaveChild(std::string &prefix, std::ostream &stream)
   std::vector< ParamT<std::string> *>::iterator iter;
 
   for (iter = this->geomNamesP.begin(); iter != this->geomNamesP.end(); iter++)
-    stream << prefix << "  " << *(iter) << "\n";
+    stream << prefix << "  " << *(iter) << std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////////////
