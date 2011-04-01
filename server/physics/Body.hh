@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 
+#include "gazebo_config.h"
 #include "Entity.hh"
 #include "Pose3d.hh"
 #include "Param.hh"
@@ -116,7 +117,7 @@ namespace gazebo
     /// \brief Set the laser fiducial integer id
     public: void SetLaserFiducialId(int id);
 
-   /// \brief Set the laser retro reflectiveness
+    /// \brief Set the laser retro reflectiveness
     public: void SetLaserRetro(float retro);
 
     /// \brief Set the linear velocity of the body
@@ -294,6 +295,16 @@ namespace gazebo
     /// \brief Map of the controllers
     protected: std::map<std::string, Controller* > controllers;
   
+#if ODE_CONTACT_BODY_MAXVEL
+    /// local contact interpenetration parameters
+    protected: ParamT<double> *maxVelP ;
+    protected: ParamT<double> *minDepthP ;
+
+    /// local contact interpenetration parameters
+    public: virtual void SetMaxVel(double maxVel) = 0;
+    public: virtual void SetMinDepth(double minDepth) = 0;
+#endif
+
     ///  User specified Mass Matrix
     protected: ParamT<bool> *customMassMatrixP;
     protected: ParamT<double> *cxP ;

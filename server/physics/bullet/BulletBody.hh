@@ -27,6 +27,7 @@
 #ifndef BulletBODY_HH
 #define BulletBODY_HH
 
+#include "GazeboError.hh"
 #include "BulletPhysics.hh"
 #include "Body.hh"
 
@@ -117,6 +118,12 @@ namespace gazebo
 
     /// \brief Set the linear damping factor
     public: virtual void SetLinearDamping(double damping);
+
+#if ODE_CONTACT_BODY_MAXVEL
+    /// local contact interpenetration parameters
+    public: void SetMaxVel(double maxVel) {gzthrow("SetMaxVel not implemented in BulletBody yet!"); };
+    public: void SetMinDepth(double minDepth) { gzthrow("SetMinDepth not implemented in BulletBody yet!"); };
+#endif
 
     /// \brief Set the angular damping factor
     public: virtual void SetAngularDamping(double damping);

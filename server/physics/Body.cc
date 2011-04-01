@@ -78,6 +78,12 @@ Body::Body(Entity *parent)
   // option to make body collide with bodies of the same parent
   this->selfCollideP = new ParamT<bool>("selfCollide", false, 0);
 
+#if ODE_CONTACT_BODY_MAXVEL
+  // local contact interpenetration parameters
+  this->maxVelP = new ParamT<double>("maxVel", -1, 0);
+  this->minDepthP = new ParamT<double>("minDepth", -1, 0);
+#endif
+
   // User can specify mass/inertia property for the body
   this->customMassMatrixP = new ParamT<bool>("massMatrix",false,0);
   this->cxP = new ParamT<double>("cx",0.0,0);
@@ -141,6 +147,12 @@ Body::~Body()
   delete this->dampingFactorP;
   delete this->turnGravityOffP;
   delete this->selfCollideP;
+
+#if ODE_CONTACT_BODY_MAXVEL
+  // local contact interpenetration parameters
+  delete this->maxVelP;
+  delete this->minDepthP;
+#endif
 
   delete this->customMassMatrixP;
   delete this->cxP ;

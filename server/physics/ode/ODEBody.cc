@@ -86,6 +86,16 @@ void ODEBody::Load(XMLConfigNode *node)
 {
   Body::Load(node);
 
+#if ODE_CONTACT_BODY_MAXVEL
+  /// local contact interpenetration parameters
+  this->maxVelP->Load(node);
+  this->minDepthP->Load(node);
+  if (**this->maxVelP >= 0)
+    this->SetMaxVel(**this->maxVelP);
+  if (**this->minDepthP >= 0)
+    this->SetMinDepth(**this->minDepthP);
+#endif
+
   // Update the Center of Mass.
   this->UpdateCoM();
 }
@@ -499,6 +509,25 @@ void ODEBody::SetLinearDamping(double damping)
   if (this->GetODEId())
     dBodySetLinearDamping(this->GetODEId(), damping); 
 }
+
+#if ODE_CONTACT_BODY_MAXVEL
+////////////////////////////////////////////////////////////////////////////////
+/// local contact interpenetration parameters
+void ODEBody::SetMaxVel(double maxVel)
+{
+  std::cout << "maxVel setting " << maxVel << "\n";
+  if (this->GetODEId())
+    dBodySetMaxVel(this->GetODEId(), maxVel); 
+}
+////////////////////////////////////////////////////////////////////////////////
+/// local contact interpenetration parameters
+void ODEBody::SetMinDepth(double minDepth)
+{
+  std::cout << "minDepth setting " << minDepth << "\n";
+  if (this->GetODEId())
+    dBodySetMinDepth(this->GetODEId(), minDepth); 
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Set the angular damping factor

@@ -126,6 +126,12 @@ namespace gazebo
     /// \brief Set the linear damping factor
     public: virtual void SetLinearDamping(double damping);
 
+#if ODE_CONTACT_BODY_MAXVEL
+    /// local contact interpenetration parameters
+    public: virtual void SetMaxVel(double maxVel);
+    public: virtual void SetMinDepth(double minDepth);
+#endif
+
     /// \brief Set the angular damping factor
     public: virtual void SetAngularDamping(double damping);
 
