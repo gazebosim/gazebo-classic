@@ -55,6 +55,7 @@
 
 #include "Timer.hh"
 
+
 using namespace gazebo;
 
 enum SceneTypes{SCENE_BSP, SCENE_EXT};
@@ -495,6 +496,20 @@ void OgreAdaptor::UpdateCameras()
   OgreCreator::Instance()->Update();
   this->root->_fireFrameStarted();
 
+  int idx = 0;
+
+  // Copy camera data to memory (blit)
+  // Only blit for cameras that needed to render in the last render loop
+  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
+  {
+    if (dynamic_cast<UserCamera*>((*iter)) == NULL && capture_cameras_data_[idx++])
+      (*iter)->CaptureData();
+  }
+
+  // Reset all cameras update status to false
+  std::fill(capture_cameras_data_.begin(), capture_cameras_data_.end(), false);
+
+  idx = 0;
   // Draw all the non-user cameras within the same sim time step
   {
     //DIAGNOSTICTIMER(timer("UpdateCameras: Non-UserCamera update",6));
@@ -504,14 +519,15 @@ void OgreAdaptor::UpdateCameras()
     boost::recursive_mutex::scoped_lock model_render_lock(*Simulator::Instance()->GetMRMutex());
     boost::recursive_mutex::scoped_lock model_delete_lock(*Simulator::Instance()->GetMDMutex());
 
+    // Track cameras that need to render this update
     for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
     {
       if (dynamic_cast<UserCamera*>((*iter)) == NULL)
-        (*iter)->Render();
+        capture_cameras_data_[idx++] = (*iter)->Render();
     }
   }
 
-  // Must update the user camera's last.
+  // Must update the user's camera last.
   {
     // this lock is needed if visuals are manipulated in physics loop during updates, do not remove unless
     // alternate check is in place
@@ -521,16 +537,9 @@ void OgreAdaptor::UpdateCameras()
     {
       userCam = dynamic_cast<UserCamera*>((*iter));
       if (userCam)
-        userCam->Update();
+    	  userCam->Update();
     }
   }
-
-  for (iter = this->cameras.begin(); iter != this->cameras.end(); iter++)
-  {
-    if (dynamic_cast<UserCamera*>((*iter)) == NULL)
-      (*iter)->CaptureData();
-  }
-
 
   {
     //DIAGNOSTICTIMER(timer("UpdateCameras: _fireFrameEnded",6));
@@ -664,6 +673,7 @@ Vector3 OgreAdaptor::GetFirstContact(OgreCamera *camera, Vector2<int> mousePos)
 void OgreAdaptor::RegisterCamera( OgreCamera *cam )
 {
   this->cameras.push_back( cam );
+  this->capture_cameras_data_.push_back(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -671,11 +681,14 @@ void OgreAdaptor::RegisterCamera( OgreCamera *cam )
 void OgreAdaptor::UnregisterCamera( OgreCamera *cam )
 {
   std::vector<OgreCamera*>::iterator iter;
-  for(iter=this->cameras.begin();iter != this->cameras.end();iter++)
+  std::vector<bool>::iterator update_iter;
+
+  for(iter=this->cameras.begin(), update_iter=this->capture_cameras_data_.begin();iter != this->cameras.end();iter++, update_iter++)
   {
     if ((*iter) == cam)
     {
       this->cameras.erase(iter);
+      this->capture_cameras_data_.erase(update_iter);
       break;
     }
   }

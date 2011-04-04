@@ -176,6 +176,7 @@ namespace gazebo
     private: std::vector<Param*> parameters;
 
     private: std::vector<OgreCamera*> cameras;
+    private: std::vector<bool> capture_cameras_data_;
 
     private: friend class DestroyerT<OgreAdaptor>;
     private: friend class SingletonT<OgreAdaptor>;

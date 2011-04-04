@@ -102,7 +102,8 @@ OgreCamera::OgreCamera(const std::string &namePrefix)
 
   this->viewController = new FPSViewController(this);
 
-  this->lastRenderTime = Simulator::Instance()->GetSimTime();
+  this->lastRenderTime            = Simulator::Instance()->GetSimTime();
+  this->lastRenderTimeNotCaptured = Simulator::Instance()->GetSimTime();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -410,9 +411,6 @@ void OgreCamera::CaptureData()
     if (!this->saveFrameBuffer)
       this->saveFrameBuffer = new unsigned char[size];
 
-    if (this->simulateDepthData && !this->saveDepthBuffer)
-    	this->saveDepthBuffer = new float[size];
-
     Ogre::Box src_box(0,0,(**this->imageSizeP).x, (**this->imageSizeP).y);
 
     Ogre::PixelBox dst_box((**this->imageSizeP).x, (**this->imageSizeP).y,
@@ -426,6 +424,9 @@ void OgreCamera::CaptureData()
     // Blit the depth buffer if needed
     if (this->simulateDepthData)
     {
+        if (!this->saveDepthBuffer)
+        	this->saveDepthBuffer = new float[size];
+
         pixelBuffer = this->depthTexture->getBuffer(0, 0);
         pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
     	Ogre::PixelBox dpt_box((**this->imageSizeP).x, (**this->imageSizeP).y,
@@ -435,6 +436,8 @@ void OgreCamera::CaptureData()
         pixelBuffer->unlock();
     }
 
+    // Update the last captured render time
+    this->lastRenderTime = this->lastRenderTimeNotCaptured;
 
     if (this->saveFramesP->GetValue())
     {
@@ -445,34 +448,37 @@ void OgreCamera::CaptureData()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Render the camera
-void OgreCamera::Render()
+bool OgreCamera::Render()
 {
   // disable rendering if "-r" option is given
   if (!Simulator::Instance()->GetRenderEngineEnabled())
-    return;
+    return false;
 
   // disable rendering if sensor not set to active
   if (!this->renderingEnabled)
-    return;
+    return false;
 
   Time physics_dt = World::Instance()->GetPhysicsEngine()->GetStepTime();
   if (((Simulator::Instance()->GetSimTime()-this->lastUpdate-this->renderPeriod)/physics_dt) >= 0)
   {
     {
-      //DIAGNOSTICTIMER(timer("OgreCamera::Render(): renderTarget update",6));
-      //boost::recursive_mutex::scoped_lock md_lock(*Simulator::Instance()->GetMDMutex());
-      this->lastRenderTime = Simulator::Instance()->GetSimTime();
+    	// Record the timestamp for the render
+    	this->lastRenderTimeNotCaptured = Simulator::Instance()->GetSimTime();
 
-      this->renderTarget->update();
+    	this->renderTarget->update();
 
-      // produce depth data for the camera
-      if (this->simulateDepthData)
-    	  this->RenderDepthData();
+    	// produce depth data for the camera
+    	if (this->simulateDepthData)
+    		this->RenderDepthData();
     }
 
     this->lastUpdate = Simulator::Instance()->GetSimTime();
+
+    // Return true that we actually rendered this step
+    return true;
   }
 
+  return false;
 }
 
 

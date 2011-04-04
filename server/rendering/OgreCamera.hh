@@ -85,7 +85,8 @@ namespace gazebo
     public: void InitCam();
 
     /// \brief Render the camera
-    public: void Render();
+    /// \return true if camera needed to render
+    public: bool Render();
 
     public: void CaptureData();
 
@@ -251,7 +252,8 @@ namespace gazebo
     /// \brief Hande a mouse event
     public: void HandleMouseEvent(const MouseEvent &evt);
 
-    /// \brief Get the time of the last render update
+    /// \brief Get the time of the last available render update
+    // We only update the available render after the data has been blitted to memory
     public: Time GetLastRenderTime() const;
 
     /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
@@ -327,8 +329,11 @@ namespace gazebo
 
     private: ViewController *viewController;
 
-    protected: Time lastRenderTime;
+    ///\brief This stores last available render time. Time the render completed, but only after the data is blitted to memory
+    private: Time lastRenderTime;
 
+    ///\brief This stores the time the render was completed
+    private: Time lastRenderTimeNotCaptured;
   };
   
   /// \}
