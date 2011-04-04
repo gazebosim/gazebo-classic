@@ -97,13 +97,13 @@ if (PKG_CONFIG_FOUND)
   #     min_depth contact velocity limits      #
   #                                            #
   ##############################################
-  SET(ODE_WG_PATCHES_VERSION 0.11.1.69 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
-  pkg_check_modules(ODE_WG_PATCHES ode>=${ODE_WG_PATCHES_VERSION})
-  IF (NOT ODE_WG_PATCHES_FOUND)
+  SET(ODE_WG_MAXVEL_PATCHES_VERSION 0.11.1.69 CACHE INTERNAL "ODE version with mavel and mindep per body" FORCE)
+  pkg_check_modules(ODE_WG_MAXVEL_PATCHES ode>=${ODE_WG_MAXVEL_PATCHES_VERSION})
+  IF (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
     SET (ODE_CONTACT_BODY_MAXVEL FALSE CACHE BOOL "support for ODE quickstep experimental contact stuff")
-  ELSE (NOT ODE_WG_PATCHES_FOUND)
+  ELSE (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
     SET (ODE_CONTACT_BODY_MAXVEL TRUE CACHE BOOL "support for ODE quickstep experimental contact stuff")
-  ENDIF (NOT ODE_WG_PATCHES_FOUND)
+  ENDIF (NOT ODE_WG_MAXVEL_PATCHES_FOUND)
 
   #################################################
   # Find OGRE 
