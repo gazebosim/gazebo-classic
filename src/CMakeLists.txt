@@ -34,9 +34,7 @@ add_dependencies( gazebo_rendering gazebo_msgs )
 add_executable(gzserver physics_server.cc PhysicsServer.cc)
 add_executable(gzclient gui_client.cc GuiClient.cc)
 add_executable(gzmaster master.cc Master.cc)
-
-#set_target_properties( gzclient PROPERTIES LINK_FLAGS "${ogre_ldflags}")
-
+add_executable(gzsensor sensors.cc Sensors.cc)
 
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport
@@ -61,6 +59,13 @@ target_link_libraries( gzclient gazebo_common
                                 gazebo_msgs
                                 pthread)
 
+target_link_libraries( gzsensor gazebo_sensors
+                                gazebo_transport
+                                gazebo_rendering
+                                gazebo_msgs)
+                                
+
 install (TARGETS gzmaster DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gzserver DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gzclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install (TARGETS gzsensor DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
