@@ -66,10 +66,9 @@ OgreAdaptor::OgreAdaptor()
 {
   // Create a new log manager and prevent output from going to stdout
   this->logManager = new Ogre::LogManager();
-  this->logManager->createLog("Ogre.log", true, false, false);
+  this->logManager->createLog("Ogre.log", true, false, true);
 
   this->backgroundColor=NULL;
-  this->logManager=NULL;
   this->sceneMgr=NULL;
   this->root=NULL;
 

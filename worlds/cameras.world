@@ -74,7 +74,6 @@
     </body:box>
   </model:physical>
 
-  <!--
   <model:physical name="camera">
     <xyz> 0 0 5 </xyz>
     <static>true</static>
@@ -137,7 +136,6 @@
     </sensor:camera>
     </body:box>
   </model:physical>
-  -->
   
 <!--
   <model:physical name="pr2">
