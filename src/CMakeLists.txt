@@ -36,6 +36,7 @@ add_executable(gzserver physics_server.cc PhysicsServer.cc)
 add_executable(gzclient gui_client.cc GuiClient.cc)
 add_executable(gzmaster master.cc Master.cc)
 add_executable(gzsensor sensor_server.cc SensorServer.cc)
+add_executable(gzcombined combined.cc Combined.cc)
 
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport
@@ -45,6 +46,16 @@ target_link_libraries( gzmaster gazebo_common
                                 ${freeimage_library}
                                 ${assimp_libraries}
                                 ${PROTOBUF_LIBRARY})
+
+target_link_libraries( gzcombined gazebo_common
+                                  gazebo_transport
+                                  gazebo_physics
+                                  gazebo_sensors
+                                  gazebo_rendering
+                                  gazebo_msgs
+                                  assimp
+                                  pthread)
+
 
 target_link_libraries( gzserver gazebo_common
                                 gazebo_transport
@@ -72,3 +83,4 @@ install (TARGETS gzmaster DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gzserver DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gzclient DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install (TARGETS gzsensor DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install (TARGETS gzcombined DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

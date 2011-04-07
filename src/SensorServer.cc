@@ -55,6 +55,9 @@ SensorServer::SensorServer()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
+  // Start the transport system by connecting to the master.
+  transport::init();
+
   /// Init the sensors library
   sensors::init("default");
 }

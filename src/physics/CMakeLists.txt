@@ -31,6 +31,7 @@ set (sources ${sources}
              Entity.cc
              World.cc
              Model.cc
+             Physics.cc
 ) 
 
 set (headers ${headers}
@@ -62,6 +63,8 @@ set (headers ${headers}
              Entity.hh
              World.hh
              Model.hh
+             Physics.hh
+             PhysicsTypes.hh
 )
 
 add_library(gazebo_physics SHARED ${sources})

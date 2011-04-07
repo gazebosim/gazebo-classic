@@ -102,10 +102,12 @@ SubscriberPtr TopicManager::Subscribe(const SubscribeOptions &ops)
   // If the publication exits, just add the subscription to it 
   if (pub)
   {
+    std::cout << "LOCAL CONNECTION\n";
     pub->AddSubscription( subscription );
   }
   else
   {
+    std::cout << "NOT LOCAL CONNECTION\n";
     // Otherwise subscribe to the remote topic
     ConnectionManager::Instance()->Subscribe(topic, ops.GetMsgType());
   }
@@ -134,6 +136,7 @@ void TopicManager::Unsubscribe( const std::string &topic, CallbackHelperPtr sub)
 void TopicManager::ConnectPubToSub( const std::string &topic,
                                     const SubscriptionTransportPtr &sublink )
 {
+  std::cout << "\n\n CONNECT PUB TO SUB \n\n";
   PublicationPtr publication = this->FindPublication( topic );
   publication->AddSubscription( sublink );
 }
@@ -164,6 +167,9 @@ void TopicManager::ConnectSubscibers(const std::string &topic)
 void TopicManager::ConnectSubToPub( const std::string &topic,
                                     const PublicationTransportPtr &publink )
 {
+
+  std::cout << "\n\n CONNECT SUB TO PUB \n\n";
+
   // Add the publication transport mechanism to the publication.
   if (publink)
   {

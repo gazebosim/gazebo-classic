@@ -1,35 +1,28 @@
-/*
- * Copyright 2011 Nate Koenig & Andrew Howard
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
-*/
-
+#include "common/Timer.hh"
 #include "common/GazeboConfig.hh"
 #include "common/XMLConfig.hh"
-#include "common/GazeboError.hh"
-
-#include "physics/Physics.hh"
 
 #include "transport/Transport.hh"
 
-#include "PhysicsServer.hh"
+#include "sensors/Sensors.hh"
+
+#include "physics/Physics.hh"
+#include "rendering/Rendering.hh"
+
+#include "Combined.hh"
 
 using namespace gazebo;
 
 const std::string default_config =
 "<?xml version='1.0'?>\
 <gazebo>\
+  <config>\
+    <verbosity>4</verbosity>\
+    <gui>\
+      <size>800 600</size>\
+      <pos>0 0</pos>\
+    </gui>\
+  </config>\
   <world name='default'>\
     <scene>\
       <ambient>0.1 0.1 0.1 1</ambient>\
@@ -87,7 +80,8 @@ const std::string default_config =
   </world>\
 </gazebo>";
 
-PhysicsServer::PhysicsServer()
+
+Combined::Combined()
 {
   this->quit = false;
 
@@ -104,23 +98,23 @@ PhysicsServer::PhysicsServer()
   transport::init();
 
   physics::init();
+
+  /// Init the sensors library
+  sensors::init("default");
 }
 
-PhysicsServer::~PhysicsServer()
+Combined::~Combined()
 {
 }
 
-void PhysicsServer::Load( const std::string &filename )
+void Combined::Load()
 {
   // Load the world file
   gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
 
   try
   {
-    if (!filename.empty())
-      xmlFile->Load(filename);
-    else
-      xmlFile->LoadString(default_config);
+    xmlFile->LoadString(default_config);
   }
   catch (common::GazeboError e)
   {
@@ -149,36 +143,50 @@ void PhysicsServer::Load( const std::string &filename )
       gzthrow("Failed to load the World\n"  << e);
     }
 
-    //common::XMLConfigNode *pluginNode = worldNode->GetChild("plugin");
-    //while (pluginNode != NULL)
-    //{
-    //  this->AddPlugin( pluginNode->GetString("filename","",1), 
-    //      pluginNode->GetString("handle","",1) );
-    //  pluginNode = pluginNode->GetNext("plugin");
-    //}
-
     worldNode = worldNode->GetNext("world");
   }
+
+
+
+  common::XMLConfigNode *configNode = rootNode->GetChild("config");
+  if (!configNode)
+    gzthrow("Invalid xml. Needs a <config> tag");
+
+  // Load the rendering system
+  if (!rendering::load(configNode))
+    gzthrow("Unable to load the rendering engine");
+
+  // The rendering engine will run headless 
+  if (!rendering::init(true))
+    gzthrow("Unable to intialize the rendering engine");
+
+  rendering::create_scene("default");
+
+  sensors::SensorPtr sensor1 = sensors::create_sensor("camera");
+  sensors::SensorPtr sensor2 = sensors::create_sensor("camera");
+
 }
 
-void PhysicsServer::Init()
+void Combined::Init()
 {
   for (int i=0; i < this->worlds.size(); i++)
     physics::init_world(this->worlds[i]);
 }
 
-void PhysicsServer::Run()
+void Combined::Run()
 {
   for (int i=0; i < this->worlds.size(); i++)
     physics::run_world(this->worlds[i]);
 
   while (!this->quit)
   {
-    usleep(1000000);
+    //timer.Start();
+    sensors::run_once(true);
+    //std::cout << "Render Time[" << timer.GetElapsed() << "]\n";
   }
 }
 
-void PhysicsServer::Quit()
+void Combined::Quit()
 {
   this->quit = true;
 }

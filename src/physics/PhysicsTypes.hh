@@ -14,28 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef PHYSICSSERVER_HH
-#define PHYSICSSERVER_HH
 
-#include <string>
-#include <vector>
-
-#include "physics/PhysicsTypes.hh"
+#include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
-  class PhysicsServer
+  namespace physics
   {
-    public: PhysicsServer();
-    public: virtual ~PhysicsServer();
+    class World;
 
-    public: void Load( const std::string &filename );
-    public: void Init();
-    public: void Run();
-    public: void Quit();
-
-    private: std::vector< physics::WorldPtr > worlds;
-    private: bool quit;
-  };
+    typedef boost::shared_ptr<World> WorldPtr;
+  }
 }
-#endif

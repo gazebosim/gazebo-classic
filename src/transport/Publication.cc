@@ -1,3 +1,4 @@
+#include "SubscriptionTransport.hh"
 #include "Publication.hh"
 
 using namespace gazebo;
@@ -42,6 +43,9 @@ void Publication::Publish(const std::string &data)
   std::list< CallbackHelperPtr >::iterator iter;
   for (iter = this->callbacks.begin(); iter != this->callbacks.end(); iter++)
   {
+    // NATY IS HERE TOMORROW
+    // if (dynamic_cast<SubscriptionTransport*>( (*iter).get() ) != NULL)
+
     (*iter)->HandleMessage(data);
   }
   this->prevMessage = data;

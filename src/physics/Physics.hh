@@ -14,28 +14,23 @@
  * limitations under the License.
  *
 */
-#ifndef PHYSICSSERVER_HH
-#define PHYSICSSERVER_HH
-
-#include <string>
-#include <vector>
 
 #include "physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
-  class PhysicsServer
+  namespace common
   {
-    public: PhysicsServer();
-    public: virtual ~PhysicsServer();
+    class XMLConfigNode;
+  }
 
-    public: void Load( const std::string &filename );
-    public: void Init();
-    public: void Run();
-    public: void Quit();
+  namespace physics
+  {
+    bool init();
 
-    private: std::vector< physics::WorldPtr > worlds;
-    private: bool quit;
-  };
+    WorldPtr create_world(const std::string &name);
+    void load_world(WorldPtr world, common::XMLConfigNode *node);
+    void init_world(WorldPtr world);
+    void run_world(WorldPtr world);
+  }
 }
-#endif

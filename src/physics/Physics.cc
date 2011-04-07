@@ -14,28 +14,38 @@
  * limitations under the License.
  *
 */
-#ifndef PHYSICSSERVER_HH
-#define PHYSICSSERVER_HH
 
-#include <string>
-#include <vector>
+#include "common/XMLConfig.hh"
 
-#include "physics/PhysicsTypes.hh"
+#include "physics/World.hh"
+#include "physics/PhysicsFactory.hh"
+#include "physics/Physics.hh"
 
-namespace gazebo
+using namespace gazebo;
+
+bool physics::init()
 {
-  class PhysicsServer
-  {
-    public: PhysicsServer();
-    public: virtual ~PhysicsServer();
-
-    public: void Load( const std::string &filename );
-    public: void Init();
-    public: void Run();
-    public: void Quit();
-
-    private: std::vector< physics::WorldPtr > worlds;
-    private: bool quit;
-  };
+  physics::PhysicsFactory::RegisterAll();
+  return true;
 }
-#endif
+
+physics::WorldPtr physics::create_world(const std::string &name)
+{
+    physics::WorldPtr world( new physics::World() );
+    return world;
+}
+
+void physics::load_world(WorldPtr world, common::XMLConfigNode *node)
+{
+  world->Load(node);
+}
+
+void physics::init_world(WorldPtr world)
+{
+  world->Init();
+}
+
+void physics::run_world(WorldPtr world)
+{
+    world->Start();
+}

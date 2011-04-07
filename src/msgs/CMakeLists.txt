@@ -23,7 +23,6 @@ set (msgs color.proto
           request.proto
           topic_info.proto
           world_stats.proto
-          float_test.proto
 )
 
 

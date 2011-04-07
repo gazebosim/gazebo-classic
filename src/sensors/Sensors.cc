@@ -21,6 +21,7 @@
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/SensorManager.hh"
+#include "sensors/Sensor.hh"
 #include "sensors/Sensors.hh"
 
 using namespace gazebo;
@@ -31,9 +32,6 @@ bool sensors::init(const std::string &world_name)
 {
   // Register all the sensor types
   sensors::SensorFactory::RegisterAll();
-
-  // Start the transport system by connecting to the master.
-  transport::init();
 
   transport::set_topic_namespace(world_name);
 
