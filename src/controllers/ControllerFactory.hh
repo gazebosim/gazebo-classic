@@ -26,7 +26,6 @@
 
 #include <string>
 #include <map>
-#include "common/StaticPluginRegister.hh"
 
 namespace gazebo
 {
@@ -77,8 +76,7 @@ Controller *New##classname(Entity *entity) \
 void Register##classname() \
 {\
   ControllerFactory::RegisterController("static", name, New##classname);\
-}\
-StaticPluginRegister Registered##classname (Register##classname);
+}
 
 /// \brief Dynamic controller registration macro
 ///

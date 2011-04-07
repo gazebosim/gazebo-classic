@@ -55,9 +55,6 @@ UserCamera::UserCamera(const std::string &name, Scene *scene)
   this->name = stream.str(); 
 
   this->connections.push_back( event::Events::ConnectShowCamerasSignal( boost::bind(&UserCamera::ToggleShowVisual, this) ) );
-  this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&UserCamera::Render, this) ) );
-  this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&UserCamera::PostRender, this) ) );
-
   this->animState = NULL;
 
   this->viewController = new FPSViewController(this);
@@ -91,8 +88,6 @@ void UserCamera::Load(common::XMLConfigNode *node)
 /// Initialize
 void UserCamera::Init()
 {
-  this->SetSceneNode( this->scene->GetManager()->getRootSceneNode()->createChildSceneNode( this->GetName() + "_SceneNode") );
-
   Camera::Init();
 
   this->visual = new Visual(this->GetName() + "_OUTLINE", this->pitchNode);
@@ -166,7 +161,7 @@ void UserCamera::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update
-void UserCamera::Render()
+void UserCamera::Update()
 {
   this->viewController->Update();
 
@@ -189,6 +184,8 @@ void UserCamera::Render()
 // Post Render
 void UserCamera::PostRender()
 {
+  Camera::PostRender();
+
   if (**this->saveFramesP)
   {
     char tmp[1024];

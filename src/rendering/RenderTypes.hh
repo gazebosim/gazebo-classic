@@ -14,13 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef RENDERING_HH
-#define RENDERING_HH
+#ifndef RENDERTYPES_HH
+#define RENDERTYPES_HH
+
+#include <boost/shared_ptr.hpp>
 
 namespace gazebo
 {
   namespace rendering
   {
+    class Scene;
+    class Light;
+
+    typedef boost::shared_ptr<Scene> ScenePtr;
+    typedef boost::shared_ptr<Light> LightPtr;
+
     enum RenderOpType 
     {
       /// A list of points, 1 vertex per point

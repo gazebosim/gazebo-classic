@@ -20,34 +20,41 @@
  * Date: 18 May 2003
  */
 
-#include "Sensor.hh"
-#include "SensorManager.hh"
-#include "SensorFactory.hh"
+#include "sensors/SensorManager.hh"
+#include "sensors/SensorFactory.hh"
+#include "sensors/Sensor.hh"
+
+void RegisterCameraSensor();
 
 using namespace gazebo;
 using namespace sensors;
 
-std::map<std::string, SensorFactoryFn> SensorFactory::sensors;
+std::map<std::string, SensorFactoryFn> SensorFactory::sensor_map;
 
+void SensorFactory::RegisterAll()
+{
+  RegisterCameraSensor();
+}
 
 // Register a model class.  Use by dynamically loaded modules
-void SensorFactory::RegisterSensor(std::string type, std::string classname,
+void SensorFactory::RegisterSensor(const std::string &classname,
                                    SensorFactoryFn factoryfn)
 {
-  sensors[classname] = factoryfn;
+  sensor_map[classname] = factoryfn;
 }
 
 
 // Create a new instance of a model.  Used by the world when reading
 // the world file.
-Sensor *SensorFactory::NewSensor(const std::string &classname)
+SensorPtr SensorFactory::NewSensor(const std::string &classname)
 {
-  if (sensors[classname])
+  SensorPtr sensor;
+
+  if (sensor_map[classname])
   {
-    Sensor *sensor = (sensors[classname]) ();
+    sensor.reset( (sensor_map[classname]) () );
     SensorManager::Instance()->AddSensor(sensor);
-    return sensor;
   }
 
-  return NULL;
+  return sensor;
 }

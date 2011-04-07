@@ -167,7 +167,7 @@ SimulationFrame::~SimulationFrame()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create the cameras
-void SimulationFrame::ViewScene( rendering::Scene *scene )
+void SimulationFrame::ViewScene( rendering::ScenePtr scene )
 {
   this->renderPanel->ViewScene(scene);
 }

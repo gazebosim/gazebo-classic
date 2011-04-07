@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 #include <OGRE/OgreMesh.h>
 

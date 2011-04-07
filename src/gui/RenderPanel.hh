@@ -21,12 +21,13 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 
+#include "rendering/RenderTypes.hh"
+
 namespace gazebo
 {
   namespace rendering
   {
     class UserCamera;
-    class Scene;
   }
 
 	namespace gui
@@ -68,7 +69,7 @@ namespace gazebo
       private: void OnYawSetFocus(wxFocusEvent &event);
       private: void OnYawKillFocus(wxFocusEvent &event);
   
-      public: void ViewScene(rendering::Scene *scene);
+      public: void ViewScene(rendering::ScenePtr scene);
   
       private: RenderControl *renderControl;
       private: wxTextCtrl *fpsCtrl;

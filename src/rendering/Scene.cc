@@ -59,7 +59,7 @@ Scene::Scene(const std::string &name)
   this->poseSub = transport::subscribe("~/pose", &Scene::ReceivePoseMsg, this);
   this->selectionSub = transport::subscribe("~/selection", &Scene::HandleSelectionMsg, this);
 
-  this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&Scene::PreRender, this) ) );
+  this->connections.push_back( event::Events::ConnectPreRenderSignal( boost::bind(&Scene::PreRender, this) ) );
 
   this->id = idCounter++;
   this->idString = boost::lexical_cast<std::string>(this->id);
@@ -94,6 +94,8 @@ Scene::Scene(const std::string &name)
 /// Destructor
 Scene::~Scene()
 {
+  std::cout << "DELETE SCENE\n";
+
   Visual_M::iterator iter;
   for (iter = this->visuals.begin(); iter != this->visuals.end(); iter++)
     delete iter->second;
@@ -348,6 +350,7 @@ Grid *Scene::GetGrid(unsigned int index) const
 //Create a camera
 Camera *Scene::CreateCamera(const std::string &name)
 {
+  std::cout << "\n\n SCENE Create A Camera\n\n";
   Camera *camera = new Camera(this->name + "::" + name, this);
   this->cameras.push_back(camera);
 

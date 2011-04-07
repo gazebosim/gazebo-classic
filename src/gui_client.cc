@@ -78,6 +78,7 @@ int main(int argc, char **argv)
 
   client = new gazebo::GuiClient();
   client->Load(config_file);
+  client->Init();
   client->Run();
 
   delete client;

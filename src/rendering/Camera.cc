@@ -69,8 +69,8 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
   this->nearClipP = new common::ParamT<double>("near_clip",1,0);
   this->farClipP = new common::ParamT<double>("far_clip",100,0);
   this->saveFramesP = new common::ParamT<bool>("save_frames",false,0);
-  this->savePathnameP = new common::ParamT<std::string>("save_frame_path","",0);
-  this->imageSizeP = new common::ParamT< common::Vector2i >("image_size", common::Vector2i(320, 240),0);
+  this->savePathnameP = new common::ParamT<std::string>("save_frame_path","/tmp/frames",0);
+  this->imageSizeP = new common::ParamT< common::Vector2i >("image_size", common::Vector2i(640, 480),0);
   this->visMaskP = new common::ParamT<std::string>("mask","none",0);
   this->hfovP = new common::ParamT<common::Angle>("hfov", common::Angle(DTOR(60)),0);
   this->imageFormatP = new common::ParamT<std::string>("image_format", "R8G8B8", 0);
@@ -89,11 +89,16 @@ Camera::Camera(const std::string &namePrefix, Scene *scene)
 
   this->renderingEnabled = true;
 
-  this->showWireframeConnection = event::Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) );
 
   this->pitchNode = NULL;
   this->sceneNode = NULL;
   this->origParentNode = NULL;
+
+  // Connect to the render signal
+  this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&Camera::Render, this) ) );
+  this->connections.push_back( event::Events::ConnectPostRenderSignal( boost::bind(&Camera::PostRender, this) ) );
+
+  this->connections.push_back( event::Events::ConnectShowWireframeSignal( boost::bind(&Camera::ToggleShowWireframe, this) ));
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -145,36 +150,36 @@ void Camera::Load( common::XMLConfigNode *node )
     this->imageFormatP->Load(node);
     this->visMaskP->Load(node);
     this->hfovP->Load(node);
+  }
 
-    if (this->visMaskP->GetValue() == "laser")
-    {
-      this->visibilityMask ^= GZ_LASER_CAMERA;
-    }
+  if (this->visMaskP->GetValue() == "laser")
+  {
+    this->visibilityMask ^= GZ_LASER_CAMERA;
+  }
 
-    if (this->imageFormatP->GetValue() == "L8")
-      this->imageFormat = (int)Ogre::PF_L8;
-    else if (this->imageFormatP->GetValue() == "R8G8B8")
-      this->imageFormat = (int)Ogre::PF_BYTE_RGB;
-    else if (this->imageFormatP->GetValue() == "B8G8R8")
-      this->imageFormat = (int)Ogre::PF_BYTE_BGR;
-    else if (this->imageFormatP->GetValue() == "FLOAT32")
-      this->imageFormat = (int)Ogre::PF_FLOAT32_R;
-    else if (this->imageFormatP->GetValue() == "FLOAT16")
-      this->imageFormat = (int)Ogre::PF_FLOAT16_R;
-    else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
-              (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
-              (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
-              (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
-    {
-      // let ogre generate rgb8 images for all bayer format requests
-      // then post process to produce actual bayer images
-      this->imageFormat = (int)Ogre::PF_BYTE_RGB;
-    }
-    else
-    {
-      std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
-      this->imageFormat = (int)Ogre::PF_R8G8B8;
-    }
+  if (this->imageFormatP->GetValue() == "L8")
+    this->imageFormat = (int)Ogre::PF_L8;
+  else if (this->imageFormatP->GetValue() == "R8G8B8")
+    this->imageFormat = (int)Ogre::PF_BYTE_RGB;
+  else if (this->imageFormatP->GetValue() == "B8G8R8")
+    this->imageFormat = (int)Ogre::PF_BYTE_BGR;
+  else if (this->imageFormatP->GetValue() == "FLOAT32")
+    this->imageFormat = (int)Ogre::PF_FLOAT32_R;
+  else if (this->imageFormatP->GetValue() == "FLOAT16")
+    this->imageFormat = (int)Ogre::PF_FLOAT16_R;
+  else if ( (this->imageFormatP->GetValue() == "BAYER_RGGB8") ||
+      (this->imageFormatP->GetValue() == "BAYER_BGGR8") ||
+      (this->imageFormatP->GetValue() == "BAYER_GBRG8") ||
+      (this->imageFormatP->GetValue() == "BAYER_GRBG8") )
+  {
+    // let ogre generate rgb8 images for all bayer format requests
+    // then post process to produce actual bayer images
+    this->imageFormat = (int)Ogre::PF_BYTE_RGB;
+  }
+  else
+  {
+    std::cerr << "Error parsing image format (" << this->imageFormatP->GetValue() << "), using default Ogre::PF_R8G8B8\n";
+    this->imageFormat = (int)Ogre::PF_R8G8B8;
   }
 
   // Create the directory to store frames
@@ -215,11 +220,14 @@ void Camera::Save(std::string &prefix, std::ostream &stream)
 // Initialize the camera
 void Camera::Init()
 {
+  this->SetSceneNode( this->scene->GetManager()->getRootSceneNode()->createChildSceneNode( this->GetName() + "_SceneNode") );
+
   this->CreateCamera();
 
   // Create a scene node to control pitch motion
   this->pitchNode = this->sceneNode->createChildSceneNode( this->name + "PitchNode");
   this->pitchNode->pitch(Ogre::Degree(0));
+
   this->pitchNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
@@ -309,8 +317,11 @@ void Camera::Render()
   this->renderTarget->update(false);
 }
 
+////////////////////////////////////////////////////////////////////////////////
 void Camera::PostRender()
 {
+  this->renderTarget->swapBuffers();
+
   if (this->newData && this->captureData)
   {
     Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
@@ -929,7 +940,7 @@ void Camera::CreateRenderTexture( const std::string &textureName )
       (Ogre::PixelFormat)this->imageFormat,
       Ogre::TU_RENDERTARGET)).getPointer();
 
-  this->renderTarget = this->renderTexture->getBuffer()->getRenderTarget();
+  this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -957,21 +968,6 @@ void Camera::CreateCamera()
 
   this->SetClipDist(**this->nearClipP, **this->farClipP);
 
-  if (this->renderTarget)
-  {
-    // Setup the viewport to use the texture
-    this->viewport = this->renderTarget->addViewport(this->camera);
-    this->viewport->setClearEveryFrame(true);
-    this->viewport->setBackgroundColour( Conversions::Color( this->scene->GetBackgroundColor() ) );
-
-    double ratio = (double)this->viewport->getActualWidth() / 
-                   (double)this->viewport->getActualHeight();
-    double vfov = 2.0 * atan(tan( (**this->hfovP).GetAsRadian() / 2.0) / ratio);
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
-  }
-
-  //this->scene->RegisterCamera(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -998,4 +994,23 @@ unsigned int Camera::GetVisibilityMask() const
   return this->visibilityMask;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Set the render target for the camera
+void Camera::SetRenderTarget( Ogre::RenderTarget *target )
+{
+  this->renderTarget = target;
 
+  if (this->renderTarget)
+  {
+    // Setup the viewport to use the texture
+    this->viewport = this->renderTarget->addViewport(this->camera);
+    this->viewport->setClearEveryFrame(true);
+    this->viewport->setBackgroundColour( Conversions::Color( this->scene->GetBackgroundColor() ) );
+
+    double ratio = (double)this->viewport->getActualWidth() / 
+                   (double)this->viewport->getActualHeight();
+    double vfov = 2.0 * atan(tan( (**this->hfovP).GetAsRadian() / 2.0) / ratio);
+    this->camera->setAspectRatio(ratio);
+    this->camera->setFOVy(Ogre::Radian(vfov));
+  }
+}

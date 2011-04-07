@@ -49,16 +49,16 @@ namespace gazebo
       protected: virtual void Load( common::XMLConfigNode *node );
     
       /// \brief Save the sensor info in XML format
-      protected: virtual void SaveChild(std::string &prefix, std::ostream &stream);
+      protected: virtual void Save(std::string &prefix, std::ostream &stream);
     
       /// \brief Initialize the camera
-      protected: virtual void InitChild();
+      protected: virtual void Init();
     
       /// \brief Update the sensor information
-      protected: virtual void Update();
+      protected: virtual void Update(bool force);
     
       /// Finalize the camera
-      protected: virtual void FiniChild();
+      protected: virtual void Fini();
     
       /// \brief Set whether the sensor is active or not
       public: virtual void SetActive(bool value);

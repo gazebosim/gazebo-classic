@@ -38,43 +38,27 @@ unsigned int WindowManager::windowCounter = 0;
 // Constructor
 WindowManager::WindowManager()
 {
-  this->renderConnection = event::Events::ConnectRenderSignal( boost::bind(&WindowManager::Render, this) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 WindowManager::~WindowManager()
 {
-  event::Events::DisconnectRenderSignal( this->renderConnection );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Attach a camera to a window
 void WindowManager::SetCamera( int windowId, Camera *camera)
 {
-  Ogre::Viewport *viewport = NULL;
-
   this->windows[windowId]->removeAllViewports(); 
-  viewport = this->windows[windowId]->addViewport(camera->GetCamera());
-
-  double ratio = (double)viewport->getActualWidth() / (double)viewport->getActualHeight();
-  double vfov = fabs(2.0 * atan(tan(camera->GetHFOV().GetAsRadian() / 2.0) / ratio));
-
-  camera->SetAspectRatio( ratio );
-  camera->GetCamera()->setFOVy(Ogre::Radian(vfov));
-  camera->SetWindowId( windowId );
-
-  viewport->setClearEveryFrame(true);
-  viewport->setBackgroundColour( Conversions::Color(common::Color(0,0,0)) );
-  viewport->setVisibilityMask(camera->GetVisibilityMask());
-
+  camera->SetRenderTarget( this->windows[windowId] );
   //RTShaderSystem::AttachViewport(viewport, camera->GetScene());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a window
 int WindowManager::CreateWindow( const std::string ogreHandle, 
-                                                 unsigned int width, 
-                                                 unsigned int height) 
+                                 unsigned int width, 
+                                 unsigned int height) 
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
@@ -126,15 +110,6 @@ void WindowManager::Resize(unsigned int id, int width, int height)
     this->windows[id]->windowMovedOrResized();
   }
 } 
-
-void WindowManager::Render()
-{
-  for (unsigned int i=0; i < this->windows.size(); i++)
-  {
-    this->windows[i]->update(false);
-    this->windows[i]->swapBuffers();
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get the average FPS

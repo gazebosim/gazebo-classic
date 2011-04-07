@@ -19,13 +19,10 @@
 
 #include <wx/wx.h>
 
+#include "rendering/RenderTypes.hh"
+
 namespace gazebo
 {
-  namespace rendering
-  {
-    class Scene;
-  }
-
 	namespace gui
   {
     class SimulationFrame;
@@ -39,7 +36,7 @@ namespace gazebo
       public: virtual ~SimulationApp();
 
       /// \brief Load the simulation app
-      public: void Load();
+      public: void Load(const std::string &filename);
   
       /// \brief Init the simulation app
       public: void Init();
@@ -52,7 +49,7 @@ namespace gazebo
       public: void OnIdle(wxTimerEvent &evt);
   
       /// \brief View a specific scene
-      public: void ViewScene( rendering::Scene *scene );
+      public: void ViewScene( rendering::ScenePtr scene );
   
       /// \brief Save the gui params in xml format
       public: void Save(std::string &prefix, std::ostream &stream);

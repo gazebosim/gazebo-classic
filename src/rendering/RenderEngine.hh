@@ -19,12 +19,13 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef OGREADAPTOR
-#define OGREADAPTOR
+#ifndef RENDERENGINE_HH
+#define RENDERENGINE_HH
 
-#include <iostream>
+#include <vector>
 
 #include "common/SingletonT.hh"
+#include "rendering/RenderTypes.hh"
 
 namespace Ogre
 {
@@ -83,7 +84,7 @@ namespace gazebo
       public: void Load(common::XMLConfigNode *rootNode);
   
       /// \brief Initialize ogre
-      public: void Init(common::XMLConfigNode *rootNode);
+      public: void Init();
   
       /// \brief Finalize
       public: void Fini();
@@ -95,16 +96,16 @@ namespace gazebo
       public: double GetUpdateRate();
   
       /// \brief Create a scene
-      //public: Scene *CreateScene(const std::string &name);
+      public: ScenePtr CreateScene(const std::string &name);
   
       /// \brief Remove a scene
-      //public: void RemoveScene(const std::string &name);
+      public: void RemoveScene(const std::string &name);
   
       /// \brief Get a scene manager
-      //public: Scene *GetScene(unsigned int index);
+      public: ScenePtr GetScene(unsigned int index);
   
       /// \brief Get the number of scene managers
-      //public: unsigned int GetSceneCount() const;
+      public: unsigned int GetSceneCount() const;
   
       /// \brief Update all the scenes 
       public: void UpdateScenes();
@@ -125,8 +126,8 @@ namespace gazebo
       /// Pointer to the root scene node
       public: Ogre::Root *root;
     
-      /// Pointer to the scene manager
-      //private: std::vector<Scene *> scenes;
+      /// All of the scenes
+      private: std::vector< ScenePtr > scenes;
     
       /// Pointer to the rendering system
       public: Ogre::RenderSystem *renderSys;

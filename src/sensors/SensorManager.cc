@@ -20,8 +20,8 @@
  * Date: 18 Dec 2009
  */
 
-#include "Sensor.hh"
-#include "SensorManager.hh"
+#include "sensors/Sensor.hh"
+#include "sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -36,23 +36,23 @@ SensorManager::SensorManager()
 /// Destructor
 SensorManager::~SensorManager()
 {
-  this->sensors.erase(this->sensors.begin(), this->sensors.end());
+  this->sensors.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update all the sensors
-void SensorManager::Update()
+void SensorManager::Update(bool force)
 {
-  std::list<Sensor*>::iterator iter;
+  std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
-    (*iter)->Update();
+    (*iter)->Update(force);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Init all the sensors
 void SensorManager::Init()
 {
-  std::list<Sensor*>::iterator iter;
+  std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Init();
 }
@@ -61,37 +61,29 @@ void SensorManager::Init()
 /// Finalize all the sensors
 void SensorManager::Fini()
 {
-  std::list<Sensor*>::iterator iter;
+  std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
     (*iter)->Fini();
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Add a sensor
-void SensorManager::AddSensor(Sensor *sensor)
+void SensorManager::AddSensor(SensorPtr sensor)
 {
-  if (!sensor)
-    return;
-
   this->sensors.push_back(sensor);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Remove a sensor
-void SensorManager::RemoveSensor(Sensor *sensor)
+void SensorManager::RemoveSensor(SensorPtr sensor)
 {
-  if (!sensor)
-    return;
-
-  std::list<Sensor*>::iterator iter;
+  std::list<SensorPtr>::iterator iter;
   for (iter = this->sensors.begin(); iter != this->sensors.end(); iter++)
-    if (*iter == sensor)
+    if ((*iter)->GetName() == sensor->GetName())
       break;
 
   if (iter != this->sensors.end())
   {
-    delete (*iter);
     this->sensors.erase(iter);
   }
 }

@@ -27,6 +27,7 @@ set (sources MovableText.cc
              RenderState.cc
              WindowManager.cc
              Conversions.cc
+             Rendering.cc
 )
 
 set (headers MovableText.hh
@@ -49,6 +50,7 @@ set (headers MovableText.hh
              WindowManager.hh
              RenderTypes.hh
              Conversions.hh
+             Rendering.hh
 )
 
 add_library(gazebo_rendering SHARED ${sources})

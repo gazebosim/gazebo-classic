@@ -129,7 +129,7 @@ void RenderPanel::Init()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a camera
-void RenderPanel::ViewScene(rendering::Scene *scene)
+void RenderPanel::ViewScene(rendering::ScenePtr scene)
 {
   this->renderControl->ViewScene(scene);
 }

@@ -24,6 +24,8 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "common/Time.hh"
+
 namespace gazebo
 {
   namespace event
@@ -50,6 +52,7 @@ namespace gazebo
       private: static int counter;
       private: int uniqueId;
 
+      private: common::Time creationTime;
       public: template<typename T> friend class EventT;
     };
     

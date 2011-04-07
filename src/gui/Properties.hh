@@ -20,7 +20,6 @@
 #include <wx/wx.h>
 
 #include "common/Param.hh"
-#include "common/StaticPluginRegister.hh"
 
 class wxPropertyGrid;
 class wxProperty;

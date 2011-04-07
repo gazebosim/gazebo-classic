@@ -26,12 +26,12 @@
 #include <list>
 
 #include "common/SingletonT.hh"
+#include "sensors/SensorTypes.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
-    class Sensor;
 
     /// \brief Class to manage and update all sensors
     class SensorManager : public SingletonT<SensorManager>
@@ -39,25 +39,25 @@ namespace gazebo
       /// \brief Constructor
       public: SensorManager();
 
-              /// \brief Destructor
+      /// \brief Destructor
       public: virtual ~SensorManager();
 
-              /// \brief Update all the sensors
-      public: void Update();
+      /// \brief Update all the sensors
+      public: void Update(bool force);
 
-              /// \brief Init all the sensors
+      /// \brief Init all the sensors
       public: void Init();
 
-              /// \brief Finalize all the sensors
+      /// \brief Finalize all the sensors
       public: void Fini();
 
-              /// \brief Add a sensor
-      public: void AddSensor(Sensor *sensor);
+      /// \brief Add a sensor
+      public: void AddSensor(SensorPtr sensor);
 
               /// \brief Remove a sensor
-      public: void RemoveSensor(Sensor *sensor);
+      public: void RemoveSensor(SensorPtr sensor);
 
-      private: std::list<Sensor *> sensors;
+      private: std::list<SensorPtr > sensors;
 
       private: friend class SingletonT<SensorManager>;
     };

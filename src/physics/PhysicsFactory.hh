@@ -75,7 +75,6 @@ void Register##classname() \
 {\
   PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\
 }
-//StaticPluginRegister Registered##classname (Register##classname);
   
   /// \}
 }

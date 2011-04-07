@@ -49,7 +49,7 @@ const std::string default_config =
       <contact_max_correcting_vel>100.0</contact_max_correcting_vel>\
       <contact_surface_layer>0.0</contact_surface_layer>\
     </physics>\
-    <model name='ball'>\
+    <model name='box1'>\
       <origin xyz='0 0 1'/>\
       <link name='body'>\
         <collision name='geom'>\
@@ -61,6 +61,7 @@ const std::string default_config =
         <visual>\
           <geometry>\
             <box size='1.0 1.0 1.0'/>\
+            <!--<mesh filename='willowgarage.dae' scale='0.0254 0.0254 0.0254'/>-->\
           </geometry>\
           <mesh filename='unit_box'/>\
         </visual>\
@@ -101,8 +102,10 @@ PhysicsServer::PhysicsServer()
     gzthrow("Error loading the Gazebo configuration file, check the .gazeborc file on your HOME directory \n" << e); 
   }
 
-  transport::init("localhost", 11345);
-  physics::PhysicsFactory::RegisterAll();
+  transport::init();
+
+  physics::init();
+  //physics::PhysicsFactory::RegisterAll();
 }
 
 PhysicsServer::~PhysicsServer()
@@ -134,7 +137,8 @@ void PhysicsServer::Load( const std::string &filename )
 
   while(worldNode)
   {
-    physics::World *world = new physics::World();
+    physics::create_world("default");
+    //physics::World *world = new physics::World();
     this->worlds.push_back(world);
 
     //Create the world

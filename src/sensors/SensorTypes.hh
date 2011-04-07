@@ -14,24 +14,19 @@
  * limitations under the License.
  *
 */
-/* Desc: Static plugin automagic registration
- ** Author: Jordi Polo 
- ** Date: 13 December 2007
- **/
+#ifndef SENSORTYPES_HH
+#define SENSORTYPES_HH
 
-#ifndef STATIC_PLUGIN_REGISTER_H
-#define STATIC_PLUGIN_REGISTER_H
-/*
- * Each staticPlugin fills this structure with their own initilization funtion
- * Done in a structure that it is initialized in a .hh and thus called when the
- * program runs (that's why they are static)
- * Usually that means that they just register themself in their proper factory.
- * */
-struct StaticPluginRegister
+#include <boost/shared_ptr.hpp>
+
+namespace gazebo
 {
-  StaticPluginRegister(void (*initFunc)())
+  namespace sensors
   {
-    (*initFunc)();
+    class Sensor;
+
+    typedef boost::shared_ptr<Sensor> SensorPtr;
   }
-};
-#endif 
+}
+ 
+#endif

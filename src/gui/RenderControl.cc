@@ -322,7 +322,7 @@ int RenderControl::GetHeight()
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Create the camera
-void RenderControl::ViewScene(rendering::Scene *scene)
+void RenderControl::ViewScene(rendering::ScenePtr scene)
 {
   if (scene->GetUserCameraCount() == 0)
     this->userCamera = scene->CreateUserCamera("rc_camera");

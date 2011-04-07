@@ -36,6 +36,7 @@
 
 #include "gazebo_config.h"
 
+#include "common/Color.hh"
 #include "common/Events.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboMessage.hh"
@@ -90,7 +91,10 @@ RenderEngine::~RenderEngine()
 void RenderEngine::Load(common::XMLConfigNode *rootNode)
 {
   if (this->root)
+  {
+    std::cerr << "Attempting to load, but root already exist\n";
     return;
+  }
 
   // Make the root
   try
@@ -113,33 +117,19 @@ void RenderEngine::Load(common::XMLConfigNode *rootNode)
 
   // Setup the available resources
   this->SetupResources();
-
-  /*Scene *scene = new Scene("primary_scene");
-  scene->Load(rootNode->GetChild("rendering"));
-  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
-  this->scenes.push_back( scene );  
-  */
-
-  /*scene = new Scene("viewer_scene");
-  scene->SetType(Scene::GENERIC);
-  scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
-  scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
-  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
-
-  this->scenes.push_back( scene );  
-  */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Create a scene
-/*Scene *RenderEngine::CreateScene(const std::string &name)
+ScenePtr RenderEngine::CreateScene(const std::string &name)
 {
-  Scene *scene = new Scene(name);
+  ScenePtr scene( new Scene(name) );
   scene->SetType(Scene::GENERIC);
-  scene->SetAmbientColor(Color(0.5, 0.5, 0.5));
-  scene->SetBackgroundColor(Color(0.5, 0.5, 0.5, 1.0));
-  scene->CreateGrid( 10, 1, 0.03, Color(1,1,1,1));
-  scene->Init(this->root);
+  scene->SetAmbientColor(common::Color(0.5, 0.5, 0.5));
+  scene->SetBackgroundColor(common::Color(0.5, 0.5, 0.5, 1.0));
+  scene->CreateGrid( 10, 1, 0.03, common::Color(1,1,1,1));
+  scene->Load(NULL);
+  scene->Init();
 
   this->scenes.push_back(scene);
   return scene;
@@ -149,7 +139,7 @@ void RenderEngine::Load(common::XMLConfigNode *rootNode)
 // Remove a scene
 void RenderEngine::RemoveScene(const std::string &name)
 {
-  std::vector<Scene*>::iterator iter;
+  std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); iter++)
     if ((*iter)->GetName() == name)
@@ -158,20 +148,19 @@ void RenderEngine::RemoveScene(const std::string &name)
   if (iter != this->scenes.end())
   {
     this->scenes.erase(iter);
-    delete *iter;
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get a scene 
-Scene *RenderEngine::GetScene(unsigned int index)
+ScenePtr RenderEngine::GetScene(unsigned int index)
 {
   if (index < this->scenes.size())
     return this->scenes[index];
   else
   {
     std::cerr << "Invalid Scene Index[" << index << "]\n";
-    return NULL;
+    return ScenePtr();
   }
 }
 
@@ -181,7 +170,7 @@ unsigned int RenderEngine::GetSceneCount() const
 {
   return this->scenes.size();
 }
-*/
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update all the scenes 
@@ -202,19 +191,17 @@ void RenderEngine::UpdateScenes()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize ogre
-void RenderEngine::Init(common::XMLConfigNode *rootNode)
+void RenderEngine::Init()
 {
-  common::XMLConfigNode *node = NULL;
+  std::cout << "RenderEngine Init\n";
   Ogre::ColourValue ambient;
-
-  if (rootNode)
-    node = rootNode->GetChild("ogre", "rendering");
 
   /// Create a dummy rendering context.
   /// This will allow gazebo to run headless. And it also allows OGRE to 
   /// initialize properly
   if (this->headless)
   {
+    std::cout << "Creating a dummy display\n";
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay) 
       gzthrow(std::string("Can't open display: ") + XDisplayName(0) + "\n");
@@ -279,6 +266,7 @@ void RenderEngine::Save(std::string &prefix, std::ostream &stream)
 // Load plugins
 void RenderEngine::LoadPlugins()
 {
+  std::cout << "RenderEngine::LoadPlugins\n";
   std::list<std::string>::iterator iter;
   std::list<std::string> ogrePaths = common::GazeboConfig::Instance()->GetOgrePaths();
  
@@ -326,6 +314,7 @@ void RenderEngine::LoadPlugins()
 // Setup resources
 void RenderEngine::SetupResources()
 {
+  std::cout << "RenderEngine::SetupResources\n";
   std::vector<std::string> archNames;
   std::vector<std::string>::iterator aiter;
   std::list<std::string>::iterator iter;
@@ -383,6 +372,7 @@ void RenderEngine::SetupResources()
 // Setup render system
 void RenderEngine::SetupRenderSystem()
 {
+  std::cout << "RenderEngine::SetupRenderSystem\n";
   Ogre::RenderSystem *renderSys;
   const Ogre::RenderSystemList *rsList;
 

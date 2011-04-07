@@ -26,12 +26,16 @@ int Connection::counter = 0;
 Connection::Connection(Event *e, int i) 
   : event(e), id(i) 
 {
+  this->creationTime = common::Time::GetWallTime();
   this->uniqueId = counter++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 Connection::~Connection()
 { 
+  if (common::Time::GetWallTime() - this->creationTime < common::Time(0,10000))
+    std::cerr << "Warning: Deleteing a connection right after creation. Make sure to save the ConnectionPtr from a Connect call\n";
+
   if (this->event && this->id >= 0)
   {
     ConnectionPtr self(this);

@@ -14,35 +14,16 @@
  * limitations under the License.
  *
 */
-#include "common/XMLConfig.hh"
 #include "common/GazeboError.hh"
 #include "common/GazeboConfig.hh"
 
 #include "gui/SimulationApp.hh"
-
-#include "rendering/RenderEngine.hh"
-#include "rendering/RenderState.hh"
-#include "rendering/Scene.hh"
 
 #include "transport/Transport.hh"
 
 #include "GuiClient.hh"
 
 using namespace gazebo;
-
-const std::string default_config =
-"<?xml version='1.0'?>\
-<gazebo>\
-  <config>\
-    <verbosity>4</verbosity>\
-    <gui>\
-      <size>800 600</size>\
-      <pos>0 0</pos>\
-    </gui>\
-  </config>\
-</gazebo>\
-";
-
 
 GuiClient::GuiClient()
   : renderEngineEnabled(true), guiEnabled(true)
@@ -72,109 +53,38 @@ GuiClient::~GuiClient()
 
 void GuiClient::Load(const std::string &filename)
 {
-  // Load the world file
-  gazebo::common::XMLConfig *xmlFile = new gazebo::common::XMLConfig();
-
   try
   {
-    if (!filename.empty())
-      xmlFile->Load(filename);
-    else
-      xmlFile->LoadString(default_config);
+    this->gui->Load(filename);
   }
   catch (common::GazeboError e)
   {
-    gzthrow("The XML config file can not be loaded, please make sure is a correct file\n" << e); 
+    gzthrow( "Error loading the GUI\n" << e);
   }
+}
 
-  common::XMLConfigNode *rootNode(xmlFile->GetRootNode());
-  if (!rootNode || rootNode->GetName() != "gazebo")
-    gzthrow("Invalid xml. Needs a root node with the <gazebo> tag");
-
-
-  common::XMLConfigNode *configNode = rootNode->GetChild("config");
-  if (!configNode)
-    gzthrow("Invalid xml. Needs a <config> tag");
-  
-  // Load the Ogre rendering system
-  rendering::RenderEngine::Instance()->Load(configNode);
-
-  
-  // Create and initialize the Gui
-  if (this->renderEngineEnabled && this->guiEnabled)
-  {
-    try
-    {
-      common::XMLConfigNode *childNode = NULL;
-      if (rootNode)
-        childNode = configNode->GetChild("gui");
-
-      int width=0;
-      int height=0;
-      int x = 0;
-      int y = 0;
-
-      if (childNode)
-      {
-        width = childNode->GetTupleInt("size", 0, 800);
-        height = childNode->GetTupleInt("size", 1, 600);
-        x = childNode->GetTupleInt("pos",0,0);
-        y = childNode->GetTupleInt("pos",1,0);
-      }
-
-      // Create the GUI
-      if (!this->gui && (childNode || !rootNode))
-      {
-        this->gui = new gui::SimulationApp();
-        this->gui->Load();
-      }
-    }
-    catch (common::GazeboError e)
-    {
-      gzthrow( "Error loading the GUI\n" << e);
-    }
-  }
-  else
-  {
-    this->gui = NULL;
-  }
-
-  //Initialize RenderEngine
-  if (this->renderEngineEnabled)
-  {
-    try
-    {
-      rendering::RenderEngine::Instance()->Init(configNode);
-    }
-    catch (common::GazeboError e)
-    {
-      gzthrow("Failed to Initialize the Rendering engine subsystem\n" << e );
-    }
-  }
-
-  // Initialize the GUI
-  if (this->gui)
+void GuiClient::Init()
+{
+  try
   {
     this->gui->Init();
   }
-
-  delete xmlFile;
+  catch (common::GazeboError e)
+  {
+    gzthrow( "Error initializing the GUI\n" << e);
+  }
 }
 
 void GuiClient::Run()
 {
-  rendering::Scene *scene = new rendering::Scene("default");
-  scene->Load(NULL);
-  scene->Init();
-
-  transport::PublisherPtr pub = transport::advertise<msgs::Request>("/gazebo/default/publish_scene");
-  msgs::Request req;
-  req.set_request("publish");
-  pub->Publish(req);
-
-  this->gui->ViewScene(scene);
-
-  this->gui->Run();
+  try
+  {
+    this->gui->Run();
+  }
+  catch (common::GazeboError e)
+  {
+    gzthrow( "Error running the GUI\n" << e);
+  }
 }
 
 void GuiClient::Quit()

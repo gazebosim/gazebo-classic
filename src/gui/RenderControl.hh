@@ -27,6 +27,9 @@
 #include "gui/PointLightMaker.hh"
 #include "gui/SpotLightMaker.hh"
 #include "gui/DirectionalLightMaker.hh"
+
+#include "rendering/RenderTypes.hh"
+
 #include "common/MouseEvent.hh"
 
 namespace gazebo
@@ -34,7 +37,6 @@ namespace gazebo
   namespace rendering
   {
     class UserCamera;
-    class Scene;
   }
 
 	namespace gui
@@ -70,7 +72,7 @@ namespace gazebo
   
       /// \brief Create the camera
       //public: void CreateCamera(rendering::Scene *scene);
-      public: void ViewScene(rendering::Scene *scene);
+      public: void ViewScene(rendering::ScenePtr scene);
   
       /// \brief Get the camera
       public: rendering::UserCamera *GetCamera();

@@ -26,6 +26,8 @@
 #include "common/GazeboError.hh"
 
 #include "rendering/Camera.hh"
+#include "rendering/Scene.hh"
+#include "rendering/RenderEngine.hh"
 
 #include "sensors/SensorFactory.hh"
 #include "sensors/CameraSensor.hh"
@@ -40,12 +42,13 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor);
 CameraSensor::CameraSensor()
     : Sensor()
 {
-  //this->camera = this->GetWorld()->GetScene()->CreateCamera("Mono");
+  rendering::ScenePtr scene = rendering::RenderEngine::Instance()->GetScene(0);
+  this->camera = scene->CreateCamera("mono_camera");
 
   this->typeName = "monocamera";
   this->camera->SetCaptureData(true);
 
-  event::Events::ConnectRenderSignal( boost::bind(&CameraSensor::Render, this) );
+  this->connections.push_back( event::Events::ConnectRenderSignal( boost::bind(&CameraSensor::Render, this)) );
 }
 
 
@@ -61,7 +64,7 @@ void CameraSensor::Load( common::XMLConfigNode *node )
 {
   Sensor::Load(node);
 
-  this->camera->Load( node );
+  this->camera->Load( NULL );
 
   // Do some sanity checks
   if (this->camera->GetImageWidth() == 0 || 
@@ -69,33 +72,34 @@ void CameraSensor::Load( common::XMLConfigNode *node )
   {
     gzthrow("image has zero size");
   }
-
-  this->ogreTextureName = this->GetName() + "_RttTex";
-
-  this->camera->CreateRenderTexture(this->ogreTextureName);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 /// Save the sensor info in XML format
-void CameraSensor::SaveChild(std::string &prefix, std::ostream &stream)
+void CameraSensor::Save(std::string &prefix, std::ostream &stream)
 {
+  Sensor::Save(prefix, stream);
   std::string p = prefix + "  ";
   this->camera->Save(p, stream);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Initialize the camera
-void CameraSensor::InitChild()
+void CameraSensor::Init()
 {
-  // NATY: Put this back in!!
-  // this->camera->SetSceneNode( this->GetVisualNode()->GetSceneNode() );
+  Sensor::Init();
   this->camera->Init();
+
+  // Create the render texture
+  this->ogreTextureName = this->GetName() + "_RttTex";
+  this->camera->CreateRenderTexture(this->ogreTextureName);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Finalize the camera
-void CameraSensor::FiniChild()
+void CameraSensor::Fini()
 {
+  Sensor::Fini();
   this->camera->Fini();
 }
 
@@ -111,21 +115,22 @@ void CameraSensor::SetActive(bool value)
 // Render new data
 void CameraSensor::Render()
 {
-  /*
-  if (this->active || **this->alwaysActiveP)
+  //if (this->active || **this->alwaysActiveP)
   {
-    this->lastUpdate = this->GetWorld()->GetSimTime();
-    this->camera->Render();
-    this->camera->PostRender();
+    //this->lastUpdate = this->GetWorld()->GetSimTime();
+    //this->camera->Render();
+    //this->camera->PostRender();
   }
-  */
+  
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // Update the drawing
-void CameraSensor::Update()
+void CameraSensor::Update(bool force)
 {
-  Sensor::Update();
+  Sensor::Update(force);
+  this->camera->Render();
+  this->camera->PostRender();
 
   // NATY
   //if (this->active || **this->alwaysActiveP)

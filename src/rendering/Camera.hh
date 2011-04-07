@@ -262,6 +262,8 @@ namespace gazebo
       /// \brief Get the visibility mask
       public: unsigned int GetVisibilityMask() const;
   
+      public: void SetRenderTarget( Ogre::RenderTarget *target );
+
       /// \brief if user requests bayer image, post process rgb from ogre to generate bayer formats
       private: void ConvertRGBToBAYER(unsigned char* dst, unsigned char* src, std::string format,int width, int height);
   
@@ -321,8 +323,8 @@ namespace gazebo
       protected: common::Time lastUpdate;
   
       protected: Scene *scene;
-      private: event::ConnectionPtr showWireframeConnection;
   
+      protected: std::vector<event::ConnectionPtr> connections;
       private: friend class Scene;
     };
     

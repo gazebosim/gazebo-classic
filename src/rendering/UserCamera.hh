@@ -59,7 +59,7 @@ namespace gazebo
       public: void Init();
   
       /// \brief Render the camera
-      public: virtual void Render();
+      public: virtual void Update();
   
       /// \brief Post render
       public: virtual void PostRender();
@@ -105,7 +105,6 @@ namespace gazebo
   
       private: ViewController *viewController;
   
-      private: std::vector<event::ConnectionPtr> connections;
       private: Ogre::AnimationState *animState;
     };
   }

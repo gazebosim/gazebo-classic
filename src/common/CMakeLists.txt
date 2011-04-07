@@ -75,7 +75,6 @@ set ( headers Messages.hh
               Quatern.hh
               Rand.hh
               SingletonT.hh
-              StaticPluginRegister.hh
               STLLoader.hh
               Time.hh
               Timer.hh

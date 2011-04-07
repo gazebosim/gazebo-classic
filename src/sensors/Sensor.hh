@@ -22,6 +22,9 @@
 #ifndef SENSOR_HH
 #define SENSOR_HH
 
+#include <vector>
+
+#include "common/Events.hh"
 #include "common/Time.hh"
 #include "common/Param.hh"
 #include "common/Pose3d.hh"
@@ -55,17 +58,14 @@ namespace gazebo
       /// \brief Save the sensor info in XML format
       public: void Save(std::string &prefix, std::ostream &stream);
   
-      /// \brief Child save function
-      protected: virtual void SaveChild(std::string &prefix,std::ostream &stream) {}
-    
       /// \brief  Initialize the sensor
-      public: void Init();
+      public: virtual void Init();
     
       /// \brief  Update the sensor
-      public: virtual void Update();
+      public: virtual void Update(bool force);
     
       /// \brief  Finalize the sensor
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Get name 
       public: std::string GetName() const;
@@ -80,12 +80,6 @@ namespace gazebo
       public: virtual void SetActive(bool value);
 
       public: bool IsActive();
-  
-      /// \brief  Initialize the child
-      protected: virtual void InitChild() {};
-    
-      /// \brief Finalize the child
-      protected: virtual void FiniChild() {};
     
       /// \brief Load a controller for this sensor
       /// \param node XML configure parameter node
@@ -105,8 +99,9 @@ namespace gazebo
       protected: common::ParamT<bool> *alwaysActiveP;
       protected: std::vector<common::Param*> parameters;
 
-      protected: common::Time updatePeriod;
       protected: std::string typeName;
+
+      protected: std::vector<event::ConnectionPtr> connections;
     };
     /// \}
   }

@@ -21,6 +21,7 @@
 #include <wx/treectrl.h>
 
 #include "common/Event.hh"
+#include "rendering/RenderTypes.hh"
 
 class wxAuiManager;
 class wxAuiManagerEvent;
@@ -29,11 +30,6 @@ class wxPropertyGridEvent;
 
 namespace gazebo
 {
-  namespace rendering
-  {
-    class Scene;
-  }
-
 	namespace gui
   {
     class RenderPanel;
@@ -50,7 +46,7 @@ namespace gazebo
       public: virtual ~SimulationFrame();
   
       /// \brief Create the cameras
-      public: void ViewScene(rendering::Scene *scene);
+      public: void ViewScene(rendering::ScenePtr scene);
   
       public: void Init();
   

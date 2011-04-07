@@ -36,6 +36,7 @@ Sensor::Sensor()
   this->active = true;
 
   common::Param::Begin(&this->parameters);
+  this->nameP = new common::ParamT<std::string>("name", "sensor_default_name",0);
   this->updateRateP = new common::ParamT<double>("update_rate", 0, 0);
   this->alwaysActiveP = new common::ParamT<bool>("always_active", false, 0);
   common::Param::End();
@@ -45,6 +46,8 @@ Sensor::Sensor()
 // Destructor
 Sensor::~Sensor()
 {
+  std::cout << "DELETE SENSOR!!\n";
+  delete this->nameP;
   delete this->updateRateP;
   delete this->alwaysActiveP;
 }
@@ -56,19 +59,6 @@ void Sensor::Load(common::XMLConfigNode *node)
   this->nameP->Load(node);
   this->updateRateP->Load(node);
   this->alwaysActiveP->Load(node);
-
-  if (**(this->updateRateP) == 0)
-    this->updatePeriod = 0.0;
-  else
-    this->updatePeriod = 1.0 / **(updateRateP);
-
-  this->LoadController( node->GetChild("controller") );
-
-  double updateRate  = node->GetDouble("updateRate", 0, 0);
-  if (updateRate == 0)
-    this->updatePeriod = 0.0; // no throttling if updateRate is 0
-  else
-    this->updatePeriod = 1.0 / updateRate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,8 +71,6 @@ void Sensor::Save(std::string &prefix, std::ostream &stream)
 
   stream << prefix << *(this->updateRateP) << "\n";
 
-  this->SaveChild(prefix, stream);
-
   stream << prefix << "</sensor:" << this->typeName << ">\n";
 }
  
@@ -90,12 +78,11 @@ void Sensor::Save(std::string &prefix, std::ostream &stream)
 /// Initialize the sensor
 void Sensor::Init()
 {
-  this->InitChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Update the sensor
-void Sensor::Update()
+void Sensor::Update(bool force)
 {
   //DiagnosticTimer timer("Sensor[" + this->GetName() + "] Update");
 
@@ -117,7 +104,6 @@ void Sensor::Fini()
 {
   //if (this->controller)
     //this->controller->Fini();
-  this->FiniChild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

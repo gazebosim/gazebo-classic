@@ -1,12 +1,15 @@
 include_directories( . )
 
-set (sources Sensor.cc
+set (sources Sensors.cc
+             Sensor.cc
              SensorFactory.cc
              SensorManager.cc
              CameraSensor.cc
 ) 
 
-set (headers Sensor.hh
+set (headers Sensors.hh
+             Sensor.hh
+             SensorTypes.hh
              SensorFactory.hh
              SensorManager.hh
              CameraSensor.hh
@@ -22,8 +25,10 @@ if (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 endif (CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE})
 
 target_link_libraries(gazebo_sensors gazebo_common 
+                                     gazebo_rendering
                                      ${libtool_library} 
-                                     ${boost_libraries})
+                                     ${boost_libraries}
+                                     )
 
 install ( TARGETS gazebo_sensors DESTINATION ${CMAKE_INSTALL_PREFIX}/lib )
 install (FILES ${headers} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/gazebo/sensors COMPONENT headers)

@@ -18,7 +18,6 @@
 #define WINDOWMANAGER_HH
 
 #include "common/SingletonT.hh"
-#include "common/Event.hh"
 #include <string>
 #include <vector>
 
@@ -49,8 +48,6 @@ namespace gazebo
       /// \brief Resize a window
       public: void Resize(unsigned int id, int width, int height);
   
-      public: void Render();
-
       /// \brief Get the average FPS
       public: float GetAvgFPS(unsigned int windowId);
   
@@ -60,8 +57,6 @@ namespace gazebo
       private: std::vector<Ogre::RenderWindow *> windows;
   
       private: static unsigned int windowCounter;
-  
-      private: event::ConnectionPtr renderConnection;
   
       private: friend class SingletonT<WindowManager>;
     };

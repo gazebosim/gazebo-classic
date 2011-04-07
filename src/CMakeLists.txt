@@ -30,11 +30,12 @@ add_subdirectory(sensors)
 add_dependencies( gazebo_common gazebo_msgs )
 add_dependencies( gazebo_gui gazebo_msgs )
 add_dependencies( gazebo_rendering gazebo_msgs )
+add_dependencies( gazebo_sensors gazebo_rendering )
 
 add_executable(gzserver physics_server.cc PhysicsServer.cc)
 add_executable(gzclient gui_client.cc GuiClient.cc)
 add_executable(gzmaster master.cc Master.cc)
-add_executable(gzsensor sensors.cc Sensors.cc)
+add_executable(gzsensor sensor_server.cc SensorServer.cc)
 
 target_link_libraries( gzmaster gazebo_common
                                 gazebo_transport
@@ -59,10 +60,12 @@ target_link_libraries( gzclient gazebo_common
                                 gazebo_msgs
                                 pthread)
 
-target_link_libraries( gzsensor gazebo_sensors
+target_link_libraries( gzsensor gazebo_common
                                 gazebo_transport
+                                gazebo_sensors
                                 gazebo_rendering
-                                gazebo_msgs)
+                                gazebo_msgs
+                                pthread)
                                 
 
 install (TARGETS gzmaster DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
